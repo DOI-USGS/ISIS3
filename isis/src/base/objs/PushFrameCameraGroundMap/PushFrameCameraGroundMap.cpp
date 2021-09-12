@@ -46,7 +46,7 @@ namespace Isis {
                                            const Longitude &lon) {
     PushFrameCameraDetectorMap *detectorMap = (PushFrameCameraDetectorMap *) p_camera->DetectorMap();
 
-    SurfacePoint surfacePoint(naif, lat, lon, p_camera->LocalRadius(lat, lon));
+    SurfacePoint surfacePoint(naif, lat, lon, p_camera->LocalRadius(naif, lat, lon));
 
     // Get ending bounding framelets and distances for iterative loop to minimize the spacecraft distance
     int startFramelet = 1;

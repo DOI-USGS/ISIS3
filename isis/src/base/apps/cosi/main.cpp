@@ -30,7 +30,7 @@ void divide(Buffer &in, Buffer &out) {
         out[i] = in[i];
       }
       else {
-        double incidence = cam->IncidenceAngle();
+        double incidence = cam->IncidenceAngle(naif);
         if(abs(incidence) >= maxinc) {
           out[i] = Isis::Null;
         }

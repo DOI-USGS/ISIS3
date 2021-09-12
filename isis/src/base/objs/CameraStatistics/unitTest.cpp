@@ -13,6 +13,8 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   try {
     cout << "UnitTest for Camera Statistics" << endl;
@@ -21,7 +23,7 @@ int main(int argc, char *argv[]) {
     Camera *cam = cube.camera();
     cout << setprecision(6);
 
-    CameraStatistics camStats(cam, 1, 1);
+    CameraStatistics camStats(naif, cam, 1, 1);
     Pvl statsPvl = camStats.toPvl();
     cout << endl;
 

@@ -49,6 +49,8 @@ namespace Isis {
       }
     }
 
+    auto naif = NaifContext::acquire();
+
     // Copy over POD values
     copy(pointObject, "PointId",
          m_pointData, &ControlNetFileProtoV0001_PBControlPoint::set_id);
@@ -78,7 +80,7 @@ namespace Isis {
     if ( pointObject.hasKeyword("Latitude")
          && pointObject.hasKeyword("Longitude")
          && pointObject.hasKeyword("Radius") ) {
-      SurfacePoint adjustedPoint(
+      SurfacePoint adjustedPoint(naif,
           Latitude(toDouble(pointObject["Latitude"][0]), Angle::Degrees),
           Longitude(toDouble(pointObject["Longitude"][0]), Angle::Degrees),
           Distance(toDouble(pointObject["Radius"][0]), Distance::Meters));
@@ -99,7 +101,7 @@ namespace Isis {
     if ( pointObject.hasKeyword("AprioriLatitude")
          && pointObject.hasKeyword("AprioriLongitude")
          && pointObject.hasKeyword("AprioriRadius") ) {
-      SurfacePoint aprioriPoint(
+      SurfacePoint aprioriPoint(naif,
           Latitude(toDouble(pointObject["AprioriLatitude"][0]), Angle::Degrees),
           Longitude(toDouble(pointObject["AprioriLongitude"][0]), Angle::Degrees),
           Distance(toDouble(pointObject["AprioriRadius"][0]), Distance::Meters));
@@ -278,10 +280,12 @@ namespace Isis {
       }
 
       SurfacePoint aprioriPoint;
-      aprioriPoint.SetRectangular( Displacement(m_pointData->apriorix(), Displacement::Meters),
+      aprioriPoint.SetRectangular( naif,
+                                   Displacement(m_pointData->apriorix(), Displacement::Meters),
                                    Displacement(m_pointData->aprioriy(), Displacement::Meters),
                                    Displacement(m_pointData->aprioriz(), Displacement::Meters) );
-      aprioriPoint.SetSphericalSigmasDistance( Distance(sigmaLat, Distance::Meters),
+      aprioriPoint.SetSphericalSigmasDistance( naif,
+                                               Distance(sigmaLat, Distance::Meters),
                                                Distance(sigmaLon, Distance::Meters),
                                                Distance(sigmaRad, Distance::Meters) );
       m_pointData->add_aprioricovar( aprioriPoint.GetRectangularMatrix()(0, 0) );
@@ -337,10 +341,12 @@ namespace Isis {
       }
 
       SurfacePoint adjustedPoint;
-      adjustedPoint.SetRectangular( Displacement(m_pointData->adjustedx(), Displacement::Meters),
+      adjustedPoint.SetRectangular( naif,
+                                    Displacement(m_pointData->adjustedx(), Displacement::Meters),
                                     Displacement(m_pointData->adjustedy(), Displacement::Meters),
                                     Displacement(m_pointData->adjustedz(), Displacement::Meters) );
-      adjustedPoint.SetSphericalSigmasDistance( Distance(sigmaLat, Distance::Meters),
+      adjustedPoint.SetSphericalSigmasDistance( naif,
+                                                Distance(sigmaLat, Distance::Meters),
                                                 Distance(sigmaLon, Distance::Meters),
                                                 Distance(sigmaRad, Distance::Meters) );
       m_pointData->add_adjustedcovar( adjustedPoint.GetRectangularMatrix()(0, 0) );

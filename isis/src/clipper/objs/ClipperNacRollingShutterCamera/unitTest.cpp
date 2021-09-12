@@ -52,6 +52,8 @@ void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif);
 // and SetImage will fail. 
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   qDebug() << "Unit Test for ClipperNacRollingShutterCamera...";
   try {
@@ -82,22 +84,22 @@ int main(void) {
     // Test all four corners to make sure the conversions are right
     // The actual four corners are not on the body, so shifting a little
     qDebug() << "For upper left corner ...";
-    TestLineSamp(cam, 145.0, 161.0);
+    TestLineSamp(cam, 145.0, 161.0, naif);
 
     qDebug() << "For upper right corner ...";
-    TestLineSamp(cam, 3655.0, 157.0);
+    TestLineSamp(cam, 3655.0, 157.0, naif);
 
     qDebug() << "For lower left corner ...";
-    TestLineSamp(cam, 289, 1767);
+    TestLineSamp(cam, 289, 1767, naif);
 
     qDebug() << "For lower right corner ...";
-    TestLineSamp(cam, 3767, 1579);
+    TestLineSamp(cam, 3767, 1579, naif);
 
     double samp = cam->Samples() / 2;
     double line = cam->Lines() / 2;
     qDebug() << "For center pixel position ...";
 
-    if(!cam->SetImage(samp, line)) {
+    if(!cam->SetImage(samp, line, naif)) {
       qDebug() << "ERROR";
       return 0;
     }

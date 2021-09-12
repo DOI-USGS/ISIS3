@@ -29,6 +29,8 @@ using namespace Isis;
 
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   qDebug() << "Unit Test for PushFrameCameraCcdLayout::FrameletInfo...";
   qDebug() << "";
@@ -63,26 +65,26 @@ int main(void) {
     qDebug() << "Create a default PushFrameCameraCcdLayout";
     PushFrameCameraCcdLayout defaultLayout;
     qDebug() << "Try adding a kernel that does not exist";
-    bool loaded = defaultLayout.addKernel("not_a_kernel_file");
+    bool loaded = defaultLayout.addKernel(naif, "not_a_kernel_file");
     qDebug() << "Kernel file loaded?" << loaded;
     qDebug() << "";
 
     qDebug() << "Create the JunoCam layout";
     PushFrameCameraCcdLayout junoLayout(-61500);
     qDebug() << "Load the JunoCam kernels";
-    if (!junoLayout.addKernel("$juno/kernels/ik/juno_junocam_v??.ti")) {
+    if (!junoLayout.addKernel(naif, "$juno/kernels/ik/juno_junocam_v??.ti")) {
       QString msg = "Failed to load the JunoCam Instrument Kernel.";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
-    if (!junoLayout.addKernel("$juno/kernels/iak/junoAddendum???.ti")) {
+    if (!junoLayout.addKernel(naif, "$juno/kernels/iak/junoAddendum???.ti")) {
       QString msg = "Failed to load the JunoCam Instrument Addendum.";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
-    qDebug() << "JunoCam CCD samples:" << junoLayout.ccdSamples();
-    qDebug() << "JunoCam CCD lines:" << junoLayout.ccdLines();
+    qDebug() << "JunoCam CCD samples:" << junoLayout.ccdSamples(naif);
+    qDebug() << "JunoCam CCD lines:" << junoLayout.ccdLines(naif);
     qDebug() << "";
     qDebug() << "Get the METHANE filter layout";
-    PushFrameCameraCcdLayout::FrameletInfo methane_info = junoLayout.getFrameInfo(-61504);
+    PushFrameCameraCcdLayout::FrameletInfo methane_info = junoLayout.getFrameInfo(naif, -61504);
     qDebug() << "METHANE filter ID:" << methane_info.m_frameId;
     qDebug() << "METHANE filter name:" << methane_info.m_filterName;
     qDebug() << "METHANE filter start sample:" << methane_info.m_startSample;
@@ -91,7 +93,7 @@ int main(void) {
     qDebug() << "METHANE filter lines:" << methane_info.m_lines;
     qDebug() << "";
     qDebug() << "Get the METHANE filter layout but give it a different name";
-    PushFrameCameraCcdLayout::FrameletInfo named_info = junoLayout.getFrameInfo(-61504, "methane");
+    PushFrameCameraCcdLayout::FrameletInfo named_info = junoLayout.getFrameInfo(naif, -61504, "methane");
     qDebug() << "METHANE filter ID:" << named_info.m_frameId;
     qDebug() << "METHANE filter name:" << named_info.m_filterName;
     qDebug() << "METHANE filter start sample:" << named_info.m_startSample;
@@ -101,7 +103,7 @@ int main(void) {
     qDebug() << "";
     qDebug() << "Attempt to get the layout for a filter that doesn't exist";
     try {
-      junoLayout.getFrameInfo(-61509);
+      junoLayout.getFrameInfo(naif, -61509);
     }
     catch(IException &e) {
       e.print();

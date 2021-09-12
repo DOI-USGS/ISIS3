@@ -300,7 +300,8 @@ namespace Isis {
    * @param minLat The minimum latitude of the grid.
    * @param maxLat The maximum latitude of the grid.
    */
-  void MosaicGridTool::setLatExtents(GridExtentSource source,
+  void MosaicGridTool::setLatExtents(NaifContextPtr naif,
+                                     GridExtentSource source,
                                      Latitude minLat = Latitude(),
                                      Latitude maxLat = Latitude()) {
     m_latExtents = source;
@@ -325,8 +326,8 @@ namespace Isis {
       switch (source) {
 
         case Map:
-          m_minLat = Latitude(tproj->MinimumLatitude(), mappingGroup, Angle::Degrees);
-          m_maxLat = Latitude(tproj->MaximumLatitude(), mappingGroup,  Angle::Degrees);
+          m_minLat = Latitude(naif, tproj->MinimumLatitude(), mappingGroup, Angle::Degrees);
+          m_maxLat = Latitude(naif, tproj->MaximumLatitude(), mappingGroup,  Angle::Degrees);
           break;
 
         case Cubes:
@@ -357,26 +358,26 @@ namespace Isis {
           }
 
           if (cubeRectWorked) {
-            m_minLat = Latitude(std::min(std::min(topLeft, topRight),
+            m_minLat = Latitude(naif, std::min(std::min(topLeft, topRight),
                                         std::min(bottomLeft, bottomRight)), mappingGroup,
                                 Angle::Degrees);
-            m_maxLat = Latitude(std::max(std::max(topLeft, topRight),
+            m_maxLat = Latitude(naif, std::max(std::max(topLeft, topRight),
                                         std::max(bottomLeft, bottomRight)), mappingGroup,
                                 Angle::Degrees);
 
             if (tproj->SetUniversalGround(-90.0, 0) &&
                 boundingRect.contains(QPointF(tproj->XCoord(), -tproj->YCoord()))) {
-              m_minLat = Latitude(-90.0, mappingGroup, Angle::Degrees);
+              m_minLat = Latitude(naif, -90.0, mappingGroup, Angle::Degrees);
             }
 
             if (tproj->SetUniversalGround(90.0, 0) &&
                 boundingRect.contains(QPointF(tproj->XCoord(), -tproj->YCoord()))) {
-              m_maxLat = Latitude(90.0, mappingGroup, Angle::Degrees);
+              m_maxLat = Latitude(naif, 90.0, mappingGroup, Angle::Degrees);
             }
           }
           else {
-            m_minLat = Latitude(-90, mappingGroup, Angle::Degrees);
-            m_maxLat = Latitude(90, mappingGroup, Angle::Degrees);
+            m_minLat = Latitude(naif, -90, mappingGroup, Angle::Degrees);
+            m_maxLat = Latitude(naif, 90, mappingGroup, Angle::Degrees);
             m_latExtents = Manual;
 
             static Projection *lastProjWithThisError = NULL;
@@ -398,8 +399,8 @@ namespace Isis {
           break;
 
         default:
-          m_minLat = Latitude(tproj->MinimumLatitude(), mappingGroup, Angle::Degrees);
-          m_maxLat = Latitude(tproj->MaximumLatitude(), mappingGroup, Angle::Degrees);
+          m_minLat = Latitude(naif, tproj->MinimumLatitude(), mappingGroup, Angle::Degrees);
+          m_maxLat = Latitude(naif, tproj->MaximumLatitude(), mappingGroup, Angle::Degrees);
       }
     }
   }
@@ -727,7 +728,9 @@ namespace Isis {
 
       if (!boundingRect.isNull()) {
 
-        setLatExtents(m_latExtents, m_minLat, m_maxLat);
+        auto naif = NaifContext::acquire();
+
+        setLatExtents(naif, m_latExtents, m_minLat, m_maxLat);
         setLonExtents(m_lonExtents, m_minLon, m_maxLon);
 
         double latRange = m_maxLat.degrees() - m_minLat.degrees();
@@ -813,12 +816,14 @@ namespace Isis {
     // If Projection changed from a file, force extents to come from 
     // the new map file
     m_latExtents = Map;
-    m_lonExtents = Map; 
+    m_lonExtents = Map;
+
+    auto naif = NaifContext::acquire();
 
     Latitude minLat = Latitude(tproj->MinimumLatitude(), Angle::Degrees);
     Latitude maxLat = Latitude(tproj->MaximumLatitude(), Angle::Degrees);
     
-    setLatExtents(m_latExtents, minLat, maxLat);
+    setLatExtents(naif, m_latExtents, minLat, maxLat);
   
     Longitude minLon = Longitude(tproj->MinimumLongitude(), Angle::Degrees);
     Longitude maxLon = Longitude(tproj->MaximumLongitude(), Angle::Degrees);
@@ -852,7 +857,8 @@ namespace Isis {
 
     
     if (m_minLon.degrees() < m_maxLon.degrees() && m_minLat.degrees() < m_maxLat.degrees()) {
-      m_gridItem = new GridGraphicsItem(m_baseLat, m_baseLon, m_latInc, m_lonInc, getWidget(),
+      auto naif = NaifContext::acquire();
+      m_gridItem = new GridGraphicsItem(naif, m_baseLat, m_baseLon, m_latInc, m_lonInc, getWidget(),
                                         m_density, m_minLat, m_maxLat, m_minLon, m_maxLon);
     }
     

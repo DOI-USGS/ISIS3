@@ -13,6 +13,8 @@ void PrintResults(PvlGroup &grp);
 
 int main() {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   // The class being tested
   CameraPointInfo cpi;
@@ -22,11 +24,11 @@ int main() {
   // under normal usage FileName is always included
 
   cpi.SetCube("$base/testData/CameraPointInfo/unitTest1.cub");
-  PvlGroup *grp = cpi.SetImage(1, 1);
+  PvlGroup *grp = cpi.SetImage(naif, 1, 1);
   PrintResults(*grp);
 
   cpi.SetCube("$base/testData/CameraPointInfo/unitTest1.cub");
-  PvlGroup *too = cpi.SetGround(-84.5, 15.0);
+  PvlGroup *too = cpi.SetGround(naif, -84.5, 15.0);
   PrintResults(*too);
 
   // We have ownership, so, delete

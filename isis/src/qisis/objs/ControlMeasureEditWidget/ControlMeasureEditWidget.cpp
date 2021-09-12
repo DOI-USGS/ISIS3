@@ -842,7 +842,8 @@ namespace Isis {
     }
     else {
       try {
-        m_rightChip->Load(*m_rightCube, *m_leftChip, *m_leftCube);
+        auto naif = NaifContext::acquire();
+        m_rightChip->Load(naif, *m_rightCube, *m_leftChip, *m_leftCube);
 
       }
       catch (IException &e) {
@@ -885,8 +886,10 @@ namespace Isis {
     m_leftSampLinePosition->setText(pos);
 
     if (m_useGeometry) {
+      auto naif = NaifContext::acquire();
+
       //  Get lat/lon from point in left
-      m_leftGroundMap->SetImage(m_leftView->tackSample(), m_leftView->tackLine());
+      m_leftGroundMap->SetImage(m_leftView->tackSample(), m_leftView->tackLine(), naif);
       double lat = m_leftGroundMap->UniversalLatitude();
       double lon = m_leftGroundMap->UniversalLongitude();
 
@@ -935,7 +938,8 @@ namespace Isis {
 
     if (m_useGeometry) {
       //  Get lat/lon from point in right
-      m_rightGroundMap->SetImage(m_rightView->tackSample(), m_rightView->tackLine());
+      auto naif = NaifContext::acquire();
+      m_rightGroundMap->SetImage(m_rightView->tackSample(), m_rightView->tackLine(), naif);
       double lat = m_rightGroundMap->UniversalLatitude();
       double lon = m_rightGroundMap->UniversalLongitude();
 
@@ -977,13 +981,15 @@ namespace Isis {
    */
   void ControlMeasureEditWidget::findPoint() {
 
+    auto naif = NaifContext::acquire();
+
     //  Get lat/lon from point in left
-    m_leftGroundMap->SetImage(m_leftView->tackSample(), m_leftView->tackLine());
+    m_leftGroundMap->SetImage(m_leftView->tackSample(), m_leftView->tackLine(), naif);
     double lat = m_leftGroundMap->UniversalLatitude();
     double lon = m_leftGroundMap->UniversalLongitude();
 
     //  Reload right chipViewport with this new tack point.
-    if ( m_rightGroundMap->SetUniversalGround(lat, lon) ) {
+    if ( m_rightGroundMap->SetUniversalGround(naif, lat, lon) ) {
       emit updateRightView(m_rightGroundMap->Sample(), m_rightGroundMap->Line());
 
       //  If moving from saved measure, turn save button to red
@@ -1077,7 +1083,8 @@ namespace Isis {
                           m_rightMeasure->GetSample(),
                           m_rightMeasure->GetLine());
       if (m_useGeometry) {
-        m_autoRegFact->SearchChip()->Load(*m_rightCube,
+        auto naif = NaifContext::acquire();
+        m_autoRegFact->SearchChip()->Load(naif, *m_rightCube,
                             *(m_autoRegFact->PatternChip()), *m_leftCube);
       }
       else {

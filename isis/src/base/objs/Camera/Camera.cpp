@@ -316,7 +316,7 @@ namespace Isis {
         TProjection *tproj = (TProjection *) p_projection;
         lat = Latitude(tproj->UniversalLatitude(), Angle::Degrees);
         lon = Longitude(tproj->UniversalLongitude(), Angle::Degrees);
-        rad = Distance(LocalRadius(lat, lon));
+        rad = Distance(LocalRadius(naif, lat, lon));
         if (!rad.isValid()) {
           shape->setHasIntersection(false);
           return false;
@@ -419,7 +419,7 @@ namespace Isis {
     Distance localRadius;
 
     if (shape->name() != "Plane") { // this is the normal behavior
-      localRadius = LocalRadius(latitude, longitude);
+      localRadius = LocalRadius(naif, latitude, longitude);
     }
     else {
       localRadius = Distance(latitude.degrees(),Distance::Kilometers);
@@ -873,7 +873,7 @@ namespace Isis {
       Latitude latitude(lat, Angle::Degrees);
       Longitude longitude(lon, Angle::Degrees);
       // get the local radius for the subspacecraft point
-      Distance radius(LocalRadius(latitude, longitude));
+      Distance radius(LocalRadius(naif, latitude, longitude));
       SurfacePoint testPoint;
 
       if (radius.isValid()) {
@@ -903,7 +903,7 @@ namespace Isis {
       latitude = Latitude(90, Angle::Degrees);
       longitude = Longitude(0.0, Angle::Degrees);
       // get radius for north pole
-      radius = LocalRadius(latitude, longitude);
+      radius = LocalRadius(naif, latitude, longitude);
 
       if (radius.isValid()) {
 
@@ -923,7 +923,7 @@ namespace Isis {
 
       latitude = Latitude(-90, Angle::Degrees);
       // get radius for south pole
-      radius = LocalRadius(latitude, longitude);
+      radius = LocalRadius(naif, latitude, longitude);
 
       if (radius.isValid()) {
 
@@ -1590,7 +1590,7 @@ namespace Isis {
         SurfacePoint surfacePoint = GetSurfacePoint();
         lat = surfacePoint.GetLatitude();
         lon = surfacePoint.GetLongitude();
-        radius = LocalRadius(lat, lon);
+        radius = LocalRadius(naif, lat, lon);
 
         naif->latrec_c(radius.kilometers(), lon.radians(), lat.radians(), cornerNeighborPoints[i]);
       }

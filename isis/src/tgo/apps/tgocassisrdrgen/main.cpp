@@ -19,6 +19,7 @@ using namespace std;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Check if input file is indeed, a cube
   if (ui.GetFileName("FROM").right(3) != "cub") {
@@ -102,7 +103,7 @@ void IsisMain() {
                               "observing surface.");
 
   // std PDS4 label
-  process.StandardPds4Label();
+  process.StandardPds4Label(naif);
 
   // Add PSA-specific schema
   process.addSchema("PDS4_PSA_1000.xsd",

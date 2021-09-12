@@ -72,24 +72,24 @@ namespace Isis {
   *   @history 2016-08-15 Victor Silva - Code adapted from lrowacpho written by Kris Becker
   *
   **/
-  double PhotometricFunction::compute( const double &line, const double &sample, int band, bool useDem) {
+  double PhotometricFunction::compute( NaifContextPtr naif, const double &line, const double &sample, int band, bool useDem) {
     // Update band if necessary
     if (m_camera->Band() != band) {
-       m_camera->SetBand(band);
+       m_camera->SetBand(band, naif);
     }
     // Return null if not able to set image
-    if (!m_camera->SetImage(sample, line)) {
+    if (!m_camera->SetImage(sample, line, naif)) {
       return (Null);
     }
     // calculate photometric angles
-    double i = m_camera->IncidenceAngle();
-    double e = m_camera->EmissionAngle();
-    double g = m_camera->PhaseAngle();
+    double i = m_camera->IncidenceAngle(naif);
+    double e = m_camera->EmissionAngle(naif);
+    double g = m_camera->PhaseAngle(naif);
     bool success = true;
 
     if (useDem) {
       Angle phase, incidence, emission;
-      m_camera->LocalPhotometricAngles(phase, incidence, emission, success);
+      m_camera->LocalPhotometricAngles(naif, phase, incidence, emission, success);
 
       if (success) {
         g = phase.degrees();
@@ -103,7 +103,7 @@ namespace Isis {
       return (Null);
     }
 
-    return photometry(i, e, g, band);
+    return photometry(naif, i, e, g, band);
   }
 
 

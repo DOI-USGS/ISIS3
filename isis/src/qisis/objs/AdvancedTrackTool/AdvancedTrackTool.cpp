@@ -404,7 +404,7 @@ namespace Isis {
         // Write out columns photometric angle values, only if set image succeeds
         double phase = cvp->camera()->PhaseAngle(naif);
         p_tableWin->table()->item(row, getIndex("Phase"))->setText(QString::number(phase));
-        double incidence = cvp->camera()->IncidenceAngle();
+        double incidence = cvp->camera()->IncidenceAngle(naif);
         p_tableWin->table()->item(row, getIndex("Incidence"))->setText(QString::number(incidence));
         double emission = cvp->camera()->EmissionAngle(naif);
         p_tableWin->table()->item(row, getIndex("Emission"))->setText(QString::number(emission));

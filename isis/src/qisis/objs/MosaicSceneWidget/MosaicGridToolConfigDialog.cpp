@@ -497,19 +497,20 @@ namespace Isis {
 
     if (m_tool->sceneWidget()->getProjection()) {
       PvlGroup mapGroup(m_tool->sceneWidget()->getProjection()->Mapping());
+      auto naif = NaifContext::acquire();
 
       m_tool->setShowGrid(m_showGridCheckBox->isChecked());
       m_tool->setAutoGridCheckBox(m_autoGridCheckBox->isChecked());
 
-      m_tool->setBaseLat(Latitude(baseLatitude.toDouble(),  mapGroup, Angle::Degrees));
+      m_tool->setBaseLat(Latitude(naif, baseLatitude.toDouble(),  mapGroup, Angle::Degrees));
       m_tool->setBaseLon(Longitude(baseLongitude.toDouble(), Angle::Degrees));
       m_tool->setLatInc(Angle(latitudeInc.toDouble(), Angle::Degrees));
       m_tool->setLonInc(Angle(longitudeInc.toDouble(), Angle::Degrees));
 
-      m_tool->setLatExtents((MosaicGridTool::GridExtentSource)
+      m_tool->setLatExtents(naif, (MosaicGridTool::GridExtentSource)
           m_latExtentCombo->itemData(m_latExtentCombo->currentIndex()).toInt(),
-          Latitude(minLatExtent.toDouble(), mapGroup, Angle::Degrees),
-          Latitude(maxLatExtent.toDouble(), mapGroup, Angle::Degrees));
+          Latitude(naif, minLatExtent.toDouble(), mapGroup, Angle::Degrees),
+          Latitude(naif, maxLatExtent.toDouble(), mapGroup, Angle::Degrees));
       m_tool->setLonExtents((MosaicGridTool::GridExtentSource)
           m_lonExtentCombo->itemData(m_lonExtentCombo->currentIndex()).toInt(),
           Longitude(minLonExtent.toDouble(), Angle::Degrees),

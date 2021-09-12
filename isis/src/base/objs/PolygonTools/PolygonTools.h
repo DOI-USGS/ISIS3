@@ -28,6 +28,8 @@
 
 #include <QString>
 
+#include "NaifContext.h"
+
 namespace Isis {
 
   /**
@@ -145,7 +147,7 @@ namespace Isis {
       static geos::geom::MultiPolygon *XYToLatLon(
         const geos::geom::MultiPolygon &xYPoly, TProjection *proj);
 
-      static geos::geom::MultiPolygon *LatLonToSampleLine(
+      static geos::geom::MultiPolygon *LatLonToSampleLine(NaifContextPtr naif,
         const geos::geom::MultiPolygon &lonLatPoly, UniversalGroundMap *ugm);
 
       // Return a deep copy of a multpolygon

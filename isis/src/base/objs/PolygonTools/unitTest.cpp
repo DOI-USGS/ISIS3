@@ -145,7 +145,7 @@ int main() {
 
     geos::geom::MultiPolygon *llmPolygon = Isis::globalFactory->createMultiPolygon(llpolys);
 
-    geos::geom::MultiPolygon *slmPolygon = PolygonTools::LatLonToSampleLine(*llmPolygon, &ugm);
+    geos::geom::MultiPolygon *slmPolygon = PolygonTools::LatLonToSampleLine(naif, *llmPolygon, &ugm);
     cout << "Coordinates of Sample/Line polygon:" <<
         PolygonTools::ReducePrecision(slmPolygon, 2)->toString() << endl;
 
@@ -166,7 +166,7 @@ int main() {
 
     geos::geom::MultiPolygon *llmPolygon2 = Isis::globalFactory->createMultiPolygon(llpolys2);
 
-    geos::geom::MultiPolygon *slmPolygon2 = PolygonTools::LatLonToSampleLine(*llmPolygon2, &ugm);
+    geos::geom::MultiPolygon *slmPolygon2 = PolygonTools::LatLonToSampleLine(naif, *llmPolygon2, &ugm);
     cout << "Coordinates of Sample/Line polygon:" <<
         PolygonTools::ReducePrecision(slmPolygon2, 2)->toString() << endl;
 

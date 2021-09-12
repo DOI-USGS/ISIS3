@@ -167,6 +167,7 @@ namespace Isis {
     text = "L " + text;
     p_lineLabel->setText(text);
 
+    auto naif = NaifContext::acquire();
 
     // Do we have a projection?
     if(cvp->projection() != NULL) {
@@ -202,7 +203,7 @@ namespace Isis {
       p_latLabel->show();
       p_lonLabel->show();
 
-      if(cvp->camera()->SetImage(sample, line)) {
+      if(cvp->camera()->SetImage(sample, line, naif)) {
         if (cvp->camera()->target()->shape()->name() != "Plane") {
           double lat = cvp->camera()->UniversalLatitude();
           double lon = cvp->camera()->UniversalLongitude();

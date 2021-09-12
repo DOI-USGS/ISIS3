@@ -289,7 +289,7 @@ namespace Isis {
 
         gp->findKeyword("Phase").setValue(toString(camera()->PhaseAngle(naif)));
         gp->findKeyword("Phase").addComment("Illumination and Other");
-        gp->findKeyword("Incidence").setValue(toString(camera()->IncidenceAngle()));
+        gp->findKeyword("Incidence").setValue(toString(camera()->IncidenceAngle(naif)));
         gp->findKeyword("Emission").setValue(toString(camera()->EmissionAngle(naif)));
 
         gp->findKeyword("EphemerisTime").setValue(toString(camera()->time().Et()), "seconds");

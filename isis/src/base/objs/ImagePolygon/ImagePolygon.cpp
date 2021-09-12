@@ -114,7 +114,7 @@ namespace Isis {
   Camera * ImagePolygon::initCube(NaifContextPtr naif, Cube &cube, int ss, int sl,
                                   int ns, int nl, int band) {
     p_gMap = new UniversalGroundMap(cube);
-    p_gMap->SetBand(band);
+    p_gMap->SetBand(band, naif);
 
     p_cube = &cube;
 
@@ -812,7 +812,7 @@ namespace Isis {
     bool hasNorthPole = false;
     bool hasSouthPole = false;
 
-    if (p_gMap->SetUniversalGround(90, 0)) {
+    if (p_gMap->SetUniversalGround(naif, 90, 0)) {
       double nPoleSample = Null;
       double nPoleLine = Null;
 
@@ -832,7 +832,7 @@ namespace Isis {
       }
     }
 
-    if (p_gMap->SetUniversalGround(-90, 0)) {
+    if (p_gMap->SetUniversalGround(naif, -90, 0)) {
       double sPoleSample = Null;
       double sPoleLine = Null;
 
@@ -862,7 +862,7 @@ namespace Isis {
     }
 
     if (hasNorthPole) {
-      p_gMap->SetUniversalGround(90, 0);
+      p_gMap->SetUniversalGround(naif, 90, 0);
 
       // If the (north) pole is settable but not within proper angles,
       //  then the polygon does not contain the (north) pole when the cube does
@@ -871,12 +871,12 @@ namespace Isis {
         return;
       }
       if (p_gMap->Camera() &&
-         p_gMap->Camera()->IncidenceAngle() > p_incidence) {
+         p_gMap->Camera()->IncidenceAngle(naif) > p_incidence) {
         return;
       }
     }
     else if (hasSouthPole) {
-      p_gMap->SetUniversalGround(-90, 0);
+      p_gMap->SetUniversalGround(naif, -90, 0);
 
       // If the (south) pole is settable but not within proper angles,
       //  then the polygon does not contain the (south) pole when the cube does
@@ -885,7 +885,7 @@ namespace Isis {
         return;
       }
       if (p_gMap->Camera() &&
-         p_gMap->Camera()->IncidenceAngle() > p_incidence) {
+         p_gMap->Camera()->IncidenceAngle(naif) > p_incidence) {
         return;
       }
     }
@@ -1054,7 +1054,7 @@ namespace Isis {
   bool ImagePolygon::SetImage(NaifContextPtr naif, const double sample, const double line) {
     bool found = false;
     if (!p_isProjected) {
-      found = p_gMap->SetImage(sample, line);
+      found = p_gMap->SetImage(sample, line, naif);
       if (!found) {
         return false;
       }
@@ -1066,7 +1066,7 @@ namespace Isis {
             return false;
           }
           if (p_gMap->Camera() &&
-             p_gMap->Camera()->IncidenceAngle() > p_incidence) {
+             p_gMap->Camera()->IncidenceAngle(naif) > p_incidence) {
             return false;
           }
         }
@@ -1101,7 +1101,7 @@ namespace Isis {
         return false;
       }
       else {
-        return p_gMap->SetImage(sample, line);
+        return p_gMap->SetImage(sample, line, naif);
       }
     }
   }

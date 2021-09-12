@@ -55,12 +55,12 @@ namespace Isis {
        * @brief Create Hilier photometric object
        *
        */
-      Hillier (PvlObject &pvl, Cube &cube, bool useCamera) : PhotometricFunction(pvl, cube, useCamera) {init(pvl, cube);};
+      Hillier (NaifContextPtr naif, PvlObject &pvl, Cube &cube, bool useCamera) : PhotometricFunction(pvl, cube, useCamera) {init(naif, pvl, cube);};
 
       //! Destructor
       virtual ~Hillier() {};
 
-      double photometry(double i, double e, double g, int band = 1) const;
+      double photometry(NaifContextPtr naif, double i, double e, double g, int band = 1) const override;
       void report(PvlContainer &pvl);
 
     private:
@@ -89,12 +89,12 @@ namespace Isis {
       std::vector<DbProfile> m_profiles;
       std::vector<Parameters> m_bandpho;
 
-      void init(PvlObject &pvl, Cube &cube);
+      void init(NaifContextPtr naif, PvlObject &pvl, Cube &cube);
 
-      virtual double photometry(const Parameters &parms, double i, double e,double g) const;
+      virtual double photometry(NaifContextPtr naif, const Parameters &parms, double i, double e,double g) const;
 
-      Parameters findParameters(const double wavelength) const;
-      Parameters extract(const DbProfile &profile) const;
+      Parameters findParameters(NaifContextPtr naif, const double wavelength) const;
+      Parameters extract(NaifContextPtr naif, const DbProfile &profile) const;
   };
 
 };

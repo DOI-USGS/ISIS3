@@ -1786,7 +1786,7 @@ void IsisMain() {
   if (angleSource == "CENTER_FROM_IMAGE") {
     cam->SetImage(cam->Samples()/2, cam->Lines()/2);
     centerPhase = cam->PhaseAngle();
-    centerIncidence = cam->IncidenceAngle();
+    centerIncidence = cam->IncidenceAngle(naif);
     centerEmission = cam->EmissionAngle();
   }
   else if (angleSource == "CENTER_FROM_LABEL") {
@@ -1904,7 +1904,7 @@ void photomet(Buffer &in, Buffer &out) {
       } else {
         // calculate photometric angles
         ellipsoidpha = cam->PhaseAngle();
-        ellipsoidinc = cam->IncidenceAngle();
+        ellipsoidinc = cam->IncidenceAngle(naif);
         ellipsoidema = cam->EmissionAngle();
         if (angleSource == "DEM") {
           Angle phase, incidence, emission;
@@ -1942,7 +1942,7 @@ void photomet(Buffer &in, Buffer &out) {
       //success = false;
     }
     else {
-      trimInc = cam->IncidenceAngle();
+      trimInc = cam->IncidenceAngle(naif);
       trimEma = cam->EmissionAngle();
     }
 

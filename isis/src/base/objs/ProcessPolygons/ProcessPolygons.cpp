@@ -35,7 +35,8 @@ namespace Isis {
    * @param lines
    * @param values
    */
-  void ProcessPolygons::Rasterize(std::vector<double> &samples,
+  void ProcessPolygons::Rasterize(NaifContextPtr naif,
+                                  std::vector<double> &samples,
                                   std::vector<double> &lines,
                                   std::vector<double> &values) {
 
@@ -56,7 +57,8 @@ namespace Isis {
    * @param band
    * @param value
    */
-  void ProcessPolygons::Rasterize(std::vector<double> &samples,
+  void ProcessPolygons::Rasterize(NaifContextPtr naif,
+                                  std::vector<double> &samples,
                                   std::vector<double> &lines,
                                   int &band, double &value) {
 

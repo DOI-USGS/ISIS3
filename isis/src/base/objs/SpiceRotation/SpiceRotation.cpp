@@ -29,7 +29,7 @@ using json = nlohmann::json;
 // Temporary declarations for bindings for Naif supportlib routines
 
 // These three declarations should be removed once supportlib is in Isis3
-extern int ck3sdn(NaifContextPtr naif, double sdntol, bool avflag, int *nrec,
+extern int ck3sdn(Isis::NaifContextPtr naif, double sdntol, bool avflag, int *nrec,
                   double *sclkdp, double *quats, double *avvs,
                   int nints, double *starts, double *dparr,
                   int *intarr);

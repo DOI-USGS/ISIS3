@@ -10,6 +10,8 @@
 #include "SpiceRotation.h"
 #include "Table.h"
 
+#include "NaifContextCast.h"
+
 // Declarations for bindings for Naif Spicelib routines that do not have
 // a wrapper
 extern int bodeul_(integer *body, doublereal *et, doublereal *ra,
@@ -24,6 +26,8 @@ using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   cout << setprecision(8);
   cout << "Unit test for SpiceRotation" << endl;
@@ -33,7 +37,7 @@ int main(int argc, char *argv[]) {
   // Load kernels to allow testing of various SpiceRotation sources
   FileName f("$base/testData/kernels");
   QString dir = f.expanded() + "/";
-  QString naif (dir + "naif0007.tls");
+  QString naif0007 (dir + "naif0007.tls");
   QString mgs(dir + "MGS_SCLKSCET.00045.tsc");
   QString mocti(dir + "moc13.ti");
   QString mocbc(dir + "moc.bc");
@@ -44,23 +48,23 @@ int main(int argc, char *argv[]) {
   QString cgCK(dir + "CATT_DV_145_02_______00216.BC");
   //QString mocadd(dir+"mocAddendum.ti");
   QString mocspice(dir + "mocSpiceRotationUnitTest.ti");
-  furnsh_c(naif.toLatin1().data());
-  furnsh_c(mgs.toLatin1().data());
-  furnsh_c(mocti.toLatin1().data());
-  furnsh_c(mocbc.toLatin1().data());
-  furnsh_c(mocbsp.toLatin1().data());
-  furnsh_c(de.toLatin1().data());
-  furnsh_c(pck.toLatin1().data());
-  furnsh_c(mocspice.toLatin1().data());
-  furnsh_c(cgFK.toLatin1().data());
-  furnsh_c(cgCK.toLatin1().data());
+  naif->furnsh_c(naif0007.toLatin1().data());
+  naif->furnsh_c(mgs.toLatin1().data());
+  naif->furnsh_c(mocti.toLatin1().data());
+  naif->furnsh_c(mocbc.toLatin1().data());
+  naif->furnsh_c(mocbsp.toLatin1().data());
+  naif->furnsh_c(de.toLatin1().data());
+  naif->furnsh_c(pck.toLatin1().data());
+  naif->furnsh_c(mocspice.toLatin1().data());
+  naif->furnsh_c(cgFK.toLatin1().data());
+  naif->furnsh_c(cgCK.toLatin1().data());
 
   double startTime = -69382819.0;
   double endTime = -69382512.0;
   double slope = (endTime - startTime) / (10 - 1);
 
   SpiceInt code;
-  namfrm_c("MGS_MOC", &code);
+  naif->namfrm_c("MGS_MOC", &code);
 //  namfrm_c ("IAU_MARS", &code);
   cout << "Naif code = " << code << endl;
 
@@ -71,8 +75,8 @@ int main(int argc, char *argv[]) {
   cout << "Testing without cache (from SPICE)... " << endl;
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    rot.SetEphemerisTime(t);
-    vector<double> CJ = rot.Matrix();
+    rot.SetEphemerisTime(t, naif);
+    vector<double> CJ = rot.Matrix(naif);
 
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
@@ -87,11 +91,11 @@ int main(int argc, char *argv[]) {
 
   // Testing with cache
   cout << "Testing with cache ... " << endl;
-  rot.LoadCache(startTime, endTime, 10);
+  rot.LoadCache(startTime, endTime, 10, naif);
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    rot.SetEphemerisTime(t);
-    vector<double> CJ = rot.Matrix();
+    rot.SetEphemerisTime(t, naif);
+    vector<double> CJ = rot.Matrix(naif);
     cout << "Time           = " << rot.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
@@ -105,19 +109,19 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   // Save off cache for polynomial over SPICE test
-  Table tab = rot.Cache("TestPolyOver");
+  Table tab = rot.Cache("TestPolyOver", naif);
 
   // Testing with Functions
   cout << "Testing with functions ... " << endl;
   vector<double> abcAng1, abcAng2, abcAng3;
-  rot.SetPolynomial();
+  rot.SetPolynomial(naif);
   rot.GetPolynomial(abcAng1, abcAng2, abcAng3);
   cout << "Source = " << rot.GetSource() << endl;
 
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    rot.SetEphemerisTime(t);
-    vector<double> CJ = rot.Matrix();
+    rot.SetEphemerisTime(t, naif);
+    vector<double> CJ = rot.Matrix(naif);
     cout << "Time           = " << rot.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
@@ -134,12 +138,12 @@ int main(int argc, char *argv[]) {
   // Testing polynomial over Spice
   cout << "Testing with polynomial functions over Spice ... " << endl;
   SpiceRotation rot2(-94031);
-  rot2.LoadCache(tab);
+  rot2.LoadCache(tab, naif);
   rot2.ComputeBaseTime();
   abcAng1.clear();
   abcAng2.clear();
   abcAng3.clear();
-  rot2.SetPolynomialDegree(2);
+  rot2.SetPolynomialDegree(naif, 2);
   abcAng1.push_back(0.0030493533013399013);
   abcAng1.push_back(-0.0027570887651990781);
   abcAng1.push_back(0.0042922079124063069);
@@ -149,13 +153,13 @@ int main(int argc, char *argv[]) {
   abcAng3.push_back(0.0057982287753588907);
   abcAng3.push_back(-0.009966680359987867);
   abcAng3.push_back(-0.0073237560434568881);
-  rot2.SetPolynomial(abcAng1, abcAng2, abcAng3, SpiceRotation::PolyFunctionOverSpice);
+  rot2.SetPolynomial(naif, abcAng1, abcAng2, abcAng3, SpiceRotation::PolyFunctionOverSpice);
   cout << "Source = " << rot2.GetSource() << endl;
 
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    rot2.SetEphemerisTime(t);
-    vector<double> CJ = rot2.Matrix();
+    rot2.SetEphemerisTime(t, naif);
+    vector<double> CJ = rot2.Matrix(naif);
     cout << "Time           = " << rot2.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
@@ -172,19 +176,19 @@ int main(int argc, char *argv[]) {
   cout << "Test fitting polynomial function over cache to new cache" << endl;
 
   // Get new cache using existing cache and polynomial
-  Table tab2 = rot2.Cache("Outputcache");
+  Table tab2 = rot2.Cache("Outputcache", naif);
   SpiceRotation rot3(-94031);
 
 
   // Load tab2 into the object
-  rot3.LoadCache(tab2);
+  rot3.LoadCache(tab2, naif);
 
   cout << "Source = " << rot3.GetSource() << endl;
 
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    rot3.SetEphemerisTime(t);
-    vector<double> CJ = rot3.Matrix();
+    rot3.SetEphemerisTime(t, naif);
+    vector<double> CJ = rot3.Matrix(naif);
     cout << "Time           = " << rot3.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
@@ -200,44 +204,44 @@ int main(int argc, char *argv[]) {
 
   // Testing ToReferencePartial method
   cout << "Testing ToReferencePartial method" << endl;
-  vector<double> angles = rot.Angles(3, 1, 3);
+  vector<double> angles = rot.Angles(3, 1, 3, naif);
   cout << "For angles (ra,dec,twist) = " << angles[0] << " " << angles[1] << " " << angles[2]
        << endl;
   vector<double> lookC;
   lookC.push_back(0.);
   lookC.push_back(0.);
   lookC.push_back(1.);
-  vector<double> lookJ = rot.J2000Vector(lookC);
+  vector<double> lookJ = rot.J2000Vector(lookC, naif);
   // Save a J2000 vector for testing target body partial methods later.
   vector<double> testLookJ(lookJ);
   cout << " For lookJ = " << lookJ[0] << " " << lookJ[1] << " " << lookJ[2] << endl;
   vector<double> dAraLookC(3);
-  dAraLookC = rot.ToReferencePartial(lookJ, SpiceRotation::WRT_RightAscension, 0);
+  dAraLookC = rot.ToReferencePartial(lookJ, SpiceRotation::WRT_RightAscension, 0, naif);
   // Take care of round-off problem.  Look for a better way
   if (abs(dAraLookC[2]) < .00000000001) dAraLookC[2] = 0.;
   cout << "Right ascension partial on A applied to lookJ =:  " << dAraLookC[0] << " "
        << dAraLookC[1] << " " << dAraLookC[2] << endl;
 
   vector<double> dBraLookC(3);
-  dBraLookC = rot.ToReferencePartial(lookJ, SpiceRotation::WRT_RightAscension, 1);
+  dBraLookC = rot.ToReferencePartial(lookJ, SpiceRotation::WRT_RightAscension, 1, naif);
   if (abs(dBraLookC[2]) < .00000000001) dBraLookC[2] = 0.;
   cout << "Right ascension partial on B applied to lookJ =:  " << dBraLookC[0] << " "
        << dBraLookC[1] << " " << dBraLookC[2] << endl;
 
   vector<double> dCraLookC(3);
-  dCraLookC = rot.ToReferencePartial(lookJ, SpiceRotation::WRT_RightAscension, 2);
+  dCraLookC = rot.ToReferencePartial(lookJ, SpiceRotation::WRT_RightAscension, 2, naif);
   if (abs(dCraLookC[2]) < .00000000001) dCraLookC[2] = 0.;
   cout << "Right ascension partial on C applied to lookJ =:  " << dCraLookC[0] << " "
        << dCraLookC[1] << " " << dCraLookC[2] << endl;
 
   vector<double> dAdecLookC(3);
-  dAdecLookC = rot.ToReferencePartial(lookJ, SpiceRotation::WRT_Declination, 0);
+  dAdecLookC = rot.ToReferencePartial(lookJ, SpiceRotation::WRT_Declination, 0, naif);
   if (abs(dAdecLookC[2]) < .00000000001) dAdecLookC[2] = 0.;
   cout << "Declination partial on A applied to lookJ =:  " << dAdecLookC[0] << " "
        << dAdecLookC[1] << " " << dAdecLookC[2] << endl << endl;
 
   vector<double> dAtwLookC;
-  dAtwLookC = rot.ToReferencePartial(lookJ, SpiceRotation::WRT_Twist, 0);
+  dAtwLookC = rot.ToReferencePartial(lookJ, SpiceRotation::WRT_Twist, 0, naif);
   for (int i = 0; i < 3; i++) {
     if (abs(dAtwLookC[i]) < .00000000000001) dAtwLookC[i] = 0.;
   }
@@ -245,19 +249,19 @@ int main(int argc, char *argv[]) {
        << dAtwLookC[1] << " " << dAtwLookC[2] << endl << endl;
 
   cout << "Testing with setting functions ... " << endl;
-  Table tab1 = rot.Cache("Test");
+  Table tab1 = rot.Cache("Test", naif);
   SpiceRotation rot4(-94031);
   SpiceRotation::Source source = SpiceRotation::Spice;
 //   rot4.SetSource(source);
 //   rot4.LoadCache(startTime, endTime, 10);
-  rot4.LoadCache(tab1);
+  rot4.LoadCache(tab1, naif);
 //   rot4.SetPolynomial(abcAng1, abcAng2, abcAng3);
   source = rot4.GetSource();
   cout << "Source = " << source << endl;
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    rot4.SetEphemerisTime(t);
-    vector<double> CJ = rot4.Matrix();
+    rot4.SetEphemerisTime(t, naif);
+    vector<double> CJ = rot4.Matrix(naif);
     cout << "Time           = " << rot4.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
@@ -273,14 +277,14 @@ int main(int argc, char *argv[]) {
 
   // Test LineCache method
   cout << "Testing line cache..." << endl;
-  Table tab4 = rot4.LineCache("Test5");
+  Table tab4 = rot4.LineCache("Test5", naif);
   SpiceRotation rot5(-94031);
-  rot5.LoadCache(tab4);
+  rot5.LoadCache(tab4, naif);
 
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    rot5.SetEphemerisTime(t);
-    vector<double> CJ = rot5.Matrix();
+    rot5.SetEphemerisTime(t, naif);
+    vector<double> CJ = rot5.Matrix(naif);
     cout << "Time           = " << rot5.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
@@ -296,13 +300,13 @@ int main(int argc, char *argv[]) {
 
   // Test table options
   cout << "Testing tables ... " << endl;
-  Table tab3 = rot.Cache("Test");
+  Table tab3 = rot.Cache("Test", naif);
   SpiceRotation rot6(-94031);
-  rot6.LoadCache(tab3);
+  rot6.LoadCache(tab3, naif);
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    rot6.SetEphemerisTime(t);
-    vector<double> CJ = rot6.Matrix();
+    rot6.SetEphemerisTime(t, naif);
+    vector<double> CJ = rot6.Matrix(naif);
     cout << "Time           = " << rot6.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
@@ -318,14 +322,14 @@ int main(int argc, char *argv[]) {
 
 // Test J2000 and Reference vector methods
   cout << "Testing vector methods" << endl;
-  rot6.SetEphemerisTime(startTime);
+  rot6.SetEphemerisTime(startTime, naif);
   vector<double> v(3);
   v[0] = 0.;
   v[1] = 0.;
   v[2] = 1.;
-  vector<double> vout = rot6.J2000Vector(v);
+  vector<double> vout = rot6.J2000Vector(v, naif);
   cout << "v = " << v[0] << " " << v[1] << " " << v[2] << endl;
-  v = rot6.ReferenceVector(vout);
+  v = rot6.ReferenceVector(vout, naif);
 
   // Take care of Solaris round-off problem.  Look for a better way
   if (abs(v[0]) < .00000000000000012) v[0] = 0.;
@@ -337,19 +341,19 @@ int main(int argc, char *argv[]) {
   // Testing linear Function
   cout << "Testing with linear function ... " << endl;
   SpiceRotation linrot(-94031);
-  linrot.LoadCache(startTime, endTime, 2);
-  linrot.SetEphemerisTime(startTime);
-  linrot.SetEphemerisTime(endTime);
+  linrot.LoadCache(startTime, endTime, 2, naif);
+  linrot.SetEphemerisTime(startTime, naif);
+  linrot.SetEphemerisTime(endTime, naif);
 
-  linrot.SetPolynomial();
+  linrot.SetPolynomial(naif);
   linrot.GetPolynomial(abcAng1, abcAng2, abcAng3);
 
   cout << "Source = " << linrot.GetSource() << endl;
 
   for (int i = 0; i < 2; i++) {
     double t = startTime + (double) i * (endTime - startTime);
-    linrot.SetEphemerisTime(t);
-    vector<double> CJ = linrot.Matrix();
+    linrot.SetEphemerisTime(t, naif);
+    vector<double> CJ = linrot.Matrix(naif);
     cout << "Time           = " << linrot.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
@@ -364,8 +368,8 @@ int main(int argc, char *argv[]) {
 
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    naRot.SetEphemerisTime(t);
-    vector<double> CJ = naRot.Matrix();
+    naRot.SetEphemerisTime(t, naif);
+    vector<double> CJ = naRot.Matrix(naif);
 
     cout << "Time           = " << naRot.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
@@ -375,15 +379,15 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   // Test angle wrap method
-  double newangle = naRot.WrapAngle(0.5235987756, 4.188790205);
+  double newangle = naRot.WrapAngle(0.5235987756, 4.188790205, naif);
   cout << "Testing angle wrapping..." << endl;
-  cout << "   Using anchor angle of 30, 240 changes to " << newangle * 180. / pi_c() << endl;
-  newangle = naRot.WrapAngle(0.5235987756, -0.1745329252);
-  cout << "   Using anchor angle of 30, -10 changes to " << newangle * 180. / pi_c() << endl;
-  newangle = naRot.WrapAngle(0.5235987756, -3.141592654);
-  cout << "   Using anchor angle of 30, -180 changes to " << newangle * 180. / pi_c() << endl;
-  newangle = naRot.WrapAngle(0.5235987756, 1.570796327);
-  cout << "   Using anchor angle of 30, 90 changes to " << newangle * 180. / pi_c() << endl <<endl << endl;
+  cout << "   Using anchor angle of 30, 240 changes to " << newangle * 180. / naif->pi_c() << endl;
+  newangle = naRot.WrapAngle(0.5235987756, -0.1745329252, naif);
+  cout << "   Using anchor angle of 30, -10 changes to " << newangle * 180. / naif->pi_c() << endl;
+  newangle = naRot.WrapAngle(0.5235987756, -3.141592654, naif);
+  cout << "   Using anchor angle of 30, -180 changes to " << newangle * 180. / naif->pi_c() << endl;
+  newangle = naRot.WrapAngle(0.5235987756, 1.570796327, naif);
+  cout << "   Using anchor angle of 30, 90 changes to " << newangle * 180. / naif->pi_c() << endl <<endl << endl;
 
 
   cout << "Begin tests for PCK data..." << endl << endl;
@@ -397,17 +401,17 @@ int main(int argc, char *argv[]) {
   // SpiceRotation targrotV1(10024);   //Frame code for Europa
   // targrotV1.LoadCache(-646009153.46723, -646009153.46723, 1); // This calls LoadPcFromSpice for Europa
   SpiceRotation targrotV1(10023);   //Frame code for Io
-  targrotV1.LoadCache(-15839262.24291, -15839262.24291, 1); // This calls LoadPcFromSpice for Io
-  targrot1.LoadCache(startTime, endTime, 2); // This calls LoadPcFromSpice for Mars
+  targrotV1.LoadCache(-15839262.24291, -15839262.24291, 1, naif); // This calls LoadPcFromSpice for Io
+  targrot1.LoadCache(startTime, endTime, 2, naif); // This calls LoadPcFromSpice for Mars
   cout << "Test CacheLabel for PCK data..." << endl;
-  Table pcktab = targrot1.Cache("Planetary constants test table"); // This calls CacheLabel
-  Table pcktabV = targrotV1.Cache("Planetary constants test table"); // This calls CacheLabel
+  Table pcktab = targrot1.Cache("Planetary constants test table", naif); // This calls CacheLabel
+  Table pcktabV = targrotV1.Cache("Planetary constants test table", naif); // This calls CacheLabel
   SpiceRotation targrot(10014);  // Mars
   // SpiceRotation targrotV(10024);  // Europa  --  The results for pm will differ slightly from TrigBasis because of the older PCK
   SpiceRotation targrotV(10023);  // Io  --
   cout << "Test LoadPCFromTable..." << endl;
-  targrot.LoadCache(pcktab);  // This calls LoadPcFromTable
-  targrotV.LoadCache(pcktabV);  // This calls LoadPcFromTable
+  targrot.LoadCache(pcktab, naif);  // This calls LoadPcFromTable
+  targrotV.LoadCache(pcktabV, naif);  // This calls LoadPcFromTable
   // Now get the values
   vector<Angle> poleRa = targrotV.poleRaCoefs();
   vector<Angle> poleDec = targrotV.poleDecCoefs();
@@ -464,18 +468,18 @@ int main(int argc, char *argv[]) {
   // bodeul_(&ibod, &tet, &tra,&tdec, &tomega, &tlambda);
   // targrotV.SetEphemerisTime(tet);
   // vector<double> pckanglesV = targrotV.Angles(3, 1, 3);
-  // cout << "    Angles = " << pckanglesV[0]*dpr_c() <<","<< pckanglesV[1]*dpr_c() <<","
-  //      << pckanglesV[2]*dpr_c() <<endl <<endl;
+  // cout << "    Angles = " << pckanglesV[0]*naif->dpr_c() <<","<< pckanglesV[1]*naif->dpr_c() <<","
+  //      << pckanglesV[2]*naif->dpr_c() <<endl <<endl;
   // end Europa test
 
   // For testing Io with the nutation/precession terms and a cache size of 1
   tet = -15839262.24291;  // time et for Io
   ibod = 501; // Io
   bodeul_(&ibod, &tet, &tra,&tdec, &tomega, &tlambda);
-  targrotV.SetEphemerisTime(tet);
-  vector<double> pckanglesV = targrotV.Angles(3, 1, 3);
-  cout << "Io    Angles = " << pckanglesV[0]*dpr_c() <<","<< pckanglesV[1]*dpr_c() <<","
-       << pckanglesV[2]*dpr_c() <<endl <<endl;
+  targrotV.SetEphemerisTime(tet, naif);
+  vector<double> pckanglesV = targrotV.Angles(3, 1, 3, naif);
+  cout << "Io    Angles = " << pckanglesV[0]*naif->dpr_c() <<","<< pckanglesV[1]*naif->dpr_c() <<","
+       << pckanglesV[2]*naif->dpr_c() <<endl <<endl;
   // end Io test
 
   // For testing Mars with more than one value in the cache
@@ -484,13 +488,13 @@ int main(int argc, char *argv[]) {
   cout << "  Source = " << targrot.GetSource() << endl;
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    targrot.SetEphemerisTime(t);
-    vector<double> CJ = targrot.Matrix();
+    targrot.SetEphemerisTime(t, naif);
+    vector<double> CJ = targrot.Matrix(naif);
     //temp debug lines to be removed...
     //end temp debug lines   Note: uncomment the next 4 lines
     cout << "    Time           = " << targrot.EphemerisTime() << endl;
     // vector<double> pckangles = targrot.Angles(3, 1, 3);
-    // cout << "    Angles = " << pckangles[0]*dpr_c() <<","<< pckangles[1]*dpr_c() <<","<< pckangles[2]*dpr_c() <<endl;
+    // cout << "    Angles = " << pckangles[0]*naif->dpr_c() <<","<< pckangles[1]*naif->dpr_c() <<","<< pckangles[2]*naif->dpr_c() <<endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
@@ -500,27 +504,27 @@ int main(int argc, char *argv[]) {
   targrotV.usePckPolynomial();
   targrot.usePckPolynomial();
   cout << "  Io PCK polynomial output" << endl;
-  targrotV.SetEphemerisTime(0.0);
-  targrotV.SetEphemerisTime(-15839262.24291);
+  targrotV.SetEphemerisTime(0.0, naif);
+  targrotV.SetEphemerisTime(-15839262.24291, naif);
   pckanglesV.clear();
   cout << "  Source = " << targrotV.GetSource() << endl;
-  pckanglesV = targrotV.Angles(3, 1, 3);
-  cout << "    Angles = " << pckanglesV[0]*dpr_c() <<","<< pckanglesV[1]*dpr_c() <<","
-       << pckanglesV[2]*dpr_c() << endl << endl;
+  pckanglesV = targrotV.Angles(3, 1, 3, naif);
+  cout << "    Angles = " << pckanglesV[0]*naif->dpr_c() <<","<< pckanglesV[1]*naif->dpr_c() <<","
+       << pckanglesV[2]*naif->dpr_c() << endl << endl;
 
    cout << "  Mars PCK polynomial output" << endl;
    cout << "  Source = " << targrot.GetSource() << endl;
   // For testing Mars with more than one value in the cache
   for (int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    targrot.SetEphemerisTime(t);
-    vector<double> CJ = targrot.Matrix();
+    targrot.SetEphemerisTime(t, naif);
+    vector<double> CJ = targrot.Matrix(naif);
     //temp debug lines to be removed...
     // vector<double> pckangles = targrot.Angles(3, 1, 3);
     cout << "    Time           = " << targrot.EphemerisTime() << endl;
 
-    // cout << "    Angles = " << pckangles[0]*dpr_c() <<","<< pckangles[1]*dpr_c() <<","<< pckangles[2]*dpr_c() <<endl;
-    //    cout << "    Angles = " << pckangles[0]*dpr_c() + 90. <<","<< 90. - pckangles[1]*dpr_c() <<","<< pckangles[2]*dpr_c() <<endl;
+    // cout << "    Angles = " << pckangles[0]*naif->dpr_c() <<","<< pckangles[1]*naif->dpr_c() <<","<< pckangles[2]*naif->dpr_c() <<endl;
+    //    cout << "    Angles = " << pckangles[0]*naif->dpr_c() + 90. <<","<< 90. - pckangles[1]*naif->dpr_c() <<","<< pckangles[2]*naif->dpr_c() <<endl;
     //end temp debug lines   Note: uncomment the next 4 lines
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
@@ -533,51 +537,51 @@ int main(int argc, char *argv[]) {
     vector<double> av = targrotV.AngularVelocity();
     cout << "SpiceRotation av = " << av[0] << " " << av[1] << " " << av[2] << endl;
     SpiceDouble tsipm[6][6];
-    sxform_c ( "J2000", "IAU_IO", -15839262.24291, tsipm);
-    // sxform_c ( "J2000", "IAU_EUROPA", -646009153.46723, tsipm);
+    naif->sxform_c ( "J2000", "IAU_IO", -15839262.24291, tsipm);
+    // naif->sxform_c ( "J2000", "IAU_EUROPA", -646009153.46723, tsipm);
     SpiceDouble tipm[3][3];
     vector<SpiceDouble> nav(3,0.);
-    xf2rav_c (tsipm, tipm, &(nav[0]) );
+    naif->xf2rav_c (tsipm, tipm, &(nav[0]) );
     cout << "J2000 to body-fixed Naif av = " << nav[0] << " " << nav[1] << " " << nav[2] << endl;
   }
   cout << endl;
 
   cout << endl << endl << "Testing partials for target body parameters..." << endl;
-  targrot.SetEphemerisTime(startTime);
+  targrot.SetEphemerisTime(startTime, naif);
   cout << "For angles (ra,dec,rotation) = " << angles[0] << " " << angles[1] << " " << angles[2]
        << endl;
   //  vector<double> dLookB(3);
   cout << "Beginning with J2000 vector " << testLookJ[0] << " " << testLookJ[1] << " " << testLookJ[2] << endl;
-  vector<double> lookB = targrot.ReferenceVector(testLookJ);
+  vector<double> lookB = targrot.ReferenceVector(testLookJ, naif);
   cout << "lookB = " << lookB[0] << " " << lookB[1] << " " << lookB[2] << endl;
 
-  vector<double> dLookB = targrot.ToReferencePartial(testLookJ, SpiceRotation::WRT_RightAscension, 0);
+  vector<double> dLookB = targrot.ToReferencePartial(testLookJ, SpiceRotation::WRT_RightAscension, 0, naif);
   cout << endl << " dLookB with respect to ra = " << dLookB[0] << " " << dLookB[1] << " " << dLookB[2] << endl;
   vector<double> matchLookJ(3);
-  matchLookJ = targrot.toJ2000Partial(dLookB, SpiceRotation::WRT_RightAscension, 0);
+  matchLookJ = targrot.toJ2000Partial(dLookB, SpiceRotation::WRT_RightAscension, 0, naif);
   cout << "  Right ascension partial on A applied to dlookB =:  " << matchLookJ[0] << " "
        << matchLookJ[1] << " " << matchLookJ[2] << endl;
 
-  dLookB = targrot.ToReferencePartial(testLookJ, SpiceRotation::WRT_Declination, 0);
+  dLookB = targrot.ToReferencePartial(testLookJ, SpiceRotation::WRT_Declination, 0, naif);
   cout << endl << " dLookB with respect to dec = " << dLookB[0] << " " << dLookB[1] << " "
        << dLookB[2] << endl;
-  matchLookJ = targrot.toJ2000Partial(dLookB, SpiceRotation::WRT_Declination, 0);
+  matchLookJ = targrot.toJ2000Partial(dLookB, SpiceRotation::WRT_Declination, 0, naif);
   cout << "  Declination partial on A applied to dlookB =:  " << matchLookJ[0] << " "
        << matchLookJ[1] << " " << matchLookJ[2] << endl;
 
-  dLookB = targrot.ToReferencePartial(testLookJ, SpiceRotation::WRT_Twist, 1);
+  dLookB = targrot.ToReferencePartial(testLookJ, SpiceRotation::WRT_Twist, 1, naif);
   cout << endl << " dLookB with respect to rotation rate = " << dLookB[0] << " " <<
           dLookB[1] << " " << dLookB[2] << endl;
   //If I apply toJ2000Partial to dLookB, I get back lookJ(x,y,0) with roundoff  -- 05-12-2015 DAC
-  matchLookJ = targrot.toJ2000Partial(dLookB, SpiceRotation::WRT_Twist, 1);
+  matchLookJ = targrot.toJ2000Partial(dLookB, SpiceRotation::WRT_Twist, 1, naif);
   cout << "  Rotation rate partial on A applied to dlookB =:  " << matchLookJ[0] << " "
        << matchLookJ[1] << " " << matchLookJ[2] << endl;
 
-  dLookB = targrot.ToReferencePartial(testLookJ, SpiceRotation::WRT_Twist, 0);
+  dLookB = targrot.ToReferencePartial(testLookJ, SpiceRotation::WRT_Twist, 0, naif);
   cout << endl << " dLookB with respect to rotation = " << dLookB[0] << " " <<
           dLookB[1] << " " << dLookB[2] << endl;
   //If I apply toJ2000Partial to dLookB, I get back lookJ(x,y,0) with roundoff  -- 05-12-2015 DAC
-  matchLookJ = targrot.toJ2000Partial(dLookB, SpiceRotation::WRT_Twist, 0);
+  matchLookJ = targrot.toJ2000Partial(dLookB, SpiceRotation::WRT_Twist, 0, naif);
   cout << "  Rotation partial on A applied to dlookB =:  " << matchLookJ[0] << " "
        << matchLookJ[1] << " " << matchLookJ[2] << endl;
 
@@ -586,11 +590,11 @@ int main(int argc, char *argv[]) {
   QString dirb = fb.expanded() + "/";
   QString bpck(dirb + "pck/lunar_de403_1950-2199_pa.bpc");
   QString fk(dirb + "fk/lunarMeanEarth001.tf");
-  furnsh_c(bpck.toLatin1().data());
-  furnsh_c(fk.toLatin1().data());
+  naif->furnsh_c(bpck.toLatin1().data());
+  naif->furnsh_c(fk.toLatin1().data());
   SpiceRotation targrotbin(310001);   //Frame code for Moon
   cout << " Source = " << targrotbin.GetSource() << endl;
-  targrotbin.LoadCache(startTime, startTime, 1); // This calls LoadPcFromSpice
+  targrotbin.LoadCache(startTime, startTime, 1, naif); // This calls LoadPcFromSpice
   SpiceRotation::FrameType frameType = targrotbin.getFrameType();
 
   if (frameType == SpiceRotation::BPC)
@@ -605,8 +609,8 @@ int main(int argc, char *argv[]) {
   SpiceRotation cgRotation(-1000012000);
   // Test time from Rosetta OSIRIS NAC image n20140901t144253568id30f22
   double cgTestTime = 462854709.88606;
-  cgRotation.SetEphemerisTime(cgTestTime);
-  vector<double> cgCJ = cgRotation.Matrix();
+  cgRotation.SetEphemerisTime(cgTestTime, naif);
+  vector<double> cgCJ = cgRotation.Matrix(naif);
   cout << "Time = " << cgRotation.EphemerisTime() << endl;
   cout << "CJ = " << cgCJ[0] << " " << cgCJ[1] << " " << cgCJ[2] << endl;
   cout << "     " << cgCJ[3] << " " << cgCJ[4] << " " << cgCJ[5] << endl;
@@ -629,7 +633,7 @@ int main(int argc, char *argv[]) {
                                                {-1.0 / sqrt(2), 0.0, 0.0, 1.0 / sqrt(2)},
                                                {0.0, 1.0 / sqrt(2), 1.0 / sqrt(2), 0.0},
                                                {-0.5, -0.5, 0.5, 0.5}}}};
-  aleQuatRot.LoadCache(aleQuatIsd);
+  aleQuatRot.LoadCache(aleQuatIsd, naif);
   cout << "Frame type = " << aleQuatRot.getFrameType() << endl;
   cout << "Is cached? " << (aleQuatRot.IsCached() ? "Yes" : "No") << endl;
   cout << "Has AV? " << (aleQuatRot.HasAngularVelocity() ? "Yes" : "No") << endl;
@@ -652,8 +656,8 @@ int main(int argc, char *argv[]) {
   }
   cout << " }" << endl;
   for (int t = 0; t <= 3; t++) {
-    aleQuatRot.SetEphemerisTime(t);
-    vector<double> CJ = aleQuatRot.Matrix();
+    aleQuatRot.SetEphemerisTime(t, naif);
+    vector<double> CJ = aleQuatRot.Matrix(naif);
     cout << "Time = " << aleQuatRot.EphemerisTime() << endl;
     cout << "CJ(" << t << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "        " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
@@ -668,7 +672,7 @@ int main(int argc, char *argv[]) {
                                      {0.0, Isis::PI, 0.0},
                                      {0.0, 0.0, Isis::PI / 2},
                                      {0.0, 0.0, Isis::PI / 2}};
-  aleQuatAVRot.LoadCache(aleQuatAVIsd);
+  aleQuatAVRot.LoadCache(aleQuatAVIsd, naif);
   cout << "Has AV? " << (aleQuatAVRot.HasAngularVelocity() ? "Yes" : "No") << endl;
 
   // Test loading cache from ALE ISD with time dependent quaternions and constant rotation
@@ -678,7 +682,7 @@ int main(int argc, char *argv[]) {
   aleQuatConstIsd["TimeDependentFrames"] = {-94030, 10014, 1};
   aleQuatConstIsd["ConstantFrames"] = {-94031, -94030};
   aleQuatConstIsd["ConstantRotation"] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0};
-  aleQuatConstRot.LoadCache(aleQuatConstIsd);
+  aleQuatConstRot.LoadCache(aleQuatConstIsd, naif);
   timeDepChain = aleQuatConstRot.TimeFrameChain();
   cout << "Time dependent frame chain = { ";
   for (int i = 0; i < timeDepChain.size(); i++) {
@@ -698,8 +702,8 @@ int main(int argc, char *argv[]) {
   }
   cout << " }" << endl;
   for (int t = 0; t <= 3; t++) {
-    aleQuatConstRot.SetEphemerisTime(t);
-    vector<double> CJ = aleQuatConstRot.Matrix();
+    aleQuatConstRot.SetEphemerisTime(t, naif);
+    vector<double> CJ = aleQuatConstRot.Matrix(naif);
     cout << "Time = " << aleQuatConstRot.EphemerisTime() << endl;
     cout << "CJ(" << t << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "        " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
@@ -725,7 +729,7 @@ int main(int argc, char *argv[]) {
   //     "Argument cacheSize must not be less or equal to zero"
   try {
     cout << endl;
-    testRot.LoadCache(10, 20, -1);
+    testRot.LoadCache(10, 20, -1, naif);
   }
   catch (IException &e) {
     e.print();
@@ -734,7 +738,7 @@ int main(int argc, char *argv[]) {
   //     "Argument startTime must be less than or equal to endTime"
   try {
     cout << endl;
-    testRot.LoadCache(20, 10, 1);
+    testRot.LoadCache(20, 10, 1, naif);
   }
   catch (IException &e) {
     e.print();
@@ -743,7 +747,7 @@ int main(int argc, char *argv[]) {
   //     "Cache size must be more than 1 if startTime and endTime differ"
   try {
     cout << endl;
-    testRot.LoadCache(10, 20, 1);
+    testRot.LoadCache(10, 20, 1, naif);
   }
   catch (IException &e) {
     e.print();
@@ -752,8 +756,8 @@ int main(int argc, char *argv[]) {
   //     "A SpiceRotation cache has already been created"
   try {
     cout << endl;
-    testRot.LoadCache(startTime, endTime, 2);
-    testRot.LoadCache(startTime, endTime - 1, 2);
+    testRot.LoadCache(startTime, endTime, 2, naif);
+    testRot.LoadCache(startTime, endTime - 1, 2, naif);
   }
   catch (IException &e) {
     e.print();
@@ -763,7 +767,7 @@ int main(int argc, char *argv[]) {
   //      "The SpiceRotation has not yet been fit to a function"
   try {
     cout << endl;
-    testRot.ReloadCache();
+    testRot.ReloadCache(naif);
   }
   catch (IException &e) {
     e.print();
@@ -774,7 +778,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl;
     SpiceRotation sr(-94031);
-    sr.LineCache("TableTest");
+    sr.LineCache("TableTest", naif);
   }
   catch (IException &e) {
     e.print();
@@ -785,7 +789,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl;
     SpiceRotation sr(-94031);
-    sr.Cache("TableTest");
+    sr.Cache("TableTest", naif);
   }
   catch (IException &e) {
     e.print();
@@ -865,7 +869,7 @@ int main(int argc, char *argv[]) {
   //      compute angular velocity."
   try {
     cout << endl;
-    testRot.ComputeAv();
+    testRot.ComputeAv(naif);
   }
   catch (IException &e) {
     e.print();
@@ -876,7 +880,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl;
     json errorTestIsd = {"Invalid"};
-    linrot.LoadCache(errorTestIsd);
+    linrot.LoadCache(errorTestIsd, naif);
   }
   catch (IException &e) {
     e.print();

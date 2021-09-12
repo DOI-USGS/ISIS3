@@ -206,12 +206,12 @@ namespace Isis {
       SurfacePoint GetSurfacePoint() const;
 
       Distance LocalRadius() const;
-      Distance LocalRadius(Latitude lat, Longitude lon);
-      Distance LocalRadius(double lat, double lon);
+      Distance LocalRadius(NaifContextPtr naif, Latitude lat, Longitude lon);
+      Distance LocalRadius(NaifContextPtr naif, double lat, double lon);
 
       double PhaseAngle(NaifContextPtr naif) const;
       double EmissionAngle(NaifContextPtr naif) const;
-      double IncidenceAngle() const;
+      double IncidenceAngle(NaifContextPtr naif) const;
 
       void LookDirection(double v[3], NaifContextPtr naif) const;
       std::vector<double> lookDirectionJ2000(NaifContextPtr naif) const;

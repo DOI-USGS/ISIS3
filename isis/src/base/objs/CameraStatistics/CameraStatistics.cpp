@@ -248,7 +248,7 @@ namespace Isis {
       m_lineResStat->AddData(cam->LineResolution(naif));
       m_phaseStat->AddData(cam->PhaseAngle(naif));
       m_emissionStat->AddData(cam->EmissionAngle(naif));
-      m_incidenceStat->AddData(cam->IncidenceAngle());
+      m_incidenceStat->AddData(cam->IncidenceAngle(naif));
       m_localSolarTimeStat->AddData(cam->LocalSolarTime(naif));
       m_localRaduisStat->AddData(cam->LocalRadius().meters());
       // if IsValid

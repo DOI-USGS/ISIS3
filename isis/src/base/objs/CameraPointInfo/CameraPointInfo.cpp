@@ -527,7 +527,7 @@ namespace Isis {
         gp->findKeyword("Phase").setValue(toString(m_camera->PhaseAngle(naif)), "DEGREE");
         gp->findKeyword("Phase").addComment("Illumination and Other");
         gp->findKeyword("Incidence").setValue(toString(
-                        m_camera->IncidenceAngle()), "DEGREE");
+                        m_camera->IncidenceAngle(naif)), "DEGREE");
         gp->findKeyword("Emission").setValue(toString(
                         m_camera->EmissionAngle(naif)), "DEGREE");
 

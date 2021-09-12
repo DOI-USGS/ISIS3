@@ -31,7 +31,8 @@ namespace Isis {
    * @param lon
    * @param values
    */
-  void ProcessGroundPolygons::Rasterize(std::vector<double> &lat,
+  void ProcessGroundPolygons::Rasterize(NaifContextPtr naif,
+                                        std::vector<double> &lat,
                                         std::vector<double> &lon,
                                         std::vector<double> &values) {
 
@@ -86,15 +87,15 @@ namespace Isis {
             tlat.push_back(llcoords->getAt(cord).y);
           }
 
-          Convert(tlat, tlon);
-          ProcessPolygons::Rasterize(p_samples, p_lines, values);
+          Convert(naif, tlat, tlon);
+          ProcessPolygons::Rasterize(naif, p_samples, p_lines, values);
         }
         delete splitPoly;
       }
     }
     else {
-      Convert(lat, lon);
-      ProcessPolygons::Rasterize(p_samples, p_lines, values);
+      Convert(naif, lat, lon);
+      ProcessPolygons::Rasterize(naif, p_samples, p_lines, values);
     }
   }
 
@@ -109,12 +110,13 @@ namespace Isis {
    * @param band
    * @param value
    */
-  void ProcessGroundPolygons::Rasterize(std::vector<double> &lat,
+  void ProcessGroundPolygons::Rasterize(NaifContextPtr naif,
+                                        std::vector<double> &lat,
                                         std::vector<double> &lon,
                                         int &band, double &value) {
 
-    Convert(lat, lon);
-    ProcessPolygons::Rasterize(p_samples, p_lines, band, value);
+    Convert(naif, lat, lon);
+    ProcessPolygons::Rasterize(naif, p_samples, p_lines, band, value);
   }
 
 
@@ -125,14 +127,15 @@ namespace Isis {
    * @param lat
    * @param lon
    */
-  void ProcessGroundPolygons::Convert(std::vector<double> &lat,
+  void ProcessGroundPolygons::Convert(NaifContextPtr naif,
+                                      std::vector<double> &lat,
                                       std::vector<double> &lon) {
 
     p_samples.clear();
     p_lines.clear();
 
     for (unsigned int i = 0; i < lat.size(); i++) {
-      if (p_groundMap->SetUniversalGround(lat[i], lon[i])) {
+      if (p_groundMap->SetUniversalGround(naif, lat[i], lon[i])) {
         p_samples.push_back(p_groundMap->Sample());
         p_lines.push_back(p_groundMap->Line());
       }

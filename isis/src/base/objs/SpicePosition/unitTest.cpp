@@ -16,6 +16,8 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   cout << setprecision(8);
   cout << "Unit test for SpicePosition" << endl;
@@ -27,9 +29,9 @@ int main(int argc, char *argv[]) {
   QString moc(dir + "moc.bsp");
   QString de(dir + "de405.bsp");
   QString pck(dir + "pck00006.tpc");
-  furnsh_c(moc.toLatin1().data());
-  furnsh_c(de.toLatin1().data());
-  furnsh_c(pck.toLatin1().data());
+  naif->furnsh_c(moc.toLatin1().data());
+  naif->furnsh_c(de.toLatin1().data());
+  naif->furnsh_c(pck.toLatin1().data());
 
   double startTime = -69382819.0;
   double endTime = -69382512.0;
@@ -41,7 +43,7 @@ int main(int argc, char *argv[]) {
   cout << "Testing without cache ... " << endl;
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    vector<double> p = pos.SetEphemerisTime(t);
+    vector<double> p = pos.SetEphemerisTime(t, naif);
     vector<double> v = pos.Velocity();
     cout << "Time           = " << pos.EphemerisTime() << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
@@ -52,10 +54,10 @@ int main(int argc, char *argv[]) {
 
   // Testing with cache
   cout << "Testing with cache ... " << endl;
-  pos.LoadCache(startTime, endTime, 10);
+  pos.LoadCache(startTime, endTime, 10, naif);
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    vector<double> p = pos.SetEphemerisTime(t);
+    vector<double> p = pos.SetEphemerisTime(t, naif);
     vector<double> v = pos.Velocity();
     cout << "Time           = " << pos.EphemerisTime() << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
@@ -65,12 +67,12 @@ int main(int argc, char *argv[]) {
 
   // Test table options
   cout << "Testing tables ... " << endl;
-  Table tab = pos.Cache("Test");
+  Table tab = pos.Cache("Test", naif);
   SpicePosition pos2(-94, 499);
-  pos2.LoadCache(tab);
+  pos2.LoadCache(tab, naif);
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    pos2.SetEphemerisTime(t);
+    pos2.SetEphemerisTime(t, naif);
     vector<double> p = pos2.Coordinate();
     vector<double> v = pos2.Velocity();
     cout << "Time           = " << pos2.EphemerisTime() << endl;
@@ -84,14 +86,14 @@ int main(int argc, char *argv[]) {
   std::vector<double> abcPos1, abcPos2, abcPos3;
   //  pos.SetOverrideBaseTime(0.,1.);
   pos.ComputeBaseTime();
-  pos.SetPolynomialDegree(7);
-  pos.SetPolynomial();
+  pos.SetPolynomialDegree(7, naif);
+  pos.SetPolynomial(naif);
   pos.GetPolynomial(abcPos1, abcPos2, abcPos3);
   //  cout << "Source = " << pos.GetSource() << endl;
 
   for (int i=0; i<10; i++) {
     double t = startTime + (double) i * slope;
-    pos.SetEphemerisTime(t);
+    pos.SetEphemerisTime(t, naif);
     vector<double> p = pos.Coordinate();
     vector<double> v = pos.Velocity();
     cout << "Time           = " << pos.EphemerisTime() << endl;
@@ -102,13 +104,13 @@ int main(int argc, char *argv[]) {
 
   // Now use LineCache method
   cout << "Testing line cache..." << endl;
-  tab = pos.LineCache("Test2");
+  tab = pos.LineCache("Test2", naif);
   SpicePosition pos3(-94, 499);
-  pos3.LoadCache(tab);
+  pos3.LoadCache(tab, naif);
 
   for (int i=0; i<10; i++) {
     double t = startTime + (double) i * slope;
-    pos3.SetEphemerisTime(t);
+    pos3.SetEphemerisTime(t, naif);
     vector<double> p = pos3.Coordinate();
     vector<double> v = pos3.Velocity();
     cout << "Time           = " << pos3.EphemerisTime() << endl;
@@ -120,7 +122,7 @@ int main(int argc, char *argv[]) {
 
   // Also test Extrapolate method
   cout << "Testing extrapolation..." << std::endl;
-  pos3.SetEphemerisTime(endTime);
+  pos3.SetEphemerisTime(endTime, naif);
   cout << "Time           = " << pos3.EphemerisTime() << endl;
   vector<double> p = pos3.Coordinate();
   cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
@@ -215,12 +217,12 @@ int main(int argc, char *argv[]) {
   table.Label()["SpkTableOriginalSize"].addValue(toString(769));
 
   // Load table into the object
-  pos4.LoadCache(table);
+  pos4.LoadCache(table, naif);
   cout << "Source = " << pos4.GetSource() << endl;
 
   for (int i=0; i<10; i++) {
     double t = startTime + (double) i * slope;
-    pos4.SetEphemerisTime(t);
+    pos4.SetEphemerisTime(t, naif);
     vector<double> p = pos4.Coordinate();
     vector<double> v = pos4.Velocity();
     cout << "Time           = " << t << endl;
@@ -236,7 +238,7 @@ int main(int argc, char *argv[]) {
   abcPos1.clear();
   abcPos2.clear();
   abcPos3.clear();
-  pos4.SetPolynomialDegree(2);
+  pos4.SetPolynomialDegree(2, naif);
   abcPos1.push_back(-0.000166791);
   abcPos1.push_back(0.0);
   abcPos1.push_back(0.0);
@@ -246,13 +248,13 @@ int main(int argc, char *argv[]) {
   abcPos3.push_back(0.00014653);
   abcPos3.push_back(0.0);
   abcPos3.push_back(0.0);
-  pos4.SetPolynomial(abcPos1, abcPos2, abcPos3,
+  pos4.SetPolynomial(naif, abcPos1, abcPos2, abcPos3,
                      SpicePosition::PolyFunctionOverHermiteConstant);
 
    cout << "Source = " << pos.GetSource() << endl;
    for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    pos4.SetEphemerisTime(t);
+    pos4.SetEphemerisTime(t, naif);
     vector<double> p = pos4.Coordinate();
     vector<double> v = pos4.Velocity();
     cout << "Time           = " << t << endl;
@@ -265,17 +267,17 @@ int main(int argc, char *argv[]) {
   cout << "Test fitting polynomial function over Hermite to new Hermite" << endl;
 
   // Fit new Hermite using existing Hermite and polynomial
-  Table table2 = pos4.Cache("OutputHermite");
+  Table table2 = pos4.Cache("OutputHermite", naif);
   SpicePosition pos5(-94, 499);
 
   // Load table2 into the object
-  pos5.LoadCache(table2);
+  pos5.LoadCache(table2, naif);
 
   cout << "Source = " << pos.GetSource() << endl;
 
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    pos5.SetEphemerisTime(t);
+    pos5.SetEphemerisTime(t, naif);
     vector<double> p = pos5.Coordinate();
     vector<double> v = pos5.Velocity();
     cout << "Time           = " << t << endl;
@@ -288,7 +290,7 @@ int main(int argc, char *argv[]) {
   // coefficient
   cout << "Test calculation of first coefficient for spacecraft velocity" << endl;
   std::vector<double> dvelocity(3,0.);
-  pos.SetEphemerisTime((startTime + endTime) / 2.);
+  pos.SetEphemerisTime((startTime + endTime) / 2., naif);
   dvelocity = pos.VelocityPartial(SpicePosition::WRT_X, 0);
   cout << "  Velocity vector for center time = (" << dvelocity[0] <<  "," << dvelocity[1] <<"," << dvelocity[2] << ")"<< endl;
 
@@ -304,11 +306,11 @@ int main(int argc, char *argv[]) {
                                             {0.0,  0.0,  0.0},
                                             {10.0,  10.0,  10.0}}}};
   SpicePosition alePos(-94, 499);
-  alePos.LoadCache(aleIsd);
+  alePos.LoadCache(aleIsd, naif);
   cout << "Source = " << alePos.GetSource() << endl;
   cout << "Has velocity? " << (alePos.HasVelocity() ? "Yes" : "No") << endl;
   for(int t = -10; t <= 10; t++) {
-   alePos.SetEphemerisTime(t);
+   alePos.SetEphemerisTime(t, naif);
    vector<double> p = alePos.Coordinate();
    cout << "Time           = " << t << endl;
    cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
@@ -323,11 +325,11 @@ int main(int argc, char *argv[]) {
                              {1.0, 1.0, 1.0},
                              {1.0, 1.0, 1.0}};
   SpicePosition aleVelPos(-94, 499);
-  aleVelPos.LoadCache(aleVelIsd);
+  aleVelPos.LoadCache(aleVelIsd, naif);
   cout << "Source = " << aleVelPos.GetSource() << endl;
   cout << "Has velocity? " << (aleVelPos.HasVelocity() ? "Yes" : "No") << endl;
   for(int t = -10; t <= 10; t++) {
-   aleVelPos.SetEphemerisTime(t);
+   aleVelPos.SetEphemerisTime(t, naif);
    vector<double> p = aleVelPos.Coordinate();
    vector<double> v = aleVelPos.Velocity();
    cout << "Time           = " << t << endl;
@@ -340,7 +342,7 @@ int main(int argc, char *argv[]) {
   // Test loading cache from an ALE ISD with non-SPICE SpicePosition
   cout << "Test loading cache from an ALE ISD with non-SPICE SpicePosition" << endl;
   try {
-    pos5.LoadCache(aleIsd);
+    pos5.LoadCache(aleIsd, naif);
   }
   catch (IException &e) {
     e.print();

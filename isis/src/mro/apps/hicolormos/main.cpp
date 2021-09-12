@@ -115,7 +115,7 @@ void IsisMain() {
   if(cam->SetUniversalGround(naif, avgLat, avgLon)) {
     Cemiss = cam->EmissionAngle(naif);
     Cphase = cam->PhaseAngle(naif);
-    Cincid = cam->IncidenceAngle();
+    Cincid = cam->IncidenceAngle(naif);
     ClocalSolTime = cam->LocalSolarTime(naif);
     CsolarLong = cam->solarLongitude(naif).degrees();
     CnorthAzimuth = cam->NorthAzimuth(naif);
@@ -127,7 +127,7 @@ void IsisMain() {
     if(cam->SetUniversalGround(naif, avgLat, avgLon)) {
       Cemiss = cam->EmissionAngle(naif);
       Cphase = cam->PhaseAngle(naif);
-      Cincid = cam->IncidenceAngle();
+      Cincid = cam->IncidenceAngle(naif);
       ClocalSolTime = cam->LocalSolarTime(naif);
       CsolarLong = cam->solarLongitude(naif).degrees();
       CnorthAzimuth = cam->NorthAzimuth(naif);
@@ -171,7 +171,7 @@ void IsisMain() {
     if(cam->SetImage(sample, line, naif)) {
       Cemiss = cam->EmissionAngle(naif);
       Cphase = cam->PhaseAngle(naif);
-      Cincid = cam->IncidenceAngle();
+      Cincid = cam->IncidenceAngle(naif);
       ClocalSolTime = cam->LocalSolarTime(naif);
       CsolarLong = cam->solarLongitude(naif).degrees();
       CnorthAzimuth = cam->NorthAzimuth(naif);
@@ -183,7 +183,7 @@ void IsisMain() {
       if(cam->SetImage(sample, line, naif)) {
         Cemiss = cam->EmissionAngle(naif);
         Cphase = cam->PhaseAngle(naif);
-        Cincid = cam->IncidenceAngle();
+        Cincid = cam->IncidenceAngle(naif);
         ClocalSolTime = cam->LocalSolarTime(naif);
         CsolarLong = cam->solarLongitude(naif).degrees();
         CnorthAzimuth = cam->NorthAzimuth(naif);

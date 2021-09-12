@@ -47,10 +47,12 @@ double correctionOffset;
 
 
 void IsisMain() {
+  auto naif = NaifContext::acquire();
+  
   // Make sure we have a moc cube
   ProcessByLine p;
   p.SetInputCube("FROM");
-  MocLabels moc(Application::GetUserInterface().GetFileName("FROM"));
+  MocLabels moc(Application::GetUserInterface().GetFileName("FROM"), naif);
 
   // It must have crosstrack summing of 1
   if(moc.CrosstrackSumming() != 1) {

@@ -71,10 +71,12 @@ void IsisMain() {
 
 // Line processing routine
 void camtrim(Buffer &in, Buffer &out) {
+  auto naif = NaifContext::acquire();
+
   // See if there is a change in band which would change the camera model
   if(in.Band() != lastBand) {
     lastBand = in.Band();
-    cam->SetBand(icube->physicalBand(lastBand));
+    cam->SetBand(icube->physicalBand(lastBand), naif);
   }
 
   // Loop for each pixel in the line.
@@ -82,7 +84,7 @@ void camtrim(Buffer &in, Buffer &out) {
   double line = in.Line();
   for(int i = 0; i < in.size(); i++) {
     samp = in.Sample(i);
-    cam->SetImage(samp, line);
+    cam->SetImage(samp, line, naif);
     if(cam->HasSurfaceIntersection()) {
       lat = cam->UniversalLatitude();
       lon = cam->UniversalLongitude();

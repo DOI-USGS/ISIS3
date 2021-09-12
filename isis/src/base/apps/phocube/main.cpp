@@ -388,7 +388,7 @@ void phocube(Buffer &out) {
           index += 64 * 64;
         }
         if (incidence) {
-          out[index] = cam->IncidenceAngle();
+          out[index] = cam->IncidenceAngle(naif);
           index += 64 * 64;
         }
         if (localEmission || localIncidence) {
@@ -572,7 +572,7 @@ MosData *getMosaicIndicies(Camera &camera, MosData &md) {
   camera.LocalPhotometricAngles(myphase, myincidence, myemission, mysuccess);
   if (!mysuccess) {
     myemission.setDegrees(camera.EmissionAngle());
-    myincidence.setDegrees(camera.IncidenceAngle());
+    myincidence.setDegrees(camera.IncidenceAngle(naif));
   }
   double res = camera.PixelResolution();
   if (fabs(res) < Epsilon) res = Epsilon;

@@ -96,7 +96,7 @@ namespace Isis {
       void setBaseLat(Latitude baseLat);
       void setBaseLon(Longitude baseLon);
       void setDensity(int density);
-      void setLatExtents(GridExtentSource source, Latitude minLat, Latitude maxLat);
+      void setLatExtents(NaifContextPtr naif, GridExtentSource source, Latitude minLat, Latitude maxLat);
       void setLatInc(Angle latInc);
       void setLonExtents(GridExtentSource source, Longitude minLon, Longitude maxLon);
       void setLonInc(Angle lonInc);

@@ -37,6 +37,8 @@ void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   cout << "Unit Test for Mariner10Camera..." << endl;
   try {
@@ -94,29 +96,29 @@ int main(void) {
       double exposureDuration = ((double) inst["ExposureDuration"])/1000; 
       QString stime = inst["StartTime"];
       double et; // StartTime keyword is the center exposure time
-      str2et_c(stime.toLatin1().data(), &et);
+      naif->str2et_c(stime.toLatin1().data(), &et);
       pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
       cout << "Shutter open = " << shuttertimes.first.Et() << endl;
       cout << "Shutter close = " << shuttertimes.second.Et() << endl << endl;
 
       // Test all four corners to make sure the conversions are right
       cout << "For upper left corner ..." << endl;
-      TestLineSamp(cam, corners[i*4].first, corners[i*4].second);
+      TestLineSamp(cam, corners[i*4].first, corners[i*4].second, naif);
 
       cout << "For upper right corner ..." << endl;
-      TestLineSamp(cam, corners[i*4+1].first, corners[i*4+1].second);
+      TestLineSamp(cam, corners[i*4+1].first, corners[i*4+1].second, naif);
 
       cout << "For lower left corner ..." << endl;
-      TestLineSamp(cam, corners[i*4+2].first, corners[i*4+2].second);
+      TestLineSamp(cam, corners[i*4+2].first, corners[i*4+2].second, naif);
 
       cout << "For lower right corner ..." << endl;
-      TestLineSamp(cam, corners[i*4+3].first, corners[i*4+3].second);
+      TestLineSamp(cam, corners[i*4+3].first, corners[i*4+3].second, naif);
 
       double samp = cam->Samples() / 2;
       double line = cam->Lines() / 2;
       cout << "For center pixel position ..." << endl;
 
-      if(!cam->SetImage(samp, line)) {
+      if(!cam->SetImage(samp, line, naif)) {
         cout << "ERROR" << endl;
         return 0;
       }

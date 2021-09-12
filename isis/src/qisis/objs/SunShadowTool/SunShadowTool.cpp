@@ -525,7 +525,7 @@ namespace Isis {
         if (success) {
           *m_endSurfacePoint = cam->GetSurfacePoint();
 
-          *m_incidenceAngle = Angle(cam->IncidenceAngle(), Angle::Degrees);
+          *m_incidenceAngle = Angle(cam->IncidenceAngle(naif), Angle::Degrees);
           Angle theta = Angle(90.0, Angle::Degrees) - *m_incidenceAngle;
 
           Displacement deltaX = m_startSurfacePoint->GetX() - m_endSurfacePoint->GetX();

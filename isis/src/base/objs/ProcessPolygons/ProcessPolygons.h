@@ -55,11 +55,13 @@ namespace Isis {
       Isis::Cube *AppendOutputCube(const QString &avgFileName,
                                    const QString &countFileName = "");
 
-      void Rasterize(std::vector<double> &samples,
+      void Rasterize(NaifContextPtr naif,
+                     std::vector<double> &samples,
                      std::vector<double> &lines,
                      std::vector<double> &values);
 
-      void Rasterize(std::vector<double> &samples,
+      void Rasterize(NaifContextPtr naif,
+                     std::vector<double> &samples,
                      std::vector<double> &lines,
                      int &band, double &value);
 

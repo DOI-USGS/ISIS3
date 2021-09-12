@@ -122,7 +122,7 @@ namespace Isis {
 
       // mutators
       BundleMeasureQsp addMeasure(ControlMeasure *controlMeasure);
-      void computeResiduals();
+      void computeResiduals(NaifContextPtr naif);
       void setAdjustedSurfacePoint(SurfacePoint surfacePoint);
       void setNumberOfRejectedMeasures(int numRejected);
       void setRejected(bool reject);

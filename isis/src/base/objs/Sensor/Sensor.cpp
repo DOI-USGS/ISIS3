@@ -186,7 +186,7 @@ namespace Isis {
 
     // double tolerance = resolution() / 100.0; return
     // target()->shape()->intersectSurface(sB, lookB, tolerance);
-    return target()->shape()->intersectSurface(sB, lookB);
+    return target()->shape()->intersectSurface(naif, sB, lookB);
   }
 
 
@@ -297,8 +297,8 @@ namespace Isis {
    * @return @b Distance The distance from the center of the planet to this
    *          lat,lon in meters.
    */
-  Distance Sensor::LocalRadius(Latitude lat, Longitude lon) {
-    return target()->shape()->localRadius(lat, lon);
+  Distance Sensor::LocalRadius(NaifContextPtr naif, Latitude lat, Longitude lon) {
+    return target()->shape()->localRadius(naif, lat, lon);
   }
 
 
@@ -313,8 +313,9 @@ namespace Isis {
     * @return @b Distance The distance from the center of the planet to this
     *          lat,lon in meters.
     */
-  Distance Sensor::LocalRadius(double lat, double lon) {
-    return target()->shape()->localRadius(Latitude(lat, Angle::Degrees),
+  Distance Sensor::LocalRadius(NaifContextPtr naif, double lat, double lon) {
+    return target()->shape()->localRadius(naif,
+                                          Latitude(lat, Angle::Degrees),
                                           Longitude(lon, Angle::Degrees));
   }
 
@@ -326,7 +327,7 @@ namespace Isis {
    */
   double Sensor::PhaseAngle(NaifContextPtr naif) const {
     std::vector<double> sunB(m_uB, m_uB+3);
-    return target()->shape()->phaseAngle(
+    return target()->shape()->phaseAngle(naif,
                                bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate(), naif), sunB);
   }
 
@@ -337,7 +338,7 @@ namespace Isis {
    * @return @b double Emission angle, in degrees.
    */
   double Sensor::EmissionAngle(NaifContextPtr naif) const {
-    return target()->shape()->emissionAngle(
+    return target()->shape()->emissionAngle(naif,
         bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate(), naif));
   }
 
@@ -347,9 +348,9 @@ namespace Isis {
    *
    * @return @b double Incidence angle, in degrees.
    */
-  double Sensor::IncidenceAngle() const {
+  double Sensor::IncidenceAngle(NaifContextPtr naif) const {
     std::vector<double> sunB(m_uB, m_uB+3);
-    return target()->shape()->incidenceAngle(sunB);
+    return target()->shape()->incidenceAngle(naif, sunB);
   }
 
 
@@ -388,7 +389,7 @@ namespace Isis {
     Latitude lat(latitude, Angle::Degrees);
     Longitude lon(longitude, Angle::Degrees);
     // Local radius is deferred to (possible derived) shape model method
-    shape->intersectSurface(lat, lon,
+    shape->intersectSurface(naif, lat, lon,
                             bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate(), naif),
                             backCheck);
 
@@ -432,7 +433,7 @@ namespace Isis {
     Longitude lon(longitude, Angle::Degrees);
     Distance rad(radius, Distance::Meters);
 
-    shape->intersectSurface(SurfacePoint(lat, lon, rad), 
+    shape->intersectSurface(SurfacePoint(naif, lat, lon, rad), 
                             bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate(), naif),
                             backCheck);
 
@@ -518,7 +519,7 @@ namespace Isis {
       // Assume the intersection point is good in order to get the emission angle
       // shape->setHasIntersection(true);  //KJB there should be a formal intersection in ShapeModel
       std::vector<double> lookdir = lookDirectionBodyFixed();
-      if ( !shape->isVisibleFrom(sB, lookdir) ) {
+      if ( !shape->isVisibleFrom(naif, sB, lookdir) ) {
         shape->clearSurfacePoint();
         shape->setHasIntersection(false);
         return false;
@@ -723,7 +724,7 @@ namespace Isis {
     double rlon = lon * PI / 180.0;
 
     // Compute radius
-    Distance rad = LocalRadius(lat, lon);
+    Distance rad = LocalRadius(naif, lat, lon);
 
     // Now with the 3 spherical value compute the x/y/z coordinate
     double ssB[3];

@@ -195,7 +195,7 @@ void IsisMain() {
     latLonGrid->CreateGrid(baseLat, baseLon, latInc, lonInc, &progress);
 
     if (ui.GetBoolean("BOUNDARY")) {
-      latLonGrid->WalkBoundary();
+      latLonGrid->WalkBoundary(naif);
       walkBoundary = true;
     }
 
@@ -388,7 +388,7 @@ void changeBand(int band){
   latLonGrid->CreateGrid(baseLat, baseLon, latInc, lonInc, &progress);
 
   if (walkBoundary)
-    latLonGrid->WalkBoundary();
+    latLonGrid->WalkBoundary(naif);
 
 }
 

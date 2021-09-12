@@ -76,7 +76,7 @@ namespace Isis {
     }
     if(!_camera->SetImage(sample, line, naif))  return (Null);
 
-    double i = _camera->IncidenceAngle();
+    double i = _camera->IncidenceAngle(naif);
     double e = _camera->EmissionAngle(naif);
     double g = _camera->PhaseAngle(naif);
     if(i >= 90.0) return (Null);

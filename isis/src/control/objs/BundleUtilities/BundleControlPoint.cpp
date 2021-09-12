@@ -129,8 +129,8 @@ namespace Isis {
    *
    * @see ControlPoint::ComputeResiduals()
    */
-  void BundleControlPoint::computeResiduals() {
-    m_controlPoint->ComputeResiduals();
+  void BundleControlPoint::computeResiduals(NaifContextPtr naif) {
+    m_controlPoint->ComputeResiduals(naif);
   }
 
 

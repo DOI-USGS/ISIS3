@@ -34,6 +34,7 @@
 #include "SpecialPixel.h"
 #include "ImagePolygon.h"
 #include "IException.h"
+#include "NaifContext.h"
 
 namespace Isis {
 
@@ -84,12 +85,12 @@ namespace Isis {
 
 
   /** Returns degree to radian conversion factor */
-  inline double DegToRad(const double ang) {
-    return (ang * rpd_c());
+  inline double DegToRad(NaifContextPtr naif, const double ang) {
+    return (ang * naif->rpd_c());
   }
   /** Returns radians to degrees conversion factor */
-  inline double RadToDeg(const double ang) {
-    return (ang * dpr_c());
+  inline double RadToDeg(NaifContextPtr naif, const double ang) {
+    return (ang * naif->dpr_c());
   }
 
   /**  A very useful, typesafe way to delete pointers in STL container
@@ -187,10 +188,10 @@ namespace Isis {
       }
       bool hasCenterGeometry() const;
       bool hasLimb() const;
-      void collect(Camera &camera, Cube &cube, bool doGeometry, bool doPolygon,
+      void collect(NaifContextPtr naif, Camera &camera, Cube &cube, bool doGeometry, bool doPolygon,
           bool getFootBlob, bool increasePrecision);
       void generateGeometryKeys(PvlObject &pband);
-      void generatePolygonKeys(PvlObject &pband);
+      void generatePolygonKeys(NaifContextPtr naif, PvlObject &pband);
 
     private:
       // Internal structure to contain geometric properties
@@ -277,13 +278,13 @@ namespace Isis {
       Pvl _mapping;
 
       void destruct();
-      GProperties getGeometrySummary() const;
-      Pvl getProjGeometry(Camera &camera,  geos::geom::MultiPolygon *footprint,
+      GProperties getGeometrySummary(NaifContextPtr naif) const;
+      Pvl getProjGeometry(NaifContextPtr naif, Camera &camera,  geos::geom::MultiPolygon *footprint,
                           GProperties &g);
       double getRadius() const;
       double getPixelResolution() const;
-      double getPixelsPerDegree(double pixres, double radius) const;
-      bool isDistShorter(double bestDist, double lat1, double lon1,
+      double getPixelsPerDegree(NaifContextPtr naif, double pixres, double radius) const;
+      bool isDistShorter(NaifContextPtr naif, double bestDist, double lat1, double lon1,
                          double lat2, double lon2, double radius,
                          double &thisDist) const;
       geos::geom::MultiPolygon *makeMultiPolygon(geos::geom::Geometry *g) const;

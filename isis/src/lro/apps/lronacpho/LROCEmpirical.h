@@ -31,10 +31,10 @@ namespace Isis {
    */
   class LROCEmpirical : public PhotometricFunction {
     public:
-      LROCEmpirical (PvlObject &pvl, Cube &cube, bool useCamera);
+      LROCEmpirical (NaifContextPtr naif, PvlObject &pvl, Cube &cube, bool useCamera);
       virtual ~LROCEmpirical () ;
 
-      double photometry(double i, double e, double g, int band = 1) const;
+      double photometry(NaifContextPtr naif, double i, double e, double g, int band = 1) const;
       void report( PvlContainer &pvl );
 
     private:
@@ -64,10 +64,10 @@ namespace Isis {
 
       };
 
-      void init(PvlObject &pvl, Cube &cube);
-      double photometry(const Parameters &parms, double i, double e,double g) const;
-      Parameters findParameters(const double wavelength) const;
-      Parameters extract( const DbProfile &profile) const;
+      void init(NaifContextPtr naif, PvlObject &pvl, Cube &cube);
+      double photometry(NaifContextPtr naif, const Parameters &parms, double i, double e,double g) const;
+      Parameters findParameters(NaifContextPtr naif, const double wavelength) const;
+      Parameters extract( NaifContextPtr naif, const DbProfile &profile) const;
 
       std::vector<DbProfile> m_profiles; //<! Profiles for all possible wavelengths
       std::vector<Parameters> m_bandpho; //<! Parameters for each band

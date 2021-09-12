@@ -75,8 +75,8 @@ namespace Isis {
 
       void setCamera(Camera *cam);
       static QString algorithmName( const PvlObject &pvl );
-      virtual double compute( const double &line, const double &sample, int band = 1, bool useDem = false);
-      virtual double photometry( double i, double e, double g, int band = 1 ) const = 0;
+      virtual double compute( NaifContextPtr naif, const double &line, const double &sample, int band = 1, bool useDem = false);
+      virtual double photometry( NaifContextPtr naif, double i, double e, double g, int band = 1 ) const = 0;
       virtual void report( PvlContainer &pvl ) = 0;
       virtual void setMinimumIncidenceAngle( double angle );
       virtual void setMaximumIncidenceAngle( double angle );

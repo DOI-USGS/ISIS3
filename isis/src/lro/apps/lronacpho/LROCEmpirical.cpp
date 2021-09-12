@@ -23,9 +23,9 @@ namespace Isis {
   * @internal
   *   @history 2016-08-15 - Code adapted from lrowacpho written by Kris Becker
   */
-  LROCEmpirical::LROCEmpirical(PvlObject &pvl, Cube &cube, bool useCamera) :
+  LROCEmpirical::LROCEmpirical(NaifContextPtr naif, PvlObject &pvl, Cube &cube, bool useCamera) :
                  PhotometricFunction(pvl, cube, useCamera) {
-    init(pvl, cube);
+    init(naif, pvl, cube);
   }
 
 
@@ -57,7 +57,7 @@ namespace Isis {
    *   @history 2016-08-15 Victor Silva - Adapted from the lrowacpho application
    *                           written by Kris Becker.
    */
-  void LROCEmpirical::init( PvlObject &pvl, Cube &cube ) {
+  void LROCEmpirical::init( NaifContextPtr naif, PvlObject &pvl, Cube &cube ) {
 
     //  Make it reentrant
     m_profiles.clear();
@@ -86,10 +86,10 @@ namespace Isis {
     QString errs("");
 
     for (int i = 0; i < cube.bandCount(); i++) {
-      Parameters parms = findParameters(toDouble(center[i]));
+      Parameters parms = findParameters(naif, toDouble(center[i]));
       if (parms.IsValid()) {
         parms.band = i + 1;
-        parms.phoStd = photometry(parms, m_iRef, m_eRef, m_gRef);
+        parms.phoStd = photometry(naif, parms, m_iRef, m_eRef, m_gRef);
         m_bandpho.push_back(parms);
       }
       else { // Appropriate photometric parameters not found
@@ -133,14 +133,14 @@ namespace Isis {
    *   @history 2016-08-15 Victor Silva - Adapted code from lrowacpho application
    *                         written by Kris Becker
    */
-  double LROCEmpirical::photometry( double i, double e, double g, int band ) const {
+  double LROCEmpirical::photometry( NaifContextPtr naif, double i, double e, double g, int band ) const {
 
     if ((band <= 0) || (band > (int) m_bandpho.size())) {
       std::string mess = "Provided band " + IString(band) + " out of range.";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
-    double ph = photometry(m_bandpho[band - 1], i, e, g);
+    double ph = photometry(naif, m_bandpho[band - 1], i, e, g);
     return (m_bandpho[band - 1].phoStd / ph);
   }
 
@@ -165,7 +165,7 @@ namespace Isis {
    *                         written by Kris Becker
    *
    */
-  double LROCEmpirical::photometry( const Parameters &parms, double i, double e, double g ) const {
+  double LROCEmpirical::photometry( NaifContextPtr naif, const Parameters &parms, double i, double e, double g ) const {
     //  Ensure problematic values are adjusted
     if (i == 0.0) {
       i = 10.E-12;
@@ -175,8 +175,8 @@ namespace Isis {
     }
 
     // Convert to radians
-    i *= rpd_c();
-    e *= rpd_c();
+    i *= naif->rpd_c();
+    e *= naif->rpd_c();
     g *= parms.phaUnit; //  Apply unit normalizer
 
     // Compute Lommel-Seeliger components
@@ -284,7 +284,7 @@ namespace Isis {
    *   @history 2016-08-15 Victor Silva - Adapted from the lrowacpho application
    *                           written by Kris Becker.
    */
-  LROCEmpirical::Parameters LROCEmpirical::findParameters( const double wavelength ) const {
+  LROCEmpirical::Parameters LROCEmpirical::findParameters( NaifContextPtr naif, const double wavelength ) const {
 
     for (unsigned int i = 0; i < m_profiles.size(); i++) {
       const DbProfile &profile = m_profiles[i];
@@ -294,7 +294,7 @@ namespace Isis {
         double tolerance = toDouble(ConfKey(profile, "BandBinCenterTolerance", toString(1.0E-6)));
 
         if (fabs(wavelength - p_center) <= fabs(tolerance)) {
-          Parameters pars = extract(profile);
+          Parameters pars = extract(naif, profile);
           pars.iProfile = i;
           pars.wavelength = wavelength;
           pars.tolerance = tolerance;
@@ -325,7 +325,7 @@ namespace Isis {
    *   @history 2016-08-15 Victor Silva - Adapted from the lrowacpho application
                               written by Kris Becker.
    */
-  LROCEmpirical::Parameters LROCEmpirical::extract( const DbProfile &profile) const {
+  LROCEmpirical::Parameters LROCEmpirical::extract( NaifContextPtr naif, const DbProfile &profile) const {
     Parameters pars;
     pars.a1 = toDouble(ConfKey(profile, "A1", toString(0.0)));
     pars.a2 = toDouble(ConfKey(profile, "A2", toString(0.0)));
@@ -334,7 +334,7 @@ namespace Isis {
     pars.tolerance = toDouble(ConfKey(profile, "BandBinCenterTolerance", toString(Null)));
     //  Determine equation units - defaults to Radians
     pars.units = ConfKey(profile, "Units", QString("Radians"));
-    pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : rpd_c();
+    pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : naif->rpd_c();
 
     return (pars);
   }

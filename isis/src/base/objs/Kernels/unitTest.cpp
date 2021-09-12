@@ -29,7 +29,9 @@ QString stripPath(QString input) {
 }
 
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
   QString inputFile = "$mgs/testData/ab102401.lev2.cub";
   if (--argc == 1) { inputFile = argv[1]; }
 
@@ -47,37 +49,37 @@ int main(int argc, char *argv[]) {
 
   //  Test to see if we have any kernels loaded at all
   Kernels query;
-  query.Discover();
+  query.Discover(naif);
   cout << "\nInitial currently loaded kernel files = " << query.size() << "\n";
   QStringList kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << kloaded.join("\n") << endl;
 
   //  Load all the kernels
-  myKernels.Load();
-  query.Discover();
+  myKernels.Load(naif);
+  query.Discover(naif);
   cout << "\nAfter LoadALL option, kernels loaded = " << query.size() << "\n";
   kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << kloaded.join("\n") << endl;
 
   // Unload and check for proper status
-  myKernels.UnLoad();
-  query.Discover();
+  myKernels.UnLoad(naif);
+  query.Discover(naif);
   cout << "\nUnLoading All, count after = " << query.size() << "\n";
 
   //  Now load the SPK kernels after unloading
-  myKernels.Load("SPK");
-  query.Discover();
+  myKernels.Load(naif, "SPK");
+  query.Discover(naif);
   cout << "\nLoaded SPK kernels = " << query.size() << "\n";
   kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << kloaded.join("\n") << endl;
 
   // Load kernels needed for Time manipulation
-  myKernels.Load("LSK,SCLK");
-  myKernels.UnLoad("SPK");
-  query.Discover();
+  myKernels.Load(naif, "LSK,SCLK");
+  myKernels.UnLoad(naif, "SPK");
+  query.Discover(naif);
   cout << "\nLoad LSK, SCLK for Time manip, unload SPK kernels = " << query.size() << "\n";
   kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
@@ -87,22 +89,22 @@ int main(int argc, char *argv[]) {
   Kernels clone;
   clone.Merge(query);
   clone.Manage();
-  clone.UnLoad();
+  clone.UnLoad(naif);
 
-  myKernels.UpdateLoadStatus();
+  myKernels.UpdateLoadStatus(naif);
   cout << "\nNumber loaded: " << myKernels.getLoadedList().size() << "\n";
-  myKernels.Load("LSK,SCLK");
+  myKernels.Load(naif,"LSK,SCLK");
   // Load same files
-  clone.Load();
-  query.Discover();
+  clone.Load(naif);
+  query.Discover(naif);
   cout << "\nCheck Double-Load of LSK, SCLK = " << query.size() << "\n";
   kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << kloaded.join("\n") << endl;
 
   // Unload each set
-  clone.UnLoad();
-  query.Discover();
+  clone.UnLoad(naif);
+  query.Discover(naif);
   cout << "\nUnload the cloned set = " << query.size() << "\n";
   kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
@@ -110,27 +112,27 @@ int main(int argc, char *argv[]) {
   clone.UnManage();
 
   //  Load SPK set
-  myKernels.UnLoad();
-  myKernels.Load("LSK,FK,DAF,SPK");
-  query.Discover();
+  myKernels.UnLoad(naif);
+  myKernels.Load(naif, "LSK,FK,DAF,SPK");
+  query.Discover(naif);
   cout << "\nCheck SPK load  (LSK,FK,DAF,SPK)= " << query.size() << "\n";
   kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << kloaded.join("\n") << endl;
 
   // Now unload SPKs, preserve LSK and load CK stuff
-  myKernels.UnLoad("DAF,SPK");
+  myKernels.UnLoad(naif, "DAF,SPK");
   cout << "Unload DAF,SPK\n";
-  myKernels.Load("SCLK,IK,CK");
-  query.Discover();
+  myKernels.Load(naif, "SCLK,IK,CK");
+  query.Discover(naif);
   cout << "\nCheck CK load  (SCLK,IK,CK) = " << query.size() << "\n";
   kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << kloaded.join("\n") << endl;
 
   // Now reload all and check
-  myKernels.Load("LSK,FK,SCLK,IK,CK");
-  query.Discover();
+  myKernels.Load(naif, "LSK,FK,SCLK,IK,CK");
+  query.Discover(naif);
   cout << "\nCheck CK reload  (LSK,FK,SCLK,IK,CK) = " << query.size() << "\n";
   kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
@@ -140,26 +142,26 @@ int main(int argc, char *argv[]) {
   clone.Clear();
   query.Clear();
   myKernels.Clear();
-  myKernels.InitializeNaifKernelPool();
+  myKernels.InitializeNaifKernelPool(naif);
 
   // Left two kernels open, ensure we have none left
-  query.Discover();
+  query.Discover(naif);
   cout << "\n\nEnsure clean pool...Count: " << query.size() << "\n";
 
   // Load a bogus file and check for missing
-  myKernels.Add("$base/kernels/lsk/dne.lsk");
+  myKernels.Add(naif, "$base/kernels/lsk/dne.lsk");
   cout << "\nLoad of bogus file, should have one missing: " << myKernels.Missing()
        << "\n";
   myKernels.Clear();
 
   // Now add a set be hand
-  myKernels.Add("$base/kernels/lsk/naif0009.tls");
-  myKernels.Add("$base/kernels/spk/de405.bsp");
-  myKernels.Add("$clementine1/kernels/ck/clem_ulcn2005_type2_1sc.bc");
-  myKernels.Add("$clementine1/kernels/fk/clem_v11.tf");
-  myKernels.Add("$clementine1/kernels/sclk/dspse002.tsc");
-  myKernels.Add("$clementine1/kernels/spk/SPKMERGE_940219_940504_CLEMV001b.bsp");
-  myKernels.Add("$clementine1/kernels/iak/uvvisAddendum003.ti");
+  myKernels.Add(naif, "$base/kernels/lsk/naif0009.tls");
+  myKernels.Add(naif, "$base/kernels/spk/de405.bsp");
+  myKernels.Add(naif, "$clementine1/kernels/ck/clem_ulcn2005_type2_1sc.bc");
+  myKernels.Add(naif, "$clementine1/kernels/fk/clem_v11.tf");
+  myKernels.Add(naif, "$clementine1/kernels/sclk/dspse002.tsc");
+  myKernels.Add(naif, "$clementine1/kernels/spk/SPKMERGE_940219_940504_CLEMV001b.bsp");
+  myKernels.Add(naif, "$clementine1/kernels/iak/uvvisAddendum003.ti");
 
   cout << "\n\nAdd Kernels directly - Count: " << myKernels.size() 
        << ", Missing: "<< myKernels.Missing() << "\n";
@@ -179,22 +181,22 @@ int main(int argc, char *argv[]) {
 
 
   // Load them all
-  myKernels.Load();
+  myKernels.Load(naif);
   kloaded = myKernels.getLoadedList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << "\nLoading all, total loaded: " << kloaded.size() << "\n";
   cout << kloaded.join("\n") << endl;
 
   //  Now double check list
-  query.Discover();
+  query.Discover(naif);
   cout << "\nCheck Load Status = " << query.size() << "\n";
   kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << kloaded.join("\n") << endl;
 
   // Unload SPK and CKs
-  myKernels.UnLoad("SPK,CK");
-  query.Discover();
+  myKernels.UnLoad(naif, "SPK,CK");
+  query.Discover(naif);
   cout << "\nUnload SPK,CK - Loaded: " << query.size() << "\n";
   kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
@@ -204,28 +206,28 @@ int main(int argc, char *argv[]) {
   clone.Clear();
   query.Clear();
   myKernels.Clear();
-  myKernels.InitializeNaifKernelPool();
+  myKernels.InitializeNaifKernelPool(naif);
 
   // Left two kernels open, ensure we have none left
-  query.Discover();
+  query.Discover(naif);
   cout << "\n\nEnsure clean pool...Count: " << query.size() << "\n";
 
 
   // Now add a set be hand
-  myKernels.Add("$base/kernels/lsk/naif0009.tls");
-  myKernels.Add("$base/kernels/pck/pck00009.tpc");
-  myKernels.Add("$hayabusa/kernels/pck/itokawa_gaskell_n3.tpc");
-  myKernels.Add("$hayabusa/kernels/tspk/de403s.bsp");
-  myKernels.Add("$hayabusa/kernels/tspk/sb_25143_140.bsp");
-  myKernels.Add("$hayabusa/kernels/spk/hay_jaxa_050916_051119_v1n.bsp");
-  myKernels.Add("$hayabusa/kernels/spk/hay_osbj_050911_051118_v1n.bsp");
-  myKernels.Add("$hayabusa/kernels/ck/hayabusa_itokawarendezvous_v02n.bc");
-  myKernels.Add("$hayabusa/kernels/fk/hayabusa_hp.tf");
-  myKernels.Add("$hayabusa/kernels/fk/itokawa_fixed.tf");
-  myKernels.Add("$hayabusa/kernels/ik/amica31.ti");
-  myKernels.Add("$hayabusa/kernels/iak/amicaAddendum001.ti");
-  myKernels.Add("$hayabusa/kernels/sclk/hayabusa.tsc");
-  myKernels.Add("$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds");
+  myKernels.Add(naif, "$base/kernels/lsk/naif0009.tls");
+  myKernels.Add(naif, "$base/kernels/pck/pck00009.tpc");
+  myKernels.Add(naif, "$hayabusa/kernels/pck/itokawa_gaskell_n3.tpc");
+  myKernels.Add(naif, "$hayabusa/kernels/tspk/de403s.bsp");
+  myKernels.Add(naif, "$hayabusa/kernels/tspk/sb_25143_140.bsp");
+  myKernels.Add(naif, "$hayabusa/kernels/spk/hay_jaxa_050916_051119_v1n.bsp");
+  myKernels.Add(naif, "$hayabusa/kernels/spk/hay_osbj_050911_051118_v1n.bsp");
+  myKernels.Add(naif, "$hayabusa/kernels/ck/hayabusa_itokawarendezvous_v02n.bc");
+  myKernels.Add(naif, "$hayabusa/kernels/fk/hayabusa_hp.tf");
+  myKernels.Add(naif, "$hayabusa/kernels/fk/itokawa_fixed.tf");
+  myKernels.Add(naif, "$hayabusa/kernels/ik/amica31.ti");
+  myKernels.Add(naif, "$hayabusa/kernels/iak/amicaAddendum001.ti");
+  myKernels.Add(naif, "$hayabusa/kernels/sclk/hayabusa.tsc");
+  myKernels.Add(naif, "$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds");
 
   cout << "\n\nAdd DSK Kernels directly - Count: " << myKernels.size() 
        << ", Missing: "<< myKernels.Missing() << "\n";
@@ -245,29 +247,29 @@ int main(int argc, char *argv[]) {
 
 
   // Load them all
-  myKernels.Load();
+  myKernels.Load(naif);
   kloaded = myKernels.getLoadedList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << "\nLoading all, total loaded: " << kloaded.size() << "\n";
   cout << kloaded.join("\n") << endl;
 
   //  Now double check list
-  query.Discover();
+  query.Discover(naif);
   cout << "\nCheck Load Status = " << query.size() << "\n";
   kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << kloaded.join("\n") << endl;
 
   // Unload SPK and CKs
-  myKernels.UnLoad("SPK,CK");
-  query.Discover();
+  myKernels.UnLoad(naif, "SPK,CK");
+  query.Discover(naif);
   cout << "\nUnload SPK,CK - Loaded: " << query.size() << "\n";
   kloaded = query.getKernelList();
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << kloaded.join("\n") << endl;
 
-  myKernels.UnLoad();
-  query.Discover();
+  myKernels.UnLoad(naif);
+  query.Discover(naif);
   cout << "\n\nAll Done - Should be 0 discovered: " << query.size() << "\n";
   // All done...
   return (0);

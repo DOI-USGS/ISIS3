@@ -94,7 +94,7 @@ void IsisMain() {
       if (cam->SetUniversalGround(naif, avgLat, avgLon)) {
         emissionAngle = cam->EmissionAngle(naif);
         phaseAngle = cam->PhaseAngle(naif);
-        incidenceAngle = cam->IncidenceAngle();
+        incidenceAngle = cam->IncidenceAngle(naif);
         localSolarTime = cam->LocalSolarTime(naif);
         solarLongitude = cam->solarLongitude(naif).degrees();
         sunAzimuth = cam->SunAzimuth(naif);
@@ -149,7 +149,7 @@ void IsisMain() {
         if (cam->SetImage(sample, line, naif)) {
           emissionAngle = cam->EmissionAngle(naif);
           phaseAngle = cam->PhaseAngle(naif);
-          incidenceAngle = cam->IncidenceAngle();
+          incidenceAngle = cam->IncidenceAngle(naif);
           localSolarTime = cam->LocalSolarTime(naif);
           solarLongitude = cam->solarLongitude(naif).degrees();
           sunAzimuth = cam->SunAzimuth(naif);

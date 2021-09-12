@@ -43,6 +43,8 @@ using namespace boost::numeric::ublas;
  */
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
+  Isis::NaifContextLifecycle naif_lifecycle;
+  auto naif = Isis::NaifContext::acquire();
   symmetric_matrix<double,upper> cvRect,cvOc;
 
   try {
@@ -61,7 +63,8 @@ int main(int argc, char *argv[]) {
     covar(2,2) = 400.;
 
     // Default is to set covar in meters**2 for length units
-    spRec.SetRectangular(Displacement(-424.024048, Displacement::Meters),
+    spRec.SetRectangular(naif,
+                         Displacement(-424.024048, Displacement::Meters),
                          Displacement(734.4311949, Displacement::Meters),
                          Displacement(529.919264, Displacement::Meters), covar);
 
@@ -125,7 +128,8 @@ int main(int argc, char *argv[]) {
     covarSphere(0,2) *= 1000.;
     covarSphere(1,2) *= 1000.;
     covarSphere(2,2) *= 1.0e6;
-    spSphere.SetSpherical(Latitude(lat, Angle::Degrees),
+    spSphere.SetSpherical(naif,
+                          Latitude(lat, Angle::Degrees),
                           Longitude(lon, Angle::Degrees),
                           Distance(radius, Distance::Meters),
                           covarSphere);
@@ -164,7 +168,8 @@ int main(int argc, char *argv[]) {
     try {
     cout << "3-Testing rectangular set with point and sigmas only..." << endl;
     Isis::SurfacePoint spRec;
-    spRec.SetRectangular(Displacement(-424.024048, Displacement::Meters),
+    spRec.SetRectangular(naif,
+                         Displacement(-424.024048, Displacement::Meters),
                          Displacement(734.4311949, Displacement::Meters),
                          Displacement(529.919264, Displacement::Meters),
                          Distance(10., Distance::Meters),
@@ -200,7 +205,8 @@ int main(int argc, char *argv[]) {
     cout << "4-Testing planetocentric set with point and sigmas  ..."
          << endl;
     Isis::SurfacePoint spSphere1,spSphere2,spSphere4;
-    spSphere1.SetSpherical(Latitude(32., Angle::Degrees),
+    spSphere1.SetSpherical(naif,
+                         Latitude(32., Angle::Degrees),
                          Longitude(120., Angle::Degrees),
                          Distance(1000., Distance::Meters),
                          Angle(1.64192315,Angle::Degrees),
@@ -210,16 +216,18 @@ int main(int argc, char *argv[]) {
     symmetric_matrix<double,upper> covarRec(3);
     covarRec.clear();
     covarRec = spSphere1.GetRectangularMatrix(SurfacePoint::Kilometers);
-    spSphere2.SetSpherical(Latitude(0.55850536, Angle::Radians),
+    spSphere2.SetSpherical(naif,
+                              Latitude(0.55850536, Angle::Radians),
                               Longitude(2.0943951, Angle::Radians),
                               Distance(1000., Distance::Meters),
                               Angle(0.028656965, Angle::Radians),
                               Angle(0.0311981281, Angle::Radians),
                               Distance(38.4548873, Distance::Meters));
-    spSphere4.SetSpherical(Latitude(0.55850536, Angle::Radians),
+    spSphere4.SetSpherical(naif, 
+                              Latitude(0.55850536, Angle::Radians),
                               Longitude(2.0943951, Angle::Radians),
                               Distance(1000., Distance::Meters));
-    spSphere4.SetSphericalSigmasDistance(
+    spSphere4.SetSphericalSigmasDistance(naif,
                               Distance(28.6569649, Distance::Meters),
                               Distance(26.4575131, Distance::Meters),
                               Distance(38.4548873, Distance::Meters));
@@ -286,7 +294,7 @@ int main(int argc, char *argv[]) {
          << covarSphere(2,1) << "  " << covarSphere(2,2) << endl << endl;
 
     cout << "Testing Longitude Accessor..." << endl;
-    Isis::SurfacePoint spSphere3(Latitude(15, Angle::Degrees),
+    Isis::SurfacePoint spSphere3(naif, Latitude(15, Angle::Degrees),
         Longitude(-45, Angle::Degrees), Distance(10, Distance::Kilometers));
     cout << "Longitude (from -45): " << spSphere3.GetLongitude().degrees()
          << endl << endl;
@@ -310,10 +318,11 @@ int main(int argc, char *argv[]) {
     covar(1,1) = .0025;
     covar(2,2) = .0004;
 
-    spRecKm.SetRectangular(Displacement(-424.024048, Displacement::Meters),
+    spRecKm.SetRectangular(naif, 
+                           Displacement(-424.024048, Displacement::Meters),
                            Displacement(734.4311949, Displacement::Meters),
                          Displacement(529.919264, Displacement::Meters));
-    spRecKm.SetMatrix(SurfacePoint::Rectangular, covar);
+    spRecKm.SetMatrix(naif, SurfacePoint::Rectangular, covar);
 
     lat = spRecKm.GetLatitude().degrees();
     lon = spRecKm.GetLongitude().degrees();
@@ -358,10 +367,11 @@ int main(int argc, char *argv[]) {
     cout << "    latitude sigma=" << latSig << " deg, longitude sigma=" << lonSig
          << " deg, radiusSig=" << radSig << " m" << endl;
     Isis::SurfacePoint spSphereKm;
-    spSphereKm.SetSpherical(Latitude(lat, Angle::Degrees),
+    spSphereKm.SetSpherical(naif,
+                          Latitude(lat, Angle::Degrees),
                           Longitude(lon, Angle::Degrees),
                             Distance(radius, Distance::Meters));
-    spSphereKm.SetMatrix(SurfacePoint::Latitudinal, covarSphKm);
+    spSphereKm.SetMatrix(naif, SurfacePoint::Latitudinal, covarSphKm);
     symmetric_matrix<double,upper> covarRecKm(3);
     covarRecKm.clear();
     covarRecKm = spSphereKm.GetRectangularMatrix(SurfacePoint::Kilometers);
@@ -400,7 +410,8 @@ int main(int argc, char *argv[]) {
     
     // Set a point for testing - Use coordinate data from test 1
     Isis::SurfacePoint spRec1;
-    spRec1.SetRectangular(Displacement(-424.024048, Displacement::Meters),
+    spRec1.SetRectangular(naif,
+                          Displacement(-424.024048, Displacement::Meters),
                           Displacement(734.4311949, Displacement::Meters),
                           Displacement(529.919264, Displacement::Meters));
     
@@ -493,7 +504,7 @@ int main(int argc, char *argv[]) {
       cout << "Test error statements: case of invalid SurfacePoint in"
               << " SetSphericalSigmasDistance " << endl;
       SurfacePoint sp;
-      sp.SetSphericalSigmasDistance(Distance(3.,Distance::Meters),
+      sp.SetSphericalSigmasDistance(naif, Distance(3.,Distance::Meters),
            Distance(3.,Distance::Meters),Distance(3.,Distance::Meters));
    }
    catch(Isis::IException &e) {
@@ -505,7 +516,8 @@ int main(int argc, char *argv[]) {
     // radii.  Try GetWeight, GetSigma and GetCoord for all possibilities.
       cout << endl;
       cout << "...Testing GetCoord, GetSigma, and GetWeight...  " << endl << endl;
-      spRec1.SetRectangularSigmas(Distance(10.,Distance::Meters),
+      spRec1.SetRectangularSigmas(naif,
+                                Distance(10.,Distance::Meters),
                                 Distance(50., Distance::Meters),
                                 Distance(20., Distance::Meters));
 
@@ -627,9 +639,9 @@ int main(int argc, char *argv[]) {
   cout << "Test computational methods..." << endl;
   cout << "  SphericalDistanceToPoint (i.e. haversine): ";
 
-  SurfacePoint point1(Latitude(0, Angle::Degrees),
+  SurfacePoint point1(naif, Latitude(0, Angle::Degrees),
       Longitude(90, Angle::Degrees), Distance(1.5, Distance::Kilometers));
-  SurfacePoint point2(Latitude(0, Angle::Degrees),
+  SurfacePoint point2(naif, Latitude(0, Angle::Degrees),
       Longitude(180, Angle::Degrees), Distance(0.5, Distance::Kilometers));
 
   Distance result = point1.GetDistanceToPoint(point2);

@@ -66,28 +66,28 @@ class MySpice : public Spice {
       cout << endl;
     }
 
-    int MyInteger(QString key) {
-      return getInteger(key, 0);
+    int MyInteger(NaifContextPtr naif, QString key) {
+      return getInteger(naif, key, 0);
     }
 
-    double MyDouble(QString key) {
-      return getDouble(key, 0);
+    double MyDouble(NaifContextPtr naif, QString key) {
+      return getDouble(naif, key, 0);
     }
 
-    QString MyString(QString key) {
-      return getString(key, 0);
+    QString MyString(NaifContextPtr naif, QString key) {
+      return getString(naif, key, 0);
     }
 
-    void MyOutput() {
+    void MyOutput(NaifContextPtr naif) {
       cout << "BJ is " << endl;
-      vector<double> BJ = bodyRotation()->Matrix();
+      vector<double> BJ = bodyRotation()->Matrix(naif);
       for(int i = 0; i < (int)BJ.size(); i++) {
         cout << BJ[i] << endl;
       }
-      vector<double> IJ = instrumentRotation()->Matrix();
+      vector<double> IJ = instrumentRotation()->Matrix(naif);
       vector<double> BI = IJ;
-      mxmt_c((SpiceDouble( *)[3])&BJ[0], (SpiceDouble( *)[3])&IJ[0],
-             (SpiceDouble( *)[3])&BI[0]);
+      naif->mxmt_c((SpiceDouble( *)[3])&BJ[0], (SpiceDouble( *)[3])&IJ[0],
+                   (SpiceDouble( *)[3])&BI[0]);
 
       cout << "BP is " << endl;
       for(int i = 0; i < (int)BI.size(); i++) {
@@ -104,6 +104,8 @@ class MySpice : public Spice {
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   cout << setprecision(10);
   cout << "Unit test for Isis::Spice" << endl;
@@ -160,7 +162,7 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "Testing unknown integer keyword ... " << endl;
-    spi.MyInteger("BadInteger");
+    spi.MyInteger(naif, "BadInteger");
   }
   catch(IException &e) {
     e.print();
@@ -170,7 +172,7 @@ int main(int argc, char *argv[]) {
   // Test bad getDouble
   try {
     cout << "Testing unknown double keyword ... " << endl;
-    spi.MyDouble("BadDouble");
+    spi.MyDouble(naif, "BadDouble");
   }
   catch(IException &e) {
     e.print();
@@ -180,7 +182,7 @@ int main(int argc, char *argv[]) {
   // Test bad getString
   try {
     cout << "Testing unknown string keyword ... " << endl;
-    spi.MyString("BadString");
+    spi.MyString(naif, "BadString");
   }
   catch(IException &e) {
     e.print();
@@ -201,9 +203,9 @@ int main(int argc, char *argv[]) {
   // Test good gets
   cout << "Testing convience get methods ... " << endl;
   cout << "Label has kernels? " << spi.hasKernels(lab) << endl;
-  cout << spi.MyInteger("FRAME_MGS_MOC") << endl;
-  cout << spi.MyDouble("INS-94030_NA_FOCAL_LENGTH") << endl;
-  cout << spi.MyString("FRAME_-94031_NAME") << endl;
+  cout << spi.MyInteger(naif, "FRAME_MGS_MOC") << endl;
+  cout << spi.MyDouble(naif, "INS-94030_NA_FOCAL_LENGTH") << endl;
+  cout << spi.MyString(naif, "FRAME_-94031_NAME") << endl;
   cout << endl;
 
   // Testing radius
@@ -214,29 +216,29 @@ int main(int argc, char *argv[]) {
   cout << "Radii[1]:  " << radii[1].kilometers() << endl;
   cout << "Radii[2]:  " << radii[2].kilometers() << endl;
   cout << endl;
-  cout << "Solar Longitude = " << spi.solarLongitude().positiveEast() << endl;
+  cout << "Solar Longitude = " << spi.solarLongitude(naif).positiveEast() << endl;
   cout << "Resolution      = " << spi.resolution() << endl;
 
   // Normal testing (no cache)
   cout << "Testing without cache ... " << endl;
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    spi.setTime(t);
+    spi.setTime(t, naif);
     cout << "Time             = " << spi.time().Et() << endl;
-    cout << "Clock Time (ET)  = " << spi.getClockTime("895484264:57204").Et() << endl;
+    cout << "Clock Time (ET)  = " << spi.getClockTime(naif, "895484264:57204").Et() << endl;
     double p[3];
-    spi.instrumentPosition(p);
+    spi.instrumentPosition(p, naif);
     cout << "Spacecraft          (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     double v[3];
-    spi.instrumentBodyFixedVelocity(v);
+    spi.instrumentBodyFixedVelocity(v, naif);
     cout << "Spacecraft Velocity (B) = " << v[0] << " " << v[1] << " " << v[2] << endl;
     spi.sunPosition(p);
     cout << "Sun                 (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-    spi.MyOutput();
+    spi.MyOutput(naif);
     double lat, lon;
-    spi.subSpacecraftPoint(lat, lon);
+    spi.subSpacecraftPoint(lat, lon, naif);
     cout << "SubSpacecraft  = " << lat << " " << lon << endl;
-    spi.subSolarPoint(lat, lon);
+    spi.subSolarPoint(lat, lon, naif);
     cout << "SubSolar       = " << lat << " " << lon << endl;
   }
   cout << endl;
@@ -244,23 +246,23 @@ int main(int argc, char *argv[]) {
   // Testing with cache
   cout << "Testing with cache ... " << endl;
   double tol = .0022; //estimate resolution pixelPitch*alt/fl*1000.
-  spi.createCache(startTime + slope, endTime - slope, 10, tol);
+  spi.createCache(startTime + slope, endTime - slope, 10, tol, naif);
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    spi.setTime(t);
+    spi.setTime(t, naif);
     cout << "Time           = " << spi.time().Et() << endl;
     double p[3];
-    spi.instrumentPosition(p);
+    spi.instrumentPosition(p, naif);
     cout << "Spacecraft (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     double v[3];
-    spi.instrumentBodyFixedVelocity(v);
+    spi.instrumentBodyFixedVelocity(v, naif);
     cout << "Spacecraft Velocity (B) = " << v[0] << " " << v[1] << " " << v[2] << endl;
     spi.sunPosition(p);
     cout << "Sun        (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
-    spi.MyOutput();
+    spi.MyOutput(naif);
     cout << "Cache Start Time = " << spi.cacheStartTime().Et() << endl;
     cout << "Cache End Time   = " << spi.cacheEndTime().Et() << endl;
-    cout << "Target Center Distance = " << spi.targetCenterDistance() << endl;
+    cout << "Target Center Distance = " << spi.targetCenterDistance(naif) << endl;
   }
   cout << endl;
 

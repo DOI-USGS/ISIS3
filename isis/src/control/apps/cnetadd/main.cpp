@@ -209,7 +209,7 @@ void IsisMain() {
               //TODO: log that it was Emission Angle that failed the check
               newCm->SetIgnored(true);
             }
-            else if (!validator->ValidIncidenceAngle(cam->IncidenceAngle())) {
+            else if (!validator->ValidIncidenceAngle(cam->IncidenceAngle(naif))) {
               //TODO: log that it was Incidence Angle that failed the check
               newCm->SetIgnored(true);
             }

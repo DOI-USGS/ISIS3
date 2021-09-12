@@ -10,8 +10,8 @@
 #include "UserInterface.h"
 
 namespace Isis {
-  extern void spiceinit(Cube *cube, UserInterface &ui, Pvl *log=nullptr);
-  extern void spiceinit(UserInterface &ui,
+  extern void spiceinit(NaifContextPtr naif, Cube *cube, UserInterface &ui, Pvl *log=nullptr);
+  extern void spiceinit(NaifContextPtr naif, UserInterface &ui,
                         Pvl *log = nullptr);
 }
 

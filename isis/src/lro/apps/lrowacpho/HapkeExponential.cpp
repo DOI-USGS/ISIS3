@@ -56,13 +56,13 @@ namespace Isis {
      * @return double Returns photometric correction using
      *         parameters
      */
-    double HapkeExponential::photometry ( double i, double e, double g, int band ) const {
+    double HapkeExponential::photometry ( NaifContextPtr naif, double i, double e, double g, int band ) const {
         // Test for valid band
         if ((band <= 0) || (band > (int) m_bandpho.size())) {
             std::string mess = "Provided band " + IString(band) + " out of range.";
             throw IException(IException::Programmer, mess, _FILEINFO_);
         }
-        double ph = photometry(m_bandpho[band - 1], i, e, g);
+        double ph = photometry(naif, m_bandpho[band - 1], i, e, g);
         return (m_bandpho[band - 1].phoStd / ph);
     }
 
@@ -81,7 +81,7 @@ namespace Isis {
      *
      * @return double Photometric correction parameter
      */
-    double HapkeExponential::photometry ( const Parameters &parms, double i, double e, double g ) const {
+    double HapkeExponential::photometry ( NaifContextPtr naif, const Parameters &parms, double i, double e, double g ) const {
         //  Ensure problematic values are adjusted
         if (i == 0.0)
             i = 10.E-12;
@@ -89,8 +89,8 @@ namespace Isis {
             e = 10.E-12;
 
         // Convert to radians
-        i *= rpd_c();
-        e *= rpd_c();
+        i *= naif->rpd_c();
+        e *= naif->rpd_c();
         g *= parms.phaUnit; //  Apply unit normalizer
 
         // Compute Lommel-Seeliger components
@@ -194,14 +194,14 @@ namespace Isis {
      * @return HapkeExponential::Parameters Container of valid values.  If
      *         not found, a value of iProfile = -1 is returned.
      */
-    HapkeExponential::Parameters HapkeExponential::findParameters ( const double wavelength ) const {
+    HapkeExponential::Parameters HapkeExponential::findParameters ( NaifContextPtr naif, const double wavelength ) const {
         for (unsigned int i = 0; i < m_profiles.size(); i++) {
             const DbProfile &p = m_profiles[i];
             if (p.exists("BandBinCenter")) {
                 double p_center = toDouble(ConfKey(p, "BandBinCenter", toString(Null)));
                 double tolerance = toDouble(ConfKey(p, "BandBinCenterTolerance", toString(1.0E-6)));
                 if (fabs(wavelength - p_center) <= fabs(tolerance)) {
-                    Parameters pars = extract(p);
+                    Parameters pars = extract(naif, p);
                     pars.iProfile = i;
                     pars.wavelength = wavelength;
                     pars.tolerance = tolerance;
@@ -227,7 +227,7 @@ namespace Isis {
      *
      * @return HapkeExponential::Parameters Container of extracted values
      */
-    HapkeExponential::Parameters HapkeExponential::extract ( const DbProfile &p ) const {
+    HapkeExponential::Parameters HapkeExponential::extract ( NaifContextPtr naif, const DbProfile &p ) const {
         Parameters pars;
 
         for (int i=1; i<=4; i++)
@@ -240,7 +240,7 @@ namespace Isis {
         pars.tolerance = toDouble(ConfKey(p, "BandBinCenterTolerance", toString(Null)));
         //  Determine equation units - defaults to Radians
         pars.units = ConfKey(p, "HapkeExponentialUnits", QString("Radians"));
-        pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : rpd_c();
+        pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : naif->rpd_c();
         return (pars);
     }
 
@@ -258,7 +258,7 @@ namespace Isis {
      * @param pvl  Input PVL parameter files
      * @param cube Input cube file to correct
      */
-    void HapkeExponential::init ( PvlObject &pvl, Cube &cube ) {
+    void HapkeExponential::init ( NaifContextPtr naif, PvlObject &pvl, Cube &cube ) {
         //  Make it reentrant
         m_profiles.clear();
         m_bandpho.clear();
@@ -283,11 +283,11 @@ namespace Isis {
         PvlKeyword center = label->findGroup("BandBin", Pvl::Traverse)["Center"];
         QString errs("");
         for (int i = 0; i < cube.bandCount(); i++) {
-            Parameters parms = findParameters(toDouble(center[i]));
+            Parameters parms = findParameters(naif, toDouble(center[i]));
             if (parms.IsValid()) {
                 parms.band = i + 1;
                 //_camera->SetBand(i + 1);
-                parms.phoStd = photometry(parms, m_iRef, m_eRef, m_gRef);
+                parms.phoStd = photometry(naif, parms, m_iRef, m_eRef, m_gRef);
                 m_bandpho.push_back(parms);
             }
             else { // Appropriate photometric parameters not found

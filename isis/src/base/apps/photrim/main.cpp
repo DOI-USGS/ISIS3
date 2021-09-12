@@ -79,7 +79,7 @@ void photrim(Buffer &in, Buffer &out) {
               (emission > maxEmission)) {
         out[i] = Isis::NULL8;
       }
-      else if (((incidence = cam->IncidenceAngle()) < minIncidence) ||
+      else if (((incidence = cam->IncidenceAngle(naif)) < minIncidence) ||
               (incidence > maxIncidence)) {
         out[i] = Isis::NULL8;
       }

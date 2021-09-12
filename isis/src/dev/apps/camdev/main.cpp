@@ -606,7 +606,7 @@ void camdev(Buffer &out) {
           index += 64 * 64;
         }
         if(incidence) {
-          out[index] = cam->IncidenceAngle();
+          out[index] = cam->IncidenceAngle(naif);
           index += 64 * 64;
         }
         if(emission) {
@@ -716,7 +716,7 @@ MosData *getMosaicIndicies(NaifContextPtr naif, Camera &camera, MosData &md) {
   camera.LocalPhotometricAngles(naif, myphase, myincidence, myemission, mysuccess);
   if (!mysuccess) {
     myemission.setDegrees(camera.EmissionAngle(naif));
-    myincidence.setDegrees(camera.IncidenceAngle());
+    myincidence.setDegrees(camera.IncidenceAngle(naif));
   }
   double res = camera.PixelResolution(naif);
   if (fabs(res) < Epsilon) res = Epsilon;

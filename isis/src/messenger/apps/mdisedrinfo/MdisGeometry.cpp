@@ -1046,7 +1046,7 @@ namespace Isis {
     if (_camera->HasSurfaceIntersection()) {
 // Solar information
       geom += format("SUB_SOLAR_AZIMUTH", _camera->SunAzimuth(naif), "DEG");
-      geom += format("INCIDENCE_ANGLE", _camera->IncidenceAngle(), "DEG");
+      geom += format("INCIDENCE_ANGLE", _camera->IncidenceAngle(naif), "DEG");
       geom += format("PHASE_ANGLE", _camera->PhaseAngle(naif), "DEG");
       geom += format("EMISSION_ANGLE", _camera->EmissionAngle(naif), "DEG");
       geom += format("LOCAL_HOUR_ANGLE", _camera->LocalSolarTime(naif) * 15.0, "DEG");

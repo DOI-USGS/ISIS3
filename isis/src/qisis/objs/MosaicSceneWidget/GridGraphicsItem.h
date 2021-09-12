@@ -4,6 +4,8 @@
 #include <QGraphicsItem>
 #include <QScopedPointer>
 
+#include "NaifContext.h"
+
 class QPointF;
 
 template<typename A> class QList;
@@ -39,7 +41,7 @@ namespace Isis {
    */
   class GridGraphicsItem : public QGraphicsItem {
     public:
-      GridGraphicsItem(Latitude baseLat, Longitude baseLon,
+      GridGraphicsItem(NaifContextPtr naif, Latitude baseLat, Longitude baseLon,
                        Angle latInc, Angle lonInc,
                        MosaicSceneWidget *projectionSrc, int density,
                        Latitude latMin, Latitude latMax,

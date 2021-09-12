@@ -43,6 +43,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "Unit test for TriangularPlate.";
     qDebug() << "";
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
 
     NaifTriangle plate(3,3);
     plate[0][0] = 1.0;    plate[0][1] = 0.0;    plate[0][2] = 0.0;
@@ -54,11 +56,11 @@ int main(int argc, char *argv[]) {
     qDebug() << plate;
     qDebug() << "Name:       " << tp.name();
     qDebug() << "ID:         " << tp.id();
-    qDebug() << "Min Radius: " << tp.minRadius().meters() << " meters";
-    qDebug() << "Max Radius: " << tp.maxRadius().meters() << " meters";
-    qDebug() << "Area:       " << tp.area();
-    qDebug() << "Normal:     " << tp.normal();
-    qDebug() << "Center:     " << tp.center();
+    qDebug() << "Min Radius: " << tp.minRadius(naif).meters() << " meters";
+    qDebug() << "Max Radius: " << tp.maxRadius(naif).meters() << " meters";
+    qDebug() << "Area:       " << tp.area(naif);
+    qDebug() << "Normal:     " << tp.normal(naif);
+    qDebug() << "Center:     " << tp.center(naif);
     qDebug() << "";
     qDebug() << "";
 
@@ -71,8 +73,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "Look for intercept using ray direction and observer";
     qDebug() << "Ray Dir:            " << raydir;
     qDebug() << "Observer:           " << vertex;
-    qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
-    Intercept *i = tp.intercept(vertex, raydir);
+    qDebug() << "Has intercept?      " << tp.hasIntercept(naif, vertex, raydir);
+    Intercept *i = tp.intercept(naif, vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
     qDebug() << "";
     // No Plate Intercept - Case (en < 0 && tdot12 > 0)
@@ -81,8 +83,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "Look for intercept using ray direction and observer";
     qDebug() << "Ray Dir:            " << raydir;
     qDebug() << "Observer:           " << vertex;
-    qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
-    i = tp.intercept(vertex, raydir);
+    qDebug() << "Has intercept?      " << tp.hasIntercept(naif, vertex, raydir);
+    i = tp.intercept(naif, vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
     qDebug() << "";
     // No Plate Intercept - Case (en < 0, tdot12 == 0, && tdot23 > 0)
@@ -91,8 +93,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "Look for intercept using ray direction and observer";
     qDebug() << "Ray Dir:            " << raydir;
     qDebug() << "Observer:           " << vertex;
-    qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
-    i = tp.intercept(vertex, raydir);
+    qDebug() << "Has intercept?      " << tp.hasIntercept(naif, vertex, raydir);
+    i = tp.intercept(naif, vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
     qDebug() << "";
     // No Plate Intercept - Case (en < 0, tdot12 == 0, tdot23 < 0, && tdot31 > 0)
@@ -101,8 +103,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "Look for intercept using ray direction and observer";
     qDebug() << "Ray Dir:            " << raydir;
     qDebug() << "Observer:           " << vertex;
-    qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
-    i = tp.intercept(vertex, raydir);
+    qDebug() << "Has intercept?      " << tp.hasIntercept(naif, vertex, raydir);
+    i = tp.intercept(naif, vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
     qDebug() << "";
     // No Plate Intercept - Case (en > 0 && tdot12 < 0)
@@ -111,8 +113,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "Look for intercept using ray direction and observer";
     qDebug() << "Ray Dir:            " << raydir;
     qDebug() << "Observer:           " << vertex;
-    qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
-    i = tp.intercept(vertex, raydir);
+    qDebug() << "Has intercept?      " << tp.hasIntercept(naif, vertex, raydir);
+    i = tp.intercept(naif, vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
     qDebug() << "";
     // No Plate Intercept - Case (en > 0, tdot12 == 0, && tdot23 < 0)
@@ -121,8 +123,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "Look for intercept using ray direction and observer";
     qDebug() << "Ray Dir:            " << raydir;
     qDebug() << "Observer:           " << vertex;
-    qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
-    i = tp.intercept(vertex, raydir);
+    qDebug() << "Has intercept?      " << tp.hasIntercept(naif, vertex, raydir);
+    i = tp.intercept(naif, vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
     qDebug() << "";
     // No Plate Intercept - Case (en > 0, tdot12 == tdot23 == 0, && tdot31 < 0)
@@ -131,8 +133,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "Look for intercept using ray direction and observer";
     qDebug() << "Ray Dir:            " << raydir;
     qDebug() << "Observer:           " << vertex;
-    qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
-    i = tp.intercept(vertex, raydir);
+    qDebug() << "Has intercept?      " << tp.hasIntercept(naif, vertex, raydir);
+    i = tp.intercept(naif, vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
     qDebug() << "";
     // No Plate Intercept - Case (en != 0 && tdot12 == tdot23 == tdot31 == 0)
@@ -141,8 +143,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "Look for intercept using ray direction and observer";
     qDebug() << "Ray Dir:            " << raydir;
     qDebug() << "Observer:           " << vertex;
-    qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
-    i = tp.intercept(vertex, raydir);
+    qDebug() << "Has intercept?      " << tp.hasIntercept(naif, vertex, raydir);
+    i = tp.intercept(naif, vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
     qDebug() << "";
     // Plate Intercept = true 
@@ -151,8 +153,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "Look for intercept using ray direction and observer";
     qDebug() << "Ray Dir:            " << raydir;
     qDebug() << "Observer:           " << vertex;
-    qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
-    i = tp.intercept(vertex, raydir);
+    qDebug() << "Has intercept?      " << tp.hasIntercept(naif, vertex, raydir);
+    i = tp.intercept(naif, vertex, raydir);
     qDebug() << "Intercept Shape:    " << i->shape()->name();
     qDebug() << "Intercept Observer: " << i->observer();
     qDebug() << "Intercept Look Dir: " << i->lookDirectionRay();
@@ -160,7 +162,7 @@ int main(int argc, char *argv[]) {
                                        << i->location().GetY().meters()
                                        << i->location().GetZ().meters()
                                        << " meters";
-    qDebug() << "Sep Angle:          " << tp.separationAngle(raydir);
+    qDebug() << "Sep Angle:          " << tp.separationAngle(naif, raydir);
     qDebug() << "";
     qDebug() << "";
 
@@ -170,16 +172,16 @@ int main(int argc, char *argv[]) {
     qDebug() << "Look for surface point using south pole";
     qDebug() << "Latitude:      " << pole;
     qDebug() << "Longitude:     " << lon;
-    qDebug() << "Has point?     " << tp.hasPoint(pole, lon);
-    SurfacePoint *spPole = tp.point(pole, lon);
+    qDebug() << "Has point?     " << tp.hasPoint(naif, pole, lon);
+    SurfacePoint *spPole = tp.point(naif, pole, lon);
     qDebug() << "Surface point at pole is null?     " << toString(spPole == NULL);
     qDebug() << "";
     Latitude equator(0.0, Angle::Degrees);
     qDebug() << "Look for surface point using equator";
     qDebug() << "Latitude:      " << equator;
     qDebug() << "Longitude:     " << lon;
-    qDebug() << "Has point?     " << tp.hasPoint(equator, lon);
-    SurfacePoint *sp = tp.point(equator, lon);
+    qDebug() << "Has point?     " << tp.hasPoint(naif, equator, lon);
+    SurfacePoint *sp = tp.point(naif, equator, lon);
     qDebug() << "Surface point: " << sp->GetX().meters()
                                   << sp->GetY().meters()
                                   << sp->GetZ().meters()
@@ -191,10 +193,10 @@ int main(int argc, char *argv[]) {
     AbstractPlate *cloneTP = tp.clone();
     qDebug() << "Create clone";
     qDebug() << "Clone Name:       " << cloneTP->name();
-    qDebug() << "Clone Min Radius: " << cloneTP->minRadius().meters() << " meters";
-    qDebug() << "Clone Max Radius: " << cloneTP->maxRadius().meters() << " meters";
-    qDebug() << "Clone Area:       " << cloneTP->area();
-    qDebug() << "Clone Normal:     " << cloneTP->normal();
+    qDebug() << "Clone Min Radius: " << cloneTP->minRadius(naif).meters() << " meters";
+    qDebug() << "Clone Max Radius: " << cloneTP->maxRadius(naif).meters() << " meters";
+    qDebug() << "Clone Area:       " << cloneTP->area(naif);
+    qDebug() << "Clone Normal:     " << cloneTP->normal(naif);
     qDebug() << "";
     qDebug() << "";
 

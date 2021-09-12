@@ -192,9 +192,9 @@ namespace Isis {
       rlat = lat * 180.0 / Isis::PI;
       rlon = lon * 180.0 / Isis::PI;
       if(useSlopeEqn) {
-        R = lastR + slope * (p_camera->LocalRadius(rlat, rlon).kilometers() - lastR);
+        R = lastR + slope * (p_camera->LocalRadius(naif, rlat, rlon).kilometers() - lastR);
       } else {
-        R = p_camera->LocalRadius(rlat, rlon).kilometers();
+        R = p_camera->LocalRadius(naif, rlat, rlon).kilometers();
       }
       
       iter++;
@@ -214,13 +214,13 @@ namespace Isis {
    * @return conversion was successful
    */
   bool RadarGroundMap::SetGround(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) {
-    Distance localRadius(p_camera->LocalRadius(lat, lon));
+    Distance localRadius(p_camera->LocalRadius(naif, lat, lon));
 
     if(!localRadius.isValid()) {
       return false;
     }
 
-    return SetGround(naif, SurfacePoint(naif, lat, lon, p_camera->LocalRadius(lat, lon)));
+    return SetGround(naif, SurfacePoint(naif, lat, lon, p_camera->LocalRadius(naif, lat, lon)));
   }
 
   /** Compute undistorted focal plane coordinate from ground position that includes a local radius

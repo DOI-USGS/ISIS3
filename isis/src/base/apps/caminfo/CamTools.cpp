@@ -157,7 +157,7 @@ namespace Isis {
     _radius = 1.0;
   }
 
-  void BandGeometry::collect(Camera &camera, Cube &cube, bool doGeometry,
+  void BandGeometry::collect(NaifContextPtr naif, Camera &camera, Cube &cube, bool doGeometry,
                              bool doPolygon, bool getFootBlob,
                              bool increasePrecision) {
     destruct();
@@ -188,7 +188,7 @@ namespace Isis {
       g.samples = _nSamps;
       g.bands = _nBands;
       g.band = band + 1;
-      camera.SetBand(band + 1);
+      camera.SetBand(band + 1, naif);
       g.realBand = cube.physicalBand(band + 1);
 
 
@@ -203,38 +203,38 @@ namespace Isis {
       g.centerSamp = centerSamp;
 
       // Now compute elements for the center pixel
-      if(camera.SetImage(centerSamp, centerLine)) {
+      if(camera.SetImage(centerSamp, centerLine, naif)) {
         _hasCenterGeom = true;
         g.centerLatitude  = camera.UniversalLatitude();
         g.centerLongitude = camera.UniversalLongitude();
         g.radius = camera.LocalRadius().meters();
 
-        g.rightAscension = camera.RightAscension();
-        g.declination    = camera.Declination();
+        g.rightAscension = camera.RightAscension(naif);
+        g.declination    = camera.Declination(naif);
 
-        g.sampRes = camera.SampleResolution();
-        g.lineRes = camera.LineResolution();
+        g.sampRes = camera.SampleResolution(naif);
+        g.lineRes = camera.LineResolution(naif);
 
-        g.obliqueSampRes = camera.ObliqueSampleResolution();
-        g.obliqueLineRes = camera.ObliqueLineResolution();
-        g.obliquePixelRes = camera.ObliquePixelResolution();
-        g.obliqueDetectorRes = camera.ObliqueDetectorResolution();
+        g.obliqueSampRes = camera.ObliqueSampleResolution(naif);
+        g.obliqueLineRes = camera.ObliqueLineResolution(naif);
+        g.obliquePixelRes = camera.ObliquePixelResolution(naif);
+        g.obliqueDetectorRes = camera.ObliqueDetectorResolution(naif);
 
-        g.solarLongitude = camera.solarLongitude().degrees();
-        g.northAzimuth = camera.NorthAzimuth();
-        g.offNader = camera.OffNadirAngle();
-        g.subSolarAzimuth = camera.SunAzimuth();
-        g.subSpacecraftAzimuth = camera.SpacecraftAzimuth();
-        g.localSolartime = camera.LocalSolarTime();
-        g.targetCenterDistance = camera.targetCenterDistance();
-        g.slantDistance = camera.SlantDistance();
+        g.solarLongitude = camera.solarLongitude(naif).degrees();
+        g.northAzimuth = camera.NorthAzimuth(naif);
+        g.offNader = camera.OffNadirAngle(naif);
+        g.subSolarAzimuth = camera.SunAzimuth(naif);
+        g.subSpacecraftAzimuth = camera.SpacecraftAzimuth(naif);
+        g.localSolartime = camera.LocalSolarTime(naif);
+        g.targetCenterDistance = camera.targetCenterDistance(naif);
+        g.slantDistance = camera.SlantDistance(naif);
 
-        camera.subSolarPoint(g.subSolarLatitude, g.subSolarLongitude);
+        camera.subSolarPoint(g.subSolarLatitude, g.subSolarLongitude, naif);
         g.subSolarGroundAzimuth = camera.GroundAzimuth(g.centerLatitude,
                                   g.centerLongitude,
                                   g.subSolarLatitude,
                                   g.subSolarLongitude);
-        camera.subSpacecraftPoint(g.subSpacecraftLatitude, g.subSpacecraftLongitude);
+        camera.subSpacecraftPoint(g.subSpacecraftLatitude, g.subSpacecraftLongitude, naif);
         g.subSpacecraftGroundAzimuth = camera.GroundAzimuth(g.centerLatitude,
                                        g.centerLongitude,
                                        g.subSpacecraftLatitude,
@@ -242,67 +242,67 @@ namespace Isis {
 
 
         //  solve for the parallax and shadow stuff
-        g.phase = camera.PhaseAngle();
-        g.emi   = camera.EmissionAngle();
-        g.inc   = camera.IncidenceAngle();
+        g.phase = camera.PhaseAngle(naif);
+        g.emi   = camera.EmissionAngle(naif);
+        g.inc   = camera.IncidenceAngle(naif);
 
         //  Parallax values (Corrected 2012-11-23, KJB)
         if(!IsSpecial(g.emi) && !IsSpecial(g.subSpacecraftGroundAzimuth)) {
-          double emi_r  = DegToRad(g.emi);
-          double ssga_r = DegToRad(g.subSpacecraftGroundAzimuth);
+          double emi_r  = DegToRad(naif, g.emi);
+          double ssga_r = DegToRad(naif, g.subSpacecraftGroundAzimuth);
           g.parallaxx = -tan(emi_r) * cos(ssga_r);
           g.parallaxy =  tan(emi_r) * sin(ssga_r);
         }
 
         // Shadow values (Corrected 2012-11-23, KJB)
         if(!IsSpecial(g.inc) && !IsSpecial(g.subSolarGroundAzimuth)) {
-          double inc_r  = DegToRad(g.inc);
-          double ssga_r = DegToRad(g.subSolarGroundAzimuth);
+          double inc_r  = DegToRad(naif, g.inc);
+          double ssga_r = DegToRad(naif, g.subSolarGroundAzimuth);
           g.shadowx = -tan(inc_r) * cos(ssga_r);
           g.shadowy =  tan(inc_r) * sin(ssga_r);
         }
       }
       //  OK...now get corner pixel geometry.  NOTE this resets image
       //  pixel location from center!!!
-      if(camera.SetImage(1.0, 1.0)) {
+      if(camera.SetImage(1.0, 1.0, naif)) {
         g.upperLeftLongitude = camera.UniversalLongitude();
         g.upperLeftLatitude =  camera.UniversalLatitude();
       }
 
-      if(camera.SetImage(1.0, cLine)) {
+      if(camera.SetImage(1.0, cLine, naif)) {
         g.lowerLeftLongitude = camera.UniversalLongitude();
         g.lowerLeftLatitude =  camera.UniversalLatitude();
       }
 
-      if(camera.SetImage(cSamp, cLine)) {
+      if(camera.SetImage(cSamp, cLine, naif)) {
         g.lowerRightLongitude = camera.UniversalLongitude();
         g.lowerRightLatitude =  camera.UniversalLatitude();
       }
 
-      if(camera.SetImage(cSamp, 1.0)) {
+      if(camera.SetImage(cSamp, 1.0, naif)) {
         g.upperRightLongitude = camera.UniversalLongitude();
         g.upperRightLatitude =  camera.UniversalLatitude();
       }
 
-      double minRes = camera.LowestImageResolution();
-      double maxRes = camera.HighestImageResolution();
+      double minRes = camera.LowestImageResolution(naif);
+      double maxRes = camera.HighestImageResolution(naif);
       if(!(IsSpecial(minRes) || IsSpecial(maxRes))) {
         g.grRes = (minRes + maxRes) / 2.0;
       }
 
       Pvl camMap;
-      camera.BasicMapping(camMap);
+      camera.BasicMapping(camMap, naif);
       _mapping = camMap;
 
       // Test for interesting intersections
-      if(camera.IntersectsLongitudeDomain(camMap)) g.hasLongitudeBoundary = true;
-      camera.SetBand(band + 1);
-      if(camera.SetUniversalGround(90.0, 0.0)) {
+      if(camera.IntersectsLongitudeDomain(camMap, naif)) g.hasLongitudeBoundary = true;
+      camera.SetBand(band + 1, naif);
+      if(camera.SetUniversalGround(naif, 90.0, 0.0)) {
         if(isPointValid(camera.Sample(), camera.Line(), &camera)) {
           g.hasNorthPole = true;
         }
       }
-      if(camera.SetUniversalGround(-90.0, 0.0)) {
+      if(camera.SetUniversalGround(naif, -90.0, 0.0)) {
         if(isPointValid(camera.Sample(), camera.Line(), &camera)) {
           g.hasSouthPole = true;
         }
@@ -314,7 +314,7 @@ namespace Isis {
         poly.Incidence(_maxIncidence);
         poly.Emission(_maxEmission);
         poly.EllipsoidLimb(true);  // Allow disabling of shape model for limbs
-        poly.Create(cube, _sampleInc, _lineInc, 1, 1, 0, 0, band + 1,
+        poly.Create(naif, cube, _sampleInc, _lineInc, 1, 1, 0, 0, band + 1,
             increasePrecision);
         geos::geom::MultiPolygon *multiP = poly.Polys();
         _polys.push_back(multiP->clone());
@@ -329,7 +329,7 @@ namespace Isis {
         }
 
         // multiP is freed by ImagePolygon object
-        _mapping = getProjGeometry(camera, multiP, g);
+        _mapping = getProjGeometry(naif, camera, multiP, g);
       }
 
       if (getFootBlob && band == 0) {
@@ -345,7 +345,7 @@ namespace Isis {
         geos::geom::MultiPolygon *multiP = poly.Polys();
         _polys.push_back(multiP->clone());
         _combined = multiP->clone();
-        _mapping = getProjGeometry(camera, multiP, g);
+        _mapping = getProjGeometry(naif, camera, multiP, g);
       }
 
       // Save off this band geometry property
@@ -355,10 +355,10 @@ namespace Isis {
 
     //  Compute the remainder of the summary bands since some of the operations
     //  need the camera model
-    _summary = getGeometrySummary();
+    _summary = getGeometrySummary(naif);
     if((size() != 1) && doPolygon) {
       geos::geom::MultiPolygon *multiP = makeMultiPolygon(_combined);
-      _mapping = getProjGeometry(camera, multiP, _summary);
+      _mapping = getProjGeometry(naif, camera, multiP, _summary);
       delete multiP;
     }
 
@@ -372,7 +372,7 @@ namespace Isis {
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
-    GProperties g = getGeometrySummary();
+    GProperties g = getGeometrySummary(naif);
 
 //geometry keywords for band output
     pband += PvlKeyword("BandsUsed", toString(size()));
@@ -471,7 +471,7 @@ namespace Isis {
     return;
   }
 
-  BandGeometry::GProperties BandGeometry::getGeometrySummary() const {
+  BandGeometry::GProperties BandGeometry::getGeometrySummary(NaifContextPtr naif) const {
     if(_isBandIndependent  || (size() == 1)) {
       return (_gBandList[0]);
     }
@@ -506,7 +506,7 @@ namespace Isis {
       }
 
       // Now check all data
-      bool isCloser = isDistShorter(centerDistance, plat, plon,
+      bool isCloser = isDistShorter(naif, centerDistance, plat, plon,
                                     b->centerLatitude, b->centerLongitude,
                                     radius, thisDist) ;
       if(isCloser) {
@@ -515,7 +515,7 @@ namespace Isis {
       }
 
       //  Do upper left and right corners
-      isCloser = isDistShorter(ulDist, plat, plon,
+      isCloser = isDistShorter(naif, ulDist, plat, plon,
                                b->upperLeftLatitude, b->upperLeftLongitude,
                                radius, thisDist);
       if(!isCloser) {
@@ -524,7 +524,7 @@ namespace Isis {
         ulDist = thisDist;
       }
 
-      isCloser = isDistShorter(urDist, plat, plon,
+      isCloser = isDistShorter(naif, urDist, plat, plon,
                                b->upperRightLatitude, b->upperRightLongitude,
                                radius, thisDist);
       if(!isCloser) {
@@ -534,7 +534,7 @@ namespace Isis {
       }
 
       //  Do lower left and right corners
-      isCloser = isDistShorter(llDist, plat, plon,
+      isCloser = isDistShorter(naif, llDist, plat, plon,
                                b->lowerLeftLatitude, b->lowerLeftLongitude,
                                radius, thisDist);
       if(!isCloser) {
@@ -543,7 +543,7 @@ namespace Isis {
         llDist = thisDist;
       }
 
-      isCloser = isDistShorter(lrDist, plat, plon,
+      isCloser = isDistShorter(naif, lrDist, plat, plon,
                                b->lowerRightLatitude, b->lowerRightLongitude,
                                radius, thisDist);
       if(!isCloser) {
@@ -566,13 +566,14 @@ namespace Isis {
   }
 
 
-  Pvl BandGeometry::getProjGeometry(Camera &camera,
+  Pvl BandGeometry::getProjGeometry(NaifContextPtr naif,
+                                    Camera &camera,
                                     geos::geom::MultiPolygon *footprint,
                                     GProperties &g) {
     // Get basic projection information.  Assumes a Sinusoidal projection with
     // East 360 longitude domain and planetocentric laitudes.
     Pvl sinuMap;
-    camera.BasicMapping(sinuMap);
+    camera.BasicMapping(sinuMap, naif);
     PvlGroup &mapping = sinuMap.findGroup("Mapping");
 
     double clon = g.centerLongitude;
@@ -597,7 +598,7 @@ namespace Isis {
 
         // Compute new ranges
         double minLat180, maxLat180, minLon180, maxLon180;
-        camera.GroundRange(minLat180, maxLat180, minLon180, maxLon180, sinuMap);
+        camera.GroundRange(minLat180, maxLat180, minLon180, maxLon180, sinuMap, naif);
         minkey.setValue(ToString(minLon180));
         maxkey.setValue(ToString(maxLon180));
         clon = (minLon180 + maxLon180) / 2.0;
@@ -622,7 +623,7 @@ namespace Isis {
     delete sinu;
     delete poly180;
 
-    if(camera.SetUniversalGround(g.centroidLatitude, g.centroidLongitude)) {
+    if(camera.SetUniversalGround(naif, g.centroidLatitude, g.centroidLongitude)) {
       g.centroidLine = camera.Line();
       g.centroidSample = camera.Sample();
       g.centroidRadius = camera.LocalRadius().meters();
@@ -631,7 +632,7 @@ namespace Isis {
     return (sinuMap);
   }
 
-  void BandGeometry::generatePolygonKeys(PvlObject &pband) {
+  void BandGeometry::generatePolygonKeys(NaifContextPtr naif, PvlObject &pband) {
     if(size() <= 0) {
       QString mess = "No Band geometry available!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
@@ -641,7 +642,7 @@ namespace Isis {
     double radius = getRadius();
     double globalCoverage(Null);
     if(!IsSpecial(radius)) {
-      double globalArea = 4.0 * pi_c() * (radius * radius) / (1000.0 * 1000.0);
+      double globalArea = 4.0 * naif->pi_c() * (radius * radius) / (1000.0 * 1000.0);
       globalCoverage = _summary.surfaceArea / globalArea * 100.0;
       globalCoverage = SetRound(globalCoverage, 6);
     }
@@ -705,16 +706,17 @@ namespace Isis {
     return (res);
   }
 
-  double BandGeometry::getPixelsPerDegree(double pixres,
+  double BandGeometry::getPixelsPerDegree(NaifContextPtr naif, 
+                                          double pixres,
                                           double radius) const {
-    double circumference = 2.0  * pi_c() * radius;
+    double circumference = 2.0  * naif->pi_c() * radius;
     double metersPerDegree = circumference / 360.0;
     double pixelsPerDegree = metersPerDegree / pixres;
     return (pixelsPerDegree);
   }
 
 
-  bool BandGeometry::isDistShorter(double bestDist, double lat1, double lon1,
+  bool BandGeometry::isDistShorter(NaifContextPtr naif, double bestDist, double lat1, double lon1,
                                    double lat2, double lon2, double radius,
                                    double &thisDist) const {
     if(IsSpecial(lat1)) return (false);
@@ -723,11 +725,11 @@ namespace Isis {
     if(IsSpecial(lon2)) return (false);
     if(IsSpecial(radius)) return (false);
 
-    SurfacePoint point1(
+    SurfacePoint point1(naif,
       Latitude(lat1, Angle::Degrees),
       Longitude(lon1, Angle::Degrees),
       Distance(radius, Distance::Meters));
-    SurfacePoint point2(
+    SurfacePoint point2(naif,
       Latitude(lat2, Angle::Degrees),
       Longitude(lon2, Angle::Degrees),
       Distance(radius, Distance::Meters));

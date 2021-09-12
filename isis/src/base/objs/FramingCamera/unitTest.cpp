@@ -82,6 +82,9 @@ class MyCamera : public FramingCamera {
 
 int main() {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
+
   //NOTE: The following cube is not from a framing camera.  The test returns
   //true for framing camera type since MyCamera is a child class of FramingCamera
   try {
@@ -98,7 +101,7 @@ int main() {
     PvlGroup inst = cube.label()->findGroup("Instrument", Pvl::Traverse);
     QString startTime = inst["StartTime"];
     double eTime = 0.0;
-    utc2et_c(startTime.toLatin1().data(), &eTime);
+    naif->utc2et_c(startTime.toLatin1().data(), &eTime);
     double expoDur = ((double) inst["ExposureDuration"])/1000; // in seconds
     pair <iTime, iTime> octime = cam.ShutterOpenCloseTimes(eTime,expoDur);
     cout.precision(12);

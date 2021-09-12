@@ -26,7 +26,7 @@ using namespace std;
 namespace Isis {
 
   void getUserEnteredKernel(UserInterface &ui, const QString &param, Kernel &kernel);
-  bool tryKernels(Cube *icube, Process &p, UserInterface &ui, Pvl *log,
+  bool tryKernels(NaifContextPtr naif, Cube *icube, Process &p, UserInterface &ui, Pvl *log,
                   Kernel lk, Kernel pck,
                   Kernel targetSpk, Kernel ck,
                   Kernel fk, Kernel ik,
@@ -42,13 +42,13 @@ namespace Isis {
    * @param ui The Application UI
    * @param(out) log The Pvl that attempted kernel sets will be logged to
    */
-  void spiceinit(UserInterface &ui, Pvl *log) {
+  void spiceinit(NaifContextPtr naif, UserInterface &ui, Pvl *log) {
     // Open the input cube
     Process p;
 
     CubeAttributeInput cai;
     Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), cai, ReadWrite);
-    spiceinit(icube, ui, log);
+    spiceinit(naif, icube, ui, log);
     p.EndProcess();
   }
 
@@ -60,7 +60,7 @@ namespace Isis {
    * @param options The options for how the cube should be spiceinit'd
    * @param(out) log The Pvl that attempted kernel sets will be logged to
    */
-  void spiceinit(Cube *icube, UserInterface &ui, Pvl *log) {
+  void spiceinit(NaifContextPtr naif, Cube *icube, UserInterface &ui, Pvl *log) {
     // Open the input cube
     Process p;
     p.SetInputCube(icube);
@@ -251,7 +251,7 @@ namespace Isis {
 
         realCkKernel.setKernels(ckKernelList);
 
-        kernelSuccess = tryKernels(icube, p, ui, log, lk, pck, targetSpk,
+        kernelSuccess = tryKernels(naif, icube, p, ui, log, lk, pck, targetSpk,
                                    realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
       }
 
@@ -306,7 +306,7 @@ namespace Isis {
    *
    * @return If a camera model was successfully created
    */
-  bool tryKernels(Cube *icube, Process &p, UserInterface &ui, Pvl *log,
+  bool tryKernels(NaifContextPtr naif, Cube *icube, Process &p, UserInterface &ui, Pvl *log,
                   Kernel lk, Kernel pck,
                   Kernel targetSpk, Kernel ck,
                   Kernel fk, Kernel ik, Kernel sclk,
@@ -478,7 +478,7 @@ namespace Isis {
       }
 
       if (ui.GetBoolean("ATTACH")) {
-        Table ckTable = cam->instrumentRotation()->Cache("InstrumentPointing");
+        Table ckTable = cam->instrumentRotation()->Cache("InstrumentPointing", naif);
         ckTable.Label() += PvlKeyword("Description", "Created by spiceinit");
         ckTable.Label() += PvlKeyword("Kernels");
 
@@ -487,7 +487,7 @@ namespace Isis {
 
         icube->write(ckTable);
 
-        Table spkTable = cam->instrumentPosition()->Cache("InstrumentPosition");
+        Table spkTable = cam->instrumentPosition()->Cache("InstrumentPosition", naif);
         spkTable.Label() += PvlKeyword("Description", "Created by spiceinit");
         spkTable.Label() += PvlKeyword("Kernels");
         for (int i = 0; i < spkKeyword.size(); i++)
@@ -495,7 +495,7 @@ namespace Isis {
 
         icube->write(spkTable);
 
-        Table bodyTable = cam->bodyRotation()->Cache("BodyRotation");
+        Table bodyTable = cam->bodyRotation()->Cache("BodyRotation", naif);
         bodyTable.Label() += PvlKeyword("Description", "Created by spiceinit");
         bodyTable.Label() += PvlKeyword("Kernels");
         for (int i = 0; i < targetSpkKeyword.size(); i++)
@@ -505,10 +505,10 @@ namespace Isis {
           bodyTable.Label()["Kernels"].addValue(pckKeyword[i]);
 
         bodyTable.Label() += PvlKeyword("SolarLongitude",
-            toString(cam->solarLongitude().degrees()));
+            toString(cam->solarLongitude(naif).degrees()));
         icube->write(bodyTable);
 
-        Table sunTable = cam->sunPosition()->Cache("SunPosition");
+        Table sunTable = cam->sunPosition()->Cache("SunPosition", naif);
         sunTable.Label() += PvlKeyword("Description", "Created by spiceinit");
         sunTable.Label() += PvlKeyword("Kernels");
         for (int i = 0; i < targetSpkKeyword.size(); i++)

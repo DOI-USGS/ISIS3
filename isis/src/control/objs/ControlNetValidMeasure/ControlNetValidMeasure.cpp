@@ -208,7 +208,7 @@ namespace Isis {
       bool success = measureCamera->SetImage(pSample, pLine, naif);
       if (success) {
         mdEmissionAngle     = measureCamera->EmissionAngle(naif);
-        mdIncidenceAngle    = measureCamera->IncidenceAngle();
+        mdIncidenceAngle    = measureCamera->IncidenceAngle(naif);
         mdResolution        = measureCamera->PixelResolution(naif);
       }
     }

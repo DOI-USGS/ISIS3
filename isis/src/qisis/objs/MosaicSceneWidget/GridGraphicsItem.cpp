@@ -23,7 +23,7 @@
 using namespace std;
 
 namespace Isis {
-  GridGraphicsItem::GridGraphicsItem(Latitude baseLat, Longitude baseLon,
+  GridGraphicsItem::GridGraphicsItem(NaifContextPtr naif, Latitude baseLat, Longitude baseLon,
       Angle latInc, Angle lonInc, MosaicSceneWidget *projectionSrc,
       int density, Latitude latMin, Latitude latMax,
       Longitude lonMin, Longitude lonMax) {
@@ -58,9 +58,9 @@ namespace Isis {
           Distance equaRad(tproj->EquatorialRadius(), Distance::Meters);
           Distance polRad(tproj->PolarRadius(), Distance::Meters);
 
-          minLat = Latitude(latMin.planetographic(Angle::Degrees), mappingGroup,
+          minLat = Latitude(naif, latMin.planetographic(Angle::Degrees), mappingGroup,
                             Angle::Degrees);
-          maxLat = Latitude(latMax.planetographic(Angle::Degrees), mappingGroup,
+          maxLat = Latitude(naif, latMax.planetographic(Angle::Degrees), mappingGroup,
                             Angle::Degrees);
           baseLat = Latitude(baseLat.degrees(), equaRad, polRad,
                             Latitude::Planetocentric, Angle::Degrees);
@@ -72,15 +72,15 @@ namespace Isis {
             // We need startLat to start above min, and be as close to min as possible
             try {
               while (startLat < minLat) {
-                startLat = startLat.add(latInc, mappingGroup);
+                startLat = startLat.add(naif, latInc, mappingGroup);
               }
             }
             catch (IException &) {
             }
 
             try {
-              while (startLat.add(latInc * -1, mappingGroup) >= minLat) {
-                startLat = startLat.add(latInc * -1, mappingGroup);
+              while (startLat.add(naif, latInc * -1, mappingGroup) >= minLat) {
+                startLat = startLat.add(naif, latInc * -1, mappingGroup);
               }
             }
             catch (IException &) {
@@ -93,7 +93,7 @@ namespace Isis {
           // We need endLat to start below max, and be as close to max as possible
           try {
             while (endLat > maxLat) {
-              endLat = endLat.add(latInc * -1, mappingGroup);
+              endLat = endLat.add(naif, latInc * -1, mappingGroup);
             }
           }
           catch (IException &) {
@@ -101,8 +101,8 @@ namespace Isis {
 
 
           try {
-            while (endLat.add(latInc, mappingGroup) <= maxLat) {
-              endLat = endLat.add(latInc, mappingGroup);
+            while (endLat.add(naif, latInc, mappingGroup) <= maxLat) {
+              endLat = endLat.add(naif, latInc, mappingGroup);
             }
           }
           catch (IException &) {
@@ -110,26 +110,26 @@ namespace Isis {
           }
         }
         else {
-          minLat = Latitude(latMin.degrees(), mappingGroup,
+          minLat = Latitude(naif, latMin.degrees(), mappingGroup,
                           Angle::Degrees);
-          maxLat = Latitude(latMax.degrees(), mappingGroup,
+          maxLat = Latitude(naif, latMax.degrees(), mappingGroup,
                           Angle::Degrees);
           
 
           // Make sure our lat increment is non-zero
           if (!qFuzzyCompare(latInc.radians(), 0.0)) {
-            startLat = Latitude(
+            startLat = Latitude(naif, 
               baseLat - Angle(floor((baseLat - minLat) / latInc) * latInc), mappingGroup);
 
           if (qFuzzyCompare(startLat.degrees(), -90.0))
-            startLat = Latitude(-90.0, mappingGroup, Angle::Degrees);
+            startLat = Latitude(naif, -90.0, mappingGroup, Angle::Degrees);
           }
 
-          endLat = Latitude(
+          endLat = Latitude(naif, 
             (long)((maxLat - startLat) / latInc) * latInc + startLat,
             mappingGroup);
           if (qFuzzyCompare(endLat.degrees(), 90.0))
-            endLat = Latitude(90.0, mappingGroup, Angle::Degrees);
+            endLat = Latitude(naif, 90.0, mappingGroup, Angle::Degrees);
         }
         
         Longitude minLon(lonMin.degrees(), mappingGroup,
@@ -246,7 +246,7 @@ namespace Isis {
             Latitude nextLat;
 
             try {
-              nextLat = lat.add(latInc, mappingGroup);
+              nextLat = lat.add(naif, latInc, mappingGroup);
             }
             catch (IException &) {
               nextLat = maxLat;
@@ -334,7 +334,7 @@ namespace Isis {
                 atMaxLat = true;
               }
               else {
-                lat = lat.add(lonRes, mappingGroup);
+                lat = lat.add(naif, lonRes, mappingGroup);
               }
             }
 

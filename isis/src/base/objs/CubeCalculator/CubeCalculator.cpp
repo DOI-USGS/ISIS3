@@ -1191,7 +1191,7 @@ namespace Isis {
             }
             if (m_inacBuffer) {
               tokenName = "inac";
-              (*m_inacBuffer)[0] = m_camera->IncidenceAngle();
+              (*m_inacBuffer)[0] = m_camera->IncidenceAngle(naif);
             }
             if (m_emacBuffer) {
               tokenName = "emac";
@@ -1210,7 +1210,7 @@ namespace Isis {
         
           if (m_camera->SetImage(i + 1, currentLine, naif)) {
             if (m_phaBuffer) (*m_phaBuffer)[i] = m_camera->PhaseAngle(naif);
-            if (m_inaBuffer) (*m_inaBuffer)[i] = m_camera->IncidenceAngle();
+            if (m_inaBuffer) (*m_inaBuffer)[i] = m_camera->IncidenceAngle(naif);
             if (m_emaBuffer) (*m_emaBuffer)[i] = m_camera->EmissionAngle(naif);
             if (m_latBuffer) (*m_latBuffer)[i] = m_camera->UniversalLatitude();
             if (m_lonBuffer) (*m_lonBuffer)[i] = m_camera->UniversalLongitude();
