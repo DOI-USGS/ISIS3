@@ -135,7 +135,7 @@ namespace Isis {
    *         surface at the given lat/lon location.
    *
    */
-  Distance EllipsoidShape::localRadius(const Latitude &lat, const Longitude &lon) {
+  Distance EllipsoidShape::localRadius(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) {
 
     std::vector<Distance> radii = targetRadii();
 

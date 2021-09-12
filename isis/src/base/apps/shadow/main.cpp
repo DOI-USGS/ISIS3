@@ -18,14 +18,14 @@ using namespace Isis;
 QStringList kernels(QString kernelType, Kernel (KernelDb::*kernelDbAccessor)(Pvl &), Pvl &labels);
 
 void IsisMain() {
-  auto naif = NaifContext::acquire();
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   ProcessByBrick p;
   Cube *demCube = p.SetInputCube("FROM");
   p.SetBrickSize(demCube->sampleCount(), 128, 1);
 
-  ShadowFunctor functor(demCube);
+  ShadowFunctor functor(naif, demCube);
 
   PvlKeyword kernelsUsed("Kernels");
   kernelsUsed.addCommentWrapped("These NAIF kernels were furnished in order to compute the "

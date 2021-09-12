@@ -220,7 +220,7 @@ namespace Isis {
       return false;
     }
 
-    return SetGround(naif, SurfacePoint(lat, lon, p_camera->LocalRadius(lat, lon)));
+    return SetGround(naif, SurfacePoint(naif, lat, lon, p_camera->LocalRadius(lat, lon)));
   }
 
   /** Compute undistorted focal plane coordinate from ground position that includes a local radius

@@ -37,6 +37,7 @@
 #include "PvlFlatMap.h"
 #include "Resource.h"
 #include "Strategy.h"
+#include "NaifContext.h"
 
 namespace Isis {
 

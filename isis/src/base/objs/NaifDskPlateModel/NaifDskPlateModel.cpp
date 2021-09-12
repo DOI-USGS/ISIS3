@@ -171,7 +171,7 @@ namespace Isis {
   #endif
   
     // Other error checks???
-    return  ( makePoint(spoint) );
+    return  ( makePoint(naif, spoint) );
   }
   
 
@@ -205,7 +205,7 @@ namespace Isis {
     NaifTriangle triangle = plate(naif, plateid); 
   
     // Return the intercept
-    return (new Intercept(vertex, raydir, makePoint(xpoint), 
+    return (new Intercept(vertex, raydir, makePoint(naif, xpoint), 
                           new TriangularPlate(triangle, plateid)));
   }
   
@@ -416,9 +416,10 @@ namespace Isis {
 
 
   /** Construct and return a SurfacePoint pointer  */
-  SurfacePoint *NaifDskPlateModel::makePoint(const NaifVertex &v) const {
+  SurfacePoint *NaifDskPlateModel::makePoint(NaifContextPtr naif, const NaifVertex &v) const {
     verify( validate(v), "Vertex/point invalid - not a 3 vector" );
-    return (new SurfacePoint(Displacement(v[0], Displacement::Kilometers),
+    return (new SurfacePoint(naif,
+                             Displacement(v[0], Displacement::Kilometers),
                              Displacement(v[1], Displacement::Kilometers),
                              Displacement(v[2], Displacement::Kilometers)));
   

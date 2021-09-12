@@ -4,6 +4,8 @@
 // Default argument requires knowledge of the type
 #include "Distance.h"
 
+#include "NaifContext.h"
+
 template <typename A, typename B> class QHash;
 template <typename A, typename B> struct QPair;
 
@@ -48,7 +50,7 @@ namespace Isis {
         HighAccuracy
       };
 
-      ShadowFunctor(Cube *inputDem);
+      ShadowFunctor(NaifContextPtr naif, Cube *inputDem);
       ShadowFunctor(const ShadowFunctor &other);
       ~ShadowFunctor();
 
@@ -127,6 +129,7 @@ namespace Isis {
       //! Statistics containing 0s for in light, 1s for in shadow, only when ray tracing might apply
       Statistics *m_shadowedByRayStats;
 
+      NaifContextPtr m_naif;
 
       // Optimization: caching results... violating const correctness here is OK.
       //! This is the "shadow map"

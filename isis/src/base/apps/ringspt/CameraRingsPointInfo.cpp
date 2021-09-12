@@ -69,7 +69,7 @@ namespace Isis {
    * @return PvlGroup* Data taken directly from the Camera and
    *         drived from Camera information. Ownership passed.
    */
-  PvlGroup *CameraRingsPointInfo::GetPointInfo(bool passed, bool allowOutside, bool allowErrors) {
+  PvlGroup *CameraRingsPointInfo::GetPointInfo(NaifContextPtr naif, bool passed, bool allowOutside, bool allowErrors) {
     PvlGroup *gp = new PvlGroup("GroundPoint");
     {
       gp->addKeyword(PvlKeyword("Filename"));
@@ -180,8 +180,8 @@ namespace Isis {
         gp->findKeyword("Sample").setValue(toString(camera()->Sample()));
         gp->findKeyword("Line").setValue(toString(camera()->Line()));
         gp->findKeyword("PixelValue").setValue(PixelToString(b[0]));
-        gp->findKeyword("RightAscension").setValue(toString(camera()->RightAscension()));
-        gp->findKeyword("Declination").setValue(toString(camera()->Declination()));
+        gp->findKeyword("RightAscension").setValue(toString(camera()->RightAscension(naif)));
+        gp->findKeyword("Declination").setValue(toString(camera()->Declination(naif)));
         // gp->findKeyword("PlanetocentricLatitude").setValue(toString(
         //                 camera()->UniversalLatitude()));
 
@@ -229,34 +229,34 @@ namespace Isis {
         gp->findKeyword("LocalRingRadius").setValue(toString(
                         camera()->LocalRadius().meters()), "meters");
         gp->findKeyword("SampleResolution").setValue(toString(
-                        camera()->SampleResolution()), "meters/pixel");
+                        camera()->SampleResolution(naif)), "meters/pixel");
         gp->findKeyword("LineResolution").setValue(toString(
-                        camera()->LineResolution()), "meters/pixel");
+                        camera()->LineResolution(naif)), "meters/pixel");
 
         //body fixed
-        camera()->instrumentPosition(spB);
+        camera()->instrumentPosition(spB, naif);
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[0]), "km");
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[1]), "km");
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[2]), "km");
         gp->findKeyword("SpacecraftPosition").addComment("Spacecraft Information");
 
         // if IsValid
-        if (Isis::IsValidPixel(camera()->SpacecraftAzimuth())) {
-          double spacecraftAzi = camera()->SpacecraftAzimuth();
+        if (Isis::IsValidPixel(camera()->SpacecraftAzimuth(naif))) {
+          double spacecraftAzi = camera()->SpacecraftAzimuth(naif);
           gp->findKeyword("SpacecraftAzimuth").setValue(toString(spacecraftAzi));
         }
         else {
           gp->findKeyword("SpacecraftAzimuth").setValue("NULL");
         }
-        gp->findKeyword("SlantDistance").setValue(toString(camera()->SlantDistance()), "km");
+        gp->findKeyword("SlantDistance").setValue(toString(camera()->SlantDistance(naif)), "km");
         gp->findKeyword("TargetCenterDistance").setValue(toString(
-                        camera()->targetCenterDistance()), "km");
-        camera()->subSpacecraftPoint(ssplat, ssplon);
+                        camera()->targetCenterDistance(naif)), "km");
+        camera()->subSpacecraftPoint(ssplat, ssplon, naif);
         gp->findKeyword("SubSpacecraftLatitude").setValue(toString(ssplat));
         gp->findKeyword("SubSpacecraftLongitude").setValue(toString(ssplon));
         gp->findKeyword("SpacecraftAltitude").setValue(toString(
-                        camera()->SpacecraftAltitude()), "km");
-        gp->findKeyword("OffNadirAngle").setValue(toString(camera()->OffNadirAngle()));
+                        camera()->SpacecraftAltitude(naif)), "km");
+        gp->findKeyword("OffNadirAngle").setValue(toString(camera()->OffNadirAngle(naif)));
 
         double subspcgrdaz = camera()->GroundAzimuth(camera()->UniversalLatitude(), 
                                                      camera()->UniversalLongitude(), 
@@ -269,8 +269,8 @@ namespace Isis {
         gp->findKeyword("SunPosition").addValue(toString(sB[2]), "km");
         gp->findKeyword("SunPosition").addComment("Sun Information");
         
-        if (Isis::IsValidPixel(camera()->SunAzimuth())) {
-          double sunAzi = camera()->SunAzimuth();
+        if (Isis::IsValidPixel(camera()->SunAzimuth(naif))) {
+          double sunAzi = camera()->SunAzimuth(naif);
           gp->findKeyword("SubSolarAzimuth").setValue(toString(sunAzi));
         }
         else {
@@ -278,7 +278,7 @@ namespace Isis {
         }
 
         gp->findKeyword("SolarDistance").setValue(toString(camera()->SolarDistance()), "AU");
-        camera()->subSolarPoint(sslat, sslon);
+        camera()->subSolarPoint(sslat, sslon, naif);
         gp->findKeyword("SubSolarLatitude").setValue(toString(sslat));
         gp->findKeyword("SubSolarLongitude").setValue(toString(sslon));
         double subsolgrdaz;
@@ -287,17 +287,17 @@ namespace Isis {
                                               sslat, sslon);
         gp->findKeyword("SubSolarGroundAzimuth").setValue(toString(subsolgrdaz));
 
-        gp->findKeyword("Phase").setValue(toString(camera()->PhaseAngle()));
+        gp->findKeyword("Phase").setValue(toString(camera()->PhaseAngle(naif)));
         gp->findKeyword("Phase").addComment("Illumination and Other");
         gp->findKeyword("Incidence").setValue(toString(camera()->IncidenceAngle()));
-        gp->findKeyword("Emission").setValue(toString(camera()->EmissionAngle()));
+        gp->findKeyword("Emission").setValue(toString(camera()->EmissionAngle(naif)));
 
         gp->findKeyword("EphemerisTime").setValue(toString(camera()->time().Et()), "seconds");
         gp->findKeyword("EphemerisTime").addComment("Time");
         utc = camera()->time().UTC();
         gp->findKeyword("UTC").setValue(utc);
-        gp->findKeyword("LocalSolarTime").setValue(toString(camera()->LocalSolarTime()), "hour");
-        gp->findKeyword("SolarLongitude").setValue(toString(camera()->solarLongitude().degrees()));
+        gp->findKeyword("LocalSolarTime").setValue(toString(camera()->LocalSolarTime(naif)), "hour");
+        gp->findKeyword("SolarLongitude").setValue(toString(camera()->solarLongitude(naif).degrees()));
         if (allowErrors) gp->findKeyword("Error").setValue("NULL");
       }
     }

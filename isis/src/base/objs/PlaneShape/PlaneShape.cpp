@@ -279,7 +279,7 @@ namespace Isis {
    */
   // TODO: what should this do in the case of a ring plane (or any other plane
   // for that matter)?
-  Distance PlaneShape::localRadius(const Latitude &lat, const Longitude &lon) {
+  Distance PlaneShape::localRadius(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) {
 
     SpiceDouble pB[3];   // surface intersection in body-fixed coordinates
 

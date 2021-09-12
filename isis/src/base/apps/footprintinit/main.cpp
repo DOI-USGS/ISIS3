@@ -18,9 +18,10 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   Pvl appLog;
   try {
-    footprintinit(ui, &appLog);
+    footprintinit(ui, naif, &appLog);
   }
   catch (...) {
     for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {

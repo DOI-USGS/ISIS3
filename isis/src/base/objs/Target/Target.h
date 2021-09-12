@@ -100,10 +100,10 @@ namespace Isis {
       std::vector<Angle> poleDecCoefs();
       std::vector<Angle> pmCoefs();
 
-      static SpiceInt lookupNaifBodyCode(QString name, NaifContextPtr naif = NaifContext::acquire());
+      static SpiceInt lookupNaifBodyCode(NaifContextPtr naif, QString name);
       // Static conversion methods
-      static PvlGroup radiiGroup(QString target, NaifContextPtr naif = NaifContext::acquire());
-      static PvlGroup radiiGroup(Pvl &cubeLab, const PvlGroup &mapGroup, NaifContextPtr naif = NaifContext::acquire());
+      static PvlGroup radiiGroup(NaifContextPtr naif, QString target);
+      static PvlGroup radiiGroup(NaifContextPtr naif, Pvl &cubeLab, const PvlGroup &mapGroup);
 
       std::vector<double> poleRaNutPrecCoefs();
       std::vector<double> poleDecNutPrecCoefs();
@@ -114,8 +114,8 @@ namespace Isis {
       std::vector<Angle> sysNutPrecCoefs();
 
     private:
-      SpiceInt lookupNaifBodyCode(Pvl &lab, NaifContextPtr naif) const;
-      static PvlGroup radiiGroup(int bodyFrameCode, NaifContextPtr naif);
+      SpiceInt lookupNaifBodyCode(NaifContextPtr naif, Pvl &lab) const;
+      static PvlGroup radiiGroup(NaifContextPtr naif, int bodyFrameCode);
       SpiceInt *m_bodyCode;          /**< The NaifBodyCode value, if it exists in the
                                        labels. Otherwise, if the target is sky,
                                        it's the SPK code and if not sky then it's

@@ -99,7 +99,7 @@ namespace Isis
     private: // methods
       QRect bandingRect();
       void stretch();
-      void track(const QPoint &);
+      void track(NaifContextPtr naif, const QPoint &);
       void zoom();
       bool trackBuffer(ViewportBuffer *, const QPoint &, double &);
     

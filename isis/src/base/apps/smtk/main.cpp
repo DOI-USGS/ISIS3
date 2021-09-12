@@ -39,11 +39,12 @@ map <QString,void*> GuiHelpers(){
 }
 
 /** Function to create a Control point from an SmtkPoint */
-ControlPoint CreatePoint(const SmtkPoint &spnt, const QString &pid,
+ControlPoint CreatePoint(NaifContextPtr naif, const SmtkPoint &spnt, const QString &pid,
                          const QString &lcn, const QString &rcn) {
   ControlPoint pnt(pid);
   Coordinate geom = spnt.getGeometry().getLeft();
-  SurfacePoint surpnt(Latitude(geom.getLatitude(), Angle::Degrees),
+  SurfacePoint surpnt(naif,
+                      Latitude(geom.getLatitude(), Angle::Degrees),
                       Longitude(geom.getLongitude(), Angle::Degrees),
                       Distance(1.0, Distance::Kilometers));  // Kludge radius
   pnt.SetAprioriSurfacePoint(surpnt);
@@ -72,7 +73,7 @@ ControlPoint CreatePoint(const SmtkPoint &spnt, const QString &pid,
 
 
 /** Function that creates and writes a control network from a SmtkQStack */
-void WriteCnet(const QString &netfile, SmtkQStack &points,
+void WriteCnet(NaifContextPtr naif, const QString &netfile, SmtkQStack &points,
                const Pvl &label, const QString &lcn,
                const QString &rcn) {
    // Initialize control point network
@@ -84,7 +85,7 @@ void WriteCnet(const QString &netfile, SmtkQStack &points,
   SmtkQStackIter pnt = points.begin();
   for (int i = 0 ; pnt != points.end() ; i++, ++pnt) {
     QString pntid = "Point_" + toString(i);
-    cn.AddPoint(new ControlPoint(CreatePoint(pnt.value(), pntid, lcn, rcn)));
+    cn.AddPoint(new ControlPoint(CreatePoint(naif, pnt.value(), pntid, lcn, rcn)));
   }
 
   cn.Write(netfile);
@@ -100,6 +101,7 @@ void IsisMain() {
   // process. Fixes #4058.
   qSetGlobalQHashSeed(1031);
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Open the first cube.  It is the left hand image.
   Cube lhImage;
@@ -204,7 +206,7 @@ void IsisMain() {
         if ( (cmLeft != 0) && (cmRight != 0) ) {
           Coordinate left = Coordinate(cmLeft->GetLine(), cmLeft->GetSample());
           Coordinate right = Coordinate(cmRight->GetLine(), cmRight->GetSample());
-          SmtkPoint spnt = matcher.Create(left, right);
+          SmtkPoint spnt = matcher.Create(naif, left, right);
 
           // Insert the point (unregistered)
           if ( spnt.isValid() ) {
@@ -239,7 +241,7 @@ void IsisMain() {
     for (int line = linc / 2 + 1; line < nl; line += linc) {
       for (int samp = sinc / 2 + 1 ; samp < ns; samp += sinc) {
         numAttemptedInitialPoints ++;
-        SmtkPoint spnt = matcher.Register(Coordinate(line,samp));
+        SmtkPoint spnt = matcher.Register(naif, Coordinate(line,samp));
         if ( spnt.isValid() ) {
           matcher.isValid(spnt);
           fpass.insert(qMakePair(line, samp), spnt);
@@ -287,7 +289,7 @@ void IsisMain() {
 
     // If a user wants to see the seed network, write it out here
     if (ui.WasEntered("OSEEDNET")) {
-      WriteCnet(ui.GetFileName("OSEEDNET"), gstack,
+      WriteCnet(naif, ui.GetFileName("OSEEDNET"), gstack,
                 *lhImage.label(), serialLeft, serialRight);
     }
 
@@ -339,7 +341,7 @@ void IsisMain() {
       SmtkPoint spnt = cstack.value();
       //  Register if its not already registered
       if (!spnt.isRegistered()) {
-        spnt = matcher.Register(spnt, spnt.getAffine());
+        spnt = matcher.Register(naif, spnt, spnt.getAffine());
       }
 
       // Still must check for validity if the point was just registered,
@@ -440,7 +442,7 @@ void IsisMain() {
     Statistics stAng;
     while ( !eigen.end() ) {   // Must use the last band for this!!
       PointPlot tm = for_each(bmf.begin(), bmf.end(), PointPlot(dem, plotdist));
-      tm.FillPoints(*lhCamera, *rhCamera, boxsize, dem, stErr, eigen, &stAng);
+      tm.FillPoints(naif, *lhCamera, *rhCamera, boxsize, dem, stErr, eigen, &stAng);
 
       ocube->write(dem);
       ocube->write(stErr);
@@ -481,7 +483,7 @@ void IsisMain() {
 
   // If a cnet file was entered, write the ControlNet pvl to the file
   if (ui.WasEntered("ONET")) {
-    WriteCnet(ui.GetFileName("ONET"), bmf, *lhImage.label(), serialLeft,
+    WriteCnet(naif, ui.GetFileName("ONET"), bmf, *lhImage.label(), serialLeft,
               serialRight);
   }
 

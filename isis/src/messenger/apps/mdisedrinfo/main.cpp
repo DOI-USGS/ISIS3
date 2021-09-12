@@ -58,7 +58,7 @@ void IsisMain() {
       Cube cube;
       cube.open(temp.expanded(), "rw");
       Pvl *label = cube.label();
-      MdisGeometry::validateTarget(*label, true);
+      MdisGeometry::validateTarget(naif, *label, true);
       cube.close();
 
       //  Run spiceinit on it
@@ -84,7 +84,7 @@ void IsisMain() {
     MdisEdrKeys edrkeys(edrlab);
 
 //  Compute the Geometry
-    MdisGeometry geom(from.expanded());
+    MdisGeometry geom(naif, from.expanded());
     Pvl geomkeys = geom.getGeometry(naif, sourceFile);
     edrkeys.updateKeys(geomkeys);
 

@@ -5,8 +5,8 @@
 #include "UserInterface.h"
 
 namespace Isis{
-  extern void campt(Cube *cube, UserInterface &ui, Pvl *log);
-  extern void campt(UserInterface &ui, Pvl *log);
+  extern void campt(NaifContextPtr naif, Cube *cube, UserInterface &ui, Pvl *log);
+  extern void campt(NaifContextPtr naif, UserInterface &ui, Pvl *log);
 }
 
 #endif

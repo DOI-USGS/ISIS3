@@ -98,7 +98,7 @@ void SpkSegment::import(Cube &cube, NaifContextPtr naif) {
     Kernels kernels = getKernels();
 
     // Load necessary kernels and id frames
-    kernels.Load("PCK,LSK,FK,SPK,EXTRA");
+    kernels.Load(naif, "PCK,LSK,FK,SPK,EXTRA");
     m_body = camera->SpkTargetId();
     m_center = camera->SpkCenterId();
     m_refFrame = getNaifName(camera->SpkReferenceId(), naif);
@@ -108,10 +108,10 @@ void SpkSegment::import(Cube &cube, NaifContextPtr naif) {
     //  Get the SPICE data
     Table spkCache("SpkSegment");
     if ( 9 == m_spkType ) {
-      spkCache = camera->instrumentPosition()->LineCache("SpkSegment");
+      spkCache = camera->instrumentPosition()->LineCache("SpkSegment", naif);
     }
     else if ( 13 == m_spkType ) {
-      spkCache = camera->instrumentPosition()->LoadHermiteCache("SpkSegment");
+      spkCache = camera->instrumentPosition()->LoadHermiteCache("SpkSegment", naif);
     }
     else {
       QString mess = "Unsupported SPK kernel type (" +
@@ -138,19 +138,19 @@ void SpkSegment::import(Cube &cube, NaifContextPtr naif) {
     // Add record to top of states
     SVector stateT(ndim2, m_states[1]);  // Map to to first record
     double sTime = m_epochs[1] - Epsilon;
-    SVector s0 = makeState(ipos, m_epochs[1], stateT, sTime);
+    SVector s0 = makeState(naif, ipos, m_epochs[1], stateT, sTime);
     SVector(ndim2, m_states[0]).inject(s0);
     m_epochs[0] = sTime;
 
     // Add record to bottom of states
     stateT = SVector(ndim2, m_states[ndim1-2]);
     sTime = m_epochs[ndim1-2] + Epsilon;
-    s0 = makeState(ipos, m_epochs[ndim1-2], stateT, sTime);
+    s0 = makeState(naif, ipos, m_epochs[ndim1-2], stateT, sTime);
     SVector(ndim2, m_states[ndim1-1]).inject(s0);
     m_epochs[ndim1-1] = sTime;
 
     //  Restore saved time and determine degree of NAIF interpolation
-    ipos->SetEphemerisTime(currentTime);
+    ipos->SetEphemerisTime(currentTime, naif);
     m_degree = std::min((int) MaximumDegree, m_states.dim1()-1);
 
     //  Ensure the degree is odd and less that the even value
@@ -226,7 +226,7 @@ void SpkSegment::getStates(NaifContextPtr naif, Camera &camera, const SMatrix &s
   }
 
   //  Compute state rotations relative to the reference frame
-  QString j2000 = getNaifName(1);  // ISIS stores in J2000
+  QString j2000 = getNaifName(1, naif);  // ISIS stores in J2000
   if (j2000 != m_refFrame) {
     // cout << "FromFrame = " << j2000 << ", TOFrame = " << _refFrame << "\n";
     naif->CheckErrors();
@@ -260,13 +260,13 @@ void SpkSegment::getStates(NaifContextPtr naif, Camera &camera, const SMatrix &s
  * @history 2011-06-03 Debbie A. Cook Put extrapolation code back
  *                                    in use since it gives the best results.
  */
-SpkSegment::SVector SpkSegment::makeState(SpicePosition *position, const double &time0,
+SpkSegment::SVector SpkSegment::makeState(NaifContextPtr naif, SpicePosition *position, const double &time0,
                                           const SVector &state0, const double &timeT) const {
 
 
   SVector stateT = state0.copy();
   // The code below seems to be working well for fixing the ends so I am putting it back in DAC
-  position->SetEphemerisTime(time0);
+  position->SetEphemerisTime(time0, naif);
   std::vector<double> tstate = position->Extrapolate(timeT);
   int nElems = std::min((int) tstate.size(), state0.dim1());
   for ( int i = 0 ; i < nElems ; i++ ) {

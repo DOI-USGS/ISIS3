@@ -34,6 +34,7 @@ void IsisMain() {
   PvlGroup &uip = Preference::Preferences().findGroup("UserInterface");
   uip["ProgressBarPercent"] = "1";
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   Progress progress;
 
   // Prepare the ISIS2 list of file names
@@ -430,7 +431,7 @@ void IsisMain() {
       if (cpoint != NULL) {
         //Add the lat,lon,rad to point
         try {
-          SurfacePoint surfacePt(Latitude(lat, Angle::Degrees),
+          SurfacePoint surfacePt(naif, Latitude(lat, Angle::Degrees),
               Longitude(lon, Angle::Degrees),
               Distance(rad, Distance::Meters));
           cpoint->SetAprioriSurfacePoint(surfacePt);

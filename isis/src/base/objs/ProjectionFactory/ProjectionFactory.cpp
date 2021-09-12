@@ -634,7 +634,7 @@ namespace Isis {
    * @return @b Projection* A pointer to a Projection object.
    *
    */
-  Isis::Projection *ProjectionFactory::CreateForCube(Isis::Pvl &label,
+  Isis::Projection *ProjectionFactory::CreateForCube(NaifContextPtr naif, Isis::Pvl &label,
       int &samples, int &lines,
       Camera &cam) {
     // Create a temporary projection and get the radius at the special latitude
@@ -675,7 +675,7 @@ namespace Isis {
       int eband = cam.Bands();
       if (cam.IsBandIndependent()) eband = 1;
       for(int band = 1; band <= eband; band++) {
-        cam.SetBand(band);
+        cam.SetBand(band, naif);
 
         // Loop for each line testing the left and right sides of the image
         for(int line = 0; line <= cam.Lines(); line++) {
@@ -683,7 +683,7 @@ namespace Isis {
           // If it is the first or last line then test the whole line
           int samp;
           for(samp = 0; samp <= cam.Samples(); samp++) {
-            if (cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
+            if (cam.SetImage((double)samp + 0.5, (double)line + 0.5, naif)) {
               double lat = cam.UniversalLatitude();
               double lon = cam.UniversalLongitude();
               proj->SetUniversalGround(lat, lon);
@@ -700,7 +700,7 @@ namespace Isis {
           // Look for the first good lat/lon on the right edge of the image
           if (samp < cam.Samples()) {
             for(samp = cam.Samples(); samp >= 0; samp--) {
-              if (cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
+              if (cam.SetImage((double)samp + 0.5, (double)line + 0.5, naif)) {
                 double lat = cam.UniversalLatitude();
                 double lon = cam.UniversalLongitude();
                 proj->SetUniversalGround(lat, lon);
@@ -717,7 +717,7 @@ namespace Isis {
         }
 
         // Special test for ground range to see if either pole is in the image
-        if (cam.SetUniversalGround(90.0, 0.0)) {
+        if (cam.SetUniversalGround(naif, 90.0, 0.0)) {
           if (cam.Sample() >= 0.5 && cam.Line() >= 0.5 &&
               cam.Sample() <= cam.Samples() + 0.5 && cam.Line() <= cam.Lines() + 0.5) {
             double lat = cam.UniversalLatitude();
@@ -732,7 +732,7 @@ namespace Isis {
           }
         }
 
-        if (cam.SetUniversalGround(-90.0, 0.0)) {
+        if (cam.SetUniversalGround(naif, -90.0, 0.0)) {
           if (cam.Sample() >= 0.5 && cam.Line() >= 0.5 &&
               cam.Sample() <= cam.Samples() + 0.5 && cam.Line() <= cam.Lines() + 0.5) {
             double lat = cam.UniversalLatitude();
@@ -885,7 +885,7 @@ namespace Isis {
    * @return Projection* A pointer to a Projection object.
    *
    */
-  Isis::Projection *ProjectionFactory::RingsCreateForCube(Isis::Pvl &label,
+  Isis::Projection *ProjectionFactory::RingsCreateForCube(NaifContextPtr naif, Isis::Pvl &label,
       int &samples, int &lines, Camera &cam) {
 
     // Create a temporary projection
@@ -927,7 +927,7 @@ namespace Isis {
       int eband = cam.Bands();
       if (cam.IsBandIndependent()) eband = 1;
       for(int band = 1; band <= eband; band++) {
-        cam.SetBand(band);
+        cam.SetBand(band, naif);
 
         // Loop for each line testing the left and right sides of the image
         for(int line = 0; line <= cam.Lines(); line++) {
@@ -935,7 +935,7 @@ namespace Isis {
           // If it is the first or last line then test the whole line
           int samp;
           for(samp = 0; samp <= cam.Samples(); samp++) {
-            if (cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
+            if (cam.SetImage((double)samp + 0.5, (double)line + 0.5, naif)) {
               double radius = cam.LocalRadius().meters();
               double az = cam.UniversalLongitude();
               proj->SetGround(radius, az);
@@ -952,7 +952,7 @@ namespace Isis {
           // Look for the first good rad/az on the right edge of the image
           if (samp < cam.Samples()) {
             for(samp = cam.Samples(); samp >= 0; samp--) {
-              if (cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
+              if (cam.SetImage((double)samp + 0.5, (double)line + 0.5, naif)) {
                 double radius = cam.LocalRadius().meters();
                 double az = cam.UniversalLongitude();
                 proj->SetGround(radius, az);

@@ -113,13 +113,15 @@ namespace Isis {
     }
 
     if (inHasValid) {
+      auto naif = NaifContext::acquire();
+
       // TODO: Change to two for loops 0->in.numsections & 0->in.section.bandcount then remove call to getSectionNumber below
       for (int inIndex=0; inIndex<in.size(); ++inIndex) {
         // For projected images, the input image sample, line will not correctly identify the
         // spectel characteristics (wavelength, width) from the spectral definition. We need to
         // map them back to the unprojected image sample and line.
-        m_inCamera->SetBand(inIndex+1);
-        int status = m_inCamera->SetImage(in.Sample(inIndex), in.Line(inIndex));
+        m_inCamera->SetBand(inIndex+1, naif);
+        int status = m_inCamera->SetImage(in.Sample(inIndex), in.Line(inIndex), naif);
         if (status) {
           double rawSample = m_inCamera->DetectorMap()->DetectorSample();
           double rawLine = m_inCamera->DetectorMap()->DetectorLine();

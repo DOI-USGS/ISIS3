@@ -43,6 +43,7 @@
 
 #include "FileName.h"
 #include "LinearAlgebra.h"
+#include "NaifContext.h"
 
 namespace Isis {
 

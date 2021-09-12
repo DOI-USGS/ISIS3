@@ -142,19 +142,20 @@ namespace Isis {
 
       const BundleObservationSolveSettingsQsp solveSettings();
 
-      bool applyParameterCorrections(LinearAlgebra::Vector corrections);
-      bool initializeExteriorOrientation();
-      void initializeBodyRotation();
-      void updateBodyRotation();
+      bool applyParameterCorrections(NaifContextPtr naif, LinearAlgebra::Vector corrections);
+      bool initializeExteriorOrientation(NaifContextPtr naif);
+      void initializeBodyRotation(NaifContextPtr naif);
+      void updateBodyRotation(NaifContextPtr naif);
 
-      void bundleOutputFetchData(QVector<double> &finalParameterValues,
+      void bundleOutputFetchData(NaifContextPtr naif,
+                            QVector<double> &finalParameterValues,
                             int &nPositionCoefficients, int &nPointingCoefficients,
                             bool &useDefaultPosition, bool &useDefaultPointing,
                             bool &useDefaultTwist);
-      void bundleOutputString(std::ostream &fpOut,bool errorPropagation);
-      QString bundleOutputCSV(bool errorPropagation);
+      void bundleOutputString(NaifContextPtr naif, std::ostream &fpOut,bool errorPropagation);
+      QString bundleOutputCSV(NaifContextPtr naif, bool errorPropagation);
 
-      QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
+      QString formatBundleOutputString(NaifContextPtr naif, bool errorPropagation, bool imageCSV=false);
       QStringList parameterList();
       QStringList imageNames();
 

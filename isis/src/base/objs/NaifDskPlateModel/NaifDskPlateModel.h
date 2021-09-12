@@ -133,7 +133,7 @@ namespace Isis {
       NaifDskDescriptor *openDSK(NaifContextPtr naif, const QString &dskfile);
       bool verify(const bool &test, const QString &errmsg,
                   const ErrAction &action = Throw) const;
-      SurfacePoint *makePoint(const NaifVertex &v) const;
+      SurfacePoint *makePoint(NaifContextPtr naif, const NaifVertex &v) const;
   };
 
 } // namespace Isis

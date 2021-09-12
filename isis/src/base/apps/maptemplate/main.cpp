@@ -308,12 +308,13 @@ void helperButtonLoadTargDef() {
 // Helper function to show system radius in log.
 void helperButtonLogRadius() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   QString targetName = ui.GetString("TARGETNAME");
   Pvl tMap;
   PvlGroup tGrp;
   // call function to get system radius
   try {
-    tGrp = Target::radiiGroup(targetName);
+    tGrp = Target::radiiGroup(naif, targetName);
   }
   catch (IException &e) {
     throw IException(e, 
@@ -430,6 +431,7 @@ void addProject(PvlGroup &mapping) {
 // Function to Add the target information to the Mapping PVL
 void addTarget(PvlGroup &mapping) {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   if(ui.GetString("TARGOPT") == "SELECT") {
     QString targetFile(ui.GetFileName("FILE"));
     Pvl p;
@@ -463,7 +465,7 @@ void addTarget(PvlGroup &mapping) {
     if ( !ui.WasEntered("EQRADIUS") || !ui.WasEntered("POLRADIUS") ) {
       try {
         // this group will contain TargetName, EquatorialRadius, and PolarRadius
-        radii = Target::radiiGroup(targetName);
+        radii = Target::radiiGroup(naif, targetName);
       }
       catch (IException &e) {
         QString msg = "Unable to find target radii automatically. "
@@ -557,6 +559,7 @@ void addResolution(PvlGroup &mapping) {
 void calcRange(double &minLat, double &maxLat,
                double &minLon, double &maxLon) {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   FileList flist(FileName(ui.GetFileName("FROMLIST")));
   minLat = DBL_MAX;
   maxLat = -DBL_MAX;
@@ -580,7 +583,7 @@ void calcRange(double &minLat, double &maxLat,
         radii += PvlKeyword("TargetName", targetName);
         // this group will contain TargetName, EquatorialRadius, and PolarRadius
         Pvl cubeLab(flist[0].expanded());
-        radii = Target::radiiGroup(cubeLab, radii);
+        radii = Target::radiiGroup(naif, cubeLab, radii);
       }
       catch (IException &e) {
         QString msg = "Unable to find target radii automatically. "
@@ -635,7 +638,7 @@ void calcRange(double &minLat, double &maxLat,
     c.open(flist[i].toString());
     Camera *cam = c.camera();
     Pvl defaultMap;
-    cam->BasicMapping(defaultMap);
+    cam->BasicMapping(defaultMap, naif);
     PvlGroup &defaultGrp = defaultMap.findGroup("Mapping");
     // Move any defaults that are not in the user map
     for(int k = 0; k < defaultGrp.keywords(); k++) {
@@ -645,7 +648,7 @@ void calcRange(double &minLat, double &maxLat,
     }
     userMap.addGroup(userGrp);
     // get the camera ground range min and max and solve for range
-    cam->GroundRange(camMinLat, camMaxLat, camMinLon, camMaxLon, userMap);
+    cam->GroundRange(camMinLat, camMaxLat, camMinLon, camMaxLon, userMap, naif);
     if(camMinLat < minLat) {
       minLat = camMinLat;
     }
@@ -665,6 +668,7 @@ void calcRange(double &minLat, double &maxLat,
 //  value will be in meters
 double calcResolution() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   FileList flist(FileName(ui.GetFileName("FROMLIST")));
   double sumRes = 0.0;
   double highRes = DBL_MAX;
@@ -674,8 +678,8 @@ double calcResolution() {
     Cube c;
     c.open(flist[i].toString());
     Camera *cam = c.camera();
-    double camLowRes = cam->LowestImageResolution();
-    double camHighRes = cam->HighestImageResolution();
+    double camLowRes = cam->LowestImageResolution(naif);
+    double camHighRes = cam->HighestImageResolution(naif);
     if(camLowRes > lowRes) lowRes = camLowRes;
     if(camHighRes < highRes) highRes = camHighRes;
     sumRes = sumRes + (camLowRes + camHighRes) / 2.0;

@@ -53,29 +53,29 @@ namespace Isis {
       virtual ~TriangularPlate();
 
       int id() const;
-      QString name() const;
+      QString name() const override;
 
-      Distance minRadius() const;
-      Distance maxRadius() const;
+      Distance minRadius(NaifContextPtr naif) const override;
+      Distance maxRadius(NaifContextPtr naif) const override;
 
-      double area() const;
-      NaifVector normal() const;
-      NaifVector center() const;
+      double area(NaifContextPtr naif) const override;
+      NaifVector normal(NaifContextPtr naif) const override;
+      NaifVector center(NaifContextPtr naif) const;
 
-      Angle separationAngle(const NaifVector &raydir) const;
+      Angle separationAngle(NaifContextPtr naif, const NaifVector &raydir) const override;
 
-      bool hasIntercept(const NaifVertex &vertex, const NaifVector &raydir) const;
-      bool hasPoint(const Latitude &lat, const Longitude &lon) const;
+      bool hasIntercept(NaifContextPtr naif, const NaifVertex &vertex, const NaifVector &raydir) const override;
+      bool hasPoint(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) const override;
 
-      SurfacePoint *point(const Latitude &lat, const Longitude &lon) const;
-      Intercept *intercept(const NaifVertex &vertex, const NaifVector &raydir) const;
+      SurfacePoint *point(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) const override;
+      Intercept *intercept(NaifContextPtr naif, const NaifVertex &vertex, const NaifVector &raydir) const override;
 
       NaifVertex vertex(int v) const;
 
-      AbstractPlate *clone() const;
+      AbstractPlate *clone() const override;
 
     protected:
-      bool findPlateIntercept(const NaifVertex &obs, const NaifVector &raydir, 
+      bool findPlateIntercept(NaifContextPtr naif, const NaifVertex &obs, const NaifVector &raydir, 
                               NaifVertex &point) const;
   
     private:

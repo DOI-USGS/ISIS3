@@ -76,8 +76,8 @@ void SpkSpiceSegment::setId(const QString &name) {
  *
  * @return int  Number of kernels loaded for the requested type
  */
-int SpkSpiceSegment::LoadKernelType(const QString &ktypes) const {
-  return (_kernels.Load(ktypes));
+int SpkSpiceSegment::LoadKernelType(NaifContextPtr naif, const QString &ktypes) const {
+  return (_kernels.Load(naif, ktypes));
 }
 
 /**
@@ -90,8 +90,8 @@ int SpkSpiceSegment::LoadKernelType(const QString &ktypes) const {
  *
  * @return int Number kernels unloaded
  */
-int SpkSpiceSegment::UnloadKernelType(const QString &ktypes) const {
-  return (_kernels.UnLoad(ktypes));
+int SpkSpiceSegment::UnloadKernelType(NaifContextPtr naif, const QString &ktypes) const {
+  return (_kernels.UnLoad(naif, ktypes));
 }
 
 /**
@@ -107,8 +107,8 @@ int SpkSpiceSegment::UnloadKernelType(const QString &ktypes) const {
  */
 void SpkSpiceSegment::init(Cube &cube, NaifContextPtr naif) {
 
-  _kernels.UnLoad();  // Unload all active, owned kernels
-  init();            // Init local variables
+  _kernels.UnLoad(naif);  // Unload all active, owned kernels
+  init();                 // Init local variables
 
   _fname = cube.fileName();
 
@@ -120,7 +120,7 @@ void SpkSpiceSegment::init(Cube &cube, NaifContextPtr naif) {
     // object checks the NAIF pool for existance.  It logs their NAIF
     // status as loaded which may cause trouble from here on...
     Pvl *label = cube.label();
-    _kernels.Init(*label);
+    _kernels.Init(naif, *label);
     Camera *camera = cube.camera();
 
     //  Determine segment ID from product ID if it exists, otherwise basename
@@ -206,7 +206,7 @@ void SpkSpiceSegment::init() {
  */
 bool SpkSpiceSegment::getImageTimes(NaifContextPtr naif, Pvl &lab, double &start, double &end) const {
 
-  _kernels.Load("LSK,SCLK");
+  _kernels.Load(naif, "LSK,SCLK");
   PvlObject &cube = lab.findObject("IsisCube");
   // Get the start and end time for the cube
   start = UTCtoET((QString) cube.findGroup("Instrument")["StartTime"], naif);

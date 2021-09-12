@@ -9,10 +9,10 @@
 #include "ProcessRubberSheet.h"
 
 namespace Isis {
-  extern void cam2map(UserInterface &ui, Pvl *log=nullptr);
-  extern void cam2map(Cube *icube, Pvl &userMap, PvlGroup &userGrp, ProcessRubberSheet &rs,
+  extern void cam2map(NaifContextPtr naif, UserInterface &ui, Pvl *log=nullptr);
+  extern void cam2map(NaifContextPtr naif, Cube *icube, Pvl &userMap, PvlGroup &userGrp, ProcessRubberSheet &rs,
                       UserInterface &ui, Pvl *log);
-  extern void cam2map(Cube *icube, Pvl &userMap, PvlGroup &userGrp, UserInterface &ui, Pvl *log);
+  extern void cam2map(NaifContextPtr naif, Cube *icube, Pvl &userMap, PvlGroup &userGrp, UserInterface &ui, Pvl *log);
 
   /**
    * @author ????-??-?? Unknown

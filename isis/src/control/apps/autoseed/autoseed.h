@@ -12,8 +12,9 @@ namespace Isis {
   };
 
   extern void autoseed(UserInterface &ui,
+                       NaifContextPtr naif,
                        Pvl *log = nullptr);
-  extern void autoseed(UserInterface &ui, SerialNumberList &serialNumbers, ControlNet *precnet = nullptr, Pvl *log=nullptr);
+  extern void autoseed(UserInterface &ui, NaifContextPtr naif, SerialNumberList &serialNumbers, ControlNet *precnet = nullptr, Pvl *log=nullptr);
 }
 
 #endif

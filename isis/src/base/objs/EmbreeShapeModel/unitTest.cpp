@@ -51,6 +51,8 @@ double roundToPrecision(double value, double precision);
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
 
     qDebug() << "Testing default shape model";
     EmbreeShapeModel defaultModel;
@@ -117,7 +119,7 @@ int main(int argc, char *argv[]) {
              << lookVec[1] << ", "
              << lookVec[2] << ")";
     qDebug() << "Intersecting Embree shape model";
-    itokawaModel.intersectSurface(observerVec, lookVec);
+    itokawaModel.intersectSurface(naif, observerVec, lookVec);
     outputModelStatus(itokawaModel);
     qDebug() << "";
 
@@ -139,7 +141,7 @@ int main(int argc, char *argv[]) {
              << lookVec[1] << ", "
              << lookVec[2] << ")";
     qDebug() << "Intersecting Embree shape model";
-    itokawaModel.intersectSurface(observerVec, lookVec);
+    itokawaModel.intersectSurface(naif, observerVec, lookVec);
     outputModelStatus(itokawaModel);
     qDebug() << "";
 
@@ -170,8 +172,8 @@ int main(int argc, char *argv[]) {
     Latitude occLat(0, Angle::Degrees);
     Longitude occLon(282, Angle::Degrees);
     std::vector<double> occlusionObserver(3, 0.0);
-    itokawaCamera->SetUniversalGround( occLat.degrees(), occLon.degrees() );
-    itokawaCamera->instrumentBodyFixedPosition(&occlusionObserver[0]);
+    itokawaCamera->SetUniversalGround( naif, occLat.degrees(), occLon.degrees() );
+    itokawaCamera->instrumentBodyFixedPosition(&occlusionObserver[0], naif);
     qDebug() << "Intersection inputs:";
     qDebug() << "  Latitude:  " << occLat.degrees();
     qDebug() << "  Longitude: " << occLon.degrees();
@@ -192,7 +194,7 @@ int main(int argc, char *argv[]) {
 
     testLat.setDegrees(0.0);
     testLon.setDegrees(200.0);
-    SurfacePoint visiblePoint( testLat, testLon,
+    SurfacePoint visiblePoint( naif, testLat, testLon,
                                Distance(230.0, Distance::Meters) );
     qDebug() << "Intersection inputs:";
     qDebug() << "  Surface Point: ("
@@ -213,7 +215,7 @@ int main(int argc, char *argv[]) {
 
     testLat.setDegrees(-45.0);
     testLon.setDegrees(80.0);
-    SurfacePoint occludedPoint( testLat, testLon,
+    SurfacePoint occludedPoint( naif, testLat, testLon,
                                 Distance(1000.0, Distance::Meters) );
     qDebug() << "Intersection inputs:";
     qDebug() << "  Surface Point: ("
@@ -240,7 +242,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Local radius point";
     qDebug() << "  Latitude:  " << testLat.degrees();
     qDebug() << "  Longitude: " << testLon.degrees();
-    qDebug() << "Radius: " << itokawaModel.localRadius(testLat, testLon).kilometers();
+    qDebug() << "Radius: " << itokawaModel.localRadius(naif, testLat, testLon).kilometers();
     qDebug() << "Checking that shape model status did not change";
     outputModelStatus(itokawaModel);
 
@@ -254,10 +256,10 @@ int main(int argc, char *argv[]) {
     lookVec[1] = 0.0;
     lookVec[2] = 0.0;
     qDebug() << "Intersecting Embree shape model";
-    itokawaModel.intersectSurface(observerVec, lookVec);
+    itokawaModel.intersectSurface(naif, observerVec, lookVec);
     outputModelStatus(itokawaModel);
     qDebug() << "Intersection is visible from same position and look direction? "
-             << itokawaModel.isVisibleFrom(observerVec, lookVec);
+             << itokawaModel.isVisibleFrom(naif, observerVec, lookVec);
     observerVec[0] = 1000.0;
     observerVec[1] = 0.0;
     observerVec[2] = 0.0;
@@ -265,7 +267,7 @@ int main(int argc, char *argv[]) {
     lookVec[1] = 0.0;
     lookVec[2] = 0.0;
     qDebug() << "Intersection is visible with non-intersecting look? "
-             << itokawaModel.isVisibleFrom(observerVec, lookVec);
+             << itokawaModel.isVisibleFrom(naif, observerVec, lookVec);
     observerVec[0] = -1000.0;
     observerVec[1] = 0.0;
     observerVec[2] = 0.0;
@@ -273,18 +275,18 @@ int main(int argc, char *argv[]) {
     lookVec[1] = 0.0;
     lookVec[2] = 0.0;
     qDebug() << "Intersection is visible from the opposite side? "
-             << itokawaModel.isVisibleFrom(observerVec, lookVec);
+             << itokawaModel.isVisibleFrom(naif, observerVec, lookVec);
     qDebug() << "Increase the tolerance to 10 km";
     itokawaModel.setTolerance(10);
     qDebug() << "Intersection is now visible from the opposite side? "
-             << itokawaModel.isVisibleFrom(observerVec, lookVec);
+             << itokawaModel.isVisibleFrom(naif, observerVec, lookVec);
 
     qDebug() << "Testing default ellipsoid normal";
     qDebug() << endl;
 
     qDebug() << "Starting model status";
     outputModelStatus(itokawaModel);
-    itokawaModel.calculateDefaultNormal();
+    itokawaModel.calculateDefaultNormal(naif);
     qDebug() << "Model status after recalculating";
     outputModelStatus(itokawaModel);
 
@@ -295,11 +297,11 @@ int main(int argc, char *argv[]) {
     observerVec[0] = 1000.0;
     observerVec[1] = 0.0;
     observerVec[2] = 0.0;
-    qDebug() << "Emission angle: " << itokawaModel.emissionAngle(observerVec);
+    qDebug() << "Emission angle: " << itokawaModel.emissionAngle(naif, observerVec);
     observerVec[0] = 1000.0;
     observerVec[1] = 100.0;
     observerVec[2] = 0.0;
-    qDebug() << "Incidence angle: " << itokawaModel.incidenceAngle(observerVec);
+    qDebug() << "Incidence angle: " << itokawaModel.incidenceAngle(naif, observerVec);
 
     qDebug() << "Testing errors";
     qDebug() << endl;

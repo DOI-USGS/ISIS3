@@ -312,6 +312,7 @@ namespace Isis {
    */
   void BandTool::changeView() {
     MdiCubeViewport *v = cubeViewport();
+    auto naif = NaifContext::acquire();
 
     if(v == NULL) return;
 
@@ -322,14 +323,14 @@ namespace Isis {
           p_redSpin->value() != v->redBand() ||
           p_grnSpin->value() != v->greenBand() ||
           p_bluSpin->value() != v->blueBand()) {
-        v->viewRGB(p_redSpin->value(), p_grnSpin->value(), p_bluSpin->value());
+        v->viewRGB(naif, p_redSpin->value(), p_grnSpin->value(), p_bluSpin->value());
       }
     }
     else {
       p_stack->setCurrentIndex(0);
       p_stack2->setCurrentIndex(0);
       if(v->isColor() || p_graySpin->value() != v->grayBand()) {
-        v->viewGray(p_graySpin->value());
+        v->viewGray(naif, p_graySpin->value());
       }
     }
 
@@ -392,6 +393,8 @@ namespace Isis {
   void BandTool::copyLinkedViewports() {
     if(!cubeViewport()->isLinked()) return;
 
+    auto naif = NaifContext::acquire();
+
     for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
       MdiCubeViewport *cvp = cubeViewportList()->at(i);
       if(!cvp->isLinked() || cvp == cubeViewport()) continue;
@@ -408,7 +411,7 @@ namespace Isis {
               p_grnSpin->value() > bands ||
               p_bluSpin->value() > bands) continue;
 
-          cvp->viewRGB(p_redSpin->value(), p_grnSpin->value(),
+          cvp->viewRGB(naif, p_redSpin->value(), p_grnSpin->value(),
                        p_bluSpin->value());
         }
       }
@@ -416,7 +419,7 @@ namespace Isis {
         if(cvp->isColor() || p_graySpin->value() != cvp->grayBand()) {
           if(p_graySpin->value() > bands) continue;
 
-          cvp->viewGray(p_graySpin->value());
+          cvp->viewGray(naif, p_graySpin->value());
         }
       }
     }
@@ -429,7 +432,7 @@ namespace Isis {
   void BandTool::copyAllViewports() {
     for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
       MdiCubeViewport *cvp = cubeViewportList()->at(i);
-
+      auto naif = NaifContext::acquire();
       int bands = cvp->cubeBands();
 
       if(p_rgbButton->isChecked()) {
@@ -442,7 +445,7 @@ namespace Isis {
               p_grnSpin->value() > bands ||
               p_bluSpin->value() > bands) continue;
 
-          cvp->viewRGB(p_redSpin->value(), p_grnSpin->value(),
+          cvp->viewRGB(naif, p_redSpin->value(), p_grnSpin->value(),
                        p_bluSpin->value());
         }
       }
@@ -450,7 +453,7 @@ namespace Isis {
         if(cvp->isColor() || p_graySpin->value() != cvp->grayBand()) {
           if(p_graySpin->value() > bands) continue;
 
-          cvp->viewGray(p_graySpin->value());
+          cvp->viewGray(naif, p_graySpin->value());
         }
       }
     }

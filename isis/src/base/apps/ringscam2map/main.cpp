@@ -231,7 +231,7 @@ void IsisMain() {
     trim = ui.GetBoolean("TRIM"); // trim allowed for defaultrange=map
   }
   else if(ui.GetString("DEFAULTRANGE") == "MINIMIZE") {
-    outmap = (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines, 
+    outmap = (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(naif, userMap, samples, lines, 
                                                                            *incam);
     trim = false;
   }

@@ -321,7 +321,7 @@ namespace Isis {
           shape->setHasIntersection(false);
           return false;
         }
-        SurfacePoint surfPt(lat, lon, rad);
+        SurfacePoint surfPt(naif, lat, lon, rad);
         if (SetGround(naif, surfPt)) {
           p_childSample = sample;
           p_childLine = line;
@@ -342,7 +342,7 @@ namespace Isis {
           shape->setHasIntersection(false);
           return false;
         }
-        SurfacePoint surfPt(lat, lon, rad);
+        SurfacePoint surfPt(naif, lat, lon, rad);
         if (SetGround(naif, surfPt)) {
           p_childSample = sample;
           p_childLine = line;
@@ -431,7 +431,7 @@ namespace Isis {
       return false;
     }
 
-    return SetGround(naif, SurfacePoint(latitude, longitude, localRadius));
+    return SetGround(naif, SurfacePoint(naif, latitude, longitude, localRadius));
   }
 
 
@@ -558,7 +558,7 @@ namespace Isis {
   bool Camera::SetUniversalGround(NaifContextPtr naif, const double latitude, const double longitude,
                                   const double radius) {
     // Convert lat/lon to undistorted focal plane x/y
-    if (p_groundMap->SetGround(naif, SurfacePoint(Latitude(latitude, Angle::Degrees),
+    if (p_groundMap->SetGround(naif, SurfacePoint(naif, Latitude(latitude, Angle::Degrees),
                                             Longitude(longitude, Angle::Degrees),
                                             Distance(radius, Distance::Meters)))) {
       return RawFocalPlanetoImage(naif);  // sets p_hasIntersection
@@ -878,7 +878,7 @@ namespace Isis {
 
       if (radius.isValid()) {
 
-        testPoint = SurfacePoint(latitude, longitude, radius);
+        testPoint = SurfacePoint(naif, latitude, longitude, radius);
 
         if (SetGround(naif, testPoint)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
@@ -907,7 +907,7 @@ namespace Isis {
 
       if (radius.isValid()) {
 
-        testPoint = SurfacePoint(latitude, longitude, radius);
+        testPoint = SurfacePoint(naif, latitude, longitude, radius);
 
         if (SetGround(naif, testPoint)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
@@ -927,7 +927,7 @@ namespace Isis {
 
       if (radius.isValid()) {
 
-        testPoint = SurfacePoint(latitude, longitude, radius);
+        testPoint = SurfacePoint(naif, latitude, longitude, radius);
         if (SetGround(naif, testPoint)) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
@@ -1120,7 +1120,7 @@ namespace Isis {
       for (Distance radius = Distance(p_minRingRadius, Distance::Meters);
                    radius <= Distance(p_maxRingRadius, Distance::Meters);
                    radius += Distance((p_maxRingRadius - p_minRingRadius) / 10.0, Distance::Meters)) {
-        if (SetGround(naif, SurfacePoint(Latitude(0.0, Angle::Degrees), Longitude(0.0, Angle::Degrees), radius))) {
+        if (SetGround(naif, SurfacePoint(naif, Latitude(0.0, Angle::Degrees), Longitude(0.0, Angle::Degrees), radius))) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minRingLongitude = 0.0;

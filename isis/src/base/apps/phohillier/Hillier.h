@@ -79,7 +79,7 @@ namespace Isis {
        * @brief Create Hilier photometric object
        *
        */
-      Hillier(PvlObject &pvl, Cube &cube);
+      Hillier(NaifContextPtr naif, PvlObject &pvl, Cube &cube);
 
       //! Destructor
       virtual ~Hillier() {};
@@ -87,8 +87,8 @@ namespace Isis {
       void setCamera(Camera *cam) {
         _camera = cam;
       }
-      double Compute(const double &line, const double &sample, int band = 1);
-      double photometry(double i, double e, double g, int band = 1) const;
+      double Compute(NaifContextPtr naif, const double &line, const double &sample, int band = 1);
+      double photometry(NaifContextPtr naif, double i, double e, double g, int band = 1) const;
       void Report(PvlContainer &pvl);
 
     private:
@@ -124,12 +124,12 @@ namespace Isis {
       double _eRef;  //  Emission  reference angle
       double _gRef;  //  Phase     reference angle
 
-      double photometry(const Parameters &parms, double i, double e,
+      double photometry(NaifContextPtr naif, const Parameters &parms, double i, double e,
                         double g) const;
 
-      Parameters findParameters(const double wavelength) const;
-      Parameters extract(const DbProfile &profile) const;
-      void init(PvlObject &pvl, Cube &cube);
+      Parameters findParameters(NaifContextPtr naif, const double wavelength) const;
+      Parameters extract(NaifContextPtr naif, const DbProfile &profile) const;
+      void init(NaifContextPtr naif, PvlObject &pvl, Cube &cube);
 
       /**
        * @brief Helper method to initialize parameters

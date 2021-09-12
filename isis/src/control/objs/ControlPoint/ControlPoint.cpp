@@ -888,7 +888,7 @@ namespace Isis {
    *
    * @return Status Success or PointLocked
    */
-  ControlPoint::Status ControlPoint::ComputeApriori() {
+  ControlPoint::Status ControlPoint::ComputeApriori(NaifContextPtr naif) {
     // TODO (KLE): where should call this go? Also, what's the point? The method has no description.
     PointModified();
 
@@ -925,7 +925,7 @@ namespace Isis {
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
-      bool setImageSuccess = cam->SetImage(m->GetSample(), m->GetLine());
+      bool setImageSuccess = cam->SetImage(m->GetSample(), m->GetLine(), naif);
       m->SetFocalPlaneMeasured(cam->DistortionMap()->UndistortedFocalPlaneX(),
                                cam->DistortionMap()->UndistortedFocalPlaneY());
 
@@ -968,7 +968,7 @@ namespace Isis {
       double avgR2 = r2B / goodMeasures;
       double scale = sqrt(avgR2/(avgX*avgX+avgY*avgY+avgZ*avgZ));
 
-      aprioriSurfacePoint.SetRectangular(
+      aprioriSurfacePoint.SetRectangular(naif,
         Displacement((avgX*scale), Displacement::Kilometers),
         Displacement((avgY*scale), Displacement::Kilometers),
         Displacement((avgZ*scale), Displacement::Kilometers));
@@ -1010,7 +1010,7 @@ namespace Isis {
    *                           points in a control net AFTER bundle adjustment. References #2591.
    *                            
    */
-  ControlPoint::Status ControlPoint::ComputeResiduals() {
+  ControlPoint::Status ControlPoint::ComputeResiduals(NaifContextPtr naif) {
     if (IsIgnored()) {
       return Failure;
     }
@@ -1041,7 +1041,7 @@ namespace Isis {
       // measurement sample/line to get the computed sample/line.  This must be
       // done manually because the camera will compute a new time for line scanners,
       // instead of using the measured time.
-      ComputeResiduals_Millimeters();
+      ComputeResiduals_Millimeters(naif);
 
       if (cam->GetCameraType()  !=  Isis::Camera::Radar) {
 
@@ -1089,18 +1089,18 @@ namespace Isis {
           adjLine = m->GetLine() + 1.;
         }
 
-        cam->SetImage(sample, adjLine);
+        cam->SetImage(sample, adjLine, naif);
         SurfacePoint sp = cam->GetSurfacePoint();
 
         // Step 2.
-        cam->SetImage(sample, m->GetLine());
+        cam->SetImage(sample, m->GetLine(), naif);
         double focalplaneX;
         double scalingY;
 
         // Step 3.
         // The default bool value will come from CameraGroundMap instead of
         // RadarGroundMap so be explicit to turn off back-of-planet test.
-        cam->GroundMap()->GetXY(sp, &focalplaneX, &scalingY, false);
+        cam->GroundMap()->GetXY(naif, sp, &focalplaneX, &scalingY, false);
         double deltaLine;
 
         if (computedY < 0) {
@@ -1170,7 +1170,7 @@ namespace Isis {
    *                            of image residuals in sample and line.
    */
 
-  ControlPoint::Status ControlPoint::ComputeResiduals_Millimeters() {
+  ControlPoint::Status ControlPoint::ComputeResiduals_Millimeters(NaifContextPtr naif) {
     if (IsIgnored()) {
       return Failure;
     }
@@ -1202,11 +1202,11 @@ namespace Isis {
       // can hold the Spice to calculate residuals in undistorted focal plane
       // coordinates.
       if (cam->GetCameraType() != 0) {  // no need to call setimage for framing camera
-        cam->SetImage(m->GetSample(), m->GetLine());
+        cam->SetImage(m->GetSample(), m->GetLine(), naif);
       }
 
       // The default bool value is true.  Turn back-of-planet test off for bundle adjustment.
-      cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy, false);
+      cam->GroundMap()->GetXY(naif, GetAdjustedSurfacePoint(), &cudx, &cudy, false);
       // double mudx = m->GetFocalPlaneMeasuredX();
       // double mudy = m->GetFocalPlaneMeasuredY();
 

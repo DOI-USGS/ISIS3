@@ -76,7 +76,7 @@ namespace Isis {
       };
 
       //! Given Control Net, find the reference based on Emission Angle
-      virtual void FindCnetRef(ControlNet &pNewNet);
+      virtual void FindCnetRef(NaifContextPtr naif, ControlNet &pNewNet) override;
   };
 };
 #endif

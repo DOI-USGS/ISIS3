@@ -247,12 +247,12 @@ namespace Isis {
 
     int nrecs = segment.size();
 
-    segment.FurnshKernelType("FK");
+    segment.FurnshKernelType(naif, "FK");
     naif->CheckErrors();
     naif->ckw03_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
                    refFrame.toLatin1().data(), hasAvvs, segId.toLatin1().data(), nrecs, &sclks[0],
                    quats[0], avvs, 1, &sclks[0]);
-    segment.UnloadKernelType("FK");
+    segment.UnloadKernelType(naif, "FK");
 
     naif->CheckErrors();
     return;

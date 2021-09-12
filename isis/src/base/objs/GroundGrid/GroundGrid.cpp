@@ -93,7 +93,8 @@ namespace Isis {
         Distance::Meters);
 
     if (p_mapping->hasKeyword("MinimumLatitude")) {
-      p_minLat = new Latitude(toDouble((*p_mapping)["MinimumLatitude"][0]), 
+      p_minLat = new Latitude(naif,
+                              toDouble((*p_mapping)["MinimumLatitude"][0]), 
                               *p_mapping,
                               Angle::Degrees, 
                               Latitude::AllowPastPole);
@@ -103,7 +104,8 @@ namespace Isis {
     }
 
     if (p_mapping->hasKeyword("MaximumLatitude")) {
-      p_maxLat = new Latitude(toDouble((*p_mapping)["MaximumLatitude"][0]), 
+      p_maxLat = new Latitude(naif,
+                              toDouble((*p_mapping)["MaximumLatitude"][0]), 
                               *p_mapping,
                               Angle::Degrees);
     }
@@ -147,7 +149,7 @@ namespace Isis {
          largerRadius.meters()) * 10;
     }
     else {
-      p_defaultResolution = (p_groundMap->Resolution() /
+      p_defaultResolution = (p_groundMap->Resolution(naif) /
         largerRadius.meters()) * 10;
     }
 
@@ -210,12 +212,13 @@ namespace Isis {
    * @param lonInc  Distance between longitude lines
    * @param progress If passed in, this progress will be used
    */
-  void GroundGrid::CreateGrid(Latitude baseLat, 
+  void GroundGrid::CreateGrid(NaifContextPtr naif,
+                              Latitude baseLat, 
                               Longitude baseLon,
                               Angle latInc,  
                               Angle lonInc,
                               Progress *progress) {
-    CreateGrid(baseLat, baseLon, latInc, lonInc, progress, Angle(), Angle());
+    CreateGrid(naif, baseLat, baseLon, latInc, lonInc, progress, Angle(), Angle());
   }
 
 
@@ -231,7 +234,8 @@ namespace Isis {
    * @param latRes  Resolution of latitude lines (in degrees/pixel)
    * @param lonRes  Resolution of longitude lines (in degrees/pixel)
    */
-  void GroundGrid::CreateGrid(Latitude baseLat, 
+  void GroundGrid::CreateGrid(NaifContextPtr naif,
+                              Latitude baseLat, 
                               Longitude baseLon,
                               Angle latInc,  
                               Angle lonInc,
@@ -296,7 +300,8 @@ namespace Isis {
     p_reinitialize = true;
 
     // Find starting points for lat/lon
-    Latitude startLat = Latitude(baseLat - Angle(floor((baseLat - *p_minLat) / latInc) * latInc),
+    Latitude startLat = Latitude(naif,
+                                 baseLat - Angle(floor((baseLat - *p_minLat) / latInc) * latInc),
                                  *GetMappingGroup(), 
                                  Latitude::AllowPastPole);
 
@@ -312,7 +317,7 @@ namespace Isis {
                      Angle::Degrees);
     }
 
-    Latitude endLat = Latitude((long)((*p_maxLat - startLat) / latInc) * latInc + startLat,
+    Latitude endLat = Latitude(naif, (long)((*p_maxLat - startLat) / latInc) * latInc + startLat,
                                *GetMappingGroup());
     Longitude endLon =
         (long)((*p_maxLon - startLon) / lonInc) * lonInc + startLon;
@@ -342,7 +347,7 @@ namespace Isis {
       for (Longitude lon = *p_minLon; lon <= *p_maxLon; lon += latRes) {
         unsigned int x = 0;
         unsigned int y = 0;
-        bool valid = GetXY(latStep, lon, x, y);
+        bool valid = GetXY(naif, latStep, lon, x, y);
 
         if (valid && havePrevious) {
           if (previousX != x || previousY != y) {
@@ -373,7 +378,7 @@ namespace Isis {
         unsigned int x = 0;
         unsigned int y = 0;
 
-        bool valid = GetXY(latStep, lon, x, y);
+        bool valid = GetXY(naif, latStep, lon, x, y);
 
         if (valid && havePrevious) {
           if (previousX == x && previousY == y) {
@@ -426,7 +431,7 @@ namespace Isis {
   /**
    * This draws grid lines along the extremes of the lat/lon box of the grid.
    */
-  void GroundGrid::WalkBoundary() {
+  void GroundGrid::WalkBoundary(NaifContextPtr naif) {
     Angle latRes = Angle(p_defaultResolution, Angle::Degrees);
     Angle lonRes = Angle(p_defaultResolution, Angle::Degrees);
 
@@ -448,7 +453,7 @@ namespace Isis {
       for (Longitude lon = minLon; lon <= maxLon; lon += latRes) {
         unsigned int x = 0;
         unsigned int y = 0;
-        bool valid = GetXY(latStep, lon, x, y);
+        bool valid = GetXY(naif, latStep, lon, x, y);
 
         if (valid && havePrevious) {
           if (previousX != x || previousY != y) {
@@ -475,7 +480,7 @@ namespace Isis {
       for (; latStep <= maxLat; latStep += lonRes) {
         unsigned int x = 0;
         unsigned int y = 0;
-        bool valid = GetXY(latStep, lon, x, y);
+        bool valid = GetXY(naif, latStep, lon, x, y);
 
         if (valid && havePrevious) {
           if (previousX != x || previousY != y) {
@@ -610,14 +615,14 @@ namespace Isis {
    *
    * @return bool Successful
    */
-  bool GroundGrid::GetXY(Latitude lat, Longitude lon,
+  bool GroundGrid::GetXY(NaifContextPtr naif, Latitude lat, Longitude lon,
                          unsigned int &x, unsigned int &y) {
     if (!GroundMap()) return false;
     if (m_extendGrid) {
-      if (!GroundMap()->SetUnboundGround(lat, lon)) return false;
+      if (!GroundMap()->SetUnboundGround(naif, lat, lon)) return false;
     }
     else {
-      if (!GroundMap()->SetGround(lat, lon)) return false;
+      if (!GroundMap()->SetGround(naif, lat, lon)) return false;
     }
     if (p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;
     if (p_groundMap->Sample() < 0.5 || p_groundMap->Line() < 0.5) return false;

@@ -97,7 +97,7 @@ namespace Isis {
       if (radius < 0.0) radius = 0.0; // TODO: massive, temporary kluge to get around testing
                                                      // latitude at -90 in caminfo app (are there
                                                      // more issues like this? Probably)KE
-      if (p_camera->Sensor::SetGround(naif, SurfacePoint(lat, lon, Distance(radius, Distance::Meters)))) {
+      if (p_camera->Sensor::SetGround(naif, SurfacePoint(naif, lat, lon, Distance(radius, Distance::Meters)))) {
          LookCtoFocalPlaneXY(naif);
          return true;
       }
@@ -105,7 +105,7 @@ namespace Isis {
     else {
       Distance radius(p_camera->LocalRadius(lat, lon));
       if (radius.isValid()) {
-        if (p_camera->Sensor::SetGround(naif, SurfacePoint(lat, lon, radius))) {
+        if (p_camera->Sensor::SetGround(naif, SurfacePoint(naif, lat, lon, radius))) {
           LookCtoFocalPlaneXY(naif);
           return true;
         }
@@ -271,7 +271,8 @@ namespace Isis {
   bool CameraGroundMap::GetXY(NaifContextPtr naif,
                               const double lat, const double lon,
                               const double radius, double *cudx, double *cudy) {
-    SurfacePoint spoint(Latitude(lat, Angle::Degrees),
+    SurfacePoint spoint(naif, 
+                        Latitude(lat, Angle::Degrees),
                         Longitude(lon, Angle::Degrees),
                         Distance(radius, Distance::Meters));
     return GetXY(naif, spoint, cudx, cudy);

@@ -53,22 +53,22 @@ namespace Isis {
       /** Destructor for Stereo */
       virtual ~Stereo() {}
 
-      static bool elevation(Camera &cam1, Camera &cam2, double &radius,
+      static bool elevation(NaifContextPtr naif, Camera &cam1, Camera &cam2, double &radius,
                             double &latitude, double &longitude,
                             double &sepang, double &error);
 
-      static void spherical(const double latitude, const double longitude,
+      static void spherical(NaifContextPtr naif, const double latitude, const double longitude,
                             const double radius, double &x, double &y,
                             double &z);
 
-      static void rectangular(const double x, const double y, const double z,
+      static void rectangular(NaifContextPtr naif, const double x, const double y, const double z,
                               double &latitude, double &longitude,
                               double &radius);
 
   private:
     static std::vector<double> array2StdVec(const double d[3]);
     static double *stdVec2Array(const std::vector<double> &v, double *d = 0);
-    static void targetToSpacecraft(Camera &camera, double TP[3]);
+    static void targetToSpacecraft(NaifContextPtr naif, Camera &camera, double TP[3]);
     static void targetToSurface(Camera &camera, double TC[3]);
 
   };

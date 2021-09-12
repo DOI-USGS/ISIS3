@@ -15,6 +15,8 @@ using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   cout.precision(14);
 
@@ -183,12 +185,12 @@ int main(int argc, char *argv[]) {
     latTestGroup += Isis::PvlKeyword("CenterLatitude", "0.0");
     latTestGroup += Isis::PvlKeyword("CenterLongitude", "0.0");
   
-    Latitude ographicLat(25, latTestGroup, Angle::Degrees);
+    Latitude ographicLat(naif, 25, latTestGroup, Angle::Degrees);
     Angle ographicAngle(30, Angle::Degrees);
     cout << "Adding an angle to a planetographic latitude with the add methods." << endl
          << ographicLat.planetographic(Angle::Degrees) << " + "
          << ographicAngle.degrees()
-         << " = " << ographicLat.add(ographicAngle, latTestGroup).planetographic(Angle::Degrees)
+         << " = " << ographicLat.add(naif, ographicAngle, latTestGroup).planetographic(Angle::Degrees)
          << endl;
     cout << "Adding an angle to a planetographic latitude with the + operator." << endl
          << ographicLat.planetographic(Angle::Degrees) << " + "
@@ -204,7 +206,7 @@ int main(int argc, char *argv[]) {
   PvlGroup mappingGroup("Mapping");
   mappingGroup += PvlKeyword("TargetName", "Yoda");
   try {
-    Latitude( Angle(PI, Angle::Radians), mappingGroup);
+    Latitude(naif, Angle(PI, Angle::Radians), mappingGroup);
   }
   catch (IException &e) {
     cout << "-------------------------------------------------------" << endl;

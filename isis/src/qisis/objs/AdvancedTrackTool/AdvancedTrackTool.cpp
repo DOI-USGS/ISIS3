@@ -175,7 +175,8 @@ namespace Isis {
    * @param p
    */
   void AdvancedTrackTool::mouseMove(QPoint p) {
-    updateRow(p);
+    auto naif = NaifContext::acquire();
+    updateRow(naif, p);
   }
 
   /**
@@ -201,7 +202,7 @@ namespace Isis {
    *
    * @param p
    */
-  void AdvancedTrackTool::updateRow(QPoint p) {
+  void AdvancedTrackTool::updateRow(NaifContextPtr naif, QPoint p) {
     MdiCubeViewport *cvp = cubeViewport();
     if(cvp == NULL) {
       p_tableWin->clearRow(p_tableWin->currentRow());
@@ -209,7 +210,7 @@ namespace Isis {
     }
 
     if(!cubeViewport()->isLinked()) {
-      updateRow(cvp, p, p_tableWin->currentRow());
+      updateRow(naif, cvp, p, p_tableWin->currentRow());
       p_numRows = 1;
     }
     else {
@@ -217,7 +218,7 @@ namespace Isis {
       for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
         MdiCubeViewport *d = (*(cubeViewportList()))[i];
         if(d->isLinked()) {
-          updateRow(d, p, p_tableWin->currentRow() + p_numRows);
+          updateRow(naif, d, p, p_tableWin->currentRow() + p_numRows);
           p_numRows++;
         }
       }
@@ -259,7 +260,7 @@ namespace Isis {
    * @param p   QPoint from which the row will be updated
    * @param row Row to be updated
    */
-  void AdvancedTrackTool::updateRow(MdiCubeViewport *cvp, QPoint p, int row) {
+  void AdvancedTrackTool::updateRow(NaifContextPtr naif, MdiCubeViewport *cvp, QPoint p, int row) {
     // Get the sample line position to report
     double sample, line;
     cvp->viewportToCube(p.x(), p.y(), sample, line);
@@ -342,7 +343,7 @@ namespace Isis {
 
     // Do we have a camera model?
     if(cvp->camera() != NULL) {
-      if(cvp->camera()->SetImage(sample, line)) {
+      if(cvp->camera()->SetImage(sample, line, naif)) {
         // Write columns ocentric lat/lon, and radius, only if set image succeeds
         double lat = cvp->camera()->UniversalLatitude();
         double lon = cvp->camera()->UniversalLongitude();
@@ -382,7 +383,7 @@ namespace Isis {
         p_tableWin->table()->item(row, getIndex("Point Z"))->setText(QString::number(pos[2]));
 
         // Write out columns resolution, only if set image succeeds
-        double res = cvp->camera()->PixelResolution();
+        double res = cvp->camera()->PixelResolution(naif);
         if (res != -1.0) {
           p_tableWin->table()->item(row, getIndex("Resolution"))->setText(QString::number(res));
         }
@@ -391,7 +392,7 @@ namespace Isis {
         }
 
         // Write out columns, oblique pixel resolution, only if set image succeeds
-        double obliquePRes = cvp->camera()->ObliquePixelResolution();
+        double obliquePRes = cvp->camera()->ObliquePixelResolution(naif);
         if (obliquePRes != Isis::Null) {
           p_tableWin->table()->item(row, getIndex("Oblique Pixel Resolution"))->
                                setText(QString::number(obliquePRes));
@@ -401,11 +402,11 @@ namespace Isis {
         }
 
         // Write out columns photometric angle values, only if set image succeeds
-        double phase = cvp->camera()->PhaseAngle();
+        double phase = cvp->camera()->PhaseAngle(naif);
         p_tableWin->table()->item(row, getIndex("Phase"))->setText(QString::number(phase));
         double incidence = cvp->camera()->IncidenceAngle();
         p_tableWin->table()->item(row, getIndex("Incidence"))->setText(QString::number(incidence));
-        double emission = cvp->camera()->EmissionAngle();
+        double emission = cvp->camera()->EmissionAngle(naif);
         p_tableWin->table()->item(row, getIndex("Emission"))->setText(QString::number(emission));
 
         // Write out columns local incidence and emission, only if set image
@@ -414,7 +415,7 @@ namespace Isis {
         // the incidence and emission angles calculated for the sphere
         Angle phaseAngle, incidenceAngle, emissionAngle;
         bool bSuccess = false;
-        cvp->camera()->LocalPhotometricAngles(phaseAngle, incidenceAngle, emissionAngle, bSuccess);
+        cvp->camera()->LocalPhotometricAngles(naif, phaseAngle, incidenceAngle, emissionAngle, bSuccess);
         if(bSuccess) {
           p_tableWin->table()->item(row, getIndex("LocalIncidence"))->
                                setText(QString::number(incidenceAngle.degrees()));
@@ -428,7 +429,7 @@ namespace Isis {
 
         // If set image succeeds, write out columns north azimuth, sun azimuth, solar longitude
         // north azimuth is meaningless for ring plane projections
-        double northAzi = cvp->camera()->NorthAzimuth();
+        double northAzi = cvp->camera()->NorthAzimuth(naif);
         if (cvp->camera()->target()->shape()->name() != "Plane"
             && Isis::IsValidPixel(northAzi)) {
           p_tableWin->table()->item(row, getIndex("North Azimuth"))->
@@ -438,7 +439,7 @@ namespace Isis {
           p_tableWin->table()->item(row, getIndex("North Azimuth"))->setText("");
         }
 
-        double sunAzi = cvp->camera()->SunAzimuth();
+        double sunAzi = cvp->camera()->SunAzimuth(naif);
         if (Isis::IsValidPixel(sunAzi)) {
           p_tableWin->table()->item(row, getIndex("Sun Azimuth"))->
                                setText(QString::number(sunAzi));
@@ -447,7 +448,7 @@ namespace Isis {
           p_tableWin->table()->item(row, getIndex("Sun Azimuth"))->setText("");
         }
 
-        double spacecraftAzi = cvp->camera()->SpacecraftAzimuth();
+        double spacecraftAzi = cvp->camera()->SpacecraftAzimuth(naif);
         if (Isis::IsValidPixel(spacecraftAzi)) {
           p_tableWin->table()->item(row, getIndex("Spacecraft Azimuth"))->
                                setText(QString::number(spacecraftAzi));
@@ -457,13 +458,13 @@ namespace Isis {
         }
 
         // Write out columns solar lon, slant distance, local solar time
-        double solarLon = cvp->camera()->solarLongitude().degrees();
+        double solarLon = cvp->camera()->solarLongitude(naif).degrees();
         p_tableWin->table()->item(row, getIndex("Solar Longitude"))->
                              setText(QString::number(solarLon));
-        double slantDistance = cvp->camera()->SlantDistance();
+        double slantDistance = cvp->camera()->SlantDistance(naif);
         p_tableWin->table()->item(row, getIndex("Slant Distance"))->
                              setText(QString::number(slantDistance));
-        double lst = cvp->camera()->LocalSolarTime();
+        double lst = cvp->camera()->LocalSolarTime(naif);
         p_tableWin->table()->item(row, getIndex("Local Solar Time"))->
                              setText(QString::number(lst));
       } // end if set image succeeds
@@ -490,9 +491,9 @@ namespace Isis {
                            setText(QString::number(distortedFocalPlaneY));
 
       // Always write out columns ra/dec, regardless of whether set image succeeds
-      double ra = cvp->camera()->RightAscension();
+      double ra = cvp->camera()->RightAscension(naif);
       p_tableWin->table()->item(row, getIndex("Right Ascension"))->setText(QString::number(ra));
-      double dec = cvp->camera()->Declination();
+      double dec = cvp->camera()->Declination(naif);
       p_tableWin->table()->item(row, getIndex("Declination"))->setText(QString::number(dec));
 
       // Always write out columns et and utc, regardless of whether set image succeeds
@@ -504,7 +505,7 @@ namespace Isis {
 
       // Always out columns spacecraft position, regardless of whether set image succeeds
       double pos[3];
-      cvp->camera()->instrumentPosition(pos);
+      cvp->camera()->instrumentPosition(pos, naif);
       p_tableWin->table()->item(row, getIndex("Spacecraft X"))->setText(QString::number(pos[0]));
       p_tableWin->table()->item(row, getIndex("Spacecraft Y"))->setText(QString::number(pos[1]));
       p_tableWin->table()->item(row, getIndex("Spacecraft Z"))->setText(QString::number(pos[2]));
@@ -813,8 +814,9 @@ namespace Isis {
    *                            the point is the first point record. Fixes #5143.
    */
   void AdvancedTrackTool::record(QPoint p) {
+    auto naif = NaifContext::acquire();
     p_tableWin->showTable();
-    updateRow(p);
+    updateRow(naif, p);
     record();
   }
 

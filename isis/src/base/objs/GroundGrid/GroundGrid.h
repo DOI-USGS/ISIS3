@@ -83,13 +83,15 @@ namespace Isis {
 
       virtual ~GroundGrid();
 
-      void CreateGrid(Latitude baseLat, 
+      void CreateGrid(NaifContextPtr naif,
+                      Latitude baseLat, 
                       Longitude baseLon,
                       Angle latInc,  
                       Angle lonInc,
                       Progress *progress = 0);
 
-      void CreateGrid(Latitude baseLat, 
+      void CreateGrid(NaifContextPtr naif,
+                      Latitude baseLat, 
                       Longitude baseLon,
                       Angle latInc,  
                       Angle lonInc,
@@ -97,7 +99,7 @@ namespace Isis {
                       Angle latRes, 
                       Angle lonRes);
 
-      void WalkBoundary();
+      void WalkBoundary(NaifContextPtr naif);
 
       void SetGroundLimits(Latitude minLat, 
                            Longitude minLon, 
@@ -115,7 +117,7 @@ namespace Isis {
       PvlGroup *GetMappingGroup();
 
     protected:
-      virtual bool GetXY(Latitude lat, Longitude lon,
+      virtual bool GetXY(NaifContextPtr naif, Latitude lat, Longitude lon,
                          unsigned int &x, unsigned int &y);
 
       UniversalGroundMap *GroundMap();

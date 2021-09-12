@@ -166,12 +166,12 @@ int main() {
     cout << "    default normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
     cout << endl << "  Testing localRadius method with good lat/lon values..." << endl;
-    cout  << "    Local radius = " << shape.localRadius(Latitude(20.532461495381, Angle::Degrees),
+    cout  << "    Local radius = " << shape.localRadius(naif, Latitude(20.532461495381, Angle::Degrees),
                                                     Longitude(228.26609149754, Angle::Degrees)).kilometers() << endl;
     // Mars radii = 3397.      3397.         3375.
 
     cout << endl << "  Testing localRadius method with bad lat/lon values..." << endl;
-    cout  << "    Local radius = " << shape.localRadius(Latitude(Null, Angle::Degrees),
+    cout  << "    Local radius = " << shape.localRadius(naif, Latitude(Null, Angle::Degrees),
                                                     Longitude(228.26609149754, Angle::Degrees)).kilometers() << endl;
 
     cout << endl << "  Testing setHasIntersection method" << endl;
@@ -189,7 +189,7 @@ int main() {
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
 
     cout << endl << " Testing intersectSurface using lat/lon from parent class..." << endl; 
-    shape.intersectSurface(sp->GetLatitude(), sp->GetLongitude(), sB);
+    shape.intersectSurface(naif, sp->GetLatitude(), sp->GetLongitude(), sB);
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
 
     cout << endl << "  Testing demScale method..." << endl;

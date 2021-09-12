@@ -92,7 +92,7 @@ namespace Isis {
       double GetMeanResolution(void);
 
       //! Given Control Net, find the reference based on Resolution
-      virtual void FindCnetRef(ControlNet &pNewNet);
+      virtual void FindCnetRef(NaifContextPtr naif, ControlNet &pNewNet) override;
 
     private:
       //! Get the Reference based on Resolution type

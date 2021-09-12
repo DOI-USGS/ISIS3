@@ -114,8 +114,8 @@ class CkSpiceSegment {
     }
 
     // Elements for writing NAIF SPICE kernels
-    int FurnshKernelType(const QString &ktypes) const;
-    int UnloadKernelType(const QString &ktypes = "") const;
+    int FurnshKernelType(NaifContextPtr naif, const QString &ktypes) const;
+    int UnloadKernelType(NaifContextPtr naif, const QString &ktypes = "") const;
     const Kernels &kernels() const { return (_kernels); }
 
     /** Returns CK segment reference frame */

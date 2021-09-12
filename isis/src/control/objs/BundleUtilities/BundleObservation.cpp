@@ -333,7 +333,7 @@ namespace Isis {
    * @internal
    *   @todo Should this always return true?
    */
-  bool BundleObservation::initializeExteriorOrientation() {
+  bool BundleObservation::initializeExteriorOrientation(NaifContextPtr naif) {
 
     if (m_solveSettings->instrumentPositionSolveOption() !=
         BundleObservationSolveSettings::NoPositionFactors) {
@@ -347,22 +347,22 @@ namespace Isis {
         SpicePosition *spicePosition = image->camera()->instrumentPosition();
 
         if (i > 0) {
-          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
+          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree(), naif);
           spicePosition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
-          spicePosition->SetPolynomial(posPoly1, posPoly2, posPoly3,
+          spicePosition->SetPolynomial(naif, posPoly1, posPoly2, posPoly3,
                                        m_solveSettings->positionInterpolationType());
         }
         else {
           // first, set the degree of the spk polynomial to be fit for a priori values
-          spicePosition->SetPolynomialDegree(m_solveSettings->spkDegree());
+          spicePosition->SetPolynomialDegree(m_solveSettings->spkDegree(), naif);
 
           // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
           // function, or polynomial function over constant hermite spline)
           // TODO: verify - I think this actually performs the a priori fit
-          spicePosition->SetPolynomial(m_solveSettings->positionInterpolationType());
+          spicePosition->SetPolynomial(naif, m_solveSettings->positionInterpolationType());
 
           // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
+          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree(), naif);
 
           if (m_instrumentPosition) { // ??? TODO: why is this different from rotation code below???
             positionBaseTime = m_instrumentPosition->GetBaseTime();
@@ -385,22 +385,22 @@ namespace Isis {
         SpiceRotation *spicerotation = image->camera()->instrumentRotation();
 
         if (i > 0) {
-          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
+          spicerotation->SetPolynomialDegree(naif, m_solveSettings->ckSolveDegree());
           spicerotation->SetOverrideBaseTime(rotationBaseTime, rotationtimeScale);
-          spicerotation->SetPolynomial(anglePoly1, anglePoly2, anglePoly3,
+          spicerotation->SetPolynomial(naif, anglePoly1, anglePoly2, anglePoly3,
                                        m_solveSettings->pointingInterpolationType());
         }
         else {
           // first, set the degree of the spk polynomial to be fit for a priori values
-          spicerotation->SetPolynomialDegree(m_solveSettings->ckDegree());
+          spicerotation->SetPolynomialDegree(naif, m_solveSettings->ckDegree());
 
           // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
           // function, or polynomial function over constant hermite spline)
           // TODO: verify - I think this actually performs the a priori fit
-          spicerotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
+          spicerotation->SetPolynomial(naif, m_solveSettings->pointingInterpolationType());
 
           // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
+          spicerotation->SetPolynomialDegree(naif, m_solveSettings->ckSolveDegree());
 
           rotationBaseTime = spicerotation->GetBaseTime();
           rotationtimeScale = spicerotation->GetTimeScale();
@@ -418,14 +418,14 @@ namespace Isis {
    *
    * @todo check to make sure m_bundleTargetBody is valid
    */
-  void BundleObservation::initializeBodyRotation() {
+  void BundleObservation::initializeBodyRotation(NaifContextPtr naif) {
     std::vector<Angle> raCoefs = m_bundleTargetBody->poleRaCoefs();
     std::vector<Angle> decCoefs = m_bundleTargetBody->poleDecCoefs();
     std::vector<Angle> pmCoefs = m_bundleTargetBody->pmCoefs();
 
     for (int i = 0; i < size(); i++) {
       BundleImageQsp image = at(i);
-      image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);
+      image->camera()->bodyRotation()->setPckPolynomial(naif, raCoefs, decCoefs, pmCoefs);
     }
   }
 
@@ -436,14 +436,14 @@ namespace Isis {
    * @internal
    *   @todo Is this a duplicate of initializeBodyRotation?
    */
-  void BundleObservation::updateBodyRotation() {
+  void BundleObservation::updateBodyRotation(NaifContextPtr naif) {
     std::vector<Angle> raCoefs = m_bundleTargetBody->poleRaCoefs();
     std::vector<Angle> decCoefs = m_bundleTargetBody->poleDecCoefs();
     std::vector<Angle> pmCoefs = m_bundleTargetBody->pmCoefs();
 
     for (int i = 0; i < size(); i++) {
       BundleImageQsp image = at(i);
-      image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);
+      image->camera()->bodyRotation()->setPckPolynomial(naif, raCoefs, decCoefs, pmCoefs);
     }
   }
 
@@ -616,7 +616,7 @@ namespace Isis {
    * @internal
    *   @todo always returns true?
    */
-  bool BundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
+  bool BundleObservation::applyParameterCorrections(NaifContextPtr naif, LinearAlgebra::Vector corrections) {
 
     int index = 0;
 
@@ -663,7 +663,7 @@ namespace Isis {
         for (int i = 0; i < size(); i++) {
           BundleImageQsp image = at(i);
           SpicePosition *spiceposition = image->camera()->instrumentPosition();
-          spiceposition->SetPolynomial(coefX, coefY, coefZ,
+          spiceposition->SetPolynomial(naif, coefX, coefY, coefZ,
                                        m_solveSettings->positionInterpolationType());
         }
       }
@@ -709,7 +709,7 @@ namespace Isis {
         for (int i = 0; i < size(); i++) {
           BundleImageQsp image = at(i);
           SpiceRotation *spiceRotation = image->camera()->instrumentRotation();
-          spiceRotation->SetPolynomial(coefRA, coefDEC, coefTWI,
+          spiceRotation->SetPolynomial(naif, coefRA, coefDEC, coefTWI,
                                        m_solveSettings->pointingInterpolationType());
         }
       }
@@ -802,7 +802,7 @@ namespace Isis {
  *   @history 2016-10-26 Ian Humphrey - Default values are now provided for parameters that are
  *                           not being solved. Fixes #4464.
  */
-QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool imageCSV) {
+QString BundleObservation::formatBundleOutputString(NaifContextPtr naif, bool errorPropagation, bool imageCSV) {
 
   std::cerr << "The function formatBundleOutputString is depricated as of ISIS 3.9"
                "and will be removed in ISIS 4.0" << std::endl;
@@ -855,7 +855,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     }
     // Use the position's center coordinate if not solving for spacecraft position
     else {
-      const std::vector<double> centerCoord = m_instrumentPosition->GetCenterCoordinate();
+      const std::vector<double> centerCoord = m_instrumentPosition->GetCenterCoordinate(naif);
       coefX[0] = centerCoord[0];
       coefY[0] = centerCoord[1];
       coefZ[0] = centerCoord[2];
@@ -868,7 +868,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     }
     // Use the pointing's center angles if not solving for pointing (rotation)
     else {
-      const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles();
+      const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles(naif);
       coefRA[0] = centerAngles[0];
       coefDEC[0] = centerAngles[1];
       coefTWI[0] = centerAngles[2];
@@ -1150,7 +1150,8 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
   * @param useDefaultPointing Reference to boolean of whether to use default pointing
   * @param useDefaultTwist Reference to bollean of whether to use defualt twist
   */
-  void BundleObservation::bundleOutputFetchData(QVector<double> &finalParameterValues,
+  void BundleObservation::bundleOutputFetchData(NaifContextPtr naif,
+                          QVector<double> &finalParameterValues,
                           int &nPositionCoefficients, int &nPointingCoefficients,
                           bool &useDefaultPosition,
                           bool &useDefaultPointing, bool &useDefaultTwist) {
@@ -1192,7 +1193,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
       }
       // Use the position's center coordinate if not solving for spacecraft position
       else {
-        const std::vector<double> centerCoord = m_instrumentPosition->GetCenterCoordinate();
+        const std::vector<double> centerCoord = m_instrumentPosition->GetCenterCoordinate(naif);
         coefX[0] = centerCoord[0];
         coefY[0] = centerCoord[1];
         coefZ[0] = centerCoord[2];
@@ -1205,7 +1206,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
       }
       // Use the pointing's center angles if not solving for pointing (rotation)
       else {
-        const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles();
+        const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles(naif);
         coefRA[0] = centerAngles[0];
         coefDEC[0] = centerAngles[1];
         coefTWI[0] = centerAngles[2];
@@ -1248,7 +1249,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
    * @param errorPropagation Boolean indicating whether or not to attach more information
    *     (corrections, sigmas, adjusted sigmas...) to the output.
    */
-  void BundleObservation::bundleOutputString(std::ostream &fpOut, bool errorPropagation) {
+  void BundleObservation::bundleOutputString(NaifContextPtr naif, std::ostream &fpOut, bool errorPropagation) {
 
     char buf[4096];
 
@@ -1256,7 +1257,8 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     int nPositionCoefficients, nPointingCoefficients;
     bool useDefaultPosition, useDefaultPointing,useDefaultTwist;
 
-    bundleOutputFetchData(finalParameterValues,
+    bundleOutputFetchData(naif,
+                          finalParameterValues,
                           nPositionCoefficients,nPointingCoefficients,
                           useDefaultPosition,useDefaultPointing,useDefaultTwist);
 
@@ -1472,13 +1474,14 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
    * @return @b QString Returns a formatted QString representing the BundleObservation in
    * csv format
    */
-  QString BundleObservation::bundleOutputCSV(bool errorPropagation) {
+  QString BundleObservation::bundleOutputCSV(NaifContextPtr naif, bool errorPropagation) {
 
     QVector<double> finalParameterValues;
     int nPositionCoefficients, nPointingCoefficients;
     bool useDefaultPosition, useDefaultPointing,useDefaultTwist;
 
-    bundleOutputFetchData(finalParameterValues,
+    bundleOutputFetchData(naif,
+                          finalParameterValues,
                           nPositionCoefficients,nPointingCoefficients,
                           useDefaultPosition,useDefaultPointing,useDefaultTwist);
 

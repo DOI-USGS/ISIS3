@@ -369,8 +369,8 @@ namespace Isis {
 
     //  Set up for observer/target and light time correction to between s/c 
     // and target body.
-    LightTimeCorrectionState ltState(*m_ikCode, this);
-    ltState.checkSpkKernelsForAberrationCorrection();
+    LightTimeCorrectionState ltState(naif, *m_ikCode, this);
+    ltState.checkSpkKernelsForAberrationCorrection(naif);
 
     vector<Distance> radius = m_target->radii();
     Distance targetRadius((radius[0] + radius[2])/2.0);
@@ -651,7 +651,7 @@ namespace Isis {
     }
 
     string abcorr;
-    if (getSpkAbCorrState(abcorr)) {
+    if (getSpkAbCorrState(naif, abcorr)) {
       instrumentPosition()->SetAberrationCorrection("NONE");
     }
 
@@ -773,7 +773,7 @@ namespace Isis {
       string abcorr;
       if (*m_cacheSize == 0) {
         if (m_startTime->Et() == 0.0 && m_endTime->Et() == 0.0
-            && getSpkAbCorrState(abcorr)) {
+            && getSpkAbCorrState(naif, abcorr)) {
           instrumentPosition()->SetAberrationCorrection("NONE");
         }
       }

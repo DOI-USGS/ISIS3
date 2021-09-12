@@ -58,7 +58,8 @@ namespace Isis {
    * @throws IException::Programmer "The number of instantaneous field of views must be a
    *                                 positive integer."
    */
-  QList< QList<QPointF> > PixelFOV::latLonVertices(Camera &camera,
+  QList< QList<QPointF> > PixelFOV::latLonVertices(NaifContextPtr naif,
+                                                   Camera &camera,
                                                    const double sample,
                                                    const double line,
                                                    const int numIfovs) const {
@@ -80,8 +81,8 @@ namespace Isis {
     // If computing an instantaneous fov
     if (numIfovs == 1) {
 
-      camera.SetImage(line, sample);
-      boundaryVertices.append(instantaneousFov(camera));
+      camera.SetImage(line, sample, naif);
+      boundaryVertices.append(instantaneousFov(naif, camera));
       return boundaryVertices;
     }
 
@@ -98,8 +99,9 @@ namespace Isis {
       }
       for (int i = 0; i < numIfovs; i++) {
         camera.SetImage(line, sample,
-                        timeStep * i - camera.exposureDuration(line, sample)/2);
-        QList<QPointF> iFov = instantaneousFov(camera);
+                        timeStep * i - camera.exposureDuration(line, sample)/2,
+                        naif);
+        QList<QPointF> iFov = instantaneousFov(naif, camera);
 
         // If the Ifov does not intersect the target move on
         if (iFov.isEmpty()) {
@@ -179,7 +181,7 @@ namespace Isis {
    * 
    * @see Camera::PixelIfovOffsets
    */
-  QList<QPointF> PixelFOV::instantaneousFov(Camera &camera) const {
+  QList<QPointF> PixelFOV::instantaneousFov(NaifContextPtr naif, Camera &camera) const {
 
     QList<QPointF> vertices;
 
@@ -189,7 +191,7 @@ namespace Isis {
     double saveLook[3];
     double newLook[3];
     double unitNewLook[3];
-    camera.LookDirection(saveLook);
+    camera.LookDirection(saveLook, naif);
     double focalLength = camera.FocalLength();
 
     //  For highly distorted instruments, take fpx, fpy (which are undistorted) convert to distorted,
@@ -204,13 +206,13 @@ namespace Isis {
       newLook[0] = focalPlaneX;
       newLook[1] = focalPlaneY;
       newLook[2] = camera.DistortionMap()->UndistortedFocalPlaneZ();
-      vhat_c(newLook, unitNewLook);
-      if (camera.SetLookDirection(unitNewLook)) {
+      naif->vhat_c(newLook, unitNewLook);
+      if (camera.SetLookDirection(unitNewLook, naif)) {
         vertices.append(QPointF(camera.UniversalLatitude(), camera.UniversalLongitude()));
       }
     }
     //  Reset look direction back to center of pixel
-    camera.SetLookDirection(saveLook);
+    camera.SetLookDirection(saveLook, naif);
     return vertices;
   }
 

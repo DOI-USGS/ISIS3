@@ -8,7 +8,9 @@ using namespace std;
 using namespace Isis;
 
 int main() {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   /**
    * @brief Test ImagePolygon object for accuracy and correct behavior.
@@ -35,7 +37,7 @@ int main() {
 
   ImagePolygon poly;
   try {
-    poly.Create(cube);
+    poly.Create(naif, cube);
   }
   catch(IException &e) {
     QString msg = "Cannot create polygon for [" + cube.fileName() + "]";
@@ -51,7 +53,7 @@ int main() {
 
   //  Test sub-poly option
   try {
-    poly.Create(cube, 12, 1, 384, 640, 385);
+    poly.Create(naif, cube, 12, 1, 384, 640, 385);
   }
   catch(IException &e) {
     QString msg = "Cannot create sub-polygon for [" + cube.fileName() + "]";
@@ -67,7 +69,7 @@ int main() {
 
   //  Test lower quality option
   try {
-    poly.Create(cube, 10, 12, 1, 384, 640, 385);
+    poly.Create(naif, cube, 10, 12, 1, 384, 640, 385);
   }
   catch(IException &e) {
     QString msg = "Cannot create lower quality polygon for [" +

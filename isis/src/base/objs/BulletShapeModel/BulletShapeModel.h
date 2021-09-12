@@ -66,28 +66,28 @@ namespace Isis {
       // Intersect the shape model
       bool intersectSurface(NaifContextPtr naif,
                             std::vector<double> observerPos,
-                            std::vector<double> lookDirection);
+                            std::vector<double> lookDirection) override;
       virtual bool intersectSurface(const Latitude &lat, const Longitude &lon,
                                     const std::vector<double> &observerPos,
                                     const bool &checkOcclusion = true);
       virtual bool intersectSurface(const SurfacePoint &surfpt, 
                                     const std::vector<double> &observerPos,
-                                    const bool &checkOcclusion = true);
+                                    const bool &checkOcclusion = true) override;
 
       virtual void setSurfacePoint(const SurfacePoint &surfacePoint);
       virtual void clearSurfacePoint();
 
       // Calculate the default normal of the current intersection point
-      void calculateDefaultNormal(NaifContextPtr naif);
+      void calculateDefaultNormal(NaifContextPtr naif) override;
 
-      bool isDEM() const;
+      bool isDEM() const override;
 
       // Calculate the surface normal of the current intersection point
       void setLocalNormalFromIntercept();
-      void calculateLocalNormal(NaifContextPtr naif, QVector<double *> cornerNeighborPoints);
-      void calculateSurfaceNormal(NaifContextPtr naif);
+      void calculateLocalNormal(NaifContextPtr naif, QVector<double *> cornerNeighborPoints) override;
+      void calculateSurfaceNormal(NaifContextPtr naif) override;
 
-      Distance localRadius(const Latitude &lat, const Longitude &lon);
+      Distance localRadius(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) override;
 
       QVector<double> ellipsoidNormal(NaifContextPtr naif);
 

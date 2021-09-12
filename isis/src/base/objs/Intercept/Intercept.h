@@ -61,10 +61,10 @@ namespace Isis {
       const NaifVector &lookDirectionRay() const;
       SurfacePoint location() const;
   
-      NaifVector normal() const;
+      NaifVector normal(NaifContextPtr naif) const;
       Angle emission(NaifContextPtr naif) const;
   
-      Angle separationAngle(const NaifVector &raydir) const;
+      Angle separationAngle(NaifContextPtr naif, const NaifVector &raydir) const;
   
       const AbstractPlate *shape() const;
   

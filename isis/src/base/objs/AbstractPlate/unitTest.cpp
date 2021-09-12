@@ -46,55 +46,59 @@ class MyPlate : public AbstractPlate {
     ~MyPlate() {
     }
   
-    QString name() const {
+    QString name() const override {
       return AbstractPlate::name();
     }
 
-    Distance minRadius() const {
+    Distance minRadius(NaifContextPtr naif) const override {
       return Distance(1.0, Distance::Meters);
     }
 
-    Distance maxRadius() const {
+    Distance maxRadius(NaifContextPtr naif) const override {
       return Distance(2.0, Distance::Meters);
     }
   
-    double area() const {
+    double area(NaifContextPtr naif) const override {
       return 3.0;
     }
 
-    NaifVector normal() const {
+    NaifVector normal(NaifContextPtr naif) const override {
       NaifVector v;
       return v;
     }
 
-    Angle separationAngle(const NaifVector &raydir) const {
+    Angle separationAngle(NaifContextPtr naif, const NaifVector &raydir) const override {
       Angle theta;
       return theta;
     }
   
-    bool hasIntercept(const NaifVertex &vertex, 
-                              const NaifVector &raydir) const {
+    bool hasIntercept(NaifContextPtr naif,
+                      const NaifVertex &vertex, 
+                      const NaifVector &raydir) const override {
       return true;
     }
 
-    bool hasPoint(const Latitude &lat, 
-                          const Longitude &lon) const {
+    bool hasPoint(NaifContextPtr naif,
+                  const Latitude &lat, 
+                  const Longitude &lon) const override {
       return false;
     }
   
-    Intercept *intercept(const NaifVertex &vertex, 
-                                 const NaifVector &raydir) const {
+    Intercept *intercept(NaifContextPtr naif,
+                         const NaifVertex &vertex, 
+                         const NaifVector &raydir) const override {
       Intercept *i = NULL;
       return i;
     }
 
-    SurfacePoint *point(const Latitude &lat, 
-                                const Longitude &lon) const {
+    SurfacePoint *point(NaifContextPtr naif,
+                        const Latitude &lat, 
+                        const Longitude &lon) const override {
       SurfacePoint *s = NULL;
       return s;
     }
   
-    AbstractPlate *clone() const {
+    AbstractPlate *clone() const override {
       return (new MyPlate());
     }
 
@@ -111,6 +115,8 @@ int main(int argc, char *argv[]) {
   try {
     qDebug() << "Unit test for Abstract Plate.";
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
 
     qDebug() << "Virtual class... first create a child";
     MyPlate mp;
@@ -119,7 +125,8 @@ int main(int argc, char *argv[]) {
     vertex[0] = 0.0;    vertex[1] = 0.0;    vertex[2] = 0.0;
     NaifVector raydir(3);
     raydir[0] = 1.0;    raydir[1] = 1.0;    raydir[2] = 1.0;
-    SurfacePoint *ipoint = new SurfacePoint(Displacement(2.0, Displacement::Meters),
+    SurfacePoint *ipoint = new SurfacePoint(naif,
+                                            Displacement(2.0, Displacement::Meters),
                                             Displacement(2.0, Displacement::Meters),
                                             Displacement(2.0, Displacement::Meters));
     qDebug() << "Construct intercept from vertex (0,0,0), vector(1,1,1), and surface point(2,2,2).";

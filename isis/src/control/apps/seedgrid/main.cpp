@@ -31,6 +31,7 @@ void IsisMain() {
 
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // get the pvl containing a mapping group
   Pvl userMap;
@@ -60,7 +61,7 @@ void IsisMain() {
   // If the mapping group doesn't have the target radii, try to get them from the Target class.
   if (!mapGroup.hasKeyword("EquatorialRadius")) {
     try {
-      PvlGroup pvlRadii = Target::radiiGroup(target);
+      PvlGroup pvlRadii = Target::radiiGroup(naif, target);
       mapGroup += PvlKeyword("EquatorialRadius", pvlRadii["EquatorialRadius"], "Meters");
       // if we successfully found equatorial radius, then polar should have worked too.
       mapGroup += PvlKeyword("PolarRadius", pvlRadii["PolarRadius"], "Meters");
@@ -159,7 +160,8 @@ void IsisMain() {
             proj->Longitude() < ui.GetDouble("MAXLON") &&
             proj->Latitude() > ui.GetDouble("MINLAT") &&
             proj->Longitude() > ui.GetDouble("MINLON")) {
-          SurfacePoint pt(Latitude(proj->Latitude(), Angle::Degrees),
+          SurfacePoint pt(naif,
+                          Latitude(proj->Latitude(), Angle::Degrees),
                           Longitude(proj->Longitude(), Angle::Degrees),
                           Distance(proj->EquatorialRadius(), Distance::Meters));
           ControlPoint * control = new ControlPoint;
@@ -206,7 +208,8 @@ void IsisMain() {
         ControlPoint * control = new ControlPoint;
         control->SetId(pointId.Next());
         control->SetIgnored(true);
-        SurfacePoint pt(Latitude(lat, Angle::Degrees),
+        SurfacePoint pt(naif,
+                        Latitude(lat, Angle::Degrees),
                         Longitude(lon, Angle::Degrees),
                         Distance(equatorialRadius, Distance::Meters));
         control->SetAprioriSurfacePoint(pt);

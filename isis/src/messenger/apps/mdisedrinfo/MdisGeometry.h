@@ -84,14 +84,14 @@ namespace Isis {
       MdisGeometry() : _label(), _orglabel(), _nSubframes(0), _camera(0),
         _digitsPrecision(_defaultDigits),
         _NullDefault("\"N/A\""), _doUpdate(true), _spice() { }
-      MdisGeometry(const QString &filename);
-      MdisGeometry(Cube &cube);
+      MdisGeometry(NaifContextPtr naif, const QString &filename);
+      MdisGeometry(NaifContextPtr naif, Cube &cube);
       virtual ~MdisGeometry() {
         delete _camera;
       }
 
-      void setCube(const QString &filename);
-      static bool validateTarget(Pvl &label, bool makeValid = true);
+      void setCube(NaifContextPtr naif, const QString &filename);
+      static bool validateTarget(NaifContextPtr naif, Pvl &label, bool makeValid = true);
       virtual void refCenterCoord(double &sample, double &line) const;
       virtual void refUpperLeftCoord(double &sample, double &line) const;
       virtual void refUpperRightCoord(double &sample, double &line) const;
@@ -170,7 +170,7 @@ namespace Isis {
       bool          _doUpdate;         //!< Action when vlue is uncomputable
       SpiceManager _spice;             //!< SPICE kernel manager
 
-      void init(Cube &cube);
+      void init(NaifContextPtr naif, Cube &cube);
 
       void GeometryKeys(NaifContextPtr naif, Pvl &geom);
       void TargetKeys(NaifContextPtr naif, Pvl &geom);

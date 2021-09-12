@@ -71,11 +71,11 @@ namespace Isis {
       double  et() const;
       const iTime &time() const;
   
-      bool updateSpice(Cube &cube, Camera *camera = 0) const;
-      bool updatePointing(Cube &cube, Camera *camera = 0) const;
-      bool updatePosition(Cube &cube, Camera *camera = 0) const;
+      bool updateSpice(NaifContextPtr naif, Cube &cube, Camera *camera = 0) const;
+      bool updatePointing(NaifContextPtr naif, Cube &cube, Camera *camera = 0) const;
+      bool updatePosition(NaifContextPtr naif, Cube &cube, Camera *camera = 0) const;
   
-      Quaternion getPointing() const;
+      Quaternion getPointing(NaifContextPtr naif) const;
       std::vector<double> getPosition() const;
       std::vector<double> getSunPosition()  const;
   

@@ -31,6 +31,7 @@ namespace Isis {
   class Stretch;
   class Tool;
   class UniversalGroundMap;
+  class NaifContext;
 
   /**
     * @brief Point Editor Widget
@@ -167,7 +168,7 @@ namespace Isis {
     public slots:
       void setLeftMeasure(ControlMeasure *leftMeasure,
                           Cube *leftCube, QString pointId);
-      void setRightMeasure(ControlMeasure *rightMeasure,
+      void setRightMeasure(NaifContext*, ControlMeasure *rightMeasure,
                            Cube *rightCube, QString pointId);
       void colorizeSaveButton();
       void refreshChips();

@@ -399,16 +399,16 @@ namespace Isis {
     }
 
     if ( options & Spice ) {
-        good = ( good && m_sumfile->updateSpice(*m_cube) );
+        good = ( good && m_sumfile->updateSpice(naif, *m_cube) );
     }
     else {
 
       if ( options & Pointing ) {
-          good = ( good && m_sumfile->updatePointing(*m_cube) );
+          good = ( good && m_sumfile->updatePointing(naif, *m_cube) );
       }
 
       if ( options & Position ) {
-          good = ( good && m_sumfile->updatePosition(*m_cube) );
+          good = ( good && m_sumfile->updatePosition(naif, *m_cube) );
       }
     }
 

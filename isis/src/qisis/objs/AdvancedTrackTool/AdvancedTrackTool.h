@@ -33,6 +33,7 @@ namespace Isis {
 
   class TableMainWindow;
   class MdiCubeViewport;
+  class NaifContext;
 
   /**
    * @brief Tool to display info for a point on a cube
@@ -127,8 +128,8 @@ namespace Isis {
       };
 
     private slots:
-      void updateRow(QPoint p);
-      void updateRow(MdiCubeViewport *cvp, QPoint p, int row);
+      void updateRow(NaifContext* naif, QPoint p);
+      void updateRow(NaifContext* naif, MdiCubeViewport *cvp, QPoint p, int row);
       void record();
       void updateID();
       void TrackMosaicOrigin(MdiCubeViewport *cvp, int piLine, int piSample,

@@ -91,7 +91,7 @@ namespace Isis {
 
 
     private:
-      PvlGroup *GetPointInfo(bool passed, bool outside, bool errors);
+      PvlGroup *GetPointInfo(NaifContextPtr naif, bool passed, bool outside, bool errors);
   };
 };
 

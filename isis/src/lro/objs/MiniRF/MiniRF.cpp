@@ -124,7 +124,7 @@ namespace Isis {
     if((QString)inst["LookDirection"] == "LEFT") {
       ldir = Radar::Left;
     }
-    RadarGroundRangeMap::setTransform(naifIkCode(), groundRangeResolution,
+    RadarGroundRangeMap::setTransform(naif, naifIkCode(), groundRangeResolution,
                                       this->Samples(), ldir);
     new RadarGroundRangeMap(naif, this, naifIkCode());
 
@@ -142,7 +142,7 @@ namespace Isis {
     // Setup the map from Radar(groundRange,t) to Radar(slantRange,t)
     RadarSlantRangeMap *slantRangeMap = new RadarSlantRangeMap(this,
         groundRangeResolution);
-    slantRangeMap->SetCoefficients(inst["RangeCoefficientSet"]);
+    slantRangeMap->SetCoefficients(naif, inst["RangeCoefficientSet"]);
 
     // Setup the ground and sky map
     RadarGroundMap *groundMap = new RadarGroundMap(this, ldir, waveLength);

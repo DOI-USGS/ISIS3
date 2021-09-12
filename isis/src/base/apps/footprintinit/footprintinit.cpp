@@ -16,15 +16,15 @@ using namespace std;
 
 namespace Isis {
 
-  void footprintinit(UserInterface &ui, Pvl *log) {
+  void footprintinit(UserInterface &ui, NaifContextPtr naif, Pvl *log) {
     Cube cube;
     cube.open(ui.GetFileName("FROM"), "rw");
 
-    footprintinit(&cube, ui, log);
+    footprintinit(naif, &cube, ui, log);
     cube.close();
   }
 
-  void footprintinit(Cube *cube, UserInterface &ui, Pvl *log) {
+  void footprintinit(NaifContextPtr naif, Cube *cube, UserInterface &ui, Pvl *log) {
     bool testXY = ui.GetBoolean("TESTXY");
 
     // Make sure cube has been run through spiceinit
@@ -60,9 +60,9 @@ namespace Isis {
     int linc = 1;
     IString incType = ui.GetString("INCTYPE");
     if (incType.UpCase() == "VERTICES") {
-      poly.initCube(*cube);
-      sinc = linc = (int)(0.5 + (((poly.validSampleDim() * 2) +
-                         (poly.validLineDim() * 2) - 3.0) /
+      poly.initCube(naif, *cube);
+      sinc = linc = (int)(0.5 + (((poly.validSampleDim(naif) * 2) +
+                         (poly.validLineDim(naif) * 2) - 3.0) /
                          ui.GetInteger("NUMVERTICES")));
       if (sinc < 1.0 || linc < 1.0)
         sinc = linc = 1.0;
@@ -78,7 +78,7 @@ namespace Isis {
 
     bool precision = ui.GetBoolean("INCREASEPRECISION");
     try {
-      poly.Create(*cube, sinc, linc, 1, 1, 0, 0, 1, precision);
+      poly.Create(naif, *cube, sinc, linc, 1, 1, 0, 0, 1, precision);
     }
     catch (IException &e) {
       QString msg = "Cannot generate polygon for [" + ui.GetFileName("FROM") + "]";
@@ -91,7 +91,7 @@ namespace Isis {
 
       Pvl cubeLab(ui.GetFileName("FROM"));
       // This call adds TargetName, EquatorialRadius and PolarRadius to mapGroup
-      mapGroup = Target::radiiGroup(cubeLab, mapGroup);
+      mapGroup = Target::radiiGroup(naif, cubeLab, mapGroup);
       // add/replace the rest of the keywords
       mapGroup.addKeyword( PvlKeyword("LatitudeType", "Planetocentric"),
                            PvlContainer::Replace );
@@ -121,7 +121,7 @@ namespace Isis {
           if (precision && sinc > 1 && linc > 1) {
             sinc = sinc * 2 / 3;
             linc = linc * 2 / 3;
-            poly.Create(*cube, sinc, linc);
+            poly.Create(naif, *cube, sinc, linc);
           }
           else {
             delete proj;

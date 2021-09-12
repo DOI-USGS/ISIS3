@@ -50,7 +50,7 @@ namespace Isis {
    * @param pNewNet   - Modified output Control Net
    *
    */
-  void CnetRefByResolution::FindCnetRef(ControlNet &pNewNet) {
+  void CnetRefByResolution::FindCnetRef(NaifContextPtr naif, ControlNet &pNewNet) {
     // Process each existing control point in the network
     int iPointsModified = 0;
     int iMeasuresModified = 0;
@@ -128,7 +128,7 @@ namespace Isis {
             Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.fileName(sn));
             
             MeasureValidationResults results =
-              ValidStandardOptions(newMsr, measureCube, &pvlMeasureGrp);
+              ValidStandardOptions(naif, newMsr, measureCube, &pvlMeasureGrp);
             if (!results.isValid()) {
               if (bPntEditLock) {
                 pvlMeasureGrp += Isis::PvlKeyword("UnIgnored", "Failed Validation Test but not Ignored as Point EditLock is True");

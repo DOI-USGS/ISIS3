@@ -58,10 +58,10 @@ void ignoreMeasures(ControlNet &cnet,
 void lockMeasures(ControlNet &cnet,
     QMap< QString, QSet<QString> * > &editMeasures);
 
-void checkAllMeasureValidity(ControlNet &cnet, QString cubeList);
+void checkAllMeasureValidity(NaifContextPtr naif, ControlNet &cnet, QString cubeList);
 
 // Validity test
-MeasureValidationResults validateMeasure(const ControlMeasure *measure,
+MeasureValidationResults validateMeasure(NaifContextPtr naif, const ControlMeasure *measure,
     Cube *cube, Camera *camera);
 
 // Logging helpers
@@ -114,6 +114,7 @@ void IsisMain() {
 
   // Interface for getting user parameters
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Get global user parameters
   bool ignore = ui.GetBoolean("IGNORE");
@@ -275,7 +276,7 @@ void IsisMain() {
       // User also provided a list of all serial numbers corresponding to every
       // cube in the control network
       QString cubeList = ui.GetFileName("FROMLIST");
-      checkAllMeasureValidity(cnet, cubeList);
+      checkAllMeasureValidity(naif, cnet, cubeList);
 
       // Delete the validator
       if (validator != NULL) {
@@ -874,7 +875,7 @@ void lockMeasures(ControlNet &cnet,
  * @param cubeList Name of the file containing the list of all Serial Numbers
  *                 in the network
  */
-void checkAllMeasureValidity(ControlNet &cnet, QString cubeList) {
+void checkAllMeasureValidity(NaifContextPtr naif, ControlNet &cnet, QString cubeList) {
   SerialNumberList serialNumbers(cubeList);
 
   QList<QString> cnetSerials = cnet.GetCubeSerials();
@@ -915,7 +916,7 @@ void checkAllMeasureValidity(ControlNet &cnet, QString cubeList) {
 
       if (!measure->IsIgnored()) {
         MeasureValidationResults results =
-            validateMeasure(measure, cube, camera);
+            validateMeasure(naif, measure, cube, camera);
 
         if (!results.isValid()) {
           QString failure = results.toString();
@@ -970,11 +971,11 @@ void checkAllMeasureValidity(ControlNet &cnet, QString cubeList) {
  * @return The results of validating the measure as an object containing the
  *         validity and a formatted error (or success) message
  */
-MeasureValidationResults validateMeasure(const ControlMeasure *measure,
+MeasureValidationResults validateMeasure(NaifContextPtr naif, const ControlMeasure *measure,
     Cube *cube, Camera *camera) {
 
   MeasureValidationResults results =
-      validator->ValidStandardOptions(measure, cube, camera);
+      validator->ValidStandardOptions(naif, measure, cube, camera);
 
   return results;
 }

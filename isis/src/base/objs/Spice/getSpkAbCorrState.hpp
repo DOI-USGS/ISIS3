@@ -16,7 +16,7 @@ namespace Isis {
 
 
 //  Prototype: static declarations limits its link scope to code its used in.
-    static bool getSpkAbCorrState(std::string &abcorr, 
+    static bool getSpkAbCorrState(NaifContextPtr naif, std::string &abcorr, 
                            const std::string &idtag = "ID:USGS_SPK_ABCORR");
 
 
@@ -40,13 +40,13 @@ namespace Isis {
      * @return bool  Returns true if the tag is found anywhere in the comments 
      *               section of the SPK, otherwise false if it is found.
      */
-    bool getSpkAbCorrState(std::string &abcorr,const std::string &idtag) {
+    bool getSpkAbCorrState(NaifContextPtr naif, std::string &abcorr,const std::string &idtag) {
 
       //  Determine loaded-only kernels.  Our search is restricted to only 
       //  kernels that are loaded and, currently, only of SPK type is of 
       //  interest.
       Kernels kernels;
-      kernels.Discover();
+      kernels.Discover(naif);
 
       //  Init the tag to Qt QString for effective searching
       QString qtag = QString::fromStdString(idtag);
@@ -61,8 +61,8 @@ namespace Isis {
         SpiceInt  handle;
         SpiceBoolean found;
         //  Get info on SPK kernel mainly the NAIF handle for comment parsing
-        kinfo_c(spkFile.toLatin1().data(), sizeof(ktype), sizeof(source), ktype,
-                source, &handle, &found);
+        naif->kinfo_c(spkFile.toLatin1().data(), sizeof(ktype), sizeof(source), ktype,
+                      source, &handle, &found);
         if (found == SPICETRUE) {
           // SPK is open so read and parse all the comments.
           SpiceChar commnt[1001];
@@ -74,7 +74,7 @@ namespace Isis {
           // first comment line when and only when the last comment line is
           // read.  This is not apparent in the NAIF documentation.
           while ( !done ) {
-            dafec_c(handle, 1, sizeof(commnt), &n, commnt, &done);
+            naif->dafec_c(handle, 1, sizeof(commnt), &n, commnt, &done);
             QString cmmt(commnt);
             int pos = 0;
             if ( (pos = cmmt.indexOf(qtag, pos, Qt::CaseInsensitive)) != -1 ) {

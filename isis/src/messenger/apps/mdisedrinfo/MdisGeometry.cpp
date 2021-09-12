@@ -53,18 +53,18 @@ namespace Isis {
    * @brief Constructor using an ISIS cube file name
    * @param filename Name of ISIS cube file
    */
-  MdisGeometry::MdisGeometry(const QString &filename) {
+  MdisGeometry::MdisGeometry(NaifContextPtr naif, const QString &filename) {
     Cube cube;
     cube.open(filename);
-    init(cube);
+    init(naif, cube);
   }
 
   /**
    * @brief Construct using an ISIS Cube class
    * @param cube ISIS cube class
    */
-  MdisGeometry::MdisGeometry(Cube &cube) {
-    init(cube);
+  MdisGeometry::MdisGeometry(NaifContextPtr naif, Cube &cube) {
+    init(naif, cube);
   }
 
   /**
@@ -76,11 +76,11 @@ namespace Isis {
    *
    * @param filename Name of ISIS cube file
    */
-  void MdisGeometry::setCube(const QString &filename) {
+  void MdisGeometry::setCube(NaifContextPtr naif, const QString &filename) {
     Cube cube;
     cube.open(filename);
     delete _camera;
-    init(cube);
+    init(naif, cube);
     return;
   }
 
@@ -106,16 +106,16 @@ namespace Isis {
    *
    * @return bool True if the target is a recognized target, false if not.
    */
-  bool MdisGeometry::validateTarget(Pvl &label, bool makeValid) {
+  bool MdisGeometry::validateTarget(NaifContextPtr naif, Pvl &label, bool makeValid) {
     // Add the planetary constants kernel
-    SpiceManager naif;
-    naif.add("$base/kernels/pck/pck?????.tpc");
+    SpiceManager naifmgr;
+    naifmgr.add(naif, "$base/kernels/pck/pck?????.tpc");
 
     //  Get the target and check for validity
     PvlKeyword &target = label.findKeyword("TargetName", PvlObject::Traverse);
     
     try {
-      Target::lookupNaifBodyCode(target);
+      Target::lookupNaifBodyCode(naif, target);
       return (true);
     }
     catch (...) {
@@ -284,7 +284,7 @@ namespace Isis {
    *
    * @param cube ISIS Cube to initialize
    */
-  void MdisGeometry::init(Cube &cube) {
+  void MdisGeometry::init(NaifContextPtr naif, Cube &cube) {
     _label = *cube.label();
     _orglabel = OriginalLabel(cube.fileName()).ReturnLabels();
     _nSubframes = (int) _orglabel.findKeyword("MESS:SUBFRAME",
@@ -293,7 +293,7 @@ namespace Isis {
     _digitsPrecision = _defaultDigits;
     _NullDefault = "\"N/A\"";
     _doUpdate = true;
-    _spice.Load(_label);
+    _spice.Load(naif, _label);
     return;
   }
 
@@ -309,6 +309,8 @@ namespace Isis {
    * @param geom Pvl container for generated keyword/value data
    */
   void MdisGeometry::GeometryKeys(NaifContextPtr naif, Pvl &geom) {
+    auto naif = NaifContext::acquire();
+
     // Ensure there is a camera model instantiated!
     if (!_camera) {
       string mess = "No image (camera model) established for Geometry keys!";
@@ -333,7 +335,7 @@ namespace Isis {
 
 // Compute the celestial north clocking angle for TWIST_ANGLE
     double res = _camera->RaDecResolution(naif);
-    _camera->SetRightAscensionDeclination(centerRa, centerDec + 2.0 * res);
+    _camera->SetRightAscensionDeclination(centerRa, centerDec + 2.0 * res, naif);
     double x = _camera->Sample() - refSamp;
     double y = _camera->Line() - refLine;
     double rot = atan2(-y, x) * 180.0 / Isis::PI;
@@ -726,8 +728,8 @@ namespace Isis {
     auto naif = NaifContext::acquire();
 
     try {
-      scCode = Target::lookupNaifBodyCode("MESSENGER", naif);
-      targCode = Target::lookupNaifBodyCode(target.toLatin1().data(), naif);
+      scCode = Target::lookupNaifBodyCode(naif, "MESSENGER");
+      targCode = Target::lookupNaifBodyCode(naif, target.toLatin1().data());
     }
     catch (...) {
       found = false;
@@ -972,8 +974,8 @@ namespace Isis {
 
     // Get NAIF body codes
     SpiceInt sc(-236), sun(10);
-    sc = Target::lookupNaifBodyCode("MESSENGER");
-    sun = Target::lookupNaifBodyCode("SUN");
+    sc = Target::lookupNaifBodyCode(naif, "MESSENGER");
+    sun = Target::lookupNaifBodyCode(naif, "SUN");
 
     //  Get the Sun to Messenger state matrix
     SpiceRotation *rotate = _camera->bodyRotation();

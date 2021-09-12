@@ -170,11 +170,11 @@ namespace Isis {
       ImagePolygon();
       ~ImagePolygon();
 
-      void Create(Cube &cube, int sinc = 1, int linc = 1,
+      void Create(NaifContextPtr naif, Cube &cube, int sinc = 1, int linc = 1,
           int ss = 1, int sl = 1, int ns = 0, int nl = 0, int band = 1,
           bool increasePrecision = false);
 
-      Camera * initCube(Cube &cube, int ss = 1, int sl = 1,
+      Camera * initCube(NaifContextPtr naif, Cube &cube, int ss = 1, int sl = 1,
                         int ns = 0, int nl = 0, int band = 1);
 
       /**
@@ -222,8 +222,8 @@ namespace Isis {
         return p_polygons;
       };
 
-      double validSampleDim();
-      double validLineDim();
+      double validSampleDim(NaifContextPtr naif);
+      double validLineDim(NaifContextPtr naif);
 
       //!  Return the sample increment used the create this polygon
       int getSinc() const {
@@ -243,11 +243,12 @@ namespace Isis {
     private:
       // Please do not add new polygon manipulation methods to this class.
       // Polygon manipulation should be done in the PolygonTools class.
-      bool SetImage(const double sample, const double line);
+      bool SetImage(NaifContextPtr naif, const double sample, const double line);
 
-      geos::geom::Coordinate FindFirstPoint();
-      void WalkPoly();
-      geos::geom::Coordinate FindNextPoint(geos::geom::Coordinate *currentPoint,
+      geos::geom::Coordinate FindFirstPoint(NaifContextPtr naif);
+      void WalkPoly(NaifContextPtr naif);
+      geos::geom::Coordinate FindNextPoint(NaifContextPtr naif,
+                                           geos::geom::Coordinate *currentPoint,
                                            geos::geom::Coordinate lastPoint,
                                            int recursionDepth = 0);
 
@@ -256,18 +257,20 @@ namespace Isis {
       void MoveBackInsideImage(double &sample, double &line, double sinc, double linc);
       bool InsideImage(double sample, double line);
       void Fix360Poly();
-      void FixPolePoly(std::vector<geos::geom::Coordinate> *crossingPoints);
+      void FixPolePoly(NaifContextPtr naif, std::vector<geos::geom::Coordinate> *crossingPoints);
 
-      bool IsLimb();
-      geos::geom::Coordinate FindBestPoint(geos::geom::Coordinate *currentPoint,
+      bool IsLimb(NaifContextPtr naif);
+      geos::geom::Coordinate FindBestPoint(NaifContextPtr naif,
+                                           geos::geom::Coordinate *currentPoint,
                                            geos::geom::Coordinate newPoint,
                                            geos::geom::Coordinate lastPoint);
-      geos::geom::Coordinate FixCornerSkip(geos::geom::Coordinate *currentPoint,
+      geos::geom::Coordinate FixCornerSkip(NaifContextPtr naif,
+                                           geos::geom::Coordinate *currentPoint,
                                            geos::geom::Coordinate newPoint);
 
-      void FindSubpixel(std::vector<geos::geom::Coordinate> & points);
+      void FindSubpixel(NaifContextPtr naif, std::vector<geos::geom::Coordinate> & points);
 
-      void calcImageBorderCoordinates();
+      void calcImageBorderCoordinates(NaifContextPtr naif);
 
       Cube *p_cube;       //!< The cube provided
       bool p_isProjected; //!< True when the provided cube is projected

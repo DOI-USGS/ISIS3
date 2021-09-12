@@ -128,10 +128,10 @@ namespace Isis {
  * 
  * @return bool   True if succesful, false if the operation fails
  */
-  bool SumFile::updateSpice(Cube &cube, Camera *camera) const {
-    bool good = updatePointing(cube, camera);
+  bool SumFile::updateSpice(NaifContextPtr naif, Cube &cube, Camera *camera) const {
+    bool good = updatePointing(naif, cube, camera);
     if ( good ) {
-     good = updatePosition(cube, camera);
+     good = updatePosition(naif, cube, camera);
     }
     return (good);
   }
@@ -148,7 +148,7 @@ namespace Isis {
    * 
    * @return bool  True if successful, false otherwise
    */
-  bool SumFile::updatePointing(Cube &cube, Camera *camera) const {
+  bool SumFile::updatePointing(NaifContextPtr naif, Cube &cube, Camera *camera) const {
   
     Camera *mycam = ( camera != NULL ) ? camera : cube.camera();
 
@@ -156,15 +156,15 @@ namespace Isis {
 
     // first, we get the rotattion between j2000 and target (i.e. body fixed frame)
     SpiceRotation *body = mycam->bodyRotation();
-    Quaternion j2000ToTarget(body->Matrix());
+    Quaternion j2000ToTarget(body->Matrix(naif), naif);
 
     // next, get the constant rotation for the camera from the cube's table
     SpiceRotation *oldRotation = mycam->instrumentRotation();
-    Quaternion oldConstantRotation(oldRotation->ConstantRotation()); // old TC rotation
+    Quaternion oldConstantRotation(oldRotation->ConstantRotation(naif), naif); // old TC rotation
 
     // Get the new rotation from the sum file. 
     // this is the instrument frame (relative to the target, i.e. body-fixed)
-    Quaternion newRotation = getPointing();
+    Quaternion newRotation = getPointing(naif);
 
     // new target to instrument rotation (TC) is found by
     //     TC = inverse(rotation from sum file) * (old TC rotation)
@@ -173,7 +173,7 @@ namespace Isis {
     //     CJ = inverse(TC) * TJ
     Quaternion newTimeBasedRotation = oldConstantRotation.Conjugate() * newRotation * j2000ToTarget; // new CJ
 
-    Table table = oldRotation->Cache("InstrumentPointing");
+    Table table = oldRotation->Cache("InstrumentPointing", naif);
     if ( table.Records() > 1 ) {
       QString message = "Expected/support only one InstrumentPointing record "
                      "(i.e., Framing camera) but got " +
@@ -219,24 +219,24 @@ namespace Isis {
    * 
    * @return bool   True if successful, false otherwise
    */
-  bool SumFile::updatePosition(Cube &cube, Camera *camera) const {
+  bool SumFile::updatePosition(NaifContextPtr naif, Cube &cube, Camera *camera) const {
   
     Camera *mycam = ( !camera ) ? cube.camera() : camera;
 
     SpiceRotation *body = mycam->bodyRotation();
-    Quaternion j2000ToTarget(body->Matrix());
+    Quaternion j2000ToTarget(body->Matrix(naif), naif);
 
     // Get body-fixed s/c vector - points from body to s/c
     vector<double> spacecraftPos = getPosition();
 
     // Have vector point from s/c to body
-    vminus_c(&spacecraftPos[0], &spacecraftPos[0]);
+    naif->vminus_c(&spacecraftPos[0], &spacecraftPos[0]);
     // Transform position vector from body-fixed to J2000
-    spacecraftPos = j2000ToTarget.Conjugate().Qxv(spacecraftPos);
+    spacecraftPos = j2000ToTarget.Conjugate().Qxv(spacecraftPos, naif);
   
     // Retrieve s/c cache and update the position
     SpicePosition *oldPosition = mycam->instrumentPosition();
-    Table table = oldPosition->Cache("InstrumentPosition");
+    Table table = oldPosition->Cache("InstrumentPosition", naif);
     if ( table.Records() > 1 ) {
       QString message = "Expected/support only one InstrumentPosition record " 
                      "(i.e., Framing camera) but got " +
@@ -287,7 +287,7 @@ namespace Isis {
    * 
    * @return Quaternion The SUMFILE's pointing matrix
    */
-  Quaternion SumFile::getPointing() const {
+  Quaternion SumFile::getPointing(NaifContextPtr naif) const {
     vector<SpiceDouble> cmatrixBodyFixed(9);
 
     // copy the transposed matrix to a 9 unit vector to be converted to quaternion
@@ -297,7 +297,7 @@ namespace Isis {
       }
     }
 
-    Quaternion quaternionBodyFixed(cmatrixBodyFixed);
+    Quaternion quaternionBodyFixed(cmatrixBodyFixed, naif);
     return quaternionBodyFixed;
   }
   

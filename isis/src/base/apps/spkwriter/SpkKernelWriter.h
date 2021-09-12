@@ -147,14 +147,14 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
         int degree = segment.Degree();
 
         int nrecs = segment.size();
-        segment.LoadKernelType("FK");
+        segment.LoadKernelType(naif, "FK");
         naif->CheckErrors();
 
         naif->spkw09_c(_handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
                        segId.toLatin1().data(), degree, nrecs, (ConstSpiceDouble (*)[6])states[0], &epochs[0]);
 
         naif->CheckErrors();
-        segment.UnloadKernelType("FK");
+        segment.UnloadKernelType(naif, "FK");
         return;
       }
       private:
@@ -182,12 +182,12 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
         int nrecs = segment.size();
 
         // Ensure the FK is loaded
-        segment.LoadKernelType("FK");
+        segment.LoadKernelType(naif, "FK");
         naif->CheckErrors();
         naif->spkw13_c(_handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
                        segId.toLatin1().data(), degree, nrecs, (ConstSpiceDouble (*)[6])states[0], &epochs[0]);
         naif->CheckErrors();
-        segment.UnloadKernelType("FK");
+        segment.UnloadKernelType(naif, "FK");
         return;
       }
 

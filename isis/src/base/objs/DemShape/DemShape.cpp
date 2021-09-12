@@ -139,7 +139,7 @@ namespace Isis {
     // for the iterative DEM intersection method
     // (this method is in the ShapeModel base class)
 
-    bool ellipseIntersected = intersectEllipsoid(observerPos, lookDirection);
+    bool ellipseIntersected = intersectEllipsoid(naif, observerPos, lookDirection);
     if (!ellipseIntersected) {
       return false;
     }
@@ -190,7 +190,8 @@ namespace Isis {
 
       // Previous Sensor version used local version of this method with lat and lon doubles.
       // Steven made the change to improve speed.  He said the difference was negilgible.
-      Distance radiusKm = localRadius(Latitude(latDD, Angle::Degrees),
+      Distance radiusKm = localRadius(naif,
+                                      Latitude(latDD, Angle::Degrees),
                                       Longitude(lonDD, Angle::Degrees));
 
       if (Isis::IsSpecial(radiusKm.kilometers())) {
@@ -254,7 +255,7 @@ namespace Isis {
    *
    * @return @b Distance Local radius from the DEM
    */
-  Distance DemShape::localRadius(const Latitude &lat, const Longitude &lon) {
+  Distance DemShape::localRadius(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) {
 
     Distance distance=Distance();
 

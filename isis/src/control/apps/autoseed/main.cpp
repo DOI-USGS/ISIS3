@@ -10,9 +10,10 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   Pvl appLog;
   try {
-    autoseed(ui, &appLog);
+    autoseed(ui, naif, &appLog);
   }
   catch (...) {
     for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {

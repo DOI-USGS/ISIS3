@@ -111,9 +111,9 @@ namespace Isis {
    * @param access Defines how the cube will be opened. Either read-only
    *     "r" or read-write "rw".
    */
-  void Cube::fromIsd(const FileName &fileName, Pvl &label, nlohmann::json &isd, QString access) {
+  void Cube::fromIsd(NaifContextPtr naif, const FileName &fileName, Pvl &label, nlohmann::json &isd, QString access) {
     fromLabel(fileName, label, access);
-    attachSpiceFromIsd(isd);
+    attachSpiceFromIsd(naif, isd);
 
     close();
     open(fileName.toString(), access);
@@ -129,7 +129,7 @@ namespace Isis {
    * @param access Defines how the cube will be opened. Either read-only
    *     "r" or read-write "rw".
    */
-  void Cube::fromIsd(const FileName &fileName, FileName &labelFile, FileName &isdFile, QString access) {
+  void Cube::fromIsd(NaifContextPtr naif, const FileName &fileName, FileName &labelFile, FileName &isdFile, QString access) {
     std::ifstream isdStream(isdFile.expanded().toStdString());
     std::ifstream labelStream(labelFile.expanded().toStdString());
     
@@ -139,7 +139,7 @@ namespace Isis {
     isdStream >> isd;
     labelStream >> label;
     
-    fromIsd(fileName, label, isd, access);
+    fromIsd(naif, fileName, label, isd, access);
     reopen("rw");  
   }
 

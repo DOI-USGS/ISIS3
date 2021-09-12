@@ -78,15 +78,15 @@ namespace Isis {
    * @internal 
    *   @history 2013-12-05 Kris Becker Original Version
    */
-  Distance TriangularPlate::maxRadius() const {
-    double radius = qMax(qMax(vnorm_c(m_plate[0]), vnorm_c(m_plate[1])), 
-                         vnorm_c(m_plate[2]));
+  Distance TriangularPlate::maxRadius(NaifContextPtr naif) const {
+    double radius = qMax(qMax(naif->vnorm_c(m_plate[0]), naif->vnorm_c(m_plate[1])), 
+                         naif->vnorm_c(m_plate[2]));
     return ( Distance(radius, Distance::Kilometers) );
   }
   
-  Distance TriangularPlate::minRadius() const {
-    double radius = qMin(qMin(vnorm_c(m_plate[0]), vnorm_c(m_plate[1])), 
-                         vnorm_c(m_plate[2]));
+  Distance TriangularPlate::minRadius(NaifContextPtr naif) const {
+    double radius = qMin(qMin(naif->vnorm_c(m_plate[0]), naif->vnorm_c(m_plate[1])), 
+                         naif->vnorm_c(m_plate[2]));
     return ( Distance(radius, Distance::Kilometers) );
   }
   
@@ -99,18 +99,18 @@ namespace Isis {
    *   @history 2014-02-05 Kris Becker Original Version
    * 
    */
-  double TriangularPlate::area() const { 
+  double TriangularPlate::area(NaifContextPtr naif) const { 
   
     //  Get the lengths of each side
     NaifVector edge(3);
-    vsub_c(m_plate[1], m_plate[0], &edge[0]);
-    double s1 = vnorm_c(&edge[0]);
+    naif->vsub_c(m_plate[1], m_plate[0], &edge[0]);
+    double s1 = naif->vnorm_c(&edge[0]);
   
-    vsub_c(m_plate[2], m_plate[0], &edge[0]);
-    double s2 = vnorm_c(&edge[0]);
+    naif->vsub_c(m_plate[2], m_plate[0], &edge[0]);
+    double s2 = naif->vnorm_c(&edge[0]);
   
-    vsub_c(m_plate[2], m_plate[1], &edge[0]);
-    double s3 = vnorm_c(&edge[0]);
+    naif->vsub_c(m_plate[2], m_plate[1], &edge[0]);
+    double s3 = naif->vnorm_c(&edge[0]);
   
     // Heron's formula for area
     double S = (s1 + s2 + s3) / 2.0;
@@ -129,25 +129,25 @@ namespace Isis {
    *   @history 2013-12-05 Kris Becker Original Version
    *  
    */ 
-  NaifVector TriangularPlate::normal() const {
+  NaifVector TriangularPlate::normal(NaifContextPtr naif) const {
   
     //  Get the lengths of each side
     NaifVector edge1(3);
-    vsub_c(m_plate[1], m_plate[0], &edge1[0]);
+    naif->vsub_c(m_plate[1], m_plate[0], &edge1[0]);
   
     NaifVector edge2(3);
-    vsub_c(m_plate[2], m_plate[0], &edge2[0]);
+    naif->vsub_c(m_plate[2], m_plate[0], &edge2[0]);
   
     NaifVector norm(3);
-    ucrss_c(&edge1[0], &edge2[0], &norm[0]);
+    naif->ucrss_c(&edge1[0], &edge2[0], &norm[0]);
     
     return (norm);
   }
   
-  NaifVector TriangularPlate::center() const {
+  NaifVector TriangularPlate::center(NaifContextPtr naif) const {
     double third(0.33333333333333331);
     NaifVector midPt(3);
-    vlcom3_c(third, m_plate[0], third, m_plate[1], third, m_plate[2], &midPt[0]);
+    naif->vlcom3_c(third, m_plate[0], third, m_plate[1], third, m_plate[2], &midPt[0]);
     return (midPt);
   }
   
@@ -167,10 +167,10 @@ namespace Isis {
    * @internal 
    *   @history 2013-12-05 Kris Becker Original Version
    */
-  Angle TriangularPlate::separationAngle(const NaifVector &raydir) const {
+  Angle TriangularPlate::separationAngle(NaifContextPtr naif, const NaifVector &raydir) const {
     //  Get two sides
-    NaifVector norm(normal());
-    double sepang = vsep_c(&norm[0], &raydir[0]);
+    NaifVector norm(normal(naif));
+    double sepang = naif->vsep_c(&norm[0], &raydir[0]);
     return ( Angle(sepang, Angle::Radians) );
   }
   
@@ -190,10 +190,11 @@ namespace Isis {
    * @internal 
    *   @history 2013-12-05 Kris Becker Original Version
    */
-  bool TriangularPlate::hasIntercept(const NaifVertex &vertex, 
+  bool TriangularPlate::hasIntercept(NaifContextPtr naif,
+                                     const NaifVertex &vertex, 
                                      const NaifVector &raydir) const {
     NaifVertex point;
-    return (findPlateIntercept(vertex, raydir, point));
+    return (findPlateIntercept(naif, vertex, raydir, point));
   }
   
   /**
@@ -212,24 +213,25 @@ namespace Isis {
    * @internal 
    *   @history 2013-12-05 Kris Becker Original Version
    */
-  bool TriangularPlate::hasPoint(const Latitude &lat, 
+  bool TriangularPlate::hasPoint(NaifContextPtr naif,
+                                 const Latitude &lat, 
                                  const Longitude &lon) const {
   
     //  Extend the maximum height of the plate to a resonable distance
-    double maxrad = maxRadius().kilometers() * 1.5;
+    double maxrad = maxRadius(naif).kilometers() * 1.5;
   
     // Create a surface point above the highest plate vertex
-    SurfacePoint point(lat, lon, Distance(maxrad, Distance::Kilometers));
+    SurfacePoint point(naif, lat, lon, Distance(maxrad, Distance::Kilometers));
     NaifVertex obs(3);
     point.ToNaifArray(&obs[0]);
   
     // Set the ray direction back toward the center of the body
     NaifVector raydir(3);
-    vminus_c(&obs[0], &raydir[0]);
+    naif->vminus_c(&obs[0], &raydir[0]);
   
     // Determine where the point/ray intercepts the plate
     NaifVertex xpt;
-    return (findPlateIntercept(obs, raydir, xpt));
+    return (findPlateIntercept(naif, obs, raydir, xpt));
   }
   
   /**
@@ -251,23 +253,24 @@ namespace Isis {
    * @internal 
    *   @history 2013-12-05 Kris Becker Original Version
    */
-  SurfacePoint *TriangularPlate::point(const Latitude &lat, 
+  SurfacePoint *TriangularPlate::point(NaifContextPtr naif,
+                                       const Latitude &lat, 
                                        const Longitude &lon) const {
     //  Extend the maximum height of the plate
-    double maxrad = maxRadius().kilometers() * 1.5;
+    double maxrad = maxRadius(naif).kilometers() * 1.5;
   
     // Create a surface point 1.5 times above the highest plate vertex
-    SurfacePoint point(lat, lon, Distance(maxrad, Distance::Kilometers));
+    SurfacePoint point(naif, lat, lon, Distance(maxrad, Distance::Kilometers));
     NaifVertex obs(3);
     point.ToNaifArray(&obs[0]);
   
     // Set the ray direction back toward the center of the body
     NaifVector raydir(3);
-    vminus_c(&obs[0], &raydir[0]);
+    naif->vminus_c(&obs[0], &raydir[0]);
   
     // Determine if the point/ray intercepts the plate
     NaifVertex xpt;
-    if ( !findPlateIntercept(obs, raydir, xpt) ) return (0);
+    if ( !findPlateIntercept(naif, obs, raydir, xpt) ) return (0);
   
     // Construct the intercept point and return it
     SurfacePoint *ipoint(new SurfacePoint());
@@ -294,10 +297,11 @@ namespace Isis {
    * @internal 
    *   @history 2013-12-05 Kris Becker Original Version
    */
-  Intercept *TriangularPlate::intercept(const NaifVertex &vertex, 
+  Intercept *TriangularPlate::intercept(NaifContextPtr naif,
+                                        const NaifVertex &vertex, 
                                         const NaifVector &raydir) const {
     NaifVertex point;
-    if ( !findPlateIntercept(vertex, raydir, point) ) return (0);
+    if ( !findPlateIntercept(naif, vertex, raydir, point) ) return (0);
   
     // Got a valid intercept.  Construct it and return
     SurfacePoint *xpt = new SurfacePoint();
@@ -371,21 +375,22 @@ namespace Isis {
    * @internal 
    *   @history 2013-12-05 Kris Becker Original Version
    */
-  bool TriangularPlate::findPlateIntercept(const NaifVertex &obs,
+  bool TriangularPlate::findPlateIntercept(NaifContextPtr naif,
+                                           const NaifVertex &obs,
                                            const NaifVector &raydir, 
                                            NaifVertex &point) const {
   
     // Construct three edges of the solid tehtrahderal between plate and observer
     NaifVector e1(3), e2(3), e3(3);
-    vsub_c(m_plate[0], &obs[0], &e1[0]);
-    vsub_c(m_plate[1], &obs[0], &e2[0]);
-    vsub_c(m_plate[2], &obs[0], &e3[0]);
+    naif->vsub_c(m_plate[0], &obs[0], &e1[0]);
+    naif->vsub_c(m_plate[1], &obs[0], &e2[0]);
+    naif->vsub_c(m_plate[2], &obs[0], &e3[0]);
   
     // Test to see if the ray direction and plate normal are perpendicular
     NaifVector tnorm12(3);
-    vcrss_c(&e1[0], &e2[0], &tnorm12[0]);
-    double tdot12 = vdot_c(&raydir[0], &tnorm12[0]);
-    double en   = vdot_c(&e3[0], &tnorm12[0]);
+    naif->vcrss_c(&e1[0], &e2[0], &tnorm12[0]);
+    double tdot12 = naif->vdot_c(&raydir[0], &tnorm12[0]);
+    double en   = naif->vdot_c(&e3[0], &tnorm12[0]);
   
     //  Check for e3 perpendicular to plate normal.  If true, e3 is a linear
     // combination of e1 and e2.
@@ -398,8 +403,8 @@ namespace Isis {
     // Check that raydir and e1 are on the same side of the plane spanned by e2 
     // and e3.
     NaifVector tnorm23(3);
-    vcrss_c(&e2[0], &e3[0], &tnorm23[0]);
-    double tdot23 = vdot_c(&raydir[0], &tnorm23[0]);
+    naif->vcrss_c(&e2[0], &e3[0], &tnorm23[0]);
+    double tdot23 = naif->vdot_c(&raydir[0], &tnorm23[0]);
   
     // Check if raydir and e3 are in same halfspace
     if ( (en > 0.0) && (tdot23 < 0.0) ) return (false);
@@ -408,8 +413,8 @@ namespace Isis {
     // Finally check that raydir and e2 are in the same half space bounded by e3
     // and e2.
     NaifVector tnorm31(3);
-    vcrss_c(&e3[0], &e1[0], &tnorm31[0]);
-    double tdot31 = vdot_c(&raydir[0], &tnorm31[0]);
+    naif->vcrss_c(&e3[0], &e1[0], &tnorm31[0]);
+    double tdot31 = naif->vdot_c(&raydir[0], &tnorm31[0]);
   
     // Check if raydir and e2 are in same halfspace
     if ( (en > 0.0) && (tdot31 < 0.0) ) return (false);
@@ -429,7 +434,7 @@ namespace Isis {
   
     double scale = en / denom;
     NaifVertex xpt(3);
-    vlcom_c(1.0, &obs[0], scale, &raydir[0], &xpt[0]);
+    naif->vlcom_c(1.0, &obs[0], scale, &raydir[0], &xpt[0]);
     point = xpt;
     return (true);
   }

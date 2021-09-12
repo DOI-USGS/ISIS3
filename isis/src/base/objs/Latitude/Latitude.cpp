@@ -100,7 +100,7 @@ namespace Isis {
    * @see ErrorChecking
    * @see CoordinateType
    */
-  Latitude::Latitude(Angle latitude, PvlGroup mapping,
+  Latitude::Latitude(NaifContextPtr naif, Angle latitude, PvlGroup mapping,
                      ErrorChecking errors) : Angle(latitude) {
     
     m_equatorialRadius = NULL;
@@ -114,7 +114,7 @@ namespace Isis {
     }
     else {
       try {
-        PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
+        PvlGroup radiiGrp = Target::radiiGroup(naif, mapping["TargetName"][0]);
         m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
                                           Distance::Meters);
         m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
@@ -158,7 +158,8 @@ namespace Isis {
    * @see ErrorChecking
    * @see CoordinateType
    */
-  Latitude::Latitude(double latitude,
+  Latitude::Latitude(NaifContextPtr naif,
+                     double latitude,
                      PvlGroup mapping,
                      Angle::Units latitudeUnits,
                      ErrorChecking errors) : Angle(latitude, latitudeUnits) {
@@ -174,7 +175,7 @@ namespace Isis {
     }
     else {
       try {
-        PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
+        PvlGroup radiiGrp = Target::radiiGroup(naif, mapping["TargetName"][0]);
         m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
                                           Distance::Meters);
         m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
@@ -513,7 +514,7 @@ namespace Isis {
    * 
    * @return The result of adding an angle to the latitude
    */
-  Latitude Latitude::add(Angle angleToAdd, PvlGroup mapping) {
+  Latitude Latitude::add(NaifContextPtr naif, Angle angleToAdd, PvlGroup mapping) {
 
     CoordinateType latType;
 
@@ -527,7 +528,7 @@ namespace Isis {
     }
     else {
       try {
-        PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
+        PvlGroup radiiGrp = Target::radiiGroup(naif, mapping["TargetName"][0]);
         equatorialRadius = Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
                                     Distance::Meters);
         polarRadius = Distance(toDouble(radiiGrp["PolarRadius"][0]),

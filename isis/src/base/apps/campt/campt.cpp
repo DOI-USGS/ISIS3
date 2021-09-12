@@ -22,17 +22,18 @@ using namespace Isis;
 namespace Isis{
 
   QList< QPair<double, double> > getPoints(const UserInterface &ui, bool usePointList);
-  QList<PvlGroup *> getCameraPointInfo(const UserInterface &ui,
+  QList<PvlGroup *> getCameraPointInfo(NaifContextPtr naif, 
+                                      const UserInterface &ui,
                                       QList< QPair<double, double> > points,
                                       CameraPointInfo &campt);
   void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints, Pvl *log);
 
-  void campt(UserInterface &ui, Pvl *log) {
+  void campt(NaifContextPtr naif, UserInterface &ui, Pvl *log) {
     Cube *cube = new Cube(ui.GetFileName("FROM"), "r");
-    campt(cube, ui, log);
+    campt(naif, cube, ui, log);
   }
 
-  void campt(Cube *cube, UserInterface &ui, Pvl *log) {
+  void campt(NaifContextPtr naif, Cube *cube, UserInterface &ui, Pvl *log) {
     // Setup our input cube
     CameraPointInfo campt;
 
@@ -48,7 +49,7 @@ namespace Isis{
     QList< QPair<double, double> > points = getPoints(ui, ui.WasEntered("COORDLIST"));
 
     // Get the camera point info for coordiante
-    QList<PvlGroup*> camPoints = getCameraPointInfo(ui, points, campt);
+    QList<PvlGroup*> camPoints = getCameraPointInfo(naif, ui, points, campt);
 
     writePoints(ui, camPoints, log);
   }
@@ -103,7 +104,8 @@ namespace Isis{
   // Gets the camera information for each point (coordinate).
   // Passed in a list of coordinates, passed in by reference a CameraPointInfo object.
   // Returns a list of PvlGroup pointers - these groups contain the camera info for each coordinate.
-  QList<PvlGroup*> getCameraPointInfo(const UserInterface &ui,
+  QList<PvlGroup*> getCameraPointInfo(NaifContextPtr naif,
+                                      const UserInterface &ui,
                                       QList< QPair<double, double> > points,
                                       CameraPointInfo &campt) {
     // Setup our parameters from ui and variables
@@ -124,25 +126,25 @@ namespace Isis{
 
       QPair<double, double> pt = points[i];
       if (type == "GROUND") {
-        camPoint = campt.SetGround(pt.first, pt.second, allowOutside, usePointList);
+        camPoint = campt.SetGround(naif, pt.first, pt.second, allowOutside, usePointList);
       }
       else {
         if (usePointList) {
-          camPoint = campt.SetImage(pt.first, pt.second, allowOutside, usePointList);
+          camPoint = campt.SetImage(naif, pt.first, pt.second, allowOutside, usePointList);
         }
         else {
           if (ui.WasEntered("SAMPLE") && ui.WasEntered("LINE")) {
-            camPoint = campt.SetImage(pt.first, pt.second, allowOutside);
+            camPoint = campt.SetImage(naif, pt.first, pt.second, allowOutside);
           }
           else {
             if (ui.WasEntered("SAMPLE")) {
-              camPoint = campt.SetSample(pt.first, allowOutside);
+              camPoint = campt.SetSample(naif, pt.first, allowOutside);
             }
             else if (ui.WasEntered("LINE")) {
-              camPoint = campt.SetLine(pt.second, allowOutside);
+              camPoint = campt.SetLine(naif, pt.second, allowOutside);
             }
             else {
-              camPoint = campt.SetCenter(allowOutside);
+              camPoint = campt.SetCenter(naif, allowOutside);
             }
           }
         }

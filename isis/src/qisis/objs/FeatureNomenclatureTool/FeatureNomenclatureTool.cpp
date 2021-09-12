@@ -732,6 +732,8 @@ namespace Isis {
    *     the nomenclature database.
    */
   void FeatureNomenclatureTool::findMissingNomenclature(MdiCubeViewport *vp) {
+    auto naif = NaifContext::acquire();
+
     try {
       // verify we can project before anything else
       UniversalGroundMap *ugm = vp->universalGroundMap();
@@ -754,7 +756,7 @@ namespace Isis {
       Latitude maxLat;
       Longitude minLon;
       Longitude maxLon;
-      if (ugm->GroundRange(vp->cube(), minLat, maxLat, minLon, maxLon) &&
+      if (ugm->GroundRange(naif, vp->cube(), minLat, maxLat, minLon, maxLon) &&
           target != "") {
         FeatureNomenclature *searcher = new FeatureNomenclature;
         connect(searcher, SIGNAL(featuresIdentified(FeatureNomenclature *)),
@@ -1059,7 +1061,8 @@ namespace Isis {
       m_gmap = vp->universalGroundMap();
       Latitude centerLat = m_feature.centerLatitude();
       Longitude centerLon = m_feature.centerLongitude();
-      if (m_gmap && m_gmap->SetGround(centerLat, centerLon)) {
+      auto naif = NaifContext::acquire();
+      if (m_gmap && m_gmap->SetGround(naif, centerLat, centerLon)) {
         m_centerSample = m_gmap->Sample();
         m_centerLine = m_gmap->Line();
 
@@ -1162,6 +1165,8 @@ namespace Isis {
 
     m_featureEdgeLineSamples->clear();
 
+    auto naif = NaifContext::acquire();
+
     if (vectorType == FeatureNomenclatureTool::Arrows8) {
 
       // We're going to permute the edge lats/lons excluding the center, so
@@ -1187,7 +1192,7 @@ namespace Isis {
 
           if (lat.isValid() && lon.isValid() &&
               (lat != centerLat || lon != centerLon) &&
-              m_gmap->SetGround(lat, lon)) {
+              m_gmap->SetGround(naif, lat, lon)) {
             m_featureEdgeLineSamples->append(
               QPair<double, double>(m_gmap->Sample(), m_gmap->Line()));
           }
@@ -1228,7 +1233,7 @@ namespace Isis {
 
         if (lat.isValid() && lon.isValid() &&
             (lat != centerLat || lon != centerLon) &&
-            m_gmap->SetGround(lat, lon)) {
+            m_gmap->SetGround(naif, lat, lon)) {
           m_featureEdgeLineSamples->append(
             QPair<double, double>(m_gmap->Sample(), m_gmap->Line()));
         }

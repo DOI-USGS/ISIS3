@@ -804,7 +804,8 @@ namespace Isis {
     }
 
     try {
-      PvlGroup pvlRadii = Target::radiiGroup(m_controlNet->GetTarget());
+      auto naif = NaifContext::acquire();
+      PvlGroup pvlRadii = Target::radiiGroup(naif, m_controlNet->GetTarget());
       m_targetRadius = Distance(pvlRadii["EquatorialRadius"], Distance::Meters);
     }
     catch(IException &e) {
@@ -1479,13 +1480,16 @@ namespace Isis {
     double elevation=0., elevationError=0.;
     Camera *leftCamera = m_leftCube->camera();
 
+    auto naif = NaifContext::acquire();
+
     //  If the local radius combo box is set to DEM, get the dem radius
     //  First, SetImage using the Elevation model, before turning off
     //  to get camera angles.
     if ( m_radiusBox->currentText() == "DEM Radius" ) {
       leftCamera->IgnoreElevationModel(false);
       leftCamera->SetImage( (*point)[Left]->GetSample(),
-                           (*point)[Left]->GetLine() );
+                           (*point)[Left]->GetLine(),
+                           naif );
       m_baseRadius = leftCamera->LocalRadius( leftCamera->GetLatitude(),
                                               leftCamera->GetLongitude() );
       if ( !m_baseRadius.isValid() ) {
@@ -1497,11 +1501,13 @@ namespace Isis {
 
     leftCamera->IgnoreElevationModel(true);
     leftCamera->SetImage( (*point)[Left]->GetSample(),
-                         (*point)[Left]->GetLine() );
+                         (*point)[Left]->GetLine(),
+                           naif );
     Camera *rightCamera = m_rightCube->camera();
     rightCamera->IgnoreElevationModel(true);
     rightCamera->SetImage( (*point)[Right]->GetSample(),
-                          (*point)[Right]->GetLine() );
+                          (*point)[Right]->GetLine(),
+                           naif );
 
     double radius, lat, lon, sepang;
     if ( Stereo::elevation( *leftCamera, *rightCamera, radius, lat, lon, sepang,
@@ -1747,6 +1753,8 @@ namespace Isis {
     int failureCount = 0;
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
+    auto naif = NaifContext::acquire();
+
     for (int i = 0; i <= (int) shortProfile.length(); i++) {
       double shortSamp=0, shortLine=0, longSamp=0, longLine=0;
       try {
@@ -1760,7 +1768,7 @@ namespace Isis {
         ar->PatternChip()->TackCube(shortSamp, shortLine);
         ar->PatternChip()->Load(*shortCube);
         ar->SearchChip()->TackCube(longSamp, longLine);
-        ar->SearchChip()->Load( *longCube, *( ar->PatternChip() ), *shortCube );
+        ar->SearchChip()->Load( naif, *longCube, *( ar->PatternChip() ), *shortCube );
         ar->Register();
 //        AutoReg::RegisterStatus status = ar->Register();
         if ( ar->Success() ) {
@@ -1772,7 +1780,7 @@ namespace Isis {
           //  to get camera angles.
           if ( m_radiusBox->currentText() == "DEM Radius" ) {
             shortCube->camera()->IgnoreElevationModel(false);
-            shortCube->camera()->SetImage(shortSamp, shortLine);
+            shortCube->camera()->SetImage(shortSamp, shortLine, naif);
             m_baseRadius = shortCube->camera()->LocalRadius(
                                   shortCube->camera()->GetLatitude(),
                                   shortCube->camera()->GetLongitude() );
@@ -1786,8 +1794,8 @@ namespace Isis {
           shortCube->camera()->IgnoreElevationModel(true);
           longCube->camera()->IgnoreElevationModel(true);
 
-          shortCube->camera()->SetImage(shortSamp, shortLine);
-          longCube->camera()->SetImage(longSamp,longLine);
+          shortCube->camera()->SetImage(shortSamp, shortLine, naif);
+          longCube->camera()->SetImage(longSamp,longLine, naif);
           double radius, lat, lon, sepang;
           if (Stereo::elevation( *shortCube->camera(), *longCube->camera(),
                                  radius, lat, lon, sepang, elevationError) )
@@ -1865,6 +1873,7 @@ namespace Isis {
     // Empty elevation info if nothing there
     QString elevationLabel, elevationErrorLabel;
     QString baseRadiiLabel, leftDemRadiiLabel, rightDemRadiiLabel;
+    auto naif = NaifContext::acquire();
     if ( m_editPoint->GetMeasure(Left)->GetFocalPlaneMeasuredX() != Isis::Null ) {
       elevationLabel = "Elevation:  " +
                        QString::number( m_editPoint->GetMeasure(Left)->
@@ -1877,7 +1886,8 @@ namespace Isis {
 
       Camera *leftCamera = m_leftCube->camera();
       leftCamera->SetImage( (*m_editPoint)[Left]->GetSample(),
-                           (*m_editPoint)[Left]->GetLine() );
+                           (*m_editPoint)[Left]->GetLine(),
+                           naif );
       double leftDemRadii =
                   leftCamera->GetSurfacePoint().GetLocalRadius().meters();
       leftDemRadiiLabel = "Left DEM Radii:  " +
@@ -1885,7 +1895,8 @@ namespace Isis {
 
       Camera *rightCamera = m_rightCube->camera();
       rightCamera->SetImage( (*m_editPoint)[Right]->GetSample(),
-                            (*m_editPoint)[Right]->GetLine() );
+                            (*m_editPoint)[Right]->GetLine(),
+                            naif );
       double rightDemRadii =
                   rightCamera->GetSurfacePoint().GetLocalRadius().meters();
       rightDemRadiiLabel = "Right DEM Radii:  " +

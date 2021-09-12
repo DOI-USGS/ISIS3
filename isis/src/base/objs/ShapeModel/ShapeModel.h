@@ -98,7 +98,7 @@ namespace Isis {
       // These two methods are for optional testing of occlusions when checking
       // specific locations on the body from the observer. The first uses 
       // localRadius() by default and so may be OK as is. 
-      virtual bool intersectSurface(const Latitude &lat, const Longitude &lon,
+      virtual bool intersectSurface(NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
                                     const std::vector<double> &observerPos,
                                     const bool &backCheck = true);
       virtual bool intersectSurface(const SurfacePoint &surfpt, 
@@ -139,7 +139,7 @@ namespace Isis {
                                 const std::vector<double> &uB);
 
       // Return local radius from shape model
-      virtual Distance localRadius(const Latitude &lat, const Longitude &lon) = 0;
+      virtual Distance localRadius(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) = 0;
 
       /**
        * Indicates whether this shape model is from a DEM. This method is used to

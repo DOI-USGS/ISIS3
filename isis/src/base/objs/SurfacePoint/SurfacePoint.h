@@ -35,6 +35,7 @@
 #include "Displacement.h"
 #include "Distance.h"
 #include "Angle.h"
+#include "NaifContext.h"
 
 namespace Isis {
   class Latitude;
@@ -171,42 +172,42 @@ namespace Isis {
       // Constructors
       SurfacePoint();
       SurfacePoint(const SurfacePoint &other);
-      SurfacePoint(const Latitude &lat, const Longitude &lon,
+      SurfacePoint(NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
                    const Distance &radius);
-      SurfacePoint(const Latitude &lat, const Longitude &lon,
+      SurfacePoint(NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
           const Distance &radius, const Angle &latSigma, const Angle &lonSigma,
           const Distance &radiusSigma);
-      SurfacePoint(const Latitude &lat, const Longitude &lon,
+      SurfacePoint(NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
                    const Distance &radius,
                    const boost::numeric::ublas::symmetric_matrix
                      <double,boost::numeric::ublas::upper>& covar);
-      SurfacePoint(const Displacement &x, const Displacement &y,
+      SurfacePoint(NaifContextPtr naif, const Displacement &x, const Displacement &y,
                    const Displacement &z);
-      SurfacePoint(const Displacement &x, const Displacement &y,
+      SurfacePoint(NaifContextPtr naif, const Displacement &x, const Displacement &y,
           const Displacement &z, const Distance &xSigma, const Distance &ySigma,
           const Distance &zSigma);
-      SurfacePoint(const Displacement &x, const Displacement &y,
+      SurfacePoint(NaifContextPtr naif, const Displacement &x, const Displacement &y,
                    const Displacement &z,
                    const boost::numeric::ublas::symmetric_matrix
                      <double,boost::numeric::ublas::upper>& covar);
       ~SurfacePoint();
 
 // Rectangular loading utilities
-      void SetRectangular(const Displacement &x, const Displacement &y,
+      void SetRectangular(NaifContextPtr naif, const Displacement &x, const Displacement &y,
           const Displacement &z, const Distance &xSigma=Distance(),
           const Distance &ySigma=Distance(), const Distance &zSigma=Distance());
 
-      void SetRectangular(const Displacement x, const Displacement y, const Displacement z,
+      void SetRectangular(NaifContextPtr naif, const Displacement x, const Displacement y, const Displacement z,
         const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);
 
       void SetRectangularCoordinates(const Displacement &x, const Displacement &y,
                                    const Displacement &z);
 
       //! Set surface point and sigmas in rectangular coordinates and convert to planetocentric
-      void SetRectangularSigmas(const Distance &xSigma, const Distance &ySigma,
+      void SetRectangularSigmas(NaifContextPtr naif, const Distance &xSigma, const Distance &ySigma,
                                 const Distance &zSigma);
 
-      void SetRectangularMatrix(
+      void SetRectangularMatrix(NaifContextPtr naif,
                                 const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar,
                                 SurfacePoint::CoordUnits units = SurfacePoint::Meters);
 
@@ -214,37 +215,38 @@ namespace Isis {
 
       //! Set surface point and covariance matrix in planetocentric coordinates and convert to rectangular
       //! (Latitude, Longitude in degrees, Radius in meters; matrix in radians and radians**2)
-      void SetSpherical (const Latitude &lat, const Longitude &lon,
+      void SetSpherical (NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
           const Distance &radius, const Angle &latSigma=Angle(),
           const Angle &lonSigma=Angle(),
           const Distance &radiusSigma=Distance());
 
-      void SetSpherical (const Latitude &lat, const Longitude &lon,
+      void SetSpherical (NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
           const Distance &radius,
           const boost::numeric::ublas::symmetric_matrix
             <double,boost::numeric::ublas::upper>& covar);
 
-      void SetSphericalCoordinates(const Latitude &lat, const Longitude &lon,
+      void SetSphericalCoordinates(NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
                                    const Distance &radius);
 
-      void SetSphericalMatrix(
+      void SetSphericalMatrix(NaifContextPtr naif,
                               const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar,
                               SurfacePoint::CoordUnits units = SurfacePoint::Meters);
 
-      void SetSphericalSigmas(const Angle &latSigma, const Angle &lonSigma,
+      void SetSphericalSigmas(NaifContextPtr naif, const Angle &latSigma, const Angle &lonSigma,
                               const Distance &radiusSigma);
 
-      void SetSphericalSigmasDistance(const Distance &latSigma,
+      void SetSphericalSigmasDistance(NaifContextPtr naif,
+                                      const Distance &latSigma,
                                       const Distance &lonSigma,
                                       const Distance &radiusSigma);
 
-      void ResetLocalRadius(const Distance &radius);
+      void ResetLocalRadius(NaifContextPtr naif, const Distance &radius);
       bool Valid() const;
       
 // Generic utilities for convenience
       
       //! Set the covariance matrix
-      void SetMatrix(CoordinateType type,
+      void SetMatrix(NaifContextPtr naif, CoordinateType type,
          const boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper>& covar);        
    
       //! Compute partial derivative of conversion from body-fixed coordinates to the specified
@@ -316,7 +318,7 @@ namespace Isis {
       void InitCovariance();
       void InitPoint();
       void SetRectangularPoint(const Displacement &x, const Displacement &y, const Displacement &z);
-      void SetSphericalPoint(const Latitude &lat, const Longitude &lon, const Distance &radius);
+      void SetSphericalPoint(NaifContextPtr naif, const Latitude &lat, const Longitude &lon, const Distance &radius);
       void FreeAllocatedMemory();
 
       Distance p_localRadius;

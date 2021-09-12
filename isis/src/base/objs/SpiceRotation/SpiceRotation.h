@@ -25,9 +25,7 @@
 #include <string>
 #include <vector>
 
-//#include "NaifContext.h"
-//#include <SpiceZfc.h>
-//#include <SpiceZmc.h>
+#include "NaifContext.h"
 
 #include <nlohmann/json.hpp>
 

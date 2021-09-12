@@ -38,18 +38,18 @@ using namespace std;
 
 namespace Isis {
 
-  void autoseed(UserInterface &ui, Pvl *log) {
+  void autoseed(UserInterface &ui, NaifContextPtr naif, Pvl *log) {
     SerialNumberList serialNumbers(ui.GetFileName("FROMLIST"));
 
     if (ui.WasEntered("CNET")) {
       ControlNet precnet(ui.GetFileName("CNET"));
-      autoseed(ui, serialNumbers, &precnet, log);
+      autoseed(ui, naif, serialNumbers, &precnet, log);
       return;
     }
-    autoseed(ui, serialNumbers, nullptr, log);
+    autoseed(ui, naif, serialNumbers, nullptr, log);
   }
 
-  void autoseed(UserInterface &ui, SerialNumberList &serialNumbers, ControlNet *precnet, Pvl *log) {
+  void autoseed(UserInterface &ui, NaifContextPtr naif, SerialNumberList &serialNumbers, ControlNet *precnet, Pvl *log) {
     // Get the AutoSeed PVL internalized
     Pvl seedDef(ui.GetFileName("DEFFILE"));
 
@@ -154,7 +154,7 @@ namespace Isis {
     PvlGroup &mapGroup = maplab.findGroup("Mapping");
 
     // overwrite empty mapping group with TargetName, EquatorialRadius, PolarRadius
-    mapGroup = Target::radiiGroup(cubeLab, mapGroup);
+    mapGroup = Target::radiiGroup(naif, cubeLab, mapGroup);
     // add rest of keywords to new mapping group
     mapGroup += PvlKeyword("LatitudeType", "Planetocentric");
     mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
@@ -166,7 +166,7 @@ namespace Isis {
 
     TProjection *proj = NULL;
     UniversalGroundMap *ugmap = NULL;
-    mapGroup = Target::radiiGroup(cubeLab, mapGroup);
+    mapGroup = Target::radiiGroup(naif, cubeLab, mapGroup);
     if (seedDomain == XY) {
       proj = (TProjection *) ProjectionFactory::Create(maplab);
     }
@@ -224,7 +224,7 @@ namespace Isis {
         QString c = serialNumbers.fileName(cm->GetCubeSerialNumber());
         Cube cube(c);
         Camera *cam = CameraFactory::Create(cube);
-        cam->SetImage(cm->GetSample(), cm->GetLine());
+        cam->SetImage(cm->GetSample(), cm->GetLine(), naif);
 
 
         points.push_back(Isis::globalFactory->createPoint(geos::geom::Coordinate(
@@ -335,7 +335,7 @@ namespace Isis {
       else if (seedDomain == SampleLine) {
         // Convert the Sample/Line points back to Lat/Lon points
         for (unsigned int pt = 0; pt < points.size(); pt ++) {
-          if (ugmap->SetImage(points[pt]->getX(), points[pt]->getY())) {
+          if (ugmap->SetImage(points[pt]->getX(), points[pt]->getY(), naif)) {
             seed.push_back(Isis::globalFactory->createPoint(
                              geos::geom::Coordinate(ugmap->UniversalLongitude(),
                                                     ugmap->UniversalLatitude())));
@@ -368,7 +368,7 @@ namespace Isis {
             throw IException(IException::User, msg, _FILEINFO_);
           }
 
-          if (!gmap->SetUniversalGround(seed[point]->getY(), seed[point]->getX())) {
+          if (!gmap->SetUniversalGround(naif, seed[point]->getY(), seed[point]->getX())) {
             // This error is more than likely due to floating point roundoff
             continue;
           }
@@ -381,8 +381,8 @@ namespace Isis {
           }
 
           // Check the Emission/Incidence Angle with the camera from the gmap
-          if (gmap->Camera()->EmissionAngle() < minEmission ||
-              gmap->Camera()->EmissionAngle() > maxEmission) {
+          if (gmap->Camera()->EmissionAngle(naif) < minEmission ||
+              gmap->Camera()->EmissionAngle(naif) > maxEmission) {
             ignore = true;
           }
           if (gmap->Camera()->IncidenceAngle() < minIncidence ||
@@ -404,7 +404,7 @@ namespace Isis {
           }
 
           // Check the Resolution with the camera from the gmap
-          if (gmap->Resolution() < minResolution ||
+          if (gmap->Resolution(naif) < minResolution ||
               (maxResolution > 0.0 && gmap->Resolution() > maxResolution)) {
             ignore = true;
           }

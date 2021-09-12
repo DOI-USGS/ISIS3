@@ -152,7 +152,7 @@ namespace Isis {
    *                                       conversion warnings in clang. Part of porting to OS X
    *                                       10.11.
    */
-  bool InterestOperator::Operate(Cube &pCube, UniversalGroundMap &pUnivGrndMap,
+  bool InterestOperator::Operate(NaifContextPtr naif, Cube &pCube, UniversalGroundMap &pUnivGrndMap,
                                  int piSample, int piLine) {
 
     if (!pUnivGrndMap.HasCamera())
@@ -187,7 +187,7 @@ namespace Isis {
 
         bCalculateInterest = false;
         MeasureValidationResults results =
-          ValidStandardOptions(chip.CubeSample(), chip.CubeLine(), &pCube);
+          ValidStandardOptions(naif, chip.CubeSample(), chip.CubeLine(), &pCube);
         if (results.isValid()) {
           bCalculateInterest = true;
         }
@@ -216,7 +216,7 @@ namespace Isis {
     // Check to see if we went through the interest chip and never got a interest at
     // any location.
     if (dBestInterest == Isis::Null || dBestInterest < p_minimumInterest) {
-      if (pUnivGrndMap.SetImage(piSample, piLine)) {
+      if (pUnivGrndMap.SetImage(piSample, piLine, naif)) {
         p_interestAmount = dBestInterest;
       }
       return false;
@@ -243,7 +243,7 @@ namespace Isis {
    * @history 10/15/2010 Sharmila Prasad - Use a single copy of Control Net
    *
    */
-  void InterestOperator::Operate(ControlNet &pNewNet, QString psSerialNumFile,
+  void InterestOperator::Operate(NaifContextPtr naif, ControlNet &pNewNet, QString psSerialNumFile,
                                  QString psOverlapListFile) {
     ReadSerialNumbers(psSerialNumFile);
 
@@ -256,7 +256,7 @@ namespace Isis {
 
     // Process the entire control net by calculating interest and moving the
     // point to a more interesting area
-    FindCnetRef(pNewNet);
+    FindCnetRef(naif, pNewNet);
   }
 
   /**
@@ -267,7 +267,7 @@ namespace Isis {
    * @param pCPoint - Control Point wtih the Locks(s)
    * @param pPvlObj - Output log Pvl
    */
-  void InterestOperator::ProcessLocked_Point_Reference(
+  void InterestOperator::ProcessLocked_Point_Reference(NaifContextPtr naif,
     ControlPoint &pCPoint, PvlObject &pPvlObj, int &piMeasuresModified) {
     int iNumMeasures  = pCPoint.GetNumMeasures();
     bool bPntEditLock = pCPoint.IsEditLocked();
@@ -302,7 +302,7 @@ namespace Isis {
         Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.fileName(sn));
 
         MeasureValidationResults results =
-          ValidStandardOptions(newMeasure, measureCube);
+          ValidStandardOptions(naif, newMeasure, measureCube);
         if (!results.isValid()) {
           if (bPntEditLock) {
             pvlMeasureGrp += Isis::PvlKeyword("UnIgnored", "Failed Validation Test but not "
@@ -360,7 +360,7 @@ namespace Isis {
    *
    * @return none
    */
-  void InterestOperator::FindCnetRef(ControlNet &pNewNet) {
+  void InterestOperator::FindCnetRef(NaifContextPtr naif, ControlNet &pNewNet) {
     int iPointsModified = 0;
     int iMeasuresModified = 0;
     int iRefChanged = 0;
@@ -403,7 +403,7 @@ namespace Isis {
         // Check only the validity of the Point / Measures only if Point and/or
         // Reference Measure is locked.
         if (newPnt->IsEditLocked() || iNumMeasuresLocked > 0) {
-          ProcessLocked_Point_Reference(*newPnt, pvlPointObj, iMeasuresModified);
+          ProcessLocked_Point_Reference(naif, *newPnt, pvlPointObj, iMeasuresModified);
 
           mPvlLog += pvlPointObj;
           mStatus.CheckStatus();
@@ -435,7 +435,7 @@ namespace Isis {
           double dBestSample   = mtInterestResults[iBestMeasureIndex].mdBestSample;
           double dBestLine     = mtInterestResults[iBestMeasureIndex].mdBestLine;
 
-          bestCamera->SetImage(dBestSample, dBestLine);
+          bestCamera->SetImage(dBestSample, dBestLine, naif);
           dReferenceLat = bestCamera->UniversalLatitude();
           dReferenceLon = bestCamera->UniversalLongitude();
 
@@ -477,7 +477,7 @@ namespace Isis {
               throw IException(e, IException::User, msg, _FILEINFO_);
             }
 
-            if (measureCamera->SetUniversalGround(dReferenceLat, dReferenceLon) &&
+            if (measureCamera->SetUniversalGround(naif, dReferenceLat, dReferenceLon) &&
                 measureCamera->InCube()) {
               // Check for reference, Put the corresponding line/samp into a newMeasure
               if (measure == iBestMeasureIndex) {
@@ -503,7 +503,7 @@ namespace Isis {
                 newMeasure->SetCoordinate(dSample, dLine);
 
                 MeasureValidationResults results =
-                  ValidStandardOptions(newMeasure, measureCube);
+                  ValidStandardOptions(naif, newMeasure, measureCube);
                 if (!results.isValid()) {
                   iNumIgnore++;
                   pvlMeasureGrp += Isis::PvlKeyword("Ignored",   "Failed Validation Test-" + results.toString());
@@ -646,7 +646,7 @@ namespace Isis {
    *
    * @param pCnetPoint - Control Point for which the best interest is calculated
    */
-  int InterestOperator::InterestByPoint(ControlPoint &pCnetPoint) {
+  int InterestOperator::InterestByPoint(NaifContextPtr naif, ControlPoint &pCnetPoint) {
     // Find the overlap this point is inside of if the overlap list is entered
     const geos::geom::MultiPolygon *overlapPoly = NULL;
 
@@ -689,7 +689,7 @@ namespace Isis {
           }
 
           // Run the interest operator on this measurment
-          if (InterestByMeasure(measure, *origMsr, *inCube)) {
+          if (InterestByMeasure(naif, measure, *origMsr, *inCube)) {
             if (dBestInterestValue == Isis::Null ||
                 CompareInterests(mtInterestResults[measure].mdInterest, dBestInterestValue)) {
               dBestInterestValue = mtInterestResults[measure].mdInterest;
@@ -717,7 +717,7 @@ namespace Isis {
    * @param pCube        - Measure Cube
    * @return bool
    */
-  bool InterestOperator::InterestByMeasure(int piMeasure, ControlMeasure &pCnetMeasure,
+  bool InterestOperator::InterestByMeasure(NaifContextPtr naif, int piMeasure, ControlMeasure &pCnetMeasure,
       Cube &pCube) {
     QString serialNum = pCnetMeasure.GetCubeSerialNumber();
 
@@ -752,7 +752,7 @@ namespace Isis {
         bCalculateInterest = false;
 
         MeasureValidationResults results =
-          ValidStandardOptions(chip.CubeSample(), chip.CubeLine(), &pCnetMeasure, &pCube);
+          ValidStandardOptions(naif, chip.CubeSample(), chip.CubeLine(), &pCnetMeasure, &pCube);
         if (results.isValid()) {
           bCalculateInterest = true;
         }
@@ -800,7 +800,7 @@ namespace Isis {
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      if (camera->SetImage(iOrigSample, iOrigLine)) {
+      if (camera->SetImage(iOrigSample, iOrigLine, naif)) {
         Portal inPortal(1, 1, pCube.pixelType());
         inPortal.SetPosition(iOrigSample, iOrigLine, 1);
         pCube.read(inPortal);
@@ -810,10 +810,10 @@ namespace Isis {
         mtInterestResults[piMeasure].mdBestLine   = Isis::Null;
         mtInterestResults[piMeasure].mdOrigSample = iOrigSample;
         mtInterestResults[piMeasure].mdOrigLine   = iOrigLine;
-        mtInterestResults[piMeasure].mdEmission   = camera->EmissionAngle();
+        mtInterestResults[piMeasure].mdEmission   = camera->EmissionAngle(naif);
         mtInterestResults[piMeasure].mdIncidence  = camera->IncidenceAngle();
         mtInterestResults[piMeasure].mdDn         = inPortal[0];
-        mtInterestResults[piMeasure].mdResolution = camera->PixelResolution();
+        mtInterestResults[piMeasure].mdResolution = camera->PixelResolution(naif);
         mtInterestResults[piMeasure].mbValid      = false;
       }
       return false;

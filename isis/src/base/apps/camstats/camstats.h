@@ -5,8 +5,8 @@
 #include "UserInterface.h"
 
 namespace Isis{
-  extern void camstats(UserInterface &ui, Pvl *log);
-  extern void camstats(Cube *icube, UserInterface &ui, Pvl *log);
+  extern void camstats(NaifContextPtr naif, UserInterface &ui, Pvl *log);
+  extern void camstats(NaifContextPtr naif, Cube *icube, UserInterface &ui, Pvl *log);
 }
 
 #endif

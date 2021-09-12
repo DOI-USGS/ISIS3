@@ -87,8 +87,8 @@ void CkSpiceSegment::setId(const QString &name) {
  *
  * @return int Returns number of kernels loaded
  */
-int CkSpiceSegment::FurnshKernelType(const QString &ktypes) const {
-  return (_kernels.Load(ktypes));
+int CkSpiceSegment::FurnshKernelType(NaifContextPtr naif, const QString &ktypes) const {
+  return (_kernels.Load(naif, ktypes));
 }
 
 /**
@@ -103,8 +103,8 @@ int CkSpiceSegment::FurnshKernelType(const QString &ktypes) const {
  *
  * @return int  Returns number of kernels unloaded
  */
-int CkSpiceSegment::UnloadKernelType(const QString &ktypes) const {
-  return (_kernels.UnLoad(ktypes));
+int CkSpiceSegment::UnloadKernelType(NaifContextPtr naif, const QString &ktypes) const {
+  return (_kernels.UnLoad(naif, ktypes));
 }
 
 /**
@@ -175,7 +175,7 @@ void CkSpiceSegment::import(NaifContextPtr naif, Cube &cube, const QString &tbln
     // object checks the NAIF pool for existance.  It logs their NAIF
     // status as loaded which may cause trouble from here on...
     Pvl *label = cube.label();
-    _kernels.Init(*label);
+    _kernels.Init(naif, *label);
 
     Camera *camera;
     // Remove the ideal camera instrument group and rename the
@@ -222,7 +222,7 @@ void CkSpiceSegment::import(NaifContextPtr naif, Cube &cube, const QString &tbln
     _endTime = _times[size(_times)-1];
 
     // Load necessary kernels (IAK for Cassini, mainly)
-    _kernels.Load("CK,FK,SCLK,LSK,IAK");
+    _kernels.Load(naif, "CK,FK,SCLK,LSK,IAK");
 
     _kernels.getLoadedList();
 
@@ -261,7 +261,7 @@ void CkSpiceSegment::import(NaifContextPtr naif, Cube &cube, const QString &tbln
 
     _utcStartTime = toUTC(startTime(), naif);
     _utcEndTime   = toUTC(endTime(), naif);
-    _kernels.UnLoad("CK,FK,SCLK,LSK,IAK");
+    _kernels.UnLoad(naif, "CK,FK,SCLK,LSK,IAK");
 
   } catch ( IException &ie  ) {
     ostringstream mess;

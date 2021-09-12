@@ -22,6 +22,7 @@ void setRangeAndPixels(UserInterface &ui, ProcessExport &p,
                        double &min, double &max, Pixtype ptype);
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Check if input file is indeed, a cube
   if (ui.GetFileName("FROM").right(3) != "cub") {
@@ -192,7 +193,7 @@ void IsisMain() {
     results += PvlKeyword("ValidMax", toString(max));
     Application::Log(results);
 
-    process.StandardPds4Label();
+    process.StandardPds4Label(naif);
     process.WritePds4(outFileName);
   }
 

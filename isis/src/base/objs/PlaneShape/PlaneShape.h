@@ -71,20 +71,20 @@ namespace Isis {
       // Intersect the shape model
       bool intersectSurface(NaifContextPtr naif,
                             std::vector<double> observerPos,
-                            std::vector<double> lookDirection);
+                            std::vector<double> lookDirection) override;
 
-      bool isDEM() const;
+      bool isDEM() const override;
 
       // Calculate the surface normal of the current intersection point
-      void calculateSurfaceNormal(NaifContextPtr naif);
-      void calculateDefaultNormal(NaifContextPtr naif);
-      void calculateLocalNormal(NaifContextPtr naif, QVector<double *> cornerNeighborPoints);
+      void calculateSurfaceNormal(NaifContextPtr naif) override;
+      void calculateDefaultNormal(NaifContextPtr naif) override;
+      void calculateLocalNormal(NaifContextPtr naif, QVector<double *> cornerNeighborPoints) override;
 
-      double emissionAngle(NaifContextPtr naif, const std::vector<double> & sB);
-      double incidenceAngle(NaifContextPtr naif, const std::vector<double> &uB);
+      double emissionAngle(NaifContextPtr naif, const std::vector<double> & sB) override;
+      double incidenceAngle(NaifContextPtr naif, const std::vector<double> &uB) override;
 
       // Get the local radius for a point on the surface
-      Distance localRadius(const Latitude &lat, const Longitude &lon);
+      Distance localRadius(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) override;
   };
 };
 

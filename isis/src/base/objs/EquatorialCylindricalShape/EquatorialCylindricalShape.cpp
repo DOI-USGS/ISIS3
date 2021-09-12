@@ -93,7 +93,7 @@ namespace Isis {
     //
     // otherwise, (i.e. DemShape::intersectSurface() fails) we will attempt to
     // intersect using the following iterative method...
-    if (!DemShape::intersectSurface(observerBodyFixedPos, observerLookVectorToTarget)) {
+    if (!DemShape::intersectSurface(naif, observerBodyFixedPos, observerLookVectorToTarget)) {
 
       SpiceDouble a = targetRadii()[0].kilometers();
 
@@ -219,7 +219,8 @@ namespace Isis {
 
       // Previous Sensor version used local version of this method with lat and lon doubles.  Steven said
       // it didn't make a significant difference in speed.
-      double r1 = (localRadius(Latitude(g1lat, Angle::Degrees),
+      double r1 = (localRadius(naif,
+                               Latitude(g1lat, Angle::Degrees),
                                Longitude(g1lon, Angle::Degrees))).kilometers();
 
       if (Isis::IsSpecial(r1)) {
@@ -279,7 +280,8 @@ namespace Isis {
 
         // Previous Sensor version used local version of this method with lat and lon doubles to save
         // According to Steven the savings was negligible.
-        double r2 = (localRadius(Latitude(g2lat, Angle::Degrees),
+        double r2 = (localRadius(naif,
+                                 Latitude(g2lat, Angle::Degrees),
                                  Longitude(g2lon, Angle::Degrees))).kilometers();
 
 
@@ -320,7 +322,8 @@ namespace Isis {
               if (plon > 360.0) plon -= 360.0;
 
               // Previous Sensor version used local version of this method with lat and lon doubles. ..Why Jeff???
-              pradius = (localRadius(Latitude(plat, Angle::Degrees),
+              pradius = (localRadius(naif,
+                                     Latitude(plat, Angle::Degrees),
                                      Longitude(plon, Angle::Degrees))).kilometers();
 
               if (Isis::IsSpecial(pradius)) {

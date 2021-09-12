@@ -46,9 +46,9 @@ namespace Isis {
    * @param pvl Photometric parameter files
    * @param cube Input cube file
    */
-  Hillier::Hillier(PvlObject &pvl, Cube &cube) {
+  Hillier::Hillier(NaifContextPtr naif, PvlObject &pvl, Cube &cube) {
     _camera = cube.camera();
-    init(pvl, cube);
+    init(naif, pvl, cube);
   }
   /**
    * @brief Compute photometric DN at given line/sample/band
@@ -68,20 +68,20 @@ namespace Isis {
    *
    * @return double Photometric correction at cube loation
    */
-  double Hillier::Compute(const double &line, const double &sample, int band) {
+  double Hillier::Compute(NaifContextPtr naif, const double &line, const double &sample, int band) {
 
     // Update band if necessary
     if(_camera->Band() != band) {
-      _camera->SetBand(band);
+      _camera->SetBand(band, naif);
     }
-    if(!_camera->SetImage(sample, line))  return (Null);
+    if(!_camera->SetImage(sample, line, naif))  return (Null);
 
     double i = _camera->IncidenceAngle();
-    double e = _camera->EmissionAngle();
-    double g = _camera->PhaseAngle();
+    double e = _camera->EmissionAngle(naif);
+    double g = _camera->PhaseAngle(naif);
     if(i >= 90.0) return (Null);
 
-    return(photometry(i, e, g, band));
+    return(photometry(naif, i, e, g, band));
   }
 
   /**
@@ -102,13 +102,13 @@ namespace Isis {
    * @return double Returns photometric correction using
    *         parameters
    */
-  double Hillier::photometry(double i, double e, double g, int band) const {
+  double Hillier::photometry(NaifContextPtr naif, double i, double e, double g, int band) const {
     // Test for valid band
     if((band <= 0) || (band > (int) _bandpho.size())) {
       QString mess = "Provided band " + toString(band) + " out of range.";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
-    double ph = photometry(_bandpho[band-1], i, e, g);
+    double ph = photometry(naif, _bandpho[band-1], i, e, g);
     return (_bandpho[band-1].phoStd / ph);
   }
 
@@ -127,7 +127,7 @@ namespace Isis {
    *
    * @return double Photometric correction parameter
    */
-  double Hillier::photometry(const Parameters &parms, double i, double e,
+  double Hillier::photometry(NaifContextPtr naif, const Parameters &parms, double i, double e,
                              double g) const {
 
     //  Ensure problematic values are adjusted
@@ -135,8 +135,8 @@ namespace Isis {
     if(e == 0.0) e = 10.E-12;
 
     // Convert to radians
-    i *= rpd_c();
-    e *= rpd_c();
+    i *= naif->rpd_c();
+    e *= naif->rpd_c();
     g *= parms.phaUnit;  //  Apply unit normalizer
 
     // Compute Lommel-Seeliger components
@@ -233,14 +233,14 @@ namespace Isis {
    * @return Hillier::Parameters Container of valid values.  If
    *         not found, a value of iProfile = -1 is returned.
    */
-  Hillier::Parameters Hillier::findParameters(const double wavelength) const {
+  Hillier::Parameters Hillier::findParameters(NaifContextPtr naif, const double wavelength) const {
     for(unsigned int i = 0 ; i < _profiles.size() ; i++) {
       const DbProfile &p = _profiles[i];
       if(p.exists("BandBinCenter")) {
         double p_center = toDouble(ConfKey(p, "BandBinCenter", toString(Null)));
         double tolerance = toDouble(ConfKey(p, "BandBinCenterTolerance", toString(1.0E-6)));
         if(fabs(wavelength - p_center) <= fabs(tolerance)) {
-          Parameters pars = extract(p);
+          Parameters pars = extract(naif, p);
           pars.iProfile = i;
           pars.wavelength = wavelength;
           pars.tolerance = tolerance;
@@ -266,7 +266,7 @@ namespace Isis {
    *
    * @return Hillier::Parameters Container of extracted values
    */
-  Hillier::Parameters Hillier::extract(const DbProfile &p) const {
+  Hillier::Parameters Hillier::extract(NaifContextPtr naif, const DbProfile &p) const {
     Parameters pars;
     pars.b0 = toDouble(ConfKey(p, "B0", toString(0.0)));
     pars.b1 = toDouble(ConfKey(p, "B1", toString(0.0)));
@@ -279,7 +279,7 @@ namespace Isis {
     pars.tolerance = toDouble(ConfKey(p, "BandBinCenterTolerance", toString(Null)));
     //  Determine equation units - defaults to Radians
     pars.units = ConfKey(p, "HillierUnits", QString("Radians"));
-    pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : rpd_c();
+    pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : naif->rpd_c();
     return (pars);
   }
 
@@ -298,7 +298,7 @@ namespace Isis {
    * @author Kris Becker - 2/22/2010
    * @history 2010-02-25 Kris Becker Added check for valid incidence angle
    */
-  void Hillier::init(PvlObject &pvl, Cube &cube) {
+  void Hillier::init(NaifContextPtr naif, PvlObject &pvl, Cube &cube) {
 
     //  Make it reentrant
     _profiles.clear();
@@ -333,11 +333,11 @@ namespace Isis {
     PvlKeyword center = label->findGroup("BandBin", Pvl::Traverse)["Center"];
     QString errs("");
     for(int i = 0; i < cube.bandCount() ; i++) {
-      Parameters parms = findParameters(toDouble(center[i]));
+      Parameters parms = findParameters(naif, toDouble(center[i]));
       if(parms.IsValid()) {
         parms.band = i + 1;
-        _camera->SetBand(i + 1);
-        parms.phoStd = photometry(parms, _iRef, _eRef, _gRef);
+        _camera->SetBand(i + 1, naif);
+        parms.phoStd = photometry(naif, parms, _iRef, _eRef, _gRef);
         _bandpho.push_back(parms);
       }
       else {  // Appropriate photometric parameters not found

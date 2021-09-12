@@ -130,14 +130,14 @@ int main(int argc, char *argv[]) {
     qDebug() << "Do we have an intersection? " << shapeModelFromPvlElevation.hasIntersection();
 
     qDebug() << "Testing intersectSurface using lat/lon from parent class..."; 
-    shapeModelFromPvlElevation.intersectSurface(xp.GetLatitude(), xp.GetLongitude(), obsPos);
+    shapeModelFromPvlElevation.intersectSurface(naif, xp.GetLatitude(), xp.GetLongitude(), obsPos);
     qDebug() << "Do we have an intersection? " << shapeModelFromPvlElevation.hasIntersection();
     qDebug() << "";
 
     qDebug() << "Find local radius given lat/lon";
     Latitude lat(0, Angle::Degrees);
     Longitude lon(0, Angle::Degrees);
-    Distance rad = shapeModelFromPvlElevation.localRadius(lat, lon);
+    Distance rad = shapeModelFromPvlElevation.localRadius(naif, lat, lon);
     qDebug() << "Local radius at (" << lat.degrees() << ", " 
                                     << lon.degrees() << ") is valid? " << rad.isValid();
     qDebug() << "Local radius:                " << rad.meters() << "meters";
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
 
 
     qDebug() << "Try to calculate norms using valid shape model...";
-    shapeModelFromPvlElevation.setLocalNormalFromIntercept();
+    shapeModelFromPvlElevation.setLocalNormalFromIntercept(naif);
     qDebug() << "Has intercept normal?                " << shapeModelFromPvlElevation.hasNormal();
     qDebug() << "Normal set from Intercept:           "
              << QVector<double>::fromStdVector(shapeModelFromPvlElevation.normal());
@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     qDebug() << "Thrown by setLocalNormalFromIntercept() - Failed to find intercept. ";
     try {
-      shapeModelFromPvlShape.setLocalNormalFromIntercept();
+      shapeModelFromPvlShape.setLocalNormalFromIntercept(naif);
     } 
     catch (IException &e) {
       e.print();

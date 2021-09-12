@@ -74,7 +74,7 @@ namespace Isis {
       };
 
       //! Given Control Net, find the reference based on Incidence Angle
-      virtual void FindCnetRef(ControlNet &pNewNet);
+      virtual void FindCnetRef(NaifContextPtr naif, ControlNet &pNewNet) override;
 
     private:
   };

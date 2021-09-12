@@ -65,36 +65,36 @@ namespace Isis {
       // Intersect the shape model
       virtual bool intersectSurface(NaifContextPtr naif,
                                     std::vector<double> observerPos,
-                                    std::vector<double> lookDirection);
+                                    std::vector<double> lookDirection) override;
       virtual bool intersectSurface(const Latitude &lat, const Longitude &lon,
                                     const std::vector<double> &observerPos,
                                     const bool &backCheck = true);
       virtual bool intersectSurface(const SurfacePoint &surfpt, 
                                     const std::vector<double> &observerPos,
-                                    const bool &backCheck = true);
+                                    const bool &backCheck = true) override;
 
       virtual void clearSurfacePoint();
 
-      virtual bool isDEM() const;
+      virtual bool isDEM() const override;
 
       double getTolerance() const;
       void   setTolerance(const double &tolerance);
 
       // Calculate the default normal of the current intersection point
-      virtual void calculateDefaultNormal(NaifContextPtr naif);
+      virtual void calculateDefaultNormal(NaifContextPtr naif) override;
       // Calculate the surface normal of the current intersection point
-      virtual void calculateLocalNormal(NaifContextPtr naif, QVector<double *> cornerNeighborPoints);
-      virtual void calculateSurfaceNormal(NaifContextPtr naif);
+      virtual void calculateLocalNormal(NaifContextPtr naif, QVector<double *> cornerNeighborPoints) override;
+      virtual void calculateSurfaceNormal(NaifContextPtr naif) override;
       QVector<double> ellipsoidNormal(NaifContextPtr naif);
 
-      virtual double incidenceAngle(NaifContextPtr naif, const std::vector<double> &uB);
+      virtual double incidenceAngle(NaifContextPtr naif, const std::vector<double> &uB) override;
 
-      virtual Distance localRadius(const Latitude &lat, const Longitude &lon);
+      virtual Distance localRadius(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) override;
 
       // Determine if the internal intercept is occluded from the observer/lookdir
       virtual bool isVisibleFrom(NaifContextPtr naif,
                                  const std::vector<double> observerPos,
-                                 const std::vector<double> lookDirection);
+                                 const std::vector<double> lookDirection) override;
 
     private:
       // Disallow copying because ShapeModel is not copyable

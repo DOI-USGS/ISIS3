@@ -379,7 +379,8 @@ namespace Isis {
    * @param factor The unit conversion factor to use on lat and lon rad or x/y/z km.
    * @param target The BundleTargetBody.
    */
-  void BundleControlPoint::applyParameterCorrections(LinearAlgebra::Vector imageSolution,
+  void BundleControlPoint::applyParameterCorrections(NaifContextPtr naif,
+                                               LinearAlgebra::Vector imageSolution,
                                                SparseBlockMatrix &sparseNormals,
                                                const BundleTargetBodyQsp target) {
     if (!isRejected()) {
@@ -390,7 +391,7 @@ namespace Isis {
       // update adjusted surface point appropriately for the coordinate type
       switch (m_coordTypeBundle) {
         case SurfacePoint::Latitudinal:
-          updateAdjustedSurfacePointLatitudinally(target);
+          updateAdjustedSurfacePointLatitudinally(naif, target);
           break;
         case SurfacePoint::Rectangular:
           updateAdjustedSurfacePointRectangularly();
@@ -652,16 +653,17 @@ namespace Isis {
    * 
    * @return @b QString The formatted output detailed string.
    */
-  QString BundleControlPoint::formatBundleOutputDetailString(bool errorPropagation,
+  QString BundleControlPoint::formatBundleOutputDetailString(NaifContextPtr naif,
+                                                             bool errorPropagation,
                                                              bool solveRadius) const {
     QString output;
     
     switch (m_coordTypeReports) {
       case SurfacePoint::Latitudinal:
-        output = formatBundleLatitudinalOutputDetailString(errorPropagation, solveRadius);
+        output = formatBundleLatitudinalOutputDetailString(naif, errorPropagation, solveRadius);
         break;
       case SurfacePoint::Rectangular:
-        output = formatBundleRectangularOutputDetailString(errorPropagation);
+        output = formatBundleRectangularOutputDetailString(naif, errorPropagation);
         break;
       default:
          IString msg ="Unknown surface point coordinate type enum [" + toString(m_coordTypeBundle) + "]." ;
@@ -691,7 +693,7 @@ namespace Isis {
    *                                                     Fixed output of radius corrections in km.  It was outputting
    *                                                     Z corrections.
    */
-  QString BundleControlPoint::formatBundleLatitudinalOutputDetailString(
+  QString BundleControlPoint::formatBundleLatitudinalOutputDetailString(NaifContextPtr naif,
                                                              bool errorPropagation,
                                                              bool solveRadius) const {
 
@@ -727,7 +729,8 @@ namespace Isis {
       double zCor = m_corrections(2);  // km
       
       if (!IsSpecial(x) && !IsSpecial(y) && !IsSpecial(z)) {
-        SurfacePoint rectPoint(Displacement(x - xCor, Displacement::Kilometers),
+        SurfacePoint rectPoint(naif,
+                              Displacement(x - xCor, Displacement::Kilometers),
                               Displacement(y - yCor, Displacement::Kilometers),
                               Displacement(z - zCor, Displacement::Kilometers));
         latInit = rectPoint.GetLatitude().degrees();
@@ -834,8 +837,8 @@ namespace Isis {
    *  @history 2017-08-24 Debbie A. Cook - Corrected units reported in comments to correctly report 
    *                                                       km and also in label line.
    */
- QString BundleControlPoint::formatBundleRectangularOutputDetailString
-                                                        (bool errorPropagation) const {
+ QString BundleControlPoint::formatBundleRectangularOutputDetailString(NaifContextPtr naif,
+                                                        bool errorPropagation) const {
     int numRays     = numberOfMeasures();
     int numGoodRays = numRays - numberOfRejectedMeasures();
     double X         = m_controlPoint->GetAdjustedSurfacePoint().GetX().kilometers();
@@ -861,7 +864,8 @@ namespace Isis {
       double radcor = m_corrections(2);
 
       if (!IsSpecial(lat) && !IsSpecial(lon) && !IsSpecial(rad)) {
-        SurfacePoint latPoint(Latitude(lat-latcor, Angle::Degrees),
+        SurfacePoint latPoint(naif,
+                              Latitude(lat-latcor, Angle::Degrees),
                               Longitude(lon-loncor, Angle::Degrees),
                               Distance(rad-radcor, Distance::Kilometers));
         XInit = latPoint.GetX().kilometers();
@@ -1081,8 +1085,8 @@ QString BundleControlPoint::formatCoordAdjustedSigmaString(SurfacePoint::CoordIn
    * @param factor The unit conversion factor to use on lat & lon.  Radius is in km & converted to m
    * @param target The BundleTargetBody.
    */
-  void BundleControlPoint::updateAdjustedSurfacePointLatitudinally
-               (const BundleTargetBodyQsp target) {
+  void BundleControlPoint::updateAdjustedSurfacePointLatitudinally(NaifContextPtr naif,
+               const BundleTargetBodyQsp target) {
       SurfacePoint surfacepoint = adjustedSurfacePoint();
       double pointLat = surfacepoint.GetLatitude().degrees();
       double pointLon = surfacepoint.GetLongitude().degrees();
@@ -1121,20 +1125,23 @@ QString BundleControlPoint::formatCoordAdjustedSigmaString(SurfacePoint::CoordIn
       // Only allow radius options for Latitudinal coordinates
       if (target && (target->solveMeanRadius() || target->solveTriaxialRadii()) ) {
         if (target->solveMeanRadius()) {
-          surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
+          surfacepoint.SetSphericalCoordinates(naif,
+                                               Latitude(pointLat, Angle::Degrees),
                                                Longitude(pointLon, Angle::Degrees),
                                                target->meanRadius());
         }
         else if (target->solveTriaxialRadii()) {
             Distance localRadius = target->localRadius(Latitude(pointLat, Angle::Degrees),
                                                    Longitude(pointLon, Angle::Degrees));
-            surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
+            surfacepoint.SetSphericalCoordinates(naif,
+                                                 Latitude(pointLat, Angle::Degrees),
                                                  Longitude(pointLon, Angle::Degrees),
                                                  localRadius);
         }
       }
       else {
-        surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
+        surfacepoint.SetSphericalCoordinates(naif,
+                                             Latitude(pointLat, Angle::Degrees),
                                              Longitude(pointLon, Angle::Degrees),
                                              Distance(pointRad, Distance::Meters));
       }

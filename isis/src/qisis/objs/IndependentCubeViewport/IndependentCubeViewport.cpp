@@ -260,7 +260,8 @@ namespace Isis
         viewport()->repaint();
       }
 
-      track(p);
+      auto naif = NaifContext::acquire();
+      track(naif, p);
     }
   }
 
@@ -379,7 +380,7 @@ namespace Isis
     stretchGray(newStretch);
   }
 
-  void IndependentCubeViewport::track(const QPoint & p)
+  void IndependentCubeViewport::track(NaifContextPtr naif, const QPoint & p)
   {
     if (grayBuffer()->working())
     {
@@ -402,7 +403,7 @@ namespace Isis
         line >= 0.5 && line <= cubeLines() + 0.5 &&
         trackBuffer(grayBuffer(), p, dn))
     {
-      bool camSucceeds = camera() && camera()->SetImage(sample, line);
+      bool camSucceeds = camera() && camera()->SetImage(sample, line, naif);
       bool projSucceeds = !camSucceeds && projection() &&
           projection()->SetWorld(sample, line);
 

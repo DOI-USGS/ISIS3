@@ -20,7 +20,9 @@ using namespace std;
 using namespace Isis;
 
 int main() {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   try {
     cout << "Unit test for PolygonTools" << endl << endl;
@@ -114,23 +116,23 @@ int main() {
 
     // Create coordinate sequence for the first of two polygons
     geos::geom::CoordinateSequence *llpts = new geos::geom::CoordinateArraySequence();
-    ugm.SetImage(1.0, 1.0);
+    ugm.SetImage(1.0, 1.0, naif);
     llpts->add(geos::geom::Coordinate(
           qRound(ugm.UniversalLongitude()),
           qRound(ugm.UniversalLatitude())));
-    ugm.SetImage(1204.0, 1.0);
+    ugm.SetImage(1204.0, 1.0, naif);
     llpts->add(geos::geom::Coordinate(
           qRound(ugm.UniversalLongitude()),
           qRound(ugm.UniversalLatitude())));
-    ugm.SetImage(1204.0, 1056.0);
+    ugm.SetImage(1204.0, 1056.0, naif);
     llpts->add(geos::geom::Coordinate(
           qRound(ugm.UniversalLongitude()),
           qRound(ugm.UniversalLatitude())));
-    ugm.SetImage(1.0, 1056.0);
+    ugm.SetImage(1.0, 1056.0, naif);
     llpts->add(geos::geom::Coordinate(
           qRound(ugm.UniversalLongitude()),
           qRound(ugm.UniversalLatitude())));
-    ugm.SetImage(1.0, 1.0);
+    ugm.SetImage(1.0, 1.0, naif);
     llpts->add(geos::geom::Coordinate(
           qRound(ugm.UniversalLongitude()),
           qRound(ugm.UniversalLatitude())));

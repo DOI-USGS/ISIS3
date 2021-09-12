@@ -16,6 +16,7 @@ void IsisMain() {
 
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Get the polygon from the input cube. NOTE: the generated poly is always in the 0 to 360 domain.
   // Use the linc/sinc requested by the user.
@@ -25,7 +26,7 @@ void IsisMain() {
   int linc = ui.GetInteger("LINC");
   ImagePolygon poly;
   //poly.Create(cube);
-  poly.Create(cube, sinc, linc);
+  poly.Create(naif, cube, sinc, linc);
   geos::geom::MultiPolygon *mPolygon = poly.Polys();
 
   // Decide if the 0 to 360 longitude domain polygon needs to be converted to the -180 to 180 domain

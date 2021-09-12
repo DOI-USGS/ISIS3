@@ -92,11 +92,11 @@ namespace Isis {
  * 
  * @return bool        True if the intersection point is valid (visable)
  */
-  bool ShapeModel::intersectSurface(const Latitude &lat, const Longitude &lon,
+  bool ShapeModel::intersectSurface(NaifContextPtr naif, const Latitude &lat, const Longitude &lon,
                                     const std::vector<double> &observerPos,
                                     const bool &backCheck) {
     // Distance radius = localRadius(lat, lon);
-    return (intersectSurface(SurfacePoint(lat, lon, localRadius(lat, lon)), observerPos, backCheck));
+    return (intersectSurface(SurfacePoint(naif, lat, lon, localRadius(naif, lat, lon)), observerPos, backCheck));
   }
 
 

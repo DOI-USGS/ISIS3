@@ -713,7 +713,7 @@ namespace Isis {
    *                           value.
    *
    */
-  void ControlPointEdit::setRightMeasure(ControlMeasure *rightMeasure,
+  void ControlPointEdit::setRightMeasure(NaifContextPtr naif, ControlMeasure *rightMeasure,
                                          Cube *rightCube, QString pointId) {
 
     //  Make sure registration is turned off
@@ -743,7 +743,7 @@ namespace Isis {
     }
     else {
       try {
-        p_rightChip->Load(*p_rightCube, *p_leftChip, *p_leftCube);
+        p_rightChip->Load(naif, *p_rightCube, *p_leftChip, *p_leftCube);
 
       }
       catch (IException &e) {
@@ -788,7 +788,8 @@ namespace Isis {
 
     if (p_useGeometry) {
       //  Get lat/lon from point in left
-      p_leftGroundMap->SetImage(p_leftView->tackSample(), p_leftView->tackLine());
+      auto naif = NaifContext::acquire();
+      p_leftGroundMap->SetImage(p_leftView->tackSample(), p_leftView->tackLine(), naif);
       double lat = p_leftGroundMap->UniversalLatitude();
       double lon = p_leftGroundMap->UniversalLongitude();
 
@@ -835,7 +836,8 @@ namespace Isis {
 
     if (p_useGeometry) {
       //  Get lat/lon from point in right
-      p_rightGroundMap->SetImage(p_rightView->tackSample(), p_rightView->tackLine());
+      auto naif = NaifContext::acquire();
+      p_rightGroundMap->SetImage(p_rightView->tackSample(), p_rightView->tackLine(), naif);
       double lat = p_rightGroundMap->UniversalLatitude();
       double lon = p_rightGroundMap->UniversalLongitude();
 
@@ -876,14 +878,15 @@ namespace Isis {
    *                        to red.
    */
   void ControlPointEdit::findPoint() {
+    auto naif = NaifContext::acquire();
 
     //  Get lat/lon from point in left
-    p_leftGroundMap->SetImage(p_leftView->tackSample(), p_leftView->tackLine());
+    p_leftGroundMap->SetImage(p_leftView->tackSample(), p_leftView->tackLine(), naif);
     double lat = p_leftGroundMap->UniversalLatitude();
     double lon = p_leftGroundMap->UniversalLongitude();
 
     //  Reload right chipViewport with this new tack point.
-    if ( p_rightGroundMap->SetUniversalGround(lat, lon) ) {
+    if ( p_rightGroundMap->SetUniversalGround(naif, lat, lon) ) {
       emit updateRightView(p_rightGroundMap->Sample(), p_rightGroundMap->Line());
 
       //  If moving from saved measure, turn save button to red
@@ -975,7 +978,8 @@ namespace Isis {
       p_autoRegFact->SearchChip()->TackCube(p_rightMeasure->GetSample(),
                                             p_rightMeasure->GetLine());
       if (p_useGeometry) {
-        p_autoRegFact->SearchChip()->Load(*p_rightCube,
+        auto naif = NaifContext::acquire();
+        p_autoRegFact->SearchChip()->Load(naif, *p_rightCube,
                             *(p_autoRegFact->PatternChip()), *p_leftCube);
       }
       else {

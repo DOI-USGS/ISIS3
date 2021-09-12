@@ -143,9 +143,9 @@ namespace Isis {
    *  @return <b>NaifVector</b> A 3D ray representing the normal direction at
    *          the intercept point in body fixed coordinates.
    */
-  NaifVector Intercept::normal() const {
+  NaifVector Intercept::normal(NaifContextPtr naif) const {
     verify( isValid(), "Unable to return Intercept normal. Invalid/undefined Intercept point.");
-    return ( m_shape->normal() );
+    return ( m_shape->normal(naif) );
   }
   
 
@@ -176,7 +176,7 @@ namespace Isis {
     naif->vsub_c(&m_observer[0], &point[0], &raydir[0]);
   
     // Return the separation angle between them
-    return (separationAngle(raydir));
+    return (separationAngle(naif, raydir));
   }
   
 
@@ -196,10 +196,10 @@ namespace Isis {
    * @internal
    *   @history 2013-12-05 Kris Becker - Original version.
    */
-  Angle Intercept::separationAngle(const NaifVector &raydir) const {
+  Angle Intercept::separationAngle(NaifContextPtr naif, const NaifVector &raydir) const {
     verify( isValid(), 
             "Unable to return Intercept separation angle. Invalid/undefined Intercept point.");
-    return (m_shape->separationAngle(raydir));
+    return (m_shape->separationAngle(naif, raydir));
   }
   
 

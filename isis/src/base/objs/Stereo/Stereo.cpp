@@ -36,7 +36,7 @@
 
 namespace Isis {
 
-  bool Stereo::elevation(Camera &cam1, Camera &cam2, double &radius,
+  bool Stereo::elevation(NaifContextPtr naif, Camera &cam1, Camera &cam2, double &radius,
                          double &latitude, double &longitude, 
                          double &sepang, double &error) {
 
@@ -47,8 +47,8 @@ namespace Isis {
 
     // Get spacecraft position from target
     double TC1[3], TC2[3];
-    targetToSpacecraft(cam1, TC1);
-    targetToSpacecraft(cam2, TC2);
+    targetToSpacecraft(naif, cam1, TC1);
+    targetToSpacecraft(naif, cam2, TC2);
 
 
     // Get surface vectors from center of body to surface
@@ -57,20 +57,20 @@ namespace Isis {
     targetToSurface(cam2, TP2);
 
     // Stereo angle
-    sepang = vsep_c(TC1, TC2) * dpr_c();
+    sepang = naif->vsep_c(TC1, TC2) * naif->dpr_c();
 
     SpiceDouble CP1[3], CP2[3];
-    vsub_c(TC1, TP1, CP1);
-    vsub_c(TC2, TP2, CP2);
+    naif->vsub_c(TC1, TP1, CP1);
+    naif->vsub_c(TC2, TP2, CP2);
 
-    sepang = vsep_c(CP1, CP2) * dpr_c();
+    sepang = naif->vsep_c(CP1, CP2) * naif->dpr_c();
 
     double DR1, DR2;
-    DR1 = vnorm_c(CP1);
-    DR2 = vnorm_c(CP2);
+    DR1 = naif->vnorm_c(CP1);
+    DR2 = naif->vnorm_c(CP2);
 
-    vscl_c(1.0/DR1, CP1, CP1);
-    vscl_c(1.0/DR2, CP2, CP2);
+    naif->vscl_c(1.0/DR1, CP1, CP1);
+    naif->vscl_c(1.0/DR2, CP2, CP2);
 
     // Do stereo intersections
     double aa = CP2[0];
@@ -132,34 +132,34 @@ namespace Isis {
     double mx = (lx+rx)/2.0;
     double my = (ly+ry)/2.0;
     double mz = (lz+rz)/2.0;
-    rectangular(mx, my, mz, latitude, longitude, radius);
+    rectangular(naif, mx, my, mz, latitude, longitude, radius);
     radius *= 1000.0 ;  // convert to meters
     error = dr * 1000.0;
     return (true);
   }
 
 
-  void Stereo::spherical(const double latitude, const double longitude, 
+  void Stereo::spherical(NaifContextPtr naif, const double latitude, const double longitude, 
                          const double radius, 
                          double &x, double &y, double &z) { 
     SpiceDouble rec[3];
-    latrec_c(radius/1000.0, longitude*rpd_c(), latitude*rpd_c(), &rec[0]);
+    naif->latrec_c(radius/1000.0, longitude*naif->rpd_c(), latitude*naif->rpd_c(), &rec[0]);
     x = rec[0];
     y = rec[1];
     z = rec[2];
     return;
   }
 
-   void Stereo::rectangular(const double x, const double y, const double z, 
+   void Stereo::rectangular(NaifContextPtr naif, const double x, const double y, const double z, 
                             double &latitude, double &longitude,
                             double &radius) { 
      SpiceDouble rec[3];
      rec[0] = x;
      rec[1] = y;
      rec[2] = z;
-     reclat_c(&rec[0], &radius, &longitude, &latitude);
-     longitude *= dpr_c();
-     latitude *= dpr_c();
+     naif->reclat_c(&rec[0], &radius, &longitude, &latitude);
+     longitude *= naif->dpr_c();
+     latitude *= naif->dpr_c();
      longitude = TProjection::To360Domain(longitude);
      return;
      return;
@@ -184,8 +184,8 @@ namespace Isis {
      return (d);
    }
 
-   void Stereo::targetToSpacecraft(Camera &camera, double TP[3]) {
-     camera.instrumentPosition(TP);
+   void Stereo::targetToSpacecraft(NaifContextPtr naif, Camera &camera, double TP[3]) {
+     camera.instrumentPosition(TP, naif);
      return;
    }
 

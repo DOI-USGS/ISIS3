@@ -63,13 +63,14 @@ class MyShape : public ShapeModel {
 
   using Isis::ShapeModel::intersectSurface;
 
-  bool intersectSurface(std::vector<double> observerPos,
-                        std::vector<double> lookDirection)  {
+  bool intersectSurface(NaifContextPtr naif,
+                        std::vector<double> observerPos,
+                        std::vector<double> lookDirection) override {
     cout << "    intersectSurface called with observer position = " <<
       observerPos[0] << ", " << observerPos[1] << ", " <<
       observerPos[2] << endl << "                                 lookDirection = " <<
       lookDirection[0] << ", " <<  lookDirection[1] << ", " << lookDirection[2] << endl;
-    intersectEllipsoid(observerPos, lookDirection);
+    intersectEllipsoid(naif, observerPos, lookDirection);
     SpiceDouble intersectionPoint[3] = {-2123.362258286, -2380.3717812236, 1194.6783966636};
 
     surfaceIntersection()->FromNaifArray(intersectionPoint);
@@ -77,7 +78,7 @@ class MyShape : public ShapeModel {
     return true;
   }
 
-  bool isDEM() const {
+  bool isDEM() const override {
     return false;
   }
 
@@ -85,11 +86,11 @@ class MyShape : public ShapeModel {
     return hasEllipsoidIntersection();
   }
 
-  virtual void calculateDefaultNormal()  {
-    calculateSurfaceNormal();
+  virtual void calculateDefaultNormal(NaifContextPtr naif) override {
+    calculateSurfaceNormal(naif);
   }
 
-  virtual void calculateLocalNormal(QVector<double *> cornerNeighborPoints) {
+  virtual void calculateLocalNormal(NaifContextPtr naif, QVector<double *> cornerNeighborPoints) override {
     std::vector<double> myNormal(3);
     myNormal[0] = -0.581842;
     myNormal[1] = -0.703663;
@@ -98,18 +99,18 @@ class MyShape : public ShapeModel {
     setHasNormal(true);
   }
 
-  virtual void calculateSurfaceNormal() {
+  virtual void calculateSurfaceNormal(NaifContextPtr naif) override {
     setNormal( -0.623384,
                -0.698838,
                 0.350738);
     setHasNormal(true);
   }
 
-  virtual void calculateEllipsoidNormal() {
-    calculateEllipsoidalSurfaceNormal();
+  virtual void calculateEllipsoidNormal(NaifContextPtr naif) {
+    calculateEllipsoidalSurfaceNormal(naif);
   }
 
-  Distance localRadius(const Latitude &lat, const Longitude &lon) {
+  Distance localRadius(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) override {
     double a = 6378.14;
     double b = 6378.14;
     double c = 6356.75;
@@ -163,47 +164,48 @@ class MyEllipse : public ShapeModel {
     setName("DefaultConstructor");
   }
 
-  bool intersectSurface(std::vector<double> observerPos,
-                                    std::vector<double> lookDirection)  {
+  bool intersectSurface(NaifContextPtr naif, 
+                        std::vector<double> observerPos,
+                        std::vector<double> lookDirection) override {
     cout << "    intersectSurface called with observer position = " <<
       observerPos[0] << ", " << observerPos[1] << ", " <<
       observerPos[2] << endl << "                                 lookDirection = " <<
       lookDirection[0] << ", " <<  lookDirection[1] << ", " << lookDirection[2] << endl;
-    return (intersectEllipsoid(observerPos, lookDirection));
+    return (intersectEllipsoid(naif, observerPos, lookDirection));
   }
 
-  bool isDEM() const {
+  bool isDEM() const override {
     return false;
   }
 
-  virtual void calculateLocalNormal(QVector<double *> cornerNeighborPoints) {
+  virtual void calculateLocalNormal(NaifContextPtr naif, QVector<double *> cornerNeighborPoints) override {
 
     std::vector<Distance> radii = targetRadii();
     std::vector<double> normal(3, 0.);
     SpiceDouble point[3];
     surfaceIntersection()->ToNaifArray(point);
-    surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(), point, (SpiceDouble *) &normal[0]);
+    naif->surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(), point, (SpiceDouble *) &normal[0]);
     setNormal(normal);
     setHasNormal(true);
 
   }
 
-  virtual void calculateSurfaceNormal() {
+  virtual void calculateSurfaceNormal(NaifContextPtr naif) override {
     std::vector<Distance> radii = targetRadii();
     std::vector<double> normal(3, 0.);
     SpiceDouble point[3];
     surfaceIntersection()->ToNaifArray(point);
-    surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(), point, (SpiceDouble *) &normal[0]);
+    naif->surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(), point, (SpiceDouble *) &normal[0]);
     setNormal(normal);
     setHasNormal(true);
   }
 
-  virtual void calculateDefaultNormal() {
+  virtual void calculateDefaultNormal(NaifContextPtr naif) override {
     setNormal(1, 0, 0);
     setHasNormal(true);
   }
 
-  Distance localRadius(const Latitude &lat, const Longitude &lon) {
+  Distance localRadius(NaifContextPtr naif, const Latitude &lat, const Longitude &lon) override {
     std::vector<Distance> radii = targetRadii();
     double a = radii[0].kilometers();
     double b = radii[1].kilometers();
@@ -235,6 +237,9 @@ class MyEllipse : public ShapeModel {
 int main() {
   try {
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
+
     QString inputFile = "$mgs/testData/ab102401.cub";
     Cube cube;
     cube.open(inputFile);
@@ -242,7 +247,7 @@ int main() {
     std::vector<Distance> radii = c->target()->radii();
     Pvl pvl = *cube.label();
     Spice spi(cube);
-    Target targ(&spi, pvl);
+    Target targ(&spi, pvl, naif);
     targ.setRadii(radii);
 
     cout << "Begin testing Shape Model base class...." << endl;
@@ -260,7 +265,7 @@ int main() {
       e.print();
     }
     try {
-      shape.calculateDefaultNormal();
+      shape.calculateDefaultNormal(naif);
     }
     catch (IException &e) {
       cout << "    Test setNormal(double,double,double) error message "
@@ -270,7 +275,7 @@ int main() {
     QVector<double *>  notUsed(4);
     for (int i = 0; i < notUsed.size(); i ++) notUsed[i] = new double[3];
     try {
-      shape.calculateLocalNormal(notUsed);
+      shape.calculateLocalNormal(naif, notUsed);
     }
     catch (IException &e) {
       cout << "    Test setNormal(vector) error message when there is no intersection:" << endl;
@@ -279,9 +284,9 @@ int main() {
     cout << "    Set a pixel in the image and check again." << endl;
     double line = 453.0;
     double sample = 534.0;
-    c->SetImage(sample, line);
+    c->SetImage(sample, line, naif);
     std::vector<double> sB(3);
-    c->instrumentPosition((double *) &sB[0]);
+    c->instrumentPosition((double *) &sB[0], naif);
     std::vector<double> uB(3);
     c->sunPosition((double *) &uB[0]);
     std::vector<double> lookB(3);
@@ -295,7 +300,7 @@ int main() {
       Emission                   = 46.966269013795
     */
     cout << endl << "    Testing pure virtual method intersectSurface..." << endl;
-    if (!shape.intersectSurface(sB, lookB)) {
+    if (!shape.intersectSurface(naif, sB, lookB)) {
       cout << "    ...  intersectSurface method failed" << endl;
       return -1;
     }
@@ -324,62 +329,64 @@ int main() {
 
     cout << endl << "  Testing photometric angle calculations before normal computation..." << endl;
     cout << "    Do we have a normal? " << shape.normalStatus() << endl;
-    double emission  = shape.emissionAngle(sB);
-    double incidence = shape.incidenceAngle(uB);
+    double emission  = shape.emissionAngle(naif, sB);
+    double incidence = shape.incidenceAngle(naif, uB);
     cout << "    Emission angle = " << emission;
     cout << "    Incidence angle = " << incidence;
     cout << endl;
 
     cout << endl << "  Testing class method calculateLocalNormal..." << endl;
-    shape.calculateLocalNormal(notUsed);
+    shape.calculateLocalNormal(naif, notUsed);
     cout << "    Do we have a normal? " << shape.normalStatus() << endl;
     vector<double> myNormal(3);
     myNormal = shape.normal();
     cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
 
     cout << endl << "  Testing class method calculateSurfaceNormal..." << endl;
-    shape.calculateSurfaceNormal();
+    shape.calculateSurfaceNormal(naif);
     myNormal = shape.normal();
     cout << "    surface normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
 
     cout << endl << "  Testing photometric angle calculations with undersize normal..." << endl;
     shape.setSmallNormal();
-    emission  = shape.emissionAngle(sB);
-    incidence = shape.incidenceAngle(uB);
+    emission  = shape.emissionAngle(naif, sB);
+    incidence = shape.incidenceAngle(naif, uB);
     cout << "    Emission angle = " << emission;
     cout << "    Incidence angle = " << incidence;
     cout << endl;
 
     cout << endl << "  Testing photometric angle calculations with oversize normal..." << endl;
     shape.setBigNormal();
-    emission  = shape.emissionAngle(sB);
-    incidence = shape.incidenceAngle(uB);
+    emission  = shape.emissionAngle(naif, sB);
+    incidence = shape.incidenceAngle(naif, uB);
     cout << "    Emission angle = " << emission;
     cout << "    Incidence angle = " << incidence;
     cout << endl;
 
     cout << "  Testing class method calculateDefaultNormal..." << endl;
-    shape.calculateDefaultNormal();
+    shape.calculateDefaultNormal(naif);
     myNormal = shape.normal();
     cout << "    default normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
 
     cout << endl << "  Testing photometric angle calculations..." << endl;
     // reset has normal to false to test (!hasNormal) scope for incidenceAngle()
     shape.setNoNormal();
-    incidence = shape.incidenceAngle(uB);
-    emission  = shape.emissionAngle(sB);
+    incidence = shape.incidenceAngle(naif, uB);
+    emission  = shape.emissionAngle(naif, sB);
     cout << "    Emission angle = " << emission;
     cout << "    Incidence angle = " << incidence;
-    cout << "    Phase angle = "  << shape.phaseAngle(sB, uB);
+    cout << "    Phase angle = "  << shape.phaseAngle(naif, sB, uB);
     cout << endl;
 
     cout << endl << "  Testing localRadius method ..." << endl;
-    cout  << "    Local radius = " << shape.localRadius(Latitude(20.532461495381, Angle::Degrees),
+    cout  << "    Local radius = " << shape.localRadius(naif,
+                                                        Latitude(20.532461495381, Angle::Degrees),
                                                         Longitude(228.26609149754, Angle::Degrees)).kilometers() << endl;
     // Mars radii = 3397.      3397.         3375.
 
     cout << endl << "  Testing intersection with occlusion check..." << endl;
-    if (!shape.intersectSurface(Latitude(20.532461495381, Angle::Degrees),
+    if (!shape.intersectSurface(naif,
+                                Latitude(20.532461495381, Angle::Degrees),
                                 Longitude(228.26609149754, Angle::Degrees),
                                 sB, true)) {
       cout << "    ...  intersectSurface method failed" << endl;
@@ -387,17 +394,17 @@ int main() {
     }
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
     cout << "    Do we have an ellipsoid intersection? " << shape.ellipsoidIntersection() << endl;
-    cout << "    Is the intersection visible? " << shape.isVisibleFrom(sB, lookB) << endl;
+    cout << "    Is the intersection visible? " << shape.isVisibleFrom(naif, sB, lookB) << endl;
     SurfacePoint *occPoint = shape.surfaceIntersection();
     std::vector<double> occPosition(3, 0.0);
     occPosition[0] = occPoint->GetX().kilometers() * 1.1;
     occPosition[1] = occPoint->GetY().kilometers() * 1.1;
     occPosition[2] = occPoint->GetZ().kilometers() * 1.1;
     cout << "    Is the intersection visible from just above it? "
-         << shape.isVisibleFrom(occPosition, lookB) << endl;
+         << shape.isVisibleFrom(naif, occPosition, lookB) << endl;
     
     cout << "    Calculate the ellipsoid normal" << endl;
-    shape.calculateEllipsoidNormal();
+    shape.calculateEllipsoidNormal(naif);
     cout << "      Do we have a normal? " << shape.normalStatus() << endl;
     myNormal = shape.normal();
     cout << "      local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
@@ -415,7 +422,7 @@ int main() {
     }
     try {
       cout << "    Attempt to calculate the ellipsoid normal without an intersection" << endl;
-      shape.calculateEllipsoidNormal();
+      shape.calculateEllipsoidNormal(naif);
       cout << "    Calculation successful" << endl;
     }
     catch (IException &e) {
@@ -454,7 +461,7 @@ int main() {
       std::vector<double> badlook(3,1.);
       badlook[0] = -1.;
 
-      if (!eshape.intersectSurface(sB, badlook)) {
+      if (!eshape.intersectSurface(naif, sB, badlook)) {
         cout << "    ...  intersectSurface method failed -- no intersection" << endl;
       }
 
@@ -469,7 +476,7 @@ int main() {
       }
       cout << endl << "    Testing  method intersectEllipsoid..." << endl;
 
-      if (eshape.intersectSurface(sB, lookB)) {
+      if (eshape.intersectSurface(naif, sB, lookB)) {
         SurfacePoint *sp = eshape.surfaceIntersection();
         cout << "    surface point = (" << sp->GetX().kilometers() << ", " <<
           sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << ")" << endl;
@@ -485,7 +492,7 @@ int main() {
         SurfacePoint badsp;
         eshape.setSurfacePoint(badsp);
         eshape.setHasIntersection(true);
-        eshape.calculateLocalNormal(notUsed);
+        eshape.calculateLocalNormal(naif, notUsed);
       }
       catch(Isis::IException &e) {
         e.print();
@@ -504,19 +511,19 @@ int main() {
       }
       try {
         cout << endl << "    Testing  method calculateEllipsoidalSurfaceNormal with no intersection..." << endl;
-        eshape.calculateLocalNormal(notUsed);
+        eshape.calculateLocalNormal(naif, notUsed);
       }
       catch(Isis::IException &e) {
         e.print();
       }
       cout << endl << "    Testing  method calculateEllipsoidalSurfaceNormal with valid intersection..." << endl;
-      if (eshape.intersectSurface(sB, lookB)) cout << "    Intersection set" << endl;
+      if (eshape.intersectSurface(naif, sB, lookB)) cout << "    Intersection set" << endl;
       cout << "      Do we have a normal? " << eshape.normalStatus() << endl;
-      eshape.calculateLocalNormal(notUsed);
+      eshape.calculateLocalNormal(naif, notUsed);
       cout << "      Do we have a normal? " << eshape.normalStatus() << endl;
       myNormal = eshape.normal();
       cout << "      local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
-      eshape.calculateSurfaceNormal();
+      eshape.calculateSurfaceNormal(naif);
       myNormal = eshape.normal();
       cout << endl << "    Testing  method targetRadii..." << endl;
       cout << "      true normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
@@ -541,14 +548,14 @@ int main() {
       e.print();
     }
     try {
-      defaultShape.calculateSurfaceNormal();
+      defaultShape.calculateSurfaceNormal(naif);
     }
     catch (IException &e) {
       cout << "    Test targetRadii() error message when there is no target:" << endl;
       e.print();
     }
     defaultShape.setHasIntersection(true);
-    defaultShape.calculateDefaultNormal();
+    defaultShape.calculateDefaultNormal(naif);
     cout << "    Is there a normal? " << defaultShape.normalStatus() << endl;
     cout << "    Number of normal components = " << defaultShape.normal().size() << endl;
 

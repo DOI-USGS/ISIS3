@@ -93,7 +93,8 @@ void IsisMain() {
         double lon = tproj->UniversalLongitude();
         double radius = tproj->LocalRadius(lat);
   
-        point.SetSphericalCoordinates(Latitude(lat, Angle::Degrees), 
+        point.SetSphericalCoordinates(naif,
+                                      Latitude(lat, Angle::Degrees), 
                                       Longitude(lon, Angle::Degrees),
                                       Distance(radius, Distance::Meters));
 

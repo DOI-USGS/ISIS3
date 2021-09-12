@@ -91,8 +91,8 @@ namespace Isis {
    * 
    * @return @b QDomDocument The output PDS4 label.
    */
-  QDomDocument &ProcessExportPds4::StandardPds4Label() {
-    CreateImageLabel();
+  QDomDocument &ProcessExportPds4::StandardPds4Label(NaifContextPtr naif) {
+    CreateImageLabel(naif);
     translateUnits(*m_domDoc);
     return *m_domDoc;
   }
@@ -117,7 +117,7 @@ namespace Isis {
    * images of object type Array_3D_Image, Array_2D_Image, or 
    * Array_3D_Spectrum. 
    */
-  void ProcessExportPds4::CreateImageLabel() {
+  void ProcessExportPds4::CreateImageLabel(NaifContextPtr naif) {
     if (InputCubes.size() == 0) {
       QString msg("Must set an input cube before creating a PDS4 label.");
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -178,7 +178,7 @@ namespace Isis {
       //   <Observation_Area>
       //     <Discipline_Area>
       //       <card:Cartography>
-      StandardAllMapping();
+      StandardAllMapping(naif);
     }
     catch (IException &e) {
       QString msg = "Unable to translate and export mapping group.";
@@ -1167,7 +1167,7 @@ namespace Isis {
    * @throws IException::User "Unable to export projection [" + projName + "] to PDS4 product. " + 
                               "This projection is not supported in ISIS3."
    */
-  void ProcessExportPds4::StandardAllMapping() {
+  void ProcessExportPds4::StandardAllMapping(NaifContextPtr naif) {
     // Cartography
     // Get the input Isis cube label and find the Mapping group if it has one
     Pvl *inputLabel = InputCubes[0]->label();
@@ -1249,7 +1249,7 @@ namespace Isis {
     
     // Add Lat/Lon range
     double maxLon, minLon, maxLat, minLat; 
-    InputCubes[0]->latLonRange(minLat, maxLat, minLon, maxLon); 
+    InputCubes[0]->latLonRange(naif, minLat, maxLat, minLon, maxLon); 
     
     xmlPath.clear();
     xmlPath << "Product_Observational"

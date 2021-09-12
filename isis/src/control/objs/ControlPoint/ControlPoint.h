@@ -519,9 +519,9 @@ namespace Isis {
 //    Status UpdateSphericalPointCoordinates(const Latitude &lat, const Longitude &lon,
 //                                      const Distance &radius);
 
-      Status ComputeApriori();
-      Status ComputeResiduals();
-      Status ComputeResiduals_Millimeters();
+      Status ComputeApriori(NaifContextPtr naif);
+      Status ComputeResiduals(NaifContextPtr naif);
+      Status ComputeResiduals_Millimeters(NaifContextPtr naif);
 
       SurfacePoint GetAdjustedSurfacePoint() const;
 

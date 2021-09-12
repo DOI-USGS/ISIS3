@@ -98,8 +98,10 @@ namespace Isis{
   // Transform method mapping output line/samps to lat/lons to input line/samps
   bool map2cam::Xform(double &inSample, double &inLine,
                       const double outSample, const double outLine) {
+    auto naif = NaifContext::acquire();
+
     // See if the output image coordinate converts to lat/lon
-    if(!p_outcam->SetImage(outSample, outLine)) return false;
+    if(!p_outcam->SetImage(outSample, outLine, naif)) return false;
 
     // Get the universal lat/lon and see if it can be converted to input line/samp
     double lat = p_outcam->UniversalLatitude();
@@ -127,6 +129,7 @@ namespace Isis{
   }
 
   void BandChange(const int band) {
-    outcam->SetBand(mcube->physicalBand(band));
+    auto naif = NaifContext::acquire();
+    outcam->SetBand(mcube->physicalBand(band), naif);
   }
 }

@@ -32,7 +32,7 @@ using namespace std;
 using namespace Isis;
 
 void ExtractPointList(ControlNet &outNet, QVector<QString> &nonListedPoints);
-void ExtractLatLonRange(ControlNet &outNet, QVector<QString> &nonLatLonPoints,
+void ExtractLatLonRange(NaifContextPtr naif, ControlNet &outNet, QVector<QString> &nonLatLonPoints,
                         QVector<QString> &cannotGenerateLatLonPoints,
                         QMap<QString, QString> sn2filename);
 bool NotInLatLonRange(SurfacePoint surfacePt, Latitude minlat,
@@ -50,6 +50,7 @@ void omit(ControlPoint *point, int cm);
 // Main program
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   if(!ui.WasEntered("FROMLIST") && ui.WasEntered("TOLIST")) {
     QString msg = "To create a [TOLIST] the [FROMLIST] parameter must be provided.";
@@ -318,7 +319,7 @@ void IsisMain() {
    // Use another pass on outNet, because this is by far the most time consuming
    // process, and time could be saved by using the reduced size of outNet
   if(latLon) {
-    ExtractLatLonRange(outNet, nonLatLonPoints, cannotGenerateLatLonPoints, sn2filename);
+    ExtractLatLonRange(naif, outNet, nonLatLonPoints, cannotGenerateLatLonPoints, sn2filename);
   }
 
   int outputPoints = outNet.GetNumPoints();
@@ -580,7 +581,8 @@ void ExtractPointList(ControlNet &outNet, QVector<QString> &nonListedPoints) {
  *                           Modified the QVector parameters to be pass-by-reference OUT parameters,
  *                           since the cnetextract main uses them for summary output.
  */
-void ExtractLatLonRange(ControlNet &outNet, 
+void ExtractLatLonRange(NaifContextPtr naif,
+                        ControlNet &outNet, 
                         QVector<QString> &nonLatLonPoints,
                         QVector<QString> &cannotGenerateLatLonPoints,  
                         QMap<QString, QString> sn2filename) {
@@ -589,7 +591,6 @@ void ExtractLatLonRange(ControlNet &outNet,
   }
 
   UserInterface &ui = Application::GetUserInterface();
-  auto naif = NaifContext::acquire();
 
   // Get the lat/lon and fix the range for the internal 0/360
   Latitude minlat(ui.GetDouble("MINLAT"), Angle::Degrees);
@@ -702,7 +703,7 @@ void ExtractLatLonRange(ControlNet &outNet,
         bool notInRange = false;
         bool validLatLonRadius = lat.isValid() && lon.isValid() && radius.isValid();
         if(validLatLonRadius) {
-          SurfacePoint sfpt(lat, lon, radius);
+          SurfacePoint sfpt(naif, lat, lon, radius);
           notInRange = NotInLatLonRange(sfpt, minlat, maxlat, minlon, maxlon);
         }
 
@@ -711,7 +712,7 @@ void ExtractLatLonRange(ControlNet &outNet,
           omit(outNet, cp);
         }
         else if(validLatLonRadius) { // Add the reference lat/lon/radius to the Control Point
-          outNet.GetPoint(cp)->SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
+          outNet.GetPoint(cp)->SetAprioriSurfacePoint(SurfacePoint(naif, lat, lon, radius));
         }
       }
     }

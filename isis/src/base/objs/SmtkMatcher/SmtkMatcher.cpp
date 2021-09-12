@@ -115,11 +115,11 @@ namespace Isis {
    *
    * @return bool True if valid in both images, otherwise false
    */
-  bool SmtkMatcher::isValid(const Coordinate &pnt) {
+  bool SmtkMatcher::isValid(NaifContextPtr naif, const Coordinate &pnt) {
     validate();  // cubs and cameras
-    Coordinate pnt2 = getLatLon(lhCamera(), pnt);
+    Coordinate pnt2 = getLatLon(naif, lhCamera(), pnt);
     if (pnt2.isValid()) {
-      pnt2 = getLineSample(rhCamera(), pnt2);
+      pnt2 = getLineSample(naif, rhCamera(), pnt2);
     }
     return (pnt2.isValid());
   }
@@ -264,9 +264,10 @@ namespace Isis {
    * find the matching point in the right-hand image.
    *
    */
-  SmtkPoint SmtkMatcher::Register(const Coordinate &lpnt,
+  SmtkPoint SmtkMatcher::Register(NaifContextPtr naif, 
+                                  const Coordinate &lpnt,
                                   const AffineRadio &affrad) {
-    return (Register(PointGeometry(lpnt), PointGeometry(), affrad));
+    return (Register(naif, PointGeometry(lpnt), PointGeometry(), affrad));
   }
 
   /**
@@ -279,9 +280,11 @@ namespace Isis {
    *
    * @return SmtkPoint Result of point registration
    */
-  SmtkPoint SmtkMatcher::Register(const PointPair &pnts,
+  SmtkPoint SmtkMatcher::Register(NaifContextPtr naif, 
+                                  const PointPair &pnts,
                                   const AffineRadio &affrad) {
-    return (Register(PointGeometry(pnts.getLeft()),
+    return (Register(naif,
+                     PointGeometry(pnts.getLeft()),
                      PointGeometry(pnts.getRight()), affrad));
   }
 
@@ -308,7 +311,8 @@ namespace Isis {
    * @return SmtkPoint A registered point.  Test for validity on return to
    *         evaluate success.
    */
-  SmtkPoint SmtkMatcher::Register(const SmtkPoint &spnt,
+  SmtkPoint SmtkMatcher::Register(NaifContextPtr naif, 
+                                  const SmtkPoint &spnt,
                                   const AffineRadio &affrad) {
 
     //  If point is already registered don't do it again.
@@ -317,7 +321,7 @@ namespace Isis {
     PointGeometry left = PointGeometry(spnt.getLeft());
     PointGeometry right = PointGeometry(spnt.getRight());
 
-    return (Register(left, right, affrad));
+    return (Register(naif, left, right, affrad));
   }
 
 
@@ -347,7 +351,8 @@ namespace Isis {
    *
    * @return SmtkPoint
    */
-  SmtkPoint SmtkMatcher::Register(const PointGeometry &lpg,
+  SmtkPoint SmtkMatcher::Register(NaifContextPtr naif, 
+                                  const PointGeometry &lpg,
                                   const PointGeometry &rpg,
                                   const AffineRadio &affrad) {
 
@@ -366,7 +371,7 @@ namespace Isis {
     Coordinate lpnt = lpg.getPoint();
     Coordinate lgeom = lpg.getGeometry();
     if (!lgeom.isValid()) {
-      lgeom = getLatLon(lhCamera(), lpnt);
+      lgeom = getLatLon(naif, lhCamera(), lpnt);
     }
 
     // Construct geometry and check validity
@@ -381,15 +386,15 @@ namespace Isis {
     Coordinate rgeom = rpg.getGeometry();
     if ( !rpnt.isValid() ) {
       if (rgeom.isValid()) {
-        rpnt = getLineSample(rhCamera(), rgeom);
+        rpnt = getLineSample(naif, rhCamera(), rgeom);
       }
       else {
-        rpnt = getLineSample(rhCamera(), lgeom);
+        rpnt = getLineSample(naif, rhCamera(), lgeom);
         rgeom = lgeom;
       }
     }
     else if (!rgeom.isValid() ){
-      rgeom = getLatLon(rhCamera(), rpnt);
+      rgeom = getLatLon(naif, rhCamera(), rpnt);
     }
 
     //  Construct and for good right geometry
@@ -404,7 +409,7 @@ namespace Isis {
       m_gruen->PatternChip()->TackCube(lpnt.getSample(), lpnt.getLine());
       m_gruen->PatternChip()->Load(*m_lhCube);
       m_gruen->SearchChip()->TackCube(rpnt.getSample(), rpnt.getLine());
-      m_gruen->SearchChip()->Load(*m_rhCube, *m_gruen->PatternChip(),
+      m_gruen->SearchChip()->Load(naif, *m_rhCube, *m_gruen->PatternChip(),
                                   *m_lhCube);
     }
     catch (IException &) {
@@ -414,7 +419,7 @@ namespace Isis {
 
     // Register the points with incoming affine/radiometric parameters
     m_gruen->setAffineRadio(affrad);
-    return (makeRegisteredPoint(left, right, m_gruen.data()));
+    return (makeRegisteredPoint(naif, left, right, m_gruen.data()));
   }
 
   /**
@@ -441,18 +446,19 @@ namespace Isis {
    *
    * @return SmtkPoint
    */
-  SmtkPoint SmtkMatcher::Create(const Coordinate &left,
+  SmtkPoint SmtkMatcher::Create(NaifContextPtr naif, 
+                                const Coordinate &left,
                                 const Coordinate &right) {
 
     // Check out left image point
-    Coordinate lgeom = getLatLon(lhCamera(), left);
+    Coordinate lgeom = getLatLon(naif, lhCamera(), left);
     if (!lgeom.isValid() ) {
       m_offImage ++;
       return (SmtkPoint(PointPair(left,right), PointPair(lgeom)));
     }
 
     // Check out right image point
-    Coordinate rgeom = getLatLon(rhCamera(), right);
+    Coordinate rgeom = getLatLon(naif, rhCamera(), right);
     if (!rgeom.isValid() ) {
       m_offImage ++;
       return (SmtkPoint(PointPair(left,right), PointPair(lgeom,rgeom)));
@@ -576,12 +582,12 @@ namespace Isis {
    *
    * @return Coordinate Returns a latitude/longitude pair of point
    */
-  Coordinate SmtkMatcher::getLatLon(Camera &camera, const Coordinate &pnt) {
+  Coordinate SmtkMatcher::getLatLon(NaifContextPtr naif, Camera &camera, const Coordinate &pnt) {
     // Check if pixel coordinate is in the left image
     Coordinate geom;
     if (pnt.isValid()) {
       if (inCube(camera, pnt)) {
-        if ( camera.SetImage(pnt.getSample(), pnt.getLine()) ) {
+        if ( camera.SetImage(pnt.getSample(), pnt.getLine(), naif) ) {
           double latitude = camera.UniversalLatitude();
           double longitude = camera.UniversalLongitude();
           geom.setLatLon(latitude, longitude);
@@ -601,12 +607,13 @@ namespace Isis {
    *
    * @return Coordinate Returns a line/sample pair of point
    */
-  Coordinate SmtkMatcher::getLineSample(Camera &camera,
+  Coordinate SmtkMatcher::getLineSample(NaifContextPtr naif, 
+                                        Camera &camera,
                                         const Coordinate &geom) {
     // Check if pixel coordinate is in the left image
     Coordinate pnt;
     if (geom.isValid()) {
-      if ( camera.SetUniversalGround(geom.getLatitude(), geom.getLongitude()) ) {
+      if ( camera.SetUniversalGround(naif, geom.getLatitude(), geom.getLongitude()) ) {
         if ( camera.InCube() ) {
           pnt.setLineSamp(camera.Line(), camera.Sample());
         }
@@ -634,7 +641,8 @@ namespace Isis {
    *
    * @return SmtkPoint
    */
-  SmtkPoint SmtkMatcher::makeRegisteredPoint(const PointGeometry &left,
+  SmtkPoint SmtkMatcher::makeRegisteredPoint(NaifContextPtr naif, 
+                                             const PointGeometry &left,
                                              const PointGeometry &right,
                                              Gruen *gruen) {
 
@@ -648,7 +656,7 @@ namespace Isis {
 
     // Compute new right coordinate data
     Coordinate rcorr = Coordinate(gruen->CubeLine(), gruen->CubeSample());
-    Coordinate rgeom = getLatLon(rhCamera(), rcorr);
+    Coordinate rgeom = getLatLon(naif, rhCamera(), rcorr);
     PointGeometry rpoint = PointGeometry(rcorr, rgeom);
 
     //  Get left and original right geometry

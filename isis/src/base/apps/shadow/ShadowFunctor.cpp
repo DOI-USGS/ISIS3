@@ -32,9 +32,10 @@ namespace Isis {
    *   DEM cube is deleted will cause undefined behavior. This does NOT take ownership of the input
    *   DEM.
    */
-  ShadowFunctor::ShadowFunctor(Cube *inputDem) {
+  ShadowFunctor::ShadowFunctor(NaifContextPtr naif, Cube *inputDem) {
     nullify();
 
+    m_naif = naif;
     m_inputDem = inputDem;
 
     try {
@@ -226,7 +227,7 @@ namespace Isis {
         // We need to calculate the direction of the light source (sun) relative to the surface
         //   point.
         if (elevationModelProjection->SetWorld(sample + 1, line + 1)) {
-          SurfacePoint startSurfacePoint(
+          SurfacePoint startSurfacePoint(m_naif,
               Latitude(elevationModelProjection->UniversalLatitude(), Angle::Degrees),
               Longitude(elevationModelProjection->UniversalLongitude(), Angle::Degrees),
               demElevation);
@@ -340,7 +341,7 @@ namespace Isis {
             rayFromSurfaceToSun[2] = sunEdgeInBoxyFixed[2] - rayStartPointInBodyFixed[2];
           }
 
-          SurfacePoint secondSurfacePoint(
+          SurfacePoint secondSurfacePoint(m_naif,
               Displacement(rayStartPointInBodyFixed[0] + rayFromSurfaceToSunCenterNormalized[0],
                            Displacement::Meters),
               Displacement(rayStartPointInBodyFixed[1] + rayFromSurfaceToSunCenterNormalized[1],
@@ -508,7 +509,8 @@ namespace Isis {
     // Set the camera to the center of the image
     camForSunPosition->SetImage(
         camForSunPosition->ParentSamples() / 2.0 + 0.5,
-        camForSunPosition->ParentLines() / 2.0 + 0.5);
+        camForSunPosition->ParentLines() / 2.0 + 0.5,
+        m_naif);
 
     setSunPosition((Spice *)camForSunPosition);
   }
@@ -537,7 +539,7 @@ namespace Isis {
     // Distance (m) / Speed of Light (m/s) = Rough estimation of time elapsed
     double lightTimeOffsetInSeconds = uncorrectedSunPositionInBodyFixedSize / 299792458;
 
-    spiceWithTimeSet->setTime(spiceWithTimeSet->time().Et() - lightTimeOffsetInSeconds);
+    spiceWithTimeSet->setTime(spiceWithTimeSet->time().Et() - lightTimeOffsetInSeconds, m_naif);
 
     spiceWithTimeSet->sunPosition(naifSunPosition);
 
@@ -662,6 +664,7 @@ namespace Isis {
    * @param other The ShadowFunctor to swap instance data with
    */
 //   void ShadowFunctor::swap(ShadowFunctor &other) {
+//     std::swap(m_naif, other.m_naif);
 //     std::swap(m_inputDem, other.m_inputDem);
 //     std::swap(m_inputDemMax, other.m_inputDemMax);
 //
@@ -809,7 +812,7 @@ namespace Isis {
       tooFarFromTarget = (rayPointElevation > Distance(m_inputDemMax, Distance::Meters));
 
       // We need to find the DEM line/sample that corresponds to this ray point.
-      SurfacePoint surfacePoint(
+      SurfacePoint surfacePoint(m_naif,
           Displacement(pointOnRayFromSurfaceToSunInBodyFixed[0], Displacement::Meters),
           Displacement(pointOnRayFromSurfaceToSunInBodyFixed[1], Displacement::Meters),
           Displacement(pointOnRayFromSurfaceToSunInBodyFixed[2], Displacement::Meters));

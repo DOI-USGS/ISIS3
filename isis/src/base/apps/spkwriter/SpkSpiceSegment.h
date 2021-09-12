@@ -101,8 +101,8 @@ class SpkSpiceSegment {
     virtual bool HasVelocityVectors() const { return (false);  }
 
     // Elements for writing NAIF SPICE kernels
-    int LoadKernelType(const QString &ktypes) const;
-    int UnloadKernelType(const QString &ktypes = "") const;
+    int LoadKernelType(NaifContextPtr naif, const QString &ktypes) const;
+    int UnloadKernelType(NaifContextPtr naif, const QString &ktypes = "") const;
     int CameraVersion() const { return (_kernels.CameraVersion()); }
 
     /** Returns a comment summarizing the segment */

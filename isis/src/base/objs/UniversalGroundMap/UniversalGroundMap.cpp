@@ -63,9 +63,9 @@ namespace Isis {
    * @param[in] band   (int)  Image band number
    *
    */
-  void UniversalGroundMap::SetBand(const int band) {
+  void UniversalGroundMap::SetBand(const int band, NaifContextPtr naif) {
     if (p_camera != NULL)
-      p_camera->SetBand(band);
+      p_camera->SetBand(band, naif);
   }
 
 
@@ -93,9 +93,9 @@ namespace Isis {
    * @return Returns true if the lat/lon position was set successfully, and
    *         false if it was not
    */
-  bool UniversalGroundMap::SetUniversalGround(double lat, double lon) {
+  bool UniversalGroundMap::SetUniversalGround(NaifContextPtr naif, double lat, double lon) {
     if (p_camera != NULL) {
-      if (p_camera->SetUniversalGround(lat, lon)) {  // This should work for rings (radius,azimuth)
+      if (p_camera->SetUniversalGround(naif, lat, lon)) {  // This should work for rings (radius,azimuth)
         return p_camera->InCube();
       }
       else {
@@ -118,9 +118,9 @@ namespace Isis {
    * @return Returns true if the lat/lon position was set successfully, and
    *         false if it was not
    */
-  bool UniversalGroundMap::SetGround(Latitude lat, Longitude lon) {
+  bool UniversalGroundMap::SetGround(NaifContextPtr naif, Latitude lat, Longitude lon) {
     if(p_camera != NULL) {
-      if(p_camera->SetGround(lat, lon)) {  // This should work for rings (radius,azimuth)
+      if(p_camera->SetGround(naif, lat, lon)) {  // This should work for rings (radius,azimuth)
         return p_camera->InCube();
       }
       else {
@@ -145,9 +145,9 @@ namespace Isis {
    * @return Returns true if the lat/lon position was set successfully, and
    *         false if it was not
    */
-  bool UniversalGroundMap::SetUnboundGround(Latitude lat, Longitude lon) {
+  bool UniversalGroundMap::SetUnboundGround(NaifContextPtr naif, Latitude lat, Longitude lon) {
     if(p_camera != NULL) {
-      if(p_camera->SetGround(lat, lon)) {  // This should work for rings (radius,azimuth)
+      if(p_camera->SetGround(naif, lat, lon)) {  // This should work for rings (radius,azimuth)
         return p_camera->InCube();
       }
       else {
@@ -171,9 +171,9 @@ namespace Isis {
    * @return Returns true if the Surface Point was set successfully, and false
    *         otherwise
    */
-  bool UniversalGroundMap::SetGround(const SurfacePoint &sp) {
+  bool UniversalGroundMap::SetGround(NaifContextPtr naif, const SurfacePoint &sp) {
     if (p_camera != NULL) {
-      if (p_camera->SetGround(sp)) {
+      if (p_camera->SetGround(naif, sp)) {
         return p_camera->InCube();
       }
       else {
@@ -224,9 +224,9 @@ namespace Isis {
    * @return Returns true if the sample/line position was set successfully, and
    *         false if it was not
    */
-  bool UniversalGroundMap::SetImage(double sample, double line) {
+  bool UniversalGroundMap::SetImage(double sample, double line, NaifContextPtr naif) {
     if (p_camera != NULL) {
-      return p_camera->SetImage(sample, line);
+      return p_camera->SetImage(sample, line, naif);
     }
     else {
       return p_projection->SetWorld(sample, line);
@@ -285,9 +285,9 @@ namespace Isis {
    *
    * @return Resolution
    */
-  double UniversalGroundMap::Resolution() const {
+  double UniversalGroundMap::Resolution(NaifContextPtr naif) const {
     if (p_camera != NULL) {
-      return p_camera->PixelResolution();
+      return p_camera->PixelResolution(naif);
     }
     else {
       return p_projection->Resolution();
@@ -311,7 +311,7 @@ namespace Isis {
    *     be determined. Some lat/lon results may still be populated; their
    *     values are undefined.
    */
-  bool UniversalGroundMap::GroundRange(Cube *cube, Latitude &minLat,
+  bool UniversalGroundMap::GroundRange(NaifContextPtr naif, Cube *cube, Latitude &minLat,
       Latitude &maxLat, Longitude &minLon, Longitude &maxLon,
       bool allowEstimation) {
     // Do we need a RingRange method?
@@ -384,7 +384,8 @@ namespace Isis {
         double maxLonDouble;
         p_camera->GroundRange(
             minLatDouble, maxLatDouble,
-            minLonDouble, maxLonDouble, mappingPvl);
+            minLonDouble, maxLonDouble, mappingPvl,
+            naif);
         minLat = Latitude(minLatDouble, Angle::Degrees);
         maxLat = Latitude(maxLatDouble, Angle::Degrees);
         minLon = Longitude(minLonDouble, Angle::Degrees);
@@ -398,9 +399,9 @@ namespace Isis {
             mappingGrp.hasKeyword("MinimumLongitude") &&
             mappingGrp.hasKeyword("MaximumLongitude")) {
 
-          minLat = Latitude(mappingGrp["MinimumLatitude"],
+          minLat = Latitude(naif, mappingGrp["MinimumLatitude"],
                             mappingGrp, Angle::Degrees);
-          maxLat = Latitude(mappingGrp["MaximumLatitude"],
+          maxLat = Latitude(naif, mappingGrp["MaximumLatitude"],
                             mappingGrp, Angle::Degrees);
           minLon = Longitude(mappingGrp["MinimumLongitude"],
                              mappingGrp, Angle::Degrees);

@@ -43,6 +43,8 @@ using namespace Isis;
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
     qDebug() << "Unit test for Intercept.";
     qDebug() << "";
 
@@ -61,7 +63,8 @@ int main(int argc, char *argv[]) {
     observer[0] = 0.0; observer[1] = 0.0; observer[2] = 0.0;
     NaifVector raydir(3);
     raydir[0] = 1.0; raydir[1] = 1.0; raydir[2] = 1.0;
-    QScopedPointer<SurfacePoint> ipoint(new SurfacePoint(Displacement(2.0, Displacement::Meters),
+    QScopedPointer<SurfacePoint> ipoint(new SurfacePoint(naif,
+                                                         Displacement(2.0, Displacement::Meters),
                                                          Displacement(2.0, Displacement::Meters),
                                                          Displacement(2.0, Displacement::Meters)));
     NaifTriangle triangle(3,3);
@@ -79,9 +82,9 @@ int main(int argc, char *argv[]) {
                               << i2.location().GetY().meters()
                               << i2.location().GetZ().meters()
                               << " meters";
-    qDebug() << "normal   = " << i2.normal();
-    qDebug() << "emission = " << i2.emission();
-    qDebug() << "sepAngle = " << i2.separationAngle(raydir);
+    qDebug() << "normal   = " << i2.normal(naif);
+    qDebug() << "emission = " << i2.emission(naif);
+    qDebug() << "sepAngle = " << i2.separationAngle(naif, raydir);
     qDebug() << "";
 
 
@@ -98,7 +101,7 @@ int main(int argc, char *argv[]) {
     try {
       NaifVector invalidLookDir;
       Intercept invalidIntercept(observer, invalidLookDir, ipoint.take(), shape.take());
-      invalidIntercept.normal();  
+      invalidIntercept.normal(naif);  
     } 
     catch (IException &e) {
       e.print();
@@ -108,7 +111,7 @@ int main(int argc, char *argv[]) {
     try {
       SurfacePoint *invalidSP = NULL;
       Intercept invalidIntercept(observer, raydir, invalidSP, shape.take());
-      invalidIntercept.emission();  
+      invalidIntercept.emission(naif);  
     } 
     catch (IException &e) {
       e.print();
@@ -118,7 +121,7 @@ int main(int argc, char *argv[]) {
     try {
       TriangularPlate *invalidShape = NULL;
       Intercept invalidIntercept(observer, raydir, ipoint.take(), invalidShape);
-      invalidIntercept.emission();  
+      invalidIntercept.emission(naif);  
     } 
     catch (IException &e) {
       e.print();

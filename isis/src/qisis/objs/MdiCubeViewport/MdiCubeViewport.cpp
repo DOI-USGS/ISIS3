@@ -119,16 +119,16 @@ namespace Isis {
   }
 
 
-  void MdiCubeViewport::viewGray(int band) {
-    CubeViewport::viewGray(band);
+  void MdiCubeViewport::viewGray(NaifContextPtr naif, int band) {
+    CubeViewport::viewGray(naif, band);
 
     for(int i = 0; i < p_toolList.size(); i++)
       p_toolList[i]->updateTool();
   }
 
 
-  void MdiCubeViewport::viewRGB(int rband, int gband, int bband) {
-    CubeViewport::viewRGB(rband, gband, bband);
+  void MdiCubeViewport::viewRGB(NaifContextPtr naif, int rband, int gband, int bband) {
+    CubeViewport::viewRGB(naif, rband, gband, bband);
 
     for(int i = 0; i < p_toolList.size(); i++)
       p_toolList[i]->updateTool();

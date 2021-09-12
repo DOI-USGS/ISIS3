@@ -140,10 +140,10 @@ namespace Isis {
       };
 
       //! Operate used by the app interestcube- to calculate interest by sample,line
-      bool Operate(Cube &pCube, UniversalGroundMap &pUnivGrndMap, int piSample, int piLine);
+      bool Operate(NaifContextPtr naif, Cube &pCube, UniversalGroundMap &pUnivGrndMap, int piSample, int piLine);
 
       //! Operate - to calculate interest for entire control net to get better reference
-      void Operate(ControlNet &pNewNet, QString psSerialNumFile, QString psOverlapListFile = "");
+      void Operate(NaifContextPtr naif, ControlNet &pNewNet, QString psSerialNumFile, QString psOverlapListFile = "");
 
       //! Return the Interest Amount
       inline double InterestAmount() const {
@@ -190,16 +190,16 @@ namespace Isis {
 
       //! Find best ref for an entire control net by calculating the interest and
       //! moving point to a better interest area.
-      void FindCnetRef(ControlNet &pNewNet);
+      void FindCnetRef(NaifContextPtr naif, ControlNet &pNewNet) override;
 
       //! Process (Validate and Log) Point with Lock or with Referemce Measure Locked
-      void ProcessLocked_Point_Reference(ControlPoint &pCPoint, PvlObject &pPvlObj, int &piMeasuresModified);
+      void ProcessLocked_Point_Reference(NaifContextPtr naif, ControlPoint &pCPoint, PvlObject &pPvlObj, int &piMeasuresModified);
 
       //! Calculate interest for a Control Point
-      int InterestByPoint(ControlPoint &pCnetPoint);
+      int InterestByPoint(NaifContextPtr naif, ControlPoint &pCnetPoint);
 
       //! Calculate interest for a measure by index
-      bool InterestByMeasure(int piMeasure, Isis::ControlMeasure &pCnetMeasure, Isis::Cube &pCube);
+      bool InterestByMeasure(NaifContextPtr naif, int piMeasure, Isis::ControlMeasure &pCnetMeasure, Isis::Cube &pCube);
 
       //! Init Interest Results structure
       void InitInterestResults(int piIndex);

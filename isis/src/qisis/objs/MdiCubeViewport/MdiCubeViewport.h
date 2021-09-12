@@ -77,8 +77,8 @@ namespace Isis {
 
     public slots:
       void setLinked(bool b);
-      void viewGray(int band);
-      void viewRGB(int red, int green, int blue);
+      void viewGray(NaifContextPtr naif, int band) override;
+      void viewRGB(NaifContextPtr naif, int red, int green, int blue) override;
 
 
     private:

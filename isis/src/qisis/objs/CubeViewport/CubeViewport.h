@@ -27,6 +27,8 @@
 // parent of this class
 #include <QAbstractScrollArea>
 
+#include "NaifContext.h"
+
 class QPaintEvent;
 
 namespace Isis {
@@ -565,8 +567,8 @@ namespace Isis {
       void center(int x, int y);
       void center(double sample, double line);
 
-      virtual void viewRGB(int redBand, int greenBand, int blueBand);
-      virtual void viewGray(int band);
+      virtual void viewRGB(NaifContextPtr naif, int redBand, int greenBand, int blueBand);
+      virtual void viewGray(NaifContextPtr naif, int band);
 
       void stretchGray(const QString &string);
       void stretchRed(const QString &string);

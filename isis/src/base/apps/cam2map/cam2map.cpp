@@ -19,7 +19,7 @@ namespace Isis {
   Cube *icube;
   Camera *incam;
 
-  void cam2map(UserInterface &ui, Pvl *log) {
+  void cam2map(NaifContextPtr naif, UserInterface &ui, Pvl *log) {
     // Open the input cube
     Cube icube;
     CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
@@ -33,17 +33,17 @@ namespace Isis {
     userMap.read(ui.GetFileName("MAP"));
     PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
-    cam2map(&icube, userMap, userGrp, ui, log);
+    cam2map(naif, &icube, userMap, userGrp, ui, log);
   }
 
 
-  void cam2map(Cube *icube, Pvl &userMap, PvlGroup &userGrp, UserInterface &ui, Pvl *log) {
+  void cam2map(NaifContextPtr naif, Cube *icube, Pvl &userMap, PvlGroup &userGrp, UserInterface &ui, Pvl *log) {
     ProcessRubberSheet p;
-    cam2map(icube, userMap, userGrp, p, ui, log);
+    cam2map(naif, icube, userMap, userGrp, p, ui, log);
   }
 
 
-  void cam2map(Cube *icube, Pvl &userMap, PvlGroup &userGrp, ProcessRubberSheet &p,
+  void cam2map(NaifContextPtr naif, Cube *icube, Pvl &userMap, PvlGroup &userGrp, ProcessRubberSheet &p,
                 UserInterface &ui, Pvl *log){
 
     // Get the camera from the input cube
@@ -59,12 +59,12 @@ namespace Isis {
 
     // Get the mapping grop
     Pvl camMap;
-    incam->BasicMapping(camMap);
+    incam->BasicMapping(camMap, naif);
     PvlGroup &camGrp = camMap.findGroup("Mapping");
 
     // Make the target info match the user mapfile
     double minlat, maxlat, minlon, maxlon;
-    incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
+    incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap, naif);
     camGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
     camGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
     camGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
@@ -183,18 +183,18 @@ namespace Isis {
 
 
       if ( (ui.GetString("DEFAULTRANGE") == "CAMERA" || ui.GetString("DEFAULTRANGE") == "MINIMIZE") ) {
-        if (incam->IntersectsLongitudeDomain(userMap)) {
+        if (incam->IntersectsLongitudeDomain(userMap, naif)) {
           if (ui.GetString("LONSEAM") == "AUTO") {
             if ((int) userGrp["LongitudeDomain"] == 360) {
               userGrp.addKeyword(PvlKeyword("LongitudeDomain", "180"), Pvl::Replace);
-              if (incam->IntersectsLongitudeDomain(userMap)) {
+              if (incam->IntersectsLongitudeDomain(userMap, naif)) {
                 // Its looks like a global image so switch back to the users preference
                 userGrp.addKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
               }
             }
             else {
               userGrp.addKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
-              if (incam->IntersectsLongitudeDomain(userMap)) {
+              if (incam->IntersectsLongitudeDomain(userMap, naif)) {
                 // Its looks like a global image so switch back to the
                 // users preference
                 userGrp.addKeyword(PvlKeyword("LongitudeDomain", "180"), Pvl::Replace);
@@ -202,7 +202,7 @@ namespace Isis {
             }
             // Make the target info match the new longitude domain
             double minlat, maxlat, minlon, maxlon;
-            incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
+            incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap, naif);
             if (!ui.WasEntered("MINLAT")) {
               userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
             }
@@ -227,7 +227,7 @@ namespace Isis {
 
       // Determine the image size
       if (ui.GetString("DEFAULTRANGE") == "MINIMIZE") {
-        outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines, *incam);
+        outmap = (TProjection *) ProjectionFactory::CreateForCube(naif, userMap, samples, lines, *incam);
         trim = false;
       }
       else {//if (ui.GetString("DEFAULTRANGE") == "CAMERA" || DEFAULTRANGE = MAP) {
@@ -284,7 +284,7 @@ namespace Isis {
     //  TODO:  WEIRD ... why is this needed ... Talk to Tracie ... JAA??
     double centerSamp = icube->sampleCount() / 2.;
     double centerLine = icube->lineCount() / 2.;
-    if (incam->SetImage(centerSamp, centerLine)) {
+    if (incam->SetImage(centerSamp, centerLine, naif)) {
       if (outmap->SetUniversalGround(incam->UniversalLatitude(),
                                     incam->UniversalLongitude())) {
         p.ForceTile(outmap->WorldX(), outmap->WorldY());
@@ -459,8 +459,10 @@ namespace Isis {
   // Transform method mapping input line/samps to lat/lons to output line/samps
   bool cam2mapForward::Xform(double &outSample, double &outLine,
                              const double inSample, const double inLine) {
+    auto naif = NaifContext::acquire();
+    
     // See if the input image coordinate converts to a lat/lon
-    if (!p_incam->SetImage(inSample,inLine)) return false;
+    if (!p_incam->SetImage(inSample,inLine,naif)) return false;
 
     // Does that ground coordinate work in the map projection
     double lat = p_incam->UniversalLatitude();
@@ -518,6 +520,8 @@ namespace Isis {
   // Transform method mapping output line/samps to lat/lons to input line/samps
   bool cam2mapReverse::Xform(double &inSample, double &inLine,
                              const double outSample, const double outLine) {
+    auto naif = NaifContext::acquire();
+
     // See if the output image coordinate converts to lat/lon
     if (!p_outmap->SetWorld(outSample, outLine)) return false;
 
@@ -533,7 +537,7 @@ namespace Isis {
     double lat = p_outmap->UniversalLatitude();
     double lon = p_outmap->UniversalLongitude();
 
-    if (!p_incam->SetUniversalGround(lat, lon)) return false;
+    if (!p_incam->SetUniversalGround(naif, lat, lon)) return false;
 
     // Make sure the point is inside the input image
     if (p_incam->Sample() < 0.5) return false;
@@ -546,7 +550,7 @@ namespace Isis {
     inLine = p_incam->Line();
 
     // Good to ground one last time to check for occlusion
-    p_incam->SetImage(inSample, inLine);
+    p_incam->SetImage(inSample, inLine, naif);
 
     if (p_occlusion){
       if (abs(lat - p_incam->UniversalLatitude()) > 0.00001 || abs(lon - p_incam->UniversalLongitude()) > 0.00001) {
@@ -566,6 +570,6 @@ namespace Isis {
   }
 
   void bandChange(const int band) {
-    incam->SetBand(band);
+    incam->SetBand(band, NaifContext::acquire());
   }
 }

@@ -135,7 +135,7 @@ namespace Isis {
                           // boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
                           // SparseBlockRowMatrix                                &Q,
                           LinearAlgebra::Vector                               &v1);
-      void applyParameterCorrections(LinearAlgebra::Vector imageSolution,
+      void applyParameterCorrections(NaifContextPtr naif, LinearAlgebra::Vector imageSolution,
            SparseBlockMatrix &sparseNormals, const BundleTargetBodyQsp target);
 
       // accessors
@@ -158,10 +158,11 @@ namespace Isis {
 
       // string format methods
       QString formatBundleOutputSummaryString(bool errorPropagation) const;
-      QString formatBundleOutputDetailString(bool errorPropagation, bool solveRadius=false) const;
-      QString formatBundleLatitudinalOutputDetailString(bool errorPropagation, 
+      QString formatBundleOutputDetailString(NaifContextPtr naif, bool errorPropagation, bool solveRadius=false) const;
+      QString formatBundleLatitudinalOutputDetailString(NaifContextPtr naif,
+                                                        bool errorPropagation, 
                                                         bool solveRadius=false) const;
-      QString formatBundleRectangularOutputDetailString(bool errorPropagation) const;
+      QString formatBundleRectangularOutputDetailString(NaifContextPtr naif, bool errorPropagation) const;
       QString formatValue(double value, int fieldWidth, int precision) const;
       QString formatAprioriSigmaString(SurfacePoint::CoordIndex index, int fieldWidth,
                                        int precision, bool solveRadius=false) const;
@@ -174,7 +175,7 @@ namespace Isis {
 
     private:
       // methods
-      void updateAdjustedSurfacePointLatitudinally(const BundleTargetBodyQsp target);
+      void updateAdjustedSurfacePointLatitudinally(NaifContextPtr naif, const BundleTargetBodyQsp target);
       void updateAdjustedSurfacePointRectangularly();
       
       //!< pointer to the control point object this represents

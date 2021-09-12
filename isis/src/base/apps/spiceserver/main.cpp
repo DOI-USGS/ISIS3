@@ -11,9 +11,10 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   Pvl appLog;
   try {
-    spiceserver(ui, &appLog);
+    spiceserver(naif, ui, &appLog);
   }
   catch (...) {
     for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {

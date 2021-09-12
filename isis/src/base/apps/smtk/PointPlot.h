@@ -98,7 +98,7 @@ namespace Isis {
             double rhSamp = point->getRight().getSample();
             if (rhcam.SetImage(rhSamp, rhLine, naif) && rhcam.InCube()) {
               double radius, lat, lon, sepang, error;
-              if (Stereo::elevation(lhcam, rhcam, radius, lat, lon, sepang, error)) {
+              if (Stereo::elevation(naif, lhcam, rhcam, radius, lat, lon, sepang, error)) {
                 int index;
                 if (WithinTile(naif, lhcam, lat, lon, radius, dem, index)) {
                   double elevation = radius - lhcam.LocalRadius().meters();

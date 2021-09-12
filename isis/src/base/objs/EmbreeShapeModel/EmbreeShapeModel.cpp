@@ -417,7 +417,8 @@ namespace Isis {
    *
    * @return @b Distance Radius value of the intercept grid point
    */
-  Distance EmbreeShapeModel::localRadius(const Latitude &lat,
+  Distance EmbreeShapeModel::localRadius(NaifContextPtr naif,
+                                         const Latitude &lat,
                                          const Longitude &lon) {
 
     // Create a ray from the origin to the surface point

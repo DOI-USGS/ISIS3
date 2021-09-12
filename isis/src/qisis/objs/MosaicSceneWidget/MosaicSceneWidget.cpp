@@ -270,11 +270,13 @@ namespace Isis {
 
 
   void MosaicSceneWidget::setProjection(const PvlGroup &mapping, Pvl label) {
+    auto naif = NaifContext::acquire();
+
     Pvl tmp;
     tmp += mapping;
 
     if (!mapping.hasKeyword("EquatorialRadius")) {
-      PvlGroup radii = Target::radiiGroup(label, mapping);
+      PvlGroup radii = Target::radiiGroup(naif, label, mapping);
       tmp.findGroup("Mapping") += radii["EquatorialRadius"];
       tmp.findGroup("Mapping") += radii["PolarRadius"];
     }

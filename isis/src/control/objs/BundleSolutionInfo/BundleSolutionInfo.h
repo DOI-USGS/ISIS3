@@ -210,8 +210,8 @@ namespace Isis {
 
       bool outputImagesCSVHeader(std::ofstream &fpOut);
       bool outputHeader(std::ofstream &fpOut);
-      bool outputText();
-      bool outputImagesCSV();
+      bool outputText(NaifContextPtr naif);
+      bool outputImagesCSV(NaifContextPtr naif);
       bool outputPointsCSV();
       bool outputResiduals();
 

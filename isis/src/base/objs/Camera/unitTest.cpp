@@ -290,7 +290,7 @@ int main() {
     lon.setDegrees(226.671);
     double radius = 3414033.72108798;
     c->SetUniversalGround(naif, lat.degrees(), lon.degrees(), radius);
-    c->SetGround(naif, SurfacePoint(lat, lon, Distance(radius, Distance::Meters)));
+    c->SetGround(naif, SurfacePoint(naif, lat, lon, Distance(radius, Distance::Meters)));
     cout << "Has intersection " << c->HasSurfaceIntersection() << endl;
     cout << "Latitude = " << c->UniversalLatitude() << endl;
     cout << "Longitude = " << c->UniversalLongitude() << endl;

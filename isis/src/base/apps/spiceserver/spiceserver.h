@@ -3,9 +3,10 @@
 
 #include "Pvl.h"
 #include "UserInterface.h"
+#include "NaifContext.h"
 
 namespace Isis{
-  extern void spiceserver(UserInterface &ui, Pvl *log = nullptr);
+  extern void spiceserver(NaifContextPtr naif, UserInterface &ui, Pvl *log = nullptr);
 }
 
 #endif

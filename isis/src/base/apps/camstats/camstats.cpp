@@ -26,18 +26,18 @@ namespace Isis {
    * @param ui UserInterface object containing camstats parameters
    * @param(out) log the Pvl that camstat results log to
    */
-  void camstats(UserInterface &ui, Pvl *log) {
+  void camstats(NaifContextPtr naif, UserInterface &ui, Pvl *log) {
     Process p;
 
     CubeAttributeInput cai;
     Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), cai, ReadWrite);
-    camstats(icube, ui, log);
+    camstats(naif, icube, ui, log);
 
     p.EndProcess();
   }
 
 
-  void camstats(Cube *icube, UserInterface &ui, Pvl *log) {
+  void camstats(NaifContextPtr naif, Cube *icube, UserInterface &ui, Pvl *log) {
     Process p;
     p.SetInputCube(icube);
     Camera *cam = icube->camera();
@@ -46,7 +46,7 @@ namespace Isis {
     QString from = icube->fileName();
     int sinc = ui.GetInteger("SINC");
     int linc = ui.GetInteger("LINC");
-    CameraStatistics camStats(cam, sinc, linc, from);
+    CameraStatistics camStats(naif, cam, sinc, linc, from);
 
     // Send the Output to the log area
     Pvl statsPvl = camStats.toPvl();

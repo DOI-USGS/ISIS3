@@ -23,6 +23,7 @@ using namespace Isis;
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   ControlNet cnet;
   if (ui.WasEntered("NETWORKID")) {
@@ -90,7 +91,8 @@ void IsisMain() {
       }
 
       try {
-        SurfacePoint pt(Latitude(lat, Angle::Degrees),
+        SurfacePoint pt(naif, 
+                        Latitude(lat, Angle::Degrees),
                         Longitude(lon, Angle::Degrees),
                         Distance(radius, Distance::Meters));
         point->SetAprioriSurfacePoint(pt);
