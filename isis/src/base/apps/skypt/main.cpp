@@ -11,6 +11,7 @@ using namespace Isis;
 void IsisMain() {
   // Get user interface
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Get input cube and get camera model for it
   QString channel = ui.GetFileName("FROM");
@@ -27,13 +28,13 @@ void IsisMain() {
     // Get users sample & line values and do a setImage for the camera
     samp = ui.GetDouble("SAMPLE");
     line = ui.GetDouble("LINE");
-    cam->SetImage(samp, line);
+    cam->SetImage(samp, line, naif);
   }
   // Do conversion from ra/dec to samp/line
   else {
     double ra = ui.GetDouble("RA");
     double dec = ui.GetDouble("DEC");
-    if (!cam->SetRightAscensionDeclination(ra, dec)) {
+    if (!cam->SetRightAscensionDeclination(ra, dec, naif)) {
       QString msg = "Invalid Ra/Dec coordinate";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -48,7 +49,7 @@ void IsisMain() {
   b.SetBasePosition(intSamp, intLine, 1);
   cube.read(b);
 
-  double rot = cam->CelestialNorthClockAngle();
+  double rot = cam->CelestialNorthClockAngle(naif);
 
   // Create group with sky position
   PvlGroup sp("SkyPoint");
@@ -56,8 +57,8 @@ void IsisMain() {
     sp += PvlKeyword("Filename", FileName(channel).expanded());
     sp += PvlKeyword("Sample", toString(cam->Sample()));
     sp += PvlKeyword("Line", toString(cam->Line()));
-    sp += PvlKeyword("RightAscension", toString(cam->RightAscension()));
-    sp += PvlKeyword("Declination", toString(cam->Declination()));
+    sp += PvlKeyword("RightAscension", toString(cam->RightAscension(naif)));
+    sp += PvlKeyword("Declination", toString(cam->Declination(naif)));
     sp += PvlKeyword("EphemerisTime", toString(cam->time().Et()));
     sp += PvlKeyword("PixelValue", PixelToString(b[0]));
     sp += PvlKeyword("CelestialNorthClockAngle", toString(rot), "degrees");

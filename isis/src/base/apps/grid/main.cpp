@@ -51,6 +51,7 @@ void IsisMain() {
   icube = p.SetInputCube("FROM");
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   QString mode = ui.GetString("MODE");
 
   outline = ui.GetBoolean("OUTLINE");
@@ -132,10 +133,10 @@ void IsisMain() {
 
     gmap = new UniversalGroundMap(*icube, UniversalGroundMap::ProjectionFirst);
 
-    latLonGrid = new GroundGrid(gmap, ticks, extendGrid,
+    latLonGrid = new GroundGrid(naif, gmap, ticks, extendGrid,
                                 icube->sampleCount(), icube->lineCount());
 
-    baseLat = Latitude(ui.GetDouble("BASELAT"),
+    baseLat = Latitude(naif, ui.GetDouble("BASELAT"),
         *latLonGrid->GetMappingGroup(), Angle::Degrees);
     baseLon = Longitude(ui.GetDouble("BASELON"),
         *latLonGrid->GetMappingGroup(), Angle::Degrees);
@@ -146,11 +147,11 @@ void IsisMain() {
     progress.SetText("Calculating Grid");
 
     if (ui.WasEntered("MINLAT"))
-      minLat = Latitude(ui.GetDouble("MINLAT"),
+      minLat = Latitude(naif, ui.GetDouble("MINLAT"),
         *latLonGrid->GetMappingGroup(), Angle::Degrees);
 
     if (ui.WasEntered("MAXLAT"))
-      maxLat = Latitude(ui.GetDouble("MAXLAT"),
+      maxLat = Latitude(naif, ui.GetDouble("MAXLAT"),
         *latLonGrid->GetMappingGroup(), Angle::Degrees);
 
     if (ui.WasEntered("MINLON"))
@@ -192,7 +193,7 @@ void IsisMain() {
       }
     }
 
-    latLonGrid->CreateGrid(baseLat, baseLon, latInc, lonInc, &progress);
+    latLonGrid->CreateGrid(naif, baseLat, baseLon, latInc, lonInc, &progress);
 
     if (ui.GetBoolean("BOUNDARY")) {
       latLonGrid->WalkBoundary(naif);
@@ -341,11 +342,13 @@ bool groundDrawPoint(int samp, int line, bool latGrid = true) {
 void changeBand(int band){ 
   Progress progress;
 
+  auto naif = NaifContext::acquire();
+
   // change band of UniversalGroundMap
-  gmap->SetBand(band);
+  gmap->SetBand(band, naif);
 
   //update latLonGrid to use new UniversalGroundMap
-  latLonGrid = new GroundGrid(gmap, ticks, extendGrid,
+  latLonGrid = new GroundGrid(naif, gmap, ticks, extendGrid,
                               icube->sampleCount(), icube->lineCount());
 
   //re-set old ground limits from GUI
@@ -385,7 +388,7 @@ void changeBand(int band){
   progress.SetText(progressMessage);
 
   //re-set lat/lon base/in from GUI
-  latLonGrid->CreateGrid(baseLat, baseLon, latInc, lonInc, &progress);
+  latLonGrid->CreateGrid(naif, baseLat, baseLon, latInc, lonInc, &progress);
 
   if (walkBoundary)
     latLonGrid->WalkBoundary(naif);

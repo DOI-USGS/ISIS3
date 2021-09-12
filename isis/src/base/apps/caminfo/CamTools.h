@@ -190,7 +190,7 @@ namespace Isis {
       bool hasLimb() const;
       void collect(NaifContextPtr naif, Camera &camera, Cube &cube, bool doGeometry, bool doPolygon,
           bool getFootBlob, bool increasePrecision);
-      void generateGeometryKeys(PvlObject &pband);
+      void generateGeometryKeys(NaifContextPtr naif, PvlObject &pband);
       void generatePolygonKeys(NaifContextPtr naif, PvlObject &pband);
 
     private:

@@ -50,13 +50,13 @@ inline double SetCeil(double value, const int precision) {
   return (value);
 }
 
-inline double Scale(const double pixres, const double polarRadius,
+inline double Scale(NaifContextPtr naif, const double pixres, const double polarRadius,
                     const double equiRadius, const double trueLat = 0.0) {
   double lat = trueLat * Isis::PI / 180.0;
   double a = polarRadius * cos(lat);
   double b = equiRadius * sin(lat);
   double localRadius = equiRadius * polarRadius / sqrt(a * a + b * b);
-  return (localRadius / pixres * pi_c() / 180.0);
+  return (localRadius / pixres * naif->pi_c() / 180.0);
 }
 
 void IsisMain() {
@@ -65,6 +65,7 @@ void IsisMain() {
   // Get the list of names of input CCD cubes to stitch together
   FileList flist;
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   flist.read(ui.GetFileName("FROMLIST"));
   if(flist.size() < 1) {
     QString msg = "The list file[" + ui.GetFileName("FROMLIST") +
@@ -130,7 +131,7 @@ void IsisMain() {
 
       Camera *cam = cube.camera();
       Pvl mapping;
-      cam->BasicMapping(mapping);
+      cam->BasicMapping(mapping, naif);
       PvlGroup &mapgrp = mapping.findGroup("Mapping");
       mapgrp.addKeyword(PvlKeyword("ProjectionName", projection), Pvl::Replace);
       mapgrp.addKeyword(PvlKeyword("LatitudeType", lattype), Pvl::Replace);
@@ -149,15 +150,15 @@ void IsisMain() {
       poleRadStat.AddData(&poleRad, 1);
 
       // Get resolution
-      double lowres = cam->LowestImageResolution();
-      double hires = cam->HighestImageResolution();
+      double lowres = cam->LowestImageResolution(naif);
+      double hires = cam->HighestImageResolution(naif);
 
       
-      double lowObliqueRes = cam->LowestObliqueImageResolution();
+      double lowObliqueRes = cam->LowestObliqueImageResolution(naif);
 
 
       
-      double hiObliqueRes= cam->HighestObliqueImageResolution();
+      double hiObliqueRes= cam->HighestObliqueImageResolution(naif);
 
 
       scaleStat.AddData(&hires, 1);
@@ -173,7 +174,7 @@ void IsisMain() {
       
       //double obliquePixRes = (lowObliqueRes+hiObliqueRes)/2.0;
 
-      double scale = Scale(pixres, poleRad, eqRad);
+      double scale = Scale(naif, pixres, poleRad, eqRad);
 
       
       //double obliqueScale = Scale(obliquePixRes,poleRad,eqRad);
@@ -199,7 +200,7 @@ void IsisMain() {
 
       // Get the universal ground range
       double minlat, maxlat, minlon, maxlon;
-      cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
+      cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping, naif);
       mapgrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
       mapgrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
       mapgrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
@@ -234,7 +235,7 @@ void IsisMain() {
   double avgLon((longitudeStat.Minimum() + longitudeStat.Maximum()) / 2.0);
   double avgEqRad((equiRadStat.Minimum() + equiRadStat.Maximum()) / 2.0);
   double avgPoleRad((poleRadStat.Minimum() + poleRadStat.Maximum()) / 2.0);
-  double scale  = Scale(avgPixRes, avgPoleRad, avgEqRad);
+  double scale  = Scale(naif, avgPixRes, avgPoleRad, avgEqRad);
   //double obliqueScale = Scale(avgObliquePixRes,avgPoleRad,avgEqRad);
 
   mapping += PvlKeyword("ProjectionName", projection);

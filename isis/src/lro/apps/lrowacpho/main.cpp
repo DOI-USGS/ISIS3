@@ -37,6 +37,7 @@ void IsisMain () {
 
     // set up the user interface
     UserInterface &ui = Application::GetUserInterface();
+    auto naif = NaifContext::acquire();
 
     bool useBackplane = false;
 
@@ -71,13 +72,13 @@ void IsisMain () {
     algoName.UpCase();
 
     if (algoName == "HILLIER") {
-        pho = new Hillier(par, *icube, !useBackplane);
+        pho = new Hillier(naif, par, *icube, !useBackplane);
     }
     else if (algoName == "EXPONENTIAL") {
-        pho = new Exponential(par, *icube, !useBackplane);
+        pho = new Exponential(naif, par, *icube, !useBackplane);
     }
     else if (algoName == "HAPKEEXPONENTIAL") {
-        pho = new HapkeExponential(par, *icube, !useBackplane);
+        pho = new HapkeExponential(naif, par, *icube, !useBackplane);
     }
     else {
         string msg = " Algorithm Name [" + algoName + "] not recognized. ";
@@ -122,6 +123,8 @@ void IsisMain () {
  */
 void phoCal ( Buffer &in, Buffer &out ) {
 
+    auto naif = NaifContext::acquire();
+    
     for (int i = 0; i < in.size(); i++) {
         //  Don't correct special pixels
         if (IsSpecial(in[i])) {
@@ -129,7 +132,7 @@ void phoCal ( Buffer &in, Buffer &out ) {
         }
         else {
             // Get correction and test for validity
-            double ph = pho->compute(in.Line(i), in.Sample(i), in.Band(i), useDem);
+            double ph = pho->compute(naif, in.Line(i), in.Sample(i), in.Band(i), useDem);
             out[i] = (IsSpecial(ph) ? Null : in[i] * ph);
         }
     }
@@ -156,6 +159,8 @@ void phoCalWithBackplane ( std::vector<Isis::Buffer *> &in, std::vector<Isis::Bu
     Buffer &incidence = *in[3];
     Buffer &calibrated = *out[0];
 
+    auto naif = NaifContext::acquire();
+
     for (int i = 0; i < image.size(); i++) {
         //  Don't correct special pixels
         if (IsSpecial(image[i])) {
@@ -163,7 +168,7 @@ void phoCalWithBackplane ( std::vector<Isis::Buffer *> &in, std::vector<Isis::Bu
         }
         else {
             // Get correction and test for validity
-            double ph = pho->photometry(incidence[i], emission[i], phase[i], image.Band(i));
+            double ph = pho->photometry(naif, incidence[i], emission[i], phase[i], image.Band(i));
             calibrated[i] = (IsSpecial(ph) ? Null : image[i] * ph);
         }
     }

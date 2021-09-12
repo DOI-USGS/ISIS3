@@ -70,6 +70,7 @@ void IsisMain() {
   ProcessRubberSheet p;
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   Pvl userMap;
   userMap.read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
@@ -97,14 +98,14 @@ void IsisMain() {
   if(ui.GetString("DEFAULTRANGE") == "CAMERA") {
     // Get the default ra/dec range
     double minRa, maxRa, minDec, maxDec;
-    incam->RaDecRange(minRa, maxRa, minDec, maxDec);
+    incam->RaDecRange(naif, minRa, maxRa, minDec, maxDec);
     userGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minRa)), Pvl::Replace);
     userGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxRa)), Pvl::Replace);
     userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minDec)), Pvl::Replace);
     userGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxDec)), Pvl::Replace);
   }
   if(ui.GetString("DEFAULTSCALE") == "CAMERA") {
-    double res = incam->RaDecResolution();
+    double res = incam->RaDecResolution(naif);
     userGrp.addKeyword(PvlKeyword("Scale", toString(1.0 / res)), Pvl::Replace);
   }
 
@@ -169,9 +170,9 @@ void IsisMain() {
 
   double centerSamp = icube->sampleCount() / 2.;
   double centerLine = icube->lineCount() / 2.;
-  incam->SetImage(centerSamp, centerLine);
-  if(proj->SetGround(incam->Declination(),
-                     incam->RightAscension())) {
+  incam->SetImage(centerSamp, centerLine, naif);
+  if(proj->SetGround(incam->Declination(naif),
+                     incam->RightAscension(naif))) {
     p.ForceTile(proj->WorldX(), proj->WorldY());
   }
 
@@ -203,7 +204,7 @@ void IsisMain() {
 }
 
 void BandChange(const int band) {
-  incam->SetBand(band);
+  incam->SetBand(band, NaifContext::acquire());
 }
 
 sky2map::sky2map(const int inputSamples, const int inputLines,
@@ -239,7 +240,9 @@ bool sky2map::Xform(double &inSample, double &inLine,
   double lat = p_outmap->Latitude();
   double lon = p_outmap->Longitude();
 
-  if(!p_incam->SetRightAscensionDeclination(lon, lat)) return false;
+  auto naif = NaifContext::acquire();
+
+  if(!p_incam->SetRightAscensionDeclination(lon, lat, naif)) return false;
 
   // Make sure the point is inside the input image
   if(p_incam->Sample() < 0.5) return false;
@@ -298,12 +301,13 @@ void LoadMapRes() {
 //Helper function to get camera resolution.
 void LoadCameraRes() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
   c.open(ui.GetFileName("FROM"));
   Camera *cam = c.camera();
-  double res = cam->RaDecResolution();
+  double res = cam->RaDecResolution(naif);
 
   ui.Clear("SCALE");
   ui.PutDouble("SCALE", 1.0 / res);
@@ -356,6 +360,7 @@ void LoadMapRange() {
 //Helper function to load camera range.
 void LoadCameraRange() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
@@ -364,7 +369,7 @@ void LoadCameraRange() {
 
   // Make the target info match the user mapfile
   double minra, maxra, mindec, maxdec;
-  cam->RaDecRange(minra, maxra, mindec, maxdec);
+  cam->RaDecRange(naif, minra, maxra, mindec, maxdec);
 
   // Set ground range parameters in UI
   ui.Clear("SRA");

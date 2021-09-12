@@ -262,8 +262,8 @@ void IsisMain() {
   }
   spRot = new SpiceRotation(frameCode);
   //create a table from starttime to endtime (streched by 3%) with NODES entries
-  spRot->LoadCache(time0-0.015*(time1-time0), time1+0.015*(time1-time0), NODES);
-  Table tableTargetRot = spRot->Cache("BodyRotation");
+  spRot->LoadCache(time0-0.015*(time1-time0), time1+0.015*(time1-time0), NODES, naif);
+  Table tableTargetRot = spRot->Cache("BodyRotation", naif);
   tableTargetRot.Label() += PvlKeyword("Description", "Created by apollopaninit");
   panCube.write(tableTargetRot);
 
@@ -271,8 +271,8 @@ void IsisMain() {
   //////////////////////////////////////////////////attach a sun position table
   spPos = new SpicePosition(10,301);  //Position of the sun (10) WRT to the MOON (301)
   //create a table from starttime to endtime (stretched by 3%) with NODES entries
-  spPos->LoadCache(time0-0.015*(time1-time0), time1+0.015*(time1-time0), NODES);
-  Table tableSunPos = spPos->Cache("SunPosition");
+  spPos->LoadCache(time0-0.015*(time1-time0), time1+0.015*(time1-time0), NODES, naif);
+  Table tableSunPos = spPos->Cache("SunPosition", naif);
   tableSunPos.Label() += PvlKeyword("SpkTableStartTime", toString(time0-0.015*(time1-time0)));
   tableSunPos.Label() += PvlKeyword("SpkTablleEndTime", toString(time1+0.015*(time1-time0)));
   tableSunPos.Label() += PvlKeyword("Description", "Created by apollopaninit");
@@ -407,13 +407,13 @@ void IsisMain() {
   posSel[2] = pos0[2] - temp*vel[2];
   //converting to J2000
   temp = time0 - 0.005*(time1-time0);  //et just before the first scan line
-  spPos->SetEphemerisTime(temp);
-  spRot->SetEphemerisTime(temp);
+  spPos->SetEphemerisTime(temp, naif);
+  spRot->SetEphemerisTime(temp, naif);
   //Despite being labeled as J2000, the coordinates for the instrument position are in fact in
   //  target centric coordinated rotated to a system centered at the target with aces parallel
   //  to J2000, whatever that means
-  posJ20 = spRot->J2000Vector(posSel); //J2000Vector calls rotates the position vector into J2000,
-                                       //  completing the transformation
+  posJ20 = spRot->J2000Vector(posSel, naif); //J2000Vector calls rotates the position vector into J2000,
+                                             //  completing the transformation
   recordPos[0] = posJ20[0];
   recordPos[1] = posJ20[1];
   recordPos[2] = posJ20[2];
@@ -427,12 +427,12 @@ void IsisMain() {
   posSel[2] = pos0[2] + temp*vel[2];
   //converting to J2000
   temp = time1 + 0.015*(time1-time0);  //et just after the last scan line
-  spPos->SetEphemerisTime(temp);
-  spRot->SetEphemerisTime(temp);
+  spPos->SetEphemerisTime(temp, naif);
+  spRot->SetEphemerisTime(temp, naif);
   //Despite being labeled as J2000, the coordinates for the instrument position are in fact
   //  in target centric coordinated rotated to a system centered at the target with aces
   //  parallel to J2000, whatever that means
-  posJ20 = spRot->J2000Vector(posSel); //J2000Vector calls rotates the position vector into J2000,
+  posJ20 = spRot->J2000Vector(posSel, naif); //J2000Vector calls rotates the position vector into J2000,
                                        //  completing the transformation
   recordPos[0] = posJ20[0];
   recordPos[1] = posJ20[1];
@@ -476,8 +476,8 @@ void IsisMain() {
   //From the cameras perspective the gimbal motion is around a constantly changing axis,
   //  this is handled by combining a series of incremental rotations
   MfromLeftEulers(M0, omega, phi, kappa);  //rotation matrix in the center Q[(NOPDES-1)/2]
-  spRot->SetEphemerisTime(isisTime.Et());
-  M_J2toT = spRot->Matrix();   //this actually gives the rotation from J2000 to target centric
+  spRot->SetEphemerisTime(isisTime.Et(), naif);
+  M_J2toT = spRot->Matrix(naif);   //this actually gives the rotation from J2000 to target centric
   for(j=0; j<3; j++)    //reformating M_J2toT to a 3x3
     for(k=0; k<3; k++)
       Mtemp1[j][k] = M_J2toT[3*j+k];
@@ -510,10 +510,10 @@ void IsisMain() {
     //  space to target centric space
     naif->mtxm_c(Mdr, Mtemp1, M0);
     //now adding the rotation from the target frame to J2000
-    spRot->SetEphemerisTime(Q[i][4]);
+    spRot->SetEphemerisTime(Q[i][4], naif);
     //this actually gives the rotation from J2000 to target centric--hence the mxmt_c function being
     //  used later
-    M_J2toT = spRot->Matrix();
+    M_J2toT = spRot->Matrix(naif);
     for(j=0; j<3; j++)  //reformating M_J2toT to a 3x3
       for(k=0; k<3; k++)
         Mtemp1[j][k] = M_J2toT[3*j+k];
@@ -545,8 +545,8 @@ void IsisMain() {
     //  space to target centric space
     naif->mtxm_c(Mdr, Mtemp1, M0);
     //now adding the rotation from the target frame to J2000
-    spRot->SetEphemerisTime(Q[i][4]);
-    M_J2toT = spRot->Matrix();
+    spRot->SetEphemerisTime(Q[i][4], naif);
+    M_J2toT = spRot->Matrix(naif);
     for(j=0; j<3; j++)  //reformating M_J2toT to a 3x3
       for(k=0; k<3; k++)
         Mtemp1[j][k] = M_J2toT[3*j+k];

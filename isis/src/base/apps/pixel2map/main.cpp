@@ -46,6 +46,7 @@ void IsisMain() {
 
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   Pvl userMap;
   userMap.read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
@@ -112,10 +113,10 @@ void IsisMain() {
 
     // Get the mapping group
     Pvl camMap;
-    g_incam->BasicMapping(camMap);
+    g_incam->BasicMapping(camMap, naif);
     camGrp = camMap.findGroup("Mapping");
 
-    g_incam->GroundRange(newminlat, newmaxlat, newminlon, newmaxlon, userMap);
+    g_incam->GroundRange(newminlat, newmaxlat, newminlon, newmaxlon, userMap, naif);
     //set min lat/lon
     if (newminlat < minlat) {
       minlat = newminlat;
@@ -244,12 +245,12 @@ void IsisMain() {
     icube.open( list.back().toString() );
     g_incam = icube.camera();
 
-    if (g_incam->IntersectsLongitudeDomain(userMap)) {
+    if (g_incam->IntersectsLongitudeDomain(userMap, naif)) {
       if (ui.GetString("LONSEAM") == "AUTO") {
         if ((int) userGrp["LongitudeDomain"] == 360) {
           userGrp.addKeyword(PvlKeyword("LongitudeDomain", toString(180)),
                              Pvl::Replace);
-          if (g_incam->IntersectsLongitudeDomain(userMap)) {
+          if (g_incam->IntersectsLongitudeDomain(userMap, naif)) {
             // Its looks like a global image so switch back to the
             // users preference
             userGrp.addKeyword(PvlKeyword("LongitudeDomain", toString(360)),
@@ -259,7 +260,7 @@ void IsisMain() {
         else {
           userGrp.addKeyword(PvlKeyword("LongitudeDomain", toString(360)),
                              Pvl::Replace);
-          if (g_incam->IntersectsLongitudeDomain(userMap)) {
+          if (g_incam->IntersectsLongitudeDomain(userMap, naif)) {
             // Its looks like a global image so switch back to the
             // users preference
             userGrp.addKeyword(PvlKeyword("LongitudeDomain", toString(180)),
@@ -268,7 +269,7 @@ void IsisMain() {
         }
         // Make the target info match the new longitude domain
         double minlat, maxlat, minlon, maxlon;
-        g_incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
+        g_incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap, naif);
         if (!ui.WasEntered("MINLAT")) {
           userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
         }
@@ -386,6 +387,8 @@ void PrintMap() {
   */
 void rasterizePixel(Isis::Buffer &in) {
 
+  auto naif = NaifContext::acquire();
+  
   std::vector<double>lat, lon;
   std::vector<double>dns;
 
@@ -401,7 +404,7 @@ void rasterizePixel(Isis::Buffer &in) {
 
   // Get the IFOVs in lat/lon space
   PixelFOV fov;
-  QList< QList< QPointF > > fovVertices = fov.latLonVertices(*g_incam, l, s, g_numIFOVs);
+  QList< QList< QPointF > > fovVertices = fov.latLonVertices(naif, *g_incam, l, s, g_numIFOVs);
 
   // loop through each ifov list
   for (int ifov = 0; ifov < fovVertices.size(); ifov++) {
@@ -413,7 +416,7 @@ void rasterizePixel(Isis::Buffer &in) {
         lon.push_back(fovVertices[ifov][point].y());
       }
       // rasterize this ifov and clear vectors for next ifov
-      g_processGroundPolygons.Rasterize(lat, lon, dns);
+      g_processGroundPolygons.Rasterize(naif, lat, lon, dns);
       lat.clear();
       lon.clear();
     }

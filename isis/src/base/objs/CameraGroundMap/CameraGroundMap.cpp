@@ -103,7 +103,7 @@ namespace Isis {
       }
     }
     else {
-      Distance radius(p_camera->LocalRadius(lat, lon));
+      Distance radius(p_camera->LocalRadius(naif, lat, lon));
       if (radius.isValid()) {
         if (p_camera->Sensor::SetGround(naif, SurfacePoint(naif, lat, lon, radius))) {
           LookCtoFocalPlaneXY(naif);

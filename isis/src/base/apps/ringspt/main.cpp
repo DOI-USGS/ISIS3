@@ -16,6 +16,7 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   bool outsideAllowed = ui.GetBoolean("ALLOWOUTSIDE");
 
   // Set up CameraRingsPointInfo and set  file
@@ -33,26 +34,26 @@ void IsisMain() {
     if (ui.WasEntered("SAMPLE") && ui.WasEntered("LINE")) {
       sample = ui.GetDouble("SAMPLE");
       line = ui.GetDouble("LINE");
-      point = ringspt.SetImage(sample, line, outsideAllowed);
+      point = ringspt.SetImage(naif, sample, line, outsideAllowed);
     }
     else {
       if (ui.WasEntered("SAMPLE")) {
         sample = ui.GetDouble("SAMPLE");
-        point = ringspt.SetSample(sample, outsideAllowed);
+        point = ringspt.SetSample(naif, sample, outsideAllowed);
       }
       else if (ui.WasEntered("LINE")) {
         line = ui.GetDouble("LINE");
-        point = ringspt.SetLine(line, outsideAllowed);
+        point = ringspt.SetLine(naif, line, outsideAllowed);
       }
       else {
-        point = ringspt.SetCenter(outsideAllowed);
+        point = ringspt.SetCenter(naif, outsideAllowed);
       }
     }
   }
   else {
     double ringRadius = ui.GetDouble("RINGRADIUS");
     double ringLongitude = ui.GetDouble("RINGLONGITUDE");
-    point = ringspt.SetGround(ringRadius, ringLongitude, outsideAllowed);
+    point = ringspt.SetGround(naif, ringRadius, ringLongitude, outsideAllowed);
   }
 
   prog.CheckStatus();

@@ -15,6 +15,7 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   /*Processing steps
   1.  Open and read the jitter table, convert the pixel offsets to angles,
       and create the polynomials (solve for the coefficients) to use to do
@@ -71,21 +72,21 @@ void IsisMain() {
 
     // Create the master rotation to be corrected
     int frameCode = cam->instrumentRotation()->Frame();
-    cam->SetImage(int(cube.sampleCount() / 2), int(cube.lineCount() / 2));
-    double tol = cam->PixelResolution();
+    cam->SetImage(int(cube.sampleCount() / 2), int(cube.lineCount() / 2), naif);
+    double tol = cam->PixelResolution(naif);
 
     if(tol < 0.) {
       // Alternative calculation of .01*ground resolution of a pixel
-      tol = cam->PixelPitch() * cam->SpacecraftAltitude() * 1000. / cam->FocalLength() / 100.;
+      tol = cam->PixelPitch() * cam->SpacecraftAltitude(naif) * 1000. / cam->FocalLength() / 100.;
     }
 
     LineScanCameraRotation crot(frameCode, cube, cam->instrumentRotation()->GetFullCacheTime(), tol);
 
-    crot.SetPolynomialDegree(ui.GetInteger("DEGREE"));
+    crot.SetPolynomialDegree(naif, ui.GetInteger("DEGREE"));
     crot.SetAxes(1, 2, 3);
     if(ui.WasEntered("PITCHRATE")) crot.ResetPitchRate(ui.GetDouble("PITCHRATE"));
     if(ui.WasEntered("YAW")) crot.ResetYaw(ui.GetDouble("YAW"));
-    crot.SetPolynomial();
+    crot.SetPolynomial(naif);
     double baseTime = crot.GetBaseTime();
     double timeScale = crot.GetTimeScale();
     double fl = cam->FocalLength();
@@ -99,10 +100,10 @@ void IsisMain() {
 
     // Set the jitter and apply to the instrument rotation
     crot.SetJitter(&jitter);
-    crot.ReloadCache();
+    crot.ReloadCache(naif);
 
     // Pull out the pointing cache as a table and write it
-    Table cmatrix = crot.Cache("InstrumentPointing");
+    Table cmatrix = crot.Cache("InstrumentPointing", naif);
     //    cmatrix.Label().addComment("Corrected using appjit and" + ui.GetFileName("JITTERFILE"));
     cmatrix.Label() += PvlKeyword("Description", "Corrected using appjit and" + ui.GetFileName("JITTERFILE"));
     cmatrix.Label() += PvlKeyword("Kernels");

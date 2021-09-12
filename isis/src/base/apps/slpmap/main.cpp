@@ -48,6 +48,7 @@ void IsisMain() {
 
   // Get the output type either ASPECT, SLOPE, or SLOPEPERCENT
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   if (ui.GetString("OUTPUT") == "ASPECT") {
     g_outputType = Aspect;
   }
@@ -87,7 +88,7 @@ void IsisMain() {
     else {
       if (ui.GetString("PIXRES") == "FILE") {
         g_groundMap = new UniversalGroundMap(*icube);
-        g_resolution = g_groundMap->Resolution();
+        g_resolution = g_groundMap->Resolution(naif);
       }
       else {
         g_resolution = ui.GetDouble("RESOLUTION");
@@ -145,10 +146,12 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
+  auto naif = NaifContext::acquire();
+
   // Get the lat/lons of the four corners of the pixel
   if ( !g_upperLeft.Valid() ) {
-    if ( g_groundMap->SetImage(in.Sample(4) - 0.5, in.Line(4) - 0.5) ) {
-      g_upperLeft.SetSphericalCoordinates(
+    if ( g_groundMap->SetImage(in.Sample(4) - 0.5, in.Line(4) - 0.5, naif) ) {
+      g_upperLeft.SetSphericalCoordinates(naif,
                      Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
                      Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
                      Distance(in[4],Distance::Meters));
@@ -156,8 +159,8 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
   }
 
   if ( !g_lowerLeft.Valid() ) {
-    if ( g_groundMap->SetImage(in.Sample(4) - 0.5, in.Line(4) + 0.5) ) {
-      g_lowerLeft.SetSphericalCoordinates(
+    if ( g_groundMap->SetImage(in.Sample(4) - 0.5, in.Line(4) + 0.5, naif) ) {
+      g_lowerLeft.SetSphericalCoordinates(naif,
                      Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
                      Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
                      Distance(in[4],Distance::Meters));
@@ -165,16 +168,16 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
   }
 
   SurfacePoint upperRight;
-  if ( g_groundMap->SetImage(in.Sample(4) + 0.5, in.Line(4) - 0.5) ) {
-    upperRight.SetSphericalCoordinates(
+  if ( g_groundMap->SetImage(in.Sample(4) + 0.5, in.Line(4) - 0.5, naif) ) {
+    upperRight.SetSphericalCoordinates(naif,
                    Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
                    Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
                    Distance(in[4],Distance::Meters));
   }  
 
   SurfacePoint lowerRight;
-  if ( g_groundMap->SetImage(in.Sample(4) + 0.5, in.Line(4) + 0.5) ) {
-    lowerRight.SetSphericalCoordinates(
+  if ( g_groundMap->SetImage(in.Sample(4) + 0.5, in.Line(4) + 0.5, naif) ) {
+    lowerRight.SetSphericalCoordinates(naif,
                    Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
                    Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
                    Distance(in[4],Distance::Meters) );

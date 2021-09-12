@@ -231,7 +231,7 @@ namespace Isis {
    */
   bool LineScanCameraGroundMap::SetGround(NaifContextPtr naif, const Latitude &lat,
       const Longitude &lon) {
-    Distance radius(p_camera->LocalRadius(lat, lon));
+    Distance radius(p_camera->LocalRadius(naif, lat, lon));
 
     if (radius.isValid()) {
       return SetGround(naif, SurfacePoint(naif, lat, lon, radius));

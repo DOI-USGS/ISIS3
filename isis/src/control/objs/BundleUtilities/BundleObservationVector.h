@@ -81,8 +81,8 @@ namespace Isis {
 
       BundleObservationQsp observationByCubeSerialNumber(QString cubeSerialNumber);
 
-      bool initializeExteriorOrientation();
-      bool initializeBodyRotation();
+      bool initializeExteriorOrientation(NaifContextPtr naif);
+      bool initializeBodyRotation(NaifContextPtr naif);
 
   private:
       //! Map between observation number and pointer to observation.

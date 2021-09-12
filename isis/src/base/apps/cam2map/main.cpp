@@ -34,9 +34,10 @@ map <QString, void *> GuiHelpers() {
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   Pvl appLog;
   try {
-    cam2map(ui, &appLog);
+    cam2map(naif, ui, &appLog);
   }
   catch (...) {
     for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
@@ -94,6 +95,7 @@ void loadMapRes() {
 //Helper function to get camera resolution.
 void loadCameraRes() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   QString file = ui.GetFileName("FROM");
 
   // Open the input cube, get the camera object, and the cam map projection
@@ -101,7 +103,7 @@ void loadCameraRes() {
   c.open(file);
   Camera *cam = c.camera();
   Pvl camMap;
-  cam->BasicMapping(camMap);
+  cam->BasicMapping(camMap, naif);
   PvlGroup &camGrp = camMap.findGroup("Mapping");
 
   ui.Clear("RESOLUTION");
@@ -157,6 +159,7 @@ void loadMapRange() {
 //Helper function to load camera range.
 void loadCameraRange() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   QString file = ui.GetFileName("FROM");
 
   // Get the map projection file provided by the user
@@ -170,7 +173,7 @@ void loadCameraRange() {
 
   // Make the target info match the user mapfile
   double minlat, maxlat, minlon, maxlon;
-  cam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
+  cam->GroundRange(minlat, maxlat, minlon, maxlon, userMap, naif);
 
   // Set ground range parameters in UI
   ui.Clear("MINLAT");

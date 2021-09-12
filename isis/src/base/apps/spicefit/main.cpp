@@ -10,6 +10,7 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   try {
     // Open the cube
     Cube cube;
@@ -26,7 +27,7 @@ void IsisMain() {
       QString msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    cam->instrumentRotation()->SetPolynomial();
+    cam->instrumentRotation()->SetPolynomial(naif);
 
     // Get the instrument pointing keyword from the kernels group and update
     // its value to table.
@@ -47,7 +48,7 @@ void IsisMain() {
     cube.putGroup(kernels);
 
     // Pull out the pointing cache as a table and write it
-    Table cmatrix = cam->instrumentRotation()->Cache("InstrumentPointing");
+    Table cmatrix = cam->instrumentRotation()->Cache("InstrumentPointing", naif);
     cmatrix.Label().addComment("Smoothed using spicefit");
     cube.write(cmatrix);
     cube.close();

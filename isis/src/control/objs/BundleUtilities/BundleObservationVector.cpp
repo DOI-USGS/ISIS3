@@ -222,11 +222,11 @@ namespace Isis {
    *
    * @return @b bool Returns true upon successful initialization 
    */
-  bool BundleObservationVector::initializeExteriorOrientation() {
+  bool BundleObservationVector::initializeExteriorOrientation(NaifContextPtr naif) {
     int nObservations = size();
     for (int i = 0; i < nObservations; i++) {
       BundleObservationQsp observation = at(i);
-      observation->initializeExteriorOrientation();
+      observation->initializeExteriorOrientation(naif);
     }
 
     return true;
@@ -238,11 +238,11 @@ namespace Isis {
    *
    * @return @b bool Returns true upon successful initialization 
    */
-  bool BundleObservationVector::initializeBodyRotation() {
+  bool BundleObservationVector::initializeBodyRotation(NaifContextPtr naif) {
     int nObservations = size();
     for (int i = 0; i < nObservations; i++) {
       BundleObservationQsp observation = at(i);
-      observation->initializeBodyRotation();
+      observation->initializeBodyRotation(naif);
     }
 
     return true;

@@ -366,7 +366,7 @@ namespace Isis {
   }
 
 
-  void BandGeometry::generateGeometryKeys(PvlObject &pband) {
+  void BandGeometry::generateGeometryKeys(NaifContextPtr naif, PvlObject &pband) {
     if(size() <= 0) {
       QString mess = "No Band geometry available!";
       throw IException(IException::Programmer, mess, _FILEINFO_);

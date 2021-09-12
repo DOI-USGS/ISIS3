@@ -17,12 +17,13 @@ int frameletSize;
 int frameletTopTrimSize, frameletBottomTrimSize,
     frameletLeftTrimSize, frameletRightTrimSize;
 
-void CalculateBottomTrim(Cube *icube);
+void CalculateBottomTrim(NaifContextPtr naif, Cube *icube);
 
 void IsisMain() {
   // Grab the file to import
   ProcessByLine p;
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   Cube *icube = p.SetInputCube("FROM");
 
@@ -51,7 +52,7 @@ void IsisMain() {
     frameletBottomTrimSize = ui.GetInteger("BOTTOMTRIM");
   }
   else {
-    CalculateBottomTrim(icube);
+    CalculateBottomTrim(naif, icube);
   }
 
   p.StartProcess(TrimFramelets);
@@ -92,7 +93,7 @@ bool NeedsTrimmed(int line) {
  *
  * @param icube The input themis vis cube
  */
-void CalculateBottomTrim(Cube *icube) {
+void CalculateBottomTrim(NaifContextPtr naif, Cube *icube) {
   frameletBottomTrimSize = 0;
 
   if(icube->camera() == NULL) {
@@ -114,12 +115,12 @@ void CalculateBottomTrim(Cube *icube) {
   Camera *camOdd = CameraFactory::Create(*icube);
 
   // Framelet 2 is even, so let's use the even camera to find the lat,lon at it's beginning
-  if(camEven->SetImage(1, frameletSize + 1)) {
+  if(camEven->SetImage(1, frameletSize + 1, naif)) {
     double framelet2StartLat = camEven->UniversalLatitude();
     double framelet2StartLon = camEven->UniversalLongitude();
 
     // Let's figure out where this is in the nearest odd framelet (hopefully framelet 1)
-    if(camOdd->SetUniversalGround(framelet2StartLat, framelet2StartLon)) {
+    if(camOdd->SetUniversalGround(naif, framelet2StartLat, framelet2StartLon)) {
       // The equivalent line to the start of framelet 2 is this found line
       int equivalentLine = (int)(camOdd->Line() + 0.5);
 

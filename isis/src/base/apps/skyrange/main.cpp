@@ -9,6 +9,8 @@ using namespace std;
 using namespace Isis;
 
 void IsisMain() {
+  auto naif = NaifContext::acquire();
+  
   // Set the input image, get the camera model
   Process p;
   Cube *icube = p.SetInputCube("FROM");
@@ -16,16 +18,16 @@ void IsisMain() {
 
   // Get the ra/dec range and resolution
   double minRa, maxRa, minDec, maxDec;
-  cam->RaDecRange(minRa, maxRa, minDec, maxDec);
-  double res = cam->RaDecResolution();
+  cam->RaDecRange(naif, minRa, maxRa, minDec, maxDec);
+  double res = cam->RaDecResolution(naif);
 
   // Get the center ra/dec
-  cam->SetImage(icube->sampleCount() / 2.0, icube->lineCount() / 2.0);
-  double centerRa  = cam->RightAscension();
-  double centerDec = cam->Declination();
+  cam->SetImage(icube->sampleCount() / 2.0, icube->lineCount() / 2.0, naif);
+  double centerRa  = cam->RightAscension(naif);
+  double centerDec = cam->Declination(naif);
 
   // Compute the rotation
-  double rot = cam->CelestialNorthClockAngle();
+  double rot = cam->CelestialNorthClockAngle(naif);
 
   // Setup and log results
   PvlGroup results("Range");

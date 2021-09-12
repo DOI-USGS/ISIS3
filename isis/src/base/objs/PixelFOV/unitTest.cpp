@@ -47,6 +47,8 @@ using namespace Isis;
  */   
 int main(void) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   cout << "Unit Test for PixelFOV..." << endl;
   try {
@@ -70,11 +72,11 @@ int main(void) {
     double samp = cam->Samples() / 2;
     double line = cam->Lines() / 2;
 
-    if (!cam->SetImage(samp, line)) {
+    if (!cam->SetImage(samp, line, naif)) {
       cout << "ERROR" << endl;
       return 0;
     }
-    QList< QList<QPointF> > pifovVertices = pifov.latLonVertices(*cam, samp, line);
+    QList< QList<QPointF> > pifovVertices = pifov.latLonVertices(naif, *cam, samp, line);
     QList<QPointF> iFOVPointCloud = pifovVertices[0];
     int numVertices = iFOVPointCloud.size();
     if (numVertices != knownLat.size()) {

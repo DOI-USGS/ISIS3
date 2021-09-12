@@ -68,7 +68,7 @@ struct MosData {
 };
 
 // Computes the special MORPHOLOGYRANK and ALBEDORANK planes
-MosData *getMosaicIndicies(Camera &camera, MosData &md);
+MosData *getMosaicIndicies(NaifContextPtr naif, Camera &camera, MosData &md);
 // Updates BandBin keyword
 void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
                    const QString &default_value = "Null");
@@ -353,7 +353,7 @@ void phocubeDN(Buffer &in, Buffer &out) {
 //  knowledge of the buffers size is assumed below, so ensure the buffer
 //  is still of the expected size.
 void phocube(Buffer &out) {
-
+  auto naif = NaifContext::acquire();
 
   // If the DN option is selected, it is already added by the phocubeDN
   // function.  We must compute the offset to start at the second band.
@@ -374,17 +374,17 @@ void phocube(Buffer &out) {
         isGood = proj->SetWorld(samp, line);
       }
       else {
-        isGood = cam->SetImage(samp, line);
+        isGood = cam->SetImage(samp, line, naif);
       }
 
       if (isGood) {
 
         if (phase) {
-          out[index] = cam->PhaseAngle();
+          out[index] = cam->PhaseAngle(naif);
           index += 64 * 64;
         }
         if (emission) {
-          out[index] = cam->EmissionAngle();
+          out[index] = cam->EmissionAngle(naif);
           index += 64 * 64;
         }
         if (incidence) {
@@ -396,7 +396,7 @@ void phocube(Buffer &out) {
           Angle incidence;
           Angle emission;
           bool success;
-          cam->LocalPhotometricAngles(phase, incidence, emission, success);
+          cam->LocalPhotometricAngles(naif, phase, incidence, emission, success);
 
           if (localEmission) {
             out[index] = emission.degrees();
@@ -431,46 +431,46 @@ void phocube(Buffer &out) {
             out[index] = proj->Resolution();
           }
           else {
-            out[index] = cam->PixelResolution();
+            out[index] = cam->PixelResolution(naif);
           }
           index += 64 * 64;
         }
         if (lineResolution) {
-          out[index] = cam->LineResolution();
+          out[index] = cam->LineResolution(naif);
           index += 64 * 64;
         }
         if (sampleResolution) {
-          out[index] = cam->SampleResolution();
+          out[index] = cam->SampleResolution(naif);
           index += 64 * 64;
         }
         if (detectorResolution) {
-          out[index] = cam->DetectorResolution();
+          out[index] = cam->DetectorResolution(naif);
           index += 64 * 64;
         }
         if (obliqueDetectorResolution) {
-          out[index] = cam->ObliqueDetectorResolution();
+          out[index] = cam->ObliqueDetectorResolution(naif);
           index += 64 * 64;
         }
         if (northAzimuth) {
-          out[index] = cam->NorthAzimuth();
+          out[index] = cam->NorthAzimuth(naif);
           index += 64 * 64;
         }
         if (sunAzimuth) {
-          out[index] = cam->SunAzimuth();
+          out[index] = cam->SunAzimuth(naif);
           index += 64 * 64;
         }
         if (spacecraftAzimuth) {
-          out[index] = cam->SpacecraftAzimuth();
+          out[index] = cam->SpacecraftAzimuth(naif);
           index += 64 * 64;
         }
         if (offnadirAngle) {
-          out[index] = cam->OffNadirAngle();
+          out[index] = cam->OffNadirAngle(naif);
           index += 64 * 64;
         }
         if (subSpacecraftGroundAzimuth) {
           double ssplat, ssplon;
           ssplat = ssplon = 0.0;
-          cam->subSpacecraftPoint(ssplat, ssplon);
+          cam->subSpacecraftPoint(ssplat, ssplon, naif);
           out[index] = cam->GroundAzimuth(cam->UniversalLatitude(),
               cam->UniversalLongitude(), ssplat, ssplon);
           index += 64 * 64;
@@ -478,7 +478,7 @@ void phocube(Buffer &out) {
         if (subSolarGroundAzimuth) {
           double sslat, sslon;
           sslat = sslon = 0.0;
-          cam->subSolarPoint(sslat,sslon);
+          cam->subSolarPoint(sslat,sslon,naif);
           out[index] = cam->GroundAzimuth(cam->UniversalLatitude(),
               cam->UniversalLongitude(), sslat, sslon);
           index += 64 * 64;
@@ -487,7 +487,7 @@ void phocube(Buffer &out) {
         // Special Mosaic indexes
         if (morphologyRank) {
           if (!p_mosd) {
-            p_mosd = getMosaicIndicies(*cam, mosd);
+            p_mosd = getMosaicIndicies(naif, *cam, mosd);
           }
           out[index] = mosd.m_morph;
           index += 64 * 64;
@@ -495,19 +495,19 @@ void phocube(Buffer &out) {
 
         if (albedoRank) {
           if (!p_mosd) {
-            p_mosd = getMosaicIndicies(*cam, mosd);
+            p_mosd = getMosaicIndicies(naif, *cam, mosd);
           }
           out[index] = mosd.m_albedo;
           index += 64 * 64;
         }
 
         if (ra) {
-          out[index] = cam->RightAscension();
+          out[index] = cam->RightAscension(naif);
           index += 64 * 64;
         }
 
         if (declination) {
-          out[index] = cam->Declination();
+          out[index] = cam->Declination(naif);
           index += 64 * 64;
         }
 
@@ -534,10 +534,10 @@ void phocube(Buffer &out) {
       else {
         for (int b = (skipDN) ? 1 : 0; b < nbands; b++) {
           if(ra && b == raBandNum) {
-            out[index] = cam->RightAscension();
+            out[index] = cam->RightAscension(naif);
           }
           else if (declination && b == raBandNum + 1) {
-            out[index] = cam->Declination();
+            out[index] = cam->Declination(naif);
           }
           else {
             out[index] = Isis::NULL8;
@@ -563,18 +563,18 @@ template <typename T>
 
 
 // Computes the special MORPHOLOGYRANK and ALBEDORANK planes
-MosData *getMosaicIndicies(Camera &camera, MosData &md) {
+MosData *getMosaicIndicies(NaifContextPtr naif, Camera &camera, MosData &md) {
   const double Epsilon(1.0E-8);
   Angle myphase;
   Angle myincidence;
   Angle myemission;
   bool mysuccess;
-  camera.LocalPhotometricAngles(myphase, myincidence, myemission, mysuccess);
+  camera.LocalPhotometricAngles(naif, myphase, myincidence, myemission, mysuccess);
   if (!mysuccess) {
-    myemission.setDegrees(camera.EmissionAngle());
+    myemission.setDegrees(camera.EmissionAngle(naif));
     myincidence.setDegrees(camera.IncidenceAngle(naif));
   }
-  double res = camera.PixelResolution();
+  double res = camera.PixelResolution(naif);
   if (fabs(res) < Epsilon) res = Epsilon;
 
   md = MosData();  // Nullifies the data

@@ -42,6 +42,7 @@ void IsisMain() {
 
   // Open the user interface and get the input file and the ideal specs file
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   Cube *mcube, *icube;
 
   // If a MATCH cube is entered, make sure to SetInputCube it first to get the SPICE blobs
@@ -151,7 +152,7 @@ void IsisMain() {
   AlphaCube alpha(*icube);
   double sample = alpha.BetaSample(.5);
   double line = alpha.BetaLine(.5);
-  incam->SetImage(sample, line);
+  incam->SetImage(sample, line, naif);
   double et = incam->time().Et();
 
   // Get the output file name and set its attributes

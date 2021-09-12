@@ -17,6 +17,7 @@ void IsisMain() {
   // Get the list of names of input CCD cubes to stitch together
   FileList flist;
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   if (ui.WasEntered("FROM")) flist.push_back(FileName(ui.GetFileName("FROM")));
   if (ui.WasEntered("FROMLIST")) flist.read(FileName(ui.GetFileName("FROMLIST")));
   if (flist.size() < 1) {
@@ -33,7 +34,7 @@ void IsisMain() {
 
   for (int i = 0 ; i < flist.size() ; i++) {
     // Add and process each image
-    kernel.add(flist[i].toString());
+    kernel.add(naif, flist[i].toString());
     prog.CheckStatus();
   }
 
@@ -63,7 +64,7 @@ void IsisMain() {
   // Write the output file if requested
   if (ui.WasEntered("TO")) {
     int cktype = ui.GetInteger("CKTYPE");
-    kernel.write(ui.GetFileName("TO"), comfile, cktype);
+    kernel.write(naif, ui.GetFileName("TO"), comfile, cktype);
   }
 
   // Write a summary of the documentation

@@ -42,7 +42,7 @@ FileName FindShutterFile(Cube *icube);
 FileName ReadWeightTable(Cube *icube);
 FileName GetScaleFactorFile();
 int getGainModeID(Cube *icube);
-void calculateScaleFactor0(Cube *icube, Cube *gaincube);
+void calculateScaleFactor0(NaifContextPtr naif, Cube *icube, Cube *gaincube);
 
 void IsisMain() {
   // Initialize Globals
@@ -51,6 +51,7 @@ void IsisMain() {
   exposureDuration = 0.0;
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Set up our ProcessByLine
   ProcessByLine p;
@@ -82,7 +83,7 @@ void IsisMain() {
     }
   }
 
-  calculateScaleFactor0(icube, gaincube);
+  calculateScaleFactor0(naif, icube, gaincube);
 
   exposureDuration = toDouble(icube->group("Instrument")["ExposureDuration"][0]) * 1000;
 
@@ -389,7 +390,7 @@ int getGainModeID(Cube *icube) {
  *
  * if output units are in radiance.
  */
-void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
+void calculateScaleFactor0(NaifContextPtr naif, Cube *icube, Cube *gaincube) {
   Pvl conversionFactors(GetScaleFactorFile().expanded());
   PvlKeyword fltToRef, fltToRad;
 
@@ -442,14 +443,14 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     QString startTime = label->findGroup("Instrument",Pvl::Traverse)["SpacecraftClockStartCount"][0];
     Isis::FileName sclk(label->findGroup("Kernels",Pvl::Traverse)["SpacecraftClock"][0]);
     QString sclkName(sclk.expanded());
-    furnsh_c(sclkName.toLatin1().data());
+    naif->furnsh_c(sclkName.toLatin1().data());
     double obsStartTime;
-    scs2e_c(-77, startTime.toLatin1().data(), &obsStartTime);
-    spicegll.setTime(obsStartTime);
+    naif->scs2e_c(-77, startTime.toLatin1().data(), &obsStartTime);
+    spicegll.setTime(obsStartTime, naif);
     double sunv[3];
     spicegll.sunPosition(sunv);
 
-    double sunkm = vnorm_c(sunv);
+    double sunkm = naif->vnorm_c(sunv);
 
     //  Convert to AU units
     rsun = sunkm / 1.49597870691E8 / 5.2;

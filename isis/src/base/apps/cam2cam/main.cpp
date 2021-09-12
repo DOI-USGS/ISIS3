@@ -113,18 +113,20 @@ cam2cam::cam2cam(const int inputSamples, const int inputLines,
 // Transform method mapping output line/samps to lat/lons to input line/samps
 bool cam2cam::Xform(double &inSample, double &inLine,
                     const double outSample, const double outLine) {
+  auto naif = NaifContext::acquire();
+
   // See if the output image coordinate converts to lat/lon
-  if(!p_outcam->SetImage(outSample, outLine)) return false;
+  if(!p_outcam->SetImage(outSample, outLine, naif)) return false;
 
   // Get the universal lat/lon and see if it can be converted to input line/samp
   double lat = p_outcam->UniversalLatitude();
   double lon = p_outcam->UniversalLongitude();
   Distance rad = p_outcam->LocalRadius();
   if (rad.isValid()) {
-    if(!p_incam->SetUniversalGround(lat, lon, rad.meters())) return false;
+    if(!p_incam->SetUniversalGround(naif, lat, lon, rad.meters())) return false;
   }
   else {
-    if(!p_incam->SetUniversalGround(lat, lon)) return false;
+    if(!p_incam->SetUniversalGround(naif, lat, lon)) return false;
   }
 
   // Make sure the point is inside the input image
@@ -148,5 +150,5 @@ int cam2cam::OutputLines() const {
 }
 
 void BandChange(const int band) {
-  incam->SetBand(band);
+  incam->SetBand(band, NaifContext::acquire());
 }

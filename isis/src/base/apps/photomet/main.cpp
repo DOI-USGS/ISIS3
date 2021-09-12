@@ -617,6 +617,7 @@ void IsisMain() {
 
   // Set up the user interface
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // get QString of parameter changes to make
   QString changePar = (QString)ui.GetString("CHNGPAR");
@@ -1784,10 +1785,10 @@ void IsisMain() {
   // If the source of photometric angles is the center of the image,
   // then get the angles at the center of the image.
   if (angleSource == "CENTER_FROM_IMAGE") {
-    cam->SetImage(cam->Samples()/2, cam->Lines()/2);
-    centerPhase = cam->PhaseAngle();
+    cam->SetImage(cam->Samples()/2, cam->Lines()/2, naif);
+    centerPhase = cam->PhaseAngle(naif);
     centerIncidence = cam->IncidenceAngle(naif);
-    centerEmission = cam->EmissionAngle();
+    centerEmission = cam->EmissionAngle(naif);
   }
   else if (angleSource == "CENTER_FROM_LABEL") {
     centerPhase = inLabel.findKeyword("PhaseAngle", Pvl::Traverse);
@@ -1873,6 +1874,8 @@ void IsisMain() {
  */
 void photomet(Buffer &in, Buffer &out) {
 
+  auto naif = NaifContext::acquire();
+  
   double deminc=0., demema=0., mult=0., base=0.;
   double ellipsoidpha=0., ellipsoidinc=0., ellipsoidema=0.;
 
@@ -1886,7 +1889,7 @@ void photomet(Buffer &in, Buffer &out) {
     // if off the target, set to null
     else if((angleSource == "ELLIPSOID" || angleSource == "DEM" ||
             angleSource == "CENTER_FROM_IMAGE") &&
-            (!cam->SetImage(in.Sample(i), in.Line(i)))) {
+            (!cam->SetImage(in.Sample(i), in.Line(i), naif))) {
       out[i] = NULL8;
     }
 
@@ -1903,12 +1906,12 @@ void photomet(Buffer &in, Buffer &out) {
         demema = centerEmission;
       } else {
         // calculate photometric angles
-        ellipsoidpha = cam->PhaseAngle();
+        ellipsoidpha = cam->PhaseAngle(naif);
         ellipsoidinc = cam->IncidenceAngle(naif);
-        ellipsoidema = cam->EmissionAngle();
+        ellipsoidema = cam->EmissionAngle(naif);
         if (angleSource == "DEM") {
           Angle phase, incidence, emission;
-          cam->LocalPhotometricAngles(phase, incidence, emission, success);
+          cam->LocalPhotometricAngles(naif, phase, incidence, emission, success);
           if (success) {
             deminc = incidence.degrees();
             demema = emission.degrees();
@@ -1937,13 +1940,13 @@ void photomet(Buffer &in, Buffer &out) {
   //bool success = true;
   for (int i = 0; i < in.size(); i++) {
     // if off the target, set to null
-    if(!cam->SetImage(in.Sample(i), in.Line(i))) {
+    if(!cam->SetImage(in.Sample(i), in.Line(i), naif)) {
       out[i] = NULL8;
       //success = false;
     }
     else {
       trimInc = cam->IncidenceAngle(naif);
-      trimEma = cam->EmissionAngle();
+      trimEma = cam->EmissionAngle(naif);
     }
 
     if(trimInc > maxinc || trimEma > maxema) {
@@ -1967,6 +1970,8 @@ void photomet(Buffer &in, Buffer &out) {
  */
 void photometWithBackplane(std::vector<Isis::Buffer *> &in, std::vector<Isis::Buffer *> &out) {
 
+  auto naif = NaifContext::acquire();
+  
   Buffer &image = *in[0];
   int index = 1;
   Buffer &phasebp = *in[1];
@@ -1994,7 +1999,7 @@ void photometWithBackplane(std::vector<Isis::Buffer *> &in, std::vector<Isis::Bu
     // if off the target, set to null
     else if((angleSource == "ELLIPSOID" || angleSource == "DEM" ||
             angleSource == "CENTER_FROM_IMAGE") &&
-            (!cam->SetImage(image.Sample(i), image.Line(i)))) {
+            (!cam->SetImage(image.Sample(i), image.Line(i), naif))) {
       outimage[i] = NULL8;
     }
 

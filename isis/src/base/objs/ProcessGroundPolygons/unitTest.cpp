@@ -18,6 +18,8 @@ std::vector<double>lat, lon, values, vimsValues;
 
 void IsisMain() {
 
+  auto naif = NaifContext::acquire();
+  
   PvlGroup mapping("Mapping");
   {
     mapping += PvlKeyword("ProjectionName", "SimpleCylindrical");
@@ -113,7 +115,7 @@ void IsisMain() {
           //Now need to convert all samps and lines to lat lon.
           for(unsigned int j = 0; j < vimsSamps.size(); j++) {
 
-            if(groundMap->SetImage(vimsSamps[j], vimsLines[j])) {
+            if(groundMap->SetImage(vimsSamps[j], vimsLines[j], naif)) {
               latitude = groundMap->UniversalLatitude();
               longitude = groundMap->UniversalLongitude();
               lat.push_back(latitude);
@@ -123,7 +125,7 @@ void IsisMain() {
           }
 
           if(lat.size() > 3) {
-            p.Rasterize(lat, lon, b, vimsValues[i]);
+            p.Rasterize(naif, lat, lon, b, vimsValues[i]);
           }
 
           lat.clear();

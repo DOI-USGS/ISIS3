@@ -309,8 +309,6 @@ namespace Isis {
    * @param geom Pvl container for generated keyword/value data
    */
   void MdisGeometry::GeometryKeys(NaifContextPtr naif, Pvl &geom) {
-    auto naif = NaifContext::acquire();
-
     // Ensure there is a camera model instantiated!
     if (!_camera) {
       string mess = "No image (camera model) established for Geometry keys!";

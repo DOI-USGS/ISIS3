@@ -61,8 +61,9 @@ void IsisMain() {
 
   // Setup the input and make sure it is a moc file
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   Cube *icube = p.SetInputCube("FROM", OneBand);
-  gbl::moc = new MocLabels(ui.GetFileName("FROM"));
+  gbl::moc = new MocLabels(ui.GetFileName("FROM"), naif);
 
   // If it is already calibrated then complain
   if(icube->hasGroup("Radiometry")) {
@@ -132,19 +133,19 @@ void IsisMain() {
   // Get the distance between Mars and the Sun at the given time in
   // Astronomical Units (AU)
   QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
-  furnsh_c(bspKernel.toLatin1().data());
+  naif->furnsh_c(bspKernel.toLatin1().data());
   QString satKernel = p.MissionData("base", "/kernels/spk/mar???.bsp", true);
-  furnsh_c(satKernel.toLatin1().data());
+  naif->furnsh_c(satKernel.toLatin1().data());
   QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-  furnsh_c(pckKernel.toLatin1().data());
+  naif->furnsh_c(pckKernel.toLatin1().data());
   double sunpos[6], lt;
-  spkezr_c("sun", etStart, "iau_mars", "LT+S", "mars", sunpos, &lt);
-  double dist = vnorm_c(sunpos);
+  naif->spkezr_c("sun", etStart, "iau_mars", "LT+S", "mars", sunpos, &lt);
+  double dist = naif->vnorm_c(sunpos);
   double kmPerAU = 1.4959787066E8;
   double sunAU = dist / kmPerAU;
-  unload_c(bspKernel.toLatin1().data());
-  unload_c(satKernel.toLatin1().data());
-  unload_c(pckKernel.toLatin1().data());
+  naif->unload_c(bspKernel.toLatin1().data());
+  naif->unload_c(satKernel.toLatin1().data());
+  naif->unload_c(pckKernel.toLatin1().data());
 
   // See if the user wants counts/ms or i/f but if w0 is 0 then
   // we must go to counts/ms

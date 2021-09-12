@@ -54,6 +54,9 @@ int main() {
   try {
 
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
+
     QString inputFile = "$mgs/testData/ab102401.cub";
     Cube cube;
     cube.open(inputFile);
@@ -63,7 +66,7 @@ int main() {
           <<radii[1].kilometers() << "," << radii[2].kilometers() << "]" << endl;
     Pvl &pvl = *cube.label();
     Spice spi(cube);
-    Target targ(&spi, pvl);
+    Target targ(&spi, pvl, naif);
     targ.setRadii(radii);
     
     cout << "Begin testing Ellipsoid Shape Model class...." << endl;
@@ -84,12 +87,12 @@ int main() {
     lookB[0] = -1.;
     cout << endl << "  Testing method intersectSurface with failure..." << endl;
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
-    shape.intersectSurface(sB, lookB);
+    shape.intersectSurface(naif, sB, lookB);
     if (!shape.hasIntersection()) cout << "    Intersection failed " << endl;
     cout << endl << "  Testing method calculateLocalNormal with intersection failure..." << endl;
     try {
       QVector<double *> emptyVector;
-      shape.calculateLocalNormal(emptyVector);
+      shape.calculateLocalNormal(naif, emptyVector);
     }
     catch (IException &e) {
       e.print();
@@ -101,13 +104,13 @@ int main() {
     cout << "   Set a pixel in the image and check again." << endl;
     double line = 453.0;
     double sample = 534.0;
-    c->SetImage(sample, line);
-    c->instrumentPosition((double *) &sB[0]);
+    c->SetImage(sample, line, naif);
+    c->instrumentPosition((double *) &sB[0], naif);
     std::vector<double> uB(3);
     c->sunPosition((double *) &uB[0]);
     c->SpacecraftSurfaceVector((double *) &lookB[0]);
 
-    if (!shape.intersectSurface(sB, lookB)) {
+    if (!shape.intersectSurface(naif, sB, lookB)) {
         cout << "    ...  intersectSurface method failed" << endl;
         return -1;
     }
@@ -121,7 +124,7 @@ int main() {
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
 
     cout << endl << " Testing intersectSurface using lat/lon from parent class..." << endl; 
-    shape.intersectSurface(sp->GetLatitude(), sp->GetLongitude(), sB);
+    shape.intersectSurface(naif, sp->GetLatitude(), sp->GetLongitude(), sB);
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
 
     cout << endl << "  Testing class method calculateLocalNormal..." << endl;
@@ -130,7 +133,7 @@ int main() {
     for (int i = 0; i < notUsed.size(); i ++)
         notUsed[i] = new double[3];
 
-    shape.calculateLocalNormal(notUsed);
+    shape.calculateLocalNormal(naif, notUsed);
     vector<double> myNormal(3);
     myNormal = shape.normal();
 
@@ -140,7 +143,7 @@ int main() {
     cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
     cout << endl << "  Testing class method calculateSurfaceNormal..." << endl;
-    shape.calculateSurfaceNormal();
+    shape.calculateSurfaceNormal(naif);
     myNormal = shape.normal();
 
 
@@ -148,12 +151,12 @@ int main() {
     cout << "    surface normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
     cout << endl << "  Testing class method calculateDefaultNormal..." << endl;
-    shape.calculateDefaultNormal();
+    shape.calculateDefaultNormal(naif);
     myNormal = shape.normal();
     cout << "    default normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
     cout << endl << "  Testing localRadius method ..." << endl;
-    cout  << "    Local radius = " << shape.localRadius(Latitude(20.532461495381, Angle::Degrees),
+    cout  << "    Local radius = " << shape.localRadius(naif, Latitude(20.532461495381, Angle::Degrees),
                                                     Longitude(228.26609149754, Angle::Degrees)).kilometers() << endl;
 
 

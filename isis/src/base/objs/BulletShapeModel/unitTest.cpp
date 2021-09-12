@@ -38,15 +38,18 @@
 
 using namespace Isis;
 
-void outputModelStatus(BulletShapeModel &bulletModel);
-void testCameraToGround(std::vector<double> &observer,
+void outputModelStatus(NaifContextPtr naif, BulletShapeModel &bulletModel);
+void testCameraToGround(NaifContextPtr naif,
+                        std::vector<double> &observer,
                         std::vector<double> &lookDir,
                         BulletShapeModel &bulletModel);
-void testGroundToCamera(Latitude &lat,
+void testGroundToCamera(NaifContextPtr naif,
+                        Latitude &lat,
                         Longitude &lon,
                         std::vector<double> &observer,
                         BulletShapeModel &bulletModel);
-void testGroundPointToCamera(Latitude &lat,
+void testGroundPointToCamera(NaifContextPtr naif,
+                             Latitude &lat,
                              Longitude &lon,
                              std::vector<double> &observer,
                              BulletShapeModel &bulletModel);
@@ -64,6 +67,8 @@ void testGroundPointToCamera(Latitude &lat,
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
 
     QString itokawaCubeFile("$hayabusa/testData/st_2391934788_v.cub");
     QString itokawaDskFile("$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
@@ -80,7 +85,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     qDebug() << "";
     BulletShapeModel defaultModel;
-    outputModelStatus(defaultModel);
+    outputModelStatus(naif, defaultModel);
     qDebug() << "";
 
     qDebug() << "----====       Construct shape model from cube       ====----";
@@ -92,7 +97,7 @@ int main(int argc, char *argv[]) {
     itokawaCubeLabel.findGroup("Kernels").findKeyword("ShapeModel").setValue(itokawaDskFile);
     BulletShapeModel itokawaModel( itokawaTarget, itokawaLabel );
     itokawaModel.setTolerance(0.001);
-    outputModelStatus(itokawaModel);
+    outputModelStatus(naif, itokawaModel);
     qDebug() << "";
 
     qDebug() << "----====     Test camera to ground intersections     ====----";
@@ -103,77 +108,78 @@ int main(int argc, char *argv[]) {
 
     observer[0] = 20; observer[1] = 0; observer[2] = 0;
     lookDir[0] = -1; lookDir[1] = 0; lookDir[2] = 0;
-    testCameraToGround(observer, lookDir, itokawaModel);
+    testCameraToGround(naif, observer, lookDir, itokawaModel);
     qDebug() << "";
 
     observer[0] = 0; observer[1] = 20; observer[2] = 0;
     lookDir[0] = 0; lookDir[1] = -1; lookDir[2] = 0;
-    testCameraToGround(observer, lookDir, itokawaModel);
+    testCameraToGround(naif, observer, lookDir, itokawaModel);
     qDebug() << "";
 
     observer[0] = 0; observer[1] = 0; observer[2] = 20;
     lookDir[0] = 0; lookDir[1] = 0; lookDir[2] = -1;
-    testCameraToGround(observer, lookDir, itokawaModel);
+    testCameraToGround(naif, observer, lookDir, itokawaModel);
     qDebug() << "";
 
     observer[0] = 0.1; observer[1] = .03; observer[2] = 10;
     lookDir[0] = 0; lookDir[1] = 0; lookDir[2] = -1;
-    testCameraToGround(observer, lookDir, itokawaModel);
+    testCameraToGround(naif, observer, lookDir, itokawaModel);
     qDebug() << "";
 
     observer[0] = -5; observer[1] = -4; observer[2] = -2;
     lookDir[0] = 0.25; lookDir[1] = 0.2; lookDir[2] = 0.1;
-    testCameraToGround(observer, lookDir, itokawaModel);
+    testCameraToGround(naif, observer, lookDir, itokawaModel);
     qDebug() << "";
 
     observer[0] = -5; observer[1] = 5; observer[2] = 4;
     lookDir[0] = 1; lookDir[1] = -2; lookDir[2] = 1;
-    testCameraToGround(observer, lookDir, itokawaModel);
+    testCameraToGround(naif, observer, lookDir, itokawaModel);
     qDebug() << "";
 
     qDebug() << "----====     Test ground to camera intersections     ====----";
     qDebug() << "";
     qDebug() << "";
     itokawaCamera->SetImage( itokawaCube.sampleCount() / 2,
-                             itokawaCube.lineCount()   / 2 );
-    itokawaCamera->instrumentPosition(&observer[0]);
+                             itokawaCube.lineCount()   / 2,
+                             naif );
+    itokawaCamera->instrumentPosition(&observer[0], naif);
     Latitude testLat(0, Angle::Degrees);
     Longitude testLon(0, Angle::Degrees);
     qDebug() << "";
 
     testLat.setDegrees(-14.5);
     testLon.setDegrees(338);
-    testGroundToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
 
     testLat.setDegrees(41.6);
     testLon.setDegrees(328);
-    testGroundToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
 
     testLat.setDegrees(-4.67);
     testLon.setDegrees(207.6);
-    testGroundToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
 
     testLat.setDegrees(-3.33);
     testLon.setDegrees(165.2);
-    testGroundToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
 
     testLat.setDegrees(-18.6357);
     testLon.setDegrees(292);
-    testGroundToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
 
     testLat.setDegrees(0.0);
     testLon.setDegrees(350);
-    testGroundToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
 
     testLat.setDegrees(25);
     testLon.setDegrees(200);
-    testGroundToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
 
     qDebug() << "----====  Test ground point to camera intersections  ====----";
@@ -182,35 +188,35 @@ int main(int argc, char *argv[]) {
 
     testLat.setDegrees(-14);
     testLon.setDegrees(194);
-    testGroundPointToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundPointToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
 
     testLat.setDegrees(42.782);
     testLon.setDegrees(328.573);
-    testGroundPointToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundPointToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
 
 
     testLat.setDegrees(-26.1383);
     testLon.setDegrees(356.964);
-    testGroundPointToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundPointToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
 
 
     testLat.setDegrees(12.8509);
     testLon.setDegrees(291.106);
-    testGroundPointToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundPointToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
 
 
     testLat.setDegrees(-18.6357);
     testLon.setDegrees(60);
-    testGroundPointToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundPointToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
 
     testLat.setDegrees(25);
     testLon.setDegrees(200);
-    testGroundPointToCamera(testLat, testLon, observer, itokawaModel);
+    testGroundPointToCamera(naif, testLat, testLon, observer, itokawaModel);
     qDebug() << "";
   }
   catch (IException &e) {
@@ -222,7 +228,7 @@ int main(int argc, char *argv[]) {
 
 }
 
-void outputModelStatus(BulletShapeModel &bulletModel) {
+void outputModelStatus(NaifContextPtr naif, BulletShapeModel &bulletModel) {
   qDebug() << "Bullet shape model status:";
   qDebug() << "  Name: " << bulletModel.name();
   qDebug() << "  Tolerance: " << bulletModel.getTolerance();
@@ -244,7 +250,7 @@ void outputModelStatus(BulletShapeModel &bulletModel) {
              << normal[1] << ", "
              << normal[2] << ")";
     if ( bulletModel.hasIntersection() ) {
-      bulletModel.calculateDefaultNormal();
+      bulletModel.calculateDefaultNormal(naif);
       normal = bulletModel.normal();
       qDebug() << "  Ellipsoid Normal: ("
                << normal[0] << ", "
@@ -261,7 +267,8 @@ void outputModelStatus(BulletShapeModel &bulletModel) {
   qDebug() << "";
 }
 
-void testCameraToGround(std::vector<double> &observer,
+void testCameraToGround(NaifContextPtr naif,
+                        std::vector<double> &observer,
                         std::vector<double> &lookDir,
                         BulletShapeModel &bulletModel) {
   qDebug() << "Observer position: ("
@@ -273,12 +280,13 @@ void testCameraToGround(std::vector<double> &observer,
            << lookDir[1] << ", "
            << lookDir[2] << ")";
   qDebug() << "";
-  qDebug() << "Intersected: " << bulletModel.intersectSurface(observer, lookDir);
+  qDebug() << "Intersected: " << bulletModel.intersectSurface(naif, observer, lookDir);
   qDebug() << "";
-  outputModelStatus(bulletModel);
+  outputModelStatus(naif, bulletModel);
 }
 
-void testGroundToCamera(Latitude &lat,
+void testGroundToCamera(NaifContextPtr naif,
+                        Latitude &lat,
                         Longitude &lon,
                         std::vector<double> &observer,
                         BulletShapeModel &bulletModel) {
@@ -289,18 +297,19 @@ void testGroundToCamera(Latitude &lat,
   qDebug() << "";
   qDebug() << "Intersected with occlusion test: " << bulletModel.intersectSurface(lat, lon, observer, true);
   qDebug() << "";
-  outputModelStatus(bulletModel);
+  outputModelStatus(naif, bulletModel);
 }
 
-void testGroundPointToCamera(Latitude &lat,
+void testGroundPointToCamera(NaifContextPtr naif,
+                             Latitude &lat,
                              Longitude &lon,
                              std::vector<double> &observer,
                              BulletShapeModel &bulletModel) {
   qDebug() << "Latitude:     " << lat.degrees();
   qDebug() << "Longitude:    " << lon.degrees();
-  Distance pointRadius = bulletModel.localRadius(lat, lon);
+  Distance pointRadius = bulletModel.localRadius(naif, lat, lon);
   qDebug() << "Local Radius: " << pointRadius.kilometers();
-  SurfacePoint groundPoint(lat ,lon, pointRadius);
+  SurfacePoint groundPoint(naif, lat ,lon, pointRadius);
   qDebug() << "Ground Point: ("
            << groundPoint.GetX().kilometers() << ", "
            << groundPoint.GetY().kilometers() << ", "
@@ -310,5 +319,5 @@ void testGroundPointToCamera(Latitude &lat,
   qDebug() << "";
   qDebug() << "Intersected with occlusion test: " << bulletModel.intersectSurface(groundPoint, observer, true);
   qDebug() << "";
-  outputModelStatus(bulletModel);
+  outputModelStatus(naif, bulletModel);
 }
