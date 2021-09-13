@@ -56,8 +56,16 @@ namespace Isis {
       Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
 
       QString transRawFile = "TgoCassisInstrument.trn";
-      QString transExportFile = "TgoCassisExportedInstrument.trn";
-
+      QFile xmlFile(xmlFileName.expanded());
+      QDomDocument xmlDoc;
+      xmlDoc.setContent(&xmlFile, true);
+      // If any instances of "Optical_Filter" exist, use PSA .trn file
+      QString transExportFile;
+      if (xmlDoc.elementsByTagName("Optical_Filter").size()){
+        transExportFile = "TgoCassisExportedInstrument_PSA.trn";
+      } else {
+        transExportFile = "TgoCassisExportedInstrument.trn";
+      }
       // first assume lev1b image
       Pvl *outputLabel = outputCube->label();
       QString target = "";
@@ -86,17 +94,17 @@ namespace Isis {
       if (!outputCube->group("Archive").hasKeyword("ObservationId")){
         convertUniqueIdToObservationId(*outputLabel);
       }
-    
+
       FileName outputCubeFileName(ui.GetFileName("TO"));
-    
+
       OriginalXmlLabel xmlLabel;
       xmlLabel.readFromXmlFile(xmlFileName);
-    
+
       importer.StartProcess();
-    
+
       // Write out original label before closing the cube
       outputCube->write(xmlLabel);
-    
+
       importer.EndProcess();
     }
     catch (IException &e) {
@@ -189,8 +197,16 @@ namespace Isis {
     //Translate the Mapping Group
     try {
       QString missionDir = "$ISISROOT/appdata/translations/";
-      FileName mapTransFile(missionDir + "TgoCassisMapping.trn");
-
+      QDomDocument xmlDoc;
+      QFile xmlFile(xmlFileName.expanded());
+      xmlDoc.setContent(&xmlFile, true);
+      // If any instances of "Observing_System_Component" exist, use PSA .trn file
+      FileName mapTransFile;
+      if (xmlDoc.elementsByTagName("cart:a_axis_radius").size()){
+        mapTransFile = FileName(missionDir + "TgoCassisMapping_PSA.trn");
+      } else {
+        mapTransFile = FileName(missionDir + "TgoCassisMapping.trn");
+      }
       // Get the translation manager ready for translating the mapping label
 
       XmlToPvlTranslationManager labelXMappinglater(xmlFileName, mapTransFile.expanded());
@@ -309,8 +325,9 @@ namespace Isis {
     PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
 
     // Add units of measurement to keywords from translation table
-    inst.findKeyword("ExposureDuration").setUnits("seconds");
-
+    if (inst.hasKeyword("ExposureDuration")){
+      inst.findKeyword("ExposureDuration").setUnits("seconds");
+    }
     // Translate BandBin group
     FileName bandBinTransFile(missionDir + "TgoCassisBandBin.trn");
     XmlToPvlTranslationManager bandBinXlater(inputLabel, bandBinTransFile.expanded());
@@ -514,5 +531,3 @@ namespace Isis {
 
   }
 }
-
-

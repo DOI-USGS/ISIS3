@@ -17,10 +17,10 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/tgocassis2isis.xml").expand
 TEST(TgoCassis2Isis, TgoCassis2IsisTestBlu) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/blu_out.cub";
-  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-BLU-03005-B1.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-BLU-03005-B1.xml",
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
-  
+
   try {
     tgocassis2isis(options);
   }
@@ -45,12 +45,12 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestBlu) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.440e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "BLU");
-  
+
   // Archive Group
   PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(archive["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(archive["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");  
+  EXPECT_EQ(archive["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");
   EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(archive["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(archive["PredictMaximumExposureTime"]), 1.5952);
@@ -67,12 +67,12 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestBlu) {
   EXPECT_EQ(int(archive["ImageFrequency"]), 400000);
   EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
   EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");  
+  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
   EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 1.440e-003);
   EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(archive["WindowCount"]), 3);
   EXPECT_EQ(int(archive["Window1Binning"]), 0);
-  EXPECT_EQ(int(archive["Window1StartSample"]), 0);    
+  EXPECT_EQ(int(archive["Window1StartSample"]), 0);
   EXPECT_EQ(int(archive["Window1EndSample"]), 2047);
   EXPECT_EQ(int(archive["Window1StartLine"]), 354);
   EXPECT_EQ(int(archive["Window1EndLine"]), 632);
@@ -85,7 +85,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestBlu) {
   EXPECT_EQ(int(archive["Window3StartSample"]), 0);
   EXPECT_EQ(int(archive["Window3EndSample"]), 2047);
   EXPECT_EQ(int(archive["Window3StartLine"]), 1048);
-  EXPECT_EQ(int(archive["Window3EndLine"]), 1302);  
+  EXPECT_EQ(int(archive["Window3EndLine"]), 1302);
   EXPECT_EQ(int(archive["Window4Binning"]), 0);
   EXPECT_EQ(int(archive["Window4StartSample"]), 1024);
   EXPECT_EQ(int(archive["Window4EndSample"]), 1087);
@@ -126,10 +126,10 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestBlu) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestRed) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/red_out.cub";
-  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-RED-01005-B1.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-RED-01005-B1.xml",
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
-  
+
   try {
     tgocassis2isis(options);
   }
@@ -154,7 +154,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestRed) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.440e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "RED");
-  
+
   // Archive Group
   PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
@@ -173,7 +173,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestRed) {
   EXPECT_EQ(int(archive["ImageFrequency"]), 400000);
   EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
   EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");  
+  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
   EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 1.440e-003);
   EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 0.16);
   EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_201_0");
@@ -200,10 +200,10 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestRed) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestNir) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/nir_out.cub";
-  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-NIR-02005-B1.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-NIR-02005-B1.xml",
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
-  
+
   try {
     tgocassis2isis(options);
   }
@@ -228,7 +228,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestNir) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.440e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "NIR");
-  
+
   // Archive Group
   PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
@@ -247,7 +247,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestNir) {
   EXPECT_EQ(int(archive["ImageFrequency"]), 400000);
   EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
   EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");  
+  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
   EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 1.440e-003);
   EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_201_0");
@@ -274,10 +274,10 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestNir) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestPan) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/pan_out.cub";
-  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-PAN-00005-B1.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-PAN-00005-B1.xml",
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
-  
+
   try {
     tgocassis2isis(options);
   }
@@ -302,7 +302,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestPan) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.440e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "PAN");
-  
+
   // Archive Group
   PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
@@ -321,7 +321,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestPan) {
   EXPECT_EQ(int(archive["ImageFrequency"]), 400000);
   EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
   EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");  
+  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
   EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 1.440e-003);
   EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 29.17);
   EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_201_0");
@@ -348,10 +348,10 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestPan) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestInstrumentError) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/error.cub";
-  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-26T22.35.51.907-RED-01033-B1-InstrumentError.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-26T22.35.51.907-RED-01033-B1-InstrumentError.xml",
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
-  
+
   try {
     tgocassis2isis(options);
     FAIL() << "Should throw an exception" << std::endl;
@@ -364,10 +364,10 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestInstrumentError) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestSpacecraftError) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/error.cub";
-  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-26T22.35.51.907-RED-01033-B1-SpacecraftError.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-26T22.35.51.907-RED-01033-B1-SpacecraftError.xml",
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
-  
+
   try {
     tgocassis2isis(options);
     FAIL() << "Should throw an exception" << std::endl;
@@ -380,10 +380,10 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestSpacecraftError) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestFilterError) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/error.cub";
-  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-20T15.30.00.349-DMP-00000-00.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-20T15.30.00.349-DMP-00000-00.xml",
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
-  
+
   try {
     tgocassis2isis(options);
     FAIL() << "Should throw an exception" << std::endl;
@@ -396,10 +396,10 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestFilterError) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestReingestedUnproj) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/reingested_unproj.cub";
-  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-26T22.50.30.181-RED-01012-B1_rdrgen.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-26T22.50.30.181-RED-01012-B1_rdrgen.xml",
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
-  
+
   try {
     tgocassis2isis(options);
   }
@@ -423,7 +423,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestReingestedUnproj) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.488e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "RED");
-  
+
   // Archive Group
   PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(archive["ObservationId"][0].toStdString(), "MY34_002002_211_2");
@@ -453,10 +453,10 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestReingestedUnproj) {
 TEST(TgoCassis2Isis, TgoCassis2IsisTestReingestedProj) {
   QTemporaryDir prefix;
   QString cubeFileName = prefix.path() + "/reingested_unproj.cub";
-  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-26T22.50.30.181-RED-01012-B1_proj_rdrgen.xml", 
+  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/CAS-MCO-2016-11-26T22.50.30.181-RED-01012-B1_proj_rdrgen.xml",
                            "to=" + cubeFileName };
   UserInterface options(APP_XML, args);
-  
+
   try {
     tgocassis2isis(options);
   }
@@ -480,7 +480,7 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestReingestedProj) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.488e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "RED");
-  
+
   // Archive Group
   PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(archive["ObservationId"][0].toStdString(), "MY34_002002_211_2");
@@ -505,4 +505,62 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestReingestedProj) {
   EXPECT_DOUBLE_EQ(hist->Sum(), 26.235685080289841);
   EXPECT_EQ(hist->ValidPixels(), 226);
   EXPECT_NEAR(hist->StandardDeviation(), 0.0031668801306310155, 0.0001);
+}
+
+
+TEST(TgoCassis2Isis, TgoCassis2IsisTestPSALabel) {
+  QTemporaryDir prefix;
+  QString cubeFileName = prefix.path() + "/psa.cub";
+  QVector<QString> args = {"from=data/tgoCassis/tgocassis2isis/MY36_015782_024_0_PAN_cropped.xml",
+                           "to=" + cubeFileName };
+  UserInterface options(APP_XML, args);
+
+  try {
+    tgocassis2isis(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to ingest image: " << e.toString().toStdString().c_str() << std::endl;
+  }
+  Cube cube(cubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  // Dimensions Group
+  EXPECT_EQ(cube.sampleCount(), 500);
+  EXPECT_EQ(cube.lineCount(), 3);
+  EXPECT_EQ(cube.bandCount(), 1);
+
+  // Instrument Group
+  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
+  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
+  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "CaSSIS");
+  EXPECT_EQ(inst["TargetName"][0].toStdString(), "Mars" );
+  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2021-06-07T00:31:03.723");
+  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.018e-003");
+  EXPECT_EQ(int(inst["SummingMode"]), 0);
+  EXPECT_EQ(inst["Filter"][0].toStdString(), "PAN");
+
+  // Archive Group
+  PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
+  EXPECT_EQ(archive["ObservationId"][0].toStdString(), "MY36_015782_024_0");
+  EXPECT_EQ(archive["ProductVersionId"][0].toStdString(), "1.0");
+  EXPECT_EQ(archive["ScalingFactor"][0].toStdString(), "1.0");
+  EXPECT_EQ(archive["YearDoy"][0].toStdString(), "2021158");
+
+  // BandBin Group
+  PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "PAN");
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 675);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 250);
+  EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143421");
+
+  // Kernels Group
+  PvlGroup &kernels = isisLabel->findGroup("Kernels", Pvl::Traverse);
+  EXPECT_EQ(int(kernels["NaifFrameCode"]), -143400);
+
+  Histogram *hist = cube.histogram();
+
+  EXPECT_NEAR(hist->Average(), 0.2833722, 0.0000001);
+  EXPECT_DOUBLE_EQ(hist->Sum(), 326.72824501991272);
+  EXPECT_EQ(hist->ValidPixels(), 1153);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.001798, 0.000001);
 }
