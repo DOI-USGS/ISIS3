@@ -940,11 +940,13 @@ namespace Isis {
     //  TODO:  If groundSource file opened does not match the SurfacePoint Source
     //  file, print warning.
 
+    auto naif = NaifContext::acquire();
+
     //  This method only called if ground measure is on the right.  Use ground measure to update
     //  apriori surface point.
     ControlMeasure *groundMeasure = m_rightMeasure;
     if (!m_groundGmap->SetImage(groundMeasure->GetSample(),
-                                groundMeasure->GetLine())) {
+                                groundMeasure->GetLine(), naif)) {
       // TODO :  should never happen, either add error check or
        //      get rid of
     }
@@ -960,12 +962,12 @@ namespace Isis {
     //        If image has shape model, radius will come from shape model
     //
     if (m_demOpen) {
-      radius = demRadius(lat,lon);
+      radius = demRadius(naif,lat,lon);
       if (radius == Null) {
         QString msg = "Could not read radius from DEM, will default to "
           "local radius of reference measure.";
         QMessageBox::warning(m_qnetTool, "Warning", msg);
-        if (m_editPoint->GetRefMeasure()->Camera()->SetGround(
+        if (m_editPoint->GetRefMeasure()->Camera()->SetGround(naif,
             Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
           radius =
             m_editPoint->GetRefMeasure()->Camera()->LocalRadius().meters();
@@ -986,7 +988,7 @@ namespace Isis {
     }
     else {
       //  Get radius from reference image
-      if (m_editPoint->GetRefMeasure()->Camera()->SetGround(
+      if (m_editPoint->GetRefMeasure()->Camera()->SetGround(naif,
             Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
         radius =
             m_editPoint->GetRefMeasure()->Camera()->LocalRadius().meters();
@@ -1013,14 +1015,15 @@ namespace Isis {
         Distance latSigma = aprioriPt.GetLatSigmaDistance();
         Distance lonSigma = aprioriPt.GetLonSigmaDistance();
         Distance radiusSigma = aprioriPt.GetLocalRadiusSigma();
-        aprioriPt.SetSphericalCoordinates(Latitude(lat, Angle::Degrees),
+        aprioriPt.SetSphericalCoordinates(naif,
+                                          Latitude(lat, Angle::Degrees),
                                           Longitude(lon, Angle::Degrees),
                                           Distance(radius, Distance::Meters));
-        aprioriPt.SetSphericalSigmasDistance(latSigma, lonSigma, radiusSigma);
+        aprioriPt.SetSphericalSigmasDistance(naif, latSigma, lonSigma, radiusSigma);
         m_editPoint->SetAprioriSurfacePoint(aprioriPt);
       }
       else {
-        m_editPoint->SetAprioriSurfacePoint(SurfacePoint(
+        m_editPoint->SetAprioriSurfacePoint(SurfacePoint(naif,
                                         Latitude(lat, Angle::Degrees),
                                         Longitude(lon, Angle::Degrees),
                                         Distance(radius, Distance::Meters)));
@@ -1520,6 +1523,8 @@ namespace Isis {
     MdiCubeViewport *cvp = cubeViewport();
     if (cvp  == NULL) return;
 
+    auto naif = NaifContext::acquire();
+    
     QString file = cvp->cube()->fileName();
     QString sn;
     try {
@@ -1606,7 +1611,7 @@ namespace Isis {
     else if (s == Qt::RightButton) {
       m_leftFile = file;
       UniversalGroundMap *gmap = cvp->universalGroundMap();
-      if (!gmap->SetImage(samp,line)) {
+      if (!gmap->SetImage(samp,line,naif)) {
         QString message = "Invalid latitude or longitude at this point. ";
         QMessageBox::critical(m_qnetTool,"Error", message);
         return;
@@ -1614,10 +1619,10 @@ namespace Isis {
       double lat = gmap->UniversalLatitude();
       double lon = gmap->UniversalLongitude();
       if (m_groundOpen && file == m_groundCube->fileName()) {
-        createFixedPoint (lat,lon);
+        createFixedPoint(naif,lat,lon);
       }
       else {
-        createPoint(lat,lon);
+        createPoint(naif,lat,lon);
       }
     }
   }
@@ -1668,7 +1673,7 @@ namespace Isis {
    *   @history 2012-05-08 Tracie Sucharski - m_leftFile changed from std::string to QString.
    *
    */
-  void QnetTool::createPoint(double lat,double lon) {
+  void QnetTool::createPoint(NaifContextPtr naif, double lat,double lon) {
 
     //  TODO:   ADD AUTOSEED OPTION (CHECKBOX?)
 
@@ -1680,7 +1685,7 @@ namespace Isis {
     for(int i = 0; i < m_serialNumberList->size(); i++) {
       if (m_serialNumberList->serialNumber(i) == m_groundSN) continue;
       cam = m_controlNet->Camera(i);
-      if(cam->SetUniversalGround(lat, lon)) {
+      if(cam->SetUniversalGround(naif, lat, lon)) {
         //  Make sure point is within image boundary
         double samp = cam->Sample();
         double line = cam->Line();
@@ -1708,7 +1713,7 @@ namespace Isis {
         pointFiles.clear();
         delete newPoint;
         newPoint = NULL;
-        createPoint(lat, lon);
+        createPoint(naif, lat, lon);
         return;
       }
 
@@ -1725,7 +1730,7 @@ namespace Isis {
         int camIndex =
               m_serialNumberList->fileNameIndex(selectedFile);
         cam = m_controlNet->Camera(camIndex);
-        cam->SetUniversalGround(lat,lon);
+        cam->SetUniversalGround(naif,lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
         m->SetAprioriSample(cam->Sample());
         m->SetAprioriLine(cam->Line());
@@ -1783,7 +1788,7 @@ namespace Isis {
    * @internal
    *
    */
-  void QnetTool::createFixedPoint(double lat,double lon) {
+  void QnetTool::createFixedPoint(NaifContextPtr naif,double lat,double lon) {
 
     //  TODO:   ADD AUTOSEED OPTION (CHECKBOX?)
 
@@ -1795,7 +1800,7 @@ namespace Isis {
     for (int i=0; i<m_serialNumberList->size(); i++) {
       if (m_serialNumberList->serialNumber(i) == m_groundSN) continue;
       cam = m_controlNet->Camera(i);
-      if (cam->SetUniversalGround(lat,lon)) {
+      if (cam->SetUniversalGround(naif,lat,lon)) {
         //  Make sure point is within image boundary
         double samp = cam->Sample();
         double line = cam->Line();
@@ -1834,7 +1839,7 @@ namespace Isis {
         pointFiles.clear();
         delete fixedPoint;
         fixedPoint = NULL;
-        createFixedPoint(lat,lon);
+        createFixedPoint(naif,lat,lon);
         return;
       }
 
@@ -1855,7 +1860,7 @@ namespace Isis {
         int camIndex =
                  m_serialNumberList->fileNameIndex(selectedFile);
         cam = m_controlNet->Camera(camIndex);
-        cam->SetUniversalGround(lat,lon);
+        cam->SetUniversalGround(naif,lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
         m->SetType(ControlMeasure::Manual);
         m->SetChooserName(Application::UserName());
@@ -1866,14 +1871,14 @@ namespace Isis {
       //  ??????       What radius , check for dem or shape model
       double radius = 0;
       if (m_demOpen) {
-        radius = demRadius(lat,lon);
+        radius = demRadius(naif,lat,lon);
         if (radius == Null) {
           QString msg = "Could not read radius from DEM, will default to the "
             "local radius of the first measure in the control point.  This "
             "will be updated to the local radius of the chosen reference "
             "measure.";
           QMessageBox::warning(m_qnetTool, "Warning", msg);
-          if ((*fixedPoint)[0]->Camera()->SetGround(
+          if ((*fixedPoint)[0]->Camera()->SetGround(naif,
                Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
             radius = (*fixedPoint)[0]->Camera()->LocalRadius().meters();
           }
@@ -1891,7 +1896,7 @@ namespace Isis {
         }
       }
       else {
-        if ((*fixedPoint)[0]->Camera()->SetGround(
+        if ((*fixedPoint)[0]->Camera()->SetGround(naif,
              Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
           radius = (*fixedPoint)[0]->Camera()->LocalRadius().meters();
         }
@@ -1908,7 +1913,7 @@ namespace Isis {
         }
       }
 
-      fixedPoint->SetAprioriSurfacePoint(SurfacePoint(
+      fixedPoint->SetAprioriSurfacePoint(SurfacePoint(naif,
                                           Latitude(lat, Angle::Degrees),
                                           Longitude(lon, Angle::Degrees),
                                           Distance(radius, Distance::Meters)));
@@ -2159,6 +2164,7 @@ namespace Isis {
    *                           loadPoint() to encapsulate duplicated code in loadGroundMeasure().
    */
   bool QnetTool::findPointLocation() {
+    auto naif = NaifContext::acquire();
     bool located = true;
 
     // Use apriori surface point to find location on ground source.  If
@@ -2175,14 +2181,14 @@ namespace Isis {
         int camIndex = m_serialNumberList->serialNumberIndex(m.GetCubeSerialNumber());
         Camera *cam;
         cam = m_controlNet->Camera(camIndex);
-        cam->SetImage(m.GetSample(),m.GetLine());
+        cam->SetImage(m.GetSample(),m.GetLine(), naif);
         lat = cam->UniversalLatitude();
         lon = cam->UniversalLongitude();
       }
 
       //  Try to locate point position on current ground source,
       //  TODO ???if doesn't exist,???
-      if (!m_groundGmap->SetUniversalGround(lat,lon)) {
+      if (!m_groundGmap->SetUniversalGround(naif,lat,lon)) {
         located = false;
         QString message = "This point does not exist on the ground source.\n";
         message += "Latitude = " + QString::number(lat);
@@ -2798,6 +2804,7 @@ namespace Isis {
    *                          namespace std"
    */
   void QnetTool::selectRightMeasure(int index) {
+  auto naif = NaifContext::acquire();
     QString file = m_pointFiles[index];
 
     QString serial = m_serialNumberList->serialNumber(file);
@@ -2816,7 +2823,7 @@ namespace Isis {
     m_rightCube.reset(new Cube(file, "r"));
 
     //  Update right measure of pointEditor
-    m_pointEditor->setRightMeasure (m_rightMeasure, m_rightCube.data(),
+    m_pointEditor->setRightMeasure (naif, m_rightMeasure, m_rightCube.data(),
                                     m_editPoint->GetId());
     updateRightMeasureInfo ();
 
@@ -3014,6 +3021,8 @@ namespace Isis {
    */
   void QnetTool::addMeasure() {
 
+    auto naif = NaifContext::acquire();
+    
     //  Create list of list box of all files highlighting those that
     //  contain the point, but that do not already have a measure.
     QStringList pointFiles;
@@ -3030,14 +3039,14 @@ namespace Isis {
     int camIndex = m_serialNumberList->serialNumberIndex(m.GetCubeSerialNumber());
     cam = m_controlNet->Camera(camIndex);
     //cam = m.Camera();
-    cam->SetImage(m.GetSample(),m.GetLine());
+    cam->SetImage(m.GetSample(),m.GetLine(),naif);
     lat = cam->UniversalLatitude();
     lon = cam->UniversalLongitude();
 
     for (int i=0; i<m_serialNumberList->size(); i++) {
       cam = m_controlNet->Camera(i);
       if (m_serialNumberList->serialNumber(i) == m_groundSN) continue;
-      if (cam->SetUniversalGround(lat,lon)) {
+      if (cam->SetUniversalGround(naif,lat,lon)) {
         //  Make sure point is within image boundary
         double samp = cam->Sample();
         double line = cam->Line();
@@ -3061,7 +3070,7 @@ namespace Isis {
         int camIndex =
               m_serialNumberList->fileNameIndex(selectedFile);
         cam = m_controlNet->Camera(camIndex);
-        cam->SetUniversalGround(lat,lon);
+        cam->SetUniversalGround(naif,lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
         m->SetAprioriSample(cam->Sample());
         m->SetAprioriLine(cam->Line());
@@ -3247,6 +3256,7 @@ namespace Isis {
    * @internal
    */
   void QnetTool::drawGroundMeasures(MdiCubeViewport *vp, QPainter *painter) {
+    auto naif = NaifContext::acquire();
 
     // loop through control network looking for fixed and constrained points
     for (int i = 0; i < m_controlNet->GetNumPoints(); i++) {
@@ -3255,7 +3265,8 @@ namespace Isis {
       if (!p.HasAprioriCoordinates()) continue;
 
       // Find the measure on the ground image
-      if (m_groundGmap->SetGround(p.GetAprioriSurfacePoint().GetLatitude(),
+      if (m_groundGmap->SetGround(naif,
+                                  p.GetAprioriSurfacePoint().GetLatitude(),
                                   p.GetAprioriSurfacePoint().GetLongitude())) {
         double samp = m_groundGmap->Sample();
         double line = m_groundGmap->Line();
@@ -4020,12 +4031,12 @@ namespace Isis {
    *
    * @internal
    */
-  double QnetTool::demRadius(double latitude, double longitude) {
+  double QnetTool::demRadius(NaifContextPtr naif, double latitude, double longitude) {
 
     if (!m_demOpen) return Null;
 
     UniversalGroundMap *demMap = new UniversalGroundMap(*m_demCube);
-    if (!demMap->SetUniversalGround(latitude, longitude)) {
+    if (!demMap->SetUniversalGround(naif, latitude, longitude)) {
       delete demMap;
       demMap = NULL;
       return Null;

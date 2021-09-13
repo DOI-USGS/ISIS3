@@ -627,6 +627,8 @@ namespace Isis {
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
   void ControlNetFilter::PointLatLonFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
+    auto naif = NaifContext::acquire();
+    
     double dMinLat = Isis::ValidMinimum, dMaxLat = Isis::ValidMaximum;
     double dMinLon = Isis::ValidMinimum, dMaxLon = Isis::ValidMaximum;
 
@@ -679,8 +681,8 @@ namespace Isis {
         Cube cube(filename, "r");
 
         Camera *camera = CameraFactory::Create(cube);
-        if (camera->SetImage(cm->GetSample(), cm->GetLine())) {
-          cPointSurfPt.SetSpherical(
+        if (camera->SetImage(cm->GetSample(), cm->GetLine(), naif)) {
+          cPointSurfPt.SetSpherical(naif,
             Latitude(camera->UniversalLatitude(), Angle::Degrees),
             Longitude(camera->UniversalLongitude(), Angle::Degrees),
             Distance(camera->LocalRadius()));
@@ -718,6 +720,8 @@ namespace Isis {
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
   void ControlNetFilter::PointDistanceFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
+    auto naif = NaifContext::acquire();
+    
     double dMaxDistance = 0;
     QString sUnits = "pixels";
 
@@ -755,8 +759,8 @@ namespace Isis {
           Cube cube1(filename1, "r");
           cam1 = CameraFactory::Create(cube1);
           if (cam1->SetImage(cp1RefMeasure->GetSample(),
-              cp1RefMeasure->GetLine())) {
-            surfacePt1.SetSpherical(
+              cp1RefMeasure->GetLine(), naif)) {
+            surfacePt1.SetSpherical(naif,
               Latitude(cam1->UniversalLatitude(), Angle::Degrees),
               Longitude(cam1->UniversalLongitude(), Angle::Degrees),
               Distance(cam1->LocalRadius())
@@ -796,8 +800,8 @@ namespace Isis {
             cam2 = CameraFactory::Create(cube2);
 
             if (cam2->SetImage(cp2RefMeasure->GetSample(),
-                cp2RefMeasure->GetLine())) {
-              surfacePt2.SetSpherical(
+                cp2RefMeasure->GetLine(), naif)) {
+              surfacePt2.SetSpherical(naif,
                 Latitude(cam2->UniversalLatitude(), Angle::Degrees),
                 Longitude(cam2->UniversalLongitude(), Angle::Degrees),
                 Distance(cam2->LocalRadius())
@@ -1285,6 +1289,8 @@ namespace Isis {
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
   void ControlNetFilter::CubeDistanceFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
+    auto naif = NaifContext::acquire();
+    
     double dDistance = 0;
     QString sUnits = "pixels";
 
@@ -1373,7 +1379,7 @@ namespace Isis {
         double dRadius = 0, dLat1 = 0, dLon1 = 0;
         if (sUnits == "meters") {
           // try to set image using sample/line values
-          if (cam->SetImage(cMeasure1->GetSample(), cMeasure1->GetLine())) {
+          if (cam->SetImage(cMeasure1->GetSample(), cMeasure1->GetLine(), naif)) {
             dRadius = cam->LocalRadius().meters();
             dLat1 = cam->UniversalLatitude();
             dLon1 = cam->UniversalLongitude();
@@ -1409,7 +1415,7 @@ namespace Isis {
             // calculate distance in meters
           {
             double dLat2 = 0, dLon2 = 0;
-            if (cam->SetImage(cMeasure2->GetSample(), cMeasure2->GetLine())) {
+            if (cam->SetImage(cMeasure2->GetSample(), cMeasure2->GetLine(), naif)) {
               dLat2 = cam->UniversalLatitude();
               dLon2 = cam->UniversalLongitude();
             }
@@ -1423,8 +1429,8 @@ namespace Isis {
             Longitude lon2(dLon2, Angle::Degrees);
             Distance radius(dRadius, Distance::Meters);
 
-            SurfacePoint point1(lat1, lon1, radius);
-            SurfacePoint point2(lat2, lon2, radius);
+            SurfacePoint point1(naif, lat1, lon1, radius);
+            SurfacePoint point2(naif, lat2, lon2, radius);
 
             dDist = point1.GetDistanceToPoint(point1, radius).meters();
           }

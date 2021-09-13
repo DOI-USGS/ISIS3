@@ -257,6 +257,8 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
   Q_ASSERT ( ( point.trainIdx >= 0) &&
              ( point.trainIdx < mpair.train().size()) );
 
+  auto naif = NaifContext::acquire();
+  
   // If no point created at this query keypoint, create a ControlPoint and add
   // the query keypoint as the reference
   if ( !(*cpt) ) {
@@ -275,7 +277,7 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
     // Set lat/lon if requested for Query image
     if ( Query == m_geomFlag ) {
       // What to do when it fails??
-      (void) setAprioriLatLon(*(*cpt), *reference, mpair.query());
+      (void) setAprioriLatLon(naif,*(*cpt), *reference, mpair.query());
     }
     nMade++;
   }
@@ -316,7 +318,7 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
     // Set lat/lon if requested for train image
     if ( Train == m_geomFlag ) {
       // What to do when it fails??
-      (void) setAprioriLatLon(*(*cpt), *trainpt, mpair.train() );
+      (void) setAprioriLatLon(naif,*(*cpt), *trainpt, mpair.train() );
     }
 
     nMade++;
@@ -342,7 +344,8 @@ ControlMeasure *MatchMaker::makeMeasure(const MatchImage &image,
   return ( v_measure.take() );
 }
 
-bool MatchMaker::setAprioriLatLon(ControlPoint &point,
+bool MatchMaker::setAprioriLatLon(NaifContextPtr naif,
+                                  ControlPoint &point,
                                   const ControlMeasure &measure,
                                   const MatchImage &image) const {
   // Check if the source has geometry
@@ -351,7 +354,7 @@ bool MatchMaker::setAprioriLatLon(ControlPoint &point,
   // Compute lat/lon
   double samp = measure.GetSample();
   double line = measure.GetLine();
-  SurfacePoint latlon = image.source().getLatLon(line,samp);
+  SurfacePoint latlon = image.source().getLatLon(naif,line,samp);
 
   // std::cout << "  Lat/Lon Coordinate: " << latlon.GetLatitude().degrees() << ", "
   //           << latlon.GetLongitude().degrees() << "\n";

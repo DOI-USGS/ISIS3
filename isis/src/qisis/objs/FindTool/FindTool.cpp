@@ -327,8 +327,10 @@ namespace Isis {
 
       UniversalGroundMap *groundMap = activeViewport->universalGroundMap();
 
+      auto naif = NaifContext::acquire();
+
       if (p_samp != DBL_MAX && p_line != DBL_MAX) {
-        if ( groundMap && groundMap->SetImage(p_samp, p_line) ) {
+        if ( groundMap && groundMap->SetImage(p_samp, p_line, naif) ) {
           QString latStr = QString::number( groundMap->UniversalLatitude() );
           QString lonStr = QString::number( groundMap->UniversalLongitude() );
           p_groundTab->p_latLineEdit->setText(latStr);
@@ -344,7 +346,7 @@ namespace Isis {
       }
       else if (p_lat != DBL_MAX && p_lon != DBL_MAX) {
         // this should also work for rings (radius, azimuth)
-        if ( groundMap && groundMap->SetUniversalGround(p_lat, p_lon) ) {
+        if ( groundMap && groundMap->SetUniversalGround(naif, p_lat, p_lon) ) {
           QString lineStr = QString::number( groundMap->Line() );
           QString sampStr = QString::number( groundMap->Sample() );
           p_imageTab->p_lineLineEdit->setText(lineStr);
@@ -413,6 +415,7 @@ namespace Isis {
    *                                    class
    */
   void FindTool::handleRecordClicked() {
+  auto naif = NaifContext::acquire();
     double line = p_line;
     double samp = p_samp;
 
@@ -421,7 +424,7 @@ namespace Isis {
       UniversalGroundMap *groundMap = cvp->universalGroundMap();
 
       if (groundMap) {
-        if ( groundMap->SetUniversalGround(p_lat, p_lon) ) {
+        if ( groundMap->SetUniversalGround(naif, p_lat, p_lon) ) {
           line = groundMap->Line();
           samp = groundMap->Sample();
         }
@@ -446,6 +449,7 @@ namespace Isis {
    * @param s
    */
   void FindTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
+    auto naif = NaifContext::acquire();
     MdiCubeViewport *activeViewport = cubeViewport();
     UniversalGroundMap *groundMap = activeViewport->universalGroundMap();
 
@@ -458,7 +462,7 @@ namespace Isis {
     p_lon = DBL_MAX;
 
     if (groundMap) {
-      if ( groundMap->SetImage(samp, line) ) {
+      if ( groundMap->SetImage(samp, line, naif) ) {
         p_lat = groundMap->UniversalLatitude();
         p_lon = groundMap->UniversalLongitude();
       }
@@ -492,10 +496,11 @@ namespace Isis {
       double samp = p_samp;
       double line = p_line;
 
+      auto naif = NaifContext::acquire();
       UniversalGroundMap *groundMap = vp->universalGroundMap();
 
       if (p_lat != DBL_MAX && p_lon != DBL_MAX && groundMap) {
-        if ( groundMap->SetUniversalGround(p_lat, p_lon) ) {
+        if ( groundMap->SetUniversalGround(naif, p_lat, p_lon) ) {
           samp = groundMap->Sample();
           line = groundMap->Line();
         }
@@ -567,6 +572,8 @@ namespace Isis {
       viewportResolutionToMatch = distancePerPixel(activeViewport, p_lat, p_lon);
     }
 
+    auto naif = NaifContext::acquire();
+    
     for (int i = 0; i < cubeViewportList()->size(); i++) {
       MdiCubeViewport *viewport = ( *( cubeViewportList() ) )[i];
 
@@ -577,7 +584,7 @@ namespace Isis {
 
         if ( groundMap && !IsSpecial(p_lat) && p_lat != DBL_MAX &&
              !IsSpecial(p_lon) && p_lon != DBL_MAX &&
-             groundMap->SetUniversalGround(p_lat, p_lon) ) {
+             groundMap->SetUniversalGround(naif, p_lat, p_lon) ) {
           double samp = groundMap->Sample();
           double line = groundMap->Line();
 
@@ -619,23 +626,24 @@ namespace Isis {
    */
   Distance FindTool::distancePerPixel(MdiCubeViewport *viewport,
                                       double lat, double lon) {
+    auto naif = NaifContext::acquire();
     UniversalGroundMap *groundMap = viewport->universalGroundMap();
     Distance viewportResolution;
 
     try {
       if ( groundMap && !IsSpecial(lat) && !IsSpecial(lon) &&
            lat != DBL_MAX && lon != DBL_MAX &&
-           groundMap->SetUniversalGround(lat, lon) ) {
+           groundMap->SetUniversalGround(naif, lat, lon) ) {
         // Distance/pixel
-        viewportResolution = Distance(groundMap->Resolution(), Distance::Meters);
+        viewportResolution = Distance(groundMap->Resolution(naif), Distance::Meters);
         double samp = groundMap->Sample();
         double line = groundMap->Line();
 
-        if ( groundMap->SetImage(samp - 0.5, line - 0.5) ) {
+        if ( groundMap->SetImage(samp - 0.5, line - 0.5, naif) ) {
           double lat1 = groundMap->UniversalLatitude();
           double lon1 = groundMap->UniversalLongitude();
 
-          if ( groundMap->SetImage(samp + 0.5, line + 0.5) ) {
+          if ( groundMap->SetImage(samp + 0.5, line + 0.5, naif) ) {
             double lat2 = groundMap->UniversalLatitude();
             double lon2 = groundMap->UniversalLongitude();
 
@@ -643,11 +651,13 @@ namespace Isis {
                 groundMap->Projection()->LocalRadius() :
                 groundMap->Camera()->LocalRadius().meters();
 
-            SurfacePoint point1( Latitude(lat1, Angle::Degrees),
+            SurfacePoint point1( naif,
+                                 Latitude(lat1, Angle::Degrees),
                                  Longitude(lon1, Angle::Degrees),
                                  Distance(radius, Distance::Meters) );
 
-            SurfacePoint point2( Latitude(lat2, Angle::Degrees),
+            SurfacePoint point2( naif,
+                                 Latitude(lat2, Angle::Degrees),
                                  Longitude(lon2, Angle::Degrees),
                                  Distance(radius, Distance::Meters) );
 

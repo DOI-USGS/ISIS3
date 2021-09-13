@@ -80,9 +80,10 @@ TEST_F(TestPayload, FunctionalTestSpiceserverDefaultParameters) {
 
   QVector<QString> args = {"From="+hexPayloadPath, "To="+outputFile, "TEMPFILE="+tempDir.path()+"/temp.cub"};
   UserInterface options(APP_XML, args);
+  auto naif = NaifContext::acquire();
   Pvl appLog;
 
-  spiceserver(options, &appLog);
+  spiceserver(naif, options, &appLog);
   
   TextFile inFile(outputFile); 
   QString hexCode; 
@@ -166,10 +167,11 @@ TEST_F(TempTestingFiles, FunctionalTestSpiceserverIsisVersion) {
 
   QVector<QString> args = {"From="+badPayloadPath, "To="+outputFile};
   UserInterface options(APP_XML, args);
+  auto naif = NaifContext::acquire();
   
   EXPECT_THROW({
     try{
-      spiceserver(options);
+      spiceserver(naif, options);
       FAIL();
     }
     catch(const IException &e) {

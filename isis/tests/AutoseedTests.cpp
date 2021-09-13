@@ -61,8 +61,9 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
                                     "pointid=??",
                                     "description=autoseed test network"};
   UserInterface autoseedUi(APP_XML, autoseedArgs);
+  auto naif = NaifContext::acquire();
 
-  autoseed(autoseedUi, log);
+  autoseed(autoseedUi, naif, log);
   ControlNet onet(outnet);
   ASSERT_EQ(onet.GetNumPoints(), 26);
 }
@@ -98,8 +99,9 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
                                     "pointid=??",
                                     "description=autoseed test network"};
   UserInterface autoseedUi(APP_XML, autoseedArgs);
+  auto naif = NaifContext::acquire();
 
-  autoseed(autoseedUi, log);
+  autoseed(autoseedUi, naif, log);
   ControlNet onet(outnet1);
   ASSERT_EQ(onet.GetNumPoints(), 18);
 
@@ -111,7 +113,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
   autoseedArgs.replace(1, "onet="+outnet2);
   autoseedArgs.replace(3, "overlaplist="+threeImageOverlapFile->original());
   autoseedUi = UserInterface(APP_XML, autoseedArgs);
-  autoseed(autoseedUi, serialNumList, &onet, log);
+  autoseed(autoseedUi, naif, serialNumList, &onet, log);
   onet = ControlNet(outnet2);
   ASSERT_EQ(onet.GetNumPoints(), 7);
 }
@@ -129,6 +131,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
                                     "pointid=???",
                                     "description=autoseed test network"};
   UserInterface autoseedUi(APP_XML, autoseedArgs);
+  auto naif = NaifContext::acquire();
 
   // Grid DN
   PvlObject autoseedObject("AutoSeed");
@@ -146,7 +149,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
   autoseedDef.addObject(autoseedObject);
   autoseedDef.write(defFile);
 
-  autoseed(autoseedUi, log);
+  autoseed(autoseedUi, naif, log);
   ControlNet onet(outnet);
   ASSERT_EQ(onet.GetNumValidPoints(), 0);
   ASSERT_EQ(onet.GetNumValidMeasures(), 0);
@@ -158,7 +161,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").addKeyword(PvlKeyword("MaxEmission", "75.0"));
   autoseedDef.write(defFile);
 
-  autoseed(autoseedUi, log);
+  autoseed(autoseedUi, naif, log);
   onet = ControlNet(outnet);
   ASSERT_EQ(onet.GetNumValidPoints(), 50);
   ASSERT_EQ(onet.GetNumValidMeasures(), 126);
@@ -169,7 +172,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").addKeyword(PvlKeyword("PixelsFromEdge", "20.0"));
   autoseedDef.write(defFile);
 
-  autoseed(autoseedUi, log);
+  autoseed(autoseedUi, naif, log);
   onet = ControlNet(outnet);
   ASSERT_EQ(onet.GetNumValidPoints(), 57);
   ASSERT_EQ(onet.GetNumValidMeasures(), 144);
@@ -180,7 +183,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").addKeyword(PvlKeyword("MaxIncidence", "65.0"));
   autoseedDef.write(defFile);
 
-  autoseed(autoseedUi, log);
+  autoseed(autoseedUi, naif, log);
   onet = ControlNet(outnet);
   ASSERT_EQ(onet.GetNumValidPoints(), 72);
   ASSERT_EQ(onet.GetNumValidMeasures(), 181);
@@ -192,7 +195,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").addKeyword(PvlKeyword("MaxResolution", "259.0"));
   autoseedDef.write(defFile);
 
-  autoseed(autoseedUi, log);
+  autoseed(autoseedUi, naif, log);
   onet = ControlNet(outnet);
   ASSERT_EQ(onet.GetNumValidPoints(), 60);
   ASSERT_EQ(onet.GetNumValidMeasures(), 147);

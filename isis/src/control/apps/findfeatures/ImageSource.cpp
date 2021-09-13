@@ -224,7 +224,7 @@ void ImageSource::load(const double minPercent,const double maxPercent) {
 }
 
 
-SurfacePoint ImageSource::getLatLon(const double &line, const double &sample) {
+SurfacePoint ImageSource::getLatLon(NaifContextPtr naif, const double &line, const double &sample) {
   SurfacePoint point;
   if ( !hasGeometry() ) return (point);
 
@@ -238,13 +238,14 @@ SurfacePoint ImageSource::getLatLon(const double &line, const double &sample) {
       double lat = m_data->m_projection->UniversalLatitude();
       double lon = m_data->m_projection->UniversalLongitude();
       double radius = m_data->m_projection->LocalRadius(lat);
-      point.SetSphericalCoordinates(Latitude(lat, Angle::Degrees), 
+      point.SetSphericalCoordinates(naif,
+                                    Latitude(lat, Angle::Degrees), 
                                     Longitude(lon, Angle::Degrees),
                                     Distance(radius, Distance::Meters));
     }
   }
   else if ( hasCamera() ) { 
-    if ( m_data->m_camera->SetImage(sample, line) ) {
+    if ( m_data->m_camera->SetImage(sample, line, naif) ) {
       point = m_data->m_camera->GetSurfacePoint();
     }
   }
@@ -253,7 +254,8 @@ SurfacePoint ImageSource::getLatLon(const double &line, const double &sample) {
 }
 
 
-bool ImageSource::getLineSamp(const SurfacePoint &point,
+bool ImageSource::getLineSamp(NaifContextPtr naif, 
+                              const SurfacePoint &point,
                               double &line, double &samp,
                               double &radius) {
   line = samp = radius = Null;
@@ -280,7 +282,7 @@ bool ImageSource::getLineSamp(const SurfacePoint &point,
     }
   }
   else if ( hasCamera() ) {
-    if ( m_data->m_camera->SetUniversalGround(lat, lon) ) { 
+    if ( m_data->m_camera->SetUniversalGround(naif, lat, lon) ) { 
       isGood = true;
       line   = m_data->m_camera->Line();
       samp   = m_data->m_camera->Sample();
@@ -291,7 +293,8 @@ bool ImageSource::getLineSamp(const SurfacePoint &point,
   return ( isGood );
 }
 
-cv::Mat ImageSource::getGeometryMapping(ImageSource &match,
+cv::Mat ImageSource::getGeometryMapping(NaifContextPtr naif, 
+                                        ImageSource &match,
                                         const int &minpts, 
                                         const double &tol,
                                         const cv::Rect &subarea) {
@@ -338,7 +341,7 @@ cv::Mat ImageSource::getGeometryMapping(ImageSource &match,
         int line = (int)(lSpacing / 2.0 + lSpacing * l + 0.5) + sline;
         int samp = (int)(sSpacing / 2.0 + sSpacing * s + 0.5) + ssamp;
         double oline, osamp, oradius;
-        if ( match.getLineSamp(getLatLon(line, samp), oline, osamp, oradius) ) {
+        if ( match.getLineSamp(naif, getLatLon(naif, line, samp), oline, osamp, oradius) ) {
           source.push_back(cv::Point2f(samp, line));
           // std::cout << "SourcePt["<<s<<","<<l<<"]: " << samp << ", " << line << "\n";
           train.push_back(cv::Point2f(osamp, oline));

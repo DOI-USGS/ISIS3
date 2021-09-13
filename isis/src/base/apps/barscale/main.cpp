@@ -24,7 +24,8 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-
+  auto naif = NaifContext::acquire();
+  
   // Get the camera information if this is not a mosaic. Otherwise, get the
   // projection information
   Process p;
@@ -46,8 +47,8 @@ void IsisMain() {
   }
 
   UniversalGroundMap groundMap(icube);
-  groundMap.SetImage(sampForResolution, lineForResolution);
-  double resolution = groundMap.Resolution();
+  groundMap.SetImage(sampForResolution, lineForResolution, naif);
+  double resolution = groundMap.Resolution(naif);
 
   // Determine the unit of measure used to create the scale and the limit for the
   // right and left sides of the scale

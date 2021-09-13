@@ -18,11 +18,13 @@ namespace Isis {
     cubeLabel >> label;
     projCubeLabel >> projLabel;
 
+    auto naif = NaifContext::acquire();
+
     testCube = new Cube();
-    testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
+    testCube->fromIsd(naif, tempDir.path() + "/default.cub", label, isd, "rw");
 
     projTestCube = new Cube();
-    projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
+    projTestCube->fromIsd(naif, tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
   }
 
 
@@ -50,11 +52,13 @@ namespace Isis {
     cubeLabel >> label;
     projCubeLabel >> projLabel;
 
+    auto naif = NaifContext::acquire();
+
     testCube = new Cube();
-    testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
+    testCube->fromIsd(naif, tempDir.path() + "/default.cub", label, isd, "rw");
 
     projTestCube = new Cube();
-    projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
+    projTestCube->fromIsd(naif, tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
   }
 
 
@@ -86,14 +90,16 @@ namespace Isis {
     threeImageOverlapFile = new FileName("data/threeImageNetwork/threeImageOverlaps.lis");
     twoImageOverlapFile = new FileName("data/threeImageNetwork/twoImageOverlaps.lis");
 
+    auto naif = NaifContext::acquire();
+
     cube1 = new Cube();
-    cube1->fromIsd(tempDir.path() + "/cube1.cub", labelPath1, isdPath1, "rw");
+    cube1->fromIsd(naif, tempDir.path() + "/cube1.cub", labelPath1, isdPath1, "rw");
 
     cube2 = new Cube();
-    cube2->fromIsd(tempDir.path() + "/cube2.cub", labelPath2, isdPath2, "rw");
+    cube2->fromIsd(naif, tempDir.path() + "/cube2.cub", labelPath2, isdPath2, "rw");
 
     cube3 = new Cube();
-    cube3->fromIsd(tempDir.path() + "/cube3.cub", labelPath3, isdPath3, "rw");
+    cube3->fromIsd(naif, tempDir.path() + "/cube3.cub", labelPath3, isdPath3, "rw");
 
     cubeList = new FileList();
     cubeList->append(cube1->fileName());

@@ -75,8 +75,8 @@ class FastGeom {
              const bool preserve = false, const double &maxarea = 3.0);
     virtual ~FastGeom();
 
-    ImageTransform *compute(MatchImage &query, MatchImage &train);
-    void apply(MatchImage &query, MatchImage &train);
+    ImageTransform *compute(NaifContextPtr naif, MatchImage &query, MatchImage &train);
+    void apply(NaifContextPtr naif, MatchImage &query, MatchImage &train);
 
   private:
     int        m_fastpts;    //!< Number of points to use for geom

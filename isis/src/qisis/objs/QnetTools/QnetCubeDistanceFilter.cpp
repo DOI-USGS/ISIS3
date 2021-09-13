@@ -100,6 +100,8 @@ namespace Isis {
       return;
     }
 
+    auto naif = NaifContext::acquire();
+    
     // Get the user entered value for filtering
     int userEntered = p_lineEdit->text().toInt();
 
@@ -136,7 +138,7 @@ namespace Isis {
           Camera *cam1;
           cam1  = controlNet()->Camera(filteredImages()[i]);
           // try to set image using sample/line values
-          if (cam1->SetImage(controlMeas1.GetSample(), controlMeas1.GetLine())) {
+          if (cam1->SetImage(controlMeas1.GetSample(), controlMeas1.GetLine(), naif)) {
             rad = cam1->LocalRadius().meters();
             lat1 = cam1->UniversalLatitude();
             lon1 = cam1->UniversalLongitude();
@@ -184,7 +186,7 @@ namespace Isis {
             Camera *cam2;
             cam2 = controlNet()->Camera(filteredImages()[i]);
             // try to set image using sample/line values
-            if (cam2->SetImage(controlMeas2.GetSample(), controlMeas2.GetLine())) {
+            if (cam2->SetImage(controlMeas2.GetSample(), controlMeas2.GetLine(), naif)) {
               lat2 = cam2->UniversalLatitude();
               lon2 = cam2->UniversalLongitude();
             }
@@ -195,11 +197,11 @@ namespace Isis {
             }
             // Calculate the distance between the two points
             // Get the distance from the camera class
-            SurfacePoint point1(
+            SurfacePoint point1(naif,
                 Latitude(lat1, Angle::Degrees),
                 Longitude(lon1, Angle::Degrees),
                 Distance(rad, Distance::Meters));
-            SurfacePoint point2(
+            SurfacePoint point2(naif,
                 Latitude(lat2, Angle::Degrees),
                 Longitude(lon2, Angle::Degrees),
                 Distance(rad, Distance::Meters));

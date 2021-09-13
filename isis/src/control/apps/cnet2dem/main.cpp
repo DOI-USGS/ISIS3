@@ -129,6 +129,7 @@ void IsisMain() {
   // We will be processing by line
   ProcessByLine p;
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   // Now parse the input datum string to determine the bands of the output
   // cube. Note the order of the bands will be as the user has specified them.
@@ -309,7 +310,8 @@ void IsisMain() {
           double lon = tproj->UniversalLongitude();
           double radius = tproj->LocalRadius(lat);
 
-          point.SetSphericalCoordinates(Latitude(lat, Angle::Degrees), 
+          point.SetSphericalCoordinates(naif,
+                                        Latitude(lat, Angle::Degrees), 
                                         Longitude(lon, Angle::Degrees),
                                         Distance(radius, Distance::Meters));
 

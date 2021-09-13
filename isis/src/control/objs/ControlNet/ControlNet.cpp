@@ -1160,11 +1160,12 @@ namespace Isis {
    */
   void ControlNet::ComputeResiduals() {
     // TODO:  Make sure the cameras have been initialized
+    auto naif = NaifContext::acquire();
 
     QHashIterator< QString, ControlPoint * > i(*points);
     while (i.hasNext()) {
       i.next();
-      i.value()->ComputeResiduals();
+      i.value()->ComputeResiduals(naif);
     }
   }
 
@@ -1176,12 +1177,13 @@ namespace Isis {
    */
   void ControlNet::ComputeApriori() {
     // TODO:  Make sure the cameras have been initialized
+    auto naif = NaifContext::acquire();
     QHashIterator< QString, ControlPoint * > i(*points);
     while (i.hasNext()) {
       i.next();
       ControlPoint *point = i.value();
       if ( !point->IsIgnored() )
-        point->ComputeApriori();
+        point->ComputeApriori(naif);
     }
   }
 

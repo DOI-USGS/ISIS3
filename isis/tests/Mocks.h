@@ -27,13 +27,13 @@ class MockCube : public Cube {
 class MockCamera : public Camera {
   public:
     MockCamera(Cube &cube): Camera(cube) {}
-    MOCK_METHOD(bool, SetImage, (const double sample, const double line), (override));
+    MOCK_METHOD(bool, SetImage, (const double sample, const double line, NaifContextPtr naif), (override));
     MOCK_METHOD(double, Line, (), (override));
     MOCK_METHOD(double, Sample, (), (override));
     MOCK_METHOD(double, UniversalLatitude, (), (const override));
     MOCK_METHOD(double, UniversalLongitude, (), (const override));
-    MOCK_METHOD(bool, SetUniversalGround, (const double latitude, const double longitude), (override));
-    MOCK_METHOD(bool, SetUniversalGround, (const double latitude, const double longitude,
+    MOCK_METHOD(bool, SetUniversalGround, (NaifContextPtr naif, const double latitude, const double longitude), (override));
+    MOCK_METHOD(bool, SetUniversalGround, (NaifContextPtr naif, const double latitude, const double longitude,
                                            const double radius), (override));
     MOCK_METHOD(CameraType, GetCameraType, (), (const, override));
     MOCK_METHOD(int, CkFrameId, (), (const override));

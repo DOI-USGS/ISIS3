@@ -163,6 +163,8 @@ int main() {
   qsrand(42);
 
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
   cout << "UnitTest for ControlNet ...." << endl << endl;
 
   cout << "******* test cube connection graph ************\n";
@@ -321,7 +323,8 @@ int main() {
       cp->SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
       cp->SetAprioriRadiusSourceFile("$base/dems/molaMarsPlanetaryRadius0003.cub");
 
-      SurfacePoint surfacePt(Displacement(-424.024048, Displacement::Meters),
+      SurfacePoint surfacePt(naif,
+          Displacement(-424.024048, Displacement::Meters),
           Displacement(734.4311949, Displacement::Meters),
           Displacement(529.919264, Displacement::Meters),
           Distance(10, Distance::Meters),

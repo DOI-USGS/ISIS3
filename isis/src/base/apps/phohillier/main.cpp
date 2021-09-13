@@ -32,9 +32,10 @@ void IsisMain() {
 
   // Set up the user interface
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   // Get the name of the parameter file
   Pvl par(ui.GetFileName("PHOPAR"));
-  unique_ptr<Hillier> photom = unique_ptr<Hillier> (new Hillier(par,  *icube));
+  unique_ptr<Hillier> photom = unique_ptr<Hillier> (new Hillier(naif, par,  *icube));
   pho = photom.get();
 
   // Start the processing
@@ -60,6 +61,8 @@ void IsisMain() {
  */
 void hillier(Buffer &in, Buffer &out) {
 
+  auto naif = NaifContext::acquire();
+  
   for(int i = 0; i < in.size(); i++) {
     //  Don't correct special pixels
     if(IsSpecial(in[i])) {
@@ -67,7 +70,7 @@ void hillier(Buffer &in, Buffer &out) {
     }
     else {
       // Get correction and test for validity
-      double ph = pho->Compute(in.Line(i), in.Sample(i), in.Band(i));
+      double ph = pho->Compute(naif, in.Line(i), in.Sample(i), in.Band(i));
       out[i] = (IsSpecial(ph) ?  Null : in[i] * ph);
     }
   }

@@ -125,7 +125,7 @@ class MatchMaker : public QLogger {
     ControlMeasure *makeMeasure(const MatchImage &image, 
                                 const int &keyindex, 
                                 const QString &name = "ControlMeasure") const;
-    bool setAprioriLatLon(ControlPoint &point, const ControlMeasure &measure,
+    bool setAprioriLatLon(NaifContextPtr naif, ControlPoint &point, const ControlMeasure &measure,
                           const MatchImage &image) const;
 
     double goodnessOfFit(const cv::KeyPoint &query, const cv::KeyPoint &train) 

@@ -298,7 +298,8 @@ namespace Isis {
 
       //  Make sure point on base cube
       try {
-        if (baseGM->SetGround(p.GetBestSurfacePoint())) {
+        auto naif = NaifContext::acquire();
+        if (baseGM->SetGround(naif, p.GetBestSurfacePoint())) {
           baseSamp = baseGM->Sample();
           baseLine = baseGM->Line();
           if (baseSamp < 1 || baseSamp > baseCube->sampleCount() ||

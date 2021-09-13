@@ -611,12 +611,13 @@ namespace Isis {
    *                           Load() method and display in QMessageBox
    */
   void ChipViewport::geomChip(Chip *matchChip, Cube *matchChipCube) {
+    auto naif = NaifContext::acquire();
 
     m_geomIt = true;
     m_matchChip = matchChip;
     m_matchChipCube = matchChipCube;
     try {
-      m_chip->Load(*m_chipCube, *matchChip, *matchChipCube);
+      m_chip->Load(naif, *m_chipCube, *matchChip, *matchChipCube);
 //    m_chip->ReLoad(*matchChip,m_zoomFactor);
     }
     catch (IException &e) {
@@ -712,7 +713,8 @@ namespace Isis {
         throw IException(IException::User, "Invalid match chip", _FILEINFO_);
       }
       try {
-        m_chip->Load(*m_chipCube, *m_matchChip, *m_matchChipCube);
+        auto naif = NaifContext::acquire();
+        m_chip->Load(naif, *m_chipCube, *m_matchChip, *m_matchChipCube);
       }
       catch (IException &e) {
         QString msg = "Cannot reload chip.\n";

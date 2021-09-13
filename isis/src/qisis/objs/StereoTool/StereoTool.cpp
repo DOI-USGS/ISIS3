@@ -849,17 +849,18 @@ namespace Isis {
    *
    */
   void StereoTool::measureSaved() {
+    auto naif = NaifContext::acquire();
 
     double samp = m_editPoint->GetMeasure(Left)->GetSample();
     double line = m_editPoint->GetMeasure(Left)->GetLine();
-    m_leftGM->SetImage(samp, line);
+    m_leftGM->SetImage(samp, line, naif);
     double lat = m_leftGM->UniversalLatitude();
     double lon = m_leftGM->UniversalLongitude();
 
-    m_rightGM->SetGround(
+    m_rightGM->SetGround(naif,
               Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees) );
     try {
-      m_editPoint->SetAprioriSurfacePoint(SurfacePoint (
+      m_editPoint->SetAprioriSurfacePoint(SurfacePoint (naif,
                 Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees),
                 m_targetRadius ) );
     }
@@ -970,14 +971,15 @@ namespace Isis {
         deletePoint(point);
       }
       else if ( rubberBandTool()->mouseButton() & Qt::RightButton ) {
+        auto naif = NaifContext::acquire();
         double lat, lon;
         if (cvp->cube() == m_leftCube) {
-          m_leftGM->SetImage(samp, line);
+          m_leftGM->SetImage(samp, line, naif);
           lat = m_leftGM->UniversalLatitude();
           lon = m_leftGM->UniversalLongitude();
         }
         else {
-          m_rightGM->SetImage(samp, line);
+          m_rightGM->SetImage(samp, line, naif);
           lat = m_rightGM->UniversalLatitude();
           lon = m_rightGM->UniversalLongitude();
         }
@@ -1078,18 +1080,19 @@ namespace Isis {
     if (cvp == NULL)
       return;
 
+    auto naif = NaifContext::acquire();
     double samp, line;
     double lat, lon;
     cvp->viewportToCube( rubberBandTool()->vertices()[0].rx(),
                          rubberBandTool()->vertices()[0].ry(),
                         samp, line );
     if ( cvp->cube() == m_leftCube ) {
-      m_leftGM->SetImage(samp, line);
+      m_leftGM->SetImage(samp, line, naif);
       lat = m_leftGM->UniversalLatitude();
       lon = m_leftGM->UniversalLongitude();
     }
     else {
-      m_rightGM->SetImage(samp, line);
+      m_rightGM->SetImage(samp, line, naif);
       lat = m_rightGM->UniversalLatitude();
       lon = m_rightGM->UniversalLongitude();
     }
@@ -1115,18 +1118,19 @@ namespace Isis {
     if (cvp == NULL)
       return;
 
+    auto naif = NaifContext::acquire();
     double samp, line;
     double lat, lon;
     cvp->viewportToCube( rubberBandTool()->vertices()[1].rx(),
                          rubberBandTool()->vertices()[1].ry(),
                          samp, line );
     if ( cvp->cube() == m_leftCube ) {
-      m_leftGM->SetImage(samp, line);
+      m_leftGM->SetImage(samp, line, naif);
       lat = m_leftGM->UniversalLatitude();
       lon = m_leftGM->UniversalLongitude();
     }
     else {
-      m_rightGM->SetImage(samp, line);
+      m_rightGM->SetImage(samp, line, naif);
       lat = m_rightGM->UniversalLatitude();
       lon = m_rightGM->UniversalLongitude();
     }
@@ -1165,16 +1169,17 @@ namespace Isis {
 
     //  TODO:   ADD AUTOSEED OPTION (CHECKBOX?)
 
+    auto naif = NaifContext::acquire();
     double leftSamp = 0, leftLine = 0;
     double rightSamp = 0, rightLine = 0;
 
     //  Make sure point exists on both linked cubes
-    if ( m_leftGM->SetUniversalGround(lat, lon) ) {
+    if ( m_leftGM->SetUniversalGround(naif, lat, lon) ) {
       leftSamp = m_leftGM->Sample();
       leftLine = m_leftGM->Line();
 
       //  Make sure point is on Right cube
-      if ( m_rightGM->SetUniversalGround(lat, lon) ) {
+      if ( m_rightGM->SetUniversalGround(naif, lat, lon) ) {
         //  Make sure point on Right cube
         rightSamp = m_rightGM->Sample();
         rightLine = m_rightGM->Line();
@@ -1247,7 +1252,7 @@ namespace Isis {
     }
 
     newPoint->SetType(ControlPoint::Free);
-    newPoint->SetAprioriSurfacePoint( SurfacePoint(
+    newPoint->SetAprioriSurfacePoint( SurfacePoint(naif,
               Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees),
               m_targetRadius) );
 
@@ -1331,11 +1336,12 @@ namespace Isis {
    * @history 2010-05-18  Tracie Sucharski - Added pointId to the dialog.
    */
   void StereoTool::loadPoint() {
+    auto naif = NaifContext::acquire();
 
     //  Initialize pointEditor with measures
     m_pointEditor->setLeftMeasure( m_editPoint->GetMeasure(Left), m_leftCube,
                                    m_editPoint->GetId() );
-    m_pointEditor->setRightMeasure( m_editPoint->GetMeasure(Right),
+    m_pointEditor->setRightMeasure( naif, m_editPoint->GetMeasure(Right),
                                     m_rightCube, m_editPoint->GetId() );
 
     //  Write pointId
@@ -1490,7 +1496,8 @@ namespace Isis {
       leftCamera->SetImage( (*point)[Left]->GetSample(),
                            (*point)[Left]->GetLine(),
                            naif );
-      m_baseRadius = leftCamera->LocalRadius( leftCamera->GetLatitude(),
+      m_baseRadius = leftCamera->LocalRadius( naif,
+                                              leftCamera->GetLatitude(),
                                               leftCamera->GetLongitude() );
       if ( !m_baseRadius.isValid() ) {
         QString message = "Invalid Dem radius, defaulting to ellipsoidal.";
@@ -1510,7 +1517,7 @@ namespace Isis {
                            naif );
 
     double radius, lat, lon, sepang;
-    if ( Stereo::elevation( *leftCamera, *rightCamera, radius, lat, lon, sepang,
+    if ( Stereo::elevation( naif, *leftCamera, *rightCamera, radius, lat, lon, sepang,
                             elevationError ) ) {
       elevation = radius - m_baseRadius.meters();
 //      cout<<setprecision(15)<<"radius = "<<radius<<"  baseRadius = "<<m_baseRadius.meters()<<"  elevation = "<<elevation<<endl;
@@ -1781,7 +1788,7 @@ namespace Isis {
           if ( m_radiusBox->currentText() == "DEM Radius" ) {
             shortCube->camera()->IgnoreElevationModel(false);
             shortCube->camera()->SetImage(shortSamp, shortLine, naif);
-            m_baseRadius = shortCube->camera()->LocalRadius(
+            m_baseRadius = shortCube->camera()->LocalRadius(naif,
                                   shortCube->camera()->GetLatitude(),
                                   shortCube->camera()->GetLongitude() );
             if ( !m_baseRadius.isValid() ) {
@@ -1797,7 +1804,7 @@ namespace Isis {
           shortCube->camera()->SetImage(shortSamp, shortLine, naif);
           longCube->camera()->SetImage(longSamp,longLine, naif);
           double radius, lat, lon, sepang;
-          if (Stereo::elevation( *shortCube->camera(), *longCube->camera(),
+          if (Stereo::elevation( naif, *shortCube->camera(), *longCube->camera(),
                                  radius, lat, lon, sepang, elevationError) )
           elevation = radius - m_baseRadius.meters();
           profileData.append( QPointF(i, elevation) );

@@ -92,6 +92,8 @@ namespace Isis {
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
+    NaifContextLifecycle naif_lifecycle;
+    auto naif = NaifContext::acquire();
 
     cout.precision(6);
 
@@ -224,7 +226,8 @@ int main(int argc, char *argv[]) {
     freePoint->Add(freeMeasure2);
     ControlPoint *fixedPoint = new ControlPoint("FixedPoint");
     fixedPoint->SetType(ControlPoint::Fixed);
-    SurfacePoint fixedSurfacePoint(Latitude(90.0, Angle::Degrees),
+    SurfacePoint fixedSurfacePoint(naif,
+                                   Latitude(90.0, Angle::Degrees),
                                    Longitude(180.0, Angle::Degrees),
                                    Distance(10.0, Distance::Meters));
     fixedPoint->SetAdjustedSurfacePoint(fixedSurfacePoint);

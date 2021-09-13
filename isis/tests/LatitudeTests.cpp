@@ -6,6 +6,7 @@
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
 #include "TestUtilities.h"
+#include "NaifContext.h"
 
 #include <gtest/gtest.h>
 #include <QString>
@@ -68,7 +69,8 @@ TEST(Latitude, AngleInputConstructor) {
 
 TEST_F(Latitude_MappingGroupTest, AnglePlanetocentricConstructor) {
   Isis::Angle angle(45.0, Isis::Angle::Degrees);
-  Isis::Latitude latitude(angle, mappingGroup);
+  auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, angle, mappingGroup);
   EXPECT_EQ(latitude.degrees(), 45.0);
   EXPECT_EQ(latitude.errorChecking(), Isis::Latitude::ThrowAllErrors);
 }
@@ -77,7 +79,8 @@ TEST_F(Latitude_MappingGroupTest, AnglePlanetocentricConstructor) {
 TEST_F(Latitude_MappingGroupTest, AnglePlanetographicConstructor) {
   mappingGroup["LatitudeType"][0] = "Planetographic";
   Isis::Angle angle(45.0, Isis::Angle::Degrees);
-  Isis::Latitude latitude(angle, mappingGroup);
+  auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, angle, mappingGroup);
   EXPECT_EQ(latitude.degrees(), 45.0);
   EXPECT_EQ(latitude.errorChecking(), Isis::Latitude::ThrowAllErrors);
 }
@@ -85,14 +88,16 @@ TEST_F(Latitude_MappingGroupTest, AnglePlanetographicConstructor) {
 
 TEST_F(Latitude_MappingGroupTest, DegreePlanetographicConstructor) {
   mappingGroup["LatitudeType"][0] = "Planetographic";
-  Isis::Latitude latitude(45.0, mappingGroup, Isis::Angle::Degrees);
+  auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, 45.0, mappingGroup, Isis::Angle::Degrees);
   EXPECT_EQ(latitude.degrees(), 45.0);
   EXPECT_EQ(latitude.errorChecking(), Isis::Latitude::ThrowAllErrors);
 }
 
 
 TEST_F(Latitude_MappingGroupTest, DegreePlanetocentricConstructor) {
-  Isis::Latitude latitude(45.0, mappingGroup, Isis::Angle::Degrees);
+  auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, 45.0, mappingGroup, Isis::Angle::Degrees);
   EXPECT_EQ(latitude.degrees(), 45.0);
   EXPECT_EQ(latitude.errorChecking(), Isis::Latitude::ThrowAllErrors);
 }
@@ -103,7 +108,8 @@ TEST_F(Latitude_MappingGroupTest, AngleIncorrectLatitudeType) {
   try {
     mappingGroup["LatitudeType"][0] = "InvalidValue";
     Isis::Angle angle(45.0, Isis::Angle::Degrees);
-    Isis::Latitude latitude(angle, mappingGroup);
+    auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, angle, mappingGroup);
     FAIL() << "Expected an IException";
   }
   catch(Isis::IException &e) {
@@ -119,7 +125,8 @@ TEST_F(Latitude_MappingGroupTest, DegreeIncorrectLatitudeType) {
   QString message = "is not recognized";
   try {
     mappingGroup["LatitudeType"][0] = "InvalidValue";
-    Isis::Latitude latitude(45.0, mappingGroup, Isis::Angle::Degrees);
+    auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, 45.0, mappingGroup, Isis::Angle::Degrees);
     FAIL() << "Expected an IException";
   }
   catch(Isis::IException &e) {
@@ -136,7 +143,8 @@ TEST_F(Latitude_MappingGroupTest, AngleMissingRadii) {
   try {
     mappingGroup.deleteKeyword("EquatorialRadius");
     Isis::Angle angle(45.0, Isis::Angle::Degrees);
-    Isis::Latitude latitude(angle, mappingGroup);
+    auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, angle, mappingGroup);
     FAIL() << "Expected an IException";
   }
   catch(Isis::IException &e) {
@@ -152,7 +160,8 @@ TEST_F(Latitude_MappingGroupTest, DegreeMissingRadii) {
   QString message = "Unable to create Latitude object from given mapping group";
   try {
     mappingGroup.deleteKeyword("EquatorialRadius");
-    Isis::Latitude latitude(45.0, mappingGroup, Isis::Angle::Degrees);
+    auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, 45.0, mappingGroup, Isis::Angle::Degrees);
     FAIL() << "Expected an IException";
   }
   catch(Isis::IException &e) {
@@ -165,7 +174,8 @@ TEST_F(Latitude_MappingGroupTest, DegreeMissingRadii) {
 
 
 TEST_F(Latitude_TargetNameGroupTest, DegreeTargetRadiiConstructor) {
-  Isis::Latitude latitude(45.0, mappingGroup, Isis::Angle::Degrees);
+  auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, 45.0, mappingGroup, Isis::Angle::Degrees);
   EXPECT_EQ(latitude.degrees(), 45.0);
   EXPECT_EQ(latitude.errorChecking(), Isis::Latitude::ThrowAllErrors);
 }
@@ -173,7 +183,8 @@ TEST_F(Latitude_TargetNameGroupTest, DegreeTargetRadiiConstructor) {
 
 TEST_F(Latitude_TargetNameGroupTest, AngleTargetRadiiConstructor) {
   Isis::Angle angle(45.0, Isis::Angle::Degrees);
-  Isis::Latitude latitude(angle, mappingGroup);
+  auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, angle, mappingGroup);
   EXPECT_EQ(latitude.degrees(), 45.0);
   EXPECT_EQ(latitude.errorChecking(), Isis::Latitude::ThrowAllErrors);
 }
@@ -366,18 +377,20 @@ TEST(Latitude, Assignment) {
 
 
 TEST_F(Latitude_MappingGroupTest, AddPlanetocentric) {
-  Isis::Latitude latitude(1.0, mappingGroup, Isis::Angle::Degrees);
+  auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, 1.0, mappingGroup, Isis::Angle::Degrees);
   Isis::Angle angleToAdd(2.0, Isis::Angle::Degrees);
-  latitude = latitude.add(angleToAdd, mappingGroup);
+  latitude = latitude.add(naif, angleToAdd, mappingGroup);
   ASSERT_DOUBLE_EQ(latitude.degrees(), 1.0 + 2.0);
 }
 
 
 TEST_F(Latitude_MappingGroupTest, AddPlanetographic) {
   mappingGroup["LatitudeType"][0] = "Planetographic";
-  Isis::Latitude latitude(1.0, mappingGroup, Isis::Angle::Degrees);
+  auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, 1.0, mappingGroup, Isis::Angle::Degrees);
   Isis::Angle angleToAdd(2.0, Isis::Angle::Degrees);
-  latitude = latitude.add(angleToAdd, mappingGroup);
+  latitude = latitude.add(naif, angleToAdd, mappingGroup);
   ASSERT_DOUBLE_EQ(latitude.degrees(), 1.0 + 2.0);
 }
 
@@ -387,9 +400,10 @@ TEST_F(Latitude_MappingGroupTest, AddIncorrectLatitudeType) {
   try {
     mappingGroup["LatitudeType"][0] = "Planetographic";
     Isis::Angle angle(1.0, Isis::Angle::Degrees);
-    Isis::Latitude latitude(angle, mappingGroup);
+    auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, angle, mappingGroup);
     mappingGroup["LatitudeType"][0] = "InvalidValue";
-    latitude = latitude.add(angle, mappingGroup);
+    latitude = latitude.add(naif, angle, mappingGroup);
     FAIL() << "Expected an IException";
   }
   catch(Isis::IException &e) {
@@ -402,9 +416,10 @@ TEST_F(Latitude_MappingGroupTest, AddIncorrectLatitudeType) {
 
 
 TEST_F(Latitude_TargetNameGroupTest, Add) {
-  Isis::Latitude latitude(1.0, mappingGroup, Isis::Angle::Degrees);
+  auto naif = Isis::NaifContext::acquire();
+  Isis::Latitude latitude(naif, 1.0, mappingGroup, Isis::Angle::Degrees);
   Isis::Angle angleToAdd(2.0, Isis::Angle::Degrees);
-  latitude = latitude.add(angleToAdd, mappingGroup);
+  latitude = latitude.add(naif, angleToAdd, mappingGroup);
   ASSERT_DOUBLE_EQ(latitude.degrees(), 1.0 + 2.0);
 }
 

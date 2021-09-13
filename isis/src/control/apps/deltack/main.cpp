@@ -274,7 +274,7 @@ void IsisMain() {
 
 
       // Output bundle adjust files
-      bundleSolution->outputText();
+      bundleSolution->outputText(naif);
       bundleSolution->outputResiduals();
 
       Table cmatrix = bundleAdjust->cMatrix(0);
@@ -329,7 +329,7 @@ void IsisMain() {
 Distance GetRadius(NaifContextPtr naif, QString filename, Latitude lat, Longitude lon) {
   Cube cube(filename, "r");
   Camera *sensor = CameraFactory::Create(cube);
-  sensor->SetGround(naif, SurfacePoint(naif, lat, lon, sensor->LocalRadius(lat, lon)));
+  sensor->SetGround(naif, SurfacePoint(naif, lat, lon, sensor->LocalRadius(naif, lat, lon)));
   Distance radius = sensor->LocalRadius();
   if (!radius.isValid()) {
     QString msg = "Could not determine radius from DEM at lat/lon [";

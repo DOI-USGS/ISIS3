@@ -60,6 +60,8 @@ class MySensor : public Sensor {
 int main(int argc, char *argv[]) {
 
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   try {
 
@@ -107,10 +109,10 @@ int main(int argc, char *argv[]) {
     cerr << "Test SetLookDirection using ShapeModel=Null" << endl;
     for(int i = 0; i < 10; i++) {
       double t = startTime + (double) i * slope;
-      spi.setTime(iTime(t));
+      spi.setTime(iTime(t), naif);
       cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
 
-      spi.SetLookDirection(v);
+      spi.SetLookDirection(v, naif);
 
       cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
       cerr << "Latitude            = " << spi.UniversalLatitude() << endl;
@@ -120,18 +122,18 @@ int main(int argc, char *argv[]) {
            << endl;
       cerr << "Local Radius        = " //< setprecision(6)
            << spi.LocalRadius().meters() << endl;
-      cerr << "Phase               = " << spi.PhaseAngle() << endl;
-      cerr << "Emission            = " << spi.EmissionAngle() << endl;
+      cerr << "Phase               = " << spi.PhaseAngle(naif) << endl;
+      cerr << "Emission            = " << spi.EmissionAngle(naif) << endl;
       cerr << "Incidence           = " << spi.IncidenceAngle(naif) << endl;
-      spi.LookDirection(p);
+      spi.LookDirection(p, naif);
       cerr << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
            << endl;
       spi.SpacecraftSurfaceVector(scSurf);
       cerr << "Spacecraft Surface Vector = " << scSurf[0] << " " << scSurf[1]
            << " " << scSurf[2] <<endl;
-      cerr << "Slant Distance      = " << spi.SlantDistance() << endl;
-      cerr << "Local Solar Time    = " << spi.LocalSolarTime() << endl;
-      cerr << "Spacecraft Altitude = " << spi.SpacecraftAltitude() << endl;
+      cerr << "Slant Distance      = " << spi.SlantDistance(naif) << endl;
+      cerr << "Local Solar Time    = " << spi.LocalSolarTime(naif) << endl;
+      cerr << "Spacecraft Altitude = " << spi.SpacecraftAltitude(naif) << endl;
       cerr << "Solar Distance      = " << spi.SolarDistance() << endl;
     }
     cerr << endl;
@@ -141,14 +143,14 @@ int main(int argc, char *argv[]) {
     p[0] = 0.0;
     p[1] = 0.0;
     p[2] = -1.0;
-    spi.SetLookDirection(p);
+    spi.SetLookDirection(p, naif);
     cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
     cerr << endl;
 
     // Test SetUniversalGround
     cerr << "Test SetUniversalGround (lat/lon only) using ShapeModel=Null"
          << endl;
-    spi.SetUniversalGround(11.57143551329, 223.328646604);
+    spi.SetUniversalGround(naif, 11.57143551329, 223.328646604);
     cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
     cerr << "Latitude            = " << spi.UniversalLatitude() << endl;
     cerr << "Longitude           = " << spi.UniversalLongitude() << endl;
@@ -156,18 +158,18 @@ int main(int argc, char *argv[]) {
     cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
     cerr << "Local Radius        = " << spi.LocalRadius().meters() << endl;
-    cerr << "Phase               = " << spi.PhaseAngle() << endl;
-    cerr << "Emission            = " << spi.EmissionAngle() << endl;
+    cerr << "Phase               = " << spi.PhaseAngle(naif) << endl;
+    cerr << "Emission            = " << spi.EmissionAngle(naif) << endl;
     cerr << "Incidence           = " << spi.IncidenceAngle(naif) << endl;
-    spi.LookDirection(p);
+    spi.LookDirection(p, naif);
     cerr << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
     spi.SpacecraftSurfaceVector(scSurf);
     cerr << "Spacecraft Surface Vector = " << scSurf[0] << " " << scSurf[1]
          << " " << scSurf[2] <<endl;
-    cerr << "Slant Distance      = " << spi.SlantDistance() << endl;
-    cerr << "Local Solar Time    = " << spi.LocalSolarTime() << endl;
-    cerr << "Spacecraft Altitude = " << spi.SpacecraftAltitude() << endl;
+    cerr << "Slant Distance      = " << spi.SlantDistance(naif) << endl;
+    cerr << "Local Solar Time    = " << spi.LocalSolarTime(naif) << endl;
+    cerr << "Spacecraft Altitude = " << spi.SpacecraftAltitude(naif) << endl;
     cerr << "Solar Distance      = " << spi.SolarDistance() << endl;
     cerr << endl;
 
@@ -177,8 +179,8 @@ int main(int argc, char *argv[]) {
     Latitude lat(11.57143551329, Angle::Degrees);
     Longitude lon(223.328646604, Angle::Degrees);
     Distance radius(3400., Distance::Meters);
-    SurfacePoint tmp(lat, lon, radius);
-    spi.SetGround(tmp);
+    SurfacePoint tmp(naif, lat, lon, radius);
+    spi.SetGround(naif, tmp);
 
     cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
     cerr << "Latitude            = " << spi.UniversalLatitude() << endl;
@@ -188,24 +190,24 @@ int main(int argc, char *argv[]) {
     cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
     cerr << "Local Radius        = " << spi.LocalRadius().meters() << endl;
-    cerr << "Phase               = " << spi.PhaseAngle() << endl;
-    cerr << "Emission            = " << spi.EmissionAngle() << endl;
+    cerr << "Phase               = " << spi.PhaseAngle(naif) << endl;
+    cerr << "Emission            = " << spi.EmissionAngle(naif) << endl;
     cerr << "Incidence           = " << spi.IncidenceAngle(naif) << endl;
-    spi.LookDirection(p);
+    spi.LookDirection(p, naif);
     cerr << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
     spi.SpacecraftSurfaceVector(scSurf);
     cerr << "Spacecraft Surface Vector = " << scSurf[0] << " " << scSurf[1]
          << " " << scSurf[2] <<endl;
-    cerr << "Slant Distance      = " << spi.SlantDistance() << endl;
-    cerr << "Local Solar Time    = " << spi.LocalSolarTime() << endl;
-    cerr << "Spacecraft Altitude = " << spi.SpacecraftAltitude() << endl;
+    cerr << "Slant Distance      = " << spi.SlantDistance(naif) << endl;
+    cerr << "Local Solar Time    = " << spi.LocalSolarTime(naif) << endl;
+    cerr << "Spacecraft Altitude = " << spi.SpacecraftAltitude(naif) << endl;
     cerr << "Solar Distance      = " << spi.SolarDistance() << endl;
     cerr << endl;
 
     // Test bad ground point
     cerr << "Test Bad ground point using ShapeModel=Null" << endl;
-    spi.SetUniversalGround(11.57143551329, 43.328646604);
+    spi.SetUniversalGround(naif, 11.57143551329, 43.328646604);
     cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl
          << endl << endl;
 
@@ -236,10 +238,10 @@ int main(int argc, char *argv[]) {
             "$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub" << endl;
     for(int i = 0; i < 10; i++) {
       double t = startTime + (double) i * slope;
-      spi2.setTime(iTime(t));
+      spi2.setTime(iTime(t), naif);
       cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
 
-      spi2.SetLookDirection(v);
+      spi2.SetLookDirection(v, naif);
 
       cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
       cerr << "Latitude            = " << spi2.UniversalLatitude() << endl;
@@ -248,18 +250,18 @@ int main(int argc, char *argv[]) {
       cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
            << endl;
       cerr << "Local Radius        = " << spi2.LocalRadius().meters() << endl;
-      cerr << "Phase               = " << spi2.PhaseAngle() << endl;
-      cerr << "Emission            = " << spi2.EmissionAngle() << endl;
+      cerr << "Phase               = " << spi2.PhaseAngle(naif) << endl;
+      cerr << "Emission            = " << spi2.EmissionAngle(naif) << endl;
       cerr << "Incidence           = " << spi2.IncidenceAngle(naif) << endl;
-      spi2.LookDirection(p);
+      spi2.LookDirection(p, naif);
       cerr << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
            << endl;
       spi2.SpacecraftSurfaceVector(scSurf);
       cerr << "Spacecraft Surface Vector = " << scSurf[0] << " " << scSurf[1]
            << " " << scSurf[2] <<endl;
-      cerr << "Slant Distance      = " << spi2.SlantDistance() << endl;
-      cerr << "Local Solar Time    = " << spi2.LocalSolarTime() << endl;
-      cerr << "Spacecraft Altitude = " << spi2.SpacecraftAltitude() << endl;
+      cerr << "Slant Distance      = " << spi2.SlantDistance(naif) << endl;
+      cerr << "Local Solar Time    = " << spi2.LocalSolarTime(naif) << endl;
+      cerr << "Spacecraft Altitude = " << spi2.SpacecraftAltitude(naif) << endl;
       cerr << "Solar Distance      = " << spi2.SolarDistance() << endl;
     }
     cerr << endl;
@@ -271,7 +273,7 @@ int main(int argc, char *argv[]) {
     p[0] = 0.0;
     p[1] = 0.0;
     p[2] = -1.0;
-    spi2.SetLookDirection(p);
+    spi2.SetLookDirection(p, naif);
     cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
     cerr << endl;
 
@@ -279,7 +281,7 @@ int main(int argc, char *argv[]) {
     cerr << "Test SetUniversalGround (lat/lon only) using "
             "ShapeModel=$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub"
          << endl;
-    spi2.SetUniversalGround(11.57143551329, 223.328646604);
+    spi2.SetUniversalGround(naif, 11.57143551329, 223.328646604);
     cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
     cerr << "Latitude            = " << spi2.UniversalLatitude() << endl;
     cerr << "Longitude           = " << spi2.UniversalLongitude() << endl;
@@ -287,18 +289,18 @@ int main(int argc, char *argv[]) {
     cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
     cerr << "Local Radius        = " << spi2.LocalRadius().meters() << endl;
-    cerr << "Phase               = " << spi2.PhaseAngle() << endl;
-    cerr << "Emission            = " << spi2.EmissionAngle() << endl;
+    cerr << "Phase               = " << spi2.PhaseAngle(naif) << endl;
+    cerr << "Emission            = " << spi2.EmissionAngle(naif) << endl;
     cerr << "Incidence           = " << spi2.IncidenceAngle(naif) << endl;
-    spi2.LookDirection(p);
+    spi2.LookDirection(p, naif);
     cerr << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
     spi2.SpacecraftSurfaceVector(scSurf);
     cerr << "Spacecraft Surface Vector = " << scSurf[0] << " " << scSurf[1]
          << " " << scSurf[2] <<endl;
-    cerr << "Slant Distance      = " << spi2.SlantDistance() << endl;
-    cerr << "Local Solar Time    = " << spi2.LocalSolarTime() << endl;
-    cerr << "Spacecraft Altitude = " << spi2.SpacecraftAltitude() << endl;
+    cerr << "Slant Distance      = " << spi2.SlantDistance(naif) << endl;
+    cerr << "Local Solar Time    = " << spi2.LocalSolarTime(naif) << endl;
+    cerr << "Spacecraft Altitude = " << spi2.SpacecraftAltitude(naif) << endl;
     cerr << "Solar Distance      = " << spi2.SolarDistance() << endl;
     cerr << endl;
 
@@ -306,7 +308,7 @@ int main(int argc, char *argv[]) {
     cerr << "Test SetUniversalGround (lat/lon/radius) using "
             "ShapeModel=$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub"
          << endl;
-    spi2.SetUniversalGround(11.57143551329, 223.328646604, 3400.);
+    spi2.SetUniversalGround(naif, 11.57143551329, 223.328646604, 3400.);
     cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
     cerr << "Latitude            = " << spi2.UniversalLatitude() << endl;
     cerr << "Longitude           = " << spi2.UniversalLongitude() << endl;
@@ -315,18 +317,18 @@ int main(int argc, char *argv[]) {
     cerr << "Point               = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
     cerr << "Local Radius        = " << spi2.LocalRadius().meters() << endl;
-    cerr << "Phase               = " << spi2.PhaseAngle() << endl;
-    cerr << "Emission            = " << spi2.EmissionAngle() << endl;
+    cerr << "Phase               = " << spi2.PhaseAngle(naif) << endl;
+    cerr << "Emission            = " << spi2.EmissionAngle(naif) << endl;
     cerr << "Incidence           = " << spi2.IncidenceAngle(naif) << endl;
-    spi2.LookDirection(p);
+    spi2.LookDirection(p, naif);
     cerr << "Look Direction      = " << p[0] << " " << p[1] << " " << p[2]
          << endl;
     spi2.SpacecraftSurfaceVector(scSurf);
     cerr << "Spacecraft Surface Vector = " << scSurf[0] << " " << scSurf[1]
          << " " << scSurf[2] <<endl;
-    cerr << "Slant Distance      = " << spi2.SlantDistance() << endl;
-    cerr << "Local Solar Time    = " << spi2.LocalSolarTime() << endl;
-    cerr << "Spacecraft Altitude = " << spi2.SpacecraftAltitude() << endl;
+    cerr << "Slant Distance      = " << spi2.SlantDistance(naif) << endl;
+    cerr << "Local Solar Time    = " << spi2.LocalSolarTime(naif) << endl;
+    cerr << "Spacecraft Altitude = " << spi2.SpacecraftAltitude(naif) << endl;
     cerr << "Solar Distance      = " << spi2.SolarDistance() << endl;
     cerr << endl;
 
@@ -334,7 +336,7 @@ int main(int argc, char *argv[]) {
     cerr << "Test Bad ground point using "
             "ShapeModel=$ISISDATA/base/dems/molaMarsPlanetaryRadius0004.cub"
          << endl;
-    spi2.SetUniversalGround(11.57143551329, 43.328646604);
+    spi2.SetUniversalGround(naif, 11.57143551329, 43.328646604);
     cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
     
     // Test name methods

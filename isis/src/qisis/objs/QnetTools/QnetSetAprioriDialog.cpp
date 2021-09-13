@@ -400,6 +400,8 @@ namespace Isis {
     //we can only populate the line edits if there is one point selected
     if (m_points.size() == 1) {
 
+      auto naif = NaifContext::acquire();
+      
       QString id = m_points.at(0)->text();
       ControlPoint *pt = m_qnetTool->controlNet()->GetPoint(id);
       ControlMeasure *m = pt->GetRefMeasure();
@@ -408,7 +410,7 @@ namespace Isis {
       int camIndex = m_qnetTool->serialNumberList()->serialNumberIndex(
           m->GetCubeSerialNumber());
       Camera *cam = m_qnetTool->controlNet()->Camera(camIndex);
-      cam->SetImage(m->GetSample(),m->GetLine());
+      cam->SetImage(m->GetSample(),m->GetLine(), naif);
       SurfacePoint refSPt = cam->GetSurfacePoint();
       if (refSPt.GetLatitude().degrees() != Null) {
          m_latLineEdit->setText(
@@ -481,7 +483,7 @@ namespace Isis {
       QString id = m_points.at(0)->text();
       ControlPoint *pt = m_qnetTool->controlNet()->GetPoint(id);
 
-
+      auto naif = NaifContext::acquire();
 
       //this code is copied from ControlPoint::ComputeApriori
 
@@ -496,7 +498,7 @@ namespace Isis {
             QString msg = "The Camera must be set prior to calculating apriori";
             throw IException(IException::Programmer, msg, _FILEINFO_);
           }
-          if (cam->SetImage(m->GetSample(), m->GetLine())) {
+          if (cam->SetImage(m->GetSample(), m->GetLine(), naif)) {
             goodMeasures++;
             double pB[3];
             cam->Coordinate(pB);
@@ -534,7 +536,7 @@ namespace Isis {
         double avgR2 = r2B / goodMeasures;
         double scale = sqrt(avgR2/(avgX*avgX+avgY*avgY+avgZ*avgZ));
 
-        aprioriSurfacePoint.SetRectangular(
+        aprioriSurfacePoint.SetRectangular(naif,
           Displacement((avgX*scale), Displacement::Kilometers),
           Displacement((avgY*scale), Displacement::Kilometers),
           Displacement((avgZ*scale), Displacement::Kilometers));
@@ -546,7 +548,7 @@ namespace Isis {
                !pt->IsCoord1Constrained() &&
                !pt->IsCoord2Constrained() &&
                !pt->IsCoord3Constrained()){
-          aprioriSurfacePoint.SetRectangular(
+          aprioriSurfacePoint.SetRectangular(naif,
           Displacement(aprioriSurfacePoint.GetX().meters(), Displacement::Meters),
           Displacement(aprioriSurfacePoint.GetY().meters(), Displacement::Meters),
           Displacement((zB / goodMeasures), Displacement::Kilometers));
@@ -913,11 +915,13 @@ namespace Isis {
       m_aprioriSource = (Source) USER;
     }
 
+    auto naif = NaifContext::acquire();
+
     for (int i = 0; i < m_points.size(); i++) {
       QString id = m_points.at(i)->text();
       ControlPoint *pt = m_qnetTool->controlNet()->GetPoint(id);
       if (m_points.size() == 1) {
-        pt->SetAprioriSurfacePoint(SurfacePoint(
+        pt->SetAprioriSurfacePoint(SurfacePoint(naif,
                                    Latitude(lat, Angle::Degrees),
                                    Longitude(lon, Angle::Degrees),
                                    Distance(radius,Distance::Meters)));
@@ -952,7 +956,8 @@ namespace Isis {
         //  first set the target radii
         SurfacePoint spt = pt->GetAprioriSurfacePoint();
 
-        spt.SetSphericalSigmasDistance(Distance(latSigma,Distance::Meters),
+        spt.SetSphericalSigmasDistance(naif,
+                                        Distance(latSigma,Distance::Meters),
                                         Distance(lonSigma,Distance::Meters),
                                         Distance(radiusSigma,Distance::Meters));
 

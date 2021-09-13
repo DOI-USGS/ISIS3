@@ -75,7 +75,7 @@ FastGeom::~FastGeom() { }
  * @param train            Train image
  * @return ImageTransform* Pointer to FastGeom transform
  */
-ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train)  {
+ImageTransform *FastGeom::compute(NaifContextPtr naif, MatchImage &query, MatchImage &train)  {
   // std::cout << "\nQuery: " << query.source().name() << "\n";
   // std::cout << "Train: " << train.source().name() << "\n";
 
@@ -84,7 +84,7 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train)  {
   RectArea tSize(0.0f, 0.0f, train.source().samples(), train.source().lines() );
 
   // std::cout << "Train-to-query mapping...\n";
-  cv::Mat t_to_q = train.source().getGeometryMapping(query.source(), 
+  cv::Mat t_to_q = train.source().getGeometryMapping(naif, query.source(), 
                                                      m_fastpts, 
                                                      m_tolerance); 
 
@@ -142,9 +142,9 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train)  {
   return ( fastg.take() );
 }
 
-void FastGeom::apply(MatchImage &query, MatchImage &train) {
+void FastGeom::apply(NaifContextPtr naif, MatchImage &query, MatchImage &train) {
   // Add the fastggeom mapping transform
-  train.addTransform( compute(query, train) );
+  train.addTransform( compute(naif, query, train) );
   return;
 }
 

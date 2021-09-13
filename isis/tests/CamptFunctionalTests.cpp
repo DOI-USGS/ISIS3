@@ -16,6 +16,8 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/campt.xml").expanded();
 
 TEST_F(DefaultCube, FunctionalTestCamptBadColumnError) {
+  auto naif = NaifContext::acquire();
+  
   // set up bad coordinates file
   std::ofstream of;
   of.open(tempDir.path().toStdString()+"/badList.lis");
@@ -30,7 +32,7 @@ TEST_F(DefaultCube, FunctionalTestCamptBadColumnError) {
   Pvl appLog;
 
   try {
-    campt(testCube, options, &appLog);
+    campt(naif, testCube, options, &appLog);
     FAIL() << "Expected an exception to be thrown";
   }
   catch(Isis::IException &e) {
@@ -48,10 +50,11 @@ TEST_F(DefaultCube, FunctionalTestCamptFlatFileError) {
   // configure UserInterface arguments for flat file error
   QVector<QString> args = {"format=flat"};
   UserInterface options(APP_XML, args);
+  auto naif = NaifContext::acquire();
   Pvl appLog;
 
   try {
-    campt(testCube, options, &appLog);
+    campt(naif, testCube, options, &appLog);
     FAIL() << "Expected an exception to be thrown";
   }
   catch(Isis::IException &e) {
@@ -66,9 +69,10 @@ TEST_F(DefaultCube, FunctionalTestCamptFlatFileError) {
 TEST_F(DefaultCube, FunctionalTestCamptDefaultParameters) {
   QVector<QString> args = {};
   UserInterface options(APP_XML, args);
+  auto naif = NaifContext::acquire();
   Pvl appLog;
 
-  campt(testCube, options, &appLog);
+  campt(naif, testCube, options, &appLog);
   PvlGroup groundPoint = appLog.findGroup("GroundPoint");
 
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 602.0);
@@ -144,9 +148,10 @@ TEST_F(DefaultCube, FunctionalTestCamptDefaultParameters) {
 TEST_F(DefaultCube, FunctionalTestCamptSetSL) {
   QVector<QString> args = {"sample=25.0", "line=25.0"};
   UserInterface options(APP_XML, args);
+  auto naif = NaifContext::acquire();
   Pvl appLog;
 
-  campt(testCube, options, &appLog);
+  campt(naif, testCube, options, &appLog);
   PvlGroup groundPoint = appLog.findGroup("GroundPoint");
 
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 25.0);
@@ -156,9 +161,10 @@ TEST_F(DefaultCube, FunctionalTestCamptSetSL) {
 TEST_F(DefaultCube, FunctionalTestCamptSetS) {
   QVector<QString> args = {"sample=25.0"};
   UserInterface options(APP_XML, args);
+  auto naif = NaifContext::acquire();
   Pvl appLog;
 
-  campt(testCube, options, &appLog);
+  campt(naif, testCube, options, &appLog);
   PvlGroup groundPoint = appLog.findGroup("GroundPoint");
 
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 25.0);
@@ -168,9 +174,10 @@ TEST_F(DefaultCube, FunctionalTestCamptSetS) {
 TEST_F(DefaultCube, FunctionalTestCamptSetL) {
   QVector<QString> args = {"line=25.0"};
   UserInterface options(APP_XML, args);
+  auto naif = NaifContext::acquire();
   Pvl appLog;
 
-  campt(testCube, options, &appLog);
+  campt(naif, testCube, options, &appLog);
   PvlGroup groundPoint = appLog.findGroup("GroundPoint");
 
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 602.0);
@@ -180,9 +187,10 @@ TEST_F(DefaultCube, FunctionalTestCamptSetL) {
 TEST_F(DefaultCube, FunctionalTestCamptSetGround) {
   QVector<QString> args = {"type=ground", "latitude=10.181441241544", "longitude=255.89292858176"};
   UserInterface options(APP_XML, args);
+  auto naif = NaifContext::acquire();
   Pvl appLog;
 
-  campt(testCube, options, &appLog);
+  campt(naif, testCube, options, &appLog);
   PvlGroup groundPoint = appLog.findGroup("GroundPoint");
 
   EXPECT_NEAR( (double) groundPoint.findKeyword("Sample"), 602.0, 1e-4);
@@ -196,9 +204,10 @@ TEST_F(DefaultCube, FunctionalTestCamptFlat) {
                            "to="+flatFile.fileName(),
                            "append=false"};
   UserInterface options(APP_XML, args);
+  auto naif = NaifContext::acquire();
   Pvl appLog;
 
-  campt(testCube, options, &appLog);
+  campt(naif, testCube, options, &appLog);
 
   int lineNumber = 0;
   QTextStream flatStream(&flatFile);
@@ -228,9 +237,10 @@ TEST_F(DefaultCube, FunctionalTestCamptCoordList) {
                            "append=false",
                            "coordtype=image"};
   UserInterface options(APP_XML, args);
+  auto naif = NaifContext::acquire();
   Pvl appLog;
 
-  campt(testCube, options, &appLog);
+  campt(naif, testCube, options, &appLog);
   PvlGroup groundPoint = appLog.group(0);
 
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 1.0);
@@ -253,9 +263,10 @@ TEST_F(DefaultCube, FunctionalTestCamptCoordList) {
 TEST_F(DefaultCube, FunctionalTestCamptAllowOutside) {
   QVector<QString> args = {"sample=-1", "line=-1", "allowoutside=true"};
   UserInterface options(APP_XML, args);
+  auto naif = NaifContext::acquire();
   Pvl appLog;
 
-  campt(testCube, options, &appLog);
+  campt(naif, testCube, options, &appLog);
   PvlGroup groundPoint = appLog.findGroup("GroundPoint");
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), -1.0);
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), -1.0);

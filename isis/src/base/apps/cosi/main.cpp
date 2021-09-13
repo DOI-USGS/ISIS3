@@ -24,8 +24,9 @@ void IsisMain() {
 }
 
 void divide(Buffer &in, Buffer &out) {
+  auto naif = NaifContext::acquire();
   for(int i = 0; i < in.size(); i++) {
-    if(cam->SetImage(i + 1, in.Line())) {
+    if(cam->SetImage(i + 1, in.Line(), naif)) {
       if(IsSpecial(in[i])) {
         out[i] = in[i];
       }

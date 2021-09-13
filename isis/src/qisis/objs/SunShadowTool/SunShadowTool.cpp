@@ -277,10 +277,11 @@ namespace Isis {
                                      m_startSamp, m_startLine);
 
       Camera *cam = cubeViewport()->cube()->camera();
+      auto naif = NaifContext::acquire();
 
-      if (cam->SetImage(m_startSamp, m_startLine)) {
+      if (cam->SetImage(m_startSamp, m_startLine, naif)) {
         m_tracking = true;
-        *m_trackingAngle = Angle(cam->SunAzimuth(), Angle::Degrees);
+        *m_trackingAngle = Angle(cam->SunAzimuth(naif), Angle::Degrees);
       }
       else {
         m_tracking = false;
@@ -451,6 +452,7 @@ namespace Isis {
    */
   void SunShadowTool::recalculateShadowHeight() {
     try {
+      auto naif = NaifContext::acquire();
       if (m_startSamp != Null && m_startLine != Null &&
           m_endSamp != Null && m_endLine != Null) {
         m_path = FileName(cubeViewport()->cube()->fileName()).path();
@@ -487,7 +489,7 @@ namespace Isis {
         
         bool success = true;
         Camera *cam = cubeViewport()->cube()->camera();
-        success = cam->SetImage(m_startSamp, m_startLine);
+        success = cam->SetImage(m_startSamp, m_startLine, naif);
 
         // Vector is in meters
         QVector3D sunDirection;
@@ -505,9 +507,9 @@ namespace Isis {
           // Vector is in kilometers
           double naifVectorFromSunToP1[3] = {0.0, 0.0, 0.0};
 
-          surfpt_c(origin, sunPosition, targetRadii[0].kilometers(),
-                   targetRadii[1].kilometers(), targetRadii[2].kilometers(),
-                   naifVectorFromSunToP1, &surfptSuccess);
+          naif->surfpt_c(origin, sunPosition, targetRadii[0].kilometers(),
+                         targetRadii[1].kilometers(), targetRadii[2].kilometers(),
+                         naifVectorFromSunToP1, &surfptSuccess);
           success = surfptSuccess;
 
           if (success) {
@@ -519,7 +521,7 @@ namespace Isis {
         }
 
         if (success) {
-          success = cam->SetImage(m_endSamp, m_endLine);
+          success = cam->SetImage(m_endSamp, m_endLine, naif);
         }
 
         if (success) {

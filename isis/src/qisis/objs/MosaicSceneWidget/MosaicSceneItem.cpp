@@ -324,6 +324,7 @@ namespace Isis {
       const QStyleOptionGraphicsItem *option) {
     Stretch *stretch = getStretch();
     QApplication::setOverrideCursor(Qt::WaitCursor);
+    auto naif = NaifContext::acquire();
 
     try {
       QGraphicsPolygonItem *polygon;
@@ -368,7 +369,7 @@ namespace Isis {
                   groundMap = new UniversalGroundMap(*m_image->cube());
                 }
 
-                if(groundMap->SetUniversalGround(lat, lon)) {
+                if(groundMap->SetUniversalGround(naif, lat, lon)) {
                   double dn = Null;
 
                   if(groundMap->Camera() && groundMap->Camera()->InCube()) {

@@ -74,10 +74,11 @@ void IsisMain() {
 // Call Operate once per pixel to get the interest for every pixel in the input cube.
 void Operate(Isis::Buffer &in, Isis::Buffer &out) {
   try {
+    auto naif = NaifContext::acquire();
     int sample = in.Sample();
     int line = in.Line();
 
-    iop->Operate(cube, *unvGMap, sample, line);
+    iop->Operate(naif, cube, *unvGMap, sample, line);
 
     out[0] = iop->InterestAmount();
 

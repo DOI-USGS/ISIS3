@@ -275,6 +275,8 @@ namespace Isis {
    * Accepts the bundle results and saves them to the project. The "Accept" button will be disabled.
    */
   void JigsawRunWidget::on_JigsawAcceptButton_clicked() {
+    auto naif = NaifContext::acquire();
+    
     m_ui->JigsawAcceptButton->setEnabled(false);
 
     // create bundle results folder
@@ -286,11 +288,11 @@ namespace Isis {
 
     //  Write csv files
     m_bundleSolutionInfo->outputResiduals();
-    m_bundleSolutionInfo->outputImagesCSV();
+    m_bundleSolutionInfo->outputImagesCSV(naif);
     m_bundleSolutionInfo->outputPointsCSV();
 
     //  Write text summary file
-    m_bundleSolutionInfo->outputText();
+    m_bundleSolutionInfo->outputText(naif);
 
     // create output control net file name
     FileName outputControlName;

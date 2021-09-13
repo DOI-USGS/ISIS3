@@ -603,6 +603,8 @@ namespace Isis {
       set<QString> &noLatLonSerialNumbers,
       QMap< QString, set<QString> > &noLatLonControlPoints) {
 
+    auto naif = NaifContext::acquire();
+   
     // Set calculating progress
     QList< QString > netSerials = cnet.GetCubeSerials();
     if (netSerials.size() > 0) {
@@ -636,7 +638,7 @@ namespace Isis {
           // Check the exact measure location
           bool setCamera = false;
           if (createdCamera) {
-            setCamera = cam->SetImage(measure->GetSample(), measure->GetLine());
+            setCamera = cam->SetImage(measure->GetSample(), measure->GetLine(), naif);
           }
 
           // Record it if it failed at anything

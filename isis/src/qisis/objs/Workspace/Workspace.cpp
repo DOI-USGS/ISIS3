@@ -337,6 +337,7 @@ namespace Isis {
    *                          Fixes #5476.
    */
   void Workspace::addCubeViewport(QString filename) {
+    auto naif = NaifContext::acquire();
 
     QFileInfo cubeFileName(filename);
 
@@ -363,7 +364,7 @@ namespace Isis {
         int index_green = st.ToInteger();
         st = IString(bands.at(2));
         int index_blue = st.ToInteger();
-        cvp->viewRGB(index_red, index_green, index_blue);
+        cvp->viewRGB(naif, index_red, index_green, index_blue);
       }
     }
 
@@ -389,6 +390,7 @@ namespace Isis {
    *                          file as a cube but fails. Fixes #5439, Fixes #5476.
    */
   void Workspace::addCubeViewportFromList(QString cubelist) {
+    auto naif = NaifContext::acquire();
 
     QFileInfo cubeFileName(cubelist);
 
@@ -432,7 +434,7 @@ namespace Isis {
           int index_green = st.ToInteger();
           st = IString(bands.at(2));
           int index_blue = st.ToInteger();
-          cvp->viewRGB(index_red, index_green, index_blue);
+          cvp->viewRGB(naif, index_red, index_green, index_blue);
         }
       }
       catch (IException &e) {

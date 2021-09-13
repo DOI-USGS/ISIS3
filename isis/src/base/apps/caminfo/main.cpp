@@ -29,12 +29,14 @@ using namespace std;
 using namespace Isis;
 
 QPair<QString, QString> MakePair(QString key, QString val);
-void GeneratePVLOutput(Cube *incube,
+void GeneratePVLOutput(NaifContextPtr naif,
+                       Cube *incube,
                        QList< QPair<QString, QString> > *general,
                        QList< QPair<QString, QString> > *camstats,
                        QList< QPair<QString, QString> > *statistics,
                        BandGeometry *bandGeom);
-void GenerateCSVOutput(Cube *incube,
+void GenerateCSVOutput(NaifContextPtr naif,
+                       Cube *incube,
                        QList< QPair<QString, QString> > *general,
                        QList< QPair<QString, QString> > *camstats,
                        QList< QPair<QString, QString> > *statistics,
@@ -43,6 +45,7 @@ void GenerateCSVOutput(Cube *incube,
 void IsisMain() {
   const QString caminfo_program  = "caminfo";
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   QList< QPair<QString, QString> > *general = NULL, *camstats = NULL, *statistics = NULL;
   BandGeometry *bandGeom = NULL;
@@ -89,7 +92,7 @@ void IsisMain() {
     QString filename = ui.GetAsString("FROM");
     int sinc = ui.GetInteger("SINC");
     int linc = ui.GetInteger("LINC");
-    CameraStatistics stats(filename, sinc, linc);
+    CameraStatistics stats(naif, filename, sinc, linc);
     Pvl camPvl = stats.toPvl();
 
     PvlGroup cg = camPvl.findGroup("Latitude", Pvl::Traverse);
@@ -173,9 +176,9 @@ void IsisMain() {
     int polySinc, polyLinc;
     if(doPolygon && incType.toUpper() == "VERTICES") {
       ImagePolygon poly;
-      poly.initCube(*incube);
-      polySinc = polyLinc = (int)(0.5 + (((poly.validSampleDim() * 2) +
-                                 (poly.validLineDim() * 2) - 3.0) /
+      poly.initCube(naif, *incube);
+      polySinc = polyLinc = (int)(0.5 + (((poly.validSampleDim(naif) * 2) +
+                                 (poly.validLineDim(naif) * 2) - 3.0) /
                                  ui.GetInteger("NUMVERTICES")));
     }
     else if (incType.toUpper() == "LINCSINC"){
@@ -259,7 +262,7 @@ void IsisMain() {
       }
     }
 
-    bandGeom->collect(*cam, *incube, doGeometry, doPolygon, getFootBlob, precision);
+    bandGeom->collect(naif, *cam, *incube, doGeometry, doPolygon, getFootBlob, precision);
 
     // Check if the user requires valid image center geometry
     if(ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
@@ -269,9 +272,9 @@ void IsisMain() {
   }
 
   if(sFormat.toUpper() == "PVL")
-    GeneratePVLOutput(incube, general, camstats, statistics, bandGeom);
+    GeneratePVLOutput(naif, incube, general, camstats, statistics, bandGeom);
   else
-    GenerateCSVOutput(incube, general, camstats, statistics, bandGeom);
+    GenerateCSVOutput(naif, incube, general, camstats, statistics, bandGeom);
 
   // Clean the data
   delete general;
@@ -303,7 +306,8 @@ QPair<QString, QString> MakePair(QString key, QString val) {
 /**
  * Get the output in PVL format
  */
-void GeneratePVLOutput(Cube *incube,
+void GeneratePVLOutput(NaifContextPtr naif,
+                       Cube *incube,
                        QList< QPair<QString, QString> > *general,
                        QList< QPair<QString, QString> > *camstats,
                        QList< QPair<QString, QString> > *statistics,
@@ -353,13 +357,13 @@ void GeneratePVLOutput(Cube *incube,
   if(bandGeom) {
     if(ui.GetBoolean("GEOMETRY")) {
       PvlObject ggroup("Geometry");
-      bandGeom->generateGeometryKeys(ggroup);
+      bandGeom->generateGeometryKeys(naif, ggroup);
       params.addObject(ggroup);
     }
 
     if(ui.GetBoolean("POLYGON") || ui.GetBoolean("USELABEL")) {
       PvlObject ggroup("Polygon");
-      bandGeom->generatePolygonKeys(ggroup);
+      bandGeom->generatePolygonKeys(naif, ggroup);
       params.addObject(ggroup);
     }
   }
@@ -380,7 +384,8 @@ void GeneratePVLOutput(Cube *incube,
  * Get the output in CSV Format. If CSV format is chosen only
  * CamStats, Stats, Geometry are info are recorded.
  */
-void GenerateCSVOutput(Cube *incube,
+void GenerateCSVOutput(NaifContextPtr naif,
+                       Cube *incube,
                        QList< QPair<QString, QString> > *general,
                        QList< QPair<QString, QString> > *camstats,
                        QList< QPair<QString, QString> > *statistics,
@@ -427,7 +432,7 @@ void GenerateCSVOutput(Cube *incube,
   // Add the geometry info
   if(ui.GetBoolean("GEOMETRY")) {
     PvlObject geomGrp("Geometry");
-    bandGeom->generateGeometryKeys(geomGrp);
+    bandGeom->generateGeometryKeys(naif, geomGrp);
     for(int i = 0; i < geomGrp.keywords(); i++) {
       if(not appending) keys += "Geom_" + geomGrp[i].name() + delim;
       values += geomGrp[i][0] + delim;

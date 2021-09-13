@@ -46,7 +46,7 @@ using geos::index::strtree::STRtree;
 using namespace std;
 using namespace Isis;
 
-void setControlPointLatLon(SerialNumberList &snl, ControlNet &cnet);
+void setControlPointLatLon(NaifContextPtr naif, SerialNumberList &snl, ControlNet &cnet);
 QList<ControlPoint *> getValidPoints(Cube &cube, STRtree &coordTree);
 
 std::map< QString, SurfacePoint > g_surfacePoints;
@@ -56,6 +56,7 @@ QMap< QString, QSet<QString> > g_modifications;
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
 
   FileList addList(ui.GetFileName("ADDLIST"));
 
@@ -110,7 +111,7 @@ void IsisMain() {
     }
 
     // Get the lat/long coords from the existing reference measure
-    setControlPointLatLon(*fromSerials, inNet);
+    setControlPointLatLon(naif, *fromSerials, inNet);
   }
   else {
     for (int cp = 0; cp < inNet.GetNumPoints(); cp++) {
@@ -190,7 +191,7 @@ void IsisMain() {
       // different DEMs are used, or the point X, Y, Z was generated from the
       // ellipsoid.
       SurfacePoint surfacePoint = g_surfacePoints[point->GetId()];
-      if (cam->SetGround(
+      if (cam->SetGround(naif,
               surfacePoint.GetLatitude(), surfacePoint.GetLongitude())) {
 
         // Make sure the samp & line are inside the image
@@ -205,7 +206,7 @@ void IsisMain() {
 
           // Check the measure for DEFFILE validity
           if (checkMeasureValidity) {
-            if (!validator->ValidEmissionAngle(cam->EmissionAngle())) {
+            if (!validator->ValidEmissionAngle(cam->EmissionAngle(naif))) {
               //TODO: log that it was Emission Angle that failed the check
               newCm->SetIgnored(true);
             }
@@ -213,7 +214,7 @@ void IsisMain() {
               //TODO: log that it was Incidence Angle that failed the check
               newCm->SetIgnored(true);
             }
-            else if (!validator->ValidResolution(cam->resolution())) {
+            else if (!validator->ValidResolution(cam->resolution(naif))) {
               //TODO: log that it was Resolution that failed the check
               newCm->SetIgnored(true);
             }
@@ -356,7 +357,7 @@ void IsisMain() {
  * @param incubes The filename of the list of cubes in the ControlNet
  * @param cnet    The filename of the ControlNet
  */
-void setControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
+void setControlPointLatLon(NaifContextPtr naif, SerialNumberList &snl, ControlNet &cnet) {
   CubeManager manager;
   manager.SetNumOpenCubes(50);   //Should keep memory usage to around 1GB
 
@@ -371,7 +372,7 @@ void setControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
 
     Cube *cube = manager.OpenCube(snl.fileName(cm->GetCubeSerialNumber()));
     try {
-      cube->camera()->SetImage(cm->GetSample(), cm->GetLine());
+      cube->camera()->SetImage(cm->GetSample(), cm->GetLine(), naif);
       g_surfacePoints[point->GetId()] = cube->camera()->GetSurfacePoint();
     }
     catch (IException &e) {

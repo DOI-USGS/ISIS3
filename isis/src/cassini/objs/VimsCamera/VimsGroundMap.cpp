@@ -391,7 +391,7 @@ namespace Isis {
       }
     else {
         //  Convert lat/lon to x/y/z
-        Distance radius = p_camera->LocalRadius(lat, lon);
+        Distance radius = p_camera->LocalRadius(naif, lat, lon);
         SpiceDouble pB[3];
         naif->latrec_c(radius.kilometers(), lon.radians(), lat.radians(), pB);
 

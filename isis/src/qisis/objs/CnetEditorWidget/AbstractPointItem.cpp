@@ -262,6 +262,7 @@ namespace Isis {
   void AbstractPointItem::setData(QString const &columnTitle,
       QString const &newData) {
     if (m_point) {
+      auto naif = NaifContext::acquire();
       Column column = getColumn(columnTitle);
 
       switch ((Column) column) {
@@ -291,19 +292,19 @@ namespace Isis {
           m_point->SetRefMeasure(newData);
           break;
         case AdjustedSPLat:
-          m_point->SetAdjustedSurfacePoint(SurfacePoint(
+          m_point->SetAdjustedSurfacePoint(SurfacePoint(naif,
               Latitude(catchNull(newData), Angle::Degrees),
               m_point->GetAdjustedSurfacePoint().GetLongitude(),
               m_point->GetAdjustedSurfacePoint().GetLocalRadius()));
           break;
         case AdjustedSPLon:
-          m_point->SetAdjustedSurfacePoint(SurfacePoint(
+          m_point->SetAdjustedSurfacePoint(SurfacePoint(naif,
               m_point->GetAdjustedSurfacePoint().GetLatitude(),
               Longitude(catchNull(newData), Angle::Degrees),
               m_point->GetAdjustedSurfacePoint().GetLocalRadius()));
           break;
         case AdjustedSPRadius:
-          m_point->SetAdjustedSurfacePoint(SurfacePoint(
+          m_point->SetAdjustedSurfacePoint(SurfacePoint(naif,
               m_point->GetAdjustedSurfacePoint().GetLatitude(),
               m_point->GetAdjustedSurfacePoint().GetLongitude(),
               Distance(catchNull(newData), Distance::Meters)));
@@ -325,10 +326,10 @@ namespace Isis {
         }
         case APrioriSPLat: {
           Latitude newLat(catchNull(newData), Angle::Degrees);
-          SurfacePoint newSurfacePoint(prepareSurfacePoint(newLat,
+          SurfacePoint newSurfacePoint(prepareSurfacePoint(naif, newLat,
               m_point->GetAprioriSurfacePoint()));
 
-          newSurfacePoint.SetSphericalCoordinates(newLat,
+          newSurfacePoint.SetSphericalCoordinates(naif, newLat,
               newSurfacePoint.GetLongitude(),
               newSurfacePoint.GetLocalRadius());
           m_point->SetAprioriSurfacePoint(newSurfacePoint);
@@ -336,10 +337,10 @@ namespace Isis {
         }
         case APrioriSPLon: {
           Longitude newLon(catchNull(newData), Angle::Degrees);
-          SurfacePoint newSurfacePoint(prepareSurfacePoint(newLon,
+          SurfacePoint newSurfacePoint(prepareSurfacePoint(naif, newLon,
               m_point->GetAprioriSurfacePoint()));
 
-          newSurfacePoint.SetSphericalCoordinates(
+          newSurfacePoint.SetSphericalCoordinates(naif,
             newSurfacePoint.GetLatitude(),
             newLon,
             newSurfacePoint.GetLocalRadius());
@@ -348,10 +349,10 @@ namespace Isis {
         }
         case APrioriSPRadius: {
           Distance newRadius(catchNull(newData), Distance::Meters);
-          SurfacePoint newSurfacePoint(prepareSurfacePoint(newRadius,
+          SurfacePoint newSurfacePoint(prepareSurfacePoint(naif, newRadius,
               m_point->GetAprioriSurfacePoint()));
 
-          newSurfacePoint.SetSphericalCoordinates(
+          newSurfacePoint.SetSphericalCoordinates(naif,
             newSurfacePoint.GetLatitude(),
             newSurfacePoint.GetLongitude(),
             newRadius);
@@ -360,10 +361,10 @@ namespace Isis {
         }
         case APrioriSPLatSigma: {
           Distance newSigma(catchNull(newData), Distance::Meters);
-          SurfacePoint newSurfacePoint(prepareSigmas(newSigma,
+          SurfacePoint newSurfacePoint(prepareSigmas(naif, newSigma,
               m_point->GetAprioriSurfacePoint()));
 
-          newSurfacePoint.SetSphericalSigmasDistance(
+          newSurfacePoint.SetSphericalSigmasDistance(naif,
             newSigma, newSurfacePoint.GetLonSigmaDistance(),
             newSurfacePoint.GetLocalRadiusSigma());
 
@@ -372,10 +373,10 @@ namespace Isis {
         }
         case APrioriSPLonSigma: {
           Distance newSigma(catchNull(newData), Distance::Meters);
-          SurfacePoint newSurfacePoint(prepareSigmas(newSigma,
+          SurfacePoint newSurfacePoint(prepareSigmas(naif, newSigma,
               m_point->GetAprioriSurfacePoint()));
 
-          newSurfacePoint.SetSphericalSigmasDistance(
+          newSurfacePoint.SetSphericalSigmasDistance(naif,
             newSurfacePoint.GetLatSigmaDistance(), newSigma,
             newSurfacePoint.GetLocalRadiusSigma());
 
@@ -384,10 +385,10 @@ namespace Isis {
         }
         case APrioriSPRadiusSigma: {
           Distance newSigma(catchNull(newData), Distance::Meters);
-          SurfacePoint newSurfacePoint(prepareSigmas(newSigma,
+          SurfacePoint newSurfacePoint(prepareSigmas(naif, newSigma,
               m_point->GetAprioriSurfacePoint()));
 
-          newSurfacePoint.SetSphericalSigmasDistance(
+          newSurfacePoint.SetSphericalSigmasDistance(naif,
             newSurfacePoint.GetLatSigmaDistance(),
             newSurfacePoint.GetLonSigmaDistance(),
             newSigma);
@@ -473,7 +474,8 @@ namespace Isis {
   }
 
 
-  SurfacePoint AbstractPointItem::prepareSigmas(Distance newSigma,
+  SurfacePoint AbstractPointItem::prepareSigmas(NaifContextPtr naif,
+      Distance newSigma,
       SurfacePoint surfacePoint) {
     const Distance free(10000, Distance::Meters);
     Distance latSigDist = surfacePoint.GetLatSigmaDistance();
@@ -494,19 +496,20 @@ namespace Isis {
       radiusSigDist = Distance();
     }
 
-    surfacePoint.SetSphericalSigmasDistance(
+    surfacePoint.SetSphericalSigmasDistance(naif,
       latSigDist, lonSigDist, radiusSigDist);
     return surfacePoint;
   }
 
 
-  SurfacePoint AbstractPointItem::prepareSurfacePoint(Latitude newLat,
+  SurfacePoint AbstractPointItem::prepareSurfacePoint(NaifContextPtr naif,
+      Latitude newLat,
       SurfacePoint surfacePoint) {
     if (newLat.isValid()) {
-      surfacePoint = prepareSurfacePoint(surfacePoint);
+      surfacePoint = prepareSurfacePoint(naif, surfacePoint);
     }
     else {
-      surfacePoint.SetSphericalCoordinates(Latitude(), Longitude(),
+      surfacePoint.SetSphericalCoordinates(naif, Latitude(), Longitude(),
           Distance());
     }
 
@@ -514,13 +517,14 @@ namespace Isis {
   }
 
 
-  SurfacePoint AbstractPointItem::prepareSurfacePoint(Longitude newLon,
+  SurfacePoint AbstractPointItem::prepareSurfacePoint(NaifContextPtr naif,
+  Longitude newLon,
       SurfacePoint surfacePoint) {
     if (newLon.isValid()) {
-      surfacePoint = prepareSurfacePoint(surfacePoint);
+      surfacePoint = prepareSurfacePoint(naif, surfacePoint);
     }
     else {
-      surfacePoint.SetSphericalCoordinates(Latitude(), Longitude(),
+      surfacePoint.SetSphericalCoordinates(naif, Latitude(), Longitude(),
           Distance());
     }
 
@@ -529,12 +533,13 @@ namespace Isis {
 
 
   SurfacePoint AbstractPointItem::prepareSurfacePoint(
+    NaifContextPtr naif,
     Distance newRadius, SurfacePoint surfacePoint) {
     if (newRadius.isValid()) {
-      surfacePoint = prepareSurfacePoint(surfacePoint);
+      surfacePoint = prepareSurfacePoint(naif, surfacePoint);
     }
     else {
-      surfacePoint.SetSphericalCoordinates(Latitude(), Longitude(),
+      surfacePoint.SetSphericalCoordinates(naif, Latitude(), Longitude(),
           Distance());
     }
 
@@ -543,6 +548,7 @@ namespace Isis {
 
 
   SurfacePoint AbstractPointItem::prepareSurfacePoint(
+    NaifContextPtr naif,
     SurfacePoint surfacePoint) {
     Latitude lat = surfacePoint.GetLatitude();
     Longitude lon = surfacePoint.GetLongitude();
@@ -555,7 +561,7 @@ namespace Isis {
     if (!radius.isValid())
       radius = Distance(10000, Distance::Meters);
 
-    surfacePoint.SetSphericalCoordinates(lat, lon, radius);
+    surfacePoint.SetSphericalCoordinates(naif, lat, lon, radius);
     return surfacePoint;
   }
 }

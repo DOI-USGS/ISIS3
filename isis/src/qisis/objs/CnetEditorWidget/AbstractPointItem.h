@@ -2,7 +2,7 @@
 #define AbstractPointItem_H
 
 #include "AbstractTreeItem.h"
-
+#include "NaifContext.h"
 
 class QString;
 class QVariant;
@@ -89,11 +89,11 @@ namespace Isis {
       AbstractPointItem(const AbstractPointItem &other);
       const AbstractPointItem &operator=(const AbstractPointItem &other);
 
-      SurfacePoint prepareSigmas(Distance, SurfacePoint);
-      SurfacePoint prepareSurfacePoint(Latitude, SurfacePoint);
-      SurfacePoint prepareSurfacePoint(Longitude, SurfacePoint);
-      SurfacePoint prepareSurfacePoint(Distance, SurfacePoint);
-      SurfacePoint prepareSurfacePoint(SurfacePoint);
+      SurfacePoint prepareSigmas(NaifContextPtr, Distance, SurfacePoint);
+      SurfacePoint prepareSurfacePoint(NaifContextPtr, Latitude, SurfacePoint);
+      SurfacePoint prepareSurfacePoint(NaifContextPtr, Longitude, SurfacePoint);
+      SurfacePoint prepareSurfacePoint(NaifContextPtr, Distance, SurfacePoint);
+      SurfacePoint prepareSurfacePoint(NaifContextPtr, SurfacePoint);
 
 
     private:

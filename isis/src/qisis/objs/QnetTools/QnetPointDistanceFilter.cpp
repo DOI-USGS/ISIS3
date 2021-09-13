@@ -93,6 +93,8 @@ namespace Isis {
     // Get the user entered value for filtering
     double userEntered = m_lineEdit->text().toDouble();
 
+    auto naif = NaifContext::acquire();
+
     // create temporary QList to contain new filtered images
     QList <int> temp;
     // Loop through each value of the filtered points list
@@ -114,7 +116,7 @@ namespace Isis {
 
         int camIndex1 = serialNumberList()->serialNumberIndex(cm1.GetCubeSerialNumber());
         cam1 = controlNet()->Camera(camIndex1);
-        cam1->SetImage(cm1.GetSample(), cm1.GetLine());
+        cam1->SetImage(cm1.GetSample(), cm1.GetLine(), naif);
         sp1 = cam1->GetSurfacePoint();
       }
       // Loop through each control point, comparing it to the initial point
@@ -134,7 +136,7 @@ namespace Isis {
           cm2 = *cp2.GetRefMeasure();
           int camIndex2 = serialNumberList()->serialNumberIndex(cm2.GetCubeSerialNumber());
           cam2 = controlNet()->Camera(camIndex2);
-          cam2->SetImage(cm2.GetSample(), cm2.GetLine());
+          cam2->SetImage(cm2.GetSample(), cm2.GetLine(), naif);
           sp2 = cam2->GetSurfacePoint();
         }
         // Get the distance from the camera class

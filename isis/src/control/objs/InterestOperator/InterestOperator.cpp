@@ -414,7 +414,7 @@ namespace Isis {
           continue;
         }
 
-        int iBestMeasureIndex = InterestByPoint(*newPnt);
+        int iBestMeasureIndex = InterestByPoint(naif, *newPnt);
 
         // Process for point with good interest and a best index
         double dReferenceLat = 0, dReferenceLon = 0;

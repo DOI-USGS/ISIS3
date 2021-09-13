@@ -85,10 +85,12 @@ class ImageSource {
 
     QString getTargetName() const;
 
-    SurfacePoint getLatLon(const double &line, const double &sample);
-    bool getLineSamp(const SurfacePoint &point,
+    SurfacePoint getLatLon(NaifContextPtr naif, const double &line, const double &sample);
+    bool getLineSamp(NaifContextPtr naif, 
+                     const SurfacePoint &point,
                      double &line, double &samp, double &radius);
-    cv::Mat getGeometryMapping(ImageSource &match, const int &minpts = 25, 
+    cv::Mat getGeometryMapping(NaifContextPtr naif, 
+                               ImageSource &match, const int &minpts = 25, 
                                const double &tol = 3.0,
                                const cv::Rect &subarea = cv::Rect());
 

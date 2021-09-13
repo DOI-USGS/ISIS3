@@ -89,11 +89,11 @@ void IsisMain() {
 
     // write output files
     if (ui.GetBoolean("BUNDLEOUT_TXT")) {
-      bundleSolution->outputText();
+      bundleSolution->outputText(naif);
     }
 
     if (ui.GetBoolean("IMAGESCSV")) {
-      bundleSolution->outputImagesCSV();
+      bundleSolution->outputImagesCSV(naif);
     }
 
     if (ui.GetBoolean("OUTPUT_CSV")) {

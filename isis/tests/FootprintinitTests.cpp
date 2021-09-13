@@ -20,7 +20,8 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/footprintinit.xml").expande
 TEST_F(DefaultCube, FunctionalTestFootprintinitDefault) {
   QVector<QString> footprintArgs = {};
   UserInterface footprintUi(APP_XML, footprintArgs);
+  auto naif = NaifContext::acquire();
 
-  footprintinit(testCube, footprintUi);
+  footprintinit(naif, testCube, footprintUi);
   ASSERT_TRUE(testCube->label()->hasObject("Polygon"));
 }

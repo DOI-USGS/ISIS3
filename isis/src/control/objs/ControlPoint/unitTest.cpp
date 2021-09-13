@@ -37,6 +37,8 @@ void printPoint(ControlPoint &p, bool = false);
  */
 int main() {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   std::cout << "ControlPoint unitTest" << std::endl;
 
@@ -50,7 +52,8 @@ int main() {
   cp.SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
   cp.SetAprioriRadiusSourceFile("$base/dems/molaMarsPlanetaryRadius0003.cub");
 
-  SurfacePoint point(Displacement(-424.024048, Displacement::Meters),
+  SurfacePoint point(naif,
+      Displacement(-424.024048, Displacement::Meters),
       Displacement(734.4311949, Displacement::Meters),
       Displacement(529.919264, Displacement::Meters),
       Distance(10, Distance::Meters),
@@ -156,7 +159,7 @@ int main() {
   std::cout << "Latitude = " << surfPt.GetLatitude().degrees() << std::endl;
   std::cout << "Longitude = " << surfPt.GetLongitude().degrees() << std::endl;
   std::cout << "Radius = " << surfPt.GetLocalRadius().meters() << std::endl;
-  surfPt.SetSpherical(Latitude(32, Angle::Degrees),
+  surfPt.SetSpherical(naif, Latitude(32, Angle::Degrees),
       Longitude(120, Angle::Degrees),
       Distance(1000, Distance::Meters));
   cp.SetAdjustedSurfacePoint(surfPt);
@@ -184,7 +187,7 @@ int main() {
   covar(2, 1) = 3.41060513e-13;
   covar(2, 2) = 400.;
 
-  point.SetRectangularMatrix(covar);
+  point.SetRectangularMatrix(naif, covar);
   cp.SetAprioriSurfacePoint(point);
 
   //c.SetAprioriCovariance();

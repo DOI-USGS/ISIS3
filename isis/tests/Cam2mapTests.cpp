@@ -52,10 +52,11 @@ TEST_F(DefaultCube, FunctionalTestCam2mapDefault) {
 
   QVector<QString> args = {"to="+tempDir.path()+"/level2.cub", "pixres=map"};
   UserInterface ui(APP_XML, args);
+  auto naif = NaifContext::acquire();
 
   Pvl log;
 
-  cam2map(testCube, userMap, userGrp, ui, &log);
+  cam2map(naif, testCube, userMap, userGrp, ui, &log);
   Cube ocube(tempDir.path()+"/level2.cub");
 
   PvlGroup cubeMapGroup = ocube.label()->findGroup("Mapping", Pvl::Traverse);
@@ -110,10 +111,11 @@ TEST_F(DefaultCube, FunctionalTestCam2mapMismatch) {
 
   QVector<QString> args = {"to="+tempDir.path()+"/level2.cub", "pixres=map"};
   UserInterface ui(APP_XML, args);
+  auto naif = NaifContext::acquire();
 
   Pvl log;
   try {
-    cam2map(testCube, userMap, userGrp, ui, &log);
+    cam2map(naif, testCube, userMap, userGrp, ui, &log);
   }
   catch(IException &e) {
     ASSERT_EQ(e.errorType(), 2);
@@ -152,10 +154,11 @@ TEST_F(DefaultCube, FunctionalTestCam2mapUserLatlon) {
                            "maxlon=10", "minlat=0", "maxlat=10", "defaultrange=camera",
                            "pixres=map"};
   UserInterface ui(APP_XML, args);
+  auto naif = NaifContext::acquire();
 
   Pvl log;
 
-  cam2map(testCube, userMap, userGrp, ui, &log);
+  cam2map(naif, testCube, userMap, userGrp, ui, &log);
   Cube ocube(tempDir.path()+"/level2.cub");
 
   ASSERT_EQ(userGrp.findKeyword("PixelResolution")[0], "100000.0");
@@ -200,10 +203,11 @@ TEST_F(LineScannerCube, FunctionalTestCam2mapMapLatlon) {
   QVector<QString> args = {"to="+tempDir.path()+"/level2.cub", "matchmap=no",
                            "defaultrange=map", "pixres=camera"};
   UserInterface ui(APP_XML, args);
+  auto naif = NaifContext::acquire();
 
   Pvl log;
 
-  cam2map(testCube, userMap, userGrp, ui, &log);
+  cam2map(naif, testCube, userMap, userGrp, ui, &log);
   Cube ocube(tempDir.path()+"/level2.cub");
 
   ASSERT_EQ(userGrp.findKeyword("PixelResolution")[0], "9.0084341025159");
@@ -219,6 +223,8 @@ TEST_F(LineScannerCube, FunctionalTestCam2mapMapLatlon) {
 }
 
 TEST_F(DefaultCube, ReverseXformUnitTestCam2map) {
+  auto naif = NaifContext::acquire();
+  
   MockCamera camera(*testCube);
   MockTProjection outmap(projLabel);
 
@@ -235,10 +241,10 @@ TEST_F(DefaultCube, ReverseXformUnitTestCam2map) {
   EXPECT_CALL(outmap, MaximumLongitude()).WillOnce(Return(10));
   EXPECT_CALL(outmap, UniversalLatitude()).WillOnce(Return(2));
   EXPECT_CALL(outmap, UniversalLongitude()).WillOnce(Return(2));
-  EXPECT_CALL(camera, SetUniversalGround(2, 2)).WillOnce(Return(1));
+  EXPECT_CALL(camera, SetUniversalGround(naif, 2, 2)).WillOnce(Return(1));
   EXPECT_CALL(camera, Sample()).Times(3).WillRepeatedly(Return(10.0));
   EXPECT_CALL(camera, Line()).Times(3).WillRepeatedly(Return(10.0));
-  EXPECT_CALL(camera, SetImage(10.0, 10.0)).WillRepeatedly(Return(1.0));
+  EXPECT_CALL(camera, SetImage(10.0, 10.0, naif)).WillRepeatedly(Return(1.0));
   EXPECT_CALL(camera, UniversalLongitude()).WillOnce(Return(2));
   EXPECT_CALL(camera, UniversalLatitude()).WillOnce(Return(2));
 
@@ -255,13 +261,15 @@ TEST_F(DefaultCube, ReverseXformUnitTestCam2map) {
 }
 
 TEST_F(DefaultCube, ForwardXformUnitTestCam2map) {
+  auto naif = NaifContext::acquire();
+
   MockCamera camera(*testCube);
   MockTProjection outmap(projLabel);
 
   Transform *transform;
   transform = new cam2mapForward(100, 100, &camera, 200, 200, &outmap, 1);
 
-  EXPECT_CALL(camera, SetImage(1.0, 1.0)).WillOnce(Return(1.0));
+  EXPECT_CALL(camera, SetImage(1.0, 1.0, naif)).WillOnce(Return(1.0));
   EXPECT_CALL(camera, UniversalLatitude()).WillOnce(Return(2.0));
   EXPECT_CALL(camera, UniversalLongitude()).WillOnce(Return(2.0));
   EXPECT_CALL(outmap, SetUniversalGround(2.0, 2.0)).WillOnce(Return(1));
@@ -317,6 +325,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapFramerMock) {
 
   QVector<QString> args = {"to=" + tempDir.path() + "level2.cub", "matchmap=yes"};
   UserInterface ui(APP_XML, args);
+  auto naif = NaifContext::acquire();
 
   Pvl log;
   MockProcessRubberSheet rs;
@@ -332,7 +341,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapFramerMock) {
   EXPECT_CALL(rs, SetTiling(4,4)).Times(AtLeast(1));
   EXPECT_CALL(rs, StartProcess).Times(AtLeast(1));
   EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
-  cam2map(testCube, userMap, userGrp, rs, ui, &log);
+  cam2map(naif, testCube, userMap, userGrp, rs, ui, &log);
 }
 
 TEST_F(LineScannerCube, FunctionalTestCam2mapLineScanMock){
@@ -365,6 +374,7 @@ TEST_F(LineScannerCube, FunctionalTestCam2mapLineScanMock){
   QVector<QString> args = {"to=" + tempDir.path() + "level2.cub", "matchmap=yes"};
 
   UserInterface ui(APP_XML, args);
+  auto naif = NaifContext::acquire();
 
   Pvl log;
   MockProcessRubberSheet rs;
@@ -380,7 +390,7 @@ TEST_F(LineScannerCube, FunctionalTestCam2mapLineScanMock){
   EXPECT_CALL(rs, processPatchTransform).Times(AtLeast(1));
   EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
 
-  cam2map(testCube, userMap, userGrp, rs, ui, &log);
+  cam2map(naif, testCube, userMap, userGrp, rs, ui, &log);
 }
 
 TEST_F(DefaultCube, FunctionalTestCam2mapForwardMock) {
@@ -416,6 +426,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapForwardMock) {
                           "warpalgorithm=forwardpatch",
                           "patchsize=0"};
   UserInterface ui(APP_XML, args);
+  auto naif = NaifContext::acquire();
 
   Pvl log;
   MockProcessRubberSheet rs;
@@ -431,7 +442,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapForwardMock) {
   EXPECT_CALL(rs, setPatchParameters(1, 1, 3, 3, 2, 2)).Times(AtLeast(1));
   EXPECT_CALL(rs, processPatchTransform).Times(AtLeast(1));
   EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
-  cam2map(testCube, userMap, userGrp, rs, ui, &log);
+  cam2map(naif, testCube, userMap, userGrp, rs, ui, &log);
 }
 
 TEST_F(DefaultCube, FunctionalTestCam2mapReverseMock) {
@@ -467,6 +478,7 @@ TEST_F(DefaultCube, FunctionalTestCam2mapReverseMock) {
                           "warpalgorithm=reversepatch",
                           "patchsize=3"};
   UserInterface ui(APP_XML, args);
+  auto naif = NaifContext::acquire();
 
   Pvl log;
   MockProcessRubberSheet rs;
@@ -482,5 +494,5 @@ TEST_F(DefaultCube, FunctionalTestCam2mapReverseMock) {
   EXPECT_CALL(rs, SetTiling(4, 4)).Times(AtLeast(1));
   EXPECT_CALL(rs, StartProcess).Times(AtLeast(1));
   EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
-  cam2map(testCube, userMap, userGrp, rs, ui, &log);
+  cam2map(naif, testCube, userMap, userGrp, rs, ui, &log);
 }

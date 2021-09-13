@@ -20,6 +20,9 @@ std::vector<double> diamondSamples, diamondLines, values1, values2;
 std::vector<int> bands;
 
 void IsisMain() {
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
+
   std::vector<double> samples, lines, values;
 
   cout << "Testing Isis::ProcessPolygons Class ... " << endl;
@@ -52,7 +55,7 @@ void IsisMain() {
         lines.push_back(l);
         value = s + l + b;
 
-        p.Rasterize(samples, lines, b, value);
+        p.Rasterize(naif, samples, lines, b, value);
 
         samples.clear();
         lines.clear();

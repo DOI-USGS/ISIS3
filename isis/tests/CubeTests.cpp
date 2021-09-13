@@ -208,9 +208,10 @@ TEST(CubeTest, TestCubeAttachSpiceFromIsd) {
   Pvl label;
   labelStrm >> label;
 
+  auto naif = NaifContext::acquire();
   QTemporaryFile tempFile;
   Cube testCube;
-  testCube.fromIsd(tempFile.fileName() + ".cub", label, isd, "rw");
+  testCube.fromIsd(naif, tempFile.fileName() + ".cub", label, isd, "rw");
 
   PvlGroup kernels = testCube.group("Kernels");
 

@@ -309,8 +309,8 @@ namespace Isis {
     public slots:
       void updateList();
       void updateNet(QString cNetFileName);
-      void createPoint(double lat,double lon);
-      void createFixedPoint(double lat,double lon);
+      void createPoint(NaifContextPtr naif, double lat,double lon);
+      void createFixedPoint(NaifContextPtr naif, double lat,double lon);
       void modifyPoint(ControlPoint *point);
       void deletePoint(ControlPoint *point);
       void updatePointInfo(QString pointId);
@@ -389,7 +389,7 @@ namespace Isis {
       void loadTemplateFile(QString);
       bool okToContinue();
       void initDem(QString demFile);
-      double demRadius(double latitude, double longitude);
+      double demRadius(NaifContextPtr naif, double latitude, double longitude);
       void clearGroundSource();
       bool IsMeasureLocked(QString serialNumber);
 

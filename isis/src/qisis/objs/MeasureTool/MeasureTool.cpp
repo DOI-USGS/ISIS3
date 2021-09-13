@@ -641,9 +641,11 @@ namespace Isis {
         cvp->viewportToCube((int)center->getX(), (int)center->getY(), sample, line);
 
         if (cvp->camera() != NULL) {
-          cvp->camera()->SetImage(sample, line);
+          auto naif = NaifContext::acquire();
+
+          cvp->camera()->SetImage(sample, line, naif);
           // pix^2 * (m/pix)^2 = m^2
-          m_mArea = m_pixArea * pow(cvp->camera()->PixelResolution(), 2);
+          m_mArea = m_pixArea * pow(cvp->camera()->PixelResolution(naif), 2);
           // m^2 * (km/m)^2 = km^2
           m_kmArea = m_mArea * pow(1 / 1000.0, 2);
         }
@@ -690,6 +692,8 @@ namespace Isis {
 
     // Get set for dealing with projection types
     if (cvp->projection() != NULL)  projType = cvp->projection()->projectionType();
+
+    auto naif = NaifContext::acquire();
 
     // Don't write anything if we are outside the cube
     if ((m_startSamp >= 0.5) && (m_endSamp >= 0.5) &&
@@ -746,12 +750,12 @@ namespace Isis {
       }
       // Do we have a camera model?
       else if (cvp->camera() != NULL &&
-              cvp->camera()->SetImage(m_startSamp, m_startLine)) {
+              cvp->camera()->SetImage(m_startSamp, m_startLine, naif)) {
         // Write columns 2-3 (Start lat/lon)
         m_startLat = cvp->camera()->UniversalLatitude();
         m_startLon = cvp->camera()->UniversalLongitude();
 
-        if (cvp->camera()->SetImage(m_endSamp, m_endLine)) {
+        if (cvp->camera()->SetImage(m_endSamp, m_endLine, naif)) {
           // Write columns 4-5 (End lat/lon)
           m_endLat = cvp->camera()->UniversalLatitude();
           m_endLon = cvp->camera()->UniversalLongitude();
@@ -778,8 +782,8 @@ namespace Isis {
 
     if (startLat.isValid() && startLon.isValid() &&
         endLat.isValid() && endLon.isValid() && radiusDist.isValid()) {
-      startPoint = SurfacePoint(startLat, startLon, radiusDist);
-      endPoint = SurfacePoint(endLat, endLon, radiusDist);
+      startPoint = SurfacePoint(naif, startLat, startLon, radiusDist);
+      endPoint = SurfacePoint(naif, endLat, endLon, radiusDist);
     }
 
     Distance distance = startPoint.GetDistanceToPoint(endPoint, radiusDist);

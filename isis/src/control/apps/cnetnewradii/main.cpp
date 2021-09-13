@@ -89,7 +89,8 @@ void IsisMain() {
       bool success = surfacePt.Valid();
 
       if (success) {
-        success = ugm->SetUniversalGround(surfacePt.GetLatitude().degrees(),
+        success = ugm->SetUniversalGround(naif,
+                                          surfacePt.GetLatitude().degrees(),
                                           surfacePt.GetLongitude().degrees());
       }
 

@@ -293,6 +293,7 @@ namespace Isis {
     SurfacePoint result;
 
     if (groundMap) {
+      auto naif = NaifContext::acquire();
       Distance radius;
 
       if (groundMap->Camera())
@@ -300,7 +301,7 @@ namespace Isis {
       else if (groundMap->Projection())
         radius = Distance(groundMap->Projection()->LocalRadius(), Distance::Meters);
 
-      result = SurfacePoint(Latitude(groundMap->UniversalLatitude(), Angle::Degrees),
+      result = SurfacePoint(naif, Latitude(groundMap->UniversalLatitude(), Angle::Degrees),
           Longitude(groundMap->UniversalLongitude(), Angle::Degrees), radius);
     }
 
@@ -322,6 +323,8 @@ namespace Isis {
 
     PlotCurve::Units targetUnits = (PlotCurve::Units)m_xUnitsCombo->itemData(
           m_xUnitsCombo->currentIndex()).toInt();
+
+    auto naif = NaifContext::acquire();
 
     if (cvp && vertices.size()) {
       Interpolator interp;
@@ -352,7 +355,7 @@ namespace Isis {
         SurfacePoint startPoint;
         UniversalGroundMap *groundMap = cvp->universalGroundMap();
         if (targetUnits != PlotCurve::PixelNumber) {
-          if (groundMap->SetImage(startSample, startLine)) {
+          if (groundMap->SetImage(startSample, startLine, naif)) {
             startPoint = resultToSurfacePoint(groundMap);
           }
           else {
@@ -388,7 +391,7 @@ namespace Isis {
               if (targetUnits != PlotCurve::PixelNumber) {
                 plotXValue = sample;
  
-                if (groundMap->SetImage(sample, line)) {
+                if (groundMap->SetImage(sample, line, naif)) {
                   Distance xDistance = startPoint.GetDistanceToPoint(resultToSurfacePoint(groundMap));
 
                   if (targetUnits == PlotCurve::Meters)
@@ -487,7 +490,7 @@ namespace Isis {
         if (targetUnits != PlotCurve::PixelNumber) {
           double midStartSample = (clickSample + acrossSample) / 2.0;
           double midStartLine = (clickLine + acrossLine) / 2.0;
-          if (groundMap->SetImage(midStartSample, midStartLine)) {
+          if (groundMap->SetImage(midStartSample, midStartLine, naif)) {
             startPoint = resultToSurfacePoint(groundMap);
           }
           else {
@@ -539,7 +542,7 @@ namespace Isis {
             double plotXValue = index + 1;
 
             if (targetUnits != PlotCurve::PixelNumber) {
-              if (groundMap->SetImage(sampleMid, lineMid)) {
+              if (groundMap->SetImage(sampleMid, lineMid, naif)) {
                 Distance xDistance = startPoint.GetDistanceToPoint(resultToSurfacePoint(groundMap));
 
                 if (targetUnits == PlotCurve::Meters)

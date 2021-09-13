@@ -2374,7 +2374,8 @@ namespace Isis {
     m_rightCube->open(file);
 
     //  Update left measure of pointEditor
-    m_pointEditor->setRightMeasure (m_rightMeasure,m_rightCube,
+   auto naif = NaifContext::acquire();
+    m_pointEditor->setRightMeasure (naif, m_rightMeasure,m_rightCube,
                                     m_editPoint->GetId());
     updateRightMeasureInfo ();
 

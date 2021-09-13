@@ -84,6 +84,8 @@ namespace Isis {
  */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
+  NaifContextLifecycle naif_lifecycle;
+  auto naif = NaifContext::acquire();
 
   cout.precision(6);
 
@@ -109,13 +111,15 @@ int main(int argc, char *argv[]) {
     freeMeasure2->SetCoordinate(1.0, 2.0);
     freeMeasure2->SetResidual(-3.0, 4.0);
     freePoint->Add(freeMeasure2);
-    SurfacePoint freeSurfacePoint(Latitude(45.0, Angle::Degrees),
+    SurfacePoint freeSurfacePoint(naif,
+                                  Latitude(45.0, Angle::Degrees),
                                   Longitude(120.0, Angle::Degrees),
                                   Distance(6.0, Distance::Meters));
     freePoint->SetAdjustedSurfacePoint(freeSurfacePoint);
     ControlPoint *fixedPoint = new ControlPoint("FixedPoint");
     fixedPoint->SetType(ControlPoint::Fixed);
-    SurfacePoint fixedSurfacePoint(Latitude(90.0, Angle::Degrees),
+    SurfacePoint fixedSurfacePoint(naif,
+                                   Latitude(90.0, Angle::Degrees),
                                    Longitude(180.0, Angle::Degrees),
                                    Distance(10.0, Distance::Meters));
     fixedPoint->SetAdjustedSurfacePoint(fixedSurfacePoint);
@@ -272,8 +276,8 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Testing output methods";
 
-    results.outputText();
-    results.outputImagesCSV();
+    results.outputText(naif);
+    results.outputImagesCSV(naif);
     results.outputPointsCSV();
     results.outputResiduals();
 

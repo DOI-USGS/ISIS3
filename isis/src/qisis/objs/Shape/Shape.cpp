@@ -637,6 +637,8 @@ namespace Isis {
    * @return The resulting footprint
    */
   geos::geom::MultiPolygon *Shape::createFootprint(QMutex *cameraMutex) {
+    auto naif = NaifContext::acquire();
+
     QMutexLocker lock(cameraMutex);
 
     // We need to walk the shape to create the polygon...
@@ -648,7 +650,7 @@ namespace Isis {
     int lineStepSize = cube()->lineCount() / 10;
     if (lineStepSize <= 0) lineStepSize = 1;
 
-    imgPoly.Create(*cube(), sampleStepSize, lineStepSize);
+    imgPoly.Create(naif, *cube(), sampleStepSize, lineStepSize);
 
     IException e = IException(IException::User,
         tr("Warning: Polygon re-calculated for [%1] which can be very slow")
@@ -761,6 +763,8 @@ namespace Isis {
         }
 
         if (obj.hasGroup("Mapping")) {
+          auto naif = NaifContext::acquire();
+
           PvlGroup mapGroup = obj.findGroup("Mapping");
 
           if (mapGroup.hasKeyword("TargetName"))
@@ -774,15 +778,15 @@ namespace Isis {
                                           mapGroup, Angle::Degrees);
 
           if (mapGroup.hasKeyword("CenterLatitude"))
-            m_centerLatitude = Latitude(toDouble(obj.findGroup("Mapping")["CenterLatitude"][0]),
+            m_centerLatitude = Latitude(naif, toDouble(obj.findGroup("Mapping")["CenterLatitude"][0]),
                                         mapGroup, Angle::Degrees);
 
           if (mapGroup.hasKeyword("MinimumLatitude"))
-            m_minimumLatitude = Latitude(toDouble(obj.findGroup("Mapping")["MinimumLatitude"][0]),
+            m_minimumLatitude = Latitude(naif, toDouble(obj.findGroup("Mapping")["MinimumLatitude"][0]),
                                          mapGroup, Angle::Degrees);
 
           if (mapGroup.hasKeyword("MaximumLatitude"))
-            m_maximumLatitude = Latitude(toDouble(obj.findGroup("Mapping")["MaximumLatitude"][0]),
+            m_maximumLatitude = Latitude(naif, toDouble(obj.findGroup("Mapping")["MaximumLatitude"][0]),
                                          mapGroup, Angle::Degrees);
 
           if (mapGroup.hasKeyword("MinimumLongitude"))

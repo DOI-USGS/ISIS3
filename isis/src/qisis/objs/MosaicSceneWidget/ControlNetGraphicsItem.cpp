@@ -146,9 +146,11 @@ namespace Isis {
               (*m_cubeToGroundMap)[filename] = groundMap;
             }
 
+            auto naif = NaifContext::acquire();
             if ((*m_cubeToGroundMap)[filename]->SetImage(
                   cp->GetRefMeasure()->GetSample(),
-                  cp->GetRefMeasure()->GetLine())) {
+                  cp->GetRefMeasure()->GetLine(),
+                  naif)) {
               double lat = (*m_cubeToGroundMap)[filename]->UniversalLatitude();
               double lon = (*m_cubeToGroundMap)[filename]->UniversalLongitude();
 

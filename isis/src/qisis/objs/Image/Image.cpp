@@ -704,6 +704,8 @@ namespace Isis {
    * @return @b (geos::geom::MultiPolygon *) The resulting footprint.
    */
   geos::geom::MultiPolygon *Image::createFootprint(QMutex *cameraMutex) {
+    auto naif = NaifContext::acquire();
+
     QMutexLocker lock(cameraMutex);
 
     // We need to walk the image to create the polygon...
@@ -715,7 +717,7 @@ namespace Isis {
     int lineStepSize = cube()->lineCount() / 10;
     if (lineStepSize <= 0) lineStepSize = 1;
 
-    imgPoly.Create(*cube(), sampleStepSize, lineStepSize);
+    imgPoly.Create(naif, *cube(), sampleStepSize, lineStepSize);
 
     IException e = IException(IException::User,
         tr("Warning: Polygon re-calculated for [%1] which can be very slow")
