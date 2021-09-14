@@ -91,6 +91,7 @@ void IsisMain() {
 
   // Get user interface
   UserInterface &ui = Application::GetUserInterface();
+  auto naif = NaifContext::acquire();
   QString toinfo;
   if ( ui.WasEntered("TOINFO")) {
     toinfo = ui.GetAsString("TOINFO");
@@ -245,7 +246,7 @@ void IsisMain() {
 
   // Check for FASTGEOM option
   if ( ui.GetBoolean("FASTGEOM") ) {
-    FastGeom geom( factory->globalParameters() );
+    FastGeom geom( naif, factory->globalParameters() );
     matcher.foreachPair( geom );
   }
 

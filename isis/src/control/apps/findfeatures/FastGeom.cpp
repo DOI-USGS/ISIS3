@@ -28,17 +28,20 @@
 namespace Isis {
 
 /* Constructor */
-FastGeom::FastGeom() : m_fastpts(25), m_tolerance(1.0), m_geomtype("camera"), 
-                       m_maxarea(3.0), m_parameters() { 
+FastGeom::FastGeom(NaifContextPtr naif) : 
+  m_fastpts(25), m_tolerance(1.0), m_geomtype("camera"), 
+  m_maxarea(3.0), m_parameters(), m_naif(naif) { 
   validate(m_geomtype);
 }
 
 /* Construct with parameters */
-FastGeom::FastGeom(const PvlFlatMap &parameters) : m_fastpts(25), 
-                                                   m_tolerance(1.0), 
-                                                   m_geomtype("camera"),
-                                                   m_maxarea(3.0),
-                                                   m_parameters(parameters) { 
+FastGeom::FastGeom(NaifContextPtr naif, const PvlFlatMap &parameters) :
+  m_fastpts(25), 
+  m_tolerance(1.0), 
+  m_geomtype("camera"),
+  m_maxarea(3.0),
+  m_parameters(parameters),
+  m_naif(naif) { 
   m_fastpts   = toInt(m_parameters.get("FastGeomPoints", "25"));
   m_tolerance = toDouble(m_parameters.get("FastGeomTolerance", "1.0"));
   m_geomtype  = m_parameters.get("GeomType", "camera").toLower();
@@ -47,10 +50,10 @@ FastGeom::FastGeom(const PvlFlatMap &parameters) : m_fastpts(25),
 }
 
 /* Construct with individual parameters to compute the fast geom transform */
-FastGeom::FastGeom(const int maxpts, const double tolerance, const bool crop,
+FastGeom::FastGeom(NaifContextPtr naif, const int maxpts, const double tolerance, const bool crop,
          const bool preserve, const double &maxarea) : 
          m_fastpts(maxpts), m_tolerance(tolerance), m_geomtype("camera"),
-         m_maxarea(maxarea), m_parameters() { 
+         m_maxarea(maxarea), m_parameters(), m_naif(naif) { 
   validate(m_geomtype);
 }
 
@@ -75,7 +78,7 @@ FastGeom::~FastGeom() { }
  * @param train            Train image
  * @return ImageTransform* Pointer to FastGeom transform
  */
-ImageTransform *FastGeom::compute(NaifContextPtr naif, MatchImage &query, MatchImage &train)  {
+ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train)  {
   // std::cout << "\nQuery: " << query.source().name() << "\n";
   // std::cout << "Train: " << train.source().name() << "\n";
 
@@ -84,7 +87,7 @@ ImageTransform *FastGeom::compute(NaifContextPtr naif, MatchImage &query, MatchI
   RectArea tSize(0.0f, 0.0f, train.source().samples(), train.source().lines() );
 
   // std::cout << "Train-to-query mapping...\n";
-  cv::Mat t_to_q = train.source().getGeometryMapping(naif, query.source(), 
+  cv::Mat t_to_q = train.source().getGeometryMapping(m_naif, query.source(), 
                                                      m_fastpts, 
                                                      m_tolerance); 
 
@@ -142,9 +145,9 @@ ImageTransform *FastGeom::compute(NaifContextPtr naif, MatchImage &query, MatchI
   return ( fastg.take() );
 }
 
-void FastGeom::apply(NaifContextPtr naif, MatchImage &query, MatchImage &train) {
+void FastGeom::apply(MatchImage &query, MatchImage &train) {
   // Add the fastggeom mapping transform
-  train.addTransform( compute(naif, query, train) );
+  train.addTransform( compute(query, train) );
   return;
 }
 

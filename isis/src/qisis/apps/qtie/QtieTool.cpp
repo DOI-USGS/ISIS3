@@ -375,17 +375,19 @@ namespace Isis {
    *
    */
   void QtieTool::measureSaved() {
+    auto naif = NaifContext::acquire();
+
     //  Get sample/line from base map and find lat/lon
     double samp = p_controlPoint->GetMeasure(Base)->GetSample();
     double line = p_controlPoint->GetMeasure(Base)->GetLine();
-    p_baseGM->SetImage(samp, line);
+    p_baseGM->SetImage(samp, line, naif);
     double lat = p_baseGM->UniversalLatitude();
     double lon = p_baseGM->UniversalLongitude();
 
     //  TODO:  Do not know if radius came from DEM (if cube spiceinit'ed
     //   with DEM) or from ellipsoid.  Once change made to camera to return
     //   DEM filename, update the point aprioiRadiusSource parameters.
-    p_matchGM->SetGround(Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees));
+    p_matchGM->SetGround(naif, Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees));
     Distance radius = p_matchGM->Camera()->LocalRadius();
     if (!radius.isValid()) {
       QString message = "Could not determine radius from DEM at lat/lon ["
@@ -394,7 +396,7 @@ namespace Isis {
       return;
     }
     try {
-      p_controlPoint->SetAprioriSurfacePoint(SurfacePoint(
+      p_controlPoint->SetAprioriSurfacePoint(SurfacePoint(naif,
                 Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees),
                 radius));
     }
@@ -441,6 +443,8 @@ namespace Isis {
       return;
     }
 
+    auto naif = NaifContext::acquire();
+    
     // ???  do we only allow mouse clicks on level1???
     //    If we allow on both, need to find samp,line on level1 if
     //    they clicked on basemap.
@@ -492,11 +496,11 @@ namespace Isis {
       deletePoint(point);
     }
     else if (s == Qt::RightButton) {
-      p_matchGM->SetImage(samp, line);
+      p_matchGM->SetImage(samp, line, naif);
       double lat = p_matchGM->UniversalLatitude();
       double lon = p_matchGM->UniversalLongitude();
 
-      createPoint(lat, lon);
+      createPoint(naif, lat, lon);
     }
   }
 
@@ -515,7 +519,7 @@ namespace Isis {
    * @history 2012-05-10  Tracie Sucharski - If point doesn't exist on 
    *                          base map, return. 
    */
-  void QtieTool::createPoint(double lat, double lon) {
+  void QtieTool::createPoint(NaifContextPtr naif, double lat, double lon) {
 
     //  TODO:   ADD AUTOSEED OPTION (CHECKBOX?)
 
@@ -523,12 +527,12 @@ namespace Isis {
     double matchSamp, matchLine;
 
     //  if clicked in match, get samp,line
-    p_matchGM->SetUniversalGround(lat, lon);
+    p_matchGM->SetUniversalGround(naif, lat, lon);
     matchSamp = p_matchGM->Sample();
     matchLine = p_matchGM->Line();
 
     //  Make sure point is on base
-    if (p_baseGM->SetUniversalGround(lat, lon)) {
+    if (p_baseGM->SetUniversalGround(naif, lat, lon)) {
       //  Make sure point on base cube
       baseSamp = p_baseGM->Sample();
       baseLine = p_baseGM->Line();
@@ -675,10 +679,12 @@ namespace Isis {
    */
   void QtieTool::loadPoint() {
 
+    auto naif = NaifContext::acquire();
+    
     //  Initialize pointEditor with measures
     p_pointEditor->setLeftMeasure(p_controlPoint->GetMeasure(Base), p_baseCube,
                                   p_controlPoint->GetId());
-    p_pointEditor->setRightMeasure(p_controlPoint->GetMeasure(Match),
+    p_pointEditor->setRightMeasure(naif, p_controlPoint->GetMeasure(Match),
                                    p_matchCube, p_controlPoint->GetId());
 
     //  Write pointId

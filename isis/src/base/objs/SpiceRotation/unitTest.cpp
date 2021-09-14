@@ -12,11 +12,6 @@
 
 #include "NaifContextCast.h"
 
-// Declarations for bindings for Naif Spicelib routines that do not have
-// a wrapper
-extern int bodeul_(integer *body, doublereal *et, doublereal *ra,
-                   doublereal *dec, doublereal *w, doublereal *lamda);
-
 using json = nlohmann::json;
 using namespace std;
 using namespace Isis;
@@ -475,7 +470,7 @@ int main(int argc, char *argv[]) {
   // For testing Io with the nutation/precession terms and a cache size of 1
   tet = -15839262.24291;  // time et for Io
   ibod = 501; // Io
-  bodeul_(&ibod, &tet, &tra,&tdec, &tomega, &tlambda);
+  naif->bodeul_(&ibod, &tet, &tra,&tdec, &tomega, &tlambda);
   targrotV.SetEphemerisTime(tet, naif);
   vector<double> pckanglesV = targrotV.Angles(3, 1, 3, naif);
   cout << "Io    Angles = " << pckanglesV[0]*naif->dpr_c() <<","<< pckanglesV[1]*naif->dpr_c() <<","

@@ -285,7 +285,7 @@ void RemoveSeam(NaifContextPtr naif, Buffer &out, int framelet, int band,
  *   is corrected by RemoveSeam and this also clears remembered offsets
  *   (used for speed optimization) when the band changes.
  */
-void FixSeams(NaifContextPtr naif, vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
+void FixSeams(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
   Buffer &evenBuffer    = *inBuffers[0];
   Buffer &oddBuffer     = *inBuffers[1];
 
@@ -306,6 +306,8 @@ void FixSeams(NaifContextPtr naif, vector<Buffer *> &inBuffers, vector<Buffer *>
   if(framelet == 0) {
     frameletOffsetsForBand.clear();
   }
+
+  auto naif = NaifContext::acquire();
 
   if(evenStats.ValidPixels() > oddStats.ValidPixels()) {
     RemoveSeam(naif, outEvenBuffer, framelet, evenBuffer.Band(), false);

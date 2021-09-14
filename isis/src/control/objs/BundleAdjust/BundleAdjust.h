@@ -399,16 +399,17 @@ namespace Isis {
       void iterationSummary();
       BundleSolutionInfo* bundleSolveInformation();
       bool computeBundleStatistics();
-      void applyParameterCorrections();
-      bool errorPropagation();
-      double computeResiduals();
+      void applyParameterCorrections(NaifContextPtr naif);
+      bool errorPropagation(NaifContextPtr naif);
+      double computeResiduals(NaifContextPtr naif);
       bool computeRejectionLimit();
       bool flagOutliers();
 
       // normal equation matrices methods
 
-      bool formNormalEquations();
-      bool computePartials(LinearAlgebra::Matrix  &coeffTarget,
+      bool formNormalEquations(NaifContextPtr naif);
+      bool computePartials(NaifContextPtr naif,
+                           LinearAlgebra::Matrix  &coeffTarget,
                            LinearAlgebra::Matrix  &coeffImage,
                            LinearAlgebra::Matrix  &coeffPoint3D,
                            LinearAlgebra::Vector  &coeffRHS,
@@ -424,7 +425,8 @@ namespace Isis {
                               LinearAlgebra::Matrix                              &coeffPoint3D,
                               LinearAlgebra::Vector                              &coeffRHS,
                               int                                                observationIndex);
-      bool formPointNormals(boost::numeric::ublas::symmetric_matrix<
+      bool formPointNormals(NaifContextPtr naif,
+                            boost::numeric::ublas::symmetric_matrix<
                                 double, boost::numeric::ublas::upper >  &N22,
                             SparseBlockColumnMatrix                     &N12,
                             LinearAlgebra::Vector                       &n2,
@@ -458,7 +460,7 @@ namespace Isis {
       bool freeCHOLMODLibraryVariables();
       bool cholmodInverse();
       bool loadCholmodTriplet();
-      bool wrapUp();
+      bool wrapUp(NaifContextPtr naif);
 
       // member variables
 

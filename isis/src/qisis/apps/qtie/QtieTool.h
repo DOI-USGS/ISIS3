@@ -92,7 +92,7 @@ namespace Isis {
     public slots:
       void setFiles(Cube *baseCube, Cube *matchCube, ControlNet *cnet);
       void clearFiles();
-      void createPoint(double lat, double lon);
+      void createPoint(NaifContextPtr naif, double lat, double lon);
       void modifyPoint(ControlPoint *point);
       void deletePoint(ControlPoint *point);
 

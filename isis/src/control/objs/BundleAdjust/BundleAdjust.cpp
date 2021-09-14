@@ -361,6 +361,8 @@ namespace Isis {
    */
   void BundleAdjust::init(Progress *progress) {
     emit(statusUpdate("Initialization"));
+    auto naif = NaifContext::acquire();
+    
     m_previousNumberImagePartials = 0;
 
     // initialize
@@ -428,10 +430,10 @@ namespace Isis {
 
       // initialize exterior orientation (spice) for all BundleImages in all BundleObservations
       // TODO!!! - should these initializations just be done when we add the new observation above?
-      m_bundleObservations.initializeExteriorOrientation();
+      m_bundleObservations.initializeExteriorOrientation(naif);
 
       if (m_bundleSettings->solveTargetBody()) {
-        m_bundleObservations.initializeBodyRotation();
+        m_bundleObservations.initializeBodyRotation(naif);
       }
 
       // set up vector of BundleControlPoints
@@ -709,6 +711,8 @@ namespace Isis {
   //      }
   //    }
 
+      auto naif = NaifContext::acquire();
+      
       // Compute the apriori coordinates for each nonheld point
       m_controlNet->ComputeApriori(); // original location
 
@@ -720,7 +724,7 @@ namespace Isis {
           BundleControlPointQsp point = m_bundleControlPoints.at(i);
           SurfacePoint surfacepoint = point->adjustedSurfacePoint();
 
-          surfacepoint.ResetLocalRadius(m_bundleTargetBody->meanRadius());
+          surfacepoint.ResetLocalRadius(naif, m_bundleTargetBody->meanRadius());
 
           point->setAdjustedSurfacePoint(surfacepoint);
         }
@@ -736,7 +740,7 @@ namespace Isis {
 
           Distance localRadius = m_bundleTargetBody->localRadius(surfacepoint.GetLatitude(),
                                                                  surfacepoint.GetLongitude());
-          surfacepoint.ResetLocalRadius(localRadius);
+          surfacepoint.ResetLocalRadius(naif, localRadius);
 
           point->setAdjustedSurfacePoint(surfacepoint);
         }
@@ -773,7 +777,7 @@ namespace Isis {
         }
 
         // form normal equations -- computePartials is called in here.
-        if (!formNormalEquations()) {
+        if (!formNormalEquations(naif)) {
           m_bundleResults.setConverged(false);
           break;
         }
@@ -804,7 +808,7 @@ namespace Isis {
         // testing
 
         // apply parameter corrections
-        applyParameterCorrections();
+        applyParameterCorrections(naif);
 
         // testing
         if (m_abort) {
@@ -816,7 +820,7 @@ namespace Isis {
         // testing
 
         // compute residuals
-        vtpv = computeResiduals();
+        vtpv = computeResiduals(naif);
 
         // flag outliers
         if ( m_bundleSettings->outlierRejection() ) {
@@ -950,7 +954,7 @@ namespace Isis {
         
         outputBundleStatus("\nStarting Error Propagation");
         
-        errorPropagation();
+        errorPropagation(naif);
         emit statusUpdate("\n\nError Propagation Complete\n");
         clock_t errorPropStopClock = clock();
         m_bundleResults.setElapsedTimeErrorProp((errorPropStopClock - errorPropStartClock)
@@ -961,7 +965,7 @@ namespace Isis {
       m_bundleResults.setElapsedTime((solveStopClock - solveStartClock)
                                      / (double)CLOCKS_PER_SEC);
 
-      wrapUp();
+      wrapUp(naif);
 
       m_bundleResults.setIterations(m_iteration);
       m_bundleResults.setObservations(m_bundleObservations);
@@ -1016,7 +1020,7 @@ namespace Isis {
    * @see BundleAdjust::formPointNormals
    * @see BundleAdjust::formWeightedNormals
    */
-  bool BundleAdjust::formNormalEquations() {
+  bool BundleAdjust::formNormalEquations(NaifContextPtr naif) {
     emit(statusBarUpdate("Forming Normal Equations"));
     bool status = false;
 
@@ -1090,7 +1094,7 @@ namespace Isis {
           continue;
         }
 
-        status = computePartials(coeffTarget, coeffImage, coeffPoint3D, coeffRHS, *measure,
+        status = computePartials(naif, coeffTarget, coeffImage, coeffPoint3D, coeffRHS, *measure,
                                      *point);
 
         if (!status) {
@@ -1108,7 +1112,7 @@ namespace Isis {
 
       } // end loop over this points measures
 
-      formPointNormals(N22, N12, n2, m_RHS, point);
+      formPointNormals(naif, N22, N12, n2, m_RHS, point);
 
       pointIndex++;
 
@@ -1281,7 +1285,8 @@ namespace Isis {
    *
    * @see BundleAdjust::formNormalEquations
    */
-  bool BundleAdjust::formPointNormals(symmetric_matrix<double, upper>&N22,
+  bool BundleAdjust::formPointNormals(NaifContextPtr naif, 
+                                      symmetric_matrix<double, upper>&N22,
                                       SparseBlockColumnMatrix &N12,
                                       vector<double> &n2,
                                       vector<double> &nj,
@@ -1323,7 +1328,7 @@ namespace Isis {
 
     // save upper triangular covariance matrix for error propagation
     SurfacePoint SurfacePoint = bundleControlPoint->adjustedSurfacePoint();
-    SurfacePoint.SetMatrix(m_bundleSettings->controlPointCoordTypeBundle(), N22);
+    SurfacePoint.SetMatrix(naif, m_bundleSettings->controlPointCoordTypeBundle(), N22);
     bundleControlPoint->setAdjustedSurfacePoint(SurfacePoint);
 
     // form Q (this is N22{-1} * N12{T})
@@ -1820,7 +1825,8 @@ namespace Isis {
    *
    * @throws IException::User "Unable to map apriori surface point for measure"
    */
-  bool BundleAdjust::computePartials(matrix<double> &coeffTarget,
+  bool BundleAdjust::computePartials(NaifContextPtr naif,
+                                     matrix<double> &coeffTarget,
                                      matrix<double> &coeffImage,
                                      matrix<double> &coeffPoint3D,
                                      vector<double> &coeffRHS,
@@ -1871,7 +1877,7 @@ namespace Isis {
       // It will have a single set of Spice for the entire image.  Scanning cameras may populate a single
       // image with multiple exposures, each with a unique set of Spice.  SetImage needs to be called
       // repeatedly for these images to point to the Spice for the current pixel.
-      measureCamera->SetImage(measure.sample(), measure.line());
+      measureCamera->SetImage(measure.sample(), measure.line(), naif);
     }
 
     // REMOVE
@@ -1881,7 +1887,7 @@ namespace Isis {
     // Compute the look vector in instrument coordinates based on time of observation and apriori
     // lat/lon/radius.  As of 05/15/2019, this call no longer does the back-of-planet test. An optional
     // bool argument was added CameraGroundMap::GetXY to turn off the test.
-    if (!(measureCamera->GroundMap()->GetXY(point.adjustedSurfacePoint(),
+    if (!(measureCamera->GroundMap()->GetXY(naif, point.adjustedSurfacePoint(),
                                             &computedX, &computedY, false))) {
       QString msg = "Unable to map apriori surface point for measure ";
       msg += measure.cubeSerialNumber() + " on point " + point.id() + " into focal plane";
@@ -1897,42 +1903,48 @@ namespace Isis {
 
     int index = 0;
     if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleRA()) {
-      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_RightAscension, 0,
+      measureCamera->GroundMap()->GetdXYdTOrientation(naif,
+                                                      SpiceRotation::WRT_RightAscension, 0,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
     if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleRAVelocity()) {
-      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_RightAscension, 1,
+      measureCamera->GroundMap()->GetdXYdTOrientation(naif,
+                                                      SpiceRotation::WRT_RightAscension, 1,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
     if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleDec()) {
-      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Declination, 0,
+      measureCamera->GroundMap()->GetdXYdTOrientation(naif,
+                                                      SpiceRotation::WRT_Declination, 0,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
     if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleDecVelocity()) {
-      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Declination, 1,
+      measureCamera->GroundMap()->GetdXYdTOrientation(naif,
+                                                      SpiceRotation::WRT_Declination, 1,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
     if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePM()) {
-      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Twist, 0,
+      measureCamera->GroundMap()->GetdXYdTOrientation(naif,
+                                                      SpiceRotation::WRT_Twist, 0,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
     }
 
     if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePMVelocity()) {
-      measureCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Twist, 1,
+      measureCamera->GroundMap()->GetdXYdTOrientation(naif,
+                                                      SpiceRotation::WRT_Twist, 1,
                                                       &coeffTarget(0, index),
                                                       &coeffTarget(1, index));
       index++;
@@ -1943,7 +1955,7 @@ namespace Isis {
           measureCamera->GroundMap()->MeanRadiusPartial(surfacePoint,
                                                         m_bundleTargetBody->meanRadius());
 
-      measureCamera->GroundMap()->GetdXYdPoint(lookBWRTMeanRadius, &coeffTarget(0, index),
+      measureCamera->GroundMap()->GetdXYdPoint(naif, lookBWRTMeanRadius, &coeffTarget(0, index),
                                                &coeffTarget(1, index));
       index++;
     }
@@ -1954,7 +1966,7 @@ namespace Isis {
           measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
                                                        CameraGroundMap::WRT_MajorAxis);
 
-      measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRadiusA, &coeffTarget(0, index),
+      measureCamera->GroundMap()->GetdXYdPoint(naif, lookBWRTRadiusA, &coeffTarget(0, index),
                                                &coeffTarget(1, index));
       index++;
 
@@ -1962,7 +1974,7 @@ namespace Isis {
           measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
                                                        CameraGroundMap::WRT_MinorAxis);
 
-      measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRadiusB, &coeffTarget(0, index),
+      measureCamera->GroundMap()->GetdXYdPoint(naif, lookBWRTRadiusB, &coeffTarget(0, index),
                                                &coeffTarget(1, index));
       index++;
 
@@ -1970,7 +1982,7 @@ namespace Isis {
           measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
                                                        CameraGroundMap::WRT_PolarAxis);
 
-      measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRadiusC, &coeffTarget(0, index),
+      measureCamera->GroundMap()->GetdXYdPoint(naif, lookBWRTRadiusC, &coeffTarget(0, index),
                                                &coeffTarget(1, index));
       index++;
     }
@@ -1986,7 +1998,8 @@ namespace Isis {
       // Add the partial for the x coordinate of the position (differentiating
       // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
       for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
-        measureCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, cameraCoef,
+        measureCamera->GroundMap()->GetdXYdPosition(naif, 
+                                                    SpicePosition::WRT_X, cameraCoef,
                                                     &coeffImage(0, index),
                                                     &coeffImage(1, index));
         index++;
@@ -1994,7 +2007,8 @@ namespace Isis {
 
       // Add the partial for the y coordinate of the position
       for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
-        measureCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, cameraCoef,
+        measureCamera->GroundMap()->GetdXYdPosition(naif, 
+                                                    SpicePosition::WRT_Y, cameraCoef,
                                                     &coeffImage(0, index),
                                                     &coeffImage(1, index));
         index++;
@@ -2002,7 +2016,8 @@ namespace Isis {
 
       // Add the partial for the z coordinate of the position
       for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
-        measureCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, cameraCoef,
+        measureCamera->GroundMap()->GetdXYdPosition(naif, 
+                                                    SpicePosition::WRT_Z, cameraCoef,
                                                     &coeffImage(0, index),
                                                     &coeffImage(1, index));
         index++;
@@ -2018,7 +2033,8 @@ namespace Isis {
 
       // Add the partials for ra
       for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
-        measureCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension,
+        measureCamera->GroundMap()->GetdXYdOrientation(naif, 
+                                                       SpiceRotation::WRT_RightAscension,
                                                        cameraCoef, &coeffImage(0, index),
                                                        &coeffImage(1, index));
         index++;
@@ -2026,7 +2042,8 @@ namespace Isis {
 
       // Add the partials for dec
       for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
-        measureCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Declination,
+        measureCamera->GroundMap()->GetdXYdOrientation(naif, 
+                                                       SpiceRotation::WRT_Declination,
                                                        cameraCoef, &coeffImage(0, index),
                                                        &coeffImage(1, index));
         index++;
@@ -2035,7 +2052,8 @@ namespace Isis {
       // Add the partial for twist if necessary
       if (observationSolveSettings->solveTwist()) {
         for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
-          measureCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist,
+          measureCamera->GroundMap()->GetdXYdOrientation(naif, 
+                                                       SpiceRotation::WRT_Twist,
                                                          cameraCoef, &coeffImage(0, index),
                                                          &coeffImage(1, index));
           index++;
@@ -2044,13 +2062,16 @@ namespace Isis {
     }
 
     // Complete partials calculations for 3D point (latitudinal or rectangular)
-    measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord1,
+    measureCamera->GroundMap()->GetdXYdPoint(naif,
+                                             lookBWRTCoord1,
                                              &coeffPoint3D(0, 0),
                                              &coeffPoint3D(1, 0));
-    measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord2,
+    measureCamera->GroundMap()->GetdXYdPoint(naif,
+                                             lookBWRTCoord2,
                                              &coeffPoint3D(0, 1),
                                              &coeffPoint3D(1, 1));
-    measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord3,
+    measureCamera->GroundMap()->GetdXYdPoint(naif,
+                                             lookBWRTCoord3,
                                              &coeffPoint3D(0, 2),
                                              &coeffPoint3D(1, 2));
 
@@ -2102,7 +2123,7 @@ namespace Isis {
   /**
    * apply parameter corrections for solution.
    */
-  void BundleAdjust::applyParameterCorrections() {
+  void BundleAdjust::applyParameterCorrections(NaifContextPtr naif) {
     emit(statusBarUpdate("Updating Parameters"));
     int t = 0;
 
@@ -2124,10 +2145,10 @@ namespace Isis {
 
       int numParameters = observation->numberParameters();
 
-      observation->applyParameterCorrections(subrange(m_imageSolution,t,t+numParameters));
+      observation->applyParameterCorrections(naif, subrange(m_imageSolution,t,t+numParameters));
 
       if (m_bundleSettings->solveTargetBody()) {
-        observation->updateBodyRotation();
+        observation->updateBodyRotation(naif);
       }
 
       t += numParameters;
@@ -2146,7 +2167,7 @@ namespace Isis {
           continue;
       }
 
-      point->applyParameterCorrections(m_imageSolution, m_sparseNormals,
+      point->applyParameterCorrections(naif, m_imageSolution, m_sparseNormals,
                                        m_bundleTargetBody); 
       pointIndex++;
 
@@ -2165,7 +2186,7 @@ namespace Isis {
    *                           plane x and y residuals instead of
    *                           image sample and line residuals.
    */
-  double BundleAdjust::computeResiduals() {
+  double BundleAdjust::computeResiduals(NaifContextPtr naif) {
     emit(statusBarUpdate("Computing Residuals"));
     double vtpv = 0.0;
     double vtpvControl = 0.0;
@@ -2185,7 +2206,7 @@ namespace Isis {
 
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
-      point->computeResiduals();
+      point->computeResiduals(naif);
 
       int numMeasures = point->numberOfMeasures();
       for (int j = 0; j < numMeasures; j++) {
@@ -2273,13 +2294,13 @@ namespace Isis {
    *
    * @return @b bool If the wrap up was successful.
    */
-  bool BundleAdjust::wrapUp() {
+  bool BundleAdjust::wrapUp(NaifContextPtr naif) {
     // compute residuals in pixels
 
     // vtpv for image coordinates
     for (int i = 0;  i < m_bundleControlPoints.size(); i++) {
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
-      point->computeResiduals();
+      point->computeResiduals(naif);
     }
 
     computeBundleStatistics();
@@ -2580,7 +2601,7 @@ namespace Isis {
    *                            covariance matrices instead of the sigmas.  This should produce 
    *                            more accurate results.  References #4649 and #501.
    */
-  bool BundleAdjust::errorPropagation() {
+  bool BundleAdjust::errorPropagation(NaifContextPtr naif) {
     emit(statusBarUpdate("Error Propagation"));
     // free unneeded memory
     cholmod_free_triplet(&m_cholmodTriplet, &m_cholmodCommon);
@@ -2893,7 +2914,7 @@ namespace Isis {
       // end debug
       
       // Distance units are km**2
-      SurfacePoint.SetMatrix(m_bundleSettings->controlPointCoordTypeBundle(),pCovar);
+      SurfacePoint.SetMatrix(naif, m_bundleSettings->controlPointCoordTypeBundle(),pCovar);
       point->setAdjustedSurfacePoint(SurfacePoint);
       // // debug lines
       // if (j < 3) {
@@ -2984,7 +3005,8 @@ namespace Isis {
    * @return @b Table The InstrumentPointing table for the cube.
    */
   Table BundleAdjust::cMatrix(int i) {
-    return m_controlNet->Camera(i)->instrumentRotation()->Cache("InstrumentPointing");
+  auto naif = NaifContext::acquire();
+    return m_controlNet->Camera(i)->instrumentRotation()->Cache("InstrumentPointing", naif);
   }
 
   /**
@@ -2996,7 +3018,8 @@ namespace Isis {
    * @return @b Table The InstrumentPosition table for the cube.
    */
   Table BundleAdjust::spVector(int i) {
-    return m_controlNet->Camera(i)->instrumentPosition()->Cache("InstrumentPosition");
+  auto naif = NaifContext::acquire();
+    return m_controlNet->Camera(i)->instrumentPosition()->Cache("InstrumentPosition", naif);
   }
 
 

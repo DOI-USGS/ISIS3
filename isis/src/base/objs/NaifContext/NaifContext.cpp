@@ -27,8 +27,11 @@
 #include "PvlToPvlTranslationManager.h"
 
 #include "cspice_state.h"
+
+extern "C" {
 #include <SpiceZpr.h>
 #include <SpiceZfc.h>
+}
 
 #include <boost/make_shared.hpp>
 
@@ -138,6 +141,10 @@ namespace Isis {
     errMsg += "The Naif error is [" + QString(naifLong) + "]";
 
     throw IException(IException::Unknown, errMsg, _FILEINFO_);
+  }
+
+  int NaifContext:: bodeul_(integer *body, doublereal *et, doublereal *ra, doublereal *dec, doublereal *w, doublereal *lamda) {
+    return ::bodeul_(m_naif.get(), body, et, ra, dec, w, lamda);
   }
 
   int NaifContext::ckfrot_(integer *inst, doublereal *et, doublereal *rotate, integer *ref, logical *found) {

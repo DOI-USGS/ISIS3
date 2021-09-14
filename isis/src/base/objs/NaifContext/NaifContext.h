@@ -25,6 +25,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+extern "C" {
 #include <SpiceZdf.h>
 #include <SpiceCK.h>
 #include <SpiceOsc.h>
@@ -35,6 +36,7 @@
 #include <SpiceEK.h>
 #include <SpicePln.h>
 #include <SpiceSPK.h>
+}
 
 #include "IException.h"
 
@@ -96,7 +98,6 @@ public:                                             \
       }
       
       NaifContext();
-      ~NaifContext();
 
       NAIF_GETSET(bool, false, naifStatusInitialized);
       NAIF_GETSET(bool, false, iTimeInitialized);
@@ -114,6 +115,7 @@ public:                                             \
       //
       // ISIS imports.
       //
+      int bodeul_(integer *body, doublereal *et, doublereal *ra, doublereal *dec, doublereal *w, doublereal *lamda);
       int ckfrot_(integer *inst, doublereal *et, doublereal *rotate, integer *ref, logical *found);
       int drotat_(doublereal *angle, integer *iaxis, doublereal *dmout);
       int frmchg_(integer *frame1, integer *frame2, doublereal *et, doublereal *rotate);
@@ -498,7 +500,6 @@ public:                                             \
       void polyds_c(ConstSpiceDouble *coeffs, SpiceInt deg, SpiceInt nderiv, SpiceDouble t, SpiceDouble *p);
       SpiceInt pos_c(ConstSpiceChar *str, ConstSpiceChar *substr, SpiceInt start);
       SpiceInt posr_c(ConstSpiceChar *str, ConstSpiceChar *substr, SpiceInt start);
-      void prefix_c(ConstSpiceChar *pref, SpiceInt spaces, SpiceInt lenout, SpiceChar *string);
       SpiceChar* prompt_c(ConstSpiceChar *prmptStr, SpiceInt lenout, SpiceChar *buffer);
       void prop2b_c(SpiceDouble gm, ConstSpiceDouble pvinit[6], SpiceDouble dt, SpiceDouble pvprop[6]);
       void prsdp_c(ConstSpiceChar *string, SpiceDouble *dpval);
