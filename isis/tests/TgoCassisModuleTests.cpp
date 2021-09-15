@@ -10,6 +10,9 @@
 #include "spiceinit.h"
 #include "tgocassisstitch.h"
 #include "tgocassisunstitch.h"
+#include "tgocassisrdrgen.h"
+#include "mosrange.h"
+#include "cam2map.h"
 
 #include "gtest/gtest.h"
 
@@ -17,8 +20,11 @@ using namespace Isis;
 
 static QString TGOCASSIS2ISIS_XML = FileName("$ISISROOT/bin/xml/tgocassis2isis.xml").expanded();
 static QString SPICEINIT_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
-static QString TGOCASSISSTITCH_XML = FileName("$ISISROOT/bin/xml/tgocassisstitch.xml").expanded();
-static QString TGOCASSISUNSTITCH_XML = FileName("$ISISROOT/bin/xml/tgocassisunstitch.xml").expanded();
+static QString STITCH_XML = FileName("$ISISROOT/bin/xml/tgocassisstitch.xml").expanded();
+static QString UNSTITCH_XML = FileName("$ISISROOT/bin/xml/tgocassisunstitch.xml").expanded();
+static QString RDRGEN_XML = FileName("$ISISROOT/bin/xml/tgocassisrdrgen.xml").expanded();
+static QString MOSRANGE_XML = FileName("$ISISROOT/bin/xml/mosrange.xml").expanded();
+static QString CAM2MAP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
 
 TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   QTemporaryDir prefix;
@@ -120,7 +126,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   
   QVector<QString> stitchArgs = {"fromlist=" + cubeListFile,  
                 "outputprefix=" + prefix.path() + "/stitched"};
-  UserInterface stitchOptions(TGOCASSISSTITCH_XML, stitchArgs);
+  UserInterface stitchOptions(STITCH_XML, stitchArgs);
   
   try {
     tgocassisstitch(stitchOptions);
@@ -131,7 +137,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   
   QVector<QString> unstitchArgs = {"from=" + prefix.path() + "/stitched-2016-11-26T22:50:27.381.cub",  
                   "outputprefix=" + prefix.path() + "/unstitched"};
-  UserInterface unstitchOptions(TGOCASSISUNSTITCH_XML, unstitchArgs);
+  UserInterface unstitchOptions(UNSTITCH_XML, unstitchArgs);
   
   try {
     tgocassisunstitch(unstitchOptions);
@@ -537,4 +543,211 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(nirUnstitchHist->Sum(), nirOrigHist->Sum());
   EXPECT_EQ(nirUnstitchHist->ValidPixels(), nirOrigHist->ValidPixels());
   EXPECT_EQ(nirUnstitchHist->StandardDeviation(), nirOrigHist->StandardDeviation());
+}
+
+
+TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
+  QTemporaryDir prefix;
+  
+  // run tgocassis2isis and spiceinit on pan framelet.
+  QString panFileName = prefix.path() + "/panframelet.cub";
+  QVector<QString> tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-PAN-00020-B1.xml",  
+                                         "to=" + panFileName};
+
+  UserInterface tgocassis2isisPan(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
+  }
+  
+  QVector<QString> spiceinitArgs = {"from=" + panFileName,  "ckp=t", "spkp=t"};
+  UserInterface spiceinitPan(SPICEINIT_XML, spiceinitArgs);
+  try {
+    spiceinit(spiceinitPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run spiceinit on pan image: " << e.what() << std::endl;
+  }
+  
+  // run tgocassis2isis and spiceinit on red framelet.
+  QString redFileName = prefix.path() + "/redframelet.cub";
+  tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-RED-01020-B1.xml",  
+                        "to=" + redFileName};
+  UserInterface tgocassis2isisRed(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisRed);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
+  }
+  
+  spiceinitArgs = {"from=" + redFileName,  "ckp=t", "spkp=t"};
+  UserInterface spiceinitRed(SPICEINIT_XML, spiceinitArgs);
+  try {
+    spiceinit(spiceinitRed);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run spiceinit on pan image: " << e.what() << std::endl;
+  }
+  
+  // run tgocassis2isis and spiceinit on blu framelet.
+  QString bluFileName = prefix.path() + "/bluframelet.cub";
+  tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-BLU-03020-B1.xml",  
+                        "to=" + bluFileName};
+  UserInterface tgocassis2isisBlu(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisBlu);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on blu image: " << e.what() << std::endl;
+  }
+  
+  spiceinitArgs = {"from=" + bluFileName,  "ckp=t", "spkp=t"};
+  UserInterface spiceinitBlu(SPICEINIT_XML, spiceinitArgs);
+  try {
+    spiceinit(spiceinitBlu);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run spiceinit on blu image: " << e.what() << std::endl;
+  }
+  
+  // run tgocassis2isis and spiceinit on nir framelet.
+  QString nirFileName = prefix.path() + "/nirframelet.cub";
+  tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-NIR-02020-B1.xml",  
+                        "to=" + nirFileName};
+  UserInterface tgocassis2isisNir(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisNir);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on nir image: " << e.what() << std::endl;
+  }
+  
+  spiceinitArgs = {"from=" + nirFileName,  "ckp=t", "spkp=t"};
+  UserInterface spiceinitNir(SPICEINIT_XML, spiceinitArgs);
+  try {
+    spiceinit(spiceinitNir);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run spiceinit  on nir image: " << e.what() << std::endl;
+  }
+  
+  // run mosrange on cube list
+  FileList *cubeList = new FileList();
+  cubeList->append(panFileName);
+  cubeList->append(redFileName);
+  cubeList->append(bluFileName);
+  cubeList->append(nirFileName);
+  
+  QString cubeListFile = prefix.path() + "/cubelist.lis";
+  cubeList->write(cubeListFile);
+  
+  QString mapFile = prefix.path() + "/equi.map";
+  QVector<QString> mosrangeArgs = {"fromlist=" + cubeListFile, "to=" + mapFile};
+  UserInterface mosrangeOptions(MOSRANGE_XML, mosrangeArgs);
+
+  try {
+    mosrange(mosrangeOptions);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run mosrange with cube list: " << e.what() << std::endl;
+  }
+  
+  // run cam2map on pan cube
+  QString panEquiFile = prefix.path() + "/pan_equi.cub";
+  QVector<QString> cam2mapArgs = {"from=" + panFileName,    
+                                  "to=" + panEquiFile,
+                                  "map=" + mapFile};
+  UserInterface cam2mapPan(CAM2MAP_XML, cam2mapArgs);
+  try {
+    cam2map(cam2mapPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run cam2map on pan image: " << e.what() << std::endl;
+  }
+  
+  // run cam2map on nir cube
+  QString nirEquiFile = prefix.path() + "/nir_equi.cub";
+  cam2mapArgs = {"from=" + nirFileName, "to=" + nirEquiFile, "map=" + mapFile};
+  UserInterface cam2mapNir(CAM2MAP_XML, cam2mapArgs);
+  try {
+    cam2map(cam2mapNir);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run cam2map on nir image: " << e.what() << std::endl;
+  }
+  
+  // run cam2map on blu cube
+  QString bluEquiFile = prefix.path() + "/blu_equi.cub";
+  cam2mapArgs = {"from=" + bluFileName, "to=" + bluEquiFile, "map=" + mapFile};
+  UserInterface cam2mapBlu(CAM2MAP_XML, cam2mapArgs);
+  try {
+    cam2map(cam2mapBlu);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run cam2map on blu image: " << e.what() << std::endl;
+  }
+  
+  // run cam2map on red cube
+  QString redEquiFile = prefix.path() + "/red_equi.cub";
+  cam2mapArgs = {"from=" + redFileName, "to=" + redEquiFile, "map=" + mapFile};
+  UserInterface cam2mapRed(CAM2MAP_XML, cam2mapArgs);
+  try {
+    cam2map(cam2mapRed);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run cam2map on red image: " << e.what() << std::endl;
+  }
+  
+  // run tgocassisrdrgen on pan cube
+  QString panExportFile = prefix.path() + "/pan_equi.img";
+  QVector<QString> rdrgenArgs = {"from=" + panEquiFile,    
+                                 "to=" + panExportFile};
+                                  
+  UserInterface rdrgenPan(RDRGEN_XML, rdrgenArgs);
+  try {
+    tgocassisrdrgen(rdrgenPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassisrdrgen on pan image: " << e.what() << std::endl;
+  }
+  
+  // run tgocassisrdrgen on nir cube
+  QString nirExportFile = prefix.path() + "/nir_equi.img";
+  rdrgenArgs = {"from=" + nirEquiFile, "to=" + nirExportFile};
+                                  
+  UserInterface rdrgenNir(RDRGEN_XML, rdrgenArgs);
+  try {
+    tgocassisrdrgen(rdrgenNir);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassisrdrgen on nir image: " << e.what() << std::endl;
+  }
+  
+  // run tgocassisrdrgen on blu cube
+  QString bluExportFile = prefix.path() + "/blu_equi.img";
+  rdrgenArgs = {"from=" + bluEquiFile, "to=" + bluExportFile};
+                                  
+  UserInterface rdrgenBlu(RDRGEN_XML, rdrgenArgs);
+  try {
+    tgocassisrdrgen(rdrgenBlu);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassisrdrgen on blu image: " << e.what() << std::endl;
+  }
+  
+  // run tgocassisrdrgen on red cube
+  QString redExportFile = prefix.path() + "/red_equi.img";
+  rdrgenArgs = {"from=" + redEquiFile, "to=" + redExportFile};
+                                  
+  UserInterface rdrgenRed(RDRGEN_XML, rdrgenArgs);
+  try {
+    tgocassisrdrgen(rdrgenRed);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassisrdrgen on red image: " << e.what() << std::endl;
+  }
+  
 }
