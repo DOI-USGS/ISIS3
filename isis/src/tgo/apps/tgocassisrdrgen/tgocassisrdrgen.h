@@ -6,14 +6,15 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "Isis.h"
+#ifndef tgocassisrdrgen_h
+#define tgocassisrdrgen_h
 
-#include "Application.h"
-#include "tgocassisrdrgen.h"
+#include "Cube.h"
+#include "UserInterface.h"
 
-using namespace Isis;
-
-void IsisMain() {
-  UserInterface &ui = Application::GetUserInterface();
-  tgocassisrdrgen(ui);
+namespace Isis{
+  extern void tgocassisrdrgen(Cube *icube, UserInterface &ui);
+  extern void tgocassisrdrgen(UserInterface &ui);
 }
+
+#endif
