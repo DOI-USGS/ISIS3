@@ -21,7 +21,8 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
-  static template <typename T> inline T MIN(const T &A, const T &B) {
+  
+  template <typename T> inline T MIN(const T &A, const T &B) {
     if(A < B) {
       return (A);
     }
@@ -30,7 +31,7 @@ namespace Isis {
     }
   }
 
-  static template <typename T> inline T MAX(const T &A, const T &B) {
+  template <typename T> inline T MAX(const T &A, const T &B) {
     if(A > B) {
       return (A);
     }
