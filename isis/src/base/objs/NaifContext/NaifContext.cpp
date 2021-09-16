@@ -159,6 +159,10 @@ namespace Isis {
     return ::frmchg_(m_naif.get(), frame1, frame2, et, rotate);
   }
 
+  int NaifContext::getlms_(char *msg, ftnlen msg_len) {
+    return ::getlms_(m_naif.get(), msg, msg_len);
+  }
+
   int NaifContext::invstm_(doublereal *mat, doublereal *invmat) {
     return ::invstm_(m_naif.get(), mat, invmat);
   }

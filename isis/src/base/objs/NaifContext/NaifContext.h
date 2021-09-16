@@ -38,8 +38,6 @@ extern "C" {
 #include <SpiceSPK.h>
 }
 
-#include "IException.h"
-
 /*
  * SPICE DEFINITIONS
  */
@@ -119,6 +117,7 @@ public:                                             \
       int ckfrot_(integer *inst, doublereal *et, doublereal *rotate, integer *ref, logical *found);
       int drotat_(doublereal *angle, integer *iaxis, doublereal *dmout);
       int frmchg_(integer *frame1, integer *frame2, doublereal *et, doublereal *rotate);
+      int getlms_(char *msg, ftnlen msg_len);
       int invstm_(doublereal *mat, doublereal *invmat);
       int refchg_(integer *frame1, integer *frame2, doublereal *et, doublereal *rotate);
       int tkfram_(integer *id, doublereal *rot, integer *frame, logical *found);
