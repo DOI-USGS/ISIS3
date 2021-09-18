@@ -24,7 +24,7 @@ void ReportError(QString err);
 
 int main() {
   Preference::Preferences(true);
-  NaifContextLifecycle naif_lifecycle;
+  NaifContextReference naif_reference;
   auto naif = NaifContext::acquire();
 
   Chip chip(51, 50);

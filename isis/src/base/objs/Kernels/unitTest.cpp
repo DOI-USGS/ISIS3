@@ -30,7 +30,7 @@ QString stripPath(QString input) {
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
-  NaifContextLifecycle naif_lifecycle;
+  NaifContextReference naif_reference;
   auto naif = NaifContext::acquire();
   QString inputFile = "$mgs/testData/ab102401.lev2.cub";
   if (--argc == 1) { inputFile = argv[1]; }

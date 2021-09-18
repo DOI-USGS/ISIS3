@@ -43,7 +43,7 @@ using namespace Isis;
 int main() {
   try {
     Preference::Preferences(true);
-    NaifContextLifecycle naif_lifecycle;
+    NaifContextReference naif_reference;
     auto naif = NaifContext::acquire();
 
     cout << "Unit test for Isis::ShapeModel" << endl;

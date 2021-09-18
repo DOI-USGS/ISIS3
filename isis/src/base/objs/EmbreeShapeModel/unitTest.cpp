@@ -51,7 +51,7 @@ double roundToPrecision(double value, double precision);
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
-    NaifContextLifecycle naif_lifecycle;
+    NaifContextReference naif_reference;
     auto naif = NaifContext::acquire();
 
     qDebug() << "Testing default shape model";

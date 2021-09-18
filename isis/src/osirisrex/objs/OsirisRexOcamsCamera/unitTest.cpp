@@ -54,7 +54,7 @@ void testLineSamp(Camera *cam, double sample, double line, NaifContextPtr naif);
 
 int main(void) {
   Preference::Preferences(true);
-  NaifContextLifecycle naif_lifecycle;
+  NaifContextReference naif_reference;
   auto naif = NaifContext::acquire();
 
   cout << "Unit Test for OsirisRexOcamsCamera..." << endl;

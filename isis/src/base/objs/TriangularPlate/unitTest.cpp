@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Unit test for TriangularPlate.";
     qDebug() << "";
     Preference::Preferences(true);
-    NaifContextLifecycle naif_lifecycle;
+    NaifContextReference naif_reference;
     auto naif = NaifContext::acquire();
 
     NaifTriangle plate(3,3);

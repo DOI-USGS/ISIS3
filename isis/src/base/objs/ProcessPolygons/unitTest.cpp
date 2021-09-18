@@ -20,7 +20,7 @@ std::vector<double> diamondSamples, diamondLines, values1, values2;
 std::vector<int> bands;
 
 void IsisMain() {
-  NaifContextLifecycle naif_lifecycle;
+  NaifContextReference naif_reference;
   auto naif = NaifContext::acquire();
 
   std::vector<double> samples, lines, values;

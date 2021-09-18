@@ -43,7 +43,7 @@ using namespace boost::numeric::ublas;
  */
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
-  Isis::NaifContextLifecycle naif_lifecycle;
+  Isis::NaifContextReference naif_reference;
   auto naif = Isis::NaifContext::acquire();
   symmetric_matrix<double,upper> cvRect,cvOc;
 

@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
   try {
     qDebug() << "Unit test for Abstract Plate.";
     Preference::Preferences(true);
-    NaifContextLifecycle naif_lifecycle;
+    NaifContextReference naif_reference;
     auto naif = NaifContext::acquire();
 
     qDebug() << "Virtual class... first create a child";

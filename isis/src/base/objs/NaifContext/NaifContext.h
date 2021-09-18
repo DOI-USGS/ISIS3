@@ -81,19 +81,36 @@ public:                                             \
       boost::shared_ptr<void> m_naif;
 
     public:
+      class Internal {
+        friend class NaifContext;
+
+        public:
+          ~Internal() { delete m_context; }
+
+        private:
+          NaifContext*      m_context;
+          int               m_refcount;
+      };
+
       // Lifecycle management.
-      static void           createForThread();
-      static void           destroyForThread();
+      static void           incrementRefcount();
+      static void           decrementRefcount();
 
       /// Get the thread local NaifContext.
       /// This is safe to cache as long as it's only called from the same thread.
       /// If an object is entirely resident in 1 thread - safe to cache as a member.
       /// If the object is used in multiple threads - cache it within method calls.
       static NaifContext *  acquire();
-      
-      static NaifContext *  useOrAcquire(NaifContext *n) {
-        return n ? n : acquire();
-      }
+
+      /// Use these methods to transfer a NaifContext between threads.
+      /// Useful if you maintain a worker pool and don't want the overhead of
+      /// initializing and destroying contexts.
+      /// 
+      /// LIMITATION: This preserves the internal refcount.
+      ///             That means all objects holding onto a NaifContextReference must
+      ///             also be transferred to the new thread. 
+      static void           attach(boost::shared_ptr<Internal> internal);
+      static boost::shared_ptr<Internal>  detach();
       
       NaifContext();
 
@@ -735,10 +752,10 @@ public:                                             \
   /**
    * Helper class to manage the lifecycle of a NaifContext.
    */
-  class NaifContextLifecycle {
+  class NaifContextReference {
     public:
-      NaifContextLifecycle() { NaifContext::createForThread(); }
-      ~NaifContextLifecycle() { NaifContext::destroyForThread(); }
+      NaifContextReference() { NaifContext::incrementRefcount(); }
+      ~NaifContextReference() { NaifContext::decrementRefcount(); }
   };
 
 }

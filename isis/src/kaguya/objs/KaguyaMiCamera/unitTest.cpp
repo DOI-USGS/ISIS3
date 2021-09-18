@@ -34,7 +34,7 @@ void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
-  NaifContextLifecycle naif_lifecycle;
+  NaifContextReference naif_reference;
   auto naif = NaifContext::acquire();
 
   cout << "Unit Test for KabuyaMiCamera..." << endl;

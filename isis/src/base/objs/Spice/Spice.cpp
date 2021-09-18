@@ -761,8 +761,6 @@ namespace Isis {
    *                                        SetEphemerisTime()
    */
   void Spice::setTime(const iTime &et, NaifContextPtr naif) {
-    naif = NaifContext::useOrAcquire(naif);
-
     if (m_et == NULL) {
       m_et = new iTime();
 
@@ -1034,8 +1032,6 @@ namespace Isis {
    *   called when not using naif.
    */
   iTime Spice::getClockTime(NaifContextPtr naif, QString clockValue, int sclkCode, bool clockTicks) {
-    naif = NaifContext::useOrAcquire(naif);
-
     if (sclkCode == -1) {
       sclkCode = naifSclkCode();
     }
@@ -1076,8 +1072,6 @@ namespace Isis {
    * @param index The index into the naif keyword array to read
    */
   QVariant Spice::readValue(NaifContextPtr naif, QString key, SpiceValueType type, int index) {
-    naif = NaifContext::useOrAcquire(naif);
-
     QVariant result;
 
     if (m_usingNaif && !m_usingAle) {

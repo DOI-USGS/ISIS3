@@ -45,7 +45,7 @@ void printRadiiGroupInfo(bool found, Pvl &label, PvlGroup &mappingGroup);
  */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
-  NaifContextLifecycle naif_lifecycle;
+  NaifContextReference naif_reference;
   auto naif = NaifContext::acquire();
 
   cout << setprecision(10);

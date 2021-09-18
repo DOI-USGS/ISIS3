@@ -19,7 +19,7 @@ void TestLineSamp(Camera *cam, double samp, double line, NaifContextPtr naif);
 
 int main(void) {
   Preference::Preferences(true);
-  NaifContextLifecycle naif_lifecycle;
+  NaifContextReference naif_reference;
   auto naif = NaifContext::acquire();
 
   QString testNACFile("$rosetta/testData/n20100710t154539230id20f22.cub");

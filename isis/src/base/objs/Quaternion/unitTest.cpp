@@ -17,7 +17,7 @@ using namespace std;
 
 int main() {
   Isis::Preference::Preferences(true);
-  Isis::NaifContextLifecycle naif_lifecycle;
+  Isis::NaifContextReference naif_reference;
   auto naif = Isis::NaifContext::acquire();
 
   // Test the matrix constructor

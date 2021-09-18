@@ -37,24 +37,51 @@ extern "C" {
 
 namespace Isis {
 
-  static NaifContext** context_tls() {
-    thread_local NaifContext* tls = nullptr;
-    return &tls;
+  thread_local NaifContext* tls_naif_context = nullptr;
+  thread_local int          tls_refcount = 0;
+
+  void NaifContext::incrementRefcount() {
+    if (!tls_refcount)
+      tls_naif_context = new NaifContext();
+    tls_refcount++;
   }
 
-  void NaifContext::createForThread() {
-    NaifContext** tls = context_tls();
-    *tls = new NaifContext();
+  void NaifContext::decrementRefcount() {
+    if (tls_refcount == 0)
+      throw std::logic_error("NaifContext refcount already at zero!");
+
+    tls_refcount--;
+    if (!tls_refcount) {
+      delete tls_naif_context;
+      tls_naif_context = nullptr;
+    }
   }
 
-  void NaifContext::destroyForThread() {
-    NaifContext** tls = context_tls();
-    delete *tls;
-    *tls = nullptr;
+  NaifContext* NaifContext::acquire() {    
+    return tls_naif_context;
   }
 
-  NaifContext* NaifContext::acquire() {
-    return *context_tls();
+  void NaifContext::attach(boost::shared_ptr<Internal> internal) {
+    if (tls_refcount)
+      throw std::runtime_error("Thread already has a NaifContext. Detach it or remove all references.");
+
+    tls_naif_context = internal->m_context;
+    tls_refcount = internal->m_refcount;
+
+    // Zero the imported data so it doesn't get deleted when going out of scope.
+    internal->m_context = nullptr;
+    internal->m_refcount = 0;
+  }
+
+  boost::shared_ptr<NaifContext::Internal> NaifContext::detach() {
+    auto internal = boost::make_shared<Internal>();
+    internal->m_context = tls_naif_context;
+    internal->m_refcount = tls_refcount;
+
+    tls_refcount = 0;
+    tls_naif_context = nullptr;
+
+    return internal;
   }
 
   NaifContext::NaifContext() : m_naif(cspice_alloc(), &cspice_free) {}

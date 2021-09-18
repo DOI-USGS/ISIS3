@@ -82,7 +82,7 @@ class MyCamera : public FramingCamera {
 
 int main() {
   Preference::Preferences(true);
-  NaifContextLifecycle naif_lifecycle;
+  NaifContextReference naif_reference;
   auto naif = NaifContext::acquire();
 
   //NOTE: The following cube is not from a framing camera.  The test returns

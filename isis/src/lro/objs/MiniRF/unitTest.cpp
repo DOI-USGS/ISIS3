@@ -34,7 +34,7 @@ void TestLineSamp(Isis::Camera *cam, double samp, double line, NaifContextPtr na
 
 int main(void) {
   Preference::Preferences(true);
-  NaifContextLifecycle naif_lifecycle;
+  NaifContextReference naif_reference;
   auto naif = NaifContext::acquire();
 
   cout << "Unit Test for MiniRFCamera..." << endl;
