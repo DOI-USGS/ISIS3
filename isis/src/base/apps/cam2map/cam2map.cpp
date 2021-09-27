@@ -47,7 +47,8 @@ namespace Isis {
                 UserInterface &ui, Pvl *log){
 
     // Get the camera from the input cube
-    p.SetInputCube(icube);
+    CubeAttributeInput &inputAtt = ui.GetInputAttribute("FROM");
+    p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
     incam = icube->camera();
 
     // Make sure it is not the sky
@@ -432,7 +433,9 @@ namespace Isis {
     p.EndProcess();
 
     // add mapping to print.prt
-    log->addGroup(cleanMapping);
+    if(log) {
+      log->addGroup(cleanMapping);
+    }
 
     // Cleanup
     delete outmap;

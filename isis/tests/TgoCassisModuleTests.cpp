@@ -10,7 +10,6 @@
 #include "spiceinit.h"
 #include "tgocassisstitch.h"
 #include "tgocassisunstitch.h"
-#include "tgocassisrdrgen.h"
 #include "mosrange.h"
 #include "cam2map.h"
 
@@ -22,7 +21,6 @@ static QString TGOCASSIS2ISIS_XML = FileName("$ISISROOT/bin/xml/tgocassis2isis.x
 static QString SPICEINIT_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
 static QString STITCH_XML = FileName("$ISISROOT/bin/xml/tgocassisstitch.xml").expanded();
 static QString UNSTITCH_XML = FileName("$ISISROOT/bin/xml/tgocassisunstitch.xml").expanded();
-static QString RDRGEN_XML = FileName("$ISISROOT/bin/xml/tgocassisrdrgen.xml").expanded();
 static QString MOSRANGE_XML = FileName("$ISISROOT/bin/xml/mosrange.xml").expanded();
 static QString CAM2MAP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
 
@@ -701,53 +699,274 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
     FAIL() << "Unable to run cam2map on red image: " << e.what() << std::endl;
   }
   
-  // run tgocassisrdrgen on pan cube
-  QString panExportFile = prefix.path() + "/pan_equi.img";
-  QVector<QString> rdrgenArgs = {"from=" + panEquiFile,    
-                                 "to=" + panExportFile};
-                                  
-  UserInterface rdrgenPan(RDRGEN_XML, rdrgenArgs);
-  try {
-    tgocassisrdrgen(rdrgenPan);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to run tgocassisrdrgen on pan image: " << e.what() << std::endl;
-  }
+  Cube panCube(panEquiFile);
+  Pvl *panLabel = panCube.label();
   
-  // run tgocassisrdrgen on nir cube
-  QString nirExportFile = prefix.path() + "/nir_equi.img";
-  rdrgenArgs = {"from=" + nirEquiFile, "to=" + nirExportFile};
-                                  
-  UserInterface rdrgenNir(RDRGEN_XML, rdrgenArgs);
-  try {
-    tgocassisrdrgen(rdrgenNir);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to run tgocassisrdrgen on nir image: " << e.what() << std::endl;
-  }
+  // Instrument Group
+  PvlGroup &inst = panLabel->findGroup("Instrument", Pvl::Traverse);
+  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
+  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "CaSSIS");
+  EXPECT_EQ(inst["TargetName"][0].toStdString(), "Mars" );
+  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2016-11-26T22:58:02.583");
+  EXPECT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "2f0154373db1aa13");
+  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
+  EXPECT_EQ(int(inst["SummingMode"]), 0);
+  EXPECT_EQ(inst["Filter"][0].toStdString(), "PAN");
   
-  // run tgocassisrdrgen on blu cube
-  QString bluExportFile = prefix.path() + "/blu_equi.img";
-  rdrgenArgs = {"from=" + bluEquiFile, "to=" + bluExportFile};
-                                  
-  UserInterface rdrgenBlu(RDRGEN_XML, rdrgenArgs);
-  try {
-    tgocassisrdrgen(rdrgenBlu);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to run tgocassisrdrgen on blu image: " << e.what() << std::endl;
-  }
+  // Archive Group
+  PvlGroup &archive = panLabel->findGroup("Archive", Pvl::Traverse);
+  EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
+  EXPECT_EQ(archive["ProductVersionId"][0].toStdString(), "UNK");
+  EXPECT_EQ(archive["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:26");
+  EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
+  EXPECT_DOUBLE_EQ(double(archive["Offset"]), 0.0);
+  EXPECT_DOUBLE_EQ(double(archive["PredictMaximumExposureTime"]), 3.4317);
+  EXPECT_DOUBLE_EQ(double(archive["CassisOffNadirAngle"]), 32.2820);
+  EXPECT_DOUBLE_EQ(double(archive["PredictedRepetitionFrequency"]), 790.7);
+  EXPECT_DOUBLE_EQ(double(archive["GroundTrackVelocity"]), 2.3616);
+  EXPECT_DOUBLE_EQ(double(archive["ForwardRotationAngle"]), 47.93);
+  EXPECT_DOUBLE_EQ(double(archive["SpiceMisalignment"]), 174.295);
+  EXPECT_DOUBLE_EQ(double(archive["FocalLength"]), 0.8770);
+  EXPECT_DOUBLE_EQ(double(archive["FNumber"]), 6.50);
+  EXPECT_EQ(int(archive["ExposureTimeCommand"]), 200);
+  EXPECT_EQ(int(archive["FrameletNumber"]), 20);
+  EXPECT_EQ(int(archive["NumberOfFramelets"]), 40);
+  EXPECT_EQ(int(archive["ImageFrequency"]), 1200000);
+  EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
+  EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799468);
+  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f0154373db1aa13");
+  EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 0.00192);
+  EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 0.00);
+  EXPECT_EQ(int(archive["WindowCount"]), 0);
+  EXPECT_EQ(int(archive["Window1Binning"]), 0);
+  EXPECT_EQ(int(archive["Window1StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window1EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window1StartLine"]), 354);
+  EXPECT_EQ(int(archive["Window1EndLine"]), 633);
+  EXPECT_EQ(int(archive["Window2Binning"]), 0);
+  EXPECT_EQ(int(archive["Window2StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window2EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window2StartLine"]), 712);
+  EXPECT_EQ(int(archive["Window2EndLine"]), 966);
+  EXPECT_EQ(int(archive["Window3Binning"]), 0);
+  EXPECT_EQ(int(archive["Window3StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window3EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window3StartLine"]), 1048);
+  EXPECT_EQ(int(archive["Window3EndLine"]), 1302);
+  EXPECT_EQ(int(archive["Window4Binning"]), 0);
+  EXPECT_EQ(int(archive["Window4StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window4EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window4StartLine"]), 1409);
+  EXPECT_EQ(int(archive["Window4EndLine"]), 1662);
+  EXPECT_EQ(int(archive["Window5Binning"]), 0);
+  EXPECT_EQ(int(archive["Window5StartSample"]), 640);
+  EXPECT_EQ(int(archive["Window5EndSample"]), 767);
+  EXPECT_EQ(int(archive["Window5StartLine"]), 200);
+  EXPECT_EQ(int(archive["Window5EndLine"]), 208);
+  EXPECT_EQ(int(archive["Window6Binning"]), 0);
+  EXPECT_EQ(int(archive["Window6StartSample"]), 1280);
+  EXPECT_EQ(int(archive["Window6EndSample"]), 1407);
+  EXPECT_EQ(int(archive["Window6StartLine"]), 1850);
+  EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
+  EXPECT_EQ(int(archive["YearDoy"]), 2016331);
+  EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
   
-  // run tgocassisrdrgen on red cube
-  QString redExportFile = prefix.path() + "/red_equi.img";
-  rdrgenArgs = {"from=" + redEquiFile, "to=" + redExportFile};
-                                  
-  UserInterface rdrgenRed(RDRGEN_XML, rdrgenArgs);
-  try {
-    tgocassisrdrgen(rdrgenRed);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to run tgocassisrdrgen on red image: " << e.what() << std::endl;
-  }
+  // BandBin Group
+  PvlGroup &bandbin = panLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "PAN");
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 677.40);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 231.5);
+  EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143421");
   
+  // Kernels Group
+  PvlGroup &kernels = panLabel->findGroup("Kernels", Pvl::Traverse);
+  EXPECT_EQ(int(kernels["NaifFrameCode"]), -143400);
+  
+  Histogram *hist = panCube.histogram();
+  
+  EXPECT_NEAR(hist->Average(), 0.082351300138231429, 0.0001);
+  EXPECT_DOUBLE_EQ(hist->Sum(), 70857.19977273792);
+  EXPECT_EQ(hist->ValidPixels(), 860426);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.0010547865346787659, 0.0001);
+  
+  
+  Cube nirCube(nirEquiFile);
+  Pvl *nirLabel = nirCube.label();
+  
+  // Instrument Group
+  inst = nirLabel->findGroup("Instrument", Pvl::Traverse);
+  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
+  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "CaSSIS");
+  EXPECT_EQ(inst["TargetName"][0].toStdString(), "Mars" );
+  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2016-11-26T22:58:02.583");
+  EXPECT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "2f0154373db1aa13");
+  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
+  EXPECT_EQ(int(inst["SummingMode"]), 0);
+  EXPECT_EQ(inst["Filter"][0].toStdString(), "NIR");
+  
+  // Archive Group
+  archive = nirLabel->findGroup("Archive", Pvl::Traverse);
+  EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
+  EXPECT_EQ(archive["ProductVersionId"][0].toStdString(), "UNK");
+  EXPECT_EQ(archive["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:26");
+  EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
+  EXPECT_DOUBLE_EQ(double(archive["Offset"]), 0.0);
+  EXPECT_DOUBLE_EQ(double(archive["PredictMaximumExposureTime"]), 3.4317);
+  EXPECT_DOUBLE_EQ(double(archive["CassisOffNadirAngle"]), 32.2820);
+  EXPECT_DOUBLE_EQ(double(archive["PredictedRepetitionFrequency"]), 790.7);
+  EXPECT_DOUBLE_EQ(double(archive["GroundTrackVelocity"]), 2.3616);
+  EXPECT_DOUBLE_EQ(double(archive["ForwardRotationAngle"]), 47.93);
+  EXPECT_DOUBLE_EQ(double(archive["SpiceMisalignment"]), 174.295);
+  EXPECT_DOUBLE_EQ(double(archive["FocalLength"]), 0.8770);
+  EXPECT_DOUBLE_EQ(double(archive["FNumber"]), 6.50);
+  EXPECT_EQ(int(archive["ExposureTimeCommand"]), 200);
+  EXPECT_EQ(int(archive["FrameletNumber"]), 20);
+  EXPECT_EQ(int(archive["NumberOfFramelets"]), 40);
+  EXPECT_EQ(int(archive["ImageFrequency"]), 1200000);
+  EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
+  EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799468);
+  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f0154373db1aa13");
+  EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 0.00192);
+  EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 0.00);
+  EXPECT_EQ(int(archive["WindowCount"]), 2);
+  EXPECT_EQ(int(archive["Window1Binning"]), 0);
+  EXPECT_EQ(int(archive["Window1StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window1EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window1StartLine"]), 354);
+  EXPECT_EQ(int(archive["Window1EndLine"]), 632);
+  EXPECT_EQ(int(archive["Window2Binning"]), 0);
+  EXPECT_EQ(int(archive["Window2StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window2EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window2StartLine"]), 712);
+  EXPECT_EQ(int(archive["Window2EndLine"]), 966);
+  EXPECT_EQ(int(archive["Window3Binning"]), 0);
+  EXPECT_EQ(int(archive["Window3StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window3EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window3StartLine"]), 1048);
+  EXPECT_EQ(int(archive["Window3EndLine"]), 1303);
+  EXPECT_EQ(int(archive["Window4Binning"]), 0);
+  EXPECT_EQ(int(archive["Window4StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window4EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window4StartLine"]), 1409);
+  EXPECT_EQ(int(archive["Window4EndLine"]), 1662);
+  EXPECT_EQ(int(archive["Window5Binning"]), 0);
+  EXPECT_EQ(int(archive["Window5StartSample"]), 640);
+  EXPECT_EQ(int(archive["Window5EndSample"]), 767);
+  EXPECT_EQ(int(archive["Window5StartLine"]), 200);
+  EXPECT_EQ(int(archive["Window5EndLine"]), 208);
+  EXPECT_EQ(int(archive["Window6Binning"]), 0);
+  EXPECT_EQ(int(archive["Window6StartSample"]), 1280);
+  EXPECT_EQ(int(archive["Window6EndSample"]), 1407);
+  EXPECT_EQ(int(archive["Window6StartLine"]), 1850);
+  EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
+  EXPECT_EQ(int(archive["YearDoy"]), 2016331);
+  EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
+  
+  // BandBin Group
+  bandbin = nirLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "NIR");
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 940.2);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 120.60);
+  EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143423");
+  
+  // Kernels Group
+  kernels = nirLabel->findGroup("Kernels", Pvl::Traverse);
+  EXPECT_EQ(int(kernels["NaifFrameCode"]), -143400);
+  
+  hist = nirCube.histogram();
+  
+  EXPECT_NEAR(hist->Average(), 0.096215370187754598, 0.0001);
+  EXPECT_DOUBLE_EQ(hist->Sum(), 78150.645788893104);
+  EXPECT_EQ(hist->ValidPixels(), 812247);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.0015024999314775509, 0.0001);
+  
+  Cube redCube(redEquiFile);
+  Pvl *redLabel = redCube.label();
+  
+  // Instrument Group
+  inst = redLabel->findGroup("Instrument", Pvl::Traverse);
+  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
+  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "CaSSIS");
+  EXPECT_EQ(inst["TargetName"][0].toStdString(), "Mars" );
+  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2016-11-26T22:58:02.583");
+  EXPECT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "2f0154373db1aa13");
+  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
+  EXPECT_EQ(int(inst["SummingMode"]), 0);
+  EXPECT_EQ(inst["Filter"][0].toStdString(), "RED");
+  
+  // Archive Group
+  archive = redLabel->findGroup("Archive", Pvl::Traverse);
+  EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
+  EXPECT_EQ(archive["ProductVersionId"][0].toStdString(), "UNK");
+  EXPECT_EQ(archive["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:26");
+  EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
+  EXPECT_DOUBLE_EQ(double(archive["Offset"]), 0.0);
+  EXPECT_DOUBLE_EQ(double(archive["PredictMaximumExposureTime"]), 3.4317);
+  EXPECT_DOUBLE_EQ(double(archive["CassisOffNadirAngle"]), 32.2820);
+  EXPECT_DOUBLE_EQ(double(archive["PredictedRepetitionFrequency"]), 790.7);
+  EXPECT_DOUBLE_EQ(double(archive["GroundTrackVelocity"]), 2.3616);
+  EXPECT_DOUBLE_EQ(double(archive["ForwardRotationAngle"]), 47.93);
+  EXPECT_DOUBLE_EQ(double(archive["SpiceMisalignment"]), 174.295);
+  EXPECT_DOUBLE_EQ(double(archive["FocalLength"]), 0.8770);
+  EXPECT_DOUBLE_EQ(double(archive["FNumber"]), 6.50);
+  EXPECT_EQ(int(archive["ExposureTimeCommand"]), 200);
+  EXPECT_EQ(int(archive["FrameletNumber"]), 20);
+  EXPECT_EQ(int(archive["NumberOfFramelets"]), 40);
+  EXPECT_EQ(int(archive["ImageFrequency"]), 1200000);
+  EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
+  EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799468);
+  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f0154373db1aa13");
+  EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 0.00192);
+  EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 0.00);
+  EXPECT_EQ(int(archive["WindowCount"]), 2);
+  EXPECT_EQ(int(archive["Window1Binning"]), 0);
+  EXPECT_EQ(int(archive["Window1StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window1EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window1StartLine"]), 354);
+  EXPECT_EQ(int(archive["Window1EndLine"]), 632);
+  EXPECT_EQ(int(archive["Window2Binning"]), 0);
+  EXPECT_EQ(int(archive["Window2StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window2EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window2StartLine"]), 712);
+  EXPECT_EQ(int(archive["Window2EndLine"]), 966);
+  EXPECT_EQ(int(archive["Window3Binning"]), 0);
+  EXPECT_EQ(int(archive["Window3StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window3EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window3StartLine"]), 1048);
+  EXPECT_EQ(int(archive["Window3EndLine"]), 1303);
+  EXPECT_EQ(int(archive["Window4Binning"]), 0);
+  EXPECT_EQ(int(archive["Window4StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window4EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window4StartLine"]), 1409);
+  EXPECT_EQ(int(archive["Window4EndLine"]), 1662);
+  EXPECT_EQ(int(archive["Window5Binning"]), 0);
+  EXPECT_EQ(int(archive["Window5StartSample"]), 640);
+  EXPECT_EQ(int(archive["Window5EndSample"]), 767);
+  EXPECT_EQ(int(archive["Window5StartLine"]), 200);
+  EXPECT_EQ(int(archive["Window5EndLine"]), 208);
+  EXPECT_EQ(int(archive["Window6Binning"]), 0);
+  EXPECT_EQ(int(archive["Window6StartSample"]), 1280);
+  EXPECT_EQ(int(archive["Window6EndSample"]), 1407);
+  EXPECT_EQ(int(archive["Window6StartLine"]), 1850);
+  EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
+  EXPECT_EQ(int(archive["YearDoy"]), 2016331);
+  EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
+  
+  // BandBin Group
+  bandbin = redLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "RED");
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 940.2);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 120.60);
+  EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143423");
+  
+  // Kernels Group
+  kernels = redLabel->findGroup("Kernels", Pvl::Traverse);
+  EXPECT_EQ(int(kernels["NaifFrameCode"]), -143400);
+  
+  hist = redCube.histogram();
+  
+  EXPECT_NEAR(hist->Average(), 0.096215370187754598, 0.0001);
+  EXPECT_DOUBLE_EQ(hist->Sum(), 78150.645788893104);
+  EXPECT_EQ(hist->ValidPixels(), 812247);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.0015024999314775509, 0.0001);
 }
