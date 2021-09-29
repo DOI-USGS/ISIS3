@@ -47,8 +47,7 @@ namespace Isis {
                 UserInterface &ui, Pvl *log){
 
     // Get the camera from the input cube
-    CubeAttributeInput &inputAtt = ui.GetInputAttribute("FROM");
-    p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
+    p.SetInputCube(icube);
     incam = icube->camera();
 
     // Make sure it is not the sky

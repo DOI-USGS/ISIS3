@@ -786,7 +786,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   Histogram *hist = panCube.histogram();
   
   EXPECT_NEAR(hist->Average(), 0.082351300138231429, 0.0001);
-  EXPECT_DOUBLE_EQ(hist->Sum(), 70857.19977273792);
+  EXPECT_NEAR(hist->Sum(), 70857.19977273792, 0.0001);
   EXPECT_EQ(hist->ValidPixels(), 860426);
   EXPECT_NEAR(hist->StandardDeviation(), 0.0010547865346787659, 0.0001);
   
@@ -877,7 +877,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   hist = nirCube.histogram();
   
   EXPECT_NEAR(hist->Average(), 0.096215370187754598, 0.0001);
-  EXPECT_DOUBLE_EQ(hist->Sum(), 78150.645788893104);
+  EXPECT_NEAR(hist->Sum(), 78150.645788893104, 0.0001);
   EXPECT_EQ(hist->ValidPixels(), 812247);
   EXPECT_NEAR(hist->StandardDeviation(), 0.0015024999314775509, 0.0001);
   
@@ -968,7 +968,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   hist = redCube.histogram();
   
   EXPECT_NEAR(hist->Average(), 0.098812884362865061, 0.0001);
-  EXPECT_DOUBLE_EQ(hist->Sum(), 78810.883871480823);
+  EXPECT_NEAR(hist->Sum(), 78810.883871480823, 0.0001);
   EXPECT_EQ(hist->ValidPixels(), 797577);
   EXPECT_NEAR(hist->StandardDeviation(), 0.0020888136703382234, 0.0001);
   
@@ -1060,7 +1060,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   hist = bluCube.histogram();
   
   EXPECT_NEAR(hist->Average(), 0.051942847688226532, 0.0001);
-  EXPECT_DOUBLE_EQ(hist->Sum(), 42226.834142448381);
+  EXPECT_NEAR(hist->Sum(), 42226.834142448381, 0.0001);
   EXPECT_EQ(hist->ValidPixels(), 812948);
   EXPECT_NEAR(hist->StandardDeviation(), 0.00085567958401590197, 0.0001);
 }
