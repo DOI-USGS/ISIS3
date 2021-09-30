@@ -198,7 +198,7 @@ namespace Isis {
           json props;
           props["kernels"] = kernel_pvl.str();
 
-          isd = ale::load(lab.fileName().toStdString(), props.dump(), "isis");
+          isd = ale::load(naif, lab.fileName().toStdString(), props.dump(), "isis");
         }
         
         json aleNaifKeywords = isd["NaifKeywords"];
