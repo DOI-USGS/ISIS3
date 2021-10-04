@@ -24,6 +24,7 @@
       will reduce the number of samples in the output image by a factor of at
       most the SpatialSumming mode value.
     </p>
+
     <p>
       The LROC NAC camera has the ability to acquire images of differing sizes in
       both line and sample.  The starting hardware detector pixel for the
@@ -44,7 +45,7 @@
       pixels and the B channel dark average is subtracted from the B channel
       image pixels.
     </p>
-    
+
     <p>
       The DN level in an uncalibrated image is the sum of the true signal from the scene, 
       the bias, the dark current, and random noise in all 3 components. The random noise in
@@ -69,7 +70,7 @@
         TrueDN is the signal that would be reported in an idealized case of an instrument with zero noise.
       </pre>
     </p>
-    
+
     <p>
       The dark average produced is dependant on which options are selected.
       There are three options for dark calibration/correction. If the image has exposure code of zero, 
@@ -82,7 +83,7 @@
       dark observations under given settings (i.e., exposure code, summing mode, etc.). The maximum
       time range between pairs of dark files is 45 days. If a suitable pair is not found, the latest
       dark file taken before the image will be used.
-      
+
       pixel_dark_average =
       avgDarkLine1_pixel * |darkfile1_time - time|   +   avgDarkLine2_pixel * |darkfile2_time - time|
       / (1.0 * ( |darkFile1_time - time| + |darkFile2_time - time| ) )
@@ -104,7 +105,7 @@
       This option uses a single custom dark file that the user must supply with the DarkFile parameter.  
       This option is typically only used in special cases, such as calibrating very long exposure NAC images.
     </p>
-    
+
     <p>
       Let's look at the case of a calibrated image for which the true signal
       is zero, a dark image. In calibration the mean bias and dark current are
@@ -136,7 +137,7 @@
       Using a spiceinited cube as input has the advantage of not requiring that local 
       mission-specific kernels be available. (See spiceinit web=true.)
     </p>
-    
+
   </description>
 
   <history>
@@ -155,7 +156,6 @@
     <change name="Victor Silva" date="2020-10-04">
       Updated dark calibration documentation to provide more clarity to dark file options
     </change>
-
   </history>
 
   <category>
@@ -242,7 +242,7 @@
         <description>
           There are three options for dark calibration/correction. If the image has exposure code of zero, 
           the nearest dark files with exposure code of zero will be used.
-          
+
           PAIR (Nearest pair of darks) [Default]:
           This option selects the two closest dark files (before and after the observation) and 
           computes a time-weighted average. The maximum time range between pairs of dark files 
@@ -253,7 +253,7 @@
           This option selects the nearest dark file (before or after the observations).  
           Note: While this is not a default option, if only one dark is available, lronaccal will
           automatically apply the nearest dark file. 
-          
+
           CUSTOM (Custom dark):
           This option uses a single custom dark file that the user must supply with the DarkFile parameter.  
           This option is typically only used in special cases, such as calibrating very long exposure NAC images.
