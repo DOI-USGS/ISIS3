@@ -668,9 +668,13 @@ TEST_F(SmallCube, FunctionalTestSpiceinitCsminitRestorationOnFail) {
 
   // Create an ISD
   json isd;
-  isd["test_param_one"] = 1.0;
-  isd["test_param_two"] = 2.0;
-
+  isd["reference_time"] = 0;
+  isd["center_latitude"] = 3.03125;
+  isd["center_longitude"] = -2.9375;
+  isd["scale"] = 240;
+  isd["center_longitude_sigma"] = 0.0645181963189456;
+  isd["center_latitude_sigma"] = 0.0645181963189456;
+  isd["scale_sigma"] = 8.25832912882503;
   QString isdPath = tempDir.path() + "/default.json";
   std::ofstream file(isdPath.toStdString());
   file << isd;

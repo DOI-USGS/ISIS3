@@ -1,0 +1,21 @@
+ Object = AutoRegistration
+   Group = Algorithm
+     Name         = MaximumCorrelation
+     Tolerance    = 0.7
+     SubPixelAccuracy = True
+   EndGroup
+
+   Group = PatternChip
+     Samples = 261
+     Lines   = 1
+   EndGroup
+
+   Group = SearchChip
+     Samples = 266
+     Lines   = 7
+   EndGroup
+
+	 Group = SurfaceModel
+		WindowSize 	= 7
+	 EndGroup
+ EndObject

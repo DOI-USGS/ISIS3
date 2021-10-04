@@ -33,7 +33,7 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "5.1.0")
+set(VERSION            "6.0.0")
 string(REPLACE "." ";" VERSION_LIST ${VERSION})
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
@@ -303,7 +303,6 @@ endif(APPLE)
 
 if(pybindings)
  find_package(Python REQUIRED)
- find_package(Sip    REQUIRED)
 endif()
 
 # Iterate through all variables and extract the libraries and include directories
@@ -355,70 +354,6 @@ list(APPEND ALLLIBS pantor::inja)
 list(REMOVE_DUPLICATES ALLLIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBS)
 list(REMOVE_DUPLICATES ALLINCDIRS)
-
-#===============================================================================
-#===============================================================================
-
-# Set python bindings configuration and set target for generating C++ files
-if(pybindings)
-  message("Configuring Python Bindings")
-
-  if (NOT DEFINED PYINSTALL_DIR)
-    set(PYINSTALL_DIR ${PYTHON_SITE_PACKAGES_DIR})
-  endif()
-  message(STATUS "PYTHON BINDINGS INSTALL DIR: ${PYINSTALL_DIR}")
-
- # We need to get the locations for sip files, modules, etc.
- set(ISIS_SIP_DIR "${CMAKE_SOURCE_DIR}/sipfiles")
- set(ISIS_SIP_MODULE "${CMAKE_SOURCE_DIR}/sipfiles/master.sip")
- set(SIP_BUILD_FILE "isispy.sbf")
- set(ISIS_SIP_CODE_DIR ${CMAKE_BINARY_DIR}/sipsrc)
-
- # Create the output directory for the new .CPP files
- execute_process(COMMAND mkdir -p "${ISIS_SIP_CODE_DIR}")
-
- # get list of output files exepected from sip
-
- # get the PYQT configuration based flags from Python
- execute_process(COMMAND ${PYTHON_EXECUTABLE} -c
-                 "from PyQt5.QtCore import PYQT_CONFIGURATION as qtconfigdict;print(qtconfigdict['sip_flags'])"
-                 OUTPUT_VARIABLE PYQT_SIP_FLAGS)
-
- # CMAKE doesn't handle spaces from python well when piping that into the
- # command because of white space and a trailing new line,
- # so we turn it into a list
- message(STATUS "Getting SIP config...")
- message(STATUS "Attempting 'python -c \"from PyQt5.QtCore import PYQT_CONFIGURATION as qtconfigdict; print(qtconfigdict['sip_flags'])\"'")
-
- if (${PYQT_SIP_FLAGS} STREQUAL "")
-    message(FATAL_ERROR "print(qtconfigdict['sip_flags']) returned empty string, is sip installed? Python binding can be disabled with pybindings=OFF")
- endif()
- string(STRIP ${PYQT_SIP_FLAGS} PYQT_SIP_FLAGS)
- string(REPLACE " " ";" PYQT_SIP_FLAGS ${PYQT_SIP_FLAGS})
-
- message(STATUS "FLAGS: ${PYQT_SIP_FLAGS}")
- message(STATUS "Generating C++ code from sip files")
- message(STATUS "SIP BUILD FILE: ${SIP_BUILD_FILE}")
- message(STATUS "SIP MODULE: ${ISIS_SIP_MODULE}")
- message(STATUS "SIP GENERATED CODE DIR: ${ISIS_SIP_CODE_DIR}")
-
- execute_process(COMMAND ${SIP_BINARY_PATH} -e -o -c ${ISIS_SIP_CODE_DIR} -I ${SIP_DEFAULT_SIP_DIR}/PyQt5 ${PYQT_SIP_FLAGS} ${ISIS_SIP_MODULE})
-
- # add target so users can run the command after initial configuration
- add_custom_target(sipfiles
-                  COMMAND ${SIP_BINARY_PATH} -e -o -c ${ISIS_SIP_CODE_DIR} -I ${SIP_DEFAULT_SIP_DIR}/PyQt5 ${PYQT_SIP_FLAGS} ${ISIS_SIP_MODULE}
-                  COMMENT "Generating C++ code from sip files")
-
- file(GLOB SIP_GENERATED_SOURCE_FILES ${ISIS_SIP_CODE_DIR}/*.cpp)
- add_library(isispy MODULE ${SIP_GENERATED_SOURCE_FILES})
- target_link_libraries(isispy ${ALLLIBS})
- target_link_libraries(isispy isis)
- set_target_properties(isispy PROPERTIES LINK_DEPENDS isis INSTALL_RPATH ${CMAKE_INSTALL_PREFIX})
- add_dependencies(isispy sipfiles)
-
- install(TARGETS isispy DESTINATION ${PYINSTALL_DIR})
-endif()
-
 
 #===============================================================================
 #===============================================================================
@@ -487,24 +422,25 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/appdata DESTINATION ${CMAKE_INSTALL_PREFIX
 # Create the appdata directory with translations directory, images directory, templates directories
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/appdata/translations
                     ${CMAKE_BINARY_DIR}/appdata/templates/apollo
-		    ${CMAKE_BINARY_DIR}/appdata/templates/autoseed
-		    ${CMAKE_BINARY_DIR}/appdata/templates/autoreg
-		    ${CMAKE_BINARY_DIR}/appdata/templates/noproj
-		    ${CMAKE_BINARY_DIR}/appdata/templates/cnetref
-		    ${CMAKE_BINARY_DIR}/appdata/templates/cnetstats
-		    ${CMAKE_BINARY_DIR}/appdata/templates/cnet_validmeasure
-		    ${CMAKE_BINARY_DIR}/appdata/templates/controlnetworks
-	            ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen
-		    ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures
-		    ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff
-		    ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw
-		    ${CMAKE_BINARY_DIR}/appdata/templates/kernels
-	            ${CMAKE_BINARY_DIR}/appdata/templates/labels
-	            ${CMAKE_BINARY_DIR}/appdata/templates/topds4
-	            ${CMAKE_BINARY_DIR}/appdata/templates/maps
-		    ${CMAKE_BINARY_DIR}/appdata/templates/photometry
-	            ${CMAKE_BINARY_DIR}/appdata/images/icons
-	            ${CMAKE_BINARY_DIR}/appdata/images/targets)
+        ${CMAKE_BINARY_DIR}/appdata/templates/autoseed
+        ${CMAKE_BINARY_DIR}/appdata/templates/autoreg
+        ${CMAKE_BINARY_DIR}/appdata/templates/noproj
+        ${CMAKE_BINARY_DIR}/appdata/templates/cnetref
+        ${CMAKE_BINARY_DIR}/appdata/templates/cnetstats
+        ${CMAKE_BINARY_DIR}/appdata/templates/cnet_validmeasure
+        ${CMAKE_BINARY_DIR}/appdata/templates/controlnetworks
+        ${CMAKE_BINARY_DIR}/appdata/export
+        ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen
+        ${CMAKE_BINARY_DIR}/appdata/import
+        ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures
+        ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff
+        ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw
+        ${CMAKE_BINARY_DIR}/appdata/templates/kernels
+        ${CMAKE_BINARY_DIR}/appdata/templates/labels
+        ${CMAKE_BINARY_DIR}/appdata/templates/maps
+        ${CMAKE_BINARY_DIR}/appdata/templates/photometry
+        ${CMAKE_BINARY_DIR}/appdata/images/icons
+        ${CMAKE_BINARY_DIR}/appdata/images/targets)
 
 
 # Have CMake process all of the source code and tests.
@@ -619,9 +555,13 @@ add_custom_target(hidtmgen ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/templates/hidtmgen/* ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen/)
 add_dependencies(isis hidtmgen)
 
-add_custom_target(topds4 ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/topds4/* ${CMAKE_BINARY_DIR}/appdata/templates/topds4)
-add_dependencies(isis topds4)
+add_custom_target(import ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/import/* ${CMAKE_BINARY_DIR}/appdata/import)
+add_dependencies(isis import)
+
+add_custom_target(export ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/appdata/export/* ${CMAKE_BINARY_DIR}/appdata/export)
+add_dependencies(isis export)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.

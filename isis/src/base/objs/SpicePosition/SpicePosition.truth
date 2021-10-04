@@ -384,3 +384,8 @@ Velocity (J) = 1 1 1
 Test loading cache from an ALE ISD with non-SPICE SpicePosition
 **PROGRAMMER ERROR** SpicePosition::LoadCache(json) only supports Spice source.
 
+Test loading cache from 0th degree polynomial
+Source = 1
+Has velocity? No
+Time           = 1
+Spacecraft (J) = 1 2 3

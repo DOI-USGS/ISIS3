@@ -86,11 +86,13 @@ namespace Isis {
     // Set up camera detector map with the coefficients and readout times
     new RollingShutterCameraDetectorMap(this, readoutTimes, sampleCoeffs, lineCoeffs);
 
-    // Set up focal plane map
-    new CameraFocalPlaneMap(this, naifIkCode());
+    // Setup focal plane map, and detector origin
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    focalMap->SetDetectorOrigin(2048.5, 1024.5);
 
     // Set up distortion map (use default for now)
-    new CameraDistortionMap(this);
+    CameraDistortionMap *distMap = new CameraDistortionMap(this);
+    distMap->SetDistortion(naifIkCode());
 
     // Set up the ground and sky map
     new CameraGroundMap(this);
@@ -126,7 +128,7 @@ namespace Isis {
    * @return int The appropriate instrument code for the "Camera-Matrix" Kernel Frame ID.
    */
   int ClipperNacRollingShutterCamera::CkFrameId() const {
-    return (-159011);
+    return (-159000);
   }
 
 
@@ -144,7 +146,7 @@ namespace Isis {
    * @return int The appropriate instrument code for the "Camera-matrix" Kernel Reference ID.
    */
   int ClipperNacRollingShutterCamera::CkReferenceId() const {
-    return (-159010);
+    return (1);
   }
 
 

@@ -24,6 +24,15 @@ QDomDocument saveToQDomDocument(BundleObservationSolveSettings &boss) {
 }
 
 
+class CSMSolveOptionStrings : public testing::TestWithParam<QPair<
+  BundleObservationSolveSettings::CSMSolveOption, QString>> {
+};
+class CSMSolveSetStrings : public testing::TestWithParam<QPair<
+  csm::param::Set, QString>> {
+};
+class CSMSolveTypeStrings : public testing::TestWithParam<QPair<
+  csm::param::Type, QString>> {
+};
 class PointingSolveOptionStrings : public testing::TestWithParam<QPair<
   BundleObservationSolveSettings::InstrumentPointingSolveOption, QString>> {
 };
@@ -35,6 +44,10 @@ TEST(BundleObservationSolveSettings, DefaultConstructor) {
   BundleObservationSolveSettings boss;
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, boss.instrumentId(), "");
+  EXPECT_EQ(boss.csmSolveOption(), BundleObservationSolveSettings::NoCSMParameters);
+  EXPECT_EQ(boss.csmParameterSet(), csm::param::ADJUSTABLE);
+  EXPECT_EQ(boss.csmParameterType(), csm::param::REAL);
+  EXPECT_TRUE(boss.csmParameterList().empty());
   EXPECT_EQ(boss.instrumentPointingSolveOption(), BundleObservationSolveSettings::AnglesOnly);
   EXPECT_EQ(boss.ckDegree(), 2);
   EXPECT_EQ(boss.ckSolveDegree(), 2);
@@ -56,6 +69,10 @@ TEST(BundleObservationSolveSettings, CopyConstructor) {
   BundleObservationSolveSettings copied(boss);
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, copied.instrumentId(), "");
+  EXPECT_EQ(copied.csmSolveOption(), BundleObservationSolveSettings::NoCSMParameters);
+  EXPECT_EQ(copied.csmParameterSet(), csm::param::ADJUSTABLE);
+  EXPECT_EQ(copied.csmParameterType(), csm::param::REAL);
+  EXPECT_TRUE(copied.csmParameterList().empty());
   EXPECT_EQ(copied.instrumentPointingSolveOption(), BundleObservationSolveSettings::AnglesOnly);
   EXPECT_EQ(copied.ckDegree(), 2);
   EXPECT_EQ(copied.ckSolveDegree(), 2);
@@ -77,12 +94,15 @@ TEST(BundleObservationSolveSettings, PvlGroupConstructor) {
   PvlKeyword camsolve("CamSolve");
   PvlKeyword twist("Twist");
   PvlKeyword spsolve("SPSolve");
+  PvlKeyword csmsolveset("CSMSOLVESET");
   camsolve = "Angles";
   twist = "yes";
   spsolve = "None";
+  csmsolveset = "ADJUSTABLE";
   settingsGroup += camsolve;
   settingsGroup += twist;
   settingsGroup += spsolve;
+  settingsGroup += csmsolveset;
 
   BundleObservationSolveSettings boss(settingsGroup);
 
@@ -100,6 +120,48 @@ TEST(BundleObservationSolveSettings, PvlGroupConstructor) {
   EXPECT_FALSE(boss.solvePositionOverHermite());
   EXPECT_EQ(boss.positionInterpolationType(), SpiceRotation::PolyFunction);
   EXPECT_TRUE(boss.aprioriPositionSigmas().isEmpty());
+  EXPECT_EQ(boss.csmSolveOption(), BundleObservationSolveSettings::Set);
+  EXPECT_EQ(boss.csmParameterSet(), csm::param::ADJUSTABLE);
+}
+
+TEST(BundleObservationSolveSettings, PvlGroupCSMTypeConstructor) {
+  PvlGroup settingsGroup("VO1/VISA");
+  PvlKeyword camsolve("CamSolve");
+  PvlKeyword spsolve("SPSolve");
+  PvlKeyword csmsolvetype("CSMSOLVETYPE");
+  camsolve = "None";
+  spsolve = "None";
+  csmsolvetype = "REAL";
+  settingsGroup += camsolve;
+  settingsGroup += spsolve;
+  settingsGroup += csmsolvetype;
+
+  BundleObservationSolveSettings boss(settingsGroup);
+
+  EXPECT_EQ(boss.csmSolveOption(), BundleObservationSolveSettings::Type);
+  EXPECT_EQ(boss.csmParameterType(), csm::param::REAL);
+}
+
+TEST(BundleObservationSolveSettings, PvlGroupCSMListConstructor) {
+  PvlGroup settingsGroup("VO1/VISA");
+  PvlKeyword camsolve("CamSolve");
+  PvlKeyword spsolve("SPSolve");
+  PvlKeyword csmsolvelist("CSMSOLVELIST");
+  camsolve = "None";
+  spsolve = "None";
+  csmsolvelist += "Param 1";
+  csmsolvelist += "Param 2";
+  settingsGroup += camsolve;
+  settingsGroup += spsolve;
+  settingsGroup += csmsolvelist;
+
+  BundleObservationSolveSettings boss(settingsGroup);
+
+  EXPECT_EQ(boss.csmSolveOption(), BundleObservationSolveSettings::List);
+  QStringList csmParamList = boss.csmParameterList();
+  ASSERT_EQ(csmParamList.size(), 2);
+  EXPECT_EQ(csmParamList[0].toStdString(), "Param 1");
+  EXPECT_EQ(csmParamList[1].toStdString(), "Param 2");
 }
 
 TEST(BundleObservationSolveSettings, AssignmentOperator) {
@@ -259,6 +321,34 @@ TEST(BundleObservationSolveSettings, setInstrumentPositionSettingsPositionVeloci
   EXPECT_EQ(boss.aprioriPositionSigmas().at(2), Isis::Null);
 }
 
+TEST(BundleObservationSolveSettings, setCsmSolveType) {
+  BundleObservationSolveSettings boss;
+  boss.setCSMSolveSet(csm::param::VALID);
+
+  EXPECT_EQ(boss.csmSolveOption(), BundleObservationSolveSettings::Set);
+  EXPECT_EQ(boss.csmParameterSet(), csm::param::VALID);
+}
+
+TEST(BundleObservationSolveSettings, setCSMSolveType) {
+  BundleObservationSolveSettings boss;
+  boss.setCSMSolveType(csm::param::FICTITIOUS);
+
+  EXPECT_EQ(boss.csmSolveOption(), BundleObservationSolveSettings::Type);
+  EXPECT_EQ(boss.csmParameterType(), csm::param::FICTITIOUS);
+}
+
+TEST(BundleObservationSolveSettings, setCSMSolveParameterList) {
+  BundleObservationSolveSettings boss;
+  boss.setCSMSolveParameterList({"param1", "param2"});
+
+  QStringList parameterList = boss.csmParameterList();
+
+  EXPECT_EQ(boss.csmSolveOption(), BundleObservationSolveSettings::List);
+  ASSERT_EQ(parameterList.size(), 2);
+  EXPECT_EQ(parameterList[0].toStdString(), "param1");
+  EXPECT_EQ(parameterList[1].toStdString(), "param2");
+}
+
 TEST(BundleObservationSolveSettings, SaveSettings){
   BundleObservationSolveSettings boss;
   QDomDocument settingsDoc = saveToQDomDocument(boss);
@@ -353,6 +443,36 @@ TEST(BundleObservationSolveSettings, SaveSettings){
     aprioriPositionSigmas.namedItem("sigma").nodeValue(), "");
 }
 
+TEST_P(CSMSolveOptionStrings, StringToOption) {
+  EXPECT_EQ(GetParam().first,
+    BundleObservationSolveSettings::stringToCSMSolveOption(GetParam().second));
+}
+
+TEST_P(CSMSolveOptionStrings, OptionToString) {
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, GetParam().second,
+    BundleObservationSolveSettings::csmSolveOptionToString(GetParam().first));
+}
+
+TEST_P(CSMSolveSetStrings, StringToOption) {
+  EXPECT_EQ(GetParam().first,
+    BundleObservationSolveSettings::stringToCSMSolveSet(GetParam().second));
+}
+
+TEST_P(CSMSolveSetStrings, OptionToString) {
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, GetParam().second,
+    BundleObservationSolveSettings::csmSolveSetToString(GetParam().first));
+}
+
+TEST_P(CSMSolveTypeStrings, StringToOption) {
+  EXPECT_EQ(GetParam().first,
+    BundleObservationSolveSettings::stringToCSMSolveType(GetParam().second));
+}
+
+TEST_P(CSMSolveTypeStrings, OptionToString) {
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, GetParam().second,
+    BundleObservationSolveSettings::csmSolveTypeToString(GetParam().first));
+}
+
 TEST_P(PointingSolveOptionStrings, StringToOption) {
   EXPECT_EQ(GetParam().first,
     BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(GetParam().second));
@@ -372,6 +492,23 @@ TEST_P(PositionSolveOptionStrings, OptionToString) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, GetParam().second,
     BundleObservationSolveSettings::instrumentPositionSolveOptionToString(GetParam().first));
 }
+
+INSTANTIATE_TEST_SUITE_P(BundleObservationSolveSettings, CSMSolveOptionStrings, ::testing::Values(
+  qMakePair(BundleObservationSolveSettings::NoCSMParameters, QString("NoCSMParameters")),
+  qMakePair(BundleObservationSolveSettings::Set, QString("Set")),
+  qMakePair(BundleObservationSolveSettings::Type, QString("Type")),
+  qMakePair(BundleObservationSolveSettings::List, QString("List"))));
+
+INSTANTIATE_TEST_SUITE_P(BundleObservationSolveSettings, CSMSolveSetStrings, ::testing::Values(
+  qMakePair(csm::param::VALID, QString("VALID")),
+  qMakePair(csm::param::ADJUSTABLE, QString("ADJUSTABLE")),
+  qMakePair(csm::param::NON_ADJUSTABLE, QString("NON_ADJUSTABLE"))));
+
+INSTANTIATE_TEST_SUITE_P(BundleObservationSolveSettings, CSMSolveTypeStrings, ::testing::Values(
+  qMakePair(csm::param::NONE, QString("NONE")),
+  qMakePair(csm::param::FICTITIOUS, QString("FICTITIOUS")),
+  qMakePair(csm::param::REAL, QString("REAL")),
+  qMakePair(csm::param::FIXED, QString("FIXED"))));
 
 INSTANTIATE_TEST_SUITE_P(BundleObservationSolveSettings, PointingSolveOptionStrings, ::testing::Values(
   qMakePair(BundleObservationSolveSettings::NoPointingFactors, QString("None")),
@@ -471,7 +608,7 @@ TEST(BundleObservationSolveSettings, GroupConstructorBadOverExisting) {
 
 TEST(BundleObservationSolveSettings, PositionStringToOptionBadValue)
 {
-  QString message = "Unknown bundle instrument position solve option foo";
+  QString message = "Unknown bundle instrument position solve option foo.";
 
   try {
     BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
@@ -488,7 +625,7 @@ TEST(BundleObservationSolveSettings, PositionStringToOptionBadValue)
 
 TEST(BundleObservationSolveSettings, PointingStringToOptionBadValue)
 {
-  QString message = "Unknown bundle instrument pointing solve option foo";
+  QString message = "Unknown bundle instrument pointing solve option foo.";
 
   try {
     BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(

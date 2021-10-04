@@ -45,7 +45,6 @@ namespace Isis {
 
   static std::vector<int> padding;
   static int colorOffset = 0;
-  static int inputCubeLines = 0;
 
   // Output UV Files
   static Cube *uveven = NULL;
