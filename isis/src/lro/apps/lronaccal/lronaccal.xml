@@ -45,25 +45,98 @@
       pixels and the B channel dark average is subtracted from the B channel
       image pixels.
     </p>
+    
+    <p>
+      The DN level in an uncalibrated image is the sum of the true signal from the scene, 
+      the bias, the dark current, and random noise in all 3 components. The random noise in
+      the true signal and dark current is called shot noise and the random noise in the bias
+      is called read noise. The true signal, bias, and dark current are defined as mean
+      values so that if the random noise were averaged down to insignificance by taking a 
+      very large number of images and averaging them, the resulting image would be the true 
+      scene, bias, and dark current with no systematic error. That implies the statistical 
+      distribution of the random noise has an average of zero, and therefore the random noise
+      has both positive and negative values, except for the trivial case of zero random noise.
+    </p>
+
+    <p>
+      The calibration equation is:
+      <pre>
+        reportedDN = ObservedDN - MeanBias - DarkCurrent 
+      </pre>
+        Where:
+      <pre>
+        ObservedDN = TrueDN + E
+        E is a randomly sampled value from (mu, sigma^2) and mu=0
+        TrueDN is the signal that would be reported in an idealized case of an instrument with zero noise.
+      </pre>
+    </p>
+    
+    
+
+    <p>
+      Let's look at the case of a calibrated image for which the true signal
+      is zero, a dark image. In calibration the mean bias and dark current are
+      subtracted. The random noise term is then randomly sampled from a known
+      distribution with a mean of zero. Since the distribution has a mean of
+      zero, values for the random noise can be positive or negative.
+      Therefore, the addition of random noise to a pixel with true signal near
+      zero can result in negative DN values.
+    </p>
+
+    <p>
+      Negative reported DNs are possible when E &lt; -1 * TrueDN. These are
+      pixels in a very dark image that happen to have a strongly negative
+      random noise value.
+    </p>
+
+    <p>
+      Note: ObservedDN and TrueDN both must be greater than or equal to zero.
+      For ObservedDN, it's because the hardware is not able to report negative
+      DN values . For TrueDN, it's because radiance and reflectivity cannot be
+      negative. The dimmest target is one that is completely dark, and for
+      that target TrueDN = 0.
+    </p>
+
+    <p>
+      If run on a non-spiceinited cube, this program requires access to local mission-specific 
+      SPICE kernels, in order to find the distance between the sun and the target body. 
+      When run on a spiceinited cube, this can be determined using the camera model.
+      Using a spiceinited cube as input has the advantage of not requiring that local 
+      mission-specific kernels be available. (See spiceinit web=true.)
 
     <p>
       The dark average produced is dependant on which options are selected.
-      If the custom dark file option is selected, the provided dark file will be used.
+      There are three options for dark calibration/correction. If the image has exposure code of zero, 
+      the nearest dark files with exposure code of zero will be used.
 
-      If the image has exposure code of zero, the nearest dark files with exposure
-      code of zero will be used.
-
-      If UseNearestTimeDarkFile option is selected, the dark file with the nearest
-      time to the image will be used for dark correction.
-
-      If UseNearestTimeDarkFilePair option is selected, the pair of dark files that
-      the image time lies between, will be used, as long as the difference between
-      dark files doesn't exceed 45 days. If a suitable pair is not found, the
-      latest dark file taken before the image will be used.
-
+      Nearest pair of darks (Default):
+      This option selects the two closest dark files (before and after the observation) and 
+      computes a time-weighted average. In the ideal case, this average product should characterize
+      the dynamic dark response the best. Note: Each dark file is an average of a month’s worth of
+      dark observations under given settings (i.e., exposure code, summing mode, etc.). The maximum
+      time range between pairs of dark files is 45 days. If a suitable pair is not found, the latest
+      dark file taken before the image will be used.
+      
       pixel_dark_average =
       avgDarkLine1_pixel * |darkfile1_time - time|   +   avgDarkLine2_pixel * |darkfile2_time - time|
       / (1.0 * ( |darkFile1_time - time| + |darkFile2_time - time| ) )
+
+      Nearest dark file:
+      This option selects the nearest dark file (before or after the observations).  
+      This option is typically only used when a pair of darks do not surround the observation.  
+      For example, during the mission, new NACs may not have a dark file in the dark catalog 
+      for times after the observation being calibrated.  In this case, lronaccal will use 
+      only the previous NAC dark in the calibration steps. However, suppose the image is calibrated
+      again after new darks have been added to the catalog. In that case, the default options for 
+      lronaccal will use a pair of dark observations, and the resulting calibrated image may have 
+      slightly different intensities than the NAC processed with only a single dark file. 
+      Note: While this is not a default option, if only one dark is available, lronaccal will
+      automatically apply the nearest dark file.  The user can see which dark(s) were applied in 
+      the cube header.
+
+      Custom dark:
+      This option uses a single custom dark file that the user must supply with the DarkFile parameter.  
+      This option is typically only used in special cases, such as calibrating very long exposure NAC images.
     </p>
 
   </description>
@@ -169,22 +242,23 @@
           Nearest Single, Pair, or Custom dark file(s). 
         </brief>
         <description>
-          There are three options for dark calibration/correction. 
+          There are three options for dark calibration/correction. If the image has exposure code of zero, 
+          the nearest dark files with exposure code of zero will be used.
           
-          PAIR:
-          The pair of dark files that the image time lies between 
-          will be used as long as the difference between dark files 
-          doesn't exceed 45 days. If a suitable pair is not found, the 
-          latest dark file taken before the image will be used. 
+          PAIR (Nearest pair of darks) [Default]:
+          This option selects the two closest dark files (before and after the observation) and 
+          computes a time-weighted average. The maximum time range between pairs of dark files 
+          is 45 days. If a suitable pair is not found, the latest dark file taken before the image 
+          will be used.
+
+          NEAREST (Nearest dark file):
+          This option selects the nearest dark file (before or after the observations).  
+          Note: While this is not a default option, if only one dark is available, lronaccal will
+          automatically apply the nearest dark file. 
           
-          NEAREST:
-          The dark file with the nearest time to the image will be used 
-          for dark correction.
-          
-          CUSTOM:
-          User can choose a custom dark file by
-          selecting "CUSTOM" and selecting custom file on user's local machine.
-          
+          CUSTOM (Custom dark):
+          This option uses a single custom dark file that the user must supply with the DarkFile parameter.  
+          This option is typically only used in special cases, such as calibrating very long exposure NAC images.
         </description>
         <default><item>Pair</item></default>
         <list>
