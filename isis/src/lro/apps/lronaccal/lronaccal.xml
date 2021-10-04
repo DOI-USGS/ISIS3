@@ -8,65 +8,62 @@
 
   <description>
     <p>
-    lronaccal performs radiometric corrections to images acquired by the Narrow Angle
-    Camera aboard the Lunar Reconnaissance Orbiter spacecraft.  The LRO NAC camera
-    will make observations simulteously with the HiRise camera.
+      lronaccal performs radiometric corrections to images acquired by the Narrow Angle
+      Camera aboard the Lunar Reconnaissance Orbiter spacecraft.  The LRO NAC camera
+      will make observations simulteously with the HiRise camera.
     </p>
 
     <p>
-    The LRO NAC detector has a total of 5064 pixels, divided among an A
-    channel and a B channel.  The pixels alternate between the two channels:
-    ABABABAB, etc.  Images from LROC NAC may or may not include all pixels in the
-    acquired image.  There are special summing modes that are utilized
-    on-board the spacecraft to average detector pixels to combine them into a
-    single output pixel value.  The value of the ISIS label keyord,
-    SpatialSumming, indicates the number of samples that were summed and
-    averaged to result in the pixel values stored in the file.  Note that this
-    will reduce the number of samples in the output image by a factor of at
-    most the SpatialSumming mode value.
+      The LRO NAC detector has a total of 5064 pixels, divided among an A
+      channel and a B channel.  The pixels alternate between the two channels:
+      ABABABAB, etc.  Images from LROC NAC may or may not include all pixels in the
+      acquired image.  There are special summing modes that are utilized
+      on-board the spacecraft to average detector pixels to combine them into a
+      single output pixel value.  The value of the ISIS label keyord,
+      SpatialSumming, indicates the number of samples that were summed and
+      averaged to result in the pixel values stored in the file.  Note that this
+      will reduce the number of samples in the output image by a factor of at
+      most the SpatialSumming mode value.
     </p>
     <p>
-    The LROC NAC camera has the ability to acquire images of differing sizes in
-    both line and sample.  The starting hardware detector pixel for the
-    acquired image is specified by the ISIS label keyword, SampleFirstPixel.
-    The first pixel in the detector is indicated by a value of 0.
-    </p>
-
-    <p>
-    Dark current pixels are taken for each line from the masked pixels
-    that lie along each edge of the image.
+      The LROC NAC camera has the ability to acquire images of differing sizes in
+      both line and sample.  The starting hardware detector pixel for the
+      acquired image is specified by the ISIS label keyword, SampleFirstPixel.
+      The first pixel in the detector is indicated by a value of 0.
     </p>
 
     <p>
-    If SpatialSumming is 1 the dark current pixels are averaged together then
-    this average is subtracted from all image pixels.  If SpatialSumming is 2,
-    the dark current pixels for the A and B channel are averaged separately,
-    then the A channel dark average is subtracted from the A channel image
-    pixels and the B channel dark average is subtracted from the B channel
-    image pixels.
+      Dark current pixels are taken for each line from the masked pixels
+      that lie along each edge of the image.
     </p>
 
     <p>
-    The dark average produced is dependant on which options are selected.
-    If the custom dark file option is selected, the provided dark file will be used.
+      If SpatialSumming is 1 the dark current pixels are averaged together then
+      this average is subtracted from all image pixels.  If SpatialSumming is 2,
+      the dark current pixels for the A and B channel are averaged separately,
+      then the A channel dark average is subtracted from the A channel image
+      pixels and the B channel dark average is subtracted from the B channel
+      image pixels.
+    </p>
 
-    If the image has exposure code of zero, the nearest dark files with exposure
-    code of zero will be used.
+    <p>
+      The dark average produced is dependant on which options are selected.
+      If the custom dark file option is selected, the provided dark file will be used.
 
-    If UseNearestTimeDarkFile option is selected, the dark file with the nearest
-    time to the image will be used for dark correction.
+      If the image has exposure code of zero, the nearest dark files with exposure
+      code of zero will be used.
 
-    If UseNearestTimeDarkFilePair option is selected, the pair of dark files that
-    the image time lies between, will be used, as long as the difference between
-    dark files doesn't exceed 45 days. If a suitable pair is not found, the
-    latest dark file taken before the image will be used.
+      If UseNearestTimeDarkFile option is selected, the dark file with the nearest
+      time to the image will be used for dark correction.
 
+      If UseNearestTimeDarkFilePair option is selected, the pair of dark files that
+      the image time lies between, will be used, as long as the difference between
+      dark files doesn't exceed 45 days. If a suitable pair is not found, the
+      latest dark file taken before the image will be used.
 
-    pixel_dark_average =
-    avgDarkLine1_pixel * |darkfile1_time - time|   +   avgDarkLine2_pixel * |darkfile2_time - time|
-    / (1.0 * ( |darkFile1_time - time| + |darkFile2_time - time| ) )
-
-
+      pixel_dark_average =
+      avgDarkLine1_pixel * |darkfile1_time - time|   +   avgDarkLine2_pixel * |darkfile2_time - time|
+      / (1.0 * ( |darkFile1_time - time| + |darkFile2_time - time| ) )
     </p>
 
   </description>
