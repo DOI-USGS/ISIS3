@@ -84,6 +84,9 @@
     <change name="Victor Silva" date="2020-06-19">
       Updated dark calibration to use nearest pair of dark images to calibrate
     </change>
+    <change name="Victor Silva" date="2020-10-04">
+      Updated dark calibration documentation to provide more clarity to dark file options
+    </change>
 
   </history>
 
@@ -155,6 +158,9 @@
         Calibrate using average dark pixels.
         </brief>
         <description>
+          Calibrate using average dark pixels. This is also referred to 
+          as dark correction. These dark calibration/correction files
+          are included in the data directory (lro/calibration/nac_darks).
         </description>
         <inclusions><item>DarkFileType</item></inclusions>
       </parameter>
@@ -162,27 +168,47 @@
       <parameter name="DarkFileType">
         <type>string</type>
         <brief>
-        Custom Dark, Nearest Dark, Nearest Dark Pair?
+          Calibrate using average dark pixels from 
+          Nearest Single, Pair, or Custom dark file(s). 
         </brief>
         <description>
+          There are three options for dark calibration/correction. 
+          
+          PAIR:
+          The pair of dark files that the image time lies between 
+          will be used as long as the difference between dark files 
+          doesn't exceed 45 days. If a suitable pair is not found, the 
+          latest dark file taken before the image will be used. 
+          
+          NEAREST:
+          The dark file with the nearest time to the image will be used 
+          for dark correction.
+          
+          CUSTOM:
+          User can choose a custom dark file by
+          selecting "CUSTOM" and selecting custom file on user's local machine.
+          
         </description>
         <default><item>Pair</item></default>
         <list>
           <option value="PAIR">
             <brief>Pair</brief>
             <description>
+              Pair of dark calibration files that the image time lies between
             </description>
             <exclusions><item>DarkFile</item></exclusions>
           </option>
           <option value="NEAREST">
             <brief>Nearest</brief>
             <description>
+              Single dark calibration file that is nearest the image time
             </description>
             <exclusions><item>DarkFile</item></exclusions>
           </option>
           <option value="CUSTOM">
             <brief>Custom Dark File</brief>
             <description>
+              User provided dark calibration file
             </description>
             <inclusions>
               <item>DarkFile</item>
