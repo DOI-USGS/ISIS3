@@ -432,7 +432,9 @@ namespace Isis {
     p.EndProcess();
 
     // add mapping to print.prt
-    log->addGroup(cleanMapping);
+    if(log) {
+      log->addGroup(cleanMapping);
+    }
 
     // Cleanup
     delete outmap;
