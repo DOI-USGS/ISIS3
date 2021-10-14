@@ -9,6 +9,8 @@
 # Summary
 A proposal for a new Long Term Support (LTS) model for ISIS releases. If accepted, every 12 months a new LTS version of ISIS will be released. The LTS version will receive bug fixes and critical security updates but no feature additions or breaking changes. When a new LTS version is released, the previous LTS version will be supported for 6 more months before it reaches End of Life (EoL). Each LTS version will be supported for at least 18 months. The following diagram gives an overview of what this could look like.
 
+![ISIS_LTS drawio](https://user-images.githubusercontent.com/22942817/137381387-1c1591eb-296a-41f1-99a7-57e164b4c5b5.png)
+
 # Motivation
 The current ISIS release process is a quarterly feature release with bug fix releases into the latest feature release. This process has been successful at rapidly getting code changes released and available for users, but more rapid releases has come with new challenges.
 
