@@ -621,7 +621,7 @@ For versions of ISIS prior to ISIS 4.1.0, please cd into `$ISIS3DATA` instead of
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/voyager2 .
 
 ### ISIS Test Data 
-ISIS is comprised of two types of tests, custom Makefile based tests, and GTest based tests. Those that are GTest based, make economical use of data that exists on the ISIS3 repo along with the source, so no special data is required to run those other than the ISIS data area. The Makefile tests depends on a separate source of data that consists of a few gigabytes of input and expected output data used for testing ISIS applications. The total size of this test data decreases as we work towards converting Makefile tests to GTests.  
+ISIS is comprised of two types of tests, custom Makefile based tests, and GTest based tests. Those that are GTest based, make economical use of data that exists on the ISIS3 repo along with the source, so no special data is required to run those other than the ISIS data area. The Makefile tests depend on a separate source of data that consists of a few gigabytes of input and expected output data used for testing ISIS applications. The Makefile based tests use the ISISTESTDATA environment variable to know where the required data are located. The total size of this test data decreases as we work towards converting Makefile tests to GTests.  
  
 ###How to download the ISIS test data with rclone  
 Test data is hosted using Amazon S3 storage buckets. We recommend using rclone to pull the data into a local directory. You can download rclone using their instructions (see: https://rclone.org/downloads/) or by using an anaconda environment (see: https://docs.anaconda.com/anaconda/install/). If you already have an anaconda environment up, install rclone with: conda install –c conda-forge rclone  
@@ -636,7 +636,7 @@ Example output: https://gist.github.com/Kelvinrr/706bbd54b1c2c30d0ce3d12f7dcaa10
 
 Once rclone is configured, simply run: `rclone sync remote:asc-isisdata/isis_testData/ $ISISTESTDATA`
 where:
-  - $ISISTESTDATA is the directory you want to download the test data to. Whatever directory you use, you want to set the environment variable $ISISTESTDATA to this directory
+  - $ISISTESTDATA is the environment variable defining the location of the ISISTESTDATA
   - remote: is the name of the configuration you created earlier. This can be whatever you want to name it, in this case it is named remote. 
   - asc-isisdata/isis_testData/ is the name of the S3 bucket you’re downloading from
 
