@@ -1,11 +1,14 @@
-# INGEST = tgocassis2isis
-# SPICE = spiceinit
-# RDRGEN = tgocassisrdrgen
-# CDIFF = cubediff
-# 
-# include $(ISISROOT)/make/isismake.tsts
-# 
-# commands:
+INGEST = tgocassis2isis
+SPICE = spiceinit
+RDRGEN = tgocassisrdrgen
+CDIFF = cubediff
+
+include $(ISISROOT)/make/isismake.tsts
+
+commands:
+
+	$(ECHO) "TESTS DISABLED, SEE ISSUE #4666" > $(OUTPUT)/message.txt
+
 # 	$(INGEST) $(TSTARGS) \
 # 	    from=$(INPUT)/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.xml \
 # 	    to=$(OUTPUT)/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.cub > /dev/null;

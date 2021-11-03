@@ -7,18 +7,22 @@
 #                             cubeit will get input cubes all of the same size. 
 #
 
-# INGEST = tgocassis2isis
-# SPICE = spiceinit
-# MAPFILE = mosrange
-# PROJECT = cam2map
-# MOSAIC = tgocassismos
-# EXPORT = isis2pds
-# GETKEY = getkey
-# CUBEIT = cubeit
-# 
-# include $(ISISROOT)/make/isismake.tsts
-# 
-# commands:
+INGEST = tgocassis2isis
+SPICE = spiceinit
+MAPFILE = mosrange
+PROJECT = cam2map
+MOSAIC = tgocassismos
+EXPORT = isis2pds
+GETKEY = getkey
+CUBEIT = cubeit
+
+include $(ISISROOT)/make/isismake.tsts
+
+commands:
+
+	$(ECHO) "TESTS DISABLED, SEE ISSUE #4666" > $(OUTPUT)/message.txt;
+
+
 #         # Ingest Red
 # 	$(LS) $(INPUT)/*-RED-*.xml > $(OUTPUT)/redInputs.lis;
 # 	$(SED) 's/^.*input\///g' $(OUTPUT)/redInputs.lis > $(OUTPUT)/redRelative.lis;

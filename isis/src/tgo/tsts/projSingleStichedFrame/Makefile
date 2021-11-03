@@ -1,8 +1,11 @@
 # APPNAME =
-# 
-# include $(ISISROOT)/make/isismake.tsts
-# 
-# commands:
+
+include $(ISISROOT)/make/isismake.tsts
+
+commands:
+
+	$(ECHO) "TESTS DISABLED, SEE ISSUE #4666" > $(OUTPUT)/message.txt
+
 # 	tgocassis2isis $(TSTARGS) \
 #             from=$(INPUT)/CAS-MCO-2016-11-26T22.50.27.381-PAN-00005-B1.xml \
 #             to=$(OUTPUT)/panframelet.cub > /dev/null;

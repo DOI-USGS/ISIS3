@@ -1,8 +1,11 @@
-# APPNAME = edrget
-# 
-# include $(ISISROOT)/make/isismake.tsts
-# 
-# commands:
+ APPNAME = edrget
+ 
+ include $(ISISROOT)/make/isismake.tsts
+ 
+ commands:
+    
+	$(ECHO) "TESTS DISABLED, SEE ISSUE #4666" > $(OUTPUT)/message.txt;
+
 # 	if [ `$(APPNAME) \
 # 	  url=pdsimage2.wr.usgs.gov/cdroms/Viking_Orbiter/vo_1004/f253sxx/f253s05.imq \
 # 	  topath=$(OUPTUT) \

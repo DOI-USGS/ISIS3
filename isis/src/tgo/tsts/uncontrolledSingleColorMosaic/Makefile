@@ -6,16 +6,19 @@
 #          2018-06-16 Kristin Berry - Upated to use tgocassismos and tgocassisrdrgen.
 #
 
-# INGEST = tgocassis2isis
-# SPICE = spiceinit
-# MAPFILE = mosrange
-# PROJECT = cam2map
-# MOSAIC = tgocassismos
-# EXPORT = tgocassisrdrgen
-# 
-# include $(ISISROOT)/make/isismake.tsts
-# 
-# commands:
+INGEST = tgocassis2isis
+SPICE = spiceinit
+MAPFILE = mosrange
+PROJECT = cam2map
+MOSAIC = tgocassismos
+EXPORT = tgocassisrdrgen
+
+include $(ISISROOT)/make/isismake.tsts
+
+commands:
+
+	$(ECHO) "TESTS DISABLED, SEE ISSUE #4666" > $(OUTPUT)/message.txt
+
 # 	$(LS) $(INPUT)/*.xml > $(OUTPUT)/inputs.lis;
 # 	$(SED) 's/^.*input\///g' $(OUTPUT)/inputs.lis > $(OUTPUT)/relative.lis;
 # 	$(SED) 's/\.xml//g' $(OUTPUT)/relative.lis > $(OUTPUT)/basenames.lis;
