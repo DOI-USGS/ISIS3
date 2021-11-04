@@ -469,7 +469,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
   }
 }
 
-TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
+TEST_F(ObservationPair, DISABLED_FunctionalTestJigsawCamSolveAll) {
   // delete to remove old camera for when cam is updated
   delete cubeL;
   delete cubeR;
@@ -789,7 +789,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
 }
 
 
- TEST_F(ObservationPair, FunctionalTestJigsawErrorNoSolve) {
+ TEST_F(ObservationPair, DISABLED_FunctionalTestJigsawErrorNoSolve) {
   QTemporaryDir prefix;
   QString outCnetFileName = prefix.path() + "/outTemp.net";
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName,
@@ -808,7 +808,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
 }
 
 
-TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoTarget) {
+TEST_F(ObservationPair, DISABLED_FunctionalTestJigsawErrorTBParamsNoTarget) {
   QTemporaryDir prefix;
   QString outCnetFileName = prefix.path() + "/outTemp.net";
 
@@ -829,7 +829,7 @@ TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoTarget) {
 }
 
 
-TEST_F(ObservationPair, FunctionalTestJigsawErrorTBParamsNoSolve) {
+TEST_F(ObservationPair, DISABLED_FunctionalTestJigsawErrorTBParamsNoSolve) {
   QTemporaryDir prefix;
   QString outCnetFileName = prefix.path() + "/outTemp.net";
 
