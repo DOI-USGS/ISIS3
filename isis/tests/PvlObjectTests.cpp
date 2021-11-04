@@ -1,6 +1,8 @@
 #include "PvlObject.h"
 #include "IException.h"
 
+#include "TestUtilities.h"
+
 #include <QString>
 
 #include <iostream>
@@ -67,7 +69,6 @@ TEST(PvlObject, invalidStream) {
   PvlObject o;
   stringstream os;
   os << "Object = Hello\nKey=Value\nEndGroup\n";
-
   try {  
     os >> o;
   }
@@ -194,4 +195,32 @@ TEST(PvlObject, constructFromPvl) {
   EXPECT_EQ(p.findKeyword("numkey"), numkey);
 }
 
+TEST(PvlObject, PvlGroupEqualTest){
+  PvlGroup pvlTmplGrp("Point_ErrorMagnitude");
+  PvlKeyword pvlTmplKwrd("Point_ErrorMagnitude__Required", "true");
+  PvlKeyword pvlTmplKwrdOne("some_message", "true");
+  PvlKeyword pvlTmplKwrdTwo("foo", "true");
+  PvlKeyword pvlTmplKwrdThree("bar", "false");
+  pvlTmplGrp += pvlTmplKwrd;
+
+  PvlGroup copy = PvlGroup(pvlTmplGrp);
+
+  EXPECT_EQ(copy, pvlTmplGrp); // should pass
+
+  copy.addKeyword(pvlTmplKwrdOne);
+  EXPECT_NO_FATAL_FAILURE(ASSERT_EQ(copy, pvlTmplGrp)); // should fail
+
+  pvlTmplGrp.addKeyword(pvlTmplKwrdOne);
+  ASSERT_EQ(copy, pvlTmplGrp); // should pass
+
+  copy.addKeyword(pvlTmplKwrdTwo);
+  pvlTmplGrp.addKeyword(pvlTmplKwrdThree);
+  EXPECT_NO_FATAL_FAILURE(ASSERT_EQ(copy, pvlTmplGrp)); // should fail
+
+  copy.addKeyword(pvlTmplKwrdThree);
+  pvlTmplGrp.addKeyword(pvlTmplKwrdTwo);
+  AssertPvlGroupEqual("Point_ErrorMagnitude", "Point_ErrorMagnitude", copy, pvlTmplGrp); // should pass
+
+  EXPECT_EQ(copy.keywords(),pvlTmplGrp.keywords()); // should pass
+}
 
