@@ -43,6 +43,12 @@ release.
 ### Deprecated
 - Deprecated edrget as discussed in [#3313](https://github.com/USGS-Astrogeology/ISIS3/issues/3313).
 
+### Changed
+- Changed caminfo's parameter default values for MAXEMISSION and MAXINCIDENCE to be
+synchronized with footprintinit default values of the same parameters.
+This corrects inconsistencies of footprint generation failing in caminfo
+but passing in footprintinit. [#4651](https://github.com/USGS-Astrogeology/ISIS3/issues/4651).
+
 ## [6.0.0] - 2021-08-27
 
 ### Added
