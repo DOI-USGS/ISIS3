@@ -54,6 +54,10 @@ namespace Isis {
       m_instrumentNameLong = "PolyMath Camera";
       m_instrumentNameShort = "PolyCam";
     }
+    else if (frameCode >= -64616 && frameCode <= -64500){
+      m_instrumentNameLong = "PolyMath Camera";
+      m_instrumentNameShort = "PolyCam";
+    }
     else {
       QString msg = "Unable to construct OSIRIS-REx camera model. "
                     "Unrecognized NaifFrameCode [" + toString(frameCode) + "].";
