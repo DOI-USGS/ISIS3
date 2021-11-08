@@ -337,16 +337,14 @@ namespace Isis {
     }
 
     // Otherwise write out col 4 (Pixel value)
+    QString pixel;
     if(cvp->isGray()) {
-      QString grayPixel = PixelToString(cvp->grayPixel(isample, iline));
-      QString p = grayPixel;
-      p_tableWin->table()->item(row, getIndex("Pixel"))->setText(p);
+      pixel = PixelToString(cvp->grayPixel(isample, iline), 12);
     }
     else {
-      QString redPixel = PixelToString(cvp->redPixel(isample, iline));
-      QString p = redPixel;
-      p_tableWin->table()->item(row, getIndex("Pixel"))->setText(p);
+      pixel = PixelToString(cvp->redPixel(isample, iline), 12);
     }
+    p_tableWin->table()->item(row, getIndex("Pixel"))->setText(pixel);
 
     // Do we have a camera model?
     if(cvp->camera() != NULL) {
