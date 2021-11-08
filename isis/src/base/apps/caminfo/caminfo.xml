@@ -39,8 +39,8 @@
 Object = Caminfo
   Object = Parameters
     Program     = caminfo
-    IsisVersion = "6.0.0  | 2021-08-10"
-    RunDate     = 2021-08-18T14:53:40
+    IsisVersion = "6.0.0  | 2021-11-08"
+    RunDate     = 2021-11-08T16:03:25
     IsisId      = Viking1/VISB/33322515
     From        = default.cub
     Lines       = 1056
@@ -49,6 +49,22 @@ Object = Caminfo
   End_Object
 
   Object = Camstats
+    MinimumLatitude                          = 9.9286479874788
+    MaximumLatitude                          = 10.434709753119
+    MinimumLongitude                         = 255.64554871862
+    MaximumLongitude                         = 256.14606952525
+    MinimumResolution                        = 18.840683425668
+    MaximumResolution                        = 18.985953877822
+    MinimumPhase                             = 79.756143590222
+    MaximumPhase                             = 81.304900313013
+    MinimumEmission                          = 10.798462835458
+    MaximumEmission                          = 13.502630463571
+    MinimumIncidence                         = 69.941096124192
+    MaximumIncidence                         = 70.311944975377
+    LocalTimeMinimum                         = 7.7698055422189
+    LocalTimeMaximum                         = 7.8031735959943
+    ObliqueResolutionMinimum                 = 19.180671135452
+    ObliqueResolutionMaximum                 = 19.525658668048
     LatitudeMinimum                          = 9.9286479874788
     LatitudeMaximum                          = 10.434709753119
     LatitudeAverage                          = 10.181983206084
@@ -60,29 +76,29 @@ Object = Caminfo
     SampleResolutionMinimum                  = 18.840683425668
     SampleResolutionMaximum                  = 18.985953877822
     SampleResolutionAverage                  = 18.90816559308
-    SampleResolutionStandardDeviation        = 0.038060007171614
+    SampleResolutionStandardDeviation        = 0.03806000717263
     LineResolutionMinimum                    = 18.840683425668
     LineResolutionMaximum                    = 18.985953877822
     LineResolutionAverage                    = 18.90816559308
-    LineResolutionStandardDeviation          = 0.038060007171614
+    LineResolutionStandardDeviation          = 0.03806000717263
     ResolutionMinimum                        = 18.840683425668
     ResolutionMaximum                        = 18.985953877822
     ResolutionAverage                        = 18.90816559308
-    ResolutionStandardDeviation              = 0.038060007171614
+    ResolutionStandardDeviation              = 0.03806000717263
     ObliqueSampleResolutionMinimum           = 19.180671135452
     ObliqueSampleResolutionMaximum           = 19.525658668048
     ObliqueSampleResolutionAverage           = 19.342626220123
-    ObliqueSampleResolutionStandardDeviation = 0.078013435023742
+    ObliqueSampleResolutionStandardDeviation = 0.078013435023247
     ObliqueLineResolutionMinimum             = 19.180671135452
     ObliqueLineResolutionMaximum             = 19.525658668048
     ObliqueLineResolutionAverage             = 19.342626220123
-    ObliqueLineResolutionStandardDeviation   = 0.078013435023742
+    ObliqueLineResolutionStandardDeviation   = 0.078013435023247
     ObliqueResolutionMinimum                 = 19.180671135452
     ObliqueResolutionMaximum                 = 19.525658668048
     ObliqueResolutionAverage                 = 19.342626220123
-    ObliqueResolutionStandardDeviation       = 0.078013435023742
+    ObliqueResolutionStandardDeviation       = 0.078013435023247
     AspectRatioMinimum                       = 1.0
-    AspectRatioMaximum                       = 1.0
+    AspectRatioMaximun                       = 1.0
     AspectRatioAverage                       = 1.0
     AspectRatioStandardDeviation             = 0.0
     PhaseMinimum                             = 79.756143590222
@@ -92,161 +108,172 @@ Object = Caminfo
     EmissionMinimum                          = 10.798462835458
     EmissionMaximum                          = 13.502630463571
     EmissionAverage                          = 12.15148695101
-    EmissionStandardDeviation                = 0.56543791358689
+    EmissionStandardDeviation                = 0.56543791358687
     IncidenceMinimum                         = 69.941096124192
     IncidenceMaximum                         = 70.311944975377
     IncidenceAverage                         = 70.127459134075
-    IncidenceStandardDeviation               = 0.10249039125851
+    IncidenceStandardDeviation               = 0.10249039126455
     LocalSolarTimeMinimum                    = 7.7698055422189
     LocalSolarTimeMaximum                    = 7.8031735959943
     LocalSolarTimeAverage                    = 7.7863626216564
-    LocalSolarTimeStandardDeviation          = 0.0071055546198845
+    LocalSolarTimeStandardDeviation          = 0.0071055546192044
     LocalRadiusMinimum                       = 3410663.3374636
     LocalRadiusMaximum                       = 3413492.0662692
     LocalRadiusAverage                       = 3412205.8144925
-    LocalRadiusStandardDeviation             = 648.57630914361
-    NorthAzimuthMinimum                      = 312.29940658572
-    NorthAzimuthMaximum                      = 350.59781250682
-    NorthAzimuthAverage                      = 332.96766151042
-    NorthAzimuthStandardDeviation            = 0.67383189468183
+    LocalRadiusStandardDeviation             = 648.57630709534
+    NorthAzimuthMinimum                      = 312.29940658864
+    NorthAzimuthMaximum                      = 350.59781250672
+    NorthAzimuthAverage                      = 332.96766151063
+    NorthAzimuthStandardDeviation            = 0.67383189481403
+  End_Object
+  Object = Statistics
+    MeanValue         = 127.49950846428
+    StandardDeviation = 73.322672255332
+    MinimumValue      = 1.0
+    MaximumValue      = 254.0
+    PercentHIS        = 0.0
+    PercentHRS        = 0.0
+    PercentLIS        = 0.0
+    PercentLRS        = 0.0
+    PercentNull       = 0.39208006141146
+    TotalPixels       = 1271424.0
   End_Object
 
   Object = Geometry
-      BandsUsed                  = 1
-      ReferenceBand              = 1
-      OriginalBand               = 1
-      Target                     = MARS
-      StartTime                  = 1977-07-09T20:05:51.5549999
-      EndTime                    = 1977-07-09T20:05:51.5549999
-      CenterLine                 = 528.0
-      CenterSample               = 602.0
-      CenterLatitude             = 10.181441241544
-      CenterLongitude            = 255.89292858176
-      CenterRadius               = 3412288.6569795
-      RightAscension             = 310.2070335306
-      Declination                = -46.327246785573
-      UpperLeftLongitude         = 255.64554871862
-      UpperLeftLatitude          = 10.086794246642
-      LowerLeftLongitude         = 255.9665140608
-      LowerLeftLatitude          = 9.9286479874788
-      LowerRightLongitude        = 256.14606952525
-      LowerRightLatitude         = 10.279980559326
-      UpperRightLongitude        = 255.82316035995
-      UpperRightLatitude         = 10.434709753119
-      PhaseAngle                 = 80.528381932125
-      EmissionAngle              = 12.133564327344
-      IncidenceAngle             = 70.127983116628
-      NorthAzimuth               = 332.65918495717
-      OffNadir                   = 9.9273765143684
-      SolarLongitude             = 294.73518830595
-      LocalTime                  = 7.7862975330952
-      TargetCenterDistance       = 4160.7294345949
-      SlantDistance              = 762.37204454685
-      SampleResolution           = 18.904248467739
-      LineResolution             = 18.904248467739
-      PixelResolution            = 18.904248467739
-      MeanGroundResolution       = 18.913336783207
-      SubSolarAzimuth            = 92.033828158603
-      SubSolarGroundAzimuth      = 118.87356333938
-      SubSolarLatitude           = -22.740326163641
-      SubSolarLongitude          = 319.09846558533
-      SubSpacecraftAzimuth       = 240.08514246555
-      SubSpacecraftGroundAzimuth = 267.5318718687
-      SubSpacecraftLatitude      = 10.078847382918
-      SubSpacecraftLongitude     = 253.65422317887
-      ParallaxX                  = 0.0092584344626295
-      ParallaxY                  = -0.21479478922806
-      ShadowX                    = 1.3359751287274
-      ShadowY                    = 2.4227562280136
-      HasLongitudeBoundary       = FALSE
-      HasNorthPole               = FALSE
-      HasSouthPole               = FALSE
-      ObliqueSampleResolution    = 19.336214219327
-      ObliqueLineResolution      = 19.336214219327
-      ObliquePixelResolution     = 19.336214219327
-      ObliqueDetectorResolution  = 19.336214219327
-    End_Object
-
-    Object = Polygon
-      CentroidLine      = 532.66229285951
-      CentroidSample    = 607.53672501072
-      CentroidLatitude  = 10.182356969859
-      CentroidLongitude = 255.89519621876
-      CentroidRadius    = 3412287.9074048 &lt;meters&gt;
-      SurfaceArea       = 488.62348528983 &lt;km^2&gt;
-      GlobalCoverage    = 3.34e-04 &lt;percent&gt;
-      SampleIncrement   = 100
-      LineIncrement     = 100
-      GisFootprint      = "MULTIPOLYGON (((255.6453583908695464
-                           10.0867904619605451, 255.6595956593271808
-                           10.1154635791014531, 255.6737985789073946
-                           10.1442167552830451, 255.6881259667616746
-                           10.1730800310205129, 255.7027887280425205
-                           10.2020508692057152, 255.7175464122890958
-                           10.2309373753062509, 255.7323280160563286
-                           10.2598036242839896, 255.7471695983951463
-                           10.2887800727178256, 255.7620066213459609
-                           10.3177301971434741, 255.7771588010552364
-                           10.3467436152087995, 255.7924323644433002
-                           10.3757139048525477, 255.8075274901822809
-                           10.4046456113999994, 255.8225576458768842
-                           10.4339028570360366, 255.8232309017442674
-                           10.4348585119487165, 255.8535629696708327
-                           10.4205061458771571, 255.8842203998140121
-                           10.4058889295564416, 255.9146926592250963
-                           10.3911941292862746, 255.9448791821614861
-                           10.3769097524926366, 255.9753755414272689
-                           10.3618204978158026, 256.0059617087890729
-                           10.3471682641369771, 256.0365409379966763
-                           10.3326326218834001, 256.0673265067632087
-                           10.3179152985589777, 256.0981249116282470
-                           10.3034581806665084, 256.1290667758755148
-                           10.2883581640098605, 256.1462671420772494
-                           10.2799873531353629, 256.1313444916623325
-                           10.2505255615226396, 256.1164688049674965
-                           10.2211844686142967, 256.1015973558028804
-                           10.1918949732268604, 256.0864534778274333
-                           10.1626571600747884, 256.0716550668443006
-                           10.1332939690604107, 256.0565706797236203
-                           10.1038668950864654, 256.0413878221121422
-                           10.0746328450545697, 256.0264747810802533
-                           10.0452711724688157, 256.0113369395158998
-                           10.0160982210436167, 255.9964691286714640
-                           9.9870846040898869, 255.9818453002924059
-                           9.9582018695888568, 255.9671085090266160
-                           9.9294365117128915, 255.9664455687814666
-                           9.9285018702230925, 255.9357798586855210
-                           9.9434114437963217, 255.9050300094461079
-                           9.9582188907694906, 255.8742299406974041
-                           9.9731382004096059, 255.8438364438290193
-                           9.9885593036033100, 255.8131996628023330
-                           10.0033543110909680, 255.7829726827725949
-                           10.0181299803242059, 255.7526929277649685
-                           10.0329436706484874, 255.7222678124940103
-                           10.0480687769201324, 255.6922853314939630
-                           10.0632502943012838, 255.6620952745569184
-                           10.0783572884044883, 255.6453583908695464
-                           10.0867904619605451)))"
-
-      Group = Mapping
-        TargetName         = MARS
-        EquatorialRadius   = 3396190.0 &lt;meters&gt;
-        PolarRadius        = 3376200.0 &lt;meters&gt;
-        LatitudeType       = Planetocentric
-        LongitudeDirection = PositiveEast
-        LongitudeDomain    = 360
-        MinimumLatitude    = 9.9284293968724
-        MaximumLatitude    = 10.434928853234
-        MinimumLongitude   = 255.64532672113
-        MaximumLongitude   = 256.14630113081
-        PixelResolution    = 18.840630601657
-        ProjectionName     = Sinusoidal
-        CenterLongitude    = 255.89292858176
-      End_Group
-    End_Object
+    BandsUsed                  = 1
+    ReferenceBand              = 1
+    OriginalBand               = 1
+    Target                     = MARS
+    StartTime                  = 1977-07-09T20:05:51.5549999
+    EndTime                    = 1977-07-09T20:05:51.5549999
+    CenterLine                 = 528.0
+    CenterSample               = 602.0
+    CenterLatitude             = 10.181441241544
+    CenterLongitude            = 255.89292858176
+    CenterRadius               = 3412288.6569795
+    RightAscension             = 310.2070335306
+    Declination                = -46.327246785573
+    UpperLeftLongitude         = 255.64554871862
+    UpperLeftLatitude          = 10.086794246642
+    LowerLeftLongitude         = 255.9665140608
+    LowerLeftLatitude          = 9.9286479874788
+    LowerRightLongitude        = 256.14606952525
+    LowerRightLatitude         = 10.279980559326
+    UpperRightLongitude        = 255.82316035995
+    UpperRightLatitude         = 10.434709753119
+    PhaseAngle                 = 80.528381932125
+    EmissionAngle              = 12.133564327344
+    IncidenceAngle             = 70.127983116628
+    NorthAzimuth               = 332.65918495755
+    OffNadir                   = 9.9273765143684
+    SolarLongitude             = 294.73518830595
+    LocalTime                  = 7.7862975330952
+    TargetCenterDistance       = 4160.7294345949
+    SlantDistance              = 762.37204454685
+    SampleResolution           = 18.904248467739
+    LineResolution             = 18.904248467739
+    PixelResolution            = 18.904248467739
+    MeanGroundResolution       = 18.913336783207
+    SubSolarAzimuth            = 92.033828158995
+    SubSolarGroundAzimuth      = 118.87356333938
+    SubSolarLatitude           = -22.740326163641
+    SubSolarLongitude          = 319.09846558533
+    SubSpacecraftAzimuth       = 240.08514246484
+    SubSpacecraftGroundAzimuth = 267.5318718687
+    SubSpacecraftLatitude      = 10.078847382918
+    SubSpacecraftLongitude     = 253.65422317887
+    ParallaxX                  = 0.0092584344626292
+    ParallaxY                  = -0.21479478922806
+    ShadowX                    = 1.3359751287274
+    ShadowY                    = 2.4227562280136
+    HasLongitudeBoundary       = FALSE
+    HasNorthPole               = FALSE
+    HasSouthPole               = FALSE
+    ObliqueSampleResolution    = 19.336214219327
+    ObliqueLineResolution      = 19.336214219327
+    ObliquePixelResolution     = 19.336214219327
+    ObliqueDetectorResolution  = 19.336214219327
   End_Object
-End
 
+  Object = Polygon
+    CentroidLine      = 532.66229285952
+    CentroidSample    = 607.53672501071
+    CentroidLatitude  = 10.182356969859
+    CentroidLongitude = 255.89519621876
+    CentroidRadius    = 3412287.9074048 <meters>
+    SurfaceArea       = 488.62348528983 <km^2>
+    GlobalCoverage    = 3.34e-04 <percent>
+    SampleIncrement   = 100
+    LineIncrement     = 100
+    GisFootprint      = "MULTIPOLYGON (((255.6453583908695464
+                         10.0867904619605451, 255.6595956593271808
+                         10.1154635791014531, 255.6737985789073946
+                         10.1442167552830451, 255.6881259667616746
+                         10.1730800310205129, 255.7027887280425205
+                         10.2020508692057152, 255.7175464122890958
+                         10.2309373753062509, 255.7323280160563286
+                         10.2598036242839878, 255.7471695983951463
+                         10.2887800727178256, 255.7620066213459609
+                         10.3177301971434758, 255.7771588010552364
+                         10.3467436152087995, 255.7924323644433002
+                         10.3757139048525477, 255.8075274901822809
+                         10.4046456113999994, 255.8225576458768842
+                         10.4339028570360366, 255.8232309017442674
+                         10.4348585119487165, 255.8535629696708327
+                         10.4205061458771606, 255.8842203998140121
+                         10.4058889295564381, 255.9146926592250963
+                         10.3911941292862764, 255.9448791821614861
+                         10.3769097524926277, 255.9753755414272689
+                         10.3618204978158026, 256.0059617087890729
+                         10.3471682641369771, 256.0365409379967332
+                         10.3326326218834055, 256.0673265067632087
+                         10.3179152985589759, 256.0981249116282470
+                         10.3034581806665066, 256.1290667758755148
+                         10.2883581640098658, 256.1462671420772494
+                         10.2799873531353612, 256.1313444916623325
+                         10.2505255615226378, 256.1164688049674965
+                         10.2211844686142967, 256.1015973558028804
+                         10.1918949732268587, 256.0864534778274333
+                         10.1626571600747884, 256.0716550668443006
+                         10.1332939690604054, 256.0565706797236203
+                         10.1038668950864672, 256.0413878221121422
+                         10.0746328450545697, 256.0264747810802533
+                         10.0452711724688157, 256.0113369395158998
+                         10.0160982210436202, 255.9964691286714640
+                         9.9870846040898869, 255.9818453002924059
+                         9.9582018695888550, 255.9671085090266160
+                         9.9294365117128915, 255.9664455687814666
+                         9.9285018702230925, 255.9357798586855210
+                         9.9434114437963252, 255.9050300094461079
+                         9.9582188907694906, 255.8742299406974041
+                         9.9731382004096076, 255.8438364438290193
+                         9.9885593036033100, 255.8131996628023330
+                         10.0033543110909680, 255.7829726827725949
+                         10.0181299803242059, 255.7526929277649685
+                         10.0329436706484874, 255.7222678124940103
+                         10.0480687769201324, 255.6922853314939630
+                         10.0632502943012838, 255.6620952745569184
+                         10.0783572884044883, 255.6453583908695464
+                         10.0867904619605451)))"
+
+    Group = Mapping
+      TargetName         = MARS
+      EquatorialRadius   = 3396190.0 <meters>
+      PolarRadius        = 3376200.0 <meters>
+      LatitudeType       = Planetocentric
+      LongitudeDirection = PositiveEast
+      LongitudeDomain    = 360
+      MinimumLatitude    = 9.9284293968724
+      MaximumLatitude    = 10.434928853234
+      MinimumLongitude   = 255.64532672113
+      MaximumLongitude   = 256.14630113081
+      PixelResolution    = 18.840630601657
+      ProjectionName     = Sinusoidal
+      CenterLongitude    = 255.89292858176
+    End_Group
+  End_Object
+End_Object
+End
 
 </pre>
 
@@ -637,8 +664,77 @@ End
           Run camstats to get camera information that can be expressed as a range.
           Camstats will run on the entire cube (common object), and for each band (bandset object).
           The default linc and sinc for camstats is "1". The user can select a different linc and sinc.
-          Output values are:
+          Output values are the same as camstats:
           <UL>
+            <LI>LocalTimeMinimum</LI>
+            <LI>LocalTimeMaximum</LI>
+            <LI>ObliqueResolutionMinimum</LI>
+            <LI>ObliqueResolutionMaximum</LI>
+            <LI>LatitudeMinimum</LI>
+            <LI>LatitudeMaximum</LI>
+            <LI>LatitudeAverage</LI>
+            <LI>LatitudeStandardDeviation</LI>
+            <LI>LongitudeMinimum</LI>
+            <LI>LongitudeMaximum</LI>
+            <LI>LongitudeAverage</LI>
+            <LI>LongitudeStandardDeviation</LI>
+            <LI>SampleResolutionMinimum</LI>
+            <LI>SampleResolutionMaximum</LI>
+            <LI>SampleResolutionAverage</LI>
+            <LI>SampleResolutionStandardDeviation</LI>
+            <LI>LineResolutionMinimum</LI>
+            <LI>LineResolutionMaximum</LI>
+            <LI>LineResolutionAverage</LI>
+            <LI>LineResolutionStandardDeviation</LI>
+            <LI>ResolutionMinimum</LI>
+            <LI>ResolutionMaximum</LI>
+            <LI>ResolutionAverage</LI>
+            <LI>ResolutionStandardDeviation</LI>
+            <LI>ObliqueSampleResolutionMinimum</LI>
+            <LI>ObliqueSampleResolutionMaximum</LI>
+            <LI>ObliqueSampleResolutionAverage</LI>
+            <LI>ObliqueSampleResolutionStandardDeviation</LI>
+            <LI>ObliqueLineResolutionMinimum</LI>
+            <LI>ObliqueLineResolutionMaximum</LI>
+            <LI>ObliqueLineResolutionAverage</LI>
+            <LI>ObliqueLineResolutionStandardDeviation</LI>
+            <LI>ObliqueResolutionMinimum</LI>
+            <LI>ObliqueResolutionMaximum</LI>
+            <LI>ObliqueResolutionAverage</LI>
+            <LI>ObliqueResolutionStandardDeviation</LI>
+            <LI>AspectRatioMinimum</LI>
+            <LI>AspectRatioMaximun</LI>
+            <LI>AspectRatioAverage</LI>
+            <LI>AspectRatioStandardDeviation</LI>
+            <LI>PhaseMinimum</LI>
+            <LI>PhaseMaximum</LI>
+            <LI>PhaseAverage</LI>
+            <LI>PhaseStandardDeviation</LI>
+            <LI>EmissionMinimum</LI>
+            <LI>EmissionMaximum</LI>
+            <LI>EmissionAverage</LI>
+            <LI>EmissionStandardDeviation</LI>
+            <LI>IncidenceMinimum</LI>
+            <LI>IncidenceMaximum</LI>
+            <LI>IncidenceAverage</LI>
+            <LI>IncidenceStandardDeviation</LI>
+            <LI>LocalSolarTimeMinimum</LI>
+            <LI>LocalSolarTimeMaximum</LI>
+            <LI>LocalSolarTimeAverage</LI>
+            <LI>LocalSolarTimeStandardDeviation</LI>
+            <LI>LocalRadiusMinimum</LI>
+            <LI>LocalRadiusMaximum</LI>
+            <LI>LocalRadiusAverage</LI>
+            <LI>LocalRadiusStandardDeviation</LI>
+            <LI>NorthAzimuthMinimum</LI>
+            <LI>NorthAzimuthMaximum</LI>
+            <LI>NorthAzimuthAverage</LI>
+            <LI>NorthAzimuthStandardDeviation</LI>
+          </UL>
+
+          There are also output values included for backwards compatibility with
+          old versions of caminfo:
+         <UL>
             <LI>MinimumLatitude</LI>
             <LI>MaximumLatitude</LI>
             <LI>MinimumLongitude</LI>
@@ -651,10 +747,6 @@ End
             <LI>MaximumEmission</LI>
             <LI>MinimumIncidence</LI>
             <LI>MaximumIncidence</LI>
-            <LI>MinimumLocalTime</LI>
-            <LI>MaximumLocalTime</LI>
-            <LI>MinimumObliqueResolution</LI>
-            <LI>MaximumObliqueResolution</LI>
           </UL>
         </description>
         <inclusions>
