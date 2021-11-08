@@ -200,9 +200,9 @@ Object = Caminfo
     CentroidSample    = 607.53672501071
     CentroidLatitude  = 10.182356969859
     CentroidLongitude = 255.89519621876
-    CentroidRadius    = 3412287.9074048 <meters>
-    SurfaceArea       = 488.62348528983 <km^2>
-    GlobalCoverage    = 3.34e-04 <percent>
+    CentroidRadius    = 3412287.9074048
+    SurfaceArea       = 488.62348528983
+    GlobalCoverage    = 3.34e-04
     SampleIncrement   = 100
     LineIncrement     = 100
     GisFootprint      = "MULTIPOLYGON (((255.6453583908695464
@@ -258,8 +258,8 @@ Object = Caminfo
 
     Group = Mapping
       TargetName         = MARS
-      EquatorialRadius   = 3396190.0 <meters>
-      PolarRadius        = 3376200.0 <meters>
+      EquatorialRadius   = 3396190.0
+      PolarRadius        = 3376200.0
       LatitudeType       = Planetocentric
       LongitudeDirection = PositiveEast
       LongitudeDomain    = 360
@@ -732,7 +732,7 @@ End
             <LI>NorthAzimuthStandardDeviation</LI>
           </UL>
 
-          There are also output values included for backwards compatibility with
+          There are also duplicate output values included for backwards compatibility with
           old versions of caminfo:
          <UL>
             <LI>MinimumLatitude</LI>
