@@ -181,37 +181,42 @@ namespace Isis {
           proj->SetWorld(p_ss-.5, p_sl-.5);
           if (proj->IsGood()) {
             maxlat = proj->UniversalLatitude();
-            if (proj->IsPlanetographic()) {
-              maxlat = proj->ToPlanetographic(maxlat);
-            }
+
             if (proj->IsPositiveEast()) {
-              minlon = proj->UniversalLongitude();
-              if (proj->Has180Domain()) {
-                minlon = proj->To180Domain(minlon);
+              if (proj->Has360Domain()) {
+                minlon = proj->ToPositiveEast(proj->Longitude(), 360);
+              }
+              else {
+                minlon = proj->ToPositiveEast(proj->Longitude(), 180);
               }
             }
             else {
-              minlon = proj->ToPositiveWest(proj->UniversalLongitude(), 360);
               if (proj->Has180Domain()) {
-                minlon = proj->To180Domain(proj->ToPositiveWest(proj->UniversalLongitude(), 360));
+                minlon = proj->ToPositiveWest(proj->Longitude(), 360);
+              }
+              else {
+                minlon = proj->ToPositiveWest(proj->Longitude(), 180);
               }
             }
             proj->SetWorld(p_es+.5, p_el+.5);
             if (proj->IsGood()) {
               minlat = proj->UniversalLatitude();
-              if (proj->IsPlanetographic()) {
-                minlat = proj->ToPlanetographic(minlat);
-              }
+
               if (proj->IsPositiveEast()) {
-                maxlon = proj->UniversalLongitude();
-                if (proj->Has180Domain()) {
-                  maxlon = proj->To180Domain(maxlon);
+                if (proj->Has360Domain()) {
+                  maxlon = proj->ToPositiveEast(proj->Longitude(), 360);
+                }
+                else {
+                  maxlon = proj->ToPositiveEast(proj->Longitude(), 180);
                 }
               }
+
               else {
-                maxlon = proj->ToPositiveWest(proj->UniversalLongitude(), 360);
-                if (proj->Has180Domain()) {
-                  maxlon = proj->To180Domain(proj->ToPositiveWest(proj->UniversalLongitude(), 360));
+                if (proj->Has360Domain()) {
+                  maxlon = proj->ToPositiveWest(proj->Longitude(), 360);
+                }
+                else {
+                  maxlon = proj->ToPositiveWest(proj->Longitude(), 180);
                 }
               }
               mapgroup.addKeyword(PvlKeyword("MinimumLatitude",toString(minlat)),Pvl::Replace);
