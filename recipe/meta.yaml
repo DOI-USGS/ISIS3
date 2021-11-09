@@ -45,72 +45,69 @@ build:
 # Shotgun strat on requirements until we can narrow them down
 requirements:
   build:
-    - boost >=1.72.0
-    - cmake >=3.15
-    - doxygen
-    - inja
-    - make
-    - ninja==1.7.2
-    - openssl>=1.1.1k
-    - protobuf
-    - xalan-c
-
-  host:
-  - ale >=0.8.7
-  - armadillo
-  - boost >=1.72.0
-  - blas
-  - usgs-astrogeology::bullet
-  - bz2file
-  - bzip2
-  - csm>=3.0.3,<3.0.4
-  - cspice
-  - curl
-  - eigen <3.4
-  - embree
-  - ffmpeg
-  - geos>=3.7,<3.8
-  - geotiff
-  - gmm
-  - gmp
-  - gsl>=2.6
-  - hdf5
-  - icu
-  - inja
-  - jama
-  - jpeg
-  - usgs-astrogeology::kakadu==1
-  - krb5
-  - libpng>=1.6.34
-  - libtiff>=4.0
-  - libxml2
-  - mesalib
-  - mysql
-  - mysql-connector-c
-  - nanoflann
-  - nlohmann_json
-  - nn
-  - opencv>=4.5.2
-  - openssl>=1.1.1k
-  - pcl >=1.10.0
-  - protobuf
-  - python>=3.7.11
-  - qhull
-  - qt>=5.9.6
-  - qwt
-  - sqlite
-  - suitesparse
-  - superlu
-  - tnt
-  - x264
-  - xalan-c
-  - xerces-c=3
-  - xorg-kbproto
-  - xorg-libice
-  - xorg-libsm
-  - xorg-libx11
-  - xorg-libxi
-  - conda-forge::zlib
+   - ale=0.8.6
+   - armadillo
+   - boost=1.72
+   - boost-cpp=1.72
+   - blas
+   - usgs-astrogeology::bullet
+   - bz2file
+   - bzip2
+   - cmake>=3.15
+   - cspice
+   - csm>=3.0.3,<3.0.4
+   - curl
+   - doxygen
+   - eigen<3.4
+   - embree
+   - ffmpeg
+   - geos>=3.7,<3.8
+   - geotiff
+   - gmp
+   - graphviz
+   - gsl>=2.6
+   - hdf5
+   - icu
+   - inja
+   - jama
+   - jpeg
+   - usgs-astrogeology::kakadu==1
+   - krb5
+   - libopencv>=4.5.2
+   - libpng>=1.6.34
+   - libprotobuf
+   - libtiff>=4.0
+   - libxml2
+   - make
+   - mesalib
+   - mysql
+   - mysql-connector-c
+   - nanoflann
+   - nlohmann_json
+   - ninja==1.7.2
+   - nn
+   - opencv>=4.5.2
+   - openssl>=1.1.1k
+   - pcl>=1.10.0
+   - protobuf
+   - python>=3.7.11
+   - qhull
+   - qt>=5.9.6
+   - qwt
+   - sqlite
+   - suitesparse
+   - superlu
+   - swig
+   - tnt
+   - x264
+   - xalan-c
+   - xerces-c=3
+   - xorg-kbproto
+   - xorg-libice
+   - xorg-libsm
+   - xorg-libx11
+   - xorg-libxi
+   - zlib
 
   run:
   - {{ pin_compatible('ale') }}
@@ -146,7 +143,6 @@ requirements:
   - {{ pin_compatible('openssl', min_pin='x', max_pin='x.x') }}
   - pcl
   - {{ pin_compatible('protobuf', max_pin='x.x') }}
-  - python>=3.7.11
   - qhull
   - {{ pin_compatible('qt', max_pin='x.x') }}
   - {{ pin_compatible('qwt', max_pin='x.x') }}
@@ -164,7 +160,6 @@ test:
   commands:
     - test -e $PREFIX/lib/libisis${SHLIB_EXT}
     - test -e $PREFIX/include/isis/Isis.h
-
 
 about:
   home: https://github.com/USGS-Astrogeology/ISIS3
