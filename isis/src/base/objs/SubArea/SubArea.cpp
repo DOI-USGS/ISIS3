@@ -191,7 +191,7 @@ namespace Isis {
               }
             }
             else {
-              if (proj->Has180Domain()) {
+              if (proj->Has360Domain()) {
                 minlon = proj->ToPositiveWest(proj->Longitude(), 360);
               }
               else {
