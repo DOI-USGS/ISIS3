@@ -43,6 +43,9 @@ release.
 ### Deprecated
 - Deprecated edrget as discussed in [#3313](https://github.com/USGS-Astrogeology/ISIS3/issues/3313).
 
+### Fixed
+- Fixed Maptrim failures when mode=both for PositiveWest longitude direction. [#4646](https://github.com/USGS-Astrogeology/ISIS3/issues/4646)
+
 ## [6.0.0] - 2021-08-27
 
 ### Added
