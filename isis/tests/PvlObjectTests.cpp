@@ -201,6 +201,7 @@ TEST(PvlObject, PvlGroupEqualTest){
   PvlKeyword pvlTmplKwrdOne("some_message", "true");
   PvlKeyword pvlTmplKwrdTwo("foo", "true");
   PvlKeyword pvlTmplKwrdThree("bar", "false");
+  PvlKeyword pvlTmplKwrdFour("fooie", "true");
   pvlTmplGrp += pvlTmplKwrd;
 
   PvlGroup copy = PvlGroup(pvlTmplGrp);
@@ -210,19 +211,21 @@ TEST(PvlObject, PvlGroupEqualTest){
 
   copy.addKeyword(pvlTmplKwrdOne);
 
-  // EXPECT_NO_FATAL_FAILURE(EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, pvlTmplGrp, copy)); // should fail
+  EXPECT_FALSE(AssertPvlGroupEqual("Point_ErrorMagnitude", "Point_ErrorMagnitude", copy, pvlTmplGrp)); // should fail
 
   pvlTmplGrp.addKeyword(pvlTmplKwrdOne);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, pvlTmplGrp, copy); // should pass
 
   copy.addKeyword(pvlTmplKwrdTwo);
   pvlTmplGrp.addKeyword(pvlTmplKwrdThree);
-  // EXPECT_NO_FATAL_FAILURE(EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, pvlTmplGrp, copy)); // should fail
+
+  EXPECT_FALSE(AssertPvlGroupEqual("Point_ErrorMagnitude", "Point_ErrorMagnitude", copy, pvlTmplGrp)); // should fail
 
   copy.addKeyword(pvlTmplKwrdThree);
   pvlTmplGrp.addKeyword(pvlTmplKwrdTwo);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, pvlTmplGrp, copy); // should pass
 
-  EXPECT_EQ(copy.keywords(),pvlTmplGrp.keywords()); // should pass
+  copy.addKeyword(pvlTmplKwrdFour);
+  EXPECT_FALSE(AssertPvlGroupEqual("Point_ErrorMagnitude", "Point_ErrorMagnitude", copy, pvlTmplGrp)); // should fail
 }
 
