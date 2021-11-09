@@ -205,21 +205,23 @@ TEST(PvlObject, PvlGroupEqualTest){
 
   PvlGroup copy = PvlGroup(pvlTmplGrp);
 
-  EXPECT_EQ(copy, pvlTmplGrp); // should pass
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, pvlTmplGrp, copy); // should pass
+
 
   copy.addKeyword(pvlTmplKwrdOne);
-  EXPECT_NO_FATAL_FAILURE(ASSERT_EQ(copy, pvlTmplGrp)); // should fail
+
+  // EXPECT_NO_FATAL_FAILURE(EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, pvlTmplGrp, copy)); // should fail
 
   pvlTmplGrp.addKeyword(pvlTmplKwrdOne);
-  ASSERT_EQ(copy, pvlTmplGrp); // should pass
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, pvlTmplGrp, copy); // should pass
 
   copy.addKeyword(pvlTmplKwrdTwo);
   pvlTmplGrp.addKeyword(pvlTmplKwrdThree);
-  EXPECT_NO_FATAL_FAILURE(ASSERT_EQ(copy, pvlTmplGrp)); // should fail
+  // EXPECT_NO_FATAL_FAILURE(EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, pvlTmplGrp, copy)); // should fail
 
   copy.addKeyword(pvlTmplKwrdThree);
   pvlTmplGrp.addKeyword(pvlTmplKwrdTwo);
-  AssertPvlGroupEqual("Point_ErrorMagnitude", "Point_ErrorMagnitude", copy, pvlTmplGrp); // should pass
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, pvlTmplGrp, copy); // should pass
 
   EXPECT_EQ(copy.keywords(),pvlTmplGrp.keywords()); // should pass
 }
