@@ -3,7 +3,7 @@ channels:
   - defaults
 
 dependencies:
-  - ale >=0.8.7
+  - ale=0.8.6
   - armadillo
   - boost=1.72
   - boost-cpp=1.72
