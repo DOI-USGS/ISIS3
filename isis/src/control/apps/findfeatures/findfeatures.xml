@@ -193,11 +193,11 @@
         The minimum specification string consists of a detector name and an
         extractor name. When no matcher is specified, a brute force matcher
         with parameters tailored to the extractor is used.  For example
-        <code>SURF/SURF</code> would result in SURF being used for the
-        detector, SURF being used for the extractor, and a brute force matcher
+        <code>SIFT/SIFT</code> would result in SIFT being used for the
+        detector, SIFT being used for the extractor, and a brute force matcher
         used for the matcher. If used with the alternatice specification
         scheme, the detector and extractor can be defined in a single
-        component. So, the specification <code>feature2d.SURF</code> defines
+        component. So, the specification <code>feature2d.SIFT</code> defines
         the exact same detector, extractor, and matcher as the previous
         specification.
       </p>
@@ -717,25 +717,6 @@
           <UL>
             <LI>
               <a href="http://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf">
-              Paper</a>
-            </LI>
-          </UL>
-        </TD>
-      </TR>
-      <TR>
-        <TD>SURF</TD>
-        <TD>Detector, Extractor</TD>
-        <TD>
-          The SURF algorithm was created to be a faster version of SIFT. It
-          provides slightly less invariance, but requires significantly less
-          computation time. The SURF algorithm is a good choice when a high
-          quality match is required and there are a large number of images
-          and/or the image size is very large.
-        </TD>
-        <TD>
-          <UL>
-            <LI>
-              <a href="http://www.vision.ee.ethz.ch/~surf/eccv06.pdf">
               Paper</a>
             </LI>
           </UL>
