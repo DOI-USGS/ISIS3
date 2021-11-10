@@ -3,7 +3,7 @@
     "name": "ISIS3",
     "organization": "U.S. Geological Survey",
     "description": "GitHub code repository for the Integrated Software for Imagers and Spectrometers (ISIS)",
-    "version": "6.0.0",
+    "version": "7.0.0",
     "status": "Release",
 
     "permissions": {
