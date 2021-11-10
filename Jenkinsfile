@@ -7,7 +7,7 @@ def nodes = [:]
 
 for (lbl in labels) {
     def label = lbl
-    def envFile = (label == "CentOS") ? "environment_gcc4.yml" : "environment.yml"
+    // def envFile = (label == "CentOS") ? "environment_gcc4.yml" : "environment.yml"
 
     nodes[label] = {
         stage(label) {
@@ -34,6 +34,7 @@ for (lbl in labels) {
                 condaEnv("isis3") {
                     // Environment
                     loginShell """
+                        conda config --env --set channel_alias https://conda.wr.usgs.gov
                         conda config --env --set remote_read_timeout_secs 3600
                         conda install -c conda-forge python=3 findutils
                         conda env update -f ${envFile} --prune
