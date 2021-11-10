@@ -2,7 +2,7 @@
 
 def NUM_CORES = 8
 def errors = []
-def labels = ['CentOS', 'Fedora', 'Ubuntu'] // labels for Jenkins node types we will build on
+def labels = ['Ubuntu'] // labels for Jenkins node types we will build on
 def nodes = [:] 
 
 for (lbl in labels) {
