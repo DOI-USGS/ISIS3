@@ -34,6 +34,7 @@ for (lbl in labels) {
                 condaEnv("isis3") {
                     // Environment
                     loginShell """
+                        conda config --env --set remote_read_timeout_secs 3600
                         conda install -c conda-forge python=3 findutils
                         conda env update -f ${envFile} --prune
                         mkdir build install
