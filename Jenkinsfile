@@ -7,7 +7,7 @@ def nodes = [:]
 
 for (lbl in labels) {
     def label = lbl
-    // def envFile = (label == "CentOS") ? "environment_gcc4.yml" : "environment.yml"
+    def envFile = (label == "CentOS") ? "environment_gcc4.yml" : "environment.yml"
 
     nodes[label] = {
         stage(label) {
