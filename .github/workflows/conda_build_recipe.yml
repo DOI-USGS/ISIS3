@@ -16,6 +16,7 @@ jobs:
           conda create -n isis python=3.6
       - name: activate conda
         run: |
+          python $CONDA_PREFIX/scripts/isisVarInit.py
           conda activate isis
       - name: add conda channels
         run: |
@@ -27,5 +28,4 @@ jobs:
           conda activate isis
       - name: install conda deps
         run: |
-          python $CONDA_PREFIX/scripts/isisVarInit.py
           $CONDA/bin/conda env update --file environment.yml --name base
