@@ -1,50 +1,16 @@
-package:
-  name: isis
-  version: {{ version }}
+name: Conda Build Recipe
 
 on: [push]
-
-source:
-  git_url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
-  git_tag: {{ version }}
-
-build:
-  number: {{ build_number }}
-
-requirements:
-  build:
-    - boost=1.68.0
-    - cmake >=3.15
-    - doxygen
-    - inja
-    - make
-    - ninja==1.7.2
-    - openssl>=1.0.0,<1.1.0
-    - protobuf=3.9.1
-    - xalan-c
-
 
 jobs: 
   test_conda_build_recipe:
     runs-on: ubuntu-latest
     steps: 
-      - uses: actions/checkout@v2
-      - name: setup conda env
-        uses: actions/setup-python@v2
-        with: 
-          python-version: 3.8
-      - name: create conda env
-        run: |
-          conda create -n isis python=3.6
-          exec $SHELL
-          conda init isis
+      - name: checkout code
+        uses: actions/checkout@v2
 
-      - name: add conda channels
-        run: |
-          conda config --env --add channels conda-forge
-          conda config --env --add channels usgs-astrogeology
-        
-      - name: install conda deps
-        run: |
-            $CONDA/bin/conda env update --file environment.yml --name base
-
+      - name: check header file in include dir
+        id: check_files
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "Isis.h"
