@@ -23,7 +23,7 @@ jobs:
 
       - name: download mamba 
         run: |
-        conda install -n base -c conda-forge mamba
+          conda install -n base -c conda-forge mamba
 
       - name: download ISIS and its dependencies
         run: |
