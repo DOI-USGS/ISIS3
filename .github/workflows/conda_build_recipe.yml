@@ -24,6 +24,7 @@ jobs:
         
       - name: set up env vars
         run: |
+            export CONDA_PREFIX=isis/
             pwd
             ls|sort
             python isis/scripts/isisVarInit.py
