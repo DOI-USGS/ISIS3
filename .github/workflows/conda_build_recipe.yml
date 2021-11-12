@@ -24,7 +24,7 @@ requirements:
     - xalan-c
 
 jobs:
-  test:
+  run:
     commands:
       - test -e $PREFIX/lib/libisis${SHLIB_EXT}
       - test -e $PREFIX/include/isis/Isis.h
