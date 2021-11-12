@@ -22,18 +22,6 @@ jobs:
           conda config --env --add channels conda-forge
           conda config --env --add channels usgs-astrogeology
         
-      - name: set up env vars
-        run: |
-            export CONDA_PREFIX=isis/
-            pwd
-            ls|sort
-            python isis/scripts/isisVarInit.py
-
-      - name: deactivate then reactivate env
-        run: |
-          conda deactivate
-          conda activate isis
-
       - name: install conda deps
         run: |
             $CONDA/bin/conda env update --file environment.yml --name base
