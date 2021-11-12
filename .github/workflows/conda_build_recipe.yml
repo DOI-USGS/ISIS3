@@ -1,18 +1,27 @@
 package:
-name: hello
-version: {{ environ.get("GIT_DESCRIBE_TAG", "") }}
+  name: isis
+  version: {{ version }}
 
 source:
-  git_url: https://github.com/USGS-Astrogeology/CSM-CameraModel.git
+  git_url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
+  git_tag: {{ version }}
+
 build:
-  string: {{ environ.get("GIT_DESCRIBE_HASH", "") }}
+  number: {{ build_number }}
 
 requirements:
   build:
-    - {{ compiler('cxx') }}  # [linux]
-    - vc 14  # [win]
-    - cmake >=3.10
-    - libcsm
-    - vc 14  # [win]
-  run:
-    - vc  # [win]
+    - boost=1.68.0
+    - cmake >=3.15
+    - doxygen
+    - inja
+    - make
+    - ninja==1.7.2
+    - openssl>=1.0.0,<1.1.0
+    - protobuf=3.9.1
+    - xalan-c
+
+test:
+  commands:
+    - test -e $PREFIX/lib/libisis${SHLIB_EXT}
+    - test -e $PREFIX/include/isis/Isis.h
