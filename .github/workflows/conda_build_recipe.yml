@@ -25,7 +25,7 @@ jobs:
         run: |
           conda deactivate
           conda activate isis
-      -name: indall conda deps
+      - name: install conda deps
         run: |
           python $CONDA_PREFIX/scripts/isisVarInit.py
           $CONDA/bin/conda env update --file environment.yml --name base
