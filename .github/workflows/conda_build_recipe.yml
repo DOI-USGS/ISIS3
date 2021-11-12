@@ -2,21 +2,38 @@ name: Conda Build Recipe
 
 on: [push]
 
-jobs: 
-  test_conda_build_recipe:
-    runs-on: ubuntu-latest
-    steps: 
-      - name: checkout code
-        uses: actions/checkout@v2
-
-      - name: check header file in include dir
-        id: check_files
-        uses: andstor/file-existence-action@v1
+jobs:
+  Build-and-Test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+       os: [ubuntu-latest, macos-latest]
+       python-version: ["3.7", "3.8", "3.9"]
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v2
         with:
-          files: "Isis.h"
-      
-      - name: move to build
-        run: cd build 
-
-      - name: install
-        run: ninja install
+          submodules: true
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+          activate-environment: isis
+          environment-file: environment.yml
+          auto-activate-base: false
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+      - name: Check build environment
+        run: |
+          conda list
+      - name: Build Package
+        run: |
+          mkdir -p build
+          cd build
+          ninja install
+      - name: Test Package
+        run: |
+          cd build
+          ctest -VV
