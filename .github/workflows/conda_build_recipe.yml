@@ -10,8 +10,9 @@ jobs:
       - name: setup conda env
         uses: actions/setup-python@v2
         with: 
-          python-version: 3.8
+          python-version: 3.6
       - name: Install dependencies
         run: |
           # $CONDA/bin/conda env update --file environment.yml --name base
-          ls
+          - test -e $PREFIX/lib/libisis${SHLIB_EXT}
+          - test -e $PREFIX/include/isis/Isis.h
