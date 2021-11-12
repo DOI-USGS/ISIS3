@@ -15,5 +15,8 @@ jobs:
         with:
           files: "Isis.h"
       
-      - name: install 
-        run: cd build ninja install
+      - name: move to build
+        run: cd build 
+
+      - name: install
+        -run: ninja install
