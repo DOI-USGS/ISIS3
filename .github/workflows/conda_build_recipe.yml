@@ -14,18 +14,29 @@ jobs:
       - name: create conda env
         run: |
           conda create -n isis python=3.6
-      - name: activate conda
-        run: |
-          python isis/scripts/isisVarInit.py
           conda activate isis
+
       - name: add conda channels
         run: |
           conda config --env --add channels conda-forge
           conda config --env --add channels usgs-astrogeology
-      - name: deactivate then reactivate env
-        run: |
-          conda deactivate
-          conda activate isis
-      - name: install conda deps
-        run: |
+     - name: download mamba 
+      run: |
+        conda install -n base -c conda-forge mamba
+
+    - name: download ISIS and its dependencies
+      run: |
+        mamba install -c usgs-astrogeology isis
+      
+    - name: set up env vars
+      run: |
+          python $CONDA_PREFIX/scripts/isisVarInit.py
+
+    - name: deactivate then reactivate env
+      run: |
+        conda deactivate
+        conda activate isis
+        
+    - name: install conda deps
+      run: |
           $CONDA/bin/conda env update --file environment.yml --name base
