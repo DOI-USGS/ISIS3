@@ -13,5 +13,5 @@ jobs:
           python-version: 3.6
       - name: Install dependencies
         run: |
-          - test -e $PREFIX/lib/libisis${SHLIB_EXT}
-          - test -e $PREFIX/include/isis/Isis.h
+          - test -e isis/lib/libisis${SHLIB_EXT}
+          - test -e isis/include/isis/Isis.h
