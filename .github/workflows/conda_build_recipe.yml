@@ -1,27 +1,29 @@
-name: Conda Build Recipe
+package:
+  name: ISIS3
+  version: {{ environ.get("GIT_DESCRIBE_TAG", "") }}
 
-on: [push]
+source:
+  git_url: https://github.com/USGS-Astrogeology/ISIS3
+build:
+  string: {{ environ.get("GIT_DESCRIBE_HASH", "") }}
 
-jobs: 
-  test_conda_build_recipe:
-    runs-on: ubuntu-latest
-    steps: 
-      - uses: actions/checkout@v2
-      - name: setup conda env
-        uses: actions/setup-python@v2
-        with: 
-          python-version: 3.8
-      - name: create conda env
-        run: |
-          conda create -n isis python=3.6
-          exec $SHELL
-          conda init isis
+requirements:
+  build:
+    - {{ compiler('cxx') }}  # [linux]
+    - vc 14  # [win]
+    - cmake >=3.10
+    - libcsm
+    - vc 14  # [win]
+  run:
+    - vc  # [win]
 
-      - name: add conda channels
-        run: |
-          conda config --env --add channels conda-forge
-          conda config --env --add channels usgs-astrogeology
-        
-      - name: install conda deps
-        run: |
-            $CONDA/bin/conda env update --file environment.yml --name base
+test:
+  commands:
+    - test -e $PREFIX/lib/libusgscsm.so  # [linux]
+    - test -e $PREFIX/lib/libusgscsm.dylib  # [osx]
+    - if not exist %LIBRARY_BIN%\usgscsm.dll exit 1  # [win]
+
+about:
+  home: https://github.com/USGS-Astrogeology/ISIS3
+  license: None
+summary: "USGS Astrogeology Community Sensor Model compliant sensor models."
