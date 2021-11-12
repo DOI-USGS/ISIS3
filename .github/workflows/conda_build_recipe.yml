@@ -2,6 +2,8 @@ package:
   name: isis
   version: {{ version }}
 
+on: [push]
+
 source:
   git_url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
   git_tag: {{ version }}
@@ -22,7 +24,6 @@ requirements:
     - xalan-c
 
 test:
-  on: [push]
   commands:
     - test -e $PREFIX/lib/libisis${SHLIB_EXT}
     - test -e $PREFIX/include/isis/Isis.h
