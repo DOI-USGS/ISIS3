@@ -20,8 +20,9 @@ jobs:
         run: |
           conda config --env --add channels conda-forge
           conda config --env --add channels usgs-astrogeology
-     - name: download mamba 
-      run: |
+
+      - name: download mamba 
+        run: |
         conda install -n base -c conda-forge mamba
 
     - name: download ISIS and its dependencies
@@ -36,7 +37,7 @@ jobs:
       run: |
         conda deactivate
         conda activate isis
-        
+
     - name: install conda deps
       run: |
           $CONDA/bin/conda env update --file environment.yml --name base
