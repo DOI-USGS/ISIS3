@@ -1,0 +1,19 @@
+name: Conda Build Recipe
+
+on: 
+  pull_request:
+    branches: [dev]
+
+jobs: 
+  test_conda_build_recipe:
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v2
+
+
+test:
+  commands:
+    - test -e $PREFIX/lib/libisis${SHLIB_EXT}
+    - test -e $PREFIX/include/isis/Isis.h
+
+
