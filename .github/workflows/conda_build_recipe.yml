@@ -10,8 +10,13 @@ jobs:
       - name: setup conda env
         uses: actions/setup-python@v2
         with: 
-          python-version: 3.6
+          python-version: 3.8
       - name: Install dependencies
-        commands:
-          - test -e $PREFIX/lib/libisis${SHLIB_EXT}
-          - test -e $PREFIX/include/isis/Isis.h
+        run: |
+          conda create -n isis python=3.6
+          conda activate isis
+          conda config --env --add channels conda-forge
+          conda config --env --add channels usgs-astrogeology
+          python $CONDA_PREFIX/scripts/isisVarInit.py
+
+          $CONDA/bin/conda env update --file environment.yml --name base
