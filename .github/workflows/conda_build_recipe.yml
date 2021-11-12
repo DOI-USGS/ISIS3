@@ -14,10 +14,5 @@ jobs:
       - name: Install dependencies
         run: |
         $CONDA/bin/conda env update --file environment.yml --name base
- 
-  # test:
-  #   commands:
-  #     - test -e $PREFIX/lib/libisis${SHLIB_EXT}
-  #     - test -e $PREFIX/include/isis/Isis.h
 
 
