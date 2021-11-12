@@ -23,7 +23,8 @@ requirements:
     - protobuf=3.9.1
     - xalan-c
 
-test:
-  commands:
-    - test -e $PREFIX/lib/libisis${SHLIB_EXT}
-    - test -e $PREFIX/include/isis/Isis.h
+jobs:
+  test:
+    commands:
+      - test -e $PREFIX/lib/libisis${SHLIB_EXT}
+      - test -e $PREFIX/include/isis/Isis.h
