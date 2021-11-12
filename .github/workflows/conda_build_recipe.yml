@@ -14,3 +14,14 @@ jobs:
         uses: andstor/file-existence-action@v1
         with:
           files: "Isis.h"
+      
+      - name: check that library built
+        requirements:
+          build:
+            - {{ compiler('cxx') }}  # [linux]
+            - vc 14  # [win]
+            - cmake >=3.10
+            - libcsm
+            - vc 14  # [win]
+          run:
+            - vc  # [win]
