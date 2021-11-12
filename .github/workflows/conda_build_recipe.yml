@@ -16,7 +16,7 @@ jobs:
           conda create -n isis python=3.6
       - name: activate conda
         run: |
-          python $CONDA_PREFIX/scripts/isisVarInit.py
+          python isis/scripts/isisVarInit.py
           conda activate isis
       - name: add conda channels
         run: |
