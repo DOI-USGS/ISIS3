@@ -23,8 +23,28 @@ requirements:
     - protobuf=3.9.1
     - xalan-c
 
-jobs:
-  run:
-    commands:
-      - test -e $PREFIX/lib/libisis${SHLIB_EXT}
-      - test -e $PREFIX/include/isis/Isis.h
+
+jobs: 
+  test_conda_build_recipe:
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v2
+      - name: setup conda env
+        uses: actions/setup-python@v2
+        with: 
+          python-version: 3.8
+      - name: create conda env
+        run: |
+          conda create -n isis python=3.6
+          exec $SHELL
+          conda init isis
+
+      - name: add conda channels
+        run: |
+          conda config --env --add channels conda-forge
+          conda config --env --add channels usgs-astrogeology
+        
+      - name: install conda deps
+        run: |
+            $CONDA/bin/conda env update --file environment.yml --name base
+
