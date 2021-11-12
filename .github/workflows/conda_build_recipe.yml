@@ -19,4 +19,4 @@ jobs:
         run: cd build 
 
       - name: install
-        -run: ninja install
+        run: ninja install
