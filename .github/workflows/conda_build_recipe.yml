@@ -24,7 +24,9 @@ jobs:
         
       - name: set up env vars
         run: |
-            python $CONDA_PREFIX/scripts/isisVarInit.py
+            pwd
+            ls|sort
+            python isis/scripts/isisVarInit.py
 
       - name: deactivate then reactivate env
         run: |
