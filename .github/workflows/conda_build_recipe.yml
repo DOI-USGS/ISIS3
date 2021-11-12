@@ -15,14 +15,6 @@ jobs:
         with:
           files: "Isis.h"
       
-      - name: check that library built
-        requirements:
-          build:
-            uses: |
-              - {{ compiler('cxx') }}  # [linux]
-              - vc 14  # [win]
-              - cmake >=3.10
-              - libcsm
-              - vc 14  # [win]
-          run:
-            - vc  # [win]
+      - name: install 
+        run: cd build
+        run: ninja install
