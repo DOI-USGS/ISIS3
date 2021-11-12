@@ -1,3 +1,9 @@
+name: isis3
+on: [push]
+source:
+  git_url: https://github.com/USGS-Astrogeology/ISIS3
+build:
+  string: {{ environ.get("GIT_DESCRIBE_HASH", "") }}
 
 requirements:
   build:
