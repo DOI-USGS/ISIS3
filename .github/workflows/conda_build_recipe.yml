@@ -1,39 +1,18 @@
-name: Conda Build Recipe
+package:
+  name: usgscsm
+  version: {{ environ.get("GIT_DESCRIBE_TAG", "") }}
 
-on: [push]
+source:
+  git_url: https://github.com/USGS-Astrogeology/CSM-CameraModel.git
+build:
+  string: {{ environ.get("GIT_DESCRIBE_HASH", "") }}
 
-jobs:
-  Build-and-Test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-       os: [ubuntu-latest, macos-latest]
-       python-version: ["3.7", "3.8", "3.9"]
-    defaults:
-      run:
-        shell: bash -l {0}
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: "latest"
-          activate-environment: isis
-          environment-file: environment.yml
-          auto-activate-base: false
-          auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
-      - name: Check build environment
-        run: |
-          conda list
-      - name: Build Package
-        run: |
-          mkdir -p build
-          cd build
-          ninja install
-      - name: Test Package
-        run: |
-          cd build
-          ctest -VV
+requirements:
+  build:
+    - {{ compiler('cxx') }}  # [linux]
+    - vc 14  # [win]
+    - cmake >=3.10
+    - libcsm
+    - vc 14  # [win]
+  run:
+    - vc  # [win]
