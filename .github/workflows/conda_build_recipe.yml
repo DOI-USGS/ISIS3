@@ -7,11 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - uses: actions/checkout@v2
-
-
-test:
-  commands:
-    - test -e $PREFIX/lib/libisis${SHLIB_EXT}
-    - test -e $PREFIX/include/isis/Isis.h
+  test:
+    commands:
+      - test -e $PREFIX/lib/libisis${SHLIB_EXT}
+      - test -e $PREFIX/include/isis/Isis.h
 
 
