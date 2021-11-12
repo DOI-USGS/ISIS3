@@ -14,8 +14,8 @@ jobs:
       - name: create conda env
         run: |
           conda create -n isis python=3.6
-          conda activate isis
           exec $SHELL
+          conda init isis
 
       - name: add conda channels
         run: |
