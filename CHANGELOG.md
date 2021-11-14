@@ -43,6 +43,7 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 - Added the ability to search filenames in measure's drop down boxes in Qnet Point Editor. [#4581](https://github.com/USGS-Astrogeology/ISIS3/issues/4581)
 - Added slope, local normal, and ellipsoid normal calculations to phocube. [#3635](https://github.com/USGS-Astrogeology/ISIS3/issues/3645)
 - Added additional translation files for TGO CaSSiS in order to support PSA compliant labels. [#4567](https://github.com/USGS-Astrogeology/ISIS3/issues/4567)
+- Added support for KaguyaTC SP Support data ingest. [#4668](https://github.com/USGS-Astrogeology/ISIS3/issues/4668)
 
 ### Deprecated
 - Deprecated edrget as discussed in [#3313](https://github.com/USGS-Astrogeology/ISIS3/issues/3313).
