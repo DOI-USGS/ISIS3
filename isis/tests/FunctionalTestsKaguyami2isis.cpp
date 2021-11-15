@@ -158,13 +158,6 @@ TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisNir) {
   )");
   PvlGroup bandBinTruth;
   bandBinStream >> bandBinTruth;
-  // AssertPvlGroupEqual("resultingBandBin", "truthBandBin", bandBin, bandBinTruth);
-
-  std::cout<<"\nbandBin Group--------\n"<<std::endl;
-  std::cout<<bandBin<<std::endl;
-  std::cout<<"\nbandBinTruth Group--------\n"<<std::endl;
-  std::cout<<bandBinTruth<<std::endl;
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, bandBin, bandBinTruth);
 
   // Kernels Group
