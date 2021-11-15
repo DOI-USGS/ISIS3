@@ -34,7 +34,7 @@ TEST_F(MroHiriseCube, FunctionalTestHimosDefault) {
   }
   Cube outputMos(options.GetFileName("TO"));
   PvlObject inputCubeLabel = dejitteredCube.label()->findObject("IsisCube");
-  PvlObject outputCubeLabel = dejitteredCube.label()->findObject("IsisCube");
+  PvlObject outputCubeLabel = outputMos.label()->findObject("IsisCube");
   PvlGroup dimensions = outputCubeLabel.findObject("Core").findGroup("Dimensions");
   PvlGroup pixels = outputCubeLabel.findObject("Core").findGroup("Pixels");
 
@@ -50,21 +50,12 @@ TEST_F(MroHiriseCube, FunctionalTestHimosDefault) {
 
   PvlGroup inputMappingGroup = inputCubeLabel.findGroup("Mapping");
   PvlGroup outputMappingGroup = outputCubeLabel.findGroup("Mapping");
-
-  
-  std::cout<< "input mapping group\n----------"<<std::endl;
-  std::cout << inputMappingGroup << std::endl;
-  std::cout<< "\n output mapping group\n----------"<<std::endl;
-  std::cout << outputMappingGroup << std::endl;
-
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, inputMappingGroup, outputMappingGroup);
-  // EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, inputCubeLabel.findGroup("Mapping"), outputCubeLabel.findGroup("Mapping"));
 
-  // AssertPvlGroupEqual("InputMapping", "OutputMapping",
-  //                     inputCubeLabel.findGroup("Mapping"), outputCubeLabel.findGroup("Mapping"));
-  // AssertPvlGroupEqual("InputMosaic", "OutputMosaic",
-  //                     inputCubeLabel.findGroup("Mosaic"), outputCubeLabel.findGroup("Mosaic"));
+  PvlGroup inputMosaicGroup = inputCubeLabel.findGroup("Mosaic");
+  PvlGroup outputMosaicGroup = outputCubeLabel.findGroup("Mosaic");
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, inputMosaicGroup, outputMosaicGroup);
+
 }
 
 TEST_F(MroHiriseCube, FunctionalTestHimosError) {
