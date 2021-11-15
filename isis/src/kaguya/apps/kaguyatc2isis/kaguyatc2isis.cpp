@@ -57,7 +57,7 @@ namespace Isis {
                     "DATA_SET_ID is [" + id + "]" +
                     "Valid formats include [TC_MAP, TCO_MAP, TC1_Level2B, " +
                     "SLN-L-TC-3-S-LEVEL2B0-V1.0, SLN-L-TC-3-W-LEVEL2B0-V1.0, " +
-		                "SLN-L-TC-3-SP-SUPPORT-LEVEL2B0-V1.0", "SLN-L-TC-5-MORNING-MAP-V4.0]";
+		                "SLN-L-TC-3-SP-SUPPORT-LEVEL2B0-V1.0, SLN-L-TC-5-MORNING-MAP-V4.0]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
