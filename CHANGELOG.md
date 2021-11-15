@@ -47,6 +47,9 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 ### Deprecated
 - Deprecated edrget as discussed in [#3313](https://github.com/USGS-Astrogeology/ISIS3/issues/3313).
 
+### Fixed
+- Fixed the Vesta target name not being translated properly in dawnfc2isis. [#4638](https://github.com/USGS-Astrogeology/ISIS3/issues/4638)
+
 ## [6.0.0] - 2021-08-27
 
 ### Added
