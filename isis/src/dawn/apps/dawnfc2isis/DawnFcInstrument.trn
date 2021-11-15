@@ -19,7 +19,7 @@
 #
 # Translation is the native and corresponding foreign values.
 # Translation may be repeated as needed.
- 
+
 Group = SpacecraftName
   Auto
   InputKey       = INSTRUMENT_HOST_NAME
@@ -29,7 +29,7 @@ Group = SpacecraftName
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (DAWN, "DAWN")
 End_Group
- 
+
 Group = InstrumentId
   Auto
   InputKey       = INSTRUMENT_ID
@@ -39,8 +39,8 @@ Group = InstrumentId
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
- 
- 
+
+
 Group = SpacecraftClockStartCount
   Auto
   InputKey       = SPACECRAFT_CLOCK_START_COUNT
@@ -80,7 +80,7 @@ Group = StopTime
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
- 
+
 Group = ExposureDuration
   Auto
   InputKey       = EXPOSURE_DURATION
@@ -90,7 +90,7 @@ Group = ExposureDuration
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
- 
+
 Group = PixelAveragingWidth
   Auto
   InputKey       = PIXEL_AVERAGING_WIDTH
@@ -112,7 +112,7 @@ Group = PixelAveragingHeight
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
- 
+
 Group = TargetName
   Auto
   InputKey       = TARGET_NAME
@@ -121,6 +121,7 @@ Group = TargetName
   OutputName     = TargetName
   InputDefault   = "N/A"
   OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = ("VESTA", "4 VESTA")
   Translation    = (*, *)
 End_Group
 
@@ -134,8 +135,8 @@ Group = OriginalTargetName
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
- 
- 
+
+
 Group = OrbitNumber
   Auto
   InputKey       = ORBIT_NUMBER
@@ -145,7 +146,7 @@ Group = OrbitNumber
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
- 
+
 Group = FirstLine
   Auto
   InputKey       = FIRST_LINE
