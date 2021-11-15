@@ -2,7 +2,7 @@
 
 def NUM_CORES = 8
 def errors = []
-def labels = ['CentOS', 'Fedora', 'Ubuntu'] // labels for Jenkins node types we will build on
+def labels = ['Ubuntu'] // labels for Jenkins node types we will build on
 def nodes = [:] 
 
 for (lbl in labels) {
@@ -34,6 +34,8 @@ for (lbl in labels) {
                 condaEnv("isis3") {
                     // Environment
                     loginShell """
+                        conda config --env --set channel_alias https://conda.wr.usgs.gov
+                        conda config --env --set remote_read_timeout_secs 3600
                         conda install -c conda-forge python=3 findutils
                         conda env update -f ${envFile} --prune
                         mkdir build install

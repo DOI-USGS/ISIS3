@@ -457,7 +457,7 @@ namespace Isis {
                "wish to create this cube, the maximum value can be changed in your personal "
                "preference file located in [~/.Isis/IsisPreferences] within the group "
                "CubeCustomization, keyword MaximumSize. If you do not have an ISISPreference file, "
-               "please refer to the documentation \"Environment and Preference Setup\". Error ";
+               "please refer to the documentation 'Environment and Preference Setup'. Error ";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
