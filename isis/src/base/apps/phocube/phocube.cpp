@@ -134,6 +134,7 @@ namespace Isis {
       if ((localSolarTime = ui.GetBoolean("LOCALTIME"))) nbands++;
     }
 
+    // ALLDN includes DN so if both are set ignore DN
     bool dn;
     bool alldn;
     if ((dn = ui.GetBoolean("DN"))) nbands++;
@@ -160,8 +161,8 @@ namespace Isis {
       throw IException(IException::User, message, _FILEINFO_);
     }
 
-    // If outputting a dn band, retrieve the orignal values for the filter name from the input cube,
-    // if it exists.  Otherwise, the default will be "DN"
+    // If outputting a dn band, retrieve the orignal values for the filter name(s) from the input cube,
+    // if they are in the band bin group.  Otherwise, the default will be "DN"
     QString bname = "DN";
     PvlKeyword bnames;
     if (dn && icube->hasGroup("BandBin")) {
@@ -512,7 +513,7 @@ namespace Isis {
             }
           }
 
-          // Trim no target intersection except RA and dec bands
+          // Trim no target intersection except DN)s), RA and DEC bands
           else {
             int startBand = 0;
             if (dn) {
