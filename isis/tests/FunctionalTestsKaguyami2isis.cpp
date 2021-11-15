@@ -150,10 +150,10 @@ TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisNir) {
   PvlGroup &bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   std::istringstream bandBinStream(R"(
   Group = BandBin
-    FilterName = (MV1, MV2, MV3, MV4, MV5)
-    Center     = (414.0, 749.0, 901.0, 950.0, 1001.0) <nm>
-    Width      = (20.0, 12.0, 21.0, 30.0, 42.0) <nm>
-    BaseBand   = MV5
+    FilterName = (MN1, MN2, MN3, MN4)
+    Center     = (1000.0, 1049.0, 1248.0, 1548.0) <nm>
+    Width      = (27.0, 28.0, 33.0, 48.0) <nm>
+    BaseBand   = MN1
   End_Group
   )");
   PvlGroup bandBinTruth;
