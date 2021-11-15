@@ -1359,7 +1359,7 @@ QStringList IsisBundleObservation::parameterList() {
    * Converts the observed value from a focal plane coordinate to
    * an image sample or line.
    *
-   * @param measure measure The measure that the partials are
+   * @param measure The measure that the partials are
    *                being computed for.
    * @param deltaVal The difference between the measured and
    *                 calculated focal plane coordinate
@@ -1368,8 +1368,7 @@ QStringList IsisBundleObservation::parameterList() {
    *                calculated (line, sample) coordinate
    */
   double IsisBundleObservation::computeObservationValue(BundleMeasure &measure, double deltaVal) {
-    Camera *measureCamera = measure.camera();
-    return deltaVal / measureCamera->PixelPitch();
+    return deltaVal * 1.4;
   }
 }
 

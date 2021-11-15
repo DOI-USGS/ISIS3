@@ -978,7 +978,14 @@ End)");
   EXPECT_THAT(lines[75].toStdString(), HasSubstr("RADII: MEAN"));
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[76].trimmed(), "");
 
-  QStringList columns = lines[159].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  QStringList columns = lines[132].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "minimum:");
+  EXPECT_NEAR(columns[1].toDouble(), -178.8718, 0.001);
+  columns = lines[136].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "maximum:");
+  EXPECT_NEAR(columns[1].toDouble(), 175.7307, 0.001);
+
+  columns = lines[159].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "RA");
   EXPECT_NEAR(columns[2].toDouble(), 269.9949, 0.0001);

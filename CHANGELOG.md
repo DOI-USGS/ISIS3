@@ -35,6 +35,9 @@ release.
 
 ## [Unreleased]
 
+### Fixed
+- Fixed a bug where the measure residuals reported in the bundleout.txt file were incorrect. [#4655](https://github.com/USGS-Astrogeology/ISIS3/issues/4655)
+
 ### Added
 - Added the USECAMSTATSTBL option to caminfo. This allows caminfo to extract existing
 camera statistics from the CameraStatistics Table of the input cube instead
