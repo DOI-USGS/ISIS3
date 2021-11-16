@@ -185,11 +185,9 @@ namespace Isis {
               maxlat = proj->ToPlanetographic(maxlat);
             }
             if (proj->IsPositiveEast()) {
-              if (proj->Has360Domain()) {
-                minlon = proj->ToPositiveEast(proj->Longitude(), 360);
-              }
-              else {
-                minlon = proj->ToPositiveEast(proj->Longitude(), 180);
+              minlon = proj->UniversalLongitude();
+              if (proj->Has180Domain()) {
+                minlon = proj->To180Domain(minlon);
               }
             }
             else {
@@ -207,14 +205,11 @@ namespace Isis {
                 minlat = proj->ToPlanetographic(minlat);
               }
               if (proj->IsPositiveEast()) {
-                if (proj->Has360Domain()) {
-                  maxlon = proj->ToPositiveEast(proj->Longitude(), 360);
-                }
-                else {
-                  maxlon = proj->ToPositiveEast(proj->Longitude(), 180);
+                maxlon = proj->UniversalLongitude();
+                if (proj->Has180Domain()) {
+                  maxlon = proj->To180Domain(maxlon);
                 }
               }
-
               else {
                 if (proj->Has360Domain()) {
                   maxlon = proj->ToPositiveWest(proj->Longitude(), 360);
