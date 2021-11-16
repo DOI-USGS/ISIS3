@@ -128,7 +128,7 @@ TEST(kaguyatc2isisTest, kaguyatc2isisTestSpSupport) {
   ASSERT_EQ(inst["SpacecraftClockStopCount"][0].toStdString(), "881712037.68994");
   ASSERT_DOUBLE_EQ(inst["ExposureDuration"], 3.25);
   ASSERT_EQ(inst["ExposureDuration"].unit(), "ms");
-  ASSERT_DOUBLE_EQ(inst["LineSamplingInterval"], 6.5);
+  ASSERT_DOUBLE_EQ(inst["LineSamplingInterval"], 6.499949);
   ASSERT_EQ(inst["LineSamplingInterval"].unit(), "ms");
   ASSERT_EQ(inst["IlluminationCondition"][0].toStdString(), "MORNING");
 
