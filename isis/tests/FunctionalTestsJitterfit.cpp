@@ -9,7 +9,7 @@
 using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/jitterfit.xml").expanded();
-TEST_F(TempTestingFiles, FunctionalTestJitterfitDefault){
+TEST_F(TempTestingFiles, DISABLED_FunctionalTestJitterfitDefault){
   QTemporaryDir prefix;
   QString outputCoeffs = prefix.path() + "/coef.csv";
   QString outputResiduals = prefix.path() + "/residuals.csv";

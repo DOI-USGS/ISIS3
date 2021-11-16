@@ -319,6 +319,17 @@
       rand notebook that jigsaw was based on. Also added a section in the documentation
       describing the target body radii solve issue.
     </change>
+    <change name="Jesse Mapel and Kristin Berry" date="2021-06-29">
+      Added the ability to bundle adjust images that use a CSM based model. New parameters
+      CSMSOLVESET, CSMSOLVELIST, and CSMSOLVEYPE were added to specify which parameters to
+      solve for. These parameters can also be used as keys in the SCCONFIG file.
+
+      Modified images CSV file to generate a separate CSV for each sensor being adjusted.
+    </change>
+    <change name="Jesse Mapel" date="2021-11-09">
+      Fixed measure residual reporting in bundleout.txt file to match the residuals
+      reported in the residuals CSV file.
+    </change>
   </history>
 
   <groups>
