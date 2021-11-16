@@ -35,8 +35,9 @@ release.
 
 ## [Unreleased]
 
-### Fixed
-- Fixed a bug where the measure residuals reported in the bundleout.txt file were incorrect. [#4655](https://github.com/USGS-Astrogeology/ISIS3/issues/4655)
+### Changed
+- Disabled SURF algorithm for findfeatures, latest version of opencv no longer provides SURF as part of the base library [#3885](https://github.com/USGS-Astrogeology/ISIS3/issues/3885)
+
 
 ### Added
 - Added the USECAMSTATSTBL option to caminfo. This allows caminfo to extract existing
@@ -52,6 +53,7 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 
 ### Fixed
 - Fixed the Vesta target name not being translated properly in dawnfc2isis. [#4638](https://github.com/USGS-Astrogeology/ISIS3/issues/4638)
+- Fixed a bug where the measure residuals reported in the bundleout.txt file were incorrect. [#4655](https://github.com/USGS-Astrogeology/ISIS3/issues/4655)
 
 ## [6.0.0] - 2021-08-27
 
