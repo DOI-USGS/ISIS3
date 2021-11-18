@@ -1,5 +1,5 @@
 # RFC
-The ISIS project uses a Request for Comment (RFC) model whereby major potential changes to the code base, data area, or binary delivery process are proposed, iterated on by any interested parties, and potentially adopted. Right now, RFCs are being housed in this repository's [wiki](https://github.com/USGS-Astrogeology/ISIS3/wiki) with associated discussions occurring on [astrodiscuss](https://astrodiscuss.usgs.gov).
+The ISIS project uses a Request for Comment (RFC) model whereby major potential changes to the code base, data area, or binary delivery process are proposed, iterated on by any interested parties, and potentially adopted. Right now, RFCs are being housed n this repository's [discussion board](https://github.com/USGS-Astrogeology/ISIS3/discussions?discussions_q=label%3ARFC).
 
 We encourage all contributors and users to review open RFCs and comment as these proposed changes will impact use of the software. 
 
@@ -9,17 +9,14 @@ RFC adoption is driven by general consensus in the RFC comments.
 
 # RFC lifecycle
 
-1. RFC is written and posted to Astrodiscuss 
+1. RFC is written and posted on the discussion board
 2. RFC is advertised and discussion proceeds until consensus is reached on what changes if any are needed
 3. RFC is closed, subsiquent issues/pull requests reference RFC. 
 
 ```markdown
-# RFC Title
-
 - Feature/Process Name: (Name of this RFC)
 - Start Date: (Today's Date)
 - RFC PR: (empty until a PR is opened)
-- Issue: (link or create and link and associated issue for discussion)
 - Author: (your name)
 
 # Summary
@@ -37,26 +34,28 @@ Explain the proposal as if it were already included in the code base or in place
 - If applicable, what might sample error messages, deprecation warnings, or migration guidance look like?
 - If applicable, how might this alter current workflows or processes?
 - If applicable, a more technical portion that describes:
-- how the feature might interact with other features
-- what the system architecture might look like
-- how testing might be done
-- what corner cases could exist that are not covered
-- this section should link back to the examples provided above
+  - how the feature might interact with other features
+  - what the system architecture might look like
+  - how testing might be done
+  - what corner cases could exist that are not covered
+  - this section should link back to the examples provided above
 
 # Drawbacks
 Why should we *not* do this?
 
 # Alternatives
-- Why is this design or solution the best of all possible solutions?
-- What other designs have been considered and what is the rationale for not choosing them?
-- What is the impact of not doing this?
+  - Why is this design or solution the best of all possible solutions?
+  - What other designs have been considered and what is the rationale for not choosing them?
+  - What is the impact of not doing this?
+
 # Unresolved Questions
-- What parts of the design will be merged through the RFC process prior to merging?
-- What parts of the RFC are expected to be addressed through implementation before stabilization?
-- What related issues are out of scope for this RFC, but could be addressed in future RFCs?
+  - What parts of the design will be merged through the RFC process prior to merging?
+  - What parts of the RFC are expected to be addressed through implementation before stabilization?
+  - What related issues are out of scope for this RFC, but could be addressed in future RFCs?
+
 # Future Possibilities
-- What future extensions could be made from this RFC?
-- What other ideas might you have? This is a great place to 'dump related ideas'.
+  - What future extensions could be made from this RFC?
+  - What other ideas might you have? This is a great place to 'dump related ideas'.
 ```
 
 # How to write a good RFC
