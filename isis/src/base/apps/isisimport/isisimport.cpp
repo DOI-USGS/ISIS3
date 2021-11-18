@@ -10,6 +10,7 @@
 #include "iTime.h"
 #include "OriginalXmlLabel.h"
 #include "XmlToJson.h"
+#include "PvlToJSON.h"
 #include "ProcessImport.h"
 
 #include "isisimport.h"
@@ -22,33 +23,35 @@ namespace Isis {
 
   void isisimport(UserInterface &ui, Pvl *log) {
     FileName fileTemplate = ("$ISISROOT/appdata/import/fileTemplate.tpl");
-    FileName xmlFileName = ui.GetFileName("FROM");
+    json jsonData;
+    bool isPDS4 = false;
+    FileName inputFileName = ui.GetFileName("FROM");
 
-    // To read the DN data
-    ProcessImport importer;
-    if (xmlFileName.removeExtension().addExtension("dat").fileExists()){
-      importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
+    try {
+      // try to convert xml file to json
+      jsonData = xmlToJson(inputFileName.toString());
+      isPDS4 = true;
     }
-    else if (xmlFileName.removeExtension().addExtension("img").fileExists()) {
-      importer.SetInputFile(xmlFileName.removeExtension().addExtension("img").expanded());
-    }
-    else {
-      QString msg = "Cannot find image file for [" + xmlFileName.name() + "]. Confirm that the "
-        ".dat or .img file for this XML exists and is located in the same directory.";
-      throw IException(IException::User, msg, _FILEINFO_);
+    catch(...) {
+      try {
+        // try to convert pvl to json
+        jsonData = pvlToJSON(inputFileName.toString());
+      }
+      catch(...) {
+        QString msg = "Unable to process import image. Please confirm image is in PDS3 or PDS4 format";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
     }
     Environment env;
 
-    // Convert xml file to json so inja can use it
-    json pds4Data = xmlToJson(xmlFileName.toString());
-
+    // Find associated template
     FileName inputTemplate;
     if (ui.WasEntered("TEMPLATE")) {
       inputTemplate = ui.GetFileName("TEMPLATE");
     }
     else {
       try {
-        std::string templateFile = env.render_file(fileTemplate.expanded().toStdString(), pds4Data);
+        std::string templateFile = env.render_file(fileTemplate.expanded().toStdString(), jsonData);
         inputTemplate = FileName(QString::fromStdString(templateFile));
       }
       catch(...) {
@@ -56,6 +59,7 @@ namespace Isis {
          throw IException(IException::User, msg, _FILEINFO_);
       }
     }
+
 
     // Template engine call back functions
     /**
@@ -130,10 +134,10 @@ namespace Isis {
       return observationId;
     });
 
-     /**
-      * Removes 'Z' that is added to StartTime when image has been reingested
-      */
-      env.add_callback("RemoveStartTimeZ", 1, [](Arguments& args) {
+   /**
+    * Removes 'Z' that is added to StartTime when image has been reingested
+    */
+    env.add_callback("RemoveStartTimeZ", 1, [](Arguments& args) {
       std::string startTime = args.at(0)->get<string>();
 
       if(startTime.back() == 'Z') {
@@ -141,10 +145,13 @@ namespace Isis {
       }
 
       return startTime;
-      });
+    }); // end of inja callbacks
 
-    // Use inja to get number of lines, samples, and bands from the input PDS4 label
-    std::string result = env.render_file(inputTemplate.expanded().toStdString(), pds4Data);
+
+    ProcessImport importer;
+
+    // Use inja to get number of lines, samples, and bands from the input label
+    std::string result = env.render_file(inputTemplate.expanded().toStdString(), jsonData);
 
     // Turn this into a Pvl label
     Pvl newLabel;
@@ -173,12 +180,15 @@ namespace Isis {
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
 
-    OriginalXmlLabel xmlLabel;
-    xmlLabel.readFromXmlFile(xmlFileName);
+    if (isPDS4) {
+      OriginalXmlLabel xmlLabel;
+      xmlLabel.readFromXmlFile(inputFileName);
+      outputCube->write(xmlLabel);
 
+
+
+    }
     importer.StartProcess();
-
-    outputCube->write(xmlLabel);
 
     // Write the updated label
     Isis::PvlObject &newCubeLabel = newLabel.findObject("IsisCube");
@@ -188,7 +198,6 @@ namespace Isis {
     for(int g = 0; g < newCubeLabel.groups(); g++) {
       outCubeLabel.addGroup(newCubeLabel.group(g));
     }
-
     importer.EndProcess();
 
     return;

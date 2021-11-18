@@ -7,9 +7,11 @@ find files of those names at the top level of this repository. **/
 #include "PvlToJSON.h"
 
 #include <nlohmann/json.hpp>
+#include <QFile>
 
 #include "Pvl.h"
 #include "PvlKeyword.h"
+#include "IException.h"
 
 using json = nlohmann::json;
 using namespace std;
@@ -349,4 +351,24 @@ namespace Isis {
     return pvlObjectToJSON(pvl);
   }
 
+  /**
+   * Converts an PVL file to a json object.
+   *
+   *
+   * @param pvlFile Path to an PVL file.
+   *
+   * @return json The pvl file converted to a json object.
+   */
+  json pvlToJSON(QString pvlFile) {
+    Pvl pvl(pvlFile);
+    QFile file(pvlFile);
+
+    if (!file.open(QIODevice::ReadOnly)) {
+      QString message = QString("Failed to open file for PVL Input: [%1]").arg(pvlFile);
+      throw IException(IException::Io, message, _FILEINFO_);
+    }
+    file.close();
+
+    return pvlToJSON(pvl);
+  }
 }
