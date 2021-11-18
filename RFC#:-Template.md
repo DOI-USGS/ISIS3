@@ -1,10 +1,9 @@
 - Feature/Process Name: (Name of this RFC)
 - Start Date: (Today's Date)
 - RFC PR: (empty until a PR is opened)
-- Issue: (link or create and link and associated issue for discussion)
 - Author: (your name)
 
-<!-- This is a comment block that is not visible. We provide some instructions in here. When submitting an RFC please copy this template into a new wiki page titled RFC#:Title, where the number is the next incrementing number. If you would like to submit an RFC, but are unable to edit the wiki, please open an issue and we will assist you in getting your RFC posted. Please fill in, to the largest extent possible, the template below describing your RFC. After that, be active on the associated issue and we can move the RFC through the process.-->
+<!-- This is a comment block that is not visible. We provide some instructions in here. When submitting an RFC please copy this template into a new discussion page titled RFC#:Title, where the number is the next incrementing number. Please fill in, to the largest extent possible, the template below describing your RFC. After that, be active on the associated issue and we can move the RFC through the process.-->
 
 # Summary
 Include a brief summary of the RFC so readers can determine if the RFC is of interest.
