@@ -1,21 +1,83 @@
 Object = IsisCube
   Object = Core
-    StartByte   = 65537
-    Format      = Tile
-    TileSamples = 1204
-    TileLines   = 1056
-
     Group = Dimensions
-      Samples = 1204
-      Lines   = 1056
-      Bands   = 1
+      Samples = {{ IMAGE.LINE_SAMPLES.Value }}
+      Lines   = {{ IMAGE.LINES.Value }}
+      Bands   = {% if exists("IMAGE.BANDS.Value") %}
+                {{ IMAGE.BANDS.Value }}
+                {% else %}
+                1
+                {% endif %}
     End_Group
 
     Group = Pixels
-      Type       = UnsignedByte
-      ByteOrder  = Lsb
-      Base       = 0.0
-      Multiplier = 1.0
+      {%- set type=IMAGE.SAMPLE_TYPE.Value -%}
+      {%- set sampbits=IMAGE.SAMPLE_BITS.Value -%}
+      {%- if type == "LSB_INTEGER" -%} {%- set pixType="Integer" -%}
+      {%- else if type == "MSB_INTEGER" -%} {%- set pixType="Integer" -%}
+      {%- else if type == "PC_INTEGER" -%} {%- set pixType="Integer" -%}
+      {%- else if type == "MAC_INTEGER" -%} {%- set pixType="Integer" -%}
+      {%- else if type == "SUN_INTEGER" -%} {%- set pixType="Integer" -%}
+      {%- else if type == "VAX_INTEGER" -%} {%- set pixType="Integer" -%}
+      {%- else if type == "UNSIGNED_INTEGER" -%} {%- set pixType="Natural" -%}
+      {%- else if type == "UNSIGNED INTEGER" -%} {%- set pixType="Natural" -%}
+      {%- else if type == "LSB_UNSIGNED_INTEGER" -%} {%- set pixType="Natural" -%}
+      {%- else if type == "MSB_UNSIGNED_INTEGER" -%} {%- set pixType="Natural" -%}
+      {%- else if type == "PC_UNSIGNED_INTEGER" -%} {%- set pixType="Natural" -%}
+      {%- else if type == "MAC_UNSIGNED_INTEGER" -%} {%- set pixType="Natural" -%}
+      {%- else if type == "SUN_UNSIGNED_INTEGER" -%} {%- set pixType="Natural" -%}
+      {%- else if type == "VAX_UNSIGNED_INTEGER" -%} {%- set pixType="Natural" -%}
+      {%- else if type == "FLOAT" -%} {%- set pixType="Real" -%}
+      {%- else if type == "REAL" -%} {%- set pixType="Real" -%}
+      {%- else if type == "PC_REAL" -%} {%- set pixType="Real" -%}
+      {%- else if type == "IEEE_REAL" -%} {%- set pixType="Real" -%}
+      {%- else if type == "MAC_REAL" -%} {%- set pixType="Real" -%}
+      {%- else if type == "SUN_REAL" -%} {%- set pixType="Real" -%}
+      {%- else if type == "VAX_REAL" -%} {%- set pixType="Real" -%}
+      {%- else -%} {%- set pixType="LSB_INTEGER" -%}
+      {%- endif -%}
+      Type       = {% if pixType == "Real" and sampbits == "64" %} Double
+                   {% else if pixType == "Real" and sampbits == "32" %} Real
+                   {% else if pixType == "Integer" and sampbits == "8" %} UnsignedByte
+                   {% else if pixType == "Integer" and sampbits == "16" %} SignedWord
+                   {% else if pixType == "Integer" and sampbits == "32" %} SignedInteger
+                   {% else if pixType == "Natural" and sampbits == "8" %} UnsignedByte
+                   {% else if pixType == "Natural" and sampbits == "16" %} UnsignedWord
+                   {% else if pixType == "Natural" and sampbits == "32" %} UnsignedInteger
+                   {% endif %}
+      ByteOrder  = {% if type == "LSB_INTEGER" %} LSB
+                   {% else if type == "PC_INTEGER" %} LSB
+                   {% else if type == "VAX_INTEGER" %} LSB
+                   {% else if type == "LSB_UNSIGNED_INTEGER" %} LSB
+                   {% else if type == "PC_UNSIGNED_INTEGER" %} LSB
+                   {% else if type == "VAX_UNSIGNED_INTEGER" %} LSB
+                   {% else if type == "PC_REAL" %} LSB
+                   {% else if type == "VAX_REAL" %} LSB
+                   {% else if type == "MSB_INTEGER" %} MSB
+                   {% else if type == "MAC_INTEGER" %} MSB
+                   {% else if type == "SUN_INTEGER" %} MSB
+                   {% else if type == "UNSIGNED_INTEGER" %} MSB
+                   {% else if type == "UNSIGNED INTEGER" %} MSB
+                   {% else if type == "MSB_UNSIGNED_INTEGER" %} MSB
+                   {% else if type == "MAC_UNSIGNED_INTEGER" %} MSB
+                   {% else if type == "SUN_UNSIGNED_INTEGER" %} MSB
+                   {% else if type == "FLOAT" %} MSB
+                   {% else if type == "REAL" %} MSB
+                   {% else if type == "IEEE_REAL" %} MSB
+                   {% else if type == "MAC_REAL" %} MSB
+                   {% else if type == "SUN_REAL" %} MSB
+                   {% else %} LSB_INTEGER
+                   {% endif %}
+      Base       = {% if exists("IMAGE.OFFSET.Value") %}
+                   {{ IMAGE.OFFSET.Value }}
+                   {% else %}
+                   0.0
+                   {% endif %}
+      Multiplier = {% if exists("IMAGE.SCALING_FACTOR.Value") %}
+                   {{ IMAGE.SCALING_FACTOR.Value }}
+                   {% else %}
+                   1.0
+                   {% endif %}
     End_Group
   End_Object
 
@@ -79,6 +141,7 @@ Object = IsisCube
                     {% else %} -30002
                     {% endif %}
                     {% set spn = 2 %}
+    {% endif %}
   End_Group
 
   Group = Reseaus
@@ -206,6 +269,7 @@ Object = IsisCube
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     Template = $viking2/reseaus/vo2.visb.template.cub
     {% endif %}
+  {% endif %}
     Status   = Nominal
   End_Group
 End_Object

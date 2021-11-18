@@ -27,6 +27,12 @@ namespace Isis {
     bool isPDS4 = false;
     FileName inputFileName = ui.GetFileName("FROM");
 
+    if (inputFileName.extension().toUpper() == "IMQ"){
+      QString msg = "Input image may be compressed. Please run image through vdcomp to uncompress"
+                    "or verify image has correct file extension.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     try {
       // try to convert xml file to json
       jsonData = xmlToJson(inputFileName.toString());
@@ -149,6 +155,8 @@ namespace Isis {
 
 
     ProcessImport importer;
+    importer.SetInputFile(inputFileName.expanded());
+
 
     // Use inja to get number of lines, samples, and bands from the input label
     std::string result = env.render_file(inputTemplate.expanded().toStdString(), jsonData);
@@ -184,9 +192,6 @@ namespace Isis {
       OriginalXmlLabel xmlLabel;
       xmlLabel.readFromXmlFile(inputFileName);
       outputCube->write(xmlLabel);
-
-
-
     }
     importer.StartProcess();
 
