@@ -360,15 +360,16 @@ namespace Isis {
    * @return json The pvl file converted to a json object.
    */
   json pvlToJSON(QString pvlFile) {
-    Pvl pvl(pvlFile);
-    QFile file(pvlFile);
+    Pvl pvl;
 
-    if (!file.open(QIODevice::ReadOnly)) {
-      QString message = QString("Failed to open file for PVL Input: [%1]").arg(pvlFile);
-      throw IException(IException::Io, message, _FILEINFO_);
+    try {
+      pvl.read(pvlFile);
     }
-    file.close();
-
+    catch (IException &e){
+      QString msg = QString("Failed to open file for PVL Input: [%1]").arg(pvlFile);
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+    
     return pvlToJSON(pvl);
   }
 }
