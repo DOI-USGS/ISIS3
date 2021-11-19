@@ -458,6 +458,12 @@ End
 
       Updated caminfo to output all CameraStatistics Keywords when running CAMSTATS.
     </change>
+    <change name="Amy Stamile" date="2021-11-04">
+      Changed parameter default values for MAXEMISSION and MAXINCIDENCE to be
+      synchronized with footprintinit default values of the same parameters.
+      This corrects inconsistencies of footprint generation failing in caminfo
+      but passing in footprintinit. Fixes #4651.
+    </change>
   </history>
 
   <category>
@@ -964,13 +970,15 @@ End
         <description>
             <p>
                 Specifies the maximum emission angle that a polygon point is
-                allowed to have.  This limit is useful for eliminating limb data
-                that cause numerous ragged spikes.  Limb data will generally
-                result in odd polygon footprints as the geometry becomes
-                unstable at the limb due to obliqueness particularly when using
-                a DEM for the shape model (see spiceinit).  This parameter
-                restricts the emission angle to create better behaved polygons
-                at the limb while sacrificing some (very oblique) data.
+                allowed to have.
+
+                Note: If needing to eliminate limb data
+                that cause numerous ragged spikes, set MAXEMISSION=89.5.
+                Limb data will generally result in odd polygon footprints as the
+                geometry becomes unstable at the limb due to obliqueness
+                particularly when using a DEM for the shape model (see spiceinit).
+                Setting this parameter to 89.5 restricts the emission angle to create better
+                behaved polygons at the limb while sacrificing some (very oblique) data.
             </p>
             <p>
                 Note: For images that have been run through spiceinit with a DEM, the
@@ -979,7 +987,7 @@ End
                 data.
             </p>
         </description>
-        <default><item>89.5</item></default>
+        <default><item>180.0</item></default>
       </parameter>
 
       <parameter name="MAXINCIDENCE">
@@ -989,13 +997,15 @@ End
         </brief>
         <description>
             Specifies the maximum incidence angle that a polygon point is
-            allowed to have.  This limit is useful for eliminating
-            terminator data that will typically be lost in photometric
-            corrections.  This parameter restricts the incidence angle to
-            create more data relevant polygons at the terminator while
-            sacrificing some (non-photometric) data.
+            allowed to have.
+
+            Note: if needing to eliminate terminator data that will typically
+            be lost in photometric corrections, set MAXINCIDENCE=120.0.
+            Setting this parameter to 120.0 restricts the incidence angle to
+            create more data relevant polygons at the terminator while sacrificing some
+            (non-photometric) data.
         </description>
-        <default><item>120.0</item></default>
+        <default><item>180.0</item></default>
       </parameter>
     </group>
 

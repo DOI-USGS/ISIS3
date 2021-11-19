@@ -37,7 +37,10 @@ release.
 
 ### Changed
 - Disabled SURF algorithm for findfeatures, latest version of opencv no longer provides SURF as part of the base library [#3885](https://github.com/USGS-Astrogeology/ISIS3/issues/3885)
-
+- Changed caminfo's parameter default values for MAXEMISSION and MAXINCIDENCE to be
+synchronized with footprintinit default values of the same parameters.
+This corrects inconsistencies of footprint generation failing in caminfo
+but passing in footprintinit. [#4651](https://github.com/USGS-Astrogeology/ISIS3/issues/4651).
 
 ### Added
 - Added the USECAMSTATSTBL option to caminfo. This allows caminfo to extract existing
