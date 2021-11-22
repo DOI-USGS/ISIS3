@@ -8,6 +8,7 @@
 #include "CubeAttribute.h"
 #include "FileName.h"
 #include "iTime.h"
+#include "OriginalLabel.h"
 #include "OriginalXmlLabel.h"
 #include "XmlToJson.h"
 #include "PvlToJSON.h"
@@ -182,8 +183,15 @@ namespace Isis {
     importer.SetBase(base);
     importer.SetMultiplier(multiplier);
 
-    // TODO: how to handle this?
-    importer.SetFileHeaderBytes(0);
+    // Handle PDS3 header
+    if (jsonData.contains("^IMAGE")) {
+      std::string offset = jsonData["^IMAGE"]["Value"];
+      std::string recBytes = jsonData["RECORD_BYTES"]["Value"];
+      importer.SetFileHeaderBytes((std::stoi(offset) - 1) * std::stoi(recBytes));
+    }
+    else {
+      importer.SetFileHeaderBytes(0);
+    }
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
@@ -192,6 +200,11 @@ namespace Isis {
       OriginalXmlLabel xmlLabel;
       xmlLabel.readFromXmlFile(inputFileName);
       outputCube->write(xmlLabel);
+    }
+    else {
+      Pvl origPvl(inputFileName.toString());
+      OriginalLabel ol(origPvl);
+      outputCube->write(ol);
     }
     importer.StartProcess();
 
