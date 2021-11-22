@@ -10,6 +10,7 @@
 #include "iTime.h"
 #include "OriginalLabel.h"
 #include "OriginalXmlLabel.h"
+#include "OriginalLabel.h"
 #include "XmlToJson.h"
 #include "PvlToJSON.h"
 #include "ProcessImport.h"
@@ -21,6 +22,8 @@ using namespace inja;
 using json = nlohmann::json;
 
 namespace Isis {
+
+
 
   void isisimport(UserInterface &ui, Pvl *log) {
     FileName fileTemplate = ("$ISISROOT/appdata/import/fileTemplate.tpl");
@@ -161,6 +164,7 @@ namespace Isis {
 
     // Use inja to get number of lines, samples, and bands from the input label
     std::string result = env.render_file(inputTemplate.expanded().toStdString(), jsonData);
+    // std::cout << result << '\n';
 
     // Turn this into a Pvl label
     Pvl newLabel;
@@ -183,22 +187,55 @@ namespace Isis {
     importer.SetBase(base);
     importer.SetMultiplier(multiplier);
 
-    PvlObject translation = newLabel.findObject("Translation");
-
-    // Check translation for potential PDS3 offset
-    if (translation.hasKeyword("DataFilePointer")) {
-      int offset = toInt(translation["DataFilePointer"]);
-
-      if (translation.hasKeyword("DataFileRecordBytes")) {
-        int recSize = toInt(translation["DataFileRecordBytes"]);
-
-        importer.SetFileHeaderBytes((offset - 1) * recSize);
-      }
+    PvlGroup archive = newLabel.findObject("IsisCube").findGroup("Archive");
+    QString originalAxisOrder = QString(archive["OriginalAxisOrder"]);
+    if (originalAxisOrder == "SAMPLELINEBAND") {
+      importer.SetOrganization(ProcessImport::BSQ);
     }
-    // Assume PDS4
+    else if (originalAxisOrder == "BANDSAMPLELINE") {
+      importer.SetOrganization(ProcessImport::BIP);
+    }
+    else if (originalAxisOrder == "SAMPLEBANDLINE") {
+      importer.SetOrganization(ProcessImport::BIL);
+    }
     else {
-      importer.SetFileHeaderBytes(0);
+      stringstream pdsOrgStream;
+      pdsOrgStream << originalAxisOrder;
+
+      QString msg = "Unsupported axis order [" + QString(originalAxisOrder) + "]";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+
+    // Set any special pixel values
+    double pdsNull = Isis::NULL8;
+    if (archive.hasKeyword("PdsNULL")) {
+      pdsNull = toDouble(archive["PdsNULL"]);
+    }
+
+    double pdsLrs = Isis::Lrs;
+    if (archive.hasKeyword("PdsLRS")) {
+      pdsLrs = toDouble(archive["PdsLRS"]);
+    }
+
+    double pdsLis = Isis::Lis;
+    if (archive.hasKeyword("PdsLIS")) {
+      pdsLis = toDouble(archive["PdsLIS"]);
+    }
+
+    double pdsHrs = Isis::Hrs;
+    if (archive.hasKeyword("PdsHRS")) {
+      pdsHrs = toDouble(archive["PdsHRS"]);
+    }
+
+    double pdsHis = Isis::His;
+    if (archive.hasKeyword("PdsHIS")) {
+      pdsHis = toDouble(archive["PdsHIS"]);
+    }
+
+    importer.SetSpecialValues(pdsNull, pdsLrs, pdsLis, pdsHrs, pdsHis);
+
+    // TODO: how to handle this?
+    importer.SetFileHeaderBytes(0);
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
