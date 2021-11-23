@@ -273,4 +273,13 @@ Object = IsisCube
     Status   = Nominal
   End_Group
 End_Object
+
+Object = Translation
+  {% if exists("ptrIMAGE.Value") %}
+  DataFilePointer             = {{ ptrIMAGE.Value }}
+  {% endif %}
+  {% if exists("RECORD_BYTES") %}
+  DataFileRecordBytes         = {{ RECORD_BYTES.Value }}
+  {% endif %}
+End_Object
 End

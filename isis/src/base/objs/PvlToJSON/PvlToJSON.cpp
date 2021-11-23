@@ -147,7 +147,14 @@ namespace Isis {
         jsonContainer[keywordIt->name().toStdString()].push_back(pvlKeywordToJSON(*keywordIt));
       }
       else {
-        jsonContainer[keywordIt->name().toStdString()] = pvlKeywordToJSON(*keywordIt);
+        // Check if keyword has a '^', if so replace with 'ptr'.
+        // This removal is due to inja handling '^' as a mathematical operator.
+        if(keywordIt->name().toStdString()[0] == '^') {
+          jsonContainer[keywordIt->name().replace("^", "ptr").toStdString()] = pvlKeywordToJSON(*keywordIt);
+        }
+        else {
+          jsonContainer[keywordIt->name().toStdString()] = pvlKeywordToJSON(*keywordIt);
+        }
       }
     }
 
@@ -369,7 +376,7 @@ namespace Isis {
       QString msg = QString("Failed to open file for PVL Input: [%1]").arg(pvlFile);
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
-    
+
     return pvlToJSON(pvl);
   }
 }

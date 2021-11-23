@@ -183,12 +183,19 @@ namespace Isis {
     importer.SetBase(base);
     importer.SetMultiplier(multiplier);
 
-    // Handle PDS3 header
-    if (jsonData.contains("^IMAGE")) {
-      std::string offset = jsonData["^IMAGE"]["Value"];
-      std::string recBytes = jsonData["RECORD_BYTES"]["Value"];
-      importer.SetFileHeaderBytes((std::stoi(offset) - 1) * std::stoi(recBytes));
+    PvlObject translation = newLabel.findObject("Translation");
+
+    // Check translation for potential PDS3 offset
+    if (translation.hasKeyword("DataFilePointer")) {
+      int offset = toInt(translation["DataFilePointer"]);
+
+      if (translation.hasKeyword("DataFileRecordBytes")) {
+        int recSize = toInt(translation["DataFileRecordBytes"]);
+
+        importer.SetFileHeaderBytes((offset - 1) * recSize);
+      }
     }
+    // Assume PDS4
     else {
       importer.SetFileHeaderBytes(0);
     }
@@ -201,10 +208,11 @@ namespace Isis {
       xmlLabel.readFromXmlFile(inputFileName);
       outputCube->write(xmlLabel);
     }
+    // Assume PDS3
     else {
-      Pvl origPvl(inputFileName.toString());
-      OriginalLabel ol(origPvl);
-      outputCube->write(ol);
+      Pvl pdsLab(inputFileName.expanded());
+      OriginalLabel pds3Label(pdsLab);
+      outputCube->write(pds3Label);
     }
     importer.StartProcess();
 
