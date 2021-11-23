@@ -126,26 +126,26 @@ Object = IsisCube
     StarTracking         = {{ infoGroup.STAR_TRACKING.Value }}
     SnapshotMode         = {{ infoGroup.SNAPSHOT_MODE.Value }}
     SamplingMode         = ({{ QUBE.SAMPLING_MODE_ID.Value.0 }}, {{ QUBE.SAMPLING_MODE_ID.Value.1 }})
-    {% if exists("QUBE.CORE_NULL.Value") %}
-    PdsNULL              = {{ QUBE.CORE_NULL.Value }}
-    {% endif %}
-    {% if exists("QUBE.CORE_NULL.Value") %}
-    PdsNULL              = {{ QUBE.CORE_NULL.Value }}
-    {% endif %}
-    {% if exists("QUBE.CORE_LOW_REPR_SATURATION.Value") %}
-    PdsLRS               = {{ QUBE.CORE_LOW_REPR_SATURATION.Value }}
-    {% endif %}
-    {% if exists("QUBE.CORE_LOW_INSTR_SATURATION.Value") %}
-    PdsLIS               = {{ QUBE.CORE_LOW_INSTR_SATURATION.Value }}
-    {% endif %}
-    {% if exists("QUBE.CORE_HIGH_REPR_SATURATION.Value") %}
-    PdsHRS               = {{ QUBE.CORE_HIGH_REPR_SATURATION.Value }}
-    {% endif %}
-    {% if exists("QUBE.CORE_HIGH_INSTR_SATURATION.Value") %}
-    PdsHIS               = {{ QUBE.CORE_HIGH_INSTR_SATURATION.Value }}
-    {% endif %}
-    OriginalAxisOrder    = {{ QUBE.AXIS_NAME.Value.0 }}{{ QUBE.AXIS_NAME.Value.1 }}{{ QUBE.AXIS_NAME.Value.2 }}
   End_Group
+End_Object
 
+Object = Translation
+  {% if exists("QUBE.CORE_NULL.Value") %}
+  PdsNULL              = {{ QUBE.CORE_NULL.Value }}
+  {% endif %}
+  {% if exists("QUBE.CORE_LOW_REPR_SATURATION.Value") %}
+  PdsLRS               = {{ QUBE.CORE_LOW_REPR_SATURATION.Value }}
+  {% endif %}
+  {% if exists("QUBE.CORE_LOW_INSTR_SATURATION.Value") %}
+  PdsLIS               = {{ QUBE.CORE_LOW_INSTR_SATURATION.Value }}
+  {% endif %}
+  {% if exists("QUBE.CORE_HIGH_REPR_SATURATION.Value") %}
+  PdsHRS               = {{ QUBE.CORE_HIGH_REPR_SATURATION.Value }}
+  {% endif %}
+  {% if exists("QUBE.CORE_HIGH_INSTR_SATURATION.Value") %}
+  PdsHIS               = {{ QUBE.CORE_HIGH_INSTR_SATURATION.Value }}
+  {% endif %}
+  OriginalAxisOrder    = {{ QUBE.AXIS_NAME.Value.0 }}{{ QUBE.AXIS_NAME.Value.1 }}{{ QUBE.AXIS_NAME.Value.2 }}
+  OriginalImageOffset  = {{ imageOffset }}
 End_Object
 End

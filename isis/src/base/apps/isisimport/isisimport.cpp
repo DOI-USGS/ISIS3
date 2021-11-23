@@ -46,6 +46,10 @@ namespace Isis {
       try {
         // try to convert pvl to json
         jsonData = pvlToJSON(inputFileName.toString());
+        // QString labelOffset = jsonData["^QUBE"]["Value"];
+        if (jsonData.find("^QUBE") != jsonData.end()) {
+          jsonData["imageOffset"] = jsonData["^QUBE"]["Value"];
+        }
       }
       catch(...) {
         QString msg = "Unable to process import image. Please confirm image is in PDS3 or PDS4 format";
@@ -164,7 +168,6 @@ namespace Isis {
 
     // Use inja to get number of lines, samples, and bands from the input label
     std::string result = env.render_file(inputTemplate.expanded().toStdString(), jsonData);
-    // std::cout << result << '\n';
 
     // Turn this into a Pvl label
     Pvl newLabel;
@@ -187,8 +190,8 @@ namespace Isis {
     importer.SetBase(base);
     importer.SetMultiplier(multiplier);
 
-    PvlGroup archive = newLabel.findObject("IsisCube").findGroup("Archive");
-    QString originalAxisOrder = QString(archive["OriginalAxisOrder"]);
+    PvlObject translation = newLabel.findObject("Translation");
+    QString originalAxisOrder = QString(translation["OriginalAxisOrder"]);
     if (originalAxisOrder == "SAMPLELINEBAND") {
       importer.SetOrganization(ProcessImport::BSQ);
     }
@@ -208,34 +211,34 @@ namespace Isis {
 
     // Set any special pixel values
     double pdsNull = Isis::NULL8;
-    if (archive.hasKeyword("PdsNULL")) {
-      pdsNull = toDouble(archive["PdsNULL"]);
+    if (translation.hasKeyword("PdsNULL")) {
+      pdsNull = toDouble(translation["PdsNULL"]);
     }
 
     double pdsLrs = Isis::Lrs;
-    if (archive.hasKeyword("PdsLRS")) {
-      pdsLrs = toDouble(archive["PdsLRS"]);
+    if (translation.hasKeyword("PdsLRS")) {
+      pdsLrs = toDouble(translation["PdsLRS"]);
     }
 
     double pdsLis = Isis::Lis;
-    if (archive.hasKeyword("PdsLIS")) {
-      pdsLis = toDouble(archive["PdsLIS"]);
+    if (translation.hasKeyword("PdsLIS")) {
+      pdsLis = toDouble(translation["PdsLIS"]);
     }
 
     double pdsHrs = Isis::Hrs;
-    if (archive.hasKeyword("PdsHRS")) {
-      pdsHrs = toDouble(archive["PdsHRS"]);
+    if (translation.hasKeyword("PdsHRS")) {
+      pdsHrs = toDouble(translation["PdsHRS"]);
     }
 
     double pdsHis = Isis::His;
-    if (archive.hasKeyword("PdsHIS")) {
-      pdsHis = toDouble(archive["PdsHIS"]);
+    if (translation.hasKeyword("PdsHIS")) {
+      pdsHis = toDouble(translation["PdsHIS"]);
     }
 
     importer.SetSpecialValues(pdsNull, pdsLrs, pdsLis, pdsHrs, pdsHis);
 
     // TODO: how to handle this?
-    importer.SetFileHeaderBytes(0);
+    importer.SetFileHeaderBytes(translation["OriginalImageOffset"]);
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
