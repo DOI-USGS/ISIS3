@@ -12,7 +12,7 @@
 
 {%- if SpacecraftName == "TRACE GAS ORBITER" -%}
 {%- set SpacecraftId="TGO" -%}
-{%- else if SpacecraftName == "VIKING_ORBITER_2" -%}
+{%- else if SpacecraftName == "VIKING_ORBITER_1" or SpacecraftName == "VIKING_ORBITER_2" -%}
 {%- set SpacecraftId="Viking" -%}
 {%- set InstrumentId="VIS" -%}
 {%- endif -%}

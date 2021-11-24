@@ -8,6 +8,7 @@
 #include "CubeAttribute.h"
 #include "FileName.h"
 #include "iTime.h"
+#include "OriginalLabel.h"
 #include "OriginalXmlLabel.h"
 #include "XmlToJson.h"
 #include "PvlToJSON.h"
@@ -182,8 +183,22 @@ namespace Isis {
     importer.SetBase(base);
     importer.SetMultiplier(multiplier);
 
-    // TODO: how to handle this?
-    importer.SetFileHeaderBytes(0);
+    PvlObject translation = newLabel.findObject("Translation");
+
+    // Check translation for potential PDS3 offset
+    if (translation.hasKeyword("DataFilePointer")) {
+      int offset = toInt(translation["DataFilePointer"]);
+
+      if (translation.hasKeyword("DataFileRecordBytes")) {
+        int recSize = toInt(translation["DataFileRecordBytes"]);
+
+        importer.SetFileHeaderBytes((offset - 1) * recSize);
+      }
+    }
+    // Assume PDS4
+    else {
+      importer.SetFileHeaderBytes(0);
+    }
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
@@ -192,6 +207,12 @@ namespace Isis {
       OriginalXmlLabel xmlLabel;
       xmlLabel.readFromXmlFile(inputFileName);
       outputCube->write(xmlLabel);
+    }
+    // Assume PDS3
+    else {
+      Pvl pdsLab(inputFileName.expanded());
+      OriginalLabel pds3Label(pdsLab);
+      outputCube->write(pds3Label);
     }
     importer.StartProcess();
 
