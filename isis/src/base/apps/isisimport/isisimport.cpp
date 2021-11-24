@@ -167,7 +167,7 @@ namespace Isis {
     }
 
     // Use inja to get number of lines, samples, and bands from the input PDS4 label
-    std::string result = env.render_file(inputTemplate.expanded().toStdString(), pds4Data);
+    std::string result = env.render_file(inputTemplate.expanded().toStdString(), jsonData);
 
     // Turn this into a Pvl label
     Pvl newLabel;
