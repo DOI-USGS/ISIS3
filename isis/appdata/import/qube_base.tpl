@@ -114,9 +114,9 @@ Object = IsisCube
 End_Object
 
 Object = Translation
-  OriginalImageOffset  = {{ imageOffset }}
+  DataFilePointer      = {{ imageOffset }}
   {% if exists("QUBE.AXIS_NAME.Value") %}
-  OriginalAxisOrder    = {{ QUBE.AXIS_NAME.Value.0 }}{{ QUBE.AXIS_NAME.Value.1 }}{{ QUBE.AXIS_NAME.Value.2 }}
+  CoreAxisNames        = {{ QUBE.AXIS_NAME.Value.0 }}{{ QUBE.AXIS_NAME.Value.1 }}{{ QUBE.AXIS_NAME.Value.2 }}
   {% endif %}
   {% if exists("BAND_BIN.BAND_BIN_BASE.Value") %}
   BandBinBase          = {{ BAND_BIN.BAND_BIN_BASE.Value }}
@@ -125,19 +125,19 @@ Object = Translation
   BandBinMultiplier    = {{ BAND_BIN.BAND_BIN_MULTIPLIER.Value }}
   {% endif %}
   {% if exists("QUBE.CORE_NULL.Value") %}
-  PdsNULL              = {{ QUBE.CORE_NULL.Value }}
+  CoreNull             = {{ QUBE.CORE_NULL.Value }}
   {% endif %}
   {% if exists("QUBE.CORE_LOW_REPR_SATURATION.Value") %}
-  PdsLRS               = {{ QUBE.CORE_LOW_REPR_SATURATION.Value }}
+  CoreLRS              = {{ QUBE.CORE_LOW_REPR_SATURATION.Value }}
   {% endif %}
   {% if exists("QUBE.CORE_LOW_INSTR_SATURATION.Value") %}
-  PdsLIS               = {{ QUBE.CORE_LOW_INSTR_SATURATION.Value }}
+  CoreLIS              = {{ QUBE.CORE_LOW_INSTR_SATURATION.Value }}
   {% endif %}
   {% if exists("QUBE.CORE_HIGH_REPR_SATURATION.Value") %}
-  PdsHRS               = {{ QUBE.CORE_HIGH_REPR_SATURATION.Value }}
+  CoreHRS              = {{ QUBE.CORE_HIGH_REPR_SATURATION.Value }}
   {% endif %}
   {% if exists("QUBE.CORE_HIGH_INSTR_SATURATION.Value") %}
-  PdsHIS               = {{ QUBE.CORE_HIGH_INSTR_SATURATION.Value }}
+  CoreHIS              = {{ QUBE.CORE_HIGH_INSTR_SATURATION.Value }}
   {% endif %}
   {% if exists("QUBE.SUFFIX_BYTES.Value") %}
   SuffixBytes          = {{ QUBE.SUFFIX_BYTES.Value }}
