@@ -12,7 +12,7 @@ XOffset              = {{ infoGroup.X_OFFSET.Value }}
 ZOffset              = {{ infoGroup.Z_OFFSET.Value }}
 SwathWidth           = {{ infoGroup.SWATH_WIDTH.Value }}
 SwathLength          = {{ infoGroup.SWATH_LENGTH.Value }}
-Channel              = VIS
+Channel              = (IR, VIS)
 ExposureDuration     = ({{ QUBE.EXPOSURE_DURATION.Value.0 }} <IR>, {{ QUBE.EXPOSURE_DURATION.Value.1 }} <VIS>)
 GainMode             = ({{ QUBE.GAIN_MODE_ID.Value.0 }}, {{ QUBE.GAIN_MODE_ID.Value.1 }})
 {% endblock %}
