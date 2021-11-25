@@ -49,6 +49,9 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelXmlInput) {
     End_Group
   End_Object
 End_Object
+Object = Translation
+  DataFilePointer = 0
+End_Object
 End)";
   of.close();
   QVector<QString> args = {"from=" + labelFileName, "template=" + templateFile, "to=" + renderedCube};
@@ -78,8 +81,8 @@ End)";
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelPds4ErrorNoImage) {
   QString labelFileName = tempDir.path() + "/doesNotExist.xml";
-  QString templateFile = tempDir.path() + "/test_result.tpl"; 
-  QString renderedCube = tempDir.path() + "/test_result.cub"; 
+  QString templateFile = tempDir.path() + "/test_result.tpl";
+  QString renderedCube = tempDir.path() + "/test_result.cub";
 
   QVector<QString> args = {"from=" + labelFileName, "template=" + templateFile, "to=" + renderedCube};
   UserInterface options(APP_XML, args);
@@ -116,6 +119,9 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelPds4RemoveStartTimeZ) {
     Group = Instrument
       StartTime = {{RemoveStartTimeZ(Cube.StartTime)}}
     End_Group
+End_Object
+Object = Translation
+  DataFilePointer = 0
 End_Object
 End)";
   of.close();
@@ -163,6 +169,9 @@ QString labelFileName = "data/isisimport/pds4.xml";
       YearDoy = {{YearDoy(Cube.StartTime)}}
     End_Group
 End_Object
+Object = Translation
+  DataFilePointer = 0
+End_Object
 End)";
   of.close();
   QVector<QString> args = {"from=" + labelFileName, "template=" + templateFile, "to=" + renderedCube};
@@ -209,6 +218,9 @@ QString labelFileName = "data/isisimport/pds4.xml";
       ObservationId = {{UniqueIdtoObservId(Cube.UniqueIdentifier, Cube.Target)}}
     End_Group
 End_Object
+Object = Translation
+  DataFilePointer = 0
+End_Object
 End)";
   of.close();
   QVector<QString> args = {"from=" + labelFileName, "template=" + templateFile, "to=" + renderedCube};
@@ -223,4 +235,3 @@ End)";
 
   EXPECT_EQ(archiveGroup["ObservationId"][0].toStdString(), "CRUS_000000_505_1");
 }
-
