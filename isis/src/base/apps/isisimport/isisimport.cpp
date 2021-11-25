@@ -207,22 +207,24 @@ namespace Isis {
       importer.SetFileHeaderBytes(0);
     }
 
-    QString originalAxisOrder = QString(translation["OriginalAxisOrder"]);
-    if (originalAxisOrder == "SAMPLELINEBAND") {
-      importer.SetOrganization(ProcessImport::BSQ);
-    }
-    else if (originalAxisOrder == "BANDSAMPLELINE") {
-      importer.SetOrganization(ProcessImport::BIP);
-    }
-    else if (originalAxisOrder == "SAMPLEBANDLINE") {
-      importer.SetOrganization(ProcessImport::BIL);
-    }
-    else {
-      stringstream pdsOrgStream;
-      pdsOrgStream << originalAxisOrder;
+    if (translation.hasKeyword("CoreAxisNames")) {
+      QString originalAxisOrder = QString(translation["CoreAxisNames"]);
+      if (originalAxisOrder == "SAMPLELINEBAND") {
+        importer.SetOrganization(ProcessImport::BSQ);
+      }
+      else if (originalAxisOrder == "BANDSAMPLELINE") {
+        importer.SetOrganization(ProcessImport::BIP);
+      }
+      else if (originalAxisOrder == "SAMPLEBANDLINE") {
+        importer.SetOrganization(ProcessImport::BIL);
+      }
+      else {
+        stringstream pdsOrgStream;
+        pdsOrgStream << originalAxisOrder;
 
-      QString msg = "Unsupported axis order [" + QString(originalAxisOrder) + "]";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
+        QString msg = "Unsupported axis order [" + QString(originalAxisOrder) + "]";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
     }
 
     // Set any special pixel values
@@ -251,7 +253,7 @@ namespace Isis {
       pdsHis = toDouble(translation["CoreHIS"]);
     }
     importer.SetSpecialValues(pdsNull, pdsLrs, pdsLis, pdsHrs, pdsHis);
-    
+
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
 
