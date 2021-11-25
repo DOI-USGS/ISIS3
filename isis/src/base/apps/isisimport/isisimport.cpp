@@ -191,6 +191,22 @@ namespace Isis {
     importer.SetMultiplier(multiplier);
 
     PvlObject translation = newLabel.findObject("Translation");
+
+    // Check translation for potential PDS3 offset
+    if (translation.hasKeyword("DataFilePointer")) {
+      int offset = toInt(translation["DataFilePointer"]);
+
+      if (translation.hasKeyword("DataFileRecordBytes")) {
+        int recSize = toInt(translation["DataFileRecordBytes"]);
+
+        importer.SetFileHeaderBytes((offset - 1) * recSize);
+      }
+    }
+    // Assume PDS4
+    else {
+      importer.SetFileHeaderBytes(0);
+    }
+
     QString originalAxisOrder = QString(translation["OriginalAxisOrder"]);
     if (originalAxisOrder == "SAMPLELINEBAND") {
       importer.SetOrganization(ProcessImport::BSQ);
@@ -211,35 +227,31 @@ namespace Isis {
 
     // Set any special pixel values
     double pdsNull = Isis::NULL8;
-    if (translation.hasKeyword("PdsNULL")) {
-      pdsNull = toDouble(translation["PdsNULL"]);
+    if (translation.hasKeyword("CoreNull")) {
+      pdsNull = toDouble(translation["CoreNull"]);
     }
 
     double pdsLrs = Isis::Lrs;
-    if (translation.hasKeyword("PdsLRS")) {
-      pdsLrs = toDouble(translation["PdsLRS"]);
+    if (translation.hasKeyword("CoreLRS")) {
+      pdsLrs = toDouble(translation["CoreLRS"]);
     }
 
     double pdsLis = Isis::Lis;
-    if (translation.hasKeyword("PdsLIS")) {
-      pdsLis = toDouble(translation["PdsLIS"]);
+    if (translation.hasKeyword("CoreLIS")) {
+      pdsLis = toDouble(translation["CoreLIS"]);
     }
 
     double pdsHrs = Isis::Hrs;
-    if (translation.hasKeyword("PdsHRS")) {
-      pdsHrs = toDouble(translation["PdsHRS"]);
+    if (translation.hasKeyword("CoreHRS")) {
+      pdsHrs = toDouble(translation["CoreHRS"]);
     }
 
     double pdsHis = Isis::His;
-    if (translation.hasKeyword("PdsHIS")) {
-      pdsHis = toDouble(translation["PdsHIS"]);
+    if (translation.hasKeyword("CoreHIS")) {
+      pdsHis = toDouble(translation["CoreHIS"]);
     }
-
     importer.SetSpecialValues(pdsNull, pdsLrs, pdsLis, pdsHrs, pdsHis);
-
-    // TODO: how to handle this?
-    importer.SetFileHeaderBytes(translation["OriginalImageOffset"]);
-
+    
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
 
