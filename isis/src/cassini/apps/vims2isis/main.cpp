@@ -144,7 +144,7 @@ void IsisMain() {
 
   //Clean up
   QString tmp(tempname.expanded());
-  // QFile::remove(tmp);
+  QFile::remove(tmp);
 }
 
 /**
