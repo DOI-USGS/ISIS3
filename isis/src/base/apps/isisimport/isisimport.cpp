@@ -156,8 +156,15 @@ namespace Isis {
 
 
     ProcessImport importer;
-    importer.SetInputFile(inputFileName.expanded());
-
+    if (inputFileName.removeExtension().addExtension("dat").fileExists()){
+      importer.SetInputFile(inputFileName.removeExtension().addExtension("dat").expanded());
+    }
+    else if (inputFileName.removeExtension().addExtension("img").fileExists()) {
+      importer.SetInputFile(inputFileName.removeExtension().addExtension("img").expanded());
+    }
+    else {
+      importer.SetInputFile(inputFileName.expanded());
+    }
 
     // Use inja to get number of lines, samples, and bands from the input label
     std::string result = env.render_file(inputTemplate.expanded().toStdString(), jsonData);
