@@ -47,8 +47,8 @@ namespace Isis {
         // try to convert pvl to json
         jsonData = pvlToJSON(inputFileName.toString());
         // QString labelOffset = jsonData["^QUBE"]["Value"];
-        if (jsonData.find("^QUBE") != jsonData.end()) {
-          jsonData["imageOffset"] = jsonData["^QUBE"]["Value"];
+        if (jsonData.find("ptrQUBE") != jsonData.end()) {
+          jsonData["imageOffset"] = jsonData["ptrQUBE"]["Value"];
         }
       }
       catch(...) {
