@@ -10,7 +10,6 @@
 #include "iTime.h"
 #include "OriginalLabel.h"
 #include "OriginalXmlLabel.h"
-#include "OriginalLabel.h"
 #include "XmlToJson.h"
 #include "PvlToJSON.h"
 #include "ProcessImport.h"
