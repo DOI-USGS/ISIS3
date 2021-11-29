@@ -46,10 +46,6 @@ namespace Isis {
       try {
         // try to convert pvl to json
         jsonData = pvlToJSON(inputFileName.toString());
-        // QString labelOffset = jsonData["^QUBE"]["Value"];
-        if (jsonData.find("ptrQUBE") != jsonData.end()) {
-          jsonData["imageOffset"] = jsonData["ptrQUBE"]["Value"];
-        }
       }
       catch(...) {
         QString msg = "Unable to process import image. Please confirm image is in PDS3 or PDS4 format";

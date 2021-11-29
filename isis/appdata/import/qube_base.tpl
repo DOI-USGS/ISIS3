@@ -114,7 +114,7 @@ Object = IsisCube
 End_Object
 
 Object = Translation
-  DataFilePointer      = {{ imageOffset }}
+  DataFilePointer      = {{ ptrQUBE.Value }}
   {% if exists("QUBE.AXIS_NAME.Value") %}
   CoreAxisNames        = {{ QUBE.AXIS_NAME.Value.0 }}{{ QUBE.AXIS_NAME.Value.1 }}{{ QUBE.AXIS_NAME.Value.2 }}
   {% endif %}
