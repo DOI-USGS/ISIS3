@@ -10,6 +10,8 @@
 {%- set SpacecraftName=Product_Observational.Observation_Area.Investigation_Area.Instrument_Host_Name -%}
 {%- else if exists("SPACECRAFT_NAME") -%}
 {%- set SpacecraftName=SPACECRAFT_NAME.Value -%}
+{%- else if exists("QUBE.MISSION_NAME") -%}
+{%- set SpacecraftName=QUBE.MISSION_NAME.Value -%}
 {%- endif -%}
 
 {%- if SpacecraftName == "TRACE GAS ORBITER" -%}
@@ -19,6 +21,9 @@
 {%- set InstrumentId="VIS" -%}
 {%- else if SpacecraftName == "MARS_RECONNAISSANCE_ORBITER" or SpacecraftName == "MARS_RECON_ORBITER" -%}
 {%- set SpacecraftId="MRO" -%}
+{%- else if SpacecraftName == "CASSINI-HUYGENS" -%}
+{%- set SpacecraftId="Cassini" -%}
+{%- set InstrumentId="VIMS" -%}
 {%- endif -%}
 
 {%- if SpacecraftId -%}$ISISROOT/appdata/import/{{- SpacecraftId -}}{{- InstrumentId -}}.tpl{%- endif -%}

@@ -22,6 +22,8 @@ using json = nlohmann::json;
 
 namespace Isis {
 
+
+
   void isisimport(UserInterface &ui, Pvl *log) {
     FileName fileTemplate = ("$ISISROOT/appdata/import/fileTemplate.tpl");
     json jsonData;
@@ -222,6 +224,53 @@ namespace Isis {
       // Save off the dark pixel data
       importer.SaveDataPrefix();
     }
+
+    if (translation.hasKeyword("CoreAxisNames")) {
+      QString originalAxisOrder = QString(translation["CoreAxisNames"]);
+      if (originalAxisOrder == "SAMPLELINEBAND") {
+        importer.SetOrganization(ProcessImport::BSQ);
+      }
+      else if (originalAxisOrder == "BANDSAMPLELINE") {
+        importer.SetOrganization(ProcessImport::BIP);
+      }
+      else if (originalAxisOrder == "SAMPLEBANDLINE") {
+        importer.SetOrganization(ProcessImport::BIL);
+      }
+      else {
+        stringstream pdsOrgStream;
+        pdsOrgStream << originalAxisOrder;
+
+        QString msg = "Unsupported axis order [" + QString(originalAxisOrder) + "]";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+
+    // Set any special pixel values
+    double pdsNull = Isis::NULL8;
+    if (translation.hasKeyword("CoreNull")) {
+      pdsNull = toDouble(translation["CoreNull"]);
+    }
+
+    double pdsLrs = Isis::Lrs;
+    if (translation.hasKeyword("CoreLRS")) {
+      pdsLrs = toDouble(translation["CoreLRS"]);
+    }
+
+    double pdsLis = Isis::Lis;
+    if (translation.hasKeyword("CoreLIS")) {
+      pdsLis = toDouble(translation["CoreLIS"]);
+    }
+
+    double pdsHrs = Isis::Hrs;
+    if (translation.hasKeyword("CoreHRS")) {
+      pdsHrs = toDouble(translation["CoreHRS"]);
+    }
+
+    double pdsHis = Isis::His;
+    if (translation.hasKeyword("CoreHIS")) {
+      pdsHis = toDouble(translation["CoreHIS"]);
+    }
+    importer.SetSpecialValues(pdsNull, pdsLrs, pdsLis, pdsHrs, pdsHis);
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
