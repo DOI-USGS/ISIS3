@@ -61,7 +61,7 @@ TEST_F(MroHiriseCube, FunctionalTestHimosDefault) {
     StopTime                  = 2006-09-29T15:16:35.036
     SpacecraftClockStopCount  = 844010213:55196
     IncidenceAngle            = 59.687930340662 <DEG>
-    EmissionAngle             = 0.091672512439956 <DEG>
+    EmissionAngle             = 0.091672512443932 <DEG>
     PhaseAngle                = 59.597812369363 <DEG>
     LocalTime                 = 15.486088288555 <LOCALDAY/24>
     SolarLongitude            = 113.54746578654 <DEG>

@@ -37,8 +37,8 @@ Object = IsisCube
     MaximumLatitude    = -4.0
     MinimumLongitude   = 29.5
     MaximumLongitude   = 31.0
-    UpperLeftCornerX   = -15195.585618718
-    UpperLeftCornerY   = -121074.5047685
+    UpperLeftCornerX   = -15195.585618718 <meters>
+    UpperLeftCornerY   = -121074.5047685 <meters>
     PixelResolution    = 245.09009062449 <meters/pixel>
     Scale              = 123.72328210776 <pixels/degree>
   End_Group
@@ -92,8 +92,8 @@ Object = IsisCube
     MaximumLatitude    = -4.0
     MinimumLongitude   = 29.0
     MaximumLongitude   = 31.0
-    UpperLeftCornerX   = -45586.756856155
-    UpperLeftCornerY   = -121074.5047685
+    UpperLeftCornerX   = -45586.756856155 <meters>
+    UpperLeftCornerY   = -121074.5047685 <meters>
     PixelResolution    = 245.09009062449 <meters/pixel>
     Scale              = 123.72328210776 <pixels/degree>
   End_Group
@@ -607,8 +607,8 @@ Object = IsisCube
     LatitudeType       = Planetocentric
     LongitudeDirection = PositiveEast
     LongitudeDomain    = 360
-    UpperLeftCornerX   = -475029.8023764
-    UpperLeftCornerY   = 2042714.0507253
+    UpperLeftCornerX   = -475029.8023764 <meters>
+    UpperLeftCornerY   = 2042714.0507253 <meters>
     PixelResolution    = 429.50253379421 <meters/pixel>
     Scale              = 138.00779473796 <pixels/degree>
   End_Group
