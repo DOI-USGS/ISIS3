@@ -209,6 +209,22 @@ namespace Isis {
       importer.SetFileHeaderBytes(0);
     }
 
+    // Processing unique to mroctx 
+    if (translation.hasKeyword("startPix")) {
+      // startPix is used only for DarkPixels which is still a TODO for mroctx.
+      //int startPix = toInt(translation["startPix"]);
+      int endPix = toInt(translation["endPix"]);
+      int suf = toInt(translation["suf"]);
+
+      importer.SetDataPrefixBytes(endPix + 1);
+      importer.SetDataSuffixBytes(suf);
+      int samps = importer.Samples() - endPix - suf - 1;
+      importer.SetDimensions(samps, importer.Lines(), importer.Bands());
+
+      // Save off the dark pixel data
+      importer.SaveDataPrefix();
+    }
+
     if (translation.hasKeyword("CoreAxisNames")) {
       QString originalAxisOrder = QString(translation["CoreAxisNames"]);
       if (originalAxisOrder == "SAMPLELINEBAND") {
