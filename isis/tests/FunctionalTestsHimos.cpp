@@ -47,10 +47,39 @@ TEST_F(MroHiriseCube, FunctionalTestHimosDefault) {
   EXPECT_EQ(double(pixels["Base"]), 1.4996565881653);
   EXPECT_EQ(double(pixels["Multiplier"]), 4.57882446313283e-05);
 
-  AssertPvlGroupEqual("InputMapping", "OutputMapping",
-                      inputCubeLabel.findGroup("Mapping"), outputCubeLabel.findGroup("Mapping"));
-  AssertPvlGroupEqual("InputMosaic", "OutputMosaic",
-                      inputCubeLabel.findGroup("Mosaic"), outputCubeLabel.findGroup("Mosaic"));
+
+  PvlGroup inputMappingGroup = inputCubeLabel.findGroup("Mapping");
+  PvlGroup outputMappingGroup = outputCubeLabel.findGroup("Mapping");
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, inputMappingGroup, outputMappingGroup);
+
+  std::istringstream mosaicStream(R"(
+  Group = Mosaic
+    ProductId                 = TRA_000823_1720_BLUEGREEN
+    SourceProductId           = (TRA_000823_1720_RED4_0, TRA_000823_1720_RED4_1)
+    StartTime                 = 2006-09-29T15:16:33.385
+    SpacecraftClockStartCount = 844010212:12516
+    StopTime                  = 2006-09-29T15:16:35.036
+    SpacecraftClockStopCount  = 844010213:55196
+    IncidenceAngle            = 59.687930340662 <DEG>
+    EmissionAngle             = 0.091672512443932 <DEG>
+    PhaseAngle                = 59.597812369363 <DEG>
+    LocalTime                 = 15.486088288555 <LOCALDAY/24>
+    SolarLongitude            = 113.54746578654 <DEG>
+    SubSolarAzimuth           = 212.41484032558 <DEG>
+    NorthAzimuth              = 270.00024569628 <DEG>
+    cpmmTdiFlag               = (Null, Null, Null, Null, Null, 128, Null, Null,
+                                 Null, Null, Null, Null, Null, Null)
+    cpmmSummingFlag           = (Null, Null, Null, Null, Null, 1, Null, Null,
+                                 Null, Null, Null, Null, Null, Null)
+    SpecialProcessingFlag     = (Null, Null, Null, Null, Null, NOMINAL, Null,
+                                 Null, Null, Null, Null, Null, Null, Null)
+  End_Group
+  )");
+  PvlGroup mosaicGroupTruth;
+  mosaicStream >> mosaicGroupTruth;
+  PvlGroup outputMosaicGroup = outputCubeLabel.findGroup("Mosaic");
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, mosaicGroupTruth, outputMosaicGroup);
+
 }
 
 TEST_F(MroHiriseCube, FunctionalTestHimosError) {

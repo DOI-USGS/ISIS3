@@ -106,7 +106,6 @@ namespace Isis {
             << " that is not in PvlGroup " << group1_expr;
       }
     }
-
     return ::testing::AssertionSuccess();
   }
 
