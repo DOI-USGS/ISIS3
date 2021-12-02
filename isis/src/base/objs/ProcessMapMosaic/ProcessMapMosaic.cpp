@@ -10,6 +10,7 @@ find files of those names at the top level of this repository. **/
 #include <QDebug>
 
 #include "Application.h"
+#include "Displacement.h"
 #include "IException.h"
 #include "ProcessByLine.h"
 #include "Preference.h"
@@ -509,9 +510,6 @@ namespace Isis {
     Pvl fileLab(inputFile);
     PvlGroup &mapping = fileLab.findGroup("Mapping", Pvl::Traverse);
 
-    mapping["UpperLeftCornerX"] = toString(xmin);
-    mapping["UpperLeftCornerY"] = toString(ymax);
-
     // All mosaicking programs use only the upper left x and y to determine where to
     // place an image into a mosaic. For clarity purposes, the mosaic programs do
     // not use lat/lon ranges for anything except creating the mosaic. By specifying
@@ -541,13 +539,15 @@ namespace Isis {
     }
 
     Projection *firstProj = ProjectionFactory::CreateFromCube(fileLab);
+    firstProj->SetUpperLeftCorner(Displacement(xmin, Displacement::Meters),
+                                  Displacement(ymax, Displacement::Meters));
+
     int samps = (int)(ceil(firstProj->ToWorldX(xmax) - firstProj->ToWorldX(xmin)) + 0.5);
     int lines = (int)(ceil(firstProj->ToWorldY(ymin) - firstProj->ToWorldY(ymax)) + 0.5);
-    delete firstProj;
 
     if (p_createMosaic) {
       Pvl newMap;
-      newMap.addGroup(mapping);
+      newMap.addGroup(firstProj->Mapping());
 
       // Initialize the mosaic
       CubeAttributeInput inAtt;
@@ -574,6 +574,7 @@ namespace Isis {
       ocube->putGroup(newMap.findGroup("Mapping", Pvl::Traverse));
       p.EndProcess();
     }
+    delete firstProj;
 
     Cube *mosaicCube = new Cube();
     mosaicCube->open(mosaicFile, "rw");
