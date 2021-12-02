@@ -154,7 +154,43 @@ namespace Isis {
       }
 
       return startTime;
-    }); // end of inja callbacks
+    });
+
+
+    /**
+     * Add ImageNumber to Archive Group based on StartTime and ProductId.
+     *
+     *   Last digit of the year (eg, 1997 => 7), followed by the
+     *   Day of the year (Julian day) followed by the
+     *   Last five digits of the ProductId
+     */
+     env.add_callback("SetImageNumber", 2, [](Arguments& args) {
+       std::string yearDoy = args.at(0)->get<string>();
+       std::string productId = args.at(1)->get<string>();
+
+       // grab the last digit of the year
+       std::string imageNumber = yearDoy.substr(3, 1);
+       // grab the DOY
+       imageNumber += yearDoy.substr(4, 3);
+       // grab the last 5 digits of productId
+       imageNumber += productId.substr(4);
+
+       return imageNumber;
+     });
+
+     /**
+      * Add ImageKeyId to Archive Group based on StartTime and ProductId
+      */
+      env.add_callback("SetImageKeyId", 2, [](Arguments& args) {
+        std::string clockCount = args.at(0)->get<string>();
+        std::string productId = args.at(1)->get<string>();
+
+        std::string imageKeyId = clockCount.substr(0, 5) + productId.substr(4);
+
+        return imageKeyId;
+      });
+
+     // end of inja callbacks
 
 
     ProcessImport importer;
@@ -209,7 +245,20 @@ namespace Isis {
       importer.SetFileHeaderBytes(0);
     }
 
-    // Processing unique to mroctx 
+    // Checks that are unique to mgsmoc
+    if (translation.hasKeyword("compressed") && translation.hasKeyword("projected")) {
+      if (toBool(translation["compressed"])) {
+        QString msg = "[" + inputFileName.name() + "] may be compressed. Please run image through mocuncompress to uncompress.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      if (toBool(translation["projected"])) {
+        QString msg = "[" + inputFileName.name() + "] appears to be an rdr file.";
+        msg += " Use pds2isis.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
+
+    // Processing that is unique to mroctx
     if (translation.hasKeyword("startPix")) {
       // startPix is used only for DarkPixels which is still a TODO for mroctx.
       //int startPix = toInt(translation["startPix"]);
