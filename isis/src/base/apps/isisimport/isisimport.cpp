@@ -10,9 +10,10 @@
 #include "iTime.h"
 #include "OriginalLabel.h"
 #include "OriginalXmlLabel.h"
-#include "XmlToJson.h"
 #include "PvlToJSON.h"
 #include "ProcessImport.h"
+#include "TextFile.h"
+#include "XmlToJson.h"
 
 #include "isisimport.h"
 
@@ -61,11 +62,13 @@ namespace Isis {
     else {
       try {
         std::string templateFile = env.render_file(fileTemplate.expanded().toStdString(), jsonData);
+        std::cout << templateFile << '\n';
         inputTemplate = FileName(QString::fromStdString(templateFile));
       }
-      catch(...) {
-         QString msg = "Cannot locate a template for input label. Please provide a template file to use.";
-         throw IException(IException::User, msg, _FILEINFO_);
+      catch(IException &e) {
+        std::cout << e.what() << '\n';
+        QString msg = "Cannot locate a template for input label. Please provide a template file to use.";
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
@@ -92,6 +95,50 @@ namespace Isis {
         doy = doy + daysInMonth[month-1];
       }
       return yearString.append(to_string(doy));
+    });
+
+    env.add_callback("capitalize", 1, [](Arguments& args) {
+      std::string str = args.at(0)->get<string>();
+      std::transform(str.begin(), str.end(),str.begin(), ::tolower);
+      str[0] = toupper(str[0]);
+      return str;
+    });
+
+    env.add_callback("CassiniIssBandInfo", 3, [](Arguments& args) {
+      std::string instrumentID = args.at(0)->get<string>();
+      std::string filter1 = args.at(1)->get<string>();
+      std::string filter2 = args.at(2)->get<string>();
+      QString filter = QString(filter1.c_str()) + "/" + QString(filter2.c_str());
+      QString dir = "$ISISROOT/appdata/translations";
+      QString cameraAngleDefs;
+      if(instrumentID.at(3) == 'N') {
+        cameraAngleDefs = dir + "/CassiniIssNarrowAngle.def";
+      }
+      else if(instrumentID.at(3) == 'W') {
+        cameraAngleDefs = dir + "/CassiniIssWideAngle.def";
+      }
+      std::cout << cameraAngleDefs << '\n';
+
+      double center = 0;
+      double width = 0;
+
+      TextFile cameraAngle(cameraAngleDefs);
+      int numLines = cameraAngle.LineCount();
+      bool foundfilter = false;
+      for(int i = 0; i < numLines; i++) {
+        QString line;
+        cameraAngle.GetLine(line, true);
+
+        QStringList tokens = line.simplified().split(" ");
+        if(tokens.count() > 2 && tokens.first() == filter) {
+          center = toDouble(tokens[1]);
+          width = toDouble(tokens[2]);
+          foundfilter = true;
+          break;
+        }
+      }
+      vector<double> bandInfo = {center, width};
+      return bandInfo;
     });
 
     /**
@@ -232,13 +279,16 @@ namespace Isis {
 
     // Check translation for potential PDS3 offset
     if (translation.hasKeyword("DataFilePointer")) {
+      PvlKeyword dataFilePointer = translation["DataFilePointer"];
+
       int offset = toInt(translation["DataFilePointer"]);
+      int recSize = 1;
 
       if (translation.hasKeyword("DataFileRecordBytes")) {
-        int recSize = toInt(translation["DataFileRecordBytes"]);
-
-        importer.SetFileHeaderBytes((offset - 1) * recSize);
+        recSize = toInt(translation["DataFileRecordBytes"]);
       }
+
+      importer.SetFileHeaderBytes((offset - 1) * recSize);
     }
     // Assume PDS4
     else {

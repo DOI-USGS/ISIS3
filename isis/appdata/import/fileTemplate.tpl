@@ -12,6 +12,8 @@
 {%- set SpacecraftName=SPACECRAFT_NAME.Value -%}
 {%- else if exists("QUBE.MISSION_NAME") -%}
 {%- set SpacecraftName=QUBE.MISSION_NAME.Value -%}
+{%- else if exists("MISSION_NAME") -%}
+{%- set SpacecraftName=MISSION_NAME.Value -%}
 {%- endif -%}
 
 {%- if SpacecraftName == "TRACE GAS ORBITER" -%}
@@ -23,6 +25,11 @@
 {%- set SpacecraftId="MRO" -%}
 {%- else if SpacecraftName == "CASSINI-HUYGENS" -%}
 {%- set SpacecraftId="Cassini" -%}
+{%- if exists("QUBE") -%}
+{%- set InstrumentId="VIMS" -%}
+{%- else -%}
+{%- set InstrumentId="ISS" -%}
+{%- endif -%}
 {%- set InstrumentId="VIMS" -%}
 {%- else if SpacecraftName == "MARS_GLOBAL_SURVEYOR" -%}
 {%- set SpacecraftId="MGS" -%}
