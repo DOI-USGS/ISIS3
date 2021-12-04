@@ -1,6 +1,8 @@
 {% extends "img_base.tpl" %}
 
 {% block instrument %}
+SpacecraftName          =  Cassini-Huygens
+
 {% set targetName =  TARGET_NAME.Value %}
 {% if targetName == "DARK SKY"%}
 {% set targetName = Sky %}
@@ -20,10 +22,11 @@
 {% set targetName = lower(targetName) %}
 {% set targetName = capitalize(targetName) %}
 {% endif %}
-TargetName              = {{ targetName }}
 
 InstrumentId            = {{ INSTRUMENT_ID.Value }}
-
+TargetName              = {{ targetName }}
+StartTime               = {% set startTime=START_TIME.Value %}
+                          {{ RemoveStartTimeZ(startTime) }}
 StopTime                = {{ STOP_TIME.Value }}
 ExposureDuration        = {{ EXPOSURE_DURATION.Value }} <Milliseconds>
 
@@ -100,7 +103,7 @@ FlightSoftwareVersionId = {{ flightSoftwareVersionId }}
 {% else if gainModeId == "215 ELECTRONS PER DN" %}
 {% set gainModeId = "215" %}
 {% endif %}
-GainModeId              = {{ gainModeId }}
+GainModeId              = {{ gainModeId }} <ElectronsPerDN>
 
 {% set gainState = GAIN_MODE_ID.Value %}
 {% if gainState == "12 ELECTRONS PER DN" %}
@@ -113,7 +116,7 @@ GainModeId              = {{ gainModeId }}
 {% set gainState = "0" %}
 {% endif %}
 GainState               = {{ gainState }}
-Image                   = {{ IMAGE_TIME.Value }}
+ImageTime               = {{ IMAGE_TIME.Value }}
 InstrumentDataRate      = {{ INSTRUMENT_DATA_RATE.Value }} <KilobitsPerSecond>
 OpticsTemperature       = ({{ OPTICS_TEMPERATURE.Value.0 }}, {{ OPTICS_TEMPERATURE.Value.1 }} <DegreesCelcius>)
 
@@ -158,6 +161,8 @@ SummingMode             = {{ summingMode }}
 {% set instrumentModeId = "Sum4" %}
 {% endif %}
 InstrumentModeId        = {{ instrumentModeId }}
+
+SpacecraftClockCount    = {{SPACECRAFT_CLOCK_CNT_PARTITION.Value}}/{{SPACECRAFT_CLOCK_START_COUNT.Value}}
 {% endblock %}
 
 {% block archive %}
@@ -166,7 +171,7 @@ ObservationId = {{ OBSERVATION_ID.Value }}
 
 {% block bandbin %}
 {{ super() }}
-FilterName   = ({{ filterName.0 }}, {{ filterName.1 }})
+FilterName   = {{ filterName.0 }}/{{ filterName.1 }}
 OriginalBand = 1
 {% set cassiniIssBandInfo = CassiniIssBandInfo(INSTRUMENT_ID.Value, filterName.0, filterName.1) %}
 Center       = {{ cassiniIssBandInfo.0 }}
@@ -180,4 +185,9 @@ Width        = {{ cassiniIssBandInfo.1 }}
   {% else %}
   NaifFrameCode = "-82361"
   {% endif %}
+{% endblock %}
+
+{% block translation %}
+CubeAtts        = "+SignedWord+-32752:32767"
+DataPrefixBytes = {{ IMAGE.LINE_PREFIX_BYTES.Value }}
 {% endblock %}

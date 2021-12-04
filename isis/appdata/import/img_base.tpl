@@ -82,15 +82,6 @@ Object = IsisCube
   End_Object
 
   Group = Instrument
-    {%- if exists("SPACECRAFT_NAME") -%}
-    {%- set SpacecraftName=SPACECRAFT_NAME.Value -%}
-    {%- else if exists("MISSION_NAME") -%}
-    {%- set SpacecraftName=MISSION_NAME.Value -%}
-    {%- endif -%}
-    SpacecraftName       = {{ SpacecraftName }}
-    StartTime            = {% set startTime=IMAGE_TIME.Value %}
-                           {{ RemoveStartTimeZ(startTime) }}
-    SpacecraftClockCount = {{ IMAGE_NUMBER.Value }}
     {% block instrument %}
     {% endblock %}
   End_Group
@@ -102,8 +93,8 @@ Object = IsisCube
     {%- else if exists("PRODUCT_ID") -%}
     {%- set ProductId=PRODUCT_ID.Value -%}
     {%- endif -%}
-    ProductId       = {{ ProductId }}
     ImageNumber     = {{ IMAGE_NUMBER.Value }}
+    ProductId       = {{ ProductId }}
     {% block archive %}
     {% endblock %}
   End_Group
@@ -137,5 +128,29 @@ Object = Translation
   {% if exists("RECORD_BYTES") %}
   DataFileRecordBytes         = {{ RECORD_BYTES.Value }}
   {% endif %}
+  {% if exists("QUBE.CORE_NULL.Value") %}
+  CoreNull             = {{ QUBE.CORE_NULL.Value }}
+  {% endif %}
+  {% if exists("QUBE.CORE_LOW_REPR_SATURATION.Value") %}
+  CoreLRS              = {{ QUBE.CORE_LOW_REPR_SATURATION.Value }}
+  {% endif %}
+  {% if exists("QUBE.CORE_LOW_INSTR_SATURATION.Value") %}
+  CoreLIS              = {{ QUBE.CORE_LOW_INSTR_SATURATION.Value }}
+  {% endif %}
+  {% if exists("QUBE.CORE_HIGH_REPR_SATURATION.Value") %}
+  CoreHRS              = {{ QUBE.CORE_HIGH_REPR_SATURATION.Value }}
+  {% endif %}
+  {% if exists("QUBE.CORE_HIGH_INSTR_SATURATION.Value") %}
+  CoreHIS              = {{ QUBE.CORE_HIGH_INSTR_SATURATION.Value }}
+  {% endif %}
+  {% if exists("QUBE.SUFFIX_BYTES.Value") %}
+  SuffixBytes          = {{ QUBE.SUFFIX_BYTES.Value }}
+  {% endif %}
+  {% if exists("QUBE.SUFFIX_ITEMS.Value") %}
+  SuffixItems          = ({{ QUBE.SUFFIX_ITEMS.Value.0 }}, {{ QUBE.SUFFIX_ITEMS.Value.1 }}, {{ QUBE.SUFFIX_ITEMS.Value.2 }})
+  {% endif %}
+  {% block translation %}
+  CubeAtts             = ""
+  {% endblock %}
 End_Object
 End
