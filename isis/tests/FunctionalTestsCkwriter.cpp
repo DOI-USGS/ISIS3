@@ -145,7 +145,7 @@ TEST_F(DefaultCube, FunctionalTestCkwriterFromlist) {
   }
 }
 
-TEST_F(ObservationPair, DISABLED_FunctionalTestCkwriterCantValidate) {
+TEST_F(ObservationPair, FunctionalTestCkwriterCantValidate) {
   Pvl appLog;
   QVector<QString> args = {"fromlist=" + cubeListFile,
                            "to=" + tempDir.path() + "/newKernel.bc"};
@@ -160,7 +160,7 @@ TEST_F(ObservationPair, DISABLED_FunctionalTestCkwriterCantValidate) {
   }
 }
 
-TEST_F(ObservationPair, DISABLED_FunctionalTestCkwriterWarnValidate) {
+TEST_F(ObservationPair, FunctionalTestCkwriterWarnValidate) {
   Pvl appLog;
   QVector<QString> args = {"fromlist=" + cubeListFile,
                            "to=" + tempDir.path() + "/newKernel.bc",

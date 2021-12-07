@@ -16,7 +16,7 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/lronac2pds.xml").expanded();
 
-TEST_F(ObservationPair, DISABLED_FunctionalTestLronac2pdsIof) {
+TEST_F(ObservationPair, FunctionalTestLronac2pdsIof) {
   QVector<QString> args = {"from=" + cubeLPath,
                            "to=" + tempDir.path() + "/LroNacL.img"};
   UserInterface options(APP_XML, args);
@@ -46,7 +46,7 @@ TEST_F(ObservationPair, DISABLED_FunctionalTestLronac2pdsIof) {
   EXPECT_EQ(QString(imageObject["MD5_CHECKSUM"]), "5f5d7bc236f794ca651cebdde529f8a4");
 }
 
-TEST_F(ObservationPair, DISABLED_FunctionalTestLronac2pdsRadiance) {
+TEST_F(ObservationPair, FunctionalTestLronac2pdsRadiance) {
   QVector<QString> args = {"from=" + cubeLPath,
                            "to=" + tempDir.path() + "/LroNacL.img"};
   UserInterface options(APP_XML, args);
