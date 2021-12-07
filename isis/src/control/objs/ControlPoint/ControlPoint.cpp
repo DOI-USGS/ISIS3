@@ -959,7 +959,7 @@ namespace Isis {
 
     // if point is Fixed or Constrained in any number of coordinates, initialize adjusted surface
     // point to a priori coordinates (set in e.g. qnet or cneteditor) and exit
-    if( IsFixed() || IsConstrained() || !id.contains("Lidar")) {
+    if( IsFixed() || IsConstrained() || id.contains("Lidar")) {
       adjustedSurfacePoint = aprioriSurfacePoint;
       return Success;
     }
