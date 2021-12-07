@@ -602,7 +602,6 @@ namespace Isis {
       void SetExplicitReference(ControlMeasure *measure);
       void ValidateMeasure(QString serialNumber) const;
       void AddMeasure(ControlMeasure *measure);
-      void PointModified();
 
 
       ControlNet *parentNetwork;
