@@ -959,7 +959,7 @@ namespace Isis {
 
     // if point is Fixed or Constrained in any number of coordinates, initialize adjusted surface
     // point to a priori coordinates (set in e.g. qnet or cneteditor) and exit
-    if( IsFixed() || IsConstrained()) {
+    if( IsFixed() || IsConstrained() || id.contains("Lidar")) {
       adjustedSurfacePoint = aprioriSurfacePoint;
       return Success;
     }
@@ -2053,8 +2053,7 @@ namespace Isis {
 
 
   /**
-   * What the heck is the point of this?
-   *
+   * Signal to indicate the point has been modified. Resets the last modified dateTime to null.
    */
   void ControlPoint::PointModified() {
     dateTime = "";
