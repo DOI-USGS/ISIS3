@@ -136,10 +136,7 @@ void IsisMain() {
   CubeAttributeInput att;
   p2.SetInputCube(ioFile, att, ReadWrite);
   //if ConversionType == 12Bit or 8LSB, only save off overclocked pixels
-  if(dataConversionType == "12Bit") {
-    p2.Progress()->SetText("Setting special pixels and saving as 16bit...");
-  }
-  else if(dataConversionType == "8LSB") {
+  if(dataConversionType == "12Bit" || dataConversionType == "8LSB") {
     p2.Progress()->SetText("Setting special pixels and saving as 16bit...");
   }
   //if ConversionType == Table, Use LUT to create stretch pairs for conversion

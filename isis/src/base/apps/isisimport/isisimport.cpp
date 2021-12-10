@@ -372,7 +372,11 @@ namespace Isis {
     }
     importer.SetSpecialValues(pdsNull, pdsLrs, pdsLis, pdsHrs, pdsHis);
 
-    CubeAttributeOutput att = CubeAttributeOutput(QString(translation["CubeAtts"]));
+    QString cubeAtts = "";
+    if (translation.hasKeyword("CubeAtts")) {
+      cubeAtts = QString(translation["CubeAtts"]);
+    }
+    CubeAttributeOutput att = CubeAttributeOutput(cubeAtts);
     Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
 
     if (isPDS4) {
