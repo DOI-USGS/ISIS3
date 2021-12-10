@@ -40,7 +40,7 @@ Object = IsisCube
   Object = Core
   Group = Dimensions
     {%- set samples = IMAGE.LINE_SAMPLES.Value -%}
-    Samples = {{ samples - endPix - suf - 1 }}
+    Samples = {{ int(samples) - endPix - suf - 1 }}
     Lines   = {{ IMAGE.LINES.Value }}
     Bands   = {% if exists("IMAGE.BANDS.Value") %}
               {{ IMAGE.BANDS.Value }}

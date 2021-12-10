@@ -317,12 +317,16 @@ namespace Isis {
     // Processing unique to mroctx
     if (translation.hasKeyword("DataPrefixBytes")) {
       importer.SetDataPrefixBytes(translation["DataPrefixBytes"]);
-      importer.SaveDataPrefix();
+      if (toInt(translation["DataPrefixBytes"]) > 0) {
+        importer.SaveDataPrefix();
+      }
     }
 
     if (translation.hasKeyword("DataSuffixBytes")) {
       importer.SetDataSuffixBytes(translation["DataSuffixBytes"]);
-      importer.SaveDataSuffix();
+      if (toInt(translation["DataSuffixBytes"]) > 0) {
+        importer.SaveDataSuffix();
+      }
     }
 
     if (translation.hasKeyword("CoreAxisNames")) {
