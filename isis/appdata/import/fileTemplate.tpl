@@ -24,6 +24,9 @@
 {%- else if SpacecraftName == "CASSINI-HUYGENS" -%}
 {%- set SpacecraftId="Cassini" -%}
 {%- set InstrumentId="VIMS" -%}
+{%- else if SpacecraftName == "MARS_GLOBAL_SURVEYOR" -%}
+{%- set SpacecraftId="MGS" -%}
+{%- set InstrumentId="MOC" -%}
 {%- endif -%}
 
 {%- if SpacecraftId -%}$ISISROOT/appdata/import/{{- SpacecraftId -}}{{- InstrumentId -}}.tpl{%- endif -%}
