@@ -109,6 +109,19 @@ namespace Isis {
 
 
   /**
+   * Sets the BundleMeasure's status to rejected or not rejected.
+   *
+   * @param reject True will set the BundleMeasure to rejected.
+   *
+   * @see ControlMeasure::SetRejected(bool reject)
+   */
+  void BundleMeasure::setImage() {
+    m_controlMeasure->Camera()->SetImage(m_controlMeasure->GetSample(),
+                                         m_controlMeasure->GetLine());
+  }
+
+
+  /**
    * Determines whether or not this BundleMeasure is rejected
    *
    * @return @b bool Returns a boolean indicating whether this BundleMeasure is rejected
@@ -194,6 +207,18 @@ namespace Isis {
 
 
   /**
+   * Accesses the current line measurement for this control measure
+   *
+   * @see ControlMeasure::GetLine()
+   *
+   * @return double Returns the line measurement for this control measure
+   */
+  double BundleMeasure::line() const {
+    return m_controlMeasure->GetLine();
+  }
+
+
+  /**
    * Accesses the sample residual for this control measure
    *
    * @see ControlMeasure::GetSampleResidual()
@@ -206,18 +231,6 @@ namespace Isis {
 
 
   /**
-   * Accesses the current line measurement for this control measure
-   *
-   * @see ControlMeasure::GetLine()
-   *
-   * @return @b double Returns the line measurement for this control measure
-   */
-  double BundleMeasure::line() const {
-    return m_controlMeasure->GetLine();
-  }
-
-
-  /**
    * Accesses the line residual for this control measure
    *
    * @see ControlMeasure::GetLineResidual()
@@ -226,6 +239,56 @@ namespace Isis {
    */
   double BundleMeasure::lineResidual() const {
     return m_controlMeasure->GetLineResidual();
+  }
+
+
+  /**
+   * Accesses the focal plane x-coordinate residual in millimeters
+   *
+   * @return double Returns the focal plane x-coordinate residual in millimeters
+   */
+  double BundleMeasure::xFocalPlaneResidual() const {
+    return m_xFocalPlaneResidual;
+  }
+
+
+  /**
+   * Accesses the focal plane y-coordinate residual in millimeters
+   *
+   * @return double Returns the focal plane y-coordinate residual in millimeters
+   */
+  double BundleMeasure::yFocalPlaneResidual() const {
+    return m_yFocalPlaneResidual;
+  }
+
+
+  /**
+   * Accesses the measure sigma
+   *
+   * @return double measure sigma
+   */
+  double BundleMeasure::sigma() const {
+    return m_sigma;
+  }
+
+
+  /**
+   * Accesses sqrt of measure weight for bundle
+   *
+   * @return double sqrt of measure weight
+   */
+  double BundleMeasure::weightSqrt() const {
+    return m_weightSqrt;
+  }
+
+
+  /**
+   * Accesses measure weight for bundle
+   *
+   * @return double measure weight
+   */
+  double BundleMeasure::weight() const {
+    return m_weightSqrt*m_weightSqrt;
   }
 
 
@@ -302,6 +365,40 @@ namespace Isis {
 
 
   /**
+   * Computes and sets measure focal plane residuals in millimeters.
+   *
+   */
+  void BundleMeasure::setFocalPlaneResidualsMillimeters() {
+    m_xFocalPlaneResidual = m_controlMeasure->GetFocalPlaneMeasuredX() -
+                            m_controlMeasure->GetFocalPlaneComputedX();
+
+    m_yFocalPlaneResidual = m_controlMeasure->GetFocalPlaneMeasuredY() -
+                            m_controlMeasure->GetFocalPlaneComputedY();
+  }
+
+
+  /**
+   * Sets sigma (i.e. standard deviation or uncertainty) of raw measure in mm and sqrt of weight for bundle
+   *
+   * @param double sigma
+   *
+   * TODO: what if camera has been subsampled, is pixel pitch computation still valid?
+   *
+   */
+  void BundleMeasure::setSigma(double sigmaMultiplier) {
+    // TODO fix for CSM
+    m_sigma = sigmaMultiplier * m_controlMeasure->Camera()->PixelPitch();
+
+    if (m_sigma <= 0.0) {
+      QString msg = "In BundleMeasure::setMeasureSigma(): m_measureSigma must be positive\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    m_weightSqrt = 1.0/m_sigma;
+  }
+
+
+  /**
    * Accesses the observation index for the parent observation
    *
    * @see BundleObservation::index()
@@ -319,7 +416,5 @@ namespace Isis {
     }
     return m_parentObservation->index();
   }
-
-
 
 }

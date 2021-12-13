@@ -96,11 +96,15 @@ namespace Isis {
         m_rmsXYResiduals(src.m_rmsXYResiduals),
         m_rejectionLimit(src.m_rejectionLimit),
         m_numberObservations(src.m_numberObservations),
+        m_numberImageObservations(src.m_numberImageObservations),
+        m_numberLidarImageObservations(src.m_numberLidarImageObservations),
         m_numberRejectedObservations(src.m_numberRejectedObservations),
+        m_numberLidarRangeConstraintEquations(src.m_numberLidarRangeConstraintEquations),
         m_numberUnknownParameters(src.m_numberUnknownParameters),
         m_numberImageParameters(src.m_numberImageParameters),
         m_numberConstrainedImageParameters(src.m_numberConstrainedImageParameters),
         m_numberConstrainedPointParameters(src.m_numberConstrainedPointParameters),
+        m_numberConstrainedLidarPointParameters(src.m_numberConstrainedLidarPointParameters),
         m_numberConstrainedTargetParameters(src.m_numberConstrainedTargetParameters),
         m_degreesOfFreedom(src.m_degreesOfFreedom),
         m_sigma0(src.m_sigma0),
@@ -108,12 +112,17 @@ namespace Isis {
         m_elapsedTimeErrorProp(src.m_elapsedTimeErrorProp),
         m_converged(src.m_converged),
         m_bundleControlPoints(src.m_bundleControlPoints),
+        m_bundleLidarPoints(src.m_bundleLidarPoints),
         m_outNet(src.m_outNet),
+        m_outLidarData(src.m_outLidarData),
         m_iterations(src.m_iterations),
         m_observations(src.m_observations),
         m_rmsImageSampleResiduals(src.m_rmsImageSampleResiduals),
         m_rmsImageLineResiduals(src.m_rmsImageLineResiduals),
         m_rmsImageResiduals(src.m_rmsImageResiduals),
+        m_rmsLidarImageSampleResiduals(src.m_rmsLidarImageSampleResiduals),
+        m_rmsLidarImageLineResiduals(src.m_rmsLidarImageLineResiduals),
+        m_rmsLidarImageResiduals(src.m_rmsLidarImageResiduals),
         m_rmsImageXSigmas(src.m_rmsImageXSigmas),
         m_rmsImageYSigmas(src.m_rmsImageYSigmas),
         m_rmsImageZSigmas(src.m_rmsImageZSigmas),
@@ -181,11 +190,15 @@ namespace Isis {
       m_rmsXYResiduals = src.m_rmsXYResiduals;
       m_rejectionLimit = src.m_rejectionLimit;
       m_numberObservations = src.m_numberObservations;
+      m_numberImageObservations = src.m_numberImageObservations;
+      m_numberLidarImageObservations = src.m_numberLidarImageObservations;
       m_numberRejectedObservations = src.m_numberRejectedObservations;
+      m_numberLidarRangeConstraintEquations = src.m_numberLidarRangeConstraintEquations;
       m_numberUnknownParameters = src.m_numberUnknownParameters;
       m_numberImageParameters = src.m_numberImageParameters;
       m_numberConstrainedImageParameters = src.m_numberConstrainedImageParameters;
       m_numberConstrainedPointParameters = src.m_numberConstrainedPointParameters;
+      m_numberConstrainedLidarPointParameters = src.m_numberConstrainedLidarPointParameters;
       m_numberConstrainedTargetParameters = src.m_numberConstrainedTargetParameters;
       m_degreesOfFreedom = src.m_degreesOfFreedom;
       m_sigma0 = src.m_sigma0;
@@ -193,12 +206,17 @@ namespace Isis {
       m_elapsedTimeErrorProp = src.m_elapsedTimeErrorProp;
       m_converged = src.m_converged;
       m_bundleControlPoints = src.m_bundleControlPoints;
+      m_bundleLidarPoints = src.m_bundleLidarPoints;
       m_outNet = src.m_outNet;
+      m_outLidarData = src.m_outLidarData;
       m_iterations = src.m_iterations;
       m_observations = src.m_observations;
       m_rmsImageSampleResiduals = src.m_rmsImageSampleResiduals;
       m_rmsImageLineResiduals = src.m_rmsImageLineResiduals;
       m_rmsImageResiduals = src.m_rmsImageResiduals;
+      m_rmsLidarImageSampleResiduals = src.m_rmsLidarImageSampleResiduals;
+      m_rmsLidarImageLineResiduals = src.m_rmsLidarImageLineResiduals;
+      m_rmsLidarImageResiduals = src.m_rmsLidarImageResiduals;
       m_rmsImageXSigmas = src.m_rmsImageXSigmas;
       m_rmsImageYSigmas = src.m_rmsImageYSigmas;
       m_rmsImageZSigmas = src.m_rmsImageZSigmas;
@@ -256,6 +274,9 @@ namespace Isis {
     m_rmsImageSampleResiduals.clear();
     m_rmsImageLineResiduals.clear();
     m_rmsImageResiduals.clear();
+    m_rmsLidarImageSampleResiduals.clear();
+    m_rmsLidarImageLineResiduals.clear();
+    m_rmsLidarImageResiduals.clear();
     m_rmsImageXSigmas.clear();
     m_rmsImageYSigmas.clear();
     m_rmsImageZSigmas.clear();
@@ -296,6 +317,8 @@ namespace Isis {
 
     // set by formNormalEquations_CHOLMOD, formNormalEquations_SPECIALK, or solve
     m_numberObservations = 0;
+    m_numberImageObservations = 0;
+    m_numberLidarImageObservations = 0;
     m_numberImageParameters = 0;
 
 // ??? unused variable ???    m_numberHeldPoints = 0;
@@ -303,8 +326,10 @@ namespace Isis {
     // set by formNormalEquations_CHOLMOD, formNormalEquations_SPECIALK, or
     // setParameterWeights (i.e. solve)
     m_numberConstrainedPointParameters = 0;
+    m_numberConstrainedLidarPointParameters = 0;
     m_numberConstrainedImageParameters = 0;
     m_numberConstrainedTargetParameters = 0;
+    m_numberLidarRangeConstraintEquations = 0;
 
     // set by initialize, formNormalEquations_CHOLMOD, formNormalEquations_SPECIALK, or solve
     m_numberUnknownParameters = 0;
@@ -325,6 +350,7 @@ namespace Isis {
 
     m_observations.clear();
     m_outNet.clear();
+    m_outLidarData.clear();
 
   }
 
@@ -369,6 +395,22 @@ namespace Isis {
     m_rmsImageLineResiduals = rmsImageLineResiduals;
     m_rmsImageSampleResiduals = rmsImageSampleResiduals;
     m_rmsImageResiduals = rmsImageResiduals;
+  }
+
+
+  /**
+   * Sets the root mean square lidar image residual Statistics lists.
+   *
+   * @param rmsLidarImageLineResiduals The new image line residuals list.
+   * @param rmsLidarImageSampleResiduals The new image sample residuals list.
+   * @param rmsLidarImageResiduals The new image residuals list.
+   */
+  void BundleResults::setRmsLidarImageResidualLists(QList<Statistics> rmsLidarImageLineResiduals,
+                                               QList<Statistics> rmsLidarImageSampleResiduals,
+                                               QList<Statistics> rmsLidarImageResiduals) {
+    m_rmsLidarImageLineResiduals = rmsLidarImageLineResiduals;
+    m_rmsLidarImageSampleResiduals = rmsLidarImageSampleResiduals;
+    m_rmsLidarImageResiduals = rmsLidarImageResiduals;
   }
 
 
@@ -659,12 +701,55 @@ namespace Isis {
 
 
   /**
+   * Sets the number of photogrammetric image observations. Note in this terminology an image
+   * measurement contributes two observations to the adjustment (i.e. sample/line).
+   *
+   * So, the number of observations divided by 2 should equal the number of image measures.
+   *
+   * @param numberObservations The number of photogrammetric image observations.
+   */
+  void BundleResults::setNumberImageObservations(int numberObservations) {
+    m_numberImageObservations = numberObservations;
+  }
+
+
+  /**
+   * Sets the number of lidar observations.
+   *
+   * @param numberLidarObservations The number of lidar observations.
+   */
+  void BundleResults::setNumberLidarImageObservations(int numberLidarObservations) {
+    m_numberLidarImageObservations = numberLidarObservations;
+  }
+
+
+  /**
    * Sets the number of image parameters.
    *
    * @param numberParameters The number of image parameters.
    */
   void BundleResults::setNumberImageParameters(int numberParameters) {
     m_numberImageParameters = numberParameters;
+  }
+
+
+  /**
+   * Set number of contrained point parameters.
+   *
+   * @param numberParameters Number of contrained point parameters.
+   */
+  void BundleResults::setNumberConstrainedPointParameters(int numberParameters) {
+    m_numberConstrainedPointParameters = numberParameters;
+  }
+
+
+  /**
+   * Set number of contrained point parameters.
+   *
+   * @param numberParameters Number of contrained point parameters.
+   */
+  void BundleResults::setNumberConstrainedLidarPointParameters(int numberParameters) {
+    m_numberConstrainedLidarPointParameters = numberParameters;
   }
 
 
@@ -733,19 +818,38 @@ namespace Isis {
 
 
   /**
+   * Sets the total number of lidar range constraints.
+   *
+   * @param numberLidarRangeConstraints The total number of lidar range constraints.
+   */
+  void BundleResults::setNumberLidarRangeConstraints(int numberLidarRangeConstraints) {
+    m_numberLidarRangeConstraintEquations = numberLidarRangeConstraints;
+  }
+
+
+  /**
    * Computes the degrees of freedom of the bundle adjustment and stores it internally.
    */
   void BundleResults::computeDegreesOfFreedom() {
-    m_degreesOfFreedom = m_numberObservations
+    m_degreesOfFreedom = m_numberObservations //TODO remove m_numberObservations
+                         + m_numberImageObservations
+                         + m_numberLidarImageObservations
                          + m_numberConstrainedPointParameters
+                         + m_numberConstrainedLidarPointParameters
                          + m_numberConstrainedImageParameters
                          + m_numberConstrainedTargetParameters
+                         + m_numberLidarRangeConstraintEquations
                          - m_numberUnknownParameters;
   }
 
 
   /**
    * Computes the sigma0 and stores it internally.
+   *
+   * Sigma0 is the standard deviation of an observation of unit weight. Sigma0^2 is the variance of
+   * an observation of unit weight (also reference variance or variance factor).
+   *
+   * Sigma0^2 = vtpv/degrees of freedom.
    *
    * @param dvtpv The weighted sum of the squares of the residuals.  Computed by
    *              V transpose * P * V, where
@@ -835,12 +939,32 @@ namespace Isis {
 
 
   /**
+   * Sets the bundle lidar point vector.
+   *
+   * @param lidarPoints Vector of BundleLidarControlPointQsps.
+   */
+  void BundleResults::setBundleLidarPoints(QVector<BundleLidarControlPointQsp> lidarPoints) {
+    m_bundleLidarPoints = lidarPoints;
+  }
+
+
+  /**
    * Sets the output ControlNet.
    *
    * @param outNet A QSharedPointer to the output ControlNet.
    */
   void BundleResults::setOutputControlNet(ControlNetQsp outNet) {
     m_outNet = outNet;
+  }
+
+
+  /**
+   * Sets the output LidarData object.
+   *
+   * @param outLidarData A QSharedPointer to the output LidarData object.
+   */
+  void BundleResults::setOutputLidarData(LidarDataQsp outLidarData) {
+    m_outLidarData = outLidarData;
   }
 
 
@@ -894,6 +1018,36 @@ namespace Isis {
    */
   QList<Statistics> BundleResults::rmsImageResiduals() const {
     return m_rmsImageResiduals;
+  }
+
+
+  /**
+   * Returns the list of RMS image lidar sample residuals statistics.
+   *
+   * @return QList<Statistics> The RMS image lidar sample residual statistics.
+   */
+  QList<Statistics> BundleResults::rmsLidarImageSampleResiduals() const {
+    return m_rmsLidarImageSampleResiduals;
+  }
+
+
+  /**
+   * Returns the list of RMS image lidar line residuals statistics.
+   *
+   * @return QList<Statistics> The RMS image lidar line residual statistics.
+   */
+  QList<Statistics> BundleResults::rmsLidarImageLineResiduals() const {
+    return m_rmsLidarImageLineResiduals;
+  }
+
+
+  /**
+   * Returns the list of RMS image lidar residuals statistics.
+   *
+   * @return QList<Statistics> The RMS image lidar residual statistics.
+   */
+  QList<Statistics> BundleResults::rmsLidarImageResiduals() const {
+    return m_rmsLidarImageResiduals;
   }
 
 
@@ -1164,6 +1318,27 @@ namespace Isis {
    */
   int BundleResults::numberObservations() const {
     return m_numberObservations;
+    // return m_numberImageObservations + m_numberLidarImageObservations; // TODO uncomment after changing numberObservations
+  }
+
+
+  /**
+   * Returns the number of observations.
+   *
+   * @return int The number of observations.
+   */
+  int BundleResults::numberImageObservations() const {
+    return m_numberImageObservations;
+  }
+
+
+  /**
+   * Returns the number of lidar observations.
+   *
+   * @return int The number of lidar observations.
+   */
+  int BundleResults::numberLidarImageObservations() const {
+    return m_numberLidarImageObservations;
   }
 
 
@@ -1204,6 +1379,16 @@ namespace Isis {
    */
   int BundleResults::numberConstrainedTargetParameters() const {
     return m_numberConstrainedTargetParameters;
+  }
+
+
+  /**
+   * Return the number of lidar range constraint equations.
+   *
+   * @return int The number of lidar range constraint equations.
+   */
+  int BundleResults::numberLidarRangeConstraintEquations() const {
+    return m_numberLidarRangeConstraintEquations;
   }
 
 
@@ -1278,6 +1463,16 @@ namespace Isis {
 
 
   /**
+   * Returns a reference to the BundleLidarControlPoint vector.
+   *
+   * @return QVector<BundleLidarControlPointQsp>& The BundleLidarControlPoint vector.
+   */
+  QVector<BundleLidarControlPointQsp> &BundleResults::bundleLidarControlPoints() {
+    return m_bundleLidarPoints;
+  }
+
+
+  /**
    * Returns a shared pointer to the output control network.
    *
    * @return @b ControlNetQsp A shared pointer to the output control network.
@@ -1291,6 +1486,18 @@ namespace Isis {
                        _FILEINFO_);
     }
     return m_outNet;
+  }
+
+
+  /**
+   * Returns a shared pointer to the output LidarData object.
+   *
+   * @return LidarDataQsp A shared pointer to the output LidarData object.
+   *
+   * @throws IException::Programmer "Output LidarData object has not been set."
+   */
+  LidarDataQsp BundleResults::outputLidarData() const {
+    return m_outLidarData;
   }
 
 
