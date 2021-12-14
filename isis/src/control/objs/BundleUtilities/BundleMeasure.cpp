@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 #include "BundleMeasure.h"
 #include "BundleObservation.h"
 #include "BundleObservationSolveSettings.h"
+#include "Camera.h"
 #include "IException.h"
 
 #include "ControlMeasure.h"
@@ -29,6 +30,8 @@ namespace Isis {
                                BundleControlPoint *bundleControlPoint) {
     m_controlMeasure = controlMeasure;
     m_parentControlPoint = bundleControlPoint;
+    m_normalsPositionBlockIndex = -1;
+    m_normalsPointingBlockIndex = -1;
   }
 
 
@@ -51,6 +54,8 @@ namespace Isis {
     m_parentControlPoint = src.m_parentControlPoint;
     m_parentBundleImage = src.m_parentBundleImage;
     m_parentObservation = src.m_parentObservation;
+    m_normalsPositionBlockIndex = src.m_normalsPositionBlockIndex;
+    m_normalsPointingBlockIndex = src.m_normalsPointingBlockIndex;
   }
 
 
@@ -70,6 +75,8 @@ namespace Isis {
       m_parentControlPoint = src.m_parentControlPoint;
       m_parentBundleImage = src.m_parentBundleImage;
       m_parentObservation = src.m_parentObservation;
+      m_normalsPositionBlockIndex = src.m_normalsPositionBlockIndex;
+      m_normalsPointingBlockIndex = src.m_normalsPointingBlockIndex;
     }
 
     return *this;
@@ -118,6 +125,50 @@ namespace Isis {
   void BundleMeasure::setImage() {
     m_controlMeasure->Camera()->SetImage(m_controlMeasure->GetSample(),
                                          m_controlMeasure->GetLine());
+  }
+
+
+  /**
+     * Sets block index into normal equations for position piecewise polynomial segment.
+     *
+     * @param index normal equations matrix block index.
+     *
+     */
+  void BundleMeasure::setNormalsPositionBlockIndex(int index) {
+    m_normalsPositionBlockIndex = index;
+  }
+
+
+  /**
+     * Sets block index into normal equations for pointing piecewise polynomial segment.
+   *
+   * @param index normal equations matrix block index.
+   *
+   */
+  void BundleMeasure::setNormalsPointingBlockIndex(int index) {
+    m_normalsPointingBlockIndex = index;
+  }
+
+
+  /**
+   * Accesses block index into normal equations matrix of position piecewise polynomial segment.
+   *
+   * @return int block index into normal equations matrix of position piecewise polynomial.
+   *                segment
+   */
+  int BundleMeasure::positionNormalsBlockIndex() const {
+    return m_normalsPositionBlockIndex;
+  }
+
+
+  /**
+   * Accesses block index into normal equations matrix of pointing piecewise polynomial segment
+   *
+   * @return int block index into normal equations matrix of pointing piecewise polynomial
+   *                segment
+   */
+  int BundleMeasure::pointingNormalsBlockIndex() const {
+    return m_normalsPointingBlockIndex;
   }
 
 

@@ -64,7 +64,7 @@ namespace Isis {
                                                          LinearAlgebra::Vector &imageSolution,
                                                          const BundleTargetBodyQsp target) {
     for (int i = 0; i < size(); i++) {
-      at(i)->applyParameterCorrections(normalsMatrix, imageSolution, target);
+      at(i)->applyParameterCorrections(imageSolution, normalsMatrix, target);
     }
   }
 

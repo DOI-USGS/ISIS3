@@ -1543,6 +1543,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Return the scaled time.
+   *
+   * @return Scaled time.
+   */
+  double SpicePosition::scaledTime() const {
+    return (p_et - p_baseTime) / p_timeScale;
+  }
+
 
   /** Cache J2000 position over existing cached time range using
    *  table

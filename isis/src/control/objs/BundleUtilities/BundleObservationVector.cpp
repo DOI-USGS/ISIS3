@@ -252,7 +252,6 @@ namespace Isis {
     std::reverse(std::begin(list), std::end(list));
     return list;
   }
-}
 
 
   /**

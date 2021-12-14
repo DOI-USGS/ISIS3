@@ -3,13 +3,14 @@
 // Qt Library
 #include <QDebug>
 
+// Boost uBLAS
+#include <boost/numeric/ublas/vector_proxy.hpp>
+
 // Isis Library
 #include "Camera.h"
 #include "CameraGroundMap.h"
+#include "IsisBundleObservation.h"
 #include "SpicePosition.h"
-
-// Boost Library
-#include <boost/numeric/ublas/vector_proxy.hpp>
 
 using namespace boost::numeric::ublas;
 
@@ -47,6 +48,15 @@ namespace Isis {
     m_rangeObservedWeightSqrt = 1.0/m_rangeObservedSigma;
     m_adjustedSigma = 0.0;
     m_dX = m_dY = m_dZ = 0.0;
+
+    // Check that the simultaneous image has an ISIS camera
+    if (m_simultaneousMeasure->camera()->GetCameraType() == Camera::Csm) {
+      QString msg = "Cannot apply a Lidar range constraint to a CSM camera model"
+                    "(Point Id: "
+                    + measure->parentControlPoint()->id() + ", Measure Serial:"
+                    + measure->cubeSerialNumber() + ").\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
 
     // initialize computed range
     computeRange();
@@ -194,7 +204,15 @@ namespace Isis {
     int positionBlockIndex = m_simultaneousMeasure->positionNormalsBlockIndex();
 
     // resize coeff_range_image matrix if necessary
-    int numPositionParameters = m_bundleObservation->numberPositionParametersPerSegment();
+    IsisBundleObservationQsp isisObservation = m_bundleObservation.dynamicCast<IsisBundleObservation>();
+    if (!isisObservation) {
+      QString msg = "Failed to cast BundleObservation to IsisBundleObservation when applying "
+                    "lidar constraint (Point Id: "
+                    + m_simultaneousMeasure->parentControlPoint()->id() + ", Measure Serial:"
+                    + m_simultaneousMeasure->cubeSerialNumber() + ").\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    int numPositionParameters = isisObservation->numberPositionParameters();
     if ((int) coeff_range_image.size2() != numPositionParameters) {
       coeff_range_image.resize(1, numPositionParameters, false);
     }

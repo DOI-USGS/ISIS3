@@ -356,6 +356,8 @@ namespace Isis {
       QVector<BundleLidarControlPointQsp> m_bundleLidarPoints;
       ControlNetQsp m_outNet;                               /**< The output control net from
                                                                  BundleAdjust.*/
+      LidarDataQsp m_outLidarData;                          /**< Output lidar data from
+                                                                 BundleAdjust.*/
       int m_iterations;                                     /**< The number of iterations taken
                                                                  by BundleAdjust.*/
       BundleObservationVector m_observations;               /**< The vector of BundleObservations
