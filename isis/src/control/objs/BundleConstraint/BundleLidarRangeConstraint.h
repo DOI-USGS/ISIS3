@@ -35,9 +35,10 @@ namespace Isis {
    *                                       of image parameters changes. This is consistent with
    *                                       BundleAdjust::computePartials. Added IExceptions to
    *                                       verify m_rangeObserved and m_rangeComputed are positive.
+   *   @history 2021-12-20 Jesse Mapel - Removed parent BundleConstraint class.
    *
    */
-  class BundleLidarRangeConstraint : public BundleConstraint {
+  class BundleLidarRangeConstraint {
     public:
       // constructor
       BundleLidarRangeConstraint(LidarControlPointQsp lidarControlPoint, BundleMeasureQsp measure);
