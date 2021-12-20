@@ -206,7 +206,7 @@ namespace Isis {
         return p_et;
       };
 
-       double scaledTime() const;
+      double scaledTime() const;
 
       const std::vector<double> &GetCenterCoordinate();
 
