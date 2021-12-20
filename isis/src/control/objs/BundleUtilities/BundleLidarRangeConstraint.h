@@ -10,7 +10,6 @@ find files of those names at the top level of this repository. **/
 #include <QSharedPointer>
 
 // Isis Library
-#include "BundleConstraint.h"
 #include "BundleLidarControlPoint.h"
 #include "BundleMeasure.h"
 #include "BundleObservation.h"
