@@ -237,6 +237,18 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
   kinfo_c(tmp.toLatin1().data(), 32, 2048, fileType, source, &handle, &found);
   QString currFile = fileType;
 
+  if (found == SPICETRUE) {
+    SpiceChar commnt[1001];
+    SpiceBoolean done(SPICEFALSE);
+    SpiceInt n;
+    // extract all comments of kernel
+    while (!done) {
+      dafec_c(handle, 25, sizeof(commnt), &n, commnt, &done);
+
+      //TODO: Grab Instrument and Offset information, if exists
+    }
+  }
+
   //create a spice cell capable of containing all the objects in the kernel.
   SPICEINT_CELL(currCell, 1000);
   //this resizing is done because otherwise a spice cell will append new data
