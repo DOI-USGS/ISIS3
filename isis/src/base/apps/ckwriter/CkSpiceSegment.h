@@ -86,8 +86,11 @@ class PvlObject;
  *
  * @history 2019-12-05 Adam Paquette - Changed how kernels are loaded so CkSpiceSegment
  *                          no longer needs to use the Spice class.
- *                          
- * @history 2021-03-23 Kaitlyn Lee - Added time bias to ET times in getTimes(). Fixes #4129
+ *
+ * @history 2021-12-22 Amy Stamile - Added timing offset information to kernel comments
+ *                          by calculating difference between label StartTime and camera model
+ *                          StartTime. This is to allow for spiceinit to handle offsets
+ *                          when finding associated smithed kernels. References #3363.
  */
 class CkSpiceSegment {
   public:
@@ -156,6 +159,7 @@ class CkSpiceSegment {
     QString _utcEndTime;   //  requires leap seconds kernel
     QString _instId;       //  Instrument ID
     QString _target;       //  Target name
+    double  _timeOffset;
     int         _instCode;     //  NAIF instrument code of the SPICE segment
     QString _instFrame;    //  NAIF instrument frame
     QString _refFrame;     //  NAIF reference frame
@@ -174,7 +178,7 @@ class CkSpiceSegment {
     SMatrix load(Table &cache);
     SMatrix getQuaternions(const SMatrix &spice) const;
     SMatrix getAngularVelocities(const SMatrix &spice) const;
-    SVector getTimes(const SMatrix &spice, const double timeBias) const;
+    SVector getTimes(const SMatrix &spice) const;
 
     bool getTimeDependentFrameIds(Table &table, int &toId, int &fromId) const;
     bool getFrameChains(Table &table, const int &leftBase,

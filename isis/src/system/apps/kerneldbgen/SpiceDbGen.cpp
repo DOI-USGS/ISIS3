@@ -232,10 +232,34 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
   furnsh_c(tmp.toLatin1().data());
   SpiceChar fileType[32], source[2048];
   SpiceInt handle;
+  QString instrument = "";
+  QString timeoffset = "";
 
   SpiceBoolean found;
   kinfo_c(tmp.toLatin1().data(), 32, 2048, fileType, source, &handle, &found);
   QString currFile = fileType;
+
+  if (found == SPICETRUE) {
+    SpiceChar commnt[1001];
+    SpiceBoolean done(SPICEFALSE);
+    SpiceInt n;
+
+    // extract all comments of kernel
+    while (!done) {
+      dafec_c(handle, 1, sizeof(commnt), &n, commnt, &done);
+      QString cmmt(commnt);
+
+      // Grab Instrument and Offset information, if exists
+      int instPos = 0;
+      if ( (instPos = cmmt.indexOf("Instrument:", instPos, Qt::CaseInsensitive)) != -1 ) {
+        instrument = cmmt.split(": ")[1];
+      }
+      int timePos = 0;
+      if ( (timePos = cmmt.indexOf("TimeOffset:", timePos, Qt::CaseInsensitive)) != -1 ) {
+        timeoffset = cmmt.split(": ")[1];
+      }
+    }
+  }
 
   //create a spice cell capable of containing all the objects in the kernel.
   SPICEINT_CELL(currCell, 1000);
@@ -298,6 +322,12 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
         result = FormatIntervals(cover, currFile, startOffset, endOffset);
       }
     }
+  }
+
+  // add instrument and timing offset only if timing offset is found in comments
+  if (!timeoffset.isEmpty()) {
+    result += PvlKeyword("TimeOffset", timeoffset);
+    result += PvlKeyword("Instrument", instrument);
   }
 
   QString outFile = fileIn.originalPath();

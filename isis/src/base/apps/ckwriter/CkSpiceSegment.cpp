@@ -42,6 +42,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
+#include "iTime.h"
 #include "NaifStatus.h"
 #include "CkSpiceSegment.h"
 #include "Table.h"
@@ -210,13 +211,16 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
     if (!value.isEmpty()) { _target = value; }
      _camVersion = _kernels.CameraVersion();
 
+    QString labStartTime = getKeyValue(*label, "StartTime");
+    iTime etLabStart(labStartTime);
+
     //  Get the SPICE data
     Table ckCache = camera->instrumentRotation()->LineCache(tblname);
     SMatrix spice = load(ckCache);
 
     _quats = getQuaternions(spice);
     _avvs = getAngularVelocities(spice);
-    _times = getTimes(spice, camera->instrumentRotation()->TimeBias());
+    _times = getTimes(spice);
 
     _startTime = _times[0];
     _endTime = _times[size(_times)-1];
@@ -260,6 +264,11 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
 
     _utcStartTime = toUTC(startTime());
     _utcEndTime   = toUTC(endTime());
+
+    _timeOffset =  fabs(etLabStart.Et() - startTime());
+    // account for padding
+    if (_timeOffset <= 0.003) { _timeOffset = 0; }
+
     _kernels.UnLoad("CK,FK,SCLK,LSK,IAK");
 
   } catch ( IException &ie  ) {
@@ -303,13 +312,13 @@ CkSpiceSegment::SMatrix CkSpiceSegment::getAngularVelocities(const SMatrix &spic
 }
 
 
-CkSpiceSegment::SVector CkSpiceSegment::getTimes(const SMatrix &spice, const double timeBias) const {
+CkSpiceSegment::SVector CkSpiceSegment::getTimes(const SMatrix &spice) const {
   int nrecs = size(spice);
   SVector etdp(nrecs);
   int tcol = spice.dim2() - 1;
 
   for ( int i = 0 ; i < nrecs ; i++ ) {
-    etdp[i] = spice[i][tcol] + timeBias;
+    etdp[i] = spice[i][tcol];
   }
   return (etdp);
 }
@@ -688,6 +697,11 @@ QString CkSpiceSegment::getComment() const {
 "  RefFrame:   " << _refFrame << endl <<
 "  Records:    " << size() << endl;
 
+  if (_timeOffset != 0) {
+    comment <<
+"  TimeOffset: " << _timeOffset << endl;
+  }
+
   QString hasAV = (size(_avvs) > 0) ? "YES" : "NO";
   comment <<
 "  HasAV:      " << hasAV << endl;
@@ -715,6 +729,7 @@ void CkSpiceSegment::init() {
   _instId = _target = "UNKNOWN";
   _instCode = 0;
   _instFrame = _refFrame = "";
+  _timeOffset = 0;
   _quats = _avvs = SMatrix(0,0);
   _times = SVector(0);
   _tickRate = 0.0;
