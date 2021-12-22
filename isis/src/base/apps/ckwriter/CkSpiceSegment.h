@@ -86,6 +86,11 @@ class PvlObject;
  *
  * @history 2019-12-05 Adam Paquette - Changed how kernels are loaded so CkSpiceSegment
  *                          no longer needs to use the Spice class.
+ *
+ * @history 2021-12-22 Amy Stamile - Added timing offset information to kernel comments
+ *                          by calculating difference between label StartTime and camera model
+ *                          StartTime. This is to allow for spiceinit to handle offsets
+ *                          when finding associated smithed kernels. References #3363.
  */
 class CkSpiceSegment {
   public:
