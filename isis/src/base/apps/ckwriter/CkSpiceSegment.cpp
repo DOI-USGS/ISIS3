@@ -264,7 +264,10 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
 
     _utcStartTime = toUTC(startTime());
     _utcEndTime   = toUTC(endTime());
-    _timeOffset =  etLabStart.Et() - startTime();
+
+    _timeOffset =  fabs(etLabStart.Et() - startTime());
+    // account for padding
+    if (_timeOffset <= 0.003) { _timeOffset = 0; }
 
     _kernels.UnLoad("CK,FK,SCLK,LSK,IAK");
 
