@@ -1,7 +1,7 @@
 # RFC
-The ISIS project uses a Request for Comment (RFC) model whereby major potential changes to the code base, data area, or binary delivery process are proposed, iterated on by any interested parties, and potentially adopted. Right now, RFCs are being housed n this repository's [discussion board](https://github.com/USGS-Astrogeology/ISIS3/discussions?discussions_q=label%3ARFC).
+The ISIS project uses a Request for Comment (RFC) model whereby major potential changes to the code base, data area, or binary delivery process are proposed, iterated on by any interested parties, and potentially adopted. Right now, RFCs are being housed in this repository's [discussion board](https://github.com/USGS-Astrogeology/ISIS3/discussions?discussions_q=label%3ARFC).
 
-We encourage all contributors and users to review open RFCs and comment as these proposed changes will impact use of the software. 
+We encourage all contributors and users to review open RFCs and comment, as these proposed changes will impact use of the software. 
 
 # RFC policies
 
@@ -9,8 +9,8 @@ RFC adoption is driven by general consensus in the RFC comments.
 
 # RFC lifecycle
 
-1. RFC is written and posted on the discussion board
-2. RFC is advertised and discussion proceeds until consensus is reached on what changes if any are needed
+1. RFC is written and posted on the discussion board.
+2. RFC is advertised and discussion proceeds until consensus is reached.
 3. RFC is closed, subsiquent issues/pull requests reference RFC. 
 
 ```markdown
@@ -20,13 +20,13 @@ RFC adoption is driven by general consensus in the RFC comments.
 - Author: (your name)
 
 # Summary
-Include a brief summary of the RFC so readers can determine if the RFC is of interest.
+<!-- Include a brief summary of the RFC so readers can determine if the RFC is of interest. -->
 
 # Motivation
-Why are we doing this? What use cases does it support? What is the expected outcome?
+<!-- Why are we doing this? What use cases does it support? What is the expected outcome? -->
 
 # Proposed Solution / Explanation
-Explain the proposal as if it were already included in the code base or in place. This may mean:
+<!-- Explain the proposal as if it were already included in the code base or in place. This may mean: -->
 
 - Introducing new named concepts.
 - Explaining changes in terms of example usage.
@@ -41,7 +41,7 @@ Explain the proposal as if it were already included in the code base or in place
   - this section should link back to the examples provided above
 
 # Drawbacks
-Why should we *not* do this?
+<!-- Why should we *not* do this? -->
 
 # Alternatives
   - Why is this design or solution the best of all possible solutions?
