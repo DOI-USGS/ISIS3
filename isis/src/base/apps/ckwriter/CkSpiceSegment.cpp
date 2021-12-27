@@ -212,7 +212,9 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
      _camVersion = _kernels.CameraVersion();
 
     QString labStartTime = getKeyValue(*label, "StartTime");
+    QString labEndTime = getKeyValue(*label, "StopTime");
     iTime etLabStart(labStartTime);
+    iTime etLabEnd(labEndTime);
 
     //  Get the SPICE data
     Table ckCache = camera->instrumentRotation()->LineCache(tblname);
@@ -265,9 +267,26 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
     _utcStartTime = toUTC(startTime());
     _utcEndTime   = toUTC(endTime());
 
-    _timeOffset =  fabs(etLabStart.Et() - startTime());
+    _startOffset =  etLabStart.Et() - startTime();
+    _endOffset =  etLabEnd.Et() - endTime();
+
+    // round offsets by 3 decimal places
+    _startOffset = qRound(_startOffset * 1000.0) / 1000.0;
+    _endOffset = qRound(_endOffset * 1000.0) / 1000.0;
+
     // account for padding
-    if (_timeOffset <= 0.003) { _timeOffset = 0; }
+    if (_startOffset >= 0.003) {
+      _startOffset = 0.0;
+    }
+    else {
+      _startOffset = fabs(_startOffset);
+    }
+    if (_endOffset <= 0.003) {
+      _endOffset = 0.0;
+    }
+    else {
+      _endOffset = fabs(_endOffset);
+    }
 
     _kernels.UnLoad("CK,FK,SCLK,LSK,IAK");
 
@@ -697,9 +716,14 @@ QString CkSpiceSegment::getComment() const {
 "  RefFrame:   " << _refFrame << endl <<
 "  Records:    " << size() << endl;
 
-  if (_timeOffset != 0) {
+  if (_startOffset != 0) {
     comment <<
-"  TimeOffset: " << _timeOffset << endl;
+"  StartOffset: " << _startOffset << endl;
+  }
+
+  if (_endOffset != 0) {
+    comment <<
+"  EndOffset: " << _endOffset << endl;
   }
 
   QString hasAV = (size(_avvs) > 0) ? "YES" : "NO";
@@ -729,7 +753,8 @@ void CkSpiceSegment::init() {
   _instId = _target = "UNKNOWN";
   _instCode = 0;
   _instFrame = _refFrame = "";
-  _timeOffset = 0;
+  _startOffset = 0.0;
+  _endOffset = 0.0;
   _quats = _avvs = SMatrix(0,0);
   _times = SVector(0);
   _tickRate = 0.0;

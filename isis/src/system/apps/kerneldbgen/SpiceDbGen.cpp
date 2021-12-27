@@ -233,7 +233,8 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
   SpiceChar fileType[32], source[2048];
   SpiceInt handle;
   QString instrument = "";
-  QString timeoffset = "";
+  QString startoffset = "";
+  QString endoffset = "";
 
   SpiceBoolean found;
   kinfo_c(tmp.toLatin1().data(), 32, 2048, fileType, source, &handle, &found);
@@ -252,11 +253,15 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
       // Grab Instrument and Offset information, if exists
       int instPos = 0;
       if ( (instPos = cmmt.indexOf("Instrument:", instPos, Qt::CaseInsensitive)) != -1 ) {
-        instrument = cmmt.split(": ")[1];
+        instrument = cmmt.remove(" ").split(":")[1];
       }
-      int timePos = 0;
-      if ( (timePos = cmmt.indexOf("TimeOffset:", timePos, Qt::CaseInsensitive)) != -1 ) {
-        timeoffset = cmmt.split(": ")[1];
+      int startPos = 0;
+      if ( (startPos = cmmt.indexOf("StartOffset:", startPos, Qt::CaseInsensitive)) != -1 ) {
+        startoffset = cmmt.remove(" ").split(":")[1];
+      }
+      int endPos = 0;
+      if ( (endPos = cmmt.indexOf("EndOffset:", endPos, Qt::CaseInsensitive)) != -1 ) {
+        endoffset = cmmt.remove(" ").split(":")[1];
       }
     }
   }
@@ -324,10 +329,15 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
     }
   }
 
-  // add instrument and timing offset only if timing offset is found in comments
-  if (!timeoffset.isEmpty()) {
-    result += PvlKeyword("TimeOffset", timeoffset);
+  // add instrument and timing offsets only if timing offsets found in comments
+  if (!startoffset.isEmpty() || !endoffset.isEmpty()) {
     result += PvlKeyword("Instrument", instrument);
+    if(!startoffset.isEmpty()){
+      result += PvlKeyword("StartOffset", startoffset);
+    }
+    if(!endoffset.isEmpty()){
+      result += PvlKeyword("EndOffset", endoffset);
+    }
   }
 
   QString outFile = fileIn.originalPath();
