@@ -151,18 +151,19 @@ class CkSpiceSegment {
     // Mutable for full loading/unloading of kernels w/o restrictions
     mutable Kernels  _kernels;
     int         _camVersion;
-    QString _name;
-    QString _fname;
+    QString     _name;
+    QString     _fname;
     double      _startTime;
     double      _endTime;
-    QString _utcStartTime; //  Need to store these as conversion from ET
-    QString _utcEndTime;   //  requires leap seconds kernel
-    QString _instId;       //  Instrument ID
-    QString _target;       //  Target name
-    double  _timeOffset;
+    QString     _utcStartTime; //  Need to store these as conversion from ET
+    QString     _utcEndTime;   //  requires leap seconds kernel
+    QString     _instId;       //  Instrument ID
+    QString     _target;       //  Target name
+    double      _startOffset;  // time offset between camera model and label start time
+    double      _endOffset;    // time offset between camera model and label end time
     int         _instCode;     //  NAIF instrument code of the SPICE segment
-    QString _instFrame;    //  NAIF instrument frame
-    QString _refFrame;     //  NAIF reference frame
+    QString     _instFrame;    //  NAIF instrument frame
+    QString     _refFrame;     //  NAIF reference frame
     SMatrix     _quats;
     SMatrix     _avvs;
     SVector     _times;
