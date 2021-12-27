@@ -692,6 +692,53 @@ namespace Isis {
     delete isdPathR;
   }
 
+  void LidarObservationPair::SetUp() {
+      TempTestingFiles::SetUp();
+
+      FileName labelPath1 = FileName("data/lidarObservationPair/lidarObservationImage1.pvl");
+      FileName labelPath2 = FileName("data/lidarObservationPair/lidarObservationImage2.pvl");
+
+      isdPath1 = new FileName("data/lidarObservationPair/lidarObservationImage1.isd");
+      isdPath2 = new FileName("data/lidarObservationPair/lidarObservationImage2.isd");
+
+      cube1 = new Cube();
+      cube2 = new Cube();
+
+      cube1Path = tempDir.path() + "/lidarObservationPair1.cub";
+      cube2Path = tempDir.path() + "/lidarObservationPair2.cub";
+
+      cube1->fromIsd(cube1Path, labelPath1, *isdPath1, "rw");
+      Pvl originalPdsLab1("data/lidarObservationPair/lidarObservationImage1OriginalLabel.pvl");
+      OriginalLabel origLabel(originalPdsLab1);
+      cube1->write(origLabel);
+      cube1->reopen("rw");
+
+      cube2->fromIsd(cube2Path, labelPath2, *isdPath2, "rw");
+
+      cubeList = new FileList();
+      cubeList->append(cube1->fileName());
+      cubeList->append(cube2->fileName());
+
+      cubeListFile = tempDir.path() + "/cubes.lis";
+      cubeList->write(cubeListFile);
+
+      csvPath = "data/lidarObservationPair/lidarPoints.csv";
+  }
+
+  void LidarObservationPair::TearDown() {
+    delete cubeList;
+
+    if (cube1) {
+      delete cube1;
+    }
+
+    if (cube2) {
+      delete cube2;
+    }
+
+    delete isdPath1;
+    delete isdPath2;
+  }
 
   void MroCtxCube::SetUp() {
     TempTestingFiles::SetUp();

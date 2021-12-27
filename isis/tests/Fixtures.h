@@ -182,6 +182,27 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class LidarObservationPair : public TempTestingFiles {
+    protected:
+
+      Cube *cube1;
+      Cube *cube2;
+
+      QString cube1Path;
+      QString cube2Path;
+
+      FileName *isdPath1;
+      FileName *isdPath2;
+
+      FileList *cubeList;
+      QString cubeListFile;
+
+      QString csvPath;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
   class ApolloNetwork : public TempTestingFiles {
     protected:
       QVector<FileName> isdFiles;
