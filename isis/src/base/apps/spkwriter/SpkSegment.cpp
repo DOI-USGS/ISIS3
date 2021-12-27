@@ -177,14 +177,19 @@ void SpkSegment::import(Cube &cube) {
 
     m_startOffset = etLabStart.Et() - m_epochs[0];
     m_endOffset = etLabEnd.Et() - m_epochs[size(m_epochs)-1];
+
+    // round offsets by 3 decimal places
+    m_startOffset = qRound(m_startOffset * 1000.0) / 1000.0;
+    m_endOffset = qRound(m_endOffset * 1000.0) / 1000.0;
+
     // account for padding
-    if (m_startOffset >= 0.0031) {
+    if (m_startOffset >= 0.003) {
       m_startOffset = 0.0;
     }
     else {
       m_startOffset = fabs(m_startOffset);
     }
-    if (m_endOffset <= 0.0031) {
+    if (m_endOffset <= 0.003) {
       m_endOffset = 0.0;
     }
     else {

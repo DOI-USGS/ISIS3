@@ -269,14 +269,19 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
 
     _startOffset =  etLabStart.Et() - startTime();
     _endOffset =  etLabEnd.Et() - endTime();
+
+    // round offsets by 3 decimal places
+    _startOffset = qRound(_startOffset * 1000.0) / 1000.0;
+    _endOffset = qRound(_endOffset * 1000.0) / 1000.0;
+
     // account for padding
-    if (_startOffset >= 0.0031) {
+    if (_startOffset >= 0.003) {
       _startOffset = 0.0;
     }
     else {
       _startOffset = fabs(_startOffset);
     }
-    if (_endOffset <= 0.0031) {
+    if (_endOffset <= 0.003) {
       _endOffset = 0.0;
     }
     else {
