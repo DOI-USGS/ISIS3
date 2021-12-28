@@ -63,7 +63,7 @@ for (lbl in labels) {
                             // Unit tests
                             stageStatus = "Running unit tests on ${label}"
                             try {
-                                loginShell "ctest -R _unit_ -j${NUM_CORES} -VV"
+                                loginShell "ctest -R _unit_ -j${NUM_CORES} --output-on-failure"
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true
@@ -72,14 +72,14 @@ for (lbl in labels) {
                             // App tests
                             stageStatus = "Running app tests on ${label}"
                             try {
-                                loginShell "ctest -R _app_ -j${NUM_CORES} -VV"
+                                loginShell "ctest -R _app_ -j${NUM_CORES} --output-on-failure"
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true
                             }
 
                             try {
-                                loginShell "ctest -R _module_ -j${NUM_CORES} -VV"
+                                loginShell "ctest -R _module_ -j${NUM_CORES} --output-on-failure"
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true
@@ -88,7 +88,7 @@ for (lbl in labels) {
                             // Gtests
                             stageStatus = "Running gtests on ${label}"
                             try {
-                                loginShell "ctest -R '.' -E '(_app_|_unit_|_module_)' -j${NUM_CORES} -VV"
+                                loginShell "ctest -R '.' -E '(_app_|_unit_|_module_)' -j${NUM_CORES} --output-on-failure"
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true
