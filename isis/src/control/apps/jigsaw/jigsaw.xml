@@ -1466,7 +1466,7 @@
       <description>
         <p>
          This example runs jigsaw in a very simple way using four MRO CTX images. Only the required parameters are entered, with all other parameters
-         left at their default settings. This bundle solution only solves for the camera orientation and does not
+         left at their default settings. This bundle solution only solves for the camera orientation (see the CAMSOLVE and TWIST parameters). This command does not
          update the SPICE information attached to the four cubes.
        </p>
        <p>
