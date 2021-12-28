@@ -179,6 +179,13 @@ TEST_F(BundleControlPointPopulated, OutputStrings) {
       detailString.toStdString(),
       ::testing::Not(::testing::HasSubstr("N/A")));
 
+  // Change point to constrained
+  freePoint->SetType(ControlPoint::Constrained);
+  detailString = bundlePoint->formatBundleOutputDetailString(false, true);
+  EXPECT_THAT(
+        detailString.toStdString(),
+        ::testing::HasSubstr("Status: CONSTRAINED"));
+
   // Change point to fixed and fix sigmas
   freePoint->SetType(ControlPoint::Fixed);
   bundlePoint->aprioriSigmas()[0] = Isis::Null;
