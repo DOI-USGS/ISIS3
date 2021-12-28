@@ -32,7 +32,7 @@ TEST_F(LidarObservationPair, FunctionalTestLrolola2isisTwoImage) {
     lrolola2isis(options);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest LRO images / point cloud: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest LRO images / point cloud: " << e.toString().toStdString() << std::endl;
   }
 
   QString otestFilePath = testFilePath + ".json";
@@ -71,7 +71,7 @@ TEST_F(LidarObservationPair, FunctionalTestLrolola2isisMultipleCsv) {
     lrolola2isis(options);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest LRO images / point cloud: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest LRO images / point cloud: " << e.toString().toStdString() << std::endl;
   }
 
   QString otestFilePath = testFilePath + ".json";
