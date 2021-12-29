@@ -212,7 +212,14 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
      _camVersion = _kernels.CameraVersion();
 
     QString labStartTime = getKeyValue(*label, "StartTime");
-    QString labEndTime = getKeyValue(*label, "StopTime");
+    QString labEndTime;
+    value = getKeyValue(*label, "StopTime");
+    if (!value.isEmpty()) {
+      labEndTime = value;
+    }
+    else {
+      labEndTime = labStartTime;
+    }
     iTime etLabStart(labStartTime);
     iTime etLabEnd(labEndTime);
 

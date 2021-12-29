@@ -171,7 +171,14 @@ void SpkSegment::import(Cube &cube) {
 
     Pvl *label = cube.label();
     QString labStartTime = getKeyValue(*label, "StartTime");
-    QString labEndTime = getKeyValue(*label, "StopTime");
+    QString labEndTime;
+    QString value = getKeyValue(*label, "StopTime");
+    if (!value.isEmpty()) {
+      labEndTime = value;
+    }
+    else {
+      labEndTime = labStartTime;
+    }
     iTime etLabStart(labStartTime);
     iTime etLabEnd(labEndTime);
 
