@@ -240,19 +240,8 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenExtraDefault) {
   EXPECT_TRUE(kerneldbPvl.hasObject("SpacecraftPointing"));
 
   PvlGroup depend = kerneldbPvl.findGroup("Dependencies", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, depend.findKeyword("ExtraKernel"), "$mro/kernels/fk/mro_v15.tf");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, depend.findKeyword("ExtraKernel"), "$mro/kernels/fk/mro_v16.tf");
-
-
-  PvlGroup select = kerneldbPvl.findGroup("Selection", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select[0][0], "2006 SEP 25 15:46:30.801907 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select[0][1], "2006 SEP 25 15:48:02.131931 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select[1][0], "2006 SEP 25 15:48:02.131931 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select[1][1], "2006 SEP 27 22:43:51.598926 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select[2][0], "2006 SEP 29 15:14:58.277016 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select[2][1], "2006 SEP 29 22:51:05.300890 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select[3][0], "2006 SEP 30 00:24:17.288930 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select[3][1], "2006 SEP 30 23:06:39.153230 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, depend[2], "$mro/kernels/fk/mro_v15.tf");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, depend[3], "$mro/kernels/fk/mro_v16.tf");
 }
 
 
