@@ -582,14 +582,6 @@ namespace Isis {
     bool matchTime = !grp.hasKeyword("Time");
     bool matchKeywords = true;
 
-    // If the kernel segment has an instrument specification that doesn't match
-    // the instrument id in the label, don't perform the rest of the checks
-    if (grp.hasKeyword("Instrument")){
-        const PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-        if (inst["InstrumentId"][0].toStdString() != grp["Instrument"][0].toStdString()){
-          return false;
-        };
-    }
 
     // First, the time search. Loop through the keywords, if the name isn't
     //  Time then skip it. If it is, then get the start/end times and keep
@@ -598,18 +590,32 @@ namespace Isis {
       PvlKeyword key = grp[keyword];
 
       if (key.isNamed("Time")) {
-        double offset = 0;
+
+        // If the kernel segment has an instrument specification that doesn't match
+        // the instrument id in the label, don't perform the rest of the checks
+        if (grp.hasKeyword("Instrument")){
+            const PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
+            if (inst["InstrumentId"][0].toStdString() != grp["Instrument"][0].toStdString()){
+              return false;
+            };
+        }
+
+        double startOffset = 0;
+        double endOffset = 0;
         // Pull the selections start and end time out
         iTime kernelStart = (QString) key[0];
         iTime kernelEnd   = (QString) key[1];
 
-        if (grp.hasKeyword("TimeOffset")){
-          offset = (double) grp["TimeOffset"];
+        if (grp.hasKeyword("StartOffset")){
+          startOffset = (double) grp["StartOffset"];
+        }
+        if (grp.hasKeyword("EndOffset")){
+          endOffset = (double) grp["EndOffset"];
         }
 
         // If the kernel times inside of the requested times we
         // set the matchTime to be true.
-        if ((kernelStart - offset <= timeToMatch) && (kernelEnd + offset >= timeToMatch)) {
+        if ((kernelStart - startOffset <= timeToMatch) && (kernelEnd + endOffset >= timeToMatch)) {
           matchTime = true;
         }
       }
