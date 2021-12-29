@@ -590,16 +590,6 @@ namespace Isis {
       PvlKeyword key = grp[keyword];
 
       if (key.isNamed("Time")) {
-
-        // If the kernel segment has an instrument specification that doesn't match
-        // the instrument id in the label, don't perform the rest of the checks
-        if (grp.hasKeyword("Instrument")){
-            const PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-            if (inst["InstrumentId"][0].toStdString() != grp["Instrument"][0].toStdString()){
-              return false;
-            };
-        }
-
         double startOffset = 0;
         double endOffset = 0;
         // Pull the selections start and end time out
@@ -617,6 +607,16 @@ namespace Isis {
         // set the matchTime to be true.
         if ((kernelStart - startOffset <= timeToMatch) && (kernelEnd + endOffset >= timeToMatch)) {
           matchTime = true;
+        }
+
+
+        // If the kernel segment has an instrument specification that doesn't match
+        // the instrument id in the label then the timing is always invalid
+        if (grp.hasKeyword("Instrument")){
+            const PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
+            if (inst["InstrumentId"][0].toStdString() != grp["Instrument"][0].toStdString()){
+              matchTime = false;
+            };
         }
       }
       else if (key.isNamed("Match")) {
