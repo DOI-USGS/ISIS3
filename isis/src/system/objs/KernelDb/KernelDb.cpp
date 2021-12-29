@@ -582,7 +582,6 @@ namespace Isis {
     bool matchTime = !grp.hasKeyword("Time");
     bool matchKeywords = true;
 
-
     // First, the time search. Loop through the keywords, if the name isn't
     //  Time then skip it. If it is, then get the start/end times and keep
     //  looking until one is found.
@@ -608,7 +607,6 @@ namespace Isis {
         if ((kernelStart - startOffset <= timeToMatch) && (kernelEnd + endOffset >= timeToMatch)) {
           matchTime = true;
         }
-
 
         // If the kernel segment has an instrument specification that doesn't match
         // the instrument id in the label then the timing is always invalid
