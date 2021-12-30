@@ -1453,4 +1453,65 @@
       </item>
     </liens>
 
+
+
+
+
+
+
+
+  <examples>
+    <example>
+      <brief> Simple run of jigsaw with images from a linescanner </brief>
+      <description>
+        <p>
+         This example runs jigsaw in a very simple way using four MRO CTX images. Only the required parameters are entered, with all other parameters
+         left at their default settings. This bundle solution only solves for the camera orientation (see the CAMSOLVE and TWIST parameters). This command does not
+         update the SPICE information attached to the four cubes.
+       </p>
+       <p>
+         A possible use for this simple run would be to test a network to identify control points that are not well placed.
+       </p>
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+         fromlist=ctx.lis cnet=hand_dense.net onet=hand_dense-jig.net
+        </commandLine>
+        <description>
+          This command line only sets the three required parameters.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/linescan/example_linescan_gui.png" width="1273" height="958">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              The top of the GUI shows the parameters filled in for input cube list, 
+              the input control network and the output control network. All other parameters
+              were left at their default values.
+            <br></br>
+            </description>
+            <thumbnail src="assets/linescan/example_linescan_gui_thumb.png" width="500" height="376" caption="jigsaw Linescan image example" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <dataFiles>
+        <dataFile path="assets/linescan/ctx.lis">
+          <brief> Cube list file </brief>
+          <description>
+            Input file defining the file names of the four cubes used in the control network.
+            The file names can include a path if needed. Each file name is on a separate line and
+            the last file name can have new line at the end, but it is not required.
+          </description>
+          <parameterName> FROMLIST </parameterName>
+        </dataFile>
+      </dataFiles>
+    </example>
+
+  </examples>
 </application>
