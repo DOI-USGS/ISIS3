@@ -428,6 +428,7 @@ namespace Isis {
             }
           }
 
+
           bool startMatches = matches(lab, grp, start, cameraVersion);
           bool endMatches = matches(lab, grp, end, cameraVersion);
 
@@ -588,14 +589,32 @@ namespace Isis {
       PvlKeyword key = grp[keyword];
 
       if (key.isNamed("Time")) {
+        double startOffset = 0;
+        double endOffset = 0;
         // Pull the selections start and end time out
         iTime kernelStart = (QString) key[0];
         iTime kernelEnd   = (QString) key[1];
 
+        if (grp.hasKeyword("StartOffset")){
+          startOffset = (double) grp["StartOffset"];
+        }
+        if (grp.hasKeyword("EndOffset")){
+          endOffset = (double) grp["EndOffset"];
+        }
+
         // If the kernel times inside of the requested times we
         // set the matchTime to be true.
-        if ((kernelStart <= timeToMatch) && (kernelEnd >= timeToMatch)) {
+        if ((kernelStart - startOffset <= timeToMatch) && (kernelEnd + endOffset >= timeToMatch)) {
           matchTime = true;
+        }
+
+        // If the kernel segment has an instrument specification that doesn't match
+        // the instrument id in the label then the timing is always invalid
+        if (grp.hasKeyword("Instrument")){
+            const PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
+            if (inst["InstrumentId"][0].toStdString() != grp["Instrument"][0].toStdString()){
+              matchTime = false;
+            };
         }
       }
       else if (key.isNamed("Match")) {
