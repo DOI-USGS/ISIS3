@@ -17,7 +17,7 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenCk) {
   QVector<QString> args = {"to="+ prefix.path() + "/kernel.db.pvl",
                            "type=CK",
                            "recondir=data/kerneldbgen",
-                           "reconfilter=(\"mro_sc_2005-10*.bc\",\"mro_sc_2005-12-*.bc\")",
+                           "reconfilter=mro_sc_2005-12-*.bc",
                            "sclk=$mro/kernels/sclk/MRO_SCLKSCET.00006.tsc",
                            "lsk=$base/kernels/lsk/naif0008.tls"};
 
@@ -40,28 +40,16 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenCk) {
 
 
   PvlGroup select = scPointing.group(1);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select.findKeyword("Time")[0], "2005 OCT 05 00:01:04.381613 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select.findKeyword("Time")[1], "2005 OCT 06 00:01:03.633358 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select.findKeyword("File"), "data/kerneldbgen/mro_sc_2005-10-05.bc");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select.findKeyword("Time")[0], "2005 DEC 13 00:01:04.662071 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select.findKeyword("Time")[1], "2005 DEC 14 00:01:03.933358 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select.findKeyword("File"), "data/kerneldbgen/mro_sc_2005-12-13.bc");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, select.findKeyword("Type"), "Reconstructed");
 
   PvlGroup select2 = scPointing.group(2);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select2.findKeyword("Time")[0], "2005 DEC 13 00:01:04.662071 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select2.findKeyword("Time")[1], "2005 DEC 14 00:01:03.933358 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select2.findKeyword("File"), "data/kerneldbgen/mro_sc_2005-12-13.bc");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select2.findKeyword("Time")[0], "2005 DEC 15 00:01:04.290582 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select2.findKeyword("Time")[1], "2005 DEC 16 00:01:03.241556 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select2.findKeyword("File"), "data/kerneldbgen/mro_sc_2005-12-15.bc");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, select2.findKeyword("Type"), "Reconstructed");
-
-  PvlGroup select3 = scPointing.group(3);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select3.findKeyword("Time")[0], "2005 DEC 14 00:01:04.933358 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select3.findKeyword("Time")[1], "2005 DEC 15 00:01:04.189019 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select3.findKeyword("File"), "data/kerneldbgen/mro_sc_2005-12-14.bc");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select3.findKeyword("Type"), "Reconstructed");
-
-  PvlGroup select4 = scPointing.group(4);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select4.findKeyword("Time")[0], "2005 DEC 15 00:01:04.290582 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select3.findKeyword("Time")[1], "2005 DEC 15 00:01:04.189019 TDB");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select4.findKeyword("File"), "data/kerneldbgen/mro_sc_2005-12-15.bc");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select4.findKeyword("Type"), "Reconstructed");
 }
 
  /**
