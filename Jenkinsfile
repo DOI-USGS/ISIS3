@@ -1,6 +1,6 @@
 // vim: ft=groovy
 
-def NUM_CORES = 8
+def NUM_CORES = 4
 def errors = []
 def labels = ['Ubuntu'] // labels for Jenkins node types we will build on
 def nodes = [:] 
@@ -34,7 +34,7 @@ for (lbl in labels) {
                 condaEnv("isis3") {
                     // Environment
                     loginShell """
-                        conda config --env --set channel_alias https://conda.wr.usgs.gov
+                        conda config --env --set channel_alias conda.prod-asc.chs.usgs.gov
                         conda config --env --set remote_read_timeout_secs 3600
                         conda install -c conda-forge python=3 findutils
                         conda env update -f ${envFile} --prune
