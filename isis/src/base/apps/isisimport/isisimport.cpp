@@ -272,6 +272,12 @@ namespace Isis {
     importer.SetBase(base);
     importer.SetMultiplier(multiplier);
 
+    // Update TargetName if Target parameter entered
+    if (ui.WasEntered("TARGET")) {
+      PvlGroup &inst = newLabel.findGroup("Instrument",Pvl::Traverse);
+      inst["TargetName"] = ui.GetString("TARGET");
+    }
+
     PvlObject translation = newLabel.findObject("Translation");
 
     // Check translation for potential PDS3 offset

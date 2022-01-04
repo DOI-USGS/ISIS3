@@ -73,7 +73,21 @@
           The ingested ISIS Cube.
         </description>
       </parameter>
-
+    </group>
+    <group name="Parameters">
+        <parameter name="TARGET">
+            <type>string</type>
+            <brief>Provide target name if absent or incorrect in input (FROM)
+              label
+            </brief>
+            <description>
+              <p>
+               This parameter may be necessary as some Dawn EDR labels may
+                not contain incorrect values for the TARGET_NAME keyword.
+              </p>
+            </description>
+            <internalDefault>Label Value</internalDefault>
+        </parameter>
     </group>
   </groups>
 </application>

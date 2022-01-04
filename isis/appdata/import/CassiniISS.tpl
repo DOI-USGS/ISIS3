@@ -166,7 +166,10 @@ SpacecraftClockCount    = {{SPACECRAFT_CLOCK_CNT_PARTITION.Value}}/{{SPACECRAFT_
 {% endblock %}
 
 {% block archive %}
+DataSetId     = {{ DataSetId }}
+ImageNumber   = {{ ImageNumber }}
 ObservationId = {{ OBSERVATION_ID.Value }}
+ProductId     = {{ ProductId }}
 {% endblock%}
 
 {% block bandbin %}
