@@ -34,7 +34,7 @@ for (lbl in labels) {
                 condaEnv("isis3") {
                     // Environment
                     loginShell """
-                        conda config --env --set channel_alias conda.prod-asc.chs.usgs.gov
+                        conda config --env --set channel_alias https://conda.prod-asc.chs.usgs.gov
                         conda config --env --set remote_read_timeout_secs 3600
                         conda install -c conda-forge python=3 findutils
                         conda env update -f ${envFile} --prune
