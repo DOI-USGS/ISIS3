@@ -10,9 +10,10 @@
 #include "iTime.h"
 #include "OriginalLabel.h"
 #include "OriginalXmlLabel.h"
-#include "XmlToJson.h"
 #include "PvlToJSON.h"
 #include "ProcessImport.h"
+#include "TextFile.h"
+#include "XmlToJson.h"
 
 #include "isisimport.h"
 
@@ -63,9 +64,9 @@ namespace Isis {
         std::string templateFile = env.render_file(fileTemplate.expanded().toStdString(), jsonData);
         inputTemplate = FileName(QString::fromStdString(templateFile));
       }
-      catch(...) {
-         QString msg = "Cannot locate a template for input label. Please provide a template file to use.";
-         throw IException(IException::User, msg, _FILEINFO_);
+      catch(IException &e) {
+        QString msg = "Cannot locate a template for input label. Please provide a template file to use.";
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
@@ -92,6 +93,49 @@ namespace Isis {
         doy = doy + daysInMonth[month-1];
       }
       return yearString.append(to_string(doy));
+    });
+
+    env.add_callback("capitalize", 1, [](Arguments& args) {
+      std::string str = args.at(0)->get<string>();
+      std::transform(str.begin(), str.end(),str.begin(), ::tolower);
+      str[0] = toupper(str[0]);
+      return str;
+    });
+
+    env.add_callback("CassiniIssBandInfo", 3, [](Arguments& args) {
+      std::string instrumentID = args.at(0)->get<string>();
+      std::string filter1 = args.at(1)->get<string>();
+      std::string filter2 = args.at(2)->get<string>();
+      QString filter = QString(filter1.c_str()) + "/" + QString(filter2.c_str());
+      QString dir = "$ISISROOT/appdata/translations";
+      QString cameraAngleDefs;
+      if(instrumentID.at(3) == 'N') {
+        cameraAngleDefs = dir + "/CassiniIssNarrowAngle.def";
+      }
+      else if(instrumentID.at(3) == 'W') {
+        cameraAngleDefs = dir + "/CassiniIssWideAngle.def";
+      }
+
+      double center = 0;
+      double width = 0;
+
+      TextFile cameraAngle(cameraAngleDefs);
+      int numLines = cameraAngle.LineCount();
+      bool foundfilter = false;
+      for(int i = 0; i < numLines; i++) {
+        QString line;
+        cameraAngle.GetLine(line, true);
+
+        QStringList tokens = line.simplified().split(" ");
+        if(tokens.count() > 2 && tokens.first() == filter) {
+          center = toDouble(tokens[1]);
+          width = toDouble(tokens[2]);
+          foundfilter = true;
+          break;
+        }
+      }
+      vector<double> bandInfo = {center, width};
+      return bandInfo;
     });
 
     /**
@@ -232,13 +276,26 @@ namespace Isis {
 
     // Check translation for potential PDS3 offset
     if (translation.hasKeyword("DataFilePointer")) {
-      int offset = toInt(translation["DataFilePointer"]);
+      PvlKeyword dataFilePointer = translation["DataFilePointer"];
+
+      int offset = 0;
+      int recSize = 1;
+      QString units = "BYTES";
+
+      if (dataFilePointer.size() == 1) {
+        offset = toInt(dataFilePointer) - 1;
+        units = dataFilePointer.unit();
+      }
+      else if (dataFilePointer.size() == 2) {
+        offset = toInt(dataFilePointer[1]) - 1;
+        units = dataFilePointer.unit(1);
+      }
 
       if (translation.hasKeyword("DataFileRecordBytes")) {
-        int recSize = toInt(translation["DataFileRecordBytes"]);
-
-        importer.SetFileHeaderBytes((offset - 1) * recSize);
+        recSize = toInt(translation["DataFileRecordBytes"]);
       }
+
+      importer.SetFileHeaderBytes((offset) * recSize);
     }
     // Assume PDS4
     else {
@@ -257,21 +314,19 @@ namespace Isis {
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
+    // Processing unique to mroctx
+    if (translation.hasKeyword("DataPrefixBytes")) {
+      importer.SetDataPrefixBytes(translation["DataPrefixBytes"]);
+      if (toInt(translation["DataPrefixBytes"]) > 0) {
+        importer.SaveDataPrefix();
+      }
+    }
 
-    // Processing that is unique to mroctx
-    if (translation.hasKeyword("startPix")) {
-      // startPix is used only for DarkPixels which is still a TODO for mroctx.
-      //int startPix = toInt(translation["startPix"]);
-      int endPix = toInt(translation["endPix"]);
-      int suf = toInt(translation["suf"]);
-
-      importer.SetDataPrefixBytes(endPix + 1);
-      importer.SetDataSuffixBytes(suf);
-      int samps = importer.Samples() - endPix - suf - 1;
-      importer.SetDimensions(samps, importer.Lines(), importer.Bands());
-
-      // Save off the dark pixel data
-      importer.SaveDataPrefix();
+    if (translation.hasKeyword("DataSuffixBytes")) {
+      importer.SetDataSuffixBytes(translation["DataSuffixBytes"]);
+      if (toInt(translation["DataSuffixBytes"]) > 0) {
+        importer.SaveDataSuffix();
+      }
     }
 
     if (translation.hasKeyword("CoreAxisNames")) {
@@ -321,7 +376,11 @@ namespace Isis {
     }
     importer.SetSpecialValues(pdsNull, pdsLrs, pdsLis, pdsHrs, pdsHis);
 
-    CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
+    QString cubeAtts = "";
+    if (translation.hasKeyword("CubeAtts")) {
+      cubeAtts = QString(translation["CubeAtts"]);
+    }
+    CubeAttributeOutput att = CubeAttributeOutput(cubeAtts);
     Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
 
     if (isPDS4) {

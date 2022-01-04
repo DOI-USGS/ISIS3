@@ -50,7 +50,6 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelXmlInput) {
   End_Object
 End_Object
 Object = Translation
-  DataFilePointer = 0
 End_Object
 End)";
   of.close();
@@ -121,7 +120,6 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelPds4RemoveStartTimeZ) {
     End_Group
 End_Object
 Object = Translation
-  DataFilePointer = 0
 End_Object
 End)";
   of.close();
@@ -170,7 +168,6 @@ QString labelFileName = "data/isisimport/pds4.xml";
     End_Group
 End_Object
 Object = Translation
-  DataFilePointer = 0
 End_Object
 End)";
   of.close();
@@ -219,7 +216,6 @@ QString labelFileName = "data/isisimport/pds4.xml";
     End_Group
 End_Object
 Object = Translation
-  DataFilePointer = 0
 End_Object
 End)";
   of.close();

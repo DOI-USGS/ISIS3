@@ -1,7 +1,46 @@
+{% if exists("SPATIAL_SUMMING") %}
+  {% set sumMode=SPATIAL_SUMMING.Value %}
+{% else %}
+  {% set sumMode=SAMPLING_FACTOR.Value %}
+{% endif %}
+
+{% if exists("EDIT_MODE_ID") %}
+  {% set editMode=EDIT_MODE_ID.Value %}
+{% else %}
+  {% set editMode=SAMPLE_FIRST_PIXEL.Value %}
+{% endif %}
+
+{%- if exists("EDIT_MODE_ID") -%}
+  {%- set startSamp=EDIT_MODE_ID.Value -%}
+{%- else -%}
+  {%- set startSamp=SAMPLE_FIRST_PIXEL.Value -%}
+{%- endif -%}
+{%- if sumMode == "1" -%}
+  {%- set startPix=0 -%}
+  {%- if editMode == "0" -%}
+    {%- set endPix=37 -%}
+    {%- set suf=18 -%}
+  {%- else -%}
+    {%- set endPix=15 -%}
+    {%- set suf=0 -%}
+  {%- endif -%}
+{%- else if sumMode == "2" -%}
+  {%- if editMode == "0" -%}
+    {%- set startPix=7 -%}
+    {%- set endPix=18 -%}
+    {%- set suf=9 -%}
+  {%- else -%}
+    {%- set startPix=0 -%}
+    {%- set endPix=7 -%}
+    {%- set suf=0 -%}
+  {%- endif -%}
+{%- endif -%}
+
 Object = IsisCube
   Object = Core
   Group = Dimensions
-    Samples = {{ IMAGE.LINE_SAMPLES.Value }}
+    {%- set samples = IMAGE.LINE_SAMPLES.Value -%}
+    Samples = {{ int(samples) - endPix - suf - 1 }}
     Lines   = {{ IMAGE.LINES.Value }}
     Bands   = {% if exists("IMAGE.BANDS.Value") %}
               {{ IMAGE.BANDS.Value }}
@@ -186,41 +225,7 @@ Object = Translation
   {% if exists("RECORD_BYTES") %}
   DataFileRecordBytes         = {{ RECORD_BYTES.Value }}
   {% endif %}
-  {% if exists("SPATIAL_SUMMING") %}
-  {% set sumMode=SPATIAL_SUMMING.Value %}
-  {% else %}
-  {% set sumMode=SAMPLING_FACTOR.Value %}
-  {% endif %}
-  {% if exists("EDIT_MODE_ID") %}
-  {% set editMode=EDIT_MODE_ID.Value %}
-  {% else %}
-  {% set editMode=SAMPLE_FIRST_PIXEL.Value %}
-  {% endif %}
-  startSamp = {% if exists("EDIT_MODE_ID") %}
-              {{ EDIT_MODE_ID.Value }}
-              {% else %}
-              {{ SAMPLE_FIRST_PIXEL.Value }}
-              {% endif %}
-  {% if sumMode == "1" %}
-    {% if editMode == "0" %}
-      startPix = 0
-      endPix = 37
-      suf = 18
-    {% else %}
-      startPix = 0
-      endPix = 15
-      suf = 0
-    {% endif %}
-  {% else if sumMode == "2" %}
-    {% if editMode == "0" %}
-      startPix = 7
-      endPix = 18
-      suf = 9
-    {% else %}
-      startPix = 0
-      endPix = 7
-      suf = 0
-    {% endif %}
-  {% endif %}
+  DataPrefixBytes             = {{ endPix + 1 }}
+  DataSuffixBytes             = {{ suf }}
 End_Object
 End
