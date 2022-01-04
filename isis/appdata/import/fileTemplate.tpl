@@ -33,6 +33,12 @@
 {%- else if SpacecraftName == "MARS_GLOBAL_SURVEYOR" -%}
 {%- set SpacecraftId="MGS" -%}
 {%- set InstrumentId="MOC" -%}
+{%- else if SpacecraftName == "DAWN MISSION TO VESTA AND CERES" -%}
+{%- set SpacecraftId="Dawn" -%}
+{%- endif -%}
+
+{%- if InstrumentId == "FC1" or InstrumentId == "FC2" -%}
+{%- set InstrumentId="FC"-%}
 {%- endif -%}
 
 {%- if SpacecraftId -%}$ISISROOT/appdata/import/{{- SpacecraftId -}}{{- InstrumentId -}}.tpl{%- endif -%}

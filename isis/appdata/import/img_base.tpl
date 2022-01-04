@@ -87,28 +87,31 @@ Object = IsisCube
   End_Group
 
   Group = Archive
-    DataSetId       = {{ DATA_SET_ID.Value }}
+    {%- set DataSetId=DATA_SET_ID.Value -%}
     {%- if exists("IMAGE_ID") -%}
     {%- set ProductId=IMAGE_ID.Value -%}
     {%- else if exists("PRODUCT_ID") -%}
     {%- set ProductId=PRODUCT_ID.Value -%}
     {%- endif -%}
-    ImageNumber     = {{ IMAGE_NUMBER.Value }}
-    ProductId       = {{ ProductId }}
+    {%- if exists("IMAGE_NUMBER") -%}
+    {%- set ImageNumber=IMAGE_NUMBER.Value -%}
+    {%- endif -%}
     {% block archive %}
     {% endblock %}
   End_Group
 
   Group = BandBin
     {% block bandbin %}
+    {% if exists("FILTER_NAME") %}
     {% set filterName=FILTER_NAME.Value %}
+    {% endif %}
     {% endblock %}
   End_Group
 
   Group = Kernels
-    {% block kernel %}
-    {% set spacecraft = SPACECRAFT_NAME.Value %}
+    {% block kernels %}
     {% set instrument = INSTRUMENT_NAME.Value %}
+    {% set instID = INSTRUMENT_ID.Value %}
     {% endblock %}
   End_Group
 
