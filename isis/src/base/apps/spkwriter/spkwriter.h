@@ -4,7 +4,7 @@
 #include "UserInterface.h"
 #include "Pvl.h"
 namespace Isis {
-  void spkwriter(UserInterface &ui, Pvl *log);
+  void spkwriter(UserInterface &ui, Pvl *log=nullptr);
 }
 
 #endif
