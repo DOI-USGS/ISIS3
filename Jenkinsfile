@@ -72,14 +72,14 @@ for (lbl in labels) {
                             // App tests
                             stageStatus = "Running app tests on ${label}"
                             try {
-                                loginShell "ctest -R _app_ -j${NUM_CORES} --output-on-failure"
+                                loginShell "ctest -R _app_ -j${NUM_CORES} --output-on-failure --timeout 3000"
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true
                             }
 
                             try {
-                                loginShell "ctest -R _module_ -j${NUM_CORES} --output-on-failure"
+                                loginShell "ctest -R _module_ -j${NUM_CORES} --output-on-failure --timeout 3000" 
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true
