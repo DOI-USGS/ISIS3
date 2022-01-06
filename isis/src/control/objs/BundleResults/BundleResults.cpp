@@ -1698,6 +1698,9 @@ namespace Isis {
     stream.writeTextElement("rejectionLimit", toString(rejectionLimit()));
     stream.writeTextElement("numberRejectedObservations", toString(numberRejectedObservations()));
     stream.writeTextElement("numberObservations", toString(numberObservations()));
+    stream.writeTextElement("numberLidarRangeConstraintEquations", toString(numberLidarRangeConstraintEquations()));
+    stream.writeTextElement("numberImageObservations", toString(numberImageObservations()));
+    stream.writeTextElement("numberLidarImageObservations", toString(numberLidarImageObservations()));
     stream.writeTextElement("numberImageParameters", toString(numberImageParameters()));
     stream.writeTextElement("numberConstrainedPointParameters",
                             toString(numberConstrainedPointParameters()));
@@ -1709,6 +1712,7 @@ namespace Isis {
     stream.writeTextElement("degreesOfFreedom", toString(degreesOfFreedom()));
     stream.writeTextElement("sigma0", toString(sigma0()));
     stream.writeTextElement("converged", toString(converged()));
+    stream.writeTextElement("iterations", toString(iterations()));
     stream.writeEndElement(); // end generalStatisticsValues
 
     stream.writeStartElement("rms");
@@ -1760,6 +1764,33 @@ namespace Isis {
     for (int i = 0; i < m_rmsImageLineResiduals.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsImageLineResiduals[i].save(stream, project);
+      stream.writeEndElement(); // end statistics item
+    }
+    stream.writeEndElement(); // end line residuals list
+
+    stream.writeStartElement("lidarResidualsList");
+    stream.writeAttribute("listSize", toString(rmsLidarImageResiduals().size()));
+    for (int i = 0; i < m_rmsLidarImageResiduals.size(); i++) {
+      stream.writeStartElement("statisticsItem");
+      m_rmsLidarImageResiduals[i].save(stream, project);
+      stream.writeEndElement(); // end statistics item
+    }
+    stream.writeEndElement(); // end line residuals list
+
+    stream.writeStartElement("lidarSampleList");
+    stream.writeAttribute("listSize", toString(rmsLidarImageSampleResiduals().size()));
+    for (int i = 0; i < m_rmsLidarImageSampleResiduals.size(); i++) {
+      stream.writeStartElement("statisticsItem");
+      m_rmsLidarImageSampleResiduals[i].save(stream, project);
+      stream.writeEndElement(); // end statistics item
+    }
+    stream.writeEndElement(); // end line residuals list
+
+    stream.writeStartElement("lidarLineList");
+    stream.writeAttribute("listSize", toString(rmsLidarImageLineResiduals().size()));
+    for (int i = 0; i < m_rmsLidarImageLineResiduals.size(); i++) {
+      stream.writeStartElement("statisticsItem");
+      m_rmsLidarImageLineResiduals[i].save(stream, project);
       stream.writeEndElement(); // end statistics item
     }
     stream.writeEndElement(); // end line residuals list
@@ -2384,8 +2415,17 @@ namespace Isis {
       else if (qName == "numberRejectedObservations") {
         m_xmlHandlerBundleResults->m_numberRejectedObservations = toInt(m_xmlHandlerCharacters);
       }
+      else if (qName == "numberLidarRangeConstraintEquations") {
+        m_xmlHandlerBundleResults->m_numberLidarRangeConstraintEquations = toInt(m_xmlHandlerCharacters);
+      }
       else if (qName == "numberObservations") {
         m_xmlHandlerBundleResults->m_numberObservations = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "numberImageObservations") {
+        m_xmlHandlerBundleResults->m_numberImageObservations = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "numberLidarImageObservations") {
+        m_xmlHandlerBundleResults->m_numberLidarImageObservations = toInt(m_xmlHandlerCharacters);
       }
       else if (qName == "numberImageParameters") {
         m_xmlHandlerBundleResults->m_numberImageParameters = toInt(m_xmlHandlerCharacters);
@@ -2413,6 +2453,9 @@ namespace Isis {
       }
       else if (qName == "converged") {
         m_xmlHandlerBundleResults->m_converged = toBool(m_xmlHandlerCharacters);
+      }
+      else if (qName == "iterations") {
+        m_xmlHandlerBundleResults->m_iterations = toInt(m_xmlHandlerCharacters);
       }
       // copy the xml handler's statistics list to the appropriate bundle statistics list
       else if (qName == "residualsList") {
@@ -2443,6 +2486,37 @@ namespace Isis {
         }
         for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
           m_xmlHandlerBundleResults->m_rmsImageLineResiduals.append(m_xmlHandlerStatisticsList[i]);
+        }
+        m_xmlHandlerStatisticsList.clear();
+      }
+      else if (qName == "lidarResidualsList") {
+        if (m_xmlHandlerResidualsListSize != m_xmlHandlerStatisticsList.size()) {
+          throw IException(IException::Unknown,
+                           "Unable to read xml file. Invalid residualsList", _FILEINFO_);
+        }
+        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+          m_xmlHandlerBundleResults->m_rmsLidarImageResiduals.append(m_xmlHandlerStatisticsList[i]);
+        }
+        m_xmlHandlerStatisticsList.clear();
+      }
+      else if (qName == "lidarSampleList") {
+        if (m_xmlHandlerSampleResidualsListSize != m_xmlHandlerStatisticsList.size()) {
+          throw IException(IException::Unknown,
+                           "Unable to read xml file. Invalid sampleList", _FILEINFO_);
+        }
+        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+          m_xmlHandlerBundleResults->m_rmsLidarImageSampleResiduals.append(
+                                                                   m_xmlHandlerStatisticsList[i]);
+        }
+        m_xmlHandlerStatisticsList.clear();
+      }
+      else if (qName == "lidarLineList") {
+        if (m_xmlHandlerLineResidualsListSize != m_xmlHandlerStatisticsList.size()) {
+          throw IException(IException::Unknown,
+                           "Unable to read xml file. Invalid lineList", _FILEINFO_);
+        }
+        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+          m_xmlHandlerBundleResults->m_rmsLidarImageLineResiduals.append(m_xmlHandlerStatisticsList[i]);
         }
         m_xmlHandlerStatisticsList.clear();
       }
