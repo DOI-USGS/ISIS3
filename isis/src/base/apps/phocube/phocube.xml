@@ -321,6 +321,7 @@ xsi:noNamespaceSchemaLocation=
     </change>
     <change name="Stuart Sides" date="2021-06-01">
       Add ALLDNS parameter to propagate all input bands to the output instead of just one band.
+    </change>
     <change name="Adam Paquette" date="2020-08-23">
       Added initial slope and backplane options for the local normal and the
       ellipsoid normal.

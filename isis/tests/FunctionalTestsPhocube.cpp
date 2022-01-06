@@ -380,11 +380,40 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllDnBands) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName")[1], "B2");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName")[2], "B3");
 
-  std::unique_ptr<Histogram> hist (cube.histogram(0));
-  EXPECT_NEAR(hist->Average(), 67.575204, .000001);
-  EXPECT_NEAR(hist->Sum(), 13515.040821, .000001);
-  EXPECT_EQ(hist->ValidPixels(), 200);
-  EXPECT_NEAR(hist->StandardDeviation(), 76.089184, .000001);
+  // Test band 1
+  {
+    int band = 1;
+    std::unique_ptr<Histogram> inHist (testCube->histogram(band));
+    std::unique_ptr<Histogram> outHist (cube.histogram(band));
+    EXPECT_NEAR(outHist->Average(), inHist->Average(), .000001);
+    EXPECT_NEAR(outHist->Sum(), inHist->Sum(), .000001);
+    EXPECT_EQ(outHist->ValidPixels(), inHist->ValidPixels());
+    EXPECT_NEAR(outHist->StandardDeviation(), inHist->StandardDeviation(), .000001);
+  }
+
+  // Test band 2
+  {
+    int band = 2;
+    std::unique_ptr<Histogram> inHist (testCube->histogram(band));
+    std::unique_ptr<Histogram> outHist (cube.histogram(band));
+    EXPECT_NEAR(outHist->Average(), inHist->Average(), .000001);
+    EXPECT_NEAR(outHist->Sum(), inHist->Sum(), .000001);
+    EXPECT_EQ(outHist->ValidPixels(), inHist->ValidPixels());
+    EXPECT_NEAR(outHist->StandardDeviation(), inHist->StandardDeviation(), .000001);
+  }
+
+  // Test band 3
+  {
+    int band = 3;
+    std::unique_ptr<Histogram> inHist (testCube->histogram(band));
+    std::unique_ptr<Histogram> outHist (cube.histogram(band));
+    EXPECT_NEAR(outHist->Average(), inHist->Average(), .000001);
+    EXPECT_NEAR(outHist->Sum(), inHist->Sum(), .000001);
+    EXPECT_EQ(outHist->ValidPixels(), inHist->ValidPixels());
+    EXPECT_NEAR(outHist->StandardDeviation(), inHist->StandardDeviation(), .000001);
+  }
+
 
   cube.close();
 }
+
