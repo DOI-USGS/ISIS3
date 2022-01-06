@@ -1850,9 +1850,7 @@ namespace Isis {
   void BundleSolutionInfo::save(QXmlStreamWriter &stream, const Project *project,
                                 FileName newProjectRoot) const {
 
-    // TODO: comment below not clear, why is this done?
-    // This is done for unitTest which has no Project
-    // SHOULD WE BE CREATING A SERIALIZED PROJECT AS INPUT TO THIS UNIT TEST?
+    // This is done for testing serialization without a Project
     QString relativePath;
     QString relativeBundlePath;
     FileName bundleSolutionInfoRoot;
@@ -1925,8 +1923,6 @@ namespace Isis {
       }
       relativeBundlePath += "/";
     }
-
-    // TODO: so, we can do the stuff below if project is NULL?
 
     stream.writeStartElement("bundleSolutionInfo");
     // save ID, cnet file name, and run time to stream

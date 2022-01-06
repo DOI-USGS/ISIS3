@@ -30,6 +30,44 @@
 
 #include "gmock/gmock.h"
 
+/**
+ * This class is needed to test the xml read/write methods.
+ * @author 2015-??-?? Jeannie Backer
+ *
+ * @internal
+ *   @history 2015-??-?? Jeannie Backer - Original version.
+ */
+namespace Isis {
+  class BundleSolutionInfoXmlHandlerTester : public BundleSolutionInfo {
+    public:
+      BundleSolutionInfoXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader,
+                                     FileName xmlFile) : BundleSolutionInfo(project, reader) {
+
+        QString xmlPath(xmlFile.expanded());
+        QFile file(xmlPath);
+
+        if (!file.open(QFile::ReadOnly) ) {
+          throw IException(IException::Io,
+                           QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
+                           _FILEINFO_);
+        }
+
+        QXmlInputSource xmlInputSource(&file);
+        bool success = reader->parse(xmlInputSource);
+        if (!success) {
+          throw IException(IException::Unknown,
+                           QString("Failed to parse xml file, [%1]").arg(xmlPath),
+                            _FILEINFO_);
+        }
+
+      }
+
+      ~BundleSolutionInfoXmlHandlerTester() {
+      }
+
+  };
+}
+
 TEST_F(ThreeImageNetwork, BundleSolutionInfoConstructors) {
   BundleSettingsQsp settings(new BundleSettings());
   BundleResults results;
@@ -45,17 +83,30 @@ TEST_F(ThreeImageNetwork, BundleSolutionInfoConstructors) {
 }
 
 
-TEST_F(ThreeImageNetwork, BundleSolutionInfoSave) {
+TEST_F(ThreeImageNetwork, BundleSolutionInfoSerialization) {
   BundleSettingsQsp settings(new BundleSettings());
   BundleResults results;
   QList<ImageList *> imageList;
   BundleSolutionInfo solution(settings, networkFile, results, imageList);
 
-  QString saveString;
-  QXmlStreamWriter saveWriter(&saveString);
-  solution.save(saveWriter, NULL, "");
+  QString saveFile = tempDir.path() + "/BundleSolutionInfoTestData.xml";
+  QFile qXmlFile(saveFile);
+  qXmlFile.open(QIODevice::ReadWrite);
+  QXmlStreamWriter writer(&qXmlFile);
+  writer.setAutoFormatting(true);
+  writer.writeStartDocument();
+  solution.save(writer, NULL, "");
+  writer.writeEndDocument();
+  qXmlFile.close();
 
-  EXPECT_FALSE(saveString.isEmpty());
+  XmlStackedHandlerReader reader;
+  BundleSolutionInfoXmlHandlerTester newSolution(NULL, &reader, saveFile);
+
+  EXPECT_EQ(solution.adjustedImages().size(), newSolution.adjustedImages().size());
+  EXPECT_EQ(solution.bundleResults().numberObservations(), newSolution.bundleResults().numberObservations());
+  EXPECT_EQ(solution.id().toStdString(), newSolution.id().toStdString());
+  EXPECT_EQ(solution.runTime().toStdString(), newSolution.runTime().toStdString());
+  EXPECT_EQ(solution.name().toStdString(), newSolution.name().toStdString());
 }
 
 
