@@ -121,6 +121,9 @@ End_Object
 
 Object = Translation
   DataFilePointer      = {{ ptrQUBE.Value }}
+  {% if exists("RECORD_BYTES") %}
+  DataFileRecordBytes  = {{ RECORD_BYTES.Value }}
+  {% endif %}
   {% if exists("QUBE.AXIS_NAME.Value") %}
   CoreAxisNames        = {{ QUBE.AXIS_NAME.Value.0 }}{{ QUBE.AXIS_NAME.Value.1 }}{{ QUBE.AXIS_NAME.Value.2 }}
   {% endif %}
