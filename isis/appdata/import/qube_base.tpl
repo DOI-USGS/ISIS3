@@ -1,9 +1,16 @@
+{% set CoreOrganization=QUBE.AXIS_NAME.Value %}
 Object = IsisCube
   Object = Core
     Group = Dimensions
-      Samples = {{ at(QUBE.CORE_ITEMS.Value, 0) }}
-      Lines   = {{ at(QUBE.CORE_ITEMS.Value, 2) }}
-      Bands   = {{ at(QUBE.CORE_ITEMS.Value, 1) }}
+    {% for org in CoreOrganization %}
+      {% if org == "SAMPLE" %}
+      Samples =  {{ at(QUBE.CORE_ITEMS.Value, loop.index1 - 1) }}
+      {% else if org == "LINE" %}
+      Lines   = {{ at(QUBE.CORE_ITEMS.Value, loop.index1 - 1) }}
+      {% else if org == "BAND" %}
+      Bands   =  {{ at(QUBE.CORE_ITEMS.Value, loop.index1 - 1) }}
+      {% endif %}
+   {% endfor %}
     End_Group
 
     Group = Pixels
@@ -92,29 +99,31 @@ Object = IsisCube
     {%- else -%}
     {%- set infoGroup=QUBE -%}
     {%- endif -%}
-    SpacecraftName       = {{ infoGroup.MISSION_NAME.Value }}
-    InstrumentId         = {{ infoGroup.INSTRUMENT_ID.Value }}
-    TargetName           = {{ infoGroup.TARGET_NAME.Value }}
-    SpacecraftClockStartCount = {{ infoGroup.SPACECRAFT_CLOCK_START_COUNT.Value }}
-    StartTime            = {% set startTime=infoGroup.START_TIME.Value %}
-                           {{ RemoveStartTimeZ(startTime) }}
     {% endblock %}
   End_Group
 
   Group = Archive
-    MissionPhaseName     = {{ infoGroup.MISSION_PHASE_NAME.Value }}
-    SequenceId           = {{ infoGroup.SEQUENCE_ID.Value }}
-    SequenceTitle        = {{ infoGroup.SEQUENCE_TITLE.Value }}
-    ObservationId        = {{ infoGroup.OBSERVATION_ID.Value }}
-    ProductId            = {{ infoGroup.PRODUCT_ID.Value }}
-    InstrumentModeId     = {{ infoGroup.INSTRUMENT_MODE_ID.Value }}
     {% block archive %}
     {% endblock %}
   End_Group
+
+  Group = BandBin
+  {% block bandbin %}
+  {% endblock %}
+  End_Group
+
+  Group = Kernels
+  {% block kernels %}
+  {% endblock %}
+  End_Group
 End_Object
+
 
 Object = Translation
   DataFilePointer      = {{ ptrQUBE.Value }}
+  {% if exists("RECORD_BYTES") %}
+  DataFileRecordBytes  = {{ RECORD_BYTES.Value }}
+  {% endif %}
   {% if exists("QUBE.AXIS_NAME.Value") %}
   CoreAxisNames        = {{ QUBE.AXIS_NAME.Value.0 }}{{ QUBE.AXIS_NAME.Value.1 }}{{ QUBE.AXIS_NAME.Value.2 }}
   {% endif %}
@@ -125,7 +134,7 @@ Object = Translation
   BandBinMultiplier    = {{ BAND_BIN.BAND_BIN_MULTIPLIER.Value }}
   {% endif %}
   {% if exists("QUBE.CORE_NULL.Value") %}
-  CoreNull             = {{ QUBE.CORE_NULL.Value }}
+  CoreNull             =  {{ QUBE.CORE_NULL.Value }}
   {% endif %}
   {% if exists("QUBE.CORE_LOW_REPR_SATURATION.Value") %}
   CoreLRS              = {{ QUBE.CORE_LOW_REPR_SATURATION.Value }}

@@ -137,24 +137,18 @@ namespace Isis {
     // Convert keywords
     PvlContainer::PvlKeywordIterator keywordIt;
     for (keywordIt = container.begin(); keywordIt != container.end(); keywordIt++) {
+      string keywordName = keywordIt->name().replace("^", "ptr").replace(":", "_").toStdString();
       // Handle repeated keywords by packing them into an array
-      if ( jsonContainer.contains(keywordIt->name().toStdString()) ) {
-        if (!jsonContainer[keywordIt->name().toStdString()].is_array()) {
+      if ( jsonContainer.contains(keywordName) ) {
+        if (!jsonContainer[keywordName].is_array()) {
           json repeatedArray;
-          repeatedArray.push_back(jsonContainer[keywordIt->name().toStdString()]);
-          jsonContainer[keywordIt->name().toStdString()] = repeatedArray;
+          repeatedArray.push_back(jsonContainer[keywordName]);
+          jsonContainer[keywordName] = repeatedArray;
         }
-        jsonContainer[keywordIt->name().toStdString()].push_back(pvlKeywordToJSON(*keywordIt));
+        jsonContainer[keywordName].push_back(pvlKeywordToJSON(*keywordIt));
       }
       else {
-        // Check if keyword has a '^', if so replace with 'ptr'.
-        // This removal is due to inja handling '^' as a mathematical operator.
-        if(keywordIt->name().toStdString()[0] == '^') {
-          jsonContainer[keywordIt->name().replace("^", "ptr").toStdString()] = pvlKeywordToJSON(*keywordIt);
-        }
-        else {
-          jsonContainer[keywordIt->name().toStdString()] = pvlKeywordToJSON(*keywordIt);
-        }
+          jsonContainer[keywordName] = pvlKeywordToJSON(*keywordIt);
       }
     }
 

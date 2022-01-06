@@ -14,6 +14,8 @@
 {%- set SpacecraftName=QUBE.MISSION_NAME.Value -%}
 {%- else if exists("MISSION_NAME") -%}
 {%- set SpacecraftName=MISSION_NAME.Value -%}
+{%- else if exists("INSTRUMENT_HOST_NAME") -%}
+{%- set SpacecraftName=INSTRUMENT_HOST_NAME.Value -%}
 {%- endif -%}
 
 {%- if SpacecraftName == "TRACE GAS ORBITER" -%}
@@ -33,7 +35,7 @@
 {%- else if SpacecraftName == "MARS_GLOBAL_SURVEYOR" -%}
 {%- set SpacecraftId="MGS" -%}
 {%- set InstrumentId="MOC" -%}
-{%- else if SpacecraftName == "DAWN MISSION TO VESTA AND CERES" -%}
+{%- else if SpacecraftName == "DAWN MISSION TO VESTA AND CERES" or SpacecraftName == "DAWN"-%}
 {%- set SpacecraftId="Dawn" -%}
 {%- endif -%}
 

@@ -64,7 +64,7 @@ namespace Isis {
         std::string templateFile = env.render_file(fileTemplate.expanded().toStdString(), jsonData);
         inputTemplate = FileName(QString::fromStdString(templateFile));
       }
-      catch(IException &e) {
+      catch(const std::exception& e) {
         QString msg = "Cannot locate a template for input label. Please provide a template file to use.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -244,6 +244,9 @@ namespace Isis {
     else if (inputFileName.removeExtension().addExtension("img").fileExists()) {
       importer.SetInputFile(inputFileName.removeExtension().addExtension("img").expanded());
     }
+    else if (inputFileName.removeExtension().addExtension("QUB").fileExists()) {
+      importer.SetInputFile(inputFileName.removeExtension().addExtension("QUB").expanded());
+    }
     else {
       importer.SetInputFile(inputFileName.expanded());
     }
@@ -289,19 +292,32 @@ namespace Isis {
       QString units = "BYTES";
 
       if (dataFilePointer.size() == 1) {
-        offset = toInt(dataFilePointer) - 1;
-        units = dataFilePointer.unit();
+        try {
+          offset = toInt(dataFilePointer) - 1;
+          units = dataFilePointer.unit();
+        }
+        catch(IException &e) {
+          // Failed to parse to an int, means we have a file name
+          // No offset given, so we use 1, offsets are 1 based
+          offset = 0;
+          units = "BYTES";
+        }
       }
       else if (dataFilePointer.size() == 2) {
         offset = toInt(dataFilePointer[1]) - 1;
         units = dataFilePointer.unit(1);
       }
-
+      else {
+        QString msg = "Improperly formatted data file pointer keyword ^IMAGE or "
+                     "^QUBE, in [" + inputFileName.toString() + "], must contain filename "
+                     " or offset or both";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+      
       if (translation.hasKeyword("DataFileRecordBytes")) {
         recSize = toInt(translation["DataFileRecordBytes"]);
       }
-
-      importer.SetFileHeaderBytes((offset) * recSize);
+      importer.SetFileHeaderBytes(offset * recSize);
     }
     // Assume PDS4
     else {
@@ -354,31 +370,46 @@ namespace Isis {
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
-
+    QString str;
     // Set any special pixel values
     double pdsNull = Isis::NULL8;
     if (translation.hasKeyword("CoreNull")) {
-      pdsNull = toDouble(translation["CoreNull"]);
+      str = QString(translation["CoreNull"]);
+      if(str != "NULL") {
+        pdsNull = toDouble(str);
+      }
     }
 
     double pdsLrs = Isis::Lrs;
     if (translation.hasKeyword("CoreLRS")) {
-      pdsLrs = toDouble(translation["CoreLRS"]);
+      str = QString(translation["CoreLRS"]);
+      if(str != "NULL") {
+        pdsLrs = toDouble(str);
+      }
     }
 
     double pdsLis = Isis::Lis;
     if (translation.hasKeyword("CoreLIS")) {
-      pdsLis = toDouble(translation["CoreLIS"]);
+      str = QString(translation["CoreLIS"]);
+      if(str != "NULL") {
+        pdsLis = toDouble(str);
+      }
     }
 
     double pdsHrs = Isis::Hrs;
     if (translation.hasKeyword("CoreHRS")) {
-      pdsHrs = toDouble(translation["CoreHRS"]);
+      str = QString(translation["CoreHRS"]);
+      if(str != "NULL") {
+        pdsHrs = toDouble(str);
+      }
     }
 
     double pdsHis = Isis::His;
     if (translation.hasKeyword("CoreHIS")) {
-      pdsHis = toDouble(translation["CoreHIS"]);
+      str = QString(translation["CoreHIS"]);
+      if(str != "NULL") {
+        pdsHis = toDouble(str);
+      }
     }
     importer.SetSpecialValues(pdsNull, pdsLrs, pdsLis, pdsHrs, pdsHis);
 
