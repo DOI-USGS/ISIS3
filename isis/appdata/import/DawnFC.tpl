@@ -56,7 +56,8 @@ FirstLineSample           = {{ IMAGE.FIRST_LINE_SAMPLE.Value }}
     ReleaseId               = {{ RELEASE_ID.Value }}
 {% endblock %}
 
-{% block bandbin %}
+{% block additional_groups %}
+Group = BandBin
 {% set filterNumber=FILTER_NUMBER.Value %}
 {% if filterNumber == "1" %}
   {% set center="700" %}
@@ -91,19 +92,20 @@ FirstLineSample           = {{ IMAGE.FIRST_LINE_SAMPLE.Value }}
   {% set width="40" %}
   {% set filterName="Blue_F8" %}
 {% endif %}
-FilterNumber = {{ filterNumber }}
-Center       = {{ center }}
-Width        = {{ width }}
-FilterName   = {{ filterName }}
-{% endblock %}
+  FilterNumber = {{ filterNumber }}
+  Center       = {{ center }}
+  Width        = {{ width }}
+  FilterName   = {{ filterName }}
+End_Group
 
-{% block kernels %}
-{{ super() }}
+Group = Kernels
+  {% set instID = INSTRUMENT_ID.Value %}
   NaifFrameCode = {% if instID == "FC1" %}
                   {{ (-203110) - int(filterNumber) }}
                   {% else if instID == "FC2" %}
                   {{ (-203120) - int(filterNumber) }}
                   {% endif %}
+End_Group
 {% endblock %}
 
 {% block translation %}

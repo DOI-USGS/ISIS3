@@ -37,6 +37,8 @@
 {%- set InstrumentId="MOC" -%}
 {%- else if SpacecraftName == "DAWN MISSION TO VESTA AND CERES" or SpacecraftName == "DAWN"-%}
 {%- set SpacecraftId="Dawn" -%}
+{%- else if SpacecraftName == "MARS EXPLORATION ROVER" -%}
+{%- set SpacecraftId="Mer" -%}
 {%- endif -%}
 
 {%- if InstrumentId == "FC1" or InstrumentId == "FC2" -%}
