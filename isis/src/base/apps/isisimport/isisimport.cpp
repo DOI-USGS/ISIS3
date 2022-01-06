@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 #include <inja/inja.hpp>
 #include <nlohmann/json.hpp>
@@ -53,6 +54,14 @@ namespace Isis {
       }
     }
     Environment env;
+
+    // Dump the JSON to the debugging file if requested
+    // This needs to be above all uses of the JSON by the template engine
+    if (ui.WasEntered("DATA")) {
+        std::ofstream jsonDataFile(FileName(ui.GetFileName("DATA")).expanded().toStdString());
+        jsonDataFile << jsonData.dump(4);
+        jsonDataFile.close();
+      }
 
     // Find associated template
     FileName inputTemplate;
