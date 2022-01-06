@@ -3,7 +3,7 @@
     {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
       "name": "Laura, Jason",
-      "orcid": ""
+      "orcid": "0000-0002-1377-8159"
     },
     {
       "name": "Acosta, Alex"
@@ -35,7 +35,8 @@
       "name": "Anderson, Jeff"
     },
     {
-      "name": "Annex, Andrew"
+      "name": "Annex, Andrew",
+      "orcid": "0000-0002-0253-2313"
     },
     {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
@@ -313,6 +314,10 @@
       "name": "Miller-Ribelin, Elizabeth"
     },
     {
+        "affiliation": "United States Geological Survey, Astro Geology Science Center",
+        "name": "Nelson, Gavin"
+    },
+    {
       "name": "Neubauer, Cole"
     },
     {
@@ -374,8 +379,7 @@
     },
     {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
-      "name": "Sides, Stuart",
-      "orcid": ""
+      "name": "Sides, Stuart"
     },
     {
       "affiliation": "Arizona State University",

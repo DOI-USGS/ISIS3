@@ -40,7 +40,7 @@ bool ptXLessThan(const QList<double> l1, const QList<double> l2);
  *
  * @internal
  */
-class LineOffsetFunctor : 
+class LineOffsetFunctor :
   public std::unary_function<double, double > {
   public:
 
@@ -56,7 +56,7 @@ class LineOffsetFunctor :
     /** Compute the number of lines between the current line (i.e., the line imaged at the et as set
      *  in the camera model) and the line number where the argument et would hit the focal
      *  plane.
-     *  
+     *
      * @param et The et at the new postion
      *
      * @return Line off (see description)
@@ -76,16 +76,16 @@ class LineOffsetFunctor :
                       "cache bounds";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
-     
+
       m_camera->Sensor::setTime(et);
- 
+
       // Set ground
       if (!m_camera->Sensor::SetGround(m_surfacePoint, false)) {
         IString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
                       " LineOffsetFunctor";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
-   
+
       // Calculate the undistorted focal plane coordinates
       m_camera->Sensor::LookDirection(lookC);
       ux = m_camera->FocalLength() * lookC[0] / lookC[2];
@@ -126,10 +126,10 @@ class LineOffsetFunctor :
         IString msg = "FocalPlaneMap::SetFocalPlane failed for surface point in "
                       "LineScanCameraGroundMap.cpp LineOffsetFunctor";
         throw IException(IException::Programmer, msg, _FILEINFO_);
-      }     
+      }
 
       // Return the offset
-      return (m_camera->FocalPlaneMap()->DetectorLineOffset() - 
+      return (m_camera->FocalPlaneMap()->DetectorLineOffset() -
               m_camera->FocalPlaneMap()->DetectorLine());
     }
 
@@ -145,7 +145,7 @@ class LineOffsetFunctor :
  *
  * @internal
  */
-class SensorSurfacePointDistanceFunctor : 
+class SensorSurfacePointDistanceFunctor :
   public std::unary_function<double, double > {
 
   public:
@@ -236,7 +236,7 @@ namespace Isis {
     //if(status == Failure) return false;
     return false;
   }
-  
+
 
   /** Compute undistorted focal plane coordinate from ground position
    *
@@ -291,26 +291,26 @@ namespace Isis {
     SensorSurfacePointDistanceFunctor distanceFunc(p_camera,surfacePoint);
 
     // METHOD #1
-    // Use the line given as a start point for the secant method root search. 
+    // Use the line given as a start point for the secant method root search.
     if (approxLine >= 0.5) {
 
       // convert the approxLine to an approximate time and offset
       p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2.0, approxLine);
       approxTime = p_camera->time().Et();
-  
+
       approxOffset = offsetFunc(approxTime);
 
       // Check to see if there is no need to improve this root, it's good enough
-      if (fabs(approxOffset) < 1e-2) { 
+      if (fabs(approxOffset) < 1e-2) {
         p_camera->Sensor::setTime(approxTime);
         // check to make sure the point isn't behind the planet
         if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
           return Failure;
-        } 
+        }
         p_camera->Sensor::LookDirection(lookC);
         ux = p_camera->FocalLength() * lookC[0] / lookC[2];
         uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-     
+
         p_focalPlaneX = ux;
         p_focalPlaneY = uy;
 
@@ -346,7 +346,7 @@ namespace Isis {
 
 
         // elliminate the node farthest away from the current best guess
-        if (fabs( xl- etGuess) > fabs( xh - etGuess)) {  
+        if (fabs( xl- etGuess) > fabs( xh - etGuess)) {
           xl = etGuess;
           fl = f;
         }
@@ -361,15 +361,15 @@ namespace Isis {
           // check to make sure the point isn't behind the planet
           if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
             return Failure;
-          } 
+          }
           p_camera->Sensor::LookDirection(lookC);
           ux = p_camera->FocalLength() * lookC[0] / lookC[2];
           uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-      
+
           p_focalPlaneX = ux;
           p_focalPlaneY = uy;
 
-          return Success;       
+          return Success;
         }
       } // End itteration using a guess
       // return Failure; // Removed to let the lagrange method try to find the line if secant fails
@@ -400,16 +400,16 @@ namespace Isis {
     for (int i=0; i<3; i++) {
       offsetNodes[i] = offsetFunc(timeNodes[i]);
     }
-   
+
     // centralize and normalize the data for stability in root finding
     timeAverage = (timeNodes[0] + timeNodes[1] + timeNodes[2]) / 3.0;
     timeNodes[0] -= timeAverage;
     timeNodes[1] -= timeAverage;
     timeNodes[2] -= timeAverage;
 
-    scale = 1.0 / sqrt((timeNodes[0] - timeNodes[2]) * 
-                       (timeNodes[0] - timeNodes[2]) + 
-                       (offsetNodes[0] - offsetNodes[2]) * 
+    scale = 1.0 / sqrt((timeNodes[0] - timeNodes[2]) *
+                       (timeNodes[0] - timeNodes[2]) +
+                       (offsetNodes[0] - offsetNodes[2]) *
                        (offsetNodes[0] - offsetNodes[2]));
 
     timeNodes[0] *= scale;
@@ -420,8 +420,8 @@ namespace Isis {
     offsetNodes[1] *= scale;
     offsetNodes[2] *= scale;
 
-    // Use lagrange interpolating polynomials to find the coefficients of the quadratic, 
-    // there are many ways to do this; I chose to do it this way because it is pretty straight 
+    // Use lagrange interpolating polynomials to find the coefficients of the quadratic,
+    // there are many ways to do this; I chose to do it this way because it is pretty straight
     // forward and cheap
     quadPoly[0] = quadPoly[1] = quadPoly[2] = 0.0;
 
@@ -434,13 +434,13 @@ namespace Isis {
     quadPoly[0] += temp;
     quadPoly[1] += temp * (-timeNodes[0] - timeNodes[2]);
     quadPoly[2] += temp * timeNodes[0] * timeNodes[2];
-      
+
     temp = offsetNodes[2] / ((timeNodes[2] - timeNodes[0]) * (timeNodes[2] - timeNodes[1]));
     quadPoly[0] += temp;
     quadPoly[1] += temp * (-timeNodes[0] - timeNodes[1]);
     quadPoly[2] += temp * timeNodes[0] * timeNodes[1];
 
-    // Now that we have the coefficients of the quadratic look for roots 
+    // Now that we have the coefficients of the quadratic look for roots
     // (see Numerical Recipes Third Edition page 227)
     temp = quadPoly[1] * quadPoly[1] - 4.0 * quadPoly[0] * quadPoly[2];  //discriminant
 
@@ -470,7 +470,7 @@ namespace Isis {
         root.removeAt(i);
       }
     }
-     
+
     // return the calculated roots to the original system
     for (int i=0; i<root.size(); i++) {
       root[i] = root[i]/scale + timeAverage;
@@ -483,9 +483,9 @@ namespace Isis {
 
     // At the time of this writing ISIS made no attempt to support any sensors that were not "1 to 1".
     // Meaning they imaged the same point on the ground in multiple lines of the image
-    // therefore we must somehow reduce multiple possible roots to a single one,  the legacy 
+    // therefore we must somehow reduce multiple possible roots to a single one,  the legacy
     // code (replaced with this code) did this based on distance from the sensor to the target
-    // the shortest distance being the winner.  For legacy consistency I have used the same logic below.  
+    // the shortest distance being the winner.  For legacy consistency I have used the same logic below.
 
     for (int i=0; i<root.size(); i++) {  // Offset/dist calculation loop
       dist << distanceFunc(root[i]);
@@ -494,11 +494,11 @@ namespace Isis {
 
     // Save the root with the smallest dist
     {
-      int j=0;   
+      int j=0;
       for (int i=1; i<root.size(); i++) {
         if (dist[i] < dist[j]) j=i;
-      }      
-        
+      }
+
       approxTime = root[j];  // Now we have our time
       approxOffset = offset[j];  // The offsets are saved to avoid recalculating it later
     }
@@ -510,11 +510,11 @@ namespace Isis {
       if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
         return Failure;
       }
-       
+
       p_camera->Sensor::LookDirection(lookC);
       ux = p_camera->FocalLength() * lookC[0] / lookC[2];
       uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-     
+
       p_focalPlaneX = ux;
       p_focalPlaneY = uy;
 
@@ -527,7 +527,7 @@ namespace Isis {
     // The offsets are typically quadratic, so three points will be used to approximate a quadratic
     // as a first order attempt to find the root location(s)
 
-    // The above sections are sufficient for finding the correct times for the vast majority of 
+    // The above sections are sufficient for finding the correct times for the vast majority of
     // back projection solutions.  The following section exists for those few particularly
     // stuborn problems.  They are typically characterised by being significantly non-quadratic.
     // Examples mostly include images with very long exposure times.
@@ -544,18 +544,18 @@ namespace Isis {
       QList <double> pt;
       pt << timeNodes[i] / scale + timeAverage;
       pt << offsetNodes[i] / scale;
-      pts << pt; 
+      pts << pt;
     }
 
     for (int i=0; i<root.size(); i++) {
       QList <double> pt;
       pt << root[i];
       pt << offset[i];
-      pts << pt; 
+      pts << pt;
     }
 
     qSort(pts.begin(), pts.end(), ptXLessThan);
-    
+
     root.clear();
     for (int i=1; i<pts.size(); i++) {
       // If the signs of the two offsets are not the same they bracket at least one root
@@ -565,7 +565,7 @@ namespace Isis {
                                                                  1.0e-3, 200, temp)) {
           root << temp;
         }
-      }      
+      }
     }
 
     // Discard any roots that are looking through the planet
@@ -592,7 +592,7 @@ namespace Isis {
 
     // Save the root with the smallest dist
     {
-      int j=0;   
+      int j=0;
       for (int i=1; i<root.size(); i++) {
         if (dist[i] < dist[j]) j=i;
       }
@@ -604,10 +604,10 @@ namespace Isis {
     p_camera->Sensor::LookDirection(lookC);
     ux = p_camera->FocalLength() * lookC[0] / lookC[2];
     uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-     
+
     p_focalPlaneX = ux;
     p_focalPlaneY = uy;
-       
+
     return Success;
   }
 }
@@ -616,4 +616,3 @@ namespace Isis {
 bool ptXLessThan(const QList<double> l1, const QList<double> l2) {
   return l1[0] < l2[0];
 }
-

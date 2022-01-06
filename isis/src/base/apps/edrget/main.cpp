@@ -14,6 +14,12 @@ using namespace Isis;
 using namespace std;
 
 void IsisMain() {
+  std::cout << "\n*********************************** WARNING ***********************************\n"
+    " This program is deprecated and will be made unavailable in a future release of\n"
+    " ISIS.  A brief discussion that lead to this decision can be found at          \n"
+    " https://github.com/USGS-Astrogeology/ISIS3/issues/3313.  Users who require    \n"
+    " similar functionality are encouraged to explore wget as a replacement.        \n"
+    "*******************************************************************************\n" << '\n';
 
   // Get the file name from the GUI
   int timeOut = 60000;
@@ -33,7 +39,7 @@ void IsisMain() {
   QUrl qurl(guiURL);
 
   //test if scheme is ftp or http
-  if (qurl.scheme().toLower() == "ftp" || qurl.scheme().toLower() == "http" || 
+  if (qurl.scheme().toLower() == "ftp" || qurl.scheme().toLower() == "http" ||
       qurl.scheme().toLower() == "https") {
 
     if (ui.IsInteractive()) {

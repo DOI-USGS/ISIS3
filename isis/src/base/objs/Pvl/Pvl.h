@@ -124,6 +124,7 @@ namespace Isis {
 
       friend std::istream &operator>>(std::istream &is, Pvl &pvl);
       friend std::ostream &operator<<(std::ostream &os, Isis::Pvl &pvl);
+      void fromString(const std::string &str);
 
       ~Pvl() {
         if(m_internalTemplate) delete m_formatTemplate;

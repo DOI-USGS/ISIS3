@@ -5,9 +5,19 @@
 
   <brief>
     Import a Galileo Near Infrared Mapping Spectrometer (NIMS) cube into ISIS cube format.
+
+    Note: This application only works with the original PDS3 archive.
+    This routine was created to restore the NIMS tube/gcube data and migrate to PDS4.
   </brief>
 
   <description>
+    <p>
+      <b>This application only works with the original
+      <a href="https://pds-imaging.jpl.nasa.gov/data/galileo/galileo_orbiter/">PDS3 archive</a>.
+      This routine was created to restore the NIMS tube/gcube data and migrate to PDS4 which has been released
+      <a href="https://pdsimage2.wr.usgs.gov/Individual_Investigations/multi_galileo_nims_tube.gcube_cahill_2019/">here</a>.
+      </b>
+    </p>
     <p>
     This program will read and convert a PDS formatted Galileo Near Infrared Mapping Spectrometer
     file (downloaded as a *.qub file from a
@@ -17,13 +27,13 @@
     NIMS cube, and an output path and name for both the core and suffix cubes.
     </p>
     <p>
-     The projections used for the original qube files are not compatible with ISIS projections, so projected Galileo NIMS 
-     qubes cannot be converted into equivalent ISIS cubes with mapping information directly. Instead, imported NIMS ISIS cubes are provided with a MappingInformation PVL group in the cube label. 
+     The projections used for the original qube files are not compatible with ISIS projections, so projected Galileo NIMS
+     qubes cannot be converted into equivalent ISIS cubes with mapping information directly. Instead, imported NIMS ISIS cubes are provided with a MappingInformation PVL group in the cube label.
      The information in this PVL group and latitude and longitude information from the output suffix cube can be used with the nocam2map ISIS application to produce a projected image. An example follows.
     </p>
     <p>
 	To use nocam2map in this way, first convert the Galileo NIMS PDS qube into an ISIS cube using gllnims2isis:
-        <pre> 
+  <pre>
   gllnims2isis from=original.qub core=core.cub suffix=suffix.cub
 	</pre>
 	 Then, extract latitude and longitude cubes from the suffix cube. The first band is latitude, the second is longitude:
@@ -32,7 +42,7 @@
   cubeatt from=suffix.cub+2 to=longitude.cub
 	</pre>
 	Next, use information from core.cub's MappingInfo PVL group to run nocam2map. Here is an example of the information contained in a MappingInfo PVL group:
-         <pre>
+  <pre>
   Group = MappingInformation
     LatitudeType            = Planetocentric
     LongitudeDirection      = PositiveWest
@@ -54,7 +64,7 @@
   nocam2map from=core.cub latcube=latitude.cub loncube=longitude.cub londir=positivewest to=projected.cub pixres=ppd resolution=0.334
   equradius=1830.00 polradius=1815.30
 </pre>
-        It isn't required, but the minimum and maximum latitude and longitude from the MappingInformation group can also be used in nocam2map to define the output range of the projection. For defining the projection to use, either a pre-existing map template can be used, or a new mapping label can be created from the information in the MappingInformation group. 
+        It isn't required, but the minimum and maximum latitude and longitude from the MappingInformation group can also be used in nocam2map to define the output range of the projection. For defining the projection to use, either a pre-existing map template can be used, or a new mapping label can be created from the information in the MappingInformation group.
 </p>
     <p>
     See Also:
@@ -75,7 +85,23 @@
         </p>
         </li>
     </ul>
-
+    <p>
+      <b>Note:</b>
+      <p>
+      Now that the data has been migrated to PDS4, this routine should not be needed
+      for ingesting Galileo NIMS tube/gcube data. The PDS4 migrated files are stored
+      in a "raw" ISIS3+ cube format with a PDS4 label. Thus applications which have
+      support for ISIS3+ cube format or the PDS4 format should be able to directly
+      use them. For more about how the data was migrated, please see the
+      <a href="https://pdsimage2.wr.usgs.gov/Individual_Investigations/multi_galileo_nims_tube.gcube_cahill_2019/document/">readme.pdf</a>
+      from the new archive or the Cahill et al., 2017 LPSC abstract.
+      </p>
+      <p>
+      Cahill, J. T. S., K. Becker, R. Espiritu, C. Isbell, and F. P. Seelos (2017), Galileo NIMS:
+      New ISIS3 tools for modernized data set handling and PDS4 re-archival, Planetary Data
+      Workshop, 3, <a href="https://www.hou.usra.edu/meetings/planetdata2017/pdf/7071.pdf">abs. 7071</a>.
+      </p>
+    </p>
     </p>
 
   </description>
@@ -86,17 +112,16 @@
     </change>
     <change name="Jeannie Backer" date="2016-03-15">
       Modified error throw to not append a caught message to the current message.
-      This was printing non UTF-8 characters on some platforms. Updated truth data. 
+      This was printing non UTF-8 characters on some platforms. Updated truth data.
     </change>
     <change name="Jesse Mapel" date="2016-10-08">
-      Modified to import the PDS mapping group. 
+      Modified to import the PDS mapping group.
     </change>
     <change name="Kristin Berry" date="2016-12-28">
       Took out the PDS mapping group because they don't match ISIS Projection standards.
       Instead a MappingInformation PVL group was added, along with documentation about
       how to use nocam2map with this information to create a valid projected ISIS Cube.
     </change>
-
   </history>
 
   <category>

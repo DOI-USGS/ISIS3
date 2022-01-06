@@ -319,6 +319,17 @@
       rand notebook that jigsaw was based on. Also added a section in the documentation
       describing the target body radii solve issue.
     </change>
+    <change name="Jesse Mapel and Kristin Berry" date="2021-06-29">
+      Added the ability to bundle adjust images that use a CSM based model. New parameters
+      CSMSOLVESET, CSMSOLVELIST, and CSMSOLVEYPE were added to specify which parameters to
+      solve for. These parameters can also be used as keys in the SCCONFIG file.
+
+      Modified images CSV file to generate a separate CSV for each sensor being adjusted.
+    </change>
+    <change name="Jesse Mapel" date="2021-11-09">
+      Fixed measure residual reporting in bundleout.txt file to match the residuals
+      reported in the residuals CSV file.
+    </change>
   </history>
 
   <groups>
@@ -1018,7 +1029,85 @@
           <item>No</item>
         </default>
       </parameter>
-      </group>
+    </group>
+
+    <group name="Community Sensor Model Options">
+      <parameter name="CSMSOLVESET">
+        <internalDefault>none</internalDefault>
+        <type>string</type>
+        <brief>Specify a set of a CSM parameters to solve for.</brief>
+        <description>
+          Specify one of the parameter sets from the CSM GeometricModel API to solve for.
+          All parameters belonging to the specified set will be solved for.
+        </description>
+        <exclusions>
+          <item>CSMSOLVETYPE</item>
+          <item>CSMSOLVELIST</item>
+        </exclusions>
+        <list>
+          <option value="VALID">
+            <brief> Solves for CSM parameters that are not NONE.</brief>
+          </option>
+          <option value="ADJUSTABLE">
+            <brief>Solves for real or fictitous CSM parameters.</brief>
+          </option>
+          <option value="NONADJUSTABLE">
+            <brief>Solves for fixed CSM parameters.</brief>
+            <description>
+              Solve for fixed CSM parameters. These parameters are generally not adjusted
+              but do have uncertainty which can help constrain the solutions and improve
+              a posteriori uncertainties for other parameters.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="CSMSOLVETYPE">
+        <type>string</type>
+        <brief>Specify a type of a CSM parameters to solve for.</brief>
+        <description>
+          Specify a parameter type from the CSM GeometricModel API to solve for.
+          All parameters of the specified type will be solved for.
+        </description>
+        <exclusions>
+          <item>CSMSOLVESET</item>
+          <item>CSMSOLVELIST</item>
+        </exclusions>
+        <list>
+          <option value="NONE">
+            <brief>Solve for unitialized CSM parameters</brief>
+          </option>
+          <option value="FICTITIOUS">
+            <brief>Solve for CSM parameters calculted by resection</brief>
+          </option>
+          <option value="REAL">
+            <brief>Solve for measured CSM parameters</brief>
+          </option>
+          <option value="FIXED">
+            <brief>Solve for fixed CSM parameters</brief>
+          </option>
+          <description>
+            Solve for fixed CSM parameters. These parameters are generally not adjusted
+            but do have uncertainty which can help constrain the solutions and improve
+            a posteriori uncertainties for other parameters.
+          </description>
+        </list>
+      </parameter>
+
+      <parameter name="CSMSOLVELIST">
+        <type>string</type>
+        <brief>Specify an explicit list of CSM parameters to solve for.</brief>
+        <description>
+          All CSM parameters in this list will be solved for. Trailing and leading whitespace
+          will be stripped off. Use standard ISIS parameter array notation to specify multiple
+          parameters.
+        </description>
+        <exclusions>
+          <item>CSMSOLVESET</item>
+          <item>CSMSOLVETYPE</item>
+        </exclusions>
+      </parameter>
+    </group>
 
     <group name="Target Body">
       <parameter name="SOLVETARGETBODY">
@@ -1342,6 +1431,21 @@
       </group>
 
     </groups>
+    <example>
+      <brief>Solve with CSM parameters</brief>
+      <description>
+        This is an example where the cubes in the network have been run through csminit.
+        When specified in CSMSOLVELIST, parameters described in the CsmInfo group can
+        be adjusted during the bundle.
+      </description>
+      <terminalInterface>
+        <commandLine> jigsaw fromlis=cubes.lis cnet=input.net onet=output.net radius=yes csmsolvelist="(Omega Bias, Phi Bias, Kappa Bias)" control_point_coordinate_type_bundle=rectangular control_point_coordinate_type_reports=rectangular point_x_sigma=50 point_y_sigma=50 point_z_sigma=50
+        </commandLine>
+        <description>
+         jigsaw CSM example
+        </description>
+      </terminalInterface>
+    </example>
 
     <liens>
       <item>Add items to glossary, example(s) and tips on how to analyze the
@@ -1349,4 +1453,65 @@
       </item>
     </liens>
 
+
+
+
+
+
+
+
+  <examples>
+    <example>
+      <brief> Simple run of jigsaw with images from a linescanner </brief>
+      <description>
+        <p>
+         This example runs jigsaw in a very simple way using four MRO CTX images. Only the required parameters are entered, with all other parameters
+         left at their default settings. This bundle solution only solves for the camera orientation (see the CAMSOLVE and TWIST parameters). This command does not
+         update the SPICE information attached to the four cubes.
+       </p>
+       <p>
+         A possible use for this simple run would be to test a network to identify control points that are not well placed.
+       </p>
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+         fromlist=ctx.lis cnet=hand_dense.net onet=hand_dense-jig.net
+        </commandLine>
+        <description>
+          This command line only sets the three required parameters.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/linescan/example_linescan_gui.png" width="1273" height="958">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              The top of the GUI shows the parameters filled in for input cube list, 
+              the input control network and the output control network. All other parameters
+              were left at their default values.
+            <br></br>
+            </description>
+            <thumbnail src="assets/linescan/example_linescan_gui_thumb.png" width="500" height="376" caption="jigsaw Linescan image example" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <dataFiles>
+        <dataFile path="assets/linescan/ctx.lis">
+          <brief> Cube list file </brief>
+          <description>
+            Input file defining the file names of the four cubes used in the control network.
+            The file names can include a path if needed. Each file name is on a separate line and
+            the last file name can have new line at the end, but it is not required.
+          </description>
+          <parameterName> FROMLIST </parameterName>
+        </dataFile>
+      </dataFiles>
+    </example>
+
+  </examples>
 </application>

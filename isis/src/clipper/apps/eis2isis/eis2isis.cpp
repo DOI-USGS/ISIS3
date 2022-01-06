@@ -97,10 +97,10 @@ namespace Isis {
       if (instrumentNameString == "EIS-NAC-RS") {
         // This ID will need to be updated. It is temporarily used for testing but is NOT the actual
         // NAC ID.
-        kerns += PvlKeyword("NaifFrameCode", toString(-159011));
+        kerns += PvlKeyword("NaifFrameCode", toString(-159101));
       }
       else if (instrumentNameString == "EIS-WAC-FC") {
-        kerns += PvlKeyword("NaifFrameCode", toString(-159104));
+        kerns += PvlKeyword("NaifFrameCode", toString(-159102));
       }
       else {
         QString msg = "Input file [" + xmlFileName.expanded() + "] has an invalid " +

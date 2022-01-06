@@ -5,6 +5,7 @@
 #include "FileName.h"
 
 #include "Blob.h"
+#include "csminit.h"
 #include "Fixtures.h"
 #include "Portal.h"
 #include "LineManager.h"
@@ -185,7 +186,7 @@ namespace Isis {
     int v_lineNum = 0;
     for(v_line.begin(); !v_line.end(); v_line++) {
       for(int i = 0; i < v_line.size(); i++) {
-        if(i == 4) { 
+        if(i == 4) {
           v_line[i] = NULL8;
         }
         else {
@@ -210,7 +211,7 @@ namespace Isis {
     int b_lineNum = 0;
     for(b_line.begin(); !b_line.end(); b_line++) {
       for(int i = 0; i < b_line.size(); i++) {
-        if( b_lineNum == 22 ) { 
+        if( b_lineNum == 22 ) {
           b_line[i] = NULL8;
         }
         else {
@@ -1389,6 +1390,7 @@ namespace Isis {
     testCube.reset();
   }
 
+
   void NullPixelCube::SetUp() {
     TempTestingFiles::SetUp();
 
@@ -1406,6 +1408,7 @@ namespace Isis {
     }
   }
 
+
   void NullPixelCube::TearDown() {
     if (testCube->isOpen()) {
       testCube->close();
@@ -1416,4 +1419,244 @@ namespace Isis {
     }
   }
 
+
+  void MiniRFNetwork::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube1 = new Cube("data/miniRFImage/LSZ_00455_1CD_XKU_87S324_V1_S1_Null.crop.cub");
+    testCube2 = new Cube("data/miniRFImage/LSZ_00457_1CD_XKU_87S321_V1_S1_Null.crop.cub");
+    testCube3 = new Cube("data/miniRFImage/LSZ_00459_1CD_XKU_88S327_V1_S1_Null.crop.cub");
+
+    cubeList = new FileList();
+
+    cubeList->append(testCube1->fileName());
+    cubeList->append(testCube2->fileName());
+    cubeList->append(testCube3->fileName());
+
+
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    cubeList->write(cubeListFile);
+
+    network = new ControlNet("data/miniRFImage/Cabeus_Orbit400_withSS_AprioriPts.net");
+    controlNetPath = tempDir.path() + "/miniRFNet.net";
+    network->Write(controlNetPath);
+  }
+
+  void MiniRFNetwork::TearDown() {
+    if (testCube1->isOpen()) {
+      testCube1->close();
+    }
+    delete testCube1;
+    if (testCube2->isOpen()) {
+      testCube2->close();
+    }
+    delete testCube2;
+    if (testCube3->isOpen()) {
+      testCube3->close();
+    }
+    delete testCube3;
+
+    if (cubeList) {
+      delete cubeList;
+    }
+  }
+
+  void VikThmNetwork::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube1 = new Cube("data/vikingThemisNetwork/F704b51.lev1_slo_crop.cub");
+    testCube2 = new Cube("data/vikingThemisNetwork/F857a32.lev1_slo_crop.cub");
+    testCube3 = new Cube("data/vikingThemisNetwork/I28234014RDR_crop.cub");
+    testCube4 = new Cube("data/vikingThemisNetwork/I52634011RDR_crop.cub");
+
+    cubeList = new FileList();
+
+    cubeList->append(testCube1->fileName());
+    cubeList->append(testCube2->fileName());
+    cubeList->append(testCube3->fileName());
+    cubeList->append(testCube4->fileName());
+
+
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    cubeList->write(cubeListFile);
+
+    network = new ControlNet("data/vikingThemisNetwork/themis_dayir_VO_arcadia_extract_hand.net");
+    controlNetPath = tempDir.path() + "/vikThmNet.net";
+    network->Write(controlNetPath);
+  }
+
+  void VikThmNetwork::TearDown() {
+    if (testCube1->isOpen()) {
+      testCube1->close();
+    }
+    delete testCube1;
+    if (testCube2->isOpen()) {
+      testCube2->close();
+    }
+    delete testCube2;
+    if (testCube3->isOpen()) {
+      testCube3->close();
+    }
+    delete testCube3;
+    if (testCube4->isOpen()) {
+      testCube4->close();
+    }
+    delete testCube4;
+
+    if (cubeList) {
+      delete cubeList;
+    }
+  }
+
+  void CSMNetwork::SetUp(){
+    QString APP_XML = FileName("$ISISROOT/bin/xml/csminit.xml").expanded();
+    QVector<QString> fNames = {"/Test_A", "/Test_B",
+                               "/Test_C", "/Test_D",
+                               "/Test_E", "/Test_F",
+                               "/Test_G", "/Test_H",
+                               "/Test_I", "/Test_J"
+                              };
+
+    cubes.fill(nullptr, 10);
+
+    cubeList = new FileList();
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    // Create CSMInit-ed cubes
+    for (int i = 0; i < cubes.size() ; i++){
+      cubes[i] = new Cube();
+      cubes[i]->setDimensions(1024,1024,1);
+      FileName cubName = FileName(tempDir.path()+fNames[i]+".cub");
+      cubes[i]->create(cubName.expanded());
+      cubeList->append(cubes[i]->fileName());
+      QVector<QString> args = {"from="+cubName.expanded(),
+                               "state=data/CSMNetwork/"+fNames[i]+".json",
+                               "modelname=TestCsmModel",
+                               "pluginname=TestCsmPlugin"
+                              };
+      UserInterface ui(APP_XML, args);
+      csminit(ui);
+    }
+    cubeList->write(cubeListFile);
+  }
+
+  void CSMNetwork::TearDown() {
+    for(int i = 0; i < cubes.size(); i++) {
+      if(cubes[i] && cubes[i]->isOpen()) {
+        delete cubes[i];
+      }
+    }
+
+    if (cubeList) {
+      delete cubeList;
+    }
+  }
+
+  void ClipperWacFcCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    QString testPath = tempDir.path() + "/test.cub";
+    QFile::copy("data/clipper/ClipperWacFc.cub", testPath);
+    wacFcCube = new Cube(testPath);
+
+    PvlGroup &wacKernels = wacFcCube->label()->findObject("IsisCube").findGroup("Kernels");
+    wacKernels.findKeyword("NaifFrameCode").setValue("-159102");
+
+    double offset = 10;
+    AlphaCube aCube(wacFcCube->sampleCount(), wacFcCube->lineCount(),
+                    wacFcCube->sampleCount()-offset, wacFcCube->lineCount() - offset,
+                    0, offset, wacFcCube->sampleCount(), wacFcCube->lineCount());
+
+    aCube.UpdateGroup(*wacFcCube);
+
+    wacFcCube->reopen("rw");
+  }
+
+  void ClipperWacFcCube::TearDown() {
+    if (wacFcCube) {
+      delete wacFcCube;
+    }
+  }
+
+  void ClipperNacRsCube::SetUp() {
+    DefaultCube::SetUp();
+
+    delete testCube;
+    testCube = new Cube();
+
+    FileName newCube(tempDir.path() + "/testing.cub");
+
+    testCube->fromIsd(newCube, label, isd, "rw");
+
+    PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue("-159101");
+
+    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+    std::istringstream iss(R"(
+      Group = Instrument
+        SpacecraftName            = Clipper
+        InstrumentId              = EIS-NAC-RS
+        TargetName                = Europa
+        StartTime                 = 2025-01-01T00:00:00.000
+        JitterSampleCoefficients = (0.0, 0.0, 0.0)
+        JitterLineCoefficients   = (0.0, 0.0, 0.0)
+      End_Group
+    )");
+
+    PvlGroup newInstGroup;
+    iss >> newInstGroup;
+    inst = newInstGroup;
+
+    PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
+    std::istringstream nk(R"(
+      Object = NaifKeywords
+        BODY_CODE               = 502
+        BODY502_RADII           = (1562.6, 1560.3, 1559.5)
+        BODY_FRAME_CODE         = 10024
+        INS-159101_FOCAL_LENGTH = 150.40199
+        INS-159101_PIXEL_PITCH  = 0.014
+        INS-159101_TRANSX       = (0.0, 0.014004651, 0.0)
+        INS-159101_TRANSY       = (0.0, 0.0, 0.01399535)
+        INS-159101_ITRANSS      = (0.0, 71.404849, 0.0)
+        INS-159101_ITRANSL      = (0.0, 0.0, 71.4523)
+        INS-159101_OD_K         = (0.0, 0.0, 0.0)
+      End_Object
+    )");
+
+    PvlObject newNaifKeywords;
+    nk >> newNaifKeywords;
+    naifKeywords = newNaifKeywords;
+
+    QString fileName = testCube->fileName();
+    delete testCube;
+    testCube = new Cube(fileName, "rw");
+
+    double offset = 10;
+    AlphaCube aCube(testCube->sampleCount(), testCube->lineCount(),
+                    testCube->sampleCount()-offset, testCube->lineCount() - offset,
+                    0, offset, testCube->sampleCount(), testCube->lineCount());
+
+    aCube.UpdateGroup(*testCube);
+    testCube->reopen("rw");
+  }
+
+  void ClipperNacRsCube::TearDown() {
+    if (testCube) {
+      delete testCube;
+    }
+  }
+
+  void ClipperPbCube::setInstrument(QString instrumentId) {
+    TempTestingFiles::SetUp();
+
+    if (instrumentId == "EIS-NAC-PB") {
+      QString testPath = tempDir.path() + "/nacTest.cub";
+      QFile::copy("data/clipper/ClipperNacPb.cub", testPath);
+      testCube = new Cube(testPath, "rw");
+    }
+    else if (instrumentId == "EIS-WAC-PB") {
+      QString testPath = tempDir.path() + "/wacTest.cub";
+      QFile::copy("data/clipper/ClipperWacPb.cub", testPath);
+      testCube = new Cube(testPath, "rw");
+    }
+  }
 }

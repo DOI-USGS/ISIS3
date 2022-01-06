@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="rtd_docs/ISIS_Logo.svg" alt="ISIS" width=200> 
+</p>
+
 # ISIS
 
 [![Join the chat at https://gitter.im/USGS-Astrogeology/isis3_cmake](https://badges.gitter.im/USGS-Astrogeology/isis3_cmake.svg)](https://gitter.im/USGS-Astrogeology/isis3_cmake?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -15,6 +19,7 @@
 * [Citing ISIS](README.md#Citing-ISIS)
 * [Start Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
 * [ISIS Data Area](README.md#The-ISIS-Data-Area)
+* [ISIS Test Data](README.md#ISIS-Test-Data)
 * [Installing Older Versions of ISIS](README.md#Installing-older-versions-of-ISIS)
 
 
@@ -38,8 +43,8 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 1.  Download either the Anaconda or Miniconda installation script for your OS platform. Anaconda is a much larger distribtion of packages supporting scientific python, while Miniconda is a minimal installation and not as large: [Anaconda installer](https://www.anaconda.com/download), [Miniconda installer](https://conda.io/miniconda.html)
 2.  If you are running on some variant of Linux, open a terminal window in the directory where you downloaded the script, and run the following commands. In this example, we chose to do a full install of Anaconda, and our OS is Linux-based. Your file name may be different depending on your environment.
 
-        chmod +x Anaconda3-5.2.0-Linux-x86_64.sh
-        ./Anaconda3-5.2.0-Linux-x86_64.sh
+        chmod +x Anaconda3-5.3.0-Linux-x86_64.sh
+        ./Anaconda3-5.3.0-Linux-x86_64.sh
 
 
     This will start the Anaconda installer which will guide you through the installation process.
@@ -78,43 +83,81 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
         conda config --env --add channels usgs-astrogeology
 
+6.  Download [Mamba](https://github.com/mamba-org/mamba). The ISIS environment is quite large and the Conda solver can take hours to resolve it. Instead, we recommend you use the much faster [Mamba](https://github.com/mamba-org/mamba) solver:
 
-6.  The environment is now ready to download ISIS and its dependencies:
+        conda install -n base -c conda-forge mamba
 
-        conda install -c usgs-astrogeology isis
+7.  The environment is now ready to download ISIS and its dependencies:
+
+        mamba install -c usgs-astrogeology isis
 
     If you would like to work with our latest ISIS version 3, rather than updating
     to ISIS 4, instead run:
 
-	    conda install -c usgs-astrogeology isis=3.10.0
+	    mamba install -c usgs-astrogeology isis=3.10.0
 
 
-7.  Finally, setup the environment variables:
+8.  Finally, setup the environment variables:
 
-    To use the default values for: `$ISISROOT, $ISISDATA, $ISISTESTDATA`, run the ISIS variable initialization script with default arguments.
+    ISIS requires several environment variables to be set in order to run correctly.
+    The variables include: ISISROOT and ISISDATA.
 
-    To do this, for versions of ISIS 4.2.0 and earlier, use:
+    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here]("#The-ISIS-Data-Area").
 
-        python $CONDA_PREFIX/scripts/isis3VarInit.py
+    The following steps are only valid for versions of ISIS after 4.2.0.
+    For older versions of ISIS follow the instructions in [this readme file.](https://github.com/USGS-Astrogeology/ISIS3/blob/adf52de0a04b087411d53f3fe1c9218b06dff92e/README.md)
 
-    For versions of ISIS after 4.2.0, use:
+    There are two methods to configure the environment variables for ISIS:
 
-        python $CONDA_PREFIX/scripts/isisVarInit.py
+    7.1 Using the provided isisVarInit.py script:
 
-    Executing this script with no arguments will result in $ISISDATA=$CONDA\_PREFIX/data, and $ISISTESTDATA=$CONDA\_PREFIX/testdata. The user can specify different directories for both of these optional values:
+      To use the default values for: `$ISISROOT` and `$ISISDATA`, run the ISIS variable initialization script with default arguments:
 
-    For ISIS 4.2.0 and earlier, use:
+          python $CONDA_PREFIX/scripts/isisVarInit.py
 
-        python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
+      Executing this script with no arguments will result in $ISISROOT=$CONDA\_PREFIX and $ISISDATA=$CONDA\_PREFIX/data. The user can specify different directories for `$ISISDATA` using the optional value:
 
-    For versions of ISIS after 4.2.0, use:
+          python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]
 
-        python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
+      Now every time the isis environment is activated, $ISISROOT and $ISISDATA will be set to the values passed to isisVarInit.py.
+      This does not happen retroactively, so re-activate the isis environment with one of the following commands:
 
-    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here]("#The-ISIS-Data-Area"). Now everytime the isis environment is activated, $ISISROOT, $ISISDATA, and $ISISTESTDATA will be set to the values passed to isisVarInit.py. This does not happen retroactively, so re-activate the isis envionment with one of the following commands:
+          for Anaconda 3.4 and up - conda activate isis
+          prior to Anaconda 3.4 - source activate isis
 
-        for Anaconda 3.4 and up - conda activate isis
-        prior to Anaconda 3.4 - source activate isis
+    7.2 Using `conda env config vars`
+
+      Conda has a built in method for configuring environment variables that are specific to a conda environment since version 4.8.
+      This version number applies only to the conda package, not to the version of miniconda or anaconda that was installed.
+
+      To determine if your version of conda is recent enough run:
+
+          conda --version
+
+      If the version number is less than 4.8, update conda to a newer version by running:
+
+          conda update -n base conda
+
+      The version number should now be greater than 4.8.
+
+      To use the built in environment variable configuration feature, first activate the environment by first running:
+
+          conda activate isis
+
+      After activation, the environment variables can be set using the syntax: `conda config vars set KEY=VALUE`.
+      To set all the environment variables ISIS requires, run the following command, updating the path to `ISISDATA` as needed:
+
+          conda env config vars set ISISROOT=$CONDA_PREFIX ISISDATA=[path to data directory]
+
+      To make these changes take effect, re-activate the isis environment by running:
+
+          conda activate isis
+
+      The environment variables are now set and ISIS is ready for use every time the isis environment is activated.
+
+      **Note** This method will not enable tab completion for arguments in C-Shell.
+
+
 
 ### Installation with Docker
 The ISIS production Dockerfile automates the conda installation process above.
@@ -283,16 +326,16 @@ remove these elements to and from your path.
 
 ### Updating
 
-  To update to a new version of ISIS up to version 3.9.1, simply run `conda update isis3`
+  To update to the newest version of ISIS, run `mamba update -c usgs-astrogeology isis`
 
-  To update to our latest release candidate up to version 3.9.1, run `conda update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
+  To update to our latest release candidate , run `mamba update -c usgs-astrogeology/label/RC isis`
 
   Note that for ISIS versions 3.10 and above, new versions and release candidates will only be
-  available under the package name `isis` and `conda update isis3` and  
-  `conda update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
-  will no longer work for additional updates. Instead, after installing an `isis` package,
-  `conda update isis` should be used to update to a new version and
-  `conda update -c usgs-astrogeology/label/RC isis` to update to a new release candidate.
+  available under the package name `isis` and `mamba update isis3` and
+  `mamba update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
+  will not work for additional updates. Instead, after installing an `isis` package,
+  `mamba update isis` should be used to update to a new version and
+  `mamba update -c usgs-astrogeology/label/RC isis` to update to a new release candidate.
 
 ### Operating System Requirements
 
@@ -540,6 +583,12 @@ For versions of ISIS prior to ISIS 4.1.0, please cd into `$ISIS3DATA` instead of
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/newhorizons .
 
 
+**OSIRIS-REx Mission:**
+
+    cd $ISISDATA
+    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/osirisrex .
+
+
 **Rolo Mission:**
 
     cd $ISISDATA
@@ -571,6 +620,33 @@ For versions of ISIS prior to ISIS 4.1.0, please cd into `$ISIS3DATA` instead of
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/voyager1 .
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/voyager2 .
 
+### ISIS Test Data 
+ISIS is comprised of two types of tests, custom Makefile based tests, and GTest based tests. Those that are GTest based, make economical use of data that exists on the ISIS3 repo along with the source, so no special data is required to run those other than the ISIS data area. The Makefile tests depend on a separate source of data that consists of a few gigabytes of input and expected output data used for testing ISIS applications. The Makefile based tests use the ISISTESTDATA environment variable to know where the required data are located. The total size of this test data decreases as we work towards converting Makefile tests to GTests.  
+ 
+###How to download the ISIS test data with rclone  
+Test data is hosted using Amazon S3 storage buckets. We recommend using rclone to pull the data into a local directory. You can download rclone using their instructions (see: https://rclone.org/downloads/) or by using an anaconda environment (see: https://docs.anaconda.com/anaconda/install/). If you already have an anaconda environment up, install rclone with: conda install –c conda-forge rclone  
+
+Next, you will want to configure rclone using a default S3 configuration. See: https://rclone.org/s3/ for detailed information on how to configure S3, but for the purposes of downloading the ISIS3 test data, you simply run rclone config which will start an interactive menu. Press enter through it all except for these details: 
+
+1. Set S3 as both your storage type and storage provider
+2. Set us-west-2 as both your region to connect to and as the location constraint. 
+3. Everything else, just leave as the default. 
+
+Example output: https://gist.github.com/Kelvinrr/706bbd54b1c2c30d0ce3d12f7dcaa10a
+
+Once rclone is configured, simply run: `rclone sync remote:asc-isisdata/isis_testData/ $ISISTESTDATA`
+where:
+  - $ISISTESTDATA is the environment variable defining the location of the ISISTESTDATA
+  - remote: is the name of the configuration you created earlier. This can be whatever you want to name it, in this case it is named remote. 
+  - asc-isisdata/isis_testData/ is the name of the S3 bucket you’re downloading from
+
+$ISISTESTDATA should now contain a full clone of the ISIS test data for running Makefile based tests. 
+
+Notes:
+  - Users can download specific files from the bucket by adding path data or file information to the first argument, that is, to download only the ‘base’ folder from the isis_testData bucket, the user could call:
+rclone sync remote:asc-isisdata/isis_testData/base
+  - It is important that users understand the difference in rclone’s ‘sync’ and ‘copy’ methods.  ‘copy’ will overwrite all data in the destination with data from source.  ‘sync’ replaces only changed data.
+  - Syncing / copying in either direction (local -> remote or remote -> local) results in any changed data being overwritten.  There is no warning message on overwrite.
 
 ## Installing older versions of ISIS
 ---------------------------------

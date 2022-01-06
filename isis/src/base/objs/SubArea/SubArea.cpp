@@ -191,9 +191,11 @@ namespace Isis {
               }
             }
             else {
-              minlon = proj->ToPositiveWest(proj->UniversalLongitude(), 360);
-              if (proj->Has180Domain()) {
-                minlon = proj->To180Domain(proj->ToPositiveWest(proj->UniversalLongitude(), 360));
+              if (proj->Has360Domain()) {
+                minlon = proj->ToPositiveWest(proj->Longitude(), 360);
+              }
+              else {
+                minlon = proj->ToPositiveWest(proj->Longitude(), 180);
               }
             }
             proj->SetWorld(p_es+.5, p_el+.5);
@@ -209,9 +211,11 @@ namespace Isis {
                 }
               }
               else {
-                maxlon = proj->ToPositiveWest(proj->UniversalLongitude(), 360);
-                if (proj->Has180Domain()) {
-                  maxlon = proj->To180Domain(proj->ToPositiveWest(proj->UniversalLongitude(), 360));
+                if (proj->Has360Domain()) {
+                  maxlon = proj->ToPositiveWest(proj->Longitude(), 360);
+                }
+                else {
+                  maxlon = proj->ToPositiveWest(proj->Longitude(), 180);
                 }
               }
               mapgroup.addKeyword(PvlKeyword("MinimumLatitude",toString(minlat)),Pvl::Replace);

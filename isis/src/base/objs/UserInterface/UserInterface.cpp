@@ -642,6 +642,9 @@ namespace Isis {
    * @throws Isis::IException::User - -ERRLIST expects a file name
    * @throws Isis::IException::User - -ONERROR only accpets CONTINUE and ABORT as valid values
    * @throws Isis::IException::Unknown - -GUI and -PID are incompatible arguments
+   *
+   * @internal
+   * @history 2021-06-05 Kris Becker - Fixed path to ISIS docs
    */
   void UserInterface::evaluateOption(const QString name,
                                      const QString value) {
@@ -680,7 +683,7 @@ namespace Isis {
     else if(name == "-WEBHELP") {
       Isis::PvlGroup &pref = Isis::Preference::Preferences().findGroup("UserInterface");
       QString command = pref["GuiHelpBrowser"];
-      command += " $ISISROOT/doc/Application/presentation/Tabbed/";
+      command += " $ISISROOT/docs/Application/presentation/Tabbed/";
       command += FileName(p_progName).name() + "/" + FileName(p_progName).name() + ".html";
       // cannot test else in unit test - don't want to open webhelp
       if (unitTest) {

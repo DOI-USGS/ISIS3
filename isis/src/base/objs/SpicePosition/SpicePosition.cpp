@@ -762,7 +762,7 @@ namespace Isis {
       p_et = p_cacheTime[0];
       SetEphemerisTime(p_et);
       std::vector<ale::State> stateCache;
-      stateCache.push_back(p_coordinate);
+      stateCache.push_back(ale::Vec3d(p_coordinate));
       std::vector<double> timeCache;
       timeCache.push_back(p_cacheTime[0]);
       if (m_state != NULL) {

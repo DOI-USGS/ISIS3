@@ -2,7 +2,7 @@
 
 def NUM_CORES = 8
 def errors = []
-def labels = ['CentOS', 'Fedora', 'Ubuntu', 'Mac'] // labels for Jenkins node types we will build on
+def labels = ['Ubuntu'] // labels for Jenkins node types we will build on
 def nodes = [:] 
 
 for (lbl in labels) {
@@ -34,6 +34,8 @@ for (lbl in labels) {
                 condaEnv("isis3") {
                     // Environment
                     loginShell """
+                        conda config --env --set channel_alias https://conda.wr.usgs.gov
+                        conda config --env --set remote_read_timeout_secs 3600
                         conda install -c conda-forge python=3 findutils
                         conda env update -f ${envFile} --prune
                         mkdir build install
@@ -61,7 +63,7 @@ for (lbl in labels) {
                             // Unit tests
                             stageStatus = "Running unit tests on ${label}"
                             try {
-                                loginShell "ctest -R _unit_ -j${NUM_CORES} -VV"
+                                loginShell "ctest -R _unit_ -j${NUM_CORES} --output-on-failure"
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true
@@ -70,14 +72,14 @@ for (lbl in labels) {
                             // App tests
                             stageStatus = "Running app tests on ${label}"
                             try {
-                                loginShell "ctest -R _app_ -j${NUM_CORES} -VV"
+                                loginShell "ctest -R _app_ -j${NUM_CORES} --output-on-failure"
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true
                             }
 
                             try {
-                                loginShell "ctest -R _module_ -j${NUM_CORES} -VV"
+                                loginShell "ctest -R _module_ -j${NUM_CORES} --output-on-failure"
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true
@@ -86,7 +88,7 @@ for (lbl in labels) {
                             // Gtests
                             stageStatus = "Running gtests on ${label}"
                             try {
-                                loginShell "ctest -R '.' -E '(_app_|_unit_|_module_)' -j${NUM_CORES} -VV"
+                                loginShell "ctest -R '.' -E '(_app_|_unit_|_module_)' -j${NUM_CORES} --output-on-failure"
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true

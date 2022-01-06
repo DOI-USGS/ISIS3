@@ -79,25 +79,6 @@ namespace Isis {
       // GetLine returns false if it was the last line... so we can't check for problems really
       inFile.GetLine(hexCode);
 
-      /*
-       * For Debugging, you may want to run spiceserver locally (without spiceinit).
-       *
-       * Uncomment the following code and run the spiceinit with web=true. An error will be thrown
-       * with the file name of the stored input hex file. You can rsync that file to your work area
-       * and run spice server locally.
-       */
-      /*
-       * const char *inmode = "overwrite";
-       * const char *ext  = "dat";
-       * TextFile newInput;
-       * newInput.Open(QString("/tmp/spice_web_service/input"), inmode, ext);
-       * newInput.Rewind();//start at begining
-       * newInput.PutLine(hexCode);
-       * newInput.Close();
-       * QString msg = "In: " + ui.GetFileName("FROM") + "   " + ui.GetFileName("TO");
-       * throw IException(IException::Programmer, msg, _FILEINFO_);
-       */
-
       Pvl label;
       label.clear();
       QString otherVersion;

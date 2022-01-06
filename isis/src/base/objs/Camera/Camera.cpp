@@ -1657,8 +1657,8 @@ namespace Isis {
 
     // get a normalized surface spacecraft vector
     SpiceDouble surfSpaceVect[3], unitizedSurfSpaceVect[3], dist;
-    std::vector<double> sB = bodyRotation()->ReferenceVector(
-        instrumentPosition()->Coordinate());
+    std::vector<double> sB(3, Isis::Null);
+    instrumentBodyFixedPosition(&sB[0]);
 
     SpiceDouble pB[3];
     SurfacePoint surfacePoint = GetSurfacePoint();
@@ -1691,6 +1691,41 @@ namespace Isis {
         Angle::Radians);
 
 
+  }
+
+
+  /**
+   * Calculates the slope at the current point
+   * by computing the angle between the local surface normal and the ellipsoid
+   * surface normal. If there is a failure during the process, such as there
+   * not being an intersection, then success will be false and slope will not
+   * be modified.
+   *
+   * @param[out] slope The slope angle in degrees
+   * @param[out] success If the slope was successfully calculated
+   */
+  void Camera::Slope(double &slope, bool &success) {
+    ShapeModel *shapeModel = target()->shape();
+    if ( !shapeModel->hasIntersection()) {
+      success = false;
+      return;
+    }
+    shapeModel->calculateSurfaceNormal();
+    if (!shapeModel->hasNormal()) {
+      success = false;
+      return;
+    }
+    std::vector<double> ellipsoidNormal = shapeModel->normal();
+
+    double localNormal[3];
+    GetLocalNormal(localNormal);
+    if (localNormal[0] == 0.0 && localNormal[1] == 0.0 && localNormal[2] == 0.0) {
+      success = false;
+      return;
+    }
+
+    slope = vsep_c(localNormal, &ellipsoidNormal[0]) * 180.0 / PI;;
+    success = true;
   }
 
 

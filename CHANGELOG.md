@@ -36,14 +36,68 @@ release.
 ## [Unreleased]
 
 ### Changed
+- Disabled SURF algorithm for findfeatures, latest version of opencv no longer provides SURF as part of the base library [#3885](https://github.com/USGS-Astrogeology/ISIS3/issues/3885)
+- Changed caminfo's parameter default values for MAXEMISSION and MAXINCIDENCE to be
+synchronized with footprintinit default values of the same parameters.
+This corrects inconsistencies of footprint generation failing in caminfo
+but passing in footprintinit. [#4651](https://github.com/USGS-Astrogeology/ISIS3/issues/4651).
+
+### Added
+- Added the USECAMSTATSTBL option to caminfo. This allows caminfo to extract existing
+camera statistics from the CameraStatistics Table of the input cube instead
+of recalculating CameraStatistics. Updated caminfo to output all CameraStatistics
+Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/ISIS3/issues/3605).
+- Added the ability to search filenames in measure's drop down boxes in Qnet Point Editor. [#4581](https://github.com/USGS-Astrogeology/ISIS3/issues/4581)
+- Added slope, local normal, and ellipsoid normal calculations to phocube. [#3635](https://github.com/USGS-Astrogeology/ISIS3/issues/3645)
+- Added additional translation files for TGO CaSSiS in order to support PSA compliant labels. [#4567](https://github.com/USGS-Astrogeology/ISIS3/issues/4567)
+- Added support for KaguyaTC SP Support data ingest. [#4668](https://github.com/USGS-Astrogeology/ISIS3/issues/4668)
+- Added examples to the jigsaw documentation. [#4718](https://github.com/USGS-Astrogeology/ISIS3/issues/4718)
+
+### Deprecated
+- Deprecated edrget as discussed in [#3313](https://github.com/USGS-Astrogeology/ISIS3/issues/3313).
+
+### Fixed
+- Fixed Maptrim failures when mode=both for PositiveWest longitude direction. [#4646](https://github.com/USGS-Astrogeology/ISIS3/issues/4646)
+- Fixed the Vesta target name not being translated properly in dawnfc2isis. [#4638](https://github.com/USGS-Astrogeology/ISIS3/issues/4638)
+- Fixed a bug where the measure residuals reported in the bundleout.txt file were incorrect. [#4655](https://github.com/USGS-Astrogeology/ISIS3/issues/4655)
+
+## [6.0.0] - 2021-08-27
+
+### Added
+- Added a new application, isisimport. The application is designed to be a replacement for many of the mission/instrument specific import applications. It does not contain the templates for those applications at this time. It uses a templateing engine instead of the translation files.
+- Added a new dark current correction to hical that works with the higher temperatures recent images are captured at. Use the new config file, $ISISDATA/mro/calibration/hical.0023_darkrate.conf, to enable the new dark current correction over the old dark current correction. Runs of hical without the new dark current correction will also produce an extra line in the output log indicating that the ZeroDarkRate module is disabled. [#4324](https://github.com/USGS-Astrogeology/ISIS3/issues/4324)
+- Added the ability to bundle adjust CSM models in jigsaw. Use the new CSMSOLVESET, CSMSOLVETYPE, and CSMSOLVELIST arguments to specify what you solve for. [#4537](https://github.com/USGS-Astrogeology/ISIS3/pull/4537)
+
+### Changed
+- Added the ability to export footprint information from a CaSSIS ISIS Cube label to the generated output PDS4 label in tgocassisrdrgen. [#4473](https://github.com/USGS-Astrogeology/ISIS3/issues/4473)
 - isisVarInit.py no longer writes a "cat" statement by default to the activate scripts which cause the ISIS version information to be written on conda activate.  This can be included in those scripts via a command line option to isisVarInit.py.  Also, a quiet option is provided to isisVarInit.py to suppress its own writing to standard out, if needed.
+- Changed how the images.csv file is output in jigsaw when there are multiple models. Now each sensor model will have its own images.csv file so that column headers can all be correct. For example, a solution involving LRONAC pairs and Apollo Metric images would generate three images.csv files: LRONAC Left, LRONAC Right, and Apollo Metric. [#4324](https://github.com/USGS-Astrogeology/ISIS3/issues/4324)
+- Changed the API of many Bundle utility classes as part of CSM support in jigsaw. [#4324](https://github.com/USGS-Astrogeology/ISIS3/issues/4324)
+
+## [5.0.2] - 2021-07-30
 
 ### Fixed
 - Fixed logging in FindFeatures where we were trying to get a non-existent Pvl group from the Pvl log. [#4375](https://github.com/USGS-Astrogeology/ISIS3/issues/4375)
+- Fixed an Minimum|Maximum calculation error when comparing all equal data in the qview statstics tool. [#4433](https://github.com/USGS-Astrogeology/ISIS3/issues/4414)
+- Fixed ISIS docs for incorrect path and -WEBHELP issues [#4510](https://github.com/USGS-Astrogeology/ISIS3/issues/4510)
+- Fixed a bug where writing out updated positions for framing cameras in jigsaw caused an error. [#4545](https://github.com/USGS-Astrogeology/ISIS3/issues/4545)
+- Fixed a bug where comments on BLOB labels were not written out. [#4442](https://github.com/USGS-Astrogeology/ISIS3/issues/4442)
+
+## [5.0.1] - 2021-06-10
+
+### Fixed
 - Fixed an arccos evaluating a double close to either 1, -1 when calculating the ground azimuth in camera.cpp. [#4393](https://github.com/USGS-Astrogeology/ISIS3/issues/4393)
 - Fixed hist outputs to N/A when all DNs are special pixels. [#3709](https://github.com/USGS-Astrogeology/ISIS3/issues/3709)
-- Fixed an Minimum|Maximum calculation error when comparing all equal data in the qview statstics tool. [#4433](https://github.com/USGS-Astrogeology/ISIS3/issues/4414)
 - Fixed SolarLon to compute from Table if cube is spiceinited. [#3703](https://github.com/USGS-Astrogeology/ISIS3/issues/3703)
+- Fixed GUI alignment to be top aligned rather than centered to make parameters less ambiguous. [#3710](https://github.com/USGS-Astrogeology/ISIS3/issues/3710)
+- Fixed hideal2pds bug where parameterizing for 8-bit output create 18-bit output. [#4006](https://github.com/USGS-Astrogeology/ISIS3/issues/4006)
+- Fixed Thm2isis to properly use output attributes [#4213](https://github.com/USGS-Astrogeology/ISIS3/issues/4213)
+- Fixed caminfo uselabel SegFault. [#4401](https://github.com/USGS-Astrogeology/ISIS3/issues/4401)
+
+### Changed
+- isisVarInit.py no longer writes a "cat" statement by default to the activate scripts which cause the ISIS version information to be written on conda activate.  This can be included in those scripts via a command line option to isisVarInit.py.  Also, a quiet option is provided to isisVarInit.py to suppress its own writing to standard out, if needed.
+- Changed the name of topds4 to isisexport. The application is designed to be a replacement for many of the mission/instrument specific export applications. It uses a templateing engine instead of the translation files.
+
 
 ## [5.0.0] - 2021-04-01
 
@@ -291,7 +345,11 @@ The unreleased comparison should always be
 {REPO_NAME}/compare/{LAST_VERSION_TAG}...HEAD
 -->
 
-[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.4.0...HEAD
+[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/6.0.0...HEAD
+[6.0.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.2...6.0.0
+[5.0.2]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.1...5.0.2
+[5.0.1]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.0...5.0.1
+[5.0.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.4.0...5.0.0
 [4.4.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.3.0...4.4.0
 [4.3.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.2.0...4.3.0
 [4.2.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/4.1.1...4.2.0

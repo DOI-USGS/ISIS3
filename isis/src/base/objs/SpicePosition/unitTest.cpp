@@ -354,4 +354,27 @@ int main(int argc, char *argv[]) {
   }
 
   cout <<endl;
+
+  // Test loading cache from 0th degree polynomial
+  cout << "Test loading cache from 0th degree polynomial" << endl;
+  json zeroDegreeIsd = {{"spk_table_start_time"    , 1.0},
+                        {"spk_table_end_time"      , 1.0},
+                        {"spk_table_original_size" , 1},
+                        {"ephemeris_times"       , {1.0}},
+                        {"positions"            , {{1.0, 2.0, 3.0}}}};
+  SpicePosition zeroDegreePoly(-94, 499);
+  zeroDegreePoly.LoadCache(zeroDegreeIsd);
+  zeroDegreePoly.ComputeBaseTime();
+  zeroDegreePoly.SetPolynomialDegree(0);
+  zeroDegreePoly.SetPolynomial();
+  Table zeroDegreeTable = zeroDegreePoly.Cache("TestZeroDegree");
+  SpicePosition singlePosition(-94, 499);
+  singlePosition.LoadCache(zeroDegreeTable);
+  cout << "Source = " << singlePosition.GetSource() << endl;
+  cout << "Has velocity? " << (singlePosition.HasVelocity() ? "Yes" : "No") << endl;
+  singlePosition.SetEphemerisTime(1.0);
+  vector<double> singlePos = singlePosition.Coordinate();
+  cout << "Time           = " << 1.0 << endl;
+  cout << "Spacecraft (J) = " << singlePos[0] << " " << singlePos[1] << " " << singlePos[2] << endl;
+
 }

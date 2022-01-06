@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="isisimport" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Convert from an external format, non-ISIS format using template files to an ISIS Cube.
+  </brief>
+
+  <description>
+    <p>
+      NOTE: This program and the associated template files are incomplete. The documentation
+      describes what the eventual intended capabilities are. Many capabilities are not implemented
+      at this time.
+    </p>
+    <p>
+      Reads an input label file and image file. The contents of the ISIS cube label file are
+      generated using the template file specified by the TEMPLATE parameter.
+    </p>
+    <p>
+      This application uses the <a href="https://pantor.github.io/inja">Inja templating engine</a>
+      to render the template file. The input data from the input label
+      is converted to JSON and then it is accessed via the Inja templating syntax.
+      See the <a href="https://pantor.github.io/inja">Inja documentation</a> for the full template
+      syntax.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Import and Export</categoryItem>
+  </category>
+
+  <history>
+    <change name="Kristin Berry and Amy Stamile" date="2021-05-17">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input label
+        </brief>
+        <description>
+          This is the label to be ingested to an ISIS Cube. It's assumed that the image is located in the same directory.
+        </description>
+        <filter>
+          *.xml
+        </filter>
+      </parameter>
+
+      <parameter name="TEMPLATE">
+        <type>filename</type>
+        <internalDefault>None</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Input template
+        </brief>
+        <description>
+          The file name of the input template. This file contains "inja" compatible
+          template syntax inside of a ISIS Cube label.
+        </description>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Isis Cube
+        </brief>
+        <description>
+          The ingested ISIS Cube.
+        </description>
+      </parameter>
+
+    </group>
+  </groups>
+</application>

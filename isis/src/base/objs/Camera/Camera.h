@@ -255,6 +255,7 @@ namespace Isis {
 
       void LocalPhotometricAngles(Angle & phase, Angle & incidence,
                                   Angle & emission, bool &success);
+      void Slope(double &slope, bool &success);
 
       void GetLocalNormal(double normal[3]);
 
@@ -361,6 +362,7 @@ namespace Isis {
         Radar,          //!< Radar Camera
         Point,          //!< Point Camera
         RollingShutter, //!< RollingShutter
+        Csm             //!< Community Sensor Model Camera
       };
 
       /**
@@ -575,5 +577,3 @@ namespace Isis {
 };
 
 #endif
-
-

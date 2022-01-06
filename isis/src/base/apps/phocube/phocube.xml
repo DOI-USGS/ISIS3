@@ -143,7 +143,7 @@ xsi:noNamespaceSchemaLocation=
     <b>
     Group = BandBin
       Name   = ("750 BW 5", "Phase Angle", "Emission Angle", "Incidence Angle",
-        	Latitude, Longitude, Morphology)
+          Latitude, Longitude, Morphology)
       Number = (7, 7, 7, 7, 7, 7, 7)
       Center = (748.7, 748.7, 748.7, 748.7, 748.7, 748.7, 748.7)
       Width  = (5.1, 5.1, 5.1, 5.1, 5.1, 5.1, 5.1)
@@ -300,7 +300,7 @@ xsi:noNamespaceSchemaLocation=
       Added an ObliqueDetectorResolution band.  This is an improvement over the previous DetectorResolution
       function (particularly for images taken near the limb of the target).  References #476, #4100.
     </change>
-		<change name="Kaj Williams" date="2017-06-09">
+    <change name="Kaj Williams" date="2017-06-09">
       Renamed albedo to albedoRank, and morph (or morphology) to morphRank (or MorphologyRank). Ref #4008.
     </change>
     <change name="Kaitlyn Lee" date="2019-02-15">
@@ -321,6 +321,9 @@ xsi:noNamespaceSchemaLocation=
     </change>
     <change name="Stuart Sides" date="2021-06-01">
       Add ALLDNS parameter to propagate all input bands to the output instead of just one band.
+    <change name="Adam Paquette" date="2020-08-23">
+      Added initial slope and backplane options for the local normal and the
+      ellipsoid normal.
     </change>
   </history>
 
@@ -661,6 +664,66 @@ xsi:noNamespaceSchemaLocation=
           The output cube labels will contain "OffNadir Angle" in the BandBin
           group, in band sequence of the output file.  OffNadirAngle is
           in degrees.
+        </description>
+      </parameter>
+      <parameter name="SLOPE">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create a slope band</brief>
+        <description>
+          If this parameter is true, the slope will be computed for every pixel
+          and placed in a band in the output cube. The output cube labels will
+          contain "Slope" in the BandBin group, in band sequence of the output
+          file. The slope is in degrees with 0 degrees being perfectly flat and
+          90 degrees being sheer vertical.
+
+          <p>
+            Note: The slope is measured relative to a sphere and not a more
+            complex datum like the gravity model
+          </p>
+
+          If computing slopes, the input image must be a level1 image. To
+          compute slopes for a level2 DEM use
+          <a href="../slpmap/slpmap.html" target="_blank">slpmap</a>.
+        </description>
+      </parameter>
+      <parameter name="LOCALNORMAL">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Create X, Y, and Z back planes from the local normal vector
+        </brief>
+        <description>
+          If this parameter is true, a local normal will be computed for
+          every pixel based on the shapemodel of the cube, and placed in
+          three bands (X, Y, Z) in the output cube. Meaning if your cube has an
+          ellipsoid shapemodel rather than a DEM, the local normal and the
+          ellipsoid normal will look the same. The output cube labels will contain
+          three "Local Normal (coord)" keywordsin the BandBin group, in band
+          sequence of the output file.
+
+          <p>
+            Note: These X, Y, and Z bands are in the body fixed reference frame.
+          </p>
+        </description>
+      </parameter>
+      <parameter name="ELLIPSOIDNORMAL">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Create X, Y, and Z back planes from the ellipsoid normal vector
+        </brief>
+        <description>
+          If this parameter is true, the ellipsoid normal will be computed for
+          every pixel and placed in three bands (X, Y, Z) in the output cube.
+          This normal will always be computed with a triaxial ellipsoid
+          regardless of shapemodel. The output cube labels will contain three
+          "Ellipsoid Normal (coord)" keywords in the BandBin group, in band
+          sequence of the output file.
+
+          <p>
+            Note: These X, Y, and Z bands are in the body fixed reference frame.
+          </p>
         </description>
       </parameter>
       <parameter name="SUBSPACECRAFTGROUNDAZIMUTH">
