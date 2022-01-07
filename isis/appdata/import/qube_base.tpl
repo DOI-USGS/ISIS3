@@ -96,6 +96,8 @@ Object = IsisCube
     {% block instrument %}
     {%- if exists("ROOT.MISSION_NAME.Value") -%}
     {%- set infoGroup=ROOT -%}
+    {%- else if exists("ROOT.ISIS_INSTRUMENT.SPACECRAFT_NAME") -%}
+    {%- set infoGroup=ROOT -%}
     {%- else -%}
     {%- set infoGroup=QUBE -%}
     {%- endif -%}

@@ -1,8 +1,9 @@
 {% extends "qube_base.tpl" %}
 
 {% block instrument %}
+{{ super() }}
     TargetName               = Moon
-    {% set spacecraftName=infoGroup.SPACECRAFT_NAME.Value.0 %}
+    {% set spacecraftName=infoGroup.ISIS_INSTRUMENT.SPACECRAFT_NAME.Value %}
     SpacecraftName           = {% if spacecraftName == "LUNAR_ORBITER_3" %}
                               "Lunar Orbiter 3"
                               {% else if spacecraftName == "LUNAR_ORBITER_4" %}
@@ -10,8 +11,8 @@
                               {% else if spacecraftName == "LUNAR_ORBITER_5" %}
                               "Lunar Orbiter 5"
                               {% endif %}
-    StartTime                = {{ infoGroup.START_TIME.Value }}
-    {% set instrumentID=infoGroup.INSTRUMENT_ID.Value %}
+    StartTime                = {{ infoGroup.ISIS_INSTRUMENT.START_TIME.Value }}
+    {% set instrumentID=infoGroup.ISIS_INSTRUMENT.INSTRUMENT_ID.Value %}
     InstrumentId             = {% if instrumentID == "24_INCH_FOCAL_LENGTH_CAMERA" or instrumentID == "24INCH_FLC" %}
                                "High Resolution Camera"
                                {% else if instrumentID in FLC %}
@@ -59,5 +60,4 @@
 
 {% block kernels %}
     NaifFrameCode = -533001
-  End_Group
 {% endblock %}
