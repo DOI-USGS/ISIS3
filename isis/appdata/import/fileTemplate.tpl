@@ -1,7 +1,7 @@
 {%- if exists("Product_Observational.Observation_Area.Observing_System.Observing_System_Component.1.name") -%}
-{%- set InstrumentId=Product_Observational.Observation_Area.Observing_System.Observing_System_Component.1.name -%}
+  {%- set InstrumentId=Product_Observational.Observation_Area.Observing_System.Observing_System_Component.1.name -%}
 {%- else if exists("INSTRUMENT_ID.Value") -%}
-{%- set InstrumentId=INSTRUMENT_ID.Value -%}
+  {%- set InstrumentId=INSTRUMENT_ID.Value -%}
 {%- endif -%}
 
 {%- if exists("Product_Observational.Observation_Area.Investigation_Area.name") -%}
