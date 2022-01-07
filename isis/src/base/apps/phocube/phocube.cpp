@@ -47,6 +47,7 @@ namespace Isis {
   }
 
   void phocube(Cube *icube, UserInterface &ui)  {
+
     // Get the camera information if this is not a mosaic. Otherwise, get the
     // projection information
     bool noCamera;
@@ -141,8 +142,17 @@ namespace Isis {
       if ((localSolarTime = ui.GetBoolean("LOCALTIME"))) nbands++;
     }
 
+    // ALLDN includes DN so if both are set ignore DN
     bool dn;
+    bool alldn;
     if ((dn = ui.GetBoolean("DN"))) nbands++;
+    if ((alldn = ui.GetBoolean("ALLDN"))) {
+      if (dn) {
+        dn = false;
+        nbands--;
+      }
+      nbands += icube->bandCount();
+    }
 
     bool latitude;
     if ((latitude = ui.GetBoolean("LATITUDE"))) nbands++;
@@ -159,16 +169,26 @@ namespace Isis {
       throw IException(IException::User, message, _FILEINFO_);
     }
 
-    // If outputting a dn band, retrieve the orignal values for the filter name from the input cube,
-    // if it exists.  Otherwise, the default will be "DN"
+    // If outputting a dn band, retrieve the orignal values for the filter name(s) from the input cube,
+    // if they are in the band bin group.  Otherwise, the default will be "DN"
     QString bname = "DN";
-    if ( dn && icube->hasGroup("BandBin") ) {
+    PvlKeyword bnames;
+    if (dn && icube->hasGroup("BandBin")) {
       PvlGroup &mybb = icube->group("BandBin");
       if ( mybb.hasKeyword("Name") ) {
         bname = mybb["Name"][0];
       }
-      else if ( mybb.hasKeyword("FilterName") ) {
+      else if (mybb.hasKeyword("FilterName")) {
         bname = mybb["FilterName"][0];
+      }
+    }
+    else if (alldn && icube->hasGroup("BandBin")) {
+      PvlGroup &mybb = icube->group("BandBin");
+      if (mybb.hasKeyword("Name")) {
+        bnames = mybb.findKeyword("Name");
+      }
+      else if (mybb.hasKeyword("FilterName")) {
+        bnames = mybb.findKeyword("FilterName");
       }
     }
 
@@ -177,6 +197,12 @@ namespace Isis {
     if (dn) {
       name += bname;
       raBandNum++;
+    }
+    else if (alldn) {
+      for (int i = 0; i<bnames.size(); i++) {
+        name += bnames[i];
+        raBandNum++;
+      }
     }
     if (phase) {
       name += "Phase Angle";
@@ -317,16 +343,32 @@ namespace Isis {
           MosData mosd, *p_mosd(0);  // For special mosaic angles
 
           int index = i * 64 + j;
-          int inIndex = index;
+          int inIndex = index; // Points to the first band's DN value of the current spectra
 
+          // Always transfer the DN(s) to the output cube
           if (dn) {
             out[index] = in[index];
             index += 64 * 64;
           }
+          else if (alldn) {
+            for (int i = 0; i < icube->bandCount(); i++) {
+              out[index] = in[index];
+              index += 64 * 64;
+            }
+          }
 
-          // If dn is true, make sure to not overwrite the original pixels with NULL for the dn band
+          // May need to skip the pho  calculations for the rest of this spectra. If so,
+          // fill the pho bands with ISIS Null, but leave the DN band(s) alone.
+          // NOTE: index -vs- inIndex below
           if (!specialPixels && IsSpecial(in[inIndex])) {
-            for (int band = (dn) ? 1 : 0; band < nbands; band++) {
+            int startBand = 0;
+            if (dn) {
+              startBand = 1;
+            }
+            else if (alldn) {
+              startBand = icube->bandCount();
+            }
+            for (int band = startBand; band < nbands; band++) {
               out[index] = Isis::Null;
               index += 64 * 64;
             }
@@ -550,10 +592,18 @@ namespace Isis {
             }
           }
 
-          // Trim outer space except RA and dec bands
+          // Trim no target intersection except DN)s), RA and DEC bands
           else {
-            for (int band = (dn) ? 1 : 0; band < nbands; band++) {
-              if(ra && band == raBandNum) {
+            int startBand = 0;
+            if (dn) {
+              startBand = 1;
+            }
+            else if (alldn) {
+              startBand = icube->bandCount();
+            }
+
+            for (int band = startBand; band < nbands; band++) {
+              if (ra && band == raBandNum) {
                 out[index] = cam->RightAscension();
               }
               else if (declination && band == raBandNum + 1) {
@@ -567,9 +617,16 @@ namespace Isis {
           }
         }
       }
-    };
+    }; // End processing function
 
-    p.SetInputCube(icube, OneBand);
+
+    if (alldn) {
+      p.SetInputCube(icube);
+    }
+    else {
+      p.SetInputCube(icube, OneBand);
+    }
+
     Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"),
                                   icube->sampleCount(), icube->lineCount(), nbands);
     p.SetBrickSize(64, 64, nbands);
