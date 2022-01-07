@@ -69,6 +69,11 @@ namespace Isis {
       void setParentImage(QSharedPointer<BundleImage> image);
       void setRejected(bool reject);
 
+      void setImage();
+      void setNormalsPositionBlockIndex(int index);
+      void setNormalsPointingBlockIndex(int index);
+      void setFocalPlaneResidualsMillimeters();
+      void setSigma(double sigma);
       bool isRejected() const;
       Camera *camera() const;
       BundleControlPoint *parentControlPoint();
@@ -80,13 +85,20 @@ namespace Isis {
       double sampleResidual() const;
       double line() const;
       double lineResidual() const;
+      double sigma() const;
+      double weight() const;
+      double weightSqrt() const;
       double residualMagnitude() const;
+      double xFocalPlaneResidual() const;
+      double yFocalPlaneResidual() const;
       QString cubeSerialNumber() const;
       double focalPlaneComputedX() const;
       double focalPlaneComputedY() const;
       double focalPlaneMeasuredX() const;
       double focalPlaneMeasuredY() const;
       int observationIndex() const;
+      int positionNormalsBlockIndex() const;
+      int pointingNormalsBlockIndex() const;
 
     private:
       ControlMeasure *m_controlMeasure;         /**< Contained control measure **/
@@ -94,6 +106,15 @@ namespace Isis {
                                                      bundle control measure **/
       QSharedPointer<BundleImage> m_parentBundleImage; /**< Parent image of this bundle control measure **/
       QSharedPointer<BundleObservation> m_parentObservation; /**< Parent bundle observation **/
+
+      int m_normalsPositionBlockIndex; //!< block index into normal equations
+      int m_normalsPointingBlockIndex; //!< block index into normal equations
+
+      double m_xFocalPlaneResidual;    //!< x focal plane residual in mm
+      double m_yFocalPlaneResidual;    //!< y focal plane residual in mm
+
+      double m_sigma;                  //!< measure uncertainty in mm
+      double m_weightSqrt;             //!< sqrt of measure weight
   };
   //! Definition for BundleMeasureQsp, a shared pointer to a BundleMeasure.
   typedef QSharedPointer<BundleMeasure> BundleMeasureQsp;

@@ -102,6 +102,7 @@ int main(int argc, char *argv[]) {
     vector<double> p = pos.Coordinate();
     vector<double> v = pos.Velocity();
     cout << "Time           = " << pos.EphemerisTime() << endl;
+    cout << "Scaled Time    = " << pos.scaledTime() << endl;
     cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
