@@ -58,12 +58,13 @@ namespace Isis {
     // Dump the JSON to the debugging file if requested
     // This needs to be above all uses of the JSON by the template engine
     if (ui.WasEntered("DATA")) {
-        std::ofstream jsonDataFile(FileName(ui.GetFileName("DATA")).expanded().toStdString());
-        jsonDataFile << jsonData.dump(4);
-        jsonDataFile.close();
-      }
+      std::ofstream jsonDataFile(FileName(ui.GetFileName("DATA")).expanded().toStdString());
+      jsonDataFile << jsonData.dump(4);
+      jsonDataFile.close();
+    }
 
     // Find associated template
+std::cout << "==================" << std::endl;
     FileName inputTemplate;
     if (ui.WasEntered("TEMPLATE")) {
       inputTemplate = ui.GetFileName("TEMPLATE");
@@ -71,10 +72,12 @@ namespace Isis {
     else {
       try {
         std::string templateFile = env.render_file(fileTemplate.expanded().toStdString(), jsonData);
+        std::cout << "Looking for template file: " << templateFile << std::endl;
         inputTemplate = FileName(QString::fromStdString(templateFile));
       }
       catch(const std::exception& e) {
         QString msg = "Cannot locate a template for input label. Please provide a template file to use.";
+        msg += e.what();
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
