@@ -1517,20 +1517,22 @@
       <brief>Run of jigsaw parameterized for Kaguya Terrain Camera (TC) images and <b>a relative control</b> network covering the Apollo 15 landing site. </brief>
       <description>
         <p>
-         A relative network is a network that has no points connected to a ground source, but connects overlapping images together. Since there is no connection to 
-         ground in the network, only camera specific parameters can be solved in the bundle. The required information to turn on spacecraft, radius, or other such
-         bundle solve parameters is not recommended.
+         A relative network is a network that connects overlapping images with tie points but has no tie points connected to a ground source. Since there is no
+         connection to ground in the network, this bundle will only solve for camera specific parameters. The bundle could still solve for other parameters and be 
+         correct relative to the camera position, but it would increase the complexity of the bundle. The proceeding two examples will include grounded networks, 
+         so we will wait to increase the complexity of the bundle until ground points are included. Additionally, in this example we are evaluating the solution and 
+         do not want to apply it to the images yet, therefore, update is set to ‘no’.
         </p> 
         <p>
-         This relative bundle turns on and parameterizes the camera twist and camera acceleration solve parameters. Turning on camera twist allows for the bundle to solve 
-         for the cameras rotation around the bore sight axis and does not require parameterization. Setting the camera solve parameter to acceleration is useful for 
-         line scan imagers and requires uncertainties to be set for the angles (deg), angular velocity (deg/s), and angular accelerations (deg/s**2). These values were 
-         set with increasing constraint because of the increasing affect alterations of higher derivative parameters have on the bundle solution.
+         This relative bundle turns on and parameterizes the camera twist and camera acceleration solve parameters. Camera twist is a flag that allows the bundle to solve 
+         for the camera's rotation around the bore sight axis and does not require an uncertainty estimation. Setting the camera solve parameter to acceleration, however, 
+         does require uncertainties to be set for the angles (deg), angular velocity (deg/s), and angular accelerations (deg/s**2). These values were set with increasing 
+         constraint because of the increasing affect alterations of higher order parameters have on the bundle solution.
         </p>
         <p>
-         The ‘overexisting’ flag allows the bundle solution to approximate the camera solution with a polynomial function as opposed to storing every individual measurement. 
-         This saves time and memory required for the bundle solution at the expense of accuracy. If one required the accuracy, overexisting could be used until the bundle 
-         is converging in a satisfactory way and then turned off for the final solution.
+         The ‘overexisting’ flag tells the bundle solution to approximate the camera solution with a zero polynomial function added to the ephemeris data (adding the 
+         polynomial <b>over</b> the <b>existing</b> data). Without the ‘overexisting’ flag, the bundle approximates the ephemerides with a polynomial, throws out the existing data
+         points, and uses the polynomial to calculate the approximate ephemerides when needed.
         </p>
         <p>
          This bundle also lowers the max iterations to 10 (from default 50). Lowering the max iterations does not affect the bundle solution. However, setting a lower 
@@ -1540,7 +1542,7 @@
       </description>
       <terminalInterface>
         <commandLine>
-        jigsaw fromlist=cubes.lis cnet=relative_reg_jig4_edit.net onet=relative_reg_jig5.net update=no file_prefix=jig5 sigma0=1.0e-10 maxits=10 \
+        jigsaw fromlist=cubes.lis cnet=relative_reg_jig4_edit.net onet=relative_reg_jig5.net update=no file_prefix=jig5 sigma0=1.0e-10 maxits=10
                twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01
         </commandLine>
         <description>
@@ -1553,34 +1555,36 @@
       <description>
         <p>
          This example jigsaw bundle is run directly after adding ground control points to the previous relative network. With ground control points inserted into the 
-         bundle solution, we can expand the bundle solve parameters to attempt solving for point radius values and the position of the spacecraft.
+         bundle solution, we will expand the bundle solve parameters to attempt solving for point radius values and the position of the spacecraft.
         </p>
         <p>
          Ground points are weighted more heavily in the bundle than relative control points and adding parameters adds more complexity to the bundle solution. Therefore, it 
-         is common to create and smith a network with only relative points and add ground point in AFTER the relative network (and its bundle solution) is of sufficient quality. 
+         is common to create and refine a network with only relative points and add ground point in <b>after</b> the relative network (and its bundle solution) is of sufficient quality. 
          The purpose of this bundle is to ensure the network bundle converges with the added ground points and solve parameters, before committing to updating the camera 
-         pointing on the images.
+         pointing on the images, so update is set to 'no'.
         </p>
         <p>
-         In addition to the previous solve parameters, this bundle turns on the point radius and spacecraft position solve parameters. Radius and spacecraft position 
-         are two parameters which can only be solved for when ground points are present in the bundle solution since they are concerned with absolute positioning.
-         Applying the point radius solve parameter requires the point_radius_sigma to be set. This value is a representation the uncertainty (in meters) of the 
-         cameras pointing corresponding to the correct elevation on the shape model. Often this value can be set, and the appropriateness of the set value can be 
-         checked using the 'POINTS DETAIL' section of the bundleout.txt file output by jigsaw. If the radius total correction of points exceeds the provided sigma, 
-         the uncertainty may need to be increased.
+         In addition to the previous solve parameters, this bundle turns on the point radius and spacecraft position solve parameters. Applying the point radius solve 
+         parameter requires the point_radius_sigma to be set. This value is a representation the uncertainty (in meters) of the cameras apriori pointing corresponding to the 
+         correct elevation on the shape model; this value is not a hard constraint. Often this value can be set, and the appropriateness of the set value can be checked using 
+         the 'POINTS DETAIL' section of the bundleout.txt file output by jigsaw. If more than half of the radius total corrections exceed the provided sigma, the uncertainty 
+         may need to be increased.
         </p>
         <p>
-         Applying the space craft position solve parameter requires an uncertainty estimation through spacecraft_position_sigma, while [file_prefix]_bundleout_images.csv 
-         holds the resulting image adjustments in the X Correction, Y Correction, and Z Correction columns. The overhermite flag allows a polynomial to estimate the 
-         spacecraft position, like the overexisting flag estimates the camera pointing with a polynomial. As such, this option saves memory and time at the expense of 
-         some loss in accuracy and this loss can be mitigated by switching it off for the final run.
+         Applying the space craft position solve parameter requires an uncertainty estimation through spacecraft_position_sigma (again this value is not a hard constraint). 
+         The appropriateness of the provided sigma can be evaluated through the bundleout_images.csv X Correction, Y Correction, and Z Correction columns.
+        </p>
+        <p>
+         The 'overhermite' flag allows an estimation the spacecraft position like the 'overexisting' flag estimates the camera pointing, with a zero-polynomial added over
+         the existing data (for spacecraft position this is a Hermite spline). These options require more memory but provide a solution more representative of the original 
+         ephemeris data.
         </p>
       </description>
       <terminalInterface>
         <commandLine>
-         jigsaw fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1.net update=no file_prefix=jig1rr sigma0=1.0e-10 maxits=10 \
-                twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01 \
-                radius=yes point_radius_sigma=500 spsolve=positions overhermite=yes spacecraft_position_sigma=1000 
+         jigsaw fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1.net update=no file_prefix=jig1rr sigma0=1.0e-10 maxits=10 
+                twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01 
+                radius=yes point_radius_sigma=500 spsolve=positions overhermite=yes spacecraft_position_sigma=1000
         </commandLine>
         <description>
         </description>
@@ -1592,9 +1596,7 @@
       <description>
         <p>
          This last example is of a final jigsaw run of a grounded network. In this example all network adjustments are done, the bundle is converging, the resulting 
-         residuals are acceptable, and therefore we are ready to update the camera pointing on the cubes. In the final run you can turn off overexisting and overhermite, 
-         if you want to regain the accuracy, but note that the bundle solution will differ from your previous run. Therefore, it is advisable to conduct one intermediate 
-         run to check the bundle is acceptable without these flags before updating the cubes. Finally, during the final run we turn on the error propagation flag. This 
+         residuals are acceptable, and therefore we are ready to update the camera pointing on the cubes. During the final run we turn on the error propagation flag, this 
          provides the variance-covariance matrix of the parameters, from which uncertainties can be computed. This is valuable if you plan to compute certainties for 
          your update cubes camera pointing (or any kernels resulting from these updated camera pointings).
         </p>
@@ -1604,9 +1606,9 @@
       </description>
       <terminalInterface>
         <commandLine>
-         jigsaw fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1_ErrProp.net update=yes file_prefix=jig1rrEP sigma0=1.0e-10 maxits=10 \
-                twist=yes camsolve=accelerations camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01 \
-                radius=yes point_radius_sigma=500 spsolve=positions spacecraft_position_sigma=1000 errorpropagation=yes 
+         jigsaw fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1_ErrProp.net update=yes file_prefix=jig1rrEP sigma0=1.0e-10 maxits=10
+                twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01
+                radius=yes point_radius_sigma=500 spsolve=positions overhermite=yes spacecraft_position_sigma=1000 errorpropagation=yes 
         </commandLine>
         <description>
         </description>
