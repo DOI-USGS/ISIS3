@@ -69,7 +69,7 @@ namespace Isis {
       inputTemplate = ui.GetFileName("TEMPLATE");
     }
     else {
-      try {
+      // try {
         std::string templateFile = env.render_file(fileTemplate.expanded().toStdString(), jsonData);
         inputTemplate = FileName(QString::fromStdString(templateFile));
       }
