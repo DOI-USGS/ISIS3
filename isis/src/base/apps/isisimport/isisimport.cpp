@@ -69,7 +69,7 @@ namespace Isis {
       inputTemplate = ui.GetFileName("TEMPLATE");
     }
     else {
-      try {
+      // try {
         std::string templateFile = env.render_file(fileTemplate.expanded().toStdString(), jsonData);
         inputTemplate = FileName(QString::fromStdString(templateFile));
       }
@@ -232,6 +232,21 @@ namespace Isis {
        return imageNumber;
      });
 
+
+    /**
+     * @brief set the subframe keyword for templates based off of the image number
+     *
+     *  subframe is being added in to the instrument group
+     */
+     env.add_callback("SetSubFrame", 1, [](Arguments& args) {
+       std::string imageNumber = args.at(0)->get<string>();
+
+       // grab the last digit of the year
+       std::string subFrame = imageNumber.substr(5);
+
+       return subFrame;
+     });
+
      /**
       * Add ImageKeyId to Archive Group based on StartTime and ProductId
       */
@@ -244,6 +259,20 @@ namespace Isis {
         return imageKeyId;
       });
 
+    /**
+     * @brief
+     *
+     */
+    env.add_callback("RemoveUnits", 1, [](Arguments& args){
+
+      std::string stringToRemove = args.at(0)->get<string>();
+
+      while(isalpha(stringToRemove.back())){
+        stringToRemove.pop_back();
+      }
+
+      return stringToRemove;
+    });
      // end of inja callbacks
 
 
@@ -332,7 +361,7 @@ namespace Isis {
                      " or offset or both";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
-      
+
       if (translation.hasKeyword("DataFileRecordBytes")) {
         recSize = toInt(translation["DataFileRecordBytes"]);
       }

@@ -57,24 +57,28 @@
     {% endif %}
   {% endblock %}
 
-  {% block archive %}
-    SoftwareVersionId         = "{{ SOFTWARE_VERSION_ID.Value }}"
-    DataSetName               = "{{ DATA_SET_NAME.Value }}"
-    DataSetId                 = {{ DATA_SET_ID.Value }}
-    ProductId                 = {{ PRODUCT_ID.Value }}
-    ProductType               = {{ PRODUCT_TYPE.Value }}
-    ProducerFullName          = "{{ PRODUCER_FULL_NAME.Value }}"
-    ProducerInstitutionName   = "{{ PRODUCER_INSTITUTION_NAME.Value }}"
-    ProductCreationTime       = {{ PRODUCT_CREATION_TIME.Value }}
-    ProductVersionId          = {{ PRODUCT_VERSION_ID.Value }}
-    InstrumentName            = "{{ INSTRUMENT_NAME.Value }}"
-    InstrumentType            = "{{ INSTRUMENT_TYPE.Value }}"
-    ImageMidTime              = {{ IMAGE_MID_TIME.Value }}
-    ProcessingLevelId         = {{ PROCESSING_LEVEL_ID.Value }}
-    EncodingType              = {{ ENCODING_TYPE.Value }}
-    {% if exists("PHOTOMETRIC_CORRECTION_TYPE") %}
-    PhotometricCorrectionType = {{ PHOTOMETRIC_CORRECTION_TYPE.Value }}
-    {% endif %}
+  {% block additional_groups %}
+    Group = Archive 
+    
+      SoftwareVersionId         = "{{ SOFTWARE_VERSION_ID.Value }}"
+      DataSetName               = "{{ DATA_SET_NAME.Value }}"
+      DataSetId                 = {{ DATA_SET_ID.Value }}
+      ProductId                 = {{ PRODUCT_ID.Value }}
+      ProductType               = {{ PRODUCT_TYPE.Value }}
+      ProducerFullName          = "{{ PRODUCER_FULL_NAME.Value }}"
+      ProducerInstitutionName   = "{{ PRODUCER_INSTITUTION_NAME.Value }}"
+      ProductCreationTime       = {{ PRODUCT_CREATION_TIME.Value }}
+      ProductVersionId          = {{ PRODUCT_VERSION_ID.Value }}
+      InstrumentName            = "{{ INSTRUMENT_NAME.Value }}"
+      InstrumentType            = "{{ INSTRUMENT_TYPE.Value }}"
+      ImageMidTime              = {{ IMAGE_MID_TIME.Value }}
+      ProcessingLevelId         = {{ PROCESSING_LEVEL_ID.Value }}
+      EncodingType              = {{ ENCODING_TYPE.Value }}
+      {% if exists("PHOTOMETRIC_CORRECTION_TYPE") %}
+      PhotometricCorrectionType = {{ PHOTOMETRIC_CORRECTION_TYPE.Value }}
+      {% endif %}
+
+    End_Group
   {% endblock %}
 
   {% block bandbin %}

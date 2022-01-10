@@ -104,10 +104,8 @@ Object = IsisCube
     {% endblock %}
   End_Group
 
-  Group = Archive
-    {% block archive %}
-    {% endblock %}
-  End_Group
+  {% block additional_groups %}
+  {% endblock %}
 
   Group = BandBin
   {% block bandbin %}
