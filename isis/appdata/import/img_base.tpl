@@ -86,20 +86,6 @@ Object = IsisCube
     {% endblock %}
   End_Group
 
-  Group = Archive
-    {%- set DataSetId=DATA_SET_ID.Value -%}
-    {%- if exists("IMAGE_ID") -%}
-    {%- set ProductId=IMAGE_ID.Value -%}
-    {%- else if exists("PRODUCT_ID") -%}
-    {%- set ProductId=PRODUCT_ID.Value -%}
-    {%- endif -%}
-    {%- if exists("IMAGE_NUMBER") -%}
-    {%- set ImageNumber=IMAGE_NUMBER.Value -%}
-    {%- endif -%}
-    {% block archive %}
-    {% endblock %}
-  End_Group
-
   {% block additional_groups %}
   {% endblock %}
 

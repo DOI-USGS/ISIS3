@@ -154,7 +154,8 @@
     TemperatureMiElectronics    = {{ instTemp.7 }}
 {% endblock %}
 
-{% block archive %}
+{% block additional_groups %}
+  Group = Archive
     DataSetID   = {% if exists("DATA_SET_ID") %}
                   {{ DATA_SET_ID.Value }}
                   {% else %}
@@ -170,9 +171,8 @@
                   {% else %}
                   NULL
                   {% endif %}
-{% endblock %}
+  End_Group
 
-{% block additional_groups %}
   Group = MerImageRequestParms
     PixelAveragingHeight =  {% if exists("IMAGE_REQUEST_PARMS.PIXEL_AVERAGING_HEIGHT") %}
                             {{ IMAGE_REQUEST_PARMS.PIXEL_AVERAGING_HEIGHT.Value }}

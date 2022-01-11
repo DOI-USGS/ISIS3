@@ -42,7 +42,7 @@
                                 {{FRAME_NUMBER.Value}}
                                 {% endif %}
 
-    
+
 
     {% if exists("QUBE.ISIS_INSTRUMENT.FIDUCIAL_ID.Value")%}
         FiducialCoordinateMicron = {{RemoveUnits(QUBE.ISIS_INSTRUMENT.FIDUCIAL_COORD_MICRON.Value)}} <um>
@@ -72,7 +72,7 @@
                                             {{ line }},
                                         {% endif %}
                                     {% endfor %}) <pixels>
-                                    
+
         {% set fidXCoords=QUBE.ISIS_INSTRUMENT.FIDUCIAL_X_COORDINATES.Value %}
         FiducialXCoordinates     = ({% for xCoord in fidXCoords %}
                                         {% if loop.is_last %}
@@ -90,7 +90,7 @@
                                             {{ yCoord }},
                                         {% endif %}
                                     {% endfor %}) <mm>
-    
+
     {% else if exists("LO_FIDUCIAL_ID.Value") %}
 
         FiducialCoordinateMicron = {{RemoveUnits(LO_FIDUCIAL_COORDINATE_MICRON.Value)}} <um>
@@ -120,7 +120,7 @@
                                             {{ line }},
                                         {% endif %}
                                     {% endfor %}) <pixels>
-                                    
+
         {% set fidXCoords=LO_FIDUCIAL_X_COORDINATES.Value %}
         FiducialXCoordinates     = ({% for xCoord in fidXCoords %}
                                         {% if loop.is_last %}
@@ -153,10 +153,10 @@
     {% if exists("QUBE.IMAGE_NUMBER") %}
         {% set ImageNumber = QUBE.IMAGE_NUMBER.Value %}
     {% else if exists("IMAGE_NUMBER") %}
-        {% set ImageNumber = IMAGE_NUMBER.Value %}
+        {% set ImageNumber = IMAGE_NUMBER.Value.0 %}
     {% endif %}
 
-    SubFrame                 = {{SetSubFrame(ImageNumber.0)}}
+    SubFrame                 = {{SetSubFrame(ImageNumber)}}
 
 {% endblock %}
 
@@ -171,32 +171,23 @@
         Center       = {{QUBE.BAND_BIN.BAND_BIN_CENTER.Value}}
         OriginalBand = {{QUBE.BAND_BIN.BAND_BIN_ORIGINAL_BAND.Value}}
     {% endif %}
-    
+
 {% endblock %}
 
 {% block additional_groups %}
-    Group = kernels
+  Group = Kernels
     {% if spacecraftName ==  "LUNAR_ORBITER_3" %}
         {% set frameCode = "-533" %}
-
     {% else if spacecraftName ==  "LUNAR_ORBITER_4" %}
         {% set frameCode = "-534" %}
-
     {% else if spacecraftName ==  "LUNAR_ORBITER_5" %}
         {% set frameCode = "-535" %}
-
     {% endif %}
-
     {% if instrumentID == "24_INCH_FOCAL_LENGTH_CAMERA" or instrumentID == "24INCH_FLC" %}
         {% set frameCodeSuffix = "001" %}
-
     {% else if instrumentID == "80_MM_FOCAL_LENGTH_CAMERA" or instrumentID == "80MM_FLC" %}
         {% set frameCodeSuffix = "002" %}
-
     {% endif %}
-
     NaifFrameCode = {{frameCode}}{{frameCodeSuffix}}
-    End_Group
-    
+  End_Group
 {% endblock %}
-

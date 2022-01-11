@@ -165,14 +165,17 @@ InstrumentModeId        = {{ instrumentModeId }}
 SpacecraftClockCount    = {{SPACECRAFT_CLOCK_CNT_PARTITION.Value}}/{{SPACECRAFT_CLOCK_START_COUNT.Value}}
 {% endblock %}
 
-{% block archive %}
-DataSetId     = {{ DataSetId }}
-ImageNumber   = {{ ImageNumber }}
-ObservationId = {{ OBSERVATION_ID.Value }}
-ProductId     = {{ ProductId }}
-{% endblock%}
+
 
 {% block additional_groups %}
+
+Group = Archive
+  DataSetId     = {{ DATA_SET_ID.Value }}
+  ImageNumber   = {{ IMAGE_NUMBER.Value }}
+  ObservationId = {{ OBSERVATION_ID.Value }}
+  ProductId     = {{ PRODUCT_ID.Value  }}
+End_Group
+
 Group = BandBin
   {% if exists("FILTER_NAME") %}
   {% set filterName=FILTER_NAME.Value %}
