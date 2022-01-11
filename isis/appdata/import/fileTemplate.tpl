@@ -14,6 +14,8 @@
   {%- set SpacecraftName=QUBE.MISSION_NAME.Value -%}
 {%- else if exists("QUBE.ISIS_INSTRUMENT.SPACECRAFT_NAME") -%}
   {%- set SpacecraftName=QUBE.ISIS_INSTRUMENT.SPACECRAFT_NAME.Value -%}
+{%- else if exists("SPACECRAFT_NAME") -%}
+  {%- set SpacecraftName=SPACECRAFT_NAME.Value -%}
 {%- else if exists("MISSION_NAME") -%}
   {%- set SpacecraftName=MISSION_NAME.Value -%}
 {%- else if exists("INSTRUMENT_HOST_NAME") -%}
