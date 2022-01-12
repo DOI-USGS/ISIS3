@@ -172,22 +172,26 @@ ObservationId = {{ OBSERVATION_ID.Value }}
 ProductId     = {{ ProductId }}
 {% endblock%}
 
-{% block bandbin %}
-{{ super() }}
-FilterName   = {{ filterName.0 }}/{{ filterName.1 }}
-OriginalBand = 1
-{% set cassiniIssBandInfo = CassiniIssBandInfo(INSTRUMENT_ID.Value, filterName.0, filterName.1) %}
-Center       = {{ cassiniIssBandInfo.0 }}
-Width        = {{ cassiniIssBandInfo.1 }}
-{% endblock%}
+{% block additional_groups %}
+Group = BandBin
+  {% if exists("FILTER_NAME") %}
+  {% set filterName=FILTER_NAME.Value %}
+  FilterName   = {{ filterName.0 }}/{{ filterName.1 }}
+  OriginalBand = 1
+  {% set cassiniIssBandInfo = CassiniIssBandInfo(INSTRUMENT_ID.Value, filterName.0, filterName.1) %}
+  Center       = {{ cassiniIssBandInfo.0 }}
+  Width        = {{ cassiniIssBandInfo.1 }}
+  {% endif %}
+End_Group
 
-{% block kernels %}
-  {{ super() }}
+Group = Kernels
+  {% set instrument = INSTRUMENT_NAME.Value %}
   {% if instrument == "ISSNA" %}
   NaifFrameCode = "-82360"
   {% else %}
   NaifFrameCode = "-82361"
   {% endif %}
+End_Group
 {% endblock %}
 
 {% block translation %}

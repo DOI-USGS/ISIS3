@@ -100,21 +100,6 @@ Object = IsisCube
     {% endblock %}
   End_Group
 
-  Group = BandBin
-    {% block bandbin %}
-    {% if exists("FILTER_NAME") %}
-    {% set filterName=FILTER_NAME.Value %}
-    {% endif %}
-    {% endblock %}
-  End_Group
-
-  Group = Kernels
-    {% block kernels %}
-    {% set instrument = INSTRUMENT_NAME.Value %}
-    {% set instID = INSTRUMENT_ID.Value %}
-    {% endblock %}
-  End_Group
-
   {% block additional_groups %}
   {% endblock %}
 

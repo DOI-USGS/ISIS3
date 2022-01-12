@@ -40,6 +40,8 @@
 {%- else if SpacecraftName == "LUNAR RECONNAISSANCE ORBITER" -%}
 {%- set SpacecraftId="LRO" -%}
 {%- set InstrumentId="CNac" -%}
+{%- else if SpacecraftName == "MARS EXPLORATION ROVER" -%}
+{%- set SpacecraftId="Mer" -%}
 {%- endif -%}
 
 {%- if InstrumentId == "FC1" or InstrumentId == "FC2" -%}
