@@ -40,7 +40,7 @@ dependencies:
   - mesalib
   - mysql
   - mysql-connector-c
-  - nanoflann
+  - nanoflann<1.4
   - nlohmann_json
   - ninja==1.7.2
   - nn
