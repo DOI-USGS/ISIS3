@@ -27,34 +27,35 @@ TemperatureFPGARaw          = {{ LRO_TEMPERATURE_FPGA_RAW.Value }}
 TemperatureTelescopeRaw     = {{ LRO_TEMPERATURE_TELESCOPE_RAW.Value }}
 {% endblock %}
 
-{% block archive %}
-DataSetId               = {{ DATA_SET_ID.Value }}
-OriginalProductId       = {{ ORIGINAL_PRODUCT_ID.Value }}
-ProductId               = {{ PRODUCT_ID.Value }}
-ProducerId              = "{{ PRODUCER_ID.Value }}"
-ProducerInstitutionName = "{{ PRODUCER_INSTITUTION_NAME.Value }}"
-ProductVersionId        = {{ PRODUCT_VERSION_ID.Value }}
-UploadId                = {{ UPLOAD_ID.Value }}
-OrbitNumber             = {{ ORBIT_NUMBER.Value }}
-RationalDescription     = "{{ RATIONALE_DESC.Value }}"
-DataQualityId           = {{ DATA_QUALITY_ID.Value }}
-LineExposureCode        = {{ LRO_LINE_EXPOSURE_CODE.Value }}
-DACResetLevel           = {{ LRO_DAC_RESET_LEVEL.Value }}
-ChannelAOffset          = {{ LRO_CHANNEL_A_OFFSET.Value }}
-ChannelBOffset          = {{ LRO_CHANNEL_B_OFFSET.Value }}
-CompandCode             = {{ LRO_COMPAND_CODE.Value }}
-LineCode                = {{ LRO_LINE_CODE.Value }}
-CompressionFlag         = {{ LRO_COMPRESSION_FLAG.Value }}
-Mode                    = {{ LRO_MODE.Value }}"
-{% endblock %}
+{% block additional_groups %}
+Group = Archive
+  DataSetId               = {{ DATA_SET_ID.Value }}
+  OriginalProductId       = {{ ORIGINAL_PRODUCT_ID.Value }}
+  ProductId               = {{ PRODUCT_ID.Value }}
+  ProducerId              = "{{ PRODUCER_ID.Value }}"
+  ProducerInstitutionName = "{{ PRODUCER_INSTITUTION_NAME.Value }}"
+  ProductVersionId        = {{ PRODUCT_VERSION_ID.Value }}
+  UploadId                = {{ UPLOAD_ID.Value }}
+  OrbitNumber             = {{ ORBIT_NUMBER.Value }}
+  RationalDescription     = "{{ RATIONALE_DESC.Value }}"
+  DataQualityId           = {{ DATA_QUALITY_ID.Value }}
+  LineExposureCode        = {{ LRO_LINE_EXPOSURE_CODE.Value }}
+  DACResetLevel           = {{ LRO_DAC_RESET_LEVEL.Value }}
+  ChannelAOffset          = {{ LRO_CHANNEL_A_OFFSET.Value }}
+  ChannelBOffset          = {{ LRO_CHANNEL_B_OFFSET.Value }}
+  CompandCode             = {{ LRO_COMPAND_CODE.Value }}
+  LineCode                = {{ LRO_LINE_CODE.Value }}
+  CompressionFlag         = {{ LRO_COMPRESSION_FLAG.Value }}
+  Mode                    = {{ LRO_MODE.Value }}"
+End_Group
 
-{% block bandbin %}
-FilterName   = BroadBand
-Center       = {{ CENTER_FILTER_WAVELENGTH.Value }} <ms>
-Width        = {{ BANDWIDTH.Value }} <ms>
-{% endblock %}
+Group = BandBin
+  FilterName   = BroadBand
+  Center       = {{ CENTER_FILTER_WAVELENGTH.Value }} <ms>
+  Width        = {{ BANDWIDTH.Value }} <ms>
+End_Group
 
-{% block kernels %}
+Group = Kernels
   NaifFrameCode = -85600
+End_Group
 {% endblock %}
-
