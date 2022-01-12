@@ -49,10 +49,14 @@
 {%- else if SpacecraftName == "LUNAR_ORBITER_3" or  SpacecraftName == "LUNAR_ORBITER_4" or  SpacecraftName == "LUNAR_ORBITER_5" -%}
   {%- set SpacecraftId="Lo" -%}
   {%- set InstrumentId="HRC" -%}
+{%- else if SpacecraftName == "SELENE" or SpacecraftName == "SELENE-M"-%}
+  {%- set SpacecraftId="Kaguya" -%}
 {%- endif -%}
 
 {%- if InstrumentId == "FC1" or InstrumentId == "FC2" -%}
   {%- set InstrumentId="FC"-%}
+{%- else if InstrumentId == "MI-NIR" or InstrumentId == "MI-VIS"-%}
+  {%- set InstrumentId="MI" -%}
 {%- endif -%}
 
 {%- if SpacecraftId -%}$ISISROOT/appdata/import/{{- SpacecraftId -}}{{- InstrumentId -}}.tpl{%- endif -%}
