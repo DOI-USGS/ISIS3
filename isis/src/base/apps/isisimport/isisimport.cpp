@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 #include <inja/inja.hpp>
 #include <nlohmann/json.hpp>
@@ -54,6 +55,14 @@ namespace Isis {
     }
     Environment env;
 
+    // Dump the JSON to the debugging file if requested
+    // This needs to be above all uses of the JSON by the template engine
+    if (ui.WasEntered("DATA")) {
+      std::ofstream jsonDataFile(FileName(ui.GetFileName("DATA")).expanded().toStdString());
+      jsonDataFile << jsonData.dump(4);
+      jsonDataFile.close();
+    }
+
     // Find associated template
     FileName inputTemplate;
     if (ui.WasEntered("TEMPLATE")) {
@@ -65,7 +74,8 @@ namespace Isis {
         inputTemplate = FileName(QString::fromStdString(templateFile));
       }
       catch(const std::exception& e) {
-        QString msg = "Cannot locate a template for input label. Please provide a template file to use.";
+        QString msg = "Cannot locate a template for input label. Please provide a template file to use. ";
+        msg += e.what();
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -252,7 +262,16 @@ namespace Isis {
     }
 
     // Use inja to get number of lines, samples, and bands from the input label
-    std::string result = env.render_file(inputTemplate.expanded().toStdString(), jsonData);
+    std::string result;
+    try {
+      result = env.render_file(inputTemplate.expanded().toStdString(), jsonData);
+    }
+    catch(const std::exception& e) {
+      QString msg = "Unable to create a cube label from [";
+      msg += inputTemplate.expanded() + "]. ";
+      msg += e.what();
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
 
     // Turn this into a Pvl label
     Pvl newLabel;
