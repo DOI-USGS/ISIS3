@@ -55,6 +55,6 @@ Width        = {{ BANDWIDTH.Value }} <ms>
 {% endblock %}
 
 {% block kernels %}
-  NaifFrameCode = 12345
+  NaifFrameCode = -85600
 {% endblock %}
 
