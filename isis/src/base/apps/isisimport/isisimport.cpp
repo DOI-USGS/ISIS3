@@ -233,11 +233,10 @@ namespace Isis {
      });
 
 
-    /**
-     * @brief set the subframe keyword for templates based off of the image number
-     *
-     *  subframe is being added in to the instrument group
-     */
+     /**
+      * Add SubFrame keyword to Instrument Group based on substring of ImageNumber.
+      *
+      */
      env.add_callback("SetSubFrame", 1, [](Arguments& args) {
        std::string imageNumber = args.at(0)->get<string>();
 
@@ -260,7 +259,7 @@ namespace Isis {
       });
 
     /**
-     * @brief
+     * Remove units from keyword value if exists at the end of the string.
      *
      */
     env.add_callback("RemoveUnits", 1, [](Arguments& args){
