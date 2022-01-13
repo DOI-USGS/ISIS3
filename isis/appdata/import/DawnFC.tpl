@@ -39,24 +39,24 @@ FirstLine                 = {{ IMAGE.FIRST_LINE.Value }}
 FirstLineSample           = {{ IMAGE.FIRST_LINE_SAMPLE.Value }}
 {% endblock %}
 
-{% block archive %}
-    FileName                = {{ FILE_NAME.Value }}
-    SoftwareName            = {{ SOFTWARE_NAME.Value }}
-    SoftwareVersionId       = {{ SOFTWARE_VERSION_ID.Value }}
-    DataSetName             = "{{ DATA_SET_NAME.Value }}"
-    DataSetId               = {{ DataSetId }}
-    ProductId               = {{ ProductId }}
-    ProductType             = {{ PRODUCT_TYPE.Value }}
-    StandardDataProductId   = {{ STANDARD_DATA_PRODUCT_ID.Value }}
-    ObservationId           = {{ OBSERVATION_ID.Value }}
-    ProducerFullName        = "{{ PRODUCER_FULL_NAME.Value }}"
-    ProducerInstitutionName = "{{ PRODUCER_INSTITUTION_NAME.Value }}"
-    ProductCreationTime     = {{ PRODUCT_CREATION_TIME.Value }}
-    ProductVersionId        = {{ PRODUCT_VERSION_ID.Value }}
-    ReleaseId               = {{ RELEASE_ID.Value }}
-{% endblock %}
-
 {% block additional_groups %}
+Group = Archive
+  FileName                = {{ FILE_NAME.Value }}
+  SoftwareName            = {{ SOFTWARE_NAME.Value }}
+  SoftwareVersionId       = {{ SOFTWARE_VERSION_ID.Value }}
+  DataSetName             = "{{ DATA_SET_NAME.Value }}"
+  DataSetId               = {{ DATA_SET_ID.Value }}
+  ProductId               = {{ PRODUCT_ID.Value }}
+  ProductType             = {{ PRODUCT_TYPE.Value }}
+  StandardDataProductId   = {{ STANDARD_DATA_PRODUCT_ID.Value }}
+  ObservationId           = {{ OBSERVATION_ID.Value }}
+  ProducerFullName        = "{{ PRODUCER_FULL_NAME.Value }}"
+  ProducerInstitutionName = "{{ PRODUCER_INSTITUTION_NAME.Value }}"
+  ProductCreationTime     = {{ PRODUCT_CREATION_TIME.Value }}
+  ProductVersionId        = {{ PRODUCT_VERSION_ID.Value }}
+  ReleaseId               = {{ RELEASE_ID.Value }}
+End_Group
+
 Group = BandBin
 {% set filterNumber=FILTER_NUMBER.Value %}
 {% if filterNumber == "1" %}

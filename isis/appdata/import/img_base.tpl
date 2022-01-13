@@ -86,19 +86,6 @@ Object = IsisCube
     {% endblock %}
   End_Group
 
-  Group = Archive
-    {%- set DataSetId=DATA_SET_ID.Value -%}
-    {%- if exists("IMAGE_ID") -%}
-    {%- set ProductId=IMAGE_ID.Value -%}
-    {%- else if exists("PRODUCT_ID") -%}
-    {%- set ProductId=PRODUCT_ID.Value -%}
-    {%- endif -%}
-    {%- if exists("IMAGE_NUMBER") -%}
-    {%- set ImageNumber=IMAGE_NUMBER.Value -%}
-    {%- endif -%}
-    {% block archive %}
-    {% endblock %}
-  End_Group
 
   {% block additional_groups %}
   {% endblock %}
@@ -116,26 +103,26 @@ Object = Translation
   {% if exists("RECORD_BYTES") %}
   DataFileRecordBytes         = {{ RECORD_BYTES.Value }}
   {% endif %}
-  {% if exists("QUBE.CORE_NULL.Value") %}
-  CoreNull             = {{ QUBE.CORE_NULL.Value }}
+  {% if exists("IMAGE.CORE_NULL.Value") %}
+  CoreNull             = {{ IMAGE.CORE_NULL.Value }}
   {% endif %}
-  {% if exists("QUBE.CORE_LOW_REPR_SATURATION.Value") %}
-  CoreLRS              = {{ QUBE.CORE_LOW_REPR_SATURATION.Value }}
+  {% if exists("IMAGE.CORE_LOW_REPR_SATURATION.Value") %}
+  CoreLRS              = {{ IMAGE.CORE_LOW_REPR_SATURATION.Value }}
   {% endif %}
-  {% if exists("QUBE.CORE_LOW_INSTR_SATURATION.Value") %}
-  CoreLIS              = {{ QUBE.CORE_LOW_INSTR_SATURATION.Value }}
+  {% if exists("IMAGE.CORE_LOW_INSTR_SATURATION.Value") %}
+  CoreLIS              = {{ IMAGE.CORE_LOW_INSTR_SATURATION.Value }}
   {% endif %}
-  {% if exists("QUBE.CORE_HIGH_REPR_SATURATION.Value") %}
-  CoreHRS              = {{ QUBE.CORE_HIGH_REPR_SATURATION.Value }}
+  {% if exists("IMAGE.CORE_HIGH_REPR_SATURATION.Value") %}
+  CoreHRS              = {{ IMAGE.CORE_HIGH_REPR_SATURATION.Value }}
   {% endif %}
-  {% if exists("QUBE.CORE_HIGH_INSTR_SATURATION.Value") %}
-  CoreHIS              = {{ QUBE.CORE_HIGH_INSTR_SATURATION.Value }}
+  {% if exists("IMAGE.CORE_HIGH_INSTR_SATURATION.Value") %}
+  CoreHIS              = {{ IMAGE.CORE_HIGH_INSTR_SATURATION.Value }}
   {% endif %}
-  {% if exists("QUBE.SUFFIX_BYTES.Value") %}
-  SuffixBytes          = {{ QUBE.SUFFIX_BYTES.Value }}
+  {% if exists("IMAGE.SUFFIX_BYTES.Value") %}
+  SuffixBytes          = {{ IMAGE.SUFFIX_BYTES.Value }}
   {% endif %}
-  {% if exists("QUBE.SUFFIX_ITEMS.Value") %}
-  SuffixItems          = ({{ QUBE.SUFFIX_ITEMS.Value.0 }}, {{ QUBE.SUFFIX_ITEMS.Value.1 }}, {{ QUBE.SUFFIX_ITEMS.Value.2 }})
+  {% if exists("IMAGE.SUFFIX_ITEMS.Value") %}
+  SuffixItems          = ({{ IMAGE.SUFFIX_ITEMS.Value.0 }}, {{ IMAGE.SUFFIX_ITEMS.Value.1 }}, {{ IMAGE.SUFFIX_ITEMS.Value.2 }})
   {% endif %}
   {% block translation %}
   CubeAtts             = ""
