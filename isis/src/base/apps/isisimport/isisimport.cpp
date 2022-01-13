@@ -148,6 +148,21 @@ namespace Isis {
       return bandInfo;
     });
 
+    env.add_callback("splitOnUnderscore", 1, [](Arguments& args){
+      std::string text = args.at(0)->get<string>();
+
+    string delimiter = "_";
+    vector<string> words{};
+
+    size_t pos;
+    while ((pos = text.find(delimiter)) != string::npos) {
+        words.push_back(text.substr(0, pos));
+        words.push_back(text.substr(pos + 1));
+        text.erase(0, pos + delimiter.length());
+    }
+      return words;
+    });
+
     /**
      * Converts UniqueId To ObservationId
      * Logic from convertUniqueIdToObservationId in tgocassis2isis app
