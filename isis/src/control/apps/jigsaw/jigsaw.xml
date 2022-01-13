@@ -1456,10 +1456,6 @@
 
 
 
-
-
-
-
   <examples>
     <example>
       <brief> Simple run of jigsaw with images from a linescanner </brief>
@@ -1540,15 +1536,17 @@
          value, it was only explicitly stated in this call.
         </p>
       </description>
+
       <terminalInterface>
         <commandLine>
-        jigsaw fromlist=cubes.lis cnet=relative_reg_jig4_edit.net onet=relative_reg_jig5.net update=no file_prefix=jig5 sigma0=1.0e-10 maxits=10
-               twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01
+        fromlist=cubes.lis cnet=relative_reg_jig4_edit.net onet=relative_reg_jig5.net update=no file_prefix=jig5 sigma0=1.0e-10 maxits=10
+        twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01
         </commandLine>
         <description>
         </description>
       </terminalInterface>
     </example>
+
 
     <example>
       <brief>Run of jigsaw parameterized for Kaguya Terrain Camera (TC) images and <b>an intermediate ground control</b> network covering the Apollo 15 landing site. </brief>
@@ -1580,16 +1578,30 @@
          ephemeris data.
         </p>
       </description>
+
       <terminalInterface>
         <commandLine>
-         jigsaw fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1.net update=no file_prefix=jig1rr sigma0=1.0e-10 maxits=10 
-                twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01 
-                radius=yes point_radius_sigma=500 spsolve=positions overhermite=yes spacecraft_position_sigma=1000
+         fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1.net update=no file_prefix=jig1rr sigma0=1.0e-10 maxits=10 
+         twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01 
+         radius=yes point_radius_sigma=500 spsolve=positions overhermite=yes spacecraft_position_sigma=1000
         </commandLine>
         <description>
         </description>
       </terminalInterface>
+
+      <dataFiles>
+        <dataFile path="assets/ap15/jig1rrEP_bundleout.txt">
+          <brief> jig1rr_bundleout.txt </brief>
+          <description>
+            A shorten example of a typical bundleout.txt file produced by a jigsaw run with error propegation. 
+            This file was trimmed to hold 10 images, 50 relative points, and all ground points
+            along with their associated detail sections. Bundleout files typically contain 
+            all image and point from a network put through jigsaw.
+          </description>
+        </dataFile>
+      </dataFiles>
     </example>
+
 
     <example>
       <brief>Run of jigsaw parameterized for Kaguya Terrain Camera (TC) images and <b>a final ground control</b> network covering Apollo 15 landing site. </brief>
@@ -1604,17 +1616,29 @@
          If you want to double check the update was completed, see cathist or catlab (search for ‘Jigged’).
         </p>
       </description>
+
       <terminalInterface>
         <commandLine>
-         jigsaw fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1_ErrProp.net update=yes file_prefix=jig1rrEP sigma0=1.0e-10 maxits=10
-                twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01
-                radius=yes point_radius_sigma=500 spsolve=positions overhermite=yes spacecraft_position_sigma=1000 errorpropagation=yes 
+         fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1_ErrProp.net update=yes file_prefix=jig1rrEP sigma0=1.0e-10 maxits=10
+         twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01
+         radius=yes point_radius_sigma=500 spsolve=positions overhermite=yes spacecraft_position_sigma=1000 errorpropagation=yes 
         </commandLine>
         <description>
         </description>
       </terminalInterface>
-    </example>
 
+      <dataFiles>
+        <dataFile path="assets/ap15/jig1rrEP_bundleout.txt">
+          <brief> jig1rrEP_bundleout.txt </brief>
+          <description>
+            A shorten example of a typical bundleout.txt file produced by a jigsaw run with error propegation. 
+            This file was trimmed to hold 10 images, 50 relative points, and all ground points
+            along with their associated detail sections. Bundleout files typically contain 
+            all image and point from a network put through jigsaw.
+          </description>
+        </dataFile>
+      </dataFiles>
+    </example>
 
   </examples>
 </application>
