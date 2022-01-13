@@ -1,0 +1,122 @@
+# Jigged = 2022-01-05T12:28:21
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 38226696
+  Bytes               = 3136
+  Records             = 49
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-131000, 1)
+  ConstantFrames      = (-131370, -131320, -131000)
+  ConstantRotation    = (0.96569856739975, 4.90579395610543e-04,
+                         0.25966523882478, -1.7391330559124e-04,
+                         0.99999921298743, -0.0012424889096337,
+                         -0.25966564400443, 0.0011547105200122,
+                         0.96569789270112)
+  CkTableStartTime    = 296840857.4588
+  CkTableEndTime      = 296840887.72259
+  CkTableOriginalSize = 4657
+  FrameTypeCode       = 3
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+# Jigged = 2022-01-05T12:28:21
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 38229832
+  Bytes                = 672
+  Records              = 12
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 296840857.4588
+  SpkTableEndTime      = 296840887.72259
+  SpkTableOriginalSize = 4657.0
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object

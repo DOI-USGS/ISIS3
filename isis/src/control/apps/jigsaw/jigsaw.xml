@@ -1637,6 +1637,24 @@
             all image and point from a network put through jigsaw.
           </description>
         </dataFile>
+
+        <dataFile path="assets/ap15/tables.txt">
+          <brief> Instrument pointing and position tables before jigsaw update </brief>
+          <description>
+            Table summaries for the InstrumentPointing and InstrumentPosition tables extracted from
+            a cube label. 
+          </description>
+        </dataFile>
+
+        <dataFile path="assets/ap15/jigged_tables.txt">
+          <brief> Instrument point and position tables after jigsaw update </brief>
+          <description>
+            Table summaries for the InstrumentPointing and InstrumentPosition tables extracted from
+            a jigsaw updated cube label. The InstrumentPointing table was updated due to the camera
+            updates solved for in the bundle (camsolve=accelerations). The InstrumentPosition table
+            was updated due to the spacecraft updates solved for in the bundle (spsolve=positions).
+          </description>
+        </dataFile>
       </dataFiles>
     </example>
 
