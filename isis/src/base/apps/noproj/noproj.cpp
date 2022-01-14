@@ -51,12 +51,12 @@ namespace Isis {
     }
     icube.open(ui.GetFileName("FROM"));
 
-    Cube *mcube = NULL;
+    Cube mcube;
     if((ui.WasEntered("MATCH"))) {
-      mcube->open(ui.GetFileName("MATCH"));
+      mcube.open(ui.GetFileName("MATCH"));
     }
 
-    noproj(&icube, mcube, ui);
+    noproj(&icube, &mcube, ui);
   }
 
   /**
@@ -64,7 +64,7 @@ namespace Isis {
    * This is the programmatic interface to the ISIS noproj application.
    *
    * @param icube input cube.
-   * @param mcube input cube whose labels will be converted to the Ideal 
+   * @param mcube input cube whose labels will be converted to the Ideal
    *              instrument and used as the cube to match.
    * @param ui the User Interface to parse the parameters from.
    */
