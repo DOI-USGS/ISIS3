@@ -96,16 +96,16 @@ Object = IsisCube
     {% block instrument %}
     {%- if exists("ROOT.MISSION_NAME.Value") -%}
     {%- set infoGroup=ROOT -%}
+    {%- else if exists("ROOT.ISIS_INSTRUMENT.SPACECRAFT_NAME") -%}
+    {%- set infoGroup=ROOT -%}
     {%- else -%}
     {%- set infoGroup=QUBE -%}
     {%- endif -%}
     {% endblock %}
   End_Group
 
-  Group = Archive
-    {% block archive %}
-    {% endblock %}
-  End_Group
+  {% block additional_groups %}
+  {% endblock %}
 
   Group = BandBin
   {% block bandbin %}
