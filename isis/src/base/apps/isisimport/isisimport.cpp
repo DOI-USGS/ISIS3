@@ -148,10 +148,10 @@ namespace Isis {
       return bandInfo;
     });
 
-    env.add_callback("splitOnUnderscore", 1, [](Arguments& args){
+    env.add_callback("splitOnChar", 2, [](Arguments& args){
       std::string text = args.at(0)->get<string>();
 
-    string delimiter = "_";
+    string delimiter = args.at(1)->get<string>();
     vector<string> words{};
 
     size_t pos;

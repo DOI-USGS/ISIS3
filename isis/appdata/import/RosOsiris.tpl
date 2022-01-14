@@ -10,30 +10,18 @@
     StopTime                   = {{STOP_TIME.Value}}
     ExposureDuration           = {{SR_ACQUIRE_OPTIONS.EXPOSURE_DURATION.Value}} <s>
     {% set pix_width_arr = SR_COMPRESSION.PIXEL_AVERAGING_WIDTH.Value%}
-    PixelAveragingWidth        = {% if exists("pix_width_arr.1") %}
-                                ({% for pix in pix_width_arr %}
-                                    {% if loop.is_last %}
-                                    {{ pix }}
-                                    {% else %}
-                                    {{ pix }},
-                                    {% endif %}
-                                   {% endfor %})  
+    PixelAveragingWidth        = {% if isArray(pix_width_arr) %}
+                               ({{ join(pix_width_arr, ", ") }})
                                 {% else %}
-                                SR_COMPRESSION.PIXEL_AVERAGING_WIDTH.Value
+                                {{SR_COMPRESSION.PIXEL_AVERAGING_WIDTH.Value}}
                                 {% endif %}
                           
 
     {% set pix_height_arr = SR_COMPRESSION.PIXEL_AVERAGING_HEIGHT.Value%}
-    PixelAveragingHeight       = {% if exists("pix_height_arr.1") %} 
-                                ({% for pix in pix_height_arr %}
-                                    {% if loop.is_last %}
-                                    {{ pix }}
-                                    {% else %}
-                                    {{ pix }},
-                                    {% endif %}
-                                   {% endfor %})
+    PixelAveragingHeight       = {% if isArray(pix_height_arr) %} 
+                                ({{ join(pix_height_arr, ", ") }})
                                 {% else %}
-                                SR_COMPRESSION.PIXEL_AVERAGING_HEIGHT.Value
+                                {{SR_COMPRESSION.PIXEL_AVERAGING_HEIGHT.Value}}
                                 {% endif %}
 
     {% set tar_name = TARGET_NAME.Value %}
@@ -65,7 +53,7 @@
 
 {% block additional_groups %}
   Group = BandBin
-    {% set filterName=splitOnUnderscore(SR_MECHANISM_STATUS.FILTER_NAME.Value) %}
+    {% set filterName=splitOnChar(SR_MECHANISM_STATUS.FILTER_NAME.Value, "_") %}
     {% set filterOneName = filterName.0 %}
     {% set filterTwoName = filterName.1 %}
 
@@ -159,8 +147,6 @@
     {% else if filterName.0 == "OI" %}
       {% set filterOneCenter = 631.6 %}
       {% set filterOneWidth = 4.0 %}
-
-
     {% endif %}
 
     {% if filterName.1 == "FFP-Vis" %}
