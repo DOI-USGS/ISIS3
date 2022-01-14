@@ -17,14 +17,7 @@
     UpperRightDaytimeFlag        = {{ UPPER_RIGHT_DAYTIME_FLAG.Value }}
     LowerLeftDaytimeFlag         = {{ LOWER_LEFT_DAYTIME_FLAG.Value }}
     LowerRightDaytimeFlag        = {{ LOWER_RIGHT_DAYTIME_FLAG.Value }}
-    {% set detstatus=DETECTOR_STATUS.Value %}
-    DetectorStatus               = ({% for det in detstatus %}
-                                      {% if loop.is_last %}
-                                        {{ det }}
-                                      {% else %}
-                                        {{ det }},
-                                      {% endif %}
-                                   {% endfor %})
+    DetectorStatus               = ({{ join(DETECTOR_STATUS.Value, ",") }})
     ExposureModeId               = {{ EXPOSURE_MODE_ID.Value }}
     LineExposureDuration         = {{ LINE_EXPOSURE_DURATION.Value }} <msec>
     SpacecraftClockStartCount    = {{ SPACECRAFT_CLOCK_START_COUNT.Value }} <sec>
@@ -61,14 +54,7 @@
     AAxisRadius                  = {{ A_AXIS_RADIUS.Value }} <km>
     BAxisRadius                  = {{ B_AXIS_RADIUS.Value }} <km>
     CAxisRadius                  = {{ C_AXIS_RADIUS.Value }} <km>
-    {% set pixpos=DEFECT_PIXEL_POSITION.Value %}
-    DefectPixelPosition          = ({% for val in pixpos %}
-                                      {% if loop.is_last %}
-                                        {{ val }}
-                                      {% else %}
-                                        {{ val }},
-                                      {% endif %}
-                                   {% endfor %})
+    DefectPixelPosition          = ({{ join(DEFECT_PIXEL_POSITION.Value, ",") }})
     SpacecraftAltitude           = {{ SPACECRAFT_ALTITUDE.Value }} <km>
     SpacecraftGroundSpeed        = {{ SPACECRAFT_GROUND_SPEED.Value }} <km/sec>
   {% endblock %}
@@ -92,30 +78,9 @@
   End_Group
 
   Group = BandBin
-   {% set filtNames=FILTER_NAME.Value %}
-    FilterName = ({% for filter in filtNames %}
-                    {% if loop.is_last %}
-                      {{ filter }}
-                    {% else %}
-                      {{ filter }},
-                    {% endif %}
-                 {% endfor %})
-    {% set centerArray=CENTER_FILTER_WAVELENGTH.Value %}
-    Center     = ({% for center in centerArray %}
-                    {% if loop.is_last %}
-                      {{ center }}
-                    {% else %}
-                      {{ center }},
-                    {% endif %}
-                 {% endfor %}) <nm>
-    {% set widthArray=BANDWIDTH.Value %}
-    Width      = ({% for width in widthArray %}
-                    {% if loop.is_last %}
-                      {{ width }}
-                    {% else %}
-                      {{ width }},
-                    {% endif %}
-                 {% endfor %}) <nm>
+    FilterName = ({{ join(FILTER_NAME.Value, ",") }})
+    Center     = ({{ join(CENTER_FILTER_WAVELENGTH.Value, ",") }}) <nm>
+    Width      = ({{ join(BANDWIDTH.Value, ",") }}) <nm>
     BaseBand   = {{ BASE_BAND.Value }}
   End_Group
 

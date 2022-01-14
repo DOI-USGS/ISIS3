@@ -35,15 +35,18 @@
       {%- set InstrumentId="VIMS" -%}
     {%- else -%}
       {%- set InstrumentId="ISS" -%}
-{%- endif -%}
+    {%- endif -%}
 {%- else if SpacecraftName == "MARS_GLOBAL_SURVEYOR" -%}
   {%- set SpacecraftId="MGS" -%}
   {%- set InstrumentId="MOC" -%}
 {%- else if SpacecraftName == "DAWN MISSION TO VESTA AND CERES" or SpacecraftName == "DAWN"-%}
-{%- set SpacecraftId="Dawn" -%}
+  {%- set SpacecraftId="Dawn" -%}
+  {%- if InstrumentId == "FC1" or InstrumentId == "FC2" -%}
+    {%- set InstrumentId="FC"-%}
+  {%- endif -%}
 {%- else if SpacecraftName == "LUNAR RECONNAISSANCE ORBITER" -%}
-{%- set SpacecraftId="LRO" -%}
-{%- set InstrumentId="CNac" -%}
+  {%- set SpacecraftId="LRO" -%}
+  {%- set InstrumentId="CNac" -%}
 {%- else if SpacecraftName == "MARS EXPLORATION ROVER" -%}
   {%- set SpacecraftId="Mer" -%}
 {%- else if SpacecraftName == "LUNAR_ORBITER_3" or  SpacecraftName == "LUNAR_ORBITER_4" or  SpacecraftName == "LUNAR_ORBITER_5" -%}
@@ -51,12 +54,14 @@
   {%- set InstrumentId="HRC" -%}
 {%- else if SpacecraftName == "SELENE" or SpacecraftName == "SELENE-M"-%}
   {%- set SpacecraftId="Kaguya" -%}
-{%- endif -%}
-
-{%- if InstrumentId == "FC1" or InstrumentId == "FC2" -%}
-  {%- set InstrumentId="FC"-%}
-{%- else if InstrumentId == "MI-NIR" or InstrumentId == "MI-VIS"-%}
-  {%- set InstrumentId="MI" -%}
+  {%- if InstrumentId == "MI-NIR" or InstrumentId == "MI-VIS"-%}
+    {%- set InstrumentId="MI" -%}
+  {%- endif -%}
+{%- else if SpacecraftName == "ROSETTA-ORBITER"-%}
+  {%- set SpacecraftId="Ros" -%}
+  {%- if InstrumentId == "OSINAC" or InstrumentId == "OSIWAC"-%}
+    {%- set InstrumentId="Osiris" -%}
+  {%- endif -%}
 {%- endif -%}
 
 {%- if SpacecraftId -%}$ISISROOT/appdata/import/{{- SpacecraftId -}}{{- InstrumentId -}}.tpl{%- endif -%}
