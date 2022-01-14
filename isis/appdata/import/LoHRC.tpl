@@ -42,76 +42,19 @@
                                 {{FRAME_NUMBER.Value}}
                                 {% endif %}
 
-
-
     {% if exists("QUBE.ISIS_INSTRUMENT.FIDUCIAL_ID.Value")%}
         FiducialCoordinateMicron = {{RemoveUnits(QUBE.ISIS_INSTRUMENT.FIDUCIAL_COORD_MICRON.Value)}} <um>
-        {% set fiducialArray=QUBE.ISIS_INSTRUMENT.FIDUCIAL_ID.Value %}
-        FiducialID               =  ({% for fid in fiducialArray %}
-                                        {% if loop.is_last %}
-                                            {{ fid }}
-                                        {% else %}
-                                            {{ fid }},
-                                        {% endif %}
-                                    {% endfor %})
-
-        {% set fidSamArray=QUBE.ISIS_INSTRUMENT.FIDUCIAL_SAMPLES.Value %}
-        FiducialSamples          = ({% for val in fidSamArray %}
-                                        {% if loop.is_last %}
-                                            {{ val }}
-                                        {% else %}
-                                            {{ val }},
-                                        {% endif %}
-                                    {% endfor %}) <pixels>
-
-        {% set fidLineArray=QUBE.ISIS_INSTRUMENT.FIDUCIAL_LINES.Value %}
-        FiducialLines            = ({% for line in fidLineArray %}
-                                        {% if loop.is_last %}
-                                            {{ line }}
-                                        {% else %}
-                                            {{ line }},
-                                        {% endif %}
-                                    {% endfor %}) <pixels>
-
-        {% set fidXCoords=QUBE.ISIS_INSTRUMENT.FIDUCIAL_X_COORDINATES.Value %}
-        FiducialXCoordinates     = ({% for xCoord in fidXCoords %}
-                                        {% if loop.is_last %}
-                                            {{ xCoord }}
-                                        {% else %}
-                                            {{ xCoord }},
-                                        {% endif %}
-                                    {% endfor %}) <mm>
-
+        FiducialID               =  ({{ join(QUBE.ISIS_INSTRUMENT.FIDUCIAL_ID.Value, ",") }})
+        FiducialSamples          = ({{ join(QUBE.ISIS_INSTRUMENT.FIDUCIAL_SAMPLES.Value, ",") }}) <pixels>
+        FiducialLines            = ({{ join(QUBE.ISIS_INSTRUMENT.FIDUCIAL_LINES.Value, ",") }}) <pixels>
+        FiducialXCoordinates     = ({{ join(QUBE.ISIS_INSTRUMENT.FIDUCIAL_X_COORDINATES.Value, ",") }}) <mm>
         {% set fidYCoords=QUBE.ISIS_INSTRUMENT.FIDUCIAL_Y_COORDINATES.Value %}
-        FiducialYCoordinates     = ({% for yCoord in fidYCoords %}
-                                        {% if loop.is_last %}
-                                            {{ yCoord }}
-                                        {% else %}
-                                            {{ yCoord }},
-                                        {% endif %}
-                                    {% endfor %}) <mm>
-
+        FiducialYCoordinates     = ({{ join(QUBE.ISIS_INSTRUMENT.FIDUCIAL_Y_COORDINATES.Value, ",") }}) <mm>
     {% else if exists("LO_FIDUCIAL_ID.Value") %}
-
         FiducialCoordinateMicron = {{RemoveUnits(LO_FIDUCIAL_COORDINATE_MICRON.Value)}} <um>
         {% set fiducialArray=LO_FIDUCIAL_ID.Value %}
-        FiducialID               =  ({% for fid in fiducialArray %}
-                                        {% if loop.is_last %}
-                                            {{ fid }}
-                                        {% else %}
-                                            {{ fid }},
-                                        {% endif %}
-                                    {% endfor %})
-
-        {% set fidSamArray=LO_FIDUCIAL_SAMPLES.Value %}
-        FiducialSamples          = ({% for val in fidSamArray %}
-                                        {% if loop.is_last %}
-                                            {{ val }}
-                                        {% else %}
-                                            {{ val }},
-                                        {% endif %}
-                                    {% endfor %}) <pixels>
-
+        FiducialID               =  ({{ join(LO_FIDUCIAL_ID.Value, ",") }})
+        FiducialSamples          = ({{ join(LO_FIDUCIAL_SAMPLES, ",") }}) <pixels>
         {% set fidLineArray=LO_FIDUCIAL_LINES.Value %}
         FiducialLines            = ({% for line in fidLineArray %}
                                         {% if loop.is_last %}

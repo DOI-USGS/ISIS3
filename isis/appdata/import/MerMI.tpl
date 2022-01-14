@@ -2,26 +2,12 @@
 
 {% block instrument %}
     {% if exists("ROVER_MOTION_COUNTER") %}
-    {% set motionCounter=ROVER_MOTION_COUNTER.Value %}
-    RoverMotionCounter          = ({% for count in motionCounter %}
-                                    {% if loop.is_last %}
-                                    {{ count }}
-                                    {% else %}
-                                    {{ count }},
-                                    {% endif %}
-                                   {% endfor %})
+    RoverMotionCounter          = ({{ join(ROVER_MOTION_COUNTER.Value, ",") }})
     {% else %}
     RoverMotionCounter          = NULL
     {% endif %}
     {% if exists("ROVER_MOTION_COUNTER_NAME") %}
-    {% set counterName=ROVER_MOTION_COUNTER_NAME.Value %}
-    RoverMotionCounterName      = ({% for name in counterName %}
-                                    {% if loop.is_last %}
-                                    {{ name }}
-                                    {% else %}
-                                    {{ name }},
-                                    {% endif %}
-                                   {% endfor %})
+    RoverMotionCounterName      = ({{ join(ROVER_MOTION_COUNTER_NAME.Value, ",") }})
     {% else %}
     RoverMotionCounterName          = NULL
     {% endif %}
@@ -117,26 +103,12 @@
                                   NULL
                                   {% endif %}
     {% if exists("INSTRUMENT_STATE_PARMS.INSTRUMENT_TEMPERATURE") %}
-    {% set instTemp=INSTRUMENT_STATE_PARMS.INSTRUMENT_TEMPERATURE.Value %}
-    InstrumentTemperature      = ({% for temp in instTemp %}
-                                    {% if loop.is_last %}
-                                    {{ temp }}
-                                    {% else %}
-                                    {{ temp }},
-                                    {% endif %}
-                                   {% endfor %})<degC>
+    InstrumentTemperature      = ({{ join(INSTRUMENT_STATE_PARMS.INSTRUMENT_TEMPERATURE.Value, ",") }})<degC>
     {% else %}
     InstrumentTemperature          = NULL
     {% endif %}
     {% if exists("INSTRUMENT_STATE_PARMS.INSTRUMENT_TEMPERATURE_NAME") %}
-    {% set tempName=INSTRUMENT_STATE_PARMS.INSTRUMENT_TEMPERATURE_NAME.Value %}
-    InstrumentTemperatureName      = ({% for name in tempName %}
-                                    {% if loop.is_last %}
-                                    "{{ name }}"
-                                    {% else %}
-                                    "{{ name }}",
-                                    {% endif %}
-                                   {% endfor %})
+    InstrumentTemperatureName      = ({{ join(INSTRUMENT_STATE_PARMS.INSTRUMENT_TEMPERATURE_NAME.Value, ",") }})
     {% else %}
     InstrumentTemperatureName     = NULL
     {% endif %}

@@ -261,6 +261,7 @@ namespace Isis {
        return subFrame;
      });
 
+
      /**
       * Add ImageKeyId to Archive Group based on StartTime and ProductId
       */
@@ -272,6 +273,7 @@ namespace Isis {
 
         return imageKeyId;
       });
+
 
     /**
      * Remove units from keyword value if exists at the end of the string.
@@ -286,6 +288,17 @@ namespace Isis {
       }
 
       return stringToRemove;
+    });
+
+
+    /**
+     * Returns character at specified index in String.
+     */
+    env.add_callback("CharAt", 2, [](Arguments& args){
+      std::string inputString = args.at(0)->get<string>();
+      int index = args.at(1)->get<int>();
+
+      return inputString.substr(index, 1);
     });
      // end of inja callbacks
 

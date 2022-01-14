@@ -15,10 +15,10 @@
                                 {% else %}
                                 {{SR_COMPRESSION.PIXEL_AVERAGING_WIDTH.Value}}
                                 {% endif %}
-                          
+
 
     {% set pix_height_arr = SR_COMPRESSION.PIXEL_AVERAGING_HEIGHT.Value%}
-    PixelAveragingHeight       = {% if isArray(pix_height_arr) %} 
+    PixelAveragingHeight       = {% if isArray(pix_height_arr) %}
                                 ({{ join(pix_height_arr, ", ") }})
                                 {% else %}
                                 {{SR_COMPRESSION.PIXEL_AVERAGING_HEIGHT.Value}}
@@ -37,7 +37,8 @@
     ProcessingLevelDescription = "{{PROCESSING_LEVEL_DESC.Value}}"
 {% endblock %}
 
-{% block archive %}
+{% block additional_groups %}
+  Group = Archive
     FileName                = {{FILE_NAME.Value}}
     SoftwareName            = {{SOFTWARE_NAME.Value}}
     SoftwareVersionId       = {{SOFTWARE_VERSION_ID.Value}}
@@ -49,9 +50,8 @@
     ProducerInstitutionName = "{{PRODUCER_INSTITUTION_NAME.Value}}"
     ProductCreationTime     = {{PRODUCT_CREATION_TIME.Value}}
     ProductVersionId        = {{PRODUCT_VERSION_ID.Value}}
-{% endblock %}
+  End_Group
 
-{% block additional_groups %}
   Group = BandBin
     {% set filterName=splitOnChar(SR_MECHANISM_STATUS.FILTER_NAME.Value, "_") %}
     {% set filterOneName = filterName.0 %}
@@ -213,7 +213,7 @@
     {%else if filterName.1 == "Empty" %}
         {% set filterTwoCenter = 0.0 %}
         {% set filterTwoWidth = 0.0 %}
-    
+
 
     {% else if filterName.1 == "UV245" %}
       {% set filterTwoCenter = 246.2 %}
