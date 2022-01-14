@@ -66,7 +66,7 @@
     {% else if filterName.0 == "FFP-IR" %}
       {% set filterOneCenter = 600.0 %}
       {% set filterOneWidth = 600.0 %}
-    {% else if filterName.0 == "Netural" %}
+    {% else if filterName.0 == "Neutral" %}
       {% set filterOneCenter = 640.0 %}
       {% set filterOneWidth = 520.0 %}
     {% else if filterName.0 == "Vis-Hydra" %}
@@ -158,7 +158,7 @@
     {% else if filterName.1 == "FFP-IR" %}
       {% set filterTwoCenter = 600.0 %}
       {% set filterTwoWidth = 600.0 %}
-    {% else if filterName.1 == "Netural" %}
+    {% else if filterName.1 == "Neutral" %}
       {% set filterTwoCenter = 640.0 %}
       {% set filterTwoWidth = 520.0 %}
     {% else if filterName.1 == "Vis-Hydra" %}
@@ -267,6 +267,12 @@
   End_Group
 
   Group = Kernels
-    NaifFrameCode = -226111
+    {% set instrumentID = INSTRUMENT_ID.Value %}
+    {% if instrumentID == "OSIWAC" %}
+      NaifFrameCode = -226112
+    {% else if instrumentID == "OSINAC" %}
+      NaifFrameCode = -226111
+    {% endif %}
   End_Group
+
 {% endblock %}
