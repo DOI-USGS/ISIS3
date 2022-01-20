@@ -1,3 +1,11 @@
+{%- if exists("Product_Observational.product_class") -%}
+  {%- set ImportSubDir="PDS4" -%}
+{%- else if exists("CCSD3ZF0000100000001NJPL3IF0PDS200000001") -%}
+  {%- set ImportSubDir="PDS3" -%}
+{%- else if exists("PDS_VERSION_ID") -%}
+  {%- set ImportSubDir="PDS3" -%}
+{%- endif -%}
+
 {%- if exists("Product_Observational.Observation_Area.Observing_System.Observing_System_Component.1.name") -%}
 {%- set InstrumentId=Product_Observational.Observation_Area.Observing_System.Observing_System_Component.1.name -%}
 {%- else if exists("INSTRUMENT_ID.Value") -%}
@@ -66,4 +74,5 @@
   {%- endif -%}
 {%- endif -%}
 
-{%- if SpacecraftId -%}$ISISROOT/appdata/import/{{- SpacecraftId -}}{{- InstrumentId -}}.tpl{%- endif -%}
+{%- if SpacecraftId -%}$ISISROOT/appdata/import/{{- ImportSubDir -}}/{{- SpacecraftId -}}{{- InstrumentId -}}.tpl{%- endif -%}
+
