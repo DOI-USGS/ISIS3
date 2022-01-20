@@ -56,6 +56,8 @@
   {%- set SpacecraftId="Kaguya" -%}
   {%- if InstrumentId == "MI-NIR" or InstrumentId == "MI-VIS"-%}
     {%- set InstrumentId="MI" -%}
+  {%- else if InstrumentId == "TC" -%}
+    {%- set InstrumentId="TC" -%}
   {%- endif -%}
 {%- else if SpacecraftName == "ROSETTA-ORBITER"-%}
   {%- set SpacecraftId="Ros" -%}
