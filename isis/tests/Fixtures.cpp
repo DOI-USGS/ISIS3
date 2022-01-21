@@ -1083,22 +1083,24 @@ namespace Isis {
 
 
   void ApolloCube::SetUp() {
+    start_time = std::chrono::steady_clock::now();
     TempTestingFiles::SetUp();
 
     testCube = new Cube();
     testCube->setDimensions(22900, 22900, 1);
     testCube->create(tempDir.path() + "/large.cub");
 
-    LineManager line(*testCube);
-    double pixelValue = 0.0;
-    for(line.begin(); !line.end(); line++) {
-      for(int i = 0; i < line.size(); i++) {
-        line[i] = pixelValue;
-      }
+    // LineManager line(*testCube);
+    // double pixelValue = 0.0;
+    // int stepSize = 100;
+    // for(line.begin(); !line.end(); line += stepSize) {
+    //   for(int i = 0; i < line.size(); i += stepSize) {
+    //     line[i] = pixelValue;
+    //   }
 
-      pixelValue++;
-      testCube->write(line);
-    }
+    //   pixelValue++;
+    //   testCube->write(line);
+    // }
 
     PvlGroup reseaus("Reseaus");
     PvlKeyword samples = PvlKeyword("Sample", "200");
