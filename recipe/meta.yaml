@@ -160,6 +160,10 @@ test:
   commands:
     - test -e $PREFIX/lib/libisis${SHLIB_EXT}
     - test -e $PREFIX/include/isis/Isis.h
+    - test -e $PREFIX/bin/isisimport
+    - ISISROOT=$PREFIX
+    - ISISROOT=$PREFIX && isisimport -HELP
+ 
 
 about:
   home: https://github.com/USGS-Astrogeology/ISIS3
