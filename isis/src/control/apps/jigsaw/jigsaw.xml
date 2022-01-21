@@ -1521,13 +1521,13 @@
         </p> 
         <p>
          This relative bundle turns on and parameterizes the camera twist and camera acceleration solve parameters. Camera twist is a flag that allows the bundle to solve 
-         for the camera's rotation around the bore sight axis and does not require an uncertainty estimation. Setting the camera solve parameter to acceleration, however, 
+         for the camera's rotation around the bore sight axis and uses the same uncertainty estimation as the other two rotations. Setting the camera solve parameter to acceleration, however, 
          does require uncertainties to be set for the angles (deg), angular velocity (deg/s), and angular accelerations (deg/s**2). These values were set with increasing 
          constraint because of the increasing affect alterations of higher order parameters have on the bundle solution.
         </p>
         <p>
-         The ‘overexisting’ flag tells the bundle solution to approximate the camera solution with a zero polynomial function added to the ephemeris data (adding the 
-         polynomial <b>over</b> the <b>existing</b> data). Without the ‘overexisting’ flag, the bundle approximates the ephemerides with a polynomial, throws out the existing data
+         The ‘overexisting’ flag tells the bundle solution to approximate the camera rotation with a zero polynomial function added to the existing rotation data (adding the 
+         polynomial <b>over</b> the <b>existing</b> data). Without the ‘overexisting’ flag, the bundle fits a polynomial to the existing rotations, throws out the existing data
          points, and uses the polynomial to calculate the approximate ephemerides when needed.
         </p>
         <p>
@@ -1574,8 +1574,8 @@
         </p>
         <p>
          The 'overhermite' flag allows an estimation the spacecraft position like the 'overexisting' flag estimates the camera pointing, with a zero-polynomial added over
-         the existing data (for spacecraft position this is a Hermite spline). These options require more memory but provide a solution more representative of the original 
-         ephemeris data.
+         the existing data (for spacecraft position this is a cubic Hermite spline). These options require more memory but provide a solution more representative of small
+         variations in the original ephemeris data.
         </p>
       </description>
 
