@@ -560,7 +560,7 @@ add_dependencies(isis hidtmgen)
 
 add_custom_target(import ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/import/* ${CMAKE_BINARY_DIR}/appdata/import)
-add_dependencies(isis import)
+add_dependencies(isis import importpds3 importpds4)
 
 add_custom_target(importpds3 ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/import/PDS3/* ${CMAKE_BINARY_DIR}/appdata/import/PDS3)
