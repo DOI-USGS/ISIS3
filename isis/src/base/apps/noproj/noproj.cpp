@@ -1,4 +1,3 @@
-#define GUIHELPERS
 #include "noproj.h"
 
 #include <iostream>
@@ -23,16 +22,6 @@ using namespace Isis;
 using namespace std;
 
 namespace Isis {
-
-  static void LoadMatchSummingMode(Cube *mcube, UserInterface &ui);
-  static void LoadInputSummingMode(Cube *icube, UserInterface &ui);
-
-  static map <QString, void *> GuiHelpers() {
-    map <QString, void *> helper;
-    helper ["LoadMatchSummingMode"] = (void *) LoadMatchSummingMode;
-    helper ["LoadInputSummingMode"] = (void *) LoadInputSummingMode;
-    return helper;
-  }
 
   static void storeSpice(PvlGroup *instrumentGroup, PvlObject *naifKeywordsObject,
                   QString oldName, QString spiceName,
@@ -122,15 +111,22 @@ namespace Isis {
     int xDepend = incam->FocalPlaneMap()->FocalPlaneXDependency();
 
     // Get output summing mode
+    double summingMode;
+    Camera *cam;
     if(ui.GetString("SOURCE") == "FROMMATCH") {
-      LoadMatchSummingMode(mcube, ui);
+      cam = mcube->camera();
+      summingMode = cam->DetectorMap()->SampleScaleFactor();
     }
     else if(ui.GetString("SOURCE") == "FROMINPUT") {
-      LoadInputSummingMode(icube, ui);
+      cam = icube->camera();
+      summingMode = cam->DetectorMap()->SampleScaleFactor();
+    }
+    else {
+      summingMode = ui.GetDouble("SUMMINGMODE");
     }
 
-    double pixPitch = incam->PixelPitch() * ui.GetDouble("SUMMINGMODE");
-    detectorSamples /= (int)(ui.GetDouble("SUMMINGMODE"));
+    double pixPitch = incam->PixelPitch() * summingMode;
+    detectorSamples /= (int)(summingMode);
     // Get the user options
     int sampleExpansion = int((ui.GetDouble("SAMPEXP") / 100.) * detectorSamples + .5);
     int lineExpansion = int((ui.GetDouble("LINEEXP") / 100.) * numberLines + .5);
@@ -138,8 +134,8 @@ namespace Isis {
 
 
     // Adjust translations for summing mode
-    transl /= ui.GetDouble("SUMMINGMODE");
-    transs /= ui.GetDouble("SUMMINGMODE");
+    transl /= summingMode;
+    transs /= summingMode;
 
     detectorSamples += sampleExpansion;
     numberLines += lineExpansion;
@@ -284,7 +280,7 @@ namespace Isis {
       inst.addKeyword(PvlKeyword("FocalLength", toString(incam->FocalLength()), "millimeters"));
     }
 
-    double newPixelPitch = incam->PixelPitch() * ui.GetDouble("SUMMINGMODE");
+    double newPixelPitch = incam->PixelPitch() * summingMode;
     if (naifKeywordsObject) {
       naifKeywordsObject->addKeyword(PvlKeyword("IDEAL_PIXEL_PITCH", toString(newPixelPitch)),
                                      Pvl::Replace);
@@ -398,18 +394,6 @@ namespace Isis {
     toCube.close();
   }
 
-  // Helper function to get output summing mode from cube to MATCH
-  void LoadMatchSummingMode(Cube *mcube, UserInterface &ui) {
-    Camera *cam = mcube->camera();
-
-    ui.Clear("SUMMINGMODE");
-    ui.PutDouble("SUMMINGMODE", cam->DetectorMap()->SampleScaleFactor());
-
-    ui.Clear("SOURCE");
-    ui.PutAsString("SOURCE", "FROMUSER");
-  }
-
-
   void storeSpice(PvlGroup *instrumentGroup, PvlObject *naifKeywordsObject,
                   QString oldName, QString spiceName,
                   double constantCoeff, double multiplierCoeff, bool putMultiplierInX) {
@@ -431,17 +415,5 @@ namespace Isis {
 
       naifKeywordsObject->addKeyword(spiceKeyword, Pvl::Replace);
     }
-  }
-
-
-  // Helper function to get output summing mode from input cube (FROM)
-  void LoadInputSummingMode(Cube *icube, UserInterface &ui) {
-    Camera *cam = icube->camera();
-
-    ui.Clear("SUMMINGMODE");
-    ui.PutDouble("SUMMINGMODE", cam->DetectorMap()->SampleScaleFactor());
-
-    ui.Clear("SOURCE");
-    ui.PutAsString("SOURCE", "FROMUSER");
   }
 }
