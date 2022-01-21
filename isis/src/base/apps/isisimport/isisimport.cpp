@@ -69,17 +69,19 @@ namespace Isis {
       inputTemplate = ui.GetFileName("TEMPLATE");
     }
     else {
+        std::string templateFile;
       try {
-        std::string templateFile = env.render_file(fileTemplate.expanded().toStdString(), jsonData);
+        templateFile = env.render_file(fileTemplate.expanded().toStdString(), jsonData);
         inputTemplate = FileName(QString::fromStdString(templateFile));
       }
       catch(const std::exception& e) {
-        QString msg = "Cannot locate a template for input label. Please provide a template file to use. ";
+        QString msg = "Cannot locate a template named [" + QString::fromStdString(templateFile) + "] for input label [";
+        msg += FileName(ui.GetFileName("FROM")).expanded();
+        msg += "]. You can explicitly provide a template file using the [TEMPLATE] parameter. ";
         msg += e.what();
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-
 
     // Template engine call back functions
     /**

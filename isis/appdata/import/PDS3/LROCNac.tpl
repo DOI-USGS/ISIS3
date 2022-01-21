@@ -55,7 +55,6 @@ Group = BandBin
   Width        = {{ BANDWIDTH.Value }} <ms>
 End_Group
 
-Group = Kernels
+{% block kernels %}
   NaifFrameCode = -85600
-End_Group
 {% endblock %}

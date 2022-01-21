@@ -1,9 +1,29 @@
+{#- This template is used to determine the path and file name of the type, mission and instrument -#}
+{#- specific template used to import an image file to a cube file -#}
+{#- All output from the rendering of this template is used as the file name for a template to create ISIS cube labels -#}
+{#- Only the last statement in this template should render any text, including \n after comments, thus the dashes -#}
+{#- -#}
+{#- Three variabls are set ImportSubDir, SpacecraftId, InstrumentId -#}
+{#- They are combined into a relative_path/file_name.tpl in the last line -#}
+{#- in the form ImportSubDir/SpacecraftIdInstrumentId.tpl -#}
+{#- -#}
+{#- Decide which import directory to find the template -#}
+{%- if exists("Product_Observational.product_class") -%}
+  {%- set ImportSubDir="PDS4" -%}
+{%- else if exists("CCSD3ZF0000100000001NJPL3IF0PDS200000001") -%}
+  {%- set ImportSubDir="PDS3" -%}
+{%- else if exists("PDS_VERSION_ID") -%}
+  {%- set ImportSubDir="PDS3" -%}
+{%- endif -%}
+
+{#- Set the instrument ID portion of the template file name -#}
 {%- if exists("Product_Observational.Observation_Area.Observing_System.Observing_System_Component.1.name") -%}
 {%- set InstrumentId=Product_Observational.Observation_Area.Observing_System.Observing_System_Component.1.name -%}
 {%- else if exists("INSTRUMENT_ID.Value") -%}
 {%- set InstrumentId=INSTRUMENT_ID.Value -%}
 {%- endif -%}
 
+{#- Get the spacecraft/mission name from the data -#}
 {%- if exists("Product_Observational.Observation_Area.Investigation_Area.name") -%}
   {%- set SpacecraftName=Product_Observational.Observation_Area.Investigation_Area.name -%}
 {%- else if exists("Product_Observational.Observation_Area.Investigation_Area.Instrument_Host_Name") -%}
@@ -22,6 +42,10 @@
   {%- set SpacecraftName=INSTRUMENT_HOST_NAME.Value -%}
 {%- endif -%}
 
+{#- Use the SpacecraftName to set the SpacecraftId portion of the template file name -#}
+{#- The InstrumentId may be adjusted once the spacecraft/mission name is found -#}
+{#- This is useful when a single template can be used for multiple instruments -#}
+{#- or when the instrument name is long or contains spaces, ... -#}
 {%- if SpacecraftName == "TRACE GAS ORBITER" -%}
   {%- set SpacecraftId="TGO" -%}
 {%- else if SpacecraftName == "VIKING_ORBITER_1" or SpacecraftName == "VIKING_ORBITER_2" -%}
@@ -66,4 +90,7 @@
   {%- endif -%}
 {%- endif -%}
 
-{%- if SpacecraftId -%}$ISISROOT/appdata/import/{{- SpacecraftId -}}{{- InstrumentId -}}.tpl{%- endif -%}
+{#- Combine the pieces to output the file name to be used to import an image into a cube -#}
+{#- This is the only line in this file that should output anything -#}
+{%- if SpacecraftId -%}$ISISROOT/appdata/import/{{- ImportSubDir -}}/{{- SpacecraftId -}}{{- InstrumentId -}}.tpl{%- endif -%}
+
