@@ -180,11 +180,9 @@ commands:
 
     * Ensure you are at the head of the release branch ```git pull upstream <version branch>``` 
 
-* Run the bash script in the root of the directory: ``` buildCondaRelease.sh```. This script will remove a CMake parameter that is used for jenkins and create a conda build running the conda build command:```conda build recipe/ -c usgs-astrogeology -c conda-forge --no-test``` 
+* Run the bash script in the root of the directory: ``` buildCondaRelease.sh```. This script will remove a CMake parameter that is used for jenkins and create a conda build running the conda build command:```conda build recipe/ -c usgs-astrogeology -c conda-forge``` 
 
-  * The -c options are to give conda a channel priority. Without these, conda will always attempt to download from the default Anaconda channel first. (Unlike the environment.yml files, channel priority cannot be defined within the meta.yaml.) 
-
-  * Since we do not have testing set-up through conda, the “--no-test” flag must be set in order to avoid errors. (By default, conda looks for a run_test file and will throw an error if it can not be located.) 
+  * The -c options are to give conda a channel priority. Without these, conda will always attempt to download from the default Anaconda channel first. (Unlike the environment.yml files, channel priority cannot be defined within the meta.yaml.)
 
   
 
