@@ -1,10 +1,9 @@
+#include "Brick.h"
 #include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
-#include "Histogram.h"
-
-#include <chrono>
+#include "Statistics.h"
 
 #include "apollocal.h"
 
@@ -15,7 +14,6 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/apollocal.xml").expanded();
 
 TEST_F(ApolloCube, FunctionalTestApollocalDefault) {
-  std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
   QTemporaryDir prefix;
 
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
@@ -29,20 +27,21 @@ TEST_F(ApolloCube, FunctionalTestApollocalDefault) {
   catch (IException &e) {
     FAIL() << "Call failed, Unable to process cube: " << e.what() << std::endl;
   }
-  std::chrono::steady_clock::time_point after_cal = std::chrono::steady_clock::now();
 
   Cube oCube(outCubeFileName, "r");
 
-  std::unique_ptr<Histogram> oCubeStats(oCube.histogram());
+  // Check a region with both Null and non-Null data
+  Brick brick(reseauSize + 10,reseauSize + 10,1,oCube.pixelType());
+  int baseSamp = (int)(reseaus[0].first+0.5) - (reseauSize/2);
+  int baseLine = (int)(reseaus[0].second+0.5) - (reseauSize/2);
+  brick.SetBasePosition(baseSamp,baseLine,1);
+  oCube.read(brick);
+  Statistics reseauStats;
+  reseauStats.AddData(&brick[0], brick.size());
 
-  EXPECT_NEAR(oCubeStats->Average(), -124.188,          0.001);
-  EXPECT_NEAR(oCubeStats->Sum(), -65125546242.836,   0.001);
-  EXPECT_NEAR(oCubeStats->ValidPixels(), 524410000,     0.001);
-  EXPECT_NEAR(oCubeStats->StandardDeviation(), 1056.736, 0.001);
-  std::chrono::steady_clock::time_point after_check = std::chrono::steady_clock::now();
-
-  std::cout << "Time to setup: " << (double)std::chrono::duration_cast<std::chrono::milliseconds>(begin - start_time).count() / 1000 << " [s]" << std::endl;
-  std::cout << "Time to calibrate: " << (double)std::chrono::duration_cast<std::chrono::milliseconds>(after_cal - begin).count() / 1000 << " [s]" << std::endl;
-  std::cout << "Time to check: " << (double)std::chrono::duration_cast<std::chrono::milliseconds>(after_check - after_cal).count() / 1000 << " [s]" << std::endl;
-  FAIL();
+  EXPECT_NEAR(reseauStats.Average(), -2864.497, 0.001);
+  EXPECT_NEAR(reseauStats.Sum(), -30389453.463, 0.001);
+  EXPECT_EQ(reseauStats.ValidPixels(), 10609);
+  EXPECT_EQ(reseauStats.NullPixels(), 2160);
+  EXPECT_NEAR(reseauStats.StandardDeviation(), 21.534, 0.001);
 }

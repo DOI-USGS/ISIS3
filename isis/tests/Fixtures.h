@@ -4,7 +4,6 @@
 #include "gtest/gtest.h"
 
 #include <string>
-#include <chrono>
 
 #include <QString>
 #include <QTemporaryDir>
@@ -257,8 +256,10 @@ namespace Isis {
 
   class ApolloCube : public LargeCube {
     protected:
+      std::vector<std::pair<int, int>> reseaus;
+      int reseauSize;
+
       void SetUp() override;
-      std::chrono::steady_clock::time_point start_time;
   };
 
   class RingsCube : public TempTestingFiles {
