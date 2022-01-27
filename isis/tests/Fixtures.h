@@ -256,6 +256,9 @@ namespace Isis {
 
   class ApolloCube : public LargeCube {
     protected:
+      std::vector<std::pair<int, int>> reseaus;
+      int reseauSize;
+
       void SetUp() override;
   };
 

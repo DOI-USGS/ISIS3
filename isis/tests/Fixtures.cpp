@@ -5,6 +5,7 @@
 #include "FileName.h"
 
 #include "Blob.h"
+#include "Brick.h"
 #include "csminit.h"
 #include "Fixtures.h"
 #include "Portal.h"
@@ -1107,39 +1108,54 @@ namespace Isis {
     testCube->setDimensions(22900, 22900, 1);
     testCube->create(tempDir.path() + "/large.cub");
 
-    LineManager line(*testCube);
-    double pixelValue = 0.0;
-    for(line.begin(); !line.end(); line++) {
-      for(int i = 0; i < line.size(); i++) {
-        line[i] = pixelValue;
+    // Reseau centers as {sample, line} pairs
+    reseaus = {{200, 200}, {400, 400}, {600, 600}};
+    reseauSize = 103;
+    int reseauValue = 100;
+
+    Brick brick(reseauSize,reseauSize,1,testCube->pixelType());
+    for (size_t res=0; res<reseaus.size(); res++) {
+      int baseSamp = (int)(reseaus[res].first+0.5) - (reseauSize/2);
+      int baseLine = (int)(reseaus[res].second+0.5) - (reseauSize/2);
+      brick.SetBasePosition(baseSamp,baseLine,1);
+      testCube->read(brick);
+      // Fill the surrounding area with a base number
+      for (int i = 0; i < reseauSize; i++) {
+        for (int j = 0; j < reseauSize; j++) {
+          brick[reseauSize*i + j] = res;
+        }
       }
 
-      pixelValue++;
-      testCube->write(line);
+      // Create reseau
+      for (int i = 0; i < reseauSize; i++) {
+        for (int j = -2; j < 3; j++) {
+          // Vertical line
+          brick[reseauSize * i + reseauSize/2 + j] = reseauValue;
+
+          // Horizontal line
+          brick[reseauSize * (reseauSize/2 + j) + i] = reseauValue;
+        }
+      }
+      testCube->write(brick);
     }
 
-    PvlGroup reseaus("Reseaus");
-    PvlKeyword samples = PvlKeyword("Sample", "200");
-    samples += "400";
-    samples += "600";
-
-    PvlKeyword lines = PvlKeyword("Line", "200");
-    lines += "400";
-    lines += "600";
-
+    PvlGroup reseausGroup("Reseaus");
+    PvlKeyword samples = PvlKeyword("Sample", QString::number(reseaus[0].first));
+    PvlKeyword lines = PvlKeyword("Line", QString::number(reseaus[0].second));
     PvlKeyword types = PvlKeyword("Type", "5");
-    types += "5";
-    types += "5";
-
     PvlKeyword valid = PvlKeyword("Valid", "1");
-    valid += "1";
-    valid += "1";
+    for (size_t i = 1; i < reseaus.size(); i++) {
+      samples += QString::number(reseaus[i].first);
+      lines += QString::number(reseaus[i].second);
+      types += "5";
+      valid += "1";
+    }
 
-    reseaus += lines;
-    reseaus += samples;
-    reseaus += types;
-    reseaus += valid;
-    reseaus += PvlKeyword("Status", "Nominal");
+    reseausGroup += lines;
+    reseausGroup += samples;
+    reseausGroup += types;
+    reseausGroup += valid;
+    reseausGroup += PvlKeyword("Status", "Nominal");
 
     std::istringstream instStr (R"(
       Group = Instrument
@@ -1154,7 +1170,7 @@ namespace Isis {
     instStr >> instGroup;
 
     Pvl *lab = testCube->label();
-    lab->findObject("IsisCube").addGroup(reseaus);
+    lab->findObject("IsisCube").addGroup(reseausGroup);
     lab->findObject("IsisCube").addGroup(instGroup);
 
     testCube->reopen("r");
