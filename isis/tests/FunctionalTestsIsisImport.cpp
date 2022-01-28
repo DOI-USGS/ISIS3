@@ -232,10 +232,6 @@ End)";
   EXPECT_EQ(archiveGroup["ObservationId"][0].toStdString(), "CRUS_000000_505_1");
 }
 
-
-
-
-
 TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyaTC) {
   std::istringstream PvlInput(R"(
                       Object = IsisCube
