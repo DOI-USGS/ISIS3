@@ -1,4 +1,4 @@
-{#- This template is used to determine the path and file name of the type, mission and instrument -#}
+{#- This template is used to determine the path and file name of the archive type, mission and instrument -#}
 {#- specific template used to import an image file to a cube file -#}
 {#- All output from the rendering of this template is used as the file name for a template to create ISIS cube labels -#}
 {#- Only the last statement in this template should render any text, including \n after comments, thus the dashes -#}
@@ -9,6 +9,8 @@
 {#- -#}
 {#- Decide which import directory to find the template -#}
 {%- if exists("Product_Observational.product_class") -%}
+  {%- set ImportSubDir="PDS4" -%}
+{%- else if exists("Product_Observational.Identification_Area.product_class") -%}
   {%- set ImportSubDir="PDS4" -%}
 {%- else if exists("CCSD3ZF0000100000001NJPL3IF0PDS200000001") -%}
   {%- set ImportSubDir="PDS3" -%}
