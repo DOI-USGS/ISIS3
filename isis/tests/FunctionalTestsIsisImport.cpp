@@ -232,19 +232,12 @@ End)";
   EXPECT_EQ(archiveGroup["ObservationId"][0].toStdString(), "CRUS_000000_505_1");
 }
 
+
+
+
+
 TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyaTC) {
-  /**
-  QVector<QString> args = {"to=" + tempDir.path()+"/output.cub"};
-  enlarge(testCube, options, &appLog);
-  */
-
-  QVector<QString> args = {"from=" + "/data/isisimport/kaguyaTC12bytesImage.img", "to=" + tempDir.path() + "/kaguyatc.cub" };
-  UserInterface options(APP_XML, args);
-  Pvl appLog;
-  isisimport(options, appLog);
-
-  Pvl output = Pvl(tempDir.path() + "/kaguyatc.cub");
-  QString PvlInput = R"(
+  std::istringstream PvlInput(R"(
                       Object = IsisCube
                       Object = Core
                         StartByte   = 65537
@@ -253,8 +246,8 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyaTC) {
                         TileLines   = 1024
 
                         Group = Dimensions
-                          Samples = 12288
-                          Lines   = 12288
+                          Samples = 3
+                          Lines   = 2
                           Bands   = 1
                         End_Group
 
@@ -464,25 +457,38 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyaTC) {
                       Bytes     = 10573
                     End_Object
                     End
-    )";
-  Pvl truth = Pvl::fromString(PvlInput);
+    )");
 
-  PvlKeyword truth_keyword = truth["lines"];
-  PvlKeyword output_keyword = output["lines"];
+  QVector<QString> args = {"from=data/isisimport/kaguyaTC12bytesImage.img", "to=" + tempDir.path() + "/kaguyatc.cub" };
+  UserInterface options(APP_XML, args);
 
-  QString truth_keyword_string = truth_keyword.tostring();
-  QString output_keyword_string = output_keyword.tostring();
-  AssertQStringsEqual(truth_keyword_string, output_keyword_string);
+  isisimport(options);
 
-  // EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 0.00192);
-  /**
-   * ----- things to test for ------
-   * number lines (semi-done)
-   * number samples
-   * number bands
-   * spacecraft name
-   * inst name or id - depending on mission 
-   * 
-   */
+  Pvl output = Pvl(tempDir.path() + "/kaguyatc.cub");
+  Pvl truth;
+  PvlInput >> truth;
+
+  PvlGroup truthDimensions = truth.findGroup("Dimensions", Isis::Plugin::Traverse);
+  PvlGroup truthInstrument = truth.findGroup("Instrument", Isis::Plugin::Traverse);
+  
+  PvlGroup outputDimensions = output.findGroup("Dimensions", Isis::Plugin::Traverse);
+  PvlGroup outputInstrument = output.findGroup("Instrument", Isis::Plugin::Traverse);
+
+
+  PvlKeyword truthLines = truthDimensions.findKeyword("Lines");
+  PvlKeyword truthSamples = truthDimensions.findKeyword("Samples");
+  PvlKeyword truthMissionName = truthInstrument.findKeyword("MissionName");
+  PvlKeyword truthSpacecraftName = truthInstrument.findKeyword("SpacecraftName");
+
+  PvlKeyword outputLines = outputDimensions.findKeyword("Lines");
+  PvlKeyword outputSamples = outputDimensions.findKeyword("Samples");
+  PvlKeyword outputMissionName = outputInstrument.findKeyword("MissionName");
+  PvlKeyword outputSpacecraftName = outputInstrument.findKeyword("SpacecraftName");
+
+
+  ASSERT_TRUE(PvlKeyword::stringEqual(truthLines, outputLines));
+  ASSERT_TRUE(PvlKeyword::stringEqual(truthSamples, outputSamples));
+  ASSERT_TRUE(PvlKeyword::stringEqual(truthMissionName, outputMissionName));
+  ASSERT_TRUE(PvlKeyword::stringEqual(truthSpacecraftName, outputSpacecraftName));
 }
 
