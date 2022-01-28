@@ -47,44 +47,53 @@ namespace Isis {
 
     // Name for output image
     FileName outputFileName(outputFile);
-    FileName genDefaultTemplate = ("$ISISROOT/appdata/export/pvl2template.tpl");
     QString path(outputFileName.originalPath());
     QString name(outputFileName.baseName());
     QString outputCubePath = path + "/" + name + ".cub";
-
     CubeAttributeOutput outputAttributes("+bsq");
     cubeatt(icube, outputCubePath, outputAttributes);
 
     json dataSource;
-
     Environment env;
 
     Pvl &cubeLabel = *icube->label();
 
-    // Add the input cube PVL label to template engine data
+    // Add the input cube label to empty template engine data
+    // This is the only data used to determine the output template.
+    // Note: No other data is added to json until after the output template has been determined
     dataSource["MainLabel"].update(pvlToJSON(cubeLabel));
 
-
-    // Handle TEMPLATE argument
+    // Get the output template manually or automatically
+    FileName genDefaultTemplate = ("$ISISROOT/appdata/export/pvl2template.tpl");
     FileName templateFn;
-    if(ui.WasEntered("TEMPLATE")) {
+    if (ui.WasEntered("TEMPLATE")) {
       templateFn = ui.GetFileName("TEMPLATE");
     }
     else {
-         std::string templateFnStd = env.render_file(genDefaultTemplate.expanded().toStdString(), dataSource);
-         templateFn = FileName(QString::fromStdString(templateFnStd));
-     
+      std::string templateFnStd;
+      try {
+        templateFnStd = env.render_file(genDefaultTemplate.expanded().toStdString(), dataSource);
+        templateFn = FileName(QString::fromStdString(templateFnStd));
+      }
+      catch (const std::exception& e) {
+        QString msg = "Cannot automatically determine the output template file name from ["; 
+        msg += genDefaultTemplate.expanded();
+        msg += "] using input label [";
+        msg += FileName(ui.GetFileName("FROM")).expanded();
+        msg += "]. You can explicitly provide an output template file using the [TEMPLATE] parameter. ";
+        msg += e.what();
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
     }
 
-    if(!templateFn.fileExists()) {
-      QString msg = "File does not exist: " + templateFn.expanded();
+    if (!templateFn.fileExists()) {
+      QString msg = "Template file [" + templateFn.expanded() + "] does not exist.";
 
       if(!ui.WasEntered("TEMPLATE")) {
-        msg += ". Unsupported Spacecraft/Instrument for PDS4 export.";
+        msg += " Unsupported Spacecraft/Instrument for export.";
       }
       throw IException(IException::User, msg, _FILEINFO_);
     }
-
 
 
     // Add the original label (from an ingestion app) to the template engine data
@@ -173,6 +182,17 @@ namespace Isis {
       }
     }
 
+    // All of the environment data has been added to the json, so dump the json if requested.
+    // NOTE: The environment has already been used to determine the output template file, so 
+    // if there is a problem with that template this dump will never happen.
+    if (ui.WasEntered("DATA")) {
+      std::ofstream jsonDataFile(FileName(ui.GetFileName("DATA")).expanded().toStdString());
+      jsonDataFile << dataSource.dump(4);
+      jsonDataFile.close();
+    }
+
+
+
     env.set_trim_blocks(true);
     env.set_lstrip_blocks(true);
 
@@ -218,6 +238,8 @@ namespace Isis {
       return PDS4PixelType(icube->pixelType(), icube->byteOrder()).toStdString();
     });
 
+    // End of environment callback functions
+
     std::string result;
     try {
       result = env.render_file(templateFn.expanded().toStdString(), dataSource);
@@ -229,11 +251,6 @@ namespace Isis {
     outFile << result;
     outFile.close();
 
-    if (ui.WasEntered("DATA")) {
-      std::ofstream jsonDataFile(FileName(ui.GetFileName("DATA")).expanded().toStdString());
-      jsonDataFile << dataSource.dump(4);
-      jsonDataFile.close();
-    }
   }
 
   QString PDS4PixelType(Isis::PixelType ipixelType, Isis::ByteOrder ibyteOrder) {
