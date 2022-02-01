@@ -7,7 +7,6 @@ find files of those names at the top level of this repository. **/
 #include "PvlToJSON.h"
 
 #include <nlohmann/json.hpp>
-#include <QFile>
 
 #include "Pvl.h"
 #include "PvlKeyword.h"
