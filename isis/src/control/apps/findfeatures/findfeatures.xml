@@ -1177,6 +1177,14 @@ Group = MatchSolution
       method to pass in clones of query and trainers. This avoids pointer issues
       which were mixing up data and causing failures. Fixes #3341.
     </change>
+    <change name="Kris Becker" date="2021-10-29">
+        Fix matrix inversion error on empty matrix. (Fixes #4639)
+        Identify images that fail FastGeom transform and exclude from matching.
+        Add TONOGEOM parameter to write failed file loads or FastGeom error
+        file list if the transform cannot be determined. Improve FastGeom
+        transform algorithm using new radial point mapping scheme. Add more
+        debugging output to help diagnose problem images/procedures.
+    </change>
   </history>
 
   <groups>
@@ -1301,6 +1309,38 @@ Group = MatchSolution
               <p>
                   NOTE this file is appended to so that continual runs will
               accumulate failures making it easier to handle failed runs.
+              </p>
+          </description>
+          <internalDefault>None</internalDefault>
+          <filter>*.lis</filter>
+        </parameter>
+
+        <parameter name="TONOGEOM">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>
+              Output list of FROM/FROMLIST cube files that failed FastGeom
+          </brief>
+          <description>
+              <p>
+                 This file will contain the list of (cube) files that could not
+                 find valid geometry mapping during the FastGeom process. Note
+                 that this process uses the current state of geometry for each
+                 image, which is likely to be a prior SPICE. This could be the
+                 cause of failures rather than no common ground coverage between
+                 the MATCH and FROM/FROMLIST images.
+
+              </p>
+              <p>
+                  NOTE this option supports the scenario where users cannot
+                  verify the FROM/FROMLIST images have any common coverage with
+                  the MATCH image. Large lists of images will have significantly
+                  compute overhead, so use sparingly.
+              </p>
+              <p>
+                 These images are excluded from the matching process since a valid
+                 fast geom transform cannot be computed and are written to a
+                 file name as specfied in this parameter.
               </p>
           </description>
           <internalDefault>None</internalDefault>
@@ -1952,6 +1992,23 @@ End
                         Selection of the MATCH option indicates use of the MATCH
                         file to compute the latitude and longitude of each
                         control point.
+                    </description>
+                </option>
+                <option value="BOTH">
+                    <brief>
+                       Use BOTH files to compute/verify geometries for control
+                    points
+                    </brief>
+                    <description>
+                        Selection of the BOTH option indicates that the MATCH
+                        and FROM/FROMLIST measures will be verified by computing
+                        a valid latitude/longitude at the matched line/sample for
+                        each measure. If the match point contains at least
+                        two valid measures, the ControlPoint is writen to the output
+                        control network file and any measures that are not valid are
+                        set to ignore. Any ControlPoint containing one or no measures
+                        is set to ignore and ultimately is not written to the output
+                        control network.
                     </description>
                 </option>
             </list>

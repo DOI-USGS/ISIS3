@@ -39,6 +39,9 @@ namespace Isis {
  *   @history 2014-07-01 Kris Becker - Original Version
  *   @history 2016-02-08 Kris Becker - Changed call to ISIS Histogram class for
  *                           recent changes
+ *   @history 2019-11-19 Kris Becker - Correctly return of target name from the
+ *                           Mapping group of projected images. Incorrect
+ *                           keyword Target used instead of TargetName
  */
 
 class ImageSource {

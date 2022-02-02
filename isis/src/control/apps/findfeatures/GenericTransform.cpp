@@ -6,10 +6,12 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
+#include <QtGlobal>
 #include <QString>
 #include <QSharedPointer>
 #include <opencv2/opencv.hpp>
 #include "GenericTransform.h"
+#include "IException.h"
 
 namespace Isis {
 /** Generic constructor is simply an identity transform */
@@ -62,7 +64,7 @@ cv::Mat GenericTransform::getMatrix() const {
 
 /** Return inverse transform matrix */
 cv::Mat GenericTransform::getInverse() const {
-  return ( m_inverse);
+  return ( m_inverse );
 }
 
 /** Return the resulting size of the transformed image */
@@ -120,6 +122,35 @@ cv::Point2f GenericTransform::inverse(const cv::Point2f &point) const {
   return ( dst[0] );
 }
 
+/**
+ * @brief Compute inverse with validation
+ *
+ * OpenCV may silenty return an empty matrix using the inv() method. There is a
+ * safer method that is applied here that will test if the matrix is invertable.
+ * If its not invertable and verify == true, then an exception is thrown.
+ *
+ * @author 2021-10-03 Kris J. Becker
+ *
+ * @param matrix Square matrix to invert
+ * @param verify If true will throw an exception if not invertable
+ *
+ * @return cv::Mat Inverted matrix
+ */
+cv::Mat GenericTransform::computeInverse(const cv::Mat &matrix,
+                                         const bool verify) {
+  cv::Mat inverse;
+  double result = cv::invert(matrix, inverse);
+  if ( verify == true ) {
+    if ( qFuzzyCompare(result+1.0, 0.0+1.0) ) {
+      QString msg = "cv::Mat inverse matrix is not invertable";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+  return ( inverse );
+}
+
+
 /** Set the forward matrix */
 void GenericTransform::setMatrix(const cv::Mat &matrix) {
   m_matrix = matrix;
@@ -132,14 +163,21 @@ void GenericTransform::setInverse(const cv::Mat &matrix) {
   return;
 }
 
-/** Calculate the inverse transform from the forward matrix */
-cv::Mat GenericTransform::calculateInverse(const cv::Mat &matrix) {
-  if (matrix.empty()) {  // inverting an empty matrix causes a segfault
-    QString msg = "Can't invert empty matrix.";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
-  }
-
-  return ( matrix.inv() );
+/**
+ * @brief Calculate the inverse transform from the forward matrix
+ *
+ * This method will compute the inverse of the matrix and return the result. If
+ * the matrix is not invertable an exception is thrown unless verify == false.
+ * If verify == false, it is up to the caller to test the returned matrix (which
+ * may be filled with 0's).
+ *
+ * @param matrix Matrix to invert
+ *
+ * @return cv:Mat Inverted matrix
+ */
+cv::Mat GenericTransform::calculateInverse(const cv::Mat &matrix,
+                                           const bool verify) {
+  return ( computeInverse(matrix, verify) );
 }
 
 /** Set the size of the transformed image */

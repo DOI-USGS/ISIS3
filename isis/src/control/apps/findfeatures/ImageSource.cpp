@@ -92,7 +92,7 @@ bool ImageSource::hasCamera() const {
 QString ImageSource::getTargetName() const {
   if ( hasProjection() ) {
     PvlGroup mapping = m_data->m_projection->Mapping();
-    return (mapping["Target"][0]);
+    return (mapping["TargetName"][0]);
   }
   else if ( hasCamera() ) {
     return ( m_data->m_camera->targetName() );
@@ -311,7 +311,7 @@ cv::Mat ImageSource::getGeometryMapping(ImageSource &match,
     train.clear();
 
   #if 0
-    std::cout << "SSamp, NSamps: " << ssamp << ", " << nsamps << "\n";
+    std::cout << "\nSSamp, NSamps: " << ssamp << ", " << nsamps << "\n";
     std::cout << "SLine, NLines: " << sline << ", " << nlines << "\n";
     std::cout << "SINC, LINC:    " << sSpacing << ", " << lSpacing << "\n";
     std::cout << "Increment:     " << increment << "\n";
