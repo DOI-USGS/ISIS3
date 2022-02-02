@@ -172,6 +172,8 @@ class IsisAml : protected IsisAmlData {
     QString GetFileName(const QString &paramName, QString extension = "") const;
     void GetFileName(const QString &paramName, std::vector<QString> &values) const;
 
+    QString GetCubeName(const QString &paramName, QString extension = "") const;
+
     QString GetString(const QString &paramName) const;
     void GetString(const QString &paramName, std::vector<QString> &values) const;
 

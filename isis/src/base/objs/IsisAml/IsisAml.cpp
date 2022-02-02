@@ -678,6 +678,65 @@ void IsisAml::GetFileName(const QString &paramName,
 }
 
 
+
+
+
+
+
+
+
+/**
+ * Retrieves of a value for a parameter of type "cubename".
+ *
+ * @param paramName The partial or full name of the parameter to be retrieved.
+ * @param extension A default extension to add if it does not already exist on
+ * the file name.  For example, "txt" will make /mydir/myfile into
+ * /mydir/myfile.txt
+ *
+ * @return The value of the parameter.
+ */
+QString IsisAml::GetCubeName(const QString &paramName, QString extension) const {
+
+  const IsisParameterData *param = ReturnParam(paramName);
+
+  if (param->type != "cube") {
+    QString message = "Parameter [" + paramName + "] is not a cubename.";
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
+  }
+
+  QString value;
+  if (param->values.size() == 0) {
+    if (param->defaultValues.size() == 0) {
+      QString message = "Parameter [" + paramName + "] has no value.";
+      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
+    }
+    else {
+      value = param->defaultValues[0];
+    }
+  }
+  else {
+    value = param->values[0];
+  }
+
+  Isis::FileName name(value);
+  if (extension != "") name = name.addExtension(extension);
+  value = name.expanded();
+  if (name.attributes().length() > 0) {
+    value += "+" + name.attributes();
+  }
+
+  return value;
+}
+
+
+
+
+
+
+
+
+
+
 // Public: Returns the first element of the value member of a parameter whos
 // name starts with paramName as a QString
 /**

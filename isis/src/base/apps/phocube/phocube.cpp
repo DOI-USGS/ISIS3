@@ -18,7 +18,8 @@
 using namespace std;
 
 namespace Isis {
-  // Function to create a keyword with same values of a specified count
+
+// Function to create a keyword with same values of a specified count
   template <typename T> PvlKeyword makeKey(const QString &name,
                                            const int &nvals,
                                            const T &value);
@@ -30,21 +31,20 @@ namespace Isis {
     double m_albedo;
   };
 
+
   // Computes the special MORPHOLOGYRANK and ALBEDORANK planes
   static MosData *getMosaicIndicies(Camera &camera, MosData &md);
   // Updates BandBin keyword
   static void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
                      const QString &default_value = "Null");
 
+
   void phocube(UserInterface &ui) {
     Cube icube;
-    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
-    if (inAtt.bands().size() != 0) {
-      icube.setVirtualBands(inAtt.bands());
-    }
-    icube.open(ui.GetFileName("FROM"));
+    icube.open(ui.GetCubeName("FROM"));
     phocube(&icube, ui);
   }
+
 
   void phocube(Cube *icube, UserInterface &ui)  {
 
