@@ -564,6 +564,11 @@ add_custom_target(export ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/export/* ${CMAKE_BINARY_DIR}/appdata/export)
 add_dependencies(isis export)
 
+# Add custom build target to copy modified Camera.plugin files to the build/lib/Camera.plugin file
+add_custom_target(lib ALL COMMAND ${CMAKE_SOURCE_DIR}/../scripts/updateBuildPlugins.sh)
+add_dependencies(isis lib)
+
+
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.
 # - Only a few things are added in order to make the tests work properly so
