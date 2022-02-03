@@ -266,8 +266,7 @@ TEST(Ciss2Isis, Ciss2isisCustomMax) {
   ASSERT_EQ((double)pixels["Multiplier"], 1.0);
 
   std::unique_ptr<Histogram> hist (outCube.histogram());
-  EXPECT_NEAR(hist->Average(), 68.998626373626379, .00001);
-  EXPECT_EQ(hist->Sum(), 50231);
+  EXPECT_EQ(hist->Maximum(), 69);
   EXPECT_EQ(hist->ValidPixels(), 728);
-  EXPECT_NEAR(hist->StandardDeviation(), 0.037062465833055058, .0001);
+  EXPECT_EQ(hist->HrsPixels(), (1024 * 10) - hist->ValidPixels());
 }
