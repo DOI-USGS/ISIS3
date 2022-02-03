@@ -55,12 +55,16 @@ class ImageTransform;
  *   @history 2016-04-06 Kris Becker Created .cpp file and completed documentation
  *   @history 2021-10-29 Kris Becker Added const qualifier to all compute() and
  *                                     apply() methods
+ *   @history 2022-02-02 Kris Becker Added Grid implementation resulting in
+ *                                     consolidation/abstraction of Radial
+ *                                     algorithm code
  */
 
 class FastGeom {
   public:
     typedef GenericTransform::RectArea   RectArea;
     typedef cv::Point2d                  FGPoint;
+    typedef cv::Rect2d                   FGFov;
 
     FastGeom();
     FastGeom(const PvlFlatMap &parameters);
@@ -73,7 +77,7 @@ class FastGeom {
                             QLogger logger = QLogger() ) const;
     void apply(MatchImage &query, MatchImage &train, QLogger logger = QLogger() ) const;
 
-    static cv::Mat getTransformMatrix(const std::vector<FGPoint> &querypts, 
+    static cv::Mat getTransformMatrix(const std::vector<FGPoint> &querypts,
                                       const std::vector<FGPoint> &trainpts,
                                       std::vector<uchar>         &inliers,
                                       const double tolerance,
@@ -90,6 +94,21 @@ class FastGeom {
     PvlFlatMap m_parameters; //!< Parameters of transform
 
     void validate( const QString &geomtype ) const;
+
+    /** Determine if point is in defined FOV for x,y */
+    inline bool in_fov(const FGPoint &point,
+                       const double xmin, const double xmax,
+                       const double ymin, const double ymax)
+                       const {
+
+      // Test if in FOV consistent with ISIS image coordinates
+      if ( (point.x >= xmin ) && (point.x < xmax ) ) {
+        if ( ( point.y >= ymin ) && (point.y < ymax ) ) {
+          return (true);
+        }
+      }
+      return (false);
+    }
 };
 
 }  // namespace Isis

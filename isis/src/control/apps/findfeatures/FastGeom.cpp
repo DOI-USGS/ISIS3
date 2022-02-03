@@ -103,22 +103,59 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train,
                      _FILEINFO_);
   }
 
+  // Setup common processing parameters
+  double q_samps = query.source().samples();
+  double q_lines = query.source().lines();
+
+  double t_samps = train.source().samples();
+  double t_lines = train.source().lines();
+
+  // Now get FOV tolerances
+  double fg_q_sample_tolerance = toDouble(m_parameters.get("FastGeomQuerySampleTolerance", "0.0"));
+  double fg_q_line_tolerance = toDouble(m_parameters.get("FastGeomQueryLineTolerance", "0.0"));
+  double fg_sample_tolerance = toDouble(m_parameters.get("FastGeomSampleTolerance", "0.0"));
+  double fg_line_tolerance = toDouble(m_parameters.get("FastGeomLineTolerance", "0.0"));
+
+  // Train line/sample map restrictions
+  double q_min_samp = 0.5 - fg_q_sample_tolerance;
+  double q_max_samp = q_samps + 0.4999 + fg_q_sample_tolerance;
+  double q_min_line = 0.5 - fg_q_line_tolerance;
+  double q_max_line = q_lines + 0.4999 + fg_q_line_tolerance;
+  FGFov  q_fov(q_min_samp, q_min_line, (q_max_samp-q_min_samp+1.0), (q_max_line-q_min_line+1.0) );
+
+  double t_min_samp = 0.5 - fg_sample_tolerance;
+  double t_max_samp = t_samps + 0.4999 + fg_sample_tolerance;
+  double t_min_line = 0.5 - fg_line_tolerance;
+  double t_max_line = t_lines + 0.4999 + fg_line_tolerance;
+  FGFov  t_fov(t_min_samp, t_min_line, (t_max_samp-t_min_samp+1.0), (t_max_line-t_min_line+1.0) );
+
+  // Set up line/sample mapping correspondance between images
+  std::vector<FGPoint>      q_points, t_points;
+  std::vector<bool>         t_inFOV;
+  std::vector<SurfacePoint> q_surface_points;
+
+  // Only the good points to matrix solver
+  std::vector<FGPoint>      q_infov_points, t_infov_points;
+
+  // Let's track some numbers
+  int n_total_points(0);
+  int n_image_points(0);
+  int n_mapped_points(0);
+  int n_train_fov(0);
 
   // Select the newer radial or earlier grid method. You gotta choose the
   // Grid option correctly or you will get the radial algorithm
-  QString fg_algorithm = m_parameters.get("FastGeomAlgorithm", "Radial");
-  bool radial_method = ( "grid" != fg_algorithm.toLower() );
-  logit <<   "  FastGeomAlgorithm: " << fg_algorithm << "\n";
+  QString fg_algorithm = m_parameters.get("FastGeomAlgorithm", "Radial").toLower();
+  bool radial_method = ( "grid" != fg_algorithm );
+  logit <<   "  FastGeomAlgorithm:       " << fg_algorithm << "\n";
+  logit <<   "  FastGeomPoints:          " << m_fastpts << "\n";
+  logit <<   "  FastGeomTolerance:       " << m_tolerance << "\n";
+  logit <<   "  FastGeomSampleTolerance: " << fg_sample_tolerance << "\n";
+  logit <<   "  FastGeomLineTolerance:   " << fg_line_tolerance << "\n\n";
 
+  // Run the requested algorithm
   if ( true == radial_method) {
     logit << "--> Using Radial Algorithm train-to-query mapping <--\n";
-
-    // Setup processing parameters
-    double q_samps = query.source().samples();
-    double q_lines = query.source().lines();
-
-    double t_samps = train.source().samples();
-    double t_lines = train.source().lines();
 
     // Compute maximum radial track at the center of the image to
     // the corner and scaling parameters
@@ -142,13 +179,6 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train,
       fg_point_inc = toDouble(m_parameters.get("FastGeomPointIncrement"));
     }
 
-    // Now get FOV tolerances
-    // Now get FOV tolerances
-    double fg_q_sample_tolerance = toDouble(m_parameters.get("FastGeomQuerySampleTolerance", "0.0"));
-    double fg_q_line_tolerance = toDouble(m_parameters.get("FastGeomQueryLineTolerance", "0.0"));
-    double fg_sample_tolerance = toDouble(m_parameters.get("FastGeomSampleTolerance", "0.0"));
-    double fg_line_tolerance = toDouble(m_parameters.get("FastGeomLineTolerance", "0.0"));
-
     // Lets report what we got
     logit <<   "  FGMaximumRadius:         " << fg_max_radius << "\n";
     logit <<   "  FGRadiusFactor:          " << fg_radius_factor << "\n";
@@ -156,10 +186,7 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train,
     logit <<   "  FGRadiusIncrement:       " << fg_radius_inc << "\n";
     logit <<   "  FGPointIncrement:        " << fg_point_inc << "\n";
     logit <<   "  TotalRadialTracks:       " << fg_max_radius / fg_radius_inc << "\n";
-    logit <<   "  FastGeomPoints:          " << m_fastpts << "\n";
-    logit <<   "  FastGeomTolerance:       " << m_tolerance << "\n";
-    logit <<   "  FastGeomSampleTolerance: " << fg_sample_tolerance << "\n";
-    logit <<   "  FastGeomLineTolerance:   " << fg_line_tolerance << "\n";
+
     logit.flush();
 
     // Rounding constant
@@ -172,31 +199,6 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train,
     // Center of query image
     double c_x = q_samps / 2.0;
     double c_y = q_lines / 2.0;
-
-    // Train line/sample map restrictions
-    double q_min_samp = 0.5 - fg_q_sample_tolerance;
-    double q_max_samp = q_samps + 0.4999 + fg_q_sample_tolerance;
-    double q_min_line = 0.5 - fg_q_line_tolerance;
-    double q_max_line = q_lines + 0.4999 + fg_q_line_tolerance;
-
-    double t_min_samp = 0.5 - fg_sample_tolerance;
-    double t_max_samp = t_samps + 0.4999 + fg_sample_tolerance;
-    double t_min_line = 0.5 - fg_line_tolerance;
-    double t_max_line = t_lines + 0.4999 + fg_line_tolerance;
-
-    // Set up line/sample mapping correspondance between images
-    std::vector<FGPoint>      q_points, t_points;
-    std::vector<bool>         t_inFOV;
-    std::vector<SurfacePoint> q_surface_points;
-
-    // Only the good points to matrix solver
-    std::vector<FGPoint>      q_infov_points, t_infov_points;
-
-    // Let's track some numbers
-    int n_total_points(0);
-    int n_image_points(0);
-    int n_mapped_points(0);
-    int n_train_fov(0);
 
     // The Circle Loop - compute points along a circle at radial
     // distance (pixels) from center
@@ -228,37 +230,32 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train,
         double q_y = ( ((v_x0 * v_sin) + (v_y0 *  v_cos)) * fg_radius ) + c_y;
 
         // Check to see if the point is in the image FOV
-        if ( (q_x >= q_min_samp) && (q_x < q_max_samp) ) {
-          if ( (q_y >= q_min_line) && (q_y < q_max_line) ) {
+        FGPoint q_coord(q_x, q_y);
+        if ( in_fov(q_coord, q_min_samp, q_max_samp, q_min_line, q_max_line) ) {
+          n_image_points++;
 
-            n_image_points++;
+          // Convert the point and if valid add to list
+          double t_x, t_y, t_r;
+          SurfacePoint q_surfpt = query.source().getLatLon(q_y, q_x);
+          if ( train.source().getLineSamp(q_surfpt, t_y, t_x, t_r) ) {
+            n_mapped_points++;
 
-            // Convert the point and if valid add to list
-            double t_x, t_y, t_r;
-            SurfacePoint q_surfpt = query.source().getLatLon(q_y, q_x);
-            if ( train.source().getLineSamp(q_surfpt, t_y, t_x, t_r) ) {
-              n_mapped_points++;
+            // Query q_coord set above
+            FGPoint t_coord(t_x, t_y);
+            q_points.push_back(q_coord);
+            q_surface_points.push_back(q_surfpt);
+            t_points.push_back(t_coord);
 
-              FGPoint q_coord(q_x, q_y);
-              FGPoint t_coord(t_x, t_y);
-              q_points.push_back(q_coord);
-              q_surface_points.push_back(q_surfpt);
-              t_points.push_back(t_coord);
+            // Test for those falling in train FOV
+            bool inFOV = in_fov(t_coord, t_min_samp, t_max_samp, t_min_line, t_max_line);
+            if ( inFOV ) {
+              n_train_fov++;
 
-              // Test for those falling in train FOV
-              bool inFOV = false;
-              if ( (t_x >= t_min_samp) && (t_x < t_max_samp) ) {
-                if ( (t_y >= t_min_line) && (t_y < t_max_line) ) {
-                  inFOV = true;
-                  n_train_fov++;
-
-                   // Save the good points
-                  q_infov_points.push_back(q_coord);
-                  t_infov_points.push_back(t_coord);
-                }
-              }
-              t_inFOV.push_back(inFOV);
+              // Save the good points
+              q_infov_points.push_back(q_coord);
+              t_infov_points.push_back(t_coord);
             }
+            t_inFOV.push_back(inFOV);
           }
         }
 
@@ -270,80 +267,182 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train,
       fg_radius         += fg_radius_inc;
       points_per_radius += fg_point_inc;
     }
-
-    // Log results
-    logit <<   "  TotalPoints:       " << n_total_points << "\n";
-    logit <<   "  ImagePoints:       " << n_image_points << "\n";
-    logit <<   "  MappedPoints:      " << n_mapped_points << "\n";
-    logit <<   "  InTrainMapFOV:     " << n_train_fov << "\n";
-
-    logit.flush();
-
-    // Lets dump the data if requested
-    if ( toBool(m_parameters.get("FastGeomDumpMapping","False")) ) {
-      FileName q_file( query.name() );
-      FileName t_file( train.name() );
-
-      QString csvout = q_file.baseName() + "_" + t_file.baseName() + ".fastgeom.csv";
-      QDebugStream csvstrm = QDebugLogger::create( csvout,
-                                                   (QIODevice::WriteOnly |
-                                                    QIODevice::Truncate) );
-      QDebugStreamType &csv(csvstrm->dbugout());
-
-
-      // Write the header
-      csv << "QuerySample,QueryLine,TrainSample,TrainLine,"
-          << "Latitude,Longitude,Radius,X,Y,Z,InTrainFOV\n";
-
-      // Write the data
-
-      for ( unsigned int i = 0 ; i < q_points.size() ; i++) {
-        const SurfacePoint &srfpt( q_surface_points[i] );
-
-        csv << q_points[i].x << ", " << q_points[i].y << ", "
-            << t_points[i].x << ", " << t_points[i].y << ", "
-            << srfpt.GetLatitude().degrees() << ", "
-            << srfpt.GetLongitude().degrees() << ", "
-            << srfpt.GetLocalRadius().meters() << ", "
-            << srfpt.GetX().meters() << ", "
-            << srfpt.GetY().meters() << ", "
-            << srfpt.GetZ().meters() << ", "
-            << (t_inFOV[i] ? "True" : "False") << "\n";
-      }
-    }
-
-    // Compute homography if enough point ater in common FOVs of both images,
-    // otherwise we report failure
-    if ( n_train_fov < m_fastpts ) {
-      QString mess = "Failed to get FOV geometry mapping for " + train.name() +
-                     " to " + query.name() + " needing " + QString::number(m_fastpts) +
-                     " but got " + QString::number(n_train_fov) +" in train FOV.";
-      logit << ">>> ERROR - " << mess << "\n";
-      throw IException(IException::Programmer, mess, _FILEINFO_);
-    }
-
-
-    // Compute homography tranformation. Note the order of the point arrays.
-    // This method computes the train to query transform. The inverse will
-    // provide sample,line translations from query-to-train sample,line
-    // coordinates
-    std::vector<uchar> t_inliers;
-    mapper = getTransformMatrix(t_infov_points, q_infov_points, t_inliers, m_tolerance, logger);
-
   }
   else { // true == grid_method
 
-    logit << "--> Using Grid Algorithm train-to-query mapping <--\n";
-    logit <<   "  FastGeomPoints:    " << m_fastpts << "\n";
-    logit <<   "  FastGeomTolerance: " << m_tolerance << "\n";
+#if USE_OLD_ALGORITHM
     mapper = train.source().getGeometryMapping(query.source(),
                                                m_fastpts,
                                                m_tolerance);
+#endif
 
+    logit << "--> Using Grid Algorithm train-to-query mapping <--\n";
+
+     // Compute increment
+    int   fg_minpts = qMax(m_fastpts, 16);
+    int increment = (int) (std::sqrt(std::max(24.0, (double) (fg_minpts - 1))) + 1.0);
+
+    double fg_max_axis = qMax( qMax(q_max_samp, q_max_line), qMax(t_max_samp, t_max_line) );
+    int v_max_iter     = int( fg_max_axis / 2.0 );
+
+    int fg_grid_start_iter = toInt(  m_parameters.get("FastGeomGridStartIteration", "0") );
+    int fg_grid_stop_iter  = toInt(  m_parameters.get("FastGeomGridStopIteration", toString(v_max_iter)) );
+    int fg_grid_iter_step  = toInt(  m_parameters.get("FastGeomGridIterationStep", "1") );
+    bool fg_save_all       = toBool( m_parameters.get("FastGeomGridSaveAllPoints", "false") );
+
+    logit <<   "\n  FastGeomGridStartIteration: " << fg_grid_start_iter << "\n";
+    logit <<   "  FastGeomGridStopIteration:  " << fg_grid_stop_iter << "\n";
+    logit <<   "  FastGeomGridIterationStep:  " << fg_grid_iter_step << "\n";
+    logit <<   "  FastGeomGridSaveAllPoints:  " << toString(fg_save_all) << "\n";
+    logit <<   "  FGPointIncrement:           " << increment << "\n";
+
+
+    bool done = false;
+    int iteration = fg_grid_start_iter;
+    int currinc(0);
+    double v_q_nsamps = q_max_samp - q_min_samp + 1.0;
+    double v_q_nlines = q_max_line - q_min_line + 1.0;
+
+    int n_iterations(0);
+    while ( (iteration < fg_grid_stop_iter) && ( !done) ) {
+
+      currinc = increment + ( iteration * 2 );
+      n_iterations++;
+
+      double sSpacing = qMax( 1.0, v_q_nsamps/(currinc*1.0) );
+      double lSpacing = qMax( 1.0, v_q_nlines/(currinc*1.0) );
+
+      if ( qMax( sSpacing, lSpacing ) <= 1.0 ) done = true; // Last possible loop
+
+      // To get all points computed...
+      if ( !fg_save_all ) {
+        q_points.clear();
+        t_points.clear();
+        t_inFOV.clear();
+        q_surface_points.clear();
+      }
+
+      // Clear these for the matrix transform
+      q_infov_points.clear();
+      t_infov_points.clear();
+      n_train_fov = 0;
+
+      // Run the loop
+      for (int l = 0 ; l < currinc ; l++) {
+        for ( int s = 0 ; s < currinc ; s++ ) {
+
+          // Total point count
+          n_total_points++;
+
+          double q_y = (lSpacing / 2.0 + lSpacing * l + 0.5) + q_min_line;
+          double q_x = (sSpacing / 2.0 + sSpacing * s + 0.5) + q_min_samp;
+
+          // Check to see if the point is in the image FOV
+          FGPoint q_coord(q_x, q_y);
+          if ( in_fov(q_coord, q_min_samp, q_max_samp, q_min_line, q_max_line) ) {
+            n_image_points++;
+
+            // Convert the point and if valid add to list
+            double t_x, t_y, t_r;
+            SurfacePoint q_surfpt = query.source().getLatLon(q_y, q_x);
+            if ( train.source().getLineSamp(q_surfpt, t_y, t_x, t_r) ) {
+              n_mapped_points++;
+
+              // Query q_coord set above
+              FGPoint t_coord(t_x, t_y);
+              q_points.push_back(q_coord);
+              q_surface_points.push_back(q_surfpt);
+              t_points.push_back(t_coord);
+
+              // Test for those falling in train FOV
+              bool inFOV = in_fov(t_coord, t_min_samp, t_max_samp, t_min_line, t_max_line);
+              if ( inFOV ) {
+                n_train_fov++;
+
+                // Save the good points
+                q_infov_points.push_back(q_coord);
+                t_infov_points.push_back(t_coord);
+              }
+              t_inFOV.push_back(inFOV);
+            }
+          }
+        }
+      }
+
+      // If on this iteration we have enough points we are done
+      if ( n_train_fov >= m_fastpts ) done = true;
+
+      // Next iteration + step
+      iteration += fg_grid_iter_step;
+    }
+
+    logit <<   "  FGTotalGridIterations:      " << n_iterations << "\n";
   }
 
+  //// Latitude/Longitude mapping complete! Check status
+
+  // Log results
+  logit <<   "\n\n==> Mapping complete <==\n";
+  logit <<   "  TotalPoints:       " << n_total_points << "\n";
+  logit <<   "  ImagePoints:       " << n_image_points << "\n";
+  logit <<   "  MappedPoints:      " << n_mapped_points << "\n";
+  logit <<   "  InTrainMapFOV:     " << n_train_fov << "\n";
+  logit.flush();
+
+  // Lets dump the data if requested
+  if ( toBool(m_parameters.get("FastGeomDumpMapping","False")) ) {
+    FileName q_file( query.name() );
+    FileName t_file( train.name() );
+
+    QString csvout = q_file.baseName() + "_" + t_file.baseName() + "." +
+                     fg_algorithm + ".fastgeom.csv";
+    logit <<   "  PointDumpFile:     " << csvout << "\n";
+    QDebugStream csvstrm = QDebugLogger::create( csvout,
+                                                (QIODevice::WriteOnly |
+                                                 QIODevice::Truncate) );
+    QDebugStreamType &csv(csvstrm->dbugout());
+
+
+    // Write the header
+    csv << "QuerySample,QueryLine,TrainSample,TrainLine,"
+        << "Latitude,Longitude,Radius,X,Y,Z,InTrainFOV\n";
+
+    // Write the data
+
+    for ( unsigned int i = 0 ; i < q_points.size() ; i++) {
+      const SurfacePoint &srfpt( q_surface_points[i] );
+
+      csv << q_points[i].x << ", " << q_points[i].y << ", "
+          << t_points[i].x << ", " << t_points[i].y << ", "
+          << srfpt.GetLatitude().degrees() << ", "
+          << srfpt.GetLongitude().degrees() << ", "
+          << srfpt.GetLocalRadius().meters() << ", "
+          << srfpt.GetX().meters() << ", "
+          << srfpt.GetY().meters() << ", "
+          << srfpt.GetZ().meters() << ", "
+          << (t_inFOV[i] ? "True" : "False") << "\n";
+    }
+  }
+
+  // Compute homography if enough point ater in common FOVs of both images,
+  // otherwise we report failure
+  if ( n_train_fov < m_fastpts ) {
+    QString mess = "Failed to get FOV geometry mapping for " + train.name() +
+                    " to " + query.name() + " needing " + QString::number(m_fastpts) +
+                    " but got " + QString::number(n_train_fov) +" in train FOV.";
+    logit << ">>> ERROR - " << mess << "\n";
+    throw IException(IException::Programmer, mess, _FILEINFO_);
+  }
+
+  // Compute homography tranformation. Note the order of the point arrays.
+  // This method computes the train to query transform. The inverse will
+  // provide sample,line translations from query-to-train sample,line
+  // coordinates
+  std::vector<uchar> t_inliers;
+  mapper = getTransformMatrix(t_infov_points, q_infov_points, t_inliers, m_tolerance, logger);
+
   // Report the transformation matrix
-  logit <<   "  MatrixTransform:   \n";
+  logit <<   "\n  MatrixTransform:   \n";
   for (int i = 0 ; i < mapper.rows ; i++) {
     logit << "    ";
     QString comma("");
@@ -353,12 +452,13 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train,
     }
     logit << "\n";
   }
+  logit << "\n";
 
   // The above matrix is for simply computing the direct fastgeom of the
   // training image into the image space of the query image, just like
   // cam2cam does.
   //
-  // Now consider cropping to only the mininmum common coverage or
+  // Now consider cropping to only the minimum common coverage or
   // preserving all the train image in the transformation (this option can
   // be really big and is not recommended for some situations!).
 
@@ -424,7 +524,7 @@ cv::Mat FastGeom::getTransformMatrix(const std::vector<FGPoint> &querypts,
 
   QDebugStreamType &logit = logger.logger();
 
-  logit << "--> Running Homography Image Transform <---\n";
+  logit << "\n--> Running Homography Image Transform <---\n";
 
   logit << "  IntialPoints:       " << querypts.size() << "\n";
   logit << "  Tolerance:          " << tolerance << "\n";
