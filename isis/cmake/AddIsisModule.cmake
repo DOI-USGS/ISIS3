@@ -178,9 +178,6 @@ function(add_isis_obj folder reqLibs)
     # Append the plugin file to a single file in the build directory
     # where the .so files will be created.  During installation copy these
     # plugin files to the installation library folder.
-    set(pluginPath ${CMAKE_BINARY_DIR}/lib/${pluginName})
-    cat(${plugins} ${pluginPath})
-    install(PROGRAMS ${pluginPath} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
     # Record this library name for the caller
     set(newPluginLib ${libName}  PARENT_SCOPE)
   endif()
