@@ -339,8 +339,6 @@ void IsisAml::PutInteger(const QString &paramName,
 }
 
 
-
-
 // Public: Sets the value member of a parameter of type double whose name
 // starts with paramName
 /**
@@ -423,7 +421,6 @@ void IsisAml::PutDouble(const QString &paramName,
 
   Verify(param);
 }
-
 
 
 // Public: Sets the value member of a parameter of type boolean whose name
@@ -554,6 +551,7 @@ QString IsisAml::GetAsString(const QString &paramName) const {
   return value;
 }
 
+
 // Public: Returns the value member of a parameter whose name starts with paramName
 // as a vector<QString>
 /**
@@ -678,13 +676,6 @@ void IsisAml::GetFileName(const QString &paramName,
 }
 
 
-
-
-
-
-
-
-
 /**
  * Retrieves of a value for a parameter of type "cubename".
  *
@@ -727,14 +718,6 @@ QString IsisAml::GetCubeName(const QString &paramName, QString extension) const 
 
   return value;
 }
-
-
-
-
-
-
-
-
 
 
 // Public: Returns the first element of the value member of a parameter whos
@@ -851,7 +834,6 @@ void IsisAml::GetString(const QString &paramName,
 }
 
 
-
 // Public: Returns the first element of the value member of a parameter whos
 // name starts with paramName as an integer
 /**
@@ -935,7 +917,6 @@ void IsisAml::GetInteger(const QString &paramName,
 }
 
 
-
 // Public: Returns the first element of the value member of a parameter whos
 // name starts with paramName as a doubble
 /**
@@ -972,6 +953,7 @@ double IsisAml::GetDouble(const QString &paramName) const {
 
   return value.ToDouble();
 }
+
 
 // Public: Returns the value member of a parameter whose name starts with paramName
 // as a vector<doubble>
@@ -1138,6 +1120,7 @@ QString IsisAml::Description() const {
   return description;
 }
 
+
 /**
  * Returns the number of groups found in the XML.
  *
@@ -1146,6 +1129,7 @@ QString IsisAml::Description() const {
 int IsisAml::NumGroups() const {
   return groups.size();
 }
+
 
 /**
  * Returns the group name of group[index].
@@ -1158,6 +1142,7 @@ QString IsisAml::GroupName(const int &index) const {
   QString s = groups[index].name;
   return s;
 }
+
 
 /**
  * Given group name return its index in the Gui
@@ -1176,6 +1161,7 @@ int IsisAml::GroupIndex(const QString & grpName) const {
   }
   return -1;
 }
+
 
 /**
  * Create a PVL file from the parameters in a Group given the Gui group name,
@@ -1237,6 +1223,7 @@ void IsisAml::CreatePVL(Isis::Pvl &pvlDef , QString guiGrpName, QString pvlObjNa
   }
 }
 
+
 /**
  * Verify if the Parameter is in the Included list
  *
@@ -1256,6 +1243,8 @@ bool IsisAml::IsParamInPvlInclude(QString & paramName, vector<QString> & include
   }
   return false;
 }
+
+
 /**
  * Returns the number of parameters in a group.
  *
@@ -1266,6 +1255,7 @@ bool IsisAml::IsParamInPvlInclude(QString & paramName, vector<QString> & include
 int IsisAml::NumParams(const int &group) const {
   return groups[group].parameters.size();
 }
+
 
 /**
  * Returns the parameter name.
@@ -1280,6 +1270,7 @@ QString IsisAml::ParamName(const int &group, const int &param) const {
   return s;
 }
 
+
 /**
  * Returns the brief description of a parameter in a specified group.
  *
@@ -1292,6 +1283,7 @@ QString IsisAml::ParamBrief(const int &group, const int &param) const {
   QString s = groups[group].parameters[param].brief;
   return s;
 }
+
 
 /**
  * Returns the long description of a parameter in a specified group.
@@ -1306,6 +1298,7 @@ QString IsisAml::ParamDescription(const int &group, const int &param) const {
   return s;
 }
 
+
 /**
  * Returns the minimum value of a parameter in a specified group.
  *
@@ -1318,6 +1311,7 @@ QString IsisAml::ParamMinimum(const int &group, const int &param) const {
   QString s = groups[group].parameters[param].minimum;
   return s;
 }
+
 
 /**
  * Returns the maximum value of a parameter in a specified group.
@@ -1332,6 +1326,7 @@ QString IsisAml::ParamMaximum(const int &group, const int &param) const {
   return s;
 }
 
+
 /**
  * Returns whether the minimum value is inclusive or not.
  *
@@ -1345,6 +1340,7 @@ QString IsisAml::ParamMinimumInclusive(const int &group, const int &param) const
   return s;
 }
 
+
 /**
  * Returns whether the maximum value is inclusive or not.
  *
@@ -1357,6 +1353,7 @@ QString IsisAml::ParamMaximumInclusive(const int &group, const int &param) const
   QString s = groups[group].parameters[param].maximum_inclusive;
   return s;
 }
+
 
 /**
  * Returns whether the selected parameter has a restriction on odd values or
@@ -1372,6 +1369,7 @@ QString IsisAml::ParamOdd(const int &group, const int &param) const {
   return s;
 }
 
+
 /**
  * Returns the number of values in the parameters greater than list.
  *
@@ -1383,6 +1381,7 @@ QString IsisAml::ParamOdd(const int &group, const int &param) const {
 int IsisAml::ParamGreaterThanSize(const int &group, const int &param) const {
   return groups[group].parameters[param].greaterThan.size();
 }
+
 
 /**
  * Returns the number of values in the parameters greater than or equal list.
@@ -1397,6 +1396,7 @@ int IsisAml::ParamGreaterThanOrEqualSize(const int &group,
   return groups[group].parameters[param].greaterThanOrEqual.size();
 }
 
+
 /**
  * Returns the number of values in the parameters less than list.
  *
@@ -1408,6 +1408,7 @@ int IsisAml::ParamGreaterThanOrEqualSize(const int &group,
 int IsisAml::ParamLessThanSize(const int &group, const int &param) const {
   return groups[group].parameters[param].lessThan.size();
 }
+
 
 /**
  * Returns the number of values in the parameters less than or equal list.
@@ -1422,6 +1423,7 @@ int IsisAml::ParamLessThanOrEqualSize(const int &group,
   return groups[group].parameters[param].lessThanOrEqual.size();
 }
 
+
 /**
  * Returns the number of values in the not equal list.
  *
@@ -1433,6 +1435,7 @@ int IsisAml::ParamLessThanOrEqualSize(const int &group,
 int IsisAml::ParamNotEqualSize(const int &group, const int &param) const {
   return groups[group].parameters[param].notEqual.size();
 }
+
 
 /**
  * Returns the name of the specified greaterThan parameter
@@ -1449,6 +1452,7 @@ QString IsisAml::ParamGreaterThan(const int &group, const int &param,
   return s;
 }
 
+
 /**
  * Returns the name of the specified greaterThanOrEqual parameter
  *
@@ -1463,6 +1467,7 @@ QString IsisAml::ParamGreaterThanOrEqual(const int &group, const int &param,
   QString s = groups[group].parameters[param].greaterThanOrEqual[great];
   return s;
 }
+
 
 /**
  * Returns the name of the specified lessThan parameter
@@ -1479,6 +1484,7 @@ QString IsisAml::ParamLessThan(const int &group, const int &param,
   return s;
 }
 
+
 /**
  * Returns the name of the specified lessThanOrEqual parameter
  *
@@ -1493,6 +1499,7 @@ QString IsisAml::ParamLessThanOrEqual(const int &group, const int &param,
   QString s = groups[group].parameters[param].lessThanOrEqual[les];
   return s;
 }
+
 
 /**
  * Returns the name of the specified notEqual parameter
@@ -1509,6 +1516,7 @@ QString IsisAml::ParamNotEqual(const int &group, const int &param,
   return s;
 }
 
+
 /**
  * Returns the name of the specified excluded parameter
  *
@@ -1523,6 +1531,7 @@ QString IsisAml::ParamExclude(const int &group, const int &param,
   QString s = groups[group].parameters[param].exclude[exclude];
   return s;
 }
+
 
 /**
  * Returns the name of the specified included parameter
@@ -1553,6 +1562,7 @@ QString IsisAml::ParamType(const int &group, const int &param) const {
   return s;
 }
 
+
 /**
  * Returns the default for a parameter in a specified group.
  *
@@ -1571,6 +1581,7 @@ QString IsisAml::ParamDefault(const int &group, const int &param) const {
   }
   return s;
 }
+
 
 /**
  * Returns the internal default for a parameter in a specified group
@@ -1591,6 +1602,7 @@ QString IsisAml::ParamInternalDefault(const int &group, const int &param) const 
   return s;
 }
 
+
 /**
  * Returns the parameter filter for a parameter in a specified group.
  *
@@ -1609,6 +1621,7 @@ QString IsisAml::ParamFilter(const int &group, const int &param) const {
   }
   return s;
 }
+
 
 /**
  * Returns the default path for a filename/cube parameter
@@ -1629,6 +1642,7 @@ QString IsisAml::ParamPath(const int &group, const int &param) const {
   return s;
 }
 
+
 /**
  * Returns the file mode for a parameter in a specified group.
  *
@@ -1647,6 +1661,7 @@ QString IsisAml::ParamFileMode(const int &group, const int &param) const {
   }
   return s;
 }
+
 
 /**
  * Returns the number of options in the specified parameter's list.
@@ -1677,6 +1692,7 @@ QString IsisAml::ParamListValue(const int &group, const int &param,
   return s;
 }
 
+
 /**
  * Returns the brief description for a specific option to a parameter.
  *
@@ -1691,6 +1707,7 @@ QString IsisAml::ParamListBrief(const int &group, const int &param,
   QString s = groups[group].parameters[param].listOptions[option].brief;
   return s;
 }
+
 
 /**
  * Returns the full description for a specific option to a parameter.
@@ -1707,6 +1724,7 @@ QString IsisAml::ParamListDescription(const int &group, const int &param,
   return s;
 }
 
+
 /**
  * Returns the number of items in a parameters list exclude section.
  *
@@ -1720,6 +1738,7 @@ int IsisAml::ParamListExcludeSize(const int &group, const int &param,
                                   const int &option) const {
   return groups[group].parameters[param].listOptions[option].exclude.size();
 }
+
 
 /**
  * Returns the parameter name to be excluded if this option is selected.
@@ -1737,6 +1756,7 @@ QString IsisAml::ParamListExclude(const int &group, const int &param,
   return s;
 }
 
+
 /**
  * Returns the number of items in a parameters list include section.
  *
@@ -1750,6 +1770,7 @@ int IsisAml::ParamListIncludeSize(const int &group, const int &param,
                                   const int &option) const {
   return groups[group].parameters[param].listOptions[option].include.size();
 }
+
 
 /**
  * Returns the parameter name to be included if this option is selected.
@@ -1767,6 +1788,7 @@ QString IsisAml::ParamListInclude(const int &group, const int &param,
   return s;
 }
 
+
 /**
  * Returns the number of parameters excluded in this parameter's exclusions
  *
@@ -1778,6 +1800,7 @@ QString IsisAml::ParamListInclude(const int &group, const int &param,
 int IsisAml::ParamExcludeSize(const int &group, const int &param) const {
   return groups[group].parameters[param].exclude.size();
 }
+
 
 /**
  * Returns the number of parameters included in this parameter's inclusions
@@ -1791,6 +1814,7 @@ int IsisAml::ParamIncludeSize(const int &group, const int &param) const {
   return groups[group].parameters[param].include.size();
 }
 
+
 /**
  * Returns the default pixel type from the XML
  *
@@ -1803,6 +1827,7 @@ QString IsisAml::PixelType(const int &group, const int &param) const {
   return groups[group].parameters[param].pixelType;
 }
 
+
 /**
  * Returns the number of helpers the parameter has
  *
@@ -1814,6 +1839,7 @@ QString IsisAml::PixelType(const int &group, const int &param) const {
 int IsisAml::HelpersSize(const int &group, const int &param) const {
   return groups[group].parameters[param].helpers.size();
 }
+
 
 /**
  * Returns the name of the helper button
@@ -1829,6 +1855,7 @@ QString IsisAml::HelperButtonName(const int &group, const int &param,
   return groups[group].parameters[param].helpers[helper].name;
 }
 
+
 /**
  * Returns the name of the helper function
  *
@@ -1842,6 +1869,7 @@ QString IsisAml::HelperFunction(const int &group, const int &param,
                                const int &helper) const {
   return groups[group].parameters[param].helpers[helper].function;
 }
+
 
 /**
  * Returns the brief description of the helper button
@@ -1857,6 +1885,7 @@ QString IsisAml::HelperBrief(const int &group, const int &param,
   return groups[group].parameters[param].helpers[helper].brief;
 }
 
+
 /**
  * Returns the long description of the helper button
  *
@@ -1871,6 +1900,7 @@ QString IsisAml::HelperDescription(const int &group, const int &param,
   return groups[group].parameters[param].helpers[helper].description;
 }
 
+
 /**
  * Returns the name of the icon for the helper button
  *
@@ -1884,6 +1914,7 @@ QString IsisAml::HelperIcon(const int &group, const int &param,
                            const int &helper) const {
   return groups[group].parameters[param].helpers[helper].icon;
 }
+
 
 /**
  * Returns a true if the parameter has a value, and false if it does not
@@ -1902,6 +1933,7 @@ bool IsisAml::WasEntered(const QString &paramName) const {
 
   return true;
 }
+
 
 /**
  * Clears the value(s) in the named parameter
@@ -1965,6 +1997,7 @@ Isis::CubeAttributeInput &IsisAml::GetInputAttribute(const QString &paramName) {
   return param->inCubeAtt;
 }
 
+
 /**
  * Gets the attributes for an output cube
  *
@@ -2010,6 +2043,7 @@ Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const QString &paramName)
   }
   return param->outCubeAtt;
 }
+
 
 /**
  * Returns a pointer to a parameter whose name starts with paramName
@@ -2062,6 +2096,7 @@ const IsisParameterData *IsisAml::ReturnParam(const QString &paramName) const {
   }
   return param;
 }
+
 
 /**
  * Throws an Isis::iExceptionXxxxxxxx if the parameter value(s) is invalid
@@ -2914,6 +2949,7 @@ void IsisAml::VerifyAll() {
   }
 }
 
+
 /**
  * Returns a boolean value based on the QString contents
  *
@@ -3136,4 +3172,3 @@ void IsisAml::StartParser(const char *xmlfile) {
   delete appHandler;
   return;
 }
-
