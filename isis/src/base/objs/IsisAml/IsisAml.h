@@ -154,6 +154,8 @@ class IsisAml : protected IsisAmlData {
     void PutFileName(const QString &paramName, const QString &value);
     void PutFileName(const QString &paramName, const std::vector<QString> &value);
 
+    void PutCubeName(const QString &paramName, const QString &value);
+
     void PutDouble(const QString &paramName, const double &value);
     void PutDouble(const QString &paramName, const std::vector<double> &value);
 

@@ -258,6 +258,39 @@ void IsisAml::PutFileName(const QString &paramName,
 }
 
 
+/**
+ * Allows the insertion of a value for a parameter of type 
+ * "cubename". A validity check is performed on the value passed
+ * in. 
+ *
+ * @param paramName The partial or full name of the parameter to be modified.
+ * @param value The QString representation of the value to be placed in the
+ * cubename's value data member.
+ */
+void IsisAml::PutCubeName(const QString &paramName,
+                          const QString &value) {
+
+  IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
+
+  if(param->type != "cube") {
+    QString message = "Parameter [" + paramName + "] is not a cubename.";
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
+  }
+
+  if(param->values.size() > 0) {
+    QString message = "A value for this parameter [" + paramName + "] has "
+                     "already been saved (possibly by IsisGui). If you need to "
+                     "change the value use \"Clear\" before the Put.";
+    throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
+  }
+
+  param->values.clear();
+  param->values.push_back(value);
+
+  Verify(param);
+}
+
+
 // Public: Sets the value member of a parameter of type integer whose name
 // starts with paramName
 
