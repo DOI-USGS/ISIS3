@@ -127,9 +127,14 @@
           Extra XML data
         </brief>
         <description>
-          The XML data contained in the file(s) specified by this parameter will
-          be added to the template data source under ExtraXml. If multiple XML files
-          are specified, then they will be merged together.
+          <p>
+            The XML data contained in the file(s) specified by this parameter will
+            be added to the template data source under ExtraXml. If multiple XML files
+            are specified, then they will be merged together.
+          </p>
+          <p>
+            The elements inside this file must be surrounded by a single XML element.
+          </p>
         </description>
       </parameter>
 
