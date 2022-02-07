@@ -24,6 +24,7 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 namespace Isis {
 
+
   //! Constructs a Process Object
   Process::Process() {
     m_ownedCubes = NULL;
@@ -47,6 +48,7 @@ namespace Isis {
     delete m_ownedCubes;
     m_ownedCubes = NULL;
   }
+
 
   /**
    * Opens an input cube specified by the programmer and verifies requirements
@@ -77,7 +79,8 @@ namespace Isis {
         cube->open(fname, "rw");
       }
       else {
-        cube->open(fname);
+        // Make sure attributes don't get processed twice
+        cube->open(FileName(fname).expanded());
       }
     }
     catch(IException &e) {
@@ -135,9 +138,9 @@ namespace Isis {
    */
   Isis::Cube *Process::SetInputCube(const QString &parameter,
                                     const int requirements) {
-    QString fname = Application::GetUserInterface().GetFileName(parameter);
+    QString fname = Application::GetUserInterface().GetCubeName(parameter);
     Isis::CubeAttributeInput &att = Application::GetUserInterface().GetInputAttribute(parameter);
-    return SetInputCube(fname, att, requirements);
+    return SetInputCube(FileName(fname).expanded(), att, requirements);
   }
 
 
@@ -204,6 +207,7 @@ namespace Isis {
     return SetOutputCubeStretch(parameter, ns, nl, nb, ui);
   }
 
+
   /**
    * Allocates a user specified output cube whose size is specified by the
    * programmer.
@@ -237,10 +241,11 @@ namespace Isis {
     }
     QString fname;
     Isis::CubeAttributeOutput atts;
-    fname = Application::GetUserInterface().GetFileName(parameter);
+    fname = Application::GetUserInterface().GetCubeName(parameter);
     atts = Application::GetUserInterface().GetOutputAttribute(parameter);
     return SetOutputCube(fname, atts, ns, nl, nb);
 }
+
 
 /**
  * Allocates a user specified output cube whose size is specified by the
@@ -279,15 +284,16 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
   QString fname;
   Isis::CubeAttributeOutput atts;
   if(ui==nullptr){
-    fname = Application::GetUserInterface().GetFileName(parameter);
+    fname = Application::GetUserInterface().GetCubeName(parameter);
     atts = Application::GetUserInterface().GetOutputAttribute(parameter);
   }
   else{
-    fname = ui->GetFileName(parameter);
+    fname = ui->GetCubeName(parameter);
     atts = ui->GetOutputAttribute(parameter);
   }
   return SetOutputCube(fname, atts, ns, nl, nb);
 }
+
 
   /**
    * Allocates a output cube whose name and size is specified by the programmer.
@@ -446,6 +452,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
     return cube;
   }
 
+
   /**
    * End the processing sequence and cleans up by closing cubes, freeing memory,
    * etc.
@@ -456,6 +463,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
     Process::Finalize();
   }
 
+
   /**
    * Cleans up by closing cubes and freeing memory for owned cubes.  Clears the
    * lists for all cubes.
@@ -464,10 +472,12 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
     ClearCubes();
   }
 
+
   void Process::AddInputCube(Cube *cube, bool owned) {
     InputCubes.push_back(cube);
     if (owned) m_ownedCubes->insert(cube);
   }
+
 
   void Process::AddOutputCube(Cube *cube, bool owned) {
     OutputCubes.push_back(cube);
@@ -597,6 +607,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
     m_ownedCubes->clear();
   }
 
+
   /**
    * Close owned input cubes from the list and clear the list
    */
@@ -610,6 +621,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
     }
     InputCubes.clear();
   }
+
 
   /**
    * Close owned output cubes from the list and clear the list
@@ -625,6 +637,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
     OutputCubes.clear();
   }
 
+
   /**
    * This method allows the programmer to turn on/off the propagation of labels
    * from the 1st input cube to any of the output cubes.  By default, propagation
@@ -639,6 +652,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
   void Process::PropagateLabels(const bool prop) {
     p_propagateLabels = prop;
   }
+
 
   /**
    * This method allows the programmer to propagate labels from a specific
@@ -668,6 +682,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
     }
   }
 
+
   /**
    * This method allows the programmer to propagate input tables to the output
    * cube (default is true)
@@ -678,6 +693,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
   void Process::PropagateTables(const bool prop) {
     p_propagateTables = prop;
   }
+
 
   /**
    * Propagate the tables from the cube with the given filename to the output
@@ -717,6 +733,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
     delete fromCube;
   }
 
+
   /**
    * This method allows the programmer to propagate input blobs to the output
    * cube (default is true)
@@ -728,6 +745,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
     p_propagatePolygons = prop;
   }
 
+
   /**
    * This method allows the programmer to propagate history to the output cube
    * (default is true)
@@ -737,6 +755,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
   void Process::PropagateHistory(const bool prop) {
     p_propagateHistory = prop;
   }
+
 
   /**
   * This method allows the programmer to propagate original labels
@@ -748,6 +767,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
   void Process::PropagateOriginalLabel(const bool prop) {
     p_propagateOriginalLabel = prop;
   }
+
 
   /**
    * This method reads the mission specific data directory from the user
@@ -783,6 +803,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
     return expanded.expanded();
   }
 
+
   /**
    * Writes out the History blob to the cube
    */
@@ -810,6 +831,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
       }
     }
   }
+
 
   /**
    * Calculates and stores off statistics on every band of every

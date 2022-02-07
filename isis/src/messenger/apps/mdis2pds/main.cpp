@@ -101,7 +101,7 @@ void IsisMain() {
   const QString mdis2pdsRuntime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();
-  FileName input(ui.GetFileName("FROM"));
+  FileName input(ui.GetCubeName("FROM"));
   FileName output = ui.GetFileName("TO");
   output = output.addExtension("IMG");
 

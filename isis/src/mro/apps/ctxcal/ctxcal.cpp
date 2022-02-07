@@ -37,7 +37,7 @@ namespace Isis {
     static double iof;          // conversion from counts/ms to IOF
 
     void ctxcal(UserInterface &ui) {
-      Cube icube(ui.GetFileName("FROM"));
+      Cube icube(ui.GetCubeName("FROM"));
       ctxcal(&icube, ui);
     }
 
@@ -59,7 +59,7 @@ namespace Isis {
 
       Cube flatFile;
       if(ui.WasEntered("FLATFILE")) {
-          flatFile.open(ui.GetFileName("FLATFILE"));
+          flatFile.open(ui.GetCubeName("FLATFILE"));
       }
       else {
           FileName flat = FileName("$mro/calibration/ctxFlat_????.cub").highestVersion();

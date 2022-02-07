@@ -61,7 +61,7 @@ namespace Isis {
       // The output from the last processing is the input into subsequent processing
       ProcessByLine p;
 
-      Cube *hifrom = p.SetInputCube(ui.GetFileName("FROM"), ui.GetInputAttribute("FROM"));
+      Cube *hifrom = p.SetInputCube(ui.GetCubeName("FROM"), ui.GetInputAttribute("FROM"));
       int nsamps = hifrom->sampleCount();
       int nlines = hifrom->lineCount();
 
@@ -71,7 +71,7 @@ namespace Isis {
       DbProfile hiprof = hiconf.getMatrixProfile();
 
       // Check for label propagation and set the output cube
-      Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"));
+      Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO"));
       if ( !IsTrueValue(hiprof,"PropagateTables", "TRUE") ) {
         RemoveHiBlobs(*(ocube->label()));
       }

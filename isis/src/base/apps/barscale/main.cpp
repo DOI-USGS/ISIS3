@@ -29,7 +29,7 @@ void IsisMain() {
   // projection information
   Process p;
   Cube icube;
-  icube.open(ui.GetFileName("FROM") );
+  icube.open(ui.GetCubeName("FROM") );
 
   // Determine where in image to get resolution from and get it
   int numSamps = icube.sampleCount();
@@ -441,7 +441,7 @@ void IsisMain() {
   lblStr = lblStr + " " + unitStr;
   painter.drawText(rightDisplayRect, lblStr);
 
-  QString inFile = ui.GetFileName("FROM");
+  QString inFile = ui.GetCubeName("FROM");
   QString outFile = ui.GetFileName("TO");
   FileName tmpBarFile = FileName::createTempFile("barscale.tif");
   QString scaleTif = tmpBarFile.expanded();

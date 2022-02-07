@@ -25,8 +25,8 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   Cube from, match;
-  from.open( ui.GetFileName("FROM") );
-  match.open( ui.GetFileName("MATCH") );
+  from.open( ui.GetCubeName("FROM") );
+  match.open( ui.GetCubeName("MATCH") );
 
   if( (from.bandCount() != 1) || (match.bandCount() != 1) ) {
     string msg = "tonematch only works for single band images.";

@@ -131,7 +131,7 @@ void IsisMain() {
   else if(ui.WasEntered("REFPIXIMAGE")) {
     Brick *b;
     Cube ERPfile;
-    ERPfile.open(ui.GetFileName("REFPIXIMAGE"));
+    ERPfile.open(ui.GetCubeName("REFPIXIMAGE"));
     b = new Brick(11, 201, 1, ERPfile.pixelType());
     b->SetBasePosition(4, 412, 1);
     ERPfile.read(*b);
@@ -143,7 +143,7 @@ void IsisMain() {
     gbl::ReferencePixelValue = stat.Average();
 
     calgrp += PvlKeyword("ReferencePixelValueSource", "ERPImage");
-    calgrp += PvlKeyword("ReferencePixelValueImage", ui.GetFileName("REFPIXIMAGE"));
+    calgrp += PvlKeyword("ReferencePixelValueImage", ui.GetCubeName("REFPIXIMAGE"));
     calgrp += PvlKeyword("ReferencePixelValue", toString(gbl::ReferencePixelValue));
   }
   else {
@@ -185,7 +185,7 @@ void IsisMain() {
   //
 
   if(ui.WasEntered("FLATFIELD")) {
-    p.SetInputCube(ui.GetFileName("FLATFIELD"), att);
+    p.SetInputCube(ui.GetCubeName("FLATFIELD"), att);
     if(stagestop == "FLAT" || stagestop == "IOF") {
       calgrp += PvlKeyword("FlatFieldImage", gbl::mi->FlatImageOpen());
     }

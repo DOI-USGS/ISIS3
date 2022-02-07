@@ -149,7 +149,7 @@ void IsisMain() {
   int index = 0;
   if(ui.WasEntered("PROPLAB")) {
     bool match = false;
-    QString fname = ui.GetFileName("PROPLAB");
+    QString fname = ui.GetCubeName("PROPLAB");
     for(int i = 0; i < cubeList.size(); i++) {
       if(fname == cubeList[i].toString()) {
         index = i;
@@ -158,7 +158,7 @@ void IsisMain() {
       }
     }
     if(!match) {
-      QString msg = "FileName [" + ui.GetFileName("PROPLAB") +
+      QString msg = "FileName [" + ui.GetCubeName("PROPLAB") +
                     "] to propagate labels from is not in the list file [" +
                     ui.GetFileName("FROMLIST") + "]";
       throw IException(IException::User, msg, _FILEINFO_);

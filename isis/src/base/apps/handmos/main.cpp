@@ -31,7 +31,7 @@ void IsisMain() {
   p.SetTrackFlag(bTrack);
 
   QString inputFile = ui.GetAsString("FROM");
-  QString mosaicFile = ui.GetFileName("MOSAIC");
+  QString mosaicFile = ui.GetCubeName("MOSAIC");
 
   // Set up the mosaic priority, either the input cube will be
   // placed ontop of the mosaic or beneath it

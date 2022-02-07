@@ -32,7 +32,7 @@ namespace Isis{
     ProcessByLine p;
 
     CubeAttributeInput &inputAtt = ui.GetInputAttribute("FROM");
-    Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
+    Cube *icube = p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
     int ins = icube->sampleCount();
     inl = icube->lineCount();
     int inb = icube->bandCount();

@@ -56,7 +56,7 @@ void IsisMain (){
     CubeAttributeInput backplaneCai = ui.GetInputAttribute("BACKPLANE");
 
     Cube bpCube;
-    bpCube.open(ui.GetFileName("BACKPLANE"));
+    bpCube.open(ui.GetCubeName("BACKPLANE"));
     int bpBands = bpCube.bandCount();
     bpCube.close();
 
@@ -74,11 +74,11 @@ void IsisMain (){
 
     CubeAttributeInput cai;
     bpCaiBands == 3 ? cai.setAttributes("+" + backplaneCai.bands()[0]) : cai.setAttributes("+1" ) ;
-    p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
+    p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
     bpCaiBands == 3 ? cai.setAttributes("+" + backplaneCai.bands()[1]) : cai.setAttributes("+2" ) ;
-    p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
+    p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
     bpCaiBands == 3 ? cai.setAttributes("+" + backplaneCai.bands()[2]) : cai.setAttributes("+3" ) ;
-    p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
+    p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
 
     useBackplane = true;
   }

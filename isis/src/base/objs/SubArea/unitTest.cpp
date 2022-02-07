@@ -31,7 +31,7 @@ void IsisMain() {
   int onl, ons;
 
   p1.SetInputCube("FROM1");
-  QString from1 = ui.GetFileName("FROM1");
+  QString from1 = ui.GetCubeName("FROM1");
   Cube inomapcube;
   inomapcube.open(from1);
   inl = inomapcube.lineCount();
@@ -81,7 +81,7 @@ void IsisMain() {
   p1.EndProcess();
 
   cout << "Output cube label: " << endl << endl;
-  QString file = ui.GetFileName("TO");
+  QString file = ui.GetCubeName("TO");
   Pvl label(file);
   cout << label.findObject("IsisCube").findObject("Core").findGroup("Dimensions") << endl << endl;
   if(label.findObject("IsisCube").hasGroup("Instrument")) {
@@ -291,7 +291,7 @@ void IsisMain() {
 
   ProcessByLine p6;
   p6.SetInputCube("FROM2");
-  QString from2 = ui.GetFileName("FROM2");
+  QString from2 = ui.GetCubeName("FROM2");
   Cube imapcube;
   imapcube.open(from2);
   inl = imapcube.lineCount();
@@ -546,7 +546,7 @@ void IsisMain() {
   results.clear();
 
   Cube smapcube;
-  QString from3 = ui.GetFileName("FROM3");
+  QString from3 = ui.GetCubeName("FROM3");
   smapcube.open(from3);
   inl = smapcube.lineCount();
   ins = smapcube.sampleCount();

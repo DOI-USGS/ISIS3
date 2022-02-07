@@ -53,7 +53,7 @@ void IsisMain() {
   CubeAttributeInput &attFrom = ui.GetInputAttribute("FROM");
   vector<QString> bandFrom = attFrom.bands();
   from.setVirtualBands(bandFrom);
-  from.open(ui.GetFileName("FROM"), "r");
+  from.open(ui.GetCubeName("FROM"), "r");
   Camera *fcamera = from.camera();
   CameraDistortionMap *dmap = fcamera->DistortionMap();
 

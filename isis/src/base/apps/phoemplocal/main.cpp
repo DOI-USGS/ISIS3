@@ -328,7 +328,7 @@ void IsisMain() {
       mainpvl.addGroup(note);
     }
     mainpvl.addGroup(results);
-    QString sOutFile = ui.GetFileName("TO");
+    QString sOutFile = ui.GetCubeName("TO");
     bool append = ui.GetBoolean("APPEND");
     ofstream os;
     if (append) {

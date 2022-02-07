@@ -64,7 +64,7 @@ void IsisMain(){
 
 
   if(ui.GetBoolean("STATS")) { //! Run extended statistics
-    Cube* ocubeptr = p.SetOutputCube (ui.GetFileName("TO"),outputProperties,
+    Cube* ocubeptr = p.SetOutputCube (ui.GetCubeName("TO"),outputProperties,
                      cubeptr->sampleCount(),cubeptr->lineCount(),
                      cubeptr->bandCount());
 

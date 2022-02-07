@@ -111,7 +111,7 @@ void IsisMain() {
 
 int addChannel(ExportDescription &desc, QString param, QString mode) {
   UserInterface &ui = Application::GetUserInterface();
-  FileName name = ui.GetFileName(param);
+  FileName name = ui.GetCubeName(param);
   CubeAttributeInput &att = ui.GetInputAttribute(param);
 
   int index = -1;

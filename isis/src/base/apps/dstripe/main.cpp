@@ -67,7 +67,7 @@ void IsisMain() {
   // Run lowpass filter on input
   QString tempFileName = FileName::createTempFile("$TEMPORARY/dstripe.temporary.cub").expanded();
   QString lowParams = "";
-  lowParams += "from= " + ui.GetFileName("FROM");
+  lowParams += "from= " + ui.GetCubeName("FROM");
   lowParams += " to= " + tempFileName + " ";
   lowParams += " samples= " + toString(lowSamples);
   lowParams += " lines= " + toString(lowLines);
@@ -77,8 +77,8 @@ void IsisMain() {
   // Make a copy of the lowpass filter results if the user wants it
   if(!ui.GetBoolean("DELETENOISE")) {
     QString lowParams = "";
-    lowParams += "from= " + ui.GetFileName("FROM");
-    lowParams += " to= " + ui.GetFileName("LPFNOISE");
+    lowParams += "from= " + ui.GetCubeName("FROM");
+    lowParams += " to= " + ui.GetCubeName("LPFNOISE");
     lowParams += " samples= " + toString(lowSamples);
     lowParams += " lines= " + toString(lowLines);
     ProgramLauncher::RunIsisProgram("lowpass", lowParams);

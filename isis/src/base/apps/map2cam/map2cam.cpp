@@ -17,17 +17,17 @@ namespace Isis{
 
     // Open the input camera cube that we will be matching and create
     // the camera object
-    FileName match = FileName(ui.GetFileName("MATCH"));
+    FileName match = FileName(ui.GetCubeName("MATCH"));
 
     Process p;
-    QString fname = ui.GetFileName("MATCH");
+    QString fname = ui.GetCubeName("MATCH");
     Isis::CubeAttributeInput &inputAtt = ui.GetInputAttribute("MATCH");
     mcube = p.SetInputCube(fname, inputAtt);
     outcam = mcube->camera();
 
     // Open the input projection cube and get the projection information
     ProcessRubberSheet rub;
-    fname = ui.GetFileName("FROM");
+    fname = ui.GetCubeName("FROM");
     inputAtt = ui.GetInputAttribute("FROM");
     Cube *icube = rub.SetInputCube(fname, inputAtt);
     TProjection *inmap = (TProjection *) icube->projection();
@@ -44,7 +44,7 @@ namespace Isis{
     // Allocate the output cube but don't propagate any labels from the map
     // file. Instead propagate from the camera file
     rub.PropagateLabels(false);
-    fname = ui.GetFileName("TO");
+    fname = ui.GetCubeName("TO");
     Isis::CubeAttributeOutput &outputAtt = ui.GetOutputAttribute("TO");
     rub.SetOutputCube(fname, outputAtt,
                       transform->OutputSamples(),

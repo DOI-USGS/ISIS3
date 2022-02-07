@@ -195,7 +195,7 @@ namespace Isis{
             cubeFile.setVirtualBands(inAtt.bands());
         }
 
-        cubeFile.open(ui.GetFileName("FROM"), "r");
+        cubeFile.open(ui.GetCubeName("FROM"), "r");
         caminfo(&cubeFile, ui);
     }
 

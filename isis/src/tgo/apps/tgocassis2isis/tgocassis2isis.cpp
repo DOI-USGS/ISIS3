@@ -53,7 +53,7 @@ namespace Isis {
       }
 
       CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-      Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
+      Cube *outputCube = importer.SetOutputCube(ui.GetCubeName("TO"), att);
 
       QString transRawFile = "TgoCassisInstrument.trn";
       QFile xmlFile(xmlFileName.expanded());
@@ -95,7 +95,7 @@ namespace Isis {
         convertUniqueIdToObservationId(*outputLabel);
       }
 
-      FileName outputCubeFileName(ui.GetFileName("TO"));
+      FileName outputCubeFileName(ui.GetCubeName("TO"));
 
       OriginalXmlLabel xmlLabel;
       xmlLabel.readFromXmlFile(xmlFileName);

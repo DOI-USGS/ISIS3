@@ -56,7 +56,7 @@ void IsisMain() {
     Pvl temp;
     temp.addGroup(results);
     temp.addGroup(orient);
-    temp.write(ui.GetFileName("TO", "txt"));
+    temp.write(ui.GetCubeName("TO", "txt"));
   }
 
   p.EndProcess();

@@ -30,9 +30,9 @@ using namespace std;
 namespace Isis {
 
 void hicolormos(UserInterface &ui) {
-  Cube from1(ui.GetFileName("FROM1"), "r");
+  Cube from1(ui.GetCubeName("FROM1"), "r");
   if (ui.WasEntered("FROM2")) {
-    Cube from2(ui.GetFileName("FROM2"), "r");
+    Cube from2(ui.GetCubeName("FROM2"), "r");
     hicolormos(&from1, &from2, ui);
   }
   else {
@@ -247,7 +247,7 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   QString MosaicPriority = ui.GetString("PRIORITY");
 
   QString parameters = "FROMLIST=" + tempFile.expanded() +
-                      " MOSAIC=" + ui.GetFileName("TO") +
+                      " MOSAIC=" + ui.GetCubeName("TO") +
                       " PRIORITY=" + MosaicPriority;
   ProgramLauncher::RunIsisProgram("automos", parameters);
 
@@ -273,7 +273,7 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   OriginalLabel from1OrgLab(from1->fileName());
 
   Cube c;
-  c.open(ui.GetFileName("TO"), "rw");
+  c.open(ui.GetCubeName("TO"), "rw");
   c.label()->findObject("IsisCube", Pvl::Traverse).addGroup(mos);
   c.write(from1OrgLab);
   c.close();

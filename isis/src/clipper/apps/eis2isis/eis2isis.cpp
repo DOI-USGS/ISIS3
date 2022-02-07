@@ -64,7 +64,7 @@ namespace Isis {
 
       translateEISLabels(xmlFileName, outputLabel);
 
-      FileName outputCubeFileName(ui.GetFileName("TO"));
+      FileName outputCubeFileName(ui.GetCubeName("TO"));
 
       OriginalXmlLabel xmlLabel;
       xmlLabel.readFromXmlFile(xmlFileName);
@@ -244,7 +244,7 @@ namespace Isis {
     if (ui.WasEntered("MAINREADOUT")) {
 
       // Create and write normalized time values in the range [-1,1] to the primary EIS cube
-      Table normalizedReadout = normalizeTimeTable(FileName(ui.GetFileName("MAINREADOUT")),
+      Table normalizedReadout = normalizeTimeTable(FileName(ui.GetCubeName("MAINREADOUT")),
                                   "Normalized Main Readout Line Times",
                                   outputCube->lineCount());
 
@@ -265,7 +265,7 @@ namespace Isis {
 
     // Handle an optional checkline cube.
     if (ui.WasEntered("FROM2")) {
-      FileName checklineXmlFileName = ui.GetFileName("FROM2");
+      FileName checklineXmlFileName = ui.GetCubeName("FROM2");
 
       if (ui.WasEntered("CHECKLINEREADOUT")) {
         // Process the checkline image to an ISIS cube and write the checkline tables

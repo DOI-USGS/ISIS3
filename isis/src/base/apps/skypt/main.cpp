@@ -13,7 +13,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get input cube and get camera model for it
-  QString channel = ui.GetFileName("FROM");
+  QString channel = ui.GetCubeName("FROM");
   Cube cube;
   cube.open(channel);
   Camera *cam = cube.camera();
@@ -69,7 +69,7 @@ void IsisMain() {
   // Write an output label file if necessary
   if (ui.WasEntered("TO")) {
     // Get user params from ui
-    QString outFile = FileName(ui.GetFileName("TO")).expanded();
+    QString outFile = FileName(ui.GetCubeName("TO")).expanded();
     bool exists = FileName(outFile).fileExists();
     bool append = ui.GetBoolean("APPEND");
 

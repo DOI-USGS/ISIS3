@@ -112,7 +112,7 @@ void IsisMain() {
     ProcessByLine p;
     CubeAttributeOutput set;
     set.setPixelType(Real);
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("CUBE"),
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("CUBE"),
                                   set, bands, bands, 2);
     p.StartProcess(WriteCube);
     ocube->putGroup(bandBin);

@@ -60,7 +60,7 @@ void IsisMain() {
   CubeAttributeInput &attTrans = ui.GetInputAttribute("FROM");
   std::vector<QString> bandTrans = attTrans.bands();
   trans.setVirtualBands(bandTrans);
-  trans.open(ui.GetFileName("FROM"), "r");
+  trans.open(ui.GetCubeName("FROM"), "r");
 
   // Open the second cube, it is held in place.  We will be matching the
   // first to this one by attempting to compute a sample/line translation
@@ -68,7 +68,7 @@ void IsisMain() {
   CubeAttributeInput &attMatch = ui.GetInputAttribute("MATCH");
   std::vector<QString> bandMatch = attMatch.bands();
   match.setVirtualBands(bandMatch);
-  match.open(ui.GetFileName("MATCH"), "r");
+  match.open(ui.GetCubeName("MATCH"), "r");
 
   // Input cube Lines and Samples must be the same and each must have only
   // one band
@@ -271,17 +271,17 @@ void IsisMain() {
   // second input image
   if (ui.WasEntered("TO")) {
     if (ui.GetString("TRANSFORM") == "TRANSLATE") {
-      QString params = " from="   + ui.GetFileName("FROM") +
-                      " to="     + ui.GetFileName("TO") +
+      QString params = " from="   + ui.GetCubeName("FROM") +
+                      " to="     + ui.GetCubeName("TO") +
                       " strans=" + toString(sTrans) +
                       " ltrans=" + toString(lTrans) +
                       " interp=" + ui.GetString("INTERP");
       ProgramLauncher::RunIsisProgram("translate", params);
     }
     else {
-      QString params = " from="    + ui.GetFileName("FROM") +
-                      " to="     + ui.GetFileName("TO") +
-                      " cube="   + ui.GetFileName("MATCH") +
+      QString params = " from="    + ui.GetCubeName("FROM") +
+                      " to="     + ui.GetCubeName("TO") +
+                      " cube="   + ui.GetCubeName("MATCH") +
                       " cnet="   + ui.GetFileName("ONET") +
                       " interp=" + ui.GetString("INTERP") +
                       " degree=" + toString(ui.GetInteger("DEGREE"));

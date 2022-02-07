@@ -53,7 +53,7 @@ void printMatrix(const SpiceDouble m[3][3]);
 void IsisMain() {
   Progress progress;
   UserInterface &ui = Application::GetUserInterface();
-  QString filename = ui.GetFileName("FROM");
+  QString filename = ui.GetCubeName("FROM");
   //ControlNet m_cnet(ui.GetFileName("NET"),&progress);
   //QList<ControlPoint *> cntrlPts = m_cnet.GetPoints();
   //int npts = cntrlPts.length();
@@ -207,7 +207,7 @@ void IsisMain() {
         rad1 = Distance(ui.GetDouble("RAD1"), Distance::Meters);
       }
       else {
-        rad1 = GetRadius(ui.GetFileName("FROM"), lat1, lon1);
+        rad1 = GetRadius(ui.GetCubeName("FROM"), lat1, lon1);
       }
 
       // In order to use the bundle adjustment class we will need a control
@@ -243,7 +243,7 @@ void IsisMain() {
           rad2 = Distance(ui.GetDouble("RAD2"), Distance::Meters);
         }
         else {
-          rad2 = GetRadius(ui.GetFileName("FROM"), lat2, lon2);
+          rad2 = GetRadius(ui.GetCubeName("FROM"), lat2, lon2);
         }
 
         ControlMeasure * m = new ControlMeasure;

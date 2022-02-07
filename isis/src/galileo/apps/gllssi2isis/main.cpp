@@ -41,7 +41,7 @@ void IsisMain() {
   ProcessImportPds p;
   UserInterface &ui = Application::GetUserInterface();
   FileName inFile = ui.GetFileName("FROM");
-  FileName outFile = ui.GetFileName("TO");
+  FileName outFile = ui.GetCubeName("TO");
 
   // Apply a fix to the gallileo pds labels so they can be read
   fixPvl(inFile.toString());
