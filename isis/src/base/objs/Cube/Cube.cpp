@@ -617,7 +617,9 @@ namespace Isis {
 
 
   /**
-   * This method will open an isis cube for reading or reading/writing.
+   * This method will open an existing isis cube for reading or 
+   * reading/writing. Any input cube attributes following the file
+   * name will be applied.
    *
    * @param[in] cubeFileName Name of the cube file to open. Environment
    *     variables in the filename will be automatically expanded.
@@ -625,14 +627,20 @@ namespace Isis {
    *     accessed. Either read-only "r" or read-write "rw".
    */
   void Cube::open(const QString &cubeFileName, QString access) {
-    // Already opened?
 
+    // Already opened?
     if (isOpen()) {
       string msg = "You already have a cube opened";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     initLabelFromFile(cubeFileName, (access == "rw"));
+
+    Isis::CubeAttributeInput att(cubeFileName);
+    if(att.bands().size() != 0) {
+      vector<QString> bands = att.bands();
+      setVirtualBands(bands);
+    }
 
     // Figure out the name of the data file
     try {
