@@ -32,16 +32,11 @@ namespace Isis {
     
     // Check if input file is indeed, a cube
     if (FileName(ui.GetCubeName("FROM")).expanded().right(3) != "cub") {
-      QString msg = "Input file [" + ui.GetFileName("FROM") +
+      QString msg = "Input file [" + ui.GetCubeName("FROM") +
                   "] does not appear to be a cube";
       throw  IException(IException::User, msg, _FILEINFO_);
     }
     
-    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
-    if (inAtt.bands().size() != 0) {
-        icube.setVirtualBands(inAtt.bands());
-    }
-
     icube.open(ui.GetCubeName("FROM"), "r");
     tgocassisrdrgen(&icube, ui);
   }

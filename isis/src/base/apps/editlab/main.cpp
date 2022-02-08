@@ -17,7 +17,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Extract label from file
-  Pvl *label = new Pvl(ui.GetCubeName("FROM"));
+  Pvl *label = new Pvl(ui.GetFileName("FROM"));
   PvlObject *pvl = label;
   QString option = ui.GetString("OPTION");
 
@@ -25,7 +25,7 @@ void IsisMain() {
   Cube *cube = NULL;
   if(label->hasObject("IsisCube")) {
     cube = new Cube();
-    cube->open(ui.GetCubeName("FROM"), "rw");
+    cube->open(ui.GetFileName("FROM"), "rw");
     pvl = &(cube->label()->findObject("IsisCube"));
   }
 
@@ -110,7 +110,7 @@ void IsisMain() {
     cube = NULL;
   }
   else {
-    label->write(ui.GetCubeName("FROM"));
+    label->write(ui.GetFileName("FROM"));
   }
 
   delete label;

@@ -57,17 +57,11 @@ void IsisMain() {
 
   // Open the first cube.  It will be matched to the second input cube.
   Cube trans;
-  CubeAttributeInput &attTrans = ui.GetInputAttribute("FROM");
-  std::vector<QString> bandTrans = attTrans.bands();
-  trans.setVirtualBands(bandTrans);
   trans.open(ui.GetCubeName("FROM"), "r");
 
   // Open the second cube, it is held in place.  We will be matching the
   // first to this one by attempting to compute a sample/line translation
   Cube match;
-  CubeAttributeInput &attMatch = ui.GetInputAttribute("MATCH");
-  std::vector<QString> bandMatch = attMatch.bands();
-  match.setVirtualBands(bandMatch);
   match.open(ui.GetCubeName("MATCH"), "r");
 
   // Input cube Lines and Samples must be the same and each must have only

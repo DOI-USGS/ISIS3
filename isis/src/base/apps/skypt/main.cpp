@@ -69,7 +69,7 @@ void IsisMain() {
   // Write an output label file if necessary
   if (ui.WasEntered("TO")) {
     // Get user params from ui
-    QString outFile = FileName(ui.GetCubeName("TO")).expanded();
+    QString outFile = FileName(ui.GetFileName("TO")).expanded();
     bool exists = FileName(outFile).fileExists();
     bool append = ui.GetBoolean("APPEND");
 

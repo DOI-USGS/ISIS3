@@ -29,7 +29,7 @@ void IsisMain() {
   Pvl lab(inFile.expanded());
 
   ofstream os;
-  QString outFile = FileName(ui.GetCubeName("TO")).expanded();
+  QString outFile = FileName(ui.GetFileName("TO")).expanded();
   os.open(outFile.toLatin1().data(), ios::out);
 
   int minobs = 1;

@@ -78,7 +78,7 @@ void IsisMain() {
   Pvl &pdsLabel = p.StandardPdsLabel(ProcessExportPds::Image);
 
   // Add PRODUCT_ID keyword, the first part of the output filename
-  FileName outFileNoExt(ui.GetCubeName("TO"));
+  FileName outFileNoExt(ui.GetFileName("TO"));
   outFileNoExt = outFileNoExt.removeExtension();
   QString productID(outFileNoExt.baseName());
   PvlKeyword productId("PRODUCT_ID", productID.toUpper());

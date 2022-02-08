@@ -118,11 +118,11 @@ void IsisMain() {
   insCode = scFrameCode - 230;
 
   try {
-    panCube.open(ui.GetCubeName("FROM"),"rw");
+    panCube.open(ui.GetFileName("FROM"),"rw");
   }
   catch (IException &e) {
     throw IException(IException::User,
-                     "Unable to open the file [" + ui.GetCubeName("FROM") + "] as a cube.",
+                     "Unable to open the file [" + ui.GetFileName("FROM") + "] as a cube.",
                      _FILEINFO_);
   }
 
@@ -769,7 +769,7 @@ void IsisMain() {
   panCube.write(tableFid);
   //close the new cube
   panCube.close(false);
-  panCube.open(ui.GetCubeName("FROM"),"rw");
+  panCube.open(ui.GetFileName("FROM"),"rw");
 
   delete spPos;
   delete spRot;

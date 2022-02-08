@@ -28,7 +28,7 @@ void IsisMain() {
     throw IException(IException::User, message, _FILEINFO_);
   }
 
-  QString file = ui.GetFileName("FROM");
+  QString file = ui.GetCubeName("FROM");
 
   //Use a Process to get the number of bands in the input cube
   Process q;
