@@ -57,7 +57,7 @@ requirements:
   - cspice
   - csm>=3.0.3,<3.0.4
   - curl
-  - eigen < 3.4
+  - eigen<3.4
   - embree
   - ffmpeg
   - geos>=3.7,<3.8
@@ -87,7 +87,7 @@ requirements:
   - nn
   - opencv>=4.5.2
   - openssl>=1.1.1k
-  - pcl >= 1.10.0
+  - pcl >=1.10.0
   - protobuf
   - python>=3.7.11
   - qhull
@@ -100,6 +100,7 @@ requirements:
   - tnt
   - x264
   - xerces-c=3
+  - xalan-c
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm
