@@ -635,7 +635,12 @@ namespace Isis {
           createdCamera = false;
         }
 
-        QList< ControlMeasure * > measures = cnet.GetMeasuresInCube(serialNumber);
+        QList< ControlMeasure * > measures;
+        if (ignore) {
+          measures = cnet.GetValidMeasuresInCube(serialNumber);
+        } else {
+          measures = cnet.GetMeasuresInCube(serialNumber);
+        }
         for (int cm = 0; cm < measures.size(); cm++) {
           ControlMeasure *measure = measures[cm];
           ControlPoint *point = measure->Parent();
