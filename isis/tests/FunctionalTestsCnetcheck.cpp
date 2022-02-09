@@ -96,7 +96,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckNoPoints) {
 }
 
 
-TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckIgnore) {
+TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckIslands) {
   // Add measures with fake serials not in the cubelist
   ControlMeasure *m1 = new ControlMeasure();
   m1->SetAprioriLine(481);
@@ -145,4 +145,58 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckIgnore) {
   EXPECT_EQ((int)pvlResults.findKeyword("NoCube"), 2);
   EXPECT_EQ((int)pvlResults.findKeyword("NoControl"), 1);
   EXPECT_EQ((int)pvlResults.findKeyword("LowCoverage"), 3);
+}
+
+TEST_F(ThreeImageNetwork, FunctionaltestCnetcheckIgnoredMeasures){
+  QVector<QString> args = {"fromlist="+cubeListFile, "prefix="+tempDir.path()+"/", "nocube=false", "lowcoverage=false"};
+  UserInterface options(APP_XML, args);
+
+  QString cube1Serial = SerialNumber::Compose(*cube1->label());
+  QString cube2Serial = SerialNumber::Compose(*cube2->label());
+  QString cube3Serial = SerialNumber::Compose(*cube3->label());
+
+  // Add measure guaranteed to fail computing lat/lon
+  ControlMeasure *m1 = new ControlMeasure();
+  m1->SetAprioriLine(481);
+  m1->SetAprioriSample(481);
+  m1->SetCamera(cube1->camera());
+  m1->SetCubeSerialNumber(cube1Serial);
+
+  ControlMeasure *m2 = new ControlMeasure();
+  m2->SetAprioriLine(999);
+  m2->SetAprioriSample(999);
+  m2->SetCamera(cube2->camera());
+  m2->SetCubeSerialNumber(cube2Serial);
+
+  ControlMeasure *m3 = new ControlMeasure();
+  m3->SetAprioriLine(1100);
+  m3->SetAprioriSample(1100);
+  m3->SetCamera(cube2->camera());
+  m3->SetCubeSerialNumber(cube3Serial);
+  m3->SetIgnored(true);
+
+  ControlPoint *newPoint = new ControlPoint();
+  newPoint->Add(m1);
+  newPoint->Add(m2);
+  newPoint->Add(m3);
+
+  network->AddPoint(newPoint);
+
+  Pvl log;
+  cnetcheck(*network, *cubeList, options, &log);
+
+  std::ifstream f(tempDir.path().toStdString() + "/NoLatLon.txt");
+  std::string ret((std::istreambuf_iterator<char>(f)),
+                 std::istreambuf_iterator<char>());
+
+  EXPECT_THAT(ret, testing::HasSubstr(cube1Serial.toStdString()));
+  EXPECT_THAT(ret, testing::HasSubstr(cube2Serial.toStdString()));
+
+  EXPECT_THAT(ret, testing::HasSubstr(cube1->fileName().toStdString()));
+  EXPECT_THAT(ret, testing::HasSubstr(cube2->fileName().toStdString()));
+
+  PvlGroup pvlResults = log.findGroup("Results");
+  EXPECT_TRUE((int)pvlResults.findKeyword("Islands") == 1);
+  EXPECT_TRUE((int)pvlResults.findKeyword("NoLatLonCubes") == 2);
+  EXPECT_FALSE(pvlResults.hasKeyword("SingleCube"));
 }
