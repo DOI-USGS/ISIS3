@@ -35,6 +35,9 @@ release.
 
 ## [Unreleased]
 
+
+## [7.0.0] - 2022-02-11
+
 ### Changed
 - Disabled SURF algorithm for findfeatures, latest version of opencv no longer provides SURF as part of the base library [#3885](https://github.com/USGS-Astrogeology/ISIS3/issues/3885)
 - Changed caminfo's parameter default values for MAXEMISSION and MAXINCIDENCE to be
@@ -349,7 +352,8 @@ The unreleased comparison should always be
 {REPO_NAME}/compare/{LAST_VERSION_TAG}...HEAD
 -->
 
-[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/6.0.0...HEAD
+[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/7.0.0...HEAD
+[7.0.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/6.0.0...7.0.0
 [6.0.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.2...6.0.0
 [5.0.2]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.1...5.0.2
 [5.0.1]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.0...5.0.1
