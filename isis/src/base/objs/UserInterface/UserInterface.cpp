@@ -405,6 +405,20 @@ namespace Isis {
   }
 
 
+/**
+ * This is used to display the updated parameters when an app is called with -last
+ * 
+ * @return QString returnString- the updated command line 
+ */
+QString UserInterface::buildNewCommandLine(){
+  QString returnString = "";
+  for(auto i:p_cmdline){
+    returnString += i;
+    returnString += " ";
+  }
+  return returnString;
+}
+
   /**
    * This is used to load the command line into p_cmdline and the Aml object
    * using information contained in argc and argv.
@@ -503,7 +517,6 @@ namespace Isis {
         if ( paramValue.size() ) {
           realValue = paramValue[0];
         }
-
         evaluateOption(paramName, realValue);
 
         continue;
@@ -517,6 +530,9 @@ namespace Isis {
         throw IException(e, IException::User, "Invalid command line", _FILEINFO_);
       }
 
+    } 
+    if( usedDashLast == true){  
+        cout << buildNewCommandLine() << endl;;
     }
 
     // Can't use the batchlist with the gui, save, last or restore option
@@ -591,7 +607,6 @@ namespace Isis {
             }
           }
 
-          cout << commandline << endl;
           return;
         }
 
