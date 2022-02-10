@@ -57,6 +57,7 @@ requirements:
   - cspice
   - csm>=3.0.3,<3.0.4
   - curl
+  - doxygen
   - eigen<3.4
   - embree
   - ffmpeg
