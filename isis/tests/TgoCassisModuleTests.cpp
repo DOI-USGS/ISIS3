@@ -7,6 +7,7 @@
 #include "Histogram.h"
 
 #include "tgocassis2isis.h"
+#include "tgocassisrdrgen.h"
 #include "spiceinit.h"
 #include "tgocassisstitch.h"
 #include "tgocassisunstitch.h"
@@ -18,6 +19,7 @@
 using namespace Isis;
 
 static QString TGOCASSIS2ISIS_XML = FileName("$ISISROOT/bin/xml/tgocassis2isis.xml").expanded();
+static QString RDRGEN_XML = FileName("$ISISROOT/bin/xml/tgocassisrdrgen.xml").expanded();
 static QString SPICEINIT_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
 static QString STITCH_XML = FileName("$ISISROOT/bin/xml/tgocassisstitch.xml").expanded();
 static QString UNSTITCH_XML = FileName("$ISISROOT/bin/xml/tgocassisunstitch.xml").expanded();
@@ -26,10 +28,10 @@ static QString CAM2MAP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded(
 
 TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   QTemporaryDir prefix;
-  
+
   // run tgocassis2isis and spiceinit on pan framelet.
   QString panFileName = prefix.path() + "/panframelet.cub";
-  QVector<QString> tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-PAN-00005-B1.xml",  
+  QVector<QString> tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-PAN-00005-B1.xml",
                                          "to=" + panFileName};
 
   UserInterface tgocassis2isisPan(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
@@ -39,7 +41,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   catch (IException &e) {
     FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
   }
-  
+
   QVector<QString> spiceinitArgs = {"from=" + panFileName,  "ckp=t", "spkp=t"};
   UserInterface spiceinitPan(SPICEINIT_XML, spiceinitArgs);
   try {
@@ -48,10 +50,10 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   catch (IException &e) {
     FAIL() << "Unable to run spiceinit on pan image: " << e.what() << std::endl;
   }
-  
+
   // run tgocassis2isis and spiceinit on red framelet.
   QString redFileName = prefix.path() + "/redframelet.cub";
-  tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-RED-01005-B1.xml",  
+  tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-RED-01005-B1.xml",
                         "to=" + redFileName};
   UserInterface tgocassis2isisRed(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
   try {
@@ -60,7 +62,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   catch (IException &e) {
     FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
   }
-  
+
   spiceinitArgs = {"from=" + redFileName,  "ckp=t", "spkp=t"};
   UserInterface spiceinitRed(SPICEINIT_XML, spiceinitArgs);
   try {
@@ -69,10 +71,10 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   catch (IException &e) {
     FAIL() << "Unable to run spiceinit on pan image: " << e.what() << std::endl;
   }
-  
+
   // run tgocassis2isis and spiceinit on blu framelet.
   QString bluFileName = prefix.path() + "/bluframelet.cub";
-  tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-BLU-03005-B1.xml",  
+  tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-BLU-03005-B1.xml",
                         "to=" + bluFileName};
   UserInterface tgocassis2isisBlu(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
   try {
@@ -81,7 +83,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   catch (IException &e) {
     FAIL() << "Unable to run tgocassis2isis on blu image: " << e.what() << std::endl;
   }
-  
+
   spiceinitArgs = {"from=" + bluFileName,  "ckp=t", "spkp=t"};
   UserInterface spiceinitBlu(SPICEINIT_XML, spiceinitArgs);
   try {
@@ -90,10 +92,10 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   catch (IException &e) {
     FAIL() << "Unable to run spiceinit on blu image: " << e.what() << std::endl;
   }
-  
+
   // run tgocassis2isis and spiceinit on nir framelet.
   QString nirFileName = prefix.path() + "/nirframelet.cub";
-  tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-NIR-02005-B1.xml",  
+  tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-NIR-02005-B1.xml",
                         "to=" + nirFileName};
   UserInterface tgocassis2isisNir(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
   try {
@@ -102,7 +104,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   catch (IException &e) {
     FAIL() << "Unable to run tgocassis2isis on nir image: " << e.what() << std::endl;
   }
-  
+
   spiceinitArgs = {"from=" + nirFileName,  "ckp=t", "spkp=t"};
   UserInterface spiceinitNir(SPICEINIT_XML, spiceinitArgs);
   try {
@@ -111,44 +113,44 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   catch (IException &e) {
     FAIL() << "Unable to run spiceinit  on nir image: " << e.what() << std::endl;
   }
-  
+
   // run stitch and unstitch on cube list
   FileList *cubeList = new FileList();
   cubeList->append(panFileName);
   cubeList->append(redFileName);
   cubeList->append(bluFileName);
   cubeList->append(nirFileName);
-  
+
   QString cubeListFile = prefix.path() + "/cubelist.lis";
   cubeList->write(cubeListFile);
-  
-  QVector<QString> stitchArgs = {"fromlist=" + cubeListFile,  
+
+  QVector<QString> stitchArgs = {"fromlist=" + cubeListFile,
                 "outputprefix=" + prefix.path() + "/stitched"};
   UserInterface stitchOptions(STITCH_XML, stitchArgs);
-  
+
   try {
     tgocassisstitch(stitchOptions);
   }
   catch (IException &e) {
     FAIL() << "Unable to run tgocassisstitch with cube list: " << e.what() << std::endl;
   }
-  
-  QVector<QString> unstitchArgs = {"from=" + prefix.path() + "/stitched-2016-11-26T22:50:27.381.cub",  
+
+  QVector<QString> unstitchArgs = {"from=" + prefix.path() + "/stitched-2016-11-26T22:50:27.381.cub",
                   "outputprefix=" + prefix.path() + "/unstitched"};
   UserInterface unstitchOptions(UNSTITCH_XML, unstitchArgs);
-  
+
   try {
     tgocassisunstitch(unstitchOptions);
   }
   catch (IException &e) {
     FAIL() << "Unable to run tgocassisunstitch with stitched cube: " << e.what() << std::endl;
   }
-  
+
   // Compare Pan unstitched cube to original cube
   QString panUnstitchFile = prefix.path() + "/unstitched_PAN.cub";
   Cube panUnstitchCube(panUnstitchFile);
   Pvl *panUnstitchLabel = panUnstitchCube.label();
-  
+
   Cube panOrigCube(panFileName);
   Pvl *panOrigLabel = panOrigCube.label();
 
@@ -168,13 +170,13 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(panUnstitchInst["ExposureDuration"], panOrigInst["ExposureDuration"]);
   EXPECT_EQ(panUnstitchInst["SummingMode"], panOrigInst["SummingMode"]);
   EXPECT_EQ(panUnstitchInst["Filter"], panOrigInst["Filter"]);
-  
+
   // Archive Group
   PvlGroup &panUnstitchArch = panUnstitchLabel->findGroup("Archive", Pvl::Traverse);
   PvlGroup &panOrigArch = panOrigLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(panUnstitchArch["DataSetId"], panOrigArch["DataSetId"]);
   EXPECT_EQ(panUnstitchArch["ProductVersionId"], panOrigArch["ProductVersionId"]);
-  EXPECT_EQ(panUnstitchArch["ProductCreationTime"], panOrigArch["ProductCreationTime"]);  
+  EXPECT_EQ(panUnstitchArch["ProductCreationTime"], panOrigArch["ProductCreationTime"]);
   EXPECT_EQ(panUnstitchArch["ScalingFactor"], panOrigArch["ScalingFactor"]);
   EXPECT_EQ(panUnstitchArch["Offset"], panOrigArch["Offset"]);
   EXPECT_EQ(panUnstitchArch["PredictMaximumExposureTime"], panOrigArch["PredictMaximumExposureTime"]);
@@ -191,12 +193,12 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(panUnstitchArch["ImageFrequency"], panOrigArch["ImageFrequency"]);
   EXPECT_EQ(panUnstitchArch["NumberOfWindows"], panOrigArch["NumberOfWindows"]);
   EXPECT_EQ(panUnstitchArch["UniqueIdentifier"], panOrigArch["UniqueIdentifier"]);
-  EXPECT_EQ(panUnstitchArch["ExposureTimestamp"], panOrigArch["ExposureTimestamp"]);  
+  EXPECT_EQ(panUnstitchArch["ExposureTimestamp"], panOrigArch["ExposureTimestamp"]);
   EXPECT_EQ(panUnstitchArch["ExposureTimePEHK"], panOrigArch["ExposureTimePEHK"]);
   EXPECT_EQ(panUnstitchArch["PixelsPossiblySaturated"], panOrigArch["PixelsPossiblySaturated"]);
   EXPECT_EQ(panUnstitchArch["WindowCount"], panOrigArch["WindowCount"]);
   EXPECT_EQ(panUnstitchArch["Window1Binning"], panOrigArch["Window1Binning"]);
-  EXPECT_EQ(panUnstitchArch["Window1StartSample"], panOrigArch["Window1StartSample"]);    
+  EXPECT_EQ(panUnstitchArch["Window1StartSample"], panOrigArch["Window1StartSample"]);
   EXPECT_EQ(panUnstitchArch["Window1EndSample"], panOrigArch["Window1EndSample"]);
   EXPECT_EQ(panUnstitchArch["Window1StartLine"], panOrigArch["Window1StartLine"]);
   EXPECT_EQ(panUnstitchArch["Window1EndLine"], panOrigArch["Window1EndLine"]);
@@ -209,7 +211,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(panUnstitchArch["Window3StartSample"], panOrigArch["Window3StartSample"]);
   EXPECT_EQ(panUnstitchArch["Window3EndSample"], panOrigArch["Window3EndSample"]);
   EXPECT_EQ(panUnstitchArch["Window3StartLine"], panOrigArch["Window3StartLine"]);
-  EXPECT_EQ(panUnstitchArch["Window3EndLine"], panOrigArch["Window3EndLine"]);  
+  EXPECT_EQ(panUnstitchArch["Window3EndLine"], panOrigArch["Window3EndLine"]);
   EXPECT_EQ(panUnstitchArch["Window4Binning"], panOrigArch["Window4Binning"]);
   EXPECT_EQ(panUnstitchArch["Window4StartSample"], panOrigArch["Window4StartSample"]);
   EXPECT_EQ(panUnstitchArch["Window4EndSample"], panOrigArch["Window4EndSample"]);
@@ -242,12 +244,12 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(panUnstitchHist->Sum(), panOrigHist->Sum());
   EXPECT_EQ(panUnstitchHist->ValidPixels(), panOrigHist->ValidPixels());
   EXPECT_EQ(panUnstitchHist->StandardDeviation(), panOrigHist->StandardDeviation());
-  
+
   // Compare Red unstitched cube to original cube
   QString redUnstitchFile = prefix.path() + "/unstitched_RED.cub";
   Cube redUnstitchCube(redUnstitchFile);
   Pvl *redUnstitchLabel = redUnstitchCube.label();
-  
+
   Cube redOrigCube(redFileName);
   Pvl *redOrigLabel = redOrigCube.label();
 
@@ -267,13 +269,13 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(redUnstitchInst["ExposureDuration"], redOrigInst["ExposureDuration"]);
   EXPECT_EQ(redUnstitchInst["SummingMode"], redOrigInst["SummingMode"]);
   EXPECT_EQ(redUnstitchInst["Filter"], redOrigInst["Filter"]);
-  
+
   // Archive Group
   PvlGroup &redUnstitchArch = redUnstitchLabel->findGroup("Archive", Pvl::Traverse);
   PvlGroup &redOrigArch = redOrigLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(redUnstitchArch["DataSetId"], redOrigArch["DataSetId"]);
   EXPECT_EQ(redUnstitchArch["ProductVersionId"], redOrigArch["ProductVersionId"]);
-  EXPECT_EQ(redUnstitchArch["ProductCreationTime"], redOrigArch["ProductCreationTime"]);  
+  EXPECT_EQ(redUnstitchArch["ProductCreationTime"], redOrigArch["ProductCreationTime"]);
   EXPECT_EQ(redUnstitchArch["ScalingFactor"], redOrigArch["ScalingFactor"]);
   EXPECT_EQ(redUnstitchArch["Offset"], redOrigArch["Offset"]);
   EXPECT_EQ(redUnstitchArch["PredictMaximumExposureTime"], redOrigArch["PredictMaximumExposureTime"]);
@@ -290,12 +292,12 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(redUnstitchArch["ImageFrequency"], redOrigArch["ImageFrequency"]);
   EXPECT_EQ(redUnstitchArch["NumberOfWindows"], redOrigArch["NumberOfWindows"]);
   EXPECT_EQ(redUnstitchArch["UniqueIdentifier"], redOrigArch["UniqueIdentifier"]);
-  EXPECT_EQ(redUnstitchArch["ExposureTimestamp"], redOrigArch["ExposureTimestamp"]);  
+  EXPECT_EQ(redUnstitchArch["ExposureTimestamp"], redOrigArch["ExposureTimestamp"]);
   EXPECT_EQ(redUnstitchArch["ExposureTimePEHK"], redOrigArch["ExposureTimePEHK"]);
   EXPECT_EQ(redUnstitchArch["PixelsPossiblySaturated"], redOrigArch["PixelsPossiblySaturated"]);
   EXPECT_EQ(redUnstitchArch["WindowCount"], redOrigArch["WindowCount"]);
   EXPECT_EQ(redUnstitchArch["Window1Binning"], redOrigArch["Window1Binning"]);
-  EXPECT_EQ(redUnstitchArch["Window1StartSample"], redOrigArch["Window1StartSample"]);    
+  EXPECT_EQ(redUnstitchArch["Window1StartSample"], redOrigArch["Window1StartSample"]);
   EXPECT_EQ(redUnstitchArch["Window1EndSample"], redOrigArch["Window1EndSample"]);
   EXPECT_EQ(redUnstitchArch["Window1StartLine"], redOrigArch["Window1StartLine"]);
   EXPECT_EQ(redUnstitchArch["Window1EndLine"], redOrigArch["Window1EndLine"]);
@@ -308,7 +310,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(redUnstitchArch["Window3StartSample"], redOrigArch["Window3StartSample"]);
   EXPECT_EQ(redUnstitchArch["Window3EndSample"], redOrigArch["Window3EndSample"]);
   EXPECT_EQ(redUnstitchArch["Window3StartLine"], redOrigArch["Window3StartLine"]);
-  EXPECT_EQ(redUnstitchArch["Window3EndLine"], redOrigArch["Window3EndLine"]);  
+  EXPECT_EQ(redUnstitchArch["Window3EndLine"], redOrigArch["Window3EndLine"]);
   EXPECT_EQ(redUnstitchArch["Window4Binning"], redOrigArch["Window4Binning"]);
   EXPECT_EQ(redUnstitchArch["Window4StartSample"], redOrigArch["Window4StartSample"]);
   EXPECT_EQ(redUnstitchArch["Window4EndSample"], redOrigArch["Window4EndSample"]);
@@ -341,13 +343,13 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(redUnstitchHist->Sum(), redOrigHist->Sum());
   EXPECT_EQ(redUnstitchHist->ValidPixels(), redOrigHist->ValidPixels());
   EXPECT_EQ(redUnstitchHist->StandardDeviation(), redOrigHist->StandardDeviation());
-  
-  
+
+
   // compare Blu unstitched cube to original cube
   QString bluUnstitchFile = prefix.path() + "/unstitched_BLU.cub";
   Cube bluUnstitchCube(bluUnstitchFile);
   Pvl *bluUnstitchLabel = bluUnstitchCube.label();
-  
+
   Cube bluOrigCube(bluFileName);
   Pvl *bluOrigLabel = bluOrigCube.label();
 
@@ -367,13 +369,13 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(bluUnstitchInst["ExposureDuration"], bluOrigInst["ExposureDuration"]);
   EXPECT_EQ(bluUnstitchInst["SummingMode"], bluOrigInst["SummingMode"]);
   EXPECT_EQ(bluUnstitchInst["Filter"], bluOrigInst["Filter"]);
-  
+
   // Archive Group
   PvlGroup &bluUnstitchArch = bluUnstitchLabel->findGroup("Archive", Pvl::Traverse);
   PvlGroup &bluOrigArch = bluOrigLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(bluUnstitchArch["DataSetId"], bluOrigArch["DataSetId"]);
   EXPECT_EQ(bluUnstitchArch["ProductVersionId"], bluOrigArch["ProductVersionId"]);
-  EXPECT_EQ(bluUnstitchArch["ProductCreationTime"], bluOrigArch["ProductCreationTime"]);  
+  EXPECT_EQ(bluUnstitchArch["ProductCreationTime"], bluOrigArch["ProductCreationTime"]);
   EXPECT_EQ(bluUnstitchArch["ScalingFactor"], bluOrigArch["ScalingFactor"]);
   EXPECT_EQ(bluUnstitchArch["Offset"], bluOrigArch["Offset"]);
   EXPECT_EQ(bluUnstitchArch["PredictMaximumExposureTime"], bluOrigArch["PredictMaximumExposureTime"]);
@@ -390,12 +392,12 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(bluUnstitchArch["ImageFrequency"], bluOrigArch["ImageFrequency"]);
   EXPECT_EQ(bluUnstitchArch["NumberOfWindows"], bluOrigArch["NumberOfWindows"]);
   EXPECT_EQ(bluUnstitchArch["UniqueIdentifier"], bluOrigArch["UniqueIdentifier"]);
-  EXPECT_EQ(bluUnstitchArch["ExposureTimestamp"], bluOrigArch["ExposureTimestamp"]);  
+  EXPECT_EQ(bluUnstitchArch["ExposureTimestamp"], bluOrigArch["ExposureTimestamp"]);
   EXPECT_EQ(bluUnstitchArch["ExposureTimePEHK"], bluOrigArch["ExposureTimePEHK"]);
   EXPECT_EQ(bluUnstitchArch["PixelsPossiblySaturated"], bluOrigArch["PixelsPossiblySaturated"]);
   EXPECT_EQ(bluUnstitchArch["WindowCount"], bluOrigArch["WindowCount"]);
   EXPECT_EQ(bluUnstitchArch["Window1Binning"], bluOrigArch["Window1Binning"]);
-  EXPECT_EQ(bluUnstitchArch["Window1StartSample"], bluOrigArch["Window1StartSample"]);    
+  EXPECT_EQ(bluUnstitchArch["Window1StartSample"], bluOrigArch["Window1StartSample"]);
   EXPECT_EQ(bluUnstitchArch["Window1EndSample"], bluOrigArch["Window1EndSample"]);
   EXPECT_EQ(bluUnstitchArch["Window1StartLine"], bluOrigArch["Window1StartLine"]);
   EXPECT_EQ(bluUnstitchArch["Window1EndLine"], bluOrigArch["Window1EndLine"]);
@@ -408,7 +410,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(bluUnstitchArch["Window3StartSample"], bluOrigArch["Window3StartSample"]);
   EXPECT_EQ(bluUnstitchArch["Window3EndSample"], bluOrigArch["Window3EndSample"]);
   EXPECT_EQ(bluUnstitchArch["Window3StartLine"], bluOrigArch["Window3StartLine"]);
-  EXPECT_EQ(bluUnstitchArch["Window3EndLine"], bluOrigArch["Window3EndLine"]);  
+  EXPECT_EQ(bluUnstitchArch["Window3EndLine"], bluOrigArch["Window3EndLine"]);
   EXPECT_EQ(bluUnstitchArch["Window4Binning"], bluOrigArch["Window4Binning"]);
   EXPECT_EQ(bluUnstitchArch["Window4StartSample"], bluOrigArch["Window4StartSample"]);
   EXPECT_EQ(bluUnstitchArch["Window4EndSample"], bluOrigArch["Window4EndSample"]);
@@ -441,13 +443,13 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(bluUnstitchHist->Sum(), bluOrigHist->Sum());
   EXPECT_EQ(bluUnstitchHist->ValidPixels(), bluOrigHist->ValidPixels());
   EXPECT_EQ(bluUnstitchHist->StandardDeviation(), bluOrigHist->StandardDeviation());
-  
-  
+
+
   // compare Nir unstitched cube to original cube
   QString nirUnstitchFile = prefix.path() + "/unstitched_NIR.cub";
   Cube nirUnstitchCube(nirUnstitchFile);
   Pvl *nirUnstitchLabel = nirUnstitchCube.label();
-  
+
   Cube nirOrigCube(nirFileName);
   Pvl *nirOrigLabel = nirOrigCube.label();
 
@@ -467,13 +469,13 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(nirUnstitchInst["ExposureDuration"], nirOrigInst["ExposureDuration"]);
   EXPECT_EQ(nirUnstitchInst["SummingMode"], nirOrigInst["SummingMode"]);
   EXPECT_EQ(nirUnstitchInst["Filter"], nirOrigInst["Filter"]);
-  
+
   // Archive Group
   PvlGroup &nirUnstitchArch = nirUnstitchLabel->findGroup("Archive", Pvl::Traverse);
   PvlGroup &nirOrigArch = nirOrigLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(nirUnstitchArch["DataSetId"], nirOrigArch["DataSetId"]);
   EXPECT_EQ(nirUnstitchArch["ProductVersionId"], nirOrigArch["ProductVersionId"]);
-  EXPECT_EQ(nirUnstitchArch["ProductCreationTime"], nirOrigArch["ProductCreationTime"]);  
+  EXPECT_EQ(nirUnstitchArch["ProductCreationTime"], nirOrigArch["ProductCreationTime"]);
   EXPECT_EQ(nirUnstitchArch["ScalingFactor"], nirOrigArch["ScalingFactor"]);
   EXPECT_EQ(nirUnstitchArch["Offset"], nirOrigArch["Offset"]);
   EXPECT_EQ(nirUnstitchArch["PredictMaximumExposureTime"], nirOrigArch["PredictMaximumExposureTime"]);
@@ -490,12 +492,12 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(nirUnstitchArch["ImageFrequency"], nirOrigArch["ImageFrequency"]);
   EXPECT_EQ(nirUnstitchArch["NumberOfWindows"], nirOrigArch["NumberOfWindows"]);
   EXPECT_EQ(nirUnstitchArch["UniqueIdentifier"], nirOrigArch["UniqueIdentifier"]);
-  EXPECT_EQ(nirUnstitchArch["ExposureTimestamp"], nirOrigArch["ExposureTimestamp"]);  
+  EXPECT_EQ(nirUnstitchArch["ExposureTimestamp"], nirOrigArch["ExposureTimestamp"]);
   EXPECT_EQ(nirUnstitchArch["ExposureTimePEHK"], nirOrigArch["ExposureTimePEHK"]);
   EXPECT_EQ(nirUnstitchArch["PixelsPossiblySaturated"], nirOrigArch["PixelsPossiblySaturated"]);
   EXPECT_EQ(nirUnstitchArch["WindowCount"], nirOrigArch["WindowCount"]);
   EXPECT_EQ(nirUnstitchArch["Window1Binning"], nirOrigArch["Window1Binning"]);
-  EXPECT_EQ(nirUnstitchArch["Window1StartSample"], nirOrigArch["Window1StartSample"]);    
+  EXPECT_EQ(nirUnstitchArch["Window1StartSample"], nirOrigArch["Window1StartSample"]);
   EXPECT_EQ(nirUnstitchArch["Window1EndSample"], nirOrigArch["Window1EndSample"]);
   EXPECT_EQ(nirUnstitchArch["Window1StartLine"], nirOrigArch["Window1StartLine"]);
   EXPECT_EQ(nirUnstitchArch["Window1EndLine"], nirOrigArch["Window1EndLine"]);
@@ -508,7 +510,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   EXPECT_EQ(nirUnstitchArch["Window3StartSample"], nirOrigArch["Window3StartSample"]);
   EXPECT_EQ(nirUnstitchArch["Window3EndSample"], nirOrigArch["Window3EndSample"]);
   EXPECT_EQ(nirUnstitchArch["Window3StartLine"], nirOrigArch["Window3StartLine"]);
-  EXPECT_EQ(nirUnstitchArch["Window3EndLine"], nirOrigArch["Window3EndLine"]);  
+  EXPECT_EQ(nirUnstitchArch["Window3EndLine"], nirOrigArch["Window3EndLine"]);
   EXPECT_EQ(nirUnstitchArch["Window4Binning"], nirOrigArch["Window4Binning"]);
   EXPECT_EQ(nirUnstitchArch["Window4StartSample"], nirOrigArch["Window4StartSample"]);
   EXPECT_EQ(nirUnstitchArch["Window4EndSample"], nirOrigArch["Window4EndSample"]);
@@ -546,10 +548,10 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
 
 TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   QTemporaryDir prefix;
-  
+
   // run tgocassis2isis and spiceinit on pan framelet.
   QString panFileName = prefix.path() + "/panframelet.cub";
-  QVector<QString> tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-PAN-00020-B1.xml",  
+  QVector<QString> tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-PAN-00020-B1.xml",
                                          "to=" + panFileName};
 
   UserInterface tgocassis2isisPan(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
@@ -559,7 +561,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
   }
-  
+
   QVector<QString> spiceinitArgs = {"from=" + panFileName,  "ckp=t", "spkp=t"};
   UserInterface spiceinitPan(SPICEINIT_XML, spiceinitArgs);
   try {
@@ -568,10 +570,10 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run spiceinit on pan image: " << e.what() << std::endl;
   }
-  
+
   // run tgocassis2isis and spiceinit on red framelet.
   QString redFileName = prefix.path() + "/redframelet.cub";
-  tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-RED-01020-B1.xml",  
+  tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-RED-01020-B1.xml",
                         "to=" + redFileName};
   UserInterface tgocassis2isisRed(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
   try {
@@ -580,7 +582,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
   }
-  
+
   spiceinitArgs = {"from=" + redFileName,  "ckp=t", "spkp=t"};
   UserInterface spiceinitRed(SPICEINIT_XML, spiceinitArgs);
   try {
@@ -589,10 +591,10 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run spiceinit on pan image: " << e.what() << std::endl;
   }
-  
+
   // run tgocassis2isis and spiceinit on blu framelet.
   QString bluFileName = prefix.path() + "/bluframelet.cub";
-  tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-BLU-03020-B1.xml",  
+  tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-BLU-03020-B1.xml",
                         "to=" + bluFileName};
   UserInterface tgocassis2isisBlu(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
   try {
@@ -601,7 +603,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run tgocassis2isis on blu image: " << e.what() << std::endl;
   }
-  
+
   spiceinitArgs = {"from=" + bluFileName,  "ckp=t", "spkp=t"};
   UserInterface spiceinitBlu(SPICEINIT_XML, spiceinitArgs);
   try {
@@ -610,10 +612,10 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run spiceinit on blu image: " << e.what() << std::endl;
   }
-  
+
   // run tgocassis2isis and spiceinit on nir framelet.
   QString nirFileName = prefix.path() + "/nirframelet.cub";
-  tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-NIR-02020-B1.xml",  
+  tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-NIR-02020-B1.xml",
                         "to=" + nirFileName};
   UserInterface tgocassis2isisNir(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
   try {
@@ -622,7 +624,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run tgocassis2isis on nir image: " << e.what() << std::endl;
   }
-  
+
   spiceinitArgs = {"from=" + nirFileName,  "ckp=t", "spkp=t"};
   UserInterface spiceinitNir(SPICEINIT_XML, spiceinitArgs);
   try {
@@ -631,17 +633,17 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run spiceinit  on nir image: " << e.what() << std::endl;
   }
-  
+
   // run mosrange on cube list
   FileList *cubeList = new FileList();
   cubeList->append(panFileName);
   cubeList->append(redFileName);
   cubeList->append(bluFileName);
   cubeList->append(nirFileName);
-  
+
   QString cubeListFile = prefix.path() + "/cubelist.lis";
   cubeList->write(cubeListFile);
-  
+
   QString mapFile = prefix.path() + "/equi.map";
   QVector<QString> mosrangeArgs = {"fromlist=" + cubeListFile, "to=" + mapFile};
   UserInterface mosrangeOptions(MOSRANGE_XML, mosrangeArgs);
@@ -652,10 +654,10 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run mosrange with cube list: " << e.what() << std::endl;
   }
-  
+
   // run cam2map on pan cube
   QString panEquiFile = prefix.path() + "/pan_equi.cub";
-  QVector<QString> cam2mapArgs = {"from=" + panFileName,    
+  QVector<QString> cam2mapArgs = {"from=" + panFileName,
                                   "to=" + panEquiFile,
                                   "map=" + mapFile};
   UserInterface cam2mapPan(CAM2MAP_XML, cam2mapArgs);
@@ -665,7 +667,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run cam2map on pan image: " << e.what() << std::endl;
   }
-  
+
   // run cam2map on nir cube
   QString nirEquiFile = prefix.path() + "/nir_equi.cub";
   cam2mapArgs = {"from=" + nirFileName, "to=" + nirEquiFile, "map=" + mapFile};
@@ -676,7 +678,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run cam2map on nir image: " << e.what() << std::endl;
   }
-  
+
   // run cam2map on blu cube
   QString bluEquiFile = prefix.path() + "/blu_equi.cub";
   cam2mapArgs = {"from=" + bluFileName, "to=" + bluEquiFile, "map=" + mapFile};
@@ -687,7 +689,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run cam2map on blu image: " << e.what() << std::endl;
   }
-  
+
   // run cam2map on red cube
   QString redEquiFile = prefix.path() + "/red_equi.cub";
   cam2mapArgs = {"from=" + redFileName, "to=" + redEquiFile, "map=" + mapFile};
@@ -698,11 +700,11 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   catch (IException &e) {
     FAIL() << "Unable to run cam2map on red image: " << e.what() << std::endl;
   }
-  
+
   // PAN Cube
   Cube panCube(panEquiFile);
   Pvl *panLabel = panCube.label();
-  
+
   // Instrument Group
   PvlGroup &inst = panLabel->findGroup("Instrument", Pvl::Traverse);
   EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
@@ -713,7 +715,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "PAN");
-  
+
   // Archive Group
   PvlGroup &archive = panLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
@@ -771,29 +773,29 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
   EXPECT_EQ(int(archive["YearDoy"]), 2016331);
   EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
-  
+
   // BandBin Group
   PvlGroup &bandbin = panLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "PAN");
   EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 677.40);
   EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 231.5);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143421");
-  
+
   // Kernels Group
   PvlGroup &kernels = panLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_EQ(int(kernels["NaifFrameCode"]), -143400);
-  
+
   Histogram *hist = panCube.histogram();
-  
+
   EXPECT_NEAR(hist->Average(), 0.082351300138231429, 0.0001);
   EXPECT_NEAR(hist->Sum(), 70857.19977273792, 0.0001);
   EXPECT_EQ(hist->ValidPixels(), 860426);
   EXPECT_NEAR(hist->StandardDeviation(), 0.0010547865346787659, 0.0001);
-  
+
   // NIR Cube
   Cube nirCube(nirEquiFile);
   Pvl *nirLabel = nirCube.label();
-  
+
   // Instrument Group
   inst = nirLabel->findGroup("Instrument", Pvl::Traverse);
   EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
@@ -804,7 +806,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "NIR");
-  
+
   // Archive Group
   archive = nirLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
@@ -862,29 +864,29 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
   EXPECT_EQ(int(archive["YearDoy"]), 2016331);
   EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
-  
+
   // BandBin Group
   bandbin = nirLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "NIR");
   EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 940.2);
   EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 120.60);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143423");
-  
+
   // Kernels Group
   kernels = nirLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_EQ(int(kernels["NaifFrameCode"]), -143400);
-  
+
   hist = nirCube.histogram();
-  
+
   EXPECT_NEAR(hist->Average(), 0.096215370187754598, 0.0001);
   EXPECT_NEAR(hist->Sum(), 78150.645788893104, 0.0001);
   EXPECT_EQ(hist->ValidPixels(), 812247);
   EXPECT_NEAR(hist->StandardDeviation(), 0.0015024999314775509, 0.0001);
-  
+
   // RED Cube
   Cube redCube(redEquiFile);
   Pvl *redLabel = redCube.label();
-  
+
   // Instrument Group
   inst = redLabel->findGroup("Instrument", Pvl::Traverse);
   EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
@@ -895,7 +897,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "RED");
-  
+
   // Archive Group
   archive = redLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
@@ -953,30 +955,30 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
   EXPECT_EQ(int(archive["YearDoy"]), 2016331);
   EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
-  
+
   // BandBin Group
   bandbin = redLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "RED");
   EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 835.40);
   EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 98);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143422");
-  
+
   // Kernels Group
   kernels = redLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_EQ(int(kernels["NaifFrameCode"]), -143400);
-  
+
   hist = redCube.histogram();
-  
+
   EXPECT_NEAR(hist->Average(), 0.098812884362865061, 0.0001);
   EXPECT_NEAR(hist->Sum(), 78810.883871480823, 0.0001);
   EXPECT_EQ(hist->ValidPixels(), 797577);
   EXPECT_NEAR(hist->StandardDeviation(), 0.0020888136703382234, 0.0001);
-  
-  
+
+
   // BLU Cube
   Cube bluCube(bluEquiFile);
   Pvl *bluLabel = bluCube.label();
-  
+
   // Instrument Group
   inst = bluLabel->findGroup("Instrument", Pvl::Traverse);
   EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
@@ -987,7 +989,7 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "BLU");
-  
+
   // Archive Group
   archive = bluLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
@@ -1045,22 +1047,102 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
   EXPECT_EQ(int(archive["YearDoy"]), 2016331);
   EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
-  
+
   // BandBin Group
   bandbin = bluLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "BLU");
   EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 497.40);
   EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 134.3);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143424");
-  
+
   // Kernels Group
   kernels = bluLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_EQ(int(kernels["NaifFrameCode"]), -143400);
-  
+
   hist = bluCube.histogram();
-  
+
   EXPECT_NEAR(hist->Average(), 0.051942847688226532, 0.0001);
   EXPECT_NEAR(hist->Sum(), 42226.834142448381, 0.0001);
   EXPECT_EQ(hist->ValidPixels(), 812948);
   EXPECT_NEAR(hist->StandardDeviation(), 0.00085567958401590197, 0.0001);
+}
+
+
+TEST(TgoCassisModuleTests, TgoCassisIngestReingest) {
+  QTemporaryDir prefix;
+
+  // run tgocassis2isis on red framelet.
+  QString redFileName = prefix.path() + "/redframelet.cub";
+  QString digestedFile = prefix.path() + "/redframelet.img";
+  QVector<QString> tgocassis2isisArgs = {
+                        "from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-RED-01020-B1.xml",
+                        "to=" + redFileName};
+  UserInterface tgocassis2isisRed(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisRed);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on red image: " << e.what() << std::endl;
+  }
+
+  // run tgocassisrdrgen on red framelet.
+  QVector<QString> rdrgenArgs = {"from=" + redFileName,  "to=" + digestedFile};
+  UserInterface rdrgenRed(RDRGEN_XML, rdrgenArgs);
+  try {
+    tgocassisrdrgen(rdrgenRed);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassisrdrgen on red image: " << e.what() << std::endl;
+  }
+
+  // run tgocassis2isis on digested red framelet.
+  QString reingestedFile = prefix.path() + "/redframelet.reingest.cub";
+  QString digestedXML = prefix.path() + "/redframelet.xml";
+  tgocassis2isisArgs = {"from=" + digestedXML, "to=" + reingestedFile};
+  UserInterface tgocassis2isisReingest(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisReingest);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on red image: " << e.what() << std::endl;
+  }
+
+  // RED Cube
+  Cube redCube(reingestedFile);
+  Pvl *redLabel = redCube.label();
+
+  // Instrument Group
+  PvlGroup &inst = redLabel->findGroup("Instrument", Pvl::Traverse);
+  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
+  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "CaSSIS");
+  EXPECT_EQ(inst["TargetName"][0].toStdString(), "Mars" );
+  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2016-11-26T22:58:02.583");
+  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
+  EXPECT_EQ(int(inst["SummingMode"]), 0);
+  EXPECT_EQ(inst["Filter"][0].toStdString(), "RED");
+
+  // Archive Group
+  PvlGroup &archive = redLabel->findGroup("Archive", Pvl::Traverse);
+  EXPECT_DOUBLE_EQ(double(archive["ProductVersionId"]), 1.0);
+  EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
+  EXPECT_EQ(int(archive["YearDoy"]), 2016331);
+  EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
+
+  // BandBin Group
+  PvlGroup &bandbin = redLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "RED");
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 840);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 100);
+  EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143422");
+
+  // Kernels Group
+  PvlGroup &kernels = redLabel->findGroup("Kernels", Pvl::Traverse);
+  EXPECT_EQ(int(kernels["NaifFrameCode"]), -143400);
+
+  Histogram *hist = redCube.histogram();
+
+  EXPECT_NEAR(hist->Average(), 0.098812884362865061, 0.0001);
+  EXPECT_NEAR(hist->Sum(), 51800.457383409142, 0.0001);
+  EXPECT_EQ(hist->ValidPixels(), 524288);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.0020888136703382234, 0.0001);
 }
