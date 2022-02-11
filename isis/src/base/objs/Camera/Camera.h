@@ -235,7 +235,7 @@ namespace Isis {
 
   class Camera : public Sensor {
     public:
-      // constructors 
+      // constructors
       Camera(Cube &cube);
 
       // destructor
@@ -279,7 +279,7 @@ namespace Isis {
       virtual double SampleResolution();
       virtual double DetectorResolution();
 
-      virtual double ObliqueDetectorResolution(bool useLocal = true);
+      virtual double ObliqueDetectorResolution(bool useLocal = false);
       virtual double ObliqueSampleResolution();
       virtual double ObliqueLineResolution();
       virtual double ObliquePixelResolution();
