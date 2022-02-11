@@ -408,13 +408,41 @@ namespace Isis {
 /**
  * This is used to display the updated parameters when an app is called with -last
  * 
- * @return QString returnString- the updated command line 
+ * @return QString currentCommandLine - the current command line stored from the last run of an app
  */
-QString UserInterface::buildNewCommandLine(){
-  QString returnString = "";
+QString UserInterface::buildNewCommandLine(QString currentCommandLine){
+  QString returnString = "";  
+  vector<QString> valuesToUpdate;
+
+  // loop user input cmd line & get updated params
   for(auto i:p_cmdline){
-    returnString += i;
-    returnString += " ";
+    QString inputParam = i;
+
+    // check for updated args in cmd line
+    if(inputParam.contains("=", Qt::CaseInsensitive)){
+      valuesToUpdate.push_back(inputParam);
+      }
+    }
+
+  // loop currentCommandLine and update returnString 
+  for(auto i:currentCommandLine.split(" ")){
+    QString paramVale = i;
+    
+    // loop values to update
+    for(auto j:valuesToUpdate){
+      QString updateVal = j;
+
+      // check to see if if the histoy param is the same as our input param
+      if(paramVale.split("=")[0].startsWith(updateVal.split("=")[0].toUpper())
+                          && !returnString.contains(paramVale.split("=")[0])){
+        returnString += paramVale.split("=")[0] + "=" + updateVal.split("=")[1] + " ";
+      }
+    }
+    
+    // add unchanged parameter to return string 
+    if(!returnString.contains(paramVale.split("=")[0])){
+      returnString += paramVale + " ";
+    }
   }
   return returnString;
 }
@@ -531,9 +559,6 @@ QString UserInterface::buildNewCommandLine(){
       }
 
     } 
-    if( usedDashLast == true){  
-        cout << buildNewCommandLine() << endl;;
-    }
 
     // Can't use the batchlist with the gui, save, last or restore option
     if ( BatchListSize() != 0 && (p_interactive || usedDashLast || p_saveFile != ""
@@ -602,11 +627,12 @@ QString UserInterface::buildNewCommandLine(){
               PutAsString(keyword, values);
               commandline += keyword + "=";
               foreach(QString val, values) {
-                commandline += val + " ";
+              commandline += val + " ";
               }
             }
           }
 
+          cout << buildNewCommandLine(commandline) << endl;
           return;
         }
 
