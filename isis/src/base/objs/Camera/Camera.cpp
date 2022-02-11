@@ -586,8 +586,10 @@ namespace Isis {
    */
   double Camera::ObliqueDetectorResolution(bool useLocal) {
 
+    std::cout << "checking intersect" << std::endl;
 
     if(!HasSurfaceIntersection()) {
+      std::cout << "no intersect" << std::endl;
       return Isis::Null;
     }
 
@@ -1669,6 +1671,7 @@ namespace Isis {
     SpiceDouble mag;
     unorm_c(normal,normal,&mag);
     if (mag == 0.) {
+      std::cout << "0 mag" << std::endl;
       success = false;
       return;
     }
