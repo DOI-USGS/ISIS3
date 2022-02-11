@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include <nlohmann/json.hpp>
+#include "QString"
 
 namespace Isis {
   class Pvl;
@@ -18,6 +19,7 @@ namespace Isis {
   class PvlObject;
 
   nlohmann::json pvlToJSON(Pvl &pvl);
+  nlohmann::json pvlToJSON(QString pvlFile);
   nlohmann::json pvlContainerToJSON(PvlContainer &container);
   nlohmann::json pvlKeywordToJSON(PvlKeyword &keyword);
   nlohmann::json pvlGroupToJSON(PvlGroup &group);
