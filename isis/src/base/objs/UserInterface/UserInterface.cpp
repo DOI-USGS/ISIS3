@@ -438,7 +438,7 @@ QString UserInterface::buildNewCommandLine(QString currentCommandLine){
         returnString += paramVale.split("=")[0] + "=" + updateVal.split("=")[1] + " ";
       }
     }
-    
+
     // add unchanged parameter to return string 
     if(!returnString.contains(paramVale.split("=")[0])){
       returnString += paramVale + " ";
@@ -545,6 +545,7 @@ QString UserInterface::buildNewCommandLine(QString currentCommandLine){
         if ( paramValue.size() ) {
           realValue = paramValue[0];
         }
+        
         evaluateOption(paramName, realValue);
 
         continue;
@@ -558,7 +559,7 @@ QString UserInterface::buildNewCommandLine(QString currentCommandLine){
         throw IException(e, IException::User, "Invalid command line", _FILEINFO_);
       }
 
-    } 
+    }
 
     // Can't use the batchlist with the gui, save, last or restore option
     if ( BatchListSize() != 0 && (p_interactive || usedDashLast || p_saveFile != ""
@@ -627,7 +628,7 @@ QString UserInterface::buildNewCommandLine(QString currentCommandLine){
               PutAsString(keyword, values);
               commandline += keyword + "=";
               foreach(QString val, values) {
-              commandline += val + " ";
+                commandline += val + " ";
               }
             }
           }
