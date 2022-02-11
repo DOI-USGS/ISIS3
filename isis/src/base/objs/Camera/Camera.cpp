@@ -576,7 +576,7 @@ namespace Isis {
    *
    *   <b>Reference 2:</b>  Handwritten notes by Orrin Thomas which can be found in the
    *                 Glossary under the entry for Oblique Detector Resolution.
-   * 
+   *
    * @param useLocal If true, emission is fetched from LocalPhotometricAngles.
    *                 Otherwise, emission is fetched from EmissionAngle().
    *                 This is an optional parameter that defaults to true,
@@ -586,10 +586,8 @@ namespace Isis {
    */
   double Camera::ObliqueDetectorResolution(bool useLocal) {
 
-    std::cout << "checking intersect" << std::endl;
 
     if(!HasSurfaceIntersection()) {
-      std::cout << "no intersect" << std::endl;
       return Isis::Null;
     }
 
@@ -656,8 +654,8 @@ namespace Isis {
    *
    * @return @b double The sample resolution
    */
-  double Camera::ObliqueSampleResolution() {
-    return ObliqueDetectorResolution() * p_detectorMap->SampleScaleFactor();
+  double Camera::ObliqueSampleResolution(bool useLocal) {
+    return ObliqueDetectorResolution(useLocal) * p_detectorMap->SampleScaleFactor();
   }
 
 
@@ -678,8 +676,8 @@ namespace Isis {
    *
    * @return @b double The line resolution
    */
-  double Camera::ObliqueLineResolution() {
-    return ObliqueDetectorResolution() * p_detectorMap->LineScaleFactor();
+  double Camera::ObliqueLineResolution(bool useLocal) {
+    return ObliqueDetectorResolution(useLocal) * p_detectorMap->LineScaleFactor();
   }
 
 
@@ -702,9 +700,9 @@ namespace Isis {
    *
    * @return @b double The pixel resolution
    */
-  double Camera::ObliquePixelResolution() {
-    double lineRes = ObliqueLineResolution();
-    double sampRes = ObliqueSampleResolution();
+  double Camera::ObliquePixelResolution(bool useLocal) {
+    double lineRes = ObliqueLineResolution(useLocal);
+    double sampRes = ObliqueSampleResolution(useLocal);
     if (lineRes < 0.0) return Isis::Null;
     if (sampRes < 0.0) return Isis::Null;
     return (lineRes + sampRes) / 2.0;

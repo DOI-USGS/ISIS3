@@ -280,9 +280,9 @@ namespace Isis {
       virtual double DetectorResolution();
 
       virtual double ObliqueDetectorResolution(bool useLocal = true);
-      virtual double ObliqueSampleResolution();
-      virtual double ObliqueLineResolution();
-      virtual double ObliquePixelResolution();
+      virtual double ObliqueSampleResolution(bool useLocal = true);
+      virtual double ObliqueLineResolution(bool useLocal = true);
+      virtual double ObliquePixelResolution(bool useLocal = true);
 
 
       virtual double resolution();
