@@ -67,6 +67,7 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 - Fixed Maptrim failures when mode=both for PositiveWest longitude direction. [#4646](https://github.com/USGS-Astrogeology/ISIS3/issues/4646)
 - Fixed the Vesta target name not being translated properly in dawnfc2isis. [#4638](https://github.com/USGS-Astrogeology/ISIS3/issues/4638)
 - Fixed a bug where the measure residuals reported in the bundleout.txt file were incorrect. [#4655](https://github.com/USGS-Astrogeology/ISIS3/issues/4655)
+- Fuxed a bug where jigsaw would raise an error when solving for framing camera pointing in observation mode. [#4686](https://github.com/USGS-Astrogeology/ISIS3/issues/4686)
 
 ## [6.0.0] - 2021-08-27
 

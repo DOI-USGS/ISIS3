@@ -241,9 +241,33 @@ namespace Isis {
       footprintNode.parentNode().removeChild(footprintNode);
     }
 
+    if(label->findObject("IsisCube").hasGroup("Archive")) {
+      PvlGroup archiveGroup = label->findObject("IsisCube").findGroup("Archive");
+
+      if (archiveGroup.hasKeyword("Browse")) {
+        PvlKeyword browseKeyword = archiveGroup.findKeyword("Browse");
+
+        QDomElement referenceListNode = pdsLabelNext.documentElement().firstChildElement("Reference_List");
+        QDomElement browseNode = pdsLabel.createElement("Browse");
+
+        for (int i = 0; i < browseKeyword.size(); i++) {
+          QString browseFile = browseKeyword[i];
+          QStringList browseComponentList = browseFile.split(QLatin1Char('_'));
+
+          QDomElement browseItem = pdsLabel.createElement("browse_record");
+          browseItem.setAttribute("record_num", i);
+          browseItem.setAttribute("filterType", browseComponentList[4]);
+
+          QDomText browseText = pdsLabel.createTextNode(browseFile);
+          browseItem.appendChild(browseText);
+          browseNode.appendChild(browseItem);
+        }
+        referenceListNode.appendChild(browseNode);
+      }
+    }
+
     QString outFile = ui.GetFileName("TO");
 
     process.WritePds4(outFile);
   }
 }
-
