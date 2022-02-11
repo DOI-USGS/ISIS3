@@ -545,7 +545,7 @@ QString UserInterface::buildNewCommandLine(QString currentCommandLine){
         if ( paramValue.size() ) {
           realValue = paramValue[0];
         }
-        
+
         evaluateOption(paramName, realValue);
 
         continue;
