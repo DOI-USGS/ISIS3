@@ -21,10 +21,10 @@ the public API is.
 argument signatures, and return signatures for functions, classes,
 and objects.
 
-	- C++ code exceptions would be those structures above marked with
-      a "private" access specifier via the C++ language.
-    - Python code exceptions would be those structures above which begin 
-      with an underbar ("_", as per Python language tradition).
+- C++ code exceptions would be those structures above marked with
+  a "private" access specifier via the C++ language.
+- Python code exceptions would be those structures above which begin 
+  with an underbar ("_", as per Python language tradition).
 
 **User-facing command-line and GUI programs**: program name, argument
 list, argument defaults, configuration or preference names and their
