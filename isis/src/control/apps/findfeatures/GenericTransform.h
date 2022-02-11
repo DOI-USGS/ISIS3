@@ -33,8 +33,9 @@ namespace Isis {
  *                           documentation
  *   @history 2021-10-30 Kris J. Becker Added verify parameter to
  *                           calculateInverse() method; if verify==true, the
- *                           inverse matrix is tested if it is indeed
+ *                           matrix is tested if it is indeed
  *                           invertable.
+ *   @history 2022-02-07 Kris Becker Modifications in response to code review
  */
 class GenericTransform : public ImageTransform {
   public:

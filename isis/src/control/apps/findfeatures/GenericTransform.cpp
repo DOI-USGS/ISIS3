@@ -129,22 +129,32 @@ cv::Point2f GenericTransform::inverse(const cv::Point2f &point) const {
  * safer method that is applied here that will test if the matrix is invertable.
  * If its not invertable and verify == true, then an exception is thrown.
  *
+ * @internal
  * @author 2021-10-03 Kris J. Becker
+ * @history 2022-02-07 Kris Becker Modifications in response to code review
  *
  * @param matrix Square matrix to invert
- * @param verify If true will throw an exception if not invertable
+ * @param verify If true will throw an exception if not invertable unless
+ *                 an actual error does occur, which throws unconditionally
  *
  * @return cv::Mat Inverted matrix
  */
 cv::Mat GenericTransform::computeInverse(const cv::Mat &matrix,
                                          const bool verify) {
   cv::Mat inverse;
-  double result = cv::invert(matrix, inverse);
-  if ( verify == true ) {
-    if ( qFuzzyCompare(result+1.0, 0.0+1.0) ) {
-      QString msg = "cv::Mat inverse matrix is not invertable";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
+  try {
+    double result = cv::invert(matrix, inverse);
+    if ( verify ) {
+      if ( 0.0 == result ) {
+        QString msg = "Transformation matrix is not invertable";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
     }
+  }
+ catch ( std::exception &e ) {
+    // This will also catch any ISIS error
+    QString msg = "Matrix inversion error: " + QString(e.what());
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   return ( inverse );

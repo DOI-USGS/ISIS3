@@ -1185,6 +1185,12 @@ Group = MatchSolution
         transform algorithm using new radial point mapping scheme. Add more
         debugging output to help diagnose problem images/procedures.
     </change>
+    <change name="Kris Becker" date="2022-02-08">
+        Reorganized FastGeom (added methods radial_algorithm(), grid_algorithm()
+        and dump_point_mapping()) and cleaned up code after USGS/Astro code
+        review. Added new paramter GLOBALS that provides convenience for setting
+        or resetting algorithm or processing variables. (Fixes #4772)
+    </change>
   </history>
 
   <groups>
@@ -1583,6 +1589,33 @@ End
           <filter>*.conf</filter>
       </parameter>
 
+      <parameter name= "GLOBALS">
+            <type>string</type>
+            <brief>String containing global parameters and values</brief>
+            <description>
+                <p>
+                    This string can contain additional parameters that will
+                    set or reset global parameters provded by other mechanisms.
+                    This program option is primarily useful for making small
+                    scale adjustments to algorithm parameters in a convenient
+                    and efficient manner.
+                </p>
+                <p>
+                    For example, using this parameter is the most straightforward
+                    way to select the FASTGEOM algorithm. To select the FastGeom
+                    Grid algorithm and constrain the number of interations to 10,
+                    use GLOBALS=FastGeomAlgorithm:Grid@FastGeomGridStopIteration:10".
+                </p>
+                <p>
+                    There is very little robust error detection or any confirmation
+                    that the parameter names are valid. Any misspelled parameters
+                    are not detected and ill-formed parameter strings may not
+                    result in errors, but passthrough and mangle other parameter
+                    construction.
+                </p>
+            </description>
+          <internalDefault>None</internalDefault>
+      </parameter>
 
       <parameter name= "MAXPOINTS">
             <type>integer</type>
@@ -1818,8 +1851,7 @@ End
 
            <option value="SCHARR">
                <brief>
-                  Apply  Scharr filtering to both FROM and MATCH images for
-                  enhanced edges.
+                  Apply Scharr filtering to both FROM and MATCH images for enhanced edges.
                </brief>
                <description>
                  A <a href="http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=sobel#scharr">
@@ -1951,8 +1983,7 @@ End
 
        <parameter name="GEOMSOURCE">
             <type>string</type>
-            <brief>Specify which input file provides lat/lons for control
-              point</brief>
+            <brief>Specify which input file provides lat/lons for control point</brief>
             <description>
                For input files that provide geometry, specify which one provides
                the latitude/longitude values for each control point.  NONE is
@@ -1985,8 +2016,7 @@ End
                 </option>
                <option value="MATCH">
                     <brief>
-                       Use the MATCH file to compute geometries for control
-                    points
+                       Use the MATCH file to compute geometries for control points
                     </brief>
                     <description>
                         Selection of the MATCH option indicates use of the MATCH
@@ -1996,8 +2026,7 @@ End
                 </option>
                 <option value="BOTH">
                     <brief>
-                       Use BOTH files to compute/verify geometries for control
-                    points
+                       Use BOTH files to compute/verify geometries for control points
                     </brief>
                     <description>
                         Selection of the BOTH option indicates that the MATCH

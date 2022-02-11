@@ -95,6 +95,7 @@ namespace Isis {
  *   @history 2019-05-16 Aaron Giroux & Eric Gault - Added a regular expression to
  *                           formatSpecifications method to allow for pathnames to be entered
  *                           using the savepath parameter. Fixes 2474.
+ *   @history 2022-02-10 Kris Becker Added parseGlobalParamters() static method
  */
 class FeatureAlgorithmFactory  {
   public:
@@ -105,6 +106,7 @@ class FeatureAlgorithmFactory  {
 
     QStringList getListAll() const;
 
+    static PvlFlatMap parseGlobalParameters(const QString &globals);
     void setGlobalParameters(const PvlFlatMap &globals);
     void addGlobalParameters(const PvlFlatMap &globals);
     void addParameter(const QString &name, const QString &value);

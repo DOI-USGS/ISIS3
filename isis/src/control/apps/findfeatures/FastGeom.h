@@ -58,6 +58,8 @@ class ImageTransform;
  *   @history 2022-02-02 Kris Becker Added Grid implementation resulting in
  *                                     consolidation/abstraction of Radial
  *                                     algorithm code
+ *   @history 2022-02-07 Kris Becker Modifications in response to USGS/Astro
+ *                                     code review in PR #4772
  */
 
 class FastGeom {
@@ -75,6 +77,21 @@ class FastGeom {
     // ImageTransform *compute(MatchImage &query, MatchImage &train) const;
     ImageTransform *compute(MatchImage &query, MatchImage &train,
                             QLogger logger = QLogger() ) const;
+
+    int radial_algorithm(MatchImage &query, MatchImage &train,
+                        const FGFov &q_fov, const FGFov &t_fov,
+                        const PvlFlatMap &parameters,
+                        std::vector<FGPoint> &q_infov_points,
+                        std::vector<FGPoint> &t_infov_points,
+                        QLogger logger = QLogger()) const;
+
+    int  grid_algorithm(MatchImage &query, MatchImage &train,
+                        const FGFov &q_fov, const FGFov &t_fov,
+                        const PvlFlatMap &parameters,
+                        std::vector<FGPoint> &q_infov_points,
+                        std::vector<FGPoint> &t_infov_points,
+                        QLogger logger = QLogger()) const;
+
     void apply(MatchImage &query, MatchImage &train, QLogger logger = QLogger() ) const;
 
     static cv::Mat getTransformMatrix(const std::vector<FGPoint> &querypts,
@@ -84,6 +101,14 @@ class FastGeom {
                                       QLogger logger = QLogger() );
 
     PvlFlatMap getParameters() const;
+
+    void dump_point_mapping(MatchImage &query, MatchImage &train,
+                          const QString &method, const PvlFlatMap &parameters,
+                          const std::vector<FGPoint> &q_points,
+                          const std::vector<FGPoint> &t_points,
+                          const std::vector<SurfacePoint> &q_surface_points,
+                          const std::vector<bool> &t_inFOV,
+                          QLogger logger = QLogger()) const;
 
   private:
     int        m_fastpts;    //!< Number of points to use for geom
@@ -95,20 +120,6 @@ class FastGeom {
 
     void validate( const QString &geomtype ) const;
 
-    /** Determine if point is in defined FOV for x,y */
-    inline bool in_fov(const FGPoint &point,
-                       const double xmin, const double xmax,
-                       const double ymin, const double ymax)
-                       const {
-
-      // Test if in FOV consistent with ISIS image coordinates
-      if ( (point.x >= xmin ) && (point.x < xmax ) ) {
-        if ( ( point.y >= ymin ) && (point.y < ymax ) ) {
-          return (true);
-        }
-      }
-      return (false);
-    }
 };
 
 }  // namespace Isis

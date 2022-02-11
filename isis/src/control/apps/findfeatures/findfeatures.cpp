@@ -105,19 +105,21 @@ namespace Isis {
    * to the matcher.
    *
    * @author 2021-10-29 Kris J. Becker
+   * @history 2022-02-08 Kris J. Becker Clarified parameter description and added
+   *                       explanation of return function return condition; modified
+   *                       return logic
    *
    * @param matcher    The source reponsible for managing the matcher process
    * @param trainfile  File name to load
-   * @param fastgeom   Apply FastGeom if provded. Errors will return false with
-   *                      no adding to the matcher
+   * @param fastgeom   Apply FastGeom if provided
    *
-   * @return bool
+   * @return bool      Any errors encountered will return false without adding
+   *                      the train image to the matcher
    */
   static bool load_train_with_geom(MatchMaker &matcher, const QString trainfile,
                                   QDebugStream &logger,
                                   const FastGeom *fastgeom = 0) {
 
-    bool isGood = false;  // If anything goes wrong...
     try {
       MatchImage t_image = MatchImage( ImageSource(trainfile) );
 
@@ -134,13 +136,13 @@ namespace Isis {
 
       // If alls good...expection should be thrown above otherwise
       matcher.addTrainImage( t_image );
-      isGood = true;
     }
     catch ( IException &ie ) {
-      isGood = false;
+      logger->dbugout() << "Failed to load " << trainfile << "\n\n";
+      return ( false );
     }
 
-    return ( isGood );
+    return ( true );
   }
 
   void findfeatures(UserInterface &ui, Pvl *log) {
@@ -246,6 +248,12 @@ namespace Isis {
       aspec.append( algos.join("|") );
     }
 
+    // Now reset any global parameters provided by the user
+    if ( ui.WasEntered("GLOBALS") ) {
+      QString gblparms = ui.GetString("GLOBALS");
+      factory->addGlobalParameters(factory->parseGlobalParameters(gblparms));
+      factory->addParameter("GLOBALS", gblparms);
+    }
 
     // Create a list of algorithm specifications from user specs and log it
     // if requested
@@ -292,7 +300,8 @@ namespace Isis {
     if ( "from"  == geomsource ) { matcher.setGeometrySourceFlag(MatchMaker::Train); }
     if ( "both"  == geomsource ) { matcher.setGeometrySourceFlag(MatchMaker::Both); }
 
-    // Trap load errors
+    // Trap load errors. Maintain a bad geom/load file list
+    FileList badgeom;
     try {
 
       logger->dbugout() << "\nImage load started at  " << Application::DateTime() << "\n";
@@ -301,11 +310,7 @@ namespace Isis {
       QScopedPointer<FastGeom> fastgeom;
       if ( ui.GetBoolean("FASTGEOM") ) {
         fastgeom.reset( new FastGeom( factory->globalParameters() ) );
-        // matcher.foreachPair( geom );  // DO NOT USE - old form has no error control
       }
-
-      // Maintain a bad geom/load file list
-      FileList badgeom;
 
       // Acquire query image. Do not use load_train_with_geom()!!!
       matcher.setQueryImage(MatchImage(ImageSource(ui.GetAsString("MATCH"))));
@@ -360,9 +365,9 @@ namespace Isis {
     if ( matcher.size() <= 0 ) {
       logger->dbugout() << "\n\n###   No valid files loaded - aborting...\n";
       logger->dbugout() <<     "Time: " << Application::DateTime() << "\n";
-      throw IException(IException::User,
-                        "Must provide both a valid FROM/FROMLIST and MATCH cube or image filename",
-                        _FILEINFO_);
+      QString msg = "Input cubes (" + QString::number(badgeom.size()) + ") failed to load. " +
+                    "Must provide valid FROM/FROMLIST and MATCH cube or image filenames";
+      throw IException(IException::User, msg,  _FILEINFO_);
     }
 
     // Check for Sobel/Scharr filtering options for both Train and Images
@@ -436,7 +441,7 @@ namespace Isis {
                                                       best->target();
       cnet.SetTarget( target );
       ID pointId( ui.GetString("POINTID"), ui.GetInteger("POINTINDEX") );
-      // matcher.setDebugOff();  TURN ON DEBUG OUTPUT FOR NETWORK GENERATION!
+
       PvlGroup cnetinfo = matcher.network(cnet, *best, pointId);
 
       if ( cnet.GetNumPoints() <= 0 ) {
