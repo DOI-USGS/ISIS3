@@ -22,18 +22,18 @@ TEST_F(DemCube, CameraObliqueResolution) {
     c = testCube->camera();
 
     c->SetImage(1, 1);
-    EXPECT_NEAR(c->ObliqueDetectorResolution(), 19.1806, 1e-4);
-    EXPECT_NEAR(c->ObliqueDetectorResolution(true), 19.2435, 1e-4);
+    EXPECT_NEAR(c->ObliqueDetectorResolution(false), 19.1806, 1e-4);
+    EXPECT_NEAR(c->ObliqueDetectorResolution(), 19.2435, 1e-4);
 
     c->SetImage(1, 1055);
-    EXPECT_NEAR(c->ObliqueDetectorResolution(), 19.4278, 1e-4);
-    EXPECT_NEAR(c->ObliqueDetectorResolution(true), 19.7497, 1e-4);
+    EXPECT_NEAR(c->ObliqueDetectorResolution(false), 19.4278, 1e-4);
+    EXPECT_NEAR(c->ObliqueDetectorResolution(), 19.7497, 1e-4);
 
     c->SetImage(1203, 1055);
-    EXPECT_NEAR(c->ObliqueDetectorResolution(), 19.5252, 1e-4);
-    EXPECT_NEAR(c->ObliqueDetectorResolution(true), 19.8820, 1e-4);
+    EXPECT_NEAR(c->ObliqueDetectorResolution(false), 19.5252, 1e-4);
+    EXPECT_NEAR(c->ObliqueDetectorResolution(), 19.8820, 1e-4);
 
     c->SetImage(1203, 1);
-    EXPECT_NEAR(c->ObliqueDetectorResolution(), 19.2788, 1e-4);
-    EXPECT_NEAR(c->ObliqueDetectorResolution(true), 19.3449, 1e-4);
+    EXPECT_NEAR(c->ObliqueDetectorResolution(false), 19.2788, 1e-4);
+    EXPECT_NEAR(c->ObliqueDetectorResolution(), 19.3449, 1e-4);
 }
