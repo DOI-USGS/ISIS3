@@ -1669,7 +1669,6 @@ namespace Isis {
     SpiceDouble mag;
     unorm_c(normal,normal,&mag);
     if (mag == 0.) {
-      std::cout << "0 mag" << std::endl;
       success = false;
       return;
     }
