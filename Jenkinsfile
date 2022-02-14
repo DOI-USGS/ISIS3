@@ -1,8 +1,8 @@
 // vim: ft=groovy
 
-def labels = ['centos', 'fedora', 'ubuntu', 'mac'] // labels for Jenkins node types we will build on
+def labels = ['centos', 'fedora', 'ubuntu'] // labels for Jenkins node types we will build on
 def nodes = [:] 
-def ISIS_VERSION="4.4.0_RC1"
+def ISIS_VERSION="7.0.0_RC1"
 
 for (lbl in labels) {
     def label = lbl 
