@@ -17,14 +17,20 @@ the public API is.
 
 ## General Guidance
 
-**Code-level structures**: Function, class, and object names,
-argument signatures, and return signatures for functions, classes,
-and objects.
+The public API consists of the following.
 
-- C++ code exceptions would be those structures above marked with
-  a "private" access specifier via the C++ language.
-- Python code exceptions would be those structures above which begin 
-  with an underbar ("_", as per Python language tradition).
+**Code-level structures**: Public function, member, and class names,
+argument signatures, and their return signatures.  Where "public"
+is defined as those elements that are typically provided for use external
+to a library or module, dependent on the language.
+
+Some examples are:
+
+- C++ public structures are those that can be access by including
+  the distributed header files for libraries.
+- Python public structures are those that do not begin with an underbar
+  ("_"), as described in PEP 8.
+
 
 **User-facing command-line and GUI programs**: program name, argument
 list, argument defaults, configuration or preference names and their
@@ -41,6 +47,21 @@ a user can expect as far as the structure of the output.
 
 
 ## More Specific Examples
+
+Adding new arguments to code level structures does not violate the
+existing public API as long as they provide a default value. For
+example changing a function *doThing(int a, double b)* to *doThing(int
+a, double b, double c=1.0)* does not violate the existing API for
+the *doThing* function as code that calls the *doThing* function will
+still compile without modification.
+
+Adding new optional arguments or arguments with default values to
+command line programs does not violate the existing public API. For
+example, adding a new argument called "check" that has a default
+value of "false" to a command line program does not violate the
+program's public API as scripts and commands that were valid
+previously are still valid after the addition.
+
 
 ### Unstructured text files
 
