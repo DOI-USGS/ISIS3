@@ -44,6 +44,9 @@ release.
 synchronized with footprintinit default values of the same parameters.
 This corrects inconsistencies of footprint generation failing in caminfo
 but passing in footprintinit. [#4651](https://github.com/USGS-Astrogeology/ISIS3/issues/4651).
+- Changed the internal logic of ObliqueDataResolution() to use LocalEmission angle rather than Emission angle.
+This will cause differences in output; new values will be more accurate because they use DEM rather than
+ellipsoid. The cost to compute the local emissoin will increase by approximately x1.5. [#3600](https://github.com/USGS-Astrogeology/ISIS3/issues/3600)
 
 ### Added
 - Added the USECAMSTATSTBL option to caminfo. This allows caminfo to extract existing
