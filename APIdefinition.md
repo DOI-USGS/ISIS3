@@ -35,8 +35,8 @@ Some examples are:
 **User-facing command-line and GUI programs**: program name, argument
 list, argument defaults, configuration or preference names and their
 defaults, and for those programs with structured output files, the
-structure and contents of those output files are analogous to the
-return signatures of code-level structures.
+structure of those output files are analogous to the return signatures
+of code-level structures.
 
 
 This guidance may be more straightforward to understand and apply
