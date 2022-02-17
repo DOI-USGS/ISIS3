@@ -87,7 +87,7 @@ In this step, we will prepare the local repository to build from as well as upda
 
   * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.**** 
 
-* Update the `build` and `run` sections by copying the current contents of `environment.yaml` into the `build` section and `run` section. Next, remove `xalan-c` and `doxygen` from both the `build` and the `run` section, as documentation is not built during this process. From the `run` section, also remove: `make`, `cmake`, and `ninja`, as they are only needed for the build. 
+* Update the `build` section by copying the current contents of `environment.yaml` into the `build` section. Update the `run` section to include any new packages and remove any packages that are no longer needed. 
 
   
 
@@ -140,9 +140,7 @@ Anaconda leverages caching in many places which can cause issues. If you are get
 
 ### Part A: Operating System 
 
-* Ensure the OS on the machine you are building the release on is the appropriate operating system (Mac OS 10.13 or Ubuntu 18 LTS). 
-
-    * If you do not have access to a Mac OS 10.14, you can ssh into prog26. 
+* Ensure the OS on the machine you are building the release on is the appropriate operating system (Mac OS 11.6 or Ubuntu 18 LTS). 
 
     * If you do not have access to a Ubuntu 18 LTS, you can ssh into prog28. 
 
@@ -180,7 +178,7 @@ commands:
 
     * Ensure you are at the head of the release branch ```git pull upstream <version branch>``` 
 
-* Run the bash script in the root of the directory: ``` buildCondaRelease.sh```. This script will remove a CMake parameter that is used for jenkins and create a conda build running the conda build command:```conda build recipe/ -c usgs-astrogeology -c conda-forge``` 
+* Run the bash script in the root of the directory: ``` buildCondaRelease.sh```. This script will remove a CMake parameter that is used for jenkins and create a conda build running the conda build command:```conda build recipe/ -c conda-forge -c usgs-astrogeology --override-channels``` 
 
   * The -c options are to give conda a channel priority. Without these, conda will always attempt to download from the default Anaconda channel first. (Unlike the environment.yml files, channel priority cannot be defined within the meta.yaml.)
 
@@ -220,7 +218,7 @@ If the upload fails or displays a prompt for a username and password, try adding
 
 Back up the build by copying the .tar.bz2 to: 
 
-  * /work/projects/conda-bld/osx-64/ for Mac OS 10.14.  
+  * /work/projects/conda-bld/osx-64/ for Mac OS 11.6.  
 
   * /work/projects/conda-bld/linux-64/ for Ubuntu 18 LTS. 
 
@@ -345,10 +343,8 @@ Copy this release's section of the Changelog here
 The following operating systems are supported for this release: 
 
 
-* Fedora 28 
 * Ubuntu 18.04 
-* CentOS 7.0 
-* macOS Mohave 10.14 
+* macOS Mohave 11.6
 
 (Other Linux/macOS variants may be able to run this release, but are not officially supported.) 
 
