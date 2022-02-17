@@ -26,6 +26,11 @@ for (lbl in labels) {
                     """
                   }
                     
+                  sh """
+                    ${condaPath}/bin/conda config --env --add channels conda-forge
+                    ${condaPath}/bin/conda config --env --add channels usgs-astrogeology
+                  """
+                    
                   // skip build for centos
                   if ("${label}" != "centos") {
                     checkout scm
@@ -41,8 +46,6 @@ for (lbl in labels) {
                   sh """
                      ${condaPath}/bin/conda config --set always_yes True
                      ${condaPath}/bin/conda config --set ssl_verify false
-                     ${condaPath}/bin/conda config --env --add channels conda-forge
-                     ${condaPath}/bin/conda config --env --add channels usgs-astrogeology
                      
                      ${condaPath}/bin/conda create -n isis -c usgs-astrogeology/label/RC isis=${ISIS_VERSION}
 
