@@ -114,6 +114,7 @@ requirements:
   - {{ pin_compatible('ale') }}
   - {{ pin_compatible('aom', max_pin='x.x') }}
   - {{ pin_compatible('boost', max_pin='x.x') }}
+  - {{ pin_compatible('boost-cpp', max_pin='x.x') }}
   - blas
   - {{ pin_compatible('bullet', max_pin='x.x') }}
   - bz2file
@@ -134,7 +135,11 @@ requirements:
   - {{ pin_compatible('jasper', max_pin='x.x') }}
   - {{ pin_compatible('jpeg', max_pin='x') }}
   - {{ pin_compatible('kakadu', max_pin='x') }}
+  - libcxx
+  - libopenblas
+  - {{ pin_compatible('libopencv', max_pin='x.x') }}
   - {{ pin_compatible('libpng') }}
+  - libtiff
   - mesalib
   - mysql
   - nanoflann
