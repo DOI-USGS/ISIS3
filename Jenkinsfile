@@ -27,8 +27,8 @@ for (lbl in labels) {
                   }
                     
                   sh """
-                    ${condaPath}/bin/conda config --env --add channels conda-forge
                     ${condaPath}/bin/conda config --env --add channels usgs-astrogeology
+                    ${condaPath}/bin/conda config --env --add channels conda-forge
                   """
                     
                   // skip build for centos
@@ -39,7 +39,7 @@ for (lbl in labels) {
                       git checkout dev 
                       cd recipe 
                       ${condaPath}/bin/conda install conda-build
-                      ${condaPath}/bin/conda build . --no-anaconda-upload  
+                      ${condaPath}/bin/conda build . -c conda-forge -c usgs-astrogeology --no-anaconda-upload  
                     """
                   }
                   
@@ -47,7 +47,7 @@ for (lbl in labels) {
                      ${condaPath}/bin/conda config --set always_yes True
                      ${condaPath}/bin/conda config --set ssl_verify false
                      
-                     ${condaPath}/bin/conda create -n isis -c usgs-astrogeology/label/RC isis=${ISIS_VERSION}
+                     ${condaPath}/bin/conda create -n isis -c conda-forge -c usgs-astrogeology/label/RC isis=${ISIS_VERSION}
 
                      export ISISROOT=${condaPath}/envs/isis/
                      ${condaPath}/bin/conda run -n isis campt -HELP
