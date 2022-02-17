@@ -1,0 +1,18 @@
+Object = SpacecraftPointing
+  RunTime = 2022-02-16T12:54:11
+
+  Group = Dependencies
+    SpacecraftClockKernel = $Odyssey/kernels/sclk/ORB1_SCLKSCET.00274.tsc
+    LeapsecondKernel      = $base/kernels/lsk/naif0008.tls
+  End_Group
+
+  Group = Selection
+    Time       = ("2002 FEB 20 22:58:59.720231 TDB",
+                  "2002 FEB 20 22:59:11.726211 TDB")
+    Instrument = THEMIS_IR
+    EndOffset  = 169.442
+    File       = data/kerneldbgen/thmIR.bc
+    Type       = Smithed
+  End_Group
+End_Object
+End

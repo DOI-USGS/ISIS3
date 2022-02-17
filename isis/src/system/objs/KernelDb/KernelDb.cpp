@@ -586,10 +586,10 @@ namespace Isis {
     QString instrument = "";
 
     if (grp.hasKeyword("StartOffset")){
-      startOffset = (double) grp["StartOffset"];
+      startOffset = (double) grp["StartOffset"] + 0.001;
     }
     if (grp.hasKeyword("EndOffset")){
-      endOffset = (double) grp["EndOffset"];
+      endOffset = (double) grp["EndOffset"] + 0.001;
     }
     if (grp.hasKeyword("Instrument")){
       instrument = (QString) grp["Instrument"];
