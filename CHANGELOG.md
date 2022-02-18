@@ -35,12 +35,18 @@ release.
 
 ## [Unreleased]
 
+
+## [7.0.0] - 2022-02-11
+
 ### Changed
 - Disabled SURF algorithm for findfeatures, latest version of opencv no longer provides SURF as part of the base library [#3885](https://github.com/USGS-Astrogeology/ISIS3/issues/3885)
 - Changed caminfo's parameter default values for MAXEMISSION and MAXINCIDENCE to be
 synchronized with footprintinit default values of the same parameters.
 This corrects inconsistencies of footprint generation failing in caminfo
 but passing in footprintinit. [#4651](https://github.com/USGS-Astrogeology/ISIS3/issues/4651).
+- Changed the internal logic of ObliqueDataResolution() to use LocalEmission angle rather than Emission angle.
+This will cause differences in output; new values will be more accurate because they use DEM rather than
+ellipsoid. The cost to compute the local emissoin will increase by approximately x1.5. [#3600](https://github.com/USGS-Astrogeology/ISIS3/issues/3600)
 
 ### Added
 - Added the USECAMSTATSTBL option to caminfo. This allows caminfo to extract existing
@@ -64,6 +70,8 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 - Fixed Maptrim failures when mode=both for PositiveWest longitude direction. [#4646](https://github.com/USGS-Astrogeology/ISIS3/issues/4646)
 - Fixed the Vesta target name not being translated properly in dawnfc2isis. [#4638](https://github.com/USGS-Astrogeology/ISIS3/issues/4638)
 - Fixed a bug where the measure residuals reported in the bundleout.txt file were incorrect. [#4655](https://github.com/USGS-Astrogeology/ISIS3/issues/4655)
+- Fixed a bug where jigsaw would raise an error when solving for framing camera pointing in observation mode. [#4686](https://github.com/USGS-Astrogeology/ISIS3/issues/4686)
+- Fixed slow runs of automos when the priority was BAND. [#4793](https://github.com/USGS-Astrogeology/ISIS3/pull/4793)
 
 ## [6.0.0] - 2021-08-27
 
@@ -349,7 +357,8 @@ The unreleased comparison should always be
 {REPO_NAME}/compare/{LAST_VERSION_TAG}...HEAD
 -->
 
-[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/6.0.0...HEAD
+[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/7.0.0...HEAD
+[7.0.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/6.0.0...7.0.0
 [6.0.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.2...6.0.0
 [5.0.2]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.1...5.0.2
 [5.0.1]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.0...5.0.1

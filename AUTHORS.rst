@@ -110,6 +110,8 @@ Integrated Software for Imagers and Spectrometers Contributors
 - Milazzo, Moses
 - Miller, David
 - Miller-Ribelin, Elizabeth
+- Nelson, Gavin (United States Geological Survey, Astro Geology
+  Science Center)
 - Neubauer, Cole
 - Oyama, Kim
 - Paquette, Adam (United States Geological Survey, Astro Geology

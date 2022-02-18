@@ -110,6 +110,8 @@ namespace Isis {
       addToExisting = true;
     }
 
+    bool isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
+
     if (addToExisting) {
       // if we have already added a BundleObservation with this number, we have to add the new
       // BundleImage to this observation
@@ -125,8 +127,6 @@ namespace Isis {
     }
     else {
       // create new BundleObservation and append to this vector
-
-      bool isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
 
       if (isIsisObservation) {
         bundleObservation.reset(new IsisBundleObservation(bundleImage,
@@ -167,14 +167,6 @@ namespace Isis {
 
       append(bundleObservation);
 
-      if (isIsisObservation) {
-        QSharedPointer<IsisBundleObservation> isisObs = qSharedPointerDynamicCast<IsisBundleObservation>(bundleObservation);
-        isisObs->initializeExteriorOrientation();
-        if (bundleSettings->solveTargetBody()) {
-          isisObs->initializeBodyRotation();
-        }
-      }
-
       // update observation number to observation ptr map
       m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
 
@@ -190,6 +182,15 @@ namespace Isis {
         m_instIdToObservationMap.insertMulti(instrumentId, bundleObservation);
       }
 
+    }
+
+    // If it's an ISIS observation, setup the camera based on the solve settings
+    if (isIsisObservation) {
+      QSharedPointer<IsisBundleObservation> isisObs = qSharedPointerDynamicCast<IsisBundleObservation>(bundleObservation);
+      isisObs->initializeExteriorOrientation();
+      if (bundleSettings->solveTargetBody()) {
+        isisObs->initializeBodyRotation();
+      }
     }
     return bundleObservation;
   }
