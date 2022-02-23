@@ -640,7 +640,7 @@ void IsisMain() {
   CentroidApolloPan centroid(resolution);
   Chip inputChip,selectionChip;
   inputChip.SetSize(int(ceil(200*5.0/resolution)), int(ceil(200*5.0/resolution)));
-  fileName = ui.GetCubeName("FROM");
+  fileName = ui.GetFileName("FROM");
   if( panCube.pixelType() == 1)  //UnsignedByte
     centroid.setDNRange(12, 1e99);  //8 bit bright target
   else

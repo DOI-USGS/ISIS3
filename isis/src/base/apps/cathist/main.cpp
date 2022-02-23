@@ -21,7 +21,7 @@ void IsisMain() {
   FileName tofile;
   bool append = false;
   if (ui.WasEntered("TO")) {
-    tofile = FileName(ui.GetCubeName("TO"));
+    tofile = FileName(ui.GetFileName("TO"));
     append = ui.GetBoolean("APPEND");
   }
 
