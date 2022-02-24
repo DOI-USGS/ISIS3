@@ -94,10 +94,10 @@ TEST_F(DefaultCube, FunctionalTestCamptDefaultParameters) {
   EXPECT_NEAR( (double) groundPoint.findKeyword("LocalRadius"), 3412288.6569795, 1e-8);
   EXPECT_NEAR( (double) groundPoint.findKeyword("SampleResolution"), 18.904248467739, 1e-8);
   EXPECT_NEAR( (double) groundPoint.findKeyword("LineResolution"), 18.904248467739, 1e-8);
-  EXPECT_NEAR( (double) groundPoint.findKeyword("ObliqueDetectorResolution"), 19.336214219327, 1e-8);
-  EXPECT_NEAR( (double) groundPoint.findKeyword("ObliquePixelResolution"), 19.336214219327, 1e-8);
-  EXPECT_NEAR( (double) groundPoint.findKeyword("ObliqueLineResolution"), 19.336214219327, 1e-8);
-  EXPECT_NEAR( (double) groundPoint.findKeyword("ObliqueSampleResolution"), 19.336214219327, 1e-8);
+  EXPECT_NEAR( (double) groundPoint.findKeyword("ObliqueDetectorResolution"), 19.589652452595999, 1e-8);
+  EXPECT_NEAR( (double) groundPoint.findKeyword("ObliquePixelResolution"), 19.589652452595999, 1e-8);
+  EXPECT_NEAR( (double) groundPoint.findKeyword("ObliqueLineResolution"), 19.589652452595999, 1e-8);
+  EXPECT_NEAR( (double) groundPoint.findKeyword("ObliqueSampleResolution"), 19.589652452595999, 1e-8);
 
   EXPECT_NEAR( toDouble(groundPoint.findKeyword("SpacecraftPosition")[0]), -1152.8979327717, 1e-8);
   EXPECT_NEAR( toDouble(groundPoint.findKeyword("SpacecraftPosition")[1]), -3930.9421518203, 1e-8);

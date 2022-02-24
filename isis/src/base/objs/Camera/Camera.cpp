@@ -557,7 +557,7 @@ namespace Isis {
   /**
    * @brief This method returns the Oblique Detector Resolution
    * if the Look Vector intersects the target and if the emission angle is greater than or equal
-   * to 0, and less than 90 degrees.   Otherwise, it returns -1.0.  This formula provides an
+   * to 0, and less than 90 degrees.   Otherwise, it returns Isis::Null.  This formula provides an
    * improved estimate to the detector resolution for images near the limb:
    *
    *
@@ -577,25 +577,43 @@ namespace Isis {
    *   <b>Reference 2:</b>  Handwritten notes by Orrin Thomas which can be found in the
    *                 Glossary under the entry for Oblique Detector Resolution.
    *
+   * @param useLocal If true, emission is fetched from LocalPhotometricAngles.
+   *                 Otherwise, emission is fetched from EmissionAngle().
+   *                 This is an optional parameter that defaults to true,
+   *                 because local emission will give more accurate results.
+   *
    * @return @b double
    */
-  double Camera::ObliqueDetectorResolution(){
+  double Camera::ObliqueDetectorResolution(bool useLocal) {
 
 
-      if(HasSurfaceIntersection()){
-
-          double thetaRad;
-          thetaRad = EmissionAngle()*DEG2RAD;
-
-          if (thetaRad < HALFPI) {
-            return DetectorResolution()/cos(thetaRad);
-
-          }
-          return Isis::Null;
-
-      }
-
+    if(!HasSurfaceIntersection()) {
       return Isis::Null;
+    }
+
+    double thetaRad;
+    double emissionDeg;
+
+    if(useLocal) {
+      Angle phase, emission, incidence;
+      bool success;
+
+      LocalPhotometricAngles(phase, incidence, emission, success);
+      emissionDeg = (success) ? emission.degrees() : Isis::Null;
+    }
+    else {
+      emissionDeg = EmissionAngle();
+    }
+
+    thetaRad = emissionDeg*DEG2RAD;
+
+    if (thetaRad < HALFPI) {
+      return DetectorResolution()/cos(thetaRad);
+
+    }
+
+    return Isis::Null;
+
 
   }
 
@@ -636,8 +654,8 @@ namespace Isis {
    *
    * @return @b double The sample resolution
    */
-  double Camera::ObliqueSampleResolution() {
-    return ObliqueDetectorResolution() * p_detectorMap->SampleScaleFactor();
+  double Camera::ObliqueSampleResolution(bool useLocal) {
+    return ObliqueDetectorResolution(useLocal) * p_detectorMap->SampleScaleFactor();
   }
 
 
@@ -658,8 +676,8 @@ namespace Isis {
    *
    * @return @b double The line resolution
    */
-  double Camera::ObliqueLineResolution() {
-    return ObliqueDetectorResolution() * p_detectorMap->LineScaleFactor();
+  double Camera::ObliqueLineResolution(bool useLocal) {
+    return ObliqueDetectorResolution(useLocal) * p_detectorMap->LineScaleFactor();
   }
 
 
@@ -682,9 +700,9 @@ namespace Isis {
    *
    * @return @b double The pixel resolution
    */
-  double Camera::ObliquePixelResolution() {
-    double lineRes = ObliqueLineResolution();
-    double sampRes = ObliqueSampleResolution();
+  double Camera::ObliquePixelResolution(bool useLocal) {
+    double lineRes = ObliqueLineResolution(useLocal);
+    double sampRes = ObliqueSampleResolution(useLocal);
     if (lineRes < 0.0) return Isis::Null;
     if (sampRes < 0.0) return Isis::Null;
     return (lineRes + sampRes) / 2.0;
