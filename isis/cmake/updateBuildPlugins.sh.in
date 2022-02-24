@@ -1,4 +1,5 @@
 > ${CMAKE_BINARY_DIR}/lib/Camera.plugin
+
 for i in find ${CMAKE_SOURCE_DIR}/src/*/objs/*/Camera.plugin
   do
     if test -f "$i"; then
