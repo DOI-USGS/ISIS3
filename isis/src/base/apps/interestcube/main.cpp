@@ -37,7 +37,7 @@ void IsisMain() {
   p.SetOutputCube("TO");
   Pvl pvl = Pvl(ui.GetFileName("PVL"));
 
-  cube.open(ui.GetFileName("FROM"));
+  cube.open(ui.GetCubeName("FROM"));
 
   try {
     // Get info from the operator group

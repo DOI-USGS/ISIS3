@@ -117,7 +117,7 @@ namespace Isis {
 
 
   void camdev(UserInterface &ui) {
-    Cube icube(ui.GetFileName("FROM"), "r");
+    Cube icube(ui.GetCubeName("FROM"), "r");
     camdev(&icube, ui);
   }
 
@@ -149,7 +149,7 @@ namespace Isis {
         cam = icube->camera();
       }
       catch(IException &e) {
-        QString msg = "If " + FileName(ui.GetFileName("FROM")).name() + " is a mosaic, make sure the SOURCE "
+        QString msg = "If " + FileName(ui.GetCubeName("FROM")).name() + " is a mosaic, make sure the SOURCE "
         "option is set to PROJECTION";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
@@ -352,7 +352,7 @@ namespace Isis {
     // If DN is chosen by the user, then we propagate the input buffer with a
     // different function - one that accepts both input and output buffers.
     p.SetInputCube(icube, OneBand);
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"), icube->sampleCount(),
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO"), icube->sampleCount(),
                                   icube->lineCount(), nbands);
     p.SetBrickSize(64, 64, nbands);
     if (dn) {

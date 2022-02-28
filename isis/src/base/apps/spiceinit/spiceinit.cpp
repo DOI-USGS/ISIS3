@@ -48,7 +48,7 @@ namespace Isis {
     Process p;
 
     CubeAttributeInput cai;
-    Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), cai, ReadWrite);
+    Cube *icube = p.SetInputCube(ui.GetCubeName("FROM"), cai, ReadWrite);
     spiceinit(icube, ui, log);
     p.EndProcess();
   }
@@ -191,7 +191,7 @@ namespace Isis {
       if ((ck.size() == 0 || ck.at(0).size() == 0) && !ui.WasEntered("CK")) {
         // no ck was found in system and user did not enter ck, throw error
         throw IException(IException::Unknown,
-                         "No Camera Kernels found for the image [" + ui.GetFileName("FROM")
+                         "No Camera Kernels found for the image [" + ui.GetCubeName("FROM")
                          + "]",
                          _FILEINFO_);
       }
@@ -675,7 +675,7 @@ namespace Isis {
     }
 
     if (ui.GetString("SHAPE") == "USER") {
-      kernelsGroup["ShapeModel"] = ui.GetFileName("MODEL");
+      kernelsGroup["ShapeModel"] = ui.GetCubeName("MODEL");
     }
 
     icube->putGroup(kernelsGroup);

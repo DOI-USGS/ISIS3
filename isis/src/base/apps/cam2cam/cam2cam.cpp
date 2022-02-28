@@ -27,9 +27,9 @@ namespace Isis {
    */
   void cam2cam(UserInterface &ui) {
     Cube *icube = new Cube();
-    icube->open(ui.GetFileName("FROM"));
+    icube->open(ui.GetCubeName("FROM"));
     Cube *mcube = new Cube();
-    mcube->open(ui.GetFileName("MATCH"));
+    mcube->open(ui.GetCubeName("MATCH"));
     return cam2cam(icube, mcube, ui);
   }
 
@@ -47,7 +47,7 @@ namespace Isis {
 
     ProcessRubberSheet m;
     m.SetInputCube(mcube);
-    Cube *ocube = m.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"),
+    Cube *ocube = m.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO"),
                                   mcube->sampleCount(), mcube->lineCount(), mcube->bandCount());
 
     // Set up the default reference band to the middle of the cube

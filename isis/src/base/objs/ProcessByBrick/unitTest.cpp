@@ -291,7 +291,7 @@ void IsisMain() {
     p.ProcessCube(functor,false);
     p.EndProcess();
     Cube cube;
-    cube.open(Application::GetUserInterface().GetFileName("TO"));
+    cube.open(Application::GetUserInterface().GetCubeName("TO"));
     Statistics *statsBand1 = cube.statistics(1);
     Statistics *statsBand2 = cube.statistics(2);
     std::cerr << "Averages: " << statsBand1->Average() << ", " <<
@@ -302,7 +302,7 @@ void IsisMain() {
   {
     cout << "Functor5 - ProcessCubeInPlace Threaded\n";
     Cube *cube = new Cube;
-    cube->open(Application::GetUserInterface().GetFileName("TO"), "rw");
+    cube->open(Application::GetUserInterface().GetCubeName("TO"), "rw");
     p.SetBrickSize(10, 10, 2);
     p.SetInputCube(cube);
     Functor5 functor;
@@ -323,7 +323,7 @@ void IsisMain() {
     p.EndProcess();
     cube->close();
     cube = new Cube;
-    cube->open(Application::GetUserInterface().GetFileName("TO"), "rw");
+    cube->open(Application::GetUserInterface().GetCubeName("TO"), "rw");
     Statistics *statsBand1 = cube->statistics(1);
     Statistics *statsBand2 = cube->statistics(2);
     delete cube;

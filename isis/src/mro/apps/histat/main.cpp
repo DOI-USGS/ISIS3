@@ -59,7 +59,7 @@ void IsisMain() {
   }
 
 
-  Isis::FileName fromFile = ui.GetFileName("FROM");
+  Isis::FileName fromFile = ui.GetCubeName("FROM");
   Isis::Cube inputCube;
   inputCube.open(fromFile.expanded());
 

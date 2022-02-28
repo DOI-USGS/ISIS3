@@ -31,18 +31,13 @@ namespace Isis {
     Cube icube;
     
     // Check if input file is indeed, a cube
-    if (ui.GetFileName("FROM").right(3) != "cub") {
-      QString msg = "Input file [" + ui.GetFileName("FROM") +
+    if (FileName(ui.GetCubeName("FROM")).expanded().right(3) != "cub") {
+      QString msg = "Input file [" + ui.GetCubeName("FROM") +
                   "] does not appear to be a cube";
       throw  IException(IException::User, msg, _FILEINFO_);
     }
     
-    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
-    if (inAtt.bands().size() != 0) {
-        icube.setVirtualBands(inAtt.bands());
-    }
-
-    icube.open(ui.GetFileName("FROM"), "r");
+    icube.open(ui.GetCubeName("FROM"), "r");
     tgocassisrdrgen(&icube, ui);
   }
 
@@ -73,7 +68,7 @@ namespace Isis {
     // Check if the cube is able to be translated into a CaSSIS xml file
     // This could very well be unnecessary
     if (!targetGroup.findKeyword("InstrumentId").isEquivalent("CaSSIS")) {
-      QString msg = "Input file [" + ui.GetFileName("FROM") +
+      QString msg = "Input file [" + ui.GetCubeName("FROM") +
                   "] does not appear to be a CaSSIS RDR product. The image" +
                   "instrument is not the CaSSIS instrument";
       throw  IException(IException::User, msg, _FILEINFO_);

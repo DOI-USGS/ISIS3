@@ -46,7 +46,7 @@ namespace Isis {
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
 
     Cube *iCube = new Cube();
-    iCube->open(ui.GetFileName("FROM"), "r");
+    iCube->open(ui.GetCubeName("FROM"), "r");
 
     if (outputCubeSpecified || logFileSpecified) {
       ProcessByLine p;
@@ -59,7 +59,7 @@ namespace Isis {
       if (outputCubeSpecified) {
         gapsFunctor.setModification("NULL buffers added to output cube");
         
-        p.SetOutputCube(ui.GetFileName("TO"), att);
+        p.SetOutputCube(ui.GetCubeName("TO"), att);
 
         p.ProcessCube(gapsFunctor, false);
       }

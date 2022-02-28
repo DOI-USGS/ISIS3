@@ -10,7 +10,7 @@ namespace Isis {
 
   void segment(UserInterface &ui) {
     Cube *incube = new Cube();
-    incube->open(ui.GetFileName("FROM"));
+    incube->open(ui.GetCubeName("FROM"));
     segment(incube, ui);
   }
 

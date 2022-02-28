@@ -49,7 +49,7 @@ namespace Isis {
 
 
   void moccal(UserInterface &ui) {
-    Cube icube(ui.GetFileName("FROM"), "rw");
+    Cube icube(ui.GetCubeName("FROM"), "rw");
     moccal(&icube, ui);
   }
 

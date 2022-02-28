@@ -1264,7 +1264,7 @@ namespace Isis {
 
     SetAttributes(att);
 
-    return Process::SetOutputCube(Application::GetUserInterface().GetFileName(parameter), att, p_ns, p_nl, p_nb);
+    return Process::SetOutputCube(Application::GetUserInterface().GetCubeName(parameter), att, p_ns, p_nl, p_nb);
   }
 
 
@@ -1275,7 +1275,7 @@ namespace Isis {
   Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter, UserInterface &ui){
     CubeAttributeOutput &att = ui.GetOutputAttribute(parameter);
     SetAttributes(att);
-    return Isis::Process::SetOutputCube(ui.GetFileName(parameter), att, p_ns, p_nl, p_nb);
+    return Isis::Process::SetOutputCube(ui.GetCubeName(parameter), att, p_ns, p_nl, p_nb);
   }
 
   /**

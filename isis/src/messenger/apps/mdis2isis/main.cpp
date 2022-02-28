@@ -128,7 +128,7 @@ void IsisMain() {
     // We're not going to unlut the data, so just set output cube
     //   and let ProcessImportPds do the writing for us.
     CubeAttributeOutput &outAtt = ui.GetOutputAttribute("TO");
-    outCube = p.SetOutputCube(ui.GetFileName("TO"), outAtt);
+    outCube = p.SetOutputCube(ui.GetCubeName("TO"), outAtt);
 
     // Write the Instrument, BandBin, Archive, and Kernels groups to the output
     // cube label
@@ -159,7 +159,7 @@ void IsisMain() {
 
     outCube = new Cube();
     outCube->setDimensions(p.Samples(), p.Lines(), p.Bands());
-    outCube->create(ui.GetFileName("TO"));
+    outCube->create(ui.GetCubeName("TO"));
 
     PvlGroup &group =  outLabel.findGroup("Instrument", Pvl::Traverse);
     group.addKeyword(PvlKeyword("Unlutted", toString((int)true)));

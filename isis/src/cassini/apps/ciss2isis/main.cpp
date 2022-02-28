@@ -19,6 +19,7 @@ void IsisMain() {
   Pvl appLog;
   try {
     ciss2isis(ui, &appLog);
+
   }
   catch (...) {
     for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {

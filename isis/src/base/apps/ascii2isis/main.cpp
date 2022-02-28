@@ -78,7 +78,7 @@ void IsisMain() {
     ProcessByLine p;
 
     
-    p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
+    p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
     p.StartProcess(ascii2isis);
     p.EndProcess();
   }
@@ -87,7 +87,7 @@ void IsisMain() {
 
     
     // Set Special Pixel ranges
-    p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
+    p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
     p.StartProcess(ascii2isis);
     p.EndProcess();
   }
@@ -95,7 +95,7 @@ void IsisMain() {
     ProcessBySpectra p(Isis::ProcessBySpectra::PerPixel);
 
     
-    p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
+    p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
     p.StartProcess(ascii2isis);
     p.EndProcess();
   }

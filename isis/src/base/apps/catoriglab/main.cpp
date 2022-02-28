@@ -20,7 +20,7 @@ void IsisMain() {
 
   // Get user entered file name & mode
   UserInterface &ui = Application::GetUserInterface();
-  QString file = ui.GetFileName("FROM");
+  QString file = ui.GetCubeName("FROM");
 
   Pvl fromLabel(file);
   if ( fromLabel.hasObject("OriginalLabel") ) {

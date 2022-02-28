@@ -31,7 +31,7 @@ namespace Isis {
   static void DeleteTables(Pvl *label, PvlGroup kernels);
 
   void nocam2map(UserInterface &ui, Pvl *log) {
-    QString inputFileName = ui.GetFileName("FROM");
+    QString inputFileName = ui.GetCubeName("FROM");
     Cube iCube(inputFileName);
     nocam2map(&iCube, ui, log);
   }
@@ -42,8 +42,8 @@ namespace Isis {
     Process p;
 
     //Create the input cubes, matching sample/lines
-    Cube *latCube = p.SetInputCube(ui.GetFileName("LATCUB"), ui.GetInputAttribute("LATCUB"), SpatialMatch);
-    Cube *lonCube = p.SetInputCube(ui.GetFileName("LONCUB"), ui.GetInputAttribute("LONCUB"), SpatialMatch);
+    Cube *latCube = p.SetInputCube(ui.GetCubeName("LATCUB"), ui.GetInputAttribute("LATCUB"), SpatialMatch);
+    Cube *lonCube = p.SetInputCube(ui.GetCubeName("LONCUB"), ui.GetInputAttribute("LONCUB"), SpatialMatch);
   
     //A 1x1 brick to read in the latitude and longitude DN values from
     //the specified cubes
@@ -202,11 +202,11 @@ namespace Isis {
       //Reopen the lat and long cubes
       latCube = new Cube();
       latCube->setVirtualBands(ui.GetInputAttribute("LATCUB").bands());
-      latCube->open(ui.GetFileName("LATCUB"));
+      latCube->open(ui.GetCubeName("LATCUB"));
   
       lonCube = new Cube();
       lonCube->setVirtualBands(ui.GetInputAttribute("LONCUB").bands());
-      lonCube->open(ui.GetFileName("LONCUB"));
+      lonCube->open(ui.GetCubeName("LONCUB"));
   
       PvlKeyword targetName;
   
@@ -428,7 +428,7 @@ namespace Isis {
                                            samples, lines);
   
       //Allocate the output cube and add the mapping labels
-      Cube *oCube = r.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"), transform->OutputSamples(),
+      Cube *oCube = r.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO"), transform->OutputSamples(),
                                     transform->OutputLines(),
                                     inCube->bandCount());
       oCube->putGroup(mapGrp);

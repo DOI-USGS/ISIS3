@@ -725,7 +725,7 @@ namespace Isis {
     //define an output cube
     outputC.setDimensions(int(maxS), int(maxL), 1);
     outputC.setPixelType(panC[0]->pixelType());  //set pixel type
-    tempString = ui.GetFileName("TO");
+    tempString = ui.GetCubeName("TO");
     outputC.create(tempString);
     outputC.close();  //closing the output cube so that it can be opened by the mosaic process
     ProcessMosaic mosaic;

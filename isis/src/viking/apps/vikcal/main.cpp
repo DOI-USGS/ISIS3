@@ -36,7 +36,7 @@ void IsisMain() {
   // segment found in the CalParameters documentation to the vikcal.xml file
   linear = false;
 // linear = ui.GetBoolean("LINEAR");
-  const QString in = ui.GetFileName("FROM");
+  const QString in = ui.GetCubeName("FROM");
 
   // Open the input cube
   Cube icube;

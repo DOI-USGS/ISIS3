@@ -61,7 +61,7 @@ namespace Isis{
     outAtt.setPixelType(SignedWord);
     outAtt.setMinimum((double)VALID_MIN2);
     outAtt.setMaximum((double)VALID_MAX2);
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), outAtt);
+    Cube *ocube = p.SetOutputCube(FileName(ui.GetCubeName("TO")).expanded(), outAtt);
 
     TranslateCassIssLabels(in, ocube, log);
 
@@ -114,7 +114,7 @@ namespace Isis{
 
     // PROCESS 2 : Do 8 bit to 12 bit conversion for image ==============================================//
     ProcessByLine p2;
-    QString ioFile = ui.GetFileName("TO");
+    QString ioFile = ui.GetCubeName("TO");
     CubeAttributeInput att;
     p2.SetInputCube(ioFile, att, ReadWrite);
     //if ConversionType == 12Bit or 8LSB, only save off overclocked pixels

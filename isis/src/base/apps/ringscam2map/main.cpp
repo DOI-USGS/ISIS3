@@ -54,7 +54,7 @@ void IsisMain() {
 
   // Make sure it is not the sky
   if(incam->target()->isSky()) {
-    QString msg = "The image [" + ui.GetFileName("FROM") +
+    QString msg = "The image [" + ui.GetCubeName("FROM") +
                   "] is targeting the sky, use skymap instead.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -209,7 +209,7 @@ void IsisMain() {
           }
         }
         else if(ui.GetString("RINGLONSEAM") == "ERROR") {
-          QString msg = "The image [" + ui.GetFileName("FROM") + "] crosses the " +
+          QString msg = "The image [" + ui.GetCubeName("FROM") + "] crosses the " +
                        "ring longitude seam";
           throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -597,7 +597,7 @@ void LoadMapRes() {
 //Helper function to get camera resolution.
 void LoadCameraRes() {
   UserInterface &ui = Application::GetUserInterface();
-  QString file = ui.GetFileName("FROM");
+  QString file = ui.GetCubeName("FROM");
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
@@ -660,7 +660,7 @@ void LoadMapRange() {
 //Helper function to load camera range.
 void LoadCameraRange() {
   UserInterface &ui = Application::GetUserInterface();
-  QString file = ui.GetFileName("FROM");
+  QString file = ui.GetCubeName("FROM");
 
   // Get the map projection file provided by the user
   Pvl userMap;

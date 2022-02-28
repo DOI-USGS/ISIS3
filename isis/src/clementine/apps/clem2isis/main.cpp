@@ -35,7 +35,7 @@ void IsisMain() {
   // Grab the file to import
   UserInterface &ui = Application::GetUserInterface();
   FileName in = ui.GetFileName("FROM");
-  FileName out = ui.GetFileName("TO");
+  FileName out = ui.GetCubeName("TO");
 
   // Make sure it is a Clementine EDR
   bool projected;
@@ -72,7 +72,7 @@ void IsisMain() {
 
   ProcessByLine p;
   CubeAttributeOutput cubeAtt("+unsignedByte+1.0:254.0");
-  Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), cubeAtt, pdsi->image_ncols, pdsi->image_nrows);
+  Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), cubeAtt, pdsi->image_ncols, pdsi->image_nrows);
   p.StartProcess(writeLine);
   translateLabels(in, ocube);
   p.EndProcess();

@@ -144,7 +144,7 @@ void IsisMain() {
       cam = icube->camera();
     }
     catch(IException &e) {
-      QString msg = "If " + FileName(ui.GetFileName("FROM")).name() + " is a mosaic, make sure the SOURCE "
+      QString msg = "If " + FileName(ui.GetCubeName("FROM")).name() + " is a mosaic, make sure the SOURCE "
       "option is set to PROJECTION";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }

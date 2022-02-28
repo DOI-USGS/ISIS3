@@ -74,7 +74,7 @@ namespace Isis {
         cam = icube->camera();
       }
       catch(IException &e) {
-        QString msg = "If " + FileName(ui.GetFileName("FROM")).name() + " is a mosaic, make sure the SOURCE "
+        QString msg = "If " + FileName(ui.GetCubeName("FROM")).name() + " is a mosaic, make sure the SOURCE "
         "option is set to PROJECTION";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
@@ -627,7 +627,7 @@ namespace Isis {
       p.SetInputCube(icube, OneBand);
     }
 
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"),
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO"),
                                   icube->sampleCount(), icube->lineCount(), nbands);
     p.SetBrickSize(64, 64, nbands);
     p.StartProcess(phocube);

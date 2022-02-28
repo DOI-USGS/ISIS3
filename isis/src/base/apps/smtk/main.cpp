@@ -103,18 +103,12 @@ void IsisMain() {
 
   // Open the first cube.  It is the left hand image.
   Cube lhImage;
-  CubeAttributeInput &attLeft = ui.GetInputAttribute("FROM");
-  vector<QString> bandLeft = attLeft.bands();
-  lhImage.setVirtualBands(bandLeft);
-  lhImage.open(ui.GetFileName("FROM"),"r");
+  lhImage.open(ui.GetCubeName("FROM"),"r");
 
   // Open the second cube, it is geomertricallty altered.  We will be matching the
   // first to this one by attempting to compute a sample/line offsets
   Cube rhImage;
-  CubeAttributeInput &attRight = ui.GetInputAttribute("MATCH");
-  vector<QString> bandRight = attRight.bands();
-  rhImage.setVirtualBands(bandRight);
-  rhImage.open(ui.GetFileName("MATCH"),"r");
+  rhImage.open(ui.GetCubeName("MATCH"),"r");
 
   // Ensure only single bands
   if (lhImage.bandCount() != 1 || rhImage.bandCount() != 1) {

@@ -34,7 +34,7 @@ map <QString, void *> GuiHelpers() {
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  FileName file = ui.GetFileName("FROM");
+  FileName file = ui.GetCubeName("FROM");
   QString blobname = ui.GetString("NAME");
   QString blobtype = ui.GetString("TYPE");
   Blob blob(blobname, blobtype, file.expanded());
@@ -48,7 +48,7 @@ void helperButtonGetBlobList() {
   bool match = false;
 
   UserInterface &ui = Application::GetUserInterface();
-  QString currentFile = ui.GetFileName("FROM");
+  QString currentFile = ui.GetCubeName("FROM");
   const Pvl label(FileName(currentFile).expanded());
 
   // Check to see if the "FILE" parameter has changed since last press

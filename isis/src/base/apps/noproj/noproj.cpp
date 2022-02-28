@@ -38,11 +38,11 @@ namespace Isis {
     if (inAtt.bands().size() != 0) {
       icube.setVirtualBands(inAtt.bands());
     }
-    icube.open(ui.GetFileName("FROM"));
+    icube.open(ui.GetCubeName("FROM"));
 
     Cube mcube;
     if((ui.WasEntered("MATCH"))) {
-      mcube.open(ui.GetFileName("MATCH"));
+      mcube.open(ui.GetCubeName("MATCH"));
     }
 
     noproj(&icube, &mcube, ui);
@@ -360,7 +360,7 @@ namespace Isis {
     label.write(matchCubeFileNoExt + ".lbl");
 
   // And run cam2cam to apply the transformation
-    QVector<QString> args = {"to=" + ui.GetFileName("TO"), "INTERP=" + ui.GetString("INTERP")};
+    QVector<QString> args = {"to=" + ui.GetCubeName("TO"), "INTERP=" + ui.GetString("INTERP")};
     UserInterface cam2camUI(FileName("$ISISROOT/bin/xml/cam2cam.xml").expanded(), args);
     Cube matchCube;
     matchCube.open(matchCubeFile.expanded(), "rw");
@@ -381,7 +381,7 @@ namespace Isis {
 
   // Finally finish by adding the OriginalInstrument group to the TO cube
     Cube toCube;
-    toCube.open(ui.GetFileName("TO"), "rw");
+    toCube.open(ui.GetCubeName("TO"), "rw");
   // Extract label and create cube object
     Pvl *toLabel = toCube.label();
     PvlObject &o = toLabel->findObject("IsisCube");

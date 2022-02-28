@@ -49,7 +49,7 @@ namespace Isis {
 
     p.SetPdsFile(inFile.expanded(), "", label);
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    Cube *outcube = p.SetOutputCube(ui.GetFileName("TO"), att);
+    Cube *outcube = p.SetOutputCube(ui.GetCubeName("TO"), att);
 
     // Get user entered special pixel ranges
     if(ui.GetBoolean("SETNULLRANGE")) {

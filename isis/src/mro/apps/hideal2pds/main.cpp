@@ -172,7 +172,7 @@ void IsisMain() {
   // create generic pds label - this will be finalized with proper line/byte counts later
   Pvl &pdsLabel = p.StandardPdsLabel(ProcessExportPds::Image);
 
-  QString isisLabelFile = ui.GetFileName("FROM");
+  QString isisLabelFile = ui.GetCubeName("FROM");
 
   // Translate the keywords from the input cube label that go in the PDS label
   PvlToPvlTranslationManager cubeLab(*(inputCube->label()),
