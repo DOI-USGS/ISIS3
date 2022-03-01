@@ -153,7 +153,6 @@ TEST_F(ThreeImageNetwork, FunctionaltestCnetcheckIgnoredMeasures){
 
   QString cube1Serial = SerialNumber::Compose(*cube1->label());
   QString cube2Serial = SerialNumber::Compose(*cube2->label());
-  QString cube3Serial = SerialNumber::Compose(*cube3->label());
 
   // Add measure guaranteed to fail computing lat/lon
   ControlMeasure *m1 = new ControlMeasure();
@@ -161,42 +160,74 @@ TEST_F(ThreeImageNetwork, FunctionaltestCnetcheckIgnoredMeasures){
   m1->SetAprioriSample(481);
   m1->SetCamera(cube1->camera());
   m1->SetCubeSerialNumber(cube1Serial);
+  m1->SetIgnored(true);
 
   ControlMeasure *m2 = new ControlMeasure();
   m2->SetAprioriLine(999);
   m2->SetAprioriSample(999);
   m2->SetCamera(cube2->camera());
   m2->SetCubeSerialNumber(cube2Serial);
-
-  ControlMeasure *m3 = new ControlMeasure();
-  m3->SetAprioriLine(1100);
-  m3->SetAprioriSample(1100);
-  m3->SetCamera(cube2->camera());
-  m3->SetCubeSerialNumber(cube3Serial);
-  m3->SetIgnored(true);
+  m2->SetIgnored(true);
 
   ControlPoint *newPoint = new ControlPoint();
   newPoint->Add(m1);
   newPoint->Add(m2);
-  newPoint->Add(m3);
+  newPoint->SetIgnored(true);
 
   network->AddPoint(newPoint);
 
   Pvl log;
   cnetcheck(*network, *cubeList, options, &log);
 
-  std::ifstream f(tempDir.path().toStdString() + "/NoLatLon.txt");
-  std::string ret((std::istreambuf_iterator<char>(f)),
-                 std::istreambuf_iterator<char>());
-
-  EXPECT_THAT(ret, testing::HasSubstr(cube1Serial.toStdString()));
-  EXPECT_THAT(ret, testing::HasSubstr(cube2Serial.toStdString()));
-
-  EXPECT_THAT(ret, testing::HasSubstr(cube1->fileName().toStdString()));
-  EXPECT_THAT(ret, testing::HasSubstr(cube2->fileName().toStdString()));
-
   PvlGroup pvlResults = log.findGroup("Results");
   EXPECT_TRUE((int)pvlResults.findKeyword("Islands") == 1);
-  EXPECT_TRUE((int)pvlResults.findKeyword("NoLatLonCubes") == 2);
+  EXPECT_FALSE(pvlResults.hasKeyword("NoLatLonCubes"));
   EXPECT_FALSE(pvlResults.hasKeyword("SingleCube"));
+}
+
+
+TEST_F(ThreeImageNetwork, FunctionalTestCnetcheckIslandsIgnoredPoint) {
+  // Add measures with fake serials not in the cubelist
+  ControlMeasure *m1 = new ControlMeasure();
+  m1->SetAprioriLine(481);
+  m1->SetAprioriSample(481);
+  m1->SetCubeSerialNumber("thisIsFakeLol");
+
+  ControlMeasure *m2 = new ControlMeasure();
+  m2->SetAprioriLine(481);
+  m2->SetAprioriSample(481);
+  m2->SetCubeSerialNumber("thisIsFakeLol2");
+
+  ControlPoint *newPoint = new ControlPoint();
+  newPoint->Add(m1);
+  newPoint->Add(m2);
+  network->AddPoint(newPoint);
+
+  ControlMeasure *m3 = new ControlMeasure();
+  m3->SetAprioriLine(881);
+  m3->SetAprioriSample(881);
+  m3->SetCubeSerialNumber("thisIsFakeLol2");
+
+  // Add an ignored point that would otherwise join the islands
+  ControlPoint *existingPoint = network->GetPoint("test0001");
+  existingPoint->Add(m3);
+  existingPoint->SetIgnored(true);
+
+  // append cube not in network
+  FileName c("data/defaultImage/defaultCube.pvl");
+  cubeList->append(c.expanded());
+
+  QVector<QString> args = {"fromlist="+cubeListFile, "prefix="+tempDir.path()+"/", "tolerance=0.95"};
+  UserInterface options(APP_XML, args);
+
+  Pvl log;
+  cnetcheck(*network, *cubeList, options, &log);
+
+  PvlGroup pvlResults = log.findGroup("Results");
+
+  EXPECT_EQ((int)pvlResults.findKeyword("Islands"), 2);
+  EXPECT_EQ((int)pvlResults.findKeyword("SingleCube"), 2);
+  EXPECT_EQ((int)pvlResults.findKeyword("NoCube"), 2);
+  EXPECT_EQ((int)pvlResults.findKeyword("NoControl"), 1);
+  EXPECT_EQ((int)pvlResults.findKeyword("LowCoverage"), 3);
 }
