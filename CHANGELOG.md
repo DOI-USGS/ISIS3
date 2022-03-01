@@ -35,6 +35,15 @@ release.
 
 ## [Unreleased]
 
+### Changed
+
+### Added
+
+### Deprecated
+
+### Fixed
+- Modified cnetcheck noLatLonCheck logic to correctly exclude ignored measures. [#4649](https://github.com/USGS-Astrogeology/ISIS3/issues/4649)
+
 
 ## [7.0.0] - 2022-02-11
 
