@@ -226,7 +226,7 @@ namespace Isis {
 
       // automos step
       QString list = ui.GetFileName("FROMLIST");
-      QString toMosaic = ui.GetFileName("TO");
+      QString toMosaic = ui.GetCubeName("TO");
       QString mosaicPriority = ui.GetString("PRIORITY");
 
       QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + mosaicPriority
@@ -259,7 +259,7 @@ namespace Isis {
       mos += PvlKeyword("NorthAzimuth ", toString(northAzimuth), "degrees");
 
       Cube mosCube;
-      mosCube.open(ui.GetFileName("TO"), "rw");
+      mosCube.open(ui.GetCubeName("TO"), "rw");
       PvlObject &lab = mosCube.label()->findObject("IsisCube");
       lab.addGroup(mos);
 
@@ -272,7 +272,7 @@ namespace Isis {
         cubeList[i]->close();
         delete cubeList[i];
       }
-      QString msg = "The mosaic [" + ui.GetFileName("TO") + "] was NOT created";
+      QString msg = "The mosaic [" + ui.GetCubeName("TO") + "] was NOT created";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   } // end of isis main

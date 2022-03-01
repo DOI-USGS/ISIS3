@@ -138,7 +138,7 @@ void CreatePsf(Pipeline &p) {
 
   // We need the base input and psf cubes to make the temporary psf cube
   Cube fromCube;
-  fromCube.open(ui.GetFileName("FROM"));
+  fromCube.open(ui.GetCubeName("FROM"));
 
   // Verify the image looks like a hirise image
   try {

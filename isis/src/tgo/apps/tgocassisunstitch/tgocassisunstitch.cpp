@@ -70,7 +70,7 @@ namespace Isis {
     CubeAttributeInput inAtt(from);
     cube = new Cube();
     cube->setVirtualBands(inAtt.bands());
-    from = ui.GetFileName("FROM");
+    from = ui.GetCubeName("FROM");
     cube->open(from);
 
     // Determine the filters / framelets in input fullframe image
@@ -153,7 +153,7 @@ namespace Isis {
 
     // Unstitch
     CubeAttributeInput &att = ui.GetInputAttribute("FROM");
-    p.SetInputCube(ui.GetFileName("FROM"), att);
+    p.SetInputCube(ui.GetCubeName("FROM"), att);
     p.Progress()->SetText("Processing output cubes.");
     p.StartProcess(unstitchFullFrame);
     p.EndProcess();

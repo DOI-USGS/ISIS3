@@ -36,7 +36,7 @@ namespace Isis{
     p.SetPdsFile(in.expanded(), "", label);
     // Segfault here
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), att);
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), att);
     p.StartProcess();
     TranslateLunarLabels(in, ocube);
     p.EndProcess();

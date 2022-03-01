@@ -137,7 +137,7 @@ namespace Isis {
         importFits.SetPixelType(Isis::Real);
       }
       importFits.SetAttributes(att);
-      output = importFits.SetOutputCube(ui.GetFileName("TO"), att);
+      output = importFits.SetOutputCube(ui.GetCubeName("TO"), att);
     }
 
     // Get the path where the New Horizons translation tables are.
@@ -244,7 +244,7 @@ namespace Isis {
       QString parameters;
       parameters += " F1= " + outputFile.toString();
       parameters += " F2= " + qualityFile.toString();
-      parameters += " TO= " + ui.GetFileName("TO");
+      parameters += " TO= " + ui.GetCubeName("TO");
       parameters += " EQUATION=" + QString("\"f1+f2\"");
       ProgramLauncher::RunIsisProgram("fx", parameters);
 

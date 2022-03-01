@@ -639,7 +639,7 @@ QString IsisAml::GetFileName(const QString &paramName, QString extension) const 
 
   const IsisParameterData *param = ReturnParam(paramName);
 
-  if((param->type != "filename") && (param->type != "cube")) {
+  if(param->type != "filename") {
     QString message = "Parameter [" + paramName + "] is not a filename.";
     throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
@@ -680,7 +680,7 @@ void IsisAml::GetFileName(const QString &paramName,
 
   const IsisParameterData *param = ReturnParam(paramName);
 
-  if((param->type != "filename") && (param->type != "cube")) {
+  if(param->type != "filename") {
     QString message = "Parameter [" + paramName + "] is not a filename.";
     throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }

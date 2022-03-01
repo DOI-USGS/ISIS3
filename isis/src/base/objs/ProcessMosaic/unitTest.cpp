@@ -568,7 +568,7 @@ void IsisMain() {
 void testIn(int iss, int isl, int isb, int ins, int inl, int inb) {
   Cube cInCube;
   UserInterface &ui = Isis::Application::GetUserInterface();
-  QString sFrom = ui.GetFileName("FROM");
+  QString sFrom = ui.GetCubeName("FROM");
   cInCube.open(sFrom);
 
   qDebug() << "";
@@ -619,9 +619,9 @@ void testOut(int piSamples, int piLines,
   UserInterface &ui = Isis::Application::GetUserInterface();
   QString sTo;
   if (piPriority == ProcessMosaic::AverageImageWithMosaic)
-    sTo = ui.GetFileName("TO_AVG");
+    sTo = ui.GetCubeName("TO_AVG");
   else
-    sTo = ui.GetFileName("TO");
+    sTo = ui.GetCubeName("TO");
   cOutCube.open(sTo);
 
   int iBands = cOutCube.bandCount();

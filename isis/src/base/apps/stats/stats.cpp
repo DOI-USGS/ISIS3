@@ -24,11 +24,7 @@ namespace Isis {
    */
   void stats(UserInterface &ui) {
     Cube *inputCube = new Cube();
-
-    CubeAttributeInput inAtt(ui.GetAsString("FROM"));
-    inputCube->setVirtualBands(inAtt.bands());
-
-    inputCube->open(ui.GetFileName("FROM"));
+    inputCube->open(ui.GetCubeName("FROM"));
     stats(inputCube, ui);
   }
 

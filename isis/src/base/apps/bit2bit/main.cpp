@@ -64,6 +64,7 @@ void IsisMain(){
 
 
   if(ui.GetBoolean("STATS")) { //! Run extended statistics
+    // The TO parameter is a filename not a cubename, so we can ignore the command line attributes
     Cube* ocubeptr = p.SetOutputCube (ui.GetFileName("TO"),outputProperties,
                      cubeptr->sampleCount(),cubeptr->lineCount(),
                      cubeptr->bandCount());

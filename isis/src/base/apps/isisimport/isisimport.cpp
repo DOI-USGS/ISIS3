@@ -495,7 +495,7 @@ namespace Isis {
       cubeAtts = QString(translation["CubeAtts"]);
     }
     CubeAttributeOutput att = CubeAttributeOutput(cubeAtts);
-    Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
+    Cube *outputCube = importer.SetOutputCube(ui.GetCubeName("TO"), att);
 
     if (isPDS4) {
       OriginalXmlLabel xmlLabel;

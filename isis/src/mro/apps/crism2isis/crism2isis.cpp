@@ -28,7 +28,7 @@ namespace Isis{
     p.SetNull(65535, 65535);
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), att);
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), att);
 
     Pvl outLabel;
 

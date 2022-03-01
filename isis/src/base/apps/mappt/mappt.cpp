@@ -29,7 +29,7 @@ void mappt(UserInterface &ui, Pvl *log) {
     cube->setVirtualBands(inAtt.bands());
   }
   
-  cube->open(ui.GetFileName("FROM"), "r");
+  cube->open(ui.GetCubeName("FROM"), "r");
   mappt(cube, ui, log, &inAtt);
 }
 

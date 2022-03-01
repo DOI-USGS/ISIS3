@@ -245,7 +245,7 @@ namespace Isis {
 
       // automos step
       QString list = ui.GetFileName("FROMLIST");
-      QString toMosaic = ui.GetFileName("TO");
+      QString toMosaic = ui.GetCubeName("TO");
       QString MosaicPriority = ui.GetString("PRIORITY");
 
       QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + MosaicPriority;
@@ -271,7 +271,7 @@ namespace Isis {
       mos += specialProcessingFlag;
 
       Cube mosCube;
-      mosCube.open(ui.GetFileName("TO"), "rw");
+      mosCube.open(ui.GetCubeName("TO"), "rw");
       PvlObject &lab = mosCube.label()->findObject("IsisCube");
       lab.addGroup(mos);
       //add orginal label blob to the output cube
@@ -285,7 +285,7 @@ namespace Isis {
         delete clist[i];
       }
       std::cout << e.what() << '\n';
-      QString msg = "The mosaic [" + ui.GetFileName("TO") + "] was NOT created";
+      QString msg = "The mosaic [" + ui.GetCubeName("TO") + "] was NOT created";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   } // end of isis main

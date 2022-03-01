@@ -19,7 +19,7 @@ namespace Isis {
     if (inAtt.bands().size() != 0) {
       cubeFile->setVirtualBands(inAtt.bands());
     }
-    cubeFile->open(ui.GetFileName("FROM"), "r");
+    cubeFile->open(ui.GetCubeName("FROM"), "r");
 
     QString pairs;
 

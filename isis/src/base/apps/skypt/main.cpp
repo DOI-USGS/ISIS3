@@ -13,7 +13,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get input cube and get camera model for it
-  QString channel = ui.GetFileName("FROM");
+  QString channel = ui.GetCubeName("FROM");
   Cube cube;
   cube.open(channel);
   Camera *cam = cube.camera();

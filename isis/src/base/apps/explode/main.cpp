@@ -19,7 +19,7 @@ void IsisMain() {
 
   // We the output filename so we can add attributes and extensions
   UserInterface &ui = Application::GetUserInterface();
-  QString outbase = ui.GetFileName("TO");
+  QString outbase = ui.GetCubeName("TO");
   CubeAttributeOutput &outatt = ui.GetOutputAttribute("TO");
 
   // Loop and extract each band

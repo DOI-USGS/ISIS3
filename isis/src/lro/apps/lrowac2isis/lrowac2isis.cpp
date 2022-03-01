@@ -169,7 +169,7 @@ namespace Isis {
       }
     }
 
-    FileName baseFileName(ui.GetFileName("TO"));
+    FileName baseFileName(ui.GetCubeName("TO"));
 
     if(uveven && uvodd) {
       // padding[1] is max padding for UV

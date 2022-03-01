@@ -31,10 +31,7 @@ void IsisMain() {
 
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
-  QString from = ui.GetAsString("FROM");
-  CubeAttributeInput inAtt(from);
-  cube.setVirtualBands(inAtt.bands());
-  from = ui.GetFileName("FROM");
+  QString from = ui.GetCubeName("FROM");
   cube.open(from);
 
   g_cropNulls = ui.GetBoolean("NULL");

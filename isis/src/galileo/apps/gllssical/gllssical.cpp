@@ -58,7 +58,7 @@ namespace Isis {
   static void calculateScaleFactor0(Cube *icube, Cube *gaincube);
   
   void gllssical(UserInterface &ui, Pvl *log) {
-    Cube icube(ui.GetFileName("FROM"));
+    Cube icube(ui.GetCubeName("FROM"));
     gllssical(&icube, ui, log);
   }   
 
@@ -116,7 +116,7 @@ namespace Isis {
     }
     p.StartProcess(Calibrate);
     PvlGroup calibrationLog("RadiometricCalibration");
-    calibrationLog.addKeyword(PvlKeyword("From", ui.GetFileName("FROM")));
+    calibrationLog.addKeyword(PvlKeyword("From", ui.GetCubeName("FROM")));
   
     FileName shutterFileName = FindShutterFile(icube);
     calibrationLog.addKeyword(PvlKeyword("DarkCurrentFile", darkFileName.originalPath() + "/" +
