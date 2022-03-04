@@ -103,7 +103,7 @@ requirements:
    - x264
    - x265
    - xalan-c
-   - xerces-c=3
+   - xerces-c
    - xorg-kbproto
    - xorg-libice
    - xorg-libsm
