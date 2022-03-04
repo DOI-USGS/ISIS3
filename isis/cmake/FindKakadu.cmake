@@ -9,7 +9,7 @@
 if(JP2KFLAG)
   find_path(KAKADU_INCLUDE_DIR
     NAME kdu_kernels.h
-    PATHS /usgs/apps/kakadu/v7_9_1-01762L/managed/all_includes/ /isisData/kakadu/ /Users/ssides/oldmac/kakadu/v7_9_1-01762L/managed/all_includes/
+    PATHS /usgs/apps/kakadu/v7_9_1-01762L/managed/all_includes/ /isisData/kakadu/ /Volumes/mac_1013_x86_64/apps/kakadu/v7_9_1-01762L/managed/all_includes/
 
   )
 
