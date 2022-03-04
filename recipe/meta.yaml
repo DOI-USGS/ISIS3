@@ -46,6 +46,7 @@ build:
 requirements:
   build:
    - ale=0.8.6
+   - aom
    - armadillo
    - boost=1.72
    - boost-cpp=1.72
@@ -100,8 +101,9 @@ requirements:
    - swig
    - tnt
    - x264
+   - x265
    - xalan-c
-   - xerces-c=3
+   - xerces-c
    - xorg-kbproto
    - xorg-libice
    - xorg-libsm
@@ -111,7 +113,9 @@ requirements:
 
   run:
   - {{ pin_compatible('ale') }}
+  - {{ pin_compatible('aom', max_pin='x.x') }}
   - {{ pin_compatible('boost', max_pin='x.x') }}
+  - {{ pin_compatible('boost-cpp', max_pin='x.x') }}
   - blas
   - {{ pin_compatible('bullet', max_pin='x.x') }}
   - bz2file
@@ -124,7 +128,6 @@ requirements:
   - {{ pin_compatible('geos', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('geotiff', max_pin='x.x') }}
   - geotiff
-  - gmm
   - {{ pin_compatible('gsl', min_pin='x.x') }}
   - hdf5
   - icu
@@ -133,7 +136,11 @@ requirements:
   - {{ pin_compatible('jasper', max_pin='x.x') }}
   - {{ pin_compatible('jpeg', max_pin='x') }}
   - {{ pin_compatible('kakadu', max_pin='x') }}
+  - libcxx
+  - libopenblas
+  - {{ pin_compatible('libopencv', max_pin='x.x') }}
   - {{ pin_compatible('libpng') }}
+  - libtiff
   - mesalib
   - mysql
   - nanoflann
@@ -149,6 +156,7 @@ requirements:
   - superlu
   - tnt
   - x264
+  - x265
   - {{ pin_compatible('xerces-c', max_pin='x.x.x') }}
   - xorg-kbproto
   - xorg-libice
@@ -162,7 +170,7 @@ test:
     - test -e $PREFIX/include/isis/Isis.h
     - test -e $PREFIX/bin/isisimport
     - ISISROOT=$PREFIX isisimport -HELP
- 
+
 
 about:
   home: https://github.com/USGS-Astrogeology/ISIS3
