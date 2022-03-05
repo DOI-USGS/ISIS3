@@ -61,7 +61,7 @@ namespace Isis{
 
     if(!proj->IsEquatorialCylindrical()) {
       CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-      ocube = p.SetOutputCube(ui.GetFileName("TO"), att);
+      ocube = p.SetOutputCube(ui.GetCubeName("TO"), att);
       p.StartProcess(GetStats);
 
       PvlGroup demRange("Results");
@@ -248,7 +248,7 @@ namespace Isis{
 
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    ocube = p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
+    ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
     // Make sure everything is propagated and closed
     p.EndProcess();
 
@@ -257,7 +257,7 @@ namespace Isis{
 
     // We need to create the output file
     ocube = new Cube();
-    ocube->open(FileName(ui.GetFileName("TO")).expanded(), "rw");
+    ocube->open(FileName(ui.GetCubeName("TO")).expanded(), "rw");
 
     p.StartProcess(DoWrap);
 

@@ -38,7 +38,7 @@ namespace Isis {
                                   "spkpos_c.html");
 
     if (ui.GetString("SUNPOSITIONSOURCE") == "MATCH") {
-      functor.setSunPosition(ui.GetFileName("MATCH"));
+      functor.setSunPosition(ui.GetCubeName("MATCH"));
     }
     else {
       QStringList allKernelFiles;

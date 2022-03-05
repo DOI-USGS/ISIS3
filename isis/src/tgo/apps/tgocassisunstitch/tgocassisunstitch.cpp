@@ -116,7 +116,7 @@ namespace Isis {
     // Determine sizes of framelets in input fullframe images
 
     // Allocate this number of total cubes of the correct size
-    FileName outputFileName(ui.GetFileName("OUTPUTPREFIX"));
+    FileName outputFileName(ui.GetCubeName("OUTPUTPREFIX"));
 
     // Sometimes there will be '.'s in an OUTPUT prefix that could
     // be confused with a file extension

@@ -244,7 +244,7 @@ namespace Isis {
     if (ui.WasEntered("MAINREADOUT")) {
 
       // Create and write normalized time values in the range [-1,1] to the primary EIS cube
-      Table normalizedReadout = normalizeTimeTable(FileName(ui.GetCubeName("MAINREADOUT")),
+      Table normalizedReadout = normalizeTimeTable(FileName(ui.GetFileName("MAINREADOUT")),
                                   "Normalized Main Readout Line Times",
                                   outputCube->lineCount());
 

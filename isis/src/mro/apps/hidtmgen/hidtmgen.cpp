@@ -218,7 +218,7 @@ namespace Isis{
         }
         else {
           dtmProductId = ui.GetString("DTM_PRODUCT_ID");
-          outFile = FileName(ui.GetCubeName("DTMTO"));
+          outFile = FileName(ui.GetFileName("DTMTO"));
         } // End scope of defaultNames true
 
         // identification labels that are pretty set in stone

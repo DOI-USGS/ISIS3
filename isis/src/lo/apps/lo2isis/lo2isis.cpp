@@ -23,7 +23,7 @@ namespace Isis{
   void lo2isis(UserInterface &ui) {
     ProcessImportPds p;
     Pvl label;
-    FileName in = ui.GetFileName("FROM");
+    FileName in = ui.GetCubeName("FROM");
 
     //Checks if in file is rdr
     label = in.expanded();
