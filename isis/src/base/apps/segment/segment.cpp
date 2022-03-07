@@ -17,7 +17,7 @@ namespace Isis {
   void segment(Cube *cube, UserInterface &ui) {
 
     //Get user parameters
-    FileName inFile = ui.GetFileName("FROM");
+    FileName inFile = ui.GetCubeName("FROM");
     int numberOfLines = ui.GetInteger("NL");
     int lineOverlap   = ui.GetInteger("OVERLAP");
 
