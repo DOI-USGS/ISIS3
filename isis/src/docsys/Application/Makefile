@@ -6,7 +6,7 @@ include $(ISISROOT)/make/isismake.os
 #   dls - deborah lee soltesz - 4/25/2002
 
 
-TOCDIR = $(ISISROOT)/doc/Application
+TOCDIR = $(ISISROOT)/doc/$(DOCVERSION)/Application
 
 
 help:
@@ -34,7 +34,7 @@ docs: documentation toccat tocoldvnew tocalph categories
 
 documentation:
 	echo "      Creating Documentation"
-	mkdir -p $(ISISROOT)/doc/Application
+	mkdir -p $(TOCDIR)
 	cd data ; $(MAKE) docs ; cd .. ;
 
 

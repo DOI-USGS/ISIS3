@@ -9,7 +9,7 @@ include $(ISISROOT)/make/isismake.os
 #                    of IsisOML system
 
 
-TOCDIR = $(ISISROOT)doc/Object
+TOCDIR = $(ISISROOT)doc/$(DOCVERSION)/Object
 OBJECTASSETS = $(wildcard $(ISISROOT)/src/*/objs/*/assets/)
 
 help:
@@ -32,22 +32,22 @@ docs: conf assetsDir
 
 documentation: 
 	echo "      Creating Object Documentation"
-	mkdir -p $(ISISROOT)/doc/Object
-	mkdir -p $(ISISROOT)/doc/Object/Developer
-	mkdir -p $(ISISROOT)/doc/Object/Programmer
-	mkdir -p $(ISISROOT)/doc/documents/DocStyle/assets
-	rsync -qlHptr --delete --rsh=ssh build/isisDoxyDefs.doxydef $(ISISROOT)/doc/documents/DocStyle/assets/
+	mkdir -p $(TOCDIR)/Object
+	mkdir -p $(TOCDIR)/Developer
+	mkdir -p $(TOCDIR)/Programmer
+	mkdir -p $(ISISROOT)/doc/$(DOCVERSION)/documents/DocStyle/assets
+	rsync -qlHptr --delete --rsh=ssh build/isisDoxyDefs.doxydef $(ISISROOT)/doc/$(DOCVERSION)/documents/DocStyle/assets/
 
 
 assetsDir:
 	echo "        ...copying assets"
 	mkdir -p $(ISISROOT)/doc/Object
-	rsync -qlHptr --delete --rsh=ssh assets $(ISISROOT)/doc/Object/ 
+	rsync -qlHptr --delete --rsh=ssh assets $(ISISROOT)/doc/$(DOCVERSION)/Object/ 
 
 conf:
 	echo "        ...building Programmer configuration"
 	cat build/Programmer.conf                                        >  build/Programmer_temp.conf
-	echo "OUTPUT_DIRECTORY = $(ISISROOT)/doc/Object/"                >> build/Programmer_temp.conf
+	echo "OUTPUT_DIRECTORY = $(ISISROOT)/doc/$(DOCVERSION)/Object/"  >> build/Programmer_temp.conf
 	echo "STRIP_FROM_PATH  = $(ISISROOT)/"                           >> build/Programmer_temp.conf
 	echo "INPUT            = build/isisDoxyDefs.doxydef $(ISISROOT)/src/ " >> build/Programmer_temp.conf
 	echo "HTML_OUTPUT      = Programmer"                             >> build/Programmer_temp.conf

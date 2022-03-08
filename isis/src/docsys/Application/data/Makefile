@@ -6,7 +6,7 @@ include $(ISISROOT)/make/isismake.os
 #   dls - deborah lee soltesz - 4/25/2002
 
 
-DEST_PRES_DIR = $(ISISROOT)/doc/Application/presentation
+DEST_PRES_DIR = $(ISISROOT)/doc/$(DOCVERSION)/Application/presentation
 
 PFSTYLEDIR = ../presentation/PrinterFriendly/styles
 PFDIR = $(DEST_PRES_DIR)/PrinterFriendly

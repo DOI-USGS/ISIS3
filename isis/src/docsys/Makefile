@@ -11,7 +11,9 @@ include $(ISISROOT)/make/isismake.os
 
 #APPLICATIONS = $(filter-out Makefile CVS $(wildcard *.*) , data/$(wildcard *))
 #DOCUMENTS    = $(filter-out Makefile $(wildcard *.*) , documents/$(wildcard *))
-DOCDIR = $(ISISROOT)/docs
+# NOTE: DOCVERSOIN needs to be set outside and passed/exported/cmake into this
+DOCVERSION = 7.0.0
+DOCDIR = $(ISISROOT)/docs/$(DOCVERSION)
 USER = isis3mgr
 USERDEV = isis3mgr
 
@@ -75,7 +77,7 @@ upperlevel:
 
 	echo "        [home page]"
 	#rsync -lHptr --delete --rsh=ssh --cvs-exclude *.html $(DOCDIR)/
-	$(XALAN) $(XALAN_VALIDATE_OPTION) $(XALAN_PARAM_OPTION) menuPath "'./'" $(XALAN_OUTFILE_OPTION) $(DOCDIR)/index.html $(XALAN_INFILE_OPTION) build/homepage.xml $(XALAN_XSL_OPTION) build/main.xsl
+	$(XALAN) $(XALAN_VALIDATE_OPTION) $(XALAN_PARAM_OPTION) menuPath "'./'" $(XALAN_OUTFILE_OPTION) $(DOCDIR)/../index.html $(XALAN_INFILE_OPTION) build/homepage.xml $(XALAN_XSL_OPTION) build/main.xsl
 
 	echo "      Finished Updating Directories"
 

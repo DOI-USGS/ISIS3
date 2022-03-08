@@ -18,7 +18,7 @@ endif
 
 DOCUMENTXMLS   = $(foreach DOC,$(DOCUMENTS),$(DOC)/$(DOC).xml)
 
-DOCDIR       = $(ISISROOT)/doc/documents
+DOCDIR       = $(ISISROOT)/doc/$(DOCVERSION)/documents
 
 
 docs: tocXML
@@ -62,47 +62,47 @@ tocXML: ../build/doctoc.xml ../build/IsisDocumentTOCbuild.xsl $(DOCUMENTXMLS)
 # build various upper level pages that link documents
 
 # ABOUT ISIS TOC
-aboutisis: $(ISISROOT)/doc/AboutIsis/index.html
-$(ISISROOT)/doc/AboutIsis/index.html: ../build/doctoc.xml ../build/AboutIsis.xsl
+aboutisis: $(ISISROOT)/doc/$(DOCVERSION)/AboutIsis/index.html
+$(ISISROOT)/doc/$(DOCVERSION)/AboutIsis/index.html: ../build/doctoc.xml ../build/AboutIsis.xsl
 
 	echo "        Constructing [About Isis]"
-	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/AboutIsis/index.html   $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/AboutIsis.xsl
+	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/$(DOCVERSION)/AboutIsis/index.html   $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/AboutIsis.xsl
 
 
 # GENERAL TOC
-general: $(ISISROOT)/doc/General/index.html
-$(ISISROOT)/doc/General/index.html: ../build/doctoc.xml ../build/General.xsl
+general: $(ISISROOT)/$(DOCVERSION)/doc/General/index.html
+$(ISISROOT)/doc/$(DOCVERSION)/General/index.html: ../build/doctoc.xml ../build/General.xsl
 
 	echo "        Constructing [General]"
-	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/General/index.html      $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/General.xsl
+	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/$(DOCVERSION)/General/index.html      $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/General.xsl
 
 # GUIDES TOC
-guides: $(ISISROOT)/doc/Guides/index.html
-$(ISISROOT)/doc/Guides/index.html: ../build/doctoc.xml ../build/Guides.xsl
+guides: $(ISISROOT)/doc/$(DOCVERSION)/Guides/index.html
+$(ISISROOT)/doc/$(DOCVERSION)/Guides/index.html: ../build/doctoc.xml ../build/Guides.xsl
 
 	echo "        Constructing [Guides]"
-	$(XALAN)  $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/Guides/index.html      $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/Guides.xsl
+	$(XALAN)  $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/$(DOCVERSION)/Guides/index.html      $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/Guides.xsl
 
 # INSTALLATION TOC
-installation: $(ISISROOT)/doc/Installation/index.html
-$(ISISROOT)/doc/Installation/index.html: ../build/doctoc.xml ../build/Installation.xsl
+installation: $(ISISROOT)/doc/$(DOCVERSION)/Installation/index.html
+$(ISISROOT)/doc/$(DOCVERSION)/Installation/index.html: ../build/doctoc.xml ../build/Installation.xsl
 
 	echo "        Constructing [Installation]"
-	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/Installation/index.html $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/Installation.xsl
+	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/$(DOCVERSION)/Installation/index.html $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/Installation.xsl
 
 # TECHNICAL INFO TOC
-technicalinfo: $(ISISROOT)/doc/TechnicalInfo/index.html
-$(ISISROOT)/doc/TechnicalInfo/index.html: ../build/doctoc.xml ../build/TechnicalInfo.xsl
+technicalinfo: $(ISISROOT)/doc/$(DOCVERSION)/TechnicalInfo/index.html
+$(ISISROOT)/doc/$(DOCVERSION)/TechnicalInfo/index.html: ../build/doctoc.xml ../build/TechnicalInfo.xsl
 
 	echo "        Constructing [TechnicalInfo]"
-	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/TechnicalInfo/index.html $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/TechnicalInfo.xsl
+	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/$(DOCVERSION)/TechnicalInfo/index.html $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/TechnicalInfo.xsl
 
 # USER DOCS TOC
-userdocs: $(ISISROOT)/doc/UserDocs/index.html
-$(ISISROOT)/doc/UserDocs/index.html: ../build/doctoc.xml ../build/UserDocs.xsl
+userdocs: $(ISISROOT)/doc/$(DOCVERSION)/UserDocs/index.html
+$(ISISROOT)/doc/$(DOCVERSION)/UserDocs/index.html: ../build/doctoc.xml ../build/UserDocs.xsl
 
 	echo "        Constructing [UserDocs]"
-	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/UserDocs/index.html    $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/UserDocs.xsl
+	$(XALAN) $(XALAN_PARAM_OPTION) menuPath "'../'" $(XALAN_OUTFILE_OPTION) $(ISISROOT)/doc/$(DOCVERSION)/UserDocs/index.html    $(XALAN_INFILE_OPTION) ../build/doctoc.xml $(XALAN_XSL_OPTION) ../build/UserDocs.xsl
 
 
 ReleaseNotes/ReleaseNotes.xml: ../build/ReleaseNotes.xsl ReleaseNotes/ReleaseNotesList.xml
