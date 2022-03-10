@@ -62,6 +62,21 @@ Deborah Lee Soltesz
 
     <hr/>
     <h2>
+      OTHER VERSIONS
+    </h2>
+
+    <div>
+      <a href="https://isis.astrogeology.usgs.gov/3.4/index.html" target="_top">
+      ISIS 3.4</a>
+    </div>
+
+    <div>
+      <a href="https://isis.astrogeology.usgs.gov/4.1/index.html" target="_top">
+      ISIS 4.1</a>
+    </div>
+
+    <hr/>
+    <h2>
       ISIS 2
     </h2>
 
