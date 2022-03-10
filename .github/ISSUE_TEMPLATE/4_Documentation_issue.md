@@ -1,7 +1,7 @@
 ---
 name: "\U0001F4D6 Documentation issue"
 about: Report issues or problems with documentation.
-
+labels: [documentation]
 ---
 
 **Description**
