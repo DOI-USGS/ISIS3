@@ -253,7 +253,7 @@ namespace Isis{
     p.EndProcess();
 
     // Now we'll really be processing our input cube
-    p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
+    p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
 
     // We need to create the output file
     ocube = new Cube();
