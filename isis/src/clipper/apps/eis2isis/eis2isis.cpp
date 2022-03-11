@@ -265,7 +265,7 @@ namespace Isis {
 
     // Handle an optional checkline cube.
     if (ui.WasEntered("FROM2")) {
-      FileName checklineXmlFileName = ui.GetCubeName("FROM2");
+      FileName checklineXmlFileName = ui.GetFileName("FROM2");
 
       if (ui.WasEntered("CHECKLINEREADOUT")) {
         // Process the checkline image to an ISIS cube and write the checkline tables
