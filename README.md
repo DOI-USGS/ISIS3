@@ -108,7 +108,7 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
     ISIS requires several environment variables to be set in order to run correctly.
     The variables include: ISISROOT and ISISDATA.
 
-    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here]("#the-isis-data-area").
+    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here](#The-ISIS-Data-Area).
 
     The following steps are only valid for versions of ISIS after 4.2.0.
     For older versions of ISIS follow the instructions in [this readme file.](https://github.com/USGS-Astrogeology/ISIS3/blob/adf52de0a04b087411d53f3fe1c9218b06dff92e/README.md)
