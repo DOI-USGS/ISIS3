@@ -39,7 +39,7 @@ Deborah Lee Soltesz
     <html>
       <head>
         <title>
-            USGS Isis: Getting Started User Documentation
+            USGS Isis: Explore in Detail User Documentation
         </title>
         <meta name="keywords" content="about, overview, introduction, Isis, image processing, software, open source, remote sensing, planetary science, astrogeology"/>
         <meta name="description" content="About the Integrated Software for Imagers and Spectrometers (ISIS), created and managed by the USGS Astrogeology Research Program. ISIS provides a comprehensive, user-friendly, portable tool for processing, analyzing, and displaying remotely sensed image data."/>
@@ -97,15 +97,16 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                User Getting Started Documentation
+                User Explore in Detail 
               </h1>
               <p>
-                Welcome! We are very glad you are joining the community!
+                Now that you have some experience running applications and working with data, you may have some questions 
+                about how exactly ISIS works.
               <p>
               </p>
-                On this page you will find resources to help you start using the ISIS software; how to install, running your 
-                first command, and a short tutorial to get you familiar with ISIS. This page will also direct you to some
-                resources where you can seek help from fellow community members.
+                On this page you will find a wide variety of resources explaining the specific details of how ISIS works. Many 
+                components of ISIS were created in response to the needs of specific data sets. So, there are a wide variety of 
+                processing paths and customizations that you can leverage when creating a workflow.
               </p>
               <p>
               </p>
@@ -118,32 +119,50 @@ Deborah Lee Soltesz
 
 
 
-<!-- Installation -->
+<!-- General Purpose -->
       <hr/>
-      <h2>Installation</h2>
+      <h2>General Purpose</h2>
       <p>
-        ISIS is a free and open-source software (FOSS) that has been in use by the planetary science and data community for decades. These documents 
-        describe how to install the latest version of ISIS and some legacy versions too.
+        These resources are useful regardless of what you are using ISIS for. They provide details about fundamental components of ISIS that 
+        are used across applications.
       </p>
-      <table class="tableTOC">
+      <table class="tableTOCmulticol">
 
         <!-- hardcoded links -->
         <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">
-            ISIS Installation Guide</a>
-          </th>
-          <td>
-          Instructions on downloading and installing ISIS 3.6 and later.
+          <td style="width:50%">
+            <dl>
+              <dt><h4>About ISIS Cubes</h4></dt>
+              <dd><a href="https://usgs-astrogeology.github.io/ISIS3/ISIS_Cube_Format.html">
+              ISIS Cube Format</a></dd>
+              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Understanding_Bit_Types">
+              Understanding Bit Types</a></dd>
+              <dd><a href="https://usgs-astrogeology.github.io/ISIS3/Core_Base_and_Multiplier.html">
+              Core Base and Multipliers</a></dd>
+              <dd><a href="https://usgs-astrogeology.github.io/ISIS3/Special_Pixels.html">
+              Special Pixels</a></dd>
+              <dd><a href="../documents/LabelDictionary/LabelDictionary.html">
+              Label Dictionary</a></dd>
+              <dd><a href="../documents/LogicalCubeFormatGuide/LogicalCubeFormatGuide.html">
+              Logical Cube Format Guide</a></dd>
+            </dl>
           </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="../documents/LegacyInstallGuide/index.html">
-            Legacy ISIS3 Installation Guide</a>
-          </th>
-          <td>
-          instructions on downloading and installing versions of ISIS3 3.5.2 and earlier.
+          <td style="width:50%">
+            <dl>
+              <dt><h4>About ISIS Applications</h4></dt>
+              <dd><a href="https://usgs-astrogeology.github.io/ISIS3/ISIS_Cube_Format.html">
+              Command Line Reference</a></dd>
+              <dd><a href="../documents/Glossary/Glossary.html">
+              Glossary</a></dd>
+              <dd><a href="../documents/ErrorHandlingFacility/ErrorHandlingFacility.html">
+              Error Handling Facility</a></dd>
+              <dd><a href="../documents/ErrorDictionary/ErrorDictionary.html">
+              Error Dictionary</a></dd>
+              <dd><a href="../documents/PreferenceDictionary/PreferenceDictionary.html">
+              Preference Dictionary</a></dd>
+              <dd><a href="../documents/SessionLogs/SessionLogs.html">
+              Session Log Explanation</a></dd>
+            </dl>
           </td>
         </tr>
       </table>
@@ -185,66 +204,116 @@ Deborah Lee Soltesz
       </xsl:if>
 -->
 
-<!-- Introductory Tutorials -->
+<!-- Task Specific Guides -->
     <hr/>
-    <h2>Introductory Tutorials</h2>
+    <h2>Task Specific Guides</h2>
       <p>
-        These documents will take you through a small tutorial to get you running your first few applications and explain some of the basics of ISIS. 
-        They will also give you a brief introduction to the planetary data ecosystem and how you can find data to process in ISIS.
+        These resources apply to specific applications or specialized processing methods. They provide particulars about how to work with individual 
+        applications or how specialized data is formatted.
       </p>
-      <table class="tableTOC">
+      <table class="tableTOCmulticol">
 
         <!-- hardcoded links -->
         <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS">
-            Introduction to ISIS</a>
-          </th>
-          <td>
-          ISIS is typically run through the command-line interface (CLI) or a graphical user interface (GUIs). All application have GUIs, but not all 
-          application can be entirely run from the command line. The interactive ISIS applications are GUI only and are used to visualize and edit 
-          specialized data, these applications all start with “q” (”qview”, “qmos”, etc.).
+          <td style="width:33%">
+            <dl>
+              <dt><h4>About Specific Applications</h4></dt>
+              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/General_Utility">
+              fx Guide</a></dd>
+              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Autoseed">
+              autoseed Guide</a></dd>
+              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/SPICE">
+              SPICE in ISIS</a></dd>
+              <dd><a href="../documents/PatternMatch/PatternMatch.html">
+              Pattern Matching Guide</a></dd>
+              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Automatic_Registration">
+              autoreg Guide</a></dd>
+            </dl>
           </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data">
-            Locating and Ingesting Image Data</a>
-          </th>
-          <td>
-          Descritpionnnn, description!
+
+          <td style="width:33%">
+            <dl>
+              <dt><h4>About Specialized Methods</h4></dt>
+              <dd><a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/971/IsisDemoIntro.pdf">
+              Photogrammetry in ISIS</a></dd>
+              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Image_Registration">
+              Image Registration</a></dd>
+              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Multi-Instrument_Registration">
+              Multi-Instrument Registration</a></dd>
+              <dd><a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/973/Jigsaw.pdf">
+              Jigsaw Overview</a></dd>
+            </dl>
+          </td>
+
+          <td style="width:33%">
+            <dl>
+              <dt><h4>Specialized Method References</h4></dt>
+              <dd><a href="https://isis.astrogeology.usgs.gov/documents/ControlNetworks/index.html">
+              Control Network Reference</a></dd>
+              <dd><a href="">
+              Map Definition Reference</a></dd>
+            </dl>
           </td>
         </tr>
       </table>
 
 
-<!-- Support -->
+<!-- Policies -->
       <hr/>
-      <h2>Support</h2>
+      <h2>Policies</h2>
       <p>
-        DESCRIPTION
+        These documents describe various policies about what users can expect when using ISIS.
       </p>
 
       <table class="tableTOC">
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/issues">
-            Github Issues</a>
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Release-Schedule">
+            Release Schedule</a>
           </th>
           <td>
-          Here you can post bug reports or feature requests and find out about the status of bugs posted by other users.
+          Description of Astrogeology Science Center's ISIS release cadence and expected dates of future releases.
           </td>
         </tr>
 
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://astrodiscuss.usgs.gov/">
-            AstroDiscuss</a>
+            <a href="../documents/BackwardCompatibility/BackwardCompatibility.html">
+            Backward Compatibility Policy</a>
           </th>
           <td>
-          A community board where we collect our online knowledge base, provide release announcements, and provide user support. If you need help, 
-          want to get the latest news, or just want to learn more and interact with other ISIS3 users come say hello!
+          Policy for ISIS backward compatibility for users.
+          </td>
+        </tr>
+
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Deprecation">
+            Deprecation Policy</a>
+          </th>
+          <td>
+          ISIS functionality deprecation procedure.
+          </td>
+        </tr>
+
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../documents/UserRights/UserRights.html">
+            User Rights</a>
+          </th>
+          <td>
+          Licensing, copyright, distribution, and warranty information.
+          </td>
+        </tr>
+
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../documents/Disclaimers/Disclaimers.html">
+            Disclaimers</a>
+          </th>
+          <td>
+          Standard legalese regarding usage, trademarks, and privacy.
           </td>
         </tr>
       </table>

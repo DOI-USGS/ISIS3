@@ -97,7 +97,7 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                User Getting Started Documentation
+                User Getting Started 
               </h1>
               <p>
                 Welcome! We are very glad you are joining the community!
@@ -212,7 +212,7 @@ Deborah Lee Soltesz
             Locating and Ingesting Image Data</a>
           </th>
           <td>
-          Descritpionnnn, description!
+          Overview of planetary datasets serving locations and descriptions of how to download and work with said data in ISIS.
           </td>
         </tr>
       </table>
@@ -222,7 +222,7 @@ Deborah Lee Soltesz
       <hr/>
       <h2>Support</h2>
       <p>
-        DESCRIPTION
+        Join the community of ISIS users, find help, and share your successes!
       </p>
 
       <table class="tableTOC">

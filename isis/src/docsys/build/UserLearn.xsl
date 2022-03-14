@@ -39,7 +39,7 @@ Deborah Lee Soltesz
     <html>
       <head>
         <title>
-            USGS Isis: Getting Started User Documentation
+            USGS Isis: Learn More User Documentation
         </title>
         <meta name="keywords" content="about, overview, introduction, Isis, image processing, software, open source, remote sensing, planetary science, astrogeology"/>
         <meta name="description" content="About the Integrated Software for Imagers and Spectrometers (ISIS), created and managed by the USGS Astrogeology Research Program. ISIS provides a comprehensive, user-friendly, portable tool for processing, analyzing, and displaying remotely sensed image data."/>
@@ -97,15 +97,15 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                User Getting Started Documentation
+                User Learn More 
               </h1>
               <p>
-                Welcome! We are very glad you are joining the community!
+                At this point you should have ISIS installed and have run your first commands, meaning you are officially an ISIS user, congratulations!
               <p>
               </p>
-                On this page you will find resources to help you start using the ISIS software; how to install, running your 
-                first command, and a short tutorial to get you familiar with ISIS. This page will also direct you to some
-                resources where you can seek help from fellow community members.
+                On this page you will find information and resources to help you further your skills as an ISIS user as well as learn some of the history 
+                of ISIS and its predecessors.  The tutorials and explanations here will help you personalize the operation of your ISIS install and the walk 
+                you through the basic steps of processing data through ISIS to create analysis ready data or control networks from various mission data.
               </p>
               <p>
               </p>
@@ -118,32 +118,42 @@ Deborah Lee Soltesz
 
 
 
-<!-- Installation -->
+<!-- About  -->
       <hr/>
-      <h2>Installation</h2>
+      <h2>About</h2>
       <p>
-        ISIS is a free and open-source software (FOSS) that has been in use by the planetary science and data community for decades. These documents 
-        describe how to install the latest version of ISIS and some legacy versions too.
+        These resources contain information about ISIS's history, personalization capabilities, and the entire catalog of applications ISIS contains.
       </p>
       <table class="tableTOC">
 
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">
-            ISIS Installation Guide</a>
+            <a href="../documents/IsisHistory/IsisHistory.html">
+            ISIS History</a>
           </th>
           <td>
-          Instructions on downloading and installing ISIS 3.6 and later.
+          ISIS has been in development since the early 1970’s, just after the Astrogeology Science Center (ASC) involvement with the Apollo mission. Learn 
+          more about the origin of this foundational software!
           </td>
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="../documents/LegacyInstallGuide/index.html">
-            Legacy ISIS3 Installation Guide</a>
+            <a href="../documents/EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html">
+            Environment and Preference Setup</a>
           </th>
           <td>
-          instructions on downloading and installing versions of ISIS3 3.5.2 and earlier.
+          This document describes how to setup your Unix environment to run ISIS and manage ISIS preference files for multiple users or installations.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../Application/index.html"> 
+            Software Manual</a>
+          </th>
+          <td>
+          This document provides detailed documentation for every application in ISIS. If you are looking for an application to perform a specific task, 
+          this is a great place to start.
           </td>
         </tr>
       </table>
@@ -185,67 +195,116 @@ Deborah Lee Soltesz
       </xsl:if>
 -->
 
-<!-- Introductory Tutorials -->
+<!-- Intermediate Tutorials -->
     <hr/>
-    <h2>Introductory Tutorials</h2>
+    <h2>Intermediate Tutorials</h2>
       <p>
-        These documents will take you through a small tutorial to get you running your first few applications and explain some of the basics of ISIS. 
-        They will also give you a brief introduction to the planetary data ecosystem and how you can find data to process in ISIS.
+        These tutorials walk you through intermediate image processing methods that are useful across a variety of workflows as well 
+        as high-level explanations of some cartographic concepts.
       </p>
-      <table class="tableTOC">
+      <table class="tableTOCmulticol">
+        <tbody>
+          <tr valign="top">
+            <td style="width:33%">
+              <h4>General Image Processing</h4>
+              <p>
+                <a href="https://usgs-astrogeology.github.io/ISIS3/The_Power_of_Spatial_Filters.html">
+                The Power of Spatial Filters</a><br/>
+                Description of spatial filter applications in ISIS and common use cases.<br/>
+                <a href="https://usgs-astrogeology.github.io/ISIS3/Removing_Striping_Noise_from_Image_Data.html">
+                Removing Striping Noise from Image Data</a><br/>
+                Procedures for removing horizontal or vertical noise in an image.
+              </p>
+            </td>
 
-        <!-- hardcoded links -->
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS">
-            Introduction to ISIS</a>
-          </th>
-          <td>
-          ISIS is typically run through the command-line interface (CLI) or a graphical user interface (GUIs). All application have GUIs, but not all 
-          application can be entirely run from the command line. The interactive ISIS applications are GUI only and are used to visualize and edit 
-          specialized data, these applications all start with “q” (”qview”, “qmos”, etc.).
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data">
-            Locating and Ingesting Image Data</a>
-          </th>
-          <td>
-          Descritpionnnn, description!
-          </td>
-        </tr>
+            <td style="width:33%">
+              <h4>Cartography</h4>
+              <p>
+                <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">
+                Learning About Map Projection</a><br/>
+                Description of the types of Projections supported by ISIS.<br/>
+                <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Camera_Geometry">
+                Camera Geometry</a><br/>
+                Description of camera geometry within ISIS and example of ISIS applications that have access to this geometry.
+              </p>
+            </td>
+
+            <td style="width:33%">
+              <h4>Interactive Tools</h4>
+              <p>
+                <a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/972/Qnet.pdf">
+                Qnet</a><br/>
+                An interactive tool to create and edit control networks.<br/>
+                <a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/974/Qtie.pdf">
+                Qtie</a><br/>
+                An interactive tool to update the camer pointing (SPICE) of a single cube.<br/>
+                <a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/975/Qview.pdf">
+                Qview</a><br/>
+                An interactive tool to display and analyze cubes.<br/>
+                <a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/976/Qmos.pdf">
+                Qmos</a><br/>
+                An interactive tool to display and analyze cube footprints.
+              </p>
+            </td>
+
+          </tr>
+        </tbody>
       </table>
 
 
-<!-- Support -->
+<!-- Mission Specific ISIS Processing -->
       <hr/>
-      <h2>Support</h2>
+      <h2>Mission Specific ISIS Processing</h2>
       <p>
-        DESCRIPTION
+        These tutorials walk you through the steps required to map project a variety of the datasets supported by ISIS.
       </p>
 
-      <table class="tableTOC">
+      <table class="tableTOCmulticol">
         <!-- hardcoded links -->
         <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/issues">
-            Github Issues</a>
-          </th>
-          <td>
-          Here you can post bug reports or feature requests and find out about the status of bugs posted by other users.
+          <td style="width:33%">
+            <h4>Moon</h4>
+            <dl>
+              <dt>Lunar Reconnaissance Orbiter</dt>
+              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data">
+              MiniRF</a></dd>
+            </dl>
           </td>
-        </tr>
 
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://astrodiscuss.usgs.gov/">
-            AstroDiscuss</a>
-          </th>
-          <td>
-          A community board where we collect our online knowledge base, provide release announcements, and provide user support. If you need help, 
-          want to get the latest news, or just want to learn more and interact with other ISIS3 users come say hello!
+          <td style="width:33%">
+            <h4>Mars</h4>
+            <dl>
+              <dt><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_(MRO)_Data">
+              Mars Reconnaissance Orbiter</a></dt>
+                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_HiRISE_Data">
+                High Resolution Imaging Science Experiment (HiRise)</a></dd>
+                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_CTX_Data">
+                Context Imager (CTX)</a></dd>
+              <dt><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Mars_Global_Surveyor_Mission">
+              Mars Global Surveyor</a></dt>
+                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Orbiter_Camera_Data">
+                Mars Orbiter Camera (MOC)</a></dd>
+              <dt><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Viking_Orbiter_Mission">
+              Mars Viking Orbiter</a></dt>
+                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Viking_Orbiter_Data">
+                Narrow Angle Camera (NAC) and Wide Angle Camera (WAC)</a></dd>
+            </dl>
           </td>
+
+          <td style="width:33%">
+            <h4>Other</h4>
+            <dl>
+              <dt><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/CSS">
+              Cassini-Huygens</a></dt>
+                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_ISS_Data">
+                Imaging Science Subsystem(ISS)</a></dd>
+                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_RADAR">
+                Radar</a></dd>
+                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_VIMS">
+                Visual and Infrared Mapping Spectrometer (VIMS)</a></dd>
+            </dl>
+          </td>
+
         </tr>
       </table>
 
