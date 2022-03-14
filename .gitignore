@@ -51,6 +51,8 @@ install/
 
 # Unignore the documentation build
 !isis/src/docsys/build
+!isis/src/docsys/Object/build
+!isis/src/docsys/Application/build
 
 # Ignore vs code
 .vscode
