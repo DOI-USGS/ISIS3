@@ -463,6 +463,7 @@ add_custom_target(docs COMMAND ${CMAKE_COMMAND}
                   -DDOXYGEN=${DOXYGEN}  -DXALAN=${XALAN}
                   -DLATEX=${LATEX}
                   -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+                  -DPACKAGE_VERSION=${PACKAGE_VERSION}
                   -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
 
 # Add custom build target to copy modified header files to the build/incs directory.
