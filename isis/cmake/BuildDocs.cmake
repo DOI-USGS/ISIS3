@@ -472,13 +472,14 @@ endfunction(build_object_docs)
 function(build_docs)
 
   message("Building Isis Documentation...")
-  message(" Version is: " ${VERSION})
 
   # Set up output directory and a temporary directory for building
-  set(docVersion       7.0.0)
+  set(docVersion       ${PACKAGE_VERSION})
   set(docBuildFolder   ${CMAKE_BINARY_DIR}/docBuild)
   set(appDataFolder    ${docBuildFolder}/Application/data)
   set(docInstallFolder ${CMAKE_BINARY_DIR}/docs) # Final output documentation
+
+  message(" Version is: " ${docVersion})
 
   # Clean up existing files
   execute_process(COMMAND rm -rf ${docBuildFolder})
