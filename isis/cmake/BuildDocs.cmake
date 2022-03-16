@@ -67,7 +67,7 @@ endfunction(copy_app_docs_info)
 function(build_upper_level)
 
   # Make new (empty) output folders
-  set(newFolders UserDocs AboutIsis General Guides Installation TechnicalInfo)
+  set(newFolders UserDocs UserStart UserLearn UserExplore UserInspire AboutIsis General Guides Installation TechnicalInfo)
   foreach(f ${newFolders})
     file(MAKE_DIRECTORY "${docInstallFolder}/${docVersion}/${f}")
   endforeach()
@@ -192,6 +192,18 @@ function(build_documents_folder)
 
   # USER DOCS TOC
   execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserDocs/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserDocs.xsl)
+
+  # USER GETTING STARTED DOCS TOC
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserStart/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserStart.xsl)
+
+  # USER LEARN MORE DOCS TOC
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserLearn/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserLearn.xsl)
+
+  # USER EXPLORE IN DETAIL DOCS TOC
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserExplore/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserExplore.xsl)
+
+  # USER GET INSPIRED DOCS TOC
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserInspire/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserInspire.xsl)
 
 endfunction(build_documents_folder)
 

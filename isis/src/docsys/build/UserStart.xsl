@@ -101,13 +101,11 @@ Deborah Lee Soltesz
               </h1>
               <p>
                 Welcome! We are very glad you are joining the community!
-              <p>
               </p>
+              <p>
                 On this page you will find resources to help you start using the ISIS software; how to install, running your 
                 first command, and a short tutorial to get you familiar with ISIS. This page will also direct you to some
                 resources where you can seek help from fellow community members.
-              </p>
-              <p>
               </p>
             </td>
             <td align="right" class="caption">

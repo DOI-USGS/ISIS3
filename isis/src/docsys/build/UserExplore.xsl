@@ -102,13 +102,11 @@ Deborah Lee Soltesz
               <p>
                 Now that you have some experience running applications and working with data, you may have some questions 
                 about how exactly ISIS works.
-              <p>
               </p>
+              <p>
                 On this page you will find a wide variety of resources explaining the specific details of how ISIS works. Many 
                 components of ISIS were created in response to the needs of specific data sets. So, there are a wide variety of 
                 processing paths and customizations that you can leverage when creating a workflow.
-              </p>
-              <p>
               </p>
             </td>
             <td align="right" class="caption">

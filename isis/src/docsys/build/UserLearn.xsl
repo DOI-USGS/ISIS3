@@ -101,13 +101,11 @@ Deborah Lee Soltesz
               </h1>
               <p>
                 At this point you should have ISIS installed and have run your first commands, meaning you are officially an ISIS user, congratulations!
-              <p>
               </p>
+              <p>
                 On this page you will find information and resources to help you further your skills as an ISIS user as well as learn some of the history 
                 of ISIS and its predecessors.  The tutorials and explanations here will help you personalize the operation of your ISIS install and the walk 
                 you through the basic steps of processing data through ISIS to create analysis ready data or control networks from various mission data.
-              </p>
-              <p>
               </p>
             </td>
             <td align="right" class="caption">

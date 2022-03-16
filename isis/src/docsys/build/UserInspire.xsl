@@ -39,7 +39,7 @@ Deborah Lee Soltesz
     <html>
       <head>
         <title>
-            USGS Isis: Getting Started User Documentation
+            USGS Isis: Get Inspired User Documentation
         </title>
         <meta name="keywords" content="about, overview, introduction, Isis, image processing, software, open source, remote sensing, planetary science, astrogeology"/>
         <meta name="description" content="About the Integrated Software for Imagers and Spectrometers (ISIS), created and managed by the USGS Astrogeology Research Program. ISIS provides a comprehensive, user-friendly, portable tool for processing, analyzing, and displaying remotely sensed image data."/>
@@ -97,17 +97,11 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                User Getting Started Documentation
+                User Get Inspired
               </h1>
               <p>
-                Welcome! We are very glad you are joining the community!
-              <p>
-              </p>
-                On this page you will find resources to help you start using the ISIS software; how to install, running your 
-                first command, and a short tutorial to get you familiar with ISIS. This page will also direct you to some
-                resources where you can seek help from fellow community members.
-              </p>
-              <p>
+                Let's zoom out and look at what community members have used ISIS to do in the past. These papers, talks and 
+                demonstrations are examples that you can draw inspiration from and model your own workflows after.
               </p>
             </td>
             <td align="right" class="caption">
@@ -118,32 +112,29 @@ Deborah Lee Soltesz
 
 
 
-<!-- Installation -->
+<!-- Talks -->
       <hr/>
-      <h2>Installation</h2>
-      <p>
-        ISIS is a free and open-source software (FOSS) that has been in use by the planetary science and data community for decades. These documents 
-        describe how to install the latest version of ISIS and some legacy versions too.
-      </p>
+      <h2>Talks</h2>
       <table class="tableTOC">
 
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">
-            ISIS Installation Guide</a>
+            <a href="https://youtu.be/rxb5_Q0xrqI?t=5040">
+            </a>
           </th>
           <td>
-          Instructions on downloading and installing ISIS 3.6 and later.
+          A presentation given by Kris Becker concerning the motivation and work done to create the <i>findfeatures</i> application. Coresponding abstract 
+          can be found <a href="https://www.hou.usra.edu/meetings/planetdata2017/pdf/7133.pdf">here</a>
           </td>
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="../documents/LegacyInstallGuide/index.html">
-            Legacy ISIS3 Installation Guide</a>
+            <a href="https://www.youtube.com/watch?v=IYpe-RJj5tE">
+            Using the Community Sensor Model with Planetary Data</a>
           </th>
           <td>
-          instructions on downloading and installing versions of ISIS3 3.5.2 and earlier.
+          A talk given by Jesse Mapel at the OpenPlanetary Lunch
           </td>
         </tr>
       </table>
@@ -185,9 +176,9 @@ Deborah Lee Soltesz
       </xsl:if>
 -->
 
-<!-- Introductory Tutorials -->
+<!-- Papers -->
     <hr/>
-    <h2>Introductory Tutorials</h2>
+    <h2>Papers</h2>
       <p>
         These documents will take you through a small tutorial to get you running your first few applications and explain some of the basics of ISIS. 
         They will also give you a brief introduction to the planetary data ecosystem and how you can find data to process in ISIS.
@@ -216,40 +207,6 @@ Deborah Lee Soltesz
           </td>
         </tr>
       </table>
-
-
-<!-- Support -->
-      <hr/>
-      <h2>Support</h2>
-      <p>
-        DESCRIPTION
-      </p>
-
-      <table class="tableTOC">
-        <!-- hardcoded links -->
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/issues">
-            Github Issues</a>
-          </th>
-          <td>
-          Here you can post bug reports or feature requests and find out about the status of bugs posted by other users.
-          </td>
-        </tr>
-
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://astrodiscuss.usgs.gov/">
-            AstroDiscuss</a>
-          </th>
-          <td>
-          A community board where we collect our online knowledge base, provide release announcements, and provide user support. If you need help, 
-          want to get the latest news, or just want to learn more and interact with other ISIS3 users come say hello!
-          </td>
-        </tr>
-      </table>
-
-
 
 
 
