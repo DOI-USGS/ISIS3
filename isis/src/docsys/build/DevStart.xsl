@@ -102,7 +102,7 @@ Deborah Lee Soltesz
               <p>
                 As Free and Open Source Software (FOSS), everyone is welcome to contribute to ISIS.
                 We define our contributors as the members of the community that help improve the
-                software in some way. Community members can contribute by reporting a bug, writing
+                software. Community members can contribute by reporting a bug, writing
                 documentation, validating the software, working on features, and many other ways.
                 You do not need to write code to contribute!
               </p>
@@ -135,7 +135,7 @@ Deborah Lee Soltesz
             astrodiscuss</a>
           </th>
           <td>
-          Ask or answer questions on out community discussion board.
+          Ask or answer questions on our community discussion board.
           </td>
         </tr>
         <tr valign="top">
@@ -234,7 +234,7 @@ Deborah Lee Soltesz
             Basic ISIS3 Programming</a>
           </th>
           <td>
-          hese exercises will walk you through the basics of ISIS applications.
+          These exercises will walk you through the basics of ISIS applications.
           </td>
         </tr>
         <tr valign="top">
