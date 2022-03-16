@@ -8,11 +8,13 @@
 
 #include "tgocassis2isis.h"
 #include "tgocassisrdrgen.h"
+#include "tgocassismos.h"
 #include "spiceinit.h"
 #include "tgocassisstitch.h"
 #include "tgocassisunstitch.h"
 #include "mosrange.h"
 #include "cam2map.h"
+#include "cubeit.h"
 
 #include "gtest/gtest.h"
 
@@ -20,11 +22,13 @@ using namespace Isis;
 
 static QString TGOCASSIS2ISIS_XML = FileName("$ISISROOT/bin/xml/tgocassis2isis.xml").expanded();
 static QString RDRGEN_XML = FileName("$ISISROOT/bin/xml/tgocassisrdrgen.xml").expanded();
+static QString MOS_XML = FileName("$ISISROOT/bin/xml/tgocassismos.xml").expanded();
 static QString SPICEINIT_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
 static QString STITCH_XML = FileName("$ISISROOT/bin/xml/tgocassisstitch.xml").expanded();
 static QString UNSTITCH_XML = FileName("$ISISROOT/bin/xml/tgocassisunstitch.xml").expanded();
 static QString MOSRANGE_XML = FileName("$ISISROOT/bin/xml/mosrange.xml").expanded();
 static QString CAM2MAP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
+static QString CUBEIT_XML = FileName("$ISISROOT/bin/xml/cubeit.xml").expanded();
 
 TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   QTemporaryDir prefix;
@@ -1145,4 +1149,260 @@ TEST(TgoCassisModuleTests, TgoCassisIngestReingest) {
   EXPECT_NEAR(hist->Sum(), 51800.457383409142, 0.0001);
   EXPECT_EQ(hist->ValidPixels(), 524288);
   EXPECT_NEAR(hist->StandardDeviation(), 0.0020888136703382234, 0.0001);
+}
+
+
+TEST(TgoCassisModuleTests, TgoCassisColorMosaic) {
+  QTemporaryDir prefix;
+
+  // run tgocassis2isis and spiceinit on pan framelet.
+  QString panFileName = prefix.path() + "/panframelet.cub";
+  QVector<QString> tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-PAN-00005-B1.xml",
+                                         "to=" + panFileName};
+
+  UserInterface tgocassis2isisPan(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
+  }
+
+  QVector<QString> spiceinitArgs = {"from=" + panFileName,  "ckp=t", "spkp=t"};
+  UserInterface spiceinitPan(SPICEINIT_XML, spiceinitArgs);
+  try {
+    spiceinit(spiceinitPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run spiceinit on pan image: " << e.what() << std::endl;
+  }
+
+  // run tgocassis2isis and spiceinit on red framelet.
+  QString redFileName = prefix.path() + "/redframelet.cub";
+  tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-RED-01005-B1.xml",
+                        "to=" + redFileName};
+  UserInterface tgocassis2isisRed(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisRed);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
+  }
+
+  spiceinitArgs = {"from=" + redFileName,  "ckp=t", "spkp=t"};
+  UserInterface spiceinitRed(SPICEINIT_XML, spiceinitArgs);
+  try {
+    spiceinit(spiceinitRed);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run spiceinit on pan image: " << e.what() << std::endl;
+  }
+
+  // run tgocassis2isis and spiceinit on blu framelet.
+  QString bluFileName = prefix.path() + "/bluframelet.cub";
+  tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-BLU-03005-B1.xml",
+                        "to=" + bluFileName};
+  UserInterface tgocassis2isisBlu(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisBlu);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on blu image: " << e.what() << std::endl;
+  }
+
+  spiceinitArgs = {"from=" + bluFileName,  "ckp=t", "spkp=t"};
+  UserInterface spiceinitBlu(SPICEINIT_XML, spiceinitArgs);
+  try {
+    spiceinit(spiceinitBlu);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run spiceinit on blu image: " << e.what() << std::endl;
+  }
+
+  // run tgocassis2isis and spiceinit on nir framelet.
+  QString nirFileName = prefix.path() + "/nirframelet.cub";
+  tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-NIR-02005-B1.xml",
+                        "to=" + nirFileName};
+  UserInterface tgocassis2isisNir(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisNir);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on nir image: " << e.what() << std::endl;
+  }
+
+  spiceinitArgs = {"from=" + nirFileName,  "ckp=t", "spkp=t"};
+  UserInterface spiceinitNir(SPICEINIT_XML, spiceinitArgs);
+  try {
+    spiceinit(spiceinitNir);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run spiceinit  on nir image: " << e.what() << std::endl;
+  }
+
+  // run mosrange on cube list
+  FileList *cubeList = new FileList();
+  cubeList->append(panFileName);
+  cubeList->append(redFileName);
+  cubeList->append(bluFileName);
+  cubeList->append(nirFileName);
+
+  QString cubeListFile = prefix.path() + "/cubelist.lis";
+  cubeList->write(cubeListFile);
+
+  QString mapFile = prefix.path() + "/equi.map";
+  QVector<QString> mosrangeArgs = {"fromlist=" + cubeListFile, "to=" + mapFile};
+  UserInterface mosrangeOptions(MOSRANGE_XML, mosrangeArgs);
+
+  try {
+    mosrange(mosrangeOptions);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run mosrange with cube list: " << e.what() << std::endl;
+  }
+
+  // run cam2map and cassismos on pan cube
+  QString panEquiFile = prefix.path() + "/pan_equi.cub";
+  QVector<QString> cam2mapArgs = {"from=" + panFileName,
+                                  "to=" + panEquiFile,
+                                  "map=" + mapFile,
+                                  "defaultrange=map",
+                                  "pixres=mpp",
+                                  "resolution=200"};
+  UserInterface cam2mapPan(CAM2MAP_XML, cam2mapArgs);
+  try {
+    cam2map(cam2mapPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run cam2map on pan image: " << e.what() << std::endl;
+  }
+
+  FileList *panMosaicList = new FileList();
+  panMosaicList->append(panEquiFile);
+  QString panListFile = prefix.path() + "/panMosaic.lis";
+  panMosaicList->write(panListFile);
+
+  QString panCassisMosaic = prefix.path() + "/panCassisMosaic.cub";
+  QVector<QString> cassismosArgs = {"fromlist=" + panListFile, "to=" + panCassisMosaic};
+  UserInterface tgocassismosPan(MOS_XML, cassismosArgs);
+  try {
+    tgocassismos(tgocassismosPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassismos on pan image: " << e.what() << std::endl;
+  }
+
+  // run cam2map and cassismos on nir cube
+  QString nirEquiFile = prefix.path() + "/nir_equi.cub";
+  cam2mapArgs = {"from=" + nirFileName,
+                 "to=" + nirEquiFile,
+                 "map=" + mapFile,
+                 "defaultrange=map",
+                 "pixres=mpp",
+                 "resolution=200"};
+  UserInterface cam2mapNir(CAM2MAP_XML, cam2mapArgs);
+  try {
+    cam2map(cam2mapNir);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run cam2map on nir image: " << e.what() << std::endl;
+  }
+
+  FileList *nirMosaicList = new FileList();
+  nirMosaicList->append(nirEquiFile);
+  QString nirListFile = prefix.path() + "/nirMosaic.lis";
+  nirMosaicList->write(nirListFile);
+
+  QString nirCassisMosaic = prefix.path() + "/nirCassisMosaic.cub";
+  cassismosArgs = {"fromlist=" + nirListFile, "to=" + nirCassisMosaic};
+  UserInterface tgocassismosNir(MOS_XML, cassismosArgs);
+  try {
+    tgocassismos(tgocassismosNir);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassismos on nir image: " << e.what() << std::endl;
+  }
+
+  // run cam2map and cassismos on blu cube
+  QString bluEquiFile = prefix.path() + "/blu_equi.cub";
+  cam2mapArgs = {"from=" + bluFileName,
+                 "to=" + bluEquiFile,
+                 "map=" + mapFile,
+                 "defaultrange=map",
+                 "pixres=mpp",
+                 "resolution=200"};
+  UserInterface cam2mapBlu(CAM2MAP_XML, cam2mapArgs);
+  try {
+    cam2map(cam2mapBlu);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run cam2map on blu image: " << e.what() << std::endl;
+  }
+
+  FileList *bluMosaicList = new FileList();
+  bluMosaicList->append(bluEquiFile);
+  QString bluListFile = prefix.path() + "/bluMosaic.lis";
+  bluMosaicList->write(bluListFile);
+
+  QString bluCassisMosaic = prefix.path() + "/bluCassisMosaic.cub";
+  cassismosArgs = {"fromlist=" + bluListFile, "to=" + bluCassisMosaic};
+  UserInterface tgocassismosBlu(MOS_XML, cassismosArgs);
+  try {
+    tgocassismos(tgocassismosBlu);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassismos on blu image: " << e.what() << std::endl;
+  }
+
+  // run cam2map and cassismos on red cube
+  QString redEquiFile = prefix.path() + "/red_equi.cub";
+  cam2mapArgs = {"from=" + redFileName,
+                  "to=" + redEquiFile,
+                  "map=" + mapFile,
+                  "defaultrange=map",
+                  "pixres=mpp",
+                  "resolution=200"};
+  UserInterface cam2mapRed(CAM2MAP_XML, cam2mapArgs);
+  try {
+    cam2map(cam2mapRed);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run cam2map on red image: " << e.what() << std::endl;
+  }
+
+  FileList *redMosaicList = new FileList();
+  redMosaicList->append(redEquiFile);
+  QString redListFile = prefix.path() + "/redMosaic.lis";
+  redMosaicList->write(redListFile);
+
+  QString redCassisMosaic = prefix.path() + "/redCassisMosaic.cub";
+  cassismosArgs = {"fromlist=" + redListFile, "to=" + redCassisMosaic};
+  UserInterface tgocassismosRed(MOS_XML, cassismosArgs);
+  try {
+    tgocassismos(tgocassismosRed);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassismos on red image: " << e.what() << std::endl;
+  }
+
+
+  // run cubeit
+  FileList *MosaicList = new FileList();
+  MosaicList->append(redCassisMosaic);
+  MosaicList->append(bluCassisMosaic);
+  MosaicList->append(nirCassisMosaic);
+  MosaicList->append(panCassisMosaic);
+  QString mosListFile = prefix.path() + "/mosaicList.lis";
+  MosaicList->write(mosListFile);
+
+  QString coloredMosaic = prefix.path() + "/coloredMosaic.cub";
+  QVector<QString> cubeitArgs = {"fromlist=" + mosListFile, "to=" + coloredMosaic};
+  UserInterface cubeitUI(CUBEIT_XML, cubeitArgs);
+  try {
+    cubeit(cubeitUI);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run cubeit on mosaic list: " << e.what() << std::endl;
+  }
+
 }
