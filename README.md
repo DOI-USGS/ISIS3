@@ -88,7 +88,7 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 1. The environment is now ready to download ISIS and its dependencies:
 
     ```bash
-    conda install -c usgs-astrogeology isis
+    conda install -c usgs-astrogeology isis=6.0.0
     ```
     
     If you would like to work with our latest ISIS version 3, rather than updating
