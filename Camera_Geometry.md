@@ -127,7 +127,7 @@ Example (not all parameters shown):
 
 <span id="Campt"></span>
 
-### **Ct** [¶](#Ct-)
+### **Campt** [¶](#Ct-)
 
 The application
 [**campt**](http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/campt/campt.html)
