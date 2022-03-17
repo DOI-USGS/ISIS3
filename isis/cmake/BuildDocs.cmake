@@ -83,9 +83,11 @@ function(build_upper_level)
 
   # These folders are populated inside "build_documents_folder"
 
-  # Create the main index.html file aka the home page
-  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"${docVersion}/\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
-  # Create a second main page inside the version numbered area for when the page above gets overwritten with a new version 
+  # Create the upper level index.html. This is a redirect down into the current version
+  message("one ==================..")
+  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"${docVersion}/\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/redirect.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/redirect.xsl)
+  message("two ----------------..")
+  # Create the main documentaion page. This is located in the version directory 
   execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
 
  # This folder just gets copied as-is
@@ -497,22 +499,22 @@ function(build_docs)
   file(MAKE_DIRECTORY "${docInstallFolder}")
 
   message("Copying application information...")
-  copy_app_docs_info()
+#  copy_app_docs_info()
 
   message("Building upper level directories...")
   build_upper_level()
 
-  build_documents_folder()
+#  build_documents_folder()
 
   message("Building application docs...")
-  build_application_docs()
+#  build_application_docs()
 
   message("Building additional TOCs...")
-  add_extra_tocs()
+#  add_extra_tocs()
 
   # This step requires Latex and Doxygen
   message("Building object documentation")
-  build_object_docs()
+#  build_object_docs()
 
   # copy the built docs in the build directory over to the install directory on install
   execute_process(COMMAND cp -rf ${docInstallFolder} ${CMAKE_INSTALL_PREFIX})
