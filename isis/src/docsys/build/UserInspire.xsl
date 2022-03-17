@@ -125,7 +125,7 @@ Deborah Lee Soltesz
             </a>
           </th>
           <td>
-            A presentation given by Kris Becker concerning the motivation and work done to create the <i>findfeatures</i> application. The Corresponding abstract 
+            A presentation given by Kris Becker concerning the motivation and work done to create the <i>findfeatures</i> application. The corresponding abstract 
             can be found <a href="https://www.hou.usra.edu/meetings/planetdata2017/pdf/7133.pdf">here</a>.
           </td>
         </tr>

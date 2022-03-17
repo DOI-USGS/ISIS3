@@ -515,7 +515,7 @@ function(build_docs)
   file(MAKE_DIRECTORY "${docInstallFolder}")
 
   message("Copying application information...")
-  # copy_app_docs_info()
+  copy_app_docs_info()
 
   message("Building upper level directories...")
   build_upper_level()
@@ -523,14 +523,14 @@ function(build_docs)
   build_documents_folder()
 
   message("Building application docs...")
-  # build_application_docs()
+  build_application_docs()
 
   message("Building additional TOCs...")
-  # add_extra_tocs()
+  add_extra_tocs()
 
   # This step requires Latex and Doxygen
   message("Building object documentation")
-  # build_object_docs()
+  build_object_docs()
 
   # copy the built docs in the build directory over to the install directory on install
   execute_process(COMMAND cp -rf ${docInstallFolder} ${CMAKE_INSTALL_PREFIX})
