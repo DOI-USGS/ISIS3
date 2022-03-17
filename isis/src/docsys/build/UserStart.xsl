@@ -97,15 +97,15 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                User Getting Started 
+                Getting Started As an ISIS User
               </h1>
               <p>
                 Welcome! We are very glad you are joining the community!
               </p>
               <p>
-                On this page you will find resources to help you start using the ISIS software; how to install, running your 
-                first command, and a short tutorial to get you familiar with ISIS. This page will also direct you to some
-                resources where you can seek help from fellow community members.
+                On this page you will find resources to help you start using the ISIS software; how to install ISIS, running your 
+                first command, and a short tutorial to get you familiar with ISIS. This page will also direct you to
+                locations where you can seek help from fellow community members.
               </p>
             </td>
             <td align="right" class="caption">
@@ -120,7 +120,7 @@ Deborah Lee Soltesz
       <hr/>
       <h2>Installation</h2>
       <p>
-        ISIS is a free and open-source software (FOSS) that has been in use by the planetary science and data community for decades. These documents 
+        The first step in using ISIS is installing it on your system. These documents 
         describe how to install the latest version of ISIS and some legacy versions too.
       </p>
       <table class="tableTOC">
@@ -132,7 +132,7 @@ Deborah Lee Soltesz
             ISIS Installation Guide</a>
           </th>
           <td>
-          Instructions on downloading and installing ISIS 3.6 and later.
+          Instructions for downloading and installing ISIS.
           </td>
         </tr>
         <tr valign="top">
@@ -141,7 +141,7 @@ Deborah Lee Soltesz
             Legacy ISIS3 Installation Guide</a>
           </th>
           <td>
-          instructions on downloading and installing versions of ISIS3 3.5.2 and earlier.
+          Instructions for downloading and installing legacy versions of ISIS3 from our rsync server.
           </td>
         </tr>
       </table>
@@ -183,12 +183,12 @@ Deborah Lee Soltesz
       </xsl:if>
 -->
 
-<!-- Introductory Tutorials -->
+<!-- Introductory Materials -->
     <hr/>
-    <h2>Introductory Tutorials</h2>
+    <h2>Introductory Materials</h2>
       <p>
-        These documents will take you through a small tutorial to get you running your first few applications and explain some of the basics of ISIS. 
-        They will also give you a brief introduction to the planetary data ecosystem and how you can find data to process in ISIS.
+        These materials will give you an introduction to ISIS, a brief tutorial on running ISIS applications, and provide some context about the history of ISIS
+        and its position within the planetary data ecosystem.
       </p>
       <table class="tableTOC">
 
@@ -199,9 +199,7 @@ Deborah Lee Soltesz
             Introduction to ISIS</a>
           </th>
           <td>
-          ISIS is typically run through the command-line interface (CLI) or a graphical user interface (GUIs). All application have GUIs, but not all 
-          application can be entirely run from the command line. The interactive ISIS applications are GUI only and are used to visualize and edit 
-          specialized data, these applications all start with “q” (”qview”, “qmos”, etc.).
+          A tutorial on what ISIS is and the different ways you can interact with ISIS applications.
           </td>
         </tr>
         <tr valign="top">
@@ -210,7 +208,17 @@ Deborah Lee Soltesz
             Locating and Ingesting Image Data</a>
           </th>
           <td>
-          Overview of planetary datasets serving locations and descriptions of how to download and work with said data in ISIS.
+          An overview of how to find, download, and ingest planetary data to use with ISIS.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../documents/IsisHistory/IsisHistory.html">
+            ISIS History</a>
+          </th>
+          <td>
+          ISIS has been in development since the early 1970’s, just after the Astrogeology Science Center (ASC) involvement with the Apollo mission. Learn 
+          more about the origin of this foundational software!
           </td>
         </tr>
       </table>
@@ -241,8 +249,8 @@ Deborah Lee Soltesz
             AstroDiscuss</a>
           </th>
           <td>
-          A community board where we collect our online knowledge base, provide release announcements, and provide user support. If you need help, 
-          want to get the latest news, or just want to learn more and interact with other ISIS3 users come say hello!
+          A community board where we collect our online knowledge base, post release announcements, and provide user support. If you need help, 
+          want to get the latest news, or just want to learn more and interact with other ISIS users come say hello!
           </td>
         </tr>
       </table>

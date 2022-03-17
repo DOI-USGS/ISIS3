@@ -118,105 +118,6 @@ Deborah Lee Soltesz
         </table>
 
 
-<!-- API Reference​ -->
-    <hr/>
-    <h2>ISIS API Reference</h2>
-      <p>
-        The ISIS API reference is particularly useful if you are working on an application
-        or interested in using the ISIS library as a dependency.
-      </p>
-      <table class="tableTOC">
-
-        <!-- hardcoded links -->
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://astrodiscuss.usgs.gov/">
-            astrodiscuss</a>
-          </th>
-          <td>
-          Ask or answer questions on out community discussion board.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/issues">
-            GitHub Issues</a>
-          </th>
-          <td>
-          Comment on bug reports or feature requests from other users.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/discussions?discussions_q=label%3ARFC">
-            Requests for Comment</a>
-          </th>
-          <td>
-          Provide feedback on major changes proposed for ISIS.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS_TC">
-            ISIS Technical Committee</a>
-          </th>
-          <td>
-          Get involved in project governance.
-          </td>
-        </tr>
-      </table>
-
-
-<!-- XML Schemas -->
-      <hr/>
-      <h2>XML Schemas</h2>
-      <p>
-        The interface for ISIS applications and much of the ISIS documentation (including this
-        very page) are generated from XML files. These schemas are a helpful reference if you
-        are creating a new application, modifying application arguments, or writing documentation.
-      </p>
-      <table class="tableTOC">
-
-        <!-- hardcoded links -->
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#getting-started-with-github">
-            Downloading the Source Code</a>
-          </th>
-          <td>
-          How to pull the source code from GitHub.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#anaconda-and-isis3-dependencies">
-            Dependency Management</a>
-          </th>
-          <td>
-          How to download the dependencies required to build ISIS.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3">
-            Building</a>
-          </th>
-          <td>
-          How to build ISIS once you have the source code and dependencies downloaded.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests">
-            Running the Test Suite</a>
-          </th>
-          <td>
-          How to run the ISIS test suite once ISIS is built.
-          </td>
-        </tr>
-      </table>
-
-
 <!-- Documentation Guides​ -->
     <hr/>
     <h2>Documentation Guides</h2>
@@ -229,21 +130,32 @@ Deborah Lee Soltesz
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_1">
-            Basic ISIS3 Programming</a>
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Contributing-Application-Documentation">
+            Contributing ISIS Application Documentation</a>
           </th>
           <td>
-          hese exercises will walk you through the basics of ISIS applications.
+          This how-to guide will take you through the steps required to write and modify the ISIS
+          application documentation.
           </td>
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_2">
-            Advanced ISIS Programming Exercises</a>
+            <a href="../documents/HowToApplicationExamples/index.html">
+            ISIS Application Examples Guide</a>
           </th>
           <td>
-          These exercises give you the chance to explore more yourself and interact with more
-          complex components of the ISIS API.
+          This how-to guide covers writing examples for ISIS application documentation.
+          Application examples are a specialized section of the ISIS application
+          documentation and require additional steps besides editing the application XML.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../documents/HowToGeneralDocumentation/index.html">
+            General ISIS Documentation Guide</a>
+          </th>
+          <td>
+          This how-to guide covers writing documentation for this website.
           </td>
         </tr>
       </table>
@@ -261,24 +173,35 @@ Deborah Lee Soltesz
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="">
-            Adding a New Feature</a>
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Writing-ISIS3-Tests-Using-Gtest-and-Ctest">
+            Writing Tests Using GTest and CTest</a>
           </th>
           <td>
-          This document will walk you through what's needed when adding a new feature to ISIS.
-          If there is something you think is missing in ISIS this will walk you through the
-          steps needed to add it.
+          As of version 3.6, ISIS uses googletest and CTest for testing. This how-to guide will
+          walk you through the steps required to write tests using the new frameworks. It also
+          covers the steps needed to convert ISIS applications to the new callable format.
           </td>
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="">
-            Modifying an Existing Feature</a>
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Test-Data-Obtaining,-Maintaining,-and-Submitting">
+            ISIS Test Data</a>
           </th>
           <td>
-          Modifying an existing feature is slightly more complex than adding a new feature to ISIS.
-          This document will walk you through what is different when you are building from an
-          existing feature instead of something new.
+          Legacy Makefile based tests in ISIS use a input and truth data to confirm that the
+          aplications produce the proper output. This page explains how to download these
+          files required to run the ISIS test suite.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../documents/HowToApplicationCategoryTest/index.html">
+            Legacy Makefile Tests Guide</a>
+          </th>
+          <td>
+          This documents describes how legacy Makefile tests work. Contributors are required
+          to use the new googletest system for new tests, but there are rare situations where
+          existing legacy Makefile tests need to be updated and cannot be converted.
           </td>
         </tr>
       </table>
@@ -296,24 +219,57 @@ Deborah Lee Soltesz
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="">
-            Adding a New Feature</a>
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Public-Release-Process">
+            Release Process</a>
           </th>
           <td>
-          This document will walk you through what's needed when adding a new feature to ISIS.
-          If there is something you think is missing in ISIS this will walk you through the
-          steps needed to add it.
+          This guide goes through all the steps required to create both release candidates
+          and full releases.
+          </td>
+        </tr>
+      </table>
+
+
+<!-- API Reference​ -->
+    <hr/>
+    <h2>ISIS API Reference</h2>
+      <p>
+        The <a href="../Object/Developer/index.html">ISIS API reference</a> is particularly
+        useful if you are working on an application or interested in using the ISIS library
+        as a dependency.
+      </p>
+
+
+<!-- XML Schemas -->
+      <hr/>
+      <h2>XML Schemas</h2>
+      <p>
+        The interface for ISIS applications and much of the ISIS documentation (including this
+        very page) are generated from XML files. These schemas are a helpful reference if you
+        are creating a new application, modifying application arguments, or writing documentation.
+      </p>
+      <table class="tableTOC">
+
+        <!-- hardcoded links -->
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../Schemas/Application/documentation/index.html">
+            ISIS Application XML Schema</a>
+          </th>
+          <td>
+          This schema defines the ISIS application XML format. This includes the applications
+          documentation and all of the application arguments.
           </td>
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="">
-            Modifying an Existing Feature</a>
+            <a href="../Schemas/Documentation/documentation/index.html">
+            ISIS Web Documentation XML Schema</a>
           </th>
           <td>
-          Modifying an existing feature is slightly more complex than adding a new feature to ISIS.
-          This document will walk you through what is different when you are building from an
-          existing feature instead of something new.
+          This schema defines the XML documentation format used to generate this documentation.
+          If you want to make a change to the ISIS website documentation, then you will need to
+          reference this schema for your changes.
           </td>
         </tr>
       </table>
