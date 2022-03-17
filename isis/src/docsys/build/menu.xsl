@@ -23,40 +23,51 @@ Deborah Lee Soltesz
       Home</a>
     </div>
 
-    <div>
-      <a href="{$menuPath}AboutIsis/index.html" target="_top">
-      About ISIS</a>
-    </div>
-
-    <div>
-      <a href="https://github.com/USGS-Astrogeology/ISIS3/issues" target="_blank" title="Launch the ISIS Support Center in a new window">
-      Support</a>
-    </div>
-
-    <div>
-      <a href="{$menuPath}Installation/index.html" target="_top">
-      Download</a>
-    </div>
 
     <hr/>
     <h2>
-      ISIS
+      User Documentation
     </h2>
 
     <div>
-      <a href="{$menuPath}UserDocs/index.html" target="_top">
-      Documentation</a>
-    </div>
-
-    <!-- Isis Workshop is only available on the website  -->
-    <div>
-      <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops" target="_blank" title="Launch ISIS Workshop in a new window">
-      Tutorials</a>
+      <a href="{$menuPath}UserStart/index.html" target="_top">
+      Getting Started</a>
     </div>
 
     <div>
-      <a href="{$menuPath}TechnicalInfo/index.html" target="_top">
-      Technical Documents</a>
+      <a href="{$menuPath}UserLearn/index.html" target="_top">
+      Learn More</a>
+    </div>
+
+    <div>
+      <a href="{$menuPath}UserExplore/index.html" target="_top">
+      Explore in Detail</a>
+    </div>
+
+    <div>
+      <a href="{$menuPath}UserInspire/index.html" target="_top">
+      Get Inspired</a>
+    </div>
+
+
+    <hr/>
+    <h2>
+      Contributor Documentation
+    </h2>
+
+    <div>
+      <a href="{$menuPath}DevStart/index.html" target="_top">
+      Getting Started</a>
+    </div>
+
+    <div>
+      <a href="{$menuPath}DevExplore/index.html" target="_top">
+      Explore in Detail</a>
+    </div>
+
+    <div>
+      <a href="{$menuPath}DevInspire/index.html" target="_top">
+      Get Inspired</a>
     </div>
 
 

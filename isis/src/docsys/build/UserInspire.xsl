@@ -121,11 +121,12 @@ Deborah Lee Soltesz
         <tr valign="top">
           <th style="width:25%">
             <a href="https://youtu.be/rxb5_Q0xrqI?t=5040">
+            A New Approach to Create Image Control Networks in ISIS
             </a>
           </th>
           <td>
-          A presentation given by Kris Becker concerning the motivation and work done to create the <i>findfeatures</i> application. Coresponding abstract 
-          can be found <a href="https://www.hou.usra.edu/meetings/planetdata2017/pdf/7133.pdf">here</a>
+            A presentation given by Kris Becker concerning the motivation and work done to create the <i>findfeatures</i> application. The corresponding abstract 
+            can be found <a href="https://www.hou.usra.edu/meetings/planetdata2017/pdf/7133.pdf">here</a>.
           </td>
         </tr>
         <tr valign="top">
@@ -134,7 +135,8 @@ Deborah Lee Soltesz
             Using the Community Sensor Model with Planetary Data</a>
           </th>
           <td>
-          A talk given by Jesse Mapel at the OpenPlanetary Lunch
+            A talk given by Jesse Mapel at the OpenPlanetary Lunch covering the Community Sensor Model API and the USGS ASC's implementation of it and 
+            supported cameras as of October 2021.
           </td>
         </tr>
       </table>
@@ -176,34 +178,58 @@ Deborah Lee Soltesz
       </xsl:if>
 -->
 
-<!-- Papers -->
+<!-- Papers and Posters -->
     <hr/>
-    <h2>Papers</h2>
-      <p>
-        These documents will take you through a small tutorial to get you running your first few applications and explain some of the basics of ISIS. 
-        They will also give you a brief introduction to the planetary data ecosystem and how you can find data to process in ISIS.
-      </p>
+    <h2>Papers and Posters</h2>
       <table class="tableTOC">
 
         <!-- hardcoded links -->
         <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS">
-            Introduction to ISIS</a>
+          <th style="width:35%">
+            <a href="https://www.hou.usra.edu/meetings/lpsc2018/pdf/2538.pdf">
+            Production of New Clementine UVVIS Map Products Tied to the LRO Reference Frame</a>
           </th>
           <td>
-          ISIS is typically run through the command-line interface (CLI) or a graphical user interface (GUIs). All application have GUIs, but not all 
-          application can be entirely run from the command line. The interactive ISIS applications are GUI only and are used to visualize and edit 
-          specialized data, these applications all start with “q” (”qview”, “qmos”, etc.).
+          In the production of the new product, the LROC team leveraged ISIS to ingest and calibrate the Clementine image as well as used the <i>findfeatures</i> 
+          application to automatically generate control points in their registration process.
           </td>
         </tr>
         <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data">
-            Locating and Ingesting Image Data</a>
+          <th style="width:35%">
+            <a href="https://www.isprs-ann-photogramm-remote-sens-spatial-inf-sci.net/I-4/203/2012/isprsannals-I-4-203-2012.pdf">
+            Jigsaw: The ISIS3 Bundle Adjustment for Extraterrestrial Photogrammetry</a>
           </th>
           <td>
-          Descritpionnnn, description!
+            One of the original authors of the <i>jigsaw</i> application describes the sparse matrix method of the photogrammetric bundle implemented in the 
+            <i>jigsaw</i> application.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:35%">
+            <a href="https://www.hou.usra.edu/meetings/lpsc2014/eposter/1915.pdf">
+            Photometric Control of Oblique Apollo 15 Metric Camera Images</a>
+          </th>
+          <td>
+            Assessing the capabilities of the ISIS software to photometrically and geodetically control oblique images from the Apollo Metric Camera (MC) data set.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:35%">
+            <a href="https://www.hou.usra.edu/meetings/lpsc2014/pdf/2892.pdf">
+            Automated and Accurate: Making DTMs from LRO-NAC using the Ames Stereo Pipeline</a>
+          </th>
+          <td>
+            Outline of the ISIS and ASP commands used by the LROC team to generate automated Digital Terrain Models (DTMs).
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:35%">
+            <a href="https://agupubs.onlinelibrary.wiley.com/doi/pdfdirect/10.1029/2007JE003000">
+            Ultrahigh resolution topographic mapping of Mars with MRO HiRISE stereo images: Meter-scale slopes of candidate Phoenix landing sites</a>
+          </th>
+          <td>
+            An analysis of candidate landing sites for the Phoenix mission in which ISIS helped calibrate and rectify images from the Mars Global Surveyor 
+            (MGS) Mars Orbiter Camera (MOC) and Mars Reconnaissance Orbiter (MRO) High Resolution Imaging Science Experiment (HiRISE) instruments.
           </td>
         </tr>
       </table>
