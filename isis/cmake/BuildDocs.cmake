@@ -83,10 +83,10 @@ function(build_upper_level)
 
   # These folders are populated inside "build_documents_folder"
 
-  # Create the main index.html file aka the home page
-  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"${docVersion}/\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
-  # Create a second main page inside the version numbered area for when the page above gets overwritten with a new version 
-  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
+  # Create a redirect for the top level index file. It points to the version index file
+  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"${docVersion}/\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/redirect.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/redirect.xsl)
+  # Create the main documentaion page. This is located in the version directory 
+  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
 
  # This folder just gets copied as-is
  # Note: Schemas are referenced inside the application xml files. The schema URI inside the xmls do not have version numbers in the path 
