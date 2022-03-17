@@ -141,7 +141,7 @@
           <tbody>
             <tr valign="top">
               <td style="width:33%">
-                <h4><a href="">Getting Started</a></h4>
+                <h4><a href="DevStart/index.html">Getting Started</a></h4>
                 <ul>
                   <li>
                     Start Contributing
@@ -164,7 +164,7 @@
                 </ul>
               </td>
               <td style="width:33%">
-                <h4><a href="">Explore in Detail</a></h4>
+                <h4><a href="DevExplore/index.html">Explore in Detail</a></h4>
                 <ul>
                   <li>
                     Developer API Reference
@@ -181,7 +181,7 @@
                 </ul>
               </td>
               <td style="width:33%">
-                <h4><a href="">Get Inspired</a></h4>
+                <h4><a href="DevInspire/index.html">Get Inspired</a></h4>
                 <ul>
                   <li>
                     Github "good first" issues
