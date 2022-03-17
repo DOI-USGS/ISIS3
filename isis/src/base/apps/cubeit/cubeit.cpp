@@ -157,7 +157,7 @@ namespace Isis {
 
     // Create the output cube
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    Cube *ocube = p2.SetOutputCube("TO", att, nsamps, nlines, nbands);
+    Cube *ocube = p2.SetOutputCube(ui.GetCubeName("TO"), att, nsamps, nlines, nbands);
     p2.ClearInputCubes();
 
     p2.Progress()->SetText("Allocating cube");

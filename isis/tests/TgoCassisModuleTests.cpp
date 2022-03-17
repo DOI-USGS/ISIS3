@@ -1405,4 +1405,134 @@ TEST(TgoCassisModuleTests, TgoCassisColorMosaic) {
     FAIL() << "Unable to run cubeit on mosaic list: " << e.what() << std::endl;
   }
 
+  // Mosaic Cube
+  Cube mosCube(coloredMosaic);
+  Pvl *lab = mosCube.label();
+
+  // Instrument Group
+  PvlGroup mos = lab->findGroup("Mosaic", Pvl::Traverse);
+  EXPECT_EQ(mos["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
+  EXPECT_EQ(mos["InstrumentId"][0].toStdString(), "CaSSIS");
+  EXPECT_EQ(mos["ObservationId"][0].toStdString(), "CRUS_049218_201_0" );
+  EXPECT_EQ(mos["StartTime"][0].toStdString(), "2016-11-26T22:50:27.381");
+  EXPECT_EQ(mos["StopTime"][0].toStdString(), "2016-11-26T22:50:27.382");
+  EXPECT_EQ(mos["SpacecraftClockStartCount"][0].toStdString(), "2f015435767e275a");
+  EXPECT_DOUBLE_EQ(double(mos["IncidenceAngle"]), 44.946650468616);
+  EXPECT_DOUBLE_EQ(double(mos["EmissionAngle"]), 11.637754697441);
+  EXPECT_DOUBLE_EQ(double(mos["LocalTime"]), 14.429448515306);
+  EXPECT_DOUBLE_EQ(double(mos["SolarLongitude"]), 269.1366003982);
+  EXPECT_DOUBLE_EQ(double(mos["SubSolarAzimuth"]), 139.56469945225);
+  EXPECT_DOUBLE_EQ(double(mos["NorthAzimuth"]), 270.0);
+
+  // Archive Group
+  PvlGroup archive = lab->findGroup("Archive", Pvl::Traverse);
+  EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
+  EXPECT_EQ(archive["ProductVersionId"][0].toStdString(), "UNK");
+  EXPECT_EQ(archive["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");
+  EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
+  EXPECT_DOUBLE_EQ(double(archive["Offset"]), 0.0);
+  EXPECT_DOUBLE_EQ(double(archive["PredictMaximumExposureTime"]), 1.5952);
+  EXPECT_DOUBLE_EQ(double(archive["CassisOffNadirAngle"]), 10.032);
+  EXPECT_DOUBLE_EQ(double(archive["PredictedRepetitionFrequency"]), 367.5);
+  EXPECT_DOUBLE_EQ(double(archive["GroundTrackVelocity"]), 3.4686);
+  EXPECT_DOUBLE_EQ(double(archive["ForwardRotationAngle"]), 52.703);
+  EXPECT_DOUBLE_EQ(double(archive["SpiceMisalignment"]), 185.422);
+  EXPECT_DOUBLE_EQ(double(archive["FocalLength"]), 0.8770);
+  EXPECT_DOUBLE_EQ(double(archive["FNumber"]), 6.50);
+  EXPECT_EQ(int(archive["ExposureTimeCommand"]), 150);
+  EXPECT_EQ(int(archive["FrameletNumber"]), 5);
+  EXPECT_EQ(int(archive["NumberOfFramelets"]), 40);
+  EXPECT_EQ(int(archive["ImageFrequency"]), 400000);
+  EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
+  EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799268);
+  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
+  EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 1.440e-003);
+  EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 0.16);
+  EXPECT_DOUBLE_EQ(double(archive["IFOV"]), 1.140e-005);
+  EXPECT_EQ(archive["FiltersAvailable"][0].toStdString(), "BLU RED NIR PAN");
+  EXPECT_DOUBLE_EQ(double(archive["PixelHeight"]), 10.0);
+  EXPECT_DOUBLE_EQ(double(archive["PixelWidth"]), 10.0);
+  EXPECT_DOUBLE_EQ(double(archive["ReadNoise"]), 61.0);
+  EXPECT_DOUBLE_EQ(double(archive["SubInstrumentIdentifier"]), 61.0);
+  EXPECT_EQ(int(archive["WindowCount"]), 1);
+  EXPECT_EQ(int(archive["Window1Binning"]), 0);
+  EXPECT_EQ(int(archive["Window1StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window1EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window1StartLine"]), 354);
+  EXPECT_EQ(int(archive["Window1EndLine"]), 632);
+  EXPECT_EQ(int(archive["Window2Binning"]), 0);
+  EXPECT_EQ(int(archive["Window2StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window2EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window2StartLine"]), 712);
+  EXPECT_EQ(int(archive["Window2EndLine"]), 967);
+  EXPECT_EQ(int(archive["Window3Binning"]), 1);
+  EXPECT_EQ(int(archive["Window3StartSample"]), 0);
+  EXPECT_EQ(int(archive["Window3EndSample"]), 2047);
+  EXPECT_EQ(int(archive["Window3StartLine"]), 1048);
+  EXPECT_EQ(int(archive["Window3EndLine"]), 1302);
+  EXPECT_EQ(int(archive["Window4Binning"]), 0);
+  EXPECT_EQ(int(archive["Window4StartSample"]), 1024);
+  EXPECT_EQ(int(archive["Window4EndSample"]), 1087);
+  EXPECT_EQ(int(archive["Window4StartLine"]), 1409);
+  EXPECT_EQ(int(archive["Window4EndLine"]), 1662);
+  EXPECT_EQ(int(archive["Window5Binning"]), 0);
+  EXPECT_EQ(int(archive["Window5StartSample"]), 640);
+  EXPECT_EQ(int(archive["Window5EndSample"]), 767);
+  EXPECT_EQ(int(archive["Window5StartLine"]), 200);
+  EXPECT_EQ(int(archive["Window5EndLine"]), 208);
+  EXPECT_EQ(int(archive["Window6Binning"]), 0);
+  EXPECT_EQ(int(archive["Window6StartSample"]), 1280);
+  EXPECT_EQ(int(archive["Window6EndSample"]), 1407);
+  EXPECT_EQ(int(archive["Window6StartLine"]), 1850);
+  EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
+  EXPECT_EQ(int(archive["YearDoy"]), 2016331);
+  EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_201_0");
+
+  // BandBin Group
+  PvlGroup bandbin = lab->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "RED");
+  EXPECT_EQ(bandbin["FilterName"][1].toStdString(), "BLU");
+  EXPECT_EQ(bandbin["FilterName"][2].toStdString(), "NIR");
+  EXPECT_EQ(bandbin["FilterName"][3].toStdString(), "PAN");
+  EXPECT_DOUBLE_EQ(bandbin["Center"][0].toDouble(), 835.4);
+  EXPECT_DOUBLE_EQ(bandbin["Center"][1].toDouble(), 497.4);
+  EXPECT_DOUBLE_EQ(bandbin["Center"][2].toDouble(), 940.2);
+  EXPECT_DOUBLE_EQ(bandbin["Center"][3].toDouble(), 677.4);
+  EXPECT_DOUBLE_EQ(bandbin["Width"][0].toDouble(), 98.0);
+  EXPECT_DOUBLE_EQ(bandbin["Width"][1].toDouble(), 134.3);
+  EXPECT_DOUBLE_EQ(bandbin["Width"][2].toDouble(), 120.6);
+  EXPECT_DOUBLE_EQ(bandbin["Width"][3].toDouble(), 231.5);
+  EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143422");
+  EXPECT_EQ(bandbin["NaifIkCode"][1].toStdString(), "-143424");
+  EXPECT_EQ(bandbin["NaifIkCode"][2].toStdString(), "-143423");
+  EXPECT_EQ(bandbin["NaifIkCode"][3].toStdString(), "-143421");
+
+  // Mapping Group
+  PvlGroup map = lab->findGroup("Mapping", Pvl::Traverse);
+  EXPECT_EQ(map["ProjectionName"][0].toStdString(), "Equirectangular");
+  EXPECT_DOUBLE_EQ(double(map["CenterLongitude"]), 266.21338321885);
+  EXPECT_EQ(map["TargetName"][0].toStdString(), "Mars");
+  EXPECT_DOUBLE_EQ(double(map["EquatorialRadius"]), 3396190.0);
+  EXPECT_DOUBLE_EQ(double(map["PolarRadius"]), 3376200.0);
+  EXPECT_EQ(map["LatitudeType"][0].toStdString(), "Planetocentric");
+  EXPECT_EQ(map["LongitudeDirection"][0].toStdString(), "PositiveEast");
+  EXPECT_EQ(int(map["LongitudeDomain"]), 360);
+  EXPECT_DOUBLE_EQ(double(map["MinimumLatitude"]), 2.465491209879);
+  EXPECT_DOUBLE_EQ(double(map["MaximumLatitude"]), 2.703757297152);
+  EXPECT_DOUBLE_EQ(double(map["MinimumLongitude"]), 266.13827437353);
+  EXPECT_DOUBLE_EQ(double(map["MaximumLongitude"]), 266.28849206417);
+  EXPECT_DOUBLE_EQ(double(map["UpperLeftCornerX"]), -4600.0);
+  EXPECT_DOUBLE_EQ(double(map["UpperLeftCornerY"]), 160400.0);
+  EXPECT_DOUBLE_EQ(double(map["PixelResolution"]), 200.0);
+  EXPECT_DOUBLE_EQ(double(map["Scale"]), 296.3699086728);
+  EXPECT_DOUBLE_EQ(double(map["CenterLatitude"]), 2.584624253516);
+  EXPECT_DOUBLE_EQ(double(map["CenterLatitudeRadius"]), 3396148.9883258);
+
+  Histogram *hist = mosCube.histogram();
+
+  EXPECT_NEAR(hist->Average(), 0.29920571615330949, 0.0001);
+  EXPECT_NEAR(hist->Sum(), 183.71230971813202, 0.0001);
+  EXPECT_EQ(hist->ValidPixels(), 614);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.0054483425167489693, 0.0001);
+
 }
