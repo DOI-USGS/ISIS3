@@ -97,11 +97,15 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                User Get Inspired
+                Get Inspired by Other ISIS Users
               </h1>
               <p>
-                Let's zoom out and look at what community members have used ISIS to do in the past. These papers, talks and 
+                These papers, talks and 
                 demonstrations are examples that you can draw inspiration from and model your own workflows after.
+              </p>
+              <p>
+                If you have examples you would like to add to this page, submit a pull request on
+                <a href="https://github.com/USGS-Astrogeology/ISIS3">GitHub</a>!
               </p>
             </td>
             <td align="right" class="caption">
@@ -135,8 +139,8 @@ Deborah Lee Soltesz
             Using the Community Sensor Model with Planetary Data</a>
           </th>
           <td>
-            A talk given by Jesse Mapel at the OpenPlanetary Lunch covering the Community Sensor Model API and the USGS ASC's implementation of it and 
-            supported cameras as of October 2021.
+            A talk given by Jesse Mapel at an OpenPlanetary Lunch covering the Community Sensor Model API, the USGS ASC's implementation of it, 
+            supported cameras as of October 2021, and how to use them in ISIS.
           </td>
         </tr>
       </table>
@@ -180,7 +184,7 @@ Deborah Lee Soltesz
 
 <!-- Papers and Posters -->
     <hr/>
-    <h2>Papers and Posters</h2>
+    <h2>Papers, Posters, and Abstracts</h2>
       <table class="tableTOC">
 
         <!-- hardcoded links -->
