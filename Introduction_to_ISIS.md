@@ -15,20 +15,15 @@
 -----
 
   - [Introduction to ISIS](#Introduction-to-ISIS-)
-      - [What is ISIS3?](#What-is-ISIS3-)
-      - [Getting Started](#Getting-Started-)
-      - [Setup for Linux/Unix](#Setup-for-LinuxUnix-)
-          - [C Shell](#C-Shell-)
-          - [Bourne Shell](#Bourne-Shell-)
-      - [Getting Help](#Getting-Help-)
-      - [User Interface for ISIS3](#User-Interface-for-ISIS3-)
+      - [What is ISIS?](#What-is-ISIS-)
+      - [User Interface for ISIS](#User-Interface-for-ISIS-)
       - [Reserved Command Line
         Arguments](#Reserved-Command-Line-Arguments-)
       - [Parameter Command Line
         Arguments](#Parameter-Command-Line-Arguments-)
       - [Application Running Modes](#Application-Running-Modes-)
-      - [ISIS3 Graphical Mode](#ISIS3-Graphical-Mode-)
-      - [ISIS3 Text Mode](#ISIS3-Text-Mode-)
+      - [ISIS Graphical Mode](#ISIS-Graphical-Mode-)
+      - [ISIS Text Mode](#ISIS-Text-Mode-)
       - [Using qview to View Cubes](#Using-qview-to-View-Cubes-)
           - [Load and Display a Multi-Band
             Cube](#Load-and-Display-a-Multi-Band-Cube-)
@@ -38,25 +33,25 @@
                 Composite](#Display-a-Red-Green-Blue-Color-Composite-)
       - [Bonus](#Bonus-)
 
-<span id="What-is-ISIS3"></span>
+<span id="What-is-ISIS"></span>
 
-## What is ISIS3? [¶](#What-is-ISIS3-)
+## What is ISIS? [¶](#What-is-ISIS-)
 
 -----
 
-ISIS3 is an image processing software package. The focus of the software
+ISIS is an image processing software package. The focus of the software
 is to manipulate imagery collected by current and past NASA planetary
 missions sent to Mars, Jupiter, Saturn, and other solar system bodies.
 
 If you're familiar with commercial image processing packages (for
 example: Adobe Photoshop, PaintShop Pro, Envi, or ERDAS Imagine) you'll
-recognize many of the standard image processing operations ISIS3 is
+recognize many of the standard image processing operations ISIS is
 capable of, such as contrast stretch, image algebra, filters, and
 statistical analysis.
 
-However, the real power of ISIS3 is its unique capabilities for
+However, the real power of ISIS is its unique capabilities for
 processing data from NASA spacecraft missions such as Voyager, Viking,
-Galileo, Mars Global Surveyor, and Mars Odyssey. ISIS3 is able to import
+Galileo, Mars Global Surveyor, and Mars Odyssey. ISIS is able to import
 raw mission data into a usable geospatial image product, and has tools
 for digital mosaicking of adjacent images, photometric modeling and
 normalization, removal of systematic noise patterns, overlaying
@@ -64,7 +59,7 @@ graticules, and numerous other cartographic and scientific analysis
 functions.
 
 The following are just a few examples of how the USGS Astrogeology
-Research Program has used ISIS3 in our work (links open in a new
+Research Program has used ISIS in our work (links open in a new
 window):
 
   - **Global mosaics** : mosaicking hundreds or thousands of images
@@ -77,7 +72,7 @@ window):
 ![Mars Hemisphere Mosaic](attachments/download/1092/Mars_hemi.gif)
 
 > This famous mosaic of the Valles Marineris hemisphere of Mars was
-> created using ISIS3. The mosaic is composed of 102 Viking Orbiter
+> created using ISIS. The mosaic is composed of 102 Viking Orbiter
 > images of Mars, and is projected into point perspective, a view
 > similar to that which one would see from a spacecraft at a distance of
 > 2500 kilometers from the surface of the planet.
@@ -88,139 +83,28 @@ window):
     Program](http://astrogeology.usgs.gov/Projects/PlanetaryMapping/)
     for more information about this work.
 
-  - **Scientific Research** : Using ISIS3 to mosaic images of a region
+  - **Scientific Research** : Using ISIS to mosaic images of a region
     of interest to create a scientifically accurate image product, and
     analyzing the imagery based on spectral, textural, or other
     attributes. See the following Science Magazine abstract for examples
     of images from the Mars Exploration Rover Mission Microscopic Image
-    that were processed and analyzed using ISIS3 as part of the
+    that were processed and analyzed using ISIS as part of the
     scientific research resulting from the mission: Textures of the
     [Soils and Rocks at Gusev Crater from Spirit's Microscopic
     Imager](http://astrogeology.usgs.gov/search/details/Mars/MER/ImagerFindings/ScienceMI824/pdf)
     .
 
-<span id="Getting-Started"></span>
+<span id="User-Interface-for-ISIS"></span>
 
-## Getting Started [¶](#Getting-Started-)
-
------
-
-To run ISIS3 applications, two things must happen. First, the ISIS3
-software has to be installed. The installation procedure will change
-from time to time so please see the ISIS Download and Installation Guide
-for the most recent instructions. Second, your environment must be setup
-so you can execute ISIS3 applications. To set your environment up
-correctly you should first find out where ISIS3 has been installed. The
-default location is */usgs/pkgs/isis3/isis* .
-
-The setup process will modify your environment:
-
-  - The environment variables PATH and LD\_LIBRARY\_PATH will be
-    modified to include the ISIS3 directories
-  - If not already defined, the environment variable ISISROOT will be
-    set to its default value
-
-The setup for ISIS3 on a "Unix" type system depends on which shell you
-work under. Follow the instructions below for your shell.
-
-<span id="Setup-for-LinuxUnix"></span>
-
-## Setup for Linux/Unix [¶](#Setup-for-LinuxUnix-)
+## User Interface for ISIS [¶](#User-Interface-for-ISIS-)
 
 -----
 
-<span id="C-Shell"></span>
-
-### C Shell [¶](#C-Shell-)
-
-If you are using C Shell (i.e. csh) or some variant (such as tcsh):
-
-**Step 1** : If ISIS3 is installed in the default location
-(/usgs/pkgs/isis3/isis) go to step 2.  
-If ISIS3 is not installed in the default location you need to set the
-environment variable ISISROOT.  
-On the command line use setenv to set the ISISROOT variable to the
-proper location  
-(replace the x's and y's with the complete path to where ISIS3 is
-installed):
-
-    setenv ISISROOT /xxxxx/yyyyy/isis
-
-**Step 2** : Use the source command to execute the ISIS3 startup script:
-
-    source /xxxxx/yyyyy/isis/scripts/isis3Startup.csh
-
-If you want ISIS3 to be initialized when you login, place the above
-commands in your .cshrc file.
-
-<span id="Bourne-Shell"></span>
-
-### Bourne Shell [¶](#Bourne-Shell-)
-
-If you are using the Bourne shell (i.e. sh) or one of its variants
-(bash, ksh):
-
-**Step 1** : If ISIS3 is installed in the default location
-(/usgs/pkgs/isis3/isis) go to step 2.  
-If ISIS3 is not installed in the default location you need to set the
-environment variable ISISROOT.  
-On the command line set ISISROOT to the proper location and export the
-variable using:
-
-    ISISROOT=/xxxxx/yyyyy/isis
-    export ISISROOT
-
-**Step 2** : Use the .(dot) command to execute the ISIS3 startup script:
-
-    . /xxxxx/yyyyy/isis/scripts/isis3Startup.sh isis3
-
-If you want ISIS3 to be initialized when you login, place the above
-commands in your .profile file.
-
-For those of you who need to work in both version 2 and 3 of ISIS, we
-suggest you keep them separate by having different terminal windows for
-each instance. For example, have one xterm with the environment set for
-version 2 and another set for version 3.
-
-<span id="Getting-Help"></span>
-
-## Getting Help [¶](#Getting-Help-)
-
------
-
-The [ISIS Support
-Center](https://github.com/USGS-Astrogeology/ISIS3/issues) is our online
-knowledge base, bug tracking, announcements, and user support center. If
-you need help, want to get the latest news, find out about the status of
-a bug (i.e. software glitch), or just want to learn more and interact
-with other ISIS3 users, the [ISIS Support
-Center](https://github.com/USGS-Astrogeology/ISIS3/issues) is the place to
-go\! The ISIS Support Center provides access to help on ISIS3.
-
-[![IsisSupport.png](attachments/thumbnail/1091/300.png)](attachments/download/1091/IsisSupport.png "IsisSupport.png")
-
-Here, you can search for questions, tickets and bug reports from other
-ISIS3 users and the ISIS Support Team -- a post about your subject may
-already have been answered. If you can't find what you are looking for,
-you can register for a user name and then submit your question as a
-Question issue. Please read the [Guidelines](Guidelines) page before
-registering.
-
-To participate in discussions or post issues, it is important that you
-follow the [Guidelines for Reporting
-Issues](Guidelines_for_Reporting_Issues) .
-
-<span id="User-Interface-for-ISIS3"></span>
-
-## User Interface for ISIS3 [¶](#User-Interface-for-ISIS3-)
-
------
-
-ISIS3 programs fall into two main groups: interactive and
+ISIS programs fall into two main groups: interactive and
 non-interactive. Interactive programs allow you to observe the results
 of actions you take almost immediately. The main interactive program is
 [**qview**](http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/qview/qview.html)
-, the image display program for ISIS3. However, most programs in ISIS3
+, the image display program for ISIS. However, most programs in ISIS
 fall into the non-interactive group. These programs process the data you
 supply, usually one or more image files, and write the results to a new
 file. Some examples are
@@ -236,12 +120,12 @@ documentation.
 
 [![QviewTwoCubes.png](attachments/thumbnail/1090/300.png)](attachments/download/1090/QviewTwoCubes.png "QviewTwoCubes.png")
 
-> **qview** , ISIS3's image display application, is an interactive
+> **qview** , ISIS's image display application, is an interactive
 > application\]\]
 
-All ISIS3 programs are launched via the command line. The command line
+All ISIS programs are launched via the command line. The command line
 refers to the text typed at the prompt of a terminal window such as
-xterm, console, or putty, or in a script like cshell, or perl. ISIS3
+xterm, console, or putty, or in a script like cshell, or perl. ISIS
 programs are started by typing the name of the program followed by any
 arguments. All arguments must be separated from each other by at least
 one space.
@@ -262,7 +146,7 @@ Reserved arguments all begin with a dash (-), and are not sensitive to
 case (i.e., -help is the same as -HElp). A list of basic reserved
 arguments includes:
 
-  - **-webhelp** Launch a web browser showing the ISIS3 help page for
+  - **-webhelp** Launch a web browser showing the ISIS help page for
     that program. All other arguments will be ignored.
   - **-help** Display a list of the program's parameters showing their
     default values. For example:
@@ -310,9 +194,9 @@ process that input data, and where to put the output data. There are six
 different types of parameters:
 
   - Cube file names - A cube file name is the location on disk of an
-    ISIS3 cube. It can be either the input to this program or where to
+    ISIS cube. It can be either the input to this program or where to
     place the output. Input cubes, must be the output from some other
-    ISIS3 program. Most programs can process cubes from ISIS2, but some
+    ISIS program. Most programs can process cubes from ISIS2, but some
     information may be interpreted differently. Output cubes, will
     always be the location to place processed results from the
     application. When entering the filename of a cube it is not
@@ -325,7 +209,7 @@ different types of parameters:
     to= f431a62
 
   - Data file names - A data file name is the location on disk of a file
-    which is not an ISIS3 cube. This includes input files from missions
+    which is not an ISIS cube. This includes input files from missions
     such as Mars Global Surveyor or Viking, and output files such as
     that produced by the program **stats** or **isis2std** .
 
@@ -349,7 +233,7 @@ different types of parameters:
     lines=1024
 
   - Boolean - Boolean parameters are used as flags to indicate true or
-    false. The ISIS3 user interface allows true values to be represented
+    false. The ISIS user interface allows true values to be represented
     by True, T, Yes or Y. False values can be False, F, No or N. Any
     mixture of upper and lower case letters is allowed. The name of the
     parameter for boolean's is usually a question such as USEDEM. This
@@ -381,13 +265,13 @@ what arguments you supplied on the command line. If any parameter
 arguments are present on the command line, the program will run in text
 mode unless explicitly overridden using the reserved argument -gui.
 
-<span id="ISIS3-Graphical-Mode"></span>
+<span id="ISIS-Graphical-Mode"></span>
 
-## ISIS3 Graphical Mode [¶](#ISIS3-Graphical-Mode-)
+## ISIS Graphical Mode [¶](#ISIS-Graphical-Mode-)
 
 -----
 
-To run an ISIS3 program in graphical mode, simply type the name of the
+To run an ISIS program in graphical mode, simply type the name of the
 program followed by the Enter key. The program will display a window
 that allows you to set parameters for the program, start/stop running
 the algorithm on the data, observe the current status of the program,
@@ -423,13 +307,13 @@ set the values for the **lowpass** application, and the -gui reserved
 argument caused the program to run in graphical mode instead of in text
 mode.
 
-<span id="ISIS3-Text-Mode"></span>
+<span id="ISIS-Text-Mode"></span>
 
-## ISIS3 Text Mode [¶](#ISIS3-Text-Mode-)
+## ISIS Text Mode [¶](#ISIS-Text-Mode-)
 
 -----
 
-For text mode, ISIS3 programs get all their parameters from you via the
+For text mode, ISIS programs get all their parameters from you via the
 command line arguments, process the data, and then exit. Programs may or
 may not show a status message and results on the terminal window. While
 running, an application that encounters an error will show the error
@@ -453,7 +337,7 @@ correct the error and try again.
 
 Naturally, one of the first things anyone wants to do when they get
 their hands on image data is look at it\! The **qview** application is
-the image viewer for ISIS3. **qview** has a number of tools to let you
+the image viewer for ISIS. **qview** has a number of tools to let you
 zoom in and out, change the contrast, choose color combinations,
 compare, and otherwise interact with and look at your images. We'll talk
 about some of these tools in detail later. For now, let's just learn how
@@ -463,10 +347,10 @@ to open an image in **qview** .
     viewer application window will open.
 
 2.  Select Open... from the File menu. A dialog box labeled "Open" will
-    appear. Images in the native ISIS3 format are called ISIS3 cubes or
+    appear. Images in the native ISIS format are called ISIS cubes or
     simply cubes.
     
-      - Find the directory containing your ISIS3 cubes
+      - Find the directory containing your ISIS cubes
       - Select one or more to open
       - Click the Open button
 
@@ -498,10 +382,10 @@ Each band can be selected to view as follows:
 
 -----
 
-Now that you know how to run ISIS3 programs go experiment with some of
+Now that you know how to run ISIS programs go experiment with some of
 the basic ones like **stats** , **hist** or **mirror** .
 
-Download the ISIS3 cube
+Download the ISIS cube
 [Intro2isis.cub.gz](attachments/download/1084/Intro2isis.cub.gz) - the
 cube is compressed in a GZIP archive file. Use gunzip to uncompress the
 cube. The filename of the cube is Intro2isis.cub.
