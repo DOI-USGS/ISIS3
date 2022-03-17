@@ -97,15 +97,15 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                User Learn More 
+                Learn More About Using ISIS
               </h1>
               <p>
-                At this point you should have ISIS installed and have run your first commands, meaning you are officially an ISIS user, congratulations!
+                At this point you have installed ISIS and executed your first applications, meaning you are officially an ISIS user, congratulations!
               </p>
               <p>
-                On this page you will find information and resources to help you further your skills as an ISIS user as well as learn some of the history 
-                of ISIS and its predecessors.  The tutorials and explanations here will help you personalize the operation of your ISIS install and the walk 
-                you through the basic steps of processing data through ISIS to create analysis ready data or control networks from various mission data.
+                On this page you will find information and resources to help you further your skills as an ISIS user.
+                The tutorials and explanations here will walk you through the basic steps of working with data in ISIS
+                and provide information about how to customize your ISIS install.
               </p>
             </td>
             <td align="right" class="caption">
@@ -114,47 +114,6 @@ Deborah Lee Soltesz
           </tr>
         </table>
 
-
-
-<!-- About  -->
-      <hr/>
-      <h2>About</h2>
-      <p>
-        These resources contain information about ISIS's history, personalization capabilities, and the entire catalog of applications ISIS contains.
-      </p>
-      <table class="tableTOC">
-
-        <!-- hardcoded links -->
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="../documents/IsisHistory/IsisHistory.html">
-            ISIS History</a>
-          </th>
-          <td>
-          ISIS has been in development since the early 1970’s, just after the Astrogeology Science Center (ASC) involvement with the Apollo mission. Learn 
-          more about the origin of this foundational software!
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="../documents/EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html">
-            Environment and Preference Setup</a>
-          </th>
-          <td>
-          This document describes how to setup your Unix environment to run ISIS and manage ISIS preference files for multiple users or installations.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="../Application/index.html"> 
-            Software Manual</a>
-          </th>
-          <td>
-          This document provides detailed documentation for every application in ISIS. If you are looking for an application to perform a specific task, 
-          this is a great place to start.
-          </td>
-        </tr>
-      </table>
 
 
 <!-- An example of how categoryItem and audience/target tags in the documentation resources
@@ -193,22 +152,21 @@ Deborah Lee Soltesz
       </xsl:if>
 -->
 
-<!-- Intermediate Tutorials -->
+<!-- Intermediate Resources -->
     <hr/>
-    <h2>Intermediate Tutorials</h2>
+    <h2>Intermediate Resources</h2>
       <p>
-        These tutorials walk you through intermediate image processing methods that are useful across a variety of workflows as well 
-        as high-level explanations of some cartographic concepts.
+        These resources are more complex than the introductory materials and are useful across workflows in ISIS.
       </p>
       <table class="tableTOCmulticol">
         <tbody>
           <tr valign="top">
             <td style="width:33%">
-              <h4>General Image Processing</h4>
+              <h4>General Image Processing Tutorials</h4>
               <p>
                 <a href="https://usgs-astrogeology.github.io/ISIS3/The_Power_of_Spatial_Filters.html">
                 The Power of Spatial Filters</a><br/>
-                Description of spatial filter applications in ISIS and common use cases.<br/>
+                A description of spatial filter applications in ISIS and common use cases.<br/>
                 <a href="https://usgs-astrogeology.github.io/ISIS3/Removing_Striping_Noise_from_Image_Data.html">
                 Removing Striping Noise from Image Data</a><br/>
                 Procedures for removing horizontal or vertical noise in an image.
@@ -216,26 +174,14 @@ Deborah Lee Soltesz
             </td>
 
             <td style="width:33%">
-              <h4>Cartography</h4>
-              <p>
-                <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">
-                Learning About Map Projection</a><br/>
-                Description of the types of Projections supported by ISIS.<br/>
-                <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Camera_Geometry">
-                Camera Geometry</a><br/>
-                Description of camera geometry within ISIS and example of ISIS applications that have access to this geometry.
-              </p>
-            </td>
-
-            <td style="width:33%">
-              <h4>Interactive Tools</h4>
+              <h4>Interactive Tool Demos</h4>
               <p>
                 <a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/972/Qnet.pdf">
                 Qnet</a><br/>
                 An interactive tool to create and edit control networks.<br/>
                 <a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/974/Qtie.pdf">
                 Qtie</a><br/>
-                An interactive tool to update the camer pointing (SPICE) of a single cube.<br/>
+                An interactive tool to update the camera geometry of a single cube.<br/>
                 <a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/975/Qview.pdf">
                 Qview</a><br/>
                 An interactive tool to display and analyze cubes.<br/>
@@ -245,8 +191,45 @@ Deborah Lee Soltesz
               </p>
             </td>
 
+            <td style="width:33%">
+              <h4>Cartography Concepts</h4>
+              <p>
+                <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">
+                Learning About Map Projection</a><br/>
+                An introduction to map projections and utilizing them in ISIS.<br/>
+                <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Camera_Geometry">
+                Camera Geometry</a><br/>
+                A description of camera geometry within ISIS and some of the ISIS applications that have access to it.
+              </p>
+            </td>
+
           </tr>
         </tbody>
+      </table>
+
+      <br/>
+      <table class="tableTOC">
+
+        <!-- hardcoded links -->
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../documents/EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html">
+            Environment and Preference Setup</a>
+          </th>
+          <td>
+          This document describes how to setup your Unix environment to run ISIS and manage ISIS preference files for multiple users or installations.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../Application/index.html"> 
+            Software Manual</a>
+          </th>
+          <td>
+          This document provides detailed documentation for every application in ISIS. If you are looking for an application to perform a specific task, 
+          this is a great place to start.
+          </td>
+        </tr>
       </table>
 
 
@@ -254,7 +237,8 @@ Deborah Lee Soltesz
       <hr/>
       <h2>Mission Specific ISIS Processing</h2>
       <p>
-        These tutorials walk you through the steps required to map project a variety of the datasets supported by ISIS.
+        These tutorials take you through all the steps required to process raw image data to map projected products for specific datasets.
+        Each tutorial is accompanied by an overview and references for the mission and instrument that created the dataset.
       </p>
 
       <table class="tableTOCmulticol">
@@ -295,7 +279,7 @@ Deborah Lee Soltesz
               <dt><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/CSS">
               Cassini-Huygens</a></dt>
                 <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_ISS_Data">
-                Imaging Science Subsystem(ISS)</a></dd>
+                Imaging Science Subsystem (ISS)</a></dd>
                 <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_RADAR">
                 Radar</a></dd>
                 <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_VIMS">
@@ -305,8 +289,6 @@ Deborah Lee Soltesz
 
         </tr>
       </table>
-
-
 
 
 

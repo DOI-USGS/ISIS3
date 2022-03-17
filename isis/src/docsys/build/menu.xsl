@@ -70,10 +70,35 @@ Deborah Lee Soltesz
       Get Inspired</a>
     </div>
 
+    <hr/>
+    <h2>
+      Quick Links
+    </h2>
+
+    <div>
+      <a href="{$menuPath}Application/index.html">
+      Software Manual</a>
+    </div>
+
+    <div>
+      <a href="https://astrodiscuss.usgs.gov/">
+      AstroDiscuss</a>
+    </div>
+
+    <div>
+      <a href="https://github.com/USGS-Astrogeology/ISIS3">
+      GitHub</a>
+    </div>
+
+    <div>
+      <a href="{$menuPath}Object/Developer/index.html">
+      API Reference</a>
+    </div>
+
 
     <hr/>
     <h2>
-      OTHER VERSIONS
+      Other Versions
     </h2>
 
     <div>

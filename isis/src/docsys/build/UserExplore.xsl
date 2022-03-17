@@ -97,16 +97,13 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                User Explore in Detail 
+                Explore Using ISIS in Detail 
               </h1>
               <p>
-                Now that you have some experience running applications and working with data, you may have some questions 
-                about how exactly ISIS works.
-              </p>
-              <p>
-                On this page you will find a wide variety of resources explaining the specific details of how ISIS works. Many 
-                components of ISIS were created in response to the needs of specific data sets. So, there are a wide variety of 
-                processing paths and customizations that you can leverage when creating a workflow.
+                Now that you have some experience running applications and working with data, understanding the finer details
+                about how ISIS works can make you a more efficient and powerful ISIS user.
+                On this page you will find resources explaining individual components of ISIS.
+                
               </p>
             </td>
             <td align="right" class="caption">
@@ -121,7 +118,7 @@ Deborah Lee Soltesz
       <hr/>
       <h2>General Purpose</h2>
       <p>
-        These resources are useful regardless of what you are using ISIS for. They provide details about fundamental components of ISIS that 
+        These resources provide details about fundamental components of ISIS that 
         are used across applications.
       </p>
       <table class="tableTOCmulticol">
@@ -206,8 +203,9 @@ Deborah Lee Soltesz
     <hr/>
     <h2>Task Specific Guides</h2>
       <p>
-        These resources apply to specific applications or specialized processing methods. They provide particulars about how to work with individual 
-        applications or how specialized data is formatted.
+        These resources apply to specific applications or specialized processing methods.
+        Over the years, ISIS has evolved in response to the needs of new datasets; so, there are a wide variety of 
+        processing paths and customizations that you can leverage when creating your workflow.
       </p>
       <table class="tableTOCmulticol">
 
@@ -271,7 +269,7 @@ Deborah Lee Soltesz
             Release Schedule</a>
           </th>
           <td>
-          Description of Astrogeology Science Center's ISIS release cadence and expected dates of future releases.
+          A description of ISIS's release cadence and expected dates of future releases.
           </td>
         </tr>
 
@@ -281,7 +279,7 @@ Deborah Lee Soltesz
             Backward Compatibility Policy</a>
           </th>
           <td>
-          Policy for ISIS backward compatibility for users.
+          What users can expect to still work after updating to a new version of ISIS.
           </td>
         </tr>
 
