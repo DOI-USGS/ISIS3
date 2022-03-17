@@ -21,7 +21,7 @@
         Applications](#Camera-Information-Applications-)
           - [Camstats](#Camstats-)
           - [Mosrange](#Mosrange-)
-          - [Ct](#Ct-)
+          - [Campt](#Campt-)
           - [Phocube](#Phocube-)
 
 <span id="Introduction"></span>
