@@ -67,7 +67,7 @@ endfunction(copy_app_docs_info)
 function(build_upper_level)
 
   # Make new (empty) output folders
-  set(newFolders UserDocs UserStart UserLearn UserExplore UserInspire DevStart DevExplore DevInspire AboutIsis General Guides Installation TechnicalInfo)
+  set(newFolders UserDocs UserStart UserLearn UserExplore UserInspire DevStart DevExplore DevInspire General Guides Installation TechnicalInfo)
   foreach(f ${newFolders})
     file(MAKE_DIRECTORY "${docInstallFolder}/${docVersion}/${f}")
   endforeach()
@@ -86,7 +86,7 @@ function(build_upper_level)
   # Create the main index.html file aka the home page
   execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"${docVersion}/\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
   # Create a second main page inside the version numbered area for when the page above gets overwritten with a new version 
-  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
 
  # This folder just gets copied as-is
  # Note: Schemas are referenced inside the application xml files. The schema URI inside the xmls do not have version numbers in the path 
@@ -174,9 +174,6 @@ function(build_documents_folder)
 
   message("    Building table of contents files...")
   # These go in top level folders in /doc/
-
-  # ABOUT ISIS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/AboutIsis/index.html   ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/AboutIsis.xsl)
 
   # GENERAL TOC
   execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/General/index.html ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/General.xsl)
