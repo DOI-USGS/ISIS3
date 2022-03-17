@@ -67,7 +67,7 @@ endfunction(copy_app_docs_info)
 function(build_upper_level)
 
   # Make new (empty) output folders
-  set(newFolders UserDocs UserStart UserLearn UserExplore UserInspire DevStart DevExplore DevInspire AboutIsis General Guides Installation TechnicalInfo)
+  set(newFolders UserDocs AboutIsis General Guides Installation TechnicalInfo)
   foreach(f ${newFolders})
     file(MAKE_DIRECTORY "${docInstallFolder}/${docVersion}/${f}")
   endforeach()
@@ -83,9 +83,11 @@ function(build_upper_level)
 
   # These folders are populated inside "build_documents_folder"
 
-  # Create the main index.html file aka the home page
-  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"${docVersion}/\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
-  # Create a second main page inside the version numbered area for when the page above gets overwritten with a new version 
+  # Create the upper level index.html. This is a redirect down into the current version
+  message("one ==================..")
+  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"${docVersion}/\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/redirect.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/redirect.xsl)
+  message("two ----------------..")
+  # Create the main documentaion page. This is located in the version directory 
   execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
 
  # This folder just gets copied as-is
@@ -192,27 +194,6 @@ function(build_documents_folder)
 
   # USER DOCS TOC
   execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserDocs/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserDocs.xsl)
-
-  # USER GETTING STARTED DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserStart/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserStart.xsl)
-
-  # USER LEARN MORE DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserLearn/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserLearn.xsl)
-
-  # USER EXPLORE IN DETAIL DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserExplore/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserExplore.xsl)
-
-  # USER GET INSPIRED DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserInspire/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserInspire.xsl)
-
-  # USER GET INSPIRED DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/DevStart/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/DevStart.xsl)
-
-  # USER GET INSPIRED DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/DevExplore/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/DevExplore.xsl)
-
-  # USER GET INSPIRED DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/DevInspire/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/DevInspire.xsl)
 
 endfunction(build_documents_folder)
 
@@ -518,22 +499,22 @@ function(build_docs)
   file(MAKE_DIRECTORY "${docInstallFolder}")
 
   message("Copying application information...")
-  copy_app_docs_info()
+#  copy_app_docs_info()
 
   message("Building upper level directories...")
   build_upper_level()
 
-  build_documents_folder()
+#  build_documents_folder()
 
   message("Building application docs...")
-  build_application_docs()
+#  build_application_docs()
 
   message("Building additional TOCs...")
-  add_extra_tocs()
+#  add_extra_tocs()
 
   # This step requires Latex and Doxygen
   message("Building object documentation")
-  build_object_docs()
+#  build_object_docs()
 
   # copy the built docs in the build directory over to the install directory on install
   execute_process(COMMAND cp -rf ${docInstallFolder} ${CMAKE_INSTALL_PREFIX})
