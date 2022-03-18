@@ -185,21 +185,25 @@ Deborah Lee Soltesz
     <h2>Testing Guides</h2>
       <p>
         Testing is a crucial component of creating sustainable software and a requirement for all
-        code contributions to ISIS.<br/>
-        As of version 3.6, ISIS uses googletest and CTest for new tests. A majority of existing tests 
-        were converted to this framework, however, some tests are still using the CMake framework previously 
-        used for ISIS testing. These guides will help you create, run, and modify ISIS tests from both frameworks.
+        code contributions to ISIS.
       </p>
-      <h3>GTest and CTest</h3>
+      <p>
+        As of version 3.6, ISIS uses googletest and CTest for new tests. A majority of existing tests 
+        have been converted to this new framework, however, some tests are still using the legacy Makefile framework.
+      </p>
+      <p>
+        These guides will help you create, run, and modify ISIS tests within both frameworks.
+      </p>
+      <h3>googletest and CTest</h3>
         <p>
-          Contributors are required to use the googletest system for new tests and convert old CMake tests where
+          Contributors are required to use the googletest system for new tests and convert legacy Makefile tests wherever
           possible.
         </p>
       <table class="tableTOC">
         <tr valign="top">
           <th style="width:25%">
             <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Writing-ISIS3-Tests-Using-Gtest-and-Ctest">
-            Writing Tests Using GTest and CTest</a>
+            Writing Tests Using googletest and CTest</a>
           </th>
           <td>
           A how-to guide for writing new tests and converting ISIS applications to the new callable format required
@@ -208,11 +212,11 @@ Deborah Lee Soltesz
         </tr>
       </table>
 
-      <h3>CMake</h3>
+      <h3>Makefile</h3>
         <p>
-          There are rare situations where existing legacy Makefile test cannot be converted and need to be updated. 
+          There are rare situations where existing legacy Makefile tests have not yet been converted and need to be updated. 
           These legacy Makefile tests use an input and truth data to confirm applications produce the proper output
-          under the testing conditions. The following guides describe how to work within the legacy test system
+          under the testing conditions. The following guides describe how to work within the legacy testing system
           and with the legacy testing data.
         </p>
       <table class="tableTOC">

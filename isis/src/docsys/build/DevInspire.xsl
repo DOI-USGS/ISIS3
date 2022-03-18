@@ -100,12 +100,9 @@ Deborah Lee Soltesz
                 Get Inspired to Contribute
               </h1>
               <p>
-                Now that you've got all the resources you need to contribute,
-                you may be asking "what should I contribute?"
-              </p>
-              <p>
-                On this page you will find resources that will inspire you and give you
-                some ideas about what other users are interested in too.
+                ISIS is always under improvement and contributions are continuously coming in from the community.
+                If you want to contribute too but are unsure of where to start, here are some resources
+                that may inspire you and show you what other users are interested in.
               </p>
               <p>
               </p>
@@ -129,22 +126,22 @@ Deborah Lee Soltesz
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement">
-            Enhancement Requests</a>
-          </th>
-          <td>
-          Look at the open enhancement requests to see what other members of the community have
-          asked for and maybe there will be something you are interested in too.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
             <a href="https://github.com/USGS-Astrogeology/ISIS3/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22">
             Good First Issues</a>
           </th>
           <td>
           Issues labeled with Good First Issue have been idenditifed by other contributors as
           places where newcomers can get started.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement">
+            Enhancement Requests</a>
+          </th>
+          <td>
+          Look at the open enhancement requests to see what other members of the community have
+          asked for and maybe there will be something you are interested in too.
           </td>
         </tr>
       </table>
@@ -154,9 +151,10 @@ Deborah Lee Soltesz
       <hr/>
       <h2>GitHub Pull Requests</h2>
       <p>
-        If you are interested in what other contributors are working on, look at the
-        GitHub pull requests that are currently open. Even if you do not have write permissions to the
-        repository, input and testing on pull requests are always appreciated.
+        Pull requests represent what is currently being worked on in ISIS and are
+        a great place to interact with active contributors.
+        Even if you cannot review a pull request; comments, questions, and
+        testing on pull requests are always appreciated.
       </p>
       <table class="tableTOC">
 
@@ -167,7 +165,7 @@ Deborah Lee Soltesz
             Open pull requests</a>
           </th>
           <td>
-          Currently open pull requests on the ISIS GitHub repository.
+          Look at the open pull requests and see if there are any that interest you.
           </td>
         </tr>
       </table>

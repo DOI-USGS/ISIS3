@@ -97,17 +97,12 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                Explore Contributing in Detail 
+                Explore the Details of Contributing Code 
               </h1>
               <p>
-                Creating and maintaining quality tools is not simple. ISIS contributors have
-                worked hard to create accurate references and guides to support future
-                contributions.
-              </p>
-              <p>
-                On this page you will find detailed references and specialized guides for contributing to ISIS.
-              </p>
-              <p>
+                This page contains references, policies, and highly specific guides for contributing code
+                to ISIS. These are working resources to help you as you develop your code and go through
+                the contribution process.
               </p>
             </td>
             <td align="right" class="caption">
@@ -117,36 +112,11 @@ Deborah Lee Soltesz
         </table>
 
 
-<!-- Maintainer Guides​ -->
-    <hr/>
-    <h2>Maintainer Guides</h2>
-      <p>
-        These resources are useful for maintainers and outline the processes that
-        support the broader user and contributor community.
-      </p>
-      <table class="tableTOC">
-
-        <!-- hardcoded links -->
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Public-Release-Process">
-            Release Process</a>
-          </th>
-          <td>
-          This guide goes through all the steps required to create both release candidates
-          and full releases.
-          </td>
-        </tr>
-      </table>
-
-
 <!-- API Reference​ -->
     <hr/>
-    <h2>ISIS API Reference</h2>
+    <h2>API Reference</h2>
       <p>
-        The ISIS API reference is particularly
-        useful if you are working on an application or interested in using the ISIS library
-        as a dependency.
+        Here you will find the documentation for the ISIS library API.
       </p>
       <table class="tableTOC">
 
@@ -154,7 +124,7 @@ Deborah Lee Soltesz
         <tr valign="top">
           <th style="width:25%">
             <a href="../Object/Developer/index.html">
-            ISIS API reference</a>
+            ISIS Library API reference</a>
           </th>
           <td>
           Documentation for all of the classes, functions, and variables in the ISIS library.
@@ -180,7 +150,7 @@ Deborah Lee Soltesz
             ISIS Application XML Schema</a>
           </th>
           <td>
-          This schema defines the ISIS application XML format. This includes the applications
+          The schema that defines the ISIS application XML format. This includes the applications
           documentation and all of the application arguments.
           </td>
         </tr>
@@ -190,7 +160,7 @@ Deborah Lee Soltesz
             ISIS Web Documentation XML Schema</a>
           </th>
           <td>
-          This schema defines the XML documentation format used to generate this documentation.
+          The schema that defines the XML documentation format used to generate this documentation.
           If you want to make a change to the ISIS website documentation, then you will need to
           reference this schema for your changes.
           </td>
@@ -202,41 +172,49 @@ Deborah Lee Soltesz
       <hr/>
       <h2>Policies</h2>
       <p>
-        The interface for ISIS applications and much of the ISIS documentation (including this
-        very page) are generated from XML files. These schemas are a helpful reference if you
-        are creating a new application, modifying application arguments, or writing documentation.
+        As open-source software, it is important to define how the community is expected to interact.
       </p>
       <table class="tableTOC">
 
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/blob/dev/CONTRIBUTING.md">
-            Contributing Guidelines</a>
-          </th>
-          <td>
-          This schema defines the ISIS application XML format. This includes the applications
-          documentation and all of the application arguments.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/blob/dev/Code-Of-Conduct.md">
-            Code of Conduct</a>
-          </th>
-          <td>
-          This schema defines the ISIS application XML format. This includes the applications
-          documentation and all of the application arguments.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
             <a href="../Documents/CodingStandards/CodingStandards.html">
             Coding Standards and Style Guide</a>
           </th>
           <td>
-          This schema defines the ISIS application XML format. This includes the applications
-          documentation and all of the application arguments.
+          The coding standard and style guide for contributions to the ISIS code base.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/blob/dev/CONTRIBUTING.md">
+            Contributing Guidelines</a>
+          </th>
+          <td>
+          Guidelines for contributors and reviewers during the contribution process.
+          </td>
+        </tr>
+      </table>
+
+
+<!-- Maintainer Guides​ -->
+    <hr/>
+    <h2>Maintainer Guides</h2>
+      <p>
+        These resources are useful for maintainers and outline the processes that
+        support the broader community.
+      </p>
+      <table class="tableTOC">
+
+        <!-- hardcoded links -->
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Public-Release-Process">
+            Release Process</a>
+          </th>
+          <td>
+          The guide that describes the steps required to create both release candidates and full releases. 
           </td>
         </tr>
       </table>

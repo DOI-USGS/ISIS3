@@ -130,6 +130,15 @@ Deborah Lee Soltesz
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/blob/dev/Code-Of-Conduct.md">
+            Code of Conduct</a>
+          </th>
+          <td>
+          Read what is expected of community members
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
             <a href="https://astrodiscuss.usgs.gov/">
             AstroDiscuss</a>
           </th>
