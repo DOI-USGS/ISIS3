@@ -97,17 +97,16 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                Contributor Getting Started 
+                Getting Started as a Contributor 
               </h1>
               <p>
-                As Free and Open Source Software (FOSS), everyone is welcome to contribute to ISIS.
-                We define our contributors as the members of the community that help improve the
-                software. Community members can contribute by reporting a bug, writing
-                documentation, validating the software, working on features, and many other ways.
-                You do not need to write code to contribute!
+                As free and open-source software (FOSS), everyone is welcome to contribute to ISIS.
+                Community members can contribute by reporting bugs, writing
+                documentation, validating the software, working on features, answering questions, or anything that
+                helps improve ISIS. You do not need to write code to contribute!
               </p>
               <p>
-                On this page you will find resources to help you improve ISIS and give back to the ISIS community.
+                On this page you will find resources for a few of the ways you can get started as a contributor.
               </p>
               <p>
               </p>
@@ -119,11 +118,11 @@ Deborah Lee Soltesz
         </table>
 
 
-<!-- Start Contributing -->
+<!-- Engaging with the Community -->
     <hr/>
-    <h2>Start Contributing</h2>
+    <h2>Engaging with the Community</h2>
       <p>
-        The quickest way to contribute to ISIS is to contribute to the community.
+        The quickest way to contribute to ISIS is to engage to the community.
         There are many ways you can support the community without writing any code at all.
       </p>
       <table class="tableTOC">
@@ -131,8 +130,17 @@ Deborah Lee Soltesz
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/blob/dev/Code-Of-Conduct.md">
+            Code of Conduct</a>
+          </th>
+          <td>
+          Read what is expected of community members
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
             <a href="https://astrodiscuss.usgs.gov/">
-            astrodiscuss</a>
+            AstroDiscuss</a>
           </th>
           <td>
           Ask or answer questions on our community discussion board.
@@ -144,7 +152,7 @@ Deborah Lee Soltesz
             GitHub Issues</a>
           </th>
           <td>
-          Comment on bug reports or feature requests from other users.
+          Comment on bug reports or feature requests from other users or make your own.
           </td>
         </tr>
         <tr valign="top">
@@ -168,13 +176,53 @@ Deborah Lee Soltesz
       </table>
 
 
+<!-- Documentation Guides​ -->
+    <hr/>
+    <h2>Documentation Guides</h2>
+      <p>
+        If you're not familiar with working on the ISIS documentation,
+        these guides can help get you started.
+      </p>
+      <table class="tableTOC">
+
+        <!-- hardcoded links -->
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Contributing-Application-Documentation">
+            Contributing ISIS Application Documentation</a>
+          </th>
+          <td>
+          A how-to guide for writing and modifying the ISIS application documentation.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../documents/HowToApplicationExamples/index.html">
+            ISIS Application Examples Guide</a>
+          </th>
+          <td>
+          A how-to guide for writing examples in ISIS application documentation.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../documents/HowToGeneralDocumentation/index.html">
+            General ISIS Documentation Guide</a>
+          </th>
+          <td>
+          A how-to guide for writing documentation for this website.
+          </td>
+        </tr>
+      </table>
+
+
 <!-- Building ISIS -->
       <hr/>
       <h2>Building ISIS</h2>
       <p>
         If you want to contribute code to ISIS, the first step is getting the ISIS source code
-        compiling on your system. This document will take you through all the steps required to
-        compile, test, and optionally install, ISIS.
+        compiling on your system. These resources will take you through all the steps required to
+        compile, test, and optionally install ISIS.
       </p>
       <table class="tableTOC">
 
@@ -194,16 +242,16 @@ Deborah Lee Soltesz
             Dependency Management</a>
           </th>
           <td>
-          How to download the dependencies required to build ISIS.
+          How to download and install the dependencies required to build ISIS.
           </td>
         </tr>
         <tr valign="top">
           <th style="width:25%">
             <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3">
-            Building</a>
+            Building and Installing</a>
           </th>
           <td>
-          How to build ISIS once you have the source code and dependencies downloaded.
+          How to build ISIS once you have the source code and dependencies.
           </td>
         </tr>
         <tr valign="top">
@@ -212,74 +260,7 @@ Deborah Lee Soltesz
             Running the Test Suite</a>
           </th>
           <td>
-          How to run the ISIS test suite once ISIS is built.
-          </td>
-        </tr>
-      </table>
-
-
-<!-- Exercises -->
-    <hr/>
-    <h2>Introductory Exercises</h2>
-      <p>
-        Now that you can compile the ISIS source code, follow along with these exercises
-        to learn about programming in ISIS.
-      </p>
-      <table class="tableTOC">
-
-        <!-- hardcoded links -->
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_1">
-            Basic ISIS3 Programming</a>
-          </th>
-          <td>
-          These exercises will walk you through the basics of ISIS applications.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_2">
-            Advanced ISIS Programming Exercises</a>
-          </th>
-          <td>
-          These exercises give you the chance to explore more yourself and interact with more
-          complex components of the ISIS API.
-          </td>
-        </tr>
-      </table>
-
-
-<!-- Contributing Features -->
-    <hr/>
-    <h2>Contributing Features</h2>
-      <p>
-        Once you know what code you want to contribute, these guides will help you get started
-        with the process and what is required for different types of code contributions.
-      </p>
-      <table class="tableTOC">
-
-        <!-- hardcoded links -->
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="">
-            Adding a New Feature</a>
-          </th>
-          <td>
-          This document will walk you through what's needed when adding a new feature to ISIS.
-          If there is something you think is missing in ISIS this will walk you through the
-          steps needed to add it.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="">
-            Modifying an Existing Feature</a>
-          </th>
-          <td>
-          Modifying an existing feature is slightly more complex than adding a new feature to ISIS.
-          This document will walk you through what is different when you are building from an
-          existing feature instead of something new.
+          How to confirm your build of ISIS is correct by running the test suite.
           </td>
         </tr>
       </table>
