@@ -217,7 +217,7 @@ Deborah Lee Soltesz
             ISIS History</a>
           </th>
           <td>
-          ISIS has been in development since the early 1970’s, just after the Astrogeology Science Center (ASC) involvement with the Apollo mission. Learn 
+          ISIS has been in development since the early 1970's, just after the Astrogeology Science Center (ASC) involvement with the Apollo mission. Learn 
           more about the origin of this foundational software!
           </td>
         </tr>
@@ -235,6 +235,16 @@ Deborah Lee Soltesz
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/blob/dev/Code-Of-Conduct.md">
+            Code of Conduct</a>
+          </th>
+          <td>
+          The code of conduct outlines what is expected of community members and ensures that our
+          community is welcoming, helpful, and respectful.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
             <a href="https://github.com/USGS-Astrogeology/ISIS3/issues">
             Github Issues</a>
           </th>
@@ -242,7 +252,6 @@ Deborah Lee Soltesz
           Here you can post bug reports or feature requests and find out about the status of bugs posted by other users.
           </td>
         </tr>
-
         <tr valign="top">
           <th style="width:25%">
             <a href="https://astrodiscuss.usgs.gov/">
