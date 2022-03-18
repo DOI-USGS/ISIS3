@@ -185,20 +185,44 @@ Deborah Lee Soltesz
     <h2>Testing Guides</h2>
       <p>
         Testing is a crucial component of creating sustainable software and a requirement for all
-        code contributions to ISIS. These guides will help you create, run, and modify the ISIS tests.
+        code contributions to ISIS.<br/>
+        As of version 3.6, ISIS uses googletest and CTest for new tests. A majority of existing tests 
+        were converted to this framework, however, some tests are still using the CMake framework previously 
+        used for ISIS testing. These guides will help you create, run, and modify ISIS tests from both frameworks.
       </p>
+      <h3>GTest and CTest</h3>
+        <p>
+          Contributors are required to use the googletest system for new tests and convert old CMake tests where
+          possible.
+        </p>
       <table class="tableTOC">
-
-        <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
             <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Writing-ISIS3-Tests-Using-Gtest-and-Ctest">
             Writing Tests Using GTest and CTest</a>
           </th>
           <td>
-          As of version 3.6, ISIS uses googletest and CTest for testing. This how-to guide will
-          walk you through the steps required to write tests using the new frameworks. It also
-          covers the steps needed to convert ISIS applications to the new callable format.
+          A how-to guide for writing new tests and converting ISIS applications to the new callable format required
+          by the googletest framework.
+          </td>
+        </tr>
+      </table>
+
+      <h3>CMake</h3>
+        <p>
+          There are rare situations where existing legacy Makefile test cannot be converted and need to be updated. 
+          These legacy Makefile tests use an input and truth data to confirm applications produce the proper output
+          under the testing conditions. The following guides describe how to work within the legacy test system
+          and with the legacy testing data.
+        </p>
+      <table class="tableTOC">
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../documents/HowToApplicationCategoryTest/index.html">
+            Legacy Makefile Tests Guide</a>
+          </th>
+          <td>
+          This document describes how legacy Makefile tests work.
           </td>
         </tr>
         <tr valign="top">
@@ -207,20 +231,7 @@ Deborah Lee Soltesz
             ISIS Test Data</a>
           </th>
           <td>
-          Legacy Makefile based tests in ISIS use a input and truth data to confirm that the
-          aplications produce the proper output. This page explains how to download these
-          files required to run the ISIS test suite.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="../documents/HowToApplicationCategoryTest/index.html">
-            Legacy Makefile Tests Guide</a>
-          </th>
-          <td>
-          This documents describes how legacy Makefile tests work. Contributors are required
-          to use the new googletest system for new tests, but there are rare situations where
-          existing legacy Makefile tests need to be updated and cannot be converted.
+          This page explains how to download the test input/truth data required to run the legacy ISIS test suite.
           </td>
         </tr>
       </table>
