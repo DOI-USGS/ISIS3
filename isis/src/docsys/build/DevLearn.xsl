@@ -97,16 +97,14 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                Getting Started as a Contributor 
+                Learn More About Contributing Code
               </h1>
               <p>
-                As free and open-source software (FOSS), everyone is welcome to contribute to ISIS.
-                Community members can contribute by reporting bugs, writing
-                documentation, validating the software, working on features, answering questions, or anything that
-                helps improve ISIS. You do not need to write code to contribute!
-              </p>
-              <p>
-                On this page you will find resources for a few of the ways you can get started as a contributor.
+                ISIS is a large package with many places to contribute and
+                improve the code base; however, the size and history of ISIS can
+                be intimidating.
+                On this page you will find resources to learn more about ISIS development
+                and help with your first code contribution.
               </p>
               <p>
               </p>
@@ -117,141 +115,112 @@ Deborah Lee Soltesz
           </tr>
         </table>
 
-
-<!-- Engaging with the Community -->
+<!-- Exercises -->
     <hr/>
-    <h2>Engaging with the Community</h2>
+    <h2>Programming Exercises</h2>
       <p>
-        The quickest way to contribute to ISIS is to engage to the community.
-        There are many ways you can support the community without writing any code at all.
+        These self-guided exercises will have you explore the ISIS code base and
+        learn about the ISIS API.
       </p>
       <table class="tableTOC">
 
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://astrodiscuss.usgs.gov/">
-            AstroDiscuss</a>
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_1">
+            Basic ISIS Programming</a>
           </th>
           <td>
-          Ask or answer questions on our community discussion board.
+          An exercise introduces you to the ISIS API by
+          examining and altering an existing ISIS application.
           </td>
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/issues">
-            GitHub Issues</a>
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_2">
+            Advanced ISIS Programming</a>
           </th>
           <td>
-          Comment on bug reports or feature requests from other users or make your own.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/discussions?discussions_q=label%3ARFC">
-            Requests for Comment</a>
-          </th>
-          <td>
-          Provide feedback on major changes proposed for ISIS.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS_TC">
-            ISIS Technical Committee</a>
-          </th>
-          <td>
-          Get involved in project governance.
+          An exercise grows your understanding of the ISIS API by
+          building on and refining the work you did in the previous exercise.
           </td>
         </tr>
       </table>
 
 
-<!-- Documentation Guides​ -->
+<!-- Contributing Guides -->
     <hr/>
-    <h2>Documentation Guides</h2>
+    <h2>Contributing Guides</h2>
       <p>
-        If you're not familiar with working on the ISIS documentation,
-        these guides can help get you started.
+        The previous exercises showed you how to write code in ISIS.
+        These guides will show you how to contribute your code change back into
+        the ISIS code base.
       </p>
       <table class="tableTOC">
 
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Contributing-Application-Documentation">
-            Contributing ISIS Application Documentation</a>
+            <a href="">
+            Adding a New Feature</a>
           </th>
           <td>
-          A how-to guide for writing and modifying the ISIS application documentation.
+          A guide to the requirements when adding a new feature to ISIS.
           </td>
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="../documents/HowToApplicationExamples/index.html">
-            ISIS Application Examples Guide</a>
+            <a href="">
+            Modifying an Existing Feature</a>
           </th>
           <td>
-          A how-to guide for writing examples in ISIS application documentation.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="../documents/HowToGeneralDocumentation/index.html">
-            General ISIS Documentation Guide</a>
-          </th>
-          <td>
-          A how-to guide for writing documentation for this website.
+          A guide to the requirements when modifying an existing feature in ISIS.
           </td>
         </tr>
       </table>
 
 
-<!-- Building ISIS -->
-      <hr/>
-      <h2>Building ISIS</h2>
+<!-- Testing Guides -->
+    <hr/>
+    <h2>Testing Guides</h2>
       <p>
-        If you want to contribute code to ISIS, the first step is getting the ISIS source code
-        compiling on your system. These resources will take you through all the steps required to
-        compile, test, and optionally install ISIS.
+        Testing is a crucial component of creating sustainable software and a requirement for all
+        code contributions to ISIS. These guides will help you create, run, and modify the ISIS tests.
       </p>
       <table class="tableTOC">
 
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#getting-started-with-github">
-            Downloading the Source Code</a>
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Writing-ISIS3-Tests-Using-Gtest-and-Ctest">
+            Writing Tests Using GTest and CTest</a>
           </th>
           <td>
-          How to pull the source code from GitHub.
+          As of version 3.6, ISIS uses googletest and CTest for testing. This how-to guide will
+          walk you through the steps required to write tests using the new frameworks. It also
+          covers the steps needed to convert ISIS applications to the new callable format.
           </td>
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#anaconda-and-isis3-dependencies">
-            Dependency Management</a>
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Test-Data-Obtaining,-Maintaining,-and-Submitting">
+            ISIS Test Data</a>
           </th>
           <td>
-          How to download and install the dependencies required to build ISIS.
+          Legacy Makefile based tests in ISIS use a input and truth data to confirm that the
+          aplications produce the proper output. This page explains how to download these
+          files required to run the ISIS test suite.
           </td>
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3">
-            Building and Installing</a>
+            <a href="../documents/HowToApplicationCategoryTest/index.html">
+            Legacy Makefile Tests Guide</a>
           </th>
           <td>
-          How to build ISIS once you have the source code and dependencies.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests">
-            Running the Test Suite</a>
-          </th>
-          <td>
-          How to confirm your build of ISIS is correct by running the test suite.
+          This documents describes how legacy Makefile tests work. Contributors are required
+          to use the new googletest system for new tests, but there are rare situations where
+          existing legacy Makefile tests need to be updated and cannot be converted.
           </td>
         </tr>
       </table>

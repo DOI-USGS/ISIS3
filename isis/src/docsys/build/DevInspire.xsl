@@ -97,7 +97,7 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                Contributor Get Inspired
+                Get Inspired to Contribute
               </h1>
               <p>
                 Now that you've got all the resources you need to contribute,
@@ -155,10 +155,22 @@ Deborah Lee Soltesz
       <h2>GitHub Pull Requests</h2>
       <p>
         If you are interested in what other contributors are working on, look at the
-        <a href="https://github.com/USGS-Astrogeology/ISIS3/pulls">GitHub pull requests</a>
-        that are currently open. Even if you do not have write permissions to the
+        GitHub pull requests that are currently open. Even if you do not have write permissions to the
         repository, input and testing on pull requests are always appreciated.
       </p>
+      <table class="tableTOC">
+
+        <!-- hardcoded links -->
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/pulls">
+            Open pull requests</a>
+          </th>
+          <td>
+          Currently open pull requests on the ISIS GitHub repository.
+          </td>
+        </tr>
+      </table>
 
 
 <!-- FOOTER -->

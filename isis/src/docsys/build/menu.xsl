@@ -61,6 +61,11 @@ Deborah Lee Soltesz
     </div>
 
     <div>
+      <a href="{$menuPath}DevLearn/index.html" target="_top">
+      Learn More</a>
+    </div>
+
+    <div>
       <a href="{$menuPath}DevExplore/index.html" target="_top">
       Explore in Detail</a>
     </div>
