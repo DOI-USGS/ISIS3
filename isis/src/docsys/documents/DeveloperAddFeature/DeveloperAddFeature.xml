@@ -6,10 +6,14 @@
         <h2><a name="Introduction">Introduction</a></h2>
           <p>
             This is a step-by-step guide describing the process for adding a new feature to ISIS.
-            Since ISIS is made up of many application programs, when we say new feature we are referring adding
+            Since ISIS is made up of many application programs, when we say new feature we mean adding
             a new program to ISIS. Each
             program in ISIS is focussed on a narrow subject, for example, isis2std is focussed on exporting ISIS cubes
             to standard image formats such as jpeg, tif, or png.
+          </p>
+          <p>
+            Many people have contributed code, documentation, answers, and suggestions to the ISIS software. As part of
+            that community you should be familiar with the <a href="https://github.com/USGS-Astrogeology/ISIS3/blob/dev/CONTRIBUTING.md">contributing guide</a>.
           </p>
           <p>
             ISIS applications are written in C++ and are supported on Ubuntu Linux and Mac OS.
@@ -17,20 +21,19 @@
 
         <h2><a name="Resources">Resources</a></h2>
           <p>
-            The <a href="https://isis.astrogeology.usgs.gov/Object/Developer/index.html>ISIS library"</a> contains 
+            The <a href="../Object/Developer/index.html">ISIS library</a> contains 
             hundreds of support classes and functions. Every application takes advantage of
             these support routines to accomplish its tasks. We encourage you to get familiar with the library before 
             starting to write your first application.
           </p>
           <p>
-            There are over 400 <a href="https://isis.astrogeology.usgs.gov/Application/index.html"ISIS applications</a>.
+            There are over 400 <a href="../Application/index.html">ISIS applications</a>.
             We suggest you get familiar with as many of these as possible, so you don't duplicate a feature that has already 
             been implemented, and to use an existing application as a template for your new feature.
           </p>
           <p>
-            ISIS applications are linked against many external libraries. We encourage you to become familiar with these 
-            external libraries. One place to start is the environment.yml file located at the root of the ISIS source
-            code tree. 
+            ISIS applications are linked against many useful external libraries. We encourage you to become familiar with these 
+            external libraries. A list of the external libraries ISIS uses directly can be found in the environment.yml file. 
           </p>
 
         <h2><a name="Getting the ISIS source code">Getting the ISIS source code</a></h2>
@@ -73,7 +76,7 @@
               Before you start writing your new feature, create an <a href="https://github.com/USGS-Astrogeology/ISIS3">issue</a> for 
               it on the ISIS GitHub site. Doing this will allow other ISIS developers to way in on your preposed feature. By posting
               a description of what you want to do and asking questions, other developers can give you pointers on how to 
-              implement it.
+              implement it. Label the issue as an "enhancement", to give others an idea what kind of issue it is.
             </p>
 
           <h2><a name="Writing your new application">Writing your new application</a></h2>
@@ -84,26 +87,37 @@
               stored. The files in this directory will be exclusively to your feature. This is where using another application as
               a template can be very useful.
             </p>
+            <p>
+              The source code inside an ISIS application directory should be organized to be a callable ISIS 
+              application. This is a change from the older style applications that could not be called directly by other applications.
+              Details about writing callable ISIS applications can be found at: 
+              <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Writing-ISIS3-Tests-Using-Gtest-and-Ctest#refactoring-isis3-applications">Refactoring ISIS Applications</a>
+            </p>
+
             <ol>
                 <li>Decide where your new application belongs</li>
                 <li>Create a directory using the same name as you new application</li>
                 <li>Create a "main.cpp" file</li>
                 <li>Create a "your_new_app.cpp" file</li>
+                <li>Create a "your_new_app.h" file</li>
                 <li>Create a "your_new_app.xml" file</li>
-                <li>Create any additional support files (e.g., support_class.cpp, support_class.h</li>
+                <li>Create any additional support files (e.g., Support_class.cpp, Support_class.h</li>
             </ol>
             <p>
               Populate the new files with the code necessary to implement your feature.
             </p>
+            <p>
+              You may also want to create a test file for your new application, and one for each supporting class you write.
+            </p>
 
             <h3>Compile and link your new application for the first time</h3>
             <p>
-              Since you are adding a new application to ISIS you will need to re-run the cmake command. This will add 
+              Since you are adding a new application to ISIS you will need to reconfigure your build with cmake. This will add 
               the new application to the list of applications the build system knows about.
             </p>
             <ol>
-              <li>Change you current working directory to the ISIS build directory (cd $ISISROOT)</li>
-              <li>Remove the contents of the build directory (rm -rf *)</li>
+              <li>Change your current working directory to the ISIS build directory (cd $ISISROOT)</li>
+              <li>Remove the CMakeCache.txt file (rm CMakeCache.txt)</li>
               <li>Re-run the cmake command (cmake -GNinja ..)</li>
               <li>Build the ISIS library and all of the applications (ninja)</li>
             </ol>
@@ -118,22 +132,39 @@
               <li>Run your application and test the user interface</li>
               <li>Run your application and test the output</li>
                 <ol>
-                  <li>Cube DNs</li>
-                  <li>Cube labels</li>
-                  <li>History</li>
-                  <li>Original label</li>
-                  <li>print.prt file</li>
-                  <li>Cleanup any temporary files</li>
+                  <li>Cube DN's - Are they what you expect?</li>
+                  <li>Cube labels - Have they been modified as you intend?</li>
+                  <li>History - Did the application add a cube history entry for every output cube?</li>
+                  <li>Original label - If your application is an import program, did it store the original label in the output cube</li>
+                  <li>print.prt file - Did your application write a log entry to the print.prt file?</li>
+                  <li>Cleanup temporary files - If you application used any temporary files, did it remove them before it exited?</li>
                 </ol>
             </ol>
 
-            <h2><a name="Writing your new application">Writing your new application</a></h2>
-              Applications in ISIS are required to have tests that exercise the majority of the application specific code.
-              These test are written using Google Test (aka, gtest). The source code for all gtests is located in the "isis/tests" directory
-              starting at the root of the code repository. Create a new file for your new application with the name "FunctionalTestsYournewapp.cpp", and
-              write tests to exercise the application. Remember to test only the functionality of your new code and not the ISIS library. Tests for the
-              ISIS library already exist.
-            </p>
+          <h2><a name="Testing for your new application">Testing for your new application</a></h2>
+          <p>
+            Applications and complex support classes in ISIS are required to have tests that exercise the majority of the their code.
+            These test are written using <a href="https://google.github.io/googletest">googletest</a> (aka, gtest). 
+            The source code for all gtests is located in the "isis/tests" directory.
+            Create a new test file for your application with the name "FunctionalTestsYournewapp.cpp", and one for each support class with a descriptive name. 
+            Write tests to exercise the application and any support classes. Remember to test only the functionality of your new code 
+            and not the ISIS library. Tests for the ISIS library already exist. See the
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Writing-ISIS3-Tests-Using-Gtest-and-Ctest">guide for writing</a> tests for detailed instructions.
+          </p>
+
+          <h2><a name="ISIS change log and attributions">Change Log and Attributions</a></h2>
+          <p>
+            Now you need to let the ISIS community know about your new application and add your name to the list
+            of people who have contributed to ISIS over it's lifetime.
+          </p>
+          <p>
+            Edit the "CHANGELOG.md" file, located at the root of your local repository, and add an entry describing your new
+            application. Read the instructions inside the file carefully.
+          </p>
+          <p>
+            Edit the ".zenodo.json" file, also located at the root or you local repository, and add your information.
+          </p>
+
 
           <h2><a name="Submit your new application for review">Submit your new application for review</a></h2>
           <p>
@@ -149,7 +180,7 @@
             <li>Update your pull request with any changes</li>
           </ol>
           <p>
-            Once your reviewers are satisfied one of them will merge your new application code with the ISIS dev brand. When 
+            Once your reviewers are satisfied one of them will merge your new application code with the ISIS dev branch. When 
             the next public feature release is created, your new application will be available alongside the other ISIS applications. 
           </p>
 
