@@ -98,10 +98,10 @@
                 <li>Decide where your new application belongs</li>
                 <li>Create a directory using the same name as you new application</li>
                 <li>Create a "main.cpp" file</li>
-                <li>Create a "your_new_app.cpp" file</li>
-                <li>Create a "your_new_app.h" file</li>
-                <li>Create a "your_new_app.xml" file</li>
-                <li>Create any additional support files (e.g., Support_class.cpp, Support_class.h</li>
+                <li>Create a "yournewapp.cpp" file</li>
+                <li>Create a "yournew_app.h" file</li>
+                <li>Create a "yournewapp.xml" file</li>
+                <li>Create any additional support files (e.g., Supportclass.cpp, Supportclass.h</li>
             </ol>
             <p>
               Populate the new files with the code necessary to implement your feature.
@@ -137,7 +137,7 @@
                   <li>History - Did the application add a cube history entry for every output cube?</li>
                   <li>Original label - If your application is an import program, did it store the original label in the output cube</li>
                   <li>print.prt file - Did your application write a log entry to the print.prt file?</li>
-                  <li>Cleanup temporary files - If you application used any temporary files, did it remove them before it exited?</li>
+                  <li>Cleanup temporary files - If your application used any temporary files, did it remove them before it exited?</li>
                 </ol>
             </ol>
 
@@ -176,7 +176,7 @@
             <li>Commit them to your local repository (git commit -m "brief description")</li>
             <li>Push the new application to your GitHub fork (git push origin)</li>
             <li>Create a pull request on <a href="https://github.com/USGS-Astrogeology/ISIS3/compare">GitHub</a></li>
-            <li>Iterate with the reviewers to fix any issues, resolve and confilcts and explain any questions</li>
+            <li>Iterate with the reviewers to fix any issues, resolve and conflicts and explain any questions</li>
             <li>Update your pull request with any changes</li>
           </ol>
           <p>
