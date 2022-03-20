@@ -102,7 +102,7 @@
             <h3>Naming Conventions and Code Style</h3>  
             <p>
               When editing the ISIS code, be aware of the <a href="../documents/CodingStandards/CodingStandards.html">style</a> the 
-              particular class or application is written with and try to follow it within reason. The naming conventions, have changed 
+              particular class or application is written with and try to follow it within reason. The naming conventions, have changed  
               over the years and can be confusing, so don't mix two conventions in a class or application.
             </p>
 
