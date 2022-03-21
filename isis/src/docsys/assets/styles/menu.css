@@ -17,7 +17,9 @@
      .isisMenu h3,
      .isisMenu h4,
      .isisMenu h5,
-     .isisMenu h6
+     .isisMenu h6,
+     .isisMenu .dropbtn,
+     .isisMenu .dropdown-content
              {
                font-family: Verdana, Helvetica, Geneva, Arial, sans-serif ;
                font-size: 80% ;
@@ -171,5 +173,69 @@
               border: 1px solid #CCCCAA ;
             }
 
+/* Drop Down Button */
+     .isisMenu .dropdown
+            {
+              position: relative;
+              display: inline-block;
+            }
 
+     .isisMenu .dropdown:hover .dropbtn 
+           {
+             padding: 2px;
+             background-color: #EEEEAA ;
+             border: 1px solid silver ;
+           }
 
+     .isisMenu .dropbtn 
+            {
+              font-variant:small-caps ;
+              text-decoration: none;
+
+              margin-top:2px;
+              margin-bottom:2px;
+              padding: 2px ;
+              background-color: #CCAA88 ;
+              opacity: .60;
+              filter: alpha(opacity=60);
+              -moz-opacity: 0.6 ;
+            }
+
+     /* Dropdown Content (Hidden by Default) */
+     .isisMenu .dropdown-content 
+           {
+             font-variant:small-caps ;
+             text-decoration: none;
+
+             display: none ;
+             position: relative ;
+             background-color: #CCAA88 ;
+             opacity: .60;
+             filter: alpha(opacity=60);
+             -moz-opacity: 0.6 ;
+             z-index: 1 ;
+           }
+     
+     /* Links inside the dropdown */
+     .isisMenu .dropdown-content a 
+           {
+             color: black ;
+             padding: 2px 2px ;
+             text-decoration: none ;
+             display: block ;
+           }
+     
+     /* Change color of dropdown links on hover */
+     .isisMenu .dropdown-content a:hover 
+           {
+               padding: 1px;
+               background-color: #EEEEAA ;
+               border: 1px solid silver ;
+           }
+     
+     /* Show the dropdown menu on hover */
+     .isisMenu .dropdown:hover .dropdown-content 
+           {
+             display: block ;
+           }
+     

@@ -16,6 +16,7 @@ Deborah Lee Soltesz
 
 -->
   <xsl:param name="menuPath"/>
+  <xsl:param name="docVersion"/>
 
   <xsl:template mode="writeMenu" name="writeMenu">
     <div>
@@ -103,21 +104,6 @@ Deborah Lee Soltesz
 
     <hr/>
     <h2>
-      Other Versions
-    </h2>
-
-    <div>
-      <a href="https://isis.astrogeology.usgs.gov/3.4/index.html" target="_top">
-      ISIS 3.4</a>
-    </div>
-
-    <div>
-      <a href="https://isis.astrogeology.usgs.gov/4.1/index.html" target="_top">
-      ISIS 4.1</a>
-    </div>
-
-    <hr/>
-    <h2>
       ISIS 2
     </h2>
 
@@ -134,6 +120,20 @@ Deborah Lee Soltesz
     <div>
       <a href="{$menuPath}documents/Isis2TechnicalDocs/index.html" target="_top">
       Technical Documents</a>
+    </div>
+
+    <xsl:param name="COLOR" select="'black'"/>
+    <hr/>
+    <h2>
+      Documentation Versions
+    </h2>
+
+    <div class="dropdown">
+      <button class="dropbtn">ISIS <xsl:value-of select="$docVersion"/></button>
+      <div class="dropdown-content">
+        <a href="https://isis.astrogeology.usgs.gov/4.1/index.html">ISIS 4.1.0</a>
+        <a href="https://isis.astrogeology.usgs.gov/3.4/index.html">ISIS 3.4.0</a>
+      </div>
     </div>
 
 

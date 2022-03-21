@@ -86,9 +86,9 @@ function(build_upper_level)
   # These folders are populated inside "build_documents_folder"
 
   # Create a redirect for the top level index file. It points to the version index file
-  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"${docVersion}/\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/redirect.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/redirect.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"${docVersion}/\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/redirect.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/redirect.xsl)
   # Create the main documentaion page. This is located in the version directory 
-  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
 
  # This folder just gets copied as-is
  # Note: Schemas are referenced inside the application xml files. The schema URI inside the xmls do not have version numbers in the path 
@@ -156,7 +156,7 @@ function(build_documents_folder)
     # Use Xalan to generate an intermediate makefile, then execute that makefile
     # to generate the output documentation files.
 
-    set(xalanCommand ${XALAN} ${XALAN_PARAM_OPTION} menuPath "../../" ${XALAN_PARAM_OPTION} dirParam "'${docName}'" ${XALAN_OUTFILE_OPTION} ${f}/Makefile_temp ${XALAN_INFILE_OPTION} ${docName}.xml  ${XALAN_XSL_OPTION} ${modDocBuildXslFile})
+    set(xalanCommand ${XALAN} ${XALAN_PARAM_OPTION} menuPath "../../" ${XALAN_PARAM_OPTION} dirParam "'${docName}'" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${f}/Makefile_temp ${XALAN_INFILE_OPTION} ${docName}.xml  ${XALAN_XSL_OPTION} ${modDocBuildXslFile})
     execute_process(COMMAND ${xalanCommand} WORKING_DIRECTORY ${f})
 
     execute_process(COMMAND make -f Makefile_temp docs WORKING_DIRECTORY ${f})
@@ -178,43 +178,43 @@ function(build_documents_folder)
   # These go in top level folders in /doc/
 
   # GENERAL TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/General/index.html ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/General.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/General/index.html ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/General.xsl)
 
   # GUIDES TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/Guides/index.html ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/Guides.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/Guides/index.html ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/Guides.xsl)
 
   # INSTALLATION TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/Installation/index.html ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/Installation.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/Installation/index.html ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/Installation.xsl)
 
   # TECHNICAL INFO TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/TechnicalInfo/index.html ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/TechnicalInfo.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/TechnicalInfo/index.html ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/TechnicalInfo.xsl)
 
   # USER DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserDocs/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserDocs.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserDocs/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserDocs.xsl)
 
   # USER GETTING STARTED DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserStart/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserStart.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserStart/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserStart.xsl)
 
   # USER LEARN MORE DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserLearn/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserLearn.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserLearn/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserLearn.xsl)
 
   # USER EXPLORE IN DETAIL DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserExplore/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserExplore.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserExplore/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserExplore.xsl)
 
   # USER GET INSPIRED DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserInspire/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserInspire.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/UserInspire/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/UserInspire.xsl)
 
   # DEV GETTING STARTED DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/DevStart/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/DevStart.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/DevStart/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/DevStart.xsl)
 
   # DEV LEARN MORE DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/DevLearn/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/DevLearn.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/DevLearn/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/DevLearn.xsl)
 
   # DEV EXPLORE IN DETAIL DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/DevExplore/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/DevExplore.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/DevExplore/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/DevExplore.xsl)
 
   # DEV GET INSPIRED DOCS TOC
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/DevInspire/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/DevInspire.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/DevInspire/index.html    ${XALAN_INFILE_OPTION} ${doctocPath} ${XALAN_XSL_OPTION} ${docBuildFolder}/build/DevInspire.xsl)
 
 endfunction(build_documents_folder)
 
@@ -265,8 +265,8 @@ function(build_application_docs)
         copy_folder(${f}/assets ${tbAppFolder})
       endif()
 
-      execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../../../../\" ${XALAN_OUTFILE_OPTION} ${pfAppFolder}/${appName}.html ${XALAN_INFILE_OPTION} ${f}/${appName}.xml ${XALAN_XSL_OPTION} ${printerStyleFolder}/IsisApplicationDocStyle.xsl)
-      execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../../../../\" ${XALAN_OUTFILE_OPTION} ${tbAppFolder}/${appName}.html ${XALAN_INFILE_OPTION} ${f}/${appName}.xml ${XALAN_XSL_OPTION} ${tabbedStyleFolder}/IsisApplicationDocStyle.xsl)
+      execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../../../../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${pfAppFolder}/${appName}.html ${XALAN_INFILE_OPTION} ${f}/${appName}.xml ${XALAN_XSL_OPTION} ${printerStyleFolder}/IsisApplicationDocStyle.xsl)
+      execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../../../../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${tbAppFolder}/${appName}.html ${XALAN_INFILE_OPTION} ${f}/${appName}.xml ${XALAN_XSL_OPTION} ${tabbedStyleFolder}/IsisApplicationDocStyle.xsl)
 
     endforeach() # End loop through app folders
 
@@ -313,13 +313,13 @@ function(add_extra_tocs)
   set(tocXml      "${CMAKE_INSTALL_PREFIX}/bin/xml/applicationTOC.xml")
 
   # Build alpha.html
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${TOCDIR}/alpha.html ${XALAN_INFILE_OPTION} ${tocXml} ${XALAN_XSL_OPTION} ${buildFolder}/TOCindex_alpha.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${TOCDIR}/alpha.html ${XALAN_INFILE_OPTION} ${tocXml} ${XALAN_XSL_OPTION} ${buildFolder}/TOCindex_alpha.xsl)
 
   # Build index.html
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${TOCDIR}/index.html ${XALAN_INFILE_OPTION} ${tocXml} ${XALAN_XSL_OPTION} ${buildFolder}/TOCindex_category.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${TOCDIR}/index.html ${XALAN_INFILE_OPTION} ${tocXml} ${XALAN_XSL_OPTION} ${buildFolder}/TOCindex_category.xsl)
 
   # Build oldvnew.html
-  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_OUTFILE_OPTION} ${TOCDIR}/oldvnew.html ${XALAN_INFILE_OPTION} ${tocXml} ${XALAN_XSL_OPTION} ${buildFolder}/TOCindex_oldvnew.xsl)
+  execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../\" ${XALAN_PARAM_OPTION} docVersion \"${docVersion}\" ${XALAN_OUTFILE_OPTION} ${TOCDIR}/oldvnew.html ${XALAN_INFILE_OPTION} ${tocXml} ${XALAN_XSL_OPTION} ${buildFolder}/TOCindex_oldvnew.xsl)
 
   # Build applicationCategories.xml
   execute_process(COMMAND ${XALAN} ${XALAN_OUTFILE_OPTION} ${CMAKE_INSTALL_PREFIX}/bin/xml/applicationCategories.xml ${XALAN_INFILE_OPTION} ${docBuildFolder}/Schemas/Application/application.xsd ${XALAN_XSL_OPTION} ${buildFolder}/IsisApplicationCategoriesbuild.xsl)
