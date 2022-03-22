@@ -203,6 +203,18 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class LidarNetwork : public LidarObservationPair {
+    protected:
+
+      QString lidarDataPath;
+
+      ControlNet *network;
+      QString controlNetPath;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
   class ApolloNetwork : public TempTestingFiles {
     protected:
       QVector<FileName> isdFiles;

@@ -307,6 +307,10 @@
       Cleaned up the bundleout.txt file and added new information in the header.
       Fixes #3267.
     </change>
+    <change name="Ken Edmundson and Debbie A. Cook" date="2019-05-20">
+      Added initial support for simultaneous LIDAR data. Added LIDARDATA, OLIDARDATA,
+      and OLIDARFORMAT arguments.
+    </change>
     <change name="Aaron Giroux" date="2019-12-19">
       Added SCCONFIG parameter which allows users to pass in a pvl file with different
       settings for different instrumentIDs. Added logic into the observationSolveSettings
@@ -384,6 +388,7 @@
           *.net
         </filter>
       </parameter>
+
       <parameter name="ONET">
         <type>filename</type>
         <fileMode>output</fileMode>
@@ -398,6 +403,69 @@
         <filter>
           *.net
         </filter>
+      </parameter>
+
+      <parameter name="LIDARDATA">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Lidar Point File - requires SPSOLVE to be turned on
+        </brief>
+        <description>
+        This file is a <def>lidar point data</def> generated from <b>lrolola2isis.cpp</b>.
+        It contains <def>lidar control point</def>s and associated measures for simultaneous images.
+        If <def>lidar point data</def> are used, SPSOLVE must be turned on (anything besides NONE)
+        
+        </description>
+        <exclusions>
+        </exclusions>
+        <filter>
+          *.dat *.json
+        </filter>
+      </parameter>
+
+      <parameter name="OLIDARDATA">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>output</fileMode>
+        <brief>
+          Output lidar data file - requires SPSOLVE to be turned on
+        </brief>
+        <description>
+          This output file contains the adjusted <def>lidar data</def> with
+          the final coordinates of the <def>lidar point</def>s and residuals for each
+          measurement.
+        </description>
+        <filter>
+          *.dat *.json
+        </filter>
+      </parameter>
+
+      <parameter name="OLIDARFORMAT">
+        <type>string</type>
+        <brief> Output lidar data file format</brief>
+        <default>
+          <item>BINARY</item>
+        </default>
+        <description>
+          Output lidar data file format.
+        </description>
+        <list>
+          <option value="BINARY">
+            <brief> Output lidar data in binary format</brief>
+            <description>
+              Output lidar data in binary format.
+            </description>
+          </option>
+
+          <option value="JSON">
+            <brief> Output lidar data in json format </brief>
+            <description>
+              Output lidar data in json format.
+            </description>
+          </option>
+        </list>
       </parameter>
 
       <parameter name="SCCONFIG">
@@ -1114,12 +1182,12 @@
         <type>boolean</type>
         <default><item>false</item></default>
         <brief>
-	  Solve for target body parameters. The parameters, their a priori values, and uncertainties are input
-	  using a PVL file specified by TBPARAMETERS below.</brief>
+    Solve for target body parameters. The parameters, their a priori values, and uncertainties are input
+    using a PVL file specified by TBPARAMETERS below.</brief>
         <description>
           Solve for target body parameters. The parameters, their a priori values, and uncertainties are input
-	  using a PVL file specified by TBPARAMETERS below. An example template PVL file is located at
-	  $ISISROOT/appdata/templates/jigsaw/TargetBodyParameters.pvl.
+    using a PVL file specified by TBPARAMETERS below. An example template PVL file is located at
+    $ISISROOT/appdata/templates/jigsaw/TargetBodyParameters.pvl.
         </description>
         <inclusions>
           <item>TBPARAMETERS</item>
@@ -1134,9 +1202,9 @@
         </brief>
         <description>
           This file contains target body parameters to solve for in the bundle adjustment, their
-	  a priori values, and uncertainties. The file must be in PVL format. An example template
+    a priori values, and uncertainties. The file must be in PVL format. An example template
           PVL file is located at $ISISROOT/appdata/templates/jigsaw/TargetBodyParameters.pvl. Instructions for the PVL
-	  structure are given in the template.
+    structure are given in the template.
         </description>
         <filter>
           *.pvl
@@ -1428,6 +1496,18 @@
             <item>yes</item>
           </default>
         </parameter>
+
+        <parameter name="LIDAR_CSV">
+          <brief> Outputs lidar data to csv file - lidar.csv</brief>
+          <description>
+            Selection of this parameter flags output of lidar data
+            points to a csv file
+          </description>
+          <type>boolean</type>
+          <default>
+            <item>no</item>
+          </default>
+        </parameter>
       </group>
 
     </groups>
@@ -1517,7 +1597,7 @@
          connection to ground in the network, this bundle will only solve for camera specific parameters. The bundle could still solve for other parameters and be 
          correct relative to the camera position, but it would increase the complexity of the bundle. The proceeding two examples will include grounded networks, 
          so we will wait to increase the complexity of the bundle until ground points are included. Additionally, in this example we are evaluating the solution and 
-         do not want to apply it to the images yet, therefore, update is set to ‘no’.
+         do not want to apply it to the images yet, therefore, update is set to 'no'.
         </p> 
         <p>
          This relative bundle turns on and parameterizes the camera twist and camera acceleration solve parameters. Camera twist is a flag that allows the bundle to solve 
@@ -1526,8 +1606,8 @@
          constraint because of the increasing affect alterations of higher order parameters have on the bundle solution.
         </p>
         <p>
-         The ‘overexisting’ flag tells the bundle solution to approximate the camera rotation with a zero polynomial function added to the existing rotation data (adding the 
-         polynomial <b>over</b> the <b>existing</b> data). Without the ‘overexisting’ flag, the bundle fits a polynomial to the existing rotations, throws out the existing data
+         The 'overexisting' flag tells the bundle solution to approximate the camera rotation with a zero polynomial function added to the existing rotation data (adding the 
+         polynomial <b>over</b> the <b>existing</b> data). Without the 'overexisting' flag, the bundle fits a polynomial to the existing rotations, throws out the existing data
          points, and uses the polynomial to calculate the approximate ephemerides when needed.
         </p>
         <p>
@@ -1613,7 +1693,7 @@
          your update cubes camera pointing (or any kernels resulting from these updated camera pointings).
         </p>
         <p>
-         If you want to double check the update was completed, see cathist or catlab (search for ‘Jigged’).
+         If you want to double check the update was completed, see cathist or catlab (search for 'Jigged').
         </p>
       </description>
 

@@ -1701,3 +1701,21 @@ TEST_F(CSMNetwork, FunctionalTestJigsawCSM) {
   EXPECT_NEAR(camJ->getParameterValue(1), 0.0, 0.00000001);
   EXPECT_NEAR(camJ->getParameterValue(2), 128.0, 0.00000001);
 }
+
+
+TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
+  # copy images
+
+  # call jigsaw w/o lidar options & apply=true on copy of images
+
+  # call jigsaw w/ lidar options & apply=true
+
+  # re-open all cubes
+
+  # for each point in lidar data
+    # in no-lidar images do ground to image to get spacecraft position at observing time
+    
+    # in lidar images do ground to image to get spacecraft position at observing time
+
+    # check that distance from ground to spacecraft position is closer to lidar range in lidar image than in no-lidar images
+}
