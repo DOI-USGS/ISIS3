@@ -129,7 +129,7 @@ namespace Isis{
   // Import a PDS3, HRSC, SRC Camera image.
   void ImportHrscSrcImage(ProcessImportPds &p, Pvl &label, UserInterface &ui) {
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    outCube = p.SetOutputCube(ui.GetFileName("TO"), att);
+    outCube = p.SetOutputCube(ui.GetCubeName("TO"), att);
     p.StartProcess();
 
     Pvl otherLabels;
@@ -189,7 +189,7 @@ namespace Isis{
     lineInFile.clear();
     numLinesSkipped = 0;
 
-    CubeAttributeOutput outAtt(ui.GetFileName("TO"));
+    CubeAttributeOutput outAtt(ui.GetCubeName("TO"));
     outCube = new Cube();
 
     outCube->setByteOrder(outAtt.byteOrder());
@@ -263,7 +263,7 @@ namespace Isis{
     outCube->setDimensions(p.Samples(), lineInFile.size(), p.Bands());
 
     p.Progress()->SetText("Importing");
-    outCube->create(ui.GetFileName("TO"));
+    outCube->create(ui.GetCubeName("TO"));
     p.StartProcess(WriteOutput);
 
     outCube->write(timesTable);

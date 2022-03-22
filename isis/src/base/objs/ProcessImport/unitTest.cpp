@@ -53,7 +53,7 @@ void IsisMain() {
 
   Process p2;
   CubeAttributeInput att;
-  QString file = Application::GetUserInterface().GetFileName("TO");
+  QString file = Application::GetUserInterface().GetCubeName("TO");
   Cube *icube = p2.SetInputCube(file, att);
   Statistics *stat = icube->statistics();
   cout << endl << "Average: " << stat->Average() << endl;
@@ -65,7 +65,7 @@ void IsisMain() {
 
   ProcessImport core_cub;
   core_cub.SetInputFile("$ISISTESTDATA/isis/src/base/unitTestData/30i001ci.qub");
-  QString coreFile = Application::GetUserInterface().GetFileName("CORE_CUBE");
+  QString coreFile = Application::GetUserInterface().GetCubeName("CORE_CUBE");
   core_cub.SetVAXConvert(true);
   core_cub.SetPixelType(Isis::Real);
   core_cub.SetByteOrder(Isis::Lsb);
@@ -90,7 +90,7 @@ void IsisMain() {
 
 
   suffix_cub.SetInputFile("$ISISTESTDATA/isis/src/base/unitTestData/30i001ci.qub");
-  QString suffixFile = Application::GetUserInterface().GetFileName("SUFFIX_CUBE");
+  QString suffixFile = Application::GetUserInterface().GetCubeName("SUFFIX_CUBE");
   suffix_cub.SetVAXConvert(true);
   suffix_cub.SetPixelType(Isis::Real);
   suffix_cub.SetByteOrder(Isis::Lsb);

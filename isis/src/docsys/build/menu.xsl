@@ -23,42 +23,98 @@ Deborah Lee Soltesz
       Home</a>
     </div>
 
+
+    <hr/>
+    <h2>
+      User Documentation
+    </h2>
+
     <div>
-      <a href="{$menuPath}AboutIsis/index.html" target="_top">
-      About ISIS</a>
+      <a href="{$menuPath}UserStart/index.html" target="_top">
+      Getting Started</a>
     </div>
 
     <div>
-      <a href="https://github.com/USGS-Astrogeology/ISIS3/issues" target="_blank" title="Launch the ISIS Support Center in a new window">
-      Support</a>
+      <a href="{$menuPath}UserLearn/index.html" target="_top">
+      Learn More</a>
     </div>
 
     <div>
-      <a href="{$menuPath}Installation/index.html" target="_top">
-      Download</a>
+      <a href="{$menuPath}UserExplore/index.html" target="_top">
+      Explore in Detail</a>
+    </div>
+
+    <div>
+      <a href="{$menuPath}UserInspire/index.html" target="_top">
+      Get Inspired</a>
+    </div>
+
+
+    <hr/>
+    <h2>
+      Contributor Documentation
+    </h2>
+
+    <div>
+      <a href="{$menuPath}DevStart/index.html" target="_top">
+      Getting Started</a>
+    </div>
+
+    <div>
+      <a href="{$menuPath}DevLearn/index.html" target="_top">
+      Learn More</a>
+    </div>
+
+    <div>
+      <a href="{$menuPath}DevExplore/index.html" target="_top">
+      Explore in Detail</a>
+    </div>
+
+    <div>
+      <a href="{$menuPath}DevInspire/index.html" target="_top">
+      Get Inspired</a>
     </div>
 
     <hr/>
     <h2>
-      ISIS
+      Quick Links
     </h2>
 
     <div>
-      <a href="{$menuPath}UserDocs/index.html" target="_top">
-      Documentation</a>
-    </div>
-
-    <!-- Isis Workshop is only available on the website  -->
-    <div>
-      <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops" target="_blank" title="Launch ISIS Workshop in a new window">
-      Tutorials</a>
+      <a href="{$menuPath}Application/index.html">
+      Software Manual</a>
     </div>
 
     <div>
-      <a href="{$menuPath}TechnicalInfo/index.html" target="_top">
-      Technical Documents</a>
+      <a href="https://astrodiscuss.usgs.gov/">
+      AstroDiscuss</a>
     </div>
 
+    <div>
+      <a href="https://github.com/USGS-Astrogeology/ISIS3">
+      GitHub</a>
+    </div>
+
+    <div>
+      <a href="{$menuPath}Object/Developer/index.html">
+      API Reference</a>
+    </div>
+
+
+    <hr/>
+    <h2>
+      Other Versions
+    </h2>
+
+    <div>
+      <a href="https://isis.astrogeology.usgs.gov/3.4/index.html" target="_top">
+      ISIS 3.4</a>
+    </div>
+
+    <div>
+      <a href="https://isis.astrogeology.usgs.gov/4.1/index.html" target="_top">
+      ISIS 4.1</a>
+    </div>
 
     <hr/>
     <h2>

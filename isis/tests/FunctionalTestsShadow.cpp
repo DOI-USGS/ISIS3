@@ -44,7 +44,7 @@ TEST_F(DemCube, FunctionalTestShadowMatch) {
   EXPECT_EQ(int(shadowStats["NumSpecialPixels"]), 2800);
   EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 0);
 
-  Cube shadowCube(shadowUi.GetFileName("TO"));
+  Cube shadowCube(shadowUi.GetCubeName("TO"));
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
@@ -83,7 +83,7 @@ TEST_F(DemCube, FunctionalTestShadowTime) {
   EXPECT_EQ(int(shadowStats["NumSpecialPixels"]), 2800);
   EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 104);
 
-  Cube shadowCube(shadowUi.GetFileName("TO"));
+  Cube shadowCube(shadowUi.GetCubeName("TO"));
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
@@ -120,7 +120,7 @@ TEST_F(DemCube, FunctionalTestShadowNoShadow) {
   EXPECT_EQ(int(shadowStats["NumSpecialPixels"]), 2800);
   EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 0);
 
-  Cube shadowCube(shadowUi.GetFileName("TO"));
+  Cube shadowCube(shadowUi.GetCubeName("TO"));
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
@@ -156,7 +156,7 @@ TEST_F(DemCube, FunctionalTestShadowAccurate) {
   EXPECT_EQ(int(shadowStats["NumSpecialPixels"]), 2800);
   EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 0);
 
-  Cube shadowCube(shadowUi.GetFileName("TO"));
+  Cube shadowCube(shadowUi.GetCubeName("TO"));
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
@@ -192,7 +192,7 @@ TEST_F(DemCube, FunctionalTestShadowCustom) {
   EXPECT_EQ(int(shadowStats["NumSpecialPixels"]), 2800);
   EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 0);
 
-  Cube shadowCube(shadowUi.GetFileName("TO"));
+  Cube shadowCube(shadowUi.GetCubeName("TO"));
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 

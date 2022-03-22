@@ -174,7 +174,7 @@ void IsisMain() {
   outAtt.setPixelType(Isis::SignedWord);
   outAtt.setMinimum((double)VALID_MIN2);
   outAtt.setMaximum((double)VALID_MAX2);
-  Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), outAtt);
+  Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), outAtt);
 
   // Translate the labels
   p.StartProcess();
@@ -203,7 +203,7 @@ void IsisMain() {
   // Do 8 bit to 12 bit conversion
   fillGap = ui.GetBoolean("FILLGAP");
   ProcessByLine p2;
-  QString ioFile = ui.GetFileName("TO");
+  QString ioFile = ui.GetCubeName("TO");
   CubeAttributeInput att;
   p2.SetInputCube(ioFile, att, ReadWrite);
   p2.Progress()->SetText("Converting 8 bit pixels to 16 bit");

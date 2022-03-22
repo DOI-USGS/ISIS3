@@ -38,10 +38,10 @@ namespace Isis{
     bool registrationFileSpecified = false;
 
     Cube jitterCube;
-    jitterCube.open(ui.GetFileName("FROM"), "rw");
+    jitterCube.open(ui.GetCubeName("FROM"), "rw");
 
     Cube checkCube;
-    checkCube.open(ui.GetFileName("FROM2"), "r");
+    checkCube.open(ui.GetCubeName("FROM2"), "r");
 
     Pvl defFile;
     defFile.read(ui.GetFileName("DEFFILE"));
@@ -55,7 +55,7 @@ namespace Isis{
     ofstream outputFile;
     if (ui.WasEntered("TO")) {
       registrationFileSpecified = true;
-      QString to(FileName(ui.GetFileName("TO")).expanded());
+      QString to(FileName(ui.GetCubeName("TO")).expanded());
       outputFile.open(to.toLatin1().data());
       outputFile << "# checkline line, checkline sample, checkline time taken, "
                     "matched jittered image line, matched jittered image "

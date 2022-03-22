@@ -36,7 +36,7 @@ void IsisMain() {
   bands = cai.bands();
 
   icube.setVirtualBands(bands);
-  icube.open(ui.GetFileName("FROM"));
+  icube.open(ui.GetCubeName("FROM"));
 
   double sscale = 3;
   double lscale = 4;
@@ -65,6 +65,6 @@ void IsisMain() {
 
   p.Finalize();
   icube.close();
-  QFile::remove(ui.GetFileName("TO"));
-  QFile::remove(ui.GetFileName("TO2"));
+  QFile::remove(ui.GetCubeName("TO"));
+  QFile::remove(ui.GetCubeName("TO2"));
 }

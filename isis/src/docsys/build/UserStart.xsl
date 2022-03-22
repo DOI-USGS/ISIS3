@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" 
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format"
     exclude-result-prefixes="xmlns fo">
 
 <!--
 
-This stylesheet will be used to generate the main TOC for the "About Isis" page
+This stylesheet will be used to generate the main TOC for the "User Docs" page
 
 Author
 Deborah Lee Soltesz
@@ -14,8 +14,9 @@ Deborah Lee Soltesz
 
 -->
 
-  <xsl:output 
-    media-type="text/html" 
+
+  <xsl:output
+    media-type="text/html"
     doctype-public="-//W3C//DTD HTML 4.01 Transitional//EN"
     doctype-system="http://www.w3.org/TR/html4/loose.dtd"
     indent="yes"
@@ -28,6 +29,7 @@ Deborah Lee Soltesz
   <xsl:key name="categoryMatch" match="/tableofcontents/document" use="category/categoryItem"/>
   <xsl:key name="audienceMatch" match="/tableofcontents/document" use="audience/target"/>
 
+
   <xsl:template match="/">
      <xsl:apply-templates select="tableofcontents" />
   </xsl:template>
@@ -37,7 +39,7 @@ Deborah Lee Soltesz
     <html>
       <head>
         <title>
-            USGS Isis: About Isis
+            USGS Isis: Getting Started User Documentation
         </title>
         <meta name="keywords" content="about, overview, introduction, Isis, image processing, software, open source, remote sensing, planetary science, astrogeology"/>
         <meta name="description" content="About the Integrated Software for Imagers and Spectrometers (ISIS), created and managed by the USGS Astrogeology Research Program. ISIS provides a comprehensive, user-friendly, portable tool for processing, analyzing, and displaying remotely sensed image data."/>
@@ -67,7 +69,7 @@ Deborah Lee Soltesz
               var s = document.getElementsByTagName('script')[0];
               s.parentNode.insertBefore(usgsAnalytics, s);
             }
-          })(); 
+          })();
           ]]></xsl:comment>
         <xsl:text>&#xa;</xsl:text>
         </script>
@@ -95,8 +97,16 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                ABOUT ISIS
+                Getting Started As an ISIS User
               </h1>
+              <p>
+                Welcome! We are very glad you are joining the community!
+              </p>
+              <p>
+                On this page you will find resources to help you start using the ISIS software; how to install ISIS, running your 
+                first command, and a short tutorial to get you familiar with ISIS. This page will also direct you to
+                locations where you can seek help from fellow community members.
+              </p>
             </td>
             <td align="right" class="caption">
             <a href="../index.html">Home</a>
@@ -105,17 +115,157 @@ Deborah Lee Soltesz
         </table>
 
 
-<!-- tables of links to documentation -->
 
+<!-- Installation -->
+      <hr/>
+      <h2>Installation</h2>
+      <p>
+        The first step in using ISIS is installing it on your system. These documents 
+        describe how to install the latest version of ISIS and some legacy versions too.
+      </p>
       <table class="tableTOC">
-      <xsl:for-each select="//document[normalize-space(category/categoryItem) = 'about' and
+
+        <!-- hardcoded links -->
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">
+            ISIS Installation Guide</a>
+          </th>
+          <td>
+          Instructions for downloading and installing ISIS.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../documents/LegacyInstallGuide/index.html">
+            Legacy ISIS3 Installation Guide</a>
+          </th>
+          <td>
+          Instructions for downloading and installing legacy versions of ISIS3 from our rsync server.
+          </td>
+        </tr>
+      </table>
+
+
+<!-- An example of how categoryItem and audience/target tags in the documentation resources
+     can be used to auto populate their ToC reference.
+      <xsl:for-each select="//document[normalize-space(category/categoryItem) = 'guide' and
                                        normalize-space(category/categoryItem) != 'hidden' and
-                                       (normalize-space(audience/target) != 'user' or
-                                        normalize-space(audience/target) != 'all')]">
+                                       (normalize-space(audience/target) = 'user' or
+                                        normalize-space(audience/target) = 'all')]">
         <xsl:sort order="ascending" select="normalize-space(title)"/>
         <xsl:apply-templates mode="singleColumn" select="."/>
       </xsl:for-each>
+
+      <xsl:for-each select="//document[(normalize-space(category/categoryItem) = 'information' or
+                                        normalize-space(category/categoryItem) = 'reference'or
+                                        normalize-space(category/categoryItem) = 'technicaldoc') and
+                                        normalize-space(category/categoryItem) != 'hidden' and
+                                       (normalize-space(audience/target) = 'user' or
+                                        normalize-space(audience/target) = 'all')]">
+        <xsl:sort order="ascending" select="normalize-space(title)"/>
+        <xsl:apply-templates mode="singleColumn" select="."/>
+      </xsl:for-each>
+-->
+<!-- An example of putting the category / audience documents into a table structure
+      <xsl:if test="//document[normalize-space(category/categoryItem) = 'guide' and
+                                       normalize-space(category/categoryItem) != 'hidden' and
+                                       normalize-space(audience/target) = 'advanced']">
+        <h3>Advanced</h3>
+        <table class="tableTOC">
+        <xsl:for-each select="//document[normalize-space(category/categoryItem) = 'guide' and
+                                         normalize-space(category/categoryItem) != 'hidden' and
+                                         normalize-space(audience/target) = 'advanced']">
+          <xsl:sort order="ascending" select="normalize-space(title)"/>
+          <xsl:apply-templates mode="singleColumn" select="."/>
+        </xsl:for-each>
       </table>
+      </xsl:if>
+-->
+
+<!-- Introductory Materials -->
+    <hr/>
+    <h2>Introductory Materials</h2>
+      <p>
+        These materials will give you an introduction to ISIS, a brief tutorial on running ISIS applications, and provide some context about the history of ISIS
+        and its position within the planetary data ecosystem.
+      </p>
+      <table class="tableTOC">
+
+        <!-- hardcoded links -->
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS">
+            Introduction to ISIS</a>
+          </th>
+          <td>
+          A tutorial on what ISIS is and the different ways you can interact with ISIS applications.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data">
+            Locating and Ingesting Image Data</a>
+          </th>
+          <td>
+          An overview of how to find, download, and ingest planetary data to use with ISIS.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../documents/IsisHistory/IsisHistory.html">
+            ISIS History</a>
+          </th>
+          <td>
+          ISIS has been in development since the early 1970's, just after the Astrogeology Science Center (ASC) involvement with the Apollo mission. Learn 
+          more about the origin of this foundational software!
+          </td>
+        </tr>
+      </table>
+
+
+<!-- Support -->
+      <hr/>
+      <h2>Support</h2>
+      <p>
+        Join the community of ISIS users, find help, and share your successes!
+      </p>
+
+      <table class="tableTOC">
+        <!-- hardcoded links -->
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/blob/dev/Code-Of-Conduct.md">
+            Code of Conduct</a>
+          </th>
+          <td>
+          The code of conduct outlines what is expected of community members and ensures that our
+          community is welcoming, helpful, and respectful.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="https://github.com/USGS-Astrogeology/ISIS3/issues">
+            Github Issues</a>
+          </th>
+          <td>
+          Here you can post bug reports or feature requests and find out about the status of bugs posted by other users.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="https://astrodiscuss.usgs.gov/">
+            AstroDiscuss</a>
+          </th>
+          <td>
+          A community board where we collect our online knowledge base, post release announcements, and provide user support. If you need help, 
+          want to get the latest news, or just want to learn more and interact with other ISIS users come say hello!
+          </td>
+        </tr>
+      </table>
+
+
+
 
 
 
@@ -128,8 +278,6 @@ Deborah Lee Soltesz
     </html>
 
   </xsl:template>
-
-
 
 
 
@@ -288,4 +436,3 @@ Deborah Lee Soltesz
 
 
 </xsl:stylesheet>
-

@@ -873,7 +873,7 @@ void calculateIrDarkCurrent(Cube *icube) {
     return;
   }
 
-  Table sideplane("SideplaneIr", ui.GetFileName("FROM"));
+  Table sideplane("SideplaneIr", ui.GetCubeName("FROM"));
 
   // If spectal summing is on OR compressor_id isnt N/A then
   //   just return.

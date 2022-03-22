@@ -30,7 +30,7 @@ namespace Isis {
     Process p;
 
     CubeAttributeInput cai;
-    Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), cai, ReadWrite);
+    Cube *icube = p.SetInputCube(ui.GetCubeName("FROM"), cai, ReadWrite);
     camstats(icube, ui, log);
 
     p.EndProcess();

@@ -29,7 +29,7 @@ namespace Isis {
 
   void isisexport(UserInterface &ui, Pvl *log) {
     Cube *icube = new Cube();
-    icube->open(ui.GetFileName("FROM"));
+    icube->open(ui.GetCubeName("FROM"));
     CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
     if (inAtt.bands().size() != 0) {
       icube->setVirtualBands(inAtt.bands());

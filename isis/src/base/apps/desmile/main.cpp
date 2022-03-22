@@ -40,7 +40,7 @@ void IsisMain() {
   Cube *inCube = procSpectra.SetInputCube("FROM");
 
   // Get the spectral information for the input cube
-  FileName smileDef = ui.GetFileName("SMILEDEF");
+  FileName smileDef = ui.GetCubeName("SMILEDEF");
   // TODO: May want to add the cube to the constructor args so some error checks can be done
   SpectralDefinition* inputSpectralDef = SpectralDefinitionFactory::NewSpectralDefinition(smileDef);
 

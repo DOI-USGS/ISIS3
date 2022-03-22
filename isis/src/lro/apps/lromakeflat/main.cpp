@@ -179,9 +179,9 @@ void IsisMain() {
   oMedianCube->setDimensions(g_sampleCount, oLineCount, 1);
   oMeanCube->setDimensions(g_sampleCount, oLineCount, 1);
   // Set name of cubes
-  oStdevCube->create(FileName(ui.GetFileName("TO")).expanded() + ".stdev.cub");
-  oMedianCube->create(FileName(ui.GetFileName("TO")).expanded() + ".median.cub");
-  oMeanCube->create(FileName(ui.GetFileName("TO")).expanded() + ".mean.cub");
+  oStdevCube->create(FileName(ui.GetCubeName("TO")).expanded() + ".stdev.cub");
+  oMedianCube->create(FileName(ui.GetCubeName("TO")).expanded() + ".median.cub");
+  oMeanCube->create(FileName(ui.GetCubeName("TO")).expanded() + ".mean.cub");
   // create new line manager
   oStdevlineMgr = new LineManager(*oStdevCube);
   oMedianLineMgr = new LineManager(*oMedianCube);
@@ -250,7 +250,7 @@ void IsisMain() {
     }
     catch (IException &e) {
       //cout << "It's no use at this point. Just go. Leave me here. I'll only slow you down.";
-      string err = "Could not write to output cube " + IString(FileName(ui.GetFileName("TO")).expanded()) + ".\n";
+      string err = "Could not write to output cube " + IString(FileName(ui.GetCubeName("TO")).expanded()) + ".\n";
       throw IException(IException::Programmer, err, _FILEINFO_);
     }
     pixelMatrix.clear();

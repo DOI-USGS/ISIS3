@@ -35,7 +35,7 @@ static unsigned int iCheckSum = 0;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  FileName inFile = ui.GetFileName("FROM");
+  FileName inFile = ui.GetCubeName("FROM");
 
   // Set the processing object
   ProcessExportMiniRFLroPds cProcess;

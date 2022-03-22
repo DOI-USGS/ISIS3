@@ -10,14 +10,14 @@ namespace Isis {
 
   void segment(UserInterface &ui) {
     Cube *incube = new Cube();
-    incube->open(ui.GetFileName("FROM"));
+    incube->open(ui.GetCubeName("FROM"));
     segment(incube, ui);
   }
 
   void segment(Cube *cube, UserInterface &ui) {
 
     //Get user parameters
-    FileName inFile = ui.GetFileName("FROM");
+    FileName inFile = ui.GetCubeName("FROM");
     int numberOfLines = ui.GetInteger("NL");
     int lineOverlap   = ui.GetInteger("OVERLAP");
 

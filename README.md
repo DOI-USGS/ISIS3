@@ -84,23 +84,18 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
     conda config --env --add channels usgs-astrogeology
     ```
-    
-1. Download [Mamba](https://github.com/mamba-org/mamba). The ISIS environment is quite large and the Conda solver can take hours to resolve it. Instead, we recommend you use the much faster [Mamba](https://github.com/mamba-org/mamba) solver:
-    
-    ```bash
-    conda install -n base -c conda-forge mamba
-    ```
+
 1. The environment is now ready to download ISIS and its dependencies:
 
     ```bash
-    mamba install -c usgs-astrogeology isis
+    conda install -c usgs-astrogeology isis=6.0.0
     ```
     
     If you would like to work with our latest ISIS version 3, rather than updating
     to ISIS 4, instead run:
 
     ```bash
-    mamba install -c usgs-astrogeology isis=3.10.0
+    conda install -c usgs-astrogeology isis=3.10.0
     ```
 
 1. Finally, setup the environment variables:
@@ -108,7 +103,7 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
     ISIS requires several environment variables to be set in order to run correctly.
     The variables include: ISISROOT and ISISDATA.
 
-    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here]("#The-ISIS-Data-Area").
+    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here](#The-ISIS-Data-Area).
 
     The following steps are only valid for versions of ISIS after 4.2.0.
     For older versions of ISIS follow the instructions in [this readme file.](https://github.com/USGS-Astrogeology/ISIS3/blob/adf52de0a04b087411d53f3fe1c9218b06dff92e/README.md)
@@ -332,16 +327,16 @@ remove these elements to and from your path.
 
 ### Updating
 
-  To update to the newest version of ISIS, run `mamba update -c usgs-astrogeology isis`
+  To update to the newest version of ISIS, run `conda update -c usgs-astrogeology isis`
 
-  To update to our latest release candidate , run `mamba update -c usgs-astrogeology/label/RC isis`
+  To update to our latest release candidate , run `conda update -c usgs-astrogeology/label/RC isis`
 
   Note that for ISIS versions 3.10 and above, new versions and release candidates will only be
-  available under the package name `isis` and `mamba update isis3` and
-  `mamba update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
+  available under the package name `isis` and `conda update isis3` and
+  `conda update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
   will not work for additional updates. Instead, after installing an `isis` package,
-  `mamba update isis` should be used to update to a new version and
-  `mamba update -c usgs-astrogeology/label/RC isis` to update to a new release candidate.
+  `conda update isis` should be used to update to a new version and
+  `conda update -c usgs-astrogeology/label/RC isis` to update to a new release candidate.
 
 ### Operating System Requirements
 

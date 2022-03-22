@@ -95,7 +95,7 @@ void IsisMain() {
   CubeAttributeInput &attTrans = ui.GetInputAttribute("FROM");
   vector<QString> bandTrans = attTrans.bands();
   trans.setVirtualBands(bandTrans);
-  trans.OpenCube(ui.GetFileName("FROM"), stitch);
+  trans.OpenCube(ui.GetCubeName("FROM"), stitch);
 
 
   // Open the second cube, it is held in place.  We will be matching the
@@ -104,7 +104,7 @@ void IsisMain() {
   CubeAttributeInput &attMatch = ui.GetInputAttribute("MATCH");
   vector<QString> bandMatch = attMatch.bands();
   match.setVirtualBands(bandMatch);
-  match.OpenCube(ui.GetFileName("MATCH"), stitch);
+  match.OpenCube(ui.GetCubeName("MATCH"), stitch);
 
 //  Ensure only one band
   if ((trans.bandCount() != 1) || (match.bandCount() != 1)) {

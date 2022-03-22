@@ -48,7 +48,7 @@ void IsisMain() {
   delete interp;
 
   UserInterface &ui = Application::GetUserInterface();
-  QFile::remove(ui.GetFileName("TO"));
+  QFile::remove(ui.GetCubeName("TO"));
 }
 
 

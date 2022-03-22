@@ -24,7 +24,7 @@ namespace Isis {
 
 
   void apollocal(UserInterface &ui) {
-    Cube cube(ui.GetFileName("FROM"), "r");
+    Cube cube(ui.GetCubeName("FROM"), "r");
     apollocal(&cube, ui);
   }
 

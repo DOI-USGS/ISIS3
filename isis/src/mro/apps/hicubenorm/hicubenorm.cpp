@@ -59,7 +59,7 @@ namespace Isis {
     void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, QString psMode);
 
     void hicubenorm(UserInterface &ui) {
-        Cube *cube = new Cube(ui.GetFileName("FROM"), "r");
+        Cube *cube = new Cube(ui.GetCubeName("FROM"), "r");
         hicubenorm(cube, ui);
     }
 
@@ -170,7 +170,7 @@ namespace Isis {
             }
 
             Isis::CubeAttributeOutput atts = ui.GetOutputAttribute("TO");
-            FileName outFileName = ui.GetFileName("TO");
+            FileName outFileName = ui.GetCubeName("TO");
 
             // Setup the output file and apply the coefficients by either
             // subtracting or multipling them

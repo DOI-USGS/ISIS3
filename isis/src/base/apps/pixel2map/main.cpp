@@ -284,7 +284,7 @@ void IsisMain() {
       }
 
       else if (ui.GetString("LONSEAM") == "ERROR") {
-        QString msg = "The image [" + ui.GetFileName("FROM") + "] crosses the " +
+        QString msg = "The image [" + ui.GetCubeName("FROM") + "] crosses the " +
                      "longitude seam";
         throw IException(IException::User, msg, _FILEINFO_);
       }

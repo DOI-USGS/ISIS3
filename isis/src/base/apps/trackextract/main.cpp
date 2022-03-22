@@ -75,8 +75,8 @@ class CopyPixelsFunctor {
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  QString inputName = ui.GetFileName("FROM");
-  QString outputName = ui.GetFileName("TO");
+  QString inputName = ui.GetCubeName("FROM");
+  QString outputName = ui.GetCubeName("TO");
 
   // Confirm that the input mosaic is of pixel-type "Real" as trackextract does not work on other
   // bit types due to corruption of these files

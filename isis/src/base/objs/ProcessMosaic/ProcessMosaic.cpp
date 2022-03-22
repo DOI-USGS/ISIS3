@@ -693,8 +693,9 @@ namespace Isis {
     return SetOutputCube(psParameter, Application::GetUserInterface());
   }
 
+
   Cube *ProcessMosaic::SetOutputCube(const QString &psParameter, UserInterface &ui) {
-    QString fname = ui.GetFileName(psParameter);
+    QString fname = ui.GetCubeName(psParameter);
 
     // Make sure there is only one output cube
     if (OutputCubes.size() > 0) {

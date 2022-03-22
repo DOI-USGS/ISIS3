@@ -20,7 +20,7 @@ void IsisMain() {
   // Get the polygon from the input cube. NOTE: the generated poly is always in the 0 to 360 domain.
   // Use the linc/sinc requested by the user.
   Cube cube;
-  cube.open(ui.GetFileName("FROM"));
+  cube.open(ui.GetCubeName("FROM"));
   int sinc = ui.GetInteger("SINC");
   int linc = ui.GetInteger("LINC");
   ImagePolygon poly;
@@ -59,7 +59,7 @@ void IsisMain() {
     }
   }
   else {
-    FileName inputFile = ui.GetFileName("FROM");
+    FileName inputFile = ui.GetCubeName("FROM");
     outgml = inputFile.removeExtension().addExtension("gml").expanded();
   }
 

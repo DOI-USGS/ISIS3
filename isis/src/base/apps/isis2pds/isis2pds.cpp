@@ -26,7 +26,7 @@ namespace Isis{
     if (inAtt.bands().size() != 0) {
       icube.setVirtualBands(inAtt.bands());
     }
-    icube.open(ui.GetFileName("FROM"));
+    icube.open(ui.GetCubeName("FROM"));
     isis2pds(&icube, ui, log);
   }
 
@@ -131,7 +131,7 @@ namespace Isis{
 
       PvlObject *label= icube->label();
       if (!label->hasObject("IsisCube")) {
-        QString msg = "Input file [" + ui.GetFileName("FROM") +
+        QString msg = "Input file [" + ui.GetCubeName("FROM") +
                       "] does not appear to be an ISIS cube.";
         throw  IException(IException::User, msg, _FILEINFO_);
       }

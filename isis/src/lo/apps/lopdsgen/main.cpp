@@ -155,7 +155,7 @@ void IsisMain() {
       pdsLabel.findObject("IMAGE").addKeyword(PvlKeyword("MAXIMUM", toString(p.CubeStatistics(0)->Maximum())), Pvl::Replace);
     }
     else {
-      FileName inputFile(ui.GetFileName("FROM"));
+      FileName inputFile(ui.GetCubeName("FROM"));
       QString msg = "[" + inputFile.expanded() + "] does not appear to be an LO file.  ";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -203,7 +203,7 @@ void IsisMain() {
     bandLab.Auto(pdsLabel);
   }
   else {
-    FileName inputFile(ui.GetFileName("FROM"));
+    FileName inputFile(ui.GetCubeName("FROM"));
     QString msg = "[" + inputFile.expanded() + "] does not contain boresight or fiducial information.  ";
     msg += "Try ingesting your data with lo2isis first.";
     throw IException(IException::User, msg, _FILEINFO_);

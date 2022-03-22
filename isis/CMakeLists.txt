@@ -463,6 +463,7 @@ add_custom_target(docs COMMAND ${CMAKE_COMMAND}
                   -DDOXYGEN=${DOXYGEN}  -DXALAN=${XALAN}
                   -DLATEX=${LATEX}
                   -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+                  -DPACKAGE_VERSION=${PACKAGE_VERSION}
                   -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
 
 # Add custom build target to copy modified header files to the build/incs directory.
@@ -574,6 +575,13 @@ add_custom_target(export ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/export/* ${CMAKE_BINARY_DIR}/appdata/export)
 add_dependencies(isis export)
 
+# Create the updateBuildPlugins.sh.in file
+configure_file(${CMAKE_SOURCE_DIR}/cmake/updateBuildPlugins.sh.in ${CMAKE_BINARY_DIR}/scripts/updateBuildPlugins.sh)
+
+# Add custom build target to copy modified Camera.plugin files to the build/lib/Camera.plugin file
+add_custom_target(cameraPlugins ALL COMMAND ${CMAKE_BINARY_DIR}/scripts/updateBuildPlugins.sh)
+add_dependencies(isis cameraPlugins)
+
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.
 # - Only a few things are added in order to make the tests work properly so
@@ -593,6 +601,7 @@ install(FILES     ${CMAKE_SOURCE_DIR}/../AUTHORS.rst  DESTINATION  ${CMAKE_INSTA
 install(FILES     ${CMAKE_SOURCE_DIR}/../CHANGELOG.md DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_BINARY_DIR}/version         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(PROGRAMS ${CMAKE_BINARY_DIR}/lib/Camera.plugin DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
 
 # Trigger all post-install behavior.
 # - The only way to run commands post-install in CMake is to add a subdirectory at

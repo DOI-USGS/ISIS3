@@ -14,7 +14,7 @@ namespace Isis {
     if (inAtt.bands().size() != 0) {
       cube.setVirtualBands(inAtt.bands());
     }
-    cube.open(ui.GetFileName("FROM"));
+    cube.open(ui.GetCubeName("FROM"));
     map2map(&cube, ui);
   }
 
@@ -27,7 +27,7 @@ namespace Isis {
     PvlGroup &userMappingGrp = userPvl.findGroup("Mapping", Pvl::Traverse);
 
     CubeAttributeInput &inputAtt =ui.GetInputAttribute("FROM");
-    p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
+    p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
 
     // Get the mapping group
     PvlGroup fromMappingGrp = icube->group("Mapping");
@@ -333,7 +333,7 @@ namespace Isis {
 
     // Allocate the output cube and add the mapping labels
     CubeAttributeOutput & att = ui.GetOutputAttribute("TO");
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), att, transform->OutputSamples(),
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, transform->OutputSamples(),
                                 transform->OutputLines(),
                                 icube->bandCount());
 

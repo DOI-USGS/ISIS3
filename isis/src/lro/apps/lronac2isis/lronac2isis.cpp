@@ -110,7 +110,7 @@ namespace Isis {
     g_ocube->setLabelsAttached(outAtt.labelAttachment() == AttachedLabel);
     g_ocube->setDimensions(p.Samples(), p.Lines(), p.Bands());
     g_ocube->setPixelType(Isis::Real);
-    g_ocube->create(ui.GetFileName("TO"));
+    g_ocube->create(ui.GetCubeName("TO"));
     // Do 8 bit to 12 bit conversion
     // And if NAC-R, flip the frame
     p.StartProcess(Import);

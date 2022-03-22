@@ -25,7 +25,7 @@ namespace Isis {
   static bool linear;
 
   void vikcal(UserInterface &ui) {
-    const QString in = ui.GetFileName("FROM");
+    const QString in = ui.GetCubeName("FROM");
   
     // Open the input cube
     Cube icube(in, "r");

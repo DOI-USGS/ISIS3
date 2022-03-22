@@ -31,10 +31,10 @@ void LoadMatchSummingMode() {
 
   // Get camera from cube to match
   if((ui.GetString("SOURCE") == "FROMMATCH") && (ui.WasEntered("MATCH"))) {
-    file = ui.GetFileName("MATCH");
+    file = ui.GetCubeName("MATCH");
   }
   else {
-    file = ui.GetFileName("FROM");
+    file = ui.GetCubeName("FROM");
   }
 
 // Open the input cube and get the camera object
@@ -54,7 +54,7 @@ void LoadInputSummingMode() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get camera from cube to match
-  QString file = ui.GetFileName("FROM");
+  QString file = ui.GetCubeName("FROM");
   // Open the input cube and get the camera object
   Cube c;
   c.open(file);

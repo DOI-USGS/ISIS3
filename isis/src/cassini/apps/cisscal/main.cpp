@@ -95,7 +95,7 @@ namespace gbl {
 void IsisMain() {
   // Initialize Globals
   UserInterface &ui = Application::GetUserInterface();
-  gbl::cissLab = new CissLabels(ui.GetFileName("FROM"));
+  gbl::cissLab = new CissLabels(ui.GetCubeName("FROM"));
   gbl::incube = NULL;
   gbl::stretch.ClearPairs();
   gbl::numberOfOverclocks = 0;

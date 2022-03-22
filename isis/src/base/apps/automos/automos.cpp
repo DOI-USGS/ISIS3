@@ -55,10 +55,10 @@ namespace Isis {
       m.SetOutputCube(list,
                       ui.GetDouble("MINLAT"), ui.GetDouble("MAXLAT"),
                       ui.GetDouble("MINLON"), ui.GetDouble("MAXLON"),
-                      oAtt, ui.GetFileName("MOSAIC"));
+                      oAtt, ui.GetCubeName("MOSAIC"));
     }
     else {
-      m.SetOutputCube(list, oAtt, ui.GetFileName("MOSAIC"));
+      m.SetOutputCube(list, oAtt, ui.GetCubeName("MOSAIC"));
     }
 
     m.SetHighSaturationFlag(ui.GetBoolean("HIGHSATURATION"));

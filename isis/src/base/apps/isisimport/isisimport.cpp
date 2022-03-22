@@ -30,7 +30,7 @@ namespace Isis {
     FileName fileTemplate = ("$ISISROOT/appdata/import/fileTemplate.tpl");
     json jsonData;
     bool isPDS4 = false;
-    FileName inputFileName = ui.GetFileName("FROM");
+    FileName inputFileName = ui.GetCubeName("FROM");
 
     if (inputFileName.extension().toUpper() == "IMQ"){
       QString msg = "Input image may be compressed. Please run image through vdcomp to uncompress"
@@ -76,7 +76,7 @@ namespace Isis {
       }
       catch(const std::exception& e) {
         QString msg = "Cannot locate a template named [" + QString::fromStdString(templateFile) + "] for input label [";
-        msg += FileName(ui.GetFileName("FROM")).expanded();
+        msg += FileName(ui.GetCubeName("FROM")).expanded();
         msg += "]. You can explicitly provide a template file using the [TEMPLATE] parameter. ";
         msg += e.what();
         throw IException(IException::User, msg, _FILEINFO_);
@@ -495,7 +495,7 @@ namespace Isis {
       cubeAtts = QString(translation["CubeAtts"]);
     }
     CubeAttributeOutput att = CubeAttributeOutput(cubeAtts);
-    Cube *outputCube = importer.SetOutputCube(ui.GetFileName("TO"), att);
+    Cube *outputCube = importer.SetOutputCube(ui.GetCubeName("TO"), att);
 
     if (isPDS4) {
       OriginalXmlLabel xmlLabel;
