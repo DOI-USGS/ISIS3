@@ -3205,3 +3205,31 @@ void IsisAml::StartParser(const char *xmlfile) {
   delete appHandler;
   return;
 }
+
+/**
+ * This is used to display the updated parameters when an app is called with -last
+ * 
+ * @return QString currentCommandLine - the current command line stored from the last run of an app
+ */
+QString IsisAml::buildNewCommandLineFromPvl(){
+  cout << "build new commandline called here";
+  QString returnString = "";  
+  Isis::Pvl temp;
+  CommandLine(temp);
+  cout << temp << endl;
+  Isis::PvlGroup params = temp.findGroup("UserParameters");
+  cout << "params are: \n" << params << endl;
+  cout << "before loop" << endl;
+  for(auto i:params){
+    cout << "in loop: "<<i << endl;
+  }
+
+  // todo
+  // loop though the params in temp group userparameters
+    // add key(param name) and value to return string
+  //return returnstring
+  
+  
+
+  return returnString;
+}

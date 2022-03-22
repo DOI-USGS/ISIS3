@@ -405,48 +405,6 @@ namespace Isis {
   }
 
 
-/**
- * This is used to display the updated parameters when an app is called with -last
- * 
- * @return QString currentCommandLine - the current command line stored from the last run of an app
- */
-QString UserInterface::buildNewCommandLine(QString currentCommandLine){
-  QString returnString = "";  
-  vector<QString> valuesToUpdate;
-
-  // loop user input cmd line & get updated params
-  for(auto i:p_cmdline){
-    QString inputParam = i;
-
-    // check for updated args in cmd line
-    if(inputParam.contains("=", Qt::CaseInsensitive)){
-      valuesToUpdate.push_back(inputParam);
-      }
-    }
-
-  // loop currentCommandLine and update returnString 
-  for(auto i:currentCommandLine.split(" ")){
-    QString paramVale = i;
-    
-    // loop values to update
-    for(auto j:valuesToUpdate){
-      QString updateVal = j;
-
-      // check to see if if the histoy param is the same as our input param
-      if(paramVale.split("=")[0].startsWith(updateVal.split("=")[0].toUpper())
-                          && !returnString.contains(paramVale.split("=")[0])){
-        returnString += paramVale.split("=")[0] + "=" + updateVal.split("=")[1] + " ";
-      }
-    }
-
-    // add unchanged parameter to return string 
-    if(!returnString.contains(paramVale.split("=")[0])){
-      returnString += paramVale + " ";
-    }
-  }
-  return returnString;
-}
-
   /**
    * This is used to load the command line into p_cmdline and the Aml object
    * using information contained in argc and argv.
@@ -560,6 +518,10 @@ QString UserInterface::buildNewCommandLine(QString currentCommandLine){
       }
 
     }
+    // might be where I want to add my thing, ask aml what it is
+    Pvl temp;
+    CommandLine(temp);
+    cout << "look here, pvl should have the info we want\n\n" << temp << endl;
 
     // Can't use the batchlist with the gui, save, last or restore option
     if ( BatchListSize() != 0 && (p_interactive || usedDashLast || p_saveFile != ""
@@ -633,7 +595,8 @@ QString UserInterface::buildNewCommandLine(QString currentCommandLine){
             }
           }
 
-          cout << buildNewCommandLine(commandline) << endl;
+          // cout << buildNewCommandLine(commandline) << endl;
+          // buildNewCommandLineFromPvl();
           return;
         }
 

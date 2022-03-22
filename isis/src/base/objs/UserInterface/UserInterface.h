@@ -196,7 +196,6 @@ namespace Isis {
 
       void SaveHistory();
 
-      QString buildNewCommandLine(QString currentCommandLine);
 
     private:
       void loadBatchList(const QString file);

@@ -317,6 +317,8 @@ class IsisAml : protected IsisAmlData {
     QString HelperIcon(const int &group, const int &param,
                            const int &helper) const;
 
+    QString buildNewCommandLineFromPvl();
+
     //! Verify whether Parameter name is in the Include list
     //! Used in creation of DefFile
     bool IsParamInPvlInclude(QString & paramName, std::vector<QString> & exclude);
