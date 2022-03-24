@@ -1,6 +1,9 @@
-#include <QtMath>
+#include <map>
+#include <cmath>
 
+#include <QtMath>
 #include <QFile>
+#include <QScopedPointer>
 
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -10,6 +13,8 @@
 #include "Longitude.h"
 #include "ControlPoint.h"
 #include "CSMCamera.h"
+#include "LidarData.h"
+#include "SerialNumber.h"
 
 #include "jigsaw.h"
 
@@ -1704,18 +1709,108 @@ TEST_F(CSMNetwork, FunctionalTestJigsawCSM) {
 
 
 TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
-  # copy images
+  // copy images
+  QString cube1fname = tempDir.path() + "/lidarObservationPair1Copy.cub";
+  QString cube2fname = tempDir.path() + "/lidarObservationPair2Copy.cub";
+  cube1->reopen("rw");
+  cube2->reopen("rw");
+  QScopedPointer<Cube> cube1Copy( cube1->copy(cube1fname, CubeAttributeOutput()) );
+  QScopedPointer<Cube> cube2Copy( cube2->copy(cube2fname, CubeAttributeOutput()) );
 
-  # call jigsaw w/o lidar options & apply=true on copy of images
 
-  # call jigsaw w/ lidar options & apply=true
+  FileList cubeListCopy;
+  cubeListCopy.append(cube1Copy->fileName());
+  cubeListCopy.append(cube2Copy->fileName());
 
-  # re-open all cubes
+  cube1->close();
+  cube2->close();
+  cube1Copy->close();
+  cube2Copy->close();
 
-  # for each point in lidar data
-    # in no-lidar images do ground to image to get spacecraft position at observing time
-    
-    # in lidar images do ground to image to get spacecraft position at observing time
+  QString cubeListFileCopy = tempDir.path() + "/cubesCopy.lis";
+  cubeListCopy.write(cubeListFileCopy);
 
-    # check that distance from ground to spacecraft position is closer to lidar range in lidar image than in no-lidar images
+  // call jigsaw w/o lidar options & apply=true on copy of images
+  QVector<QString> args1 = {"radius=yes",
+                            "errorpropagation=yes",
+                            "spsolve=position",
+                            "spacecraft_position_sigma=1000.0",
+                            "camsolve=angles",
+                            "twist=yes",
+                            "camera_angles_sigma=2.",
+                            "update=yes",
+                            "bundleout_txt=yes",
+                            "cnet="+controlNetPath,
+                            "fromlist="+cubeListFile,
+                            "onet="+tempDir.path()+"/no_lidar.net",
+                            "file_prefix="+tempDir.path()+"/no_lidar"};
+
+  UserInterface ui1(APP_XML, args1);
+  jigsaw(ui1);
+
+  // call jigsaw w/ lidar options & apply=true
+  QVector<QString> args2 = {"radius=yes",
+                            "errorpropagation=yes",
+                            "spsolve=position",
+                            "spacecraft_position_sigma=1000.0",
+                            "camsolve=angles",
+                            "twist=yes",
+                            "camera_angles_sigma=2.",
+                            "update=yes",
+                            "bundleout_txt=yes",
+                            "cnet="+controlNetPath,
+                            "fromlist="+cubeListFileCopy,
+                            "onet="+tempDir.path()+"/lidar.net",
+                            "file_prefix="+tempDir.path()+"/lidar",
+                            "lidardata="+lidarDataPath,
+                            "olidardata="+tempDir.path()+"/lidar_out.json",
+                            "olidarformat=json",
+                            "lidar_csv=yes"};
+
+  UserInterface ui2(APP_XML, args2);
+  jigsaw(ui2);
+
+  // re-open all cubes
+  // Make a new cube object to get the updated camera models after bundle adjust
+  Cube bundledCube1(cube1Path);
+  Cube bundledCube2(cube2Path);
+  Cube bundledCube1Copy(cube1fname);
+  Cube bundledCube2Copy(cube2fname);
+
+  std::map<QString, Camera*> noLidarCameras;
+  std::map<QString, Camera*> lidarCameras;
+  noLidarCameras[SerialNumber::Compose(bundledCube1)] = bundledCube1.camera();
+  noLidarCameras[SerialNumber::Compose(bundledCube2)] = bundledCube2.camera();
+  lidarCameras[SerialNumber::Compose(bundledCube1Copy)] = bundledCube1Copy.camera();
+  lidarCameras[SerialNumber::Compose(bundledCube2Copy)] = bundledCube2Copy.camera();
+
+  // for each point in lidar data
+  for (const auto &point : rangeData.points()) {
+    for (const auto &sn : point->snSimultaneous()) {
+      //point get measure
+      ControlMeasure *m = (*point)[sn];
+      // in no-lidar images do ground to image to get spacecraft position at observing time
+      Camera *noLidarCamera = noLidarCameras[sn];
+      bool success = noLidarCamera->SetImage(m->GetSample(), m->GetLine());
+
+      EXPECT_TRUE(success) << "Failed to set image in no-lidar cube " << sn.toStdString()
+            << " at point " << point->GetId().toStdString();
+      if (!success) {
+        continue;
+      }
+
+      // in lidar images do ground to image to get spacecraft position at observing time
+      Camera *lidarCamera = lidarCameras[sn];
+      success = lidarCamera->SetImage(m->GetSample(), m->GetLine());
+
+      EXPECT_TRUE(success) << "Failed to set image in lidar cube " << sn.toStdString()
+            << " at point " << point->GetId().toStdString();
+      if (!success) {
+        continue;
+      }
+      // check that distance from ground to spacecraft position is closer to lidar range in lidar image than in no-lidar images
+      EXPECT_LT(abs(lidarCamera->SlantDistance() - point->range()), abs(noLidarCamera->SlantDistance() - point->range()))
+            << "Failed for point " <<  point->GetId().toStdString();
+    }
+  }
 }

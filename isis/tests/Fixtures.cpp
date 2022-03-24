@@ -763,13 +763,13 @@ namespace Isis {
       LidarObservationPair::SetUp();
 
       lidarDataPath = "data/LidarNetwork/lidarData.json";
-
+      rangeData.read(lidarDataPath);
       controlNetPath = "data/LidarNetwork/network.pvl";
 
       network = new ControlNet(controlNetPath);
 
       // Create the filelist
-      
+
   }
 
   void LidarNetwork::TearDown() {

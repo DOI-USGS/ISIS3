@@ -28,6 +28,7 @@
 #include "ControlNet.h"
 #include "FileList.h"
 #include "FileName.h"
+#include "LidarData.h"
 
 #include <geos/io/WKTReader.h>
 #include <geos/io/WKTWriter.h>
@@ -206,6 +207,7 @@ namespace Isis {
   class LidarNetwork : public LidarObservationPair {
     protected:
 
+      LidarData rangeData;
       QString lidarDataPath;
 
       ControlNet *network;
