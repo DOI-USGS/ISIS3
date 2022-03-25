@@ -50,9 +50,20 @@ namespace Isis {
     m_points.insert(point->GetId(), point);
   }
 
+  /**
+   * Gets a single LidarDataPoint by serial number
+   *
+   * @param serialNumber The serial number of the LidarDataPoint
+   * @return QSharedPointer<LidarDataPoint> The LidarDataPoint matching the supplied serial number
+   */
+
+  QSharedPointer<LidarControlPoint> LidarData::point(QString serialNumber) const{
+    return m_points.value(serialNumber, 0);
+  }
+
 
   /**
-   * Gets the list of Lidar data points optionally sorted . 
+   * Gets the list of Lidar data points optionally sorted .
    *
    * @param sort An option to sort the list.  The default is false (no sort).
    * @return @b QList<QSharedPointer<LidarControlPoint>> Returns list of Lidar control points.
@@ -69,7 +80,7 @@ namespace Isis {
       return m_points.values();
     }
     else {
-      // Sort the points as recommended by QT with std::sort since qsort is deprecated 
+      // Sort the points as recommended by QT with std::sort since qsort is deprecated
       QList< QSharedPointer<LidarControlPoint> > pointlist = points();
       std::sort(pointlist.begin(), pointlist.end(),
                 LidarControlPoint::LidarControlPointLessThanFunctor());
@@ -324,7 +335,7 @@ namespace Isis {
         if (pointObject.contains("radius") && pointObject["radius"].isDouble()) {
           radius = pointObject["radius"].toDouble();
         }
-        
+
         QSharedPointer<LidarControlPoint> lcp =
             QSharedPointer<LidarControlPoint>(new LidarControlPoint());
         lcp->SetId(id);
@@ -343,7 +354,7 @@ namespace Isis {
           aprioriMatrix(1, 1) = aprioriMatrixArray[3].toDouble();
           aprioriMatrix(1, 2) = aprioriMatrix(2, 1) = aprioriMatrixArray[4].toDouble();
           aprioriMatrix(2, 2) = aprioriMatrixArray[5].toDouble();
-          
+
           lcp->SetAprioriSurfacePoint(SurfacePoint(Latitude(latitude, Angle::Units::Degrees),
                                                  Longitude(longitude, Angle::Units::Degrees),
                                                  Distance(radius, Distance::Units::Kilometers),
@@ -356,7 +367,7 @@ namespace Isis {
                                                    Distance(radius, Distance::Units::Kilometers)));
         }
 
-        // Set the adjusted surface point if it exists 
+        // Set the adjusted surface point if it exists
         if (pointObject.contains("adjustedLatitude") &&
              pointObject["adjustedLatitude"].isDouble() &&
              pointObject.contains("adjustedLongitude") &&
@@ -372,7 +383,7 @@ namespace Isis {
 
           double adjustedRadius = 0.0;
           adjustedRadius = pointObject["radius"].toDouble();
-        
+
           if (pointObject.contains("adjustedMatrix") &&
               pointObject["adjustedMatrix"].isArray()) {
             QJsonArray  adjustedMatrixArray = pointObject["adjustedMatrix"].toArray();
@@ -384,7 +395,7 @@ namespace Isis {
             adjustedMatrix(1, 1) = adjustedMatrixArray[3].toDouble();
             adjustedMatrix(1, 2) = adjustedMatrix(2, 1) = adjustedMatrixArray[4].toDouble();
             adjustedMatrix(2, 2) = adjustedMatrixArray[5].toDouble();
-          
+
             lcp->SetAdjustedSurfacePoint(SurfacePoint(Latitude(adjustedLatitude, Angle::Units::Degrees),
                                                      Longitude(adjustedLongitude, Angle::Units::Degrees),
                                                      Distance(adjustedRadius, Distance::Units::Kilometers),
@@ -397,19 +408,19 @@ namespace Isis {
                                                      Distance(adjustedRadius, Distance::Units::Kilometers)));
           }
         }
- 
+
         if (pointObject.contains("simultaneousImages") &&
                                  pointObject["simultaneousImages"].isArray()) {
           QJsonArray simultaneousArray =
                 pointObject["simultaneousImages"].toArray();
-           
+
               for (int simIndex = 0; simIndex < simultaneousArray.size(); simIndex ++) {
                 QString newSerial;
                 // Unserialize each simultaneous image serial number
                 newSerial =  simultaneousArray[simIndex].toString();
                 lcp->addSimultaneous(newSerial);
                 m_numSimultaneousMeasures++;
-              }              
+              }
         }
 
         // Unserialize ControlMeasures
@@ -472,7 +483,7 @@ namespace Isis {
    */
   void LidarData::write(FileName outputFile, LidarData::Format format) {
     bool sort = false;  // Default behavior
-    
+
     // Set up the output file
     if (format == Json) {
       outputFile = outputFile.setExtension("json");
@@ -504,14 +515,14 @@ namespace Isis {
       pointObject["range"] = lcp->range();
       pointObject["sigmaRange"] = lcp->sigmaRange();
       pointObject["time"] = lcp->time().Et();
-      
+
       // Serialize the AprioriSurfacePoint
       SurfacePoint aprioriSurfacePoint = lcp->GetAprioriSurfacePoint();
       if (aprioriSurfacePoint.Valid()) {
         pointObject["latitude"] = aprioriSurfacePoint.GetLatitude().planetocentric(Angle::Units::Degrees);
         pointObject["longitude"] = aprioriSurfacePoint.GetLongitude().positiveEast(Angle::Units::Degrees);
         pointObject["radius"] = aprioriSurfacePoint.GetLocalRadius().kilometers();
-      
+
         // Serialize the apriori matrix
         symmetric_matrix<double, upper> aprioriMatrix = aprioriSurfacePoint.GetSphericalMatrix();
         QJsonArray aprioriMatrixArray;
@@ -532,7 +543,7 @@ namespace Isis {
           pointObject["aprioriMatrix"] = aprioriMatrixArray;
         }
       }
-      
+
       // Serialize the AdjustedSurfacePoint
       SurfacePoint adjustedSurfacePoint = lcp->GetAdjustedSurfacePoint();
       if (adjustedSurfacePoint.Valid()) {
@@ -541,7 +552,7 @@ namespace Isis {
         pointObject["adjustedLongitude"] =
           adjustedSurfacePoint.GetLongitude().positiveEast(Angle::Units::Degrees);
         pointObject["adjustedRadius"] = adjustedSurfacePoint.GetLocalRadius().kilometers();
-      
+
         // Serialize the adjusted matrix
         symmetric_matrix<double, upper> adjustedMatrix = adjustedSurfacePoint.GetSphericalMatrix();
         QJsonArray adjustedMatrixArray;

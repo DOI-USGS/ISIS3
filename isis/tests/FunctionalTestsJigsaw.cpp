@@ -1813,4 +1813,57 @@ TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
             << "Failed for point " <<  point->GetId().toStdString();
     }
   }
+
+  LidarData lidarDataIn;
+  lidarDataIn.read(lidarDataPath);
+  LidarData lidarDataOut;
+  lidarDataOut.read(tempDir.path() + "/lidar_out.json");
+
+  QFile bo(tempDir.path() + "/lidar_bundleout.txt");
+  QString contents;
+  if (bo.open(QIODevice::ReadOnly)) {
+    contents = bo.read(bo.size());
+  }
+  else {
+    FAIL() << "Failed to open bundleout.txt" << std::endl;
+  }
+
+  QStringList lines = contents.split("\n");
+
+  EXPECT_THAT(lines[7].toStdString(), HasSubstr(("Lidar Data Filename: " + lidarDataPath).toStdString()));
+
+  QStringList lidarPoints = lines[71].split(":");
+  EXPECT_THAT(lidarPoints[0].trimmed().toStdString(), HasSubstr("Lidar Points"));
+  EXPECT_EQ(lidarPoints[1].trimmed().toInt(), lidarDataIn.numberLidarPoints());
+
+  int nMeasuresCube1 = lidarDataIn.GetMeasuresInCube(SerialNumber::Compose(bundledCube1Copy)).count();
+  int nMeasuresCube2 = lidarDataIn.GetMeasuresInCube(SerialNumber::Compose(bundledCube2Copy)).count();
+  int nValidMeasuresCube1 = lidarDataIn.GetNumberOfValidMeasuresInImage( SerialNumber::Compose(bundledCube1Copy));
+  int nValidMeasuresCube2 = lidarDataIn.GetNumberOfValidMeasuresInImage( SerialNumber::Compose(bundledCube2Copy));
+  int nValidMeasures = nValidMeasuresCube1 + nValidMeasuresCube2;
+
+  QStringList lidarRangeConstraints = lines[78].split(":");
+  EXPECT_THAT(lidarRangeConstraints[0].trimmed().toStdString(), HasSubstr("Lidar Range Constraints"));
+  EXPECT_EQ(lidarRangeConstraints[1].trimmed().toInt(), nValidMeasures);
+
+  QStringList columns = lines[133].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_EQ(columns[7], nValidMeasuresCube1);
+  EXPECT_EQ(columns[9], nMeasuresCube1);
+  columns = lines[134].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  EXPECT_EQ(columns[7], nValidMeasuresCube2);
+  EXPECT_EQ(columns[9], nMeasuresCube2);
+
+  CSVReader::CSVAxis csvLine;
+  CSVReader header = CSVReader(tempDir.path()+"/lidar_bundleout.csv",
+                               false, 0, ',', false, true);
+
+
+  for (int i = 0; i < header.rows(); i++){
+    csvLine = header.getRow(i);
+    EXPECT_NEAR(csvLine[2].toDouble(), lidarDataIn.point(csvLine[0])->range(), 0.0001);
+    EXPECT_NEAR(csvLine[3].toDouble(), lidarDataIn.point(csvLine[0])->sigmaRange(), 0.0001);
+    EXPECT_NEAR(csvLine[4].toDouble(), lidarDataOut.point(csvLine[0])->range(), 0.0001);
+    EXPECT_NEAR(csvLine[5].toDouble(), lidarDataOut.point(csvLine[0])->sigmaRange(), 0.0001);
+  }
+
 }
