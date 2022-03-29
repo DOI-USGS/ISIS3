@@ -60,7 +60,7 @@ namespace Isis {
 
       void insert(QSharedPointer<LidarControlPoint> point);
 
-      QSharedPointer<LidarControlPoint> point(QString serialNumber) const;
+      QSharedPointer<LidarControlPoint> point(QString pointId) const;
       QList< QSharedPointer<LidarControlPoint> > points(bool sort = false) const;
 
       void SetImages(SerialNumberList &list, Progress *progress = 0);

@@ -51,14 +51,14 @@ namespace Isis {
   }
 
   /**
-   * Gets a single LidarDataPoint by serial number
+   * Gets a single LidarDataPoint by ID
    *
-   * @param serialNumber The serial number of the LidarDataPoint
-   * @return QSharedPointer<LidarDataPoint> The LidarDataPoint matching the supplied serial number
+   * @param pointId The ID of the LidarDataPoint
+   * @return QSharedPointer<LidarDataPoint> The LidarDataPoint matching the supplied ID
    */
 
-  QSharedPointer<LidarControlPoint> LidarData::point(QString serialNumber) const{
-    return m_points.value(serialNumber, 0);
+  QSharedPointer<LidarControlPoint> LidarData::point(QString pointId) const{
+    return m_points.value(pointId, 0);
   }
 
 
@@ -660,12 +660,12 @@ namespace Isis {
     QList< ControlMeasure * > validMeasures;
 
     // Get measures in cube will validate this for us, so we don't need to re-check
-//    QList< ControlMeasure * > measureList = GetMeasuresInCube(serialNumber);
-    QList< ControlMeasure * > measureList;
+    QList< ControlMeasure * > measureList = GetMeasuresInCube(serialNumber);
 
     foreach(ControlMeasure * measure, measureList) {
-      if (!measure->IsIgnored())
+      if (!measure->IsIgnored()) {
         validMeasures.append(measure);
+      }
     }
 
     return validMeasures;
@@ -676,13 +676,19 @@ namespace Isis {
    *
    * @returns A list of all measures which are in a given cube
    */
-//  QList< ControlMeasure * > LidarData::GetMeasuresInCube(QString serialNumber) {
-//    if( !ValidateSerialNumber(serialNumber) ) {
-//      IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
-//          "the network";
-//      throw IException(IException::Programmer, msg, _FILEINFO_);
+  QList< ControlMeasure * > LidarData::GetMeasuresInCube(QString serialNumber) {
+    if( !ValidateSerialNumber(serialNumber) ) {
+      IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
+          "the network";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
 
-//    }
-//    return m_controlGraph[m_vertexMap[serialNumber]].measures.values();
-//  }
+    }
+    QList< ControlMeasure * > measures;
+    foreach(QSharedPointer <LidarControlPoint> point, m_points) {
+      if (point->HasSerialNumber(serialNumber)) {
+        measures.append(point->GetMeasure(serialNumber));
+      }
+    }
+    return measures;
+  }
 }
