@@ -37,11 +37,12 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawApollo) {
                             "twist=yes",
                             "camera_angles_sigma=2.",
                             "update=no",
-                            "bundleout_txt=no",
+                            // "bundleout_txt=no",
                             "cnet="+controlNetPath,
                             "fromlist="+tempDir.path() + "/cubes.lis",
                             "onet="+tempDir.path()+"/apollo_out.net",
-                            "file_prefix="+tempDir.path()+"/"};
+                            // "file_prefix="+tempDir.path()+"/"};
+                            "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawApollo/"};
 
   UserInterface ui(APP_XML, args);
 
@@ -252,16 +253,17 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
   QStringList lines = bundleOut.split("\n");
 
   EXPECT_THAT(lines[24].toStdString(), HasSubstr("LATITUDINAL"));
-  EXPECT_THAT(lines[57].toStdString(), HasSubstr("LATITUDE"));
-  EXPECT_THAT(lines[58].toStdString(), HasSubstr("LONGITUDE"));
-  EXPECT_THAT(lines[59].toStdString(), HasSubstr("RADIUS"));
+  EXPECT_THAT(lines[58].toStdString(), HasSubstr("LATITUDE"));
+  EXPECT_THAT(lines[59].toStdString(), HasSubstr("LONGITUDE"));
+  EXPECT_THAT(lines[60].toStdString(), HasSubstr("RADIUS"));
 
-  EXPECT_THAT(lines[244].toStdString(), HasSubstr("Latitude"));
-  EXPECT_THAT(lines[248].toStdString(), HasSubstr("Longitude"));
-  EXPECT_THAT(lines[252].toStdString(), HasSubstr("Radius"));
+  EXPECT_THAT(lines[202].toStdString(), HasSubstr("Latitude"));
+  EXPECT_THAT(lines[206].toStdString(), HasSubstr("Longitude"));
+  EXPECT_THAT(lines[210].toStdString(), HasSubstr("Radius"));
 
-  EXPECT_THAT(lines[667].toStdString(), HasSubstr("LATITUDE"));
-  EXPECT_THAT(lines[668].toStdString(), HasSubstr("LONGITUDE"));
+  EXPECT_THAT(lines[626].toStdString(), HasSubstr("LATITUDE"));
+  EXPECT_THAT(lines[627].toStdString(), HasSubstr("LONGITUDE"));
+  EXPECT_THAT(lines[628].toStdString(), HasSubstr("RADIUS"));
 
 
   // Rectangular Bundle, Latitudinal output
@@ -351,17 +353,17 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
   lines = bundleOut2.split("\n");
 
   EXPECT_THAT(lines[24].toStdString(), HasSubstr("RECTANGULAR"));
-  EXPECT_THAT(lines[57].toStdString(), HasSubstr("X"));
-  EXPECT_THAT(lines[58].toStdString(), HasSubstr("Y"));
-  EXPECT_THAT(lines[59].toStdString(), HasSubstr("Z"));
+  EXPECT_THAT(lines[58].toStdString(), HasSubstr("X"));
+  EXPECT_THAT(lines[59].toStdString(), HasSubstr("Y"));
+  EXPECT_THAT(lines[60].toStdString(), HasSubstr("Z"));
 
-  EXPECT_THAT(lines[244].toStdString(), HasSubstr("POINT X"));
-  EXPECT_THAT(lines[248].toStdString(), HasSubstr("POINT Y"));
-  EXPECT_THAT(lines[252].toStdString(), HasSubstr("POINT Z"));
+  EXPECT_THAT(lines[202].toStdString(), HasSubstr("POINT X"));
+  EXPECT_THAT(lines[206].toStdString(), HasSubstr("POINT Y"));
+  EXPECT_THAT(lines[210].toStdString(), HasSubstr("POINT Z"));
 
-  EXPECT_THAT(lines[667].toStdString(), HasSubstr("BODY-FIXED-X"));
-  EXPECT_THAT(lines[668].toStdString(), HasSubstr("BODY-FIXED-Y"));
-  EXPECT_THAT(lines[669].toStdString(), HasSubstr("BODY-FIXED-Z"));
+  EXPECT_THAT(lines[626].toStdString(), HasSubstr("BODY-FIXED-X"));
+  EXPECT_THAT(lines[627].toStdString(), HasSubstr("BODY-FIXED-Y"));
+  EXPECT_THAT(lines[628].toStdString(), HasSubstr("BODY-FIXED-Z"));
 
 
   // Compare newtwork and images.csv against the rectangular, latitude bundle
@@ -429,17 +431,17 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
   lines = bundleOut4.split("\n");
 
   EXPECT_THAT(lines[24].toStdString(), HasSubstr("RECTANGULAR"));
-  EXPECT_THAT(lines[57].toStdString(), HasSubstr("X"));
-  EXPECT_THAT(lines[58].toStdString(), HasSubstr("Y"));
-  EXPECT_THAT(lines[59].toStdString(), HasSubstr("Z"));
+  EXPECT_THAT(lines[58].toStdString(), HasSubstr("X"));
+  EXPECT_THAT(lines[59].toStdString(), HasSubstr("Y"));
+  EXPECT_THAT(lines[60].toStdString(), HasSubstr("Z"));
 
-  EXPECT_THAT(lines[244].toStdString(), HasSubstr("POINT X"));
-  EXPECT_THAT(lines[248].toStdString(), HasSubstr("POINT Y"));
-  EXPECT_THAT(lines[252].toStdString(), HasSubstr("POINT Z"));
+  EXPECT_THAT(lines[202].toStdString(), HasSubstr("POINT X"));
+  EXPECT_THAT(lines[206].toStdString(), HasSubstr("POINT Y"));
+  EXPECT_THAT(lines[210].toStdString(), HasSubstr("POINT Z"));
 
-  EXPECT_THAT(lines[667].toStdString(), HasSubstr("BODY-FIXED-X"));
-  EXPECT_THAT(lines[668].toStdString(), HasSubstr("BODY-FIXED-Y"));
-  EXPECT_THAT(lines[669].toStdString(), HasSubstr("BODY-FIXED-Z"));
+  EXPECT_THAT(lines[626].toStdString(), HasSubstr("BODY-FIXED-X"));
+  EXPECT_THAT(lines[627].toStdString(), HasSubstr("BODY-FIXED-Y"));
+  EXPECT_THAT(lines[628].toStdString(), HasSubstr("BODY-FIXED-Z"));
 
   bundleFile4.close();
 
@@ -483,7 +485,8 @@ TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
   QString outCnetFileName = prefix.path() + "/outTemp.net";
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName,
                            "observations=yes", "update=yes", "Cksolvedegree=3",
-                           "Camsolve=all", "twist=no", "Spsolve=none", "Radius=no", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
+                          //  "Camsolve=all", "twist=no", "Spsolve=none", "Radius=no", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
+                           "Camsolve=all", "twist=no", "Spsolve=none", "Radius=no", "imagescsv=on", "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawCamSolveAll/"};
 
   UserInterface options(APP_XML, args);
 
@@ -669,7 +672,8 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawOutlierRejection) {
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName,
                            "radius=yes", "errorpropagation=yes", "outlier_rejection=True", "spsolve=position", "Spacecraft_position_sigma=1000",
                            "Residuals_csv=on", "Camsolve=angles", "Twist=yes", "Camera_angles_sigma=2",
-                           "Output_csv=off", "imagescsv=on", "file_prefix="+prefix.path() + "/"};
+                          //  "Output_csv=off", "imagescsv=on", "file_prefix="+prefix.path() + "/"};
+                           "Output_csv=on", "imagescsv=on", "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawOutlierRejection/"};
 
   UserInterface options(APP_XML, args);
 
@@ -734,7 +738,8 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
                            "Radius=yes", "Errorpropagation=yes", "Spsolve=position","Spacecraft_position_sigma=1000.0",
                            "Camsolve=angles", "twist=yes", "Camera_angles_sigma=2",
                            "Model1=huber", "Max_model1_c_quantile=0.6", "Model2=chen", "Max_model2_c_quantile=0.98", "Sigma0=1e-3",
-                           "bundleout_txt=yes", "Output_csv=on", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
+                          //  "bundleout_txt=yes", "Output_csv=on", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
+                           "bundleout_txt=yes", "Output_csv=on", "imagescsv=on", "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawMEstimator/"};
 
   UserInterface options(APP_XML, args);
 
@@ -956,7 +961,8 @@ End)");
   // just use isdPath for a valid PVL file without the wanted groups
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName,
                           "Solvetargetbody=yes", "Errorpropagation=yes",  "Camsolve=angles", "twist=off", "camera_angles_sigma=2.0", "bundleout_txt=yes",
-                          "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix="+prefix.path()+"/", "tbparameters="+tbParamsPath};
+                          // "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix="+prefix.path()+"/", "tbparameters="+tbParamsPath};
+                          "imagescsv=yes", "output_csv=yes", "residuals_csv=yes", "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawPoleRaDecW0WdotMeanRadius/", "tbparameters="+tbParamsPath};
 
   UserInterface options(APP_XML, args);
 
@@ -1123,7 +1129,8 @@ End)");
   // just use isdPath for a valid PVL file without the wanted groups
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName,
                           "Solvetargetbody=yes", "Errorpropagation=yes",  "Camsolve=angles", "twist=off", "camera_angles_sigma=2.0", "bundleout_txt=yes",
-                          "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix="+prefix.path()+"/", "tbparameters="+tbParamsPath};
+                          // "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix="+prefix.path()+"/", "tbparameters="+tbParamsPath};
+                          "imagescsv=yes", "output_csv=yes", "residuals_csv=yes", "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawPoleRaDecW0WdotTriaxial/", "tbparameters="+tbParamsPath};
 
   UserInterface options(APP_XML, args);
 
@@ -1511,8 +1518,10 @@ TEST_F(MiniRFNetwork, FunctionalTestJigsawRadar) {
   // solving for position only, with error propagation
   QVector<QString> args1 = {"fromlist="+cubeListFile, "cnet="+controlNetPath,
                            "onet="+outCnetFileName, "maxits=10", "errorprop=yes",
-                           "bundleout_txt=no", "spsolve=accelerations",
-                           "camsolve=no", "file_prefix="+prefix.path()+"/radar_sparse_poh"};
+                          //  "bundleout_txt=no", "spsolve=accelerations",
+                           "bundleout_txt=yes", "spsolve=accelerations",
+                          //  "camsolve=no", "file_prefix="+prefix.path()+"/radar_sparse_poh"};
+                           "camsolve=no", "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawRadar/"};
 
  UserInterface options1(APP_XML, args1);
 
