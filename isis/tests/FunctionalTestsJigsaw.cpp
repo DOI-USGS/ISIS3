@@ -37,12 +37,11 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawApollo) {
                             "twist=yes",
                             "camera_angles_sigma=2.",
                             "update=no",
-                            // "bundleout_txt=no",
+                            "bundleout_txt=no",
                             "cnet="+controlNetPath,
                             "fromlist="+tempDir.path() + "/cubes.lis",
                             "onet="+tempDir.path()+"/apollo_out.net",
-                            // "file_prefix="+tempDir.path()+"/"};
-                            "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawApollo/"};
+                            "file_prefix="+tempDir.path()+"/"};
 
   UserInterface ui(APP_XML, args);
 
@@ -257,13 +256,13 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
   EXPECT_THAT(lines[59].toStdString(), HasSubstr("LONGITUDE"));
   EXPECT_THAT(lines[60].toStdString(), HasSubstr("RADIUS"));
 
-  EXPECT_THAT(lines[202].toStdString(), HasSubstr("Latitude"));
-  EXPECT_THAT(lines[206].toStdString(), HasSubstr("Longitude"));
-  EXPECT_THAT(lines[210].toStdString(), HasSubstr("Radius"));
+  EXPECT_THAT(lines[245].toStdString(), HasSubstr("Latitude"));
+  EXPECT_THAT(lines[249].toStdString(), HasSubstr("Longitude"));
+  EXPECT_THAT(lines[253].toStdString(), HasSubstr("Radius"));
 
-  EXPECT_THAT(lines[626].toStdString(), HasSubstr("LATITUDE"));
-  EXPECT_THAT(lines[627].toStdString(), HasSubstr("LONGITUDE"));
-  EXPECT_THAT(lines[628].toStdString(), HasSubstr("RADIUS"));
+  EXPECT_THAT(lines[668].toStdString(), HasSubstr("LATITUDE"));
+  EXPECT_THAT(lines[669].toStdString(), HasSubstr("LONGITUDE"));
+  EXPECT_THAT(lines[670].toStdString(), HasSubstr("RADIUS"));
 
 
   // Rectangular Bundle, Latitudinal output
@@ -357,13 +356,13 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
   EXPECT_THAT(lines[59].toStdString(), HasSubstr("Y"));
   EXPECT_THAT(lines[60].toStdString(), HasSubstr("Z"));
 
-  EXPECT_THAT(lines[202].toStdString(), HasSubstr("POINT X"));
-  EXPECT_THAT(lines[206].toStdString(), HasSubstr("POINT Y"));
-  EXPECT_THAT(lines[210].toStdString(), HasSubstr("POINT Z"));
+  EXPECT_THAT(lines[245].toStdString(), HasSubstr("POINT X"));
+  EXPECT_THAT(lines[249].toStdString(), HasSubstr("POINT Y"));
+  EXPECT_THAT(lines[253].toStdString(), HasSubstr("POINT Z"));
 
-  EXPECT_THAT(lines[626].toStdString(), HasSubstr("BODY-FIXED-X"));
-  EXPECT_THAT(lines[627].toStdString(), HasSubstr("BODY-FIXED-Y"));
-  EXPECT_THAT(lines[628].toStdString(), HasSubstr("BODY-FIXED-Z"));
+  EXPECT_THAT(lines[668].toStdString(), HasSubstr("BODY-FIXED-X"));
+  EXPECT_THAT(lines[669].toStdString(), HasSubstr("BODY-FIXED-Y"));
+  EXPECT_THAT(lines[670].toStdString(), HasSubstr("BODY-FIXED-Z"));
 
 
   // Compare newtwork and images.csv against the rectangular, latitude bundle
@@ -435,13 +434,13 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
   EXPECT_THAT(lines[59].toStdString(), HasSubstr("Y"));
   EXPECT_THAT(lines[60].toStdString(), HasSubstr("Z"));
 
-  EXPECT_THAT(lines[202].toStdString(), HasSubstr("POINT X"));
-  EXPECT_THAT(lines[206].toStdString(), HasSubstr("POINT Y"));
-  EXPECT_THAT(lines[210].toStdString(), HasSubstr("POINT Z"));
+  EXPECT_THAT(lines[245].toStdString(), HasSubstr("POINT X"));
+  EXPECT_THAT(lines[249].toStdString(), HasSubstr("POINT Y"));
+  EXPECT_THAT(lines[253].toStdString(), HasSubstr("POINT Z"));
 
-  EXPECT_THAT(lines[626].toStdString(), HasSubstr("BODY-FIXED-X"));
-  EXPECT_THAT(lines[627].toStdString(), HasSubstr("BODY-FIXED-Y"));
-  EXPECT_THAT(lines[628].toStdString(), HasSubstr("BODY-FIXED-Z"));
+  EXPECT_THAT(lines[668].toStdString(), HasSubstr("BODY-FIXED-X"));
+  EXPECT_THAT(lines[669].toStdString(), HasSubstr("BODY-FIXED-Y"));
+  EXPECT_THAT(lines[670].toStdString(), HasSubstr("BODY-FIXED-Z"));
 
   bundleFile4.close();
 
@@ -485,8 +484,7 @@ TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
   QString outCnetFileName = prefix.path() + "/outTemp.net";
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName,
                            "observations=yes", "update=yes", "Cksolvedegree=3",
-                          //  "Camsolve=all", "twist=no", "Spsolve=none", "Radius=no", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
-                           "Camsolve=all", "twist=no", "Spsolve=none", "Radius=no", "imagescsv=on", "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawCamSolveAll/"};
+                           "Camsolve=all", "twist=no", "Spsolve=none", "Radius=no", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
 
   UserInterface options(APP_XML, args);
 
@@ -672,8 +670,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawOutlierRejection) {
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName,
                            "radius=yes", "errorpropagation=yes", "outlier_rejection=True", "spsolve=position", "Spacecraft_position_sigma=1000",
                            "Residuals_csv=on", "Camsolve=angles", "Twist=yes", "Camera_angles_sigma=2",
-                          //  "Output_csv=off", "imagescsv=on", "file_prefix="+prefix.path() + "/"};
-                           "Output_csv=on", "imagescsv=on", "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawOutlierRejection/"};
+                           "Output_csv=off", "imagescsv=on", "file_prefix="+prefix.path() + "/"};
 
   UserInterface options(APP_XML, args);
 
@@ -738,8 +735,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
                            "Radius=yes", "Errorpropagation=yes", "Spsolve=position","Spacecraft_position_sigma=1000.0",
                            "Camsolve=angles", "twist=yes", "Camera_angles_sigma=2",
                            "Model1=huber", "Max_model1_c_quantile=0.6", "Model2=chen", "Max_model2_c_quantile=0.98", "Sigma0=1e-3",
-                          //  "bundleout_txt=yes", "Output_csv=on", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
-                           "bundleout_txt=yes", "Output_csv=on", "imagescsv=on", "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawMEstimator/"};
+                           "bundleout_txt=yes", "Output_csv=on", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
 
   UserInterface options(APP_XML, args);
 
@@ -783,19 +779,19 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
 
   QStringList lines = contents.split("\n");
 
-  EXPECT_THAT(lines[31].toStdString(), HasSubstr("Tier 0 Enabled: TRUE"));
-  EXPECT_THAT(lines[32].toStdString(), HasSubstr("Maximum Likelihood Model: Huber"));
-  EXPECT_THAT(lines[33].toStdString(), HasSubstr("Quantile used for tweaking constant: 0.6"));
-  EXPECT_THAT(lines[34].toStdString(), HasSubstr("Quantile weighted R^2 Residual value: 0.207"));
-  EXPECT_THAT(lines[35].toStdString(), HasSubstr("Approx. weighted Residual cutoff: N/A"));
+  EXPECT_THAT(lines[32].toStdString(), HasSubstr("Tier 0 Enabled: TRUE"));
+  EXPECT_THAT(lines[33].toStdString(), HasSubstr("Maximum Likelihood Model: Huber"));
+  EXPECT_THAT(lines[34].toStdString(), HasSubstr("Quantile used for tweaking constant: 0.6"));
+  EXPECT_THAT(lines[35].toStdString(), HasSubstr("Quantile weighted R^2 Residual value: 0.207"));
+  EXPECT_THAT(lines[36].toStdString(), HasSubstr("Approx. weighted Residual cutoff: N/A"));
 
-  EXPECT_THAT(lines[37].toStdString(), HasSubstr("Tier 1 Enabled: TRUE"));
-  EXPECT_THAT(lines[38].toStdString(), HasSubstr("Maximum Likelihood Model: Chen"));
-  EXPECT_THAT(lines[39].toStdString(), HasSubstr("Quantile used for tweaking constant: 0.98"));
-  EXPECT_THAT(lines[40].toStdString(), HasSubstr("Quantile weighted R^2 Residual value: 1.0"));
-  EXPECT_THAT(lines[41].toStdString(), HasSubstr("Approx. weighted Residual cutoff: 1.0"));
+  EXPECT_THAT(lines[38].toStdString(), HasSubstr("Tier 1 Enabled: TRUE"));
+  EXPECT_THAT(lines[39].toStdString(), HasSubstr("Maximum Likelihood Model: Chen"));
+  EXPECT_THAT(lines[40].toStdString(), HasSubstr("Quantile used for tweaking constant: 0.98"));
+  EXPECT_THAT(lines[41].toStdString(), HasSubstr("Quantile weighted R^2 Residual value: 1.0"));
+  EXPECT_THAT(lines[42].toStdString(), HasSubstr("Approx. weighted Residual cutoff: 1.0"));
 
-  EXPECT_THAT(lines[43].toStdString(), HasSubstr(" Tier 2 Enabled: FALSE"));
+  EXPECT_THAT(lines[44].toStdString(), HasSubstr(" Tier 2 Enabled: FALSE"));
 }
 
 
@@ -961,8 +957,7 @@ End)");
   // just use isdPath for a valid PVL file without the wanted groups
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName,
                           "Solvetargetbody=yes", "Errorpropagation=yes",  "Camsolve=angles", "twist=off", "camera_angles_sigma=2.0", "bundleout_txt=yes",
-                          // "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix="+prefix.path()+"/", "tbparameters="+tbParamsPath};
-                          "imagescsv=yes", "output_csv=yes", "residuals_csv=yes", "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawPoleRaDecW0WdotMeanRadius/", "tbparameters="+tbParamsPath};
+                          "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix="+prefix.path()+"/", "tbparameters="+tbParamsPath};
 
   UserInterface options(APP_XML, args);
 
@@ -986,17 +981,10 @@ End)");
 
   QStringList lines = contents.split("\n");
 
-  EXPECT_THAT(lines[75].toStdString(), HasSubstr("RADII: MEAN"));
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[76].trimmed(), "");
+  EXPECT_THAT(lines[76].toStdString(), HasSubstr("RADII: MEAN"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[77].trimmed(), "");
 
-  QStringList columns = lines[132].split(QRegExp("\\s+"), QString::SkipEmptyParts);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "minimum:");
-  EXPECT_NEAR(columns[1].toDouble(), -178.8718, 0.001);
-  columns = lines[136].split(QRegExp("\\s+"), QString::SkipEmptyParts);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "maximum:");
-  EXPECT_NEAR(columns[1].toDouble(), 175.7307, 0.001);
-
-  columns = lines[159].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  QStringList columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "RA");
   EXPECT_NEAR(columns[2].toDouble(), 269.9949, 0.0001);
@@ -1005,7 +993,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
   EXPECT_NEAR(columns[6].toDouble(), 0.00167495, 0.0001);
 
-  columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "DEC");
   EXPECT_NEAR(columns[2].toDouble(), 66.5392, 0.0001);
@@ -1014,7 +1002,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
   EXPECT_NEAR(columns[6].toDouble(), 0.00068524, 0.0001);
 
-  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PM");
   EXPECT_NEAR(columns[1].toDouble(), 38.32132, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -383.36347956, 0.0001);
@@ -1022,7 +1010,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 1.55731615, 0.0001);
 
-  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PMv");
   EXPECT_NEAR(columns[1].toDouble(), 13.17635815, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -0.03669501, 0.0001);
@@ -1030,7 +1018,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 0.00015007, 0.0001);
 
-  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[164].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "MeanRadius");
   EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -1.67807036, 0.0001);
@@ -1129,8 +1117,7 @@ End)");
   // just use isdPath for a valid PVL file without the wanted groups
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+controlNetPath, "onet="+outCnetFileName,
                           "Solvetargetbody=yes", "Errorpropagation=yes",  "Camsolve=angles", "twist=off", "camera_angles_sigma=2.0", "bundleout_txt=yes",
-                          // "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix="+prefix.path()+"/", "tbparameters="+tbParamsPath};
-                          "imagescsv=yes", "output_csv=yes", "residuals_csv=yes", "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawPoleRaDecW0WdotTriaxial/", "tbparameters="+tbParamsPath};
+                          "imagescsv=no", "output_csv=no", "residuals_csv=no", "file_prefix="+prefix.path()+"/", "tbparameters="+tbParamsPath};
 
   UserInterface options(APP_XML, args);
 
@@ -1154,10 +1141,10 @@ End)");
 
   QStringList lines = contents.split("\n");
 
-  EXPECT_THAT(lines[75].toStdString(), HasSubstr("RADII: TRIAXIAL"));
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[76].trimmed(), "");
+  EXPECT_THAT(lines[76].toStdString(), HasSubstr("RADII: TRIAXIAL"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[77].trimmed(), "");
 
-  QStringList columns = lines[159].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  QStringList columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "RA");
   EXPECT_NEAR(columns[2].toDouble(), 269.9949, 0.0001);
@@ -1166,7 +1153,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
   EXPECT_NEAR(columns[6].toDouble(), 0.00199725, 0.0001);
 
-  columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "DEC");
   EXPECT_NEAR(columns[2].toDouble(), 66.5392, 0.0001);
@@ -1175,7 +1162,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
   EXPECT_NEAR(columns[6].toDouble(), 0.00149539, 0.0001);
 
-  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PM");
   EXPECT_NEAR(columns[1].toDouble(), 38.32132, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -291.78617547, 0.0001);
@@ -1183,7 +1170,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 2.00568417, 0.0001);
 
-  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PMv");
   EXPECT_NEAR(columns[1].toDouble(), 13.17635815, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -0.02785056, 0.0001);
@@ -1191,7 +1178,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 0.00019333, 0.0001);
 
-  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[164].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusA");
   EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), 6.87282091, 0.0001);
@@ -1199,7 +1186,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 1.23289971, 0.0001);
 
-  columns = lines[164].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[165].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusB");
   EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), 2.34406319, 0.0001);
@@ -1207,7 +1194,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 12.52974045, 0.0001);
 
-  columns = lines[165].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[166].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusC");
   EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -37.55670044, 0.0001);
@@ -1518,10 +1505,8 @@ TEST_F(MiniRFNetwork, FunctionalTestJigsawRadar) {
   // solving for position only, with error propagation
   QVector<QString> args1 = {"fromlist="+cubeListFile, "cnet="+controlNetPath,
                            "onet="+outCnetFileName, "maxits=10", "errorprop=yes",
-                          //  "bundleout_txt=no", "spsolve=accelerations",
-                           "bundleout_txt=yes", "spsolve=accelerations",
-                          //  "camsolve=no", "file_prefix="+prefix.path()+"/radar_sparse_poh"};
-                           "camsolve=no", "file_prefix=/work/users/jmapel/ISIS3/build/FunctionalTestJigsawRadar/"};
+                           "bundleout_txt=no", "spsolve=accelerations",
+                           "camsolve=no", "file_prefix="+prefix.path()+"/radar_sparse_poh"};
 
  UserInterface options1(APP_XML, args1);
 

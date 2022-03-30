@@ -517,7 +517,7 @@ namespace Isis {
 
           measure->setParentObservation(observation);
           measure->setParentImage(image);
-        measure->setSigma(0.3);
+        measure->setSigma(1.4);
         }
 
       point->ComputeApriori();
@@ -2221,7 +2221,7 @@ namespace Isis {
 
     // vtpv for target body parameters
     if ( m_bundleTargetBody) {
-      vtpv = m_bundleTargetBody->vtpv();
+      vtpv += m_bundleTargetBody->vtpv();
     }
 
 

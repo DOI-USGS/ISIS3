@@ -831,8 +831,7 @@ namespace Isis {
    * Computes the degrees of freedom of the bundle adjustment and stores it internally.
    */
   void BundleResults::computeDegreesOfFreedom() {
-    m_degreesOfFreedom = m_numberObservations //TODO remove m_numberObservations
-                         + m_numberImageObservations
+    m_degreesOfFreedom = m_numberImageObservations
                          + m_numberLidarImageObservations
                          + m_numberConstrainedPointParameters
                          + m_numberConstrainedLidarPointParameters
@@ -1317,8 +1316,7 @@ namespace Isis {
    * @return @b int The number of observations.
    */
   int BundleResults::numberObservations() const {
-    return m_numberObservations;
-    // return m_numberImageObservations + m_numberLidarImageObservations; // TODO uncomment after changing numberObservations
+    return m_numberImageObservations + m_numberLidarImageObservations;
   }
 
 
