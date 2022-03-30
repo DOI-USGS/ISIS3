@@ -1751,6 +1751,7 @@ TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
                             "twist=yes",
                             "camera_angles_sigma=2.",
                             "update=yes",
+                            "SIGMA0=0.00001",
                             "bundleout_txt=yes",
                             "cnet="+controlNetPath,
                             "fromlist="+cubeListFileCopy,
@@ -1824,9 +1825,9 @@ TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
 
   QStringList lines = contents.split("\n");
 
-  EXPECT_THAT(lines[7].toStdString(), HasSubstr(("Lidar Data Filename: " + lidarDataPath).toStdString()));
+  EXPECT_THAT(lines[10].toStdString(), HasSubstr(("Lidar Data Filename: " + lidarDataPath).toStdString()));
 
-  QStringList lidarPoints = lines[71].split(":");
+  QStringList lidarPoints = lines[73].split(":");
   EXPECT_THAT(lidarPoints[0].trimmed().toStdString(), HasSubstr("Lidar Points"));
   EXPECT_EQ(lidarPoints[1].trimmed().toInt(), lidarDataIn.numberLidarPoints());
 
@@ -1834,30 +1835,32 @@ TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
   int nMeasuresCube2 = lidarDataIn.GetMeasuresInCube(SerialNumber::Compose(bundledCube2Copy)).count();
   int nValidMeasuresCube1 = lidarDataIn.GetNumberOfValidMeasuresInImage( SerialNumber::Compose(bundledCube1Copy));
   int nValidMeasuresCube2 = lidarDataIn.GetNumberOfValidMeasuresInImage( SerialNumber::Compose(bundledCube2Copy));
-  int nValidMeasures = nValidMeasuresCube1 + nValidMeasuresCube2;
 
-  QStringList lidarRangeConstraints = lines[78].split(":");
+  QStringList lidarRangeConstraints = lines[79].split(":");
   EXPECT_THAT(lidarRangeConstraints[0].trimmed().toStdString(), HasSubstr("Lidar Range Constraints"));
-  EXPECT_EQ(lidarRangeConstraints[1].trimmed().toInt(), nValidMeasures);
+  EXPECT_EQ(lidarRangeConstraints[1].trimmed().toInt(), lidarDataIn.numberSimultaneousMeasures());
 
-  QStringList columns = lines[133].split(QRegExp("\\s+"), QString::SkipEmptyParts);
-  EXPECT_EQ(columns[7], nValidMeasuresCube1);
-  EXPECT_EQ(columns[9], nMeasuresCube1);
-  columns = lines[134].split(QRegExp("\\s+"), QString::SkipEmptyParts);
-  EXPECT_EQ(columns[7], nValidMeasuresCube2);
-  EXPECT_EQ(columns[9], nMeasuresCube2);
+  QStringList columns = lines[136].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  ASSERT_GE(columns.size(), 10);
+  EXPECT_EQ(columns[6].toInt(), nValidMeasuresCube1);
+  EXPECT_EQ(columns[7].toInt(), nMeasuresCube1);
+  columns = lines[137].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  ASSERT_GE(columns.size(), 10);
+  EXPECT_EQ(columns[6].toInt(), nValidMeasuresCube2);
+  EXPECT_EQ(columns[7].toInt(), nMeasuresCube2);
 
   CSVReader::CSVAxis csvLine;
-  CSVReader header = CSVReader(tempDir.path()+"/lidar_bundleout.csv",
-                               false, 0, ',', false, true);
+  CSVReader header = CSVReader(tempDir.path()+"/lidar_bundleout_lidar.csv",
+                               false, 0, ',', true, true);
 
-
-  for (int i = 0; i < header.rows(); i++){
+  for (int i = 3; i < header.rows(); i++){
     csvLine = header.getRow(i);
-    EXPECT_NEAR(csvLine[2].toDouble(), lidarDataIn.point(csvLine[0])->range(), 0.0001);
-    EXPECT_NEAR(csvLine[3].toDouble(), lidarDataIn.point(csvLine[0])->sigmaRange(), 0.0001);
-    EXPECT_NEAR(csvLine[4].toDouble(), lidarDataOut.point(csvLine[0])->range(), 0.0001);
-    EXPECT_NEAR(csvLine[5].toDouble(), lidarDataOut.point(csvLine[0])->sigmaRange(), 0.0001);
+    QString pointId = csvLine[0].trimmed();
+    EXPECT_NEAR(csvLine[2].toDouble(), lidarDataIn.point(pointId)->range(), 0.0001);
+    EXPECT_NEAR(csvLine[3].toDouble(), lidarDataIn.point(pointId)->sigmaRange() * 0.001, 0.0001);
+    EXPECT_NEAR(csvLine[4].toDouble(), lidarDataOut.point(pointId)->range(), 0.0001);
+    // The bundle doesn't write out updated sigma ranges
+    // EXPECT_NEAR(csvLine[5].toDouble(), lidarDataOut.point(pointId)->sigmaRange() * 0.001, 0.0001);
   }
 
 }

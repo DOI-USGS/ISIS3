@@ -58,7 +58,12 @@ namespace Isis {
    */
 
   QSharedPointer<LidarControlPoint> LidarData::point(QString pointId) const{
-    return m_points.value(pointId, 0);
+    QSharedPointer<LidarControlPoint> point = m_points.value(pointId, 0);
+    if (!point) {
+      QString msg = "Point " + pointId + " is not in the lidar data.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return point;
   }
 
 

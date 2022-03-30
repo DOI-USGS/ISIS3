@@ -22,14 +22,14 @@ namespace Isis {
 
   /**
    * This class holds information about a lidar control point that BundleAdjust requires.
-   * 
+   *
    * This class was created to extract functionality from BundleAdjust and wrap a LidarControlPoint
    * with the extra necessary information to correctly perform a bundle adjustment.
    *
    * Note that only non-ignored lidar control points should be used to construct a
    * BundleLidarControlPoint. Similarly, a BundleLidarControlPoint should only contain non-ignored
    * control measures.
-   * 
+   *
    * @author 2018-02-08 Ken Edmundson
    *
    * @internal
@@ -53,6 +53,10 @@ namespace Isis {
                                     LinearAlgebra::VectorCompressed& n1,
                                     LinearAlgebra::Vector& n2);
       void computeResiduals();
+
+      virtual void applyParameterCorrections(LinearAlgebra::Vector imageSolution,
+                                             SparseBlockMatrix &sparseNormals,
+                                             const BundleTargetBodyQsp target);
 
       BundleLidarRangeConstraintQsp rangeConstraint(int n);
       double vtpvRangeContribution();

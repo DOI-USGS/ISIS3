@@ -121,8 +121,9 @@ namespace Isis {
                           // boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
                           // SparseBlockRowMatrix                                &Q,
                           LinearAlgebra::Vector                               &v1);
-      void applyParameterCorrections(LinearAlgebra::Vector imageSolution,
-           SparseBlockMatrix &sparseNormals, const BundleTargetBodyQsp target);
+      virtual void applyParameterCorrections(LinearAlgebra::Vector imageSolution,
+                                             SparseBlockMatrix &sparseNormals,
+                                             const BundleTargetBodyQsp target);
       double vtpv();
       double vtpvMeasures();
 

@@ -1287,6 +1287,7 @@ namespace Isis {
     int numLidarPoints = m_bundleLidarControlPoints.size();
     m_numLidarConstraints = 0;
 
+
     for (int i = 0; i < numLidarPoints; i++) {
       emit(pointUpdate(i+1));
       BundleLidarControlPointQsp point = m_bundleLidarControlPoints.at(i);
