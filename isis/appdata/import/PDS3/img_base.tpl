@@ -82,10 +82,22 @@ Object = IsisCube
   End_Object
 
   Group = Instrument
+   i = 5
     {% block instrument %}
     {% endblock %}
+    i=6
   End_Group
+  i=7
 
+  {% block mapping %}
+    {% if exists("IMAGE_MAP_PROJECTION") %}
+      Group = Mapping
+        {% if IMAGE_MAP_PROJECTION.MAP_PROJECTION_TYPE.Value == "EQUIRECTANGULAR" %}
+          {% include "Equirectangular.tpl" %}
+        {% endif %}
+      End_Group
+    {% endif %}
+  {% endblock %}
 
   {% block additional_groups %}
   {% endblock %}
