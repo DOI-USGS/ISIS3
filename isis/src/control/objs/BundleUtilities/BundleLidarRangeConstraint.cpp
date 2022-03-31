@@ -5,6 +5,7 @@
 
 // Boost uBLAS
 #include <boost/numeric/ublas/vector_proxy.hpp>
+#include <boost/numeric/ublas/matrix_proxy.hpp>
 
 // Isis Library
 #include "Camera.h"
@@ -201,7 +202,7 @@ namespace Isis {
     static LinearAlgebra::Vector coeff_range_RHS(1);         //!< Right hand side of normals
 
     // index into normal equations for this measure
-    int positionBlockIndex = m_simultaneousMeasure->positionNormalsBlockIndex();
+    int positionBlockIndex = m_simultaneousMeasure->observationIndex();
 
     // resize coeff_range_image matrix if necessary
     IsisBundleObservationQsp isisObservation = m_bundleObservation.dynamicCast<IsisBundleObservation>();
@@ -294,11 +295,20 @@ namespace Isis {
     coeff_range_RHS     *= m_rangeObservedWeightSqrt;
 
     // add range condition contribution to N11 portion of normal equations matrix
-    (*(*normalsMatrix[positionBlockIndex])[positionBlockIndex])
-        += prod(trans(coeff_range_image), coeff_range_image);
+    matrix_range<LinearAlgebra::Matrix> normal_range(
+          *(*normalsMatrix[positionBlockIndex])[positionBlockIndex],
+          range(0, coeff_range_image.size2()),
+          range(0, coeff_range_image.size2()));
+
+    normal_range += prod(trans(coeff_range_image), coeff_range_image);
 
     // add range condition contribution to N12 portion of normal equations matrix
-    *N12[positionBlockIndex] += prod(trans(coeff_range_image), coeff_range_point3D);
+    matrix_range<LinearAlgebra::Matrix> N12_range(
+          *N12[positionBlockIndex],
+          range(0, coeff_range_image.size2()),
+          range(0, coeff_range_point3D.size2()));
+
+    N12_range += prod(trans(coeff_range_image), coeff_range_point3D);
 
     // contribution to n1 vector
     int startColumn = normalsMatrix.at(positionBlockIndex)->startColumn();

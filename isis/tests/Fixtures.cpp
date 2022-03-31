@@ -759,6 +759,25 @@ namespace Isis {
     delete isdPath2;
   }
 
+  void LidarNetwork::SetUp() {
+      LidarObservationPair::SetUp();
+
+      lidarDataPath = "data/LidarNetwork/lidarData.json";
+      rangeData.read(lidarDataPath);
+      controlNetPath = "data/LidarNetwork/network.pvl";
+
+      network = new ControlNet(controlNetPath);
+
+      // Create the filelist
+
+  }
+
+  void LidarNetwork::TearDown() {
+    if (network) {
+      delete network;
+    }
+  }
+
   void MroCtxCube::SetUp() {
     TempTestingFiles::SetUp();
 

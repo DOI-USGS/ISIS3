@@ -30,10 +30,10 @@ namespace Isis {
   /**
    * Constructs a BundleLidarControlPoint object from a LidarControlPoint. Only the
    * non-ignored measures are added to the BundleLidarControlPoint.
-   *  
+   *
    * @param bundleSettings BundleSettings.
    *
-   * @param controlPoint Pointer to a ControlPoint that will be used to 
+   * @param controlPoint Pointer to a ControlPoint that will be used to
    *                     construct this BundleLidarControlPoint.
    *
    * TODO: is the typecast expensive?
@@ -68,7 +68,7 @@ namespace Isis {
   /**
    * TODO: implement?
    * Copy constructor.
-   *  
+   *
    * @param src The BundleLidarControlPoint to be copied.
    */
 //  BundleLidarControlPoint::BundleLidarControlPoint(const BundleLidarControlPoint &src) {
@@ -86,7 +86,7 @@ namespace Isis {
 
   /**
    * Copies given BundleLidarControlPoint to this BundleLidarControlPoint.
-   *  
+   *
    * @param src The BundleLidarControlPoint to be copied.
    */
   void BundleLidarControlPoint::copy(const BundleLidarControlPoint &src) {
@@ -105,6 +105,25 @@ namespace Isis {
     // compute and store focal plane residuals in millimeters
     for (int i = 0; i < size(); i++) {
       at(i)->setFocalPlaneResidualsMillimeters();
+    }
+  }
+
+
+  /**
+   * Apply the parameter corrections to the lidar range.
+   */
+  void BundleLidarControlPoint::applyParameterCorrections(
+        LinearAlgebra::Vector imageSolution,
+        SparseBlockMatrix &sparseNormals,
+        const BundleTargetBodyQsp target) {
+    // Call parent class method to apply point corrections
+    BundleControlPoint::applyParameterCorrections(imageSolution, sparseNormals, target);
+
+    for (int i = 0; i < m_rangeConstraints.size(); i++) {
+      m_lidarControlPoint->setRange(m_rangeConstraints[i]->rangeComputed());
+      // The updated range sigma cannot be computed because the bundle does not
+      // solve for the range, it simply re-computes it each iteration
+      // m_lidarControlPoint->setRangeSigma(m_rangeConstraints[i]->rangeAdjustedSigma());
     }
   }
 
