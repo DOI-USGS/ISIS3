@@ -170,7 +170,7 @@ namespace Isis {
   /**
    * Converts a FITS file to a json object.
    *
-   * @param fitsFile Path to an FITS file.
+   * @param fitsFile Path to a FITS file.
    *
    * @return json The FITS file converted to a json object.
    */
