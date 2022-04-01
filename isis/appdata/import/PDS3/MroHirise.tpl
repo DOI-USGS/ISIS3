@@ -91,9 +91,13 @@
   End_Group
 
   Group = BandBin
-    FilterName                      = {{INSTRUMENT_SETTING_PARAMETERS.FILTER_NAME.Value}}
-    FilterCenter                    = {{INSTRUMENT_SETTING_PARAMETERS.CENTER_FILTER_WAVELENGTH.Value}}
-    FilterWidth                     = {{INSTRUMENT_SETTING_PARAMETERS.BANDWIDTH.Value}}
+    Name                      = {{INSTRUMENT_SETTING_PARAMETERS.FILTER_NAME.Value}}
+    Center                    = {{INSTRUMENT_SETTING_PARAMETERS.CENTER_FILTER_WAVELENGTH.Value}}
+    Width                     = {{INSTRUMENT_SETTING_PARAMETERS.BANDWIDTH.Value}}
+  End_Group
+
+  Group = Kernels
+    NaifIkCode                = "-74699"
   End_Group
 
 {% endblock %}
