@@ -24,6 +24,8 @@ namespace Isis {
    *
    * @param the stream to convert
    * @return @b json The contents of the stream as a JSON object
+   *
+   * This logic was taken from ProcessImportFits::extractFitsLabels
    */
   json fitsToJson(std::ifstream &fileStream) {
     PvlObject fitsPvl;
