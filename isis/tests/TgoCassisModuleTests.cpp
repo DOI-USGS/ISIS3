@@ -1407,126 +1407,163 @@ TEST(TgoCassisModuleTests, TgoCassisColorMosaic) {
 
   // Mosaic Cube
   Cube mosCube(coloredMosaic);
-  Pvl *lab = mosCube.label();
+  Pvl *outLabel = mosCube.label();
 
-  // Instrument Group
-  PvlGroup mos = lab->findGroup("Mosaic", Pvl::Traverse);
-  EXPECT_EQ(mos["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
-  EXPECT_EQ(mos["InstrumentId"][0].toStdString(), "CaSSIS");
-  EXPECT_EQ(mos["ObservationId"][0].toStdString(), "CRUS_049218_201_0" );
-  EXPECT_EQ(mos["StartTime"][0].toStdString(), "2016-11-26T22:50:27.381");
-  EXPECT_EQ(mos["StopTime"][0].toStdString(), "2016-11-26T22:50:27.382");
-  EXPECT_EQ(mos["SpacecraftClockStartCount"][0].toStdString(), "2f015435767e275a");
-  EXPECT_DOUBLE_EQ(double(mos["IncidenceAngle"]), 44.946650468616);
-  EXPECT_DOUBLE_EQ(double(mos["EmissionAngle"]), 11.637754697441);
-  EXPECT_DOUBLE_EQ(double(mos["LocalTime"]), 14.429448515306);
-  EXPECT_DOUBLE_EQ(double(mos["SolarLongitude"]), 269.1366003982);
-  EXPECT_DOUBLE_EQ(double(mos["SubSolarAzimuth"]), 139.56469945225);
-  EXPECT_DOUBLE_EQ(double(mos["NorthAzimuth"]), 270.0);
+  std::istringstream mos(R"(
+    Group = Mosaic
+      SpacecraftName            = "TRACE GAS ORBITER"
+      InstrumentId              = CaSSIS
+      ObservationId             = CRUS_049218_201_0
+      StartTime                 = 2016-11-26T22:50:27.381
+      StopTime                  = 2016-11-26T22:50:27.382
+      SpacecraftClockStartCount = 2f015435767e275a
+      IncidenceAngle            = 44.946650468616 <degrees>
+      EmissionAngle             = 11.637754697441 <degrees>
+      PhaseAngle                = 44.136937967978 <degrees>
+      LocalTime                 = 14.429448515306
+      SolarLongitude            = 269.1366003982 <degrees>
+      SubSolarAzimuth           = 139.56469945225 <degrees>
+      NorthAzimuth              = 270.0 <degrees>
+    End_Group
+  )");
 
-  // Archive Group
-  PvlGroup archive = lab->findGroup("Archive", Pvl::Traverse);
-  EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
-  EXPECT_EQ(archive["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(archive["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");
-  EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
-  EXPECT_DOUBLE_EQ(double(archive["Offset"]), 0.0);
-  EXPECT_DOUBLE_EQ(double(archive["PredictMaximumExposureTime"]), 1.5952);
-  EXPECT_DOUBLE_EQ(double(archive["CassisOffNadirAngle"]), 10.032);
-  EXPECT_DOUBLE_EQ(double(archive["PredictedRepetitionFrequency"]), 367.5);
-  EXPECT_DOUBLE_EQ(double(archive["GroundTrackVelocity"]), 3.4686);
-  EXPECT_DOUBLE_EQ(double(archive["ForwardRotationAngle"]), 52.703);
-  EXPECT_DOUBLE_EQ(double(archive["SpiceMisalignment"]), 185.422);
-  EXPECT_DOUBLE_EQ(double(archive["FocalLength"]), 0.8770);
-  EXPECT_DOUBLE_EQ(double(archive["FNumber"]), 6.50);
-  EXPECT_EQ(int(archive["ExposureTimeCommand"]), 150);
-  EXPECT_EQ(int(archive["FrameletNumber"]), 5);
-  EXPECT_EQ(int(archive["NumberOfFramelets"]), 40);
-  EXPECT_EQ(int(archive["ImageFrequency"]), 400000);
-  EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
-  EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
-  EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 1.440e-003);
-  EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 0.16);
-  EXPECT_DOUBLE_EQ(double(archive["IFOV"]), 1.140e-005);
-  EXPECT_EQ(archive["FiltersAvailable"][0].toStdString(), "BLU RED NIR PAN");
-  EXPECT_DOUBLE_EQ(double(archive["PixelHeight"]), 10.0);
-  EXPECT_DOUBLE_EQ(double(archive["PixelWidth"]), 10.0);
-  EXPECT_DOUBLE_EQ(double(archive["ReadNoise"]), 61.0);
-  EXPECT_DOUBLE_EQ(double(archive["SubInstrumentIdentifier"]), 61.0);
-  EXPECT_EQ(int(archive["WindowCount"]), 1);
-  EXPECT_EQ(int(archive["Window1Binning"]), 0);
-  EXPECT_EQ(int(archive["Window1StartSample"]), 0);
-  EXPECT_EQ(int(archive["Window1EndSample"]), 2047);
-  EXPECT_EQ(int(archive["Window1StartLine"]), 354);
-  EXPECT_EQ(int(archive["Window1EndLine"]), 632);
-  EXPECT_EQ(int(archive["Window2Binning"]), 0);
-  EXPECT_EQ(int(archive["Window2StartSample"]), 0);
-  EXPECT_EQ(int(archive["Window2EndSample"]), 2047);
-  EXPECT_EQ(int(archive["Window2StartLine"]), 712);
-  EXPECT_EQ(int(archive["Window2EndLine"]), 967);
-  EXPECT_EQ(int(archive["Window3Binning"]), 1);
-  EXPECT_EQ(int(archive["Window3StartSample"]), 0);
-  EXPECT_EQ(int(archive["Window3EndSample"]), 2047);
-  EXPECT_EQ(int(archive["Window3StartLine"]), 1048);
-  EXPECT_EQ(int(archive["Window3EndLine"]), 1302);
-  EXPECT_EQ(int(archive["Window4Binning"]), 0);
-  EXPECT_EQ(int(archive["Window4StartSample"]), 1024);
-  EXPECT_EQ(int(archive["Window4EndSample"]), 1087);
-  EXPECT_EQ(int(archive["Window4StartLine"]), 1409);
-  EXPECT_EQ(int(archive["Window4EndLine"]), 1662);
-  EXPECT_EQ(int(archive["Window5Binning"]), 0);
-  EXPECT_EQ(int(archive["Window5StartSample"]), 640);
-  EXPECT_EQ(int(archive["Window5EndSample"]), 767);
-  EXPECT_EQ(int(archive["Window5StartLine"]), 200);
-  EXPECT_EQ(int(archive["Window5EndLine"]), 208);
-  EXPECT_EQ(int(archive["Window6Binning"]), 0);
-  EXPECT_EQ(int(archive["Window6StartSample"]), 1280);
-  EXPECT_EQ(int(archive["Window6EndSample"]), 1407);
-  EXPECT_EQ(int(archive["Window6StartLine"]), 1850);
-  EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
-  EXPECT_EQ(int(archive["YearDoy"]), 2016331);
-  EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_201_0");
+  PvlGroup truthMosGroup;
+  mos >> truthMosGroup;
+  PvlGroup &mosGroup = outLabel->findGroup("Mosaic", Pvl::Traverse);
 
-  // BandBin Group
-  PvlGroup bandbin = lab->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "RED");
-  EXPECT_EQ(bandbin["FilterName"][1].toStdString(), "BLU");
-  EXPECT_EQ(bandbin["FilterName"][2].toStdString(), "NIR");
-  EXPECT_EQ(bandbin["FilterName"][3].toStdString(), "PAN");
-  EXPECT_DOUBLE_EQ(bandbin["Center"][0].toDouble(), 835.4);
-  EXPECT_DOUBLE_EQ(bandbin["Center"][1].toDouble(), 497.4);
-  EXPECT_DOUBLE_EQ(bandbin["Center"][2].toDouble(), 940.2);
-  EXPECT_DOUBLE_EQ(bandbin["Center"][3].toDouble(), 677.4);
-  EXPECT_DOUBLE_EQ(bandbin["Width"][0].toDouble(), 98.0);
-  EXPECT_DOUBLE_EQ(bandbin["Width"][1].toDouble(), 134.3);
-  EXPECT_DOUBLE_EQ(bandbin["Width"][2].toDouble(), 120.6);
-  EXPECT_DOUBLE_EQ(bandbin["Width"][3].toDouble(), 231.5);
-  EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143422");
-  EXPECT_EQ(bandbin["NaifIkCode"][1].toStdString(), "-143424");
-  EXPECT_EQ(bandbin["NaifIkCode"][2].toStdString(), "-143423");
-  EXPECT_EQ(bandbin["NaifIkCode"][3].toStdString(), "-143421");
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, mosGroup, truthMosGroup);
 
-  // Mapping Group
-  PvlGroup map = lab->findGroup("Mapping", Pvl::Traverse);
-  EXPECT_EQ(map["ProjectionName"][0].toStdString(), "Equirectangular");
-  EXPECT_DOUBLE_EQ(double(map["CenterLongitude"]), 266.21338321885);
-  EXPECT_EQ(map["TargetName"][0].toStdString(), "Mars");
-  EXPECT_DOUBLE_EQ(double(map["EquatorialRadius"]), 3396190.0);
-  EXPECT_DOUBLE_EQ(double(map["PolarRadius"]), 3376200.0);
-  EXPECT_EQ(map["LatitudeType"][0].toStdString(), "Planetocentric");
-  EXPECT_EQ(map["LongitudeDirection"][0].toStdString(), "PositiveEast");
-  EXPECT_EQ(int(map["LongitudeDomain"]), 360);
-  EXPECT_DOUBLE_EQ(double(map["MinimumLatitude"]), 2.465491209879);
-  EXPECT_DOUBLE_EQ(double(map["MaximumLatitude"]), 2.703757297152);
-  EXPECT_DOUBLE_EQ(double(map["MinimumLongitude"]), 266.13827437353);
-  EXPECT_DOUBLE_EQ(double(map["MaximumLongitude"]), 266.28849206417);
-  EXPECT_DOUBLE_EQ(double(map["UpperLeftCornerX"]), -4600.0);
-  EXPECT_DOUBLE_EQ(double(map["UpperLeftCornerY"]), 160400.0);
-  EXPECT_DOUBLE_EQ(double(map["PixelResolution"]), 200.0);
-  EXPECT_DOUBLE_EQ(double(map["Scale"]), 296.3699086728);
-  EXPECT_DOUBLE_EQ(double(map["CenterLatitude"]), 2.584624253516);
-  EXPECT_DOUBLE_EQ(double(map["CenterLatitudeRadius"]), 3396148.9883258);
+  std::istringstream arss(R"(
+    Group = Archive
+      DataSetId                    = TBD
+      ProductVersionId             = UNK
+      ProducerId                   = UBE
+      ProducerName                 = "Nicolas Thomas"
+      ProductCreationTime          = 2017-10-03T10:50:12
+      FileName                     = CAS-MCO-2016-11-26T22.50.27.381-RED-01005-B1
+      ScalingFactor                = 1.00
+      Offset                       = 0.00
+      PredictMaximumExposureTime   = 1.5952 <ms>
+      CassisOffNadirAngle          = 10.032 <deg>
+      PredictedRepetitionFrequency = 367.5 <ms>
+      GroundTrackVelocity          = 3.4686 <km/s>
+      ForwardRotationAngle         = 52.703 <deg>
+      SpiceMisalignment            = 185.422 <deg>
+      FocalLength                  = 0.8770 <m>
+      FNumber                      = 6.50
+      ExposureTimeCommand          = 150
+      FrameletNumber               = 5
+      NumberOfFramelets            = 40
+      ImageFrequency               = 400000 <ms>
+      NumberOfWindows              = 6
+      UniqueIdentifier             = 100799268
+      UID                          = 100799268
+      ExposureTimestamp            = 2f015435767e275a
+      ExposureTimePEHK             = 1.440e-003 <ms>
+      PixelsPossiblySaturated      = 0.16
+      IFOV                         = 1.140e-005
+      IFOVUnit                     = rad/px
+      FiltersAvailable             = "BLU RED NIR PAN"
+      FocalLengthUnit              = M
+      TelescopeType                = "Three-mirror anastigmat with powered fold mirror"
+      DetectorDescription          = "2D Array"
+      PixelHeight                  = 10.0
+      PixelHeightUnit              = MICRON
+      PixelWidth                   = 10.0
+      PixelWidthUnit               = MICRON
+      DetectorType                 = 'SI CMOS HYBRID (OSPREY 2K)'
+      ReadNoise                    = 61.0
+      ReadNoiseUnit                = ELECTRON
+      MissionPhase                 = MCO
+      SubInstrumentIdentifier      = 61.0
+      WindowCount                  = 1
+      Window1Binning               = 0
+      Window1StartSample           = 0
+      Window1EndSample             = 2047
+      Window1StartLine             = 354
+      Window1EndLine               = 632
+      Window2Binning               = 0
+      Window2StartSample           = 0
+      Window2EndSample             = 2047
+      Window2StartLine             = 712
+      Window2EndLine               = 967
+      Window3Binning               = 1
+      Window3StartSample           = 0
+      Window3EndSample             = 2047
+      Window3StartLine             = 1048
+      Window3EndLine               = 1302
+      Window4Binning               = 0
+      Window4StartSample           = 1024
+      Window4EndSample             = 1087
+      Window4StartLine             = 1409
+      Window4EndLine               = 1662
+      Window5Binning               = 0
+      Window5StartSample           = 640
+      Window5EndSample             = 767
+      Window5StartLine             = 200
+      Window5EndLine               = 208
+      Window6Binning               = 0
+      Window6StartSample           = 1280
+      Window6EndSample             = 1407
+      Window6StartLine             = 1850
+      Window6EndLine               = 1858
+      YearDoy                      = 2016331
+      ObservationId                = CRUS_049218_201_0
+    End_Group
+  )");
+
+  PvlGroup truthArchiveGroup;
+  arss >> truthArchiveGroup;
+
+  PvlGroup &archiveGroup = outLabel->findGroup("Archive", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, archiveGroup, truthArchiveGroup);
+
+  std::istringstream bbss(R"(
+    Group = BandBin
+      FilterName = (RED, BLU, NIR, PAN)
+      Center     = (835.4, 497.4, 940.2, 677.4) <nm>
+      Width      = (98.0, 134.3, 120.6, 231.5) <nm>
+      NaifIkCode = (-143422, -143424, -143423, -143421)
+    End_Group
+  )");
+
+  PvlGroup truthBandBinGroup;
+  bbss >> truthBandBinGroup;
+
+  PvlGroup &bandBinGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, bandBinGroup, truthBandBinGroup);
+
+  std::istringstream map(R"(
+    Group = Mapping
+      ProjectionName       = Equirectangular
+      CenterLongitude      = 266.21338321885
+      TargetName           = Mars
+      EquatorialRadius     = 3396190.0 <meters>
+      PolarRadius          = 3376200.0 <meters>
+      LatitudeType         = Planetocentric
+      LongitudeDirection   = PositiveEast
+      LongitudeDomain      = 360
+      MinimumLatitude      = 2.465491209879
+      MaximumLatitude      = 2.703757297152
+      MinimumLongitude     = 266.13827437353
+      MaximumLongitude     = 266.28849206417
+      UpperLeftCornerX     = -4600.0 <meters>
+      UpperLeftCornerY     = 160400.0 <meters>
+      PixelResolution      = 200.0 <meters/pixel>
+      Scale                = 296.3699086728 <pixels/degree>
+      CenterLatitude       = 2.584624253516
+      CenterLatitudeRadius = 3396148.9883258
+    End_Group
+  )");
+
+  PvlGroup truthMappingGroup;
+  map >> truthMappingGroup;
+
+  PvlGroup &mappingGroup = outLabel->findGroup("Mapping", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, mappingGroup, truthMappingGroup);
 
   Histogram *hist = mosCube.histogram();
 
