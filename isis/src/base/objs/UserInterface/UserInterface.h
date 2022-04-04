@@ -191,6 +191,8 @@ namespace Isis {
       QString GetInfoFileName();
       bool GetInfoFlag();
 
+      QString buildNewCommandLineFromPvl(Pvl temp);
+
       void SetBatchList(int i);
       void SetErrorList(int i);
 

@@ -518,10 +518,11 @@ namespace Isis {
       }
 
     }
-    // might be where I want to add my thing, ask aml what it is
-    Pvl temp;
-    CommandLine(temp);
-    cout << "look here, pvl should have the info we want\n\n" << temp << endl;
+    if(usedDashLast == true){
+      Pvl temp;
+      CommandLine(temp);
+      cout << buildNewCommandLineFromPvl(temp) << endl;
+    }
 
     // Can't use the batchlist with the gui, save, last or restore option
     if ( BatchListSize() != 0 && (p_interactive || usedDashLast || p_saveFile != ""
@@ -539,7 +540,20 @@ namespace Isis {
     }
   }
 
+  QString UserInterface::buildNewCommandLineFromPvl(Pvl temp){
+    PvlGroup group = temp.group(0);
+    int numKeywords = group.keywords();
+    QString returnVal = ""; 
 
+    for(int i = 0; i < numKeywords; i++){
+      PvlKeyword key = group[i];
+      returnVal += key.name();
+      returnVal += "=";
+      returnVal += QString(key);
+      returnVal += " ";
+    }
+    return returnVal;
+  }
   /**
    * Loads the previous history for the program
    *
