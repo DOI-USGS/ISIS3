@@ -1693,4 +1693,14 @@ namespace Isis {
       testCube = new Cube(testPath, "rw");
     }
   }
+
+void NearMsiCameraCube::Init() {
+    TempTestingFiles::SetUp();
+
+    QString msicube = "m0155881376f3_2p_cif_dbl.cub";
+    QString testPath = tempDir.path() + "/" + msicube;
+    QFile::copy("data/near/msicamera/"+msicube, testPath);
+    testCube = new Cube(testPath, "rw");
+
+  }
 }

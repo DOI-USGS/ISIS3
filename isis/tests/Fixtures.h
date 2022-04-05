@@ -395,6 +395,12 @@ class ClipperPbCube : public TempTestingFiles {
     void setInstrument(QString instrumentId);
 };
 
+class NearMsiCameraCube : public TempTestingFiles {
+  protected:
+    Cube *testCube;
+    void Init();
+};
+
 }
 
 #endif
