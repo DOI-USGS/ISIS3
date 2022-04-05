@@ -1577,7 +1577,7 @@ TEST(TgoCassisModuleTests, TgoCassisMapProjectedReingested) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis on red framelet.
-  QString outputCubeName = prefix.path() + "/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.cub";
+  QString outputCubeName = "/Users/acpaquette/Desktop/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.cub";
   QString digestedFile = prefix.path() + "/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.equi.img";
   QVector<QString> tgocassis2isisArgs = {
                         "from=data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.xml",
@@ -1591,7 +1591,10 @@ TEST(TgoCassisModuleTests, TgoCassisMapProjectedReingested) {
   }
 
   // run spiceinit on framelet.
-  QVector<QString> spiceinitArgs = {"from=" + outputCubeName, "ckp=t", "spkp=t"};
+  QVector<QString> spiceinitArgs = {"from=" + outputCubeName,
+                                    "ck=data/tgoCassis/mapProjectedReingested/*.xc",
+                                    "spk=data/tgoCassis/mapProjectedReingested/*.xsp" 
+                                    "ckp=t", "spkp=t"};
   UserInterface spiceinitUi(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitUi);
