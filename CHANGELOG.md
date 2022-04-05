@@ -38,7 +38,7 @@ release.
 ### Changed
 
 ### Added
-- Improved functionality of msi2isis and MsiCamera model to support new Eros dataset, including support for Gaskell's SUMSPICE files that adjust timing, pointing and spacecraft position ephemeris. [#4886] (https://github.com/USGS-Astrogeology/ISIS3/issues/4886)
+- Improved functionality of msi2isis and MsiCamera model to support new Eros dataset, including support for Gaskell's SUMSPICE files that adjust timing, pointing and spacecraft position ephemeris. [#4886](https://github.com/USGS-Astrogeology/ISIS3/issues/4886)
 
 ### Deprecated
 

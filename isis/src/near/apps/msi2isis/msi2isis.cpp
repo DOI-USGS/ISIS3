@@ -150,7 +150,6 @@ namespace Isis {
     else {
         // Image has the proper expanded size
         enlargeProcessOutCube = importProcessOutCube;
-        // inatt.addAttributes(enlargeProcessOutCube);
     }
 
     // The third (last) process will flip the image lines and set the 33 pixels
@@ -201,13 +200,8 @@ namespace Isis {
     int trim = 33;         // Default trim buffer size
     int numSamples = outputCube->sampleCount();
 
-    if ( ui.GetBoolean("TRIM") ) { // TRIM == TRUE
-        // default trim options
-      trim = 33;         // Default trim buffer size
-    }
-    else {  // TRIM == FALSE
-        // Effectively turns off trimming
-      trim = 0;          // No grim lines/samples
+    if ( !ui.GetBoolean("TRIM") ) { // TRIM=false
+      trim = 0;                     // No trimming of lines/samples
     }
 
 //************************************************************************
