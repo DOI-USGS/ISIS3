@@ -32,7 +32,10 @@ namespace Isis {
    *                           does not correct for temperature. If the
    *                           temperature-dependent ik is used, the code at the
    *                           end of this file should replace the
-   *                           LoadCache() call in the constructor.
+   *                           LoadCache() call in the constructor
+   *   @history 2019-08-15 Kris Becker - Corrected format of the start/stop
+   *                           SCLK times to make it work with sumspice.
+   *
    */
   MsiCamera::MsiCamera(Cube &cube) : FramingCamera(cube) {
     m_instrumentNameLong = "Multi-Spectral Imager";
@@ -49,7 +52,18 @@ namespace Isis {
     // Get the start time in et
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    double et = iTime((QString)inst["StartTime"]).Et();
+    // This corrects the format of the SCLK times. Updates by
+    // UA correct the time on the label in msi2isis, this is
+    // designed to be backward compatability. Note the updated
+    // version of the msi2isis ensure updates by sumspice work
+    // properly - ie., SpacecraftClockStartCount must be valid.
+    // KJB/UA 2019-08-25
+    QString stime = inst["SpacecraftClockStartCount"];
+    stime.remove('.');  //  Backward compatability!!
+
+    iTime etStart = getClockTime(stime);
+    double et = etStart.Et();
+
 
     // divide exposure duration keyword value by 1000 to convert to seconds
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
