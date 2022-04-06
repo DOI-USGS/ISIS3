@@ -397,8 +397,10 @@ class ClipperPbCube : public TempTestingFiles {
 
 class NearMsiCameraCube : public TempTestingFiles {
   protected:
-    Cube *testCube;
-    void Init();
+    // Cube *testCube;
+    std::unique_ptr<Cube> testCube;
+    void SetUp() override;
+    void TearDown() override;
 };
 
 }

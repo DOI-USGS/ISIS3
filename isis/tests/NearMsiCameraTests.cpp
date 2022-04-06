@@ -7,7 +7,6 @@
 using namespace Isis;
 
 TEST_F(NearMsiCameraCube, NearMsiCameraTest) {
-  Init();
 
   MsiCamera *cam = (MsiCamera *)testCube->camera();
 

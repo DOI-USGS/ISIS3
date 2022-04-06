@@ -1694,13 +1694,13 @@ namespace Isis {
     }
   }
 
-void NearMsiCameraCube::Init() {
+  void NearMsiCameraCube::SetUp() {
     TempTestingFiles::SetUp();
+    QString msicube = "data/near/msicamera/m0155881376f3_2p_cif_dbl.cub";
+    testCube.reset( new Cube(msicube, "r") ) ;
+  }
 
-    QString msicube = "m0155881376f3_2p_cif_dbl.cub";
-    QString testPath = tempDir.path() + "/" + msicube;
-    QFile::copy("data/near/msicamera/"+msicube, testPath);
-    testCube = new Cube(testPath, "rw");
-
+  void NearMsiCameraCube::TearDown() {
+    testCube.reset();
   }
 }
