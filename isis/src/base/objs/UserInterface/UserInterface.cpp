@@ -521,7 +521,7 @@ namespace Isis {
     if(usedDashLast == true){
       Pvl temp;
       CommandLine(temp);
-      cout << buildNewCommandLineFromPvl(temp) << endl;
+      cout << BuildNewCommandLineFromPvl(temp) << endl;
     }
 
     // Can't use the batchlist with the gui, save, last or restore option
@@ -540,7 +540,7 @@ namespace Isis {
     }
   }
 
-  QString UserInterface::buildNewCommandLineFromPvl(Pvl temp){
+  QString UserInterface::BuildNewCommandLineFromPvl(Pvl temp){
     PvlGroup group = temp.group(0);
     int numKeywords = group.keywords();
     QString returnVal = ""; 
@@ -609,8 +609,6 @@ namespace Isis {
             }
           }
 
-          // cout << buildNewCommandLine(commandline) << endl;
-          // buildNewCommandLineFromPvl();
           return;
         }
 
