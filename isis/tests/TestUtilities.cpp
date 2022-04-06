@@ -250,4 +250,33 @@ namespace Isis {
         ::testing::Field(&csm::EcefCoord::z, ::testing::DoubleNear(expected.z, 0.0001))
     );
   }
+
+  // Writes binary kernels to the data area. Unsure of the best way to handle
+  // clean up. Didn't want to dive into the rabbit hole of C++ alternatives
+  // to python yeild statements
+  QString generateBinaryKernels(QVector<QString> kernelList) {
+    QString binaryKernelList("(");
+    for (QString kernel : kernelList) {
+      FileName file(kernel);
+      QString kernelExtension = file.extension();
+      QString pathToBinaryKernel = file.path() + "/" + file.baseName() + "." + kernelExtension.replace('x', 'b');
+      FileName binaryFile(pathToBinaryKernel);
+
+      if (kernelExtension.contains("x") && !binaryFile.fileExists()) {
+        QString path = file.expanded();
+        QString command = "tobin " + path;
+        int status = system(command.toLatin1().data());
+
+        if (status != 0) {
+          QString msg = "Executing command [" + command +
+                        "] failed with return status [" + toString(status) + "]";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+        }
+      }
+      binaryKernelList += binaryFile.expanded();
+      binaryKernelList += ", ";
+    }
+    binaryKernelList += ")";
+    return binaryKernelList;
+  }
 }

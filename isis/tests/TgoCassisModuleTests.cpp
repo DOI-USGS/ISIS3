@@ -1590,11 +1590,20 @@ TEST(TgoCassisModuleTests, TgoCassisMapProjectedReingested) {
     FAIL() << "Unable to run tgocassis2isis on image: " << e.what() << std::endl;
   }
 
+  // Could probably be replaced with a glob
+  QVector<QString> ckKernels = {QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_0_sliced_-143410.xc"),
+                                QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_1_sliced_-143410.xc"),
+                                QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_0_sliced_-143000.xc"),
+                                QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_1_sliced_-143000.xc")};
+  QVector<QString> spkKernels = {QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_0.xsp"),
+                                 QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_1.xsp")};
+  QString binaryCkKernels = generateBinaryKernels(ckKernels);
+  QString binarySpkKernels = generateBinaryKernels(spkKernels);
+
   // run spiceinit on framelet.
   QVector<QString> spiceinitArgs = {"from=" + outputCubeName,
-                                    "ck=data/tgoCassis/mapProjectedReingested/*.xc",
-                                    "spk=data/tgoCassis/mapProjectedReingested/*.xsp" 
-                                    "ckp=t", "spkp=t"};
+                                    "ck=" + binaryCkKernels,
+                                    "spk=" + binarySpkKernels};
   UserInterface spiceinitUi(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitUi);
