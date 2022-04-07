@@ -1696,8 +1696,18 @@ namespace Isis {
 
   void NearMsiCameraCube::SetUp() {
     TempTestingFiles::SetUp();
-    QString msicube = "data/near/msicamera/m0155881376f3_2p_cif_dbl.cub";
-    testCube.reset( new Cube(msicube, "r") ) ;
+
+    json isd;
+    Pvl label;
+
+    std::ifstream isdFile("data/near/msicamera/m0155881376f3_2p_cif_dbl.isd");
+    std::ifstream cubeLabel("data/near/msicamera/m0155881376f3_2p_cif_dbl.pvl");
+
+    isdFile >> isd;
+    cubeLabel >> label;
+
+    testCube.reset( new Cube() ) ;
+    testCube->fromIsd(tempDir.path() + "/m0155881376f3_2p_cif_dbl.cub", label, isd, "rw");
   }
 
   void NearMsiCameraCube::TearDown() {
