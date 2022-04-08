@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="shadowcam2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+    <brief>
+      Import an SHADOWCAM  image as an Isis cube
+    </brief>
+
+    <description>
+        This program takes a raw EDR image from the Korean Pathfinder Lunar Orbiter ShadowCam TDI Camera and produces an Isis cube containing the image data. ShadowCam images in the CDR or RDR format should be ingested using pds2isis.
+    </description>
+
+    <history>
+        <change name="Victor Silva" date="2022-03-16">
+            Original Version
+        </change>
+    </history>
+
+    <category>
+      <missionItem>Korean Pathfinder Lunar Orbiter</missionItem>
+    </category>
+
+    <groups>
+        <group name="Files">
+            <parameter name="FROM">
+                <type>filename</type>
+                <fileMode>input</fileMode>
+                <brief>
+                    Input file
+                </brief>
+                <description>
+                    The image to be processed
+                </description>
+                <filter>
+                    *.img
+                </filter>
+            </parameter>
+
+            <parameter name="TO">
+                <type>cube</type>
+                <fileMode>output</fileMode>
+                <brief>
+                    Output cube
+                </brief>
+                <description>
+                    This is the resultant cube containing the decompanded and tiled image and label data.
+                </description>
+                <filter>
+                    *.cub
+                </filter>
+            </parameter>
+        </group>
+    </groups>
+</application>
