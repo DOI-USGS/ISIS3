@@ -67,7 +67,8 @@ namespace Isis {
   ::testing::Matcher<const csm::ImageCoord&> MatchImageCoord(const csm::ImageCoord &expected);
   ::testing::Matcher<const csm::EcefCoord&> MatchEcefCoord(const csm::EcefCoord &expected);
 
-  QString generateBinaryKernels(QVector<QString> kernelList);
+  QVector<QString> generateBinaryKernels(QVector<QString> kernelList);
+  QString fileListToString(QVector<QString> fileList);
 }
 
 #endif

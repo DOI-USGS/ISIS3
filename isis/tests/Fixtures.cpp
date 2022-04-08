@@ -1189,7 +1189,7 @@ namespace Isis {
   }
 
 
- void OsirisRexCube::setInstrument(QString ikid, QString instrumentId) {
+  void OsirisRexCube::setInstrument(QString ikid, QString instrumentId) {
     delete testCube;
     testCube = new Cube();
 
@@ -1692,5 +1692,42 @@ namespace Isis {
       QFile::copy("data/clipper/ClipperWacPb.cub", testPath);
       testCube = new Cube(testPath, "rw");
     }
+  }
+
+  void tgoCassisKernels::SetUpTestSuite() {
+    QVector<QString> ckKernels = {QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_0_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_1_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_0_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_1_sliced_-143000.xc")};
+    QVector<QString> spkKernels = {QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_0.xsp"),
+                                   QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_1.xsp")};
+
+    // variables defined in TgoCassisModuleTests
+    if (binaryCkKernels.size() == 0) {
+      binaryCkKernels = generateBinaryKernels(ckKernels);
+      binarySpkKernels = generateBinaryKernels(spkKernels);
+
+      binaryCkKernelsAsString = fileListToString(binaryCkKernels);
+      binarySpkKernelsAsString = fileListToString(binarySpkKernels);
+    }
+  }
+
+  void tgoCassisKernels::TearDownTestSuite() {
+    for (QString kernel : binaryCkKernels) {
+      if( remove( kernel.toStdString().c_str() ) != 0 ) {
+        perror( "Error deleting file" );
+      }
+    }
+
+    for (QString kernel : binarySpkKernels) {
+      if( remove( kernel.toStdString().c_str() ) != 0 ) {
+        perror( "Error deleting file" );
+      }
+    }
+
+    binaryCkKernels = {};
+    binarySpkKernels = {};
+    binaryCkKernelsAsString = "";
+    binarySpkKernelsAsString = "";
   }
 }

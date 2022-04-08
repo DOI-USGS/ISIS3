@@ -30,6 +30,12 @@ static QString MOSRANGE_XML = FileName("$ISISROOT/bin/xml/mosrange.xml").expande
 static QString CAM2MAP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
 static QString CUBEIT_XML = FileName("$ISISROOT/bin/xml/cubeit.xml").expanded();
 
+QVector<QString> tgoCassisKernels::binaryCkKernels = {};
+QVector<QString> tgoCassisKernels::binarySpkKernels = {};
+
+QString tgoCassisKernels::binaryCkKernelsAsString = "";
+QString tgoCassisKernels::binarySpkKernelsAsString = "";
+
 TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   QTemporaryDir prefix;
 
@@ -1573,11 +1579,12 @@ TEST(TgoCassisModuleTests, TgoCassisColorMosaic) {
   EXPECT_NEAR(hist->StandardDeviation(), 0.0054483425167489693, 0.0001);
 }
 
-TEST(TgoCassisModuleTests, TgoCassisMapProjectedReingested) {
+
+TEST_F(tgoCassisKernels, TgoCassisMapProjectedReingested) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis on red framelet.
-  QString outputCubeName = "/Users/acpaquette/Desktop/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.cub";
+  QString outputCubeName = prefix.path() + "CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.cub";
   QString digestedFile = prefix.path() + "/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.equi.img";
   QVector<QString> tgocassis2isisArgs = {
                         "from=data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.xml",
@@ -1590,20 +1597,10 @@ TEST(TgoCassisModuleTests, TgoCassisMapProjectedReingested) {
     FAIL() << "Unable to run tgocassis2isis on image: " << e.what() << std::endl;
   }
 
-  // Could probably be replaced with a glob
-  QVector<QString> ckKernels = {QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_0_sliced_-143410.xc"),
-                                QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_1_sliced_-143410.xc"),
-                                QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_0_sliced_-143000.xc"),
-                                QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_1_sliced_-143000.xc")};
-  QVector<QString> spkKernels = {QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_0.xsp"),
-                                 QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_1.xsp")};
-  QString binaryCkKernels = generateBinaryKernels(ckKernels);
-  QString binarySpkKernels = generateBinaryKernels(spkKernels);
-
   // run spiceinit on framelet.
   QVector<QString> spiceinitArgs = {"from=" + outputCubeName,
-                                    "ck=" + binaryCkKernels,
-                                    "spk=" + binarySpkKernels};
+                                    "ck=" + binaryCkKernelsAsString,
+                                    "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitUi(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitUi);
