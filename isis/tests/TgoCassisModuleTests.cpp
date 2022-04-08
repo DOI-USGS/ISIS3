@@ -1617,9 +1617,9 @@ TEST_F(tgoCassisKernels, TgoCassisMapProjectedReingested) {
                                   "map=" + mapFile,
                                   "pixres=mpp",
                                   "resolution=200"};
-  UserInterface cam2mapPan(CAM2MAP_XML, cam2mapArgs);
+  UserInterface cam2mapUi(CAM2MAP_XML, cam2mapArgs);
   try {
-    cam2map(cam2mapPan);
+    cam2map(cam2mapUi);
   }
   catch (IException &e) {
     FAIL() << "Unable to run cam2map on image: " << e.what() << std::endl;
