@@ -161,7 +161,7 @@ Deborah Lee Soltesz
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="">
+            <a href="../documents/DeveloperAddFeature/DeveloperAddFeature.html">
             Adding a New Feature</a>
           </th>
           <td>
@@ -170,7 +170,7 @@ Deborah Lee Soltesz
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="">
+            <a href="../documents/DeveloperModifyIsis/DeveloperModifyIsis.html">
             Modifying an Existing Feature</a>
           </th>
           <td>
