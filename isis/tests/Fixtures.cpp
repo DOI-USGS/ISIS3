@@ -1694,6 +1694,28 @@ namespace Isis {
     }
   }
 
+
+  void NearMsiCameraCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    json isd;
+    Pvl label;
+
+    std::ifstream isdFile("data/near/msicamera/m0155881376f3_2p_cif_dbl.isd");
+    std::ifstream cubeLabel("data/near/msicamera/m0155881376f3_2p_cif_dbl.pvl");
+
+    isdFile >> isd;
+    cubeLabel >> label;
+
+    testCube.reset( new Cube() ) ;
+    testCube->fromIsd(tempDir.path() + "/m0155881376f3_2p_cif_dbl.cub", label, isd, "rw");
+  }
+
+  void NearMsiCameraCube::TearDown() {
+    testCube.reset();
+  }
+
+
   void tgoCassisKernels::SetUpTestSuite() {
     QVector<QString> ckKernels = {QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_0_sliced_-143410.xc"),
                                   QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_1_sliced_-143410.xc"),

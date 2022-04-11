@@ -395,6 +395,14 @@ class ClipperPbCube : public TempTestingFiles {
     void setInstrument(QString instrumentId);
 };
 
+class NearMsiCameraCube : public TempTestingFiles {
+  protected:
+    // Cube *testCube;
+    std::unique_ptr<Cube> testCube;
+    void SetUp() override;
+    void TearDown() override;
+};
+
 class tgoCassisKernels : public ::testing::Test {
   protected:
     static void SetUpTestSuite();

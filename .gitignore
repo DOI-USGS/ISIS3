@@ -54,6 +54,10 @@ install/
 !isis/src/docsys/Object/build
 !isis/src/docsys/Application/build
 
+# Unignore msi2isis label files in data area as input files require these
+!isis/tests/data/near/msi2isis/*.lbl
+!isis/tests/data/near/msicamera/*.cub
+
 # Ignore vs code
 .vscode
 
