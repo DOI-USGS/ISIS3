@@ -1765,3 +1765,249 @@ TEST(TgoCassisModuleTests, TgoCassisSingleColorMosaicReingest) {
   EXPECT_EQ(hist->ValidPixels(), 661);
   EXPECT_NEAR(hist->StandardDeviation(), 0.0022430344774779496, 0.0001);
 }
+
+
+TEST(TgoCassisModuleTests, TgoCassisUncontrolledSingleColorMosaic) {
+  QTemporaryDir prefix;
+
+  // run tgocassis2isis and spiceinit on pan framelet.
+  QString panFileName = prefix.path() + "/panframelet.cub";
+  QVector<QString> tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-PAN-00005-B1.xml",
+                                         "to=" + panFileName};
+
+  UserInterface tgocassis2isisPan(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
+  }
+
+  QVector<QString> spiceinitArgs = {"from=" + panFileName,  "ckp=t", "spkp=t"};
+  UserInterface spiceinitPan(SPICEINIT_XML, spiceinitArgs);
+  try {
+    spiceinit(spiceinitPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run spiceinit on pan image: " << e.what() << std::endl;
+  }
+
+  // run mosrange on cube list
+  FileList *cubeList = new FileList();
+  cubeList->append(panFileName);
+
+  QString cubeListFile = prefix.path() + "/cubelist.lis";
+  cubeList->write(cubeListFile);
+
+  QString mapFile = prefix.path() + "/equi.map";
+  QVector<QString> mosrangeArgs = {"fromlist=" + cubeListFile, "to=" + mapFile};
+  UserInterface mosrangeOptions(MOSRANGE_XML, mosrangeArgs);
+
+  try {
+    mosrange(mosrangeOptions);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run mosrange with cube list: " << e.what() << std::endl;
+  }
+
+  // run cam2map and cassismos on pan cube
+  QString panEquiFile = prefix.path() + "/pan_equi.cub";
+  QVector<QString> cam2mapArgs = {"from=" + panFileName,
+                                  "to=" + panEquiFile,
+                                  "map=" + mapFile,
+                                  "defaultrange=map",
+                                  "pixres=mpp",
+                                  "resolution=200"};
+  UserInterface cam2mapPan(CAM2MAP_XML, cam2mapArgs);
+  try {
+    cam2map(cam2mapPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run cam2map on pan image: " << e.what() << std::endl;
+  }
+
+  FileList *mosaicList = new FileList();
+  mosaicList->append(panEquiFile);
+  QString listFile = prefix.path() + "/cubelist.lis";
+  mosaicList->write(listFile);
+
+  QString mosaicCubeFile = prefix.path() + "/mosaic.cub";
+  QVector<QString> cassismosArgs = {"fromlist=" + listFile, "to=" + mosaicCubeFile};
+  UserInterface options(MOS_XML, cassismosArgs);
+  try {
+    tgocassismos(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassismos on mosaic list: " << e.what() << std::endl;
+  }
+
+  // Mosaic Cube
+  Cube mosCube(mosaicCubeFile);
+  Pvl *outLabel = mosCube.label();
+
+  std::istringstream arss(R"(
+    Group = Archive
+        DataSetId                    = TBD
+        ProductVersionId             = UNK
+        ProducerId                   = UBE
+        ProducerName                 = "Nicolas Thomas"
+        ProductCreationTime          = 2017-10-03T10:50:12
+        FileName                     = CAS-MCO-2016-11-26T22.50.27.381-PAN-00005--
+                                       B1
+        ScalingFactor                = 1.00
+        Offset                       = 0.00
+        PredictMaximumExposureTime   = 1.5952 <ms>
+        CassisOffNadirAngle          = 10.032 <deg>
+        PredictedRepetitionFrequency = 367.5 <ms>
+        GroundTrackVelocity          = 3.4686 <km/s>
+        ForwardRotationAngle         = 52.703 <deg>
+        SpiceMisalignment            = 185.422 <deg>
+        FocalLength                  = 0.8770 <m>
+        FNumber                      = 6.50
+        ExposureTimeCommand          = 150
+        FrameletNumber               = 5
+        NumberOfFramelets            = 40
+        ImageFrequency               = 400000 <ms>
+        NumberOfWindows              = 6
+        UniqueIdentifier             = 100799268
+        UID                          = 100799268
+        ExposureTimestamp            = 2f015435767e275a
+        ExposureTimePEHK             = 1.440e-003 <ms>
+        PixelsPossiblySaturated      = 29.17
+        IFOV                         = 1.140e-005
+        IFOVUnit                     = rad/px
+        FiltersAvailable             = "BLU RED NIR PAN"
+        FocalLengthUnit              = M
+        TelescopeType                = "Three-mirror anastigmat with powered fold
+                                        mirror"
+        DetectorDescription          = "2D Array"
+        PixelHeight                  = 10.0
+        PixelHeightUnit              = MICRON
+        PixelWidth                   = 10.0
+        PixelWidthUnit               = MICRON
+        DetectorType                 = 'SI CMOS HYBRID (OSPREY 2K)'
+        ReadNoise                    = 61.0
+        ReadNoiseUnit                = ELECTRON
+        MissionPhase                 = MCO
+        SubInstrumentIdentifier      = 61.0
+        WindowCount                  = 0
+        Window1Binning               = 0
+        Window1StartSample           = 0
+        Window1EndSample             = 2047
+        Window1StartLine             = 354
+        Window1EndLine               = 633
+        Window2Binning               = 0
+        Window2StartSample           = 0
+        Window2EndSample             = 2047
+        Window2StartLine             = 712
+        Window2EndLine               = 966
+        Window3Binning               = 1
+        Window3StartSample           = 0
+        Window3EndSample             = 2047
+        Window3StartLine             = 1048
+        Window3EndLine               = 1302
+        Window4Binning               = 0
+        Window4StartSample           = 1024
+        Window4EndSample             = 1087
+        Window4StartLine             = 1409
+        Window4EndLine               = 1662
+        Window5Binning               = 0
+        Window5StartSample           = 640
+        Window5EndSample             = 767
+        Window5StartLine             = 200
+        Window5EndLine               = 208
+        Window6Binning               = 0
+        Window6StartSample           = 1280
+        Window6EndSample             = 1407
+        Window6StartLine             = 1850
+        Window6EndLine               = 1858
+        YearDoy                      = 2016331
+        ObservationId                = CRUS_049218_201_0
+      End_Group
+  )");
+
+  PvlGroup truthArchiveGroup;
+  arss >> truthArchiveGroup;
+
+  PvlGroup &archiveGroup = outLabel->findGroup("Archive", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, archiveGroup, truthArchiveGroup);
+
+  std::istringstream bbss(R"(
+    Group = BandBin
+      FilterName = PAN
+      Center     = 677.4 <nm>
+      Width      = 231.5 <nm>
+      NaifIkCode = -143421
+    End_Group
+  )");
+
+  PvlGroup truthBandBinGroup;
+  bbss >> truthBandBinGroup;
+
+  PvlGroup &bandBinGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, bandBinGroup, truthBandBinGroup);
+
+  std::istringstream map(R"(
+    Group = Mapping
+      ProjectionName       = Equirectangular
+      CenterLongitude      = 266.15724842165
+      TargetName           = Mars
+      EquatorialRadius     = 3396190.0 <meters>
+      PolarRadius          = 3376200.0 <meters>
+      LatitudeType         = Planetocentric
+      LongitudeDirection   = PositiveEast
+      LongitudeDomain      = 360
+      MinimumLatitude      = 2.465960911303
+      MaximumLatitude      = 2.702892431819
+      MinimumLongitude     = 266.13827437353
+      MaximumLongitude     = 266.17622246977
+      UpperLeftCornerX     = -1200.0 <meters>
+      UpperLeftCornerY     = 160400.0 <meters>
+      PixelResolution      = 200.0 <meters/pixel>
+      Scale                = 296.36990921958 <pixels/degree>
+      CenterLatitude       = 2.584426671561
+      CenterLatitudeRadius = 3396148.9945915
+    End_Group
+  )");
+
+  PvlGroup truthMappingGroup;
+  map >> truthMappingGroup;
+
+  PvlGroup &mappingGroup = outLabel->findGroup("Mapping", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, mappingGroup, truthMappingGroup);
+
+  std::istringstream mos(R"(
+    Group = Mosaic
+      SpacecraftName            = "TRACE GAS ORBITER"
+      InstrumentId              = CaSSIS
+      ObservationId             = CRUS_049218_201_0
+      StartTime                 = 2016-11-26T22:50:27.381
+      StopTime                  = 2016-11-26T22:50:27.382
+      SpacecraftClockStartCount = 2f015435767e275a
+      IncidenceAngle            = 44.903865525262 <degrees>
+      EmissionAngle             = 11.357161002382 <degrees>
+      PhaseAngle                = 44.334625021078 <degrees>
+      LocalTime                 = 14.425706195493
+      SolarLongitude            = 269.1366003982 <degrees>
+      SubSolarAzimuth           = 139.52581194362 <degrees>
+      NorthAzimuth              = 270.0 <degrees>
+    End_Group
+  )");
+
+  PvlGroup truthMosaicGroup;
+  mos >> truthMosaicGroup;
+
+  PvlGroup &mosaicGroup = outLabel->findGroup("Mosaic", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, mosaicGroup, truthMosaicGroup);
+
+  Histogram *hist = mosCube.histogram();
+
+  EXPECT_NEAR(hist->Average(), 0.20770993546981495, 0.0001);
+  EXPECT_NEAR(hist->Sum(), 137.29626734554768, 0.0001);
+  EXPECT_EQ(hist->ValidPixels(), 661);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.0022430344774779496, 0.0001);
+}
