@@ -395,6 +395,18 @@ class ClipperPbCube : public TempTestingFiles {
     void setInstrument(QString instrumentId);
 };
 
+class tgoCassisKernels : public ::testing::Test {
+  protected:
+    static void SetUpTestSuite();
+    static void TearDownTestSuite();
+
+    static QVector<QString> binaryCkKernels;
+    static QVector<QString> binarySpkKernels;
+
+    static QString binaryCkKernelsAsString;
+    static QString binarySpkKernelsAsString;
+};
+
 }
 
 #endif

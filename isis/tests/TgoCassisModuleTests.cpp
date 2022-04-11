@@ -30,6 +30,12 @@ static QString MOSRANGE_XML = FileName("$ISISROOT/bin/xml/mosrange.xml").expande
 static QString CAM2MAP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
 static QString CUBEIT_XML = FileName("$ISISROOT/bin/xml/cubeit.xml").expanded();
 
+QVector<QString> tgoCassisKernels::binaryCkKernels = {};
+QVector<QString> tgoCassisKernels::binarySpkKernels = {};
+
+QString tgoCassisKernels::binaryCkKernelsAsString = "";
+QString tgoCassisKernels::binarySpkKernelsAsString = "";
+
 TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
   QTemporaryDir prefix;
 
@@ -1571,7 +1577,147 @@ TEST(TgoCassisModuleTests, TgoCassisColorMosaic) {
   EXPECT_NEAR(hist->Sum(), 183.71230971813202, 0.0001);
   EXPECT_EQ(hist->ValidPixels(), 614);
   EXPECT_NEAR(hist->StandardDeviation(), 0.0054483425167489693, 0.0001);
+}
 
+
+TEST_F(tgoCassisKernels, TgoCassisMapProjectedReingested) {
+  QTemporaryDir prefix;
+
+  // run tgocassis2isis on red framelet.
+  QString outputCubeName = prefix.path() + "CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.cub";
+  QString digestedFile = prefix.path() + "/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.equi.img";
+  QVector<QString> tgocassis2isisArgs = {
+                        "from=data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.xml",
+                        "to=" + outputCubeName};
+  UserInterface tgocassis2isisUi(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisUi);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on image: " << e.what() << std::endl;
+  }
+
+  // run spiceinit on framelet.
+  QVector<QString> spiceinitArgs = {"from=" + outputCubeName,
+                                    "ck=" + binaryCkKernelsAsString,
+                                    "spk=" + binarySpkKernelsAsString};
+  UserInterface spiceinitUi(SPICEINIT_XML, spiceinitArgs);
+  try {
+    spiceinit(spiceinitUi);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run spiceinit on image: " << e.what() << std::endl;
+  }
+
+  // run cam2map on pan cube
+  QString projCubeName = prefix.path() + "/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.equi.cub";
+  QString mapFile = "data/tgoCassis/mapProjectedReingested/equi.map";
+  QVector<QString> cam2mapArgs = {"from=" + outputCubeName,
+                                  "to=" + projCubeName,
+                                  "map=" + mapFile,
+                                  "pixres=mpp",
+                                  "resolution=200"};
+  UserInterface cam2mapUi(CAM2MAP_XML, cam2mapArgs);
+  try {
+    cam2map(cam2mapUi);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run cam2map on image: " << e.what() << std::endl;
+  }
+
+  // run tgocassisrdrgen on image.
+  QVector<QString> rdrgenArgs = {"from=" + projCubeName,  "to=" + digestedFile};
+  UserInterface rdrgenUi(RDRGEN_XML, rdrgenArgs);
+  try {
+    tgocassisrdrgen(rdrgenUi);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassisrdrgen on image: " << e.what() << std::endl;
+  }
+
+  // run tgocassis2isis on digested red framelet.
+  QString digestedXML = prefix.path() + "/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.equi.xml";
+  QString reingestedFile = prefix.path() + "/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.equi.reingested.cub";
+  tgocassis2isisArgs = {"from=" + digestedXML, "to=" + reingestedFile};
+  UserInterface tgocassis2isisReingest(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisReingest);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on red image: " << e.what() << std::endl;
+  }
+
+  // RED Cube
+  Cube reingestCube(reingestedFile);
+  Pvl *reingestLabel = reingestCube.label();
+
+  // Instrument Group
+  std::istringstream iss(R"(
+    Group = Instrument
+      SpacecraftName   = "TRACE GAS ORBITER"
+      InstrumentId     = CaSSIS
+      Expanded         = 1
+      TargetName       = Mars
+      StartTime        = 2018-05-05T23:11:48.767
+      ExposureDuration = 1.488e-003 <seconds>
+      Filter           = RED
+      Expanded         = 1
+      SummingMode      = 0
+    End_Group
+  )");
+
+  PvlGroup truthInstGroup;
+  iss >> truthInstGroup;
+  PvlGroup &instGroup = reingestLabel->findGroup("Instrument", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, instGroup, truthInstGroup);
+
+  // Archive Group
+  std::istringstream arss(R"(
+    Group = Archive
+      ObservationId    = MY34_002002_211_2
+      DataSetId        = urn:esa:psa:em16_tgo_cas:data_projected:my34_002002_211_2
+      ProductVersionId = 1.0
+      FileName         = CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1.equi.img
+      ScalingFactor    = 1.0
+      YearDoy          = 2018125
+    End_Group
+  )");
+
+  PvlGroup truthArchiveGroup;
+  arss >> truthArchiveGroup;
+
+  PvlGroup &archiveGroup = reingestLabel->findGroup("Archive", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, archiveGroup, truthArchiveGroup);
+
+  // BandBin Group
+  std::istringstream bbss(R"(
+    Group = BandBin
+      FilterName = RED
+      Center     = 840 <nm>
+      Width      = 100 <nm>
+      NaifIkCode = -143422
+    End_Group
+  )");
+
+  PvlGroup truthBandBinGroup;
+  bbss >> truthBandBinGroup;
+
+  PvlGroup &bandBinGroup = reingestLabel->findGroup("BandBin", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, bandBinGroup, truthBandBinGroup);
+
+  // Kernels Group
+  PvlGroup &kernels = reingestLabel->findGroup("Kernels", Pvl::Traverse);
+  EXPECT_EQ(int(kernels["NaifFrameCode"]), -143400);
+
+  Histogram *hist = reingestCube.histogram();
+
+  EXPECT_NEAR(hist->Average(), 0.11603580358533563, 0.0001);
+  EXPECT_NEAR(hist->Sum(), 26.108894683420658, 0.0001);
+  EXPECT_EQ(hist->ValidPixels(), 225);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.0031002995166270952, 0.0001);
 }
 
 
