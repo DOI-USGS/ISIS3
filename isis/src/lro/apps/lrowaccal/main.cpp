@@ -336,7 +336,7 @@ void IsisMain () {
         vals.addValue(toString(g_iofResponsivity[i]));
     }
     else {
-      calgrp += PvlKeyword("RadiometricType", "AbsoluteRadiance", "W/m2/sr/um");
+      calgrp += PvlKeyword("RadiometricType", "AbsoluteRadiance");
       for (unsigned int i=0; i< g_radianceResponsivity.size(); i++)
         vals.addValue(toString(g_radianceResponsivity[i]));
     }
