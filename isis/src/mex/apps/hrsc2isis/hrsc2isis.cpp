@@ -15,12 +15,11 @@ find files of those names at the top level of this repository. **/
 #include "LineManager.h"
 #include "IException.h"
 #include "Application.h"
+#include "OriginalLabel.h"
 
 using namespace std;
 namespace Isis{
-  void ImportHrscStereoImage(ProcessImportPds &p, Pvl &label);
-  void ImportHrscStereoImage(ProcessImportPds &p, Pvl &label, UserInterface &ui);
-  void ImportHrscSrcImage(ProcessImportPds &p, Pvl &label);
+  void ImportHrscStereoImage(ProcessImportPds &p, Pvl &label, UserInterface &ui, Pvl &originalLab);
   void ImportHrscSrcImage(ProcessImportPds &p, Pvl &label, UserInterface &ui);
 
   void IgnoreData(Isis::Buffer &buf);
@@ -85,46 +84,11 @@ namespace Isis{
       ImportHrscSrcImage(p, label, ui);
     }
     else {
-      ImportHrscStereoImage(p, label, ui);
+      ImportHrscStereoImage(p, label, ui, label);
     }
 
 
   }
-
-
-  // Import a PDS3, HRSC, SRC Camera image.
-  void ImportHrscSrcImage(ProcessImportPds &p, Pvl &label) {
-
-    outCube = p.SetOutputCube("TO");
-    p.StartProcess();
-
-    Pvl otherLabels;
-    TranslateHrscLabels(label, otherLabels);
-
-    if (otherLabels.hasGroup("Instrument") &&
-        (otherLabels.findGroup("Instrument").keywords() > 0)) {
-      outCube->putGroup(otherLabels.findGroup("Instrument"));
-    }
-
-    if (otherLabels.hasGroup("BandBin") &&
-        (otherLabels.findGroup("BandBin").keywords() > 0)) {
-      outCube->putGroup(otherLabels.findGroup("BandBin"));
-    }
-
-    if (otherLabels.hasGroup("Archive") &&
-        (otherLabels.findGroup("Archive").keywords() > 0)) {
-      outCube->putGroup(otherLabels.findGroup("Archive"));
-    }
-
-    if (otherLabels.hasGroup("Kernels") &&
-        (otherLabels.findGroup("Kernels").keywords() > 0)) {
-      outCube->putGroup(otherLabels.findGroup("Kernels"));
-    }
-
-    p.EndProcess();
-  }
-
-
 
   // Import a PDS3, HRSC, SRC Camera image.
   void ImportHrscSrcImage(ProcessImportPds &p, Pvl &label, UserInterface &ui) {
@@ -178,14 +142,7 @@ namespace Isis{
    * NOTE: Regardless of the input file's byte order IMAGE-SAMPLE_TYPE, the prefix data byte order
    * is always LSB.
    */
-
-  void ImportHrscStereoImage(ProcessImportPds &p, Pvl &label) {
-    UserInterface &ui = Application::GetUserInterface();
-    ImportHrscStereoImage(p, label, ui);
-  }
-
-
-  void ImportHrscStereoImage(ProcessImportPds &p, Pvl &label, UserInterface &ui) {
+  void ImportHrscStereoImage(ProcessImportPds &p, Pvl &label, UserInterface &ui, Pvl &originalLab) {
     lineInFile.clear();
     numLinesSkipped = 0;
 
@@ -292,6 +249,10 @@ namespace Isis{
         (otherLabels.findGroup("Kernels").keywords() > 0)) {
       outCube->putGroup(otherLabels.findGroup("Kernels"));
     }
+
+
+    OriginalLabel ol(originalLab);
+    outCube->write(ol);
 
     p.EndProcess();
 

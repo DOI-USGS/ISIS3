@@ -79,6 +79,7 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 - Fixed slow runs of automos when the priority was BAND. [#4793](https://github.com/USGS-Astrogeology/ISIS3/pull/4793)
 - Fixed qview crashing when attempting to load image DNs. [4818](https://github.com/USGS-Astrogeology/ISIS3/issues/4818)
 - Modified cnetcheck noLatLonCheck logic to correctly exclude ignored measures. [#4649](https://github.com/USGS-Astrogeology/ISIS3/issues/4649)
+- Fixed bug where the original label was not attached to stereo HRSC images on import [#4816](https://github.com/USGS-Astrogeology/ISIS3/issues/4816)
 
 ## [6.0.0] - 2021-08-27
 
