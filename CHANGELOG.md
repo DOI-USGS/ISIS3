@@ -44,6 +44,7 @@ release.
 
 ### Fixed
 - Modified cnetcheck noLatLonCheck logic to correctly exclude ignored measures. [#4649](https://github.com/USGS-Astrogeology/ISIS3/issues/4649)
+- Fixed bug where the original label was not attached to stereo HRSC images on import [#4816](https://github.com/USGS-Astrogeology/ISIS3/issues/4816)
 
 
 ## [7.0.0] - 2022-02-11
