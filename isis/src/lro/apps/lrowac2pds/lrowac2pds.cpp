@@ -75,10 +75,10 @@ namespace Isis {
       Pvl pdsLab;
 
       FileList list;
-      list.read(ui.GetCubeName("FROMLIST"));
+      list.read(ui.GetFileName("FROMLIST"));
 
       if (list.size() < 1) {
-          QString msg = "The list file [" + ui.GetCubeName("FROMLIST") + "does not contain any data";
+          QString msg = "The list file [" + ui.GetFileName("FROMLIST") + "does not contain any data";
           throw IException(IException::User, msg, _FILEINFO_);
       }
 
