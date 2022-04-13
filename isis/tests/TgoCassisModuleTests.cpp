@@ -30,13 +30,13 @@ static QString MOSRANGE_XML = FileName("$ISISROOT/bin/xml/mosrange.xml").expande
 static QString CAM2MAP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
 static QString CUBEIT_XML = FileName("$ISISROOT/bin/xml/cubeit.xml").expanded();
 
-QVector<QString> tgoCassisModuleKernels::binaryCkKernels = {};
-QVector<QString> tgoCassisModuleKernels::binarySpkKernels = {};
+QVector<QString> TgoCassisModuleKernels::binaryCkKernels = {};
+QVector<QString> TgoCassisModuleKernels::binarySpkKernels = {};
 
-QString tgoCassisModuleKernels::binaryCkKernelsAsString = "";
-QString tgoCassisModuleKernels::binarySpkKernelsAsString = "";
+QString TgoCassisModuleKernels::binaryCkKernelsAsString = "";
+QString TgoCassisModuleKernels::binarySpkKernelsAsString = "";
 
-TEST_F(tgoCassisModuleKernels, TgoCassisModuleTestStitchUnstitch) {
+TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis and spiceinit on pan framelet.
@@ -564,7 +564,7 @@ TEST_F(tgoCassisModuleKernels, TgoCassisModuleTestStitchUnstitch) {
 }
 
 
-TEST_F(tgoCassisModuleKernels, TgoCassisModuleTestSingleFrameletProjection) {
+TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis and spiceinit on pan framelet.
@@ -1095,7 +1095,7 @@ TEST_F(tgoCassisModuleKernels, TgoCassisModuleTestSingleFrameletProjection) {
 }
 
 
-TEST(tgoCassisModule, TgoCassisModuleTestIngestReingest) {
+TEST(TgoCassisModuleTests, TgoCassisIngestReingest) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis on red framelet.
@@ -1175,7 +1175,7 @@ TEST(tgoCassisModule, TgoCassisModuleTestIngestReingest) {
 }
 
 
-TEST_F(tgoCassisModuleKernels, TgoCassisModuleTestColorMosaic) {
+TEST_F(TgoCassisModuleKernels, TgoCassisTestColorMosaic) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis and spiceinit on pan framelet.
@@ -1605,7 +1605,7 @@ TEST_F(tgoCassisModuleKernels, TgoCassisModuleTestColorMosaic) {
 }
 
 
-TEST_F(tgoCassisModuleKernels, TgoCassisModuleTestMapProjectedReingested) {
+TEST_F(TgoCassisModuleKernels, TgoCassisMapProjectedReingested) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis on red framelet.
@@ -1738,6 +1738,198 @@ TEST_F(tgoCassisModuleKernels, TgoCassisModuleTestMapProjectedReingested) {
   EXPECT_EQ(int(kernels["NaifFrameCode"]), -143400);
 
   Histogram *hist = reingestCube.histogram();
+
+  EXPECT_NEAR(hist->Average(), 0.11603580358533563, 0.0001);
+  EXPECT_NEAR(hist->Sum(), 26.108894683420658, 0.0001);
+  EXPECT_EQ(hist->ValidPixels(), 225);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.0031002995166270952, 0.0001);
+}
+
+
+TEST_F(TgoCassisModuleKernels, TgoCassisSingleColorMosaicReingest) {
+  QTemporaryDir prefix;
+
+  // run tgocassis2isis and spiceinit on pan framelet.
+  QString panFileName = prefix.path() + "/panframelet.cub";
+  QVector<QString> tgocassis2isisArgs = {"from=data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381-PAN-00005-B1.xml",
+                                         "to=" + panFileName};
+
+  UserInterface tgocassis2isisPan(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
+  }
+
+  QVector<QString> spiceinitArgs = {"from=" + panFileName,  "ckp=t", "spkp=t"};
+  UserInterface spiceinitPan(SPICEINIT_XML, spiceinitArgs);
+  try {
+    spiceinit(spiceinitPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run spiceinit on pan image: " << e.what() << std::endl;
+  }
+
+  // run mosrange on cube list
+  FileList *cubeList = new FileList();
+  cubeList->append(panFileName);
+
+  QString cubeListFile = prefix.path() + "/cubelist.lis";
+  cubeList->write(cubeListFile);
+
+  QString mapFile = prefix.path() + "/equi.map";
+  QVector<QString> mosrangeArgs = {"fromlist=" + cubeListFile, "to=" + mapFile};
+  UserInterface mosrangeOptions(MOSRANGE_XML, mosrangeArgs);
+
+  try {
+    mosrange(mosrangeOptions);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run mosrange with cube list: " << e.what() << std::endl;
+  }
+
+  // run cam2map and cassismos on pan cube
+  QString panEquiFile = prefix.path() + "/pan_equi.cub";
+  QVector<QString> cam2mapArgs = {"from=" + panFileName,
+                                  "to=" + panEquiFile,
+                                  "map=" + mapFile,
+                                  "defaultrange=map",
+                                  "pixres=mpp",
+                                  "resolution=200"};
+  UserInterface cam2mapPan(CAM2MAP_XML, cam2mapArgs);
+  try {
+    cam2map(cam2mapPan);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run cam2map on pan image: " << e.what() << std::endl;
+  }
+
+  FileList *mosaicList = new FileList();
+  mosaicList->append(panEquiFile);
+  QString listFile = prefix.path() + "/cubelist.lis";
+  mosaicList->write(listFile);
+
+  QString mosaicCubeFile = prefix.path() + "/mosaic.cub";
+  QVector<QString> cassismosArgs = {"fromlist=" + listFile, "to=" + mosaicCubeFile};
+  UserInterface options(MOS_XML, cassismosArgs);
+  try {
+    tgocassismos(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassismos on mosaic list: " << e.what() << std::endl;
+  }
+
+  // run tgocassisrdrgen on color mosaic.
+  QString digestedFile = prefix.path() + "/mosaic.img";
+  QVector<QString> rdrgenArgs = {"from=" + mosaicCubeFile,  "to=" + digestedFile};
+  UserInterface rdrgen(RDRGEN_XML, rdrgenArgs);
+  try {
+    tgocassisrdrgen(rdrgen);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassisrdrgen on color mosiac image: " << e.what() << std::endl;
+  }
+
+  // run tgocassis2isis on digested color mosaic.
+  QString reingestedFile = prefix.path() + "/mosaic.reingest.cub";
+  QString digestedXML = prefix.path() + "/mosaic.xml";
+  tgocassis2isisArgs = {"from=" + digestedXML, "to=" + reingestedFile};
+  UserInterface tgocassis2isisReingest(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  try {
+    tgocassis2isis(tgocassis2isisReingest);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to run tgocassis2isis on color mosaic image: " << e.what() << std::endl;
+  }
+
+  // Mosaic Cube
+  Cube mosCube(reingestedFile);
+  Pvl *outLabel = mosCube.label();
+
+  std::istringstream inst(R"(
+    Group = Instrument
+      SpacecraftName = "TRACE GAS ORBITER"
+      InstrumentId   = CaSSIS
+      Expanded       = 1
+      TargetName     = Mars
+      StartTime      = 2016-11-26T22:50:27.381
+      Filter         = PAN
+      Expanded       = 1
+      SummingMode    = 0
+    End_Group
+  )");
+
+  PvlGroup truthInstGroup;
+  inst >> truthInstGroup;
+  PvlGroup &instGroup = outLabel->findGroup("Instrument", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, instGroup, truthInstGroup);
+
+  std::istringstream arss(R"(
+    Group = Archive
+      ObservationId    = CRUS_049218_201_0
+      DataSetId        = urn:esa:psa:em16_tgo_cas:data_derived:crus_049218_201_0
+      ProductVersionId = 1.0
+      FileName         = mosaic.img
+      ScalingFactor    = 1.0
+      YearDoy          = 2016331
+    End_Group
+  )");
+
+  PvlGroup truthArchiveGroup;
+  arss >> truthArchiveGroup;
+
+  PvlGroup &archiveGroup = outLabel->findGroup("Archive", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, archiveGroup, truthArchiveGroup);
+
+  std::istringstream bbss(R"(
+    Group = BandBin
+      FilterName = PAN
+      Center     = 675 <nm>
+      Width      = 250 <nm>
+      NaifIkCode = -143421
+    End_Group
+  )");
+
+  PvlGroup truthBandBinGroup;
+  bbss >> truthBandBinGroup;
+
+  PvlGroup &bandBinGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, bandBinGroup, truthBandBinGroup);
+
+  std::istringstream map(R"(
+    Group = Mapping
+      ProjectionName     = Equirectangular
+      CenterLongitude    = 266.15724842165
+      TargetName         = Mars
+      EquatorialRadius   = 3396190.0
+      PolarRadius        = 3376200.0
+      LatitudeType       = Planetocentric
+      LongitudeDirection = PositiveEast
+      LongitudeDomain    = 360
+      MinimumLatitude    = 2.4698863724983
+      MaximumLatitude    = 2.7060776922727
+      MinimumLongitude   = 266.1741364076
+      MaximumLongitude   = 266.13698283851
+      UpperLeftCornerX   = -1200.0
+      UpperLeftCornerY   = 160400.0
+      PixelResolution    = 200.0
+      Scale              = 296.36990921958
+      CenterLatitude     = 0.0
+    End_Group
+  )");
+
+  PvlGroup truthMappingGroup;
+  map >> truthMappingGroup;
+
+  PvlGroup &mappingGroup = outLabel->findGroup("Mapping", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, mappingGroup, truthMappingGroup);
+
+  Histogram *hist = mosCube.histogram();
 
   EXPECT_NEAR(hist->Average(), 0.20770993546981495, 0.0001);
   EXPECT_NEAR(hist->Sum(), 137.29626734554768, 0.0001);
