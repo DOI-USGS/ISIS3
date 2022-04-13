@@ -568,8 +568,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis and spiceinit on pan framelet.
-  // QString panFileName = prefix.path() + "/panframelet.cub";
-  QString panFileName = "/Users/acpaquette/Desktop/panframelet.cub";
+  QString panFileName = prefix.path() + "/panframelet.cub";
   QVector<QString> tgocassis2isisArgs = {"from=data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583-PAN-00020-B1.xml",
                                          "to=" + panFileName};
 
