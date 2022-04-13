@@ -31,10 +31,10 @@
         <type>File</type>
         <fileMode>input</fileMode>
         <brief>
-          Input File to be converted
+          A list of cubes to import
         </brief>
         <description>
-          The File to be converted to PDS IMG format.
+          A file containing a list of PDS3 files to be imported.
         </description>
         <filter>
           *.cub
