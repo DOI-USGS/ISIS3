@@ -1718,7 +1718,6 @@ namespace Isis {
 
   void tgoCassisModuleKernels::SetUpTestSuite() {
     QTemporaryDir prefix;
-    prefix.setAutoRemove(false);
     QVector<QString> ckKernels = {QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_0_sliced_-143410.xc"),
                                   QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_1_sliced_-143410.xc"),
                                   QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_0_sliced_-143000.xc"),
@@ -1741,39 +1740,19 @@ namespace Isis {
     QVector<QString> tempSpkKernels;
 
     for (int i = 0; i < ckKernels.size(); i++) {
-      try // If you want to avoid exception handling, then use the error code overload of the following functions.
-      {
-        QString kernelFile = ckKernels[i];
-        QString kernelExtension = kernelFile.split('.').last();
-        QString targetFile = prefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
-        std::cout << targetFile << '\n';
-        // QString targetFile = "/Users/acpaquette/Desktop/kernels/" + kernelFile;
-        // fs::create_directories(tempDir.path());
-        QFile::copy(kernelFile, targetFile);
-        tempCkKernels.append(targetFile);
-      }
-      catch (std::exception& e) // Not using fs::filesystem_error since std::bad_alloc can throw too.
-      {
-         std::cout << e.what();
-      }
+      QString kernelFile = ckKernels[i];
+      QString kernelExtension = kernelFile.split('.').last();
+      QString targetFile = prefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
+      QFile::copy(kernelFile, targetFile);
+      tempCkKernels.append(targetFile);
     }
 
     for (int i = 0; i < spkKernels.size(); i++) {
-      try // If you want to avoid exception handling, then use the error code overload of the following functions.
-      {
-        QString kernelFile = spkKernels[i];
-        QString kernelExtension = kernelFile.split('.').last();
-        QString targetFile = prefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
-        std::cout << targetFile << '\n';
-        // QString targetFile = "/Users/acpaquette/Desktop/kernels/" + kernelFile;
-        // fs::create_directories(tempDir.path());
-        QFile::copy(kernelFile, targetFile);
-        tempSpkKernels.append(targetFile);
-      }
-      catch (std::exception& e) // Not using fs::filesystem_error since std::bad_alloc can throw too.
-      {
-         std::cout << e.what();
-      }
+      QString kernelFile = spkKernels[i];
+      QString kernelExtension = kernelFile.split('.').last();
+      QString targetFile = prefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
+      QFile::copy(kernelFile, targetFile);
+      tempSpkKernels.append(targetFile);
     }
 
     // variables defined in TgoCassisModuleTests
@@ -1787,21 +1766,9 @@ namespace Isis {
   }
 
   void tgoCassisModuleKernels::TearDownTestSuite() {
-    // for (QString kernel : binaryCkKernels) {
-    //   if( remove( kernel.toStdString().c_str() ) != 0 ) {
-    //     perror( "Error deleting file" );
-    //   }
-    // }
-    //
-    // for (QString kernel : binarySpkKernels) {
-    //   if( remove( kernel.toStdString().c_str() ) != 0 ) {
-    //     perror( "Error deleting file" );
-    //   }
-    // }
-    //
-    // binaryCkKernels = {};
-    // binarySpkKernels = {};
-    // binaryCkKernelsAsString = "";
-    // binarySpkKernelsAsString = "";
+    binaryCkKernels = {};
+    binarySpkKernels = {};
+    binaryCkKernelsAsString = "";
+    binarySpkKernelsAsString = "";
   }
 }
