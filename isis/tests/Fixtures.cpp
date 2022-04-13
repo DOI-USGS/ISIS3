@@ -14,8 +14,6 @@
 #include "TestUtilities.h"
 #include "ControlNet.h"
 
-namespace fs = std::__fs::filesystem;
-
 namespace Isis {
 
   void TempTestingFiles::SetUp() {
