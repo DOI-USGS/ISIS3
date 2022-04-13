@@ -1714,7 +1714,7 @@ namespace Isis {
     testCube.reset();
   }
 
-  void tgoCassisModuleKernels::SetUpTestSuite() {
+  void TgoCassisModuleKernels::SetUpTestSuite() {
     QTemporaryDir prefix;
     QVector<QString> ckKernels = {QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_0_sliced_-143410.xc"),
                                   QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_1_sliced_-143410.xc"),
@@ -1763,7 +1763,7 @@ namespace Isis {
     }
   }
 
-  void tgoCassisModuleKernels::TearDownTestSuite() {
+  void TgoCassisModuleKernels::TearDownTestSuite() {
     binaryCkKernels = {};
     binarySpkKernels = {};
     binaryCkKernelsAsString = "";

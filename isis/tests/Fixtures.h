@@ -403,7 +403,7 @@ class NearMsiCameraCube : public TempTestingFiles {
     void TearDown() override;
 };
 
-class tgoCassisModuleKernels : public ::testing::Test {
+class TgoCassisModuleKernels : public ::testing::Test {
   protected:
     static void SetUpTestSuite();
     static void TearDownTestSuite();
