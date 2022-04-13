@@ -1762,7 +1762,9 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleColorMosaicReingest) {
     FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
   }
 
-  QVector<QString> spiceinitArgs = {"from=" + panFileName,  "ckp=t", "spkp=t"};
+  QVector<QString> spiceinitArgs = {"from=" + panFileName,
+                                    "ck=" + binaryCkKernelsAsString,
+                                    "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitPan(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitPan);
