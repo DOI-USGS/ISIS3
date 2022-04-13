@@ -16,8 +16,8 @@ namespace Isis {
 
     // Get the list of names of input CCD cubes to stitch together
     FileList flist;
-    if (ui.WasEntered("FROM")) flist.push_back(FileName(ui.GetFileName("FROM")));
-    if (ui.WasEntered("FROMLIST")) flist.read(FileName(ui.GetFileName("FROMLIST")));
+    if (ui.WasEntered("FROM")) flist.push_back(GetCubeName(ui.GetGetCubeName("FROM")));
+    if (ui.WasEntered("FROMLIST")) flist.read(GetCubeName(ui.GetGetCubeName("FROMLIST")));
     if (flist.size() < 1) {
       QString msg = "Files must be specified in FROM and/or FROMLIST - none found!";
       throw IException(IException::User,msg,_FILEINFO_);
@@ -59,17 +59,17 @@ namespace Isis {
 
     //  Get comment file
     QString comfile("");
-    if (ui.WasEntered("COMFILE")) comfile = ui.GetFileName("COMFILE");
+    if (ui.WasEntered("COMFILE")) comfile = ui.GetGetCubeName("COMFILE");
 
     // Write the output file if requested
     if (ui.WasEntered("TO")) {
       int cktype = ui.GetInteger("CKTYPE");
-      kernel.write(ui.GetFileName("TO"), comfile, cktype);
+      kernel.write(ui.GetGetCubeName("TO"), comfile, cktype);
     }
 
     // Write a summary of the documentation
     if (ui.WasEntered("SUMMARY")) {
-      QString fFile = FileName(ui.GetFileName("SUMMARY")).expanded();
+      QString fFile = GetCubeName(ui.GetGetCubeName("SUMMARY")).expanded();
       ofstream os;
       os.open(fFile.toLatin1().data(),ios::out);
       if (!os) {
