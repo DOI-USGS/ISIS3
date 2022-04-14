@@ -64,7 +64,7 @@ namespace Isis {
     // Write the output file if requested
     if (ui.WasEntered("TO")) {
       int cktype = ui.GetInteger("CKTYPE");
-      kernel.write(ui.GetCubeName("TO"), comfile, cktype);
+      kernel.write(ui.GetFileName("TO"), comfile, cktype);
     }
 
     // Write a summary of the documentation

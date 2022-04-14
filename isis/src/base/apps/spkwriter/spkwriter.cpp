@@ -104,7 +104,7 @@ namespace Isis {
 
     // Write the output file if requested
     if (ui.WasEntered("TO")) {
-      kwriter.write(kernel, ui.GetCubeName("TO"), comfile);
+      kwriter.write(kernel, ui.GetFileName("TO"), comfile);
     }
 
     // Write a summary of the documentation
