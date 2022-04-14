@@ -59,7 +59,7 @@ namespace Isis {
 
     //  Get comment file
     QString comfile("");
-    if (ui.WasEntered("COMFILE")) comfile = ui.GetCubeName("COMFILE");
+    if (ui.WasEntered("COMFILE")) comfile = ui.GetFileName("COMFILE");
 
     // Write the output file if requested
     if (ui.WasEntered("TO")) {
@@ -69,7 +69,7 @@ namespace Isis {
 
     // Write a summary of the documentation
     if (ui.WasEntered("SUMMARY")) {
-      QString fFile = FileName(ui.GetCubeName("SUMMARY")).expanded();
+      QString fFile = FileName(ui.GetFileName("SUMMARY")).expanded();
       ofstream os;
       os.open(fFile.toLatin1().data(),ios::out);
       if (!os) {
