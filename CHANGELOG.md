@@ -58,6 +58,16 @@ but passing in footprintinit. [#4651](https://github.com/USGS-Astrogeology/ISIS3
 - Changed the internal logic of ObliqueDataResolution() to use LocalEmission angle rather than Emission angle.
 This will cause differences in output; new values will be more accurate because they use DEM rather than
 ellipsoid. The cost to compute the local emissoin will increase by approximately x1.5. [#3600](https://github.com/USGS-Astrogeology/ISIS3/issues/3600)
+- Changed website layout to better surface relevant documents.
+[#4839](https://github.com/USGS-Astrogeology/ISIS3/pull/4839)
+[#4847](https://github.com/USGS-Astrogeology/ISIS3/pull/4847)
+[#4851](https://github.com/USGS-Astrogeology/ISIS3/pull/4851)
+[#4852](https://github.com/USGS-Astrogeology/ISIS3/pull/4852)
+[#4856](https://github.com/USGS-Astrogeology/ISIS3/pull/4856)
+[#4865](https://github.com/USGS-Astrogeology/ISIS3/pull/4865)
+[#4859](https://github.com/USGS-Astrogeology/ISIS3/pull/4859)
+[#4872](https://github.com/USGS-Astrogeology/ISIS3/pull/4872)
+[#4871](https://github.com/USGS-Astrogeology/ISIS3/pull/4871)
 
 ### Added
 - Added the USECAMSTATSTBL option to caminfo. This allows caminfo to extract existing
@@ -73,6 +83,12 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 - Added import templates for isisimport, Cassini ISS, Cassini Vims, Kaguya TC Kaguya MI, Dawn FC, Dawn VIR, LROC NAC, LO HRC, MGS MOC, MER MI, MRO CTX, Rosetta Osiris, Viking VIS [#4606](https://github.com/USGS-Astrogeology/ISIS3/issues/4606)
 - Added export templates for isisexport, LROC NAC EDR [#4606](https://github.com/USGS-Astrogeology/ISIS3/issues/4606)
 - Added optional JSON data output parameter, DATA, for debugging template engine failures [#4606](https://github.com/USGS-Astrogeology/ISIS3/issues/4606)
+- Added new documentatin for contributing code.
+[#4859](https://github.com/USGS-Astrogeology/ISIS3/pull/4859)
+[#4871](https://github.com/USGS-Astrogeology/ISIS3/pull/4871)
+- Added versioning to website documentation.
+[#4852](https://github.com/USGS-Astrogeology/ISIS3/pull/4852)
+[#4872](https://github.com/USGS-Astrogeology/ISIS3/pull/4872)
 
 ### Deprecated
 - Deprecated edrget as discussed in [#3313](https://github.com/USGS-Astrogeology/ISIS3/issues/3313).
