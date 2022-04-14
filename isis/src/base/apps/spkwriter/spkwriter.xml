@@ -265,7 +265,7 @@ User Comments
           </filter>
         </parameter>
       <parameter name="FROMLIST">
-        <type>cube</type>
+        <type>filename</type>
         <fileMode>input</fileMode>
         <internalDefault>None</internalDefault>
         <brief>

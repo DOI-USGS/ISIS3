@@ -49,7 +49,7 @@ namespace Isis {
     // Get the list of names of input CCD cubes to stitch together
     FileList flist;
     if (ui.WasEntered("FROM")) flist.push_back(ui.GetCubeName("FROM"));
-    if (ui.WasEntered("FROMLIST")) flist.read(ui.GetCubeName("FROMLIST"));
+    if (ui.WasEntered("FROMLIST")) flist.read(ui.GetFileName("FROMLIST"));
     if (flist.size() < 1) {
       QString msg = "Files must be specified in FROM and/or FROMLIST - none found!";
       throw IException(IException::User,msg,_FILEINFO_);
@@ -98,7 +98,7 @@ namespace Isis {
 
     //  Process CK kernel requests
     QString comfile("");
-    if (ui.WasEntered("COMFILE")) comfile = ui.GetCubeName("COMFILE");
+    if (ui.WasEntered("COMFILE")) comfile = ui.GetFileName("COMFILE");
 
     SpkKernelWriter kwriter(spkType);
 
@@ -109,7 +109,7 @@ namespace Isis {
 
     // Write a summary of the documentation
     if (ui.WasEntered("SUMMARY")) {
-      QString fFile = FileName(ui.GetCubeName("SUMMARY")).expanded();
+      QString fFile = FileName(ui.GetFileName("SUMMARY")).expanded();
       ofstream os;
       os.open(fFile.toLatin1().data(),ios::out);
       if (!os) {
