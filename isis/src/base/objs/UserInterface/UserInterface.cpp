@@ -518,7 +518,7 @@ namespace Isis {
       }
 
     }
-    if(usedDashLast == true){
+    if(usedDashLast) {
       Pvl temp;
       CommandLine(temp);
       cout << BuildNewCommandLineFromPvl(temp) << endl;
@@ -543,7 +543,7 @@ namespace Isis {
   QString UserInterface::BuildNewCommandLineFromPvl(Pvl temp){
     PvlGroup group = temp.group(0);
     int numKeywords = group.keywords();
-    QString returnVal = ""; 
+    QString returnVal = p_progName + " ";
 
     for(int i = 0; i < numKeywords; i++){
       PvlKeyword key = group[i];
