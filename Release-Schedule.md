@@ -21,8 +21,11 @@ As described above, we will release on a three month cadence. Releases will be l
 | 4.3.0 | Release | 10.26.20 |
 | 4.4.0 | Release | 2.8.21 |
 | 5.0.0_RC | Release Candidate | 4.1.21 |
-| 5.0.0 | Release | 4.26.21 |
-| 5.1.0_RC | Release Candidate | 6.28.21 | 
-| 5.1.0 | Release | 7.25.21 |
-| 5.2.0_RC | Release Candidate | 9.27.21 |
-| 5.2.0 | Release | 10.25.21 |
+| 5.0.0 | Release | 4.27.21 |
+| 6.0.0_RC | Release Candidate | 8.1.21 | 
+| 6.0.0 | Release | 7.25.21 |
+| 7.0.0_RC1 | Release Candidate | 3.4.22 |
+| 7.0.0_RC2 | Release Candidate | 4.15.22 |
+| 7.0.0 | Release | 5.2.22 |
+| 7.1.0_RC | Release Candidate | 6.6.22 |
+| 7.1.0 | Release | 7.5.22 |
