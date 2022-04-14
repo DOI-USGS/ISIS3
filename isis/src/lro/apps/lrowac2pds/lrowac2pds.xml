@@ -28,7 +28,7 @@
   <groups>
     <group name="Files">
       <parameter name="FROMLIST">
-        <type>File</type>
+        <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
           A list of cubes to import
