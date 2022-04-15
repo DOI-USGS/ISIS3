@@ -1714,8 +1714,7 @@ namespace Isis {
     testCube.reset();
   }
 
-  void TgoCassisModuleKernels::SetUpTestSuite() {
-    QTemporaryDir prefix;
+  void TgoCassisModuleKernels::SetUp() {
     QVector<QString> ckKernels = {QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_0_sliced_-143410.xc"),
                                   QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_1_sliced_-143410.xc"),
                                   QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_0_sliced_-143000.xc"),
@@ -1740,7 +1739,7 @@ namespace Isis {
     for (int i = 0; i < ckKernels.size(); i++) {
       QString kernelFile = ckKernels[i];
       QString kernelExtension = kernelFile.split('.').last();
-      QString targetFile = prefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
+      QString targetFile = kernelPrefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
       QFile::copy(kernelFile, targetFile);
       tempCkKernels.append(targetFile);
     }
@@ -1748,7 +1747,7 @@ namespace Isis {
     for (int i = 0; i < spkKernels.size(); i++) {
       QString kernelFile = spkKernels[i];
       QString kernelExtension = kernelFile.split('.').last();
-      QString targetFile = prefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
+      QString targetFile = kernelPrefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
       QFile::copy(kernelFile, targetFile);
       tempSpkKernels.append(targetFile);
     }
@@ -1763,7 +1762,7 @@ namespace Isis {
     }
   }
 
-  void TgoCassisModuleKernels::TearDownTestSuite() {
+  void TgoCassisModuleKernels::TearDown() {
     binaryCkKernels = {};
     binarySpkKernels = {};
     binaryCkKernelsAsString = "";

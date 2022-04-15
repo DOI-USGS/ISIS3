@@ -30,11 +30,6 @@ static QString MOSRANGE_XML = FileName("$ISISROOT/bin/xml/mosrange.xml").expande
 static QString CAM2MAP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
 static QString CUBEIT_XML = FileName("$ISISROOT/bin/xml/cubeit.xml").expanded();
 
-QVector<QString> TgoCassisModuleKernels::binaryCkKernels = {};
-QVector<QString> TgoCassisModuleKernels::binarySpkKernels = {};
-
-QString TgoCassisModuleKernels::binaryCkKernelsAsString = "";
-QString TgoCassisModuleKernels::binarySpkKernelsAsString = "";
 
 TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
   QTemporaryDir prefix;
