@@ -641,6 +641,7 @@ namespace Isis {
 
     // Find the edge of the polygon
     geos::geom::Coordinate firstPoint = FindFirstPoint();
+
     points.push_back(firstPoint);
     //************************
     // Start walking the edge
@@ -653,8 +654,6 @@ namespace Isis {
 
     do {
       tempPoint = FindNextPoint(&currentPoint, lastPoint);
-      //exit(1);
-
 
       // First check if the distance is within range of skipping
       bool snapToFirstPoint = true;
@@ -687,7 +686,6 @@ namespace Isis {
           }
         }
       }
-
       // Failed to find the next point
       if (tempPoint.equals(currentPoint)) {
         geos::geom::Coordinate oldDuplicatePoint = tempPoint;
@@ -852,7 +850,8 @@ namespace Isis {
 
       if (nPoleSample >= 0.5 && nPoleLine >= 0.5 &&
          nPoleSample <= p_cube->sampleCount() + 0.5 &&
-         nPoleLine <= p_cube->lineCount() + 0.5) {
+         nPoleLine <= p_cube->lineCount() + 0.5 &&
+         SetImage(nPoleSample, nPoleLine)) {
         hasNorthPole = true;
       }
     }
@@ -872,7 +871,8 @@ namespace Isis {
 
       if (sPoleSample >= 0.5 && sPoleLine >= 0.5 &&
          sPoleSample <= p_cube->sampleCount() + 0.5 &&
-         sPoleLine <= p_cube->lineCount() + 0.5) {
+         sPoleLine <= p_cube->lineCount() + 0.5 &&
+         SetImage(sPoleSample, sPoleLine)) {
         hasSouthPole = true;
       }
     }
@@ -1153,6 +1153,7 @@ namespace Isis {
     for (unsigned int i = 1; i < p_pts->getSize(); i++) {
       lon = p_pts->getAt(i).x;
       lat = p_pts->getAt(i).y;
+      
       // check to see if you just crossed the Meridian
       if (abs(lon - prevLon) > 180 && (prevLat != 90 && prevLat != -90)) {
         newCoords = true;
@@ -1328,6 +1329,11 @@ namespace Isis {
       std::string msg = "Unable to create image footprint (Fix360Poly) due to ";
       msg += "isis operation exception [" + IString(e.what()) + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    }
+    catch(std::exception &e) {
+      std::string msg = "Caught std::exception: ";
+      msg += e.what();
+      throw IException(IException::Unknown, msg, _FILEINFO_); 
     }
     catch(...) {
       std::string msg = "Unable to create image footprint (Fix360Poly) due to ";
