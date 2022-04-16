@@ -75,17 +75,25 @@ namespace Isis {
     // The observation start time and clock count for SRC are based on the center of the exposure.
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-    QString clockCount = inst["SpacecraftClockStartCount"];
-    double et = getClockTime(clockCount).Et();
-    double exposureDuration = (double)inst["ExposureDuration"] / 1000.0;
 
-    pair<iTime, iTime> startStop = ShutterOpenCloseTimes(et, exposureDuration);
-    setTime(et);
+    // scs 2022-04-16 Changed to use the StartTime instead of the StartClock.
+    // HRSC SRC images taken in a sequence (e.g., Phobos) often have identical StartClock values,
+    // but different StartTime values
+    //QString clockCount = inst["SpacecraftClockStartCount"];
+    //double et = getClockTime(clockCount).Et();
+    //double exposureDuration = (double)inst["ExposureDuration"] / 1000.0;
+    //pair<iTime, iTime> startStop = ShutterOpenCloseTimes(startTime, exposureDuration);
+    //setTime(et);
+
+    iTime startTime;
+    startTime.setUtc((QString)inst["StartTime"]);   
+    setTime(startTime);
 
     // Internalize all the NAIF SPICE information into memory.
     LoadCache();
     NaifStatus::CheckErrors();
   }
+
 
   /**
    * Returns the shutter open and close times.
@@ -103,6 +111,7 @@ namespace Isis {
     return FramingCamera::ShutterOpenCloseTimes(time - exposureDuration / 2.0, exposureDuration);
   }
 }
+
 
 /**
  * This is the function that is called in order to instantiate a MexHrscSrcCamera

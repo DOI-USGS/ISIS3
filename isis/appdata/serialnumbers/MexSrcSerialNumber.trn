@@ -12,7 +12,7 @@ End_Group
 
 Group = Keyword2
   Auto
-  InputKey       = SpacecraftClockStartCount
+  InputKey       = StartTime
   InputGroup     = "IsisCube,Instrument"
   InputPosition  = (IsisCube, Instrument)
   OutputName     = Keyword2
