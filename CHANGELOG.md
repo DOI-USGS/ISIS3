@@ -35,8 +35,6 @@ release.
 
 ## [Unreleased]
 
-- Added check to determine if poles were a valid projection point in ImagePolygon when generating footprint for a map projected image. [#4390](https://github.com/USGS-Astrogeology/ISIS3/issues/4390)
-
 ### Changed
 
 ### Added
@@ -45,8 +43,7 @@ release.
 ### Deprecated
 
 ### Fixed
-- Modified cnetcheck noLatLonCheck logic to correctly exclude ignored measures. [#4649](https://github.com/USGS-Astrogeology/ISIS3/issues/4649)
-- Fixed bug where the original label was not attached to stereo HRSC images on import [#4816](https://github.com/USGS-Astrogeology/ISIS3/issues/4816)
+- Added check to determine if poles were a valid projection point in ImagePolygon when generating footprint for a map projected image. [#4390](https://github.com/USGS-Astrogeology/ISIS3/issues/4390)
 
 
 ## [7.0.0] - 2022-02-11
@@ -102,6 +99,9 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 - Fixed a bug where jigsaw would raise an error when solving for framing camera pointing in observation mode. [#4686](https://github.com/USGS-Astrogeology/ISIS3/issues/4686)
 - Fixed slow runs of automos when the priority was BAND. [#4793](https://github.com/USGS-Astrogeology/ISIS3/pull/4793)
 - Fixed qview crashing when attempting to load image DNs. [4818](https://github.com/USGS-Astrogeology/ISIS3/issues/4818)
+- Fixed qnet crashing when entering an invalid image name in the measure selection box. [#4581](https://github.com/USGS-Astrogeology/ISIS3/issues/4581)
+- Modified cnetcheck noLatLonCheck logic to correctly exclude ignored measures. [#4649](https://github.com/USGS-Astrogeology/ISIS3/issues/4649)
+- Fixed bug where the original label was not attached to stereo HRSC images on import [#4816](https://github.com/USGS-Astrogeology/ISIS3/issues/4816)
 
 ## [6.0.0] - 2021-08-27
 
