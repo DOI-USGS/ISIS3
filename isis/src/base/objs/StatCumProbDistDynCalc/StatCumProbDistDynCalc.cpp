@@ -25,6 +25,8 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 #include <iostream>
 
+using namespace std;
+
 namespace Isis {
 
 
@@ -401,7 +403,7 @@ namespace Isis {
 
       // if there are now m_numberQuantiles observations, then sort them from smallest to greatest
       if (m_numberObservations == m_numberQuantiles) {
-        qSort(m_observationValues.begin(),  m_observationValues.end(),  qLess<double>());
+        sort(m_observationValues.begin(),  m_observationValues.end(),  qLess<double>());
       }
     }
     else { // m_numberObservations >= m_numberQuantiles 

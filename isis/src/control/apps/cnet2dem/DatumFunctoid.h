@@ -26,6 +26,8 @@ extern "C" {
 #include "nn.h"
 }
 
+using namespace std;
+
 namespace Isis {
 
   /**
@@ -119,7 +121,7 @@ namespace Isis {
           radii.push_back(m.getPoint(i).radius());
         }
 
-        qSort(radii);
+        sort(radii.begin(), radii.end());
         if ( (radii.size() % 2) == 0) {
           int ndx0 = (radii.size() - 1) / 2;
           v = (radii[ndx0] + radii[ndx0+1]) / 2.0;
@@ -264,7 +266,7 @@ namespace Isis {
         for (int i = 0 ; i < m.size() ; i++) {
           distances.push_back(m.getDistance(i));
         }
-        qSort(distances);
+        sort(distances.begin(), distances.end());
 
         if ( (distances.size() % 2) == 0) {
           int ndx0 = (distances.size() - 1) / 2;

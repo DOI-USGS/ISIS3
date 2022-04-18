@@ -1488,7 +1488,7 @@ namespace Isis {
       }
     }
 
-    qSort(xAxisPoints.begin(), xAxisPoints.end(), &numericStringLessThan);
+    sort(xAxisPoints.begin(), xAxisPoints.end(), &numericStringLessThan);
 
     m_tableWindow->table()->setRowCount(xAxisPoints.size());
 

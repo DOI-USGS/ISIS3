@@ -30,6 +30,7 @@ find files of those names at the top level of this repository. **/
 #define RADIUS_CELLS        100
 
 ///#define DEBUG 1
+using namespace std;
 
 namespace Isis {
 
@@ -146,7 +147,7 @@ namespace Isis {
     }
 
     // Sort to find the image with the highest measure count as a starting point
-    qSort(pntcount.begin(), pntcount.end(), SortSerialsByPntSize());
+    sort(pntcount.begin(), pntcount.end(), SortSerialsByPntSize());
 
 #if defined(DEBUG)
     for (int i = 0; i < pntcount.size() ; i++) {

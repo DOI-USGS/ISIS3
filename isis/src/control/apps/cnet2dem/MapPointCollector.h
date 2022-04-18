@@ -19,6 +19,8 @@ find files of those names at the top level of this repository. **/
 #include "ControlPointCloudPt.h"
 #include "Statistics.h"
 
+using namespace std;
+
 namespace Isis {
 
   /**
@@ -145,7 +147,7 @@ namespace Isis {
           v_radii.push_back(points[i].first.radius() );
         }
 
-        qSort(v_radii);
+        sort(v_radii.begin(), v_radii.end());
         if ( (v_radii.size() % 2) == 0 ) {
           int ndx0 = (v_radii.size() - 1) / 2;
           median = (v_radii[ndx0] + v_radii[ndx0+1]) / 2.0;

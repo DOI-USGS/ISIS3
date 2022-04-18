@@ -57,6 +57,8 @@
 #include "ToolPad.h"
 #include "XmlStackedHandlerReader.h"
 
+using namespace std;
+
 namespace Isis {
   /**
    * Create a scene widget.
@@ -1457,7 +1459,7 @@ namespace Isis {
     TextFile file(output, "overwrite");
 
     QList<MosaicSceneItem *> sorted = *m_mosaicSceneItems;
-    qSort(sorted.begin(), sorted.end(), zOrderGreaterThan);
+    sort(sorted.begin(), sorted.end(), zOrderGreaterThan);
 
     MosaicSceneItem *sceneItem;
     foreach(sceneItem, sorted) {

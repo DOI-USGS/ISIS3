@@ -34,6 +34,7 @@
 #include "Target.h"
 #include "ToolPad.h"
 
+using namespace std;
 
 namespace Isis {
 
@@ -1444,7 +1445,7 @@ namespace Isis {
     m_featureScreenAreas = new QList<FeatureDisplayPosition>;
     m_viewportCubeRange = new QPair<QPointF, QPointF>;
 
-    qSort(features.begin(), features.end(),
+    sort(features.begin(), features.end(),
           &FeatureNomenclature::featureDiameterGreaterThan);
 
     for (int i = 0; i < features.count(); i++) {

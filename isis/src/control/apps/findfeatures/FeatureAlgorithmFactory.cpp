@@ -383,7 +383,7 @@ RobustMatcherList FeatureAlgorithmFactory::create(const QString &specs,
   RobustMatcherList algoList;
 
   // Individual algorithm specifications are separated by vertical bars
-  QStringList algorithms = specs.split("|", QString::SkipEmptyParts);
+  QStringList algorithms = specs.split("|", Qt::SkipEmptyParts);
   if ( algorithms.size() == 0 ) {
     if ( errorIfEmpty ) {
       QString mess = "No feature matcher algorithms provided!";
@@ -523,10 +523,10 @@ QStringList FeatureAlgorithmFactory::formatSpecifications(QString specification)
   QStringList parts;
   if ( specification.contains(QRegularExpression("@savepath", QRegularExpression::CaseInsensitiveOption)) ) {
     QRegularExpression sep("/(?=(.*(@savepath)))",QRegularExpression::CaseInsensitiveOption);
-    parts = specification.split(sep, QString::SkipEmptyParts);
+    parts = specification.split(sep, Qt::SkipEmptyParts);
   }
   else {
-    parts = specification.split("/", QString::SkipEmptyParts);
+    parts = specification.split("/", Qt::SkipEmptyParts);
   }
   // Componenet specifications
   QString feature2dSpec;
@@ -624,7 +624,7 @@ QStringList FeatureAlgorithmFactory::formatSpecifications(QString specification)
 
   // If a parameter specification was found get it
   if ( !parametersSpec.isEmpty() ) {
-    if ( parametersSpec.split("@", QString::SkipEmptyParts).takeFirst().toLower() !=
+    if ( parametersSpec.split("@", Qt::SkipEmptyParts).takeFirst().toLower() !=
          "parameters" ) {
       QString mess = "Invalid specification:\n" +
                      specification + "\n" +

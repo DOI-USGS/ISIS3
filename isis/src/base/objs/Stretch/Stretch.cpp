@@ -189,7 +189,7 @@ namespace Isis {
     QString p = pairs.simplified().trimmed();
     p.replace(QRegExp("[\\s]*:"), ":");
     p.replace(QRegExp(":[\\s]*"), ":");
-    QStringList pairList = p.split(" ", QString::SkipEmptyParts);
+    QStringList pairList = p.split(" ", Qt::SkipEmptyParts);
 
     try {
       foreach(QString singlePair, pairList) {

@@ -242,9 +242,9 @@ namespace Isis {
 
 
   QStringList FeatureInventory::feature2DNames() const {
-    QSet<QString> nameSet = m_detectorNames.toSet();
-    nameSet.intersect( m_extractorNames.toSet() );
-    QStringList nameList = QList<QString>::fromSet( nameSet );
+    QSet<QString> nameSet(m_detectorNames.begin(), m_detectorNames.end());
+    nameSet.intersect(QSet<QString>(m_extractorNames.begin(), m_extractorNames.end()));
+    QStringList nameList = QList<QString>(nameSet.begin(), nameSet.end());
 
     return ( nameList );
   }
@@ -268,7 +268,7 @@ namespace Isis {
   /** Split the string with the provided separator in individual parts   */
    QStringList FeatureInventory::parse(const QString &config,
                                        const QString &sep) const {
-     return ( config.split(sep, QString::SkipEmptyParts) );
+     return ( config.split(sep, Qt::SkipEmptyParts) );
    }
 
    PvlFlatMap FeatureInventory::parameters(const QStringList &fromConfig) const {

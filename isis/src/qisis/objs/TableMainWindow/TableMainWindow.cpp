@@ -13,6 +13,7 @@
 #include <QTableWidget>
 #include <QToolBar>
 
+using namespace std;
 
 namespace Isis {
   /**
@@ -370,7 +371,7 @@ namespace Isis {
   /**
    * This method checks to see if the table has been created. If
    * not it calls the createTable method before calling show.
-   * 
+   *
    * @history 2017-10-06 Adam Goins - showTable() now calls syncColumns() after it calls
    *                        this->show() so that it hides the unselected columns appropriately.
    *                        Fixes #5141.
@@ -424,7 +425,7 @@ namespace Isis {
       }
     }
 
-    qSort(selectedRows.begin(), selectedRows.end());
+    sort(selectedRows.begin(), selectedRows.end());
     for(int d = selectedRows.size(); d > 0; d--) {
       p_table->removeRow(selectedRows[d-1]);
     }
@@ -551,7 +552,7 @@ namespace Isis {
         }
       }
       //If the line is not empty, add it to the file
-      if (line.split(",", QString::SkipEmptyParts).count() != 0)
+      if (line.split(",", Qt::SkipEmptyParts).count() != 0)
         t << line << endl;
     }
     p_currentFile.close();

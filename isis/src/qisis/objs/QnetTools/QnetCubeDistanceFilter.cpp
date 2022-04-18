@@ -20,6 +20,8 @@
 #include "SerialNumberList.h"
 #include "SurfacePoint.h"
 
+using namespace std;
+
 namespace Isis {
   /**
    * Contructor for the Cube Distance filter.  It
@@ -238,7 +240,7 @@ namespace Isis {
     } // this ends i loop
 
     // Sort QList of filtered points before displaying list to user
-    qSort(temp.begin(), temp.end());
+    sort(temp.begin(), temp.end());
     // replace existing filter list with this one
     filteredImages() = temp;
 

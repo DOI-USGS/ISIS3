@@ -94,6 +94,8 @@ find files of those names at the top level of this repository. **/
 #include "XmlStackedHandler.h"
 #include "XmlStackedHandlerReader.h"
 
+using namespace std;
+
 namespace Isis {
 
   /**
@@ -1760,7 +1762,7 @@ namespace Isis {
             actionsInsideMenu.append(action);
           }
 
-          qSort(actionsInsideMenu.begin(), actionsInsideMenu.end(), &actionTextLessThan);
+          sort(actionsInsideMenu.begin(), actionsInsideMenu.end(), &actionTextLessThan);
 
           QAction *allAct = new QAction(tr("All"), NULL);
 

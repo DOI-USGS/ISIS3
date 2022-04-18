@@ -28,6 +28,7 @@ find files of those names at the top level of this repository. **/
 #include "ControlMeasureLogData.h"
 
 ///#define DEBUG 1
+using namespace std;
 
 namespace Isis {
 
@@ -172,7 +173,7 @@ namespace Isis {
     }
 
     // Sort the points based upon strength
-    qSort(m_kpts.begin(), m_kpts.end(), SortStrengthDescending());
+    sort(m_kpts.begin(), m_kpts.end(), SortStrengthDescending());
 
 #if defined(DEBUG)
     for (int p = 0; p < qMin(m_kpts.size(), 5); p++) {
