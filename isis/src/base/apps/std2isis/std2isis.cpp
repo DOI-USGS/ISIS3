@@ -26,7 +26,7 @@ namespace Isis {
         importer->setLrsRange(ui.GetDouble("LRSMIN"), ui.GetDouble("LRSMAX"));
 
     // Import the image
-    FileName outputName = ui.GetFileName("TO");
+    FileName outputName = ui.GetCubeName("TO");
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     importer->import(outputName, att);
 

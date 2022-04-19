@@ -61,11 +61,11 @@ namespace Isis {
   int g_cropLineCount = 0;
 
   void hicrop(UserInterface &ui, Pvl *log) {
-    QString inputFileName = ui.GetFileName("FROM");
+    QString inputFileName = ui.GetCubeName("FROM");
     CubeAttributeInput inAtt(inputFileName);
     g_cube = new Cube();
     g_cube->setVirtualBands(inAtt.bands());
-    inputFileName = ui.GetFileName("FROM");
+    inputFileName = ui.GetCubeName("FROM");
     g_cube->open(inputFileName);
 
     hicrop(g_cube, ui, log);
@@ -321,7 +321,7 @@ namespace Isis {
       int inputLineCount = g_cube->lineCount();
 
       Isis::CubeAttributeOutput atts = ui.GetOutputAttribute("TO");
-      FileName outFileName = ui.GetFileName("TO");
+      FileName outFileName = ui.GetCubeName("TO");
       Cube *ocube = p.SetOutputCube(outFileName.expanded(), atts, numSamps, g_cropLineCount, numBands);
 
       p.ClearInputCubes();

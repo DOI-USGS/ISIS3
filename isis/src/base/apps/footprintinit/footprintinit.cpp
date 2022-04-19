@@ -18,7 +18,7 @@ namespace Isis {
 
   void footprintinit(UserInterface &ui, Pvl *log) {
     Cube cube;
-    cube.open(ui.GetFileName("FROM"), "rw");
+    cube.open(ui.GetCubeName("FROM"), "rw");
 
     footprintinit(&cube, ui, log);
     cube.close();

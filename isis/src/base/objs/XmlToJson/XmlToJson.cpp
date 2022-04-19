@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <QDomDocument>
 #include <QDomElement>
 #include <QFile>
+#include <QString>
 
 using json = nlohmann::json;
 
@@ -40,9 +41,11 @@ namespace Isis {
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
-    if (!doc.setContent(&file)) {
+    QString errMsg;
+    int errLine, errCol;
+    if (!doc.setContent(&file, &errMsg, &errLine, &errCol)) {
       file.close();
-      QString message = QString("Failed to use file for XML Input: [%1]").arg(xmlFile);    
+      QString message = QString("Failed to use file for XML Input: [%1]. %2 at line %3, column %4").arg(xmlFile).arg(errMsg).arg(errLine).arg(errCol);
       throw IException(IException::Io, message, _FILEINFO_);
     }
 

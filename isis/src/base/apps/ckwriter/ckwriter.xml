@@ -294,7 +294,7 @@ spiceinit from=EN0131771668M.cub ck=EN0131771668M.bc extra=$extra
   <groups>
     <group name="Files">
         <parameter name="FROM">
-          <type>filename</type>
+          <type>cube</type>
           <fileMode>input</fileMode>
           <internalDefault>None</internalDefault>
           <brief>

@@ -48,7 +48,7 @@ void IsisMain() {
   Process p;
 
   UserInterface &ui = Application::GetUserInterface();
-  QString from = ui.GetFileName("FROM");
+  QString from = ui.GetCubeName("FROM");
   QString to = FileName(ui.GetFileName("TO")).expanded();
   QString socetProject = ui.GetString("SS_PROJECT");
   QString socetImageLocation = ui.GetString("SS_IMG_LOC");

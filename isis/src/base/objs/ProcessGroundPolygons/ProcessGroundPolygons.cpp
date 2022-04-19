@@ -245,7 +245,7 @@ namespace Isis {
       QString &cube) {
 
     QString avgString =
-      Application::GetUserInterface().GetFileName(parameter);
+      Application::GetUserInterface().GetCubeName(parameter);
     CubeAttributeOutput atts =
       Application::GetUserInterface().GetOutputAttribute(parameter);
 
@@ -270,7 +270,7 @@ namespace Isis {
       Isis::Pvl &map, int bands) {
 
     QString avgString =
-      Application::GetUserInterface().GetFileName(parameter);
+      Application::GetUserInterface().GetCubeName(parameter);
     CubeAttributeOutput atts =
       Application::GetUserInterface().GetOutputAttribute(parameter);
 

@@ -200,7 +200,7 @@ void ComputeInputRange() {
       //Else read the target name from the input cube
       else {
         Pvl fromFile;
-        fromFile.read(ui.GetFileName("FROM"));
+        fromFile.read(ui.GetCubeName("FROM"));
         target = (QString)fromFile.findKeyword("TargetName", Pvl::Traverse);
       }
 

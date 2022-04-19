@@ -101,10 +101,10 @@ void IsisMain() {
 
   // Write the image data to the output cubes
 
-  Cube* reflectanceCube = processPDS.SetOutputCube(ui.GetFileName("TO"),
+  Cube* reflectanceCube = processPDS.SetOutputCube(ui.GetCubeName("TO"),
                                                    outputAtts,
                                                    1, 1, 64);
-  Cube* stdevCube = processPDS.SetOutputCube(ui.GetFileName("TOSTDDEV"),
+  Cube* stdevCube = processPDS.SetOutputCube(ui.GetCubeName("TOSTDDEV"),
                                              outputAtts,
                                              1, 1, 64);
 

@@ -391,7 +391,7 @@ namespace Isis {
    *
    * @returns @b double The oblique line resolution in meters per pixel
    */
-  double CSMCamera::ObliqueLineResolution() {
+  double CSMCamera::ObliqueLineResolution(bool useLocal) {
     // CSM resolution is always the oblique resolution so just return it
     return LineResolution();
   }
@@ -406,7 +406,7 @@ namespace Isis {
    *
    * @returns @b double The oblique sample resolution in meters per pixel
    */
-  double CSMCamera::ObliqueSampleResolution() {
+  double CSMCamera::ObliqueSampleResolution(bool useLocal) {
     // CSM resolution is always the oblique resolution so just return it
     return SampleResolution();
   }
@@ -421,7 +421,7 @@ namespace Isis {
    *
    * @returns @b double The oblique detector resolution in meters per pixel
    */
-  double CSMCamera::ObliqueDetectorResolution() {
+  double CSMCamera::ObliqueDetectorResolution(bool useLocal) {
     // CSM resolution is always the oblique resolution so just return it
     return DetectorResolution();
   }

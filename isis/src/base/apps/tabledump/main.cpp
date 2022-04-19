@@ -25,7 +25,7 @@ map <QString, void *> GuiHelpers() {
 void IsisMain() {
   // Gather parameters from the UserInterface
   UserInterface &ui = Application::GetUserInterface();
-  FileName file = ui.GetFileName("FROM");
+  FileName file = ui.GetCubeName("FROM");
   QString tableName = ui.GetString("NAME");
   Table table(tableName, file.expanded());
 
@@ -146,7 +146,7 @@ void helperButtonGetTableList() {
   bool match = false;
 
   UserInterface &ui = Application::GetUserInterface();
-  QString currentFile = ui.GetFileName("FROM");
+  QString currentFile = ui.GetCubeName("FROM");
   const Pvl label(FileName(currentFile).expanded());
 
   // Check to see if the "FILE" parameter has changed since last press

@@ -23,14 +23,14 @@ namespace Isis{
       // To propogate labels, set input cube,
       // this cube will be cleared after output cube is set.
       CubeAttributeInput &inputAtt = ui.GetInputAttribute("FROM");
-      p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
+      p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
 
       // Setup the input and output cubes
       QString replaceMode = ui.GetAsString("VPER_REPLACE");
       CubeAttributeInput cai(ui.GetAsString("FROM"));
       bands = cai.bands();
 
-      QString from = ui.GetFileName("FROM");
+      QString from = ui.GetCubeName("FROM");
       inCube.setVirtualBands(bands);
       inCube.open(from);
 
@@ -62,7 +62,7 @@ namespace Isis{
 
       //  Allocate output file
       CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-      Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), att, ons, onl, inb);
+      Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, ons, onl, inb);
       // Our processing routine only needs 1
       // the original set was for info about the cube only
       p.ClearInputCubes();

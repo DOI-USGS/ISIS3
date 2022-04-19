@@ -1,0 +1,40 @@
+\begintext
+
+From the following lines, we can determine that
+focal length is 166.85 in mm and 10428.125 in pixels. Thus,
+pixel resolution is 10428.125/166.85 = 166.85 pix/mm and
+pixel pitch is 1/62.5 = 0.016 mm/pix.
+The following lines were found in the document 
+/usgs/cpkgs/isis2/lsb/isisd/data/mission.sav:
+
+
+
+Near_1 MSI    166.85mm pixel-0.027x0.016mm raw size=244lx537s
+                                                            F/L     CENTER  UNDISTORTED DISTORTED WEIGHT
+        MISSION                     CAMERA     FILTER     PIXELS   LINE  SAMP   NL   NS   NL   NS   C
+ _______________________________|X_________|___________|_________|_____|_____|____|____|____|____|_____|
+
+NEAR_1                           MSI       ALL          10428.125 206.5  269.  412  537  412  537    1.
+
+
+K1 was found in isis2 spi_distorccd.F
+
+
+
+\begindata
+INS-93001_PLATFORM_ID = -93000
+INS-93001_FRAME_ID = -93001
+#INS-93900_FRAME_ID = -93900
+#INS-93901_FRAME_ID = -93901
+
+INS-93001_K1 = -0.00007
+INS-93001_FOCAL_LENGTH = 166.85
+INS-93001_PIXEL_PITCH = 0.016
+
+INS-93001_BORESIGHT_SAMPLE = 269.0
+INS-93001_BORESIGHT_LINE = 206.5
+
+INS-93001_TRANSX  = (  0.0,       0.016,        0.0   )
+INS-93001_TRANSY  = (  0.0,       0.0,         -0.016 )
+INS-93001_ITRANSS = (  0.0,      62.5,          0.0   )
+INS-93001_ITRANSL = (  0.0,       0.0,        -62.5   )

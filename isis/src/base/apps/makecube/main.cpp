@@ -94,7 +94,7 @@ void IsisMain() {
   int samps = ui.GetInteger("SAMPLES");
   int lines = ui.GetInteger("LINES");
   int bands = ui.GetInteger("BANDS");
-  p.SetOutputCube(ui.GetFileName("TO"), att, samps, lines, bands);
+  p.SetOutputCube(ui.GetCubeName("TO"), att, samps, lines, bands);
 
   // Make the cube
   p.ProcessCubeInPlace(ConstantValueFunctor(value), false);

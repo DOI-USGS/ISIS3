@@ -137,7 +137,7 @@ namespace Isis {
        flag  -> type of solutions sought: 1 decomposition only, 2 decomposition and solve, 3 decompose solve and inverse a
      */
 
-    if (flag < 1 && flag > 3)
+    if (flag < 1 || flag > 3)
       return NOT_SOLVABLE;
 
     /*************** STEP 1:  DECOMPOSE THE A MATRIX ***************/

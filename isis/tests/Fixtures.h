@@ -256,6 +256,9 @@ namespace Isis {
 
   class ApolloCube : public LargeCube {
     protected:
+      std::vector<std::pair<int, int>> reseaus;
+      int reseauSize;
+
       void SetUp() override;
   };
 
@@ -390,6 +393,32 @@ class ClipperPbCube : public TempTestingFiles {
   protected:
     Cube *testCube;
     void setInstrument(QString instrumentId);
+};
+
+class NearMsiCameraCube : public TempTestingFiles {
+  protected:
+    // Cube *testCube;
+    std::unique_ptr<Cube> testCube;
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class TgoCassisModuleKernels : public ::testing::Test {
+
+  protected:
+    // You can define per-test set-up logic as usual.
+    void SetUp() override;
+
+    // You can define per-test tear-down logic as usual.
+    void TearDown() override;
+
+    QTemporaryDir kernelPrefix;
+
+    QVector<QString> binaryCkKernels;
+    QVector<QString> binarySpkKernels;
+
+    QString binaryCkKernelsAsString;
+    QString binarySpkKernelsAsString;
 };
 
 }

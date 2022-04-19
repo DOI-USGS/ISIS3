@@ -31,7 +31,7 @@ namespace Isis {
         Isis::Cube *icube;
         Isis::CubeAttributeInput inAtt;
 
-        cubeFn = ui.GetFileName("FROM");
+        cubeFn = ui.GetCubeName("FROM");
         icube = new Cube(cubeFn);
         inAtt = ui.GetInputAttribute("FROM");
 
@@ -46,7 +46,7 @@ namespace Isis {
         outputCube = new Cube();
         outputCube->setDimensions(icube->sampleCount(), icube->lineCount(), icube->bandCount());
 
-        outputCube->create(ui.GetFileName("TO"));
+        outputCube->create(ui.GetCubeName("TO"));
 
         if(icube->hasGroup("Instrument")) {
             PvlGroup inst = icube->group("Instrument");

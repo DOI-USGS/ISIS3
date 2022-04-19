@@ -25,7 +25,7 @@ namespace Isis{
 
   void maptrim(UserInterface &ui, Pvl *log) {
     // Get the projection
-    Pvl pvl(ui.GetFileName("FROM"));
+    Pvl pvl(ui.GetCubeName("FROM"));
     proj = (TProjection *) ProjectionFactory::CreateFromCube(pvl);
 
     // Determine ground range to crop and/or trim
@@ -55,7 +55,7 @@ namespace Isis{
 
       ProcessByLine p;
       CubeAttributeInput &inputAtt = ui.GetInputAttribute("FROM");
-      p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
+      p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
       p.StartProcess(getSize);
       p.EndProcess();
 
@@ -64,7 +64,7 @@ namespace Isis{
 
       // Run external crop
       QString cropParams = "";
-      cropParams += "from=" + ui.GetFileName("FROM");
+      cropParams += "from=" + ui.GetCubeName("FROM");
       if(mode == "CROP") {
         cropParams += " to=" + ui.GetAsString("TO");
       }
@@ -102,11 +102,11 @@ namespace Isis{
       }
       else { //if its trim
         CubeAttributeInput &inputAtt = ui.GetInputAttribute("FROM");
-        p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
+        p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
       }
 
       CubeAttributeOutput &outputAtt = ui.GetOutputAttribute("TO");
-      p.SetOutputCube(ui.GetFileName("TO"), outputAtt);
+      p.SetOutputCube(ui.GetCubeName("TO"), outputAtt);
       p.StartProcess(trim);
       p.EndProcess();
       if(mode == "BOTH") {

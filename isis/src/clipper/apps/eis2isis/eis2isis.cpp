@@ -64,7 +64,7 @@ namespace Isis {
 
       translateEISLabels(xmlFileName, outputLabel);
 
-      FileName outputCubeFileName(ui.GetFileName("TO"));
+      FileName outputCubeFileName(ui.GetCubeName("TO"));
 
       OriginalXmlLabel xmlLabel;
       xmlLabel.readFromXmlFile(xmlFileName);

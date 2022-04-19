@@ -52,6 +52,7 @@ namespace Isis {
   Table *g_utcTable;
   PvlGroup g_results("Results");
 
+
   Pvl chan1m32isis(UserInterface &ui) {
     Pvl log;
     importImage("TO", (ProcessImportPds::PdsFileType)(ProcessImportPds::Rdn|ProcessImportPds::L0), ui);
@@ -61,10 +62,12 @@ namespace Isis {
     return log;
   }
 
+
   void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType) {
     UserInterface &ui = Application::GetUserInterface();
     importImage(outputParamName, fileType, ui);
   }
+
 
   void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType, UserInterface &ui) {
     if (!ui.WasEntered(outputParamName)) {
@@ -192,7 +195,7 @@ namespace Isis {
         g_oCube->setPixelType(importPds.PixelType());
       }
       g_oCube->setDimensions(importPds.Samples(), outputLines, importPds.Bands());
-      g_oCube->create(ui.GetFileName(outputParamName));
+      g_oCube->create(ui.GetCubeName(outputParamName));
       g_oCube->addCachingAlgorithm(new BoxcarCachingAlgorithm());
 
       g_oBuff = new Isis::Brick(importPds.Samples(), outputLines, importPds.Bands(),
@@ -238,7 +241,7 @@ namespace Isis {
     if (linesNeedFlipped) {
       ProcessBySample flipLines;
       flipLines.Progress()->SetText("Flipping Lines");
-      Cube *cube = flipLines.SetInputCube(ui.GetFileName(outputParamName), inAttribute);
+      Cube *cube = flipLines.SetInputCube(ui.GetCubeName(outputParamName), inAttribute);
       cube->reopen("rw");
       flipLines.ProcessCubeInPlace(flip, false);
     }
@@ -246,7 +249,7 @@ namespace Isis {
     if (samplesNeedFlipped) {
       ProcessByLine flipSamples;
       flipSamples.Progress()->SetText("Flipping Samples");
-      Cube *cube = flipSamples.SetInputCube(ui.GetFileName(outputParamName), inAttribute);
+      Cube *cube = flipSamples.SetInputCube(ui.GetCubeName(outputParamName), inAttribute);
       cube->reopen("rw");
       flipSamples.ProcessCubeInPlace(flip, false);
     }

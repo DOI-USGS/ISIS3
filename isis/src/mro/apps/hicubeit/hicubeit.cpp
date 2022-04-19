@@ -20,9 +20,9 @@ using namespace std;
 namespace Isis {
 
   void hicubeit(UserInterface &ui) {
-    QString redFile = ui.GetFileName("RED");
-    QString irFile  = ui.GetFileName("IR");
-    QString bgFile  = ui.GetFileName("BG");
+    QString redFile = ui.GetCubeName("RED");
+    QString irFile  = ui.GetCubeName("IR");
+    QString bgFile  = ui.GetCubeName("BG");
 
     FileName tempFile = FileName::createTempFile("$TEMPORARY/hicubeit.temp.lis");
     TextFile tf;
@@ -33,7 +33,7 @@ namespace Isis {
     tf.Close();
 
     QString parameters = QString(" FROMLIST = ")    + tempFile.expanded() +
-                        QString(" TO = ")      + ui.GetFileName("TO") +
+                        QString(" TO = ")      + ui.GetCubeName("TO") +
                         QString(" PROPLAB = ") + redFile;
     ProgramLauncher::RunIsisProgram("cubeit", parameters);
     remove(tempFile.expanded().toLatin1().data());
@@ -181,7 +181,7 @@ namespace Isis {
 
     // Add the group to the output cube
     Cube c;
-    c.open(ui.GetFileName("TO"), "rw");
+    c.open(ui.GetCubeName("TO"), "rw");
     c.label()->findObject("IsisCube", Pvl::Traverse).addGroup(mos);
     c.close();
   }

@@ -36,11 +36,37 @@ release.
 ## [Unreleased]
 
 ### Changed
+
+### Added
+- Improved functionality of msi2isis and MsiCamera model to support new Eros dataset, including support for Gaskell's SUMSPICE files that adjust timing, pointing and spacecraft position ephemeris. [#4886](https://github.com/USGS-Astrogeology/ISIS3/issues/4886)
+
+### Deprecated
+
+### Fixed
+- Added check to determine if poles were a valid projection point in ImagePolygon when generating footprint for a map projected image. [#4390](https://github.com/USGS-Astrogeology/ISIS3/issues/4390)
+
+
+## [7.0.0] - 2022-02-11
+
+### Changed
 - Disabled SURF algorithm for findfeatures, latest version of opencv no longer provides SURF as part of the base library [#3885](https://github.com/USGS-Astrogeology/ISIS3/issues/3885)
 - Changed caminfo's parameter default values for MAXEMISSION and MAXINCIDENCE to be
 synchronized with footprintinit default values of the same parameters.
 This corrects inconsistencies of footprint generation failing in caminfo
 but passing in footprintinit. [#4651](https://github.com/USGS-Astrogeology/ISIS3/issues/4651).
+- Changed the internal logic of ObliqueDataResolution() to use LocalEmission angle rather than Emission angle.
+This will cause differences in output; new values will be more accurate because they use DEM rather than
+ellipsoid. The cost to compute the local emissoin will increase by approximately x1.5. [#3600](https://github.com/USGS-Astrogeology/ISIS3/issues/3600)
+- Changed website layout to better surface relevant documents.
+[#4839](https://github.com/USGS-Astrogeology/ISIS3/pull/4839)
+[#4847](https://github.com/USGS-Astrogeology/ISIS3/pull/4847)
+[#4851](https://github.com/USGS-Astrogeology/ISIS3/pull/4851)
+[#4852](https://github.com/USGS-Astrogeology/ISIS3/pull/4852)
+[#4856](https://github.com/USGS-Astrogeology/ISIS3/pull/4856)
+[#4865](https://github.com/USGS-Astrogeology/ISIS3/pull/4865)
+[#4859](https://github.com/USGS-Astrogeology/ISIS3/pull/4859)
+[#4872](https://github.com/USGS-Astrogeology/ISIS3/pull/4872)
+[#4871](https://github.com/USGS-Astrogeology/ISIS3/pull/4871)
 
 ### Added
 - Added the USECAMSTATSTBL option to caminfo. This allows caminfo to extract existing
@@ -52,6 +78,16 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 - Added additional translation files for TGO CaSSiS in order to support PSA compliant labels. [#4567](https://github.com/USGS-Astrogeology/ISIS3/issues/4567)
 - Added support for KaguyaTC SP Support data ingest. [#4668](https://github.com/USGS-Astrogeology/ISIS3/issues/4668)
 - Added examples to the jigsaw documentation. [#4718](https://github.com/USGS-Astrogeology/ISIS3/issues/4718)
+- Added ALLDNS option to phocube. [#3877](https://github.com/USGS-Astrogeology/ISIS3/issues/3877)
+- Added import templates for isisimport, Cassini ISS, Cassini Vims, Kaguya TC Kaguya MI, Dawn FC, Dawn VIR, LROC NAC, LO HRC, MGS MOC, MER MI, MRO CTX, Rosetta Osiris, Viking VIS [#4606](https://github.com/USGS-Astrogeology/ISIS3/issues/4606)
+- Added export templates for isisexport, LROC NAC EDR [#4606](https://github.com/USGS-Astrogeology/ISIS3/issues/4606)
+- Added optional JSON data output parameter, DATA, for debugging template engine failures [#4606](https://github.com/USGS-Astrogeology/ISIS3/issues/4606)
+- Added new documentatin for contributing code.
+[#4859](https://github.com/USGS-Astrogeology/ISIS3/pull/4859)
+[#4871](https://github.com/USGS-Astrogeology/ISIS3/pull/4871)
+- Added versioning to website documentation.
+[#4852](https://github.com/USGS-Astrogeology/ISIS3/pull/4852)
+[#4872](https://github.com/USGS-Astrogeology/ISIS3/pull/4872)
 
 ### Deprecated
 - Deprecated edrget as discussed in [#3313](https://github.com/USGS-Astrogeology/ISIS3/issues/3313).
@@ -60,6 +96,12 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 - Fixed Maptrim failures when mode=both for PositiveWest longitude direction. [#4646](https://github.com/USGS-Astrogeology/ISIS3/issues/4646)
 - Fixed the Vesta target name not being translated properly in dawnfc2isis. [#4638](https://github.com/USGS-Astrogeology/ISIS3/issues/4638)
 - Fixed a bug where the measure residuals reported in the bundleout.txt file were incorrect. [#4655](https://github.com/USGS-Astrogeology/ISIS3/issues/4655)
+- Fixed a bug where jigsaw would raise an error when solving for framing camera pointing in observation mode. [#4686](https://github.com/USGS-Astrogeology/ISIS3/issues/4686)
+- Fixed slow runs of automos when the priority was BAND. [#4793](https://github.com/USGS-Astrogeology/ISIS3/pull/4793)
+- Fixed qview crashing when attempting to load image DNs. [4818](https://github.com/USGS-Astrogeology/ISIS3/issues/4818)
+- Fixed qnet crashing when entering an invalid image name in the measure selection box. [#4581](https://github.com/USGS-Astrogeology/ISIS3/issues/4581)
+- Modified cnetcheck noLatLonCheck logic to correctly exclude ignored measures. [#4649](https://github.com/USGS-Astrogeology/ISIS3/issues/4649)
+- Fixed bug where the original label was not attached to stereo HRSC images on import [#4816](https://github.com/USGS-Astrogeology/ISIS3/issues/4816)
 
 ## [6.0.0] - 2021-08-27
 
@@ -345,7 +387,8 @@ The unreleased comparison should always be
 {REPO_NAME}/compare/{LAST_VERSION_TAG}...HEAD
 -->
 
-[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/6.0.0...HEAD
+[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/7.0.0...HEAD
+[7.0.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/6.0.0...7.0.0
 [6.0.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.2...6.0.0
 [5.0.2]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.1...5.0.2
 [5.0.1]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.0...5.0.1

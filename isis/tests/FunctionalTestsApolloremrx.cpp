@@ -19,7 +19,8 @@ TEST_F(ApolloCube, FunctionalTestApolloremrxDefault) {
 
   QTemporaryDir prefix;
   QString outCubeFileName = prefix.path()+"/outTEMP.cub";
-  QVector<QString> args = {"to=" + outCubeFileName, "action=null"};
+  QVector<QString> args = {"to=" + outCubeFileName,
+                           "action=null"};
 
   UserInterface options(APP_XML, args);
   try {
@@ -32,30 +33,73 @@ TEST_F(ApolloCube, FunctionalTestApolloremrxDefault) {
   Cube cube(outCubeFileName);
   Pvl *isisLabel = cube.label();
 
-  PvlGroup reseaus = isisLabel->findObject("IsisCube").findGroup("Reseaus");
-  PvlKeyword lineKey = reseaus.findKeyword("Line");
+  PvlGroup reseausGroup = isisLabel->findObject("IsisCube").findGroup("Reseaus");
+  PvlKeyword lineKey = reseausGroup.findKeyword("Line");
   EXPECT_NEAR(lineKey[0].toDouble(), 200, 0.0001);
   EXPECT_NEAR(lineKey[1].toDouble(), 400, 0.0001);
   EXPECT_NEAR(lineKey[2].toDouble(), 600, 0.0001);
 
-  PvlKeyword sampleKey = reseaus.findKeyword("Sample");
+  PvlKeyword sampleKey = reseausGroup.findKeyword("Sample");
   EXPECT_NEAR(sampleKey[0].toDouble(), 200, 0.0001);
   EXPECT_NEAR(sampleKey[1].toDouble(), 400, 0.0001);
   EXPECT_NEAR(sampleKey[2].toDouble(), 600, 0.0001);
 
-  PvlKeyword validKey = reseaus.findKeyword("Valid");
+  PvlKeyword validKey = reseausGroup.findKeyword("Valid");
   EXPECT_EQ(validKey[0].toInt(), 1);
   EXPECT_EQ(validKey[1].toInt(), 1);
   EXPECT_EQ(validKey[2].toInt(), 1);
 
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, reseaus.findKeyword("Status"), "Removed");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, reseausGroup.findKeyword("Status"), "Removed");
 
-  std::unique_ptr<Histogram> hist (testCube->histogram());
+  Brick brick(reseauSize,reseauSize,1,cube.pixelType());
 
-  ASSERT_DOUBLE_EQ(hist->Average(), 11449.5);
-  ASSERT_DOUBLE_EQ(hist->Sum(), 6004232295000);
-  ASSERT_EQ(hist->ValidPixels(), 524410000);
-  ASSERT_NEAR(hist->StandardDeviation(), 6610.66055, 0.00001);
+  for (size_t i = 0; i < reseaus.size(); i++) {
+    int baseSamp = (int)(reseaus[i].first+0.5) - (reseauSize/2);
+    int baseLine = (int)(reseaus[i].second+0.5) - (reseauSize/2);
+    brick.SetBasePosition(baseSamp,baseLine,1);
+    cube.read(brick);
+    Statistics reseauStats;
+    reseauStats.AddData(&brick[0], brick.size());
+
+    EXPECT_NEAR(reseauStats.Average(), i, 0.001) << "Reseau " << i;
+    EXPECT_EQ(reseauStats.ValidPixels(), 9604) << "Reseau " << i;
+    EXPECT_EQ(reseauStats.NullPixels(), 1005) << "Reseau " << i;
+    EXPECT_NEAR(reseauStats.StandardDeviation(), 0.0, 0.001) << "Reseau " << i;
+  }
+}
+
+TEST_F(ApolloCube, FunctionalTestApolloremrxPatch) {
+
+  testCube->group("RESEAUS")["STATUS"] = "Refined";
+
+  QTemporaryDir prefix;
+  QString outCubeFileName = prefix.path()+"/outTEMP.cub";
+  QVector<QString> args = {"to=" + outCubeFileName,
+                           "action=PATCH"};
+
+  UserInterface options(APP_XML, args);
+  try {
+    apolloremrx(testCube, options);
+  }
+  catch (IException &e) {
+    FAIL() << "Call failed, Unable to process cube: " << e.what() << std::endl;
+  }
+
+  Cube cube(outCubeFileName);
+
+  Brick brick(reseauSize,reseauSize,1,cube.pixelType());
+
+  for (size_t i = 0; i < reseaus.size(); i++) {
+    int baseSamp = (int)(reseaus[i].first+0.5) - (reseauSize/2);
+    int baseLine = (int)(reseaus[i].second+0.5) - (reseauSize/2);
+    brick.SetBasePosition(baseSamp,baseLine,1);
+    cube.read(brick);
+    Statistics reseauStats;
+    reseauStats.AddData(&brick[0], brick.size());
+
+    EXPECT_EQ(reseauStats.ValidPixels(), 10609) << "Reseau " << i;
+    EXPECT_EQ(reseauStats.NullPixels(), 0) << "Reseau " << i;
+  }
 }
 
 TEST_F(ApolloCube, FunctionalTestApolloremrxRemovedError) {

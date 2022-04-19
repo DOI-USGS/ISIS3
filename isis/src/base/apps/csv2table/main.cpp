@@ -123,7 +123,7 @@ void IsisMain() {
   }
 
   // Write the table to the cube
-  QString outCubeFileName(ui.GetFileName("to"));
+  QString outCubeFileName(ui.GetCubeName("to"));
   Cube outCube;
   try {
     outCube.open(outCubeFileName, "rw");

@@ -49,7 +49,7 @@ void pvlOut(Statistics stats1, Statistics stats2, QString name, int start,
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  Isis::FileName fromFile = ui.GetFileName("FROM");
+  Isis::FileName fromFile = ui.GetCubeName("FROM");
 
   Isis::Cube inputCube;
   inputCube.open(fromFile.expanded());

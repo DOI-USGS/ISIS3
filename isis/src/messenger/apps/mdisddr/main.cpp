@@ -116,7 +116,7 @@ void IsisMain() {
   const QString dataSetID = "MESS-E/V/H-MDIS-6-DDR-GEOMDATA-V1.0";
 
   UserInterface &ui = Application::GetUserInterface();
-  FileName input(ui.GetFileName("FROM"));
+  FileName input(ui.GetCubeName("FROM"));
   QString to = "";
   bool toEntered = ui.WasEntered("TO");
   if (toEntered) {

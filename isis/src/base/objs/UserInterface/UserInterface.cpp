@@ -518,6 +518,11 @@ namespace Isis {
       }
 
     }
+    if(usedDashLast) {
+      Pvl temp;
+      CommandLine(temp);
+      cout << BuildNewCommandLineFromPvl(temp) << endl;
+    }
 
     // Can't use the batchlist with the gui, save, last or restore option
     if ( BatchListSize() != 0 && (p_interactive || usedDashLast || p_saveFile != ""
@@ -535,7 +540,20 @@ namespace Isis {
     }
   }
 
+  QString UserInterface::BuildNewCommandLineFromPvl(Pvl temp){
+    PvlGroup group = temp.group(0);
+    int numKeywords = group.keywords();
+    QString returnVal = p_progName + " ";
 
+    for(int i = 0; i < numKeywords; i++){
+      PvlKeyword key = group[i];
+      returnVal += key.name();
+      returnVal += "=";
+      returnVal += QString(key);
+      returnVal += " ";
+    }
+    return returnVal;
+  }
   /**
    * Loads the previous history for the program
    *
@@ -591,7 +609,6 @@ namespace Isis {
             }
           }
 
-          cout << commandline << endl;
           return;
         }
 

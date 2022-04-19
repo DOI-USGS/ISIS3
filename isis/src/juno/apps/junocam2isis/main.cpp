@@ -109,7 +109,7 @@ void IsisMain() {
     int numFullFrames = importPds.Lines() / g_fullFrameLines;
 
     // Allocate this number of total cubes of the correct size
-    FileName outputFileName(ui.GetFileName("TO"));
+    FileName outputFileName(ui.GetCubeName("TO"));
     QString outputBaseName = outputFileName.removeExtension().expanded();
 
     // Now this will be a list of output Fullframes 1-N.cub
@@ -185,7 +185,7 @@ void IsisMain() {
                          .addKeyword(PvlKeyword("NumberFramelets", toString(frameletsPerFilter)));
 
     // get output file name and remove cube extension, if entered
-    FileName outputFileName(ui.GetFileName("TO"));
+    FileName outputFileName(ui.GetCubeName("TO"));
     QString outputBaseName = outputFileName.removeExtension().expanded();
 
     QFile allCubesListFile(outputBaseName + ".lis");

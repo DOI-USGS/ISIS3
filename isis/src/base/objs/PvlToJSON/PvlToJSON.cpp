@@ -10,6 +10,7 @@ find files of those names at the top level of this repository. **/
 
 #include "Pvl.h"
 #include "PvlKeyword.h"
+#include "IException.h"
 
 using json = nlohmann::json;
 using namespace std;
@@ -135,17 +136,18 @@ namespace Isis {
     // Convert keywords
     PvlContainer::PvlKeywordIterator keywordIt;
     for (keywordIt = container.begin(); keywordIt != container.end(); keywordIt++) {
+      string keywordName = keywordIt->name().replace("^", "ptr").replace(":", "_").toStdString();
       // Handle repeated keywords by packing them into an array
-      if ( jsonContainer.contains(keywordIt->name().toStdString()) ) {
-        if (!jsonContainer[keywordIt->name().toStdString()].is_array()) {
+      if ( jsonContainer.contains(keywordName) ) {
+        if (!jsonContainer[keywordName].is_array()) {
           json repeatedArray;
-          repeatedArray.push_back(jsonContainer[keywordIt->name().toStdString()]);
-          jsonContainer[keywordIt->name().toStdString()] = repeatedArray;
+          repeatedArray.push_back(jsonContainer[keywordName]);
+          jsonContainer[keywordName] = repeatedArray;
         }
-        jsonContainer[keywordIt->name().toStdString()].push_back(pvlKeywordToJSON(*keywordIt));
+        jsonContainer[keywordName].push_back(pvlKeywordToJSON(*keywordIt));
       }
       else {
-        jsonContainer[keywordIt->name().toStdString()] = pvlKeywordToJSON(*keywordIt);
+          jsonContainer[keywordName] = pvlKeywordToJSON(*keywordIt);
       }
     }
 
@@ -349,4 +351,25 @@ namespace Isis {
     return pvlObjectToJSON(pvl);
   }
 
+  /**
+   * Converts an PVL file to a json object.
+   *
+   *
+   * @param pvlFile Path to an PVL file.
+   *
+   * @return json The pvl file converted to a json object.
+   */
+  json pvlToJSON(QString pvlFile) {
+    Pvl pvl;
+
+    try {
+      pvl.read(pvlFile);
+    }
+    catch (IException &e){
+      QString msg = QString("Failed to open file for PVL Input: [%1]").arg(pvlFile);
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+
+    return pvlToJSON(pvl);
+  }
 }

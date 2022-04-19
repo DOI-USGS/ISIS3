@@ -301,7 +301,7 @@ void LoadCameraRes() {
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
-  c.open(ui.GetFileName("FROM"));
+  c.open(ui.GetCubeName("FROM"));
   Camera *cam = c.camera();
   double res = cam->RaDecResolution();
 
@@ -359,7 +359,7 @@ void LoadCameraRange() {
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
-  c.open(ui.GetFileName("FROM"));
+  c.open(ui.GetCubeName("FROM"));
   Camera *cam = c.camera();
 
   // Make the target info match the user mapfile

@@ -17,7 +17,7 @@
     },
 
     "homepageURL": "https://isis.astrogeology.usgs.gov",
-    "downloadURL": "https://github.com/USGS-Astrogeology/ISIS3/archive/refs/tags/6.0.0_RC1.zip",
+    "downloadURL": "https://github.com/USGS-Astrogeology/ISIS3/archive/refs/tags/7.0.0_RC1.zip",
     "disclaimerURL": "https://github.com/USGS-Astrogeology/ISIS3/blob/master/LICENSE.md",
     "repositoryURL": "https://github.com/USGS-Astrogeology/ISIS3/",
     "vcs": "git",
@@ -41,7 +41,7 @@
     },
 
     "date": {
-      "metadataLastUpdated": "2021-08-10"
+      "metadataLastUpdated": "2022-02-08"
     }
   }
 ]
