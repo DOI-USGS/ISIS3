@@ -403,16 +403,22 @@ class NearMsiCameraCube : public TempTestingFiles {
     void TearDown() override;
 };
 
-class tgoCassisKernels : public ::testing::Test {
+class TgoCassisModuleKernels : public ::testing::Test {
+
   protected:
-    static void SetUpTestSuite();
-    static void TearDownTestSuite();
+    // You can define per-test set-up logic as usual.
+    void SetUp() override;
 
-    static QVector<QString> binaryCkKernels;
-    static QVector<QString> binarySpkKernels;
+    // You can define per-test tear-down logic as usual.
+    void TearDown() override;
 
-    static QString binaryCkKernelsAsString;
-    static QString binarySpkKernelsAsString;
+    QTemporaryDir kernelPrefix;
+
+    QVector<QString> binaryCkKernels;
+    QVector<QString> binarySpkKernels;
+
+    QString binaryCkKernelsAsString;
+    QString binarySpkKernelsAsString;
 };
 
 }

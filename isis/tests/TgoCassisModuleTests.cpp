@@ -30,13 +30,8 @@ static QString MOSRANGE_XML = FileName("$ISISROOT/bin/xml/mosrange.xml").expande
 static QString CAM2MAP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
 static QString CUBEIT_XML = FileName("$ISISROOT/bin/xml/cubeit.xml").expanded();
 
-QVector<QString> tgoCassisKernels::binaryCkKernels = {};
-QVector<QString> tgoCassisKernels::binarySpkKernels = {};
 
-QString tgoCassisKernels::binaryCkKernelsAsString = "";
-QString tgoCassisKernels::binarySpkKernelsAsString = "";
-
-TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
+TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis and spiceinit on pan framelet.
@@ -52,7 +47,9 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
     FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
   }
 
-  QVector<QString> spiceinitArgs = {"from=" + panFileName,  "ckp=t", "spkp=t"};
+  QVector<QString> spiceinitArgs = {"from=" + panFileName,
+                                    "ck=" + binaryCkKernelsAsString,
+                                    "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitPan(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitPan);
@@ -73,7 +70,9 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
     FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
   }
 
-  spiceinitArgs = {"from=" + redFileName,  "ckp=t", "spkp=t"};
+  spiceinitArgs = {"from=" + redFileName,
+                   "ck=" + binaryCkKernelsAsString,
+                   "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitRed(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitRed);
@@ -94,7 +93,9 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
     FAIL() << "Unable to run tgocassis2isis on blu image: " << e.what() << std::endl;
   }
 
-  spiceinitArgs = {"from=" + bluFileName,  "ckp=t", "spkp=t"};
+  spiceinitArgs = {"from=" + bluFileName,
+                   "ck=" + binaryCkKernelsAsString,
+                   "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitBlu(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitBlu);
@@ -115,7 +116,9 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
     FAIL() << "Unable to run tgocassis2isis on nir image: " << e.what() << std::endl;
   }
 
-  spiceinitArgs = {"from=" + nirFileName,  "ckp=t", "spkp=t"};
+  spiceinitArgs = {"from=" + nirFileName,
+                   "ck=" + binaryCkKernelsAsString,
+                   "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitNir(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitNir);
@@ -556,7 +559,7 @@ TEST(TgoCassisModuleTests, TgoCassisStitchUnstitch) {
 }
 
 
-TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
+TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis and spiceinit on pan framelet.
@@ -572,7 +575,9 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
     FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
   }
 
-  QVector<QString> spiceinitArgs = {"from=" + panFileName,  "ckp=t", "spkp=t"};
+  QVector<QString> spiceinitArgs = {"from=" + panFileName,
+                                    "ck=" + binaryCkKernelsAsString,
+                                    "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitPan(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitPan);
@@ -593,7 +598,9 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
     FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
   }
 
-  spiceinitArgs = {"from=" + redFileName,  "ckp=t", "spkp=t"};
+  spiceinitArgs = {"from=" + redFileName,
+                   "ck=" + binaryCkKernelsAsString,
+                   "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitRed(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitRed);
@@ -614,7 +621,9 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
     FAIL() << "Unable to run tgocassis2isis on blu image: " << e.what() << std::endl;
   }
 
-  spiceinitArgs = {"from=" + bluFileName,  "ckp=t", "spkp=t"};
+  spiceinitArgs = {"from=" + bluFileName,
+                   "ck=" + binaryCkKernelsAsString,
+                   "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitBlu(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitBlu);
@@ -635,7 +644,9 @@ TEST(TgoCassisModuleTests, TgoCassisSingleFrameletProjection) {
     FAIL() << "Unable to run tgocassis2isis on nir image: " << e.what() << std::endl;
   }
 
-  spiceinitArgs = {"from=" + nirFileName,  "ckp=t", "spkp=t"};
+  spiceinitArgs = {"from=" + nirFileName,
+                   "ck=" + binaryCkKernelsAsString,
+                   "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitNir(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitNir);
@@ -1158,7 +1169,7 @@ TEST(TgoCassisModuleTests, TgoCassisIngestReingest) {
 }
 
 
-TEST(TgoCassisModuleTests, TgoCassisColorMosaic) {
+TEST_F(TgoCassisModuleKernels, TgoCassisTestColorMosaic) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis and spiceinit on pan framelet.
@@ -1174,7 +1185,9 @@ TEST(TgoCassisModuleTests, TgoCassisColorMosaic) {
     FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
   }
 
-  QVector<QString> spiceinitArgs = {"from=" + panFileName,  "ckp=t", "spkp=t"};
+  QVector<QString> spiceinitArgs = {"from=" + panFileName,
+                                    "ck=" + binaryCkKernelsAsString,
+                                    "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitPan(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitPan);
@@ -1195,7 +1208,9 @@ TEST(TgoCassisModuleTests, TgoCassisColorMosaic) {
     FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
   }
 
-  spiceinitArgs = {"from=" + redFileName,  "ckp=t", "spkp=t"};
+  spiceinitArgs = {"from=" + redFileName,
+                   "ck=" + binaryCkKernelsAsString,
+                   "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitRed(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitRed);
@@ -1216,7 +1231,9 @@ TEST(TgoCassisModuleTests, TgoCassisColorMosaic) {
     FAIL() << "Unable to run tgocassis2isis on blu image: " << e.what() << std::endl;
   }
 
-  spiceinitArgs = {"from=" + bluFileName,  "ckp=t", "spkp=t"};
+  spiceinitArgs = {"from=" + bluFileName,
+                   "ck=" + binaryCkKernelsAsString,
+                   "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitBlu(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitBlu);
@@ -1237,7 +1254,9 @@ TEST(TgoCassisModuleTests, TgoCassisColorMosaic) {
     FAIL() << "Unable to run tgocassis2isis on nir image: " << e.what() << std::endl;
   }
 
-  spiceinitArgs = {"from=" + nirFileName,  "ckp=t", "spkp=t"};
+  spiceinitArgs = {"from=" + nirFileName,
+                   "ck=" + binaryCkKernelsAsString,
+                   "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitNir(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitNir);
@@ -1580,7 +1599,7 @@ TEST(TgoCassisModuleTests, TgoCassisColorMosaic) {
 }
 
 
-TEST_F(tgoCassisKernels, TgoCassisMapProjectedReingested) {
+TEST_F(TgoCassisModuleKernels, TgoCassisMapProjectedReingested) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis on red framelet.
@@ -1721,7 +1740,7 @@ TEST_F(tgoCassisKernels, TgoCassisMapProjectedReingested) {
 }
 
 
-TEST(TgoCassisModuleTests, TgoCassisSingleColorMosaicReingest) {
+TEST_F(TgoCassisModuleKernels, TgoCassisSingleColorMosaicReingest) {
   QTemporaryDir prefix;
 
   // run tgocassis2isis and spiceinit on pan framelet.
@@ -1737,7 +1756,9 @@ TEST(TgoCassisModuleTests, TgoCassisSingleColorMosaicReingest) {
     FAIL() << "Unable to run tgocassis2isis on pan image: " << e.what() << std::endl;
   }
 
-  QVector<QString> spiceinitArgs = {"from=" + panFileName,  "ckp=t", "spkp=t"};
+  QVector<QString> spiceinitArgs = {"from=" + panFileName,
+                                    "ck=" + binaryCkKernelsAsString,
+                                    "spk=" + binarySpkKernelsAsString};
   UserInterface spiceinitPan(SPICEINIT_XML, spiceinitArgs);
   try {
     spiceinit(spiceinitPan);

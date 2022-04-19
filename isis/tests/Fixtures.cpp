@@ -1694,7 +1694,6 @@ namespace Isis {
     }
   }
 
-
   void NearMsiCameraCube::SetUp() {
     TempTestingFiles::SetUp();
 
@@ -1715,38 +1714,55 @@ namespace Isis {
     testCube.reset();
   }
 
-
-  void tgoCassisKernels::SetUpTestSuite() {
+  void TgoCassisModuleKernels::SetUp() {
     QVector<QString> ckKernels = {QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_0_sliced_-143410.xc"),
                                   QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_1_sliced_-143410.xc"),
                                   QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_0_sliced_-143000.xc"),
-                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_1_sliced_-143000.xc")};
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_1_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_0_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_1_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_0_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_1_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_0_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_1_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_0_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_1_sliced_-143000.xc")};
+    QVector<QString> tempCkKernels;
     QVector<QString> spkKernels = {QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_0.xsp"),
-                                   QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_1.xsp")};
+                                   QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_1.xsp"),
+                                   QString("data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381_0.xsp"),
+                                   QString("data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381_1.xsp"),
+                                   QString("data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583_0.xsp"),
+                                   QString("data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583_1.xsp")};
+    QVector<QString> tempSpkKernels;
+
+    for (int i = 0; i < ckKernels.size(); i++) {
+      QString kernelFile = ckKernels[i];
+      QString kernelExtension = kernelFile.split('.').last();
+      QString targetFile = kernelPrefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
+      QFile::copy(kernelFile, targetFile);
+      tempCkKernels.append(targetFile);
+    }
+
+    for (int i = 0; i < spkKernels.size(); i++) {
+      QString kernelFile = spkKernels[i];
+      QString kernelExtension = kernelFile.split('.').last();
+      QString targetFile = kernelPrefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
+      QFile::copy(kernelFile, targetFile);
+      tempSpkKernels.append(targetFile);
+    }
 
     // variables defined in TgoCassisModuleTests
     if (binaryCkKernels.size() == 0) {
-      binaryCkKernels = generateBinaryKernels(ckKernels);
-      binarySpkKernels = generateBinaryKernels(spkKernels);
+      binaryCkKernels = generateBinaryKernels(tempCkKernels);
+      binarySpkKernels = generateBinaryKernels(tempSpkKernels);
 
       binaryCkKernelsAsString = fileListToString(binaryCkKernels);
       binarySpkKernelsAsString = fileListToString(binarySpkKernels);
     }
   }
 
-  void tgoCassisKernels::TearDownTestSuite() {
-    for (QString kernel : binaryCkKernels) {
-      if( remove( kernel.toStdString().c_str() ) != 0 ) {
-        perror( "Error deleting file" );
-      }
-    }
-
-    for (QString kernel : binarySpkKernels) {
-      if( remove( kernel.toStdString().c_str() ) != 0 ) {
-        perror( "Error deleting file" );
-      }
-    }
-
+  void TgoCassisModuleKernels::TearDown() {
     binaryCkKernels = {};
     binarySpkKernels = {};
     binaryCkKernelsAsString = "";
