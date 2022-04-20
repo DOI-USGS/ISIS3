@@ -580,13 +580,13 @@ namespace Isis {
         Image *image = m_project->image(id);
         if (image) {
           // Find ProjectItem and append to list
-          item = source->findItemData(qVariantFromValue(image));
+          item = source->findItemData(QVariant::fromValue(image));
         }
       }
       else if (localName == "shape") {
         Shape *shape = m_project->shape(id);
         if (shape) {
-          item = source->findItemData(qVariantFromValue(shape));
+          item = source->findItemData(QVariant::fromValue(shape));
         }
       }
       if (item) {

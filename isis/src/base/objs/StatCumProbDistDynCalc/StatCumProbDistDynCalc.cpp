@@ -403,7 +403,7 @@ namespace Isis {
 
       // if there are now m_numberQuantiles observations, then sort them from smallest to greatest
       if (m_numberObservations == m_numberQuantiles) {
-        sort(m_observationValues.begin(),  m_observationValues.end(),  qLess<double>());
+        sort(m_observationValues.begin(),  m_observationValues.end(), std::less<double>());
       }
     }
     else { // m_numberObservations >= m_numberQuantiles 

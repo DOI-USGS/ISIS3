@@ -220,7 +220,7 @@ namespace Isis {
           vector<QString> userEnteredCks;
           ui.GetAsString("CK", userEnteredCks);
           // convert user entered std vector to QStringList and add to ckKernelList
-          ckKernelList = QVector<QString>::fromStdVector(userEnteredCks).toList();
+          ckKernelList = QVector<QString>(userEnteredCks.begin(),userEnteredCks.end()).toList();
         }
         else {// loop through cks found in the system
 
@@ -283,7 +283,7 @@ namespace Isis {
       // NOTE: This is using GetAsString so that vars like $mgs can be used.
       vector<QString> kernels;
       ui.GetAsString(param, kernels);
-      kernel.setKernels(QVector<QString>::fromStdVector(kernels).toList());
+      kernel.setKernels(QVector<QString>(kernels.begin(),kernels.end()).toList());
     }
   }
 

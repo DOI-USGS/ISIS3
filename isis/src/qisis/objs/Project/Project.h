@@ -27,7 +27,6 @@
 #include <QPointer>
 #include <QStringList>
 #include <QUndoStack>
-#include <QXmlDefaultHandler>
 
 class QMutex;
 class QProgressBar;

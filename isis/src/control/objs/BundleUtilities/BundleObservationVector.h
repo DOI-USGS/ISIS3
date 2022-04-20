@@ -10,7 +10,6 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QList>
-#include <QMap>
 #include <QMultiMap>
 #include <QSharedPointer>
 #include <QString>
@@ -78,9 +77,9 @@ namespace Isis {
 
   private:
       //! Map between observation number and pointer to observation.
-      QMap<QString, BundleObservationQsp> m_observationNumberToObservationMap;
+      QMultiMap<QString, BundleObservationQsp> m_observationNumberToObservationMap;
       //! Map between image serial number and pointer to observation.
-      QMap<QString, BundleObservationQsp> m_imageSerialToObservationMap;
+      QMultiMap<QString, BundleObservationQsp> m_imageSerialToObservationMap;
       //! Map between instrument ID and pointer to observation.
       QMultiMap<QString, BundleObservationQsp> m_instIdToObservationMap;
   };

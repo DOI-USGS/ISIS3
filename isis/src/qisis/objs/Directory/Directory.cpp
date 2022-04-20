@@ -683,7 +683,7 @@ namespace Isis {
     connect(this, SIGNAL(cnetModified()), result->cnetEditorWidget(), SLOT(rebuildModels()));
 
     m_cnetEditorViewWidgets.append(result);
-    m_controlMap.insertMulti(control, result);
+    m_controlMap.insert(control, result);
 
     result->setWindowTitle(title);
     if (objectName != "") {

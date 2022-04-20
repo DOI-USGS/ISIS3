@@ -24,7 +24,7 @@ namespace Isis {
   class MainWindow : public QMainWindow {
       Q_OBJECT
     public:
-      MainWindow(QString title, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+      MainWindow(QString title, QWidget *parent = 0, Qt::WindowFlags flags = Qt::Widget);
       virtual ~MainWindow();
 
       static QString settingsFileName(QString objectTitle);
@@ -41,4 +41,3 @@ namespace Isis {
 };
 
 #endif
-

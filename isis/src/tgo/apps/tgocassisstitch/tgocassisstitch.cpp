@@ -10,6 +10,7 @@ find files of those names at the top level of this repository. **/
 
 #include <QList>
 #include <QMap>
+#include <QMultiMap>
 #include <QString>
 
 #include "AlphaCube.h"
@@ -119,12 +120,12 @@ namespace Isis {
    *                                   files in that frame.
    */
   QMap<QString, FileName> sortFramelets(FileName frameletListFile) {
-    QMap<QString, FileName> frameMap;
+    QMultiMap<QString, FileName> frameMap;
 
     ObservationNumberList frameletList(frameletListFile.expanded(), false);
 
     for (int i = 0; i < frameletList.size(); i++) {
-      frameMap.insertMulti( frameletList.observationNumber(i),
+      frameMap.insert( frameletList.observationNumber(i),
                             frameletList.fileName(i) );
     }
 
@@ -304,5 +305,3 @@ namespace Isis {
     outputCube()->write(outputManager);
   }
 }
-
-
