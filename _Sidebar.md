@@ -62,6 +62,8 @@
 * [Multi-Instrument Registration](https://github.com/USGS-Astrogeology/ISIS3/wiki/Multi-Instrument_Registration)
 
 ### Mission Specific ISIS3 Processing
+* [Lunar Reconnaissance Orbiter (LRO)](https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Lunar_Reconnaissance_Orbiter_(LRO)_Data)
+	* [MiniRF - Miniature Radio Frequency instrument](https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data)
 * [Mars Reconnaissance Orbiter (MRO)](https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_(MRO)_Data)
 	* [HiRISE - High Resolution Imaging Science Experiment](https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_HiRISE_Data)
 	* [CTX (Context Camera)](https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_CTX_Data)
@@ -73,8 +75,6 @@
 	* [ISS (Imaging Science SubSystem)](https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_ISS_Data)
 	* [RADAR - Imaging, Altimeter, Scatterometer, Radiometer](https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_RADAR)
 	* [VIMS (Visual and Infrared Mapping Spectrometer)](https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_VIMS)
-* Working with Lunar Reconnaissance Orbiter (LRO)
-	* [MiniRF - Miniature Radio Frequency instrument](https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data)
 
 ### Programming in ISIS3
 * [Exercises 1](https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_1)
