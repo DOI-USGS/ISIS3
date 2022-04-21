@@ -68,7 +68,7 @@ What follows is an example of processing the experimental data records (EDR) for
 
 Visit http://wms.lroc.asu.edu/lroc/search and search for these. Once you have the full URL, they can be downloaded with ``wget``. This will result in two  files, named M104318871LE.img and M104318871RE.img.
 
-We convert each .img file to an ISIS .cub camera image, initialize the SPICE kernels, and perform radiometric calibration and echo correction. Here are the steps, illustrated on the first image::
+We convert each .img file to an ISIS .cub camera image, initialize the SPICE kernels, and perform radiometric calibration and echo correction. Here are the steps, illustrated on the first image:
    
     lronac2isis from = M104318871LE.IMG     to = M104318871LE.cub
     spiceinit   from = M104318871LE.cub
