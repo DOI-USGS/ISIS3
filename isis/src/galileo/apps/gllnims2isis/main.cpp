@@ -444,9 +444,9 @@ QByteArray pvlFix(QString fileName){
   QByteArray fileData = pvlFile.readAll();
   QByteArray pvlData;
 
-  QString pvlEnd("QUBE\nEND");
-  int ix = fileData.lastIndexOf(pvlEnd);
+  int ix = fileData.lastIndexOf("QUBE\nEND");
 
+  QString pvlEnd("QUBE\nEND");
   pvlData = fileData.left(ix+pvlEnd.size());
 
   //Is this one of the messed up files?

@@ -2035,7 +2035,7 @@ namespace Isis {
         int lockedMeasures = 0;
         for (int i=0; i<deletePointDialog->fileList->count(); i++) {
           QListWidgetItem *item = deletePointDialog->fileList->item(i);
-          if (!deletePointDialog->fileList->isItemSelected(item)) continue;
+          if (!item->isSelected()) continue;
 
           //  Do not delete reference without asking user
           if (m_editPoint->IsReferenceExplicit() &&

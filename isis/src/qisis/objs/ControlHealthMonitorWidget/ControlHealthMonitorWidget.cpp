@@ -16,7 +16,7 @@ find files of those names at the top level of this repository. **/
 #include <QToolBar>
 #include <iostream>
 
-#include <QApplication>
+#include <QGuiApplication>
 #include <QtCore>
 #include <QLabel>
 #include <QtGui>
@@ -32,6 +32,7 @@ find files of those names at the top level of this repository. **/
 #include <QGridLayout>
 #include <QWidgetAction>
 #include <QMenu>
+#include <QScreen>
 #include <ControlNet.h>
 #include <ControlNetVitals.h>
 #include <ControlPoint.h>
@@ -337,7 +338,7 @@ namespace Isis {
     m_historyTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_historyTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_historyTable->setSelectionMode(QAbstractItemView::SingleSelection);
-    m_historyTable->setGeometry(QApplication::desktop()->screenGeometry());
+    m_historyTable->setGeometry(QGuiApplication::primaryScreen()->availableGeometry());
 
     overviewLayout->addWidget(m_historyTable);
     overview->setLayout(overviewLayout);
@@ -415,7 +416,7 @@ namespace Isis {
     m_imagesTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     m_imagesTable->setShowGrid(true);
-    m_imagesTable->setGeometry(QApplication::desktop()->screenGeometry());
+    m_imagesTable->setGeometry(QGuiApplication::primaryScreen()->availableGeometry());
     m_imagesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     imagesLayout->addSpacing(30);
@@ -569,7 +570,7 @@ namespace Isis {
     m_pointsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_pointsTable->setSelectionMode(QAbstractItemView::SingleSelection);
     m_pointsTable->setShowGrid(true);
-    m_pointsTable->setGeometry(QApplication::desktop()->screenGeometry());
+    m_pointsTable->setGeometry(QGuiApplication::primaryScreen()->availableGeometry());
     m_pointsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     connect(m_pointsTable, SIGNAL(itemDoubleClicked(QTableWidgetItem *)),

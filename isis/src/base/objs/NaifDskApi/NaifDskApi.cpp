@@ -75,7 +75,7 @@ namespace Isis {
       for (int j = 0; j < tntMatrix.dim2(); j++) {
         dbg.nospace() << toString(tntMatrix[i][j], 15) << "     ";
       }
-      dbg.nospace() << endl;
+      dbg.nospace() << Qt::endl;
     }
     return dbg;
   }

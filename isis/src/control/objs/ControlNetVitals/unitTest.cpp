@@ -32,7 +32,7 @@ int main() {
   try {
     Preference::Preferences(true);
 
-    qDebug() << "Testing Control Net Vitals" << endl;
+    qDebug() << "Testing Control Net Vitals" << Qt::endl;
 
     qDebug() << "Loading Network";
 
@@ -198,7 +198,7 @@ int main() {
 
   }
   catch(IException &e) {
-    qDebug() << "ControlNetVitals unit test failed!" << endl;
+    qDebug() << "ControlNetVitals unit test failed!" << Qt::endl;
     e.print();
   }
 }

@@ -70,9 +70,9 @@ namespace Isis {
             model or is projected, and will only center the point on images  \
             where the selected lat/lon position exists.</p>";
     p_findPoint->setWhatsThis(text);
-    p_findPoint->setEnabled(false); 
+    p_findPoint->setEnabled(false);
     connect( p_findPoint, SIGNAL( triggered() ),
-             p_dialog, SLOT( show() ) ); 
+             p_dialog, SLOT( show() ) );
   }
 
   FindTool::~FindTool() {
@@ -80,7 +80,7 @@ namespace Isis {
     delete p_groundTab->p_lonLineEdit->validator();
   }
 
-  
+
   /**
    * Creates the dialog used by this tool
    *
@@ -98,15 +98,15 @@ namespace Isis {
 
     // Create the action buttons
     QPushButton *okButton = new QPushButton("Ok");
-    connect( okButton, SIGNAL( clicked() ), 
+    connect( okButton, SIGNAL( clicked() ),
              this, SLOT( handleOkClicked() ) );
 
     QPushButton *recordButton = new QPushButton("Record Point");
-    connect( recordButton, SIGNAL( clicked() ), 
+    connect( recordButton, SIGNAL( clicked() ),
              this, SLOT( handleRecordClicked() ) );
 
     QPushButton *closeButton = new QPushButton("Close");
-    connect( closeButton, SIGNAL( clicked() ), 
+    connect( closeButton, SIGNAL( clicked() ),
              p_dialog, SLOT( hide() ) );
 
     // Put the buttons in a horizontal orientation
@@ -146,7 +146,7 @@ namespace Isis {
     setLayout(gridLayout);
   }
 
-  
+
   /**
    * The image tab used by the dialog in the FindTool
    *
@@ -169,7 +169,7 @@ namespace Isis {
     setLayout(gridLayout);
   }
 
- 
+
   /**
    * Adds the find tool to the toolpad
    *
@@ -189,7 +189,7 @@ namespace Isis {
     return action;
   }
 
-  
+
   /**
    * Adds the find tool to the menu
    *
@@ -199,7 +199,7 @@ namespace Isis {
     menu->addAction(p_findPoint);
   }
 
-  
+
   /**
    * Creates the tool bar for the find tool
    *
@@ -223,7 +223,7 @@ namespace Isis {
             model or is projected, and will only center the point on images  \
             where the selected lat/lon position exists.</p>";
     p_showDialogButton->setWhatsThis(text);
-    connect( p_showDialogButton, SIGNAL( clicked() ), 
+    connect( p_showDialogButton, SIGNAL( clicked() ),
              p_dialog, SLOT( show() ) );
     p_showDialogButton->setAutoRaise(true);
     p_showDialogButton->setIconSize( QSize(22, 22) );
@@ -239,7 +239,7 @@ namespace Isis {
     p_linkViewportsButton->setToolTip("Link Georeferenced Images");
     p_linkViewportsButton->setWhatsThis("<b>Function: </b> Links all open images that have\
                               a camera model or are map projections");
-    connect( p_linkViewportsButton, SIGNAL( clicked() ), 
+    connect( p_linkViewportsButton, SIGNAL( clicked() ),
              this, SLOT( handleLinkClicked() ) );
     p_linkViewportsButton->setAutoRaise(true);
     p_linkViewportsButton->setIconSize( QSize(22, 22) );
@@ -249,7 +249,7 @@ namespace Isis {
     p_togglePointVisibleButton->setToolTip("Hide red dot");
     p_togglePointVisibleButton->setCheckable(true);
     p_togglePointVisibleButton->setChecked(true);
-    connect( p_togglePointVisibleButton, SIGNAL( clicked() ), 
+    connect( p_togglePointVisibleButton, SIGNAL( clicked() ),
              this, SLOT( togglePointVisible() ) );
 
     p_statusEdit = new QLineEdit();
@@ -272,8 +272,8 @@ namespace Isis {
 
     return hbox;
   }
-  
-  
+
+
   /**
    * Overriden method to update this tool - Checks if cube is open and
    * checks if the image has camera and/or projection or none and sets
@@ -396,7 +396,7 @@ namespace Isis {
     updateTool();
   }
 
-  
+
   /**
    * Slot called when the record button is clicked.  It creates a
    * QPoint from the current line/sample in the active cube
@@ -519,12 +519,12 @@ namespace Isis {
         pen.setWidth(3);
         pen.setStyle(Qt::SolidLine);
         painter->setPen(pen);
-        painter->drawRoundRect(x - 2, y - 2, 4, 4);
+        painter->drawRoundedRect(x - 2, y - 2, 4, 4, 1, 1, Qt::RelativeSize);
       }
     }
   }
 
-  
+
   //! toggles visibility of the red circle
   void FindTool::togglePointVisible() {
     // toggle the member boolean that specifies visibility

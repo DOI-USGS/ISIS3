@@ -475,9 +475,9 @@ QByteArray fixLabels(QString fileName, History *hist){
   QByteArray fileData = imgFile.readAll();
   QByteArray labels;
 
-  QString labelEnd("\nEND");
-  int ix = fileData.lastIndexOf(labelEnd);
+  int ix = fileData.lastIndexOf("\nEND");
 
+  QString labelEnd("\nEND");
   labels = fileData.left(ix + labelEnd.size());
   PvlObject hEntry = Isis::iApp->History();
 
@@ -531,7 +531,7 @@ QByteArray fixLabels(QString fileName, History *hist){
   if (replaceImageId == true) {
     labels.replace(imageIdIndex,
                    i - imageIdIndex - 1,
-                   QByteArray("IMAGE_ID                         = ").append(baseName));
+                   QByteArray("IMAGE_ID                         = ").append(baseName.toUtf8()));
     PvlGroup insIdWarning("Warning");
     PvlKeyword insIdMsg("Message", "The IMAGE_ID for [" + fileName + "] is corrupted. The ProductId "
                               + "in the output cube will instead be set to [" + baseName + "].");

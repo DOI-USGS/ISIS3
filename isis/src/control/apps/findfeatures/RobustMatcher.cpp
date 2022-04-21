@@ -18,7 +18,7 @@ find files of those names at the top level of this repository. **/
 #include <QtDebug>
 #include <QList>
 #include <QStringList>
-#include <QTime>
+#include <QElapsedTimer>
 
 #include <opencv2/opencv.hpp>
 
@@ -158,7 +158,7 @@ MatchPair RobustMatcher::match(MatchImage &query, MatchImage &train) const {
   }
 
    // Do not include in timer up to here
-   QTime stime;
+   QElapsedTimer stime;
    stime.start();
 
    // 1a. Detection of the features
@@ -346,7 +346,7 @@ MatchPairQList RobustMatcher::match(MatchImage &query,
    }
 
    // Start timer
-   QTime stime;
+   QElapsedTimer stime;
    stime.start();
 
    // 1a. Run detection of features
@@ -541,7 +541,7 @@ bool RobustMatcher::removeOutliers(const cv::Mat &queryDescriptors,
   matches.clear();
 
   // Start the timer
-  QTime stime;
+  QElapsedTimer stime;
   stime.start();
   double v_time;  // Ratio test timing
 
@@ -665,7 +665,7 @@ int RobustMatcher::ratioTest(std::vector<std::vector<cv::DMatch> > &matches,
     logger().flush();
   }
 
-  QTime stime;
+  QElapsedTimer stime;
   stime.start();  // Start the timer
 
   int removed(0);
@@ -723,7 +723,7 @@ void RobustMatcher::symmetryTest(const std::vector<std::vector<cv::DMatch> >& ma
   symMatches.clear();
   // Do not include in timer
 
-  QTime stime;
+  QElapsedTimer stime;
   stime.start();  // Start the timer
 
   // for all matches image 1 -> image 2
@@ -814,7 +814,7 @@ cv::Mat RobustMatcher::ransacTest(const std::vector<cv::DMatch>& matches,
   }
 
   // Got some points, get the timer started
-  QTime stime;
+  QElapsedTimer stime;
   stime.start();
 
   // Convert keypoints into Point2f
@@ -977,7 +977,7 @@ cv::Mat RobustMatcher::computeHomography(const std::vector<cv::KeyPoint>& query,
   mtime = 0.0;
   cv::Mat homography = cv::Mat::eye(3,3,CV_64F);
 
-  QTime stime;
+  QElapsedTimer stime;
   stime.start();  // Start the timer
 
   // Prepare source and train points
@@ -1154,7 +1154,7 @@ void RobustMatcher::RootSift(cv::Mat &descriptors, const float eps) const {
 
 
 /** Returns elapsed time since the timer was started in seconds */
-double RobustMatcher::elapsed(const QTime &runtime) const {
+double RobustMatcher::elapsed(const QElapsedTimer &runtime) const {
   return (runtime.elapsed() / 1000.0);
 }
 

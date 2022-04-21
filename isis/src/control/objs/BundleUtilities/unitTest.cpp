@@ -1936,5 +1936,5 @@ void printXml(const BundleObservationSolveSettings &printable) {
   writer.setAutoFormatting(true);
   printable.save(writer, NULL);
   output.remove(QRegExp("<id>[^<]*</id>"));
-  qDebug().noquote() << output << endl << endl;
+  qDebug().noquote() << output << Qt::endl << Qt::endl;
 }

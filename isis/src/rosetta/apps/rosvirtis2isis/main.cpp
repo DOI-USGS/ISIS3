@@ -592,9 +592,9 @@ QByteArray pvlFix(QString fileName){
   QByteArray fileData = pvlFile.readAll();
   QByteArray pvlData;
 
-  QString pvlEnd("QUBE\n\nEND");
-  int ix = fileData.lastIndexOf(pvlEnd);
+  int ix = fileData.lastIndexOf("QUBE\n\nEND");
 
+  QString pvlEnd("QUBE\n\nEND");
   pvlData = fileData.left(ix+pvlEnd.size());
 
   QList<QByteArray> pvlLines = pvlData.split('\n');

@@ -245,9 +245,9 @@ namespace Isis {
       }
 
       p_table->setColumnWidth(destinationColumn,
-          QFontMetrics(header->font()).width(header->text()) + 20);
+          QFontMetrics(header->font()).horizontalAdvance(header->text()) + 20);
           // Removed: rounding and int?
-          // qRound(QFontMetrics(header->font()).width(header->text()) + 20));
+          // qRound(QFontMetrics(header->font()).horizontalAdvance(header->text()) + 20));
     }
 
     int endCol = p_table->columnCount() - 1;

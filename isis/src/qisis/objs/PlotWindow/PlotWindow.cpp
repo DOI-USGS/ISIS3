@@ -28,6 +28,7 @@
 #include <QSet>
 #include <QTableWidget>
 #include <QToolBar>
+#include <QPageSize>
 
 #include "Cube.h"
 #include "CubePlotCurve.h"
@@ -574,7 +575,8 @@ namespace Isis {
     /* Initialize a printer*/
     static QPrinter *printer = NULL;
     if (printer == NULL) printer = new QPrinter;
-    printer->setPageSize(QPrinter::Letter);
+    QPageSize pageSize(QPageSize::Letter);
+    printer->setPageSize(pageSize);
     printer->setColorMode(QPrinter::Color);
 
     QPrintDialog printDialog(printer, (QWidget *)parent());

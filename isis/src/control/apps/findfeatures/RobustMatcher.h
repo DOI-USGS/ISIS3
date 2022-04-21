@@ -12,7 +12,7 @@ find files of those names at the top level of this repository. **/
 
 #include <QString>
 #include <QSharedPointer>
-#include <QTime>
+#include <QElapsedTimer>
 
 #include <opencv2/opencv.hpp>
 
@@ -107,7 +107,7 @@ class QDebug;
 
       void init(const PvlFlatMap &parameters = PvlFlatMap());
       void RootSift(cv::Mat &descriptors, const float eps = 1.0E-7) const;
-      double elapsed(const QTime &runtime) const;  // returns seconds
+      double elapsed(const QElapsedTimer &runtime) const;  // returns seconds
 
   };
 

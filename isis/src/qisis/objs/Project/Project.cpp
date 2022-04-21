@@ -79,8 +79,6 @@
 
 namespace Isis {
 
-
-
   /**
    * Create a new Project. This creates a project on disk at /tmp/username_appname_pid.
    */
@@ -2302,7 +2300,7 @@ namespace Isis {
    * @param newProjectRoot The new root directory for the project.
    */
   void Project::relocateProjectRoot(QString newProjectRoot) {
-    *m_projectRoot = newProjectRoot;
+    m_projectRoot->setPath(newProjectRoot);
     emit projectRelocated(this);
   }
 

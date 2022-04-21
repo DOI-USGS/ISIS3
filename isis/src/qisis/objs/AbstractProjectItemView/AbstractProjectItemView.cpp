@@ -10,7 +10,6 @@ find files of those names at the top level of this repository. **/
 
 #include <QAction>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
@@ -19,6 +18,8 @@ find files of those names at the top level of this repository. **/
 #include <QRect>
 #include <QSizePolicy>
 #include <QWidget>
+#include <QGuiApplication>
+#include <QScreen>
 
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
@@ -54,8 +55,7 @@ namespace Isis {
 
     //  Size hint is made large as a hack to have the views fill the available dock
     //  space. SizePolicy alone did not work.
-    QDesktopWidget deskTop;
-    QRect availableSpace = deskTop.availableGeometry(deskTop.primaryScreen());
+    QRect availableSpace = (QGuiApplication::primaryScreen()->availableGeometry());
     return QSize( .89 * availableSpace.width(), .5 * availableSpace.height() );
   }
 
