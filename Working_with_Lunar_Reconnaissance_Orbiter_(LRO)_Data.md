@@ -88,7 +88,7 @@ Angle Camera - Mono (EDRWAM)* option.
 
 Search either based on a longitude-latitude window, or near a
 notable feature, such as a named crater.  Here are a couple of images
-having the Tycho crater::
+having the Tycho crater:
 
     http://pds.lroc.asu.edu/data/LRO-L-LROC-2-EDR-V1.0/LROLRC_0002/DATA/MAP/2010035/WAC/M119923055ME.IMG
     http://pds.lroc.asu.edu/data/LRO-L-LROC-2-EDR-V1.0/LROLRC_0002/DATA/MAP/2010035/WAC/M119929852ME.IMG
