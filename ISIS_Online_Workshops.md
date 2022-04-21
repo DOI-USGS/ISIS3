@@ -109,6 +109,11 @@ Notes
 
 ## Mission Specific ISIS3 Processing [¶](#Mission-Specific-ISIS3-Processing-)
 
+  - [Lunar Reconnaissance Orbiter
+    (LRO):](Working_with_Lunar_Reconnaissance_Orbiter_\(LRO\)_Data)
+      - [MiniRF - Miniature Radio Frequency
+        instrument](Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data)
+
   - [Mars Reconnaissance Orbiter
     (MRO):](Working_with_Mars_Reconnaissance_Orbiter_\(MRO\)_Data)
       - [HiRISE - High Resolution Imaging Science
@@ -127,9 +132,6 @@ Notes
         Radiometer](Working_with_Cassini_RADAR)
       - [VIMS (Visual and Infrared Mapping
         Spectrometer)](Working_with_Cassini_VIMS)
-  - Working with Lunar Reconnaissance Orbiter (LRO)
-      - [MiniRF - Miniature Radio Frequency
-        instrument](Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data)
 
 <span id="Programming-in-ISIS3"></span>
 
