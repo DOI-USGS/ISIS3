@@ -60,7 +60,7 @@ See https://en.wikipedia.org/wiki/Lunar_Reconnaissance_Orbiter#Payload.
 
 ### Data Processing with ISIS [¶](#Data-Processing-with-ISIS-)
 
-#### LRO Narrow Angle Camera (WAC) [¶](#LRO-Narrow-Angle-Camera-\(NAC\)-)
+#### LRO Narrow Angle Camera (NAC) [¶](#LRO-Narrow-Angle-Camera-\(NAC\)-)
 
 TBD
 
