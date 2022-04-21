@@ -24,7 +24,7 @@
       -   - [Brief Mission Summary](#Brief-Mission-Summary-)
           - [Science Goals](#Science-Goals-)
           - [Science Instruments](#Science-Instruments-)
-          - [Data Processing with ISIS](#Data-Processing-)
+          - [Data Processing with ISIS](#Data-Processing-with-ISIS-)         
       - [References & Related
         Resources](#References--Related-Resources-)
           - [Planetary Data System (PDS) Information and Data Search
@@ -52,7 +52,71 @@ Areas of investigation include selenodetic global topography; the lunar polar re
 
 See https://en.wikipedia.org/wiki/Lunar_Reconnaissance_Orbiter#Payload.
 
-### Data Processing with ISIS [¶](#Data-Processing-)
+### Data Processing with ISIS [¶](#Data-Processing-with-ISIS-)
+
+#### LRO Narrow Angle Camera (NAC)
+
+TBD
+
+#### LRO Wide Angle Camera (WAC)
+
+We will focus on the monochromatic images for this sensor. Visit:
+
+   https://ode.rsl.wustl.edu/moon/indexproductsearch.aspx
+
+Find the *Lunar Reconnaissance Orbiter -> Experiment Data Record Wide
+Angle Camera - Mono (EDRWAM)* option.
+
+Search either based on a longitude-latitude window, or near a
+notable feature, such as a named crater.  Here are a couple of images
+having the Tycho crater::
+
+    http://pds.lroc.asu.edu/data/LRO-L-LROC-2-EDR-V1.0/LROLRC_0002/DATA/MAP/2010035/WAC/M119923055ME.IMG
+    http://pds.lroc.asu.edu/data/LRO-L-LROC-2-EDR-V1.0/LROLRC_0002/DATA/MAP/2010035/WAC/M119929852ME.IMG
+
+Fetch these with ``wget``. For a dataset called ``image.IMG``, do:
+
+    lrowac2isis from = image.IMG to = image.cub
+
+This will create so-called *even* and *odd* datasets, with names like
+``image.vis.even.cub`` and ``image.vis.odd.cub``.
+
+Run ``spiceinit`` on them to set up the SPICE kernels:
+
+    spiceinit from = image.vis.even.cub
+    spiceinit from = image.vis.odd.cub
+
+followed by ``lrowaccal`` to adjust the image intensity:
+
+    lrowaccal from = image.vis.even.cub to = image.vis.even.cal.cub
+    lrowaccal from = image.vis.odd.cub  to = image.vis.odd.cal.cub
+
+If these are inspected, such as with ``qview``, it can be
+seen that instead of a single contiguous image we have a set of narrow
+horizontal bands, with some bands in the *even* and some in the *odd*
+cub file. The pixel rows in each band may also be recorded in reverse.
+
+The only way to fix these artifacts currently is to mapprojected these
+images and fuse them. This happens as:
+
+    cam2map from = image.vis.even.cal.cub to = image.vis.even.cal.map.cub
+    cam2map from = image.vis.odd.cal.cub  to = image.vis.odd.cal.map.cub  \
+      map = image.vis.even.cal.map.cub matchmap = true
+
+Note how in the second ``cam2map`` call we used the ``map`` and
+``matchmap`` arguments. This is to ensure that both of these output
+images have the same resolution and projection. In particular, if more
+datasets are present, it is suggested for all of them to use the same
+previously created .cub file as a map reference. That makes terrain
+creation with photogrammetry work more reliably. 
+
+The fusion happens as:
+
+    ls image.vis.even.cal.map.cub image.vis.odd.cal.map.cub  > image.txt
+    noseam fromlist = image.txt to = image.noseam.cub SAMPLES=73 LINES=73
+
+The obtained file ``image.noseam.cub`` may still have some small artifacts
+but should be overall reasonably good. 
 
 <span id="References-amp-Related-Resources"></span>
 
