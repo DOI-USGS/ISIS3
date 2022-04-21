@@ -27,7 +27,7 @@
           - [Science Goals](#Science-Goals-)
           - [Science Instruments](#Science-Instruments-)
           - [Data Processing with ISIS](#Data-Processing-with-ISIS-)
-          - - [LRO Wide Angle Camera (WAC)](#LRO-Wide-Angle-Camera-\(WAC\)-)
+          - - [LRO Wide Angle Camera (WAC)](#lro-wide-angle-camera-wac-)
 
       - [References & Related
         Resources](#References--Related-Resources-)
