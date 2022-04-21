@@ -62,7 +62,20 @@ See https://en.wikipedia.org/wiki/Lunar_Reconnaissance_Orbiter#Payload.
 
 #### LRO Narrow Angle Camera (NAC) [¶](#LRO-Narrow-Angle-Camera-\(NAC\)-)
 
-TBD
+LRO NAC consists of two cameras, with both acquiring image data at the same time, denoted with ``L`` and ``R``. 
+
+What follows is an example of processing the experimental data records (EDR) for images M104318871LE and M104318871RE. 
+
+Visit http://wms.lroc.asu.edu/lroc/search and search for these. Once you have the full URL, they can be downloaded with ``wget``. This will result in two  files, named M104318871LE.img and M104318871RE.img.
+
+We convert each .img file to an ISIS .cub camera image, initialize the SPICE kernels, and perform radiometric calibration and echo correction. Here are the steps, illustrated on the first image::
+   
+    lronac2isis from = M104318871LE.IMG     to = M104318871LE.cub
+    spiceinit   from = M104318871LE.cub
+    lronaccal   from = M104318871LE.cub     to = M104318871LE.cal.cub
+    lronacecho  from = M104318871LE.cal.cub to = M104318871LE.cal.echo.cub
+
+The obtained images can be inspected with ``qview``.
 
 #### LRO Wide Angle Camera (WAC) [¶](#LRO-Wide-Angle-Camera-\(WAC\)-)
 
