@@ -183,9 +183,10 @@
       <parameter name="PHOPAR">
         <type>filename</type>
         <fileMode>input</fileMode>
-        <default><item>default</item></default>
+        <defaultPath>$lro/calibration</defaultPath>
+        <default><item>$lro/calibration/NAC_PHO_LROC_Empirical.????.pvl</item></default>
         <brief>
-          PVL file
+          PVL file containing parameters for photometric calibration
         </brief>
         <description>
           This file will contain a set of parameters A or B to use when
