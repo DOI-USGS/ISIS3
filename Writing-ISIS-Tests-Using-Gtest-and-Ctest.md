@@ -28,10 +28,17 @@
 
 
 # Creating a new test suite
+
+## For a Class
 1. Create a new file `ClassNameTests.cpp` in `isis/tests/`. For example, the tests for the Cube class should be in `CubeTests.cpp`.
 1. Add `#include "gmock/gmock.h"` to the file.
 1. Write your test cases.
 1. Delete old tests
+
+## For an Application
+1. Create a new file `FunctionalTestAppname.cpp` in `isis/tests/`. For example, the tests the application `isisimport` should be in `FunctionalTestIsisImport.cpp`.
+1. Add you tests to this file
+1. Delete the tests and all of the test directories  
 
 Note: If your tests require the use of ISIS's Null value, you will need to include SpecialPixel.h
 
