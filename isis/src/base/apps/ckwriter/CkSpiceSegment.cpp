@@ -274,10 +274,15 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
     _utcStartTime = toUTC(startTime());
     _utcEndTime   = toUTC(endTime());
 
+    // These offsets are absolute values. If there is a StartOffset, then this
+    // must be subtracted from the label's original start time and if there is
+    // an EndOffset, then the offset must be added to the label's original end
+    // time.
     _startOffset =  etLabStart.Et() - startTime();
     _endOffset =  etLabEnd.Et() - endTime();
 
-    // round offsets by 3 decimal places
+
+    // Label start/end times are 3 decimal places, so round offsets to match.
     _startOffset = qRound(_startOffset * 1000.0) / 1000.0;
     _endOffset = qRound(_endOffset * 1000.0) / 1000.0;
 
