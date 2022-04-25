@@ -123,12 +123,14 @@ This is a first step towards several places:
 For the rest of this document, we will use `appname` as the name of the application that is being worked on. Simple example at https://github.com/USGS-Astrogeology/ISIS3/tree/dev/isis/src/base/apps/crop 
 
 1. In the `appname` folder create two new files, `appname.cpp` and `appname.h`. These files are where the application logic will live.
-1. In `appname.h` and `appname.cpp` create a new function in the `Isis` namespace with the following signature `void appname(UserInterface &ui)`. If the application has a `from` cube, add a second function with the input cube `void appname(Cube incube, UserInterface &ui)`. 
-1. Copy the contents of `IsisMain` in `main.cpp` into the new `void appname(Cube incube, UserInterface &ui)` function. Rewrite `void appname(UserInterface &ui)` to unpack the "from" cube into `void appname(Cube incube, UserInterface &ui)` (if the app doesn't take an input cube, simple copy the contents into` void appname(Cube incube, UserInterface &ui)`). Similar if input is some other data structure (e.g. a ControlNet object or FileList object, add them as part of the input parameters, see spiceinit and cnetcheck tests for examples). 
-1. Copy any helper functions or global variables from `main.cpp` into `appname.cpp`. So as to not pollute the `Isis` namespace and avoid redefining symbols, forward declare any helper function in `appname.cpp` and do not define them in `appname.h`. 
+1. In `appname.h` and `appname.cpp` create a new function in the `Isis` namespace with the following signature `void appname(UserInterface &ui)`. If the application has a `from` cube, add a second function with the input cube as the first argument `void appname(Cube incube, UserInterface &ui)`. 
+1. Copy the contents of `IsisMain` function located in `main.cpp` into the new `void appname(Cube incube, UserInterface &ui)` function. (if the app doesn't take any file parameters (i.e., network, text, cube list...) simply copy the contents into` void appname(Cube incube, UserInterface &ui)`). If there is no input cube, but there are other input files, add them as input parameters similar to how the input cube was done, see spiceinit and cnetcheck tests for examples).  
+1. Modify `void appname(UserInterface &ui)` to open the input cube, usually "from", and call the second function `void appname(Cube incube, UserInterface &ui)` 
+1. Copy any helper functions or global variables from `main.cpp` into `appname.cpp`. So as to not pollute the `Isis` namespace and avoid redefining symbols
+1. Prototype any helper functions at the top of `appname.cpp`. Do not define them in `appname.h`. 
 1. Put all of the required includes in `appname.cpp` and `appname.h`.
-1. Remove the call to get the UserInterface; it usually looks like `UserInterface &ui = Application::GetUserInterface();`.
-1. In `main.ccp`, put the following
+1. Remove the call to get the UserInterface from `appname.cpp`; it usually looks like `UserInterface &ui = Application::GetUserInterface();`.
+1. In `main.ccp`, add the following
 
 ```C++
 #include "Isis.h"
