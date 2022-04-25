@@ -58,15 +58,15 @@ Be sure to choose a substring of the exception message that will uniquely identi
 Normally, if the error message does not contain the substring, gtest will only output the the expression evaluated to false. To make the failure message more helpful, we add `<< e.toString().toStdString()` which outputs the full error message if the test fails.
 
 ## Testing floating point numbers
-Comparison between floating point numbers is a common problem in both writing and testing software. Carefully choosing test data can help avoid comparisons that are likely to cause problems. Whenever possible, use test data such that output values can be exactly stored in a double-precision floating point number (c++ double). For example, if a function takes its input and divides it by 116, a good test input would be 232 because 232/116 = 2 which can be stored exactly in a double. On the other hand, 1 would be a poor test input because 1/116 cannot be precisely stored in a double. If a comparison between numbers that cannot be stored precisely is required, gtest provides [Special Assertions](https://github.com/abseil/googletest/blob/master/googletest/docs/advanced.md#floating-point-comparison) to make the comparisons more tolerant to different rounding.
+Comparison between floating point numbers is a common problem in both writing and testing software. Carefully choosing test data can help avoid comparisons that are likely to cause problems. Whenever possible, use test data such that output values can be exactly stored in a double-precision floating point number (c++ double). For example, if a function takes its input and divides it by 116, a good test input would be 232 because 232/116 = 2 which can be stored exactly in a double. On the other hand, 1 would be a poor test input because 1/116 cannot be precisely stored in a double. If a comparison between numbers that cannot be stored precisely is required, gtest provides [Special Assertions](https://github.com/google/googletest/blob/main/docs/reference/assertions.md#floating-point) to make the comparisons more tolerant to different rounding.
 
 ## Test fixtures
-Because each test case is a completely fresh environment, there is often set-up code that is shared between multiple test cases. You can use a test fixture to avoid copying and pasting this set-up code multiple times. See the [gtest documentation](https://github.com/abseil/googletest/blob/master/googletest/docs/primer.md#test-fixtures-using-the-same-data-configuration-for-multiple-tests) for how to create and use fixtures in gtest.
+Because each test case is a completely fresh environment, there is often set-up code that is shared between multiple test cases. You can use a test fixture to avoid copying and pasting this set-up code multiple times. See the [gtest documentation](https://github.com/google/googletest/blob/main/docs/primer.md#test-fixtures-using-the-same-data-configuration-for-multiple-tests-same-data-multiple-tests) for how to create and use fixtures in gtest.
 
 In order to conform to our test case naming conventions, all test fixtures need to be named `ClassName_FixtureName`. For example, a fixture that sets up a BundleSettings object in a not-default state for the BundleSettings unit test could be called `BundleSettings_NotDefault`.
 
 ## Test parameterization
-If the same process needs to be run with several different inputs, it can be easily automated via [value-parameterized tests](https://github.com/abseil/googletest/blob/master/googletest/docs/advanced.md#value-parameterized-tests). In order to maintain test naming conventions, when you call the `INSTANTIATE_TEST_CASE_P` macro make sure the first parameter is. `ClassName`. For example
+If the same process needs to be run with several different inputs, it can be easily automated via [value-parameterized tests](https://github.com/google/googletest/blob/main/docs/advanced.md#value-parameterized-tests). In order to maintain test naming conventions, when you call the `INSTANTIATE_TEST_CASE_P` macro make sure the first parameter is. `ClassName`. For example
 
 ```
 INSTANTIATE_TEST_CASE_P(
@@ -255,10 +255,10 @@ void IsisMain() {
 ```
 
 # Helpful documentation
-* [gtest primer](https://github.com/abseil/googletest/blob/master/googletest/docs/primer.md) : It is highly recommended that you read over the primer if you are not familiar with gtest.
-* [Advanced gtest](https://github.com/abseil/googletest/blob/master/googletest/docs/advanced.md) : This document covers a wide range of advanced options for testing tricky logic and customizing test output.
-* [gmock Introduction](https://github.com/abseil/googletest/blob/master/googlemock/docs/ForDummies.md) : A great introduction to how gmock can be used to remove dependencies from tests.
-* [gmock Matcher List](https://github.com/abseil/googletest/blob/master/googlemock/docs/CheatSheet.md#matchers) : This whole document is helpful for gmock, but these matchers have some nice uses in gtest too.
+* [gtest primer](https://github.com/google/googletest/blob/main/docs/primer.md) : It is highly recommended that you read over the primer if you are not familiar with gtest.
+* [Advanced gtest](https://github.com/google/googletest/blob/main/docs/advanced.md) : This document covers a wide range of advanced options for testing tricky logic and customizing test output.
+* [gmock Introduction](https://github.com/google/googletest/blob/main/docs/gmock_for_dummies.md) : A great introduction to how gmock can be used to remove dependencies from tests.
+* [gmock Matcher List](https://github.com/google/googletest/blob/main/docs/gmock_cheat_sheet.md#matchers-matcherlist) : This whole document is helpful for gmock, but these matchers have some nice uses in gtest too.
 
 
 # ISIS App Testing Cookbook 
