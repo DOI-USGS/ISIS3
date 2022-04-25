@@ -132,10 +132,10 @@ For the rest of this document, we will use `appname` as the name of the applicat
 
 1. In the `appname` folder create two new files, `appname.cpp` and `appname.h`. These files are where the application logic will live.
 1. In `appname.h` and `appname.cpp` create a new function in the `Isis` namespace with the following signature `void appname(UserInterface &ui)`. If the application has a `from` cube, add a second function with the input cube as the first argument `void appname(Cube incube, UserInterface &ui)`. 
-1. Copy the contents of `IsisMain` function located in `main.cpp` into the new `void appname(Cube incube, UserInterface &ui)` function. (if the app doesn't take any file parameters (i.e., network, text, cube list...) simply copy the contents into` void appname(Cube incube, UserInterface &ui)`). If there is no input cube, but there are other input files, add them as input parameters similar to how the input cube was done, see spiceinit and cnetcheck tests for examples).  
-1. Modify `void appname(UserInterface &ui)` to open the input cube, usually "from", and call the second function `void appname(Cube incube, UserInterface &ui)` 
+1. Copy the contents of the existing `IsisMain` function curretly located in `main.cpp` into the new `void appname(Cube incube, UserInterface &ui)` function. (if the app doesn't take any file parameters (i.e., network, text, cube list...) copy the contents into` void appname(UserInterface &ui)`). If there is no input cube, but there are other input files, add them as input parameters similar to how the input cube was done, see spiceinit and cnetcheck tests for examples).  
+1. Modify `void appname(UserInterface &ui)` to open the input cube, usually "from", and/or other files and call the second function `void appname(Cube incube, UserInterface &ui)` 
 1. Copy any helper functions or global variables from `main.cpp` into `appname.cpp`. So as to not pollute the `Isis` namespace and avoid redefining symbols
-1. Prototype any helper functions at the top of `appname.cpp`. Do not define them in `appname.h`. 
+1. Prototype any helper functions at the top of `appname.cpp` and define them at the bottom of `appname.cpp`. Do not define them in `appname.h`. 
 1. Put all of the required includes in `appname.cpp` and `appname.h`.
 1. Remove the call to get the UserInterface from `appname.cpp`; it usually looks like `UserInterface &ui = Application::GetUserInterface();`.
 1. In `main.ccp`, add the following
