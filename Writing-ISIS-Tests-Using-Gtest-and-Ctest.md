@@ -1,13 +1,13 @@
 - [Creating a new test suite](#creating-a-new-test-suite)
+- [Test names](#test-names)
+  - [Basic tests](#basic-tests)
+  - [Test fixtures](#test-fixtures-1)
+  - [Parameterized tests](#parameterized-tests)
 - [General Testing Tips](#general-testing-tips)
   - [Testing exceptions](#testing-exceptions)
   - [Testing floating point numbers](#testing-floating-point-numbers)
   - [Test fixtures](#test-fixtures)
   - [Test parameterization](#test-parameterization)
-- [Test names](#test-names)
-  - [Basic tests](#basic-tests)
-  - [Test fixtures](#test-fixtures-1)
-  - [Parameterized tests](#parameterized-tests)
 - [Refactoring ISIS3 Applications](#refactoring-isis3-applications)
   - [Creating a basic callable function](#creating-a-basic-callable-function)
     - [If your application uses `Application::Log()`](#if-your-application-uses-applicationlog)
@@ -41,6 +41,38 @@
 1. Delete the tests and all of the test directories  
 
 Note: If your tests require the use of ISIS's Null value, you will need to include SpecialPixel.h
+
+# Test names
+We use gtest as our unit testing framework, but use ctest to actually run the tests. Test name can be defined in the test definition (cpp file). The naming convention for gtests is `UnitTest<Object><test case>` for unit tests and `FunctionalTest<app name><test case>` for app tests. Both are upper camel case. The documentation for how this works can be found in [cmake's documentation](https://cmake.org/cmake/help/v3.13/module/GoogleTest.html).
+
+>**Note:** App names are considered a single word for camel case purposes. So when naming a test file or function, only capitalize the first letter of the app name, even if the app name is made up of multiple words. 
+
+To run the gtests for a specific class, use `ctest -R ClassName`
+
+To run all gtests, use `ctest -R "\." -E "(_app_|_unit_)"`. Not that this command simply excludes old Makefile based tests that contain the substrings `_app_` and `_unit_` in their respective names. 
+
+## Basic tests
+`TEST(Foo, Bar)` will produce the test `Foo.Bar`.
+
+## Test fixtures
+`TEST_F(Foo, Bar)` will also produce the test `Foo.Bar`.
+
+The names of fixtures are at the developer's decretion. Fixtures that require extra data should have their data files placed in ISIS3/isis/tests/data inside a folder matching the fixture name.
+
+## Parameterized tests
+```
+TEST_P(Foo, Bar) {
+...
+}
+INSTANTIATE_TEST_CASE_P(
+      Baz,
+      Foo,
+      ::testing::Values(T x, T y, T z));
+```
+will produce 3 different tests that are named
+1. `Baz/Foo.Bar/x`
+1. `Baz/Foo.Bar/y`
+1. `Baz/Foo.Bar/z`
 
 # General Testing Tips
 
@@ -84,37 +116,6 @@ INSTANTIATE_TEST_CASE_P(
 
 will ensure that the tests start with `BundleSettings`.
 
-# Test names
-We use gtest as our unit testing framework, but use ctest to actually run the tests. Test name can be defined in the test definition (cpp file). The naming convention for gtests is `UnitTest<Object><test case>` for unit tests and `FunctionalTest<app name><test case>` for app tests. Both are upper camel case. The documentation for how this works can be found in [cmake's documentation](https://cmake.org/cmake/help/v3.13/module/GoogleTest.html).
-
->**Note:** App names are considered a single word for camel case purposes. So when naming a test file or function, only capitalize the first letter of the app name, even if the app name is made up of multiple words. 
-
-To run the gtests for a specific class, use `ctest -R ClassName`
-
-To run all gtests, use `ctest -R "\." -E "(_app_|_unit_)"`. Not that this command simply excludes old Makefile based tests that contain the substrings `_app_` and `_unit_` in their respective names. 
-
-## Basic tests
-`TEST(Foo, Bar)` will produce the test `Foo.Bar`.
-
-## Test fixtures
-`TEST_F(Foo, Bar)` will also produce the test `Foo.Bar`.
-
-The names of fixtures are at the developer's decretion. Fixtures that require extra data should have their data files placed in ISIS3/isis/tests/data inside a folder matching the fixture name.
-
-## Parameterized tests
-```
-TEST_P(Foo, Bar) {
-...
-}
-INSTANTIATE_TEST_CASE_P(
-      Baz,
-      Foo,
-      ::testing::Values(T x, T y, T z));
-```
-will produce 3 different tests that are named
-1. `Baz/Foo.Bar/x`
-1. `Baz/Foo.Bar/y`
-1. `Baz/Foo.Bar/z`
 
 # Refactoring ISIS3 Applications
 
