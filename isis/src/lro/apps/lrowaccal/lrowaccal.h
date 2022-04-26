@@ -1,16 +1,16 @@
 #ifndef lrowaccal_h
 #define lrowaccal_h
 
-#include "Cube.h"
-#include "UserInterface.h"
 #include <vector>
-#include <QString>
+
 #include <QDir>
 #include <QRegExp>
+#include <QString>
 
 #include "Brick.h"
 #include "Camera.h"
 #include "Constants.h"
+#include "Cube.h"
 #include "CubeAttribute.h"
 #include "iTime.h"
 #include "Message.h"
@@ -20,13 +20,12 @@
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
+#include "UserInterface.h"
 
-using namespace std;
-using namespace Isis;
 
 namespace Isis {
   extern void lrowaccal(UserInterface &ui);
-  extern void lrowaccal(Cube *icube, UserInterface &ui, vector<QString> darkFiles, 
+  extern void lrowaccal(Cube *icube, UserInterface &ui, std::vector<QString> darkFiles, 
     QString flatFile, QString radFile, QString specpixFile, QString tempFile);
 }
 

@@ -1,7 +1,5 @@
 #include "lrowaccal.h"
 
-using namespace std;
-
 #define POLAR_MODE_SAMPLES 1024
 #define NO_POLAR_MODE_SAMPLES 704
 #define BW_BANDS 1
@@ -72,7 +70,7 @@ namespace Isis {
 
   vector<int> g_bands;
 
-  Buffer *g_darkCube1, *g_darkCube2, *g_flatCube, *g_specpixCube;
+  Buffer *g_darkCube1 = NULL, *g_darkCube2 = NULL, *g_flatCube = NULL, *g_specpixCube = NULL;
 
   // forward declared helper functions
   void ResetGlobals();
@@ -93,6 +91,10 @@ namespace Isis {
   void lrowaccal(UserInterface &ui) {
     ResetGlobals();
 
+    Cube *icube = NULL;
+    icube = new Cube();
+    icube->open(ui.GetCubeName("FROM"));
+
     g_dark = ui.GetBoolean("DARK");
     g_flatfield = ui.GetBoolean("FLATFIELD");
     g_radiometric = ui.GetBoolean("RADIOMETRIC");
@@ -107,12 +109,10 @@ namespace Isis {
     QString specpixFile = ui.GetAsString("SPECIALPIXELSFILE");
     QString tempFile = ui.GetAsString("TEMPERATUREFILE");
 
-    Cube *icube = new Cube();
-    icube->open(ui.GetCubeName("FROM"));
-
     lrowaccal(icube, ui, darkFiles, flatFile, radFile, specpixFile, tempFile);
 
     delete icube;
+    icube = NULL;
   }
 
   /**
@@ -188,7 +188,7 @@ namespace Isis {
         if (instModeId == "BW")
           darkFile += "_" + filter + "_Mode" + mode;
         darkFile += "_Offset" + offset + "_*C_*T_Dark.????.cub";
-        GetDark (darkFile, temp, time, g_darkCube1, g_darkCube2, g_temp1, g_temp2, darkFiles[0], darkFiles[1]);
+        GetDark(darkFile, temp, time, g_darkCube1, g_darkCube2, g_temp1, g_temp2, darkFiles[0], darkFiles[1]);
       }
       else if (darkFiles.size() == 1) {
         CopyCubeIntoBuffer(darkFiles[0], g_darkCube1);
@@ -199,10 +199,10 @@ namespace Isis {
       else {
         CopyCubeIntoBuffer(darkFiles[0], g_darkCube1);
         int index = darkFiles[0].lastIndexOf("_");
-        g_temp1 = IString(darkFiles[0].mid( darkFiles[0].lastIndexOf("_", index-1), index)).ToDouble();
+        g_temp1 = IString(darkFiles[0].mid(darkFiles[0].lastIndexOf("_", index-1), index)).ToDouble();
         CopyCubeIntoBuffer(darkFiles[1], g_darkCube2);
         index = darkFiles[1].lastIndexOf("_");
-        g_temp2 = IString(darkFiles[1].mid( darkFiles[1].lastIndexOf("_", index-1), index)).ToDouble();
+        g_temp2 = IString(darkFiles[1].mid(darkFiles[1].lastIndexOf("_", index-1), index)).ToDouble();
       }
     }
 
@@ -248,7 +248,7 @@ namespace Isis {
         }
 
         try {
-          Camera *cam;
+          Camera *cam = NULL;
           cam = icube->camera();
           iTime startTime((QString) inst["StartTime"]);
           cam->setTime(startTime);
@@ -349,7 +349,8 @@ namespace Isis {
 
     g_exposure = inst["ExposureDuration"];
 
-    Cube *ocube = p.SetOutputCube("TO");
+    Cube *ocube = NULL;
+    ocube = p.SetOutputCube("TO");
     p.ProcessCube(Calibrate, false);
 
     // Add an output group with the appropriate information
@@ -386,7 +387,7 @@ namespace Isis {
     ocube->putGroup(calgrp);
   }
 
-  void ResetGlobals () {
+  void ResetGlobals() {
     g_iofResponsivity.clear();
     g_radianceResponsivity.clear();
     for (int b = 0; b < 7; b++){
@@ -418,7 +419,7 @@ namespace Isis {
   }
 
   // Calibrate each framelet
-  void Calibrate (Buffer &inCube, Buffer &outCube) {
+  void Calibrate(Buffer &inCube, Buffer &outCube) {
     int correctBand = -1;
     //If we are passed in a single band (img.cub+4) we need to pay special attention that we don't start with band1
     if (inCube.BandDimension() == 1 && g_bands.size() == 1)
@@ -443,7 +444,7 @@ namespace Isis {
     if (g_dark) {
       double tempFactor = (frameTemp - g_temp2) / (g_temp1-g_temp2);
 
-      for ( int b=0; b<inCube.BandDimension(); b++) {
+      for (int b=0; b<inCube.BandDimension(); b++) {
         // We find the index of the corresponding dark frame band as the offset
         int offset;
         if (correctBand != -1)
@@ -501,7 +502,7 @@ namespace Isis {
     }
 
     if (g_flatfield) {
-      for ( int b=0; b<inCube.BandDimension(); b++) {
+      for (int b=0; b<inCube.BandDimension(); b++) {
         // We find the index of the corresponding flat frame band as the offset
         int offset;
         if (correctBand != -1)
@@ -544,7 +545,7 @@ namespace Isis {
     }
 
     if (g_specpix) {
-      for ( int b=0; b<inCube.BandDimension(); b++) {
+      for (int b=0; b<inCube.BandDimension(); b++) {
         // We find the index of the corresponding flat frame band as the offset
         int offset;
         if (correctBand != -1)
@@ -594,7 +595,7 @@ namespace Isis {
     }
   }
 
-  void CopyCubeIntoBuffer (QString &fileString, Buffer* &data) {
+  void CopyCubeIntoBuffer(QString &fileString, Buffer* &data) {
     Cube cube;
     FileName filename(fileString);
     if (filename.isVersioned())
@@ -608,12 +609,13 @@ namespace Isis {
     brick.SetBasePosition(1, 1, 1);
     cube.read(brick);
 
+    data = NULL;
     data = new Buffer(brick);
 
     fileString = filename.expanded();
   }
 
-  double min ( double a, double b ) {
+  double min(double a, double b) {
     if (a < b)
       return a;
     return b;
@@ -651,7 +653,7 @@ namespace Isis {
     filter.append(".*");
 
     // get a list of dark files that match our basename
-    QDir dir( filename.path(), filter );
+    QDir dir(filename.path(), filter);
 
     vector<DarkFileInfo> darkFiles;
     darkFiles.reserve(dir.count());
@@ -724,8 +726,8 @@ namespace Isis {
     file2.replace(timeIndex, 1, toString(time2));
     file2.replace(tempIndex, 1, toString((int)temp2));
 
-    CopyCubeIntoBuffer ( file1, data1 );
-    CopyCubeIntoBuffer ( file2, data2 );
+    CopyCubeIntoBuffer(file1, data1);
+    CopyCubeIntoBuffer(file2, data2);
   }
 
   void GetMask(QString &fileString, double temp, Buffer* &data) {
@@ -738,7 +740,7 @@ namespace Isis {
     QString filter(basename);
     filter.append(".*");
 
-    QDir dir( filename.path(), filter );
+    QDir dir(filename.path(), filter);
 
     // create a regular expression to capture the temp and time from filenames
     QString regexPattern(basename);
@@ -779,7 +781,7 @@ namespace Isis {
     index = fileString.indexOf("*");
     fileString.replace(index, 1, toString((int)bestTemp));
 
-    CopyCubeIntoBuffer ( fileString, data );
+    CopyCubeIntoBuffer(fileString, data);
   }
 
   /**
