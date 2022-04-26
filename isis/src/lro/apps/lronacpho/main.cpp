@@ -11,7 +11,6 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 #include "lronacpho.h"
 
-using namespace std;
 using namespace Isis;
 
 /**
@@ -25,7 +24,7 @@ using namespace Isis;
   *
   * @internal
   *   @history 2016-09-19 Victor Silva - Adapted from lrowacpho written by Kris Becker
-  *	 @history 2021-03-12 Victor Silva - Updates include ability to run with default values
+  *	  @history 2021-03-12 Victor Silva - Updates include ability to run with default values
   * 																			Added new values for 2019 version of LROC Empirical function.
   */
 void IsisMain (){

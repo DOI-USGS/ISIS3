@@ -8,11 +8,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "UserInterface.h"
-
-
 #include "lronacpho.h"
-
-
 
 using namespace std;
 
@@ -60,7 +56,6 @@ namespace Isis{
     p.SetInputCube(iCube);
 
     Cube *oCube = p.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO"));//, 
-                    //iCube->sampleCount(), iCube->lineCount(), iCube->bandCount());
     
     // Backplane option
     bool useBackplane = false;
@@ -155,6 +150,7 @@ namespace Isis{
     p.ClearInputCubes();
     delete g_phoFunction;
   }
+  
   /**
     * @brief Apply LROC Empirical photometric correction
     *

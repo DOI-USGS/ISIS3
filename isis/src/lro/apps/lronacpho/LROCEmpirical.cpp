@@ -12,7 +12,6 @@ find files of those names at the top level of this repository. **/
 #include <iostream>
 #include <memory>
 #include <sstream>
-
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
@@ -38,12 +37,10 @@ namespace Isis {
     init(pvl, cube);
   }
 
-
   /**
    * Destructor
    */
   LROCEmpirical::~LROCEmpirical() {};
-
 
   /**
    * @brief Initialize class from input PVL and Cube files
@@ -120,7 +117,6 @@ namespace Isis {
     return;
   }
 
-
   /**
    * @brief Method to get photometric property given angles
    *
@@ -153,7 +149,6 @@ namespace Isis {
     double ph = photometry(m_bandpho[band - 1], i, e, g);
     return (m_bandpho[band - 1].phoStd / ph);
   }
-
 
   /**
    * @brief Performs actual photometric correction calculations
@@ -207,7 +202,6 @@ namespace Isis {
 
     return (rcal);
   }
-
 
   /**
    * @brief Return parameters used for all bands
@@ -287,7 +281,6 @@ namespace Isis {
     return;
   }
 
-
   /**
    * @brief Determine LROC Empirical parameters given a wavewlength
    *
@@ -333,8 +326,6 @@ namespace Isis {
     // Not found if we reach here
     return (Parameters());
   }
-
-
 
   /*
    * @brief Extracts necessary LROCEmprical parameters from profile
