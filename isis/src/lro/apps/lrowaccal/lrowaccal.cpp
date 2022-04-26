@@ -413,9 +413,13 @@ namespace Isis {
     g_numFrames = 0;
 
     delete g_darkCube1;
+    g_darkCube1 = NULL;
     delete g_darkCube2;
+    g_darkCube2 = NULL;
     delete g_flatCube;
+    g_flatCube = NULL;
     delete g_specpixCube;
+    g_specpixCube = NULL;
   }
 
   // Calibrate each framelet
