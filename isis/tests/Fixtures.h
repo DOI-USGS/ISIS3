@@ -85,7 +85,6 @@ namespace Isis {
       void TearDown() override;
   };
 
-
   class DefaultCube : public TempTestingFiles {
     protected:
       Cube *testCube;
@@ -257,6 +256,9 @@ namespace Isis {
 
   class ApolloCube : public LargeCube {
     protected:
+      std::vector<std::pair<int, int>> reseaus;
+      int reseauSize;
+
       void SetUp() override;
   };
 
@@ -316,13 +318,109 @@ class HistoryBlob : public TempTestingFiles {
     void SetUp() override;
 };
 
+
 class NullPixelCube : public TempTestingFiles {
   protected:
     Cube *testCube;
+    void SetUp() override;
+    void TearDown() override;
+};
+
+
+class MiniRFNetwork : public TempTestingFiles {
+  protected:
+    Cube *testCube1;
+    Cube *testCube2;
+    Cube *testCube3;
+
+    FileList *cubeList;
+    QString cubeListFile;
+
+    ControlNet *network;
+    QString controlNetPath;
 
     void SetUp() override;
     void TearDown() override;
 };
+
+class VikThmNetwork : public TempTestingFiles {
+  protected:
+    Cube *testCube1;
+    Cube *testCube2;
+    Cube *testCube3;
+    Cube *testCube4;
+
+    FileList *cubeList;
+    QString cubeListFile;
+
+    ControlNet *network;
+    QString controlNetPath;
+
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class CSMNetwork : public TempTestingFiles {
+  protected:
+
+    QVector<FileName> stateStringFiles;
+    QVector<FileName> labelFiles;
+    QVector<Cube*> cubes;
+
+    FileList *cubeList;
+    QString cubeListFile;
+
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class ClipperWacFcCube : public DefaultCube {
+  protected:
+    Cube *wacFcCube;
+    Pvl label;
+    json isd;
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class ClipperNacRsCube : public DefaultCube {
+  protected:
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class ClipperPbCube : public TempTestingFiles {
+  protected:
+    Cube *testCube;
+    void setInstrument(QString instrumentId);
+};
+
+class NearMsiCameraCube : public TempTestingFiles {
+  protected:
+    // Cube *testCube;
+    std::unique_ptr<Cube> testCube;
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class TgoCassisModuleKernels : public ::testing::Test {
+
+  protected:
+    // You can define per-test set-up logic as usual.
+    void SetUp() override;
+
+    // You can define per-test tear-down logic as usual.
+    void TearDown() override;
+
+    QTemporaryDir kernelPrefix;
+
+    QVector<QString> binaryCkKernels;
+    QVector<QString> binarySpkKernels;
+
+    QString binaryCkKernelsAsString;
+    QString binarySpkKernelsAsString;
+};
+
 }
 
 #endif

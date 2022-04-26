@@ -172,10 +172,10 @@ namespace Isis {
       icube.setVirtualBands(inAtt.bands());
     }
 
-    icube.open(FileName(ui.GetFileName("FROM")).expanded());
+    icube.open(FileName(ui.GetCubeName("FROM")).expanded());
 
     // Make sure it is a Marci cube
-    FileName inFileName = ui.GetFileName("FROM");
+    FileName inFileName = ui.GetCubeName("FROM");
     try {
       if (icube.group("Instrument")["InstrumentID"][0] != "Marci") {
         throw IException();
@@ -310,7 +310,7 @@ namespace Isis {
     ocube.setLabelsAttached(outAtt.labelAttachment() == AttachedLabel);
     ocube.setPixelType(outAtt.pixelType());
 
-    ocube.create(FileName(ui.GetFileName("TO")).expanded());
+    ocube.create(FileName(ui.GetCubeName("TO")).expanded());
 
     LineManager icubeMgr(icube);
 

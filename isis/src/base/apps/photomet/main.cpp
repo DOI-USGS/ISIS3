@@ -1779,7 +1779,7 @@ void IsisMain() {
   p.SetOutputCube("TO");
 
   Pvl inLabel;
-  inLabel.read(ui.GetFileName("FROM"));
+  inLabel.read(ui.GetCubeName("FROM"));
 
   // If the source of photometric angles is the center of the image,
   // then get the angles at the center of the image.

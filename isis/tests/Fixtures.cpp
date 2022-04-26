@@ -5,6 +5,8 @@
 #include "FileName.h"
 
 #include "Blob.h"
+#include "Brick.h"
+#include "csminit.h"
 #include "Fixtures.h"
 #include "Portal.h"
 #include "LineManager.h"
@@ -185,7 +187,7 @@ namespace Isis {
     int v_lineNum = 0;
     for(v_line.begin(); !v_line.end(); v_line++) {
       for(int i = 0; i < v_line.size(); i++) {
-        if(i == 4) { 
+        if(i == 4) {
           v_line[i] = NULL8;
         }
         else {
@@ -210,7 +212,7 @@ namespace Isis {
     int b_lineNum = 0;
     for(b_line.begin(); !b_line.end(); b_line++) {
       for(int i = 0; i < b_line.size(); i++) {
-        if( b_lineNum == 22 ) { 
+        if( b_lineNum == 22 ) {
           b_line[i] = NULL8;
         }
         else {
@@ -435,9 +437,27 @@ namespace Isis {
 
     testCube = new Cube();
     testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
+    LineManager line(*testCube);
+    int pixelValue = 1;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) (pixelValue % 255);
+        pixelValue++;
+      }
+      testCube->write(line);
+    }
 
     projTestCube = new Cube();
     projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
+    line = LineManager(*projTestCube);
+    pixelValue = 1;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) (pixelValue % 255);
+        pixelValue++;
+      }
+      projTestCube->write(line);
+    }
   }
 
 
@@ -1088,39 +1108,54 @@ namespace Isis {
     testCube->setDimensions(22900, 22900, 1);
     testCube->create(tempDir.path() + "/large.cub");
 
-    LineManager line(*testCube);
-    double pixelValue = 0.0;
-    for(line.begin(); !line.end(); line++) {
-      for(int i = 0; i < line.size(); i++) {
-        line[i] = pixelValue;
+    // Reseau centers as {sample, line} pairs
+    reseaus = {{200, 200}, {400, 400}, {600, 600}};
+    reseauSize = 103;
+    int reseauValue = 100;
+
+    Brick brick(reseauSize,reseauSize,1,testCube->pixelType());
+    for (size_t res=0; res<reseaus.size(); res++) {
+      int baseSamp = (int)(reseaus[res].first+0.5) - (reseauSize/2);
+      int baseLine = (int)(reseaus[res].second+0.5) - (reseauSize/2);
+      brick.SetBasePosition(baseSamp,baseLine,1);
+      testCube->read(brick);
+      // Fill the surrounding area with a base number
+      for (int i = 0; i < reseauSize; i++) {
+        for (int j = 0; j < reseauSize; j++) {
+          brick[reseauSize*i + j] = res;
+        }
       }
 
-      pixelValue++;
-      testCube->write(line);
+      // Create reseau
+      for (int i = 0; i < reseauSize; i++) {
+        for (int j = -2; j < 3; j++) {
+          // Vertical line
+          brick[reseauSize * i + reseauSize/2 + j] = reseauValue;
+
+          // Horizontal line
+          brick[reseauSize * (reseauSize/2 + j) + i] = reseauValue;
+        }
+      }
+      testCube->write(brick);
     }
 
-    PvlGroup reseaus("Reseaus");
-    PvlKeyword samples = PvlKeyword("Sample", "200");
-    samples += "400";
-    samples += "600";
-
-    PvlKeyword lines = PvlKeyword("Line", "200");
-    lines += "400";
-    lines += "600";
-
+    PvlGroup reseausGroup("Reseaus");
+    PvlKeyword samples = PvlKeyword("Sample", QString::number(reseaus[0].first));
+    PvlKeyword lines = PvlKeyword("Line", QString::number(reseaus[0].second));
     PvlKeyword types = PvlKeyword("Type", "5");
-    types += "5";
-    types += "5";
-
     PvlKeyword valid = PvlKeyword("Valid", "1");
-    valid += "1";
-    valid += "1";
+    for (size_t i = 1; i < reseaus.size(); i++) {
+      samples += QString::number(reseaus[i].first);
+      lines += QString::number(reseaus[i].second);
+      types += "5";
+      valid += "1";
+    }
 
-    reseaus += lines;
-    reseaus += samples;
-    reseaus += types;
-    reseaus += valid;
-    reseaus += PvlKeyword("Status", "Nominal");
+    reseausGroup += lines;
+    reseausGroup += samples;
+    reseausGroup += types;
+    reseausGroup += valid;
+    reseausGroup += PvlKeyword("Status", "Nominal");
 
     std::istringstream instStr (R"(
       Group = Instrument
@@ -1135,7 +1170,7 @@ namespace Isis {
     instStr >> instGroup;
 
     Pvl *lab = testCube->label();
-    lab->findObject("IsisCube").addGroup(reseaus);
+    lab->findObject("IsisCube").addGroup(reseausGroup);
     lab->findObject("IsisCube").addGroup(instGroup);
 
     testCube->reopen("r");
@@ -1154,7 +1189,7 @@ namespace Isis {
   }
 
 
- void OsirisRexCube::setInstrument(QString ikid, QString instrumentId) {
+  void OsirisRexCube::setInstrument(QString ikid, QString instrumentId) {
     delete testCube;
     testCube = new Cube();
 
@@ -1389,6 +1424,7 @@ namespace Isis {
     testCube.reset();
   }
 
+
   void NullPixelCube::SetUp() {
     TempTestingFiles::SetUp();
 
@@ -1406,6 +1442,7 @@ namespace Isis {
     }
   }
 
+
   void NullPixelCube::TearDown() {
     if (testCube->isOpen()) {
       testCube->close();
@@ -1416,4 +1453,319 @@ namespace Isis {
     }
   }
 
+
+  void MiniRFNetwork::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube1 = new Cube("data/miniRFImage/LSZ_00455_1CD_XKU_87S324_V1_S1_Null.crop.cub");
+    testCube2 = new Cube("data/miniRFImage/LSZ_00457_1CD_XKU_87S321_V1_S1_Null.crop.cub");
+    testCube3 = new Cube("data/miniRFImage/LSZ_00459_1CD_XKU_88S327_V1_S1_Null.crop.cub");
+
+    cubeList = new FileList();
+
+    cubeList->append(testCube1->fileName());
+    cubeList->append(testCube2->fileName());
+    cubeList->append(testCube3->fileName());
+
+
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    cubeList->write(cubeListFile);
+
+    network = new ControlNet("data/miniRFImage/Cabeus_Orbit400_withSS_AprioriPts.net");
+    controlNetPath = tempDir.path() + "/miniRFNet.net";
+    network->Write(controlNetPath);
+  }
+
+  void MiniRFNetwork::TearDown() {
+    if (testCube1->isOpen()) {
+      testCube1->close();
+    }
+    delete testCube1;
+    if (testCube2->isOpen()) {
+      testCube2->close();
+    }
+    delete testCube2;
+    if (testCube3->isOpen()) {
+      testCube3->close();
+    }
+    delete testCube3;
+
+    if (cubeList) {
+      delete cubeList;
+    }
+  }
+
+  void VikThmNetwork::SetUp() {
+    TempTestingFiles::SetUp();
+
+    testCube1 = new Cube("data/vikingThemisNetwork/F704b51.lev1_slo_crop.cub");
+    testCube2 = new Cube("data/vikingThemisNetwork/F857a32.lev1_slo_crop.cub");
+    testCube3 = new Cube("data/vikingThemisNetwork/I28234014RDR_crop.cub");
+    testCube4 = new Cube("data/vikingThemisNetwork/I52634011RDR_crop.cub");
+
+    cubeList = new FileList();
+
+    cubeList->append(testCube1->fileName());
+    cubeList->append(testCube2->fileName());
+    cubeList->append(testCube3->fileName());
+    cubeList->append(testCube4->fileName());
+
+
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    cubeList->write(cubeListFile);
+
+    network = new ControlNet("data/vikingThemisNetwork/themis_dayir_VO_arcadia_extract_hand.net");
+    controlNetPath = tempDir.path() + "/vikThmNet.net";
+    network->Write(controlNetPath);
+  }
+
+  void VikThmNetwork::TearDown() {
+    if (testCube1->isOpen()) {
+      testCube1->close();
+    }
+    delete testCube1;
+    if (testCube2->isOpen()) {
+      testCube2->close();
+    }
+    delete testCube2;
+    if (testCube3->isOpen()) {
+      testCube3->close();
+    }
+    delete testCube3;
+    if (testCube4->isOpen()) {
+      testCube4->close();
+    }
+    delete testCube4;
+
+    if (cubeList) {
+      delete cubeList;
+    }
+  }
+
+  void CSMNetwork::SetUp(){
+    QString APP_XML = FileName("$ISISROOT/bin/xml/csminit.xml").expanded();
+    QVector<QString> fNames = {"/Test_A", "/Test_B",
+                               "/Test_C", "/Test_D",
+                               "/Test_E", "/Test_F",
+                               "/Test_G", "/Test_H",
+                               "/Test_I", "/Test_J"
+                              };
+
+    cubes.fill(nullptr, 10);
+
+    cubeList = new FileList();
+    cubeListFile = tempDir.path() + "/cubes.lis";
+    // Create CSMInit-ed cubes
+    for (int i = 0; i < cubes.size() ; i++){
+      cubes[i] = new Cube();
+      cubes[i]->setDimensions(1024,1024,1);
+      FileName cubName = FileName(tempDir.path()+fNames[i]+".cub");
+      cubes[i]->create(cubName.expanded());
+      cubeList->append(cubes[i]->fileName());
+      QVector<QString> args = {"from="+cubName.expanded(),
+                               "state=data/CSMNetwork/"+fNames[i]+".json",
+                               "modelname=TestCsmModel",
+                               "pluginname=TestCsmPlugin"
+                              };
+      UserInterface ui(APP_XML, args);
+      csminit(ui);
+    }
+    cubeList->write(cubeListFile);
+  }
+
+  void CSMNetwork::TearDown() {
+    for(int i = 0; i < cubes.size(); i++) {
+      if(cubes[i] && cubes[i]->isOpen()) {
+        delete cubes[i];
+      }
+    }
+
+    if (cubeList) {
+      delete cubeList;
+    }
+  }
+
+  void ClipperWacFcCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    QString testPath = tempDir.path() + "/test.cub";
+    QFile::copy("data/clipper/ClipperWacFc.cub", testPath);
+    wacFcCube = new Cube(testPath);
+
+    PvlGroup &wacKernels = wacFcCube->label()->findObject("IsisCube").findGroup("Kernels");
+    wacKernels.findKeyword("NaifFrameCode").setValue("-159102");
+
+    double offset = 10;
+    AlphaCube aCube(wacFcCube->sampleCount(), wacFcCube->lineCount(),
+                    wacFcCube->sampleCount()-offset, wacFcCube->lineCount() - offset,
+                    0, offset, wacFcCube->sampleCount(), wacFcCube->lineCount());
+
+    aCube.UpdateGroup(*wacFcCube);
+
+    wacFcCube->reopen("rw");
+  }
+
+  void ClipperWacFcCube::TearDown() {
+    if (wacFcCube) {
+      delete wacFcCube;
+    }
+  }
+
+  void ClipperNacRsCube::SetUp() {
+    DefaultCube::SetUp();
+
+    delete testCube;
+    testCube = new Cube();
+
+    FileName newCube(tempDir.path() + "/testing.cub");
+
+    testCube->fromIsd(newCube, label, isd, "rw");
+
+    PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
+    kernels.findKeyword("NaifFrameCode").setValue("-159101");
+
+    PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
+    std::istringstream iss(R"(
+      Group = Instrument
+        SpacecraftName            = Clipper
+        InstrumentId              = EIS-NAC-RS
+        TargetName                = Europa
+        StartTime                 = 2025-01-01T00:00:00.000
+        JitterSampleCoefficients = (0.0, 0.0, 0.0)
+        JitterLineCoefficients   = (0.0, 0.0, 0.0)
+      End_Group
+    )");
+
+    PvlGroup newInstGroup;
+    iss >> newInstGroup;
+    inst = newInstGroup;
+
+    PvlObject &naifKeywords = testCube->label()->findObject("NaifKeywords");
+    std::istringstream nk(R"(
+      Object = NaifKeywords
+        BODY_CODE               = 502
+        BODY502_RADII           = (1562.6, 1560.3, 1559.5)
+        BODY_FRAME_CODE         = 10024
+        INS-159101_FOCAL_LENGTH = 150.40199
+        INS-159101_PIXEL_PITCH  = 0.014
+        INS-159101_TRANSX       = (0.0, 0.014004651, 0.0)
+        INS-159101_TRANSY       = (0.0, 0.0, 0.01399535)
+        INS-159101_ITRANSS      = (0.0, 71.404849, 0.0)
+        INS-159101_ITRANSL      = (0.0, 0.0, 71.4523)
+        INS-159101_OD_K         = (0.0, 0.0, 0.0)
+      End_Object
+    )");
+
+    PvlObject newNaifKeywords;
+    nk >> newNaifKeywords;
+    naifKeywords = newNaifKeywords;
+
+    QString fileName = testCube->fileName();
+    delete testCube;
+    testCube = new Cube(fileName, "rw");
+
+    double offset = 10;
+    AlphaCube aCube(testCube->sampleCount(), testCube->lineCount(),
+                    testCube->sampleCount()-offset, testCube->lineCount() - offset,
+                    0, offset, testCube->sampleCount(), testCube->lineCount());
+
+    aCube.UpdateGroup(*testCube);
+    testCube->reopen("rw");
+  }
+
+  void ClipperNacRsCube::TearDown() {
+    if (testCube) {
+      delete testCube;
+    }
+  }
+
+  void ClipperPbCube::setInstrument(QString instrumentId) {
+    TempTestingFiles::SetUp();
+
+    if (instrumentId == "EIS-NAC-PB") {
+      QString testPath = tempDir.path() + "/nacTest.cub";
+      QFile::copy("data/clipper/ClipperNacPb.cub", testPath);
+      testCube = new Cube(testPath, "rw");
+    }
+    else if (instrumentId == "EIS-WAC-PB") {
+      QString testPath = tempDir.path() + "/wacTest.cub";
+      QFile::copy("data/clipper/ClipperWacPb.cub", testPath);
+      testCube = new Cube(testPath, "rw");
+    }
+  }
+
+  void NearMsiCameraCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    json isd;
+    Pvl label;
+
+    std::ifstream isdFile("data/near/msicamera/m0155881376f3_2p_cif_dbl.isd");
+    std::ifstream cubeLabel("data/near/msicamera/m0155881376f3_2p_cif_dbl.pvl");
+
+    isdFile >> isd;
+    cubeLabel >> label;
+
+    testCube.reset( new Cube() ) ;
+    testCube->fromIsd(tempDir.path() + "/m0155881376f3_2p_cif_dbl.cub", label, isd, "rw");
+  }
+
+  void NearMsiCameraCube::TearDown() {
+    testCube.reset();
+  }
+
+  void TgoCassisModuleKernels::SetUp() {
+    QVector<QString> ckKernels = {QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_0_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_1_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_0_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_1_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_0_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_1_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_0_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_1_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_0_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_1_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_0_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_1_sliced_-143000.xc")};
+    QVector<QString> tempCkKernels;
+    QVector<QString> spkKernels = {QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_0.xsp"),
+                                   QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_1.xsp"),
+                                   QString("data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381_0.xsp"),
+                                   QString("data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381_1.xsp"),
+                                   QString("data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583_0.xsp"),
+                                   QString("data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583_1.xsp")};
+    QVector<QString> tempSpkKernels;
+
+    for (int i = 0; i < ckKernels.size(); i++) {
+      QString kernelFile = ckKernels[i];
+      QString kernelExtension = kernelFile.split('.').last();
+      QString targetFile = kernelPrefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
+      QFile::copy(kernelFile, targetFile);
+      tempCkKernels.append(targetFile);
+    }
+
+    for (int i = 0; i < spkKernels.size(); i++) {
+      QString kernelFile = spkKernels[i];
+      QString kernelExtension = kernelFile.split('.').last();
+      QString targetFile = kernelPrefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
+      QFile::copy(kernelFile, targetFile);
+      tempSpkKernels.append(targetFile);
+    }
+
+    // variables defined in TgoCassisModuleTests
+    if (binaryCkKernels.size() == 0) {
+      binaryCkKernels = generateBinaryKernels(tempCkKernels);
+      binarySpkKernels = generateBinaryKernels(tempSpkKernels);
+
+      binaryCkKernelsAsString = fileListToString(binaryCkKernels);
+      binarySpkKernelsAsString = fileListToString(binarySpkKernels);
+    }
+  }
+
+  void TgoCassisModuleKernels::TearDown() {
+    binaryCkKernels = {};
+    binarySpkKernels = {};
+    binaryCkKernelsAsString = "";
+    binarySpkKernelsAsString = "";
+  }
 }

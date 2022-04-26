@@ -111,16 +111,16 @@
         Samples = 2468
         Lines   = 11499
         Bands   = 1
-      EndGroup
+      End_Group
 
       Group = Pixels
         Type       = Real
         ByteOrder  = Lsb
         Base       = 0.0
         Multiplier = 1.0
-      EndGroup
-    EndObject
-  EndObject
+      End_Group
+    End_Object
+  End_Object
 End
 
           </pre>

@@ -49,7 +49,7 @@ void IsisMain() {
     bool bRemoveFurrows = ui.GetBoolean("FURROWS");
 
     // Get the cube info
-    inFile  = ui.GetFileName("FROM");
+    inFile  = ui.GetCubeName("FROM");
     outFile = ui.GetFileName("TO");
     Pvl cubeLabel;
     if (bIngestion) {

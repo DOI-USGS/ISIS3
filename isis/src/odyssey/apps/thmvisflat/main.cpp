@@ -27,10 +27,10 @@ void IsisMain() {
     icube.setVirtualBands(inAtt.bands());
   }
 
-  icube.open(FileName(ui.GetFileName("FROM")).expanded());
+  icube.open(FileName(ui.GetCubeName("FROM")).expanded());
 
   // Make sure it is a Themis EDR/RDR
-  FileName inFileName = ui.GetFileName("FROM");
+  FileName inFileName = ui.GetCubeName("FROM");
   try {
     if(icube.group("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
       QString msg = "This program is intended for use on THEMIS VIS images only. [";
@@ -71,7 +71,7 @@ void IsisMain() {
   ocube.setLabelsAttached(outAtt.labelAttachment() == AttachedLabel);
   ocube.setPixelType(outAtt.pixelType());
 
-  ocube.create(FileName(ui.GetFileName("TO")).expanded());
+  ocube.create(FileName(ui.GetCubeName("TO")).expanded());
 
   LineManager icubeMgr(icube);
   vector<int> filter;

@@ -240,23 +240,11 @@ namespace Isis {
       p_grnLabel->hide();
       p_bluLabel->hide();
 
-      ViewportBuffer *grayBuf = cvp->grayBuffer();
+      ViewportBuffer *buf = cvp->grayBuffer();
 
-      if(grayBuf->working()) {
-        p_grayLabel->setText("BUSY");
-      }
-      else {
-        const QRect rect(grayBuf->bufferXYRect());
+      QString pixelString = updateColorLabel(p, buf, p_grayLabel);
 
-        if(p.x() >= rect.left() && p.x() <= rect.right() &&
-            p.y() >= rect.top() && p.y() <= rect.bottom()) {
-          const int bufX = p.x() - rect.left();
-          const int bufY = p.y() - rect.top();
-          QString pixelString = IString(PixelToString(
-                                                grayBuf->getLine(bufY)[bufX])).ToQt();
-          p_grayLabel->setText(pixelString);
-        }
-      }
+      p_grayLabel->setText(pixelString);
     }
     else {
       p_grayLabel->hide();
@@ -265,62 +253,37 @@ namespace Isis {
       p_bluLabel->show();
 
       ViewportBuffer *redBuf = cvp->redBuffer();
-
-      if(redBuf->working()) {
-        p_grayLabel->setText("BUSY");
-      }
-      else {
-        const QRect rRect = redBuf->bufferXYRect();
-
-        if(p.x() >= rRect.left() && p.x() < rRect.right() &&
-            p.y() >= rRect.top() && p.y() < rRect.bottom()) {
-          const int rBufX = p.x() - rRect.left();
-          const int rBufY = p.y() - rRect.top();
-          QString rLab = "R ";
-          rLab += IString(PixelToString(
-                                  redBuf->getLine(rBufY)[rBufX])).ToQt();
-          p_redLabel->setText(rLab);
-        }
-      }
+      QString pixelString = updateColorLabel(p, redBuf, p_redLabel);
+      QString rLab = "R ";
+      rLab += IString(pixelString).ToQt();
+      p_redLabel->setText(rLab);
 
       ViewportBuffer *greenBuf = cvp->greenBuffer();
-
-      if(greenBuf->working()) {
-        p_grayLabel->setText("BUSY");
-      }
-      else {
-        const QRect gRect = greenBuf->bufferXYRect();
-
-        if(p.x() >= gRect.left() && p.x() < gRect.right() &&
-            p.y() >= gRect.top() && p.y() < gRect.bottom()) {
-          const int gBufX = p.x() - gRect.left();
-          const int gBufY = p.y() - gRect.top();
-          QString gLab = "G ";
-          gLab += IString(PixelToString(
-                                  greenBuf->getLine(gBufY)[gBufX])).ToQt();
-          p_grnLabel->setText(gLab);
-        }
-      }
+      pixelString = updateColorLabel(p, greenBuf, p_grnLabel);
+      QString gLab = "G ";
+      gLab += IString(pixelString).ToQt();
+      p_grnLabel->setText(gLab);
 
       ViewportBuffer *blueBuf = cvp->blueBuffer();
+      pixelString = updateColorLabel(p, blueBuf, p_bluLabel);
+      QString bLab = "B ";
+      bLab += IString(pixelString).ToQt();
+      p_bluLabel->setText(bLab);
+    }
+  }
 
-      if(blueBuf->working()) {
-        p_grayLabel->setText("BUSY");
-      }
-      else {
-        const QRect bRect = blueBuf->bufferXYRect();
+  QString TrackTool::updateColorLabel(QPoint p, ViewportBuffer *buf, QLabel *label) {
+    if(!buf->working()) {
+      const QRect rRect = buf->bufferXYRect();
 
-        if(p.x() >= bRect.left() && p.x() < bRect.right() &&
-            p.y() >= bRect.top() && p.y() < bRect.bottom()) {
-          const int bBufX = p.x() - bRect.left();
-          const int bBufY = p.y() - bRect.top();
-          QString bLab = "B ";
-          bLab += IString(PixelToString(
-                                  blueBuf->getLine(bBufY)[bBufX])).ToQt();
-          p_bluLabel->setText(bLab);
-        }
+      if(p.x() >= rRect.left() && p.x() < rRect.right() &&
+          p.y() >= rRect.top() && p.y() < rRect.bottom()) {
+        const int rBufX = p.x() - rRect.left();
+        const int rBufY = p.y() - rRect.top();
+        return PixelToString(buf->getLine(rBufY)[rBufX], 12);
       }
     }
+    return "BUSY";
   }
 
 
@@ -383,4 +346,3 @@ namespace Isis {
     return p_sbar;
   }
 }
-

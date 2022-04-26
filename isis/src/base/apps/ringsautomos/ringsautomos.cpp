@@ -57,10 +57,10 @@ namespace Isis {
       m.RingsSetOutputCube(list,
                       ui.GetDouble("MINRINGRAD"), ui.GetDouble("MAXRINGRAD"),
                       ui.GetDouble("MINRINGLON"), ui.GetDouble("MAXRINGLON"),
-                      oAtt, ui.GetFileName("MOSAIC"));
+                      oAtt, ui.GetCubeName("MOSAIC"));
     }
     else {
-      m.RingsSetOutputCube(list, oAtt, ui.GetFileName("MOSAIC"));
+      m.RingsSetOutputCube(list, oAtt, ui.GetCubeName("MOSAIC"));
     }
 
     m.SetHighSaturationFlag(ui.GetBoolean("HIGHSATURATION"));

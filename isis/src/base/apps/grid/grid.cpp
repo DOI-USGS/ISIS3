@@ -35,7 +35,7 @@ namespace Isis {
     if (inAtt.bands().size() != 0) {
       icube.setVirtualBands(inAtt.bands());
     }
-    icube.open(ui.GetFileName("FROM"));
+    icube.open(ui.GetCubeName("FROM"));
     grid(&icube, ui);
   }
 
@@ -43,7 +43,7 @@ namespace Isis {
     // We will be processing by line
     ProcessByLine p;
     p.SetInputCube(icube);
-    p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"), 
+    p.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO"), 
                     icube->sampleCount(), icube->lineCount(), icube->bandCount());
 
     QString mode = ui.GetString("MODE");

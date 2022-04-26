@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Product_Observational>
+
+  <Identification_Area>
+    <logical_identifier>TBD</logical_identifier>
+    <version_id>UNK</version_id>
+    <title>CaSSIS Data Record</title>
+    <information_model_version>TBD</information_model_version>
+    <product_class>Product_Observational</product_class>
+    <Modification_History>
+      <Modification_Detail>
+        <modification_date>2017-03-04T18:52:31</modification_date>
+        <description>Header_Creation: c_new_header</description>
+        <version_id>V3.2</version_id>
+        <version_date>16-Feb-2017</version_date>
+      </Modification_Detail>
+      <Modification_Detail>
+        <modification_date>2017-03-04T18:52:31</modification_date>
+        <description>SC TM Conversion: c_sc_file_resolution</description>
+        <version_id>V1.3</version_id>
+        <version_date>07-Jan-2017</version_date>
+      </Modification_Detail>
+      <Modification_Detail>
+        <modification_date>2017-03-04T18:52:31</modification_date>
+        <description>SC TM Conversion: c_batch_sc_tm_packets</description>
+        <version_id>V1.15</version_id>
+        <version_date>02-Mar-2017</version_date>
+      </Modification_Detail>
+    </Modification_History>
+    <Producer_data>
+      <Producer_full_name>Nicolas Thomas</Producer_full_name>
+      <Producer_id>UBE</Producer_id>
+      <Producer_institution_name>Physikalisches Inst., Universitaet Bern</Producer_institution_name>
+      <Citation_Information>Thomas, N., Cremonese, G., Ziethe, R., Gerber, M., et al. The Colour and Stereo Surface Imaging System (CaSSIS) for the ExoMars Trace Gas Orbiter. Space Science Reviews, submitted.</Citation_Information>
+    </Producer_data>
+    <Product_Id>MCO20161120153000349DMP00000000</Product_Id>
+  </Identification_Area>
+
+  <Observation_Area>
+    <Science_Facets bandwidth="Broad" discipline_name="Imaging" domain="Surface" wavelength_range="Visible"/>
+    <Investigation_Area>
+      <Instrument_Host_Id>TGO</Instrument_Host_Id>
+      <Instrument_Host_Name>TRACE GAS ORBITER</Instrument_Host_Name>
+      <Mission_Id>TRACE GAS ORBITER</Mission_Id>
+      <Mission_Name>EXOMARS TRACE GAS ORBITER</Mission_Name>
+    </Investigation_Area>
+    <Observing_System>
+      <name>Colour and Stereo Surface Imaging System on Exomars Trace Gas Orbiter</name>
+      <description>The scientific imaging system of Exomars TGO</description>
+      <Observing_System_Component>
+        <name>TGO</name>
+        <type>Spacecraft</type>
+        <description>Instrument Host</description>
+      </Observing_System_Component>
+      <Observing_System_Component>
+        <name>CaSSIS</name>
+        <type>Instrument</type>
+        <description>PUSH-FRAME CMOS VISIBLE REFLECTING TELESCOPE</description>
+      </Observing_System_Component>
+    </Observing_System>
+  </Observation_Area>
+
+  <CaSSIS_Header>
+    <CaSSIS_General>
+      <INSTRUMENT_IFOV Unit="rad/px">1.142e-005</INSTRUMENT_IFOV>
+      <TELESCOPE_FOCAL_LENGTH Unit="M"> 0.8760</TELESCOPE_FOCAL_LENGTH>
+      <TELESCOPE_F_NUMBER>  6.49</TELESCOPE_F_NUMBER>
+      <TELESCOPE_TYPE>Three-mirror anastigmat with powered fold mirror</TELESCOPE_TYPE>
+      <DETECTOR_DESC>2D Array</DETECTOR_DESC>
+      <DETECTOR_PIXEL_HEIGHT Unit="MICRON">   10.0</DETECTOR_PIXEL_HEIGHT>
+      <DETECTOR_PIXEL_WIDTH Unit="MICRON">   10.0</DETECTOR_PIXEL_WIDTH>
+      <DETECTOR_TYPE>SI CMOS HYBRID (OSPREY 2K)</DETECTOR_TYPE>
+      <DETECTOR_READ_NOISE Unit="ELECTRON">   61.0</DETECTOR_READ_NOISE>
+      <FILTERS_AVAILABLE>BLU RED NIR PAN</FILTERS_AVAILABLE>
+    </CaSSIS_General>
+    <FSW_HEADER CompressionRatio="0" CompressionRatio_Length="1" CompressionRatio_Tag="5" Data_Length="2056" Data_Tag="160" Error="0" Error_Length="4" Error_Tag="9" ExposureTimestamp="0000000000000000" ExposureTimestamp_Length="8" ExposureTimestamp_Tag="11" FRAME_HEADER="250B" Offset="0" Offset_Length="4" Offset_Tag="7" PEHK="00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" PEHK_Length="64" PEHK_Tag="80" Position="0" Position_Length="4" Position_Tag="10" ScienceTM_Length="2225" SequenceCounter="0" SequenceCounter_Length="1" SequenceCounter_Tag="4" Timestamp="2f014be53baba6a4" Timestamp_Length="8" Timestamp_Tag="1" TotalDataLength="0" TotalDataLength_Length="4" TotalDataLength_Tag="6" Type="210" Type_Length="1" Type_Tag="8" UID="100729532" UID_Length="4" UID_Tag="2" WindowCounter="0" WindowCounter_Length="1" WindowCounter_Tag="3"/>
+    <PEHK_HEADER/>
+    <DERIVED_HEADER_DATA Description="Derived data from HK">
+      <OnboardImageAcquisitionTime Time_Base="UTC">2016-11-20T15:30:00.349</OnboardImageAcquisitionTime>
+      <OnboardAcquisitionSCLKTime Time_Base="sclk">    21751099.43942</OnboardAcquisitionSCLKTime>
+      <MissionPhase Phase_Definition="CaSSIS">MCO</MissionPhase>
+      <Filter Form="Acronym">DMP</Filter>
+      <PixelsPossiblySaturated Value="%">      0.00</PixelsPossiblySaturated>
+      <Expanded Flag="N/A">N/A</Expanded>
+    </DERIVED_HEADER_DATA>
+    <GEOMETRIC_DATA Description="Geometric data from SPICE kernels">
+      <TARGET>Pi2 Orionis</TARGET>
+      <POINTING_RIGHT_ASCENSION Unit="deg (J2000)">72.5127</POINTING_RIGHT_ASCENSION>
+      <POINTING_DECLINATION Unit="deg (J2000)">9.0197</POINTING_DECLINATION>
+      <HELIOCENTRIC_DISTANCE Unit="AU">1.3847626</HELIOCENTRIC_DISTANCE>
+      <MARSCENTRIC_DISTANCE Unit="km">101756.8</MARSCENTRIC_DISTANCE>
+      <GEOCENTRIC_DISTANCE Unit="AU">1.3727146</GEOCENTRIC_DISTANCE>
+      <SOLAR_ELONGATION_ANGLE Unit="deg">23.958</SOLAR_ELONGATION_ANGLE>
+      <SUB_SPACECRAFT_LONGITUDE Unit="deg">102.935</SUB_SPACECRAFT_LONGITUDE>
+      <SUB_SPACECRAFT_LATITUDE Unit="deg">1.577</SUB_SPACECRAFT_LATITUDE>
+      <Kernels_Used Unit="N/A">em16_tgo_sc_slt_npo_20180101_20181231_s20170201_v01.bc,em16_tgo_sc_fpp_014_01_20160314_20170315_s20170201_v01.bc,em16_tgo_sc_fpp_d170207_pointing_20170305_20170309_s20170201_v01.bc,cassis_ck_p_160312_170308_170220.bc,em16_tgo_v10.tf,em16_tgo_ops_v02.tf,rssd0002.tf,em16_tgo_cassis_v04.ti,naif0012.tls,PCK00010.TPC,de-403-masses.TPC,em16_tgo_step_20170201.tsc,em16_tgo_flp_002_01_20171120_20230301_v01.bsp,em16_tgo_fpp_014_01_20160314_20170315_v01.bsp,DE432s.BSP,mar097.BSP</Kernels_Used>
+    </GEOMETRIC_DATA>
+  </CaSSIS_Header>
+
+  <Errors>
+    <ERROR_BLOCK>Listing</ERROR_BLOCK>
+  </Errors>
+
+  <File_Area_Observational>
+    <File>
+      <file_name>CAS-MCO-2016-11-20T15.30.00.349-DMP-00000-00</file_name>
+      <creation_date_time>2017-03-04T18:52:31</creation_date_time>
+      <comment>CaSSIS specific XML header</comment>
+      <created_file_name>F:\CaSSIS\data\MCO\161120_stellar_cal_orbit09\level0\CAS-MCO-2016-11-20T15.30.00.349-DMP-00000-00</created_file_name>
+    </File>
+    <Array_2D_Image>
+      <axes>1</axes>
+      <Axis_Array>
+        <axis_name>Sample</axis_name>
+        <sequence_number>1</sequence_number>
+        <elements>2056</elements>
+      </Axis_Array>
+      <Element_Array>
+        <data_type>UnsignedLSB1</data_type>
+        <idl_data_type>1</idl_data_type>
+        <order>First_Index_Fastest</order>
+        <unit>DN</unit>
+        <scaling_factor> 1.00</scaling_factor>
+        <offset> 0.00</offset>
+      </Element_Array>
+    </Array_2D_Image>
+  </File_Area_Observational>
+
+</Product_Observational>

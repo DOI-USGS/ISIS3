@@ -235,7 +235,7 @@ namespace Isis {
 
   class Camera : public Sensor {
     public:
-      // constructors 
+      // constructors
       Camera(Cube &cube);
 
       // destructor
@@ -255,6 +255,7 @@ namespace Isis {
 
       void LocalPhotometricAngles(Angle & phase, Angle & incidence,
                                   Angle & emission, bool &success);
+      void Slope(double &slope, bool &success);
 
       void GetLocalNormal(double normal[3]);
 
@@ -278,10 +279,10 @@ namespace Isis {
       virtual double SampleResolution();
       virtual double DetectorResolution();
 
-      virtual double ObliqueDetectorResolution();
-      virtual double ObliqueSampleResolution();
-      virtual double ObliqueLineResolution();
-      virtual double ObliquePixelResolution();
+      virtual double ObliqueDetectorResolution(bool useLocal = true);
+      virtual double ObliqueSampleResolution(bool useLocal = true);
+      virtual double ObliqueLineResolution(bool useLocal = true);
+      virtual double ObliquePixelResolution(bool useLocal = true);
 
 
       virtual double resolution();
@@ -361,6 +362,7 @@ namespace Isis {
         Radar,          //!< Radar Camera
         Point,          //!< Point Camera
         RollingShutter, //!< RollingShutter
+        Csm             //!< Community Sensor Model Camera
       };
 
       /**
@@ -575,5 +577,3 @@ namespace Isis {
 };
 
 #endif
-
-

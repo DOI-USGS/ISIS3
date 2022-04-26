@@ -41,11 +41,11 @@ void IsisMain() {
   }
   cnet.SetUserName(Application::Name());
 
-  QString filename = ui.GetFileName("FROM");
+  QString filename = ui.GetCubeName("FROM");
   Cube inputCube;
   inputCube.open(filename, "r");
 
-  QString locFilename = ui.GetFileName("LOC");
+  QString locFilename = ui.GetCubeName("LOC");
   Cube locCube;
   locCube.open(locFilename, "r");
 

@@ -49,7 +49,7 @@ namespace Isis {
 
 
   void moccal(UserInterface &ui) {
-    Cube icube(ui.GetFileName("FROM"), "rw");
+    Cube icube(ui.GetCubeName("FROM"), "rw");
     moccal(&icube, ui);
   }
 
@@ -200,7 +200,7 @@ namespace Isis {
     p.EndProcess();
 
     // Now go fix errors around the wago changes
-    gbl::FixWagoLines(ui.GetFileName("TO"));
+    gbl::FixWagoLines(ui.GetCubeName("TO"));
 
     // Cleanup
     gbl::pixelGain.clear();

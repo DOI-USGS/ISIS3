@@ -1,0 +1,30 @@
+Group = Keyword1
+  Auto
+  InputKey       = CSMPlatformId
+  InputGroup     = "IsisCube,CsmInfo"
+  InputPosition  = (IsisCube, CsmInfo)
+  OutputName     = Keyword1
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (* , *)
+End_Group
+
+Group = Keyword2
+  Auto
+  InputKey       = CSMInstrumentId
+  InputGroup     = "IsisCube,CsmInfo"
+  InputPosition  = (IsisCube, CsmInfo)
+  OutputName     = Keyword2
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (*, *)
+End_Group
+
+Group = Keyword3
+  Auto
+  InputKey       = ReferenceTime
+  InputGroup     = "IsisCube,CsmInfo"
+  InputPosition  = (IsisCube, CsmInfo)
+  OutputName     = Keyword3
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (*, *)
+End_Group
+End

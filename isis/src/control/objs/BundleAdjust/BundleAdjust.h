@@ -362,6 +362,7 @@ namespace Isis {
       bool             isConverged();
       Table            cMatrix(int index);
       Table            spVector(int index);
+      QString          modelState(int index);
       int              numberOfImages() const;
       double           iteration() const;
 

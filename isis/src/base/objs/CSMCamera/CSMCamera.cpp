@@ -7,7 +7,6 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "CSMCamera.h"
-#include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 
 #include <fstream>
@@ -24,6 +23,8 @@ find files of those names at the top level of this repository. **/
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "Constants.h"
+#include "Displacement.h"
+#include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
@@ -33,6 +34,7 @@ find files of those names at the top level of this repository. **/
 #include "LinearAlgebra.h"
 #include "NaifStatus.h"
 #include "SpecialPixel.h"
+#include "SurfacePoint.h"
 
 #include "csm/Warning.h"
 #include "csm/Error.h"
@@ -84,7 +86,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
     if (!plugin->canModelBeConstructedFromState(modelName.toStdString(), stateString.toStdString())) {
-      QString msg = "CSM state string attached to image [" + cube.fileName() + "]. cannot "
+      QString msg = "CSM state string attached to image [" + cube.fileName() + "] cannot "
                     "be converted to a [" + modelName + "] using [" + pluginName + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -119,11 +121,14 @@ namespace Isis {
    * @returns @b bool If the image coordinate was set successfully
    */
   bool CSMCamera::SetImage(const double sample, const double line) {
+    // Save off the line & sample
+    p_childSample = sample;
+    p_childLine = line;
+
     csm::ImageCoord imagePt;
     isisToCsmPixel(p_alphaCube->AlphaLine(line), p_alphaCube->AlphaSample(sample), imagePt);
     double achievedPrecision = 0;
     csm::WarningList warnings;
-
     csm::EcefLocus imageLocus;
     try {
       imageLocus = m_model->imageToRemoteImagingLocus(imagePt,
@@ -154,18 +159,19 @@ namespace Isis {
     std::vector<double> locusVec = {imageLocus.direction.x,
                                     imageLocus.direction.y,
                                     imageLocus.direction.z};
-    if(!target()->shape()->intersectSurface(obsPosition, locusVec)) {
-      return false;
-    }
 
-    // If we are here then everything went well so save the pixel and return true
+    // Save off the look vector
     m_lookB[0] = locusVec[0];
     m_lookB[1] = locusVec[1];
     m_lookB[2] = locusVec[2];
     m_newLookB = true;
+
+    // Check for a ground intersection
+    if(!target()->shape()->intersectSurface(obsPosition, locusVec)) {
+      return false;
+    }
+
     p_pointComputed = true;
-    p_childSample = sample;
-    p_childLine = line;
     if (!m_et) {
       m_et = new iTime();
     }
@@ -231,7 +237,7 @@ namespace Isis {
       latitude = Latitude(0.,Angle::Degrees);
     }
 
-      if (!localRadius.isValid()) {
+    if (!localRadius.isValid()) {
       target()->shape()->clearSurfacePoint();
       return false;
     }
@@ -385,7 +391,7 @@ namespace Isis {
    *
    * @returns @b double The oblique line resolution in meters per pixel
    */
-  double CSMCamera::ObliqueLineResolution() {
+  double CSMCamera::ObliqueLineResolution(bool useLocal) {
     // CSM resolution is always the oblique resolution so just return it
     return LineResolution();
   }
@@ -400,7 +406,7 @@ namespace Isis {
    *
    * @returns @b double The oblique sample resolution in meters per pixel
    */
-  double CSMCamera::ObliqueSampleResolution() {
+  double CSMCamera::ObliqueSampleResolution(bool useLocal) {
     // CSM resolution is always the oblique resolution so just return it
     return SampleResolution();
   }
@@ -415,7 +421,7 @@ namespace Isis {
    *
    * @returns @b double The oblique detector resolution in meters per pixel
    */
-  double CSMCamera::ObliqueDetectorResolution() {
+  double CSMCamera::ObliqueDetectorResolution(bool useLocal) {
     // CSM resolution is always the oblique resolution so just return it
     return DetectorResolution();
   }
@@ -598,6 +604,52 @@ namespace Isis {
 
 
   /**
+  * Compute the partial derivatives of the sample, line with
+  * respect to the x, y, z coordinates of the ground point.
+  *
+  * The resultant partials are
+  * line WRT x
+  * line WRT y
+  * line WRT z
+  * sample WRT x
+  * sample WRT y
+  * sample WRT z
+  *
+  * @return @b std::vector<double> The partial derivatives of the
+  *                                sample, line with respect to
+  *                                the ground coordinate.
+  */
+  vector<double> CSMCamera::GroundPartials() {
+    return GroundPartials(GetSurfacePoint());
+  }
+
+
+  /**
+  * Compute the partial derivatives of the sample, line with
+  * respect to the x, y, z coordinates of the ground point.
+  *
+  * The resultant partials are
+  * line WRT x
+  * line WRT y
+  * line WRT z
+  * sample WRT x
+  * sample WRT y
+  * sample WRT z
+  *
+  * @param groundPoint The ground point to compute the partials at
+  *
+  * @return @b std::vector<double> The partial derivatives of the
+  *                                sample, line with respect to
+  *                                the ground coordinate.
+  */
+  vector<double> CSMCamera::GroundPartials(SurfacePoint groundPoint) {
+    csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
+    vector<double> groundPartials = m_model->computeGroundPartials(groundCoord);
+    return groundPartials;
+  }
+
+
+  /**
    * Set the Target object for the camera model.
    *
    * @param label The label containing information to create the Target from
@@ -738,8 +790,8 @@ namespace Isis {
 
 
   /**
-   * Compute the slant distance form the sensor to the ground point at the
-   * currently set time.
+   * Compute the slant distance from the sensor to the ground
+   * point at the currently set time.
    *
    * @returns @b double The distance from the sensor to the ground point in kilometers
    */
@@ -771,6 +823,151 @@ namespace Isis {
         sensorPosition[0] * sensorPosition[0] +
         sensorPosition[1] * sensorPosition[1] +
         sensorPosition[2] * sensorPosition[2]);
+  }
+
+
+  /**
+   * Get the indices of the parameters that belong to a set.
+   *
+   * @param paramSet The set of indices to get
+   *
+   * @returns @b std::vector<int> Vector of the parameter indices
+   */
+  std::vector<int> CSMCamera::getParameterIndices(csm::param::Set paramSet) const {
+    return m_model->getParameterSetIndices(paramSet);
+  }
+
+
+  /**
+   * Get the indices of all parameters of a specific type
+   *
+   * @param paramType The type of parameters to get the indices of
+   *
+   * @return @b std::vector<int> Vector of the parameter indices
+   */
+  std::vector<int> CSMCamera::getParameterIndices(csm::param::Type paramType) const {
+    std::vector<int> parameterIndices;
+    for (int i = 0; i < m_model->getNumParameters(); i++) {
+      if (m_model->getParameterType(i) == paramType) {
+        parameterIndices.push_back(i);
+      }
+    }
+    return parameterIndices;
+  }
+
+
+  /**
+   * Get the indices of a list of parameters
+   *
+   * @param paramType The list of parameters to get the indices of
+   *
+   * @return @b std::vector<int> Vector of the parameter indices in the same order as the input list
+   */
+  std::vector<int> CSMCamera::getParameterIndices(QStringList paramList) const {
+    std::vector<int> parameterIndices;
+    QStringList failedParams;
+    for (int i = 0; i < paramList.size(); i++) {
+      bool found = false;
+      for (int j = 0; j < m_model->getNumParameters(); j++) {
+        if (QString::compare(QString::fromStdString(m_model->getParameterName(j)).trimmed(),
+                             paramList[i].trimmed(),
+                             Qt::CaseInsensitive) == 0) {
+          parameterIndices.push_back(j);
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        failedParams.push_back(paramList[i]);
+      }
+    }
+
+    if (!failedParams.empty()) {
+      QString msg = "Failed to find indices for the following parameters [" +
+                    failedParams.join(",") + "].";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    return parameterIndices;
+  }
+
+
+  /**
+   * Adjust the value of a parameter.
+   *
+   * @param index The index of the parameter to update
+   * @param correction Value to add to the parameter's current value
+   */
+  void CSMCamera::applyParameterCorrection(int index, double correction) {
+    double currentValue = m_model->getParameterValue(index);
+    m_model->setParameterValue(index, currentValue + correction);
+  }
+
+
+  /**
+   * Get the covariance between two parameters.
+   *
+   * @param index1 The index of the first parameter
+   * @param index2 The index of the second parameter
+   */
+  double CSMCamera::getParameterCovariance(int index1, int index2) {
+    return m_model->getParameterCovariance(index1, index2);
+  }
+
+
+  vector<double> CSMCamera::getSensorPartials(int index, SurfacePoint groundPoint) {
+    // csm::SensorPartials holds (line, sample) in order for each parameter
+   csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
+   std::pair<double, double> partials = m_model->computeSensorPartials(index, groundCoord);
+   vector<double> partialsVector = {partials.first, partials.second};
+
+   return partialsVector;
+  }
+
+
+  /**
+   * Get the name of the parameter.
+   *
+   * @param index The index of parameter
+   *
+   * @returns @b QString name of the parameter at index
+   */
+  QString CSMCamera::getParameterName(int index) {
+    return QString::fromStdString(m_model->getParameterName(index));
+  }
+
+
+  /**
+   * Get the value of a parameter.
+   *
+   * @param index The index of the parameter
+   *
+   * @returns @b double value of the parameter at index
+   */
+  double CSMCamera::getParameterValue(int index) {
+    return m_model->getParameterValue(index);
+  }
+
+
+  /**
+   * Get the units of the parameter at a particular index.
+   *
+   * @param index The index of parameter
+   *
+   * @returns @b QString units of the parameter at index
+   */
+  QString CSMCamera::getParameterUnits(int index) {
+    return QString::fromStdString(m_model->getParameterUnits(index));
+  }
+
+
+  /**
+   * Get the CSM Model state string to re-create the CSM Model.
+   *
+   * @returns @b QString The CSM Model state string
+   */
+  QString CSMCamera::getModelState() const {
+    return QString::fromStdString(m_model->getModelState());
   }
 
 

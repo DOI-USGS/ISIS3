@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <QDomDocument>
 #include <QDomElement>
 #include <QFile>
+#include <QString>
 
 using json = nlohmann::json;
 
@@ -40,9 +41,11 @@ namespace Isis {
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
-    if (!doc.setContent(&file)) {
+    QString errMsg;
+    int errLine, errCol;
+    if (!doc.setContent(&file, &errMsg, &errLine, &errCol)) {
       file.close();
-      QString message = QString("Failed to use file for XML Input: [%1]").arg(xmlFile);    
+      QString message = QString("Failed to use file for XML Input: [%1]. %2 at line %3, column %4").arg(xmlFile).arg(errMsg).arg(errLine).arg(errCol);
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
@@ -78,10 +81,11 @@ namespace Isis {
    * JSON: {tag: value}
    * 
    *  XML: <tag attributeName="attributeValue">textValue</tag>
-   *  JSON: {tag: {@attributeName: "attributeValue, "#text":textValue } }
+   *  JSON: {tag: {attrib_attributeName: "attributeValue,
+   *  "_text":textValue } }
    *
    *  XML: <tag attributeName="attributeValue" />
-   *  JSON: {tag: {@attributeName: "attributeValue"} }
+   *  JSON: {tag: {attrib_attributeName: "attributeValue"} }
    * 
    *  XML: <tag />
    *  JSON: tag: null
@@ -97,24 +101,24 @@ namespace Isis {
       QDomNamedNodeMap attrMap = element.attributes();
       for (int i=0; i < attrMap.size(); i++) {
         QDomAttr attr = attrMap.item(i).toAttr(); 
-        attributeSection["@"+attr.name().toStdString()] = attr.value().toStdString();
+        attributeSection["attrib_"+attr.name().toStdString()] = attr.value().toStdString();
       }
       // If there is no textValue, don't include it
       // <tag attributeName="attributeValue" />
       if (!element.text().isEmpty()) {
-        attributeSection["#text"] = element.text().toStdString(); 
+        attributeSection["_text"] = element.text().toStdString(); 
       }
-      newJson[element.tagName().toStdString()] = attributeSection;
+      newJson[element.tagName().replace(":", "_").toStdString()] = attributeSection;
     }
     else {
       // Just add element and its value
       // <tag>value</tag>
       if (!element.text().isEmpty()) {
-        newJson[element.tagName().toStdString()] = element.text().toStdString();
+        newJson[element.tagName().replace(":", "_").toStdString()] = element.text().toStdString();
       }
       else {
         // <tag /> no value case
-        newJson[element.tagName().toStdString()];
+        newJson[element.tagName().replace(":", "_").toStdString()];
       }
     }
     return newJson;
@@ -157,9 +161,9 @@ namespace Isis {
           if (!output[element.tagName().toStdString()].is_array()) {
             json repeatedArray;
             repeatedArray.push_back(output[element.tagName().toStdString()]);
-            output[element.tagName().toStdString()] = repeatedArray;
+            output[element.tagName().replace(":", "_").toStdString()] = repeatedArray;
           }
-          output[element.tagName().toStdString()].push_back(converted[element.tagName().toStdString()]);
+          output[element.tagName().replace(":", "_").toStdString()].push_back(converted[element.tagName().toStdString()]);
         }
       }
       else {
@@ -175,9 +179,9 @@ namespace Isis {
           if (!output[element.tagName().toStdString()].is_array()) {
             json repeatedArray;
             repeatedArray.push_back(output[element.tagName().toStdString()]);
-            output[element.tagName().toStdString()] = repeatedArray;
+            output[element.tagName().replace(":", "_").toStdString()] = repeatedArray;
           }
-          output[element.tagName().toStdString()].push_back(temporaryJson);
+          output[element.tagName().replace(":", "_").toStdString()].push_back(temporaryJson);
         }
         else {
           if (element.hasAttributes()) {
@@ -185,15 +189,15 @@ namespace Isis {
             QDomNamedNodeMap attrMap = element.attributes();
             for (int j=0; j < attrMap.size(); j++) {
               QDomAttr attr = attrMap.item(j).toAttr(); 
-              tempArea["@"+attr.name().toStdString()] = attr.value().toStdString();
+              tempArea["attrib_"+attr.name().toStdString()] = attr.value().toStdString();
             }
             tempArea.update(
                 convertXmlToJson(next, output[element.tagName().toStdString()]));
-            output[element.tagName().toStdString()] = tempArea;
+            output[element.tagName().replace(":", "_").toStdString()] = tempArea;
           }
           else {
             output[element.tagName().toStdString()] = 
-              convertXmlToJson(next, output[element.tagName().toStdString()]);
+              convertXmlToJson(next, output[element.tagName().replace(":", "_").toStdString()]);
           }
         }
       }

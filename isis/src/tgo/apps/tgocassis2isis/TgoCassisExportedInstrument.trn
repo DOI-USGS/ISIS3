@@ -101,6 +101,7 @@ End_Group
 
 Group = ExposureDuration
   Auto
+  Optional
   InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Imaging_Instrument_Parameters)
   InputKey             = img:exposure_duration
   OutputName           = ExposureDuration

@@ -1449,7 +1449,7 @@ Exact and partial name match tests:
   PutFileName:
 **PROGRAMMER ERROR** A value for this parameter [G0P0] has already been saved (possibly by IsisGui). If you need to change the value use "Clear" before the Put.
 
-**PROGRAMMER ERROR** Parameter [G2P4] is not a filename.
+**PROGRAMMER ERROR** Parameter [G2P4] is not a cubename.
 
   Cube tests:
 **PROGRAMMER ERROR** Unable to get input cube attributes.  Parameter [CUBE2] is not an input. Parameter fileMode = [output].

@@ -45,4 +45,4 @@ add_executable(runISISTests
 
 target_link_libraries(runISISTests isis ${MISSION_LIBS} ${ALLLIBS} ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} Threads::Threads)
 
-gtest_discover_tests(runISISTests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+gtest_discover_tests(runISISTests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests PROPERTIES DISCOVERY_TIMEOUT 6000)

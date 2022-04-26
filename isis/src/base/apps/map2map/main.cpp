@@ -64,7 +64,7 @@ catch(IException &e) {
 Pvl fromMap;
 
 try {
-fromMap.read(ui.GetFileName("FROM"));
+fromMap.read(ui.GetCubeName("FROM"));
 }
 catch(IException &e) {
 }

@@ -26,7 +26,7 @@ namespace Isis {
     if (inAtt.bands().size() != 0) {
       cube.setVirtualBands(inAtt.bands());
     }
-    cube.open(ui.GetFileName("FROM"));
+    cube.open(ui.GetCubeName("FROM"));
     hist(&cube, ui);
   }
 

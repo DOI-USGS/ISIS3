@@ -11,7 +11,7 @@ using namespace Isis;
 namespace Isis {
 
   void mapmos(UserInterface &ui, Pvl *log) {
-    Cube *inCube = new Cube( ui.GetFileName("FROM"), "r");
+    Cube *inCube = new Cube( ui.GetCubeName("FROM"), "r");
     mapmos(inCube, ui, log);
   }
 
@@ -84,10 +84,10 @@ namespace Isis {
       }
       
       CubeAttributeOutput oAtt = ui.GetOutputAttribute("MOSAIC");
-      m.SetOutputCube(sInputFile, mapGroup, oAtt, ui.GetFileName("MOSAIC"));
+      m.SetOutputCube(sInputFile, mapGroup, oAtt, ui.GetCubeName("MOSAIC"));
     }
     else {
-      m.SetOutputCube(ui.GetFileName("MOSAIC"));
+      m.SetOutputCube(ui.GetCubeName("MOSAIC"));
     }
 
 

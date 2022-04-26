@@ -31,7 +31,7 @@ namespace Isis {
                 const QString &delimiters = " ");
   
   void bandnorm(UserInterface &ui) {
-    Cube icube(ui.GetFileName("FROM"), "r");
+    Cube icube(ui.GetCubeName("FROM"), "r");
     bandnorm(&icube, ui);
   }
   
@@ -110,7 +110,7 @@ namespace Isis {
     }
   
     // Setup the output file and apply the correction
-    p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"), icube->sampleCount(), icube->lineCount(), icube->bandCount());
+    p.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO"), icube->sampleCount(), icube->lineCount(), icube->bandCount());
     p.StartProcess(normalize);
   
     // Cleanup

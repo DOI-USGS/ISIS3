@@ -10,6 +10,7 @@ find files of those names at the top level of this repository. **/
 
 #include <locale>
 #include <fstream>
+#include <sstream>
 
 #include "FileName.h"
 #include "IException.h"
@@ -48,6 +49,34 @@ namespace Isis {
     m_filename = "";
     m_terminator = "End";
     m_internalTemplate = false;
+  }
+
+
+  /**
+   * Load PVL information from a string 
+   *  
+   * TODO: fully document 
+   */
+  void Pvl::fromString(const std::string &str) {
+    stringstream stm;
+    stm << str;
+    if(!stm) {
+      QString message = "Failed to use string: " + QString::fromStdString(str) + "to create Pvl";
+      throw IException(IException::Io, message, _FILEINFO_);
+    }
+
+    // Read it
+    try {
+      stm >> *this;
+    }
+    catch(IException &e) {
+      QString message = "Unable to create PVL from string: " + QString::fromStdString(str);
+      throw IException(e, IException::Unknown, message, _FILEINFO_);
+    }
+    catch(...) {
+      QString message = "Unable to create PVL from string: " + QString::fromStdString(str);
+      throw IException(IException::Unknown, message, _FILEINFO_);
+    }
   }
 
 

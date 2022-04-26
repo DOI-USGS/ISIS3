@@ -7,6 +7,7 @@
 #include "csm/Plugin.h"
 #include "csm/Version.h"
 #include "csm/CorrelationModel.h"
+#include "csm/SettableEllipsoid.h"
 
 #include <nlohmann/json.hpp>
 
@@ -16,7 +17,7 @@
  * 
  * @author 2020-12-08 Kristin Berry
  */
-class TestCsmModel : public csm::RasterGM {
+class TestCsmModel : public csm::RasterGM, public csm::SettableEllipsoid {
   public:
     // Static variables that describe the model
     static const std::string SENSOR_MODEL_NAME;
@@ -82,13 +83,20 @@ class TestCsmModel : public csm::RasterGM {
                                     double* achievedPrecision = NULL,
                                     csm::WarningList* warnings = NULL) const;
 
+    virtual csm::ImageCoord groundToImage(const csm::EcefCoord& groundPt,
+                                    const std::vector<double> &adjustments,
+                                    double desiredPrecision = 0.001,
+                                    double* achievedPrecision = NULL,
+                                    csm::WarningList* warnings = NULL) const;
+
+
     virtual csm::ImageCoordCovar groundToImage(const csm::EcefCoordCovar& groundPt,
                                          double desiredPrecision = 0.001,
                                          double* achievedPrecision = NULL,
                                          csm::WarningList* warnings = NULL) const;
   
     virtual csm::EcefCoord imageToGround(const csm::ImageCoord& imagePt,
-                                   double height,
+                                   double height = 0.0,
                                    double desiredPrecision = 0.001,
                                    double* achievedPrecision = NULL,
                                    csm::WarningList* warnings = NULL) const;
@@ -153,9 +161,13 @@ class TestCsmModel : public csm::RasterGM {
    virtual std::vector<double> getUnmodeledCrossCovariance(
                 const csm::ImageCoord& pt1,
                 const csm::ImageCoord& pt2) const;
-
+   virtual csm::Ellipsoid getEllipsoid() const;
+   double  getValue(int index, const std::vector<double> &adjustments) const;
   private:
     std::vector<double> m_param_values; //! Parameter values associated with the sensor model
+    std::vector<double> m_param_sigmas; //! Sigma values associated with the sensor model parameters
     csm::NoCorrelationModel m_correlationModel;
+    double m_referenceTime;
+    std::vector<double> m_noAdjustments; 
 };
 #endif

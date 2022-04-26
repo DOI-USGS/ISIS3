@@ -36,9 +36,13 @@ class CSMPluginFixture : public TempTestingFiles {
 
       // Create and populate test ISDs
       json isd;
-      isd["test_param_one"] = 1.0;
-      isd["test_param_two"] = 2.0;
-
+      isd["reference_time"] = 0;
+      isd["center_latitude"] = 3.03125;
+      isd["center_longitude"] = -2.9375;
+      isd["scale"] = 240;
+      isd["center_longitude_sigma"] = 0.0645181963189456;
+      isd["center_latitude_sigma"] = 0.0645181963189456;
+      isd["scale_sigma"] = 8.25832912882503;
       isdPath = tempDir.path() + "/default.json";
       std::ofstream file(isdPath.toStdString());
       file << isd;
@@ -118,16 +122,16 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   ASSERT_TRUE(infoGroup.hasKeyword("ReferenceTime"));
   EXPECT_EQ(infoGroup["ReferenceTime"][0].toStdString(), model.getReferenceDateAndTime());
   ASSERT_TRUE(infoGroup.hasKeyword("ModelParameterNames"));
-  ASSERT_EQ(infoGroup["ModelParameterNames"].size(), 2);
+  ASSERT_EQ(infoGroup["ModelParameterNames"].size(), 3);
   EXPECT_EQ(infoGroup["ModelParameterNames"][0].toStdString(), TestCsmModel::PARAM_NAMES[0]);
   EXPECT_EQ(infoGroup["ModelParameterNames"][1].toStdString(), TestCsmModel::PARAM_NAMES[1]);
   ASSERT_TRUE(infoGroup.hasKeyword("ModelParameterUnits"));
-  ASSERT_EQ(infoGroup["ModelParameterUnits"].size(), 2);
+  ASSERT_EQ(infoGroup["ModelParameterUnits"].size(), 3);
   EXPECT_EQ(infoGroup["ModelParameterUnits"][0].toStdString(), TestCsmModel::PARAM_UNITS[0]);
   EXPECT_EQ(infoGroup["ModelParameterUnits"][1].toStdString(), TestCsmModel::PARAM_UNITS[1]);
   ASSERT_TRUE(infoGroup.hasKeyword("ModelParameterTypes"));
-  ASSERT_EQ(infoGroup["ModelParameterTypes"].size(), 2);
-  EXPECT_EQ(infoGroup["ModelParameterTypes"][0].toStdString(), "FICTITIOUS");
+  ASSERT_EQ(infoGroup["ModelParameterTypes"].size(), 3);
+  EXPECT_EQ(infoGroup["ModelParameterTypes"][0].toStdString(), "REAL");
   EXPECT_EQ(infoGroup["ModelParameterTypes"][1].toStdString(), "REAL");
 
   // Check the Kernels group
@@ -291,9 +295,13 @@ TEST_F(CSMPluginFixture, CSMInitFails) {
 TEST_F(DefaultCube, CSMInitSpiceCleanup) {
   // Create an ISD
   json isd;
-  isd["test_param_one"] = 1.0;
-  isd["test_param_two"] = 2.0;
-
+  isd["reference_time"] = 0;
+  isd["center_latitude"] = 3.03125;
+  isd["center_longitude"] = -2.9375;
+  isd["scale"] = 240;
+  isd["center_longitude_sigma"] = 0.0645181963189456;
+  isd["center_latitude_sigma"] = 0.0645181963189456;
+  isd["scale_sigma"] = 8.25832912882503;
   QString isdPath = tempDir.path() + "/default.json";
   std::ofstream file(isdPath.toStdString());
   file << isd;

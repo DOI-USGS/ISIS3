@@ -25,7 +25,7 @@ namespace Isis {
     if (inAtt.bands().size() != 0) {
       cubeFile->setVirtualBands(inAtt.bands());
     }
-    cubeFile->open(ui.GetFileName("FROM"), "r");
+    cubeFile->open(ui.GetCubeName("FROM"), "r");
 
     fillgap(cubeFile, ui, log);
   }
@@ -53,21 +53,21 @@ namespace Isis {
     if(Dir == "SAMPLE") {
       ProcessBySample p;
       p.SetInputCube(inCube);
-      p.SetOutputCube(ui.GetFileName("TO"), att);
+      p.SetOutputCube(ui.GetCubeName("TO"), att);
       p.StartProcess(fill);
       p.EndProcess();
     }
     else if(Dir == "LINE") {
       ProcessByLine p;
       p.SetInputCube(inCube);
-      p.SetOutputCube(ui.GetFileName("TO"), att);
+      p.SetOutputCube(ui.GetCubeName("TO"), att);
       p.StartProcess(fill);
       p.EndProcess();
     }
     else if(Dir == "BAND") {
       ProcessBySpectra p;
       p.SetInputCube(inCube);
-      p.SetOutputCube(ui.GetFileName("TO"), att);
+      p.SetOutputCube(ui.GetCubeName("TO"), att);
       p.StartProcess(fill);
       p.EndProcess();
     }

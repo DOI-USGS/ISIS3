@@ -28,7 +28,7 @@ void helperButtonCalcMinMax() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Setup a cube for gathering stats from the user requested band
-  QString file = ui.GetFileName("FROM");
+  QString file = ui.GetCubeName("FROM");
 
   Cube inCube;
   CubeAttributeInput attrib = ui.GetInputAttribute("FROM");

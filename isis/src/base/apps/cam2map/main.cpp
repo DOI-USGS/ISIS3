@@ -94,7 +94,7 @@ void loadMapRes() {
 //Helper function to get camera resolution.
 void loadCameraRes() {
   UserInterface &ui = Application::GetUserInterface();
-  QString file = ui.GetFileName("FROM");
+  QString file = ui.GetCubeName("FROM");
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
@@ -157,7 +157,7 @@ void loadMapRange() {
 //Helper function to load camera range.
 void loadCameraRange() {
   UserInterface &ui = Application::GetUserInterface();
-  QString file = ui.GetFileName("FROM");
+  QString file = ui.GetCubeName("FROM");
 
   // Get the map projection file provided by the user
   Pvl userMap;

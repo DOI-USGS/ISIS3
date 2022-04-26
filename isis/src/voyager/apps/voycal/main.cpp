@@ -66,7 +66,7 @@ void IsisMain() {
 
   // Check for projection
   if (incube->isProjected()) {
-    QString msg = "The cube [" + ui.GetFileName("FROM") + "] has a projection" +
+    QString msg = "The cube [" + ui.GetCubeName("FROM") + "] has a projection" +
                   " and cannot be radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -79,7 +79,7 @@ void IsisMain() {
 
   // Verify not radiometrically corrected
   if (isiscube.hasGroup("Radiometry")) {
-    QString msg = "Cube [" + ui.GetFileName("FROM") + "] has already been" +
+    QString msg = "Cube [" + ui.GetCubeName("FROM") + "] has already been" +
                   " radiometrically corrected";
     throw IException(IException::User,msg,_FILEINFO_);
   }
@@ -87,7 +87,7 @@ void IsisMain() {
   // Verify Voyager spacecraft and get number, 1 or 2
   QString scNumber = instrument["SpacecraftName"][0];
   if (scNumber != "VOYAGER_1" && scNumber != "VOYAGER_2") {
-    QString msg = "The cube [" + ui.GetFileName("FROM") + "] does not appear" +
+    QString msg = "The cube [" + ui.GetCubeName("FROM") + "] does not appear" +
                   " to be a Voyager image";
     throw IException(IException::User, msg, _FILEINFO_);
   }

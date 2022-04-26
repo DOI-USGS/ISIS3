@@ -331,7 +331,8 @@ namespace Isis {
   QGroupBox * QnetTool::createLeftMeasureGroupBox() {
 
     m_leftCombo = new QComboBox;
-    m_leftCombo->view()->installEventFilter(this);
+    m_leftCombo->setEditable(true);
+    m_leftCombo->setInsertPolicy(QComboBox::NoInsert);
     m_leftCombo->setToolTip("Choose left control measure");
     m_leftCombo->setWhatsThis("Choose left control measure identified by "
                               "cube filename.");
@@ -404,7 +405,8 @@ namespace Isis {
 
     // create widgets for the right groupbox
     m_rightCombo = new QComboBox;
-    m_rightCombo->view()->installEventFilter(this);
+    m_rightCombo->setEditable(true);
+    m_rightCombo->setInsertPolicy(QComboBox::NoInsert);
 
     // Attach shortcuts to Qnet Tool's window for selecting right measures
     // Note: Qt handles this memory for us since m_qnetTool is the parent of these shortcuts

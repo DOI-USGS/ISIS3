@@ -11,6 +11,7 @@ class QStatusBar;
 namespace Isis {
   class MdiCubeViewport;
   class WarningWidget;
+  class ViewportBuffer;
 
   /**
    * @brief This tool is part of the Qisis namespace and displays the statusbar of the window.
@@ -61,6 +62,7 @@ namespace Isis {
 
     private:
       void updateLabels(QPoint p);
+      QString updateColorLabel(QPoint p, ViewportBuffer *buf, QLabel *label);
       void clearLabels();
 
       QStatusBar *p_sbar;           //!< Status bar

@@ -50,13 +50,14 @@ namespace Isis {
         && id != "TC2_Level2B"
         && id != "SLN-L-TC-3-S-LEVEL2B0-V1.0"
         && id != "SLN-L-TC-3-W-LEVEL2B0-V1.0"
+        && id != "SLN-L-TC-3-SP-SUPPORT-LEVEL2B0-V1.0"
         && id != "SLN-L-TC-5-MORNING-MAP-V4.0") {
       QString msg = "Input file [" + labelFile + "] does not appear to be " +
                     "a supported Kaguya Terrain Camera format. " +
                     "DATA_SET_ID is [" + id + "]" +
                     "Valid formats include [TC_MAP, TCO_MAP, TC1_Level2B, " +
                     "SLN-L-TC-3-S-LEVEL2B0-V1.0, SLN-L-TC-3-W-LEVEL2B0-V1.0, " +
-		    "SLN-L-TC-5-MORNING-MAP-V4.0]";
+		                "SLN-L-TC-3-SP-SUPPORT-LEVEL2B0-V1.0, SLN-L-TC-5-MORNING-MAP-V4.0]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -67,7 +68,7 @@ namespace Isis {
     importPds.SetPdsFile(label, dataFile);
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    Cube *outcube = importPds.SetOutputCube(ui.GetFileName("TO"), att);
+    Cube *outcube = importPds.SetOutputCube(ui.GetCubeName("TO"), att);
 
     // Get user entered special pixel ranges
     if (ui.GetBoolean("SETNULLRANGE")) {

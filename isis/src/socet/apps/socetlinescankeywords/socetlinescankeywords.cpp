@@ -41,7 +41,7 @@ namespace Isis {
 
 void socetlinescankeywords (UserInterface &ui) {  
   // Get user parameters and error check
-  Cube input(ui.GetFileName("FROM"), "rw");    
+  Cube input(ui.GetCubeName("FROM"), "rw");    
   socetlinescankeywords(&input, ui);
 }
 

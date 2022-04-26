@@ -51,6 +51,12 @@ install/
 
 # Unignore the documentation build
 !isis/src/docsys/build
+!isis/src/docsys/Object/build
+!isis/src/docsys/Application/build
+
+# Unignore msi2isis label files in data area as input files require these
+!isis/tests/data/near/msi2isis/*.lbl
+!isis/tests/data/near/msicamera/*.cub
 
 # Ignore vs code
 .vscode
@@ -87,3 +93,4 @@ Temporary Items
 .apdisk
 
 # End of https://www.gitignore.io/api/macos
+.idea

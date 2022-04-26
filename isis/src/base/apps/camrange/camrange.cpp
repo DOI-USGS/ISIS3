@@ -12,7 +12,7 @@ using namespace Isis;
 namespace Isis {
   
   void camrange(UserInterface &ui, Pvl *log) {
-    Cube *cube = new Cube( ui.GetFileName("FROM"), "r");
+    Cube *cube = new Cube( ui.GetCubeName("FROM"), "r");
     camrange(cube, ui, log);
   }
 
@@ -32,7 +32,7 @@ namespace Isis {
     cam->radii(radii);
     Target *camTarget = cam->target();
     PvlGroup target("Target");
-    target += PvlKeyword("From", ui.GetFileName("FROM"));
+    target += PvlKeyword("From", ui.GetCubeName("FROM"));
     target += PvlKeyword("TargetName", camTarget->name());
     target += PvlKeyword("RadiusA", toString(radii[0].meters()), "meters");
     target += PvlKeyword("RadiusB", toString(radii[1].meters()), "meters");

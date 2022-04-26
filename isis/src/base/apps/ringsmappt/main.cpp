@@ -130,7 +130,7 @@ void IsisMain() {
   if(proj->IsGood()) {
     PvlGroup results("Results");
     results += PvlKeyword("Filename",
-                          FileName(ui.GetFileName("FROM")).expanded());
+                          FileName(ui.GetCubeName("FROM")).expanded());
     results += PvlKeyword("Sample", toString(proj->WorldX()));
     results += PvlKeyword("Line", toString(proj->WorldY()));
     results += PvlKeyword("PixelValue", PixelToString(b[0]));

@@ -7,12 +7,13 @@
 #include <vector>
 
 #include <QString>
+#include <QVector>
 
 #include "csm.h"
 
+#include "FileName.h"
 #include "IException.h"
 #include "PvlGroup.h"
-
 #include "Pvl.h"
 #include "PvlObject.h"
 
@@ -44,6 +45,12 @@ namespace Isis {
       PvlGroup group1,
       PvlGroup group2);
 
+  ::testing::AssertionResult AssertPvlGroupKeywordsEqual(
+      const char* group1_expr,
+      const char* group2_expr,
+      PvlGroup group1,
+      PvlGroup group2);
+
   ::testing::AssertionResult AssertVectorsNear(
       const char* vec1_expr,
       const char* vec2_expr,
@@ -59,6 +66,9 @@ namespace Isis {
 
   ::testing::Matcher<const csm::ImageCoord&> MatchImageCoord(const csm::ImageCoord &expected);
   ::testing::Matcher<const csm::EcefCoord&> MatchEcefCoord(const csm::EcefCoord &expected);
+
+  QVector<QString> generateBinaryKernels(QVector<QString> kernelList);
+  QString fileListToString(QVector<QString> fileList);
 }
 
 #endif

@@ -18,7 +18,7 @@ namespace Isis {
 
   
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), att);
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), att);
 
     // Get user entered special pixel ranges
     if(ui.GetBoolean("SETNULLRANGE")) {

@@ -28,7 +28,7 @@ namespace Isis{
   void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints, Pvl *log);
 
   void campt(UserInterface &ui, Pvl *log) {
-    Cube *cube = new Cube(ui.GetFileName("FROM"), "r");
+    Cube *cube = new Cube(ui.GetCubeName("FROM"), "r");
     campt(cube, ui, log);
   }
 

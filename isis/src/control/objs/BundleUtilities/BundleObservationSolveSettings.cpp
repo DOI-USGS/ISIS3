@@ -58,7 +58,7 @@ namespace Isis {
   BundleObservationSolveSettings::BundleObservationSolveSettings(const PvlGroup &scParameterGroup) {
     initialize();
 
-      // group name must be instrument id
+    // group name must be instrument id
     m_instrumentId = (QString)scParameterGroup.nameKeyword();
 
     // If CKDEGREE is not specified, then a default of 2 is used
@@ -66,7 +66,7 @@ namespace Isis {
       m_ckDegree = (int)(scParameterGroup.findKeyword("CKDEGREE"));
     }
 
-    // If CKSOLVEDEGREE is not specified, then a default of 2 is used -------jwb----- why ??? why not match camsolve option ???
+    // If CKSOLVEDEGREE is not specified, then a default of 2 is used
     if (scParameterGroup.hasKeyword("CKSOLVEDEGREE")) {
       m_ckSolveDegree = (int) (scParameterGroup.findKeyword("CKSOLVEDEGREE"));
     }
@@ -237,28 +237,25 @@ namespace Isis {
         }
       }
     }
+
+    // CSM settings
+    if (scParameterGroup.hasKeyword("CSMSOLVESET")) {
+      setCSMSolveSet(stringToCSMSolveSet(scParameterGroup.findKeyword("CSMSOLVESET")));
+    }
+    else if (scParameterGroup.hasKeyword("CSMSOLVETYPE")) {
+      setCSMSolveType(stringToCSMSolveType(scParameterGroup.findKeyword("CSMSOLVETYPE")));
+    }
+    else if (scParameterGroup.hasKeyword("CSMSOLVELIST")) {
+      PvlKeyword csmSolveListKey = scParameterGroup.findKeyword("CSMSOLVELIST");
+      QStringList csmSolveList;
+      for (int i = 0; i < csmSolveListKey.size(); i++) {
+        csmSolveList.append(csmSolveListKey[i]);
+      }
+      setCSMSolveParameterList(csmSolveList);
+    }
   }
 
 
-//  BundleObservationSolveSettings::BundleObservationSolveSettings(const BundleObservationSolveSettings &other)
-//      : m_id(new QUuid(other.m_id->toString())),
-//        m_instrumentId(other.m_instrumentId),
-//        m_instrumentPointingSolveOption(other.m_instrumentPointingSolveOption),
-//        m_numberCamAngleCoefSolved(other.m_numberCamAngleCoefSolved),
-//        m_ckDegree(other.m_ckDegree),
-//        m_ckSolveDegree(other.m_ckSolveDegree),
-//        m_solveTwist(other.m_solveTwist),
-//        m_solvePointingPolynomialOverExisting(other.m_solvePointingPolynomialOverExisting),
-//        m_anglesAprioriSigma(other.m_anglesAprioriSigma),
-//        m_pointingInterpolationType(other.m_pointingInterpolationType),
-//        m_instrumentPositionSolveOption(other.m_instrumentPositionSolveOption),
-//        m_numberCamPosCoefSolved(other.m_numberCamPosCoefSolved),
-//        m_spkDegree(other.m_spkDegree),
-//        m_spkSolveDegree(other.m_spkSolveDegree),
-//        m_solvePositionOverHermiteSpline(other.m_solvePositionOverHermiteSpline),
-//        m_positionAprioriSigma(other.m_positionAprioriSigma),
-//        m_positionInterpolationType(other.m_positionInterpolationType) {
-//  }
   /**
    * Constructs a BundleObservationSolveSettings from another one.
    *
@@ -272,6 +269,10 @@ namespace Isis {
      // or intit all variables in all constructors
 
     m_instrumentId = other.m_instrumentId;
+    m_csmSolveOption = other.m_csmSolveOption;
+    m_csmSolveSet = other.m_csmSolveSet;
+    m_csmSolveType = other.m_csmSolveType;
+    m_csmSolveList = other.m_csmSolveList;
     m_instrumentPointingSolveOption = other.m_instrumentPointingSolveOption;
     m_observationNumbers = other.m_observationNumbers;
     m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
@@ -320,6 +321,12 @@ namespace Isis {
       m_instrumentId = other.m_instrumentId;
       m_observationNumbers = other.m_observationNumbers;
 
+      // CSM related
+      m_csmSolveOption = other.m_csmSolveOption;
+      m_csmSolveSet = other.m_csmSolveSet;
+      m_csmSolveType = other.m_csmSolveType;
+      m_csmSolveList = other.m_csmSolveList;
+
       // pointing related
       m_instrumentPointingSolveOption = other.m_instrumentPointingSolveOption;
       m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
@@ -354,6 +361,12 @@ namespace Isis {
     m_id = new QUuid(QUuid::createUuid());
 
     m_instrumentId = "";
+
+    // CSM solve options
+    m_csmSolveOption = BundleObservationSolveSettings::NoCSMParameters;
+    m_csmSolveSet = csm::param::ADJUSTABLE;
+    m_csmSolveType = csm::param::REAL;
+    m_csmSolveList = QStringList();
 
     // Camera Pointing Options
     // Defaults:
@@ -438,6 +451,249 @@ namespace Isis {
    */
   QSet<QString> BundleObservationSolveSettings::observationNumbers() const {
     return m_observationNumbers;
+  }
+
+
+  // =============================================================================================//
+  // ======================== CSM Options ========================================================//
+  // =============================================================================================//
+
+
+  /**
+   * Convert a string to a CSM solve option enumeration value.
+   *
+   * @param option The option as a string
+   *
+   * @return @b CSMSolveOption The option's enumeration value
+   */
+  BundleObservationSolveSettings::CSMSolveOption
+      BundleObservationSolveSettings::stringToCSMSolveOption(QString option) {
+    if (option.compare("NoCSMParameters", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::NoCSMParameters;
+    }
+    else if (option.compare("Set", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::Set;
+    }
+    else if (option.compare("Type", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::Type;
+    }
+    else if (option.compare("List", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::List;
+    }
+    else {
+      throw IException(IException::Unknown,
+                       "Unknown bundle CSM solve option " + option + ".",
+                       _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * Convert a CSM solve option enumeration value to a string.
+   *
+   * @param option The option's enumeration value
+   *
+   * @return @b QString The option as a string
+   */
+  QString BundleObservationSolveSettings::csmSolveOptionToString(CSMSolveOption option) {
+    if (option == BundleObservationSolveSettings::NoCSMParameters) {
+      return "NoCSMParameters";
+    }
+    else if (option == BundleObservationSolveSettings::Set)  {
+      return "Set";
+    }
+    else if (option == BundleObservationSolveSettings::Type) {
+      return "Type";
+    }
+    else if (option == BundleObservationSolveSettings::List) {
+      return "List";
+    }
+    else {
+      throw IException(IException::Programmer,
+                       "Unknown CSM solve option enum [" + toString(option) + "].",
+                       _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * Convert a string to its CSM parameter set enumeration value.
+   *
+   * @param set The set name
+   *
+   * @return @b csm::param::Set The set's enumeration value
+   */
+  csm::param::Set BundleObservationSolveSettings::stringToCSMSolveSet(QString set) {
+    if (set.compare("VALID", Qt::CaseInsensitive) == 0) {
+      return csm::param::VALID;
+    }
+    else if (set.compare("ADJUSTABLE", Qt::CaseInsensitive) == 0) {
+      return csm::param::ADJUSTABLE;
+    }
+    else if (set.compare("NON_ADJUSTABLE", Qt::CaseInsensitive) == 0) {
+      return csm::param::NON_ADJUSTABLE;
+    }
+    else {
+      throw IException(IException::Unknown,
+                       "Unknown bundle CSM parameter set " + set + ".",
+                       _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * Convert a CSM parameter set enumeration value to a string.
+   *
+   * @param set The set's enumeration value
+   *
+   * @return @b QString The set's name
+   */
+  QString BundleObservationSolveSettings::csmSolveSetToString(csm::param::Set set) {
+    if (set == csm::param::VALID) {
+      return "VALID";
+    }
+    else if (set == csm::param::ADJUSTABLE)  {
+      return "ADJUSTABLE";
+    }
+    else if (set == csm::param::NON_ADJUSTABLE) {
+      return "NON_ADJUSTABLE";
+    }
+    else {
+      throw IException(IException::Programmer,
+                       "Unknown CSM parameter set enum [" + toString(set) + "].",
+                       _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * Convert a string to its CSM parameter type enumeration value.
+   *
+   * @param type The type name
+   *
+   * @return @b csm::param::Type The types's enumeration value
+   */
+  csm::param::Type BundleObservationSolveSettings::stringToCSMSolveType(QString type) {
+    if (type.compare("NONE", Qt::CaseInsensitive) == 0) {
+      return csm::param::NONE;
+    }
+    else if (type.compare("FICTITIOUS", Qt::CaseInsensitive) == 0) {
+      return csm::param::FICTITIOUS;
+    }
+    else if (type.compare("REAL", Qt::CaseInsensitive) == 0) {
+      return csm::param::REAL;
+    }
+    else if (type.compare("FIXED", Qt::CaseInsensitive) == 0) {
+      return csm::param::FIXED;
+    }
+    else {
+      throw IException(IException::Unknown,
+                       "Unknown bundle CSM parameter type " + type + ".",
+                       _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * Convert a CSM parameter type enumeration value to a string.
+   *
+   * @param type The type's enumeration value
+   *
+   * @return @b QString The type's name
+   */
+  QString BundleObservationSolveSettings::csmSolveTypeToString(csm::param::Type type) {
+    if (type == csm::param::NONE) {
+      return "NONE";
+    }
+    else if (type == csm::param::FICTITIOUS)  {
+      return "FICTITIOUS";
+    }
+    else if (type == csm::param::REAL) {
+      return "REAL";
+    }
+    else if (type == csm::param::FIXED) {
+      return "FIXED";
+    }
+    else {
+      throw IException(IException::Programmer,
+                       "Unknown CSM parameter type enum [" + toString(type) + "].",
+                       _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * Set the set of CSM parameters to solve for. See the CSM API documentation
+   * for what the different set values mean.
+   *
+   * @param set The set to solve for
+   */
+  void BundleObservationSolveSettings::setCSMSolveSet(csm::param::Set set) {
+    m_csmSolveOption = BundleObservationSolveSettings::Set;
+    m_csmSolveSet = set;
+  }
+
+
+  /**
+   * Set the type of CSM parameters to solve for.
+   *
+   * @param type The parameter type to solve for
+   */
+  void BundleObservationSolveSettings::setCSMSolveType(csm::param::Type type) {
+    m_csmSolveOption = BundleObservationSolveSettings::Type;
+    m_csmSolveType = type;
+  }
+
+
+  /**
+   * Set an explicit list of CSM parameters to solve for.
+   *
+   * @param list The names of the parameters to solve for
+   */
+  void BundleObservationSolveSettings::setCSMSolveParameterList(QStringList list) {
+    m_csmSolveOption = BundleObservationSolveSettings::List;
+    m_csmSolveList = list;
+  }
+
+
+  /**
+   * Get how the CSM parameters to solve for are specified for this observation.
+   *
+   * @return @b CSMSolveOption
+   */
+  BundleObservationSolveSettings::CSMSolveOption
+      BundleObservationSolveSettings::csmSolveOption() const {
+    return m_csmSolveOption;
+  }
+
+
+  /**
+   * Get the set of CSM parameters to solve for
+   *
+   * @return @b csm::param::Set The CSM parameter set to solve for
+   */
+  csm::param::Set BundleObservationSolveSettings::csmParameterSet() const {
+    return m_csmSolveSet;
+  }
+
+
+  /**
+   * Get the type of CSM parameters to solve for
+   *
+   * @return @b csm::param::Type The CSM parameter type to solve for
+   */
+  csm::param::Type BundleObservationSolveSettings::csmParameterType() const {
+    return m_csmSolveType;
+  }
+
+
+  /**
+   * Get the list of CSM parameters to solve for
+   *
+   * @return @b QStringList The names of the CSM parameters to solve for
+   */
+  QStringList BundleObservationSolveSettings::csmParameterList() const {
+    return m_csmSolveList;
   }
 
 

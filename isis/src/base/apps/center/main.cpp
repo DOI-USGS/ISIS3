@@ -75,8 +75,8 @@ void IsisMain() {
     }
     double sTrans = sMiddle - csamp;
     double lTrans = lMiddle - cline;
-    QString params = "from=" + ui.GetFileName("FROM") + 
-                     " to=" + ui.GetFileName("TO") + 
+    QString params = "from=" + ui.GetCubeName("FROM") + 
+                     " to=" + ui.GetCubeName("TO") + 
                      " strans=" + toString(sTrans) + 
                      " ltrans=" + toString(lTrans) + 
                      " interp=" + ui.GetString("INTERP");

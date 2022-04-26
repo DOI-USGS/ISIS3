@@ -55,7 +55,7 @@ void IsisMain() {
     p->SetBrickSize(1, lines, 1);
   }
   //Make the cube
-  p->SetOutputCube(ui.GetFileName("TO"), att, samps, lines);
+  p->SetOutputCube(ui.GetCubeName("TO"), att, samps, lines);
   p->StartProcess(GreyScale);
   p->EndProcess();
 

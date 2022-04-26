@@ -63,7 +63,7 @@ TEST(Eis2Isis, Eis2IsisTestNacDefault) {
 
   // Kernels Group
   PvlGroup &kernels = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  ASSERT_EQ(int(kernels["NaifFrameCode"]), -159011 );
+  ASSERT_EQ(int(kernels["NaifFrameCode"]), -159101 );
 
   Histogram *hist = cube.histogram();
 
@@ -129,7 +129,7 @@ TEST(Eis2Isis, Eis2IsisTestNacCheckline)
 
   // Kernels Group
   PvlGroup &kernels = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  ASSERT_EQ(int(kernels["NaifFrameCode"]), -159011 );
+  ASSERT_EQ(int(kernels["NaifFrameCode"]), -159101 );
 
   Histogram *hist = cube.histogram();
 
@@ -137,7 +137,7 @@ TEST(Eis2Isis, Eis2IsisTestNacCheckline)
   ASSERT_NEAR(hist->Sum(), 1.1068e+20, 1e+16);
   ASSERT_EQ(hist->ValidPixels(), 180);
   ASSERT_NEAR(hist->StandardDeviation(),  1.2004e+19, 1e+15);
-  
+
 }
 
 
@@ -208,7 +208,7 @@ TEST(Eis2Isis, Eis2IsisTestWacDefault) {
 
   // Kernels Group
   PvlGroup &kernels = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  ASSERT_EQ(int(kernels["NaifFrameCode"]), -159104 );
+  ASSERT_EQ(int(kernels["NaifFrameCode"]), -159102 );
 
 
   Histogram *hist = cube.histogram();
