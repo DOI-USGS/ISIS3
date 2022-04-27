@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <QMutexLocker>
 #include <QtConcurrentRun>
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QXmlStreamWriter>
 
 #include "ControlList.h"
@@ -1112,7 +1113,7 @@ namespace Isis {
         m_progressBar->update();
 
         delete m_elapsedTimer;
-        m_elapsedTimer = new QTime;
+        m_elapsedTimer = new QElapsedTimer;
         m_elapsedTimer->start();
 
         if (isSynchronous()) {
@@ -1183,7 +1184,7 @@ namespace Isis {
         m_progressBar->update();
 
         delete m_elapsedTimer;
-        m_elapsedTimer = new QTime;
+        m_elapsedTimer = new QElapsedTimer;
         m_elapsedTimer->start();
 
         if (isSynchronous()) {

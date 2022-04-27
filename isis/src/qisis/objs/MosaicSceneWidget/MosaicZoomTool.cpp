@@ -250,7 +250,7 @@ namespace Isis {
 
 
   double MosaicZoomTool::limitZoomBy(double factor) {
-    QMatrix matrix = getWidget()->getView()->matrix();
+    QTransform matrix = getWidget()->getView()->viewportTransform();
     matrix = matrix.scale(factor, factor).inverted();
 
     int smallerDimension = getWidget()->getView()->width();
@@ -270,7 +270,7 @@ namespace Isis {
     //   that corresponds to the Qt bug(?) causing us to not pan correctly on
     //   the zoom in.
     if((point2.x() - point1.x()) < 1) {
-      QMatrix origMatrix = getWidget()->getView()->matrix();
+      QTransform origMatrix = getWidget()->getView()->viewportTransform();
       factor = smallerDimension / (origMatrix.m11() * 1.0);
     }
 
@@ -278,7 +278,7 @@ namespace Isis {
     point2 = matrix.map(QPointF(largerDimension, 0));
 
     if((point2.x() - point1.x()) > 1E10) {
-      QMatrix origMatrix = getWidget()->getView()->matrix();
+      QTransform origMatrix = getWidget()->getView()->viewportTransform();
       factor = largerDimension / (origMatrix.m11() * 1E10);
     }
 

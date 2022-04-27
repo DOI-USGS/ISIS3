@@ -168,7 +168,6 @@ cout << "  " << "Island Count = " << islands.size() << endl;
 
 
 int main() {
-  qsrand(42);
 
   Preference::Preferences(true);
   cout << "UnitTest for ControlNet ...." << endl << endl;

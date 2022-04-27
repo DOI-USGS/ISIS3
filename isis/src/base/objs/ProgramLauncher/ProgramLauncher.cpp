@@ -45,8 +45,8 @@ namespace Isis {
       program = isisExecutableFileName;
     }
 
-    QString command = program.expanded() + " " + parameters +
-        " -pid=" + toString(getpid());
+    QString command = program.expanded();
+
 
     if(!isIsisProgram) {
       QString msg = "Program [" + programName + "] does not appear to be a "
@@ -62,7 +62,7 @@ namespace Isis {
 
     QProcess childProcess;
     childProcess.setProcessChannelMode(QProcess::ForwardedChannels);
-    childProcess.start(command);
+    childProcess.start(command, QStringList() << parameters << "-pid=" << toString(getpid()));
     childProcess.waitForStarted();
 
     bool connected = false;

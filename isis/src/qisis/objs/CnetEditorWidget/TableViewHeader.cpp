@@ -185,7 +185,7 @@ namespace Isis {
         TableColumn *& col = visibleCols[i];
 
         if (col->getTitle().isEmpty())
-          col->setWidth(QFontMetrics(font()).width(
+          col->setWidth(QFontMetrics(font()).horizontalAdvance(
               QString::number(m_visibleCount)) + 22);
       }
     }

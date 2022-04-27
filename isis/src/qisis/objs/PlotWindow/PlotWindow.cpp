@@ -1466,11 +1466,9 @@ namespace Isis {
             qRound( ((curveIndex * percentPerCurve) +
                      (inverseDataIndex * percentPerDataIndex)) * 1000.0));
 
-        // It turns out that qBinaryFind(container, value) is NOT the same as
-        //   qBinaryFind(container.begin(), container.end(), value). Use the one
-        //   that works right.
+
         QList<QString>::const_iterator foundPos =
-            qBinaryFind(xAxisPoints.begin(), xAxisPoints.end(), xValueString);
+            std::lower_bound(xAxisPoints.begin(), xAxisPoints.end(), xValueString);
 
         if (foundPos == xAxisPoints.end()) {
           bool inserted = false;

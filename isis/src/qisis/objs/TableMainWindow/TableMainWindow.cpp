@@ -528,7 +528,7 @@ namespace Isis {
       }
     }
     //Add the headers to the file
-    t << line << endl;
+    t << line << Qt::endl;
 
     //Add each row to the file
     for(int i = 0; i < p_table->rowCount(); i++) {
@@ -553,7 +553,7 @@ namespace Isis {
       }
       //If the line is not empty, add it to the file
       if (line.split(",", Qt::SkipEmptyParts).count() != 0)
-        t << line << endl;
+        t << line << Qt::endl;
     }
     p_currentFile.close();
     this->setWindowTitle(p_title + " : " + p_currentFile.fileName());
