@@ -26,6 +26,7 @@ using namespace Isis;
   *   @history 2016-09-19 Victor Silva - Adapted from lrowacpho written by Kris Becker
   *	  @history 2021-03-12 Victor Silva - Updates include ability to run with default values
   * 																			Added new values for 2019 version of LROC Empirical function.
+  *  @history 2022-04-18 Victor Silva - Refactored to make callable for GTest framework
   */
 void IsisMain (){
   UserInterface &ui = Application::GetUserInterface();
@@ -33,7 +34,6 @@ void IsisMain (){
   
   try {
     lronacpho(ui, &appLog);
-
   }
   catch (...) {
     for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {

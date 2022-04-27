@@ -7,7 +7,7 @@
 
 namespace Isis{
   extern void lronacpho(Cube *iCube, UserInterface &ui, Pvl *log=nullptr);
-  extern void lronacpho(UserInterface &ui, Pvl *appLog=nullptr);
+  extern void lronacpho(UserInterface &ui, Pvl *log=nullptr);
 }
 
 #endif

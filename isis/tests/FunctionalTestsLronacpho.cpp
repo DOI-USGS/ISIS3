@@ -6,14 +6,26 @@
 #include "TestUtilities.h"
 #include "Endian.h"
 #include "PixelType.h"
-
 #include "lronacpho.h"
-
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
 using namespace Isis;
 using namespace testing; 
+
+/**
+  *
+  * @brief Photometric application for the LRO NAC cameras
+  *
+  * This application provides features that allow multiband cubes for LRO NAC cameras
+  *   to be photometrically corrected
+  *
+  * @author 2016-09-16 Victor Silva
+  *
+  * @internal
+  *   @history 2022-04-26 Victor Silva - Original Version - Functional test is against known value for input 
+  *                                      cub since fx is not yet callable
+  */
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/lronacpho.xml").expanded();
 
