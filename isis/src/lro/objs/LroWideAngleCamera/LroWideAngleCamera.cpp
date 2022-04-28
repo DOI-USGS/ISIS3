@@ -292,18 +292,17 @@ namespace Isis {
     }
 
     if (nvals <= 0) {
-      try{
-        PvlObject NaifKeywords = getStoredNaifKeywords();
-        PvlKeyword kw = NaifKeywords[key];
-        IntParameterList parms;
-        for (int i = 0; i<kw.size(); i++){
-          parms.push_back(toInt(kw[i]));
-        }
-        return parms;
-      } catch(...){
+      PvlObject NaifKeywords = getStoredNaifKeywords();
+      if (!NaifKeywords.hasKeyword(key)){
         QString mess = "Kernel pool keyword " + key + " not found!";
         throw IException(IException::Programmer, mess, _FILEINFO_);
       }
+      PvlKeyword kw = NaifKeywords[key];
+      IntParameterList parms;
+      for (int i = 0; i<kw.size(); i++){
+        parms.push_back(toInt(kw[i]));
+      }
+      return parms;
     }
 
     IntParameterList parms;
