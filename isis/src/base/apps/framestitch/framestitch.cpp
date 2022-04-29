@@ -69,7 +69,8 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // Use the median to handle any outliers
+    // The statistics object contains only a single value at this point
+    // so minimum=average=maximum
     return frameHeights.Average();
   }
 
