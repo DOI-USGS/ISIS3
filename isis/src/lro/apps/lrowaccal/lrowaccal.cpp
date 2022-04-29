@@ -350,7 +350,7 @@ namespace Isis {
     g_exposure = inst["ExposureDuration"];
 
     Cube *ocube = NULL;
-    ocube = p.SetOutputCube("TO");
+    ocube = p.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO"));
     p.ProcessCube(Calibrate, false);
 
     // Add an output group with the appropriate information
