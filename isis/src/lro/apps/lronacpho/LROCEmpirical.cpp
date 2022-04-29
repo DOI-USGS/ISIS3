@@ -347,7 +347,7 @@ namespace Isis {
    *   @history 2021-03-12 Victor Silva - Added b parameters for 2019 version of
    *                                      LROC Empirical algorithm
    *
-   *   @history 2022-04-26 Victor Silva - Changed strings casted using toString to 
+   *   @history 2022-04-26 Victor Silva - Changed strings casted using toString to
    *                                      string literal "0.0"
    *
    */
@@ -355,16 +355,16 @@ namespace Isis {
     Parameters pars;
 
     for (int i=0; i<4; i++)
-        pars.aTerms.push_back(toDouble(ConfKey(profile, "A" + toString(i), "0.0")));
+        pars.aTerms.push_back(toDouble(ConfKey(profile, "A" + toString(i), toString(0.0))));
     for (int i=0; i<7; i++)
-        pars.bTerms.push_back(toDouble(ConfKey(profile, "B" + toString(i), "0.0")));
+        pars.bTerms.push_back(toDouble(ConfKey(profile, "B" + toString(i), toString(0.0))));
 
     pars.wavelength = toDouble(ConfKey(profile, "BandBinCenter", toString(Null)));
     pars.tolerance = toDouble(ConfKey(profile, "BandBinCenterTolerance", toString(Null)));
     //  Determine equation units - defaults to Radians
     pars.units = ConfKey(profile, "Units", QString("Radians"));
     pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : rpd_c();
-    pars.algoVersion = toInt(ConfKey(profile, "AlgorithmVersion", "0"));
+    pars.algoVersion = toInt(ConfKey(profile, "AlgorithmVersion", toString(0)));
 
     return (pars);
   }
