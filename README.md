@@ -91,8 +91,7 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
     conda install -c usgs-astrogeology isis=6.0.0
     ```
     
-    If you would like to work with our latest ISIS version 3, rather than updating
-    to ISIS 4, instead run:
+    If you would like to work with ISIS version 3, rather than the latest ISIS, run instead:
 
     ```bash
     conda install -c usgs-astrogeology isis=3.10.0

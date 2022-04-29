@@ -57,8 +57,8 @@ namespace Isis {
    */
   void OriginalXmlLabel::fromBlob(Isis::Blob blob) {
     QString errorMessage;
-    int errorLine;
-    int errorColumn;
+    int errorLine = 0;
+    int errorColumn = 0;
 
     if ( !m_originalLabel.setContent( QByteArray(blob.getBuffer(), blob.Size()) ) ) {
       QString msg = "XML read/parse error when parsing original label. "

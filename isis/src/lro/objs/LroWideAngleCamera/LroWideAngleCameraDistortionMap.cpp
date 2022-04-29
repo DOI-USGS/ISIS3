@@ -33,7 +33,11 @@ namespace Isis {
   LroWideAngleCameraDistortionMap::LroWideAngleCameraDistortionMap(Camera *parent,
                                                                    int naifIkCode) :
                                                                    CameraDistortionMap(parent) {
-    SetDistortion(naifIkCode);
+    // Initialize distortion coefficients to 0 to avoid segfaults
+    QString odkkey = "INS" + toString(naifIkCode) + "_OD_K";
+    for (int i = 0; i < 3; ++i) {
+      p_odk.push_back(0);
+    }
   }
 
 

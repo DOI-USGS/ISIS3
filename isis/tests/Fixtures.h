@@ -395,6 +395,32 @@ class ClipperPbCube : public TempTestingFiles {
     void setInstrument(QString instrumentId);
 };
 
+class NearMsiCameraCube : public TempTestingFiles {
+  protected:
+    // Cube *testCube;
+    std::unique_ptr<Cube> testCube;
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class TgoCassisModuleKernels : public ::testing::Test {
+
+  protected:
+    // You can define per-test set-up logic as usual.
+    void SetUp() override;
+
+    // You can define per-test tear-down logic as usual.
+    void TearDown() override;
+
+    QTemporaryDir kernelPrefix;
+
+    QVector<QString> binaryCkKernels;
+    QVector<QString> binarySpkKernels;
+
+    QString binaryCkKernelsAsString;
+    QString binarySpkKernelsAsString;
+};
+
 }
 
 #endif
