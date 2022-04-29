@@ -7,7 +7,6 @@
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "Camera.h"
-#include "Histogram.h"
 #include "IException.h"
 #include "IString.h"
 #include "LineManager.h"
@@ -23,13 +22,19 @@ using namespace Isis;
 namespace Isis {
 
   /**
-   * Helper function to count the size of frames in a cube
+   * Helper function to count the height of frames in a cube.
+   *
+   * Iterates over the lines in the cube and counts sequential all NULL lines
+   * assuming these are frames that have been removed from the cube.
+   *
+   * If different frame heights are computed within the cube or there are
+   * no all null lines in the cube an error is raised.
    */
-  int computeFrameSize(Cube *cube) {
-    // Use a histogram to accumulate frame counts
-    Histogram frameSizes(0.0, 1024.0, 1024);
+  int computeFrameHeight(Cube *cube) {
+    // Use a Statistics object to track min/max height count
+    Statistics frameHeights;
     LineManager cubeLine(*cube);
-    int currentFrameSize = 0;
+    int currentFrameHeight = 0;
     for (int line = 1; line <= cube->lineCount(); line++) {
       cubeLine.SetLine(line);
       cube->read(cubeLine);
@@ -37,33 +42,39 @@ namespace Isis {
       lineStats.AddData(cubeLine.DoubleBuffer(), cubeLine.size());
       // If the line is all NULL add it to the current frame count
       if (lineStats.TotalPixels() == lineStats.NullPixels()) {
-        ++currentFrameSize;
+        ++currentFrameHeight;
       }
       // If the line has non-NULL pixels and we have previously counted
       // some all null lines add the count to our histogram and reset
-      else if (currentFrameSize > 0) {
-        frameSizes.AddData(currentFrameSize);
-        currentFrameSize = 0;
+      else if (currentFrameHeight > 0) {
+        frameHeights.AddData(currentFrameHeight);
+        currentFrameHeight = 0;
       }
     }
 
     // If the last line is part of a NULL frame handle it now
-    if (currentFrameSize > 0) {
-      frameSizes.AddData(currentFrameSize);
+    if (currentFrameHeight > 0) {
+      frameHeights.AddData(currentFrameHeight);
     }
 
-    // Special case where there are no all NULL lines
-    if (frameSizes.TotalPixels() == 0) {
-      return 0;
+    if (frameHeights.TotalPixels() == 0) {
+      QString msg = "Failed to find any NULL frames in cube [" + cube->fileName() + "]."
+                    "Please manually enter the frame height.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    if (frameHeights.Minimum() != frameHeights.Maximum()) {
+      QString msg = "Found different frame heights between [" + toString((int)frameHeights.Minimum())
+                  + "] and [" + toString((int)frameHeights.Maximum()) + "] lines in cube ["
+                  + cube->fileName() + "]. Please manually enter the frame height.";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Use the median to handle any outliers
-    return frameSizes.Median();
+    return frameHeights.Average();
   }
 
   /**
-   * Compute the stats for an ISIS cube. This is the programmatic interface to
-   * the ISIS stats application.
+   * Combine even and odd cubes from a push frame image into a single cube.
    *
    * @param ui The User Interface to parse the parameters from
    */
@@ -114,33 +125,23 @@ namespace Isis {
           outCubeFile, CubeAttributeOutput(outCubeFile),
           evenCube->sampleCount(), evenCube->lineCount(), evenCube->bandCount());
 
-    int frameSize = 1;
-    if (ui.WasEntered("FRAMESIZE")) {
-      frameSize = ui.GetInteger("FRAMESIZE");
+    int frameHeight = 1;
+    if (ui.WasEntered("frameHeight")) {
+      frameHeight = ui.GetInteger("FRAMEHEIGHT");
     }
     else {
       // User didn't pass the size of the frames so attempt to infer it from
       // the cubes
-      int evenFrameSize = computeFrameSize(evenCube);
-      int oddFrameSize = computeFrameSize(oddCube);
+      int evenFrameHeight = computeFrameHeight(evenCube);
+      int oddFrameHeight = computeFrameHeight(oddCube);
 
-      if (evenFrameSize == 0) {
-        QString msg = "Failed to find any NULL frames in even cube when attempting "
-                      "to compute frame size.";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-      if (oddFrameSize == 0) {
-        QString msg = "Failed to find any NULL frames in odd cube when attempting "
-                      "to compute frame size.";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-      if (evenFrameSize != oddFrameSize) {
-        QString msg = "Computed frame sizes for even cube [" + toString(evenFrameSize)
-                    + "] and odd cube [" + toString(oddFrameSize) + "] do not match.";
+      if (evenFrameHeight != oddFrameHeight) {
+        QString msg = "Computed frame heights for even cube [" + toString(evenFrameHeight)
+                    + "] and odd cube [" + toString(oddFrameHeight) + "] do not match.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      frameSize = evenFrameSize;
+      frameHeight = evenFrameHeight;
     }
 
     // If there's an even number of frames and the inputs are flipped, we have to
@@ -154,11 +155,11 @@ namespace Isis {
     // 0000  ####         ####  0000
     // ####  0000         0000  ####
     //
-    int numFrames = evenCube->lineCount() / frameSize;
+    int numFrames = evenCube->lineCount() / frameHeight;
     bool swapInputCubes = inputFlipped && numFrames % 2 == 0;
 
     // Processing Setup
-    process.SetBrickSize(evenCube->sampleCount(), frameSize, evenCube->bandCount());
+    process.SetBrickSize(evenCube->sampleCount(), frameHeight, evenCube->bandCount());
     process.PropagateTables(false);
     process.PropagatePolygons(false);
 
@@ -167,7 +168,7 @@ namespace Isis {
      */
     auto interweaveFrames = [&](std::vector<Buffer *> &in, std::vector<Buffer *> &out)->void {
       // Assumes even is first and odd is second
-      int inIndex = (in[0]->Line() / frameSize) % 2;
+      int inIndex = (in[0]->Line() / frameHeight) % 2;
       if (swapInputCubes) {
         inIndex = 1 - inIndex;
       }
@@ -190,14 +191,14 @@ namespace Isis {
     // ProcessByBrick requires that all buffers move through the cubes the same
     // way so we have to do a second manual pass to flip the output cube if requested.
     if (ui.GetBoolean("FLIP")) {
-      Brick topBuff(outCube->sampleCount(), frameSize, outCube->bandCount(), outCube->pixelType());
-      Brick bottomBuff(outCube->sampleCount(), frameSize, outCube->bandCount(), outCube->pixelType());
-      Brick tempBuff(outCube->sampleCount(), frameSize, outCube->bandCount(), outCube->pixelType());
+      Brick topBuff(outCube->sampleCount(), frameHeight, outCube->bandCount(), outCube->pixelType());
+      Brick bottomBuff(outCube->sampleCount(), frameHeight, outCube->bandCount(), outCube->pixelType());
+      Brick tempBuff(outCube->sampleCount(), frameHeight, outCube->bandCount(), outCube->pixelType());
 
       for (int frame = 0; frame < numFrames / 2; frame++) {
-        topBuff.SetBasePosition(1,frame * frameSize + 1,1);
+        topBuff.SetBasePosition(1,frame * frameHeight + 1,1);
         outCube->read(topBuff);
-        bottomBuff.SetBasePosition(1,outCube->lineCount() - (frame + 1) * frameSize + 1,1);
+        bottomBuff.SetBasePosition(1,outCube->lineCount() - (frame + 1) * frameHeight + 1,1);
         outCube->read(bottomBuff);
 
         tempBuff.Copy(topBuff);

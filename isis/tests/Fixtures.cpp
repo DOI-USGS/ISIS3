@@ -254,24 +254,24 @@ namespace Isis {
   void PushFramePair::SetUp() {
     numSamps = 16;
     numBands = 3;
-    frameSize = 12;
+    frameHeight = 12;
     numFrames = 10;
 
     evenCube.reset(new Cube());
-    evenCube->setDimensions(numSamps, frameSize * numFrames, numBands);
+    evenCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
     evenCube->create(tempDir.path() + "/even.cub");
 
     oddCube.reset(new Cube());
-    oddCube->setDimensions(numSamps, frameSize * numFrames, numBands);
+    oddCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
     oddCube->create(tempDir.path() + "/odd.cub");
 
-    Brick frameBrick(numSamps, frameSize, numBands, evenCube->pixelType());
+    Brick frameBrick(numSamps, frameHeight, numBands, evenCube->pixelType());
 
     for (int frameIndex = 0; frameIndex < numFrames; frameIndex++) {
       for (int brickIndex = 0; brickIndex < frameBrick.size(); brickIndex++) {
         frameBrick[brickIndex] = frameIndex + 1;
       }
-      frameBrick.SetBasePosition(1,frameIndex * frameSize + 1,1);
+      frameBrick.SetBasePosition(1,frameIndex * frameHeight + 1,1);
       if (frameIndex % 2 == 0) {
         evenCube->write(frameBrick);
       }
@@ -294,24 +294,24 @@ namespace Isis {
   void FlippedPushFramePair::SetUp() {
     numSamps = 16;
     numBands = 3;
-    frameSize = 12;
+    frameHeight = 12;
     numFrames = 10;
 
     evenCube.reset(new Cube());
-    evenCube->setDimensions(numSamps, frameSize * numFrames, numBands);
+    evenCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
     evenCube->create(tempDir.path() + "/even.cub");
 
     oddCube.reset(new Cube());
-    oddCube->setDimensions(numSamps, frameSize * numFrames, numBands);
+    oddCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
     oddCube->create(tempDir.path() + "/odd.cub");
 
-    Brick frameBrick(numSamps, frameSize, numBands, evenCube->pixelType());
+    Brick frameBrick(numSamps, frameHeight, numBands, evenCube->pixelType());
 
     for (int frameIndex = 0; frameIndex < numFrames; frameIndex++) {
       for (int brickIndex = 0; brickIndex < frameBrick.size(); brickIndex++) {
         frameBrick[brickIndex] = numFrames - frameIndex;
       }
-      frameBrick.SetBasePosition(1,frameIndex * frameSize + 1,1);
+      frameBrick.SetBasePosition(1,frameIndex * frameHeight + 1,1);
       if (frameIndex % 2 == 0) {
         oddCube->write(frameBrick);
       }

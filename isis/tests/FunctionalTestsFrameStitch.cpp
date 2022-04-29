@@ -20,12 +20,12 @@ using namespace testing;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/framestitch.xml").expanded();
 
-TEST_F(PushFramePair, FunctionalTestFramestitchManualSize) {
+TEST_F(PushFramePair, FunctionalTestFramestitchManualHeight) {
   QString outCubePath = tempDir.path() + "/stitched.cub";
   QVector<QString> args = {
         "EVEN="+evenCube->fileName(),
         "ODD="+oddCube->fileName(),
-        "FRAMESIZE="+toString(frameSize),
+        "FRAMEHEIGHT="+toString(frameHeight),
         "TO="+outCubePath};
 
   UserInterface ui(APP_XML, args);
@@ -40,7 +40,7 @@ TEST_F(PushFramePair, FunctionalTestFramestitchManualSize) {
   EXPECT_EQ(bandStats->NullPixels(), 0);
 
   // Check the order on the first two and last two frames
-  Brick outBrick(numSamps, frameSize, numBands, outCube.pixelType());
+  Brick outBrick(numSamps, frameHeight, numBands, outCube.pixelType());
   outBrick.SetBasePosition(1,1,1);
   outCube.read(outBrick);
   Statistics frameStats;
@@ -49,21 +49,21 @@ TEST_F(PushFramePair, FunctionalTestFramestitchManualSize) {
   EXPECT_EQ(frameStats.Maximum(), 1);
   frameStats.Reset();
 
-  outBrick.SetBasePosition(1,frameSize + 1,1);
+  outBrick.SetBasePosition(1,frameHeight + 1,1);
   outCube.read(outBrick);
   frameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
   EXPECT_EQ(frameStats.Minimum(), 2);
   EXPECT_EQ(frameStats.Maximum(), 2);
   frameStats.Reset();
 
-  outBrick.SetBasePosition(1,8*frameSize + 1,1);
+  outBrick.SetBasePosition(1,8*frameHeight + 1,1);
   outCube.read(outBrick);
   frameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
   EXPECT_EQ(frameStats.Minimum(), 9);
   EXPECT_EQ(frameStats.Maximum(), 9);
   frameStats.Reset();
 
-  outBrick.SetBasePosition(1,9*frameSize + 1,1);
+  outBrick.SetBasePosition(1,9*frameHeight + 1,1);
   outCube.read(outBrick);
   frameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
   EXPECT_EQ(frameStats.Minimum(), 10);
@@ -71,12 +71,12 @@ TEST_F(PushFramePair, FunctionalTestFramestitchManualSize) {
   frameStats.Reset();
 }
 
-TEST_F(PushFramePair, FunctionalTestFramestitchAutoSize) {
+TEST_F(PushFramePair, FunctionalTestFramestitchAutoHeight) {
   QString manualCubePath = tempDir.path() + "/manual.cub";
   QVector<QString> manualArgs = {
         "EVEN="+evenCube->fileName(),
         "ODD="+oddCube->fileName(),
-        "FRAMESIZE="+toString(frameSize),
+        "FRAMEHEIGHT="+toString(frameHeight),
         "TO="+manualCubePath};
 
   UserInterface manualUI(APP_XML, manualArgs);
@@ -102,6 +102,16 @@ TEST_F(PushFramePair, FunctionalTestFramestitchAutoSize) {
   EXPECT_EQ(manualStats->Maximum(), autoStats->Maximum());
   EXPECT_EQ(manualStats->Average(), autoStats->Average());
   EXPECT_EQ(manualStats->NullPixels(), autoStats->NullPixels());
+
+  Brick outBrick(numSamps, frameHeight, numBands, manualCube.pixelType());
+  outBrick.SetBasePosition(1,1,1);
+  Statistics manualFrameStats, autoFrameStats;
+  manualCube.read(outBrick);
+  manualFrameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
+  autoCube.read(outBrick);
+  autoFrameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
+  EXPECT_EQ(manualFrameStats.Minimum(), autoFrameStats.Minimum());
+  EXPECT_EQ(manualFrameStats.Maximum(), autoFrameStats.Maximum());
 }
 
 TEST_F(PushFramePair, FunctionalTestFramestitchFlip) {
@@ -109,7 +119,7 @@ TEST_F(PushFramePair, FunctionalTestFramestitchFlip) {
   QVector<QString> args = {
         "EVEN="+evenCube->fileName(),
         "ODD="+oddCube->fileName(),
-        "FRAMESIZE="+toString(frameSize),
+        "FRAMEHEIGHT="+toString(frameHeight),
         "TO="+outCubePath,
         "FLIP=YES"};
 
@@ -120,7 +130,7 @@ TEST_F(PushFramePair, FunctionalTestFramestitchFlip) {
   Cube outCube(outCubePath);
 
   // Check the order on the first two and last two frames
-  Brick outBrick(numSamps, frameSize, numBands, outCube.pixelType());
+  Brick outBrick(numSamps, frameHeight, numBands, outCube.pixelType());
   outBrick.SetBasePosition(1,1,1);
   outCube.read(outBrick);
   Statistics frameStats;
@@ -129,21 +139,21 @@ TEST_F(PushFramePair, FunctionalTestFramestitchFlip) {
   EXPECT_EQ(frameStats.Maximum(), 10);
   frameStats.Reset();
 
-  outBrick.SetBasePosition(1,frameSize + 1,1);
+  outBrick.SetBasePosition(1,frameHeight + 1,1);
   outCube.read(outBrick);
   frameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
   EXPECT_EQ(frameStats.Minimum(), 9);
   EXPECT_EQ(frameStats.Maximum(), 9);
   frameStats.Reset();
 
-  outBrick.SetBasePosition(1,8*frameSize + 1,1);
+  outBrick.SetBasePosition(1,8*frameHeight + 1,1);
   outCube.read(outBrick);
   frameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
   EXPECT_EQ(frameStats.Minimum(), 2);
   EXPECT_EQ(frameStats.Maximum(), 2);
   frameStats.Reset();
 
-  outBrick.SetBasePosition(1,9*frameSize + 1,1);
+  outBrick.SetBasePosition(1,9*frameHeight + 1,1);
   outCube.read(outBrick);
   frameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
   EXPECT_EQ(frameStats.Minimum(), 1);
@@ -160,7 +170,7 @@ TEST_F(FlippedPushFramePair, FunctionalTestFramestitchNoFlip) {
   QVector<QString> args = {
         "EVEN="+evenCube->fileName(),
         "ODD="+oddCube->fileName(),
-        "FRAMESIZE="+toString(frameSize),
+        "FRAMEHEIGHT="+toString(frameHeight),
         "TO="+outCubePath};
 
   UserInterface ui(APP_XML, args);
@@ -170,7 +180,7 @@ TEST_F(FlippedPushFramePair, FunctionalTestFramestitchNoFlip) {
   Cube outCube(outCubePath);
 
   // Check the order on the first two and last two frames
-  Brick outBrick(numSamps, frameSize, numBands, outCube.pixelType());
+  Brick outBrick(numSamps, frameHeight, numBands, outCube.pixelType());
   outBrick.SetBasePosition(1,1,1);
   outCube.read(outBrick);
   Statistics frameStats;
@@ -179,21 +189,21 @@ TEST_F(FlippedPushFramePair, FunctionalTestFramestitchNoFlip) {
   EXPECT_EQ(frameStats.Maximum(), 10);
   frameStats.Reset();
 
-  outBrick.SetBasePosition(1,frameSize + 1,1);
+  outBrick.SetBasePosition(1,frameHeight + 1,1);
   outCube.read(outBrick);
   frameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
   EXPECT_EQ(frameStats.Minimum(), 9);
   EXPECT_EQ(frameStats.Maximum(), 9);
   frameStats.Reset();
 
-  outBrick.SetBasePosition(1,8*frameSize + 1,1);
+  outBrick.SetBasePosition(1,8*frameHeight + 1,1);
   outCube.read(outBrick);
   frameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
   EXPECT_EQ(frameStats.Minimum(), 2);
   EXPECT_EQ(frameStats.Maximum(), 2);
   frameStats.Reset();
 
-  outBrick.SetBasePosition(1,9*frameSize + 1,1);
+  outBrick.SetBasePosition(1,9*frameHeight + 1,1);
   outCube.read(outBrick);
   frameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
   EXPECT_EQ(frameStats.Minimum(), 1);
@@ -210,7 +220,7 @@ TEST_F(FlippedPushFramePair, FunctionalTestFramestitchFlip) {
   QVector<QString> args = {
         "EVEN="+evenCube->fileName(),
         "ODD="+oddCube->fileName(),
-        "FRAMESIZE="+toString(frameSize),
+        "FRAMEHEIGHT="+toString(frameHeight),
         "TO="+outCubePath,
         "FLIP=YES"};
 
@@ -221,7 +231,7 @@ TEST_F(FlippedPushFramePair, FunctionalTestFramestitchFlip) {
   Cube outCube(outCubePath);
 
   // Check the order on the first two and last two frames
-  Brick outBrick(numSamps, frameSize, numBands, outCube.pixelType());
+  Brick outBrick(numSamps, frameHeight, numBands, outCube.pixelType());
   outBrick.SetBasePosition(1,1,1);
   outCube.read(outBrick);
   Statistics frameStats;
@@ -230,21 +240,21 @@ TEST_F(FlippedPushFramePair, FunctionalTestFramestitchFlip) {
   EXPECT_EQ(frameStats.Maximum(), 1);
   frameStats.Reset();
 
-  outBrick.SetBasePosition(1,frameSize + 1,1);
+  outBrick.SetBasePosition(1,frameHeight + 1,1);
   outCube.read(outBrick);
   frameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
   EXPECT_EQ(frameStats.Minimum(), 2);
   EXPECT_EQ(frameStats.Maximum(), 2);
   frameStats.Reset();
 
-  outBrick.SetBasePosition(1,8*frameSize + 1,1);
+  outBrick.SetBasePosition(1,8*frameHeight + 1,1);
   outCube.read(outBrick);
   frameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
   EXPECT_EQ(frameStats.Minimum(), 9);
   EXPECT_EQ(frameStats.Maximum(), 9);
   frameStats.Reset();
 
-  outBrick.SetBasePosition(1,9*frameSize + 1,1);
+  outBrick.SetBasePosition(1,9*frameHeight + 1,1);
   outCube.read(outBrick);
   frameStats.AddData(outBrick.DoubleBuffer(), outBrick.size());
   EXPECT_EQ(frameStats.Minimum(), 10);
@@ -263,7 +273,7 @@ TEST_F(PushFramePair, FunctionalTestFramestitchDifferentObservations) {
   QVector<QString> args = {
         "EVEN="+evenCube->fileName(),
         "ODD="+oddCube->fileName(),
-        "FRAMESIZE="+toString(frameSize),
+        "FRAMEHEIGHT="+toString(frameHeight),
         "TO="+tempDir.path() + "/stitched.cub"};
 
   UserInterface ui(APP_XML, args);
@@ -287,7 +297,7 @@ TEST_F(FlippedPushFramePair, FunctionalTestFramestitchDifferentFlipping) {
   QVector<QString> args = {
         "EVEN="+evenCube->fileName(),
         "ODD="+oddCube->fileName(),
-        "FRAMESIZE="+toString(frameSize),
+        "FRAMEHEIGHT="+toString(frameHeight),
         "TO="+tempDir.path() + "/stitched.cub"};
 
   UserInterface ui(APP_XML, args);
@@ -329,32 +339,15 @@ TEST_F(PushFramePair, FunctionalTestFramestitchAutoNoNulls) {
     FAIL() << "Expected an IException";
   }
   catch(IException &e) {
-    EXPECT_THAT(e.what(), testing::HasSubstr("Failed to find any NULL frames in even cube"));
-  }
-  catch(std::exception &e) {
-    FAIL() << "Expected an IException, got exception with error " << e.what() << std::endl;
-  }
-
-  args = {
-        "ODD="+evenCube->fileName(),
-        "EVEN="+oddCube->fileName(),
-        "TO="+tempDir.path() + "/stitched.cub"};
-
-  ui = UserInterface(APP_XML, args);
-
-  try {
-    framestitch(ui);
-    FAIL() << "Expected an IException";
-  }
-  catch(IException &e) {
-    EXPECT_THAT(e.what(), testing::HasSubstr("Failed to find any NULL frames in odd cube"));
+    EXPECT_THAT(e.what(), testing::HasSubstr("Failed to find any NULL frames in cube"));
+    EXPECT_THAT(e.what(), testing::HasSubstr("Please manually enter the frame height"));
   }
   catch(std::exception &e) {
     FAIL() << "Expected an IException, got exception with error " << e.what() << std::endl;
   }
 }
 
-TEST_F(PushFramePair, FunctionalTestFramestitchAutoDifferentSizes) {
+TEST_F(PushFramePair, FunctionalTestFramestitchAutoMismatchedHeights) {
   LineManager lineWriter(*evenCube);
   for (int i = 0; i < lineWriter.size(); i++) {
     lineWriter[i] = Null;
@@ -366,12 +359,12 @@ TEST_F(PushFramePair, FunctionalTestFramestitchAutoDifferentSizes) {
     }
   }
 
-  Brick frameBrick(numSamps, 2*frameSize, numBands, evenCube->pixelType());
+  Brick frameBrick(numSamps, 2*frameHeight, numBands, evenCube->pixelType());
   for (int frameIndex = 1; frameIndex < numFrames; frameIndex+=2) {
     for (int brickIndex = 0; brickIndex < frameBrick.size(); brickIndex++) {
       frameBrick[brickIndex] = numFrames - frameIndex;
     }
-    frameBrick.SetBasePosition(1,2 * frameIndex * frameSize + 1,1);
+    frameBrick.SetBasePosition(1,2 * frameIndex * frameHeight + 1,1);
     evenCube->write(frameBrick);
   }
   evenCube->reopen("rw");
@@ -388,8 +381,39 @@ TEST_F(PushFramePair, FunctionalTestFramestitchAutoDifferentSizes) {
     FAIL() << "Expected an IException";
   }
   catch(IException &e) {
-    EXPECT_THAT(e.what(), testing::HasSubstr("Computed frame sizes for even cube "
+    EXPECT_THAT(e.what(), testing::HasSubstr("Computed frame heights for even cube "
                                              "[24] and odd cube [12] do not match"));
+  }
+  catch(std::exception &e) {
+    FAIL() << "Expected an IException, got exception with error " << e.what() << std::endl;
+  }
+}
+
+TEST_F(PushFramePair, FunctionalTestFramestitchAutoDifferentHeights) {
+  // Make frame 6 NULL so that there is a 36 line null frame
+  Brick frameBrick(numSamps, frameHeight, numBands, evenCube->pixelType());
+  for (int brickIndex = 0; brickIndex < frameBrick.size(); brickIndex++) {
+    frameBrick[brickIndex] = Null;
+  }
+  frameBrick.SetBasePosition(1,6 * frameHeight + 1,1);
+  evenCube->write(frameBrick);
+  evenCube->reopen("rw");
+
+  QVector<QString> args = {
+        "EVEN="+evenCube->fileName(),
+        "ODD="+oddCube->fileName(),
+        "TO="+tempDir.path() + "/stitched.cub"};
+
+  UserInterface ui(APP_XML, args);
+
+  try {
+    framestitch(ui);
+    FAIL() << "Expected an IException";
+  }
+  catch(IException &e) {
+    EXPECT_THAT(e.what(), testing::HasSubstr("Found different frame heights between [12] "
+                                             "and [36] lines in cube"));
+    EXPECT_THAT(e.what(), testing::HasSubstr("Please manually enter the frame height"));
   }
   catch(std::exception &e) {
     FAIL() << "Expected an IException, got exception with error " << e.what() << std::endl;

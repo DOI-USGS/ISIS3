@@ -92,7 +92,7 @@ namespace Isis {
       std::shared_ptr<Cube> oddCube;
       int numSamps;
       int numBands;
-      int frameSize;
+      int frameHeight;
       int numFrames;
 
       void SetUp() override;
@@ -104,7 +104,7 @@ namespace Isis {
       std::shared_ptr<Cube> oddCube;
       int numSamps;
       int numBands;
-      int frameSize;
+      int frameHeight;
       int numFrames;
 
       void SetUp() override;

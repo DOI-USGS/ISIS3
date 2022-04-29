@@ -422,8 +422,8 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
 
 
   /**
-   * Starts the systematic processing of the input cube by moving an arbitrary
-   * shaped brick through the cube. This method requires that exactly one input
+   * Starts the systematic processing of the input cube by moving an arbitrarily-shaped
+   * brick through the cube. This method requires that exactly one input
    * cube be loaded. No output cubes are produced.
    *
    * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes
@@ -463,8 +463,8 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
 
 
   /**
-   * Starts the systematic processing of the input cube by moving an arbitrary
-   * shaped brick through the cube. This method requires that exactly one input
+   * Starts the systematic processing of the input cube by moving an arbitrarily-shaped
+   * brick through the cube. This method requires that exactly one input
    * cube be loaded. No output cubes are produced.
    *
    * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes
@@ -504,8 +504,8 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
 
 
   /**
-   * Starts the systematic processing of the input cube by moving an arbitrary
-   * shaped brick through the cube. This method requires that exactly one input
+   * Starts the systematic processing of the input cube by moving an arbitrarily-shaped
+   * brick through the cube. This method requires that exactly one input
    * cube and one output cube be loaded using the SetInputCube and SetOutputCube
    * methods.
    *
@@ -545,8 +545,8 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
 
 
   /**
-   * Starts the systematic processing of the input cube by moving an arbitrary
-   * shaped brick through the cube. This method requires that exactly one input
+   * Starts the systematic processing of the input cube by moving an arbitrarily-shaped
+   * brick through the cube. This method requires that exactly one input
    * cube and one output cube be loaded using the SetInputCube and SetOutputCube
    * methods.
    *
@@ -586,8 +586,8 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
 
 
   /**
-   * Starts the systematic processing of the input cube by moving an arbitrary
-   * shaped brick through the cube. This method allows multiple input and output
+   * Starts the systematic processing of the input cube by moving an arbitrarily-shaped
+   * brick through the cube. This method allows multiple input and output
    * cubes.
    *
    * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes
@@ -662,8 +662,8 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
 
 
   /**
-   * Starts the systematic processing of the input cube by moving an arbitrary
-   * shaped brick through the cube. This method allows multiple input and output
+   * Starts the systematic processing of the input cube by moving an arbitrarily-shaped
+   * brick through the cube. This method allows multiple input and output
    * cubes.
    *
    * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes
