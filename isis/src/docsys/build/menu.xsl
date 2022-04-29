@@ -100,20 +100,19 @@ Deborah Lee Soltesz
       API Reference</a>
     </div>
 
-
     <hr/>
     <h2>
-      Other Versions
+      Documentation Versions
     </h2>
 
     <div>
-      <a href="https://isis.astrogeology.usgs.gov/3.4/index.html" target="_top">
-      ISIS 3.4</a>
-    </div>
-
-    <div>
-      <a href="https://isis.astrogeology.usgs.gov/4.1/index.html" target="_top">
-      ISIS 4.1</a>
+      <label for="Versions"></label>
+      <select name="Versions" id="Versions">
+        <option value="Public Release" onClick="location.href='https://isis.astrogeology.usgs.gov'" selected="Public Release">Public Release</option> 
+        <option value="6.0.0" onClick="location.href='https://isis.astrogeology.usgs.gov/6.0.0/index.html'">6.0.0</option>
+        <option value="3.9.0" onClick="location.href='https://isis.astrogeology.usgs.gov/3.9.0/index.html'">3.9.0</option>
+        <option value="3.5.0" onClick="location.href='https://isis.astrogeology.usgs.gov/3.5.0/index.html'">3.5.0</option>
+      </select>
     </div>
 
     <hr/>

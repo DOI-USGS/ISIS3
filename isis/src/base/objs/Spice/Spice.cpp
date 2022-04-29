@@ -1240,7 +1240,8 @@ namespace Isis {
           result = toInt(storedKeyword[index]);
         }
       }
-      catch(IException &) {
+      catch(IException &e) {
+        e.print();
       }
     }
 
