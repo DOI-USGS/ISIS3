@@ -660,6 +660,82 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
     omgrs.clear();
   }
 
+
+  /**
+   * Starts the systematic processing of the input cube by moving an arbitrary
+   * shaped brick through the cube. This method allows multiple input and output
+   * cubes.
+   *
+   * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes
+   * @param funct (vector<Buffer *> &in, vector<Buffer *> &out)
+   *              Receive an nxm brick in the input buffer. If n=1 and m=lines
+   *              this will process by columns.  Likewise if n=samples and m=1
+   *              this will process by lines.
+   *
+   * @throws iException::Programmer
+   */
+  void ProcessByBrick::StartProcess(std::function<void(std::vector<Buffer *> &in,
+                                                       std::vector<Buffer *> &out)> funct) {
+    // Construct two vectors of brick buffer managers
+    // The input buffer managers
+    vector<Brick *> imgrs;
+    vector<Buffer *> ibufs;
+
+    // And the output buffer managers
+    vector<Brick *> omgrs;
+    vector<Buffer *> obufs;
+
+    int numBricks = PrepProcessCubes(ibufs, obufs, imgrs, omgrs);
+
+    // Loop and let the app programmer process the bricks
+    p_progress->SetMaximumSteps(numBricks);
+    p_progress->CheckStatus();
+
+    for(int t = 0; t < numBricks; t++) {
+      // Read the input buffers
+      for(unsigned int i = 0; i < InputCubes.size(); i++) {
+        InputCubes[i]->read(*ibufs[i]);
+      }
+
+      // Pass them to the application function
+      funct(ibufs, obufs);
+
+      // And copy them into the output cubes
+      for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+        OutputCubes[i]->write(*obufs[i]);
+        omgrs[i]->next();
+      }
+
+      for(unsigned int i = 0; i < InputCubes.size(); i++) {
+        imgrs[i]->next();
+
+        // if the manager has reached the end and the
+        // wrap option is on, wrap around to the beginning
+        if(Wraps() && imgrs[i]->end())
+          imgrs[i]->begin();
+
+        // Enforce same band
+        if(imgrs[i]->Band() != imgrs[0]->Band() &&
+           InputCubes[i]->bandCount() != 1) {
+          imgrs[i]->SetBaseBand(imgrs[0]->Band());
+        }
+      }
+      p_progress->CheckStatus();
+    }
+
+    for(unsigned int i = 0; i < ibufs.size(); i++) {
+      delete ibufs[i];
+    }
+    ibufs.clear();
+    imgrs.clear();
+
+    for(unsigned int i = 0; i < obufs.size(); i++) {
+      delete obufs[i];
+    }
+    obufs.clear();
+    omgrs.clear();
+  }
+
   /**
    * End the processing sequence and cleans up by closing cubes, freeing memory,
    *   etc.
