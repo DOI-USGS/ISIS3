@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<application name="framestitch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Stitches even and odd frames from push frame <def link="Cube">cubes</def> back into a single cube.
+  </brief>
+
+  <description>
+    <p>
+      This program combines the even and odd frames from push frame <def link="Cube">cubes</def> back
+      into a single interwoven <def link="Cube">cube</def>. It can also optionally flip the frame order
+      so that adjacent ground features appear adjacent between frames. This program
+      is designed to be run before processing the data in another software package
+      as it removes the camera information from the output <def link="Cube">cube</def>.
+    </p>
+    <p>
+      When many push frame images are ingested into ISIS, their frames are separated
+      into two different cubes, one with even frames and one with odd frames. In the
+      odd frame cube, the lines for the even frames are Null and in the even frame cube,
+      the lines for the odd frames are null. This makes processing in other applications
+      difficult because each image only has half the data and covers half the ground.
+      The footprint for each image is also composed of multiple disjoint pieces and can
+      be difficult to work with.
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jesse Mapel" date="2022-04-22">
+      Original version
+    </change>
+  </history>
+
+  <seeAlso>
+    <applications>
+    <item>marciflip</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="EVEN">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Even frame cube
+        </brief>
+        <description>
+          This specifies the input <def link="Cube">cube</def> containing even frames.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="ODD">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Odd frame cube
+        </brief>
+        <description>
+          This specifies the input <def link="Cube">cube</def> containing odd frames.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output file that contains all frames
+        </brief>
+        <description>
+          The output filename for the <def link="Cube">cube</def> containing the
+          combined frames from the input even and odd <def link="Cube">cubes</def>.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Settings">
+      <parameter name="FLIP">
+        <type>boolean</type>
+        <brief>
+          Flip the frame order
+        </brief>
+        <description>
+          <p>
+            If true, the order of the frames in the output cube will be reversed.
+            So the firt frame in the output cube will be the last frame in the input
+            cubes and the last frame in the output cube will be the first frame in
+            the input cubes.
+          </p>
+          <p>
+            This option can be used to correct for adjacent ground points not being
+            adjacent between frames. This occurs when the flight direction and the
+            increasing line direction on the detector are opposite each other.
+          </p>
+          <p>
+            This option can also be used to undo any flipping in the input cubes.
+          </p>
+        </description>
+        <default><item>FALSE</item></default>
+      </parameter>
+
+      <parameter name="FRAMEHEIGHT">
+        <type>integer</type>
+        <brief>
+          The number of lines in each frame
+        </brief>
+        <description>
+          <p>
+            The number of lines in each frame.
+          </p>
+          <p>
+            If not entered, then the program will attempt to count the number of
+            adjacent NULL and non-NULL lines in each image to determine a frame size.
+          </p>
+        </description>
+        <internalDefault>Camera</internalDefault>
+        <minimum>1</minimum>
+      </parameter>
+    </group>
+  </groups>
+
+</application>
