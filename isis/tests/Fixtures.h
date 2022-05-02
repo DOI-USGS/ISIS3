@@ -3,6 +3,7 @@
 
 #include "gtest/gtest.h"
 
+#include <memory>
 #include <string>
 
 #include <QString>
@@ -83,6 +84,30 @@ namespace Isis {
 
       void SetUp() override;
       void TearDown() override;
+  };
+
+  class PushFramePair : public TempTestingFiles {
+    protected:
+      std::shared_ptr<Cube> evenCube;
+      std::shared_ptr<Cube> oddCube;
+      int numSamps;
+      int numBands;
+      int frameHeight;
+      int numFrames;
+
+      void SetUp() override;
+  };
+
+  class FlippedPushFramePair : public TempTestingFiles {
+    protected:
+      std::shared_ptr<Cube> evenCube;
+      std::shared_ptr<Cube> oddCube;
+      int numSamps;
+      int numBands;
+      int frameHeight;
+      int numFrames;
+
+      void SetUp() override;
   };
 
   class DefaultCube : public TempTestingFiles {
