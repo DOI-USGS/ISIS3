@@ -251,6 +251,87 @@ namespace Isis {
   }
 
 
+  void PushFramePair::SetUp() {
+    numSamps = 16;
+    numBands = 3;
+    frameHeight = 12;
+    numFrames = 10;
+
+    evenCube.reset(new Cube());
+    evenCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
+    evenCube->create(tempDir.path() + "/even.cub");
+
+    oddCube.reset(new Cube());
+    oddCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
+    oddCube->create(tempDir.path() + "/odd.cub");
+
+    Brick frameBrick(numSamps, frameHeight, numBands, evenCube->pixelType());
+
+    for (int frameIndex = 0; frameIndex < numFrames; frameIndex++) {
+      for (int brickIndex = 0; brickIndex < frameBrick.size(); brickIndex++) {
+        frameBrick[brickIndex] = frameIndex + 1;
+      }
+      frameBrick.SetBasePosition(1,frameIndex * frameHeight + 1,1);
+      if (frameIndex % 2 == 0) {
+        oddCube->write(frameBrick);
+      }
+      else {
+        evenCube->write(frameBrick);
+      }
+    }
+
+    PvlGroup intGroup("Instrument");
+    intGroup += PvlKeyword("StartTime", "2008-06-14T13:32:10.933207");
+    evenCube->putGroup(intGroup);
+    oddCube->putGroup(intGroup);
+
+    evenCube->reopen("rw");
+    oddCube->reopen("rw");
+
+  }
+
+
+  void FlippedPushFramePair::SetUp() {
+    numSamps = 16;
+    numBands = 3;
+    frameHeight = 12;
+    numFrames = 10;
+
+    evenCube.reset(new Cube());
+    evenCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
+    evenCube->create(tempDir.path() + "/even.cub");
+
+    oddCube.reset(new Cube());
+    oddCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
+    oddCube->create(tempDir.path() + "/odd.cub");
+
+    Brick frameBrick(numSamps, frameHeight, numBands, evenCube->pixelType());
+
+    for (int frameIndex = 0; frameIndex < numFrames; frameIndex++) {
+      for (int brickIndex = 0; brickIndex < frameBrick.size(); brickIndex++) {
+        frameBrick[brickIndex] = numFrames - frameIndex;
+      }
+      frameBrick.SetBasePosition(1,frameIndex * frameHeight + 1,1);
+      if (frameIndex % 2 == 0) {
+        evenCube->write(frameBrick);
+      }
+      else {
+        oddCube->write(frameBrick);
+      }
+    }
+
+    PvlGroup intGroup("Instrument");
+    intGroup += PvlKeyword("DataFlipped", "True");
+    intGroup += PvlKeyword("StartTime", "2008-06-14T13:32:10.933207");
+    evenCube->putGroup(intGroup);
+    oddCube->putGroup(intGroup);
+
+    evenCube->reopen("rw");
+    oddCube->reopen("rw");
+
+  }
+
+
   void DemCube::SetUp() {
     DefaultCube::SetUp();
     testCube->label()->object(4)["SolarLongitude"] = "294.73518831328";
