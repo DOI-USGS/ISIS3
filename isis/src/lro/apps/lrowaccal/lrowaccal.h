@@ -25,8 +25,7 @@
 
 namespace Isis {
   extern void lrowaccal(UserInterface &ui);
-  extern void lrowaccal(Cube *icube, UserInterface &ui, std::vector<QString> darkFiles, 
-    QString flatFile, QString radFile, QString specpixFile, QString tempFile);
+  extern void lrowaccal(Cube *icube, UserInterface &ui);
 }
 
 #endif
