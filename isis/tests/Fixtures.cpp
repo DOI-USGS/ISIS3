@@ -273,10 +273,10 @@ namespace Isis {
       }
       frameBrick.SetBasePosition(1,frameIndex * frameHeight + 1,1);
       if (frameIndex % 2 == 0) {
-        evenCube->write(frameBrick);
+        oddCube->write(frameBrick);
       }
       else {
-        oddCube->write(frameBrick);
+        evenCube->write(frameBrick);
       }
     }
 
@@ -313,10 +313,10 @@ namespace Isis {
       }
       frameBrick.SetBasePosition(1,frameIndex * frameHeight + 1,1);
       if (frameIndex % 2 == 0) {
-        oddCube->write(frameBrick);
+        evenCube->write(frameBrick);
       }
       else {
-        evenCube->write(frameBrick);
+        oddCube->write(frameBrick);
       }
     }
 

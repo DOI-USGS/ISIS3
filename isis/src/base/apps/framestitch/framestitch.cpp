@@ -82,14 +82,14 @@ namespace Isis {
   void framestitch(UserInterface &ui) {
     ProcessByBrick process;
 
-    // It is very important that the even cube gets added first as later on
+    // It is very important that the odd cube gets added first as later on
     // we'll use frameNumber % 2 to index the input cube vector
-    QString evenCubeFile = ui.GetCubeName("EVEN");
-    Cube* evenCube = process.SetInputCube(evenCubeFile,
-                                          CubeAttributeInput(evenCubeFile));
     QString oddCubeFile = ui.GetCubeName("ODD");
     Cube* oddCube = process.SetInputCube(oddCubeFile,
                                          CubeAttributeInput(oddCubeFile));
+    QString evenCubeFile = ui.GetCubeName("EVEN");
+    Cube* evenCube = process.SetInputCube(evenCubeFile,
+                                          CubeAttributeInput(evenCubeFile));
 
 
     // Check that all the inputs are valid
@@ -168,7 +168,7 @@ namespace Isis {
      * Frame stitching processing function
      */
     auto interweaveFrames = [&](std::vector<Buffer *> &in, std::vector<Buffer *> &out)->void {
-      // Assumes even is first and odd is second
+      // Assumes odd is first and even is second
       int inIndex = (in[0]->Line() / frameHeight) % 2;
       if (swapInputCubes) {
         inIndex = 1 - inIndex;

@@ -390,14 +390,14 @@ TEST_F(PushFramePair, FunctionalTestFramestitchAutoMismatchedHeights) {
 }
 
 TEST_F(PushFramePair, FunctionalTestFramestitchAutoDifferentHeights) {
-  // Make frame 6 NULL so that there is a 36 line null frame
-  Brick frameBrick(numSamps, frameHeight, numBands, evenCube->pixelType());
+  // Make frame 7 NULL so that there is a 36 line null frame
+  Brick frameBrick(numSamps, frameHeight, numBands, oddCube->pixelType());
   for (int brickIndex = 0; brickIndex < frameBrick.size(); brickIndex++) {
     frameBrick[brickIndex] = Null;
   }
   frameBrick.SetBasePosition(1,6 * frameHeight + 1,1);
-  evenCube->write(frameBrick);
-  evenCube->reopen("rw");
+  oddCube->write(frameBrick);
+  oddCube->reopen("rw");
 
   QVector<QString> args = {
         "EVEN="+evenCube->fileName(),
