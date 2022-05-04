@@ -1,3 +1,22 @@
+#include <vector>
+
+#include <QDir>
+#include <QRegExp>
+#include <QString>
+
+#include "Brick.h"
+#include "Camera.h"
+#include "Constants.h"
+#include "CubeAttribute.h"
+#include "iTime.h"
+#include "Message.h"
+#include "NaifStatus.h"
+#include "Preference.h"
+#include "ProcessByBrick.h"
+#include "PvlGroup.h"
+#include "SpecialPixel.h"
+#include "Statistics.h"
+
 #include "lrowaccal.h"
 
 #define POLAR_MODE_SAMPLES 1024
@@ -15,8 +34,6 @@ using namespace Isis;
 
 
 namespace Isis {
-  // globals
-
   /**
    * @brief Calibrate a WAC cube. 
    *
