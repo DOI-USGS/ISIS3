@@ -38,3 +38,31 @@ TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelExists) {
 
   EXPECT_EQ(radiometryGroup["RadiometricType"].unit().toStdString(), "W/m2/sr/um");
 }
+
+TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelNotForIOF) {
+  QTemporaryDir tempDir;
+  ASSERT_TRUE(tempDir.isValid());
+  
+  QString outCubeFileName = tempDir.path() + "/outTemp.cub";
+  QString testCubeFileName = "data/lrowaccal/M1388981421CE.tmp.vis.even.reduced.cub";
+
+  QVector<QString> args = {"from=" + testCubeFileName, 
+                           "to=" + outCubeFileName, 
+                           "radiometrictype=IOF", 
+                           "radiometricfile=Default"};
+  UserInterface options(APP_XML, args);
+
+  try {
+    lrowaccal(options);
+  }
+  catch(IException &e) {
+    FAIL() << "Unable to open image cube: " << e.what() << std::endl;
+  }
+
+  Cube outCube(outCubeFileName);
+  Pvl *outCubeLabel = outCube.label();
+
+  PvlGroup &radiometryGroup = outCubeLabel->findGroup("Radiometry", Pvl::Traverse);
+
+  EXPECT_NE(radiometryGroup["RadiometricType"].unit().toStdString(), "W/m2/sr/um");
+}
