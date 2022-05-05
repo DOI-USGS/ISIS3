@@ -32,24 +32,13 @@ TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelExists) {
   }
 
   Cube outCube(outCubeFileName);
-  Pvl *outCubeLabel = outCube.label();
 
-  PvlGroup radiometryGroup;
-  try {
-    radiometryGroup = outCubeLabel->findGroup("Radiometry", Pvl::Traverse);
-  }
-  catch(IException &e) {
-    FAIL() << "Unable to find Radiometry group in output cube label: " << e.what() << std::endl;
-  }
+  ASSERT_TRUE(outCube.hasGroup("Radiometry"));
+  PvlGroup &radiometry = outCube.group("Radiometry");
 
-  PvlKeyword radiometricTypeKeyword;
-  try {
-    radiometricTypeKeyword = radiometryGroup.findKeyword("RadiometricType");
-  }
-  catch(IException &e) {
-    FAIL() << "Unable to find RadiometricType keyword in Radiometry group of output cube label: " << e.what() << std::endl;
-  }
-  EXPECT_EQ(radiometricTypeKeyword.unit().toStdString(), "W/m2/sr/um");
+  ASSERT_TRUE(radiometry.hasKeyword("RadiometricType"));
+  PvlKeyword &radiometricType = radiometry["RadiometricType"];
+  ASSERT_EQ(radiometricType.unit().toStdString(), "W/m2/sr/um");
 }
 
 TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelNotForIOF) {
@@ -73,22 +62,11 @@ TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelNotForIOF) {
   }
 
   Cube outCube(outCubeFileName);
-  Pvl *outCubeLabel = outCube.label();
 
-  PvlGroup radiometryGroup;
-  try {
-    radiometryGroup = outCubeLabel->findGroup("Radiometry", Pvl::Traverse);
-  }
-  catch(IException &e) {
-    FAIL() << "Unable to find Radiometry group in output cube label: " << e.what() << std::endl;
-  }
+  ASSERT_TRUE(outCube.hasGroup("Radiometry"));
+  PvlGroup &radiometry = outCube.group("Radiometry");
 
-  PvlKeyword radiometricTypeKeyword;
-  try {
-    radiometricTypeKeyword = radiometryGroup.findKeyword("RadiometricType");
-  }
-  catch(IException &e) {
-    FAIL() << "Unable to find RadiometricType keyword in Radiometry group of output cube label: " << e.what() << std::endl;
-  }
-  EXPECT_NE(radiometricTypeKeyword.unit().toStdString(), "W/m2/sr/um");
+  ASSERT_TRUE(radiometry.hasKeyword("RadiometricType"));
+  PvlKeyword &radiometricType = radiometry["RadiometricType"];
+  ASSERT_NE(radiometricType.unit().toStdString(), "W/m2/sr/um");
 }
