@@ -5,6 +5,7 @@ import logging as log
 import os
 import json
 import argparse
+import string
 import subprocess
 import tempfile
 
@@ -121,17 +122,21 @@ def download_pub(inputcommand, destination, mission_name, cfg, dry_run):
     
     log.info("Starting to download kernels")
 
-    if(inputcommand == "lsf"):
+    if inputcommand != "lsf" and destination == "":
+        raise Exception("Invalid format, you must enter a destination to run any command other than lsf")
+
+    elif inputcommand == "lsf":
         
         mission_name = mission_name.strip("/")
         log.debug(f"Running lsf using mission name {mission_name}")
-
         extra_args= [f"{mission_name}", "-R", "--format", "p", "--files-only"]
         results = rclone(command="lsf", extra_args=extra_args, config=cfg, redirect_stdout=True, redirect_stderr=False)
-        f = open(f"{destination}/output.json" , "w")
-        f.truncate()
-        f.write(json.loads(json.dumps(results.get('out').decode('utf-8'))))
-        f.close()
+        
+        if destination != "":
+            f = open(f"{destination}/output.json" , "w")
+            f.truncate()
+            f.write(json.loads(json.dumps(results.get('out').decode('utf-8'))))
+            f.close()
     else:
         destination += "/"+str(mission_name).replace(":","")
         destination = destination.replace("_usgs/","/")
@@ -207,7 +212,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = helpString, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('command', help="the rclone command you would like to run; ie lsjson, sync")
     parser.add_argument('mission', help='mission for files to be downloaded')
-    parser.add_argument('dest', help='the destination to download files from source')
+    parser.add_argument('dest', nargs="?", default="",help='the destination to download files from source, not needed for running lsf as the input command')
     parser.add_argument('--legacy', help="flag to download ISIS data prior to ISIS 4.1.0", default=False, action='store_true')
     parser.add_argument('--dry-run', help="run a dry run for rclone value should be a boolean", default=False, action='store_true')
     parser.add_argument('-v', '--verbose', action='count', default=0)    
