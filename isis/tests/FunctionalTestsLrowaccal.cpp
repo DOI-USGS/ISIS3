@@ -28,15 +28,28 @@ TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelExists) {
     lrowaccal(options);
   }
   catch(IException &e) {
-    FAIL() << "Unable to open image cube: " << e.what() << std::endl;
+    FAIL() << "Call to lrowaccal failed, unable to calibrate cube: " << e.what() << std::endl;
   }
 
   Cube outCube(outCubeFileName);
   Pvl *outCubeLabel = outCube.label();
 
-  PvlGroup &radiometryGroup = outCubeLabel->findGroup("Radiometry", Pvl::Traverse);
+  PvlGroup radiometryGroup;
+  try {
+    radiometryGroup = outCubeLabel->findGroup("Radiometry", Pvl::Traverse);
+  }
+  catch(IException &e) {
+    FAIL() << "Unable to find Radiometry group in output cube label: " << e.what() << std::endl;
+  }
 
-  EXPECT_EQ(radiometryGroup["RadiometricType"].unit().toStdString(), "W/m2/sr/um");
+  PvlKeyword radiometricTypeKeyword;
+  try {
+    radiometricTypeKeyword = radiometryGroup.findKeyword("RadiometricType");
+  }
+  catch(IException &e) {
+    FAIL() << "Unable to find RadiometricType keyword in Radiometry group of output cube label: " << e.what() << std::endl;
+  }
+  EXPECT_EQ(radiometricTypeKeyword.unit().toStdString(), "W/m2/sr/um");
 }
 
 TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelNotForIOF) {
@@ -56,13 +69,26 @@ TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelNotForIOF) {
     lrowaccal(options);
   }
   catch(IException &e) {
-    FAIL() << "Unable to open image cube: " << e.what() << std::endl;
+    FAIL() << "Call to lrowaccal failed, unable to calibrate cube: " << e.what() << std::endl;
   }
 
   Cube outCube(outCubeFileName);
   Pvl *outCubeLabel = outCube.label();
 
-  PvlGroup &radiometryGroup = outCubeLabel->findGroup("Radiometry", Pvl::Traverse);
+  PvlGroup radiometryGroup;
+  try {
+    radiometryGroup = outCubeLabel->findGroup("Radiometry", Pvl::Traverse);
+  }
+  catch(IException &e) {
+    FAIL() << "Unable to find Radiometry group in output cube label: " << e.what() << std::endl;
+  }
 
-  EXPECT_NE(radiometryGroup["RadiometricType"].unit().toStdString(), "W/m2/sr/um");
+  PvlKeyword radiometricTypeKeyword;
+  try {
+    radiometricTypeKeyword = radiometryGroup.findKeyword("RadiometricType");
+  }
+  catch(IException &e) {
+    FAIL() << "Unable to find RadiometricType keyword in Radiometry group of output cube label: " << e.what() << std::endl;
+  }
+  EXPECT_NE(radiometricTypeKeyword.unit().toStdString(), "W/m2/sr/um");
 }
