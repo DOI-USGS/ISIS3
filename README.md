@@ -609,4 +609,22 @@ If you are looking for ISIS2, please [refer to the ISIS 2 Installation Guide](ht
 
 ### How do I install ISIS3.5.2 or earlier?
 
-If you are looking for a version of ISIS prior to 3.6.0, please [refer to the Legacy ISIS3 Installation Guide](https://isis.astrogeology.usgs.gov/documents/LegacyInstallGuide/index.html) for instructions on downloading and installing ISIS, versions prior to 3.6.0.
+If you are looking for a version of ISIS prior to 3.6.0, please [refer to the Legacy ISIS3 Installation Guide](https://isis.astrogeology.usgs.gov/documents/LegacyInstallGuide/index.html) for instructions on downloading and installing ISIS, versions prior to 3.6.0
+
+### How do I access the ISISDATA download script with ISIS 7.0.0 or earlier 
+
+You can download the script and config file from the repo:
+
+```
+# install rclone 
+conda install -c conda-forge rclone
+
+# download the script and rclone config file
+curl https://github.com/USGS-Astrogeology/ISIS3/raw/dev/isis/scripts/downloadIsisData.py -O downloadIsisData.py
+
+curl https://github.com/USGS-Astrogeology/ISIS3/raw/dev/isis/config/rclone.conf -O rclone.conf
+
+# ruin the script as normal, using --config to point to where you downloaded the config file 
+python downloadIsisData.py sync <mission> $ISISDATA --config rclone.conf
+
+```

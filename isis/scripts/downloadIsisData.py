@@ -5,7 +5,6 @@ import logging as log
 import os
 import json
 import argparse
-import string
 import subprocess
 import tempfile
 
@@ -122,21 +121,17 @@ def download_pub(inputcommand, destination, mission_name, cfg, dry_run):
     
     log.info("Starting to download kernels")
 
-    if inputcommand != "lsf" and destination == "":
-        raise Exception("Invalid format, you must enter a destination to run any command other than lsf")
-
-    elif inputcommand == "lsf":
+    if(inputcommand == "lsf"):
         
         mission_name = mission_name.strip("/")
         log.debug(f"Running lsf using mission name {mission_name}")
+
         extra_args= [f"{mission_name}", "-R", "--format", "p", "--files-only"]
         results = rclone(command="lsf", extra_args=extra_args, config=cfg, redirect_stdout=True, redirect_stderr=False)
-        
-        if destination != "":
-            f = open(f"{destination}/output.json" , "w")
-            f.truncate()
-            f.write(json.loads(json.dumps(results.get('out').decode('utf-8'))))
-            f.close()
+        f = open(f"{destination}/output.json" , "w")
+        f.truncate()
+        f.write(json.loads(json.dumps(results.get('out').decode('utf-8'))))
+        f.close()
     else:
         destination += "/"+str(mission_name).replace(":","")
         destination = destination.replace("_usgs/","/")
@@ -150,7 +145,7 @@ def download_pub(inputcommand, destination, mission_name, cfg, dry_run):
     log.info("Done downloading files")
 
 
-def main(command, mission, dest, legacy_flag, dry_run):
+def main(command, mission, dest, legacy_flag, cfg_path, dry_run):
     """
     Parameters 
     ----------
@@ -163,8 +158,6 @@ def main(command, mission, dest, legacy_flag, dry_run):
     """
     log.info("---Script starting---")
     
-    cfg_path = os.path.dirname(__file__) + '/../config/rclone.conf'
-
     log.debug(f"Using config: {cfg_path}")
     result = rclone("listremotes", config=cfg_path)
     results = result.get('out').decode("utf-8").split("\n")
@@ -212,11 +205,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = helpString, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('command', help="the rclone command you would like to run; ie lsjson, sync")
     parser.add_argument('mission', help='mission for files to be downloaded')
-    parser.add_argument('dest', nargs="?", default="",help='the destination to download files from source, not needed for running lsf as the input command')
+    parser.add_argument('dest', help='the destination to download files from source')
     parser.add_argument('--legacy', help="flag to download ISIS data prior to ISIS 4.1.0", default=False, action='store_true')
     parser.add_argument('--dry-run', help="run a dry run for rclone value should be a boolean", default=False, action='store_true')
     parser.add_argument('-v', '--verbose', action='count', default=0)    
+    parser.add_argument('--config', action='store', default=os.path.dirname(__file__) + '/../config/rclone.conf')
     args = parser.parse_args()
+
+    if args.verbose == 0:
+        log.basicConfig(
+            format='%(asctime)s %(levelname)-8s %(message)s',
+            level=log.WARN,
+            datefmt='%Y-%m-%d %H:%M:%S')
 
     if args.verbose == 1:
         log.basicConfig(
@@ -230,5 +230,5 @@ if __name__ == '__main__':
             level=log.DEBUG,
             datefmt='%Y-%m-%d %H:%M:%S')
 
-    main(args.command, args.mission, args.dest, args.legacy ,args.dry_run)
+    main(args.command, args.mission, args.dest, args.legacy, os.path.expanduser(args.config), args.dry_run)
 
