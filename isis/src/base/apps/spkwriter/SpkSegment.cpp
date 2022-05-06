@@ -171,25 +171,21 @@ void SpkSegment::import(Cube &cube) {
     setEndTime(m_epochs[size(m_epochs)-1]);
 
     Pvl *label = cube.label();
-    std::cout << label << '\n';
-    std::cout << *label << '\n';
-    QString SCClockStartTime = getKeyValue(*label, "SpacecraftClockStartCount");
-    QString SCClockStopTime;
-    QString value = getKeyValue(*label, "SpacecraftClockStopCount");
+    QString labStartTime = getKeyValue(*label, "StartTime");
+    QString labEndTime;
+    QString value = getKeyValue(*label, "StopTime");
     if (!value.isEmpty()) {
-      SCClockStopTime = value;
+      labEndTime = value;
     }
     else {
-      SCClockStopTime = SCClockStartTime;
+      labEndTime = SCClockStartTime;
     }
 
-    std::cout << SCClockStartTime << '\n';
-    std::cout << SCClockStopTime << '\n';
-    double etClockStart = cube.camera()->getClockTime(SCClockStartTime).Et();
-    double etClockStop = cube.camera()->getClockTime(SCClockStopTime).Et();
+    iTime etLabStart(SCClockStartTime);
+    iTime etLabEnd(SCClockStopTime);
 
-    m_startOffset = etClockStart - m_epochs[0];
-    m_endOffset = etClockStop - m_epochs[size(m_epochs)-1];
+    m_startOffset = etLabStart - m_epochs[0];
+    m_endOffset = etLabStop - m_epochs[size(m_epochs)-1];
 
     // Label start/end times are 3 decimal places, so round offsets to match.
     m_startOffset = qRound(m_startOffset * 1000.0) / 1000.0;
