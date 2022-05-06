@@ -36,7 +36,7 @@ void IsisMain() {
   g_delta = ui.GetDouble("DELTA");
   g_halfDelta = g_delta/2.0;
 
-  Pvl lab(ui.GetFileName("FROM"));
+  Pvl lab(ui.GetCubeName("FROM"));
   PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
   // Check if it is a NAC image

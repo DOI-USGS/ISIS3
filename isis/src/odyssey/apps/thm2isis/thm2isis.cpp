@@ -68,7 +68,7 @@ namespace Isis {
     TranslateLabels(pdsLab, isis3Lab, p.Bands(), ui);
 
     // Set up the output cube
-    FileName outFile(ui.GetFileName("TO"));
+    FileName outFile(ui.GetCubeName("TO"));
     PvlGroup &inst = isis3Lab.findGroup("Instrument", Pvl::Traverse);
     CubeAttributeOutput outAttr = ui.GetOutputAttribute("to");
     

@@ -37,13 +37,13 @@ void IsisMain() {
 
   int ifile = 0;
   // Make sure the master file is included in the input file list
-  while(ifile < (int) list.size() && list[ifile].toString() != FileName(ui.GetFileName("MASTER")).expanded()) {
+  while(ifile < (int) list.size() && list[ifile].toString() != FileName(ui.GetCubeName("MASTER")).expanded()) {
     ifile++;
   }
 
   if(ifile >= list.size()) {
-    QString msg = "The master file, [" + FileName(ui.GetFileName("MASTER")).expanded() + " is not included in " +
-                 "the input list file " + ui.GetFileName("FROMLIST") + "]";
+    QString msg = "The master file, [" + FileName(ui.GetCubeName("MASTER")).expanded() + " is not included in " +
+                 "the input list file " + ui.GetCubeName("FROMLIST") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -55,7 +55,7 @@ void IsisMain() {
   try {
     // Open the master cube
     Cube cube;
-    cube.open(ui.GetFileName("MASTER"), "rw");
+    cube.open(ui.GetCubeName("MASTER"), "rw");
 
     //check for existing polygon, if exists delete it
     if(cube.label()->hasObject("Polygon")) {
@@ -65,7 +65,7 @@ void IsisMain() {
     // Get the camera
     Camera *cam = cube.camera();
     if(cam->DetectorMap()->LineRate() == 0.0) {
-      QString msg = "[" + ui.GetFileName("MASTER") + "] is not a line scan camera image";
+      QString msg = "[" + ui.GetCubeName("MASTER") + "] is not a line scan camera image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -127,12 +127,12 @@ void IsisMain() {
 
     cube.putGroup(kernels);
     cube.close();
-    gp += PvlKeyword("StatusMaster", ui.GetFileName("MASTER") + ":  camera pointing updated");
+    gp += PvlKeyword("StatusMaster", ui.GetCubeName("MASTER") + ":  camera pointing updated");
 
     // Apply the dejittered pointing to the rest of the files
     step2 = true;
     for(int ifile = 0; ifile < list.size(); ifile++) {
-      if(list[ifile].toString() != ui.GetFileName("MASTER")) {
+      if(list[ifile].toString() != ui.GetCubeName("MASTER")) {
         // Open the cube
         cube.open(list[ifile].toString(), "rw");
         //check for existing polygon, if exists delete it
@@ -142,7 +142,7 @@ void IsisMain() {
         // Get the camera and make sure it is a line scan camera
         Camera *cam = cube.camera();
         if(cam->DetectorMap()->LineRate() == 0.0) {
-          QString msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
+          QString msg = "[" + ui.GetCubeName("FROM") + "] is not a line scan camera";
           throw IException(IException::User, msg, _FILEINFO_);
         }
         // Write out the pointing cache as a table
@@ -168,7 +168,7 @@ void IsisMain() {
   catch(IException &e) {
     QString msg;
     if(!step2) {
-      msg = "Unable to fit pointing for [" + ui.GetFileName("MASTER") + "]";
+      msg = "Unable to fit pointing for [" + ui.GetCubeName("MASTER") + "]";
     }
     else {
       msg = "Unable to update pointing for nonMaster file(s)";

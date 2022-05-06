@@ -110,7 +110,7 @@ xsi:noNamespaceSchemaLocation=
      <li>RADEC (<def link="Right Ascension">Right Ascension</def>, <def link="Declination">Declination</def> )</li>
      <li><def link="Local Solar Time">LOCALTIME</def></li>
      </ul>
-  The following options are available for Level2 images:
+       The following options are available for Level2 images:
      <ul>
      <li>DN</li>
      <li>LATITUDE</li>
@@ -188,7 +188,7 @@ xsi:noNamespaceSchemaLocation=
 
   <liens>
     <item>Add resolution to possible outputs</item>
-    <item>Convert to a IsisProcessBySpectra when it gets written</item>
+    <item>Convert to an IsisProcessBySpectra when it gets written</item>
   </liens>
 
   <history>
@@ -319,6 +319,9 @@ xsi:noNamespaceSchemaLocation=
     <change name="Kaitlyn Lee" date="2020-03-15">
       Converted application and tests for Gtest conversion.
     </change>
+    <change name="Stuart Sides" date="2021-06-01">
+      Add ALLDNS parameter to propagate all input bands to the output instead of just one band.
+    </change>
     <change name="Adam Paquette" date="2020-08-23">
       Added initial slope and backplane options for the local normal and the
       ellipsoid normal.
@@ -340,8 +343,8 @@ xsi:noNamespaceSchemaLocation=
         </brief>
         <description>
           This is the input filename.  The input image cube can be a <def>Level1</def>
-    or <def>Level2</def> file.  For a Level1 image, spiceinit
-    must be successfully applied before running phocube.
+          or <def>Level2</def> file.  For a Level1 image, spiceinit
+          must be successfully applied before running phocube.
         </description>
         <filter>
           *.cub
@@ -427,8 +430,11 @@ xsi:noNamespaceSchemaLocation=
         <default><item>TRUE</item></default>
         <brief>Include special pixels in the ouptut image</brief>
         <description>
-          If this parameter is true, calculations will be done on special pixels.
-          If this parameter is false, special pixels will be skipped and set to NULL in the output image for all bands selected.
+          Controls the output of the values phocube calculates based on the DN from the first band.
+          If this parameter is true, phocube will always attempt to calculate values for the requested bands.
+          If this parameter is false, and the DN is a special pixel value, phocube will not
+          calculate values, and will instead place ISIS Null values in all requested photometry bands.
+          The DN bands, if requested, will be transfered to the output cube regardless of this setting.
         </description>
       </parameter>
       <parameter name="DN">
@@ -441,6 +447,30 @@ xsi:noNamespaceSchemaLocation=
           the output file.  The DN parameter must be set to "true,"
           if the output product created is expected to contain the input
           image information.
+        </description>
+      </parameter>
+      <parameter name="ALLDNS">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Propagate all of the input pixel DNs to the output file</brief>
+        <description>
+          <p>
+            If this parameter is true, all the <def link="Digital Number">DN</def> values
+            from all of the bands in the input image, subject to the input cube attribute,
+            will be propagated to the output file.
+            Calculations for the other bands that require a sensor model (e.g., phase) will be
+            based on the first band, again subject to the cube attribute.
+            This doesn't affect the values calculated for those bands when the
+            input image bands are spatially allinged,
+            but it is very import when the bands of the input image are not
+            spatially alligned (e.g., Level 1, Odyssey, Themis IR).
+            Use the input cube attribute to select the band used to calculate
+            the other phocube values (e.g., ThemisIR.cub+9,1-5).
+            The geometry of the first band or the first band in the input attribute,
+            will be used to calculate the phocube values.
+            NOTE: If the DN parameter is also set then ALLDNS will take presidence,
+            and DN will be ignored.
+          </p>
         </description>
       </parameter>
       <parameter name="PHASE">
@@ -726,7 +756,7 @@ xsi:noNamespaceSchemaLocation=
         <default><item>FALSE</item></default>
         <brief>Create a morphology rank band, used for ranking images based on favorable local emission angles.</brief>
         <description>
-          <p>
+	        <p>
             This band is computed from the <def link="Pixel Resolution">pixel resolution</def>
             and <def link="Emission Angle">emission angle</def> using the following formula:<br />
             <br />MorphologyRank = PixelResolution / cos(EmissionAngle)<br /> <br />
@@ -739,52 +769,51 @@ xsi:noNamespaceSchemaLocation=
             value very close to zero.
           </p>
           <p>
-           <dl>
-             <dt>
-              Append the following parameters to the <i>automos</i> command line to utilize this backplane band:
-            </dt>
-            <dd>
-              <b>priority=band type=keyword keyname=Name keyvalue=morphologyRank criteria=lesser</b>.
-            </dd>
-          </dl>
-          See <i>automos</i> documentation for further details.
-        </p>
-      </description>
-    </parameter>
-    <parameter name="ALBEDORANK">
-      <type>boolean</type>
-      <default><item>FALSE</item></default>
-      <brief>Create an albedo rank band, used for ranking images based on favorable emission and incidence angles.</brief>
-      <description>
-        <p>
-          This band is computed from the <def link="Pixel Resolution">pixel resolution</def>,
-          <def link="Incidence Angle">incidence angle</def> and <def link="Emission Angle">emission angle</def>
-          using the following formula:<br /><br />
-          AlbedoRank = PixelResolution * [(1 / cos(EmissionAngle)) + (1 / cos(IncidenceAngle))]<br /><br />
-          The resulting output band can be used by <i>automos</i> to create an albedo-based
-          mosaic product.  This option always uses the
-          <def link="Local Emission Angle">local emission angle</def>  and
-          <def link="Local Incidence Angle">local incidence angle</def> if the input file
-          is initialized (spiceinit) with an elevation model (DEM); otherwise, it
-          uses the default calculation (from the ellipsoid).  All computed cosines are
-          tested for zero.  If the result is zero, then the value is set to a constant
-          value very close to zero.
-        </p>
-        <p>
-          <dl>
-            <dt>
-              Append the following parameters to the <i>automos</i> command line to utilize this backplane band:
-            </dt>
-            <dd>
-              <b>priority=band type=keyword keyname=Name keyvalue=albedoRank
-              criteria=lesser</b>.
-            </dd>
-          </dl>
-          See <i>automos</i> documentation for further details.
-        </p>
-      </description>
-    </parameter>
-    <parameter name="RADEC">
+            <dl>
+              <dt>
+                Append the following parameters to the <i>automos</i> command line to utilize this backplane band:
+              </dt>
+              <dd>
+                <b>priority=band type=keyword keyname=Name keyvalue=morphologyRank criteria=lesser</b>.
+              </dd>
+            </dl>
+            See <i>automos</i> documentation for further details.
+          </p>
+        </description>
+      </parameter>
+     <parameter name="ALBEDORANK">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create an albedo rank band, used for ranking images based on favorable emission and incidence angles.</brief>
+        <description>
+          <p>
+            This band is computed from the <def link="Pixel Resolution">pixel resolution</def>,
+            <def link="Incidence Angle">incidence angle</def> and <def link="Emission Angle">emission angle</def>
+            using the following formula:<br /><br />
+            AlbedoRank = PixelResolution * [(1 / cos(EmissionAngle)) + (1 / cos(IncidenceAngle))]<br /><br />
+            The resulting output band can be used by <i>automos</i> to create an albedo-based
+            mosaic product.  This option always uses the
+            <def link="Local Emission Angle">local emission angle</def>  and
+            <def link="Local Incidence Angle">local incidence angle</def> if the input file
+            is initialized (spiceinit) with an elevation model (DEM); otherwise, it
+            uses the default calculation (from the ellipsoid).  All computed cosines are
+            tested for zero.  If the result is zero, then the value is set to a constant
+            value very close to zero.
+          </p>
+          <p>
+ 	          <dl>
+              <dt>
+                Append the following parameters to the <i>automos</i> command line to utilize this backplane band:
+              </dt>
+              <dd>
+                <b>priority=band type=keyword keyname=Name keyvalue=albedoRank criteria=lesser</b>.
+              </dd>
+            </dl>
+            See <i>automos</i> documentation for further details.
+          </p>
+        </description>
+      </parameter>
+      <parameter name="RADEC">
          <type>boolean</type>
          <default><item>FALSE</item></default>
          <brief>Create bands for Right Ascension and Declination</brief>
@@ -839,8 +868,8 @@ xsi:noNamespaceSchemaLocation=
       </description>
       <terminalInterface>
         <commandLine>
-         from=EW0131773041G_cal.cub to=EW0131773041G_cal.pho.cub phase=no emission=no incidence=no
-         longitude=no morphologyRank=yes
+          from=EW0131773041G_cal.cub to=EW0131773041G_cal.pho.cub phase=no emission=no incidence=no
+          longitude=no morphologyRank=yes
         </commandLine>
         <description>Run <i>phocube</i> to create latitude and morphologyRank bands.</description>
       </terminalInterface>

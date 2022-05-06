@@ -1,0 +1,360 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 179
+    TileLines   = 412
+
+    Group = Dimensions
+      Samples = 537
+      Lines   = 412
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName                    = "NEAR EARTH ASTEROID RENDEZVOUS"
+    InstrumentId                      = MSI
+    TargetName                        = EROS
+    StartTime                         = 2001-01-26T01:05:40.688
+    StopTime                          = 2001-01-26T01:05:40.704
+    SpacecraftClockStartCount         = 155881376903
+    SpacecraftClockStopCount          = 155881376919
+    ExposureDuration                  = 16.00 <ms>
+    OriginalSpacecraftClockStartCount = 155881376.903
+    OriginalSpacecraftClockStopCount  = 155881376.919
+    DpuDeckTemperature                = 287.31 <K>
+  End_Group
+
+  Group = Archive
+    DataSetId          = NEAR-A-MSI-3-EDR-EROS/ORBIT-V1.0
+    ProducerFullName   = "Scott L. Murchie"
+    ProductId          = M0155881376F3_2P_CIF_DBL.FIT
+    ProductVersionId   = 1.0
+    InstrumentHostName = "NEAR EARTH ASTEROID RENDEZVOUS"
+    InstrumentName     = "MULTI-SPECTRAL IMAGER"
+    InstrumentId       = MSI
+    TargetName         = EROS
+  End_Group
+
+  Group = BandBin
+    FilterNumber = 3
+    Center       = 760 <nm>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -93001
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
+    TargetPosition            = (Table, $base/kernels/spk/de405.bsp,
+                                 $near/kernels/tspk/erosephem_1999004_2002181.-
+                                 bsp)
+    InstrumentPointing        = (Table, $near/kernels/ck/near_2001026_v01.bc,
+                                 $near/kernels/fk/eros_fixed.tf)
+    Instrument                = $near/kernels/ik/msi15.ti
+    SpacecraftClock           = $near/kernels/sclk/near_171.tsc
+    InstrumentPosition        = (Table,
+                                 $near/kernels/spk/near_erosorbit_nav_v1.bsp)
+    InstrumentAddendum        = $near/kernels/iak/msiAddendum002.ti
+    ShapeModel                = Null
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 2
+    Source                    = isis
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 956041
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-93000, 1)
+  ConstantFrames      = (-93001, -93000)
+  ConstantRotation    = (-0.0014422521585655, 6.97819591591201e-07,
+                         0.99999895995357, -4.83840156360023e-04,
+                         -0.99999988294934, 2.96266649392629e-20,
+                         0.99999884290304, -4.83839653143796e-04,
+                         0.0014422523273821)
+  CkTableStartTime    = 33743204.880839
+  CkTableEndTime      = 33743204.880839
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($near/kernels/ck/near_2001026_v01.bc,
+                         $near/kernels/fk/eros_fixed.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 956105
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 33743204.880839
+  SpkTableEndTime      = 33743204.880839
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $near/kernels/spk/near_erosorbit_nav_v1.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 956161
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (2000433, 1)
+  CkTableStartTime    = 33743204.880839
+  CkTableEndTime      = 33743204.880839
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 2
+  PoleRa              = (11.35, 0.0, 0.0)
+  PoleDec             = (17.22, 0.0, 0.0)
+  PrimeMeridian       = (326.07, 1639.38864745, 0.0)
+  Description         = "Created by spiceinit"
+  Kernels             = ($base/kernels/spk/de405.bsp,
+                         $near/kernels/tspk/erosephem_1999004_2002181.bsp,
+                         $base/kernels/pck/pck00009.tpc)
+  SolarLongitude      = 266.4405879943
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 956225
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 33743204.880839
+  SpkTableEndTime      = 33743204.880839
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($base/kernels/spk/de405.bsp,
+                          $near/kernels/tspk/erosephem_1999004_2002181.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 956281
+  Bytes     = 3560
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 950513
+  Bytes     = 3864
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                          = 2000433
+  BODY2000433_RADII                  = (17.0, 5.5, 5.5)
+  BODY_FRAME_CODE                    = 2000433
+  INS-93001_SWAP_OBSERVER_TARGET     = TRUE
+  INS-93001_LIGHTTIME_CORRECTION     = LT+S
+  INS-93001_LT_SURFACE_CORRECT       = FALSE
+  INS-93001_FOCAL_LENGTH             = 166.85
+  INS-93001_PIXEL_PITCH              = 0.016
+  CLOCK_ET_-93_155881376903_COMPUTED = 1b93fb260b178041
+  INS-93001_TRANSX                   = (0.0, 0.016, 0.0)
+  INS-93001_TRANSY                   = (0.0, 0.0, -0.016)
+  INS-93001_ITRANSS                  = (0.0, 62.5, 0.0)
+  INS-93001_ITRANSL                  = (0.0, 0.0, -62.5)
+  INS-93001_BORESIGHT_LINE           = 206.5
+  INS-93001_BORESIGHT_SAMPLE         = 269.0
+  INS-93001_K1                       = -7.0e-05
+End_Object
+End

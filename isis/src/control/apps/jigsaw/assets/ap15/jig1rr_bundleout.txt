@@ -1,0 +1,1206 @@
+JIGSAW: BUNDLE ADJUSTMENT
+=========================
+
+                       Run Time: 2020-02-20T16:05:21
+                       Network Filename: grounded_relative_reg.net
+                       Cube List: cubes_for_ground_update.lis
+                       Output Network Filename: grounded_rr_jig1.net
+                       Output File Prefix: jig1rr_
+                       Network Id: kagtc_ap15_grnd_rel_reg
+                       Network Description: combined_imgnet_5px_edit_subreg2_edit_thinned_jig3 with hand ground
+                       Target: MOON
+
+                       Linear Units: kilometers
+                       Angular Units: decimal degrees
+
+INPUT: SOLVE OPTIONS
+====================
+
+                   OBSERVATIONS: OFF
+                         RADIUS: ON
+                    TARGET BODY: OFF
+                         UPDATE: NO
+              ERROR PROPAGATION: OFF
+  CONTROL POINT COORDINATE TYPE FOR REPORTS: LATITUDINAL
+  CONTROL POINT COORDINATE TYPE FOR BUNDLE: LATITUDINAL
+              OUTLIER REJECTION: OFF
+           REJECTION MULTIPLIER: N/A
+
+MAXIMUM LIKELIHOOD ESTIMATION
+============================
+
+                         Tier 0 Enabled: FALSE
+                         Tier 1 Enabled: FALSE
+                         Tier 2 Enabled: FALSE
+
+INPUT: CONVERGENCE CRITERIA
+===========================
+
+                         SIGMA0: 1.000000e-10
+             MAXIMUM ITERATIONS: 10
+
+INPUT: CAMERA POINTING OPTIONS
+==============================
+
+                          CAMSOLVE: ANGLES, VELOCITIES, ACCELERATIONS
+                             TWIST: ON
+ POLYNOMIAL OVER EXISTING POINTING: ON
+
+INPUT: SPACECRAFT OPTIONS
+=========================
+
+                        SPSOLVE: POSITION
+ POLYNOMIAL OVER HERMITE SPLINE: ON
+
+INPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES
+===========================================
+
+               POINT LATITUDE SIGMA: N/A
+              POINT LONGITUDE SIGMA: N/A
+                 POINT RADIUS SIGMA: 500.000000 (meters)
+          SPACECRAFT POSITION SIGMA: 1000.000000 (meters)
+          SPACECRAFT VELOCITY SIGMA: N/A
+      SPACECRAFT ACCELERATION SIGMA: N/A
+                CAMERA ANGLES SIGMA: 0.250000 (dd)
+      CAMERA ANGULAR VELOCITY SIGMA: 0.100000 (dd/s)
+  CAMERA ANGULAR ACCELERATION SIGMA: 0.010000 (dd/s/s)
+
+JIGSAW: RESULTS
+===============
+
+                         Images:    375
+                         Points:  26296
+                 Total Measures: 127782
+             Total Observations: 255564
+              Good Observations: 255564
+          Rejected Observations:      0
+   Constrained Point Parameters:  26322
+   Constrained Image Parameters:   4500
+                       Unknowns:  83388
+             Degrees of Freedom: 202998
+           Convergence Criteria:  1e-10(Sigma0)
+                     Iterations:      4
+                         Sigma0:         0.20930178443943692201
+ Error Propagation Elapsed Time: 0.0000 (seconds)
+             Total Elapsed Time: 380.4300 (seconds)
+
+           Residual Percentiles:
+                 Percentile   1:   -0.661                 Percentile  34:   -0.076                 Percentile  67:   +0.081
+                 Percentile   2:   -0.547                 Percentile  35:   -0.071                 Percentile  68:   +0.087
+                 Percentile   3:   -0.479                 Percentile  36:   -0.065                 Percentile  69:   +0.093
+                 Percentile   4:   -0.431                 Percentile  37:   -0.059                 Percentile  70:   +0.099
+                 Percentile   5:   -0.395                 Percentile  38:   -0.054                 Percentile  71:   +0.105
+                 Percentile   6:   -0.364                 Percentile  39:   -0.049                 Percentile  72:   +0.111
+                 Percentile   7:   -0.341                 Percentile  40:   -0.044                 Percentile  73:   +0.118
+                 Percentile   8:   -0.318                 Percentile  41:   -0.039                 Percentile  74:   +0.125
+                 Percentile   9:   -0.299                 Percentile  42:   -0.034                 Percentile  75:   +0.132
+                 Percentile  10:   -0.283                 Percentile  43:   -0.029                 Percentile  76:   +0.139
+                 Percentile  11:   -0.267                 Percentile  44:   -0.025                 Percentile  77:   +0.147
+                 Percentile  12:   -0.254                 Percentile  45:   -0.020                 Percentile  78:   +0.154
+                 Percentile  13:   -0.241                 Percentile  46:   -0.016                 Percentile  79:   +0.162
+                 Percentile  14:   -0.229                 Percentile  47:   -0.011                 Percentile  80:   +0.171
+                 Percentile  15:   -0.218                 Percentile  48:   -0.007                 Percentile  81:   +0.180
+                 Percentile  16:   -0.208                 Percentile  49:   -0.004                 Percentile  82:   +0.189
+                 Percentile  17:   -0.198                 Percentile  50:   -0.000                 Percentile  83:   +0.198
+                 Percentile  18:   -0.188                 Percentile  51:   +0.003                 Percentile  84:   +0.209
+                 Percentile  19:   -0.180                 Percentile  52:   +0.007                 Percentile  85:   +0.220
+                 Percentile  20:   -0.171                 Percentile  53:   +0.011                 Percentile  86:   +0.232
+                 Percentile  21:   -0.162                 Percentile  54:   +0.016                 Percentile  87:   +0.244
+                 Percentile  22:   -0.154                 Percentile  55:   +0.020                 Percentile  88:   +0.257
+                 Percentile  23:   -0.146                 Percentile  56:   +0.024                 Percentile  89:   +0.272
+                 Percentile  24:   -0.139                 Percentile  57:   +0.029                 Percentile  90:   +0.288
+                 Percentile  25:   -0.132                 Percentile  58:   +0.034                 Percentile  91:   +0.304
+                 Percentile  26:   -0.125                 Percentile  59:   +0.039                 Percentile  92:   +0.323
+                 Percentile  27:   -0.119                 Percentile  60:   +0.044                 Percentile  93:   +0.344
+                 Percentile  28:   -0.112                 Percentile  61:   +0.049                 Percentile  94:   +0.369
+                 Percentile  29:   -0.106                 Percentile  62:   +0.054                 Percentile  95:   +0.399
+                 Percentile  30:   -0.100                 Percentile  63:   +0.059                 Percentile  96:   +0.434
+                 Percentile  31:   -0.093                 Percentile  64:   +0.065                 Percentile  97:   +0.479
+                 Percentile  32:   -0.088                 Percentile  65:   +0.070                 Percentile  98:   +0.543
+                 Percentile  33:   -0.082                 Percentile  66:   +0.075                 Percentile  99:   +0.656
+
+              Residual Box Plot:
+                        minimum:   -1.869
+                     Quartile 1:   -0.132
+                         Median:   -0.000
+                     Quartile 3:   +0.132
+                        maximum:   +2.037
+
+IMAGE MEASURES SUMMARY
+==========================
+
+                                                                                                            Measures                            RMS(pixels)
+                                                                                                  ***************************   *******************************************
+                                                                                                  |  Accepted  |   Total    |   |   Samples   |    Lines    |    Total    |
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03020N316E0040.cub           248          248            0.1928        0.3173        0.2625 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03019N316E0051.cub           345          345            0.1707        0.2548        0.2168 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03021N316E0029.cub           438          438            0.2766        0.2106        0.2458 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03025N297E3584.cub           253          253            0.1802        0.1372        0.1602 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03025N311E3584.cub           129          129            0.0266        0.1282        0.0926 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03025N283E3584.cub           319          319            0.2522        0.1457        0.2059 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03024N278E3595.cub           399          399            0.3870        0.1700        0.2989 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03018N315E0062.cub           388          388            0.1615        0.2341        0.2011 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03024N306E3595.cub           332          332            0.2201        0.2025        0.2115 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03019N302E0050.cub           423          423            0.1672        0.2727        0.2262 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03021N302E0028.cub           460          460            0.2743        0.2343        0.2551 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03020N302E0039.cub           301          301            0.1799        0.3781        0.2961 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03024N292E3595.cub           417          417            0.2552        0.1839        0.2224 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03025N270E3584.cub           310          310            0.4340        0.1657        0.3285 
+/work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03026N311E3573.cub            84           84            0.0589        0.0812        0.0710 
+
+Total RMS:                                                                                                                              0.2641        0.2126        0.2397
+
+IMAGE EXTERIOR ORIENTATION
+==========================
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03020N316E0040.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-12T16:10:02.050274
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000            0.13790414               0.13790414              1000.0            N/A        m
+  Y  (km)          0.00000000            0.09171807               0.09171807              1000.0            N/A        m
+  Z  (km)          0.00000000           -0.21343266              -0.21343266              1000.0            N/A        m
+ RA  (dd)          0.00000000           -0.17150899              -0.17150899                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00741997               0.00741997                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00133389               0.00133389                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000            0.01082193               0.01082193                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.00450095              -0.00450095                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00142119              -0.00142119                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000           -0.13902862              -0.13902862                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00485198               0.00485198                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00147529               0.00147529                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03019N316E0051.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-12T14:11:58.999002
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000           -0.04834306              -0.04834306              1000.0            N/A        m
+  Y  (km)          0.00000000            0.43279896               0.43279896              1000.0            N/A        m
+  Z  (km)          0.00000000           -0.09677002              -0.09677002              1000.0            N/A        m
+ RA  (dd)          0.00000000            0.05216805               0.05216805                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00726666               0.00726666                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00041977              -0.00041977                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000            0.05385872               0.05385872                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.00462291              -0.00462291                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00042802               0.00042802                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000           -0.09892603              -0.09892603                0.25            N/A        dd
+    (dd/s)         0.00000000            0.01473743               0.01473743                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00108539              -0.00108539                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03021N316E0029.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-12T18:08:05.050276
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000            0.21944807               0.21944807              1000.0            N/A        m
+  Y  (km)          0.00000000            0.14436991               0.14436991              1000.0            N/A        m
+  Z  (km)          0.00000000           -0.54471189              -0.54471189              1000.0            N/A        m
+ RA  (dd)          0.00000000           -0.10832395              -0.10832395                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00883267               0.00883267                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00044754              -0.00044754                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000           -0.14173616              -0.14173616                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.00318782              -0.00318782                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00022182              -0.00022182                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000            0.01139489               0.01139489                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00140787               0.00140787                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00117196               0.00117196                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03025N297E3584.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-13T02:00:54.909245
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000           -0.04569226              -0.04569226              1000.0            N/A        m
+  Y  (km)          0.00000000            0.01948868               0.01948868              1000.0            N/A        m
+  Z  (km)          0.00000000            0.00430271               0.00430271              1000.0            N/A        m
+ RA  (dd)          0.00000000            0.01313494               0.01313494                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.00366423              -0.00366423                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00178808              -0.00178808                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000            0.05927123               0.05927123                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00615871               0.00615871                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00050136              -0.00050136                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000            0.48629196               0.48629196                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.02369850              -0.02369850                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00019652              -0.00019652                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03025N311E3584.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-13T02:00:28.337447
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000           -0.06248267              -0.06248267              1000.0            N/A        m
+  Y  (km)          0.00000000           -0.08900668              -0.08900668              1000.0            N/A        m
+  Z  (km)          0.00000000            0.10337443               0.10337443              1000.0            N/A        m
+ RA  (dd)          0.00000000           -0.06113418              -0.06113418                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00486030               0.00486030                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00039538              -0.00039538                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000            0.10102183               0.10102183                0.25            N/A        dd
+    (dd/s)         0.00000000            0.01185208               0.01185208                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00083568               0.00083568                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000            0.48360004               0.48360004                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.00719620              -0.00719620                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00038111              -0.00038111                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03025N283E3584.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-13T02:01:21.481043
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000           -0.04142193              -0.04142193              1000.0            N/A        m
+  Y  (km)          0.00000000           -0.04404038              -0.04404038              1000.0            N/A        m
+  Z  (km)          0.00000000            0.02346738               0.02346738              1000.0            N/A        m
+ RA  (dd)          0.00000000           -0.03463111              -0.03463111                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.00112558              -0.00112558                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00149917               0.00149917                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000            0.07735519               0.07735519                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00510279               0.00510279                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00181898               0.00181898                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000            0.43213982               0.43213982                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.02595010              -0.02595010                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00001555               0.00001555                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03024N278E3595.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-13T00:03:27.909095
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000           -0.05640016              -0.05640016              1000.0            N/A        m
+  Y  (km)          0.00000000            0.22243778               0.22243778              1000.0            N/A        m
+  Z  (km)          0.00000000           -0.05826668              -0.05826668              1000.0            N/A        m
+ RA  (dd)          0.00000000            0.06693617               0.06693617                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00087048               0.00087048                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00041945               0.00041945                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000            0.10707240               0.10707240                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.00061172              -0.00061172                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00147045               0.00147045                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000            0.32723040               0.32723040                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.02298866              -0.02298866                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00037318               0.00037318                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03018N315E0062.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-12T12:13:56.989943
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000           -0.06268669              -0.06268669              1000.0            N/A        m
+  Y  (km)          0.00000000            0.38252233               0.38252233              1000.0            N/A        m
+  Z  (km)          0.00000000           -0.15806015              -0.15806015              1000.0            N/A        m
+ RA  (dd)          0.00000000            0.03345273               0.03345273                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00794184               0.00794184                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00037278              -0.00037278                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000           -0.04274290              -0.04274290                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00041386               0.00041386                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00079677              -0.00079677                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000           -0.20148754              -0.20148754                0.25            N/A        dd
+    (dd/s)         0.00000000            0.02535315               0.02535315                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00066108               0.00066108                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03024N306E3595.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-13T00:02:34.765536
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000           -0.08956560              -0.08956560              1000.0            N/A        m
+  Y  (km)          0.00000000            0.31955171               0.31955171              1000.0            N/A        m
+  Z  (km)          0.00000000           -0.02465902              -0.02465902              1000.0            N/A        m
+ RA  (dd)          0.00000000            0.12881108               0.12881108                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00077515               0.00077515                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00048828               0.00048828                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000            0.12944759               0.12944759                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00422350               0.00422350                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00272102              -0.00272102                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000            0.42166704               0.42166704                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.02352225              -0.02352225                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00015393              -0.00015393                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03019N302E0050.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-12T14:12:25.570810
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000           -0.05541960              -0.05541960              1000.0            N/A        m
+  Y  (km)          0.00000000            0.38114383               0.38114383              1000.0            N/A        m
+  Z  (km)          0.00000000           -0.05391903              -0.05391903              1000.0            N/A        m
+ RA  (dd)          0.00000000            0.03074598               0.03074598                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00935816               0.00935816                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00040786              -0.00040786                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000            0.07071264               0.07071264                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.00494890              -0.00494890                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00070049               0.00070049                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000           -0.08587027              -0.08587027                0.25            N/A        dd
+    (dd/s)         0.00000000            0.01835000               0.01835000                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00088988              -0.00088988                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03021N302E0028.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-12T18:08:31.622084
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000            0.23103156               0.23103156              1000.0            N/A        m
+  Y  (km)          0.00000000            0.20018748               0.20018748              1000.0            N/A        m
+  Z  (km)          0.00000000           -0.55893399              -0.55893399              1000.0            N/A        m
+ RA  (dd)          0.00000000           -0.06279679              -0.06279679                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00002709               0.00002709                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00126845              -0.00126845                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000           -0.16047937              -0.16047937                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.00741313              -0.00741313                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00004799               0.00004799                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000            0.01332148               0.01332148                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.02077520              -0.02077520                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00157148               0.00157148                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03020N302E0039.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-12T16:10:28.622082
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000            0.09133358               0.09133358              1000.0            N/A        m
+  Y  (km)          0.00000000            0.06701897               0.06701897              1000.0            N/A        m
+  Z  (km)          0.00000000           -0.05611183              -0.05611183              1000.0            N/A        m
+ RA  (dd)          0.00000000           -0.17686146              -0.17686146                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00845606               0.00845606                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00022670               0.00022670                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000            0.09421075               0.09421075                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.00673454              -0.00673454                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00061395              -0.00061395                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000           -0.14505629              -0.14505629                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00799301               0.00799301                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00132289               0.00132289                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03024N292E3595.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-13T00:03:01.337315
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000           -0.09185044              -0.09185044              1000.0            N/A        m
+  Y  (km)          0.00000000            0.27731658               0.27731658              1000.0            N/A        m
+  Z  (km)          0.00000000            0.02009743               0.02009743              1000.0            N/A        m
+ RA  (dd)          0.00000000            0.10065918               0.10065918                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00037483               0.00037483                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00057693               0.00057693                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000            0.15750621               0.15750621                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00023157               0.00023157                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00175402              -0.00175402                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000            0.36945110               0.36945110                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.02420534              -0.02420534                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00034047               0.00034047                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03025N270E3584.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-13T02:01:48.052841
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000           -0.04401598              -0.04401598              1000.0            N/A        m
+  Y  (km)          0.00000000            0.00281680               0.00281680              1000.0            N/A        m
+  Z  (km)          0.00000000            0.02381221               0.02381221              1000.0            N/A        m
+ RA  (dd)          0.00000000           -0.00407601              -0.00407601                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.00032833              -0.00032833                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00137458              -0.00137458                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000            0.08769363               0.08769363                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00627620               0.00627620                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00100858               0.00100858                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000            0.40249128               0.40249128                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.02131709              -0.02131709                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00070343               0.00070343                0.01            N/A        dd/s^2
+
+Image Full File Name: /work/projects/kaguya/ladoramkershner/Control/imagenet/Ground/cubes/TC2S2B0_01_03026N311E3573.cub
+
+Image Serial Number: KAGUYA/TC2/2008-06-13T03:58:31.337449
+Image           Initial                 Total                  Final                                      Accuracy
+Parameter       Value                   Correction             Value                      Initial           Final           Units
+                                                                                          ***************************************
+  X  (km)          0.00000000           -0.16851873              -0.16851873              1000.0            N/A        m
+  Y  (km)          0.00000000           -0.13380569              -0.13380569              1000.0            N/A        m
+  Z  (km)          0.00000000            0.39572527               0.39572527              1000.0            N/A        m
+ RA  (dd)          0.00000000            0.02225835               0.02225835                0.25            N/A        dd
+    (dd/s)         0.00000000            0.00122232               0.00122232                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000           -0.00030953              -0.00030953                0.01            N/A        dd/s^2
+DEC  (dd)          0.00000000            0.16839578               0.16839578                0.25            N/A        dd
+    (dd/s)         0.00000000            0.01172026               0.01172026                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00031655               0.00031655                0.01            N/A        dd/s^2
+TWI  (dd)          0.00000000            0.64132778               0.64132778                0.25            N/A        dd
+    (dd/s)         0.00000000           -0.01115940              -0.01115940                 0.1            N/A        dd/s
+   (dd/s^2)        0.00000000            0.00016458               0.00016458                0.01            N/A        dd/s^2
+
+
+POINTS SUMMARY
+==============
+                                                                                                       Sigma          Sigma              Sigma
+           Label         Status     Rays    RMS        Latitude       Longitude          Radius        Latitude       Longitude          Radius
+TC2W2B0_01_05183N276E0073_bndry_8_kag_ap15           FREE   10 of 10  0.22     26.87747145      7.81031855   1734.97794420             N/A             N/A             N/A
+TC2W2B0_01_05183N289E0073_UL_kag_ap15           FREE   10 of 10  0.26     28.20707946      6.60352896   1734.94226643             N/A             N/A             N/A
+TC2W2B0_01_05190N250E3599_bndry_25_kag_ap15           FREE    8 of 8  0.30     24.42895279    359.31739636   1735.51514077             N/A             N/A             N/A
+TC2W2B0_01_05183N276E0073_UL_kag_ap15           FREE    9 of 9  0.26     26.84643109      6.64739543   1736.17545696             N/A             N/A             N/A
+TC2W2B0_01_05190N277E3599_grid_33_kag_ap15           FREE    8 of 8  0.19     27.13428690    359.39927126   1735.34200330             N/A             N/A             N/A
+TC2W2B0_01_05187N209E0032_bndry_17_kag_ap15           FREE    9 of 9  0.25     21.67761158      2.68026117   1736.71989217             N/A             N/A             N/A
+TC2W2B0_01_05183N262E0073_bndry_8_kag_ap15           FREE    9 of 9  0.24     25.52848989      7.83109968   1734.90985215             N/A             N/A             N/A
+TC2S2B0_01_03022N248E0017_bndry_3_kag_ap15           FREE    8 of 8  0.31     25.60346543      1.43943458   1735.44130855             N/A             N/A             N/A
+TC2W2B0_01_05188N277E0020_UL_kag_ap15           FREE    8 of 8  0.34     26.94468262      1.36019374   1735.34916105             N/A             N/A             N/A
+TC2S2B0_01_03023N275E0006_grid_96_kag_ap15           FREE    9 of 9  0.25     26.90593607      1.13417569   1735.33121732             N/A             N/A             N/A
+TC2W2B0_01_05188N263E0020_grid_95_kag_ap15           FREE    9 of 9  0.33     26.92744766      2.37656624   1735.38286341             N/A             N/A             N/A
+TC2W2B0_01_05182N290E0083_UL_kag_ap15           FREE   10 of 10  0.16     28.23751097      7.66261726   1734.87389156             N/A             N/A             N/A
+TC2W2B0_01_05190N264E3599_grid_33_kag_ap15           FREE    8 of 8  0.17     25.78089766    359.43037428   1735.58945153             N/A             N/A             N/A
+TC1W2B0_01_05189N272E0010_grid_56_kag_ap15           FREE    8 of 8  0.23     26.93289215      1.46528597   1735.34875218             N/A             N/A             N/A
+TC2W2B0_01_05182N263E0084_UL_kag_ap15           FREE    8 of 8  0.25     25.53750508      7.73429962   1735.08171497             N/A             N/A             N/A
+TC1S2B0_01_05187N292E0029_grid_88_kag_ap15           FREE    9 of 9  0.24     29.61997656      3.31677337   1735.41494494             N/A             N/A             N/A
+TC2W2B0_01_05188N277E0020_bndry_1_kag_ap15           FREE    8 of 8  0.19     26.94646820      1.50546257   1735.35318474             N/A             N/A             N/A
+TC1W2B0_01_05182N245E0084_bndry_28_kag_ap15           FREE    8 of 8  0.24     24.34272663      7.75783592   1734.86523895             N/A             N/A             N/A
+TC2W2B0_01_05190N277E3599_bndry_25_kag_ap15           FREE    8 of 8  0.38     27.13296920    359.25424854   1735.34440926             N/A             N/A             N/A
+TC1W2B0_01_05188N259E0020_bndry_27_kag_ap15           FREE    8 of 8  0.34     25.60561397      1.38884882   1735.46279668             N/A             N/A             N/A
+TC1S2B0_01_05186N279E0039_grid_81_kag_ap15           FREE    9 of 9  0.18     28.24268147      3.45114396   1735.46049325             N/A             N/A             N/A
+TC2W2B0_01_05190N250E3599_LL_kag_ap15           FREE    8 of 8  0.33     25.77266624    359.28722517   1735.54880510             N/A             N/A             N/A
+TC2S2B0_01_03016N274E0083_bndry_1_kag_ap15           FREE    8 of 8  0.15     28.24929582      7.74356782   1734.85844312             N/A             N/A             N/A
+TC2W2B0_01_05185N263E0052_UR_kag_ap15           FREE    9 of 9  0.19     25.59998404      5.84198246   1737.31457784             N/A             N/A             N/A
+TC2S2B0_01_03024N265E3595_grid_35_kag_ap15           FREE    8 of 8  0.41     27.08852850    359.24892321   1735.35830190             N/A             N/A             N/A
+TC2S2B0_01_03017N261E0072_UR_kag_ap15           FREE    9 of 9  0.18     26.89212799      7.88772079   1734.87150169             N/A             N/A             N/A
+TC2S2B0_01_03024N265E3595_grid_36_kag_ap15           FREE    8 of 8  0.15     27.08674631    359.40636231   1735.33426647             N/A             N/A             N/A
+TC2W2B0_01_05191N264E3589_bndry_24_kag_ap15           FREE    7 of 7  0.24     27.15462469    359.36233164   1735.34574434             N/A             N/A             N/A
+TC2W2B0_01_05189N236E0010_UR_kag_ap15           FREE    9 of 9  0.25     22.83754508      1.64471303   1738.51361529             N/A             N/A             N/A
+TC2S2B0_01_03016N261E0083_UL_kag_ap15           FREE   10 of 10  0.30     26.87697720      7.57852044   1735.44271334             N/A             N/A             N/A
+TC2S2B0_01_03022N262E0017_bndry_4_kag_ap15           FREE    9 of 9  0.36     26.96994983      1.61070184   1735.36389254             N/A             N/A             N/A
+TC2S2B0_01_03016N261E0083_bndry_2_kag_ap15           FREE    9 of 9  0.20     26.88128269      7.88704612   1734.87192044             N/A             N/A             N/A
+TC2W2B0_01_05182N236E0084_bndry_30_kag_ap15           FREE    8 of 8  0.23     23.83125128      7.77511835   1734.89214652             N/A             N/A             N/A
+TC1W2B0_01_05182N245E0084_bndry_1_kag_ap15           FREE   10 of 10  0.19     23.68638644      7.91726506   1734.86406433             N/A             N/A             N/A
+TC2S2B0_01_03025N242E3583_grid_60_kag_ap15           FREE    7 of 7  0.23     24.35408713    358.26784929   1735.69901500             N/A             N/A             N/A
+TC2W2B0_01_05192N249E3578_bndry_9_kag_ap15           FREE    7 of 7  0.24     24.37722586    358.48897483   1735.64854875             N/A             N/A             N/A
+TC2W2B0_01_05189N263E0010_bndry_17_kag_ap15           FREE    7 of 7  0.13     27.06528315      0.45153098   1735.35817193             N/A             N/A             N/A
+TC2W2B0_01_05183N289E0073_bndry_1_kag_ap15           FREE    7 of 7  0.09     28.20984005      6.75193749   1734.92888694             N/A             N/A             N/A
+TC2W2B0_01_05182N290E0083_bndry_32_kag_ap15           FREE    9 of 9  0.16     29.55688761      7.62635882   1734.90130934             N/A             N/A             N/A
+TC1S2B0_01_05186N292E0039_bndry_17_kag_ap15           FREE    8 of 8  0.14     29.94136868      3.40644455   1735.31474761             N/A             N/A             N/A
+TC2W2B0_01_05182N222E0085_bndry_17_kag_ap15           FREE    9 of 9  0.16     23.00097473      7.93776161   1734.97755604             N/A             N/A             N/A
+TC2S2B0_01_03018N274E0061_bndry_8_kag_ap15           FREE    7 of 7  0.14     28.23201186      6.66119385   1734.93935119             N/A             N/A             N/A
+TC2S2B0_01_03018N206E0060_grid_35_kag_ap15           FREE   11 of 11  0.21     21.21552567      5.78882513   1736.55050340             N/A             N/A             N/A
+TC2W2B0_01_05184N209E0064_LL_kag_ap15           FREE    7 of 7  0.21     21.67276519      5.71511422   1736.76535927             N/A             N/A             N/A
+TC1S2B0_01_05187N300E0028_UR_kag_ap15           FREE    8 of 8  0.26     29.81443197      3.45201127   1735.31922476             N/A             N/A             N/A
+TC1W2B0_01_05188N259E0020_grid_49_kag_ap15           FREE    8 of 8  0.20     25.60791489      1.53202289   1735.41926937             N/A             N/A             N/A
+TC2W2B0_01_05192N263E3578_bndry_24_kag_ap15           FREE    7 of 7  0.11     27.07659547    358.31323499   1735.26016649             N/A             N/A             N/A
+TC2W2B0_01_05192N263E3578_LR_kag_ap15           FREE    7 of 7  0.29     27.07648086    358.45892716   1735.33056425             N/A             N/A             N/A
+TC1W2B0_01_05184N218E0063_bndry_17_kag_ap15           FREE    9 of 9  0.26     22.56081683      5.83263218   1737.25735281             N/A             N/A             N/A
+TC2W2B0_01_05183N208E0074_grid_81_kag_ap15           FREE    9 of 9  0.20     21.25191488      6.92344337   1736.87211777             N/A             N/A             N/A
+ lak_hand_grnd_1    CONSTRAINED    3 of 3  0.61     29.46316933    358.98615952   1735.32430195             N/A             N/A             N/A
+ lak_hand_grnd_2    CONSTRAINED    2 of 2  0.79     29.99669857      4.25902183   1735.23474090             N/A             N/A             N/A
+ lak_hand_grnd_3    CONSTRAINED    2 of 2  0.94     30.01917869      6.84856698   1734.95842411             N/A             N/A             N/A
+ lak_hand_grnd_4    CONSTRAINED    4 of 4  0.52     27.42134350    359.09468033   1735.40619044             N/A             N/A             N/A
+ lak_hand_grnd_5    CONSTRAINED    6 of 6  0.49     26.94981414      2.04137154   1735.33805137             N/A             N/A             N/A
+ lak_hand_grnd_6    CONSTRAINED    2 of 2  0.54     25.18523457    359.77445305   1735.29305157             N/A             N/A             N/A
+ lak_hand_grnd_7    CONSTRAINED    3 of 3  0.92     21.41750858    358.30620852   1735.42620773             N/A             N/A             N/A
+ lak_hand_grnd_8    CONSTRAINED    4 of 4  0.59     25.58090079      2.62104625   1735.41695137             N/A             N/A             N/A
+ lak_hand_grnd_9    CONSTRAINED    5 of 5  0.80     23.78057085      7.60667399   1734.85237547             N/A             N/A             N/A
+lak_hand_grnd_10    CONSTRAINED    2 of 2  0.36     23.70900375      2.84825857   1735.95194178             N/A             N/A             N/A
+lak_hand_grnd_11    CONSTRAINED    7 of 7  0.28     25.74680805      5.63045774   1737.32280236             N/A             N/A             N/A
+lak_hand_grnd_12    CONSTRAINED    7 of 7  0.41     27.11345033      4.53286977   1735.32093050             N/A             N/A             N/A
+lak_hand_grnd_13    CONSTRAINED    5 of 5  0.43     22.27576668      5.71501575   1737.95068083             N/A             N/A             N/A
+
+
+POINTS DETAIL
+=============
+
+ Label: TC2W2B0_01_05183N276E0073_bndry_8_kag_ap15
+Status: FREE
+  Rays: 10 of 10
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      26.87628005           0.00119140         36.07678332         26.87747145              FREE               N/A
+ LONGITUDE       7.80402672           0.00629183        169.94207602          7.81031855              FREE               N/A
+    RADIUS    1734.96374043           0.01420377         14.20376957       1734.97794420      500.00000000               N/A
+
+ Label: TC2W2B0_01_05183N289E0073_UL_kag_ap15
+Status: FREE
+  Rays: 10 of 10
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      28.21179824          -0.00471879       -142.88699857         28.20707946              FREE               N/A
+ LONGITUDE       6.59782883           0.00570013        152.10513245          6.60352896              FREE               N/A
+    RADIUS    1734.95715478          -0.01488835        -14.88834508       1734.94226643      500.00000000               N/A
+
+ Label: TC2W2B0_01_05190N250E3599_bndry_25_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      24.43794919          -0.00899640       -272.50507429         24.42895279              FREE               N/A
+ LONGITUDE     359.31283297           0.00456338        125.85213738        359.31739636              FREE               N/A
+    RADIUS    1735.53374773          -0.01860696        -18.60695956       1735.51514077      500.00000000               N/A
+
+ Label: TC2W2B0_01_05183N276E0073_UL_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      26.85057890          -0.00414780       -125.68663561         26.84643109              FREE               N/A
+ LONGITUDE       6.64102574           0.00636969        172.21103450          6.64739543              FREE               N/A
+    RADIUS    1736.19534879          -0.01989183        -19.89182960       1736.17545696      500.00000000               N/A
+
+ Label: TC2W2B0_01_05190N277E3599_grid_33_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      27.14268100          -0.00839410       -254.23578387         27.13428690              FREE               N/A
+ LONGITUDE     359.39318791           0.00608335        163.97063577        359.39927126              FREE               N/A
+    RADIUS    1735.34473377          -0.00273047         -2.73046995       1735.34200330      500.00000000               N/A
+
+ Label: TC2W2B0_01_05187N209E0032_bndry_17_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      21.68960064          -0.01198906       -363.40604436         21.67761158              FREE               N/A
+ LONGITUDE       2.67893654           0.00132463         37.31188534          2.68026117              FREE               N/A
+    RADIUS    1736.70976096           0.01013121         10.13120800       1736.71989217      500.00000000               N/A
+
+ Label: TC2W2B0_01_05183N262E0073_bndry_8_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      25.52770856           0.00078133         23.65856740         25.52848989              FREE               N/A
+ LONGITUDE       7.82530254           0.00579714        158.39918513          7.83109968              FREE               N/A
+    RADIUS    1734.91309047          -0.00323831         -3.23831267       1734.90985215      500.00000000               N/A
+
+ Label: TC2S2B0_01_03022N248E0017_bndry_3_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      25.61560167          -0.01213624       -367.59659097         25.60346543              FREE               N/A
+ LONGITUDE       1.43471515           0.00471943        128.91096614          1.43943458              FREE               N/A
+    RADIUS    1735.44336916          -0.00206061         -2.06061030       1735.44130855      500.00000000               N/A
+
+ Label: TC2W2B0_01_05188N277E0020_UL_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      26.95690570          -0.01222308       -370.20709391         26.94468262              FREE               N/A
+ LONGITUDE       1.35489822           0.00529553        142.97750514          1.36019374              FREE               N/A
+    RADIUS    1735.35273428          -0.00357323         -3.57322695       1735.34916105      500.00000000               N/A
+
+ Label: TC2S2B0_01_03023N275E0006_grid_96_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      26.91850128          -0.01256521       -380.56552177         26.90593607              FREE               N/A
+ LONGITUDE       1.13031188           0.00386380        104.35614255          1.13417569              FREE               N/A
+    RADIUS    1735.34695781          -0.01574049        -15.74049235       1735.33121732      500.00000000               N/A
+
+ Label: TC2W2B0_01_05188N263E0020_grid_95_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      26.94011888          -0.01267122       -383.78762773         26.92744766              FREE               N/A
+ LONGITUDE       2.37304561           0.00352063         95.07233601          2.37656624              FREE               N/A
+    RADIUS    1735.39791629          -0.01505288        -15.05287806       1735.38286341      500.00000000               N/A
+
+ Label: TC2W2B0_01_05182N290E0083_UL_kag_ap15
+Status: FREE
+  Rays: 10 of 10
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      28.23662117           0.00088980         26.94240763         28.23751097              FREE               N/A
+ LONGITUDE       7.65657869           0.00603857        161.08385339          7.66261726              FREE               N/A
+    RADIUS    1734.86347044           0.01042112         10.42111572       1734.87389156      500.00000000               N/A
+
+ Label: TC2W2B0_01_05190N264E3599_grid_33_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      25.78968611          -0.00878845       -266.21762489         25.78089766              FREE               N/A
+ LONGITUDE     359.42513442           0.00523985        142.92554097        359.43037428              FREE               N/A
+    RADIUS    1735.60689377          -0.01744225        -17.44224513       1735.58945153      500.00000000               N/A
+
+ Label: TC1W2B0_01_05189N272E0010_grid_56_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      26.94521440          -0.01232225       -373.21088845         26.93289215              FREE               N/A
+ LONGITUDE       1.46008001           0.00520597        140.57405776          1.46528597              FREE               N/A
+    RADIUS    1735.35780431          -0.00905213         -9.05213334       1735.34875218      500.00000000               N/A
+
+ Label: TC2W2B0_01_05182N263E0084_UL_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      25.53699680           0.00050827         15.39198467         25.53750508              FREE               N/A
+ LONGITUDE       7.72844444           0.00585518        159.98911456          7.73429962              FREE               N/A
+    RADIUS    1735.11282263          -0.03110767        -31.10766588       1735.08171497      500.00000000               N/A
+
+ Label: TC1S2B0_01_05187N292E0029_grid_88_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      29.63298581          -0.01300925       -394.03337112         29.61997656              FREE               N/A
+ LONGITUDE       3.31222271           0.00455066        119.82186514          3.31677337              FREE               N/A
+    RADIUS    1735.44715735          -0.03221241        -32.21241220       1735.41494494      500.00000000               N/A
+
+ Label: TC2W2B0_01_05188N277E0020_bndry_1_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      26.95892943          -0.01246123       -377.42114786         26.94646820              FREE               N/A
+ LONGITUDE       1.50026995           0.00519262        140.19704339          1.50546257              FREE               N/A
+    RADIUS    1735.34312030           0.01006444         10.06444468       1735.35318474      500.00000000               N/A
+
+ Label: TC1W2B0_01_05182N245E0084_bndry_28_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      24.34262034           0.00010629          3.21843386         24.34272663              FREE               N/A
+ LONGITUDE       7.75239385           0.00544207        150.13123243          7.75783592              FREE               N/A
+    RADIUS    1734.86998613          -0.00474718         -4.74718137       1734.86523895      500.00000000               N/A
+
+ Label: TC2W2B0_01_05190N277E3599_bndry_25_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      27.14072023          -0.00775103       -234.75908752         27.13296920              FREE               N/A
+ LONGITUDE     359.24804248           0.00620606        167.28040546        359.25424854              FREE               N/A
+    RADIUS    1735.34215834           0.00225092          2.25091756       1735.34440926      500.00000000               N/A
+
+ Label: TC1W2B0_01_05188N259E0020_bndry_27_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      25.61770263          -0.01208866       -366.15989777         25.60561397              FREE               N/A
+ LONGITUDE       1.38410389           0.00474494        129.60703168          1.38884882              FREE               N/A
+    RADIUS    1735.46659625          -0.00379957         -3.79956856       1735.46279668      500.00000000               N/A
+
+ Label: TC1S2B0_01_05186N279E0039_grid_81_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      28.25489050          -0.01220903       -369.80544498         28.24268147              FREE               N/A
+ LONGITUDE       3.44669644           0.00444752        118.67574065          3.45114396              FREE               N/A
+    RADIUS    1735.47552648          -0.01503322        -15.03322370       1735.46049325      500.00000000               N/A
+
+ Label: TC2W2B0_01_05190N250E3599_LL_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      25.78086217          -0.00819592       -248.26307921         25.77266624              FREE               N/A
+ LONGITUDE     359.28189242           0.00533275        145.46622302        359.28722517              FREE               N/A
+    RADIUS    1735.56618957          -0.01738447        -17.38447254       1735.54880510      500.00000000               N/A
+
+ Label: TC2S2B0_01_03016N274E0083_bndry_1_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      28.24788113           0.00141469         42.83540508         28.24929582              FREE               N/A
+ LONGITUDE       7.73664113           0.00692669        184.75330230          7.74356782              FREE               N/A
+    RADIUS    1734.87369364          -0.01525052        -15.25051531       1734.85844312      500.00000000               N/A
+
+ Label: TC2W2B0_01_05185N263E0052_UR_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      25.60694151          -0.00695748       -210.96358815         25.59998404              FREE               N/A
+ LONGITUDE       5.83684252           0.00513995        140.55312709          5.84198246              FREE               N/A
+    RADIUS    1737.34210793          -0.02753008        -27.53008362       1737.31457784      500.00000000               N/A
+
+ Label: TC2S2B0_01_03024N265E3595_grid_35_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      27.09619744          -0.00766894       -232.27465433         27.08852850              FREE               N/A
+ LONGITUDE     359.24276540           0.00615781        166.04713945        359.24892321              FREE               N/A
+    RADIUS    1735.37017464          -0.01187274        -11.87274286       1735.35830190      500.00000000               N/A
+
+ Label: TC2S2B0_01_03017N261E0072_UR_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      26.89064375           0.00148423         44.94142934         26.89212799              FREE               N/A
+ LONGITUDE       7.88154958           0.00617121        166.65236635          7.88772079              FREE               N/A
+    RADIUS    1734.86799666           0.00350503          3.50502853       1734.87150169      500.00000000               N/A
+
+ Label: TC2S2B0_01_03024N265E3595_grid_36_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      27.09519720          -0.00845089       -255.95458461         27.08674631              FREE               N/A
+ LONGITUDE     359.40031352           0.00604879        163.10755108        359.40636231              FREE               N/A
+    RADIUS    1735.33421313           0.00005334          0.05334444       1735.33426647      500.00000000               N/A
+
+ Label: TC2W2B0_01_05191N264E3589_bndry_24_kag_ap15
+Status: FREE
+  Rays: 7 of 7
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      27.16291978          -0.00829509       -251.23742855         27.15462469              FREE               N/A
+ LONGITUDE     359.35636479           0.00596685        160.80167447        359.36233164              FREE               N/A
+    RADIUS    1735.35076220          -0.00501787         -5.01786528       1735.34574434      500.00000000               N/A
+
+ Label: TC2W2B0_01_05189N236E0010_UR_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      22.84998968          -0.01244460       -377.60369856         22.83754508              FREE               N/A
+ LONGITUDE       1.64278234           0.00193069         53.99006532          1.64471303              FREE               N/A
+    RADIUS    1738.55743923          -0.04382394        -43.82394221       1738.51361529      500.00000000               N/A
+
+ Label: TC2S2B0_01_03016N261E0083_UL_kag_ap15
+Status: FREE
+  Rays: 10 of 10
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      26.87663263           0.00034457         10.43662437         26.87697720              FREE               N/A
+ LONGITUDE       7.57335044           0.00517000        139.67957538          7.57852044              FREE               N/A
+    RADIUS    1735.44395649          -0.00124315         -1.24314740       1735.44271334      500.00000000               N/A
+
+ Label: TC2S2B0_01_03022N262E0017_bndry_4_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      26.98256456          -0.01261473       -382.07248587         26.96994983              FREE               N/A
+ LONGITUDE       1.60582024           0.00488160        131.77317559          1.61070184              FREE               N/A
+    RADIUS    1735.36031697           0.00357557          3.57556921       1735.36389254      500.00000000               N/A
+
+ Label: TC2S2B0_01_03016N261E0083_bndry_2_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      26.87964462           0.00163807         49.59934332         26.88128269              FREE               N/A
+ LONGITUDE       7.88086991           0.00617621        166.80357409          7.88704612              FREE               N/A
+    RADIUS    1734.87504813          -0.00312769         -3.12769119       1734.87192044      500.00000000               N/A
+
+ Label: TC2W2B0_01_05182N236E0084_bndry_30_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      23.83102050           0.00023077          6.98772204         23.83125128              FREE               N/A
+ LONGITUDE       7.77034414           0.00477421        132.23574480          7.77511835              FREE               N/A
+    RADIUS    1734.88750744           0.00463908          4.63908140       1734.89214652      500.00000000               N/A
+
+ Label: TC1W2B0_01_05182N245E0084_bndry_1_kag_ap15
+Status: FREE
+  Rays: 10 of 10
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      23.68534563           0.00104081         31.51468650         23.68638644              FREE               N/A
+ LONGITUDE       7.91336629           0.00389877        108.10638935          7.91726506              FREE               N/A
+    RADIUS    1734.84989088           0.01417345         14.17344732       1734.86406433      500.00000000               N/A
+
+ Label: TC2S2B0_01_03025N242E3583_grid_60_kag_ap15
+Status: FREE
+  Rays: 7 of 7
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      24.35962344          -0.00553631       -167.71501035         24.35408713              FREE               N/A
+ LONGITUDE     358.26333492           0.00451437        124.58734345        358.26784929              FREE               N/A
+    RADIUS    1735.67824934           0.02076566         20.76565794       1735.69901500      500.00000000               N/A
+
+ Label: TC2W2B0_01_05192N249E3578_bndry_9_kag_ap15
+Status: FREE
+  Rays: 7 of 7
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      24.38374230          -0.00651644       -197.40109868         24.37722586              FREE               N/A
+ LONGITUDE     358.48461066           0.00436417        120.41660559        358.48897483              FREE               N/A
+    RADIUS    1735.66059853          -0.01204978        -12.04978294       1735.64854875      500.00000000               N/A
+
+ Label: TC2W2B0_01_05189N263E0010_bndry_17_kag_ap15
+Status: FREE
+  Rays: 7 of 7
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      27.07649263          -0.01120948       -339.50950352         27.06528315              FREE               N/A
+ LONGITUDE       0.44580758           0.00572340        154.36492577          0.45153098              FREE               N/A
+    RADIUS    1735.34755098           0.01062094         10.62094082       1735.35817193      500.00000000               N/A
+
+ Label: TC2W2B0_01_05183N289E0073_bndry_1_kag_ap15
+Status: FREE
+  Rays: 7 of 7
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      28.21357376          -0.00373371       -113.05752274         28.20984005              FREE               N/A
+ LONGITUDE       6.74497031           0.00696718        185.90956403          6.75193749              FREE               N/A
+    RADIUS    1734.95222860          -0.02334166        -23.34165684       1734.92888694      500.00000000               N/A
+
+ Label: TC2W2B0_01_05182N290E0083_bndry_32_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      29.55602752           0.00086009         26.04332610         29.55688761              FREE               N/A
+ LONGITUDE       7.62078382           0.00557500        146.84167978          7.62635882              FREE               N/A
+    RADIUS    1734.90309873          -0.00178939         -1.78938551       1734.90130934      500.00000000               N/A
+
+ Label: TC1S2B0_01_05186N292E0039_bndry_17_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      29.95426481          -0.01289614       -390.58469961         29.94136868              FREE               N/A
+ LONGITUDE       3.40149564           0.00494891        129.88296183          3.40644455              FREE               N/A
+    RADIUS    1735.34216716          -0.02741956        -27.41955532       1735.31474761      500.00000000               N/A
+
+ Label: TC2W2B0_01_05182N222E0085_bndry_17_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      22.99975000           0.00122473         37.08618097         23.00097473              FREE               N/A
+ LONGITUDE       7.93367455           0.00408706        113.92137702          7.93776161              FREE               N/A
+    RADIUS    1734.97238885           0.00516718          5.16718427       1734.97755604      500.00000000               N/A
+
+ Label: TC2S2B0_01_03018N274E0061_bndry_8_kag_ap15
+Status: FREE
+  Rays: 7 of 7
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      28.23608163          -0.00406977       -123.23423488         28.23201186              FREE               N/A
+ LONGITUDE       6.65415055           0.00704330        187.90266518          6.66119385              FREE               N/A
+    RADIUS    1734.96021184          -0.02086064        -20.86064320       1734.93935119      500.00000000               N/A
+
+ Label: TC2S2B0_01_03018N206E0060_grid_35_kag_ap15
+Status: FREE
+  Rays: 11 of 11
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      21.22219975          -0.00667408       -202.28146712         21.21552567              FREE               N/A
+ LONGITUDE       5.78650533           0.00231980         65.54461319          5.78882513              FREE               N/A
+    RADIUS    1736.57592558          -0.02542218        -25.42218128       1736.55050340      500.00000000               N/A
+
+ Label: TC2W2B0_01_05184N209E0064_LL_kag_ap15
+Status: FREE
+  Rays: 7 of 7
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      21.67952188          -0.00675670       -204.81089270         21.67276519              FREE               N/A
+ LONGITUDE       5.71115991           0.00395431        111.39068268          5.71511422              FREE               N/A
+    RADIUS    1736.80127419          -0.03591492        -35.91492394       1736.76535927      500.00000000               N/A
+
+ Label: TC1S2B0_01_05187N300E0028_UR_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      29.82717808          -0.01274610       -386.04168135         29.81443197              FREE               N/A
+ LONGITUDE       3.44702791           0.00498336        130.95404573          3.45201127              FREE               N/A
+    RADIUS    1735.34559322          -0.02636847        -26.36846680       1735.31922476      500.00000000               N/A
+
+ Label: TC1W2B0_01_05188N259E0020_grid_49_kag_ap15
+Status: FREE
+  Rays: 8 of 8
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      25.62014582          -0.01223094       -370.46023278         25.60791489              FREE               N/A
+ LONGITUDE       1.52735671           0.00466618        127.45017129          1.53202289              FREE               N/A
+    RADIUS    1735.41759958           0.00166978          1.66978406       1735.41926937      500.00000000               N/A
+
+ Label: TC2W2B0_01_05192N263E3578_bndry_24_kag_ap15
+Status: FREE
+  Rays: 7 of 7
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      27.08056526          -0.00396979       -120.22904872         27.07659547              FREE               N/A
+ LONGITUDE     358.30707567           0.00615932        166.09600405        358.31323499              FREE               N/A
+    RADIUS    1735.24484073           0.01532576         15.32575564       1735.26016649      500.00000000               N/A
+
+ Label: TC2W2B0_01_05192N263E3578_LR_kag_ap15
+Status: FREE
+  Rays: 7 of 7
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      27.08126960          -0.00478873       -145.03747927         27.07648086              FREE               N/A
+ LONGITUDE     358.45289408           0.00603308        162.69856170        358.45892716              FREE               N/A
+    RADIUS    1735.32323113           0.00733312          7.33312257       1735.33056425      500.00000000               N/A
+
+ Label: TC1W2B0_01_05184N218E0063_bndry_17_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      22.56758787          -0.00677104       -205.30363147         22.56081683              FREE               N/A
+ LONGITUDE       5.82900693           0.00362525        101.50882437          5.83263218              FREE               N/A
+    RADIUS    1737.18876489           0.06858793         68.58792546       1737.25735281      500.00000000               N/A
+
+ Label: TC2W2B0_01_05183N208E0074_grid_81_kag_ap15
+Status: FREE
+  Rays: 9 of 9
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      21.25422170          -0.00230682        -69.92927161         21.25191488              FREE               N/A
+ LONGITUDE       6.92068820           0.00275517         77.84074038          6.92344337              FREE               N/A
+    RADIUS    1736.89941395          -0.02729618        -27.29617996       1736.87211777      500.00000000               N/A
+
+ Label: lak_hand_grnd_1
+Status: CONSTRAINED
+  Rays: 3 of 3
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      29.46093760           0.00223173         67.59274408         29.46316933       30.00000000               N/A
+ LONGITUDE     358.98437500           0.00178452         47.05810329        358.98615952       30.00000000               N/A
+    RADIUS    1735.23674716           0.08755479         87.55478783       1735.32430195       50.00000000               N/A
+
+ Label: lak_hand_grnd_2
+Status: CONSTRAINED
+  Rays: 2 of 2
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      29.99976094          -0.00306237        -92.74560344         29.99669857       30.00000000               N/A
+ LONGITUDE       4.25788640           0.00113543         29.78104304          4.25902183       30.00000000               N/A
+    RADIUS    1735.21665246           0.01808844         18.08843723       1735.23474090       50.00000000               N/A
+
+ Label: lak_hand_grnd_3
+Status: CONSTRAINED
+  Rays: 2 of 2
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      30.01518215           0.00399653        121.01800042         30.01917869       30.00000000               N/A
+ LONGITUDE       6.84837873           0.00018825          4.93581320          6.84856698       30.00000000               N/A
+    RADIUS    1734.86381119           0.09461292         94.61292182       1734.95842411       50.00000000               N/A
+
+ Label: lak_hand_grnd_4
+Status: CONSTRAINED
+  Rays: 4 of 4
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      27.42089482           0.00044867         13.58971450         27.42134350       30.00000000               N/A
+ LONGITUDE     359.09348294           0.00119739         32.19238594        359.09468033       30.00000000               N/A
+    RADIUS    1735.33300905           0.07318139         73.18138558       1735.40619044       50.00000000               N/A
+
+ Label: lak_hand_grnd_5
+Status: CONSTRAINED
+  Rays: 6 of 6
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      26.95423306          -0.00441891       -133.83725919         26.94981414       30.00000000               N/A
+ LONGITUDE       2.04134651           0.00002503          0.67572259          2.04137154       30.00000000               N/A
+    RADIUS    1735.24180347           0.09624790         96.24789978       1735.33805137       50.00000000               N/A
+
+ Label: lak_hand_grnd_6
+Status: CONSTRAINED
+  Rays: 2 of 2
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      25.18623567          -0.00100109        -30.31967300         25.18523457       30.00000000               N/A
+ LONGITUDE     359.77479017          -0.00033712         -9.23969086        359.77445305       30.00000000               N/A
+    RADIUS    1735.30569465          -0.01264307        -12.64307448       1735.29305157       50.00000000               N/A
+
+ Label: lak_hand_grnd_7
+Status: CONSTRAINED
+  Rays: 3 of 3
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      21.41664428           0.00086431         26.17888632         21.41750858       30.00000000               N/A
+ LONGITUDE     358.30915478          -0.00294626        -83.07663902        358.30620852       30.00000000               N/A
+    RADIUS    1735.32902069           0.09718704         97.18704171       1735.42620773       50.00000000               N/A
+
+ Label: lak_hand_grnd_8
+Status: CONSTRAINED
+  Rays: 4 of 4
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      25.58383800          -0.00293721        -88.96444380         25.58090079       30.00000000               N/A
+ LONGITUDE       2.62094762           0.00009862          2.69438551          2.62104625       30.00000000               N/A
+    RADIUS    1735.32473232           0.09221905         92.21905349       1735.41695137       50.00000000               N/A
+
+ Label: lak_hand_grnd_9
+Status: CONSTRAINED
+  Rays: 5 of 5
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      23.77253838           0.00803247        243.21410879         23.78057085       30.00000000               N/A
+ LONGITUDE       7.60771974          -0.00104576        -28.97589039          7.60667399       30.00000000               N/A
+    RADIUS    1734.80650000           0.04587547         45.87546517       1734.85237547       50.00000000               N/A
+
+ Label: lak_hand_grnd_10
+Status: CONSTRAINED
+  Rays: 2 of 2
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      23.71062496          -0.00162121        -49.11957514         23.70900375       30.00000000               N/A
+ LONGITUDE       2.84939188          -0.00113331        -31.43901437          2.84825857       30.00000000               N/A
+    RADIUS    1735.98457879          -0.03263702        -32.63701832       1735.95194178       50.00000000               N/A
+
+ Label: lak_hand_grnd_11
+Status: CONSTRAINED
+  Rays: 7 of 7
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      25.74579529           0.00101277         30.70911039         25.74680805       30.00000000               N/A
+ LONGITUDE       5.63048882          -0.00003108         -0.84896147          5.63045774       30.00000000               N/A
+    RADIUS    1737.27121671           0.05158564         51.58564486       1737.32280236       50.00000000               N/A
+
+ Label: lak_hand_grnd_12
+Status: CONSTRAINED
+  Rays: 7 of 7
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      27.11428485          -0.00083452        -25.27508103         27.11345033       30.00000000               N/A
+ LONGITUDE       4.53135987           0.00150990         40.70506366          4.53286977       30.00000000               N/A
+    RADIUS    1735.18829384           0.13263665        132.63665326       1735.32093050       50.00000000               N/A
+
+ Label: lak_hand_grnd_13
+Status: CONSTRAINED
+  Rays: 5 of 5
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      22.27580641          -0.00003973         -1.20513729         22.27576668       30.00000000               N/A
+ LONGITUDE       5.71585626          -0.00084051        -23.59246733          5.71501575       30.00000000               N/A
+    RADIUS    1737.85113943           0.09954140         99.54140126       1737.95068083       50.00000000               N/A
+

@@ -40,123 +40,123 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
 ### ISIS Installation With Conda
 
-1.  Download either the Anaconda or Miniconda installation script for your OS platform. Anaconda is a much larger distribtion of packages supporting scientific python, while Miniconda is a minimal installation and not as large: [Anaconda installer](https://www.anaconda.com/download), [Miniconda installer](https://conda.io/miniconda.html)
-2.  If you are running on some variant of Linux, open a terminal window in the directory where you downloaded the script, and run the following commands. In this example, we chose to do a full install of Anaconda, and our OS is Linux-based. Your file name may be different depending on your environment.
-
-        chmod +x Anaconda3-5.3.0-Linux-x86_64.sh
-        ./Anaconda3-5.3.0-Linux-x86_64.sh
-
-
+1. Download either the Anaconda or Miniconda installation script for your OS platform. Anaconda is a much larger distribtion of packages supporting scientific python, while Miniconda is a minimal installation and not as large: [Anaconda installer](https://www.anaconda.com/download), [Miniconda installer](https://conda.io/miniconda.html)
+1. If you are running on some variant of Linux, open a terminal window in the directory where you downloaded the script, and run the following commands. In this example, we chose to do a full install of Anaconda, and our OS is Linux-based. Your file name may be different depending on your environment.
+    
+    ```bash
+    chmod +x Anaconda3-5.3.0-Linux-x86_64.sh
+    ./Anaconda3-5.3.0-Linux-x86_64.sh
+    ```
     This will start the Anaconda installer which will guide you through the installation process.
 
-3.  If you are running Mac OS X, a pkg file (which looks similar to Anaconda3-5.3.0-MacOSX-x86\_64.pkg) will be downloaded. Double-click on the file to start the installation process.
-4.  After the installation has finished, open up a bash prompt in your terminal window.
-5.  Next setup your Anaconda environment for ISIS. In the bash prompt, run the following commands:
+1. If you are running Mac OS X, a pkg file (which looks similar to Anaconda3-5.3.0-MacOSX-x86\_64.pkg) will be downloaded. Double-click on the file to start the installation process.
+1. After the installation has finished, open up a bash prompt in your terminal window.
+1. Next setup your Anaconda environment for ISIS. In the bash prompt, run the following commands:
 
-        #Create a new conda environment to install ISIS in
-        conda create -n isis python=3.6
+    ```bash
+    #Create a new conda environment to install ISIS in
+    conda create -n isis python=3.6
 
-        #Activate the environment
-        #Depending on your version of Anaconda use one of the following:
+    #Activate the environment
+    #Depending on your version of Anaconda use one of the following:
 
-        #Anaconda 3.4 and up:
-        conda activate isis
+    #Anaconda 3.4 and up:
+    conda activate isis
 
-        #Prior to Anaconda 3.4:
-        source activate isis
+    #Prior to Anaconda 3.4:
+    source activate isis
 
-        #Add the following channels to the environment
-        conda config --env --add channels conda-forge
-        conda config --env --add channels usgs-astrogeology
+    #Add the following channels to the environment
+    conda config --env --add channels conda-forge
+    conda config --env --add channels usgs-astrogeology
 
-        #Verify you have the correct channels:
-        conda config --show channels
+    #Verify you have the correct channels:
+    conda config --show channels
 
-        #You should see:
+    #You should see:
 
-        channels:
-            - usgs-astrogeology
-            - conda-forge
-            - defaults
+    channels:
+        - usgs-astrogeology
+        - conda-forge
+        - defaults
 
-        #The order is important.  If conda-forge is before usgs-astrogeology, you will need to run:
+    #The order is important.  If conda-forge is before usgs-astrogeology, you will need to run:
 
-        conda config --env --add channels usgs-astrogeology
+    conda config --env --add channels usgs-astrogeology
+    ```
 
-6.  Download [Mamba](https://github.com/mamba-org/mamba). The ISIS environment is quite large and the Conda solver can take hours to resolve it. Instead, we recommend you use the much faster [Mamba](https://github.com/mamba-org/mamba) solver:
+1. The environment is now ready to download ISIS and its dependencies:
 
-        conda install -n base -c conda-forge mamba
+    ```bash
+    conda install -c usgs-astrogeology isis=6.0.0
+    ```
+    
+    If you would like to work with ISIS version 3, rather than the latest ISIS, run instead:
 
-7.  The environment is now ready to download ISIS and its dependencies:
+    ```bash
+    conda install -c usgs-astrogeology isis=3.10.0
+    ```
 
-        mamba install -c usgs-astrogeology isis
-
-    If you would like to work with our latest ISIS version 3, rather than updating
-    to ISIS 4, instead run:
-
-	    mamba install -c usgs-astrogeology isis=3.10.0
-
-
-8.  Finally, setup the environment variables:
+1. Finally, setup the environment variables:
 
     ISIS requires several environment variables to be set in order to run correctly.
     The variables include: ISISROOT and ISISDATA.
 
-    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here]("#The-ISIS-Data-Area").
+    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here](#The-ISIS-Data-Area).
 
     The following steps are only valid for versions of ISIS after 4.2.0.
     For older versions of ISIS follow the instructions in [this readme file.](https://github.com/USGS-Astrogeology/ISIS3/blob/adf52de0a04b087411d53f3fe1c9218b06dff92e/README.md)
 
     There are two methods to configure the environment variables for ISIS:
 
-    7.1 Using the provided isisVarInit.py script:
+    1. Using `conda env config vars` *preferred*
 
-      To use the default values for: `$ISISROOT` and `$ISISDATA`, run the ISIS variable initialization script with default arguments:
+       Conda has a built in method for configuring environment variables that are specific to a conda environment since version 4.8.
+       This version number applies only to the conda package, not to the version of miniconda or anaconda that was installed.
 
-          python $CONDA_PREFIX/scripts/isisVarInit.py
+       To determine if your version of conda is recent enough run:
 
-      Executing this script with no arguments will result in $ISISROOT=$CONDA\_PREFIX and $ISISDATA=$CONDA\_PREFIX/data. The user can specify different directories for `$ISISDATA` using the optional value:
+           conda --version
 
-          python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]
+       If the version number is less than 4.8, update conda to a newer version by running:
 
-      Now every time the isis environment is activated, $ISISROOT and $ISISDATA will be set to the values passed to isisVarInit.py.
-      This does not happen retroactively, so re-activate the isis environment with one of the following commands:
+           conda update -n base conda
 
-          for Anaconda 3.4 and up - conda activate isis
-          prior to Anaconda 3.4 - source activate isis
+       The version number should now be greater than 4.8.
 
-    7.2 Using `conda env config vars`
+       To use the built in environment variable configuration feature, first activate the environment by first running:
 
-      Conda has a built in method for configuring environment variables that are specific to a conda environment since version 4.8.
-      This version number applies only to the conda package, not to the version of miniconda or anaconda that was installed.
+           conda activate isis
 
-      To determine if your version of conda is recent enough run:
+       After activation, the environment variables can be set using the syntax: `conda config vars set KEY=VALUE`.
+       To set all the environment variables ISIS requires, run the following command, updating the path to `ISISDATA` as needed:
 
-          conda --version
+           conda env config vars set ISISROOT=$CONDA_PREFIX ISISDATA=[path to data directory]
 
-      If the version number is less than 4.8, update conda to a newer version by running:
+       To make these changes take effect, re-activate the isis environment by running:
 
-          conda update -n base conda
+           conda activate isis
 
-      The version number should now be greater than 4.8.
+       The environment variables are now set and ISIS is ready for use every time the isis environment is activated.
 
-      To use the built in environment variable configuration feature, first activate the environment by first running:
+       **Note** This method will not enable tab completion for arguments in C-Shell.
 
-          conda activate isis
 
-      After activation, the environment variables can be set using the syntax: `conda config vars set KEY=VALUE`.
-      To set all the environment variables ISIS requires, run the following command, updating the path to `ISISDATA` as needed:
+    1. Using the provided isisVarInit.py script:
 
-          conda env config vars set ISISROOT=$CONDA_PREFIX ISISDATA=[path to data directory]
+       To use the default values for: `$ISISROOT` and `$ISISDATA`, run the ISIS variable initialization script with default arguments:
 
-      To make these changes take effect, re-activate the isis environment by running:
+           python $CONDA_PREFIX/scripts/isisVarInit.py
 
-          conda activate isis
+       Executing this script with no arguments will result in $ISISROOT=$CONDA\_PREFIX and $ISISDATA=$CONDA\_PREFIX/data. The user can specify different directories for `$ISISDATA` using the optional value:
 
-      The environment variables are now set and ISIS is ready for use every time the isis environment is activated.
+           python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]
 
-      **Note** This method will not enable tab completion for arguments in C-Shell.
+       Now every time the isis environment is activated, $ISISROOT and $ISISDATA will be set to the values passed to isisVarInit.py.
+       This does not happen retroactively, so re-activate the isis environment with one of the following commands:
 
+           for Anaconda 3.4 and up - conda activate isis
+           prior to Anaconda 3.4 - source activate isis
 
 
 ### Installation with Docker
@@ -326,16 +326,16 @@ remove these elements to and from your path.
 
 ### Updating
 
-  To update to the newest version of ISIS, run `mamba update -c usgs-astrogeology isis`
+  To update to the newest version of ISIS, run `conda update -c usgs-astrogeology isis`
 
-  To update to our latest release candidate , run `mamba update -c usgs-astrogeology/label/RC isis`
+  To update to our latest release candidate , run `conda update -c usgs-astrogeology/label/RC isis`
 
   Note that for ISIS versions 3.10 and above, new versions and release candidates will only be
-  available under the package name `isis` and `mamba update isis3` and
-  `mamba update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
+  available under the package name `isis` and `conda update isis3` and
+  `conda update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
   will not work for additional updates. Instead, after installing an `isis` package,
-  `mamba update isis` should be used to update to a new version and
-  `mamba update -c usgs-astrogeology/label/RC isis` to update to a new release candidate.
+  `conda update isis` should be used to update to a new version and
+  `conda update -c usgs-astrogeology/label/RC isis` to update to a new release candidate.
 
 ### Operating System Requirements
 

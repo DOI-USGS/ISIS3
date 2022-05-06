@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+  <files>
+    <file>
+      <body>
+        <h2><a name="Introduction">Introduction</a></h2>
+          <p>
+            This is a step-by-step guide describing the process for modifying ISIS.
+            There are two broad categories of modifications, minor and major. Most of the steps
+            below are the same for both categories. Where there are differences, it will be noted.
+            Many of the steps in this guide are similar or identical to the guide to adding a new feature.
+          </p>
+          <p>
+            ISIS is used by individuals, small groups, and large instrument teams to process images returned from spacecraft 
+            throughout our solar system. If anything changes in ISIS, even if it is a correction to an error, those people
+            may be impacted. The process outlined below contains key communication steps to assist everyone interested 
+            in understanding what changes are being made, what they will affect, and when the change is available. This is crucial
+            for the individual who may spend hours tracking down a difference between a product made with one version of ISIS versus another.
+            Instrument teams using compute clusters to process raw image data into products might process terabytes of data before finding
+            discrepancies and have to backtrack through thousands of lines of code and database entries to find where a change adversely affected
+            a product.
+          </p>
+          <p>
+            Many people have contributed code, documentation, answers, and suggestions to the ISIS software. As part of
+            that community you should be familiar with the <a href="https://github.com/USGS-Astrogeology/ISIS3/blob/dev/CONTRIBUTING.md">contributing guide</a>.
+          </p>
+          <p>
+            ISIS library and the applications are written in C++ and are supported on Ubuntu Linux and Mac OS.
+          </p>
+
+        <h2><a name="Resources">Resources</a></h2>
+          <p>
+            The <a href="../Object/Developer/index.html">ISIS library</a> contains 
+            hundreds of support classes and functions. Every application takes advantage of
+            these support routines to accomplish its tasks. We encourage you to get familiar with the library before 
+            modifying anything in ISIS. Many classes in the library make heavy use of other classes in the library 
+          </p>
+          <p>
+            There are over 400 <a href="../Application/index.html">ISIS applications</a>.
+            Every one of them uses many routines in the ISIS library. We suggest you get familiar with as many of these
+            as possible.
+          </p>
+          <p>
+            ISIS applications are linked against many useful external libraries. We encourage you to become familiar with these 
+            external libraries. A list of the external libraries ISIS uses directly can be found in the environment.yml file. 
+          </p>
+
+        <h2><a name="Getting the ISIS source code">Getting the ISIS source code</a></h2>
+          <p>
+            All of the ISIS source code is available on <a href="https://github.com/USGS-Astrogeology/ISIS3">GitHub</a>.
+            This GitHub source code repository is the primary Git repository for ISIS. If you are unfamiliar with
+            Git and/or GitHub you should go through the GitHub <a href="https://docs.github.com/en/get-started">getting started</a>
+            pages before you start writing code.
+          </p>
+
+          <h3>Steps to get ISIS source code on your local machine</h3>
+            <ol>
+              <li>Setup a GitHub account</li>
+              <li>Fork the ISIS repository</li>
+              <li>Clone your fork to a local repository</li>
+            </ol>
+
+
+          <h2><a name="Setting up an environment to compile and link ISIS">Setting up an environment to compile and link ISIS</a></h2>
+            <p>
+              The ISIS package is written in C++. In order to run and test your new feature, you will need to compile the source code and
+              link it against the ISIS library and the external libraries. Follow the instructions on the ISIS GitHub Wiki for 
+              <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake"> building ISIS</a>.
+            </p>
+            <p>
+              Depending on how your computer is setup, you may also need to install:
+            </p>
+            <ul>
+              <li> Compiler (Mac OS Xcode, Linux GNU C++)</li>
+              <li> Editor (Vim, Nano, Atom, ...</li>
+            </ul>
+
+            <p>
+              Once you have a complete environment set up for ISIS development, we suggest you 
+              <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3">compile and build</a> 
+              all of ISIS. This step will make sure you have everything setup and ready to go.
+            </p>
+
+
+          <h2><a name="Starting a conversation with other ISIS developers">Starting a conversation with other ISIS developers</a></h2>
+            <p>
+              Communicating your intension to modify ISIS is crucial and required. This communication starts with a GitHub issue in the
+              ISIS <a href="https://github.com/USGS-Astrogeology/ISIS3">code repository</a>. Starting this conversation will allow other 
+              ISIS developers to way in on your preposed change. By posting
+              a description of what you want to do and asking questions, other developers can give you pointers on how to 
+              implement it. Label the issue as a <q>Bug</q> for changes to correct errors, or <q>Enhancement</q> for changes to the way an
+              application works or is controlled.
+            </p>
+            <p>
+              Once other developers have read your proposed change, they may concur with your idea (i.e., minor chage), or ask you to writeup
+              a <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC%23:-Template">request for comment (RFC) (i.e., major change)</a>. When writing an
+              RFC is required, be aware the process deliberately takes time.
+            </p>
+
+
+          <h2><a name="Before Editing the Code">Before Editing the Code</a></h2>
+            <h3>Naming Conventions and Code Style</h3>  
+            <p>
+              When editing the ISIS code, be aware of the <a href="../documents/CodingStandards/CodingStandards.html">style</a> the 
+              particular class or application is written with and try to follow it within reason. The naming conventions, have changed  
+              over the years and can be confusing, so don't mix two conventions in a class or application.
+            </p>
+
+            <h3>Testing</h3>
+              <p>
+                Applications and complex support classes in ISIS are required to have tests that exercise the majority of the their code.
+                These test are written using <a href="https://google.github.io/googletest">googletest</a> (aka, gtest). 
+                The source code for all gtests is located in the isis/tests directory.
+                Create a new test file for your application with the name FunctionalTestsYournewapp.cpp, and one for each support class with a descriptive name. 
+                Write tests to exercise the application and any support classes. Remember to test only the functionality of your new code 
+                and not the ISIS library. Tests for the ISIS library already exist. See the
+                <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Writing-ISIS3-Tests-Using-Gtest-and-Ctest">guide for writing</a> tests for detailed instructions.
+              </p>
+
+              <p>
+                There are extensive tests in the isis/tests directory for both classes and applications. Many still have the older style
+                hand written tests located with the class and in the application's tsts directory. Before
+                you make your modification we suggest you become familiar with the tests that directly involve your changes. If you are 
+                fixing an error, check the tests to see if what you are fixing is tested, and if so, verify the output before you start.
+              </p>
+
+
+          <h2><a name="Make the Modification ">Make the Modification</a></h2>
+
+            <p>
+              Iterate over the steps below to make your change and thoroughly test the results
+            </p>
+            <ol>
+              <li>Write or modify the code as needed for your change</li>
+              <li>Compile your changes and re-link the applications (ninja)</li>
+              <li>Fix any compile or linking errros</li>
+              <li>Run any test that are directly associated with the change (ctest -R ModifiedClass, ctest -R FunctionalTestsApplicationname)</li>
+              <li>Modify any failed tests</li>
+              <li>Run all of the tests (ctest)</li>
+              <li>Modify any failed tests</li>
+            </ol>
+
+
+          <h2><a name="ISIS change log and attributions">Change Log and Attributions</a></h2>
+            <p>
+              Now you need to let the ISIS community know your changes are going into the system and add your name to the list
+              of people who have contributed to ISIS over it's lifetime.
+            </p>
+            <p>
+              Edit the CHANGELOG.md file, located at the root of your local repository, and add an entry describing your changes.
+              Read the instructions inside the file carefully.
+            </p>
+            <p>
+              Edit the .zenodo.json file, also located at the root or you local repository, and add your information.
+            </p>
+
+
+          <h2><a name="Submit your changes for review">Submit your new application for review</a></h2>
+            <p>
+              Now that you have your changes working perfectly. It's time to get them reviewed by
+              other ISIS developers, so they can be added to ISIS and be distributed with the next appropriate public release.
+            </p>
+            <ol>
+              <li>Tell git to track any changed or new files (git add new_files)</li>
+              <li>Commit them to your local repository (git commit -m <q>brief description</q>)</li>
+              <li>Push all of the changes to your GitHub fork (git push origin)</li>
+              <li>Create a pull request on <a href="https://github.com/USGS-Astrogeology/ISIS3/compare">GitHub</a></li>
+              <li>Iterate with the reviewers to fix any issues, resolve any conflicts and explain any questions</li>
+              <li>Update your pull request with any changes</li>
+            </ol>
+            <p>
+              Once your reviewers are satisfied, one of them will merge your modified code with the ISIS dev branch. When 
+              the next appropriate public release is created, your changes will be available alongside. 
+            </p>
+
+      </body>
+
+      <type>HTML</type>
+
+      <source>
+        <filename>DeveloperModifyIsis.html</filename>
+      </source>
+    </file>
+  </files>
+
+  <category>
+    <categoryItem>guide</categoryItem>
+  </category>
+
+  <audience>
+    <target>developer</target>
+  </audience>
+
+  <bibliography>
+    <title>Developer </title>
+    <brief>Modifying the ISIS software</brief>
+    <description>
+      This is a step-by-step guide describing the process for modifying the ISIS software.
+    </description>
+    <author>Stuart Sides</author>
+    <date>2022-03-19</date>
+  </bibliography>
+
+  <history>
+    <change date="2022-03-19" name="Stuart Sides">Original document</change>
+  </history>
+</documentation>

@@ -83,7 +83,7 @@ Testing Reserved Parameter=Invalid Value
 **USER ERROR** Invalid value for reserve parameter [-VERBOSE].
 
 Testing Unambiguous Reserved Parameter Resolution (-la)
-./unitTest From=It To=Worked 
+./unitTest FROM=It TO=Worked TESTONE=0 TESTTWO=1 TESTTHREE=1 LISTTEST=INCLUDEOPT EXCLUDEDTEST=10 
 FROM:    It
 TO:      Worked
 GUI:     0
@@ -143,11 +143,10 @@ Testing -BATCHLIST with -SAVE
 **USER ERROR** -BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, or -LAST.
 
 Testing -BATCHLIST with -RESTORE
-./unitTest From=It To=Worked 
 **USER ERROR** -BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, or -LAST.
 
 Testing -BATCHLIST with -LAST
-./unitTest From=It To=Worked 
+./unitTest FROM=$1 TO=$2 TESTONE=0 TESTTWO=1 TESTTHREE=1 LISTTEST=INCLUDEOPT EXCLUDEDTEST=10 
 **USER ERROR** -BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, or -LAST.
 
 Testing -BATCHLIST with nonexistent .lis file
@@ -266,13 +265,13 @@ GetInfoFlag() returns: 1
 GetInfoFileName() returns: debug.log
 
 Testing -LAST
-./unitTest From=It To=Worked 
+./unitTest FROM=It TO=Worked TESTONE=0 TESTTWO=1 TESTTHREE=1 LISTTEST=INCLUDEOPT EXCLUDEDTEST=10 
 FROM:    It
 TO:      Worked
 GUI:     0
 
 Testing -LAST with other app parameters
-./unitTest From=It To=Worked 
+./unitTest FROM=otherParam TO=Worked TESTONE=0 TESTTWO=1 TESTTHREE=1 LISTTEST=INCLUDEOPT EXCLUDEDTEST=10 
 FROM:    otherParam
 TO:      Worked
 GUI:     0
@@ -286,7 +285,6 @@ FileOutput = On
 FileName = unitTest.prt
 
 Testing -RESTORE with valid (existing) .par file
-./unitTest From=It To=Worked 
 FROM:    It
 TO:      Worked
 GUI:     0
@@ -310,7 +308,6 @@ TO:      works
 GUI:     0
 
 Restoring Saved Parameters:
-./unitTest FROM=saveParam TO=works 
 FROM:    saveParam
 TO:      works
 GUI:     0

@@ -31,13 +31,6 @@ void generateCSVOutput(Pvl &inputCubeLabel);
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
-  // Check if input file is indeed, a cube
-  if (ui.GetFileName("FROM").right(3) != "cub") {
-    QString msg = "Input file [" + ui.GetFileName("FROM") +
-                  "] does not appear to be a cube";
-    throw  IException(IException::User, msg, _FILEINFO_);
-  }
-
   // Setup the process and set the input cube
   ProcessExportPds4 process;
   Cube *inputCube = process.SetInputCube("FROM");

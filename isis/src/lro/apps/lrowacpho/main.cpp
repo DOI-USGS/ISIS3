@@ -63,11 +63,11 @@ void IsisMain () {
 
         CubeAttributeInput cai;
         cai.setAttributes("+" + backplaneCai.bands()[0]);
-        p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
+        p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
         cai.setAttributes("+" + backplaneCai.bands()[1]);
-        p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
+        p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
         cai.setAttributes("+" + backplaneCai.bands()[2]);
-        p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
+        p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
 
         useBackplane = true;
     }

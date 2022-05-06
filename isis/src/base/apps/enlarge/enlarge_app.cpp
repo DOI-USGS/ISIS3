@@ -15,7 +15,7 @@ namespace Isis{
     if (inAtt.bands().size() != 0) {
       icube.setVirtualBands(inAtt.bands());
     }
-    icube.open(ui.GetFileName("FROM"));
+    icube.open(ui.GetCubeName("FROM"));
     enlarge(&icube, ui, log);
   }
 
@@ -74,7 +74,7 @@ namespace Isis{
     }
     
     // Allocate the output file, the number of bands does not change in the output
-    QString outputFileName = ui.GetFileName("TO");
+    QString outputFileName = ui.GetCubeName("TO");
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     Cube *ocube = p.SetOutputCube(outputFileName, att, ons, onl, inb);
     

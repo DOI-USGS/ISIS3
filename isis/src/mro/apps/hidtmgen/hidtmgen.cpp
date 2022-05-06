@@ -188,8 +188,8 @@ namespace Isis{
         setUpProcessPixels(ui, pdsExportProcess, DTM);
         // set the input cube to process
         CubeAttributeInput inAttribute;
-        Cube *inCube = pdsExportProcess.SetInputCube(ui.GetFileName("DTM"), inAttribute);
-        verifyDTM(inCube,  ui.GetFileName("DTM"));
+        Cube *inCube = pdsExportProcess.SetInputCube(ui.GetCubeName("DTM"), inAttribute);
+        verifyDTM(inCube,  ui.GetCubeName("DTM"));
 
         // These are our output labels, will be modifying heavily
         Pvl &pdsLabel = pdsExportProcess.StandardPdsLabel(ProcessExportPds::Image);

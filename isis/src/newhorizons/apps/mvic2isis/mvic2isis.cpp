@@ -114,7 +114,7 @@ namespace Isis {
 
     // Set up the output cube
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    Cube *output = importFits.SetOutputCube(ui.GetFileName("TO"), att);
+    Cube *output = importFits.SetOutputCube(ui.GetCubeName("TO"), att);
 
     translateLabels(primaryLabel, output); // Results are put directly into the cube label (output)
 

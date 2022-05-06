@@ -32,7 +32,7 @@ TEST_F(MroHiriseCube, FunctionalTestHimosDefault) {
   catch (IException &e) {
     FAIL() << "Unable to create mosaic image: " << e.toString().toStdString().c_str() << std::endl;
   }
-  Cube outputMos(options.GetFileName("TO"));
+  Cube outputMos(options.GetCubeName("TO"));
   PvlObject inputCubeLabel = dejitteredCube.label()->findObject("IsisCube");
   PvlObject outputCubeLabel = outputMos.label()->findObject("IsisCube");
   PvlGroup dimensions = outputCubeLabel.findObject("Core").findGroup("Dimensions");
@@ -96,7 +96,7 @@ TEST_F(MroHiriseCube, FunctionalTestHimosError) {
   UserInterface options(APP_XML, args);
   try {
    himos(options);
-   FAIL() << "Should not have been able to create mosaic: " << options.GetFileName("TO").toStdString().c_str() << std::endl;
+   FAIL() << "Should not have been able to create mosaic: " << options.GetCubeName("TO").toStdString().c_str() << std::endl;
   }
   catch (IException &e) {
     EXPECT_THAT(e.what(), testing::HasSubstr("was NOT created"));
@@ -122,7 +122,7 @@ TEST_F(MroHiriseCube, FunctionalTestHimosMismatchObs) {
   UserInterface options(APP_XML, args);
   try {
    himos(options);
-   FAIL() << "Should not have been able to create mosaic: " << options.GetFileName("TO").toStdString().c_str() << std::endl;
+   FAIL() << "Should not have been able to create mosaic: " << options.GetCubeName("TO").toStdString().c_str() << std::endl;
   }
   catch (IException &e) {
     EXPECT_THAT(e.what(), testing::HasSubstr("was NOT created"));
@@ -148,7 +148,7 @@ TEST_F(MroHiriseCube, FunctionalTestHimosMismatchFilter) {
   UserInterface options(APP_XML, args);
   try {
    himos(options);
-   FAIL() << "Should not have been able to create mosaic: " << options.GetFileName("TO").toStdString().c_str() << std::endl;
+   FAIL() << "Should not have been able to create mosaic: " << options.GetCubeName("TO").toStdString().c_str() << std::endl;
   }
   catch (IException &e) {
     EXPECT_THAT(e.what(), testing::HasSubstr("was NOT created"));

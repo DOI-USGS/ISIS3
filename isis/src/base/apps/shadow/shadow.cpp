@@ -18,7 +18,7 @@ namespace Isis {
                       UserInterface &ui);
 
   void shadow(UserInterface &ui, Pvl *log) {
-    Cube *demCube = new Cube(ui.GetFileName("FROM"));
+    Cube *demCube = new Cube(ui.GetCubeName("FROM"));
 
     shadow(demCube, ui, log);
   }
@@ -38,7 +38,7 @@ namespace Isis {
                                   "spkpos_c.html");
 
     if (ui.GetString("SUNPOSITIONSOURCE") == "MATCH") {
-      functor.setSunPosition(ui.GetFileName("MATCH"));
+      functor.setSunPosition(ui.GetCubeName("MATCH"));
     }
     else {
       QStringList allKernelFiles;
@@ -118,7 +118,7 @@ namespace Isis {
     int ns = demCube->sampleCount();
     int nl = demCube->lineCount();
     int nb = demCube->bandCount();
-    Cube *outputCube = p.SetOutputCube(ui.GetFileName("TO"), atts, ns, nl, nb);
+    Cube *outputCube = p.SetOutputCube(ui.GetCubeName("TO"), atts, ns, nl, nb);
 
     p.ProcessCube(functor, false);
 

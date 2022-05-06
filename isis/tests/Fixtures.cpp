@@ -5,6 +5,7 @@
 #include "FileName.h"
 
 #include "Blob.h"
+#include "Brick.h"
 #include "csminit.h"
 #include "Fixtures.h"
 #include "Portal.h"
@@ -250,6 +251,87 @@ namespace Isis {
   }
 
 
+  void PushFramePair::SetUp() {
+    numSamps = 16;
+    numBands = 3;
+    frameHeight = 12;
+    numFrames = 10;
+
+    evenCube.reset(new Cube());
+    evenCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
+    evenCube->create(tempDir.path() + "/even.cub");
+
+    oddCube.reset(new Cube());
+    oddCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
+    oddCube->create(tempDir.path() + "/odd.cub");
+
+    Brick frameBrick(numSamps, frameHeight, numBands, evenCube->pixelType());
+
+    for (int frameIndex = 0; frameIndex < numFrames; frameIndex++) {
+      for (int brickIndex = 0; brickIndex < frameBrick.size(); brickIndex++) {
+        frameBrick[brickIndex] = frameIndex + 1;
+      }
+      frameBrick.SetBasePosition(1,frameIndex * frameHeight + 1,1);
+      if (frameIndex % 2 == 0) {
+        oddCube->write(frameBrick);
+      }
+      else {
+        evenCube->write(frameBrick);
+      }
+    }
+
+    PvlGroup intGroup("Instrument");
+    intGroup += PvlKeyword("StartTime", "2008-06-14T13:32:10.933207");
+    evenCube->putGroup(intGroup);
+    oddCube->putGroup(intGroup);
+
+    evenCube->reopen("rw");
+    oddCube->reopen("rw");
+
+  }
+
+
+  void FlippedPushFramePair::SetUp() {
+    numSamps = 16;
+    numBands = 3;
+    frameHeight = 12;
+    numFrames = 10;
+
+    evenCube.reset(new Cube());
+    evenCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
+    evenCube->create(tempDir.path() + "/even.cub");
+
+    oddCube.reset(new Cube());
+    oddCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
+    oddCube->create(tempDir.path() + "/odd.cub");
+
+    Brick frameBrick(numSamps, frameHeight, numBands, evenCube->pixelType());
+
+    for (int frameIndex = 0; frameIndex < numFrames; frameIndex++) {
+      for (int brickIndex = 0; brickIndex < frameBrick.size(); brickIndex++) {
+        frameBrick[brickIndex] = numFrames - frameIndex;
+      }
+      frameBrick.SetBasePosition(1,frameIndex * frameHeight + 1,1);
+      if (frameIndex % 2 == 0) {
+        evenCube->write(frameBrick);
+      }
+      else {
+        oddCube->write(frameBrick);
+      }
+    }
+
+    PvlGroup intGroup("Instrument");
+    intGroup += PvlKeyword("DataFlipped", "True");
+    intGroup += PvlKeyword("StartTime", "2008-06-14T13:32:10.933207");
+    evenCube->putGroup(intGroup);
+    oddCube->putGroup(intGroup);
+
+    evenCube->reopen("rw");
+    oddCube->reopen("rw");
+
+  }
+
+
   void DemCube::SetUp() {
     DefaultCube::SetUp();
     testCube->label()->object(4)["SolarLongitude"] = "294.73518831328";
@@ -436,9 +518,27 @@ namespace Isis {
 
     testCube = new Cube();
     testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
+    LineManager line(*testCube);
+    int pixelValue = 1;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) (pixelValue % 255);
+        pixelValue++;
+      }
+      testCube->write(line);
+    }
 
     projTestCube = new Cube();
     projTestCube->fromIsd(tempDir.path() + "/default.level2.cub", projLabel, isd, "rw");
+    line = LineManager(*projTestCube);
+    pixelValue = 1;
+    for(line.begin(); !line.end(); line++) {
+      for(int i = 0; i < line.size(); i++) {
+        line[i] = (double) (pixelValue % 255);
+        pixelValue++;
+      }
+      projTestCube->write(line);
+    }
   }
 
 
@@ -1089,39 +1189,54 @@ namespace Isis {
     testCube->setDimensions(22900, 22900, 1);
     testCube->create(tempDir.path() + "/large.cub");
 
-    LineManager line(*testCube);
-    double pixelValue = 0.0;
-    for(line.begin(); !line.end(); line++) {
-      for(int i = 0; i < line.size(); i++) {
-        line[i] = pixelValue;
+    // Reseau centers as {sample, line} pairs
+    reseaus = {{200, 200}, {400, 400}, {600, 600}};
+    reseauSize = 103;
+    int reseauValue = 100;
+
+    Brick brick(reseauSize,reseauSize,1,testCube->pixelType());
+    for (size_t res=0; res<reseaus.size(); res++) {
+      int baseSamp = (int)(reseaus[res].first+0.5) - (reseauSize/2);
+      int baseLine = (int)(reseaus[res].second+0.5) - (reseauSize/2);
+      brick.SetBasePosition(baseSamp,baseLine,1);
+      testCube->read(brick);
+      // Fill the surrounding area with a base number
+      for (int i = 0; i < reseauSize; i++) {
+        for (int j = 0; j < reseauSize; j++) {
+          brick[reseauSize*i + j] = res;
+        }
       }
 
-      pixelValue++;
-      testCube->write(line);
+      // Create reseau
+      for (int i = 0; i < reseauSize; i++) {
+        for (int j = -2; j < 3; j++) {
+          // Vertical line
+          brick[reseauSize * i + reseauSize/2 + j] = reseauValue;
+
+          // Horizontal line
+          brick[reseauSize * (reseauSize/2 + j) + i] = reseauValue;
+        }
+      }
+      testCube->write(brick);
     }
 
-    PvlGroup reseaus("Reseaus");
-    PvlKeyword samples = PvlKeyword("Sample", "200");
-    samples += "400";
-    samples += "600";
-
-    PvlKeyword lines = PvlKeyword("Line", "200");
-    lines += "400";
-    lines += "600";
-
+    PvlGroup reseausGroup("Reseaus");
+    PvlKeyword samples = PvlKeyword("Sample", QString::number(reseaus[0].first));
+    PvlKeyword lines = PvlKeyword("Line", QString::number(reseaus[0].second));
     PvlKeyword types = PvlKeyword("Type", "5");
-    types += "5";
-    types += "5";
-
     PvlKeyword valid = PvlKeyword("Valid", "1");
-    valid += "1";
-    valid += "1";
+    for (size_t i = 1; i < reseaus.size(); i++) {
+      samples += QString::number(reseaus[i].first);
+      lines += QString::number(reseaus[i].second);
+      types += "5";
+      valid += "1";
+    }
 
-    reseaus += lines;
-    reseaus += samples;
-    reseaus += types;
-    reseaus += valid;
-    reseaus += PvlKeyword("Status", "Nominal");
+    reseausGroup += lines;
+    reseausGroup += samples;
+    reseausGroup += types;
+    reseausGroup += valid;
+    reseausGroup += PvlKeyword("Status", "Nominal");
 
     std::istringstream instStr (R"(
       Group = Instrument
@@ -1136,7 +1251,7 @@ namespace Isis {
     instStr >> instGroup;
 
     Pvl *lab = testCube->label();
-    lab->findObject("IsisCube").addGroup(reseaus);
+    lab->findObject("IsisCube").addGroup(reseausGroup);
     lab->findObject("IsisCube").addGroup(instGroup);
 
     testCube->reopen("r");
@@ -1155,7 +1270,7 @@ namespace Isis {
   }
 
 
- void OsirisRexCube::setInstrument(QString ikid, QString instrumentId) {
+  void OsirisRexCube::setInstrument(QString ikid, QString instrumentId) {
     delete testCube;
     testCube = new Cube();
 
@@ -1658,5 +1773,80 @@ namespace Isis {
       QFile::copy("data/clipper/ClipperWacPb.cub", testPath);
       testCube = new Cube(testPath, "rw");
     }
+  }
+
+  void NearMsiCameraCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    json isd;
+    Pvl label;
+
+    std::ifstream isdFile("data/near/msicamera/m0155881376f3_2p_cif_dbl.isd");
+    std::ifstream cubeLabel("data/near/msicamera/m0155881376f3_2p_cif_dbl.pvl");
+
+    isdFile >> isd;
+    cubeLabel >> label;
+
+    testCube.reset( new Cube() ) ;
+    testCube->fromIsd(tempDir.path() + "/m0155881376f3_2p_cif_dbl.cub", label, isd, "rw");
+  }
+
+  void NearMsiCameraCube::TearDown() {
+    testCube.reset();
+  }
+
+  void TgoCassisModuleKernels::SetUp() {
+    QVector<QString> ckKernels = {QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_0_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_1_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_0_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_1_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_0_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_1_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_0_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_1_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_0_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_1_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_0_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_1_sliced_-143000.xc")};
+    QVector<QString> tempCkKernels;
+    QVector<QString> spkKernels = {QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_0.xsp"),
+                                   QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_1.xsp"),
+                                   QString("data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381_0.xsp"),
+                                   QString("data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381_1.xsp"),
+                                   QString("data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583_0.xsp"),
+                                   QString("data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583_1.xsp")};
+    QVector<QString> tempSpkKernels;
+
+    for (int i = 0; i < ckKernels.size(); i++) {
+      QString kernelFile = ckKernels[i];
+      QString kernelExtension = kernelFile.split('.').last();
+      QString targetFile = kernelPrefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
+      QFile::copy(kernelFile, targetFile);
+      tempCkKernels.append(targetFile);
+    }
+
+    for (int i = 0; i < spkKernels.size(); i++) {
+      QString kernelFile = spkKernels[i];
+      QString kernelExtension = kernelFile.split('.').last();
+      QString targetFile = kernelPrefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
+      QFile::copy(kernelFile, targetFile);
+      tempSpkKernels.append(targetFile);
+    }
+
+    // variables defined in TgoCassisModuleTests
+    if (binaryCkKernels.size() == 0) {
+      binaryCkKernels = generateBinaryKernels(tempCkKernels);
+      binarySpkKernels = generateBinaryKernels(tempSpkKernels);
+
+      binaryCkKernelsAsString = fileListToString(binaryCkKernels);
+      binarySpkKernelsAsString = fileListToString(binarySpkKernels);
+    }
+  }
+
+  void TgoCassisModuleKernels::TearDown() {
+    binaryCkKernels = {};
+    binarySpkKernels = {};
+    binaryCkKernelsAsString = "";
+    binarySpkKernelsAsString = "";
   }
 }

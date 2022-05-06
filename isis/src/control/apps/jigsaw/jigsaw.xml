@@ -1453,4 +1453,210 @@
       </item>
     </liens>
 
+
+
+
+  <examples>
+    <example>
+      <brief> Simple run of jigsaw with images from a linescanner </brief>
+      <description>
+        <p>
+         This example runs jigsaw in a very simple way using four MRO CTX images. Only the required parameters are entered, with all other parameters
+         left at their default settings. This bundle solution only solves for the camera orientation (see the CAMSOLVE and TWIST parameters). This command does not
+         update the SPICE information attached to the four cubes.
+       </p>
+       <p>
+         A possible use for this simple run would be to test a network to identify control points that are not well placed.
+       </p>
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+         fromlist=ctx.lis cnet=hand_dense.net onet=hand_dense-jig.net
+        </commandLine>
+        <description>
+          This command line only sets the three required parameters.
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/linescan/example_linescan_gui.png" width="1273" height="958">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              The top of the GUI shows the parameters filled in for input cube list, 
+              the input control network and the output control network. All other parameters
+              were left at their default values.
+            <br></br>
+            </description>
+            <thumbnail src="assets/linescan/example_linescan_gui_thumb.png" width="500" height="376" caption="jigsaw Linescan image example" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <dataFiles>
+        <dataFile path="assets/linescan/ctx.lis">
+          <brief> Cube list file </brief>
+          <description>
+            Input file defining the file names of the four cubes used in the control network.
+            The file names can include a path if needed. Each file name is on a separate line and
+            the last file name can have new line at the end, but it is not required.
+          </description>
+          <parameterName> FROMLIST </parameterName>
+        </dataFile>
+      </dataFiles>
+    </example>
+
+    <example>
+      <brief>Run of jigsaw parameterized for Kaguya Terrain Camera (TC) images and <b>a relative control</b> network covering the Apollo 15 landing site. </brief>
+      <description>
+        <p>
+         A relative network is a network that connects overlapping images with tie points but has no tie points connected to a ground source. Since there is no
+         connection to ground in the network, this bundle will only solve for camera specific parameters. The bundle could still solve for other parameters and be 
+         correct relative to the camera position, but it would increase the complexity of the bundle. The proceeding two examples will include grounded networks, 
+         so we will wait to increase the complexity of the bundle until ground points are included. Additionally, in this example we are evaluating the solution and 
+         do not want to apply it to the images yet, therefore, update is set to ‘no’.
+        </p> 
+        <p>
+         This relative bundle turns on and parameterizes the camera twist and camera acceleration solve parameters. Camera twist is a flag that allows the bundle to solve 
+         for the camera's rotation around the bore sight axis and uses the same uncertainty estimation as the other two rotations. Setting the camera solve parameter to acceleration, however, 
+         does require uncertainties to be set for the angles (deg), angular velocity (deg/s), and angular accelerations (deg/s**2). These values were set with increasing 
+         constraint because of the increasing affect alterations of higher order parameters have on the bundle solution.
+        </p>
+        <p>
+         The ‘overexisting’ flag tells the bundle solution to approximate the camera rotation with a zero polynomial function added to the existing rotation data (adding the 
+         polynomial <b>over</b> the <b>existing</b> data). Without the ‘overexisting’ flag, the bundle fits a polynomial to the existing rotations, throws out the existing data
+         points, and uses the polynomial to calculate the approximate ephemerides when needed.
+        </p>
+        <p>
+         This bundle also lowers the max iterations to 10 (from default 50). Lowering the max iterations does not affect the bundle solution. However, setting a lower 
+         iteration limit can serve as a flag if you expect your network to bundle quickly. Finally, the sigma0 convergence criteria was not changed from its default 
+         value, it was only explicitly stated in this call.
+        </p>
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+        fromlist=cubes.lis cnet=relative_reg_jig4_edit.net onet=relative_reg_jig5.net update=no file_prefix=jig5 sigma0=1.0e-10 maxits=10
+        twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01
+        </commandLine>
+        <description>
+        </description>
+      </terminalInterface>
+    </example>
+
+
+    <example>
+      <brief>Run of jigsaw parameterized for Kaguya Terrain Camera (TC) images and <b>an intermediate ground control</b> network covering the Apollo 15 landing site. </brief>
+      <description>
+        <p>
+         This example jigsaw bundle is run directly after adding ground control points to the previous relative network. With ground control points inserted into the 
+         bundle solution, we will expand the bundle solve parameters to attempt solving for point radius values and the position of the spacecraft.
+        </p>
+        <p>
+         Ground points are weighted more heavily in the bundle than relative control points and adding parameters adds more complexity to the bundle solution. Therefore, it 
+         is common to create and refine a network with only relative points and add ground point in <b>after</b> the relative network (and its bundle solution) is of sufficient quality. 
+         The purpose of this bundle is to ensure the network bundle converges with the added ground points and solve parameters, before committing to updating the camera 
+         pointing on the images, so update is set to 'no'.
+        </p>
+        <p>
+         In addition to the previous solve parameters, this bundle turns on the point radius and spacecraft position solve parameters. Applying the point radius solve 
+         parameter requires the point_radius_sigma to be set. This value is a representation the uncertainty (in meters) of the cameras apriori pointing corresponding to the 
+         correct elevation on the shape model; this value is not a hard constraint. Often this value can be set, and the appropriateness of the set value can be checked using 
+         the 'POINTS DETAIL' section of the bundleout.txt file output by jigsaw. If more than half of the radius total corrections exceed the provided sigma, the uncertainty 
+         may need to be increased.
+        </p>
+        <p>
+         Applying the space craft position solve parameter requires an uncertainty estimation through spacecraft_position_sigma (again this value is not a hard constraint). 
+         The appropriateness of the provided sigma can be evaluated through the bundleout_images.csv X Correction, Y Correction, and Z Correction columns.
+        </p>
+        <p>
+         The 'overhermite' flag allows an estimation the spacecraft position like the 'overexisting' flag estimates the camera pointing, with a zero-polynomial added over
+         the existing data (for spacecraft position this is a cubic Hermite spline). These options require more memory but provide a solution more representative of small
+         variations in the original ephemeris data.
+        </p>
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+         fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1.net update=no file_prefix=jig1rr sigma0=1.0e-10 maxits=10 
+         twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01 
+         radius=yes point_radius_sigma=500 spsolve=positions overhermite=yes spacecraft_position_sigma=1000
+        </commandLine>
+        <description>
+        </description>
+      </terminalInterface>
+
+      <dataFiles>
+        <dataFile path="assets/ap15/jig1rrEP_bundleout.txt">
+          <brief> jig1rr_bundleout.txt </brief>
+          <description>
+            A shorten example of a typical bundleout.txt file produced by a jigsaw run with error propegation. 
+            This file was trimmed to hold 10 images, 50 relative points, and all ground points
+            along with their associated detail sections. Bundleout files typically contain 
+            all image and point from a network put through jigsaw.
+          </description>
+        </dataFile>
+      </dataFiles>
+    </example>
+
+
+    <example>
+      <brief>Run of jigsaw parameterized for Kaguya Terrain Camera (TC) images and <b>a final ground control</b> network covering Apollo 15 landing site. </brief>
+      <description>
+        <p>
+         This last example is of a final jigsaw run of a grounded network. In this example all network adjustments are done, the bundle is converging, the resulting 
+         residuals are acceptable, and therefore we are ready to update the camera pointing on the cubes. During the final run we turn on the error propagation flag, this 
+         provides the variance-covariance matrix of the parameters, from which uncertainties can be computed. This is valuable if you plan to compute certainties for 
+         your update cubes camera pointing (or any kernels resulting from these updated camera pointings).
+        </p>
+        <p>
+         If you want to double check the update was completed, see cathist or catlab (search for ‘Jigged’).
+        </p>
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+         fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1_ErrProp.net update=yes file_prefix=jig1rrEP sigma0=1.0e-10 maxits=10
+         twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01
+         radius=yes point_radius_sigma=500 spsolve=positions overhermite=yes spacecraft_position_sigma=1000 errorpropagation=yes 
+        </commandLine>
+        <description>
+        </description>
+      </terminalInterface>
+
+      <dataFiles>
+        <dataFile path="assets/ap15/jig1rrEP_bundleout.txt">
+          <brief> jig1rrEP_bundleout.txt </brief>
+          <description>
+            A shorten example of a typical bundleout.txt file produced by a jigsaw run with error propegation. 
+            This file was trimmed to hold 10 images, 50 relative points, and all ground points
+            along with their associated detail sections. Bundleout files typically contain 
+            all image and point from a network put through jigsaw.
+          </description>
+        </dataFile>
+
+        <dataFile path="assets/ap15/tables.txt">
+          <brief> Instrument pointing and position tables before jigsaw update </brief>
+          <description>
+            Table summaries for the InstrumentPointing and InstrumentPosition tables extracted from
+            a cube label. 
+          </description>
+        </dataFile>
+
+        <dataFile path="assets/ap15/jigged_tables.txt">
+          <brief> Instrument point and position tables after jigsaw update </brief>
+          <description>
+            Table summaries for the InstrumentPointing and InstrumentPosition tables extracted from
+            a jigsaw updated cube label. The InstrumentPointing table was updated due to the camera
+            updates solved for in the bundle (camsolve=accelerations). The InstrumentPosition table
+            was updated due to the spacecraft updates solved for in the bundle (spsolve=positions).
+          </description>
+        </dataFile>
+      </dataFiles>
+    </example>
+
+  </examples>
 </application>

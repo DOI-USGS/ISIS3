@@ -306,7 +306,7 @@ namespace Isis {
    */
   void Pipeline::SetInputFile(const QString &inputParam) {
     UserInterface &ui = Application::GetUserInterface();
-    p_originalInput.push_back(ui.GetFileName(inputParam));
+    p_originalInput.push_back(ui.GetCubeName(inputParam));
     p_inputBranches.push_back(inputParam);
     p_virtualBands.push_back(ui.GetInputAttribute(inputParam).toString());
   }

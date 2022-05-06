@@ -15,7 +15,7 @@ void IsisMain() {
 
   // Get user entered file name & mode
   UserInterface &ui = Application::GetUserInterface();
-  FileName fromfile(ui.GetFileName("FROM"));
+  FileName fromfile(ui.GetCubeName("FROM"));
   QString mode = ui.GetString("MODE");
 
   FileName tofile;

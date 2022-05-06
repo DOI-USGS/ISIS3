@@ -31,7 +31,7 @@ void IsisMain() {
   cout << vlab << endl;
   Process p2;
   CubeAttributeInput att;
-  QString file = Application::GetUserInterface().GetFileName("TO");
+  QString file = Application::GetUserInterface().GetCubeName("TO");
   Cube *icube = p2.SetInputCube(file, att);
   Statistics *stat = icube->statistics();
   cout << stat->Average() << endl;

@@ -73,7 +73,35 @@
           The ingested ISIS Cube.
         </description>
       </parameter>
-
     </group>
+    <group name="Overides">
+        <parameter name="TARGET">
+            <type>string</type>
+            <brief>Provide target name if absent or incorrect in input (FROM)
+              label
+            </brief>
+            <description>
+              <p>
+               This parameter may be necessary as some input files may
+               not contain a target name or it may be incorrect. Some Dawn
+               EDRs have this issue.
+              </p>
+            </description>
+            <internalDefault>Label Value</internalDefault>
+        </parameter>
+    </group>
+    <group name="Debug">
+         <parameter name="DATA">
+             <type>filename</type>
+             <brief>
+               Dump of the json used in the templates
+             </brief>
+             <description>
+               This output file is used to dump the contents of the JSON structure
+               used by the template engine as its source of data.
+             </description>
+             <internalDefault>Optional JSON output</internalDefault>
+         </parameter>
+     </group>
   </groups>
 </application>

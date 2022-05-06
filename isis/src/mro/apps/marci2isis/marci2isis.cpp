@@ -126,7 +126,7 @@ namespace Isis{
     outputCubes[0]->setDimensions(numSamples, numLines, numFilters);
     outputCubes[1]->setDimensions(numSamples, numLines, numFilters);
 
-    FileName outputFile(ui.GetFileName("TO"));
+    FileName outputFile(ui.GetCubeName("TO"));
     QString evenFile = outputFile.path() + "/" + outputFile.baseName() + ".even.cub";
     QString oddFile = outputFile.path() + "/" + outputFile.baseName() + ".odd.cub";
 

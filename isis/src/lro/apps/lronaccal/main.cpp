@@ -69,7 +69,7 @@ void IsisMain() {
   g_radiometric = ui.GetBoolean("RADIOMETRIC");
   g_iof = (ui.GetString("RADIOMETRICTYPE") == "IOF");
 
-  Isis::Pvl lab(ui.GetFileName("FROM"));
+  Isis::Pvl lab(ui.GetCubeName("FROM"));
   Isis::PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
   // Check if it is a NAC image
