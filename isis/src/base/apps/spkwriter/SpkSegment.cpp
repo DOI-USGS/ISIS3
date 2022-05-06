@@ -178,14 +178,14 @@ void SpkSegment::import(Cube &cube) {
       labEndTime = value;
     }
     else {
-      labEndTime = SCClockStartTime;
+      labEndTime = labStartTime;
     }
 
-    iTime etLabStart(SCClockStartTime);
-    iTime etLabEnd(SCClockStopTime);
+    iTime etLabStart(labStartTime);
+    iTime etLabEnd(labEndTime);
 
-    m_startOffset = etLabStart - m_epochs[0];
-    m_endOffset = etLabStop - m_epochs[size(m_epochs)-1];
+    m_startOffset = etLabStart.Et() - m_epochs[0];
+    m_endOffset = etLabEnd.Et() - m_epochs[size(m_epochs)-1];
 
     // Label start/end times are 3 decimal places, so round offsets to match.
     m_startOffset = qRound(m_startOffset * 1000.0) / 1000.0;
