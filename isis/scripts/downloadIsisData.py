@@ -128,7 +128,7 @@ def download_pub(inputcommand, destination, mission_name, cfg, dry_run):
         f.close()
     else:
         mission_dir_name = mission_name.split("_")[0]
-        destination += "/"+str(mission_dir_name).replace(":","")
+        destination += str(mission_dir_name).replace(":","")
         extra_args=[f"{mission_name}",f"{destination}", "--progress", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
     if dry_run:
         extra_args.append("--dry-run")
