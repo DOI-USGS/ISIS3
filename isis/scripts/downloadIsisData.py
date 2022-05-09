@@ -212,7 +212,7 @@ if __name__ == '__main__':
     }
 
     if args.verbose == 0:
-        log_kwargs['level'] =  log.WARN
+        log_kwargs['level'] = log.WARN
     elif args.verbose == 1:
         log_kwargs['level'] = log.INFO
     elif args.verbose >= 2:
