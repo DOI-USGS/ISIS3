@@ -1,5 +1,5 @@
 Group = MarsExpress/Src
-  Version = 1
+  Version = 2
   Library = MexHrscSrcCamera
   Routine = MexHrscSrcCameraPlugin
 EndGroup
