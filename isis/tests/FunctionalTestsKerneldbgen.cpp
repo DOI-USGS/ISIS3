@@ -105,7 +105,7 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenCoverageLevelInterval) {
                            "level=INTERVAL",
                            "recondir=data/kerneldbgen",
                            "reconfilter=em16_tgo_sc_??m_*.bc",
-                           "sclk=$tgo/kernels/sclk/em16_tgo_step_????????.tsc",
+                           "sclk=data/kerneldbgen/em16_tgo_step_????????.tsc",
                            "lsk=$base/kernels/lsk/naif0012.tls"};
 
   UserInterface options(APP_XML, args);
@@ -211,7 +211,7 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenExtraDefault) {
                            "level=INTERVAL",
                            "recondir=$mro/kernels/ck",
                            "reconfilter=mro_crm_psp_??????_??????.bc",
-                           "sclk=$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc",
+                           "sclk=data/kerneldbgen/MRO_SCLKSCET.?????.65536.tsc",
                            "lsk=$base/kernels/lsk/naif????.tls",
                            "extra=($mro/kernels/fk/mro_v15.tf,$mro/kernels/fk/kernels.????.db)"};
 
@@ -238,7 +238,7 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenExtraBadKeyword) {
   QVector<QString> args = {"to="+ prefix.path() + "/crism_kernels.????.db.pvl",
                            "recondir=$mro/kernels/ck",
                            "reconfilter=mro_crm_psp_??????_??????.bc",
-                           "sclk=$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc",
+                           "sclk=data/kerneldbgen/MRO_SCLKSCET.?????.65536.tsc",
                            "lsk=$base/kernels/lsk/naif????.tls",
                            "extra=data/kerneldbgen/kernels_badkeywordvalue.db"};
 
@@ -258,7 +258,7 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenExtraBlank) {
   QVector<QString> args = {"to="+ prefix.path() + "/crism_kernels.????.db.pvl",
                            "recondir=$mro/kernels/ck",
                            "reconfilter=mro_crm_psp_??????_??????.bc",
-                           "sclk=$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc",
+                           "sclk=data/kerneldbgen/MRO_SCLKSCET.?????.65536.tsc",
                            "lsk=$base/kernels/lsk/naif????.tls",
                            "extra=data/kerneldbgen/kernels_blank.db"};
 
@@ -278,7 +278,7 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenMisnamedGroup) {
   QVector<QString> args = {"to="+ prefix.path() + "/crism_kernels.????.db.pvl",
                            "recondir=$mro/kernels/ck",
                            "reconfilter=mro_crm_psp_??????_??????.bc",
-                           "sclk=$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc",
+                           "sclk=data/kerneldbgen/MRO_SCLKSCET.?????.65536.tsc",
                            "lsk=$base/kernels/lsk/naif????.tls",
                            "extra=data/kerneldbgen/kernels_misnamedgroup.db"};
 
@@ -298,7 +298,7 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenExtraMisnamedKeyword) {
   QVector<QString> args = {"to="+ prefix.path() + "/crism_kernels.????.db.pvl",
                            "recondir=$mro/kernels/ck",
                            "reconfilter=mro_crm_psp_??????_??????.bc",
-                           "sclk=$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc",
+                           "sclk=data/kerneldbgen/MRO_SCLKSCET.?????.65536.tsc",
                            "lsk=$base/kernels/lsk/naif????.tls",
                            "extra=data/kerneldbgen/kernels_misnamedkeyword.db"};
 
@@ -318,7 +318,7 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenExtraNoGroup) {
   QVector<QString> args = {"to="+ prefix.path() + "/crism_kernels.????.db.pvl",
                            "recondir=$mro/kernels/ck",
                            "reconfilter=mro_crm_psp_??????_??????.bc",
-                           "sclk=$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc",
+                           "sclk=data/kerneldbgen/MRO_SCLKSCET.?????.65536.tsc",
                            "lsk=$base/kernels/lsk/naif????.tls",
                            "extra=data/kerneldbgen/kernels_nogroup.db"};
 
@@ -339,7 +339,7 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenExtraNoKeyword) {
   QVector<QString> args = {"to="+ prefix.path() + "/crism_kernels.????.db.pvl",
                            "recondir=$mro/kernels/ck",
                            "reconfilter=mro_crm_psp_??????_??????.bc",
-                           "sclk=$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc",
+                           "sclk=data/kerneldbgen/MRO_SCLKSCET.?????.65536.tsc",
                            "lsk=$base/kernels/lsk/naif????.tls",
                            "extra=data/kerneldbgen/kernels_nokeyword.db"};
 
@@ -399,7 +399,7 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenSmithedCkOffsets) {
                            "smitheddir=data/kerneldbgen",
                            "smithedfilter=thmIR.bc",
                            "lsk=$base/kernels/lsk/naif0008.tls",
-                           "sclk=$Odyssey/kernels/sclk/ORB1_SCLKSCET.00274.tsc"};
+                           "sclk=data/kerneldbgen/ORB1_SCLKSCET.00274.tsc"};
 
   UserInterface options(APP_XML, args);
   try {
