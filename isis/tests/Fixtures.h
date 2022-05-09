@@ -3,6 +3,7 @@
 
 #include "gtest/gtest.h"
 
+#include <memory>
 #include <string>
 
 #include <QString>
@@ -83,6 +84,30 @@ namespace Isis {
 
       void SetUp() override;
       void TearDown() override;
+  };
+
+  class PushFramePair : public TempTestingFiles {
+    protected:
+      std::shared_ptr<Cube> evenCube;
+      std::shared_ptr<Cube> oddCube;
+      int numSamps;
+      int numBands;
+      int frameHeight;
+      int numFrames;
+
+      void SetUp() override;
+  };
+
+  class FlippedPushFramePair : public TempTestingFiles {
+    protected:
+      std::shared_ptr<Cube> evenCube;
+      std::shared_ptr<Cube> oddCube;
+      int numSamps;
+      int numBands;
+      int frameHeight;
+      int numFrames;
+
+      void SetUp() override;
   };
 
   class DefaultCube : public TempTestingFiles {
@@ -403,16 +428,22 @@ class NearMsiCameraCube : public TempTestingFiles {
     void TearDown() override;
 };
 
-class tgoCassisKernels : public ::testing::Test {
+class TgoCassisModuleKernels : public ::testing::Test {
+
   protected:
-    static void SetUpTestSuite();
-    static void TearDownTestSuite();
+    // You can define per-test set-up logic as usual.
+    void SetUp() override;
 
-    static QVector<QString> binaryCkKernels;
-    static QVector<QString> binarySpkKernels;
+    // You can define per-test tear-down logic as usual.
+    void TearDown() override;
 
-    static QString binaryCkKernelsAsString;
-    static QString binarySpkKernelsAsString;
+    QTemporaryDir kernelPrefix;
+
+    QVector<QString> binaryCkKernels;
+    QVector<QString> binarySpkKernels;
+
+    QString binaryCkKernelsAsString;
+    QString binarySpkKernelsAsString;
 };
 
 }

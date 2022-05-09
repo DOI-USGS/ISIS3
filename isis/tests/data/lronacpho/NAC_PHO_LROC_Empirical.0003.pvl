@@ -1,0 +1,30 @@
+Object = NormalizationModel
+  Group = Algorithm
+    Name = LROC_Empirical
+    PhotoModel = LROC_Empirical
+    Incref=30.0
+    Emaref=0.0
+    Pharef=30.0
+  EndGroup
+EndObject
+
+Object = PhotometricModel
+  Units = Degrees
+  Group = Algorithm
+    Name = LROC_Empirical
+    FilterName = "Broadband"
+    BandBinCenter = 600.0
+    AlgorithmVersion = 2019
+    A0 =  0.0
+    A1 =  0.0
+    A2 =  0.0
+    A3 =  0.0
+    B0 = -1.479654495
+    B1 = -0.000083528
+    B2 =  0.012964707
+    B3 = -0.237774774
+    B4 =  0.556075496
+    B5 =  0.663671460
+    B6 = -0.439918609
+  EndGroup
+EndObject

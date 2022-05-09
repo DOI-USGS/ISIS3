@@ -265,6 +265,7 @@ namespace Isis {
       if (file.extension().contains("x") && !binaryFile.fileExists()) {
         QString path = file.expanded();
         QString command = "tobin " + path;
+        command += " >nul 2>nul";
         int status = system(command.toLatin1().data());
 
         if (status != 0) {
