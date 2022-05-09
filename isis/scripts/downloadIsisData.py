@@ -10,11 +10,6 @@ import tempfile
 
 from os import path
 
-log.basicConfig(
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=log.DEBUG,
-    datefmt='%Y-%m-%d %H:%M:%S')
-
 # set log level to debug
 def call_subprocess(command, redirect_stdout=True, redirect_stderr=False):
     stdout = subprocess.PIPE if redirect_stdout else None
@@ -134,7 +129,7 @@ def download_pub(inputcommand, destination, mission_name, cfg, dry_run):
     else:
         mission_dir_name = mission_name.split("_")[0]
         destination += "/"+str(mission_dir_name).replace(":","")
-        extra_args=[f"{mission_name}",f"{destination}", "--progress", "--track-renames"]
+        extra_args=[f"{mission_name}",f"{destination}", "--progress", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
     if dry_run:
         extra_args.append("--dry-run")
 
@@ -210,23 +205,20 @@ if __name__ == '__main__':
     parser.add_argument('--config', action='store', default=os.path.dirname(__file__) + '/../config/rclone.conf')
     args = parser.parse_args()
 
+    log_kwargs = {
+      'format': '%(asctime)s %(levelname)-8s %(message)s',
+      'level': log.WARN,
+      'datefmt' : '%Y-%m-%d %H:%M:%S' 
+    }
+
     if args.verbose == 0:
-        log.basicConfig(
-            format='%(asctime)s %(levelname)-8s %(message)s',
-            level=log.WARN,
-            datefmt='%Y-%m-%d %H:%M:%S')
+        log_kwargs['level'] =  log.WARN
+    elif args.verbose == 1:
+        log_kwargs['level'] = log.INFO
+    elif args.verbose >= 2:
+        log_kwargs['level'] = log.DEBUG
 
-    if args.verbose == 1:
-        log.basicConfig(
-            format='%(asctime)s %(levelname)-8s %(message)s',
-            level=log.INFO,
-            datefmt='%Y-%m-%d %H:%M:%S')
-
-    if args.verbose >= 2:
-        log.basicConfig(
-            format='%(asctime)s %(levelname)-8s %(message)s',
-            level=log.DEBUG,
-            datefmt='%Y-%m-%d %H:%M:%S')
+    log.basicConfig(**log_kwargs)
 
     main(args.command, args.mission, args.dest, args.legacy, os.path.expanduser(args.config), args.dry_run)
 
