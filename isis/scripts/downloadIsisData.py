@@ -94,7 +94,7 @@ def driver_for_missions(command, mission_to_download, mission_list, cfg, destina
     for mission in mission_list: 
         if mission_to_download.lower() == mission.strip(":"):
             path = f"{mission}/"
-            log.info("Mission found in mission list")
+            log.info(f"{mission_to_download} found in mission list")
 
     if path == None:
         log.info("Mission not found in mission list")
@@ -121,8 +121,7 @@ def download_pub(inputcommand, destination, mission_name, cfg, dry_run):
     
     log.info("Starting to download kernels")
 
-    if(inputcommand == "lsf"):
-        
+    if(inputcommand == "lsf"):        
         mission_name = mission_name.strip("/")
         log.debug(f"Running lsf using mission name {mission_name}")
 
@@ -133,9 +132,8 @@ def download_pub(inputcommand, destination, mission_name, cfg, dry_run):
         f.write(json.loads(json.dumps(results.get('out').decode('utf-8'))))
         f.close()
     else:
-        destination += "/"+str(mission_name).replace(":","")
-        destination = destination.replace("_usgs/","/")
-        destination = destination.replace("_base/","/")
+        mission_dir_name = mission_name.split("_")[0]
+        destination += "/"+str(mission_dir_name).replace(":","")
         extra_args=[f"{mission_name}",f"{destination}", "--progress", "--track-renames"]
     if dry_run:
         extra_args.append("--dry-run")
