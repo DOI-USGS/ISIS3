@@ -76,15 +76,6 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    // scs 2022-04-16 Changed to use the StartTime instead of the StartClock.
-    // HRSC SRC images taken in a sequence (e.g., Phobos) often have identical StartClock values,
-    // but different StartTime values
-    //QString clockCount = inst["SpacecraftClockStartCount"];
-    //double et = getClockTime(clockCount).Et();
-    //double exposureDuration = (double)inst["ExposureDuration"] / 1000.0;
-    //pair<iTime, iTime> startStop = ShutterOpenCloseTimes(startTime, exposureDuration);
-    //setTime(et);
-
     iTime startTime;
     startTime.setUtc((QString)inst["StartTime"]);   
     setTime(startTime);
