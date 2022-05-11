@@ -158,7 +158,6 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 - Fixed issue where serial numbers for Kaguya TC and MI image could not be generated. [4235](https://github.com/USGS-Astrogeology/ISIS3/issues/4235)
 - Fixed hardcoded file naming in the hijitter app dealing with output from pipeline. [#4372](https://github.com/USGS-Astrogeology/ISIS3/pull/4372)
 - Fixed "About Qview" to point to website documentation. [4333](https://github.com/USGS-Astrogeology/ISIS3/issues/4333)
-- Fixed bug where the time bias was not being added to the ephemeris times in ckwriter. [4129](https://github.com/USGS-Astrogeology/ISIS3/issues/4129)
 
 ### Changed
 
