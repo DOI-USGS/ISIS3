@@ -38,6 +38,7 @@ release.
 - Added a new application, framestitch, for stitching even and odd push frame images back together prior to processing in other applications. [4924](https://github.com/USGS-Astrogeology/ISIS3/issues/4924)
 
 ### Changed
+- Updated the LRO calibration application Lrowaccal to add a units label to the RadiometricType keyword of the Radiometry group in the output cube label if the RadiometricType parameter is Radiance. No functionality is changed if the RadiometricType parameter is IOF. Lrowaccal has also been refactored to be callable for testing purposes. Issue: [#4939](https://github.com/USGS-Astrogeology/ISIS3/issues/4939), PR: [#4940](https://github.com/USGS-Astrogeology/ISIS3/pull/4940)
 
 ### Added
 - Improved functionality of msi2isis and MsiCamera model to support new Eros dataset, including support for Gaskell's SUMSPICE files that adjust timing, pointing and spacecraft position ephemeris. [#4886](https://github.com/USGS-Astrogeology/ISIS3/issues/4886)
