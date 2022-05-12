@@ -2280,8 +2280,8 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   // run stitch and unstitch on cube list
   FileList *cubeList = new FileList();
   cubeList->append(panFileName);
-  cubeList->append(redFileName);
   cubeList->append(bluFileName);
+  cubeList->append(redFileName);
   cubeList->append(nirFileName);
 
   QString cubeListFile = prefix.path() + "/cubelist.lis";
@@ -2318,7 +2318,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   }
 
   // run cam2map and cassismos on pan cube
-  QString projectedFile = prefix.path() + "/projected.cub";
+  QString projectedFile = "/Users/acpaquette/Desktop/projected.cub";
   QVector<QString> cam2mapArgs = {"from=" + tgocassisstitchOutput,
                                   "to=" + projectedFile,
                                   "map=" + mapFile,};
@@ -2341,53 +2341,118 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
     FAIL() << "Unable to run tgocassisrdrgen on projected image: " << e.what() << std::endl;
   }
 
-  QString ingestedExportFile = prefix.path() + "/exported.cub";
-  tgocassis2isisArgs = {"from=" + prefix.path() + "/exported.xml",
-                        "to=" + ingestedExportFile};
-  UserInterface tgocassis2isisIngest(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
-  try {
-    tgocassis2isis(tgocassis2isisIngest);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to run tgocassis2isis on output image: " << e.what() << std::endl;
-  }
+  // QString ingestedExportFile = prefix.path() + "/exported.cub";
+  // tgocassis2isisArgs = {"from=" + prefix.path() + "/exported.xml",
+  //                       "to=" + ingestedExportFile};
+  // UserInterface tgocassis2isisIngest(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
+  // try {
+  //   tgocassis2isis(tgocassis2isisIngest);
+  // }
+  // catch (IException &e) {
+  //   FAIL() << "Unable to run tgocassis2isis on output image: " << e.what() << std::endl;
+  // }
 
   // Mosaic Cube
-  Cube exportCube(ingestedExportFile);
+  Cube exportCube(projectedFile);
   Pvl *outLabel = exportCube.label();
 
-  std::istringstream mos(R"(
-    Group = Mosaic
-      SpacecraftName            = "TRACE GAS ORBITER"
-      InstrumentId              = CaSSIS
-      ObservationId             = CRUS_049218_201_0
-      StartTime                 = 2016-11-26T22:50:27.381
-      StopTime                  = 2016-11-26T22:50:27.382
-      SpacecraftClockStartCount = 2f015435767e275a
-      IncidenceAngle            = 44.946650468616 <degrees>
-      EmissionAngle             = 11.637754697441 <degrees>
-      PhaseAngle                = 44.136937967978 <degrees>
-      LocalTime                 = 14.429448515306
-      SolarLongitude            = 269.1366003982 <degrees>
-      SubSolarAzimuth           = 139.56469945225 <degrees>
-      NorthAzimuth              = 270.0 <degrees>
-    End_Group
-  )");
-
-  PvlGroup truthMosGroup;
-  mos >> truthMosGroup;
-  PvlGroup &mosGroup = outLabel->findGroup("Mosaic", Pvl::Traverse);
-
-  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, mosGroup, truthMosGroup);
-
-  std::istringstream arss(R"(
-    Group = Archive
+  std::istringstream arnirss(R"(
+    Group = ArchiveNIR
       DataSetId                    = TBD
       ProductVersionId             = UNK
       ProducerId                   = UBE
-      ProducerName                 = "Nicolas Thomas"
+      ProducerName                 = 'Nicolas Thomas'
       ProductCreationTime          = 2017-10-03T10:50:12
-      FileName                     = CAS-MCO-2016-11-26T22.50.27.381-RED-01005-B1
+      FileName                     = CAS-MCO-2016-11-26T22.50.27.381-NIR-02005--
+                                     B1
+      ScalingFactor                = 1.00
+      Offset                       = 0.00
+      PredictMaximumExposureTime   = 1.5952 <ms>
+      CassisOffNadirAngle          = 10.032 <deg>
+      PredictedRepetitionFrequency = 367.5 <ms>
+      GroundTrackVelocity          = 3.4686 <km/s>
+      ForwardRotationAngle         = 52.703 <deg>
+      SpiceMisalignment            = 185.422 <deg>
+      FocalLength                  = 0.8770 <m>
+      FNumber                      = 6.50
+      ExposureTimeCommand          = 150
+      FrameletNumber               = 5
+      NumberOfFramelets            = 40
+      ImageFrequency               = 400000 <ms>
+      NumberOfWindows              = 6
+      UniqueIdentifier             = 100799268
+      UID                          = 100799268
+      ExposureTimestamp            = 2f015435767e275a
+      ExposureTimePEHK             = 1.440e-003 <ms>
+      PixelsPossiblySaturated      = 0.00
+      IFOV                         = 1.140e-005
+      IFOVUnit                     = rad/px
+      FiltersAvailable             = "BLU RED NIR PAN"
+      FocalLengthUnit              = M
+      TelescopeType                = "Three-mirror anastigmat with powered fold
+                                      mirror"
+      DetectorDescription          = "2D Array"
+      PixelHeight                  = 10.0
+      PixelHeightUnit              = MICRON
+      PixelWidth                   = 10.0
+      PixelWidthUnit               = MICRON
+      DetectorType                 = 'SI CMOS HYBRID (OSPREY 2K)'
+      ReadNoise                    = 61.0
+      ReadNoiseUnit                = ELECTRON
+      MissionPhase                 = MCO
+      SubInstrumentIdentifier      = 61.0
+      WindowCount                  = 2
+      Window1Binning               = 0
+      Window1StartSample           = 0
+      Window1EndSample             = 2047
+      Window1StartLine             = 354
+      Window1EndLine               = 632
+      Window2Binning               = 0
+      Window2StartSample           = 0
+      Window2EndSample             = 2047
+      Window2StartLine             = 712
+      Window2EndLine               = 966
+      Window3Binning               = 1
+      Window3StartSample           = 0
+      Window3EndSample             = 2047
+      Window3StartLine             = 1048
+      Window3EndLine               = 1303
+      Window4Binning               = 0
+      Window4StartSample           = 1024
+      Window4EndSample             = 1087
+      Window4StartLine             = 1409
+      Window4EndLine               = 1662
+      Window5Binning               = 0
+      Window5StartSample           = 640
+      Window5EndSample             = 767
+      Window5StartLine             = 200
+      Window5EndLine               = 208
+      Window6Binning               = 0
+      Window6StartSample           = 1280
+      Window6EndSample             = 1407
+      Window6StartLine             = 1850
+      Window6EndLine               = 1858
+      YearDoy                      = 2016331
+      ObservationId                = CRUS_049218_201_0
+    End_Group
+  )");
+
+  PvlGroup truthNIRArchiveGroup;
+  arnirss >> truthNIRArchiveGroup;
+
+  PvlGroup &archiveGroup = outLabel->findGroup("ArchiveNIR", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, archiveGroup, truthNIRArchiveGroup);
+
+  std::istringstream arredss(R"(
+    Group = ArchiveRED
+      DataSetId                    = TBD
+      ProductVersionId             = UNK
+      ProducerId                   = UBE
+      ProducerName                 = 'Nicolas Thomas'
+      ProductCreationTime          = 2017-10-03T10:50:12
+      FileName                     = CAS-MCO-2016-11-26T22.50.27.381-RED-01005--
+                                     B1
       ScalingFactor                = 1.00
       Offset                       = 0.00
       PredictMaximumExposureTime   = 1.5952 <ms>
@@ -2412,7 +2477,8 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
       IFOVUnit                     = rad/px
       FiltersAvailable             = "BLU RED NIR PAN"
       FocalLengthUnit              = M
-      TelescopeType                = "Three-mirror anastigmat with powered fold mirror"
+      TelescopeType                = "Three-mirror anastigmat with powered fold
+                                      mirror"
       DetectorDescription          = "2D Array"
       PixelHeight                  = 10.0
       PixelHeightUnit              = MICRON
@@ -2459,49 +2525,232 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
     End_Group
   )");
 
-  PvlGroup truthArchiveGroup;
-  arss >> truthArchiveGroup;
+  PvlGroup truthREDArchiveGroup;
+  arredss >> truthREDArchiveGroup;
 
-  PvlGroup &archiveGroup = outLabel->findGroup("Archive", Pvl::Traverse);
+  archiveGroup = outLabel->findGroup("ArchiveRED", Pvl::Traverse);
 
-  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, archiveGroup, truthArchiveGroup);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, archiveGroup, truthREDArchiveGroup);
 
-  std::istringstream bbss(R"(
-    Group = BandBin
-      FilterName = (RED, BLU, NIR, PAN)
-      Center     = (835.4, 497.4, 940.2, 677.4) <nm>
-      Width      = (98.0, 134.3, 120.6, 231.5) <nm>
-      NaifIkCode = (-143422, -143424, -143423, -143421)
+  std::istringstream arbluss(R"(
+    Group = ArchiveBLU
+      DataSetId                    = TBD
+      ProductVersionId             = UNK
+      ProducerId                   = UBE
+      ProducerName                 = 'Nicolas Thomas'
+      ProductCreationTime          = 2017-10-03T10:50:12
+      FileName                     = CAS-MCO-2016-11-26T22.50.27.381-BLU-03005--
+                                     B1
+      ScalingFactor                = 1.00
+      Offset                       = 0.00
+      PredictMaximumExposureTime   = 1.5952 <ms>
+      CassisOffNadirAngle          = 10.032 <deg>
+      PredictedRepetitionFrequency = 367.5 <ms>
+      GroundTrackVelocity          = 3.4686 <km/s>
+      ForwardRotationAngle         = 52.703 <deg>
+      SpiceMisalignment            = 185.422 <deg>
+      FocalLength                  = 0.8770 <m>
+      FNumber                      = 6.50
+      ExposureTimeCommand          = 150
+      FrameletNumber               = 5
+      NumberOfFramelets            = 40
+      ImageFrequency               = 400000 <ms>
+      NumberOfWindows              = 6
+      UniqueIdentifier             = 100799268
+      UID                          = 100799268
+      ExposureTimestamp            = 2f015435767e275a
+      ExposureTimePEHK             = 1.440e-003 <ms>
+      PixelsPossiblySaturated      = 0.00
+      IFOV                         = 1.140e-005
+      IFOVUnit                     = rad/px
+      FiltersAvailable             = "BLU RED NIR PAN"
+      FocalLengthUnit              = M
+      TelescopeType                = "Three-mirror anastigmat with powered fold
+                                      mirror"
+      DetectorDescription          = "2D Array"
+      PixelHeight                  = 10.0
+      PixelHeightUnit              = MICRON
+      PixelWidth                   = 10.0
+      PixelWidthUnit               = MICRON
+      DetectorType                 = 'SI CMOS HYBRID (OSPREY 2K)'
+      ReadNoise                    = 61.0
+      ReadNoiseUnit                = ELECTRON
+      MissionPhase                 = MCO
+      SubInstrumentIdentifier      = 61.0
+      WindowCount                  = 3
+      Window1Binning               = 0
+      Window1StartSample           = 0
+      Window1EndSample             = 2047
+      Window1StartLine             = 354
+      Window1EndLine               = 632
+      Window2Binning               = 0
+      Window2StartSample           = 0
+      Window2EndSample             = 2047
+      Window2StartLine             = 712
+      Window2EndLine               = 966
+      Window3Binning               = 1
+      Window3StartSample           = 0
+      Window3EndSample             = 2047
+      Window3StartLine             = 1048
+      Window3EndLine               = 1302
+      Window4Binning               = 0
+      Window4StartSample           = 1024
+      Window4EndSample             = 1087
+      Window4StartLine             = 1409
+      Window4EndLine               = 1626
+      Window5Binning               = 0
+      Window5StartSample           = 640
+      Window5EndSample             = 767
+      Window5StartLine             = 200
+      Window5EndLine               = 208
+      Window6Binning               = 0
+      Window6StartSample           = 1280
+      Window6EndSample             = 1407
+      Window6StartLine             = 1850
+      Window6EndLine               = 1858
+      YearDoy                      = 2016331
+      ObservationId                = CRUS_049218_201_0
     End_Group
   )");
 
-  PvlGroup truthBandBinGroup;
-  bbss >> truthBandBinGroup;
+  PvlGroup truthBLUArchiveGroup;
+  arbluss >> truthBLUArchiveGroup;
 
-  PvlGroup &bandBinGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
+  archiveGroup = outLabel->findGroup("ArchiveBLU", Pvl::Traverse);
 
-  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, bandBinGroup, truthBandBinGroup);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, archiveGroup, truthBLUArchiveGroup);
+
+  std::istringstream arpanss(R"(
+    Group = ArchivePAN
+      DataSetId                    = TBD
+      ProductVersionId             = UNK
+      ProducerId                   = UBE
+      ProducerName                 = 'Nicolas Thomas'
+      ProductCreationTime          = 2017-10-03T10:50:12
+      FileName                     = CAS-MCO-2016-11-26T22.50.27.381-PAN-00005--
+                                     B1
+      ScalingFactor                = 1.00
+      Offset                       = 0.00
+      PredictMaximumExposureTime   = 1.5952 <ms>
+      CassisOffNadirAngle          = 10.032 <deg>
+      PredictedRepetitionFrequency = 367.5 <ms>
+      GroundTrackVelocity          = 3.4686 <km/s>
+      ForwardRotationAngle         = 52.703 <deg>
+      SpiceMisalignment            = 185.422 <deg>
+      FocalLength                  = 0.8770 <m>
+      FNumber                      = 6.50
+      ExposureTimeCommand          = 150
+      FrameletNumber               = 5
+      NumberOfFramelets            = 40
+      ImageFrequency               = 400000 <ms>
+      NumberOfWindows              = 6
+      UniqueIdentifier             = 100799268
+      UID                          = 100799268
+      ExposureTimestamp            = 2f015435767e275a
+      ExposureTimePEHK             = 1.440e-003 <ms>
+      PixelsPossiblySaturated      = 29.17
+      IFOV                         = 1.140e-005
+      IFOVUnit                     = rad/px
+      FiltersAvailable             = "BLU RED NIR PAN"
+      FocalLengthUnit              = M
+      TelescopeType                = "Three-mirror anastigmat with powered fold
+                                      mirror"
+      DetectorDescription          = "2D Array"
+      PixelHeight                  = 10.0
+      PixelHeightUnit              = MICRON
+      PixelWidth                   = 10.0
+      PixelWidthUnit               = MICRON
+      DetectorType                 = 'SI CMOS HYBRID (OSPREY 2K)'
+      ReadNoise                    = 61.0
+      ReadNoiseUnit                = ELECTRON
+      MissionPhase                 = MCO
+      SubInstrumentIdentifier      = 61.0
+      WindowCount                  = 0
+      Window1Binning               = 0
+      Window1StartSample           = 0
+      Window1EndSample             = 2047
+      Window1StartLine             = 354
+      Window1EndLine               = 633
+      Window2Binning               = 0
+      Window2StartSample           = 0
+      Window2EndSample             = 2047
+      Window2StartLine             = 712
+      Window2EndLine               = 966
+      Window3Binning               = 1
+      Window3StartSample           = 0
+      Window3EndSample             = 2047
+      Window3StartLine             = 1048
+      Window3EndLine               = 1302
+      Window4Binning               = 0
+      Window4StartSample           = 1024
+      Window4EndSample             = 1087
+      Window4StartLine             = 1409
+      Window4EndLine               = 1662
+      Window5Binning               = 0
+      Window5StartSample           = 640
+      Window5EndSample             = 767
+      Window5StartLine             = 200
+      Window5EndLine               = 208
+      Window6Binning               = 0
+      Window6StartSample           = 1280
+      Window6EndSample             = 1407
+      Window6StartLine             = 1850
+      Window6EndLine               = 1858
+      YearDoy                      = 2016331
+      ObservationId                = CRUS_049218_201_0
+    End_Group
+  )");
+
+  PvlGroup truthPANArchiveGroup;
+  arpanss >> truthPANArchiveGroup;
+
+  archiveGroup = outLabel->findGroup("ArchivePAN", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, archiveGroup, truthPANArchiveGroup);
+
+  std::istringstream sss(R"(
+    Group = Stitch
+      OriginalFilters    = (NIR, RED, BLU, PAN)
+      FilterCenters      = (940.2, 835.4, 497.4, 677.4)
+      FilterWidths       = (120.6, 98.0, 134.3, 231.5)
+      FilterIkCodes      = (-143423, -143422, -143424, -143421)
+      FilterStartSamples = (0.0, 0.0, 1024.0, 0.0)
+      FilterSamples      = (2048, 2048, 64, 2048)
+      FilterStartLines   = (1048.0, 712.0, 1409.0, 354.0)
+      FilterLines        = (256, 256, 218, 280)
+      FilterFileNames    = (CAS-MCO-2016-11-26T22.50.27.381-NIR-02005-B1,
+                            CAS-MCO-2016-11-26T22.50.27.381-RED-01005-B1,
+                            CAS-MCO-2016-11-26T22.50.27.381-BLU-03005-B1,
+                            CAS-MCO-2016-11-26T22.50.27.381-PAN-00005-B1)
+    End_Group
+  )");
+
+  PvlGroup truthStitchGroup;
+  sss >> truthStitchGroup;
+
+  PvlGroup &stitchGroup = outLabel->findGroup("Stitch", Pvl::Traverse);
+
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, stitchGroup, truthStitchGroup);
 
   std::istringstream map(R"(
     Group = Mapping
-      ProjectionName       = Equirectangular
-      CenterLongitude      = 266.21338321885
-      TargetName           = Mars
-      EquatorialRadius     = 3396190.0 <meters>
-      PolarRadius          = 3376200.0 <meters>
-      LatitudeType         = Planetocentric
-      LongitudeDirection   = PositiveEast
-      LongitudeDomain      = 360
-      MinimumLatitude      = 2.465491209879
-      MaximumLatitude      = 2.703757297152
-      MinimumLongitude     = 266.13827437353
-      MaximumLongitude     = 266.28849206417
-      UpperLeftCornerX     = -4600.0 <meters>
-      UpperLeftCornerY     = 160400.0 <meters>
-      PixelResolution      = 200.0 <meters/pixel>
-      Scale                = 296.3699086728 <pixels/degree>
-      CenterLatitude       = 2.584624253516
-      CenterLatitudeRadius = 3396148.9883258
+      ProjectionName     = Equirectangular
+      CenterLongitude    = 266.21992961904
+      TargetName         = Mars
+      EquatorialRadius   = 3396190.0 <meters>
+      PolarRadius        = 3376200.0 <meters>
+      LatitudeType       = Planetocentric
+      LongitudeDirection = PositiveEast
+      LongitudeDomain    = 360
+      MinimumLatitude    = 2.4644293339627
+      MaximumLatitude    = 2.7054455166927
+      MinimumLongitude   = 266.09781108551
+      MaximumLongitude   = 266.34204815257
+      UpperLeftCornerX   = -7234.9327157961 <meters>
+      UpperLeftCornerY   = 160368.69134142 <meters>
+      PixelResolution    = 6.7806304740357 <meters/pixel>
+      Scale              = 8741.6622669795 <pixels/degree>
+      CenterLatitude     = 2.584937425328
     End_Group
   )");
 
@@ -2514,8 +2763,8 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
 
   Histogram *hist = exportCube.histogram();
 
-  EXPECT_NEAR(hist->Average(), 0.29920571615330949, 0.0001);
-  EXPECT_NEAR(hist->Sum(), 183.71230971813202, 0.0001);
-  EXPECT_EQ(hist->ValidPixels(), 614);
-  EXPECT_NEAR(hist->StandardDeviation(), 0.0054483425167489693, 0.0001);
+  EXPECT_NEAR(hist->Average(), 0.26625623495550205, 0.0001);
+  EXPECT_NEAR(hist->Sum(), 444615.69537125883, 0.0001);
+  EXPECT_EQ(hist->ValidPixels(), 1669879);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.048925404459616698, 0.0001);
 }
