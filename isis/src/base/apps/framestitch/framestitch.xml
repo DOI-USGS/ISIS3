@@ -136,7 +136,8 @@
       <parameter name="NUM_LINES_OVERLAP">
         <type>integer</type>
         <brief>
-          The number of lines in each frame repeating information present in neighboring frames.
+          The number of lines in each frame repeating information
+          present in neighboring frames.
         </brief>
         <description>
           <p>
@@ -147,7 +148,9 @@
           non-negative number.
           </p>
           <p>
-            If not entered, the program will assume the value 0.
+            If not entered, the program will assume the value 2, which
+            is what the PushFrame CSM camera model for this sensor
+            assumes.
           </p>
         </description>
         <internalDefault>Camera</internalDefault>

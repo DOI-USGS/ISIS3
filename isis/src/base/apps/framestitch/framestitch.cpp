@@ -145,10 +145,10 @@ namespace Isis {
       frameHeight = evenFrameHeight;
     }
 
-    int numLinesOverlap = 0; // The default value
-    if (ui.WasEntered("NUM_LINES_OVERLAP")) {
+    int numLinesOverlap = 2; // The default value
+    if (ui.WasEntered("NUM_LINES_OVERLAP"))
       numLinesOverlap = ui.GetInteger("NUM_LINES_OVERLAP");
-    }
+
     if (numLinesOverlap %2 != 0 || numLinesOverlap < 0) {
       QString msg = "Expecting a non-negative and even value for NUM_LINES_OVERLAP.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -242,13 +242,10 @@ namespace Isis {
     for (int line = 0; line < outCube->lineCount(); line++) {
       int frame = line / frameHeight; // block index
       int lineInFrame = line - frameHeight * frame; // line index in the current block
-      
-      if (lineInFrame < numLinesOverlap / 2) 
-        continue; // these get wiped
-      
-      if (lineInFrame >= frameHeight - numLinesOverlap / 2) {
-        continue; // gets wiped 
-      }
+
+      // Skip these lines, which will result in them being wiped
+      if (lineInFrame < numLinesOverlap / 2 || lineInFrame >= frameHeight - numLinesOverlap / 2)
+        continue;
 
       // Same book-keeping is needed to compute where the line will go
       int src = line;
