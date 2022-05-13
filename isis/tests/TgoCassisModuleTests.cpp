@@ -2318,7 +2318,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   }
 
   // run cam2map and cassismos on pan cube
-  QString projectedFile = "/Users/acpaquette/Desktop/projected.cub";
+  QString projectedFile = prefix.path() + "/projected.cub";
   QVector<QString> cam2mapArgs = {"from=" + tgocassisstitchOutput,
                                   "to=" + projectedFile,
                                   "map=" + mapFile,};
