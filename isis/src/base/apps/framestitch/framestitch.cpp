@@ -1,6 +1,7 @@
 #include "framestitch.h"
 
 #include <QString>
+#include <iostream>
 
 #include "Brick.h"
 #include "Buffer.h"
@@ -129,8 +130,7 @@ namespace Isis {
     int frameHeight = 1;
     if (ui.WasEntered("frameHeight")) {
       frameHeight = ui.GetInteger("FRAMEHEIGHT");
-    }
-    else {
+    } else {
       // User didn't pass the size of the frames so attempt to infer it from
       // the cubes
       int evenFrameHeight = computeFrameHeight(evenCube);
@@ -145,6 +145,15 @@ namespace Isis {
       frameHeight = evenFrameHeight;
     }
 
+    int numLinesOverlap = 0; // The default value
+    if (ui.WasEntered("NUM_LINES_OVERLAP")) {
+      numLinesOverlap = ui.GetInteger("NUM_LINES_OVERLAP");
+    }
+    if (numLinesOverlap %2 != 0 || numLinesOverlap < 0) {
+      QString msg = "Expecting a non-negative and even value for NUM_LINES_OVERLAP.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    
     // If there's an even number of frames and the inputs are flipped, we have to
     // swap even and odd because the first frame in the even cube is valid and the
     // first frame in the odd cube is now all NULL.
@@ -173,6 +182,9 @@ namespace Isis {
       if (swapInputCubes) {
         inIndex = 1 - inIndex;
       }
+      // in[0] is first input cube and in[1] is the second. Copy from
+      // one of these, depending on how inIndex changes, to out[0],
+      // which is the only output cube.
       out[0]->Copy(*in[inIndex]);
     };
 
@@ -189,24 +201,30 @@ namespace Isis {
     }
     outInst["Framelets"].setValue("All");
 
-    // ProcessByBrick requires that all buffers move through the cubes the same
-    // way so we have to do a second manual pass to flip the output cube if requested.
+    // At this stage the merging of the two input cubes has been scheduled,
+    // with the result in outCube.
+    
+    // ProcessByBrick requires that all buffers move through the cubes
+    // the same way so we have to do a second manual pass to flip the
+    // output cube if requested.
     if (ui.GetBoolean("FLIP")) {
+      // Need a temporary buffer to help with the swapping of top and
+      // bottom portions of outCube.
       Brick topBuff(outCube->sampleCount(), frameHeight, outCube->bandCount(), outCube->pixelType());
-      Brick bottomBuff(outCube->sampleCount(), frameHeight, outCube->bandCount(), outCube->pixelType());
-      Brick tempBuff(outCube->sampleCount(), frameHeight, outCube->bandCount(), outCube->pixelType());
+      Brick botBuff(outCube->sampleCount(), frameHeight, outCube->bandCount(), outCube->pixelType());
+      Brick tmpBuff(outCube->sampleCount(), frameHeight, outCube->bandCount(), outCube->pixelType());
 
       for (int frame = 0; frame < numFrames / 2; frame++) {
         topBuff.SetBasePosition(1,frame * frameHeight + 1,1);
         outCube->read(topBuff);
-        bottomBuff.SetBasePosition(1,outCube->lineCount() - (frame + 1) * frameHeight + 1,1);
-        outCube->read(bottomBuff);
+        botBuff.SetBasePosition(1,outCube->lineCount() - (frame + 1) * frameHeight + 1,1);
+        outCube->read(botBuff);
 
-        tempBuff.Copy(topBuff);
-        topBuff.Copy(bottomBuff);
+        tmpBuff.Copy(topBuff);
+        topBuff.Copy(botBuff);
         outCube->write(topBuff);
-        bottomBuff.Copy(tempBuff);
-        outCube->write(bottomBuff);
+        botBuff.Copy(tmpBuff);
+        outCube->write(botBuff);
       }
 
       if (!outInst.hasKeyword("DataFlipped")) {
@@ -214,9 +232,53 @@ namespace Isis {
       }
       outInst["DataFlipped"].setValue(toString(!inputFlipped));
     }
+  
+    // Wipe numLinesOverlap/2 lines at the top and same amount at the bottom
+    // of each framelet to reduce their overlap.
 
+    Brick srcBuff(outCube->sampleCount(), 1, outCube->bandCount(), outCube->pixelType());
+    Brick dstBuff(outCube->sampleCount(), 1, outCube->bandCount(), outCube->pixelType());
+    
+    for (int line = 0; line < outCube->lineCount(); line++) {
+      int frame = line / frameHeight; // block index
+      int lineInFrame = line - frameHeight * frame; // line index in the current block
+      
+      if (lineInFrame < numLinesOverlap / 2) 
+        continue; // these get wiped
+      
+      if (lineInFrame >= frameHeight - numLinesOverlap / 2) {
+        continue; // gets wiped 
+      }
+
+      // Same book-keeping is needed to compute where the line will go
+      int src = line;
+      int dst = lineInFrame - numLinesOverlap / 2 + (frameHeight - numLinesOverlap) * frame;
+
+      srcBuff.SetBasePosition(1, src + 1, 1);
+      dstBuff.SetBasePosition(1, dst + 1, 1);
+
+      outCube->read(srcBuff);  // read into srcBuf
+      dstBuff.Copy(srcBuff);   // copy from srcBuff to dstBuff
+      outCube->write(dstBuff); // write into outCube
+    }
+    
+    // Wipe the last lines of the image after they are transferred
+    // TODO: Figure out how to resize the cube.
+    for (int line = outCube->lineCount() - numFrames * numLinesOverlap;
+         line < outCube->lineCount(); line++) {
+
+      srcBuff.SetBasePosition(1, line + 1, 1);
+      outCube->read(srcBuff);
+
+      for (int it = 0; it < srcBuff.size(); it++)
+        srcBuff[it] = Isis::NULL8;
+      
+      outCube->write(srcBuff);
+    }
+    
     process.EndProcess();
-
+    
+    return;
   }
 
-}
+} // end namespace Isis
