@@ -34,6 +34,7 @@ release.
 -->
 
 ## [Unreleased]
+- Added check to determine if poles were a valid projection point in ImagePolygon when generating footprint for a map projected image. [#4390](https://github.com/USGS-Astrogeology/ISIS3/issues/4390)
 - Updated the LRO photometry application Lronacpho, to use by default the current 2019 photometric model (LROC_Empirical). The model's coefficients are found in the PVL file that exists in the LRO data/mission/calibration directory. If the old parameter file is provided, the old algorithm(2014) will be used. This functionality is desired for calculation comparisons. Issue: [#4512](https://github.com/USGS-Astrogeology/ISIS3/issues/4512), PR: [#4519](https://github.com/USGS-Astrogeology/ISIS3/pull/4519)
 - Added a new application, framestitch, for stitching even and odd push frame images back together prior to processing in other applications. [4924](https://github.com/USGS-Astrogeology/ISIS3/issues/4924)
 
@@ -47,6 +48,7 @@ release.
 
 ### Fixed
 - Added check to determine if poles were a valid projection point in ImagePolygon when generating footprint for a map projected image. [#4390](https://github.com/USGS-Astrogeology/ISIS3/issues/4390)
+- Fixed the Mars Express HRSC SRC camera and serial number to use the StartTime instead of the StartClockCount  [#4803](https://github.com/USGS-Astrogeology/ISIS3/issues/4803)
 
 
 ## [7.0.0] - 2022-02-11
