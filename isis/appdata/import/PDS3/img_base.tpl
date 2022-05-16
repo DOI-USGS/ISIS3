@@ -96,7 +96,11 @@ Object = Translation
   {% if exists("ptrIMAGE.Units") %}
   DataFilePointer             = {{ ptrIMAGE.Value }} <{{ ptrIMAGE.Units }}>
   {% else if exists("ptrIMAGE.Value") %}
-  DataFilePointer             = {{ ptrIMAGE.Value }}
+    {% if isArray(ptrIMAGE.Value) %}
+    DataFilePointer             = ({{ ptrIMAGE.Value.0 }}, {{ ptrIMAGE.Value.1 }})
+    {% else %}
+    DataFilePointer             = {{ ptrIMAGE.Value }}
+    {% endif %}
   {% endif %}
   {% if exists("RECORD_BYTES") %}
   DataFileRecordBytes         = {{ RECORD_BYTES.Value }}
