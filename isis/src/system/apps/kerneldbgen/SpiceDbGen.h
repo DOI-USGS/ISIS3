@@ -42,6 +42,11 @@ find files of those names at the top level of this repository. **/
  *   @history 2019-08-13 Jesse Mapel - Added the ability to pass an explicit lsit
  *                           of files to the Direct method. Fixes #3390.
  *
+ *   @history 2021-12-22 Amy Stamile - Added the ability to include timing offset information
+ *                          in db if information exists in the kernel comments.
+ *                          This information will be use in spiceinit to handle time offsets
+ *                          when selecting smithed kernels. References #3363.
+ *
  */
 class SpiceDbGen {
 

@@ -9,6 +9,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
+#include "Preference.h"
 
 #include "gmock/gmock.h"
 
@@ -333,4 +334,31 @@ TEST_F(TestKernelDb, SystemCKConfig) {
   QStringList cks2 = cKernels2.kernels();
   ASSERT_EQ(cks2.size(), 1);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks2[0], "$mro/kernels/ck/mro_crm_psp_080101_080131.bc");
+}
+
+
+
+TEST_F(TestKernelDb, TestKernelsSmithOffset) {
+  PvlGroup &instGroup = cubeLabel.findObject("IsisCube").findGroup("Instrument");
+  instGroup.findKeyword("StartTime") = "2002-02-20T22:57:57.253";
+  instGroup.findKeyword("StopTime") = "2002-02-20T23:00:56.983";
+  instGroup.findKeyword("SpacecraftName") = "MARS_ODYSSEY";
+  instGroup.findKeyword("InstrumentId") = "THEMIS_IR";
+  KernelDb db(Kernel::Smithed);
+
+  PvlGroup &dataDir = Preference::Preferences(true).findGroup("DataDirectory");
+
+  QString testDir = "data/KernelDb";
+
+  db.loadKernelDbFiles(dataDir, testDir + "/ck", cubeLabel);
+  db.loadKernelDbFiles(dataDir, testDir + "/spk", cubeLabel);
+  db.readKernelDbFiles();
+
+  QStringList spk = db.spacecraftPosition(cubeLabel).kernels();
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, spk[0], "data/kerneldbgen/thmIR.bsp");
+
+  QList<std::priority_queue<Kernel>> ck = db.spacecraftPointing(cubeLabel);
+  Kernel cKernels(ck[0].top());
+  QStringList cklist = cKernels.kernels();
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cklist[0], "data/kerneldbgen/thmIR.bc");
 }

@@ -428,6 +428,7 @@ namespace Isis {
             }
           }
 
+
           bool startMatches = matches(lab, grp, start, cameraVersion);
           bool endMatches = matches(lab, grp, end, cameraVersion);
 
@@ -580,6 +581,19 @@ namespace Isis {
     const PvlObject &cube = lab.findObject("IsisCube");
     bool matchTime = !grp.hasKeyword("Time");
     bool matchKeywords = true;
+    double startOffset = 0;
+    double endOffset = 0;
+    QString instrument = "";
+
+    if (grp.hasKeyword("StartOffset")){
+      startOffset = (double) grp["StartOffset"] + 0.001;
+    }
+    if (grp.hasKeyword("EndOffset")){
+      endOffset = (double) grp["EndOffset"] + 0.001;
+    }
+    if (grp.hasKeyword("Instrument")){
+      instrument = (QString) grp["Instrument"];
+    }
 
     // First, the time search. Loop through the keywords, if the name isn't
     //  Time then skip it. If it is, then get the start/end times and keep
@@ -588,16 +602,27 @@ namespace Isis {
       PvlKeyword key = grp[keyword];
 
       if (key.isNamed("Time")) {
+
         // Pull the selections start and end time out
         iTime kernelStart = (QString) key[0];
         iTime kernelEnd   = (QString) key[1];
 
         // If the kernel times inside of the requested times we
         // set the matchTime to be true.
-        if ((kernelStart <= timeToMatch) && (kernelEnd >= timeToMatch)) {
+        if ((kernelStart - startOffset <= timeToMatch) && (kernelEnd + endOffset >= timeToMatch)) {
           matchTime = true;
         }
+        // If the kernel segment has an instrument specification that doesn't match
+        // the instrument id in the label then the timing is always invalid
+        if (!instrument.isEmpty()) {
+          const PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
+          QString instId = (QString) inst.findKeyword("InstrumentId");
+          if (instId.compare(instrument) != 0) {
+            matchTime = false;
+          }
+        }
       }
+
       else if (key.isNamed("Match")) {
         try {
           QString matchGroup = key[0];

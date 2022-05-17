@@ -240,6 +240,12 @@
     <change name="Stuart Sides" date="2021-02-22">
       Added ability to get the sun distance from the camera.
     </change>
+    <change name="Cordell Michaud" date="2022-05-03">
+      Refactored lrowaccal to be callable for testing and to remove global 
+      variables and helper functions. Added units label "W/m2/sr/um" to 
+      RadiometricType keyword in output cube label when RadiometricType is 
+      AbsoluteRadiance.
+    </change>
   </history>
 
   <groups>
