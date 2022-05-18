@@ -136,10 +136,6 @@ message("\tINSTALL PREFIX: ${CMAKE_INSTALL_PREFIX}")
 #===============================================================================
 #===============================================================================
 
-# Set up the ctest tool which is used to run all of the tests.
-enable_testing()
-include(CTest)
-
 # Set up Anaconda prefix in the case with a non-default conda env is activated
 if(EXISTS $ENV{CONDA_PREFIX})
   message("CONDA PREFIX: $ENV{CONDA_PREFIX}")
@@ -152,10 +148,6 @@ endif()
 if(JP2KFLAG)
  set(JP2KFLAG 1)
 endif()
-
-# Set up the ctest tool which is used to run all of the tests.
-enable_testing()
-include(CTest)
 
 # Specify flags used
 # on linux, add the conda prefix to handle possible issues with rpaths at link time
@@ -608,8 +600,7 @@ install(PROGRAMS ${CMAKE_BINARY_DIR}/lib/Camera.plugin DESTINATION ${CMAKE_INSTA
 #   the end of this file containing a CMakeLists.txt file which includes all of
 #   the desired post-install commands inside.
 add_subdirectory(cmake)
-option (BUILD_TESTS "Build tests" ON)
-if(BUILD_TESTS)
+if(buildTests)
   include(CTest)
   enable_testing()
   add_subdirectory(tests)
