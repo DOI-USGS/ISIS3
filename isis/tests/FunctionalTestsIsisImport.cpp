@@ -235,702 +235,258 @@ End)";
   EXPECT_EQ(archiveGroup["ObservationId"][0].toStdString(), "CRUS_000000_505_1");
 }
 
+TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyaTC) {
+  std::istringstream PvlInput(R"(
+                      Object = IsisCube
+                      Object = Core
+                        StartByte   = 65537
+                        Format      = Tile
+                        TileSamples = 1024
+                        TileLines   = 1024
 
-TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiVis) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "/kaguyatc2isisTEMP.cub";
-  QVector<QString> args = {"from=data/kaguyami2isis/vis_cropped.img", "to="+cubeFileName};
+                        Group = Dimensions
+                          Samples = 3
+                          Lines   = 2
+                          Bands   = 1
+                        End_Group
 
+                        Group = Pixels
+                          Type       = SignedWord
+                          ByteOrder  = Lsb
+                          Base       = 0.0
+                          Multiplier = 2.0e-05
+                        End_Group
+                      End_Object
+
+                      Group = Instrument
+                        MissionName        = SELENE
+                        SpacecraftName     = KAGUYA
+                        InstrumentName     = "Terrain Camera"
+                        InstrumentId       = TC
+                        TargetName         = MOON
+                        ObservationModeId  = NORMAL&SUPPORT
+                        SensorDescription  = "Imagery type:Pushbroom. ImageryMode:Mono,Stereo.
+                                              ExposureTimeMode:Long,Middle,Short.
+                                              CompressionMode:NonComp,DCT. Q-table:32 patterns.
+                                              H-table:4 patterns.
+                                              SwathMode:F(Full),N(Nominal),H(Half). First pixel
+                                              number:1(F),297(N),1172(H)."
+                        SensorDescription2 = "Pixel size:7x7[micron^2](TC1/TC2). Wavelength
+                                              range:430-850[nm](TC1/TC2). A/D
+                                              rate:10[bit](TC1/TC2). Slant angle:+/-15[degree]
+                                              (from nadir to +x of S/C)(TC1/TC2). Focal
+                                              length:72.45/72.63[mm](TC1/TC2). F
+                                              number:3.97/3.98(TC1/TC2)."
+                      End_Group
+
+                      Group = Archive
+                        ProductId                   = TC_EVE_02_S09E000S12E003SC
+                        SoftwareName                = RGC_TC_MI
+                        SoftwareVersion             = 2.5.0
+                        ProcessVersionId            = MAP
+                        ProductCreationTime         = 2009-09-17T01:03:48Z
+                        ProgramStartTime            = 2009-09-17T00:58:53Z
+                        ProducerId                  = LISM
+                        ProductSetId                = TC_Evening_MAP
+                        ProductVersionId            = 02
+                        RegisteredProduct           = Y
+                        Level2AFileName             = (TC2S2A0_02DMF03519_003_0012.img,
+                                                      TC2S2A0_02DMF03519_003_0013.img,
+                                                      TC2S2A0_02DMF03519_003_0014.img,
+                                                      TC2S2A0_02DMF03520_003_0012.img,
+                                                      TC2S2A0_02DMF03520_003_0013.img,
+                                                      TC2S2A0_02DMF03520_003_0014.img,
+                                                      TC2S2A0_02DMF03521_003_0012.img,
+                                                      TC2S2A0_02DMF03521_003_0013.img,
+                                                      TC2S2A0_02DMF03521_003_0014.img,
+                                                      TC2S2A0_02DMF03522_003_0012.img,
+                                                      TC2S2A0_02DMF03522_003_0013.img,
+                                                      TC2S2A0_02DMF03522_003_0014.img)
+                        SpiceMetakernelFileName     = (RGC_INF_TCv301IK_RISE100g_de421_090819.mk,
+                                                      RGC_INF_TCv301IK_RISE100g_de421_090819.mk,
+                                                      RGC_INF_TCv301IK_RISE100g_de421_090819.mk,
+                                                      RGC_INF_TCv301IK_RISE100g_de421_090819.mk,
+                                                      RGC_INF_TCv301IK_RISE100g_de421_090819.mk,
+                                                      RGC_INF_TCv301IK_RISE100g_de421_090819.mk,
+                                                      RGC_INF_TCv301IK_RISE100g_de421_090819.mk,
+                                                      RGC_INF_TCv301IK_RISE100g_de421_090819.mk,
+                                                      RGC_INF_TCv301IK_RISE100g_de421_090819.mk,
+                                                      RGC_INF_TCv301IK_RISE100g_de421_090819.mk,
+                                                      RGC_INF_TCv301IK_RISE100g_de421_090819.mk,
+                                                      RGC_INF_TCv301IK_RISE100g_de421_090819.mk)
+                        DataSetId                   = TC_MAP
+                        ImageValueType              = REFLECTANCE
+                        ImageUnit                   = ND
+                        MinForStatisticalEvaluation = 0
+                        MaxForStatisticalEvaluation = 32767
+                        SceneMaximumDn              = 25005
+                        SceneMinimumDn              = 1
+                        SceneAverageDn              = 3782.5
+                        SceneStdevDn                = 1777.9
+                        SceneModeDn                 = 154
+                        ShadowedAreaMinimum         = 0
+                        ShadowedAreaMaximum         = 0
+                        ShadowedAreaPercentage      = 0
+                        InvalidType                 = (SATURATION, MINUS, DUMMY_DEFECT, OTHER)
+                        InvalidValue                = (-20000, -21000, -22000, -23000)
+                        InvalidPixels               = (0, 0, 0, 0)
+                        OutOfImageBoundsValue       = -30000
+                        OutOfImageBoundsPixel       = 0
+                        StretchedFlag               = FALSE
+                        DarkFileName                = (TC2_DRK_02952_04739_M_C_b05.csv,
+                                                      TC2_DRK_02952_04739_M_C_b05.csv,
+                                                      TC2_DRK_02952_04739_M_C_b05.csv,
+                                                      TC2_DRK_02952_04739_M_C_b05.csv,
+                                                      TC2_DRK_02952_04739_M_C_b05.csv,
+                                                      TC2_DRK_02952_04739_M_C_b05.csv,
+                                                      TC2_DRK_02952_04739_M_C_b05.csv,
+                                                      TC2_DRK_02952_04739_M_C_b05.csv,
+                                                      TC2_DRK_02952_04739_M_C_b05.csv,
+                                                      TC2_DRK_02952_04739_M_C_b05.csv,
+                                                      TC2_DRK_02952_04739_M_C_b05.csv,
+                                                      TC2_DRK_02952_04739_M_C_b05.csv)
+                        FlatFileName                = (TC2_FLT_00293_04739_N_C_b05.csv,
+                                                      TC2_FLT_00293_04739_N_C_b05.csv,
+                                                      TC2_FLT_00293_04739_N_C_b05.csv,
+                                                      TC2_FLT_00293_04739_N_C_b05.csv,
+                                                      TC2_FLT_00293_04739_N_C_b05.csv,
+                                                      TC2_FLT_00293_04739_N_C_b05.csv,
+                                                      TC2_FLT_00293_04739_N_C_b05.csv,
+                                                      TC2_FLT_00293_04739_N_C_b05.csv,
+                                                      TC2_FLT_00293_04739_N_C_b05.csv,
+                                                      TC2_FLT_00293_04739_N_C_b05.csv,
+                                                      TC2_FLT_00293_04739_N_C_b05.csv,
+                                                      TC2_FLT_00293_04739_N_C_b05.csv)
+                        EfficFileName               = (TC2_EFF_PRFLT_N_N_v01.csv,
+                                                      TC2_EFF_PRFLT_N_N_v01.csv,
+                                                      TC2_EFF_PRFLT_N_N_v01.csv,
+                                                      TC2_EFF_PRFLT_N_N_v01.csv,
+                                                      TC2_EFF_PRFLT_N_N_v01.csv,
+                                                      TC2_EFF_PRFLT_N_N_v01.csv,
+                                                      TC2_EFF_PRFLT_N_N_v01.csv,
+                                                      TC2_EFF_PRFLT_N_N_v01.csv,
+                                                      TC2_EFF_PRFLT_N_N_v01.csv,
+                                                      TC2_EFF_PRFLT_N_N_v01.csv,
+                                                      TC2_EFF_PRFLT_N_N_v01.csv,
+                                                      TC2_EFF_PRFLT_N_N_v01.csv)
+                        NonlinFileName              = (TC2_NLT_PRFLT_N_N_v01.csv,
+                                                      TC2_NLT_PRFLT_N_N_v01.csv,
+                                                      TC2_NLT_PRFLT_N_N_v01.csv,
+                                                      TC2_NLT_PRFLT_N_N_v01.csv,
+                                                      TC2_NLT_PRFLT_N_N_v01.csv,
+                                                      TC2_NLT_PRFLT_N_N_v01.csv,
+                                                      TC2_NLT_PRFLT_N_N_v01.csv,
+                                                      TC2_NLT_PRFLT_N_N_v01.csv,
+                                                      TC2_NLT_PRFLT_N_N_v01.csv,
+                                                      TC2_NLT_PRFLT_N_N_v01.csv,
+                                                      TC2_NLT_PRFLT_N_N_v01.csv,
+                                                      TC2_NLT_PRFLT_N_N_v01.csv)
+                        RadCnvCoef                  = (3.723389, 3.723389, 3.723389, 3.723389,
+                                                      3.723389, 3.723389, 3.723389, 3.723389,
+                                                      3.723389, 3.723389, 3.723389,
+                                                      3.723389) <W/m**2/micron/sr>
+                        RefCnvCoef                  = 0.002396 <1/(W/m**2/micron/sr)>
+                        StandardGeometry            = (30.0, 0.0, 30.0)
+                        PhotoCorrId                 = USGS
+                        PhotoCorrCoef               = (-1.900000e-02, 2.420000e-04, -1.460000e-06,
+                                                      5.400000e-02, 1.600000e+00, 0.000000e+00,
+                                                      -2.180000e-01, 5.000000e-01, 4.000000e-01,
+                                                      -8.170000e-02, 8.100000e-03)
+                        ResamplingMethod            = Bi-Linear
+                        TcoMosaicFileName           = (N/A, N/A, N/A, N/A, N/A, N/A, N/A, N/A,
+                                                      N/A, N/A, N/A, N/A)
+                        DtmMosaicFileName           = (N/A, N/A, N/A, N/A, N/A, N/A, N/A, N/A,
+                                                      N/A, N/A, N/A, N/A)
+                        OverlapSelectionId          = "OVERWRITTEN BY BIGGER REV. NUMBER SCENE &
+                                                      MORE ACCURATE SPK VERSION"
+                        MatchingMosaic              = N/A
+                        L2aDeadPixelThreshold       = 30
+                        L2aSaturationThreshold      = 1023
+                        DarkValidMinimum            = -5
+                        RadianceSaturationThreshold = 425.971000 <W/m**2/micron/sr>
+                        RefSaturationThreshold      = 0.655340 <ND>
+                        RefCnvCoef                  = 0.002396 <1/(W/m**2/micron/sr)>
+                        StandardGeometry            = (30.0, 0.0, 30.0)
+                        PhotoCorrId                 = USGS
+                        PhotoCorrCoef               = (-1.900000e-02, 2.420000e-04, -1.460000e-06,
+                                                      5.400000e-02, 1.600000e+00, 0.000000e+00,
+                                                      -2.180000e-01, 5.000000e-01, 4.000000e-01,
+                                                      -8.170000e-02, 8.100000e-03)
+                      End_Group
+
+                      Group = BandBin
+                        FilterName = BroadBand
+                        Center     = 640nm
+                        Width      = 420nm
+                      End_Group
+
+                      Group = Mapping
+                        ProjectionName     = SimpleCylindrical
+                        CenterLongitude    = 0.0
+                        TargetName         = Moon
+                        EquatorialRadius   = 1737400.0 <meters>
+                        PolarRadius        = 1737400.0 <meters>
+                        LatitudeType       = Planetocentric
+                        LongitudeDirection = PositiveEast
+                        LongitudeDomain    = 360
+                        MinimumLatitude    = -11.99975586
+                        MaximumLatitude    = -9.0
+                        MinimumLongitude   = 0.0
+                        MaximumLongitude   = 2.99975586
+                        UpperLeftCornerX   = 3.7015 <meters>
+                        UpperLeftCornerY   = -272900.4905 <meters>
+                        PixelResolution    = 7.403 <meters/pixel>
+                        Scale              = 4096.0 <pixels/degree>
+                      End_Group
+                    End_Object
+
+                    Object = Label
+                      Bytes = 65536
+                    End_Object
+
+                    Object = History
+                      Name      = IsisCube
+                      StartByte = 302055425
+                      Bytes     = 725
+                    End_Object
+
+                    Object = OriginalLabel
+                      Name      = IsisCube
+                      StartByte = 302056150
+                      Bytes     = 10573
+                    End_Object
+                    End
+    )");
+
+  QVector<QString> args = {"from=data/isisimport/kaguyaTC12bytesImage.img", "to=" + tempDir.path() + "/kaguyatc.cub" };
   UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest Kaguya MI image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
 
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
+  isisimport(options);
 
-  // Dimensions group
-  EXPECT_EQ(cube.sampleCount(), 962);
-  EXPECT_EQ(cube.lineCount(), 20);
-  EXPECT_EQ(cube.bandCount(), 2);
+  Pvl output = Pvl(tempDir.path() + "/kaguyatc.cub");
+  Pvl truth;
+  PvlInput >> truth;
 
-  // Pixels group
-  EXPECT_EQ(PixelTypeName(cube.pixelType()), "SignedWord");
-  EXPECT_EQ(ByteOrderName(cube.byteOrder()), "Lsb");
-  EXPECT_DOUBLE_EQ(cube.base(), 0.0);
-  EXPECT_DOUBLE_EQ(cube.multiplier(), 0.013);
+  PvlGroup truthDimensions = truth.findGroup("Dimensions", Isis::Plugin::Traverse);
+  PvlGroup truthInstrument = truth.findGroup("Instrument", Isis::Plugin::Traverse);
 
-  // Instrument Group
-  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(inst["MissionName"][0].toStdString(), "SELENE");
-  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "KAGUYA");
-  EXPECT_EQ(inst["InstrumentName"][0].toStdString(), "Multiband Imager Visible");
-  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "MI-VIS");
-  EXPECT_EQ(inst["TargetName"][0].toStdString(), "MOON");
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2008-09-16T20:11:04.162607");
-  EXPECT_EQ(inst["StopTime"][0].toStdString(), "2008-09-16T20:11:16.629582");
-  EXPECT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "905631054.826");
-  EXPECT_EQ(inst["SpacecraftClockStopCount"][0].toStdString(), "905631067.294");
-  EXPECT_DOUBLE_EQ(inst["LineExposureDuration"], 2.6623);
-  EXPECT_EQ(inst["LineExposureDuration"].unit(), "msec");
-  EXPECT_DOUBLE_EQ(inst["LineSamplingInterval"], 13);
-  EXPECT_EQ(inst["LineSamplingInterval"].unit(), "msec");
-  EXPECT_DOUBLE_EQ(inst["CorrectedSamplingInterval"], 12.999974);
-  EXPECT_EQ(inst["CorrectedSamplingInterval"].unit(), "msec");
+  PvlGroup outputDimensions = output.findGroup("Dimensions", Isis::Plugin::Traverse);
+  PvlGroup outputInstrument = output.findGroup("Instrument", Isis::Plugin::Traverse);
 
-  // Archive Group
-  PvlGroup &arch = isisLabel->findGroup("Archive", Pvl::Traverse);
 
-  EXPECT_EQ(arch["DataSetId"][0].toStdString(), "MI-VIS_Level2B");
-  EXPECT_EQ(arch["ProductSetId"][0].toStdString(), "MI-VIS_Level2B2");
+  PvlKeyword truthLines = truthDimensions.findKeyword("Lines");
+  PvlKeyword truthSamples = truthDimensions.findKeyword("Samples");
+  PvlKeyword truthMissionName = truthInstrument.findKeyword("MissionName");
+  PvlKeyword truthSpacecraftName = truthInstrument.findKeyword("SpacecraftName");
 
-  // Bandbin Group
-  PvlGroup &bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  std::istringstream bandBinStream(R"(
-  Group = BandBin
-    FilterName = (MV1, MV2, MV3, MV4, MV5)
-    Center     = (414.0, 749.0, 901.0, 950.0, 1001.0) <nm>
-    Width      = (20.0, 12.0, 21.0, 30.0, 42.0) <nm>
-    BaseBand   = MV5
-  End_Group
-  )");
-  PvlGroup bandBinTruth;
-  bandBinStream >> bandBinTruth;
-  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, bandBin, bandBinTruth);
+  PvlKeyword outputLines = outputDimensions.findKeyword("Lines");
+  PvlKeyword outputSamples = outputDimensions.findKeyword("Samples");
+  PvlKeyword outputMissionName = outputInstrument.findKeyword("MissionName");
+  PvlKeyword outputSpacecraftName = outputInstrument.findKeyword("SpacecraftName");
 
-  // Kernels Group
-  PvlGroup &kern = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  EXPECT_EQ(int(kern["NaifCkCode"]), -131330);
-  EXPECT_EQ(int(kern["NaifFrameCode"]), -131335);
 
-  std::unique_ptr<Histogram> hist (cube.histogram());
-
-  EXPECT_DOUBLE_EQ(hist->Average(), 25.685768243243238);
-  EXPECT_DOUBLE_EQ(hist->Sum(), 494194.18099999992);
-  EXPECT_EQ(hist->ValidPixels(), 19240);
-  EXPECT_DOUBLE_EQ(hist->StandardDeviation(), 26.830242572528928);
+  ASSERT_TRUE(PvlKeyword::stringEqual(truthLines, outputLines));
+  ASSERT_TRUE(PvlKeyword::stringEqual(truthSamples, outputSamples));
+  ASSERT_TRUE(PvlKeyword::stringEqual(truthMissionName, outputMissionName));
+  ASSERT_TRUE(PvlKeyword::stringEqual(truthSpacecraftName, outputSpacecraftName));
 }
-
-TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiNir) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "/kaguyatc2isisTEMP.cub";
-  QVector<QString> args = {"from=data/kaguyami2isis/nir_cropped.img", "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest Kaguya MI image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
-
-  // Dimensions group
-  EXPECT_EQ(cube.sampleCount(), 320);
-  EXPECT_EQ(cube.lineCount(), 20);
-  EXPECT_EQ(cube.bandCount(), 2);
-
-  // Pixels group
-  EXPECT_EQ(PixelTypeName(cube.pixelType()), "SignedWord");
-  EXPECT_EQ(ByteOrderName(cube.byteOrder()), "Lsb");
-  EXPECT_DOUBLE_EQ(cube.base(), 0.0);
-  EXPECT_DOUBLE_EQ(cube.multiplier(), 0.013);
-
-  // Instrument Group
-  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(inst["MissionName"][0].toStdString(), "SELENE");
-  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "KAGUYA");
-  EXPECT_EQ(inst["InstrumentName"][0].toStdString(), "Multiband Imager Near Infrared");
-  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "MI-NIR");
-  EXPECT_EQ(inst["TargetName"][0].toStdString(), "MOON");
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2008-09-16T20:10:30.480257");
-  EXPECT_EQ(inst["StopTime"][0].toStdString(), "2008-09-16T20:10:42.921232");
-  EXPECT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "905631021.132");
-  EXPECT_EQ(inst["SpacecraftClockStopCount"][0].toStdString(), "905631033.574");
-  EXPECT_DOUBLE_EQ(inst["LineExposureDuration"], 13.2148);
-  EXPECT_EQ(inst["LineExposureDuration"].unit(), "msec");
-  EXPECT_DOUBLE_EQ(inst["LineSamplingInterval"], 39);
-  EXPECT_EQ(inst["LineSamplingInterval"].unit(), "msec");
-  EXPECT_DOUBLE_EQ(inst["CorrectedSamplingInterval"], 38.999922);
-  EXPECT_EQ(inst["CorrectedSamplingInterval"].unit(), "msec");
-
-  // Archive Group
-  PvlGroup &arch = isisLabel->findGroup("Archive", Pvl::Traverse);
-
-  EXPECT_EQ(arch["DataSetId"][0].toStdString(), "MI-NIR_Level2B");
-  EXPECT_EQ(arch["ProductSetId"][0].toStdString(), "MI-NIR_Level2B2");
-
-  // Bandbin Group
-  PvlGroup &bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  std::istringstream bandBinStream(R"(
-  Group = BandBin
-    FilterName = (MN1, MN2, MN3, MN4)
-    Center     = (1000.0, 1049.0, 1248.0, 1548.0) <nm>
-    Width      = (27.0, 28.0, 33.0, 48.0) <nm>
-    BaseBand   = MN1
-  End_Group
-  )");
-  PvlGroup bandBinTruth;
-  bandBinStream >> bandBinTruth;
-  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, bandBin, bandBinTruth);
-
-  // Kernels Group
-  PvlGroup &kern = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  EXPECT_EQ(int(kern["NaifCkCode"]), -131340);
-  EXPECT_EQ(int(kern["NaifFrameCode"]), -131341);
-
-  std::unique_ptr<Histogram> hist (cube.histogram());
-
-  EXPECT_DOUBLE_EQ(hist->Average(), 29.395262812500022);
-  EXPECT_DOUBLE_EQ(hist->Sum(), 188129.68200000015);
-  EXPECT_EQ(hist->ValidPixels(), 6400);
-  EXPECT_DOUBLE_EQ(hist->StandardDeviation(), 2.8449125231835715);
-}
-
-TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiProj) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "/kaguyatc2isisTEMP.cub";
-  QVector<QString> args = {"from=data/kaguyami2isis/3C5_label.pvl", "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-    FAIL() << "Should not have been able to ingest: " << args[0].toStdString().c_str() << std::endl;
-  }
-  catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("**PROGRAMMER ERROR** Unable to create a cube label from"));
-  }
-}
-/*
-TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiNullRange) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "kaguyatc2isisTEMP.cub";
-  QVector<QString> args = {"from=data/kaguyami2isis/vis_cropped.img",
-                           "setnullrange=yes",
-                           "nullmin=0",
-                           "nullmax=17486",
-                           "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest Kaguya MI image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  std::unique_ptr<Histogram> hist (cube.histogram());
-
-  EXPECT_EQ(hist->ValidPixels(), 79);
-  EXPECT_EQ(hist->NullPixels(), 19161);
-}
-
-TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiHrsRange) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "kaguyatc2isisTEMP.cub";
-  QVector<QString> args = {"from=data/kaguyami2isis/vis_cropped.img",
-                           "sethrsrange=yes",
-                           "hrsmin=0",
-                           "hrsmax=17486",
-                           "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest Kaguya MI image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  std::unique_ptr<Histogram> hist (cube.histogram());
-
-  EXPECT_EQ(hist->ValidPixels(), 79);
-  EXPECT_EQ(hist->HrsPixels(), 19161);
-}
-
-TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiHisRange) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "kaguyatc2isisTEMP.cub";
-  QVector<QString> args = {"from=data/kaguyami2isis/vis_cropped.img",
-                           "sethisrange=yes",
-                           "hismin=0",
-                           "hismax=17486",
-                           "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest Kaguya MI image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  std::unique_ptr<Histogram> hist (cube.histogram());
-
-  EXPECT_EQ(hist->ValidPixels(), 79);
-  EXPECT_EQ(hist->HisPixels(), 19161);
-}
-
-TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiLrsRange) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "kaguyatc2isisTEMP.cub";
-  QVector<QString> args = {"from=data/kaguyami2isis/vis_cropped.img",
-                           "setlrsrange=yes",
-                           "lrsmin=0",
-                           "lrsmax=17486",
-                           "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest Kaguya MI image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  std::unique_ptr<Histogram> hist (cube.histogram());
-
-  EXPECT_EQ(hist->ValidPixels(), 79);
-  EXPECT_EQ(hist->LrsPixels(), 19161);
-}
-
-TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiLisRange) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "kaguyatc2isisTEMP.cub";
-  QVector<QString> args = {"from=data/kaguyami2isis/vis_cropped.img",
-                           "setlisrange=yes",
-                           "lismin=0",
-                           "lismax=17486",
-                           "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest Kaguya MI image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  std::unique_ptr<Histogram> hist (cube.histogram());
-
-  EXPECT_EQ(hist->ValidPixels(), 79);
-  EXPECT_EQ(hist->LisPixels(), 19161);
-}
-*/
-TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiError) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "kaguyatc2isisTEMP.cub";
-  QVector<QString> args = {"from=data/kaguyatc2isis/TC1S2B0_01_05186N225E0040_mini.lbl",
-                           "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-   isisimport(options);
-   FAIL() << "Should not have been able to ingest: " << args[0].toStdString().c_str() << std::endl;
-  }
-  catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("**PROGRAMMER ERROR** Unable to create a cube label from"));
-  }
-}
-
-TEST(IsisImportTests, loTestDefault) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "/lo2isisTEMP.cub";
-  QVector<QString> args = {"from=data/lo2isis/case01/3133_h1_cropped.cub", "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest LO image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
-
-  // Dimensions group
-  ASSERT_EQ(cube.sampleCount(), 151);
-  ASSERT_EQ(cube.lineCount(), 5);
-  ASSERT_EQ(cube.bandCount(), 1);
-
-  // Pixels group
-  ASSERT_EQ(PixelTypeName(cube.pixelType()), "UnsignedByte");
-  ASSERT_EQ(ByteOrderName(cube.byteOrder()), "Lsb");
-  ASSERT_DOUBLE_EQ(cube.base(), 0.0);
-  ASSERT_DOUBLE_EQ(cube.multiplier(), 1.0);
-
-  // Instrument Group
-  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["SpacecraftName"][0].toStdString(), "Lunar Orbiter 3");
-  ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "High Resolution Camera");
-  ASSERT_EQ(inst["TargetName"][0].toStdString(), "Moon");
-  ASSERT_EQ(inst["StartTime"][0].toStdString(), "1967-02-20T08:14:28.610");
-  ASSERT_DOUBLE_EQ(inst["FiducialCoordinateMicron"], 50);
-  ASSERT_EQ(inst["FiducialCoordinateMicron"].unit(), "um");
-  ASSERT_DOUBLE_EQ(inst["FrameNumber"], 3133);
-
-  ASSERT_EQ(inst["FiducialID"][0].toStdString(), "1b");
-  ASSERT_EQ(inst["FiducialID"][6].toStdString(), "73a");
-  ASSERT_EQ(inst["FiducialID"][14].toStdString(), "144b");
-  ASSERT_EQ(inst["FiducialID"][29].toStdString(), "283b");
-
-  ASSERT_DOUBLE_EQ(inst["FiducialSamples"][0].toDouble(), 32162.0);
-  ASSERT_DOUBLE_EQ(inst["FiducialSamples"][6].toDouble(), 24295.0);
-  ASSERT_DOUBLE_EQ(inst["FiducialSamples"][14].toDouble(), 16593.0);
-  ASSERT_DOUBLE_EQ(inst["FiducialSamples"][29].toDouble(), 1248.0);
-
-  ASSERT_DOUBLE_EQ(inst["FiducialLines"][0].toDouble(), 8510.0);
-  ASSERT_DOUBLE_EQ(inst["FiducialLines"][6].toDouble(), 8504.0);
-  ASSERT_DOUBLE_EQ(inst["FiducialLines"][14].toDouble(), 584.0);
-  ASSERT_DOUBLE_EQ(inst["FiducialLines"][29].toDouble(), 8496.0);
-
-  ASSERT_DOUBLE_EQ(inst["FiducialXCoordinates"][0].toDouble(), -108.168);
-  ASSERT_DOUBLE_EQ(inst["FiducialXCoordinates"][6].toDouble(), -53.474);
-  ASSERT_DOUBLE_EQ(inst["FiducialXCoordinates"][14].toDouble(), 0.122);
-  ASSERT_DOUBLE_EQ(inst["FiducialXCoordinates"][29].toDouble(), 106.844);
-
-  ASSERT_DOUBLE_EQ(inst["FiducialYCoordinates"][0].toDouble(), 27.476);
-  ASSERT_DOUBLE_EQ(inst["FiducialYCoordinates"][6].toDouble(), 27.5);
-  ASSERT_DOUBLE_EQ(inst["FiducialYCoordinates"][14].toDouble(), -27.493);
-  ASSERT_DOUBLE_EQ(inst["FiducialYCoordinates"][29].toDouble(), 27.479);
-
-  // Bandbin Group
-  PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Center"][0], "1.0");
-  ASSERT_EQ(bandbin["OriginalBand"][0], "1");
-
-  // Kernels Group
-  PvlGroup &kern = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  ASSERT_EQ(int(kern["NaifFrameCode"]), -533001);
-
-  std::unique_ptr<Histogram> hist (cube.histogram());
-
-  ASSERT_NEAR(hist->Average(), 75.43576, .00001);
-  ASSERT_EQ(hist->Sum(), 56954);
-  ASSERT_EQ(hist->ValidPixels(), 755);
-  ASSERT_NEAR(hist->StandardDeviation(), 11.2905, .0001);
-}
-
-TEST(IsisImportTests, loMirrored) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "/lo2isisTEMP.cub";
-  QVector<QString> args = {"from=data/lo2isis/case02/4164H_Full_mirror_cropped.cub", "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest LO image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
-
-  // Dimensions group
-  ASSERT_EQ(cube.sampleCount(), 34530);
-  ASSERT_EQ(cube.lineCount(), 5);
-  ASSERT_EQ(cube.bandCount(), 1);
-
-  // Instrument Group
-  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["SpacecraftName"][0].toStdString(), "Lunar Orbiter 4");
-  ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "High Resolution Camera");
-  ASSERT_EQ(inst["TargetName"][0].toStdString(), "Moon");
-  ASSERT_EQ(inst["StartTime"][0].toStdString(), "1967-05-23T07:12:45.810");
-  ASSERT_DOUBLE_EQ(inst["FrameNumber"], 4164);
-
-  // Bandbin Group
-  PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Center"][0], "1.0");
-  ASSERT_EQ(bandbin["OriginalBand"][0], "1");
-
-  // Kernels Group
-  PvlGroup &kern = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  ASSERT_EQ(int(kern["NaifFrameCode"]), -534001);
-}
-
-TEST(IsisImportTests, loMedToHi) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "/lo2isisTEMP.cub";
-  QVector<QString> args = {"from=data/lo2isis/case03/3083_med_tohi_isis2_cropped.cub", "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest LO image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
-
-  // Dimensions group
-  ASSERT_EQ(cube.sampleCount(), 100);
-  ASSERT_EQ(cube.lineCount(), 5);
-  ASSERT_EQ(cube.bandCount(), 1);
-
-  // Instrument Group
-  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["SpacecraftName"][0].toStdString(), "Lunar Orbiter 3");
-  ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "Medium Resolution Camera");
-  ASSERT_EQ(inst["TargetName"][0].toStdString(), "Moon");
-  ASSERT_EQ(inst["StartTime"][0].toStdString(), "1967-02-17T21:09:27.610");
-  ASSERT_DOUBLE_EQ(inst["FrameNumber"], 3083);
-  ASSERT_DOUBLE_EQ(inst["BoresightSample"], 5427.039);
-  ASSERT_DOUBLE_EQ(inst["BoresightLine"], 4550.455);
-  ASSERT_DOUBLE_EQ(inst["SubFrame"], 0);
-
-  // Bandbin Group
-  PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["FilterName"][0].toStdString(), "none");
-  ASSERT_EQ(bandbin["Center"][0], "1.0");
-  ASSERT_EQ(bandbin["OriginalBand"][0], "1");
-
-  // Kernels Group
-  PvlGroup &kern = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  ASSERT_EQ(int(kern["NaifFrameCode"]), -533002);
-}
-
-TEST(IsisImportTests, loMed) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "/lo2isisTEMP.cub";
-  QVector<QString> args = {"from=data/lo2isis/case04/3083_med_isis2_cropped.cub", "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest LO image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
-
-  // Dimensions group
-  ASSERT_EQ(cube.sampleCount(), 11800);
-  ASSERT_EQ(cube.lineCount(), 5);
-  ASSERT_EQ(cube.bandCount(), 1);
-
-  // Instrument Group
-  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["SpacecraftName"][0].toStdString(), "Lunar Orbiter 3");
-  ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "Medium Resolution Camera");
-  ASSERT_EQ(inst["TargetName"][0].toStdString(), "Moon");
-  ASSERT_EQ(inst["StartTime"][0].toStdString(), "1967-02-17T21:09:27.610");
-  ASSERT_DOUBLE_EQ(inst["FrameNumber"], 3083);
-  ASSERT_DOUBLE_EQ(inst["SubFrame"], 0);
-
-  // Bandbin Group
-  PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["FilterName"][0].toStdString(), "none");
-  ASSERT_EQ(bandbin["Center"][0], "1.0");
-  ASSERT_EQ(bandbin["OriginalBand"][0], "1");
-
-  // Kernels Group
-  PvlGroup &kern = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  ASSERT_EQ(int(kern["NaifFrameCode"]), -533002);
-}
-
-TEST(IsisImportTests, loReingest) {
-  QTemporaryDir prefix;
-  QString cubeFileName = prefix.path() + "/lo2isisTEMP.cub";
-  QVector<QString> args = {"from=data/lo2isis/reimport/3133_h1.pds_cropped.img", "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest LO image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
-
-  // Dimensions group
-  ASSERT_EQ(cube.sampleCount(), 151);
-  ASSERT_EQ(cube.lineCount(), 5);
-  ASSERT_EQ(cube.bandCount(), 1);
-
-  // Instrument Group
-  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["SpacecraftName"][0].toStdString(), "Lunar Orbiter 3");
-  ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "High Resolution Camera");
-  ASSERT_EQ(inst["TargetName"][0].toStdString(), "Moon");
-  ASSERT_EQ(inst["StartTime"][0].toStdString(), "1967-02-20T08:14:28.610000");
-  ASSERT_DOUBLE_EQ(inst["FrameNumber"], 3133);
-  ASSERT_DOUBLE_EQ(inst["SubFrame"], 2921);
-
-  // Kernels Group
-  PvlGroup &kern = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  ASSERT_EQ(int(kern["NaifFrameCode"]), -533001);
-}
-/*
-TEST(IsisImportTests, LroNacLFull) {
-  QTemporaryDir prefix;
-  ASSERT_TRUE(prefix.isValid());
-
-  QString cubeFileName = prefix.path() + "/lo2isisTEMP.cub";
-  QVector<QString> args = {"from=data/lronac/nacl.img", "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest LO image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
-
-  // Dimensions group
-  ASSERT_EQ(cube.sampleCount(), 5064);
-  ASSERT_EQ(cube.lineCount(), 10);
-  ASSERT_EQ(cube.bandCount(), 1);
-
-  // Pixels group
-  ASSERT_EQ(PixelTypeName(cube.pixelType()), "Real");
-  ASSERT_EQ(ByteOrderName(cube.byteOrder()), "Lsb");
-  ASSERT_DOUBLE_EQ(cube.base(), 0.0);
-  ASSERT_DOUBLE_EQ(cube.multiplier(), 1.0);
-
-  // Instrument Group
-  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["SpacecraftName"][0].toStdString(), "LUNAR RECONNAISSANCE ORBITER");
-  ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "NACL");
-  ASSERT_EQ(inst["TargetName"][0].toStdString(), "MOON");
-  ASSERT_EQ(inst["StartTime"][0].toStdString(), "2009-11-29T14:51:21.968000");
-
-  ASSERT_EQ(inst["TemperatureSCS"][0].toStdString(), "3.88");
-  ASSERT_EQ(inst["TemperatureFPA"][0].toStdString(), "17.73");
-  ASSERT_EQ(inst["TemperatureFPGA"][0].toStdString(), "-12.94");
-  ASSERT_EQ(inst["TemperatureTelescope"][0].toStdString(), "8.89");
-  ASSERT_EQ(inst["SpatialSumming"][0].toStdString(), "1");
-
-  ASSERT_EQ(inst["TemperatureSCSRaw"][0].toStdString(), "2770");
-  ASSERT_EQ(inst["TemperatureFPARaw"][0].toStdString(), "2115");
-  ASSERT_EQ(inst["TemperatureFPGARaw"][0].toStdString(), "3440");
-  ASSERT_EQ(inst["TemperatureTelescopeRaw"][0].toStdString(), "2536");
-
-  // Bandbin Group
-  PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["FilterName"][0], "BroadBand");
-  ASSERT_EQ(bandbin["Center"][0], "600");
-  ASSERT_EQ(bandbin["Width"][0], "300");
-
-  // Kernels Group
-  PvlGroup &kern = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  ASSERT_EQ(int(kern["NaifFrameCode"]), -85600);
-
-  std::unique_ptr<Histogram> hist (cube.histogram());
-
-  ASSERT_NEAR(hist->Average(), 167.19855845181675, .00001);
-  ASSERT_EQ(hist->Sum(), 8466935);
-  ASSERT_EQ(hist->ValidPixels(), 50640);
-  ASSERT_NEAR(hist->StandardDeviation(), 85.2134, .0001);
-}
-
-TEST(IsisImportTests, LroNacR) {
-  QTemporaryDir prefix;
-  ASSERT_TRUE(prefix.isValid());
-
-  QString cubeFileName = prefix.path() + "/lo2isisTEMP.cub";
-  QVector<QString> args = {"from=data/lronac/nacr.img", "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-  }
-  catch (IException &e) {
-    FAIL() << "Unable to ingest LO image: " <<e.toString().toStdString().c_str() << std::endl;
-  }
-
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
-
-  // Dimensions group
-  ASSERT_EQ(cube.sampleCount(), 5064);
-  ASSERT_EQ(cube.lineCount(), 10);
-  ASSERT_EQ(cube.bandCount(), 1);
-
-  // Pixels group
-  ASSERT_EQ(PixelTypeName(cube.pixelType()), "Real");
-  ASSERT_EQ(ByteOrderName(cube.byteOrder()), "Lsb");
-  ASSERT_DOUBLE_EQ(cube.base(), 0.0);
-  ASSERT_DOUBLE_EQ(cube.multiplier(), 1.0);
-
-  // Instrument Group
-  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["SpacecraftName"][0].toStdString(), "LUNAR RECONNAISSANCE ORBITER");
-  ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "NACR");
-  ASSERT_EQ(inst["TargetName"][0].toStdString(), "MOON");
-  ASSERT_EQ(inst["StartTime"][0].toStdString(), "2009-11-29T14:51:21.968000");
-
-  ASSERT_EQ(inst["TemperatureSCS"][0].toStdString(), "3.88");
-  ASSERT_EQ(inst["TemperatureFPA"][0].toStdString(), "17.67");
-  ASSERT_EQ(inst["TemperatureFPGA"][0].toStdString(), "-11.38");
-  ASSERT_EQ(inst["TemperatureTelescope"][0].toStdString(), "11.14");
-  ASSERT_EQ(inst["SpatialSumming"][0].toStdString(), "1");
-
-  ASSERT_EQ(inst["TemperatureSCSRaw"][0].toStdString(), "2770");
-  ASSERT_EQ(inst["TemperatureFPARaw"][0].toStdString(), "2118");
-  ASSERT_EQ(inst["TemperatureFPGARaw"][0].toStdString(), "3388");
-  ASSERT_EQ(inst["TemperatureTelescopeRaw"][0].toStdString(), "2429");
-
-  // Bandbin Group
-  PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["FilterName"][0], "BroadBand");
-  ASSERT_EQ(bandbin["Center"][0], "600");
-  ASSERT_EQ(bandbin["Width"][0], "300");
-
-  // Kernels Group
-  PvlGroup &kern = isisLabel->findGroup("Kernels", Pvl::Traverse);
-  ASSERT_EQ(int(kern["NaifFrameCode"]), -85610);
-
-  std::unique_ptr<Histogram> hist (cube.histogram());
-
-  ASSERT_NEAR(hist->Average(), 159.45262638230648, .00001);
-  ASSERT_EQ(hist->Sum(), 8074681);
-  ASSERT_EQ(hist->ValidPixels(), 50640);
-  ASSERT_NEAR(hist->StandardDeviation(), 82.499865428882416, .0001);
-}
-
-TEST(IsisImportTests, LroLabelFail) {
-  QTemporaryDir prefix;
-  ASSERT_TRUE(prefix.isValid());
-
-  QString badLabelPath = prefix.path() + "/badLabel.img";
-  Pvl lab("data/lronac/nacr.img");
-  PvlKeyword &bterm = lab.findKeyword("LRO:BTERM");
-  bterm.setValue("fake");
-  lab.write(badLabelPath);
-
-  QString cubeFileName = prefix.path() + "/doesntMatter.cub";
-  QVector<QString> args = {"from="+badLabelPath, "to="+cubeFileName};
-
-  UserInterface options(APP_XML, args);
-  try {
-    isisimport(options);
-    FAIL() << "Expected to throw exception";
-  }
-  catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("The decompanding terms do not have the same dimensions"));
-     }
-
-}
-*/
