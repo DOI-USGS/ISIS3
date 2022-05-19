@@ -137,7 +137,6 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportMerMI){
   PvlGroup outputMerImageRequestParms = output.findGroup("MerImageRequestParms", Isis::Plugin::Traverse);
   PvlGroup outputMerSubframeRequestParms = output.findGroup("MerSubframeRequestParms", Isis::Plugin::Traverse);
 
-//   do this for every test rather then was down below 
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outputDimensions, truthDimensions);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outputPixels, truthPixels);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outputArchive, truthArchive);

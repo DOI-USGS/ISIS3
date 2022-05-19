@@ -122,8 +122,17 @@
                                     {% else %}
                                     NULL
                                     {% endif %}
-    TemperatureMiCCD            = {{ instTemp.6 }}
-    TemperatureMiElectronics    = {{ instTemp.7 }}
+
+    TemperatureMiCCD            = {% if exists ("instTemp") %}
+                                  {{ instTemp.6 }}
+                                  {% else %}
+                                  NULL
+                                  {% endif %}
+    TemperatureMiElectronics    = {% if exists ("instTemp") %}
+                                  {{ instTemp.7 }}
+                                  {% else %}
+                                  NULL
+                                  {% endif %}
 {% endblock %}
 
 {% block additional_groups %}
