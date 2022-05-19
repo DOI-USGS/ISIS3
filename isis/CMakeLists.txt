@@ -17,8 +17,6 @@ include(AddIsisModule)
 include(Utilities)
 include(TestSetup)
 include(InstallThirdParty)
-include(cmake/gtest.cmake)
-include(GoogleTest)
 
 include(CMakePrintHelpers)
 
@@ -601,6 +599,8 @@ install(PROGRAMS ${CMAKE_BINARY_DIR}/lib/Camera.plugin DESTINATION ${CMAKE_INSTA
 #   the desired post-install commands inside.
 add_subdirectory(cmake)
 if(buildTests)
+  include(cmake/gtest.cmake)
+  include(GoogleTest)
   include(CTest)
   enable_testing()
   add_subdirectory(tests)
