@@ -12,11 +12,15 @@
 #include "PvlKeyword.h"
 
 #include "isisimport.h"
+#include "TestUtilities.h"
 
 #include "gmock/gmock.h"
 
 using namespace Isis;
 using json = nlohmann::json;
+
+static QString APP_XML = FileName("$ISISROOT/bin/xml/isisimport.xml").expanded();
+
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportMerMI){
     std::istringstream PvlInput(R"(
@@ -120,14 +124,25 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportMerMI){
   PvlInput >> truth;
 
   PvlGroup truthDimensions = truth.findGroup("Dimensions", Isis::Plugin::Traverse);
+  PvlGroup truthPixels = truth.findGroup("Pixels", Isis::Plugin::Traverse);
+  PvlGroup truthArchive = truth.findGroup("Archive", Isis::Plugin::Traverse);
   PvlGroup truthInstrument = truth.findGroup("Instrument", Isis::Plugin::Traverse);
+  PvlGroup truthMerImageRequestParms = truth.findGroup("MerImageRequestParms", Isis::Plugin::Traverse);
+  PvlGroup truthMerSubframeRequestParms = truth.findGroup("MerSubframeRequestParms", Isis::Plugin::Traverse);
   
   PvlGroup outputDimensions = output.findGroup("Dimensions", Isis::Plugin::Traverse);
+  PvlGroup outputPixels = output.findGroup("Pixels", Isis::Plugin::Traverse);
+  PvlGroup outputArchive = output.findGroup("Archive", Isis::Plugin::Traverse);
   PvlGroup outputInstrument = output.findGroup("Instrument", Isis::Plugin::Traverse);
-  PvlGroup outputInstrument = output.findGroup("Instrument", Isis::Plugin::Traverse);
+  PvlGroup outputMerImageRequestParms = output.findGroup("MerImageRequestParms", Isis::Plugin::Traverse);
+  PvlGroup outputMerSubframeRequestParms = output.findGroup("MerSubframeRequestParms", Isis::Plugin::Traverse);
 
 //   do this for every test rather then was down below 
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outputDimensions, truthDimensions);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outputPixels, truthPixels);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outputArchive, truthArchive);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outputInstrument, truthInstrument);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outputMerImageRequestParms, truthMerImageRequestParms);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outputMerSubframeRequestParms, truthMerSubframeRequestParms);
 
 }
