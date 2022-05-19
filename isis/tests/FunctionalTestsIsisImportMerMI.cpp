@@ -112,7 +112,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportMerMI){
             StartByte = 2163162
             Bytes     = 19191
         End_Object
-        End            
+        End         
     )");
   QVector<QString> args = {"from=data/isisimport/1M189529263EFF64KCP2977M2F1_cropped.IMG", "to=" + tempDir.path() + "/MerMI.cub" };
   UserInterface options(APP_XML, args);
