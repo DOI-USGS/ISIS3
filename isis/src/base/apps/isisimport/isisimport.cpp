@@ -340,6 +340,11 @@ namespace Isis {
     Pvl newLabel;
     newLabel.fromString(result);
 
+    PvlObject translation = newLabel.findObject("Translation");
+    if (translation.hasKeyword("Failure")) {
+      throw IException(IException::Io, QString(translation.findKeyword("Failure")), _FILEINFO_);
+    }
+
     // Set everything needed by ProcessImport
     PvlGroup dimensions = newLabel.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
     int ns = toInt(dimensions["Samples"]);
@@ -362,8 +367,6 @@ namespace Isis {
       PvlGroup &inst = newLabel.findGroup("Instrument",Pvl::Traverse);
       inst["TargetName"] = ui.GetString("TARGET");
     }
-
-    PvlObject translation = newLabel.findObject("Translation");
 
     // Check translation for potential PDS3 offset
     if (translation.hasKeyword("DataFilePointer")) {
