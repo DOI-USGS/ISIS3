@@ -419,3 +419,30 @@ TEST_F(PushFramePair, FunctionalTestFramestitchAutoDifferentHeights) {
     FAIL() << "Expected an IException, got exception with error " << e.what() << std::endl;
   }
 }
+
+// Test removing a total of this many lines from each framelet
+// (half at the top of each framelet and half at the bottom).
+TEST_F(PushFramePair, FunctionalTestFramestitchRemoveOverlap) {
+  QString outCubePath = tempDir.path() + "/stitched.cub";
+  int numLinesOverlap = 2;
+  QVector<QString> args = {
+        "EVEN="+evenCube->fileName(),
+        "ODD="+oddCube->fileName(),
+        "FRAMEHEIGHT="+toString(frameHeight),
+        "NUM_LINES_OVERLAP=" + toString(numLinesOverlap),
+        "TO="+outCubePath};
+
+  UserInterface ui(APP_XML, args);
+
+  framestitch(ui);
+
+  Cube outCube(outCubePath);
+  std::shared_ptr<Statistics> bandStats(outCube.statistics());
+  EXPECT_EQ(bandStats->Minimum(), 1);
+  EXPECT_EQ(bandStats->Maximum(), numFrames);
+  EXPECT_DOUBLE_EQ(bandStats->Average(), (numFrames + 1) / 2.0);
+  EXPECT_EQ(bandStats->NullPixels(), 0);
+
+  // The output cube should have fewer lines
+  EXPECT_EQ(evenCube->lineCount(), outCube.lineCount() + numFrames * numLinesOverlap);
+}
