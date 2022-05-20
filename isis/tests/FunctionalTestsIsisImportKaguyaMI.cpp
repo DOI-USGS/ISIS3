@@ -194,6 +194,8 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiProj) {
   }
 }
 
+// This block is waiting for UI updates to isisimport to handle
+// setting values for ISIS special pixel ranges
 /*
 TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiNullRange) {
   QTemporaryDir prefix;
