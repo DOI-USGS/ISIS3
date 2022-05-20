@@ -133,7 +133,6 @@ namespace Isis {
 
       TextFile cameraAngle(cameraAngleDefs);
       int numLines = cameraAngle.LineCount();
-      bool foundfilter = false;
       for(int i = 0; i < numLines; i++) {
         QString line;
         cameraAngle.GetLine(line, true);
@@ -142,7 +141,6 @@ namespace Isis {
         if(tokens.count() > 2 && tokens.first() == filter) {
           center = toDouble(tokens[1]);
           width = toDouble(tokens[2]);
-          foundfilter = true;
           break;
         }
       }
