@@ -282,7 +282,7 @@ namespace Isis {
   QString fileListToString(QVector<QString> fileList) {
     QString filesAsString("(");
 
-    for (size_t i = 0; i < fileList.size(); i++) {
+    for (int i = 0; i < fileList.size(); i++) {
       FileName file(fileList[i]);
 
       filesAsString += file.expanded();

@@ -152,7 +152,7 @@
 			of 2 or 4 works reasonably for WAC images.
           </p>
         </description>
-        <internalDefault>Camera</internalDefault>
+        <internalDefault>0</internalDefault>
         <minimum>0</minimum>
       </parameter>
 
