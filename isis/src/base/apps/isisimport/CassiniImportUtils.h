@@ -5,8 +5,8 @@
 
 #include <QString>
 
-#include "BaseProcessFunctor.h"
 #include "EndianSwapper.h"
+#include "IsisImportBaseProcessFunctor.h"
 #include "ProcessByLine.h"
 #include "ProcessImport.h"
 #include "PvlGroup.h"
