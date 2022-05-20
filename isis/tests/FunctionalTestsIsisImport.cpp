@@ -18,6 +18,7 @@
 #include "gmock/gmock.h"
 
 using namespace Isis;
+using namespace testing;
 using json = nlohmann::json;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/isisimport.xml").expanded();

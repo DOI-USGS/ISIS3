@@ -1,13 +1,22 @@
 {% extends "img_base.tpl" %}
 
-
 {% block instrument %}
 SpacecraftName              = "{{ MISSION_NAME.Value }}"
 InstrumentHostName          = "{{ INSTRUMENT_HOST_NAME.Value }}"
 InstrumentHostId            = {{ INSTRUMENT_HOST_ID.Value }}
-InstrumentName              = "{{ INSTRUMENT_NAME.Value }}"
-InstrumentId                = {{ INSTRUMENT_ID.Value }}
-FrameId                     = {{ FRAME_ID.Value }}
+{% set frameId =  FRAME_ID.Value %}
+{% if frameId == "LEFT" %}
+InstrumentName              = "LUNAR RECONNAISSANCE ORBITER NARROW ANGLE CAMERA LEFT"
+{% else %}
+InstrumentName              = "LUNAR RECONNAISSANCE ORBITER NARROW ANGLE CAMERA RIGHT"
+{% endif %}
+{% if frameId == "LEFT" %}
+InstrumentId                = "NACL"
+{% else %}
+InstrumentId                = "NACR"
+{% endif %}
+FrameId                     = {{ frameId }}
+TargetName                  = {{ TARGET_NAME.Value }}
 MissioinPhaseName           = "{{ MISSION_PHASE_NAME.Value }}"
 PreRollTime                 = {{ LRO_PREROLL_TIME.Value }}
 StartTime                   = {{ START_TIME.Value }}
@@ -55,6 +64,56 @@ Group = BandBin
   Width        = {{ BANDWIDTH.Value }} <ms>
 End_Group
 
-{% block kernels %}
+Group = Kernels
+  {% if frameId == "LEFT" %}
   NaifFrameCode = -85600
+  {% else %}
+  NaifFrameCode = -85610
+  {% endif %}
+End_Group
+{% endblock %}
+
+{% block translation %}
+CubeAtts             = "+Real"
+{% set xtermSize = 0 %}
+{%- if isArray(LRO_XTERM.Value) -%}
+xterm                = (
+## for term in LRO_XTERM.Value
+  {% set xtermSize = xtermSize + 1%}
+  {{ term }} {%- if not loop.is_last -%}, {%- endif -%}
+## endfor
+)
+{%- else -%}
+{% set xtermSize = 1 %}
+xterm                = {{ LRO_XTERM.Value }}
+{%- endif -%}
+
+{% set mtermSize = 0 %}
+{%- if isArray(LRO_MTERM.Value) -%}
+mterm                = (
+## for term in LRO_MTERM.Value
+  {% set mtermSize = mtermSize + 1%}
+  {{ term }} {%- if not loop.is_last -%}, {%- endif -%}
+## endfor
+)
+{%- else -%}
+{% set mtermSize = 1 %}
+mterm                = {{ LRO_MTERM.Value }}
+{%- endif -%}
+
+{% set btermSize = 0 %}
+{%- if isArray(LRO_BTERM.Value) -%}
+bterm                = (
+## for term in LRO_BTERM.Value
+  {% set btermSize = btermSize + 1%}
+  {{ term }} {%- if not loop.is_last -%}, {%- endif -%}
+## endfor
+)
+{%- else -%}
+{% set btermSize = 1 %}
+bterm                = {{ LRO_BTERM.Value }}
+{%- endif -%}
+{% if mtermSize != xtermSize or btermSize != xtermSize%}
+Failure              = "The decompanding terms do not have the same dimensions"
+{% endif %}
 {% endblock %}

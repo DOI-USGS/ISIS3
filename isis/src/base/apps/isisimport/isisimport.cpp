@@ -367,12 +367,22 @@ namespace Isis {
       QString msg = "Unable to create a cube label from [";
       msg += inputTemplate.expanded() + "]. ";
       msg += e.what();
-      throw IException(IException::User, msg, _FILEINFO_);
+      if (ui.WasEntered("TEMPLATE")) {
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      else {
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
     }
 
     // Turn this into a Pvl label
     Pvl newLabel;
     newLabel.fromString(result);
+
+    PvlObject translation = newLabel.findObject("Translation");
+    if (translation.hasKeyword("Failure")) {
+      throw IException(IException::Io, QString(translation.findKeyword("Failure")), _FILEINFO_);
+    }
 
     // Set everything needed by ProcessImport
     PvlGroup dimensions = newLabel.findObject("IsisCube").findObject("Core").findGroup("Dimensions");
@@ -396,8 +406,6 @@ namespace Isis {
       PvlGroup &inst = newLabel.findGroup("Instrument",Pvl::Traverse);
       inst["TargetName"] = ui.GetString("TARGET");
     }
-
-    PvlObject translation = newLabel.findObject("Translation");
 
     // Check translation for potential PDS3 offset
     if (translation.hasKeyword("DataFilePointer")) {
@@ -430,8 +438,15 @@ namespace Isis {
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
-      if (translation.hasKeyword("DataFileRecordBytes")) {
-        recSize = toInt(translation["DataFileRecordBytes"]);
+      // Now, to handle the offset
+      units = units.trimmed();
+      if (units == "BYTES" || units == "B") {
+        recSize = 1;
+      }
+      else {
+        if (translation.hasKeyword("DataFileRecordBytes")) {
+          recSize = toInt(translation["DataFileRecordBytes"]);
+        }
       }
       importer.SetFileHeaderBytes(offset * recSize);
       importer.SaveFileHeader();
