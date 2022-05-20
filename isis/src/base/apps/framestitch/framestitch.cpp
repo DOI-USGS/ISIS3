@@ -1,6 +1,7 @@
 #include "framestitch.h"
 
 #include <QString>
+#include <iostream>
 
 #include "Brick.h"
 #include "Buffer.h"
@@ -121,16 +122,10 @@ namespace Isis {
       }
     }
 
-    QString outCubeFile = ui.GetCubeName("TO");
-    Cube *outCube = process.SetOutputCube(
-          outCubeFile, CubeAttributeOutput(outCubeFile),
-          evenCube->sampleCount(), evenCube->lineCount(), evenCube->bandCount());
-
     int frameHeight = 1;
     if (ui.WasEntered("frameHeight")) {
       frameHeight = ui.GetInteger("FRAMEHEIGHT");
-    }
-    else {
+    } else {
       // User didn't pass the size of the frames so attempt to infer it from
       // the cubes
       int evenFrameHeight = computeFrameHeight(evenCube);
@@ -144,7 +139,24 @@ namespace Isis {
 
       frameHeight = evenFrameHeight;
     }
+    int numFrames = evenCube->lineCount() / frameHeight;
 
+    int numLinesOverlap = 0; // The default value
+    if (ui.WasEntered("NUM_LINES_OVERLAP"))
+      numLinesOverlap = ui.GetInteger("NUM_LINES_OVERLAP");
+
+    if (numLinesOverlap % 2 != 0 || numLinesOverlap < 0) {
+      QString msg = "Expecting a non-negative and even value for NUM_LINES_OVERLAP.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    int reducedFrameHeight = frameHeight - numLinesOverlap;
+    
+    QString outCubeFile = ui.GetCubeName("TO");
+    Cube *outCube = process.SetOutputCube(
+          outCubeFile, CubeAttributeOutput(outCubeFile),
+          evenCube->sampleCount(), numFrames * reducedFrameHeight, evenCube->bandCount());
+    
     // If there's an even number of frames and the inputs are flipped, we have to
     // swap even and odd because the first frame in the even cube is valid and the
     // first frame in the odd cube is now all NULL.
@@ -156,27 +168,38 @@ namespace Isis {
     // 0000  ####         ####  0000
     // ####  0000         0000  ####
     //
-    int numFrames = evenCube->lineCount() / frameHeight;
     bool swapInputCubes = inputFlipped && numFrames % 2 == 0;
 
-    // Processing Setup
+    // Processing setup
     process.SetBrickSize(evenCube->sampleCount(), frameHeight, evenCube->bandCount());
     process.PropagateTables(false);
     process.PropagatePolygons(false);
 
-    /**
-     * Frame stitching processing function
-     */
-    auto interweaveFrames = [&](std::vector<Buffer *> &in, std::vector<Buffer *> &out)->void {
-      // Assumes odd is first and even is second
-      int inIndex = (in[0]->Line() / frameHeight) % 2;
-      if (swapInputCubes) {
-        inIndex = 1 - inIndex;
-      }
-      out[0]->Copy(*in[inIndex]);
-    };
+    // Put together the frames from the two input cubes. Note that we
+    // wipe a total of numLinesOverlap lines from each frame as we do
+    // so, by simply not reading in the lines we don't want to keep.
+    for (int frame = 0; frame < numFrames; frame++) {
 
-    process.StartProcess(interweaveFrames);
+      Brick buff(evenCube->sampleCount(), reducedFrameHeight, evenCube->bandCount(),
+                   evenCube->pixelType());
+      
+      // Set reading position
+      buff.SetBasePosition(1, frame * frameHeight + numLinesOverlap/2 + 1, 1);
+
+      int inIndex = frame % 2;
+      if (swapInputCubes)
+        inIndex = 1 - inIndex;
+
+      if (inIndex == 0) 
+        oddCube->read(buff);
+      else
+        evenCube->read(buff);
+
+      // Set writing position
+      buff.SetBasePosition(1, frame * reducedFrameHeight + 1, 1);
+      
+      outCube->write(buff);
+    }
 
     // Update the output label
     outCube->deleteGroup("Kernels");
@@ -189,24 +212,25 @@ namespace Isis {
     }
     outInst["Framelets"].setValue("All");
 
-    // ProcessByBrick requires that all buffers move through the cubes the same
-    // way so we have to do a second manual pass to flip the output cube if requested.
+    // Flip the output cube if requested
     if (ui.GetBoolean("FLIP")) {
-      Brick topBuff(outCube->sampleCount(), frameHeight, outCube->bandCount(), outCube->pixelType());
-      Brick bottomBuff(outCube->sampleCount(), frameHeight, outCube->bandCount(), outCube->pixelType());
-      Brick tempBuff(outCube->sampleCount(), frameHeight, outCube->bandCount(), outCube->pixelType());
+      // Need a temporary buffer to help with the swapping of top and
+      // bottom portions of outCube.
+      Brick topBuff(outCube->sampleCount(), reducedFrameHeight, outCube->bandCount(), outCube->pixelType());
+      Brick botBuff(outCube->sampleCount(), reducedFrameHeight, outCube->bandCount(), outCube->pixelType());
+      Brick tmpBuff(outCube->sampleCount(), reducedFrameHeight, outCube->bandCount(), outCube->pixelType());
 
       for (int frame = 0; frame < numFrames / 2; frame++) {
-        topBuff.SetBasePosition(1,frame * frameHeight + 1,1);
+        topBuff.SetBasePosition(1,frame * reducedFrameHeight + 1,1);
         outCube->read(topBuff);
-        bottomBuff.SetBasePosition(1,outCube->lineCount() - (frame + 1) * frameHeight + 1,1);
-        outCube->read(bottomBuff);
+        botBuff.SetBasePosition(1,outCube->lineCount() - (frame + 1) * reducedFrameHeight + 1,1);
+        outCube->read(botBuff);
 
-        tempBuff.Copy(topBuff);
-        topBuff.Copy(bottomBuff);
+        tmpBuff.Copy(topBuff);
+        topBuff.Copy(botBuff);
         outCube->write(topBuff);
-        bottomBuff.Copy(tempBuff);
-        outCube->write(bottomBuff);
+        botBuff.Copy(tmpBuff);
+        outCube->write(botBuff);
       }
 
       if (!outInst.hasKeyword("DataFlipped")) {
@@ -215,8 +239,14 @@ namespace Isis {
       outInst["DataFlipped"].setValue(toString(!inputFlipped));
     }
 
+    // Record numLinesOverlap
+    if (!outInst.hasKeyword("NumLinesOverlap"))
+      outInst.addKeyword(PvlKeyword("NumLinesOverlap"));
+    outInst["numLinesOverlap"].setValue(toString(numLinesOverlap));
+    
     process.EndProcess();
-
+    
+    return;
   }
 
-}
+} // end namespace Isis
