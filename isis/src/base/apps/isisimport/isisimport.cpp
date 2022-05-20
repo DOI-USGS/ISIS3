@@ -8,6 +8,7 @@
 
 #include "CubeAttribute.h"
 #include "FileName.h"
+#include "importUtils.h"
 #include "iTime.h"
 #include "OriginalLabel.h"
 #include "OriginalXmlLabel.h"
@@ -23,8 +24,6 @@ using namespace inja;
 using json = nlohmann::json;
 
 namespace Isis {
-
-
 
   void isisimport(UserInterface &ui, Pvl *log) {
     FileName fileTemplate = ("$ISISROOT/appdata/import/fileTemplate.tpl");
@@ -148,6 +147,50 @@ namespace Isis {
       return bandInfo;
     });
 
+    env.add_callback("CassiniIssStretchPairs", 0, [](Arguments& args) {
+      PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
+      QString missionDir = (QString) dataDir["Cassini"];
+      FileName *lutFile = new FileName(missionDir + "/calibration/lut/lut.tab");
+      TextFile *stretchPairs = new TextFile(lutFile->expanded());
+
+      vector<double> vectorStretchPairs = {};
+
+      bool begindataFound = false;
+      QString line;
+      bool goodLine = stretchPairs->GetLine(line);
+
+      // Search for tag "\begindata" if it was not already found by recursively using this method
+      while (!begindataFound) {
+
+        if (!goodLine) {
+          // Might want to detail this probelm a little more
+          return std::string("()");
+        }
+
+        if(!line.contains("\\begindata")) {
+          goodLine = stretchPairs->GetLine(line);
+        }
+        else {
+          begindataFound = true;
+        }
+      }
+
+      // Create the stretch pairs
+      double temp1 = 0;
+      for(int i = 0; i < stretchPairs->LineCount(); i++) {
+        stretchPairs->GetLine(line);  //assigns value to line
+        line = line.simplified();
+
+        for (QString value: line.split(QRegExp("[\\s,]"), QString::SkipEmptyParts)) {
+          vectorStretchPairs.push_back(temp1);
+          vectorStretchPairs.push_back(toDouble(value));
+          temp1++;
+        }
+      }
+
+      return vectorToString(vectorStretchPairs).toStdString();
+    });
+
     env.add_callback("splitOnChar", 2, [](Arguments& args){
       std::string text = args.at(0)->get<string>();
 
@@ -250,7 +293,6 @@ namespace Isis {
 
      /**
       * Add SubFrame keyword to Instrument Group based on substring of ImageNumber.
-      *
       */
      env.add_callback("SetSubFrame", 1, [](Arguments& args) {
        std::string imageNumber = args.at(0)->get<string>();
@@ -277,7 +319,6 @@ namespace Isis {
 
     /**
      * Remove units from keyword value if exists at the end of the string.
-     *
      */
     env.add_callback("RemoveUnits", 1, [](Arguments& args){
 
@@ -393,6 +434,7 @@ namespace Isis {
         recSize = toInt(translation["DataFileRecordBytes"]);
       }
       importer.SetFileHeaderBytes(offset * recSize);
+      importer.SaveFileHeader();
     }
     // Assume PDS4
     else {
@@ -492,8 +534,8 @@ namespace Isis {
     if (translation.hasKeyword("CubeAtts")) {
       cubeAtts = QString(translation["CubeAtts"]);
     }
-    CubeAttributeOutput att = CubeAttributeOutput(cubeAtts);
-    Cube *outputCube = importer.SetOutputCube(ui.GetCubeName("TO"), att);
+    CubeAttributeOutput outputAtts = CubeAttributeOutput(cubeAtts);
+    Cube *outputCube = importer.SetOutputCube(ui.GetCubeName("TO"), outputAtts);
 
     if (isPDS4) {
       OriginalXmlLabel xmlLabel;
@@ -516,7 +558,24 @@ namespace Isis {
     for(int g = 0; g < newCubeLabel.groups(); g++) {
       outCubeLabel.addGroup(newCubeLabel.group(g));
     }
+
+    if (translation.hasObject("AncillaryProcess")) {
+      for(int i = 0; i < translation.objects(); ++i) {
+        PvlObject &object = translation.object(i);
+        QString objectName = object.name();
+        if (objectName == "AncillaryProcess") {
+          applyAncillaryProcess(outputCube, QString(object["ProcessFunction"]), translation, &importer);
+        }
+      }
+    }
+
     importer.EndProcess();
+
+    if (translation.hasObject("PostProcess")) {
+      // Expand for potentially more than one prefix process
+      // See AncillaryProcess section above
+      runProcess(ui.GetCubeName("TO"), translation.findObject("PostProcess"));
+    }
 
     return;
   }

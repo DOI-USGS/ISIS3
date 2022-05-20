@@ -6,10 +6,12 @@
 #include <nlohmann/json.hpp>
 
 #include "Fixtures.h"
+#include "Histogram.h"
 #include "md5wrapper.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
+#include "TestUtilities.h"
 
 #include "isisimport.h"
 
@@ -231,5 +233,3 @@ End)";
 
   EXPECT_EQ(archiveGroup["ObservationId"][0].toStdString(), "CRUS_000000_505_1");
 }
-
-
