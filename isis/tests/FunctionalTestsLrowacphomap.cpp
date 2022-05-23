@@ -78,12 +78,12 @@ TEST(Lrowacphomap, FunctionalTestLrowacphomapNoBack) {
     FAIL() << "Call to lrowacphomap failed, unable to apply photometric correction to input cube: " << e.what() << std::endl;
   }
 
-  double expectedAvg = 58.565850201775;
-  double expectedStdDev = 19.336237864721;
-  double expectedMedian = 56.231717465174;
-  double expectedMin = 21.181716918945;
-  double expectedMax = 160.17492675781;
-  double expectedSum = 197132.65177917;
+  double expectedAvg = 58.159470616532;
+  double expectedStdDev = 18.558190342074;
+  double expectedMedian = 56.508963061387;
+  double expectedMin = 23.405038833618;
+  double expectedMax = 155.67340087891;
+  double expectedSum = 195764.77809525;
 
   Cube outCube(outCubeFileName);
 
