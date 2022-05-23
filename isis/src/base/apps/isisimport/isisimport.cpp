@@ -3,7 +3,6 @@
 
 #include <inja/inja.hpp>
 #include <nlohmann/json.hpp>
-#include <QRegularExpression>
 #include <QString>
 #include <QtMath>
 
