@@ -43,6 +43,7 @@ release.
 
 ### Added
 - Improved functionality of msi2isis and MsiCamera model to support new Eros dataset, including support for Gaskell's SUMSPICE files that adjust timing, pointing and spacecraft position ephemeris. [#4886](https://github.com/USGS-Astrogeology/ISIS3/issues/4886)
+- Re-added and refactored the LRO photometry application lrowacphomap to be callable for testing purposes. Issue: [#4960](https://github.com/USGS-Astrogeology/ISIS3/issues/4960), PR: [#4961](https://github.com/USGS-Astrogeology/ISIS3/pull/4961)
 
 ### Deprecated
 
