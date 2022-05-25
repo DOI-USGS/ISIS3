@@ -1,6 +1,7 @@
-{% if Product_Observational.Observation_Area.Observing_System.Observing_System_Component.2.name == "WAC FC" or Product_Observational.Observation_Area.Observing_System.Observing_System_Component.2.name == "WAC PB" %}
+{% set sub_sensor = Product_Observational.Label_TBD.Observation_Area.Observing_System.Observing_System_Component.0.name %}
+{% if sub_sensor == "WAC FC" or sub_sensor == "WAC PB" %}
 {% set sensor="WAC" %}
-{% else if Product_Observational.Observation_Area.Observing_System.Observing_System_Component.2.name == "NAC FC" or Product_Observational.Observation_Area.Observing_System.Observing_System_Component.2.name == "NAC PB" %}
+{% else if sub_sensor == "NAC FC" or sub_sensor == "NAC PB" %}
 {% set sensor="NAC" %}
 {% else %}
 {% set sensor="UNK" %}
@@ -74,31 +75,79 @@ Object = IsisCube
   End_Object
 
   Group = Instrument
-    Sensor = {{sensor}}
     SpacecraftName            = "{{ Product_Observational.Observation_Area.Investigation_Area.name }}"
-    InstrumentId              = "{{ Product_Observational.Observation_Area.Observing_System.Observing_System_Component.1.name }} {{ Product_Observational.Observation_Area.Observing_System.Observing_System_Component.2.name }}"
+    InstrumentId              = "{{ Product_Observational.Observation_Area.Observing_System.Observing_System_Component.1.name }} {{ Product_Observational.Label_TBD.Observation_Area.Observing_System.Observing_System_Component.0.name }}"
     TargetName                = {{ at(splitOnChar(Product_Observational.Observation_Area.Target_Identification.name, " "), 1) }}
     StartTime                 = {{ RemoveStartTimeZ(Product_Observational.Observation_Area.Time_Coordinates.start_date_time) }}
     ExposureDuration          = {{ Product_Observational.Observation_Area.Discipline_Area.img_Exposure.img_exposure_duration._text }}<seconds>
   End_Group
 
+{% set filter=Product_Observational.Label_TBD.Observation_Area.Observing_System.Observing_System_Component.1.name %}
   Group = BandBin
-    {# Hard code to clear filter #}
-    FilterName = Clear
-    {% if sensor == "WAC" %}
-    Center     = 712.5 <nm>
-    Width      = 675 <nm>
-    {% else %}
-    Center     = 702.5 <nm>
-    Width      = 695 <nm>
-    {% endif %}
+    FilterName = {{ filter }}
+    Center = {% if filter == "CLEAR" %}
+               {% if sensor == "WAC" %}
+               712.5 <nm>
+               {% else if sensor == "NAC" %}
+               702.5 <nm>
+               {% else %}
+               UNK
+               {% endif %}
+             {% else if filter == "NUV" %}
+               {% if sensor == "WAC" %}
+               387.5 <nm>
+               {% else if sensor == "NAC"  %}
+               377.5 <nm>
+               {% else %}
+               UNK
+               {% endif %}
+             {% else if filter == "BLU" %}
+             427.5 <nm>
+             {% else if filter == "GRN" %}
+             555 <nm>
+             {% else if filter == "RED" %}
+             670 <nm>
+             {% else if filter == "IR1" %}
+             850 <nm>
+             {% else if filter == "1MC" %}
+             1000 <nm>
+             {% else %}
+             UNK
+             {% endif %}
+    Width = {% if filter == "CLEAR" %}
+              {% if sensor == "WAC" %}
+              675 <nm>
+              {% else %}
+              695 <nm>
+              {% endif %}
+            {% else if filter == "NUV" %}
+              {% if sensor == "WAC" %}
+              25 <nm>
+              {% else %}
+              45 <nm>
+              {% endif %}
+            {% else if filter == "BLU" %}
+            95 <nm>
+            {% else if filter == "GRN" %}
+            70 <nm>
+            {% else if filter == "RED" %}
+            60 <nm>
+            {% else if filter == "IR1" %}
+            40 <nm>
+            {% else if filter == "1MC" %}
+            100 <nm>
+            {% else %}
+            UNK
+            {% endif %}
   End_Group
 
   Group = Kernels
     NaifFrameCode = {% if sensor == "WAC" %}
                     -159104
-                    {% else %}
+                    {% else if sensor == "NAC" %}
                     -159103
+                    {% else %}
+                    UNK
                     {% endif %}
 
   End_Group
