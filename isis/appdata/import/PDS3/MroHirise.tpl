@@ -23,7 +23,6 @@
     ChannelNumber                   = {{INSTRUMENT_SETTING_PARAMETERS.MRO_CHANNEL_NUMBER.Value}}
     LookupTableType                 = ({{ join(INSTRUMENT_SETTING_PARAMETERS.MRO_LOOKUP_CONVERSION_TABLE.Value, ", ") }})
     LookupTableNumber               = {{INSTRUMENT_SETTING_PARAMETERS.MRO_LOOKUP_TABLE_NUMBER.Value}}
-    LookupTable                     = ({{ join(INSTRUMENT_SETTING_PARAMETERS.MRO_LOOKUP_CONVERSION_TABLE.Value, ", ")}})
     LookupTableMinimum              = {{INSTRUMENT_SETTING_PARAMETERS.MRO_LOOKUP_TABLE_MINIMUM.Value}}
     LookupTableMaximum              = {{INSTRUMENT_SETTING_PARAMETERS.MRO_LOOKUP_TABLE_MAXIMUM.Value}}
     LookupTableMedian               = {{INSTRUMENT_SETTING_PARAMETERS.MRO_LOOKUP_TABLE_MEDIAN.Value}}
