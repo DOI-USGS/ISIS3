@@ -293,9 +293,14 @@ This step will update the ISIS documentation on our [website](https://isis.astro
 * Run the ```ninja docs``` command from this build directory to build the documentation for this version of the code. 
 
 
-### Part B: Upload the documentation 
+### Part B: Upload the documentation
 
-* In the isis/src/docsys directory (this directory is in the ISIS source tree) run the command ```make wwwdoc``` as the isis3mgr user. 
+This step requires that you have an rclone config for the `asc-docs` bucket. You can get credentials from vault.
+
+In the `$ISISROOT/docs` directory run the following commands, but replace <your-config> with your config for `asc-docs` and <version-number> with the version of ISIS you are releasing. For example if you config is called `s3-docs` and you are releasing 8.1.0, the first command would be `rclone sync --dry-run docs/8.1.0 s3-docs://asc-docs/isis-site/8.1.0/
+
+* Optionally add the `--dry-run` flag to test prior to actually uploading, `rclone sync docs/<version-number> <your-config>://asc-docs/isis-site/<version-number>/`
+* `rclone sync copy docs/index.html <your-config>://asc-docs/isis-site/`
 
 
 ## Step 11: Communicate Availability of Build 
