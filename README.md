@@ -55,16 +55,10 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
     ```bash
     #Create a new conda environment to install ISIS in
-    conda create -n isis python=3.6
+    conda create -n isis
 
     #Activate the environment
-    #Depending on your version of Anaconda use one of the following:
-
-    #Anaconda 3.4 and up:
     conda activate isis
-
-    #Prior to Anaconda 3.4:
-    source activate isis
 
     #Add the following channels to the environment
     conda config --env --add channels conda-forge
@@ -88,13 +82,7 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 1. The environment is now ready to download ISIS and its dependencies:
 
     ```bash
-    conda install -c usgs-astrogeology isis=6.0.0
-    ```
-    
-    If you would like to work with ISIS version 3, rather than the latest ISIS, run instead:
-
-    ```bash
-    conda install -c usgs-astrogeology isis=3.10.0
+    conda install -c usgs-astrogeology isis=7.0.0
     ```
 
 1. Finally, setup the environment variables:
