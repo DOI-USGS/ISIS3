@@ -85,9 +85,6 @@ namespace Isis {
   vector<vector<double> > g_linearityCoefficients;
   Buffer *g_darkCube0, *g_darkCube1;
 
-
-
-
   /**
     * @brief  Calling method of the application
     *
@@ -101,6 +98,7 @@ namespace Isis {
     Cube iCube(ui.GetCubeName("FROM"));
     lronaccal(&iCube, ui);
   }
+
   /**
     * This is the main constructor lronaccal method. Lronaccal is used to calibrate LRO images
     * 
@@ -117,10 +115,6 @@ namespace Isis {
     ResetGlobals();
     // We will be processing by line
     ProcessByLine p;
-   
-
-    // Setup the input and make sure it is a ctx file
-    //UserInterface &ui = Application::GetUserInterface();
 
     g_masked = ui.GetBoolean("MASKED");
     g_dark = ui.GetBoolean("DARK");
@@ -163,8 +157,6 @@ namespace Isis {
 
     g_exposure = inst["LineExposureDuration"];
 
-    //Cube *iCube = p.SetInputCube("FROM", OneBand);
-    //p.SetInputCube(iCube, OneBand);
     p.SetInputCube(iCube, OneBand);
 
     // If there is any pixel in the image with a DN > 1000
@@ -176,12 +168,10 @@ namespace Isis {
 
     if(g_masked) {
       QString maskedFile = ui.GetAsString("MASKEDFILE");
-
       if(maskedFile.toLower() == "default" || maskedFile.length() == 0){
         GetCalibrationDirectory("", maskedFile);
         maskedFile = maskedFile + instId + "_MaskedPixels.????.pvl";
       }
-
       FileName maskedFileName(maskedFile);
       if(maskedFileName.isVersioned())
         maskedFileName = maskedFileName.highestVersion();
@@ -189,7 +179,6 @@ namespace Isis {
         QString msg = maskedFile + " does not exist.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-
       Pvl maskedPvl(maskedFileName.expanded());
       PvlKeyword maskedPixels;
       int cutoff;
@@ -208,7 +197,7 @@ namespace Isis {
         else
           g_maskedPixelsRight.push_back(toInt(maskedPixels[i]));
     }
-
+    
     vector <QString> darkFiles;
 
     if(g_dark) {
@@ -333,13 +322,13 @@ namespace Isis {
             double etStart = startTime.Et();
             // Get the distance between the Moon and the Sun at the given time in
             // Astronomical Units (AU)
-            QString bspKernel1 = p.MissionData("lro", "/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
-            QString bspKernel2 = p.MissionData("lro", "/kernels/tspk/de421.bsp", false);
+            QString bspKernel1 = p.MissionData("lro", "$base/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
+            QString bspKernel2 = p.MissionData("lro", "$base/kernels/tspk/de421.bsp", false);
             furnsh_c(bspKernel1.toLatin1().data());
             furnsh_c(bspKernel2.toLatin1().data());
             QString pckKernel1 = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-            QString pckKernel2 = p.MissionData("lro", "/kernels/pck/moon_080317.tf", false);
-            QString pckKernel3 = p.MissionData("lro", "/kernels/pck/moon_assoc_me.tf", false);
+            QString pckKernel2 = p.MissionData("lro", "$base/kernels/pck/moon_080317.tf", false);
+            QString pckKernel3 = p.MissionData("lro", "$base/kernels/pck/moon_assoc_me.tf", false);
             furnsh_c(pckKernel1.toLatin1().data());
             furnsh_c(pckKernel2.toLatin1().data());
             furnsh_c(pckKernel3.toLatin1().data());
@@ -365,10 +354,8 @@ namespace Isis {
         g_radianceRight = radPvl["Radiance_RIGHT"];
       }
     }
-
     // Setup the output cube
-    Cube *ocube = p.SetOutputCube("TO");
-
+    Cube * oCube = p.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO")); 
     // Start the line-by-line calibration sequence
     p.StartProcess(Calibrate);
 
@@ -381,6 +368,7 @@ namespace Isis {
         darkColumns += toString(g_maskedPixelsRight[i]);
       calgrp += darkColumns;
     }
+
     if(g_dark){
       PvlKeyword darks("DarkFiles");
       darks.addValue(darkFiles[0]);
@@ -395,10 +383,12 @@ namespace Isis {
 
       calgrp += darks;
     }
+
     if(g_nonlinear) {
       calgrp += PvlKeyword("NonlinearOffset", offsetFile);
       calgrp += PvlKeyword("LinearizationCoefficients", coefficientFile);
     }
+
     if(g_flatfield)
       calgrp += PvlKeyword("FlatFile", flatFile);
     if(g_radiometric) {
@@ -418,7 +408,8 @@ namespace Isis {
       }
       calgrp += PvlKeyword("SolarDistance", toString(g_solarDistance));
     }
-    ocube->putGroup(calgrp);
+
+    oCube->putGroup(calgrp);
     p.EndProcess();
   }
 
@@ -429,15 +420,12 @@ namespace Isis {
   void ResetGlobals() {
     g_exposure = 1.0; // Exposure duration
     g_solarDistance = 1.01; // average distance in [AU]
-
     g_maskedPixelsLeft.clear();
     g_maskedPixelsRight.clear();
-
     g_radianceLeft = 1.0;
     g_radianceRight = 1.0;
     g_iofLeft = 1.0;
     g_iofRight = 1.0;
-
     g_summed = true;
     g_masked = true;
     g_dark = true;
@@ -620,9 +608,7 @@ namespace Isis {
 
       }
       else {
-
         in[i] = Isis::Null;
-
       }
     }
   }
