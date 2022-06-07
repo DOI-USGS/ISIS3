@@ -250,7 +250,7 @@ User Comments
   <groups>
     <group name="Input Files">
         <parameter name="FROM">
-          <type>filename</type>
+          <type>cube</type>
           <fileMode>input</fileMode>
           <internalDefault>None</internalDefault>
           <brief>

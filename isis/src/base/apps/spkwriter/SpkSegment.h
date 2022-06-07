@@ -108,12 +108,15 @@ class SpkSegment : public SpkSpiceSegment {
     int         m_body;         //  NAIF body code of the SPICE segment
     QString     m_bodyFrame;    //  NAIF body frame
     int         m_center;       //  NAIF center code of the SPICE segment
+    QString     m_instId;       //  Instrument ID
     QString     m_centerFrame;  //  NAIF center frame
     QString     m_refFrame;     //  NAIF reference frame
     SMatrix     m_states;       //  Position states
     SVector     m_epochs;       //  ET times of records
     bool        m_hasVV;        //  Has velocity vectors?
     int         m_degree;       //  Degree of polynomial to fit in NAIF kernel
+    double      m_startOffset;  // time offset between camera model and label start time
+    double      m_endOffset;    // time offset between camera model and label end time
 
     // Internal processing methods
     void init(const int spkType = 13);

@@ -192,6 +192,7 @@ namespace Isis {
     // Setup focal plane and distortion maps
     LroWideAngleCameraFocalPlaneMap *fplane = new LroWideAngleCameraFocalPlaneMap(this, naifIkCode());
     LroWideAngleCameraDistortionMap *distort = new LroWideAngleCameraDistortionMap(this, naifIkCode());
+
     for ( int i = 0 ; i < filtNames.size() ; i++ ) {
       fplane->addFilter(filterIKCode.get(filtNames[i].toInt()));
       distort->addFilter(filterIKCode.get(filtNames[i].toInt()));
@@ -291,8 +292,17 @@ namespace Isis {
     }
 
     if (nvals <= 0) {
-      QString mess = "Kernel pool keyword " + key + " not found!";
-      throw IException(IException::Programmer, mess, _FILEINFO_);
+      PvlObject NaifKeywords = getStoredNaifKeywords();
+      if (!NaifKeywords.hasKeyword(key)){
+        QString mess = "Kernel pool keyword " + key + " not found!";
+        throw IException(IException::Programmer, mess, _FILEINFO_);
+      }
+      PvlKeyword kw = NaifKeywords[key];
+      IntParameterList parms;
+      for (int i = 0; i<kw.size(); i++){
+        parms.push_back(toInt(kw[i]));
+      }
+      return parms;
     }
 
     IntParameterList parms;

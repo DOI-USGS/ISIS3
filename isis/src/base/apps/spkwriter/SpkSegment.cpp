@@ -37,7 +37,9 @@
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
+#include "iTime.h"
 #include "NaifStatus.h"
+#include "Spice.h"
 #include "SpkSegment.h"
 #include "Table.h"
 
@@ -168,6 +170,43 @@ void SpkSegment::import(Cube &cube) {
     setStartTime(m_epochs[0]);
     setEndTime(m_epochs[size(m_epochs)-1]);
 
+    Pvl *label = cube.label();
+    QString labStartTime = getKeyValue(*label, "StartTime");
+    QString labEndTime;
+    QString value = getKeyValue(*label, "StopTime");
+    if (!value.isEmpty()) {
+      labEndTime = value;
+    }
+    else {
+      labEndTime = labStartTime;
+    }
+
+    iTime etLabStart(labStartTime);
+    iTime etLabEnd(labEndTime);
+
+    m_startOffset = etLabStart.Et() - m_epochs[0];
+    m_endOffset = etLabEnd.Et() - m_epochs[size(m_epochs)-1];
+
+    // Label start/end times are 3 decimal places, so round offsets to match.
+    m_startOffset = qRound(m_startOffset * 1000.0) / 1000.0;
+    m_endOffset = qRound(m_endOffset * 1000.0) / 1000.0;
+
+    // account for padding
+    if (m_startOffset >= 0.003) {
+      m_startOffset = 0.0;
+    }
+    else {
+      m_startOffset = fabs(m_startOffset);
+    }
+    if (m_endOffset <= 0.003) {
+      m_endOffset = 0.0;
+    }
+    else {
+      m_endOffset = fabs(m_endOffset);
+    }
+
+    m_instId = getKeyValue(*label, "InstrumentId");
+
   } catch ( IException &ie  ) {
     ostringstream mess;
     mess << "Failed to construct SPK content from ISIS file " << Source();
@@ -291,10 +330,21 @@ QString SpkSegment::getComment() const {
 "  Segment ID:  " << Id() << " (ProductId)" << endl <<
 "  StartTime:   " << utcStartTime() << endl <<
 "  EndTime:     " << utcEndTime() << endl <<
+"  Instrument:  " << m_instId << endl <<
 "  Target Body: " << "Body " << m_body << ", " << m_bodyFrame << endl <<
 "  Center Body: " << "Body " << m_center << ", " << m_centerFrame << endl <<
 "  RefFrame:    " << m_refFrame << endl <<
 "  Records:     " << size() << endl;
+
+  if (m_startOffset != 0) {
+    comment <<
+"  StartOffset: " << m_startOffset << endl;
+  }
+
+  if (m_endOffset != 0) {
+    comment <<
+"  EndOffset:   " << m_endOffset << endl;
+  }
 
   string hasVV = (m_hasVV) ? "YES" : "NO";
   comment <<
@@ -358,10 +408,12 @@ void SpkSegment::init(const int spkType) {
   m_spkType = spkType;
   m_body = m_center = 1;
   m_bodyFrame = m_centerFrame = m_refFrame = "";
+  m_instId = "UNKNOWN";
   m_states = SMatrix(0,0);
   m_epochs = SVector(0);
   m_hasVV = false;
   m_degree = 1;
+  m_startOffset = 0.0;
   return;
 }
 

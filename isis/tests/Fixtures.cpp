@@ -251,6 +251,87 @@ namespace Isis {
   }
 
 
+  void PushFramePair::SetUp() {
+    numSamps = 16;
+    numBands = 3;
+    frameHeight = 12;
+    numFrames = 10;
+
+    evenCube.reset(new Cube());
+    evenCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
+    evenCube->create(tempDir.path() + "/even.cub");
+
+    oddCube.reset(new Cube());
+    oddCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
+    oddCube->create(tempDir.path() + "/odd.cub");
+
+    Brick frameBrick(numSamps, frameHeight, numBands, evenCube->pixelType());
+
+    for (int frameIndex = 0; frameIndex < numFrames; frameIndex++) {
+      for (int brickIndex = 0; brickIndex < frameBrick.size(); brickIndex++) {
+        frameBrick[brickIndex] = frameIndex + 1;
+      }
+      frameBrick.SetBasePosition(1,frameIndex * frameHeight + 1,1);
+      if (frameIndex % 2 == 0) {
+        oddCube->write(frameBrick);
+      }
+      else {
+        evenCube->write(frameBrick);
+      }
+    }
+
+    PvlGroup intGroup("Instrument");
+    intGroup += PvlKeyword("StartTime", "2008-06-14T13:32:10.933207");
+    evenCube->putGroup(intGroup);
+    oddCube->putGroup(intGroup);
+
+    evenCube->reopen("rw");
+    oddCube->reopen("rw");
+
+  }
+
+
+  void FlippedPushFramePair::SetUp() {
+    numSamps = 16;
+    numBands = 3;
+    frameHeight = 12;
+    numFrames = 10;
+
+    evenCube.reset(new Cube());
+    evenCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
+    evenCube->create(tempDir.path() + "/even.cub");
+
+    oddCube.reset(new Cube());
+    oddCube->setDimensions(numSamps, frameHeight * numFrames, numBands);
+    oddCube->create(tempDir.path() + "/odd.cub");
+
+    Brick frameBrick(numSamps, frameHeight, numBands, evenCube->pixelType());
+
+    for (int frameIndex = 0; frameIndex < numFrames; frameIndex++) {
+      for (int brickIndex = 0; brickIndex < frameBrick.size(); brickIndex++) {
+        frameBrick[brickIndex] = numFrames - frameIndex;
+      }
+      frameBrick.SetBasePosition(1,frameIndex * frameHeight + 1,1);
+      if (frameIndex % 2 == 0) {
+        evenCube->write(frameBrick);
+      }
+      else {
+        oddCube->write(frameBrick);
+      }
+    }
+
+    PvlGroup intGroup("Instrument");
+    intGroup += PvlKeyword("DataFlipped", "True");
+    intGroup += PvlKeyword("StartTime", "2008-06-14T13:32:10.933207");
+    evenCube->putGroup(intGroup);
+    oddCube->putGroup(intGroup);
+
+    evenCube->reopen("rw");
+    oddCube->reopen("rw");
+
+  }
+
+
   void DemCube::SetUp() {
     DefaultCube::SetUp();
     testCube->label()->object(4)["SolarLongitude"] = "294.73518831328";
@@ -1189,7 +1270,7 @@ namespace Isis {
   }
 
 
- void OsirisRexCube::setInstrument(QString ikid, QString instrumentId) {
+  void OsirisRexCube::setInstrument(QString ikid, QString instrumentId) {
     delete testCube;
     testCube = new Cube();
 
@@ -1692,5 +1773,80 @@ namespace Isis {
       QFile::copy("data/clipper/ClipperWacPb.cub", testPath);
       testCube = new Cube(testPath, "rw");
     }
+  }
+
+  void NearMsiCameraCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    json isd;
+    Pvl label;
+
+    std::ifstream isdFile("data/near/msicamera/m0155881376f3_2p_cif_dbl.isd");
+    std::ifstream cubeLabel("data/near/msicamera/m0155881376f3_2p_cif_dbl.pvl");
+
+    isdFile >> isd;
+    cubeLabel >> label;
+
+    testCube.reset( new Cube() ) ;
+    testCube->fromIsd(tempDir.path() + "/m0155881376f3_2p_cif_dbl.cub", label, isd, "rw");
+  }
+
+  void NearMsiCameraCube::TearDown() {
+    testCube.reset();
+  }
+
+  void TgoCassisModuleKernels::SetUp() {
+    QVector<QString> ckKernels = {QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_0_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_cassis_tel_20160407_20221231_s20220316_v01_1_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_0_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/mapProjectedReingested/em16_tgo_sc_ssm_20180501_20180601_s20180321_v01_1_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_0_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_1_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_0_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_1_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_0_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_cassis_tel_20160407_20221231_s20220402_v01_1_sliced_-143410.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_0_sliced_-143000.xc"),
+                                  QString("data/tgoCassis/singleFrameletProj/em16_tgo_sc_spm_20161101_20170301_s20191109_v01_1_sliced_-143000.xc")};
+    QVector<QString> tempCkKernels;
+    QVector<QString> spkKernels = {QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_0.xsp"),
+                                   QString("data/tgoCassis/mapProjectedReingested/CAS-M01-2018-05-05T23.11.48.767-RED-01029-B1_1.xsp"),
+                                   QString("data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381_0.xsp"),
+                                   QString("data/tgoCassis/CAS-MCO-2016-11-26T22.50.27.381_1.xsp"),
+                                   QString("data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583_0.xsp"),
+                                   QString("data/tgoCassis/singleFrameletProj/CAS-MCO-2016-11-26T22.58.02.583_1.xsp")};
+    QVector<QString> tempSpkKernels;
+
+    for (int i = 0; i < ckKernels.size(); i++) {
+      QString kernelFile = ckKernels[i];
+      QString kernelExtension = kernelFile.split('.').last();
+      QString targetFile = kernelPrefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
+      QFile::copy(kernelFile, targetFile);
+      tempCkKernels.append(targetFile);
+    }
+
+    for (int i = 0; i < spkKernels.size(); i++) {
+      QString kernelFile = spkKernels[i];
+      QString kernelExtension = kernelFile.split('.').last();
+      QString targetFile = kernelPrefix.path() + "/" + QString::number(i) + '.' + kernelExtension;
+      QFile::copy(kernelFile, targetFile);
+      tempSpkKernels.append(targetFile);
+    }
+
+    // variables defined in TgoCassisModuleTests
+    if (binaryCkKernels.size() == 0) {
+      binaryCkKernels = generateBinaryKernels(tempCkKernels);
+      binarySpkKernels = generateBinaryKernels(tempSpkKernels);
+
+      binaryCkKernelsAsString = fileListToString(binaryCkKernels);
+      binarySpkKernelsAsString = fileListToString(binarySpkKernels);
+    }
+  }
+
+  void TgoCassisModuleKernels::TearDown() {
+    binaryCkKernels = {};
+    binarySpkKernels = {};
+    binaryCkKernelsAsString = "";
+    binarySpkKernelsAsString = "";
   }
 }

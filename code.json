@@ -18,7 +18,7 @@
 
     "homepageURL": "https://isis.astrogeology.usgs.gov",
     "downloadURL": "https://github.com/USGS-Astrogeology/ISIS3/archive/refs/tags/7.0.0_RC1.zip",
-    "disclaimerURL": "https://github.com/USGS-Astrogeology/ISIS3/blob/master/LICENSE.md",
+    "disclaimerURL": "https://github.com/USGS-Astrogeology/ISIS3/blob/master/DISCLAIMER.md",
     "repositoryURL": "https://github.com/USGS-Astrogeology/ISIS3/",
     "vcs": "git",
 

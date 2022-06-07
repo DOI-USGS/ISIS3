@@ -77,6 +77,8 @@ namespace Isis {
    *   @history 2017-05-08 Tyler Wilson - Added a call to the virtual method SetBricks inside
    *                          the functions PreProcessCubeInPlace/PreProcessCube/PreProcessCubes.
    *                          Fixes #4698.
+   *   @history 2022-04-22 Jesse Mapel - Added std::function process method for multiple
+   *                          input and output cubes.
    */
   class ProcessByBrick : public Process {
     public:
@@ -132,10 +134,12 @@ namespace Isis {
       using Isis::Process::StartProcess;  // make parents virtual function visable
       virtual void StartProcess(void funct(Buffer &in));
       virtual void StartProcess(std::function<void(Buffer &in)> funct );
-      virtual void StartProcess(std::function<void(Buffer &in, Buffer &out)> funct);
       virtual void StartProcess(void funct(Buffer &in, Buffer &out));
+      virtual void StartProcess(std::function<void(Buffer &in, Buffer &out)> funct);
       virtual void StartProcess(void funct(std::vector<Buffer *> &in,
                                            std::vector<Buffer *> &out));
+      virtual void StartProcess(std::function<void(std::vector<Buffer *> &in,
+                                                   std::vector<Buffer *> &out)> funct);
       void EndProcess();// Depricated. Please use Finalize
       void Finalize();
 

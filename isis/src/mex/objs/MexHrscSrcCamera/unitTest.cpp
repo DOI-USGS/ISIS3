@@ -35,8 +35,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -9.3335948038633116;
-    double knownLon = 90.4734324741402531;
+    double knownLat = -6.1835212703283418;
+    double knownLon = 90.4775137054191845;
 
     Cube c("$ISISTESTDATA/isis/src/mex/unitTestData/H0010_0023_SR2.cub", "r");
     Camera *cam = CameraFactory::Create(c);
@@ -60,16 +60,16 @@ int main(void) {
 
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;
-    TestLineSamp(cam, 1.0, 1.0);
+    TestLineSamp(cam, 10.0, 10.0);
 
     cout << "For upper right corner ..." << endl;
-    TestLineSamp(cam, cam->Samples(), 1.0);
+    TestLineSamp(cam, cam->Samples()-10.0, 10.0);
 
     cout << "For lower left corner ..." << endl;
-    TestLineSamp(cam, 1.0, cam->Lines());
+    TestLineSamp(cam, 10.0, cam->Lines()-10.0);
 
     cout << "For lower right corner ..." << endl;
-    TestLineSamp(cam, cam->Samples(), cam->Lines());
+    TestLineSamp(cam, cam->Samples()-10.0, cam->Lines()-10.0);
 
     double samp = cam->Samples() / 2.0;
     double line = cam->Lines() / 2.0;

@@ -120,7 +120,15 @@ End_Object
 
 
 Object = Translation
-  DataFilePointer      = {{ ptrQUBE.Value }}
+  {% if exists("ptrQUBE.Units") %}
+  DataFilePointer             = {{ ptrQUBE.Value }} <{{ ptrQUBE.Units }}>
+  {% else if exists("ptrQUBE.Value") %}
+    {% if isArray(ptrQUBE.Value) %}
+    DataFilePointer             = ({{ ptrQUBE.Value.0 }}, {{ ptrQUBE.Value.1 }})
+    {% else %}
+    DataFilePointer             = {{ ptrQUBE.Value }}
+    {% endif %}
+  {% endif %}
   {% if exists("RECORD_BYTES") %}
   DataFileRecordBytes  = {{ RECORD_BYTES.Value }}
   {% endif %}

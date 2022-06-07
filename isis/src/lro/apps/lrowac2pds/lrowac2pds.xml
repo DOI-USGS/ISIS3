@@ -28,13 +28,13 @@
   <groups>
     <group name="Files">
       <parameter name="FROMLIST">
-        <type>cube</type>
+        <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input cube to be converted
+          A list of cubes to import
         </brief>
         <description>
-          The cube to be converted to PDS IMG format.
+          A file containing a list of PDS3 files to be imported.
         </description>
         <filter>
           *.cub
