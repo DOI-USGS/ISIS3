@@ -3,6 +3,9 @@
 
 #include <QRegExp>
 #include <QString>
+#include <QTemporaryDir>
+#include <QTemporaryFile>
+#include <QFileInfo>
 #include <nlohmann/json.hpp>
 
 #include "Fixtures.h"
@@ -83,10 +86,94 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
     End_Object
     End
   )");
-  QString dataFileName = " data/eis2isis/nacFrame/nac000xxx_2022145t000000_0000000001_frame_raw02.xml";
+  QString dataFilePath= " data/isisimport/eispds/nacFrame/nac000xxx_2022145t000000_0000000001_frame_raw02.xml";
+  QString dataFileName = "nac000xxx_2022145t000000_0000000001_frame_raw02.xml";
+  QString imageFilePath = " data/isisimport/eispds/nacFrame/nac000xxx_2022145t000000_0000000001_frame_raw02.img";
+  QString imageFileName = "nac000xxx_2022145t000000_0000000001_frame_raw02.img";
   QString templateFile = "../appdata/import/PDS4/ClipperEIS.tpl";
   QString cubeFileName = tempDir.path() + "/nacFrame.cub";
-  QVector<QString> args = {"from=" + dataFileName, "to=" + cubeFileName, "template=" + templateFile};
+
+  // hard coding these values for now, but we should use some sort of xml parser to grab these values from the labels xml
+  int samples = 3832;
+  int lines = 1335;
+  int bytes = 2;
+
+  // create a temp img file and write data to it
+  QFile tempImgFile(tempDir.path() + "/" + imageFileName);
+  if(!tempImgFile.open(QFile::WriteOnly | QFile::Text)){
+      qDebug() << " Could not open file for writing";
+      return;
+  }
+  QTextStream out(&tempImgFile);
+  char writeToFile[samples * bytes];
+  for(int i=0; i<samples * bytes; i++){
+    writeToFile[i] = '0';
+  }
+  for(int i=0; i<lines; i++){
+    QTextStream out(&tempImgFile);
+    out << writeToFile;
+  }
+  tempImgFile.flush();
+  tempImgFile.close();
+
+  // read the temp img file and output to screen for debugging
+    if(!tempImgFile.open(QFile::ReadOnly |
+                  QFile::Text))
+    {
+        qDebug() << " Could not open the file for reading";
+        return;
+    }
+
+    QTextStream in(&tempImgFile);
+    QString myText = in.readAll();
+    // qDebug() << myText;
+    tempImgFile.close();
+
+
+  
+
+  // create a temp data file and copy the contents of the xml in to it
+  QFile tempDataFile(tempDir.path() + "/" + dataFileName);
+  QFileInfo fileInfo(tempDataFile);
+  if(!tempDataFile.open(QFile::WriteOnly | QFile::Text)){
+      qDebug() << " Could not open file for writing";
+      return;
+  }
+  else{
+      // read from xml
+  QFile inputFile(dataFilePath);
+  std::cout<<"before if"<<std::endl;
+  if (!inputFile.open(QFile::ReadOnly |
+                  QFile::Text))
+  {
+        qDebug() << " Could not open the file for reading";
+        return;
+  }
+  std::cout<<"after if"<<std::endl;
+  QTextStream test(&inputFile);
+  QString data = test.readAll();
+  qDebug() << data;
+  inputFile.close();
+
+  }
+
+  // QFile::copy(dataFilePath, fileInfo.absoluteFilePath());
+
+
+    // if(!tempDataFile.open(QFile::ReadOnly |
+    //               QFile::Text))
+    // {
+    //     qDebug() << " Could not open the file for reading";
+    // }
+
+    // QTextStream in(&tempDataFile);
+    // QString myText = in.readAll();
+    // qDebug() << myText;
+
+    // tempDataFile.close();
+
+
+  QVector<QString> args = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName, "template=" + templateFile};
 
   UserInterface options(APP_XML, args);
   isisimport(options);
@@ -178,7 +265,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
     End
   )");
 
-  QString dataFileName = "data/eis2isis/nacPushb/nac000xxx_2022145t000000_0000000001_pushb_raw02.xml";
+  QString dataFileName = "data/isisimport/eispds/nacPushb/nac000xxx_2022145t000000_0000000001_pushb_raw02.xml";
   QString templateFile = "../appdata/import/PDS4/ClipperEIS.tpl";
   QString cubeFileName = tempDir.path() + "/NacPb.cub";
   QVector<QString> args = {"from=" + dataFileName, "to=" + cubeFileName, "template=" + templateFile};
@@ -253,7 +340,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
     End_Object
     End
   )");
-  QString dataFileName = " data/eis2isis/wacFrame/wac000xxx_2022126t000000_000000001_frame_raw02.xml";
+  QString dataFileName = "  data/isisimport/eispds/wacFrame/wac000xxx_2022126t000000_000000001_frame_raw02.xml";
   QString templateFile = "../appdata/import/PDS4/ClipperEIS.tpl";
   QString cubeFileName = tempDir.path() + "/wacFrame.cub";
   QVector<QString> args = {"from=" + dataFileName, "to=" + cubeFileName, "template=" + templateFile};
@@ -341,7 +428,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
     End
   )");
 
-  QString dataFileName = "data/eis2isis/wacPushb/wac000xxx_2022126t000000_000000002_pushb_raw02.xml";
+  QString dataFileName = " data/isisimport/eispds/wacPushb/wac000xxx_2022126t000000_000000002_pushb_raw02.xml";
   QString templateFile = "../appdata/import/PDS4/ClipperEIS.tpl";
   QString cubeFileName = tempDir.path() + "/WacPb.cub";
   QVector<QString> args = {"from=" + dataFileName, "to=" + cubeFileName, "template=" + templateFile};
