@@ -7,8 +7,10 @@
 #include <QTemporaryFile>
 #include <QFileInfo>
 #include <QTextStream>
-#include <nlohmann/json.hpp>
+#include <QByteArray>
+#include <QDataStream>
 
+#include <nlohmann/json.hpp>
 #include "Fixtures.h"
 #include "Histogram.h"
 #include "md5wrapper.h"
@@ -16,9 +18,7 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "TestUtilities.h"
-
 #include "isisimport.h"
-
 #include "gmock/gmock.h"
 
 using namespace Isis;
@@ -26,55 +26,6 @@ using namespace testing;
 using json = nlohmann::json;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/isisimport.xml").expanded();
-// sub class temp testing 
-// QFile *helper(QString dataFilePath, QString imageFileName, QString dataFileName) {
-//   QTemporaryDir tempDir;
-//   int samples = 3832;
-//   int lines = 1335;
-//   int bytes = 2;
-//   QFile tempImgFile(tempDir.path() + "/" + imageFileName);
-//   if(!tempImgFile.open(QFile::WriteOnly | QFile::Text)){
-//       qDebug() << " Could not open file for writing";
-//   }
-//   QTextStream out(&tempImgFile);
-
-//   // generate a single line 
-//   char writeToFile[samples * bytes];
-//   for(int i=0; i<samples * bytes; i++){
-//     writeToFile[i] = '0';
-//   }
-
-//   // write the lines to the temp file 
-//   for(int i=0; i<lines; i++){
-//     QTextStream out(&tempImgFile);
-//     out << writeToFile;
-//   }
-//   tempImgFile.flush();
-//   tempImgFile.close();
-
-//   // create a temp data file and copy the contents of the xml in to it
-//   QFile *tempDataFile;
-//   tempDataFile = new QFile(tempDir.path() + "/" + dataFileName);
-  
-//   if(!tempDataFile->open(QFile::ReadWrite | QFile::Text)){
-//       qDebug() << " Could not open file for writing";
-//   }
-
-//   // open xml to get data
-//   QFile realXmlFile(dataFilePath);
-//   if (!realXmlFile.open(QIODevice::ReadOnly | QIODevice::Text))
-//   {
-//       qDebug() << "Failed to open file";
-//   }
-
-//   QTextStream xmlData(tempDataFile);
-//   xmlData << realXmlFile.readAll();
-  
-//   tempDataFile->close();
-//   realXmlFile.close();
-
-//   return tempDataFile;
-// }
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
   std::istringstream PvlInput(R"(
@@ -142,24 +93,24 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
   QString templateFile = "../appdata/import/PDS4/ClipperEIS.tpl";
   QString cubeFileName = tempDir.path() + "/nacFrame.cub";
 
-// -------------------------------------------------
-  // hard coding these values for now, but we should use some sort of xml parser to grab these values from the labels xml
-  int samples = 3832;
-  int lines = 1335;
+  int samples = 1335;
+  int lines = 3832;
   int bytes = 2;
+
   // create a temp img file and write data to it
   QFile tempImgFile(tempDir.path() + "/" + imageFileName);;
 
   (tempDir.path() + "/" + imageFileName);
   if(!tempImgFile.open(QFile::WriteOnly | QFile::Text)){
-      qDebug() << " Could not open file for writing";
+      FAIL() << " Could not open file for writing";
   }
   QTextStream out(&tempImgFile);
 
-  // generate a single line 
-  char writeToFile[samples * bytes];
-  for(int i=0; i<samples * bytes; i++){
-    writeToFile[i] = '0';
+  // generate lines 
+  QByteArray writeToFile = QByteArray();
+  short int fill = 0;
+  for(int i=-1; i<(samples * bytes); i++){
+    writeToFile.append(fill);
   }
 
   // write the lines to the temp file 
@@ -174,14 +125,14 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
   QFile tempDataFile(tempDir.path() + "/" + dataFileName);
   
   if(!tempDataFile.open(QFile::ReadWrite | QFile::Text)){
-      qDebug() << " Could not open file for writing";
+      FAIL() << " Could not open file for writing";
   }
 
   // open xml to get data
   QFile realXmlFile(dataFilePath);
   if (!realXmlFile.open(QIODevice::ReadOnly | QIODevice::Text))
   {
-      qDebug() << "Failed to open file";
+      FAIL() << "Failed to open file";
   }
 
   QTextStream xmlData(&tempDataFile);
@@ -195,7 +146,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
   QVector<QString> args = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName, "template=" + templateFile};
   UserInterface options(APP_XML, args);
   isisimport(options);
-// -------------------------------------------------
+
   Pvl truthLabel;
   PvlInput >> truthLabel;
 
@@ -204,12 +155,10 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
 
   PvlGroup truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);
   PvlGroup &outGroup = outLabel->findGroup("Dimensions", Pvl::Traverse);
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 
   truthGroup = truthLabel.findGroup("Pixels", Pvl::Traverse);
   outGroup = outLabel->findGroup("Pixels", Pvl::Traverse);
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 
   truthGroup = truthLabel.findGroup("Instrument", Pvl::Traverse);
@@ -218,7 +167,6 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
 
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 }
 
@@ -289,24 +237,24 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
   QString templateFile = "../appdata/import/PDS4/ClipperEIS.tpl";
   QString cubeFileName = tempDir.path() + "/NacPb.cub";
 
-  // -------------------------------------------------
-  // hard coding these values for now, but we should use some sort of xml parser to grab these values from the labels xml
   int samples = 1335;
   int lines = 3832;
   int bytes = 2;
+
   // create a temp img file and write data to it
   QFile tempImgFile(tempDir.path() + "/" + imageFileName);;
 
   (tempDir.path() + "/" + imageFileName);
   if(!tempImgFile.open(QFile::WriteOnly | QFile::Text)){
-      qDebug() << " Could not open file for writing";
+      FAIL() << " Could not open file for writing";
   }
   QTextStream out(&tempImgFile);
 
-  // generate a single line 
-  char writeToFile[samples * bytes];
-  for(int i=0; i<samples * bytes; i++){
-    writeToFile[i] = '0';
+ // generate lines 
+  QByteArray writeToFile = QByteArray();
+  short int fill = 0;
+  for(int i=-1; i<(samples * bytes); i++){
+    writeToFile.append(fill);
   }
 
   // write the lines to the temp file 
@@ -321,14 +269,14 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
   QFile tempDataFile(tempDir.path() + "/" + dataFileName);
   
   if(!tempDataFile.open(QFile::ReadWrite | QFile::Text)){
-      qDebug() << " Could not open file for writing";
+      FAIL() << " Could not open file for writing";
   }
 
   // open xml to get data
   QFile realXmlFile(dataFilePath);
   if (!realXmlFile.open(QIODevice::ReadOnly | QIODevice::Text))
   {
-      qDebug() << "Failed to open file";
+      FAIL() << "Failed to open file";
   }
 
   QTextStream xmlData(&tempDataFile);
@@ -342,7 +290,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
   QVector<QString> args = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName, "template=" + templateFile};
   UserInterface options(APP_XML, args);
   isisimport(options);
-// -------------------------------------------------
+
 
   Pvl truthLabel;
   PvlInput >> truthLabel;
@@ -352,12 +300,10 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
 
   PvlGroup truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);
   PvlGroup &outGroup = outLabel->findGroup("Dimensions", Pvl::Traverse);
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 
   truthGroup = truthLabel.findGroup("Pixels", Pvl::Traverse);
   outGroup = outLabel->findGroup("Pixels", Pvl::Traverse);
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 
   truthGroup = truthLabel.findGroup("Instrument", Pvl::Traverse);
@@ -366,7 +312,6 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
 
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 }
 
@@ -417,24 +362,26 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
   QString imageFileName = "wac000xxx_2022126t000000_000000001_frame_raw02.img";
   QString templateFile = "../appdata/import/PDS4/ClipperEIS.tpl";
   QString cubeFileName = tempDir.path() + "/wacFrame.cub";
-  // -------------------------------------------------
-  // hard coding these values for now, but we should use some sort of xml parser to grab these values from the labels xml
+  
+
   int samples = 1335;
   int lines = 3832;
   int bytes = 2;
+
   // create a temp img file and write data to it
   QFile tempImgFile(tempDir.path() + "/" + imageFileName);;
 
   (tempDir.path() + "/" + imageFileName);
   if(!tempImgFile.open(QFile::WriteOnly | QFile::Text)){
-      qDebug() << " Could not open file for writing";
+      FAIL() << " Could not open file for writing";
   }
   QTextStream out(&tempImgFile);
 
-  // generate a single line 
-  char writeToFile[samples * bytes];
-  for(int i=0; i<samples * bytes; i++){
-    writeToFile[i] = '0';
+ // generate lines 
+  QByteArray writeToFile = QByteArray();
+  short int fill = 0;
+  for(int i=-1; i<(samples * bytes); i++){
+    writeToFile.append(fill);
   }
 
   // write the lines to the temp file 
@@ -449,14 +396,14 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
   QFile tempDataFile(tempDir.path() + "/" + dataFileName);
   
   if(!tempDataFile.open(QFile::ReadWrite | QFile::Text)){
-      qDebug() << " Could not open file for writing";
+      FAIL() << " Could not open file for writing";
   }
 
   // open xml to get data
   QFile realXmlFile(dataFilePath);
   if (!realXmlFile.open(QIODevice::ReadOnly | QIODevice::Text))
   {
-      qDebug() << "Failed to open file";
+      FAIL() << "Failed to open file";
   }
 
   QTextStream xmlData(&tempDataFile);
@@ -470,7 +417,6 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
   QVector<QString> args = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName, "template=" + templateFile};
   UserInterface options(APP_XML, args);
   isisimport(options);
-// -------------------------------------------------
 
   Pvl truthLabel;
   PvlInput >> truthLabel;
@@ -480,12 +426,10 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
 
   PvlGroup truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);
   PvlGroup &outGroup = outLabel->findGroup("Dimensions", Pvl::Traverse);
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 
   truthGroup = truthLabel.findGroup("Pixels", Pvl::Traverse);
   outGroup = outLabel->findGroup("Pixels", Pvl::Traverse);
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 }
 
@@ -555,24 +499,26 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
   QString imageFileName = "wac000xxx_2022126t000000_000000002_pushb_raw02.img";
   QString templateFile = "../appdata/import/PDS4/ClipperEIS.tpl";
   QString cubeFileName = tempDir.path() + "/WacPb.cub";
-    // -------------------------------------------------
-  // hard coding these values for now, but we should use some sort of xml parser to grab these values from the labels xml
+    
+
   int samples = 4096;
   int lines = 4096;
   int bytes = 2;
+
   // create a temp img file and write data to it
   QFile tempImgFile(tempDir.path() + "/" + imageFileName);;
 
   (tempDir.path() + "/" + imageFileName);
   if(!tempImgFile.open(QFile::WriteOnly | QFile::Text)){
-      qDebug() << " Could not open file for writing";
+      FAIL() << " Could not open file for writing";
   }
   QTextStream out(&tempImgFile);
 
-  // generate a single line 
-  char writeToFile[samples * bytes];
-  for(int i=0; i<samples * bytes; i++){
-    writeToFile[i] = '0';
+  // generate lines 
+  QByteArray writeToFile = QByteArray();
+  short int fill = 0;
+  for(int i=-1; i<(samples * bytes); i++){
+    writeToFile.append(fill);
   }
 
   // write the lines to the temp file 
@@ -587,14 +533,14 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
   QFile tempDataFile(tempDir.path() + "/" + dataFileName);
   
   if(!tempDataFile.open(QFile::ReadWrite | QFile::Text)){
-      qDebug() << " Could not open file for writing";
+      FAIL() << " Could not open file for writing";
   }
 
   // open xml to get data
   QFile realXmlFile(dataFilePath);
   if (!realXmlFile.open(QIODevice::ReadOnly | QIODevice::Text))
   {
-      qDebug() << "Failed to open file";
+      FAIL() << "Failed to open file";
   }
 
   QTextStream xmlData(&tempDataFile);
@@ -608,7 +554,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
   QVector<QString> args = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName, "template=" + templateFile};
   UserInterface options(APP_XML, args);
   isisimport(options);
-// -------------------------------------------------
+
   Pvl truthLabel;
   PvlInput >> truthLabel;
 
@@ -617,12 +563,10 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
 
   PvlGroup truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);
   PvlGroup &outGroup = outLabel->findGroup("Dimensions", Pvl::Traverse);
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 
   truthGroup = truthLabel.findGroup("Pixels", Pvl::Traverse);
   outGroup = outLabel->findGroup("Pixels", Pvl::Traverse);
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 
   truthGroup = truthLabel.findGroup("Instrument", Pvl::Traverse);
@@ -631,6 +575,5 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
 
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
-
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 }
