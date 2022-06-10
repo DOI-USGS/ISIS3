@@ -82,6 +82,7 @@ namespace Isis {
    */
   void framestitch(UserInterface &ui) {
     ProcessByBrick process;
+    process.PropagatePolygons(false);
 
     // It is very important that the odd cube gets added first as later on
     // we'll use frameNumber % 2 to index the input cube vector
@@ -151,12 +152,12 @@ namespace Isis {
     }
 
     int reducedFrameHeight = frameHeight - numLinesOverlap;
-    
+
     QString outCubeFile = ui.GetCubeName("TO");
     Cube *outCube = process.SetOutputCube(
           outCubeFile, CubeAttributeOutput(outCubeFile),
           evenCube->sampleCount(), numFrames * reducedFrameHeight, evenCube->bandCount());
-    
+
     // If there's an even number of frames and the inputs are flipped, we have to
     // swap even and odd because the first frame in the even cube is valid and the
     // first frame in the odd cube is now all NULL.
@@ -172,8 +173,6 @@ namespace Isis {
 
     // Processing setup
     process.SetBrickSize(evenCube->sampleCount(), frameHeight, evenCube->bandCount());
-    process.PropagateTables(false);
-    process.PropagatePolygons(false);
 
     // Put together the frames from the two input cubes. Note that we
     // wipe a total of numLinesOverlap lines from each frame as we do
@@ -182,7 +181,7 @@ namespace Isis {
 
       Brick buff(evenCube->sampleCount(), reducedFrameHeight, evenCube->bandCount(),
                    evenCube->pixelType());
-      
+
       // Set reading position
       buff.SetBasePosition(1, frame * frameHeight + numLinesOverlap/2 + 1, 1);
 
@@ -190,19 +189,18 @@ namespace Isis {
       if (swapInputCubes)
         inIndex = 1 - inIndex;
 
-      if (inIndex == 0) 
+      if (inIndex == 0)
         oddCube->read(buff);
       else
         evenCube->read(buff);
 
       // Set writing position
       buff.SetBasePosition(1, frame * reducedFrameHeight + 1, 1);
-      
+
       outCube->write(buff);
     }
 
     // Update the output label
-    outCube->deleteGroup("Kernels");
     if (!outCube->hasGroup("Instrument")) {
       outCube->putGroup(PvlGroup("Instrument"));
     }
@@ -243,9 +241,9 @@ namespace Isis {
     if (!outInst.hasKeyword("NumLinesOverlap"))
       outInst.addKeyword(PvlKeyword("NumLinesOverlap"));
     outInst["numLinesOverlap"].setValue(toString(numLinesOverlap));
-    
+
     process.EndProcess();
-    
+
     return;
   }
 
