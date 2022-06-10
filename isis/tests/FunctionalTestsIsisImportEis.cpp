@@ -6,6 +6,7 @@
 #include <QTemporaryDir>
 #include <QTemporaryFile>
 #include <QFileInfo>
+#include <QDataStream>
 #include <QTextStream>
 #include <QByteArray>
 #include <QDataStream>
@@ -52,7 +53,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
 
       Group = Instrument
         SpacecraftName   = "Europa Clipper"
-        InstrumentId     = "EIS NAC PB"
+        InstrumentId     = "EIS NAC FC"
         TargetName       = Didymos
         StartTime        = 2021-03-06T04:05:27.77
         ExposureDuration = 1.0 <seconds>
@@ -98,13 +99,12 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
   int bytes = 2;
 
   // create a temp img file and write data to it
-  QFile tempImgFile(tempDir.path() + "/" + imageFileName);;
+  QFile tempImgFile(tempDir.path() + "/" + imageFileName);
 
-  (tempDir.path() + "/" + imageFileName);
   if(!tempImgFile.open(QFile::WriteOnly | QFile::Text)){
       FAIL() << " Could not open file for writing";
   }
-  QTextStream out(&tempImgFile);
+  QDataStream out(&tempImgFile);
 
   // generate lines 
   QByteArray writeToFile = QByteArray();
@@ -115,7 +115,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
 
   // write the lines to the temp file 
   for(int i=0; i<lines; i++){
-    QTextStream out(&tempImgFile);
+    QDataStream out(&tempImgFile);
     out << writeToFile;
   }
   tempImgFile.flush();
@@ -143,6 +143,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
 
   QFileInfo fileInfo(tempDataFile);
 
+  // testing with template
   QVector<QString> args = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName, "template=" + templateFile};
   UserInterface options(APP_XML, args);
   isisimport(options);
@@ -167,6 +168,38 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
 
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+ 
+  truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
+  outGroup = outLabel->findGroup("Kernels", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  // testing with out template
+  QVector<QString> argsNoTemp = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName};
+  UserInterface optionsNoTemp(APP_XML, argsNoTemp);
+  isisimport(optionsNoTemp);
+
+  Cube outCubeNoTemp(cubeFileName);
+  Pvl *outLabelNoTemp = outCubeNoTemp.label();
+
+  truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Dimensions", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Pixels", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Pixels", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Instrument", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Instrument", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+ 
+  truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 }
 
@@ -242,15 +275,14 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
   int bytes = 2;
 
   // create a temp img file and write data to it
-  QFile tempImgFile(tempDir.path() + "/" + imageFileName);;
+  QFile tempImgFile(tempDir.path() + "/" + imageFileName);
 
-  (tempDir.path() + "/" + imageFileName);
   if(!tempImgFile.open(QFile::WriteOnly | QFile::Text)){
       FAIL() << " Could not open file for writing";
   }
-  QTextStream out(&tempImgFile);
+  QDataStream out(&tempImgFile);
 
- // generate lines 
+  // generate lines 
   QByteArray writeToFile = QByteArray();
   short int fill = 0;
   for(int i=-1; i<(samples * bytes); i++){
@@ -259,7 +291,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
 
   // write the lines to the temp file 
   for(int i=0; i<lines; i++){
-    QTextStream out(&tempImgFile);
+    QDataStream out(&tempImgFile);
     out << writeToFile;
   }
   tempImgFile.flush();
@@ -287,10 +319,10 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
 
   QFileInfo fileInfo(tempDataFile);
 
+  // testing with template
   QVector<QString> args = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName, "template=" + templateFile};
   UserInterface options(APP_XML, args);
   isisimport(options);
-
 
   Pvl truthLabel;
   PvlInput >> truthLabel;
@@ -312,6 +344,38 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
 
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+ 
+  truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
+  outGroup = outLabel->findGroup("Kernels", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  // testing with out template
+  QVector<QString> argsNoTemp = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName};
+  UserInterface optionsNoTemp(APP_XML, argsNoTemp);
+  isisimport(optionsNoTemp);
+
+  Cube outCubeNoTemp(cubeFileName);
+  Pvl *outLabelNoTemp = outCubeNoTemp.label();
+
+  truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Dimensions", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Pixels", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Pixels", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Instrument", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Instrument", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+ 
+  truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 }
 
@@ -337,6 +401,24 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
           Multiplier = 1.0
         End_Group
       End_Object
+
+      Group = Instrument
+        SpacecraftName   = "Europa Clipper"
+        InstrumentId     = "EIS WAC FC"
+        TargetName       = Didymos
+        StartTime        = 2021-03-06T04:05:27.77
+        ExposureDuration = 1.0 <seconds>
+      End_Group
+
+      Group = BandBin
+        FilterName = CLEAR
+        Center     = 712.5 <nm>
+        Width      = 675 <nm>
+      End_Group
+
+      Group = Kernels
+        NaifFrameCode = -159104
+      End_Group
     End_Object
 
     Object = Label
@@ -346,12 +428,12 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
     Object = History
       Name      = IsisCube
       StartByte = 10296977
-      Bytes     = 654
+      Bytes     = 695
     End_Object
 
     Object = OriginalXmlLabel
       Name      = IsisCube
-      StartByte = 10297631
+      StartByte = 10297672
       Bytes     = 13164
       ByteOrder = Lsb
     End_Object
@@ -363,21 +445,19 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
   QString templateFile = "../appdata/import/PDS4/ClipperEIS.tpl";
   QString cubeFileName = tempDir.path() + "/wacFrame.cub";
   
-
   int samples = 1335;
   int lines = 3832;
   int bytes = 2;
 
   // create a temp img file and write data to it
-  QFile tempImgFile(tempDir.path() + "/" + imageFileName);;
+  QFile tempImgFile(tempDir.path() + "/" + imageFileName);
 
-  (tempDir.path() + "/" + imageFileName);
   if(!tempImgFile.open(QFile::WriteOnly | QFile::Text)){
       FAIL() << " Could not open file for writing";
   }
-  QTextStream out(&tempImgFile);
+  QDataStream out(&tempImgFile);
 
- // generate lines 
+  // generate lines 
   QByteArray writeToFile = QByteArray();
   short int fill = 0;
   for(int i=-1; i<(samples * bytes); i++){
@@ -386,7 +466,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
 
   // write the lines to the temp file 
   for(int i=0; i<lines; i++){
-    QTextStream out(&tempImgFile);
+    QDataStream out(&tempImgFile);
     out << writeToFile;
   }
   tempImgFile.flush();
@@ -414,6 +494,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
 
   QFileInfo fileInfo(tempDataFile);
 
+  // testing with template
   QVector<QString> args = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName, "template=" + templateFile};
   UserInterface options(APP_XML, args);
   isisimport(options);
@@ -430,6 +511,46 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
 
   truthGroup = truthLabel.findGroup("Pixels", Pvl::Traverse);
   outGroup = outLabel->findGroup("Pixels", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Instrument", Pvl::Traverse);
+  outGroup = outLabel->findGroup("Instrument", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
+  outGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+ 
+  truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
+  outGroup = outLabel->findGroup("Kernels", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  // testing with out template
+  QVector<QString> argsNoTemp = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName};
+  UserInterface optionsNoTemp(APP_XML, argsNoTemp);
+  isisimport(optionsNoTemp);
+
+  Cube outCubeNoTemp(cubeFileName);
+  Pvl *outLabelNoTemp = outCubeNoTemp.label();
+
+  truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Dimensions", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Pixels", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Pixels", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Instrument", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Instrument", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+ 
+  truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 }
 
@@ -506,13 +627,12 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
   int bytes = 2;
 
   // create a temp img file and write data to it
-  QFile tempImgFile(tempDir.path() + "/" + imageFileName);;
+  QFile tempImgFile(tempDir.path() + "/" + imageFileName);
 
-  (tempDir.path() + "/" + imageFileName);
   if(!tempImgFile.open(QFile::WriteOnly | QFile::Text)){
       FAIL() << " Could not open file for writing";
   }
-  QTextStream out(&tempImgFile);
+  QDataStream out(&tempImgFile);
 
   // generate lines 
   QByteArray writeToFile = QByteArray();
@@ -523,7 +643,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
 
   // write the lines to the temp file 
   for(int i=0; i<lines; i++){
-    QTextStream out(&tempImgFile);
+    QDataStream out(&tempImgFile);
     out << writeToFile;
   }
   tempImgFile.flush();
@@ -551,6 +671,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
 
   QFileInfo fileInfo(tempDataFile);
 
+  // testing with template
   QVector<QString> args = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName, "template=" + templateFile};
   UserInterface options(APP_XML, args);
   isisimport(options);
@@ -575,5 +696,37 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
 
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+ 
+  truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
+  outGroup = outLabel->findGroup("Kernels", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  // testing with out template
+  QVector<QString> argsNoTemp = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName};
+  UserInterface optionsNoTemp(APP_XML, argsNoTemp);
+  isisimport(optionsNoTemp);
+
+  Cube outCubeNoTemp(cubeFileName);
+  Pvl *outLabelNoTemp = outCubeNoTemp.label();
+
+  truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Dimensions", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Pixels", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Pixels", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Instrument", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Instrument", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+ 
+  truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
+  outGroup = outLabelNoTemp->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 }
