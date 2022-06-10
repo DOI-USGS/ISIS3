@@ -14,8 +14,8 @@
       data as the first several rows of the next frame, reduntant
       lines can be eliminated with the num_lines_overlap parameter.
       This program is designed to be run before processing the
-      data in another software package as it removes the camera
-      information from the output <def link="Cube">cube</def>.
+      data in another software package and the output cube will not
+      produce a valid camera model for further processing in ISIS.
     </p>
     <p>
       When many push frame images are ingested into ISIS, their frames are separated
@@ -149,7 +149,7 @@
           </p>
           <p>
             If not entered, the program will assume the value 0. A value
-			of 2 or 4 works reasonably for LRO WAC images.
+            of 2 or 4 works reasonably for LRO WAC images.
           </p>
         </description>
         <internalDefault>0</internalDefault>

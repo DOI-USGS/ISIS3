@@ -7,6 +7,7 @@
 #include "LineManager.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
+#include "Table.h"
 
 #include "TestUtilities.h"
 #include "Fixtures.h"
