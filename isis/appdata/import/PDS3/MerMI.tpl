@@ -107,11 +107,13 @@
     {% else %}
     InstrumentTemperature          = NULL
     {% endif %}
+
     {% if exists("INSTRUMENT_STATE_PARMS.INSTRUMENT_TEMPERATURE_NAME") %}
-    InstrumentTemperatureName      = ({{ join(INSTRUMENT_STATE_PARMS.INSTRUMENT_TEMPERATURE_NAME.Value, ",") }})
+    InstrumentTemperatureName = ("{{ join(INSTRUMENT_STATE_PARMS.INSTRUMENT_TEMPERATURE_NAME.Value, "\", \"")}}")
     {% else %}
-    InstrumentTemperatureName     = NULL
+    InstrumentTemperatureName = NULL
     {% endif %}
+
     OffsetModeID                  = {% if exists("INSTRUMENT_STATE_PARMS.OFFSET_MODE_ID") %}
                                     {{ INSTRUMENT_STATE_PARMS.OFFSET_MODE_ID.Value }}
                                     {% else %}
@@ -122,8 +124,8 @@
                                     {% else %}
                                     NULL
                                     {% endif %}
-    TemperatureMiCCD            = {{ instTemp.6 }}
-    TemperatureMiElectronics    = {{ instTemp.7 }}
+    TemperatureMiCCD            = {{ INSTRUMENT_STATE_PARMS.INSTRUMENT_TEMPERATURE.Value.6}}
+    TemperatureMiElectronics    = {{ INSTRUMENT_STATE_PARMS.INSTRUMENT_TEMPERATURE.Value.7 }}
 {% endblock %}
 
 {% block additional_groups %}
