@@ -112,6 +112,13 @@ namespace Isis {
 
   /**
    * Iteratively finds a solution to "apply" jitter to an image coordinate.
+   * Each iteration adds jitter to the original image coordinate until it finds
+   * an image coordinate that maps back to to the original image coordinate when
+   * jitter is removed. This is similar to how we handle applying radial distortion.
+   *
+   * Note: If the jitter varies significantly (>1 pixel difference) then it is possible
+   * for there to be multiple solutions to the inverse problem and it is impossible to
+   * know which one to choose.
    *
    * @param sample Image sample to apply jitter to.
    * @param line Image line to apply jitter to.
@@ -127,16 +134,11 @@ namespace Isis {
     int iterations = 0;
     int maxIterations = 50;
 
-    p_detectorSample = sample;
-    p_detectorLine   = line;
-    p_parentSample   = (p_detectorSample - p_ss) / p_detectorSampleSumming + 1.0;
-    p_parentLine     = (p_detectorLine   - p_sl) / p_detectorLineSumming   + 1.0;
+    while((qFabs(sample - jittered.first) > 1e-7) ||
+          (qFabs(line - jittered.second) > 1e-7)) {
 
-    while((qFabs(sample - currentSample) < 1e-7) &&
-          (qFabs(line - currentLine) < 1e-7)) {
-
-      currentSample = (currentSample - jittered.first);
-      currentLine = (currentLine - jittered.second);
+      currentSample = sample + (currentSample - jittered.first);
+      currentLine = line + (currentLine - jittered.second);
 
       jittered = removeJitter(currentSample, currentLine);
 
@@ -148,7 +150,7 @@ namespace Isis {
 
     }
 
-    return std::pair<double, double>(sample + currentSample, line + currentLine);
+    return std::pair<double, double>(currentSample, currentLine);
   }
 
   /**
