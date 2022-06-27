@@ -285,7 +285,15 @@ find_package(Armadillo         REQUIRED)
 find_package(Threads)
 find_package(inja              REQUIRED)
 
+# Setup for googletest/googlemock before adding SensorUtilities so we build its tests
+if(buildTests)
+  set(INSTALL_GTEST OFF)
+  add_subdirectory(../gtest gtest)
+else()
+  set(SENSOR_UTILITIES_BUILD_TESTS OFF CACHE BOOL "Disable SensorUtilities Tests")
+endif()
 
+add_subdirectory(../SensorUtilities SensorUtilities)
 
 # In this case, we specify the version numbers being searched for in the non-traditional installs.
 if(APPLE)
@@ -339,7 +347,7 @@ foreach (_variableName ${_variableNames})
 endforeach()
 
 # add target based linkages to ALLLIBS variable
-list(APPEND ALLLIBS pantor::inja)
+list(APPEND ALLLIBS pantor::inja sensorutilities)
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)
