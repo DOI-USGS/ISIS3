@@ -17,8 +17,6 @@ include(AddIsisModule)
 include(Utilities)
 include(TestSetup)
 include(InstallThirdParty)
-include(cmake/gtest.cmake)
-include(GoogleTest)
 
 include(CMakePrintHelpers)
 
