@@ -6,6 +6,12 @@
 
 using namespace SensorUtilities;
 
+// Check to make sure we can create an image point without a band and it defaults to 0.
+TEST(ImagePt, NoBandInit) {
+  ImagePt testPt = {1.0, 2.0};
+  EXPECT_EQ(testPt.band, 0.0);
+}
+
 TEST(Magnitude, Unit) {
   EXPECT_DOUBLE_EQ(magnitude({1.0, 0.0, 0.0}), 1.0);
   EXPECT_DOUBLE_EQ(magnitude({0.0, 1.0, 0.0}), 1.0);

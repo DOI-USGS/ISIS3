@@ -27,6 +27,7 @@ namespace SensorUtilities {
   struct ImagePt {
     double line;
     double sample;
+    double band;
   };
 
 

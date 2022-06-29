@@ -1,0 +1,118 @@
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+#include "IsisSensor.h"
+
+#include "Angle.h"
+#include "Camera.h"
+#include "Distance.h"
+#include "iTime.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "SurfacePoint.h"
+
+using namespace std;
+
+namespace Isis {
+  IsisSensor::IsisSensor(Camera* cam) {
+    m_cam = cam;
+  }
+
+  SensorUtilities::ObserverState IsisSensor::getState(const SensorUtilities::ImagePt &imagePoint) {
+
+    // These image coordinates are in ISIS pixels; (0.5, 0.5, 1.0) is the origin.
+    double oldLine =  m_cam->Line();
+    double oldSample = m_cam->Sample();
+    double oldBand = m_cam->Band();
+    double newLine = imagePoint.line + 0.5;
+    double newSample = imagePoint.sample + 0.5;
+    double newBand = imagePoint.band + 1.0;
+
+    bool imagePtChanged = oldLine != newLine ||
+                          oldSample != newSample ||
+                          (!m_cam->IsBandIndependent() && oldBand != newBand);
+    if (imagePtChanged) {
+      m_cam->SetBand(newBand);
+      m_cam->SetImage(newSample, newLine);
+    }
+
+    vector<double> lookBF = m_cam->lookDirectionBodyFixed();
+    SensorUtilities::Vec lookVec = {lookBF[0], lookBF[1], lookBF[2]};
+
+    vector<double> lookJ2000 = m_cam->lookDirectionJ2000();
+    SensorUtilities::Vec lookVecJ2000 = {lookJ2000[0], lookJ2000[1], lookJ2000[2]};
+
+    vector<double> posBF(3);
+    m_cam->instrumentBodyFixedPosition(&posBF[0]);
+    SensorUtilities::Vec sensorPos = {posBF[0], posBF[1], posBF[2]};
+
+    double sensorTime = m_cam->time().Et();
+
+    SensorUtilities::ObserverState sensorState = {
+          lookVec,
+          lookVecJ2000,
+          sensorPos,
+          sensorTime,
+          imagePoint};
+
+    if (imagePtChanged) {
+      m_cam->SetBand(oldBand);
+      m_cam->SetImage(oldSample, oldLine);
+    }
+    return sensorState;
+  }
+
+
+  SensorUtilities::ObserverState IsisSensor::getState(const SensorUtilities::GroundPt3D &groundPt) {
+    SurfacePoint oldGroundPt = m_cam->GetSurfacePoint();
+    SurfacePoint newGroundPt = SurfacePoint(
+          Latitude(groundPt.lat, Angle::Radians),
+          Longitude(groundPt.lon, Angle::Radians),
+          Distance(groundPt.radius, Distance::Meters));
+    // For consistency with ISIS, reset with the image point
+    double oldLine =  m_cam->Line();
+    double oldSample = m_cam->Sample();
+    double oldBand = m_cam->Band();
+
+    bool groundPtChanged = !(oldGroundPt == newGroundPt);
+
+    if (groundPtChanged) {
+      m_cam->SetGround(newGroundPt);
+    }
+
+    vector<double> lookBF = m_cam->lookDirectionBodyFixed();
+    SensorUtilities::Vec lookVec = {lookBF[0], lookBF[1], lookBF[2]};
+
+    vector<double> lookJ2000 = m_cam->lookDirectionJ2000();
+    SensorUtilities::Vec lookVecJ2000 = {lookJ2000[0], lookJ2000[1], lookJ2000[2]};
+
+    vector<double> posBF(3);
+    m_cam->instrumentBodyFixedPosition(&posBF[0]);
+    SensorUtilities::Vec sensorPos = {posBF[0], posBF[1], posBF[2]};
+
+    double sensorTime = m_cam->time().Et();
+
+    SensorUtilities::ImagePt imagePoint = {
+          m_cam->Line() - 0.5,
+          m_cam->Sample() - 0.5,
+          m_cam->Band() - 1.0};
+
+    SensorUtilities::ObserverState sensorState = {
+          lookVec,
+          lookVecJ2000,
+          sensorPos,
+          sensorTime,
+          imagePoint};
+
+    if (groundPtChanged) {
+      m_cam->SetBand(oldBand);
+      m_cam->SetImage(oldSample, oldLine);
+    }
+
+    return sensorState;
+  }
+
+}

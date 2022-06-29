@@ -1,79 +1,85 @@
 #include "SensorUtilities.h"
 
 namespace SensorUtilities {
-  double phaseAngle(ImagePt imagePoint, Sensor *sensor, Shape *shape, Illuminator *illuminator) {
-    Vec lookVec = sensor->lookVec(imagePoint);
-    Vec sensorPos = sensor->sensorPos(imagePoint);
-    Vec groundPt = shape->intersect(sensorPos, lookVec);
-    Vec illumPos = illuminator->position( sensor->time(imagePoint) );
+  double phaseAngle(const ImagePt &imagePoint, Sensor *sensor, Shape *shape, Illuminator *illuminator) {
+    ObserverState sensorState = sensor->getState(imagePoint);
+    Intersection intersect = shape->intersect(sensorState.sensorPos, sensorState.lookVec);
+    Vec illumPos = illuminator->position(sensorState.time);
 
-    Vec illumDiff = illumPos - groundPt;
-    Vec sensorDiff = sensorPos - groundPt;
+    Vec illumDiff = illumPos - intersect.groundPt;
+    Vec sensorDiff = sensorState.sensorPos - intersect.groundPt;
     return sepAngle(illumDiff, sensorDiff);
   }
 
 
-  double emissionAngle(ImagePt imagePoint, Sensor *sensor, Shape *shape) {
-    Vec lookVec = sensor->lookVec(imagePoint);
-    Vec sensorPos = sensor->sensorPos(imagePoint);
-    Vec groundPt = shape->intersect(sensorPos, lookVec);
-    Vec surfaceNormal = shape->normal(groundPt);
+  double emissionAngle(const ImagePt &imagePoint, Sensor *sensor, Shape *shape) {
+    ObserverState sensorState = sensor->getState(imagePoint);
+    Intersection intersect = shape->intersect(sensorState.sensorPos, sensorState.lookVec);
 
-    Vec sensorDiff = sensorPos - groundPt;
-    return sepAngle(surfaceNormal, sensorDiff);
+    Vec sensorDiff = sensorState.sensorPos - intersect.groundPt;
+    return sepAngle(intersect.normal, sensorDiff);
   }
 
 
-  double illuminationDistance(ImagePt imagePoint, Sensor *sensor, Shape *shape, Illuminator *illuminator) {
-    Vec lookVec = sensor->lookVec(imagePoint);
-    Vec sensorPos = sensor->sensorPos(imagePoint);
-    Vec groundPt = shape->intersect(sensorPos, lookVec);
-    Vec illumPos = illuminator->position( sensor->time(imagePoint) );
+  double ellipsoidEmissionAngle(const ImagePt &imagePoint, Sensor *sensor, Shape *shape) {
+    ObserverState sensorState = sensor->getState(imagePoint);
+    Intersection intersect = shape->intersect(sensorState.sensorPos, sensorState.lookVec, false);
 
-    return distance(illumPos, groundPt);
+    Vec sensorDiff = sensorState.sensorPos - intersect.groundPt;
+    return sepAngle(intersect.normal, sensorDiff);
   }
 
 
-  GroundPt2D subSpacecraftPoint(ImagePt imagePoint, Sensor *sensor)  {
-    Vec sensorPos = sensor->sensorPos(imagePoint);
-    GroundPt3D latLonRad = rectToSpherical(sensorPos);
+  double illuminationDistance(const ImagePt &imagePoint, Sensor *sensor, Shape *shape, Illuminator *illuminator) {
+    ObserverState sensorState = sensor->getState(imagePoint);
+    Intersection intersect = shape->intersect(sensorState.sensorPos, sensorState.lookVec);
+    Vec illumPos = illuminator->position(sensorState.time);
+
+    return distance(illumPos, intersect.groundPt);
+  }
+
+
+  GroundPt2D subSpacecraftPoint(const ImagePt &imagePoint, Sensor *sensor)  {
+    ObserverState sensorState = sensor->getState(imagePoint);
+    GroundPt3D latLonRad = rectToSpherical(sensorState.sensorPos);
     return {latLonRad.lat, latLonRad.lon};
   }
 
 
-  Vec subSpacecraftPoint(ImagePt imagePoint, Sensor *sensor, Shape *shape)  {
-    Vec sensorPos = sensor->sensorPos(imagePoint);
-    Vec lookVec = {-sensorPos.x, -sensorPos.y, -sensorPos.z};
-    return shape->intersect(sensorPos, lookVec);
+  Vec subSpacecraftPoint(const ImagePt &imagePoint, Sensor *sensor, Shape *shape)  {
+    ObserverState sensorState = sensor->getState(imagePoint);
+    Vec lookVec = {-sensorState.sensorPos.x, -sensorState.sensorPos.y, -sensorState.sensorPos.z};
+    return shape->intersect(sensorState.sensorPos, lookVec).groundPt;
   }
 
 
-  GroundPt2D subSolarPoint(ImagePt imagePoint, Sensor *sensor, Illuminator *illuminator)  {
-    Vec illumPos = illuminator->position(sensor->time(imagePoint));
+  GroundPt2D subSolarPoint(const ImagePt &imagePoint, Sensor *sensor, Illuminator *illuminator)  {
+    ObserverState sensorState = sensor->getState(imagePoint);
+    Vec illumPos = illuminator->position(sensorState.time);
     GroundPt3D latLonRad = rectToSpherical(illumPos);
     return {latLonRad.lat, latLonRad.lon};
   }
 
 
-  Vec subSolarPoint(ImagePt imagePoint, Sensor *sensor, Illuminator *illuminator, Shape *shape) {
-    Vec illumPos = illuminator->position(sensor->time(imagePoint));
+  Vec subSolarPoint(const ImagePt &imagePoint, Sensor *sensor, Illuminator *illuminator, Shape *shape) {
+    ObserverState sensorState = sensor->getState(imagePoint);
+    Vec illumPos = illuminator->position(sensorState.time);
     Vec lookVec = {-illumPos.x, -illumPos.y, -illumPos.z};
-    return shape->intersect(illumPos, lookVec);
+    return shape->intersect(illumPos, lookVec).groundPt;
   }
 
 
-  double localRadius(ImagePt imagePoint, Sensor *sensor, Shape *shape) {
-    Vec lookVec = sensor->lookVec(imagePoint);
-    Vec sensorPos = sensor->sensorPos(imagePoint);
-    Vec groundPt = shape->intersect(sensorPos, lookVec);
-    return magnitude(groundPt);
+  double localRadius(const ImagePt &imagePoint, Sensor *sensor, Shape *shape) {
+    ObserverState sensorState = sensor->getState(imagePoint);
+    Intersection intersect = shape->intersect(sensorState.sensorPos, sensorState.lookVec);
+    return magnitude(intersect.groundPt);
   }
 
 
-  double localRadius(GroundPt2D groundPt, Shape *shape, double maxRadius) {
+  double localRadius(const GroundPt2D &groundPt, Shape *shape, double maxRadius) {
     Vec position = sphericalToRect({groundPt.lat, groundPt.lon, maxRadius});
     Vec lookVec = {-position.x, -position.y, -position.z};
-    Vec radPt = shape->intersect(position, lookVec);
-    return magnitude(radPt);
+    Intersection intersect = shape->intersect(position, lookVec);
+    return magnitude(intersect.groundPt);
   }
 }

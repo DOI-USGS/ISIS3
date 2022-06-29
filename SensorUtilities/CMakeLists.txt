@@ -54,7 +54,8 @@ if(SENSOR_UTILITIES_BUILD_TESTS)
                         sensorutilities)
 
   include(GoogleTest)
-  gtest_discover_tests(SensorUtilitiesTests)
+  gtest_discover_tests(SensorUtilitiesTests
+                       TEST_PREFIX SensorUtilities.)
 else()
   message(STATUS "Skipping Tests")
 endif()

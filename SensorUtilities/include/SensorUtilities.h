@@ -10,21 +10,33 @@
 namespace SensorUtilities {
 
 
-  // Interface
-  class Shape {
-    public:
-      virtual Vec intersect(Vec sensorPos, Vec lookVec) = 0;
-      virtual Vec normal(Vec groundPos) = 0;
+  struct ObserverState {
+    Vec lookVec;
+    Vec j2000LookVec;
+    Vec sensorPos;
+    double time;
+    ImagePt imagePoint;
   };
 
 
-  // Interface only
+  struct Intersection {
+    Vec groundPt;
+    Vec normal;
+  };
+
+
+    // Interface only
   class Sensor {
     public:
-      virtual Vec lookVec(ImagePt imagePoint) = 0;
-      virtual Vec j2000LookVec(ImagePt imagePoint) = 0;
-      virtual Vec sensorPos(ImagePt imagePoint) = 0;
-      virtual double time(ImagePt imagePoint) = 0;
+      virtual ObserverState getState(const ImagePt &imagePoint) = 0;
+      virtual ObserverState getState(const GroundPt3D &groundPt) = 0;
+  };
+
+
+  // Interface
+  class Shape {
+    public:
+      virtual Intersection intersect(const Vec &sensorPos, const Vec &lookVec, bool computeLocalNormal=true) = 0;
   };
 
 
@@ -42,7 +54,7 @@ namespace SensorUtilities {
    *
    * @return The phase angle in radians
    */
-  double phaseAngle(ImagePt imagePoint, Sensor *sensor, Shape *shape, Illuminator *illuminator);
+  double phaseAngle(const ImagePt &imagePoint, Sensor *sensor, Shape *shape, Illuminator *illuminator);
 
 
   /**
@@ -52,7 +64,18 @@ namespace SensorUtilities {
    *
    * @return The emission angle in radians
    */
-  double emissionAngle(ImagePt imagePoint, Sensor *sensor, Shape *shape);
+  double emissionAngle(const ImagePt &imagePoint, Sensor *sensor, Shape *shape);
+
+
+  /**
+   * Compute the emission angle at an image point using the ellipsoid surface normal.
+   * Computing an ellipsoid surface normal is much faster than computing a local
+   * surface normal but less precise. The exact differences will depend upon what type
+   * of shape you use.
+   *
+   * @return The emission angle in radians
+   */
+  double ellipsoidEmissionAngle(const ImagePt &imagePoint, Sensor *sensor, Shape *shape);
 
 
   /**
@@ -60,33 +83,33 @@ namespace SensorUtilities {
    *
    * @return The distance to the illuminator in meters
    */
-  double illuminationDistance(ImagePt imagePoint, Sensor *sensor, Shape *shape, Illuminator *illuminator);
+  double illuminationDistance(const ImagePt &imagePoint, Sensor *sensor, Shape *shape, Illuminator *illuminator);
 
 
   /**
    * Compute the latitude and longitude on the body below the sensor
    * when an image coordinate was observed.
    */
-  GroundPt2D subSpacecraftPoint(ImagePt imagePoint, Sensor *sensor);
+  GroundPt2D subSpacecraftPoint(const ImagePt &imagePoint, Sensor *sensor);
 
 
   /**
    * Compute the point on the body below the sensor when an image coordinate was observed.
    */
-  Vec subSpacecraftPoint(ImagePt imagePoint, Sensor *sensor, Shape *shape);
+  Vec subSpacecraftPoint(const ImagePt &imagePoint, Sensor *sensor, Shape *shape);
 
 
   /**
    * Compute the latitude and longitude on the body below the illuminator
    * when an image coordinate was observed.
    */
-  GroundPt2D subSolarPoint(ImagePt imagePoint, Sensor *sensor, Illuminator *illuminator);
+  GroundPt2D subSolarPoint(const ImagePt &imagePoint, Sensor *sensor, Illuminator *illuminator);
 
 
   /**
    * Compute the point on the body below the illuminator when an image coordinate was observed.
    */
-  Vec subSolarPoint(ImagePt imagePoint, Sensor *sensor, Illuminator *illuminator, Shape *shape);
+  Vec subSolarPoint(const ImagePt &imagePoint, Sensor *sensor, Illuminator *illuminator, Shape *shape);
 
 
   /**
@@ -94,7 +117,7 @@ namespace SensorUtilities {
    *
    * @return The local radius in meters
    */
-  double localRadius(ImagePt imagePoint, Sensor *sensor, Shape *shape);
+  double localRadius(const ImagePt &imagePoint, Sensor *sensor, Shape *shape);
 
 
   /**
@@ -108,7 +131,7 @@ namespace SensorUtilities {
    *
    * @return The local radius in meters
    */
-  double localRadius(GroundPt2D groundPt, Shape *shape, double maxRadius=1e9);
+  double localRadius(const GroundPt2D &groundPt, Shape *shape, double maxRadius=1e9);
 
 
   // RaDec computeRightAscensionDeclination(ImagePt imagePoint, Sensor *sensor) {
