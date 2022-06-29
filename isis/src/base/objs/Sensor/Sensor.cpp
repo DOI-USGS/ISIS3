@@ -19,10 +19,14 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "IString.h"
 #include "iTime.h"
+#include "IsisIlluminator.h"
+#include "IsisSensor.h"
+#include "IsisShape.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
 #include "Projection.h"
+#include "SensorUtilities.h"
 #include "ShapeModel.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
@@ -310,9 +314,14 @@ namespace Isis {
    * @return @b double Phase angle, in degrees.
    */
   double Sensor::PhaseAngle() const {
-    std::vector<double> sunB(m_uB, m_uB+3);
-    return target()->shape()->phaseAngle(
-                               bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate()), sunB);
+    double sensorPosBf[3];
+    instrumentBodyFixedPosition(sensorPosBf);
+    SensorUtilities::Vec sensorPos = {sensorPosBf[0], sensorPosBf[1], sensorPosBf[2]};
+    double groundPtBf[3];
+    Coordinate(groundPtBf);
+    SensorUtilities::Vec groundPt = {groundPtBf[0], groundPtBf[1], groundPtBf[2]};
+    SensorUtilities::Vec sunPosBf = {m_uB[0], m_uB[1], m_uB[2]};
+    return RAD2DEG * SensorUtilities::phaseAngle(sensorPos, groundPt, sunPosBf);
   }
 
 

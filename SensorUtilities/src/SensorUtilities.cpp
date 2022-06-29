@@ -5,9 +5,13 @@ namespace SensorUtilities {
     ObserverState sensorState = sensor->getState(imagePoint);
     Intersection intersect = shape->intersect(sensorState.sensorPos, sensorState.lookVec);
     Vec illumPos = illuminator->position(sensorState.time);
+    return phaseAngle(sensorState.sensorPos, intersect.groundPt, illumPos);
+  }
 
-    Vec illumDiff = illumPos - intersect.groundPt;
-    Vec sensorDiff = sensorState.sensorPos - intersect.groundPt;
+
+  double phaseAngle(const Vec &sensorPos, const Vec &groundPoint, const Vec &illumPos) {
+    Vec illumDiff = illumPos - groundPoint;
+    Vec sensorDiff = sensorPos - groundPoint;
     return sepAngle(illumDiff, sensorDiff);
   }
 

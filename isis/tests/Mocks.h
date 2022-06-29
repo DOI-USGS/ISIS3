@@ -12,10 +12,19 @@
 #include "Interpolator.h"
 #include "Process.h"
 #include "ProcessRubberSheet.h"
+#include "SpicePosition.h"
 #include "TProjection.h"
 #include "Transform.h"
 
 using namespace Isis;
+
+class MockSpicePosition : public SpicePosition {
+  public:
+    MockSpicePosition(int targetCode, int observerCode): SpicePosition(targetCode, observerCode) {}
+    MOCK_METHOD(const std::vector<double>&, SetEphemerisTime, (double et));
+    MOCK_METHOD(double, EphemerisTime, (), (const));
+    MOCK_METHOD(const std::vector<double>&, Coordinate, ());
+};
 
 class MockCube : public Cube {
   public:

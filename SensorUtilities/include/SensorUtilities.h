@@ -58,6 +58,16 @@ namespace SensorUtilities {
 
 
   /**
+   * Compute the phase angle from an observer and ground point.
+   * The phase angle is the separation angle between the vector from the ground point to the
+   * illuminator and the vector from the ground point to the sensor.
+   *
+   * @return The phase angle in radians
+   */
+  double phaseAngle(const Vec &sensorPos, const Vec &groundPoint, const Vec &illumPos);
+
+
+  /**
    * Compute the emission angle at an image point.
    * The emission angle is the separation angle between the surface normal and the vector from
    * the ground point to the sensor.
