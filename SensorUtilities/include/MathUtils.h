@@ -65,6 +65,25 @@ namespace SensorUtilities {
 
 
   /**
+   * Compute the separation angle between the vectors defined by three points.
+   * The separation angle is the angle inscribed by the points
+   * A, B, and C as follows:
+   *
+   *    A
+   *   /
+   *  /
+   * B - - - C
+   *
+   * @param aPt The first point
+   * @param bPt The middle point
+   * @param cPt The second point
+   *
+   * @return The separation angle in radians between 0 and pi
+   */
+  double sepAngle(Vec aPt, Vec bPt, Vec cPt);
+
+
+  /**
    * Compute the separation angle between two vectors
    *
    * @param aVec The first vector

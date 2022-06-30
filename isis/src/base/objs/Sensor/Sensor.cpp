@@ -11,6 +11,8 @@ find files of those names at the top level of this repository. **/
 #include <QDebug>
 #include <QString>
 
+#include "MathUtils.h"
+
 #include "Angle.h"
 #include "Constants.h"
 #include "CubeManager.h"
@@ -19,14 +21,10 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "IString.h"
 #include "iTime.h"
-#include "IsisIlluminator.h"
-#include "IsisSensor.h"
-#include "IsisShape.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
 #include "Projection.h"
-#include "SensorUtilities.h"
 #include "ShapeModel.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
@@ -318,7 +316,7 @@ namespace Isis {
     instrumentBodyFixedPosition(sensorPosBf);
     double groundPtBf[3];
     Coordinate(groundPtBf);
-    return RAD2DEG * SensorUtilities::phaseAngle(sensorPosBf, groundPtBf, m_uB);
+    return RAD2DEG * SensorUtilities::sepAngle(sensorPosBf, groundPtBf, m_uB);
   }
 
 

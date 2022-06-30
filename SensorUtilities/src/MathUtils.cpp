@@ -58,6 +58,11 @@ namespace SensorUtilities {
   }
 
 
+  double sepAngle(Vec aPt, Vec bPt, Vec cPt) {
+    return sepAngle(aPt - bPt, cPt - bPt);
+  }
+
+
   double sepAngle(Vec aVec, Vec bVec) {
     double dotProd = aVec.x * bVec.x + aVec.y * bVec.y + aVec.z * bVec.z;
     dotProd /= magnitude(aVec) * magnitude(bVec);
