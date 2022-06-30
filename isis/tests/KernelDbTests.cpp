@@ -348,7 +348,7 @@ TEST_F(TestKernelDb, TestKernelsSmithOffset) {
 
   PvlGroup &dataDir = Preference::Preferences(true).findGroup("DataDirectory");
 
-  QString testDir = "data/KernelDb";
+  QString testDir = "data/KernelDB";
 
   db.loadKernelDbFiles(dataDir, testDir + "/ck", cubeLabel);
   db.loadKernelDbFiles(dataDir, testDir + "/spk", cubeLabel);
