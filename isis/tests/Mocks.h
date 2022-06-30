@@ -9,9 +9,13 @@
 
 #include "Cube.h"
 #include "Camera.h"
+#include "Distance.h"
 #include "Interpolator.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "Process.h"
 #include "ProcessRubberSheet.h"
+#include "ShapeModel.h"
 #include "SpicePosition.h"
 #include "TProjection.h"
 #include "Transform.h"
@@ -91,6 +95,18 @@ public:
   MOCK_METHOD(void, SetTiling, (long long start, long long end));
   MOCK_METHOD(void, EndProcess, (), (override));
   MOCK_METHOD(void, BandChange, (void (*funct)(const int band)), (override));
+};
+
+class MockShapeModel : public ShapeModel {
+  public:
+    MOCK_METHOD(bool, intersectSurface, (std::vector<double> observerPos, std::vector<double> lookDirection));
+    MOCK_METHOD(SurfacePoint*, surfaceIntersection,(), (const));
+    MOCK_METHOD(bool, isDEM, (), (const));
+    MOCK_METHOD(void, calculateLocalNormal, (QVector<double *> neighborPoints));
+    MOCK_METHOD(void, calculateSurfaceNormal, ());
+    MOCK_METHOD(std::vector<double>, normal, ());
+    MOCK_METHOD(void, calculateDefaultNormal, ());
+    MOCK_METHOD(Distance, localRadius, (const Latitude &lat, const Longitude &lon));
 };
 
 
