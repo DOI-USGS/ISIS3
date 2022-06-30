@@ -188,7 +188,7 @@ namespace Isis {
       Latitude GetLatitude() const;
       virtual double UniversalLongitude() const;
       Longitude GetLongitude() const;
-      SurfacePoint GetSurfacePoint() const;
+      virtual SurfacePoint GetSurfacePoint() const;
 
       Distance LocalRadius() const;
       Distance LocalRadius(Latitude lat, Longitude lon);
@@ -199,8 +199,8 @@ namespace Isis {
       virtual double IncidenceAngle() const;
 
       void LookDirection(double v[3]) const;
-      std::vector<double> lookDirectionJ2000() const;
-      std::vector<double> lookDirectionBodyFixed() const;
+      virtual std::vector<double> lookDirectionJ2000() const;
+      virtual std::vector<double> lookDirectionBodyFixed() const;
 
       virtual double RightAscension();
       virtual double Declination();

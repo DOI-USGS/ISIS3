@@ -11,12 +11,14 @@
 #include "Camera.h"
 #include "Distance.h"
 #include "Interpolator.h"
+#include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Process.h"
 #include "ProcessRubberSheet.h"
 #include "ShapeModel.h"
 #include "SpicePosition.h"
+#include "SurfacePoint.h"
 #include "TProjection.h"
 #include "Transform.h"
 
@@ -47,6 +49,11 @@ class MockCamera : public Camera {
     MOCK_METHOD(bool, SetImage, (const double sample, const double line), (override));
     MOCK_METHOD(double, Line, (), (const, override));
     MOCK_METHOD(double, Sample, (), (const, override));
+    MOCK_METHOD(void, SetBand, (int band), (override));
+    MOCK_METHOD(int, Band, (), (const, override));
+    MOCK_METHOD(bool, SetGround, (const SurfacePoint &surfacePt), (override));
+    MOCK_METHOD(SurfacePoint, GetSurfacePoint, (), (const, override));
+    MOCK_METHOD(bool, IsBandIndependent, (), (override));
     MOCK_METHOD(double, UniversalLatitude, (), (const override));
     MOCK_METHOD(double, UniversalLongitude, (), (const override));
     MOCK_METHOD(bool, SetUniversalGround, (const double latitude, const double longitude), (override));
@@ -56,6 +63,10 @@ class MockCamera : public Camera {
     MOCK_METHOD(int, CkFrameId, (), (const override));
     MOCK_METHOD(int, CkReferenceId, (), (const override));
     MOCK_METHOD(int, SpkReferenceId, (), (const override));
+    MOCK_METHOD(std::vector<double>, lookDirectionBodyFixed, (), (const, override));
+    MOCK_METHOD(std::vector<double>, lookDirectionJ2000, (), (const, override));
+    MOCK_METHOD(void, instrumentBodyFixedPosition, (double p[3]), (const, override));
+    MOCK_METHOD(iTime, time, (), (const, override));
 };
 
 class MockTProjection : public TProjection {

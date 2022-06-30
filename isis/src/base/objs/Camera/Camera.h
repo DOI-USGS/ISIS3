@@ -265,7 +265,7 @@ namespace Isis {
       bool HasReferenceBand() const;
       virtual void SetBand(const int band);
       virtual double Sample() const;
-      int Band() const;
+      virtual int Band() const;
       virtual double Line() const;
 
       bool GroundRange(double &minlat, double &maxlat, double &minlon,

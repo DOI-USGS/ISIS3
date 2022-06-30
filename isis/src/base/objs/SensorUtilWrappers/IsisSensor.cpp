@@ -23,13 +23,13 @@ namespace Isis {
 
   SensorUtilities::ObserverState IsisSensor::getState(const SensorUtilities::ImagePt &imagePoint) {
 
-    // These image coordinates are in ISIS pixels; (0.5, 0.5, 1.0) is the origin.
+    // These image coordinates are in ISIS pixels; (0.5, 0.5, 1) is the origin.
     double oldLine =  m_cam->Line();
     double oldSample = m_cam->Sample();
-    double oldBand = m_cam->Band();
+    int oldBand = m_cam->Band();
     double newLine = imagePoint.line + 0.5;
     double newSample = imagePoint.sample + 0.5;
-    double newBand = imagePoint.band + 1.0;
+    int newBand = imagePoint.band + 1;
 
     bool imagePtChanged = oldLine != newLine ||
                           oldSample != newSample ||
@@ -47,7 +47,8 @@ namespace Isis {
 
     vector<double> posBF(3);
     m_cam->instrumentBodyFixedPosition(&posBF[0]);
-    SensorUtilities::Vec sensorPos = {posBF[0], posBF[1], posBF[2]};
+    // Conver to meters from ISIS's Km
+    SensorUtilities::Vec sensorPos = {1000 * posBF[0], 1000 * posBF[1], 1000 * posBF[2]};
 
     double sensorTime = m_cam->time().Et();
 
@@ -91,14 +92,15 @@ namespace Isis {
 
     vector<double> posBF(3);
     m_cam->instrumentBodyFixedPosition(&posBF[0]);
-    SensorUtilities::Vec sensorPos = {posBF[0], posBF[1], posBF[2]};
+    // Conver to meters from ISIS's Km
+    SensorUtilities::Vec sensorPos = {1000 * posBF[0], 1000 * posBF[1], 1000 * posBF[2]};
 
     double sensorTime = m_cam->time().Et();
 
     SensorUtilities::ImagePt imagePoint = {
           m_cam->Line() - 0.5,
           m_cam->Sample() - 0.5,
-          m_cam->Band() - 1.0};
+          m_cam->Band() - 1};
 
     SensorUtilities::ObserverState sensorState = {
           lookVec,
