@@ -212,11 +212,6 @@ namespace Isis {
       virtual double SolarDistance() const;
       double SpacecraftAltitude();
 
-      // Return local radius from dem
-//      Distance DemRadius(const SurfacePoint &pt);
-//      Distance DemRadius(const Latitude &lat, const Longitude
-//      &lon); bool HasElevationModel() {
-
       /**
        * Virtual method that returns the pixel resolution of the sensor in
        * meters/pix.
@@ -240,9 +235,6 @@ namespace Isis {
       bool m_newLookB;      //!< flag to indicate we need to recompute ra/dec
 
     private:
-      // This version of DemRadius is for SetLookDirection ONLY. Do not call.
-      // DAC TODO Why is next declaration here? Don't move until I know
-//      double DemRadius(double lat, double lon);
       void CommonInitialize(const std::string &demCube);
 
 

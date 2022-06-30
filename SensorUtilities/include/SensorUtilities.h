@@ -25,7 +25,7 @@ namespace SensorUtilities {
   };
 
 
-    // Interface only
+  // Interface only
   class Sensor {
     public:
       virtual ObserverState getState(const ImagePt &imagePoint) = 0;

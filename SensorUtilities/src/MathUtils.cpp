@@ -39,6 +39,25 @@ namespace SensorUtilities {
   }
 
 
+  Vec::Vec(double a, double b, double c) {
+    x = a;
+    y = b;
+    z = c;
+  }
+
+
+  Vec::Vec(const double data[3]) {
+    x = data[0];
+    y = data[1];
+    z = data[2];
+  }
+
+
+  Vec::operator std::vector<double>() const {
+    return {x, y, z};
+  }
+
+
   double sepAngle(Vec aVec, Vec bVec) {
     double dotProd = aVec.x * bVec.x + aVec.y * bVec.y + aVec.z * bVec.z;
     dotProd /= magnitude(aVec) * magnitude(bVec);

@@ -35,6 +35,11 @@ namespace SensorUtilities {
     double x;
     double y;
     double z;
+
+    Vec(double a, double b, double c);
+    Vec(const double data[3]);
+
+    operator std::vector<double>() const;
   };
 
 
