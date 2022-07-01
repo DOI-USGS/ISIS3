@@ -15,12 +15,25 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
+  /**
+   * Create a CSMSensor from a CSM RasterGM model and the rotation to J2000.
+   *
+   * @param cam The CSM model to dispatch to for actual sensor computations
+   * @param j2000Rot The rotation from object space to the universal J2000
+   *                 reference frame. This must use the same time range as cam.
+   */
   CsmSensor::CsmSensor(csm::RasterGM* cam, ale::Orientations *j2000Rot) {
     m_cam = cam;
     m_j2000Rot = j2000Rot;
   }
 
 
+  /**
+   * Get the state of the model at a given image point.
+   *
+   * @see RasterGM::getImageTime
+   * @see RasterGM::imageToRemoteImagingLocus
+   */
   SensorUtilities::ObserverState CsmSensor::getState(const SensorUtilities::ImagePt &imagePoint) {
 
     csm::ImageCoord csmImagePt(imagePoint.line, imagePoint.sample);
@@ -48,6 +61,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the state of the model as it observers a given ground point.
+   * This method uses RasterGM::groundToImage with the default precision
+   * of 0.001 pixels.
+   *
+   * @see RasterGM::groundToImage
+   */
   SensorUtilities::ObserverState CsmSensor::getState(const SensorUtilities::GroundPt3D &groundPt) {
     SensorUtilities::Vec groundCoord = SensorUtilities::sphericalToRect(groundPt);
     csm::EcefCoord csmGroundPt = {groundCoord.x, groundCoord.y, groundCoord.z};

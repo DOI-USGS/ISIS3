@@ -17,10 +17,23 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
+  /**
+   * Create an IsisSensor wrapping an ISIS Camera object.
+   */
   IsisSensor::IsisSensor(Camera* cam) {
     m_cam = cam;
   }
 
+
+  /**
+   * Get the sensor state at an image coordinate.
+   * If the image coordinate matches the image coordinate that the ISIS Camera
+   * is already set to, then it will not compute a new intersection.
+   * Note that SensorUtilities::ImagePt are 0-based and ISIS image coordiantes
+   * are 0.5-based. The input is expected to use the SensorUtilities convention
+   * to conform to the interface. This function handles the conversion to and
+   * from ISIS image coordinates.
+   */
   SensorUtilities::ObserverState IsisSensor::getState(const SensorUtilities::ImagePt &imagePoint) {
 
     // These image coordinates are in ISIS pixels; (0.5, 0.5, 1) is the origin.
@@ -67,6 +80,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Get the sensor state as it observes a ground point.
+   * The ground points is mapped back onto the surface model used by the ISIS
+   * Camera prior to back projecting it into the image. So, it is possible this
+   * will not perfectly invert with getState(ImagePt) depending on how what
+   * surface model you then intersect it with.
+   */
   SensorUtilities::ObserverState IsisSensor::getState(const SensorUtilities::GroundPt3D &groundPt) {
     SurfacePoint oldGroundPt = m_cam->GetSurfacePoint();
     SurfacePoint newGroundPt = SurfacePoint(

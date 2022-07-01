@@ -11,6 +11,12 @@ find files of those names at the top level of this repository. **/
 namespace Isis {
   class Camera;
 
+  /**
+   * Implementation of SensorUtilities::Sensor backed by an ISIS camera model.
+   * This includes a full shape model and sun, but they are not used except when
+   * getting the state from a ground point, the ground point is mapped back onto
+   * the surface model prior to back-projection.
+   */
   class IsisSensor : SensorUtilities::Sensor {
     public:
       IsisSensor(Camera* cam);

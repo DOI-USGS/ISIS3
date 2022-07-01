@@ -11,11 +11,17 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
+  /**
+   * Create an IsisIlluminator that wraps a SpicePosition.
+   */
   IsisIlluminator::IsisIlluminator (SpicePosition* pos) {
     m_pos = pos;
   }
 
 
+  /**
+   * Get the position in meters at a given time.
+   */
   SensorUtilities::Vec IsisIlluminator::position(double time) {
     double oldTime = m_pos->EphemerisTime();
     bool timeChanged = oldTime != time;

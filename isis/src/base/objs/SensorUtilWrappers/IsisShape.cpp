@@ -14,10 +14,21 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
+  /**
+   * Create an IsisShape that wraps an ISIS ShapeModel.
+   */
   IsisShape::IsisShape (ShapeModel* shape) {
     m_shape = shape;
   }
 
+
+  /**
+   * Intersect the ShapeModel.
+   * Depending on what type of ShapeModel this is wrapping, the local normal will
+   * be computed differently. Of note, DEM ShapeModels do not support local normal
+   * calculations right now, because of the extra information required by the
+   * current ISIS DEM local normal calculation requiring extra observer rays.
+   */
   SensorUtilities::Intersection IsisShape::intersect(const SensorUtilities::Vec &sensorPos, const SensorUtilities::Vec &lookVec, bool computeLocalNormal) {
     vector<double> pos = {sensorPos.x, sensorPos.y, sensorPos.z};
     vector<double> look = {lookVec.x, lookVec.y, lookVec.z};

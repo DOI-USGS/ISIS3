@@ -11,6 +11,9 @@ find files of those names at the top level of this repository. **/
 namespace Isis {
   class SpicePosition;
 
+  /**
+   * Implementation of SensorUtilities::Illuminator backed by an ISIS SpicePosition.
+   */
   class IsisIlluminator : SensorUtilities::Illuminator {
     public:
       IsisIlluminator(SpicePosition* pos);

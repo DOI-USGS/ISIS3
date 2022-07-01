@@ -13,6 +13,14 @@ find files of those names at the top level of this repository. **/
 #include "Orientations.h"
 
 namespace Isis {
+  /**
+   * Implementation of the SensorUtilities::Sensor interface for a CSM RasterGM
+   * model.
+   *
+   * This also incorporates an ALE Orientations object to hanlde the transformation
+   * from object space, which CSM only operates in, to the universal J2000 reference
+   * frame.
+   */
   class CsmSensor : SensorUtilities::Sensor {
     public:
       CsmSensor(csm::RasterGM* cam, ale::Orientations *j2000Rot);
@@ -20,7 +28,12 @@ namespace Isis {
       virtual SensorUtilities::ObserverState getState(const SensorUtilities::ImagePt &imagePoint);
       virtual SensorUtilities::ObserverState getState(const SensorUtilities::GroundPt3D &groundPt);
     private:
+      // The CSM model to dispatch to
       csm::RasterGM* m_cam;
+      /**
+       * The time dependent rotation from object space to J2000. This should
+       * use the same time range as the CSM model.
+       */
       ale::Orientations* m_j2000Rot;
   };
 };

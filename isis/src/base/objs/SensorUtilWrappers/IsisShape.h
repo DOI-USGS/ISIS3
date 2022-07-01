@@ -11,6 +11,9 @@ find files of those names at the top level of this repository. **/
 namespace Isis {
   class ShapeModel;
 
+  /**
+   * Implementation of SensorUtilities::Shape backed by an ISIS ShapeModel.
+   */
   class IsisShape : SensorUtilities::Shape {
     public:
       IsisShape(ShapeModel* shape);
