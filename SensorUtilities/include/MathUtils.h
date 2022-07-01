@@ -5,12 +5,23 @@
 
 namespace SensorUtilities {
 
+  /**
+   * Structure for a 2-dimensional spherical ground point.
+   * Latitude and longitude are in radians.
+   * Longitude is planeto-centric, positive east, and in [-pi, pi].
+   */
   struct GroundPt2D {
     double lat;
     double lon;
   };
 
 
+  /**
+   * Structure for a 3-dimensional spherical ground point.
+   * Latitude and longitude are in radians.
+   * Longitude is planeto-centric, positive east, and in [-pi, pi].
+   * Radius is in meters.
+   */
   struct GroundPt3D {
     double lat;
     double lon;
@@ -18,12 +29,11 @@ namespace SensorUtilities {
   };
 
 
-  struct RaDec {
-    double ra;
-    double dec;
-  };
-
-
+  /**
+   * Structure for a point in an image.
+   * The line and sample origin is the upper-left corner at (0, 0).
+   * The first band in the image is 0.
+   */
   struct ImagePt {
     double line;
     double sample;
@@ -31,14 +41,30 @@ namespace SensorUtilities {
   };
 
 
+  /**
+   * Structure for a 3-dimensional rectangular point or vector.
+   * Distances are in meters.
+   */
   struct Vec {
     double x;
     double y;
     double z;
 
+    /**
+     * Construct a vector from 3 values
+     */
     Vec(double a, double b, double c);
+
+    /**
+     * Construct a vector from an array with at least 3 values.
+     * The data is copied into the structure.
+     */
     Vec(const double data[3]);
 
+    /**
+     * Create a std::vector from the structure.
+     * The data in the std:vector is a copy.
+     */
     operator std::vector<double>() const;
   };
 
@@ -47,9 +73,6 @@ namespace SensorUtilities {
 
 
   bool operator==(const GroundPt3D& lhs, const GroundPt3D& rhs);
-
-
-  bool operator==(const RaDec& lhs, const RaDec& rhs);
 
 
   bool operator==(const ImagePt& lhs, const ImagePt& rhs);

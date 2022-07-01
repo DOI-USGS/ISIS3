@@ -10,39 +10,80 @@
 namespace SensorUtilities {
 
 
+  /**
+   * Structure for storing the state of an observer at a specific image coordinate
+   * and time.
+   */
   struct ObserverState {
+    // The look vector for the image coordinate in object space
     Vec lookVec;
+    // The look vector for the image coordinate in the universal reference frame
     Vec j2000LookVec;
+    // The position of the observer in object space
     Vec sensorPos;
+    // The time that the observer state exists at in ephemeris seconds
     double time;
+    // The image coordinate that was captured at the time
     ImagePt imagePoint;
   };
 
 
+  /**
+   * Structure for storing an intersection with a surface.
+   */
   struct Intersection {
     Vec groundPt;
     Vec normal;
   };
 
 
-  // Interface only
+  /**
+   * Interface for sensors.
+   * Implementaions of this interface are responsible for operating in both object
+   * space and the universal reference frame.
+   */
   class Sensor {
     public:
+      /**
+       * Get the observer state at a given image coordinate.
+       */
       virtual ObserverState getState(const ImagePt &imagePoint) = 0;
+
+      /**
+       * Get the observer state that observers a given ground point.
+       */
       virtual ObserverState getState(const GroundPt3D &groundPt) = 0;
   };
 
 
-  // Interface
+  /**
+   * Interface for surface models.
+   * Implementations of this interface operate in object space.
+   */
   class Shape {
     public:
+      /**
+       * Intersect a vector with the surface model.
+       *
+       * @param sensorPos The starting point of the vector to intersect
+       * @param lookVec The direction component of the vector. This may or may not be normalized.
+       * @param computeLocalNormal If the more accurate local normal should be computed instead of the
+       *                           potentially faster ellipsoid normal.
+       */
       virtual Intersection intersect(const Vec &sensorPos, const Vec &lookVec, bool computeLocalNormal=true) = 0;
   };
 
 
-  // Interface only
+  /**
+   * Interface for the location of the illumination source.
+   * Primarily this will be the location of the sun.
+   * Implementations of this interface operate in object space.
+   */
   class Illuminator {
     public:
+      /**
+       * Get the position for the illumination source at a given time.
+       */
       virtual Vec position(double time) = 0;
   };
 

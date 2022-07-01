@@ -14,11 +14,6 @@ namespace SensorUtilities {
   }
 
 
-  bool operator==(const RaDec& lhs, const RaDec& rhs) {
-    return lhs.ra == rhs.ra && lhs.dec == rhs.dec;
-  }
-
-
   bool operator==(const ImagePt& lhs, const ImagePt& rhs) {
     return lhs.line == rhs.line && lhs.sample == rhs.sample;
   }
