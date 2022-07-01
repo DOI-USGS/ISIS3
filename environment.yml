@@ -1,4 +1,5 @@
 channels:
+  - mechsoft
   - usgs-astrogeology
   - conda-forge
   - defaults
