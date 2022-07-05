@@ -144,7 +144,6 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
     EXPECT_NEAR(hist->Average(), bandAvg[i-1], 0.000001);
     EXPECT_NEAR(hist->Sum(), bandSum[i-1], 0.000001);
     EXPECT_EQ(hist->ValidPixels(), bandValid[i-1]);
-    std::cout << "------------BAND # --- " << i << " --- " << bandBin.findKeyword("Name")[i-1] << std::endl;
     EXPECT_NEAR(hist->StandardDeviation(), bandStd[i-1], 0.000001);
   }
 
