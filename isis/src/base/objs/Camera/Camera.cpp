@@ -1685,7 +1685,7 @@ namespace Isis {
 
     // get the vector from the surface to the sun
     SensorUtilities::Vec sunPos(m_uB);
-    SensorUtilities::Vec groundToSun = sunPos - sensorPos;
+    SensorUtilities::Vec groundToSun = sunPos - groundPt;
 
     phase = Angle(SensorUtilities::sepAngle(groundToSensor, groundToSun),
         Angle::Radians);
