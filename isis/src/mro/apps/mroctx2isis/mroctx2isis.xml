@@ -121,6 +121,15 @@
             </description>
             <default><item>true</item></default>
           </parameter>
+          <parameter name="LABELONLY">
+            <type>boolean</type>
+            <default><item>false</item></default>
+            <brief>Skips image data</brief>
+            <description>
+                Leaves the data segment of the cube empty. Speeds up processing and reduces disk IO.
+                Useful for batch processing of label data.
+            </description>
+          </parameter>
         </group>
     </groups>
 </application>

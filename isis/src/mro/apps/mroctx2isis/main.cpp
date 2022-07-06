@@ -18,6 +18,7 @@ using namespace Isis;
 // Global variables for processing functions
 Stretch stretch;
 
+void NullProcesss(Buffer &buf) {}
 void FixDns8(Buffer &buf);
 void TranslateMroCtxLabels(FileName &labelFile, Cube *ocube);
 void SaveDarkData(ProcessImportPds &process, Cube *ocube, int startPix, int endPix);
@@ -169,7 +170,7 @@ void IsisMain() {
   Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), outAtt);
 
   // Translate the labels
-  p.StartProcess();
+  p.StartProcess(ui.GetBoolean("LABELONLY") ? NullProcesss : nullptr);
   TranslateMroCtxLabels(inFile, ocube);
 
   // Set up the strech for the 8 to 12 bit conversion from file
