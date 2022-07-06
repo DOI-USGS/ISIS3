@@ -51,6 +51,7 @@ release.
 - Added check to determine if poles were a valid projection point in ImagePolygon when generating footprint for a map projected image. [#4390](https://github.com/USGS-Astrogeology/ISIS3/issues/4390)
 - Fixed the Mars Express HRSC SRC camera and serial number to use the StartTime instead of the StartClockCount  [#4803](https://github.com/USGS-Astrogeology/ISIS3/issues/4803)
 - Fixed algorithm for applying rolling shutter jitter. Matches implementation in USGSCSM.
+- Fixed isis2std incorrectly outputing signed 16 bit tiff files. [#4897](https://github.com/USGS-Astrogeology/ISIS3/issues/4897)
 
 
 ## [7.0.0] - 2022-02-11
