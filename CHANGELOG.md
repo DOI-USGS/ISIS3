@@ -48,6 +48,7 @@ release.
 ### Deprecated
 
 ### Fixed
+- Fixed CNetCombinePt logging functionality such that only merged points are included in the log.
 - Added check to determine if poles were a valid projection point in ImagePolygon when generating footprint for a map projected image. [#4390](https://github.com/USGS-Astrogeology/ISIS3/issues/4390)
 - Fixed the Mars Express HRSC SRC camera and serial number to use the StartTime instead of the StartClockCount  [#4803](https://github.com/USGS-Astrogeology/ISIS3/issues/4803)
 - Fixed algorithm for applying rolling shutter jitter. Matches implementation in USGSCSM.
