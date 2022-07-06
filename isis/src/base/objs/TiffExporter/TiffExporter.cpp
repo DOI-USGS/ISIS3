@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
+#include "UserInterface.h"
 
 using namespace Isis;
 
@@ -71,7 +72,7 @@ namespace Isis {
    *                         "packbits", "lzw", "deflate", and "none".
    */
   void TiffExporter::write(FileName outputName, int quality,
-                           QString compression) {
+                           QString compression, UserInterface *ui) {
 
     outputName = outputName.addExtension(extension());
 
@@ -114,7 +115,7 @@ namespace Isis {
 
     TIFFSetField(m_image, TIFFTAG_SAMPLESPERPIXEL, bands());
 
-    ImageExporter::write(outputName, quality);
+    ImageExporter::write(outputName, quality, compression, ui);
   }
 
 

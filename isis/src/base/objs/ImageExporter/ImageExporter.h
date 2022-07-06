@@ -20,6 +20,7 @@ namespace Isis {
   class Buffer;
   class Cube;
   class CubeAttributeOutput;
+  class UserInterface;
   class ExportDescription;
   class FileName;
   class ProcessExport;
@@ -59,7 +60,7 @@ namespace Isis {
       void operator()(vector<Buffer *> &in) const;
 
       virtual void write(FileName outputName, int quality=100,
-                         QString compression="none");
+                         QString compression="none", UserInterface *ui = nullptr);
 
       int samples() const;
       int lines() const;
@@ -89,7 +90,7 @@ namespace Isis {
        *
        * @param desc The description describing the export parameters
        */
-      virtual void setRgba(ExportDescription &desc) = 0; 
+      virtual void setRgba(ExportDescription &desc) = 0;
 
       static ImageExporter *fromFormat(QString format);
 
@@ -165,12 +166,12 @@ namespace Isis {
            be mapped to this value. */
       double m_outputPixelMinimum;
 
-      /**! The absolute maximum value for the output pixels. Larger DNs will 
+      /**! The absolute maximum value for the output pixels. Larger DNs will
            be mapped to this value. */
       double m_outputPixelMaximum;
 
-      /**! The description for the export. This includes, pixel type, number of 
-           channels, and the output values for min valid, max valid, and special 
+      /**! The description for the export. This includes, pixel type, number of
+           channels, and the output values for min valid, max valid, and special
            pixels */
       ExportDescription *m_exportDescription;
   };
