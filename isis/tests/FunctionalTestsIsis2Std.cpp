@@ -1,5 +1,6 @@
 #include "gmock/gmock.h"
 
+#include <QFile>
 #include <QString>
 #include <QVector>
 
@@ -15,84 +16,92 @@
 
 using namespace Isis;
 
+class IsisTruthCube : public TempTestingFiles {
+    protected:
+      Cube inputCube;
+      QString inputCubeFilename;
+      int chunkSize;
+
+      void SetUp() override {
+        inputCubeFilename = tempDir.path() + "/test_input.cub";
+        inputCube.setDimensions(128, 128, 1);
+        inputCube.create(inputCubeFilename);
+
+        chunkSize = inputCube.lineCount() / 8.0;
+
+        int pixVal = 0;
+        LineManager lineWriter(inputCube);
+        lineWriter.begin();
+        // Write an integer gradient
+        for (int line = 0; line < chunkSize; line++) {
+          for (int sample = 0; sample < lineWriter.size(); sample++) {
+          lineWriter[sample] = pixVal++;
+          }
+          inputCube.write(lineWriter);
+          lineWriter++;
+        }
+
+        // Write VERY big negative and positive numbers
+        double floatScale = ((double)VALID_MAX4 - (double)VALID_MIN4) / (chunkSize - 1);
+        for (int line = 0; line < chunkSize; line++) {
+          for (int sample = 0; sample < lineWriter.size(); sample++) {
+          lineWriter[sample] = VALID_MIN4 + line * floatScale;
+          }
+          inputCube.write(lineWriter);
+          lineWriter++;
+        }
+
+        // Write VERY small negative and positive numbers
+        double tinyStart = -1e-20;
+        double tinyStop = 1e-20;
+        double tinyScale = (tinyStop - tinyStart) / (chunkSize - 1);
+        for (int line = 0; line < chunkSize; line++) {
+          for (int sample = 0; sample < lineWriter.size(); sample++) {
+            lineWriter[sample] = tinyStart + line * tinyScale;
+          }
+          inputCube.write(lineWriter);
+          lineWriter++;
+        }
+
+        // Write all of the special pixel values
+        for (int line = 0; line < chunkSize; line++) {
+          for (int sample = 0; sample < lineWriter.size(); sample++) {
+            lineWriter[sample] = Lrs;
+          }
+          inputCube.write(lineWriter);
+          lineWriter++;
+        }
+        for (int line = 0; line < chunkSize; line++) {
+          for (int sample = 0; sample < lineWriter.size(); sample++) {
+            lineWriter[sample] = Lis;
+          }
+          inputCube.write(lineWriter);
+          lineWriter++;
+        }
+        for (int line = 0; line < chunkSize; line++) {
+          for (int sample = 0; sample < lineWriter.size(); sample++) {
+            lineWriter[sample] = His;
+          }
+          inputCube.write(lineWriter);
+          lineWriter++;
+        }
+        for (int line = 0; line < chunkSize; line++) {
+          for (int sample = 0; sample < lineWriter.size(); sample++) {
+            lineWriter[sample] = Hrs;
+          }
+          inputCube.write(lineWriter);
+          lineWriter++;
+        }
+
+        inputCube.close();
+      }
+  };
+
 static QString APP_XML = FileName("$ISISROOT/bin/xml/isis2std.xml").expanded();
 static QString STD2ISIS_XML = FileName("$ISISROOT/bin/xml/std2isis.xml").expanded();
 
 
-TEST_F(TempTestingFiles, FunctionalTestsIsis2StdBmp) {
-  QString inputCubeFilename = tempDir.path() + "/test_input.cub";
-  Cube inputCube;
-  inputCube.setDimensions(128, 128, 1);
-  inputCube.create(inputCubeFilename);
-
-  int chunkSize = inputCube.lineCount() / 8.0;
-
-  int pixVal = 0;
-  LineManager lineWriter(inputCube);
-  lineWriter.begin();
-  // Write an integer gradient
-  for (int line = 0; line < chunkSize; line++) {
-    for (int sample = 0; sample < lineWriter.size(); sample++) {
-      lineWriter[sample] = pixVal++;
-    }
-    inputCube.write(lineWriter);
-    lineWriter++;
-  }
-
-  // Write VERY big negative and positive numbers
-  double floatScale = ((double)VALID_MAX4 - (double)VALID_MIN4) / (chunkSize - 1);
-  for (int line = 0; line < chunkSize; line++) {
-    for (int sample = 0; sample < lineWriter.size(); sample++) {
-      lineWriter[sample] = VALID_MIN4 + line * floatScale;
-    }
-    inputCube.write(lineWriter);
-    lineWriter++;
-  }
-
-  // Write VERY small negative and positive numbers
-  double tinyStart = -1e-20;
-  double tinyStop = 1e-20;
-  double tinyScale = (tinyStop - tinyStart) / (chunkSize - 1);
-  for (int line = 0; line < chunkSize; line++) {
-    for (int sample = 0; sample < lineWriter.size(); sample++) {
-      lineWriter[sample] = tinyStart + line * tinyScale;
-    }
-    inputCube.write(lineWriter);
-    lineWriter++;
-  }
-
-  // Write all of the special pixel values
-  for (int line = 0; line < chunkSize; line++) {
-    for (int sample = 0; sample < lineWriter.size(); sample++) {
-      lineWriter[sample] = Lrs;
-    }
-    inputCube.write(lineWriter);
-    lineWriter++;
-  }
-  for (int line = 0; line < chunkSize; line++) {
-    for (int sample = 0; sample < lineWriter.size(); sample++) {
-      lineWriter[sample] = Lis;
-    }
-    inputCube.write(lineWriter);
-    lineWriter++;
-  }
-  for (int line = 0; line < chunkSize; line++) {
-    for (int sample = 0; sample < lineWriter.size(); sample++) {
-      lineWriter[sample] = His;
-    }
-    inputCube.write(lineWriter);
-    lineWriter++;
-  }
-  for (int line = 0; line < chunkSize; line++) {
-    for (int sample = 0; sample < lineWriter.size(); sample++) {
-      lineWriter[sample] = Hrs;
-    }
-    inputCube.write(lineWriter);
-    lineWriter++;
-  }
-
-  inputCube.close();
-
+TEST_F(IsisTruthCube, FunctionalTestsIsis2StdBmp) {
   QString outputBmpFilename = tempDir.path() + "/test_output.bmp";
   QVector<QString> args = {"from=" + inputCubeFilename,
                            "to=" + outputBmpFilename,
@@ -195,4 +204,24 @@ TEST_F(TempTestingFiles, FunctionalTestsIsis2StdBmp) {
   nullStats.AddData(checkReader.DoubleBuffer(), checkReader.size());
   EXPECT_EQ(nullStats.Minimum(), NULL1);
   EXPECT_EQ(nullStats.Maximum(), NULL1);
+}
+
+TEST_F(IsisTruthCube, FunctionalTestsIsis2StdExtension) {
+  QString outputBmpFilename = tempDir.path() + "/test_output";
+  QVector<QString> args = {"from=" + inputCubeFilename,
+                           "to=" + outputBmpFilename,
+                           "mode=grayscale",
+                           "format=bmp",
+                           "stretch=linear"};
+
+  UserInterface options(APP_XML, args);
+  try {
+    isis2std(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to translate image: " << e.what() << std::endl;
+  }
+
+  QFile outputFile(outputBmpFilename + ".bmp");
+  EXPECT_TRUE(outputFile.exists());
 }
