@@ -172,30 +172,11 @@ namespace Isis {
         ZrHist.add("Debug::SkipModule invoked!");
       }
 
-      /////////////////////////////////////////////////////////////////
-      //  ZeroDark removes dark current
-      //
-      procStep = "ZeroDark module";
-      hiconf.selectProfile("ZeroDark");
-      hiprof =  hiconf.getMatrixProfile();
-      HiHistory ZdHist;
-      ZdHist.add("Profile["+ hiprof.Name()+"]");
-      if ( !SkipModule(hiprof) ) {
-        ZeroDark zd(hiconf);
-        calVars->add(hiconf.getProfileName(), zd.ref());
-        ZdHist = zd.History();
-        if ( hiprof.exists("DumpModuleFile") ) {
-          zd.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
-        }
-      }
-      else {
-        calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
-        ZdHist.add("Debug::SkipModule invoked!");
-      }
 
       /////////////////////////////////////////////////////////////////
       //  ZeroDarkRate removes dark current with a new approach compared
       //    with ZeroDark.
+      bool zdrFallback = false;
       procStep = "ZeroDarkRate module";
       HiHistory ZdrHist;
       ZdrHist.add("Profile[ZeroDarkRate]");
@@ -217,11 +198,21 @@ namespace Isis {
                            "in your configuration file.";
             throw IException(IException::User, mess, _FILEINFO_);
           }
-          ZeroDarkRate zdr(hiconf);
-          calVars->add(hiconf.getProfileName(), zdr.ref());
-          ZdrHist = zdr.History();
-          if ( hiprof.exists("DumpModuleFile") ) {
-            zdr.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+          try{
+            ZeroDarkRate zdr(hiconf);
+            calVars->add(hiconf.getProfileName(), zdr.ref());
+            ZdrHist = zdr.History();
+            if ( hiprof.exists("DumpModuleFile") ) {
+              zdr.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+            }
+          }
+          catch(IException e){
+            zdrFallback = true;
+            calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
+            std::cout << "Falling back to ZeroDark implementation. Unable to initialize ZeroDarkRate "
+                      << "module with the following error:" << std::endl << e.what() << std::endl;
+            ZdrHist.add("Debug::Unable to initialize ZeroDarkRate module. "
+                        "Falling back to ZeroDark implementation");
           }
         }
         else {
@@ -229,6 +220,29 @@ namespace Isis {
           ZdrHist.add("Debug::SkipModule invoked!");
         }
       }
+
+      /////////////////////////////////////////////////////////////////
+      //  ZeroDark removes dark current
+      //
+      procStep = "ZeroDark module";
+      hiconf.selectProfile("ZeroDark");
+      hiprof =  hiconf.getMatrixProfile();
+      HiHistory ZdHist;
+      ZdHist.add("Profile["+ hiprof.Name()+"]");
+      // If ZeroDark module is enabled or we need to fall back to zero dark from zero dark rate
+      if ( !SkipModule(hiprof) || zdrFallback) {
+        ZeroDark zd(hiconf);
+        calVars->add(hiconf.getProfileName(), zd.ref());
+        ZdHist = zd.History();
+        if ( hiprof.exists("DumpModuleFile") ) {
+          zd.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+        }
+      }
+      else {
+        calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
+        ZdHist.add("Debug::SkipModule invoked!");
+      }
+
 
       ////////////////////////////////////////////////////////////////////
       //  GainLineDrift correct for gain-based drift
