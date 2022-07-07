@@ -1,6 +1,7 @@
 #include "gmock/gmock.h"
 
-#include <QString.h>
+#include <QString>
+#include <QVector>
 
 #include "isis2std.h"
 
