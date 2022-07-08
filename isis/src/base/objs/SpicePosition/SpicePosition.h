@@ -197,18 +197,18 @@ namespace Isis {
       virtual QString GetAberrationCorrection() const;
       double GetLightTime() const;
 
-      const std::vector<double> &SetEphemerisTime(double et);
+      virtual const std::vector<double> &SetEphemerisTime(double et);
       enum PartialType {WRT_X, WRT_Y, WRT_Z};
 
       //! Return the current ephemeris time
-      double EphemerisTime() const {
+      virtual double EphemerisTime() const {
         return p_et;
       };
 
       const std::vector<double> &GetCenterCoordinate();
 
       //! Return the current J2000 position
-      const std::vector<double> &Coordinate() {
+      virtual const std::vector<double> &Coordinate() {
         return p_coordinate;
       };
 
