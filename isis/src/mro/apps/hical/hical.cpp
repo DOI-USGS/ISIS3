@@ -188,6 +188,7 @@ namespace Isis {
       else {
         hiconf.selectProfile("ZeroDarkRate");
         hiprof =  hiconf.getMatrixProfile();
+
         if ( !SkipModule(hiprof) ) {
           // Make sure we aren't applying ZeroDark and ZeroDarkRate
           if ( !SkipModule(hiconf.getMatrixProfile("ZeroDark")) ){
@@ -207,12 +208,33 @@ namespace Isis {
             }
           }
           catch(IException e){
-            zdrFallback = true;
-            calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
-            std::cout << "Falling back to ZeroDark implementation. Unable to initialize ZeroDarkRate "
-                      << "module with the following error:" << std::endl << e.what() << std::endl;
-            ZdrHist.add("Debug::Unable to initialize ZeroDarkRate module. "
-                        "Falling back to ZeroDark implementation");
+            if (hiprof.exists("Fallback")){
+              if (IsTrueValue(hiprof, "Fallback")){
+                zdrFallback = true;
+                calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
+                std::cout << "Falling back to ZeroDark implementation. Unable to initialize ZeroDarkRate "
+                          << "module with the following error:" << std::endl << e.what() << "\nContinuing..."<< std::endl;
+                ZdrHist.add("Debug::Unable to initialize ZeroDarkRate module. "
+                            "Falling back to ZeroDark implementation");
+              } else {
+                // If fallback is false, throw the exception
+                std::cerr<< "\nNot all combinations of CCD, channel, TDI rate, binning value, and ADC setting "
+                             "have a DarkRate*.csv available, and you may need to run hical with ZeroDark instead "
+                             "of ZeroDarkRate specified in the configuration file. Alternatively, you may specify "
+                             "Fallback = True in the ZeroDarkRate configuration profile to automatically use the "
+                             "ZeroDark module on ZeroDarkRate failure.\n" << std::endl;
+                throw(e);
+              }
+            } else {
+              // If fallback is not found, throw the exception
+              std::cerr<< "\nNot all combinations of CCD, channel, TDI rate, binning value, and ADC setting "
+                            "have a DarkRate*.csv available, and you may need to run hical with ZeroDark instead "
+                            "of ZeroDarkRate specified in the configuration file. Alternatively, you may specify "
+                            "Fallback = True in the ZeroDarkRate configuration profile to automatically use the "
+                            "ZeroDark module on ZeroDarkRate failure.\n" << std::endl;
+
+              throw(e);
+            }
           }
         }
         else {
