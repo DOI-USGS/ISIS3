@@ -16,6 +16,7 @@ find files of those names at the top level of this repository. **/
 #include "ProcessExport.h"
 #include "QtExporter.h"
 #include "TiffExporter.h"
+#include "UserInterface.h"
 
 using namespace Isis;
 using namespace std;
@@ -47,9 +48,9 @@ namespace Isis {
 
 
   /**
-   * Generic initialization with the export description.  Set the export 
-   * description given the pixel type of the passed in description. Use 
-   * the number of channels in the export description to determine the 
+   * Generic initialization with the export description.  Set the export
+   * description given the pixel type of the passed in description. Use
+   * the number of channels in the export description to determine the
    * write method (i.e. grayscale, rgb, or rgba). This will also set the
    * member variables for the number of samples, lines, and bands.
    *
@@ -97,15 +98,23 @@ namespace Isis {
    * @param outputName The filename of the output cube
    * @param quality The quality of the output from 0 to 100, defaults to 100
    * @param compression The compression algorithm used. Image format specific.
+   * @param ui The optional user interface to set the input image pixel range.
    */
   void ImageExporter::write(FileName outputName, int quality,
-                            QString compression) {
+                            QString compression, UserInterface *ui) {
     ProcessExport &p = process();
-    if (!p.HasInputRange()) p.SetInputRange();
+    if (!p.HasInputRange()) {
+      if (ui) {
+        p.SetInputRange(*ui);
+      }
+      else {
+        p.SetInputRange();
+      }
+    }
     p.ProcessCubes(*this);
-    
+
     outputName = outputName.addExtension(m_extension);
-    
+
     createWorldFile(outputName);
   }
 
@@ -168,14 +177,14 @@ namespace Isis {
 
   /**
    * Set the DN floor and ceiling for the exported image.  All DNs less than
-   * the min will be set to the min in the exported image.  Similarly, all DNs 
-   * greater than the max will be set to the max in the exported image. 
-   *  
-   * Note: These values may be "special".  For example, if Null pixels are 
-   * exported to 0.0 and the minimum valid pixels are exported to 2.0, then 0.0 
-   * should be passed in for the value of the @b min parameter. 
+   * the min will be set to the min in the exported image.  Similarly, all DNs
+   * greater than the max will be set to the max in the exported image.
    *
-   * @param min The absolute minimum output DN value. 
+   * Note: These values may be "special".  For example, if Null pixels are
+   * exported to 0.0 and the minimum valid pixels are exported to 2.0, then 0.0
+   * should be passed in for the value of the @b min parameter.
+   *
+   * @param min The absolute minimum output DN value.
    * @param max The absolute maximum output DN value.
    */
   void ImageExporter::setOutputPixelRange(double outputPixelMinimum, double outputPixelMaximum) {
@@ -210,7 +219,7 @@ namespace Isis {
   }
 
   /**
-   * Sets the description for the output image. 
+   * Sets the description for the output image.
    *
    * @param desc The export description
    */
@@ -219,7 +228,7 @@ namespace Isis {
   }
 
   /**
-   * Gets the description for the output image. 
+   * Gets the description for the output image.
    *
    * @return The export description
    */
@@ -230,16 +239,16 @@ namespace Isis {
 
   /**
    * Sets up the export process with the parameters described within the given
-   * description. 
-   *  
-   * This method determines determines whether to write the data as grayscale, 
-   * RGB, or RGBA. It then opens a cube for retrieving the input data and 
-   * establishing the dimensions of the output image. Next, the ProcessExport 
-   * format is set to BIL and the ProcessExport output pixel type, output valid 
-   * data range, and output null are set based on the given export description. 
-   * Last, the absolute output pixel range is set based on the given description 
-   * (this is the smallest and largest allowed pixel values in the output, 
-   * including "special" pixel values). 
+   * description.
+   *
+   * This method determines determines whether to write the data as grayscale,
+   * RGB, or RGBA. It then opens a cube for retrieving the input data and
+   * establishing the dimensions of the output image. Next, the ProcessExport
+   * format is set to BIL and the ProcessExport output pixel type, output valid
+   * data range, and output null are set based on the given export description.
+   * Last, the absolute output pixel range is set based on the given description
+   * (this is the smallest and largest allowed pixel values in the output,
+   * including "special" pixel values).
    *
    * @return A cube pointer to the first channel created, owned by the process
    */
@@ -269,20 +278,20 @@ namespace Isis {
 
     for (int i = 1; i < m_exportDescription->channelCount(); i++) addChannel(i);
 
-    p.setFormat(ProcessExport::BIL);// why BIL and not default to BSQ??? Doesn't appear to make a 
+    p.setFormat(ProcessExport::BIL);// why BIL and not default to BSQ??? Doesn't appear to make a
                                     // difference in output images
 
     // set up the output pixel type, special pixels and valid output range for
     // the stretch that will be performed by ProcessExport
     p.SetOutputType(exportDescription().pixelType());
-    p.SetOutputRange(m_exportDescription->outputPixelValidMin(), 
+    p.SetOutputRange(m_exportDescription->outputPixelValidMin(),
                      m_exportDescription->outputPixelValidMax());
-    
-    // the dafault value for the null 
+
+    // the dafault value for the null
     p.SetOutputNull(m_exportDescription->outputPixelNull());
 
-    // set the absolute min/max values for all pixels (including specials) in the output image 
-    setOutputPixelRange(m_exportDescription->outputPixelAbsoluteMin(), 
+    // set the absolute min/max values for all pixels (including specials) in the output image
+    setOutputPixelRange(m_exportDescription->outputPixelAbsoluteMin(),
                         m_exportDescription->outputPixelAbsoluteMax());
     return cube;
   }
@@ -310,7 +319,7 @@ namespace Isis {
     }
     else {
       return Isis::None;
-    }   
+    }
   }
 
 
