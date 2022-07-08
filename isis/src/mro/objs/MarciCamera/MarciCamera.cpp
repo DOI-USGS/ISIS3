@@ -178,22 +178,41 @@ namespace Isis {
    * @param vband The band number to set
    */
   void MarciCamera::SetBand(const int vband) {
+    // Sanity check on requested band
+    int maxVirtualBands = min(p_detectorStartLines.size(), p_frameletOffsets.size());
+    
+    if (((vband <= 0) || (vband > maxVirtualBands)) && (vband > Bands())) {
+      ostringstream mess;
+      mess << "Requested virtual band (" << vband
+           << ") outside valid (BandBin/Center) limits (1 - " << maxVirtualBands
+           <<  ")";
+      throw IException(IException::Programmer, mess.str(), _FILEINFO_);
+    }
+
     Camera::SetBand(vband);
+    
+    if ((vband > maxVirtualBands) && (vband <= Bands())) {
+      // probably switching to a band from phocube or similar
+      // instead of a different filter band, so just re-use the 
+      // properties from the current band. 
+      return;
+    }
 
     PushFrameCameraDetectorMap *dmap = (PushFrameCameraDetectorMap *)DetectorMap();
-    dmap->SetBandFirstDetectorLine(p_detectorStartLines[vband-1]);
-    dmap->SetFrameletOffset(p_frameletOffsets[vband-1]);
+    dmap->SetBandFirstDetectorLine(p_detectorStartLines.at(vband-1));
+    dmap->SetFrameletOffset(p_frameletOffsets.at(vband-1));
 
     MarciDistortionMap *distmap = (MarciDistortionMap *)DistortionMap();
-    distmap->SetFilter(p_filterNumbers[vband-1]);
+    distmap->SetFilter(p_filterNumbers.at(vband-1));
+    
   }
 
 
 
   /**
    * The camera model is band dependent, so this method returns false
-   *
-   * @return bool False
+   *  
+   * @return bool false
    */
   bool MarciCamera::IsBandIndependent() {
     return false;

@@ -2690,7 +2690,7 @@ namespace Isis {
    */
   bool Camera::HasProjection() {
     return p_projection != 0;
-    }
+  }
 
 
   /**
