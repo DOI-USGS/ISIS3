@@ -208,31 +208,20 @@ namespace Isis {
             }
           }
           catch(IException e){
-            if (hiprof.exists("Fallback")){
-              if (IsTrueValue(hiprof, "Fallback")){
+            if (hiprof.exists("Fallback") && IsTrueValue(hiprof, "Fallback")){
                 zdrFallback = true;
                 calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
                 std::cerr << "Falling back to ZeroDark implementation. Unable to initialize ZeroDarkRate "
                           << "module with the following error:" << std::endl << e.what() << "\nContinuing..."<< std::endl;
                 ZdrHist.add("Debug::Unable to initialize ZeroDarkRate module. "
                             "Falling back to ZeroDark implementation");
-              } else {
-                // If fallback is false, throw the exception
-                std::cerr<< "\nNot all combinations of CCD, channel, TDI rate, binning value, and ADC setting "
-                             "have a DarkRate*.csv available, and you may need to run hical with ZeroDark instead "
-                             "of ZeroDarkRate specified in the configuration file. Alternatively, you may specify "
-                             "Fallback = True in the ZeroDarkRate configuration profile to automatically use the "
-                             "ZeroDark module on ZeroDarkRate failure.\n" << std::endl;
-                throw(e);
-              }
             } else {
-              // If fallback is not found, throw the exception
+              // If fallback is not found or fallback is false, throw the exception
               std::cerr<< "\nNot all combinations of CCD, channel, TDI rate, binning value, and ADC setting "
                             "have a DarkRate*.csv available, and you may need to run hical with ZeroDark instead "
                             "of ZeroDarkRate specified in the configuration file. Alternatively, you may specify "
                             "Fallback = True in the ZeroDarkRate configuration profile to automatically use the "
                             "ZeroDark module on ZeroDarkRate failure.\n" << std::endl;
-
               throw(e);
             }
           }
