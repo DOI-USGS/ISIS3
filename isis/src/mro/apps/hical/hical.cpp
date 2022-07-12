@@ -212,7 +212,7 @@ namespace Isis {
               if (IsTrueValue(hiprof, "Fallback")){
                 zdrFallback = true;
                 calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
-                std::cout << "Falling back to ZeroDark implementation. Unable to initialize ZeroDarkRate "
+                std::cerr << "Falling back to ZeroDark implementation. Unable to initialize ZeroDarkRate "
                           << "module with the following error:" << std::endl << e.what() << "\nContinuing..."<< std::endl;
                 ZdrHist.add("Debug::Unable to initialize ZeroDarkRate module. "
                             "Falling back to ZeroDark implementation");
