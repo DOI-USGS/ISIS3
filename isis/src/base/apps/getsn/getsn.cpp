@@ -89,6 +89,6 @@ namespace Isis {
       }
     }
 
-    log->addGroup(sn);    
+    log->addLogGroup(sn);    
   }
 }

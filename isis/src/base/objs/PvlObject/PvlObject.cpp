@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 #include "Message.h"
 #include "PvlFormat.h"
+#include "Application.h"
 
 #include <QList>
 
@@ -157,6 +158,15 @@ namespace Isis {
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
+  /**
+   * Add a group to the object and report it to the log/terminal. 
+   *
+   * @param group The PvlGroup object to add.
+   */
+  void PvlObject::addLogGroup(Isis::PvlGroup &group) {
+    addGroup(group);
+    Application::Log(group);
+  };
 
   /**
    * Finds a keyword in the current PvlObject, or deeper inside

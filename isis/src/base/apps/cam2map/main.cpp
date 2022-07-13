@@ -35,19 +35,7 @@ map <QString, void *> GuiHelpers() {
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Pvl appLog;
-  try {
-    cam2map(ui, &appLog);
-  }
-  catch (...) {
-    for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
-      Application::Log(*grpIt);
-    }
-    throw;
-  }
-
-  for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
-    Application::Log(*grpIt);
-  }
+  cam2map(ui, &appLog);
 }
 
 // Helper function to print out mapfile to session log

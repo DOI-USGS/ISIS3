@@ -31,6 +31,7 @@ namespace Isis {
   class Gui;
   class IException;
   class Progress;
+  class PvlObject; 
 
   /**
    *  @author ????-??-?? Unknown

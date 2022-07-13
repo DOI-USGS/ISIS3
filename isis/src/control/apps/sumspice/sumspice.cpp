@@ -121,7 +121,7 @@ namespace Isis {
     }
 
     if (duplicates.keywords() != 0 && log) {
-      log->addGroup(duplicates);
+      log->addLogGroup(duplicates);
     }
 
     // Determine the update mode
@@ -197,7 +197,7 @@ namespace Isis {
       PvlGroup loggrp("Warnings");
       loggrp.addKeyword(message);
       if (log){
-        log->addGroup(loggrp);
+        log->addLogGroup(loggrp);
       }
     }
 

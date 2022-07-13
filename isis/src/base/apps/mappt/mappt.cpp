@@ -40,7 +40,7 @@ void mappt(Cube *icube, UserInterface &ui, Pvl *log, CubeAttributeInput* inAtt) 
    
   if(log) {
     for(int i = 0; i < points.size(); i++) {
-      log->addGroup(getProjPointInfo(icube, points[i], ui, log));
+      log->addLogGroup(getProjPointInfo(icube, points[i], ui, log));
     } 
   }
 

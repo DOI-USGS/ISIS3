@@ -439,7 +439,7 @@ namespace Isis {
           currentKernels += PvlKeyword("Error", errPvl.group(errPvl.groups() - 1)["Message"][0]);
 
         if (log) {
-          log->addGroup(currentKernels);
+          log->addLogGroup(currentKernels);
         }
         throw e;
       }

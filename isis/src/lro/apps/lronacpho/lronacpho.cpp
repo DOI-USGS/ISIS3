@@ -142,7 +142,7 @@ namespace Isis{
     oCube->putGroup(photo);
     
     if(log){
-      log->addGroup(photo);
+      log->addLogGroup(photo);
     }
     //Application::Log(photo);
 

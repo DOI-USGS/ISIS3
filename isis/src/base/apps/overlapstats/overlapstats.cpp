@@ -244,7 +244,7 @@ namespace Isis {
       }
     }
 
-    log->addGroup(brief);
+    log->addLogGroup(brief);
 
     //Log the ERRORS file
     if (ui.WasEntered("ERRORS")) {
@@ -260,7 +260,7 @@ namespace Isis {
       PvlGroup grp("OverlapStats");
       PvlKeyword key("ErrorNumber", toString(errorNum));
       grp.addKeyword(key);
-      log->addGroup(grp);
+      log->addLogGroup(grp);
     }
 
     // Display FULL output
@@ -276,7 +276,7 @@ namespace Isis {
       }
     }
 
-    log->addGroup(brief);
+    log->addLogGroup(brief);
   }
 
 

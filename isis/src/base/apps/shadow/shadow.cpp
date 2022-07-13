@@ -129,7 +129,7 @@ namespace Isis {
     }
 
     if (log) {
-      log->addGroup(functorLogData);
+      log->addLogGroup(functorLogData);
     }
 
     // Look for shape model object and remove it from output
