@@ -13,6 +13,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 set(CMAKE_FRAMEWORK_PATH /System/Library/Frameworks/)
 set(CMAKE_FIND_FRAMEWORK LAST)
 
+# Enable use of @rpath on Mac
+set(CMAKE_MACOS_RPATH 1)
+
 include(AddIsisModule)
 include(Utilities)
 include(TestSetup)
