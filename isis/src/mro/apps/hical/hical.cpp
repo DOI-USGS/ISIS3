@@ -172,6 +172,66 @@ namespace Isis {
         ZrHist.add("Debug::SkipModule invoked!");
       }
 
+
+      /////////////////////////////////////////////////////////////////
+      //  ZeroDarkRate removes dark current with a new approach compared
+      //    with ZeroDark.
+      bool zdrFallback = false;
+      procStep = "ZeroDarkRate module";
+      HiHistory ZdrHist;
+      ZdrHist.add("Profile[ZeroDarkRate]");
+      // Check for backwards compatibility with old config files
+      if (!hiconf.profileExists("ZeroDarkRate")) {
+        calVars->add("ZeroDarkRate", HiVector(nsamps, 0.0));
+        ZdrHist.add("Skipped, module not in config file");
+      }
+      else {
+        hiconf.selectProfile("ZeroDarkRate");
+        hiprof =  hiconf.getMatrixProfile();
+
+        if ( !SkipModule(hiprof) ) {
+          // Make sure we aren't applying ZeroDark and ZeroDarkRate
+          if ( !SkipModule(hiconf.getMatrixProfile("ZeroDark")) ){
+            QString mess = "You have enabled both the ZeroDark and the ZeroDarkRate modules."
+                           "This means you are attempting to remove the dark current twice with "
+                           "two different algorithms. This is not approved use of hical. "
+                           "Please disable one or the other module using the Debug::SkipModule "
+                           "in your configuration file.";
+            throw IException(IException::User, mess, _FILEINFO_);
+          }
+          try{
+            ZeroDarkRate zdr(hiconf);
+            calVars->add(hiconf.getProfileName(), zdr.ref());
+            ZdrHist = zdr.History();
+            if ( hiprof.exists("DumpModuleFile") ) {
+              zdr.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
+            }
+          }
+          catch(IException e){
+            if (hiprof.exists("Fallback") && IsTrueValue(hiprof, "Fallback")){
+                zdrFallback = true;
+                calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
+                std::cerr << "Falling back to ZeroDark implementation. Unable to initialize ZeroDarkRate "
+                          << "module with the following error:" << std::endl << e.what() << "\nContinuing..."<< std::endl;
+                ZdrHist.add("Debug::Unable to initialize ZeroDarkRate module. "
+                            "Falling back to ZeroDark implementation");
+            } else {
+              // If fallback is not found or fallback is false, throw the exception
+              std::cerr<< "\nNot all combinations of CCD, channel, TDI rate, binning value, and ADC setting "
+                            "have a DarkRate*.csv available, and you may need to run hical with ZeroDark instead "
+                            "of ZeroDarkRate specified in the configuration file. Alternatively, you may specify "
+                            "Fallback = True in the ZeroDarkRate configuration profile to automatically use the "
+                            "ZeroDark module on ZeroDarkRate failure.\n" << std::endl;
+              throw(e);
+            }
+          }
+        }
+        else {
+          calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
+          ZdrHist.add("Debug::SkipModule invoked!");
+        }
+      }
+
       /////////////////////////////////////////////////////////////////
       //  ZeroDark removes dark current
       //
@@ -180,7 +240,8 @@ namespace Isis {
       hiprof =  hiconf.getMatrixProfile();
       HiHistory ZdHist;
       ZdHist.add("Profile["+ hiprof.Name()+"]");
-      if ( !SkipModule(hiprof) ) {
+      // If ZeroDark module is enabled or we need to fall back to zero dark from zero dark rate
+      if ( !SkipModule(hiprof) || zdrFallback) {
         ZeroDark zd(hiconf);
         calVars->add(hiconf.getProfileName(), zd.ref());
         ZdHist = zd.History();
@@ -193,42 +254,6 @@ namespace Isis {
         ZdHist.add("Debug::SkipModule invoked!");
       }
 
-      /////////////////////////////////////////////////////////////////
-      //  ZeroDarkRate removes dark current with a new approach compared
-      //    with ZeroDark.
-      procStep = "ZeroDarkRate module";
-      HiHistory ZdrHist;
-      ZdrHist.add("Profile[ZeroDarkRate]");
-      // Check for backwards compatibility with old config files
-      if (!hiconf.profileExists("ZeroDarkRate")) {
-        calVars->add("ZeroDarkRate", HiVector(nsamps, 0.0));
-        ZdrHist.add("Skipped, module not in config file");
-      }
-      else {
-        hiconf.selectProfile("ZeroDarkRate");
-        hiprof =  hiconf.getMatrixProfile();
-        if ( !SkipModule(hiprof) ) {
-          // Make sure we aren't applying ZeroDark and ZeroDarkRate
-          if ( !SkipModule(hiconf.getMatrixProfile("ZeroDark")) ){
-            QString mess = "You have enabled both the ZeroDark and the ZeroDarkRate modules."
-                           "This means you are attempting to remove the dark current twice with "
-                           "two different algorithms. This is not approved use of hical. "
-                           "Please disable one or the other module using the Debug::SkipModule "
-                           "in your configuration file.";
-            throw IException(IException::User, mess, _FILEINFO_);
-          }
-          ZeroDarkRate zdr(hiconf);
-          calVars->add(hiconf.getProfileName(), zdr.ref());
-          ZdrHist = zdr.History();
-          if ( hiprof.exists("DumpModuleFile") ) {
-            zdr.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
-          }
-        }
-        else {
-          calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));
-          ZdrHist.add("Debug::SkipModule invoked!");
-        }
-      }
 
       ////////////////////////////////////////////////////////////////////
       //  GainLineDrift correct for gain-based drift
