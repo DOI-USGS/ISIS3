@@ -1585,10 +1585,9 @@ namespace Isis {
       }
     }
 
+    // check for extraneous data in the keyword ... ,2,3
     QRegularExpression regex("(,*[0-9]?)?");
-    QString temp = "";
-    temp += keyword;
-    QRegularExpressionMatch match = regex.match(temp);
+    QRegularExpressionMatch match = regex.match(keyword);
     if (!keyword.isEmpty() && match.hasMatch()) {
           keywordValues.at(0).first += keyword;
           keyword = "";
