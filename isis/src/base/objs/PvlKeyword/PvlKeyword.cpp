@@ -1585,9 +1585,9 @@ namespace Isis {
       }
     }
 
-    QRegularExpression regex("(,)");
+    QRegularExpression regex("(,*[0-9]?)?");
     QString temp = "";
-    temp += keyword[0];
+    temp += keyword;
     QRegularExpressionMatch match = regex.match(temp);
     if (!keyword.isEmpty() && match.hasMatch()) {
           keywordValues.at(0).first += keyword;
