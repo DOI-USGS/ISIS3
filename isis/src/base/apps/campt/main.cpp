@@ -3,7 +3,6 @@
 #include "campt.h"
 
 #include "Application.h"
-#include "PvlLog.h"
 
 using namespace std;
 using namespace Isis;

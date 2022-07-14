@@ -2,7 +2,6 @@
 
 #include "Application.h"
 #include "UserInterface.h"
-#include "PvlLog.h"
 #include "stretch_app.h"
  
 using namespace std;
