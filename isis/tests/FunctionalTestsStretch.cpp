@@ -47,7 +47,7 @@ TEST_F(SpecialSmallCube, FunctionalTestStretchSwitchSpecial) {
   QString pairs = "0:255 255:0";
 
   UserInterface options(STRETCH_XML, args);
-  PvlLog log;
+  Log log;
   try {
     stretch(testCube, pairs, options, &log);
   }
