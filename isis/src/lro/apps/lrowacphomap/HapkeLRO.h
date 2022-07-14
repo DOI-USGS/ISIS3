@@ -49,7 +49,7 @@ namespace Isis {
    * Camera", published in Icaris v141, pg. 205-255 (1999).
    *
    * @author  2021-08-18 Cordell Michaud
-   * 
+   *
    * @internal
    *   @history 2021-07-19 Cordell Michaud - Code adapted from PhotometricFunction and HapkeLRO written by Kris Becker
    *
@@ -61,7 +61,7 @@ namespace Isis {
       bool normalized() const;
       double photometry(double i, double e, double g, int band = 1) const override;
       double photometry(double i, double e, double g, double lat, double lon, int band = 1) const;
-      void report(PvlContainer &pvl);
+      void report(PvlContainer &pvl) override;
       void setNormalized(bool normalized);
 
     private:
@@ -81,17 +81,17 @@ namespace Isis {
 
       /**
        * Container for band photometric correction parameters
-       * 
+       *
        * @author 2021-07-30 Cordell Michaud
-       * 
+       *
        * @internal
        *   @history 2021-07-19 Cordell Michaud - Code adapted from PhotoemtricFunction written by Kris Becker
        */
       class Parameters
       {
         public:
-          Parameters() 
-            : band(1), bandBinCenter(0.0), mapBands(), 
+          Parameters()
+            : band(1), bandBinCenter(0.0), mapBands(),
             names(), phoStd(0.0), values() {}
 
           ~Parameters() {}

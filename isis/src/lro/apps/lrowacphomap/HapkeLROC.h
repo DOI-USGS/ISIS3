@@ -38,7 +38,7 @@ namespace Isis {
    * This class is based on the Hapke PhotoModel from Isis base code. Photometry method
    * was updated to match full Hapke (2012) model and some variable names were changed
    * to match reference formula.
-   * 
+   *
    * Reference:
    *    Hapke, B. (2012) Theory of Reflectance and Emittance Spectroscopy, Cambridge Univ. Press.
    *
@@ -56,7 +56,7 @@ namespace Isis {
       bool normalized() const;
       double photometry(double i, double e, double g, int band = 1) const override;
       double photometry(double i, double e, double g, double lat, double lon, int band = 1) const;
-      void report(PvlContainer &pvl);
+      void report(PvlContainer &pvl) override;
       void setNormalized(bool normalized);
 
     private:
@@ -78,7 +78,6 @@ namespace Isis {
       mutable double m_oldPhase;
       mutable double m_oldIncidence;
       mutable double m_oldEmission;
-      mutable double m_photoB0save;
       mutable double m_photoCot2t;
       mutable double m_photoCott;
       mutable double m_photoTant;
@@ -89,16 +88,16 @@ namespace Isis {
 
       /**
         * Container for band photometric correction parameters
-        * 
+        *
         * @author 2021-08-02 Cordell Michaud
-        * 
+        *
         * @internal
         *   @history 2021-07-19 Cordell Michaud - Code adapted from PhotometricFunction written by Kris Becker
         */
       class Parameters {
         public:
-          Parameters() 
-            : band(1), bandBinCenter(0.0), mapBands(), 
+          Parameters()
+            : band(1), bandBinCenter(0.0), mapBands(),
             names(), phoStd(0.0), values() {}
 
           ~Parameters() {}
