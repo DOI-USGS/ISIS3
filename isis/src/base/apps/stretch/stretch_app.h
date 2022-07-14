@@ -4,7 +4,6 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "UserInterface.h"
-#include "PvlLog.h"
 
 namespace Isis {
   extern void stretch(UserInterface &ui, Pvl *log=nullptr);
