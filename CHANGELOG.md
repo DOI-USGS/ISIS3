@@ -40,6 +40,8 @@ release.
 - Updated the LRO calibration application Lrowaccal to add a units label to the RadiometricType keyword of the Radiometry group in the output cube label if the RadiometricType parameter is Radiance. No functionality is changed if the RadiometricType parameter is IOF. Lrowaccal has also been refactored to be callable for testing purposes. Issue: [#4939](https://github.com/USGS-Astrogeology/ISIS3/issues/4939), PR: [#4940](https://github.com/USGS-Astrogeology/ISIS3/pull/4940)
 - Changed how logs are reported so they no longer only printing at the end of the applications execution. [#4914](https://github.com/USGS-Astrogeology/ISIS3/issues/4914)
 - Update marcical to include step 3 of the mission team's MARCI calibration process described [here](https://pds-imaging.jpl.nasa.gov/data/mro/mars_reconnaissance_orbiter/marci/mrom_1343/calib/marcical.txt). [#5004](https://github.com/USGS-Astrogeology/ISIS3/pull/5004)
+
+
 ### Added
 - Improved functionality of msi2isis and MsiCamera model to support new Eros dataset, including support for Gaskell's SUMSPICE files that adjust timing, pointing and spacecraft position ephemeris. [#4886](https://github.com/USGS-Astrogeology/ISIS3/issues/4886)
 - Added a new application, framestitch, for stitching even and odd push frame images back together prior to processing in other applications. [4924](https://github.com/USGS-Astrogeology/ISIS3/issues/4924)
@@ -55,6 +57,8 @@ release.
 - Fixed algorithm for applying rolling shutter jitter. Matches implementation in USGSCSM.
 - Fixed isis2std incorrectly outputing signed 16 bit tiff files. [#4897](https://github.com/USGS-Astrogeology/ISIS3/issues/4897)
 - Fixed CNetCombinePt logging functionality such that only merged points are included in the log. [#4973](https://github.com/USGS-Astrogeology/ISIS3/issues/4973)
+- Removed SpkCenterId functions in Cassini camera models due to spkwriter writing positions of Cassini relative to Titan but labeling
+it in the kernel as the position relative to the Saturn Barycenter. [#4942](https://github.com/USGS-Astrogeology/ISIS3/issues/4942)
 
 
 ## [7.0.0] - 2022-02-11
