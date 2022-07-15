@@ -80,6 +80,18 @@ int main(int argc, char *argv[]) {
     success = shapeModelFromPvlShape.intersectSurface(obsPos, lookDir);
     qDebug() << "Intersection successful?     " << toString(success);
 
+    qDebug() << "Try to intersect surface at obsPos (1000,0,0) and lookDir (-1,0,0)";
+    obsPos[0]  = 1000.0;  obsPos[1]  = 0.0;   obsPos[2]  = 0.0;
+    lookDir[0] = -1.0;  lookDir[1] = 0.0;  lookDir[2] = 0.0;
+    success = shapeModelFromPvlShape.intersectSurface(obsPos, lookDir);
+    if (success) {
+      SurfacePoint *point = shapeModelFromPvlShape.surfaceIntersection();
+      qDebug() << "Intercept X = " << point->DisplacementToDouble(point->GetX(), SurfacePoint::Kilometers);
+      qDebug() << "Intercept Y = " << point->DisplacementToDouble(point->GetY(), SurfacePoint::Kilometers);
+      qDebug() << "Intercept Z = " << point->DisplacementToDouble(point->GetZ(), SurfacePoint::Kilometers);
+    }
+    qDebug() << "Intersection successful?     " << toString(success);
+
     qDebug() << "";
     qDebug() << "Construct NaifDskShape object from cube labels with ElevationModel=DSK file.";    
     Pvl pvlWithElevation("./st_2530292409_v_DskElevationModel.lbl");
@@ -160,7 +172,6 @@ int main(int argc, char *argv[]) {
     qDebug() << "Local normal from neighbor points:   "
              << QVector<double>::fromStdVector(shapeModelFromPvlElevation.normal());
     qDebug() << "";
-
 
     qDebug() << "================================= Error Throws ==================================";
     qDebug() << "Construct NaifDskShape object from cube labels with ShapeModel=Null.";    

@@ -43,6 +43,7 @@ namespace Isis {
     setName("DSK");
   }
 
+
   /**
    * @brief Constructor provided for instantiation from an ISIS cube
    *
@@ -84,6 +85,7 @@ namespace Isis {
     m_model = NaifDskPlateModel(dskFile);
 
   }
+
 
   /**
    * @brief Constructor for creating new shape model from the same DSK file
@@ -144,6 +146,37 @@ namespace Isis {
     return ( success );
   }
 
+
+  /**
+  * @brief Compute surface intersection with optional occlusion check
+  *
+  * This method sets the surface point at the given latitude, longitude. The
+  * derived model is called to get the radius at that location to complete the
+  * accuracy of the surface point, them the derived method is called to complete
+  * the intersection.
+  *
+  * @author 2022-07-14 Stuart Sides, Jesse Mapel
+  *
+  * @param surfpt       Absolute point on the surface to check
+  * @param observerPos  Position of the observer
+  * @param backCheck    Flag to indicate occlusion check
+  *
+  * @return bool        True if the intersection point is valid (visable)
+  */
+  bool NaifDskShape::intersectSurface(const SurfacePoint &surfpt,
+                                    const std::vector<double> &observerPos,
+                                    const bool &backCheck) {
+
+    std::vector<double> look(3);
+    look[0] = surfpt.GetX().kilometers() - observerPos[0];
+    look[1] = surfpt.GetY().kilometers() - observerPos[1];
+    look[2] = surfpt.GetZ().kilometers() - observerPos[2];
+
+    return intersectSurface(observerPos, look);
+
+  }
+
+
   /**
    * @brief Determine DEM radius at a given lat/lon grid point
    *
@@ -166,6 +199,7 @@ namespace Isis {
     if ( !pnt.isNull() )  return (pnt->GetLocalRadius());
     return (Distance());
   }
+
 
   /**
    * @brief Set the normal vector to the intercept point normal
@@ -229,7 +263,6 @@ namespace Isis {
    * @param neighborPoints Input body-fixed points to compute normal for
    */
   void NaifDskShape::calculateLocalNormal(QVector<double *> neighborPoints) {
-
     // Sanity check
     if ( !hasIntersection() ) { // hasIntersection()  <==>  !m_intercept.isNull()
       QString mess = "Intercept point does not exist - cannot provide normal vector";
@@ -247,12 +280,14 @@ namespace Isis {
      calculateSurfaceNormal();
   }
 
+
   /** Return the surface normal of the ellipsi=oud */
   void NaifDskShape::calculateSurfaceNormal() {
     // ShapeModel (parent class) throws error if no intersection
     setNormal(ellipsoidNormal().toStdVector());// this takes care of setHasNormal(true);
     return;
   }
+
 
   /**
    * @brief Compute the true surface normal vector of an ellipsoid
@@ -300,10 +335,12 @@ namespace Isis {
     return (norm);
   }
 
+
   /** Returns a direct reference to the DSK plate model file interface */
   const NaifDskPlateModel &NaifDskShape::model() const {
     return (m_model);
   }
+
 
   /**
    * @brief Returns a pointer to the current intercept
@@ -321,4 +358,4 @@ namespace Isis {
     return ( m_intercept.data() );
   }
 
-}; // namespace Isis
+}; // namespace Isis 
