@@ -57,7 +57,8 @@ TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
 
 
 TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
-  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+//  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+  QString cubeFileName = "phocubeTEMP.cub";
   QVector<QString> args = {"to=" + cubeFileName, "dn=true", "phase=true", "emission=true",
                            "incidence=true", "localemission=true", "localincidence=true",
                            "latitude=true", "longitude=true", "pixelresolution=true",
@@ -112,6 +113,39 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
   EXPECT_NEAR(hist->Sum(), -38442.610203064978, .000001);
   EXPECT_EQ(hist->ValidPixels(), 675);
   EXPECT_NEAR(hist->StandardDeviation(), 667.22433030730758, .000001);
+
+  QVector<double> bandAvg { 13.0,       79.770518,  10.803234,   70.294379,    11.761092,
+                            68.010367,  10.087063, 255.646436,   18.841226,    18.841226,
+                            18.841226,  18.841226,  19.245272,  333.908975,    91.554202,
+                           242.133221,   8.841775, 269.934427,  118.758131,     0.019245,
+                             0.069564, 311.691558, -46.862035, -832.758554, -3254.327910,
+                           597.579855,   7.769864 };
+  QVector<double> bandSum {  325.0,      1994.262954,   270.080856,   1757.359497,    294.027304,
+                            1700.259178,  252.176593,  6391.160919,    471.030651,    471.030651,
+                             471.030651,  471.030651,   481.131809,   8347.724395,   2288.855072,
+                            6053.330535,  221.044387,  6748.360687,   2968.953285,      0.481131,
+                               1.739105, 7792.288970, -1171.550888, -20818.963867, -81358.197753,
+                           14939.496398,  194.246617 };
+  QVector<double> bandValid {25, 25, 25, 25, 25,
+                             25, 25, 25, 25, 25,
+                             25, 25, 25, 25, 25,
+                             25, 25, 25, 25, 25,
+                             25, 25, 25, 25, 25,
+                             25, 25 };
+  QVector<double> bandStd {7.359800,  0.002117,   0.002563, 0.000482, 0.062853,
+                           0.061155,  0.000466,   0.000481, 0.000144, 0.000144,
+                           0.000144,  0.000144,   0.004518, 0.012455, 0.006764,
+                           0.018025,  0.002090,   0.013626, 0.000216, 4.518225e-06,
+                           0.000128,  0.003065,   0.002088, 0.027295, 0.007589,
+                           0.0278004, 3.211263e-5 };
+
+  for (int i=1; i<=cube.bandCount(); i++) {
+    std::unique_ptr<Histogram> hist(cube.histogram(i));
+    EXPECT_NEAR(hist->Average(), bandAvg[i-1], 0.000001);
+    EXPECT_NEAR(hist->Sum(), bandSum[i-1], 0.000001);
+    EXPECT_EQ(hist->ValidPixels(), bandValid[i-1]);
+    EXPECT_NEAR(hist->StandardDeviation(), bandStd[i-1], 0.000001);
+  }
 
   cube.close();
 }

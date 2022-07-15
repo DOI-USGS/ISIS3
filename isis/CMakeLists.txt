@@ -13,6 +13,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 set(CMAKE_FRAMEWORK_PATH /System/Library/Frameworks/)
 set(CMAKE_FIND_FRAMEWORK LAST)
 
+# Enable use of @rpath on Mac
+set(CMAKE_MACOS_RPATH 1)
+
 include(AddIsisModule)
 include(Utilities)
 include(TestSetup)
@@ -285,7 +288,15 @@ find_package(Armadillo         REQUIRED)
 find_package(Threads)
 find_package(inja              REQUIRED)
 
+# Setup for googletest/googlemock before adding SensorUtilities so we build its tests
+if(buildTests)
+  set(INSTALL_GTEST OFF)
+  add_subdirectory(../gtest gtest)
+else()
+  set(SENSOR_UTILITIES_BUILD_TESTS OFF CACHE BOOL "Disable SensorUtilities Tests")
+endif()
 
+add_subdirectory(../SensorUtilities SensorUtilities)
 
 # In this case, we specify the version numbers being searched for in the non-traditional installs.
 if(APPLE)
@@ -339,7 +350,7 @@ foreach (_variableName ${_variableNames})
 endforeach()
 
 # add target based linkages to ALLLIBS variable
-list(APPEND ALLLIBS pantor::inja)
+list(APPEND ALLLIBS pantor::inja sensorutilities)
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)

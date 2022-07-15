@@ -462,7 +462,9 @@ namespace Isis {
   bool cam2mapForward::Xform(double &outSample, double &outLine,
                              const double inSample, const double inLine) {
     // See if the input image coordinate converts to a lat/lon
-    if (!p_incam->SetImage(inSample,inLine)) return false;
+    if (!p_incam->SetImage(inSample,inLine)) {
+      return false;
+    }
 
     // Does that ground coordinate work in the map projection
     double lat = p_incam->UniversalLatitude();
@@ -568,6 +570,7 @@ namespace Isis {
   }
 
   void bandChange(const int band) {
+    // band dependant band change
     incam->SetBand(band);
   }
 }

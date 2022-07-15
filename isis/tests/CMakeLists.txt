@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(INSTALL_GTEST OFF)
-add_subdirectory(../../gtest gtest)
 include(GoogleTest)
 
 add_dependencies(isis isis)
