@@ -464,6 +464,10 @@ End
       This corrects inconsistencies of footprint generation failing in caminfo
       but passing in footprintinit. Fixes #4651.
     </change>
+    <change name="Adam Paquette" date="2021-07-06">
+      Updated CAMSTATS parameter decision tree to allow users to extract
+      camstats even if the cube contains a camstats table. Fixes #4919.
+    </change>
   </history>
 
   <category>
