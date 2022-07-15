@@ -40,7 +40,7 @@ TEST(LronaccalDefault, FunctionalTestsLronaccal) {
     geometrically transformed (i.e. scaled, rotated, sheared, or
     reflected) or cropped
   */
-  QString iCubeFile =  "data/lronaccal/input/M1333276014R.cub";
+  QString iCubeFile =  "$ISISTESTDATA/isis/src/lro/apps/lronaccal/M1333276014R.cub";
   QString oCubeFile = outputDir.path() + "/out.default.cub";
   QString oCubeCropFile = outputDir.path() + "/out.default.crop.cub";
   QString tCubeFile = "data/lronaccal/truth/M1333276014R.default.crop.cub";
@@ -88,7 +88,7 @@ TEST(LronaccalNear, FunctionalTestsLronaccal) {
     geometrically transformed (i.e. scaled, rotated, sheared, or
     reflected) or cropped
   */
-  QString iCubeFile =  "data/lronaccal/input/M1333276014R.cub";
+  QString iCubeFile =  "$ISISTESTDATA/isis/src/lro/apps/lronaccal/M1333276014R.cub";
   QString oCubeFile = outputDir.path() + "/out.near.cub";
   QString oCubeCropFile = outputDir.path() + "/out.near.crop.cub";
   QString tCubeFile = "data/lronaccal/truth/M1333276014R.near.crop.cub";
@@ -132,7 +132,7 @@ TEST(LronaccalPair, FunctionalTestsLronaccal) {
 
   ASSERT_TRUE(outputDir.isValid());
 
-  QString iCubeFile =  "data/lronaccal/input/M1333276014R.cub";
+  QString iCubeFile =  "$ISISTESTDATA/isis/src/lro/apps/lronaccal/M1333276014R.cub";
   QString oCubeFile = outputDir.path() + "/out.pair.cub";
   QString oCubeCropFile = outputDir.path() + "/out.pair.crop.cub";
   QString tCubeFile = "data/lronaccal/truth/M1333276014R.pair.crop.cub";
