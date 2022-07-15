@@ -46,6 +46,7 @@ release.
 - Re-added and refactored the LRO photometry application lrowacphomap to be callable for testing purposes. Issue: [#4960](https://github.com/USGS-Astrogeology/ISIS3/issues/4960), PR: [#4961](https://github.com/USGS-Astrogeology/ISIS3/pull/4961)
 - Added check to determine if poles were a valid projection point in ImagePolygon when generating footprint for a map projected image. [#4390](https://github.com/USGS-Astrogeology/ISIS3/issues/4390)
 - Added changes to lronaccal to use time-dependent dark files for dark correction and use of specific dark files for images with exp code of zero. Also added GTests for lronaccal and refactored code to make callable. Added 3 truth cubes to testing directory.  PR[#4520](https://github.com/USGS-Astrogeology/ISIS3/pull/4520)
+- Added failure for images with missing original label in caminfo. [#4817](https://github.com/USGS-Astrogeology/ISIS3/pull/4817)
 
 ### Deprecated
 
