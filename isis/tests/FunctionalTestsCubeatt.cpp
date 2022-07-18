@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Cube.h"
-#include "Fixtures.h"
+#include "CubeFixtures.h"
 #include "Statistics.h"
 
 #include "cubeatt.h"
@@ -51,8 +51,8 @@ TEST_F(SmallCube, FunctionalTestCubeattNoChange) {
   // Setting the pixel range modifies the base/multiplier, so check those.
   EXPECT_EQ(outputCube.base(), 0);
   EXPECT_EQ(outputCube.multiplier(), 1);
-  EXPECT_EQ(outputCube.bandCount(), 10);  
- 
+  EXPECT_EQ(outputCube.bandCount(), 10);
+
   // Test that DNs match in the input and output cubes
   Statistics *outputStats = outputCube.statistics();
   Statistics *inputStats = testCube->statistics();
@@ -68,7 +68,7 @@ TEST_F(SmallCube, FunctionalTestCubeattVirtualBands) {
   UserInterface options(APP_XML, args);
   cubeatt(options);
   Cube outputCube(cubePath);
-  EXPECT_EQ(outputCube.bandCount(), 9);  
+  EXPECT_EQ(outputCube.bandCount(), 9);
 
   // Do need to check the label for this one, since outputCube.physicalBand() will not work
   // in this context:
@@ -151,7 +151,7 @@ TEST_F(SmallCube, FunctionalTestCubeattInputAndOutputAttributes) {
   Statistics *outputStats = outputCube.statistics();
   EXPECT_GE(outputStats->Minimum(), 200);
   EXPECT_LE(outputStats->Maximum(), 300);
-  EXPECT_EQ(outputCube.bandCount(), 3);  
+  EXPECT_EQ(outputCube.bandCount(), 3);
 
   Pvl *label = outputCube.label();
   PvlGroup bandBin = label->findObject("IsisCube").findGroup("BandBin");

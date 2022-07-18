@@ -1,7 +1,8 @@
 #include <QTemporaryDir>
 
 #include "himos.h"
-#include "Fixtures.h"
+#include "CameraFixtures.h"
+#include "FileList.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"

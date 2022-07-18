@@ -3,10 +3,10 @@
 #include <iostream>
 
 #include "Cube.h"
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "TestUtilities.h"
 #include "ImageImporter.h"
-#include "Histogram.h" 
+#include "Histogram.h"
 
 #include "gmock/gmock.h"
 
@@ -18,12 +18,12 @@ TEST_F(TempTestingFiles, DISABLED_UnitTestImageImporterTestJpeg) {
 
   ImageImporter *importer = ImageImporter::fromFileName(inputName);
   FileName outputName(tempDir.path() + "/out.cub");
-  importer->import(outputName); 
-  delete importer; 
+  importer->import(outputName);
+  delete importer;
 
   Cube outCube(outputName.expanded());
   Pvl *outLabel = outCube.label();
-  
+
   PvlGroup dimensions = outLabel->findGroup("Dimensions", Pvl::Traverse);
   ASSERT_EQ((int)dimensions["Samples"], 126);
   ASSERT_EQ((int)dimensions["Lines"], 126);
@@ -36,7 +36,7 @@ TEST_F(TempTestingFiles, DISABLED_UnitTestImageImporterTestJpeg) {
   ASSERT_EQ((double)pixels["Multiplier"], 1.0);
 
   PvlGroup bandbin = outLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red"); 
+  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red");
   ASSERT_EQ(bandbin["Name"][1].toStdString(), "Green");
   ASSERT_EQ(bandbin["Name"][2].toStdString(), "Blue");
 
@@ -53,12 +53,12 @@ TEST_F(TempTestingFiles, UnitTestImageImporterStd2IsisTiffRgb) {
 
   ImageImporter *importer = ImageImporter::fromFileName(inputName);
   FileName outputName(tempDir.path() + "/out.cub");
-  importer->import(outputName); 
-  delete importer; 
+  importer->import(outputName);
+  delete importer;
 
   Cube outCube(outputName.expanded());
   Pvl *outLabel = outCube.label();
-  
+
   PvlGroup dimensions = outLabel->findGroup("Dimensions", Pvl::Traverse);
   ASSERT_EQ((int)dimensions["Samples"], 256);
   ASSERT_EQ((int)dimensions["Lines"], 192);
@@ -71,7 +71,7 @@ TEST_F(TempTestingFiles, UnitTestImageImporterStd2IsisTiffRgb) {
   ASSERT_EQ((double)pixels["Multiplier"], 1.0);
 
   PvlGroup bandbin = outLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red"); 
+  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red");
   ASSERT_EQ(bandbin["Name"][1].toStdString(), "Green");
   ASSERT_EQ(bandbin["Name"][2].toStdString(), "Blue");
 
@@ -88,12 +88,12 @@ TEST_F(TempTestingFiles, UnitTestImageImporterStd2IsisJp2) {
 
   ImageImporter *importer = ImageImporter::fromFileName(inputName);
   FileName outputName(tempDir.path() + "/out.cub");
-  importer->import(outputName); 
-  delete importer; 
-  
+  importer->import(outputName);
+  delete importer;
+
   Cube outCube(outputName.expanded());
   Pvl *outLabel = outCube.label();
-  
+
   PvlGroup dimensions = outLabel->findGroup("Dimensions", Pvl::Traverse);
   ASSERT_EQ((int)dimensions["Samples"], 126);
   ASSERT_EQ((int)dimensions["Lines"], 126);
@@ -106,12 +106,12 @@ TEST_F(TempTestingFiles, UnitTestImageImporterStd2IsisJp2) {
   ASSERT_EQ((double)pixels["Multiplier"], 1.0);
 
   PvlGroup bandbin = outLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red"); 
+  ASSERT_EQ(bandbin["Name"][0].toStdString(), "Red");
   ASSERT_EQ(bandbin["Name"][1].toStdString(), "Green");
   ASSERT_EQ(bandbin["Name"][2].toStdString(), "Blue");
 
   std::unique_ptr<Histogram> hist (outCube.histogram());
-  
+
   ASSERT_NEAR(hist->Average(), 113.12452758881331, .00001);
   ASSERT_EQ(hist->Sum(), 1795965);
   ASSERT_EQ(hist->ValidPixels(), 15876);

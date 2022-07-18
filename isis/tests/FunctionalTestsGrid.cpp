@@ -4,9 +4,12 @@
 #include <QTextStream>
 #include <QStringList>
 
-#include "Fixtures.h"
+#include "CubeFixtures.h"
+#include "CameraFixtures.h"
+#include "CubeFixtures.h"
 #include "LineManager.h"
 #include "PvlGroup.h"
+#include "SpecialPixel.h"
 #include "TestUtilities.h"
 
 #include "gmock/gmock.h"
@@ -89,11 +92,11 @@ TEST_F(SmallCube, FunctionalTestGridHrsLrs) {
   }
 
   LineManager line(outputCube);
-  for (int i = 1; i <= outputCube.lineCount(); i++) { 
+  for (int i = 1; i <= outputCube.lineCount(); i++) {
     line.SetLine(i);
     outputCube.read(line);
 
-    for (int j = 0; j < line.size(); j++) { 
+    for (int j = 0; j < line.size(); j++) {
       if (i % 5 == 1 || j % 5 == 0 ) {
         EXPECT_EQ(line[j], Isis::Lrs);
       }
@@ -119,11 +122,11 @@ TEST_F(SmallCube, FunctionalTestGridLrsNull) {
   }
 
   LineManager line(outputCube);
-  for (int i = 1; i <= outputCube.lineCount(); i++) { 
+  for (int i = 1; i <= outputCube.lineCount(); i++) {
     line.SetLine(i);
     outputCube.read(line);
 
-    for (int j = 0; j < line.size(); j++) { 
+    for (int j = 0; j < line.size(); j++) {
       if (i % 5 == 1 || j % 5 == 0) {
         EXPECT_EQ(line[j], Isis::Null);
       }
@@ -149,11 +152,11 @@ TEST_F(SmallCube, FunctionalTestGridNullDn) {
   }
 
   LineManager line(outputCube);
-  for (int i = 1; i <= outputCube.lineCount(); i++) { 
+  for (int i = 1; i <= outputCube.lineCount(); i++) {
     line.SetLine(i);
     outputCube.read(line);
 
-    for (int j = 0; j < line.size(); j++) { 
+    for (int j = 0; j < line.size(); j++) {
       if (i % 5 == 1 || j % 5 == 0) {
         EXPECT_DOUBLE_EQ(line[j], 0.0);
       }
@@ -179,11 +182,11 @@ TEST_F(SmallCube, FunctionalTestGridDnHrs) {
   }
 
   LineManager line(outputCube);
-  for (int i = 1; i <= outputCube.lineCount(); i++) { 
+  for (int i = 1; i <= outputCube.lineCount(); i++) {
     line.SetLine(i);
     outputCube.read(line);
 
-    for (int j = 0; j < line.size(); j++) { 
+    for (int j = 0; j < line.size(); j++) {
       if (i % 5 == 1 || j % 5 == 0) {
         EXPECT_EQ(line[j], Isis::Hrs);
       }
@@ -339,7 +342,7 @@ TEST_F(DefaultCube, FunctionalTestGridWorld) {
   }
   projTestCube->reopen("rw");
 
-  // need to remove old camera pointer 
+  // need to remove old camera pointer
   delete projTestCube;
 
   // Cube now has new mapping group

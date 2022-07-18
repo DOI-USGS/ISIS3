@@ -14,7 +14,7 @@
 #include "ControlMeasure.h"
 #include "Distance.h"
 #include "FileName.h"
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "SurfacePoint.h"

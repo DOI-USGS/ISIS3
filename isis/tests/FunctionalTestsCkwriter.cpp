@@ -1,7 +1,11 @@
 #include "ckwriter.h"
 
-#include "Fixtures.h"
+#include "Camera.h"
+#include "CameraFixtures.h"
+#include "NetworkFixtures.h"
 #include "Pvl.h"
+#include "SpiceRotation.h"
+#include "Table.h"
 #include "TextFile.h"
 #include "TestUtilities.h"
 

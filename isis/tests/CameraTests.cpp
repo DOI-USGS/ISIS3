@@ -12,7 +12,7 @@
 #include "TestUtilities.h"
 #include "FileName.h"
 #include "Camera.h"
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 
 using namespace Isis;
 
