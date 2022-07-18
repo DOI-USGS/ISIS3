@@ -100,12 +100,12 @@ namespace Isis {
       // Logs the cube if it falls outside of the given mosaic
       PvlGroup outsiders("Outside");
       outsiders += PvlKeyword("File", sInputFile);
-      log->addGroup(outsiders);
+      log->addLogGroup(outsiders);
     }
     else {
       // Logs the input file location in the mosaic
       for (int i = 0; i < m.imagePositions().groups(); i++) {
-        log->addGroup(m.imagePositions().group(i));
+        log->addLogGroup(m.imagePositions().group(i));
       }
     }
 

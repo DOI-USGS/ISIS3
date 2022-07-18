@@ -459,7 +459,7 @@ namespace Isis {
     QString logstr = ss.str().c_str();
 
     if (log){
-      log->addGroup(results);
+      log->addLogGroup(results);
     }
 
     if (!ui.IsInteractive()) {

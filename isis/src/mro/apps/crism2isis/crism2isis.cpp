@@ -174,7 +174,7 @@ namespace Isis{
                           "using the nearest-neighbor algorithm due to gimble "
                           "jitter of the MRO CRISM instrument.");
     if (log){
-      log->addGroup(results);
+      log->addLogGroup(results);
     }
     return;
   }

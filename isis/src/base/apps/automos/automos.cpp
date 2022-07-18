@@ -78,7 +78,7 @@ namespace Isis {
         PvlGroup outsiders("Outside");
         outsiders += PvlKeyword("File", list[i].toString());
         if (log) {
-          log->addGroup(outsiders);
+          log->addLogGroup(outsiders);
         }
       }
       else {
@@ -95,7 +95,7 @@ namespace Isis {
     // Logs the input file location in the mosaic
     for (int i = 0; i < m.imagePositions().groups(); i++) {
       if (log) {
-        log->addGroup(m.imagePositions().group(i));
+        log->addLogGroup(m.imagePositions().group(i));
       }
     }
 

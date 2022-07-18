@@ -372,7 +372,7 @@ namespace Isis {
 
       // Write the results to the log
       if(log) {
-        log->addGroup(results);
+        log->addLogGroup(results);
       }
 
       // Unfurnishes kernel files to prevent file table overflow

@@ -72,7 +72,7 @@ namespace Isis {
                                                    in addition error in the bundle adjust. \
                                                    We recommend that you do not solve for radii at this moment."));
          if(log) {
-           log->PvlObject::addGroup(radiusSolveWarning);
+           log->addLogGroup(radiusSolveWarning);
          }
       }
     }
@@ -183,10 +183,10 @@ namespace Isis {
         iss >> summary;
 
         for (auto grpIt = summary.beginGroup(); grpIt!= summary.endGroup(); grpIt++) {
-          log->addGroup(*grpIt);
+          log->addLogGroup(*grpIt);
         }
 
-        log->addGroup(gp);
+        log->addLogGroup(gp);
       }
       delete bundleSolution;
     }

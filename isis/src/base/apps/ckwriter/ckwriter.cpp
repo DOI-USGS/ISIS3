@@ -51,7 +51,7 @@ namespace Isis {
         overlap.setName("Overlaps");
         overlap.addKeyword(PvlKeyword("Class", "WARNING"), PvlContainer::Replace);
         if (log) {
-          log->addGroup(overlap);
+          log->addLogGroup(overlap);
         }
       }
     }

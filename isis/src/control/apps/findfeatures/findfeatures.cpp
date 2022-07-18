@@ -313,7 +313,7 @@ namespace Isis{
     }
 
     if(log){
-      log->addGroup(bestinfo);
+      log->addLogGroup(bestinfo);
     }
 
 
@@ -353,7 +353,7 @@ namespace Isis{
       // Write out control network
       cnet.Write( ui.GetFileName("ONET") );
       if(log){
-        log->addGroup(cnetinfo);
+        log->addLogGroup(cnetinfo);
       }
     }
 

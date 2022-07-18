@@ -370,7 +370,7 @@ namespace Isis {
     p.EndProcess();
 
     if (log){
-      log->addGroup(cleanOutGrp);
+      log->addLogGroup(cleanOutGrp);
     }
 
     // Cleanup

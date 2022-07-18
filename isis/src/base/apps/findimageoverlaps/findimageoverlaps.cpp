@@ -87,7 +87,7 @@ namespace Isis {
     results += PvlKeyword("ErrorCount", toString((BigInt)overlaps.Errors().size()));
 
     if (log) {
-      log->addGroup(results);
+      log->addLogGroup(results);
     }
   }
 }

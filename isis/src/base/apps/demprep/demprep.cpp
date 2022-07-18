@@ -68,7 +68,7 @@ namespace Isis{
       demRange += PvlKeyword("MinimumRadius", toString(inCubeStats.Minimum()), "meters");
       demRange += PvlKeyword("MaximumRadius", toString(inCubeStats.Maximum()), "meters");
       if (log){
-        log->addGroup(demRange);
+        log->addLogGroup(demRange);
       }
 
       // Store min/max radii values in new ShapeModelStatistics table
@@ -268,7 +268,7 @@ namespace Isis{
     demRange += PvlKeyword("MinimumRadius", toString(outCubeStats.Minimum()), "meters");
     demRange += PvlKeyword("MaximumRadius", toString(outCubeStats.Maximum()), "meters");
     if (log){
-      log->addGroup(demRange);
+      log->addLogGroup(demRange);
     }
 
     // Store min/max radii values in new ShapeModelStatistics table

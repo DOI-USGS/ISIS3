@@ -121,7 +121,7 @@ namespace Isis {
     results.setName("Results");
     results[0].addComment("Projection offsets and multipliers have been changed from");
     results[0].addComment("defaults. New values are below.");
-    log->addGroup(results);
+    log->addLogGroup(results);
   }
 
   p.EndProcess();
