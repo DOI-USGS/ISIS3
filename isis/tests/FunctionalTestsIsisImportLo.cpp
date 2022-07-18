@@ -3,9 +3,9 @@
 
 #include <QRegExp>
 #include <QString>
+#include <QTemporaryDir>
 #include <nlohmann/json.hpp>
 
-#include "Fixtures.h"
 #include "Histogram.h"
 #include "md5wrapper.h"
 #include "Pvl.h"

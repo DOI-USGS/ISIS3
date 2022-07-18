@@ -3,7 +3,7 @@
 #include "TestUtilities.h"
 #include "iTime.h"
 
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include <gtest/gtest.h>
 
 using namespace Isis;

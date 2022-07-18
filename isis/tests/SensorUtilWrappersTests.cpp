@@ -1,6 +1,6 @@
 #include "gmock/gmock.h"
 
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "Mocks.h"
 
 #include "csm.h"

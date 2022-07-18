@@ -1,7 +1,7 @@
 #include <QTemporaryDir>
 
 #include "msi2isis.h"
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "LineManager.h"
 #include "Pvl.h"
 #include "PvlGroup.h"

@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "cnetpvl2bin.h"
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
 #include "Progress.h"
 #include "gmock/gmock.h"
 #include "FileName.h"

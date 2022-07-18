@@ -2,7 +2,7 @@
 #include <memory>
 
 #include "mvic2isis.h"
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -12,8 +12,6 @@
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-
-#include "Fixtures.h"
 
 using namespace Isis;
 

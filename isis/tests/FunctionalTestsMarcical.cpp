@@ -1,7 +1,6 @@
 #include <QTemporaryDir>
 
 #include "marcical.h"
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -90,7 +89,7 @@ TEST(Marcical, MarcicalTestSingleDuration) {
   EXPECT_NEAR( outHist->Average(), 0.00656912, 1e-7 );
   EXPECT_NEAR( outHist->Sum(), 0.131382, 1e-6 );
   EXPECT_EQ( outHist->ValidPixels(), 20 );
-  EXPECT_NEAR( outHist->StandardDeviation(), 0.000671733, 1e-8 ); 
+  EXPECT_NEAR( outHist->StandardDeviation(), 0.000671733, 1e-8 );
 }
 
 TEST(Marcical, MarcicalTestSingleDurationNoIof) {
@@ -110,7 +109,7 @@ TEST(Marcical, MarcicalTestSingleDurationNoIof) {
 
   PvlGroup &inst = label->findGroup("Instrument", Pvl::Traverse);
   EXPECT_EQ( inst["VariableExposureDuration"][0].toStdString(), "8.8" );
-  
+
   std::unique_ptr<Histogram> outHist (outCube.histogram());
   EXPECT_NEAR( outHist->Average(), 1.61438, 1e-4 );
   EXPECT_NEAR( outHist->Sum(), 32.2875, 1e-4 );

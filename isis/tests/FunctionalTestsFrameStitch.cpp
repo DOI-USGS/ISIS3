@@ -10,7 +10,7 @@
 #include "Table.h"
 
 #include "TestUtilities.h"
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "gmock/gmock.h"
 
 #include "gmock/gmock.h"

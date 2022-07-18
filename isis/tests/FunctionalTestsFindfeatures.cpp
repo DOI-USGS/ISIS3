@@ -4,7 +4,7 @@
 #include <QTextStream>
 #include <QStringList>
 
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
 #include "SurfacePoint.h"

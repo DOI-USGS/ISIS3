@@ -5,8 +5,9 @@
 #include <QString>
 #include <nlohmann/json.hpp>
 
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "md5wrapper.h"
+#include "Plugin.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -112,7 +113,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportMerMICaseOne){
             StartByte = 2163162
             Bytes     = 19191
         End_Object
-        End         
+        End
     )");
   QVector<QString> args = {"from=data/isisimport/1M189529263EFF64KCP2977M2F1_cropped.IMG", "to=" + tempDir.path() + "/MerMI1.cub" };
   UserInterface options(APP_XML, args);
@@ -129,7 +130,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportMerMICaseOne){
   PvlGroup truthInstrument = truth.findGroup("Instrument", Isis::Plugin::Traverse);
   PvlGroup truthMerImageRequestParms = truth.findGroup("MerImageRequestParms", Isis::Plugin::Traverse);
   PvlGroup truthMerSubframeRequestParms = truth.findGroup("MerSubframeRequestParms", Isis::Plugin::Traverse);
-  
+
   PvlGroup outputDimensions = output.findGroup("Dimensions", Isis::Plugin::Traverse);
   PvlGroup outputPixels = output.findGroup("Pixels", Isis::Plugin::Traverse);
   PvlGroup outputArchive = output.findGroup("Archive", Isis::Plugin::Traverse);
@@ -253,7 +254,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportMerMICaseTwo){
   PvlGroup truthInstrument = truth.findGroup("Instrument", Isis::Plugin::Traverse);
   PvlGroup truthMerImageRequestParms = truth.findGroup("MerImageRequestParms", Isis::Plugin::Traverse);
   PvlGroup truthMerSubframeRequestParms = truth.findGroup("MerSubframeRequestParms", Isis::Plugin::Traverse);
-  
+
   PvlGroup outputDimensions = output.findGroup("Dimensions", Isis::Plugin::Traverse);
   PvlGroup outputPixels = output.findGroup("Pixels", Isis::Plugin::Traverse);
   PvlGroup outputArchive = output.findGroup("Archive", Isis::Plugin::Traverse);

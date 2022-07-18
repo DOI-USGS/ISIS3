@@ -1,7 +1,10 @@
 #include "Cube.h"
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
+#include "Table.h"
+#include "TableField.h"
+#include "TableRecord.h"
 #include "TestUtilities.h"
 #include "CameraStatistics.h"
 

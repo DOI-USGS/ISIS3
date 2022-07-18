@@ -1,5 +1,5 @@
 #include "Brick.h"
-#include "Fixtures.h"
+#include "CubeFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"

@@ -5,7 +5,7 @@
 #include <QString>
 #include <nlohmann/json.hpp>
 
-#include "Fixtures.h"
+#include "CubeFixtures.h"
 #include "md5wrapper.h"
 #include "OriginalLabel.h"
 #include "OriginalXmlLabel.h"

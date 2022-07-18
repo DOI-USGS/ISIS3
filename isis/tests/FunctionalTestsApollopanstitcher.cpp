@@ -13,7 +13,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
-#include "Fixtures.h"
+#include "TempFixtures.h"
 
 using namespace Isis;
 

@@ -1,6 +1,5 @@
 #include <QTemporaryDir>
 
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"

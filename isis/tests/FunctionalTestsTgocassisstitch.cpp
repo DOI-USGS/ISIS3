@@ -1,7 +1,7 @@
 #include <QTemporaryDir>
 
 #include "tgocassisstitch.h"
-#include "Fixtures.h"
+#include "FileList.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -16,7 +16,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/tgocassisstitch.xml").expan
 
 TEST(TgoCassisstitch, TgoCassisstitchMultiframeTest) {
   QTemporaryDir prefix;
-  
+
   FileList *cubeList = new FileList();
   cubeList->append("data/tgoCassis/tgocassisstitch/CAS-MCO-2016-11-22T16.16.16.833-BLU-03006-B1.cub");
   cubeList->append("data/tgoCassis/tgocassisstitch/CAS-MCO-2016-11-22T16.16.16.833-RED-01006-B1_crop.cub");
@@ -26,7 +26,7 @@ TEST(TgoCassisstitch, TgoCassisstitchMultiframeTest) {
   QString cubeListFile = prefix.path() + "/cubelist.lis";
   cubeList->write(cubeListFile);
 
-  QVector<QString> args = {"fromlist=" + cubeListFile,  
+  QVector<QString> args = {"fromlist=" + cubeListFile,
                            "outputprefix=" + prefix.path() + "/CAS-MCO"};
   UserInterface options(APP_XML, args);
 
@@ -36,7 +36,7 @@ TEST(TgoCassisstitch, TgoCassisstitchMultiframeTest) {
   catch (IException &e) {
     FAIL() << "Unable to run tgocassisstitch with cube list: " << e.what() << std::endl;
   }
-  
+
   Cube cube(prefix.path() + "/CAS-MCO-2016-11-22T16:16:16.833.cub");
   Pvl *isisLabel = cube.label();
 
@@ -55,12 +55,12 @@ TEST(TgoCassisstitch, TgoCassisstitchMultiframeTest) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.152e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "FULLCCD");
-  
+
   // Red Archive Group
   PvlGroup &arcRed = isisLabel->findGroup("archiveRED", Pvl::Traverse);
   EXPECT_EQ(arcRed["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(arcRed["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(arcRed["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:29");  
+  EXPECT_EQ(arcRed["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:29");
   EXPECT_DOUBLE_EQ(double(arcRed["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(arcRed["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(arcRed["PredictMaximumExposureTime"]), 5.2866);
@@ -77,16 +77,16 @@ TEST(TgoCassisstitch, TgoCassisstitchMultiframeTest) {
   EXPECT_EQ(int(arcRed["ImageFrequency"]), 1000000);
   EXPECT_EQ(int(arcRed["NumberOfWindows"]), 6);
   EXPECT_EQ(int(arcRed["UniqueIdentifier"]), 100732832);
-  EXPECT_EQ(arcRed["ExposureTimestamp"][0].toStdString(), "2f014e931416226d");  
+  EXPECT_EQ(arcRed["ExposureTimestamp"][0].toStdString(), "2f014e931416226d");
   EXPECT_DOUBLE_EQ(double(arcRed["ExposureTimePEHK"]), 1.152e-003);
   EXPECT_DOUBLE_EQ(double(arcRed["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(arcRed["YearDoy"]), 2016327);
-  
+
   // Pan Archive Group
   PvlGroup &arcPan = isisLabel->findGroup("archivePAN", Pvl::Traverse);
   EXPECT_EQ(arcPan["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(arcPan["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(arcPan["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:29");  
+  EXPECT_EQ(arcPan["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:29");
   EXPECT_DOUBLE_EQ(double(arcPan["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(arcPan["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(arcPan["PredictMaximumExposureTime"]), 5.2866);
@@ -103,16 +103,16 @@ TEST(TgoCassisstitch, TgoCassisstitchMultiframeTest) {
   EXPECT_EQ(int(arcPan["ImageFrequency"]), 1000000);
   EXPECT_EQ(int(arcPan["NumberOfWindows"]), 6);
   EXPECT_EQ(int(arcPan["UniqueIdentifier"]), 100732832);
-  EXPECT_EQ(arcPan["ExposureTimestamp"][0].toStdString(), "2f014e931416226d");  
+  EXPECT_EQ(arcPan["ExposureTimestamp"][0].toStdString(), "2f014e931416226d");
   EXPECT_DOUBLE_EQ(double(arcPan["ExposureTimePEHK"]), 1.152e-003);
   EXPECT_DOUBLE_EQ(double(arcPan["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(arcPan["YearDoy"]), 2016327);
-  
+
   // Nir Archive Group
   PvlGroup &arcNir = isisLabel->findGroup("archiveNIR", Pvl::Traverse);
   EXPECT_EQ(arcNir["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(arcNir["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(arcNir["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:29");  
+  EXPECT_EQ(arcNir["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:29");
   EXPECT_DOUBLE_EQ(double(arcNir["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(arcNir["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(arcNir["PredictMaximumExposureTime"]), 5.2866);
@@ -129,16 +129,16 @@ TEST(TgoCassisstitch, TgoCassisstitchMultiframeTest) {
   EXPECT_EQ(int(arcNir["ImageFrequency"]), 1000000);
   EXPECT_EQ(int(arcNir["NumberOfWindows"]), 6);
   EXPECT_EQ(int(arcNir["UniqueIdentifier"]), 100732832);
-  EXPECT_EQ(arcNir["ExposureTimestamp"][0].toStdString(), "2f014e931416226d");  
+  EXPECT_EQ(arcNir["ExposureTimestamp"][0].toStdString(), "2f014e931416226d");
   EXPECT_DOUBLE_EQ(double(arcNir["ExposureTimePEHK"]), 1.152e-003);
   EXPECT_DOUBLE_EQ(double(arcNir["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(arcNir["YearDoy"]), 2016327);
-    
+
   // Blue Archive Group
   PvlGroup &arcBlu = isisLabel->findGroup("archiveBLU", Pvl::Traverse);
   EXPECT_EQ(arcBlu["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(arcBlu["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(arcBlu["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:29");  
+  EXPECT_EQ(arcBlu["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:29");
   EXPECT_DOUBLE_EQ(double(arcBlu["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(arcBlu["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(arcBlu["PredictMaximumExposureTime"]), 5.2866);
@@ -155,12 +155,12 @@ TEST(TgoCassisstitch, TgoCassisstitchMultiframeTest) {
   EXPECT_EQ(int(arcBlu["ImageFrequency"]), 1000000);
   EXPECT_EQ(int(arcBlu["NumberOfWindows"]), 6);
   EXPECT_EQ(int(arcBlu["UniqueIdentifier"]), 100732832);
-  EXPECT_EQ(arcBlu["ExposureTimestamp"][0].toStdString(), "2f014e931416226d");  
+  EXPECT_EQ(arcBlu["ExposureTimestamp"][0].toStdString(), "2f014e931416226d");
   EXPECT_DOUBLE_EQ(double(arcBlu["ExposureTimePEHK"]), 1.152e-003);
   EXPECT_DOUBLE_EQ(double(arcBlu["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(arcBlu["YearDoy"]), 2016327);
-  
-  // Stitch Group 
+
+  // Stitch Group
   PvlGroup &stitch = isisLabel->findGroup("Stitch", Pvl::Traverse);
   EXPECT_EQ(stitch["OriginalFilters"][0].toStdString(), "PAN");
   EXPECT_EQ(stitch["OriginalFilters"][1].toStdString(), "NIR");
@@ -210,7 +210,7 @@ TEST(TgoCassisstitch, TgoCassisstitchMultiframeTest) {
 
 TEST(TgoCassisstitch, TgoCassisstitchSingleframeTest) {
   QTemporaryDir prefix;
-  
+
   FileList *cubeList = new FileList();
   cubeList->append("data/tgoCassis/tgocassisstitch/CAS-MCO-2016-11-22T16.16.10.833-BLU-03000-B1_crop.cub");
   cubeList->append("data/tgoCassis/tgocassisstitch/CAS-MCO-2016-11-22T16.16.10.833-NIR-02000-B1_crop.cub");
@@ -220,7 +220,7 @@ TEST(TgoCassisstitch, TgoCassisstitchSingleframeTest) {
   QString cubeListFile = prefix.path() + "/cubelist.lis";
   cubeList->write(cubeListFile);
 
-  QVector<QString> args = {"fromlist=" + cubeListFile,  
+  QVector<QString> args = {"fromlist=" + cubeListFile,
                            "outputprefix=" + prefix.path() + "/CAS-MCO"};
   UserInterface options(APP_XML, args);
 
@@ -230,7 +230,7 @@ TEST(TgoCassisstitch, TgoCassisstitchSingleframeTest) {
   catch (IException &e) {
     FAIL() << "Unable to run tgocassisstitch with cube list: " << e.what() << std::endl;
   }
-  
+
   Cube cube(prefix.path() + "/CAS-MCO-2016-11-22T16:16:10.833.cub");
   Pvl *isisLabel = cube.label();
 
@@ -249,12 +249,12 @@ TEST(TgoCassisstitch, TgoCassisstitchSingleframeTest) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.152e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "FULLCCD");
-  
+
   // Red Archive Group
   PvlGroup &arcRed = isisLabel->findGroup("archiveRED", Pvl::Traverse);
   EXPECT_EQ(arcRed["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(arcRed["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(arcRed["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:28");  
+  EXPECT_EQ(arcRed["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:28");
   EXPECT_DOUBLE_EQ(double(arcRed["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(arcRed["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(arcRed["PredictMaximumExposureTime"]), 5.3718000000000004);
@@ -271,16 +271,16 @@ TEST(TgoCassisstitch, TgoCassisstitchSingleframeTest) {
   EXPECT_EQ(int(arcRed["ImageFrequency"]), 1000000);
   EXPECT_EQ(int(arcRed["NumberOfWindows"]), 6);
   EXPECT_EQ(int(arcRed["UniqueIdentifier"]), 100732832);
-  EXPECT_EQ(arcRed["ExposureTimestamp"][0].toStdString(), "2f014e930e16226d");  
+  EXPECT_EQ(arcRed["ExposureTimestamp"][0].toStdString(), "2f014e930e16226d");
   EXPECT_DOUBLE_EQ(double(arcRed["ExposureTimePEHK"]), 1.152e-003);
   EXPECT_DOUBLE_EQ(double(arcRed["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(arcRed["YearDoy"]), 2016327);
-  
+
   // Pan Archive Group
   PvlGroup &arcPan = isisLabel->findGroup("archivePAN", Pvl::Traverse);
   EXPECT_EQ(arcPan["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(arcPan["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(arcPan["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:28");  
+  EXPECT_EQ(arcPan["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:28");
   EXPECT_DOUBLE_EQ(double(arcPan["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(arcPan["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(arcPan["PredictMaximumExposureTime"]), 5.3718);
@@ -297,16 +297,16 @@ TEST(TgoCassisstitch, TgoCassisstitchSingleframeTest) {
   EXPECT_EQ(int(arcPan["ImageFrequency"]), 1000000);
   EXPECT_EQ(int(arcPan["NumberOfWindows"]), 6);
   EXPECT_EQ(int(arcPan["UniqueIdentifier"]), 100732832);
-  EXPECT_EQ(arcPan["ExposureTimestamp"][0].toStdString(), "2f014e930e16226d");  
+  EXPECT_EQ(arcPan["ExposureTimestamp"][0].toStdString(), "2f014e930e16226d");
   EXPECT_DOUBLE_EQ(double(arcPan["ExposureTimePEHK"]), 1.152e-003);
   EXPECT_DOUBLE_EQ(double(arcPan["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(arcPan["YearDoy"]), 2016327);
-  
+
   // Nir Archive Group
   PvlGroup &arcNir = isisLabel->findGroup("archiveNIR", Pvl::Traverse);
   EXPECT_EQ(arcNir["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(arcNir["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(arcNir["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:28");  
+  EXPECT_EQ(arcNir["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:28");
   EXPECT_DOUBLE_EQ(double(arcNir["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(arcNir["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(arcNir["PredictMaximumExposureTime"]), 5.3718);
@@ -323,16 +323,16 @@ TEST(TgoCassisstitch, TgoCassisstitchSingleframeTest) {
   EXPECT_EQ(int(arcNir["ImageFrequency"]), 1000000);
   EXPECT_EQ(int(arcNir["NumberOfWindows"]), 6);
   EXPECT_EQ(int(arcNir["UniqueIdentifier"]), 100732832);
-  EXPECT_EQ(arcNir["ExposureTimestamp"][0].toStdString(), "2f014e930e16226d");  
+  EXPECT_EQ(arcNir["ExposureTimestamp"][0].toStdString(), "2f014e930e16226d");
   EXPECT_DOUBLE_EQ(double(arcNir["ExposureTimePEHK"]), 1.152e-003);
   EXPECT_DOUBLE_EQ(double(arcNir["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(arcNir["YearDoy"]), 2016327);
-    
+
   // Blue Archive Group
   PvlGroup &arcBlu = isisLabel->findGroup("archiveBLU", Pvl::Traverse);
   EXPECT_EQ(arcBlu["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(arcBlu["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(arcBlu["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:28");  
+  EXPECT_EQ(arcBlu["ProductCreationTime"][0].toStdString(), "2017-10-03T09:38:28");
   EXPECT_DOUBLE_EQ(double(arcBlu["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(arcBlu["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(arcBlu["PredictMaximumExposureTime"]), 5.3718);
@@ -349,12 +349,12 @@ TEST(TgoCassisstitch, TgoCassisstitchSingleframeTest) {
   EXPECT_EQ(int(arcBlu["ImageFrequency"]), 1000000);
   EXPECT_EQ(int(arcBlu["NumberOfWindows"]), 6);
   EXPECT_EQ(int(arcBlu["UniqueIdentifier"]), 100732832);
-  EXPECT_EQ(arcBlu["ExposureTimestamp"][0].toStdString(), "2f014e930e16226d");  
+  EXPECT_EQ(arcBlu["ExposureTimestamp"][0].toStdString(), "2f014e930e16226d");
   EXPECT_DOUBLE_EQ(double(arcBlu["ExposureTimePEHK"]), 1.152e-003);
   EXPECT_DOUBLE_EQ(double(arcBlu["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(arcBlu["YearDoy"]), 2016327);
-  
-  // Stitch Group 
+
+  // Stitch Group
   PvlGroup &stitch = isisLabel->findGroup("Stitch", Pvl::Traverse);
   EXPECT_EQ(stitch["OriginalFilters"][0].toStdString(), "RED");
   EXPECT_EQ(stitch["OriginalFilters"][1].toStdString(), "PAN");
@@ -400,5 +400,5 @@ TEST(TgoCassisstitch, TgoCassisstitchSingleframeTest) {
   EXPECT_DOUBLE_EQ(hist->Sum(), 19.647446379065514);
   EXPECT_EQ(hist->ValidPixels(), 100);
   EXPECT_NEAR(hist->StandardDeviation(), 0.063902362199265747, 0.0001);
-  
+
 }
