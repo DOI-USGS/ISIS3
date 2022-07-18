@@ -1,3 +1,5 @@
+
+
 #!/usr/bin/env python
 
 from pprint import pprint
@@ -20,7 +22,8 @@ def call_subprocess(command, redirect_stdout=True, redirect_stderr=False):
             stderr=stderr) as proc:
         (out, err) = proc.communicate()
 
-        log.debug(out.decode())
+        if out:
+            log.debug(out.decode())
         if err:
             log.warning(err.decode("utf-8").replace("\\n", "\n"))
 
@@ -40,21 +43,21 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
             config_path = config
             command_with_args = ["rclone", command, f'--config={config_path}', *extra_args]
             log.debug("Invoking : %s", " ".join(command_with_args))
-            return call_subprocess(command_with_args) 
+            return call_subprocess(command_with_args, redirect_stdout, redirect_stderr)
         else:
             log.debug(f"rclone() : using config string {config}")
 
             # most likely a config string
-            with tempfile.NamedTemporaryFile() as f:  
+            with tempfile.NamedTemporaryFile() as f:
                 config_path = path.realpath(f.name)
 
                 log.debug(f"USING CONFIG:\n{config}")
-                
+
                 f.write(config.encode())
                 command_with_args = ["rclone", command, f"--config={config_path}", *extra_args]
                 log.debug("Invoking : %s", " ".join(command_with_args))
-                return call_subprocess(command_with_args, redirect_stdout, redirect_stderr) 
-        
+                return call_subprocess(command_with_args, redirect_stdout, redirect_stderr)
+
     except FileNotFoundError as not_found_e:
         log.error("Executable not found. %s", not_found_e)
         return {
@@ -71,22 +74,22 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
 
 def driver_for_missions(command, mission_to_download, mission_list, cfg, destination, dry_run):
     """
-    Parameters 
+    Parameters
     ----------
     mission_to_download : str
-        mission that you want to download 
+        mission that you want to download
 
     mission_list : list
-        list of missions to loop though and get kernel's for mission to download 
+        list of missions to loop though and get kernel's for mission to download
 
     cfg : str
-        config file for mission's ftp and http paths 
+        config file for mission's ftp and http paths
 
-    destination str 
+    destination str
         path to location where files will be copied/downloaded too
     """
     path = None
-    for mission in mission_list: 
+    for mission in mission_list:
         if mission_to_download.lower() == mission.strip(":"):
             path = f"{mission}/"
             log.info(f"{mission_to_download} found in mission list")
@@ -97,26 +100,26 @@ def driver_for_missions(command, mission_to_download, mission_list, cfg, destina
 
     else:
         download_pub(command, destination, path, cfg, dry_run)
-             
+
 
 def download_pub(inputcommand, destination, mission_name, cfg, dry_run):
     """
-    Parameters 
+    Parameters
     ----------
-    
-    destination str 
+
+    destination str
             path to location where files will be copied/downloaded too
-    
+
     set_of_pub : set(str)
             set of kernels that will be downloaded
-    
+
     cfg : str
             config file
     """
-    
+
     log.info("Starting to download kernels")
 
-    if(inputcommand == "lsf"):        
+    if(inputcommand == "lsf"):
         mission_name = mission_name.strip("/")
         log.debug(f"Running lsf using mission name {mission_name}")
 
@@ -127,9 +130,20 @@ def download_pub(inputcommand, destination, mission_name, cfg, dry_run):
         f.write(json.loads(json.dumps(results.get('out').decode('utf-8'))))
         f.close()
     else:
-        mission_dir_name = mission_name.split("_")[0]
+        log.debug(f"Running {inputcommand} for {mission_name}")
+        mission_dir_name, source_type = mission_name.replace(":/", "").split("_")
+
+        log.debug(f"Mission_dir_name: {mission_dir_name}, source_type: {source_type}")
+
         destination += str(mission_dir_name).replace(":","")
-        extra_args=[f"{mission_name}",f"{destination}", "--progress", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
+        if source_type == "pub":
+            destination = os.path.join(destination, "kernels")
+
+        if not os.path.exists(destination):
+            log.debug("{destination} does not exist, making directory")
+            os.makedirs(destination)
+
+        extra_args=[f"{mission_name}",f"{destination}", "--progress", "--checkers=40", "--transfers=20", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
     if dry_run:
         extra_args.append("--dry-run")
 
@@ -140,21 +154,21 @@ def download_pub(inputcommand, destination, mission_name, cfg, dry_run):
 
 def main(command, mission, dest, legacy_flag, cfg_path, dry_run):
     """
-    Parameters 
+    Parameters
     ----------
-    
-    source str 
+
+    source str
             path to location where files are being copied/downloaded from
-    
+
     dest : str
                path to location where files will be copied/downloaded too
     """
     log.info("---Script starting---")
-    
+
     log.debug(f"Using config: {cfg_path}")
     result = rclone("listremotes", config=cfg_path)
     results = result.get('out').decode("utf-8").split("\n")
-    
+
     log.debug(f"Output from list remotes:\n {results}")
 
     if legacy_flag:
@@ -163,7 +177,7 @@ def main(command, mission, dest, legacy_flag, cfg_path, dry_run):
             driver_for_missions(command, remote, results, cfg_path, dest, dry_run)
 
     if(mission.upper() == "ALL"):
-        mission_arr =  ["tgo", "dawn", "cassini", "hayabusa2", "juno", "odyssey", "mro", "mex", "cassis", "apollo15", "apollo16", "apollo17", "base", "hayabusa", "chandrayaan1", "clementine1", "kaguya", "mariner10", "messenger", "mgs", "near", "newhorizons", "osirisrex", "rosetta", "smart1", "viking1", "viking2", "voyager1", "voyager2"]
+        mission_arr =  ["dawn", "cassini", "hayabusa2", "juno", "odyssey", "mro", "mex", "cassis", "apollo15", "apollo16", "apollo17", "base", "hayabusa", "chandrayaan1", "clementine1", "kaguya", "mariner10", "messenger", "mgs", "near", "newhorizons", "osirisrex", "rosetta", "smart1", "viking1", "viking2", "voyager1", "voyager2", "tgo"]
         for mission in mission_arr:
 
             if f"{mission}_pub:" in results:
@@ -183,7 +197,7 @@ def main(command, mission, dest, legacy_flag, cfg_path, dry_run):
 
 
 if __name__ == '__main__':
-    mission_arr =  ["tgo", "dawn", "cassini", "hayabusa2", "juno", "odyssey", "mro", "mex", "cassis", "apollo15", "apollo16", "apollo17", "base", "hayabusa", "chandrayaan1", "clementine1", "kaguya", "mariner10", "messenger", "mgs", "near", "newhorizons", "osirisrex", "rosetta", "smart1", "viking1", "viking2", "voyager1", "voyager2"]
+    mission_arr =  ["dawn", "cassini", "hayabusa2", "juno", "odyssey", "mro", "mex", "cassis", "apollo15", "apollo16", "apollo17", "base", "hayabusa", "chandrayaan1", "clementine1", "kaguya", "mariner10", "messenger", "mgs", "near", "newhorizons", "osirisrex", "rosetta", "smart1", "viking1", "viking2", "voyager1", "voyager2", "tgo"]
     missionList = ""
     for mission in mission_arr:
         missionList += mission + ", "
@@ -201,14 +215,14 @@ if __name__ == '__main__':
     parser.add_argument('dest', help='the destination to download files from source')
     parser.add_argument('--legacy', help="flag to download ISIS data prior to ISIS 4.1.0", default=False, action='store_true')
     parser.add_argument('--dry-run', help="run a dry run for rclone value should be a boolean", default=False, action='store_true')
-    parser.add_argument('-v', '--verbose', action='count', default=0)    
+    parser.add_argument('-v', '--verbose', action='count', default=0)
     parser.add_argument('--config', action='store', default=os.path.dirname(__file__) + '/../config/rclone.conf')
     args = parser.parse_args()
 
     log_kwargs = {
       'format': '%(asctime)s %(levelname)-8s %(message)s',
       'level': log.WARN,
-      'datefmt' : '%Y-%m-%d %H:%M:%S' 
+      'datefmt' : '%Y-%m-%d %H:%M:%S'
     }
 
     if args.verbose == 0:
@@ -221,4 +235,3 @@ if __name__ == '__main__':
     log.basicConfig(**log_kwargs)
 
     main(args.command, args.mission, args.dest, args.legacy, os.path.expanduser(args.config), args.dry_run)
-
