@@ -1,6 +1,5 @@
 #include <QTemporaryDir>
 #include "LineManager.h"
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -11,7 +10,7 @@
 #include "gmock/gmock.h"
 
 using namespace Isis;
-using namespace testing; 
+using namespace testing;
 
 /**
   *
@@ -23,7 +22,7 @@ using namespace testing;
   * @author 2016-09-16 Victor Silva
   *
   * @internal
-  *   @history 2022-04-26 Victor Silva - Original Version - Functional test is against known value for input 
+  *   @history 2022-04-26 Victor Silva - Original Version - Functional test is against known value for input
   *                                      cub since fx is not yet callable
   */
 
@@ -38,7 +37,7 @@ TEST(LronacphoNoDemAlgo3, FunctionalTestsLronacpho) {
   QString outCubeFileName = prefix.path() + "/output.cub";
   QString phoParameterFileName = "data/lronacpho/NAC_PHO_LROC_Empirical.0003.pvl";
   QVector<QString> args = {"from="+inCubeFileName, "to="+outCubeFileName, "PHOPAR="+phoParameterFileName, "usedem=no"};
- 
+
   UserInterface options(APP_XML, args);
   try {
     lronacpho(options);
@@ -56,12 +55,12 @@ TEST(LronacphoNoDemAlgo3, FunctionalTestsLronacpho) {
      fx="\( f1 ) * ( ( cos(inal(f1) * pi / 180) + cos(emal(f1) * pi / 180) ) / cos(inal(f1) * pi / 180) / ( e ^ ( -1.479654495 -0.000083528 * phal(f1)^2 + 0.012964707 * phal(f1)  -0.237774774 * phal(f1) ^ (1/2) + 0.556075496 * ( cos(emal(f1)*pi/180) ) +   0.663671460 * ( cos(inal(f1) * pi / 180) ) -0.439918609 * ( cos(inal(f1) * pi / 180) )^2  ))) * 0.087598" f1=input/M143947267L.cal.echo.crop.cub to=output/output2.cub;
     */
     double algo3Result = 0.26584613;
-    
+
     // dop! lineManager is not zero based
     LineManager oLine(outputCube);
     oLine.SetLine(300);
     outputCube.read(oLine);
- 
+
     EXPECT_NEAR(oLine[300],algo3Result, 0.002);
     outputCube.close();
   }
@@ -79,7 +78,7 @@ TEST(LronacphoNoDemAlgo2, FunctionalTestsLronacpho) {
   QString outCubeFileName = prefix.path() + "/output.cub";
   QString phoParameterFileName = "data/lronacpho/NAC_PHO_LROC_Empirical.0002.pvl";
   QVector<QString> args = {"from="+inCubeFileName, "to="+outCubeFileName, "PHOPAR="+phoParameterFileName, "usedem=no"};
- 
+
   UserInterface options(APP_XML, args);
   try {
     lronacpho(options);
@@ -91,14 +90,14 @@ TEST(LronacphoNoDemAlgo2, FunctionalTestsLronacpho) {
     // open output cube to test al algorithm was applied correctly
     Cube outputCube;
     outputCube.open(outCubeFileName, "r");
-   
+
     double algo2Result = 0.28940132;
 
     // dop! lineManager is not zero based
     LineManager oLine(outputCube);
     oLine.SetLine(300);
     outputCube.read(oLine);
- 
+
     EXPECT_NEAR(oLine[300],algo2Result, 0.002);
 
     outputCube.close();
@@ -117,7 +116,7 @@ TEST(LronacphoNoDemAlgoDefault, FunctionalTestsLronacpho) {
   QString outCubeFileName = prefix.path() + "/output.cub";
   QString phoParameterFileName = "data/lronacpho/NAC_PHO_LROC_Empirical.0003.pvl";
   QVector<QString> args = {"from="+inCubeFileName, "to="+outCubeFileName, "usedem=no"};
- 
+
   UserInterface options(APP_XML, args);
   try {
     lronacpho(options);
@@ -128,15 +127,15 @@ TEST(LronacphoNoDemAlgoDefault, FunctionalTestsLronacpho) {
   try{
     // open output cube to test al algorithm was applied correctly
     Cube outputCube;
- 
+
     outputCube.open(outCubeFileName, "r");
-    
+
     double algo3Result = 0.26584613;
 
     LineManager oLine(outputCube);
     oLine.SetLine(300);
     outputCube.read(oLine);
- 
+
     EXPECT_NEAR(oLine[300],algo3Result, 0.002);
     outputCube.close();
   }

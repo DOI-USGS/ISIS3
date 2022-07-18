@@ -2,7 +2,7 @@
 #include <QTemporaryFile>
 
 #include "findimageoverlaps.h"
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
 #include "TestUtilities.h"
 #include "IException.h"
 #include "FileList.h"
@@ -20,9 +20,9 @@
 #include "geos/geom/LinearRing.h"
 #include "geos/geom/Polygon.h"
 
-#include "Fixtures.h"
-
 #include "gmock/gmock.h"
+
+using json = nlohmann::json;
 
 using namespace Isis;
 

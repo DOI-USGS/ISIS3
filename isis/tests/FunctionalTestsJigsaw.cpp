@@ -14,7 +14,9 @@
 #include "jigsaw.h"
 
 #include "TestUtilities.h"
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
+#include "CsmFixtures.h"
+
 #include "gmock/gmock.h"
 
 using namespace Isis;

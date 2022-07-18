@@ -5,7 +5,7 @@
 #include <QString>
 #include <nlohmann/json.hpp>
 
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "Histogram.h"
 #include "md5wrapper.h"
 #include "Pvl.h"

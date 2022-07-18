@@ -10,7 +10,7 @@
 #include "FileName.h"
 #include "SerialNumber.h"
 
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
 
 #include "gmock/gmock.h"
 

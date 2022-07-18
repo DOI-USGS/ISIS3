@@ -10,7 +10,7 @@
 
 #include "Cube.h"
 #include "std2isis.h"
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "Histogram.h"
 #include "LineManager.h"
 #include "Portal.h"

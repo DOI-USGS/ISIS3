@@ -1,4 +1,4 @@
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -25,11 +25,11 @@ TEST_F(DefaultCube, FunctionalTestVikcalDefault) {
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
-  
+
   Cube oCube(outCubeFileName, "r");
 
   PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("Radiometry");
-  
+
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("offc"), 0);
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("exp"), 7.73);
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("gain"), 1.0);
@@ -50,7 +50,7 @@ TEST_F(DefaultCube, FunctionalTestVikcalDefault) {
 
 TEST_F(DefaultCube, FunctionalTestCtxcalCameraComparison) {
   // Note: DefaultCube is a viking image
-  
+
   QString outCubeFileNameCam = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"to="+outCubeFileNameCam};
 
@@ -64,7 +64,7 @@ TEST_F(DefaultCube, FunctionalTestCtxcalCameraComparison) {
   }
 
   // force camera to not construct
-  Pvl *lab = testCube->label(); 
+  Pvl *lab = testCube->label();
   lab->deleteObject("NaifKeywords");
 
   QString outCubeFileNameNoCam = tempDir.path() + "/outTempNoCam.cub";
@@ -80,10 +80,10 @@ TEST_F(DefaultCube, FunctionalTestCtxcalCameraComparison) {
   Cube oNoCamCube(outCubeFileNameCam, "r");
   Cube oCamCube(outCubeFileNameCam, "r");
 
-  Pvl *noCamLab = oNoCamCube.label(); 
+  Pvl *noCamLab = oNoCamCube.label();
   Pvl *camLab = oCamCube.label();
 
-  EXPECT_DOUBLE_EQ((double)noCamLab->findObject("IsisCube").findGroup("Radiometry").findKeyword("dist1"), 
+  EXPECT_DOUBLE_EQ((double)noCamLab->findObject("IsisCube").findGroup("Radiometry").findKeyword("dist1"),
                    (double)camLab->findObject("IsisCube").findGroup("Radiometry").findKeyword("dist1"));
 
   EXPECT_DOUBLE_EQ((double)noCamLab->findObject("IsisCube").findGroup("Radiometry").findKeyword("dist1"), 211727039.58284);

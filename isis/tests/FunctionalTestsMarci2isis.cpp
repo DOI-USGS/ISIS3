@@ -1,7 +1,6 @@
 #include <QTemporaryDir>
 
 #include "marci2isis.h"
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -22,7 +21,7 @@ TEST(Marci2Isis, Marci2isisTestDefault) {
 
   QString cubeFileNameEven = prefix.path() + "/marci2isis_out.even.cub";
   QString cubeFileNameOdd = prefix.path() + "/marci2isis_out.odd.cub";
-  
+
   Cube cubeEven(cubeFileNameEven);
   Cube cubeOdd(cubeFileNameOdd);
   Pvl *evenLabel = cubeEven.label();
@@ -49,7 +48,7 @@ TEST(Marci2Isis, Marci2isisTestDefault) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, evenPixels["ByteOrder"][0], oddPixels["ByteOrder"][0]);
   ASSERT_EQ((double)evenPixels["Base"], (double)oddPixels["Base"]);
   ASSERT_EQ((double)evenPixels["Multiplier"], (double)oddPixels["Multiplier"]);
-  
+
   // Instrument Group
   PvlGroup &evenInst = evenLabel->findGroup("Instrument", Pvl::Traverse);
   PvlGroup &oddInst = oddLabel->findGroup("Instrument", Pvl::Traverse);
@@ -127,8 +126,8 @@ TEST(Marci2Isis, Marci2isisTestDefault) {
 
   ASSERT_EQ((int)evenKernels["NaifIkCode"], -74420);
   ASSERT_EQ((int)evenKernels["NaifIkCode"], (int)oddKernels["NaifIkCode"]);
-  
-  
+
+
   // Label Object
   ASSERT_EQ((int)evenLabel->findObject("Label").findKeyword("Bytes"), 65536);
   ASSERT_EQ((int)oddLabel->findObject("Label").findKeyword("Bytes"), 65536);
@@ -173,7 +172,7 @@ TEST(Marci2Isis, Marci2isisTestColorOffset) {
   QString cubeFileNameEven = prefix.path() + "/marci2isis_out.even.cub";
   Cube cubeEven(cubeFileNameEven);
   Pvl *evenLabel = cubeEven.label();
-  
+
   ASSERT_EQ((int)evenLabel->findKeyword("TileLines", Pvl::Traverse), 86);
 
   PvlGroup dimensions = evenLabel->findGroup("Dimensions", Pvl::Traverse);

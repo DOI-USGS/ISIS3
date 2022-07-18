@@ -4,13 +4,14 @@
 #include <math.h>
 
 #include "Cube.h"
-#include "Histogram.h"
-#include "Pvl.h"
-#include "TestUtilities.h"
 #include "FileName.h"
+#include "Histogram.h"
 #include "LineManager.h"
+#include "Pvl.h"
+#include "Table.h"
+#include "TestUtilities.h"
 
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"

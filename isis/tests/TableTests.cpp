@@ -1,4 +1,5 @@
-#include "Fixtures.h"
+#include "Blob.h"
+#include "TempFixtures.h"
 #include "Table.h"
 #include "TableField.h"
 #include "TableRecord.h"

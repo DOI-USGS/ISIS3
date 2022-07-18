@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Cube.h"

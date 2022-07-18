@@ -12,7 +12,7 @@
 #include <QDataStream>
 
 #include <nlohmann/json.hpp>
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "Histogram.h"
 #include "md5wrapper.h"
 #include "Pvl.h"
@@ -106,14 +106,14 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
   }
   QDataStream out(&tempImgFile);
 
-  // generate lines 
+  // generate lines
   QByteArray writeToFile = QByteArray();
   short int fill = 0;
   for(int i=-1; i<(samples * bytes); i++){
     writeToFile.append(fill);
   }
 
-  // write the lines to the temp file 
+  // write the lines to the temp file
   for(int i=0; i<lines; i++){
     QDataStream out(&tempImgFile);
     out << writeToFile;
@@ -123,7 +123,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
 
   // create a temp data file and copy the contents of the xml in to it
   QFile tempDataFile(tempDir.path() + "/" + dataFileName);
-  
+
   if(!tempDataFile.open(QFile::ReadWrite | QFile::Text)){
       FAIL() << " Could not open file for writing";
   }
@@ -137,7 +137,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
 
   QTextStream xmlData(&tempDataFile);
   xmlData << realXmlFile.readAll();
-  
+
   tempDataFile.close();
   realXmlFile.close();
 
@@ -169,7 +169,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
- 
+
   truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
   outGroup = outLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
@@ -197,7 +197,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacFrame){
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabelNoTemp->findGroup("BandBin", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
- 
+
   truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
   outGroup = outLabelNoTemp->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
@@ -282,14 +282,14 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
   }
   QDataStream out(&tempImgFile);
 
-  // generate lines 
+  // generate lines
   QByteArray writeToFile = QByteArray();
   short int fill = 0;
   for(int i=-1; i<(samples * bytes); i++){
     writeToFile.append(fill);
   }
 
-  // write the lines to the temp file 
+  // write the lines to the temp file
   for(int i=0; i<lines; i++){
     QDataStream out(&tempImgFile);
     out << writeToFile;
@@ -299,7 +299,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
 
   // create a temp data file and copy the contents of the xml in to it
   QFile tempDataFile(tempDir.path() + "/" + dataFileName);
-  
+
   if(!tempDataFile.open(QFile::ReadWrite | QFile::Text)){
       FAIL() << " Could not open file for writing";
   }
@@ -313,7 +313,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
 
   QTextStream xmlData(&tempDataFile);
   xmlData << realXmlFile.readAll();
-  
+
   tempDataFile.close();
   realXmlFile.close();
 
@@ -345,7 +345,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
- 
+
   truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
   outGroup = outLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
@@ -373,7 +373,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisNacPb){
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabelNoTemp->findGroup("BandBin", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
- 
+
   truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
   outGroup = outLabelNoTemp->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
@@ -444,7 +444,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
   QString imageFileName = "wac000xxx_2022126t000000_000000001_frame_raw02.img";
   QString templateFile = "../appdata/import/PDS4/ClipperEIS.tpl";
   QString cubeFileName = tempDir.path() + "/wacFrame.cub";
-  
+
   int samples = 1335;
   int lines = 3832;
   int bytes = 2;
@@ -457,14 +457,14 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
   }
   QDataStream out(&tempImgFile);
 
-  // generate lines 
+  // generate lines
   QByteArray writeToFile = QByteArray();
   short int fill = 0;
   for(int i=-1; i<(samples * bytes); i++){
     writeToFile.append(fill);
   }
 
-  // write the lines to the temp file 
+  // write the lines to the temp file
   for(int i=0; i<lines; i++){
     QDataStream out(&tempImgFile);
     out << writeToFile;
@@ -474,7 +474,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
 
   // create a temp data file and copy the contents of the xml in to it
   QFile tempDataFile(tempDir.path() + "/" + dataFileName);
-  
+
   if(!tempDataFile.open(QFile::ReadWrite | QFile::Text)){
       FAIL() << " Could not open file for writing";
   }
@@ -488,7 +488,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
 
   QTextStream xmlData(&tempDataFile);
   xmlData << realXmlFile.readAll();
-  
+
   tempDataFile.close();
   realXmlFile.close();
 
@@ -520,7 +520,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
- 
+
   truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
   outGroup = outLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
@@ -548,7 +548,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacFrame){
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabelNoTemp->findGroup("BandBin", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
- 
+
   truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
   outGroup = outLabelNoTemp->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
@@ -620,7 +620,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
   QString imageFileName = "wac000xxx_2022126t000000_000000002_pushb_raw02.img";
   QString templateFile = "../appdata/import/PDS4/ClipperEIS.tpl";
   QString cubeFileName = tempDir.path() + "/WacPb.cub";
-    
+
 
   int samples = 4096;
   int lines = 4096;
@@ -634,14 +634,14 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
   }
   QDataStream out(&tempImgFile);
 
-  // generate lines 
+  // generate lines
   QByteArray writeToFile = QByteArray();
   short int fill = 0;
   for(int i=-1; i<(samples * bytes); i++){
     writeToFile.append(fill);
   }
 
-  // write the lines to the temp file 
+  // write the lines to the temp file
   for(int i=0; i<lines; i++){
     QDataStream out(&tempImgFile);
     out << writeToFile;
@@ -651,7 +651,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
 
   // create a temp data file and copy the contents of the xml in to it
   QFile tempDataFile(tempDir.path() + "/" + dataFileName);
-  
+
   if(!tempDataFile.open(QFile::ReadWrite | QFile::Text)){
       FAIL() << " Could not open file for writing";
   }
@@ -665,7 +665,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
 
   QTextStream xmlData(&tempDataFile);
   xmlData << realXmlFile.readAll();
-  
+
   tempDataFile.close();
   realXmlFile.close();
 
@@ -697,7 +697,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
- 
+
   truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
   outGroup = outLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
@@ -725,7 +725,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportEisWacPb){
   truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
   outGroup = outLabelNoTemp->findGroup("BandBin", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
- 
+
   truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
   outGroup = outLabelNoTemp->findGroup("Kernels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);

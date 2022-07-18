@@ -1,5 +1,4 @@
 #include <QTemporaryDir>
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -13,7 +12,7 @@
 
 using namespace std;
 using namespace Isis;
-using namespace testing; 
+using namespace testing;
 
 /**
   *
@@ -25,7 +24,7 @@ using namespace testing;
   * @author 2016-09-16 Victor Silva
   *
   * @internal
-  *   @history 2022-04-26 Victor Silva - Original Version - Functional test is against known value for input 
+  *   @history 2022-04-26 Victor Silva - Original Version - Functional test is against known value for input
   *                                      cub since fx is not yet callable
   */
 
@@ -45,8 +44,8 @@ TEST(LronaccalDefault, FunctionalTestsLronaccal) {
   QString oCubeCropFile = outputDir.path() + "/out.default.crop.cub";
   QString tCubeFile = "data/lronaccal/truth/M1333276014R.default.crop.cub";
 
-  QVector<QString> args = {"from="+iCubeFile, "to="+oCubeFile }; 
- 
+  QVector<QString> args = {"from="+iCubeFile, "to="+oCubeFile };
+
   UserInterface options(APP_XML, args);
   try {
     lronaccal(options);
@@ -59,7 +58,7 @@ TEST(LronaccalDefault, FunctionalTestsLronaccal) {
     QVector<QString> argsCrop = {"from=" + oCubeFile, "to=" + oCubeCropFile, "sample=80", "nsamples=80", "line=80", "nlines=80"};
     UserInterface options2(CROP_XML, argsCrop);
     crop(options2);
-    
+
     Cube oCube(oCubeCropFile, "r");
     Cube tCube(tCubeFile, "r");
 
@@ -70,7 +69,7 @@ TEST(LronaccalDefault, FunctionalTestsLronaccal) {
     EXPECT_NEAR(oCubeStats->Sum(), tCubeStats->Sum(), 0.001);
     EXPECT_NEAR(oCubeStats->ValidPixels(), tCubeStats->ValidPixels(), 0.001);
     EXPECT_NEAR(oCubeStats->StandardDeviation(), tCubeStats->StandardDeviation(), 0.001);
-    
+
     tCube.close();
     oCube.close();
   }
@@ -94,7 +93,7 @@ TEST(LronaccalNear, FunctionalTestsLronaccal) {
   QString tCubeFile = "data/lronaccal/truth/M1333276014R.near.crop.cub";
 
   QVector<QString> args = {"from="+iCubeFile, "to="+oCubeFile, "DarkFileType=NEAREST"};
- 
+
   UserInterface options(APP_XML, args);
   try {
     lronaccal(options);
@@ -102,12 +101,12 @@ TEST(LronaccalNear, FunctionalTestsLronaccal) {
   catch (IException &e) {
     FAIL() << "Unable to calibrate the LRO image: " <<e.toString().toStdString().c_str() << std::endl;
   }
-  try{  
+  try{
     static QString CROP_XML = FileName("$ISISROOT/bin/xml/crop.xml").expanded();
     QVector<QString> argsCrop = {"from=" + oCubeFile, "to=" + oCubeCropFile, "sample=80", "nsamples=80", "line=80", "nlines=80"};
     UserInterface options2(CROP_XML, argsCrop);
     crop(options2);
-    
+
     Cube oCube(oCubeCropFile, "r");
     Cube tCube(tCubeFile, "r");
 
@@ -118,7 +117,7 @@ TEST(LronaccalNear, FunctionalTestsLronaccal) {
     EXPECT_NEAR(oCubeStats->Sum(), tCubeStats->Sum(), 0.001);
     EXPECT_NEAR(oCubeStats->ValidPixels(), tCubeStats->ValidPixels(), 0.001);
     EXPECT_NEAR(oCubeStats->StandardDeviation(), tCubeStats->StandardDeviation(), 0.001);
-    
+
     tCube.close();
     oCube.close();
   }
@@ -138,7 +137,7 @@ TEST(LronaccalPair, FunctionalTestsLronaccal) {
   QString tCubeFile = "data/lronaccal/truth/M1333276014R.pair.crop.cub";
 
   QVector<QString> args = {"from="+iCubeFile, "to="+oCubeFile, "DarkFileType=PAIR"};
- 
+
   UserInterface options(APP_XML, args);
   try {
     lronaccal(options);
@@ -151,7 +150,7 @@ TEST(LronaccalPair, FunctionalTestsLronaccal) {
     QVector<QString> argsCrop = {"from=" + oCubeFile, "to=" + oCubeCropFile, "sample=80", "nsamples=80", "line=80", "nlines=80"};
     UserInterface options2(CROP_XML, argsCrop);
     crop(options2);
-    
+
     Cube oCube(oCubeCropFile, "r");
     Cube tCube(tCubeFile, "r");
 
@@ -162,7 +161,7 @@ TEST(LronaccalPair, FunctionalTestsLronaccal) {
     EXPECT_NEAR(oCubeStats->Sum(), tCubeStats->Sum(), 0.001);
     EXPECT_NEAR(oCubeStats->ValidPixels(), tCubeStats->ValidPixels(), 0.001);
     EXPECT_NEAR(oCubeStats->StandardDeviation(), tCubeStats->StandardDeviation(), 0.001);
-    
+
     tCube.close();
     oCube.close();
   }

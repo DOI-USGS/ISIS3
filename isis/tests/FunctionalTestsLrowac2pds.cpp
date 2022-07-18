@@ -1,10 +1,10 @@
 #include <QTextStream>
+#include <QTemporaryDir>
 #include <QStringList>
 #include <QFile>
 #include <QDebug>
 
 #include "lrowac2pds.h"
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
