@@ -11,6 +11,7 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "IString.h"
 #include "JP2Encoder.h"
+#include "UserInterface.h"
 
 using namespace Isis;
 
@@ -62,16 +63,16 @@ namespace Isis {
    * @param compression The compression algorithm used. Not used for JPEG 2000
    */
   void JP2Exporter::write(FileName outputName, int quality,
-                          QString compression) {
-    
+                          QString compression, UserInterface *ui) {
+
     outputName = outputName.addExtension(extension());
-    
+
     PixelType type = pixelType();
     m_encoder = new JP2Encoder(
         outputName.expanded(), samples(), lines(), bands(), type);
     m_encoder->OpenFile();
 
-    ImageExporter::write(outputName, quality);
+    ImageExporter::write(outputName, quality, compression, ui);
   }
 
 

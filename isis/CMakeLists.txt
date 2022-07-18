@@ -13,12 +13,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 set(CMAKE_FRAMEWORK_PATH /System/Library/Frameworks/)
 set(CMAKE_FIND_FRAMEWORK LAST)
 
+# Enable use of @rpath on Mac
+set(CMAKE_MACOS_RPATH 1)
+
 include(AddIsisModule)
 include(Utilities)
 include(TestSetup)
 include(InstallThirdParty)
-include(cmake/gtest.cmake)
-include(GoogleTest)
 
 include(CMakePrintHelpers)
 
@@ -136,10 +137,6 @@ message("\tINSTALL PREFIX: ${CMAKE_INSTALL_PREFIX}")
 #===============================================================================
 #===============================================================================
 
-# Set up the ctest tool which is used to run all of the tests.
-enable_testing()
-include(CTest)
-
 # Set up Anaconda prefix in the case with a non-default conda env is activated
 if(EXISTS $ENV{CONDA_PREFIX})
   message("CONDA PREFIX: $ENV{CONDA_PREFIX}")
@@ -153,9 +150,11 @@ if(JP2KFLAG)
  set(JP2KFLAG 1)
 endif()
 
-# Set up the ctest tool which is used to run all of the tests.
-enable_testing()
-include(CTest)
+if(buildTests)
+  include(CTest)
+  enable_testing()
+endif()
+
 
 # Specify flags used
 # on linux, add the conda prefix to handle possible issues with rpaths at link time
@@ -295,7 +294,15 @@ find_package(Armadillo         REQUIRED)
 find_package(Threads)
 find_package(inja              REQUIRED)
 
+# Setup for googletest/googlemock before adding SensorUtilities so we build its tests
+if(buildTests)
+  set(INSTALL_GTEST OFF)
+  add_subdirectory(../gtest gtest)
+else()
+  set(SENSOR_UTILITIES_BUILD_TESTS OFF CACHE BOOL "Disable SensorUtilities Tests")
+endif()
 
+add_subdirectory(../SensorUtilities SensorUtilities)
 
 # In this case, we specify the version numbers being searched for in the non-traditional installs.
 if(APPLE)
@@ -349,7 +356,7 @@ foreach (_variableName ${_variableNames})
 endforeach()
 
 # add target based linkages to ALLLIBS variable
-list(APPEND ALLLIBS pantor::inja)
+list(APPEND ALLLIBS pantor::inja sensorutilities)
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)
@@ -608,9 +615,7 @@ install(PROGRAMS ${CMAKE_BINARY_DIR}/lib/Camera.plugin DESTINATION ${CMAKE_INSTA
 #   the end of this file containing a CMakeLists.txt file which includes all of
 #   the desired post-install commands inside.
 add_subdirectory(cmake)
-option (BUILD_TESTS "Build tests" ON)
-if(BUILD_TESTS)
-  include(CTest)
-  enable_testing()
+
+if(buildTests) 
   add_subdirectory(tests)
 endif()

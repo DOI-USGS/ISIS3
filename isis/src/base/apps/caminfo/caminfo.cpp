@@ -290,7 +290,7 @@ namespace Isis{
         // Run camstats on the entire image (all bands)
         // another camstats will be run for each band and output
         // for each band.
-        else if (ui.GetBoolean("CAMSTATS") && !incube->hasTable("CameraStatistics")) {
+        else if (ui.GetBoolean("CAMSTATS")) {
           camstats = new QList< QPair<QString, QString> >;
 
           QString filename = incube->fileName();

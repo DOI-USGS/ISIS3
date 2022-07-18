@@ -54,7 +54,7 @@
         FiducialCoordinateMicron = {{RemoveUnits(LO_FIDUCIAL_COORDINATE_MICRON.Value)}} <um>
         {% set fiducialArray=LO_FIDUCIAL_ID.Value %}
         FiducialID               =  ({{ join(LO_FIDUCIAL_ID.Value, ",") }})
-        FiducialSamples          = ({{ join(LO_FIDUCIAL_SAMPLES, ",") }}) <pixels>
+        FiducialSamples          = ({{ join(LO_FIDUCIAL_SAMPLES.Value, ",") }}) <pixels>
         {% set fidLineArray=LO_FIDUCIAL_LINES.Value %}
         FiducialLines            = ({% for line in fidLineArray %}
                                         {% if loop.is_last %}
@@ -83,12 +83,12 @@
                                     {% endfor %}) <mm>
 
     {% else if exists("LO_BORESIGHT_LINE")%}
-        BoresightLine = {{LO_BORESIGHT_LINE}}
-        BoresightSample = {{LO_BORESIGHT_SAMPLE}}
+        BoresightLine = {{LO_BORESIGHT_LINE.Value}}
+        BoresightSample = {{LO_BORESIGHT_SAMPLE.Value}}
 
     {% else if exists("QUBE.ISIS_INSTRUMENT.BORESIGHT_LINE") %}
-        BoresightLine = {{QUBE.ISIS_INSTRUMENT.BORESIGHT_LINE}}
-        BoresightSample = {{QUBE.ISIS_INSTRUMENT.BORESIGHT_SAMPLE}}
+        BoresightLine = {{QUBE.ISIS_INSTRUMENT.BORESIGHT_LINE.Value}}
+        BoresightSample = {{QUBE.ISIS_INSTRUMENT.BORESIGHT_SAMPLE.Value}}
         FiducialCoordinateMicron = {{RemoveUnits(QUBE.ISIS_INSTRUMENT.FIDUCIAL_COORD_MICRON.Value)}} <um>
 
     {% endif %}
@@ -104,16 +104,17 @@
 {% endblock %}
 
 {% block bandbin %}
-    {% if exists("QUBE.ISIS_INSTRUMENT.FIDUCIAL_ID") %}
-        FilterName   = {{QUBE.BAND_BIN.BAND_BIN_UNIT.Value}}
-        Center       = {{QUBE.BAND_BIN.BAND_BIN_CENTER.Value}}
-        OriginalBand = {{QUBE.BAND_BIN.BAND_BIN_ORIGINAL_BAND.Value}}
 
-    {% else if exists("QUBE.ISIS_INSTRUMENT.BORESIGHT_SAMPLE") %}
-        FilterName   = {{QUBE.BAND_BIN.BAND_BIN_UNIT.Value}}
-        Center       = {{QUBE.BAND_BIN.BAND_BIN_CENTER.Value}}
-        OriginalBand = {{QUBE.BAND_BIN.BAND_BIN_ORIGINAL_BAND.Value}}
-    {% endif %}
+{% if exists("QUBE.ISIS_INSTRUMENT.FIDUCIAL_ID") or exists("QUBE.ISIS_INSTRUMENT.BORESIGHT_SAMPLE") %}
+  {%- set filterName = QUBE.BAND_BIN.BAND_BIN_UNIT.Value -%}
+  {% if filterName == "NONE" %}
+  FilterName   = none
+  {% else %}
+  FilterName   = {{QUBE.BAND_BIN.BAND_BIN_UNIT.Value}}
+  {% endif %}
+  Center       = {{QUBE.BAND_BIN.BAND_BIN_CENTER.Value}}
+  OriginalBand = {{QUBE.BAND_BIN.BAND_BIN_ORIGINAL_BAND.Value}}
+{% endif %}
 
 {% endblock %}
 

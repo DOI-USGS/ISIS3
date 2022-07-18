@@ -1,0 +1,30 @@
+Group = Mapping
+  ProjectionName            = Equirectangular
+  TargetName                = Mars
+  EquatorialRadius          = 3396190.0 <meters>
+  PolarRadius               = 3376200.0 <meters>
+  LatitudeType              = Planetocentric
+  LongitudeDirection        = PositiveEast
+  LongitudeDomain           = 360
+  PixelResolution           = 4.434456285329 <meters/pixel>
+  Scale                     = 13366.846735961 <pixels/degree>
+  MinPixelResolution        = 4.4319183304641 <meters/pixel>
+  MaxPixelResolution        = 4.4369942401935 <meters/pixel>
+  MinObliquePixelResolution = 4.5174230281992 <meters/pixel>
+  MaxObliquePixelResolution = 4.5255899788918 <meters/pixel>
+  CenterLongitude           = 176.64264073103
+  CenterLatitude            = -29.845670941671
+  MinimumLatitude           = -30.153087961753
+  MaximumLatitude           = -29.538253921589
+  MinimumLongitude          = 176.52709102356
+  MaximumLongitude          = 176.7581904385
+
+  # Actual Parameters without precision applied
+  PreciseCenterLongitude    = 176.64264073103
+  PreciseCenterLatitude     = -29.845670941671
+  PreciseMinimumLatitude    = -30.153087961752
+  PreciseMaximumLatitude    = -29.538253921589
+  PreciseMinimumLongitude   = 176.52709102356
+  PreciseMaximumLongitude   = 176.7581904385
+End_Group
+End

@@ -299,7 +299,7 @@ namespace Isis {
 
       virtual Longitude solarLongitude();
       virtual void instrumentBodyFixedVelocity(double v[3]) const;
-      iTime time() const;
+      virtual iTime time() const;
 
       void radii(Distance r[3]) const;
 

@@ -24,6 +24,7 @@
       will reduce the number of samples in the output image by a factor of at
       most the SpatialSumming mode value.
     </p>
+
     <p>
       The LROC NAC camera has the ability to acquire images of differing sizes in
       both line and sample.  The starting hardware detector pixel for the
@@ -35,7 +36,7 @@
       Dark current pixels are taken for each line from the masked pixels
       that lie along each edge of the image.
     </p>
-    
+
     <p>
       If SpatialSumming is 1 the dark current pixels are averaged together then
       this average is subtracted from all image pixels.  If SpatialSumming is 2,
@@ -59,14 +60,51 @@
 
     <p>
       The calibration equation is:
-      <pre>  reportedDN = ObservedDN - MeanBias - DarkCurrent </pre>
-
+      <pre>
+        reportedDN = ObservedDN - MeanBias - DarkCurrent 
+      </pre>
         Where:
-        <pre>
-   ObservedDN = TrueDN + E
-   E is a randomly sampled value from (mu, sigma^2) and mu=0
-   TrueDN is the signal that would be reported in an idealized case of an instrument with zero noise.</pre>
-     </p>
+      <pre>
+        ObservedDN = TrueDN + E
+        E is a randomly sampled value from (mu, sigma^2) and mu=0
+        TrueDN is the signal that would be reported in an idealized case of an instrument with zero noise.
+      </pre>
+    </p>
+
+    <p>
+      The dark average produced is dependant on which options are selected.
+      There are three options for dark calibration/correction. If the image has exposure code of zero, 
+      the nearest dark files with exposure code of zero will be used.
+
+      Nearest pair of darks (Default):
+      This option selects the two closest dark files (before and after the observation) and 
+      computes a time-weighted average. In the ideal case, this average product should characterize
+      the dynamic dark response the best. Note: Each dark file is an average of a month’s worth of
+      dark observations under given settings (i.e., exposure code, summing mode, etc.). The maximum
+      time range between pairs of dark files is 45 days. If a suitable pair is not found, the latest
+      dark file taken before the image will be used.
+
+      pixel_dark_average =
+      avgDarkLine1_pixel * |darkfile1_time - time|   +   avgDarkLine2_pixel * |darkfile2_time - time|
+      / (1.0 * ( |darkFile1_time - time| + |darkFile2_time - time| ) )
+
+      Nearest dark file:
+      This option selects the nearest dark file (before or after the observations).  
+      This option is typically only used when a pair of darks do not surround the observation.  
+      For example, during the mission, new NACs may not have a dark file in the dark catalog 
+      for times after the observation being calibrated.  In this case, lronaccal will use 
+      only the previous NAC dark in the calibration steps. However, suppose the image is calibrated
+      again after new darks have been added to the catalog. In that case, the default options for 
+      lronaccal will use a pair of dark observations, and the resulting calibrated image may have 
+      slightly different intensities than the NAC processed with only a single dark file. 
+      Note: While this is not a default option, if only one dark is available, lronaccal will
+      automatically apply the nearest dark file.  The user can see which dark(s) were applied in 
+      the cube header.
+
+      Custom dark:
+      This option uses a single custom dark file that the user must supply with the DarkFile parameter.  
+      This option is typically only used in special cases, such as calibrating very long exposure NAC images.
+    </p>
 
     <p>
       Let's look at the case of a calibrated image for which the true signal
@@ -93,12 +131,13 @@
     </p>
 
     <p>
-    If run on a non-spiceinited cube, this program requires access to local mission-specific 
-    SPICE kernels, in order to find the distance between the sun and the target body. 
-    When run on a spiceinited cube, this can be determined using the camera model.
-    Using a spiceinited cube as input has the advantage of not requiring that local 
-    mission-specific kernels be available. (See spiceinit web=true.)
+      If run on a non-spiceinited cube, this program requires access to local mission-specific 
+      SPICE kernels, in order to find the distance between the sun and the target body. 
+      When run on a spiceinited cube, this can be determined using the camera model.
+      Using a spiceinited cube as input has the advantage of not requiring that local 
+      mission-specific kernels be available. (See spiceinit web=true.)
     </p>
+
   </description>
 
   <history>
@@ -107,6 +146,15 @@
     </change>
     <change name="Adam Licht" date="2013-02-28">
       No longer treat negative DNs differently in the Non-linearity correction.
+    </change>
+    <change name="Victor Silva" date="2020-01-06">
+      Added option for base calibration directory
+    </change>
+    <change name="Victor Silva" date="2020-06-19">
+      Updated dark calibration to use nearest pair of dark images to calibrate
+    </change>
+    <change name="Victor Silva" date="2020-10-04">
+      Updated dark calibration documentation to provide more clarity to dark file options
     </change>
   </history>
 
@@ -169,30 +217,85 @@
         </description>
       </parameter>
     </group>
-    
-    <group name="Dark Options">
+
+    <group name="Dark File Options">
       <parameter name="Dark">
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-        Calibrate using the average dark pixels.
+        Calibrate using average dark pixels.
         </brief>
         <description>
+          Calibrate using average dark pixels. This is also referred to 
+          as dark correction. These dark calibration/correction files
+          are included in the data directory (lro/calibration/nac_darks).
         </description>
-        <inclusions><item>DarkFile</item></inclusions>
+        <inclusions><item>DarkFileType</item></inclusions>
       </parameter>
-      
+
+      <parameter name="DarkFileType">
+        <type>string</type>
+        <brief>
+          Calibrate using average dark pixels from 
+          Nearest Single, Pair, or Custom dark file(s). 
+        </brief>
+        <description>
+          There are three options for dark calibration/correction. If the image has exposure code of zero, 
+          the nearest dark files with exposure code of zero will be used.
+
+          PAIR (Nearest pair of darks) [Default]:
+          This option selects the two closest dark files (before and after the observation) and 
+          computes a time-weighted average. The maximum time range between pairs of dark files 
+          is 45 days. If a suitable pair is not found, the latest dark file taken before the image 
+          will be used.
+
+          NEAREST (Nearest dark file):
+          This option selects the nearest dark file (before or after the observations).  
+          Note: While this is not a default option, if only one dark is available, lronaccal will
+          automatically apply the nearest dark file. 
+
+          CUSTOM (Custom dark):
+          This option uses a single custom dark file that the user must supply with the DarkFile parameter.  
+          This option is typically only used in special cases, such as calibrating very long exposure NAC images.
+        </description>
+        <default><item>Pair</item></default>
+        <list>
+          <option value="PAIR">
+            <brief>Pair</brief>
+            <description>
+              Pair of dark calibration files that the image time lies between
+            </description>
+            <exclusions><item>DarkFile</item></exclusions>
+          </option>
+          <option value="NEAREST">
+            <brief>Nearest</brief>
+            <description>
+              Single dark calibration file that is nearest the image time
+            </description>
+            <exclusions><item>DarkFile</item></exclusions>
+          </option>
+          <option value="CUSTOM">
+            <brief>Custom Dark File</brief>
+            <description>
+              User provided dark calibration file
+            </description>
+            <inclusions>
+              <item>DarkFile</item>
+            </inclusions>
+          </option>
+        </list>
+      </parameter>
+
       <parameter name="DarkFile">
         <type>filename</type>
-        <default><item>Default</item></default>
+        <default><item></item></default>
         <brief>
-        Calibrate using the average dark pixels.
         </brief>
         <description>
         </description>
       </parameter>
     </group>
-      
+
     <group name="Nonlinearity Options">
       <parameter name="Nonlinearity">
         <type>boolean</type>
@@ -207,7 +310,7 @@
           <item>NonlinearityFile</item>
         </inclusions>
       </parameter>
-      
+
       <parameter name="OffsetFile">
         <type>filename</type>
         <default><item>Default</item></default>
@@ -217,7 +320,7 @@
         <description>
         </description>
       </parameter>
-      
+
       <parameter name="NonlinearityFile">
         <type>filename</type>
         <default><item>Default</item></default>
@@ -228,7 +331,7 @@
         </description>
       </parameter>
     </group>
-      
+
     <group name="Flatfield Options">
       <parameter name="Flatfield">
         <type>boolean</type>
@@ -240,7 +343,7 @@
         </description>
         <inclusions><item>FlatfieldFile</item></inclusions>
       </parameter>
-      
+
       <parameter name="FlatfieldFile">
         <type>filename</type>
         <default><item>Default</item></default>
@@ -251,7 +354,7 @@
         </description>
       </parameter>
     </group>
-      
+
     <group name="Radiometric Options">
       <parameter name="Radiometric">
         <type>boolean</type>
@@ -266,7 +369,7 @@
           <item>RadiometricFile</item>
         </inclusions>
       </parameter>
-      
+
       <parameter name="RadiometricType">
         <type>string</type>
         <brief>
@@ -288,7 +391,7 @@
           </option>
         </list>
       </parameter>
-      
+
       <parameter name="RadiometricFile">
         <type>filename</type>
         <default><item>Default</item></default>

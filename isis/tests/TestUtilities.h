@@ -7,12 +7,13 @@
 #include <vector>
 
 #include <QString>
+#include <QVector>
 
 #include "csm.h"
 
+#include "FileName.h"
 #include "IException.h"
 #include "PvlGroup.h"
-
 #include "Pvl.h"
 #include "PvlObject.h"
 
@@ -65,6 +66,9 @@ namespace Isis {
 
   ::testing::Matcher<const csm::ImageCoord&> MatchImageCoord(const csm::ImageCoord &expected);
   ::testing::Matcher<const csm::EcefCoord&> MatchEcefCoord(const csm::EcefCoord &expected);
+
+  QVector<QString> generateBinaryKernels(QVector<QString> kernelList);
+  QString fileListToString(QVector<QString> fileList);
 }
 
 #endif

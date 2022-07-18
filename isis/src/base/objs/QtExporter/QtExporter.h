@@ -54,7 +54,7 @@ namespace Isis {
       virtual void setRgba(ExportDescription &desc);
 
       virtual void write(FileName outputName, int quality=100,
-                         QString compression="none");
+                         QString compression="none", UserInterface *ui = nullptr);
 
       static bool canWriteFormat(QString format);
 
@@ -67,7 +67,7 @@ namespace Isis {
 
     private:
       void initialize(ExportDescription &desc);
-       
+
       //! Structure holding all output image data in memory.
       QImage *m_qimage;
 

@@ -128,7 +128,7 @@ requirements:
   - {{ pin_compatible('geos', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('geotiff', max_pin='x.x') }}
   - geotiff
-  - {{ pin_compatible('gsl', min_pin='x.x') }}
+  - {{ pin_compatible('gsl', min_pin='x.x', max_pin='x.x.x') }}
   - hdf5
   - icu
   - inja

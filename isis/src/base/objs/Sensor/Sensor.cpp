@@ -11,6 +11,8 @@ find files of those names at the top level of this repository. **/
 #include <QDebug>
 #include <QString>
 
+#include "MathUtils.h"
+
 #include "Angle.h"
 #include "Constants.h"
 #include "CubeManager.h"
@@ -310,9 +312,11 @@ namespace Isis {
    * @return @b double Phase angle, in degrees.
    */
   double Sensor::PhaseAngle() const {
-    std::vector<double> sunB(m_uB, m_uB+3);
-    return target()->shape()->phaseAngle(
-                               bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate()), sunB);
+    double sensorPosBf[3];
+    instrumentBodyFixedPosition(sensorPosBf);
+    double groundPtBf[3];
+    Coordinate(groundPtBf);
+    return RAD2DEG * SensorUtilities::sepAngle(sensorPosBf, groundPtBf, m_uB);
   }
 
 
@@ -584,16 +588,17 @@ namespace Isis {
    */
   void Sensor::computeRaDec() {
     m_newLookB = false;
-    vector<double> lookB(3);
-    lookB[0] = m_lookB[0];
-    lookB[1] = m_lookB[1];
-    lookB[2] = m_lookB[2];
+    vector<double> lookB = {m_lookB[0], m_lookB[1], m_lookB[2]};
     vector<double> lookJ = bodyRotation()->J2000Vector(lookB);
 
-    SpiceDouble range;
-    recrad_c((SpiceDouble *)&lookJ[0], &range, &m_ra, &m_dec);
-    m_ra *= 180.0 / PI;
-    m_dec *= 180.0 / PI;
+    SensorUtilities::GroundPt3D sphericalPt = SensorUtilities::rectToSpherical(&lookJ[0]);
+    m_ra = sphericalPt.lon;
+    // Convert to [0, 2pi] domain
+    if (m_ra < 0) {
+      m_ra += 2 * PI;
+    }
+    m_ra *= RAD2DEG;
+    m_dec = sphericalPt.lat * RAD2DEG;
   }
 
 
@@ -606,11 +611,13 @@ namespace Isis {
    * @return @b bool True if successful.
    */
   bool Sensor::SetRightAscensionDeclination(const double ra, const double dec) {
-    vector<double> lookJ(3);
-    radrec_c(1.0, ra * PI / 180.0, dec * PI / 180.0, (SpiceDouble *)&lookJ[0]);
+    double raRad = ra * DEG2RAD;
+    double decRad = dec * DEG2RAD;
+    SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 1.0};
+    SensorUtilities::Vec rectPt = SensorUtilities::sphericalToRect(sphericalPt);
 
-    vector<double> lookC = instrumentRotation()->ReferenceVector(lookJ);
-    return SetLookDirection((double *)&lookC[0]);
+    vector<double> lookC = instrumentRotation()->ReferenceVector(rectPt);
+    return SetLookDirection(&lookC[0]);
   }
 
 
@@ -635,20 +642,16 @@ namespace Isis {
    * @return @b double Slant distance.
    */
   double Sensor::SlantDistance() const {
-    SpiceDouble psB[3], upsB[3];
-    SpiceDouble dist;
+    double sensorPos[3];
+    instrumentBodyFixedPosition(sensorPos);
 
-    std::vector<double> sB = bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate());
+    SurfacePoint *surfPoint = target()->shape()->surfaceIntersection();
+    SensorUtilities::Vec groundPt = {
+          surfPoint->GetX().kilometers(),
+          surfPoint->GetY().kilometers(),
+          surfPoint->GetZ().kilometers()};
 
-    SpiceDouble pB[3];
-    ShapeModel *shape = target()->shape();
-    pB[0] = shape->surfaceIntersection()->GetX().kilometers();
-    pB[1] = shape->surfaceIntersection()->GetY().kilometers();
-    pB[2] = shape->surfaceIntersection()->GetZ().kilometers();
-
-    vsub_c(pB, (SpiceDouble *) &sB[0], psB);
-    unorm_c(psB, upsB, &dist);
-    return dist;
+    return SensorUtilities::distance(sensorPos, groundPt);
   }
 
 
@@ -679,16 +682,13 @@ namespace Isis {
     double sB[3];
     Spice::sunPosition(sB);
 
-    // Calc the change
-    ShapeModel *shape = target()->shape();
-    double xChange = sB[0] - shape->surfaceIntersection()->GetX().kilometers();
-    double yChange = sB[1] - shape->surfaceIntersection()->GetY().kilometers();
-    double zChange = sB[2] - shape->surfaceIntersection()->GetZ().kilometers();
+    SurfacePoint *intersection = target()->shape()->surfaceIntersection();
+    SensorUtilities::Vec groundPt = {
+          intersection->GetX().kilometers(),
+          intersection->GetY().kilometers(),
+          intersection->GetZ().kilometers()};
 
-    // Calc the distance and convert to AU
-    double dist = sqrt(xChange*xChange + yChange*yChange + zChange*zChange);
-    dist /= 149597870.691;
-    return dist;
+    return SensorUtilities::distance(groundPt, sB) / 149597870.691;
   }
 
 
@@ -700,108 +700,17 @@ namespace Isis {
    */
   double Sensor::SpacecraftAltitude() {
     // Get the spacecraft coord
-    double spB[3];
-    Spice::instrumentPosition(spB);
+    double sensorPos[3];
+    Spice::instrumentPosition(sensorPos);
 
     // Get subspacecraft point
     double lat, lon;
     subSpacecraftPoint(lat, lon);
-    double rlat = lat * PI / 180.0;
-    double rlon = lon * PI / 180.0;
 
     // Compute radius
     Distance rad = LocalRadius(lat, lon);
 
-    // Now with the 3 spherical value compute the x/y/z coordinate
-    double ssB[3];
-    latrec_c(rad.kilometers(), rlon, rlat, ssB);
-
-    // Calc the change
-    double xChange = spB[0] - ssB[0];
-    double yChange = spB[1] - ssB[1];
-    double zChange = spB[2] - ssB[2];
-
-    // Calc the distance
-    double dist = sqrt(xChange*xChange + yChange*yChange + zChange*zChange);
-    return dist;
+    // Take the difference
+    return SensorUtilities::magnitude(sensorPos) - rad.kilometers();
   }
-
-
-  /**
-   * Gets the radius from the DEM, if we have one.
-
-   * @return @b double Local radius from the DEM
-   */
-//  Distance Sensor::DemRadius(const SurfacePoint &pt) {
-//    return DemRadius(pt.GetLatitude(), pt.GetLongitude());
-//  }
-
-
-  /**
-   * Gets the radius from the DEM, if we have one.
-   * @param lat Latitude
-   * @param lon Longitude
-   * @return @b double Local radius from the DEM
-   */
-//  Distance Sensor::DemRadius(const Latitude &lat, const Longitude &lon) {
-//    if (!m_hasElevationModel) return Distance();
-//    //if (!lat.Valid() || !lon.Valid()) return Distance();
-//    m_demProj->SetUniversalGround(lat.degrees(), lon.degrees());
-//    if (!m_demProj->IsGood()) {
-//      return Distance();
-//    }
-
-//    m_portal->SetPosition(m_demProj->WorldX(), m_demProj->WorldY(), 1);
-
-//    m_demCube->read(*m_portal);
-
-//    const double &radius = m_interp->Interpolate(m_demProj->WorldX(),
-//                                                 m_demProj->WorldY(),
-//                                                 m_portal->DoubleBuffer());
-
-//    return Distance(radius, Distance::Meters);
-//      Distance fred;
-//      return fred;
-//  }
-
-
-  /**
-   * This method is an optimized version of DemRadius(Latitude, Longitude) meant
-   * for SetLookDirection until the Projection class has been refactored to use
-   * Latitude and Longitude instead of doubles.
-   *
-   * Please do not call this method as it is lacking checks that
-   *   SetLookDirection has already performed.
-   *
-   * @returns A radius in kilometers
-   */
-//  double Sensor::DemRadius(double lat, double lon) {
-//    if (!m_demProj->SetUniversalGround(lat, lon)) {
-//      return Isis::Null;
-//    }
-
-//    m_portal->SetPosition(m_demProj->WorldX(), m_demProj->WorldY(), 1);
-//    m_demCube->read(*m_portal);
-
-//    double radius = m_interp->Interpolate(m_demProj->WorldX(),
-//                                          m_demProj->WorldY(),
-//                                          m_portal->DoubleBuffer());
-//    if (Isis::IsSpecial(radius)) {
-//      return Isis::Null;
-//    }
-
-//    return radius / 1000.0;
-//      double fred;
-//      return fred;
-//  }
-  /**
-   * Indicates whether the Kernels PvlGroup has an ElevationModel or
-   * ShapeModel PvlKeyword value.
-   *
-   * @return @b bool True if an elevation model exists.
-   */
-//   bool HasElevationModel() {
-//     return m_hasElevationModel;
-//   };
-
 }

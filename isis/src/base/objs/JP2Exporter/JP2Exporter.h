@@ -37,7 +37,7 @@ namespace Isis {
       virtual ~JP2Exporter();
 
       virtual void write(FileName outputName, int quality=100,
-                         QString compression="none");
+                         QString compression="none", UserInterface *ui = nullptr);
 
       static bool canWriteFormat(QString format);
 
