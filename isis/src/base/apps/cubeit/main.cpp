@@ -21,19 +21,7 @@ map <QString, void *> GuiHelpers() {
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Pvl appLog;
-  try {
-    cubeit(ui, &appLog);
-  }
-  catch (...) {
-    for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
-      Application::Log(*grpIt);
-    }
-    throw;
-  }
-
-  for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
-    Application::Log(*grpIt);
-  }
+  cubeit(ui, &appLog);
 }
 
 //Helper function to output the input file to log.

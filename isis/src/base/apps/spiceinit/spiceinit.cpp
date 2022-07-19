@@ -474,7 +474,7 @@ namespace Isis {
         currentKernels += source;
         icube->putGroup(currentKernels);
         if (log){
-          log->addGroup(currentKernels);
+          log->addLogGroup(currentKernels);
         }
 
       }
@@ -485,7 +485,7 @@ namespace Isis {
           currentKernels += PvlKeyword("Error", errPvl.group(errPvl.groups() - 1)["Message"][0]);
         }
         if (log) {
-          log->addGroup(currentKernels);
+          log->addLogGroup(currentKernels);
         }
         icube->putGroup(originalKernels);
 
@@ -681,7 +681,7 @@ namespace Isis {
     icube->putGroup(kernelsGroup);
 
     if (log) {
-      log->addGroup(kernelsGroup);
+      log->addLogGroup(kernelsGroup);
     }
 
     Pvl *icubeLabel = icube->label();

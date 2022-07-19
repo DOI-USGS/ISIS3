@@ -186,7 +186,7 @@ namespace Isis {
     error += PvlKeyword("LineStdDeviationError", toString(lineErr.StandardDeviation()));
     
     if (log) {
-        log->addGroup(error);
+        log->addLogGroup(error);
     }
 
     //Close the input cubes for cleanup
@@ -465,7 +465,7 @@ namespace Isis {
       PvlGroup mapping = outmap->Mapping();
       
       if (log) {
-        log->addGroup(mapping);
+        log->addLogGroup(mapping);
       }
 
       //Clean up

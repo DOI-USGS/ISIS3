@@ -120,7 +120,7 @@ namespace Isis{
       results += PvlKeyword("ValidMin", toString(min));
       results += PvlKeyword("ValidMax", toString(max));
       if (log){
-        log->addGroup(results);
+        log->addLogGroup(results);
       }
     }
     else {
@@ -196,7 +196,7 @@ namespace Isis{
       results += PvlKeyword("ValidMin", toString(min));
       results += PvlKeyword("ValidMax", toString(max));
       if (log){
-        log->addGroup(results);
+        log->addLogGroup(results);
       }
 
       process.StandardPds4Label();

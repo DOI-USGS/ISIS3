@@ -433,7 +433,7 @@ namespace Isis {
 
     // add mapping to print.prt
     if(log) {
-      log->addGroup(cleanMapping);
+      log->addLogGroup(cleanMapping);
     }
 
     // Cleanup
