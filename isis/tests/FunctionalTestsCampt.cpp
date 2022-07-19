@@ -6,7 +6,8 @@
 #include "csm/Ellipsoid.h"
 
 #include "campt.h"
-#include "Fixtures.h"
+#include "CameraFixtures.h"
+#include "CsmFixtures.h"
 #include "Mocks.h"
 #include "Pvl.h"
 #include "PvlGroup.h"

@@ -259,7 +259,7 @@ namespace Isis{
       }
 
       // we still want to output the results
-      log->addGroup((*point));
+      log->addLogGroup((*point));
       delete point;
       point = NULL;
     }

@@ -147,7 +147,7 @@ namespace Isis {
     ocube->putGroup(calibrationLog);
     
     if(log){
-      log->addGroup(calibrationLog);
+      log->addLogGroup(calibrationLog);
     }
     
     p.EndProcess();

@@ -4,7 +4,7 @@
 #include <QTextStream>
 #include <QStringList>
 
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
 
@@ -132,8 +132,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsCubeFilter) {
   QTemporaryFile flatFile;
   ASSERT_TRUE(flatFile.open());
 
-  QVector<QString> args = {"filter=yes", 
-                           "deffile=" + defFile.fileName(), 
+  QVector<QString> args = {"filter=yes",
+                           "deffile=" + defFile.fileName(),
                            "flatfile=" + flatFile.fileName()};
   UserInterface options(APP_XML, args);
   Pvl log;
@@ -174,8 +174,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsPointFilter) {
   QTemporaryFile flatFile;
   ASSERT_TRUE(flatFile.open());
 
-  QVector<QString> args = {"filter=yes", 
-                           "deffile=" + defFile.fileName(), 
+  QVector<QString> args = {"filter=yes",
+                           "deffile=" + defFile.fileName(),
                            "flatfile=" + flatFile.fileName()};
   UserInterface options(APP_XML, args);
   Pvl log;
@@ -189,7 +189,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsPointFilter) {
   while(!stream.atEnd()) {
     QString line = stream.readLine();
     QStringList values = line.split(",");
-    
+
     ASSERT_DOUBLE_EQ(values.size(), 13);
     lineNumber++;
   }
@@ -211,8 +211,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetstatsInvalidDefFile) {
   QTemporaryFile flatFile;
   ASSERT_TRUE(flatFile.open());
 
-  QVector<QString> args = {"filter=yes", 
-                           "deffile=" + defFile.fileName(), 
+  QVector<QString> args = {"filter=yes",
+                           "deffile=" + defFile.fileName(),
                            "flatfile=" + flatFile.fileName()};
   UserInterface options(APP_XML, args);
   Pvl log;

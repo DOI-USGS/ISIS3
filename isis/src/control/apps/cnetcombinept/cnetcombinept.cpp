@@ -499,7 +499,7 @@ namespace Isis{
       summary += PvlKeyword("MeasuresMerged",    toString(nMerged));
       summary += PvlKeyword("MeasuresDeleted",   toString(nRemoved));
       summary += PvlKeyword("MinimumMeasures",   toString(nMinMeasures));
-      log->addGroup(summary);
+      log->addLogGroup(summary);
     }
 
     pbl.EndProcess();

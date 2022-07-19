@@ -398,7 +398,7 @@ namespace Isis {
 
     // Log Control Net results
     if (log){
-      log->addGroup(summary);
+      log->addLogGroup(summary);
     }
 
     outProgress.CheckStatus();
@@ -504,7 +504,7 @@ namespace Isis {
                            "Check the documentation for specific keyword descriptions.");
       }
       if(log) {
-        log->addGroup(results);
+        log->addLogGroup(results);
       }
 
       resultsProgress.CheckStatus();

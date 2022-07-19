@@ -1,4 +1,5 @@
-#include "Fixtures.h"
+#include <QTemporaryDir>
+
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -14,13 +15,13 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/lrowaccal.xml").expanded();
 TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelExists) {
   QTemporaryDir tempDir;
   ASSERT_TRUE(tempDir.isValid());
-  
+
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QString testCubeFileName = "data/lrowaccal/M1388981421CE.tmp.vis.even.reduced.cub";
 
-  QVector<QString> args = {"from=" + testCubeFileName, 
-                           "to=" + outCubeFileName, 
-                           "radiometrictype=Radiance", 
+  QVector<QString> args = {"from=" + testCubeFileName,
+                           "to=" + outCubeFileName,
+                           "radiometrictype=Radiance",
                            "radiometricfile=Default"};
   UserInterface options(APP_XML, args);
 
@@ -44,13 +45,13 @@ TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelExists) {
 TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelNotForIOF) {
   QTemporaryDir tempDir;
   ASSERT_TRUE(tempDir.isValid());
-  
+
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QString testCubeFileName = "data/lrowaccal/M1388981421CE.tmp.vis.even.reduced.cub";
 
-  QVector<QString> args = {"from=" + testCubeFileName, 
-                           "to=" + outCubeFileName, 
-                           "radiometrictype=IOF", 
+  QVector<QString> args = {"from=" + testCubeFileName,
+                           "to=" + outCubeFileName,
+                           "radiometrictype=IOF",
                            "radiometricfile=Default"};
   UserInterface options(APP_XML, args);
 

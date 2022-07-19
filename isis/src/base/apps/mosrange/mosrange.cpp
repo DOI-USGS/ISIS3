@@ -294,7 +294,7 @@ namespace Isis {
     mapping += PvlKeyword("PreciseMaximumLongitude", toString(longitudeStat.Maximum()));
 
     if (log){
-      log->addGroup(mapping);
+      log->addLogGroup(mapping);
     }
     
     // Write the output file if requested

@@ -5,7 +5,7 @@
 #include <QStringList>
 
 #include "BandManager.h"
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "Histogram.h"
 #include "LineManager.h"
 #include "PvlGroup.h"

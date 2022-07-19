@@ -11,14 +11,14 @@
     band's filter number. In order to output in I/F units, the cube must have spice
     data. This calibration problem follows the algorithms described the document titled:<br/><br/>
 
-Mars Reconnaissance Orbiter Mars Color Imager (MARCI): <br/>
-Instrument Description, Calibration, and Performance<br/><br/>
+    Mars Reconnaissance Orbiter Mars Color Imager (MARCI): <br/>
+    Instrument Description, Calibration, and Performance<br/><br/>
 
-J.F. Bell III, M.J. Wolff, M.C. Malin, W.M. Calvin, B.A. Cantor, 
-M.A. Caplinger, R.T. Clancy, K.S. Edgett3, L.J. Edwards5, J. Fahle, 
-F. Ghaemi, R.M. Haberle, A. Hale, P.B. James, S.W. Lee, 
-T. McConnochie, E. Noe Dobrea1, M.A. Ravine, D. Schaeffer, 
-K.D. Supulver, and P.C. Thomas
+    J.F. Bell III, M.J. Wolff, M.C. Malin, W.M. Calvin, B.A. Cantor, 
+    M.A. Caplinger, R.T. Clancy, K.S. Edgett3, L.J. Edwards5, J. Fahle, 
+    F. Ghaemi, R.M. Haberle, A. Hale, P.B. James, S.W. Lee, 
+    T. McConnochie, E. Noe Dobrea1, M.A. Ravine, D. Schaeffer, 
+    K.D. Supulver, and P.C. Thomas
   </description>
 
   <category>
@@ -47,6 +47,10 @@ K.D. Supulver, and P.C. Thomas
     <change name="Stuart Sides" date="2019-11-08">
       Modified to use the exposure duration from the new label keywords added by
       marci2isis. Related #2034
+    </change>
+    <change name="Lauren Adoram-Kershner" date="2022-07-15">
+    Implimented step 3 of marci calibration description, where if normalized flatfile DN value 
+    is less than 0.25, the output cube DN is set to 0. 
     </change>
   </history>
 

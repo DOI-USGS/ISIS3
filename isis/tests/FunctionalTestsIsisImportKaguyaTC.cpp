@@ -5,8 +5,9 @@
 #include <QString>
 #include <nlohmann/json.hpp>
 
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "md5wrapper.h"
+#include "Plugin.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -254,7 +255,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyaTC) {
 
   PvlGroup truthDimensions = truth.findGroup("Dimensions", Isis::Plugin::Traverse);
   PvlGroup truthInstrument = truth.findGroup("Instrument", Isis::Plugin::Traverse);
-  
+
   PvlGroup outputDimensions = output.findGroup("Dimensions", Isis::Plugin::Traverse);
   PvlGroup outputInstrument = output.findGroup("Instrument", Isis::Plugin::Traverse);
 

@@ -2,15 +2,19 @@
 #include <QTemporaryFile>
 #include <QTemporaryDir>
 
+#include <geos/geom/Geometry.h>
+#include <geos/geom/CoordinateArraySequence.h>
+
 #include "footprintinit.h"
 
 #include "Cube.h"
+#include "ImagePolygon.h"
 #include "Pvl.h"
 #include "TestUtilities.h"
 #include "FileName.h"
 #include "LineManager.h"
 
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 
 #include "gmock/gmock.h"
 

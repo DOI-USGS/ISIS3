@@ -1,7 +1,7 @@
 #include <QTemporaryDir>
 
 #include "fillgap.h"
-#include "Fixtures.h"
+#include "CubeFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -34,7 +34,7 @@ TEST_F( SmallGapCube, FillGapTestBandAkima )
   catch (IException &e) {
     FAIL() << e.toString().toStdString().c_str() << std::endl;
   }
-  
+
   Cube outCube(cubeFileName);
   Pvl *label = outCube.label();
 
@@ -387,7 +387,7 @@ TEST_F( SmallGapCube, FillGapTestGapsOnEdge )
   int lineNum = 0;
   for(line.begin(); !line.end(); line++) {
     for(int i = 0; i < line.size(); i++) {
-      if( lineNum == 0 ) { 
+      if( lineNum == 0 ) {
         line[i] = NULL8;
       }
     }
@@ -407,5 +407,5 @@ TEST_F( SmallGapCube, FillGapTestGapsOnEdge )
   }
 
   PvlGroup &mess = log.findGroup("Messages", Pvl::Traverse);
-  EXPECT_EQ(mess["Warning"][0].toStdString(), "Unable to fill 9 special pixels." ); 
+  EXPECT_EQ(mess["Warning"][0].toStdString(), "Unable to fill 9 special pixels." );
 }

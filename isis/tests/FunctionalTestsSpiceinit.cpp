@@ -17,7 +17,8 @@
 #include "TestUtilities.h"
 #include "FileName.h"
 
-#include "Fixtures.h"
+#include "CameraFixtures.h"
+#include "CubeFixtures.h"
 
 using json = nlohmann::json;
 

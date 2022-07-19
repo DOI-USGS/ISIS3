@@ -116,7 +116,7 @@ namespace Isis{
     // Add mapping to print.prt
     PvlGroup mapping = proj->Mapping();
     if (log){
-      log->addGroup(mapping);
+      log->addLogGroup(mapping);
     }
 
     delete proj;

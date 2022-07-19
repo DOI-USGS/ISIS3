@@ -1,6 +1,6 @@
 #include "ringsautomos.h"
 
-#include "Fixtures.h"
+#include "CubeFixtures.h"
 #include "TestUtilities.h"
 #include "UserInterface.h"
 #include "Histogram.h"

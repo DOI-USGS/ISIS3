@@ -3,7 +3,7 @@
 #include <QTemporaryFile>
 
 #include "camrange.h"
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"

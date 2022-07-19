@@ -4,10 +4,12 @@
 
 #include "findimageoverlaps.h"
 #include "overlapstats.h"
-#include "Fixtures.h"
+#include "ImagePolygon.h"
+#include "NetworkFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
+
 #include "gmock/gmock.h"
 
 using namespace Isis;
