@@ -1,7 +1,7 @@
-
-
 #!/usr/bin/env python
 
+from multiprocessing import ProcessError
+from multiprocessing.dummy import Process
 from pprint import pprint
 import logging as log
 import os
@@ -9,13 +9,21 @@ import json
 import argparse
 import subprocess
 import tempfile
-
+from shutil import which
 from os import path
+
+# mission_arr =  ["dawn", "cassini", "hayabusa2", "juno", "odyssey", "mro", "mex", "cassis", "apollo15", "apollo16", "apollo17", "base", "hayabusa", "chandrayaan1", "clementine1", "kaguya", "mariner10", "messenger", "mgs", "near", "newhorizons", "osirisrex", "rosetta", "smart1", "viking1", "viking2", "voyager1", "voyager2", "tgo"]
 
 # set log level to debug
 def call_subprocess(command, redirect_stdout=True, redirect_stderr=False):
     stdout = subprocess.PIPE if redirect_stdout else None
     stderr = subprocess.PIPE if redirect_stderr else None
+
+    if not which(command[0]):
+        raise ProcessLookupError(f"{command[0]} is not installed.")
+
+    log.debug("Invoking : %s", " ".join(command))
+
     with subprocess.Popen(
             command,
             stdout=stdout,
@@ -23,6 +31,7 @@ def call_subprocess(command, redirect_stdout=True, redirect_stderr=False):
         (out, err) = proc.communicate()
 
         if out:
+            log.debug("Process output: ")
             log.debug(out.decode())
         if err:
             log.warning(err.decode("utf-8").replace("\\n", "\n"))
@@ -55,54 +64,16 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
 
                 f.write(config.encode())
                 command_with_args = ["rclone", command, f"--config={config_path}", *extra_args]
-                log.debug("Invoking : %s", " ".join(command_with_args))
                 return call_subprocess(command_with_args, redirect_stdout, redirect_stderr)
-
-    except FileNotFoundError as not_found_e:
+    except ProcessLookupError as not_found_e:
         log.error("Executable not found. %s", not_found_e)
-        return {
-            "code": -20,
-            "error": not_found_e
-        }
+        raise Exception("rclone is not installed, please install with: 'conda install -c conda-forge rclone'")
     except Exception as generic_e:
         log.exception("Error running command. Reason: %s", generic_e)
-        return {
-            "code": -30,
-            "error": generic_e
-        }
+        raise Exception()
 
 
-def driver_for_missions(command, mission_to_download, mission_list, cfg, destination, dry_run):
-    """
-    Parameters
-    ----------
-    mission_to_download : str
-        mission that you want to download
-
-    mission_list : list
-        list of missions to loop though and get kernel's for mission to download
-
-    cfg : str
-        config file for mission's ftp and http paths
-
-    destination str
-        path to location where files will be copied/downloaded too
-    """
-    path = None
-    for mission in mission_list:
-        if mission_to_download.lower() == mission.strip(":"):
-            path = f"{mission}/"
-            log.info(f"{mission_to_download} found in mission list")
-
-    if path == None:
-        log.info("Mission not found in mission list")
-        raise RuntimeError(f"Mission not found in mission list: {mission_to_download}")
-
-    else:
-        download_pub(command, destination, path, cfg, dry_run)
-
-
-def download_pub(inputcommand, destination, mission_name, cfg, dry_run):
+def create_rclone_arguments(destination, mission_name, dry_run=False, ntransfers=10):
     """
     Parameters
     ----------
@@ -112,47 +83,30 @@ def download_pub(inputcommand, destination, mission_name, cfg, dry_run):
 
     set_of_pub : set(str)
             set of kernels that will be downloaded
-
-    cfg : str
-            config file
     """
+    log.debug(f"Creating RClone command for {mission_name}")
+    mission_dir_name, source_type = mission_name.replace(":", "").split("_")
 
-    log.info("Starting to download kernels")
+    log.debug(f"Mission_dir_name: {mission_dir_name}, source_type: {source_type}")
 
-    if(inputcommand == "lsf"):
-        mission_name = mission_name.strip("/")
-        log.debug(f"Running lsf using mission name {mission_name}")
+    destination += str(mission_dir_name).replace(":","")
+    if source_type == "naifKernels":
+        destination = os.path.join(destination, "kernels")
 
-        extra_args= [f"{mission_name}", "-R", "--format", "p", "--files-only"]
-        results = rclone(command="lsf", extra_args=extra_args, config=cfg, redirect_stdout=True, redirect_stderr=False)
-        f = open(f"{destination}/output.json" , "w")
-        f.truncate()
-        f.write(json.loads(json.dumps(results.get('out').decode('utf-8'))))
-        f.close()
-    else:
-        log.debug(f"Running {inputcommand} for {mission_name}")
-        mission_dir_name, source_type = mission_name.replace(":/", "").split("_")
+    if not os.path.exists(destination) and dry_run==False:
+        log.debug("{destination} does not exist, making directory")
+        os.makedirs(destination)
 
-        log.debug(f"Mission_dir_name: {mission_dir_name}, source_type: {source_type}")
-
-        destination += str(mission_dir_name).replace(":","")
-        if source_type == "pub":
-            destination = os.path.join(destination, "kernels")
-
-        if not os.path.exists(destination):
-            log.debug("{destination} does not exist, making directory")
-            os.makedirs(destination)
-
-        extra_args=[f"{mission_name}",f"{destination}", "--progress", "--checkers=40", "--transfers=20", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
+    extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
+    
     if dry_run:
         extra_args.append("--dry-run")
 
+    log.debug(f"Args created: {extra_args}")
+    return extra_args
 
-    rclone(command=inputcommand, extra_args=extra_args, config=cfg, redirect_stdout=False, redirect_stderr=False)
-    log.info("Done downloading files")
 
-
-def main(command, mission, dest, legacy_flag, cfg_path, dry_run):
+def main(mission, dest, cfg_path, dry_run, ntransfers):
     """
     Parameters
     ----------
@@ -167,55 +121,55 @@ def main(command, mission, dest, legacy_flag, cfg_path, dry_run):
 
     log.debug(f"Using config: {cfg_path}")
     result = rclone("listremotes", config=cfg_path)
-    results = result.get('out').decode("utf-8").split("\n")
+    config_sources = result.get('out').decode("utf-8").split("\n")
+    if config_sources == ['']: 
+        log.error("Remote sources came back empty. Get more info by re-running with verbose flag.")
+        quit(-1)
+    log.debug(f"Remote Sources: {config_sources}")
 
-    log.debug(f"Output from list remotes:\n {results}")
+    supported_missions = {}
+    for source in config_sources: 
+        parsed_name = source.split("_")
+        # If it is a mission, it should be in the format <mission_nam>_<source_type>
+        if len(parsed_name) == 2 and parsed_name[1] in ["usgs:", "naifKernels:"]: 
+            remotes_mission_name = parsed_name[0]
+            supported_missions[remotes_mission_name] = supported_missions.get(remotes_mission_name, []) + [source]
 
-    if legacy_flag:
-        legacy_remotes = ["legacy_base_usgs"]
-        for remote in legacy_remotes:
-            driver_for_missions(command, remote, results, cfg_path, dest, dry_run)
+    log.debug(f"Supported missions:\n {supported_missions.keys()}")
+    log.debug(f"Complete Dictionary:\n {json.dumps(supported_missions, indent=2)}")
 
-    if(mission.upper() == "ALL"):
-        mission_arr =  ["dawn", "cassini", "hayabusa2", "juno", "odyssey", "mro", "mex", "cassis", "apollo15", "apollo16", "apollo17", "base", "hayabusa", "chandrayaan1", "clementine1", "kaguya", "mariner10", "messenger", "mgs", "near", "newhorizons", "osirisrex", "rosetta", "smart1", "viking1", "viking2", "voyager1", "voyager2", "tgo"]
-        for mission in mission_arr:
-
-            if f"{mission}_pub:" in results:
-                driver_for_missions(command, f"{mission}_pub", results, cfg_path, dest, dry_run)
-
-            if f"{mission}_usgs:" in results:
-                driver_for_missions(command, f"{mission}_usgs", results, cfg_path, dest, dry_run)
-
+    if not mission in supported_missions.keys():
+        raise LookupError(f"{mission} is not in the list of supported missions: {supported_missions.keys()}")
+ 
+    if mission == "legacybase":
+        args = create_rclone_arguments(dest, "legacybase_usgs:", dry_run, ntransfers)
+        rclone(command="sync", extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
+    elif(mission.upper() == "ALL"):
+        supported_missions.pop("legacybase")
+        for mission, remotes in supported_missions.items():
+            for remote in remotes:
+                args = create_rclone_arguments(dest, remote, dry_run, ntransfers)
+                rclone(command="sync", extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
     else:
-        if f"{mission}_pub:" in results:
-            driver_for_missions(command, f"{mission}_pub", results, cfg_path, dest, dry_run)
-
-        if f"{mission}_usgs:" in results:
-            driver_for_missions(command, f"{mission}_usgs", results, cfg_path, dest, dry_run)
+        for remote in supported_missions[mission]:
+            args = create_rclone_arguments(dest, remote, dry_run, ntransfers)
+            rclone(command="sync", extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False) 
 
 
-
-
-if __name__ == '__main__':
-    mission_arr =  ["dawn", "cassini", "hayabusa2", "juno", "odyssey", "mro", "mex", "cassis", "apollo15", "apollo16", "apollo17", "base", "hayabusa", "chandrayaan1", "clementine1", "kaguya", "mariner10", "messenger", "mgs", "near", "newhorizons", "osirisrex", "rosetta", "smart1", "viking1", "viking2", "voyager1", "voyager2", "tgo"]
-    missionList = ""
-    for mission in mission_arr:
-        missionList += mission + ", "
+if __name__ == '__main__': 
     helpString = (
     '''This will allow for a user to download isis data directly to their machine from the USGS S3 buckets as well as public end points\n\n'''
     '''To use the download ISIS Data script you must supply 3 parameters with an optional 4th.\n\n'''
-    '''<rclone command> <Mission name> <destination to copy to> <--dry-run (optional)> \nCompatible missions to download data from:'''
-    f'''\n[{missionList}]\n\n'''
+    '''<rclone command> <Mission name> <destination to copy to> <--dry-run (optional)> \n'''
     '''Example of how to run this program:\n'''
     '''python downloadIsisData.py sync tgo ~/isisData/tgo\n\n'''
     '''NOTE: if you would like to download the data for every mission supply the value ALL for the <Mission name> parameter''')
     parser = argparse.ArgumentParser(description = helpString, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('command', help="the rclone command you would like to run; ie lsjson, sync")
     parser.add_argument('mission', help='mission for files to be downloaded')
     parser.add_argument('dest', help='the destination to download files from source')
-    parser.add_argument('--legacy', help="flag to download ISIS data prior to ISIS 4.1.0", default=False, action='store_true')
     parser.add_argument('--dry-run', help="run a dry run for rclone value should be a boolean", default=False, action='store_true')
     parser.add_argument('-v', '--verbose', action='count', default=0)
+    parser.add_argument('-n', '--num-transfers', action='store', default=10)
     parser.add_argument('--config', action='store', default=os.path.dirname(__file__) + '/../config/rclone.conf')
     args = parser.parse_args()
 
@@ -234,4 +188,4 @@ if __name__ == '__main__':
 
     log.basicConfig(**log_kwargs)
 
-    main(args.command, args.mission, args.dest, args.legacy, os.path.expanduser(args.config), args.dry_run)
+    main(args.mission, args.dest, os.path.expanduser(args.config), args.dry_run, args.num_transfers)
