@@ -80,11 +80,18 @@ namespace Isis{
       }
 
       // Add the orginal label blob
-      if(ui.GetBoolean("ORIGINALLABEL") && incube->label()->hasObject("OriginalLabel")) {
-        OriginalLabel orig = incube->readOriginalLabel();
-        Pvl p = orig.ReturnLabels();
-        p.setName("OriginalLabel");
-        params.addObject(p);
+      if(ui.GetBoolean("ORIGINALLABEL")) {
+        if (incube->label()->hasObject("OriginalLabel")) {
+          OriginalLabel orig = incube->readOriginalLabel();
+          Pvl p = orig.ReturnLabels();
+          p.setName("OriginalLabel");
+          params.addObject(p);
+        }
+        else {
+          QString msg = "Could not find OriginalLabel "
+                        "in input file [" + incube->fileName() + "].";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
 
       // Add the stats
