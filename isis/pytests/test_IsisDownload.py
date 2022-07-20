@@ -2,9 +2,13 @@ from functools import total_ordering
 from tkinter.filedialog import test
 import pytest
 import os
+
+import sys
+sys.path.append('../scripts/')
+
 import json
 import argparse
-from downloadIsisData import rclone 
+from downloadIsisData import rclone
 import logging as log 
 
 log.basicConfig(

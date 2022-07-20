@@ -12,7 +12,22 @@ import tempfile
 from shutil import which
 from os import path
 
-# mission_arr =  ["dawn", "cassini", "hayabusa2", "juno", "odyssey", "mro", "mex", "cassis", "apollo15", "apollo16", "apollo17", "base", "hayabusa", "chandrayaan1", "clementine1", "kaguya", "mariner10", "messenger", "mgs", "near", "newhorizons", "osirisrex", "rosetta", "smart1", "viking1", "viking2", "voyager1", "voyager2", "tgo"]
+
+def find_conf():
+    from pathlib import Path
+    local_path = Path("rclone.conf")
+    install_path = Path(os.environ.get("CONDA_PREFIX")) / "etc" / local_path
+    repo_path = Path(os.path.dirname(__file__)) / '..' / 'config' / 'rclone.conf' 
+    
+    if local_path.exists():
+        return str(local_path) 
+    elif repo_path.exists():
+        return str(repo_path)
+    elif install_path.exists():
+        return str(install_path)
+    else:
+        return ""
+
 
 # set log level to debug
 def call_subprocess(command, redirect_stdout=True, redirect_stderr=False):
@@ -170,7 +185,7 @@ if __name__ == '__main__':
     parser.add_argument('--dry-run', help="run a dry run for rclone value should be a boolean", default=False, action='store_true')
     parser.add_argument('-v', '--verbose', action='count', default=0)
     parser.add_argument('-n', '--num-transfers', action='store', default=10)
-    parser.add_argument('--config', action='store', default=os.path.dirname(__file__) + '/../config/rclone.conf')
+    parser.add_argument('--config', action='store', default=find_conf())
     args = parser.parse_args()
 
     log_kwargs = {
