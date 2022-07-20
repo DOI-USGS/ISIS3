@@ -97,7 +97,7 @@ for (lbl in labels) {
                             // pytests
                             stageStatus = "Running pytests on ${label}"
                             try {
-                                loginShell "pytest $WORKSPACE/isis/pytests"
+                                loginShell "cd $WORKSPACE/isis/pytests && pytest ."
                             } catch(e) {
                                 errors.add(stageStatus)
                                 osFailed = true
