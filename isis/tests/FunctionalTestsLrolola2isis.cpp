@@ -36,8 +36,8 @@ TEST_F(LidarObservationPair, FunctionalTestLrolola2isisTwoImage) {
   }
 
   QString otestFilePath = testFilePath + ".json";
-  json testJson;
-  json truthJson;
+  nlohmann::json testJson;
+  nlohmann::json truthJson;
   
   std::ifstream ifs;
   ifs.open(otestFilePath.toStdString());
@@ -75,8 +75,8 @@ TEST_F(LidarObservationPair, FunctionalTestLrolola2isisMultipleCsv) {
   }
 
   QString otestFilePath = testFilePath + ".json";
-  json testJson;
-  json truthJson;
+  nlohmann::json testJson;
+  nlohmann::json truthJson;
   
   std::ifstream ifs;
   ifs.open(otestFilePath.toStdString());
