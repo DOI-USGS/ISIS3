@@ -16,7 +16,7 @@ from os import path
 def find_conf():
     from pathlib import Path
     local_path = Path("rclone.conf")
-    install_path = Path(os.environ.get("CONDA_PREFIX")) / "etc" / local_path
+    install_path = Path(os.environ.get("CONDA_PREFIX")) / "etc" / "isis" / local_path
     repo_path = Path(os.path.dirname(__file__)) / '..' / 'config' / 'rclone.conf' 
     
     if local_path.exists():
