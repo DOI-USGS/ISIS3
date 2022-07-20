@@ -7,6 +7,7 @@
 #include "Cube.h"
 #include "FileList.h"
 #include "FileName.h"
+#include "LidarData.h"
 #include "TempFixtures.h"
 
 namespace Isis {
