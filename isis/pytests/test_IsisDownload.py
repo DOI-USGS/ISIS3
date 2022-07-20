@@ -21,8 +21,7 @@ mission_arr =  ["tgo", "dawn", "cassini", "hayabusa2", "juno", "odyssey", "mro",
 def test(mission_name):
     log.debug(f"Testing mission: {mission_name}")
     cfg_path = (os.path.dirname(__file__) + '/../config/rclone.conf')
-
-    # dataPath = "/Volumes/common/pkgs/isis3/isis_data"
+    log.info(cfg_path)
     dataPath = str(os.environ.get("ISISDATA"))
 
     log.debug("Getting Data from nfs mounts")
@@ -35,7 +34,7 @@ def test(mission_name):
         truth_set.add(line)
     log.debug("Getting Data from remotes")
     # data from pub source ie: naif, jaxa, esa, ect... 
-    test_args_pub = [f"{mission_name}_pub:/", "-l", "-R", "--format", "p", "--files-only"]
+    test_args_pub = [f"{mission_name}_naifKernels:/", "-l", "-R", "--format", "p", "--files-only"]
     test_data_pub = rclone(command="lsf", extra_args=test_args_pub, config=cfg_path, redirect_stdout=True, redirect_stderr=False)
 
     test_data_pub = test_data_pub.get('out').decode('utf-8')
