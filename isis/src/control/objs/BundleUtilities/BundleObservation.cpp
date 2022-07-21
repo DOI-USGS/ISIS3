@@ -237,4 +237,23 @@ namespace Isis {
   QStringList BundleObservation::imageNames() {
     return m_imageNames;
   }
+
+
+  /**
+   * Compute vtpv, the weighted sum of squares of constrained image parameter residuals.
+   *
+   * @return double Weighted sum of squares of constrained image parameter residuals.
+   */
+  double BundleObservation::vtpv() {
+    double vtpv = 0.0;
+
+    for (int i = 0; i < (int)m_corrections.size(); i++) {
+      if (m_weights[i] > 0.0) {
+        vtpv += m_corrections[i]* m_corrections[i] * m_weights[i];
+      }
+
+    }
+
+    return vtpv;
+  }
 }
