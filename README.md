@@ -376,7 +376,7 @@ Under the root directory of the ISIS Data Area pointed to by the ISISDATA/ISIS3D
 
 ### Versions of the ISIS Data Area
 
-In ISIS version 4.1.0, several files previously stored in the data area closely associated with ISIS applications were moved into version control with the ISIS source code. To support the use of data in ISIS versions predating 4.1.0 the `downloadIsisData` application will need to be supplied the optional parameter `--legacy`. This is explained further in the [Full ISIS Data Download](README.md#Full-ISIS-Data-Download) section. 
+In ISIS version 4.1.0 and later, several files previously stored in the data area closely associated with ISIS applications were moved into version control with the ISIS source code. To support the use of data in ISIS versions predating 4.1.0 the `downloadIsisData` application will need to be supplied the optional parameter `--legacy`. This is explained further in the [Full ISIS Data Download](README.md#Full-ISIS-Data-Download) section. 
 
 
 ### Size of the ISIS Data Area
@@ -385,7 +385,7 @@ If you plan to work with data from all missions, then the download will require 
 
 ### Full ISIS Data Download
 
-> Warning if you are looking to download ISIS data via rsync the servers will be shutdown in a few months.
+> Warning if you are looking to download ISIS data via rsync the servers will be shutdown in November of 2022.
 the outdated rsync download information can be found [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Outdated-ISIS-Data-Information)
 
 
@@ -407,7 +407,7 @@ To download all ISIS data, use the following command:
 
 This data area contains data that is common between multiple missions such as DEMS and leap second kernels. As of ISIS 4.1, the base data area is no longer required to run many applications as data such as icons and templates has been moved into the binary distribution. If you plan to work with any applications that use camera models (e.g., cam2map, campt, qview), it is still recommended you download the base data area. To download the base data area run the following commands:
 
-    downloadIsisData sync base $ISISDATA
+    downloadIsisData base $ISISDATA
 
 ### Partial Download of Mission Specific Data
 
@@ -432,151 +432,45 @@ rsync -azv <b>--exclude='kernels'</b> --delete --partial isisdist.astrogeology.u
 
 For versions of ISIS prior to ISIS 4.1.0, please use the `--legacy` flag
 
-**Apollo Mission:**
-
-    downloadIsisData sync apollo15 $ISISDATA
-
-    downloadIsisData sync apollo16 $ISISDATA
-
-    downloadIsisData sync apollo17 $ISISDATA
-
-**Cassini Mission:**
-
-    downloadIsisData sync cassini $ISISDATA
-
-
-**Chandrayaan Mission:**
-
-    downloadIsisData sync chandrayaan1 $ISISDATA 
-
-
-**Clementine Mission:**
-
-    downloadIsisData sync clementine1 $ISISDATA 
-
-
-**Dawn Mission:**
-
-    downloadIsisData sync dawn $ISISDATA 
-
-
-**ExoMars Trace Gas Orbiter Mission:**
-
-    downloadIsisData sync tgo $ISISDATA 
-
-
-**Galileo Mission:**
-
-    downloadIsisData sync galileo $ISISDATA 
-
-
-**Hayabusa Mission:**
-
-    downloadIsisData sync hayabusa2 $ISISDATA 
-
-
-**Juno Mission:**
-
-    downloadIsisData sync juno $ISISDATA
-
-
-**Kaguya Mission:**
-
-    downloadIsisData sync kaguya $ISISDATA
-
-
-**Lunar Orbiter Mission:**
-
-    downloadIsisData sync lo $ISISDATA
-
-
-**Lunar Reconnaissance Orbiter Mission:**
-
-    downloadIsisData sync lro $ISISDATA
-
-
-**Mars Exploration Rover Mission:**
-
-    downloadIsisData sync mer $ISISDATA
-
-
-**Mariner10 Mission:**
-
-    downloadIsisData sync mariner10 $ISISDATA
-
-
-**Messenger Mission:**
-
-    downloadIsisData sync messenger $ISISDATA
-
-
-**Mars Express Mission:**
-
-    downloadIsisData sync mex $ISISDATA
-
-
-**Mars Global Surveyor Mission:**
-
-    downloadIsisData sync mgs $ISISDATA
-
-
-**Mars Reconnaissance Orbiter Mission:**
-
-    downloadIsisData sync mro $ISISDATA
-
-
-**Mars Odyssey Mission:**
-
-    downloadIsisData sync odyssey $ISISDATA
-
-
-**Near Mission:**
-
-    downloadIsisData sync near $ISISDATA
-
-
-**New Horizons Mission:**
-
-    downloadIsisData sync newhorizons $ISISDATA
-
-
-**OSIRIS-REx Mission:**
-
-    downloadIsisData sync osirisrex $ISISDATA 
-
-
-**Rolo Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/rolo .
-
-
-**Rosetta Mission:**
-
-    downloadIsisData sync rosetta $ISISDATA 
-
-
-**Smart1 Mission:**
-
-    downloadIsisData sync smart1 $ISISDATA
-
-
-**Viking Mission:**
-
-    downloadIsisData sync viking1 $ISISDATA
-    downloadIsisData sync viking2 $ISISDATA
-
-
-**Voyager Mission:**
-
-    downloadIsisData sync voyager1 $ISISDATA
-    downloadIsisData sync voyager2 $ISISDATA
+| Mission | Command |
+| ------ | ------ |
+| Apollo 15 | `downloadIsisData apollo15 $ISISDATA` |
+| Apollo 16 | `downloadIsisData apollo16 $ISISDATA` |
+| Apollo 17 | `downloadIsisData apollo17 $ISISDATA` |
+| Cassini | `downloadIsisData cassini $ISISDATA` | 
+| Chandrayaan 1 | `downloadIsisData chandrayaan1 $ISISDATA` |
+| Clementine 1 | `downloadIsisData clementine1 $ISISDATA` |
+| Dawn | `downloadIsisData dawn $ISISDATA` |
+| ExoMars | `downloadIsisData tgo $ISISDATA` |
+| Galileo | `downloadIsisData galileo $ISISDATA` | 
+| Hayabusa 2 | `downloadIsisData hayabusa2 $ISISDATA` |
+| Juno | `downloadIsisData juno $ISISDATA` |
+| Kaguya | `downloadIsisData kaguya $ISISDATA` |
+| Lunar Orbiter | `downloadIsisData lo $ISISDATA` |
+| Lunar Reconnaissance Orbiter | `downloadIsisData lro $ISISDATA` |
+| Mars Exploration Rover  | `downloadIsisData mer $ISISDATA` |
+| Mariner10  | `downloadIsisData mariner10 $ISISDATA` |
+| Messenger | `downloadIsisData messenger $ISISDATA` |
+| Mars Express  | `downloadIsisData mex $ISISDATA` |
+| Mars Global Surveyor  | `downloadIsisData mgs $ISISDATA` |
+| Mars Reconnaissance Orbiter  | `downloadIsisData mro $ISISDATA` |
+| Mars Odyssey  | `downloadIsisData odyssey $ISISDAT`A |
+| Near  | `downloadIsisData near $ISISDATA` |
+| New Horizons  | `downloadIsisData newhorizons $ISISDATA` |
+| OSIRIS-REx  | `downloadIsisData osirisrex $ISISDATA` |
+| Rolo  | `downloadIsisData rolo $ISISDATA` |
+| Rosetta  | `downloadIsisData rosetta $ISISDATA` |
+| Smart1  | `downloadIsisData smart1 $ISISDATA` |
+| Viking 1 | `downloadIsisData viking1 $ISISDATA` |
+| Viking 2 | `downloadIsisData viking2 $ISISDATA` |
+| Voyager 1 | `downloadIsisData voyager1 $ISISDATA` |
+| Voyager 2 | `downloadIsisData voyager2 $ISISDATA` |
 
 ### ISIS Test Data 
-ISIS is comprised of two types of tests, custom Makefile based tests, and GTest based tests. Those that are GTest based, make economical use of data that exists on the ISIS3 repo along with the source, so no special data is required to run those other than the ISIS data area. The Makefile tests depend on a separate source of data that consists of a few gigabytes of input and expected output data used for testing ISIS applications. The Makefile based tests use the ISISTESTDATA environment variable to know where the required data are located. The total size of this test data decreases as we work towards converting Makefile tests to GTests.  
+ISIS is comprised of two types of tests, custom Makefile based tests, and GTest based tests. Those that are GTest based, make economical use of data that exists on the ISIS3 repo along with the source, so no special data is required to run those other than the ISIS data area. The Makefile tests depend on a separate source of data that consists of a few gigabytes of input and expected output data used for testing ISIS applications. The Makefile based tests use the `ISISTESTDATA` environment variable to know where the required data are located. The total size of this test data decreases as we work towards converting Makefile tests to GTests.  
  
 ###How to download the ISIS test data with rclone  
-Test data is hosted using Amazon S3 storage buckets. We recommend using rclone to pull the data into a local directory. You can download rclone using their instructions (see: https://rclone.org/downloads/) or by using an anaconda environment (see: https://docs.anaconda.com/anaconda/install/). If you already have an anaconda environment up, install rclone with: conda install –c conda-forge rclone  
+Test data is hosted using Amazon S3 storage buckets. We recommend using rclone to pull the data into a local directory. You can download rclone using their instructions (see: https://rclone.org/downloads/) or by using an anaconda environment (see: https://docs.anaconda.com/anaconda/install/). If you already have an anaconda environment up, install rclone with: `conda install –c conda-forge rclone` 
 
 Next, you will want to configure rclone using a default S3 configuration. See: https://rclone.org/s3/ for detailed information on how to configure S3, but for the purposes of downloading the ISIS3 test data, you simply run rclone config which will start an interactive menu. Press enter through it all except for these details: 
 
