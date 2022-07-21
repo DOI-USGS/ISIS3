@@ -1,63 +1,63 @@
-from functools import total_ordering
-from tkinter.filedialog import test
-import pytest
-import os
 
 import sys
 sys.path.append('../scripts/')
 
-import json
-import argparse
-from downloadIsisData import rclone
-import logging as log 
+import os
+import pytest 
+from unittest import mock
+from tempfile import TemporaryDirectory
+from pathlib import Path
 
-log.basicConfig(
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=log.DEBUG,
-    datefmt='%Y-%m-%d %H:%M:%S')
+from downloadIsisData import rclone, create_rclone_arguments
 
-mission_arr =  ["tgo", "dawn", "cassini", "hayabusa2", "juno", "odyssey", "mro", "mex", "apollo15", "apollo16", "apollo17", "base", "hayabusa", "chandrayaan1", "clementine1", "kaguya", "mariner10", "messenger", "mgs", "near", "newhorizons", "osirisrex", "rosetta", "smart1", "viking1", "viking2", "voyager1", "voyager2"]
-@pytest.mark.parametrize("mission_name",mission_arr)
-def test(mission_name):
-    log.debug(f"Testing mission: {mission_name}")
-    cfg_path = (os.path.dirname(__file__) + '/../config/rclone.conf')
-    log.info(cfg_path)
-    dataPath = str(os.environ.get("ISISDATA"))
+class MockedPopen:
+    def __init__(self, args, **kwargs):
+        self.args = args
+        self.returncode = 0
 
-    log.debug("Getting Data from nfs mounts")
-    # data from rclone with USGS Mount 
-    truth_data = rclone("lsf", cfg_path, extra_args=[dataPath, "-l", "-R", "--format", "p", "--files-only"], redirect_stdout=True, redirect_stderr=True)
-    truth_data = truth_data.get('out').decode('utf-8')
-    truth_set = set()
+    def __enter__(self):
+        return self
 
-    for line in truth_data.split("\n"):
-        truth_set.add(line)
-    log.debug("Getting Data from remotes")
-    # data from pub source ie: naif, jaxa, esa, ect... 
-    test_args_pub = [f"{mission_name}_naifKernels:/", "-l", "-R", "--format", "p", "--files-only"]
-    test_data_pub = rclone(command="lsf", extra_args=test_args_pub, config=cfg_path, redirect_stdout=True, redirect_stderr=False)
+    def __exit__(self, exc_type, value, traceback):
+        pass
 
-    test_data_pub = test_data_pub.get('out').decode('utf-8')
-
-    # data from S3 Bucket
-    test_args_usgs = [f"{mission_name}_usgs:/", "-l","-R", "--format", "p", "--files-only"]
-    test_data_usgs = rclone(command="lsf", extra_args=test_args_usgs, config=cfg_path, redirect_stdout=True, redirect_stderr=False)
-    
-    test_data_usgs = test_data_usgs.get('out').decode('utf-8')
-    test_set = set()
-
-    # need to change to compair data from remotes to aws isisdata dev-buckets
-    for item in test_data_pub.split("\n"):
-        if item == "" or item == " ":
-            pass
+    def communicate(self, input=None, timeout=None): 
+        if self.args[0] == 'rclone':
+            stdout = "Success".encode("utf-8")
+            stderr = ''.encode("utf-8")
+            self.returncode = 0
         else:
-            item = f"kernels/{item}"
-            test_set.add(item)
+            raise Exception()
 
-    for item in test_data_usgs.split("\n"):
-        test_set.add(item)
+        return stdout, stderr
 
-    diff = truth_set.difference(test_set)
-    if len(diff) > 0:
-        assert False    
-    assert True
+
+class MockedBustedPopen:
+    def __init__(self, args, **kwargs):
+        raise Exception("idk what happened")
+
+@mock.patch('downloadIsisData.which', return_value=False)
+def test_rclone_not_installed(mock_which):
+    with pytest.raises(ProcessLookupError, match="rclone is not installed"):
+        rclone("lsf", "test", extra_args=["-l", "-R", "--format", "p", "--files-only"], redirect_stdout=True, redirect_stderr=True)
+
+
+@mock.patch("subprocess.Popen", MockedPopen)
+def test_rclone():
+    res = rclone("lsf", "test", extra_args=["-l", "-R", "--format", "p", "--files-only"], redirect_stdout=True, redirect_stderr=True)
+    assert res["out"].decode() == "Success"
+
+@mock.patch("subprocess.Popen", MockedBustedPopen)
+def test_rclone_unknown_exception():
+    with pytest.raises(Exception, match="idk"):
+        res = rclone("lsf", "test", extra_args=["-l", "-R", "--format", "p", "--files-only"], redirect_stdout=True, redirect_stderr=True)
+
+
+def test_create_rclone_args():
+    with TemporaryDirectory() as tdir: 
+        dest = Path(tdir) / "test"
+        args = create_rclone_arguments(str(dest), "lro_naifKernels:", dry_run=False, ntransfers=100)
+        assert args == ['lro_naifKernels:', str(dest/"lro"/"kernels"), '--progress', '--checkers=100', '--transfers=100', '--track-renames', '--log-level=WARNING']
+        assert dest.exists()
+
+

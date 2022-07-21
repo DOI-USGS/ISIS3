@@ -82,10 +82,11 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
                 return call_subprocess(command_with_args, redirect_stdout, redirect_stderr)
     except ProcessLookupError as not_found_e:
         log.error("Executable not found. %s", not_found_e)
-        raise Exception("rclone is not installed, please install with: 'conda install -c conda-forge rclone'")
+        raise ProcessLookupError("rclone is not installed, please install with: 'conda install -c conda-forge rclone'")
     except Exception as generic_e:
-        log.exception("Error running command. Reason: %s", generic_e)
-        raise Exception()
+        message = f"Error running command. Reason: {generic_e}"
+        log.exception(message)
+        raise Exception(message)
 
 
 def create_rclone_arguments(destination, mission_name, dry_run=False, ntransfers=10):
@@ -104,12 +105,13 @@ def create_rclone_arguments(destination, mission_name, dry_run=False, ntransfers
 
     log.debug(f"Mission_dir_name: {mission_dir_name}, source_type: {source_type}")
 
-    destination += str(mission_dir_name).replace(":","")
+    destination = os.path.join(destination, str(mission_dir_name).replace(":",""))
     if source_type == "naifKernels":
         destination = os.path.join(destination, "kernels")
 
     if not os.path.exists(destination) and dry_run==False:
         log.debug("{destination} does not exist, making directory")
+        print(destination)
         os.makedirs(destination)
 
     extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
