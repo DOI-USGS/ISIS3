@@ -162,7 +162,7 @@ class BundleResultsPopulated : public TempTestingFiles {
               rmsImageLineResiduals,
               rmsImageSampleResiduals,
               rmsImageResiduals);
-      
+
       results.setRmsLidarImageResidualLists(
               rmsLidarImageLineResiduals,
               rmsLidarImageSampleResiduals,
@@ -563,12 +563,12 @@ TEST(BundleResults, Sigma0Computation) {
   catch (...) {
     FAIL() << "Expected an IException";
   }
-  results.setNumberObservations(14);
+  results.setNumberImageObservations(14);
   results.computeDegreesOfFreedom();
   results.computeSigma0(56.0, BundleSettings::Sigma0);
   EXPECT_EQ(2.0, results.sigma0());
 
-  results.setNumberObservations(0);
+  results.setNumberImageObservations(0);
   results.computeDegreesOfFreedom();
   results.computeSigma0(9.0, BundleSettings::ParameterCorrections);
   EXPECT_EQ(3.0, results.sigma0());
@@ -605,7 +605,7 @@ TEST_F(BundleResultsPopulated, Serialization) {
 
   XmlStackedHandlerReader reader;
   BundleResultsXmlHandlerTester newResults(NULL, &reader, saveFile);
-  
+
   EXPECT_EQ(newResults.numberFixedPoints(), results.numberFixedPoints());
   EXPECT_EQ(newResults.numberHeldImages(), results.numberHeldImages());
   EXPECT_EQ(newResults.numberIgnoredPoints(), results.numberIgnoredPoints());
