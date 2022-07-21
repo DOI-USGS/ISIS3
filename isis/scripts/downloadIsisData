@@ -179,7 +179,7 @@ if __name__ == '__main__':
     '''To use the download ISIS Data script you must supply 3 parameters with an optional 4th.\n\n'''
     '''<rclone command> <Mission name> <destination to copy to> <--dry-run (optional)> \n'''
     '''Example of how to run this program:\n'''
-    '''python downloadIsisData.py sync tgo ~/isisData/tgo\n\n'''
+    '''python downloadIsisData.py tgo ~/isisData/tgo\n\n'''
     '''NOTE: if you would like to download the data for every mission supply the value ALL for the <Mission name> parameter''')
     parser = argparse.ArgumentParser(description = helpString, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('mission', help='mission for files to be downloaded')
