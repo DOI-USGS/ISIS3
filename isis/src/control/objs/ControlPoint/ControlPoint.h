@@ -348,6 +348,8 @@ namespace Isis {
    *                           #2591). Added check to IsConstrained() method to see if point type is
    *                           Free, in which case we ignore stored a priori sigmas on the
    *                           coordinates.
+   *   @history 2019-04-28 Ken Edmundson Moved PointModified signal and Measures member variable to
+   *                           protected and made destructor virtual for subclass LidarControlPoint.
    *  @history 2019-05-16 Debbie A. Cook  See history entry for ComputeResiduals.  Modified call to
    *                           CameraGroundMap to not do back-of-planet test. References #2591.
    */
@@ -461,7 +463,7 @@ namespace Isis {
       ControlPoint();
       ControlPoint(const ControlPoint &);
       ControlPoint(const QString &id);
-      ~ControlPoint();
+      virtual ~ControlPoint();
 
       ControlNet *Parent() { return parentNetwork; }
 
@@ -591,18 +593,18 @@ namespace Isis {
       double GetResidualRms() const;
       void ClearJigsawRejected();
 
+    protected:
+      void PointModified();
+      //!< List of Control Measures
+      QHash< QString, ControlMeasure * > * measures;
+
     private:
       void SetExplicitReference(ControlMeasure *measure);
       void ValidateMeasure(QString serialNumber) const;
       void AddMeasure(ControlMeasure *measure);
-      void PointModified();
 
 
-    private:
       ControlNet *parentNetwork;
-
-      //!< List of Control Measures
-      QHash< QString, ControlMeasure * > * measures;
 
       QStringList *cubeSerials;
 

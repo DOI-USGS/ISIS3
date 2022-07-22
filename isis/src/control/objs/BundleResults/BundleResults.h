@@ -18,10 +18,12 @@ find files of those names at the top level of this repository. **/
 
 // Isis Library
 #include "BundleControlPoint.h"
+#include "BundleLidarControlPoint.h"
 #include "BundleObservationVector.h"
 #include "BundleSettings.h"
 #include "ControlNet.h"
 #include "Distance.h"
+#include "LidarData.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "PvlObject.h"
 #include "Statistics.h" // ???
@@ -75,9 +77,16 @@ namespace Isis {
    *                            control point coordinate names.  Methods changed:  copy constructor,
    *                            assignment operator, initialize,  Also added access methods for coordinate types.
    *                            References #4649 and #501.
+   *   @history 2018-06-01 Ken Edmundson - removed derivation from QObject; added member variable
+   *                           m_numberLidarRangeConstraintEquations with setter/getter; added
+   *                           member variable m_outLidarData with setter/getter.
    *   @history 2018-09-30 Debbie A. Cook - Removed methods setRadiansToMeters and
    *                            radiansToMeters and member variable m_radiansToMeters.  References #4649
    *                            and #501.
+   *   @history 2019-04-28 Ken Edmundson - Added QList<Statistics> members for lidar residuals -
+   *                            m_rmsLidarImageSampleResiduals, m_rmsLidarImageLineResiduals,
+   *                            m_rmsLidarImageResiduals. Also added accessors for these lists and a
+   *                            method to set them (setRmsLidarImageResidualLists).
    */
   class BundleResults : public QObject {
     Q_OBJECT
@@ -98,6 +107,9 @@ namespace Isis {
       void setRmsImageResidualLists(QVector<Statistics> rmsImageLineResiduals,
                                     QVector<Statistics> rmsImageSampleResiduals,
                                     QVector<Statistics> rmsImageResiduals);
+      void setRmsLidarImageResidualLists(QList<Statistics> rmsLidarImageLineResiduals,
+                                    QList<Statistics> rmsLidarImageSampleResiduals,
+                                    QList<Statistics> rmsLidarImageResiduals);
       void setSigmaCoord1Range(Distance minCoord1Dist, Distance maxCoord1Dist,
                                  QString minCoord1PointId, QString maxCoord1PointId);
       void setSigmaCoord2Range(Distance minCoord2Dist, Distance maxCoord2Dist,
@@ -144,14 +156,19 @@ namespace Isis {
       bool flagOutliers(ControlNet *pCnet);
 #endif
       void setNumberRejectedObservations(int numberObservations);
+      void setNumberImageObservations(int numberObservations);
+      void setNumberLidarImageObservations(int numberLidarObservations);
       void setNumberObservations(int numberObservations);
       void setNumberImageParameters(int numberParameters); // ??? this is the same value an m_nRank
+      void setNumberConstrainedPointParameters(int numberParameters);
+      void setNumberConstrainedLidarPointParameters(int numberParameters);
       void resetNumberConstrainedPointParameters();
       void incrementNumberConstrainedPointParameters(int incrementAmount);
       void resetNumberConstrainedImageParameters();
       void incrementNumberConstrainedImageParameters(int incrementAmount);
       void resetNumberConstrainedTargetParameters();
       void incrementNumberConstrainedTargetParameters(int incrementAmount);
+      void setNumberLidarRangeConstraints(int numberLidarRangeConstraints);
       void setNumberUnknownParameters(int numberParameters);
       void computeDegreesOfFreedom();
       void computeSigma0(double dvtpv, BundleSettings::ConvergenceCriteria criteria);
@@ -161,7 +178,9 @@ namespace Isis {
       void setElapsedTimeErrorProp(double time);
       void setConverged(bool converged); // or initialze method
       void setBundleControlPoints(QVector<BundleControlPointQsp> controlPoints);
+      void setBundleLidarPoints(QVector<BundleLidarControlPointQsp> lidarPoints);
       void setOutputControlNet(ControlNetQsp outNet);
+      void setOutputLidarData(LidarDataQsp outLidarData);
       void setIterations(int iterations);
       void setObservations(BundleObservationVector observations);
 
@@ -169,6 +188,9 @@ namespace Isis {
       QList<Statistics> rmsImageSampleResiduals() const;
       QList<Statistics> rmsImageLineResiduals() const;
       QList<Statistics> rmsImageResiduals() const;
+      QList<Statistics> rmsLidarImageSampleResiduals() const;
+      QList<Statistics> rmsLidarImageLineResiduals() const;
+      QList<Statistics> rmsLidarImageResiduals() const;
       QVector<Statistics> rmsImageXSigmas() const;       // currently unused ???
       QVector<Statistics> rmsImageYSigmas() const;       // currently unused ???
       QVector<Statistics> rmsImageZSigmas() const;       // currently unused ???
@@ -201,11 +223,14 @@ namespace Isis {
       double rejectionLimit() const;
       int numberRejectedObservations() const;
       int numberObservations() const;
+      int numberImageObservations() const;
+      int numberLidarImageObservations() const;
 
       int numberImageParameters() const; // ??? this is the same value an m_nRank
       int numberConstrainedPointParameters() const;
       int numberConstrainedImageParameters() const;
       int numberConstrainedTargetParameters() const;
+      int numberLidarRangeConstraintEquations() const;
       int numberUnknownParameters() const;
       int degreesOfFreedom() const;
       double sigma0() const;
@@ -213,7 +238,9 @@ namespace Isis {
       double elapsedTimeErrorProp() const;
       bool converged() const; // or initialze method
       QVector<BundleControlPointQsp> &bundleControlPoints();
+      QVector<BundleLidarControlPointQsp> &bundleLidarControlPoints();
       ControlNetQsp outputControlNet() const;
+      LidarDataQsp outputLidarData() const;
       int iterations() const;
       const BundleObservationVector &observations() const;
 
@@ -299,11 +326,15 @@ namespace Isis {
       double m_rejectionLimit;                //!< current rejection limit
       // TODO:??? reorder read/write data stream, init, copy constructor, operator=
       int m_numberObservations;                //!< number of image coordinate observations
+      int m_numberImageObservations;               //!< photogrammetry image coords. (2 per measure)
+      int m_numberLidarImageObservations;          //!< lidar image coords.          (2 per measure)
       int m_numberRejectedObservations;        //!< number of rejected image coordinate observations
+      int m_numberLidarRangeConstraintEquations;   //!< # lidar range constraint equations
       int m_numberUnknownParameters;           //!< total number of parameters to solve for
       int m_numberImageParameters;             //!< number of image parameters
       int m_numberConstrainedImageParameters;  //!< number of constrained image parameters
       int m_numberConstrainedPointParameters;  //!< number of constrained point parameters
+      int m_numberConstrainedLidarPointParameters; //!< lidar points
       int m_numberConstrainedTargetParameters; //!< number of constrained target parameters
       int m_degreesOfFreedom;                  //!< degrees of freedom
       double m_sigma0;                         //!< std deviation of unit weight
@@ -321,7 +352,11 @@ namespace Isis {
                                                                  hold pointers to the points
                                                                  and measures in the output
                                                                  control net.*/
+
+      QVector<BundleLidarControlPointQsp> m_bundleLidarPoints;
       ControlNetQsp m_outNet;                               /**< The output control net from
+                                                                 BundleAdjust.*/
+      LidarDataQsp m_outLidarData;                          /**< Output lidar data from
                                                                  BundleAdjust.*/
       int m_iterations;                                     /**< The number of iterations taken
                                                                  by BundleAdjust.*/
@@ -339,6 +374,13 @@ namespace Isis {
                                                        for each image in the bundle  */
       QList<Statistics> m_rmsImageResiduals;      /**< RMS image sample and line residual statistics
                                                        for each image in the bundle  */
+
+      QList<Statistics> m_rmsLidarImageSampleResiduals; /**< List of RMS lidar sample residual stats
+                                                             for each image in the bundle  */
+      QList<Statistics> m_rmsLidarImageLineResiduals;   /**< List of RMS lidar line residual stats
+                                                             for each image in the bundle  */
+      QList<Statistics> m_rmsLidarImageResiduals;       /**< RMS image lidar sample & line residual
+                                                             stats for each image in the bundle  */
 
       //!< The root mean square image x sigmas.
       QVector<Statistics> m_rmsImageXSigmas;     // unset and unused ???

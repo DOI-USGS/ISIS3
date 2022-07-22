@@ -20,6 +20,7 @@ find files of those names at the top level of this repository. **/
 
 // Isis lib
 #include "BundleControlPoint.h"
+#include "BundleLidarPointVector.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleObservationVector.h"
 #include "BundleResults.h"
@@ -30,8 +31,9 @@ find files of those names at the top level of this repository. **/
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
+#include "LidarData.h"
 #include "LinearAlgebra.h"
-#include "MaximumLikelihoodWFunctions.h" // why not just forward declare???
+#include "MaximumLikelihoodWFunctions.h"
 #include "ObservationNumberList.h"
 #include "Progress.h"
 #include "SerialNumberList.h"
@@ -276,10 +278,9 @@ namespace Isis {
    *                            solving for triaxial radii when coordinate type is not Latitudinal.
    *                            Added new optional argument controlPointCoordType to ControlNet
    *                            constructor call.  References #4649 and #501.
-   *   @history 2018-05-31 Debbie A. Cook - Moved productAlphaAV and control point parameter
-   *                            correction code to BundleControlPoint.  Earlier revised errorPropagation to
-   *                            compute the sigmas via the variance/covariance matrices instead of the sigmas.
-   *                            This should produce more accurate results.  References #4649 and #501.
+   *   @history 2018-02-12 Ken Edmundson - Removed members m_xResiduals, m_yResiduals, and
+   *                           m_xyResiduals and made them local to the computeResiduals() method.
+   *                           Removed member m_bodyRadii, used only locally in init() method.
    *   @history 2018-05-22 Ken Edmundson - Modified methods bundleSolveInformation() and
    *                           solveCholeskyBR() to return raw pointers to a BundleSolutionInfo object.
    *                           Also modified resultsReady signal to take a raw pointer to a
@@ -287,10 +288,17 @@ namespace Isis {
    *                           constructor in the BundleSolutionInfo class because it is derived
    *                           from QObject. Note that we ultimately want to return a QSharedPointer
    *                           instead of a raw pointer.
+   *   @history 2018-05-31 Debbie A. Cook - Moved productAlphaAV and control point parameter
+   *                            correction code to BundleControlPoint.  Earlier revised errorPropagation to
+   *                            compute the sigmas via the variance/covariance matrices instead of the sigmas.
+   *                            This should produce more accurate results.  References #4649 and #501.
    *   @history 2018-06-14 Christopher Combs - Added getter method to tell if a bundle adjust was
    *                           aborted. Added emits for status updates to the run widget.
    *   @history 2018-06-18 Makayla Shepherd - Stopped command line output for ipce BundleAdjust.
    *                           Fixes #4171.
+   *   @history 2018-06-27 Ken Edmundson - Now setting measure sigmas in BundleMeasure in init()
+   *                           method; retrieving sigma and sqrt of weight in computePartials and
+   *                           computeVtpv methods.
    *   @history 2018-09-06 Debbie A. Cook - (added to BundleXYZ branch on 2017-09-01)
    *                            Added BundleSettingsQsp as argument to BundleControlPoint constructor
    *                            and moved setWeights call from BundleAdjust::init to BundleControlPoint
@@ -308,6 +316,9 @@ namespace Isis {
    *                            which have been replaced with the local radius of a control
    *                            point for converting point sigmas to/from radians from/to meters.
    *                            References #4649 and #501.
+   *   @history 2018-11-29 Ken Edmundson - Modifed init, initializeNormalEquationsMatrix, and
+   *                           computePartials methods.
+   *   @history 2019-04-29 Ken Edmundson - Modifications for bundle with lidar.
    *  @history 2019-05-15 Debbie A. Cook - The call to CameraGroundMap::GetXY in method
    *                            ComputePartials was modified to not check for points on the back side
    *                            of the planet when computing instrument coordinates during the bundle
@@ -321,6 +332,11 @@ namespace Isis {
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    const QString &cnetFile,
                    const QString &cubeList,
+                   bool printSummary = true);
+      BundleAdjust(BundleSettingsQsp bundleSettings,
+                   const QString &cnetFile,
+                   const QString &cubeList,
+                   const QString &lidarDataFile,
                    bool printSummary = true);
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    QString &cnet,
@@ -356,6 +372,7 @@ namespace Isis {
       // accessors
 
       ControlNetQsp    controlNet();
+      LidarDataQsp     lidarData();
       SerialNumberList *serialNumberList();
       QString          fileName(int index);
       QString          iterationSummaryGroup() const;
@@ -387,7 +404,8 @@ namespace Isis {
       bool computeBundleStatistics();
       void applyParameterCorrections();
       bool errorPropagation();
-      double computeResiduals();
+      void computeResiduals();
+      double computeVtpv();
       bool computeRejectionLimit();
       bool flagOutliers();
 
@@ -400,24 +418,27 @@ namespace Isis {
                            LinearAlgebra::Vector  &coeffRHS,
                            BundleMeasure          &measure,
                            BundleControlPoint     &point);
-      bool formMeasureNormals(boost::numeric::ublas::symmetric_matrix<
-                                  double, boost::numeric::ublas::upper >         &N22,
-                              SparseBlockColumnMatrix                            &N12,
-                              boost::numeric::ublas::compressed_vector< double > &n1,
-                              LinearAlgebra::Vector                              &n2,
-                              LinearAlgebra::Matrix                              &coeffTarget,
-                              LinearAlgebra::Matrix                              &coeffImage,
-                              LinearAlgebra::Matrix                              &coeffPoint3D,
-                              LinearAlgebra::Vector                              &coeffRHS,
-                              int                                                observationIndex);
-      bool formPointNormals(boost::numeric::ublas::symmetric_matrix<
-                                double, boost::numeric::ublas::upper >  &N22,
-                            SparseBlockColumnMatrix                     &N12,
-                            LinearAlgebra::Vector                       &n2,
-                            LinearAlgebra::Vector                       &nj,
-                            BundleControlPointQsp                       &point);
-      bool formWeightedNormals(boost::numeric::ublas::compressed_vector< double >  &n1,
-                               LinearAlgebra::Vector                               &nj);
+      bool formMeasureNormals(LinearAlgebra::MatrixUpperTriangular &N22,
+                              SparseBlockColumnMatrix              &N12,
+                              LinearAlgebra::VectorCompressed      &n1,
+                              LinearAlgebra::Vector                &n2,
+                              LinearAlgebra::Matrix                &coeffTarget,
+                              LinearAlgebra::Matrix                &coeffImage,
+                              LinearAlgebra::Matrix                &coeffPoint3D,
+                              LinearAlgebra::Vector                &coeffRHS,
+                              int                                  observationIndex);
+      int formPointNormals(LinearAlgebra::MatrixUpperTriangular &N22,
+                           SparseBlockColumnMatrix              &N12,
+                           LinearAlgebra::Vector                &n2,
+                           LinearAlgebra::Vector                &nj,
+                           BundleControlPointQsp                &point);
+      int formLidarPointNormals(LinearAlgebra::MatrixUpperTriangular &N22,
+                                SparseBlockColumnMatrix              &N12,
+                                LinearAlgebra::Vector                &n2,
+                                LinearAlgebra::Vector                &nj,
+                                BundleLidarControlPointQsp           &point);
+      bool formWeightedNormals(LinearAlgebra::VectorCompressed  &n1,
+                               LinearAlgebra::Vector            &nj);
 
       // dedicated matrix functions
 
@@ -427,39 +448,32 @@ namespace Isis {
                                SparseBlockRowMatrix  &A,
                                LinearAlgebra::Vector &B,
                                LinearAlgebra::Vector &C);
-      bool invert3x3(boost::numeric::ublas::symmetric_matrix<
-                          double, boost::numeric::ublas::upper >  &m);
-      bool productATransB(boost::numeric::ublas::symmetric_matrix<
-                              double, boost::numeric::ublas::upper >  &N22,
-                          SparseBlockColumnMatrix                     &N12,
-                          SparseBlockRowMatrix                        &Q);
-      void productAlphaAV(double alpha,
-                          boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
-                          SparseBlockRowMatrix                                &Q,
-                          LinearAlgebra::Vector                               &v1);
+      bool invert3x3(LinearAlgebra::MatrixUpperTriangular &m);
+      bool productATransB(LinearAlgebra::MatrixUpperTriangular &N22,
+                          SparseBlockColumnMatrix              &N12,
+                          SparseBlockRowMatrix                 &Q);
 
       // CHOLMOD library methods
 
       bool initializeCHOLMODLibraryVariables();
       bool freeCHOLMODLibraryVariables();
-      bool cholmodInverse();
       bool loadCholmodTriplet();
-      bool wrapUp();
 
       // member variables
 
       BundleSettingsQsp m_bundleSettings;                    //!< Contains the solve settings.
       BundleResults  m_bundleResults;                        //!< Stores the results of the
                                                              //!< bundle adjust.
-      Statistics m_xResiduals;                               //!< x residual statistics.
-      Statistics m_yResiduals;                               //!< y residual statistics.
-      Statistics m_xyResiduals;                              //!< xy residual statistics.
       ControlNetQsp m_controlNet;                            //!< Output control net.
       QString m_cnetFileName;                                //!< The control net filename.
-      QVector <BundleControlPointQsp> m_bundleControlPoints; /**!< Vector of control points.
-                                                                   Contains only non-ignored
-                                                                   control points from the control
-                                                                   net.*/
+
+      QVector <BundleControlPointQsp> m_bundleControlPoints; //!< Vector of control points.
+      BundleLidarPointVector m_bundleLidarControlPoints;     //!< Vector of lidar points.
+
+      QString m_lidarFileName;                               //!< Input lidar point filename.
+      LidarDataQsp m_lidarDataSet;                           //!< Output lidar data.
+      int m_numLidarConstraints;                             //!< TODO: temp
+
       BundleObservationVector m_bundleObservations;          /**!< Vector of observations.
                                                                    Each observation contains one or
                                                                    more images.*/
@@ -477,6 +491,7 @@ namespace Isis {
                                                                    the destructor.*/
       int m_rank;                                            //!< The rank of the system.
       int m_iteration;                                       //!< The current iteration.
+      double m_iterationTime;                                //!< Time for last iteration
       int m_numberOfImagePartials;                           //!< number of image-related partials.
       QList<ImageList *> m_imageLists;                        /**!< The lists of images used in the
                                                                    bundle.*/

@@ -209,7 +209,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
 
     QString outFileName = tempDir.path() + "/outTemp.csv";
     QVector<QString> args = {"to="+outFileName,
-        "ISISLABEL=true", "ORIGINAL=true", "STATISTICS=true", "CAMSTATS=true",
+        "ISISLABEL=true", "STATISTICS=true", "CAMSTATS=true",
         "POLYGON=true", "polysinc=100", "polylinc=100"};
 
     UserInterface options(APP_XML, args);
@@ -367,7 +367,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
 TEST_F(DefaultCube, FunctionalTestCaminfoPoly) {
     QString outFileName = tempDir.path() + "/outTemp.pvl";
     QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outFileName,
-        "ISISLABEL=false", "ORIGINAL=false", "STATISTICS=false", "CAMSTATS=false",
+        "ISISLABEL=false", "STATISTICS=false", "CAMSTATS=false",
         "POLYGON=true", "inctype=vertices", "numvertices=3"};
 
     UserInterface options(APP_XML, args);
@@ -398,7 +398,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoPoly) {
 TEST_F(DefaultCube, FunctionalTestCaminfoBoundary) {
     QString outFileName = tempDir.path() + "/outTemp.cub";
     QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outFileName,
-        "ISISLABEL=false", "ORIGINAL=false", "STATISTICS=true", "CAMSTATS=true",
+        "ISISLABEL=false", "STATISTICS=true", "CAMSTATS=true",
         "POLYGON=true", "LINC=25", "SINC=25", "POLYSINC=100", "POLYLINC=100"};
 
     UserInterface options(APP_XML, args);

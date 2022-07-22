@@ -1,0 +1,90 @@
+PDS_VERSION_ID                     = PDS3
+
+/*FILE CHARACTERISTICS*/
+RECORD_TYPE                        = FIXED_LENGTH
+RECORD_BYTES                       = 5064      
+FILE_RECORDS                       = 52225     
+LABEL_RECORDS                      = 1         
+^IMAGE                             = 2         
+
+/*DATA IDENTIFICATION*/
+DATA_SET_ID                        = "LRO-L-LROC-2-EDR-V1.0"
+ORIGINAL_PRODUCT_ID                = nacl0001f286
+PRODUCT_ID                         = M119212462LE
+MISSION_NAME                       = "LUNAR RECONNAISSANCE ORBITER"
+MISSION_PHASE_NAME                 = "NOMINAL MISSION"
+INSTRUMENT_HOST_NAME               = "LUNAR RECONNAISSANCE ORBITER"
+INSTRUMENT_HOST_ID                 = LRO
+INSTRUMENT_NAME                    = "LUNAR RECONNAISSANCE ORBITER CAMERA"
+INSTRUMENT_ID                      = LROC
+LRO:PREROLL_TIME                   = 2010-01-27T06:19:55.207
+START_TIME                         = 2010-01-27T06:19:55.580
+STOP_TIME                          = 2010-01-27T06:20:14.633
+LRO:SPACECRAFT_CLOCK_PREROLL_COUNT = "1/286265995:12451"
+SPACECRAFT_CLOCK_START_COUNT       = "1/286265995:36934"
+SPACECRAFT_CLOCK_STOP_COUNT        = "1/286266014:40414"
+ORBIT_NUMBER                       = 2702
+PRODUCER_ID                        = LRO_LROC_TEAM
+PRODUCT_CREATION_TIME              = 2013-09-11T09:48:02
+PRODUCER_INSTITUTION_NAME          = "ARIZONA STATE UNIVERSITY"
+PRODUCT_TYPE                       = EDR
+PRODUCT_VERSION_ID                 = "v1.8"
+UPLOAD_ID                          = "SC_2010027_0000_A_V01.txt"
+
+/*DATA DESCRIPTION*/
+TARGET_NAME                        = "MOON"
+RATIONALE_DESC                     = "TARGET OF OPPORTUNITY"
+FRAME_ID                           = LEFT
+DATA_QUALITY_ID                    = "0"
+DATA_QUALITY_DESC                  = "The DATA_QUALITY_ID is set to an 8-bit
+   value that encodes the following data quality information for the 
+   observation. For each bit  a value of 0 means FALSE and a value of 1 means 
+   TRUE. More information about the data quality ID can be found in the LROC
+   EDR/CDR SIS, section 3.3 'Label and Header Descriptions'.
+       Bit 1: Temperature of focal plane array is out of bounds.
+       Bit 2: Threshold for saturated pixels is reached.
+       Bit 3: Threshold for under-saturated pixels is reached.
+       Bit 4: Observation is missing telemetry packets.
+       Bit 5: SPICE information is bad or missing.
+       Bit 6: Observation or housekeeping information is bad or missing.
+       Bit 7: Spare.
+       Bit 8: Spare."
+
+/*ENVIRONMENT*/
+LRO:TEMPERATURE_SCS                = 4.17 <degC>
+LRO:TEMPERATURE_FPA                = 17.37 <degC>
+LRO:TEMPERATURE_FPGA               = -12.43 <degC>
+LRO:TEMPERATURE_TELESCOPE          = 8.22 <degC>
+LRO:TEMPERATURE_SCS_RAW            = 2757
+LRO:TEMPERATURE_FPA_RAW            = 2132
+LRO:TEMPERATURE_FPGA_RAW           = 3423
+LRO:TEMPERATURE_TELESCOPE_RAW      = 2568
+
+/*IMAGING PARAMETERS*/
+CROSSTRACK_SUMMING                 = 1
+BANDWIDTH                          = 300 <nm>
+CENTER_FILTER_WAVELENGTH           = 600 <nm>
+LINE_EXPOSURE_DURATION             = 0.363200 <ms>
+LRO:LINE_EXPOSURE_CODE             = 3
+LRO:DAC_RESET_LEVEL                = 198
+LRO:CHANNEL_A_OFFSET               = 49
+LRO:CHANNEL_B_OFFSET               = 112
+LRO:COMPAND_CODE                   = 0
+LRO:LINE_CODE                      = 51
+LRO:BTERM                          = (0,8,25,59,128)
+LRO:MTERM                          = (0.5,0.25,0.125,0.0625,0.03125)
+LRO:XTERM                          = (0,32,136,543,2207)
+LRO:COMPRESSION_FLAG               = 1
+LRO:MODE                           = 7
+
+/*DATA OBJECT*/
+OBJECT                             = IMAGE
+    LINES                          = 52224
+    LINE_SAMPLES                   = 5064
+    SAMPLE_BITS                    = 8
+    SAMPLE_TYPE                    = LSB_INTEGER
+    UNIT                           = "RAW_INSTRUMENT_COUNT"
+    MD5_CHECKSUM                   = "e53932771e9f018bfe66ab871b59e14a"
+END_OBJECT                         = IMAGE
+END
+

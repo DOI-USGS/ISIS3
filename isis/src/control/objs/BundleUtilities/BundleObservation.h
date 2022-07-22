@@ -66,6 +66,8 @@ namespace Isis {
 
       QString instrumentId();
 
+      double vtpv();
+
       virtual LinearAlgebra::Vector &parameterWeights();
       virtual LinearAlgebra::Vector &parameterCorrections();
       virtual LinearAlgebra::Vector &aprioriSigmas();

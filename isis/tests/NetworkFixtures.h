@@ -7,6 +7,7 @@
 #include "Cube.h"
 #include "FileList.h"
 #include "FileName.h"
+#include "LidarData.h"
 #include "TempFixtures.h"
 
 namespace Isis {
@@ -81,6 +82,39 @@ namespace Isis {
       void TearDown() override;
   };
 
+    class LidarObservationPair : public TempTestingFiles {
+    protected:
+
+      Cube *cube1;
+      Cube *cube2;
+
+      QString cube1Path;
+      QString cube2Path;
+
+      FileName *isdPath1;
+      FileName *isdPath2;
+
+      FileList *cubeList;
+      QString cubeListFile;
+
+      QString csvPath;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
+  class LidarNetwork : public LidarObservationPair {
+    protected:
+
+      LidarData rangeData;
+      QString lidarDataPath;
+
+      ControlNet *network;
+      QString controlNetPath;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
 
   class MiniRFNetwork : public TempTestingFiles {
     protected:

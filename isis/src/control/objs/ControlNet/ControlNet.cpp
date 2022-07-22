@@ -1235,6 +1235,18 @@ namespace Isis {
 
 
   /**
+   * Returns the camera list from the input serial number
+   * 
+   * @param serialNumber Serial number.
+   * 
+   * @return Isis::Camera* The pointer to the resultant camera.
+   */
+  Isis::Camera *ControlNet::Camera(QString serialNumber) {
+    return p_cameraMap[serialNumber];
+  } 
+
+
+  /**
    * Return the Created Date
    *
    * @author Sharmila Prasad (10/6/2010)
