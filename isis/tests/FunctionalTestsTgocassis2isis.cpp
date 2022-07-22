@@ -106,8 +106,8 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestBlu) {
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "BLU");
-  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 497.40);
-  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 134.30);
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 494.8);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 133.6);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143424");
 
   // Kernels Group
@@ -180,8 +180,8 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestRed) {
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "RED");
-  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 835.40);
-  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 98);
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 836.0);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 98.5);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143422");
 
   // Kernels Group
@@ -254,8 +254,8 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestNir) {
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "NIR");
-  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 940.20);
-  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 120.60);
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 939.3);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 121.8);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143423");
 
   // Kernels Group
@@ -328,8 +328,8 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestPan) {
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "PAN");
-  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 677.40);
-  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 231.5);
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 678.2);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 231.9);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143421");
 
   // Kernels Group
@@ -433,8 +433,8 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestReingestedUnproj) {
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "RED");
-  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 840);
-  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 100);
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 836.0);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 98.5);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143422");
 
   // Kernels Group
@@ -490,8 +490,8 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestReingestedProj) {
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "RED");
-  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 840);
-  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 100);
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 836.0);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 98.5);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143422");
 
   // Kernels Group
@@ -548,8 +548,8 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestPSALabel) {
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "PAN");
-  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 675);
-  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 250);
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 678.2);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 231.9);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143421");
 
   // Kernels Group
