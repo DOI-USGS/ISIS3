@@ -609,6 +609,8 @@ install(FILES     ${CMAKE_SOURCE_DIR}/../CHANGELOG.md DESTINATION  ${CMAKE_INSTA
 install(FILES     ${CMAKE_BINARY_DIR}/version         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(PROGRAMS ${CMAKE_BINARY_DIR}/lib/Camera.plugin DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
+install(PROGRAMS ${CMAKE_SOURCE_DIR}/scripts/downloadIsisData.py DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
+install(PROGRAMS ${CMAKE_SOURCE_DIR}/config/rclone.conf DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/isis/)
 
 # Trigger all post-install behavior.
 # - The only way to run commands post-install in CMake is to add a subdirectory at

@@ -49,6 +49,8 @@ dependencies:
   - pcl >= 1.10.0
   - protobuf<3.20
   - python>=3.7.11
+  - pytest
+  - rclone
   - qhull
   - qt>=5.9.6
   - qwt
