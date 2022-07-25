@@ -376,7 +376,7 @@ Under the root directory of the ISIS Data Area pointed to by the ISISDATA/ISIS3D
 
 ### Versions of the ISIS Data Area
 
-In ISIS version 4.1.0 and later, several files previously stored in the data area closely associated with ISIS applications were moved into version control with the ISIS source code. To support the use of data in ISIS versions predating 4.1.0 the `downloadIsisData` application will need to be supplied the optional parameter `--legacy`. This is explained further in the [Full ISIS Data Download](README.md#Full-ISIS-Data-Download) section. 
+In ISIS version 4.1.0 and later, several files previously stored in the data area closely associated with ISIS applications were moved into version control with the ISIS source code. To support the use of data in ISIS versions predating 4.1.0 the `downloadIsisData` application will need to download the data named `legacybase`. This is explained further in the [Full ISIS Data Download](README.md#Full-ISIS-Data-Download) section. 
 
 
 ### Size of the ISIS Data Area
@@ -391,13 +391,9 @@ the outdated rsync download information can be found [here](https://github.com/U
 
 The ISIS Data Area is hosted on a combination of AWS S3 buckets and public http servers e.g. NAIF, Jaxa, ESA and not through conda channels like the ISIS binaries. This requires using the `downloadIsisData.py` script from within a terminal window within your Unix distribution, or from within WSL if running Windows 10. Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
 
-> Note: For accessing ISIS Data for versions of ISIS prior to ISIS 4.1.0, you must always use the optional --legacy flag when using this application as shown below:
-
-    downloadIsisData sync base $ISISDATA --legacy
-
 To download all ISIS data, use the following command:
 
-    downloadIsisData sync all $ISISDATA
+    downloadIsisData  all $ISISDATA
 
 > Note: this applicaion takes in 3 parameters in the following order \<rclone command> \<mission> \<download destination>
 
@@ -409,6 +405,9 @@ This data area contains data that is common between multiple missions such as DE
 
     downloadIsisData base $ISISDATA
 
+> Note: For accessing ISIS Data for versions of ISIS prior to ISIS 4.1.0, you must download the `legacybase` area and not the base area when using this application as shown below:
+
+    downloadIsisData legacybase $ISISDATA
 ### Partial Download of Mission Specific Data
 
 There are many missions supported by ISIS. If you are only working with a few missions then you can save disk space by downloading only those specific data areas. If you want to limit the download even further, read the next section about the SPICE Web Service. Otherwise [jump](#Mission-Specific-Data-Downloads) to the mission specific sections.
