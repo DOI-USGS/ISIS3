@@ -453,7 +453,7 @@ For versions of ISIS prior to ISIS 4.1.0, please use the `--legacy` flag
 | Mars Express  | `downloadIsisData mex $ISISDATA` |
 | Mars Global Surveyor  | `downloadIsisData mgs $ISISDATA` |
 | Mars Reconnaissance Orbiter  | `downloadIsisData mro $ISISDATA` |
-| Mars Odyssey  | `downloadIsisData odyssey $ISISDAT`A |
+| Mars Odyssey  | `downloadIsisData odyssey $ISISDATA` |
 | Near  | `downloadIsisData near $ISISDATA` |
 | New Horizons  | `downloadIsisData newhorizons $ISISDATA` |
 | OSIRIS-REx  | `downloadIsisData osirisrex $ISISDATA` |
