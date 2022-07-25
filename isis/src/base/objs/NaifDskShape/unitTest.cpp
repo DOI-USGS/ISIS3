@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 
 #include "Angle.h"
 #include "Cube.h"
+#include "Displacement.h"
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
@@ -80,10 +81,13 @@ int main(int argc, char *argv[]) {
     success = shapeModelFromPvlShape.intersectSurface(obsPos, lookDir);
     qDebug() << "Intersection successful?     " << toString(success);
 
-    qDebug() << "Try to intersect surface at obsPos (1000,0,0) and lookDir (-1,0,0)";
+    qDebug() << "Try to intersect surface at obsPos (1000,0,0) and ground point (1,0,0)";
+    Displacement x(1.0, Displacement::Meters);
+    Displacement y(0.0, Displacement::Meters);
+    Displacement z(0.0, Displacement::Meters);
+    SurfacePoint SurfPt(x, y, z);
     obsPos[0]  = 1000.0;  obsPos[1]  = 0.0;   obsPos[2]  = 0.0;
-    lookDir[0] = -1.0;  lookDir[1] = 0.0;  lookDir[2] = 0.0;
-    success = shapeModelFromPvlShape.intersectSurface(obsPos, lookDir);
+    success = shapeModelFromPvlShape.intersectSurface(SurfPt, obsPos);
     if (success) {
       SurfacePoint *point = shapeModelFromPvlShape.surfaceIntersection();
       qDebug() << "Intercept X = " << point->DisplacementToDouble(point->GetX(), SurfacePoint::Kilometers);
