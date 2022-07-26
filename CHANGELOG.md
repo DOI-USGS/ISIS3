@@ -59,6 +59,7 @@ release.
 - Fixed CNetCombinePt logging functionality such that only merged points are included in the log. [#4973](https://github.com/USGS-Astrogeology/ISIS3/issues/4973)
 - Removed SpkCenterId functions in Cassini camera models due to spkwriter writing positions of Cassini relative to Titan but labeling
 it in the kernel as the position relative to the Saturn Barycenter. [#4942](https://github.com/USGS-Astrogeology/ISIS3/issues/4942)
+- Corrected issue where footprintinit would fail with a segmentation error. [4943](https://github.com/USGS-Astrogeology/ISIS3/issues/4943)
 
 
 ## [7.0.0] - 2022-02-11

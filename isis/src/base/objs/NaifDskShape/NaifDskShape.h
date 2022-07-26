@@ -56,6 +56,10 @@ namespace Isis {
       bool intersectSurface(std::vector<double> observerPos,
                             std::vector<double> lookDirection);
 
+      bool intersectSurface(const SurfacePoint &surfpt,
+                            const std::vector<double> &observerPos,
+                            const bool &backCheck=true);
+
       // Calculate the default normal of the current intersection point
       void calculateDefaultNormal();
 
@@ -72,6 +76,7 @@ namespace Isis {
 
       const NaifDskPlateModel &model() const;
       const Intercept *intercept() const;
+
 
     private:
       // Disallow copying because ShapeModel is not copyable
