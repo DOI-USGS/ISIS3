@@ -1,7 +1,10 @@
 #include "Cube.h"
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
+#include "Table.h"
+#include "TableField.h"
+#include "TableRecord.h"
 #include "TestUtilities.h"
 #include "CameraStatistics.h"
 
@@ -172,9 +175,41 @@ TEST_F(DefaultCube, FunctionalTestCaminfoCsv) {
 
 
 TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
+    CameraStatistics camStats(testCube->camera(), 100, 100, testCube->fileName());
+
+    Pvl statsPvl = camStats.toPvl();
+    TableField fname("Name", Isis::TableField::Text, 45);
+    TableField fmin("Minimum", Isis::TableField::Double);
+    TableField fmax("Maximum", Isis::TableField::Double);
+    TableField favg("Average", Isis::TableField::Double);
+    TableField fstd("StandardDeviation", Isis::TableField::Double);
+
+    TableRecord record;
+    record += fname;
+    record += fmin;
+    record += fmax;
+    record += favg;
+    record += fstd;
+
+    Table table("CameraStatistics", record);
+
+    for (int i = 1; i < statsPvl.groups(); i++) {
+      PvlGroup &group = statsPvl.group(i);
+
+      int entry = 0;
+      record[entry] = group.name();
+      entry++;
+      for (int j = 0; j < group.keywords(); j++) {
+        record[entry] = toDouble(group[j][0]);
+        entry++;
+      }
+      table += record;
+    }
+    testCube->write(table);
+
     QString outFileName = tempDir.path() + "/outTemp.csv";
     QVector<QString> args = {"to="+outFileName,
-        "ISISLABEL=true", "ORIGINAL=true", "STATISTICS=true", "CAMSTATS=true",
+        "ISISLABEL=true", "STATISTICS=true", "CAMSTATS=true",
         "POLYGON=true", "polysinc=100", "polylinc=100"};
 
     UserInterface options(APP_XML, args);
@@ -332,7 +367,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
 TEST_F(DefaultCube, FunctionalTestCaminfoPoly) {
     QString outFileName = tempDir.path() + "/outTemp.pvl";
     QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outFileName,
-        "ISISLABEL=false", "ORIGINAL=false", "STATISTICS=false", "CAMSTATS=false",
+        "ISISLABEL=false", "STATISTICS=false", "CAMSTATS=false",
         "POLYGON=true", "inctype=vertices", "numvertices=3"};
 
     UserInterface options(APP_XML, args);
@@ -363,7 +398,7 @@ TEST_F(DefaultCube, FunctionalTestCaminfoPoly) {
 TEST_F(DefaultCube, FunctionalTestCaminfoBoundary) {
     QString outFileName = tempDir.path() + "/outTemp.cub";
     QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outFileName,
-        "ISISLABEL=false", "ORIGINAL=false", "STATISTICS=true", "CAMSTATS=true",
+        "ISISLABEL=false", "STATISTICS=true", "CAMSTATS=true",
         "POLYGON=true", "LINC=25", "SINC=25", "POLYSINC=100", "POLYLINC=100"};
 
     UserInterface options(APP_XML, args);

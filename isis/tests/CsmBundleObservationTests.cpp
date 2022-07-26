@@ -4,7 +4,7 @@
 
 #include "CsmBundleObservation.h"
 #include "CSMCamera.h"
-#include "Fixtures.h"
+#include "CsmFixtures.h"
 #include "MockCsmPlugin.h"
 #include "Mocks.h"
 #include "TestUtilities.h"

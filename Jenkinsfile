@@ -93,6 +93,14 @@ for (lbl in labels) {
                                 errors.add(stageStatus)
                                 osFailed = true
                             }
+                            // pytests
+                            stageStatus = "Running pytests on ${label}"
+                            try {
+                                loginShell "cd $WORKSPACE/isis/pytests && pytest ."
+                            } catch(e) {
+                                errors.add(stageStatus)
+                                osFailed = true
+                            }
 
                             if (osFailed) {
                                 error "Failed on ${label}"

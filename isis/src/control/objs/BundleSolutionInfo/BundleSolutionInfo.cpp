@@ -17,6 +17,7 @@ find files of those names at the top level of this repository. **/
 #include <QUuid>
 #include <QXmlStreamWriter>
 
+#include "BundleLidarRangeConstraint.h"
 #include "BundleResults.h"
 #include "Control.h"
 #include "ControlList.h"
@@ -55,6 +56,37 @@ namespace Isis {
     m_inputControlNetFileName = new FileName(controlNetworkFileName);
     m_outputControl = NULL;
     m_outputControlName="";
+    m_inputLidarDataFileName = NULL;
+    m_outputLidarDataSet = NULL;
+    m_settings = inputSettings;
+    m_statisticsResults = new BundleResults(outputStatistics);
+    m_images = new QList<ImageList *>(imgList);
+    m_adjustedImages = new QList<ImageList *>;
+  }
+
+
+  /**
+   * Constructor. Creates a BundleSolutionInfo.
+   *
+   * @param inputSettings The settings saved in BundleSolutionInfo
+   * @param controlNetworkFileName The file name and path of the control network
+   * @param outputStatistics The results of the BundleAdjust
+   * @param parent The Qt-relationship parent
+   */
+  BundleSolutionInfo::BundleSolutionInfo(BundleSettingsQsp inputSettings,
+                                         FileName controlNetworkFileName,
+                                         FileName lidarDataFileName,
+                                         BundleResults outputStatistics,
+                                         QList<ImageList *> imgList,
+                                         QObject *parent) : QObject(parent) {
+    m_id = new QUuid(QUuid::createUuid());
+    m_runTime = "";
+    m_name = m_runTime;
+    m_inputControlNetFileName = new FileName(controlNetworkFileName);
+    m_outputControl = NULL;
+    m_outputControlName="";
+    m_inputLidarDataFileName = new FileName(lidarDataFileName);
+    m_outputLidarDataSet = NULL;
     m_settings = inputSettings;
     m_statisticsResults = new BundleResults(outputStatistics);
     m_images = new QList<ImageList *>(imgList);
@@ -79,6 +111,8 @@ namespace Isis {
     m_inputControlNetFileName = NULL;
     m_outputControl = NULL;
     m_outputControlName="";
+    m_inputLidarDataFileName = NULL;
+    m_outputLidarDataSet = NULL;
     m_statisticsResults = NULL;
     // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
     m_images = new QList<ImageList *>;
@@ -100,6 +134,12 @@ namespace Isis {
 
     delete m_outputControl;
     m_outputControl = NULL;
+
+    delete m_inputLidarDataFileName;
+    m_inputLidarDataFileName = NULL;
+
+    delete m_outputLidarDataSet;
+    m_outputLidarDataSet = NULL;
 
     delete m_statisticsResults;
     m_statisticsResults = NULL;
@@ -287,6 +327,16 @@ namespace Isis {
       return m_outputControl->fileName();
     else
       return m_outputControlName;
+  }
+
+
+  /**
+   * Returns name of input lidar data file (if any).
+   *
+   * @return QString Name of input lidar data file.
+   */
+  QString BundleSolutionInfo::inputLidarDataFileName() const {
+    return m_inputLidarDataFileName->expanded();
   }
 
 
@@ -482,6 +532,8 @@ namespace Isis {
       return false;
     }
 
+    LidarDataQsp lidarData = m_statisticsResults->outputLidarData();
+
     char buf[1056];
     int numObservations = m_statisticsResults->observations().size();
     int numImages = 0;
@@ -489,13 +541,15 @@ namespace Isis {
       numImages += m_statisticsResults->observations().at(i)->size();
     }
     int numValidPoints = m_statisticsResults->outputControlNet()->GetNumValidPoints();
+
+    int numValidLidarPoints = 0;
+    if (lidarData) {
+      numValidLidarPoints = lidarData->numberLidarPoints();
+    }
+
     int numInnerConstraints = 0;
     int numDistanceConstraints = 0;
-    int numDegreesOfFreedom = m_statisticsResults->numberObservations()
-                            + m_statisticsResults->numberConstrainedPointParameters()
-                            + m_statisticsResults->numberConstrainedImageParameters()
-                            + m_statisticsResults->numberConstrainedTargetParameters()
-                            - m_statisticsResults->numberUnknownParameters();
+    int numDegreesOfFreedom = m_statisticsResults->degreesOfFreedom();
 
     int convergenceCriteria = 1;
 
@@ -526,6 +580,11 @@ namespace Isis {
     sprintf(buf, "\n                       Network Description: %s",\
                   m_statisticsResults->outputControlNet()->Description().toLatin1().data());
     fpOut << buf;
+    if (m_inputLidarDataFileName) {
+      sprintf(buf, "\n            Lidar Data Filename: %s",
+                    m_inputLidarDataFileName->expanded().toLatin1().data());
+      fpOut << buf;
+    }
     sprintf(buf, "\n                       Target: %s",
                   m_statisticsResults->outputControlNet()->GetTarget().toLatin1().data());
     fpOut << buf;
@@ -838,6 +897,11 @@ namespace Isis {
     sprintf(buf, "\n                         Points: %6d",numValidPoints);
     fpOut << buf;
 
+    if (numValidLidarPoints > 0) {
+      sprintf(buf, "\n                   Lidar Points: %6d",numValidLidarPoints);
+      fpOut << buf;
+    }
+
     sprintf(buf, "\n                 Total Measures: %6d",
                   (m_statisticsResults->numberObservations()
                       + m_statisticsResults->numberRejectedObservations()) / 2);
@@ -871,6 +935,12 @@ namespace Isis {
     if (m_statisticsResults->numberConstrainedTargetParameters() > 0) {
       sprintf(buf, "\n  Constrained Target Parameters: %6d",
                     m_statisticsResults->numberConstrainedTargetParameters());
+      fpOut << buf;
+    }
+
+    if (m_statisticsResults->numberLidarRangeConstraintEquations() > 0) {
+      sprintf(buf, "\n        Lidar Range Constraints: %6d",
+              m_statisticsResults->numberLidarRangeConstraintEquations());
       fpOut << buf;
     }
 
@@ -997,21 +1067,30 @@ namespace Isis {
     // Pad each element in the table with the space for the longest image
     // path/name then padd it the length of the element + 1
     QString header("Measures                            RMS(pixels)");
+    if (m_statisticsResults->outputLidarData()) {
+      header += "                                   Lidar RMS(pixels)";
+    }
     // This is padded by an extra 11 to move it center to the table
     sprintf(buf,"%*s\n", header.length() + 11 + filePadding, header.toLatin1().data());
     fpOut << buf;
 
     QString dividers("***************************   *******************************************");
+    if (m_statisticsResults->outputLidarData()) {
+      dividers += "   *******************************************";
+    }
     sprintf(buf,"%*s\n", dividers.length() + 1 + filePadding, dividers.toLatin1().data());
     fpOut << buf;
 
     QString fields("|  Accepted  |   Total    |   |   Samples   |    Lines    |    Total    |");
+    if (m_statisticsResults->outputLidarData()) {
+      fields += "   |   Samples   |    Lines    |    Total    |";
+    }
     sprintf(buf,"%*s\n", fields.length() + 1 + filePadding, fields.toLatin1().data());
     fpOut << buf;
 
-    int numMeasures;
-    int numRejectedMeasures;
-    int numUsed;
+    int numMeasures, numLidarMeasures;
+    int numRejectedMeasures, numLidarRejectedMeasures;
+    int numUsed, numLidarUsed;
     int imageIndex = 0;
     Statistics rmsSamplesTotal,rmsLinesTotal,rmsTotals;
 
@@ -1051,9 +1130,37 @@ namespace Isis {
         sprintf(buf, " %12d %12d     ", numUsed, numMeasures);
         fpOut << buf;
 
-        sprintf(buf,"%13.4lf %13.4lf %13.4lf \n",
+        sprintf(buf,"%13.4lf %13.4lf %13.4lf",
                 rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
 
+        fpOut << buf;
+
+        if (m_statisticsResults->outputLidarData()) {
+          double rmsLidarSampleResiduals = m_statisticsResults->
+                                          rmsLidarImageSampleResiduals()[imageIndex].Rms();
+          double rmsLidarLineResiduals = m_statisticsResults->
+                                        rmsLidarImageLineResiduals()[imageIndex].Rms();
+          double rmsLidarLandSResiduals =  m_statisticsResults->
+                                          rmsLidarImageResiduals()[imageIndex].Rms();
+
+          numLidarMeasures = m_statisticsResults->outputLidarData()->
+                             GetNumberOfValidMeasuresInImage(bundleImage->serialNumber());
+
+          numLidarRejectedMeasures = m_statisticsResults->outputLidarData()->
+                             GetNumberOfJigsawRejectedMeasuresInImage(bundleImage->serialNumber());
+
+          numLidarUsed = numLidarMeasures - numLidarRejectedMeasures;
+
+          sprintf(buf, " %12d %12d     ", numLidarUsed, numLidarMeasures);
+          fpOut << buf;
+
+          sprintf(buf,"%13.4lf %13.4lf %13.4lf",
+                  rmsLidarSampleResiduals,rmsLidarLineResiduals,rmsLidarLandSResiduals);
+
+          fpOut << buf;
+        }
+
+        sprintf(buf, " \n");
         fpOut << buf;
         imageIndex++;
       }
@@ -1374,6 +1481,16 @@ namespace Isis {
       fpOut << (const char*)pointSummaryString.toLatin1().data();
     }
 
+    int nLidarPoints = m_statisticsResults->bundleLidarControlPoints().size();
+    for (int i = 0; i < nLidarPoints; i++) {
+      BundleLidarControlPointQsp lidarControlPoint
+          = m_statisticsResults->bundleLidarControlPoints().at(i);
+
+      QString pointSummaryString =
+          lidarControlPoint->formatBundleOutputSummaryString(berrorProp);
+      fpOut << (const char*)pointSummaryString.toLatin1().data();
+    }
+
     // output point detail data header
     sprintf(buf, "\n\nPOINTS DETAIL\n=============\n\n");
     fpOut << buf;
@@ -1385,8 +1502,16 @@ namespace Isis {
 
       // Removed radiansToMeters argument 9/18/2018 DAC
       QString pointDetailString =
-          bundleControlPoint->formatBundleOutputDetailString(berrorProp,
-                                                           solveRadius);
+          bundleControlPoint->formatBundleOutputDetailString(berrorProp, solveRadius);
+      fpOut << (const char*)pointDetailString.toLatin1().data();
+    }
+
+    for (int i = 0; i < nLidarPoints; i++) {
+      BundleLidarControlPointQsp bundleLidarControlPoint =
+          m_statisticsResults->bundleLidarControlPoints().at(i);
+
+      QString pointDetailString =
+          bundleLidarControlPoint->formatBundleOutputDetailString(berrorProp, solveRadius);
       fpOut << (const char*)pointDetailString.toLatin1().data();
     }
 
@@ -1510,6 +1635,64 @@ namespace Isis {
 
 
   /**
+   * Outputs lidar data to a csv file.
+   *
+   * @return bool If the point data was successfully output.
+   */
+  bool BundleSolutionInfo::outputLidarCSV() {
+    char buf[1056];
+
+    QString ofname = "bundleout_lidar.csv";
+    ofname = m_settings->outputFilePrefix() + ofname;
+    m_csvSavedPointsFilename = ofname;
+
+    std::ofstream fpOut(ofname.toLatin1().data(), std::ios::out);
+    if (!fpOut) {
+      return false;
+    }
+
+    int numPoints = m_statisticsResults->bundleLidarControlPoints().size();
+
+    //                     measured   apriori   adjusted               adjusted
+    //                      range      sigma     range      residual     sigma
+    // point id  image       (km)       (km)      (km)        (km)       (km)
+
+    // print column headers
+    if (m_settings->errorPropagation()) {
+      sprintf(buf, ",,measured,a priori,adjusted,adjusted\n"
+              "point,image,range,sigma,range,sigma,residual\n"
+              "id,name,(km),(km),(km),(km),(km)\n");
+    }
+    else {
+      sprintf(buf, ",,measured,a priori,adjusted\n"
+                   "point,image,range,sigma,range,residual\n"
+                   "id,name,(km),(km),(km),(km)\n");
+    }
+    fpOut << buf;
+
+    for (int i = 0; i < numPoints; i++) {
+
+      BundleLidarControlPointQsp point = m_statisticsResults->bundleLidarControlPoints().at(i);
+      if (!point || point->isRejected()) {
+        continue;
+      }
+
+      int nRangeConstraints = point->numberRangeConstraints();
+      for (int j = 0; j < nRangeConstraints; j++) {
+        BundleLidarRangeConstraintQsp rangeConstraint = point->rangeConstraint(j);
+
+        QString str = rangeConstraint->formatBundleOutputString(m_settings->errorPropagation());
+        fpOut << str;
+      }
+    }
+
+    fpOut.close();
+
+    return true;
+  }
+
+
+  /**
    * Outputs image coordinate residuals to a csv file.
    *
    * @return @b bool If the residuals were successfully output.
@@ -1591,6 +1774,57 @@ namespace Isis {
       }
     }
 
+    numPoints = m_statisticsResults->bundleLidarControlPoints().size();
+    numMeasures = 0;
+
+    BundleLidarControlPointQsp bundleLidarPoint;
+
+    for (int i = 0; i < numPoints; i++) {
+      bundleLidarPoint = m_statisticsResults->bundleLidarControlPoints().at(i);
+      numMeasures = bundleLidarPoint->size();
+
+      if (bundleLidarPoint->rawControlPoint()->IsIgnored()) {
+        continue;
+      }
+
+      for (int j = 0; j < numMeasures; j++) {
+        bundleMeasure = bundleLidarPoint->at(j);
+
+        Camera *measureCamera = bundleMeasure->camera();
+        if (!measureCamera) {
+          continue;
+        }
+
+        if (bundleMeasure->isRejected()) {
+          sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
+                  bundleLidarPoint->id().toLatin1().data(),
+                  bundleMeasure->parentBundleImage()->fileName().toLatin1().data(),
+                  bundleMeasure->cubeSerialNumber().toLatin1().data(),
+                  bundleMeasure->focalPlaneMeasuredX(),
+                  bundleMeasure->focalPlaneMeasuredY(),
+                  bundleMeasure->sample(),
+                  bundleMeasure->line(),
+                  bundleMeasure->sampleResidual(),
+                  bundleMeasure->lineResidual(),
+                  bundleMeasure->residualMagnitude());
+        }
+        else {
+          sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
+                  bundleLidarPoint->id().toLatin1().data(),
+                  bundleMeasure->parentBundleImage()->fileName().toLatin1().data(),
+                  bundleMeasure->cubeSerialNumber().toLatin1().data(),
+                  bundleMeasure->focalPlaneMeasuredX(),
+                  bundleMeasure->focalPlaneMeasuredY(),
+                  bundleMeasure->sample(),
+                  bundleMeasure->line(),
+                  bundleMeasure->sampleResidual(),
+                  bundleMeasure->lineResidual(),
+                  bundleMeasure->residualMagnitude());
+        }
+        fpOut << buf;
+      }
+    }
+
     fpOut.close();
 
     return true;
@@ -1616,9 +1850,7 @@ namespace Isis {
   void BundleSolutionInfo::save(QXmlStreamWriter &stream, const Project *project,
                                 FileName newProjectRoot) const {
 
-    // TODO: comment below not clear, why is this done?
-    // This is done for unitTest which has no Project
-    // SHOULD WE BE CREATING A SERIALIZED PROJECT AS INPUT TO THIS UNIT TEST?
+    // This is done for testing serialization without a Project
     QString relativePath;
     QString relativeBundlePath;
     FileName bundleSolutionInfoRoot;
@@ -1691,8 +1923,6 @@ namespace Isis {
       }
       relativeBundlePath += "/";
     }
-
-    // TODO: so, we can do the stuff below if project is NULL?
 
     stream.writeStartElement("bundleSolutionInfo");
     // save ID, cnet file name, and run time to stream

@@ -147,6 +147,8 @@ namespace Isis {
         throw IException(IException::Programmer, message, _FILEINFO_);
       }
 
+      bundleImage->setParentObservation(bundleObservation);
+
       // Find the bundle observation solve settings for this new observation
       BundleObservationSolveSettings solveSettings;
       // When there is only one bundle observation solve setting, use it for all observations
@@ -250,5 +252,22 @@ namespace Isis {
     // multimap returns them in reverse order they were put in, so invert them to preserve order
     std::reverse(std::begin(list), std::end(list));
     return list;
+  }
+
+
+  /**
+   * Compute vtpv, the weighted sum of squares of constrained image parameter residuals.
+   *
+   * @return double Weighted sum of squares of constrained image parameter residuals.
+   */
+  double BundleObservationVector::vtpvContribution() {
+    double vtpvImage = 0;
+
+    for (int i = 0; i < size(); i++) {
+      BundleObservationQsp bundleObservation = at(i);
+      vtpvImage += bundleObservation->vtpv();
+    }
+
+    return vtpvImage;
   }
 }

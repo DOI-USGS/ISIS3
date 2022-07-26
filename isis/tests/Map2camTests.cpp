@@ -12,7 +12,7 @@
 #include "TestUtilities.h"
 #include "FileName.h"
 
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 
 #include "gmock/gmock.h"
 

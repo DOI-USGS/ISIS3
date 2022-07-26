@@ -2,7 +2,7 @@
 
 #include <QTextStream>
 
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "Histogram.h"
 #include "LineManager.h"
 #include "PvlGroup.h"
@@ -176,7 +176,7 @@ TEST_F(DefaultCube, FunctionalTestNoprojSpecs) {
       Created      = 2006-12-14T10:10:49
       LastModified = 2019-06-27
       # 2019-11-05 Modified by ladoramkershner: Added Mariner 10
-      
+
       # Group name and values will change once stabilized
       Group = "Clipper EIS 2025/EIS-NAC-RS"
         DetectorSamples = 4000
@@ -234,7 +234,7 @@ TEST_F(DefaultCube, FunctionalTestNoprojSpecs) {
         TransY = -0.39031635
         ItransS = 55.759479
       End_Group
-      
+
       Group = "MARS RECONNAISSANCE ORBITER/HIRISE"
         DetectorSamples = 20000
     #    Use the average of red ccd's 4 & 5 for the offsets

@@ -152,16 +152,6 @@ formula:
 
 namespace Isis {
 
-  const QString knownFilters[] = {
-    "NIR",
-    "RED",
-    "ORANGE",
-    "GREEN",
-    "BLUE",
-    "LONG_UV",
-    "SHORT_UV"
-  };
-
   Stretch stretch;
 
   void marcical(UserInterface &ui) {
@@ -175,7 +165,6 @@ namespace Isis {
     icube.open(FileName(ui.GetCubeName("FROM")).expanded());
 
     // Make sure it is a Marci cube
-    FileName inFileName = ui.GetCubeName("FROM");
     try {
       if (icube.group("Instrument")["InstrumentID"][0] != "Marci") {
         throw IException();
@@ -186,6 +175,7 @@ namespace Isis {
       }
     }
     catch (IException &) {
+      FileName inFileName = ui.GetCubeName("FROM");
       QString msg = "This program is intended for use on MARCI images only. [";
       msg += inFileName.expanded() + "] does not appear to be a MARCI image.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -318,20 +308,20 @@ namespace Isis {
     vector<int> filter;
 
     // Conversion from filter name to filter index
-    map<QString, int> filterNameToFilterIndex;
-    filterNameToFilterIndex.insert(pair<QString, int>("BLUE",     1));
-    filterNameToFilterIndex.insert(pair<QString, int>("GREEN",    2));
-    filterNameToFilterIndex.insert(pair<QString, int>("ORANGE",   3));
-    filterNameToFilterIndex.insert(pair<QString, int>("RED",      4));
-    filterNameToFilterIndex.insert(pair<QString, int>("NIR",      5));
-    filterNameToFilterIndex.insert(pair<QString, int>("SHORT_UV", 6));
-    filterNameToFilterIndex.insert(pair<QString, int>("LONG_UV",  7));
+    map<QString, int> filterNameToFilterNumber;
+    filterNameToFilterNumber.insert(pair<QString, int>("BLUE",     1));
+    filterNameToFilterNumber.insert(pair<QString, int>("GREEN",    2));
+    filterNameToFilterNumber.insert(pair<QString, int>("ORANGE",   3));
+    filterNameToFilterNumber.insert(pair<QString, int>("RED",      4));
+    filterNameToFilterNumber.insert(pair<QString, int>("NIR",      5));
+    filterNameToFilterNumber.insert(pair<QString, int>("SHORT_UV", 6));
+    filterNameToFilterNumber.insert(pair<QString, int>("LONG_UV",  7));
 
     PvlKeyword filtNames = icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"];
     int numFilters = filtNames.size();
     for (int i = 0; i < filtNames.size(); i++) {
-      if (filterNameToFilterIndex.find(filtNames[i]) != filterNameToFilterIndex.end()) {
-        filter.push_back(filterNameToFilterIndex.find(filtNames[i])->second);
+      if (filterNameToFilterNumber.find(filtNames[i]) != filterNameToFilterNumber.end()) {
+        filter.push_back(filterNameToFilterNumber.find(filtNames[i])->second);
       }
       else {
         QString msg = "Unrecognized filter name [" + QString(filtNames[i]) + "]";
@@ -347,21 +337,14 @@ namespace Isis {
     PvlKeyword &colOff = icube.label()->findGroup("Instrument", Pvl::Traverse)["ColorOffset"];
     int colorOffset = toInt(colOff[0]);
 
-    for (int filter = 0; filter < numFilters; filter++) {
+    for (int i = 0; i < numFilters; i++) {
       if (colorOffset > 0) {
-        // find the filter num
-        int filtNum = 0;
-        int numKnownFilters = sizeof(knownFilters) / sizeof(QString);
+        int filtNum = filterNameToFilterNumber[filtNames[i]] - 1; // if first vis filter (Blue) there is no offset 1 -> 0
 
-        while (filtNum < numKnownFilters &&
-              (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][filter] != knownFilters[filtNum]) {
-          filtNum ++;
-        }
-
-        padding[filter] = (colorOffset * filterHeight) * filtNum;
+        padding[i] = (colorOffset * filterHeight) * filtNum;
       }
       else {
-        padding[filter] = 0;
+        padding[i] = 0;
       }
     }
 
@@ -508,7 +491,12 @@ namespace Isis {
           ocubeMgr[i] = icubeMgr[i];
         }
         else {
-          ocubeMgr[i] = stretch.Map(icubeMgr[i]) / (*fcubeMgrs[fcubeIndex])[i];
+          if ((*fcubeMgrs[fcubeIndex])[i] < 0.25) {
+            ocubeMgr[i] = 0;
+          }
+          else {
+            ocubeMgr[i] = stretch.Map(icubeMgr[i]) / (*fcubeMgrs[fcubeIndex])[i];
+          }
 
           ocubeMgr[i] = ocubeMgr[i] / exposure / (summing * decimation[fcubeIndex]) / calibrationCoeffs[fcubeIndex].first;
 
@@ -523,6 +511,11 @@ namespace Isis {
 
       icubeMgr++;
       ocubeMgr++;
+
+      // checks if we have reached the end before setting higher band
+      if (ocubeMgr.end()) {
+        break;
+      }
 
       bool newFramelet = false;
 

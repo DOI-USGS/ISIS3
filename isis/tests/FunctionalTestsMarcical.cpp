@@ -1,7 +1,6 @@
 #include <QTemporaryDir>
 
 #include "marcical.h"
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -35,10 +34,10 @@ TEST(Marcical, MarcicalTestDefault) {
   EXPECT_EQ( inst["VariableExposureDuration"][2].toStdString(), "17.5" );
 
   std::unique_ptr<Histogram> outHist (outCube.histogram());
-  EXPECT_NEAR( outHist->Average(), 0.034876, 1e-6 );
-  EXPECT_NEAR( outHist->Sum(), 1.39504, 1e-5 );
+  EXPECT_NEAR( outHist->Average(), 0.046682, 1e-6 );
+  EXPECT_NEAR( outHist->Sum(), 1.86728, 1e-5 );
   EXPECT_EQ( outHist->ValidPixels(), 40 );
-  EXPECT_NEAR( outHist->StandardDeviation(), 0.0110666, 1e-7 );
+  EXPECT_NEAR( outHist->StandardDeviation(), 0.0148127, 1e-7 );
 }
 
 TEST(Marcical, MarcicalTestDefaultNoIof) {
@@ -62,10 +61,10 @@ TEST(Marcical, MarcicalTestDefaultNoIof) {
   EXPECT_EQ( inst["VariableExposureDuration"][2].toStdString(), "17.5" );
 
   std::unique_ptr<Histogram> outHist (outCube.histogram());
-  EXPECT_NEAR( outHist->Average(), 8.80655,  1e-5);
-  EXPECT_NEAR( outHist->Sum(), 352.262, 1e-3 );
+  EXPECT_NEAR( outHist->Average(), 11.78765,  1e-5);
+  EXPECT_NEAR( outHist->Sum(), 471.5062, 1e-3 );
   EXPECT_EQ( outHist->ValidPixels(), 40 );
-  EXPECT_NEAR( outHist->StandardDeviation(), 2.79442, 1e-5 );
+  EXPECT_NEAR( outHist->StandardDeviation(), 3.74036, 1e-5 );
 }
 
 TEST(Marcical, MarcicalTestSingleDuration) {
@@ -87,10 +86,10 @@ TEST(Marcical, MarcicalTestSingleDuration) {
   EXPECT_EQ( inst["VariableExposureDuration"][0].toStdString(), "8.8" );
 
   std::unique_ptr<Histogram> outHist (outCube.histogram());
-  EXPECT_NEAR( outHist->Average(), 0.00656912, 1e-7 );
-  EXPECT_NEAR( outHist->Sum(), 0.131382, 1e-6 );
+  EXPECT_NEAR( outHist->Average(), 0.00879284, 1e-7 );
+  EXPECT_NEAR( outHist->Sum(), 0.175856, 1e-6 );
   EXPECT_EQ( outHist->ValidPixels(), 20 );
-  EXPECT_NEAR( outHist->StandardDeviation(), 0.000671733, 1e-8 ); 
+  EXPECT_NEAR( outHist->StandardDeviation(), 0.000899121, 1e-8 );
 }
 
 TEST(Marcical, MarcicalTestSingleDurationNoIof) {
@@ -110,10 +109,10 @@ TEST(Marcical, MarcicalTestSingleDurationNoIof) {
 
   PvlGroup &inst = label->findGroup("Instrument", Pvl::Traverse);
   EXPECT_EQ( inst["VariableExposureDuration"][0].toStdString(), "8.8" );
-  
+
   std::unique_ptr<Histogram> outHist (outCube.histogram());
-  EXPECT_NEAR( outHist->Average(), 1.61438, 1e-4 );
-  EXPECT_NEAR( outHist->Sum(), 32.2875, 1e-4 );
+  EXPECT_NEAR( outHist->Average(), 2.16086, 1e-4 );
+  EXPECT_NEAR( outHist->Sum(), 43.2172, 1e-4 );
   EXPECT_EQ( outHist->ValidPixels(), 20 );
-  EXPECT_NEAR( outHist->StandardDeviation(), 0.16508, 1e-4 );
+  EXPECT_NEAR( outHist->StandardDeviation(), 0.22096, 1e-4 );
 }

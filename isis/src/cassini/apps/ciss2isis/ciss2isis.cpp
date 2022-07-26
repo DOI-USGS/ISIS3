@@ -362,7 +362,7 @@ namespace Isis{
       PvlGroup msgGrp("Warnings");
       msgGrp += PvlKeyword("CameraAngleLookup", "Failed! No Camera information for filter combination: " + filter);
       if (log) {
-        log->addGroup(msgGrp);
+        log->addLogGroup(msgGrp);
       }
       bandBin += PvlKeyword("Center", "None found for filter combination.");
       bandBin += PvlKeyword("Width", "None found for filter combination.");

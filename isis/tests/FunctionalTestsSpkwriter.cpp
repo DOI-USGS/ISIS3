@@ -1,7 +1,13 @@
 #include "spkwriter.h"
 
-#include "Fixtures.h"
+#include <SpiceUsr.h>
+
+#include "Camera.h"
+#include "CameraFixtures.h"
+#include "NaifStatus.h"
+#include "NetworkFixtures.h"
 #include "Pvl.h"
+#include "Table.h"
 #include "TextFile.h"
 #include "TestUtilities.h"
 

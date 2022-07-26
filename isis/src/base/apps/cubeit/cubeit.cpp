@@ -116,7 +116,7 @@ namespace Isis {
       //Only write out results group if we added something to it.
       if (results.hasKeyword("UnpropagatedBand")) {
         if (log){
-          log->addGroup(results);
+          log->addLogGroup(results);
         }
       }
     }

@@ -353,16 +353,17 @@ namespace Isis {
   void Application::Log(PvlGroup &results) {
     // Add it to the log file
     static bool blankLine = false;
-
-    SessionLog::TheLog().AddResults(results);
+    if (iApp) {
+      SessionLog::TheLog().AddResults(results);
+    }
 
     // See if the log file will be written to the terminal/gui
     // The results group of the Sessoion::Log will be written later
     // in Application::FunctionCleanup if TerminalOutput is on
-    if (SessionLog::TheLog().TerminalOutput()) return;
+    if (iApp && SessionLog::TheLog().TerminalOutput()) return;
 
     // See if we should write the info to our parents gui
-    if (HasParent()) {
+    if (iApp && HasParent()) {
       ostringstream ostr;
       if (blankLine) ostr << endl;
       ostr << results << endl;
@@ -371,7 +372,7 @@ namespace Isis {
     }
 
     // Otherwise see if we need to write to our gui
-    else if (iApp->GetUserInterface().IsInteractive()) {
+    else if (iApp && iApp->GetUserInterface().IsInteractive()) {
       ostringstream ostr;
       if (blankLine) ostr << endl;
       ostr << results << endl;

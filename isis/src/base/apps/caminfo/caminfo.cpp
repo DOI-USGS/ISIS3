@@ -80,11 +80,18 @@ namespace Isis{
       }
 
       // Add the orginal label blob
-      if(ui.GetBoolean("ORIGINALLABEL") && incube->label()->hasObject("OriginalLabel")) {
-        OriginalLabel orig = incube->readOriginalLabel();
-        Pvl p = orig.ReturnLabels();
-        p.setName("OriginalLabel");
-        params.addObject(p);
+      if(ui.GetBoolean("ORIGINALLABEL")) {
+        if (incube->label()->hasObject("OriginalLabel")) {
+          OriginalLabel orig = incube->readOriginalLabel();
+          Pvl p = orig.ReturnLabels();
+          p.setName("OriginalLabel");
+          params.addObject(p);
+        }
+        else {
+          QString msg = "Could not find OriginalLabel "
+                        "in input file [" + incube->fileName() + "].";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
 
       // Add the stats
@@ -290,7 +297,7 @@ namespace Isis{
         // Run camstats on the entire image (all bands)
         // another camstats will be run for each band and output
         // for each band.
-        else if (ui.GetBoolean("CAMSTATS") && !incube->hasTable("CameraStatistics")) {
+        else if (ui.GetBoolean("CAMSTATS")) {
           camstats = new QList< QPair<QString, QString> >;
 
           QString filename = incube->fileName();

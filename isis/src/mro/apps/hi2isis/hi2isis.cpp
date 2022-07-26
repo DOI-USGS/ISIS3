@@ -230,7 +230,7 @@ namespace Isis {
 
     // Write the results to the log
     if(log){
-      log->addGroup(results);
+      log->addLogGroup(results);
     }
 
     return;

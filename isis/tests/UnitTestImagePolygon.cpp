@@ -10,7 +10,8 @@
 
 #include <gtest/gtest.h>
 
-#include "Fixtures.h"
+#include "CameraFixtures.h"
+#include "TempFixtures.h"
 
 using namespace Isis;
 

@@ -9,7 +9,7 @@ using json = nlohmann::json;
 #include "Cube.h"
 #include "Camera.h"
 
-#include "Fixtures.h"
+#include "CubeFixtures.h"
 #include "TestUtilities.h"
 
 #include "gmock/gmock.h"

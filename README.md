@@ -376,19 +376,8 @@ Under the root directory of the ISIS Data Area pointed to by the ISISDATA/ISIS3D
 
 ### Versions of the ISIS Data Area
 
-In ISIS version 4.1.0, several files previously stored in the data area closely associated with ISIS applications were moved into version control with the ISIS source code. Additionally, the environment variables used for the ISIS Data Area and the rsync location for the ISIS Data Area were also updated.
+In ISIS version 4.1.0 and later, several files previously stored in the data area closely associated with ISIS applications were moved into version control with the ISIS source code. To support the use of data in ISIS versions predating 4.1.0 the `downloadIsisData` application will need to download the data named `legacybase`. This is explained further in the [Full ISIS Data Download](README.md#Full-ISIS-Data-Download) section. 
 
-The correct environment variable names and rsync modules to use for the ISIS Data Area for each version of ISIS are summarized in the table below:
-
-ISIS version | ISIS Data Environment variable name | ISIS Data rsync module
----|---|---
-3.x | `$ISIS3DATA` | `isis3data`
-4.0.x | `$ISIS3DATA` | `isis3data`
-4.1.0 | `$ISISDATA` | `isisdata`
-
-The ISIS Data rsync module specifies where to rsync the data from and is the name used after the `::` in the rsync download commands below. For example, the rsync module is in bold in the following example rsync command:
-
-``rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::``**``isis3data``**``/data/`` .
 
 ### Size of the ISIS Data Area
 
@@ -396,17 +385,17 @@ If you plan to work with data from all missions, then the download will require 
 
 ### Full ISIS Data Download
 
-The ISIS Data Area is hosted on rsync servers and not through conda channels like the ISIS binaries. This requires using the rsync command from within a terminal window within your Unix distribution, or from within WSL if running Windows 10.  Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
+> Warning if you are looking to download ISIS data via rsync the servers will be shutdown in November of 2022.
+the outdated rsync download information can be found [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Outdated-ISIS-Data-Information)
 
-To download all ISIS data, enter the following commands in the location where you want to install the ISIS Data Area, for versions of ISIS 4.1.0 and later:
 
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/ .
+The ISIS Data Area is hosted on a combination of AWS S3 buckets and public http servers e.g. NAIF, Jaxa, ESA and not through conda channels like the ISIS binaries. This requires using the `downloadIsisData.py` script from within a terminal window within your Unix distribution, or from within WSL if running Windows 10. Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
 
-For earlier versions, use:
+To download all ISIS data, use the following command:
 
-    cd $ISIS3DATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/ .
+    downloadIsisData  all $ISISDATA
+
+> Note: this applicaion takes in 3 parameters in the following order \<rclone command> \<mission> \<download destination>
 
 > Note: The above command downloads all ISIS data including the required base data area and all of the optional mission data areas.
 
@@ -414,11 +403,11 @@ For earlier versions, use:
 
 This data area contains data that is common between multiple missions such as DEMS and leap second kernels. As of ISIS 4.1, the base data area is no longer required to run many applications as data such as icons and templates has been moved into the binary distribution. If you plan to work with any applications that use camera models (e.g., cam2map, campt, qview), it is still recommended you download the base data area. To download the base data area run the following commands:
 
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/base .
+    downloadIsisData base $ISISDATA
 
-For versions of ISIS prior to ISIS 4.1.0, please use `isis3data` instead of `isisdata` in the above command.
+> Note: For accessing ISIS Data for versions of ISIS prior to ISIS 4.1.0, you must download the `legacybase` area and not the base area when using this application as shown below:
 
+    downloadIsisData legacybase $ISISDATA
 ### Partial Download of Mission Specific Data
 
 There are many missions supported by ISIS. If you are only working with a few missions then you can save disk space by downloading only those specific data areas. If you want to limit the download even further, read the next section about the SPICE Web Service. Otherwise [jump](#Mission-Specific-Data-Downloads) to the mission specific sections.
@@ -440,179 +429,47 @@ rsync -azv <b>--exclude='kernels'</b> --delete --partial isisdist.astrogeology.u
 
 ### Mission Specific Data Downloads
 
-For versions of ISIS prior to ISIS 4.1.0, please cd into `$ISIS3DATA` instead of `$ISISDATA` and use `isis3data` instead of `isisdata` in all the below rsync commands.
-
-**Apollo Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/apollo15 .
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/apollo16 .
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/apollo17 .
-
-
-**Cassini Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/cassini .
-
-
-**Chandrayaan Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/chandrayaan1 .
-
-
-**Clementine Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/clementine1 .
-
-
-**Dawn Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/dawn .
-
-
-**ExoMars Trace Gas Orbiter Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/tgo .
-
-
-**Galileo Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/galileo .
-
-
-**Hayabusa Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/hayabusa .
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/hayabusa2 .
-
-
-**Juno Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/juno .
-
-
-**Kaguya Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/kaguya .
-
-
-**Lunar Orbiter Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/lo .
-
-
-**Lunar Reconnaissance Orbiter Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/lro .
-
-
-**Mars Exploration Rover Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/mer .
-
-
-**Mariner10 Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/mariner10 .
-
-
-**Messenger Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/messenger .
-
-
-**Mars Express Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/mex .
-
-
-**Mars Global Surveyor Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/mgs .
-
-
-**Mars Reconnaissance Orbiter Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/mro .
-
-
-**Mars Odyssey Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/odyssey .
-
-
-**Near Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/near .
-
-
-**New Horizons Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/newhorizons .
-
-
-**OSIRIS-REx Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/osirisrex .
-
-
-**Rolo Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/rolo .
-
-
-**Rosetta Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/rosetta .
-
-
-**Smart1 Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/smart1 .
-
-
-**Viking Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/viking1 .
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/viking2 .
-
-
-**Voyager Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/voyager1 .
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/voyager2 .
+For versions of ISIS prior to ISIS 4.1.0, please use the `--legacy` flag
+
+| Mission | Command |
+| ------ | ------ |
+| Apollo 15 | `downloadIsisData apollo15 $ISISDATA` |
+| Apollo 16 | `downloadIsisData apollo16 $ISISDATA` |
+| Apollo 17 | `downloadIsisData apollo17 $ISISDATA` |
+| Cassini | `downloadIsisData cassini $ISISDATA` | 
+| Chandrayaan 1 | `downloadIsisData chandrayaan1 $ISISDATA` |
+| Clementine 1 | `downloadIsisData clementine1 $ISISDATA` |
+| Dawn | `downloadIsisData dawn $ISISDATA` |
+| ExoMars | `downloadIsisData tgo $ISISDATA` |
+| Galileo | `downloadIsisData galileo $ISISDATA` | 
+| Hayabusa 2 | `downloadIsisData hayabusa2 $ISISDATA` |
+| Juno | `downloadIsisData juno $ISISDATA` |
+| Kaguya | `downloadIsisData kaguya $ISISDATA` |
+| Lunar Orbiter | `downloadIsisData lo $ISISDATA` |
+| Lunar Reconnaissance Orbiter | `downloadIsisData lro $ISISDATA` |
+| Mars Exploration Rover  | `downloadIsisData mer $ISISDATA` |
+| Mariner10  | `downloadIsisData mariner10 $ISISDATA` |
+| Messenger | `downloadIsisData messenger $ISISDATA` |
+| Mars Express  | `downloadIsisData mex $ISISDATA` |
+| Mars Global Surveyor  | `downloadIsisData mgs $ISISDATA` |
+| Mars Reconnaissance Orbiter  | `downloadIsisData mro $ISISDATA` |
+| Mars Odyssey  | `downloadIsisData odyssey $ISISDATA` |
+| Near  | `downloadIsisData near $ISISDATA` |
+| New Horizons  | `downloadIsisData newhorizons $ISISDATA` |
+| OSIRIS-REx  | `downloadIsisData osirisrex $ISISDATA` |
+| Rolo  | `downloadIsisData rolo $ISISDATA` |
+| Rosetta  | `downloadIsisData rosetta $ISISDATA` |
+| Smart1  | `downloadIsisData smart1 $ISISDATA` |
+| Viking 1 | `downloadIsisData viking1 $ISISDATA` |
+| Viking 2 | `downloadIsisData viking2 $ISISDATA` |
+| Voyager 1 | `downloadIsisData voyager1 $ISISDATA` |
+| Voyager 2 | `downloadIsisData voyager2 $ISISDATA` |
 
 ### ISIS Test Data 
-ISIS is comprised of two types of tests, custom Makefile based tests, and GTest based tests. Those that are GTest based, make economical use of data that exists on the ISIS3 repo along with the source, so no special data is required to run those other than the ISIS data area. The Makefile tests depend on a separate source of data that consists of a few gigabytes of input and expected output data used for testing ISIS applications. The Makefile based tests use the ISISTESTDATA environment variable to know where the required data are located. The total size of this test data decreases as we work towards converting Makefile tests to GTests.  
+ISIS is comprised of two types of tests, custom Makefile based tests, and GTest based tests. Those that are GTest based, make economical use of data that exists on the ISIS3 repo along with the source, so no special data is required to run those other than the ISIS data area. The Makefile tests depend on a separate source of data that consists of a few gigabytes of input and expected output data used for testing ISIS applications. The Makefile based tests use the `ISISTESTDATA` environment variable to know where the required data are located. The total size of this test data decreases as we work towards converting Makefile tests to GTests.  
  
 ###How to download the ISIS test data with rclone  
-Test data is hosted using Amazon S3 storage buckets. We recommend using rclone to pull the data into a local directory. You can download rclone using their instructions (see: https://rclone.org/downloads/) or by using an anaconda environment (see: https://docs.anaconda.com/anaconda/install/). If you already have an anaconda environment up, install rclone with: conda install –c conda-forge rclone  
+Test data is hosted using Amazon S3 storage buckets. We recommend using rclone to pull the data into a local directory. You can download rclone using their instructions (see: https://rclone.org/downloads/) or by using an anaconda environment (see: https://docs.anaconda.com/anaconda/install/). If you already have an anaconda environment up, install rclone with: `conda install –c conda-forge rclone` 
 
 Next, you will want to configure rclone using a default S3 configuration. See: https://rclone.org/s3/ for detailed information on how to configure S3, but for the purposes of downloading the ISIS3 test data, you simply run rclone config which will start an interactive menu. Press enter through it all except for these details: 
 
@@ -645,4 +502,22 @@ If you are looking for ISIS2, please [refer to the ISIS 2 Installation Guide](ht
 
 ### How do I install ISIS3.5.2 or earlier?
 
-If you are looking for a version of ISIS prior to 3.6.0, please [refer to the Legacy ISIS3 Installation Guide](https://isis.astrogeology.usgs.gov/documents/LegacyInstallGuide/index.html) for instructions on downloading and installing ISIS, versions prior to 3.6.0.
+If you are looking for a version of ISIS prior to 3.6.0, please [refer to the Legacy ISIS3 Installation Guide](https://isis.astrogeology.usgs.gov/documents/LegacyInstallGuide/index.html) for instructions on downloading and installing ISIS, versions prior to 3.6.0
+
+### How do I access the ISISDATA download script with ISIS 7.0.0 or earlier 
+
+You can download the script and config file from the repo:
+
+```
+# install rclone 
+conda install -c conda-forge rclone
+
+# download the script and rclone config file
+curl https://github.com/USGS-Astrogeology/ISIS3/raw/dev/isis/scripts/downloadIsisData.py -o downloadIsisData.py
+
+curl https://github.com/USGS-Astrogeology/ISIS3/raw/dev/isis/config/rclone.conf -o rclone.conf
+
+# run the script as normal, using --config to point to where you downloaded the config file 
+python downloadIsisData.py sync <mission> $ISISDATA --config rclone.conf
+
+```

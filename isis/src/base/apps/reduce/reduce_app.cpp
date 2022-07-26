@@ -86,7 +86,7 @@ namespace Isis{
 
       // Write the results to the log
       if (log){
-        log->addGroup(results);
+        log->addLogGroup(results);
       }
     } // REFORMAT THESE ERRORS INTO ISIS TYPES AND RETHROW
     catch (IException &) {

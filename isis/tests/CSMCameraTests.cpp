@@ -5,7 +5,7 @@
 #include "csm/Ellipsoid.h"
 
 #include "CSMCamera.h"
-#include "Fixtures.h"
+#include "CsmFixtures.h"
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -13,14 +13,11 @@
 #include "Mocks.h"
 #include "TestUtilities.h"
 #include "FileName.h"
-#include "Fixtures.h"
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
-
-#include "gmock/gmock.h"
 
 using namespace Isis;
 

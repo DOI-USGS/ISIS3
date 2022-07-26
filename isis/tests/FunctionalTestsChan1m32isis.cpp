@@ -2,7 +2,6 @@
 #include <QFile>
 
 #include "chan1m32isis.h"
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"

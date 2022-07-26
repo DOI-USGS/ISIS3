@@ -15,7 +15,7 @@
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
 #include "gmock/gmock.h"
 
 using namespace Isis;

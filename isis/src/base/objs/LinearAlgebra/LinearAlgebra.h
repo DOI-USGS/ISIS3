@@ -11,6 +11,8 @@ find files of those names at the top level of this repository. **/
 
 // boost library
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/vector_sparse.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
 // Qt Library
@@ -109,6 +111,16 @@ namespace Isis {
        */
       typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> SymmetricMatrix;
       /**
+       * Definition for an Isis::LinearAlgebra::MatrixUpperTriangular of doubles with
+       * an upper configuration. This is a typedef for a boost symmetric_matrix.
+       *
+       * Note: This typedef is used so that we can add functionality to an
+       * existing matrix type and/or change which third party library's matrix
+       * we are using without changing all references to this type in the ISIS
+       * API.
+       */
+      typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> MatrixUpperTriangular;
+      /**
        * Definition for an Isis::LinearAlgebra::Vector of doubles. This is a
        * typedef for a boost vector.
        *
@@ -118,6 +130,16 @@ namespace Isis {
        * API.
        */
       typedef boost::numeric::ublas::vector<double> Vector;
+      /**
+       * Definition for an Isis::LinearAlgebra::VectorCompressed of doubles. This is a
+       * typedef for a boost vector. It stores the vector in a more memory efficient form.
+       *
+       * Note: This typedef is used so that we can add functionality to an
+       * existing vector type and/or change which third party library's vector
+       * we are using without changing all references to this type in the ISIS
+       * API.
+       */
+       typedef boost::numeric::ublas::compressed_vector<double> VectorCompressed;
 
       // define AxisAngle and EulerAngle
       /**

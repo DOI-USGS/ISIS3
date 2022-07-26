@@ -5,7 +5,7 @@
 #include <typeinfo>
 
 #include "mapmos.h"
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
 #include "Pvl.h"
 #include "Histogram.h"
 #include "TestUtilities.h"
@@ -177,7 +177,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestMapmos720deg) {
   EXPECT_EQ(double(mapping["MaximumLatitude"]), 5);
   EXPECT_EQ(double(mapping["MinimumLongitude"]), 0);
   EXPECT_EQ(double(mapping["MaximumLongitude"]), 720);
-} 
+}
 
 TEST_F(ThreeImageNetwork, FunctionalTestMapmosExtents) {
   QTemporaryDir prefix;
@@ -230,7 +230,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestMapmosTracking) {
   PvlGroup bandbin = mosaicLabel.findGroup("BandBin");
   PvlGroup tracking = mosaicLabel.findGroup("Tracking");
   QString trackPath = prefix.path() + "/" + tracking["FileName"][0];
-  
+
   try {
     Cube trackCube(trackPath);
     PvlObject trackLabel = trackCube.label()->findObject("IsisCube");
@@ -243,7 +243,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestMapmosTracking) {
   catch (IException &e) {
     FAIL() << "Invalid FileName for tracking cube: " << e.toString().toStdString().c_str() << std::endl;
   }
-} 
+}
 
 TEST_F(ThreeImageNetwork, FunctionalTestMapmosMatchBandBin) {
   QTemporaryDir prefix;

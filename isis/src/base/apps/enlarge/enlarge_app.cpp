@@ -94,7 +94,7 @@ namespace Isis{
     delete interp;
 
     // Write the results to the log
-    log->addGroup(resultsGrp);
+    log->addLogGroup(resultsGrp);
   }
 }
 
