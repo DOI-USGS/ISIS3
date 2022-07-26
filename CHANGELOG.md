@@ -34,11 +34,6 @@ release.
 -->
 
 ## [Unreleased]
-- Added check to determine if poles were a valid projection point in ImagePolygon when generating footprint for a map projected image. [#4390](https://github.com/USGS-Astrogeology/ISIS3/issues/4390)
-- Updated the LRO photometry application Lronacpho, to use by default the current 2019 photometric model (LROC_Empirical). The model's coefficients are found in the PVL file that exists in the LRO data/mission/calibration directory. If the old parameter file is provided, the old algorithm(2014) will be used. This functionality is desired for calculation comparisons. Issue: [#4512](https://github.com/USGS-Astrogeology/ISIS3/issues/4512), PR: [#4519](https://github.com/USGS-Astrogeology/ISIS3/pull/4519)
-- Added a new application, framestitch, for stitching even and odd push frame images back together prior to processing in other applications. [4924](https://github.com/USGS-Astrogeology/ISIS3/issues/4924)
-- Corrected issue where footprintinit would fail with a segmentation error. [4943](https://github.com/USGS-Astrogeology/ISIS3/issues/4943)
-- Added changes to lronaccal to use time-dependent dark files for dark correction and use of specific dark files for images with exp code of zero. Also added GTests for lronaccal and refactored code to make callable. Added 3 truth cubes to testing directory.  PR[#4520](https://github.com/USGS-Astrogeology/ISIS3/pull/4520)
 
 ### Changed
 - Updated the LRO photometry application Lronacpho, to use by default the current 2019 photometric model (LROC_Empirical). The model's coefficients are found in the PVL file that exists in the LRO data/mission/calibration directory. If the old parameter file is provided, the old algorithm(2014) will be used. This functionality is desired for calculation comparisons. Issue: [#4512](https://github.com/USGS-Astrogeology/ISIS3/issues/4512), PR: [#4519](https://github.com/USGS-Astrogeology/ISIS3/pull/4519)
@@ -64,6 +59,7 @@ release.
 - Fixed CNetCombinePt logging functionality such that only merged points are included in the log. [#4973](https://github.com/USGS-Astrogeology/ISIS3/issues/4973)
 - Removed SpkCenterId functions in Cassini camera models due to spkwriter writing positions of Cassini relative to Titan but labeling
 it in the kernel as the position relative to the Saturn Barycenter. [#4942](https://github.com/USGS-Astrogeology/ISIS3/issues/4942)
+- Corrected issue where footprintinit would fail with a segmentation error. [4943](https://github.com/USGS-Astrogeology/ISIS3/issues/4943)
 
 
 ## [7.0.0] - 2022-02-11
