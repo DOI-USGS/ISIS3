@@ -17,6 +17,7 @@ Integrated Software for Imagers and Spectrometers Contributors
 - Austin, Christopher
 - Backer, Jeanie
 - Barrett, Janet
+- Bauck, Kirsten
 - Bauers, Joni
 - Becker, Kris
 - Becker, Tammy
@@ -107,6 +108,7 @@ Integrated Software for Imagers and Spectrometers Contributors
 - McEwin, Alfred
 - McMacken, Dennis
 - Mehlman, Bob (University of California, Los Angeles)
+- Michaud, Cordell (Arizona State University)
 - Milazzo, Moses
 - Miller, David
 - Miller-Ribelin, Elizabeth
