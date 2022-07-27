@@ -49,50 +49,50 @@ for (lbl in labels) {
                     withEnv(isisEnv) {
                         dir(env.ISISROOT) {
                             // Build
-                            stageStatus = "Building ISIS on ${label}"
-                            try {
-                                loginShell """
-                                    cmake -GNinja ${cmakeFlags.join(' ')} ../isis
-                                    ninja -j${NUM_CORES} install
-                                """
-                            } catch(e) {
-                                // Die right here
-                                error stageStatus
-                            }
+                            // stageStatus = "Building ISIS on ${label}"
+                            // try {
+                            //     loginShell """
+                            //         cmake -GNinja ${cmakeFlags.join(' ')} ../isis
+                            //         ninja -j${NUM_CORES} install
+                            //     """
+                            // } catch(e) {
+                            //     // Die right here
+                            //     error stageStatus
+                            // }
 
-                            // Unit tests
-                            stageStatus = "Running unit tests on ${label}"
-                            try {
-                                loginShell "ctest -R _unit_ -j${NUM_CORES} --output-on-failure"
-                            } catch(e) {
-                                errors.add(stageStatus)
-                                osFailed = true
-                            }
+                            // // Unit tests
+                            // stageStatus = "Running unit tests on ${label}"
+                            // try {
+                            //     loginShell "ctest -R _unit_ -j${NUM_CORES} --output-on-failure"
+                            // } catch(e) {
+                            //     errors.add(stageStatus)
+                            //     osFailed = true
+                            // }
 
-                            // App tests
-                            stageStatus = "Running app tests on ${label}"
-                            try {
-                                loginShell "ctest -R _app_ -j${NUM_CORES} --output-on-failure --timeout 10000"
-                            } catch(e) {
-                                errors.add(stageStatus)
-                                osFailed = true
-                            }
+                            // // App tests
+                            // stageStatus = "Running app tests on ${label}"
+                            // try {
+                            //     loginShell "ctest -R _app_ -j${NUM_CORES} --output-on-failure --timeout 10000"
+                            // } catch(e) {
+                            //     errors.add(stageStatus)
+                            //     osFailed = true
+                            // }
 
-                            try {
-                                loginShell "ctest -R _module_ -j${NUM_CORES} --output-on-failure --timeout 10000" 
-                            } catch(e) {
-                                errors.add(stageStatus)
-                                osFailed = true
-                            }
+                            // try {
+                            //     loginShell "ctest -R _module_ -j${NUM_CORES} --output-on-failure --timeout 10000" 
+                            // } catch(e) {
+                            //     errors.add(stageStatus)
+                            //     osFailed = true
+                            // }
 
-                            // Gtests
-                            stageStatus = "Running gtests on ${label}"
-                            try {
-                                loginShell "ctest -R '.' -E '(_app_|_unit_|_module_)' -j${NUM_CORES} --output-on-failure --timeout 10000"
-                            } catch(e) {
-                                errors.add(stageStatus)
-                                osFailed = true
-                            }
+                            // // Gtests
+                            // stageStatus = "Running gtests on ${label}"
+                            // try {
+                            //     loginShell "ctest -R '.' -E '(_app_|_unit_|_module_)' -j${NUM_CORES} --output-on-failure --timeout 10000"
+                            // } catch(e) {
+                            //     errors.add(stageStatus)
+                            //     osFailed = true
+                            // }
                             // pytests
                             stageStatus = "Running pytests on ${label}"
                             try {
