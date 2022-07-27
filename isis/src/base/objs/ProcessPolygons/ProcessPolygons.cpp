@@ -357,7 +357,7 @@ namespace Isis {
                                       const int nbands) {
 
     QString avgString =
-      Application::GetUserInterface().GetFileName(parameter);
+      Application::GetUserInterface().GetCubeName(parameter);
 
     Isis::CubeAttributeOutput atts =
       Application::GetUserInterface().GetOutputAttribute(parameter);

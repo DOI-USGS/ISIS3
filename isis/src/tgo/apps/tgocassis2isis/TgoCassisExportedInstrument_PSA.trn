@@ -136,10 +136,10 @@ Group = Center
   InputKey       = img:filter_name
   OutputName     = Center
   OutputPosition = (Object, IsisCube, Group, BandBin)
-  Translation    = (675, PAN)
-  Translation    = (485, BLU)
-  Translation    = (840, RED)
-  Translation    = (985, NIR)
+  Translation    = (678.2, PAN)
+  Translation    = (494.8, BLU)
+  Translation    = (836.0, RED)
+  Translation    = (939.3, NIR)
 
 End_Group
 
@@ -149,10 +149,10 @@ Group = Width
   InputKey       = img:filter_name
   OutputName     = Width
   OutputPosition = (Object, IsisCube, Group, BandBin)
-  Translation    = (250, PAN)
-  Translation    = (165, BLU)
-  Translation    = (100, RED)
-  Translation    = (220, NIR)
+  Translation    = (231.9, PAN)
+  Translation    = (121.8, BLU)
+  Translation    = (98.5, RED)
+  Translation    = (133.6, NIR)
 
 End_Group
 

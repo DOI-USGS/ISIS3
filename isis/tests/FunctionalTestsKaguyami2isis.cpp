@@ -1,7 +1,6 @@
 #include <QTemporaryDir>
 
 #include "kaguyami2isis.h"
-#include "Fixtures.h"
 #include "Histogram.h"
 #include "Pvl.h"
 #include "PvlGroup.h"

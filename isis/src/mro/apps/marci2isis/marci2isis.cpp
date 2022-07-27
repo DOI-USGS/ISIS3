@@ -126,7 +126,7 @@ namespace Isis{
     outputCubes[0]->setDimensions(numSamples, numLines, numFilters);
     outputCubes[1]->setDimensions(numSamples, numLines, numFilters);
 
-    FileName outputFile(ui.GetFileName("TO"));
+    FileName outputFile(ui.GetCubeName("TO"));
     QString evenFile = outputFile.path() + "/" + outputFile.baseName() + ".even.cub";
     QString oddFile = outputFile.path() + "/" + outputFile.baseName() + ".odd.cub";
 
@@ -226,7 +226,7 @@ namespace Isis{
                                     " Assuming exposure time is fixed for [" + inFile.toString() +  "]" );
       missing.addKeyword(message);
       missing.addKeyword(PvlKeyword("FileNotFoundInVarexpFile", prodId), Pvl::Replace);
-      log->addGroup(missing);
+      log->addLogGroup(missing);
     }
 
     // Translate labels to every image and close output cubes before calling EndProcess

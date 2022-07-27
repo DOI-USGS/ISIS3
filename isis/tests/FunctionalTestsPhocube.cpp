@@ -3,9 +3,9 @@
 #include <QTemporaryFile>
 #include <QTextStream>
 #include <QStringList>
-  
+
 #include "BandManager.h"
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "Histogram.h"
 #include "LineManager.h"
 #include "PvlGroup.h"
@@ -16,6 +16,7 @@
 using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/phocube.xml").expanded();
+
 
 TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
@@ -54,8 +55,10 @@ TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
   cube.close();
 }
 
+
 TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
-  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+//  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+  QString cubeFileName = "phocubeTEMP.cub";
   QVector<QString> args = {"to=" + cubeFileName, "dn=true", "phase=true", "emission=true",
                            "incidence=true", "localemission=true", "localincidence=true",
                            "latitude=true", "longitude=true", "pixelresolution=true",
@@ -111,12 +114,46 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
   EXPECT_EQ(hist->ValidPixels(), 675);
   EXPECT_NEAR(hist->StandardDeviation(), 667.22433030730758, .000001);
 
+  QVector<double> bandAvg { 13.0,       79.770518,  10.803234,   70.294379,    11.761092,
+                            68.010367,  10.087063, 255.646436,   18.841226,    18.841226,
+                            18.841226,  18.841226,  19.245272,  333.908975,    91.554202,
+                           242.133221,   8.841775, 269.934427,  118.758131,     0.019245,
+                             0.069564, 311.691558, -46.862035, -832.758554, -3254.327910,
+                           597.579855,   7.769864 };
+  QVector<double> bandSum {  325.0,      1994.262954,   270.080856,   1757.359497,    294.027304,
+                            1700.259178,  252.176593,  6391.160919,    471.030651,    471.030651,
+                             471.030651,  471.030651,   481.131809,   8347.724395,   2288.855072,
+                            6053.330535,  221.044387,  6748.360687,   2968.953285,      0.481131,
+                               1.739105, 7792.288970, -1171.550888, -20818.963867, -81358.197753,
+                           14939.496398,  194.246617 };
+  QVector<double> bandValid {25, 25, 25, 25, 25,
+                             25, 25, 25, 25, 25,
+                             25, 25, 25, 25, 25,
+                             25, 25, 25, 25, 25,
+                             25, 25, 25, 25, 25,
+                             25, 25 };
+  QVector<double> bandStd {7.359800,  0.002117,   0.002563, 0.000482, 0.062853,
+                           0.061155,  0.000466,   0.000481, 0.000144, 0.000144,
+                           0.000144,  0.000144,   0.004518, 0.012455, 0.006764,
+                           0.018025,  0.002090,   0.013626, 0.000216, 4.518225e-06,
+                           0.000128,  0.003065,   0.002088, 0.027295, 0.007589,
+                           0.0278004, 3.211263e-5 };
+
+  for (int i=1; i<=cube.bandCount(); i++) {
+    std::unique_ptr<Histogram> hist(cube.histogram(i));
+    EXPECT_NEAR(hist->Average(), bandAvg[i-1], 0.000001);
+    EXPECT_NEAR(hist->Sum(), bandSum[i-1], 0.000001);
+    EXPECT_EQ(hist->ValidPixels(), bandValid[i-1]);
+    EXPECT_NEAR(hist->StandardDeviation(), bandStd[i-1], 0.000001);
+  }
+
   cube.close();
 }
 
+
 TEST_F(DefaultCube, FunctionalTestPhocubeSpecialPixels) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
-  QVector<QString> args = {"to=" + cubeFileName, "specialpixels=false", "dn=true", "emission=false", 
+  QVector<QString> args = {"to=" + cubeFileName, "specialpixels=false", "dn=true", "emission=false",
                            "incidence=false", "latitude=false", "longitude=false"};
   UserInterface options(APP_XML, args);
 
@@ -165,10 +202,10 @@ TEST_F(DefaultCube, FunctionalTestPhocubeSpecialPixels) {
 
   int band = 1;
   LineManager outLine(cube);
-  for (int i = 1; i <= cube.lineCount(); i++) { 
+  for (int i = 1; i <= cube.lineCount(); i++) {
     outLine.SetLine(i, band);
     cube.read(outLine);
-    for (int j = 0; j < outLine.size(); j++) { 
+    for (int j = 0; j < outLine.size(); j++) {
       if (i == 1) { // First line of both bands should match the input cube
         EXPECT_FALSE(IsSpecial(outLine[j]));
       }
@@ -195,9 +232,10 @@ TEST_F(DefaultCube, FunctionalTestPhocubeSpecialPixels) {
   cube.close();
 }
 
+
 TEST_F(OffBodyCube, FunctionalTestPhocubeOffBody) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
-  QVector<QString> args = {"to=" + cubeFileName, "emission=false", "radec=true", 
+  QVector<QString> args = {"to=" + cubeFileName, "emission=false", "radec=true",
                            "incidence=false", "latitude=false", "longitude=false"};
   UserInterface options(APP_XML, args);
   phocube(testCube, options);
@@ -213,13 +251,13 @@ TEST_F(OffBodyCube, FunctionalTestPhocubeOffBody) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Phase Angle");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Right Ascension");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Declination");
-  
+
   int band = 1;
   LineManager outLine(cube);
-  for (int i = 1; i <= cube.lineCount(); i++) { 
+  for (int i = 1; i <= cube.lineCount(); i++) {
     outLine.SetLine(i, band);
     cube.read(outLine);
-    for (int j = 0; j < outLine.size(); j++) { 
+    for (int j = 0; j < outLine.size(); j++) {
       if (band == 1 && i < 4) { // Phase band will not be null at on-body pixels
         EXPECT_NE(outLine[j], Isis::NULL8);
       }
@@ -245,6 +283,7 @@ TEST_F(OffBodyCube, FunctionalTestPhocubeOffBody) {
 
   cube.close();
 }
+
 
 TEST_F(DefaultCube, FunctionalTestPhocubeMosaic) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
@@ -277,6 +316,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeMosaic) {
   cube.close();
 }
 
+
 // Tests that we can process radar data.
 TEST_F(MiniRFCube, FunctionalTestPhocubeMiniRF) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
@@ -295,12 +335,12 @@ TEST_F(MiniRFCube, FunctionalTestPhocubeMiniRF) {
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name"), "Sub Spacecraft Ground Azimuth");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName"), "H RECEIVE INTENSITY");
-  
+
   LineManager outLine(cube);
-  for (int i = 1; i <= cube.lineCount(); i++) { 
+  for (int i = 1; i <= cube.lineCount(); i++) {
     outLine.SetLine(i);
     cube.read(outLine);
-    for (int j = 0; j < outLine.size(); j++) { 
+    for (int j = 0; j < outLine.size(); j++) {
       if (i < 3) {
         EXPECT_TRUE(outLine[j] > 1.0);
       }
@@ -318,6 +358,7 @@ TEST_F(MiniRFCube, FunctionalTestPhocubeMiniRF) {
 
   cube.close();
 }
+
 
 TEST_F(DefaultCube, FunctionalTestPhocubeNoBandBin) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
@@ -347,3 +388,66 @@ TEST_F(DefaultCube, FunctionalTestPhocubeNoBandBin) {
 
   cube.close();
 }
+
+
+TEST_F(DefaultCube, FunctionalTestPhocubeAllDnBands) {
+  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+  QVector<QString> args = {"to=" + cubeFileName, "alldn=true"};
+
+  UserInterface options(APP_XML, args);
+  resizeCube(5, 5, 3);
+  Pvl *inIsisLabel = testCube->label();
+  PvlGroup &inBandBin = inIsisLabel->findGroup("BandBin", Pvl::Traverse);
+  inBandBin["FilterName"] = "(B1, B2, B3)";
+
+  phocube(testCube, options);
+
+  Cube cube(cubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
+  ASSERT_EQ(cube.lineCount(), testCube->lineCount());
+  ASSERT_EQ(cube.bandCount(), 8);
+
+  PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName")[0], "B1");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName")[1], "B2");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName")[2], "B3");
+
+  // Test band 1
+  {
+    int band = 1;
+    std::unique_ptr<Histogram> inHist (testCube->histogram(band));
+    std::unique_ptr<Histogram> outHist (cube.histogram(band));
+    EXPECT_NEAR(outHist->Average(), inHist->Average(), .000001);
+    EXPECT_NEAR(outHist->Sum(), inHist->Sum(), .000001);
+    EXPECT_EQ(outHist->ValidPixels(), inHist->ValidPixels());
+    EXPECT_NEAR(outHist->StandardDeviation(), inHist->StandardDeviation(), .000001);
+  }
+
+  // Test band 2
+  {
+    int band = 2;
+    std::unique_ptr<Histogram> inHist (testCube->histogram(band));
+    std::unique_ptr<Histogram> outHist (cube.histogram(band));
+    EXPECT_NEAR(outHist->Average(), inHist->Average(), .000001);
+    EXPECT_NEAR(outHist->Sum(), inHist->Sum(), .000001);
+    EXPECT_EQ(outHist->ValidPixels(), inHist->ValidPixels());
+    EXPECT_NEAR(outHist->StandardDeviation(), inHist->StandardDeviation(), .000001);
+  }
+
+  // Test band 3
+  {
+    int band = 3;
+    std::unique_ptr<Histogram> inHist (testCube->histogram(band));
+    std::unique_ptr<Histogram> outHist (cube.histogram(band));
+    EXPECT_NEAR(outHist->Average(), inHist->Average(), .000001);
+    EXPECT_NEAR(outHist->Sum(), inHist->Sum(), .000001);
+    EXPECT_EQ(outHist->ValidPixels(), inHist->ValidPixels());
+    EXPECT_NEAR(outHist->StandardDeviation(), inHist->StandardDeviation(), .000001);
+  }
+
+
+  cube.close();
+}
+

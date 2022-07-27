@@ -1,4 +1,4 @@
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -18,7 +18,7 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalDefault) {
   QVector<QString> args = {"to="+outCubeFileName};
 
   UserInterface options(APP_XML, args);
-  
+
   try {
     ctxcal(testCube.get(), options);
   }
@@ -30,7 +30,7 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalDefault) {
 
   PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("Radiometry");
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("iof"), 1.86764430855461e-04);
-  
+
   Histogram *oCubeStats = oCube.histogram();
 
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.077640061192214491);
@@ -45,7 +45,7 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalFlatfile) {
   QVector<QString> args = {"to="+outCubeFileName, "flatfile=$ISISDATA/mro/calibration/ctxFlat_0001.cub"};
 
   UserInterface options(APP_XML, args);
-  
+
   try {
     ctxcal(testCube.get(), options);
   }
@@ -69,7 +69,7 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalIofFalse) {
   QVector<QString> args = {"to="+outCubeFileName, "iof=false"};
 
   UserInterface options(APP_XML, args);
-  
+
   try {
     ctxcal(testCube.get(), options);
   }
@@ -78,10 +78,10 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalIofFalse) {
   }
 
   Cube oCube(outCubeFileName, "r");
-  
+
   PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("Radiometry");
-  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("iof"), 1); 
-  
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("iof"), 1);
+
   Histogram *oCubeStats = oCube.histogram();
 
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 221.12296661376953);
@@ -96,35 +96,35 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalCameraComparison) {
   QVector<QString> args = {"to="+outCubeFileNameCam};
 
   UserInterface options(APP_XML, args);
-  
+
   try {
     ctxcal(testCube.get(), options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
-  
+
   // force camera to not construct
-  Pvl *lab = testCube->label(); 
+  Pvl *lab = testCube->label();
   lab->deleteObject("NaifKeywords");
 
   QString outCubeFileNameNoCam = tempDir.path() + "/outTempNoCam.cub";
   args = {"to="+outCubeFileNameNoCam};
-  
+
   try {
     ctxcal(testCube.get(), options);
   }
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
-  
+
   Cube oNoCamCube(outCubeFileNameCam, "r");
   Cube oCamCube(outCubeFileNameCam, "r");
 
-  Pvl *noCamLab = oNoCamCube.label(); 
+  Pvl *noCamLab = oNoCamCube.label();
   Pvl *camLab = oCamCube.label();
 
-  EXPECT_DOUBLE_EQ((double)noCamLab->findObject("IsisCube").findGroup("Radiometry").findKeyword("iof"), 
+  EXPECT_DOUBLE_EQ((double)noCamLab->findObject("IsisCube").findGroup("Radiometry").findKeyword("iof"),
                    (double)camLab->findObject("IsisCube").findGroup("Radiometry").findKeyword("iof"));
 
   EXPECT_DOUBLE_EQ((double)noCamLab->findObject("IsisCube").findGroup("Radiometry").findKeyword("iof"), 1.86764430855461e-04);

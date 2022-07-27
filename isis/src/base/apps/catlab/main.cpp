@@ -14,7 +14,7 @@ void IsisMain() {
 
   // Get filename provided by the user
   UserInterface &ui = Application::GetUserInterface();
-  QString file = ui.GetFileName("FROM");
+  QString file = ui.GetCubeName("FROM");
   
   // Extract label from file
   Pvl label(file);

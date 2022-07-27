@@ -49,8 +49,8 @@ void ProcessBands(Pvl &pdsLab, Cube *vimscube, VimsType vtype);
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileName in = ui.GetFileName("FROM");
-  FileName outIr = ui.GetFileName("IR");
-  FileName outVis = ui.GetFileName("VIS");
+  FileName outIr = ui.GetCubeName("IR");
+  FileName outVis = ui.GetCubeName("VIS");
   Pvl lab(in.expanded());
 
   //Checks if in file is rdr

@@ -18,7 +18,7 @@ namespace Isis {
 
   
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), att);
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), att);
 
     // Get user entered special pixel ranges
     if(ui.GetBoolean("SETNULLRANGE")) {
@@ -73,7 +73,7 @@ namespace Isis {
       results.setName("Results");
       results[0].addComment("Projection offsets and multipliers have been changed from");
       results[0].addComment("defaults. New values are below.");
-      log->addGroup(results);
+      log->addLogGroup(results);
     }
 
     p.EndProcess();

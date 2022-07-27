@@ -5,7 +5,7 @@
       <body>
         <h2><a name="Introduction">Introduction</a></h2>
         <p>
-	Integrated System for Imagers and Spectrometers (ISIS) has been a staple
+	Integrated Software for Imagers and Spectrometers (ISIS) has been a staple
 	for the cartographic and scientific analysis of planetary image data 
 	since 1992 with a heritage reaching back to 1971. The key strength of 
 	ISIS is its ability to rigorously "control" planetary image data, 
@@ -178,7 +178,7 @@
 
         <br clear="all"/>
 
-        <h2><a name="IsisSoftware">Integrated System for Imagers and Spectrometers</a></h2>
+        <h2><a name="IsisSoftware">Integrated Software for Imagers and Spectrometers</a></h2>
         <p>
 	In the late 1980s, the requirement to handle large volumes of complex 
 	data acquired by new instruments significantly changed the requirements 

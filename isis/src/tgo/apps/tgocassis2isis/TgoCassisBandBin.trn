@@ -34,6 +34,12 @@
 # the elements tag under the second Axis_Array array tag because it also has a
 # axis_name tag with a value of Sample.
 
+# history:
+#   2021-07-18 Austin Sanders - Updated center and width translations as
+#                               requested by mission team.
+
+
+
 Group = FilterName
   Auto
   Optional
@@ -52,10 +58,10 @@ Group = Center
   InputKey       = Filter
   OutputName     = Center
   OutputPosition = (Object, IsisCube, Group, BandBin)
-  Translation    = (677.4, PAN)
-  Translation    = (497.4, BLU)
-  Translation    = (835.4, RED)
-  Translation    = (940.2, NIR)
+  Translation    = (678.2, PAN)
+  Translation    = (494.8, BLU)
+  Translation    = (836.0, RED)
+  Translation    = (939.3, NIR)
 
 End_Group
 
@@ -66,10 +72,10 @@ Group = Width
   InputKey       = Filter
   OutputName     = Width
   OutputPosition = (Object, IsisCube, Group, BandBin)
-  Translation    = (231.5, PAN)
-  Translation    = (134.3, BLU)
-  Translation    = (98.0, RED)
-  Translation    = (120.6, NIR)
+  Translation    = (231.9, PAN)
+  Translation    = (133.6, BLU)
+  Translation    = (98.5, RED)
+  Translation    = (121.8, NIR)
 
 End_Group
 

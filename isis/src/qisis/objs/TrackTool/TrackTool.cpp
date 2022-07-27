@@ -273,10 +273,7 @@ namespace Isis {
   }
 
   QString TrackTool::updateColorLabel(QPoint p, ViewportBuffer *buf, QLabel *label) {
-    if(buf->working()) {
-      label->setText("BUSY");
-    }
-    else {
+    if(!buf->working()) {
       const QRect rRect = buf->bufferXYRect();
 
       if(p.x() >= rRect.left() && p.x() < rRect.right() &&
@@ -286,6 +283,7 @@ namespace Isis {
         return PixelToString(buf->getLine(rBufY)[rBufX], 12);
       }
     }
+    return "BUSY";
   }
 
 

@@ -20,6 +20,7 @@
 #       A custom build of ISIS3.6.1 for the CaSSIS mission:    {% set version = "3.6.1_cassis" %}
 {% set version = "7.1.0_RC1" %}
 
+
 # This is the build number for the current version you are building. If this is the first build of
 # this version, the build number will be 0. It is incremented by 1 with every consecutive build of
 # the same version.
@@ -46,6 +47,7 @@ build:
 requirements:
   build:
    - ale=0.8.6
+   - aom
    - armadillo
    - boost=1.72
    - boost-cpp=1.72
@@ -82,7 +84,7 @@ requirements:
    - mesalib
    - mysql
    - mysql-connector-c
-   - nanoflann
+   - nanoflann<1.4
    - nlohmann_json
    - ninja==1.7.2
    - nn
@@ -100,8 +102,9 @@ requirements:
    - swig
    - tnt
    - x264
+   - x265
    - xalan-c
-   - xerces-c=3
+   - xerces-c
    - xorg-kbproto
    - xorg-libice
    - xorg-libsm
@@ -111,7 +114,9 @@ requirements:
 
   run:
   - {{ pin_compatible('ale') }}
+  - {{ pin_compatible('aom', max_pin='x.x') }}
   - {{ pin_compatible('boost', max_pin='x.x') }}
+  - {{ pin_compatible('boost-cpp', max_pin='x.x') }}
   - blas
   - {{ pin_compatible('bullet', max_pin='x.x') }}
   - bz2file
@@ -124,8 +129,7 @@ requirements:
   - {{ pin_compatible('geos', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('geotiff', max_pin='x.x') }}
   - geotiff
-  - gmm
-  - {{ pin_compatible('gsl', min_pin='x.x') }}
+  - {{ pin_compatible('gsl', min_pin='x.x', max_pin='x.x.x') }}
   - hdf5
   - icu
   - inja
@@ -133,7 +137,11 @@ requirements:
   - {{ pin_compatible('jasper', max_pin='x.x') }}
   - {{ pin_compatible('jpeg', max_pin='x') }}
   - {{ pin_compatible('kakadu', max_pin='x') }}
+  - libcxx
+  - libopenblas
+  - {{ pin_compatible('libopencv', max_pin='x.x') }}
   - {{ pin_compatible('libpng') }}
+  - libtiff
   - mesalib
   - mysql
   - nanoflann
@@ -149,6 +157,7 @@ requirements:
   - superlu
   - tnt
   - x264
+  - x265
   - {{ pin_compatible('xerces-c', max_pin='x.x.x') }}
   - xorg-kbproto
   - xorg-libice
@@ -160,6 +169,9 @@ test:
   commands:
     - test -e $PREFIX/lib/libisis${SHLIB_EXT}
     - test -e $PREFIX/include/isis/Isis.h
+    - test -e $PREFIX/bin/isisimport
+    - ISISROOT=$PREFIX isisimport -HELP
+
 
 about:
   home: https://github.com/USGS-Astrogeology/ISIS3

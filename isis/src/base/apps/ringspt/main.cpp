@@ -20,7 +20,7 @@ void IsisMain() {
 
   // Set up CameraRingsPointInfo and set  file
   CameraRingsPointInfo ringspt;
-  ringspt.SetCube(ui.GetFileName("FROM") + "+" + ui.GetInputAttribute("FROM").toString());
+  ringspt.SetCube(ui.GetCubeName("FROM"));
 
   Progress prog;
   prog.SetMaximumSteps(1);

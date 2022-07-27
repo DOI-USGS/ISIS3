@@ -13,7 +13,7 @@
 #include "TestUtilities.h"
 #include "FileName.h"
 #include "ProjectionFactory.h"
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "Mocks.h"
 
 using namespace Isis;

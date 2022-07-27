@@ -48,7 +48,7 @@ namespace Isis {
 
     // Get the list of names of input CCD cubes to stitch together
     FileList flist;
-    if (ui.WasEntered("FROM")) flist.push_back(ui.GetFileName("FROM"));
+    if (ui.WasEntered("FROM")) flist.push_back(ui.GetCubeName("FROM"));
     if (ui.WasEntered("FROMLIST")) flist.read(ui.GetFileName("FROMLIST"));
     if (flist.size() < 1) {
       QString msg = "Files must be specified in FROM and/or FROMLIST - none found!";
@@ -91,7 +91,7 @@ namespace Isis {
         PvlGroup overlap = overrors.group(i);
         overlap.setName("Overlaps");
         overlap.addKeyword(PvlKeyword("Class", "WARNING"), PvlContainer::Replace);
-        log->addGroup(overlap);
+        log->addLogGroup(overlap);
       }
     }
 

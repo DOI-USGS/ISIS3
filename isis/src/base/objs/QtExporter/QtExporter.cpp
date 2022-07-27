@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
+#include "UserInterface.h"
 
 using namespace Isis;
 
@@ -197,9 +198,9 @@ namespace Isis {
    * @param compression The compression algorithm used. Not supported for Qt.
    */
   void QtExporter::write(FileName outputName, int quality,
-                         QString compression) {
-    ImageExporter::write(outputName, quality);
-    
+                         QString compression, UserInterface *ui) {
+    ImageExporter::write(outputName, quality, compression, ui);
+
     outputName = outputName.addExtension(extension());
 
     // The return status is wrong for JPEG images, so the code will always

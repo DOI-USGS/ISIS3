@@ -98,7 +98,7 @@ namespace Isis {
       BundleControlPoint(const BundleControlPoint &src);
 
       //destructor
-      ~BundleControlPoint();
+      virtual ~BundleControlPoint();
 
       // equals operator
       BundleControlPoint &operator=(const BundleControlPoint &src);// ??? not implemented
@@ -121,8 +121,11 @@ namespace Isis {
                           // boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
                           // SparseBlockRowMatrix                                &Q,
                           LinearAlgebra::Vector                               &v1);
-      void applyParameterCorrections(LinearAlgebra::Vector imageSolution,
-           SparseBlockMatrix &sparseNormals, const BundleTargetBodyQsp target);
+      virtual void applyParameterCorrections(LinearAlgebra::Vector imageSolution,
+                                             SparseBlockMatrix &sparseNormals,
+                                             const BundleTargetBodyQsp target);
+      double vtpv();
+      double vtpvMeasures();
 
       // accessors
       ControlPoint *rawControlPoint() const;
@@ -158,13 +161,14 @@ namespace Isis {
       QString formatCoordAdjustedSigmaString(SurfacePoint::CoordIndex, int fieldWidth, int precision,
                                                 bool errorPropagation) const;
 
+    protected:
+      //!< pointer to the control point object this represents
+      ControlPoint *m_controlPoint;
+
     private:
       // methods
       void updateAdjustedSurfacePointLatitudinally(const BundleTargetBodyQsp target);
       void updateAdjustedSurfacePointRectangularly();
-
-      //!< pointer to the control point object this represents
-      ControlPoint *m_controlPoint;
 
       //! corrections to point parameters
       boost::numeric::ublas::bounded_vector< double, 3 > m_corrections;

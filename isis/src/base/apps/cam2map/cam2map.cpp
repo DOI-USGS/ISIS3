@@ -26,7 +26,7 @@ namespace Isis {
     if (inAtt.bands().size() != 0) {
       icube.setVirtualBands(inAtt.bands());
     }
-    icube.open(ui.GetFileName("FROM"));
+    icube.open(ui.GetCubeName("FROM"));
 
     // Get the map projection file provided by the user
     Pvl userMap;
@@ -52,7 +52,7 @@ namespace Isis {
 
     // Make sure it is not the sky
     if (incam->target()->isSky()) {
-      QString msg = "The image [" + ui.GetFileName("FROM") +
+      QString msg = "The image [" + ui.GetCubeName("FROM") +
                     "] is targeting the sky, use skymap instead.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -218,7 +218,7 @@ namespace Isis {
           }
 
           else if (ui.GetString("LONSEAM") == "ERROR") {
-            QString msg = "The image [" + ui.GetFileName("FROM") + "] crosses the " +
+            QString msg = "The image [" + ui.GetCubeName("FROM") + "] crosses the " +
                           "longitude seam";
             throw IException(IException::User, msg, _FILEINFO_);
           }
@@ -256,7 +256,7 @@ namespace Isis {
     PvlGroup cleanMapping = outmap->Mapping();
 
     // Allocate the output cube and add the mapping labels
-    QString fname = ui.GetFileName("TO");
+    QString fname = ui.GetCubeName("TO");
     Isis::CubeAttributeOutput &atts = ui.GetOutputAttribute("TO");
     Cube *ocube = p.SetOutputCube(fname, atts, samples, lines, icube->bandCount());
 
@@ -433,7 +433,7 @@ namespace Isis {
 
     // add mapping to print.prt
     if(log) {
-      log->addGroup(cleanMapping);
+      log->addLogGroup(cleanMapping);
     }
 
     // Cleanup
@@ -462,7 +462,9 @@ namespace Isis {
   bool cam2mapForward::Xform(double &outSample, double &outLine,
                              const double inSample, const double inLine) {
     // See if the input image coordinate converts to a lat/lon
-    if (!p_incam->SetImage(inSample,inLine)) return false;
+    if (!p_incam->SetImage(inSample,inLine)) {
+      return false;
+    }
 
     // Does that ground coordinate work in the map projection
     double lat = p_incam->UniversalLatitude();
@@ -568,6 +570,7 @@ namespace Isis {
   }
 
   void bandChange(const int band) {
+    // band dependant band change
     incam->SetBand(band);
   }
 }

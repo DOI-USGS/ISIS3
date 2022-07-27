@@ -110,6 +110,8 @@ namespace Isis {
       addToExisting = true;
     }
 
+    bool isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
+
     if (addToExisting) {
       // if we have already added a BundleObservation with this number, we have to add the new
       // BundleImage to this observation
@@ -125,8 +127,6 @@ namespace Isis {
     }
     else {
       // create new BundleObservation and append to this vector
-
-      bool isIsisObservation = bundleImage->camera()->GetCameraType() != Camera::Csm;
 
       if (isIsisObservation) {
         bundleObservation.reset(new IsisBundleObservation(bundleImage,
@@ -146,6 +146,8 @@ namespace Isis {
         message += "for " + bundleImage->fileName();
         throw IException(IException::Programmer, message, _FILEINFO_);
       }
+
+      bundleImage->setParentObservation(bundleObservation);
 
       // Find the bundle observation solve settings for this new observation
       BundleObservationSolveSettings solveSettings;
@@ -167,14 +169,6 @@ namespace Isis {
 
       append(bundleObservation);
 
-      if (isIsisObservation) {
-        QSharedPointer<IsisBundleObservation> isisObs = qSharedPointerDynamicCast<IsisBundleObservation>(bundleObservation);
-        isisObs->initializeExteriorOrientation();
-        if (bundleSettings->solveTargetBody()) {
-          isisObs->initializeBodyRotation();
-        }
-      }
-
       // update observation number to observation ptr map
       m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
 
@@ -190,6 +184,15 @@ namespace Isis {
         m_instIdToObservationMap.insertMulti(instrumentId, bundleObservation);
       }
 
+    }
+
+    // If it's an ISIS observation, setup the camera based on the solve settings
+    if (isIsisObservation) {
+      QSharedPointer<IsisBundleObservation> isisObs = qSharedPointerDynamicCast<IsisBundleObservation>(bundleObservation);
+      isisObs->initializeExteriorOrientation();
+      if (bundleSettings->solveTargetBody()) {
+        isisObs->initializeBodyRotation();
+      }
     }
     return bundleObservation;
   }
@@ -249,5 +252,22 @@ namespace Isis {
     // multimap returns them in reverse order they were put in, so invert them to preserve order
     std::reverse(std::begin(list), std::end(list));
     return list;
+  }
+
+
+  /**
+   * Compute vtpv, the weighted sum of squares of constrained image parameter residuals.
+   *
+   * @return double Weighted sum of squares of constrained image parameter residuals.
+   */
+  double BundleObservationVector::vtpvContribution() {
+    double vtpvImage = 0;
+
+    for (int i = 0; i < size(); i++) {
+      BundleObservationQsp bundleObservation = at(i);
+      vtpvImage += bundleObservation->vtpv();
+    }
+
+    return vtpvImage;
   }
 }

@@ -1,7 +1,6 @@
 #include <QTemporaryDir>
 
 #include "pds2isis.h"
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"

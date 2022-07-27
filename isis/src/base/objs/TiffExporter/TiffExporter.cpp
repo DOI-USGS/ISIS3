@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
+#include "UserInterface.h"
 
 using namespace Isis;
 
@@ -68,13 +69,13 @@ namespace Isis {
    * @param outputName The filename of the output cube
    * @param quality The quality of the output, not used for TIFF
    * @param compression The compression algorithm used. Currenly supports
-   *                         "packbits", "lzw", "deflate", and "none". 
+   *                         "packbits", "lzw", "deflate", and "none".
    */
   void TiffExporter::write(FileName outputName, int quality,
-                           QString compression) {
-    
+                           QString compression, UserInterface *ui) {
+
     outputName = outputName.addExtension(extension());
-    
+
     // Open the output image
     m_image = TIFFOpen(outputName.expanded().toLatin1().data(), "w");
 
@@ -109,10 +110,12 @@ namespace Isis {
     PixelType type = pixelType();
     int bps = (type == Isis::UnsignedByte) ? 8 : 16;
     TIFFSetField(m_image, TIFFTAG_BITSPERSAMPLE, bps);
+    int sampleFormat = (type == Isis::SignedWord) ? 2 : 1 ;
+    TIFFSetField(m_image, TIFFTAG_SAMPLEFORMAT, sampleFormat);
 
     TIFFSetField(m_image, TIFFTAG_SAMPLESPERPIXEL, bands());
 
-    ImageExporter::write(outputName, quality);
+    ImageExporter::write(outputName, quality, compression, ui);
   }
 
 
@@ -127,7 +130,7 @@ namespace Isis {
   void TiffExporter::setBuffer(int s, int b, int dn) const {
     PixelType type = pixelType();
     int index = s * bands() + b;
-    
+
     switch (type) {
       case UnsignedByte:
         m_raster[index] = (unsigned char) dn;

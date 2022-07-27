@@ -30,7 +30,7 @@ namespace Isis {
     Process p;
 
     CubeAttributeInput cai;
-    Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), cai, ReadWrite);
+    Cube *icube = p.SetInputCube(ui.GetCubeName("FROM"), cai, ReadWrite);
     camstats(icube, ui, log);
 
     p.EndProcess();
@@ -51,7 +51,7 @@ namespace Isis {
     // Send the Output to the log area
     Pvl statsPvl = camStats.toPvl();
     for (int i = 0; i < statsPvl.groups(); i++) {
-      log->addGroup(statsPvl.group(i));
+      log->addLogGroup(statsPvl.group(i));
     }
 
     if(ui.WasEntered("TO")) {

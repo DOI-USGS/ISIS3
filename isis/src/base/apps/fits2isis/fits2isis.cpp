@@ -39,7 +39,7 @@ namespace Isis{
     pfits.setProcessFileStructure(ui.GetInteger("IMAGENUMBER"));
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    Cube *output = pfits.SetOutputCube(ui.GetFileName("TO"), att);
+    Cube *output = pfits.SetOutputCube(ui.GetCubeName("TO"), att);
 
     // Add instrument group if any keywords were put into it.
     PvlGroup instGrp = pfits.standardInstrumentGroup(pfits.fitsImageLabel(0));

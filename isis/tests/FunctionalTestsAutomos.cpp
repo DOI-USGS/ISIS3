@@ -1,6 +1,7 @@
 #include "automos.h"
 
-#include "Fixtures.h"
+#include "CameraFixtures.h"
+#include "FileList.h"
 #include "TestUtilities.h"
 #include "UserInterface.h"
 #include "Histogram.h"

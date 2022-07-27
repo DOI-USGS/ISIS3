@@ -55,10 +55,10 @@ namespace Isis {
       m.SetOutputCube(list,
                       ui.GetDouble("MINLAT"), ui.GetDouble("MAXLAT"),
                       ui.GetDouble("MINLON"), ui.GetDouble("MAXLON"),
-                      oAtt, ui.GetFileName("MOSAIC"));
+                      oAtt, ui.GetCubeName("MOSAIC"));
     }
     else {
-      m.SetOutputCube(list, oAtt, ui.GetFileName("MOSAIC"));
+      m.SetOutputCube(list, oAtt, ui.GetCubeName("MOSAIC"));
     }
 
     m.SetHighSaturationFlag(ui.GetBoolean("HIGHSATURATION"));
@@ -78,7 +78,7 @@ namespace Isis {
         PvlGroup outsiders("Outside");
         outsiders += PvlKeyword("File", list[i].toString());
         if (log) {
-          log->addGroup(outsiders);
+          log->addLogGroup(outsiders);
         }
       }
       else {
@@ -95,7 +95,7 @@ namespace Isis {
     // Logs the input file location in the mosaic
     for (int i = 0; i < m.imagePositions().groups(); i++) {
       if (log) {
-        log->addGroup(m.imagePositions().group(i));
+        log->addLogGroup(m.imagePositions().group(i));
       }
     }
 

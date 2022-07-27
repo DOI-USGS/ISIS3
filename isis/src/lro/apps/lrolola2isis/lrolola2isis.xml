@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="lrolola2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Imports LIDAR data from LRO LOLA instrument.
+  </brief>
+
+  <description>
+    <p>
+      Imports LIDAR data from LRO LOLA instrument.
+    </p>
+
+  </description>
+
+  <history>
+    <change name="Makayla Shepherd and Tyler Wilson" date="2017-01-29">
+      Original version
+    </change>
+    <change name="Debbie Cook" date="2018-03-19">
+      Added items that will be needed to bundle adjust:  new point keyword
+      simultaneousImages that is an array of serial numbers of the measures
+      on images taken simultaneously with the Lidar data, a threshold to
+      screen measures that are off the image, and both point (lat/lon/radius)
+      and range constraints.  Also added point type and set it to Constrained.
+    </change>
+    <change name="Debbie Cook" date="2018-04-16">
+      Fixed the case where a Lidar point has no simultaneous measures on
+      any images in the input list.  In this case do not write out the
+      point because it has no constraints.  In the future, the
+      functionality may change to include points without simultaneous
+      measures in the bundle adjustment.  References #5343.
+    </change>
+    <change name="Ken Edmundson" date="2018-06-20">
+      Changed call to Camera::SetGround to use the SurfacePoint with the input
+      lidar point coordinates. Ensures use of lidar point radius instead of the
+      local radius.
+    </change>
+    <change name="Ken Edmundson" date="2018-06-25">
+      Changed internal default for lidar coordinate a priori uncertainties to "none", allowing FREE
+      lidar points.
+      </change>
+    <change name="Debbie A Cook" date="2019-02-23">
+      Added new file OUTPUTTYPE=TEST, to be used strictly for testing.
+      This option does a SLOW sort on the output data. The resulting output file
+      is sorted by pointID, which allows testing software to compare
+      output with truth data.  References #5343.
+      </change>
+    <change name="Debbie A Cook" date="2019-03-11">
+      Added new input parameter FROMLIST to allow entering multiple input
+      Lidar CSV files.  All input points are written out into a single Lidar data 
+      file.  References #5343.
+      </change>
+  </history>
+
+  <category>
+    <missionItem>Lunar Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input LOLA Lidar RDR data in CSV format
+        </brief>
+        <description>
+          This file is downloaded from Washington University at
+          
+          "https://ode.rsl.wustl.edu/moon/indextools.aspx?displaypage=lolardr"
+          
+          It contains altimetry readings organized along the spacecraft orbit track.
+          
+        </description>
+        <exclusions>
+           <item>FROMLIST</item>
+        </exclusions>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Input LOLA Lidar CSV file list from which to generate the Lidar control point file
+        </brief>
+        <description>
+          This file contains a list of CSV files of LOLA Lidar RDR  that will be used to generate 
+          an Isis Lidar control point file.  Each file in FROMLIST is expected to be a CSV with
+          LOLA Lidar RDR data. See FROM for more information on the data.
+        </description>
+        <exclusions>
+           <item>FROM</item>
+        </exclusions>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+      
+      <parameter name="CUBES">
+         <type>filename</type>
+         <fileMode>input</fileMode>
+         <brief>
+           List with cubes to add as measures to the lidar points.
+         </brief>
+         <filter>
+           *.lis
+         </filter>
+       </parameter>
+       <parameter name="TO">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>
+            Output lidar point data 
+          </brief>
+        </parameter>
+        <parameter name="OUTPUTTYPE">
+          <type>string</type>
+          <description>
+            The output type, either binary or json.
+          </description>
+          <default><item>BINARY</item></default>
+          <list>
+            <option value="BINARY">
+              <brief> Binary output file (.dat)</brief>
+            </option>
+            <option value="JSON">
+              <brief> JSON output file (.json)</brief>
+            </option>
+            <option value="TEST">
+              <brief> DO NOT USE (only for tests) ordered JSON output file (.json) </brief>
+            </option>
+          </list>
+        </parameter>
+    </group>
+    <group name="Processing Parameters">
+        <parameter name="POINTID">
+          <type>string</type>
+          <brief>
+            The pattern to be used to create point ids.
+          </brief>
+          <description>
+            <p>
+              This string will be used to create unique IDs for each control
+              point created by this program. The string must contain a
+              single series
+              of question marks ("?"). For example: "VallesMarineris????"
+            </p>
+            <p>
+              The question marks will be replaced
+              with a number beginning with zero and incremented by one each time
+              a new control point is created. The example above would cause the
+              first control point to have an ID of "VallesMarineris0000", the
+              second ID would be "VallesMarineris0001" and so on.
+              The maximum number of new control points for this example would be
+              10000 with the final ID being "VallesMarineris9999".
+            </p>
+            <p>
+              Note: Make sure there are enough "?"s for all the control
+              points that might be created during this run. If all the possible
+              point IDs are exhausted the program will exit with an error, and 
+              will not produce an output control network file. 
+            </p>
+            <p>
+              Examples of POINTID:
+            </p>
+            <ul>
+              <li>POINTID="JohnDoe?????"</li>
+              <li>POINTID="Quad1_????></li>
+              <li>POINTID="JD_???_test1"</li>
+            </ul>
+          </description>
+        </parameter>
+        <parameter name="THRESHOLD">
+        <type>double</type>
+        <minimum inclusive="yes">0</minimum>
+        <default>
+          <item>0.0</item>
+        </default>
+          <brief>
+            The threshold allowed for points to be off the image in pixels..
+          </brief>
+          <description>
+            <p>
+              This value is used to screen measures during back projection.
+              If a Lidar point maps into an image with coordinates outside
+              of the valid pixel range extended by the threshold value, it
+              will be rejected as a measure for that point.
+            </p>
+          </description>
+        </parameter>            
+    </group>
+    <group name="Point Uncertainties">
+        <parameter name="POINT_RANGE_SIGMA">
+          <brief> Range uncertainty for all points (meters)</brief>
+          <description>
+            This value will be used as the range uncertainty
+            for all points.  Units are meters.
+          </description>
+          <type>double</type>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
+        </parameter>
+
+        <parameter name="POINT_LATITUDE_SIGMA">
+         <brief> Latitude uncertainty for all points (meters)</brief>
+         <description>
+           This value will be used as the latitude uncertainty
+           for all points.  Units are meters.
+         </description>
+         <type>double</type>
+         <internalDefault>none</internalDefault>
+         <minimum inclusive="yes">0</minimum>
+        </parameter>
+  
+        <parameter name="POINT_LONGITUDE_SIGMA">
+         <brief> Longitude uncertainty for all points (meters)</brief>
+         <description>
+           This optional value will be used as the longitude
+           uncertainty for all points. Units are meters.
+         </description>
+         <type>double</type>
+         <internalDefault>none</internalDefault>
+         <minimum inclusive="yes">0</minimum>
+        </parameter>
+
+        <parameter name="POINT_RADIUS_SIGMA">
+          <brief> Radius uncertainty for all points (meters)
+          </brief>
+          <description> 
+            This value will be used as the radius uncertainty for 
+            all points.  Units are meters.
+          </description>
+          <type>double</type>
+          <internalDefault>none</internalDefault>
+          <minimum inclusive="yes">0</minimum>
+        </parameter>
+    </group>
+  </groups>
+</application>

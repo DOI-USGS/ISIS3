@@ -36,7 +36,7 @@ void IsisMain() {
 
   QString output;
   if(ui.WasEntered("TO")) {
-    output = ui.GetFileName("TO");
+    output = ui.GetCubeName("TO");
   }
   else {
     output = input.path() + input.baseName() + ".cub";

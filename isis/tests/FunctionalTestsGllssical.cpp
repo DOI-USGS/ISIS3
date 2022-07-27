@@ -1,4 +1,4 @@
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -28,7 +28,7 @@ TEST_F(GalileoSsiCube, FunctionalTestGllssicalDefault) {
   Cube oCube(outCubeFileName, "r");
 
   PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("RadiometricCalibration");
-  
+
   EXPECT_EQ(radGroup.findKeyword("DarkCurrentFile")[0].toStdString(), "$galileo/calibration/darkcurrent/2f8.dc04.cub");
   EXPECT_EQ(radGroup.findKeyword("GainFile")[0].toStdString(), "$galileo/calibration/gain/redf.cal04.cub");
   EXPECT_EQ(radGroup.findKeyword("ShutterFile")[0].toStdString(), "$galileo/calibration/shutter/calibration.so02F.cub");
@@ -69,7 +69,7 @@ TEST_F(GalileoSsiCube, FunctionalTestGllssicalClear) {
   // tempDir exists if the fixture subclasses TempTestingFiles, which most do
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName};
-  
+
   UserInterface options(APP_XML, args);
   try {
     gllssical(options);
@@ -81,7 +81,7 @@ TEST_F(GalileoSsiCube, FunctionalTestGllssicalClear) {
   Cube oCube(outCubeFileName, "r");
 
   PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("RadiometricCalibration");
-  
+
   EXPECT_EQ(radGroup.findKeyword("DarkCurrentFile")[0].toStdString(), "$galileo/calibration/darkcurrent/2f8.dc04.cub");
   EXPECT_EQ(radGroup.findKeyword("GainFile")[0].toStdString(), "$galileo/calibration/gain/clrf.cal04.cub");
   EXPECT_EQ(radGroup.findKeyword("ShutterFile")[0].toStdString(), "$galileo/calibration/shutter/calibration.so02F.cub");
@@ -106,7 +106,7 @@ TEST_F(GalileoSsiCube, FunctionalTestGllssicalClear) {
 TEST_F(GalileoSsiCube, FunctionalTestGllssicalRadiance) {
   // tempDir exists if the fixture subclasses TempTestingFiles, which most do
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
-  QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName, 
+  QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
                            "UNITS=RADIANCE", "SCALE=0.0001", "BITWEIGHTING=true"};
 
   UserInterface options(APP_XML, args);
@@ -120,7 +120,7 @@ TEST_F(GalileoSsiCube, FunctionalTestGllssicalRadiance) {
   Cube oCube(outCubeFileName, "r");
 
   PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("RadiometricCalibration");
-  
+
   EXPECT_EQ(radGroup.findKeyword("DarkCurrentFile")[0].toStdString(), "$galileo/calibration/darkcurrent/2f8.dc04.cub");
   EXPECT_EQ(radGroup.findKeyword("GainFile")[0].toStdString(), "$galileo/calibration/gain/redf.cal04.cub");
   EXPECT_EQ(radGroup.findKeyword("ShutterFile")[0].toStdString(), "$galileo/calibration/shutter/calibration.so02F.cub");

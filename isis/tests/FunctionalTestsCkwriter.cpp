@@ -1,7 +1,11 @@
 #include "ckwriter.h"
 
-#include "Fixtures.h"
+#include "Camera.h"
+#include "CameraFixtures.h"
+#include "NetworkFixtures.h"
 #include "Pvl.h"
+#include "SpiceRotation.h"
+#include "Table.h"
 #include "TextFile.h"
 #include "TestUtilities.h"
 
@@ -208,4 +212,58 @@ TEST_F(DefaultCube, FunctionalTestCkwriterComSum) {
   }
 
   EXPECT_EQ("This is a comment", line);
+}
+
+
+TEST(Ckwriter, FunctionalTestCkwriterOffsets) {
+  QTemporaryDir prefix;
+
+  QVector<QString> args = {"from=data/kernelWriterOffset/thmIR.cub",
+                           "to=" + prefix.path() + "/newKernel.bc"};
+
+  UserInterface options(APP_XML, args);
+  try {
+   ckwriter(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to write kernel file: " << e.toString().toStdString().c_str() << std::endl;
+  }
+  QString tmp = options.GetFileName("TO");
+  furnsh_c(tmp.toLatin1().data());
+  SpiceChar fileType[32], source[2048];
+  SpiceInt handle;
+  QString instrument = "";
+  QString startoffset = "";
+  QString endoffset = "";
+
+  SpiceBoolean found;
+  kinfo_c(tmp.toLatin1().data(), 32, 2048, fileType, source, &handle, &found);
+
+  if (found == SPICETRUE) {
+    SpiceChar commnt[1001];
+    SpiceBoolean done(SPICEFALSE);
+    SpiceInt n;
+
+    while (!done) {
+      dafec_c(handle, 1, sizeof(commnt), &n, commnt, &done);
+      QString cmmt(commnt);
+
+      int instPos = 0;
+      if ( (instPos = cmmt.indexOf("Instrument:", instPos, Qt::CaseInsensitive)) != -1 ) {
+        instrument = cmmt.remove(" ").split(":")[1];
+      }
+      int startPos = 0;
+      if ( (startPos = cmmt.indexOf("StartOffset:", startPos, Qt::CaseInsensitive)) != -1 ) {
+        startoffset = cmmt.remove(" ").split(":")[1];
+      }
+      int endPos = 0;
+      if ( (endPos = cmmt.indexOf("EndOffset:", endPos, Qt::CaseInsensitive)) != -1 ) {
+        endoffset = cmmt.remove(" ").split(":")[1];
+      }
+    }
+  }
+
+  EXPECT_EQ(instrument, "THEMIS_IR");
+  EXPECT_EQ(startoffset, "");
+  EXPECT_EQ(endoffset, "169.442");
 }

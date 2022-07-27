@@ -14,7 +14,7 @@
 #include "ControlMeasure.h"
 #include "Distance.h"
 #include "FileName.h"
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "SurfacePoint.h"
@@ -251,7 +251,9 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptLog) {
   QHash<QString, QSet<QString>> merges;
   QHash<QString, int> startSizes;
   QHash<QString, int> endSizes;
+  short nLines = 0;
   while (!logFileHandle.atEnd()) {
+    nLines++;
     QStringList splitLine = QString(logFileHandle.readLine()).trimmed().split(',');
     ASSERT_EQ(splitLine.size(), 4);
     startSizes.insert(splitLine[0], splitLine[1].toInt());
@@ -282,6 +284,7 @@ TEST_F(CombineNetworks, FunctionalTestCnetcombineptLog) {
   EXPECT_TRUE(merges["1b"].contains("3a"));
   EXPECT_TRUE(merges["1b"].contains("2b"));
   EXPECT_TRUE(merges["1b"].contains("3b"));
+  EXPECT_EQ(nLines, 2);
 }
 
 TEST_F(CombineNetworks, FunctionalTestCnetcombineptList) {

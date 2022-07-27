@@ -11,6 +11,11 @@ Intersection successful?  "No"
 Construct NaifDskShape object from cube labels with ShapeModel=DSK file.
 Try to intersect surface at obsPos (0,0,1000) and lookDir (0,-1,-1)
 Intersection successful?      "No"
+Try to intersect surface at obsPos (1000,0,0) and lookDir (-1,0,0)
+Intercept X =  0.28911
+Intercept Y =  0
+Intercept Z =  0
+Intersection successful?      "Yes"
 
 Construct NaifDskShape object from cube labels with ElevationModel=DSK file.
 Try to intersect surface at obsPos (1000,0,0) and lookDir (-1,0,0)
@@ -49,7 +54,6 @@ Construct NaifDskShape object from cube labels with ShapeModel=Null.
 **USER ERROR** NAIF DSK file [Null] does not exist.
 
 Thrown by setLocalNormalFromIntercept() - Failed to find intercept. 
-**PROGRAMMER ERROR** Intercept point does not exist - cannot provide normal vector.
 
 Thrown by calculateLocalNormal() - Failed to find intercept for normal vector. 
 **PROGRAMMER ERROR** Intercept point does not exist - cannot provide normal vector.

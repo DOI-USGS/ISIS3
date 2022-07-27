@@ -663,7 +663,7 @@ namespace Isis {
     }
     else {
       throw IException(IException::Unknown,
-                       QObject::tr("No existing files found with a numerial version matching [%1] "
+                       QObject::tr("No existing files found with a numerical version matching [%1] "
                                    "in [%2]")
                          .arg(FileName(expanded()).name()).arg(path()),
                        _FILEINFO_);

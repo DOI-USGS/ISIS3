@@ -7,7 +7,8 @@
 #include <QDomDocument>
 
 #include "spiceserver.h"
-#include "Fixtures.h"
+#include "CameraFixtures.h"
+#include "TempFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -21,16 +22,16 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/spiceserver.xml").expanded(
 
 class TestPayload : public DefaultCube {
     protected:
-      
-      QString asciiPayloadPath; 
-      QString hexPayloadPath; 
 
-      void SetUp() override {    
+      QString asciiPayloadPath;
+      QString hexPayloadPath;
+
+      void SetUp() override {
         DefaultCube::SetUp();
         QByteArray prefix = R"(
             <input_label>
             <isis_version>
-            352e312e312e3020616c706861207c20323031322d30352d3231 
+            352e312e312e3020616c706861207c20323031322d30352d3231
             </isis_version>
             <parameters>
               <cksmithed value='no' />
@@ -46,28 +47,28 @@ class TestPayload : public DefaultCube {
             </parameters>
             <label>
          )";
-        
-        std::ostringstream labelStream; 
+
+        std::ostringstream labelStream;
         labelStream << *testCube->label();
-        QByteArray labelBytes = labelStream.str().c_str(); 
+        QByteArray labelBytes = labelStream.str().c_str();
 
         QByteArray suffix = R"(
             </label>
           </input_label>
         )";
-        
+
         QByteArray asciiPayload = prefix+labelBytes.toHex()+suffix;
 
-        QByteArray hexPayload = asciiPayload.toHex(); 
-        
+        QByteArray hexPayload = asciiPayload.toHex();
+
         asciiPayloadPath = tempDir.path() + "/asciiPayload.txt";
         hexPayloadPath = tempDir.path() + "/hexPayload.txt";
-        
+
         QFile asciiFile(asciiPayloadPath);
         asciiFile.open(QIODevice::WriteOnly);
         asciiFile.write(asciiPayload);
         asciiFile.close();
-        
+
         QFile hexFile(hexPayloadPath);
         hexFile.open(QIODevice::WriteOnly);
         hexFile.write(hexPayload);
@@ -83,24 +84,24 @@ TEST_F(TestPayload, FunctionalTestSpiceserverDefaultParameters) {
   Pvl appLog;
 
   spiceserver(options, &appLog);
-  
-  TextFile inFile(outputFile); 
-  QString hexCode; 
+
+  TextFile inFile(outputFile);
+  QString hexCode;
   inFile.GetLine(hexCode);
-  
+
   QString xml( QByteArray::fromHex( QByteArray( hexCode.toLatin1() ) ).constData() );
-  
+
   QDomDocument document;
   QString error;
   Pvl kernelsLabel;
   Pvl instrumentPositionTable;
-  
-  // Use Qt's XML API to get elements we want to compare 
+
+  // Use Qt's XML API to get elements we want to compare
   int errorLine, errorCol;
   if ( document.setContent(QString(xml), &error, &errorLine, &errorCol) ) {
     QDomElement rootElement = document.firstChild().toElement();
     for ( QDomNode node = rootElement.firstChild(); !node.isNull(); node = node.nextSibling() ) {
-      
+
       QDomElement element = node.toElement();
 
       if (element.tagName() == "kernels_label") {
@@ -112,7 +113,7 @@ TEST_F(TestPayload, FunctionalTestSpiceserverDefaultParameters) {
       else if (element.tagName() == "tables") {
         for ( QDomNode node = element.firstChild(); !node.isNull(); node = node.nextSibling() ) {
           QDomElement table = node.toElement();
-          
+
           if (table.tagName() == "instrument_position") {
              QString encoded = table.firstChild().toText().data();
              std::stringstream labStream;
@@ -126,14 +127,14 @@ TEST_F(TestPayload, FunctionalTestSpiceserverDefaultParameters) {
   else {
     FAIL() << "Unable to open output file, either doesn't exist for formatted incorrectly.";
   }
-  
+
   PvlGroup naifKeywords = kernelsLabel.group(0);
 
   EXPECT_EQ((int)naifKeywords.findKeyword("NaifFrameCode"), -27002);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, naifKeywords.findKeyword("TargetPosition")[0], "Table");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, naifKeywords.findKeyword("InstrumentPointing")[0], "Table");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, naifKeywords.findKeyword("InstrumentPosition")[0], "Table");
-  
+
   PvlObject table = instrumentPositionTable.findObject("Table");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString(table.findKeyword("Name")), "InstrumentPosition");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString(table.group(0).findKeyword("Name")), "J2000X");
@@ -146,7 +147,7 @@ TEST_F(TestPayload, FunctionalTestSpiceserverDefaultParameters) {
 
 
 TEST_F(TempTestingFiles, FunctionalTestSpiceserverIsisVersion) {
-  
+
   // Isis Version 3.4.1
   QByteArray badPayload = R"(
     <input_label>
@@ -155,10 +156,10 @@ TEST_F(TempTestingFiles, FunctionalTestSpiceserverIsisVersion) {
       </isis_version>
     </input_label>
   )";
-  
-  QString outputFile = tempDir.path() + "/out.txt"; 
+
+  QString outputFile = tempDir.path() + "/out.txt";
   QString badPayloadPath = tempDir.path() + "/out.txt";
-  
+
   QFile asciiFile(badPayloadPath);
   asciiFile.open(QIODevice::WriteOnly);
   asciiFile.write(badPayload.toHex());
@@ -166,7 +167,7 @@ TEST_F(TempTestingFiles, FunctionalTestSpiceserverIsisVersion) {
 
   QVector<QString> args = {"From="+badPayloadPath, "To="+outputFile};
   UserInterface options(APP_XML, args);
-  
+
   EXPECT_THROW({
     try{
       spiceserver(options);
@@ -177,4 +178,4 @@ TEST_F(TempTestingFiles, FunctionalTestSpiceserverIsisVersion) {
       throw;
     }
   }, IException);
-} 
+}

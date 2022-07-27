@@ -15,6 +15,7 @@ find files of those names at the top level of this repository. **/
 
 #include "BundleObservation.h"
 #include "BundleSettings.h"
+#include "LidarData.h"
 #include "SurfacePoint.h"
 
 #include "XmlStackedHandler.h"
@@ -136,6 +137,8 @@ namespace Isis {
    *                           because BundleSolutionInfo is derived from QObject (see comment
    *                           below). Removed copy constructor and assignment operator from cpp
    *                           file.
+   *   @history 2018-06-01 Ken Edmundson - modifications to add lidar data input, output, and
+   *                          serialization.
    *   @history 2018-06-01 Debbie A. Cook - ( Added 2018-02-21 to BundleXYZ branch) Added
    *                           coordinate types to report and appropriate headings for columns based
    *                           on the coordinate type.  Also added a utility method to return the
@@ -164,6 +167,12 @@ namespace Isis {
                     BundleResults outputStatistics,
                     QList<ImageList *> imgList,
                     QObject *parent = 0);
+      BundleSolutionInfo(BundleSettingsQsp inputSettings,
+                    FileName controlNetworkFileName,
+                    FileName lidarDataFileName,
+                    BundleResults outputStatistics,
+                    QList<ImageList *> imgList,
+                    QObject *parent = 0);
       BundleSolutionInfo(Project *project,
                     XmlStackedHandlerReader *xmlReader,
                     QObject *parent = 0);  //TODO does xml stuff need project???
@@ -189,6 +198,7 @@ namespace Isis {
       QString outputControlNetFileName() const;
       Control *control() const;
       QString outputControlName() const;
+      QString inputLidarDataFileName() const;
       BundleSettingsQsp bundleSettings();
       BundleResults bundleResults();
       QList<ImageList *> imageList();
@@ -201,6 +211,7 @@ namespace Isis {
       bool outputText();
       bool outputImagesCSV();
       bool outputPointsCSV();
+      bool outputLidarCSV();
       bool outputResiduals();
 
       void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
@@ -254,6 +265,8 @@ namespace Isis {
       FileName           *m_inputControlNetFileName;     //!< Input control network file name
       Control            *m_outputControl;               //!< Output control
       QString             m_outputControlName;
+      FileName           *m_inputLidarDataFileName;      //!< Input lidar data file name
+      LidarData          *m_outputLidarDataSet;          //!< QList of adjusted lidar points
       BundleSettingsQsp   m_settings;                    //!< Bundle settings
       BundleResults      *m_statisticsResults;           //!< Bundle statistical results
       QList<ImageList *> *m_images;                      //!< Input image list

@@ -192,6 +192,7 @@ namespace Isis {
     // Setup focal plane and distortion maps
     LroWideAngleCameraFocalPlaneMap *fplane = new LroWideAngleCameraFocalPlaneMap(this, naifIkCode());
     LroWideAngleCameraDistortionMap *distort = new LroWideAngleCameraDistortionMap(this, naifIkCode());
+
     for ( int i = 0 ; i < filtNames.size() ; i++ ) {
       fplane->addFilter(filterIKCode.get(filtNames[i].toInt()));
       distort->addFilter(filterIKCode.get(filtNames[i].toInt()));
@@ -231,28 +232,35 @@ namespace Isis {
   void LroWideAngleCamera::SetBand(const int vband) {
 
     // Sanity check on requested band
-    int maxbands = min(p_detectorStartLines.size(), p_frameletOffsets.size());
-    if ((vband <= 0) || (vband > maxbands)) {
+    int maxVirtualBands = min(p_detectorStartLines.size(), p_frameletOffsets.size());
+    if (((vband <= 0) || (vband > maxVirtualBands)) && (vband > Bands())) {
       ostringstream mess;
       mess << "Requested virtual band (" << vband
-           << ") outside valid (BandBin/Center) limits (1 - " << maxbands
+           << ") outside valid (BandBin/Center) limits (1 - " << maxVirtualBands
            <<  ")";
       throw IException(IException::Programmer, mess.str(), _FILEINFO_);
     }
 
     //  Set up valid band access
     Camera::SetBand(vband);
+    if ((vband > maxVirtualBands) && (vband <= Bands())) {
+      // probably switching to a band from phocube or similar
+      // instead of a different filter band, so just re-use the 
+      // properties from the current band. 
+      return;
+    }
+
     PushFrameCameraDetectorMap *dmap = NULL;
     dmap = (PushFrameCameraDetectorMap *) DetectorMap();
-    dmap->SetBandFirstDetectorLine(p_detectorStartLines[vband - 1]);
-    dmap->SetFrameletOffset(p_frameletOffsets[vband - 1]);
+    dmap->SetBandFirstDetectorLine(p_detectorStartLines.at(vband - 1));
+    dmap->SetFrameletOffset(p_frameletOffsets.at(vband - 1));
 
-    SetFocalLength(p_focalLength[vband-1]);
+    SetFocalLength(p_focalLength.at(vband-1));
 
     LroWideAngleCameraFocalPlaneMap *fplane = (LroWideAngleCameraFocalPlaneMap *) FocalPlaneMap();
     fplane->setBand(vband);
-    fplane->SetDetectorOrigin(p_boreSightSample[vband-1] + 1.0,
-                              p_boreSightLine[vband-1]   + 1.0);
+    fplane->SetDetectorOrigin(p_boreSightSample.at(vband-1) + 1.0,
+                              p_boreSightLine.at(vband-1)   + 1.0);
 
     LroWideAngleCameraDistortionMap *distort = (LroWideAngleCameraDistortionMap *) DistortionMap();
     distort->setBand(vband);
@@ -291,8 +299,17 @@ namespace Isis {
     }
 
     if (nvals <= 0) {
-      QString mess = "Kernel pool keyword " + key + " not found!";
-      throw IException(IException::Programmer, mess, _FILEINFO_);
+      PvlObject NaifKeywords = getStoredNaifKeywords();
+      if (!NaifKeywords.hasKeyword(key)){
+        QString mess = "Kernel pool keyword " + key + " not found!";
+        throw IException(IException::Programmer, mess, _FILEINFO_);
+      }
+      PvlKeyword kw = NaifKeywords[key];
+      IntParameterList parms;
+      for (int i = 0; i<kw.size(); i++){
+        parms.push_back(toInt(kw[i]));
+      }
+      return parms;
     }
 
     IntParameterList parms;
@@ -311,7 +328,9 @@ namespace Isis {
    * @return bool False
    */
   bool LroWideAngleCamera::IsBandIndependent() {
-    return false;
+    // only band independant if there is one filter 
+    // band on the image
+    return p_frameletOffsets.size() == 1;
   }
 
 

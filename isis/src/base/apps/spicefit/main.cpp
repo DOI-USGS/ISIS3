@@ -13,7 +13,7 @@ void IsisMain() {
   try {
     // Open the cube
     Cube cube;
-    cube.open(ui.GetFileName("FROM"), "rw");
+    cube.open(ui.GetCubeName("FROM"), "rw");
 
     //check for existing polygon, if exists delete it
     if(cube.label()->hasObject("Polygon")) {
@@ -23,7 +23,7 @@ void IsisMain() {
     // Get the camera, interpolate to a parabola
     Camera *cam = cube.camera();
     if(cam->DetectorMap()->LineRate() == 0.0) {
-      QString msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
+      QString msg = "[" + ui.GetCubeName("FROM") + "] is not a line scan camera";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     cam->instrumentRotation()->SetPolynomial();

@@ -23,7 +23,7 @@ void IsisMain() {
   pipeline.KeepTemporaryFiles(!rmv);
 
   // Figure out which masking cube to use
-  Pvl p(ui.GetFileName("FROM"));
+  Pvl p(ui.GetCubeName("FROM"));
   PvlGroup &inst = p.findGroup("Instrument", Pvl::Traverse);
   int spn;
   QString scn = (QString)inst["SpacecraftName"];

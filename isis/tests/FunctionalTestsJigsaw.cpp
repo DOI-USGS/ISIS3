@@ -1,6 +1,9 @@
-#include <QtMath>
+#include <map>
+#include <cmath>
 
+#include <QtMath>
 #include <QFile>
+#include <QScopedPointer>
 
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -10,11 +13,15 @@
 #include "Longitude.h"
 #include "ControlPoint.h"
 #include "CSMCamera.h"
+#include "LidarData.h"
+#include "SerialNumber.h"
 
 #include "jigsaw.h"
 
 #include "TestUtilities.h"
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
+#include "CsmFixtures.h"
+
 #include "gmock/gmock.h"
 
 using namespace Isis;
@@ -247,16 +254,17 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
   QStringList lines = bundleOut.split("\n");
 
   EXPECT_THAT(lines[24].toStdString(), HasSubstr("LATITUDINAL"));
-  EXPECT_THAT(lines[57].toStdString(), HasSubstr("LATITUDE"));
-  EXPECT_THAT(lines[58].toStdString(), HasSubstr("LONGITUDE"));
-  EXPECT_THAT(lines[59].toStdString(), HasSubstr("RADIUS"));
+  EXPECT_THAT(lines[58].toStdString(), HasSubstr("LATITUDE"));
+  EXPECT_THAT(lines[59].toStdString(), HasSubstr("LONGITUDE"));
+  EXPECT_THAT(lines[60].toStdString(), HasSubstr("RADIUS"));
 
-  EXPECT_THAT(lines[244].toStdString(), HasSubstr("Latitude"));
-  EXPECT_THAT(lines[248].toStdString(), HasSubstr("Longitude"));
-  EXPECT_THAT(lines[252].toStdString(), HasSubstr("Radius"));
+  EXPECT_THAT(lines[245].toStdString(), HasSubstr("Latitude"));
+  EXPECT_THAT(lines[249].toStdString(), HasSubstr("Longitude"));
+  EXPECT_THAT(lines[253].toStdString(), HasSubstr("Radius"));
 
-  EXPECT_THAT(lines[667].toStdString(), HasSubstr("LATITUDE"));
-  EXPECT_THAT(lines[668].toStdString(), HasSubstr("LONGITUDE"));
+  EXPECT_THAT(lines[668].toStdString(), HasSubstr("LATITUDE"));
+  EXPECT_THAT(lines[669].toStdString(), HasSubstr("LONGITUDE"));
+  EXPECT_THAT(lines[670].toStdString(), HasSubstr("RADIUS"));
 
 
   // Rectangular Bundle, Latitudinal output
@@ -346,17 +354,17 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
   lines = bundleOut2.split("\n");
 
   EXPECT_THAT(lines[24].toStdString(), HasSubstr("RECTANGULAR"));
-  EXPECT_THAT(lines[57].toStdString(), HasSubstr("X"));
-  EXPECT_THAT(lines[58].toStdString(), HasSubstr("Y"));
-  EXPECT_THAT(lines[59].toStdString(), HasSubstr("Z"));
+  EXPECT_THAT(lines[58].toStdString(), HasSubstr("X"));
+  EXPECT_THAT(lines[59].toStdString(), HasSubstr("Y"));
+  EXPECT_THAT(lines[60].toStdString(), HasSubstr("Z"));
 
-  EXPECT_THAT(lines[244].toStdString(), HasSubstr("POINT X"));
-  EXPECT_THAT(lines[248].toStdString(), HasSubstr("POINT Y"));
-  EXPECT_THAT(lines[252].toStdString(), HasSubstr("POINT Z"));
+  EXPECT_THAT(lines[245].toStdString(), HasSubstr("POINT X"));
+  EXPECT_THAT(lines[249].toStdString(), HasSubstr("POINT Y"));
+  EXPECT_THAT(lines[253].toStdString(), HasSubstr("POINT Z"));
 
-  EXPECT_THAT(lines[667].toStdString(), HasSubstr("BODY-FIXED-X"));
-  EXPECT_THAT(lines[668].toStdString(), HasSubstr("BODY-FIXED-Y"));
-  EXPECT_THAT(lines[669].toStdString(), HasSubstr("BODY-FIXED-Z"));
+  EXPECT_THAT(lines[668].toStdString(), HasSubstr("BODY-FIXED-X"));
+  EXPECT_THAT(lines[669].toStdString(), HasSubstr("BODY-FIXED-Y"));
+  EXPECT_THAT(lines[670].toStdString(), HasSubstr("BODY-FIXED-Z"));
 
 
   // Compare newtwork and images.csv against the rectangular, latitude bundle
@@ -424,17 +432,17 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawBundleXYZ) {
   lines = bundleOut4.split("\n");
 
   EXPECT_THAT(lines[24].toStdString(), HasSubstr("RECTANGULAR"));
-  EXPECT_THAT(lines[57].toStdString(), HasSubstr("X"));
-  EXPECT_THAT(lines[58].toStdString(), HasSubstr("Y"));
-  EXPECT_THAT(lines[59].toStdString(), HasSubstr("Z"));
+  EXPECT_THAT(lines[58].toStdString(), HasSubstr("X"));
+  EXPECT_THAT(lines[59].toStdString(), HasSubstr("Y"));
+  EXPECT_THAT(lines[60].toStdString(), HasSubstr("Z"));
 
-  EXPECT_THAT(lines[244].toStdString(), HasSubstr("POINT X"));
-  EXPECT_THAT(lines[248].toStdString(), HasSubstr("POINT Y"));
-  EXPECT_THAT(lines[252].toStdString(), HasSubstr("POINT Z"));
+  EXPECT_THAT(lines[245].toStdString(), HasSubstr("POINT X"));
+  EXPECT_THAT(lines[249].toStdString(), HasSubstr("POINT Y"));
+  EXPECT_THAT(lines[253].toStdString(), HasSubstr("POINT Z"));
 
-  EXPECT_THAT(lines[667].toStdString(), HasSubstr("BODY-FIXED-X"));
-  EXPECT_THAT(lines[668].toStdString(), HasSubstr("BODY-FIXED-Y"));
-  EXPECT_THAT(lines[669].toStdString(), HasSubstr("BODY-FIXED-Z"));
+  EXPECT_THAT(lines[668].toStdString(), HasSubstr("BODY-FIXED-X"));
+  EXPECT_THAT(lines[669].toStdString(), HasSubstr("BODY-FIXED-Y"));
+  EXPECT_THAT(lines[670].toStdString(), HasSubstr("BODY-FIXED-Z"));
 
   bundleFile4.close();
 
@@ -773,19 +781,19 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawMEstimator) {
 
   QStringList lines = contents.split("\n");
 
-  EXPECT_THAT(lines[31].toStdString(), HasSubstr("Tier 0 Enabled: TRUE"));
-  EXPECT_THAT(lines[32].toStdString(), HasSubstr("Maximum Likelihood Model: Huber"));
-  EXPECT_THAT(lines[33].toStdString(), HasSubstr("Quantile used for tweaking constant: 0.6"));
-  EXPECT_THAT(lines[34].toStdString(), HasSubstr("Quantile weighted R^2 Residual value: 0.207"));
-  EXPECT_THAT(lines[35].toStdString(), HasSubstr("Approx. weighted Residual cutoff: N/A"));
+  EXPECT_THAT(lines[32].toStdString(), HasSubstr("Tier 0 Enabled: TRUE"));
+  EXPECT_THAT(lines[33].toStdString(), HasSubstr("Maximum Likelihood Model: Huber"));
+  EXPECT_THAT(lines[34].toStdString(), HasSubstr("Quantile used for tweaking constant: 0.6"));
+  EXPECT_THAT(lines[35].toStdString(), HasSubstr("Quantile weighted R^2 Residual value: 0.207"));
+  EXPECT_THAT(lines[36].toStdString(), HasSubstr("Approx. weighted Residual cutoff: N/A"));
 
-  EXPECT_THAT(lines[37].toStdString(), HasSubstr("Tier 1 Enabled: TRUE"));
-  EXPECT_THAT(lines[38].toStdString(), HasSubstr("Maximum Likelihood Model: Chen"));
-  EXPECT_THAT(lines[39].toStdString(), HasSubstr("Quantile used for tweaking constant: 0.98"));
-  EXPECT_THAT(lines[40].toStdString(), HasSubstr("Quantile weighted R^2 Residual value: 1.0"));
-  EXPECT_THAT(lines[41].toStdString(), HasSubstr("Approx. weighted Residual cutoff: 1.0"));
+  EXPECT_THAT(lines[38].toStdString(), HasSubstr("Tier 1 Enabled: TRUE"));
+  EXPECT_THAT(lines[39].toStdString(), HasSubstr("Maximum Likelihood Model: Chen"));
+  EXPECT_THAT(lines[40].toStdString(), HasSubstr("Quantile used for tweaking constant: 0.98"));
+  EXPECT_THAT(lines[41].toStdString(), HasSubstr("Quantile weighted R^2 Residual value: 1.0"));
+  EXPECT_THAT(lines[42].toStdString(), HasSubstr("Approx. weighted Residual cutoff: 1.0"));
 
-  EXPECT_THAT(lines[43].toStdString(), HasSubstr(" Tier 2 Enabled: FALSE"));
+  EXPECT_THAT(lines[44].toStdString(), HasSubstr(" Tier 2 Enabled: FALSE"));
 }
 
 
@@ -975,17 +983,10 @@ End)");
 
   QStringList lines = contents.split("\n");
 
-  EXPECT_THAT(lines[75].toStdString(), HasSubstr("RADII: MEAN"));
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[76].trimmed(), "");
+  EXPECT_THAT(lines[76].toStdString(), HasSubstr("RADII: MEAN"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[77].trimmed(), "");
 
-  QStringList columns = lines[132].split(QRegExp("\\s+"), QString::SkipEmptyParts);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "minimum:");
-  EXPECT_NEAR(columns[1].toDouble(), -178.8718, 0.001);
-  columns = lines[136].split(QRegExp("\\s+"), QString::SkipEmptyParts);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "maximum:");
-  EXPECT_NEAR(columns[1].toDouble(), 175.7307, 0.001);
-
-  columns = lines[159].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  QStringList columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "RA");
   EXPECT_NEAR(columns[2].toDouble(), 269.9949, 0.0001);
@@ -994,7 +995,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
   EXPECT_NEAR(columns[6].toDouble(), 0.00167495, 0.0001);
 
-  columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "DEC");
   EXPECT_NEAR(columns[2].toDouble(), 66.5392, 0.0001);
@@ -1003,7 +1004,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
   EXPECT_NEAR(columns[6].toDouble(), 0.00068524, 0.0001);
 
-  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PM");
   EXPECT_NEAR(columns[1].toDouble(), 38.32132, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -383.36347956, 0.0001);
@@ -1011,7 +1012,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 1.55731615, 0.0001);
 
-  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PMv");
   EXPECT_NEAR(columns[1].toDouble(), 13.17635815, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -0.03669501, 0.0001);
@@ -1019,7 +1020,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 0.00015007, 0.0001);
 
-  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[164].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "MeanRadius");
   EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -1.67807036, 0.0001);
@@ -1142,10 +1143,10 @@ End)");
 
   QStringList lines = contents.split("\n");
 
-  EXPECT_THAT(lines[75].toStdString(), HasSubstr("RADII: TRIAXIAL"));
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[76].trimmed(), "");
+  EXPECT_THAT(lines[76].toStdString(), HasSubstr("RADII: TRIAXIAL"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[77].trimmed(), "");
 
-  QStringList columns = lines[159].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  QStringList columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "RA");
   EXPECT_NEAR(columns[2].toDouble(), 269.9949, 0.0001);
@@ -1154,7 +1155,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
   EXPECT_NEAR(columns[6].toDouble(), 0.00199725, 0.0001);
 
-  columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "DEC");
   EXPECT_NEAR(columns[2].toDouble(), 66.5392, 0.0001);
@@ -1163,7 +1164,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
   EXPECT_NEAR(columns[6].toDouble(), 0.00149539, 0.0001);
 
-  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PM");
   EXPECT_NEAR(columns[1].toDouble(), 38.32132, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -291.78617547, 0.0001);
@@ -1171,7 +1172,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 2.00568417, 0.0001);
 
-  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PMv");
   EXPECT_NEAR(columns[1].toDouble(), 13.17635815, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -0.02785056, 0.0001);
@@ -1179,7 +1180,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 0.00019333, 0.0001);
 
-  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[164].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusA");
   EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), 6.87282091, 0.0001);
@@ -1187,7 +1188,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 1.23289971, 0.0001);
 
-  columns = lines[164].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[165].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusB");
   EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), 2.34406319, 0.0001);
@@ -1195,7 +1196,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 12.52974045, 0.0001);
 
-  columns = lines[165].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[166].split(QRegExp("\\s+"), QString::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusC");
   EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -37.55670044, 0.0001);
@@ -1700,4 +1701,168 @@ TEST_F(CSMNetwork, FunctionalTestJigsawCSM) {
   EXPECT_NEAR(camJ->getParameterValue(0), 0.0, 0.00000001);
   EXPECT_NEAR(camJ->getParameterValue(1), 0.0, 0.00000001);
   EXPECT_NEAR(camJ->getParameterValue(2), 128.0, 0.00000001);
+}
+
+
+TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
+  // copy images
+  QString cube1fname = tempDir.path() + "/lidarObservationPair1Copy.cub";
+  QString cube2fname = tempDir.path() + "/lidarObservationPair2Copy.cub";
+  cube1->reopen("rw");
+  cube2->reopen("rw");
+  QScopedPointer<Cube> cube1Copy( cube1->copy(cube1fname, CubeAttributeOutput()) );
+  QScopedPointer<Cube> cube2Copy( cube2->copy(cube2fname, CubeAttributeOutput()) );
+
+
+  FileList cubeListCopy;
+  cubeListCopy.append(cube1Copy->fileName());
+  cubeListCopy.append(cube2Copy->fileName());
+
+  cube1->close();
+  cube2->close();
+  cube1Copy->close();
+  cube2Copy->close();
+
+  QString cubeListFileCopy = tempDir.path() + "/cubesCopy.lis";
+  cubeListCopy.write(cubeListFileCopy);
+
+  // call jigsaw w/o lidar options & apply=true on copy of images
+  QVector<QString> args1 = {"radius=yes",
+                            "errorpropagation=yes",
+                            "spsolve=position",
+                            "spacecraft_position_sigma=1000.0",
+                            "camsolve=angles",
+                            "twist=yes",
+                            "camera_angles_sigma=2.",
+                            "update=yes",
+                            "bundleout_txt=yes",
+                            "cnet="+controlNetPath,
+                            "fromlist="+cubeListFile,
+                            "onet="+tempDir.path()+"/no_lidar.net",
+                            "file_prefix="+tempDir.path()+"/no_lidar"};
+
+  UserInterface ui1(APP_XML, args1);
+  jigsaw(ui1);
+
+  // call jigsaw w/ lidar options & apply=true
+  QVector<QString> args2 = {"radius=yes",
+                            "errorpropagation=yes",
+                            "spsolve=position",
+                            "spacecraft_position_sigma=1000.0",
+                            "camsolve=angles",
+                            "twist=yes",
+                            "camera_angles_sigma=2.",
+                            "update=yes",
+                            "SIGMA0=0.00001",
+                            "bundleout_txt=yes",
+                            "cnet="+controlNetPath,
+                            "fromlist="+cubeListFileCopy,
+                            "onet="+tempDir.path()+"/lidar.net",
+                            "file_prefix="+tempDir.path()+"/lidar",
+                            "lidardata="+lidarDataPath,
+                            "olidardata="+tempDir.path()+"/lidar_out.json",
+                            "olidarformat=json",
+                            "lidar_csv=yes"};
+
+  UserInterface ui2(APP_XML, args2);
+  jigsaw(ui2);
+
+  // re-open all cubes
+  // Make a new cube object to get the updated camera models after bundle adjust
+  Cube bundledCube1(cube1Path);
+  Cube bundledCube2(cube2Path);
+  Cube bundledCube1Copy(cube1fname);
+  Cube bundledCube2Copy(cube2fname);
+
+  std::map<QString, Camera*> noLidarCameras;
+  std::map<QString, Camera*> lidarCameras;
+  noLidarCameras[SerialNumber::Compose(bundledCube1)] = bundledCube1.camera();
+  noLidarCameras[SerialNumber::Compose(bundledCube2)] = bundledCube2.camera();
+  lidarCameras[SerialNumber::Compose(bundledCube1Copy)] = bundledCube1Copy.camera();
+  lidarCameras[SerialNumber::Compose(bundledCube2Copy)] = bundledCube2Copy.camera();
+
+  // for each point in lidar data
+  for (const auto &point : rangeData.points()) {
+    for (const auto &sn : point->snSimultaneous()) {
+      //point get measure
+      ControlMeasure *m = (*point)[sn];
+      // in no-lidar images do ground to image to get spacecraft position at observing time
+      Camera *noLidarCamera = noLidarCameras[sn];
+      bool success = noLidarCamera->SetImage(m->GetSample(), m->GetLine());
+
+      EXPECT_TRUE(success) << "Failed to set image in no-lidar cube " << sn.toStdString()
+            << " at point " << point->GetId().toStdString();
+      if (!success) {
+        continue;
+      }
+
+      // in lidar images do ground to image to get spacecraft position at observing time
+      Camera *lidarCamera = lidarCameras[sn];
+      success = lidarCamera->SetImage(m->GetSample(), m->GetLine());
+
+      EXPECT_TRUE(success) << "Failed to set image in lidar cube " << sn.toStdString()
+            << " at point " << point->GetId().toStdString();
+      if (!success) {
+        continue;
+      }
+      // check that distance from ground to spacecraft position is closer to lidar range in lidar image than in no-lidar images
+      EXPECT_LT(abs(lidarCamera->SlantDistance() - point->range()), abs(noLidarCamera->SlantDistance() - point->range()))
+            << "Failed for point " <<  point->GetId().toStdString();
+    }
+  }
+
+  LidarData lidarDataIn;
+  lidarDataIn.read(lidarDataPath);
+  LidarData lidarDataOut;
+  lidarDataOut.read(tempDir.path() + "/lidar_out.json");
+
+  QFile bo(tempDir.path() + "/lidar_bundleout.txt");
+  QString contents;
+  if (bo.open(QIODevice::ReadOnly)) {
+    contents = bo.read(bo.size());
+  }
+  else {
+    FAIL() << "Failed to open bundleout.txt" << std::endl;
+  }
+
+  QStringList lines = contents.split("\n");
+
+  EXPECT_THAT(lines[10].toStdString(), HasSubstr(("Lidar Data Filename: " + lidarDataPath).toStdString()));
+
+  QStringList lidarPoints = lines[73].split(":");
+  EXPECT_THAT(lidarPoints[0].trimmed().toStdString(), HasSubstr("Lidar Points"));
+  EXPECT_EQ(lidarPoints[1].trimmed().toInt(), lidarDataIn.numberLidarPoints());
+
+  int nMeasuresCube1 = lidarDataIn.GetMeasuresInCube(SerialNumber::Compose(bundledCube1Copy)).count();
+  int nMeasuresCube2 = lidarDataIn.GetMeasuresInCube(SerialNumber::Compose(bundledCube2Copy)).count();
+  int nValidMeasuresCube1 = lidarDataIn.GetNumberOfValidMeasuresInImage( SerialNumber::Compose(bundledCube1Copy));
+  int nValidMeasuresCube2 = lidarDataIn.GetNumberOfValidMeasuresInImage( SerialNumber::Compose(bundledCube2Copy));
+
+  QStringList lidarRangeConstraints = lines[79].split(":");
+  EXPECT_THAT(lidarRangeConstraints[0].trimmed().toStdString(), HasSubstr("Lidar Range Constraints"));
+  EXPECT_EQ(lidarRangeConstraints[1].trimmed().toInt(), lidarDataIn.numberSimultaneousMeasures());
+
+  QStringList columns = lines[136].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  ASSERT_GE(columns.size(), 10);
+  EXPECT_EQ(columns[6].toInt(), nValidMeasuresCube1);
+  EXPECT_EQ(columns[7].toInt(), nMeasuresCube1);
+  columns = lines[137].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  ASSERT_GE(columns.size(), 10);
+  EXPECT_EQ(columns[6].toInt(), nValidMeasuresCube2);
+  EXPECT_EQ(columns[7].toInt(), nMeasuresCube2);
+
+  CSVReader::CSVAxis csvLine;
+  CSVReader header = CSVReader(tempDir.path()+"/lidar_bundleout_lidar.csv",
+                               false, 0, ',', true, true);
+
+  for (int i = 3; i < header.rows(); i++){
+    csvLine = header.getRow(i);
+    QString pointId = csvLine[0].trimmed();
+    EXPECT_NEAR(csvLine[2].toDouble(), lidarDataIn.point(pointId)->range(), 0.0001);
+    EXPECT_NEAR(csvLine[3].toDouble(), lidarDataIn.point(pointId)->sigmaRange() * 0.001, 0.0001);
+    EXPECT_NEAR(csvLine[4].toDouble(), lidarDataOut.point(pointId)->range(), 0.0001);
+    // The bundle doesn't write out updated sigma ranges
+    // EXPECT_NEAR(csvLine[5].toDouble(), lidarDataOut.point(pointId)->sigmaRange() * 0.001, 0.0001);
+  }
+
 }

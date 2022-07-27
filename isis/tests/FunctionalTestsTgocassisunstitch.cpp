@@ -1,7 +1,6 @@
 #include <QTemporaryDir>
 
 #include "tgocassisunstitch.h"
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -16,23 +15,23 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/tgocassisunstitch.xml").exp
 
 TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   QTemporaryDir prefix;
-  
-  QVector<QString> args = {"from=data/tgoCassis/tgocassisunstitch/stitched-2016-11-26T22-50-27.381_crop.cub",  
+
+  QVector<QString> args = {"from=data/tgoCassis/tgocassisunstitch/stitched-2016-11-26T22-50-27.381_crop.cub",
                            "outputprefix=" + prefix.path() + "/unstitched"};
   UserInterface options(APP_XML, args);
-  
+
   try {
     tgocassisunstitch(options);
   }
   catch (IException &e) {
     FAIL() << "Unable to run tgocassisunstitch with stitched cube: " << e.what() << std::endl;
   }
-  
+
   // Unstitched Pan Cube
   QString panFile = prefix.path() + "/unstitched_PAN.cub";
   Cube panCube(panFile);
   Pvl *panLabel = panCube.label();
-  
+
   // Dimensions group
   EXPECT_EQ(panCube.sampleCount(), 2048);
   EXPECT_EQ(panCube.lineCount(), 280);
@@ -48,12 +47,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_EQ(panInst["ExposureDuration"][0].toStdString(), "1.440e-003");
   EXPECT_EQ(int(panInst["SummingMode"]), 0);
   EXPECT_EQ(panInst["Filter"][0].toStdString(), "PAN");
-  
+
   // Archive Group
   PvlGroup &panArch = panLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(panArch["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(panArch["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(panArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");  
+  EXPECT_EQ(panArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");
   EXPECT_DOUBLE_EQ(double(panArch["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(panArch["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(panArch["PredictMaximumExposureTime"]), 1.5952);
@@ -70,12 +69,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_EQ(int(panArch["ImageFrequency"]), 400000);
   EXPECT_EQ(int(panArch["NumberOfWindows"]), 6);
   EXPECT_EQ(int(panArch["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(panArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");  
+  EXPECT_EQ(panArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
   EXPECT_DOUBLE_EQ(double(panArch["ExposureTimePEHK"]), 1.440e-003);
   EXPECT_DOUBLE_EQ(double(panArch["PixelsPossiblySaturated"]), 29.17);
   EXPECT_EQ(int(panArch["WindowCount"]), 0);
   EXPECT_EQ(int(panArch["Window1Binning"]), 0);
-  EXPECT_EQ(int(panArch["Window1StartSample"]), 0);    
+  EXPECT_EQ(int(panArch["Window1StartSample"]), 0);
   EXPECT_EQ(int(panArch["Window1EndSample"]), 2047);
   EXPECT_EQ(int(panArch["Window1StartLine"]), 354);
   EXPECT_EQ(int(panArch["Window1EndLine"]), 633);
@@ -88,7 +87,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_EQ(int(panArch["Window3StartSample"]), 0);
   EXPECT_EQ(int(panArch["Window3EndSample"]), 2047);
   EXPECT_EQ(int(panArch["Window3StartLine"]), 1048);
-  EXPECT_EQ(int(panArch["Window3EndLine"]), 1302);  
+  EXPECT_EQ(int(panArch["Window3EndLine"]), 1302);
   EXPECT_EQ(int(panArch["Window4Binning"]), 0);
   EXPECT_EQ(int(panArch["Window4StartSample"]), 1024);
   EXPECT_EQ(int(panArch["Window4EndSample"]), 1087);
@@ -112,16 +111,16 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_DOUBLE_EQ(double(panBand["Center"]), 675.0);
   EXPECT_DOUBLE_EQ(double(panBand["Width"]), 250.0);
   EXPECT_EQ(panBand["NaifIkCode"][0].toStdString(), "-143421");
-  
+
   // Kernels Group
   PvlGroup &panKern = panLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_EQ(int(panKern["NaifFrameCode"]), -143400);
-  
+
   // Unstitched Red Cube
   QString redFile = prefix.path() + "/unstitched_RED.cub";
   Cube redCube(redFile);
   Pvl *redLabel = redCube.label();
-  
+
   // Dimensions group
   EXPECT_EQ(redCube.sampleCount(), 2048);
   EXPECT_EQ(redCube.lineCount(), 256);
@@ -137,12 +136,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_EQ(redInst["ExposureDuration"][0].toStdString(), "1.440e-003");
   EXPECT_EQ(int(redInst["SummingMode"]), 0);
   EXPECT_EQ(redInst["Filter"][0].toStdString(), "RED");
-  
+
   // Archive Group
   PvlGroup &redArch = redLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(redArch["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(redArch["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(redArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");  
+  EXPECT_EQ(redArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");
   EXPECT_DOUBLE_EQ(double(redArch["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(redArch["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(redArch["PredictMaximumExposureTime"]), 1.5952);
@@ -159,12 +158,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_EQ(int(redArch["ImageFrequency"]), 400000);
   EXPECT_EQ(int(redArch["NumberOfWindows"]), 6);
   EXPECT_EQ(int(redArch["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(redArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");  
+  EXPECT_EQ(redArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
   EXPECT_DOUBLE_EQ(double(redArch["ExposureTimePEHK"]), 1.440e-003);
   EXPECT_DOUBLE_EQ(double(redArch["PixelsPossiblySaturated"]), 0.16);
   EXPECT_EQ(int(redArch["WindowCount"]), 1);
   EXPECT_EQ(int(redArch["Window1Binning"]), 0);
-  EXPECT_EQ(int(redArch["Window1StartSample"]), 0);    
+  EXPECT_EQ(int(redArch["Window1StartSample"]), 0);
   EXPECT_EQ(int(redArch["Window1EndSample"]), 2047);
   EXPECT_EQ(int(redArch["Window1StartLine"]), 354);
   EXPECT_EQ(int(redArch["Window1EndLine"]), 632);
@@ -177,7 +176,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_EQ(int(redArch["Window3StartSample"]), 0);
   EXPECT_EQ(int(redArch["Window3EndSample"]), 2047);
   EXPECT_EQ(int(redArch["Window3StartLine"]), 1048);
-  EXPECT_EQ(int(redArch["Window3EndLine"]), 1302);  
+  EXPECT_EQ(int(redArch["Window3EndLine"]), 1302);
   EXPECT_EQ(int(redArch["Window4Binning"]), 0);
   EXPECT_EQ(int(redArch["Window4StartSample"]), 1024);
   EXPECT_EQ(int(redArch["Window4EndSample"]), 1087);
@@ -201,12 +200,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_DOUBLE_EQ(double(redBand["Center"]), 840.0);
   EXPECT_DOUBLE_EQ(double(redBand["Width"]), 100.0);
   EXPECT_EQ(redBand["NaifIkCode"][0].toStdString(), "-143422");
-  
+
   // Kernels Group
   PvlGroup &redKern = redLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_EQ(int(redKern["NaifFrameCode"]), -143400);
-  
-  
+
+
   // Unstitched Blu Cube
   QString bluFile = prefix.path() + "/unstitched_BLU.cub";
   Cube bluCube(bluFile);
@@ -232,7 +231,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   PvlGroup &bluArch = bluLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(bluArch["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(bluArch["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(bluArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");  
+  EXPECT_EQ(bluArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");
   EXPECT_DOUBLE_EQ(double(bluArch["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(bluArch["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(bluArch["PredictMaximumExposureTime"]), 1.5952);
@@ -249,12 +248,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_EQ(int(bluArch["ImageFrequency"]), 400000);
   EXPECT_EQ(int(bluArch["NumberOfWindows"]), 6);
   EXPECT_EQ(int(bluArch["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(bluArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");  
+  EXPECT_EQ(bluArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
   EXPECT_DOUBLE_EQ(double(bluArch["ExposureTimePEHK"]), 1.440e-003);
   EXPECT_DOUBLE_EQ(double(bluArch["PixelsPossiblySaturated"]), 0);
   EXPECT_EQ(int(bluArch["WindowCount"]), 3);
   EXPECT_EQ(int(bluArch["Window1Binning"]), 0);
-  EXPECT_EQ(int(bluArch["Window1StartSample"]), 0);    
+  EXPECT_EQ(int(bluArch["Window1StartSample"]), 0);
   EXPECT_EQ(int(bluArch["Window1EndSample"]), 2047);
   EXPECT_EQ(int(bluArch["Window1StartLine"]), 354);
   EXPECT_EQ(int(bluArch["Window1EndLine"]), 632);
@@ -267,7 +266,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_EQ(int(bluArch["Window3StartSample"]), 0);
   EXPECT_EQ(int(bluArch["Window3EndSample"]), 2047);
   EXPECT_EQ(int(bluArch["Window3StartLine"]), 1048);
-  EXPECT_EQ(int(bluArch["Window3EndLine"]), 1302);  
+  EXPECT_EQ(int(bluArch["Window3EndLine"]), 1302);
   EXPECT_EQ(int(bluArch["Window4Binning"]), 0);
   EXPECT_EQ(int(bluArch["Window4StartSample"]), 1024);
   EXPECT_EQ(int(bluArch["Window4EndSample"]), 1087);
@@ -295,13 +294,13 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   // Kernels Group
   PvlGroup &bluKern = bluLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_EQ(int(bluKern["NaifFrameCode"]), -143400);
-  
-  
+
+
   // Unstitched Nir Cube
   QString nirFile = prefix.path() + "/unstitched_NIR.cub";
   Cube nirCube(nirFile);
   Pvl *nirLabel = nirCube.label();
-  
+
   // Dimensions group
   EXPECT_EQ(nirCube.sampleCount(), 2048);
   EXPECT_EQ(nirCube.lineCount(), 256);
@@ -317,12 +316,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_EQ(nirInst["ExposureDuration"][0].toStdString(), "1.440e-003");
   EXPECT_EQ(int(nirInst["SummingMode"]), 0);
   EXPECT_EQ(nirInst["Filter"][0].toStdString(), "NIR");
-  
+
   // Archive Group
   PvlGroup &nirArch = nirLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(nirArch["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(nirArch["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(nirArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");  
+  EXPECT_EQ(nirArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");
   EXPECT_DOUBLE_EQ(double(nirArch["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(nirArch["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(nirArch["PredictMaximumExposureTime"]), 1.5952);
@@ -339,12 +338,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_EQ(int(nirArch["ImageFrequency"]), 400000);
   EXPECT_EQ(int(nirArch["NumberOfWindows"]), 6);
   EXPECT_EQ(int(nirArch["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(nirArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");  
+  EXPECT_EQ(nirArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
   EXPECT_DOUBLE_EQ(double(nirArch["ExposureTimePEHK"]), 1.440e-003);
   EXPECT_DOUBLE_EQ(double(nirArch["PixelsPossiblySaturated"]), 0);
   EXPECT_EQ(int(nirArch["WindowCount"]), 2);
   EXPECT_EQ(int(nirArch["Window1Binning"]), 0);
-  EXPECT_EQ(int(nirArch["Window1StartSample"]), 0);    
+  EXPECT_EQ(int(nirArch["Window1StartSample"]), 0);
   EXPECT_EQ(int(nirArch["Window1EndSample"]), 2047);
   EXPECT_EQ(int(nirArch["Window1StartLine"]), 354);
   EXPECT_EQ(int(nirArch["Window1EndLine"]), 632);
@@ -357,7 +356,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_EQ(int(nirArch["Window3StartSample"]), 0);
   EXPECT_EQ(int(nirArch["Window3EndSample"]), 2047);
   EXPECT_EQ(int(nirArch["Window3StartLine"]), 1048);
-  EXPECT_EQ(int(nirArch["Window3EndLine"]), 1303);  
+  EXPECT_EQ(int(nirArch["Window3EndLine"]), 1303);
   EXPECT_EQ(int(nirArch["Window4Binning"]), 0);
   EXPECT_EQ(int(nirArch["Window4StartSample"]), 1024);
   EXPECT_EQ(int(nirArch["Window4EndSample"]), 1087);
@@ -381,7 +380,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
   EXPECT_DOUBLE_EQ(double(nirBand["Center"]), 985.0);
   EXPECT_DOUBLE_EQ(double(nirBand["Width"]), 220.0);
   EXPECT_EQ(nirBand["NaifIkCode"][0].toStdString(), "-143423");
-  
+
   // Kernels Group
   PvlGroup &nirKern = nirLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_EQ(int(nirKern["NaifFrameCode"]), -143400);
@@ -390,23 +389,23 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
 
 TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   QTemporaryDir prefix;
-  
-  QVector<QString> args = {"from=data/tgoCassis/tgocassisunstitch/stitched-spice-2016-11-26T22:50:27.381_crop.cub",  
+
+  QVector<QString> args = {"from=data/tgoCassis/tgocassisunstitch/stitched-spice-2016-11-26T22:50:27.381_crop.cub",
                            "outputprefix=" + prefix.path() + "/unstitched"};
   UserInterface options(APP_XML, args);
-  
+
   try {
     tgocassisunstitch(options);
   }
   catch (IException &e) {
     FAIL() << "Unable to run tgocassisunstitch with stitched cube: " << e.what() << std::endl;
   }
-  
+
   // Unstitched Pan Cube
   QString panFile = prefix.path() + "/unstitched_PAN.cub";
   Cube panCube(panFile);
   Pvl *panLabel = panCube.label();
-  
+
   // Dimensions group
   EXPECT_EQ(panCube.sampleCount(), 2048);
   EXPECT_EQ(panCube.lineCount(), 280);
@@ -422,12 +421,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_EQ(panInst["ExposureDuration"][0].toStdString(), "1.440e-003");
   EXPECT_EQ(int(panInst["SummingMode"]), 0);
   EXPECT_EQ(panInst["Filter"][0].toStdString(), "PAN");
-  
+
   // Archive Group
   PvlGroup &panArch = panLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(panArch["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(panArch["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(panArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");  
+  EXPECT_EQ(panArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");
   EXPECT_DOUBLE_EQ(double(panArch["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(panArch["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(panArch["PredictMaximumExposureTime"]), 1.5952);
@@ -444,12 +443,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_EQ(int(panArch["ImageFrequency"]), 400000);
   EXPECT_EQ(int(panArch["NumberOfWindows"]), 6);
   EXPECT_EQ(int(panArch["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(panArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");  
+  EXPECT_EQ(panArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
   EXPECT_DOUBLE_EQ(double(panArch["ExposureTimePEHK"]), 1.440e-003);
   EXPECT_DOUBLE_EQ(double(panArch["PixelsPossiblySaturated"]), 29.17);
   EXPECT_EQ(int(panArch["WindowCount"]), 0);
   EXPECT_EQ(int(panArch["Window1Binning"]), 0);
-  EXPECT_EQ(int(panArch["Window1StartSample"]), 0);    
+  EXPECT_EQ(int(panArch["Window1StartSample"]), 0);
   EXPECT_EQ(int(panArch["Window1EndSample"]), 2047);
   EXPECT_EQ(int(panArch["Window1StartLine"]), 354);
   EXPECT_EQ(int(panArch["Window1EndLine"]), 633);
@@ -462,7 +461,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_EQ(int(panArch["Window3StartSample"]), 0);
   EXPECT_EQ(int(panArch["Window3EndSample"]), 2047);
   EXPECT_EQ(int(panArch["Window3StartLine"]), 1048);
-  EXPECT_EQ(int(panArch["Window3EndLine"]), 1302);  
+  EXPECT_EQ(int(panArch["Window3EndLine"]), 1302);
   EXPECT_EQ(int(panArch["Window4Binning"]), 0);
   EXPECT_EQ(int(panArch["Window4StartSample"]), 1024);
   EXPECT_EQ(int(panArch["Window4EndSample"]), 1087);
@@ -486,7 +485,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_DOUBLE_EQ(double(panBand["Center"]), 675.0);
   EXPECT_DOUBLE_EQ(double(panBand["Width"]), 250.0);
   EXPECT_EQ(panBand["NaifIkCode"][0].toStdString(), "-143421");
-  
+
   // Kernels Group
   PvlGroup &panKern = panLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_EQ(int(panKern["NaifFrameCode"]), -143400);
@@ -499,12 +498,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_TRUE(panKern.hasKeyword("InstrumentPosition"));
   EXPECT_TRUE(panKern.hasKeyword("InstrumentAddendum"));
   EXPECT_TRUE(panKern.hasKeyword("ShapeModel"));
-  
+
   // Unstitched Red Cube
   QString redFile = prefix.path() + "/unstitched_RED.cub";
   Cube redCube(redFile);
   Pvl *redLabel = redCube.label();
-  
+
   // Dimensions group
   EXPECT_EQ(redCube.sampleCount(), 2048);
   EXPECT_EQ(redCube.lineCount(), 256);
@@ -520,12 +519,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_EQ(redInst["ExposureDuration"][0].toStdString(), "1.440e-003");
   EXPECT_EQ(int(redInst["SummingMode"]), 0);
   EXPECT_EQ(redInst["Filter"][0].toStdString(), "RED");
-  
+
   // Archive Group
   PvlGroup &redArch = redLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(redArch["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(redArch["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(redArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");  
+  EXPECT_EQ(redArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");
   EXPECT_DOUBLE_EQ(double(redArch["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(redArch["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(redArch["PredictMaximumExposureTime"]), 1.5952);
@@ -542,12 +541,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_EQ(int(redArch["ImageFrequency"]), 400000);
   EXPECT_EQ(int(redArch["NumberOfWindows"]), 6);
   EXPECT_EQ(int(redArch["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(redArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");  
+  EXPECT_EQ(redArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
   EXPECT_DOUBLE_EQ(double(redArch["ExposureTimePEHK"]), 1.440e-003);
   EXPECT_DOUBLE_EQ(double(redArch["PixelsPossiblySaturated"]), 0.16);
   EXPECT_EQ(int(redArch["WindowCount"]), 1);
   EXPECT_EQ(int(redArch["Window1Binning"]), 0);
-  EXPECT_EQ(int(redArch["Window1StartSample"]), 0);    
+  EXPECT_EQ(int(redArch["Window1StartSample"]), 0);
   EXPECT_EQ(int(redArch["Window1EndSample"]), 2047);
   EXPECT_EQ(int(redArch["Window1StartLine"]), 354);
   EXPECT_EQ(int(redArch["Window1EndLine"]), 632);
@@ -560,7 +559,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_EQ(int(redArch["Window3StartSample"]), 0);
   EXPECT_EQ(int(redArch["Window3EndSample"]), 2047);
   EXPECT_EQ(int(redArch["Window3StartLine"]), 1048);
-  EXPECT_EQ(int(redArch["Window3EndLine"]), 1302);  
+  EXPECT_EQ(int(redArch["Window3EndLine"]), 1302);
   EXPECT_EQ(int(redArch["Window4Binning"]), 0);
   EXPECT_EQ(int(redArch["Window4StartSample"]), 1024);
   EXPECT_EQ(int(redArch["Window4EndSample"]), 1087);
@@ -584,7 +583,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_DOUBLE_EQ(double(redBand["Center"]), 840.0);
   EXPECT_DOUBLE_EQ(double(redBand["Width"]), 100.0);
   EXPECT_EQ(redBand["NaifIkCode"][0].toStdString(), "-143422");
-  
+
   // Kernels Group
   PvlGroup &redKern = redLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_EQ(int(redKern["NaifFrameCode"]), -143400);
@@ -597,8 +596,8 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_TRUE(redKern.hasKeyword("InstrumentPosition"));
   EXPECT_TRUE(redKern.hasKeyword("InstrumentAddendum"));
   EXPECT_TRUE(redKern.hasKeyword("ShapeModel"));
-  
-  
+
+
   // Unstitched Blu Cube
   QString bluFile = prefix.path() + "/unstitched_BLU.cub";
   Cube bluCube(bluFile);
@@ -624,7 +623,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   PvlGroup &bluArch = bluLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(bluArch["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(bluArch["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(bluArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");  
+  EXPECT_EQ(bluArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");
   EXPECT_DOUBLE_EQ(double(bluArch["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(bluArch["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(bluArch["PredictMaximumExposureTime"]), 1.5952);
@@ -641,12 +640,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_EQ(int(bluArch["ImageFrequency"]), 400000);
   EXPECT_EQ(int(bluArch["NumberOfWindows"]), 6);
   EXPECT_EQ(int(bluArch["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(bluArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");  
+  EXPECT_EQ(bluArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
   EXPECT_DOUBLE_EQ(double(bluArch["ExposureTimePEHK"]), 1.440e-003);
   EXPECT_DOUBLE_EQ(double(bluArch["PixelsPossiblySaturated"]), 0);
   EXPECT_EQ(int(bluArch["WindowCount"]), 3);
   EXPECT_EQ(int(bluArch["Window1Binning"]), 0);
-  EXPECT_EQ(int(bluArch["Window1StartSample"]), 0);    
+  EXPECT_EQ(int(bluArch["Window1StartSample"]), 0);
   EXPECT_EQ(int(bluArch["Window1EndSample"]), 2047);
   EXPECT_EQ(int(bluArch["Window1StartLine"]), 354);
   EXPECT_EQ(int(bluArch["Window1EndLine"]), 632);
@@ -659,7 +658,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_EQ(int(bluArch["Window3StartSample"]), 0);
   EXPECT_EQ(int(bluArch["Window3EndSample"]), 2047);
   EXPECT_EQ(int(bluArch["Window3StartLine"]), 1048);
-  EXPECT_EQ(int(bluArch["Window3EndLine"]), 1302);  
+  EXPECT_EQ(int(bluArch["Window3EndLine"]), 1302);
   EXPECT_EQ(int(bluArch["Window4Binning"]), 0);
   EXPECT_EQ(int(bluArch["Window4StartSample"]), 1024);
   EXPECT_EQ(int(bluArch["Window4EndSample"]), 1087);
@@ -696,13 +695,13 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_TRUE(bluKern.hasKeyword("InstrumentPosition"));
   EXPECT_TRUE(bluKern.hasKeyword("InstrumentAddendum"));
   EXPECT_TRUE(bluKern.hasKeyword("ShapeModel"));
-  
-  
+
+
   // Unstitched Nir Cube
   QString nirFile = prefix.path() + "/unstitched_NIR.cub";
   Cube nirCube(nirFile);
   Pvl *nirLabel = nirCube.label();
-  
+
   // Dimensions group
   EXPECT_EQ(nirCube.sampleCount(), 2048);
   EXPECT_EQ(nirCube.lineCount(), 256);
@@ -718,12 +717,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_EQ(nirInst["ExposureDuration"][0].toStdString(), "1.440e-003");
   EXPECT_EQ(int(nirInst["SummingMode"]), 0);
   EXPECT_EQ(nirInst["Filter"][0].toStdString(), "NIR");
-  
+
   // Archive Group
   PvlGroup &nirArch = nirLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_EQ(nirArch["DataSetId"][0].toStdString(), "TBD");
   EXPECT_EQ(nirArch["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(nirArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");  
+  EXPECT_EQ(nirArch["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:12");
   EXPECT_DOUBLE_EQ(double(nirArch["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(nirArch["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(nirArch["PredictMaximumExposureTime"]), 1.5952);
@@ -740,12 +739,12 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_EQ(int(nirArch["ImageFrequency"]), 400000);
   EXPECT_EQ(int(nirArch["NumberOfWindows"]), 6);
   EXPECT_EQ(int(nirArch["UniqueIdentifier"]), 100799268);
-  EXPECT_EQ(nirArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");  
+  EXPECT_EQ(nirArch["ExposureTimestamp"][0].toStdString(), "2f015435767e275a");
   EXPECT_DOUBLE_EQ(double(nirArch["ExposureTimePEHK"]), 1.440e-003);
   EXPECT_DOUBLE_EQ(double(nirArch["PixelsPossiblySaturated"]), 0);
   EXPECT_EQ(int(nirArch["WindowCount"]), 2);
   EXPECT_EQ(int(nirArch["Window1Binning"]), 0);
-  EXPECT_EQ(int(nirArch["Window1StartSample"]), 0);    
+  EXPECT_EQ(int(nirArch["Window1StartSample"]), 0);
   EXPECT_EQ(int(nirArch["Window1EndSample"]), 2047);
   EXPECT_EQ(int(nirArch["Window1StartLine"]), 354);
   EXPECT_EQ(int(nirArch["Window1EndLine"]), 632);
@@ -758,7 +757,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_EQ(int(nirArch["Window3StartSample"]), 0);
   EXPECT_EQ(int(nirArch["Window3EndSample"]), 2047);
   EXPECT_EQ(int(nirArch["Window3StartLine"]), 1048);
-  EXPECT_EQ(int(nirArch["Window3EndLine"]), 1303);  
+  EXPECT_EQ(int(nirArch["Window3EndLine"]), 1303);
   EXPECT_EQ(int(nirArch["Window4Binning"]), 0);
   EXPECT_EQ(int(nirArch["Window4StartSample"]), 1024);
   EXPECT_EQ(int(nirArch["Window4EndSample"]), 1087);
@@ -782,7 +781,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   EXPECT_DOUBLE_EQ(double(nirBand["Center"]), 985.0);
   EXPECT_DOUBLE_EQ(double(nirBand["Width"]), 220.0);
   EXPECT_EQ(nirBand["NaifIkCode"][0].toStdString(), "-143423");
-  
+
   // Kernels Group
   PvlGroup &nirKern = nirLabel->findGroup("Kernels", Pvl::Traverse);
   EXPECT_EQ(int(nirKern["NaifFrameCode"]), -143400);

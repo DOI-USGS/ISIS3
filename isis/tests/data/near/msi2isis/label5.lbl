@@ -1,0 +1,99 @@
+PDS_VERSION_ID                = PDS3                                          
+RECORD_TYPE                   = FIXED_LENGTH                                  
+RECORD_BYTES                  = 2880                                          
+FILE_RECORDS                  = 186                                           
+                                                                              
+^HEADER                       = "M0126865998F4_2P_IOF.FIT"                    
+^IMAGE                        = ("M0126865998F4_2P_IOF.FIT", 5)               
+                                                                              
+DATA_SET_ID                   = "NEAR-A-MSI-3-EDR-EROS/ORBIT-V1.0"            
+INSTRUMENT_HOST_NAME          = "NEAR EARTH ASTEROID RENDEZVOUS"              
+INSTRUMENT_NAME               = "MULTI-SPECTRAL IMAGER"                       
+INSTRUMENT_ID                 = MSI                                           
+                                                                              
+/***** PRODUCT INFORMATION *****/                                             
+PRODUCT_ID                    = "M0126865998F4_2P_IOF.FIT"                    
+SOURCE_PRODUCT_ID             = ( "M0126865998F4_2P.FIT",                     
+                                  "FLAT4_31C.FIT",                            
+                                  "N/A",                                      
+                                  "N/A",                                      
+                                  "DARK_MODEL_V4.TAB" )                       
+PROCESSING_HISTORY_TEXT       = "IOF"                                         
+PRODUCT_VERSION_ID            = "1.0"                                         
+PRODUCER_FULL_NAME            = "Scott L. Murchie"                            
+PRODUCT_CREATION_TIME         = 2001-08-26T05:15:41.000                       
+SOFTWARE_NAME                 = "RECAL"                                       
+SOFTWARE_VERSION_ID           = "1.0"                                         
+PARAMETER_NAME                = "Cal coefficients ver 3"                      
+FLAT_FIELD_CORRECTION_FLAG    = TRUE                                          
+DARK_CURRENT_CORRECTION_FLAG  = TRUE                                          
+DATA_QUALITY_ID               = 20000000                                      
+DATA_QUALITY_DESC             = "                                             
+  DATA_QUALITY_ID fields are defined in the MSIDS.CAT."                       
+                                                                              
+/***** TIME INFORMATION    *****/                                             
+START_TIME                    = 2000-02-25T05:16:12.656                       
+STOP_TIME                     = 2000-02-25T05:16:12.745                       
+SPACECRAFT_CLOCK_START_COUNT  = 126865998.830                                 
+SPACECRAFT_CLOCK_STOP_COUNT   = 126865998.919                                 
+                                                                              
+/***** OBSERVATION INFORMATION    *****/                                      
+EXPOSURE_DURATION             = 89.00 <ms>                                    
+EXPOSURE_TYPE                 = "AUTO"                                        
+COMMANDED_FILTER_NUMBER       = 4                                             
+FILTER_NUMBER                 = 4                                             
+FOCAL_PLANE_TEMPERATURE       = 245.15 <K>                                    
+INSTRUMENT_TEMPERATURE        = ( 292.93 <K> , 286.50 <K> )                   
+SEQUENCE_TABLE_ID             = 18                                            
+SEQUENCE_TITLE                = "DailyGlobal_56"                              
+INST_CMPRS_QUANTZ_TBL_ID      = 5                                             
+                                                                              
+/***** IMAGE INFORMATION    *****/                                            
+PIXEL_GEOMETRY_CORRECTION_FLAG= N                                             
+LINE_DISPLAY_DIRECTION        = DOWN                                            
+SAMPLE_DISPLAY_DIRECTION      = RIGHT                                         
+                                                                              
+/***** GEOMETRY VALUES    *****/                                              
+RIGHT_ASCENSION               =  99.7226515496658550 <deg>                    
+DECLINATION                   = -41.6936635222329170 <deg>                    
+CELESTIAL_NORTH_CLOCK_ANGLE   =  95.8959137149517320 <deg>                    
+CENTER_LATITUDE               =  23.43 <deg>                                  
+CENTER_LONGITUDE              = 194.34 <deg>                                  
+COORDINATE_SYSTEM_CENTER_NAME = SUN                                           
+EMECL_SC_QUATERNION           = (  0.6152713528318168,  0.2411572819729510,   
+                                  -0.2663500172469832, -0.7016708601961865 )  
+SUN_SC_POSITION_VECTOR  = ( -123042017.157, -155788544.160, -110735450.566 )  
+TARGET_NAME                   = "EROS"                                        
+TARGET_CENTER_DISTANCE        =        362.9 <km>                             
+SLANT_DISTANCE                =   356.69 <km>                                 
+HORIZONTAL_PIXEL_SCALE        =     0.034567 <km>                             
+VERTICAL_PIXEL_SCALE          =     0.058414 <km>                             
+INCIDENCE_ANGLE               =  68.69 <deg>                                  
+EMISSION_ANGLE                =  35.65 <deg>                                  
+PHASE_ANGLE                   =  96.45 <deg>                                  
+                                                                              
+OBJECT                      = HEADER                                          
+  BYTES                     = 11520                                           
+  HEADER_TYPE               = FITS                                            
+  INTERCHANGE_FORMAT        = BINARY                                          
+  RECORDS                   = 4                                               
+  DESCRIPTION               = "                                               
+  FITS format defined in NASA/Science Office Standards Technology 100-1.0.    
+  Parameter definitions are in /DOCUMENT/INSTRUMENT/MSIDEFINITIONS.TXT."      
+END_OBJECT                  = HEADER                                          
+                                                                              
+OBJECT                      = IMAGE                                           
+  LINES                     = 244                                             
+  LINE_SAMPLES              = 537                                             
+  SAMPLE_BITS               =  32                                             
+  SAMPLE_TYPE               = IEEE_REAL                                       
+  OFFSET                    =  0                                              
+  MEAN                      =    0.00832697                                   
+  STANDARD_DEVIATION        =     0.0140723                                   
+  MINIMUM                   =  -0.000249646                                   
+  MAXIMUM                   =     0.0577788                                   
+  PIXEL_SATURATION_VALUE    = "N/A"                                           
+  SATURATED_PIXELS          =      0                                          
+END_OBJECT                  = IMAGE                                           
+                                                                              
+END                                                                           

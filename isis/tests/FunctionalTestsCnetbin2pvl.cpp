@@ -2,7 +2,7 @@
 
 #include "Pvl.h"
 #include "cnetbin2pvl.h"
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
 #include "Progress.h"
 #include "gmock/gmock.h"
 #include "FileName.h"

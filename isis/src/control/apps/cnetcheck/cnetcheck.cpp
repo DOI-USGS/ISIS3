@@ -459,7 +459,7 @@ namespace Isis {
     QString logstr = ss.str().c_str();
 
     if (log){
-      log->addGroup(results);
+      log->addLogGroup(results);
     }
 
     if (!ui.IsInteractive()) {
@@ -635,7 +635,12 @@ namespace Isis {
           createdCamera = false;
         }
 
-        QList< ControlMeasure * > measures = cnet.GetMeasuresInCube(serialNumber);
+        QList< ControlMeasure * > measures;
+        if (ignore) {
+          measures = cnet.GetValidMeasuresInCube(serialNumber);
+        } else {
+          measures = cnet.GetMeasuresInCube(serialNumber);
+        }
         for (int cm = 0; cm < measures.size(); cm++) {
           ControlMeasure *measure = measures[cm];
           ControlPoint *point = measure->Parent();

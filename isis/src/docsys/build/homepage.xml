@@ -23,40 +23,172 @@
   <table>
     <tr>
       <td valign="top">
-        <h2>Welcome</h2>
+        <h2><a name="WhatIsIsis">What is ISIS?</a></h2>
         <p>
-	  This is the home page for ISIS, a digital image processing software
-	  package. The focus of the software is to manipulate imagery collected
-	  by current and past NASA and International planetary missions sent
-	  throughout our Solar System.
+          Integrated Software for Imagers and Spectrometers (ISIS) is free and
+          open-source software (FOSS) developed by the USGS Astrogeology
+          Science Center for NASA and the planetary community. ISIS is a
+          fundamental tool for processing raw archival data into analysis ready
+          products and includes standard image processing tools such as
+          contrast, stretch, image algebra, filters, and statistical analysis.
+          However, ISIS's key feature is the ability to place different types of
+          data in the correct cartographic locations on extraterrestrial bodies.
+          The cartographically located data can then be used to create archives,
+          topographic or cartographic maps, digital elevation models, and other
+          scientific products.
         </p>
-        <h2>Announcements</h2>
-        <div style="text-align:center;">
-          <div style="padding:10px; text-align: left;">
-            <script type="text/javascript">
-              writeAnnouncements () ;
-            </script>
-          </div>
-        </div>
-        <h2>Request for comments</h2>
+        <h2><a name="SupportingPlanetarySpaceMissions">Supporting Planetary Space Missions</a></h2>
         <p>
-          Major changes to how ISIS works are now handled through Requests for Comment (RFCs).
-          These are a venue for the user community to voice their opinions on how they would
-          like the software to work.
-          Currently open RFCs can be found on the
-          <a href="https://github.com/USGS-Astrogeology/ISIS3#requests-for-comment" target="top">ISIS Github</a>.
+          ISIS is a valuable resource for planetary missions that require
+          systematic data processing, products for planning, and research and
+          analysis of derived data products. Support for a mission is added to
+          ISIS by creating sensor models, tools for ingesting mission-specific
+          ancillary data, and optional tools for calibrating mission data. Once
+          a mission is supported, data from that mission can be used with the
+          full suite of processing and analysis tools in ISIS. ISIS supports
+          data from NASA and International spacecraft missions including Lunar
+          Orbiter, Apollo, Voyager, Mariner 10, Viking, Galileo, Magellan,
+          Clementine, Mars Global Surveyor, Cassini, Mars Odyssey, Mars
+          Reconnaissance Orbiter, MESSENGER, Lunar Reconnaissance Orbiter,
+          Chandrayaan, Dawn, Kaguya, and New Horizons.
         </p>
-        <h2>Popular Destinations</h2>
-        <ul>
-          <li>
-            <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/isis.cgi">
-              ISIS 2 Home Page
-            </a>
-          </li>
-          <li>
-            <a href="Application/index.html">ISIS Application Table of Contents</a>
-          </li>
-        </ul>
+
+        <h2><a name="UserDocHome">ISIS Users</a></h2>
+        <table class="tableTOCmulticol">
+          <tbody>
+            <tr valign="top">
+              <td style="width:25%">
+                <h4><a href="UserStart/index.html">Getting Started</a></h4>
+                <ul>
+                  <li>
+                    Installation
+                  </li>
+                  <li>
+                    Introductory Materials
+                  </li>
+                  <li>
+                    Support
+                  </li>
+                </ul>
+              </td>
+              <td style="width:25%">
+                <h4><a href="UserLearn/index.html">Learn More</a></h4>
+                <ul>
+                  <li>
+                    Intermediate Resources
+                  </li>
+                  <li>
+                    Mission Specific ISIS Processing
+                  </li>
+                </ul>
+              </td>
+              <td style="width:25%">
+                <h4><a href="UserExplore/index.html">Explore in Detail</a></h4>
+                <ul>
+                  <li>
+                    ISIS Cube Format
+                  </li>
+                  <li>
+                    Command Line Reference
+                  </li>
+                  <li>
+                    SPICE in ISIS
+                  </li>
+                  <li>
+                    Specialized Method Conceptual Workflows
+                  </li>
+                  <li>
+                    Policies
+                  </li>
+                  <li>
+                    ... and More!
+                  </li>
+                </ul>
+              </td>
+              <td style="width:25%">
+                <h4><a href="UserInspire/index.html">Get Inspired</a></h4>
+                <ul>
+                  <li>
+                    White papers
+                  </li>
+                  <li>
+                    Presentations
+                  </li>
+                  <li>
+                    Talks
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2><a name="ContributorDocHome">ISIS Contributors</a></h2>
+        <table class="tableTOCmulticol">
+          <tbody>
+            <tr valign="top">
+              <td style="width:25%">
+                <h4><a href="DevStart/index.html">Getting Started</a></h4>
+                <ul>
+                  <li>
+                    Engaging with the Community
+                  </li>
+                  <li>
+                    Documentation Guides
+                  </li>
+                  <li>
+                    Building ISIS
+                  </li>
+                </ul>
+              </td>
+              <td style="width:25%">
+                <h4><a href="DevLearn/index.html">Learn More</a></h4>
+                <ul>
+                  <li>
+                    Programming Exercises
+                  </li>
+                  <li>
+                    Contributing Guides
+                  </li>
+                  <li>
+                    Testing Guides
+                  </li>
+                </ul>
+              </td>
+              <td style="width:25%">
+                <h4><a href="DevExplore/index.html">Explore in Detail</a></h4>
+                <ul>
+                  <li>
+                    Maintainer Guides
+                  </li>
+                  <li>
+                    Developer API Reference
+                  </li>
+                  <li>
+                    XML Schema
+                  </li>
+                  <li>
+                    Policies
+                  </li>
+                </ul>
+              </td>
+              <td style="width:25%">
+                <h4><a href="DevInspire/index.html">Get Inspired</a></h4>
+                <ul>
+                  <li>
+                    Github "good first" issues
+                  </li>
+                  <li>
+                    Github "enhancement" issues
+                  </li>
+                  <li>
+                    Github Pull Requests
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
 <!-- Commented out because the feed2js PHP script doesn't seem to be working due
      to deprecated calls.

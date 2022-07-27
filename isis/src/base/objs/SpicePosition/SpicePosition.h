@@ -168,6 +168,7 @@ namespace Isis {
    *   @history 2017-08-18 Tyler Wilson, Summer Stapleton, Ian Humphrey -  Added opening/closing brackets
    *                           to SetEphemerisTimePolyFunction() so this class compiles without warnings
    *                           under C++14. References #4809.
+   *   @history 2018-06-22 Ken Edmundson - Added scaledTime() method to return current scaled time.
    *   @history 2020-07-01 Kristin Berry - Updated to use ale::States for internal state cache.
    */
   class SpicePosition {
@@ -197,18 +198,20 @@ namespace Isis {
       virtual QString GetAberrationCorrection() const;
       double GetLightTime() const;
 
-      const std::vector<double> &SetEphemerisTime(double et);
+      virtual const std::vector<double> &SetEphemerisTime(double et);
       enum PartialType {WRT_X, WRT_Y, WRT_Z};
 
       //! Return the current ephemeris time
-      double EphemerisTime() const {
+      virtual double EphemerisTime() const {
         return p_et;
       };
+
+      double scaledTime() const;
 
       const std::vector<double> &GetCenterCoordinate();
 
       //! Return the current J2000 position
-      const std::vector<double> &Coordinate() {
+      virtual const std::vector<double> &Coordinate() {
         return p_coordinate;
       };
 

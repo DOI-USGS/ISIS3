@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="lrowacphomap" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Apply Hapke bidirectional reflectance model photometric correction to multiband cubes
+  </brief>
+
+  <description>
+    <p>
+      <b>lrowacphomap</b> implements photometric correction based on the full form of bidirectional reflectance model by Hapke (2012). See below for
+      full description of the model. It takes an input cube to be corrected, an output cube to write the results to, a parameter cube that defines the Hapke parameters
+      to be used for the correction, a PVL input file to define the algorithm and an optional backplane cube. Here's an example command line:
+    </p>
+      <pre>
+  lrowacphomap from=input.cub+1 to=output.cub phoalgo=hapke.pvl phoparcube=params.cub backplane=input.cub+2,3,4,5,6
+      </pre>
+    <p>
+      The input cube (<i>from</i>) must have a BandBin label.
+    </p>
+      <pre>
+  <b>Example (containing image and backplane bands):</b>
+
+  Group = BandBin
+    FilterNumber = (1, 2, 3, 4, 5, 6)
+    Center       = (321, 321, 321, 321, 321, 321)
+    Width        = (32, 32, 32, 32, 32, 32)
+    Name         = (Image, Phase, Emission, Incidence, lat, lon)
+  End_Group
+      </pre>
+    <p>
+      The PVL file (<i>phoalgo</i>) contains the algorithm name, reference values for normalization, and a Parameters group to define the parameter bands from the parameter cube to use.
+      <pre>
+  <b>Example:</b>
+
+  Object = PhotometricModel 
+    Name   = HapkeLROC
+    Units  = Degrees
+    Incref = 60.0
+    Emiref = 0.0
+    Pharef = 60.0
+    
+    Group = Parameters
+      BandBinCenter = 321
+      Bands = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+    EndGroup
+  EndObject
+      </pre>
+
+      The Incref, Emiref and Pharef are the incidence, emission and phase angles to be used as the common illumination and viewing angles. It will be used to normalize
+      the photometric correction parameter to these angles. The equation used to create the photometrically corrected I/F is:
+      <pre>
+          <i>n_IOF = IOF / Model(g,e,i) * Model(Pharef,Emiref,Incref)</i>
+
+          where <i>Model(g,e,i)</i> is the model value for phase (g), emission (e), and incidence (i) at each pixel,
+          <i>Model(Pharef,Emiref,Incref)</i> is the model value at the given common geometric angles.
+      </pre>
+    </p>
+
+    <p>
+      The parameter cube (<i>phoparcube</i>) should be a 9 band cube with the parameters in the order:
+      <pre>   <image src="assets/images/params.png"/></pre>
+    </p>
+
+    <p>
+      <i>backplane</i> cube must contain 5 bands (in order): <i>Phase Angle, Emission Angle, Incidence Angle, Latitude, Longitude</i>
+    </p>
+
+    <h3>Hapke Bidirectional Reflectance Model</h3>
+
+    <p>
+      In full form of bidirectional reflectance model by Hapke (2012), the radiance factor <i>I/F</i> is
+      <pre>   <image src="assets/images/i_f.png"/></pre>
+      <i>I</i> is radiance, <i>F</i> is perfectly diffuse surface illuminated at <i>i = e = g = 0</i> (corresponds to the flat-field).
+    </p>
+
+    <p>
+      The bidirectional reflectance <i>r(i,e,g)</i> is
+      <pre>   <image src="assets/images/r_ieg.png"/></pre>
+      where <i>i</i> is incidence angle, <i>e</i> is emission angle, and <i>g</i> is phase angle, <i>i<sub>e</sub></i> and <i>e<sub>e</sub></i> are the effective angle of incidence and emission respectively.
+    </p>
+
+    <p>
+      Then, <i>K</i> is (porosity effect)
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/k.png"/></pre>
+    </p>
+
+    <p>
+      <i>p(g)</i> is, (H-G phase function)
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/p_g.png"/></pre>
+    </p>
+
+    <p>
+      <i>B<sub>S</sub>(g)</i> is, (Shadow Hiding Opposition surge Effect: SHOE )
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/bs_g.png"/></pre>
+    </p>
+
+    <p>
+      <i>M(i,e)</i> is, (Isotropic Multiple Scattering Approximation: IMSA)
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/m_ie.png"/></pre>
+    </p>
+
+    <p>
+      where <i>H(x)</i> is,
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/h_x.png"/></pre>
+    </p>
+
+    <p>
+      where <i>r<sub>0</sub></i> is,
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/r0.png"/></pre>
+    </p>
+
+    <p>
+      <i>B<sub>C</sub>(g)</i> is, (Coherent Backscatter Opposition surge Effect: CBOE)
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/bc.png"/></pre>
+    </p>
+
+
+    <p>
+      Then, <i>S(i,e,g)</i> is, (Shadow effect)
+    </p>
+
+    <p>
+      When <i>i <image src="assets/images/le.png"/> e</i>,
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/s_iepsi-ie.png"/></pre>
+    </p>
+
+    <p>
+      where <image src="assets/images/mu_0e.png"/> and <image src="assets/images/mu_e.png"/> are,
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/mu_0e-ie.png"/></pre>
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/mu_e-ie.png"/></pre>
+    </p>
+
+    <p>
+      When <i>e <image src="assets/images/le.png"/> i</i>,
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/s_iepsi-ei.png"/></pre>
+    </p>
+
+    <p>
+      where <image src="assets/images/mu_0e.png"/> and <image src="assets/images/mu_e.png"/> are,
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/mu_0e-ei.png"/></pre>
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/mu_e-ei.png"/></pre>
+    </p>
+
+    <p>
+      where <image src="assets/images/chi_thetap_small.png"/> is,
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/chi_thetap.png"/></pre>
+    </p>
+
+    <p>
+      and <image src="assets/images/eta_y_only.png"/> is, (<i>y</i> corresponds to <i>i</i> or <i>e</i>)
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/eta_y.png"/></pre>
+    </p>
+
+    <p>
+      where <i>E<sub>1</sub></i> and <i>E<sub>2</sub></i> are, (<i>y</i> corresponds to <i>i</i> or <i>e</i>)
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/e1.png"/></pre>
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/e2.png"/></pre>
+    </p>
+
+    <p>
+      <image src="assets/images/f_psi_only.png"/> is given by,
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/f_psi.png"/></pre>
+    </p>
+
+    <p>
+      <image src="assets/images/psi_only.png"/> is given by,
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/cos_g.png"/></pre>
+    </p>
+
+    <p>
+      Thus it can be written as,
+    </p>
+
+    <p>
+      <pre>   <image src="assets/images/psi.png"/></pre>
+    </p>
+
+    <p>
+      Finally, free parameters are,
+    </p>
+
+    <pre>
+      <i>w</i> (Single scattering albedo)
+      <i>b</i> (H-G phase function asymmetry)
+      <i>c</i> (H-G phase function amplitude)
+      <i>B<sub>C0</sub></i> (CBOE amplitude)
+      <i>h<sub>C</sub></i> (CBOE angular width)
+      <i>B<sub>S0</sub></i> (SHOE amplitude)
+      <i>h<sub>S</sub></i> (SHOE angular width)
+      <image src="assets/images/thetap.png"/> (Roughness parameter)
+      <image src="assets/images/phi.png"/> (Filling factor)
+    </pre>
+    
+    <p>
+      Reference:
+      <pre>
+      Hapke, B. (2012) Theory of Reflectance and Emittance Spectroscopy, Cambridge Univ. Press.
+      </pre>
+    </p>
+  </description>
+
+  <history>
+    <change name="Kris Becker" date="2010-02-21">
+      Original version.
+    </change>
+    <change name="Dan Clarke" date="2012-09-28">
+      Added full Hapke model.
+      Optimized processing.
+      Updated documentation.
+    </change>
+    <change name="Adam Licht" date="2013-01-18">
+      Fixed an error in how parameters were loaded for use in the refrence model calculation.
+    </change>
+    <change name="Cordell Michaud" date="2022-05-10">
+      Refactored lrowacphomap for testability and added functional tests.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Lunar Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+          Use this parameter to select the input filename.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          This file will contain the photometrically corrected image data after 
+          being corrected.
+        </description>
+      </parameter>
+      
+      <parameter name="BACKPLANE">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>input</fileMode>
+        <brief>
+          Backplane Cube
+        </brief>
+        <description>
+          This file will contain the backplane data. It must have "Phase Angle", "Emission Angle",
+          "Incidence Angle", "Latitude" and "Longitude".
+        </description>
+        <internalDefault>
+            Calculate the photometry on the fly
+        </internalDefault>
+      </parameter>
+
+      <parameter name="PHOALGO">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Pvl file
+        </brief>
+        <description>
+          This file will contain the photometric correction algorithm information.
+          
+          Here's an example pvl file for Hapke photometric correction:
+          <pre>
+    Object = PhotometricModel 
+      Name   = HapkeLROC
+      Units  = Degrees
+      Incref = 60.0
+      Emiref = 0.0
+      Pharef = 60.0
+      
+      Group = Parameters
+        BandBinCenter = 321
+        Bands = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+      EndGroup
+    EndObject
+          </pre>
+        </description>
+	       <filter>*.pvl</filter>
+      </parameter>
+      <parameter name="PHOPARCUBE">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Parameter cube
+        </brief>
+        <description>
+          This file will contain the parameters (in order) Wh, Hg1, Hg2, Bc0, hc, B0, Hh, Theta, phi. See the main program
+          documentation for a full description.
+        </description>
+               <filter>*.cub</filter>
+      </parameter>
+
+    </group>
+    
+    <group name="Photometry">
+      <parameter name="MINPHASE">
+        <type>double</type>
+        <default><item>0.0</item></default>
+        <brief>Minimum phase angle to trim</brief>
+        <description>
+          Pixels which have a phase angle less than this value will be
+          trimmed.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">180.0</maximum>
+        <lessThanOrEqual><item>MAXPHASE</item></lessThanOrEqual>
+      </parameter>
+      <parameter name="MAXPHASE">
+        <type>double</type>
+        <default><item>180.0</item></default>
+        <brief>Maximum phase angle to trim</brief>
+        <description>
+          Pixels which have a phase angle greater than this value will be
+          trimmed.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">180.0</maximum>
+        <greaterThanOrEqual><item>MINPHASE</item></greaterThanOrEqual>
+      </parameter>
+
+      <parameter name="MINEMISSION">
+        <type>double</type>
+        <default><item>0.0</item></default>
+        <brief>Minimum emission angle to trim</brief>
+        <description>
+          Pixels which have an emission angle less than this value will be
+          trimmed.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+        <lessThanOrEqual><item>MAXEMISSION</item></lessThanOrEqual>
+      </parameter>
+      <parameter name="MAXEMISSION">
+        <default><item>90.0</item></default>
+        <type>double</type>
+        <brief>Maximum emission angle to trim</brief>
+        <description>
+          Pixels which have a emission angle greater than this value will be
+          trimmed.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+        <greaterThanOrEqual><item>MINEMISSION</item></greaterThanOrEqual>
+      </parameter>
+
+      <parameter name="MININCIDENCE">
+        <type>double</type>
+        <default><item>0.0</item></default>
+        <brief>Minimum incidence angle to trim</brief>
+        <description>
+          Pixels which have an incidence angle less than this value will be
+          trimmed.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">180.0</maximum>
+        <lessThanOrEqual><item>MAXINCIDENCE</item></lessThanOrEqual>
+      </parameter>
+      <parameter name="MAXINCIDENCE">
+        <type>double</type>
+        <default><item>90.0</item></default>
+        <brief>Maximum incidence angle to trim</brief>
+        <description>
+          Pixels which have a incidence angle greater than this value will be
+          trimmed.
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">180.0</maximum>
+        <greaterThanOrEqual><item>MININCIDENCE</item></greaterThanOrEqual>
+      </parameter>
+    </group>
+    
+    <group name="Other Options">
+      <parameter name="USEDEM">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Use DEM instead of ellipsoid for photometric angle calculations
+        </brief>
+        <description>
+          Phase, Emission, and Incidence angles can be calculated from the
+          elipsoid (default) or from the DEM.  The difference is that using the
+          DEM the surface roughness is taken into account.
+        </description>
+      </parameter>
+      <parameter name="PHOTOMETRYONLY">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Output only photometry value in output cube.
+        </brief>
+        <description>
+          Only the photometry value will be written to the output cube, not
+          the original image data. Used for testing photometry calculation.
+        </description>
+      </parameter>
+      <parameter name="NORMALIZED">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Normalize photometry value before applying to input image.
+        </brief>
+        <description>
+          Set to False to cause the photometry value to not be normalized.
+          Used for testing photometry calculation.
+        </description>
+      </parameter>
+    </group>
+    
+  </groups>
+</application>

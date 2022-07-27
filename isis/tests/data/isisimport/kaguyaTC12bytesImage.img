@@ -1,0 +1,189 @@
+PDS_VERSION_ID                       = "PDS3"
+/*** FILE FORMAT ***/
+RECORD_TYPE                          = "UNDEFINED"
+FILE_NAME                            = "TC_EVE_02_S09E000S12E003SC.img"
+PRODUCT_ID                           = "TC_EVE_02_S09E000S12E003SC"
+DATA_FORMAT                          = "PDS"
+
+/*** POINTERS TO START BYTE OFFSET OF OBJECTS IN FILE ***/
+^IMAGE                               = 11738 <BYTES>
+
+/*** GENERAL DATA DESCRIPTION PARAMETERS ***/
+SOFTWARE_NAME                        = "RGC_TC_MI"
+SOFTWARE_VERSION                     = "2.5.0"
+PROCESS_VERSION_ID                   = "MAP"
+PRODUCT_CREATION_TIME                = 2009-09-17T01:03:48Z
+PROGRAM_START_TIME                   = 2009-09-17T00:58:53Z
+PRODUCER_ID                          = "LISM"
+PRODUCT_SET_ID                       = "TC_Evening_MAP"
+PRODUCT_VERSION_ID                   = "02"
+REGISTERED_PRODUCT                   = "Y"
+LEVEL2A_FILE_NAME                    = ("TC2S2A0_02DMF03519_003_0012.img",
+                                        "TC2S2A0_02DMF03519_003_0013.img",
+                                        "TC2S2A0_02DMF03519_003_0014.img",
+                                        "TC2S2A0_02DMF03520_003_0012.img",
+                                        "TC2S2A0_02DMF03520_003_0013.img",
+                                        "TC2S2A0_02DMF03520_003_0014.img",
+                                        "TC2S2A0_02DMF03521_003_0012.img",
+                                        "TC2S2A0_02DMF03521_003_0013.img",
+                                        "TC2S2A0_02DMF03521_003_0014.img",
+                                        "TC2S2A0_02DMF03522_003_0012.img",
+                                        "TC2S2A0_02DMF03522_003_0013.img",
+                                        "TC2S2A0_02DMF03522_003_0014.img")
+SPICE_METAKERNEL_FILE_NAME           = ("RGC_INF_TCv301IK_RISE100g_de421_090819.mk",
+                                        "RGC_INF_TCv301IK_RISE100g_de421_090819.mk",
+                                        "RGC_INF_TCv301IK_RISE100g_de421_090819.mk",
+                                        "RGC_INF_TCv301IK_RISE100g_de421_090819.mk",
+                                        "RGC_INF_TCv301IK_RISE100g_de421_090819.mk",
+                                        "RGC_INF_TCv301IK_RISE100g_de421_090819.mk",
+                                        "RGC_INF_TCv301IK_RISE100g_de421_090819.mk",
+                                        "RGC_INF_TCv301IK_RISE100g_de421_090819.mk",
+                                        "RGC_INF_TCv301IK_RISE100g_de421_090819.mk",
+                                        "RGC_INF_TCv301IK_RISE100g_de421_090819.mk",
+                                        "RGC_INF_TCv301IK_RISE100g_de421_090819.mk",
+                                        "RGC_INF_TCv301IK_RISE100g_de421_090819.mk")
+
+/*** SCENE RELATED PARAMETERS ***/
+MISSION_NAME                         = "SELENE"
+SPACECRAFT_NAME                      = "SELENE-M"
+DATA_SET_ID                          = "TC_MAP"
+INSTRUMENT_NAME                      = "Terrain Camera"
+INSTRUMENT_ID                        = "TC"
+TARGET_NAME                          = "MOON"
+OBSERVATION_MODE_ID                  = "NORMAL&SUPPORT"
+SENSOR_DESCRIPTION                   = "Imagery type:Pushbroom. ImageryMode:Mono,Stereo. ExposureTimeMode:Long,Middle,Short. CompressionMode:NonComp,DCT. Q-table:32 patterns. H-table:4 patterns. SwathMode:F(Full),N(Nominal),H(Half). First pixel number:1(F),297(N),1172(H)."
+SENSOR_DESCRIPTION2                  = "Pixel size:7x7[micron^2](TC1/TC2). Wavelength range:430-850[nm](TC1/TC2). A/D rate:10[bit](TC1/TC2). Slant angle:+/-15[degree] (from nadir to +x of S/C)(TC1/TC2). Focal length:72.45/72.63[mm](TC1/TC2). F number:3.97/3.98(TC1/TC2)."
+
+/*** DESCRIPTION OF OBJECTS CONTAINED IN THE FILE ***/
+
+OBJECT                               = IMAGE
+    BANDS                            = 1
+    BAND_STORAGE_TYPE                = "BAND SEQUENTIAL"
+    LINES                            = 2
+    LINE_SAMPLES                     = 3
+    SAMPLE_TYPE                      = "MSB_INTEGER"
+    SAMPLE_BITS                      = 16
+    IMAGE_VALUE_TYPE                 = "REFLECTANCE"
+    UNIT                             = "ND"
+    SCALING_FACTOR                   = 2.00000e-05
+    OFFSET                           = 0.00000e+00
+    MIN_FOR_STATISTICAL_EVALUATION   = 0
+    MAX_FOR_STATISTICAL_EVALUATION   = 32767
+    SCENE_MAXIMUM_DN                 = 25005
+    SCENE_MINIMUM_DN                 = 1
+    SCENE_AVERAGE_DN                 = 3782.5
+    SCENE_STDEV_DN                   = 1777.9
+    SCENE_MODE_DN                    = 154
+    SHADOWED_AREA_MINIMUM            = 0
+    SHADOWED_AREA_MAXIMUM            = 0
+    SHADOWED_AREA_PERCENTAGE         = 0
+    INVALID_TYPE                     = ("SATURATION" , "MINUS" , "DUMMY_DEFECT" , "OTHER")
+    INVALID_VALUE                    = (-20000 , -21000 , -22000 , -23000)
+    INVALID_PIXELS                   = (0 , 0 , 0 , 0)
+    OUT_OF_IMAGE_BOUNDS_VALUE        = -30000
+    OUT_OF_IMAGE_BOUNDS_PIXELS       = 0
+    STRETCHED_FLAG                   = FALSE
+END_OBJECT                           = IMAGE
+
+OBJECT                               = IMAGE_MAP_PROJECTION
+    MAP_PROJECTION_TYPE              = "Simple Cylindrical"
+    COORDINATE_SYSTEM_TYPE           = "BODY-FIXED ROTATING"
+    COORDINATE_SYSTEM_NAME           = "PLANETOCENTRIC"
+    A_AXIS_RADIUS                    =   1737.4 <km>
+    B_AXIS_RADIUS                    =   1737.4 <km>
+    C_AXIS_RADIUS                    =   1737.4 <km>
+    FIRST_STANDARD_PARALLEL          = "N/A"
+    SECOND_STANDARD_PARALLEL         = "N/A"
+    POSITIVE_LONGITUDE_DIRECTION     = "EAST"
+    CENTER_LATITUDE                  =  0.00000000 <deg>
+    CENTER_LONGITUDE                 =   0.00000000 <deg>
+    REFERENCE_LATITUDE               = "N/A"
+    REFERENCE_LONGITUDE              = "N/A"
+    LINE_FIRST_PIXEL                 = 1
+    LINE_LAST_PIXEL                  = 12288
+    SAMPLE_FIRST_PIXEL               = 1
+    SAMPLE_LAST_PIXEL                = 12288
+    MAP_PROJECTION_ROTATION          = 0.000000 <deg>
+    MAP_RESOLUTION                   = 4096.000000 <pixel/deg>
+    MAP_SCALE                        = 0.007403 <km/pixel>
+    MAXIMUM_LATITUDE                 = -9.00000000 <deg>
+    MINIMUM_LATITUDE                 = -11.99975586 <deg>
+    EASTERNMOST_LONGITUDE            =   2.99975586 <deg>
+    WESTERNMOST_LONGITUDE            =   0.00000000 <deg>
+    LINE_PROJECTION_OFFSET           = -36864.000000 <pixel>
+    SAMPLE_PROJECTION_OFFSET         = 0.000000 <pixel>
+END_OBJECT                           = IMAGE_MAP_PROJECTION
+
+OBJECT                               = PROCESSING_PARAMETERS
+    DARK_FILE_NAME                   = ("TC2_DRK_02952_04739_M_C_b05.csv",
+                                        "TC2_DRK_02952_04739_M_C_b05.csv",
+                                        "TC2_DRK_02952_04739_M_C_b05.csv",
+                                        "TC2_DRK_02952_04739_M_C_b05.csv",
+                                        "TC2_DRK_02952_04739_M_C_b05.csv",
+                                        "TC2_DRK_02952_04739_M_C_b05.csv",
+                                        "TC2_DRK_02952_04739_M_C_b05.csv",
+                                        "TC2_DRK_02952_04739_M_C_b05.csv",
+                                        "TC2_DRK_02952_04739_M_C_b05.csv",
+                                        "TC2_DRK_02952_04739_M_C_b05.csv",
+                                        "TC2_DRK_02952_04739_M_C_b05.csv",
+                                        "TC2_DRK_02952_04739_M_C_b05.csv")
+    FLAT_FILE_NAME                   = ("TC2_FLT_00293_04739_N_C_b05.csv",
+                                        "TC2_FLT_00293_04739_N_C_b05.csv",
+                                        "TC2_FLT_00293_04739_N_C_b05.csv",
+                                        "TC2_FLT_00293_04739_N_C_b05.csv",
+                                        "TC2_FLT_00293_04739_N_C_b05.csv",
+                                        "TC2_FLT_00293_04739_N_C_b05.csv",
+                                        "TC2_FLT_00293_04739_N_C_b05.csv",
+                                        "TC2_FLT_00293_04739_N_C_b05.csv",
+                                        "TC2_FLT_00293_04739_N_C_b05.csv",
+                                        "TC2_FLT_00293_04739_N_C_b05.csv",
+                                        "TC2_FLT_00293_04739_N_C_b05.csv",
+                                        "TC2_FLT_00293_04739_N_C_b05.csv")
+    EFFIC_FILE_NAME                  = ("TC2_EFF_PRFLT_N_N_v01.csv",
+                                        "TC2_EFF_PRFLT_N_N_v01.csv",
+                                        "TC2_EFF_PRFLT_N_N_v01.csv",
+                                        "TC2_EFF_PRFLT_N_N_v01.csv",
+                                        "TC2_EFF_PRFLT_N_N_v01.csv",
+                                        "TC2_EFF_PRFLT_N_N_v01.csv",
+                                        "TC2_EFF_PRFLT_N_N_v01.csv",
+                                        "TC2_EFF_PRFLT_N_N_v01.csv",
+                                        "TC2_EFF_PRFLT_N_N_v01.csv",
+                                        "TC2_EFF_PRFLT_N_N_v01.csv",
+                                        "TC2_EFF_PRFLT_N_N_v01.csv",
+                                        "TC2_EFF_PRFLT_N_N_v01.csv")
+    NONLIN_FILE_NAME                 = ("TC2_NLT_PRFLT_N_N_v01.csv",
+                                        "TC2_NLT_PRFLT_N_N_v01.csv",
+                                        "TC2_NLT_PRFLT_N_N_v01.csv",
+                                        "TC2_NLT_PRFLT_N_N_v01.csv",
+                                        "TC2_NLT_PRFLT_N_N_v01.csv",
+                                        "TC2_NLT_PRFLT_N_N_v01.csv",
+                                        "TC2_NLT_PRFLT_N_N_v01.csv",
+                                        "TC2_NLT_PRFLT_N_N_v01.csv",
+                                        "TC2_NLT_PRFLT_N_N_v01.csv",
+                                        "TC2_NLT_PRFLT_N_N_v01.csv",
+                                        "TC2_NLT_PRFLT_N_N_v01.csv",
+                                        "TC2_NLT_PRFLT_N_N_v01.csv")
+    RAD_CNV_COEF                     = (3.723389, 3.723389, 3.723389, 3.723389,
+                                        3.723389, 3.723389, 3.723389, 3.723389,
+                                        3.723389, 3.723389, 3.723389, 3.723389) <W/m**2/micron/sr>
+    REF_CNV_COEF                     = 0.002396 <1/(W/m**2/micron/sr)>
+    STANDARD_GEOMETRY                = (30.0, 0.0, 30.0)
+    PHOTO_CORR_ID                    = "USGS"
+    PHOTO_CORR_COEF                  = (-1.900000e-02, 2.420000e-04, -1.460000e-06, 5.400000e-02, 1.600000e+00, 0.000000e+00, -2.180000e-01, 5.000000e-01, 4.000000e-01, -8.170000e-02, 8.100000e-03)
+    RESAMPLING_METHOD                = "Bi-Linear"
+    TCO_MOSAIC_FILE_NAME             = ("N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+                                        "N/A", "N/A", "N/A", "N/A", "N/A",
+                                        "N/A")
+    DTM_MOSAIC_FILE_NAME             = ("N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+                                        "N/A", "N/A", "N/A", "N/A", "N/A",
+                                        "N/A")
+    OVERLAP_SELECTION_ID             = "OVERWRITTEN BY BIGGER REV. NUMBER SCENE & MORE ACCURATE SPK VERSION"
+    MATCHING_MOSAIC                  = "N/A"
+    L2A_DEAD_PIXEL_THRESHOLD         = 30
+    L2A_SATURATION_THRESHOLD         = 1023
+    DARK_VALID_MINIMUM               = -5
+    RADIANCE_SATURATION_THRESHOLD    = 425.971000 <W/m**2/micron/sr>
+    REF_SATURATION_THRESHOLD         = 0.655340 <ND>
+END_OBJECT                           = PROCESSING_PARAMETERS
+END
+Z�@�H�

@@ -72,6 +72,10 @@ namespace Isis {
    *   @history 2018-03-14 Adam Goins - Changed cache calculations with LoadCache() call.
    *                           This fixes an error where VimsCamera caused spiceinit to
    *                           fail when TargetName == SKY. Fixes #5353.
+   *   @history 2022-07-14 Amy Stamile - Removed SpkCenterId function due to spkwriter writing
+   *                           positions of Cassini relative to Titan (NAIF ID 606) but labeling
+   *                           it in the kernel as the position relative to the Saturn Barycenter
+   *                           (NAIF ID 6) Reference #4942.
    */
   class VimsCamera : public Camera {
     public:
@@ -108,14 +112,6 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int CkReferenceId() const { return (1); }
-
-      /**
-       *  SPK Center ID - 6 (Saturn)
-       *
-       * @return @b int The appropriate instrument code for the Spacecraft
-       *         Kernel Center ID
-       */
-      virtual int SpkCenterId() const { return 6; }
 
       /**
        *  SPK Reference ID - J2000

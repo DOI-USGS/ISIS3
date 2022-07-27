@@ -51,21 +51,9 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Pvl appLog;
 
-  try {
-    nocam2map(ui, &appLog);
-  }
-  catch (...) {
-    for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
-      Application::Log(*grpIt);
-    }
-    throw;
-  }
- 
-  for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
-    Application::Log(*grpIt);
-  }
+  nocam2map(ui, &appLog); 
 
-    // in this case, output data are in a "Results" group.
+  // in this case, output data are in a "Results" group.
   PvlGroup results = appLog.findGroup("Mapping");
   if( ui.WasEntered("TO") && ui.IsInteractive() ) {
     Application::GuiLog(results);
@@ -200,7 +188,7 @@ void ComputeInputRange() {
       //Else read the target name from the input cube
       else {
         Pvl fromFile;
-        fromFile.read(ui.GetFileName("FROM"));
+        fromFile.read(ui.GetCubeName("FROM"));
         target = (QString)fromFile.findKeyword("TargetName", Pvl::Traverse);
       }
 

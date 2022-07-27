@@ -24,11 +24,11 @@ void IsisMain() {
 
   // Make cube and open Read/Write
   Cube inOut;
-  inOut.open(ui.GetFileName("From"),"rw");
+  inOut.open(ui.GetCubeName("From"),"rw");
 
   Pvl * mergeTo = NULL;
   Pvl * source = NULL;
-  QString sourceFileName = ui.GetFileName("Source");
+  QString sourceFileName = ui.GetCubeName("Source");
   mergeTo = inOut.label();
   source = new Pvl(sourceFileName);
 

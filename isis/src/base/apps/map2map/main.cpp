@@ -20,19 +20,7 @@ map <QString, void *> GuiHelpers() {
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Pvl appLog;
-  try {
-    map2map(ui, &appLog);
-  }
-  catch (...) {
-    for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
-      Application::Log(*grpIt);
-    }
-    throw;
-  }
-
-  for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
-    Application::Log(*grpIt);
-  }
+  map2map(ui, &appLog); 
 }
 
 // Helper function to print out mapfile to session log
@@ -64,7 +52,7 @@ catch(IException &e) {
 Pvl fromMap;
 
 try {
-fromMap.read(ui.GetFileName("FROM"));
+fromMap.read(ui.GetCubeName("FROM"));
 }
 catch(IException &e) {
 }

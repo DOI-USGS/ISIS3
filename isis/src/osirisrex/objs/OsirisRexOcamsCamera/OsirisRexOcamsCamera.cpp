@@ -50,7 +50,7 @@ namespace Isis {
       m_instrumentNameLong = "Sampling Camera";
       m_instrumentNameShort = "SamCam";
     } // IK values for polycam: -64360 (general) and -64616 to -64500 (focus specific)
-    else if (frameCode == -64360) {
+    else if ((frameCode == -64360) || (frameCode >= -64616 && frameCode <= -64500)) {
       m_instrumentNameLong = "PolyMath Camera";
       m_instrumentNameShort = "PolyCam";
     }

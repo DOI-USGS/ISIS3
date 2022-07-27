@@ -12,8 +12,6 @@
 #include "Table.h"
 #include "Histogram.h"
 
-#include "Fixtures.h"
-
 #include "gmock/gmock.h"
 
 using namespace Isis;

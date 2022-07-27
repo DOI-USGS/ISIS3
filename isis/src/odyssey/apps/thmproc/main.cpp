@@ -53,7 +53,7 @@ void IsisMain() {
     }
   }
   if(ui.WasEntered("MODEL")) {
-    FileName modelPreference = ui.GetFileName("MODEL");
+    FileName modelPreference = ui.GetCubeName("MODEL");
     if(!modelPreference.fileExists()){
       QString msg = "Please provide a valid MODEL preference file.";
       throw IException(IException::User, msg, _FILEINFO_);

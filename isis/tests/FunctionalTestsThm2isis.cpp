@@ -1,4 +1,4 @@
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "Histogram.h"
@@ -24,7 +24,7 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisVis) {
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
-  
+
   // open even cube
   Cube evenCube( tempDir.path() + "/test.even.cub");
   Pvl *isisLabel = evenCube.label();
@@ -147,7 +147,7 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisIr) {
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
-  
+
   Cube oCube(outCubeFileName);
   Pvl *isisLabel = oCube.label();
 
@@ -188,9 +188,9 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisIr) {
   EXPECT_EQ(bandbin["FilterNumber"].size(), 10);
 
   std::unique_ptr<Histogram> hist (oCube.histogram());
- 
+
   EXPECT_NEAR(hist->Minimum(), 0.00029065093258395791, 0.0001);
-  EXPECT_NEAR(hist->Maximum(), 0.00064912717789411545, 0.0001); 
+  EXPECT_NEAR(hist->Maximum(), 0.00064912717789411545, 0.0001);
   EXPECT_NEAR(hist->Average(), 0.00047608536842744795, 0.0001);
   EXPECT_NEAR(hist->Sum(), 0.023804268421372399, .00001);
   EXPECT_EQ(hist->ValidPixels(), 50);
@@ -210,7 +210,7 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisOutAttributes) {
   catch (IException &e) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
-  
+
   // open even cube
   Cube evenCube( tempDir.path() + "/test.even.cub");
 
@@ -221,9 +221,9 @@ TEST_F(TempTestingFiles, FunctionalTestThm2isisOutAttributes) {
   EXPECT_DOUBLE_EQ(evenCube.multiplier(), 3.95256916996048e-07);
 
   std::unique_ptr<Histogram> hist (evenCube.histogram());
-   
+
   EXPECT_NEAR(hist->Minimum(), 0.0012, 0.0001);
-  EXPECT_NEAR(hist->Maximum(), 0.0013, 0.0001); 
+  EXPECT_NEAR(hist->Maximum(), 0.0013, 0.0001);
   EXPECT_NEAR(hist->Average(), 0.00122, 0.0001);
   EXPECT_NEAR(hist->Sum(), 6.6702830039524876, .00001);
   EXPECT_EQ(hist->ValidPixels(), 5472);

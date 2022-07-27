@@ -34,7 +34,7 @@ void IsisMain() {
   ControlNet cnet(ui.GetFileName("CNET"));
 
   // Get input DEM cube and get ground map for it
-  QString demFile = ui.GetFileName("MODEL");
+  QString demFile = ui.GetCubeName("MODEL");
   Cube demCube;
   demCube.open(demFile);
   UniversalGroundMap *ugm = NULL;
