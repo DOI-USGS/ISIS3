@@ -12,7 +12,6 @@ find files of those names at the top level of this repository. **/
 
 #include <iostream>
 #include <queue>
-#include <gtest/gtest_prod.h>
 
 #include <QList>
 #include <QString>
@@ -133,7 +132,8 @@ namespace Isis {
       static bool matches(const Pvl &lab, PvlGroup &kernelDbGrp,
                           iTime timeToMatch, int cameraVersion);
     private:
-      FRIEND_TEST(::TestKernelDb, TestKernelsSmithOffset);
+      // giving the KernelDb unit test access to private members
+      friend class TestKernelDb_TestKernelsSmithOffset_Test;
 
       void loadKernelDbFiles(PvlGroup &dataDir,
                              QString directory,

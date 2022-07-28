@@ -296,7 +296,6 @@ find_package(inja              REQUIRED)
 
 add_subdirectory(../gtest gtest)
 
-
 # Setup for googletest/googlemock before adding SensorUtilities so we build its tests
 if(buildTests)
   set(INSTALL_GTEST OFF)
