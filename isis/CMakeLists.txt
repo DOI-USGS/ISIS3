@@ -294,6 +294,9 @@ find_package(Armadillo         REQUIRED)
 find_package(Threads)
 find_package(inja              REQUIRED)
 
+add_subdirectory(../gtest gtest)
+
+
 # Setup for googletest/googlemock before adding SensorUtilities so we build its tests
 if(buildTests)
   set(INSTALL_GTEST OFF)
@@ -618,6 +621,6 @@ install(PROGRAMS ${CMAKE_SOURCE_DIR}/config/rclone.conf DESTINATION ${CMAKE_INST
 #   the desired post-install commands inside.
 add_subdirectory(cmake)
 
-if(buildTests) 
+if(buildTests)
   add_subdirectory(tests)
 endif()
