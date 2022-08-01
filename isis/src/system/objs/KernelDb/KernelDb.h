@@ -12,7 +12,6 @@ find files of those names at the top level of this repository. **/
 
 #include <iostream>
 #include <queue>
-#include <gtest/gtest_prod.h>
 
 #include <QList>
 #include <QString>
@@ -22,7 +21,7 @@ find files of those names at the top level of this repository. **/
 #include "Kernel.h"
 #include "Pvl.h"
 
-class TestKernelDb_TestKernelsSmithOffset_Test;
+class  KernelDbFixture_TestKernelsSmithOffset_Test;
 
 namespace Isis {
   class FileName;
@@ -107,7 +106,7 @@ namespace Isis {
       KernelDb(const unsigned int allowedKernelTypes);
       KernelDb(const QString &dbName, const unsigned int allowedKernelTypes);
       KernelDb(std::istream &dbStream, const unsigned int allowedKernelTypes);
-
+      
       // destructor
       ~KernelDb();
 
@@ -133,8 +132,8 @@ namespace Isis {
       static bool matches(const Pvl &lab, PvlGroup &kernelDbGrp,
                           iTime timeToMatch, int cameraVersion);
     private:
-      FRIEND_TEST(::TestKernelDb, TestKernelsSmithOffset);
-
+      friend class ::KernelDbFixture_TestKernelsSmithOffset_Test; 
+      
       void loadKernelDbFiles(PvlGroup &dataDir,
                              QString directory,
                              const Pvl &lab);

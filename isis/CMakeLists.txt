@@ -618,6 +618,6 @@ install(PROGRAMS ${CMAKE_SOURCE_DIR}/config/rclone.conf DESTINATION ${CMAKE_INST
 #   the desired post-install commands inside.
 add_subdirectory(cmake)
 
-if(buildTests) 
+if(buildTests)
   add_subdirectory(tests)
 endif()
