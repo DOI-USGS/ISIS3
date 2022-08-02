@@ -213,9 +213,7 @@ namespace Isis {
         }
 
         json aleNaifKeywords = isd["naif_keywords"];
-        std::cout << aleNaifKeywords << std::endl;
         m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords);
-        std::cout << m_naifKeywords << std::endl;
 
         // Still need to load clock kernels for now
         load(kernels["LeapSecond"], noTables);
@@ -446,7 +444,7 @@ namespace Isis {
     }
     else if (m_usingAle) {
      m_instrumentRotation->LoadCache(isd["instrument_pointing"]);
-     m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::No);
+     m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
      if (m_instrumentRotation->cacheSize() > 5) {
        m_instrumentRotation->LoadTimeCache();
      }
