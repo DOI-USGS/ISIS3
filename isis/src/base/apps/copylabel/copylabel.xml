@@ -66,6 +66,11 @@
    <change name="Mackenzie Boyd" date="2011-04-27">
      Original version.  
    </change>
+   <change name="Adam Paquette" date="2022-08-02">
+     Added the ability to directly request objects from a cubes
+     label to be copied to the new cube. Similarly to how the
+     GROUPS argument functions.
+   </change>
   </history>
 
   <category>
