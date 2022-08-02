@@ -208,6 +208,18 @@
         </description>
       </parameter>
 
+      <parameter name="OBJECTS">
+        <type>string</type>
+        <internalDefault>none</internalDefault> 
+        <brief>
+          Copy the given objects, in CSV format
+        </brief>
+        <description>
+          Copy and given objects over to the FROM cube, groups must be specified 
+          with exact spelling, and be comma separated.
+        </description>
+      </parameter>
+
       <parameter name="BLOBS">
         <type>string</type>
         <internalDefault>none</internalDefault> 
