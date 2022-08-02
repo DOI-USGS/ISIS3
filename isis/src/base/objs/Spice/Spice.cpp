@@ -703,8 +703,9 @@ namespace Isis {
     }
     else if (m_instrumentPosition->GetSource() == SpicePosition::Memcache) {
       int aleCacheSize = m_instrumentPosition->cacheSize();
-      if (aleCacheSize > 3)
+      if (aleCacheSize > 3) {
         m_instrumentPosition->Memcache2HermiteCache(tol);
+      }
     }
     
 
