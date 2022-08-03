@@ -207,7 +207,7 @@
           Copy the given groups, in CSV format
         </brief>
         <description>
-          Copy and given groups over to the FROM cube, groups must exist in the
+          Copy any given groups over to the FROM cube, groups must exist in the
           IsisCube Object to be copied, and must be specified with exact spelling,
           comma separated.
         </description>
@@ -220,7 +220,7 @@
           Copy the given objects, in CSV format
         </brief>
         <description>
-          Copy and given objects over to the FROM cube, groups must be specified 
+          Copy any given objects over to the FROM cube, groups must be specified 
           with exact spelling, and be comma separated.
         </description>
       </parameter>
