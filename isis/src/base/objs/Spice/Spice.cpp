@@ -350,7 +350,7 @@ namespace Isis {
     else {
       // JAA - Modified to store and look for the frame body code in the cube labels
       SpiceInt frameCode;
-      if ((m_usingNaif) || (!m_naifKeywords->hasKeyword("BODY_FRAME_CODE"))) {
+      if ((m_usingNaif) && (!m_naifKeywords->hasKeyword("BODY_FRAME_CODE"))) {
         char frameName[32];
         SpiceBoolean found;
         cidfrm_c(*m_spkBodyCode, sizeof(frameName), &frameCode, frameName, &found);
@@ -463,9 +463,6 @@ namespace Isis {
 
     if (m_usingAle) {
       m_instrumentPosition->LoadCache(isd["instrument_position"]);
-      if (m_instrumentPosition->cacheSize() > 3) {
-        m_instrumentPosition->Memcache2HermiteCache(0.01);
-      }
     }
     else if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
       Table t("InstrumentPosition", lab.fileName(), lab);
@@ -704,6 +701,13 @@ namespace Isis {
           cacheSize);
       if (cacheSize > 3) m_instrumentPosition->Memcache2HermiteCache(tol);
     }
+    else if (m_instrumentPosition->GetSource() == SpicePosition::Memcache) {
+      int aleCacheSize = m_instrumentPosition->cacheSize();
+      if (aleCacheSize > 3) {
+        m_instrumentPosition->Memcache2HermiteCache(tol);
+      }
+    }
+    
 
     if (!m_sunPosition->IsCached()) {
       int sunPositionCacheSize = cacheSize;

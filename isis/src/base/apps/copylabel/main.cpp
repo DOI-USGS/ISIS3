@@ -17,7 +17,8 @@ using namespace std;
 using namespace Isis;
 
 bool copyGroup(Pvl * source, Pvl * mergeTo, QString name);
-bool copyBlob(Cube * from, Cube * to, QString type, QString name, QString fname);
+bool copyObject(Pvl *source, Pvl *mergeTo, QString name);
+bool copyBlob(Cube *from, Cube *to, QString type, QString name, QString fname);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -194,6 +195,19 @@ void IsisMain() {
     }
   }
 
+  // Any other requested objects
+  if (ui.WasEntered("Objects")) {
+    QString objs = QString(ui.GetString("Objects")).remove(" ");
+    QStringList list = objs.split(",");
+    QString obj;
+    foreach (obj, list) {
+      if (obj.size() != 0) {
+        bool success = copyObject(source, mergeTo, obj);
+        results += PvlKeyword(obj, success ? "true" : "false");
+      }
+    }
+  }
+
   // Any other requested blobs
   // Expected format is: <Object name>:<Name keyword>
   if (ui.WasEntered("Blobs")) {
@@ -251,6 +265,26 @@ bool copyGroup(Pvl * source, Pvl * mergeTo, QString name) {
     return true;
   }
   catch (IException &) {
+    return false;
+  }
+}
+
+// Copy an Object from the IsisCube pvl in one cube to the other
+// If it exists in the source, we'll copy it, if it exists in the
+// mergeTo Pvl, we'll overwrite it.
+bool copyObject(Pvl *source, Pvl *mergeTo, QString name)
+{
+  try
+  {
+    // The call we're looking to get an exception on is the one just below.
+    PvlObject &toCopy = source->findObject(name, Pvl::Traverse);
+    if (mergeTo->hasObject(name))
+      mergeTo->deleteGroup(name);
+    mergeTo->addObject(toCopy);
+    return true;
+  }
+  catch (IException &)
+  {
     return false;
   }
 }

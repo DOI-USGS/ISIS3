@@ -66,6 +66,11 @@
    <change name="Mackenzie Boyd" date="2011-04-27">
      Original version.  
    </change>
+   <change name="Adam Paquette" date="2022-08-02">
+     Added the ability to directly request objects from a cubes
+     label to be copied to the new cube. Similarly to how the
+     GROUPS argument functions.
+   </change>
   </history>
 
   <category>
@@ -202,9 +207,21 @@
           Copy the given groups, in CSV format
         </brief>
         <description>
-          Copy and given groups over to the FROM cube, groups must exist in the
+          Copy any given groups over to the FROM cube, groups must exist in the
           IsisCube Object to be copied, and must be specified with exact spelling,
           comma separated.
+        </description>
+      </parameter>
+
+      <parameter name="OBJECTS">
+        <type>string</type>
+        <internalDefault>none</internalDefault> 
+        <brief>
+          Copy the given objects, in CSV format
+        </brief>
+        <description>
+          Copy any given objects over to the FROM cube, groups must be specified 
+          with exact spelling, and be comma separated.
         </description>
       </parameter>
 
