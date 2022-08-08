@@ -179,10 +179,9 @@ def main(mission, dest, cfg_path, dry_run, ntransfers):
 if __name__ == '__main__':
     helpString = (
     '''This will allow for a user to download isis data directly to their machine from the USGS S3 buckets as well as public end points\n\n'''
-    '''To use the download ISIS Data script you must supply 3 parameters with an optional 4th.\n\n'''
-    '''<rclone command> <Mission name> <destination to copy to> <--dry-run (optional)> \n'''
-    '''Example of how to run this program:\n'''
-    '''python downloadIsisData.py tgo ~/isisData/tgo\n\n'''
+    '''<Mission name> <destination to copy to> <--dry-run (optional)> \n\n'''
+    '''Example of how to run this program:\n\n'''
+    '''    downloadIsisData tgo ~/isisData/\n\n'''
     '''NOTE: if you would like to download the data for every mission supply the value ALL for the <Mission name> parameter''')
     parser = argparse.ArgumentParser(description = helpString, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('mission', help='mission for files to be downloaded')
