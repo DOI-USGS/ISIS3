@@ -43,6 +43,8 @@ release.
 
 ### Fixed
 
+- Fixed bugs in downloadIsisData script [#5024](https://github.com/USGS-Astrogeology/ISIS3/issues/5024) 
+
 ## [7.1.0] - 2022-07-27
 
 ### Changed
