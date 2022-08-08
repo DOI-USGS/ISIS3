@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <application name="jigsaw" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Improves image alignment
+    Improves image alignment by updating camera geometry attached to cubes.
   </brief>
 
   <description>
   <h3>Overview</h3>
     <p>
-      The <b>jigsaw</b> application performs a bundle adjustment on a group of overlapping Isis,
-      level 1, <def>cube</def>s from framing and/or line-scan cameras.  The adjustment
-      simultaneously defines the selected image geometry information (camera pointing, spacecraft
+      The <b>jigsaw</b> application performs a photogrammetric bundle adjustment on a group of
+      overlapping, level 1 <def>cube</def>s from framing and/or line-scan cameras.  The adjustment
+      simultaneously refines the selected image geometry information (camera pointing, spacecraft
       position) and <def>control point</def> coordinates (x,y,z or lat,lon,radius) to reduce
       boundary mismatches in mosaics of the images.
     </p>
@@ -25,28 +25,29 @@
     <img src='assets/images/mdis2_Controlled.png' alt='After jigsaw (controlled)' width='306' height='259' />
 
     <p>
-      The <b>jigsaw</b> application assumes <b>spiceinit</b> or <b>csminit</b> has been run on the input
-      <def>cube</def>s so that camera information is included in the Isis <def>cube</def> labels. In order to
-      run the program, the user must provide a list of input <def>cube</def>s, an input <def>control
-      net</def>, the name of an output <def>control net</def>, and the solve settings.
-      <b>jigsaw</b> outputs a new <def>control net</def> that includes the initial state of the
-      points in the network and their final state after the adjustment.  The initial states of
-      the points are tagged as <def>a priori</def> in the <def>control net</def>, and their final
-      states are tagged as <def>adjusted</def>.  The measured <def>sample</def>/<def>line</def> positions
-      associated with the <def>control point</def>s in the net are not changed. camera information
-      in the <def>cube</def> labels is updated at the end of the adjustment only
-      if the bundle converges and the <b>UPDATE</b> parameter is selected.
+      The <b>jigsaw</b> application assumes <b>spiceinit</b> or <b>csminit</b> has been run on the
+      input <def>cube</def>s so that camera information is included in the Isis <def>cube</def>
+      labels. In order to run the program, the user must provide a list of input <def>cube</def>s,
+      an input <def>control net</def>, the name of an output <def>control network</def>, and the
+      solve settings. The measured <def>sample</def>/<def>line</def> positions associated with the
+      <def>control measure</def>s in the network are not changed. Instead, the control points and
+      camera information are adjusted. <b>jigsaw</b> outputs a new <def>control network</def> that
+      includes the initial state of the points in the network and their final state after the
+      adjustment.  The initial states of the points are tagged as <def>a priori</def> in the
+      <def>control network</def>, and their final states are tagged as <def>adjusted</def>.
+      Updated camera information is only written to the <def>cube</def> labels is if the bundle
+      converges and the <b>UPDATE</b> parameter is selected.
     </p>
 
     <p>
-      Optional output files can be selected to provide more information for analyzing the
-      results.  <b>BUNDLEOUT_TXT</b> provides an overall summary of the bundle adjustment.
-      It lists the user input parameters selected and tables of statistics for both the
-      images and the points. The image statistics can also be written to a separate
-      <b>CSV</b> file and likewise for the point statistics with the <b>OUTPUT_CSV</b>
-      option selected.  <b>RESIDUALS_CSV</b> provides a table of the measured image
-      coordinates and the final <def>sample</def>, <def>line</def>, and overall residuals
-      in both millimeters and pixels.
+      Optional output files can be enabled to provide more information for analyzing the results of
+      the bundle. <b>BUNDLEOUT_TXT</b> provides an overall summary of the bundle adjustment;
+      it lists the user input parameters selected and tables of statistics for both the
+      images and the points. The image statistics can be written to a separate machine readable
+      file with the <b>IMAGESCSV</b> option and likewise for the point statistics with the
+      <b>OUTPUT_CSV</b> option. <b>RESIDUALS_CSV</b> provides a table of the measured image
+      coordinates, the final <def>sample</def>, <def>line</def>, and overall residuals
+      of every control measure in both millimeters and pixels.
     </p>
 
     <h3>Observation Equations</h3>
@@ -54,61 +55,62 @@
     <p>
       The <b>jigsaw</b> application attempts to minimize the reprojective error within the control network.
       For each control measure and its control point in the control network, the reprojective error is
-      the difference between the control measures image coordinate and the image coordinate that the control
-      point projects to through the camera model. We also refer to the reprojective error as the measure
-      residual. So, for each control measure we can write an observation equation:
+      the difference between the control measure's image coordinate (typically determined from image
+      <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Automatic_Registration">registration</a>)
+      and the image coordinate that the control point projects to through the camera model. We also
+      refer to the reprojective error as the measure residual. So, for each control measure we can
+      write an observation equation:
     </p>
     <pre>
       reprojective_error = control_measure - camera(control_point)
     </pre>
     <p>
       The camera models use additional parameters such as the instrument position and pointing to compute
-      what image coordinate a control point projects to. So, the camera function in our observation
-      equation actually takes a variety of parameters:
+      what image coordinate a control point projects to; so, the camera function in our observation
+      equation can be written more explicitly as:
     </p>
     <pre>
       reprojective_error = control_measure - camera(control_point, camera_parameters)
     </pre>
     <p>
       The primary decision when using the jigsaw application is which parameters to include
-      as variables in the observation equations. Later sections in this documentation will
-      cover choosing parameters.
+      as variables in the observation equations. Later sections will cover what parameters can
+      be included and common considerations when choosing them.
     </p>
     <p>
-      By combining all of the observation equations for all of the control measures in the control network
+      By combining all the observation equations for all the control measures in the control network
       we can create a system of equations. Then, we can find the camera parameters and control point
-      coordinates that minimize the sum of the squared errors using that system.
+      coordinates that minimize the sum of the squared reprojective errors using the system of equations.
     </p>
     <p>
-      Below is an example
-      system of obseration equations for a control network with three images (A, B, and C) and three
-      control points (1, 2, and 3). Control point 1 has control measures on images A and B, Control point 2
-      has control measures on images B and C, and control point 3 has control measures on images A, B, and C.
-      <code>control_point_1</code> is the coordinate of control point 1, <code>camera_parameters_A</code> are the
-      camera parameters for image A's camera model, <code>camera_A</code> is the projection function for image A's
-      camera model, and <code>control_measure_1_A</code> is the image coordinate of
+      Below is an example system of observation equations for a control network with three images
+      (A, B, and C) and three control points (1, 2, and 3). Control point 1 has control measures
+      on images A and B, control point 2 has control measures on images B and C, and control
+      point 3 has control measures on images A, B, and C. <code>control_point_1</code> is the
+      ground coordinate of control point 1, <code>camera_parameters_A</code> are the camera
+      parameters for image A's camera model, <code>camera_A</code> is the projection function
+      for image A's camera model, and <code>control_measure_1_A</code> is the image coordinate of
       control point 1's control measure on image A.
     </p>
     <img src='assets/images/simple_network.png' alt='Simple control network with 3 images and 3 points' width='400' height='412' />
     <pre>
-                           | control_measure_1_A - camera_A(control_point_1, camera_parameters_A) |
-                           | control_measure_1_B - camera_B(control_point_1, camera_parameters_B) |
-                           | control_measure_2_B - camera_B(control_point_2, camera_parameters_B) |
-      reprojective_error = | control_measure_2_C - camera_C(control_point_3, camera_parameters_C) |
-                           | control_measure_3_A - camera_A(control_point_3, camera_parameters_A) |
-                           | control_measure_3_B - camera_B(control_point_3, camera_parameters_B) |
-                           | control_measure_3_C - camera_C(control_point_3, camera_parameters_C) |
+                    || control_measure_1_A - camera_A(control_point_1, camera_parameters_A) ||
+                    || control_measure_1_B - camera_B(control_point_1, camera_parameters_B) ||
+                    || control_measure_2_B - camera_B(control_point_2, camera_parameters_B) ||
+      total_error = || control_measure_2_C - camera_C(control_point_3, camera_parameters_C) ||
+                    || control_measure_3_A - camera_A(control_point_3, camera_parameters_A) ||
+                    || control_measure_3_B - camera_B(control_point_3, camera_parameters_B) ||
+                    || control_measure_3_C - camera_C(control_point_3, camera_parameters_C) ||
     </pre>
     <p>
       If the camera projection functions were linear, we could easily minimize this system. Unfortunately,
-      the camera projection functions are quite non-linear. So, instead we have to perform a linearization and
+      the camera projection functions are quite non-linear; so, we linearize and
       iteratively compute updates that will gradually approach a minimum. The actual
       structure of the observation equations is complex and vary significantly
-      based on the dataset and which parameters are being solved for. If the parameters
-      are sufficiently far away from a minimum, the updates can even diverge. So,
+      based on the dataset and which parameters are being solved for. If the a-priori parameter
+      values are sufficiently far away from a minimum, the updates can even diverge. So,
       it is important to check your input data set and solve options. Tools like the
-      <b>cnetcheck</b> application and extra options like outlier rejection can help
-      with this.
+      <b>cnetcheck</b> application and <b>jigsaw</b>> options like <b>OUTLIER_REJECTION</b> can help.
     </p>
     <p>
       As with all iterative methods convergence criteria is important. The default for
@@ -126,9 +128,12 @@
     <h3>Solve Options</h3>
 
     <p>
-      Choosing solve options is difficult and often requires experimentation. As a general rule
-      of thumb, the more variation in your dataset, the more you can solve for. Here are
-      some suggestions about what to start with.
+      Choosing solve options is difficult and often requires experimentation. As a general rule,
+      the more variation in observation geometry in your dataset and the better distributed your
+      control measures are across and within images, the more parameters you can solve for.
+      The following sections describe the different options you can use when running the
+      <b>jigsaw</b> application. Each section will cover a subset of the options explaining
+      common situations in which they are used and how to choose values for them.
     </p>
 
     <h4>Control Network</h4>
@@ -139,13 +144,14 @@
     <p>
       Most control networks are generated by finding matching points between groups
       of images. This defines a relative relationship between the images, but it does not
-      relate those images to the actual surface. So, additional information is needed
+      relate those images to the actual planetary surface; so, additional information is needed
       to absolutely control the images. In terrestrial work, known points on the ground
       are identified in the imagery via special target markers, but this is usually not
-      possible with planetary data. So, instead, we relate to an additional dataset such
-      as a previous basemap or surface model. This additional relationship is called ground
-      control. Sometimes, there is not sufficient previous data to do this or it will be
-      done as a secondary step after running jigsaw. In these cases, we say that ground
+      possible with planetary data. Instead, we relate the images to an additional dataset such
+      as a basemap or surface model. This additional relationship is called ground
+      control. Sometimes, there are not sufficient previous data products to provide accurate
+      ground control or ground will be done as a secondary step after successfully running jigsaw
+      on a relatively controlled network. In both these cases, we say that ground
       control is not present.
     </p>
     <p>
@@ -153,55 +159,61 @@
       you hold the instrument position fixed and only solve for the instrument pointing.
       This is because without ground control, the instrument position and pointing can
       become correlated and there will be multiple minimums for the observation equations.
-      We recommend holing the instrument position fixed becaue a-priori data for it generally is more
+      We recommend holding the instrument position fixed becaue a-priori data for it generally is more
       accurate than the instrument pointing.
     </p>
 
     <h4>Sensor Types</h4>
+    <h5>Framing</h5>
     <p>
-      Framing sensors are the simplest type or sensor to work with. The entire image is exposed at the same
+      Framing sensors are the most basic type or sensor to use with <b>jigsaw</b>. The entire image is exposed at the same
       time, so there is only a single position and pointing value for each image. With these datasets
-      you will want to use the either NONE or POSITIONS for the <b>SPSOLVE</b> parameter and ANLGES
+      you will want to use the either NONE or POSITIONS for the <b>SPSOLVE</b> parameter and ANGLES
       for the <b>CAMSOLVE</b> parameter.
     </p>
+    <h5>Pushbroom</h5>
     <p>
       Pushbroom sensors require additional consideration because the image is exposed over a period of
-      time and the position and pointing are time dependent. The <b>jigsaw</b> application handles this
-      by modeling the position and pointing as polynomial functions of time. First polynomial functions
-      are fit to the existing position and pointing values on each image. Then, each iteration updates
-      the polynomial coefficients. For example, setting <b>CAMSOLVE</b> to velocities will use first
+      time and therefore, position and pointing are time dependent. The <b>jigsaw</b> application handles this
+      by modeling the position and pointing as polynomial functions of time. Polynomial functions
+      are fit to the a-priori position and pointing values on each image. Then, each iteration updates
+      the polynomial coefficients. Setting <b>CAMSOLVE</b> to velocities will use first
       degree, linear, polynomials and setting <b>CAMSOLVE</b> to accelerations will use
       second degree, quadratic, polynomials for the pointing angles. For most pushbroom observations,
-      we recommend using second degree polynomials.
+      we recommend using second degree polynomials, solving for accelerations.
     </p>
     <p>
-      There are also a variety of parameters that allow for more precise control over the polynomails used
+      There are also a variety of parameters that allow for more precise control over the polynomials used
       and the polynomial fitting process. The <b>OVERHERMITE</b> parameter changes the initial polynomial
-      setup so that it does not replace the original position values. Instead, the polynomial starts out as a
-      zero polynomial and is added to the original position values. The <b>OVEREXISTING</b>
+      setup so that it does not replace the a-priori position values. Instead, the polynomial starts out as a
+      zero polynomial and is added to the original position values. This effectively adds the noise
+      from the a-priori position values to the constant term of the polynomial. The <b>OVEREXISTING</b>
       parameter does the same thing for pointing values. These two options allow you to preserve complex
       variation like jitter. We recommend enabling these options for jittery images and very long
       exposure pushbroom images.
     </p>
     <p>
       The <b>SPSOLVE</b> and <b>CAMSOLVE</b> parameters only allow up to a second degree
-      polynomial. To use a higher degree polynomial for pointing values, set these to ALL and then set
+      polynomial. To use a higher degree polynomial for pointing values, set <b>CAMSOLVE</b> to ALL and then set
       the <b>CKDEGREE</b> parameter to the degree of the polynomial you want to fit over the original
       pointing values and set the <b>CKSOLVEDEGREE</b> parameter to the degree of the polynomial you want
-      to solve for. The <b>SPKDEGREE</b> and <b>SPKSOLVEDEGREE</b> parameters do the same thing for
-      position values. For example, if you want to fit a 3rd degree polynomial for the position values
-      and then solve for a 5th degree polynomial set <b>SPKDEGREE=3</b> and <b>SPKSOLVEDEGREE=5</b>.
+      to solve for. Setting the <b>SPSOLVE</b>, <b>SPKDEGREE</b>, and <b>SPKSOLVEDEGREE</b> parameters
+      in a similar way adjusts the polynomial for postion values in the same way.
+      For example, if you want to fit a 3rd degree polynomial for the position values
+      and then solve for a 5th degree polynomial set <b>SPSOLVE</b> to ALL, <b>SPKDEGREE</b> to 3,
+      and <b>SPKSOLVEDEGREE</b> to 5.
       These parameters should only be used when you know the a-priori position and/or pointing values are
-      well modeled by high degree polynomails. Using very high degree polynomials can result in extreme
+      well modeled by high degree polynomials. Using high degree polynomials can result in extreme
       over-fitting where the solution looks good in areas near control measures and control points but
       is poor in areas far from control measures and control points. The end behavior, the solution at
       the start and end of images, becomes particularly unstable as the degree of the polynomial used
-      goes up.
+      increases.
     </p>
+    <h5>Synthetic Aperture Radar</h5>
     <p>
       Running the <b>jigsaw</b> application with synthetic aperture radar (SAR) images is different because
       SAR sensors do not have a pointing component. Thus, you can only solve for the sensor position when
-      working with SAR imagery. SAR imagery also tends to have very long duration images which can
+      working with SAR imagery. SAR imagery also tends to have long duration images which can
       necessitate using the <b>OVERHERMITE</b>, <b>SPKDEGREE</b>, and <b>SPKSOLVEDEGREE</b> parameters.
     </p>
 
@@ -212,78 +224,83 @@
       that describe how the initial error is distributed. The parameter sigmas are also sometimes
       called uncertainties. Parameters with higher a-priori sigma values
       are allowed to vary more freely than those with lower a-priori sigma values. The a-priori sigma values
-      are not hard contraints that limit how much parameters can change, but rather relative accuracy estimates
+      are not hard constraints that limit how much parameters can change, but rather relative accuracy estimates
       that adjust how much parameters change relative to each other.
     </p>
     <p>
       The <b>POINT_LATITUDE_SIGMA</b>, <b>POINT_LONGITUDE_SIGMA</b>, and <b>POINT_RADIUS_SIGMA</b>
       parameters set the a-priori sigmas for control points <i>that do not already have a ground source</i>.
-      If a control point already has a ground source, such as a previous basemap or DEM, then it already has
-      internal sigma values associated with it or is held comletely fixed. The exact behavior depends
-      on how the ground source was set. All of these sigmas are in meters on the ground, so the latitude
-      and longitude sigmas are uncertainty in the latitude and longitude directions. Generally, you will
+      If a control point already has a ground source, such as a basemap or DEM, then it already has
+      internal sigma values associated with it or is held completely fixed. The exact behavior depends
+      on how the control points were created, a topic outside the scope of this documentation.
+      These sigmas are in meters on the ground, so the latitude
+      and longitude sigmas are uncertainty in meters in the latitude and longitude directions. Generally, you will
       choose values for these parameters based on the resolution of the images and a visual comparison with
       other datasets. The radius sigma is also usually higher than the latitude and longitude sigmas
-      because there is not a very large separation angle between different observations of the ground
-      point.
+      because there is less variation of the viewing geometry with respect to the radius.
     </p>
     <p>
       The <b>CAMERA_ANGLES_SIGMA</b>, <b>CAMERA_ANGULAR_VELOCITY_SIGMA</b>, and
       <b>CAMERA_ANGULAR_ACCELERATION_SIGMA</b> parameters set the a-priori sigmas for the instrument pointing.
       Similarly, the <b>SPACECRAFT_POSITION_SIGMA</b>, <b>SPACECRAFT_VELOCITY_SIGMA</b>,
       and <b>SPACECRAFT_ACCELERATION_SIGMA</b> parameters set the a-priori sigmas for the instrument position.
-      The velocity and acceleration sigmas are only used if you are solving for them.
-      Finding initial values for these sigmas is challenging as they are not a part of the SPICE kernels
-      used to generate the initial position and pointin values. Some teams will publish uncertainties
-      with their SPK and CK solutions which can be used here, but it is not a part of the SPK or CK
-      specification. Also keep in mind that the velocity and acceleration sigmas are
-      in meters per second or meters per second squared (degrees per second and degrees per second squared
-      for angles). So, the velocity sigma will generally be smaller than the position sigma and similarly,
-      the acceleration sigma will be smaller than the velocity sigma.
+      The sigma for each parameter is only used if you are solving for that parameter. For example,
+      if you are solving for angular velocities and not solving for any adjustments to the instrument
+      position you would enter <b>CAMERA_ANGLES_SIGMA</b> and <b>CAMERA_ANGULAR_VELOCITY_SIGMA</b>.
+      Finding initial values for these sigmas is challenging as SPICE does not have a way to specify them.
+      Some teams will publish uncertainties for their SPK and CK solutions in separate documentation or
+      the kernel comments, the commnt utility will read the comments on a kernel file. The velocity
+      and acceleration sigmas are in meters per second and meters per second squared respectively
+      (degrees per second and degrees per second squared for angles). So, the velocity sigma will
+      generally be smaller than the position sigma and the acceleration sigma will be smaller than
+      the velocity sigma.
     </p>
     <p>
       Coming up with a-priori sigma values can be quite challenging, but the <b>jigsaw</b> application
       has the ability to produce updated sigma values for your solution. By enabling the <b>ERRORPROPAGATION</b>
       parameter, you will get a-posteriori (updated) sigmas for each control point and camera parameter
-      in your solution. This is helpful for analyzing and communicating the quality of your solution.
-      Computing the updated sigmas, imposes a significant computation and memory overhead, so it is
-      recommended that you wait until you are happy with the rest of your settings before enabling the
-      <b>ERRORPROPAGATION</b> parameter.
+      in your solution. This information is helpful for analyzing and communicating the quality of
+      your solution. Computing the updated sigmas, imposes a significant computation and memory
+      overhead, so it is recommended that you enbale <b>ERRORPROPAGATION</b> parameter after you
+      have run bundle adjustment with all of your other settings and gotten a satisfactory result.
     </p>
 
     <h4>Community Sensor Model</h4>
     <p>
-      The options that control which parameters to solve for only work with ISIS camera models. When
-      working with community sensor model (CSM) camera models, you will need to manually specify the
-      exact camera parameters that you want to solve for. This is because the CSM API only exposes a
+      The <b>jigsaw</b> options that control which parameters to solve for only work with ISIS
+      camera models. When working with community sensor model (CSM) camera models, you will
+      need to manually specify the camera parameters to solve for. This is because the
+      <a href="https://github.com/ngageoint/csm">CSM API</a> only exposes a
       generic camera parameter interface that may or may not be related to the physical state of the
-      sensor when an image was exposed. See the <b>CSMSOLVELIST</b> parameter documentation for how
-      to do this.
+      sensor when an image was aquired. The <b>CSMSOLVELIST</b> option allows for an explicit list
+      of model parameters. You can also use the <b>CSMSOLVESET</b> or <b>CSMSOLVEYPE</b> options
+      to choose your parameters based on how they are labeled in the model.
     </p>
     <p>
       Each CSM plugin library defines its own set of adjustable parameters. See the
       documentation for the CSM plugin library you are using for what different adjustable parameters
-      are and when to solve for them. The sigma values for parameters are also baked into the CSM plugin
+      are and when to solve for them. The sigma values for parameters are also included in the CSM plugin
       library and image support data (ISD). So, you do not need to specify camera parameter sigmas when
-      working with CSM camera models; you still need to specify control point coordinate sigmas.
+      working with CSM camera models; however, you still need to specify control point coordinate sigmas.
       For convenience, the <b>csminit</b> application adds information about all of the adjustable
       parameters to the image label.
     </p>
     <p>
-      The CSM API natively uses a rectangular coordinate system. So, we also recommend that
+      The CSM API natively uses a rectangular coordinate system. So, we recommend that
       you have the <b>jigsaw</b> application perform calculations in a rectangular coordinate system
       when working with CSM camera models. To do this, set the <b>CONTROL_POINT_COORDINATE_TYPE_BUNDLE</b>
-      parameter to <code>RECTANGULAR</code>. You can also set the
-      <b>CONTROL_POINT_COORDINATE_TYPE_REPORTS</b> parameter to <code>RECTANGULAR</code> to see the
-      results in a rectangular coordiante system, but this is more a matter of personal preference.
+      parameter to RECTANGULAR. You can also set the
+      <b>CONTROL_POINT_COORDINATE_TYPE_REPORTS</b> parameter to RECTANGULAR to see the
+      results in a rectangular coordinate system, but this is a matter of personal preference
+      and will not impact the results.
     </p>
 
     <h4>Robustness</h4>
     <p>
       Much of the mathematical underpinning of the <b>jigsaw</b> application expects that the error
-      in the input data is purely random noise. If there are issues with control measures not being
-      poorly registered or blatently wrong, it can produce errors in the output solution. Generally,
-      users will need to manually identify and correct this errors prior to running the <b>jigsaw</b>
+      in the input data is purely random noise. If there are issues with control measures being
+      poorly registered or blatantly wrong, it can produce errors in the output solution. Generally,
+      users should identify and correct these errors before accepting the output of the <b>jigsaw</b>
       application, but there are a handful of parameters than can be used to make your solutions more
       robust to them.
     </p>
@@ -301,10 +318,10 @@
       parameter is enabled. For this reason, always check your output
       control network for islands with the <b>cnetcheck</b> application when using the
       <b>OUTLIER_REJECTION</b> parameter. Choosing an appropriate value for the <b>REJECTION_MULTIPLIER</b>
-      is about deciding how aggresively you want to eliminate control measures. The default value
-      will only remove extreme errors, but lower values will remove many control measures that are not
-      atually errors. It is recommended that you start with the default value and then if you want to remove
-      more potential outliers reduce it gradually. If you are seeing too many rejections with the
+      is about deciding how aggressively you want to eliminate control measures. The default value
+      will only remove extreme errors, but lower values will remove control measures that are not
+      actually errors. It is recommended that you start with the default value and then if you want to remove
+      more potential outlier, reduce it gradually. If you are seeing too many rejections with the
       default value, then your input data is extremely poor and you should investigate other methods
       of improving it prior to running the <b>jigsaw</b> application. You can use the <b>qnet</b>
       application to examine and improve your control network. You can use the <b>qtie</b> application
@@ -315,7 +332,7 @@
       measures. Similar to the sigmas for control points and parameters, these are a measurement
       of the relative quality of each control measure. Control measures with a higher sigma have less
       impact on the solution than control measures with a lower sigma. Most control networks have
-      a very large number of control measures and it is not realistic to manually set the sigma for
+      a large number of control measures and it is not realistic to manually set the sigma for
       each one. So, the <b>jigsaw</b> application can instead use maximum likelihood estimation (MLE)
       to estimate the sigma for each control measure each iteration. There are a variety of models to
       choose from, but all of them start each control measure's sigmas at 1. Then, if the control
@@ -346,7 +363,7 @@
       translation file called <code>ObservationKeys</code>. This specifies the number of keys from the
       serial number to use in the observation number. For example JunoCam serial numbers consist of
       <code>SpacecraftName/InstrumentId/StartTime/FrameNumber/FilterName</code> and it has
-      <code>ObservationKeys = 4</code>. So, the observaiton number for a JunoCam image is the first
+      <code>ObservationKeys = 4</code>. So, the observation number for a JunoCam image is the first
       four keys of its serial number, <code>SpacecraftName/InstrumentId/StartTime/FrameNumber</code>.
       Thus, if two JunoCam images have the same StartTime and FrameNumber but different FilterNames
       and the <b>OBSERVATIONS</b> parameter is enabled, then they will share camera parameters.
@@ -400,12 +417,12 @@
       likely increases error in the solve.</b>
       <p>
         With the current jigsaw implementation, it is NOT possible to individually
-        solve for either the mean or triaxial radii as seperate calculations in
+        solve for either the mean or triaxial radii as separate calculations in
         the bundle adjustment. More specifically, the target body radii has no
         effect when solving for individual points and thus cannot be solved for in the bundle.
         A local radii solve is already part of the sequence of equations that <b>jigsaw</b>
         uses to compute various partial derivatives to populate the solve matrix.
-        A seperate mean or triaxial radii solve can be applied to the target body
+        A separate mean or triaxial radii solve can be applied to the target body
         and the partials from this separate application are added to the
         solve matrix. This option adds additional computation time to <b>jigsaw</b>
         and creates additional uncertainty/error in the bundle adjust. We advise
@@ -415,7 +432,7 @@
         If you are trying to generate a spheroid from a control network there are
         other programs that can do this for you. An easier but more naive method
         is ingesting the <i>OUTPUT_CSV</i> from your network, gather local radii
-        information from those points, then generate a sphereiod from those local radii.
+        information from those points, then generate a spheroid from those local radii.
       </p>
       </blockquote>
 
