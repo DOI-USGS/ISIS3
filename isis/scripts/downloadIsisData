@@ -15,20 +15,20 @@ from os import path
 def find_conf():
     from pathlib import Path
     local_path = Path("rclone.conf")
-    if os.environ.get("CONDA_PREFIX"):
-        install_path = Path(os.environ.get("CONDA_PREFIX")) / "etc" / "isis" / local_path
-    else:
-        install_path = Path()
+    # this should be installed in scripts folder, so config is one directory up in etc 
+    install_path = Path(os.path.dirname(__file__)) / '..' / "etc" / "isis" / 'rclone.conf'
     repo_path = Path(os.path.dirname(__file__)) / '..' / 'config' / 'rclone.conf'
-
+    print(install_path)    
     if local_path.exists():
+        print(str(local_path))
         return str(local_path)
     elif repo_path.exists():
         return str(repo_path)
     elif install_path.exists():
+        print(str(install_path))
         return str(install_path)
     else:
-        return ""
+        raise RuntimeError("No config found, try passing it in explicitly with --config <path>")
 
 
 # set log level to debug
