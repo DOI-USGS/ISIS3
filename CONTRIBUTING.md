@@ -46,11 +46,3 @@ by discussion, compromise on the proposed change, or withdrawal of the proposed 
 When making a bug fix contribution, please add the [bug](https://github.com/USGS-Astrogeology/ISIS3/pulls?q=is%3Apr+label%3Abug+) label to your pull request. This will automatically cherry-pick your PR into the latest release branch so that it can be distributed in the next bug fix release.
 
 When making a contribution for the first time, please add your name to the `.zenodo.json file.` We strongly recommend adding your affiliation and ORCiD to the `zenodo.json` file. These additions only have to happen once.
-
-# Becoming a Committer
-
-All contributors who land a non-trivial contribution should be on-boarded in a timely manner,
-and added as a committer, and be given write access to the repository.
-
-Committers are expected to follow this policy and continue to send pull requests, go through
-proper review, and have other committers merge their pull requests.
