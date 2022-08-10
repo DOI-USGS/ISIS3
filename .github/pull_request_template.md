@@ -15,8 +15,6 @@
 <!--- If you performed any manual validation of the changes please indicate -->
 <!--- what data you used and how you validated your results. -->
 
-## Screenshots (if appropriate):
-
 ## Types of changes
 <!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
 - [ ] Bug fix (non-breaking change which fixes an issue)
