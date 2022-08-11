@@ -8,12 +8,13 @@
 <!--- If fixing a bug, there should be an issue describing it with steps to reproduce -->
 <!--- Please link to the issue here: -->
 
-## How Has This Been Tested?
-<!--- Please describe in detail how you tested your changes. -->
+## How Has This Been Validated?
+<!--- All changes need to be validated to confirm that they produce -->
+<!--- scientifically accurate results. -->
 <!--- If your changes include any new algorithms or changes to existing algorithms, -->
-<!--- please provide references to any publications or references for them. -->
-<!--- If you performed any manual validation of the changes please indicate -->
-<!--- what data you used and how you validated your results. -->
+<!--- please indicate any publications or references for them. -->
+<!--- If you manually validated the changes please indicate -->
+<!--- what data you used and how you checked the results. -->
 
 ## Types of changes
 <!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
