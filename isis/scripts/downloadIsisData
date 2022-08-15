@@ -10,7 +10,7 @@ import subprocess
 import tempfile
 from shutil import which
 from os import path
-
+from collections import OrderedDict
 
 def find_conf():
     from pathlib import Path
@@ -144,8 +144,8 @@ def main(mission, dest, cfg_path, dry_run, ntransfers):
         quit(-1)
     log.debug(f"Remote Sources: {config_sources}")
 
-    supported_missions = {}
-    for source in config_sources:
+    supported_missions = OrderedDict({})
+    for source in sorted(config_sources, key=lambda x: x.split("_")[-1]):
         parsed_name = source.split("_")
         # If it is a mission, it should be in the format <mission_nam>_<source_type>
         if len(parsed_name) == 2 and parsed_name[1] in ["usgs:", "naifKernels:"]:
