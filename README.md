@@ -513,11 +513,11 @@ You can download the script and config file from the repo:
 conda install -c conda-forge rclone
 
 # download the script and rclone config file
-curl https://github.com/USGS-Astrogeology/ISIS3/raw/dev/isis/scripts/downloadIsisData.py -o downloadIsisData.py
+curl -LJO https://github.com/USGS-Astrogeology/ISIS3/raw/dev/isis/scripts/downloadIsisData.py
 
-curl https://github.com/USGS-Astrogeology/ISIS3/raw/dev/isis/config/rclone.conf -o rclone.conf
+curl -LJO https://github.com/USGS-Astrogeology/ISIS3/raw/dev/isis/config/rclone.conf
 
 # run the script as normal, using --config to point to where you downloaded the config file 
-python downloadIsisData.py sync <mission> $ISISDATA --config rclone.conf
+python downloadIsisData --config rclone.conf <mission> $ISISDATA
 
 ```
