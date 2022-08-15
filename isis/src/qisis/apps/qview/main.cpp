@@ -25,6 +25,7 @@ find files of those names at the top level of this repository. **/
 #include "BandTool.h"
 #include "BlinkTool.h"
 #include "EditTool.h"
+#include "LatLonGridTool.h"
 #include "FeatureNomenclatureTool.h"
 #include "FileName.h"
 #include "FileTool.h"
@@ -175,6 +176,8 @@ int main(int argc, char *argv[]) {
 
   Tool *editTool = createTool<EditTool>(vw, &tools);
 
+  Tool *latLonGridTool = createTool<LatLonGridTool>(vw, &tools);
+
   Tool *windowTool = createTool<WindowTool>(vw, &tools);
 
   Tool *measureTool = createTool<MeasureTool>(vw, &tools);
@@ -276,6 +279,7 @@ int main(int argc, char *argv[]) {
   delete statsTool;
   delete helpTool;
   delete matchTool;
+  delete latLonGridTool;
   delete stereoTool;
   delete histTool;
   delete spatialPlotTool;
