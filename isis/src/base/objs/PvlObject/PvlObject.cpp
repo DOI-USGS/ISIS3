@@ -66,7 +66,13 @@ namespace Isis {
         keyword.setName(QString::fromStdString(it.key()));
         if (it.value().is_array()) {
           for(auto ar = it.value().begin(); ar!=it.value().end(); ar++) {
-            keyword.addJsonValue(*ar);
+            try {
+              keyword.addJsonValue(*ar);
+            }
+            catch (IException &e) {
+              QString msg = "While attempting to parse " + name + " the following occured";
+              throw IException(e, IException::Unknown, msg, _FILEINFO_);
+            }
           }
         }
         else {

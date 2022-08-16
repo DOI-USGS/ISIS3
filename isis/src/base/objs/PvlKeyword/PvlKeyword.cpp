@@ -166,12 +166,10 @@ namespace Isis {
    * and resets to the value given using addJsonValue(). Defaults to
    * unit = "" (empty QString).
    *
-   * @param value New value to be assigned.
+   * @param jsonobj New jsobobj to be parsed and assigned.
    * @param unit Units of measurement corresponding to the value.
    *
-   * @see addValue()
-   * @see operator=
-   * @see operator+=
+   * @see addJsonValue()
    */
   void PvlKeyword::setJsonValue(json jsonobj, QString unit)
   {
@@ -296,16 +294,21 @@ namespace Isis {
    * given to the array of values for this PvlKeyword object using addValue.
    * Defaults to unit = "" (empty QString).
    *
-   * @param value New value to be assigned.
+   * @param jsonobj New jsonobj to be parsed and assigned.
    * @param unit Units of measurement corresponding to the value.
    *
    * @see setJsonValue()
-   * @see operator=
-   * @see operator+=
+   * @see addValue()
+   *
+   * @throws Isis::iException::Unknown - jsonobj cannot be an array of values
    */
   void PvlKeyword::addJsonValue(json jsonobj, QString unit) {
     QString value;
-    if (jsonobj.is_number())
+    if (jsonobj.is_array()) {
+      QString msg = "Unable to convert " + name() + " with nested json array value into PvlKeyword";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+    else if (jsonobj.is_number())
     {
       value = QString::number(jsonobj.get<double>(), 'g', 16);
     }
