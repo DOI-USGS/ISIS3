@@ -389,7 +389,7 @@ If you plan to work with data from all missions, then the download will require 
 the outdated rsync download information can be found [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Outdated-ISIS-Data-Information)
 
 
-The ISIS Data Area is hosted on a combination of AWS S3 buckets and public http servers e.g. NAIF, Jaxa, ESA and not through conda channels like the ISIS binaries. This requires using the `downloadIsisData.py` script from within a terminal window within your Unix distribution, or from within WSL if running Windows 10. Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
+The ISIS Data Area is hosted on a combination of AWS S3 buckets and public http servers e.g. NAIF, Jaxa, ESA and not through conda channels like the ISIS binaries. This requires using the `downloadIsisData` script from within a terminal window within your Unix distribution, or from within WSL if running Windows 10. Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
 
 To download all ISIS data, use the following command:
 
@@ -513,11 +513,12 @@ You can download the script and config file from the repo:
 conda install -c conda-forge rclone
 
 # download the script and rclone config file
-curl https://github.com/USGS-Astrogeology/ISIS3/raw/dev/isis/scripts/downloadIsisData.py -o downloadIsisData.py
+curl https://raw.githubusercontent.com/USGS-Astrogeology/ISIS3/dev/isis/scripts/downloadIsisData -o downloadIsisData.py
 
-curl https://github.com/USGS-Astrogeology/ISIS3/raw/dev/isis/config/rclone.conf -o rclone.conf
+curl https://raw.githubusercontent.com/USGS-Astrogeology/ISIS3/dev/isis/config/rclone.conf -o rclone.conf
 
 # run the script as normal, using --config to point to where you downloaded the config file 
-python downloadIsisData.py sync <mission> $ISISDATA --config rclone.conf
-
+python downloadIsisData <mission> $ISISDATA --config rclone.conf
 ```
+
+> The script does not support python2, sometimes you need to explicitly use python3 with `python3 downloadIsisData <mission> $ISISDATA --config rclone.conf` 
