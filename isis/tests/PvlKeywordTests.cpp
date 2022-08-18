@@ -375,6 +375,57 @@ TEST(PvlKeyword, KeywordValidationString) {
 	}
 }
 
+TEST(PvlKeyword, testJsonAddInt) {
+    PvlKeyword keyword("Key");
+		json jsonobj = {{"Key1", 1}, {"Key2", 2}};
+		keyword.addJsonValue(jsonobj["Key1"]);
+		keyword.addJsonValue(jsonobj["Key2"]);
+
+		EXPECT_EQ(keyword[0], "1");
+		EXPECT_EQ(keyword[1], "2");
+}
+
+TEST(PvlKeyword, testJsonAddDouble) {
+    PvlKeyword keyword("Key");
+		json jsonobj = {{"Key", 1.000000000000001}};
+		keyword.addJsonValue(jsonobj["Key"]);
+
+		EXPECT_EQ(keyword[0], "1.000000000000001");
+}
+
+TEST(PvlKeyword, testJsonAddBool) {
+    PvlKeyword keyword("Key");
+		json jsonobj = {{"Key", true}};
+		keyword.addJsonValue(jsonobj["Key"]);
+
+		EXPECT_EQ(keyword[0], "true");
+}
+
+TEST(PvlKeyword, testJsonAddNull) {
+    PvlKeyword keyword("Key");
+		json jsonobj = {{"Key", nullptr}};
+		keyword.addJsonValue(jsonobj["Key"]);
+
+		EXPECT_EQ(keyword[0], "Null");
+}
+
+TEST(PvlKeyword, testJsonAddString) {
+    PvlKeyword keyword("Key");
+		json jsonobj = {{"Key", "Banana"}};
+		keyword.addJsonValue(jsonobj["Key"]);
+
+		EXPECT_EQ(keyword[0], "Banana");
+}
+
+TEST(PvlKeyword, testJsonSet) {
+    PvlKeyword keyword("Key", "1");
+		json jsonobj = {{"Key", 2}};
+
+		keyword.setJsonValue(jsonobj["Key"]);
+
+		EXPECT_EQ(keyword[0], "2");
+}
+
 void comparePvlKeywords(PvlKeyword pvlKeyword1, PvlKeyword pvlKeyword2)
 {
 	EXPECT_TRUE(PvlKeyword::stringEqual(pvlKeyword1.name(), pvlKeyword2.name()));
