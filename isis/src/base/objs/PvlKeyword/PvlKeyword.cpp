@@ -17,6 +17,7 @@ find files of those names at the top level of this repository. **/
 #include "PvlSequence.h"
 
 using namespace std;
+using json = nlohmann::json;
 namespace Isis {
   //! Constructs a blank PvlKeyword object.
   PvlKeyword::PvlKeyword() {
@@ -157,6 +158,24 @@ namespace Isis {
     addValue(value, unit);
   }
 
+  /**
+   * Sets new value from Json.
+   *
+   * If no current value exists, this method sets the given json value
+   * to the PvlKeyword.  Otherwise, it clears any existing values
+   * and resets to the value given using addJsonValue(). Defaults to
+   * unit = "" (empty QString).
+   *
+   * @param jsonobj New jsobobj to be parsed and assigned.
+   * @param unit Units of measurement corresponding to the value.
+   *
+   * @see addJsonValue()
+   */
+  void PvlKeyword::setJsonValue(json jsonobj, QString unit)
+  {
+    clear();
+    addJsonValue(jsonobj, unit);
+  }
 
   /**
    * Sets the unit of measure for all current values if any exist
@@ -265,6 +284,47 @@ namespace Isis {
     else if (m_units) {
       m_units->push_back("");
     }
+  }
+
+  /**
+   * Adds a value with units.
+   *
+   * If no current value exists, this method sets the given json value.
+   * Otherwise, it retains any current values and adds the json value
+   * given to the array of values for this PvlKeyword object using addValue.
+   * Defaults to unit = "" (empty QString).
+   *
+   * @param jsonobj New jsonobj to be parsed and assigned.
+   * @param unit Units of measurement corresponding to the value.
+   *
+   * @see setJsonValue()
+   * @see addValue()
+   *
+   * @throws Isis::iException::Unknown - jsonobj cannot be an array of values
+   */
+  void PvlKeyword::addJsonValue(json jsonobj, QString unit) {
+    QString value;
+    if (jsonobj.is_array()) {
+      QString msg = "Unable to convert " + name() + " with nested json array value into PvlKeyword";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+    else if (jsonobj.is_number())
+    {
+      value = QString::number(jsonobj.get<double>(), 'g', 16);
+    }
+    else if (jsonobj.is_boolean())
+    {
+      value = QString(jsonobj.get<bool>() ? "true" : "false");
+    }
+    else if (jsonobj.is_null())
+    {
+      value = QString("Null");
+    }
+    else
+    {
+      value = QString::fromStdString(jsonobj);
+    }
+    addValue(value, unit);
   }
 
   /**

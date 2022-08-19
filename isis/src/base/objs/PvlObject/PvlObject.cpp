@@ -63,27 +63,20 @@ namespace Isis {
 
     for(auto it = jsonobj.begin(); it != jsonobj.end(); it++) {
         PvlKeyword keyword;
+        keyword.setName(QString::fromStdString(it.key()));
         if (it.value().is_array()) {
-          keyword.setName(QString::fromStdString(it.key()));
-          for(auto ar = it.value().begin(); ar!=it.value().end();ar++) {
-            keyword += QString::number(ar->get<double>(), 'g', 16);
+          for(auto ar = it.value().begin(); ar!=it.value().end(); ar++) {
+            try {
+              keyword.addJsonValue(*ar);
+            }
+            catch (IException &e) {
+              QString msg = "While attempting to parse " + name + " the following occured";
+              throw IException(e, IException::Unknown, msg, _FILEINFO_);
+            }
           }
         }
-        else if(it.value().is_number()) {
-          keyword.setName(QString::fromStdString(it.key()));
-          keyword.setValue(QString::number(it->get<double>()));
-        }
-        else if(it.value().is_boolean()) {
-          keyword.setName(QString::fromStdString(it.key()));
-          keyword.setValue(QString(it->get<bool>() ? "true" : "false"));
-        }
-        else if(it.value().is_null()) {
-          keyword.setName(QString::fromStdString(it.key()));
-          keyword.setValue(QString("Null"));
-        }
         else {
-          keyword.setName(QString::fromStdString(it.key()));
-          keyword.setValue(QString::fromStdString(it.value()));
+          keyword.setJsonValue(*it);
         }
         addKeyword(keyword);
     }

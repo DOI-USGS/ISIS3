@@ -9,6 +9,7 @@
 
 #include "Blob.h"
 #include "Pvl.h"
+#include "PvlKeyword.h"
 
 #include "TempFixtures.h"
 #include "CameraFixtures.h"
@@ -46,6 +47,19 @@ class HistoryBlob : public TempTestingFiles {
     void SetUp() override;
 };
 
+class RawPvlKeywords : public ::testing::Test {
+  protected:
+    // You can define per-test set-up logic as usual.
+    void SetUp() override;
+
+    // You can define per-test tear-down logic as usual.
+    void TearDown() override;
+
+    
+    std::vector<QString> keywordsToTry;
+    std::vector<PvlKeyword> results;
+    std::vector<bool> valid;
+  };
 }
 
 #endif

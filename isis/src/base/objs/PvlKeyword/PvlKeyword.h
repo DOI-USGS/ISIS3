@@ -17,6 +17,8 @@ find files of those names at the top level of this repository. **/
 #include "Constants.h"
 #include "IString.h"
 
+#include <nlohmann/json.hpp>
+
 namespace Isis {
   class PvlSequence;
   class PvlFormat;
@@ -78,6 +80,9 @@ namespace Isis {
    *                          the QString "Yes" instead of the keyword name. Added padding on
    *                          control statements to bring the code closer to ISIS Coding Standards.
    *                          References #1659.
+   * 
+   *  @history 2022-08-15 Adam Paquette - Added the ability to add and set PvlKeyword values from JSON
+   *                          keyword value pairs.
    */
   class PvlKeyword {
     public:
@@ -112,6 +117,7 @@ namespace Isis {
       };
 
       void setValue(QString value, QString unit = "");
+      void setJsonValue(nlohmann::json jsonobj, QString unit = "");
 
       void setUnits(QString units);
       void setUnits(QString value, QString units);
@@ -119,6 +125,8 @@ namespace Isis {
       PvlKeyword &operator=(QString value);
 
       void addValue(QString value, QString unit = "");
+      void addJsonValue(nlohmann::json jsonobj, QString unit = "");
+
       PvlKeyword &operator+=(QString value);
 
       //! Returns the number of values stored in this keyword
