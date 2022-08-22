@@ -209,7 +209,7 @@ namespace Isis {
           json props;
           props["kernels"] = kernel_pvl.str();
 
-          isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale");
+          isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale", false);
         }
 
         json aleNaifKeywords = isd["naif_keywords"];
@@ -350,7 +350,7 @@ namespace Isis {
     else {
       // JAA - Modified to store and look for the frame body code in the cube labels
       SpiceInt frameCode;
-      if ((m_usingNaif) && (!m_naifKeywords->hasKeyword("BODY_FRAME_CODE"))) {
+      if (((m_usingNaif) || (!m_naifKeywords->hasKeyword("BODY_FRAME_CODE"))) && !isUsingAle()) {
         char frameName[32];
         SpiceBoolean found;
         cidfrm_c(*m_spkBodyCode, sizeof(frameName), &frameCode, frameName, &found);
@@ -701,7 +701,7 @@ namespace Isis {
           cacheSize);
       if (cacheSize > 3) m_instrumentPosition->Memcache2HermiteCache(tol);
     }
-    else if (m_instrumentPosition->GetSource() == SpicePosition::Memcache) {
+    else if (m_instrumentPosition->GetSource() == SpicePosition::Memcache && m_instrumentPosition->HasVelocity() && isUsingAle()) {
       int aleCacheSize = m_instrumentPosition->cacheSize();
       if (aleCacheSize > 3) {
         m_instrumentPosition->Memcache2HermiteCache(tol);
