@@ -110,10 +110,6 @@ def create_rclone_arguments(destination, mission_name, ntransfers=10, rclone_kwa
     if source_type == "naifKernels":
         destination = os.path.join(destination, "kernels")
 
-    # if not os.path.exists(destination) and dry_run==False:
-    #    log.debug("{destination} does not exist, making directory")
-    #    os.makedirs(destination)
-
     extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
 
     extra_args.extend(rclone_kwargs)
