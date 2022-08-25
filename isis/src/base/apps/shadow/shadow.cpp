@@ -118,6 +118,7 @@ namespace Isis {
     int ns = demCube->sampleCount();
     int nl = demCube->lineCount();
     int nb = demCube->bandCount();
+    std::cout << ns << ", " << nl << ", "<< nb << std::endl;
     Cube *outputCube = p.SetOutputCube(ui.GetCubeName("TO"), atts, ns, nl, nb);
 
     p.ProcessCube(functor, false);
