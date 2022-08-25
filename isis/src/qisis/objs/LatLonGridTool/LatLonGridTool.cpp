@@ -9,14 +9,15 @@ find files of those names at the top level of this repository. **/
 #include "LatLonGridTool.h"
 
 #include <QAction>
-#include <QApplication>
 #include <QPixmap>
 #include <QStackedWidget>
+#include <QHBoxLayout>
+#include <QCheckBox>
 #include <QPainter>
 
 #include "MdiCubeViewport.h"
 #include "ToolPad.h"
-#include "Workspace.h"
+#include "Camera.h"
 
 
 namespace Isis {
@@ -24,8 +25,6 @@ namespace Isis {
    * Constructs an LatLonGridTool object.
    *
    * @param parent Parent widget
-   *
-   *
    */
   LatLonGridTool::LatLonGridTool(QWidget *parent) : Tool(parent) {
   }
@@ -52,35 +51,6 @@ namespace Isis {
   }
 
   /**
-   * Draws grid onto cube viewport
-   * This is overiding the parents paintViewport member.
-   *
-   * @param vp Pointer to Viewport to be painted
-   * @param painter
-   */
-  void LatLonGridTool::paintViewport(MdiCubeViewport *mvp, QPainter *painter) {
-      drawLatLonGrid (mvp, painter);
-  }
-
-  /**
-   * Draws grid
-   * @param vp Viewport whose measurements will be drawn
-   * @param painter
-   */
-  void LatLonGridTool::drawLatLonGrid(MdiCubeViewport *mvp, QPainter *painter) {
-    double samp = 100;
-    double line = 100;
-    int x, y;
-    mvp->cubeToViewport(samp, line, x, y);
-    QBrush brush(Qt::gray);
-    QPen pen(brush, 2);
-
-    painter->setPen(pen);
-    // TODO: draw grid lines based on lat lons
-    painter->drawLine(20, 120, 250, 120);
-  }
-
-  /**
    * Creates the toolbar containing the lat-lon grid tool widgets
    *
    * @param active  input  The widget that will contain the lat-lon grid tool
@@ -91,8 +61,68 @@ namespace Isis {
   QWidget *LatLonGridTool::createToolBarWidget(QStackedWidget *active) {
     QWidget *container = new QWidget(active);
     container->setObjectName("LatLonGridToolActiveToolBarWidget");
+    m_gridCheckBox = new QCheckBox;
+    m_gridCheckBox->setText("Show Grid");
+
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->setMargin(0);
+    layout->addWidget(m_gridCheckBox);
+    layout->addStretch(1);
+    container->setLayout(layout);
 
     m_container = container;
     return container;
+  }
+
+  /**
+   * Draws grid onto cube viewport
+   * This is overiding the parents paintViewport member.
+   *
+   * @param vp Pointer to Viewport to be painted
+   * @param painter
+   */
+  void LatLonGridTool::paintViewport(MdiCubeViewport *mvp, QPainter *painter) {
+    int x1, x2, y1, y2;
+    double lat, lon;
+    QFont font;
+    QBrush brush(Qt::gray);
+    QPen pen(brush, 1);
+
+    // Only draws if "Show Grid" checkbox is checked
+    if (m_gridCheckBox->isChecked()) {
+      painter->setPen(pen);
+      font.setPixelSize(8);
+      painter->setFont(font);
+
+      // Draws Longitude Lines
+      for (int i = 0; i < mvp->cubeSamples(); i += mvp->cubeSamples() / 12) {
+        if (mvp->camera() != NULL && mvp->camera()->SetImage(i, 0)) {
+            lon = mvp->camera()->UniversalLongitude();
+
+            lon = ceil(lon * 100.0) / 100.0;
+
+            mvp->cubeToViewport(i, 0, x1, y1);
+            mvp->cubeToViewport(0, mvp->cubeLines(), x2, y2);
+            painter->drawLine(x1, y1, x1, y2);
+
+            painter->drawText(x1, y2, toString(lon));
+        }
+      }
+
+      // Draws Latitude Lines
+      for (int i = 0; i < mvp->cubeLines(); i += mvp->cubeLines() / 12) {
+        if (mvp->camera() != NULL && mvp->camera()->SetImage(0, i)) {
+            lat = mvp->camera()->UniversalLatitude();
+
+            lat = ceil(lat * 100.0) / 100.0;
+
+            mvp->cubeToViewport(0, i, x1, y1);
+            mvp->cubeToViewport(mvp->cubeSamples(), 0, x2, y2);
+            painter->drawLine(x1, y1, x2, y1);
+
+            painter->drawText(x2, y1, toString(lat));
+        }
+      }
+    }
   }
 }

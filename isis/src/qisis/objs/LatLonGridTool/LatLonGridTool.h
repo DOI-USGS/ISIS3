@@ -14,10 +14,12 @@ find files of those names at the top level of this repository. **/
 
 #include <QMap>
 #include <QStack>
+#include <QPointer>
 
 
 class QToolButton;
 class QPainter;
+class QCheckBox;
 
 namespace Isis {
   class MdiCubeViewport;
@@ -47,7 +49,7 @@ namespace Isis {
 
     private:
       QWidget *m_container;
-      void drawLatLonGrid (MdiCubeViewport *mvp,QPainter *painter);
+      QPointer<QCheckBox> m_gridCheckBox;
   };
 };
 
