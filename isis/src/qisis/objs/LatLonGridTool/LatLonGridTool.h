@@ -40,12 +40,12 @@ namespace Isis {
 
     public:
       LatLonGridTool(QWidget *parent);
-      void addTo(ToolPad *toolpad);
       void paintViewport(MdiCubeViewport *mvp, QPainter *painter);
 
     protected:
       QAction *toolPadAction(ToolPad *pad);
       QWidget *createToolBarWidget(QStackedWidget *active);
+      void updateTool();
 
     private:
       QWidget *m_container;

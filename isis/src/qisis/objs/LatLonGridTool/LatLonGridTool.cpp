@@ -61,6 +61,7 @@ namespace Isis {
   QWidget *LatLonGridTool::createToolBarWidget(QStackedWidget *active) {
     QWidget *container = new QWidget(active);
     container->setObjectName("LatLonGridToolActiveToolBarWidget");
+
     m_gridCheckBox = new QCheckBox;
     m_gridCheckBox->setText("Show Grid");
 
@@ -123,6 +124,20 @@ namespace Isis {
             painter->drawText(x2, y1, toString(lat));
         }
       }
+    }
+    else {
+      mvp = cubeViewport();
+    }
+  }
+
+  void LatLonGridTool::updateTool() {
+    MdiCubeViewport *vp = cubeViewport();
+
+    if (vp->camera() == NULL) {
+        m_gridCheckBox->setEnabled(false);
+    }
+    else {
+        m_gridCheckBox->setEnabled(true);
     }
   }
 }
