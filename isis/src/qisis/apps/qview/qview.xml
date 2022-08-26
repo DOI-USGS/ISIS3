@@ -266,5 +266,8 @@
     <change name="Summer Stapleton" date="2018-03-14">
       Included documentation for Spatial Plot Tool in this .xml. References #5281.
     </change>
+    <change name="Amy Stamile" date="2022-08-26">
+      Added latitude and longtitude grid display.
+    </change>
   </history>
 </application>

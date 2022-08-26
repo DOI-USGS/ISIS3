@@ -85,6 +85,7 @@ namespace Isis {
   void LatLonGridTool::paintViewport(MdiCubeViewport *mvp, QPainter *painter) {
     int x1, x2, y1, y2;
     double lat, lon;
+
     QFont font;
     QBrush brush(Qt::gray);
     QPen pen(brush, 1);
@@ -96,8 +97,9 @@ namespace Isis {
       painter->setFont(font);
 
       // Draws Longitude Lines
-      for (int i = 0; i < mvp->cubeSamples(); i += mvp->cubeSamples() / 12) {
-        if (mvp->camera() != NULL && mvp->camera()->SetImage(i, 0)) {
+      for (int i = mvp->cubeSamples(); i > 0; i -= mvp->cubeSamples() / 12) {
+        if (mvp->camera() != NULL) {
+            mvp->camera()->SetImage(i, 0);
             lon = mvp->camera()->UniversalLongitude();
 
             lon = ceil(lon * 100.0) / 100.0;
@@ -106,13 +108,14 @@ namespace Isis {
             mvp->cubeToViewport(0, mvp->cubeLines(), x2, y2);
             painter->drawLine(x1, y1, x1, y2);
 
-            painter->drawText(x1, y2, toString(lon));
+            painter->drawText(x1, y2 + 10, toString(lon));
         }
       }
 
       // Draws Latitude Lines
-      for (int i = 0; i < mvp->cubeLines(); i += mvp->cubeLines() / 12) {
-        if (mvp->camera() != NULL && mvp->camera()->SetImage(0, i)) {
+      for (int i = mvp->cubeLines(); i > 0; i -= mvp->cubeLines() / 12) {
+        if (mvp->camera() != NULL) {
+            mvp->camera()->SetImage(0, i);
             lat = mvp->camera()->UniversalLatitude();
 
             lat = ceil(lat * 100.0) / 100.0;
@@ -121,15 +124,19 @@ namespace Isis {
             mvp->cubeToViewport(mvp->cubeSamples(), 0, x2, y2);
             painter->drawLine(x1, y1, x2, y1);
 
-            painter->drawText(x2, y1, toString(lat));
+            painter->drawText(x2 + 5, y1, toString(lat));
         }
       }
     }
+    // remove grid by updating viewport to original cubeViewport
     else {
       mvp = cubeViewport();
     }
   }
 
+  /**
+   * Enables/Disable grid option tool based on camera model
+   */
   void LatLonGridTool::updateTool() {
     MdiCubeViewport *vp = cubeViewport();
 
