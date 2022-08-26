@@ -150,8 +150,8 @@ TEST_F(DefaultCube, FunctionalTestCamstatsFlat) {
       EXPECT_PRED_FORMAT2(AssertQStringsEqual, fields.value(2), "LatitudeMaximum");
     }
     else if(lineNumber == 1) {
-      EXPECT_NEAR(fields.value(2).toDouble(), 10.434709753, 1e-8);
-      EXPECT_NEAR(fields.value(1).toDouble(), 9.928647987, 1e-8);
+      EXPECT_NEAR(fields.value(2).toDouble(), 10.434709879, 1e-8);
+      EXPECT_NEAR(fields.value(1).toDouble(), 9.928647861, 1e-8);
     }
     lineNumber++;
   }

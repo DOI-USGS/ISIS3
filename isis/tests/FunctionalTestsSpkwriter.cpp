@@ -135,7 +135,8 @@ TEST_F(DefaultCube, FunctionalTestSpkwriterFromlist) {
 TEST_F(ObservationPair, FunctionalTestSpkwriterCantValidate) {
   Pvl appLog;
   QVector<QString> args = {"fromlist=" + cubeListFile,
-                           "to=" + tempDir.path() + "/newKernel.bsp"};
+                           "to=" + tempDir.path() + "/newKernel.bsp",
+                           "type=9"};
 
   UserInterface options(APP_XML, args);
   try {
@@ -151,6 +152,7 @@ TEST_F(ObservationPair, FunctionalTestSpkwriterWarnValidate) {
   Pvl appLog;
   QVector<QString> args = {"fromlist=" + cubeListFile,
                            "to=" + tempDir.path() + "/newKernel.bsp",
+                           "type=9",
                            "overlap=warn"};
 
   UserInterface options(APP_XML, args);
