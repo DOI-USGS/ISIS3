@@ -1734,11 +1734,12 @@ TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
                             "twist=yes",
                             "camera_angles_sigma=2.",
                             "update=yes",
+                            "overhermite=true",
                             "bundleout_txt=yes",
-                            "cnet="+controlNetPath,
-                            "fromlist="+cubeListFile,
-                            "onet="+tempDir.path()+"/no_lidar.net",
-                            "file_prefix="+tempDir.path()+"/no_lidar"};
+                            "cnet=" + controlNetPath,
+                            "fromlist=" + cubeListFile,
+                            "onet=" + tempDir.path() + "/no_lidar.net",
+                            "file_prefix=" + tempDir.path() + "/no_lidar"};
 
   UserInterface ui1(APP_XML, args1);
   jigsaw(ui1);
@@ -1752,14 +1753,15 @@ TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
                             "twist=yes",
                             "camera_angles_sigma=2.",
                             "update=yes",
+                            "overhermite=true",
                             "SIGMA0=0.00001",
                             "bundleout_txt=yes",
-                            "cnet="+controlNetPath,
-                            "fromlist="+cubeListFileCopy,
-                            "onet="+tempDir.path()+"/lidar.net",
-                            "file_prefix="+tempDir.path()+"/lidar",
-                            "lidardata="+lidarDataPath,
-                            "olidardata="+tempDir.path()+"/lidar_out.json",
+                            "cnet=" + controlNetPath,
+                            "fromlist=" + cubeListFileCopy,
+                            "onet=" + tempDir.path() + "/lidar.net",
+                            "file_prefix=" + tempDir.path() + "/lidar",
+                            "lidardata=" + lidarDataPath,
+                            "olidardata=" + tempDir.path() + "/lidar_out.json",
                             "olidarformat=json",
                             "lidar_csv=yes"};
 

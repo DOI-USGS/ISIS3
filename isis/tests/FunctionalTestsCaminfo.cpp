@@ -282,10 +282,10 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
     EXPECT_NEAR(camstats.findKeyword("LocalRadiusMaximum"), 3413492.0662692, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("LocalRadiusAverage"), 3412205.8144925, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("LocalRadiusStandardDeviation"), 648.57630914361, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("NorthAzimuthMinimum"), 312.29940658572, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("NorthAzimuthMaximum"), 350.59781250682, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("NorthAzimuthMinimum"), 312.35223008738, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("NorthAzimuthMaximum"), 350.57900431316, 0.001);
     EXPECT_NEAR(camstats.findKeyword("NorthAzimuthAverage"), 332.96766151042, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("NorthAzimuthStandardDeviation"), 0.67383189468183, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("NorthAzimuthStandardDeviation"), 0.67037977027338, 0.001);
 
     EXPECT_TRUE(camobj.hasObject("IsisLabel"));
     EXPECT_TRUE(camobj.hasObject("Parameters"));

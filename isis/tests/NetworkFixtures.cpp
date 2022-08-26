@@ -360,6 +360,9 @@ namespace Isis {
   void LidarNetwork::SetUp() {
       LidarObservationPair::SetUp();
 
+      // Lidar Data file was generated from the following
+      // lrolola2isis from=../isis/tests/data/lidarObservationPair/lidarPoints.csv cubes=cubes.lis point_range_sigma=10 point_lat=10 point_rad=10 point_lon=10 pointid="Lidar????" outputtype=JSON to=lidarData.json
+      // Additionally the point Lidar0068 may need to be removed from a newly generated data file
       lidarDataPath = "data/LidarNetwork/lidarData.json";
       rangeData.read(lidarDataPath);
       controlNetPath = "data/LidarNetwork/network.pvl";
