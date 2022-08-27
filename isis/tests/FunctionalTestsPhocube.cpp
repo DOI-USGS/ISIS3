@@ -48,7 +48,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
 
   std::unique_ptr<Histogram> hist (cube.histogram(0));
   EXPECT_NEAR(hist->Average(), 85.320326568603519, .000001);
-  EXPECT_NEAR(hist->Sum(), 10665.040821075439, .000001);
+  EXPECT_NEAR(hist->Sum(), 10665.040761947632, .000001);
   EXPECT_EQ(hist->ValidPixels(), 125);
   EXPECT_NEAR(hist->StandardDeviation(), 90.340311076718081, .000001);
 
