@@ -61,10 +61,10 @@ TEST_F(DefaultCube, FunctionalTestCamstatsDefaultParameters) {
   EXPECT_NEAR( (double) group.findKeyword("ObliqueSampleResolutionStandardDeviation"), 0.21126193741980, 1e-8);
 
   group = appLog.findGroup("ObliqueLineResolution");
-  EXPECT_NEAR( (double) group.findKeyword("ObliqueResolutionMinimum"), 18.967773792077001, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("ObliqueResolutionMaximum"), 21.179427868487998, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("ObliqueResolutionAverage"), 19.550786868806998, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("ObliqueResolutionStandardDeviation"), 0.21126193741980, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("ObliqueLineResolutionMinimum"), 18.967773792077001, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("ObliqueLineResolutionMaximum"), 21.179427868487998, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("ObliqueLineResolutionAverage"), 19.550786868806998, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("ObliqueLineResolutionStandardDeviation"), 0.21126193741980, 1e-8);
 
   group = appLog.findGroup("ObliqueResolution");
   EXPECT_NEAR( (double) group.findKeyword("ObliqueResolutionMinimum"), 18.967773792077001, 1e-8);
