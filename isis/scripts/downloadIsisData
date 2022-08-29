@@ -188,11 +188,12 @@ if __name__ == '__main__':
         # download everything for tgo
         $ downloadIsisData tgo $ISISDATA
     
-        # download everythin except kernels with debug output
+        # download everything except kernels with debug output
         $ downloadIsisData all $ISISDATA --dry-run --exclude="kernels/**" -vv
         
         # download only cks and fks
-        $ downloadIsisData all $ISISDATA --include="{ck/**,fk/**}"''')
+        $ downloadIsisData all $ISISDATA --include="{ck/**,fk/**}" 
+    ''')
     parser = argparse.ArgumentParser(description = helpString,formatter_class=argparse.RawDescriptionHelpFormatter, usage=usageString)
     parser.add_argument('mission', help='mission for files to be downloaded. Use "all" to download everything, "legacybase" to download base data for ISIS<4.1.0.')
     parser.add_argument('dest', help='the destination to download files from source')
@@ -201,8 +202,6 @@ if __name__ == '__main__':
     parser.add_argument('--config', action='store', default=find_conf())
     args, kwargs = parser.parse_known_args()
     
-    print(kwargs)
-
     log_kwargs = {
       'format': '%(asctime)s %(levelname)-8s %(message)s',
       'level': log.WARN,
@@ -217,6 +216,7 @@ if __name__ == '__main__':
         log_kwargs['level'] = log.DEBUG
 
     log.basicConfig(**log_kwargs)
+    log.debug("Additional Args:", kwargs)
 
     main(args.mission, args.dest, os.path.expanduser(args.config), args.num_transfers, kwargs)
 
