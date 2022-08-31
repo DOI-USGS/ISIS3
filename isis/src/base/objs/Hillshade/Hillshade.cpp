@@ -7,7 +7,6 @@ find files of those names at the top level of this repository. **/
 #include "Hillshade.h"
 
 #include <algorithm>
-#include <iostream>
 
 #include <QDebug>
 #include <QObject>
@@ -231,7 +230,6 @@ namespace Isis {
     bool anySpecialPixels = false;
     for(int i = 0; i < input.size(); ++i) {
       if(IsSpecial(input[i])) {
-        std::cout << "special pixel " << input[i] << std::endl;
         anySpecialPixels = true;
       }
     }
