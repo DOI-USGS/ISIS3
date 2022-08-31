@@ -224,7 +224,6 @@ namespace Isis {
 
         // We need to calculate the direction of the light source (sun) relative to the surface
         //   point.
-        std::cout << "l/s: " << line << ", " << sample << std::endl;
         if (elevationModelProjection->SetWorld(sample + 1, line + 1)) {
           SurfacePoint startSurfacePoint(
               Latitude(elevationModelProjection->UniversalLatitude(), Angle::Degrees),
@@ -394,18 +393,15 @@ namespace Isis {
 
           Hillshade hillshade(azimuth, elevation, elevationModelProjection->Resolution());
 
-          // int sizex = 
 
-          Portal portal(3, 3, m_inputDem->pixelType(), -1.5, -1.5);
+          Portal portal(3, 3, m_inputDem->pixelType(), 0, 0);
           portal.SetPosition(sample, line, input.Band());
 
           if (!portal.CopyOverlapFrom(input)) {
-            std::cout << "oof" << std::endl;
             m_inputDem->read(portal);
           }
 
           double shadedValue = hillshade.shadedValue(portal);
-
           if (shadedValue > 0) {
             bool shadowed = m_enableShadowCalculations && couldBeShadowed &&
                 isShadowed(rayStartPointInBodyFixed, sample + 1, line + 1,
@@ -423,7 +419,6 @@ namespace Isis {
             }
           }
           else {
-            std::cout << "else shadow" << std::endl;
             m_shadowedByRayStats->AddData(0.0);
             output[bufferIndex] = Lrs;
           }
