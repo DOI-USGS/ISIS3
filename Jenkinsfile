@@ -16,7 +16,6 @@ pipeline {
         ISISDATA        =   '/astro_efs/isis_data'
         ISISTESTDATA    =   '/astro_efs/isis_testData'
         MALLOC_CHECK_   =   1
-        PATH            =   "${env.WORKSPACE}/install/bin:${env.PATH}"
         ISISROOT        =   "${env.WORKSPACE}/build"
         KAKADU_HEADERS  =   '/astro_efs/kakadu_7_9'
     }
@@ -27,7 +26,6 @@ pipeline {
                 sh '''
                 . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
                 echo "ISISROOT: ${ISISROOT}"
-                echo "CURRENT PATH: ${PATH}"
                 
                 conda create -y -n isis
                 conda activate isis > /dev/null
@@ -41,9 +39,6 @@ pipeline {
             }
         }
         stage('Build') {
-            environment {
-                ISIS_INSTALL_DIR = "${env.WORKSPACE}/install"
-            }
             steps {
                 sh '''
                 . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
@@ -54,16 +49,13 @@ pipeline {
                       -DKAKADU_INCLUDE_DIR=${KAKADU_HEADERS} \
                       -Dpybindings=OFF \
                       -DCMAKE_BUILD_TYPE=RELEASE \
-                      -DCMAKE_INSTALL_PREFIX=${ISIS_INSTALL_DIR} \
+                      -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} \
                       ../isis
                 ninja -j 8 install
                 '''
             }
         }
         stage('GTests') {
-            environment {
-                PATH = "${env.WORKSPACE}/install/bin:${env.PATH}"
-            }
             steps {
                 catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
                     sh '''
@@ -76,9 +68,6 @@ pipeline {
             }
         }
         stage('Unit Tests') {
-            environment {
-                PATH            =   "${env.WORKSPACE}/install/bin:${env.PATH}"
-            }
             steps {
                 catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
                     sh '''
@@ -91,9 +80,6 @@ pipeline {
             }
         }
         stage('App Tests') {
-            environment {
-                PATH            =   "${env.WORKSPACE}/install/bin:${env.PATH}"
-            }
             steps {
                 catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
                     sh '''
@@ -106,9 +92,6 @@ pipeline {
             }
         }
         stage('Module Tests') {
-            environment {
-                PATH            =   "${env.WORKSPACE}/install/bin:${env.PATH}"
-            }
             steps {
                 catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
                     sh '''
