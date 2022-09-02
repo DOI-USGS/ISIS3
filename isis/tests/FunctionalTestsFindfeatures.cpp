@@ -97,7 +97,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesGeomMatch) {
   lat = sp.GetLatitude();
   lon = sp.GetLongitude();
   EXPECT_DOUBLE_EQ(lat.planetocentric(), 0.028914626048514001);
-  EXPECT_DOUBLE_EQ(lon.positiveEast(), 0.0071459947198023958);
+  EXPECT_DOUBLE_EQ(lon.positiveEast(), 0.0071459947198023819);
 }
 
 
