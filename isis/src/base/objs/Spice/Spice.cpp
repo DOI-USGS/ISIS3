@@ -369,7 +369,13 @@ namespace Isis {
         storeValue("BODY_FRAME_CODE", 0, SpiceIntType, result);
       }
       else {
-        frameCode = getInteger("BODY_FRAME_CODE", 0);
+        try {
+          frameCode = getInteger("BODY_FRAME_CODE", 0);
+        }
+        catch(IException &e) {
+          QString msg = "Unable to read BODY_FRAME_CODE from naifkeywords group";
+          throw IException(IException::Io, msg, _FILEINFO_);
+        }
       }
 
       m_bodyRotation = new SpiceRotation(frameCode);
