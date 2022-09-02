@@ -798,8 +798,8 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   // BandBin Group
   PvlGroup &bandbin = panLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "PAN");
-  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 677.40);
-  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 231.5);
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 678.2);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 231.9);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143421");
 
   // Kernels Group
@@ -889,8 +889,8 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   // BandBin Group
   bandbin = nirLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "NIR");
-  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 940.2);
-  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 120.60);
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 939.3);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 121.8);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143423");
 
   // Kernels Group
@@ -980,8 +980,8 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   // BandBin Group
   bandbin = redLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "RED");
-  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 835.40);
-  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 98);
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 836);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 98.5);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143422");
 
   // Kernels Group
@@ -1072,8 +1072,8 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   // BandBin Group
   bandbin = bluLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "BLU");
-  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 497.40);
-  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 134.3);
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 494.8);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 133.6);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143424");
 
   // Kernels Group
@@ -1152,8 +1152,8 @@ TEST(TgoCassisModuleTests, TgoCassisIngestReingest) {
   // BandBin Group
   PvlGroup &bandbin = redLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "RED");
-  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 840);
-  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 100);
+  EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 836);
+  EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 98.5);
   EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143422");
 
   // Kernels Group
@@ -1547,8 +1547,8 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestColorMosaic) {
   std::istringstream bbss(R"(
     Group = BandBin
       FilterName = (RED, BLU, NIR, PAN)
-      Center     = (835.4, 497.4, 940.2, 677.4) <nm>
-      Width      = (98.0, 134.3, 120.6, 231.5) <nm>
+      Center     = (836.0, 494.8, 939.3, 678.2) <nm>
+      Width      = (98.5, 133.6, 121.8, 231.9) <nm>
       NaifIkCode = (-143422, -143424, -143423, -143421)
     End_Group
   )");
@@ -1714,8 +1714,8 @@ TEST_F(TgoCassisModuleKernels, TgoCassisMapProjectedReingested) {
   std::istringstream bbss(R"(
     Group = BandBin
       FilterName = RED
-      Center     = 840 <nm>
-      Width      = 100 <nm>
+      Center     = 836.0 <nm>
+      Width      = 98.5 <nm>
       NaifIkCode = -143422
     End_Group
   )");
@@ -1883,8 +1883,8 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleColorMosaicReingest) {
   std::istringstream bbss(R"(
     Group = BandBin
       FilterName = PAN
-      Center     = 675 <nm>
-      Width      = 250 <nm>
+      Center     = 678.2 <nm>
+      Width      = 231.9 <nm>
       NaifIkCode = -143421
     End_Group
   )");
@@ -2103,8 +2103,8 @@ TEST(TgoCassisModuleTests, TgoCassisUncontrolledSingleColorMosaic) {
   std::istringstream bbss(R"(
     Group = BandBin
       FilterName = PAN
-      Center     = 677.4 <nm>
-      Width      = 231.5 <nm>
+      Center     = 678.2 <nm>
+      Width      = 231.9 <nm>
       NaifIkCode = -143421
     End_Group
   )");
@@ -2711,8 +2711,8 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   std::istringstream sss(R"(
     Group = Stitch
       OriginalFilters    = (NIR, RED, BLU, PAN)
-      FilterCenters      = (940.2, 835.4, 497.4, 677.4)
-      FilterWidths       = (120.6, 98.0, 134.3, 231.5)
+      FilterCenters      = (939.3, 836.0, 494.8, 678.2)
+      FilterWidths       = (121.8, 98.5, 133.6, 231.9)
       FilterIkCodes      = (-143423, -143422, -143424, -143421)
       FilterStartSamples = (0.0, 0.0, 1024.0, 0.0)
       FilterSamples      = (2048, 2048, 64, 2048)
@@ -2729,6 +2729,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   sss >> truthStitchGroup;
 
   PvlGroup &stitchGroup = outLabel->findGroup("Stitch", Pvl::Traverse);
+  std::cout << stitchGroup << std::endl;
 
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, stitchGroup, truthStitchGroup);
 
