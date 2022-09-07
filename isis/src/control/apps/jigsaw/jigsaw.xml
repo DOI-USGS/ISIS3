@@ -35,7 +35,7 @@
       includes the initial state of the points in the network and their final state after the
       adjustment.  The initial states of the points are tagged as <def>a priori</def> in the
       <def>control network</def>, and their final states are tagged as <def>adjusted</def>.
-      Updated camera information is only written to the <def>cube</def> labels is if the bundle
+      Updated camera information is only written to the <def>cube</def> labels if the bundle
       converges and the <b>UPDATE</b> parameter is selected.
     </p>
 
@@ -110,7 +110,7 @@
       based on the dataset and which parameters are being solved for. If the a-priori parameter
       values are sufficiently far away from a minimum, the updates can even diverge. So,
       it is important to check your input data set and solve options. Tools like the
-      <b>cnetcheck</b> application and <b>jigsaw</b>> options like <b>OUTLIER_REJECTION</b> can help.
+      <b>cnetcheck</b> application and <b>jigsaw</b> options like <b>OUTLIER_REJECTION</b> can help.
     </p>
     <p>
       As with all iterative methods convergence criteria is important. The default for
@@ -159,7 +159,7 @@
       you hold the instrument position fixed and only solve for the instrument pointing.
       This is because without ground control, the instrument position and pointing can
       become correlated and there will be multiple minimums for the observation equations.
-      We recommend holding the instrument position fixed becaue a-priori data for it generally is more
+      We recommend holding the instrument position fixed because a-priori data for it generally is more
       accurate than the instrument pointing.
     </p>
 
@@ -198,7 +198,7 @@
       the <b>CKDEGREE</b> parameter to the degree of the polynomial you want to fit over the original
       pointing values and set the <b>CKSOLVEDEGREE</b> parameter to the degree of the polynomial you want
       to solve for. Setting the <b>SPSOLVE</b>, <b>SPKDEGREE</b>, and <b>SPKSOLVEDEGREE</b> parameters
-      in a similar way adjusts the polynomial for postion values in the same way.
+      in a similar fashion gives fine control over the polynomial for postion values.
       For example, if you want to fit a 3rd degree polynomial for the position values
       and then solve for a 5th degree polynomial set <b>SPSOLVE</b> to ALL, <b>SPKDEGREE</b> to 3,
       and <b>SPKSOLVEDEGREE</b> to 5.
@@ -249,7 +249,9 @@
       position you would enter <b>CAMERA_ANGLES_SIGMA</b> and <b>CAMERA_ANGULAR_VELOCITY_SIGMA</b>.
       Finding initial values for these sigmas is challenging as SPICE does not have a way to specify them.
       Some teams will publish uncertainties for their SPK and CK solutions in separate documentation or
-      the kernel comments, the commnt utility will read the comments on a kernel file. The velocity
+      the kernel comments, the
+      <a href="https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/ug/commnt.html">commnt</a> utility
+      will read the comments on a kernel file. The velocity
       and acceleration sigmas are in meters per second and meters per second squared respectively
       (degrees per second and degrees per second squared for angles). So, the velocity sigma will
       generally be smaller than the position sigma and the acceleration sigma will be smaller than
@@ -261,7 +263,7 @@
       parameter, you will get a-posteriori (updated) sigmas for each control point and camera parameter
       in your solution. This information is helpful for analyzing and communicating the quality of
       your solution. Computing the updated sigmas, imposes a significant computation and memory
-      overhead, so it is recommended that you enbale <b>ERRORPROPAGATION</b> parameter after you
+      overhead, so it is recommended that you enable <b>ERRORPROPAGATION</b> parameter after you
       have run bundle adjustment with all of your other settings and gotten a satisfactory result.
     </p>
 
@@ -272,7 +274,7 @@
       need to manually specify the camera parameters to solve for. This is because the
       <a href="https://github.com/ngageoint/csm">CSM API</a> only exposes a
       generic camera parameter interface that may or may not be related to the physical state of the
-      sensor when an image was aquired. The <b>CSMSOLVELIST</b> option allows for an explicit list
+      sensor when an image was acquired. The <b>CSMSOLVELIST</b> option allows for an explicit list
       of model parameters. You can also use the <b>CSMSOLVESET</b> or <b>CSMSOLVEYPE</b> options
       to choose your parameters based on how they are labeled in the model.
     </p>
@@ -340,7 +342,7 @@
       This reduces the impact of poor control measures in a more targeted fashion than simple
       outlier rejection. In order to produce good results, though, a high density of control measures
       is required to approximate the true reprojective error probability distributions. Some of the
-      modules used with MLE can set a measure's sigma to infinty, effectively removing it from the
+      modules used with MLE can set a measure's sigma to infinity, effectively removing it from the
       solution. Similar to when using the <b>OUTLIER_REJECTION</b> parameter, this can create islands
       in your control network. If you are
       working with a large amount of data and want a robustness option that is more targeted and
@@ -386,7 +388,7 @@
       A rigorous development of how the <b>jigsaw</b> application works can be found
       in these
       <a href="https://earthsciences.osu.edu/sites/default/files/2019-12/OSU_Adjustment_Notes_Part_1.pdf">lecture notes</a>
-      from Ohio Sate University.
+      from Ohio State University.
     </p>
 
     <h3>Known Issues</h3>
@@ -418,7 +420,7 @@
       <p>
         With the current jigsaw implementation, it is NOT possible to individually
         solve for either the mean or triaxial radii as separate calculations in
-        the bundle adjustment. More specifically, the target body radii has no
+        the bundle adjustment. More specifically, the target body radii have no
         effect when solving for individual points and thus cannot be solved for in the bundle.
         A local radii solve is already part of the sequence of equations that <b>jigsaw</b>
         uses to compute various partial derivatives to populate the solve matrix.
