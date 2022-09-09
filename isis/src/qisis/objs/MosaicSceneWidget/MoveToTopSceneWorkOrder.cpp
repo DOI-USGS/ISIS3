@@ -1,4 +1,3 @@
-#include "IsisDebug.h"
 #include "MoveToTopSceneWorkOrder.h"
 
 #include "MosaicSceneWidget.h"

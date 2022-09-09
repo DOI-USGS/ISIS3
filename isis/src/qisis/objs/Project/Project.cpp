@@ -20,7 +20,6 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include "IsisDebug.h"
 #include "Project.h"
 
 #include <unistd.h>
@@ -3018,7 +3017,6 @@ namespace Isis {
         QString type = atts.value("type");
 
         m_workOrder = WorkOrderFactory::create(m_project, type);
-        ASSERT(m_workOrder->metaObject()->className() == type);
 
         m_workOrder->read(reader());
       }

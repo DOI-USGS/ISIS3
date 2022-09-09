@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "AbstractPointItem.h"
 
 #include <QDateTime>
@@ -79,7 +77,6 @@ namespace Isis {
         return "Jigsaw Rejected";
     }
 
-    ASSERT(0);
     return QString();
   }
 
@@ -154,7 +151,7 @@ namespace Isis {
   AbstractPointItem::AbstractPointItem(ControlPoint *cp,
       int avgCharWidth, AbstractTreeItem *parent)
     : AbstractTreeItem(parent) {
-    ASSERT(cp);
+
     m_point = cp;
     calcDataWidth(avgCharWidth);
 
@@ -295,7 +292,6 @@ namespace Isis {
           m_point->SetIgnored(newData == "Yes");
           break;
         case Reference:
-          ASSERT(m_point->HasSerialNumber(newData));
           m_point->SetRefMeasure(newData);
           break;
         case AdjustedSPLat:

@@ -5,8 +5,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include <string>
 #include <iostream>
 #include <vector>
@@ -587,8 +585,7 @@ namespace Isis {
    *                       p_cubeSamps in ASSERT.
    */
   void ImagePolygon::calcImageBorderCoordinates() {
-    ASSERT(p_cube);
-
+    
     for (int line = p_cubeStartLine; !m_leftCoord && line <= p_cubeLines; line++) {
       for (int sample = p_cubeStartSamp; !m_leftCoord && sample <= p_cubeSamps; sample++) {
         if (SetImage(sample, line)) {

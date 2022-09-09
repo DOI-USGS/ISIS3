@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "ControlNet.h"
 
 #include <iostream>
@@ -752,9 +750,7 @@ namespace Isis {
    * @param measure The measure removed from the network.
    */
   void ControlNet::measureDeleted(ControlMeasure *measure) {
-    ASSERT(measure);
     QString serial = measure->GetCubeSerialNumber();
-    ASSERT(m_vertexMap.contains(serial));
 
     emit measureRemoved(measure);
 

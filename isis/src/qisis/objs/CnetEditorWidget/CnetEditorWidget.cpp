@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "CnetEditorWidget.h"
 
 #include <QAction>
@@ -305,7 +303,6 @@ namespace Isis {
    * Creates the menus, and options for the widget
    */
   void CnetEditorWidget::createActions() {
-    ASSERT(m_menuActions);
 
     QAction *freezeTablesAct = new QAction(QIcon(
         FileName("$ISISROOT/appdata/images/icons/ice.png").expanded()),
@@ -387,9 +384,6 @@ namespace Isis {
    * Creates filter widgets
    */
   void CnetEditorWidget::createFilterArea() {
-    ASSERT(m_pointModel);
-    ASSERT(m_imageModel);
-    ASSERT(m_connectionModel);
 
     FilterWidget *pointFilter = new FilterWidget("Points and Measures");
     if (m_pointModel) {
@@ -488,7 +482,6 @@ namespace Isis {
         "measure.  Each column in the table is an attribute of a control "
         "measure.<br/><br/>Rows with bold text are reference measures.  "
         "Cells that are gray are not editable.</html>");
-    ASSERT(m_pointTableView);
     connect(m_pointTableView,
         SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
         m_measureTableModel,
@@ -637,9 +630,6 @@ namespace Isis {
    * Reads the working version settings stored at the settings path
    */
   void CnetEditorWidget::readSettings() {
-    ASSERT(m_workingVersion);
-    ASSERT(m_settingsPath);
-    ASSERT(m_measureTableView);
 
     QSettings settings(*m_settingsPath, QSettings::NativeFormat);
     *m_workingVersion = settings.value("version", "").toString();
@@ -681,9 +671,6 @@ namespace Isis {
    * Writes the configuration settings used
    */
   void CnetEditorWidget::writeSettings() {
-    ASSERT(m_mainSplitter);
-    ASSERT(m_settingsPath);
-    ASSERT(m_measureTableView);
 
     QSettings settings(*m_settingsPath, QSettings::NativeFormat);
     settings.setValue("version", VERSION);
@@ -836,7 +823,6 @@ namespace Isis {
    * @return QMap< QAction *, QList< QString > > QMap of menu actions
    */
   QMap< QAction *, QList< QString > > CnetEditorWidget::menuActions() {
-    ASSERT(m_menuActions);
     return *m_menuActions;
   }
 
@@ -847,7 +833,6 @@ namespace Isis {
    * @return QMap< QAction *, QList< QString > > QMap of tool bar actions
    */
   QMap< QString, QList< QAction * > > CnetEditorWidget::toolBarActions() {
-    ASSERT(m_toolBarActions);
     return *m_toolBarActions;
   }
 

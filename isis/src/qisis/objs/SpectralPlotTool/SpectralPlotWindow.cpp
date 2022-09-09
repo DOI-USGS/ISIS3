@@ -1,5 +1,3 @@
-#include "IsisDebug.h"
-
 #include "SpectralPlotWindow.h"
 
 #include <QAction>

@@ -1,5 +1,3 @@
-#include "IsisDebug.h"
-
 #include "PlotCurve.h"
 
 #include <iostream>
@@ -248,7 +246,6 @@ namespace Isis {
       }
 
       setData(new QwtPointSeriesData(plotDataValues));
-      ASSERT(dataPos <= classData.size());
 
       return classData.right(classData.size() - dataPos);
     }

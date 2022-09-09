@@ -231,8 +231,6 @@ void RemoveSeam(Buffer &out, int framelet, int band,
         // Use optimization!
         offsetSample = frameletOffsetsForBand[optimizeIndex].SampleOffset();
         offsetLine = frameletOffsetsForBand[optimizeIndex].LineOffset();
-
-        ASSERT(frameletOffsetsForBand[optimizeIndex].Sample() == sample);
       }
       // There is no pre-calculated translation, calculate it
       else if(badCam->SetImage(sample, badLine)) {

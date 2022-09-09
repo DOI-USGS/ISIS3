@@ -1,5 +1,3 @@
-#include "IsisDebug.h"
-
 #include "Tab.h"
 
 //#include <iostream>
@@ -26,8 +24,6 @@ namespace Isis
     setCheckable(true);
 
     connect(this, SIGNAL(triggered()), this, SLOT(handleTriggered()));
-
-    ASSERT_PTR(associatedWidget);
   }
 
 

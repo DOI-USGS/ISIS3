@@ -9,8 +9,6 @@ find files of those names at the top level of this repository. **/
 #error *****Isis.h MUST be included before any other files!*****
 #endif
 
-#include "IsisDebug.h"
-
 #include <signal.h>
 
 #include <QCoreApplication>
@@ -99,13 +97,6 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-#ifdef CWDEBUG
-  startMonitoringMemory();
-  signal(SIGSEGV, SegmentationFault);
-  signal(SIGABRT, Abort);
-  signal(SIGINT, InterruptSignal);
-#endif
-
   Isis::Application::p_applicationForceGuiApp  = false;
 
 #ifdef USE_GUI_QAPP
@@ -119,73 +110,3 @@ int main(int argc, char *argv[]) {
   delete QCoreApplication::instance();
   return status;
 }
-
-#ifdef CWDEBUG
-void startMonitoringMemory() {
-#ifndef NOMEMCHECK
-  MyMutex *mutex = new MyMutex();
-  std::fstream *alloc_output = new std::fstream("/dev/null");
-  Debug(make_all_allocations_invisible_except(NULL));
-  ForAllDebugChannels(if(debugChannel.is_on()) debugChannel.off());
-  Debug(dc::malloc.on());
-  Debug(libcw_do.on());
-  Debug(libcw_do.set_ostream(alloc_output));
-  Debug(libcw_do.set_ostream(alloc_output, mutex));
-  atexit(stopMonitoringMemory);
-#endif
-}
-
-
-void stopMonitoringMemory() {
-#ifndef NOMEMCHECK
-  Debug(
-    alloc_filter_ct alloc_filter;
-    std::vector<std::string> objmasks;
-    objmasks.push_back("libc.so*");
-    objmasks.push_back("libstdc++*");
-    std::vector<std::string> srcmasks;
-    srcmasks.push_back("*new_allocator.h*");
-    srcmasks.push_back("*set_ostream.inl*");
-    alloc_filter.hide_objectfiles_matching(objmasks);
-    alloc_filter.hide_sourcefiles_matching(srcmasks);
-    alloc_filter.hide_unknown_locations();
-    delete libcw_do.get_ostream();
-    libcw_do.set_ostream(&std::cout);
-    list_allocations_on(libcw_do, alloc_filter);
-    dc::malloc.off();
-    libcw_do.off()
-  );
-#endif
-}
-
-
-void SegmentationFault(int) {
-  std::vector<std::string> currentStack;
-  StackTrace::GetStackTrace(&currentStack);
-
-  std::cerr << "Segmentation Fault" << std::endl;
-  for(unsigned int i = 1; i < currentStack.size(); i++) {
-    std::cerr << currentStack[i] << std::endl;
-  }
-
-  exit(1);
-}
-
-void Abort(int) {
-  std::vector<std::string> currentStack;
-  StackTrace::GetStackTrace(&currentStack);
-
-  std::cerr << "Abort" << std::endl;
-  for(unsigned int i = 1; i < currentStack.size(); i++) {
-    std::cerr << currentStack[i] << std::endl;
-  }
-
-  exit(1);
-}
-
-
-void InterruptSignal(int) {
-  exit(1);
-}
-
-#endif

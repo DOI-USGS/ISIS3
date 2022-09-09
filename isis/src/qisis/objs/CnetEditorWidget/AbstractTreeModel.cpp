@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "AbstractTreeModel.h"
 
 #include <algorithm>
@@ -43,7 +41,6 @@ find files of those names at the top level of this repository. **/
 namespace Isis {
   AbstractTreeModel::AbstractTreeModel(ControlNet *controlNet, TreeView *v,
       QObject *parent) : QObject(parent), m_view(v), m_cNet(controlNet) {
-    ASSERT(m_cNet);
 
     m_filterWatcher = NULL;
     m_rebuildWatcher = NULL;
@@ -148,7 +145,6 @@ namespace Isis {
       }
 
       while ((row < end || grabToEnd) && listStillValid && currentItem) {
-        ASSERT(currentItem);
         foundItems.append(currentItem);
         listStillValid = (currentItem != lastVisibleFilteredItem ||
             currentItem == currentItem->parent()->getLastVisibleChild());
@@ -232,8 +228,6 @@ namespace Isis {
   QList< AbstractTreeItem * > AbstractTreeModel::getSelectedItems(
     InterestingItemsFlag flags, bool ignoreExpansion) {
     QList< AbstractTreeItem * > selectedItems;
-
-    ASSERT(rootItem);
 
     if (!isFiltering()) {
       AbstractTreeItem *currentItem = rootItem->getFirstVisibleChild();
@@ -373,7 +367,6 @@ namespace Isis {
 
 
   void AbstractTreeModel::clear() {
-    ASSERT(rootItem);
 
     delete rootItem;
     rootItem = NULL;
@@ -577,7 +570,6 @@ namespace Isis {
     RootItem *newRoot = newRootPtr.loadAcquire();
 
     if (newRoot && newRoot->childCount()) {
-      ASSERT(rootItem);
       delete rootItem;
       rootItem = NULL;
       rootItem = newRoot;

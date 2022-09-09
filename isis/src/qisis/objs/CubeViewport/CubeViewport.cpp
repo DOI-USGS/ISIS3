@@ -6,7 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
 #include "CubeViewport.h"
 
 #include <iomanip>
@@ -2422,8 +2421,6 @@ namespace Isis {
 
 
   CubeStretch CubeViewport::BandInfo::getStretch() const {
-    ASSERT_PTR(stretch);
-
     return *stretch;
   }
 
@@ -2435,7 +2432,6 @@ namespace Isis {
 
   const CubeViewport::BandInfo &CubeViewport::BandInfo::operator=(
     CubeViewport::BandInfo other) {
-    ASSERT_PTR(other.stretch);
 
     stretch = NULL;
     stretch = new CubeStretch;

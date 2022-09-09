@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "FilterGroup.h"
 
 #include <QButtonGroup>
@@ -192,7 +190,6 @@ namespace Isis {
 
 
   void FilterGroup::addSelector(AbstractFilterSelector *newSelector) {
-    ASSERT(newSelector);
 
     if (newSelector) {
       connect(newSelector, SIGNAL(close(AbstractFilterSelector *)),
@@ -246,9 +243,6 @@ namespace Isis {
 
 
   FilterGroup &FilterGroup::operator=(FilterGroup other) {
-    ASSERT(m_filterType);
-    ASSERT(m_selectors);
-    ASSERT(m_buttonGroup);
 
     // create temporary list of new selectors
     QList< AbstractFilterSelector * > newSelectors;
@@ -311,8 +305,6 @@ namespace Isis {
     bool (AbstractFilter::*hasFilterMeth)() const,
     QString(AbstractFilter::*descriptionMeth)() const) const {
     QString description;
-
-    ASSERT(m_selectors);
 
     QList< AbstractFilterSelector * > selectorsWithFilters;
     for (int i = 0; i < m_selectors->size(); i++)

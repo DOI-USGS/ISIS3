@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "ChipViewport.h"
 
 #include <iostream>
@@ -146,8 +144,6 @@ namespace Isis {
    * @param cvp Pointer to the cube viewport to apply the stretch to
    */
   void ChipViewport::stretchFromCubeViewport(Stretch *newStretch, CubeViewport *cvp) {
-
-    ASSERT(cvp != NULL);
 
     if (!cvp || !m_chipCube)
       return;

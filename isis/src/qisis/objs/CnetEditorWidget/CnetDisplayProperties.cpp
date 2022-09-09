@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "CnetDisplayProperties.h"
 
 #include <iostream>
@@ -153,7 +151,6 @@ namespace Isis {
    */
   QString CnetDisplayProperties::getImageName(QString cubeSerialNumber,
       bool forceFullPaths) const {
-    ASSERT(m_serialNumberToFileNameMap);
 
     QString imageName = cubeSerialNumber;
 
@@ -176,8 +173,6 @@ namespace Isis {
 
 
   QString CnetDisplayProperties::getSerialNumber(QString imageId) {
-    ASSERT(m_serialNumberToFileNameMap);
-
     QString sn = imageId;
 
     if (m_serialNumberToFileNameMap && useFileNames) {
