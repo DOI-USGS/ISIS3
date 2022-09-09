@@ -182,10 +182,6 @@ namespace Isis {
   bool Cube::isOpen() const {
     bool open = (m_ioHandler != NULL);
 
-    Q_ASSERT(open == (bool)m_labelFile);
-    Q_ASSERT(open == (bool)m_labelFileName);
-    Q_ASSERT(open == (bool)m_label);
-
     return open;
   }
 
