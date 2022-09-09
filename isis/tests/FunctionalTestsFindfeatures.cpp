@@ -79,8 +79,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesGeomMatch) {
   SurfacePoint sp = pt->GetAprioriSurfacePoint();
   Latitude lat = sp.GetLatitude();
   Longitude lon = sp.GetLongitude();
-  EXPECT_DOUBLE_EQ(lat.planetocentric(), 0.02581190071853327);
-  EXPECT_DOUBLE_EQ(lon.positiveEast(), 0.0012615643288328212);
+  EXPECT_DOUBLE_EQ(lat.planetocentric(), 0.025811899541941467);
+  EXPECT_DOUBLE_EQ(lon.positiveEast(), 0.0012615634743558179);
 
 
   // Control point with two measures
@@ -96,8 +96,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesGeomMatch) {
   sp = pt->GetAprioriSurfacePoint();
   lat = sp.GetLatitude();
   lon = sp.GetLongitude();
-  EXPECT_DOUBLE_EQ(lat.planetocentric(), 0.028914626182060754);
-  EXPECT_DOUBLE_EQ(lon.positiveEast(), 0.0071459825362942221);
+  EXPECT_DOUBLE_EQ(lat.planetocentric(), 0.028914626048514001);
+  EXPECT_DOUBLE_EQ(lon.positiveEast(), 0.0071459947198023819);
 }
 
 

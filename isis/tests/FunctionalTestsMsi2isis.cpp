@@ -293,8 +293,8 @@ TEST_F(TempTestingFiles, Msi2isisTestNearestNeighbor) {
 
   std::unique_ptr<Histogram> hist (cube.histogram());
 
-  EXPECT_NEAR(hist->Average(), 0.0090919593904032, .000001);
-  EXPECT_NEAR(hist->Sum(), 1481.6802540165, .0001);
+  EXPECT_NEAR(hist->Average(), 0.0090912713562279774, .000001);
+  EXPECT_NEAR(hist->Sum(), 1481.5681278390484, .0001);
   EXPECT_EQ(hist->ValidPixels(), 162966);
   EXPECT_EQ(hist->NullPixels(), 58278);
   EXPECT_NEAR(hist->StandardDeviation(), 0.013550997159207, .0001);
@@ -325,8 +325,8 @@ TEST_F(TempTestingFiles, Msi2isisTestBilinear) {
 
   std::unique_ptr<Histogram> hist (cube.histogram());
 
-  EXPECT_NEAR(hist->Average(), 0.009091271356228, .000001);
-  EXPECT_NEAR(hist->Sum(), 1481.568127839, .0001);
+  EXPECT_NEAR(hist->Average(), 0.0090912713562279774, .000001);
+  EXPECT_NEAR(hist->Sum(), 1481.5681278390484, .0001);
   EXPECT_EQ(hist->ValidPixels(), 162966);
   EXPECT_EQ(hist->NullPixels(), 58278);
   EXPECT_NEAR(hist->StandardDeviation(), 0.013542099831273, .0001);

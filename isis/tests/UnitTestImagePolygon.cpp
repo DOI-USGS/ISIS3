@@ -90,7 +90,7 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonCross) {
   geos::geom::Point* centroid = poly.Polys()->getCentroid();
 
   std::vector<double> lons = {0.000000, 360.000000, 360.000000, 0.000000, 0.000000};
-  std::vector<double> lats = {54.208706, 54.208706, 77.858556, 77.858556, 54.208706};
+  std::vector<double> lats = {54.208699, 54.208699, 77.858559, 77.858559, 54.208699};
 
   geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
   for (size_t i = 0; i < coordArray.getSize(); i++) {
@@ -98,8 +98,8 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonCross) {
     EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
 
-  EXPECT_NEAR(214.397933, centroid->getX(), 1e-6);
-  EXPECT_NEAR(67.471761, centroid->getY(), 1e-6);
+  EXPECT_NEAR(214.399354, centroid->getX(), 1e-6);
+  EXPECT_NEAR(67.471751, centroid->getY(), 1e-6);
 }
 
 TEST_F(DefaultCube, UnitTestImagePolygonBoundary) {
@@ -146,8 +146,8 @@ TEST_F(DefaultCube, UnitTestImagePolygonBoundary) {
   geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
   geos::geom::Point* centroid = poly.Polys()->getCentroid();
 
-  std::vector<double> lons = {222.252869, 262.514561, 262.514561, 222.252869, 222.252869};
-  std::vector<double> lats = {12.939325, 12.939325, 26.058469, 26.058469, 12.939325};
+  std::vector<double> lons = {222.252839, 262.514600, 262.514600, 222.252839, 222.252839};
+  std::vector<double> lats = {12.939321, 12.939321, 26.058448, 26.058448, 12.939321};
 
   geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
   for (size_t i = 0; i < coordArray.getSize(); i++) {
@@ -155,8 +155,8 @@ TEST_F(DefaultCube, UnitTestImagePolygonBoundary) {
     EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
 
-  EXPECT_NEAR(242.543845, centroid->getX(), 1e-6);
-  EXPECT_NEAR(19.733747, centroid->getY(), 1e-6);
+  EXPECT_NEAR(242.543860, centroid->getX(), 1e-6);
+  EXPECT_NEAR(19.733739, centroid->getY(), 1e-6);
 }
 
 TEST_F(TempTestingFiles, UnitTestImagePolygonMosaic) {
@@ -255,8 +255,8 @@ TEST_F(DefaultCube, UnitTestImagePolygonOutlier) {
   geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
   geos::geom::Point* centroid = poly.Polys()->getCentroid();
 
-  std::vector<double> lons = {194.815844, 269.631838, 269.631838, 194.815844, 194.815844};
-  std::vector<double> lats = {-66.783492, -66.783492, 5.718545, 5.718545, -66.783492};
+  std::vector<double> lons = {194.815808, 269.631838, 269.631838, 194.815808, 194.815808};
+  std::vector<double> lats = {-66.783521, -66.783521, 5.718550, 5.718550, -66.783521};
 
   geos::geom::CoordinateArraySequence coordArray = geos::geom::CoordinateArraySequence(*(boundary->getCoordinates()));
   for (size_t i = 0; i < coordArray.getSize(); i++) {
@@ -264,6 +264,6 @@ TEST_F(DefaultCube, UnitTestImagePolygonOutlier) {
     EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
 
-  EXPECT_NEAR(239.768831, centroid->getX(), 1e-6);
-  EXPECT_NEAR(-32.260171, centroid->getY(), 1e-6);
+  EXPECT_NEAR(239.768815, centroid->getX(), 1e-6);
+  EXPECT_NEAR(-32.260187, centroid->getY(), 1e-6);
 }
