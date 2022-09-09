@@ -394,7 +394,7 @@ namespace Isis {
           Hillshade hillshade(azimuth, elevation, elevationModelProjection->Resolution());
 
 
-          Portal portal(3, 3, m_inputDem->pixelType(), 0, 0);
+          Portal portal(3, 3, m_inputDem->pixelType(), -0.5, -0.5);
           portal.SetPosition(sample, line, input.Band());
 
           if (!portal.CopyOverlapFrom(input)) {
