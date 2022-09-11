@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "ImagePointTreeModel.h"
 
 #include <iostream>
@@ -84,10 +82,8 @@ namespace Isis {
     imageItem->moveToThread(m_targetThread);
     QList< ControlMeasure * > measures = m_controlNet->GetMeasuresInCube(imageSerial);
     for (int j = 0; j < measures.size(); j++) {
-      ASSERT(measures[j]);
       ControlPoint *point = measures[j]->Parent();
 
-      ASSERT(point);
       PointLeafItem *pointItem = new PointLeafItem(
         point, m_avgCharWidth, imageItem);
       pointItem->setSelectable(false);

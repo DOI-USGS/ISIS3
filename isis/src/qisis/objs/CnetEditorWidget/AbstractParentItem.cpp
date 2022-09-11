@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "AbstractParentItem.h"
 
 #include <QList>
@@ -46,14 +44,11 @@ namespace Isis {
 
 
   AbstractTreeItem *AbstractParentItem::childAt(int row) const {
-    ASSERT(m_children);
-    ASSERT(row >= 0 && row < m_children->size());
     return m_children->value(row);
   }
 
 
   QList< AbstractTreeItem * > AbstractParentItem::getChildren() const {
-    ASSERT(m_children);
     return *m_children;
   }
 
@@ -69,22 +64,16 @@ namespace Isis {
 
 
   int AbstractParentItem::indexOf(AbstractTreeItem *child) const {
-    ASSERT(child);
-    ASSERT(m_children);
     return m_children->indexOf(child);
   }
 
 
   int AbstractParentItem::childCount() const {
-    ASSERT(m_children);
     return m_children->size();
   }
 
 
   void AbstractParentItem::addChild(AbstractTreeItem *child) {
-    ASSERT(child);
-    ASSERT(m_children);
-    ASSERT(!dynamic_cast< RootItem * >(child));
 
     //     if (!m_firstVisibleChild && child->isVisible())
     //     {

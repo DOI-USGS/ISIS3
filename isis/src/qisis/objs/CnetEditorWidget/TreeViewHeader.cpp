@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "TreeViewHeader.h"
 
 #include <iostream>
@@ -32,8 +30,6 @@ namespace Isis {
   TreeViewHeader::TreeViewHeader(TreeViewContent *someContent,
       QWidget *parent) : QWidget(parent), m_content(someContent) {
     nullify();
-
-    ASSERT(m_content);
 
     m_headerText = new QString("Header text");
     m_filterProgress = 0;
@@ -69,13 +65,11 @@ namespace Isis {
   }
 
   QString TreeViewHeader::getText() {
-    ASSERT(m_headerText);
     return *m_headerText;
   }
 
 
   void TreeViewHeader::setText(QString text) {
-    ASSERT(m_headerText);
     *m_headerText = text;
     updateGeometry();
     update();

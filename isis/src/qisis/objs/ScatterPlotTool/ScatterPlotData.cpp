@@ -1,4 +1,3 @@
-#include "IsisDebug.h"
 #include "ScatterPlotData.h"
 
 #include <algorithm>
@@ -36,7 +35,6 @@ namespace Isis {
       m_alarmedBins(new QMap<int, bool>) {
     int startLine = qRound(lineRange.minValue());
     int endLine = qRound(lineRange.maxValue());
-    ASSERT(xCube->lineCount() == yCube->lineCount());
 
     ImageHistogram *xCubeHist = new ImageHistogram(*xCube, xCubeBand, NULL,
         sampleRange.minValue(), lineRange.minValue(),
@@ -66,8 +64,6 @@ namespace Isis {
                  1, 1, xCube->pixelType());
     Brick brick2((int)(sampleRange.maxValue() - sampleRange.minValue() + 1),
                  1, 1, yCube->pixelType());
-    ASSERT(xCube->sampleCount() == yCube->sampleCount());
-    ASSERT(brick1.size() == brick2.size());
 
     for (int line = startLine; line <= endLine; line++) {
       brick1.SetBasePosition(qRound(sampleRange.minValue()), line, xCubeBand);

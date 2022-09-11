@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-//Isis.h and IsisDebug.h if needed
-
 
 //C++ standard libraries if needed
 #include <math.h>

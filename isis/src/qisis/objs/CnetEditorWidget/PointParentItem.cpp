@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "PointParentItem.h"
 
 #include "MeasureLeafItem.h"
@@ -25,9 +23,6 @@ namespace Isis {
 
 
   void PointParentItem::addChild(AbstractTreeItem *child) {
-    // Only MeasureLeafItems should be children of PointParentItems
-    ASSERT(dynamic_cast< MeasureLeafItem * >(child));
-
     AbstractParentItem::addChild(child);
   }
 }

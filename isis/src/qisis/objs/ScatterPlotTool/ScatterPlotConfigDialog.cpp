@@ -1,4 +1,3 @@
-#include "IsisDebug.h"
 #include "ScatterPlotConfigDialog.h"
 
 #include <qwt_interval.h>
@@ -495,7 +494,6 @@ namespace Isis {
     if (m_useViewportRangesCheckBox->isChecked()) {
       MdiCubeViewport * container = xAxisCubeViewport();
       if (!container && xAxisCube()) {
-        ASSERT(0);
         sampleRange.setInterval(1.0, xAxisCube()->sampleCount());
         lineRange.setInterval(1.0, xAxisCube()->lineCount());
       }

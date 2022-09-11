@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "AbstractMeasureItem.h"
 
 #include <QMessageBox>
@@ -76,7 +74,6 @@ namespace Isis {
         return "Residual Magnitude";
     }
 
-    ASSERT(0);
     return QString();
   }
 
@@ -144,7 +141,7 @@ namespace Isis {
   AbstractMeasureItem::AbstractMeasureItem(ControlMeasure *cm,
       int avgCharWidth, AbstractTreeItem *parent)
     : AbstractTreeItem(parent) {
-    ASSERT(cm);
+
     m_measure = cm;
     calcDataWidth(avgCharWidth);
 
@@ -409,7 +406,6 @@ namespace Isis {
 
   void AbstractMeasureItem::setLogData(ControlMeasure *m_measure,
       int m_measureLogDataEnum, const QString &value) {
-    ASSERT(m_measure);
 
     QString newDataStr = value.toLower();
     ControlMeasureLogData::NumericLogDataType type =

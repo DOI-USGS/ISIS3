@@ -1,4 +1,3 @@
-#include "IsisDebug.h"
 #include "ShadowFunctor.h"
 
 #include <algorithm>
@@ -884,7 +883,6 @@ namespace Isis {
 
         portal.SetPosition(*demSampleAlongRay, *demLineAlongRay, 1);
 
-        ASSERT(quickCache);
         if (!portal.CopyOverlapFrom(*quickCache)) {
           m_inputDem->read(portal);
         }

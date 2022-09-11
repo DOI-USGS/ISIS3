@@ -4,8 +4,6 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
-
-#include "IsisDebug.h"
 #include "CubeIoHandler.h"
 
 #include <algorithm>
@@ -155,7 +153,6 @@ namespace Isis {
    *   because we can no longer do IO by the time this destructor is called.
    */
   CubeIoHandler::~CubeIoHandler() {
-    ASSERT( m_rawData ? m_rawData->size() == 0 : 1 );
 
     if (m_ioThreadPool)
       m_ioThreadPool->waitForDone();
@@ -179,7 +176,6 @@ namespace Isis {
       QMapIterator<int, RawCubeChunk *> it(*m_rawData);
       while (it.hasNext()) {
         // Unwritten data here means it cannot be written :(
-        ASSERT(0);
         it.next();
 
         if(it.value())
@@ -528,9 +524,6 @@ namespace Isis {
    * @return The chunk's index into the file
    */
   int CubeIoHandler::getChunkIndex(const RawCubeChunk &chunk)  const {
-//     ASSERT(chunk.getStartSample() <= sampleCount());
-//     ASSERT(chunk.getStartLine() <= lineCount());
-//     ASSERT(chunk.getStartBand() <= bandCount());
 
     int sampleIndex = (chunk.getStartSample() - 1) / getSampleCountInChunk();
     int lineIndex = (chunk.getStartLine() - 1) / getLineCountInChunk();
@@ -1142,7 +1135,6 @@ namespace Isis {
    */
   RawCubeChunk *CubeIoHandler::getNullChunk(int chunkIndex) const {
     // Shouldn't ask for null chunks when the area has already been allocated
-//     ASSERT(getChunk(chunkIndex) == NULL);
 
     int startSample = 0;
     int startLine = 0;
@@ -1915,7 +1907,6 @@ namespace Isis {
     m_ioHandler->m_writeThreadMutex->unlock();
     m_ioHandler = NULL;
 
-    ASSERT(m_buffersToWrite->isEmpty());
     delete m_buffersToWrite;
     m_buffersToWrite = NULL;
   }

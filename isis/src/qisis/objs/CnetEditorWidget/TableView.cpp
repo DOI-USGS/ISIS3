@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "TableView.h"
 
 #include <iostream>
@@ -126,7 +124,6 @@ namespace Isis {
     */
   TableView::~TableView() {
     // save column widths
-    ASSERT(objectName().size());
     if (m_settingsPath->size() && objectName().size()) {
       QSettings settings(*m_settingsPath, QSettings::NativeFormat);
       QString key;
@@ -203,11 +200,9 @@ namespace Isis {
 
   //   void TableView::setModel(AbstractTableModel * newModel)
   //   {
-  //     ASSERT(m_content);
   //
   //     if (newModel)
   //     {
-  //       ASSERT(m_header);
   //       connect(newModel, SIGNAL(filterProgressChanged(int)),
   //           m_header, SLOT(updateFilterProgress(int)));
   //       connect(newModel, SIGNAL(rebuildProgressChanged(int)),

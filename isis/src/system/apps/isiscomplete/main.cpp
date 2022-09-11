@@ -25,13 +25,6 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  // Too slow if in debug mode
-#ifndef CWDEBUG
-  for(int i = 1; i < argc; i++) {
-    MakeCompletion(argv[i]);
-  }
-#endif
-
   return 0;
 }
 

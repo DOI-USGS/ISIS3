@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "AbstractPlotTool.h"
 
 #include <QComboBox>
@@ -181,8 +179,6 @@ namespace Isis {
       // Selected an item in the list that isn't a window
       if (m_selectWindowCombo->itemData(currentIndex).isNull()) {
         addWindow();
-        ASSERT(m_selectWindowCombo->itemData(
-            m_selectWindowCombo->currentIndex()).canConvert<PlotWindow *>());
       }
       else if (selectedWindow(false)) {
         selectedWindow(false)->showWindow();

@@ -7,7 +7,6 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "Isis.h"
-#include "IsisDebug.h"
 #include "Application.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"

@@ -4,7 +4,6 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
-#include "IsisDebug.h"
 #include "XmlStackedHandler.h"
 
 #include <QDebug>
@@ -56,7 +55,6 @@ namespace Isis {
                           const QString &qName) {
     m_depth--;
 
-    ASSERT(m_depth >= 0);
     if (m_depth == 0 && reader()) {
       reader()->popContentHandler();
 
