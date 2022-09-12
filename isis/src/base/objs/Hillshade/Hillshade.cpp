@@ -280,7 +280,6 @@ namespace Isis {
       double numerator = 1.0 + p0 * p + q0 * q;
 
       double denominator = sqrt(1 + p * p + q * q) * sqrt(1 + p0 * p0 + q0 * q0);
-
       result = numerator / denominator;
     }
 

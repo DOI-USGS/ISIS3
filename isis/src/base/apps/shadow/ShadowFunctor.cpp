@@ -392,15 +392,15 @@ namespace Isis {
 
           Hillshade hillshade(azimuth, elevation, elevationModelProjection->Resolution());
 
-          Portal portal(3, 3, m_inputDem->pixelType(), -1.5, -1.5);
-          portal.SetPosition(sample + 1, line + 1, input.Band());
+
+          Portal portal(3, 3, m_inputDem->pixelType(), -0.5, -0.5);
+          portal.SetPosition(sample, line, input.Band());
 
           if (!portal.CopyOverlapFrom(input)) {
             m_inputDem->read(portal);
           }
 
           double shadedValue = hillshade.shadedValue(portal);
-
           if (shadedValue > 0) {
             bool shadowed = m_enableShadowCalculations && couldBeShadowed &&
                 isShadowed(rayStartPointInBodyFixed, sample + 1, line + 1,
