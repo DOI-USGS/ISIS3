@@ -74,7 +74,7 @@ TEST_F(DefaultCube, FunctionalTestCkwriterDefault) {
                      originalRotation->TimeBasedMatrix()[i]);
   }
 
-  for (size_t = 0; i < newKernelRotation->AngularVelocity().size(); i++) {
+  for (size_t i = 0; i < newKernelRotation->AngularVelocity().size(); i++) {
     ASSERT_DOUBLE_EQ(newKernelRotation->AngularVelocity()[i],
                      originalRotation->AngularVelocity()[i]);
   }
