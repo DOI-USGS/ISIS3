@@ -82,7 +82,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawApollo) {
 
   EXPECT_EQ(numRows-3, points.length());
 
-  ControlPoint* outputPoint;
+  ControlPoint* outputPoint = nullptr;
   for (int i=3; i < numRows; i++) {
     csvLine = line.getRow(i);
     EXPECT_NO_THROW({
