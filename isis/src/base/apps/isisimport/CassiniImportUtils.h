@@ -39,7 +39,7 @@ namespace Isis {
        */
       CassiniIssFixDnFunctor(PvlKeyword &stretchPairs, QString dataConversionType, int validMax) {
         m_stretch = Stretch();
-        for (size_t i = 0; i < stretchPairs.size(); i+=2) {
+        for (size_t i = 0; i < (size_t)stretchPairs.size(); i+=2) {
           m_stretch.AddPair(toDouble(stretchPairs[i]),
                              toDouble(stretchPairs[i + 1]));
         }
@@ -192,7 +192,7 @@ namespace Isis {
     //Adjust Table-encoded values from 8 bit back to 12 bit.
     PvlKeyword stretchPairs = translation["stretchPairs"];
     Stretch stretch;
-    for (size_t i = 0; i < stretchPairs.size(); i+=2) {
+    for (size_t i = 0; i < (size_t)stretchPairs.size(); i+=2) {
       stretch.AddPair(toDouble(stretchPairs[i]),
                          toDouble(stretchPairs[i + 1]));
     }

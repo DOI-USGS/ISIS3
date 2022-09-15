@@ -207,7 +207,7 @@ namespace Isis {
               zdr.Dump(hiconf.getMatrixSource("DumpModuleFile",hiprof));
             }
           }
-          catch(IException e){
+          catch(IException &e){
             if (hiprof.exists("Fallback") && IsTrueValue(hiprof, "Fallback")){
                 zdrFallback = true;
                 calVars->add(hiconf.getProfileName(), HiVector(nsamps, 0.0));

@@ -100,7 +100,7 @@ void image_open(char *filename, struct image_header *header, char *mode)
     header->bpe = hdr_buf[3];
     if(header->bpe == 0)
       header->bpe = 8;
-    text_ptr = (char *) malloc(strlen(((char *)hdr_buf) + IMAGE_LABEL_OFFSET));
+    text_ptr = (char *) malloc(strlen(((char *)hdr_buf) + IMAGE_LABEL_OFFSET)+1);
     strcpy(text_ptr, (char *)(((char *)hdr_buf) + IMAGE_LABEL_OFFSET));
     header->label = text_ptr;
     header->fd = fd;
