@@ -140,11 +140,13 @@ namespace Isis {
   void LatLonGridTool::updateTool() {
     MdiCubeViewport *vp = cubeViewport();
 
-    if (vp->camera() == NULL) {
+    if (vp != NULL) {
+      if (vp->camera() == NULL) {
         m_gridCheckBox->setEnabled(false);
-    }
-    else {
-        m_gridCheckBox->setEnabled(true);
+      }
+      else {
+          m_gridCheckBox->setEnabled(true);
+      }
     }
   }
 }
