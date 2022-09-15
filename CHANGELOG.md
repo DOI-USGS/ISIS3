@@ -38,6 +38,7 @@ release.
 ### Changed
 
 ### Added
+- Added LatLonGrid Tool to Qview to view latitude and longitude lines if camera model information is present.
 
 ### Deprecated
 
