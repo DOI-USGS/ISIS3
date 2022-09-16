@@ -52,10 +52,8 @@ TEST_F(DefaultCube, FunctionalTestSpkwriterDefault) {
 
   newKernelCube.reopen("rw");
 
-  Camera *newCamera = nullptr;
-
   try {
-    newCamera = newKernelCube.camera();
+    newKernelCube.camera();
   } catch(IException &e) {
     FAIL() << "Unable to generate camera with new spk kernel: " << e.toString().toStdString().c_str() << std::endl;
   }
@@ -111,10 +109,8 @@ TEST_F(DefaultCube, FunctionalTestSpkwriterFromlist) {
 
   newKernelCube.reopen("rw");
 
-  Camera *newCamera = nullptr;
-
   try {
-    newCamera = newKernelCube.camera();
+    newKernelCube.camera();
   } catch(IException &e) {
     FAIL() << "Unable to generate camera with new spk kernel: " << e.toString().toStdString().c_str() << std::endl;
   }

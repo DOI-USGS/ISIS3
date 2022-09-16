@@ -82,7 +82,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawApollo) {
 
   EXPECT_EQ(numRows-3, points.length());
 
-  ControlPoint* outputPoint;
+  ControlPoint* outputPoint = nullptr;
   for (int i=3; i < numRows; i++) {
     csvLine = line.getRow(i);
     EXPECT_NO_THROW({
@@ -174,10 +174,10 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawApollo) {
   ControlMeasure* measure;
   for (int i=3; i < numRows; i++) {
     csvLine = line.getRow(i);
-    EXPECT_NO_THROW({
+    ASSERT_NO_THROW({
       outputPoint = outputNet.GetPoint(csvLine[0]);
     }) << "Point in residuals.csv is not present in output network.";
-    EXPECT_NO_THROW({
+    ASSERT_NO_THROW({
       measure = outputPoint->GetMeasure(csvLine[2]);
    }) << "Point in residuals.csv is not present in output network.";
     // Compare sample, line, residuals

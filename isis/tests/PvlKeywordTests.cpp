@@ -431,13 +431,13 @@ void comparePvlKeywords(PvlKeyword pvlKeyword1, PvlKeyword pvlKeyword2)
 	EXPECT_TRUE(PvlKeyword::stringEqual(pvlKeyword1.name(), pvlKeyword2.name()));
 
 	ASSERT_EQ(pvlKeyword1.comments(), pvlKeyword2.comments());
-	for (unsigned int comment = 0; comment < pvlKeyword1.comments(); comment++)
+	for (unsigned int comment = 0; comment < (unsigned int)pvlKeyword1.comments(); comment++)
 	{
 		EXPECT_TRUE(PvlKeyword::stringEqual(pvlKeyword1.comment(comment), pvlKeyword2.comment(comment)));
 	}
 
 	ASSERT_EQ(pvlKeyword1.size(), pvlKeyword2.size());
-	for (unsigned int value = 0; value < pvlKeyword1.size(); value++)
+	for (unsigned int value = 0; value < (unsigned int)pvlKeyword1.size(); value++)
 	{
 		EXPECT_TRUE(PvlKeyword::stringEqual(pvlKeyword1[value], pvlKeyword2[value]));
 		EXPECT_TRUE(PvlKeyword::stringEqual(pvlKeyword1.unit(value), pvlKeyword2.unit(value)));

@@ -69,12 +69,12 @@ TEST_F(DefaultCube, FunctionalTestCkwriterDefault) {
 
   ASSERT_EQ(newKernelRotation->cacheSize(), originalRotation->cacheSize());
 
-  for (int i = 0; i < newKernelRotation->TimeBasedMatrix().size(); i++) {
+  for (size_t i = 0; i < newKernelRotation->TimeBasedMatrix().size(); i++) {
     ASSERT_DOUBLE_EQ(newKernelRotation->TimeBasedMatrix()[i],
                      originalRotation->TimeBasedMatrix()[i]);
   }
 
-  for (int i = 0; i < newKernelRotation->AngularVelocity().size(); i++) {
+  for (size_t i = 0; i < newKernelRotation->AngularVelocity().size(); i++) {
     ASSERT_DOUBLE_EQ(newKernelRotation->AngularVelocity()[i],
                      originalRotation->AngularVelocity()[i]);
   }
@@ -138,12 +138,12 @@ TEST_F(DefaultCube, FunctionalTestCkwriterFromlist) {
 
   ASSERT_EQ(newKernelRotation->cacheSize(), originalRotation->cacheSize());
 
-  for (int i = 0; i < newKernelRotation->TimeBasedMatrix().size(); i++) {
+  for (size_t i = 0; i < newKernelRotation->TimeBasedMatrix().size(); i++) {
     ASSERT_DOUBLE_EQ(newKernelRotation->TimeBasedMatrix()[i],
                      originalRotation->TimeBasedMatrix()[i]);
   }
 
-  for (int i = 0; i < newKernelRotation->AngularVelocity().size(); i++) {
+  for (size_t i = 0; i < newKernelRotation->AngularVelocity().size(); i++) {
     ASSERT_DOUBLE_EQ(newKernelRotation->AngularVelocity()[i],
                      originalRotation->AngularVelocity()[i]);
   }
