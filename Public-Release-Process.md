@@ -377,7 +377,11 @@ There are some important considerations to keep in mind when using this release 
 
 * Send an email to all of astro (GS-G-AZflg Astro <gs-g-azflg_astro@usgs.gov>) informing them of internal availability. 
 
-    * Your e-mail can simply be a link to the external announcement. 
+    * Your e-mail can simply be a link to the external announcement.
+
+## Step 12: Update the Release Schedule
+
+Update the [release schedule](https://github.com/USGS-Astrogeology/ISIS3/wiki/Release-Schedule) with the date of the release and update any future releases with the appropriate dates. Releases should be nominally 3 months apart.
 
 
 ## Problems 
