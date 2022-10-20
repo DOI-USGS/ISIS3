@@ -453,6 +453,7 @@ For versions of ISIS prior to ISIS 4.1.0, please use the `--legacy` flag
 | Mars Express  | `downloadIsisData mex $ISISDATA` |
 | Mars Global Surveyor  | `downloadIsisData mgs $ISISDATA` |
 | Mars Reconnaissance Orbiter  | `downloadIsisData mro $ISISDATA` |
+| Mars Science Laboratory  | `downloadIsisData msl $ISISDATA` |
 | Mars Odyssey  | `downloadIsisData odyssey $ISISDATA` |
 | Near  | `downloadIsisData near $ISISDATA` |
 | New Horizons  | `downloadIsisData newhorizons $ISISDATA` |
@@ -468,7 +469,7 @@ For versions of ISIS prior to ISIS 4.1.0, please use the `--legacy` flag
 ### ISIS Test Data 
 ISIS is comprised of two types of tests, custom Makefile based tests, and GTest based tests. Those that are GTest based, make economical use of data that exists on the ISIS3 repo along with the source, so no special data is required to run those other than the ISIS data area. The Makefile tests depend on a separate source of data that consists of a few gigabytes of input and expected output data used for testing ISIS applications. The Makefile based tests use the `ISISTESTDATA` environment variable to know where the required data are located. The total size of this test data decreases as we work towards converting Makefile tests to GTests.  
  
-###How to download the ISIS test data with rclone  
+### How to download the ISIS test data with rclone  
 Test data is hosted using Amazon S3 storage buckets. We recommend using rclone to pull the data into a local directory. You can download rclone using their instructions (see: https://rclone.org/downloads/) or by using an anaconda environment (see: https://docs.anaconda.com/anaconda/install/). If you already have an anaconda environment up, install rclone with: `conda install –c conda-forge rclone` 
 
 Next, you will want to configure rclone using a default S3 configuration. See: https://rclone.org/s3/ for detailed information on how to configure S3, but for the purposes of downloading the ISIS3 test data, you simply run rclone config which will start an interactive menu. Press enter through it all except for these details: 
