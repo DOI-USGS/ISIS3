@@ -451,7 +451,7 @@ namespace Isis {
    * @param isdRot The ALE ISD as a JSON object.
    *
    */
-  void SpiceRotation::LoadCache(json &isdRot){
+  void SpiceRotation::LoadCache(json &isdRot) {
     if (p_source != Spice) {
         throw IException(IException::Programmer, "SpiceRotation::LoadCache(json) only supports Spice source", _FILEINFO_);
     }

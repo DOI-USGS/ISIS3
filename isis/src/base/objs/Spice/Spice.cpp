@@ -82,6 +82,7 @@ namespace Isis {
    * @param isd ALE Json ISD
    */
   Spice::Spice(Pvl &lab, json isd) {
+    m_usingAle = true; 
     init(lab, true, isd);
   }
 
@@ -185,10 +186,10 @@ namespace Isis {
     }
 
     // We should remove this completely in the near future
-    m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
-    m_usingAle = false;
+    m_usingNaif = (!lab.hasObject("NaifKeywords") || noTables) && !m_usingAle;
+    m_usingAle = false || m_usingAle;
 
-
+    std::cout << m_usingAle << " " << m_usingNaif << std::endl;
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
     //  ephemerides. (2008-02-27 (KJB))
@@ -273,13 +274,13 @@ namespace Isis {
       }
     }
     else {
-      *m_naifKeywords = lab.findObject("NaifKeywords");
-
+      PvlObject nk("NaifKeywords", isd["naif_keywords"]);
+      lab.addObject(nk);
+      *m_naifKeywords = nk;
       // Moved the construction of the Target after the NAIF kenels have been loaded or the
       // NAIF keywords have been pulled from the cube labels, so we can find target body codes
       // that are defined in kernels and not just body codes build into spicelib
       // TODO: Move this below the else once the rings code above has been refactored
-
       m_target = new Target(this, lab);
     }
 
@@ -425,8 +426,7 @@ namespace Isis {
     //  SpacecraftPosition.  The old keywords were in existance before the
     //  Table option, so we don't need to check for Table under the old
     //  keywords.
-
-    if (kernels["InstrumentPointing"].size() == 0) {
+    if (!m_usingAle && kernels["InstrumentPointing"].size() == 0) {
       throw IException(IException::Unknown,
                        "No camera pointing available",
                        _FILEINFO_);
@@ -434,7 +434,14 @@ namespace Isis {
 
     //  2009-03-18  Tracie Sucharski - Removed test for old keywords, any files
     // with the old keywords should be re-run through spiceinit.
-    if (kernels["InstrumentPointing"][0].toUpper() == "NADIR") {
+    if (m_usingAle) {
+     m_instrumentRotation->LoadCache(isd["instrument_pointing"]);
+     m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
+     if (m_instrumentRotation->cacheSize() > 5) {
+       m_instrumentRotation->LoadTimeCache();
+     }
+    }
+    else if (kernels.hasKeyword("InstrumentPointing") && kernels["InstrumentPointing"][0].toUpper() == "NADIR") {
       if (m_instrumentRotation) {
         delete m_instrumentRotation;
         m_instrumentRotation = NULL;
@@ -442,27 +449,20 @@ namespace Isis {
 
       m_instrumentRotation = new SpiceRotation(*m_ikCode, *m_spkBodyCode);
     }
-    else if (m_usingAle) {
-     m_instrumentRotation->LoadCache(isd["instrument_pointing"]);
-     m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
-     if (m_instrumentRotation->cacheSize() > 5) {
-       m_instrumentRotation->LoadTimeCache();
-     }
-    }
     else if (kernels["InstrumentPointing"][0].toUpper() == "TABLE") {
       Table t("InstrumentPointing", lab.fileName(), lab);
       m_instrumentRotation->LoadCache(t);
     }
 
 
-    if (kernels["InstrumentPosition"].size() == 0) {
-      throw IException(IException::Unknown,
-                       "No instrument position available",
-                       _FILEINFO_);
-    }
 
     if (m_usingAle) {
       m_instrumentPosition->LoadCache(isd["instrument_position"]);
+    }
+    else if (kernels["InstrumentPosition"].size() == 0) {
+      throw IException(IException::Unknown,
+                       "No instrument position available",
+                       _FILEINFO_);
     }
     else if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
       Table t("InstrumentPosition", lab.fileName(), lab);

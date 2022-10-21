@@ -11,6 +11,9 @@ find files of those names at the top level of this repository. **/
 #include <QString>
 #include <QStringList>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 #include "csm/csm.h"
 #include "csm/GeometricModel.h"
 #include "csm/Isd.h"
@@ -29,6 +32,7 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
+#include "SpiceRotation.h"
 
 using namespace std;
 
@@ -181,7 +185,7 @@ namespace Isis {
       }
 
       // TODO: Add warning argument and use message from csm::Warning for Isis::IException error.
-      if (plugin->canModelBeConstructedFromState(modelName.toStdString(), stateString.toStdString())){
+      if (plugin->canModelBeConstructedFromState(modelName.toStdString(), stateString.toStdString())) {
         model = plugin->constructModelFromState(stateString.toStdString());
       }
       else {
@@ -191,6 +195,7 @@ namespace Isis {
     } // end of State else statement
 
     string modelState = model->getModelState();
+    std::cout << "State: " << modelState << std::endl; 
 
     // Making copies of original Pvl Groups from input label so they can be restored if csminit fails.
     PvlGroup originalInstrument;
@@ -416,6 +421,78 @@ namespace Isis {
     blobLabel += PvlKeyword("ModelName", modelName);
     blobLabel += PvlKeyword("PluginName", pluginName);
     cube->write(csmStateBlob);
+
+    // Try to attach rotations
+    if (ui.WasEntered("ISD")) {
+      QString isdFilePath = ui.GetFileName("ISD");
+      std::ifstream ifs(isdFilePath.toStdString());
+      json jf = json::parse(ifs);
+
+      Spice spice(*cube->label(), jf);
+
+      Table ckTable = cam->instrumentRotation()->Cache("InstrumentPointing");
+      ckTable.Label() += PvlKeyword("Description", "Created by spiceinit");
+      ckTable.Label() += PvlKeyword("Kernels");
+
+      for (int i = 0; i < ckKeyword.size(); i++)
+        ckTable.Label()["Kernels"].addValue(ckKeyword[i]);
+
+      icube->write(ckTable);
+
+      Table spkTable = cam->instrumentPosition()->Cache("InstrumentPosition");
+      spkTable.Label() += PvlKeyword("Description", "Created by spiceinit");
+      spkTable.Label() += PvlKeyword("Kernels");
+      for (int i = 0; i < spkKeyword.size(); i++)
+        spkTable.Label()["Kernels"].addValue(spkKeyword[i]);
+
+      icube->write(spkTable);
+
+      Table bodyTable = cam->bodyRotation()->Cache("BodyRotation");
+      bodyTable.Label() += PvlKeyword("Description", "Created by spiceinit");
+      bodyTable.Label() += PvlKeyword("Kernels");
+      for (int i = 0; i < targetSpkKeyword.size(); i++)
+        bodyTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
+
+      for (int i = 0; i < pckKeyword.size(); i++)
+        bodyTable.Label()["Kernels"].addValue(pckKeyword[i]);
+
+      bodyTable.Label() += PvlKeyword("SolarLongitude",
+          toString(cam->solarLongitude().degrees()));
+      icube->write(bodyTable);
+
+      Table sunTable = cam->sunPosition()->Cache("SunPosition");
+      sunTable.Label() += PvlKeyword("Description", "Created by spiceinit");
+      sunTable.Label() += PvlKeyword("Kernels");
+      for (int i = 0; i < targetSpkKeyword.size(); i++)
+        sunTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
+
+      icube->write(sunTable);
+
+      //  Save original kernels in keyword before changing to Table
+      PvlKeyword origCk = currentKernels["InstrumentPointing"];
+      PvlKeyword origSpk = currentKernels["InstrumentPosition"];
+      PvlKeyword origTargPos = currentKernels["TargetPosition"];
+
+      currentKernels["InstrumentPointing"] = "Table";
+      for (int i = 0; i < origCk.size(); i++)
+        currentKernels["InstrumentPointing"].addValue(origCk[i]);
+
+      currentKernels["InstrumentPosition"] = "Table";
+      for (int i = 0; i < origSpk.size(); i++)
+        currentKernels["InstrumentPosition"].addValue(origSpk[i]);
+
+      currentKernels["TargetPosition"] = "Table";
+      for (int i = 0; i < origTargPos.size(); i++)
+        currentKernels["TargetPosition"].addValue(origTargPos[i]);
+
+
+      // PvlObject nk("NaifKeywords", jf["NaifKeywords"]);
+      // cube->putGroup(nk);
+
+      // SpiceRotation* rot = new SpiceRotation(*cube->label, jf);
+      // rot->LoadCache(jf); 
+
+    }
 
     try {
       CameraFactory::Create(*cube);
