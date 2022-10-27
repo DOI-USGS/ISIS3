@@ -35,6 +35,7 @@ find files of those names at the top level of this repository. **/
 #include "NaifStatus.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
+#include "Table.h"
 
 #include "csm/Warning.h"
 #include "csm/Error.h"
@@ -57,6 +58,7 @@ namespace Isis {
     Blob state("CSMState", "String");
     cube.read(state);
     PvlObject &blobLabel = state.Label();
+
     QString pluginName = blobLabel.findKeyword("PluginName")[0];
     QString modelName = blobLabel.findKeyword("ModelName")[0];
     QString stateString = QString::fromUtf8(state.getBuffer(), state.Size());
@@ -108,6 +110,16 @@ namespace Isis {
     m_refTime.setUtc(timeString);
 
     setTarget(*cube.label());
+
+    if (cube.hasTable("BodyRotation")) {
+      Table bodyRotTable("BodyRotation", cube.fileName(), *cube.label());
+      m_bodyRot = new SpiceRotation(499);
+      m_bodyRot->LoadCache(bodyRotTable);
+
+      PvlKeyword solarLonKey = bodyRotTable.Label().findKeyword("SolarLongitude");
+      m_solarLongitude = new Longitude((double)solarLonKey, Angle::Radians);
+      m_solarLongitude->force360Domain();
+    }
   }
 
 
@@ -980,8 +992,9 @@ namespace Isis {
    * @param time The time to set
    */
   void CSMCamera::setTime(const iTime &time) {
-    QString msg = "Setting the image time is not supported for CSM camera models";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
+    if(m_bodyRot != NULL) {
+      m_bodyRot->SetEphemerisTime(time.Et());
+    }
   }
 
 
@@ -1067,8 +1080,7 @@ namespace Isis {
    * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the body orientation
    */
   SpiceRotation *CSMCamera::bodyRotation() const {
-    QString msg = "Target body orientation is not supported for CSM camera models";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
+    return m_bodyRot;
   }
 
 
@@ -1123,8 +1135,16 @@ namespace Isis {
    * @returns @b double The Right Ascension
    */
   double CSMCamera::RightAscension() {
-    QString msg = "Right Ascension is not supported for CSM camera models";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
+    if (m_bodyRot == NULL || m_model == NULL) {
+      QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    double precision;
+    csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(Lines()/2, Samples()/2), 0.00001, &precision);
+    csm::EcefVector v = locus.direction;
+    std::vector<double> jvec = m_bodyRot->J2000Vector({v.x, v.y, v.z});
+    return v.x;
   }
 
 
@@ -1137,7 +1157,14 @@ namespace Isis {
    * @returns @b double The Declination
    */
   double CSMCamera::Declination() {
-    QString msg = "Declination is not supported for CSM camera models";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
+    if (m_bodyRot == NULL || m_model == NULL) {
+      QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    double precision;
+    csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(Lines()/2, Samples()/2), 0.00001, &precision);
+    csm::EcefVector v = locus.direction;
+    std::vector<double> jvec = m_bodyRot->J2000Vector({v.x, v.y, v.z});
+    return v.y;
   }
 }

@@ -33,6 +33,7 @@ using json = nlohmann::json;
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "SpiceRotation.h"
+#include "Longitude.h"
 
 using namespace std;
 
@@ -430,61 +431,12 @@ namespace Isis {
 
       Spice spice(*cube->label(), jf);
 
-      Table ckTable = cam->instrumentRotation()->Cache("InstrumentPointing");
-      ckTable.Label() += PvlKeyword("Description", "Created by spiceinit");
-      ckTable.Label() += PvlKeyword("Kernels");
-
-      for (int i = 0; i < ckKeyword.size(); i++)
-        ckTable.Label()["Kernels"].addValue(ckKeyword[i]);
-
-      icube->write(ckTable);
-
-      Table spkTable = cam->instrumentPosition()->Cache("InstrumentPosition");
-      spkTable.Label() += PvlKeyword("Description", "Created by spiceinit");
-      spkTable.Label() += PvlKeyword("Kernels");
-      for (int i = 0; i < spkKeyword.size(); i++)
-        spkTable.Label()["Kernels"].addValue(spkKeyword[i]);
-
-      icube->write(spkTable);
-
-      Table bodyTable = cam->bodyRotation()->Cache("BodyRotation");
-      bodyTable.Label() += PvlKeyword("Description", "Created by spiceinit");
-      bodyTable.Label() += PvlKeyword("Kernels");
-      for (int i = 0; i < targetSpkKeyword.size(); i++)
-        bodyTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
-
-      for (int i = 0; i < pckKeyword.size(); i++)
-        bodyTable.Label()["Kernels"].addValue(pckKeyword[i]);
+      Table bodyTable = spice.bodyRotation()->Cache("BodyRotation");
+      bodyTable.Label() += PvlKeyword("Description", "Created by csminit");
 
       bodyTable.Label() += PvlKeyword("SolarLongitude",
-          toString(cam->solarLongitude().degrees()));
-      icube->write(bodyTable);
-
-      Table sunTable = cam->sunPosition()->Cache("SunPosition");
-      sunTable.Label() += PvlKeyword("Description", "Created by spiceinit");
-      sunTable.Label() += PvlKeyword("Kernels");
-      for (int i = 0; i < targetSpkKeyword.size(); i++)
-        sunTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
-
-      icube->write(sunTable);
-
-      //  Save original kernels in keyword before changing to Table
-      PvlKeyword origCk = currentKernels["InstrumentPointing"];
-      PvlKeyword origSpk = currentKernels["InstrumentPosition"];
-      PvlKeyword origTargPos = currentKernels["TargetPosition"];
-
-      currentKernels["InstrumentPointing"] = "Table";
-      for (int i = 0; i < origCk.size(); i++)
-        currentKernels["InstrumentPointing"].addValue(origCk[i]);
-
-      currentKernels["InstrumentPosition"] = "Table";
-      for (int i = 0; i < origSpk.size(); i++)
-        currentKernels["InstrumentPosition"].addValue(origSpk[i]);
-
-      currentKernels["TargetPosition"] = "Table";
-      for (int i = 0; i < origTargPos.size(); i++)
-        currentKernels["TargetPosition"].addValue(origTargPos[i]);
-
+          toString(spice.solarLongitude().degrees()));
+      cube->write(bodyTable);
 
       // PvlObject nk("NaifKeywords", jf["NaifKeywords"]);
       // cube->putGroup(nk);
