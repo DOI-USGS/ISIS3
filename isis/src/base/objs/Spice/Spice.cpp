@@ -194,7 +194,7 @@ namespace Isis {
     //  ephemerides. (2008-02-27 (KJB))
     if (m_usingNaif) {
       try {
-        if (isd == NULL){
+        if (isd == NULL) {
           // try using ALE
           std::ostringstream kernel_pvl;
           kernel_pvl << kernels;

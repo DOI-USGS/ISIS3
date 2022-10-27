@@ -145,6 +145,8 @@ namespace Isis {
 
       csm::RasterGM *m_model; //! CSM sensor model
       iTime m_refTime; //! The reference time that all model image times are relative to
+      SpiceRotation *m_bodyRot;
+      Longitude *m_solarLongitude;
 
       void isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel) const;
       void csmToIsisPixel(csm::ImageCoord csmPixel, double &line, double &sample) const;
