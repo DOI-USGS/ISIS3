@@ -168,7 +168,15 @@ Secondly, The user can specify what type of SPK kernel
 
 -----
 
-**Under Construction\!\!**
+Shape Models are what ISIS intersects imaging rays with. When mapping a pixel from an image to a ground point, ISIS generates a look vector using the camera model and then intersects that ray with the surface to generate a ground point.
+
+Automatic model selection
+
+The most basic type of shape model is an ellipsoid shape model. When using an ellipsoid shape model, ISIS intersects imaging rays with a tri-axial ellipsoid. The ellipsoid radii are defined in the PCK. To use an ellipsoid shape model, set `SHAPE=ELLIPSOID` when running spiceinit.
+
+ISIS also supports Digital Elevation Models (DEMs) as shape models. A DEM is a raster image that defines the local radius at each pixel in the image. DEMs can cover a local region or the entirety of a body. When working with a DEM, make sure that it covers the entire ground range of your data set. Some applications use DEMs that define the height or elevation above a reference ellipsoid, but ISIS only supports DEMs that define the radius so that there is no inconsistency between reference ellipsoids. Before using a DEM, it must first be ingested into an ISIS cube file and then run through the demprep application. Once that is complete, set `SHAPE=USER MODEL=<path to your DEM cube>` when running spiceinit.
+
+Ray tracing shape models
 
 <span id="References-amp-Related-Resources"></span>
 
