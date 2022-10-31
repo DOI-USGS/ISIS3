@@ -74,7 +74,7 @@ namespace Isis {
    * @param modelName The name of the CSM::Model that will be created
    * @param stateString The state string the the CSM::Model will be created from
    */
-  void CSMCamera::init(Cube &cube, QString pluginName, QString modelName, QString stateString){
+  void CSMCamera::init(Cube &cube, QString pluginName, QString modelName, QString stateString) {
     const csm::Plugin *plugin = csm::Plugin::findPlugin(pluginName.toStdString());
     if (!plugin) {
       QStringList availablePlugins;
@@ -119,6 +119,8 @@ namespace Isis {
       PvlKeyword solarLonKey = bodyRotTable.Label().findKeyword("SolarLongitude");
       m_solarLongitude = new Longitude((double)solarLonKey, Angle::Radians);
       m_solarLongitude->force360Domain();
+
+      new CameraSkyMap(this);
     }
   }
 
