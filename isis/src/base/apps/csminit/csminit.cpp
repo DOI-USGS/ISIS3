@@ -435,7 +435,7 @@ namespace Isis {
       bodyTable.Label() += PvlKeyword("Description", "Created by csminit");
 
       bodyTable.Label() += PvlKeyword("SolarLongitude",
-          toString(spice.solarLongitude().degrees()));
+         "10"/**toString(spice.solarLongitude().degrees())**/ );
       cube->write(bodyTable);
 
       // PvlObject nk("NaifKeywords", jf["NaifKeywords"]);
