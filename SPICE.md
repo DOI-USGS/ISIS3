@@ -176,7 +176,43 @@ The most basic type of shape model is an ellipsoid shape model. When using an el
 
 ISIS also supports Digital Elevation Models (DEMs) as shape models. A DEM is a raster image that defines the local radius at each pixel in the image. DEMs can cover a local region or the entirety of a body. When working with a DEM, make sure that it covers the entire ground range of your data set. Some applications use DEMs that define the height or elevation above a reference ellipsoid, but ISIS only supports DEMs that define the radius so that there is no inconsistency between reference ellipsoids. Before using a DEM, it must first be ingested into an ISIS cube file and then run through the demprep application. Once that is complete, set `SHAPE=USER MODEL=<path to your DEM cube>` when running spiceinit.
 
-Ray tracing shape models
+Some data sets observe irregular surfaces that cannot be represented by a DEM. Surfaces in these situations are now being represented by Digital Shape Kernels (DSKs). You can select a DSK shape model in spiceinit the same way you can select a DEM, set `SHAPE=USER MODEL=<path to your DSK file>`. ISIS supports shape models for DSKs in three different ways: CSPICE, Embree, and Bullet.
+
+By default, ISIS will use the low-level CSPICE routines to intersect imaging rays with the DSK. The CSPICE routines do not load the surface shape into memory, so they use less memory but are limited by your I/O speeds. We recommend having the DSK file on a local, high-speed SSD when using the CSPICE routines.
+
+Both Embree and Bullet load the surface shape from the DSK file into memory and then use ray casting algorithms to intersect imaging rays with the surface. As such, they require more memory, but are significantly faster than the CSPICE routines. Embree performs floating point intersection operations which have between 6 and 9 significant digits of precision. Bullet performs double precision intersection operations  which have between 15 and 18 significant digits of precision. For rapid analysis and to check processing, some users prefer Embree, but for final products and precision analysis we recommend using Bullet. To select the Embree or Bullet shape model you will need to modify the ShapeModel section of your IsisPreference file.
+
+```
+Group = ShapeModel
+  RayTraceEngine = Embree
+  OnError = Continue
+EndGroup
+```
+
+or 
+
+```
+Group = ShapeModel
+  RayTraceEngine = Bullet
+  OnError = Continue
+EndGroup
+```
+
+If you run spiceinit with a DSK shape model and a RayTraceEngine specified in your IsisPreference file, then that will be added to the output cube's label. The cube will use the selected shape model from that point on. This can be overwritten by your current IsisPreference file contents. See the table below for more details:
+
+|IsisPreference at spiceinit | IsisPreference now      | shape model used |
+| -------------------------- | ----------------------- | ---------------- |
+| No ShapeModel Group        | No ShapeModel Group     | CSPICE           |
+| No ShapeModel Group        | RayTraceEngine = Bullet | Bullet           |
+| No ShapeModel Group        | RayTraceEngine = Embree | Embree           |
+| RayTraceEngine = Embree    | No ShapeModel Group     | Embree           |
+| RayTraceEngine = Embree    | RayTraceEngine = CSPICE | CSPICE           |
+| RayTraceEngine = Embree    | RayTraceEngine = Embree | Embree           |
+| RayTraceEngine = Embree    | RayTraceEngine = Bullet | Bullet           |
+| RayTraceEngine = Bullet    | No ShapeModel Group     | Bullet           |
+| RayTraceEngine = Bullet    | RayTraceEngine = CSPICE | CSPICE           |
+| RayTraceEngine = Bullet    | RayTraceEngine = Embree | Embree           |
+| RayTraceEngine = Bullet    | RayTraceEngine = Bullet | Bullet           |
 
 <span id="References-amp-Related-Resources"></span>
 
