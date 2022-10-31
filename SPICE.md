@@ -170,7 +170,7 @@ Secondly, The user can specify what type of SPK kernel
 
 Shape Models are what ISIS intersects imaging rays with. When mapping a pixel from an image to a ground point, ISIS generates a look vector using the camera model and then intersects that ray with the surface to generate a ground point.
 
-Automatic model selection
+The ISIS data area and spiceinit are set up to automatically select an appropriate shape model for most data sets. If want more control over which shape model you use or are working with a new data set, here's the different options available in ISIS.
 
 The most basic type of shape model is an ellipsoid shape model. When using an ellipsoid shape model, ISIS intersects imaging rays with a tri-axial ellipsoid. The ellipsoid radii are defined in the PCK. To use an ellipsoid shape model, set `SHAPE=ELLIPSOID` when running spiceinit.
 
