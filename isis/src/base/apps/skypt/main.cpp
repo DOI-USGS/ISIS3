@@ -2,6 +2,7 @@
 
 #include "Brick.h"
 #include "Camera.h"
+#include "CSMCamera.h"
 #include "IException.h"
 #include "iTime.h"
 
@@ -47,8 +48,13 @@ void IsisMain() {
   int intLine = (int)(line + 0.5);
   b.SetBasePosition(intSamp, intLine, 1);
   cube.read(b);
-
-  double rot = cam->CelestialNorthClockAngle();
+  
+  double rot;
+  if (cube.hasBlob("CSMState", "String")) {
+    rot = ((CSMCamera*)cam)->CelestialNorthClockAngle();
+  } else {
+    rot = cam->CelestialNorthClockAngle();
+  }
 
   // Create group with sky position
   PvlGroup sp("SkyPoint");

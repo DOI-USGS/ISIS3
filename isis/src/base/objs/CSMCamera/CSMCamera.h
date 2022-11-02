@@ -81,8 +81,10 @@ namespace Isis {
       virtual bool SetGround(const SurfacePoint &surfacePt);
       virtual bool SetUniversalGround(const double latitude, const double longitude);
       virtual bool SetUniversalGround(const double latitude, const double longitude, double radius);
-
+      virtual bool SetRightAscensionDeclination(const double ra, const double dec);
       virtual void setTime(const iTime &time);
+      virtual bool SetLookDirection(const double v[3]);
+      virtual double CelestialNorthClockAngle();
 
       virtual double LineResolution();
       virtual double SampleResolution();
