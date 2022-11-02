@@ -30,6 +30,7 @@ namespace Isis {
    */
   class CameraSkyMap {
     public:
+      CameraSkyMap() = default;
       CameraSkyMap(Camera *parent);
 
       //! Destructor

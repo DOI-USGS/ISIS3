@@ -36,6 +36,8 @@ find files of those names at the top level of this repository. **/
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
 #include "Table.h"
+#include "SensorUtilities.h"
+#include "CSMSkyMap.h"
 
 #include "csm/Warning.h"
 #include "csm/Error.h"
@@ -120,7 +122,7 @@ namespace Isis {
       m_solarLongitude = new Longitude((double)solarLonKey, Angle::Radians);
       m_solarLongitude->force360Domain();
 
-      new CameraSkyMap(this);
+      new CSMSkyMap(this);
     }
   }
 
@@ -257,6 +259,123 @@ namespace Isis {
     }
 
     return SetGround(SurfacePoint(latitude, longitude, localRadius));
+  }
+
+
+  /**
+   * Given the ra/dec compute the look direction.
+   *
+   * @param ra    Right ascension in degrees (sky longitude).
+   * @param dec   Declination in degrees (sky latitude).
+   *
+   * @return @b bool True if successful.
+   */
+  bool CSMCamera::SetRightAscensionDeclination(const double ra, const double dec) {
+    double raRad = ra * DEG2RAD;
+    double decRad = dec * DEG2RAD;
+
+    // Make the radius bigger, some multiple of the body radius -or- use sensor position at the reference point 
+    SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 99999};
+    SensorUtilities::Vec rectPt = SensorUtilities::sphericalToRect(sphericalPt);
+
+    // vector<double> lookC = instrumentRotation()->ReferenceVector(rectPt);
+    csm::EcefCoord lookPt = {rectPt.x, rectPt.y, rectPt.x};
+    double achievedPrecision = 0;
+    csm::WarningList warnings;
+    bool validBackProject;
+    csm::ImageCoord imagePt;
+
+    try {
+      imagePt = m_model->groundToImage(lookPt, 0.01, &achievedPrecision, &warnings); 
+    }
+    catch (csm::Error &e) {
+      validBackProject = false;
+    }
+    
+    p_childLine = imagePt.line; 
+    p_childSample = imagePt.samp;     
+
+    return validBackProject;
+  }
+
+
+  /**
+   * Sets the look direction of the spacecraft. This routine will then attempt to
+   * intersect the look direction with the target. If successful you can utilize
+   * the methods which return the lat/lon, phase, incidence, etc. This routine
+   * returns false if the look direction does not intersect the target.
+   *
+   * @param v[] A look vector in camera coordinates. For example, (0,0,1) is
+   *            usually the look direction out of the boresight of a camera.
+   *
+   * @return @b bool Indicates whether the given look direction intersects the target.
+   * 
+   */
+  bool CSMCamera::SetLookDirection(const double v[3]) {
+    //std::cout << "Sensor::SetLookDirection()\n";
+    // The look vector must be in the camera coordinate system
+
+    // copy v to LookC
+    // lookC[0] = v[0];
+    // lookC[1] = v[1];
+    // lookC[2] = v[2]
+    vector<double> lookC(v, v + 3);
+
+    // Convert it to body-fixed
+    // const vector<double> &lookJ = instrumentRotation()->J2000Vector(lookC);
+    const vector<double> &lookB = lookDirectionBodyFixed();
+
+    // This memcpy does:
+    // m_lookB[0] = lookB[0];
+    // m_lookB[1] = lookB[1];
+    // m_lookB[2] = lookB[2];
+    memcpy(m_lookB, &lookB[0], sizeof(double) * 3);
+    m_newLookB = true;
+
+    // Don't try to intersect the sky
+    if (target()->isSky()) {
+      target()->shape()->setHasIntersection(false);
+      return false;
+    }
+
+    // See if it intersects the planet
+    const vector<double> &sB = bodyRotation()->ReferenceVector(
+        instrumentPosition()->Coordinate());
+
+    // double tolerance = resolution() / 100.0; return
+    // target()->shape()->intersectSurface(sB, lookB, tolerance);
+    return target()->shape()->intersectSurface(sB, lookB);
+  }
+
+
+  /**
+   * Computes the celestial north clock angle at the current
+   * line/sample or ra/dec. The reference vector is a vecor from the
+   * current pixel pointed directly "upward". Celetial North
+   * is a vector from the current pixel poiting towards celetial north.
+   * The Celestial North Clock Angle is the angle between these two vectors
+   * on the image.
+   *
+   * @return @b double The resultant Celestial North Clock Angle
+   */
+  double CSMCamera::CelestialNorthClockAngle() {
+    double orgLine = Line();
+    double orgSample = Sample();
+    double orgDec = Declination();
+    double orgRa = RightAscension();
+
+    SetRightAscensionDeclination(orgRa, orgDec + (2 * RaDecResolution()));
+    double y = Line() - orgLine;
+    double x = Sample() - orgSample;
+    double celestialNorthClockAngle = atan2(-y, x) * 180.0 / Isis::PI;
+    celestialNorthClockAngle = 90.0 - celestialNorthClockAngle;
+
+    if (celestialNorthClockAngle < 0.0) {
+       celestialNorthClockAngle += 360.0;
+    }
+
+    SetImage(orgSample, orgLine);
+    return celestialNorthClockAngle;
   }
 
 
@@ -1096,7 +1215,7 @@ namespace Isis {
    * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the sensor orientation
    */
   SpiceRotation *CSMCamera::instrumentRotation() const {
-    QString msg = "Instrument orientation is not supported for CSM camera models";
+    QString msg = "Instrument rotation is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
