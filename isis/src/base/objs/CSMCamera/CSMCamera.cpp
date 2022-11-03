@@ -112,7 +112,7 @@ namespace Isis {
     m_refTime.setUtc(timeString);
 
     setTarget(*cube.label());
-
+    
     if (cube.hasTable("BodyRotation")) {
       Table bodyRotTable("BodyRotation", cube.fileName(), *cube.label());
       m_bodyRot = new SpiceRotation(499);

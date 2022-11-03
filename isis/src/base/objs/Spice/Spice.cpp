@@ -97,6 +97,7 @@ namespace Isis {
    */
   void Spice::csmInit(Cube &cube, Pvl label) {
     defaultInit();
+    *m_ikCode = -78987; 
     m_target = new Target;
     NaifStatus::CheckErrors();
   }
@@ -189,7 +190,6 @@ namespace Isis {
     m_usingNaif = (!lab.hasObject("NaifKeywords") || noTables) && !m_usingAle;
     m_usingAle = false || m_usingAle;
 
-    std::cout << m_usingAle << " " << m_usingNaif << std::endl;
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
     //  ephemerides. (2008-02-27 (KJB))
@@ -273,7 +273,7 @@ namespace Isis {
         load(ringPck, noTables);
       }
     }
-    else {
+    else { 
       PvlObject nk("NaifKeywords", isd["naif_keywords"]);
       lab.addObject(nk);
       *m_naifKeywords = nk;
@@ -298,11 +298,14 @@ namespace Isis {
     //    Use bodycode to obtain radii and attitude (pole position/omega0)
     //
     //    Use spkbodycode to read body position from spk
-
     QString trykey = "NaifIkCode";
     if (kernels.hasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
-    *m_ikCode = toInt(kernels[trykey][0]);
-
+    if (lab.findObject("IsisCube").hasGroup("CsmInfo")) {
+      *m_ikCode = -78987; 
+    }
+    else {
+      *m_ikCode = toInt(kernels[trykey][0]);
+    }
     *m_spkCode  = *m_ikCode / 1000;
     *m_sclkCode = *m_spkCode;
     *m_ckCode   = *m_ikCode;
@@ -347,6 +350,7 @@ namespace Isis {
       // Create the identity rotation for sky targets
       // Everything in bodyfixed will really be J2000
       m_bodyRotation = new SpiceRotation(1);
+
     }
     else {
       // JAA - Modified to store and look for the frame body code in the cube labels
@@ -469,6 +473,7 @@ namespace Isis {
       m_instrumentPosition->LoadCache(t);
     }
     NaifStatus::CheckErrors();
+    std::cout << "done" << std::endl;
   }
 
 

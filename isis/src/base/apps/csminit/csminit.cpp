@@ -438,11 +438,9 @@ namespace Isis {
          "10"/**toString(spice.solarLongitude().degrees())**/ );
       cube->write(bodyTable);
 
-      // PvlObject nk("NaifKeywords", jf["NaifKeywords"]);
+      // PvlGroup nk("NaifKeywords", jf["NaifKeywords"]);
       // cube->putGroup(nk);
 
-      // SpiceRotation* rot = new SpiceRotation(*cube->label, jf);
-      // rot->LoadCache(jf); 
 
     }
 

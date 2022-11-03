@@ -62,7 +62,7 @@ namespace Isis {
     if (name().toUpper() == "SKY") {
       m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
       m_sky = true;
-      int ikCode = toInt(kernels[trykey][0]);
+      int ikCode = spice->naifIkCode(); // toInt(kernels[trykey][0]);
       *m_bodyCode  = ikCode / 1000;
       // Check for override in kernel group
       if (kernels.hasKeyword("NaifSpkCode")) {
