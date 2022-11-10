@@ -251,7 +251,7 @@ namespace Isis {
                                       const double radius);
       virtual bool SetGround(Latitude latitude, Longitude longitude);
       virtual bool SetGround(const SurfacePoint & surfacePt);
-      bool SetRightAscensionDeclination(const double ra, const double dec);
+      virtual bool SetRightAscensionDeclination(const double ra, const double dec);
 
       void LocalPhotometricAngles(Angle & phase, Angle & incidence,
                                   Angle & emission, bool &success);
