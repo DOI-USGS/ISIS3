@@ -82,7 +82,6 @@ namespace Isis {
    * @param isd ALE Json ISD
    */
   Spice::Spice(Pvl &lab, json isd) {
-    m_usingAle = true; 
     init(lab, true, isd);
   }
 
@@ -97,7 +96,6 @@ namespace Isis {
    */
   void Spice::csmInit(Cube &cube, Pvl label) {
     defaultInit();
-    *m_ikCode = -78987; 
     m_target = new Target;
     NaifStatus::CheckErrors();
   }
@@ -187,8 +185,9 @@ namespace Isis {
     }
 
     // We should remove this completely in the near future
-    m_usingNaif = (!lab.hasObject("NaifKeywords") || noTables) && !m_usingAle;
-    m_usingAle = false || m_usingAle;
+    m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
+    m_usingAle = false;
+
 
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
@@ -202,7 +201,7 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
-        if (isd == NULL) {
+        if (isd == NULL){
           // try using ALE
           std::ostringstream kernel_pvl;
           kernel_pvl << kernels;
@@ -210,7 +209,7 @@ namespace Isis {
           json props;
           props["kernels"] = kernel_pvl.str();
 
-          isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale");
+          isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale", false);
         }
 
         json aleNaifKeywords = isd["naif_keywords"];
@@ -273,14 +272,14 @@ namespace Isis {
         load(ringPck, noTables);
       }
     }
-    else { 
-      PvlObject nk("NaifKeywords", isd["naif_keywords"]);
-      lab.addObject(nk);
-      *m_naifKeywords = nk;
+    else {
+      *m_naifKeywords = lab.findObject("NaifKeywords");
+
       // Moved the construction of the Target after the NAIF kenels have been loaded or the
       // NAIF keywords have been pulled from the cube labels, so we can find target body codes
       // that are defined in kernels and not just body codes build into spicelib
       // TODO: Move this below the else once the rings code above has been refactored
+
       m_target = new Target(this, lab);
     }
 
@@ -298,14 +297,11 @@ namespace Isis {
     //    Use bodycode to obtain radii and attitude (pole position/omega0)
     //
     //    Use spkbodycode to read body position from spk
+
     QString trykey = "NaifIkCode";
     if (kernels.hasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
-    if (lab.findObject("IsisCube").hasGroup("CsmInfo")) {
-      *m_ikCode = -78987; 
-    }
-    else {
-      *m_ikCode = toInt(kernels[trykey][0]);
-    }
+    *m_ikCode = toInt(kernels[trykey][0]);
+
     *m_spkCode  = *m_ikCode / 1000;
     *m_sclkCode = *m_spkCode;
     *m_ckCode   = *m_ikCode;
@@ -350,12 +346,11 @@ namespace Isis {
       // Create the identity rotation for sky targets
       // Everything in bodyfixed will really be J2000
       m_bodyRotation = new SpiceRotation(1);
-
     }
     else {
       // JAA - Modified to store and look for the frame body code in the cube labels
       SpiceInt frameCode;
-      if ((m_usingNaif) && (!m_naifKeywords->hasKeyword("BODY_FRAME_CODE"))) {
+      if (((m_usingNaif) || (!m_naifKeywords->hasKeyword("BODY_FRAME_CODE"))) && !isUsingAle()) {
         char frameName[32];
         SpiceBoolean found;
         cidfrm_c(*m_spkBodyCode, sizeof(frameName), &frameCode, frameName, &found);
@@ -374,7 +369,13 @@ namespace Isis {
         storeValue("BODY_FRAME_CODE", 0, SpiceIntType, result);
       }
       else {
-        frameCode = getInteger("BODY_FRAME_CODE", 0);
+        try {
+          frameCode = getInteger("BODY_FRAME_CODE", 0);
+        }
+        catch(IException &e) {
+          QString msg = "Unable to read BODY_FRAME_CODE from naifkeywords group";
+          throw IException(IException::Io, msg, _FILEINFO_);
+        }
       }
 
       m_bodyRotation = new SpiceRotation(frameCode);
@@ -430,7 +431,8 @@ namespace Isis {
     //  SpacecraftPosition.  The old keywords were in existance before the
     //  Table option, so we don't need to check for Table under the old
     //  keywords.
-    if (!m_usingAle && kernels["InstrumentPointing"].size() == 0) {
+
+    if (kernels["InstrumentPointing"].size() == 0) {
       throw IException(IException::Unknown,
                        "No camera pointing available",
                        _FILEINFO_);
@@ -438,14 +440,7 @@ namespace Isis {
 
     //  2009-03-18  Tracie Sucharski - Removed test for old keywords, any files
     // with the old keywords should be re-run through spiceinit.
-    if (m_usingAle) {
-     m_instrumentRotation->LoadCache(isd["instrument_pointing"]);
-     m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
-     if (m_instrumentRotation->cacheSize() > 5) {
-       m_instrumentRotation->LoadTimeCache();
-     }
-    }
-    else if (kernels.hasKeyword("InstrumentPointing") && kernels["InstrumentPointing"][0].toUpper() == "NADIR") {
+    if (kernels["InstrumentPointing"][0].toUpper() == "NADIR") {
       if (m_instrumentRotation) {
         delete m_instrumentRotation;
         m_instrumentRotation = NULL;
@@ -453,27 +448,33 @@ namespace Isis {
 
       m_instrumentRotation = new SpiceRotation(*m_ikCode, *m_spkBodyCode);
     }
+    else if (m_usingAle) {
+     m_instrumentRotation->LoadCache(isd["instrument_pointing"]);
+     m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
+     if (m_instrumentRotation->cacheSize() > 5) {
+       m_instrumentRotation->LoadTimeCache();
+     }
+    }
     else if (kernels["InstrumentPointing"][0].toUpper() == "TABLE") {
       Table t("InstrumentPointing", lab.fileName(), lab);
       m_instrumentRotation->LoadCache(t);
     }
 
 
-
-    if (m_usingAle) {
-      m_instrumentPosition->LoadCache(isd["instrument_position"]);
-    }
-    else if (kernels["InstrumentPosition"].size() == 0) {
+    if (kernels["InstrumentPosition"].size() == 0) {
       throw IException(IException::Unknown,
                        "No instrument position available",
                        _FILEINFO_);
+    }
+
+    if (m_usingAle) {
+      m_instrumentPosition->LoadCache(isd["instrument_position"]);
     }
     else if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
       Table t("InstrumentPosition", lab.fileName(), lab);
       m_instrumentPosition->LoadCache(t);
     }
     NaifStatus::CheckErrors();
-    std::cout << "done" << std::endl;
   }
 
 
@@ -706,7 +707,7 @@ namespace Isis {
           cacheSize);
       if (cacheSize > 3) m_instrumentPosition->Memcache2HermiteCache(tol);
     }
-    else if (m_instrumentPosition->GetSource() == SpicePosition::Memcache) {
+    else if (m_instrumentPosition->GetSource() == SpicePosition::Memcache && m_instrumentPosition->HasVelocity() && isUsingAle()) {
       int aleCacheSize = m_instrumentPosition->cacheSize();
       if (aleCacheSize > 3) {
         m_instrumentPosition->Memcache2HermiteCache(tol);
