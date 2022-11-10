@@ -424,24 +424,34 @@ namespace Isis {
     cube->write(csmStateBlob);
 
     // Try to attach rotations
+    // If a camera fails to generate the original BodyRotation
+    // table will overwrite this one (if there was an original
+    // BodyRotation table)
     if (ui.WasEntered("ISD")) {
       QString isdFilePath = ui.GetFileName("ISD");
-      std::ifstream ifs(isdFilePath.toStdString());
-      json jf = json::parse(ifs);
+      std::ifstream isdFileStream(isdFilePath.toStdString());
+      json isd = json::parse(isdFileStream);
 
-      Spice spice(*cube->label(), jf);
+      if (isd.contains("body_rotation")) {
+        int bodyFrameCode = isd["body_rotation"]["time_dependent_frames"][0];
+        if (isd["body_rotation"].contains("constant_frames")) {
+          bodyFrameCode = isd["body_rotation"]["constant_frames"][0];
+        }
 
-      Table bodyTable = spice.bodyRotation()->Cache("BodyRotation");
-      bodyTable.Label() += PvlKeyword("Description", "Created by csminit");
+        SpiceRotation bodyRotation(bodyFrameCode);
+        bodyRotation.LoadCache(isd["body_rotation"]);
 
-      bodyTable.Label() += PvlKeyword("SolarLongitude",
-         "10"/**toString(spice.solarLongitude().degrees())**/ );
-      cube->write(bodyTable);
-
-      // PvlGroup nk("NaifKeywords", jf["NaifKeywords"]);
-      // cube->putGroup(nk);
-
-
+        Table bodyTable = bodyRotation.Cache("BodyRotation");
+        bodyTable.Label() += PvlKeyword("Description", "Created by csminit");
+        bodyTable.Label() += PvlKeyword("SolarLongitude",
+          "10"/**toString(spice.solarLongitude().degrees())**/ );
+        cube->write(bodyTable);
+        if (isd.contains("naif_keywords")) {
+          json aleNaifKeywords = isd["naif_keywords"];
+          PvlObject naifKeywords = PvlObject("NaifKeywords", aleNaifKeywords);
+          *cube->label() += naifKeywords;
+        }
+      }
     }
 
     try {
