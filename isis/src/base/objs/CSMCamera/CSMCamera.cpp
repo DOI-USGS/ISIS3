@@ -115,8 +115,8 @@ namespace Isis {
 
     if (cube.hasTable("BodyRotation")) {
       Table bodyRotTable("BodyRotation", cube.fileName(), *cube.label());
-      m_bodyRot = new SpiceRotation(499);
-      m_bodyRot->LoadCache(bodyRotTable);
+      m_bodyRotation = new SpiceRotation(1);
+      m_bodyRotation->LoadCache(bodyRotTable);
 
       PvlKeyword solarLonKey = bodyRotTable.Label().findKeyword("SolarLongitude");
       m_solarLongitude = new Longitude((double)solarLonKey, Angle::Radians);
@@ -177,10 +177,17 @@ namespace Isis {
                                     imageLocus.direction.z};
 
     // Save off the look vector
-    m_lookB[0] = locusVec[0];
-    m_lookB[1] = locusVec[1];
-    m_lookB[2] = locusVec[2];
-    m_newLookB = true;
+    bool intersect = SetLookDirection(locusVec);
+    if (!m_et) {
+      m_et = new iTime();
+    }
+    *m_et = m_refTime + m_model->getImageTime(imagePt);
+    setTime(*m_et);
+    
+    if (target()->isSky()) {
+      target()->shape()->setHasIntersection(false);
+      return false;
+    }
 
     // Check for a ground intersection
     if(!target()->shape()->intersectSurface(obsPosition, locusVec)) {
@@ -188,10 +195,6 @@ namespace Isis {
     }
 
     p_pointComputed = true;
-    if (!m_et) {
-      m_et = new iTime();
-    }
-    *m_et = m_refTime + m_model->getImageTime(imagePt);
     return true;
   }
 
@@ -275,7 +278,7 @@ namespace Isis {
     double decRad = dec * DEG2RAD;
 
     // Make the radius bigger, some multiple of the body radius -or- use sensor position at the reference point 
-    SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 99999};
+    SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 10e12};
     SensorUtilities::Vec rectPt = SensorUtilities::sphericalToRect(sphericalPt);
 
     // vector<double> lookC = instrumentRotation()->ReferenceVector(rectPt);
@@ -286,14 +289,15 @@ namespace Isis {
     csm::ImageCoord imagePt;
 
     try {
-      imagePt = m_model->groundToImage(lookPt, 0.01, &achievedPrecision, &warnings); 
+      imagePt = m_model->groundToImage(lookPt, 0.01, &achievedPrecision, &warnings);
+      double sample;
+      double line;
+      csmToIsisPixel(imagePt, line, sample);
+      validBackProject = SetImage(sample, line);
     }
     catch (csm::Error &e) {
       validBackProject = false;
     }
-    
-    p_childLine = imagePt.line; 
-    p_childSample = imagePt.samp;     
 
     return validBackProject;
   }
@@ -311,19 +315,8 @@ namespace Isis {
    * @return @b bool Indicates whether the given look direction intersects the target.
    * 
    */
-  bool CSMCamera::SetLookDirection(const double v[3]) {
-    //std::cout << "Sensor::SetLookDirection()\n";
-    // The look vector must be in the camera coordinate system
-
-    // copy v to LookC
-    // lookC[0] = v[0];
-    // lookC[1] = v[1];
-    // lookC[2] = v[2]
-    vector<double> lookC(v, v + 3);
-
-    // Convert it to body-fixed
-    // const vector<double> &lookJ = instrumentRotation()->J2000Vector(lookC);
-    const vector<double> &lookB = lookDirectionBodyFixed();
+  bool CSMCamera::SetLookDirection(const vector<double> lookB) {
+    // The look vector must be in the bodyfixed coordinate system
 
     // This memcpy does:
     // m_lookB[0] = lookB[0];
@@ -331,20 +324,6 @@ namespace Isis {
     // m_lookB[2] = lookB[2];
     memcpy(m_lookB, &lookB[0], sizeof(double) * 3);
     m_newLookB = true;
-
-    // Don't try to intersect the sky
-    if (target()->isSky()) {
-      target()->shape()->setHasIntersection(false);
-      return false;
-    }
-
-    // See if it intersects the planet
-    const vector<double> &sB = bodyRotation()->ReferenceVector(
-        instrumentPosition()->Coordinate());
-
-    // double tolerance = resolution() / 100.0; return
-    // target()->shape()->intersectSurface(sB, lookB, tolerance);
-    return target()->shape()->intersectSurface(sB, lookB);
   }
 
 
@@ -1113,8 +1092,8 @@ namespace Isis {
    * @param time The time to set
    */
   void CSMCamera::setTime(const iTime &time) {
-    if(m_bodyRot != NULL) {
-      m_bodyRot->SetEphemerisTime(time.Et());
+    if(bodyRotation() != NULL) {
+      bodyRotation()->SetEphemerisTime(time.Et());
     }
   }
 
@@ -1192,20 +1171,6 @@ namespace Isis {
 
 
   /**
-   * Get the SpiceRotation object the contains the orientation of the target body
-   * relative to J2000.
-   *
-   * This is not supported for CSM sensors because the CSM API only supports the
-   * body fixed coordinate system and does not provide rotations to any others.
-   *
-   * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the body orientation
-   */
-  SpiceRotation *CSMCamera::bodyRotation() const {
-    return m_bodyRot;
-  }
-
-
-  /**
    * Get the SpiceRotation object the contains the orientation of the sensor
    * relative to J2000.
    *
@@ -1246,46 +1211,14 @@ namespace Isis {
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
-
   /**
-   * Computes the Right Ascension of the currently set image coordinate.
-   *
-   * This is not supported for CSM sensors because the CSM API only supports the
-   * body fixed coordinate system and does not provide rotations to any others.
-   *
-   * @returns @b double The Right Ascension
+   * Accessor method for the body rotation.
+   * @return @b iTime Body rotation for the image.
+   * @author Steven Lambright
+   * @internal
+   *   @history 2011-02-09 Steven Lambright - Original version.
    */
-  double CSMCamera::RightAscension() {
-    if (m_bodyRot == NULL || m_model == NULL) {
-      QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    double precision;
-    csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(Lines()/2, Samples()/2), 0.00001, &precision);
-    csm::EcefVector v = locus.direction;
-    std::vector<double> jvec = m_bodyRot->J2000Vector({v.x, v.y, v.z});
-    return v.x;
-  }
-
-
-  /**
-   * Computes the Declination of the currently set image coordinate.
-   *
-   * This is not supported for CSM sensors because the CSM API only supports the
-   * body fixed coordinate system and does not provide rotations to any others.
-   *
-   * @returns @b double The Declination
-   */
-  double CSMCamera::Declination() {
-    if (m_bodyRot == NULL || m_model == NULL) {
-      QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-    double precision;
-    csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(Lines()/2, Samples()/2), 0.00001, &precision);
-    csm::EcefVector v = locus.direction;
-    std::vector<double> jvec = m_bodyRot->J2000Vector({v.x, v.y, v.z});
-    return v.y;
+  SpiceRotation *CSMCamera::bodyRotation() const {
+    return m_bodyRotation;
   }
 }
