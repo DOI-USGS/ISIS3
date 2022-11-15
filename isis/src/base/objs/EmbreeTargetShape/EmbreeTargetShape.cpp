@@ -279,7 +279,7 @@ namespace Isis {
         throw IException(IException::Io, msg, _FILEINFO_);
       }
       // DSKs
-      else if (file.extension() == "bds") {
+      else if (file.extension().toLower() == "bds") {
         mesh = readDSK(file);
       }
       // Let PCL try to handle other formats (obj, ply, etc.)
