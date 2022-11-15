@@ -4,7 +4,6 @@
 #include "TestUtilities.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include <QPair>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QXmlStreamWriter>
@@ -22,23 +21,6 @@ QDomDocument saveToQDomDocument(BundleObservationSolveSettings &boss) {
 
   return settingsDoc;
 }
-
-
-class CSMSolveOptionStrings : public testing::TestWithParam<QPair<
-  BundleObservationSolveSettings::CSMSolveOption, QString>> {
-};
-class CSMSolveSetStrings : public testing::TestWithParam<QPair<
-  csm::param::Set, QString>> {
-};
-class CSMSolveTypeStrings : public testing::TestWithParam<QPair<
-  csm::param::Type, QString>> {
-};
-class PointingSolveOptionStrings : public testing::TestWithParam<QPair<
-  BundleObservationSolveSettings::InstrumentPointingSolveOption, QString>> {
-};
-class PositionSolveOptionStrings : public testing::TestWithParam<QPair<
-  BundleObservationSolveSettings::InstrumentPositionSolveOption, QString>> {
-};
 
 TEST(BundleObservationSolveSettings, DefaultConstructor) {
   BundleObservationSolveSettings boss;
@@ -443,90 +425,77 @@ TEST(BundleObservationSolveSettings, SaveSettings){
     aprioriPositionSigmas.namedItem("sigma").nodeValue(), "");
 }
 
-TEST_P(CSMSolveOptionStrings, StringToOption) {
-  EXPECT_EQ(GetParam().first,
-    BundleObservationSolveSettings::stringToCSMSolveOption(GetParam().second));
+TEST(CSMSolveOptionStrings, StringToOption) {
+  EXPECT_EQ(BundleObservationSolveSettings::NoCSMParameters, BundleObservationSolveSettings::stringToCSMSolveOption(QString("NoCSMParameters")));
+  EXPECT_EQ(BundleObservationSolveSettings::Set, BundleObservationSolveSettings::stringToCSMSolveOption(QString("Set")));
+  EXPECT_EQ(BundleObservationSolveSettings::Type, BundleObservationSolveSettings::stringToCSMSolveOption(QString("Type")));
+  EXPECT_EQ(BundleObservationSolveSettings::List, BundleObservationSolveSettings::stringToCSMSolveOption(QString("List")));
 }
 
-TEST_P(CSMSolveOptionStrings, OptionToString) {
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, GetParam().second,
-    BundleObservationSolveSettings::csmSolveOptionToString(GetParam().first));
+TEST(CSMSolveOptionStrings, OptionToString) {
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, "NoCSMParameters" , BundleObservationSolveSettings::csmSolveOptionToString(BundleObservationSolveSettings::NoCSMParameters));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, "Set" , BundleObservationSolveSettings::csmSolveOptionToString(BundleObservationSolveSettings::Set));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, "Type" , BundleObservationSolveSettings::csmSolveOptionToString(BundleObservationSolveSettings::Type));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, "List" , BundleObservationSolveSettings::csmSolveOptionToString(BundleObservationSolveSettings::List));
 }
 
-TEST_P(CSMSolveSetStrings, StringToOption) {
-  EXPECT_EQ(GetParam().first,
-    BundleObservationSolveSettings::stringToCSMSolveSet(GetParam().second));
+TEST(CSMSolveSetStrings, StringToOption) {
+  EXPECT_EQ(csm::param::VALID, BundleObservationSolveSettings::stringToCSMSolveSet(QString("VALID")));
+  EXPECT_EQ(csm::param::ADJUSTABLE, BundleObservationSolveSettings::stringToCSMSolveSet(QString("ADJUSTABLE")));
+  EXPECT_EQ(csm::param::NON_ADJUSTABLE, BundleObservationSolveSettings::stringToCSMSolveSet(QString("NON_ADJUSTABLE")));
 }
 
-TEST_P(CSMSolveSetStrings, OptionToString) {
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, GetParam().second,
-    BundleObservationSolveSettings::csmSolveSetToString(GetParam().first));
+TEST(CSMSolveSetStrings, OptionToString) {
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("VALID"), BundleObservationSolveSettings::csmSolveSetToString(csm::param::VALID));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("ADJUSTABLE"), BundleObservationSolveSettings::csmSolveSetToString(csm::param::ADJUSTABLE));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("NON_ADJUSTABLE"), BundleObservationSolveSettings::csmSolveSetToString(csm::param::NON_ADJUSTABLE));
 }
 
-TEST_P(CSMSolveTypeStrings, StringToOption) {
-  EXPECT_EQ(GetParam().first,
-    BundleObservationSolveSettings::stringToCSMSolveType(GetParam().second));
+TEST(CSMSolveTypeStrings, StringToOption) {
+  EXPECT_EQ(csm::param::NONE, BundleObservationSolveSettings::stringToCSMSolveType(QString("NONE")));
+  EXPECT_EQ(csm::param::FICTITIOUS, BundleObservationSolveSettings::stringToCSMSolveType(QString("FICTITIOUS")));
+  EXPECT_EQ(csm::param::REAL, BundleObservationSolveSettings::stringToCSMSolveType(QString("REAL")));
+  EXPECT_EQ(csm::param::FIXED, BundleObservationSolveSettings::stringToCSMSolveType(QString("FIXED")));
 }
 
-TEST_P(CSMSolveTypeStrings, OptionToString) {
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, GetParam().second,
-    BundleObservationSolveSettings::csmSolveTypeToString(GetParam().first));
+TEST(CSMSolveTypeStrings, OptionToString) {
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("NONE"), BundleObservationSolveSettings::csmSolveTypeToString(csm::param::NONE));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("FICTITIOUS"), BundleObservationSolveSettings::csmSolveTypeToString(csm::param::FICTITIOUS));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("REAL"), BundleObservationSolveSettings::csmSolveTypeToString(csm::param::REAL));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("FIXED"), BundleObservationSolveSettings::csmSolveTypeToString(csm::param::FIXED));
 }
 
-TEST_P(PointingSolveOptionStrings, StringToOption) {
-  EXPECT_EQ(GetParam().first,
-    BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(GetParam().second));
+TEST(PointingSolveOptionStrings, StringToOption) {
+  EXPECT_EQ(BundleObservationSolveSettings::NoPointingFactors, BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(QString("None")));
+  EXPECT_EQ(BundleObservationSolveSettings::AnglesOnly, BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(QString("AnglesOnly")));
+  EXPECT_EQ(BundleObservationSolveSettings::AnglesVelocity, BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(QString("AnglesAndVelocity")));
+  EXPECT_EQ(BundleObservationSolveSettings::AnglesVelocityAcceleration, BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(QString("AnglesVelocityAndAcceleration")));
+  EXPECT_EQ(BundleObservationSolveSettings::AllPointingCoefficients, BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(QString("AllPolynomialCoefficients")));
 }
 
-TEST_P(PointingSolveOptionStrings, OptionToString) {
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, GetParam().second,
-    BundleObservationSolveSettings::instrumentPointingSolveOptionToString(GetParam().first));
+TEST(PointingSolveOptionStrings, OptionToString) {
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("None"), BundleObservationSolveSettings::instrumentPointingSolveOptionToString(BundleObservationSolveSettings::NoPointingFactors));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("AnglesOnly"), BundleObservationSolveSettings::instrumentPointingSolveOptionToString(BundleObservationSolveSettings::AnglesOnly));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("AnglesAndVelocity"), BundleObservationSolveSettings::instrumentPointingSolveOptionToString(BundleObservationSolveSettings::AnglesVelocity));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("AnglesVelocityAndAcceleration"), BundleObservationSolveSettings::instrumentPointingSolveOptionToString(BundleObservationSolveSettings::AnglesVelocityAcceleration));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("AllPolynomialCoefficients"), BundleObservationSolveSettings::instrumentPointingSolveOptionToString(BundleObservationSolveSettings::AllPointingCoefficients));
 }
 
-TEST_P(PositionSolveOptionStrings, StringToOption) {
-  EXPECT_EQ(GetParam().first,
-    BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(GetParam().second));
+TEST(PositionSolveOptionStrings, StringToOption) {
+  EXPECT_EQ(BundleObservationSolveSettings::NoPositionFactors, BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(QString("None")));
+  EXPECT_EQ(BundleObservationSolveSettings::PositionOnly, BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(QString("PositionOnly")));
+  EXPECT_EQ(BundleObservationSolveSettings::PositionVelocity, BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(QString("PositionAndVelocity")));
+  EXPECT_EQ(BundleObservationSolveSettings::PositionVelocityAcceleration, BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(QString("PositionVelocityAndAcceleration")));
+  EXPECT_EQ(BundleObservationSolveSettings::AllPositionCoefficients, BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(QString("AllPolynomialCoefficients")));
 }
 
-TEST_P(PositionSolveOptionStrings, OptionToString) {
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, GetParam().second,
-    BundleObservationSolveSettings::instrumentPositionSolveOptionToString(GetParam().first));
+TEST(PositionSolveOptionStrings, OptionToString) {
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("None"), BundleObservationSolveSettings::instrumentPositionSolveOptionToString(BundleObservationSolveSettings::NoPositionFactors));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("PositionOnly"), BundleObservationSolveSettings::instrumentPositionSolveOptionToString(BundleObservationSolveSettings::PositionOnly));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("PositionAndVelocity"), BundleObservationSolveSettings::instrumentPositionSolveOptionToString(BundleObservationSolveSettings::PositionVelocity));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("PositionVelocityAndAcceleration"), BundleObservationSolveSettings::instrumentPositionSolveOptionToString(BundleObservationSolveSettings::PositionVelocityAcceleration));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("AllPolynomialCoefficients"), BundleObservationSolveSettings::instrumentPositionSolveOptionToString(BundleObservationSolveSettings::AllPositionCoefficients));
 }
-
-INSTANTIATE_TEST_SUITE_P(BundleObservationSolveSettings, CSMSolveOptionStrings, ::testing::Values(
-  qMakePair(BundleObservationSolveSettings::NoCSMParameters, QString("NoCSMParameters")),
-  qMakePair(BundleObservationSolveSettings::Set, QString("Set")),
-  qMakePair(BundleObservationSolveSettings::Type, QString("Type")),
-  qMakePair(BundleObservationSolveSettings::List, QString("List"))));
-
-INSTANTIATE_TEST_SUITE_P(BundleObservationSolveSettings, CSMSolveSetStrings, ::testing::Values(
-  qMakePair(csm::param::VALID, QString("VALID")),
-  qMakePair(csm::param::ADJUSTABLE, QString("ADJUSTABLE")),
-  qMakePair(csm::param::NON_ADJUSTABLE, QString("NON_ADJUSTABLE"))));
-
-INSTANTIATE_TEST_SUITE_P(BundleObservationSolveSettings, CSMSolveTypeStrings, ::testing::Values(
-  qMakePair(csm::param::NONE, QString("NONE")),
-  qMakePair(csm::param::FICTITIOUS, QString("FICTITIOUS")),
-  qMakePair(csm::param::REAL, QString("REAL")),
-  qMakePair(csm::param::FIXED, QString("FIXED"))));
-
-INSTANTIATE_TEST_SUITE_P(BundleObservationSolveSettings, PointingSolveOptionStrings, ::testing::Values(
-  qMakePair(BundleObservationSolveSettings::NoPointingFactors, QString("None")),
-  qMakePair(BundleObservationSolveSettings::AnglesOnly, QString("AnglesOnly")),
-  qMakePair(BundleObservationSolveSettings::AnglesVelocity, QString("AnglesAndVelocity")),
-  qMakePair(BundleObservationSolveSettings::AnglesVelocityAcceleration,
-            QString("AnglesVelocityAndAcceleration")),
-  qMakePair(BundleObservationSolveSettings::AllPointingCoefficients,
-            QString("AllPolynomialCoefficients"))));
-
-INSTANTIATE_TEST_SUITE_P(BundleObservationSolveSettings, PositionSolveOptionStrings, ::testing::Values(
-  qMakePair(BundleObservationSolveSettings::NoPositionFactors, QString("None")),
-  qMakePair(BundleObservationSolveSettings::PositionOnly, QString("PositionOnly")),
-  qMakePair(BundleObservationSolveSettings::PositionVelocity, QString("PositionAndVelocity")),
-  qMakePair(BundleObservationSolveSettings::PositionVelocityAcceleration,
-            QString("PositionVelocityAndAcceleration")),
-  qMakePair(BundleObservationSolveSettings::AllPositionCoefficients,
-            QString("AllPolynomialCoefficients"))));
 
 TEST(BundleObservationSolveSettings, GroupConstructorBadOverhermite) {
   QString message = "The OVERHERMITE parameter must be set to TRUE or FALSE; YES or NO";

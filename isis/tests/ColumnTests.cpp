@@ -5,18 +5,6 @@
 
 using namespace Isis;
 
-class Types : public testing::TestWithParam<Column::Type> {
-};
-
-class TypeError : public testing::TestWithParam<Column::Type> {
-};
-
-class Align : public testing::TestWithParam<Column::Align> {
-};
-
-class PrecisionError : public testing::TestWithParam<Column::Align> {
-};
-
 //Tests that the default constructor works as intended
 TEST(Column, DefaultConstructor) {
   Column column;
@@ -56,26 +44,30 @@ TEST(Column, Width) {
 }
 
 //Tests SetType & DataType functions with every member of the Type enum
-TEST_P(Types, Type) {
-  Column column;
-  column.SetType(GetParam());
+TEST(Types, Type) {
+  std::list<Column::Type> list = {Column::NoType, Column::Integer, Column::Real, Column::String, Column::Pixel};
 
-  EXPECT_EQ(column.DataType(), GetParam());
+  for (Column::Type type : list) {
+    Column column;
+    column.SetType(type);
+
+    EXPECT_EQ(column.DataType(), type);
+  }
+  
 }
-
-INSTANTIATE_TEST_SUITE_P(Column, Types, ::testing::Values(
-  Column::NoType, Column::Integer, Column::Real, Column::String, Column::Pixel));
 
 //Tests SetAlignment & Alignment functions with every member of the Align enum
-TEST_P(Align, Alignment) {
-  Column column;
-  column.SetAlignment(GetParam());
+TEST(Align, Alignment) {
+  std::list<Column::Align> list = {Column::NoAlign, Column::Right, Column::Left, Column::Decimal};
 
-  EXPECT_EQ(column.Alignment(), GetParam());
+  for (Column::Align alignment : list) {
+    Column column;
+    column.SetAlignment(alignment);
+
+    EXPECT_EQ(column.Alignment(), alignment);
+  }
+  
 }
-
-INSTANTIATE_TEST_SUITE_P(Column, Align, ::testing::Values(
-  Column::NoAlign, Column::Right, Column::Left, Column::Decimal));
 
 //Tests SetPrecision & Precision functions with Real type and Pixel type.
 //These are the only two types expected to work with SetPrecision
@@ -131,61 +123,71 @@ TEST(Column, SetWidthError) {
 //Tests that SetTypes' exceptions are working correctly
 //Should throw an error when Alignment is Decimal and
 //SetType is called with String or Integer
-TEST_P(TypeError, SetTypeError) {
+TEST(TypeError, SetTypeError) {
   QString message = "Integer or string type is not sensible if alignment is Decimal.";
-  Column column;
-  column.SetAlignment(Column::Decimal);
-  try {
-    column.SetType(GetParam());
-  }
-  catch(IException &e) {
-    EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
-  }
-  catch(...) {
-    FAIL() << "Expected an IException with message \""
-    << message.toStdString() <<"\"";
+
+  std::list<Column::Type> list = {Column::Integer, Column::String};
+
+  for (Column::Type type : list) {
+    Column column;
+    column.SetAlignment(Column::Decimal);
+    try {
+      column.SetType(type);
+    }
+    catch(IException &e) {
+      EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
+    }
+    catch(...) {
+      FAIL() << "Expected an IException with message \""
+      << message.toStdString() <<"\"";
+    }
   }
 }
 
 //Tests that SetAlignment's exceptions are working correctly
 //Should throw an error when Type is String or Integer and
 //SetAllignment is called with Decimal
-TEST_P(TypeError, SetAlignmentError) {
+TEST(TypeError, SetAlignmentError) {
   QString message = "Decimal alignment does not make sense for integer or string values.";
-  Column column;
-  column.SetType(GetParam());
-  try {
-    column.SetAlignment(Column::Decimal);
-  }
-  catch(IException &e) {
-    EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
-  }
-  catch(...) {
-    FAIL() << "Expected an IException with message \""
-    << message.toStdString() <<"\"";
+
+  std::list<Column::Type> list = {Column::Integer, Column::String};
+
+  for (Column::Type type : list) {
+    Column column;
+    column.SetType(type);
+    try {
+      column.SetAlignment(Column::Decimal);
+    }
+    catch(IException &e) {
+      EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
+    }
+    catch(...) {
+      FAIL() << "Expected an IException with message \""
+      << message.toStdString() <<"\"";
+    }
   }
 }
 
-INSTANTIATE_TEST_SUITE_P(Column, TypeError, ::testing::Values(
-  Column::Integer, Column::String));
 
 //Tests that Precision's exceptions are working correctly
 //Should throw an error when SetPrecision is called and Alignment is not Decimal
-TEST_P(PrecisionError, SetPrecisionError) {
+TEST(PrecisionError, SetPrecisionError) {
   QString message = "Setting precision only makes sense for Decimal Alignment";
-  Column column;
-  column.SetAlignment(GetParam());
+  std::list<Column::Align> list = {Column::NoAlign, Column::Right, Column::Left};
 
-  try{
-    column.SetPrecision(10);
-  }
-  catch(IException &e) {
-    EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
-  }
-  catch(...) {
-    FAIL() << "Expected an IException with message \""
-    << message.toStdString() <<"\"";
+  for (Column::Align alignment : list) {
+    Column column;
+    column.SetAlignment(alignment);
+
+    try{
+      column.SetPrecision(10);
+    }
+    catch(IException &e) {
+      EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
+    }
+    catch(...) {
+      FAIL() << "Expected an IException with message \""
+      << message.toStdString() <<"\"";
+    }
   }
 }
-INSTANTIATE_TEST_SUITE_P(Column, PrecisionError, ::testing::Values(
-  Column::NoAlign, Column::Right, Column::Left));

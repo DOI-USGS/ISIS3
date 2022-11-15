@@ -11,18 +11,15 @@
 namespace Isis{
 
 
-  class QStringQColorPair: public ::testing::TestWithParam<std::pair<QString, QColor> > {
-    // Intentionally left empty
-  };
-
-
-  class InvalidColorString: public ::testing::TestWithParam<QString> {
-  // Intentionally left empty
-  };
-
-
-  TEST_P (QStringQColorPair, ValidColorToString) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, GetParam().first, Color::toRGBAString(GetParam().second));
+  TEST (QStringQColorPair, ValidColorToString) {
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("#000000ff"), Color::toRGBAString(QColor(0, 0, 0)));
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("#00000000"), Color::toRGBAString(QColor(0, 0, 0, 0)));
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("#ff000000"), Color::toRGBAString(QColor(255, 0, 0, 0)));
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("#00ff0000"), Color::toRGBAString(QColor(0, 255, 0, 0)));
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("#0000ff00"), Color::toRGBAString(QColor(0, 0, 255, 0)));
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("#000000ff"), Color::toRGBAString(QColor(0, 0, 0, 255)));
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("#ffffffff"), Color::toRGBAString(QColor(255, 255, 255, 255)));
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString("#0a141e28"), Color::toRGBAString(QColor(10, 20, 30, 40)));
   }
 
 
@@ -49,42 +46,43 @@ namespace Isis{
   }
 
 
-  TEST_P (QStringQColorPair, ValidStringToColor) {
-    EXPECT_EQ(GetParam().second, Color::fromRGBAString(GetParam().first));
+  TEST (QStringQColorPair, ValidStringToColor) {
+    EXPECT_EQ(QColor(0, 0, 0), Color::fromRGBAString(QString("#000000ff")));
+    EXPECT_EQ(QColor(0, 0, 0, 0), Color::fromRGBAString(QString("#00000000")));
+    EXPECT_EQ(QColor(255, 0, 0, 0), Color::fromRGBAString(QString("#ff000000")));
+    EXPECT_EQ(QColor(0, 255, 0, 0), Color::fromRGBAString(QString("#00ff0000")));
+    EXPECT_EQ(QColor(0, 0, 255, 0), Color::fromRGBAString(QString("#0000ff00")));
+    EXPECT_EQ(QColor(0, 0, 0, 255), Color::fromRGBAString(QString("#000000ff")));
+    EXPECT_EQ(QColor(255, 255, 255, 255), Color::fromRGBAString(QString("#ffffffff")));
+    EXPECT_EQ(QColor(10, 20, 30, 40), Color::fromRGBAString(QString("#0a141e28")));
+
   }
 
 
-  TEST_P (InvalidColorString, InvalidStringToColor) {
-    EXPECT_EQ(QColor(QColor::Invalid), Color::fromRGBAString(GetParam()));
+  TEST (InvalidColorString, InvalidStringToColor) {
+    EXPECT_EQ(QColor(QColor::Invalid), Color::fromRGBAString("#rrggbbaa"));
+    EXPECT_EQ(QColor(QColor::Invalid), Color::fromRGBAString(" 00112233"));
+    EXPECT_EQ(QColor(QColor::Invalid), Color::fromRGBAString(""));
+    EXPECT_EQ(QColor(QColor::Invalid), Color::fromRGBAString("#001122"));
   }
 
 
-  TEST_P (QStringQColorPair, ValidColorRGBAFormat) {
-    EXPECT_TRUE(Color::colorRGBAFormat().exactMatch(GetParam().first));
+  TEST (QStringQColorPair, ValidColorRGBAFormat) {
+    EXPECT_TRUE(Color::colorRGBAFormat().exactMatch(QString("#000000ff")));
+    EXPECT_TRUE(Color::colorRGBAFormat().exactMatch(QString("#00000000")));
+    EXPECT_TRUE(Color::colorRGBAFormat().exactMatch(QString("#ff000000")));
+    EXPECT_TRUE(Color::colorRGBAFormat().exactMatch(QString("#00ff0000")));
+    EXPECT_TRUE(Color::colorRGBAFormat().exactMatch(QString("#0000ff00")));
+    EXPECT_TRUE(Color::colorRGBAFormat().exactMatch(QString("#000000ff")));
+    EXPECT_TRUE(Color::colorRGBAFormat().exactMatch(QString("#ffffffff")));
+    EXPECT_TRUE(Color::colorRGBAFormat().exactMatch(QString("#0a141e28")));
   }
 
 
-  TEST_P (InvalidColorString, InvalidColorRGBAFormat) {
-    EXPECT_FALSE(Color::colorRGBAFormat().exactMatch(GetParam()));
+  TEST (InvalidColorString, InvalidColorRGBAFormat) {
+    EXPECT_FALSE(Color::colorRGBAFormat().exactMatch(QString("#rrggbbaa")));
+    EXPECT_FALSE(Color::colorRGBAFormat().exactMatch(QString(" 00112233")));
+    EXPECT_FALSE(Color::colorRGBAFormat().exactMatch(QString("")));
+    EXPECT_FALSE(Color::colorRGBAFormat().exactMatch(QString("#001122")));
   }
-
-  INSTANTIATE_TEST_SUITE_P (Color,
-                           QStringQColorPair,
-                           ::testing::Values(std::make_pair(QString("#000000ff"), QColor(0, 0, 0)),
-                                             std::make_pair(QString("#00000000"), QColor(0, 0, 0, 0)),
-                                             std::make_pair(QString("#ff000000"), QColor(255, 0, 0, 0)),
-                                             std::make_pair(QString("#00ff0000"), QColor(0, 255, 0, 0)),
-                                             std::make_pair(QString("#0000ff00"), QColor(0, 0, 255, 0)),
-                                             std::make_pair(QString("#000000ff"), QColor(0, 0, 0, 255)),
-                                             std::make_pair(QString("#ffffffff"), QColor(255, 255, 255, 255)),
-                                             std::make_pair(QString("#0a141e28"), QColor(10, 20, 30, 40))));
-
-
-  INSTANTIATE_TEST_SUITE_P (Color,
-                           InvalidColorString,
-                           ::testing::Values(QString("#rrggbbaa"),
-                                            QString(" 00112233"),
-                                            QString(""),
-                                            QString("#001122")));
-
 }

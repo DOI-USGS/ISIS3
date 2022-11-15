@@ -6,6 +6,7 @@
 #include "gmock/gmock.h"
 
 using namespace Isis;
+using namespace std;
 
 TEST(iTimeTests, TimeAccess) {
     iTime testTime("2003-01-02T12:15:01.1234");
@@ -125,43 +126,38 @@ TEST(iTimeTests, Arithmetic) {
 }
 
 
-// googletest parameterized test class to hold two UTC strings.
-// The first string is the expected string formatted as YYYY-MM-DDThh:mm:ss.zzzz
-// The second string is the input string for setUTC
-class SetUTC : public ::testing::TestWithParam<std::pair<std::string, std::string>> {};
+TEST(SetUTC, CheckOutput) {
+    pair<string, string> arr[] = { 
+        make_pair("2003-01-02T12:15:01.1234", "2003-01-02T12:15:01.1234"),
+        make_pair("2003-01-02T12:15:01.1234", "20030102T121501.1234"),
+        make_pair("2003-01-02T12:15:01.1234", "200302T121501.1234"),
+        make_pair("2003-01-02T12:15:01.1234", "2003-02T12:15:01.1234"),
+        make_pair("2003-05-02T12:15:01.1234", "2003122T121501.1234"),
+        make_pair("2003-05-02T12:15:01.1234", "2003-122T12:15:01.1234"),
+        make_pair("2003-01-02T12:15:01", "20030102T121501"),
+        make_pair("2003-01-02T12:15:01", "2003-01-02T12:15:01"),
+        make_pair("2003-01-02T12:15:00", "20030102T1215"),
+        make_pair("2003-01-02T12:15:00", "2003-01-02T12:15"),
+        make_pair("2003-01-02T12:00:00", "20030102T12"),
+        make_pair("2003-01-02T12:00:00", "2003-01-02T12"),
+        make_pair("2003-01-02T00:00:00", "20030102T"),
+        make_pair("2003-01-02T00:00:00", "2003-01-02T") };
 
+    for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++){
+        QString expectedString = QString::fromStdString(arr[i].first);
+        iTime expectedTime(expectedString);
+        iTime testTime;
 
-TEST_P(SetUTC, CheckOutput) {
-    QString expectedString = QString::fromStdString(GetParam().first);
-    iTime expectedTime(expectedString);
-    iTime testTime;
+        QString inputString = QString::fromStdString(arr[i].second);
+        testTime.setUtc(inputString);
 
-    QString inputString = QString::fromStdString(GetParam().second);
-    testTime.setUtc(inputString);
-
-    EXPECT_EQ(expectedTime.Year(), testTime.Year());
-    EXPECT_EQ(expectedTime.Month(), testTime.Month());
-    EXPECT_EQ(expectedTime.Day(), testTime.Day());
-    EXPECT_EQ(expectedTime.Hour(), testTime.Hour());
-    EXPECT_EQ(expectedTime.Minute(), testTime.Minute());
-    EXPECT_EQ(expectedTime.Second(), testTime.Second());
-    EXPECT_EQ(expectedTime.DayOfYear(), testTime.DayOfYear());
-    EXPECT_NEAR(expectedTime.Et(), testTime.Et(), 0.000001);
+        EXPECT_EQ(expectedTime.Year(), testTime.Year());
+        EXPECT_EQ(expectedTime.Month(), testTime.Month());
+        EXPECT_EQ(expectedTime.Day(), testTime.Day());
+        EXPECT_EQ(expectedTime.Hour(), testTime.Hour());
+        EXPECT_EQ(expectedTime.Minute(), testTime.Minute());
+        EXPECT_EQ(expectedTime.Second(), testTime.Second());
+        EXPECT_EQ(expectedTime.DayOfYear(), testTime.DayOfYear());
+        EXPECT_NEAR(expectedTime.Et(), testTime.Et(), 0.000001);
+    }
 }
-
-
-INSTANTIATE_TEST_SUITE_P(iTimeTests, SetUTC, ::testing::Values(
-    std::make_pair("2003-01-02T12:15:01.1234", "2003-01-02T12:15:01.1234"),
-    std::make_pair("2003-01-02T12:15:01.1234", "20030102T121501.1234"),
-    std::make_pair("2003-01-02T12:15:01.1234", "200302T121501.1234"),
-    std::make_pair("2003-01-02T12:15:01.1234", "2003-02T12:15:01.1234"),
-    std::make_pair("2003-05-02T12:15:01.1234", "2003122T121501.1234"),
-    std::make_pair("2003-05-02T12:15:01.1234", "2003-122T12:15:01.1234"),
-    std::make_pair("2003-01-02T12:15:01", "20030102T121501"),
-    std::make_pair("2003-01-02T12:15:01", "2003-01-02T12:15:01"),
-    std::make_pair("2003-01-02T12:15:00", "20030102T1215"),
-    std::make_pair("2003-01-02T12:15:00", "2003-01-02T12:15"),
-    std::make_pair("2003-01-02T12:00:00", "20030102T12"),
-    std::make_pair("2003-01-02T12:00:00", "2003-01-02T12"),
-    std::make_pair("2003-01-02T00:00:00", "20030102T"),
-    std::make_pair("2003-01-02T00:00:00", "2003-01-02T")));

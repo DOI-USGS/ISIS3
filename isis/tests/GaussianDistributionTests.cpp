@@ -3,12 +3,7 @@
 #include "TestUtilities.h"
 
 #include <gtest/gtest.h>
-#include <QPair>
 #include <QString>
-
-class DoubleTest : public ::testing::TestWithParam<QPair <double, double> > {
-  // Intentionally empty
-};
 
 
 TEST(GaussianDistribution, DefaultConstructor) {
@@ -40,28 +35,45 @@ TEST(GaussianDistribution, InvalidPercentage) {
 }
 
 
-TEST_P(DoubleTest, Distributions) {
+TEST(DoubleTest, Distributions) {
   Isis::GaussianDistribution dist;
-  EXPECT_NEAR(dist.CumulativeDistribution(GetParam().first), GetParam().second, .000000000000000001);
-  EXPECT_NEAR(dist.InverseCumulativeDistribution(GetParam().second), GetParam().first, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(-3.0), 0.13498980316295217, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(0.13498980316295217), -3.0, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(-2.5), 0.62096653257757595, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(0.62096653257757595), -2.5, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(-2.0), 2.2750131948179018, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(2.2750131948179018), -2.0, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(-1.5),6.6807201268857881, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(6.6807201268857881), -1.5, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(-1.0), 15.865525393145695, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(15.865525393145695), -1.0, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(-0.5), 30.853753872598688, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(30.853753872598688), -0.5, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(0.0), 50, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(50), 0.0, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(0.5), 69.146246127401312, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(69.146246127401312), 0.5, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(1.0), 84.134474606854297, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(84.134474606854297), 1.0, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(1.5), 93.319279873114212, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(93.319279873114212), 1.5, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(2.0), 97.724986805182098, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(97.724986805182098), 2.0, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(2.5), 99.379033467422431, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(99.379033467422431), 2.5, .000001);
+
+  EXPECT_NEAR(dist.CumulativeDistribution(3.0), 99.865010196837048, .000000000000000001);
+  EXPECT_NEAR(dist.InverseCumulativeDistribution(99.865010196837048), 3.0, .000001);
 }
-
-
-QPair <double, double> neg3(-3.0, 0.13498980316295217);
-QPair <double, double> neg2point5(-2.5, 0.62096653257757595);
-QPair <double, double> neg2(-2.0, 2.2750131948179018);
-QPair <double, double> neg1point5(-1.5, 6.6807201268857881);
-QPair <double, double> neg1(-1.0, 15.865525393145695);
-QPair <double, double> negpoint5(-0.5, 30.853753872598688);
-QPair <double, double> zero(0.0, 50);
-QPair <double, double> pospoint5(0.5, 69.146246127401312);
-QPair <double, double> pos1(1.0, 84.134474606854297);
-QPair <double, double> pos1point5(1.5, 93.319279873114212);
-QPair <double, double> pos2(2.0, 97.724986805182098);
-QPair <double, double> pos2point5(2.5, 99.379033467422431);
-QPair <double, double> pos3(3.0, 99.865010196837048);
-
-
-INSTANTIATE_TEST_SUITE_P(GaussianDistribution, DoubleTest, ::testing::Values(neg3, neg2point5, 
-                         neg2, neg1point5, neg1, negpoint5, zero, pospoint5, pos1, pos1point5, 
-                         pos2, pos2point5, pos3));

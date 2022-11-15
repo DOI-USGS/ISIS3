@@ -6,7 +6,6 @@
 #include <QByteArray>
 #include <QString>
 #include <QList>
-#include <QPair>
 #include <QDomDocument>
 #include <QXmlStreamWriter>
 
@@ -243,179 +242,202 @@ TEST_F(BundleSettings_NotDefault, Assignment) {
   EXPECT_EQ(testSettings.bundleTargetBody(), assignedSettings.bundleTargetBody());
 }
 
-TEST_P(BoolTest, validateNetwork) {
+TEST(BoolTest, validateNetwork) {
   BundleSettings testSettings;
-  testSettings.setValidateNetwork(GetParam());
-  EXPECT_EQ(GetParam(), testSettings.validateNetwork());
+
+  testSettings.setValidateNetwork(true);
+  EXPECT_EQ(true, testSettings.validateNetwork());
+  
+  testSettings.setValidateNetwork(false);
+  EXPECT_EQ(false, testSettings.validateNetwork());
 }
 
-TEST_P(BoolTest, saveValidateNetwork) {
+TEST(BoolTest, saveValidateNetwork) {
   BundleSettings testSettings;
-  testSettings.setValidateNetwork(GetParam());
+  std::list<bool> list = {true, false};
 
-  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
-  QDomElement root = settingsDoc.documentElement();
+  for (bool boolean : list) {
+      testSettings.setValidateNetwork(boolean);
 
-  QDomElement globalSettings = root.firstChildElement("globalSettings");
-  ASSERT_FALSE(globalSettings.isNull());
+      QDomDocument settingsDoc = saveToQDomDocument(testSettings);
+      QDomElement root = settingsDoc.documentElement();
 
-  QDomElement validateNetwork = globalSettings.firstChildElement("validateNetwork");
-  ASSERT_FALSE(validateNetwork.isNull());
-  EXPECT_EQ("validateNetwork", validateNetwork.tagName());
-  EXPECT_EQ(toString(testSettings.validateNetwork()), validateNetwork.text());
+      QDomElement globalSettings = root.firstChildElement("globalSettings");
+      ASSERT_FALSE(globalSettings.isNull());
+
+      QDomElement validateNetwork = globalSettings.firstChildElement("validateNetwork");
+      ASSERT_FALSE(validateNetwork.isNull());
+      EXPECT_EQ("validateNetwork", validateNetwork.tagName());
+      EXPECT_EQ(toString(testSettings.validateNetwork()), validateNetwork.text());
+  }
 }
 
-TEST_P(BoolTest, outlierRejection) {
+TEST(BoolTest, outlierRejection) {
   BundleSettings testSettings;
-  testSettings.setOutlierRejection(GetParam());
-  EXPECT_EQ(GetParam(), testSettings.outlierRejection());
+
+  testSettings.setOutlierRejection(true);
+  EXPECT_EQ(true, testSettings.outlierRejection());
+  
+  testSettings.setOutlierRejection(false);
+  EXPECT_EQ(false, testSettings.outlierRejection());
 }
 
-TEST_P(BoolTest, saveOutlierRejection) {
+TEST(BoolTest, saveOutlierRejection) {
   BundleSettings testSettings;
-  testSettings.setOutlierRejection(GetParam());
+  std::list<bool> list = {true, false};
 
-  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
-  QDomElement root = settingsDoc.documentElement();
+  for (bool boolean : list) {
+      testSettings.setOutlierRejection(boolean);
 
-  QDomElement globalSettings = root.firstChildElement("globalSettings");
-  ASSERT_FALSE(globalSettings.isNull());
+      QDomDocument settingsDoc = saveToQDomDocument(testSettings);
+      QDomElement root = settingsDoc.documentElement();
 
-  QDomElement outlierRejectionOptions = globalSettings.firstChildElement("outlierRejectionOptions");
-  ASSERT_FALSE(outlierRejectionOptions.isNull());
-  QDomNamedNodeMap outlierRejectionOptionsAtts = outlierRejectionOptions.attributes();
-  EXPECT_EQ(
-        toString(testSettings.outlierRejection()),
-        outlierRejectionOptionsAtts.namedItem("rejection").nodeValue()
-  );
-  EXPECT_EQ(
-        (testSettings.outlierRejection() ?
-            toString(testSettings.outlierRejectionMultiplier()) : "N/A"),
-        outlierRejectionOptionsAtts.namedItem("multiplier").nodeValue()
-  );
+      QDomElement globalSettings = root.firstChildElement("globalSettings");
+      ASSERT_FALSE(globalSettings.isNull());
+
+      QDomElement outlierRejectionOptions = globalSettings.firstChildElement("outlierRejectionOptions");
+      ASSERT_FALSE(outlierRejectionOptions.isNull());
+      QDomNamedNodeMap outlierRejectionOptionsAtts = outlierRejectionOptions.attributes();
+      EXPECT_EQ(
+            toString(testSettings.outlierRejection()),
+            outlierRejectionOptionsAtts.namedItem("rejection").nodeValue()
+      );
+      EXPECT_EQ(
+            (testSettings.outlierRejection() ?
+                  toString(testSettings.outlierRejectionMultiplier()) : "N/A"),
+            outlierRejectionOptionsAtts.namedItem("multiplier").nodeValue()
+      );
+  }
 }
 
-TEST_P(BoolTest, inverseMatrix) {
+TEST(BoolTest, inverseMatrix) {
   BundleSettings testSettings;
-  testSettings.setSolveOptions(
-        testSettings.solveObservationMode(),
-        testSettings.updateCubeLabel(),
-        true,
-        testSettings.solveRadius()
-  );
-  testSettings.setCreateInverseMatrix(GetParam());
-  EXPECT_EQ(GetParam(), testSettings.createInverseMatrix());
+  std::list<bool> list = {true, false};
+
+  for (bool boolean : list) {
+      testSettings.setSolveOptions(
+            testSettings.solveObservationMode(),
+            testSettings.updateCubeLabel(),
+            true,
+            testSettings.solveRadius()
+      );
+      testSettings.setCreateInverseMatrix(boolean);
+      EXPECT_EQ(boolean, testSettings.createInverseMatrix());
+  }
 }
 
-TEST_P(BoolTest, setBoolSolveOptions) {
+TEST(BoolTest, setBoolSolveOptions) {
   BundleSettings testSettings;
-  testSettings.setSolveOptions(
-        GetParam(),
-        GetParam(),
-        GetParam(),
-        GetParam()
-  );
-  EXPECT_EQ(GetParam(), testSettings.solveObservationMode());
-  EXPECT_EQ(GetParam(), testSettings.updateCubeLabel());
-  EXPECT_EQ(GetParam(), testSettings.errorPropagation());
-  EXPECT_EQ(GetParam(), testSettings.solveRadius());
+  std::list<bool> list = {true, false};
+
+  for (bool boolean : list) {
+      testSettings.setSolveOptions(
+            boolean,
+            boolean,
+            boolean,
+            boolean
+      );
+      EXPECT_EQ(boolean, testSettings.solveObservationMode());
+      EXPECT_EQ(boolean, testSettings.updateCubeLabel());
+      EXPECT_EQ(boolean, testSettings.errorPropagation());
+      EXPECT_EQ(boolean, testSettings.solveRadius());
+  }
 }
 
-TEST_P(BoolTest, saveSolveOptions) {
+TEST(BoolTest, saveSolveOptions) {
   BundleSettings testSettings;
-  testSettings.setSolveOptions(
-        GetParam(),
-        GetParam(),
-        GetParam(),
-        GetParam()
-  );
-  testSettings.setCreateInverseMatrix(GetParam());
+  std::list<bool> list = {true, false};
 
-  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
-  QDomElement root = settingsDoc.documentElement();
+  for (bool boolean : list) {
+      testSettings.setSolveOptions(
+            boolean,
+            boolean,
+            boolean,
+            boolean
+      );
+      testSettings.setCreateInverseMatrix(boolean);
 
-  QDomElement globalSettings = root.firstChildElement("globalSettings");
-  ASSERT_FALSE(globalSettings.isNull());
+      QDomDocument settingsDoc = saveToQDomDocument(testSettings);
+      QDomElement root = settingsDoc.documentElement();
 
-  QDomElement solveOptions = globalSettings.firstChildElement("solveOptions");
-  ASSERT_FALSE(solveOptions.isNull());
-  QDomNamedNodeMap solveOptionAtts = solveOptions.attributes();
-  EXPECT_EQ(
-        toString(testSettings.solveObservationMode()),
-        solveOptionAtts.namedItem("solveObservationMode").nodeValue()
-  );
-  EXPECT_EQ(
-        toString(testSettings.solveRadius()),
-        solveOptionAtts.namedItem("solveRadius").nodeValue()
-  );
-  EXPECT_EQ(
-        toString(testSettings.updateCubeLabel()),
-        solveOptionAtts.namedItem("updateCubeLabel").nodeValue()
-  );
-  EXPECT_EQ(
-        toString(testSettings.errorPropagation()),
-        solveOptionAtts.namedItem("errorPropagation").nodeValue()
-  );
-  EXPECT_EQ(
-        toString(testSettings.createInverseMatrix()),
-        solveOptionAtts.namedItem("createInverseMatrix").nodeValue()
-  );
+      QDomElement globalSettings = root.firstChildElement("globalSettings");
+      ASSERT_FALSE(globalSettings.isNull());
+
+      QDomElement solveOptions = globalSettings.firstChildElement("solveOptions");
+      ASSERT_FALSE(solveOptions.isNull());
+      QDomNamedNodeMap solveOptionAtts = solveOptions.attributes();
+      EXPECT_EQ(
+            toString(testSettings.solveObservationMode()),
+            solveOptionAtts.namedItem("solveObservationMode").nodeValue()
+      );
+      EXPECT_EQ(
+            toString(testSettings.solveRadius()),
+            solveOptionAtts.namedItem("solveRadius").nodeValue()
+      );
+      EXPECT_EQ(
+            toString(testSettings.updateCubeLabel()),
+            solveOptionAtts.namedItem("updateCubeLabel").nodeValue()
+      );
+      EXPECT_EQ(
+            toString(testSettings.errorPropagation()),
+            solveOptionAtts.namedItem("errorPropagation").nodeValue()
+      );
+      EXPECT_EQ(
+            toString(testSettings.createInverseMatrix()),
+            solveOptionAtts.namedItem("createInverseMatrix").nodeValue()
+      );
+  }
 }
 
-INSTANTIATE_TEST_SUITE_P(
-      BundleSettings,
-      BoolTest,
-      ::testing::Bool()
-);
-
-TEST_P(CoordinateTypeTest, setCoordinateTypeSolveOptions) {
+TEST(CoordinateTypeTest, setCoordinateTypeSolveOptions) {
   BundleSettings testSettings;
-  testSettings.setSolveOptions(
-        testSettings.solveObservationMode(),
-        testSettings.updateCubeLabel(),
-        testSettings.errorPropagation(),
-        testSettings.solveRadius(),
-        GetParam(),
-        GetParam()
-  );
-  EXPECT_EQ(GetParam(), testSettings.controlPointCoordTypeReports());
-  EXPECT_EQ(GetParam(), testSettings.controlPointCoordTypeBundle());
+  std::list<SurfacePoint::CoordinateType> list = {SurfacePoint::Latitudinal, SurfacePoint::Rectangular};
+  for (SurfacePoint::CoordinateType type : list) {
+      testSettings.setSolveOptions(
+            testSettings.solveObservationMode(),
+            testSettings.updateCubeLabel(),
+            testSettings.errorPropagation(),
+            testSettings.solveRadius(),
+            type,
+            type
+      );
+      EXPECT_EQ(type, testSettings.controlPointCoordTypeReports());
+      EXPECT_EQ(type, testSettings.controlPointCoordTypeBundle());
+  }
 }
 
-TEST_P(BoolTest, saveCoordinateTypes) {
+TEST(BoolTest, saveCoordinateTypes) {
   BundleSettings testSettings;
-  testSettings.setSolveOptions(
-        GetParam(),
-        GetParam(),
-        GetParam(),
-        GetParam()
-  );
-  testSettings.setCreateInverseMatrix(GetParam());
+  std::list<bool> list = {true, false};
 
-  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
-  QDomElement root = settingsDoc.documentElement();
+  for (bool boolean : list) {
+      testSettings.setSolveOptions(
+            boolean,
+            boolean,
+            boolean,
+            boolean
+      );
+      testSettings.setCreateInverseMatrix(boolean);
 
-  QDomElement globalSettings = root.firstChildElement("globalSettings");
-  ASSERT_FALSE(globalSettings.isNull());
+      QDomDocument settingsDoc = saveToQDomDocument(testSettings);
+      QDomElement root = settingsDoc.documentElement();
 
-  QDomElement solveOptions = globalSettings.firstChildElement("solveOptions");
-  ASSERT_FALSE(solveOptions.isNull());
-  QDomNamedNodeMap solveOptionAtts = solveOptions.attributes();
-  EXPECT_EQ(
-        toString(testSettings.controlPointCoordTypeReports()),
-        solveOptionAtts.namedItem("controlPointCoordTypeReports").nodeValue()
-  );
-  EXPECT_EQ(
-        toString(testSettings.controlPointCoordTypeBundle()),
-        solveOptionAtts.namedItem("controlPointCoordTypeBundle").nodeValue()
-  );
+      QDomElement globalSettings = root.firstChildElement("globalSettings");
+      ASSERT_FALSE(globalSettings.isNull());
+
+      QDomElement solveOptions = globalSettings.firstChildElement("solveOptions");
+      ASSERT_FALSE(solveOptions.isNull());
+      QDomNamedNodeMap solveOptionAtts = solveOptions.attributes();
+      EXPECT_EQ(
+            toString(testSettings.controlPointCoordTypeReports()),
+            solveOptionAtts.namedItem("controlPointCoordTypeReports").nodeValue()
+      );
+      EXPECT_EQ(
+            toString(testSettings.controlPointCoordTypeBundle()),
+            solveOptionAtts.namedItem("controlPointCoordTypeBundle").nodeValue()
+      );
+  }
 }
-
-INSTANTIATE_TEST_SUITE_P(
-      BundleSettings,
-      CoordinateTypeTest,
-      ::testing::Values(SurfacePoint::Latitudinal, SurfacePoint::Rectangular)
-);
 
 TEST(BundleSettings, setGlobalSigmas) {
   BundleSettings testSettings;
@@ -580,62 +602,70 @@ TEST_F(BundleSettings_ObservationTest, saveObservationSolveSettings) {
   EXPECT_EQ(testSettings.numberSolveSettings(), observationSolveSettingsList.childNodes().size());
 }
 
-TEST_P(ConvergenceCriteriaTest, convergenceCriteriaStrings) {
-  QString criteriaString = BundleSettings::convergenceCriteriaToString(GetParam());
-  BundleSettings::ConvergenceCriteria criteria =
-        BundleSettings::stringToConvergenceCriteria(criteriaString);
-  EXPECT_EQ(GetParam(), criteria);
+TEST(ConvergenceCriteriaTest, convergenceCriteriaStrings) {
+  std::list<BundleSettings::ConvergenceCriteria> list = {BundleSettings::Sigma0, BundleSettings::ParameterCorrections};
+
+  for (BundleSettings::ConvergenceCriteria convergeCriteria : list) {
+      QString criteriaString = BundleSettings::convergenceCriteriaToString(convergeCriteria);
+      BundleSettings::ConvergenceCriteria criteria =
+            BundleSettings::stringToConvergenceCriteria(criteriaString);
+      EXPECT_EQ(convergeCriteria, criteria);
+  }
 }
 
-TEST_P(ConvergenceCriteriaTest, convergenceCriteria) {
+TEST(ConvergenceCriteriaTest, convergenceCriteria) {
   BundleSettings testSettings;
-  testSettings.setConvergenceCriteria(
-        GetParam(),
-        2.0,
-        50
-  );
-  EXPECT_EQ(GetParam(), testSettings.convergenceCriteria());
-  EXPECT_EQ(2.0, testSettings.convergenceCriteriaThreshold());
-  EXPECT_EQ(50, testSettings.convergenceCriteriaMaximumIterations());
+  std::list<BundleSettings::ConvergenceCriteria> list = {BundleSettings::Sigma0, BundleSettings::ParameterCorrections};
+
+  for (BundleSettings::ConvergenceCriteria criteria : list) {
+      testSettings.setConvergenceCriteria(
+            criteria,
+            2.0,
+            50
+      );
+  
+      EXPECT_EQ(criteria, testSettings.convergenceCriteria());
+      EXPECT_EQ(2.0, testSettings.convergenceCriteriaThreshold());
+      EXPECT_EQ(50, testSettings.convergenceCriteriaMaximumIterations());
+  }
 }
 
-TEST_P(ConvergenceCriteriaTest, saveConvergenceCriteria) {
+TEST(ConvergenceCriteriaTest, saveConvergenceCriteria) {
   BundleSettings testSettings;
-  testSettings.setConvergenceCriteria(
-        GetParam(),
-        2.0,
-        50
-  );
-  testSettings.setCreateInverseMatrix(GetParam());
+  std::list<BundleSettings::ConvergenceCriteria> list = {BundleSettings::Sigma0, BundleSettings::ParameterCorrections};
 
-  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
-  QDomElement root = settingsDoc.documentElement();
+  for (BundleSettings::ConvergenceCriteria criteria : list) {
+      testSettings.setConvergenceCriteria(
+            criteria,
+            2.0,
+            50
+      );
+  
+      testSettings.setCreateInverseMatrix(criteria);
 
-  QDomElement globalSettings = root.firstChildElement("globalSettings");
-  ASSERT_FALSE(globalSettings.isNull());
+      QDomDocument settingsDoc = saveToQDomDocument(testSettings);
+      QDomElement root = settingsDoc.documentElement();
 
-  QDomElement convergenceCriteriaOptions = globalSettings.firstChildElement("convergenceCriteriaOptions");
-  ASSERT_FALSE(convergenceCriteriaOptions.isNull());
-  QDomNamedNodeMap convergenceCriteriaOptionsAtts = convergenceCriteriaOptions.attributes();
-  EXPECT_EQ(
-        BundleSettings::convergenceCriteriaToString(testSettings.convergenceCriteria()),
-        convergenceCriteriaOptionsAtts.namedItem("convergenceCriteria").nodeValue()
-  );
-  EXPECT_EQ(
-        toString(testSettings.convergenceCriteriaThreshold()),
-        convergenceCriteriaOptionsAtts.namedItem("threshold").nodeValue()
-  );
-  EXPECT_EQ(
-        toString(testSettings.convergenceCriteriaMaximumIterations()),
-        convergenceCriteriaOptionsAtts.namedItem("maximumIterations").nodeValue()
-  );
+      QDomElement globalSettings = root.firstChildElement("globalSettings");
+      ASSERT_FALSE(globalSettings.isNull());
+
+      QDomElement convergenceCriteriaOptions = globalSettings.firstChildElement("convergenceCriteriaOptions");
+      ASSERT_FALSE(convergenceCriteriaOptions.isNull());
+      QDomNamedNodeMap convergenceCriteriaOptionsAtts = convergenceCriteriaOptions.attributes();
+      EXPECT_EQ(
+            BundleSettings::convergenceCriteriaToString(testSettings.convergenceCriteria()),
+            convergenceCriteriaOptionsAtts.namedItem("convergenceCriteria").nodeValue()
+      );
+      EXPECT_EQ(
+            toString(testSettings.convergenceCriteriaThreshold()),
+            convergenceCriteriaOptionsAtts.namedItem("threshold").nodeValue()
+      );
+      EXPECT_EQ(
+            toString(testSettings.convergenceCriteriaMaximumIterations()),
+            convergenceCriteriaOptionsAtts.namedItem("maximumIterations").nodeValue()
+      );
+  }
 }
-
-INSTANTIATE_TEST_SUITE_P(
-      BundleSettings,
-      ConvergenceCriteriaTest,
-      ::testing::Values(BundleSettings::Sigma0, BundleSettings::ParameterCorrections)
-);
 
 TEST(BundleSettings, maximumLikelihoodHuber) {
   BundleSettings testSettings;

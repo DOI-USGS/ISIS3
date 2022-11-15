@@ -2,61 +2,41 @@
 #include "TestUtilities.h"
 
 #include <gtest/gtest.h>
-#include <QPair>
 
 using namespace Isis;
 
-
-class PixelSize : public testing::TestWithParam<QPair<PixelType, int>> {
-};
-
-class PixelName : public testing::TestWithParam<QPair<PixelType, QString>> {
-};
-
-class PixelEnum : public testing::TestWithParam<QPair<QString, int>> {
-};
-
-TEST_P(PixelSize, TestSize) {
-  EXPECT_EQ(SizeOf(GetParam().first), GetParam().second);
+TEST(PixelSize, TestSize) {
+  EXPECT_EQ(SizeOf(PixelType::None), 0);
+  EXPECT_EQ(SizeOf(PixelType::UnsignedByte), 1);
+  EXPECT_EQ(SizeOf(PixelType::SignedByte), 1);
+  EXPECT_EQ(SizeOf(PixelType::UnsignedWord), 2);
+  EXPECT_EQ(SizeOf(PixelType::SignedWord), 2);
+  EXPECT_EQ(SizeOf(PixelType::UnsignedInteger), 4);
+  EXPECT_EQ(SizeOf(PixelType::SignedInteger), 4);
+  EXPECT_EQ(SizeOf(PixelType::Real), 4);
+  EXPECT_EQ(SizeOf(PixelType::Double), 8);
 }
 
-TEST_P(PixelName, TestName) {
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, PixelTypeName(GetParam().first), GetParam().second);
+TEST(PixelName, TestName) {
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, PixelTypeName(PixelType::None), QString("None"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, PixelTypeName(PixelType::UnsignedByte), QString("UnsignedByte"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, PixelTypeName(PixelType::SignedByte), QString("SignedByte"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, PixelTypeName(PixelType::UnsignedWord), QString("UnsignedWord"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, PixelTypeName(PixelType::SignedWord), QString("SignedWord"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, PixelTypeName(PixelType::UnsignedInteger), QString("UnsignedInteger"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, PixelTypeName(PixelType::SignedInteger), QString("SignedInteger"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, PixelTypeName(PixelType::Real), QString("Real"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, PixelTypeName(PixelType::Double), QString("Double"));
 }
 
-TEST_P(PixelEnum, TestEnum) {
-  EXPECT_EQ(PixelTypeEnumeration(GetParam().first), GetParam().second);
+TEST(PixelEnum, TestEnum) {
+  EXPECT_EQ(PixelTypeEnumeration(QString("None")), 0);
+  EXPECT_EQ(PixelTypeEnumeration(QString("UnsignedByte")), 1);
+  EXPECT_EQ(PixelTypeEnumeration(QString("SignedByte")), 2);
+  EXPECT_EQ(PixelTypeEnumeration(QString("UnsignedWord")), 3);
+  EXPECT_EQ(PixelTypeEnumeration(QString("SignedWord")), 4);
+  EXPECT_EQ(PixelTypeEnumeration(QString("UnsignedInteger")), 5);
+  EXPECT_EQ(PixelTypeEnumeration(QString("Real")), 7);
+  EXPECT_EQ(PixelTypeEnumeration(QString("Double")), 8);
 }
 
-INSTANTIATE_TEST_SUITE_P(PixelType, PixelSize, ::testing::Values(
-  qMakePair(PixelType::None, 0),
-  qMakePair(PixelType::UnsignedByte, 1),
-  qMakePair(PixelType::SignedByte, 1),
-  qMakePair(PixelType::UnsignedWord, 2),
-  qMakePair(PixelType::SignedWord, 2),
-  qMakePair(PixelType::UnsignedInteger, 4),
-  qMakePair(PixelType::SignedInteger, 4),
-  qMakePair(PixelType::Real, 4),
-  qMakePair(PixelType::Double, 8)));
-
-INSTANTIATE_TEST_SUITE_P(PixelType, PixelName, ::testing::Values(
-  qMakePair(PixelType::None, QString("None")),
-  qMakePair(PixelType::UnsignedByte, QString("UnsignedByte")),
-  qMakePair(PixelType::SignedByte, QString("SignedByte")),
-  qMakePair(PixelType::UnsignedWord, QString("UnsignedWord")),
-  qMakePair(PixelType::SignedWord, QString("SignedWord")),
-  qMakePair(PixelType::UnsignedInteger, QString("UnsignedInteger")),
-  qMakePair(PixelType::SignedInteger, QString("SignedInteger")),
-  qMakePair(PixelType::Real, QString("Real")),
-  qMakePair(PixelType::Double, QString("Double"))));
-
-INSTANTIATE_TEST_SUITE_P(PixelType, PixelEnum, ::testing::Values(
-  qMakePair(QString("None"), 0),
-  qMakePair(QString("UnsignedByte"), 1),
-  qMakePair(QString("SignedByte"), 2),
-  qMakePair(QString("UnsignedWord"), 3),
-  qMakePair(QString("SignedWord"), 4),
-  qMakePair(QString("UnsignedInteger"), 5),
-  qMakePair(QString("SignedInteger"), 6),
-  qMakePair(QString("Real"), 7),
-  qMakePair(QString("Double"), 8)));

@@ -1,21 +1,17 @@
 #include "Endian.h"
 
 #include <gtest/gtest.h>
-#include <QPair>
 
 using namespace Isis;
 
-class ConversionTest : public ::testing::TestWithParam<QPair <QString, Isis::ByteOrder> > {
-	// Intentionally empty
-};
+TEST(ConversionTest, ByteOrder) {
+	ASSERT_EQ(ByteOrderEnumeration("None"), Isis::ByteOrder::NoByteOrder);
+	ASSERT_EQ(ByteOrderName(Isis::ByteOrder::NoByteOrder), "None");
 
-TEST_P(ConversionTest, ByteOrder) {
-	ASSERT_EQ(ByteOrderEnumeration(GetParam().first), GetParam().second);
-	ASSERT_EQ(ByteOrderName(GetParam().second), GetParam().first);
+	ASSERT_EQ(ByteOrderEnumeration("Lsb"), Isis::ByteOrder::Lsb);
+	ASSERT_EQ(ByteOrderName(Isis::ByteOrder::Lsb), "Lsb");
+
+	ASSERT_EQ(ByteOrderEnumeration("Msb"), Isis::ByteOrder::Msb);
+	ASSERT_EQ(ByteOrderName(Isis::ByteOrder::Msb), "Msb");
 }
 
-QPair<QString, Isis::ByteOrder> noOrder("None", Isis::ByteOrder::NoByteOrder);
-QPair<QString, Isis::ByteOrder> lsb("Lsb", Isis::ByteOrder::Lsb);
-QPair<QString, Isis::ByteOrder> msb("Msb", Isis::ByteOrder::Msb);
-
-INSTANTIATE_TEST_SUITE_P(Endian, ConversionTest, ::testing::Values(noOrder, lsb, msb));

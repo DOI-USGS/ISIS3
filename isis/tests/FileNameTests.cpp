@@ -229,27 +229,21 @@ TEST(FileName, NotEqualOperator) {
   EXPECT_TRUE(file1 != file2);
 }
 
-TEST_P(FileName_Fixture_Versioned, IsVersioned) {
-  FileName file(GetParam());
-
-  EXPECT_TRUE(file.isVersioned());
-}
-
-const char* versionedFiles[] = {"tttt??????", "tttt??????.tmp", "tttt_?.tmp", "??tttt",
+TEST(FileName_Fixture_Versioned, IsVersioned) {
+  const char* versionedFiles[] = {"tttt??????", "tttt??????.tmp", "tttt_?.tmp", "??tttt",
                                 "?tttt000008.tmp", "junk?", "tttt{ddMMMyyyy}.tmp",
                                 "tt{MMM}tt{dd}yy{yy}.tmp", "tt{d}tt{MMM}.tmp", "tt{d}tt{MMMM}.tmp",
                                 "tt{dd}.tmp", "tttt{dd}.tmp", "$TEMPORARY/{MMM}-{dd}-{yy}_v???.tmp"};
+  for (int i = 0; i < sizeof(versionedFiles) / sizeof(versionedFiles[0]); i++) {
+    FileName file(versionedFiles[i]);
 
-INSTANTIATE_TEST_SUITE_P(FileName, FileName_Fixture_Versioned, ::testing::ValuesIn(versionedFiles));
+    EXPECT_TRUE(file.isVersioned());
+  }
 
-TEST_P(FileName_Fixture_NotVersioned, IsVersioned) {
-  FileName file(GetParam());
+}
+
+TEST(FileName_Fixture_NotVersioned, IsVersioned) {
+  FileName file("tttt");
 
   EXPECT_FALSE(file.isVersioned());
 }
-
-const char* notVersionedFiles[] = {"tttt"};
-//TODO These actually throw errors so they cannot be checked like this
-//"tttt{}.tmp", "ttttt{}.tmp", "??tttt??", "tttt{aaaa}.tmp"};
-
-INSTANTIATE_TEST_SUITE_P(FileName, FileName_Fixture_NotVersioned, ::testing::ValuesIn(notVersionedFiles));
