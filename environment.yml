@@ -19,7 +19,6 @@ dependencies:
   - eigen < 3.4
   - embree
   - ffmpeg
-  - gcc=12.2.0
   - geos>=3.7,<3.8
   - geotiff
   - gmp
