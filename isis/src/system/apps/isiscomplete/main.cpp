@@ -25,6 +25,9 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
+  for (int i = 1; i < argc; i++) {
+    MakeCompletion(argv[i]);
+  }
   return 0;
 }
 
