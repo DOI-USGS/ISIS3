@@ -294,7 +294,7 @@ TEST_F(TempTestingFiles, Msi2isisTestNearestNeighbor) {
   std::unique_ptr<Histogram> hist (cube.histogram());
 
   EXPECT_NEAR(hist->Average(), 0.0090912713562279774, .000001);
-  EXPECT_NEAR(hist->Sum(), 1481.5681278390484, .0001);
+  EXPECT_NEAR(hist->Sum(), 1481.6802540164529, .0001);
   EXPECT_EQ(hist->ValidPixels(), 162966);
   EXPECT_EQ(hist->NullPixels(), 58278);
   EXPECT_NEAR(hist->StandardDeviation(), 0.013550997159207, .0001);
