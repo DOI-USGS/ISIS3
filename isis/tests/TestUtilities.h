@@ -11,6 +11,8 @@
 
 #include "csm.h"
 
+#include <nlohmann/json.hpp>
+
 #include "FileName.h"
 #include "IException.h"
 #include "PvlGroup.h"
@@ -57,6 +59,20 @@ namespace Isis {
       const char* tolerance_expr,
       const std::vector<double> &vec1,
       const std::vector<double> &vec2,
+      double tolerance);
+
+  std::vector<std::string> compareJsons(
+      const nlohmann::json &json1,
+      const nlohmann::json &json2,
+      std::string jsonPointer,
+      double tolerance);
+
+  ::testing::AssertionResult AssertJsonsNear(
+      const char* json1_expr,
+      const char* json2_expr,
+      const char* tolerance_expr,
+      const nlohmann::json &json1,
+      const nlohmann::json &json2,
       double tolerance);
 
   bool isNumeric(QString str);
