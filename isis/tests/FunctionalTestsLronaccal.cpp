@@ -40,8 +40,7 @@ TEST(LronaccalDefault, FunctionalTestsLronaccal) {
     reflected) or cropped
   */
   QString iCubeFile =  "$ISISTESTDATA/isis/src/lro/apps/lronaccal/M1333276014R.cub";
-  // QString oCubeFile = outputDir.path() + "/out.default.cub";
-QString oCubeFile = "/Users/astamile/out.default.cub";
+  QString oCubeFile = outputDir.path() + "/out.default.cub";
   QString oCubeCropFile = outputDir.path() + "/out.default.crop.cub";
   QString tCubeFile = "data/lronaccal/truth/M1333276014R.default.crop.cub";
 
