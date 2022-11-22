@@ -2340,18 +2340,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   catch (IException &e) {
     FAIL() << "Unable to run tgocassisrdrgen on projected image: " << e.what() << std::endl;
   }
-
-  // QString ingestedExportFile = prefix.path() + "/exported.cub";
-  // tgocassis2isisArgs = {"from=" + prefix.path() + "/exported.xml",
-  //                       "to=" + ingestedExportFile};
-  // UserInterface tgocassis2isisIngest(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
-  // try {
-  //   tgocassis2isis(tgocassis2isisIngest);
-  // }
-  // catch (IException &e) {
-  //   FAIL() << "Unable to run tgocassis2isis on output image: " << e.what() << std::endl;
-  // }
-
+  
   // Mosaic Cube
   Cube exportCube(projectedFile);
   Pvl *outLabel = exportCube.label();
@@ -2765,7 +2754,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   Histogram *hist = exportCube.histogram();
 
   EXPECT_NEAR(hist->Average(), 0.26625623495550205, 0.0001);
-  EXPECT_NEAR(hist->Sum(), 444615.96850222297, 0.0001);
-  EXPECT_EQ(hist->ValidPixels(), 1669880);
+  EXPECT_NEAR(hist->Sum(), 444615.69537125883, 0.0001);
+  EXPECT_EQ(hist->ValidPixels(), 1669879);
   EXPECT_NEAR(hist->StandardDeviation(), 0.048925404459616698, 0.0001);
 }
