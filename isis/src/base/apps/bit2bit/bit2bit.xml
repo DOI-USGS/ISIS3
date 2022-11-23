@@ -69,6 +69,9 @@
     <change name="Philip Martinez" date="2010-06-10">
       Original version
     </change>
+    <change name="Jacob Cain" date="2022-11-22">
+      Changed TO type to cube. Fixes #4780.
+    </change>
   </history>
 
   <groups>
@@ -88,7 +91,8 @@
       </parameter>
 
       <parameter name="TO">
-        <type>filename</type>
+        <type>cube</type>
+        <filter>*.cub</filter>
         <fileMode>output</fileMode>
         <brief>
           Output cube

@@ -19,6 +19,9 @@
     <change name="Ernest Cisneros" date="2016-07-12">
       Update to documentation for consistentsy and clarity. Fixes #3913.
     </change>
+    <change name="Jacob Cain" date="2022-11-23">
+      Changed filter for FROMLIST from .cub to .txt .lis .lst.
+    </change>
   </history>
 
   <category>
@@ -37,7 +40,7 @@
           A file containing a list of PDS3 files to be imported.
         </description>
         <filter>
-          *.cub
+          *.txt *.lis *.lst
         </filter>
       </parameter>
 
