@@ -16,8 +16,6 @@ downloadIsisData = module_from_spec(spec)
 spec.loader.exec_module(downloadIsisData)
 did = downloadIsisData
 
-# from downloadIsisData import rclone, create_rclone_arguments
-
 class MockedPopen:
     def __init__(self, args, **kwargs):
         self.args = args
@@ -58,9 +56,6 @@ def test_rclone_unknown_exception():
 
 def test_create_rclone_args():
     with TemporaryDirectory() as tdir: 
-        dest = Path(tdir) / "test"
-        args = did.create_rclone_arguments(str(dest), "lro_naifKernels:", dry_run=False, ntransfers=100)
-        assert args == ['lro_naifKernels:', str(dest/"lro"/"kernels"), '--progress', '--checkers=100', '--transfers=100', '--track-renames', '--log-level=WARNING']
-        assert dest.exists()
-
-
+        dest = Path(tdir)
+        args = did.create_rclone_arguments(str(dest), "lro_naifKernels:", ntransfers=100, rclone_kwargs=["--dry_run"])
+        assert args == ['lro_naifKernels:', str(dest/"lro"/"kernels"), '--progress', '--checkers=100', '--transfers=100', '--track-renames', '--log-level=WARNING', '--dry_run']
