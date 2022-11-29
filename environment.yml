@@ -15,6 +15,7 @@ dependencies:
   - cspice
   - csm>=3.0.3,<3.0.4
   - curl
+  - cxx-compiler=1.1.2
   - doxygen
   - eigen < 3.4
   - embree
@@ -52,7 +53,7 @@ dependencies:
   - pytest
   - rclone
   - qhull
-  - qt>=5.9.6
+  - qt>=5.9.6,<5.15.0
   - qwt
   - sqlite
   - suitesparse
