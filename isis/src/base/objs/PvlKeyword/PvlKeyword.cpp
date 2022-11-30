@@ -1586,7 +1586,7 @@ namespace Isis {
     }
 
     // check for extraneous data in the keyword ... ,2,3
-    QRegularExpression regex("(,*[0-9]?)?");
+    QRegularExpression regex("^,");
     QRegularExpressionMatch match = regex.match(keyword);
     if (!keyword.isEmpty() && match.hasMatch()) {
           keywordValues.at(0).first += keyword;
