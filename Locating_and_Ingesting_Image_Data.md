@@ -62,7 +62,7 @@ data that covers your area of interest in the vast quantities available.
 ![Pds icon](attachments/download/900/Pds.gif) [Planetary Data System
 Image Atlas.](http://pdsimg.jpl.nasa.gov/Atlas)
 
-Data can be found for each planet, mission and instrument listed below.
+Data can be found for each planet, some example mission and instrument listed below.
 
 <span id="Venus"></span>
 
