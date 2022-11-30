@@ -130,7 +130,7 @@ programs are started by typing the name of the program followed by any
 arguments. All arguments must be separated from each other by at least
 one space.
 
-Command line arguments are broken into two categories: reserved, and
+Command line arguments are broken into two categories: reserved and
 parameter. Reserved arguments always begin with a dash (-) and change
 major things about how the program runs while parameter arguments supply
 data to the application and control how it processes that input data to
