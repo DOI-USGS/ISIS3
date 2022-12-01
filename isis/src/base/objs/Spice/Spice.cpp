@@ -1118,7 +1118,7 @@ namespace Isis {
         gdpool_c(key.toLatin1().data(), (SpiceInt)index, 1,
                  &numValuesRead, &kernelValue, &found);
 
-        if (found)
+        if (found && numValuesRead > 0)
           result = kernelValue;
       }
       else if (type == SpiceStringType) {
@@ -1126,7 +1126,7 @@ namespace Isis {
         gcpool_c(key.toLatin1().data(), (SpiceInt)index, 1, sizeof(kernelValue),
                  &numValuesRead, kernelValue, &found);
 
-        if (found)
+        if (found && numValuesRead > 0)
           result = kernelValue;
       }
       else if (type == SpiceIntType) {
@@ -1134,7 +1134,7 @@ namespace Isis {
         gipool_c(key.toLatin1().data(), (SpiceInt)index, 1, &numValuesRead,
                  &kernelValue, &found);
 
-        if (found)
+        if (found && numValuesRead > 0)
           result = (int)kernelValue;
       }
 
