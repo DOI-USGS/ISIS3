@@ -89,7 +89,6 @@ namespace Isis {
       }
     }
 
-    // log->addLogGroup(sn);
     if (ui.IsInteractive()) {
       log->addLogGroup(sn);
     }
