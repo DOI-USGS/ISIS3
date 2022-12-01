@@ -111,7 +111,7 @@ namespace Isis {
 
 
     // the given input file appears to be valid, continue with the import process
-    FileName importProcessOutCube("$TEMPORARY/" + from.baseName() + ".import.tmp.cub");
+    FileName importProcessOutCube = FileName::createTempFile("$Temporary/" + from.baseName() + ".import.tmp.cub");
     CubeAttributeOutput outatt = CubeAttributeOutput("+Real");
     importPds.SetOutputCube(importProcessOutCube.expanded(), outatt);
     importPds.StartProcess();
@@ -120,7 +120,7 @@ namespace Isis {
 
 
     CubeAttributeInput inatt;
-    FileName enlargeProcessOutCube("$TEMPORARY/" + from.baseName() + ".enlarge.tmp.cub");
+    FileName enlargeProcessOutCube = FileName::createTempFile("$Temporary/" + from.baseName() + ".enlarge.tmp.cub");
     if ( 412 != lines ) {
       // The second process will enlarge the imported cube from 537x244 to 537x412
       ProcessRubberSheet enlargeProcess;
@@ -200,7 +200,7 @@ namespace Isis {
     int trim = 33;         // Default trim buffer size
     int numSamples = outputCube->sampleCount();
 
-    if ( !ui.GetBoolean("TRIM") ) { // TRIM=false
+    if ( ui.GetBoolean("TRIM") == false ) { // TRIM=false
       trim = 0;                     // No trimming of lines/samples
     }
 

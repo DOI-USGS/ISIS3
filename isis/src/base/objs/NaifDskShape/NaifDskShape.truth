@@ -11,7 +11,7 @@ Intersection successful?  "No"
 Construct NaifDskShape object from cube labels with ShapeModel=DSK file.
 Try to intersect surface at obsPos (0,0,1000) and lookDir (0,-1,-1)
 Intersection successful?      "No"
-Try to intersect surface at obsPos (1000,0,0) and lookDir (-1,0,0)
+Try to intersect surface at obsPos (1000,0,0) and ground point (1,0,0)
 Intercept X =  0.28911
 Intercept Y =  0
 Intercept Z =  0
