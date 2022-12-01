@@ -36,6 +36,7 @@ release.
 ## [Unreleased]
 
 ### Changed
+- Updated Hayabusa2 mission name and updated translation files to make L2DShapeModelFileName, L2DPhaseFunctionFileName, L2CShapeModelFileName, and BandRegistration optional keywords.
 
 ### Added
 - Added LatLonGrid Tool to Qview to view latitude and longitude lines if camera model information is present.
@@ -55,7 +56,6 @@ release.
 ## [7.1.0] - 2022-07-27
 
 ### Changed
-- Updated Hayabusa2 mission name and updated translation files to make L2DShapeModelFileName, L2DPhaseFunctionFileName, L2CShapeModelFileName, and BandRegistration optional keywords.
 - Updated the LRO photometry application Lronacpho, to use by default the current 2019 photometric model (LROC_Empirical). The model's coefficients are found in the PVL file that exists in the LRO data/mission/calibration directory. If the old parameter file is provided, the old algorithm(2014) will be used. This functionality is desired for calculation comparisons. Issue: [#4512](https://github.com/USGS-Astrogeology/ISIS3/issues/4512), PR: [#4519](https://github.com/USGS-Astrogeology/ISIS3/pull/4519)
 - Updated the LRO calibration application Lrowaccal to add a units label to the RadiometricType keyword of the Radiometry group in the output cube label if the RadiometricType parameter is Radiance. No functionality is changed if the RadiometricType parameter is IOF. Lrowaccal has also been refactored to be callable for testing purposes. Issue: [#4939](https://github.com/USGS-Astrogeology/ISIS3/issues/4939), PR: [#4940](https://github.com/USGS-Astrogeology/ISIS3/pull/4940)
 - Changed how logs are reported so they no longer only printing at the end of the applications execution. [#4914](https://github.com/USGS-Astrogeology/ISIS3/issues/4914)
