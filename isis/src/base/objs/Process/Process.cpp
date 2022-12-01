@@ -799,7 +799,19 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
     }
 
     Isis::FileName expanded(dir + "/" + file);
-    if(highestVersion) expanded = expanded.highestVersion();
+    // Highest version checks if the file exists, if we
+    // do not ask for the highest version, then we need to check
+    // if the file exists
+    if (highestVersion) {
+      expanded = expanded.highestVersion();
+    }
+    else {
+      if (!expanded.fileExists()) {
+        QString message = "The file [" + expanded.original() + "] " +
+                          "cannot be found under [" + mission + "]";
+        throw IException(IException::Io, message, _FILEINFO_);
+      }
+    }
     return expanded.expanded();
   }
 

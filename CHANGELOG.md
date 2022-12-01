@@ -44,6 +44,7 @@ release.
 
 ### Fixed
 
+- Added mapping group to track cube via processmosaic [#4810](https://github.com/USGS-Astrogeology/ISIS3/issues/4810)
 - Fixed bugs in downloadIsisData script [#5024](https://github.com/USGS-Astrogeology/ISIS3/issues/5024) 
 - Fixed shadow shifting image by 2 pixels to the upper left corner. [#5035](https://github.com/USGS-Astrogeology/ISIS3/issues/5035)
 - Fixed compiler warnings on ubuntu [#4911](https://github.com/USGS-Astrogeology/ISIS3/issues/4911)
