@@ -31,7 +31,7 @@ void IsisMain() {
 
   // Get the input file from the user interface
   UserInterface &ui = Application::GetUserInterface();
-  QString labelFile = ui.GetFileName("FROM");
+  QString labelFile = ui.GetCubeName("FROM");
 
   // Open the file ... it must be a label-type file
   Pvl lab;
@@ -129,7 +129,7 @@ void IsisMain() {
 //Helper function to output the input file to log.
 void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
-  QString file(ui.GetFileName("FROM"));
+  QString file(ui.GetCubeName("FROM"));
   Pvl p;
   p.read(file);
   Application::GuiLog(p);

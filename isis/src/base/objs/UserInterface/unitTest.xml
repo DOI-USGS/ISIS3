@@ -26,15 +26,12 @@
       Replaced application name="hist" with name="unitTest".
       Added a new group of parameters to test -HELP=value.
     </change>
-    <change name="Jacob Cain" date="2022-11-23">
-      Changed type of cubes from filename to cube.
-    </change>
   </history>
 
   <groups>
     <group name="Files">
       <parameter name="FROM">
-        <type>cube</type>
+        <type>filename</type>
         <brief>
           Test cube
         </brief>
@@ -47,7 +44,7 @@
         <default><item>$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub</item></default>
       </parameter>
       <parameter name="TO">
-        <type>cube</type>
+        <type>filename</type>
         <pixelType>real</pixelType>
         <brief>
           Test cube
