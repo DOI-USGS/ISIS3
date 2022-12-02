@@ -23,9 +23,6 @@
     <change name="Jeannie Walldren" date="2010-07-20">
       Replaced filemode tags with fileMode and button attributes with name
     </change>
-    <change name="Jacob Cain" date="2022-11-23">
-      changed G0p0 type from filename to cube.
-    </change>
   </history>
 
   <category>
@@ -36,7 +33,7 @@
   <groups>
     <group name="GROUP 0">
       <parameter name="G0p0">
-        <type>cube</type>
+        <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
           G0P0 Filename
