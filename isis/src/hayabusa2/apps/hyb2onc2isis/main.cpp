@@ -64,7 +64,7 @@ void IsisMain () {
   }
 
   missid = missid.simplified().trimmed();
-  if (QString::compare(missid, "HAYABUSA-2", Qt::CaseInsensitive) != 0) {
+  if ((QString::compare(missid, "HAYABUSA2", Qt::CaseInsensitive) != 0) && (QString::compare(missid, "HAYABUSA-2", Qt::CaseInsensitive) != 0)) {
     QString msg = "Input file [" + FileName(ui.GetFileName("FROM")).expanded() +
                   "] does not appear to be a Hayabusa2 label file.";
     throw IException(IException::Unknown, msg, _FILEINFO_);

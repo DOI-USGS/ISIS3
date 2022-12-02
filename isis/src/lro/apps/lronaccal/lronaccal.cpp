@@ -322,13 +322,13 @@ namespace Isis {
             double etStart = startTime.Et();
             // Get the distance between the Moon and the Sun at the given time in
             // Astronomical Units (AU)
-            QString bspKernel1 = p.MissionData("lro", "$base/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
-            QString bspKernel2 = p.MissionData("lro", "$base/kernels/tspk/de421.bsp", false);
+            QString bspKernel1 = p.MissionData("lro", "/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
+            QString bspKernel2 = p.MissionData("lro", "/kernels/tspk/de421.bsp", false);
             furnsh_c(bspKernel1.toLatin1().data());
             furnsh_c(bspKernel2.toLatin1().data());
             QString pckKernel1 = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-            QString pckKernel2 = p.MissionData("lro", "$base/kernels/pck/moon_080317.tf", false);
-            QString pckKernel3 = p.MissionData("lro", "$base/kernels/pck/moon_assoc_me.tf", false);
+            QString pckKernel2 = p.MissionData("lro", "/kernels/pck/moon_080317.tf", false);
+            QString pckKernel3 = p.MissionData("lro", "/kernels/pck/moon_assoc_me.tf", false);
             furnsh_c(pckKernel1.toLatin1().data());
             furnsh_c(pckKernel2.toLatin1().data());
             furnsh_c(pckKernel3.toLatin1().data());
@@ -497,7 +497,7 @@ namespace Isis {
       data.push_back(toDouble(lineString.split(QRegExp("[ ,;]")).first()));
       line++;
     }
-    fileString = filename.expanded();
+    fileString = filename.original();
   }
 
   /**
@@ -529,7 +529,7 @@ namespace Isis {
       data.push_back(line);
     }
 
-    fileString = filename.expanded();
+    fileString = filename.original();
   }
 
   /**
@@ -877,7 +877,7 @@ namespace Isis {
     for(int i = 0; i < cube.sampleCount(); i++)
       data.push_back(brick[i]);
 
-    fileString = filename.expanded();
+    fileString = filename.original();
 
     if(data.empty()){
       QString msg = "Copy from + " + fileString + " into vector failed.";

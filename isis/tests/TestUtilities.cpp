@@ -1,5 +1,8 @@
 #include "TestUtilities.h"
 
+#include <cmath>
+#include <string>
+
 namespace Isis {
 
   /**
@@ -196,6 +199,145 @@ namespace Isis {
           << vec1[index] << " and " << vec2[index] << ".\n";
     }
     return failure;
+  }
+
+  /**
+   * Helper recursive comparison function for two JSON objects
+   * Logic is modified from nlohmann::json::diff function
+   */
+  std::vector<std::string> compareJsons(
+      const nlohmann::json &json1,
+      const nlohmann::json &json2,
+      std::string jsonPointer,
+      double tolerance) {
+    std::vector<std::string> differences;
+    // Basic check for equality to short-circuit behavior
+    if (json1 == json2) {
+      return differences;
+    }
+
+    // Check types
+    // If both are numeric, then don't check the type so we can compare ints to floats
+    if (!(json1.is_number() && json2.is_number()) && json1.type() != json2.type()) {
+      differences.push_back("JSONs have different types at [" + jsonPointer + "]");
+      return differences;
+    }
+
+    switch (json1.type()) {
+      // Handle arrays
+      case nlohmann::detail::value_t::array: {
+        // Check for same size
+        if (json1.size() != json2.size()) {
+          differences.push_back(
+              "JSONs have different sized arrays [" + std::to_string(json1.size())
+              + "] and [" + std::to_string(json2.size()) + "] at [" + jsonPointer + "]");
+          return differences;
+        }
+
+        // Check values
+        for (size_t i = 0; i < json1.size(); i++) {
+          std::string newPointer = jsonPointer + "/" + std::to_string(i);
+          std::vector<std::string> tempDiffs = compareJsons(json1[i], json2[i], newPointer, tolerance);
+          differences.insert(differences.end(), tempDiffs.begin(), tempDiffs.end());
+        }
+
+        break;
+      }
+
+      // Handle objects
+      case nlohmann::detail::value_t::object: {
+        // Check for keys from the first JSON
+        for (auto it = json1.cbegin(); it != json1.cend(); ++it) {
+          // Check for presence
+          if (json2.contains(it.key())) {
+            // Check values
+            std::string newPointer = jsonPointer + "/" + it.key();
+            std::vector<std::string> tempDiffs = compareJsons(it.value(), json2[it.key()], newPointer, tolerance);
+            differences.insert(differences.end(), tempDiffs.begin(), tempDiffs.end());
+          }
+          else {
+            differences.push_back(
+                "Key [" + it.key() + "] is present in the first JSON but not the second at ["
+                + jsonPointer + "]");
+          }
+        }
+
+        // Check for keys from the second JSON
+        // This time only check for presence because if they are present in the first JSON
+        // we have already checked their value
+        for (auto it = json2.cbegin(); it != json2.cend(); ++it) {
+          if (!json1.contains(it.key())) {
+            differences.push_back(
+                "Key [" + it.key() + "] is present in the second JSON but not the first at ["
+                + jsonPointer + "]");
+          }
+        }
+
+        break;
+      }
+
+      // Handle numeric types
+      case nlohmann::detail::value_t::number_integer:
+      case nlohmann::detail::value_t::number_unsigned:
+      case nlohmann::detail::value_t::number_float: {
+        double numDiff = abs(json1.get<double>() - json2.get<double>());
+        if (numDiff > tolerance) {
+          differences.push_back(
+                "Values [" + json1.dump() + "] and [" + json2.dump() + "] differ by ["
+                + std::to_string(numDiff) + "] which is greater than tolerance ["
+                + std::to_string(tolerance) + "] at [" + jsonPointer + "]");
+        }
+
+        break;
+      }
+
+      // Handle the rest
+      case nlohmann::detail::value_t::null:
+      case nlohmann::detail::value_t::string:
+      case nlohmann::detail::value_t::boolean:
+      case nlohmann::detail::value_t::binary:
+      case nlohmann::detail::value_t::discarded:
+      default: {
+        // This "if" is redundant with the short-circuit check but is included for clarity/safety
+        if (json1 != json2) {
+          differences.push_back(
+                "Values [" + json1.dump() + "] and [" + json2.dump() + "] differ at ["
+                + jsonPointer + "]");
+        }
+
+        break;
+      }
+    }
+
+    return differences;
+  }
+
+
+  /**
+   * Asserts that two JSON objects are the same except for numerical values are within
+   * a given tolerance.
+   */
+  ::testing::AssertionResult AssertJsonsNear(
+      const char* json1_expr,
+      const char* json2_expr,
+      const char* tolerance_expr,
+      const nlohmann::json &json1,
+      const nlohmann::json &json2,
+      double tolerance) {
+
+    std::vector<std::string> differences = compareJsons(json1, json2, std::string(""), tolerance);
+
+    if (differences.size() > 0) {
+      ::testing::AssertionResult failure = ::testing::AssertionFailure()
+          << "JSONs " << json1_expr << " and " << json2_expr << " are different within a tolerance of "
+          << tolerance_expr << std::endl;
+      for (size_t i = 0; i < differences.size(); i++) {
+        failure << differences[i] << std::endl;
+      }
+      return failure;
+    }
+
+    return ::testing::AssertionSuccess();
   }
 
   // Check to see if a QString contains only numeric values.

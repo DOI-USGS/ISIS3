@@ -92,7 +92,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelPds4ErrorNoImage) {
 }
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelPds4RemoveStartTimeZ) {
-  QString labelFileName = "data/isisimport/pds4.xml";
+  QString labelFileName = tempDir.path() + "/pds4.xml";
   std::ofstream ofxml;
   ofxml.open(labelFileName.toStdString());
   ofxml << R"(<Cube><Dimensions> <Lines>2</Lines> <Samples>3</Samples> <Bands>1</Bands> </Dimensions><StartTime>2021-01-01T00:00:00Z</StartTime></Cube>)";
@@ -140,7 +140,7 @@ End)";
 }
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelPds4YearDoy) {
-QString labelFileName = "data/isisimport/pds4.xml";
+  QString labelFileName = tempDir.path() + "/pds4.xml";
   std::ofstream ofxml;
   ofxml.open(labelFileName.toStdString());
   ofxml << R"(<Cube><Dimensions> <Lines>2</Lines> <Samples>3</Samples> <Bands>1</Bands> </Dimensions><StartTime>2021-02-01T00:00:00Z
@@ -188,7 +188,7 @@ End)";
 }
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelObservationId) {
-QString labelFileName = "data/isisimport/pds4.xml";
+  QString labelFileName = tempDir.path() + "/pds4.xml";
   std::ofstream ofxml;
   ofxml.open(labelFileName.toStdString());
   ofxml << R"(<Cube><Dimensions> <Lines>2</Lines> <Samples>3</Samples> <Bands>1</Bands> </Dimensions><UniqueIdentifier>2021
