@@ -36,6 +36,7 @@ release.
 ## [Unreleased]
 
 ### Changed
+- Updated Hayabusa2 mission name and updated translation files to make L2DShapeModelFileName, L2DPhaseFunctionFileName, L2CShapeModelFileName, and BandRegistration optional keywords.
 
 ### Added
 - Added LatLonGrid Tool to Qview to view latitude and longitude lines if camera model information is present.
