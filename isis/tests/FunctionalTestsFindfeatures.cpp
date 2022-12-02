@@ -74,30 +74,30 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesGeomMatch) {
   //Control point with a single measure
   ControlPoint *pt = network.GetPoint("test_network_0001");
   ControlMeasure *cm = pt->GetMeasure(SerialNumber::Compose(*cube2));
-  EXPECT_DOUBLE_EQ(cm->GetSample(), 60.719512939453125);
-  EXPECT_DOUBLE_EQ(cm->GetLine(), 31.866861343383789);
+  EXPECT_NEAR(cm->GetSample(), 60.719512939453125, 1e-6);
+  EXPECT_NEAR(cm->GetLine(), 31.866861343383789, 1e-6);
   SurfacePoint sp = pt->GetAprioriSurfacePoint();
   Latitude lat = sp.GetLatitude();
   Longitude lon = sp.GetLongitude();
-  EXPECT_DOUBLE_EQ(lat.planetocentric(), 0.025811899541941467);
-  EXPECT_DOUBLE_EQ(lon.positiveEast(), 0.0012615634743558179);
+  EXPECT_NEAR(lat.planetocentric(), 0.025811899541941467, 1e-6);
+  EXPECT_NEAR(lon.positiveEast(), 0.0012615634743558179, 1e-6);
 
 
   // Control point with two measures
   pt = network.GetPoint("test_network_0018");
   cm = pt->GetMeasure(SerialNumber::Compose(*cube2));
-  EXPECT_DOUBLE_EQ(cm->GetSample(), 143.62646484375);
-  EXPECT_DOUBLE_EQ(cm->GetLine(), 69.777481079101562);
+  EXPECT_NEAR(cm->GetSample(), 143.62646484375, 1e-6);
+  EXPECT_NEAR(cm->GetLine(), 69.777481079101562, 1e-6);
 
   cm = pt->GetMeasure(SerialNumber::Compose(*cube1));
-  EXPECT_DOUBLE_EQ(cm->GetSample(), 383.62646484375);
-  EXPECT_DOUBLE_EQ(cm->GetLine(), 81.777481079101562);
+  EXPECT_NEAR(cm->GetSample(), 383.62646484375, 1e-6);
+  EXPECT_NEAR(cm->GetLine(), 81.777481079101562, 1e-6);
 
   sp = pt->GetAprioriSurfacePoint();
   lat = sp.GetLatitude();
   lon = sp.GetLongitude();
-  EXPECT_DOUBLE_EQ(lat.planetocentric(), 0.028914626048514001);
-  EXPECT_DOUBLE_EQ(lon.positiveEast(), 0.0071459947198023819);
+  EXPECT_NEAR(lat.planetocentric(), 0.028914626048514001, 1e-6);
+  EXPECT_NEAR(lon.positiveEast(), 0.0071459947198023819, 1e-6);
 }
 
 

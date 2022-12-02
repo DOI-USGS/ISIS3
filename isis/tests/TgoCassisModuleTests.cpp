@@ -2277,7 +2277,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
     FAIL() << "Unable to run spiceinit  on nir image: " << e.what() << std::endl;
   }
 
-  // run stitch and unstitch on cube list
+  // run stitch on cube list
   FileList *cubeList = new FileList();
   cubeList->append(panFileName);
   cubeList->append(bluFileName);
@@ -2317,14 +2317,15 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
     FAIL() << "Unable to run mosrange with cube list: " << e.what() << std::endl;
   }
 
-  // run cam2map and cassismos on pan cube
+  // run cam2map on stitched cube
   QString projectedFile = prefix.path() + "/projected.cub";
   QVector<QString> cam2mapArgs = {"from=" + tgocassisstitchOutput,
                                   "to=" + projectedFile,
-                                  "map=" + mapFile,};
-  UserInterface cam2mapPan(CAM2MAP_XML, cam2mapArgs);
+                                  "map=" + mapFile,
+                                  "pixres=map"};
+  UserInterface cam2mapOptions(CAM2MAP_XML, cam2mapArgs);
   try {
-    cam2map(cam2mapPan);
+    cam2map(cam2mapOptions);
   }
   catch (IException &e) {
     FAIL() << "Unable to run cam2map on stitched image: " << e.what() << std::endl;
@@ -2340,18 +2341,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   catch (IException &e) {
     FAIL() << "Unable to run tgocassisrdrgen on projected image: " << e.what() << std::endl;
   }
-
-  // QString ingestedExportFile = prefix.path() + "/exported.cub";
-  // tgocassis2isisArgs = {"from=" + prefix.path() + "/exported.xml",
-  //                       "to=" + ingestedExportFile};
-  // UserInterface tgocassis2isisIngest(TGOCASSIS2ISIS_XML, tgocassis2isisArgs);
-  // try {
-  //   tgocassis2isis(tgocassis2isisIngest);
-  // }
-  // catch (IException &e) {
-  //   FAIL() << "Unable to run tgocassis2isis on output image: " << e.what() << std::endl;
-  // }
-
+  
   // Mosaic Cube
   Cube exportCube(projectedFile);
   Pvl *outLabel = exportCube.label();
@@ -2747,10 +2737,10 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
       MaximumLatitude    = 2.7054455166927
       MinimumLongitude   = 266.09781108551
       MaximumLongitude   = 266.34204815257
-      UpperLeftCornerX   = -7234.9327157961 <meters>
-      UpperLeftCornerY   = 160368.69134142 <meters>
-      PixelResolution    = 6.7806304740357 <meters/pixel>
-      Scale              = 8741.6622669795 <pixels/degree>
+      UpperLeftCornerX   = -7233.2769909138 <meters>
+      UpperLeftCornerY   = 160363.72421906 <meters>
+      PixelResolution    = 6.80458795006 <meters/pixel>
+      Scale              = 8710.8847730724 <pixels/degree>
       CenterLatitude     = 2.584937425328
     End_Group
   )");
@@ -2765,7 +2755,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   Histogram *hist = exportCube.histogram();
 
   EXPECT_NEAR(hist->Average(), 0.26625623495550205, 0.0001);
-  EXPECT_NEAR(hist->Sum(), 444615.96850222297, 0.0001);
-  EXPECT_EQ(hist->ValidPixels(), 1669880);
+  EXPECT_NEAR(hist->Sum(), 441491.9287794265, 0.001);
+  EXPECT_EQ(hist->ValidPixels(), 1658108);
   EXPECT_NEAR(hist->StandardDeviation(), 0.048925404459616698, 0.0001);
 }

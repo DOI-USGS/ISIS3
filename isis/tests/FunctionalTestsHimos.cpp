@@ -48,39 +48,30 @@ TEST_F(MroHiriseCube, FunctionalTestHimosDefault) {
   EXPECT_EQ(double(pixels["Base"]), 1.4996565881653);
   EXPECT_EQ(double(pixels["Multiplier"]), 4.57882446313283e-05);
 
-
   PvlGroup inputMappingGroup = inputCubeLabel.findGroup("Mapping");
   PvlGroup outputMappingGroup = outputCubeLabel.findGroup("Mapping");
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, inputMappingGroup, outputMappingGroup);
 
-  std::istringstream mosaicStream(R"(
-  Group = Mosaic
-    ProductId                 = TRA_000823_1720_BLUEGREEN
-    SourceProductId           = (TRA_000823_1720_RED4_0, TRA_000823_1720_RED4_1)
-    StartTime                 = 2006-09-29T15:16:33.385
-    SpacecraftClockStartCount = 844010212:12516
-    StopTime                  = 2006-09-29T15:16:35.036
-    SpacecraftClockStopCount  = 844010213:55196
-    IncidenceAngle            = 59.687930340662 <DEG>
-    EmissionAngle             = 0.091672512443932 <DEG>
-    PhaseAngle                = 59.597812369363 <DEG>
-    LocalTime                 = 15.486088288555 <LOCALDAY/24>
-    SolarLongitude            = 113.54746578654 <DEG>
-    SubSolarAzimuth           = 212.41484032558 <DEG>
-    NorthAzimuth              = 270.00024569628 <DEG>
-    cpmmTdiFlag               = (Null, Null, Null, Null, Null, 128, Null, Null,
-                                 Null, Null, Null, Null, Null, Null)
-    cpmmSummingFlag           = (Null, Null, Null, Null, Null, 1, Null, Null,
-                                 Null, Null, Null, Null, Null, Null)
-    SpecialProcessingFlag     = (Null, Null, Null, Null, Null, NOMINAL, Null,
-                                 Null, Null, Null, Null, Null, Null, Null)
-  End_Group
-  )");
-  PvlGroup mosaicGroupTruth;
-  mosaicStream >> mosaicGroupTruth;
-  PvlGroup outputMosaicGroup = outputCubeLabel.findGroup("Mosaic");
-  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, mosaicGroupTruth, outputMosaicGroup);
+  PvlGroup mos = outputCubeLabel.findGroup("Mosaic");
+  EXPECT_EQ(mos["ProductId"][0].toStdString(), "TRA_000823_1720_BLUEGREEN");
+  EXPECT_EQ(mos["SourceProductId"][0].toStdString(), "TRA_000823_1720_RED4_0");
+  EXPECT_EQ(mos["SourceProductId"][1].toStdString(), "TRA_000823_1720_RED4_1");
+  EXPECT_EQ(mos["StartTime"][0].toStdString(), "2006-09-29T15:16:33.385");
+  EXPECT_EQ(mos["SpacecraftClockStartCount"][0].toStdString(), "844010212:12516");
+  EXPECT_EQ(mos["StopTime"][0].toStdString(), "2006-09-29T15:16:35.036");
+  EXPECT_EQ(mos["SpacecraftClockStopCount"][0].toStdString(), "844010213:55196");
 
+  EXPECT_NEAR(mos["IncidenceAngle"][0].toDouble(), 59.687930340662, 1e-6);
+  EXPECT_NEAR(mos["EmissionAngle"][0].toDouble(), 0.091672512439956, 1e-6);
+  EXPECT_NEAR(mos["PhaseAngle"][0].toDouble(), 59.597812369363, 1e-6);
+  EXPECT_NEAR(mos["LocalTime"][0].toDouble(), 15.486088288555, 1e-6);
+  EXPECT_NEAR(mos["SolarLongitude"][0].toDouble(), 113.54746578654, 1e-6);
+  EXPECT_NEAR(mos["SubSolarAzimuth"][0].toDouble(), 212.41484032558 , 1e-6);
+  EXPECT_NEAR(mos["NorthAzimuth"][0].toDouble(), 270.00024569628, 1e-6);
+
+  EXPECT_EQ(mos["cpmmTdiFlag"][5].toStdString(), "128");
+  EXPECT_EQ(mos["cpmmSummingFlag"][5].toStdString(), "1");
+  EXPECT_EQ(mos["SpecialProcessingFlag"][5].toStdString(), "NOMINAL");
 }
 
 TEST_F(MroHiriseCube, FunctionalTestHimosError) {
