@@ -65,7 +65,7 @@ namespace Isis {
     //  Get the list of input cubes to be processed
     FileList cubeNameList;
     if ( ui.WasEntered("FROM") ) {
-      cubeNameList.append(ui.GetFileName("FROM"));
+      cubeNameList.append(ui.GetCubeName("FROM"));
     }
     else if ( ui.WasEntered("FROMLIST") ) {
       cubeNameList.read(ui.GetFileName("FROMLIST"));

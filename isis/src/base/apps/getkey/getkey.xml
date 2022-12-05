@@ -64,12 +64,15 @@
     <change name="Ra'ad Saleh" date="2013-02-04">
       Fixed error in printing PVL values caused by line continuations. Fixes #1017.
     </change>
+    <change name="Jacob" date="2022-11-23">
+      Changed FROM input type from filename to cube.
+    </change>
   </history>
 
   <groups>
     <group name="Files">
       <parameter name="FROM">
-        <type>filename</type>
+        <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
           Filename of a label file

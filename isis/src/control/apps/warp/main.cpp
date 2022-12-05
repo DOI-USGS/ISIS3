@@ -60,7 +60,7 @@ void IsisMain() {
   int onl, ons;
   if (ui.GetString("OSIZE") == "MATCH") {
     Cube c;
-    c.open(ui.GetFileName("CUBE"), "r");
+    c.open(ui.GetCubeName("CUBE"), "r");
     onl = c.lineCount();
     ons = c.sampleCount();
     c.close();
