@@ -103,6 +103,7 @@ requirements:
    - texlive-core
    - tnt
    - x264
+   - x265
    - xalan-c
    - xerces-c=3
    - xorg-kbproto
