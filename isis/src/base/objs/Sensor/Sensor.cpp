@@ -141,7 +141,7 @@ namespace Isis {
    *
    */
   bool Sensor::SetLookDirection(const double v[3]) {
-    //std::cout << "Sensor::SetLookDirection()\n";
+    // std::cout << "Sensor::SetLookDirection()\n";
     // The look vector must be in the camera coordinate system
 
     // copy v to LookC
@@ -153,6 +153,7 @@ namespace Isis {
     // Convert it to body-fixed
     const vector<double> &lookJ = instrumentRotation()->J2000Vector(lookC);
     const vector<double> &lookB = bodyRotation()->ReferenceVector(lookJ);
+    cout << lookB[0] << ", " << lookB[1] << ", " << lookB[2] << endl;
 
     // This memcpy does:
     // m_lookB[0] = lookB[0];
@@ -615,10 +616,11 @@ namespace Isis {
     double decRad = dec * DEG2RAD;
 
     // Make the radius bigger, some multiple of the body radius -or- use sensor position at the reference point 
-    SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 1.0};
+    SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 1};
     SensorUtilities::Vec rectPt = SensorUtilities::sphericalToRect(sphericalPt);
 
     vector<double> lookC = instrumentRotation()->ReferenceVector(rectPt);
+    cout << lookC[0] << ", " << lookC[1] << ", " << lookC[2] << endl;
     return SetLookDirection(&lookC[0]);
   }
 

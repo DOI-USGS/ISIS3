@@ -33,41 +33,12 @@ namespace Isis {
    * the focal plane?
    */
   bool CSMSkyMap::SetSky(const double ra, const double dec) {
-    double raRad = ra * DEG2RAD;
-    double decRad = dec * DEG2RAD;
-
-    // Make the radius bigger, some multiple of the body radius -or- use sensor position at the reference point
-    SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 10e12};
-    SensorUtilities::Vec rectPt = SensorUtilities::sphericalToRect(sphericalPt);
-
-    double f = p_camera->FocalLength();
-    double m[3][3];
-    double x = p_camera->getParameterValue(3);
-    double y = p_camera->getParameterValue(4);
-    double z = p_camera->getParameterValue(5);
-    double w = p_camera->getParameterValue(6);
-
-    double norm = sqrt(x * x + y * y + z * z + w * w);
-    x /= norm;
-    y /= norm;
-    w /= norm;
-    z /= norm;
-
-    m[0][0] = w * w + x * x - y * y - z * z;
-    m[0][1] = 2 * (x * y - w * z);
-    m[0][2] = 2 * (w * y + x * z);
-    m[1][0] = 2 * (x * y + w * z);
-    m[1][1] = w * w - x * x + y * y - z * z;
-    m[1][2] = 2 * (y * z - w * x);
-    m[2][0] = 2 * (x * z - w * y);
-    m[2][1] = 2 * (w * x + y * z);
-    m[2][2] = w * w - x * x - y * y + z * z;
-
-    // Sensor position
-    double undistortedx, undistortedy, denom;
-    denom = m[0][2] * xo + m[1][2] * yo + m[2][2] * zo;
-    p_focalPlaneX = (f * (m[0][0] * xo + m[1][0] * yo + m[2][0] * zo) / denom);
-    p_focalPlaneY = (f * (m[0][1] * xo + m[1][1] * yo + m[2][1] * zo) / denom);
+    ((CSMCamera*)p_camera)->SetRightAscensionDeclination(ra, dec);
+    double lookC[3];
+    ((CSMCamera*)p_camera)->LookDirection(lookC);
+    double scale = p_camera->FocalLength() / lookC[2];
+    p_focalPlaneX = lookC[0] * scale;
+    p_focalPlaneY = lookC[1] * scale;
     return true;
   }
 

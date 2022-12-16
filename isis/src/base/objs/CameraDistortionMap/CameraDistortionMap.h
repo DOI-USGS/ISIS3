@@ -68,7 +68,7 @@ namespace Isis {
       double p_undistortedFocalPlaneY;  //!< Undistorted focal plane y
       double p_zDirection;              //!< Undistorted focal plane z
 
-      std::vector<double> p_odk;        //!< Vector of distortion coefficients
+      std::vector<double> p_odk = {0, 0, 0};        //!< Vector of distortion coefficients
   };
 };
 #endif

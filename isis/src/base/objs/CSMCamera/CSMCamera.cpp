@@ -18,6 +18,7 @@ find files of those names at the top level of this repository. **/
 #include <QPointF>
 #include <QString>
 
+#include "Affine.h"
 #include "Blob.h"
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
@@ -37,7 +38,6 @@ find files of those names at the top level of this repository. **/
 #include "SurfacePoint.h"
 #include "Table.h"
 #include "SensorUtilities.h"
-#include "CSMSkyMap.h"
 
 #include "csm/Warning.h"
 #include "csm/Error.h"
@@ -45,9 +45,15 @@ find files of those names at the top level of this repository. **/
 #include "csm/Ellipsoid.h"
 #include "csm/SettableEllipsoid.h"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 using namespace std;
 
 namespace Isis {
+
+json stateAsJson(std::string modelState);
+void sanitize(std::string &input);
 
   /**
    * Constructor for an ISIS Camera model that uses a Community Sensor Model (CSM)
@@ -113,6 +119,7 @@ namespace Isis {
 
     setTarget(*cube.label());
 
+    // Setup a bunch of ISIS stuff
     if (cube.hasTable("BodyRotation")) {
       Table bodyRotTable("BodyRotation", cube.fileName(), *cube.label());
       m_bodyRotation = new SpiceRotation(1);
@@ -122,8 +129,47 @@ namespace Isis {
       m_solarLongitude = new Longitude((double)solarLonKey, Angle::Radians);
       m_solarLongitude->force360Domain();
 
-      new CSMSkyMap(this);
     }
+
+    if (cube.hasTable("InstrumentPointing")) {
+      Table instRotTable("InstrumentPointing", cube.fileName(), *cube.label());
+      PvlObject instRotPvlObject = instRotTable.Label();
+      int ikCode = toInt(instRotPvlObject["TimeDependentFrames"][0]);
+      if (instRotPvlObject.hasKeyword("ConstantFrames")) {
+        ikCode = toInt(instRotPvlObject["ConstantFrames"][0]);
+      }
+      m_instrumentRotation = new SpiceRotation(ikCode);
+      m_instrumentRotation->LoadCache(instRotTable);
+
+      json isdJson = stateAsJson(stateString.toStdString());
+      cout << isdJson << endl;
+
+      SetFocalLength(isdJson["m_focalLength"]);
+
+      Affine::AMatrix matrix(3, 3, 0.0);
+      // matrix[0][0] = 1;
+      // matrix[1][1] = 1;
+
+      matrix[0][0] = isdJson["m_transX"][1];
+      matrix[1][1] = isdJson["m_transY"][2];
+      matrix[2][2] = 1;
+      Affine affine(matrix);
+
+      CameraDetectorMap *detMap = new CameraDetectorMap(this);
+      detMap->SetStartingDetectorSample(0);
+      detMap->SetStartingDetectorLine(0);
+
+      // Affine affine;
+      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, affine);
+      focalMap->SetDetectorOrigin(isdJson["m_ccdCenter"][1], isdJson["m_ccdCenter"][0]);
+
+      // Setup distortion map
+      CameraDistortionMap *distMap = new CameraDistortionMap(this);
+
+      new CameraSkyMap(this);
+    }
+
+    setTime(m_refTime);
   }
 
 
@@ -183,7 +229,6 @@ namespace Isis {
     }
     *m_et = m_refTime + m_model->getImageTime(imagePt);
     setTime(*m_et);
-    
     if (target()->isSky()) {
       target()->shape()->setHasIntersection(false);
       return false;
@@ -265,42 +310,42 @@ namespace Isis {
   }
 
 
-  /**
-   * Given the ra/dec compute the look direction.
-   *
-   * @param ra    Right ascension in degrees (sky longitude).
-   * @param dec   Declination in degrees (sky latitude).
-   *
-   * @return @b bool True if successful.
-   */
-  bool CSMCamera::SetRightAscensionDeclination(const double ra, const double dec) {
-    double raRad = ra * DEG2RAD;
-    double decRad = dec * DEG2RAD;
+  // /**
+  //  * Given the ra/dec compute the look direction.
+  //  *
+  //  * @param ra    Right ascension in degrees (sky longitude).
+  //  * @param dec   Declination in degrees (sky latitude).
+  //  *
+  //  * @return @b bool True if successful.
+  //  */
+  // bool CSMCamera::SetRightAscensionDeclination(const double ra, const double dec) {
+  //   double raRad = ra * DEG2RAD;
+  //   double decRad = dec * DEG2RAD;
 
-    // Make the radius bigger, some multiple of the body radius -or- use sensor position at the reference point 
-    SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 10e12};
-    SensorUtilities::Vec rectPt = SensorUtilities::sphericalToRect(sphericalPt);
+  //   // Make the radius bigger, some multiple of the body radius -or- use sensor position at the reference point
+  //   SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 10e12};
+  //   SensorUtilities::Vec rectPt = SensorUtilities::sphericalToRect(sphericalPt);
 
-    // vector<double> lookC = instrumentRotation()->ReferenceVector(rectPt);
-    csm::EcefCoord lookPt = {rectPt.x, rectPt.y, rectPt.x};
-    double achievedPrecision = 0;
-    csm::WarningList warnings;
-    bool validBackProject;
-    csm::ImageCoord imagePt;
+  //   // vector<double> lookC = instrumentRotation()->ReferenceVector(rectPt);
+  //   csm::EcefCoord lookPt = {rectPt.x, rectPt.y, rectPt.x};
+  //   double achievedPrecision = 0;
+  //   csm::WarningList warnings;
+  //   bool validBackProject;
+  //   csm::ImageCoord imagePt;
 
-    try {
-      imagePt = m_model->groundToImage(lookPt, 0.01, &achievedPrecision, &warnings);
-      double sample;
-      double line;
-      csmToIsisPixel(imagePt, line, sample);
-      validBackProject = SetImage(sample, line);
-    }
-    catch (csm::Error &e) {
-      validBackProject = false;
-    }
+  //   try {
+  //     imagePt = m_model->groundToImage(lookPt, 0.01, &achievedPrecision, &warnings);
+  //     double sample;
+  //     double line;
+  //     csmToIsisPixel(imagePt, line, sample);
+  //     validBackProject = SetImage(sample, line);
+  //   }
+  //   catch (csm::Error &e) {
+  //     validBackProject = false;
+  //   }
 
-    return validBackProject;
-  }
+  //   return validBackProject;
+  // }
 
 
   /**
@@ -315,8 +360,8 @@ namespace Isis {
    * @return @b bool Indicates whether the given look direction intersects the target.
    * 
    */
-  bool CSMCamera::SetLookDirection(const vector<double> lookB) {
-    // The look vector must be in the bodyfixed coordinate system
+  bool CSMCamera::SetLookDirection(const std::vector<double> lookB) {
+    // The look vector must be in the camera coordinate system
 
     // This memcpy does:
     // m_lookB[0] = lookB[0];
@@ -1094,6 +1139,7 @@ namespace Isis {
   void CSMCamera::setTime(const iTime &time) {
     if(bodyRotation() != NULL) {
       bodyRotation()->SetEphemerisTime(time.Et());
+      instrumentRotation()->SetEphemerisTime(time.Et());
     }
   }
 
@@ -1171,6 +1217,20 @@ namespace Isis {
 
 
   /**
+   * Get the SpiceRotation object the contains the orientation of the target body
+   * relative to J2000.
+   *
+   * This is not supported for CSM sensors because the CSM API only supports the
+   * body fixed coordinate system and does not provide rotations to any others.
+   *
+   * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the body orientation
+   */
+  SpiceRotation *CSMCamera::bodyRotation() const {
+    return m_bodyRotation;
+  }
+
+
+  /**
    * Get the SpiceRotation object the contains the orientation of the sensor
    * relative to J2000.
    *
@@ -1180,8 +1240,7 @@ namespace Isis {
    * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the sensor orientation
    */
   SpiceRotation *CSMCamera::instrumentRotation() const {
-    QString msg = "Instrument rotation is not supported for CSM camera models";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
+    return m_instrumentRotation;
   }
 
 
@@ -1211,14 +1270,63 @@ namespace Isis {
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
-  /**
-   * Accessor method for the body rotation.
-   * @return @b iTime Body rotation for the image.
-   * @author Steven Lambright
-   * @internal
-   *   @history 2011-02-09 Steven Lambright - Original version.
-   */
-  SpiceRotation *CSMCamera::bodyRotation() const {
-    return m_bodyRotation;
+
+  // /**
+  //  * Computes the Right Ascension of the currently set image coordinate.
+  //  *
+  //  * This is not supported for CSM sensors because the CSM API only supports the
+  //  * body fixed coordinate system and does not provide rotations to any others.
+  //  *
+  //  * @returns @b double The Right Ascension
+  //  */
+  // double CSMCamera::RightAscension() {
+  //   if (m_bodyRot == NULL || m_model == NULL) {
+  //     QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
+  //     throw IException(IException::Programmer, msg, _FILEINFO_);
+  //   }
+
+  //   double precision;
+  //   csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(Lines()/2, Samples()/2), 0.00001, &precision);
+  //   csm::EcefVector v = locus.direction;
+  //   std::vector<double> jvec = m_bodyRot->J2000Vector({v.x, v.y, v.z});
+  //   return v.x;
+  // }
+
+
+  // /**
+  //  * Computes the Declination of the currently set image coordinate.
+  //  *
+  //  * This is not supported for CSM sensors because the CSM API only supports the
+  //  * body fixed coordinate system and does not provide rotations to any others.
+  //  *
+  //  * @returns @b double The Declination
+  //  */
+  // double CSMCamera::Declination() {
+  //   if (m_bodyRot == NULL || m_model == NULL) {
+  //     QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
+  //     throw IException(IException::Programmer, msg, _FILEINFO_);
+  //   }
+  //   double precision;
+  //   csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(Lines()/2, Samples()/2), 0.00001, &precision);
+  //   csm::EcefVector v = locus.direction;
+  //   std::vector<double> jvec = m_bodyRot->J2000Vector({v.x, v.y, v.z});
+  //   return v.y;
+  // }
+  json stateAsJson(std::string modelState) {
+    // Remove special characters from string
+    sanitize(modelState);
+
+    std::size_t foundFirst = modelState.find_first_of("{");
+    std::size_t foundLast = modelState.find_last_of("}");
+
+    if (foundFirst == std::string::npos) {
+      foundFirst = 0;
+    }
+    return json::parse(modelState.begin() + foundFirst, modelState.begin() + foundLast + 1);
+  }
+
+  void sanitize(std::string &input){
+    // Replaces characters from the string that are not printable with newlines
+    std::replace_if(input.begin(), input.end(), [](int c){return !::isprint(c);}, '\n');
   }
 }

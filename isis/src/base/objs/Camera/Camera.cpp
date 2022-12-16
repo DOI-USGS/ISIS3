@@ -1450,18 +1450,23 @@ namespace Isis {
    *              if it was not
    */
   bool Camera::SetRightAscensionDeclination(const double ra, const double dec) {
+    cout << "Setting RA, DEC: " << ra << ", " << dec << endl;
     if (p_skyMap->SetSky(ra, dec)) {
       double ux = p_skyMap->FocalPlaneX();
       double uy = p_skyMap->FocalPlaneY();
+      cout << "GOT FOCAL X, Y: " << ux << ", " << uy << endl;
       if (p_distortionMap->SetUndistortedFocalPlane(ux, uy)) {
         double dx = p_distortionMap->FocalPlaneX();
         double dy = p_distortionMap->FocalPlaneY();
+        cout << "GOT undistorted FOCAL X, Y: " << dx << ", " << dy << endl;
         if (p_focalPlaneMap->SetFocalPlane(dx, dy)) {
           double detectorSamp = p_focalPlaneMap->DetectorSample();
           double detectorLine = p_focalPlaneMap->DetectorLine();
+          cout << "GOT detector samp, lin: " << detectorSamp << ", " << detectorLine << endl;
           if (p_detectorMap->SetDetector(detectorSamp, detectorLine)) {
             double parentSample = p_detectorMap->ParentSample();
             double parentLine = p_detectorMap->ParentLine();
+            cout << "GOT parent samp, lin: " << parentSample << ", " << parentLine << endl;
 
             if (p_projection == NULL || p_ignoreProjection) {
               p_childSample = p_alphaCube->BetaSample(parentSample);
