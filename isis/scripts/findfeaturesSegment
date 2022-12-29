@@ -58,6 +58,12 @@ def parse_parameters():
     
             # Add the parameter name and value to the dictionary.
             params[name.lower()] = value
+
+    if (params.get("debug", "false").lower() == "true"):
+        log.basicConfig(level=logging.DEBUG)
+    else: 
+        log.basicConfig(level=logging.INFO)    
+    
     log.debug(f"parameters: {params}")
     return params
 
@@ -256,10 +262,6 @@ def merge(d1, d2, k):
 
 if __name__ == "__main__": 
     params = parse_parameters()
-    if (params.get("debug").lower() == "true"):
-        log.basicConfig(level=logging.DEBUG)
-    else: 
-        log.basicConfig(level=logging.INFO)    
 
     if "nl" not in params : 
         raise ValueError('**User Error** invalid command Line. Missing Parameter "nl"')
@@ -335,3 +337,4 @@ if __name__ == "__main__":
         log.debug(' '.join(err.cmd))
         log.debug(err.stdout)
         log.debug(err.stderr)
+
