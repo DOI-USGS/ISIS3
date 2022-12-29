@@ -13,7 +13,6 @@ from glob import glob
 import logging
 from pathlib import Path
 import logging as log
-import itertools 
 from copy import deepcopy
 import tempfile
 
@@ -21,26 +20,47 @@ import plio
 from plio.io import io_controlnetwork as cnet
 from plio.io import isis_serial_number as sn
 
-MAX_LEN = 30000
+from subprocess import check_output
+from multiprocessing.pool import ThreadPool
+import multiprocessing
+import itertools
+from functools import reduce
 
+MAX_LEN = 30000
+def footprintinit(img):
+    """
+    Just a wrapper for footprintinit with logging and exception handling 
+    Probably should be a functor in kalasiris
+    """
+    try:
+        ret = kisis.footprintinit(img)
+        log.debug(f"returned: {ret}")
+    except subprocess.CalledProcessError as err:
+        log.debug('Had an ISIS error:')
+        log.debug(' '.join(err.cmd))
+        log.debug(err.stdout)
+        log.debug(err.stderr)
+
+        
 def parse_parameters():
-  # Use a regular expression to extract the parameter name and value from each
-  # key-value pair in the parameter string.
-  pattern = r'(\w+)=(\S+)'
-  
-  # Create a dictionary to store the parameter names and values.
-  params = {}
-  for arg in sys.argv[1:]:
-    # Extract the parameter name and value from the argument.
-    matches = re.findall(pattern, arg)
-    for match in matches:
-      name = match[0]
-      value = match[1]
+    # Use a regular expression to extract the parameter name and value from each
+    # key-value pair in the parameter string.
+    pattern = r'(\w+)=(\S+)'
+
+    # Create a dictionary to store the parameter names and values.
+    params = {}
+    for arg in sys.argv[1:]:
+        # Extract the parameter name and value from the argument.
+        matches = re.findall(pattern, arg)
+        for match in matches:
+            name = match[0]
+            value = match[1]
     
-      # Add the parameter name and value to the dictionary.
-      params[name.lower()] = value
-  
-  return params
+            # Add the parameter name and value to the dictionary.
+            params[name.lower()] = value
+    log.debug(f"parameters: {params}")
+    return params
+
 
 def read_cubelist(cube_list : Path):
     """
@@ -87,6 +107,7 @@ def segment(img_path : Path, nlines : int = MAX_LEN):
     segment_metadata = {}
     try:
         ret = kisis.segment(img_path, nl=MAX_LEN, overlap=0)
+        log.debug(f"{ret}")
         segment_metadata = pvl.loads(ret.stdout)
         
         # comes nested in a "results" group, trim it off
@@ -95,12 +116,18 @@ def segment(img_path : Path, nlines : int = MAX_LEN):
         glob_str = str(img_path.parent / img_path.stem) + ".segment*"
         log.debug(f"globbing segments: glob({glob_str})")
         segments = sorted(glob(glob_str))
+        
         log.debug(f"segments: {segments}")
+        
+        i = 0
         for s, meta in zip(segments, segment_metadata):
+            i += 1
             meta["Path"] = s
-            meta["SN"] = sn.generate_serial_number(s)
-            # recompute footprint
-            kisis.footprintinit(s)
+            serial = kisis.getsn(s).stdout.split("\n")[0].strip()
+            log.debug(f"sn: {serial}")
+            meta["SN"] = serial 
+            meta["Segment"] = i
+            meta["Original"] = str(img_path)
         
         seg_dict_keys = [f"seg{n}" for n in range(1,len(segments)+1)]
         segment_dict = dict(zip(seg_dict_keys, segment_metadata))
@@ -111,12 +138,125 @@ def segment(img_path : Path, nlines : int = MAX_LEN):
         print(err.stdout)
         print(err.stderr)
         raise err
+    return segment_dict
+
+
+def findFeaturesSegment(params, images):
+    match_segment_n = images["match"]["Segment"]
+    from_segment_n = images["from"][0]["Segment"]
+
+    new_params = deepcopy(params)
+    new_params.pop("nl")
     
-    return segment_metadata
+    # make sure none of these keys are still in the params
+    new_params.pop("fromlist", None)
+    new_params.pop("from", None)
+    new_params["match"] = images["match"]["Path"]
+
+    og_onet = Path(params["onet"])
+    og_tolist = Path(params["tolist"])
+    og_pointid = params["pointid"]
+    og_networkid = params["networkid"]
+
+    from_images = [image["Path"] for image in images["from"]]
+    starting_lines = [image["StartingLine"] for image in images["from"]]
+    log.debug(f"from images: {from_images}")
+    
+    fromlist_path = Path(og_tolist.parent / f"from_images_segment{from_segment_n}.lis")
+    from_stem = fromlist_path.stem
+    log.debug(f"fromlist: {from_images}")
+
+    if not fromlist_path.exists():
+        log.debug(f"writing to: {fromlist_path}")
+        kisis.fromlist.make(from_images, fromlist_path)
+    else:
+        log.debug(f"{fromlist_path} already exists")
+    
+    match_stem = Path(new_params["match"]).stem 
+
+    if "debuglog" in new_params:
+        og_log =  Path(new_params["debuglog"])
+        new_log = og_log.parent / f"{og_log.stem}.{match_stem}_{from_stem}{og_log.suffix}" 
+        new_params["debuglog"] = str(new_log)
+
+    new_params["fromlist"] = str(fromlist_path)
+    new_params["networkid"] = og_networkid + f"_{match_stem}_{from_stem}"
+    new_params["pointid"] = og_pointid + f"_{match_stem}_{from_stem}"
+    new_params["onet"] = f"{og_onet.parent/og_onet.stem}.{match_stem}.{from_stem}.net"
+    new_params["tolist"] = f"{og_tolist.parent/og_tolist.stem}.{match_stem}.{from_stem}.lis"
+
+    log.debug(new_params)
+
+    # check for overlaps
+    is_overlapping = False
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+        overlapfromlist = tmpdir / "fromlist.lis"
+        overlaptolist = tmpdir / "tolist.lis"
+
+        kisis.fromlist.make([*from_images, new_params["match"]], overlapfromlist)
+        kisis.findimageoverlaps(fromlist=overlapfromlist, overlaplist=overlaptolist)
+        ret = kisis.overlapstats(fromlist=overlapfromlist, overlaplist=overlaptolist)
+        stats = pvl.loads(ret.stdout)
+        log.debug(f"overlap stats: {ret.stdout}")
+        is_overlapping = not all([k[1].get("NoOverlap", "") == new_params["match"] for k in stats])
+
+    log.debug(f"Is overlapping? {is_overlapping}")
+
+    if is_overlapping:
+        try:
+            ret = kisis.findfeatures(**new_params)
+            log.debug(f"returned: {ret}")
+        except subprocess.CalledProcessError as err:
+            log.debug('Had an ISIS error:')
+            log.debug(' '.join(err.cmd))
+            log.debug(err.stdout)
+            log.debug(err.stderr)
+
+        segmented_net = cnet.from_isis(new_params["onet"])
+
+        # starting sample in inclusive, so subtract 1
+        segmented_net.loc[segmented_net.serialnumber == images["match"]["SN"], "line"] += images["match"]["StartingLine"]-1 
+
+        # offset the images 
+        for k, image in enumerate(images["from"]):
+            image_sn = image["SN"]
+
+            # starting sample is inclusive, so subtract 1
+            segmented_net.loc[segmented_net.serialnumber == image_sn, "line"] += starting_lines[k]-1
+        cnet.to_isis(segmented_net, new_params["onet"], targetname="moon")
+        
+        from_originals = [image["Original"] for image in images["from"]]
+        return {"onet": new_params["onet"], "original_images": from_originals}
+
+
+def merge(d1, d2, k): 
+    """
+    Merge two dictionary keys together such that they 
+    always comes back as a list
+    """
+    # probably a cleaner way to do this
+
+    v1 = d1.get(k, None)
+    v2 = d2.get(k, None)
+
+    if not v1:
+        return v2 if isinstance(v2, list) else [v2]
+    if not v2:
+        return v1 if isinstance(v1, list) else [v1]
+    if isinstance(v1, list) and not isinstance(v2, list):
+        return v1+[v2]
+    if not isinstance(v1, list) and isinstance(v2, list):
+        return [v1]+v2
+    if not isinstance(v1, list) and not isinstance(v2, list):
+        return [v1]+[v2]
+    if isinstance(v1, list) and isinstance(v2, list):
+        return v1+v2
+
 
 if __name__ == "__main__": 
     params = parse_parameters()
-    if (params.get("debug") == "True"):
+    if (params.get("debug").lower() == "true"):
         log.basicConfig(level=logging.DEBUG)
     else: 
         log.basicConfig(level=logging.INFO)    
@@ -130,106 +270,66 @@ if __name__ == "__main__":
     elif "fromlist" in params:
         img_list = read_cubelist(params["fromlist"])
     else:
-        raise ValueError('**User Error** invalid command Line. Missing Parameter "nl"')    
+        raise ValueError('**User Error** invalid command Line. Missing Parameter "from" or "fromlist"')    
 
-    from_segments = {}
-
-    for img in img_list:
-        res = segment(img)
-        from_segments[img] = res
-        
+    # Segment things 
+    nthreads = int(params.get("maxthreads", multiprocessing.cpu_count()))
+    pool = ThreadPool(nthreads)
+    output = pool.map_async(segment, img_list)
+    pool.close()
+    pool.join()
+    output = output.get()
+    
     match_segments = segment(params["match"])
-    max_from_segments = max([len(v) for k,v in from_segments.items()])
-
-    onets = []
-    for i in range(len(match_segments)):
-        for j in range(max_from_segments): 
-            match_segment_n = i+1
-            from_segment_n = j+1
-            
-            new_params = deepcopy(params)
-
-            # make sure none of these keys are still in the params
-            new_params.pop("fromlist", None)
-            new_params.pop("from", None)
-
-            new_params["match"] = match_segments[i]["Path"]
-
-            og_onet = Path(params["onet"])
-            og_tolist = Path(params["tolist"])
-            og_pointid = params["pointid"]
-            og_networkid = params["networkid"]
-            
-            from_images = [segment[j]["Path"] for image, segment in from_segments.items() if j < len(segment)]
-            starting_lines = [segment[j]["StartingLine"] for image, segment in from_segments.items() if j < len(segment)]
-            
-            fromlist_path = Path(og_tolist.parent / f"from_images_segment{from_segment_n}.lis")
-            log.debug(f"fromlist: {from_images}")
-            
-            if not fromlist_path.exists():
-                log.debug(f"writing to: {fromlist_path}")
-                kisis.fromlist.make(from_images, fromlist_path)
-            else:
-                log.debug(f"{fromlist_path} already exists")
-            
-            if "debuglog" in new_params:
-                og_log =  Path(new_params["debuglog"])
-                new_log = og_log.parent / f"{og_log.stem}.match_segment{match_segment_n}.from_segment{from_segment_n}{og_log.suffix}" 
-                new_params["debuglog"] = str(new_log)
-                
-            new_params["fromlist"] = str(fromlist_path)
-            new_params["networkid"] = og_networkid + f"_match_segment{match_segment_n}_from_segment{from_segment_n}"
-            new_params["pointid"] = og_pointid + f"_match_segment{match_segment_n}_from_segment{from_segment_n}"
-            new_params["onet"] = f"{og_onet.parent/og_onet.stem}.match_segment{match_segment_n}.from_segment{from_segment_n}.net"
-            new_params["tolist"] = f"{og_tolist.parent/og_tolist.stem}.match_segment{match_segment_n}.from_segment{from_segment_n}.lis"
-
-            log.debug(new_params)
-            
-            # check for overlaps
-            is_overlapping = False
-            with tempfile.TemporaryDirectory() as tmpdir:
-                tmpdir = Path(tmpdir)
-                overlapfromlist = tmpdir / "fromlist.lis"
-                overlaptolist = tmpdir / "tolist.lis"
-                
-                kisis.fromlist.make([*from_images, new_params["match"]], overlapfromlist)
-                kisis.findimageoverlaps(fromlist=overlapfromlist, overlaplist=overlaptolist)
-                ret = kisis.overlapstats(fromlist=overlapfromlist, overlaplist=overlaptolist)
-                stats = pvl.loads(ret.stdout)
-                log.debug(f"overlap stats: {ret.stdout}")
-                is_overlapping = not all([k[1].get("NoOverlap", "") == new_params["match"] for k in stats])
-                
-            log.debug(f"Is overlapping? {is_overlapping}")
-            
-            if is_overlapping: 
-                try:
-                    ret = kisis.findfeatures(**new_params)
-                    log.debug(f"returned: {ret}")
-                except subprocess.CalledProcessError as err:
-                    log.debug('Had an ISIS error:')
-                    log.debug(' '.join(err.cmd))
-                    log.debug(err.stdout)
-                    log.debug(err.stderr)
-            
-                segmented_net = cnet.from_isis(new_params["onet"])
-
-                # starting sample in inclusive, so subtract 1
-                segmented_net.loc[segmented_net.serialnumber == match_segments[i]["SN"], "line"] += match_segments[i]["StartingLine"]-1 
-
-                # offset the images 
-                for k, image in enumerate(from_images):
-                    image_sn = sn.generate_serial_number(image)
-
-                    # starting sample is inclusive, so subtract 1
-                    segmented_net.loc[segmented_net.serialnumber == image_sn, "line"] += starting_lines[k]-1
-                cnet.to_isis(segmented_net, new_params["onet"], targetname="moon")
-                onets.append(new_params["onet"])
+    from_segments = reduce(lambda d1,d2: {k: merge(d1, d2, k) for k in set(d1)|set(d2)}, output)
+    segment_paths = [s["Path"] for sublist in list(from_segments.values()) for s in sublist]    
+    segment_paths = segment_paths + [s["Path"] for s in list(match_segments.values())]
+    
+    # re-generate footprints
+    pool = ThreadPool(nthreads)
+    output = pool.map_async(footprintinit, segment_paths)
+    pool.close()
+    pool.join()
+    output = output.get()
+    log.debug(f"{output}")
+    
+    image_sets = list(itertools.product(match_segments.values(), from_segments.values())) 
+    
+    # restructure things to be easier to manage
+    job_dicts = []
+    for im in image_sets:
+        match = im[0]
+        from_images = im[1]
+        job_dicts.append({
+          "match" : match,
+          "from" : from_images
+        }) 
+    
+    pool = ThreadPool(nthreads)
+    starmap_args = list(zip([params]*len(job_dicts), job_dicts))
+    output = pool.starmap_async(findFeaturesSegment, starmap_args)
+    pool.close()
+    pool.join()
+    output = output.get()
+    log.debug(f"output: {output}")
     
     # merge the networks 
-    kisis.fromlist.make(onets, "nets.lis")
-
+    onets = [o["onet"] for o in output if isinstance(o, dict)]
+    log.debug(f"onets: {onets}")
+    onet_list = Path(params["onet"]).with_suffix(".segmented.lis")
+    kisis.fromlist.make(onets, onet_list)
+    
+    # merge the filelists 
+    tolists = [set(o["original_images"]) for o in output if isinstance(o, dict)] 
+    
+    final_images = set.union(*tolists)
+    final_images.add(params["match"])
+    
+    log.debug(f"merged images: {final_images}")
+    kisis.fromlist.make(final_images, Path(params["tolist"]))
+        
     try:
-        kisis.cnetmerge(clist = "nets.lis", onet="/Users/krodriguez/lronac_ff2/test.net", networkid=params["networkid"], description=params["description"])
+        kisis.cnetmerge(clist = onet_list, onet=params["onet"], networkid=params["networkid"], description=f"{params['description']}")
     except subprocess.CalledProcessError as err:
         log.debug('Had an ISIS error:')
         log.debug(' '.join(err.cmd))
