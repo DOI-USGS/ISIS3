@@ -25,8 +25,11 @@ from multiprocessing.pool import ThreadPool
 import multiprocessing
 import itertools
 from functools import reduce
+from subprocess import check_output
+
 
 MAX_LEN = 30000
+
 def footprintinit(img):
     """
     Just a wrapper for footprintinit with logging and exception handling 
@@ -43,6 +46,11 @@ def footprintinit(img):
 
         
 def parse_parameters():
+    if sys.argv[1].lower() == "-help":
+        print(check_output(["findfeatures", "-HELP"]).decode("UTF-8").strip())
+        print(f"NL\t\t= {MAX_LEN}") 
+        exit()
+
     # Use a regular expression to extract the parameter name and value from each
     # key-value pair in the parameter string.
     pattern = r'(\w+)=(\S+)'
@@ -64,6 +72,7 @@ def parse_parameters():
     else: 
         log.basicConfig(level=logging.INFO)    
     
+    params["nl"] = params.get("nl", MAX_LEN)
     log.debug(f"parameters: {params}")
     return params
 
