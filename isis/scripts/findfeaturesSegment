@@ -47,6 +47,7 @@ def footprintinit(img):
         
 def parse_parameters():
     if sys.argv[1].lower() == "-help":
+        # ghetto ISIS style help string
         print(check_output(["findfeatures", "-HELP"]).decode("UTF-8").strip())
         print(f"NL\t\t= {MAX_LEN}") 
         exit()
