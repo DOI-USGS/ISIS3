@@ -4,7 +4,8 @@ channels:
 
 dependencies:
   - plio
-  - ale=0.8.6
+  - kalasiris 
+  - ale>=0.8.8
   - armadillo
   - boost=1.72
   - boost-cpp=1.72

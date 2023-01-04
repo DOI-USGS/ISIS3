@@ -27,10 +27,12 @@ import itertools
 from functools import reduce
 from subprocess import check_output
 
-
 MAX_LEN = 30000
 
-def footprintinit(img):
+# remove progress bar output from string
+filter_progress = lambda x: "\n".join([line for line in x.split("\n") if not "% Processed" in line and not "Working" in line])
+
+def footprintinit(img : str):
     """
     Just a wrapper for footprintinit with logging and exception handling 
     Probably should be a functor in kalasiris
@@ -38,6 +40,7 @@ def footprintinit(img):
     try:
         ret = kisis.footprintinit(img)
         log.debug(f"returned: {ret}")
+        return ret
     except subprocess.CalledProcessError as err:
         log.debug('Had an ISIS error:')
         log.debug(' '.join(err.cmd))
@@ -124,7 +127,7 @@ def segment(img_path : Path, nlines : int = MAX_LEN):
     try:
         ret = kisis.segment(img_path, nl=MAX_LEN, overlap=0)
         log.debug(f"{ret}")
-        segment_metadata = pvl.loads(ret.stdout)
+        segment_metadata = pvl.loads(filter_progress(ret.stdout))
         
         # comes nested in a "results" group, trim it off
         segment_metadata = [s[1] for s in segment_metadata]
@@ -213,7 +216,7 @@ def findFeaturesSegment(params, images):
         kisis.fromlist.make([*from_images, new_params["match"]], overlapfromlist)
         kisis.findimageoverlaps(fromlist=overlapfromlist, overlaplist=overlaptolist)
         ret = kisis.overlapstats(fromlist=overlapfromlist, overlaplist=overlaptolist)
-        stats = pvl.loads(ret.stdout)
+        stats = pvl.loads(filter_progress(ret.stdout))
         log.debug(f"overlap stats: {ret.stdout}")
         is_overlapping = not all([k[1].get("NoOverlap", "") == new_params["match"] for k in stats])
 
