@@ -10,4 +10,3 @@
 - chandrayaan1/kernels/spk/SAVE_SCS_2017-11-22
 - */kernels/fk/release.*/*
 - cassini/kernels/fk/Archive
-

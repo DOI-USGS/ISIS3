@@ -11,9 +11,9 @@ import tempfile
 from shutil import which
 from os import path
 from collections import OrderedDict
+from pathlib import Path
 
 def find_conf():
-    from pathlib import Path
     local_path = Path("rclone.conf")
     # this should be installed in scripts folder, so config is one directory up in etc 
     install_path = Path(os.path.dirname(__file__)) / '..' / "etc" / "isis" / 'rclone.conf'
@@ -110,7 +110,10 @@ def create_rclone_arguments(destination, mission_name, ntransfers=10, rclone_kwa
     if source_type == "naifKernels":
         destination = os.path.join(destination, "kernels")
 
-    extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
+    exclude_paths = Path(os.path.dirname(__file__)) / '..' / 'config' / 'exclude_list.txt'
+
+
+    extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}", f"--exclude-from={exclude_paths}"]
 
     extra_args.extend(rclone_kwargs)
     log.debug(f"Args created: {extra_args}")
