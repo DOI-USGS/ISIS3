@@ -219,4 +219,3 @@ if __name__ == '__main__':
     log.debug("Additional Args:", kwargs)
 
     main(args.mission, args.dest, os.path.expanduser(args.config), args.num_transfers, kwargs)
-
