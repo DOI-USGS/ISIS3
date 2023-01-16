@@ -40,13 +40,14 @@ release.
 
 ### Added
 - Added LatLonGrid Tool to Qview to view latitude and longitude lines if camera model information is present.
+- Added a new application, _isisdataeval_, that validates/verifies ISISDATA installations and aids in the development and management of this resource. Users can use _isisdataeval_ to help resolve runtime problems related to ISIS kernels and calibration processing. In fact, it is designed to be used on any directory as it will create a detailed install volume inventory with file/volume hashes and is not restricted to ISIS use.
 
 ### Deprecated
 
 ### Fixed
 - Fixed some wrong parameter types [#4780](https://github.com/USGS-Astrogeology/ISIS3/issues/4780)
 - Added mapping group to track cube via processmosaic [#4810](https://github.com/USGS-Astrogeology/ISIS3/issues/4810)
-- Fixed bugs in downloadIsisData script [#5024](https://github.com/USGS-Astrogeology/ISIS3/issues/5024) 
+- Fixed bugs in downloadIsisData script [#5024](https://github.com/USGS-Astrogeology/ISIS3/issues/5024)
 - Fixed shadow shifting image by 2 pixels to the upper left corner. [#5035](https://github.com/USGS-Astrogeology/ISIS3/issues/5035)
 - Fixed compiler warnings on ubuntu [#4911](https://github.com/USGS-Astrogeology/ISIS3/issues/4911)
 - Fixes embree shape models not being from .BDS extension files [5064](https://github.com/USGS-Astrogeology/ISIS3/issues/5064)
