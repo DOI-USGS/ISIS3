@@ -208,12 +208,12 @@ End
       If no files are found, which typically occurs when looking for the
       highest version, it is reported as missing. The missing file, the
       file that contains the reference to it, and the status of the file
-      are written to the file name specifed in the MISSING parameter.
+      are written to the file name specifed in the TOISSUES parameter.
     </p>
     <p>
       There are occurances of kernel DB files that contain no specification
       or content at all. These are oddball files in the system and are also
-      reported as invalid. All files contained in the MISSING output file
+      reported as invalid. All files contained in the TOISSUES output file
       would lead to errors in <em>spiceinit</em> for images obtained from that
       particular mission.
     </p>
@@ -385,7 +385,7 @@ error,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA,/opt/isisdatafull/rosetta/
       <parameter name= "HASH">
         <type>string</type>
         <default><item>NOHASH</item></default>
-        <brief>Type of fast geom mapping to apply</brief>
+        <brief>Type of hash algorithm to use for computing file hashes</brief>
         <description>
           <p>
             Compute file hash values for all files found in the ISISDATA
