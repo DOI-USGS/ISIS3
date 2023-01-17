@@ -13,6 +13,9 @@ from os import path
 from collections import OrderedDict
 from pathlib import Path
 
+exclude_list = [    '/a_older_versions/*',    '/kernels/*/former_versions/',    '/corrupt_files/*',    '/zzarchive/**',    '/kernels/*/original',    'gallileo/kernels/ck/prime_mission/*/extended_mission/*',    'gallileo/kernels/*/prime_mission/',    'galileo/kernels/ck/GEM/',    'clementine1/kernels/ck/save',    'chandrayaan1/kernels/spk/SAVE_SCS_2017-11-22',    '*/kernels/fk/release.*/*',    'cassini/kernels/fk/Archive']
+exclude_string = "{" + ",".join(exclude_list) + "}"
+
 def find_conf():
     local_path = Path("rclone.conf")
     # this should be installed in scripts folder, so config is one directory up in etc 
@@ -112,8 +115,7 @@ def create_rclone_arguments(destination, mission_name, ntransfers=10, rclone_kwa
 
     exclude_paths = Path(os.path.dirname(__file__)) / '..' / 'config' / 'exclude_list.txt'
 
-
-    extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}", f"--exclude-from={exclude_paths}"]
+    extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}", f"--exclude={exclude_string}"]
 
     extra_args.extend(rclone_kwargs)
     log.debug(f"Args created: {extra_args}")
