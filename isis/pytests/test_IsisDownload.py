@@ -6,7 +6,7 @@ import os
 import pytest 
 from unittest import mock
 from tempfile import TemporaryDirectory
-from pathlib import Path, exists
+from pathlib import Path
 
 from importlib.util import spec_from_loader, module_from_spec
 from importlib.machinery import SourceFileLoader 
