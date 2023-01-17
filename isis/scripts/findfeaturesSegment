@@ -199,10 +199,10 @@ def findFeaturesSegment(params, images):
         new_params["debuglog"] = str(new_log)
 
     new_params["fromlist"] = str(fromlist_path)
-    new_params["networkid"] = og_networkid + f"_{match_stem}_{from_stem}"
-    new_params["pointid"] = og_pointid + f"_{match_stem}_{from_stem}"
-    new_params["onet"] = f"{og_onet.parent/og_onet.stem}.{match_stem}.{from_stem}.net"
-    new_params["tolist"] = f"{og_tolist.parent/og_tolist.stem}.{match_stem}.{from_stem}.lis"
+    new_params["networkid"] = og_networkid + f"_{match_segment_n}_{from_stem}"
+    new_params["pointid"] = og_pointid + f"_{match_segment_n}_{from_stem}"
+    new_params["onet"] = f"{og_onet.parent/og_onet.stem}_{match_segment_n}_{from_stem}.net"
+    new_params["tolist"] = f"{og_tolist.parent/og_tolist.stem}_{match_segment_n}_{from_stem}.lis"
 
     log.debug(new_params)
 
