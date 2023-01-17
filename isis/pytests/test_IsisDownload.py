@@ -12,8 +12,7 @@ import tempfile
 from importlib.util import spec_from_loader, module_from_spec
 from importlib.machinery import SourceFileLoader
 
-root = os.environ.get("ISISROOT")
-spec = spec_from_loader("downloadIsisData", SourceFileLoader("downloadIsisData", "{}/isis/scripts/downloadIsisData".format(root)))
+spec = spec_from_loader("downloadIsisData", SourceFileLoader("downloadIsisData", "../scripts/downloadIsisData"))
 downloadIsisData = module_from_spec(spec)
 spec.loader.exec_module(downloadIsisData)
 did = downloadIsisData
