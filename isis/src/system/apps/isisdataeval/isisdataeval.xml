@@ -242,16 +242,20 @@ End
       <parameter name="PREFERENCES">
         <type>string</type>
         <brief>
-          Use a specific IsisPreferences file rather than the
-          Defaults
+          IsisPreferences file contents overrides defaults
         </brief>
         <description>
            Defines data directory substitutions that is assumed to be
            part of the ISISDATA directory hierachy. Specifying an ISIS
            Preferences file using "-pref=PREFERENCES" is equivalent to
            using this parameter except that using this parameter will
-           log the Preferences file used. Note the DataDictionary group
-           is reported to the user and logged to the print.prt file.
+           log the Preferences file used. If both are options are given,
+           the contents of this PREFERENCES file overrides them all
+           loaded before it. <em>isisdataeval</em> uses the contents
+           of the DataDictionary group for ISIS mission and environment
+           variable file path translations. This DataDictionary
+           group is reported to the user and logged to the
+           print.prt file.
         </description>
         <internalDefault>
            None
@@ -499,7 +503,7 @@ md5  /opt/isisdatafiltered/apollo15/calibration/ApolloPanFiducialMark.cub
       <parameter name="HASHBUFFER">
         <type>integer</type>
         <default><item>256</item></default>
-        <brief>Size of the buffer (MB) to read files for hash</brief>
+        <brief>Size of the buffer (MB) to read files for hash processing</brief>
         <description>
           This allows users to have more control of the size of
           buffer to read inventory file data to compute hashes.
@@ -693,7 +697,7 @@ End_Group
 
     <example>
       <brief>
-        Evaluation of an ISISDATA mission kernel installation
+        Evaluation of an ISISDATA mission kernel installation directory
       </brief>
       <description>
         <p>

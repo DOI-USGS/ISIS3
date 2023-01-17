@@ -252,6 +252,7 @@ namespace Isis {
           header.append( hashtag );
         }
 
+        // Write header to output file
         os << header.join(",") << std::endl;
 
         std::cout << "Running inventory ..." << std::endl;
@@ -299,7 +300,8 @@ namespace Isis {
             }
             else {
 
-              // Create the values array from json object
+              // Create and write the values array from json object
+              // Don't terminate the row here in case hashing is needed
               os << dbfile.values().join(",");
 
               // If hashing has been requested, do it here. We are computing two
@@ -312,10 +314,11 @@ namespace Isis {
                 QFile v_file( dbfile.expanded() );
                 if ( !v_file.open( QIODevice::ReadOnly ) ) {
                   inventory_errors.push_back( DBFileDisposition( "error", dbfile.expanded(), dbfile, "openfailed" ) );
+                  // Write a null as the hash
                   os << "," << db_null();
                 }
                 else {
-                  // Read (in 1 MB chunks) bytes and add to hahses
+                  // Read (in (1MB * HASHBUFFER) chunks) bytes and add to hashes
                   while ( !v_file.atEnd() ) {
                     qint64 nread = v_file.read(file_data.get(), MaxBytesToRead );
 
@@ -324,6 +327,7 @@ namespace Isis {
                     volume_hash.addData( file_data.get(), nread );
                   }
 
+                  // Write the file hash to the output file row
                   os << "," << QString::fromUtf8( file_hash.result().toHex() );
                 }
               }
