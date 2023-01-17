@@ -375,7 +375,7 @@ void IsisMain() {
   ocube->setDimensions(numOutputSamples, tempFileLength, 2);
   PvlGroup &prefs = Preference::Preferences().findGroup("DataDirectory", Pvl::Traverse);
   QString outTmpName = (QString)prefs["Temporary"][0] + "/";
-  outTmpName += FileName(ui.GetFileName("TO")).baseName() + ".tmp.cub";
+  outTmpName += FileName(ui.GetCubeName("TO")).baseName() + ".tmp.cub";
   ocube->create(outTmpName);
   oLineMgr = new LineManager(*ocube);
   oLineMgr->SetLine(1);
@@ -461,7 +461,7 @@ void IsisMain() {
     ocube->setDimensions(numOutputSamples, tempFileLength, 1);
   }
 
-  ocube->create(FileName(ui.GetFileName("TO")).expanded());
+  ocube->create(FileName(ui.GetCubeName("TO")).expanded());
   oLineMgr = new LineManager(*ocube);
   oLineMgr->SetLine(1);
 

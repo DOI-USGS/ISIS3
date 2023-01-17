@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "TreeView.h"
 
 #include <QLabel>
@@ -60,7 +58,6 @@ namespace Isis {
 
 
   void TreeView::setModel(AbstractTreeModel *someModel) {
-    ASSERT(m_content);
     m_content->setModel(someModel);
 
     connect(someModel, SIGNAL(filterProgressChanged(int)),
@@ -102,7 +99,6 @@ namespace Isis {
   void TreeView::deactivate() {
     m_active = false;
 
-    ASSERT(m_header);
     if (m_header)
       m_header->setActive(false);
     update();
@@ -112,7 +108,6 @@ namespace Isis {
   void TreeView::activate() {
     m_active = true;
 
-    ASSERT(m_header);
     if (m_header)
       m_header->setActive(true);
     update();

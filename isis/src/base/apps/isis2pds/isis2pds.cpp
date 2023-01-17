@@ -26,7 +26,7 @@ namespace Isis{
     if (inAtt.bands().size() != 0) {
       icube.setVirtualBands(inAtt.bands());
     }
-    icube.open(ui.GetFileName("FROM"));
+    icube.open(ui.GetCubeName("FROM"));
     isis2pds(&icube, ui, log);
   }
 
@@ -120,7 +120,7 @@ namespace Isis{
       results += PvlKeyword("ValidMin", toString(min));
       results += PvlKeyword("ValidMax", toString(max));
       if (log){
-        log->addGroup(results);
+        log->addLogGroup(results);
       }
     }
     else {
@@ -131,7 +131,7 @@ namespace Isis{
 
       PvlObject *label= icube->label();
       if (!label->hasObject("IsisCube")) {
-        QString msg = "Input file [" + ui.GetFileName("FROM") +
+        QString msg = "Input file [" + ui.GetCubeName("FROM") +
                       "] does not appear to be an ISIS cube.";
         throw  IException(IException::User, msg, _FILEINFO_);
       }
@@ -196,7 +196,7 @@ namespace Isis{
       results += PvlKeyword("ValidMin", toString(min));
       results += PvlKeyword("ValidMax", toString(max));
       if (log){
-        log->addGroup(results);
+        log->addLogGroup(results);
       }
 
       process.StandardPds4Label();

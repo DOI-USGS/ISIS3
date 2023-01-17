@@ -2,11 +2,11 @@
 #include <QFile>
 
 #include "hrsc2isis.h"
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
 #include "Histogram.h"
+#include "OriginalLabel.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -81,6 +81,11 @@ TEST(Hrsc2isis, Hrsc2IsisTestDefault) {
   ASSERT_DOUBLE_EQ(hist->Sum(), 409993);
   ASSERT_EQ(hist->ValidPixels(), 6440);
   ASSERT_NEAR(hist->StandardDeviation(), 6.36599, .00001);
+
+  // check original label exists
+  Pvl ogLab = cube.readOriginalLabel().ReturnLabels();
+  ASSERT_EQ(archive["DETECTOR_ID"][0].toStdString(), "MEX_HRSC_RED" );
+
 }
 
 
@@ -134,6 +139,10 @@ TEST(Hrsc2isis, Hrsc2IsisTestPhobos) {
   ASSERT_DOUBLE_EQ(hist->Sum(), 2496);
   ASSERT_EQ(hist->ValidPixels(), 25920);
   ASSERT_NEAR(hist->StandardDeviation(), 0.52835, .00001);
+
+  // check original label exists
+  Pvl ogLab = cube.readOriginalLabel().ReturnLabels();
+  ASSERT_EQ(archive["DETECTOR_ID"][0].toStdString(), "MEX_HRSC_S2" );
 }
 
 

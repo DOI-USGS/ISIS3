@@ -215,15 +215,15 @@ namespace Isis {
    *                           image. Previously, this had to be done throug the graph.
    *   @history 2018-01-26 Kristin Berry - Added pointAdded() function to eliminate redundant measure
    *                           adds to the control network.
+   *   @history 2018-04-05 Adam Goins - Added a check to the versionedReader targetRadii
+   *                           group to set radii values to those ingested from the versioner
+   *                           if they exist. Otherwise, we call SetTarget with the targetname.
+   *                           Fixes #5361.
    *   @history 2018-06-10 Kristin Berry - Removed unused methods and associated code:
    *                           MinimumSpanningTree(), GetNodeConnections(), RandomBFS(), Shuffle(),
    *                           CalcBWAndCE(), CubeGraphToString(), getGraphNode(). References #5434
    *   @history 2018-06-10 Kristin Berry - Updated to use the boost graph library instead of our
    *                           custom graph structure ControlCubeGraphNode.
-   *   @history 2018-04-05 Adam Goins - Added a check to the versionedReader targetRadii
-   *                           group to set radii values to those ingested from the versioner
-   *                           if they exist. Otherwise, we call SetTarget with the targetname.
-   *                           Fixes #5361.
    *   @history 2018-06-06 Jesse Mapel - Added a method to get all adjacent images to ControlNet.
    *                           Previously this functionality was only available through the
    *                           ControlCubeGraphNode class. References #5434.
@@ -236,15 +236,16 @@ namespace Isis {
    *                           These signals exist for the purpose of communication between the
    *                           ControlNetVitals class, and the network that it is observing.
    *                           Fixes #5435.
+   *  @history 2018-06-22 Ken Edmundson - Added typedef for QSharedPointer to control network.
    *  @history 2018-06-25 Kristin Berry - Updated GetNumberOfValidMeasuresInImage() to use
    *                           GetValidMeasuresInCube() if SetImage has not yet been called to populate
    *                           the p_cameraValidMeasuresMap.
    *   @history 2018-06-25 Jesse Mapel - Fixed the incorrect signal being called when adding and
    *                           removing measures. References #5435.
-   *   @history 2018-06-29 Kristin Berry - Added addEdge() and removeEdge() functions to make
-   *                           code cleaner.
    *   @history 2018-06-25 Jesse Mapel - Fixed ignoring measures with ignored adjacent measures
    *                           incorrectly modifying the edge between the two image vertices.
+   *   @history 2018-06-29 Kristin Berry - Added addEdge() and removeEdge() functions to make
+   *                           code cleaner.
    *   @history 2018-07-06 Jesse Mapel - Modified addEdge and removeEdge to always emit a graph
    *                           modified signal if an edge is added or removed. Added graph
    *                           modified signal when a vertex is added.
@@ -315,6 +316,7 @@ namespace Isis {
 
       double AverageResidual();
       Isis::Camera *Camera(int index);
+      Isis::Camera *Camera(QString serialNumber);                                                                       
       QString CreatedDate() const;
       QString Description() const;
       ControlPoint *FindClosest(QString serialNumber,
@@ -478,6 +480,7 @@ namespace Isis {
       SurfacePoint::CoordinateType m_coordType; //!< The coordinate type of the control points
   };
 
+  //! Typedef for QSharedPointer to control network.
   //! This typedef is for future implementation of target body
   typedef QSharedPointer<ControlNet> ControlNetQsp;
 }

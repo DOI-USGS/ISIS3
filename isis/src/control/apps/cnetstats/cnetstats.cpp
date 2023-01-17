@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "cnetstats.h"
 #include "ControlNetFilter.h"
 #include "ControlNetStatistics.h"
@@ -68,7 +66,7 @@ namespace Isis{
         for (int i=0; i<pvlDefFile.objects(); i++) {
           PvlObject pvlObj = pvlDefFile.object(i);
           for (int j=0; j<pvlObj.groups(); j++) {
-            log->addGroup(pvlObj.group(j));
+            log->addLogGroup(pvlObj.group(j));
           }
         }
 
@@ -80,7 +78,7 @@ namespace Isis{
           for (int i=0; i<pvlResults.objects(); i++) {
             PvlObject pvlObj = pvlResults.object(i);
             for (int j=0; j<pvlObj.groups(); j++) {
-              log->addGroup(pvlObj.group(j));
+              log->addLogGroup(pvlObj.group(j));
             }
           }
           QString sErrMsg = "Invalid Deffile\n";
@@ -110,7 +108,7 @@ namespace Isis{
       // Log the summary of the input Control Network
       PvlGroup statsGrp;
       cNetFilter.GenerateControlNetStats(statsGrp);
-      log->addGroup(statsGrp);
+      log->addLogGroup(statsGrp);
 
       // Run Filters using Deffile
       if (ui.WasEntered("DEFFILE")) {

@@ -4,7 +4,6 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
-#include "IsisDebug.h"
 #include "CubeDataThread.h"
 
 #include <QApplication>
@@ -499,7 +498,6 @@ namespace Isis {
     int endBand = overlapping->Band(overlapping->size() - 1);
 
     // Now let's search for overlaps
-    ASSERT(p_managedData->size() == p_managedDataSources->size());
     for (int knownBrick = 0; knownBrick < p_managedData->size(); knownBrick++) {
       int sourceCube = (*p_managedDataSources)[knownBrick];
 
@@ -585,13 +583,11 @@ namespace Isis {
    *                  (exact same range, but not same pointer).
    */
   void CubeDataThread::DoneWithData(int cubeId, const Isis::Brick *brickDone) {
-    ASSERT(brickDone != NULL);
     int instance = 0;
     bool exactMatch = false;
     bool writeLock = false;
 
     int index = OverlapIndex(brickDone, cubeId, instance, exactMatch);
-    ASSERT(p_managedData->size() == p_managedDataSources->size());
     while (index != -1) {
       // If this isn't the data they're finished with, we don't care about it
       if (!exactMatch) {
@@ -671,7 +667,6 @@ namespace Isis {
       index = OverlapIndex(brickDone, cubeId, instance, exactMatch);
     }
 
-    ASSERT(p_managedData->size() == p_managedDataSources->size());
   }
 
   /**
@@ -682,7 +677,6 @@ namespace Isis {
    * @return bool True if deletion actually happened
    */
   bool CubeDataThread::FreeBrick(int brickIndex) {
-    ASSERT(p_managedData->size() == p_managedDataSources->size());
 
     // make sure brick is not still being used!
     if (!(*p_managedData)[brickIndex].first->tryLockForWrite()) {

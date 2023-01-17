@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "MeasureTableDelegate.h"
 
 #include <iostream>
@@ -79,7 +77,7 @@ namespace Isis {
       AbstractMeasureItem::getColumn(col->getTitle());
 
     QString data = row->getFormattedData(col->getTitle());
-    ASSERT(row->getPointerType() == AbstractTreeItem::Measure);
+
     ControlMeasure *measure = (ControlMeasure *)row->getPointer();
 
     switch (column) {
@@ -119,7 +117,7 @@ namespace Isis {
       AbstractMeasureItem::getColumn(col->getTitle());
 
     QString data = row->getFormattedData(col->getTitle());
-    ASSERT(row->getPointerType() == AbstractTreeItem::Measure);
+
     ControlMeasure *measure = (ControlMeasure *) row->getPointer();
 
     switch (column) {

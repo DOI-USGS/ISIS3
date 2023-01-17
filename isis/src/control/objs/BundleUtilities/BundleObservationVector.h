@@ -51,6 +51,8 @@ namespace Isis {
    *   @history 2016-10-13 Ian Humphrey - Modified addnew so that we set solve settings based
    *                           on the BundleObsevation's observation number. Renamed addnew to
    *                           addNew(). References #4293.
+   *   @history 2018-02-12 Ken Edmundson Renamed initializeBodyRotation method to setBodyRotation.
+   *   @history 2018-11-29 Ken Edmundson Modified addNew method. Removed setBodyRotation method.
    */
   class BundleObservationVector : public QVector<BundleObservationQsp> {
 
@@ -68,6 +70,8 @@ namespace Isis {
       int numberParameters();
 
       BundleObservationQsp observationByCubeSerialNumber(QString cubeSerialNumber);
+
+      double vtpvContribution();
 
       QList<QString> instrumentIds() const;
       QList<BundleObservationQsp> observationsByInstId(QString instrumentId) const;

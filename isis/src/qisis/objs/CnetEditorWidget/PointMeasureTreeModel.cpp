@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "PointMeasureTreeModel.h"
 
 #include <iostream>
@@ -71,7 +69,6 @@ namespace Isis {
 
     for (int j = 0; j < point->GetNumMeasures(); j++) {
       const ControlMeasure *measure = point->GetMeasure(j);
-      ASSERT(measure);
 
       MeasureLeafItem *measureItem = new MeasureLeafItem(
         const_cast< ControlMeasure * >(measure), m_avgCharWidth, pointItem);
@@ -119,7 +116,6 @@ namespace Isis {
         futureRoot.cancel();
       }
 
-      ASSERT(getControlNetwork());
       futureRoot = QtConcurrent::mappedReduced(
           getControlNetwork()->GetPoints(),
           CreateRootItemFunctor(this, QThread::currentThread()),

@@ -1,4 +1,3 @@
-#include "IsisDebug.h"
 #include "MeasureTool.h"
 
 #include <QApplication>
@@ -339,7 +338,6 @@ namespace Isis {
    * @param row
    */
   void MeasureTool::updateRow(int row) {
-    ASSERT(row < m_tableWin->table()->rowCount());
 
     if (row >= m_tableWin->table()->rowCount()) {
       return;

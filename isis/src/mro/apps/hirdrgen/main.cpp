@@ -48,7 +48,7 @@ void IsisMain() {
   // Check to see if the input cube looks like a HiRISE RDR
   if (icube->bandCount() > 3) {
     QString msg = "Input file [" +
-                 Application::GetUserInterface().GetFileName("FROM") +
+                 Application::GetUserInterface().GetCubeName("FROM") +
                  "] does not appear to be a HiRISE RDR product. Number of " +
                  "bands is greater than 3";
     throw IException(IException::Programmer, msg, _FILEINFO_);

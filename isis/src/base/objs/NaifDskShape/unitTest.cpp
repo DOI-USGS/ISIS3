@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 
 #include "Angle.h"
 #include "Cube.h"
+#include "Displacement.h"
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
@@ -78,6 +79,21 @@ int main(int argc, char *argv[]) {
     obsPos[0]  = 0.0;  obsPos[1]  = 0.0;   obsPos[2]  = 1000.0;
     lookDir[0] = 0.0;  lookDir[1] = -1.0;  lookDir[2] = -1.0;
     success = shapeModelFromPvlShape.intersectSurface(obsPos, lookDir);
+    qDebug() << "Intersection successful?     " << toString(success);
+
+    qDebug() << "Try to intersect surface at obsPos (1000,0,0) and ground point (1,0,0)";
+    Displacement x(1.0, Displacement::Meters);
+    Displacement y(0.0, Displacement::Meters);
+    Displacement z(0.0, Displacement::Meters);
+    SurfacePoint SurfPt(x, y, z);
+    obsPos[0]  = 1000.0;  obsPos[1]  = 0.0;   obsPos[2]  = 0.0;
+    success = shapeModelFromPvlShape.intersectSurface(SurfPt, obsPos);
+    if (success) {
+      SurfacePoint *point = shapeModelFromPvlShape.surfaceIntersection();
+      qDebug() << "Intercept X = " << point->DisplacementToDouble(point->GetX(), SurfacePoint::Kilometers);
+      qDebug() << "Intercept Y = " << point->DisplacementToDouble(point->GetY(), SurfacePoint::Kilometers);
+      qDebug() << "Intercept Z = " << point->DisplacementToDouble(point->GetZ(), SurfacePoint::Kilometers);
+    }
     qDebug() << "Intersection successful?     " << toString(success);
 
     qDebug() << "";
@@ -160,7 +176,6 @@ int main(int argc, char *argv[]) {
     qDebug() << "Local normal from neighbor points:   "
              << QVector<double>::fromStdVector(shapeModelFromPvlElevation.normal());
     qDebug() << "";
-
 
     qDebug() << "================================= Error Throws ==================================";
     qDebug() << "Construct NaifDskShape object from cube labels with ShapeModel=Null.";    

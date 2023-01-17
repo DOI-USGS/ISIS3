@@ -18,7 +18,7 @@ namespace Isis {
 
   void footprintinit(UserInterface &ui, Pvl *log) {
     Cube cube;
-    cube.open(ui.GetFileName("FROM"), "rw");
+    cube.open(ui.GetCubeName("FROM"), "rw");
 
     footprintinit(&cube, ui, log);
     cube.close();
@@ -144,7 +144,7 @@ namespace Isis {
       PvlGroup results("Results");
       results.addKeyword(PvlKeyword("SINC", toString(sinc)));
       results.addKeyword(PvlKeyword("LINC", toString(linc)));
-      log->addGroup(results);
+      log->addLogGroup(results);
     }
 
     Process p;

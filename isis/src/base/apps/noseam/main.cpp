@@ -67,7 +67,7 @@ void IsisMain() {
   //Finally combines the highpass and lowpass mosaics
   parameters = "FROM=" + pathName + "HighpassMosaic.cub" +
                " FROM2=" + pathName + "LowpassMosaic.cub" +
-               " TO=" + ui.GetFileName("TO") +
+               " TO=" + ui.GetCubeName("TO") +
                " OPERATOR= add";
   ProgramLauncher::RunIsisProgram("algebra", parameters);
 

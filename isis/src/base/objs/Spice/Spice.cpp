@@ -209,7 +209,7 @@ namespace Isis {
           json props;
           props["kernels"] = kernel_pvl.str();
 
-          isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale");
+          isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale", false);
         }
 
         json aleNaifKeywords = isd["naif_keywords"];
@@ -350,7 +350,7 @@ namespace Isis {
     else {
       // JAA - Modified to store and look for the frame body code in the cube labels
       SpiceInt frameCode;
-      if ((m_usingNaif) || (!m_naifKeywords->hasKeyword("BODY_FRAME_CODE"))) {
+      if (((m_usingNaif) || (!m_naifKeywords->hasKeyword("BODY_FRAME_CODE"))) && !isUsingAle()) {
         char frameName[32];
         SpiceBoolean found;
         cidfrm_c(*m_spkBodyCode, sizeof(frameName), &frameCode, frameName, &found);
@@ -369,7 +369,13 @@ namespace Isis {
         storeValue("BODY_FRAME_CODE", 0, SpiceIntType, result);
       }
       else {
-        frameCode = getInteger("BODY_FRAME_CODE", 0);
+        try {
+          frameCode = getInteger("BODY_FRAME_CODE", 0);
+        }
+        catch(IException &e) {
+          QString msg = "Unable to read BODY_FRAME_CODE from naifkeywords group";
+          throw IException(IException::Io, msg, _FILEINFO_);
+        }
       }
 
       m_bodyRotation = new SpiceRotation(frameCode);
@@ -463,9 +469,6 @@ namespace Isis {
 
     if (m_usingAle) {
       m_instrumentPosition->LoadCache(isd["instrument_position"]);
-      if (m_instrumentPosition->cacheSize() > 3) {
-        m_instrumentPosition->Memcache2HermiteCache(0.01);
-      }
     }
     else if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
       Table t("InstrumentPosition", lab.fileName(), lab);
@@ -704,6 +707,13 @@ namespace Isis {
           cacheSize);
       if (cacheSize > 3) m_instrumentPosition->Memcache2HermiteCache(tol);
     }
+    else if (m_instrumentPosition->GetSource() == SpicePosition::Memcache && m_instrumentPosition->HasVelocity() && isUsingAle()) {
+      int aleCacheSize = m_instrumentPosition->cacheSize();
+      if (aleCacheSize > 3) {
+        m_instrumentPosition->Memcache2HermiteCache(tol);
+      }
+    }
+    
 
     if (!m_sunPosition->IsCached()) {
       int sunPositionCacheSize = cacheSize;
@@ -1240,7 +1250,8 @@ namespace Isis {
           result = toInt(storedKeyword[index]);
         }
       }
-      catch(IException &) {
+      catch(IException &e) {
+        e.print();
       }
     }
 

@@ -2,7 +2,6 @@
 #include <QTemporaryDir>
 
 #include "mimap2isis.h"
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"

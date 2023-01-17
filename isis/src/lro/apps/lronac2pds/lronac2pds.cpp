@@ -48,11 +48,11 @@ namespace Isis {
 
       ProcessByLine p;
       CubeAttributeInput &att = ui.GetInputAttribute("FROM");
-      Cube *inCube = p.SetInputCube(ui.GetFileName("FROM"), att);
+      Cube *inCube = p.SetInputCube(ui.GetCubeName("FROM"), att);
 
       g_isIof = inCube->label()->findGroup("Radiometry", Pvl::Traverse).findKeyword("RadiometricType")[0].toUpper() == "IOF";
 
-      FileName scaledCube("$TEMPORARY/" + FileName(ui.GetFileName("FROM")).name());
+      FileName scaledCube("$TEMPORARY/" + FileName(ui.GetCubeName("FROM")).name());
       scaledCube.addExtension("cub");
 
       scaledCube = FileName::createTempFile(scaledCube);

@@ -1,4 +1,3 @@
-#include "IsisDebug.h"
 #include "SunShadowTool.h"
 
 #include <QApplication>
@@ -316,7 +315,6 @@ namespace Isis {
    * @param row
    */
   void SunShadowTool::updateRow(int row) {
-    ASSERT(row < m_tableWin->table()->rowCount());
 
     if (row >= m_tableWin->table()->rowCount() || !
         m_tableWin->isVisible()) {

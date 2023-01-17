@@ -89,7 +89,7 @@ namespace Isis {
 
 
       // Return the surface intersection
-      SurfacePoint *surfaceIntersection() const;
+      virtual SurfacePoint *surfaceIntersection() const;
 
       bool hasIntersection();
       bool hasNormal() const;
@@ -141,7 +141,7 @@ namespace Isis {
       virtual void setSurfacePoint(const SurfacePoint &surfacePoint);
 
       // Return the normal (surface or local) of the current intersection point
-      std::vector<double>  normal();
+      virtual std::vector<double>  normal();
 
       // Determine if the internal intercept is occluded from the observer/lookdir
       virtual bool isVisibleFrom(const std::vector<double> observerPos,

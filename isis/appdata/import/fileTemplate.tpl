@@ -50,6 +50,9 @@
 {#- or when the instrument name is long or contains spaces, ... -#}
 {%- if SpacecraftName == "TRACE GAS ORBITER" -%}
   {%- set SpacecraftId="TGO" -%}
+{%- else if SpacecraftName == "Europa Clipper" -%}
+  {%- set SpacecraftId="Clipper" -%}
+  {%- set InstrumentId="EIS" -%}
 {%- else if SpacecraftName == "VIKING_ORBITER_1" or SpacecraftName == "VIKING_ORBITER_2" -%}
   {%- set SpacecraftId="Viking" -%}
   {%- set InstrumentId="VIS" -%}

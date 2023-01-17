@@ -1,5 +1,3 @@
-#include "IsisDebug.h"
-
 #include "PlotWindowBestFitDialog.h"
 
 #include <iostream>

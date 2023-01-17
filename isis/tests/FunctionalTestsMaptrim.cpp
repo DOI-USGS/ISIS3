@@ -12,7 +12,7 @@
 #include "Table.h"
 #include "Histogram.h"
 
-#include "Fixtures.h"
+#include "CameraFixtures.h"
 
 #include "gmock/gmock.h"
 

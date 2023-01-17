@@ -62,7 +62,7 @@ namespace Isis {
 
   void isis2ascii(UserInterface &ui) {
     Cube icube;
-    icube.open(ui.GetFileName("FROM"));
+    icube.open(ui.GetCubeName("FROM"));
 
     isis2ascii(&icube, ui);
   }

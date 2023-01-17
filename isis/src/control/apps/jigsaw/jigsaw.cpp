@@ -72,7 +72,7 @@ namespace Isis {
                                                    in addition error in the bundle adjust. \
                                                    We recommend that you do not solve for radii at this moment."));
          if(log) {
-           log->PvlObject::addGroup(radiusSolveWarning);
+           log->addLogGroup(radiusSolveWarning);
          }
       }
     }
@@ -86,6 +86,17 @@ namespace Isis {
         ControlNetQsp cnet = fixHeldImages(cnetFile, heldList, cubeList);
         bundleAdjustment = new BundleAdjust(settings, cnet, cubeList);
       }
+    else if (ui.WasEntered("LIDARDATA")) {
+      QString lidarFile = ui.GetFileName("LIDARDATA");
+
+      // validate lidar point file exists
+      if (!QFile::exists(lidarFile)) {
+        string msg = "Input lidar point file does not exist";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList, lidarFile);
+    }
       else {
         bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList);
       }
@@ -119,9 +130,23 @@ namespace Isis {
         bundleSolution->outputResiduals();
       }
 
+    // write lidar csv output file
+    if (ui.GetBoolean("LIDAR_CSV")) {
+      bundleSolution->outputLidarCSV();
+    }
+
       // write updated control net
       bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
 
+    // write updated lidar data file
+    if (ui.WasEntered("LIDARDATA")) {
+      if (ui.GetString("OLIDARFORMAT") == "JSON") {
+        bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA"),LidarData::Format::Json);
+      }
+      else {
+        bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA"),LidarData::Format::Binary);
+      }
+    }
       PvlGroup gp("JigsawResults");
       // Update the cube pointing if requested but ONLY if bundle has converged
       if (ui.GetBoolean("UPDATE") ) {
@@ -183,10 +208,10 @@ namespace Isis {
         iss >> summary;
 
         for (auto grpIt = summary.beginGroup(); grpIt!= summary.endGroup(); grpIt++) {
-          log->addGroup(*grpIt);
+          log->addLogGroup(*grpIt);
         }
 
-        log->addGroup(gp);
+        log->addLogGroup(gp);
       }
       delete bundleSolution;
     }

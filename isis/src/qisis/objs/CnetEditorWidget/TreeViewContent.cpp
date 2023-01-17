@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "TreeViewContent.h"
 
 #include <cmath>
@@ -49,7 +47,6 @@ namespace Isis {
     horizontalScrollBar()->setSingleStep(10);
     m_rowHeight = QFontMetrics(font()).height() + ITEM_PADDING;
     m_contentWidth = 0;
-    ASSERT(m_rowHeight > 0);
 
     setMouseTracking(true);
     setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -127,7 +124,7 @@ namespace Isis {
 
 
   void TreeViewContent::refresh() {
-    ASSERT(m_model);
+
     if (m_model) {
       if (!m_model->isFiltering()) {
         QSize modelVisibleSize =
@@ -337,7 +334,6 @@ namespace Isis {
           if (m_alternatingRowColors && (startRow + i) % 2 == 1)
             backgroundColor = palette().alternateBase().color();
 
-          ASSERT(m_items->at(i));
           if (m_items->at(i)->isSelected())
             backgroundColor = palette().highlight().color();
         }
@@ -410,9 +406,7 @@ namespace Isis {
 
   void TreeViewContent::paintItemText(QPainter *painter,
       int index, QPoint absolutePosition, QPoint relativePosition) {
-    ASSERT(m_items);
-    ASSERT(index >= 0 && index < m_items->size());
-
+        
     QPoint point(-absolutePosition.x(), relativePosition.y());
 
     AbstractTreeItem *item = (*m_items)[index];

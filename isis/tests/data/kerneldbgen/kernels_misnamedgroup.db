@@ -1,0 +1,6 @@
+Object = Frame
+  Group = SomeSelection
+    File  = ("mro", "kernels/fk/mro_v??.tf")
+  EndGroup
+EndObject
+

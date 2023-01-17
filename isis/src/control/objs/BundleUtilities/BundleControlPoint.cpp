@@ -139,6 +139,11 @@ namespace Isis {
    */
   void BundleControlPoint::computeResiduals() {
     m_controlPoint->ComputeResiduals();
+
+    // compute and store focal plane residuals in millimeters
+    for (int i = 0; i < size(); i++) {
+      at(i)->setFocalPlaneResidualsMillimeters();
+    }
   }
 
 
@@ -1172,11 +1177,60 @@ QString BundleControlPoint::formatCoordAdjustedSigmaString(SurfacePoint::CoordIn
       pointY += 1000. * YCorrection;
       pointZ += 1000. * ZCorrection;
 
-      surfacepoint.SetRectangularCoordinates(
-                                             Displacement(pointX, Displacement::Meters),
+      surfacepoint.SetRectangularCoordinates(Displacement(pointX, Displacement::Meters),
                                              Displacement(pointY, Displacement::Meters),
                                              Displacement(pointZ, Displacement::Meters));
       // Reset the point now that it has been updated
       setAdjustedSurfacePoint(surfacepoint);
+  }
+
+
+  /**
+   * Compute vtpv of image measures (weighted sum of squares of measure residuals).
+   *
+   * @return double weighted sum of squares of measure residuals (vtpv).
+   */
+  double BundleControlPoint::vtpvMeasures() {
+
+    double vtpv = 0.0;
+    double weight = 0.0;
+    double vx,vy;
+
+    for (int i = 0; i < size(); i++) {
+      BundleMeasureQsp measure = at(i);
+      if (measure->isRejected()) {
+        continue;
+      }
+
+      weight = measure->weight();
+      vx = measure->xFocalPlaneResidual();
+      vy = measure->yFocalPlaneResidual();
+
+      vtpv += vx * vx * weight + vy * vy * weight;
+    }
+
+    return vtpv;
+  }
+
+
+  /**
+   * Compute vtpv, the weighted sum of squares of constrained point residuals.
+   *
+   * @return double Weighted sum of squares of constrained point residuals.
+   */
+  double BundleControlPoint::vtpv() {
+    double vtpv = 0.0;
+
+    if ( m_weights(0) > 0.0 ) {
+        vtpv += m_corrections(0) * m_corrections(0) * m_weights(0);
+    }
+    if ( m_weights(1) > 0.0 ) {
+        vtpv += m_corrections(1) * m_corrections(1) * m_weights(1);
+    }
+    if ( m_weights(2) > 0.0 ) {
+        vtpv += m_corrections(2) * m_corrections(2) * m_weights(2);
+    }
+
+    return vtpv;
   }
 }

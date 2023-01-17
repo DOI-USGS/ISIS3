@@ -16,7 +16,7 @@ namespace Isis {
    */
   PvlGroup crop(UserInterface &ui) {
     Cube *icube = new Cube();
-    icube->open(ui.GetFileName("FROM"));
+    icube->open(ui.GetCubeName("FROM"));
     return crop(icube, ui);
   }
 
@@ -58,7 +58,7 @@ namespace Isis {
     CubeAttributeInput inAtt(from);
     cube = new Cube();
     cube->setVirtualBands(inAtt.bands());
-    from = ui.GetFileName("FROM");
+    from = ui.GetCubeName("FROM");
     cube->open(from);
 
     // Determine the sub-area to extract
@@ -116,9 +116,9 @@ namespace Isis {
 
     // Allocate the output file and make sure things get propogated nicely
     CubeAttributeInput &inputAtt =ui.GetInputAttribute("FROM");
-    p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
+    p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
     p.PropagateTables(false);
     p.ClearInputCubes();
 

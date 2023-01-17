@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 #include "BundleMeasure.h"
 #include "BundleObservation.h"
 #include "BundleObservationSolveSettings.h"
+#include "Camera.h"
 #include "IException.h"
 
 #include "ControlMeasure.h"
@@ -29,6 +30,8 @@ namespace Isis {
                                BundleControlPoint *bundleControlPoint) {
     m_controlMeasure = controlMeasure;
     m_parentControlPoint = bundleControlPoint;
+    m_normalsPositionBlockIndex = -1;
+    m_normalsPointingBlockIndex = -1;
   }
 
 
@@ -51,6 +54,8 @@ namespace Isis {
     m_parentControlPoint = src.m_parentControlPoint;
     m_parentBundleImage = src.m_parentBundleImage;
     m_parentObservation = src.m_parentObservation;
+    m_normalsPositionBlockIndex = src.m_normalsPositionBlockIndex;
+    m_normalsPointingBlockIndex = src.m_normalsPointingBlockIndex;
   }
 
 
@@ -70,6 +75,8 @@ namespace Isis {
       m_parentControlPoint = src.m_parentControlPoint;
       m_parentBundleImage = src.m_parentBundleImage;
       m_parentObservation = src.m_parentObservation;
+      m_normalsPositionBlockIndex = src.m_normalsPositionBlockIndex;
+      m_normalsPointingBlockIndex = src.m_normalsPointingBlockIndex;
     }
 
     return *this;
@@ -105,6 +112,63 @@ namespace Isis {
    */
   void BundleMeasure::setRejected(bool reject) {
     m_controlMeasure->SetRejected(reject);
+  }
+
+
+  /**
+   * Sets the BundleMeasure's status to rejected or not rejected.
+   *
+   * @param reject True will set the BundleMeasure to rejected.
+   *
+   * @see ControlMeasure::SetRejected(bool reject)
+   */
+  void BundleMeasure::setImage() {
+    m_controlMeasure->Camera()->SetImage(m_controlMeasure->GetSample(),
+                                         m_controlMeasure->GetLine());
+  }
+
+
+  /**
+     * Sets block index into normal equations for position piecewise polynomial segment.
+     *
+     * @param index normal equations matrix block index.
+     *
+     */
+  void BundleMeasure::setNormalsPositionBlockIndex(int index) {
+    m_normalsPositionBlockIndex = index;
+  }
+
+
+  /**
+     * Sets block index into normal equations for pointing piecewise polynomial segment.
+   *
+   * @param index normal equations matrix block index.
+   *
+   */
+  void BundleMeasure::setNormalsPointingBlockIndex(int index) {
+    m_normalsPointingBlockIndex = index;
+  }
+
+
+  /**
+   * Accesses block index into normal equations matrix of position piecewise polynomial segment.
+   *
+   * @return int block index into normal equations matrix of position piecewise polynomial.
+   *                segment
+   */
+  int BundleMeasure::positionNormalsBlockIndex() const {
+    return m_normalsPositionBlockIndex;
+  }
+
+
+  /**
+   * Accesses block index into normal equations matrix of pointing piecewise polynomial segment
+   *
+   * @return int block index into normal equations matrix of pointing piecewise polynomial
+   *                segment
+   */
+  int BundleMeasure::pointingNormalsBlockIndex() const {
+    return m_normalsPointingBlockIndex;
   }
 
 
@@ -194,6 +258,18 @@ namespace Isis {
 
 
   /**
+   * Accesses the current line measurement for this control measure
+   *
+   * @see ControlMeasure::GetLine()
+   *
+   * @return double Returns the line measurement for this control measure
+   */
+  double BundleMeasure::line() const {
+    return m_controlMeasure->GetLine();
+  }
+
+
+  /**
    * Accesses the sample residual for this control measure
    *
    * @see ControlMeasure::GetSampleResidual()
@@ -206,18 +282,6 @@ namespace Isis {
 
 
   /**
-   * Accesses the current line measurement for this control measure
-   *
-   * @see ControlMeasure::GetLine()
-   *
-   * @return @b double Returns the line measurement for this control measure
-   */
-  double BundleMeasure::line() const {
-    return m_controlMeasure->GetLine();
-  }
-
-
-  /**
    * Accesses the line residual for this control measure
    *
    * @see ControlMeasure::GetLineResidual()
@@ -226,6 +290,56 @@ namespace Isis {
    */
   double BundleMeasure::lineResidual() const {
     return m_controlMeasure->GetLineResidual();
+  }
+
+
+  /**
+   * Accesses the focal plane x-coordinate residual in millimeters
+   *
+   * @return double Returns the focal plane x-coordinate residual in millimeters
+   */
+  double BundleMeasure::xFocalPlaneResidual() const {
+    return m_xFocalPlaneResidual;
+  }
+
+
+  /**
+   * Accesses the focal plane y-coordinate residual in millimeters
+   *
+   * @return double Returns the focal plane y-coordinate residual in millimeters
+   */
+  double BundleMeasure::yFocalPlaneResidual() const {
+    return m_yFocalPlaneResidual;
+  }
+
+
+  /**
+   * Accesses the measure sigma
+   *
+   * @return double measure sigma
+   */
+  double BundleMeasure::sigma() const {
+    return m_sigma;
+  }
+
+
+  /**
+   * Accesses sqrt of measure weight for bundle
+   *
+   * @return double sqrt of measure weight
+   */
+  double BundleMeasure::weightSqrt() const {
+    return m_weightSqrt;
+  }
+
+
+  /**
+   * Accesses measure weight for bundle
+   *
+   * @return double measure weight
+   */
+  double BundleMeasure::weight() const {
+    return m_weightSqrt*m_weightSqrt;
   }
 
 
@@ -302,6 +416,40 @@ namespace Isis {
 
 
   /**
+   * Computes and sets measure focal plane residuals in millimeters.
+   *
+   */
+  void BundleMeasure::setFocalPlaneResidualsMillimeters() {
+    m_xFocalPlaneResidual = m_controlMeasure->GetFocalPlaneMeasuredX() -
+                            m_controlMeasure->GetFocalPlaneComputedX();
+
+    m_yFocalPlaneResidual = m_controlMeasure->GetFocalPlaneMeasuredY() -
+                            m_controlMeasure->GetFocalPlaneComputedY();
+  }
+
+
+  /**
+   * Sets sigma (i.e. standard deviation or uncertainty) of raw measure in mm and sqrt of weight for bundle
+   *
+   * @param double sigma
+   *
+   * TODO: what if camera has been subsampled, is pixel pitch computation still valid?
+   *
+   */
+  void BundleMeasure::setSigma(double sigmaMultiplier) {
+    // TODO fix for CSM
+    m_sigma = sigmaMultiplier * m_controlMeasure->Camera()->PixelPitch();
+
+    if (m_sigma <= 0.0) {
+      QString msg = "In BundleMeasure::setMeasureSigma(): m_measureSigma must be positive\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    m_weightSqrt = 1.0/m_sigma;
+  }
+
+
+  /**
    * Accesses the observation index for the parent observation
    *
    * @see BundleObservation::index()
@@ -319,7 +467,5 @@ namespace Isis {
     }
     return m_parentObservation->index();
   }
-
-
 
 }

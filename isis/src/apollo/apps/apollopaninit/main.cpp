@@ -7,7 +7,6 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 
-//Isis.h and IsisDebug.h if needed
 #include "Isis.h"
 
 //C++ standard libraries if needed
@@ -118,11 +117,11 @@ void IsisMain() {
   insCode = scFrameCode - 230;
 
   try {
-    panCube.open(ui.GetFileName("FROM"),"rw");
+    panCube.open(ui.GetCubeName("FROM"),"rw");
   }
   catch (IException &e) {
     throw IException(IException::User,
-                     "Unable to open the file [" + ui.GetFileName("FROM") + "] as a cube.",
+                     "Unable to open the file [" + ui.GetCubeName("FROM") + "] as a cube.",
                      _FILEINFO_);
   }
 
@@ -640,7 +639,7 @@ void IsisMain() {
   CentroidApolloPan centroid(resolution);
   Chip inputChip,selectionChip;
   inputChip.SetSize(int(ceil(200*5.0/resolution)), int(ceil(200*5.0/resolution)));
-  fileName = ui.GetFileName("FROM");
+  fileName = ui.GetCubeName("FROM");
   if( panCube.pixelType() == 1)  //UnsignedByte
     centroid.setDNRange(12, 1e99);  //8 bit bright target
   else
@@ -769,7 +768,7 @@ void IsisMain() {
   panCube.write(tableFid);
   //close the new cube
   panCube.close(false);
-  panCube.open(ui.GetFileName("FROM"),"rw");
+  panCube.open(ui.GetCubeName("FROM"),"rw");
 
   delete spPos;
   delete spRot;

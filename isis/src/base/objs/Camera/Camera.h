@@ -235,7 +235,7 @@ namespace Isis {
 
   class Camera : public Sensor {
     public:
-      // constructors 
+      // constructors
       Camera(Cube &cube);
 
       // destructor
@@ -265,7 +265,7 @@ namespace Isis {
       bool HasReferenceBand() const;
       virtual void SetBand(const int band);
       virtual double Sample() const;
-      int Band() const;
+      virtual int Band() const;
       virtual double Line() const;
 
       bool GroundRange(double &minlat, double &maxlat, double &minlon,
@@ -279,10 +279,10 @@ namespace Isis {
       virtual double SampleResolution();
       virtual double DetectorResolution();
 
-      virtual double ObliqueDetectorResolution();
-      virtual double ObliqueSampleResolution();
-      virtual double ObliqueLineResolution();
-      virtual double ObliquePixelResolution();
+      virtual double ObliqueDetectorResolution(bool useLocal = true);
+      virtual double ObliqueSampleResolution(bool useLocal = true);
+      virtual double ObliqueLineResolution(bool useLocal = true);
+      virtual double ObliquePixelResolution(bool useLocal = true);
 
 
       virtual double resolution();

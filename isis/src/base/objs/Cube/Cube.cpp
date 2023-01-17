@@ -4,7 +4,6 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
-#include "IsisDebug.h"
 #include "Cube.h"
 
 #include <sstream>
@@ -182,10 +181,6 @@ namespace Isis {
    */
   bool Cube::isOpen() const {
     bool open = (m_ioHandler != NULL);
-
-    ASSERT(open == (bool)m_labelFile);
-    ASSERT(open == (bool)m_labelFileName);
-    ASSERT(open == (bool)m_label);
 
     return open;
   }
@@ -510,8 +505,6 @@ namespace Isis {
     else {
       cubFile = cubFile.addExtension("ecub");
 
-      ASSERT(m_dataFileName);
-
       core += PvlKeyword("^DnFile", m_dataFileName->original());
 //       m_dataFileName = new FileName(cubFile);
       m_dataFile = new QFile(realDataFileName().expanded());
@@ -617,7 +610,9 @@ namespace Isis {
 
 
   /**
-   * This method will open an isis cube for reading or reading/writing.
+   * This method will open an existing isis cube for reading or 
+   * reading/writing. Any input cube attributes following the file
+   * name will be applied.
    *
    * @param[in] cubeFileName Name of the cube file to open. Environment
    *     variables in the filename will be automatically expanded.
@@ -625,14 +620,20 @@ namespace Isis {
    *     accessed. Either read-only "r" or read-write "rw".
    */
   void Cube::open(const QString &cubeFileName, QString access) {
-    // Already opened?
 
+    // Already opened?
     if (isOpen()) {
       string msg = "You already have a cube opened";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     initLabelFromFile(cubeFileName, (access == "rw"));
+
+    Isis::CubeAttributeInput att(cubeFileName);
+    if(att.bands().size() != 0) {
+      vector<QString> bands = att.bands();
+      setVirtualBands(bands);
+    }
 
     // Figure out the name of the data file
     try {
@@ -2202,17 +2203,14 @@ namespace Isis {
 
     // Attached, stores DN data - normal cube
     if (m_attached && m_storesDnData) {
-      ASSERT(m_labelFileName);
       result = *m_labelFileName;
     }
     // Detached, stores DN data - standard detached cube
     else if (!m_attached && m_storesDnData) {
-      ASSERT(m_dataFileName);
       result = *m_dataFileName;
     }
     // External cube - go look at our external file
     else if (!m_storesDnData) {
-      ASSERT(m_dataFileName);
       FileName guess = *m_dataFileName;
       QDir dir(guess.toString());
 
@@ -2332,7 +2330,6 @@ namespace Isis {
    *          reformatted
    */
   void Cube::initLabelFromFile(FileName labelFileName, bool readWrite) {
-    ASSERT(!m_labelFileName);
 
     try {
       if (labelFileName.fileExists()) {

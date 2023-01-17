@@ -1,5 +1,3 @@
-#include "IsisDebug.h"
-
 #include "MatrixSceneWidget.h"
 
 #include <float.h>

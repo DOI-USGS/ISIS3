@@ -4,8 +4,6 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
-
-#include "IsisDebug.h"
 #include "IException.h"
 
 #include <stdlib.h>
@@ -661,30 +659,6 @@ namespace Isis {
     swap(copy);
 
     return *this;
-  }
-
-
-  /**
-   * Returns an IException representing the current stack, excluding this
-   * method.
-   *
-   * @return an IException representing a current stack trace
-   */
-  IException IException::createStackTrace() {
-    vector<string> theStack;
-    StackTrace::GetStackTrace(&theStack);
-    QString message;
-
-    for(unsigned int i = 1; i < theStack.size(); i++) {
-      message += (theStack[i] + "\n").c_str();
-    }
-
-    IException result;
-    if (theStack.size() != 0) {
-      result = IException(Unknown, message, NULL, -1);
-    }
-
-    return result;
   }
 
 

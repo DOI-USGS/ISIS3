@@ -1,4 +1,3 @@
-#include "IsisDebug.h"
 #include "FeatureNomenclature.h"
 
 #include <QDebug>
@@ -858,7 +857,6 @@ namespace Isis {
    * @param xmlSearchResults The searchresults XML from the nomenclature server.
    */
   void FeatureNomenclature::readSearchResults(QDomElement xmlSearchResults) {
-    ASSERT(xmlSearchResults.tagName() == "searchresults");
 
     if (!m_features)
       m_features = new QList<Feature>;

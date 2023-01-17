@@ -58,6 +58,9 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     <change name="Adam Paquette" date="2021-08-10">
       Removed commented out debugging code that should be run in SpiceClient/spiceinit.
     </change>
+    <change name="Jacob Cain" date="2022-11-22">
+      Changed TEMPFILE type to cube. Fixes #4780.
+    </change>
   </history>
 
   <groups>
@@ -109,7 +112,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
       </parameter>
 
       <parameter name="TEMPFILE">
-        <type>filename</type>
+        <type>cube</type>
         <fileMode>output</fileMode>
         <default><item>/tmp/spice_web_service/inputLabels.cub</item></default>
         <brief>

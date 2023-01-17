@@ -1,5 +1,5 @@
 #include "CSVReader.h"
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "jitterfit.h"
 #include "TestUtilities.h"
 

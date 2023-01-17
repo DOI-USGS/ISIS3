@@ -43,7 +43,7 @@ void IsisMain() {
     cout << plab << endl;
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    QString file = Isis::Application::GetUserInterface().GetFileName("TO");
+    QString file = Isis::Application::GetUserInterface().GetCubeName("TO");
     Isis::Cube *cube = p2.SetInputCube(file, att);
     Isis::Statistics *stat = cube->statistics();
     cout << stat->Average() << endl;
@@ -73,7 +73,7 @@ void IsisMain() {
     cout << plab << endl;
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    QString file = Isis::Application::GetUserInterface().GetFileName("TO");
+    QString file = Isis::Application::GetUserInterface().GetCubeName("TO");
     Isis::Cube *cube = p2.SetInputCube(file, att);
     Isis::Statistics *stat = cube->statistics();
     cout << stat->Average() << endl;
@@ -108,7 +108,7 @@ void IsisMain() {
     p.EndProcess();
 
     cout << ilab << endl;
-    QString file = Isis::Application::GetUserInterface().GetFileName("TO");
+    QString file = Isis::Application::GetUserInterface().GetCubeName("TO");
     QFile::remove(file);
   }
   catch(Isis::IException &e) {
@@ -130,7 +130,7 @@ void IsisMain() {
     cout << plab << endl;
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    QString file = Isis::Application::GetUserInterface().GetFileName("TO");
+    QString file = Isis::Application::GetUserInterface().GetCubeName("TO");
     Isis::Cube *cube = p2.SetInputCube(file, att);
     Pvl isisCubeLab = *(cube->label());
     (isisCubeLab.findObject("IsisCube").findObject("Core")["StartByte"]).setValue("");
@@ -187,7 +187,7 @@ void IsisMain() {
     }
     
     p.EndProcess();
-    QFile::remove(Isis::Application::GetUserInterface().GetFileName("TO"));
+    QFile::remove(Isis::Application::GetUserInterface().GetCubeName("TO"));
   }
   
 }

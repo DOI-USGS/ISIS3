@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "TableViewHeader.h"
 
 #include <iostream>
@@ -328,7 +326,7 @@ namespace Isis {
         QPainter::TextAntialiasing);
 
     ARROW_HEIGHT = qMax(height() / 5, 3);
-    ASSERT(height() > 8);
+
     ARROW_WIDTH = ARROW_HEIGHT * 2 - 1;
 
     paintHeader(&painter, height());
@@ -548,16 +546,11 @@ namespace Isis {
 
       if (visibleCol == visibleCols.getSortingOrder()[0] &&
           visibleCol->getWidth() >= SORT_ARROW_MARGIN * 2 + ARROW_WIDTH) {
-        ASSERT(SORT_ARROW_MARGIN > 0);
 
         QRect arrowRect(textRect.right() + 1,
             textRect.y(),
             SORT_ARROW_MARGIN * 2 + ARROW_WIDTH,
             textRect.height());
-
-        ASSERT(arrowRect.width() + textRect.width() == columnRect.width());
-        ASSERT(arrowRect.right() == columnRect.right());
-
 
         // assume ascending order (arrow looks like v)
         QPoint left(arrowRect.left() + SORT_ARROW_MARGIN,
@@ -571,9 +564,6 @@ namespace Isis {
 
         QPoint right(center.x() + ((ARROW_WIDTH - 1) / 2),
             arrowRect.center().y() - ((ARROW_HEIGHT - 1) / 2));
-
-        ASSERT(right.x() == arrowRect.right() - SORT_ARROW_MARGIN);
-        ASSERT(right.x() - center.x() == center.x() - left.x());
 
         if (!visibleCol->sortAscending()) {
           // flip arrow (to look like ^)

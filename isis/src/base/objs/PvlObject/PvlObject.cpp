@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 #include "Message.h"
 #include "PvlFormat.h"
+#include "Application.h"
 
 #include <QList>
 
@@ -62,27 +63,20 @@ namespace Isis {
 
     for(auto it = jsonobj.begin(); it != jsonobj.end(); it++) {
         PvlKeyword keyword;
+        keyword.setName(QString::fromStdString(it.key()));
         if (it.value().is_array()) {
-          keyword.setName(QString::fromStdString(it.key()));
-          for(auto ar = it.value().begin(); ar!=it.value().end();ar++) {
-            keyword += QString::number(ar->get<double>());
+          for(auto ar = it.value().begin(); ar!=it.value().end(); ar++) {
+            try {
+              keyword.addJsonValue(*ar);
+            }
+            catch (IException &e) {
+              QString msg = "While attempting to parse " + name + " the following occured";
+              throw IException(e, IException::Unknown, msg, _FILEINFO_);
+            }
           }
         }
-        else if(it.value().is_number()) {
-          keyword.setName(QString::fromStdString(it.key()));
-          keyword.setValue(QString::number(it->get<double>()));
-        }
-        else if(it.value().is_boolean()) {
-          keyword.setName(QString::fromStdString(it.key()));
-          keyword.setValue(QString(it->get<bool>() ? "true" : "false"));
-        }
-        else if(it.value().is_null()) {
-          keyword.setName(QString::fromStdString(it.key()));
-          keyword.setValue(QString("Null"));
-        }
         else {
-          keyword.setName(QString::fromStdString(it.key()));
-          keyword.setValue(QString::fromStdString(it.value()));
+          keyword.setJsonValue(*it);
         }
         addKeyword(keyword);
     }
@@ -157,6 +151,15 @@ namespace Isis {
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
+  /**
+   * Add a group to the object and report it to the log/terminal. 
+   *
+   * @param group The PvlGroup object to add.
+   */
+  void PvlObject::addLogGroup(Isis::PvlGroup &group) {
+    addGroup(group);
+    Application::Log(group);
+  };
 
   /**
    * Finds a keyword in the current PvlObject, or deeper inside

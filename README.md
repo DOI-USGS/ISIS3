@@ -40,124 +40,111 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
 ### ISIS Installation With Conda
 
-1.  Download either the Anaconda or Miniconda installation script for your OS platform. Anaconda is a much larger distribtion of packages supporting scientific python, while Miniconda is a minimal installation and not as large: [Anaconda installer](https://www.anaconda.com/download), [Miniconda installer](https://conda.io/miniconda.html)
-2.  If you are running on some variant of Linux, open a terminal window in the directory where you downloaded the script, and run the following commands. In this example, we chose to do a full install of Anaconda, and our OS is Linux-based. Your file name may be different depending on your environment.
-
-        chmod +x Anaconda3-5.3.0-Linux-x86_64.sh
-        ./Anaconda3-5.3.0-Linux-x86_64.sh
-
-
+1. Download either the Anaconda or Miniconda installation script for your OS platform. Anaconda is a much larger distribtion of packages supporting scientific python, while Miniconda is a minimal installation and not as large: [Anaconda installer](https://www.anaconda.com/download), [Miniconda installer](https://conda.io/miniconda.html)
+1. If you are running on some variant of Linux, open a terminal window in the directory where you downloaded the script, and run the following commands. In this example, we chose to do a full install of Anaconda, and our OS is Linux-based. Your file name may be different depending on your environment.
+    
+    ```bash
+    chmod +x Anaconda3-5.3.0-Linux-x86_64.sh
+    ./Anaconda3-5.3.0-Linux-x86_64.sh
+    ```
     This will start the Anaconda installer which will guide you through the installation process.
 
-3.  If you are running Mac OS X, a pkg file (which looks similar to Anaconda3-5.3.0-MacOSX-x86\_64.pkg) will be downloaded. Double-click on the file to start the installation process.
-4.  After the installation has finished, open up a bash prompt in your terminal window.
-5.  Next setup your Anaconda environment for ISIS. In the bash prompt, run the following commands:
+1. If you are running Mac OS X, a pkg file (which looks similar to Anaconda3-5.3.0-MacOSX-x86\_64.pkg) will be downloaded. Double-click on the file to start the installation process.
+1. After the installation has finished, open up a bash prompt in your terminal window.
+1. Next setup your Anaconda environment for ISIS. In the bash prompt, run the following commands:
 
-        #Create a new conda environment to install ISIS in
-        conda create -n isis python=3.6
+    ```bash
+    #Create a new conda environment to install ISIS in
+    conda create -n isis
 
-        #Activate the environment
-        #Depending on your version of Anaconda use one of the following:
+    #Activate the environment
+    conda activate isis
 
-        #Anaconda 3.4 and up:
-        conda activate isis
+    #Add the following channels to the environment
+    conda config --env --add channels conda-forge
+    conda config --env --add channels usgs-astrogeology
 
-        #Prior to Anaconda 3.4:
-        source activate isis
+    #Verify you have the correct channels:
+    conda config --show channels
 
-        #Add the following channels to the environment
-        conda config --env --add channels conda-forge
-        conda config --env --add channels usgs-astrogeology
+    #You should see:
 
-        #Verify you have the correct channels:
-        conda config --show channels
+    channels:
+        - usgs-astrogeology
+        - conda-forge
+        - defaults
 
-        #You should see:
+    #The order is important.  If conda-forge is before usgs-astrogeology, you will need to run:
 
-        channels:
-            - usgs-astrogeology
-            - conda-forge
-            - defaults
+    conda config --env --add channels usgs-astrogeology
+    ```
 
-        #The order is important.  If conda-forge is before usgs-astrogeology, you will need to run:
+1. The environment is now ready to download ISIS and its dependencies:
 
-        conda config --env --add channels usgs-astrogeology
+    ```bash
+    conda install -c usgs-astrogeology isis=7.0.0
+    ```
 
-6.  Download [Mamba](https://github.com/mamba-org/mamba). The ISIS environment is quite large and the Conda solver can take hours to resolve it. Instead, we recommend you use the much faster [Mamba](https://github.com/mamba-org/mamba) solver:
-
-        conda install -n base -c conda-forge mamba
-
-7.  The environment is now ready to download ISIS and its dependencies:
-
-        mamba install -c usgs-astrogeology isis
-
-    If you would like to work with our latest ISIS version 3, rather than updating
-    to ISIS 4, instead run:
-
-	    mamba install -c usgs-astrogeology isis=3.10.0
-
-
-8.  Finally, setup the environment variables:
+1. Finally, setup the environment variables:
 
     ISIS requires several environment variables to be set in order to run correctly.
     The variables include: ISISROOT and ISISDATA.
 
-    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here]("#The-ISIS-Data-Area").
+    More information about the ISISDATA environment variable and the ISIS Data Area can be found [here](#The-ISIS-Data-Area).
 
     The following steps are only valid for versions of ISIS after 4.2.0.
     For older versions of ISIS follow the instructions in [this readme file.](https://github.com/USGS-Astrogeology/ISIS3/blob/adf52de0a04b087411d53f3fe1c9218b06dff92e/README.md)
 
     There are two methods to configure the environment variables for ISIS:
 
-    7.1 Using `conda env config vars` *preferred*
+    1. Using `conda env config vars` *preferred*
 
-      Conda has a built in method for configuring environment variables that are specific to a conda environment since version 4.8.
-      This version number applies only to the conda package, not to the version of miniconda or anaconda that was installed.
+       Conda has a built in method for configuring environment variables that are specific to a conda environment since version 4.8.
+       This version number applies only to the conda package, not to the version of miniconda or anaconda that was installed.
 
-      To determine if your version of conda is recent enough run:
+       To determine if your version of conda is recent enough run:
 
-          conda --version
+           conda --version
 
-      If the version number is less than 4.8, update conda to a newer version by running:
+       If the version number is less than 4.8, update conda to a newer version by running:
 
-          conda update -n base conda
+           conda update -n base conda
 
-      The version number should now be greater than 4.8.
+       The version number should now be greater than 4.8.
 
-      To use the built in environment variable configuration feature, first activate the environment by first running:
+       To use the built in environment variable configuration feature, first activate the environment by first running:
 
-          conda activate isis
+           conda activate isis
 
-      After activation, the environment variables can be set using the syntax: `conda config vars set KEY=VALUE`.
-      To set all the environment variables ISIS requires, run the following command, updating the path to `ISISDATA` as needed:
+       After activation, the environment variables can be set using the syntax: `conda config vars set KEY=VALUE`.
+       To set all the environment variables ISIS requires, run the following command, updating the path to `ISISDATA` as needed:
 
-          conda env config vars set ISISROOT=$CONDA_PREFIX ISISDATA=[path to data directory]
+           conda env config vars set ISISROOT=$CONDA_PREFIX ISISDATA=[path to data directory]
 
-      To make these changes take effect, re-activate the isis environment by running:
+       To make these changes take effect, re-activate the isis environment by running:
 
-          conda activate isis
+           conda activate isis
 
-      The environment variables are now set and ISIS is ready for use every time the isis environment is activated.
+       The environment variables are now set and ISIS is ready for use every time the isis environment is activated.
 
-      **Note** This method will not enable tab completion for arguments in C-Shell.
+       **Note** This method will not enable tab completion for arguments in C-Shell.
 
 
-    7.2 Using the provided isisVarInit.py script:
+    1. Using the provided isisVarInit.py script:
 
-      To use the default values for: `$ISISROOT` and `$ISISDATA`, run the ISIS variable initialization script with default arguments:
+       To use the default values for: `$ISISROOT` and `$ISISDATA`, run the ISIS variable initialization script with default arguments:
 
-          python $CONDA_PREFIX/scripts/isisVarInit.py
+           python $CONDA_PREFIX/scripts/isisVarInit.py
 
-      Executing this script with no arguments will result in $ISISROOT=$CONDA\_PREFIX and $ISISDATA=$CONDA\_PREFIX/data. The user can specify different directories for `$ISISDATA` using the optional value:
+       Executing this script with no arguments will result in $ISISROOT=$CONDA\_PREFIX and $ISISDATA=$CONDA\_PREFIX/data. The user can specify different directories for `$ISISDATA` using the optional value:
 
-          python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]
+           python $CONDA_PREFIX/scripts/isisVarInit.py --data-dir=[path to data directory]
 
-      Now every time the isis environment is activated, $ISISROOT and $ISISDATA will be set to the values passed to isisVarInit.py.
-      This does not happen retroactively, so re-activate the isis environment with one of the following commands:
+       Now every time the isis environment is activated, $ISISROOT and $ISISDATA will be set to the values passed to isisVarInit.py.
+       This does not happen retroactively, so re-activate the isis environment with one of the following commands:
 
-          for Anaconda 3.4 and up - conda activate isis
-          prior to Anaconda 3.4 - source activate isis
-
+           for Anaconda 3.4 and up - conda activate isis
+           prior to Anaconda 3.4 - source activate isis
 
 
 ### Installation with Docker
@@ -327,16 +314,16 @@ remove these elements to and from your path.
 
 ### Updating
 
-  To update to the newest version of ISIS, run `mamba update -c usgs-astrogeology isis`
+  To update to the newest version of ISIS, run `conda update -c usgs-astrogeology isis`
 
-  To update to our latest release candidate , run `mamba update -c usgs-astrogeology/label/RC isis`
+  To update to our latest release candidate , run `conda update -c usgs-astrogeology/label/RC isis`
 
   Note that for ISIS versions 3.10 and above, new versions and release candidates will only be
-  available under the package name `isis` and `mamba update isis3` and
-  `mamba update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
+  available under the package name `isis` and `conda update isis3` and
+  `conda update -c usgs-astrogeology -c usgs-astrogeology/label/RC isis3`
   will not work for additional updates. Instead, after installing an `isis` package,
-  `mamba update isis` should be used to update to a new version and
-  `mamba update -c usgs-astrogeology/label/RC isis` to update to a new release candidate.
+  `conda update isis` should be used to update to a new version and
+  `conda update -c usgs-astrogeology/label/RC isis` to update to a new release candidate.
 
 ### Operating System Requirements
 
@@ -389,19 +376,8 @@ Under the root directory of the ISIS Data Area pointed to by the ISISDATA/ISIS3D
 
 ### Versions of the ISIS Data Area
 
-In ISIS version 4.1.0, several files previously stored in the data area closely associated with ISIS applications were moved into version control with the ISIS source code. Additionally, the environment variables used for the ISIS Data Area and the rsync location for the ISIS Data Area were also updated.
+In ISIS version 4.1.0 and later, several files previously stored in the data area closely associated with ISIS applications were moved into version control with the ISIS source code. To support the use of data in ISIS versions predating 4.1.0 the `downloadIsisData` application will need to download the data named `legacybase`. This is explained further in the [Full ISIS Data Download](README.md#Full-ISIS-Data-Download) section. 
 
-The correct environment variable names and rsync modules to use for the ISIS Data Area for each version of ISIS are summarized in the table below:
-
-ISIS version | ISIS Data Environment variable name | ISIS Data rsync module
----|---|---
-3.x | `$ISIS3DATA` | `isis3data`
-4.0.x | `$ISIS3DATA` | `isis3data`
-4.1.0 | `$ISISDATA` | `isisdata`
-
-The ISIS Data rsync module specifies where to rsync the data from and is the name used after the `::` in the rsync download commands below. For example, the rsync module is in bold in the following example rsync command:
-
-``rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::``**``isis3data``**``/data/`` .
 
 ### Size of the ISIS Data Area
 
@@ -409,17 +385,17 @@ If you plan to work with data from all missions, then the download will require 
 
 ### Full ISIS Data Download
 
-The ISIS Data Area is hosted on rsync servers and not through conda channels like the ISIS binaries. This requires using the rsync command from within a terminal window within your Unix distribution, or from within WSL if running Windows 10.  Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
+> Warning if you are looking to download ISIS data via rsync the servers will be shutdown in November of 2022.
+the outdated rsync download information can be found [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Outdated-ISIS-Data-Information)
 
-To download all ISIS data, enter the following commands in the location where you want to install the ISIS Data Area, for versions of ISIS 4.1.0 and later:
 
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/ .
+The ISIS Data Area is hosted on a combination of AWS S3 buckets and public http servers e.g. NAIF, Jaxa, ESA and not through conda channels like the ISIS binaries. This requires using the `downloadIsisData` script from within a terminal window within your Unix distribution, or from within WSL if running Windows 10. Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
 
-For earlier versions, use:
+To download all ISIS data, use the following command:
 
-    cd $ISIS3DATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/ .
+    downloadIsisData  all $ISISDATA
+
+> Note: this applicaion takes in 3 parameters in the following order \<rclone command> \<mission> \<download destination>
 
 > Note: The above command downloads all ISIS data including the required base data area and all of the optional mission data areas.
 
@@ -427,11 +403,11 @@ For earlier versions, use:
 
 This data area contains data that is common between multiple missions such as DEMS and leap second kernels. As of ISIS 4.1, the base data area is no longer required to run many applications as data such as icons and templates has been moved into the binary distribution. If you plan to work with any applications that use camera models (e.g., cam2map, campt, qview), it is still recommended you download the base data area. To download the base data area run the following commands:
 
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/base .
+    downloadIsisData base $ISISDATA
 
-For versions of ISIS prior to ISIS 4.1.0, please use `isis3data` instead of `isisdata` in the above command.
+> Note: For accessing ISIS Data for versions of ISIS prior to ISIS 4.1.0, you must download the `legacybase` area and not the base area when using this application as shown below:
 
+    downloadIsisData legacybase $ISISDATA
 ### Partial Download of Mission Specific Data
 
 There are many missions supported by ISIS. If you are only working with a few missions then you can save disk space by downloading only those specific data areas. If you want to limit the download even further, read the next section about the SPICE Web Service. Otherwise [jump](#Mission-Specific-Data-Downloads) to the mission specific sections.
@@ -453,179 +429,48 @@ rsync -azv <b>--exclude='kernels'</b> --delete --partial isisdist.astrogeology.u
 
 ### Mission Specific Data Downloads
 
-For versions of ISIS prior to ISIS 4.1.0, please cd into `$ISIS3DATA` instead of `$ISISDATA` and use `isis3data` instead of `isisdata` in all the below rsync commands.
-
-**Apollo Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/apollo15 .
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/apollo16 .
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/apollo17 .
-
-
-**Cassini Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/cassini .
-
-
-**Chandrayaan Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/chandrayaan1 .
-
-
-**Clementine Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/clementine1 .
-
-
-**Dawn Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/dawn .
-
-
-**ExoMars Trace Gas Orbiter Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/tgo .
-
-
-**Galileo Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/galileo .
-
-
-**Hayabusa Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/hayabusa .
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/hayabusa2 .
-
-
-**Juno Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/juno .
-
-
-**Kaguya Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/kaguya .
-
-
-**Lunar Orbiter Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/lo .
-
-
-**Lunar Reconnaissance Orbiter Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/lro .
-
-
-**Mars Exploration Rover Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/mer .
-
-
-**Mariner10 Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/mariner10 .
-
-
-**Messenger Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/messenger .
-
-
-**Mars Express Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/mex .
-
-
-**Mars Global Surveyor Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/mgs .
-
-
-**Mars Reconnaissance Orbiter Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/mro .
-
-
-**Mars Odyssey Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/odyssey .
-
-
-**Near Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/near .
-
-
-**New Horizons Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/newhorizons .
-
-
-**OSIRIS-REx Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/osirisrex .
-
-
-**Rolo Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/rolo .
-
-
-**Rosetta Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/rosetta .
-
-
-**Smart1 Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/smart1 .
-
-
-**Viking Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/viking1 .
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/viking2 .
-
-
-**Voyager Mission:**
-
-    cd $ISISDATA
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/voyager1 .
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/voyager2 .
+For versions of ISIS prior to ISIS 4.1.0, please use the `--legacy` flag
+
+| Mission | Command |
+| ------ | ------ |
+| Apollo 15 | `downloadIsisData apollo15 $ISISDATA` |
+| Apollo 16 | `downloadIsisData apollo16 $ISISDATA` |
+| Apollo 17 | `downloadIsisData apollo17 $ISISDATA` |
+| Cassini | `downloadIsisData cassini $ISISDATA` | 
+| Chandrayaan 1 | `downloadIsisData chandrayaan1 $ISISDATA` |
+| Clementine 1 | `downloadIsisData clementine1 $ISISDATA` |
+| Dawn | `downloadIsisData dawn $ISISDATA` |
+| ExoMars | `downloadIsisData tgo $ISISDATA` |
+| Galileo | `downloadIsisData galileo $ISISDATA` | 
+| Hayabusa 2 | `downloadIsisData hayabusa2 $ISISDATA` |
+| Juno | `downloadIsisData juno $ISISDATA` |
+| Kaguya | `downloadIsisData kaguya $ISISDATA` |
+| Lunar Orbiter | `downloadIsisData lo $ISISDATA` |
+| Lunar Reconnaissance Orbiter | `downloadIsisData lro $ISISDATA` |
+| Mars Exploration Rover  | `downloadIsisData mer $ISISDATA` |
+| Mariner10  | `downloadIsisData mariner10 $ISISDATA` |
+| Messenger | `downloadIsisData messenger $ISISDATA` |
+| Mars Express  | `downloadIsisData mex $ISISDATA` |
+| Mars Global Surveyor  | `downloadIsisData mgs $ISISDATA` |
+| Mars Reconnaissance Orbiter  | `downloadIsisData mro $ISISDATA` |
+| Mars Science Laboratory  | `downloadIsisData msl $ISISDATA` |
+| Mars Odyssey  | `downloadIsisData odyssey $ISISDATA` |
+| Near  | `downloadIsisData near $ISISDATA` |
+| New Horizons  | `downloadIsisData newhorizons $ISISDATA` |
+| OSIRIS-REx  | `downloadIsisData osirisrex $ISISDATA` |
+| Rolo  | `downloadIsisData rolo $ISISDATA` |
+| Rosetta  | `downloadIsisData rosetta $ISISDATA` |
+| Smart1  | `downloadIsisData smart1 $ISISDATA` |
+| Viking 1 | `downloadIsisData viking1 $ISISDATA` |
+| Viking 2 | `downloadIsisData viking2 $ISISDATA` |
+| Voyager 1 | `downloadIsisData voyager1 $ISISDATA` |
+| Voyager 2 | `downloadIsisData voyager2 $ISISDATA` |
 
 ### ISIS Test Data 
-ISIS is comprised of two types of tests, custom Makefile based tests, and GTest based tests. Those that are GTest based, make economical use of data that exists on the ISIS3 repo along with the source, so no special data is required to run those other than the ISIS data area. The Makefile tests depend on a separate source of data that consists of a few gigabytes of input and expected output data used for testing ISIS applications. The Makefile based tests use the ISISTESTDATA environment variable to know where the required data are located. The total size of this test data decreases as we work towards converting Makefile tests to GTests.  
+ISIS is comprised of two types of tests, custom Makefile based tests, and GTest based tests. Those that are GTest based, make economical use of data that exists on the ISIS3 repo along with the source, so no special data is required to run those other than the ISIS data area. The Makefile tests depend on a separate source of data that consists of a few gigabytes of input and expected output data used for testing ISIS applications. The Makefile based tests use the `ISISTESTDATA` environment variable to know where the required data are located. The total size of this test data decreases as we work towards converting Makefile tests to GTests.  
  
-###How to download the ISIS test data with rclone  
-Test data is hosted using Amazon S3 storage buckets. We recommend using rclone to pull the data into a local directory. You can download rclone using their instructions (see: https://rclone.org/downloads/) or by using an anaconda environment (see: https://docs.anaconda.com/anaconda/install/). If you already have an anaconda environment up, install rclone with: conda install –c conda-forge rclone  
+### How to download the ISIS test data with rclone  
+Test data is hosted using Amazon S3 storage buckets. We recommend using rclone to pull the data into a local directory. You can download rclone using their instructions (see: https://rclone.org/downloads/) or by using an anaconda environment (see: https://docs.anaconda.com/anaconda/install/). If you already have an anaconda environment up, install rclone with: `conda install –c conda-forge rclone` 
 
 Next, you will want to configure rclone using a default S3 configuration. See: https://rclone.org/s3/ for detailed information on how to configure S3, but for the purposes of downloading the ISIS3 test data, you simply run rclone config which will start an interactive menu. Press enter through it all except for these details: 
 
@@ -658,4 +503,23 @@ If you are looking for ISIS2, please [refer to the ISIS 2 Installation Guide](ht
 
 ### How do I install ISIS3.5.2 or earlier?
 
-If you are looking for a version of ISIS prior to 3.6.0, please [refer to the Legacy ISIS3 Installation Guide](https://isis.astrogeology.usgs.gov/documents/LegacyInstallGuide/index.html) for instructions on downloading and installing ISIS, versions prior to 3.6.0.
+If you are looking for a version of ISIS prior to 3.6.0, please [refer to the Legacy ISIS3 Installation Guide](https://isis.astrogeology.usgs.gov/documents/LegacyInstallGuide/index.html) for instructions on downloading and installing ISIS, versions prior to 3.6.0
+
+### How do I access the ISISDATA download script with ISIS 7.0.0 or earlier 
+
+You can download the script and config file from the repo:
+
+```
+# install rclone 
+conda install -c conda-forge rclone
+
+# download the script and rclone config file
+curl -LJO https://github.com/USGS-Astrogeology/ISIS3/raw/dev/isis/scripts/downloadIsisData
+
+curl -LJO https://github.com/USGS-Astrogeology/ISIS3/raw/dev/isis/config/rclone.conf
+
+# run the script as normal, using --config to point to where you downloaded the config file 
+python downloadIsisData --config rclone.conf <mission> $ISISDATA
+```
+
+> The script does not support python2, sometimes you need to explicitly use python3 with `python3 downloadIsisData <mission> $ISISDATA --config rclone.conf` 

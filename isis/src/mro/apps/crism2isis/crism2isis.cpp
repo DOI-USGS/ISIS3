@@ -28,7 +28,7 @@ namespace Isis{
     p.SetNull(65535, 65535);
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), att);
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), att);
 
     Pvl outLabel;
 
@@ -174,7 +174,7 @@ namespace Isis{
                           "using the nearest-neighbor algorithm due to gimble "
                           "jitter of the MRO CRISM instrument.");
     if (log){
-      log->addGroup(results);
+      log->addLogGroup(results);
     }
     return;
   }

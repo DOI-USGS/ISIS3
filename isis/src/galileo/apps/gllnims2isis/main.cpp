@@ -251,8 +251,8 @@ PvlGroup originalMappingGroup = qube.findGroup("IMAGE_MAP_PROJECTION", Pvl::Trav
   importPds.EndProcess();
 
 // New nocam2map hint PvlGroup
-  Cube coreCube(FileName(ui.GetFileName("CORE")).expanded(),"rw");
-  Cube suffixCube(FileName(ui.GetFileName("SUFFIX")).expanded(), "rw");
+  Cube coreCube(FileName(ui.GetCubeName("CORE")).expanded(),"rw");
+  Cube suffixCube(FileName(ui.GetCubeName("SUFFIX")).expanded(), "rw");
 
   PvlGroup mappingInfo("MappingInformation");
 

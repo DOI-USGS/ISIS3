@@ -17,7 +17,7 @@ void IsisMain() {
 
   // Open the input cube
   Cube cube;
-  cube.open(ui.GetFileName("FROM"), "rw");
+  cube.open(ui.GetCubeName("FROM"), "rw");
 
   //Get the map projection file provided by the user
   Pvl userMap;

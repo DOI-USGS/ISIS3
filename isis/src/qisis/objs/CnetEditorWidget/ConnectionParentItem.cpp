@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "ConnectionParentItem.h"
 
 #include "ImageParentItem.h"
@@ -25,9 +23,6 @@ namespace Isis {
 
 
   void ConnectionParentItem::addChild(AbstractTreeItem *child) {
-    // Only ImageParentItems should be children of ConnectionParentItems
-    ASSERT(dynamic_cast< ImageParentItem * >(child));
-
     AbstractParentItem::addChild(child);
   }
 }

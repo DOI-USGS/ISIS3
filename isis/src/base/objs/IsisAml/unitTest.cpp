@@ -369,8 +369,8 @@ int main(void) {
     }
     aml->Clear("G0P0");
 
-    try { // PARAMETER NOT FILENAME
-      aml->PutFileName("G2P4", "xxxxxx");
+    try { // PARAMETER NOT CUBENAME
+      aml->PutCubeName("G2P4", "xxxxxx");
     }
     catch(IException &error) {
       ReportError(error.toString());
@@ -379,7 +379,7 @@ int main(void) {
     cout << "  Cube tests:" << endl;
 
     try { // UNABLE TO GET INPUT CUBE ATTRIBUTES
-      aml->PutFileName("CUBE2", "xxxxxxx.cub+1,2-4");
+      aml->PutCubeName("CUBE2", "xxxxxxx.cub+1,2-4");
       CubeAttributeInput &att = aml->GetInputAttribute("CUBE2");
       cout << "    " << att.toString() << endl;
     }
@@ -389,7 +389,7 @@ int main(void) {
     aml->Clear("CUBE2");
 
     try { // UNABLE TO GET OUTPUT CUBE ATTRIBUTES
-      aml->PutFileName("CUBE1", "yyyyyyy.cub+8-bit+BSQ+detached");
+      aml->PutCubeName("CUBE1", "yyyyyyy.cub+8-bit+BSQ+detached");
       CubeAttributeOutput &att = aml->GetOutputAttribute("CUBE1");
       QString strng = att.toString();
       cout << "    Att QString  = " << strng << endl;

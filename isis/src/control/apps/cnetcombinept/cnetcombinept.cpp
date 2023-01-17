@@ -278,6 +278,7 @@ namespace Isis{
     BigInt nfound(0);
     BigInt nMerged(0);
     BOOST_FOREACH ( ControlPoint *point, all_points ) {
+      BigInt localFound(0);
       // Don't consider ignored or edit locked points
       if ( isWorthy( point ) ) {
 
@@ -298,10 +299,11 @@ namespace Isis{
             QList<PointType> m_points = m_cloud->radius_query(m_p, search_radius_sq);
             ControlPointMerger merger(image_tolerance);
             p_merged += merger.apply(point, m_points);
-            nfound   += merger.size();
+            localFound = merger.size();
+            nfound   += localFound;
 
             // Log any points that were merged
-            if (logMerges && nfound > 0) {
+            if (logMerges && localFound > 0) {
               QHash<QString, QSet<QString>>::iterator logIt = mergeLog.find(point->GetId());
               // point hasn't had any points merged into it yet
               if (logIt == mergeLog.end()) {
@@ -497,7 +499,7 @@ namespace Isis{
       summary += PvlKeyword("MeasuresMerged",    toString(nMerged));
       summary += PvlKeyword("MeasuresDeleted",   toString(nRemoved));
       summary += PvlKeyword("MinimumMeasures",   toString(nMinMeasures));
-      log->addGroup(summary);
+      log->addLogGroup(summary);
     }
 
     pbl.EndProcess();

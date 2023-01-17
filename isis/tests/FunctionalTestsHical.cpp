@@ -6,7 +6,6 @@
 #include <QTextStream>
 
 #include "hical.h"
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -533,4 +532,28 @@ TEST(HicalTest, DarkRate) {
   ASSERT_TRUE(patameterMatches.hasNext()) << "Failed to find second bracketed value in " << paramString.toStdString();
   parameterValues = patameterMatches.next();
   EXPECT_NEAR(parameterValues.captured(0).toDouble(), 163.44824721503, 0.00001);
+}
+
+TEST(HicalTest, DarkRateFallback) {
+  QTemporaryDir prefix;
+  QString outFileName = prefix.path() + "/out.cub";
+  QVector<QString> args = { "FROM=data/hical/mroHical.cub",
+                            "TO=" + outFileName,
+                            "CONF=data/hical/hical.0023_darkrate_missing.conf",
+                            "OPATH=" + prefix.path() + "/" };
+  UserInterface options(APP_XML, args);
+
+  try {
+    hical(options);
+  }
+  catch (IException &e) {
+    FAIL() << e.toString().toStdString().c_str() << std::endl;
+  }
+
+  // Check calibrated cube
+  Cube outCube(outFileName);
+
+  std::unique_ptr<Statistics> stats (outCube.statistics());
+  EXPECT_NEAR(stats->Average(), 0.066949089371337325, .00001);
+  EXPECT_NEAR(stats->StandardDeviation(), 0.004873520482354521, .00001);
 }

@@ -1,5 +1,3 @@
-#include "IsisDebug.h"
-
 #include "SpatialPlotTool.h"
 
 #include <iostream>

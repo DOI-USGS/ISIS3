@@ -487,7 +487,7 @@ namespace Isis {
     pluginInfo.addKeyword(PvlKeyword("MaxIncidence", toString(maxIncidence)));
     pluginInfo.addKeyword(PvlKeyword("MaxEmission", toString(maxEmission)));
     if (log) {
-      log->addGroup(pluginInfo);
+      log->addLogGroup(pluginInfo);
     }
 
     // inform user of any unused (invalid) keywords found in the def file
@@ -495,7 +495,7 @@ namespace Isis {
       PvlGroup unusedKeywords(unusedDefKeywords);
       unusedKeywords.setName("InvalidKeyordsFoundInDefFile");
       if (log) {
-        log->addGroup(unusedKeywords);
+        log->addLogGroup(unusedKeywords);
       }
     }
 
@@ -518,7 +518,7 @@ namespace Isis {
     resultsGrp.addKeyword(cpIgnoredCountKeyword);
     resultsGrp.addKeyword(cmIgnoredCountKeyword);
     if (log) {
-      log->addGroup(resultsGrp);
+      log->addLogGroup(resultsGrp);
     }
 
     if (seedDomain == XY) {

@@ -1,0 +1,1700 @@
+{
+    "points": [
+        {
+            "aprioriMatrix": [
+                3.322018066054457e-11,
+                0,
+                0,
+                1.367726161813928e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0024",
+            "latitude": 60.4729205,
+            "longitude": 99.084402,
+            "measures": [
+                {
+                    "line": 234.38760599480054,
+                    "sample": 5027.524223351649,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 233.89421358763073,
+                    "sample": 4543.79939838827,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.998106,
+            "range": 56.818434,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845261.805634
+        },
+        {
+            "aprioriMatrix": [
+                3.3220573983746765e-11,
+                0,
+                0,
+                1.3694620624491287e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0025",
+            "latitude": 60.49330080000001,
+            "longitude": 99.0835271,
+            "measures": [
+                {
+                    "line": 1290.728823372604,
+                    "sample": 4982.153822031804,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 1289.735503559494,
+                    "sample": 4481.130477887619,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.987835,
+            "range": 56.828662,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845262.1984916
+        },
+        {
+            "aprioriMatrix": [
+                3.322351185529408e-11,
+                0,
+                0,
+                1.3711785532322878e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0026",
+            "latitude": 60.5121681,
+            "longitude": 99.0842599,
+            "measures": [
+                {
+                    "line": 2269.7747287932716,
+                    "sample": 4982.1157073054765,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 2268.7725867318213,
+                    "sample": 4431.927595730721,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.911123,
+            "range": 56.905245,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845262.55563515
+        },
+        {
+            "aprioriMatrix": [
+                3.3226307277545105e-11,
+                0,
+                0,
+                1.3728925191595597e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0027",
+            "latitude": 60.531035300000006,
+            "longitude": 99.0850093,
+            "measures": [
+                {
+                    "line": 3248.8098514659678,
+                    "sample": 4982.101463279392,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 3247.603163943002,
+                    "sample": 4384.446400811999,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.83814,
+            "range": 56.978097,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845262.9127765
+        },
+        {
+            "aprioriMatrix": [
+                3.322801811224275e-11,
+                0,
+                0,
+                1.3745648212882434e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0028",
+            "latitude": 60.5499006,
+            "longitude": 99.08576460000002,
+            "measures": [
+                {
+                    "line": 4227.880099757055,
+                    "sample": 4982.005469905642,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 4226.6405738652675,
+                    "sample": 4349.688330496552,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.793478,
+            "range": 57.022628,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845263.2699205
+        },
+        {
+            "aprioriMatrix": [
+                3.322849853495493e-11,
+                0,
+                0,
+                1.3761155382429987e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0029",
+            "latitude": 60.56789799999999,
+            "longitude": 99.0873291,
+            "measures": [
+                {
+                    "line": 5162.292453700381,
+                    "sample": 5004.144464186805,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 5161.23525427429,
+                    "sample": 4350.467856791021,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.780937,
+            "range": 57.034965,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845263.62706304
+        },
+        {
+            "aprioriMatrix": [
+                3.322793709149799e-11,
+                0,
+                0,
+                1.3776996743081246e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0030",
+            "latitude": 60.5867599,
+            "longitude": 99.0881049,
+            "measures": [
+                {
+                    "line": 6141.160280404553,
+                    "sample": 5004.151713102616,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 6139.938235634478,
+                    "sample": 4341.900301488964,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.795593,
+            "range": 57.020177,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845263.98420584
+        },
+        {
+            "aprioriMatrix": [
+                3.3226900933170565e-11,
+                0,
+                0,
+                1.3792674067443906e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0031",
+            "latitude": 60.60562459999999,
+            "longitude": 99.0888855,
+            "measures": [
+                {
+                    "line": 7119.952627872927,
+                    "sample": 5004.184058638919,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 7118.986918429622,
+                    "sample": 4338.881868596509,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.822642,
+            "range": 56.992995,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845264.3413495
+        },
+        {
+            "aprioriMatrix": [
+                3.322593162563276e-11,
+                0,
+                0,
+                1.380840745888666e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0032",
+            "latitude": 60.624487,
+            "longitude": 99.0896657,
+            "measures": [
+                {
+                    "line": 8098.87355144211,
+                    "sample": 5004.246503283161,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 8097.739729155434,
+                    "sample": 4334.8552020638,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.847947,
+            "range": 56.967557,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845264.6984916
+        },
+        {
+            "aprioriMatrix": [
+                3.322553487487634e-11,
+                0,
+                0,
+                1.3824406807656025e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0033",
+            "latitude": 60.6433463,
+            "longitude": 99.0904407,
+            "measures": [
+                {
+                    "line": 9077.624074918353,
+                    "sample": 5004.164585678957,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 9076.317401914199,
+                    "sample": 4324.476777158061,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.858305,
+            "range": 56.957066,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845265.05563456
+        },
+        {
+            "aprioriMatrix": [
+                3.32249389194127e-11,
+                0,
+                0,
+                1.3840779949755092e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0034",
+            "latitude": 60.6627009,
+            "longitude": 99.0886397,
+            "measures": [
+                {
+                    "line": 10080.052859439606,
+                    "sample": 4935.369606232713,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 10077.725746377446,
+                    "sample": 4251.595561214213,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.873864,
+            "range": 56.941565,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845265.41277814
+        },
+        {
+            "aprioriMatrix": [
+                3.3223544295382545e-11,
+                0,
+                0,
+                1.3856430948118914e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0035",
+            "latitude": 60.681566000000004,
+            "longitude": 99.0894272,
+            "measures": [
+                {
+                    "line": 11058.872653902816,
+                    "sample": 4935.3679331134545,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 11056.723782932118,
+                    "sample": 4252.416104096248,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.910276,
+            "range": 56.90502,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845265.76992005
+        },
+        {
+            "aprioriMatrix": [
+                3.3222576436865136e-11,
+                0,
+                0,
+                1.3872287601681396e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0036",
+            "latitude": 60.70042790000001,
+            "longitude": 99.0902117,
+            "measures": [
+                {
+                    "line": 12037.861051334303,
+                    "sample": 4935.350444652353,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 12035.387554299683,
+                    "sample": 4248.109505357039,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.935547,
+            "range": 56.879614,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845266.1270635
+        },
+        {
+            "aprioriMatrix": [
+                3.322192617888208e-11,
+                0,
+                0,
+                1.3888309113586286e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0037",
+            "latitude": 60.7192914,
+            "longitude": 99.0909945,
+            "measures": [
+                {
+                    "line": 13016.728878038475,
+                    "sample": 4935.420609744321,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 13014.328736365054,
+                    "sample": 4240.029362963747,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.952526,
+            "range": 56.862501,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845266.4842065
+        },
+        {
+            "aprioriMatrix": [
+                3.322370124939775e-11,
+                0,
+                0,
+                1.390644893717634e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0038",
+            "latitude": 60.73939240000001,
+            "longitude": 99.0927065,
+            "measures": [
+                {
+                    "line": 14060.369815430795,
+                    "sample": 4959.176358130785,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 14058.267342951369,
+                    "sample": 4225.634961514641,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.9061779999997,
+            "range": 56.908687,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845266.8413485
+        },
+        {
+            "aprioriMatrix": [
+                3.322242079295494e-11,
+                0,
+                0,
+                1.3921852109873518e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0039",
+            "latitude": 60.7577723,
+            "longitude": 99.0960711,
+            "measures": [
+                {
+                    "line": 15015.807384293295,
+                    "sample": 5027.653757459346,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 15014.942313831056,
+                    "sample": 4289.377465645547,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.939611,
+            "range": 56.874928,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845267.1984925
+        },
+        {
+            "aprioriMatrix": [
+                3.322078280670254e-11,
+                0,
+                0,
+                1.3937550913979495e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0040",
+            "latitude": 60.77663119999999,
+            "longitude": 99.0968649,
+            "measures": [
+                {
+                    "line": 15994.621460632581,
+                    "sample": 5027.6758515612355,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 15993.404153736614,
+                    "sample": 4293.472566007183,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1734.982382,
+            "range": 56.83202,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845267.555635
+        },
+        {
+            "aprioriMatrix": [
+                3.321726486419305e-11,
+                0,
+                0,
+                1.3952491552043493e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0041",
+            "latitude": 60.79549140000001,
+            "longitude": 99.0976724,
+            "measures": [
+                {
+                    "line": 16973.39518335446,
+                    "sample": 5027.775002242935,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 16972.14732533924,
+                    "sample": 4319.076680847422,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.074253,
+            "range": 56.740013,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845267.9127772
+        },
+        {
+            "aprioriMatrix": [
+                3.321358784060965e-11,
+                0,
+                0,
+                1.396739360274046e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0042",
+            "latitude": 60.81435129999999,
+            "longitude": 99.0984847,
+            "measures": [
+                {
+                    "line": 17952.034121726694,
+                    "sample": 5027.7852462870715,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 17951.062530784497,
+                    "sample": 4346.87896457602,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.170294,
+            "range": 56.643835,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845268.2699213
+        },
+        {
+            "aprioriMatrix": [
+                3.321009370071261e-11,
+                0,
+                0,
+                1.3983727514252678e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0043",
+            "latitude": 60.8347278,
+            "longitude": 99.0976484,
+            "measures": [
+                {
+                    "line": 19008.39494410081,
+                    "sample": 4982.409915459435,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 19006.916237254023,
+                    "sample": 4329.021184706818,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.261573,
+            "range": 56.552504,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845268.6627772
+        },
+        {
+            "aprioriMatrix": [
+                3.320952602539158e-11,
+                0,
+                0,
+                1.4000003449117707e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0044",
+            "latitude": 60.8535917,
+            "longitude": 99.09843750000002,
+            "measures": [
+                {
+                    "line": 19987.306718671713,
+                    "sample": 4982.376714323733,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 19985.94939942709,
+                    "sample": 4320.378560392293,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.276404,
+            "range": 56.537537,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845269.01992005
+        },
+        {
+            "aprioriMatrix": [
+                3.320928718583363e-11,
+                0,
+                0,
+                1.4016449747879369e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0045",
+            "latitude": 60.8724554,
+            "longitude": 99.0992256,
+            "measures": [
+                {
+                    "line": 20966.2866206048,
+                    "sample": 4982.385618746818,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 20964.772298014715,
+                    "sample": 4308.175035779172,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.282644,
+            "range": 56.53116,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845269.3770646
+        },
+        {
+            "aprioriMatrix": [
+                3.320940392600077e-11,
+                0,
+                0,
+                1.4033077933082617e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0046",
+            "latitude": 60.891318500000004,
+            "longitude": 99.1000136,
+            "measures": [
+                {
+                    "line": 21945.199048675582,
+                    "sample": 4982.368158237079,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 21943.618722597916,
+                    "sample": 4291.516121100574,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.279594,
+            "range": 56.534072,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845269.7342056
+        },
+        {
+            "aprioriMatrix": [
+                3.320965091960304e-11,
+                0,
+                0,
+                1.4049793819943608e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0047",
+            "latitude": 60.91018160000001,
+            "longitude": 99.100801,
+            "measures": [
+                {
+                    "line": 22924.137453366475,
+                    "sample": 4982.493599883044,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 22922.45256730848,
+                    "sample": 4273.521350794635,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.273141,
+            "range": 56.540388,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845270.0913489
+        },
+        {
+            "aprioriMatrix": [
+                3.320843304929317e-11,
+                0,
+                0,
+                1.4065921258422626e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0048",
+            "latitude": 60.9290438,
+            "longitude": 99.1016042,
+            "measures": [
+                {
+                    "line": 23903.036648064746,
+                    "sample": 4982.435945658038,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 23901.235602403605,
+                    "sample": 4272.464713052604,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.30496,
+            "range": 56.508429,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845270.44849217
+        },
+        {
+            "aprioriMatrix": [
+                3.3208179371422955e-11,
+                0,
+                0,
+                1.4082487939187947e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0049",
+            "latitude": 60.9479048,
+            "longitude": 99.1023953,
+            "measures": [
+                {
+                    "line": 24881.91542089186,
+                    "sample": 4982.382796863155,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 24879.877644900258,
+                    "sample": 4260.165074783394,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.311588,
+            "range": 56.501663,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845270.80563504
+        },
+        {
+            "aprioriMatrix": [
+                3.320852624640439e-11,
+                0,
+                0,
+                1.4099344193908092e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0050",
+            "latitude": 60.966768200000004,
+            "longitude": 99.1031844,
+            "measures": [
+                {
+                    "line": 25860.77409859775,
+                    "sample": 4982.377182189848,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 25858.65447174655,
+                    "sample": 4240.570942834369,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.302525,
+            "range": 56.510587,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845271.16277874
+        },
+        {
+            "aprioriMatrix": [
+                3.3208697025866175e-11,
+                0,
+                0,
+                1.41153953827662e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0051",
+            "latitude": 60.9847723,
+            "longitude": 99.1047742,
+            "measures": [
+                {
+                    "line": 26795.658116077335,
+                    "sample": 5004.511059470261,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 26793.533587977057,
+                    "sample": 4244.4037414566465,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.298063,
+            "range": 56.514837,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845271.5199208
+        },
+        {
+            "aprioriMatrix": [
+                3.3208773880881227e-11,
+                0,
+                0,
+                1.4132202887169111e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0052",
+            "latitude": 61.0036372,
+            "longitude": 99.10556880000001,
+            "measures": [
+                {
+                    "line": 27774.648147258515,
+                    "sample": 5004.439591327677,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 27772.628996013413,
+                    "sample": 4228.447077978751,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.296055,
+            "range": 56.516706,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845271.8770627
+        },
+        {
+            "aprioriMatrix": [
+                3.3209040579038574e-11,
+                0,
+                0,
+                1.4149122025822343e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0053",
+            "latitude": 61.02249950000001,
+            "longitude": 99.1063627,
+            "measures": [
+                {
+                    "line": 28753.584591449777,
+                    "sample": 5004.348487844444,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 28751.215491020517,
+                    "sample": 4210.307081628274,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.289087,
+            "range": 56.523534,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845272.23420686
+        },
+        {
+            "aprioriMatrix": [
+                3.320915257178863e-11,
+                0,
+                0,
+                1.416600850931545e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0054",
+            "latitude": 61.041361800000004,
+            "longitude": 99.107156,
+            "measures": [
+                {
+                    "line": 29732.504534769145,
+                    "sample": 5004.445034732473,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 29729.999506365457,
+                    "sample": 4193.735035569114,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.286161,
+            "range": 56.52632,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845272.59134996
+        },
+        {
+            "aprioriMatrix": [
+                3.3208827044192656e-11,
+                0,
+                0,
+                1.418274247924864e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0055",
+            "latitude": 61.0602253,
+            "longitude": 99.1079557,
+            "measures": [
+                {
+                    "line": 30711.462871206288,
+                    "sample": 5004.422413843053,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 30708.797245207817,
+                    "sample": 4182.137996065438,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.294666,
+            "range": 56.517674,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845272.9484915
+        },
+        {
+            "aprioriMatrix": [
+                3.320776762949257e-11,
+                0,
+                0,
+                1.4199195471749757e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0056",
+            "latitude": 61.0790887,
+            "longitude": 99.1087671,
+            "measures": [
+                {
+                    "line": 31690.400295647367,
+                    "sample": 5004.468270829152,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 31687.628312543904,
+                    "sample": 4179.264755235672,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.322346,
+            "range": 56.489853,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845273.3056356
+        },
+        {
+            "aprioriMatrix": [
+                3.320680279482515e-11,
+                0,
+                0,
+                1.421572246117539e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0057",
+            "latitude": 61.0979535,
+            "longitude": 99.1095697,
+            "measures": [
+                {
+                    "line": 32669.241982356456,
+                    "sample": 5004.42134862645,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 32666.735973702955,
+                    "sample": 4174.909532395293,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.347556,
+            "range": 56.464503,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845273.66277754
+        },
+        {
+            "aprioriMatrix": [
+                3.3207970208014817e-11,
+                0,
+                0,
+                1.4233195783173796e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0058",
+            "latitude": 61.1168183,
+            "longitude": 99.11035930000001,
+            "measures": [
+                {
+                    "line": 33648.26338153173,
+                    "sample": 5004.340327398922,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 33645.55576816616,
+                    "sample": 4146.350448275309,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.317053,
+            "range": 56.494864,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845274.0199213
+        },
+        {
+            "aprioriMatrix": [
+                3.320918728735967e-11,
+                0,
+                0,
+                1.4250724759707352e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0059",
+            "latitude": 61.1356827,
+            "longitude": 99.1111518,
+            "measures": [
+                {
+                    "line": 34627.243610214755,
+                    "sample": 5004.387016522111,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 34624.26414090033,
+                    "sample": 4116.9564052678725,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.285254,
+            "range": 56.526521,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845274.37706494
+        },
+        {
+            "aprioriMatrix": [
+                3.3208858161438495e-11,
+                0,
+                0,
+                1.4267622831887928e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0060",
+            "latitude": 61.1545455,
+            "longitude": 99.1119541,
+            "measures": [
+                {
+                    "line": 35606.141497913275,
+                    "sample": 5004.313583485793,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 35603.200585091596,
+                    "sample": 4105.6868166136865,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.293853,
+            "range": 56.517781,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845274.73420596
+        },
+        {
+            "aprioriMatrix": [
+                3.320833793888807e-11,
+                0,
+                0,
+                1.4284473764957404e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0061",
+            "latitude": 61.173410200000006,
+            "longitude": 99.1127626,
+            "measures": [
+                {
+                    "line": 36585.08464047828,
+                    "sample": 5004.276523822719,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 36582.06449079651,
+                    "sample": 4096.503403670376,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.307445,
+            "range": 56.504046,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845275.09134924
+        },
+        {
+            "aprioriMatrix": [
+                3.320785661378425e-11,
+                0,
+                0,
+                1.4301371871700922e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0062",
+            "latitude": 61.1922718,
+            "longitude": 99.1135699,
+            "measures": [
+                {
+                    "line": 37564.067809910746,
+                    "sample": 5004.292337300198,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 37560.8476892666,
+                    "sample": 4086.569783896375,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.320021,
+            "range": 56.491327,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845275.4484925
+        },
+        {
+            "aprioriMatrix": [
+                3.320818446179219e-11,
+                0,
+                0,
+                1.4318655775764227e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0063",
+            "latitude": 61.2111373,
+            "longitude": 99.114372,
+            "measures": [
+                {
+                    "line": 38542.86554875311,
+                    "sample": 5004.285815022116,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 38539.77400420977,
+                    "sample": 4067.4417412231523,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.311455,
+            "range": 56.49975,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845275.8056356
+        },
+        {
+            "aprioriMatrix": [
+                3.320795156902933e-11,
+                0,
+                0,
+                1.4335730351228387e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0064",
+            "latitude": 61.23000110000001,
+            "longitude": 99.1151795,
+            "measures": [
+                {
+                    "line": 39521.784675197625,
+                    "sample": 5004.294217611256,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 39518.46554932211,
+                    "sample": 4054.652060793388,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.31754,
+            "range": 56.493521,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845276.1627782
+        },
+        {
+            "aprioriMatrix": [
+                3.320791233918302e-11,
+                0,
+                0,
+                1.4352919501100779e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0065",
+            "latitude": 61.248861700000006,
+            "longitude": 99.1159863,
+            "measures": [
+                {
+                    "line": 40500.69939051798,
+                    "sample": 5004.320443771472,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 40497.27766516177,
+                    "sample": 4040.0984554800334,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.318565,
+            "range": 56.492353,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845276.51992095
+        },
+        {
+            "aprioriMatrix": [
+                3.3206588554419055e-11,
+                0,
+                0,
+                1.4369590878285952e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0066",
+            "latitude": 61.2677267,
+            "longitude": 99.11680830000002,
+            "measures": [
+                {
+                    "line": 41479.617373337715,
+                    "sample": 5004.344427011365,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 41476.33075908108,
+                    "sample": 4040.3771488847988,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.353154,
+            "range": 56.457618,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845276.87706304
+        },
+        {
+            "aprioriMatrix": [
+                3.320412379076868e-11,
+                0,
+                0,
+                1.438579627001496e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0067",
+            "latitude": 61.2865868,
+            "longitude": 99.11763650000002,
+            "measures": [
+                {
+                    "line": 42458.41674592977,
+                    "sample": 5004.335139171277,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 42454.935225334804,
+                    "sample": 4053.6566940524917,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.417561,
+            "range": 56.393067,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845277.234207
+        },
+        {
+            "aprioriMatrix": [
+                3.3201258967989476e-11,
+                0,
+                0,
+                1.440186113039954e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0068",
+            "latitude": 61.3054483,
+            "longitude": 99.1184645,
+            "measures": [
+                {
+                    "line": 43437.209746898014,
+                    "sample": 5004.318018684795,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 43434.007434125524,
+                    "sample": 4071.5523560522975,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.492431,
+            "range": 56.318051,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845277.5913504
+        },
+        {
+            "aprioriMatrix": [
+                3.3202886020922737e-11,
+                0,
+                0,
+                1.441991260339968e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0069",
+            "latitude": 61.3243146,
+            "longitude": 99.1192643,
+            "measures": [
+                {
+                    "line": 44416.27999518911,
+                    "sample": 5004.376739905592,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 44412.90956957324,
+                    "sample": 4037.1126985950314,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.449908,
+            "range": 56.36043,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845277.9484919
+        },
+        {
+            "aprioriMatrix": [
+                3.3203658322717205e-11,
+                0,
+                0,
+                1.4437625374119196e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0070",
+            "latitude": 61.343177399999995,
+            "longitude": 99.1200717,
+            "measures": [
+                {
+                    "line": 45395.208270631905,
+                    "sample": 5004.38680191596,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 45391.521877825486,
+                    "sample": 4012.775485306008,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.429725,
+            "range": 56.380467,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845278.3056358
+        },
+        {
+            "aprioriMatrix": [
+                3.32024611765017e-11,
+                0,
+                0,
+                1.4454517239544585e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0071",
+            "latitude": 61.36204140000001,
+            "longitude": 99.120888,
+            "measures": [
+                {
+                    "line": 46374.164646569414,
+                    "sample": 5004.327047701587,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 46370.55945112272,
+                    "sample": 4011.153490272115,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.461011,
+            "range": 56.349035,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845278.66277796
+        },
+        {
+            "aprioriMatrix": [
+                3.3204067156513675e-11,
+                0,
+                0,
+                1.4473107616214498e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0072",
+            "latitude": 61.3813842,
+            "longitude": 99.11906870000001,
+            "measures": [
+                {
+                    "line": 47376.274033025766,
+                    "sample": 4935.358565272816,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 47371.395656443616,
+                    "sample": 3913.2093079985652,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.419041,
+            "range": 56.391049,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845279.01992166
+        },
+        {
+            "aprioriMatrix": [
+                3.320458842672873e-11,
+                0,
+                0,
+                1.4490818837843452e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0073",
+            "latitude": 61.4002484,
+            "longitude": 99.11987280000001,
+            "measures": [
+                {
+                    "line": 48355.20198171862,
+                    "sample": 4935.430460550753,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 48350.242897901655,
+                    "sample": 3891.7645755344447,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.405419,
+            "range": 56.404526,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845279.37706524
+        },
+        {
+            "aprioriMatrix": [
+                3.320404465591745e-11,
+                0,
+                0,
+                1.4508099356576817e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0074",
+            "latitude": 61.4191118,
+            "longitude": 99.1206939,
+            "measures": [
+                {
+                    "line": 49334.189889025205,
+                    "sample": 4935.465698942573,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 49329.112521730494,
+                    "sample": 3882.6570004012947,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.419629,
+            "range": 56.390168,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845279.73420644
+        },
+        {
+            "aprioriMatrix": [
+                3.320347070711455e-11,
+                0,
+                0,
+                1.4525401128528083e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0075",
+            "latitude": 61.4379753,
+            "longitude": 99.1215091,
+            "measures": [
+                {
+                    "line": 50313.088756973535,
+                    "sample": 4935.362899524509,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 50307.72744398225,
+                    "sample": 3873.8102533216156,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.434628,
+            "range": 56.375022,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845280.09134954
+        },
+        {
+            "aprioriMatrix": [
+                3.320254003784627e-11,
+                0,
+                0,
+                1.4542580892491523e-10,
+                0,
+                100
+            ],
+            "id": "Lidar0076",
+            "latitude": 61.4568386,
+            "longitude": 99.1223316,
+            "measures": [
+                {
+                    "line": 51291.94906842912,
+                    "sample": 4935.412960458046,
+                    "serialNumber": "LRO/1/286265995:36824/NACL"
+                },
+                {
+                    "line": 51286.80961864609,
+                    "sample": 3869.014107209312,
+                    "serialNumber": "LRO/1/286272781:34203/NACL"
+                }
+            ],
+            "radius": 1735.45895,
+            "range": 56.350552,
+            "sigmaRange": 10,
+            "simultaneousImages": [
+                "LRO/1/286265995:36824/NACL"
+            ],
+            "time": 317845280.4484929
+        }
+    ]
+}

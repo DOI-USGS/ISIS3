@@ -15,10 +15,10 @@ Group = GroundPoint
   LocalRadius                = 1742653.345818 <meters>
   SampleResolution           = 186.88473742666 <meters/pixel>
   LineResolution             = 186.88473742666 <meters/pixel>
-  ObliqueDetectorResolution  = 187.44583818806 <meters>
-  ObliquePixelResolution     = 187.44583818806 <meters/pix>
-  ObliqueLineResolution      = 187.44583818806 <meters>
-  ObliqueSampleResolution    = 187.44583818806 <meters>
+  ObliqueDetectorResolution  = 190.4516366997 <meters>
+  ObliquePixelResolution     = 190.4516366997 <meters/pix>
+  ObliqueLineResolution      = 190.4516366997 <meters>
+  ObliqueSampleResolution    = 190.4516366997 <meters>
 
   # Spacecraft Information
   SpacecraftPosition         = (216.77599432924, 54.260221515165,
@@ -78,10 +78,10 @@ Group = GroundPoint
   LocalRadius                = 1738477.7500095 <meters>
   SampleResolution           = 187.58212566559 <meters/pixel>
   LineResolution             = 187.58212566559 <meters/pixel>
-  ObliqueDetectorResolution  = 187.61662252249 <meters>
-  ObliquePixelResolution     = 187.61662252249 <meters/pix>
-  ObliqueLineResolution      = 187.61662252249 <meters>
-  ObliqueSampleResolution    = 187.61662252249 <meters>
+  ObliqueDetectorResolution  = 190.29281394228 <meters>
+  ObliquePixelResolution     = 190.29281394228 <meters/pix>
+  ObliqueLineResolution      = 190.29281394228 <meters>
+  ObliqueSampleResolution    = 190.29281394228 <meters>
 
   # Spacecraft Information
   SpacecraftPosition         = (216.77599432924, 54.260221515165,

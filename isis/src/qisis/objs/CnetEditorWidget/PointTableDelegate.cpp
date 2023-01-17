@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "PointTableDelegate.h"
 
 #include <iostream>
@@ -110,7 +108,7 @@ namespace Isis {
       AbstractPointItem::getColumn(columnTitle);
 
     QString data = row->getFormattedData(columnTitle);
-    ASSERT(row->getPointerType() == AbstractTreeItem::Point);
+
     ControlPoint *point = (ControlPoint *)row->getPointer();
 
     switch (column) {
@@ -170,7 +168,7 @@ namespace Isis {
       AbstractPointItem::getColumn(columnTitle);
 
     QString data = row->getFormattedData(columnTitle);
-    ASSERT(row->getPointerType() == AbstractTreeItem::Point);
+
     ControlPoint *point = (ControlPoint *)row->getPointer();
 
     switch (column) {

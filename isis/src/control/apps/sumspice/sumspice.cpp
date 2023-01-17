@@ -65,7 +65,7 @@ namespace Isis {
     //  Get the list of input cubes to be processed
     FileList cubeNameList;
     if ( ui.WasEntered("FROM") ) {
-      cubeNameList.append(ui.GetFileName("FROM"));
+      cubeNameList.append(ui.GetCubeName("FROM"));
     }
     else if ( ui.WasEntered("FROMLIST") ) {
       cubeNameList.read(ui.GetFileName("FROMLIST"));
@@ -121,7 +121,7 @@ namespace Isis {
     }
 
     if (duplicates.keywords() != 0 && log) {
-      log->addGroup(duplicates);
+      log->addLogGroup(duplicates);
     }
 
     // Determine the update mode
@@ -197,7 +197,7 @@ namespace Isis {
       PvlGroup loggrp("Warnings");
       loggrp.addKeyword(message);
       if (log){
-        log->addGroup(loggrp);
+        log->addLogGroup(loggrp);
       }
     }
 

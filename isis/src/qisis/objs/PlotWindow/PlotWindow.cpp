@@ -1,5 +1,3 @@
-#include "IsisDebug.h"
-
 #include "PlotWindow.h"
 
 #include <algorithm>

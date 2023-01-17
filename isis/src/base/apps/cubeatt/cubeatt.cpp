@@ -14,7 +14,7 @@ namespace Isis {
     if (inAtt.bands().size() != 0) {
       icube.setVirtualBands(inAtt.bands());
     }
-    icube.open(ui.GetFileName("FROM"));
+    icube.open(ui.GetCubeName("FROM"));
     cubeatt(&icube, ui);
   }
 
@@ -22,7 +22,7 @@ namespace Isis {
   // Doesn't allow specification of input attributes
   void cubeatt(Cube *icube, UserInterface &ui) {
     bool propTables = ui.GetBoolean("PROPTABLES");
-    QString outputFileName = ui.GetFileName("TO");
+    QString outputFileName = ui.GetCubeName("TO");
     CubeAttributeOutput outputAttributes= ui.GetOutputAttribute("TO");
     cubeatt(icube, outputFileName, outputAttributes, propTables);
   }
