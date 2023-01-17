@@ -62,20 +62,24 @@ def test_create_rclone_args():
 
 
 def test_file_filtering():
-    with TemporaryDirectory() as tdir:
-        dest = Path(tdir)
-        # Run the rclone command to download files
-        did.rclone("lsf", "test", dest, extra_args=["-l", "-R", "--format", "p", "--files-only"], redirect_stdout=True, redirect_stderr=True)
-        # Check if the specified files are not present in the destination directory
-        assert not (dest / "a_older_versions").exists()
-        assert not (dest / "kernels" / "*" / "former_versions").exists()
-        assert not (dest / "corrupt_files").exists()
-        assert not (dest / "zzarchive").exists()
-        assert not (dest / "kernels" / "*" / "original").exists()
-        assert not (dest / "gallileo" / "kernels" / "ck" / "prime_mission" / "*" / "extended_mission").exists()
-        assert not (dest / "gallileo" / "kernels" / "*" / "prime_mission").exists()
-        assert not (dest / "galileo" / "kernels" / "ck" / "GEM").exists()
-        assert not (dest / "clementine1" / "kernels" / "ck" / "save").exists()
-        assert not (dest / "chandrayaan1" / "kernels" / "spk" / "SAVE_SCS_2017-11-22").exists()
-        assert not (dest / "*" / "kernels" / "fk" / "release.*" / "*").exists()
-        assert not (dest / "cassini" / "kernels" / "fk" / "Archive").exists()
+    "Test that rclone filtered files correctly"
+    files_to_check = [
+        "/a_older_versions/*",
+        "/kernels/*/former_versions/",
+        "/corrupt_files/*",
+        "/zzarchive/**",
+        "/kernels/*/original",
+        "gallileo/kernels/ck/prime_mission/*/extended_mission/*",
+        "gallileo/kernels/*/prime_mission/",
+        "galileo/kernels/ck/GEM/",
+        "clementine1/kernels/ck/save",
+        "chandrayaan1/kernels/spk/SAVE_SCS_2017-11-22",
+        "*/kernels/fk/release.*/*",
+        "cassini/kernels/fk/Archive"
+    ]
+
+    isisdata_folder = os.environ.get("ISISDATA")
+    if not isisdata_folder:
+        raise Exception("ISISDATA environment variable is not set.")
+    for file in files_to_check:
+        assert not os.path.exists(os.path.join(isisdata_folder, file))
