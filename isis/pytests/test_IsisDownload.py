@@ -7,6 +7,7 @@ import pytest
 from unittest import mock
 from tempfile import TemporaryDirectory
 from pathlib import Path
+import tempfile
 
 from importlib.util import spec_from_loader, module_from_spec
 from importlib.machinery import SourceFileLoader
@@ -63,8 +64,7 @@ def test_create_rclone_args():
 
 
 def test_file_filtering():
-    "Test that rclone filtered files correctly"
-    files_to_check = [
+    files_to_exclude = [
         "/a_older_versions/*",
         "/kernels/*/former_versions/",
         "/corrupt_files/*",
@@ -79,8 +79,15 @@ def test_file_filtering():
         "cassini/kernels/fk/Archive"
     ]
 
-    isisdata_folder = os.environ.get("ISISDATA")
-    if not isisdata_folder:
-        raise Exception("ISISDATA environment variable is not set.")
-    for file in files_to_check:
-        assert not os.path.exists(os.path.join(isisdata_folder, file))
+    dest = tempfile.mkdtemp()  # Create a temporary directory and assign the path to 'dest'
+
+    # Get the rclone command that was passed to subprocess.run in downloadIsisData
+    rclone_args = did.create_rclone_arguments(dest, "lro_naifKernels:", ntransfers=100, rclone_kwargs=["--dry_run"])
+
+    # Check if the command contains the --exclude argument
+    assert "--exclude" in rclone_args
+
+    # Check if the command contains the specified regexps
+    exclude_str = rclone_args[rclone_args.index("--exclude") + 1]
+    for file in files_to_exclude:
+        assert file in exclude_str
