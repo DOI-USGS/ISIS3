@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "FilterWidget.h"
 
 #include <iostream>
@@ -106,9 +104,6 @@ namespace Isis {
 
 
   FilterWidget &FilterWidget::operator=(FilterWidget other) {
-    ASSERT(m_filterType);
-    ASSERT(m_filterGroups);
-    ASSERT(m_buttonGroup);
 
     // create temporary list of new groups
     QList< FilterGroup * > newGroups;
@@ -176,7 +171,6 @@ namespace Isis {
         "the group.  There is also a green plus (+) button outside any group "
         "for adding a new group.</html>";
 
-    ASSERT(m_filterType);
 
     QString title = "Filter " + *m_filterType;
     QLabel *titleLabel = new QLabel(title);
@@ -275,7 +269,6 @@ namespace Isis {
       bool (AbstractFilter::*hasFilterMeth)() const,
       QString(AbstractFilter::*descriptionMeth)() const,
       QString title) {
-    ASSERT(label);
 
     if (label) {
       label->clear();
@@ -329,8 +322,6 @@ namespace Isis {
 
 
   void FilterWidget::maybeScroll(FilterGroup *group) {
-    ASSERT(m_filterGroups);
-    ASSERT(m_filterGroups->size());
 
     if (m_filterGroups && m_filterGroups->size() &&
         m_filterGroups->at(m_filterGroups->size() - 1) == group)

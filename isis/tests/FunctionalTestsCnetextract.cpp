@@ -3,7 +3,7 @@
 #include <QTemporaryFile>
 
 #include "cnetextract.h"
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"

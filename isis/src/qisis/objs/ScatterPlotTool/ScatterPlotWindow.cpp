@@ -1,4 +1,3 @@
-#include "IsisDebug.h"
 #include "ScatterPlotWindow.h"
 
 #include <QMenuBar>
@@ -436,7 +435,6 @@ namespace Isis {
           yCubePortal->SetPosition(cubeSample, cubeLine, m_yAxisCubeBand);
           m_yAxisCube->read(*yCubePortal);
 
-          ASSERT(xCubePortal->size() == yCubePortal->size());
           for (int i = 0; i < xCubePortal->size(); i++) {
             double x = (*xCubePortal)[i];
             double y = (*yCubePortal)[i];

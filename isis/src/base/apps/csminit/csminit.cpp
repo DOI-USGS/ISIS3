@@ -45,7 +45,7 @@ namespace Isis {
     // managing the Cube in memory and adding history
     Process p;
     // Get the cube here so that we check early if it doesn't exist
-    Cube *cube = p.SetInputCube(ui.GetFileName("FROM"), ui.GetInputAttribute("FROM"), ReadWrite);
+    Cube *cube = p.SetInputCube(ui.GetCubeName("FROM"), ui.GetInputAttribute("FROM"), ReadWrite);
 
     // We have to call this to get the plugin list loaded.
     CameraFactory::initPlugin();

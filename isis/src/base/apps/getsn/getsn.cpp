@@ -22,7 +22,7 @@ namespace Isis {
 
   void getsn( UserInterface &ui, Pvl *log ) {
     // Open the input cube
-    Cube *cube = new Cube( ui.GetFileName("FROM"), "r");
+    Cube *cube = new Cube( ui.GetCubeName("FROM"), "r");
     
     getsn( cube, ui, log );
 
@@ -89,6 +89,11 @@ namespace Isis {
       }
     }
 
-    log->addGroup(sn);    
+    if (ui.IsInteractive()) {
+      log->addLogGroup(sn);
+    }
+    else {
+      log->addGroup(sn);
+    }
   }
 }

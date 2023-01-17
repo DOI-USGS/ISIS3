@@ -26,7 +26,7 @@
 #include "SerialNumberList.h"
 #include "TestUtilities.h"
 
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
 
 #include "gmock/gmock.h"
 

@@ -49,8 +49,8 @@ void IsisMain() {
     bool bRemoveFurrows = ui.GetBoolean("FURROWS");
 
     // Get the cube info
-    inFile  = ui.GetFileName("FROM");
-    outFile = ui.GetFileName("TO");
+    inFile  = ui.GetCubeName("FROM");
+    outFile = ui.GetCubeName("TO");
     Pvl cubeLabel;
     if (bIngestion) {
       int sDotPos = outFile.indexOf('.');

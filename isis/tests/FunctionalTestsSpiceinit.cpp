@@ -17,7 +17,8 @@
 #include "TestUtilities.h"
 #include "FileName.h"
 
-#include "Fixtures.h"
+#include "CameraFixtures.h"
+#include "CubeFixtures.h"
 
 using json = nlohmann::json;
 
@@ -408,7 +409,7 @@ TEST(Spiceinit, TestSpiceinitNadir) {
 
   testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
 
-  QVector<QString> args = {"cknadir=True", "tspk=$base/kernels/spk/de405.bsp", "attach=false"};
+  QVector<QString> args = {"ckrecon=False", "cknadir=True", "tspk=$base/kernels/spk/de405.bsp", "attach=false"};
   UserInterface options(APP_XML, args);
 
   spiceinit(&testCube, options);

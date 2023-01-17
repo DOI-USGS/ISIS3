@@ -95,7 +95,7 @@ namespace Isis {
     Q_OBJECT
     public:
       Statistics(QObject *parent = 0);
-      Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0); 
+      Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
       Statistics(const PvlGroup &inStats, QObject *parent = 0);
       // TODO: does xml read/write stuff need Project input???
       Statistics(const Statistics &other);
@@ -150,7 +150,7 @@ namespace Isis {
 
       void save(QXmlStreamWriter &stream, const Project *project) const;
       // TODO: does xml stuff need project???
-    
+
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
@@ -169,16 +169,16 @@ namespace Isis {
           XmlHandler(Statistics *statistics, Project *project);
           // TODO: does xml stuff need project???
           ~XmlHandler();
-   
+
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName, const QXmlAttributes &atts);
           virtual bool characters(const QString &ch);
           virtual bool endElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName);
-   
+
         private:
           Q_DISABLE_COPY(XmlHandler);
-   
+
           Statistics *m_xmlHandlerStatistics;
           Project *m_xmlHandlerProject;
           // TODO: does xml stuff need project???

@@ -19,7 +19,7 @@ namespace Isis {
     if (inAtt.bands().size() != 0) {
       cubeFile->setVirtualBands(inAtt.bands());
     }
-    cubeFile->open(ui.GetFileName("FROM"), "r");
+    cubeFile->open(ui.GetCubeName("FROM"), "r");
 
     QString pairs;
 
@@ -46,6 +46,7 @@ namespace Isis {
     stretch(cubeFile, pairs, ui, log);
   }
 
+
   void stretch(Cube *inCube, QString &pairs, UserInterface &ui, Pvl *log) {
     ProcessByLine p;
     p.SetInputCube(inCube);
@@ -53,8 +54,9 @@ namespace Isis {
     if(ui.GetBoolean("USEPERCENTAGES")) {
       str.Parse(pairs, inCube->histogram());
     }
-    else
+    else {
       str.Parse(pairs);
+    }
 
     // Setup new mappings for special pixels if necessary
     if(ui.WasEntered("NULL"))
@@ -81,7 +83,7 @@ namespace Isis {
     results.addKeyword(dnPairs);
 
     if (log){
-      log->addGroup(results);
+      log->addLogGroup(results);
     }
   }
 

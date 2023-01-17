@@ -6,7 +6,7 @@
 #include <QStringList>
 #include <QFile>
 
-#include "Fixtures.h"
+#include "TempFixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"

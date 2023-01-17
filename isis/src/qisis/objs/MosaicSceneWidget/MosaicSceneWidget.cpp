@@ -1,5 +1,3 @@
-#include "IsisDebug.h"
-
 #include "MosaicSceneWidget.h"
 
 #include <sstream>
@@ -2019,7 +2017,6 @@ namespace Isis {
           ImageList *images = action->data().value<ImageList *>();
 
           foreach (Image *image, *images) {
-            ASSERT(cubeToMosaic(image));
             boundingBox = boundingBox.united(cubeToMosaic(image)->boundingRect());
           }
         }
@@ -2205,7 +2202,6 @@ namespace Isis {
         }
       }
       else if (localName == "images" && m_imagesToAdd->count()) {
-        ASSERT(m_imagesToAdd->count() == m_imageZValues.count());
         m_scene->addImages(*m_imagesToAdd);
 
         for (int i = 0; i < m_imageZValues.count(); i++) {

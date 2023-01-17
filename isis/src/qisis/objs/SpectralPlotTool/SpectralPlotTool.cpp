@@ -1,5 +1,3 @@
-#include "IsisDebug.h"
-
 #include "SpectralPlotTool.h"
 
 #include <iostream>
@@ -73,7 +71,6 @@ namespace Isis {
    */
   QComboBox *SpectralPlotTool::spectralDisplayCombo() const
   {
-    ASSERT(m_displayCombo);
     return m_displayCombo;
   }
 

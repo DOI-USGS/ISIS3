@@ -13,7 +13,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
-#include "Fixtures.h"
+#include "TempFixtures.h"
 
 using namespace Isis;
 
@@ -31,7 +31,7 @@ TEST_F(TempTestingFiles, FunctionalTestApollopanstitcherDefault) {
   catch (IException &e) {
     FAIL() << "Unable to stitcher apollo images: " << e.toString().toStdString().c_str() << std::endl;
   }
-  Cube outputCube(options.GetFileName("TO"));
+  Cube outputCube(options.GetCubeName("TO"));
 
   std::unique_ptr<Histogram> hist (outputCube.histogram());
 

@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "TableViewContent.h"
 
 #include <cmath>
@@ -84,7 +82,6 @@ namespace Isis {
     verticalScrollBar()->setSingleStep(1);
 
     m_rowHeight = QFontMetrics(font()).height() + ITEM_PADDING;
-    ASSERT(m_rowHeight > 0);
 
     connect(horizontalScrollBar(), SIGNAL(valueChanged(int)),
         this, SIGNAL(horizontalScrollBarValueChanged(int)));
@@ -165,7 +162,6 @@ namespace Isis {
     * @return AbstractTableModel The model of the table
     */
   AbstractTableModel *TableViewContent::getModel() {
-    ASSERT(m_model);
     return m_model;
   }
 
@@ -605,7 +601,6 @@ namespace Isis {
     else if (key == Qt::Key_Up || key == Qt::Key_Down ||
         key == Qt::Key_Left || key == Qt::Key_Right) {
       if (!hasActiveCell()) {
-        ASSERT(m_items);
         if (m_items && m_items->size()) {
           m_activeCell->first = (*m_items)[0];
           m_activeCell->second = 1;
@@ -613,12 +608,9 @@ namespace Isis {
       }
 
       if (hasActiveCell() && !m_editWidget) {
-        // should have m_items if we have an active cell
-        ASSERT(m_items->size());
 
         // Handle up arrow with shift pressed
         if (key == Qt::Key_Up && event->modifiers() == Qt::ShiftModifier) {
-          ASSERT(m_lastShiftArrowSelectedCell);
 
           AbstractTreeItem *prevCell = m_lastShiftArrowSelectedCell->first ?
               m_lastShiftArrowSelectedCell->first : m_activeCell->first;
@@ -653,7 +645,6 @@ namespace Isis {
                 }
                 else {
                   //int m_itemsLastIndex = m_items->size() - 1;
-                  //ASSERT(m_itemsPrevIndex == m_items->at(m_items->size() - 1));
                   //verticalScrollBar()->setValue(qMin(prevCell + 1, ));
                 }
               }
@@ -702,7 +693,6 @@ namespace Isis {
                 }
                 else {
                   //int m_itemsLastIndex = m_items->size() - 1;
-                  //ASSERT(m_itemsPrevIndex == m_items->at(m_items->size() - 1));
                   //verticalScrollBar()->setValue(qMin(prevCell + 1, ));
                 }
               }
@@ -738,8 +728,6 @@ namespace Isis {
       if (hasActiveCell() && !event->text().isEmpty()) {
         if (!m_items->contains(m_activeCell->first))
           scrollTo(m_activeCell->first);
-
-        ASSERT(m_items->contains(m_activeCell->first));
 
         if (m_items->contains(m_activeCell->first) &&
             cellIsEditable(m_items->indexOf(m_activeCell->first),
@@ -860,8 +848,6 @@ namespace Isis {
     * @param event The paint event
     */
   void TableViewContent::paintEvent(QPaintEvent *event) {
-    ASSERT(m_model);
-    ASSERT(m_columns);
     if (m_model && m_columns) {
       //       int startRow = verticalScrollBar()->value();
       int rowCount = (int) ceil(viewport()->height() / (double) m_rowHeight);
@@ -1048,7 +1034,6 @@ namespace Isis {
     * Clears the selected column
     */
   void TableViewContent::clearColumnSelection() {
-    ASSERT(m_lastShiftArrowSelectedCell);
     m_lastShiftArrowSelectedCell->first = NULL;
     rowsWithActiveColumnSelected->clear();
   }
@@ -1064,7 +1049,6 @@ namespace Isis {
       TableColumn *col = m_columns->getVisibleColumns()[m_activeCell->second];
 
       QString colTitle = col->getTitle();
-      ASSERT(colTitle.size());
 
       // Grab the active cell's data and copy it to the selected cells that are
       // in the same column as the active cell.
@@ -1072,7 +1056,6 @@ namespace Isis {
 
       QList< AbstractTreeItem * > selection = allCells ? m_model->getItems(
           0, m_model->getVisibleRowCount()) : *rowsWithActiveColumnSelected;
-      ASSERT(selection.size());
 
       bool needsDialog = true;
       bool done = false;
@@ -1274,8 +1257,6 @@ namespace Isis {
     * @return bool True if the cell is selectable and editable
     */
   bool TableViewContent::cellIsEditable(int rowNum, int colNum) const {
-    ASSERT(rowNum >= 0 && rowNum < m_items->size());
-    ASSERT(colNum >= 0 && colNum < m_columns->getVisibleColumns().size());
 
     bool editable = false;
 
@@ -1312,8 +1293,6 @@ namespace Isis {
     */
   void TableViewContent::paintRow(QPainter *painter, int rowNum,
       QPoint absolutePosition, QPoint relativePosition) {
-    ASSERT(m_items);
-    ASSERT(rowNum >= 0 && rowNum < m_items->size());
 
     QPoint point(-absolutePosition.x(), relativePosition.y());
 
@@ -1333,7 +1312,6 @@ namespace Isis {
 
       QPen gridPen(Qt::gray);
 
-      ASSERT(m_columns);
       TableColumnList visibleCols = m_columns->getVisibleColumns();
       for (int i = 0; i < visibleCols.size(); i++) {
         // draw text
@@ -1653,7 +1631,6 @@ namespace Isis {
     * Updates the item list
     */
   void TableViewContent::updateItemList() {
-    ASSERT(m_items);
 
     if (m_model) {
       int startRow = verticalScrollBar()->value();

@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "PointTableModel.h"
 
 #include <iostream>
@@ -115,7 +113,6 @@ namespace Isis {
       case AbstractPointItem::APrioriSPLatSigma:
       case AbstractPointItem::APrioriSPLonSigma:
       case AbstractPointItem::APrioriSPRadiusSigma: {
-          ASSERT(row->getPointerType() == AbstractTreeItem::Point);
           ControlPoint *point = (ControlPoint *) row->getPointer();
 
           // Check to see if any of the sigma values are null.
@@ -137,7 +134,6 @@ namespace Isis {
       case AbstractPointItem::APrioriSPLat:
       case AbstractPointItem::APrioriSPLon:
       case AbstractPointItem::APrioriSPRadius: {
-          ASSERT(row->getPointerType() == AbstractTreeItem::Point);
           ControlPoint *point = (ControlPoint *) row->getPointer();
 
           // Check to see if any of the surface point values are null.

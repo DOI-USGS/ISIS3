@@ -67,7 +67,7 @@ namespace Isis {
     }
 
     // Stitch together the individual frames
-    FileName outputFileName(ui.GetFileName("OUTPUTPREFIX"));
+    FileName outputFileName(ui.GetCubeName("OUTPUTPREFIX"));
     QString outputBaseName = outputFileName.expanded();
     QStringList frameKeys = frameMap.uniqueKeys();
     Progress stitchProgress;

@@ -21,6 +21,8 @@ find files of those names at the top level of this repository. **/
 #include "Kernel.h"
 #include "Pvl.h"
 
+class  KernelDbFixture_TestKernelsSmithOffset_Test;
+
 namespace Isis {
   class FileName;
   class iTime;
@@ -104,7 +106,7 @@ namespace Isis {
       KernelDb(const unsigned int allowedKernelTypes);
       KernelDb(const QString &dbName, const unsigned int allowedKernelTypes);
       KernelDb(std::istream &dbStream, const unsigned int allowedKernelTypes);
-
+      
       // destructor
       ~KernelDb();
 
@@ -130,6 +132,8 @@ namespace Isis {
       static bool matches(const Pvl &lab, PvlGroup &kernelDbGrp,
                           iTime timeToMatch, int cameraVersion);
     private:
+      friend class ::KernelDbFixture_TestKernelsSmithOffset_Test; 
+      
       void loadKernelDbFiles(PvlGroup &dataDir,
                              QString directory,
                              const Pvl &lab);

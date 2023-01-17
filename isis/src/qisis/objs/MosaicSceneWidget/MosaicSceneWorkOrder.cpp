@@ -1,4 +1,3 @@
-#include "IsisDebug.h"
 #include "MosaicSceneWorkOrder.h"
 
 #include <QProgressDialog>
@@ -66,8 +65,6 @@ namespace Isis {
    */
   void MosaicSceneWorkOrder::restoreZPositions(bool zValuesMightBeInUse) {
     QStringList zPositions = internalData().mid(1);
-
-    ASSERT(zPositions.count() == imageList()->count());
 
     MosaicSceneWidget *sceneWidget = scene();
 

@@ -36,11 +36,74 @@ release.
 ## [Unreleased]
 
 ### Changed
+- Updated Hayabusa2 mission name and updated translation files to make L2DShapeModelFileName, L2DPhaseFunctionFileName, L2CShapeModelFileName, and BandRegistration optional keywords.
+
+### Added
+- Added LatLonGrid Tool to Qview to view latitude and longitude lines if camera model information is present.
+
+### Deprecated
+
+### Fixed
+- Fixed some wrong parameter types [#4780](https://github.com/USGS-Astrogeology/ISIS3/issues/4780)
+- Added mapping group to track cube via processmosaic [#4810](https://github.com/USGS-Astrogeology/ISIS3/issues/4810)
+- Fixed bugs in downloadIsisData script [#5024](https://github.com/USGS-Astrogeology/ISIS3/issues/5024) 
+- Fixed shadow shifting image by 2 pixels to the upper left corner. [#5035](https://github.com/USGS-Astrogeology/ISIS3/issues/5035)
+- Fixed compiler warnings on ubuntu [#4911](https://github.com/USGS-Astrogeology/ISIS3/issues/4911)
+- Fixes embree shape models not being from .BDS extension files [5064](https://github.com/USGS-Astrogeology/ISIS3/issues/5064)
+- Fixed failing shapemodel parameters when bullet was the preferred ray tracing engine but could not be created. [#5062](https://github.com/USGS-Astrogeology/ISIS3/issues/5062)
+- Fixed version for Qt to prevent depreciations. [#5070](https://github.com/USGS-Astrogeology/ISIS3/issues/5070)
+
+## [7.1.0] - 2022-07-27
+
+### Changed
+- Updated the LRO photometry application Lronacpho, to use by default the current 2019 photometric model (LROC_Empirical). The model's coefficients are found in the PVL file that exists in the LRO data/mission/calibration directory. If the old parameter file is provided, the old algorithm(2014) will be used. This functionality is desired for calculation comparisons. Issue: [#4512](https://github.com/USGS-Astrogeology/ISIS3/issues/4512), PR: [#4519](https://github.com/USGS-Astrogeology/ISIS3/pull/4519)
+- Updated the LRO calibration application Lrowaccal to add a units label to the RadiometricType keyword of the Radiometry group in the output cube label if the RadiometricType parameter is Radiance. No functionality is changed if the RadiometricType parameter is IOF. Lrowaccal has also been refactored to be callable for testing purposes. Issue: [#4939](https://github.com/USGS-Astrogeology/ISIS3/issues/4939), PR: [#4940](https://github.com/USGS-Astrogeology/ISIS3/pull/4940)
+- Changed how logs are reported so they no longer only printing at the end of the applications execution. [#4914](https://github.com/USGS-Astrogeology/ISIS3/issues/4914)
+- Update marcical to include step 3 of the mission team's MARCI calibration process described [here](https://pds-imaging.jpl.nasa.gov/data/mro/mars_reconnaissance_orbiter/marci/mrom_1343/calib/marcical.txt). [#5004](https://github.com/USGS-Astrogeology/ISIS3/pull/5004)
+- Updated center / width values for TGO CaSSIS as requested [here](https://github.com/USGS-Astrogeology/ISIS3/issues/5006)
+
+### Added
+- Improved functionality of msi2isis and MsiCamera model to support new Eros dataset, including support for Gaskell's SUMSPICE files that adjust timing, pointing and spacecraft position ephemeris. [#4886](https://github.com/USGS-Astrogeology/ISIS3/issues/4886)
+- Added a new application, framestitch, for stitching even and odd push frame images back together prior to processing in other applications. [4924](https://github.com/USGS-Astrogeology/ISIS3/issues/4924)
+- Re-added and refactored the LRO photometry application lrowacphomap to be callable for testing purposes. Issue: [#4960](https://github.com/USGS-Astrogeology/ISIS3/issues/4960), PR: [#4961](https://github.com/USGS-Astrogeology/ISIS3/pull/4961)
+- Added check to determine if poles were a valid projection point in ImagePolygon when generating footprint for a map projected image. [#4390](https://github.com/USGS-Astrogeology/ISIS3/issues/4390)
+- Added changes to lronaccal to use time-dependent dark files for dark correction and use of specific dark files for images with exp code of zero. Also added GTests for lronaccal and refactored code to make callable. Added 3 truth cubes to testing directory.  PR[#4520](https://github.com/USGS-Astrogeology/ISIS3/pull/4520)
+- Added failure for images with missing original label in caminfo. [#4817](https://github.com/USGS-Astrogeology/ISIS3/pull/4817)
+
+### Deprecated
+
+### Fixed
+- Added check to determine if poles were a valid projection point in ImagePolygon when generating footprint for a map projected image. [#4390](https://github.com/USGS-Astrogeology/ISIS3/issues/4390)
+- Fixed the Mars Express HRSC SRC camera and serial number to use the StartTime instead of the StartClockCount  [#4803](https://github.com/USGS-Astrogeology/ISIS3/issues/4803)
+- Fixed algorithm for applying rolling shutter jitter. Matches implementation in USGSCSM.
+- Fixed isis2std incorrectly outputing signed 16 bit tiff files. [#4897](https://github.com/USGS-Astrogeology/ISIS3/issues/4897)
+- Fixed CNetCombinePt logging functionality such that only merged points are included in the log. [#4973](https://github.com/USGS-Astrogeology/ISIS3/issues/4973)
+- Removed SpkCenterId functions in Cassini camera models due to spkwriter writing positions of Cassini relative to Titan but labeling
+it in the kernel as the position relative to the Saturn Barycenter. [#4942](https://github.com/USGS-Astrogeology/ISIS3/issues/4942)
+- Corrected issue where footprintinit would fail with a segmentation error. [4943](https://github.com/USGS-Astrogeology/ISIS3/issues/4943)
+
+
+## [7.0.0] - 2022-02-11
+
+### Changed
 - Disabled SURF algorithm for findfeatures, latest version of opencv no longer provides SURF as part of the base library [#3885](https://github.com/USGS-Astrogeology/ISIS3/issues/3885)
 - Changed caminfo's parameter default values for MAXEMISSION and MAXINCIDENCE to be
 synchronized with footprintinit default values of the same parameters.
 This corrects inconsistencies of footprint generation failing in caminfo
 but passing in footprintinit. [#4651](https://github.com/USGS-Astrogeology/ISIS3/issues/4651).
+- Changed the internal logic of ObliqueDataResolution() to use LocalEmission angle rather than Emission angle.
+This will cause differences in output; new values will be more accurate because they use DEM rather than
+ellipsoid. The cost to compute the local emissoin will increase by approximately x1.5. [#3600](https://github.com/USGS-Astrogeology/ISIS3/issues/3600)
+- Changed website layout to better surface relevant documents.
+[#4839](https://github.com/USGS-Astrogeology/ISIS3/pull/4839)
+[#4847](https://github.com/USGS-Astrogeology/ISIS3/pull/4847)
+[#4851](https://github.com/USGS-Astrogeology/ISIS3/pull/4851)
+[#4852](https://github.com/USGS-Astrogeology/ISIS3/pull/4852)
+[#4856](https://github.com/USGS-Astrogeology/ISIS3/pull/4856)
+[#4865](https://github.com/USGS-Astrogeology/ISIS3/pull/4865)
+[#4859](https://github.com/USGS-Astrogeology/ISIS3/pull/4859)
+[#4872](https://github.com/USGS-Astrogeology/ISIS3/pull/4872)
+[#4871](https://github.com/USGS-Astrogeology/ISIS3/pull/4871)
 
 ### Added
 - Added the USECAMSTATSTBL option to caminfo. This allows caminfo to extract existing
@@ -56,6 +119,12 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 - Added import templates for isisimport, Cassini ISS, Cassini Vims, Kaguya TC Kaguya MI, Dawn FC, Dawn VIR, LROC NAC, LO HRC, MGS MOC, MER MI, MRO CTX, Rosetta Osiris, Viking VIS [#4606](https://github.com/USGS-Astrogeology/ISIS3/issues/4606)
 - Added export templates for isisexport, LROC NAC EDR [#4606](https://github.com/USGS-Astrogeology/ISIS3/issues/4606)
 - Added optional JSON data output parameter, DATA, for debugging template engine failures [#4606](https://github.com/USGS-Astrogeology/ISIS3/issues/4606)
+- Added new documentatin for contributing code.
+[#4859](https://github.com/USGS-Astrogeology/ISIS3/pull/4859)
+[#4871](https://github.com/USGS-Astrogeology/ISIS3/pull/4871)
+- Added versioning to website documentation.
+[#4852](https://github.com/USGS-Astrogeology/ISIS3/pull/4852)
+[#4872](https://github.com/USGS-Astrogeology/ISIS3/pull/4872)
 
 ### Deprecated
 - Deprecated edrget as discussed in [#3313](https://github.com/USGS-Astrogeology/ISIS3/issues/3313).
@@ -64,6 +133,12 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 - Fixed Maptrim failures when mode=both for PositiveWest longitude direction. [#4646](https://github.com/USGS-Astrogeology/ISIS3/issues/4646)
 - Fixed the Vesta target name not being translated properly in dawnfc2isis. [#4638](https://github.com/USGS-Astrogeology/ISIS3/issues/4638)
 - Fixed a bug where the measure residuals reported in the bundleout.txt file were incorrect. [#4655](https://github.com/USGS-Astrogeology/ISIS3/issues/4655)
+- Fixed a bug where jigsaw would raise an error when solving for framing camera pointing in observation mode. [#4686](https://github.com/USGS-Astrogeology/ISIS3/issues/4686)
+- Fixed slow runs of automos when the priority was BAND. [#4793](https://github.com/USGS-Astrogeology/ISIS3/pull/4793)
+- Fixed qview crashing when attempting to load image DNs. [4818](https://github.com/USGS-Astrogeology/ISIS3/issues/4818)
+- Fixed qnet crashing when entering an invalid image name in the measure selection box. [#4581](https://github.com/USGS-Astrogeology/ISIS3/issues/4581)
+- Modified cnetcheck noLatLonCheck logic to correctly exclude ignored measures. [#4649](https://github.com/USGS-Astrogeology/ISIS3/issues/4649)
+- Fixed bug where the original label was not attached to stereo HRSC images on import [#4816](https://github.com/USGS-Astrogeology/ISIS3/issues/4816)
 
 ## [6.0.0] - 2021-08-27
 
@@ -118,7 +193,6 @@ Keywords when running CAMSTATS.  [#3605](https://github.com/USGS-Astrogeology/IS
 - Fixed issue where serial numbers for Kaguya TC and MI image could not be generated. [4235](https://github.com/USGS-Astrogeology/ISIS3/issues/4235)
 - Fixed hardcoded file naming in the hijitter app dealing with output from pipeline. [#4372](https://github.com/USGS-Astrogeology/ISIS3/pull/4372)
 - Fixed "About Qview" to point to website documentation. [4333](https://github.com/USGS-Astrogeology/ISIS3/issues/4333)
-- Fixed bug where the time bias was not being added to the ephemeris times in ckwriter. [4129](https://github.com/USGS-Astrogeology/ISIS3/issues/4129)
 
 ### Changed
 
@@ -349,7 +423,8 @@ The unreleased comparison should always be
 {REPO_NAME}/compare/{LAST_VERSION_TAG}...HEAD
 -->
 
-[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/6.0.0...HEAD
+[unreleased]: https://github.com/USGS-Astrogeology/ISIS3/compare/7.0.0...HEAD
+[7.0.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/6.0.0...7.0.0
 [6.0.0]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.2...6.0.0
 [5.0.2]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.1...5.0.2
 [5.0.1]: https://github.com/USGS-Astrogeology/ISIS3/compare/5.0.0...5.0.1

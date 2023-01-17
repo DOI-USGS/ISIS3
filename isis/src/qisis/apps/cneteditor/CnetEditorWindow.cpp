@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "CnetEditorWindow.h"
 
 #include <QAction>
@@ -54,7 +52,6 @@ namespace Isis {
     setAcceptMode(AcceptSave);
     setNameFilter("Control Network files (*.net *.bin);;All files (*)");
     QGridLayout *mainLayout = qobject_cast< QGridLayout * >(layout());
-    ASSERT(mainLayout);
 
     if (mainLayout)
       mainLayout->addLayout(l, mainLayout->rowCount(), 0, 1, -1);
@@ -538,8 +535,6 @@ namespace Isis {
 
     try {
 
-    ASSERT(displayProperties);
-
     connect(displayProperties, SIGNAL(composeProgressRangeChanged(int, int)),
             cubeListProgressBar, SLOT(setRange(int, int)));
     connect(displayProperties, SIGNAL(composeProgressChanged(int)),
@@ -563,7 +558,6 @@ namespace Isis {
 
 
   void CnetEditorWindow::save() {
-    ASSERT(!curFile->isEmpty());
 
     if (saveFilteredNetwork) {
       QString newCubeListFileName;
@@ -590,7 +584,6 @@ namespace Isis {
             throw IException(IException::Programmer, msg, _FILEINFO_);
           }
 
-          ASSERT(displayProperties);
           QStringList cubeFileNames =
             displayProperties->getCubeList(filteredCnet);
 
@@ -736,13 +729,11 @@ namespace Isis {
 
 
   void CnetEditorWindow::networkLoaded(QList<Control *> nets) {
-    ASSERT(nets.count() == 1);
     networkLoaded(nets.first()->controlNet(), nets.first()->fileName());
   }
 
 
   void CnetEditorWindow::cubeListLoaded() {
-    ASSERT(cubeListProgressBar);
     cubeListProgressBar->setVisible(false);
   }
 
@@ -772,7 +763,6 @@ namespace Isis {
         if (actListIndex == -1) {
           QMenuBar *mb = qobject_cast< QMenuBar * >(widget);
           QMenu *m = qobject_cast< QMenu * >(widget);
-          ASSERT((mb != NULL) ^(m != NULL));
 
           if (mb) {
             mb->addMenu(menuName);
@@ -844,8 +834,6 @@ namespace Isis {
 
 
   int CnetEditorWindow::indexOfToolBar(QString objName) {
-
-    ASSERT(toolBars);
 
     int index = -1;
 

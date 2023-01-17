@@ -307,6 +307,12 @@ namespace Isis {
           bandBin.addKeyword(trackBand);
           trackingLabel->findObject("IsisCube").addGroup(bandBin);
 
+          // Write the mapping group to the tracking cube label
+          if (inLab->findObject("IsisCube").hasGroup("Mapping")) {
+            PvlGroup & mappingGroup = inLab->findGroup("Mapping", Pvl::Traverse);
+            trackingLabel->findObject("IsisCube").addGroup(mappingGroup);
+          }
+
           // Initialize an empty TrackingTable object to manage tracking table in tracking cube
           trackingTable = new TrackingTable();
         }
@@ -693,8 +699,9 @@ namespace Isis {
     return SetOutputCube(psParameter, Application::GetUserInterface());
   }
 
+
   Cube *ProcessMosaic::SetOutputCube(const QString &psParameter, UserInterface &ui) {
-    QString fname = ui.GetFileName(psParameter);
+    QString fname = ui.GetCubeName(psParameter);
 
     // Make sure there is only one output cube
     if (OutputCubes.size() > 0) {

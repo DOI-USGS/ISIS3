@@ -1,6 +1,6 @@
 #include "pointreg.h"
 
-#include "Fixtures.h"
+#include "NetworkFixtures.h"
 #include "TestUtilities.h"
 #include "UserInterface.h"
 #include "ControlNet.h"
@@ -36,7 +36,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregDefault) {
   PvlGroup measures = log.findGroup("Measures");
   EXPECT_EQ(int(points["Total"]), 16);
   EXPECT_EQ(int(measures["Registered"]), 3);
-  
+
   // Check flatFile
   QFile flatFile(flatFilePath);
   EXPECT_TRUE(flatFile.size() > 0) ;
@@ -75,7 +75,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregFailOptions) {
   PvlGroup measures = log.findGroup("Measures");
   EXPECT_EQ(int(points["Total"]), 3);
   EXPECT_EQ(int(measures["Registered"]), 3);
-  
+
   // Check flatFile
   QFile flatFile(flatFilePath);
   EXPECT_TRUE(flatFile.size() > 0) ;
@@ -115,7 +115,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregOutputOptionsA) {
   EXPECT_EQ(int(points["Total"]), 16);
   EXPECT_EQ(int(measures["Registered"]), 0);
   EXPECT_EQ(int(surface["SurfaceModelNotEnoughValidData"]), 0);
-  
+
   // Check flatFile
   QFile flatFile(flatFilePath);
   EXPECT_TRUE(flatFile.size() > 0) ;
@@ -155,7 +155,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregOutputOptionsB) {
   EXPECT_EQ(int(points["Total"]), 16);
   EXPECT_EQ(int(measures["Registered"]), 3);
   EXPECT_EQ(int(surface["SurfaceModelNotEnoughValidData"]), 15);
-  
+
   // Check flatFile
   QFile flatFile(flatFilePath);
   EXPECT_TRUE(flatFile.size() > 0) ;
@@ -195,7 +195,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregOutputOptionsC) {
   EXPECT_EQ(int(points["Total"]), 3);
   EXPECT_EQ(int(measures["Registered"]), 3);
   EXPECT_EQ(int(surface["SurfaceModelNotEnoughValidData"]), 15);
-  
+
   // Check flatFile
   QFile flatFile(flatFilePath);
   EXPECT_TRUE(flatFile.size() > 0) ;
@@ -299,7 +299,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregValidation) {
   EXPECT_EQ(int(points["Total"]), 16);
   EXPECT_EQ(int(measures["Registered"]), 3);
   EXPECT_EQ(int(valid["Total"]), 3);
-  
+
   QFile falsePos(falsePosPath);  // Should be empty
 
   EXPECT_TRUE(falsePos.size() > 140);  // 140 is the size of the empty table due to column names
@@ -339,8 +339,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregValidationRevert) {
   EXPECT_EQ(int(points["Total"]), 16);
   EXPECT_EQ(int(measures["Registered"]), 0);
   EXPECT_EQ(int(valid["Total"]), 0);
-  
-  QFile falsePos(falsePosPath);  // Should be empty 
+
+  QFile falsePos(falsePosPath);  // Should be empty
 
   EXPECT_TRUE(falsePos.size() == 140);  // 140 is the size of the empty table due to column names
 }
@@ -380,8 +380,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestPointregValidationSkipped) {
   EXPECT_EQ(int(points["Total"]), 16);
   EXPECT_EQ(int(measures["Registered"]), 0);
   EXPECT_EQ(int(valid["Total"]), 0);
-  
-  QFile falsePos(falsePosPath);  // Should be empty 
+
+  QFile falsePos(falsePosPath);  // Should be empty
 
   EXPECT_TRUE(falsePos.size() == 140);  // 140 is the size of the empty table due to column names
 }

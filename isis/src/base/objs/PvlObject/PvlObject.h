@@ -188,6 +188,8 @@ namespace Isis {
         //m_groups[m_groups.size()-1].SetFileName(FileName());
       };
 
+      void addLogGroup(Isis::PvlGroup &group);
+
       using PvlContainer::operator+=;
       void operator+= (const Isis::PvlGroup &group) {
         addGroup(group);

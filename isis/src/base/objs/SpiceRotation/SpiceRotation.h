@@ -200,7 +200,6 @@ namespace Isis {
    *                           The current example is the comet 67P/CHURYUMOV-GERASIMENKO
    *                           imaged by Rosetta. Some future comet/astroid missions are expected
    *                           to use a CK defined body fixed reference frame. Fixes #5408.
-   * @history 2021-03-23 Kaitlyn Lee - Added getter function for time bias. Fixes #4129.
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    *  @todo Consider making this a base class with child classes based on frame type or
@@ -224,7 +223,6 @@ namespace Isis {
       int Frame();
 
       void SetTimeBias(double timeBias);
-      double TimeBias() const;
 
       /**
        * The rotation can come from one of 3 places for an Isis cube.  The class

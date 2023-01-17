@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "CubePlotCurve.h"
 
 #include <iostream>
@@ -117,7 +115,6 @@ namespace Isis {
         m_pointList.append(points);
       }
 
-      ASSERT(dataPos == classData.size());
     }
     else {
       IString msg = "The given byte array is not large enough to contain the "

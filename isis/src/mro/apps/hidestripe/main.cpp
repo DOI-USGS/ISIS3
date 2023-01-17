@@ -55,7 +55,7 @@ const int num_phases = 4;
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
-  Isis::FileName fromFile = ui.GetFileName("FROM");
+  Isis::FileName fromFile = ui.GetCubeName("FROM");
 
   Isis::Cube inputCube;
   inputCube.open(fromFile.expanded());

@@ -52,6 +52,9 @@
       "name": "Barrett, Janet"
     },
     {
+      "name": "Bauck, Kirsten"
+    },
+    {
       "name": "Bauers, Joni"
     },
     {
@@ -80,6 +83,11 @@
     },
     {
       "name": "Brownsberger, Sasha"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Cain, Jacob",
+      "orcid": "0000-0002-7734-2485"
     },
     {
       "name": "Chaves, Pat"
@@ -201,6 +209,9 @@
     {
       "name": "Heyer, Eric"
     },
+	{
+	  "name": "Hibl, Anton"
+	},
     {
       "name": "Hilt, Noah"
     },
@@ -305,6 +316,10 @@
       "name": "Mehlman, Bob"
     },
     {
+      "affiliation": "Arizona State University",
+      "name": "Michaud, Cordell"
+    },
+    {
       "name": "Milazzo, Moses"
     },
     {
@@ -314,8 +329,8 @@
       "name": "Miller-Ribelin, Elizabeth"
     },
     {
-        "affiliation": "United States Geological Survey, Astro Geology Science Center",
-        "name": "Nelson, Gavin"
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Nelson, Gavin"
     },
     {
       "name": "Neubauer, Cole"

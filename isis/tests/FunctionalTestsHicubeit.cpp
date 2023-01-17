@@ -1,7 +1,6 @@
 #include <QTemporaryDir>
 
 #include "hicubeit.h"
-#include "Fixtures.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -28,7 +27,7 @@ TEST(Hicubeit, Default) {
   }
   catch (IException &e) {
     FAIL() << e.toString().toStdString().c_str() << std::endl;
-  } 
+  }
 
   Cube outCube(outFileName);
   Pvl *outLabel = outCube.label();

@@ -9,12 +9,13 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
+#include "Preference.h"
 
 #include "gmock/gmock.h"
 
 using namespace Isis;
 
-class TestKernelDb : public ::testing::Test {
+class KernelDbFixture : public ::testing::Test {
   protected:
   Pvl cubeLabel;
   Pvl dbPvl;
@@ -209,7 +210,7 @@ class TestKernelDb : public ::testing::Test {
   }
 };
 
-TEST_F(TestKernelDb, TestKernelsFromDb) {
+TEST_F(KernelDbFixture, TestKernelsFromDb) {
   std::stringstream dbStr;
   dbStr << dbPvl;
   KernelDb db(dbStr, Kernel::Predicted|Kernel::Nadir|Kernel::Reconstructed|Kernel::Smithed);
@@ -263,7 +264,7 @@ TEST_F(TestKernelDb, TestKernelsFromDb) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, dems[1], "$base/demTest2");
 }
 
-TEST_F(TestKernelDb, TwoCks) {
+TEST_F(KernelDbFixture, TwoCks) {
   PvlGroup &instGroup = cubeLabel.findObject("IsisCube").findGroup("Instrument");
   instGroup.findKeyword("StopTime") = "2005 JUN 15 12:14:00.000 TDB";
   std::stringstream dbStr;
@@ -280,7 +281,7 @@ TEST_F(TestKernelDb, TwoCks) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks[1], "$base/ckTest2.2");
 }
 
-TEST_F(TestKernelDb, SystemKernels) {
+TEST_F(KernelDbFixture, SystemKernels) {
   PvlGroup &instGroup = cubeLabel.findObject("IsisCube").findGroup("Instrument");
   instGroup.findKeyword("StartTime") = "2008 JAN 12 00:00:00.0";
   instGroup.findKeyword("StopTime") = "2008 JAN 12 00:00:00.0";
@@ -309,7 +310,7 @@ TEST_F(TestKernelDb, SystemKernels) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, spks[0], "$mro/kernels/spk/mro_psp6_ssd_mro110c.bsp");
 }
 
-TEST_F(TestKernelDb, SystemCKConfig) {
+TEST_F(KernelDbFixture, SystemCKConfig) {
   PvlGroup &instGroup = cubeLabel.findObject("IsisCube").findGroup("Instrument");
   instGroup.findKeyword("StartTime") = "2008 JAN 12 00:00:00.0";
   instGroup.findKeyword("StopTime") = "2008 JAN 12 00:00:00.0";
@@ -333,4 +334,31 @@ TEST_F(TestKernelDb, SystemCKConfig) {
   QStringList cks2 = cKernels2.kernels();
   ASSERT_EQ(cks2.size(), 1);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cks2[0], "$mro/kernels/ck/mro_crm_psp_080101_080131.bc");
+}
+
+
+
+TEST_F(KernelDbFixture, TestKernelsSmithOffset) {
+  PvlGroup &instGroup = cubeLabel.findObject("IsisCube").findGroup("Instrument");
+  instGroup.findKeyword("StartTime") = "2002-02-20T22:57:57.253";
+  instGroup.findKeyword("StopTime") = "2002-02-20T23:00:56.983";
+  instGroup.findKeyword("SpacecraftName") = "MARS_ODYSSEY";
+  instGroup.findKeyword("InstrumentId") = "THEMIS_IR";
+  KernelDb db(Kernel::Smithed);
+
+  PvlGroup &dataDir = Preference::Preferences(true).findGroup("DataDirectory");
+
+  QString testDir = "data/kernelDB";
+
+  db.loadKernelDbFiles(dataDir, testDir + "/ck", cubeLabel);
+  db.loadKernelDbFiles(dataDir, testDir + "/spk", cubeLabel);
+  db.readKernelDbFiles();
+
+  QStringList spk = db.spacecraftPosition(cubeLabel).kernels();
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, spk[0], "data/kerneldbgen/thmIR.bsp");
+
+  QList<std::priority_queue<Kernel>> ck = db.spacecraftPointing(cubeLabel);
+  Kernel cKernels(ck[0].top());
+  QStringList cklist = cKernels.kernels();
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, cklist[0], "data/kerneldbgen/thmIR.bc");
 }

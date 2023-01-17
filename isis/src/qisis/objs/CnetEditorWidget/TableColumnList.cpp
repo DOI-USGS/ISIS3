@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "TableColumnList.h"
 
 #include <iostream>
@@ -164,7 +162,6 @@ namespace Isis {
 
 
   int TableColumnList::size() const {
-    ASSERT(m_cols);
     return m_cols->size();
   }
 
@@ -239,7 +236,6 @@ namespace Isis {
 
 
   QList< TableColumn * > TableColumnList::getSortingOrder() {
-    ASSERT(m_sortingOrder);
 
     QList< TableColumn * > validSortingOrder;
     for (int i = 0; i < m_sortingOrder->size(); i++)
@@ -268,7 +264,6 @@ namespace Isis {
 
 
   void TableColumnList::checkIndexRange(int index) {
-    ASSERT(m_cols);
 
     if (index < 0 || index >= m_cols->size()) {
       QString msg = "index [";

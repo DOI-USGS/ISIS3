@@ -38,11 +38,11 @@ namespace Isis {
     if (inAtt.bands().size() != 0) {
       icube.setVirtualBands(inAtt.bands());
     }
-    icube.open(ui.GetFileName("FROM"));
+    icube.open(ui.GetCubeName("FROM"));
 
     Cube mcube;
     if((ui.WasEntered("MATCH"))) {
-      mcube.open(ui.GetFileName("MATCH"));
+      mcube.open(ui.GetCubeName("MATCH"));
     }
 
     noproj(&icube, &mcube, ui);
@@ -184,11 +184,13 @@ namespace Isis {
 
     // Can we do a regular label? Didn't work on 12-15-2006
     cao.setLabelAttachment(Isis::DetachedLabel);
+    FileName matchCubeFile = FileName::createTempFile("$Temporary/match.cub");
+    QString matchCubeFileNoExt = matchCubeFile.path() + "/" + matchCubeFile.baseName();
 
     // Determine the output image size from
     //   1) the idealInstrument pvl if there or
     //   2) the input size expanded by user specified percentage
-    Cube *ocube = p.SetOutputCube("match.cub", cao, 1, 1, 1);
+    Cube *ocube = p.SetOutputCube(matchCubeFile.expanded(), cao, 1, 1, 1);
     // Extract the times and the target from the instrument group
     QString startTime = inst["StartTime"];
     QString stopTime;
@@ -350,36 +352,36 @@ namespace Isis {
   // Now adjust the label to fake the true size of the image to match without
   // taking all the space it would require for the image data
     Pvl label;
-    label.read("match.lbl");
+    label.read(matchCubeFileNoExt + ".lbl");
     PvlGroup &dims = label.findGroup("Dimensions", Pvl::Traverse);
     dims["Lines"] = toString(numberLines);
     dims["Samples"] = toString(detectorSamples);
     dims["Bands"] = toString(numberBands);
-    label.write("match.lbl");
+    label.write(matchCubeFileNoExt + ".lbl");
 
   // And run cam2cam to apply the transformation
-    QVector<QString> args = {"to=" + ui.GetFileName("TO"), "INTERP=" + ui.GetString("INTERP")};
+    QVector<QString> args = {"to=" + ui.GetCubeName("TO"), "INTERP=" + ui.GetString("INTERP")};
     UserInterface cam2camUI(FileName("$ISISROOT/bin/xml/cam2cam.xml").expanded(), args);
     Cube matchCube;
-    matchCube.open("match.cub", "rw");
+    matchCube.open(matchCubeFile.expanded(), "rw");
     cam2cam(icube, &matchCube, cam2camUI);
 
   //  Cleanup by deleting the match files
-    remove("match.History.IsisCube");
-    remove("match.lbl");
-    remove("match.cub");
-    remove("match.OriginalLabel.IsisCube");
-    remove("match.Table.BodyRotation");
-    remove("match.Table.HiRISE Ancillary");
-    remove("match.Table.HiRISE Calibration Ancillary");
-    remove("match.Table.HiRISE Calibration Image");
-    remove("match.Table.InstrumentPointing");
-    remove("match.Table.InstrumentPosition");
-    remove("match.Table.SunPosition");
+    remove((matchCubeFileNoExt + ".History.IsisCube").toStdString().c_str());
+    remove((matchCubeFileNoExt + ".lbl").toStdString().c_str());
+    remove(matchCubeFile.expanded().toStdString().c_str());
+    remove((matchCubeFileNoExt + ".OriginalLabel.IsisCube").toStdString().c_str());
+    remove((matchCubeFileNoExt + ".Table.BodyRotation").toStdString().c_str());
+    remove((matchCubeFileNoExt + ".Table.HiRISE Ancillary").toStdString().c_str());
+    remove((matchCubeFileNoExt + ".Table.HiRISE Calibration Ancillary").toStdString().c_str());
+    remove((matchCubeFileNoExt + ".Table.HiRISE Calibration Image").toStdString().c_str());
+    remove((matchCubeFileNoExt + ".Table.InstrumentPointing").toStdString().c_str());
+    remove((matchCubeFileNoExt + ".Table.InstrumentPosition").toStdString().c_str());
+    remove((matchCubeFileNoExt + ".Table.SunPosition").toStdString().c_str());
 
   // Finally finish by adding the OriginalInstrument group to the TO cube
     Cube toCube;
-    toCube.open(ui.GetFileName("TO"), "rw");
+    toCube.open(ui.GetCubeName("TO"), "rw");
   // Extract label and create cube object
     Pvl *toLabel = toCube.label();
     PvlObject &o = toLabel->findObject("IsisCube");

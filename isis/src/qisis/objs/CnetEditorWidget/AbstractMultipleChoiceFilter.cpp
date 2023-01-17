@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include "AbstractMultipleChoiceFilter.h"
 
 #include <iostream>
@@ -82,13 +80,11 @@ namespace Isis {
 
 
   QString const &AbstractMultipleChoiceFilter::getCurrentChoice() const {
-    ASSERT(m_curChoice);
     return *m_curChoice;
   }
 
 
   void AbstractMultipleChoiceFilter::updateCurChoice(QString newChoice) {
-    ASSERT(m_curChoice);
 
     *m_curChoice = newChoice;
 

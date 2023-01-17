@@ -29,7 +29,7 @@ namespace Isis {
 
   void isisexport(UserInterface &ui, Pvl *log) {
     Cube *icube = new Cube();
-    icube->open(ui.GetFileName("FROM"));
+    icube->open(ui.GetCubeName("FROM"));
     CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
     if (inAtt.bands().size() != 0) {
       icube->setVirtualBands(inAtt.bands());
@@ -127,7 +127,7 @@ namespace Isis {
                               + "Previous value [" + QString::fromStdString(dataSource["ExtraPvl"][element.key()].dump())
                               + "] will be overwritten.";
               duplicateWarnings += PvlKeyword("Duplicate", message);
-              log->addGroup(duplicateWarnings);
+              log->addLogGroup(duplicateWarnings);
             }
           }
         }
@@ -150,7 +150,7 @@ namespace Isis {
                               + "Previous value [" + QString::fromStdString(dataSource["ExtraXml"][element.key()].dump())
                               + "] will be overwritten.";
               duplicateWarnings += PvlKeyword("Duplicate", message);
-              log->addGroup(duplicateWarnings);
+              log->addLogGroup(duplicateWarnings);
             }
           }
         }
@@ -174,7 +174,7 @@ namespace Isis {
                               + "Previous value [" + QString::fromStdString(dataSource["ExtraJson"][element.key()].dump())
                               + "] will be overwritten.";
               duplicateWarnings += PvlKeyword("Duplicate", message);
-              log->addGroup(duplicateWarnings);
+              log->addLogGroup(duplicateWarnings);
             }
           }
         }

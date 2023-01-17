@@ -1,4 +1,3 @@
-#include "IsisDebug.h"
 #include "FeatureNomenclatureTool.h"
 
 #include <QAction>

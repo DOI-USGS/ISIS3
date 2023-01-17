@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include <iostream>
 #include <limits>
 
@@ -165,7 +163,7 @@ namespace Isis {
         createEffectivenessCheckBox("&Measures"), 2);
 
     QString firstGroupEntry;
-    ASSERT(m_effectivenessGroup->buttons().size());
+
     if (m_effectivenessGroup->buttons().size()) {
       firstGroupEntry = m_effectivenessGroup->buttons()[0]->text();
       firstGroupEntry.remove(0, 1);
@@ -256,14 +254,12 @@ namespace Isis {
 
 
   QBoxLayout *AbstractFilter::getMainLayout() const {
-    ASSERT(m_mainLayout);
 
     return m_mainLayout;
   }
 
 
   QBoxLayout *AbstractFilter::getInclusiveExclusiveLayout() const {
-    ASSERT(m_inclusiveExclusiveLayout);
 
     return m_inclusiveExclusiveLayout;
   }
@@ -274,11 +270,10 @@ namespace Isis {
     int passedCount = 0;
 
     foreach (ControlMeasure * measure, measures) {
-      ASSERT(measure);
 
       if (usePoints) {
         ControlPoint *point = measure->Parent();
-        ASSERT(point);
+
         if (point && evaluate(point))
           passedCount++;
       }
@@ -320,7 +315,6 @@ namespace Isis {
 
   bool AbstractFilter::evaluatePointFromMeasureFilter(
     const ControlPoint *point) const {
-    ASSERT(point);
 
     bool evaluation = true;
 
@@ -333,7 +327,6 @@ namespace Isis {
 
   bool AbstractFilter::evaluate(const ControlPoint *point,
       bool (ControlPoint::*meth)() const) const {
-    ASSERT(point);
 
     return !((point->*meth)() ^ inclusive());
   }
@@ -341,14 +334,12 @@ namespace Isis {
 
   bool AbstractFilter::evaluate(const ControlMeasure *measure,
       bool (ControlMeasure::*meth)() const) const {
-    ASSERT(measure);
 
     return !((measure->*meth)() ^ inclusive());
   }
 
 
   void AbstractFilter::updateEffectiveness() {
-    ASSERT(m_effectivenessGroup);
 
     if (m_effectivenessGroup) {
       FilterEffectivenessFlag newFlags;

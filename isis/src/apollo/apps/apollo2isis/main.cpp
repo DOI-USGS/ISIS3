@@ -56,7 +56,7 @@ void IsisMain() {
   p.SetPdsFile(inFile.expanded(), "", pdsLabel);
 
   QString filename = FileName(ui.GetFileName("FROM")).baseName();
-  FileName toFile = ui.GetFileName("TO");
+  FileName toFile = ui.GetCubeName("TO");
 
   apollo = new Apollo(filename);
 

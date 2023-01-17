@@ -42,7 +42,7 @@ void IsisMain() {
   // Setup the input and make sure it is a mariner10 file
   UserInterface & ui = Application::GetUserInterface();
 
-  Isis::Pvl lab(ui.GetFileName("FROM"));
+  Isis::Pvl lab(ui.GetCubeName("FROM"));
   Isis::PvlGroup & inst = lab.findGroup("Instrument", Pvl::Traverse);
 
   QString mission = inst["SpacecraftName"];
@@ -119,7 +119,7 @@ void IsisMain() {
   }
 
   if (ui.WasEntered ("COEFCUBE")) {
-    coCube.open(ui.GetFileName("COEFCUBE"));
+    coCube.open(ui.GetCubeName("COEFCUBE"));
   }
   else {
     FileName coFile("$mariner10/calibration/mariner_10_" + filter + "_" +

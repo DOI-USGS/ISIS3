@@ -6,8 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
-
 #include <cmath>
 #include <iostream>
 
@@ -205,13 +203,11 @@ namespace Isis {
 
 
   AbstractTreeModel *AbstractTableModel::getDataModel() {
-    ASSERT(m_dataModel);
     return m_dataModel;
   }
 
 
   const AbstractTreeModel *AbstractTableModel::getDataModel() const {
-    ASSERT(m_dataModel);
     return m_dataModel;
   }
 
@@ -356,7 +352,6 @@ namespace Isis {
 
   QList< AbstractTreeItem * > AbstractTableModel::doSort(
     QList< AbstractTreeItem * > itemsToSort) {
-    ASSERT(!isSorting());
     if (!isSorting()) {
       setSorting(true);
 
@@ -422,8 +417,6 @@ namespace Isis {
 
 
   void AbstractTableModel::rebuildSort() {
-    ASSERT(m_dataModel);
-    ASSERT(m_sortedItems);
     m_sortedItems->clear();
     cancelSort();
 

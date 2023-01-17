@@ -18,7 +18,8 @@
 using namespace std;
 
 namespace Isis {
-  // Function to create a keyword with same values of a specified count
+
+// Function to create a keyword with same values of a specified count
   template <typename T> PvlKeyword makeKey(const QString &name,
                                            const int &nvals,
                                            const T &value);
@@ -30,21 +31,20 @@ namespace Isis {
     double m_albedo;
   };
 
+
   // Computes the special MORPHOLOGYRANK and ALBEDORANK planes
   static MosData *getMosaicIndicies(Camera &camera, MosData &md);
   // Updates BandBin keyword
   static void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
                      const QString &default_value = "Null");
 
+
   void phocube(UserInterface &ui) {
     Cube icube;
-    CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
-    if (inAtt.bands().size() != 0) {
-      icube.setVirtualBands(inAtt.bands());
-    }
-    icube.open(ui.GetFileName("FROM"));
+    icube.open(ui.GetCubeName("FROM"));
     phocube(&icube, ui);
   }
+
 
   void phocube(Cube *icube, UserInterface &ui)  {
 
@@ -74,7 +74,7 @@ namespace Isis {
         cam = icube->camera();
       }
       catch(IException &e) {
-        QString msg = "If " + FileName(ui.GetFileName("FROM")).name() + " is a mosaic, make sure the SOURCE "
+        QString msg = "If " + FileName(ui.GetCubeName("FROM")).name() + " is a mosaic, make sure the SOURCE "
         "option is set to PROJECTION";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
@@ -627,7 +627,7 @@ namespace Isis {
       p.SetInputCube(icube, OneBand);
     }
 
-    Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), ui.GetOutputAttribute("TO"),
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO"),
                                   icube->sampleCount(), icube->lineCount(), nbands);
     p.SetBrickSize(64, 64, nbands);
     p.StartProcess(phocube);

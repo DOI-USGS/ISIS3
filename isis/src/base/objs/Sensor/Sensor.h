@@ -188,7 +188,7 @@ namespace Isis {
       Latitude GetLatitude() const;
       virtual double UniversalLongitude() const;
       Longitude GetLongitude() const;
-      SurfacePoint GetSurfacePoint() const;
+      virtual SurfacePoint GetSurfacePoint() const;
 
       Distance LocalRadius() const;
       Distance LocalRadius(Latitude lat, Longitude lon);
@@ -199,8 +199,8 @@ namespace Isis {
       virtual double IncidenceAngle() const;
 
       void LookDirection(double v[3]) const;
-      std::vector<double> lookDirectionJ2000() const;
-      std::vector<double> lookDirectionBodyFixed() const;
+      virtual std::vector<double> lookDirectionJ2000() const;
+      virtual std::vector<double> lookDirectionBodyFixed() const;
 
       virtual double RightAscension();
       virtual double Declination();
@@ -211,11 +211,6 @@ namespace Isis {
       double LocalSolarTime();
       virtual double SolarDistance() const;
       double SpacecraftAltitude();
-
-      // Return local radius from dem
-//      Distance DemRadius(const SurfacePoint &pt);
-//      Distance DemRadius(const Latitude &lat, const Longitude
-//      &lon); bool HasElevationModel() {
 
       /**
        * Virtual method that returns the pixel resolution of the sensor in
@@ -240,9 +235,6 @@ namespace Isis {
       bool m_newLookB;      //!< flag to indicate we need to recompute ra/dec
 
     private:
-      // This version of DemRadius is for SetLookDirection ONLY. Do not call.
-      // DAC TODO Why is next declaration here? Don't move until I know
-//      double DemRadius(double lat, double lon);
       void CommonInitialize(const std::string &demCube);
 
 

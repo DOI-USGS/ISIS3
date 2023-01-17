@@ -22,15 +22,17 @@ namespace Isis {
 
   void cpy(Buffer &in, Buffer &out);
 
+
   void apolloremrx(UserInterface &ui) {
     Cube cube;
     CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
     if (inAtt.bands().size() != 0) {
       cube.setVirtualBands(inAtt.bands());
     }
-    cube.open(ui.GetFileName("FROM"));
+    cube.open(ui.GetCubeName("FROM"));
     apolloremrx(&cube, ui);
   }
+
 
   void apolloremrx(Cube *info, UserInterface &ui) {
     int dim;
@@ -68,7 +70,7 @@ namespace Isis {
     status = "Removed";
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    p.SetOutputCube(ui.GetFileName("TO"), att);
+    p.SetOutputCube(ui.GetCubeName("TO"), att);
 
     // Start the processing
     p.StartProcess(cpy);
@@ -77,7 +79,7 @@ namespace Isis {
     dim = apollo.ReseauDimension();
 
     // Get other user entered options
-    QString out = ui.GetFileName("TO");
+    QString out = ui.GetCubeName("TO");
     resvalid = ui.GetBoolean("RESVALID");
     action = ui.GetString("ACTION");
 

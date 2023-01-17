@@ -469,25 +469,25 @@ namespace Isis {
     PvlGroup pLog("Points");
     pLog += PvlKeyword("Total", toString(outNet.GetNumPoints()));
     pLog += PvlKeyword("Ignored", toString(ignored));
-    appLog->addGroup(pLog);
+    appLog->addLogGroup(pLog);
 
     PvlGroup mLog("Measures");
     mLog += PvlKeyword("Locked", toString(locked));
     mLog += PvlKeyword("Registered", toString(registered));
     mLog += PvlKeyword("NotIntersected", toString(notintersected));
     mLog += PvlKeyword("Unregistered", toString(unregistered));
-    appLog->addGroup(mLog);
+    appLog->addLogGroup(mLog);
 
     // Log Registration Statistics
     Pvl arPvl = ar->RegistrationStatistics();
 
     for (int i = 0; i < arPvl.groups(); i++) {
-      appLog->addGroup(arPvl.group(i));
+      appLog->addLogGroup(arPvl.group(i));
     }
 
     // add the auto registration information to print.prt
     PvlGroup autoRegTemplate = ar->RegTemplate();
-    appLog->addGroup(autoRegTemplate);
+    appLog->addLogGroup(autoRegTemplate);
 
     if (validator) {
       PvlGroup validationGroup("ValidationStatistics");
@@ -502,11 +502,11 @@ namespace Isis {
         }
       }
 
-      appLog->addGroup(validationGroup);
+      appLog->addLogGroup(validationGroup);
 
       PvlGroup validationTemplate = validator->UpdatedTemplate();
       validationTemplate.setName("ValidationTemplate");
-      appLog->addGroup(validationTemplate);
+      appLog->addLogGroup(validationTemplate);
     }
 
     outNet.Write(ui.GetFileName("ONET"));

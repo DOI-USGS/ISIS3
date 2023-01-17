@@ -63,6 +63,7 @@ namespace Isis {
 
     CubeAttributeInput inAtt(inputFile);
     Cube *inCube = ProcessMosaic::SetInputCube(inputFile, inAtt);
+    inCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(2));
 
     Cube *mosaicCube = OutputCubes[0];
     Projection *iproj = inCube->projection();

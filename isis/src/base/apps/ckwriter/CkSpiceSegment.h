@@ -86,8 +86,11 @@ class PvlObject;
  *
  * @history 2019-12-05 Adam Paquette - Changed how kernels are loaded so CkSpiceSegment
  *                          no longer needs to use the Spice class.
- *                          
- * @history 2021-03-23 Kaitlyn Lee - Added time bias to ET times in getTimes(). Fixes #4129
+ *
+ * @history 2021-12-22 Amy Stamile - Added timing offset information to kernel comments
+ *                          by calculating difference between label StartTime and camera model
+ *                          StartTime. This is to allow for spiceinit to handle offsets
+ *                          when finding associated smithed kernels. References #3363.
  */
 class CkSpiceSegment {
   public:
@@ -148,17 +151,19 @@ class CkSpiceSegment {
     // Mutable for full loading/unloading of kernels w/o restrictions
     mutable Kernels  _kernels;
     int         _camVersion;
-    QString _name;
-    QString _fname;
+    QString     _name;
+    QString     _fname;
     double      _startTime;
     double      _endTime;
-    QString _utcStartTime; //  Need to store these as conversion from ET
-    QString _utcEndTime;   //  requires leap seconds kernel
-    QString _instId;       //  Instrument ID
-    QString _target;       //  Target name
+    QString     _utcStartTime; //  Need to store these as conversion from ET
+    QString     _utcEndTime;   //  requires leap seconds kernel
+    QString     _instId;       //  Instrument ID
+    QString     _target;       //  Target name
+    double      _startOffset;  // time offset between camera model and label start time
+    double      _endOffset;    // time offset between camera model and label end time
     int         _instCode;     //  NAIF instrument code of the SPICE segment
-    QString _instFrame;    //  NAIF instrument frame
-    QString _refFrame;     //  NAIF reference frame
+    QString     _instFrame;    //  NAIF instrument frame
+    QString     _refFrame;     //  NAIF reference frame
     SMatrix     _quats;
     SMatrix     _avvs;
     SVector     _times;
@@ -174,7 +179,7 @@ class CkSpiceSegment {
     SMatrix load(Table &cache);
     SMatrix getQuaternions(const SMatrix &spice) const;
     SMatrix getAngularVelocities(const SMatrix &spice) const;
-    SVector getTimes(const SMatrix &spice, const double timeBias) const;
+    SVector getTimes(const SMatrix &spice) const;
 
     bool getTimeDependentFrameIds(Table &table, int &toId, int &fromId) const;
     bool getFrameChains(Table &table, const int &leftBase,

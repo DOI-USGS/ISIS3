@@ -25,19 +25,7 @@ map <QString, void *> GuiHelpers() {
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Pvl appLog;
-  try {
-    automos(ui, &appLog);
-  }
-  catch (...) {
-    for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
-      Application::Log(*grpIt);
-    }
-    throw;
-  }
-
-  for (auto grpIt = appLog.beginGroup(); grpIt!= appLog.endGroup(); grpIt++) {
-    Application::Log(*grpIt);
-  }
+  automos(ui, &appLog);
 }
 
 // Function to calculate the ground range from multiple inputs (list of images)

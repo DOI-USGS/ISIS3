@@ -1,14 +1,15 @@
 <?xml version="1.0"?>
 <application name="jigsaw" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Improves camera pointing and a whole lot more!
+    Improves image alignment by updating camera geometry attached to cubes.
   </brief>
 
   <description>
+  <h3>Overview</h3>
     <p>
-      The <b>jigsaw</b> application performs a bundle adjustment on a group of overlapping Isis,
-      level 1, <def>cube</def>s from framing and/or line-scan cameras.  The adjustment
-      simultaneously defines the selected image geometry information (camera pointing, spacecraft
+      The <b>jigsaw</b> application performs a photogrammetric bundle adjustment on a group of
+      overlapping, level 1 <def>cube</def>s from framing and/or line-scan cameras.  The adjustment
+      simultaneously refines the selected image geometry information (camera pointing, spacecraft
       position) and <def>control point</def> coordinates (x,y,z or lat,lon,radius) to reduce
       boundary mismatches in mosaics of the images.
     </p>
@@ -24,53 +25,373 @@
     <img src='assets/images/mdis2_Controlled.png' alt='After jigsaw (controlled)' width='306' height='259' />
 
     <p>
-      The <b>jigsaw</b> application assumes <b>spiceinit</b> has been run on the input <def>cube</def>s so that
-      <def>SPICE</def> is included in the Isis <def>cube</def> labels in the Kernels group.  In order to
-      run the program, the user must provide a list of input <def>cube</def>s, an input <def>control
-      net</def>, the name of an output <def>control net</def>, and the adjustment parameters.
-      <b>jigsaw</b> outputs a new <def>control net</def> that includes the initial state of the
-      points in the network and their final state after the adjustment.  The initial states of
-      the points are tagged as <def>a priori</def> in the <def>control net</def>, and their final
-      states are tagged as <def>adjusted</def>.  The measured <def>sample</def>/<def>line</def> positions
-      associated with the <def>control point</def>s in the net are not changed.  <def>SPICE</def>
-      in the <def>cube</def> labels is updated at the end of the adjustment only
-      if the bundle converges and the <b>UPDATE</b> parameter is selected.
+      The <b>jigsaw</b> application assumes <b>spiceinit</b> or <b>csminit</b> has been run on the
+      input <def>cube</def>s so that camera information is included in the Isis <def>cube</def>
+      labels. In order to run the program, the user must provide a list of input <def>cube</def>s,
+      an input <def>control net</def>, the name of an output <def>control network</def>, and the
+      solve settings. The measured <def>sample</def>/<def>line</def> positions associated with the
+      <def>control measure</def>s in the network are not changed. Instead, the control points and
+      camera information are adjusted. <b>jigsaw</b> outputs a new <def>control network</def> that
+      includes the initial state of the points in the network and their final state after the
+      adjustment.  The initial states of the points are tagged as <def>a priori</def> in the
+      <def>control network</def>, and their final states are tagged as <def>adjusted</def>.
+      Updated camera information is only written to the <def>cube</def> labels if the bundle
+      converges and the <b>UPDATE</b> parameter is selected.
     </p>
 
     <p>
-      Optional output files can be selected to provide more information for analyzing the
-      results.  <b>BUNDLEOUT_TXT</b> provides an overall summary of the bundle adjustment.
-      It lists the user input parameters selected and tables of statistics for both the
-      images and the points.   The image statistics can also be written to a separate
-      <b>CSV</b> file and likewise for the point statistics with the <b>OUTPUT_CSV</b>
-      option selected.  <b>RESIDUALS_CSV</b> provides a table of the measured image
-      coordinates and the final <def>sample</def>, <def>line</def>, and overall residuals
-      in both millimeters and pixels.
+      Optional output files can be enabled to provide more information for analyzing the results of
+      the bundle. <b>BUNDLEOUT_TXT</b> provides an overall summary of the bundle adjustment;
+      it lists the user input parameters selected and tables of statistics for both the
+      images and the points. The image statistics can be written to a separate machine readable
+      file with the <b>IMAGESCSV</b> option and likewise for the point statistics with the
+      <b>OUTPUT_CSV</b> option. <b>RESIDUALS_CSV</b> provides a table of the measured image
+      coordinates, the final <def>sample</def>, <def>line</def>, and overall residuals
+      of every control measure in both millimeters and pixels.
     </p>
 
+    <h3>Observation Equations</h3>
+
     <p>
-      The functional model for the bundle adjustment is the <i>collinearity
-      condition</i>.  It stipulates that the camera perspective center, a ground
-      point, and its associated image point measurement be collinear.  The diagram
-      below demonstrates the collinear condition in a <i>bundle adjustment</i>.
-      The vectors formed by connecting each object space point (target surface x,y,z)
-      and its corresponding image space points (<def>sample</def>,<def>line</def>) form
-      a <i>bundle</i> of light rays.
+      The <b>jigsaw</b> application attempts to minimize the reprojective error within the control network.
+      For each control measure and its control point in the control network, the reprojective error is
+      the difference between the control measure's image coordinate (typically determined from image
+      <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Automatic_Registration">registration</a>)
+      and the image coordinate that the control point projects to through the camera model. We also
+      refer to the reprojective error as the measure residual. So, for each control measure we can
+      write an observation equation:
     </p>
-    <img src='assets/images/BundleAdjustment_KarlKraus.png' alt='Before jigsaw (uncontrolled)' width='498' height='355' />
+    <pre>
+      reprojective_error = control_measure - camera(control_point)
+    </pre>
     <p>
-     Kraus, Karl., 1993. Photogrammetry Vol. I., Fundamentals and Standard
-     Processes, Der. Dümmler Verlag, Bonn, Germany, ISBN 3-427-78684-6, 397
-     pages.
+      The camera models use additional parameters such as the instrument position and pointing to compute
+      what image coordinate a control point projects to; so, the camera function in our observation
+      equation can be written more explicitly as:
+    </p>
+    <pre>
+      reprojective_error = control_measure - camera(control_point, camera_parameters)
+    </pre>
+    <p>
+      The primary decision when using the jigsaw application is which parameters to include
+      as variables in the observation equations. Later sections will cover what parameters can
+      be included and common considerations when choosing them.
+    </p>
+    <p>
+      By combining all the observation equations for all the control measures in the control network
+      we can create a system of equations. Then, we can find the camera parameters and control point
+      coordinates that minimize the sum of the squared reprojective errors using the system of equations.
+    </p>
+    <p>
+      Below is an example system of observation equations for a control network with three images
+      (A, B, and C) and three control points (1, 2, and 3). Control point 1 has control measures
+      on images A and B, control point 2 has control measures on images B and C, and control
+      point 3 has control measures on images A, B, and C. <code>control_point_1</code> is the
+      ground coordinate of control point 1, <code>camera_parameters_A</code> are the camera
+      parameters for image A's camera model, <code>camera_A</code> is the projection function
+      for image A's camera model, and <code>control_measure_1_A</code> is the image coordinate of
+      control point 1's control measure on image A.
+    </p>
+    <img src='assets/images/simple_network.png' alt='Simple control network with 3 images and 3 points' width='400' height='412' />
+    <pre>
+                    || control_measure_1_A - camera_A(control_point_1, camera_parameters_A) ||
+                    || control_measure_1_B - camera_B(control_point_1, camera_parameters_B) ||
+                    || control_measure_2_B - camera_B(control_point_2, camera_parameters_B) ||
+      total_error = || control_measure_2_C - camera_C(control_point_3, camera_parameters_C) ||
+                    || control_measure_3_A - camera_A(control_point_3, camera_parameters_A) ||
+                    || control_measure_3_B - camera_B(control_point_3, camera_parameters_B) ||
+                    || control_measure_3_C - camera_C(control_point_3, camera_parameters_C) ||
+    </pre>
+    <p>
+      If the camera projection functions were linear, we could easily minimize this system. Unfortunately,
+      the camera projection functions are quite non-linear; so, we linearize and
+      iteratively compute updates that will gradually approach a minimum. The actual
+      structure of the observation equations is complex and vary significantly
+      based on the dataset and which parameters are being solved for. If the a-priori parameter
+      values are sufficiently far away from a minimum, the updates can even diverge. So,
+      it is important to check your input data set and solve options. Tools like the
+      <b>cnetcheck</b> application and <b>jigsaw</b> options like <b>OUTLIER_REJECTION</b> can help.
+    </p>
+    <p>
+      As with all iterative methods convergence criteria is important. The default for
+      the <b>jigsaw</b> application is to converge based on the sigma0 value. This is a
+      complex value that includes many technical details outside the scope of this
+      documentation. In a brief, it is a measurement of the remaining error in a typical
+      observation. The sigma0 value is also a good first estimate of the quality
+      of the solution. If the only errors in the control network are purely random noise,
+      then the sigma0 should be 1. So, if the sigma0 value for your solution is
+      significantly larger than 1, then it is an indication that there is an unusual
+      source of error in your control network such as poorly registered control measures
+      or poor a-priori camera parameters.
     </p>
 
-    <h4>Relevant Documentation</h4>
+    <h3>Solve Options</h3>
+
+    <p>
+      Choosing solve options is difficult and often requires experimentation. As a general rule,
+      the more variation in observation geometry in your dataset and the better distributed your
+      control measures are across and within images, the more parameters you can solve for.
+      The following sections describe the different options you can use when running the
+      <b>jigsaw</b> application. Each section will cover a subset of the options explaining
+      common situations in which they are used and how to choose values for them.
+    </p>
+
+    <h4>Control Network</h4>
+    <p>
+      Control networks can contain a wide variety of information, but the primary
+      concern for choosing solve options is the presence or lack of ground control.
+    </p>
+    <p>
+      Most control networks are generated by finding matching points between groups
+      of images. This defines a relative relationship between the images, but it does not
+      relate those images to the actual planetary surface; so, additional information is needed
+      to absolutely control the images. In terrestrial work, known points on the ground
+      are identified in the imagery via special target markers, but this is usually not
+      possible with planetary data. Instead, we relate the images to an additional dataset such
+      as a basemap or surface model. This additional relationship is called ground
+      control. Sometimes, there are not sufficient previous data products to provide accurate
+      ground control or ground will be done as a secondary step after successfully running jigsaw
+      on a relatively controlled network. In both these cases, we say that ground
+      control is not present.
+    </p>
+    <p>
+      If your control network does not have ground control, then we recommended that
+      you hold the instrument position fixed and only solve for the instrument pointing.
+      This is because without ground control, the instrument position and pointing can
+      become correlated and there will be multiple minimums for the observation equations.
+      We recommend holding the instrument position fixed because a-priori data for it generally is more
+      accurate than the instrument pointing.
+    </p>
+
+    <h4>Sensor Types</h4>
+    <h5>Framing</h5>
+    <p>
+      Framing sensors are the most basic type or sensor to use with <b>jigsaw</b>. The entire image is exposed at the same
+      time, so there is only a single position and pointing value for each image. With these datasets
+      you will want to use the either NONE or POSITIONS for the <b>SPSOLVE</b> parameter and ANGLES
+      for the <b>CAMSOLVE</b> parameter.
+    </p>
+    <h5>Pushbroom</h5>
+    <p>
+      Pushbroom sensors require additional consideration because the image is exposed over a period of
+      time and therefore, position and pointing are time dependent. The <b>jigsaw</b> application handles this
+      by modeling the position and pointing as polynomial functions of time. Polynomial functions
+      are fit to the a-priori position and pointing values on each image. Then, each iteration updates
+      the polynomial coefficients. Setting <b>CAMSOLVE</b> to velocities will use first
+      degree, linear, polynomials and setting <b>CAMSOLVE</b> to accelerations will use
+      second degree, quadratic, polynomials for the pointing angles. For most pushbroom observations,
+      we recommend using second degree polynomials, solving for accelerations.
+    </p>
+    <p>
+      There are also a variety of parameters that allow for more precise control over the polynomials used
+      and the polynomial fitting process. The <b>OVERHERMITE</b> parameter changes the initial polynomial
+      setup so that it does not replace the a-priori position values. Instead, the polynomial starts out as a
+      zero polynomial and is added to the original position values. This effectively adds the noise
+      from the a-priori position values to the constant term of the polynomial. The <b>OVEREXISTING</b>
+      parameter does the same thing for pointing values. These two options allow you to preserve complex
+      variation like jitter. We recommend enabling these options for jittery images and very long
+      exposure pushbroom images.
+    </p>
+    <p>
+      The <b>SPSOLVE</b> and <b>CAMSOLVE</b> parameters only allow up to a second degree
+      polynomial. To use a higher degree polynomial for pointing values, set <b>CAMSOLVE</b> to ALL and then set
+      the <b>CKDEGREE</b> parameter to the degree of the polynomial you want to fit over the original
+      pointing values and set the <b>CKSOLVEDEGREE</b> parameter to the degree of the polynomial you want
+      to solve for. Setting the <b>SPSOLVE</b>, <b>SPKDEGREE</b>, and <b>SPKSOLVEDEGREE</b> parameters
+      in a similar fashion gives fine control over the polynomial for postion values.
+      For example, if you want to fit a 3rd degree polynomial for the position values
+      and then solve for a 5th degree polynomial set <b>SPSOLVE</b> to ALL, <b>SPKDEGREE</b> to 3,
+      and <b>SPKSOLVEDEGREE</b> to 5.
+      These parameters should only be used when you know the a-priori position and/or pointing values are
+      well modeled by high degree polynomials. Using high degree polynomials can result in extreme
+      over-fitting where the solution looks good in areas near control measures and control points but
+      is poor in areas far from control measures and control points. The end behavior, the solution at
+      the start and end of images, becomes particularly unstable as the degree of the polynomial used
+      increases.
+    </p>
+    <h5>Synthetic Aperture Radar</h5>
+    <p>
+      Running the <b>jigsaw</b> application with synthetic aperture radar (SAR) images is different because
+      SAR sensors do not have a pointing component. Thus, you can only solve for the sensor position when
+      working with SAR imagery. SAR imagery also tends to have long duration images which can
+      necessitate using the <b>OVERHERMITE</b>, <b>SPKDEGREE</b>, and <b>SPKSOLVEDEGREE</b> parameters.
+    </p>
+
+    <h4>Parameter Sigmas</h4>
+    <p>
+      The initial, or a-priori, camera parameters and control points all contain error, but it is not equally
+      distributed. The <b>jigsaw</b> application allows users to input a-priori sigmas for different parameters
+      that describe how the initial error is distributed. The parameter sigmas are also sometimes
+      called uncertainties. Parameters with higher a-priori sigma values
+      are allowed to vary more freely than those with lower a-priori sigma values. The a-priori sigma values
+      are not hard constraints that limit how much parameters can change, but rather relative accuracy estimates
+      that adjust how much parameters change relative to each other.
+    </p>
+    <p>
+      The <b>POINT_LATITUDE_SIGMA</b>, <b>POINT_LONGITUDE_SIGMA</b>, and <b>POINT_RADIUS_SIGMA</b>
+      parameters set the a-priori sigmas for control points <i>that do not already have a ground source</i>.
+      If a control point already has a ground source, such as a basemap or DEM, then it already has
+      internal sigma values associated with it or is held completely fixed. The exact behavior depends
+      on how the control points were created, a topic outside the scope of this documentation.
+      These sigmas are in meters on the ground, so the latitude
+      and longitude sigmas are uncertainty in meters in the latitude and longitude directions. Generally, you will
+      choose values for these parameters based on the resolution of the images and a visual comparison with
+      other datasets. The radius sigma is also usually higher than the latitude and longitude sigmas
+      because there is less variation of the viewing geometry with respect to the radius.
+    </p>
+    <p>
+      The <b>CAMERA_ANGLES_SIGMA</b>, <b>CAMERA_ANGULAR_VELOCITY_SIGMA</b>, and
+      <b>CAMERA_ANGULAR_ACCELERATION_SIGMA</b> parameters set the a-priori sigmas for the instrument pointing.
+      Similarly, the <b>SPACECRAFT_POSITION_SIGMA</b>, <b>SPACECRAFT_VELOCITY_SIGMA</b>,
+      and <b>SPACECRAFT_ACCELERATION_SIGMA</b> parameters set the a-priori sigmas for the instrument position.
+      The sigma for each parameter is only used if you are solving for that parameter. For example,
+      if you are solving for angular velocities and not solving for any adjustments to the instrument
+      position you would enter <b>CAMERA_ANGLES_SIGMA</b> and <b>CAMERA_ANGULAR_VELOCITY_SIGMA</b>.
+      Finding initial values for these sigmas is challenging as SPICE does not have a way to specify them.
+      Some teams will publish uncertainties for their SPK and CK solutions in separate documentation or
+      the kernel comments, the
+      <a href="https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/ug/commnt.html">commnt</a> utility
+      will read the comments on a kernel file. The velocity
+      and acceleration sigmas are in meters per second and meters per second squared respectively
+      (degrees per second and degrees per second squared for angles). So, the velocity sigma will
+      generally be smaller than the position sigma and the acceleration sigma will be smaller than
+      the velocity sigma.
+    </p>
+    <p>
+      Coming up with a-priori sigma values can be quite challenging, but the <b>jigsaw</b> application
+      has the ability to produce updated sigma values for your solution. By enabling the <b>ERRORPROPAGATION</b>
+      parameter, you will get a-posteriori (updated) sigmas for each control point and camera parameter
+      in your solution. This information is helpful for analyzing and communicating the quality of
+      your solution. Computing the updated sigmas, imposes a significant computation and memory
+      overhead, so it is recommended that you enable <b>ERRORPROPAGATION</b> parameter after you
+      have run bundle adjustment with all of your other settings and gotten a satisfactory result.
+    </p>
+
+    <h4>Community Sensor Model</h4>
+    <p>
+      The <b>jigsaw</b> options that control which parameters to solve for only work with ISIS
+      camera models. When working with community sensor model (CSM) camera models, you will
+      need to manually specify the camera parameters to solve for. This is because the
+      <a href="https://github.com/ngageoint/csm">CSM API</a> only exposes a
+      generic camera parameter interface that may or may not be related to the physical state of the
+      sensor when an image was acquired. The <b>CSMSOLVELIST</b> option allows for an explicit list
+      of model parameters. You can also use the <b>CSMSOLVESET</b> or <b>CSMSOLVEYPE</b> options
+      to choose your parameters based on how they are labeled in the model.
+    </p>
+    <p>
+      Each CSM plugin library defines its own set of adjustable parameters. See the
+      documentation for the CSM plugin library you are using for what different adjustable parameters
+      are and when to solve for them. The sigma values for parameters are also included in the CSM plugin
+      library and image support data (ISD). So, you do not need to specify camera parameter sigmas when
+      working with CSM camera models; however, you still need to specify control point coordinate sigmas.
+      For convenience, the <b>csminit</b> application adds information about all of the adjustable
+      parameters to the image label.
+    </p>
+    <p>
+      The CSM API natively uses a rectangular coordinate system. So, we recommend that
+      you have the <b>jigsaw</b> application perform calculations in a rectangular coordinate system
+      when working with CSM camera models. To do this, set the <b>CONTROL_POINT_COORDINATE_TYPE_BUNDLE</b>
+      parameter to RECTANGULAR. You can also set the
+      <b>CONTROL_POINT_COORDINATE_TYPE_REPORTS</b> parameter to RECTANGULAR to see the
+      results in a rectangular coordinate system, but this is a matter of personal preference
+      and will not impact the results.
+    </p>
+
+    <h4>Robustness</h4>
+    <p>
+      Much of the mathematical underpinning of the <b>jigsaw</b> application expects that the error
+      in the input data is purely random noise. If there are issues with control measures being
+      poorly registered or blatantly wrong, it can produce errors in the output solution. Generally,
+      users should identify and correct these errors before accepting the output of the <b>jigsaw</b>
+      application, but there are a handful of parameters than can be used to make your solutions more
+      robust to them.
+    </p>
+    <p>
+      The <b>OUTLIER_REJECTION</b> parameter adds a simple calculation to each iteration that looks
+      for potential outliers. The median average deviation (MAD) of the measure residuals is computed
+      and then any control measure whose residual is larger than a multiple of the MAD of the measure residuals
+      is flagged as rejected. Control measures that are flagged as rejected are removed
+      from future iterations. The multiplier for the rejection threshold is set by the
+      <b>REJECTION_MULTIPLIER</b> parameter. The residuals for rejected measures are re-computed
+      after each iteration and if they fall back below the threshold they are un-flagged
+      and included again. Enabling this parameter can help eliminate egregious errors in your control
+      measures, but it is not very sensitive. It is also not selective about what is rejected.
+      So, it is possible to introduce islands into your control network when the <b>OUTLIER_REJECTION</b>
+      parameter is enabled. For this reason, always check your output
+      control network for islands with the <b>cnetcheck</b> application when using the
+      <b>OUTLIER_REJECTION</b> parameter. Choosing an appropriate value for the <b>REJECTION_MULTIPLIER</b>
+      is about deciding how aggressively you want to eliminate control measures. The default value
+      will only remove extreme errors, but lower values will remove control measures that are not
+      actually errors. It is recommended that you start with the default value and then if you want to remove
+      more potential outlier, reduce it gradually. If you are seeing too many rejections with the
+      default value, then your input data is extremely poor and you should investigate other methods
+      of improving it prior to running the <b>jigsaw</b> application. You can use the <b>qnet</b>
+      application to examine and improve your control network. You can use the <b>qtie</b> application
+      to manually adjust your a-priori camera parameters.
+    </p>
+    <p>
+      The <b>jigsaw</b> application also has the ability to set sigmas for individual control
+      measures. Similar to the sigmas for control points and parameters, these are a measurement
+      of the relative quality of each control measure. Control measures with a higher sigma have less
+      impact on the solution than control measures with a lower sigma. Most control networks have
+      a large number of control measures and it is not realistic to manually set the sigma for
+      each one. So, the <b>jigsaw</b> application can instead use maximum likelihood estimation (MLE)
+      to estimate the sigma for each control measure each iteration. There are a variety of models to
+      choose from, but all of them start each control measure's sigmas at 1. Then, if the control
+      measure's reprojective error falls beyond a certain quantile the sigma will be increased.
+      This reduces the impact of poor control measures in a more targeted fashion than simple
+      outlier rejection. In order to produce good results, though, a high density of control measures
+      is required to approximate the true reprojective error probability distributions. Some of the
+      modules used with MLE can set a measure's sigma to infinity, effectively removing it from the
+      solution. Similar to when using the <b>OUTLIER_REJECTION</b> parameter, this can create islands
+      in your control network. If you are
+      working with a large amount of data and want a robustness option that is more targeted and
+      customizable than outlier rejection, then using the MLE parameters is a good option. See the
+      <b>MODEL1</b>, <b>MODEL2</b>, <b>MODEL3</b>, <b>MAX_MODEL1_C_QUANTILE</b>,
+      <b>MAX_MODEL2_C_QUANTILE</b>, and <b>MAX_MODEL3_C_QUANTILE</b> parameter documentation for
+      more information.
+    </p>
+
+    <h4>Observation Mode</h4>
+    <p>
+      Sometimes multiple images are exposed at the same time. They could be exposed by different sensors
+      on the same spacecraft or they could be read out from different parts of the same sensor. When
+      this happens, many of the camera parameters for the two images are the same. By default, the
+      <b>jigsaw</b> application has a different set of camera parameters for each image. To allow
+      different images that are captured simultaneously to share camera parameters enable the
+      <b>OBSERVATIONS</b> parameter. This will combine all of the images with the same observation
+      number into a single set of parameters. By default the observation number for an image is the
+      same as the serial number. For some instruments, there is an extra keyword in their serial number
+      translation file called <code>ObservationKeys</code>. This specifies the number of keys from the
+      serial number to use in the observation number. For example JunoCam serial numbers consist of
+      <code>SpacecraftName/InstrumentId/StartTime/FrameNumber/FilterName</code> and it has
+      <code>ObservationKeys = 4</code>. So, the observation number for a JunoCam image is the first
+      four keys of its serial number, <code>SpacecraftName/InstrumentId/StartTime/FrameNumber</code>.
+      Thus, if two JunoCam images have the same StartTime and FrameNumber but different FilterNames
+      and the <b>OBSERVATIONS</b> parameter is enabled, then they will share camera parameters.
+      To check if observation mode
+      is setup for use with your data set, check the serial number translation file located in
+      <code>$ISISROOT/appdata/translations</code>.
+    </p>
+
+    <h3>References</h3>
     <p>
       For information on what the original <b>jigsaw</b> code was based on checkout
       <a href="https://www.rand.org/pubs/notes/N3330.html">Rand Notebook</a>
     </p>
+    <p>
+      A more technical look at the <b>jigsaw</b> application can be found in
+      <i>Jigsaw: The ISIS3 bundle adjustment for extraterrestrial photogrammetry</i>
+      by K. L. Edmundson et al.
+    </p>
+    <p>
+      A rigorous development of how the <b>jigsaw</b> application works can be found
+      in these
+      <a href="https://earthsciences.osu.edu/sites/default/files/2019-12/OSU_Adjustment_Notes_Part_1.pdf">lecture notes</a>
+      from Ohio State University.
+    </p>
 
-    <h4>Known Issues</h4>
+    <h3>Known Issues</h3>
       <blockquote>
       <b>Running jigsaw with a control net containing <i>JigsawRejected</i>
       flags may result in bundle failure</b>
@@ -98,12 +419,12 @@
       likely increases error in the solve.</b>
       <p>
         With the current jigsaw implementation, it is NOT possible to individually
-        solve for either the mean or triaxial radii as seperate calculations in
-        the bundle adjustment. More specifically, the target body radii has no
+        solve for either the mean or triaxial radii as separate calculations in
+        the bundle adjustment. More specifically, the target body radii have no
         effect when solving for individual points and thus cannot be solved for in the bundle.
         A local radii solve is already part of the sequence of equations that <b>jigsaw</b>
         uses to compute various partial derivatives to populate the solve matrix.
-        A seperate mean or triaxial radii solve can be applied to the target body
+        A separate mean or triaxial radii solve can be applied to the target body
         and the partials from this separate application are added to the
         solve matrix. This option adds additional computation time to <b>jigsaw</b>
         and creates additional uncertainty/error in the bundle adjust. We advise
@@ -113,7 +434,7 @@
         If you are trying to generate a spheroid from a control network there are
         other programs that can do this for you. An easier but more naive method
         is ingesting the <i>OUTPUT_CSV</i> from your network, gather local radii
-        information from those points, then generate a sphereiod from those local radii.
+        information from those points, then generate a spheroid from those local radii.
       </p>
       </blockquote>
 
@@ -307,6 +628,10 @@
       Cleaned up the bundleout.txt file and added new information in the header.
       Fixes #3267.
     </change>
+    <change name="Ken Edmundson and Debbie A. Cook" date="2019-05-20">
+      Added initial support for simultaneous LIDAR data. Added LIDARDATA, OLIDARDATA,
+      and OLIDARFORMAT arguments.
+    </change>
     <change name="Aaron Giroux" date="2019-12-19">
       Added SCCONFIG parameter which allows users to pass in a pvl file with different
       settings for different instrumentIDs. Added logic into the observationSolveSettings
@@ -384,6 +709,7 @@
           *.net
         </filter>
       </parameter>
+
       <parameter name="ONET">
         <type>filename</type>
         <fileMode>output</fileMode>
@@ -398,6 +724,69 @@
         <filter>
           *.net
         </filter>
+      </parameter>
+
+      <parameter name="LIDARDATA">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Lidar Point File - requires SPSOLVE to be turned on
+        </brief>
+        <description>
+        This file is a <def>lidar point data</def> generated from <b>lrolola2isis.cpp</b>.
+        It contains <def>lidar control point</def>s and associated measures for simultaneous images.
+        If <def>lidar point data</def> are used, SPSOLVE must be turned on (anything besides NONE)
+
+        </description>
+        <exclusions>
+        </exclusions>
+        <filter>
+          *.dat *.json
+        </filter>
+      </parameter>
+
+      <parameter name="OLIDARDATA">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>output</fileMode>
+        <brief>
+          Output lidar data file - requires SPSOLVE to be turned on
+        </brief>
+        <description>
+          This output file contains the adjusted <def>lidar data</def> with
+          the final coordinates of the <def>lidar point</def>s and residuals for each
+          measurement.
+        </description>
+        <filter>
+          *.dat *.json
+        </filter>
+      </parameter>
+
+      <parameter name="OLIDARFORMAT">
+        <type>string</type>
+        <brief> Output lidar data file format</brief>
+        <default>
+          <item>BINARY</item>
+        </default>
+        <description>
+          Output lidar data file format.
+        </description>
+        <list>
+          <option value="BINARY">
+            <brief> Output lidar data in binary format</brief>
+            <description>
+              Output lidar data in binary format.
+            </description>
+          </option>
+
+          <option value="JSON">
+            <brief> Output lidar data in json format </brief>
+            <description>
+              Output lidar data in json format.
+            </description>
+          </option>
+        </list>
       </parameter>
 
       <parameter name="SCCONFIG">
@@ -1114,12 +1503,12 @@
         <type>boolean</type>
         <default><item>false</item></default>
         <brief>
-	  Solve for target body parameters. The parameters, their a priori values, and uncertainties are input
-	  using a PVL file specified by TBPARAMETERS below.</brief>
+    Solve for target body parameters. The parameters, their a priori values, and uncertainties are input
+    using a PVL file specified by TBPARAMETERS below.</brief>
         <description>
           Solve for target body parameters. The parameters, their a priori values, and uncertainties are input
-	  using a PVL file specified by TBPARAMETERS below. An example template PVL file is located at
-	  $ISISROOT/appdata/templates/jigsaw/TargetBodyParameters.pvl.
+    using a PVL file specified by TBPARAMETERS below. An example template PVL file is located at
+    $ISISROOT/appdata/templates/jigsaw/TargetBodyParameters.pvl.
         </description>
         <inclusions>
           <item>TBPARAMETERS</item>
@@ -1134,9 +1523,9 @@
         </brief>
         <description>
           This file contains target body parameters to solve for in the bundle adjustment, their
-	  a priori values, and uncertainties. The file must be in PVL format. An example template
+    a priori values, and uncertainties. The file must be in PVL format. An example template
           PVL file is located at $ISISROOT/appdata/templates/jigsaw/TargetBodyParameters.pvl. Instructions for the PVL
-	  structure are given in the template.
+    structure are given in the template.
         </description>
         <filter>
           *.pvl
@@ -1428,9 +1817,32 @@
             <item>yes</item>
           </default>
         </parameter>
+
+        <parameter name="LIDAR_CSV">
+          <brief> Outputs lidar data to csv file - lidar.csv</brief>
+          <description>
+            Selection of this parameter flags output of lidar data
+            points to a csv file
+          </description>
+          <type>boolean</type>
+          <default>
+            <item>no</item>
+          </default>
+        </parameter>
       </group>
 
     </groups>
+
+    <liens>
+      <item>Add items to glossary, example(s) and tips on how to analyze the
+            results.
+      </item>
+    </liens>
+
+
+
+
+  <examples>
     <example>
       <brief>Solve with CSM parameters</brief>
       <description>
@@ -1446,17 +1858,6 @@
         </description>
       </terminalInterface>
     </example>
-
-    <liens>
-      <item>Add items to glossary, example(s) and tips on how to analyze the
-            results.
-      </item>
-    </liens>
-
-
-
-
-  <examples>
     <example>
       <brief> Simple run of jigsaw with images from a linescanner </brief>
       <description>
@@ -1486,7 +1887,7 @@
               Example GUI
             </brief>
             <description>
-              The top of the GUI shows the parameters filled in for input cube list, 
+              The top of the GUI shows the parameters filled in for input cube list,
               the input control network and the output control network. All other parameters
               were left at their default values.
             <br></br>
@@ -1514,25 +1915,25 @@
       <description>
         <p>
          A relative network is a network that connects overlapping images with tie points but has no tie points connected to a ground source. Since there is no
-         connection to ground in the network, this bundle will only solve for camera specific parameters. The bundle could still solve for other parameters and be 
-         correct relative to the camera position, but it would increase the complexity of the bundle. The proceeding two examples will include grounded networks, 
-         so we will wait to increase the complexity of the bundle until ground points are included. Additionally, in this example we are evaluating the solution and 
-         do not want to apply it to the images yet, therefore, update is set to ‘no’.
-        </p> 
+         connection to ground in the network, this bundle will only solve for camera specific parameters. The bundle could still solve for other parameters and be
+         correct relative to the camera position, but it would increase the complexity of the bundle. The proceeding two examples will include grounded networks,
+         so we will wait to increase the complexity of the bundle until ground points are included. Additionally, in this example we are evaluating the solution and
+         do not want to apply it to the images yet, therefore, update is set to 'no'.
+        </p>
         <p>
-         This relative bundle turns on and parameterizes the camera twist and camera acceleration solve parameters. Camera twist is a flag that allows the bundle to solve 
-         for the camera's rotation around the bore sight axis and uses the same uncertainty estimation as the other two rotations. Setting the camera solve parameter to acceleration, however, 
-         does require uncertainties to be set for the angles (deg), angular velocity (deg/s), and angular accelerations (deg/s**2). These values were set with increasing 
+         This relative bundle turns on and parameterizes the camera twist and camera acceleration solve parameters. Camera twist is a flag that allows the bundle to solve
+         for the camera's rotation around the bore sight axis and uses the same uncertainty estimation as the other two rotations. Setting the camera solve parameter to acceleration, however,
+         does require uncertainties to be set for the angles (deg), angular velocity (deg/s), and angular accelerations (deg/s**2). These values were set with increasing
          constraint because of the increasing affect alterations of higher order parameters have on the bundle solution.
         </p>
         <p>
-         The ‘overexisting’ flag tells the bundle solution to approximate the camera rotation with a zero polynomial function added to the existing rotation data (adding the 
-         polynomial <b>over</b> the <b>existing</b> data). Without the ‘overexisting’ flag, the bundle fits a polynomial to the existing rotations, throws out the existing data
+         The 'overexisting' flag tells the bundle solution to approximate the camera rotation with a zero polynomial function added to the existing rotation data (adding the
+         polynomial <b>over</b> the <b>existing</b> data). Without the 'overexisting' flag, the bundle fits a polynomial to the existing rotations, throws out the existing data
          points, and uses the polynomial to calculate the approximate ephemerides when needed.
         </p>
         <p>
-         This bundle also lowers the max iterations to 10 (from default 50). Lowering the max iterations does not affect the bundle solution. However, setting a lower 
-         iteration limit can serve as a flag if you expect your network to bundle quickly. Finally, the sigma0 convergence criteria was not changed from its default 
+         This bundle also lowers the max iterations to 10 (from default 50). Lowering the max iterations does not affect the bundle solution. However, setting a lower
+         iteration limit can serve as a flag if you expect your network to bundle quickly. Finally, the sigma0 convergence criteria was not changed from its default
          value, it was only explicitly stated in this call.
         </p>
       </description>
@@ -1552,24 +1953,24 @@
       <brief>Run of jigsaw parameterized for Kaguya Terrain Camera (TC) images and <b>an intermediate ground control</b> network covering the Apollo 15 landing site. </brief>
       <description>
         <p>
-         This example jigsaw bundle is run directly after adding ground control points to the previous relative network. With ground control points inserted into the 
+         This example jigsaw bundle is run directly after adding ground control points to the previous relative network. With ground control points inserted into the
          bundle solution, we will expand the bundle solve parameters to attempt solving for point radius values and the position of the spacecraft.
         </p>
         <p>
-         Ground points are weighted more heavily in the bundle than relative control points and adding parameters adds more complexity to the bundle solution. Therefore, it 
-         is common to create and refine a network with only relative points and add ground point in <b>after</b> the relative network (and its bundle solution) is of sufficient quality. 
-         The purpose of this bundle is to ensure the network bundle converges with the added ground points and solve parameters, before committing to updating the camera 
+         Ground points are weighted more heavily in the bundle than relative control points and adding parameters adds more complexity to the bundle solution. Therefore, it
+         is common to create and refine a network with only relative points and add ground point in <b>after</b> the relative network (and its bundle solution) is of sufficient quality.
+         The purpose of this bundle is to ensure the network bundle converges with the added ground points and solve parameters, before committing to updating the camera
          pointing on the images, so update is set to 'no'.
         </p>
         <p>
-         In addition to the previous solve parameters, this bundle turns on the point radius and spacecraft position solve parameters. Applying the point radius solve 
-         parameter requires the point_radius_sigma to be set. This value is a representation the uncertainty (in meters) of the cameras apriori pointing corresponding to the 
-         correct elevation on the shape model; this value is not a hard constraint. Often this value can be set, and the appropriateness of the set value can be checked using 
-         the 'POINTS DETAIL' section of the bundleout.txt file output by jigsaw. If more than half of the radius total corrections exceed the provided sigma, the uncertainty 
+         In addition to the previous solve parameters, this bundle turns on the point radius and spacecraft position solve parameters. Applying the point radius solve
+         parameter requires the point_radius_sigma to be set. This value is a representation the uncertainty (in meters) of the cameras apriori pointing corresponding to the
+         correct elevation on the shape model; this value is not a hard constraint. Often this value can be set, and the appropriateness of the set value can be checked using
+         the 'POINTS DETAIL' section of the bundleout.txt file output by jigsaw. If more than half of the radius total corrections exceed the provided sigma, the uncertainty
          may need to be increased.
         </p>
         <p>
-         Applying the space craft position solve parameter requires an uncertainty estimation through spacecraft_position_sigma (again this value is not a hard constraint). 
+         Applying the space craft position solve parameter requires an uncertainty estimation through spacecraft_position_sigma (again this value is not a hard constraint).
          The appropriateness of the provided sigma can be evaluated through the bundleout_images.csv X Correction, Y Correction, and Z Correction columns.
         </p>
         <p>
@@ -1581,8 +1982,8 @@
 
       <terminalInterface>
         <commandLine>
-         fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1.net update=no file_prefix=jig1rr sigma0=1.0e-10 maxits=10 
-         twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01 
+         fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1.net update=no file_prefix=jig1rr sigma0=1.0e-10 maxits=10
+         twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01
          radius=yes point_radius_sigma=500 spsolve=positions overhermite=yes spacecraft_position_sigma=1000
         </commandLine>
         <description>
@@ -1593,13 +1994,29 @@
         <dataFile path="assets/ap15/jig1rrEP_bundleout.txt">
           <brief> jig1rr_bundleout.txt </brief>
           <description>
-            A shorten example of a typical bundleout.txt file produced by a jigsaw run with error propegation. 
+            A shorten example of a typical bundleout.txt file produced by a jigsaw run with error propegation.
             This file was trimmed to hold 10 images, 50 relative points, and all ground points
-            along with their associated detail sections. Bundleout files typically contain 
+            along with their associated detail sections. Bundleout files typically contain
             all image and point from a network put through jigsaw.
           </description>
         </dataFile>
       </dataFiles>
+    </example>
+
+    <example>
+      <brief>Solve with lidar data</brief>
+      <description>
+        This is an example of how to use simultaneous lidar measurments to constrain
+        the instrument position. The constraints on the lidar data are already contained
+        in the lidardata input file.
+      </description>
+      <terminalInterface>
+        <commandLine> jigsaw lidar_csv=yes fromlis=cubes.lis cnet=input.net onet=output.net lidardata=lidar_data.json olidardata=lidar_data_jigged.json radius=yes twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1
+        </commandLine>
+        <description>
+         lidar example. Note the lidar_csv, lidardata, and olidardata arguments.
+        </description>
+      </terminalInterface>
     </example>
 
 
@@ -1607,13 +2024,13 @@
       <brief>Run of jigsaw parameterized for Kaguya Terrain Camera (TC) images and <b>a final ground control</b> network covering Apollo 15 landing site. </brief>
       <description>
         <p>
-         This last example is of a final jigsaw run of a grounded network. In this example all network adjustments are done, the bundle is converging, the resulting 
-         residuals are acceptable, and therefore we are ready to update the camera pointing on the cubes. During the final run we turn on the error propagation flag, this 
-         provides the variance-covariance matrix of the parameters, from which uncertainties can be computed. This is valuable if you plan to compute certainties for 
+         This last example is of a final jigsaw run of a grounded network. In this example all network adjustments are done, the bundle is converging, the resulting
+         residuals are acceptable, and therefore we are ready to update the camera pointing on the cubes. During the final run we turn on the error propagation flag, this
+         provides the variance-covariance matrix of the parameters, from which uncertainties can be computed. This is valuable if you plan to compute certainties for
          your update cubes camera pointing (or any kernels resulting from these updated camera pointings).
         </p>
         <p>
-         If you want to double check the update was completed, see cathist or catlab (search for ‘Jigged’).
+         If you want to double check the update was completed, see cathist or catlab (search for 'Jigged').
         </p>
       </description>
 
@@ -1621,7 +2038,7 @@
         <commandLine>
          fromlist=cubes_for_ground_update.lis cnet=grounded_relative_reg.net onet=grounded_rr_jig1_ErrProp.net update=yes file_prefix=jig1rrEP sigma0=1.0e-10 maxits=10
          twist=yes camsolve=accelerations overexisting=yes camera_angles_sigma=.25 camera_angular_velocity_sigma=.1 camera_angular_acceleration_sigma=.01
-         radius=yes point_radius_sigma=500 spsolve=positions overhermite=yes spacecraft_position_sigma=1000 errorpropagation=yes 
+         radius=yes point_radius_sigma=500 spsolve=positions overhermite=yes spacecraft_position_sigma=1000 errorpropagation=yes
         </commandLine>
         <description>
         </description>
@@ -1631,9 +2048,9 @@
         <dataFile path="assets/ap15/jig1rrEP_bundleout.txt">
           <brief> jig1rrEP_bundleout.txt </brief>
           <description>
-            A shorten example of a typical bundleout.txt file produced by a jigsaw run with error propegation. 
+            A shorten example of a typical bundleout.txt file produced by a jigsaw run with error propegation.
             This file was trimmed to hold 10 images, 50 relative points, and all ground points
-            along with their associated detail sections. Bundleout files typically contain 
+            along with their associated detail sections. Bundleout files typically contain
             all image and point from a network put through jigsaw.
           </description>
         </dataFile>
@@ -1642,7 +2059,7 @@
           <brief> Instrument pointing and position tables before jigsaw update </brief>
           <description>
             Table summaries for the InstrumentPointing and InstrumentPosition tables extracted from
-            a cube label. 
+            a cube label.
           </description>
         </dataFile>
 

@@ -6,7 +6,6 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "IsisDebug.h"
 #include "ControlPoint.h"
 
 #include <boost/numeric/ublas/symmetric.hpp>
@@ -242,7 +241,6 @@ namespace Isis {
     }
 
     if (!measures->size()) {
-      ASSERT(!HasRefMeasure());
       referenceMeasure = measure;
     }
     else if (referenceMeasure->IsIgnored() && !measure->IsIgnored() &&
@@ -352,7 +350,6 @@ namespace Isis {
    * @param measure The measure to delete
    */
   int ControlPoint::Delete(ControlMeasure *measure) {
-    ASSERT(measure);
     return Delete(measure->GetCubeSerialNumber());
   }
 
@@ -572,7 +569,6 @@ namespace Isis {
       return PointLocked;
     }
 
-    ASSERT(cm);
     SetExplicitReference(cm);
     return Success;
   }
@@ -959,7 +955,7 @@ namespace Isis {
 
     // if point is Fixed or Constrained in any number of coordinates, initialize adjusted surface
     // point to a priori coordinates (set in e.g. qnet or cneteditor) and exit
-    if( IsFixed() || IsConstrained()) {
+    if( IsFixed() || IsConstrained() || id.contains("Lidar")) {
       adjustedSurfacePoint = aprioriSurfacePoint;
       return Success;
     }
@@ -1780,7 +1776,6 @@ namespace Isis {
    *          is false.
    */
   int ControlPoint::IndexOf(ControlMeasure *cm, bool throws) const {
-    ASSERT(cm);
     return IndexOf(cm->GetCubeSerialNumber(), throws);
   }
 
@@ -1822,7 +1817,6 @@ namespace Isis {
     }
 
     int index = cubeSerials->indexOf(referenceMeasure->GetCubeSerialNumber());
-    ASSERT(index != -1)
 
     return index;
   }
@@ -2053,8 +2047,7 @@ namespace Isis {
 
 
   /**
-   * What the heck is the point of this?
-   *
+   * Signal to indicate the point has been modified. Resets the last modified dateTime to null.
    */
   void ControlPoint::PointModified() {
     dateTime = "";

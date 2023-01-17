@@ -27,7 +27,8 @@ InstrumentId            = {{ INSTRUMENT_ID.Value }}
 TargetName              = {{ targetName }}
 StartTime               = {% set startTime=START_TIME.Value %}
                           {{ RemoveStartTimeZ(startTime) }}
-StopTime                = {{ STOP_TIME.Value }}
+StopTime                = {% set stopTime=STOP_TIME.Value %}
+                          {{ RemoveStartTimeZ(stopTime) }}
 ExposureDuration        = {{ EXPOSURE_DURATION.Value }} <Milliseconds>
 
 {% set antibloomingStateFlag = ANTIBLOOMING_STATE_FLAG.Value %}
@@ -116,7 +117,8 @@ GainModeId              = {{ gainModeId }} <ElectronsPerDN>
 {% set gainState = "0" %}
 {% endif %}
 GainState               = {{ gainState }}
-ImageTime               = {{ IMAGE_TIME.Value }}
+ImageTime               = {% set imageTime=IMAGE_TIME.Value %}
+                          {{ RemoveStartTimeZ(imageTime) }}
 InstrumentDataRate      = {{ INSTRUMENT_DATA_RATE.Value }} <KilobitsPerSecond>
 OpticsTemperature       = ({{ OPTICS_TEMPERATURE.Value.0 }}, {{ OPTICS_TEMPERATURE.Value.1 }} <DegreesCelcius>)
 
@@ -198,6 +200,28 @@ End_Group
 {% endblock %}
 
 {% block translation %}
-CubeAtts        = "+SignedWord+-32752:32767"
-DataPrefixBytes = {{ IMAGE.LINE_PREFIX_BYTES.Value }}
+CubeAtts                = "+SignedWord+-32752:32767"
+DataPrefixBytes         = {{ IMAGE.LINE_PREFIX_BYTES.Value }}
+StretchPairs            = {{ CassiniIssStretchPairs() }}
+DataConversionType      = {{ dataConversionType }}
+ValidMaximum            = {{ VALID_MAXIMUM.Value.1 }}
+SummingMode             = {{ summingMode }}
+CompressionType         = {{ compressionType }}
+FlightSoftwareVersionId = {{ FLIGHT_SOFTWARE_VERSION_ID.Value }}
+VicarLabelBytes         = {{ IMAGE_HEADER.BYTES.Value }}
+
+Object = AncillaryProcess
+  ProcessFunction = cassiniIssCreateLinePrefixTable
+End_Object
+
+Object = AncillaryProcess
+  ProcessFunction = cassiniIssFixLabel
+End_Object
+
+Object = PostProcess
+  ProcessFunction    = cassiniIssFixDnPostProcess
+  StretchPairs       = {{ CassiniIssStretchPairs() }}
+  DataConversionType = {{ dataConversionType }}
+  ValidMaximum       = {{ VALID_MAXIMUM.Value.1 }}
+End_Object
 {% endblock %}

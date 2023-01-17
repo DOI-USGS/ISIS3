@@ -2,8 +2,8 @@
 #include <QFile>
 
 #include "sumspice.h"
-#include "Fixtures.h"
 #include "TestUtilities.h"
+#include "Table.h"
 #include "UserInterface.h"
 #include "Histogram.h"
 #include "iTime.h"

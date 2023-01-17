@@ -166,7 +166,6 @@ namespace Isis {
 
             // Bullet failed to load the kernel...test failure conditions
             if ("cub" == ext) {
-              onerror = "fail";   // This is fatal no matter the condition
               QString mess = "Bullet could not initialize ISIS Cube DEM";
               throw IException(IException::Unknown, mess, _FILEINFO_);
             }
@@ -189,11 +188,14 @@ namespace Isis {
 
             return ( b_model );
           }
-        } catch (IException &ie) {
+        } 
+        catch (IException &ie) {
           fileError.append(ie);
           QString mess = "Unable to create preferred BulletShapeModel";
           fileError.append(IException(IException::Unknown, mess, _FILEINFO_));
-          if ("fail" == onerror) throw fileError;
+          if ("fail" == onerror) {
+            throw fileError;
+          }
         }
 
         // Don't have ShapeModel yet - invoke pre-exising behavior (2017-03-23)
@@ -227,7 +229,9 @@ namespace Isis {
           fileError.append(ie);
           QString mess = "Unable to create preferred EmbreeShapeModel";
           fileError.append(IException(IException::Unknown, mess, _FILEINFO_));
-          if ("fail" == onerror) throw fileError;
+          if ("fail" == onerror) {
+            throw fileError;
+          }
         }
       }
 

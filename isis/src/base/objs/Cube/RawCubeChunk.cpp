@@ -4,7 +4,6 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
-#include "IsisDebug.h"
 #include "RawCubeChunk.h"
 
 #include <cmath>
@@ -167,7 +166,6 @@ namespace Isis {
    * @param offset the position to place the new value at
    */
   void RawCubeChunk::setData(unsigned char value, int offset) {
-    ASSERT(offset < getByteCount());
 
     m_dirty = true;
     m_rawBufferInternalPtr[offset] = value;
@@ -182,7 +180,6 @@ namespace Isis {
    * @param offset the position to place the new value at
    */
   void RawCubeChunk::setData(short value, int offset) {
-    ASSERT((int)(offset * sizeof(short)) < getByteCount());
 
     m_dirty = true;
     ((short *)m_rawBufferInternalPtr)[offset] = value;
@@ -197,7 +194,6 @@ namespace Isis {
    * @param offset the position to place the new value at
    */
   void RawCubeChunk::setData(const float &value, const int &offset) {
-    ASSERT((int)(offset * sizeof(float)) < getByteCount());
 
     m_dirty = true;
     ((float *)m_rawBufferInternalPtr)[offset] = value;

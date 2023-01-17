@@ -20,6 +20,8 @@ find files of those names at the top level of this repository. **/
 #include <QTime>
 #include <QVector>
 
+#include "MathUtils.h"
+
 #include "Angle.h"
 #include "Constants.h"
 #include "CameraDetectorMap.h"
@@ -557,7 +559,7 @@ namespace Isis {
   /**
    * @brief This method returns the Oblique Detector Resolution
    * if the Look Vector intersects the target and if the emission angle is greater than or equal
-   * to 0, and less than 90 degrees.   Otherwise, it returns -1.0.  This formula provides an
+   * to 0, and less than 90 degrees.   Otherwise, it returns Isis::Null.  This formula provides an
    * improved estimate to the detector resolution for images near the limb:
    *
    *
@@ -577,25 +579,43 @@ namespace Isis {
    *   <b>Reference 2:</b>  Handwritten notes by Orrin Thomas which can be found in the
    *                 Glossary under the entry for Oblique Detector Resolution.
    *
+   * @param useLocal If true, emission is fetched from LocalPhotometricAngles.
+   *                 Otherwise, emission is fetched from EmissionAngle().
+   *                 This is an optional parameter that defaults to true,
+   *                 because local emission will give more accurate results.
+   *
    * @return @b double
    */
-  double Camera::ObliqueDetectorResolution(){
+  double Camera::ObliqueDetectorResolution(bool useLocal) {
 
 
-      if(HasSurfaceIntersection()){
-
-          double thetaRad;
-          thetaRad = EmissionAngle()*DEG2RAD;
-
-          if (thetaRad < HALFPI) {
-            return DetectorResolution()/cos(thetaRad);
-
-          }
-          return Isis::Null;
-
-      }
-
+    if(!HasSurfaceIntersection()) {
       return Isis::Null;
+    }
+
+    double thetaRad;
+    double emissionDeg;
+
+    if(useLocal) {
+      Angle phase, emission, incidence;
+      bool success;
+
+      LocalPhotometricAngles(phase, incidence, emission, success);
+      emissionDeg = (success) ? emission.degrees() : Isis::Null;
+    }
+    else {
+      emissionDeg = EmissionAngle();
+    }
+
+    thetaRad = emissionDeg*DEG2RAD;
+
+    if (thetaRad < HALFPI) {
+      return DetectorResolution()/cos(thetaRad);
+
+    }
+
+    return Isis::Null;
+
 
   }
 
@@ -611,10 +631,7 @@ namespace Isis {
       instrumentPosition(sB);
       double pB[3];
       Coordinate(pB);
-      double a = sB[0] - pB[0];
-      double b = sB[1] - pB[1];
-      double c = sB[2] - pB[2];
-      double dist = sqrt(a * a + b * b + c * c) * 1000.0;
+      double dist = SensorUtilities::distance(sB, pB) * 1000.0;
       return dist / (p_focalLength / p_pixelPitch);
     }
     return Isis::Null;
@@ -636,8 +653,8 @@ namespace Isis {
    *
    * @return @b double The sample resolution
    */
-  double Camera::ObliqueSampleResolution() {
-    return ObliqueDetectorResolution() * p_detectorMap->SampleScaleFactor();
+  double Camera::ObliqueSampleResolution(bool useLocal) {
+    return ObliqueDetectorResolution(useLocal) * p_detectorMap->SampleScaleFactor();
   }
 
 
@@ -658,8 +675,8 @@ namespace Isis {
    *
    * @return @b double The line resolution
    */
-  double Camera::ObliqueLineResolution() {
-    return ObliqueDetectorResolution() * p_detectorMap->LineScaleFactor();
+  double Camera::ObliqueLineResolution(bool useLocal) {
+    return ObliqueDetectorResolution(useLocal) * p_detectorMap->LineScaleFactor();
   }
 
 
@@ -682,9 +699,9 @@ namespace Isis {
    *
    * @return @b double The pixel resolution
    */
-  double Camera::ObliquePixelResolution() {
-    double lineRes = ObliqueLineResolution();
-    double sampRes = ObliqueSampleResolution();
+  double Camera::ObliquePixelResolution(bool useLocal) {
+    double lineRes = ObliqueLineResolution(useLocal);
+    double sampRes = ObliqueSampleResolution(useLocal);
     if (lineRes < 0.0) return Isis::Null;
     if (sampRes < 0.0) return Isis::Null;
     return (lineRes + sampRes) / 2.0;
@@ -1648,48 +1665,36 @@ namespace Isis {
     success = true;
 
     // Check to make sure normal is valid
-    SpiceDouble mag;
-    unorm_c(normal,normal,&mag);
-    if (mag == 0.) {
+    if (SensorUtilities::magnitude(normal) == 0.) {
       success = false;
       return;
     }
 
-    // get a normalized surface spacecraft vector
-    SpiceDouble surfSpaceVect[3], unitizedSurfSpaceVect[3], dist;
-    std::vector<double> sB(3, Isis::Null);
-    instrumentBodyFixedPosition(&sB[0]);
+    // get the vector from the surface to the sensor
+    double sensorPosBf[3];
+    instrumentBodyFixedPosition(sensorPosBf);
+    SensorUtilities::Vec sensorPos(sensorPosBf);
 
-    SpiceDouble pB[3];
     SurfacePoint surfacePoint = GetSurfacePoint();
-    pB[0] = surfacePoint.GetX().kilometers();
-    pB[1] = surfacePoint.GetY().kilometers();
-    pB[2] = surfacePoint.GetZ().kilometers();
+    SensorUtilities::Vec groundPt = {
+      surfacePoint.GetX().kilometers(),
+      surfacePoint.GetY().kilometers(),
+      surfacePoint.GetZ().kilometers()};
 
-    vsub_c((SpiceDouble *) &sB[0], pB, surfSpaceVect);
-    unorm_c(surfSpaceVect, unitizedSurfSpaceVect, &dist);
+    SensorUtilities::Vec groundToSensor = sensorPos - groundPt;
 
-    // get a normalized surface sun vector
-    SpiceDouble surfaceSunVect[3];
-    vsub_c(m_uB, pB, surfaceSunVect);
-    SpiceDouble unitizedSurfSunVect[3];
-    unorm_c(surfaceSunVect, unitizedSurfSunVect, &dist);
+    // get the vector from the surface to the sun
+    SensorUtilities::Vec sunPos(m_uB);
+    SensorUtilities::Vec groundToSun = sunPos - groundPt;
 
-    // use normalized surface spacecraft and surface sun vectors to calculate
-    // the phase angle (in radians)
-    phase = Angle(vsep_c(unitizedSurfSpaceVect, unitizedSurfSunVect),
+    phase = Angle(SensorUtilities::sepAngle(groundToSensor, groundToSun),
         Angle::Radians);
 
-    // use normalized surface spacecraft and local normal vectors to calculate
-    // the emission angle (in radians)
-    emission = Angle(vsep_c(unitizedSurfSpaceVect, normal),
+    emission = Angle(SensorUtilities::sepAngle(groundToSensor, normal),
         Angle::Radians);
 
-    // use normalized surface sun and normal vectors to calculate the incidence
-    // angle (in radians)
-    incidence = Angle(vsep_c(unitizedSurfSunVect, normal),
+    incidence = Angle(SensorUtilities::sepAngle(groundToSun, normal),
         Angle::Radians);
-
 
   }
 
@@ -1724,7 +1729,7 @@ namespace Isis {
       return;
     }
 
-    slope = vsep_c(localNormal, &ellipsoidNormal[0]) * 180.0 / PI;;
+    slope = SensorUtilities::sepAngle(localNormal, &ellipsoidNormal[0]) * RAD2DEG;
     success = true;
   }
 
@@ -2228,21 +2233,17 @@ namespace Isis {
    * @return @b double Off Nadir Angle
    */
   double Camera::OffNadirAngle() {
-    NaifStatus::CheckErrors();
-
     // Get the xyz coordinates for the spacecraft and point we are interested in
     double coord[3], spCoord[3];
     Coordinate(coord);
     instrumentPosition(spCoord);
 
     // Get the angle between the 2 points and convert to degrees
-    double a = vsep_c(coord, spCoord) * 180.0 / PI;
+    double a = SensorUtilities::sepAngle(coord, spCoord) * RAD2DEG;
     double b = 180.0 - EmissionAngle();
 
     // The three angles in a triangle must add up to 180 degrees
     double c = 180.0 - (a + b);
-
-    NaifStatus::CheckErrors();
 
     return c;
   }
@@ -2672,7 +2673,7 @@ namespace Isis {
    */
   bool Camera::HasProjection() {
     return p_projection != 0;
-    }
+  }
 
 
   /**

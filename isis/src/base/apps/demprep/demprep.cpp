@@ -32,7 +32,7 @@ namespace Isis{
     ProcessByLine p;
 
     CubeAttributeInput &inputAtt = ui.GetInputAttribute("FROM");
-    Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
+    Cube *icube = p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
     int ins = icube->sampleCount();
     inl = icube->lineCount();
     int inb = icube->bandCount();
@@ -61,14 +61,14 @@ namespace Isis{
 
     if(!proj->IsEquatorialCylindrical()) {
       CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-      ocube = p.SetOutputCube(ui.GetFileName("TO"), att);
+      ocube = p.SetOutputCube(ui.GetCubeName("TO"), att);
       p.StartProcess(GetStats);
 
       PvlGroup demRange("Results");
       demRange += PvlKeyword("MinimumRadius", toString(inCubeStats.Minimum()), "meters");
       demRange += PvlKeyword("MaximumRadius", toString(inCubeStats.Maximum()), "meters");
       if (log){
-        log->addGroup(demRange);
+        log->addLogGroup(demRange);
       }
 
       // Store min/max radii values in new ShapeModelStatistics table
@@ -248,16 +248,16 @@ namespace Isis{
 
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    ocube = p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
+    ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
     // Make sure everything is propagated and closed
     p.EndProcess();
 
     // Now we'll really be processing our input cube
-    p.SetInputCube(ui.GetFileName("FROM"), inputAtt);
+    p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
 
     // We need to create the output file
     ocube = new Cube();
-    ocube->open(FileName(ui.GetFileName("TO")).expanded(), "rw");
+    ocube->open(FileName(ui.GetCubeName("TO")).expanded(), "rw");
 
     p.StartProcess(DoWrap);
 
@@ -268,7 +268,7 @@ namespace Isis{
     demRange += PvlKeyword("MinimumRadius", toString(outCubeStats.Minimum()), "meters");
     demRange += PvlKeyword("MaximumRadius", toString(outCubeStats.Maximum()), "meters");
     if (log){
-      log->addGroup(demRange);
+      log->addLogGroup(demRange);
     }
 
     // Store min/max radii values in new ShapeModelStatistics table
