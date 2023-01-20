@@ -63,21 +63,6 @@ def test_create_rclone_args():
 
 
 def test_file_filtering():
-    files_to_exclude = [
-        "/a_older_versions/*",
-        "/kernels/*/former_versions/",
-        "/corrupt_files/*",
-        "/zzarchive/**",
-        "/kernels/*/original",
-        "gallileo/kernels/ck/prime_mission/*/extended_mission/*",
-        "gallileo/kernels/*/prime_mission/",
-        "galileo/kernels/ck/GEM/",
-        "clementine1/kernels/ck/save",
-        "chandrayaan1/kernels/spk/SAVE_SCS_2017-11-22",
-        "*/kernels/fk/release.*/*",
-        "cassini/kernels/fk/Archive"
-    ]
-
     dest = tempfile.mkdtemp()  # Create a temporary directory and assign the path to 'dest'
 
     # Get the rclone command that was passed to subprocess.run in downloadIsisData
@@ -87,6 +72,5 @@ def test_file_filtering():
     assert "--exclude" in rclone_args
 
     # Check if the command contains the specified regexps
-    exclude_str = rclone_args[rclone_args.index("--exclude") + 1]
     for file in files_to_exclude:
-        assert file in exclude_str
+        assert file in did.exclude_string
