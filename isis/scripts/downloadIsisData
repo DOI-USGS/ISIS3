@@ -113,9 +113,21 @@ def create_rclone_arguments(destination, mission_name, ntransfers=10, rclone_kwa
     if source_type == "naifKernels":
         destination = os.path.join(destination, "kernels")
 
-    extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}", f"--exclude={exclude_string}"]
+    # Add default filter flag
+    filter_args = ["--filter", f"{exclude_string}"]
 
-    extra_args.extend(rclone_kwargs)
+    # Check for additional include and exclude flags
+    include_args = [arg for arg in rclone_kwargs if arg.startswith("--include")]
+    exclude_args = [arg for arg in rclone_kwargs if arg.startswith("--exclude")]
+
+    # Merge any additional include and exclude flags with the default filter flag
+    if include_args:
+        filter_args[1] += "," + ",".join([arg.split("=")[1] for arg in include_args])
+    if exclude_args:
+        filter_args[1] += "," + ",".join([arg.split("=")[1] for arg in exclude_args])
+
+    extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
+    extra_args.extend(filter_args)
     log.debug(f"Args created: {extra_args}")
     return extra_args
 
