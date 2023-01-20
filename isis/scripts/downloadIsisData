@@ -128,6 +128,7 @@ def create_rclone_arguments(destination, mission_name, ntransfers=10, rclone_kwa
 
     extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
     extra_args.extend(filter_args)
+    extra_args.extend(rclone_kwargs)
     log.debug(f"Args created: {extra_args}")
     return extra_args
 
