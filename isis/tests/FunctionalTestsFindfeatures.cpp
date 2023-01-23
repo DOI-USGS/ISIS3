@@ -215,7 +215,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesErrorNoInput) {
     FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("**USER ERROR** Must provide both a FROM/FROMLIST and MATCH cube or image filename"));
+    EXPECT_THAT(e.what(), HasSubstr("**USER ERROR** Input cubes (0) failed to load. Must provide valid FROM/FROMLIST and MATCH cube or image filenames"));
   }
 }
 
