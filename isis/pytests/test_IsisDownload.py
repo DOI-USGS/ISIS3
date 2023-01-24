@@ -59,7 +59,10 @@ def test_create_rclone_args():
     with TemporaryDirectory() as tdir: 
         dest = Path(tdir)
         args = did.create_rclone_arguments(str(dest), "lro_naifKernels:", ntransfers=100, rclone_kwargs=["--dry_run"])
-        assert args == ['lro_naifKernels:', str(dest/"lro"/"kernels"), '--progress', '--checkers=100', '--transfers=100', '--track-renames', '--log-level=WARNING', '--dry_run']
+        assert args == ['lro_naifKernels:', str(dest/"lro"/"kernels"),
+                        '--progress', '--checkers=100', '--transfers=100',
+                        '--track-renames', '--log-level=WARNING',"--filter",
+                        f"{did.exclude_string}", '--dry_run']
 
 
 def test_file_filtering():
@@ -69,17 +72,17 @@ def test_file_filtering():
     rclone_args = did.create_rclone_arguments(dest, "lro_naifKernels:", ntransfers=100, rclone_kwargs=["--dry_run"])
 
     # Check if the command contains the --exclude argument
-    assert "--exclude" in rclone_args
+    assert "--filter" in rclone_args
 
     # Check if the command contains the specified regexps
-    for file in files_to_exclude:
+    for file in did.exclude_string:
         assert file in did.exclude_string
 
 
 def test_create_rclone_arguments_with_include():
     destination = "/path/to/destination"
-    mission_name = "mission:name"
+    mission_name = "mission_name:name"
     ntransfers = 10
-    rclone_kwargs = ["--include=pattern1", "--include=pattern2"]
-    expected_args = ["mission:name", "/path/to/destination/mission/name", "--progress", "--checkers=10", "--transfers=10", "--track-renames", "--log-level=DEBUG", "--filter", "exclude_string,pattern1,pattern2+"]
-    assert create_rclone_arguments(destination, mission_name, ntransfers, rclone_kwargs) == expected_args
+    rclone_kwargs = ["--include=pattern1"]
+    expected_args = ["mission_name:name", "/path/to/destination/mission", "--progress", "--checkers=10", "--transfers=10", "--track-renames", "--log-level=WARNING", "--filter", f"{did.exclude_string},pattern1+","--include=pattern1"]
+    assert did.create_rclone_arguments(destination, mission_name, ntransfers, rclone_kwargs) == expected_args
