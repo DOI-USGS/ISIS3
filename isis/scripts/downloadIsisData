@@ -116,16 +116,21 @@ def create_rclone_arguments(destination, mission_name, ntransfers=10, rclone_kwa
     # Add default filter flag
     filter_args = ["--filter", f"{exclude_string}"]
 
-    # Check for additional include and exclude flags
+
+   # Check for additional include and exclude flags
     include_args = [arg for arg in rclone_kwargs if arg.startswith("--include")]
     exclude_args = [arg for arg in rclone_kwargs if arg.startswith("--exclude")]
+    filter_args_provided = [arg for arg in rclone_kwargs if arg.startswith("--filter")]
 
     # Merge any additional include and exclude flags with the default filter flag
-    if include_args:
-        filter_args[1] += "," + ",".join([arg.split("=")[1] for arg in include_args])
-    if exclude_args:
-        filter_args[1] += "," + ",".join([arg.split("=")[1] for arg in exclude_args])
-
+    if filter_args_provided:
+        filter_args = filter_args_provided
+    else:
+        if include_args:
+            filter_args[1] += "," + ",".join([arg.split("=")[1] for arg in include_args]) + "+"
+        if exclude_args:
+            filter_args[1] += "," + ",".join([arg.split("=")[1] for arg in exclude_args])
+    
     extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
     extra_args.extend(filter_args)
     extra_args.extend(rclone_kwargs)

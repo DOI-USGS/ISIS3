@@ -12,7 +12,7 @@ import tempfile
 from importlib.util import spec_from_loader, module_from_spec
 from importlib.machinery import SourceFileLoader
 
-spec = spec_from_loader("downloadIsisData", SourceFileLoader("downloadIsisData", "../scripts/downloadIsisData"))
+spec = spec_from_loader("downloadIsisData", SourceFileLoader("downloadIsisData", "isis/scripts/downloadIsisData"))
 downloadIsisData = module_from_spec(spec)
 spec.loader.exec_module(downloadIsisData)
 did = downloadIsisData
@@ -74,3 +74,12 @@ def test_file_filtering():
     # Check if the command contains the specified regexps
     for file in files_to_exclude:
         assert file in did.exclude_string
+
+
+def test_create_rclone_arguments_with_include():
+    destination = "/path/to/destination"
+    mission_name = "mission:name"
+    ntransfers = 10
+    rclone_kwargs = ["--include=pattern1", "--include=pattern2"]
+    expected_args = ["mission:name", "/path/to/destination/mission/name", "--progress", "--checkers=10", "--transfers=10", "--track-renames", "--log-level=DEBUG", "--filter", "exclude_string,pattern1,pattern2+"]
+    assert create_rclone_arguments(destination, mission_name, ntransfers, rclone_kwargs) == expected_args
