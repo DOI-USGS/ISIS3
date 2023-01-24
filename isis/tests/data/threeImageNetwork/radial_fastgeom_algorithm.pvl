@@ -1,0 +1,15 @@
+Object = FastGeomParameters
+
+  FastGeomAlgorithm            = "Radial"
+  FastGeomPoints               = 50
+
+  FastGeomRadialPointCount     = 7
+  FastGeomRadialPointFactor    = 0.5
+  FastGeomRadialSegmentLength  = 10
+
+  FastGeomQuerySampleTolerance = 15
+  FastGeomQueryLineTolerance   = 15
+
+EndObject = FastGeomParameters
+End
+

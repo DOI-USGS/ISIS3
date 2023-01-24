@@ -1,0 +1,15 @@
+Object = FastGeomParameters
+
+  FastGeomAlgorithm            = "Grid"
+  FastGeomPoints               = 60
+  
+  FastGeomTrainSampleTolerance = 15
+  FastGeomTrainLineTolerance   = 15
+
+  FastGeomGridStartIteration   = 5
+  FastGeomGridStopIteration    = 10
+  FastGeomGridIterationStep    = 2
+
+EndObject = FastGeomParameters
+End
+
