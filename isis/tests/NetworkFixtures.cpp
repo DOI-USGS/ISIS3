@@ -104,6 +104,9 @@ namespace Isis {
     cube1map->fromIsd(tempDir.path() + "/cube1map.cub", mappedLabelPath1, *isdPath1, "rw");
     cube2map->fromIsd(tempDir.path() + "/cube2map.cub", mappedLabelPath2, *isdPath2, "rw");
     cube3map->fromIsd(tempDir.path() + "/cube3map.cub", mappedLabelPath3, *isdPath3, "rw");
+
+    grid_fastgeom_config = "data/threeImageNetwork/grid_fastgeom_algorithm.pvl";
+    radial_fastgeom_config = "data/threeImageNetwork/radial_fastgeom_algorithm.pvl";
   }
 
 
