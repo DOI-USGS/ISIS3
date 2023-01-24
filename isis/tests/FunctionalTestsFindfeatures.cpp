@@ -346,7 +346,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomDefault) {
   ASSERT_EQ( keyvalues.get( "FastGeomRadialSegments",       "null"), "14");
 
   // Do the floating point special
-  EXPECT_NEAR( toDouble(keyvalues.get( "FastGeomMaximumRadius",        "null") ), 339.411, 1.0E-3);
+  EXPECT_NEAR( toDouble(keyvalues.get( "FastGeomMaximumRadius",        "-1") ), 339.411, 1.0E-4);
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomRadialConfig) {
@@ -414,7 +414,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomRadialConfig) {
   ASSERT_EQ( keyvalues.get( "FastGeomRadialSegments",       "null"), "37");
 
   // Do the floating point special
-  EXPECT_NEAR( toDouble(keyvalues.get( "FastGeomMaximumRadius",        "null") ), 360.624, 1.0E-3);
+  EXPECT_NEAR( toDouble(keyvalues.get( "FastGeomMaximumRadius",        "-1") ), 360.624, 1.0E-4);
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomGridDefault) {
