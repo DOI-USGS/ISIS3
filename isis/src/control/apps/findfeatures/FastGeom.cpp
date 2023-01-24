@@ -307,7 +307,7 @@ int FastGeom::radial_algorithm(MatchImage &query, MatchImage &train,
   if ( fg_point_count < 3) fg_point_count = 3;
 
   // Lets report what we got
-  logit <<   "  FGMaximumRadius:               " << fg_max_radius << "\n";
+  logit <<   "  FastGeomMaximumRadius:         " << fg_max_radius << "\n";
   logit <<   "  FastGeomRadialSegmentLength:   " << fg_radial_seglen << "\n";
   logit <<   "  FastGeomRadialPointCount:      " << fg_point_count << "\n";
   logit <<   "  FastGeomRadialPointFactor:     " << fg_point_factor << "\n";
@@ -458,7 +458,7 @@ int FastGeom::grid_algorithm(MatchImage &query, MatchImage &train,
   logit <<   "  FastGeomGridStopIteration:  " << fg_grid_stop_iter << "\n";
   logit <<   "  FastGeomGridIterationStep:  " << fg_grid_iter_step << "\n";
   logit <<   "  FastGeomGridSaveAllPoints:  " << toString(fg_save_all) << "\n";
-  logit <<   "  FGPointIncrement:           " << increment << "\n";
+  logit <<   "  FastGeomPointIncrement:     " << increment << "\n";
 
   // Set up line/sample mapping correspondence between images
   std::vector<FGPoint>      q_points, t_points;
@@ -556,11 +556,11 @@ int FastGeom::grid_algorithm(MatchImage &query, MatchImage &train,
 
   // Log results
   logit <<   "\n==> Grid Point Mapping complete <==\n";
-  logit <<   "  FGTotalGridIterations:  " << n_iterations << "\n";
-  logit <<   "  TotalPoints:            " << n_total_points << "\n";
-  logit <<   "  ImagePoints:            " << n_image_points << "\n";
-  logit <<   "  MappedPoints:           " << n_mapped_points << "\n";
-  logit <<   "  InTrainMapFOV:          " << n_train_fov << "\n";
+  logit <<   "  FastGeomTotalGridIterations:  " << n_iterations << "\n";
+  logit <<   "  TotalPoints:                  " << n_total_points << "\n";
+  logit <<   "  ImagePoints:                  " << n_image_points << "\n";
+  logit <<   "  MappedPoints:                 " << n_mapped_points << "\n";
+  logit <<   "  InTrainMapFOV:                " << n_train_fov << "\n";
   logit.flush();
 
   // Dump the points. Method wil use the m_parameters to determine if the
