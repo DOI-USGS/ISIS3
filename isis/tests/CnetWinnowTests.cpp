@@ -21,7 +21,7 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetwinnow.xml").expanded()
 TEST_F(ThreeImageNetwork, FunctionalTestCnetwinnowDefault) {
   QString onetPath = tempDir.path()+"/winnowedNetwork.net";
   QVector<QString> args = {"onet="+onetPath,
-                           "file_prefix=winnow"};
+                           "file_prefix=" + tempDir.path() + "/winnow"};
   UserInterface ui(APP_XML, args);
 
   int initialMeasureCount = network->GetNumValidMeasures();
