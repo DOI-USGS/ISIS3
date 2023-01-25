@@ -29,7 +29,7 @@ class MockedPopen:
     def __exit__(self, exc_type, value, traceback):
         pass
 
-    def communicate(self, input=None, timeout=None): 
+    def communicate(self, input=None, timeout=None):
         if self.args[0] == 'rclone':
             stdout = "Success".encode("utf-8")
             stderr = ''.encode("utf-8")
@@ -54,6 +54,18 @@ def test_rclone():
 def test_rclone_unknown_exception():
     with pytest.raises(Exception, match="idk"):
         res = did.rclone("lsf", "test", extra_args=["-l", "-R", "--format", "p", "--files-only"], redirect_stdout=True, redirect_stderr=True)
+
+
+def test_rclone():
+    with mock.patch("subprocess.Popen", MockedPopen):
+        res = did.rclone("lsf", "test", extra_args=["-l", "-R", "--format", "p", "--files-only"], redirect_stdout=True, redirect_stderr=True)
+        assert res["out"].decode() == "Success"
+
+
+def test_rclone_unknown_exception():
+    with mock.patch("subprocess.Popen", MockedBustedPopen):
+        with pytest.raises(Exception, match="idk"):
+            did.rclone("lsf", "test", extra_args=["-l", "-R", "--format", "p", "--files-only"], redirect_stdout=True, redirect_stderr=True)
 
 
 def test_create_rclone_args():
