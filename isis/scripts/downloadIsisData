@@ -13,7 +13,7 @@ from os import path
 from collections import OrderedDict
 from pathlib import Path
 
-exclude_list = [    '/a_older_versions/*',    '/kernels/*/former_versions/',    '/corrupt_files/*',    '/zzarchive/**',    '/kernels/*/original',    'gallileo/kernels/ck/prime_mission/*/extended_mission/*',    'gallileo/kernels/*/prime_mission/',    'galileo/kernels/ck/GEM/',    'clementine1/kernels/ck/save',    'chandrayaan1/kernels/spk/SAVE_SCS_2017-11-22',    '*/kernels/fk/release.*/*',    'cassini/kernels/fk/Archive']
+exclude_list = [    '/a_older_versions/*',    '/kernels/*/former_versions/',    '/corrupt_files/*',    '/zzarchive/**',    '/kernels/*/original',    'gallileo/kernels/ck/prime_mission/*/extended_mission/*',    'gallileo/kernels/*/prime_mission/',    'galileo/kernels/ck/GEM/',    'clementine1/kernels/ck/save',    'chandrayaan1/kernels/spk/SAVE_SCS_2017-11-22',    '*/kernels/fk/release.*/*',    'cassini/kernels/fk/Archive', '.hidden_file']
 exclude_string = "{" + ",".join(exclude_list) + "}"
 
 def find_conf():
@@ -45,7 +45,7 @@ def call_subprocess(command, redirect_stdout=True, redirect_stderr=False):
             command,
             stdout=stdout,
             stderr=stderr) as proc:
-        (out, err) = proc.communicate()
+        return proc.communicate()
 
         if out:
             log.debug("Process output: ")
