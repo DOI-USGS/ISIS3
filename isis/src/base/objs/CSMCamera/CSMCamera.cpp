@@ -142,13 +142,10 @@ void sanitize(std::string &input);
       m_instrumentRotation->LoadCache(instRotTable);
 
       json isdJson = stateAsJson(stateString.toStdString());
-      cout << isdJson << endl;
 
       SetFocalLength(isdJson["m_focalLength"]);
 
       Affine::AMatrix matrix(3, 3, 0.0);
-      // matrix[0][0] = 1;
-      // matrix[1][1] = 1;
 
       matrix[0][0] = isdJson["m_transX"][1];
       matrix[1][1] = isdJson["m_transY"][2];
@@ -164,8 +161,7 @@ void sanitize(std::string &input);
       focalMap->SetDetectorOrigin(isdJson["m_ccdCenter"][1], isdJson["m_ccdCenter"][0]);
 
       // Setup distortion map
-      CameraDistortionMap *distMap = new CameraDistortionMap(this);
-
+      new CameraDistortionMap(this);
       new CameraSkyMap(this);
     }
 
@@ -369,6 +365,15 @@ void sanitize(std::string &input);
     // m_lookB[2] = lookB[2];
     memcpy(m_lookB, &lookB[0], sizeof(double) * 3);
     m_newLookB = true;
+
+    // Don't try to intersect the sky
+    if (target()->isSky())
+    {
+      target()->shape()->setHasIntersection(false);
+      return false;
+    }
+
+    return false;
   }
 
 
