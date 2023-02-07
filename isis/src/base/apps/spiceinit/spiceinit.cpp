@@ -255,7 +255,6 @@ namespace Isis {
         kernelSuccess = tryKernels(icube, p, ui, log, lk, pck, targetSpk,
                                    realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
       }
-
       if (!kernelSuccess) {
         throw IException(IException::Unknown,
                          "Unable to initialize camera model",
