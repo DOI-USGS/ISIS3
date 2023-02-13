@@ -14,20 +14,19 @@ from collections import OrderedDict
 from pathlib import Path
 
 exclude_list = [
-    '/a_older_versions/**',
-    '/kernels/*/former_versions/',
-    '/corrupt_files/**',
-    '/zzarchive/**',
-    '/kernels/*/original',
-    'gallileo/kernels/ck/prime_mission/*/extended_mission/**',
-    'gallileo/kernels/*/prime_mission/',
-    'galileo/kernels/ck/GEM/',
-    'clementine1/kernels/ck/save',
-    'chandrayaan1/kernels/spk/SAVE_SCS_2017-11-22',
-    '*/kernels/fk/release.**',
-    'cassini/kernels/fk/Archive',
-    '.hidden_file'
-]
+    '/a_older_versions/*',
+    '*/former_versions/',
+    'corrupt_files/*',
+    'zzarchive/**',
+    '*/original',
+    'ck/prime_mission/*/extended_mission/*',
+    '*/prime_mission/',
+    'ck/GEM/',
+    'ck/save',
+    'spk/SAVE_SCS_2017-11-22',
+    'fk/release.*/*',
+    'fk/Archive'
+    ]
 
 def join_excludes(exclude_patterns):
     """
@@ -149,15 +148,15 @@ def create_rclone_arguments(destination, mission_name, ntransfers=10, rclone_kwa
     filter_args = []
     for include_arg in include_args:
         include_regex = include_arg.split("=")[1]
-        filter_args.append(f"--filter=+ {include_regex}")
+        filter_args.append(f'--filter=+ {include_regex}')
     for exclude_arg in exclude_args:
         exclude_regex = exclude_arg.split("=")[1]
-        filter_args.append(f"--filter=- {exclude_regex}")
+        filter_args.append(f'--filter=- {exclude_regex}')
     for filter_arg in filter_args_provided:
         filter_regex = filter_arg.split("=")[1]
-        filter_args.append(f"{filter_arg}")
+        filter_args.append(f'--filter=- {filter_arg}')
     for exclude_item in exclude_list:
-        filter_args.append(f"--filter=- {exclude_item}")
+        filter_args.append(f'--filter=- {exclude_item}')
 
     extra_args = [f"{mission_name}",
                   f"{destination}", 
