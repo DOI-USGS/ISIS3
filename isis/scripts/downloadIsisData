@@ -12,20 +12,22 @@ from shutil import which
 from os import path
 from collections import OrderedDict
 from pathlib import Path
+import sys
+import re
 
 exclude_list = [
-    '/a_older_versions/*',
-    '*/former_versions/',
-    'corrupt_files/*',
-    'zzarchive/**',
-    '*/original',
-    'ck/prime_mission/*/extended_mission/*',
-    '*/prime_mission/',
-    'ck/GEM/',
-    'ck/save',
-    'spk/SAVE_SCS_2017-11-22',
-    'fk/release.*/*',
-    'fk/Archive'
+        '/a_older_versions/*',
+        '*/former_versions/',
+        'corrupt_files/*',
+        'zzarchive/**',
+        '*/original/',
+        'ck/prime_mission/*/extended_mission/*',
+        '*/prime_mission/',
+        #'ck/GEM/',
+        #'ck/save/',
+        'spk/SAVE_SCS_2017-11-22/',
+        'fk/release.*/*',
+        'fk/Archive/'
     ]
 
 def join_excludes(exclude_patterns):
@@ -36,9 +38,29 @@ def join_excludes(exclude_patterns):
     exclude_patterns : list
         list of regex patterns to join to a filter str for rclone
     """
-    return " --filter=".join(
-        ['="- {}"\n'.format(pattern) for pattern in exclude_patterns])
+    return " --filter".join(['="- {}"\n'.format(pattern) for pattern in exclude_patterns])
 
+# logic for if user includes their own includes
+if "--include" in sys.argv:
+    # grab include argument
+    include_argers = [arg for arg in sys.argv if arg.startswith("--include")][0].split("=")[1]
+    # if more than one include pattern
+    if include_argers.startswith("{") and include_argers.endswith("}"):
+        # split and make a list
+        include_argers = include_argers.strip("{}").split(",")
+
+    # loop through all includes
+    for arg in include_argers:
+        # if present in default exclude list
+        if arg in exclude_list:
+            # remove include argers from the exclude_list
+            exclude_list.remove(arg)
+        # if present in default exclude list
+        if f"{arg}/" in exclude_list:
+            # remove include argers from the exclude list
+            exclude_list.remove(f"{arg}/")
+
+# join exclude string
 exclude_string = join_excludes(exclude_list)
 
 def find_conf():
@@ -91,6 +113,9 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
 
             # this is probably a config file on disk so pass it through
             config_path = config
+
+            for arg in extra_args:
+                arg = re.sub(r'--filter=- ([^ ]+)', r'--filter="- \1"', arg)
             command_with_args = ["rclone", command, f'--config={config_path}', *extra_args]
             log.debug("Invoking : %s", " ".join(command_with_args))
             return call_subprocess(command_with_args, redirect_stdout, redirect_stderr)
@@ -104,7 +129,9 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
                 log.debug(f"USING CONFIG:\n{config}")
 
                 f.write(config.encode())
-            
+
+                for arg in extra_args:
+                    arg = re.sub(r'--filter=- ([^ ]+)', r'--filter="- \1"', arg)
                 command_with_args = ["rclone", command, f"--config={config_path}", *extra_args]
                 return call_subprocess(command_with_args, redirect_stdout, redirect_stderr)
     except ProcessLookupError as not_found_e:
@@ -185,7 +212,7 @@ def main(mission, dest, cfg_path, ntransfers, kwargs):
           
     """
     log.info("---Script starting---")
-
+            
     log.debug(f"Using config: {cfg_path}")
     result = rclone("listremotes", config=cfg_path)
     config_sources = result[0].decode("utf-8").split("\n")
@@ -254,7 +281,7 @@ if __name__ == '__main__':
     parser.add_argument('--config', action='store', default=find_conf())
     parser.add_argument('--filter', help='files and patterns to ignore while downloading', default=exclude_string)
     args, kwargs = parser.parse_known_args()
-    
+ 
     log_kwargs = {
       'format': '%(asctime)s %(levelname)-8s %(message)s',
       'level': log.WARN,
@@ -269,6 +296,6 @@ if __name__ == '__main__':
         log_kwargs['level'] = log.DEBUG
 
     log.basicConfig(**log_kwargs)
-    log.debug("Additional Args:", kwargs)
+    log.debug("Additional Args:", *kwargs)
 
     main(args.mission, args.dest, os.path.expanduser(args.config), args.num_transfers, kwargs)
