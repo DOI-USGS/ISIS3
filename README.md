@@ -55,7 +55,7 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
     ```bash
     #Create a new conda environment to install ISIS in
-    conda create -n isis
+    conda create -n isis python=3.6
 
     #Activate the environment
     conda activate isis
