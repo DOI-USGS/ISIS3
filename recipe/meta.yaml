@@ -115,6 +115,7 @@ requirements:
 
   run:
   - {{ pin_compatible('ale', max_pin='x.x.x') }}
+  - {{ pin_compatible('armadillo', max_pin='x.x.x') }}
   - {{ pin_compatible('aom', max_pin='x.x') }}
   - {{ pin_compatible('boost', max_pin='x.x') }}
   - {{ pin_compatible('boost-cpp', max_pin='x.x') }}
