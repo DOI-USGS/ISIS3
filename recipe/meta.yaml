@@ -87,6 +87,7 @@ requirements:
    - nlohmann_json
    - ninja==1.7.2
    - nn
+   - numpy=1.7
    - opencv>=4.5.2
    - openssl>=1.1.1k
    - pcl>=1.10.0
@@ -149,6 +150,7 @@ requirements:
   - nanoflann
   - nlohmann_json
   - nn
+  - {{ pin_compatible('numpy', max_pin='x.x') }}
   - {{ pin_compatible('opencv', max_pin='x.x') }}
   - {{ pin_compatible('openssl', min_pin='x', max_pin='x.x') }}
   - pcl
