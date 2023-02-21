@@ -17,7 +17,7 @@ dependencies:
   - curl
   - doxygen
   - eigen < 3.4
-  - embree
+  - embree>=2.17,<3
   - ffmpeg
   - geos>=3.7,<3.8
   - geotiff
