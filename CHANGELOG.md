@@ -36,6 +36,16 @@ release.
 ## [Unreleased]
 
 ### Changed
+
+### Added
+
+### Deprecated
+
+### Fixed
+
+## [7.2.0] - 2022-12-07
+
+### Changed
 - Updated Hayabusa2 mission name and updated translation files to make L2DShapeModelFileName, L2DPhaseFunctionFileName, L2CShapeModelFileName, and BandRegistration optional keywords.
 
 ### Added
