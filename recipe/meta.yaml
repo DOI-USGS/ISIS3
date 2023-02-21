@@ -60,13 +60,15 @@ requirements:
   - curl
   - doxygen
   - eigen<3.4
-  - embree
+  # versioned due to major release of embree 3 on conda-forge
+  # it is not compatible without changes to ISIS
+  - embree>=2.17, <3
   - ffmpeg
   - geos>=3.7,<3.8
   - geotiff
   - gmp
   - graphviz
-  - gsl>=2.6
+  - gsl>=2.6,<2.7
   - hdf5
   - icu
   - inja
@@ -76,7 +78,7 @@ requirements:
   - krb5
   - libopencv>=4.5.2
   - libpng>=1.6.34
-  - libprotobuf
+  - libprotobuf<3.20
   - libtiff>=4.0
   - libxml2
   - make
@@ -87,23 +89,26 @@ requirements:
   - nlohmann_json
   - ninja==1.7.2
   - nn
+  - numpy=1.23
   - opencv>=4.5.2
   - openssl>=1.1.1k
   - pcl>=1.10.0
-  - protobuf
+  - protobuf<3.20
   - python>=3.7.11
+  - rclone
   - qhull
-  - qt>=5.9.6
+  - qt>=5.9.6,<5.15.0
   - qwt
   - sqlite
   - suitesparse
   - superlu
   - swig
+  - texlive-core
   - tnt
   - x264
   - x265
   - xalan-c
-  - xerces-c
+  - xerces-c=3
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm
@@ -123,7 +128,7 @@ requirements:
   - cspice
   - curl
   - eigen
-  - embree
+  - {{ pin_compatible('embree', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('ffmpeg', min_pin='x.x') }}
   - {{ pin_compatible('geos', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('geotiff', max_pin='x.x') }}
