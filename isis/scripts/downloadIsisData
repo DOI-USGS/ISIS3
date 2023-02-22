@@ -15,19 +15,24 @@ from pathlib import Path
 import sys
 import re
 
+
 exclude_list = [
-        '/a_older_versions/*',
-        '*/former_versions/',
-        'corrupt_files/*',
-        'zzarchive/**',
-        '*/original/',
-        'ck/prime_mission/*/extended_mission/*',
-        '*/prime_mission/',
-        #'ck/GEM/',
-        #'ck/save/',
+        'source/',
+        '/a_older_versions/',
+        '/former_versions/',
+        'corrupt_files/',
+        'zzarchive/',
+        '/original/',
+        'ck/prime_mission/',
+        'extended_mission/',
+        '/prime_mission/',
+        'ck/GEM/',
+        'ck/save/',
         'spk/SAVE_SCS_2017-11-22/',
-        'fk/release.*/*',
-        'fk/Archive/'
+        'release*/',
+        'Archive/',
+        'ek/',
+        '*.lbl'
     ]
 
 def join_excludes(exclude_patterns):
