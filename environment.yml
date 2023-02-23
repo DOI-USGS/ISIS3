@@ -3,7 +3,6 @@ channels:
   - defaults
 
 dependencies:
-  - plio
   - ale=0.8.6
   - armadillo
   - boost=1.72
