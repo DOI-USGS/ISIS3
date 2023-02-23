@@ -88,6 +88,21 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
         raise Exception(message)
 
 
+def get_kernal_destination_path(source_type):
+    
+    switcher ={
+        "naifKernals": "kernals",
+        "pck": "kernals/pck",
+        "ck":"kernals/ck",
+        "spk":"kernals/spk",
+        "fk": "kernals/fk",
+        "iak":"kernals/pck",
+        "sclk":"kernals/sclk",
+        "tspk":"kernals/tspk"
+    }
+    return switcher.get(source_type, "")
+
+
 def create_rclone_arguments(destination, mission_name, ntransfers=10, rclone_kwargs=[]):
     """
     Parameters
@@ -107,9 +122,8 @@ def create_rclone_arguments(destination, mission_name, ntransfers=10, rclone_kwa
     log.debug(f"Mission_dir_name: {mission_dir_name}, source_type: {source_type}")
 
     destination = os.path.join(destination, str(mission_dir_name).replace(":",""))
-    if source_type == "naifKernels":
-        destination = os.path.join(destination, "kernels")
-
+    #add kernal directory path if needed
+    destination = os.path.join(destination, get_kernal_destination_path(source_type))
     extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
 
     extra_args.extend(rclone_kwargs)
@@ -146,7 +160,7 @@ def main(mission, dest, cfg_path, ntransfers, kwargs):
     for source in sorted(config_sources, key=lambda x: x.split("_")[-1]):
         parsed_name = source.split("_")
         # If it is a mission, it should be in the format <mission_nam>_<source_type>
-        if len(parsed_name) == 2 and parsed_name[1] in ["usgs:", "naifKernels:"]:
+        if len(parsed_name) == 2 and parsed_name[1] in ["usgs:", "naifKernels:", "pck"]:
             remotes_mission_name = parsed_name[0]
             supported_missions[remotes_mission_name] = supported_missions.get(remotes_mission_name, []) + [source]
 
