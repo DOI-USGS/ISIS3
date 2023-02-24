@@ -67,21 +67,18 @@ namespace Isis {
     }
 
     // Stitch together the individual frames
-    FileName outputFileName;
-    bool pref = false;
-    bool suff = false;
-    // if output prefix was given
-    if (ui.IsOptionSet("OUTPUTPREFIX")) {
-      outputFileName = FileName(ui.GetCubeName("OUTPUTPREFIX"));
-      pref = true
-    } else if (ui.IsOptionSet("OUTPUTSUFFIX")) { // if output suffix was given
-      outputFileName = FileName(ui.GetCubeName("OUTPUTSUFFIX"));
-      suff = true
-    } else {
+    try {
+      if (ui.IsOptionSet("OUTPUTPREFIX")) { // if prefix was given
+          FileName outputFileName(ui.GetCubeName("OUTPUTPREFIX"));
+        } else if (ui.IsOptionSet("OUTPUTSUFFIX")) { // if suffix was given
+          FileName outputFileName(ui.GetCubeName("OUTPUTSUFFIX"));
+        }
+    catch (IException &e){
       // handle error case where neither option is set
-      QString msg = "No prefix/suffix provided."
+      QString msg = "No prefix/suffix provided.";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
+    
     QString outputBaseName = outputFileName.expanded();
     QStringList frameKeys = frameMap.uniqueKeys();
     Progress stitchProgress;
@@ -91,10 +88,12 @@ namespace Isis {
     foreach(QString frameKey, frameKeys) {
       try {
         QString frameIdentifier = frameKey.split("/").last();
-        if (pref) { // if prefix was given
+        if (ui.IsOptionSet("OUTPUTPREFIX")) { // if prefix was given
           FileName frameFileName(outputBaseName + "-" + frameIdentifier + ".cub");
-        } else if (suff) { // if output suffix was given
+        } else if ui.IsOptionSet("OUTPUTSUFFIX")) { // if output suffix was given
           FileName frameFileName(frameIdentifier + "-" + outputBaseName + ".cub");
+        } else {
+          FileName frameFileName(frameIdentifier + ".cub");
         }
         stitchFrame( frameMap.values(frameKey), frameFileName );
         stitchProgress.CheckStatus();
