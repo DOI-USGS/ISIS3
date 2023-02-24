@@ -91,16 +91,24 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
 def get_kernal_destination_path(source_type):
     
     switcher ={
-        "naifKernals": "kernals",
-        "pck": "kernals/pck",
-        "ck":"kernals/ck",
-        "spk":"kernals/spk",
-        "fk": "kernals/fk",
-        "iak":"kernals/pck",
-        "sclk":"kernals/sclk",
-        "tspk":"kernals/tspk"
+        "naifKernels": "kernels",
+        "pck": "kernels/pck",
+        "ck":"kernels/ck",
+        "spk":"kernels/spk",
+        "fk": "kernels/fk",
+        "iak":"kernels/iak",
+        "sclk":"kernels/sclk",
+        "tspk":"kernels/tspk",
+        "usgs":""
     }
-    return switcher.get(source_type, "")
+    try:
+        source_path = switcher.get(source_type)
+    except KeyError as e:
+        
+        raise KeyError(f"kernal path not found. Source type {source_type} is invalid")
+
+    log.debug(f"source path for {source_type} is {source_path}" )
+    return source_path
 
 
 def create_rclone_arguments(destination, mission_name, ntransfers=10, rclone_kwargs=[]):
@@ -160,7 +168,7 @@ def main(mission, dest, cfg_path, ntransfers, kwargs):
     for source in sorted(config_sources, key=lambda x: x.split("_")[-1]):
         parsed_name = source.split("_")
         # If it is a mission, it should be in the format <mission_nam>_<source_type>
-        if len(parsed_name) == 2 and parsed_name[1] in ["usgs:", "naifKernels:", "pck"]:
+        if len(parsed_name) == 2 and parsed_name[1] in ["usgs:", "naifKernels:", "pck:"]:
             remotes_mission_name = parsed_name[0]
             supported_missions[remotes_mission_name] = supported_missions.get(remotes_mission_name, []) + [source]
 
