@@ -73,6 +73,7 @@ namespace Isis {
         } else if (ui.IsOptionSet("OUTPUTSUFFIX")) { // if suffix was given
           FileName outputFileName(ui.GetCubeName("OUTPUTSUFFIX"));
         }
+    }
     catch (IException &e){
       // handle error case where neither option is set
       QString msg = "No prefix/suffix provided.";
