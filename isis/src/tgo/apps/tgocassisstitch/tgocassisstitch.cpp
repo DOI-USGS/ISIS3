@@ -67,19 +67,27 @@ namespace Isis {
     }
 
     // Stitch together the individual frames
-    FileName outputFileName(ui.GetCubeName("OUTPUTPREFIX"));
+    FileName outputFileName(ui.GetCubeName("OUT"));
+    bool suff(ui.GetBoolean("SUFFIX"));
     QString outputBaseName = outputFileName.expanded();
     QStringList frameKeys = frameMap.uniqueKeys();
     Progress stitchProgress;
     stitchProgress.SetText("Stitching Frames");
     stitchProgress.SetMaximumSteps(frameKeys.size());
     stitchProgress.CheckStatus();
+    
     foreach(QString frameKey, frameKeys) {
       try {
         QString frameIdentifier = frameKey.split("/").last();
-        FileName frameFileName(outputBaseName + "-" + frameIdentifier + ".cub");
-        stitchFrame( frameMap.values(frameKey), frameFileName );
-        stitchProgress.CheckStatus();
+        if (suff == true) {
+          FileName frameFileName(frameIdentifier + "-" + outputBaseName + ".cub");
+          stitchFrame( frameMap.values(frameKey), frameFileName );
+          stitchProgress.CheckStatus();
+        } else {
+          FileName frameFileName(outputBaseName + "-" + frameIdentifier + ".cub");
+          stitchFrame( frameMap.values(frameKey), frameFileName );
+          stitchProgress.CheckStatus();
+        }
       }
       catch (IException &e) {
         QString msg = "Failed stitch frame for observation ["

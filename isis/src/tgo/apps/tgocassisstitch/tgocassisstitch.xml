@@ -29,6 +29,10 @@
     <change name="Adam Goins" date="2018-02-15">
       Modified stitchFrame to store the Archive group for ingested framelets. Fixes #5333.
     </change>
+    <change name="Anton Hibl" date="2023-02-24">
+      Modified stitchFrame to have logic for suffix or prefix in the output
+      filename. Fixes #5125.
+    </change>
   </history>
 
   <category>
@@ -54,7 +58,7 @@
         </filter>
       </parameter>
 
-      <parameter name="OUTPUTPREFIX">
+      <parameter name="OUT">
          <type>cube</type>
          <fileMode>output</fileMode>
          <brief>
@@ -64,6 +68,23 @@
            The stitched cubes will be output as this basename plus the last
            component of the serial number. Usually this will be the start time
            for the frame.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+      </parameter>
+
+      <parameter name="SUFFIX">
+         <type>boolean</type>
+         <default><item>FALSE</item></default>
+         <fileMode>output</fileMode>
+         <brief>
+           output using suffix instead of prefix.
+         </brief>
+         <description>
+           The stitched cubes will be output as the last component of the serial
+           number plus this basename. Usually this will be the start time for
+           the frame.
          </description>
          <filter>
            *.cub
