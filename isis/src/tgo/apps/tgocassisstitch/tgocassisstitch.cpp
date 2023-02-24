@@ -71,10 +71,10 @@ namespace Isis {
     bool suff = false;
     FileName outputFileName;
 
-    if (ui.IsOptionSet("OUTPUTPREFIX")) { // if prefix was given
+    if (ui.WasEntered("OUTPUTPREFIX") && ui.GetString("OUTPUTSUFFIX") == "NONE") {
       FileName outputFileName(ui.GetCubeName("OUTPUTPREFIX"));
       pref = true;
-    } else if (ui.IsOptionSet("OUTPUTSUFFIX")) { // if suffix was given
+    } else if (ui.WasEntered("OUTPUTSUFFIX") && ui.GetString("OUTPUTPREFIX") == "NONE") { 
       FileName outputFileName(ui.GetCubeName("OUTPUTSUFFIX"));
       suff = true;
     }
