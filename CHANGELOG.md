@@ -36,6 +36,7 @@ release.
 ## [Unreleased]
 
 ### Changed
+- Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
 
 ### Added
 
