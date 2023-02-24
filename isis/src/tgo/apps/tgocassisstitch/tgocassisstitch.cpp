@@ -67,7 +67,21 @@ namespace Isis {
     }
 
     // Stitch together the individual frames
-    FileName outputFileName(ui.GetCubeName("OUTPUTPREFIX"));
+    FileName outputFileName;
+    bool pref = false;
+    bool suff = false;
+    // if output prefix was given
+    if (ui.IsOptionSet("OUTPUTPREFIX")) {
+      outputFileName = FileName(ui.GetCubeName("OUTPUTPREFIX"));
+      pref = true
+    } else if (ui.IsOptionSet("OUTPUTSUFFIX")) { // if output suffix was given
+      outputFileName = FileName(ui.GetCubeName("OUTPUTSUFFIX"));
+      suff = true
+    } else {
+      // handle error case where neither option is set
+      QString msg = "No prefix/suffix provided."
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    }
     QString outputBaseName = outputFileName.expanded();
     QStringList frameKeys = frameMap.uniqueKeys();
     Progress stitchProgress;
@@ -77,7 +91,11 @@ namespace Isis {
     foreach(QString frameKey, frameKeys) {
       try {
         QString frameIdentifier = frameKey.split("/").last();
-        FileName frameFileName(outputBaseName + "-" + frameIdentifier + ".cub");
+        if (pref) { // if prefix was given
+          FileName frameFileName(outputBaseName + "-" + frameIdentifier + ".cub");
+        } else if (suff) { // if output suffix was given
+          FileName frameFileName(frameIdentifier + "-" + outputBaseName + ".cub");
+        }
         stitchFrame( frameMap.values(frameKey), frameFileName );
         stitchProgress.CheckStatus();
       }
