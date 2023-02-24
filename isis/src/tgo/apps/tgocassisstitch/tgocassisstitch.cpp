@@ -91,7 +91,7 @@ namespace Isis {
         QString frameIdentifier = frameKey.split("/").last();
         if (ui.IsOptionSet("OUTPUTPREFIX")) { // if prefix was given
           FileName frameFileName(outputBaseName + "-" + frameIdentifier + ".cub");
-        } else if ui.IsOptionSet("OUTPUTSUFFIX")) { // if output suffix was given
+        } else if (ui.IsOptionSet("OUTPUTSUFFIX")) { // if output suffix was given
           FileName frameFileName(frameIdentifier + "-" + outputBaseName + ".cub");
         } else {
           FileName frameFileName(frameIdentifier + ".cub");
