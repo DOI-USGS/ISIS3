@@ -67,37 +67,27 @@ namespace Isis {
     }
 
     // Stitch together the individual frames
-    bool pref = false;
-    bool suff = false;
-    FileName outputFileName;
-
-    if (ui.WasEntered("OUTPUTPREFIX") && ui.GetString("OUTPUTSUFFIX") == "NONE") {
-      FileName outputFileName(ui.GetCubeName("OUTPUTPREFIX"));
-      pref = true;
-    } else if (ui.WasEntered("OUTPUTSUFFIX") && ui.GetString("OUTPUTPREFIX") == "NONE") { 
-      FileName outputFileName(ui.GetCubeName("OUTPUTSUFFIX"));
-      suff = true;
-    }
-    
+    FileName outputFileName(ui.GetCubeName("OUT"));
+    bool suff(ui.GetBoolean("SUFFIX"));
     QString outputBaseName = outputFileName.expanded();
     QStringList frameKeys = frameMap.uniqueKeys();
     Progress stitchProgress;
     stitchProgress.SetText("Stitching Frames");
     stitchProgress.SetMaximumSteps(frameKeys.size());
     stitchProgress.CheckStatus();
+    
     foreach(QString frameKey, frameKeys) {
       try {
         QString frameIdentifier = frameKey.split("/").last();
-        FileName frameFileName;
-        if (pref == true) { // if prefix was given
-          FileName frameFileName(outputBaseName + "-" + frameIdentifier + ".cub");
-        } else if (suff == true) { // if output suffix was given
+        if (suff == true) {
           FileName frameFileName(frameIdentifier + "-" + outputBaseName + ".cub");
+          stitchFrame( frameMap.values(frameKey), frameFileName );
+          stitchProgress.CheckStatus();
         } else {
-          FileName frameFileName(frameIdentifier + ".cub");
+          FileName frameFileName(outputBaseName + "-" + frameIdentifier + ".cub");
+          stitchFrame( frameMap.values(frameKey), frameFileName );
+          stitchProgress.CheckStatus();
         }
-        stitchFrame( frameMap.values(frameKey), frameFileName );
-        stitchProgress.CheckStatus();
       }
       catch (IException &e) {
         QString msg = "Failed stitch frame for observation ["
