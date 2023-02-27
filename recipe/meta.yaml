@@ -55,7 +55,7 @@ requirements:
    - bz2file
    - bzip2
    - cmake>=3.15
-   - cspice
+   - cspice=67
    - csm>=3.0.3,<3.0.4
    - curl
    - doxygen
