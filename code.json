@@ -1,51 +1,6 @@
 [
   {
-    "name": "ISIS3",
-    "organization": "U.S. Geological Survey",
-    "description": "GitHub code repository for the Integrated Software for Imagers and Spectrometers (ISIS)",
-    "version": "7.2.0",
-    "status": "Release",
-
-    "permissions": {
-      "usageType": "openSource",
-      "licenses": [
-        {
-          "name": "Public Domain, CC0-1.0",
-          "URL": "https://code.usgs.gov/astrogeology/isis/-/blob/7.2.0/LICENSE.md"
-        }
-      ]
-    },
-
-    "homepageURL": "https://isis.astrogeology.usgs.gov",
-    "downloadURL": "https://code.usgs.gov/astrogeology/isis/-/tree/7.2.0",
-    "disclaimerURL": "https://code.usgs.gov/astrogeology/isis/-/blob/7.2.0/DISCLAIMER.md",
-    "repositoryURL": "https://code.usgs.gov/astrogeology/isis",
-    "vcs": "git",
-
-    "laborHours": 2400,
-
-    "tags": [
-      "Planetary",
-      "Remote Sensing",
-      "Photogrammetry",
-      "Data Processing"
-    ],
-
-    "languages": [
-      "C++"
-    ],
-
-    "contact": {
-      "name": "Dr. Jason Laura",
-      "email": "jlaura@usgs.gov"
-    },
-
-    "date": {
-      "metadataLastUpdated": "2023-02-21"
-    }
-  },
-  {
-    "name": "ISIS3",
+    "name": "ISIS",
     "organization": "U.S. Geological Survey",
     "description": "GitHub code repository for the Integrated Software for Imagers and Spectrometers (ISIS)",
     "version": "7.1.0",
@@ -56,18 +11,18 @@
       "licenses": [
         {
           "name": "Public Domain, CC0-1.0",
-          "URL": "https://code.usgs.gov/astrogeology/isis/-/blob/7.1.0/LICENSE.md"
+          "URL": "https://code.usgs.gov/astrogeology/isis/-/raw/main/LICENSE.md"
         }
       ]
     },
 
-    "homepageURL": "https://isis.astrogeology.usgs.gov",
-    "downloadURL": "https://code.usgs.gov/astrogeology/isis/-/tree/7.1.0",
-    "disclaimerURL": "https://code.usgs.gov/astrogeology/isis/-/blob/7.1.0/DISCLAIMER.md",
-    "repositoryURL": "https://code.usgs.gov/astrogeology/isis",
+    "homepageURL": "https://code.usgs.gov/astrogeology/isis/",
+    "downloadURL": "https://code.usgs.gov/astrogeology/isis/-/archive/main/isis-main.zip",
+    "disclaimerURL": "https://code.usgs.gov/astrogeology/isis/-/raw/main/DISCLAIMER.md",
+    "repositoryURL": "https://code.usgs.gov/astrogeology/isis.git",
     "vcs": "git",
 
-    "laborHours": 2400,
+    "laborHours": 24000,
 
     "tags": [
       "Planetary",
@@ -87,50 +42,6 @@
 
     "date": {
       "metadataLastUpdated": "2023-01-25"
-    }
-  },{
-    "name": "ISIS3",
-    "organization": "U.S. Geological Survey",
-    "description": "GitHub code repository for the Integrated Software for Imagers and Spectrometers (ISIS)",
-    "version": "7.0.0",
-    "status": "Release",
-
-    "permissions": {
-      "usageType": "openSource",
-      "licenses": [
-        {
-          "name": "Public Domain, CC0-1.0",
-          "URL": "https://code.usgs.gov/astrogeology/isis/-/blob/7.0.0/LICENSE.md"
-        }
-      ]
-    },
-
-    "homepageURL": "https://isis.astrogeology.usgs.gov",
-    "downloadURL": "https://code.usgs.gov/astrogeology/isis/-/tree/7.0.0",
-    "disclaimerURL": "https://code.usgs.gov/astrogeology/isis/-/blob/7.0.0/DISCLAIMER.md",
-    "repositoryURL": "https://code.usgs.gov/astrogeology/isis",
-    "vcs": "git",
-
-    "laborHours": 2400,
-
-    "tags": [
-      "Planetary",
-      "Remote Sensing",
-      "Photogrammetry",
-      "Data Processing"
-    ],
-
-    "languages": [
-      "C++"
-    ],
-
-    "contact": {
-      "name": "Dr. Jason Laura",
-      "email": "jlaura@usgs.gov"
-    },
-
-    "date": {
-      "metadataLastUpdated": "2022-12-07"
     }
   }
 ]
