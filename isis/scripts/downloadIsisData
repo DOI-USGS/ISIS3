@@ -12,6 +12,18 @@ from shutil import which
 from os import path
 from collections import OrderedDict
 
+SOURCE_PATH = {
+    "naifKernels": "kernels",
+    "pck": "kernels/pck",
+    "ck":"kernels/ck",
+    "spk":"kernels/spk",
+    "fk": "kernels/fk",
+    "iak":"kernels/iak",
+    "sclk":"kernels/sclk",
+    "tspk":"kernels/tspk",
+    "usgs":""
+}
+
 def find_conf():
     from pathlib import Path
     local_path = Path("rclone.conf")
@@ -89,20 +101,9 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
 
 
 def get_kernal_destination_path(source_type):
-    
-    switcher ={
-        "naifKernels": "kernels",
-        "pck": "kernels/pck",
-        "ck":"kernels/ck",
-        "spk":"kernels/spk",
-        "fk": "kernels/fk",
-        "iak":"kernels/iak",
-        "sclk":"kernels/sclk",
-        "tspk":"kernels/tspk",
-        "usgs":""
-    }
+
     try:
-        source_path = switcher.get(source_type)
+        source_path = SOURCE_PATH.get(source_type)
     except KeyError as e:
         
         raise KeyError(f"kernal path not found. Source type {source_type} is invalid")
@@ -168,7 +169,7 @@ def main(mission, dest, cfg_path, ntransfers, kwargs):
     for source in sorted(config_sources, key=lambda x: x.split("_")[-1]):
         parsed_name = source.split("_")
         # If it is a mission, it should be in the format <mission_nam>_<source_type>
-        if len(parsed_name) == 2 and parsed_name[1] in ["usgs:", "naifKernels:", "pck:"]:
+        if len(parsed_name) == 2 and parsed_name[1].replace(":","") in SOURCE_PATH.keys():
             remotes_mission_name = parsed_name[0]
             supported_missions[remotes_mission_name] = supported_missions.get(remotes_mission_name, []) + [source]
 
