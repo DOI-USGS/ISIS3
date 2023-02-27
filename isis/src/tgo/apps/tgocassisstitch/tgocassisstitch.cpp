@@ -67,9 +67,10 @@ namespace Isis {
     }
 
     // Stitch together the individual frames
-    FileName outputFileName(ui.GetCubeName("OUT"));
-    bool suff(ui.GetBoolean("SUFFIX"));
-    QString outputBaseName = outputFileName.expanded();
+    FileName outputPrefix(ui.GetCubeName("OUTPUTPREFIX"));
+    FileName outputSuffix(ui.GetCubeName("OUTPUTSUFFIX"));
+    QString outputPrefBaseName = outputPrefix.expanded();
+    QString outputSuffBaseName = outputSuffix.expanded();
     QStringList frameKeys = frameMap.uniqueKeys();
     Progress stitchProgress;
     stitchProgress.SetText("Stitching Frames");
@@ -79,12 +80,22 @@ namespace Isis {
     foreach(QString frameKey, frameKeys) {
       try {
         QString frameIdentifier = frameKey.split("/").last();
-        if (suff == true) {
-          FileName frameFileName(frameIdentifier + "-" + outputBaseName + ".cub");
+        if ((outputPrefix != "nil") && (outputSuffix == "nil")) {
+          FileName frameFileName(outputPrefBaseName + "-" + frameIdentifier + ".cub");
           stitchFrame( frameMap.values(frameKey), frameFileName );
           stitchProgress.CheckStatus();
-        } else {
-          FileName frameFileName(outputBaseName + "-" + frameIdentifier + ".cub");
+        } else if ((outputSuffix != "nil") && (outputPrefix == "nil")) {
+          FileName frameFileName(frameIdentifier + "-" + outputSuffBaseName + ".cub");
+          stitchFrame( frameMap.values(frameKey), frameFileName );
+          stitchProgress.CheckStatus();
+        } else if ((outputPrefix != "nil") && (outputSuffix != "nil")) {
+          FileName frameFileName(outputPrefBaseName +
+                                 "-" + frameIdentifier +
+                                 "-" + outputSuffBaseName + ".cub");
+          stitchFrame( frameMap.values(frameKey), frameFileName );
+          stitchProgress.CheckStatus();
+        } else if ((outputPrefix == "nil") && (outputSuffix == "nil")) {
+          FileName frameFileName(frameIdentifier + ".cub");
           stitchFrame( frameMap.values(frameKey), frameFileName );
           stitchProgress.CheckStatus();
         }
