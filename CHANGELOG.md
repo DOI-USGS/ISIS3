@@ -36,6 +36,8 @@ release.
 ## [Unreleased]
 
 ### Changed
+- Modified tgocassisstitch to optionally output naming convention as a suffix
+  rather than prefix with a new flag.
 
 ### Added
 
