@@ -41,11 +41,11 @@ release.
 - Removed the `.py` extention from the _isisdataeval_ tool `isisdata_mockup` for consistency and install it in $ISISROOT/bin; added the `--tojson` and `--hasher` option to _isisdata_mockup_ tool improve utility; updated the tool `README.md` documentation to reflect this change, removed help output and trimmed example results;  fixed paths to test data in `make_isisdata_mockup.sh`. [#5163](https://github.com/DOI-USGS/ISIS3/pull/5163)
 - Significantly refactored FASTGEOM processing in <i>findfeatures</i> to accommodate stability and functionality. The scope of the algorithm was taken out of the ImageSource class and isolated to support this feature. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Report better information regarding the behavior of <i>findfeatures</i>, FASTGEOM algorithms, and creation of the output network. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
+- Modified tgocassisstitch to optionally allow either a outputprefix or an
+  outputsuffix, both, or neither for naming convention purposes. [#5162](https://github.com/DOI-USGS/ISIS3/pull/5162)
 - Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
 - Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
 - Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
-- Modified tgocassisstitch to optionally output naming convention as a suffix
-  rather than prefix with a new flag.
 
 ### Added
 - Added rclone to run dependencies in meta.yaml [#5183](https://github.com/DOI-USGS/ISIS3/issues/5183)

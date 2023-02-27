@@ -66,11 +66,19 @@ namespace Isis {
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
 
+    // read the optional cubename
+    FileName frameletCubeFlag(ui.GetCubeName("CUBENAME"));
+    QString frameletCubeName = frameletCubeFlag.expanded();
+
     // Stitch together the individual frames
-    FileName outputFileName(ui.GetCubeName("OUT"));
-    bool suff(ui.GetBoolean("SUFFIX"));
-    QString outputBaseName = outputFileName.expanded();
+    FileName outputPrefix(ui.GetCubeName("OUTPUTPREFIX"));
+    FileName outputSuffix(ui.GetCubeName("OUTPUTSUFFIX"));
+    QString outputPrefBaseName = outputPrefix.expanded();
+    QString outputSuffBaseName = outputSuffix.expanded();
     QStringList frameKeys = frameMap.uniqueKeys();
+    foreach (const QString& key, frameKeys) {
+      std::cout << key.toStdString() << std::endl;
+    }
     Progress stitchProgress;
     stitchProgress.SetText("Stitching Frames");
     stitchProgress.SetMaximumSteps(frameKeys.size());
@@ -79,14 +87,50 @@ namespace Isis {
     foreach(QString frameKey, frameKeys) {
       try {
         QString frameIdentifier = frameKey.split("/").last();
-        if (suff == true) {
-          FileName frameFileName(frameIdentifier + "-" + outputBaseName + ".cub");
-          stitchFrame( frameMap.values(frameKey), frameFileName );
-          stitchProgress.CheckStatus();
-        } else {
-          FileName frameFileName(outputBaseName + "-" + frameIdentifier + ".cub");
-          stitchFrame( frameMap.values(frameKey), frameFileName );
-          stitchProgress.CheckStatus();
+        if ((outputPrefix != "nil") && (outputSuffix == "nil")) {
+          if (frameletCubeName != "nil") {
+            FileName frameFileName(outputPrefBaseName + "-" + frameletCubeName + ".cub");
+            stitchFrame( frameMap.values(frameKey), frameFileName );
+            stitchProgress.CheckStatus();
+          } else {
+            FileName frameFileName(outputPrefBaseName + "-" + frameIdentifier + ".cub");
+            stitchFrame( frameMap.values(frameKey), frameFileName );
+            stitchProgress.CheckStatus();
+          }
+        } else if ((outputSuffix != "nil") && (outputPrefix == "nil")) {
+          if (frameletCubeName != "nil") {
+            FileName frameFileName(frameletCubeName + "-" + outputSuffBaseName + ".cub");
+            stitchFrame( frameMap.values(frameKey), frameFileName );
+            stitchProgress.CheckStatus();
+          } else {
+            FileName frameFileName(frameIdentifier + "-" + outputSuffBaseName + ".cub");
+            stitchFrame( frameMap.values(frameKey), frameFileName );
+            stitchProgress.CheckStatus();
+          }
+        } else if ((outputPrefix != "nil") && (outputSuffix != "nil")) {
+          if (frameletCubeName != "nil") {
+            FileName frameFileName(outputPrefBaseName +
+                                   "-" + frameletCubeName +
+                                   "-" + outputSuffBaseName + ".cub");
+            stitchFrame( frameMap.values(frameKey), frameFileName );
+            stitchProgress.CheckStatus();
+          } else {
+            FileName frameFileName(outputPrefBaseName +
+                                 "-" + frameIdentifier +
+                                 "-" + outputSuffBaseName + ".cub");
+            stitchFrame( frameMap.values(frameKey), frameFileName );
+            stitchProgress.CheckStatus();
+          }
+        } else if ((outputPrefix == "nil") && (outputSuffix == "nil")) {
+           if (frameletCubeName != "nil") {
+            FileName frameFileName(frameletCubeName + ".cub");
+            stitchFrame( frameMap.values(frameKey), frameFileName );
+            stitchProgress.CheckStatus();
+          } else {
+            FileName frameFileName(frameIdentifier + ".cub");
+            stitchFrame( frameMap.values(frameKey), frameFileName );
+            stitchProgress.CheckStatus();
+          }
         }
       }
       catch (IException &e) {

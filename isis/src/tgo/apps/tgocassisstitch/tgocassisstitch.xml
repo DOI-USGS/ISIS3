@@ -58,11 +58,28 @@
         </filter>
       </parameter>
 
-      <parameter name="OUT">
-         <type>cube</type>
+      <parameter name="CUBENAME">
+        <type>cube</type>
+        <default><item>nil</item></default>
+        <fileMode>input</fileMode>
+        <brief>
+          An optional name for the output cube.
+        </brief>
+        <description>
+          An optional name for the output cube instead of the default timestamp
+          style naming.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="OUTPUTPREFIX">
+        <type>cube</type>
+        <default><item>nil</item></default>
          <fileMode>output</fileMode>
          <brief>
-           Output ISIS cube basename.
+           Output ISIS cube basename prefix.
          </brief>
          <description>
            The stitched cubes will be output as this basename plus the last
@@ -74,12 +91,12 @@
          </filter>
       </parameter>
 
-      <parameter name="SUFFIX">
-         <type>boolean</type>
-         <default><item>FALSE</item></default>
+      <parameter name="OUTPUTSUFFIX">
+         <type>cube</type>
+         <default><item>nil</item></default>
          <fileMode>output</fileMode>
          <brief>
-           output using suffix instead of prefix.
+           output ISIS cube basename suffix.
          </brief>
          <description>
            The stitched cubes will be output as the last component of the serial
