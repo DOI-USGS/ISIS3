@@ -38,6 +38,7 @@ release.
 ### Changed
 - Modified tgocassisstitch to optionally output naming convention as a suffix
   rather than prefix with a new flag.
+- Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
 
 ### Added
 
