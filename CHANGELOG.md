@@ -56,6 +56,10 @@ release.
 - Added new option <b>GEOMSOURCE=BOTH</b> to <i>findfeatures</i> to check both the MATCH and FROM/FROMLIST images for valid control measure geometry to produce better networks and prevent downstream processing errors. Ignore points that end up with no valid measures (but can be retained with use of <b>PreserveIgnoredControl</b> via GLOBALS parameterization). [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Added new gtests for <i>findfeatures</i> that replaces all the old application tests. These tests are <i>FunctionalTestFindfeaturesFastGeomDefault</i>, <i>FunctionalTestFindfeaturesFastGeomRadialConfig</i>, <i>FunctionalTestFindfeaturesFastGeomGridDefault</i> and <i>FunctionalTestFindfeaturesFastGeomGridConfig</i>. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 
+- Added an optional cubename parameter which lets the user override the
+  timestamp style naming convention of the output cube with their own name; if
+  not specified retains existing behavior [#5125](https://github.com/USGS-Astrogeology/ISIS3/issues/5125)
+
 ### Deprecated
 
 ### Removed

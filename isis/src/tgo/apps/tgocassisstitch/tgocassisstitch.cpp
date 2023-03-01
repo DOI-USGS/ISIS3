@@ -76,9 +76,6 @@ namespace Isis {
     QString outputPrefBaseName = outputPrefix.expanded();
     QString outputSuffBaseName = outputSuffix.expanded();
     QStringList frameKeys = frameMap.uniqueKeys();
-    foreach (const QString& key, frameKeys) {
-      std::cout << key.toStdString() << std::endl;
-    }
     Progress stitchProgress;
     stitchProgress.SetText("Stitching Frames");
     stitchProgress.SetMaximumSteps(frameKeys.size());
