@@ -33,6 +33,11 @@
       Modified stitchFrame to have logic for suffix or prefix in the output
       filename. Fixes #5125.
     </change>
+    <change name="Anton Hibl" date="2023-03-01">
+      Added an optional argument to tgocassisstitch which allows for an optional
+      cubename to override the default timestamp-style naming convention and
+      bahavior for the output cube. Fixes #5125.
+    </change>
   </history>
 
   <category>
