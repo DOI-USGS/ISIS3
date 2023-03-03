@@ -90,11 +90,19 @@ namespace Isis {
         if (outputSuffix == "nil"){
           outputSuffix = "";
         }
-        FileName frameFileName(outputPrefBaseName +
+        if (frameletCubeName != "nil") {
+          FileName frameFileName(outputPrefBaseName +
                                frameletCubeName +
                                outputSuffBaseName + ".cub");
-        stitchFrame( frameMap.values(frameKey), frameFileName );
-        stitchProgress.CheckStatus();
+          stitchFrame( frameMap.values(frameKey), frameFileName );
+          stitchProgress.CheckStatus();
+          else {
+            FileName frameFileName(outputPrefBaseName +
+                               frameIdentifier +
+                               outputSuffBaseName + ".cub");
+            stitchFrame( frameMap.values(frameKey), frameFileName );
+            stitchProgress.CheckStatus();
+          }
       }
       catch (IException &e) {
         QString msg = "Failed stitch frame for observation ["
