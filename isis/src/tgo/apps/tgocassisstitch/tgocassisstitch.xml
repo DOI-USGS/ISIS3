@@ -65,7 +65,7 @@
 
       <parameter name="CUBENAME">
         <type>cube</type>
-        <default><item>nil</item></default>
+        <default><item></item></default>
         <fileMode>input</fileMode>
         <brief>
           An optional name for the output cube.
@@ -81,7 +81,7 @@
 
       <parameter name="OUTPUTPREFIX">
         <type>cube</type>
-        <default><item>nil</item></default>
+        <default><item></item></default>
          <fileMode>output</fileMode>
          <brief>
            Output ISIS cube basename prefix.
@@ -98,7 +98,7 @@
 
       <parameter name="OUTPUTSUFFIX">
          <type>cube</type>
-         <default><item>nil</item></default>
+         <default><item></item></default>
          <fileMode>output</fileMode>
          <brief>
            output ISIS cube basename suffix.

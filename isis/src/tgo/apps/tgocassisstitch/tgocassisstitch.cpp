@@ -84,13 +84,7 @@ namespace Isis {
     foreach(QString frameKey, frameKeys) {
       try {
         QString frameIdentifier = frameKey.split("/").last();
-        if(outputPrefix == "nil"){
-          outputPrefix = "";
-        }
-        if (outputSuffix == "nil"){
-          outputSuffix = "";
-        }
-        if (frameletCubeName != "nil") {
+        if (frameletCubeName != "") {
           FileName frameFileName(outputPrefBaseName +
                                frameletCubeName +
                                outputSuffBaseName + ".cub");
