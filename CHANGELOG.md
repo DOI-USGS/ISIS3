@@ -43,9 +43,9 @@ release.
 
 ### Added
 
-- Added an optional cubename parameter which lets the user override the
-  timestamp style naming convention of the output cube with their own name; if
-  not specified retains existing behavior [#5125](https://github.com/USGS-Astrogeology/ISIS3/issues/5125)
+- Added an optional cubename parameter to tgocassisstitch which lets the user
+  override the timestamp style naming convention of the output cube with their
+  own name; if not specified retains existing behavior [#5125](https://github.com/USGS-Astrogeology/ISIS3/issues/5125)
 
 ### Deprecated
 
