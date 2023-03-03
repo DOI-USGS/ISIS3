@@ -3,7 +3,7 @@
     "name": "ISIS3",
     "organization": "U.S. Geological Survey",
     "description": "GitHub code repository for the Integrated Software for Imagers and Spectrometers (ISIS)",
-    "version": "7.0.0",
+    "version": "7.0.1",
     "status": "Release",
 
     "permissions": {
@@ -17,7 +17,7 @@
     },
 
     "homepageURL": "https://isis.astrogeology.usgs.gov",
-    "downloadURL": "https://github.com/USGS-Astrogeology/ISIS3/archive/refs/tags/7.0.0_RC1.zip",
+    "downloadURL": "https://github.com/USGS-Astrogeology/ISIS3/archive/refs/tags/7.0.1.zip",
     "disclaimerURL": "https://github.com/USGS-Astrogeology/ISIS3/blob/master/DISCLAIMER.md",
     "repositoryURL": "https://github.com/USGS-Astrogeology/ISIS3/",
     "vcs": "git",
@@ -41,7 +41,7 @@
     },
 
     "date": {
-      "metadataLastUpdated": "2022-02-08"
+      "metadataLastUpdated": "2022-03-03"
     }
   }
 ]
