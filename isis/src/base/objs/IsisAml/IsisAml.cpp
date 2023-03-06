@@ -10,6 +10,9 @@ find files of those names at the top level of this repository. **/
 #include <xercesc/util/TransService.hpp>
 #include <xercesc/sax2/XMLReaderFactory.hpp>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 #include "FileName.h"
 #include "IException.h"
 #include "IsisAml.h"
@@ -638,7 +641,6 @@ void IsisAml::GetAsString(const QString &paramName,
 QString IsisAml::GetFileName(const QString &paramName, QString extension) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
-
   if(param->type != "filename") {
     QString message = "Parameter [" + paramName + "] is not a filename.";
     throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
@@ -1193,6 +1195,65 @@ int IsisAml::GroupIndex(const QString & grpName) const {
     }
   }
   return -1;
+}
+
+
+/**
+ * Creates a json object which could be used as a command line
+ *
+ */
+json IsisAml::GetParams() { 
+  json ret = {}; 
+  Isis::PvlGroup group("UserParameters");
+
+  // Add appropriate keywords
+  for(unsigned int g = 0; g < groups.size(); g++) {
+    for(unsigned int p = 0; p < groups[g].parameters.size(); p++) {
+      const IsisParameterData *param = ReturnParam(ParamName(g, p));
+      // If this param has a value add it to the command line
+      if(param->values.size() > 0) {
+        std::vector<std::string> values(param->values.size());
+
+        for(unsigned int value = 0; value < param->values.size(); value++) {
+          values[value] = param->values[value].toStdString();
+        }
+
+        if (values.size() == 0) { 
+          ret[param->name.toStdString()] = "NULL";
+        }
+        if (values.size() > 1) {  
+          ret[param->name.toStdString()] = values;
+        }
+        else { 
+          ret[param->name.toStdString()] = values.at(0); 
+        }
+
+      }
+
+      // Or if it has a default value add it to the command line
+      else if(param->defaultValues.size() > 0) {
+        std::vector<std::string> values(param->defaultValues.size());
+        
+        for(unsigned int value = 0;
+           value < param->defaultValues.size();
+           value++) {
+          values[value] = param->defaultValues[value].toStdString();
+        }
+
+        if (values.size() == 0) { 
+          ret[param->name.toStdString()] = "NULL";
+        }
+        else if (values.size() > 1) {  
+          ret[param->name.toStdString()] = values;
+        }
+        else { 
+          ret[param->name.toStdString()] = values.at(0); 
+        }
+      }
+    }
+  }
+
+  return ret;  
 }
 
 

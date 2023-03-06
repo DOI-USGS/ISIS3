@@ -1,0 +1,11 @@
+import setuptools
+
+if __name__ == '__main__':
+    setuptools.setup(
+        name='astroset',
+        version='${CMAKE_PROJECT_VERSION}',
+        packages=['astroset'],
+        package_data={'':['_astroset.so']},
+        zip_safe=False,  # Some OSes can not dynamically load an so from an egg (zipfile)
+        license='UnLicense',
+)

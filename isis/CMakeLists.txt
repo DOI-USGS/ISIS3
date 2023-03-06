@@ -309,16 +309,12 @@ if(APPLE)
   find_package(OpenGL REQUIRED)
 endif(APPLE)
 
-if(pybindings)
- find_package(Python REQUIRED)
-endif()
-
 # Iterate through all variables and extract the libraries and include directories
 get_cmake_property(_variableNames VARIABLES) # Get All VARIABLES
 
 set(ALLLIBDIRS "")
 set(ALLLIBS "")
-set(ALLINCDIRS "")
+set(ALLINCDIRS "${CMAKE_SOURCE_DIR}/inc")
 
 # Get all include dir variables
 foreach (_variableName ${_variableNames})
@@ -378,6 +374,9 @@ include_directories(${CMAKE_BINARY_DIR}/inc)
 set(CORE_LIB_NAME isis)
 message(STATUS "CORE LIB:  ${CORE_LIB_NAME}")
 
+if(pybindings)
+ add_subdirectory(python_bindings)
+endif()
 
 # Specify relative library include paths which will be set up on
 #  the installed files.
@@ -610,7 +609,6 @@ install(FILES     ${CMAKE_BINARY_DIR}/version         DESTINATION  ${CMAKE_INSTA
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(PROGRAMS ${CMAKE_BINARY_DIR}/lib/Camera.plugin DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
 install(PROGRAMS ${CMAKE_SOURCE_DIR}/scripts/downloadIsisData DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
-install(PROGRAMS ${CMAKE_SOURCE_DIR}/scripts/findfeaturesSegment DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
 install(FILES ${CMAKE_SOURCE_DIR}/config/rclone.conf DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/isis/)
 
 # Trigger all post-install behavior.
