@@ -17,7 +17,7 @@ _**Note: Automation of Steps 1 - 3 is TBD. The PR in Step 3 will be manually rev
  
 ## Step 1: Check the PRs for Labels
 * Any bugfix PR that addressed an issue with the `bug` label should have a `bug` label as well. 
-* Manually update PRs with the `bug` label in preparation of the next step.
+* Manually update PRs with the `bug` label in preparation for the next step.
 
 ## Step 2: Cherry-pick the PRs
 * Pick and choose the bugfix PRs that will be brought down into the LTS version. 
