@@ -13,6 +13,7 @@
 * [Continuous Integration](https://github.com/USGS-Astrogeology/ISIS3/wiki/Internal-CI---Jenkins)
 * [Updating Application Documentation](https://github.com/USGS-Astrogeology/ISIS3/wiki/Contributing-Application-Documentation)
 * [Deprecating Functionality](https://github.com/USGS-Astrogeology/ISIS3/wiki/Deprecation)
+* [LTS Release Process](https://github.com/DOI-USGS/ISIS3/wiki/LTS-Release-Process)
 
 # Open RFCs
   * [RFC Template](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC%23:-Template)
