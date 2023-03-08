@@ -22,13 +22,13 @@ jobs:
     - name: install python packages
       run: |
         python -m pip install --upgrade pip
-        pip install requests
+        python -m pip install requests
     - id: execute_py_script
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_API_URL: ${{ secrets.GITHUB_API_URL }}
         GITHUB_SHA: ${{ secrets.GITHUB_SHA }}
-      run: python src/.github/pr_bugfix_checker.py
+      run: python pr_bugfix_checker.py
     # Print the result to the log
     - name: See result
       run: echo "${{ steps.execute_py_script.outputs.result }}"
