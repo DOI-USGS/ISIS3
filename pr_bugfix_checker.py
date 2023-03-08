@@ -23,7 +23,7 @@ def main():
     try:
         # TODO: Remove below pull all PRs [TESTING ONLY]
         GET_PR_LIST_URL=f'{BASE_URL}/pulls?state=all'
-        response = requests.get(GET_PR_LIST_URL, headers=headers)
+        response = requests.get(GET_PR_LIST_URL, headers=HEADERS)
 
         # response = requests.get(f'{COMMITS_URL}/{GITHUB_SHA}/pulls', headers=HEADERS, verify='/Users/chkim/homebrew/etc/ca-certificates/cert.pem')
         response.raise_for_status()
