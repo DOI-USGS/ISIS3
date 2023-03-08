@@ -8,6 +8,8 @@ def main():
     # Constants
     GITHUB_TOKEN=os.environ["GITHUB_TOKEN"]
     GITHUB_API_URL=os.environ["GITHUB_API_URL"]
+    GITHUB_SHA=os.environ["GITHUB_SHA"]
+
     BASE_URL=f'{GITHUB_API_URL}/repos/chkim-usgs/ISIS3'
     COMMITS_URL=f'{BASE_URL}/commits/'
     ISSUES_URL=f'{BASE_URL}/issues'
@@ -19,7 +21,11 @@ def main():
 
     # Get list of PRs associated with commitSHA
     try:
-        response = requests.get(f'{COMMITS_URL}/{GITHUB_SHA}/pulls', headers=HEADERS, verify='/Users/chkim/homebrew/etc/ca-certificates/cert.pem')
+        # TODO: Remove below pull all PRs [TESTING ONLY]
+        GET_PR_LIST_URL=f'{BASE_URL}/pulls?state=all'
+        response = requests.get(GET_PR_LIST_URL, headers=headers)
+
+        # response = requests.get(f'{COMMITS_URL}/{GITHUB_SHA}/pulls', headers=HEADERS, verify='/Users/chkim/homebrew/etc/ca-certificates/cert.pem')
         response.raise_for_status()
     except requests.exceptions.HTTPError as he:
         print("HTTPError in retrieving list of PRs", he)

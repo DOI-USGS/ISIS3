@@ -27,6 +27,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_API_URL: ${{ secrets.GITHUB_API_URL }}
+        GITHUB_SHA: ${{ secrets.GITHUB_SHA }}
       run: python src/.github/pr_bugfix_checker.py
     # Print the result to the log
     - name: See result
