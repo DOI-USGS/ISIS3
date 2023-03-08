@@ -2,7 +2,7 @@ name: Cherrypick bugfixes to release branch
 on:
   push:
     branches:
-      - dev
+      - test_dev
 jobs:
   # Check if the PR is a bugfix
   check_labels:
@@ -12,14 +12,40 @@ jobs:
     outputs: 
       result: ${{steps.check_pr_labels.outputs.result}}
     steps:
-    - id: check_pr_labels
-      uses: 3pointer/check-pr-labels-on-push-action@v1.0.3
+    - name: checkout repo content
+      uses: actions/checkout@v2 # checkout the repository content
+    - id: setup python
+      uses: actions/setup-python@v4
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        labels: '["bug"]'
+        python-version: '3.10'
+        cache: 'pip'
+    - id: install python packages
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+    - id: execute py script
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_API_URL: ${{ secrets.GITHUB_API_URL }}
+      run: python src/.github/pr_bugfix_checker.py
     # Print the result to the log
     - name: See result
       run: echo "${{ steps.check_pr_labels.outputs.result }}"
+  # check_labels:
+  #   runs-on: ubuntu-latest
+  #   name: Check PR labels action step
+  #   # Make the output of this job available to other jobs
+  #   outputs: 
+  #     result: ${{steps.check_pr_labels.outputs.result}}
+  #   steps:
+  #   - id: check_pr_labels
+  #     uses: 3pointer/check-pr-labels-on-push-action@v1.0.3
+  #     with:
+  #       github-token: ${{ secrets.GITHUB_TOKEN }}
+  #       labels: '["bug"]'
+  #   # Print the result to the log
+  #   - name: See result
+  #     run: echo "${{ steps.check_pr_labels.outputs.result }}"
   release_pull_request:
     needs: check_labels
     # Only run this step if the code was a bugfix
