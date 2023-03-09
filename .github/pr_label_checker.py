@@ -119,10 +119,13 @@ def get_pr(pull_number: str) -> Response:
 
 def is_pr_bugfix(response: Response):
     labels = response.json().get("labels")
+    logging.info("Labels: " + str(labels))
     for label in labels:
         if label.get("name") == "bug":
-            print(True)
-    print(False)
+            logging.info("This is TRUE")
+            return True
+    logging.info("This is False")
+    return False
 
 if __name__ == "__main__":
     try:
