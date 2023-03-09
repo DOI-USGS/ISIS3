@@ -95,7 +95,7 @@ def main():
     except RequestException as re:
         raise RequestException("Unable to update PR.", re)
     
-    return true
+    return True
 
 
 if __name__ == "__main__":
