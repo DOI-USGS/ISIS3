@@ -39,7 +39,7 @@ def get_prs_associated_with_commit() -> Response:
 def get_pr_attributes(response: Response) -> tuple:
     # Get necessary PR attributes
     pull_response_json = response.json()
-    print("Pull repsonse json: " + pull_response_json)
+    print("Pull repsonse json: " + str(pull_response_json))
     if len(pull_response_json) == 0:
         print(False)
         sys.exit(1)
