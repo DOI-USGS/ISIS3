@@ -117,12 +117,12 @@ def get_pr(pull_number: str) -> Response:
     except RequestException as re:
         raise RequestException("Unable to retrieve issues.", re)
 
-def is_pr_bugfix(response: Response) -> bool:
+def is_pr_bugfix(response: Response):
     labels = response.json().get("labels")
     for label in labels:
         if label.get("name") == "bug":
-            return True
-    return False
+            return "This is TRUE"
+    return "This is FALSE"
 
 if __name__ == "__main__":
     try:
