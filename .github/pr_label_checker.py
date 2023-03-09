@@ -57,7 +57,7 @@ def search_for_linked_issues(pull_body: str) -> list:
     for linked_issue in linked_issues:
         # Strip linked issue text of '#'
         issue_numbers.append(linked_issue.replace('#',''))
-    print("ISSUE NUMBERS: " + str(issue_numbers))
+    # print("ISSUE NUMBERS: " + str(issue_numbers))
     return issue_numbers
 
 def get_linked_issues(issue_numbers: list) -> Response:
@@ -85,7 +85,7 @@ def get_issue_labels(response: Response) -> list:
         # Get name of each label object
         label_name = issue_label.get("name")
         combined_issue_labels.append(label_name)
-    print("COMBINED ISSUE LABELS: " + str(combined_issue_labels))
+    # print("COMBINED ISSUE LABELS: " + str(combined_issue_labels))
     return combined_issue_labels
 
 def convert_issue_list_to_dict(combined_issue_labels: list) -> dict:
@@ -100,7 +100,7 @@ def update_pr_labels(pull_number: str, labels_data: dict):
     # Source: https://stackoverflow.com/q/68459601
     try:
         response = post(f'{ISSUES_URL}/{pull_number}/labels', json=labels_data, headers=HEADERS)
-        print("UPDATED RESPONSE: " + str(response.json()))
+        logging.info("UPDATED RESPONSE: " + str(response.json()))
         response.raise_for_status()
     except HTTPError as he:
         raise HTTPError("HTTPError in updating PR.", he)
@@ -119,12 +119,12 @@ def get_pr(pull_number: str) -> Response:
 
 def is_pr_bugfix(response: Response):
     labels = response.json().get("labels")
-    print("Labels: " + str(labels))
+    logging.info("Labels: " + str(labels))
     for label in labels:
         if label.get("name") == "bug":
-            print("This is TRUE")
+            logging.info("PR is a bugfix")
             return True
-    print("This is False")
+    logging.info("PR is not a bugfix")
     return False
 
 if __name__ == "__main__":
@@ -139,7 +139,7 @@ if __name__ == "__main__":
 
         # Check PR labels for 'bug'
         response = get_pr(pull_number)
-        is_pr_bugfix(response)
+        print(is_pr_bugfix(response))
     except (HTTPError, RequestException, Exception):
         raise
 
