@@ -94,12 +94,13 @@ def main():
         raise HTTPError("HTTPError in updating PR.", he)
     except RequestException as re:
         raise RequestException("Unable to update PR.", re)
+    
+    return true
 
 
 if __name__ == "__main__":
     try:
         main()
-        return true
-    except (HTTPError, RequestException) as e:
+    except (HTTPError, RequestException, Exception):
         raise
         sys.exit(1)
