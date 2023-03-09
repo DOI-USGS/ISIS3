@@ -1,6 +1,6 @@
 import requests
 import json
-import re
+import re as rgx
 import os
 
 
@@ -37,8 +37,11 @@ def main():
 
     # Get necessary PR attributes
     pull_response_json = response.json()
+    print("PULL RESPONSE: " + str(response.json()))
     pull_number = pull_response_json[0].get("number")
+    print("PULL NUMBER: " + str(pull_number))
     pull_body = pull_response_json[0].get("body")
+    print("PULL BODY: " + str(pull_body))
 
     """
     Search for linked issues in PR body.
@@ -49,11 +52,12 @@ def main():
     '#ABC' - fails
     '## ABC'- fails
     """
-    linked_issues = re.findall('#[^\D]\d*', pull_body)
+    linked_issues = rgx.findall('#[^\D]\d*', pull_body)
     issue_numbers = []
     for linked_issue in linked_issues:
         # Strip linked issue text of '#'
         issue_numbers.append(linked_issue.replace('#',''))
+    print("ISSUE NUMBERS: " + str(issue_numbers))
 
     # Verify issues exists and has labels
     combined_issue_labels = []
@@ -89,6 +93,7 @@ def main():
     try:
         response = requests.post(f'{ISSUES_URL}/{pull_number}/labels', json=labels_data, headers=HEADERS)
         response.raise_for_status()
+        print("UPDATED RESPONSE: " + str(response.json()))
     except requests.exceptions.HTTPError as he:
         print("HTTPError in retrieving list of PRs", he)
         sys.exit(1) 
