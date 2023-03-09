@@ -83,7 +83,7 @@ def main():
             # Get name of each label object
             label_name = issue_label.get("name")
             combined_issue_labels.append(label_name)
-    print(combined_issue_labels)
+    print("COMBINED ISSUE LABELS: " + str(combined_issue_labels))
 
     # Convert label list into JSON-formatted dict
     labels_data = {}
@@ -93,8 +93,8 @@ def main():
     # Source: https://stackoverflow.com/q/68459601
     try:
         response = requests.post(f'{ISSUES_URL}/{pull_number}/labels', json=labels_data, headers=HEADERS)
-        response.raise_for_status()
         print("UPDATED RESPONSE: " + str(response.json()))
+        response.raise_for_status()
     except requests.exceptions.HTTPError as he:
         print("HTTPError in updating PR.", he)
         print(traceback.format_exc())
