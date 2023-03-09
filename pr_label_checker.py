@@ -2,8 +2,10 @@ import json
 import os
 import re as rgx
 import requests
+from requests.exceptions import HTTPError, RequestException
 import sys
 import traceback
+
 
 
 def main():
@@ -29,13 +31,10 @@ def main():
 
         # response = requests.get(f'{COMMITS_URL}/{GITHUB_SHA}/pulls', headers=HEADERS, verify='/Users/chkim/homebrew/etc/ca-certificates/cert.pem')
         response.raise_for_status()
-    except requests.exceptions.HTTPError as he:
-        print("HTTPError in retrieving list of PRs", he)
-        sys.exit(1)
-        raise 
-    except requests.exceptions.RequestException as re:
-        print("Unable to retrieve list of PRs associated with commit.", re)
-        sys.exit(1)
+    except HTTPError as he:
+        raise HTTPError("HTTPError in retrieving list of PRs", he) 
+    except RequestException as re:
+        raise RequestException("Unable to retrieve list of PRs associated with commit.", re)
 
     # Get necessary PR attributes
     pull_response_json = response.json()
@@ -67,21 +66,18 @@ def main():
         try:
             response = requests.get(f'{ISSUES_URL}/{issue_number}', headers=HEADERS)
             response.raise_for_status()
-        except requests.exceptions.HTTPError as he:
-            print("HTTPError in retrieving issues", he)
-            sys.exit(1)
-            raise 
-        except requests.exceptions.RequestException as re:
-            print("Unable to retrieve issues.", re)
-            sys.exit(1)
+        except HTTPError as he:
+            raise HTTPError("HTTPError in retrieving issues", he)
+        except RequestException as re:
+            raise RequestException("Unable to retrieve issues.", re)
         
-        # Combine labels into a list
-        issue_response_json = response.json()
-        issue_labels = issue_response_json.get("labels")
-        for issue_label in issue_labels:
-            # Get name of each label object
-            label_name = issue_label.get("name")
-            combined_issue_labels.append(label_name)
+    # Combine labels into a list
+    issue_response_json = response.json()
+    issue_labels = issue_response_json.get("labels")
+    for issue_label in issue_labels:
+        # Get name of each label object
+        label_name = issue_label.get("name")
+        combined_issue_labels.append(label_name)
     print("COMBINED ISSUE LABELS: " + str(combined_issue_labels))
 
     # Convert label list into JSON-formatted dict
@@ -94,17 +90,16 @@ def main():
         response = requests.post(f'{ISSUES_URL}/{pull_number}/labels', json=labels_data, headers=HEADERS)
         print("UPDATED RESPONSE: " + str(response.json()))
         response.raise_for_status()
-    except requests.exceptions.HTTPError as he:
-        print("HTTPError in updating PR.", he)
-        print(traceback.format_exc())
-        sys.exit(1) 
-    except requests.exceptions.RequestException as re:
-        print("Unable to update PR.", re)
-        print(traceback.format_exc())
-        sys.exit(1)
-
-    sys.exit(0)
+    except HTTPError as he:
+        raise HTTPError("HTTPError in updating PR.", he)
+    except RequestException as re:
+        raise RequestException("Unable to update PR.", re)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+        return true
+    except (HTTPError, RequestException) as e:
+        raise
+        sys.exit(1)
