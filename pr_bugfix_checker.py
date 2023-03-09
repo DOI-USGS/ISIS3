@@ -42,7 +42,6 @@ def main():
     pull_number = pull_response_json[0].get("number")
     print("PULL NUMBER: " + str(pull_number))
     pull_body = pull_response_json[0].get("body")
-    print("PULL BODY: " + str(pull_body))
 
     """
     Search for linked issues in PR body.

@@ -7,6 +7,8 @@ jobs:
   # Check if the PR is a bugfix
   check_labels:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     name: Check PR labels action step
     # Make the output of this job available to other jobs
     outputs: 
