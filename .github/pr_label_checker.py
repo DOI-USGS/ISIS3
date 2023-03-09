@@ -57,7 +57,7 @@ def search_for_linked_issues(pull_body: str) -> list:
     for linked_issue in linked_issues:
         # Strip linked issue text of '#'
         issue_numbers.append(linked_issue.replace('#',''))
-    logging.info("ISSUE NUMBERS: " + str(issue_numbers))
+    print("ISSUE NUMBERS: " + str(issue_numbers))
     return issue_numbers
 
 def get_linked_issues(issue_numbers: list) -> Response:
@@ -85,7 +85,7 @@ def get_issue_labels(response: Response) -> list:
         # Get name of each label object
         label_name = issue_label.get("name")
         combined_issue_labels.append(label_name)
-    logging.info("COMBINED ISSUE LABELS: " + str(combined_issue_labels))
+    print("COMBINED ISSUE LABELS: " + str(combined_issue_labels))
     return combined_issue_labels
 
 def convert_issue_list_to_dict(combined_issue_labels: list) -> dict:
@@ -100,7 +100,7 @@ def update_pr_labels(pull_number: str, labels_data: dict):
     # Source: https://stackoverflow.com/q/68459601
     try:
         response = post(f'{ISSUES_URL}/{pull_number}/labels', json=labels_data, headers=HEADERS)
-        logging.info("UPDATED RESPONSE: " + str(response.json()))
+        print("UPDATED RESPONSE: " + str(response.json()))
         response.raise_for_status()
     except HTTPError as he:
         raise HTTPError("HTTPError in updating PR.", he)
@@ -119,12 +119,12 @@ def get_pr(pull_number: str) -> Response:
 
 def is_pr_bugfix(response: Response):
     labels = response.json().get("labels")
-    logging.info("Labels: " + str(labels))
+    print("Labels: " + str(labels))
     for label in labels:
         if label.get("name") == "bug":
-            logging.info("This is TRUE")
+            print("This is TRUE")
             return True
-    logging.info("This is False")
+    print("This is False")
     return False
 
 if __name__ == "__main__":
