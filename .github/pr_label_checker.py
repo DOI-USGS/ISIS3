@@ -13,7 +13,7 @@ GITHUB_SHA=os.environ["GITHUB_SHA"]
 
 BASE_URL=f'{GITHUB_API_URL}/repos/chkim-usgs/ISIS3'
 PULLS_URL=f'{BASE_URL}/pulls'
-COMMITS_URL=f'{BASE_URL}/commits/'
+COMMITS_URL=f'{BASE_URL}/commits'
 ISSUES_URL=f'{BASE_URL}/issues'
 HEADERS = {
     "Accept": "application/vnd.github+json",
