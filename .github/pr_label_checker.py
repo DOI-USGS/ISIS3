@@ -139,3 +139,5 @@ if __name__ == "__main__":
         is_pr_bugfix(response)
     except (HTTPError, RequestException, Exception):
         raise
+
+is_pr_bugfix(response)
