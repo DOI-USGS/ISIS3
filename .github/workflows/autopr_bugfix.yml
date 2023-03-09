@@ -12,7 +12,7 @@ jobs:
     name: Check PR labels action step
     # Make the output of this job available to other jobs
     outputs: 
-      result: ${{steps.execute_py_script.outputs.result}}
+      result: ${{steps.execute_py_script.outputs.is_pr_bugfix}}
     steps:
     - name: checkout repo content
       uses: actions/checkout@v2 # checkout the repository content
@@ -31,11 +31,10 @@ jobs:
         GITHUB_API_URL: ${{ secrets.GITHUB_API_URL }}
         GITHUB_SHA: ${{ secrets.GITHUB_SHA }}
       run: |
-        is_pr_bugfix=$(python ./.github/pr_label_checker.py)
-        echo "::set-output name=bool::$is_pr_bugfix"
+        echo "is_pr_bugfix=$(python ./.github/pr_label_checker.py)" >> $GITHUB_OUTPUT
     # Print the result to the log
     - name: See result
-      run: echo "${{ steps.execute_py_script.outputs.output1 }}"
+      run: echo "${{ steps.execute_py_script.outputs.is_pr_bugfix }}"
   # check_labels:
   #   runs-on: ubuntu-latest
   #   name: Check PR labels action step
