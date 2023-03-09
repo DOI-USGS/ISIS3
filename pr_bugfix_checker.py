@@ -3,6 +3,7 @@ import os
 import re as rgx
 import requests
 import sys
+import traceback
 
 
 def main():
@@ -68,11 +69,11 @@ def main():
             response = requests.get(f'{ISSUES_URL}/{issue_number}', headers=HEADERS)
             response.raise_for_status()
         except requests.exceptions.HTTPError as he:
-            print("HTTPError in retrieving list of PRs", he)
+            print("HTTPError in retrieving issues", he)
             sys.exit(1)
             raise 
         except requests.exceptions.RequestException as re:
-            print("Unable to retrieve list of PRs associated with commit.", re)
+            print("Unable to retrieve issues.", re)
             sys.exit(1)
         
         # Combine labels into a list
@@ -95,10 +96,12 @@ def main():
         response.raise_for_status()
         print("UPDATED RESPONSE: " + str(response.json()))
     except requests.exceptions.HTTPError as he:
-        print("HTTPError in retrieving list of PRs", he)
+        print("HTTPError in updating PR.", he)
+        print(traceback.format_exc())
         sys.exit(1) 
     except requests.exceptions.RequestException as re:
-        print("Unable to retrieve list of PRs associated with commit.", re)
+        print("Unable to update PR.", re)
+        print(traceback.format_exc())
         sys.exit(1)
 
     sys.exit(0)
