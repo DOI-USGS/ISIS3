@@ -30,7 +30,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_API_URL: ${{ secrets.GITHUB_API_URL }}
         GITHUB_SHA: ${{ secrets.GITHUB_SHA }}
-      run: python pr_bugfix_checker.py
+      run: python pr_label_checker.py
     # Print the result to the log
     - name: See result
       run: echo "${{ steps.execute_py_script.outputs.result }}"
