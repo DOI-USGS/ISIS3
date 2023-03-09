@@ -42,7 +42,7 @@ def get_pr_attributes(response: Response) -> tuple:
     print("Pull repsonse json: " + str(pull_response_json))
     if len(pull_response_json) == 0:
         print(False)
-        sys.exit(1)
+        sys.exit(0)
     pull_number = pull_response_json.get("number")
     pull_body = pull_response_json.get("body")
     return (pull_number, pull_body)
