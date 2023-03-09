@@ -4,6 +4,7 @@ import re as rgx
 from requests import get, post
 from requests import Response
 from requests.exceptions import HTTPError, RequestException
+import sys
 
 # Constants
 GITHUB_TOKEN=os.environ["GITHUB_TOKEN"]
@@ -24,10 +25,10 @@ def get_prs_associated_with_commit() -> Response:
 # Get list of PRs associated with commitSHA
     try:
         # TODO: Remove below pull all PRs [TESTING ONLY]
-        GET_PR_LIST_URL=f'{BASE_URL}/pulls?state=all'
-        response = get(GET_PR_LIST_URL, headers=HEADERS)
+        # GET_PR_LIST_URL=f'{BASE_URL}/pulls?state=all'
+        # response = get(GET_PR_LIST_URL, headers=HEADERS)
 
-        # response = get(f'{COMMITS_URL}/{GITHUB_SHA}/pulls', headers=HEADERS)
+        response = get(f'{COMMITS_URL}/{GITHUB_SHA}/pulls', headers=HEADERS)
         response.raise_for_status()
         return response
     except HTTPError as he:
@@ -38,8 +39,11 @@ def get_prs_associated_with_commit() -> Response:
 def get_pr_attributes(response: Response) -> tuple:
     # Get necessary PR attributes
     pull_response_json = response.json()
-    pull_number = pull_response_json[0].get("number")
-    pull_body = pull_response_json[0].get("body")
+    if len(pull_response_json) == 0:
+        print(False)
+        sys.exit(1)
+    pull_number = pull_response_json.get("number")
+    pull_body = pull_response_json.get("body")
     return (pull_number, pull_body)
 
 def search_for_linked_issues(pull_body: str) -> list:
