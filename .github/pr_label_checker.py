@@ -43,8 +43,8 @@ def get_pr_attributes(response: Response) -> tuple:
     if len(pull_response_json) == 0:
         print(False)
         sys.exit(1)
-    pull_number = pull_response_json.get("number")
-    pull_body = pull_response_json.get("body")
+    pull_number = pull_response_json[0].get("number")
+    pull_body = pull_response_json[0].get("body")
     return (pull_number, pull_body)
 
 def search_for_linked_issues(pull_body: str) -> list:
