@@ -1,7 +1,8 @@
-import requests
 import json
-import re as rgx
 import os
+import re as rgx
+import requests
+import sys
 
 
 def main():
@@ -37,7 +38,6 @@ def main():
 
     # Get necessary PR attributes
     pull_response_json = response.json()
-    print("PULL RESPONSE: " + str(response.json()))
     pull_number = pull_response_json[0].get("number")
     print("PULL NUMBER: " + str(pull_number))
     pull_body = pull_response_json[0].get("body")
