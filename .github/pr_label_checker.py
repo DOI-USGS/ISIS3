@@ -121,8 +121,8 @@ def is_pr_bugfix(response: Response):
     labels = response.json().get("labels")
     for label in labels:
         if label.get("name") == "bug":
-            return "This is TRUE"
-    return "This is FALSE"
+            print(True)
+    print(False)
 
 if __name__ == "__main__":
     try:
@@ -140,4 +140,3 @@ if __name__ == "__main__":
     except (HTTPError, RequestException, Exception):
         raise
 
-is_pr_bugfix(response)
