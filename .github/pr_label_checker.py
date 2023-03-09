@@ -1,10 +1,9 @@
-import json
+import logging
 import os
 import re as rgx
 from requests import get, post
 from requests import Response
 from requests.exceptions import HTTPError, RequestException
-import sys
 
 # Constants
 GITHUB_TOKEN=os.environ["GITHUB_TOKEN"]
@@ -58,7 +57,7 @@ def search_for_linked_issues(pull_body: str) -> list:
     for linked_issue in linked_issues:
         # Strip linked issue text of '#'
         issue_numbers.append(linked_issue.replace('#',''))
-    print("ISSUE NUMBERS: " + str(issue_numbers))
+    logging.info("ISSUE NUMBERS: " + str(issue_numbers))
     return issue_numbers
 
 def get_linked_issues(issue_numbers: list) -> Response:
@@ -86,7 +85,7 @@ def get_issue_labels(response: Response) -> list:
         # Get name of each label object
         label_name = issue_label.get("name")
         combined_issue_labels.append(label_name)
-    print("COMBINED ISSUE LABELS: " + str(combined_issue_labels))
+    logging.info("COMBINED ISSUE LABELS: " + str(combined_issue_labels))
     return combined_issue_labels
 
 def convert_issue_list_to_dict(combined_issue_labels: list) -> dict:
@@ -101,7 +100,7 @@ def update_pr_labels(pull_number: str, labels_data: dict):
     # Source: https://stackoverflow.com/q/68459601
     try:
         response = post(f'{ISSUES_URL}/{pull_number}/labels', json=labels_data, headers=HEADERS)
-        print("UPDATED RESPONSE: " + str(response.json()))
+        logging.info("UPDATED RESPONSE: " + str(response.json()))
         response.raise_for_status()
     except HTTPError as he:
         raise HTTPError("HTTPError in updating PR.", he)
