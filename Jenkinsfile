@@ -129,9 +129,13 @@ pipeline {
               } 
             }
             steps {
-                if (env.BRANCH_NAME ==~ /PR-\d+/) {
-                    pullRequest.labels.each{
-                        echo "label: $it"
+                script{
+                    if (env.BRANCH_NAME ==~ /PR-\d+/) {
+                        pullRequest.labels.each{
+                            echo "label: $it"
+                        }
+                    } else {
+                        echo "Not a PR"
                     }
                 }
             }
