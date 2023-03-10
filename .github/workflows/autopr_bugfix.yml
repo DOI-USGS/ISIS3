@@ -2,7 +2,7 @@ name: Cherrypick bugfixes to release branch
 on:
   push:
     branches:
-      - test_dev
+      - dev
 jobs:
   # Check if the PR is a bugfix
   check_labels:
@@ -36,21 +36,6 @@ jobs:
     # Print the result to the log
     - name: See result
       run: echo "${{ steps.execute_py_script.outputs.result }}"
-  # check_labels:
-  #   runs-on: ubuntu-latest
-  #   name: Check PR labels action step
-  #   # Make the output of this job available to other jobs
-  #   outputs: 
-  #     result: ${{steps.check_pr_labels.outputs.result}}
-  #   steps:
-  #   - id: check_pr_labels
-  #     uses: 3pointer/check-pr-labels-on-push-action@v1.0.3
-  #     with:
-  #       github-token: ${{ secrets.GITHUB_TOKEN }}
-  #       labels: '["bug"]'
-  #   # Print the result to the log
-  #   - name: See result
-  #     run: echo "${{ steps.check_pr_labels.outputs.result }}"
   release_pull_request:
     needs: check_labels
     # Only run this step if the code was a bugfix
@@ -58,27 +43,25 @@ jobs:
     runs-on: ubuntu-latest
     name: release_pull_request
     steps:
-      - name: "Check if check_labels worked"
-        run: echo "Auto-labeling PR worked!!"
-  #   - name: checkout
-  #     uses: actions/checkout@v2.2.0
-  #     # Fetch all info including branches + tags
-  #     with:
-  #       fetch-depth: 0
-  #   - name: 'Get Previous tag'
-  #     id: get_latest_tag
-  #     uses: "WyriHaximus/github-action-get-previous-tag@v1"
-  #   - id: get_short_version
-  #     # Get the major / minor version without patch info i.e. 6.0 from 6.0.1
-  #     run: |
-  #       major_minor=$(echo ${{steps.get_latest_tag.outputs.tag}} | cut -d '.' -f 1,2)
-  #       echo "::set-output name=major_minor::$major_minor"
-  #   - name: Create PR to branch
-  #     uses: adamtharani/github-action-cherry-pick@master
-  #     # PR to the latest feature release.  Merges are enabled
-  #     with:
-  #       pr_branch: ${{steps.get_short_version.outputs.major_minor}}
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       DRY_RUN: false
+    - name: checkout
+      uses: actions/checkout@v2.2.0
+      # Fetch all info including branches + tags
+      with:
+        fetch-depth: 0
+    - name: 'Get Previous tag'
+      id: get_latest_tag
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+    - id: get_short_version
+      # Get the major / minor version without patch info i.e. 6.0 from 6.0.1
+      run: |
+        major_minor=$(echo ${{steps.get_latest_tag.outputs.tag}} | cut -d '.' -f 1,2)
+        echo "::set-output name=major_minor::$major_minor"
+    - name: Create PR to branch
+      uses: adamtharani/github-action-cherry-pick@master
+      # PR to the latest feature release.  Merges are enabled
+      with:
+        pr_branch: ${{steps.get_short_version.outputs.major_minor}}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DRY_RUN: false
 
