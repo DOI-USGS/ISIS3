@@ -122,10 +122,19 @@ pipeline {
             }
         }
         stage('Deploy') {
+            when { 
+              allOf { 
+                expression { env.GITHUB_PR_STATE == "CLOSE" }
+                expression { env.GITHUB_PR_TARGET_BRANCH == "dev" }
+                expression { env.GITHUB_PR_SOURCE_BRANCH == "PR-*" }
+              } 
+            }
             steps {
-                sh '''
-                echo "This is where deploy would happen."
-                '''
+                if (env.BRANCH_NAME ==~ /PR-\d+/) {
+                    pullRequest.labels.each{
+                        echo "label: $it"
+                    }
+                }
             }
         }
     }
