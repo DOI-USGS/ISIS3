@@ -43,25 +43,27 @@ jobs:
     runs-on: ubuntu-latest
     name: release_pull_request
     steps:
-    - name: checkout
-      uses: actions/checkout@v2.2.0
-      # Fetch all info including branches + tags
-      with:
-        fetch-depth: 0
-    - name: 'Get Previous tag'
-      id: get_latest_tag
-      uses: "WyriHaximus/github-action-get-previous-tag@v1"
-    - id: get_short_version
-      # Get the major / minor version without patch info i.e. 6.0 from 6.0.1
-      run: |
-        major_minor=$(echo ${{steps.get_latest_tag.outputs.tag}} | cut -d '.' -f 1,2)
-        echo "::set-output name=major_minor::$major_minor"
-    - name: Create PR to branch
-      uses: adamtharani/github-action-cherry-pick@master
-      # PR to the latest feature release.  Merges are enabled
-      with:
-        pr_branch: ${{steps.get_short_version.outputs.major_minor}}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DRY_RUN: false
+      - name: "Check if check_labels worked"
+        run: echo "Auto-labeling PR worked!!"
+  #   - name: checkout
+  #     uses: actions/checkout@v2.2.0
+  #     # Fetch all info including branches + tags
+  #     with:
+  #       fetch-depth: 0
+  #   - name: 'Get Previous tag'
+  #     id: get_latest_tag
+  #     uses: "WyriHaximus/github-action-get-previous-tag@v1"
+  #   - id: get_short_version
+  #     # Get the major / minor version without patch info i.e. 6.0 from 6.0.1
+  #     run: |
+  #       major_minor=$(echo ${{steps.get_latest_tag.outputs.tag}} | cut -d '.' -f 1,2)
+  #       echo "::set-output name=major_minor::$major_minor"
+  #   - name: Create PR to branch
+  #     uses: adamtharani/github-action-cherry-pick@master
+  #     # PR to the latest feature release.  Merges are enabled
+  #     with:
+  #       pr_branch: ${{steps.get_short_version.outputs.major_minor}}
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       DRY_RUN: false
 
