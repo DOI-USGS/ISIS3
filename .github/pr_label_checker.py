@@ -22,12 +22,10 @@ HEADERS = {
 }
 
 def get_prs_associated_with_commit() -> Response:
-# Get list of PRs associated with commitSHA
+    """
+    Get list of PRs associated with commit.
+    """
     try:
-        # TODO: Remove below pull all PRs [TESTING ONLY]
-        # GET_PR_LIST_URL=f'{BASE_URL}/pulls?state=all'
-        # response = get(GET_PR_LIST_URL, headers=HEADERS)
-
         response = get(f'{COMMITS_URL}/{GITHUB_SHA}/pulls', headers=HEADERS)
         response.raise_for_status()
         return response
@@ -37,12 +35,14 @@ def get_prs_associated_with_commit() -> Response:
         raise RequestException("Unable to retrieve list of PRs associated with commit.", re)
 
 def get_pr_attributes(response: Response) -> tuple:
-    # Get necessary PR attributes
+    """
+    Get necessary PR attributes.
+    """
     pull_response_json = response.json()
-    # print("Pull response json: " + str(pull_response_json))
     if len(pull_response_json) == 0:
+        # No PRs in commit
         print(False)
-        sys.exit(1)
+        sys.exit(0)
     pull_number = pull_response_json[0].get("number")
     pull_body = pull_response_json[0].get("body")
     return (pull_number, pull_body)
@@ -62,50 +62,61 @@ def search_for_linked_issues(pull_body: str) -> list:
     for linked_issue in linked_issues:
         # Strip linked issue text of '#'
         issue_numbers.append(linked_issue.replace('#',''))
-    # print("ISSUE NUMBERS: " + str(issue_numbers))
     return issue_numbers
 
-def get_linked_issues(issue_numbers: list) -> Response:
-    # Verify issues exists and has labels
+def get_linked_issues(issue_numbers: list) -> list:
+    """
+    Verify issues exists and has labels.
+    """
+    response_list = []
     for issue_number in issue_numbers:
         # Get labels from issue
         try:
             response = get(f'{ISSUES_URL}/{issue_number}', headers=HEADERS)
             response.raise_for_status()
-            return response
+            response_list.append(response)
         except HTTPError as he:
             raise HTTPError("HTTPError in retrieving issues", he)
         except RequestException as re:
             raise RequestException("Unable to retrieve issues.", re)
+    return response_list
 
-def get_issue_labels(response: Response) -> list:
+def get_issue_labels(response_list: list) -> list:
     """
     Get labels from all linked issues.
     """
     combined_issue_labels = []
-    # Combine labels into a list
-    issue_response_json = response.json()
-    issue_labels = issue_response_json.get("labels")
-    for issue_label in issue_labels:
-        # Get name of each label object
-        label_name = issue_label.get("name")
-        combined_issue_labels.append(label_name)
-    # print("COMBINED ISSUE LABELS: " + str(combined_issue_labels))
+    for response in response_list:
+        # Combine labels into a list
+        issue_response_json = response.json()
+        issue_labels = issue_response_json.get("labels")
+        for issue_label in issue_labels:
+            # Get name of each label object
+            label_name = issue_label.get("name")
+            if label_name not in combined_issue_labels:
+                # Add label if it does not exist
+                combined_issue_labels.append(label_name)
+    if not combined_issue_labels:
+        # No labels to return
+        print(False)
+        sys.exit(0)
     return combined_issue_labels
 
 def convert_issue_list_to_dict(combined_issue_labels: list) -> dict:
-    # Convert label list into JSON-formatted dict
+    """
+    Convert label list into JSON-formatted dict
+    """
     labels_data = {}
     labels_data["labels"] = combined_issue_labels
     return labels_data
 
 def update_pr_labels(pull_number: str, labels_data: dict):
-
-    # Update pull request with labels
+    """
+    Update pull request with labels
     # Source: https://stackoverflow.com/q/68459601
+    """
     try:
         response = post(f'{ISSUES_URL}/{pull_number}/labels', json=labels_data, headers=HEADERS)
-        logging.info("UPDATED RESPONSE: " + str(response.json()))
         response.raise_for_status()
     except HTTPError as he:
         raise HTTPError("HTTPError in updating PR.", he)
@@ -113,6 +124,9 @@ def update_pr_labels(pull_number: str, labels_data: dict):
         raise RequestException("Unable to update PR.", re)
 
 def get_pr(pull_number: str) -> Response:
+    """
+    Get pull request
+    """
     try:
         response = get(f'{PULLS_URL}/{pull_number}', headers=HEADERS)
         response.raise_for_status()
@@ -123,6 +137,9 @@ def get_pr(pull_number: str) -> Response:
         raise RequestException("Unable to retrieve issues.", re)
 
 def is_pr_bugfix(response: Response):
+    """
+    Check PR label for 'bug'
+    """
     labels = response.json().get("labels")
     logging.info("Labels: " + str(labels))
     for label in labels:
@@ -134,17 +151,18 @@ def is_pr_bugfix(response: Response):
 
 if __name__ == "__main__":
     try:
+        # Update PR labels
         response = get_prs_associated_with_commit()
         pull_number, pull_body = get_pr_attributes(response)
         issue_numbers = search_for_linked_issues(pull_body)
-        response = get_linked_issues(issue_numbers)
-        combined_issue_labels = get_issue_labels(response)
+        response_list = get_linked_issues(issue_numbers)
+        combined_issue_labels = get_issue_labels(response_list)
         labels_data = convert_issue_list_to_dict(combined_issue_labels)
         update_pr_labels(pull_number, labels_data)
 
-        # Check PR labels for 'bug'
+        # Check if PR is a bugfix
         response = get_pr(pull_number)
         print(is_pr_bugfix(response))
-    except (HTTPError, RequestException, Exception):
+    except (HTTPError, RequestException):
         raise
 
