@@ -28,6 +28,8 @@ Integrated Software for Imagers and Spectrometers Contributors
 - Bonn, John
 - Boyd, Mackenzie
 - Brownsberger, Sasha
+- Cain, Jacob (United States Geological Survey, Astro Geology Science
+  Center)
 - Chaves, Pat
 - Christensen, Way
 - Clark, Roger (United States Geological Survey)
@@ -71,6 +73,7 @@ Integrated Software for Imagers and Spectrometers Contributors
 - Herkenhoff, Ken (United States Geological Survey, Astro Geology
   Science Center)
 - Heyer, Eric
+- Hibl, Anton
 - Hilt, Noah
 - Howington-Kraus, Elpitha
 - Humphrey, Ian

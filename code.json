@@ -1,28 +1,28 @@
 [
   {
-    "name": "ISIS3",
+    "name": "ISIS",
     "organization": "U.S. Geological Survey",
     "description": "GitHub code repository for the Integrated Software for Imagers and Spectrometers (ISIS)",
-    "version": "7.1.0",
-    "status": "Release",
+    "version": "dev",
+    "status": "Development",
 
     "permissions": {
       "usageType": "openSource",
       "licenses": [
         {
           "name": "Public Domain, CC0-1.0",
-          "URL": "https://code.usgs.gov/astrogeology/isis/-/blob/7.1.0/LICENSE.md"
+          "URL": "https://code.usgs.gov/astrogeology/isis/-/raw/dev/LICENSE.md"
         }
       ]
     },
 
-    "homepageURL": "https://isis.astrogeology.usgs.gov",
-    "downloadURL": "https://code.usgs.gov/astrogeology/isis/-/tree/7.1.0",
-    "disclaimerURL": "https://code.usgs.gov/astrogeology/isis/-/blob/7.1.0/DISCLAIMER.md",
-    "repositoryURL": "https://code.usgs.gov/astrogeology/isis",
+    "homepageURL": "https://code.usgs.gov/astrogeology/isis/",
+    "downloadURL": "https://code.usgs.gov/astrogeology/isis/-/archive/dev/isis-dev.zip",
+    "disclaimerURL": "https://code.usgs.gov/astrogeology/isis/-/raw/dev/DISCLAIMER.md",
+    "repositoryURL": "https://code.usgs.gov/astrogeology/isis.git",
     "vcs": "git",
 
-    "laborHours": 2400,
+    "laborHours": 24000,
 
     "tags": [
       "Planetary",
@@ -41,32 +41,32 @@
     },
 
     "date": {
-      "metadataLastUpdated": "2023-01-25"
+      "metadataLastUpdated": "2023-02-27"
     }
   },{
     "name": "ISIS3",
     "organization": "U.S. Geological Survey",
     "description": "GitHub code repository for the Integrated Software for Imagers and Spectrometers (ISIS)",
-    "version": "7.0.0",
-    "status": "Release",
+    "version": "7.1.0",
+    "status": "Production",
 
     "permissions": {
       "usageType": "openSource",
       "licenses": [
         {
           "name": "Public Domain, CC0-1.0",
-          "URL": "https://code.usgs.gov/astrogeology/isis/-/blob/7.0.0/LICENSE.md"
+          "URL": "https://code.usgs.gov/astrogeology/isis/-/raw/7.1.0/LICENSE.md"
         }
       ]
     },
 
     "homepageURL": "https://isis.astrogeology.usgs.gov",
-    "downloadURL": "https://code.usgs.gov/astrogeology/isis/-/tree/7.0.0",
-    "disclaimerURL": "https://code.usgs.gov/astrogeology/isis/-/blob/7.0.0/DISCLAIMER.md",
-    "repositoryURL": "https://code.usgs.gov/astrogeology/isis",
+    "downloadURL": "https://code.usgs.gov/astrogeology/isis/-/archive/7.1.0/isis-7.1.0.zip",
+    "disclaimerURL": "https://code.usgs.gov/astrogeology/isis/-/raw/7.1.0/DISCLAIMER.md",
+    "repositoryURL": "https://code.usgs.gov/astrogeology/isis.git",
     "vcs": "git",
 
-    "laborHours": 2400,
+    "laborHours": 0,
 
     "tags": [
       "Planetary",
