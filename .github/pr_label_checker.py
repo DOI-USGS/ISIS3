@@ -1,4 +1,3 @@
-import logging
 import os
 import re as rgx
 from requests import get, post
@@ -102,19 +101,13 @@ def get_issue_labels(response_list: list) -> list:
         sys.exit(0)
     return combined_issue_labels
 
-def convert_issue_list_to_dict(combined_issue_labels: list) -> dict:
-    """
-    Convert label list into JSON-formatted dict
-    """
-    labels_data = {}
-    labels_data["labels"] = combined_issue_labels
-    return labels_data
-
-def update_pr_labels(pull_number: str, labels_data: dict):
+def update_pr_labels(pull_number: str, combined_issue_labels: list):
     """
     Update pull request with labels
     # Source: https://stackoverflow.com/q/68459601
     """
+    # Convert label list into JSON-formatted dict
+    labels_data = {"labels": combined_issue_labels}
     try:
         response = post(f'{ISSUES_URL}/{pull_number}/labels', json=labels_data, headers=HEADERS)
         response.raise_for_status()
@@ -136,17 +129,14 @@ def get_pr(pull_number: str) -> Response:
     except RequestException as re:
         raise RequestException("Unable to retrieve issues.", re)
 
-def is_pr_bugfix(response: Response):
+def is_pr_bugfix(response: Response) -> bool:
     """
     Check PR label for 'bug'
     """
     labels = response.json().get("labels")
-    logging.info("Labels: " + str(labels))
     for label in labels:
         if label.get("name") == "bug":
-            logging.info("PR is a bugfix")
             return True
-    logging.info("PR is not a bugfix")
     return False
 
 if __name__ == "__main__":
@@ -157,8 +147,7 @@ if __name__ == "__main__":
         issue_numbers = search_for_linked_issues(pull_body)
         response_list = get_linked_issues(issue_numbers)
         combined_issue_labels = get_issue_labels(response_list)
-        labels_data = convert_issue_list_to_dict(combined_issue_labels)
-        update_pr_labels(pull_number, labels_data)
+        update_pr_labels(pull_number, combined_issue_labels)
 
         # Check if PR is a bugfix
         response = get_pr(pull_number)
