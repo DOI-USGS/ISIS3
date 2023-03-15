@@ -36,6 +36,8 @@ release.
 ## [Unreleased]
 
 ### Changed
+- Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
+- Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
 
 ### Added
 
@@ -62,6 +64,7 @@ release.
 - Fixes embree shape models not being from .BDS extension files [5064](https://github.com/USGS-Astrogeology/ISIS3/issues/5064)
 - Fixed failing shapemodel parameters when bullet was the preferred ray tracing engine but could not be created. [#5062](https://github.com/USGS-Astrogeology/ISIS3/issues/5062)
 - Fixed version for Qt to prevent depreciations. [#5070](https://github.com/USGS-Astrogeology/ISIS3/issues/5070)
+- Fixed NaN velocities in spkwriter as a result of jigsaw position solves. [#4942](https://github.com/USGS-Astrogeology/ISIS3/issues/4942)
 
 ## [7.1.0] - 2022-07-27
 
