@@ -44,6 +44,7 @@ release.
 ### Deprecated
 
 ### Fixed
+- Fixed users not being able to modify planetographic projections in qmos
 
 ## [7.2.0] - 2022-12-07
 
