@@ -744,7 +744,7 @@ namespace Isis {
     // Load the time cache first
     LoadTimeCache();
 
-    if (p_fullCacheSize > 1) {
+    if (p_hasVelocity) {
       // Load the positions and velocity caches
       p_et = -DBL_MAX;   // Forces recalculation in SetEphemerisTime
       std::vector<ale::State> stateCache;
