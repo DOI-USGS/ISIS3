@@ -40,7 +40,7 @@ TEST(TgoCassisstitch, TgoCassisstitchMultiframeTest) {
     FAIL() << "Unable to run tgocassisstitch with cube list: " << e.what() << std::endl;
   }
 
-  Cube cube(prefix.path() + "/CAS-MCO-defaultnil.cub");
+  Cube cube(prefix.path() + "/CAS-MCO-default.cub");
   Pvl *isisLabel = cube.label();
 
   // Dimensions Group
@@ -237,7 +237,7 @@ TEST(TgoCassisstitch, TgoCassisstitchSingleframeTest) {
     FAIL() << "Unable to run tgocassisstitch with cube list: " << e.what() << std::endl;
   }
 
-  Cube cube(prefix.path() + "/CAS-MCO-defaultnil.cub");
+  Cube cube(prefix.path() + "/CAS-MCO-default.cub");
   Pvl *isisLabel = cube.label();
 
   // Dimensions Group
