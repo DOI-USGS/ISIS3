@@ -73,6 +73,12 @@ namespace Isis {
     // Stitch together the individual frames
     FileName outputPrefix(ui.GetCubeName("OUTPUTPREFIX"));
     FileName outputSuffix(ui.GetCubeName("OUTPUTSUFFIX"));
+    if(outputPrefix == "nil"){
+        outputPrefix = "";
+    }
+    if (outputSuffix == "nil"){
+         outputSuffix = "";
+    }
     QString outputPrefBaseName = outputPrefix.expanded();
     QString outputSuffBaseName = outputSuffix.expanded();
     QStringList frameKeys = frameMap.uniqueKeys();
@@ -85,12 +91,15 @@ namespace Isis {
       try {
         QString frameIdentifier = frameKey.split("/").last();
 <<<<<<< HEAD
+<<<<<<< HEAD
         if(outputPrefix == "nil"){
           outputPrefix = "";
         }
         if (outputSuffix == "nil"){
           outputSuffix = "";
         }
+=======
+>>>>>>> 37c1659f8 (changed string logic, fixed issues with tests I think.)
         if (frameletCubeName != "nil") {
           FileName frameFileName(outputPrefBaseName +
                                frameletCubeName +
