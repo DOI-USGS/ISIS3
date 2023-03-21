@@ -84,6 +84,7 @@ namespace Isis {
     foreach(QString frameKey, frameKeys) {
       try {
         QString frameIdentifier = frameKey.split("/").last();
+<<<<<<< HEAD
         if(outputPrefix == "nil"){
           outputPrefix = "";
         }
@@ -100,6 +101,24 @@ namespace Isis {
           FileName frameFileName(outputPrefBaseName +
                                  frameIdentifier +
                                  outputSuffBaseName + ".cub");
+=======
+        if ((outputPrefix != "nil") && (outputSuffix == "nil")) {
+          FileName frameFileName(outputPrefBaseName + "-" + frameIdentifier + ".cub");
+          stitchFrame( frameMap.values(frameKey), frameFileName );
+          stitchProgress.CheckStatus();
+        } else if ((outputSuffix != "nil") && (outputPrefix == "nil")) {
+          FileName frameFileName(frameIdentifier + "-" + outputSuffBaseName + ".cub");
+          stitchFrame( frameMap.values(frameKey), frameFileName );
+          stitchProgress.CheckStatus();
+        } else if ((outputPrefix != "nil") && (outputSuffix != "nil")) {
+          FileName frameFileName(outputPrefBaseName +
+                                 "-" + frameIdentifier +
+                                 "-" + outputSuffBaseName + ".cub");
+          stitchFrame( frameMap.values(frameKey), frameFileName );
+          stitchProgress.CheckStatus();
+        } else if ((outputPrefix == "nil") && (outputSuffix == "nil")) {
+          FileName frameFileName(frameIdentifier + ".cub");
+>>>>>>> 528a5aa05 (modified to allow prefix, suffix, both, or neither for better extensibility)
           stitchFrame( frameMap.values(frameKey), frameFileName );
           stitchProgress.CheckStatus();
         }

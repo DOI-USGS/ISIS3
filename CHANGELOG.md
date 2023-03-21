@@ -37,11 +37,19 @@ release.
 
 ### Changed
 <<<<<<< HEAD
+<<<<<<< HEAD
 - Modified tgocassisstitch to optionally allow either a outputprefix or an
   outputsuffix, both, or neither for naming convention purposes [#5125](https://github.com/USGS-Astrogeology/ISIS3/issues/5125)
 =======
 <<<<<<< HEAD
 >>>>>>> c29be5eb7 (cmake -DJP2KFLAG=OFF -DbuildTests=OFF -GNinja ../isisadding to changelog)
+=======
+<<<<<<< HEAD
+=======
+- Modified tgocassisstitch to optionally allow either a outputprefix or an
+  outputsuffix, both, or neither for naming convention purposes
+>>>>>>> 07d99860a (modified to allow prefix, suffix, both, or neither for better extensibility)
+>>>>>>> 528a5aa05 (modified to allow prefix, suffix, both, or neither for better extensibility)
 - Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
 - Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
 =======
