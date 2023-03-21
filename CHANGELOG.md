@@ -51,10 +51,20 @@ release.
 <<<<<<< HEAD
 =======
 - Modified tgocassisstitch to optionally allow either a outputprefix or an
+<<<<<<< HEAD
   outputsuffix, both, or neither for naming convention purposes
 >>>>>>> 07d99860a (modified to allow prefix, suffix, both, or neither for better extensibility)
+<<<<<<< HEAD
 >>>>>>> 528a5aa05 (modified to allow prefix, suffix, both, or neither for better extensibility)
+<<<<<<< HEAD
 >>>>>>> 41f0ce656 (modified to allow prefix, suffix, both, or neither for better extensibility)
+=======
+=======
+=======
+  outputsuffix, both, or neither for naming convention purposes [#5125](https://github.com/USGS-Astrogeology/ISIS3/issues/5125)
+>>>>>>> 316610135 (added details to changelog)
+>>>>>>> fdef12dc9 (added details to changelog)
+>>>>>>> 76a28a8a6 (added details to changelog)
 - Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
 - Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
 - Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
@@ -62,9 +72,15 @@ release.
 ### Added
 - Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
 
+<<<<<<< HEAD
 - Added an optional cubename parameter to tgocassisstitch which lets the user
   override the timestamp style naming convention of the output cube with their
   own name; if not specified retains existing behavior [#5125](https://github.com/USGS-Astrogeology/ISIS3/issues/5125)
+=======
+- Added an optional cubename parameter which lets the user override the
+  timestamp style naming convention of the output cube with their own name; if
+  not specified retains existing behavior [#5125](https://github.com/USGS-Astrogeology/ISIS3/issues/5125)
+>>>>>>> fdef12dc9 (added details to changelog)
 
 ### Deprecated
 
