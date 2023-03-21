@@ -30,4 +30,5 @@ As described above, we will release on a three month cadence. Releases will be l
 | 7.1.0_RC | Release Candidate | 8.1.22 |
 | 7.1.0 | Release | 9.20.22 |
 | 7.2.0_RC | Release Candidate | 11.7.22 |
-| 7.2.0 | Release | 12.5.22 |
+| 7.2.0 | Release | 03.21.23 |
+| 8.0.0 | LTS Release | 5.5.23 |
