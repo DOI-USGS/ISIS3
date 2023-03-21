@@ -41,7 +41,7 @@ release.
 - Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
 
 ### Added
-- Instructions on setting `channel_priority=flexible` for isis environment manually during installation
+- Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
 
 ### Deprecated
 
