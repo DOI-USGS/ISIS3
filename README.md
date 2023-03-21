@@ -77,6 +77,9 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
     #The order is important.  If conda-forge is before usgs-astrogeology, you will need to run:
 
     conda config --env --add channels usgs-astrogeology
+    
+    #Then set channel_priority to flexible in case there is a global channel_priority=strict setting
+    conda config --env --set channel_priority flexible
     ```
 
 1. The environment is now ready to download ISIS and its dependencies:
