@@ -44,8 +44,10 @@ release.
 - Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
 - Modified tgocassisstitch to optionally output naming convention as a suffix
   rather than prefix with a new flag.
+- Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
 
 ### Added
+- Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
 
 - Added an optional cubename parameter to tgocassisstitch which lets the user
   override the timestamp style naming convention of the output cube with their

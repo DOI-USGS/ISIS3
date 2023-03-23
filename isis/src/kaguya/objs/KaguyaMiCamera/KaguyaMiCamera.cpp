@@ -59,7 +59,7 @@ namespace Isis {
     // Set up the camera info from ik/iak kernels
 
     SetFocalLength();
-    //Kaguya IK kernal uses INS-131???_PIXEL_SIZE instead of PIXEL_PITCH
+    //Kaguya IK kernel uses INS-131???_PIXEL_SIZE instead of PIXEL_PITCH
     QString ikernKey = "INS" + toString(naifIkCode()) + "_PIXEL_SIZE";
     SetPixelPitch(getDouble(ikernKey));
 

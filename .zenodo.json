@@ -465,7 +465,11 @@
     },
     {
       "name": "Young, Aaron"
-    }
+    },
+    {
+      "name": "Jia, Bojun",
+      "orcid": "0000-0001-7218-6746"
+    },
   ],
   "title": "Integrated Software for Imagers and Spectrometers",
   "description": "A software library and set of tools to support ingestion, processing, and analysis of planetary science data.",
