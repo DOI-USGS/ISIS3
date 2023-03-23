@@ -38,12 +38,15 @@ release.
 ### Changed
 - Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
 - Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
+- Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
 
 ### Added
+- Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
 
 ### Deprecated
 
 ### Fixed
+- Fixed users not being able to modify planetographic projections in qmos
 
 ## [7.2.0] - 2022-12-07
 

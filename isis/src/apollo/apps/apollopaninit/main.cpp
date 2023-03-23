@@ -186,7 +186,7 @@ void IsisMain() {
 
   panCube.putGroup(inst_pvlG);
 
-  ///////////////////////////////////The kernals group
+  ///////////////////////////////////The kernels group
   kernels_pvlG.setName("Kernels");
   kernels_pvlG.clear();
 
@@ -228,7 +228,7 @@ void IsisMain() {
 
   panCube.putGroup(kernels_pvlG);
 
-  //Load all the kernals
+  //Load all the kernels
   Load_Kernel(kernels_pvlG["TargetPosition"]);
   Load_Kernel(kernels_pvlG["TargetAttitudeShape"]);
   Load_Kernel(kernels_pvlG["LeapSecond"]);
@@ -792,7 +792,7 @@ void IsisMain() {
 //  without shoe-horning the input to please the rest of the Spice::Init() funciton
 void Load_Kernel(Isis::PvlKeyword &key) {
 
-  //Load all the kernal files (file names are stored as values of the PvlKeyword)
+  //Load all the kernel files (file names are stored as values of the PvlKeyword)
   NaifStatus::CheckErrors();
 
   for(int i = 0; i < key.size(); i++) {
