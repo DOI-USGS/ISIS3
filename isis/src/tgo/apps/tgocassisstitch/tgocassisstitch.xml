@@ -63,7 +63,6 @@
         </filter>
       </parameter>
 
-<<<<<<< HEAD
       <parameter name="CUBENAME">
         <type>cube</type>
         <default><item>nil</item></default>
@@ -80,8 +79,6 @@
         </filter>
       </parameter>
 
-=======
->>>>>>> 528a5aa05 (modified to allow prefix, suffix, both, or neither for better extensibility)
       <parameter name="OUTPUTPREFIX">
         <type>cube</type>
         <default><item>nil</item></default>
