@@ -204,7 +204,7 @@ End
       for kernel DB files using the form <b>kernels.????.db</b>. The
       highest version of these files are selected and its contents are read.
       For every <b>File</b> specification in a <b>Selection</b> group,
-      the highested version is determined and then checked for existance.
+      the highest version is determined and then checked for existance.
       If no files are found, which typically occurs when looking for the
       highest version, it is reported as missing. The missing file, the
       file that contains the reference to it, and the status of the file
@@ -386,6 +386,26 @@ error,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA,/opt/isisdatafull/rosetta/
     </group>
 
     <group name= "Options">
+      <parameter name="VERIFY">
+        <type>boolean</type>
+        <brief>Run verification of inventory</brief>
+        <description>
+          <p>
+            This parameter is provided to explicity turn on the process
+            of verification of the ISISDATA FILE inventory. This is not
+            needed if HASH!=None and/or a file is provided in the
+            TOINVENTORY parameter.
+          </p>
+          <p>
+            Basic vertification of ISISDATA inventory will run through
+            all the files in ISISDATA and ensure that the expanded version
+            of the filename exists. There is at least one case this option
+            will reveal is if a `+` character exists in a file name. It is
+            flagged as an error here.
+          </p>
+        </description>
+        <default><item>false</item></default>
+      </parameter>
       <parameter name= "HASH">
         <type>string</type>
         <default><item>NOHASH</item></default>
@@ -688,9 +708,16 @@ End_Group
           configuration file. Files with <em>empty</em> status have no
           content or do not specify any kernels. This may be needed to
           satisfy spiceinit requirements. A status of <em>external</em>
-          indicate the file <em>as specified</em> in the db/conf file
-          does not exist in the ISISDATA inventory. For the occurances
-          in the above results indicate an extra '/' in the file name.
+          may have several potential reasons for this categorization.
+          One case identifiesa  file that is referred to in a kernel
+          DB/conf file, but is not found in the full ISISDATA file
+          inventory. If a kernel file path specification contains
+          extra characters, such as '//' in a file path specification.
+          And finally, if you run <em>isisdataeval</em> on a mission
+          directory, it will identify any kernels that are referenced
+          outside that directory. This can be very helpful to finding
+          files that are external dependencies to a mission kernels
+          configuration.
         </p>
       </description>
     </example>

@@ -46,8 +46,28 @@ namespace Isis {
   using namespace Data;
 
   //********************************************************************
-  // Helper functions
+  // Helper functions and datatypes
   //********************************************************************
+
+  /** Struct to capture inventory counts */
+  struct validation_counts {
+    validation_counts() {
+      m_missing = m_empty = m_symlinks = m_externals = m_errors = 0;
+    }
+    ~validation_counts() { }
+
+    inline int sum() const {
+      int total = m_missing + m_empty + m_symlinks + m_externals + m_errors;
+      return ( total );
+    }
+
+    int m_missing;
+    int m_empty;
+    int m_symlinks;
+    int m_externals;
+    int m_errors;
+  };
+  typedef struct validation_counts ValidationCounts;
 
   /** Add log Group to log file and console for backward compatability */
   inline void db_addLogGroup( Pvl *log, PvlGroup &group ) {
@@ -59,8 +79,10 @@ namespace Isis {
   }
 
   /** Report evaluation data consistently */
-  inline void report_issues( std::ostream &db_os, const Data::DBFileDispositionList &db_status,
-                             int &v_missing, int &v_empty, int &v_symlinks, int &v_externals ) {
+  inline void report_issues( std::ostream &db_os,
+                             const Data::DBFileDispositionList &db_status,
+                             ValidationCounts &counts ) {
+
 
     if ( db_status.size() > 0) {
       db_os << "status, filespec, sourcespec, source, target, category" << std::endl;
@@ -75,10 +97,11 @@ namespace Isis {
               << db_file.status()
               << std::endl;
 
-        if ( "missing"  == v_status ) v_missing++;
-        if ( "empty"    == v_status ) v_empty++;
-        if ( "symlink"  == v_status ) v_symlinks++;
-        if ( "external" == v_status ) v_externals++;
+        if ( "missing"  == v_status ) counts.m_missing++;
+        if ( "empty"    == v_status ) counts.m_empty++;
+        if ( "symlink"  == v_status ) counts.m_symlinks++;
+        if ( "external" == v_status ) counts.m_externals++;
+        if ( "error"    == v_status ) counts.m_errors++;
       }
     }
   }
@@ -161,24 +184,25 @@ namespace Isis {
     std::cout << "\nValidation Complete..." << v_bad << " issues found!" << std::endl;
 
     // Report kernel validation status to console
-    int v_missing(0), v_empty(0), v_symlinks(0), v_externals(0);
-    report_issues(std::cout, kernel_status, v_missing, v_empty, v_symlinks, v_externals );
+    ValidationCounts inventory_counts;
+    report_issues(std::cout, kernel_status, inventory_counts );
 
     // Generate the result log
     std::cout << std::endl;
     PvlGroup results("Results");
-    results.addKeyword( PvlKeyword( "ISISDATA", isisdata.expanded() ) );
-    results.addKeyword( PvlKeyword( "DATADIR", datadir ) );
-    results.addKeyword( PvlKeyword( "EmptyKernelDBs", toString( v_empty ) ) );
-    results.addKeyword( PvlKeyword( "MissingKernelDBs", toString( v_missing ) ) );
-    results.addKeyword( PvlKeyword( "SymlinkKernelFiles", toString( v_symlinks ) ) );
-    results.addKeyword( PvlKeyword( "ExternalKernelFiles", toString( v_externals ) ) );
-    results.addKeyword( PvlKeyword( "TotalDBConfigFiles", toString( t_configs ), "conf" ) );
-    results.addKeyword( PvlKeyword( "TotalKernelDBFiles", toString( t_kerneldbs ), "db" ) );
-    results.addKeyword( PvlKeyword( "TotalDirectories", toString( t_dirs ) ) );
-    results.addKeyword( PvlKeyword( "TotalDataFiles", toString( t_files ) ) );
-    results.addKeyword( PvlKeyword( "TotalInstallSize", toString( t_install_size ), "bytes" ) );
-    results.addKeyword( PvlKeyword( "TotalVolumeSize", toString( t_volume_size ), "GB" ) );
+    results.addKeyword( PvlKeyword( "ISISDATA",            isisdata.expanded() ) );
+    results.addKeyword( PvlKeyword( "DATADIR",             datadir ) );
+    results.addKeyword( PvlKeyword( "EmptyKernelDBs",      toString( inventory_counts.m_empty ) ) );
+    results.addKeyword( PvlKeyword( "MissingKernelDBs",    toString( inventory_counts.m_missing ) ) );
+    results.addKeyword( PvlKeyword( "SymlinkKernelFiles",  toString( inventory_counts.m_symlinks ) ) );
+    results.addKeyword( PvlKeyword( "ExternalKernelFiles", toString( inventory_counts.m_externals ) ) );
+    results.addKeyword( PvlKeyword( "ErrorKernelFiles",    toString( inventory_counts.m_errors ) ) );
+    results.addKeyword( PvlKeyword( "TotalDBConfigFiles",  toString( t_configs ), "conf" ) );
+    results.addKeyword( PvlKeyword( "TotalKernelDBFiles",  toString( t_kerneldbs ), "db" ) );
+    results.addKeyword( PvlKeyword( "TotalDirectories",    toString( t_dirs ) ) );
+    results.addKeyword( PvlKeyword( "TotalDataFiles",      toString( t_files ) ) );
+    results.addKeyword( PvlKeyword( "TotalInstallSize",    toString( t_install_size ), "bytes" ) );
+    results.addKeyword( PvlKeyword( "TotalVolumeSize",     toString( t_volume_size ), "GB" ) );
 
     // If users wants kernel issues reported, write it out here
     if ( ui.WasEntered( "TOISSUES" ) ) {
@@ -194,8 +218,8 @@ namespace Isis {
         }
 
         // Write the results
-        v_missing = v_empty = v_symlinks = v_externals = 0;
-        report_issues( os, kernel_status, v_missing, v_empty, v_symlinks, v_externals );
+        ValidationCounts issue_counts;
+        report_issues( os, kernel_status, issue_counts );
 
         // All done...
         os.close();
@@ -208,6 +232,7 @@ namespace Isis {
     //*******************************************************************
     // If user wants to validate the whole of DATADIR, this is it.
     const bool needInventory = ui.WasEntered( "TOINVENTORY" );
+    const bool doVerify      = ui.GetBoolean( "VERIFY" );
 
     // Set up default hash and determine if requested by user
     QCryptographicHash::Algorithm hash_algorithm = QCryptographicHash::Md5;
@@ -215,7 +240,7 @@ namespace Isis {
     const bool needHash = ( "nohash" != hashtype );
 
     // Either case will kick off the inventory.
-    if ( needInventory || needHash ) {
+    if ( needInventory || needHash || doVerify ) {
 
       // Check if user wants detailed log of DATADIR
       QString inventory_file( "/dev/null" );
@@ -232,6 +257,7 @@ namespace Isis {
       }
 
       // Only write the file if there are missing files
+      ValidationCounts error_counts_t;
       if ( v_isisdatadir.size() > 0 ) {
 
         std::ofstream os;
@@ -287,14 +313,14 @@ namespace Isis {
               DBFileStatus symfile( symtarget );
 
               // Report symlink
-              inventory_errors.push_back( DBFileDisposition( "Symlink", dbfile.name(), symfile, "inventory" ) );
+              inventory_errors.push_back( DBFileDisposition( "symlink", dbfile.name(), symfile, "inventory" ) );
 
               if ( !symfile.exists() ) {
-                inventory_errors.push_back( DBFileDisposition( "Missing", dbfile.info().symLinkTarget(), dbfile, "nosymlink" ) );
+                inventory_errors.push_back( DBFileDisposition( "missing", dbfile.info().symLinkTarget(), dbfile, "nosymlink" ) );
               }
               else {
                 if ( !v_isisdatadir.allfiles().contains( symfile.original() ) ) {
-                  inventory_errors.push_back( DBFileDisposition( "External", symfile.name(), dbfile, "symlink" ) );
+                  inventory_errors.push_back( DBFileDisposition( "external", symfile.name(), dbfile, "symlink" ) );
                 }
               }
             }
@@ -306,12 +332,12 @@ namespace Isis {
 
               // If hashing has been requested, do it here. We are computing two
               // hashes - one is individual file hash, the other is the complete
-              // volume hash.
+              // volume hash. Otherwise, check the file for errors.
+              QFile v_file( dbfile.expanded() );
               if ( needHash ) {
                 QCryptographicHash file_hash( hash_algorithm );
 
                 // File exists, lets open it and compute the hash
-                QFile v_file( dbfile.expanded() );
                 if ( !v_file.open( QIODevice::ReadOnly ) ) {
                   inventory_errors.push_back( DBFileDisposition( "error", dbfile.expanded(), dbfile, "openfailed" ) );
                   // Write a null as the hash
@@ -331,6 +357,12 @@ namespace Isis {
                   os << "," << QString::fromUtf8( file_hash.result().toHex() );
                 }
               }
+              else {
+                // Check for existance of expanded version of file
+                if ( !v_file.exists() ) {
+                  inventory_errors.push_back( DBFileDisposition( "error", dbfile.expanded(), dbfile, "badfilename" ) );
+                }
+              }
 
               // Terminate the line and on to the next one
               os << std::endl;
@@ -343,8 +375,8 @@ namespace Isis {
         // Report any issues found with inventory...
         std::cout << "\nInventory Complete..." << inventory_errors.size() << " issues found!" << std::endl;
         if ( inventory_errors.size() > 0) {
-          v_missing = v_empty = v_symlinks = v_externals = 0;
-          report_issues( std::cout, inventory_errors, v_missing, v_empty, v_symlinks, v_externals );
+          report_issues( std::cout, inventory_errors, error_counts_t );
+
 
           // If users wants the missing reported, write it out here
           if ( ui.WasEntered( "TOERRORS" ) ) {
@@ -360,8 +392,8 @@ namespace Isis {
             }
 
             // Write the results
-            v_missing = v_empty = v_symlinks = v_externals = 0;
-            report_issues( error_os, inventory_errors, v_missing, v_empty, v_symlinks, v_externals );
+            ValidationCounts counts_t;
+            report_issues( error_os, inventory_errors, counts_t );
 
             // All done...
             error_os.close();
@@ -369,14 +401,18 @@ namespace Isis {
 
         }
 
-        // Log inventory sym links found
-        results.addKeyword( PvlKeyword( "InventorySymLinks", toString( n_symlinks ) ) );
+        // Report results
+        results.addKeyword( PvlKeyword( "MissingInInventory",  toString( error_counts_t.m_missing ) ) );
+        results.addKeyword( PvlKeyword( "SymlinkInInventory",  toString( error_counts_t.m_symlinks ) ) );
+        results.addKeyword( PvlKeyword( "ExternalToInventory", toString( error_counts_t.m_externals ) ) );
+        results.addKeyword( PvlKeyword( "ErrorInInventory",    toString( error_counts_t.m_errors ) ) );
+
         if ( needHash ) {
           QByteArray v_hash_data = volume_hash.result();
           QString volume_hash_str = QString::fromUtf8( v_hash_data.toHex() );
           BigInt hbsize = HashBufferSizeBytes;
 
-          results.addKeyword( PvlKeyword( "HashBufferSize", toString(hbsize), "bytes" ) );
+          results.addKeyword( PvlKeyword( "HashBufferSize",  toString(hbsize), "bytes" ) );
           results.addKeyword( PvlKeyword( "TotalVolumeHash", volume_hash_str, hashtype ) );
         }
 
