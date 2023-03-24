@@ -90,20 +90,27 @@ namespace Isis {
     foreach(QString frameKey, frameKeys) {
       try {
         QString frameIdentifier = frameKey.split("/").last();
+        
+        if(outputPrefix == "nil"){
+          outputPrefix = "";
+        }
+        if (outputSuffix == "nil"){
+          outputSuffix = "";
+        }
         if (frameletCubeName != "nil") {
           FileName frameFileName(outputPrefBaseName +
-                                 frameletCubeName +
+                               frameletCubeName +
+                               outputSuffBaseName + ".cub");
+          stitchFrame( frameMap.values(frameKey), frameFileName );
+          stitchProgress.CheckStatus();
+        } else {
+          FileName frameFileName(outputPrefBaseName +
+                                 frameIdentifier +
+
                                  outputSuffBaseName + ".cub");
           stitchFrame( frameMap.values(frameKey), frameFileName );
           stitchProgress.CheckStatus();
         }
-          else {
-            FileName frameFileName(outputPrefBaseName +
-                               frameIdentifier +
-                               outputSuffBaseName + ".cub");
-            stitchFrame( frameMap.values(frameKey), frameFileName );
-            stitchProgress.CheckStatus();
-          }
       }
       catch (IException &e) {
         QString msg = "Failed stitch frame for observation ["
