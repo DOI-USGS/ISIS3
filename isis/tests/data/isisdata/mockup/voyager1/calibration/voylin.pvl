@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/calibration/voylin.pvl",
+    "filesize": 3081,
+    "createtime": "2022-08-12T23:56:40.000000",
+    "modifiedtime": "2022-11-24T12:14:38.380276",
+    "md5hash": "fe1a3506c2bffb9340adc47fd8e0d32a",
+    "sha256hash": "c2be18929678a86daab8506440b24e6fbd564844918d79c68537fa178cc4b231",
+    "sha1hash": "6c18abcb15a6607fafafbf65e2cc2d8a8f9adcff"
+}

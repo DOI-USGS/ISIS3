@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/smart1/kernels/lsk/NAIF0012.TLS",
+    "filesize": 5257,
+    "createtime": "2022-07-01T07:16:54.000000",
+    "modifiedtime": "2022-11-24T05:59:07.276644",
+    "md5hash": "25a2fff30b0dedb4d76c06727b1895b1",
+    "sha256hash": "678e32bdb5a744117a467cd9601cd6b373f0e9bc9bbde1371d5eee39600a039b",
+    "sha1hash": "09d4bd44f3f72e01d02bc6df06b5db1a6a877351"
+}

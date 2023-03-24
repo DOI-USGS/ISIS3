@@ -1,0 +1,467 @@
+Object = TargetPosition
+  Group = Selection
+    File = ("base", "kernels/spk/de???.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Phobos")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/mar080.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Deimos")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/mar080.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Mars")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/mar097.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Jupiter")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/jup310.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Io")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/jup310.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Europa")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/jup310.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Ganymede")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/jup310.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Callisto")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/jup310.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Amalthea")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/jup310.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Thebe")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/jup310.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Adrastea")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/jup310.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Metis")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/jup310.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Saturn")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Mimas")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Enceladus")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Tethys")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Dione")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Rhea")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Titan")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Hyperion")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Iapetus")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Phoebe")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Helene")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Telesto")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Calypso")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Methone")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Polydeuces")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat425.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Janus")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat393.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Epimetheus")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat393.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Atlas")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat393.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Prometheus")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat393.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Pandora")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat393.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Pallene")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat393.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Anthe")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat393.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Aegaeon")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/sat393.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Neptune")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep090.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Naiad")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep090.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Thalassa")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep090.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Despina")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep090.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Galatea")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep090.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Larissa")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep090.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Proteus")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep090.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Halimede")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep086.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Psamathe")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep086.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Sao")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep096.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Laomedeia")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep096.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Neso")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep086.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Triton")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep081.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Nereid")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/nep081.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Ariel")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura111.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Umbriel")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura111.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Titania")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura111.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Oberon")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura111.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Miranda")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura111.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Caliban")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura112.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Sycorax")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura112.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Prospero")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura112.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Setebos")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura112.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Stephano")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura112.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Trinculo")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura112.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Francisco")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura112.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Margaret")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura112.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Ferdinand")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura112.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Cordelia")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Ophelia")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Bianca")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Cressida")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Desdemona")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Juliet")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Portia")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Rosalind")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Belinda")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Puck")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Perdita")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Mab")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Cupid")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Uranus")
+    File = ("base", "kernels/spk/de???.bsp")
+    File = ("base", "kernels/spk/ura115.bsp")
+  EndGroup
+EndObject

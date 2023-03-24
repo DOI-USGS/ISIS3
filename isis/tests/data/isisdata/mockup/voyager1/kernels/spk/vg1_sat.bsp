@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/kernels/spk/vg1_sat.bsp",
+    "filesize": 2329600,
+    "createtime": "2022-08-12T23:56:41.000000",
+    "modifiedtime": "2022-11-24T12:14:40.409870",
+    "md5hash": "5263d1c58582f5d42908a22bbc4dbf2b",
+    "sha256hash": "0fb6dff32957f75cc8c053a357b496ff99e4477b93008bc000823662f83a757a",
+    "sha1hash": "f08f6c9941f4d07887bbafe954a4723c5e782331"
+}

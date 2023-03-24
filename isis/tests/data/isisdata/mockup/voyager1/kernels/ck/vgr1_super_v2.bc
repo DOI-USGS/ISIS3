@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/kernels/ck/vgr1_super_v2.bc",
+    "filesize": 18109440,
+    "createtime": "2015-11-17T23:09:21.000000",
+    "modifiedtime": "2022-11-24T12:14:01.662231",
+    "md5hash": "eda5bb712dbe8ec9eeda1fd7ce19a160",
+    "sha256hash": "7eca0d844535e9ae71366a0a2dbf791f49819ee554fe88d97f0c77f9f9b47e18",
+    "sha1hash": "ba13466158f2eafd77ed826ac5524cf02fb10976"
+}
