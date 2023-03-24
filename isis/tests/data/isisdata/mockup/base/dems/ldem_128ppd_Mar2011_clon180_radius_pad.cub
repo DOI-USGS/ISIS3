@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/base/dems/ldem_128ppd_Mar2011_clon180_radius_pad.cub",
+    "filesize": 2141164162,
+    "createtime": "2022-08-12T22:11:16.000000",
+    "modifiedtime": "2022-11-24T12:23:46.593616",
+    "md5hash": "cb36cb569671f4db0badc29d737ed6d5",
+    "sha256hash": "8cec6c47db55adcf12841848862863e0420c3d85697cb8d0311c3a8b32ee6058",
+    "sha1hash": "a4694fa04358dccb3da49fcdbc8ee3e6ef5109f4"
+}
