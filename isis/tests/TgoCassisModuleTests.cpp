@@ -138,7 +138,8 @@ TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
   cubeList->write(cubeListFile);
 
   QVector<QString> stitchArgs = {"fromlist=" + cubeListFile,
-                "outputprefix=" + prefix.path() + "/stitched"};
+                                 "cubename=default",
+                "outputprefix=" + prefix.path() + "/stitched."};
   UserInterface stitchOptions(STITCH_XML, stitchArgs);
 
   try {
@@ -148,7 +149,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
     FAIL() << "Unable to run tgocassisstitch with cube list: " << e.what() << std::endl;
   }
 
-  QVector<QString> unstitchArgs = {"from=" + prefix.path() + "/stitched-2016-11-26T22:50:27.381.cub",
+  QVector<QString> unstitchArgs = {"from=" + prefix.path() + "/stitched.default.cub",
                   "outputprefix=" + prefix.path() + "/unstitched"};
   UserInterface unstitchOptions(UNSTITCH_XML, unstitchArgs);
 

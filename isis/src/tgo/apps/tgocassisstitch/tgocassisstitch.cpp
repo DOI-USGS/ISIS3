@@ -90,6 +90,7 @@ namespace Isis {
     foreach(QString frameKey, frameKeys) {
       try {
         QString frameIdentifier = frameKey.split("/").last();
+        
         if(outputPrefix == "nil"){
           outputPrefix = "";
         }
@@ -105,6 +106,7 @@ namespace Isis {
         } else {
           FileName frameFileName(outputPrefBaseName +
                                  frameIdentifier +
+
                                  outputSuffBaseName + ".cub");
           stitchFrame( frameMap.values(frameKey), frameFileName );
           stitchProgress.CheckStatus();
