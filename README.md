@@ -77,6 +77,9 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
     #The order is important.  If conda-forge is before usgs-astrogeology, you will need to run:
 
     conda config --env --add channels usgs-astrogeology
+    
+    #Then set channel_priority to flexible in case there is a global channel_priority=strict setting
+    conda config --env --set channel_priority flexible
     ```
 
 1. The environment is now ready to download ISIS and its dependencies:
@@ -393,9 +396,10 @@ The ISIS Data Area is hosted on a combination of AWS S3 buckets and public http 
 
 To download all ISIS data, use the following command:
 
-    downloadIsisData  all $ISISDATA
+    downloadIsisData all $ISISDATA
 
-> Note: this applicaion takes in 3 parameters in the following order \<rclone command> \<mission> \<download destination>
+> Note: this applicaion takes in 3 parameters in the following order \<mission> \<download destination> \<rclone command>  
+> For more usage, run `downloadIsisData --help` or `downloadIsisData -h`.
 
 > Note: The above command downloads all ISIS data including the required base data area and all of the optional mission data areas.
 
@@ -414,16 +418,19 @@ There are many missions supported by ISIS. If you are only working with a few mi
 
 ### ISIS SPICE Web Service
 
-ISIS can now use a service to retrieve the SPICE data for all instruments ISIS supports via the internet. To use this service instead of your local SPICE data, click the WEB check box in the spiceinit program GUI or type spiceinit web=yes at the command line. Using the ISIS SPICE Web Service will significantly reduce the size of the downloads from our data area. If you want to use this new service, without having to download all the SPICE data, add the following argument to the mission-specific rsync command:
+ISIS can now use a service to retrieve the SPICE data for all instruments ISIS supports via the internet. To use this service instead of your local SPICE data, click the WEB check box in the spiceinit program GUI or type spiceinit web=yes at the command line. Using the ISIS SPICE Web Service will significantly reduce the size of the downloads from our data area. If you want to use this new service, without having to download all the SPICE data, add the following argument to the mission-specific downloadIsisData command:
 
-    --exclude='kernels'
+    --exclude="kernels/**"
 
 For example:
 
 <pre>
-cd $ISISDATA
-rsync -azv <b>--exclude='kernels'</b> --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/cassini .
+downloadIsisData cassini $ISISDATA --exclude="kernels/**"
 </pre>
+
+You can also use `include` argument to partially download specific kernels. For example, download only cks and fks of LRO mission:
+
+    downloadIsisData lro $ISISDATA --include="{ck/**,fk/**}"
 
 **WARNING:** Some instruments require mission data to be present for radiometric calibration, which is not supported by the SPICE Web Server, and some programs that are designed to run an image from ingestion through the mapping phase do not have an option to use the SPICE Web Service. For information specific to an instrument, see the documentation for radiometric calibration programs.
 

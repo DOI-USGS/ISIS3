@@ -36,6 +36,21 @@ release.
 ## [Unreleased]
 
 ### Changed
+- Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
+- Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
+- Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
+
+### Added
+- Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
+
+### Deprecated
+
+### Fixed
+- Fixed users not being able to modify planetographic projections in qmos
+
+## [7.2.0] - 2022-12-07
+
+### Changed
 - Updated Hayabusa2 mission name and updated translation files to make L2DShapeModelFileName, L2DPhaseFunctionFileName, L2CShapeModelFileName, and BandRegistration optional keywords.
 
 ### Added
@@ -52,6 +67,7 @@ release.
 - Fixes embree shape models not being from .BDS extension files [5064](https://github.com/USGS-Astrogeology/ISIS3/issues/5064)
 - Fixed failing shapemodel parameters when bullet was the preferred ray tracing engine but could not be created. [#5062](https://github.com/USGS-Astrogeology/ISIS3/issues/5062)
 - Fixed version for Qt to prevent depreciations. [#5070](https://github.com/USGS-Astrogeology/ISIS3/issues/5070)
+- Fixed NaN velocities in spkwriter as a result of jigsaw position solves. [#4942](https://github.com/USGS-Astrogeology/ISIS3/issues/4942)
 
 ## [7.1.0] - 2022-07-27
 
