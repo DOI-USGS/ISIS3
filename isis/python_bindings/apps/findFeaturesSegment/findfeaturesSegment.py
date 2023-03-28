@@ -133,6 +133,25 @@ def segment(img_path : Path, nlines : int = MAX_LEN):
 
 
 def findFeaturesSegment(params, images):
+    """
+    findFeaturesSegment Calls FindFeatures on segmented images  
+
+    findFeaturesSegment works by splitting the MATCH and FROM images into segments defined by NL with 0 
+    pixel overlaps. The match image segments are then matched with every FROM/FROMLIST image semgnet that overlap 
+    enough as defined by max/min overlap and area parameters. 
+
+    Parameters
+    ----------
+    params : namespace
+             namespace from argparse containing parameters 
+    images : dict
+             dictionary of images to match. Format dictated by segment. 
+
+    Returns
+    -------
+    dict
+        dictionary containing output cnet and image list
+    """
     match_segment_n = images["match"]["Segment"]
     from_segment_n = images["from"][0]["Segment"]
 
@@ -249,8 +268,8 @@ def findFeaturesSegment(params, images):
 
 def merge(d1, d2, k): 
     """
-    Merge two dictionary keys together such that they 
-    always comes back as a list
+    Merge two dictionary keys together such that values 
+    always comes back as a list when keys overlap. 
     """
     # probably a cleaner way to do this
 
