@@ -78,7 +78,7 @@ option(buildMissions   "Build the mission specific modules"             ON  )
 option(buildStaticCore "Build libisis static as well as dynamic"        OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
 option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
-option(pybindings      "Turn on to build Python bindings"               OFF )
+option(pybindings      "Turn on to build Python bindings"               ON )
 
 # if cmake install prefix is not set, and conda env is activated, use the
 # conda env as the install directory.
