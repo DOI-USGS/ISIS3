@@ -138,8 +138,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
   cubeList->write(cubeListFile);
 
   QVector<QString> stitchArgs = {"fromlist=" + cubeListFile,
-                                 "cubename=default",
-                "outputprefix=" + prefix.path() + "/stitched."};
+                "outputprefix=" + prefix.path() + "/stitched-"};
   UserInterface stitchOptions(STITCH_XML, stitchArgs);
 
   try {
@@ -149,8 +148,9 @@ TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
     FAIL() << "Unable to run tgocassisstitch with cube list: " << e.what() << std::endl;
   }
 
-  QVector<QString> unstitchArgs = {"from=" + prefix.path() + "/stitched.default.cub",
-                  "outputprefix=" + prefix.path() + "/unstitched"};
+  QVector<QString> unstitchArgs = {"from=" + prefix.path() + "/stitched-2016-11-26T22:50:27.381.cub",
+                                   "outputprefix=" + prefix.path() + "/unstitched"};
+
   UserInterface unstitchOptions(UNSTITCH_XML, unstitchArgs);
 
   try {
@@ -663,11 +663,11 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   cubeList->append(bluFileName);
   cubeList->append(nirFileName);
 
-  QString cubeListFile = prefix.path() + "/cubelist.lis";
-  cubeList->write(cubeListFile);
+  QString mosCubeListFile = prefix.path() + "/cubelist.lis";
+  cubeList->write(mosCubeListFile);
 
   QString mapFile = prefix.path() + "/equi.map";
-  QVector<QString> mosrangeArgs = {"fromlist=" + cubeListFile, "to=" + mapFile};
+  QVector<QString> mosrangeArgs = {"fromlist=" + mosCubeListFile, "to=" + mapFile};
   UserInterface mosrangeOptions(MOSRANGE_XML, mosrangeArgs);
 
   try {
@@ -2289,7 +2289,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   cubeList->write(cubeListFile);
 
   QVector<QString> stitchArgs = {"fromlist=" + cubeListFile,
-                "outputprefix=" + prefix.path() + "/stitched"};
+                "outputprefix=" + prefix.path() + "/stitched-"};
   UserInterface stitchOptions(STITCH_XML, stitchArgs);
 
   try {
