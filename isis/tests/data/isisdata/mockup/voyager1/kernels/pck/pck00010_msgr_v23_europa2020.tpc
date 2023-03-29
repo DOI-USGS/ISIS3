@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/kernels/pck/pck00010_msgr_v23_europa2020.tpc",
+    "filesize": 141312,
+    "createtime": "2022-08-12T23:56:41.000000",
+    "modifiedtime": "2022-11-24T12:14:38.994728",
+    "md5hash": "8443f44f50ced8047e2d56544b46f562",
+    "sha256hash": "3d5bc73a07931fea5a4907032f22bf4c1511a69ff6f0a69e588e8079cab85a8b",
+    "sha1hash": "ec5229a92bcc7436f6698071562db093199b3262"
+}

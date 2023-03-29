@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/base/kernels/pck/moon_pa_de418_1950-2050.bpc",
+    "filesize": 1186816,
+    "createtime": "2022-08-12T22:13:16.000000",
+    "modifiedtime": "2022-11-24T12:25:33.290957",
+    "md5hash": "3fbed36f4c207341a4295032ad6a47e8",
+    "sha256hash": "60223bce1cffdf228916d160d4d7abed44e14b994226d8316bf9de38c44914ed",
+    "sha1hash": "1fbf3f955b92cbcf50d6d7ce71c978716d105103"
+}

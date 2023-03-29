@@ -1,0 +1,99 @@
+Object = SpacecraftPosition
+  RunTime = 2016-12-30T14:03:20
+
+  Group = Dependencies
+    LeapsecondKernel = $hayabusa/kernels/lsk/naif0009.tls
+  End_Group
+
+  Group = Selection
+    Time = ("2005 SEP 16 05:42:48.850734 TDB",
+            "2005 NOV 04 07:05:06.468335 TDB")
+    Time = ("2005 NOV 08 05:02:32.168636 TDB",
+            "2005 NOV 09 02:51:57.910845 TDB")
+    Time = ("2005 NOV 11 15:51:41.248077 TDB",
+            "2005 NOV 12 06:27:24.520770 TDB")
+    Time = ("2005 NOV 19 12:28:24.338207 TDB",
+            "2005 NOV 19 23:55:07.665319 TDB")
+    File = $hayabusa/kernels/spk/hay_jaxa_050916_051119_v1n.bsp
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2005 SEP 11 05:52:42.327481 TDB",
+            "2005 NOV 03 22:19:06.187556 TDB")
+    Time = ("2005 NOV 08 10:06:10.123624 TDB",
+            "2005 NOV 08 20:06:40.509630 TDB")
+    Time = ("2005 NOV 11 12:11:00.691675 TDB",
+            "2005 NOV 11 20:59:54.014682 TDB")
+    Time = ("2005 NOV 16 03:56:39.238760 TDB",
+            "2005 NOV 16 23:20:49.947776 TDB")
+    Time = ("2005 NOV 18 06:09:34.291801 TDB",
+            "2005 NOV 18 21:57:26.398814 TDB")
+    File = $hayabusa/kernels/spk/hay_osbj_050911_051118_v1n.bsp
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2005 NOV 08 21:04:14.210806 TDB",
+            "2005 NOV 09 06:07:53.752332 TDB")
+    File = $hayabusa/kernels/spk/hayabusa_20051108_20051109_v01.bsp
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2005 NOV 09 07:13:21.695059 TDB",
+            "2005 NOV 09 12:01:08.398950 TDB")
+    File = $hayabusa/kernels/spk/hayabusa_20051109_20051109_v01.bsp
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2005 NOV 10 21:49:10.590670 TDB",
+            "2005 NOV 12 14:49:37.134195 TDB")
+    File = $hayabusa/kernels/spk/hayabusa_20051110_20051112_v01.bsp
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2005 NOV 11 21:45:05.994022 TDB",
+            "2005 NOV 12 05:43:29.548014 TDB")
+    File = $hayabusa/kernels/spk/hayabusa_20051111_20051112_v01.bsp
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2005 NOV 12 22:50:58.615165 TDB",
+            "2005 NOV 14 04:58:56.114311 TDB")
+    File = $hayabusa/kernels/spk/hayabusa_20051112_20051114_v01.bsp
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2005 NOV 14 23:22:54.584456 TDB",
+            "2005 NOV 16 05:37:16.086662 TDB")
+    File = $hayabusa/kernels/spk/hayabusa_20051114_20051116_v01.bsp
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2005 NOV 15 23:22:52.596430 TDB",
+            "2005 NOV 17 05:35:06.083202 TDB")
+    File = $hayabusa/kernels/spk/hayabusa_20051115_20051117_v01.bsp
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2005 NOV 16 21:57:30.715444 TDB",
+            "2005 NOV 18 05:39:38.052262 TDB")
+    File = $hayabusa/kernels/spk/hayabusa_20051116_20051118_v01.bsp
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2005 NOV 17 21:59:36.741975 TDB",
+            "2005 NOV 19 05:35:38.704435 TDB")
+    File = $hayabusa/kernels/spk/hayabusa_20051117_20051119_v01.bsp
+    Type = Reconstructed
+  End_Group
+End_Object
+End
