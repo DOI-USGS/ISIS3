@@ -78,8 +78,6 @@ namespace Isis {
         p_pts->add(geos::geom::Coordinate(coordArray.getAt(i)));
       }
     }
-
-    delete wkt;
   }
 
 
@@ -238,9 +236,7 @@ namespace Isis {
         p_pts = NULL;
         p_pts = new geos::geom::CoordinateArraySequence();
 
-        std::cout << "C 1 -------------" << std::endl;
         WalkPoly();
-        std::cout << "C 2 -------------" << std::endl;
 
         polygonGenerated = true;
       }
@@ -262,7 +258,6 @@ namespace Isis {
         }
       }
     }
-    std::cout << "C 3 -------------" << std::endl;
 
     /*------------------------------------------------------------------------
     /  If image contains 0/360 boundary, the polygon needs to be split up
@@ -274,7 +269,6 @@ namespace Isis {
     }
 
     // Create the polygon, fixing if needed
-    std::cout << "C 4 -------------" << std::endl;
     Fix360Poly();
     std::cout << "C 5 -------------" << std::endl;
 
@@ -818,7 +812,6 @@ namespace Isis {
       p_pts->toVector(coords);
       coords.erase(coords.begin() + p_pts->size() - 2);
       p_pts->setPoints(coords);
-      //p_pts->deleteAt(p_pts->size() - 2);
     }
 
     delete tempPts;
@@ -1205,7 +1198,6 @@ namespace Isis {
       geos::geom::Polygon *newPoly = globalFactory->createPolygon
                                      (globalFactory->createLinearRing(newLonLatPts), NULL);
       p_polygons = PolygonTools::MakeMultiPolygon(newPoly);
-      //delete newLonLatPts;
       return;
     }
 
@@ -1305,7 +1297,6 @@ namespace Isis {
         // Add the points to polys
         finalpolys->push_back(globalFactory->createPolygon
                               (globalFactory->createLinearRing(newLonLatPts), NULL));
-        delete pts3;
       }
 
       // This loop is over polygons that will always be in 0-360 space no need to convert
@@ -1316,17 +1307,6 @@ namespace Isis {
 
       p_polygons = globalFactory->createMultiPolygon(finalpolys);
 
-      std::cout << "F 1==========" << std::endl;
-      //delete finalpolys;
-      std::cout << "F 2==========" << std::endl;
-      delete newGeom;
-      std::cout << "F 3==========" << std::endl;
-      delete newLonLatPts;
-      std::cout << "F 4==========" << std::endl;
-      delete pts;
-      std::cout << "F 5==========" << std::endl;
-      delete pts2;
-      std::cout << "F 6==========" << std::endl;
     }
     catch(geos::util::IllegalArgumentException *geosIll) {
       std::string msg = "Unable to create image footprint (Fix360Poly) due to ";
