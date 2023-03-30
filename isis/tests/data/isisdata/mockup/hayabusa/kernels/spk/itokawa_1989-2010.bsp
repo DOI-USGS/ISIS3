@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/hayabusa/kernels/spk/itokawa_1989-2010.bsp",
+    "filesize": 487424,
+    "createtime": "2007-10-16T00:50:09.000000",
+    "modifiedtime": "2022-11-23T23:36:49.376283",
+    "md5hash": "f88e1c1bef333cab89e29f49d93eb437",
+    "sha256hash": "1b109c72300da10835752abbcb6d842fef07d64282f58023173388307fa8d03a",
+    "sha1hash": "48c63d7e3a802e62e43ea1537721232f1b034eff"
+}

@@ -1,0 +1,894 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="isisdataeval"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Evaluate ISISDATA structure and validity
+  </brief>
+  <description>
+    <p>
+      <em>isisdataeval</em> reads the contents of an ISISDATA area and
+      verifies its contents. This is done by traversing the DATADIR directory
+      and finding all <b>kernel.????.db</b> and <b>kernel.????.conf</b>. The
+      contents of these files contain configurations of kernel file patterns
+      that are used by <em>spiceinit</em> to attach/associate all required
+      NAIF SPICE kernels to individual image cubes after ingestion into ISIS.
+      Every <b>File</b> keyword found in a <b>Selection</b> group in databases
+      is <em>expanded</em> using the same process  applied in <em>spiceinit</em>.
+      <em>spiceinit</em> translates (environment) variables using special ISIS
+      translation values (e.g., mission names) and numerical versioning to
+      resolve file naming patterns into absolute path references. A valid
+      ISISDATA setup will result in valid formulations of absolute file name
+      paths in <b>File</b> keyword values to exising files.
+    </p>
+    <p>
+      The second aspect of this application is use this as a tool to help
+      assess problems encountered with user installations of ISISDATA. There
+      are numerous occurances of users having problems with local ISISDATA
+      installations. Many of these problems are related to the integrity of
+      the local installation. <em>isisdataeval</em> computes a file hash value
+      for each file in the DATADIR directory and all its subdirectories.
+      This means it will also inspect calibration files that are in the
+      ISISDATA installation. It will also calculate a volume hash. This
+      hash is a running hash of all the files combined into a single
+      hash value. If the <em>TotalVolumeHash</em> value does not match
+      values computed in others, particularly the USGS ISISDATA source,
+      then its likely the installation failed and/or files are
+      corrupted/missing.
+    </p>
+    <h3>Goals and Objectives</h3>
+    <p>
+      Motivation for this tool is to validate the ISISDATA installation on a local
+      processing system.
+      <a href="https://astrodiscuss.usgs.gov/t/replacing-the-usgs-isis-rsync-server/924">Recent changes</a>
+      to how the USGS provides ISISDATA to ISIS users separates the kernel
+      configuration (USGS/AWS) from the kernel download resources (typically NAIF).
+
+      This can be a useful tool to quickly determine if <em>spiceinit</em> failures
+      may be due to missing files or improper local ISIS installation. It can also be
+      used to validate a local ISISDATA install where kernel file download filters
+      have been applied to ISISDATA installation processing. For example, AWS S3
+      storage does not support symbolic links to files, so a great deal of effort
+      has been made to identify and report these types of files (they lead to
+      copies/redundancy of the linked file). When given the $ISISDATA
+      directory (the default), this tool will inspect all files and directories
+      contained in the installation for a valid ISISDATA configuration. As it pertains
+      to <em>isisdataeval</em>, a valid ISISDATA installation is confirmed when
+      all the contents of the kernel database (DB) and configuration files are
+      translated into files that exist in the system. <em>isisdataeval</em>
+      <b>does not</b>, however, confirm all necessary or required files have been
+      downloaded to the local system, but it can be verified by comparing
+      results of the application on each install of ISISDATA.
+    </p>
+    <h3>ISISDATA Kernel Architecture</h3>
+    <p>
+      There are two types of kernel DB files that are evaluated - the <b>kernel.????.db</b>
+      database lookup file and the <b>kernel.????.conf</b> configuration file.The kernel DB
+      files contain a sequence of <b>Selection</b> groups that have one or
+      more <b>File</b> PVL keyword/values entries. Each of the <b>File</b> keywords may
+      have one or two values. These values, when combined properly, must resolve to an
+      existing file within the ISISDATA directory structure to be valid. For the value
+      in the keyword form <b>File = "file_spec"</b>, <b>"file_spec"</b> may start with a "$"
+      indicating a special value that ISIS translates to an absolute path, or an
+      absolute path to a file. <b>"file_spec"</b> may also contain a contiguous series of
+      <b>"????"</b> that corresponds directly to the position of characters in the file name
+      that are numerical values indicating a version of the file referenced. ISIS will
+      search for files that satisfy the pattern and then choose the highest version of
+      that file pattern.
+    </p>
+    <p>
+      In the two value case, the general form is <b>File = ("mission", "file_spec")</b>
+      where <b>"mission"</b> refers to a keyword in the <b>DataDictionary</b> group of
+      an <em>IsisPreferences</em> file. The value of this keyword is a path that may
+      contain an environment variable, such as "$ISISDATA", and additional path
+      specifications. The second value of this keyword contains the remaining portion
+      of a valid path that may or may not contain a file pattern such as
+      <em><b>"kernels/pck/moon_pa_de421_1900-????.bpc"</b></em>. A valid
+      two value <b>File</b> keyword may look like
+      <b>File = ("osirisrex", "kernels/pck/moon_pa_de421_1900-????.bpc")</b>.
+      If the environment variable $ISISDATA is set to <b>ISISDATA=/opt/isis/data</b>,
+      the fully resolved file name will have the form
+      <b>/opt/isis/data/osirisrex/kernels/pck/moon_pa_de421_1900-2050.bpc</b>. Here is
+      an example of a Mariner10 CK <b>kernel.?????.db</b> file:
+    </p>
+    <PRE>
+# The times in this file come from the naif toolkit application "spacit", with
+#  a 1 minute padding on the start and end times.
+
+Object = SpacecraftPointing
+  RunTime = 2010-03-03T16:25:09
+
+  Group = Dependencies
+    SpacecraftClockKernel = $mariner10/kernels/sclk/mariner10.0001.tsc
+    LeapsecondKernel      = $base/kernels/lsk/naif0009.tls
+  End_Group
+
+  Group = Selection
+    Time = ("1974 MAR 28 19:17:26.574 TDB", "1975 MAR 17 09:57:46.641 TDB")
+    Match = ("Instrument","InstrumentId","M10_VIDICON_A")
+    File = $mariner10/kernels/ck/MERCURY_MARINER_10_A.bc
+    Type = Smithed
+  End_Group
+
+  Group = Selection
+    Time = ("1974 MAR 28 19:17:26.574 TDB", "1975 MAR 17 09:57:46.641 TDB")
+    Match = ("Instrument","InstrumentId","M10_VIDICON_B")
+    File = $mariner10/kernels/ck/MERCURY_MARINER_10_B.bc
+    Type = Smithed
+  End_Group
+
+  Group = Selection
+    Time = ("1973 NOV 03 21:04:54.460 TDB", "1975 MAR 17 10:13:56.517 TDB")
+    Match = ("Instrument","InstrumentId","M10_VIDICON_A")
+    File = $mariner10/kernels/ck/MARINER_10_A_gem.bc
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("1973 NOV 03 21:05:36.460 TDB", "1975 MAR 17 10:14:38.517 TDB")
+    Match = ("Instrument","InstrumentId","M10_VIDICON_B")
+    File = $mariner10/kernels/ck/MARINER_10_B_gem.bc
+    Type = Reconstructed
+  End_Group
+
+End_Object
+End
+
+    </PRE>
+    <p>
+      Kernel configuration files are of the form <b>"kernel.????.conf"</b> where
+      <b>"????"</b> corresponds to an ordered version number sequence that specifies
+      the versions of a kernel configuration file. These types of kernel
+      configuration files typically contain patterns of alternative kernel
+      DB file names thus providing support for more complex NAIF SPICE kernel
+      configurations. They often contain more than one kernel DB <b>File</b>
+      pattern specification in <b>Selection</b> groups.
+      When utilized in the camera kernels (CK) mission directory, it can be used to specify
+      two or more independent kernel DB files that are required to compute
+      spacecraft/instrument attitude/pointing epoch states. below is an
+      example of a multi-kernel CK specification for the MESSENGER MDIS instruments.
+      The <b>File</b> keywords are the two-valued form where "messenger" must map
+      to an entry in the <b>DataDictionary</b> group of a loaded
+      <em>IsisPreferences</em> file.
+    </p>
+    <PRE>
+Object = Instrument
+
+  Group = Selection
+    Match = ("Instrument","InstrumentId","MDIS-WAC")
+    File = ("messenger", "kernels/ck/mdis_kernels.????.db")
+    File = ("messenger", "kernels/ck/messenger_mdis_att_kernels.????.db")
+    File = ("messenger", "kernels/ck/messenger_kernels.????.db")
+  End_Group
+
+  Group = Selection
+    Match = ("Instrument","InstrumentId","MDIS-NAC")
+    File = ("messenger", "kernels/ck/mdis_kernels.????.db")
+    File = ("messenger", "kernels/ck/messenger_mdis_att_kernels.????.db")
+    File = ("messenger", "kernels/ck/messenger_kernels.????.db")
+  End_Group
+
+End_Object
+End
+    </PRE>
+    <p>
+      Note the <b>Dependencies</b> group, or any other group/keyword section, are
+      ignored and not evaluated/validated by this application.
+    </p>
+    <h3>Validation</h3>
+    <p>
+      The procedure to validate the ISISDATA area will start with the DATADIR
+      directory provided by the user. The default refers to the top level ISIS
+      ancillary data istallation directory specifed by the environment
+      variable $ISISDATA. However, this can be any existing directory in the
+      $ISISDATA hierarchy, such as DATADIR=$ISISDATA/osirisrex.
+      <em>isisdataeval</em> will evaluate every file in that directory
+      and all subdirectories for validity.
+    </p>
+    <p>
+      The total number files are counted and sizes of every file is accumulated
+      as the top directory is traversed. The algorithm to validate ISISDATA
+      searches for two basic file patterns in each directory. First, all kernel
+      configurations are searched for using the file pattern form
+      <b>kernel.????.conf</b>. For all configurations found, the highest
+      verson of the config file is selected and its contents read. The highest
+      version of each file pattern found in all <b>File</b> keywords in
+      <b>Selection</b> groups are determined. These files are treated as
+      kernel DB files and evaluated as described below. Note these file names
+      are strongly recommended <b>not</b> to be of the generic form
+      <b>kernel.????.db</b> to minimize confusion and erroneous behavior.
+    </p>
+    <p>
+      After the configuration files are processed, a second search is made
+      for kernel DB files using the form <b>kernels.????.db</b>. The
+      highest version of these files are selected and its contents are read.
+      For every <b>File</b> specification in a <b>Selection</b> group,
+      the highest version is determined and then checked for existance.
+      If no files are found, which typically occurs when looking for the
+      highest version, it is reported as missing. The missing file, the
+      file that contains the reference to it, and the status of the file
+      are written to the file name specifed in the TOISSUES parameter.
+    </p>
+    <p>
+      There are occurances of kernel DB files that contain no specification
+      or content at all. These are oddball files in the system and are also
+      reported as invalid. All files contained in the TOISSUES output file
+      would lead to errors in <em>spiceinit</em> for images obtained from that
+      particular mission.
+    </p>
+  </description>
+
+  <history>
+    <change name="Kris J. Becker" date="2023-01-09">
+      Original version
+    </change>
+  </history>
+
+  <seeAlso>
+    <applications>
+      <item>kerneldbgen</item>
+      <item>spiceinit</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <categoryItem>System</categoryItem>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="PREFERENCES">
+        <type>string</type>
+        <brief>
+          IsisPreferences file contents overrides defaults
+        </brief>
+        <description>
+           Defines data directory substitutions that is assumed to be
+           part of the ISISDATA directory hierachy. Specifying an ISIS
+           Preferences file using "-pref=PREFERENCES" is equivalent to
+           using this parameter except that using this parameter will
+           log the Preferences file used. If both are options are given,
+           the contents of this PREFERENCES file overrides them all
+           loaded before it. <em>isisdataeval</em> uses the contents
+           of the DataDictionary group for ISIS mission and environment
+           variable file path translations. This DataDictionary
+           group is reported to the user and logged to the
+           print.prt file.
+        </description>
+        <internalDefault>
+           None
+        </internalDefault>
+      </parameter>
+
+      <parameter name="DATADIR">
+        <type>string</type>
+        <brief>
+          Top data directory to evaluate
+        </brief>
+        <description>
+           Top data directory that is assumed to be part of the
+           ISISDATA directory hierachy. The default value of this
+           parameter will evaluate all of ISISDATA that is installed
+           in the specified directory.
+        </description>
+        <default><item>
+           $ISISDATA
+        </item></default>
+      </parameter>
+
+
+      <parameter name="ISISDATA">
+        <type>string</type>
+        <brief>
+          Specify root data directory to use for ISISDATA
+        </brief>
+        <description>
+         This may be required to efficiently switch to different installations
+         of ISISDATA. It is needed because the translations within the kernel DB
+         and config files will eventually translate $ISISDATA to an absolute directory
+         name. It can be altered easily by manually adding the translation of ISISDATA
+         into the <b>DataDictionary</b> after reading all the
+         <em>IsisPreferences</em> files (several versions may be read for each
+         ISIS application ran). This essentially replaces the current value of
+         $ISISDATA without the need to expressly set an environment variable.
+         This is accomplished by adding the value given to the <b>DataDictionary</b>
+         which will be used to fully expand ISIS file names.
+        </description>
+        <internalDefault>
+           $ISISDATA
+        </internalDefault>
+      </parameter>
+
+      <parameter name="TOISSUES">
+        <type>filename</type>
+        <brief>
+           Filename to write names of problematic kernels files in DATADIR
+        </brief>
+        <description>
+          <p>
+            Provide the name of a file to write problematic (e.g., missing,
+            symlinks, etc...) kernels encountered during
+            validation. There will be six columns separated by a comma. The columes
+            are "status, filespec, sourcespec, source, target, category". where the
+            <em>status</em> indicates the issue/problem with the file,
+            <em>filespec</em> is the original form of the name,
+            <em>sourcespec</em> is the name of the versioned patterned source db/conf,
+            <em>target</em> is the fully expanded filespec, and
+            <em>category</em> is the type or category of the source reference.
+            An brief example of the contents:
+          </p>
+<PRE>
+status, filespec, sourcespec, source, target, category
+missing,$apollo17/kernels/ik/apollo17_panoramic.????.ti,/opt/isisdatafull/apollo17/kernels/ik/kernels.????.db,/opt/isisdatafull/apollo17/kernels/ik/kernels.0002.db,/opt/isisdatafull/apollo17/kernels/ik/kernels.0002.db,null
+missing,$base/kernels/spk/nep096.bsp,/opt/isisdatafull/base/kernels/spk/kernels.????.db,/opt/isisdatafull/base/kernels/spk/kernels.0006.db,/opt/isisdatafull/base/kernels/spk/kernels.0006.db,null
+missing,$base/kernels/spk/nep096.bsp,/opt/isisdatafull/base/kernels/spk/kernels.????.db,/opt/isisdatafull/base/kernels/spk/kernels.0006.db,/opt/isisdatafull/base/kernels/spk/kernels.0006.db,null
+empty,/opt/isisdatafull/cassini/kernels/ik/kernels.????.db,/opt/isisdatafull/cassini/kernels/ik/kernels.0001.db,/opt/isisdatafull/cassini/kernels/ik/kernels.0001.db,/opt/isisdatafull/cassini/kernels/ik/kernels.0001.db,Instrument
+</PRE>
+        </description>
+        <internalDefault>
+           None
+        </internalDefault>
+      </parameter>
+
+      <parameter name="TOINVENTORY">
+        <type>filename</type>
+        <brief>
+           Filename to write all files in DATADIR inventory volume
+        </brief>
+        <description>
+        <p>
+          Provide the name of a file to results of the inventory volumn in DATADIR.
+          validation. There will be six columns separated by a comma. The columns
+          are "status, filespec, sourcespec, source, target, category". where the
+          <em>status</em> indicates the issue/problem with the file,
+          <em>filespec</em> is the original form of the name,
+          <em>sourcespec</em> is the name of the versioned patterned source db/conf,
+          <em>target</em> is the fully expanded filespec, and
+          <em>category</em> is the type or category of the source reference.
+          An brief example of the contents:
+          </p>
+<PRE>
+filespec,filepath,exists,file,symlink,target,created,createdet,modified,modifiedet,size,md5hash
+/opt/isisdatafull/apollo15/calibration/ApolloPanFiducialMark.cub,/opt/isisdatafull/apollo15/calibration/ApolloPanFiducialMark.cub,true,/opt/isisdatafull/apollo15/calibration/ApolloPanFiducialMark.cub,false,/opt/isisdatafull/apollo15/calibration/ApolloPanFiducialMark.cub,2022-12-02T14:10:29,723262298.1831114,2022-08-12T22:10:19,713614288.1829929,330891,9336f9b68d0686004b0f4bdc0633ccf6
+/opt/isisdatafull/apollo15/calibration/METRIC_flatfield.cub,/opt/isisdatafull/apollo15/calibration/METRIC_flatfield.cub,true,/opt/isisdatafull/apollo15/calibration/METRIC_flatfield.cub,false,/opt/isisdatafull/apollo15/calibration/METRIC_flatfield.cub,2022-12-02T14:11:58,723262387.1831114,2022-08-12T22:10:19,713614288.1829929,2099909504,c28e9708cd4b99db50e43b91faa28cc1
+/opt/isisdatafull/apollo15/kernels/ck/AS15_M_REV04_SMITHED_V01.bc,/opt/isisdatafull/apollo15/kernels/ck/AS15_M_REV04_SMITHED_V01.bc,true,/opt/isisdatafull/apollo15/kernels/ck/AS15_M_REV04_SMITHED_V01.bc,false,/opt/isisdatafull/apollo15/kernels/ck/AS15_M_REV04_SMITHED_V01.bc,2022-12-02T14:10:31,723262300.1831114,2022-08-12T22:10:19,713614288.1829929,49152,44743a36fba4b394752fbf5749c626ec
+</PRE>
+        </description>
+        <internalDefault>
+           None
+        </internalDefault>
+      </parameter>
+
+      <parameter name="TOERRORS">
+        <type>filename</type>
+        <brief>
+           Filename to write errors found in the DATADIR inventory volume
+        </brief>
+        <description>
+          Provide the name of a file to write errors (e.g., missing,
+          symlinks, etc...) files during the inventory. Errors in the
+          inventory are defined as any symlink (file), symlinks that
+          reference non-existant files or files external to the
+          DATADIR directory. And any file that cannot be opened/read
+          are also reported. The format of this file will be as follows:
+<PRE>
+status, filespec, sourcespec, source, target, category
+error,/opt/isisdatafull/mex/kernels/dsk/MEX_SC_SA,/opt/isisdatafull/mex/kernels/dsk/MEX_SC_SA+Y_V00.OBJ,/opt/isisdatafull/mex/kernels/dsk/MEX_SC_SA,/opt/isisdatafull/mex/kernels/dsk/MEX_SC_SA+Y_V00.OBJ,openfailed
+error,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA+Y_V00.BDS,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA+Y_V00.BDS,openfailed
+</PRE>
+        </description>
+        <internalDefault>
+           None
+        </internalDefault>
+      </parameter>
+    </group>
+
+    <group name= "Options">
+      <parameter name="VERIFY">
+        <type>boolean</type>
+        <brief>Run verification of inventory</brief>
+        <description>
+          <p>
+            This parameter is provided to explicity turn on the process
+            of verification of the ISISDATA FILE inventory. This is not
+            needed if HASH!=None and/or a file is provided in the
+            TOINVENTORY parameter.
+          </p>
+          <p>
+            Basic vertification of ISISDATA inventory will run through
+            all the files in ISISDATA and ensure that the expanded version
+            of the filename exists. There is at least one case this option
+            will reveal is if a `+` character exists in a file name. It is
+            flagged as an error here.
+          </p>
+        </description>
+        <default><item>false</item></default>
+      </parameter>
+      <parameter name= "HASH">
+        <type>string</type>
+        <default><item>NOHASH</item></default>
+        <brief>Type of hash algorithm to use for computing file hashes</brief>
+        <description>
+          <p>
+            Compute file hash values for all files found in the ISISDATA
+            directory. Note if this parameter is given, it will invoke a
+            complete inventory of the DATADIR directory and compute the
+            HASH for the file using the specified algorithm. Not only
+            does it compute the hash for the file, it also computes a
+            a complete volume hash of all files in the inventory.
+            This option can be most useful for verifying ISISDATA
+            installations are valid.
+          </p>
+          <p>
+            BE FOREWARNED!! Appling this option will significantly slow down the
+            the execution of this application. It essentially reads all the
+            files in the DATADIR path and all subdirectories
+            (i.e., the <em>volume</em>) and reports a single hash value for the
+            complete DATADIR contents. If DATADIR = ISISDATA, the hash value
+            for the complete ISISDATA volume is computed as a single value
+            and reports it to the console and in the ISIS log file.
+          </p>
+          <p>
+            The short description of hash algorithms below are provided from this
+            <a href="https://www.freecodecamp.org/news/md5-vs-sha-1-vs-sha-2-which-is-the-most-secure-encryption-hash-and-how-to-check-them/">
+            link</a>. As such, each file that has a hash value can easily compared
+            for the same contents using programs provided by most computer operating
+            systems. Linux provides the <em>md5sum</em> application. On the Mac platform,
+            it is just <em>md5</em>.
+          </p>
+          <p>
+            The TOINVENTORY file will contain a <em>md5hash</em> column similar
+            to this example:
+<PRE>
+filespec,size,md5hash
+/opt/isisdatafiltered/apollo15/calibration/ApolloPanFiducialMark.cub,330891,9336f9b68d0686004b0f4bdc0633ccf6
+</PRE>
+             To compare this file directly, you can use the command:
+<PRE>
+md5  /opt/isisdatafiltered/apollo15/calibration/ApolloPanFiducialMark.cub
+</PRE>
+          </p>
+        </description>
+        <list>
+            <option value="NOHASH">
+               <brief>
+                  Hashes will not be computed
+               </brief>
+               <description>
+                  This indicates that no hash values will be computed for the
+                  the ISISDATA inventory (default).
+               </description>
+           </option>
+           <option value="MD5">
+               <brief>
+                  Compute a crypto hash using the MD5 algorithm
+               </brief>
+               <description>
+                   The MD5 hash function produces a 128-bit hash value.
+                   It was designed for use in cryptography, but vulnerabilities
+                   were discovered over the course of time, so it is no longer
+                   recommended for that purpose. However, it is still used
+                   for database partitioning and computing checksums to
+                   validate files transfers.
+               </description>
+           </option>
+           <option value="SHA1">
+               <brief>
+                 Compute a crypto hash using the SHA-1 algorithm
+               </brief>
+               <description>
+                  <p>
+                    SHA stands for Secure Hash Algorithm. The first version of
+                    the algorithm was SHA-1, and was later followed by SHA-2
+                    (see below).
+                  </p>
+                  <p>
+                    Whereas MD5 produces a 128-bit hash, SHA1 generates
+                    160-bit hash (20 bytes). In hexadecimal format, it is an
+                    integer 40 digits long. Like MD5, it was designed for
+                    cryptology applications, but was soon found to have
+                    vulnerabilities also. As of today, it is no longer
+                    considered to be any less resistant to attack than MD5.
+                  </p>
+               </description>
+           </option>
+
+           <option value="SHA256">
+               <brief>
+                   Compute a crypto hash using the SHA-256 algorithm
+               </brief>
+               <description>
+                  <p>
+                    The second version of SHA, called SHA-2, has many variants.
+                    Probably the one most commonly used is SHA-256, which the
+                    National Institute of Standards and Technology (NIST)
+                    recommends using instead of MD5 or SHA-1.
+                  </p>
+                  <p>
+                    The SHA-256 algorithm returns hash value of 256-bits, or
+                    64 hexadecimal digits. While not quite perfect, current
+                    research indicates it is considerably more secure than
+                    either MD5 or SHA-1.
+                  </p>
+                  <p>
+                    Performance-wise, a SHA-256 hash is about 20-30% slower
+                    to calculate than either MD5 or SHA-1 hashes.
+                  </p>
+               </description>
+           </option>
+        </list>
+      </parameter>
+      <parameter name="HASHBUFFER">
+        <type>integer</type>
+        <default><item>256</item></default>
+        <brief>Size of the buffer (MB) to read files for hash processing</brief>
+        <description>
+          This allows users to have more control of the size of
+          buffer to read inventory file data to compute hashes.
+          Specify this value in megabytes ( 1024 * 1024 * HASHBUFFER).
+          The buffer is not allocated if HASH=NOHASH.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+        General usage that evaluates the complete ISISDATA installation
+      </brief>
+      <description>
+        <p>
+          This example shows the complete installation of the full ISISDATA
+          download and install using the USGS
+          <a href="https://github.com/USGS-Astrogeology/ISIS3/blob/dev/isis/scripts/downloadIsisData">downloadIsisData</a>
+          utility and the
+          <a href="https://github.com/USGS-Astrogeology/ISIS3/blob/dev/isis/config/rclone.conf">rclone.conf</a> file.
+<PRE>
+mkdir -p /opt/isisdatafull
+./downloadIsisData all /opt/isisdatafull --config=rclone.conf  -vv --log-file=isisdata_full.log
+
+isisdataeval isisdata=/opt/isisdatafull \
+             datadir=/opt/isisdatafull \
+             toissues=isisdata_full_download_issues.csv \
+             toinventory=isisdata_full_download_inventory.csv \
+             toerrors=isisdata_full_download_inventory_errors.csv \
+             hash=md5 \
+             preference=IsisPreferences | tee -a isisdata_full_evaluation.log
+</PRE>
+        </p>
+        <p>
+          This run produces the following results that was current state of the
+          ISISDATA volume on or about December 2, 2022. Note a more comprehensive
+          set of results are available
+          <a href="https://gist.github.com/KrisBecker/327976baa7ce10f80cbc7ba3b8b8e9e7">here</a>:
+<PRE>
+DATAROOT = /opt/isisdatafull
+DATAROOT = /opt/isisdatafull
+
+ISISDATA = $ISISDATA
+ISISDATA = /opt/isisdatafull
+ISISDATA reset by user!
+
+########################################################
+# Customize the location of mission specific data
+# files (calibration and spice kernels).  Usually this
+# should be left to the Isis administrator
+########################################################
+Group = DataDirectory
+  # Backwards compatability for versions prior to 4.1.0
+  ISIS3DATA    = $ISISDATA
+  Apollo15     = $ISISDATA/apollo15
+  Apollo16     = $ISISDATA/apollo16
+  Apollo17     = $ISISDATA/apollo17
+  Base         = $ISISDATA/base
+  Cassini      = $ISISDATA/cassini
+  Chan1        = $ISISDATA/chan1
+  Chandrayaan1 = $ISISDATA/chandrayaan1
+  Clementine1  = $ISISDATA/clementine1
+  Clipper      = $ISISDATA/../datalocal/clipper
+  Control      = $ISISDATA/control
+  Dawn         = $ISISDATA/dawn
+  Galileo      = $ISISDATA/galileo
+  Hayabusa     = $ISISDATA/hayabusa
+  Hayabusa2    = $ISISDATA/hayabusa2
+  Juno         = $ISISDATA/juno
+  Kaguya       = $ISISDATA/kaguya
+  Lo           = $ISISDATA/lo
+  Lro          = $ISISDATA/lro
+  Mariner10    = $ISISDATA/mariner10
+  Mer          = $ISISDATA/mer
+  Mex          = $ISISDATA/mex
+  Messenger    = $ISISDATA/messenger
+  Mgs          = $ISISDATA/mgs
+  Mro          = $ISISDATA/mro
+  Near         = $ISISDATA/near
+  NewHorizons  = $ISISDATA/newhorizons
+  Odyssey      = $ISISDATA/odyssey
+  OsirisRex    = $ISISDATA/osirisrex
+  Rolo         = $ISISDATA/rolo
+  Rosetta      = $ISISDATA/rosetta
+  Smart1       = $ISISDATA/smart1
+  Tgo          = $ISISDATA/tgo
+  Viking1      = $ISISDATA/viking1
+  Viking2      = $ISISDATA/viking2
+  Voyager1     = $ISISDATA/voyager1
+  Voyager2     = $ISISDATA/voyager2
+  Temporary    = .
+  ISISDATA     = /opt/isisdatafull
+End_Group
+
+Validation Complete...45 issues found!
+status, filespec, sourcespec, source, target, category
+missing,$apollo17/kernels/ik/apollo17_panoramic.????.ti,/opt/isisdatafull/apollo17/kernels/ik/kernels.????.db,/opt/isisdatafull/apollo17/kernels/ik/kernels.0002.db,/opt/isisdatafull/apollo17/kernels/ik/kernels.0002.db,null
+missing,$base/kernels/spk/nep096.bsp,/opt/isisdatafull/base/kernels/spk/kernels.????.db,/opt/isisdatafull/base/kernels/spk/kernels.0006.db,/opt/isisdatafull/base/kernels/spk/kernels.0006.db,null
+missing,$base/kernels/spk/nep096.bsp,/opt/isisdatafull/base/kernels/spk/kernels.????.db,/opt/isisdatafull/base/kernels/spk/kernels.0006.db,/opt/isisdatafull/base/kernels/spk/kernels.0006.db,null
+empty,/opt/isisdatafull/cassini/kernels/ik/kernels.????.db,/opt/isisdatafull/cassini/kernels/ik/kernels.0001.db,/opt/isisdatafull/cassini/kernels/ik/kernels.0001.db,/opt/isisdatafull/cassini/kernels/ik/kernels.0001.db,Instrument
+missing,$Clementine1/kernels/ck/MOON0056-060111.3s.bc,/opt/isisdatafull/clementine1/kernels/ck/save/kernels.????.db,/opt/isisdatafull/clementine1/kernels/ck/save/kernels.0003.db,/opt/isisdatafull/clementine1/kernels/ck/save/kernels.0003.db,Smithed
+missing,$Clementine1/kernels/iak/lwirAddendum???.ti,/opt/isisdatafull/clementine1/kernels/iak/kernels.????.db,/opt/isisdatafull/clementine1/kernels/iak/kernels.0002.db,/opt/isisdatafull/clementine1/kernels/iak/kernels.0002.db,null
+empty,/opt/isisdatafull/clementine1/kernels/pck/kernels.????.db,/opt/isisdatafull/clementine1/kernels/pck/kernels.0001.db,/opt/isisdatafull/clementine1/kernels/pck/kernels.0001.db,/opt/isisdatafull/clementine1/kernels/pck/kernels.0001.db,TargetAttitudeShape
+empty,/opt/isisdatafull/galileo/kernels/fk/kernels.????.db,/opt/isisdatafull/galileo/kernels/fk/kernels.0001.db,/opt/isisdatafull/galileo/kernels/fk/kernels.0001.db,/opt/isisdatafull/galileo/kernels/fk/kernels.0001.db,Frame
+empty,/opt/isisdatafull/galileo/kernels/ik/kernels.????.db,/opt/isisdatafull/galileo/kernels/ik/kernels.0001.db,/opt/isisdatafull/galileo/kernels/ik/kernels.0001.db,/opt/isisdatafull/galileo/kernels/ik/kernels.0001.db,Instrument
+missing,$galileo/kernels/spk/s000407a.bsp,/opt/isisdatafull/galileo/kernels/spk/kernels.????.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,Reconstructed
+missing,$galileo/kernels/spk/s000615a.bsp,/opt/isisdatafull/galileo/kernels/spk/kernels.????.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,Reconstructed
+missing,$galileo/kernels/spk/s020128a.bsp,/opt/isisdatafull/galileo/kernels/spk/kernels.????.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,Reconstructed
+missing,$galileo/kernels/spk/s021119a.bsp,/opt/isisdatafull/galileo/kernels/spk/kernels.????.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,Reconstructed
+missing,$galileo/kernels/spk/s030129a.bsp,/opt/isisdatafull/galileo/kernels/spk/kernels.????.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,Reconstructed
+missing,$galileo/kernels/spk/s980326b.bsp,/opt/isisdatafull/galileo/kernels/spk/kernels.????.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,Reconstructed
+missing,$galileo/kernels/spk/s990114a.bsp,/opt/isisdatafull/galileo/kernels/spk/kernels.????.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,/opt/isisdatafull/galileo/kernels/spk/kernels.0003.db,Reconstructed
+external,/opt/isisdatafull/kaguya/kernels/spk//SELMAINGRGM900CL660DIRALT2008103020090610.bsp,/opt/isisdatafull/kaguya/kernels/spk/kernels.????.db,/opt/isisdatafull/kaguya/kernels/spk/kernels.0005.db,/opt/isisdatafull/kaguya/kernels/spk/kernels.0005.db,Smithed
+empty,/opt/isisdatafull/lo/kernels/fk/kernels.????.db,/opt/isisdatafull/lo/kernels/fk/kernels.0001.db,/opt/isisdatafull/lo/kernels/fk/kernels.0001.db,/opt/isisdatafull/lo/kernels/fk/kernels.0001.db,Frame
+empty,/opt/isisdatafull/mariner10/kernels/ik/kernels.????.db,/opt/isisdatafull/mariner10/kernels/ik/kernels.0001.db,/opt/isisdatafull/mariner10/kernels/ik/kernels.0001.db,/opt/isisdatafull/mariner10/kernels/ik/kernels.0001.db,Instrument
+empty,/opt/isisdatafull/mgs/kernels/fk/kernels.????.db,/opt/isisdatafull/mgs/kernels/fk/kernels.0001.db,/opt/isisdatafull/mgs/kernels/fk/kernels.0001.db,/opt/isisdatafull/mgs/kernels/fk/kernels.0001.db,Frame
+empty,/opt/isisdatafull/odyssey/kernels/ik/kernels.????.db,/opt/isisdatafull/odyssey/kernels/ik/kernels.0001.db,/opt/isisdatafull/odyssey/kernels/ik/kernels.0001.db,/opt/isisdatafull/odyssey/kernels/ik/kernels.0001.db,Instrument
+missing,$osirisrex/kernels/pck/moon_pa_de421_1900-????.bpc,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.????.db,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.0001.db,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.0001.db,null
+missing,$osirisrex/kernels/fk/moon_??????.tf,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.????.db,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.0001.db,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.0001.db,null
+missing,$osirisrex/kernels/fk/moon_assoc_me.tf,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.????.db,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.0001.db,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.0001.db,null
+missing,$osirisrex/kernels/pck/earth_latest_high_prec.bpc,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.????.db,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.0001.db,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.0001.db,null
+missing,$osirisrex/kernels/fk/earth_assoc_itrf??.tf,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.????.db,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.0001.db,/opt/isisdatafull/osirisrex/kernels/dsk/kernels.0001.db,null
+missing,$osirisrex/kernels/pck/moon_pa_de421_1900-????.bpc,/opt/isisdatafull/osirisrex/kernels/pck/kernels.????.db,/opt/isisdatafull/osirisrex/kernels/pck/kernels.0001.db,/opt/isisdatafull/osirisrex/kernels/pck/kernels.0001.db,null
+missing,$osirisrex/kernels/fk/moon_??????.tf,/opt/isisdatafull/osirisrex/kernels/pck/kernels.????.db,/opt/isisdatafull/osirisrex/kernels/pck/kernels.0001.db,/opt/isisdatafull/osirisrex/kernels/pck/kernels.0001.db,null
+missing,$osirisrex/kernels/fk/moon_assoc_me.tf,/opt/isisdatafull/osirisrex/kernels/pck/kernels.????.db,/opt/isisdatafull/osirisrex/kernels/pck/kernels.0001.db,/opt/isisdatafull/osirisrex/kernels/pck/kernels.0001.db,null
+missing,$osirisrex/kernels/pck/earth_latest_high_prec.bpc,/opt/isisdatafull/osirisrex/kernels/pck/kernels.????.db,/opt/isisdatafull/osirisrex/kernels/pck/kernels.0001.db,/opt/isisdatafull/osirisrex/kernels/pck/kernels.0001.db,null
+missing,$osirisrex/kernels/fk/earth_assoc_itrf??.tf,/opt/isisdatafull/osirisrex/kernels/pck/kernels.????.db,/opt/isisdatafull/osirisrex/kernels/pck/kernels.0001.db,/opt/isisdatafull/osirisrex/kernels/pck/kernels.0001.db,null
+missing,$smart1/kernels/fk/SMART1_V????.TF,/opt/isisdatafull/smart1/kernels/fk/kernels.????.db,/opt/isisdatafull/smart1/kernels/fk/kernels.0001.db,/opt/isisdatafull/smart1/kernels/fk/kernels.0001.db,null
+empty,/opt/isisdatafull/smart1/kernels/iak/kernels.????.db,/opt/isisdatafull/smart1/kernels/iak/kernels.0001.db,/opt/isisdatafull/smart1/kernels/iak/kernels.0001.db,/opt/isisdatafull/smart1/kernels/iak/kernels.0001.db,Empty
+empty,/opt/isisdatafull/viking1/kernels/ik/kernels.????.db,/opt/isisdatafull/viking1/kernels/ik/kernels.0001.db,/opt/isisdatafull/viking1/kernels/ik/kernels.0001.db,/opt/isisdatafull/viking1/kernels/ik/kernels.0001.db,Instrument
+empty,/opt/isisdatafull/viking2/kernels/ik/kernels.????.db,/opt/isisdatafull/viking2/kernels/ik/kernels.0001.db,/opt/isisdatafull/viking2/kernels/ik/kernels.0001.db,/opt/isisdatafull/viking2/kernels/ik/kernels.0001.db,Instrument
+external,/opt/isisdatafull/voyager1/kernels/spk//vg1_sat.bsp,/opt/isisdatafull/voyager1/kernels/spk/kernels.????.db,/opt/isisdatafull/voyager1/kernels/spk/kernels.0002.db,/opt/isisdatafull/voyager1/kernels/spk/kernels.0002.db,Reconstructed
+external,/opt/isisdatafull/voyager1/kernels/spk//vgr1_jup230.bsp,/opt/isisdatafull/voyager1/kernels/spk/kernels.????.db,/opt/isisdatafull/voyager1/kernels/spk/kernels.0002.db,/opt/isisdatafull/voyager1/kernels/spk/kernels.0002.db,Reconstructed
+external,/opt/isisdatafull/voyager1/kernels/spk//vgr1_sat336.bsp,/opt/isisdatafull/voyager1/kernels/spk/kernels.????.db,/opt/isisdatafull/voyager1/kernels/spk/kernels.0002.db,/opt/isisdatafull/voyager1/kernels/spk/kernels.0002.db,Reconstructed
+external,/opt/isisdatafull/voyager2/kernels/spk//vg2_nep.bsp,/opt/isisdatafull/voyager2/kernels/spk/kernels.????.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,Reconstructed
+external,/opt/isisdatafull/voyager2/kernels/spk//vg2_sat.bsp,/opt/isisdatafull/voyager2/kernels/spk/kernels.????.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,Reconstructed
+external,/opt/isisdatafull/voyager2/kernels/spk//vg2_ura.bsp,/opt/isisdatafull/voyager2/kernels/spk/kernels.????.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,Reconstructed
+external,/opt/isisdatafull/voyager2/kernels/spk//vgr2_jup230.bsp,/opt/isisdatafull/voyager2/kernels/spk/kernels.????.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,Reconstructed
+external,/opt/isisdatafull/voyager2/kernels/spk//vgr2_nep081.bsp,/opt/isisdatafull/voyager2/kernels/spk/kernels.????.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,Reconstructed
+external,/opt/isisdatafull/voyager2/kernels/spk//vgr2_sat336.bsp,/opt/isisdatafull/voyager2/kernels/spk/kernels.????.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,Reconstructed
+external,/opt/isisdatafull/voyager2/kernels/spk//vgr2_ura083.bsp,/opt/isisdatafull/voyager2/kernels/spk/kernels.????.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,/opt/isisdatafull/voyager2/kernels/spk/kernels.0002.db,Reconstructed
+
+Running inventory ...
+isisdataeval: inventory+md5hash
+100% Processed
+
+Inventory Complete...10 issues found!
+status, filespec, sourcespec, source, target, category
+error,/opt/isisdatafull/mex/kernels/dsk/MEX_SC_SA,/opt/isisdatafull/mex/kernels/dsk/MEX_SC_SA+Y_V00.OBJ,/opt/isisdatafull/mex/kernels/dsk/MEX_SC_SA,/opt/isisdatafull/mex/kernels/dsk/MEX_SC_SA+Y_V00.OBJ,openfailed
+error,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA+Y_V00.BDS,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA+Y_V00.BDS,openfailed
+error,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA+Y_V00.OBJ,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA,/opt/isisdatafull/rosetta/kernels/dsk/ROS_SC_SA+Y_V00.OBJ,openfailed
+error,/opt/isisdatafull/tgo/kernels/dsk/em16_tgo_sc_sa,/opt/isisdatafull/tgo/kernels/dsk/em16_tgo_sc_sa+z_v00.bds,/opt/isisdatafull/tgo/kernels/dsk/em16_tgo_sc_sa,/opt/isisdatafull/tgo/kernels/dsk/em16_tgo_sc_sa+z_v00.bds,openfailed
+error,/opt/isisdatafull/tgo/kernels/dsk/em16_tgo_sc_sa,/opt/isisdatafull/tgo/kernels/dsk/em16_tgo_sc_sa+z_v00.obj,/opt/isisdatafull/tgo/kernels/dsk/em16_tgo_sc_sa,/opt/isisdatafull/tgo/kernels/dsk/em16_tgo_sc_sa+z_v00.obj,openfailed
+error,/opt/isisdatafull/tgo/kernels/dsk/em16_tgo_sc_sa,/opt/isisdatafull/tgo/kernels/dsk/em16_tgo_sc_sa+z_v00.png,/opt/isisdatafull/tgo/kernels/dsk/em16_tgo_sc_sa,/opt/isisdatafull/tgo/kernels/dsk/em16_tgo_sc_sa+z_v00.png,openfailed
+error,/opt/isisdatafull/voyager1/kernels/spk/voyager_1.ST,/opt/isisdatafull/voyager1/kernels/spk/voyager_1.ST+1991_a54418u.merged.bsp,/opt/isisdatafull/voyager1/kernels/spk/voyager_1.ST,/opt/isisdatafull/voyager1/kernels/spk/voyager_1.ST+1991_a54418u.merged.bsp,openfailed
+error,/opt/isisdatafull/voyager1/kernels/spk/voyager_2.ST,/opt/isisdatafull/voyager1/kernels/spk/voyager_2.ST+1992_m05208u.merged.bsp,/opt/isisdatafull/voyager1/kernels/spk/voyager_2.ST,/opt/isisdatafull/voyager1/kernels/spk/voyager_2.ST+1992_m05208u.merged.bsp,openfailed
+error,/opt/isisdatafull/voyager2/kernels/spk/voyager_1.ST,/opt/isisdatafull/voyager2/kernels/spk/voyager_1.ST+1991_a54418u.merged.bsp,/opt/isisdatafull/voyager2/kernels/spk/voyager_1.ST,/opt/isisdatafull/voyager2/kernels/spk/voyager_1.ST+1991_a54418u.merged.bsp,openfailed
+error,/opt/isisdatafull/voyager2/kernels/spk/voyager_2.ST,/opt/isisdatafull/voyager2/kernels/spk/voyager_2.ST+1992_m05208u.merged.bsp,/opt/isisdatafull/voyager2/kernels/spk/voyager_2.ST,/opt/isisdatafull/voyager2/kernels/spk/voyager_2.ST+1992_m05208u.merged.bsp,openfailed
+
+Group = Results
+  ISISDATA            = /opt/isisdatafull
+  DATADIR             = /opt/isisdatafull
+  EmptyKernelDBs      = 11
+  MissingKernelDBs    = 23
+  SymlinkKernelFiles  = 0
+  ExternalKernelFiles = 11
+  TotalDBConfigFiles  = 10 &lt;conf&gt;
+  TotalKernelDBFiles  = 219 &lt;db&gt;
+  TotalDirectories    = 565
+  TotalDataFiles      = 101452
+  TotalInstallSize    = 1947030252490 &lt;bytes&gt;
+  TotalVolumeSize     = 1813.3132276032 &lt;GB&gt;
+  InventorySymLinks   = 0
+  HashBufferSize      = 268435456 &lt;bytes&gt;
+  TotalVolumeHash     = 6cd919230b88ba0fa68d71d9942f3894 &lt;md5&gt;
+End_Group
+</PRE>
+          The files labeled <em>missing</em> are kernel files contained in
+          either a kernels.????.db or kernels.????.conf ISIS kernel database
+          configuration file. Files with <em>empty</em> status have no
+          content or do not specify any kernels. This may be needed to
+          satisfy spiceinit requirements. A status of <em>external</em>
+          may have several potential reasons for this categorization.
+          One case identifiesa  file that is referred to in a kernel
+          DB/conf file, but is not found in the full ISISDATA file
+          inventory. If a kernel file path specification contains
+          extra characters, such as '//' in a file path specification.
+          And finally, if you run <em>isisdataeval</em> on a mission
+          directory, it will identify any kernels that are referenced
+          outside that directory. This can be very helpful to finding
+          files that are external dependencies to a mission kernels
+          configuration.
+        </p>
+      </description>
+    </example>
+
+    <example>
+      <brief>
+        Evaluation of an ISISDATA mission kernel installation directory
+      </brief>
+      <description>
+        <p>
+          <em>isisdataeval</em> can be helpful to evaluate the condition of
+          a single mission dataset, such as $ISISDATA/smart1, the one we are
+          using in this example. By setting datadir=/opt/isis/data/smart1,
+          a subdirectory of $ISISDATA, it will only evaluate the contents
+          of that directory. Note this is also the recommended way to
+          confirm an ISISDATA installation by using the <em>TotalVolumeHash</em>
+          hash value to compare with others that produce the same run on the
+          SMART1 dataset.
+<PRE>
+isisdataeval isisdata=/opt/isis/data datadir=/opt/isis/data/smart1 hash=md5 preferences=IsisPreferences
+</PRE>
+        </p>
+        <p>
+          This run produces the following results that was current state of the
+          ISISDATA volume on or about December 2, 2022. Note a more comprehensive
+          set of results are available
+          <a href="https://gist.github.com/KrisBecker/327976baa7ce10f80cbc7ba3b8b8e9e7">here</a>:
+<PRE>
+
+
+DATAROOT = /opt/isis/data/smart1
+DATAROOT = /opt/isis/data/smart1
+
+ISISDATA = $ISISDATA
+ISISDATA = /opt/isis/data
+ISISDATA reset by user!
+
+########################################################
+# Customize the location of mission specific data
+# files (calibration and spice kernels).  Usually this
+# should be left to the Isis administrator
+########################################################
+Group = DataDirectory
+  # Backwards compatability for versions prior to 4.1.0
+  ISIS3DATA    = $ISISDATA
+  Apollo15     = $ISISDATA/apollo15
+  Apollo16     = $ISISDATA/apollo16
+  Apollo17     = $ISISDATA/apollo17
+  Base         = $ISISDATA/base
+  Cassini      = $ISISDATA/cassini
+  Chan1        = $ISISDATA/chan1
+  Chandrayaan1 = $ISISDATA/chandrayaan1
+  Clementine1  = $ISISDATA/clementine1
+  Clipper      = $ISISDATA/../datalocal/clipper
+  Control      = $ISISDATA/control
+  Dawn         = $ISISDATA/dawn
+  Galileo      = $ISISDATA/galileo
+  Hayabusa     = $ISISDATA/hayabusa
+  Hayabusa2    = $ISISDATA/hayabusa2
+  Juno         = $ISISDATA/juno
+  Kaguya       = $ISISDATA/kaguya
+  Lo           = $ISISDATA/lo
+  Lro          = $ISISDATA/lro
+  Mariner10    = $ISISDATA/mariner10
+  Mer          = $ISISDATA/mer
+  Mex          = $ISISDATA/mex
+  Messenger    = $ISISDATA/messenger
+  Mgs          = $ISISDATA/mgs
+  Mro          = $ISISDATA/mro
+  Near         = $ISISDATA/near
+  NewHorizons  = $ISISDATA/newhorizons
+  Odyssey      = $ISISDATA/odyssey
+  OsirisRex    = $ISISDATA/osirisrex
+  Rolo         = $ISISDATA/rolo
+  Rosetta      = $ISISDATA/rosetta
+  Smart1       = $ISISDATA/smart1
+  Tgo          = $ISISDATA/tgo
+  Viking1      = $ISISDATA/viking1
+  Viking2      = $ISISDATA/viking2
+  Voyager1     = $ISISDATA/voyager1
+  Voyager2     = $ISISDATA/voyager2
+  Temporary    = .
+  ISISDATA     = /opt/isis/data
+End_Group
+
+Validation Complete...2 issues found!
+status, filespec, sourcespec, source, target, category
+missing,$smart1/kernels/fk/SMART1_V????.TF,/opt/isis/data/smart1/kernels/fk/kernels.????.db,/opt/isis/data/smart1/kernels/fk/kernels.0001.db,/opt/isis/data/smart1/kernels/fk/kernels.0001.db,null
+empty,/opt/isis/data/smart1/kernels/iak/kernels.????.db,/opt/isis/data/smart1/kernels/iak/kernels.0001.db,/opt/isis/data/smart1/kernels/iak/kernels.0001.db,/opt/isis/data/smart1/kernels/iak/kernels.0001.db,Empty
+
+Running inventory ...
+isisdataeval: inventory+md5hash
+100% Processed
+
+Inventory Complete...0 issues found!
+
+Group = Results
+  ISISDATA            = /opt/isis/data
+  DATADIR             = /opt/isis/data/smart1
+  EmptyKernelDBs      = 1
+  MissingKernelDBs    = 1
+  SymlinkKernelFiles  = 0
+  ExternalKernelFiles = 0
+  TotalDBConfigFiles  = 0 &lt;conf&gt;
+  TotalKernelDBFiles  = 7 &lt;db&gt;
+  TotalDirectories    = 19
+  TotalDataFiles      = 2821
+  TotalInstallSize    = 12774236932 &lt;bytes&gt;
+  TotalVolumeSize     = 11.896935228258 &lt;GB&gt;
+  InventorySymLinks   = 0
+  HashBufferSize      = 268435456 &lt;bytes&gt;
+  TotalVolumeHash     = e152f4636dedaa40e2d66630036336ce &lt;md5&gt;
+End_Group
+
+</PRE>
+          The file labeled <em>missing</em> in this run is actually
+          a typo in the /opt/isis/data/smart1/kernels/fk/kernels.0001.db
+          database file.
+          The <em>empty</em> file has no no content and its size is
+          actually 0.
+        </p>
+      </description>
+    </example>
+
+    <example>
+      <brief>
+        Using file hash values effectively
+      </brief>
+      <description>
+        <p>
+          <em>isisdataeval</em> is intended to provide a means
+          to help support users and developers to determine
+          if processing errors are due to ISISDATA installation
+          problems. The individual file hash values are a useful
+          tool to ensure the contents of the installed ISISDATA
+          files match the ISISDATA source hash. Users can run
+          <em>isisdataeval</em> on a directory and determine
+          the hash values for all files in the that directory
+          and all subdirectories. This includes calibration
+          and any/all files that exist in the directories. By
+          choosing to compute the file hash (i.e., HASH=MD5),
+          and save the results to a file specified in
+          TOINVENTORY, the hash file is provided in that
+          output file as the last column. The column name
+          will be a composite of the value supplied in the
+          HASH parameter with "hash" appended. So if
+          HASH=MD5, the column will be "md5hash" as shown below.
+<PRE>
+filespec,filepath,exists,file,symlink,target,created,createdet,modified,modifiedet,size,md5hash
+ /opt/isis/data/osirisrex/kernels/spk/orx_201020_201020_201020_od294_v1.bsp,/opt/isis/data/osirisrex/kernels/spk/orx_201020_201020_201020_od294_v1.bsp,true,/opt/isis/data/osirisrex/kernels/spk/orx_201020_201020_201020_od294_v1.bsp,false,/opt/isis/data/osirisrex/kernels/spk/orx_201020_201020_201020_od294_v1.bsp,2022-12-02T03:45:35,723224804.1831008,2021-05-14T17:52:17,674286806.1852669,32768,57729ccd8fe7c44ad3ac887a80846413
+</PRE>
+        </p>
+        <p>
+          In this example, it shows the OSIRIS-REx kernel, /opt/isis/data/osirisrex/kernels/spk/orx_201020_201020_201020_od294_v1.bsp,
+          is 32768 bytes in size and has a hash value of "57729ccd8fe7c44ad3ac887a80846413".
+          You can now run the equivalent MD5 command, available on most OSes, on the file
+          and it should directly compare with the hash value in the ISISDATA inventory
+          file. The Linux application, <em>md5sum</em>, can be used to compute the MD5 hash
+          of any file.
+<PRE>
+ls -l /opt/isis/data/osirisrex/kernels/spk/orx_201020_201020_201020_od294_v1.bsp
+-rw-rw-r--+ 1 kbecker kbecker 32768 May 14  2021 /opt/isis/data/osirisrex/kernels/spk/orx_201020_201020_201020_od294_v1.bsp
+
+
+md5sum /opt/isis/data/osirisrex/kernels/spk/orx_201020_201020_201020_od294_v1.bsp
+57729ccd8fe7c44ad3ac887a80846413  /opt/isis/data/osirisrex/kernels/spk/orx_201020_201020_201020_od294_v1.bsp
+</PRE>
+          In this particular example, the size, actual date created (in the
+          <em>modified</em> column) and the hash value all compare precisely.
+        </p>
+      </description>
+    </example>
+  </examples>
+</application>

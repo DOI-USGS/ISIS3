@@ -1,0 +1,37 @@
+Object = SpacecraftPointing
+  RunTime = 2010-06-22T09:02:08
+
+  Group = Dependencies
+    SpacecraftClockKernel = /usgs/cpkgs/isis3/data/voyager1/kernels/sclk/vg100008.tsc
+    LeapsecondKernel      = /usgs/cpkgs/isis3/data/base/kernels/lsk/naif0009.tls
+  End_Group
+
+  Group = Selection
+    Match = ("Instrument","InstrumentID","WIDE_ANGLE_CAMERA")
+    Time  = ("1980 OCT 25 01:32:35.956 TDB", "1980 DEC 15 23:51:48.341 TDB")
+    File  = ("voyager1", "kernels/ck/vg1_sat_qmw_wa_fc-31100_t2.bc")
+    Type  = Reconstructed
+  End_Group
+
+  Group = Selection
+    Match = ("Instrument","InstrumentID","NARROW_ANGLE_CAMERA")
+    Time  = ("1980 AUG 23 12:44:35.670 TDB", "1980 DEC 15 23:49:24.341 TDB")
+    File  = ("voyager1", "kernels/ck/vg1_sat_qmw_na_fc-31100_t2.bc")
+    Type  = Reconstructed
+  End_Group
+
+  Group = Selection
+    Match = ("Instrument","InstrumentID","WIDE_ANGLE_CAMERA")
+    Time  = ("1979 FEB 04 03:20:35.776 TDB", "1979 APR 13 23:54:20.801 TDB")
+    File  = ("voyager1", "kernels/ck/vg1_jup_qmw_wa_fc-31100_t2.bc")
+    Type  = Reconstructed
+  End_Group
+
+  Group = Selection
+    Match = ("Instrument","InstrumentID","NARROW_ANGLE_CAMERA")
+    Time  = ("1979 JAN 04 23:56:35.135 TDB", "1979 APR 13 23:57:32.801 TDB")
+    File  = ("voyager1", "kernels/ck/vg1_jup_qmw_na_fc-31100_t2.bc")
+    Type  = Reconstructed
+  End_Group
+End_Object
+End

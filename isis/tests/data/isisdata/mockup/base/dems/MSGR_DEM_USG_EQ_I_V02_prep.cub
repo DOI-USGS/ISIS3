@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/base/dems/MSGR_DEM_USG_EQ_I_V02_prep.cub",
+    "filesize": 531052027,
+    "createtime": "2022-08-12T22:10:56.000000",
+    "modifiedtime": "2022-11-24T12:20:59.444382",
+    "md5hash": "4e9239e4d394e01cf15024bece226879",
+    "sha256hash": "5acbf0f80cba98c3361ec2df28c5cc3037e61a78cb015de2a941ea4504b5e986",
+    "sha1hash": "6b00ed9be186c89116912aeae4719872a1e140ed"
+}
