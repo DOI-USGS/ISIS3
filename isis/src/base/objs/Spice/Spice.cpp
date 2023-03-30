@@ -1142,6 +1142,10 @@ namespace Isis {
         QString msg = "Can not find [" + key + "] in text kernels";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
+      else if (numValuesRead == 0){
+        QString msg = "Found " + key + "] in text kernels, but no values were identified and read.";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
 
       storeValue(key, index, type, result);
       NaifStatus::CheckErrors();
