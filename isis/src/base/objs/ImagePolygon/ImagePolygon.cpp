@@ -270,7 +270,6 @@ namespace Isis {
 
     // Create the polygon, fixing if needed
     Fix360Poly();
-    std::cout << "C 5 -------------" << std::endl;
 
     if (p_brick != 0) delete p_brick;
 

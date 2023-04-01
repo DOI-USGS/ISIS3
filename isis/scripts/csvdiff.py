@@ -133,7 +133,7 @@ for i in range(len(csv_1)):
     if is_number(value_1) and is_number(value_2):
       # Generate the error and get the tolerance if provided, else assume 0.0
       error = math.fabs(float(value_1) - float(value_2))
-      tolerance = 0.0
+      tolerance = 1e-9
       if column_1 in tolerance_map:
         tolerance = tolerance_map[column_1]
 

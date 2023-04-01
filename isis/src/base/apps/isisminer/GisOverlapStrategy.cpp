@@ -377,6 +377,7 @@ namespace Isis {
       if ( !resource->isEqual(*candidate)) {
         double ratioA = rgeom->intersectRatio(*candidate->geometry()); 
         double ratioB = candidate->geometry()->intersectRatio(*rgeom); 
+        double EPSILON = 1e-9;
 
         if ( isDebug() ) {
           cout << "\nSource " << resource->name() << " overlaps "
