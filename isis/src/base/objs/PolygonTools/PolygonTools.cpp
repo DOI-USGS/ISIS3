@@ -2162,8 +2162,6 @@ namespace Isis {
             lon = lon - 360;
           }
           newLonLatPts->add(geos::geom::Coordinate(lon, lat), k);
-
-          delete pts3;
         }
         // Add the points to polys
         finalpolys->push_back(globalFactory->createPolygon
@@ -2178,8 +2176,6 @@ namespace Isis {
 
       geos::geom::MultiPolygon *multi_polygon = globalFactory->createMultiPolygon(finalpolys);
 
-      delete finalpolys;
-      delete newGeom;
       delete newLonLatPts;
       delete pts;
       delete pts2;

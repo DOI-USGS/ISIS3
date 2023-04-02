@@ -11,7 +11,6 @@ find files of those names at the top level of this repository. **/
 #include "geos/geom/CoordinateSequence.h"
 #include "geos/geom/CoordinateArraySequence.h"
 #include "geos/geom/LineString.h"
-//#include "geos/geosAlgorithm.h"
 
 #include "Application.h"
 #include "BoxcarCachingAlgorithm.h"

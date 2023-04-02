@@ -1197,6 +1197,7 @@ namespace Isis {
       geos::geom::Polygon *newPoly = globalFactory->createPolygon
                                      (globalFactory->createLinearRing(newLonLatPts), NULL);
       p_polygons = PolygonTools::MakeMultiPolygon(newPoly);
+      delete newLonLatPts;
       return;
     }
 
@@ -1306,6 +1307,9 @@ namespace Isis {
 
       p_polygons = globalFactory->createMultiPolygon(finalpolys);
 
+      delete newLonLatPts;
+      delete pts;
+      delete pts2;
     }
     catch(geos::util::IllegalArgumentException *geosIll) {
       std::string msg = "Unable to create image footprint (Fix360Poly) due to ";
