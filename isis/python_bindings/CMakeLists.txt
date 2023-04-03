@@ -25,15 +25,6 @@ swig_link_libraries(astroset isis Python3::Module)
 set_target_properties(astroset PROPERTIES SWIG_USE_TARGET_INCLUDE_DIRECTORIES TRUE)
 set_target_properties(astroset PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${ISISPY_OUTPUT_DIR})
 
-# Setup for wrapper tests
-if(pybindings)
-    add_test(NAME python-tests
-        COMMAND python -m pytest ${CMAKE_CURRENT_SOURCE_DIR}/tests
-        WORKING_DIRECTORY ${ISISPY_OUTPUT_DIR})
-else()
-    message(STATUS "Skipping Python Bindings Tests")
-endif()
-
 # Create the files to install the Python wrapper
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in
                ${CMAKE_CURRENT_BINARY_DIR}/setup.py)

@@ -314,7 +314,7 @@ get_cmake_property(_variableNames VARIABLES) # Get All VARIABLES
 
 set(ALLLIBDIRS "")
 set(ALLLIBS "")
-set(ALLINCDIRS "${CMAKE_SOURCE_DIR}/inc")
+set(ALLINCDIRS "")
 
 # Get all include dir variables
 foreach (_variableName ${_variableNames})

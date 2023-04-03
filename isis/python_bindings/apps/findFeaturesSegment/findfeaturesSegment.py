@@ -132,26 +132,8 @@ def segment(img_path : Path, nlines : int = MAX_LEN):
     return segment_dict
 
 
-def findFeaturesSegment(params, images):
-    """
-    findFeaturesSegment Calls FindFeatures on segmented images  
+def generate_cnet(params, images):
 
-    findFeaturesSegment works by splitting the MATCH and FROM images into segments defined by NL with 0 
-    pixel overlaps. The match image segments are then matched with every FROM/FROMLIST image semgnet that overlap 
-    enough as defined by max/min overlap and area parameters. 
-
-    Parameters
-    ----------
-    params : namespace
-             namespace from argparse containing parameters 
-    images : dict
-             dictionary of images to match. Format dictated by segment. 
-
-    Returns
-    -------
-    dict
-        dictionary containing output cnet and image list
-    """
     match_segment_n = images["match"]["Segment"]
     from_segment_n = images["from"][0]["Segment"]
 
@@ -290,9 +272,26 @@ def merge(d1, d2, k):
         return v1+v2
 
 
-if __name__ == "__main__": 
-    ui = astroset.init_application(sys.argv)
-    
+def findFeaturesSegment(ui):
+    """
+    findFeaturesSegment Calls FindFeatures on segmented images  
+
+    findFeaturesSegment works by splitting the MATCH and FROM images into segments defined by NL with 0 
+    pixel overlaps. The match image segments are then matched with every FROM/FROMLIST image semgnet that overlap 
+    enough as defined by max/min overlap and area parameters. 
+
+    Parameters
+    ----------
+    ui : astroset.UserInterface 
+         UserInterface object containing user parameters
+    images : dict
+             dictionary of images to match. Format dictated by segment. 
+
+    Returns
+    -------
+    dict
+        dictionary containing output cnet and image list
+    """
     if ui.GetBoolean("debug"):
         log.basicConfig(level=logging.DEBUG)
     else: 
@@ -349,8 +348,8 @@ if __name__ == "__main__":
 
     pool = ThreadPool(ceil(nthreads/len(job_dicts)))
     starmap_args = list(zip([params]*len(job_dicts), job_dicts))
-    output = pool.starmap_async(findFeaturesSegment, starmap_args)
-    pool.close()
+    output = pool.starmap_async(generate_cnet, starmap_args)
+    pool.close()``
     pool.join()
     output = output.get()
     log.debug(f"output: {output}")
@@ -377,4 +376,9 @@ if __name__ == "__main__":
         log.debug(' '.join(err.cmd))
         log.debug(err.stdout)
         log.debug(err.stderr)
+
+
+if __name__ == "__main__": 
+    ui = astroset.init_application(sys.argv)
+    findFeaturesSegment(ui) 
 
