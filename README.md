@@ -399,9 +399,7 @@ If you plan to work with data from all missions, then the download will require 
 
 ### Full ISIS Data Download
 
-> Warning if you are looking to download ISIS data via rsync the servers will be shutdown in November of 2022.
-the outdated rsync download information can be found [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Outdated-ISIS-Data-Information)
-
+> Warning: if you are looking to download ISIS data via rsync, this is no longer supported. The rsync server isisdist.astrogeology.usgs.gov was shutdown in November 30, 2022 and replaced with an Amazon S3 storage bucket specified in [rclone.conf](isis/config/rclone.conf). The outdated rsync download information can be found [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Outdated-ISIS-Data-Information) and updated instructions for downloading ISIS data are provided below.
 
 The ISIS Data Area is hosted on a combination of AWS S3 buckets and public http servers e.g. NAIF, Jaxa, ESA and not through conda channels like the ISIS binaries. This requires using the `downloadIsisData` script from within a terminal window within your Unix distribution, or from within WSL if running Windows 10. Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
 
@@ -435,9 +433,7 @@ ISIS can now use a service to retrieve the SPICE data for all instruments ISIS s
 
 For example:
 
-<pre>
-downloadIsisData cassini $ISISDATA --exclude="kernels/**"
-</pre>
+    downloadIsisData cassini $ISISDATA --exclude="kernels/**"
 
 You can also use `include` argument to partially download specific kernels. For example, download only cks and fks of LRO mission:
 

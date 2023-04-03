@@ -46,6 +46,7 @@ release.
 ### Deprecated
 
 ### Fixed
+- Updated README.md to remove remaining references to downloading data from discontinued rsync server [#5152](https://github.com/DOI-USGS/ISIS3/issues/5152)
 - Fixed users not being able to modify planetographic projections in qmos
 
 ## [7.2.0] - 2022-12-07
