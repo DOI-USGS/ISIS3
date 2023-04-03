@@ -39,7 +39,7 @@ release.
 - Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
 - Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
 - Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
-- Updated documention for tgocassisrdrgen to be more descriptive and accurate.
+- Updated documentation for `tgocassisrdrgen` to be more descriptive and accurate.
 
 ### Added
 - Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
