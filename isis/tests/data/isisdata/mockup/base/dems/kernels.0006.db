@@ -1,0 +1,37 @@
+#
+# Database file for DEMs. 
+#
+# history ????-??-?? Unknown - Added Mars MOLA DEM.
+# history 2011-04-12 Stuart Sides - Changed to use the LOLA DEM instead of ULCN. 
+# history 2011-06-24 Unknown - Added Vesta DEM.
+# history 2016-09-23 Stuart Sides - Comment out old Vesta DEM. Added new Vesta DEM.
+# history 2016-10-25 Jeannie Backer - Updated to include Ceres DEM.
+#
+Object = Dem 
+  Group = Selection
+    Match = ("Instrument","TargetName","Mars")
+    File  = ("base", "dems/molaMarsPlanetaryRadius????.cub")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Moon")
+    File  = ("base", "dems/ldem_128ppd_Mar2011_clon180_radius_pad.cub")
+  EndGroup
+
+  # Comment this one out because a new one was being added
+  #Group = Selection
+  #  Match = ("Instrument","TargetName","Vesta")
+  #  File  = ("base", "dems/vesta_hst_dem_????.cub")
+  #EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Vesta")
+    File  = ("base", "dems/Vesta_Dawn_HAMO_DTM_DLR_Global_48ppd.cub")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Ceres")
+    File  = ("base", "dems/Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016_prep.cub")
+  EndGroup
+EndObject
+

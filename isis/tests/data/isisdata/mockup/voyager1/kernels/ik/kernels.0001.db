@@ -1,0 +1,12 @@
+Object = Instrument
+  Group = Selection
+    Match = ("Instrument","InstrumentId","NARROW_ANGLE_CAMERA")
+    File  = ("voyager1","kernels/ik/vg1_issna_v??.ti")
+  EndGroup
+  Group = Selection
+    Match = ("Instrument","InstrumentId","WIDE_ANGLE_CAMERA")
+    File  = ("voyager1","kernels/ik/vg1_isswa_v??.ti")
+  EndGroup
+EndObject
+
+

@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/base/dems/DEIMOS_K005_THO_V01.bds",
+    "filesize": 395264,
+    "createtime": "2022-09-19T06:12:00.000000",
+    "modifiedtime": "2022-11-24T12:18:04.936926",
+    "md5hash": "8e284a502773766527674c3ec78e86d1",
+    "sha256hash": "dbb21955995e91624df355559580309e4038059850bba23c7feada062f3f6371",
+    "sha1hash": "4477caca7e6c79c86aa76b686d2325381d941e7c"
+}

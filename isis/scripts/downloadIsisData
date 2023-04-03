@@ -100,13 +100,13 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
         raise Exception(message)
 
 
-def get_kernal_destination_path(source_type):
+def get_kernel_destination_path(source_type):
 
     try:
         source_path = SOURCE_PATH.get(source_type)
     except KeyError as e:
         
-        raise KeyError(f"kernal path not found. Source type {source_type} is invalid")
+        raise KeyError(f"kernel path not found. Source type {source_type} is invalid")
 
     log.debug(f"source path for {source_type} is {source_path}" )
     return source_path
@@ -131,8 +131,8 @@ def create_rclone_arguments(destination, mission_name, ntransfers=10, rclone_kwa
     log.debug(f"Mission_dir_name: {mission_dir_name}, source_type: {source_type}")
 
     destination = os.path.join(destination, str(mission_dir_name).replace(":",""))
-    #add kernal directory path if needed
-    destination = os.path.join(destination, get_kernal_destination_path(source_type))
+    #add kernel directory path if needed
+    destination = os.path.join(destination, get_kernel_destination_path(source_type))
     extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
 
     extra_args.extend(rclone_kwargs)
