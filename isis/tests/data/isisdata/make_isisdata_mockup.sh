@@ -4,7 +4,7 @@
 # cd ISIS3/isis/test/data/isisdata
 mkdir -p mockup mockprocessing
 
-# Produce the mockup data. Its assumed isisdata_mockup.py is in a runtime path.
+# Produce the mockup data. Its assumed isisdata_mockup is in a runtime path.
 isisdata_mockup --saveconfig --hasher all --isisdata $ISISDATA/base     --outpath mockprocessing/isisdatamockup/base     --ghostdir '$ISISDATA/base'     --tojson isisdata_mockup_base.json
 isisdata_mockup --saveconfig --hasher all --isisdata $ISISDATA/hayabusa --outpath mockprocessing/isisdatamockup/hayabusa --ghostdir '$ISISDATA/hayabusa' --tojson isisdata_mockup_hayabusa.json
 isisdata_mockup --saveconfig --hasher all --isisdata $ISISDATA/smart1   --outpath mockprocessing/isisdatamockup/smart1   --ghostdir '$ISISDATA/smart1'   --tojson isisdata_mockup_smart1.json
