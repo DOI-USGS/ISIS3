@@ -141,6 +141,12 @@ for i in range(len(csv_1)):
       if error > tolerance:
         sys.exit("FAILURE Error '%.14f' is greater than tolerance '%.14f' " %
             (error, tolerance) + "(line %d, column %s)!" % (line_num, column_1))
+    
+    elif csv_1_header == "GISINTERSECTIONFOOTPRINT":
+        if len(value_1) != len(value_2):
+          sys.exit("FAILURE Value " +
+            "'%s' does not equal '%s' " % (value_1, value_2) +
+            "(line %d, column %s)!" % (line_num, column_1))
     else:
       # At least one of the values is a non-numeric type, so compare as strings
       if value_1 != value_2:
