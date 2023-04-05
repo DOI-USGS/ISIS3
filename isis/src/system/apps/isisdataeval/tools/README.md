@@ -19,18 +19,18 @@ The ISISDATA mockup system is a complete copy of every directory and every file 
 
 The size of this file has been reduced to 376 bytes from 4,097,024 bytes. Each file will contain JSON text with details about the original file. The files size, creation and modified dates, and hash values for md5, sha1 and sha256 hash algorithms are computed from the contents of the file using Python tools. This provides a an external source (Python) comparison of the Qt hash algorithnms used in `isisdataeval` for validation tests. Note it is possible, but cannot be guaranteed, the _source_ for the file will exist in every ISISDATA install, or even be the same file. But this is a good thing because it **validates** the local ISISDATA installation and test environment.
 
-# <a name="#isisdatamockuptool">ISISDATA Mockup Tool - isisdata_mockup.py</a>
+# <a name="#isisdatamockuptool">ISISDATA Mockup Tool - isisdata_mockup</a>
 
-A tool has been provided with the `isisdataeval` application that generates ISISDATA mockups for this and potentially other uses. This Python tool will convert an ISISDATA installation into a mockup that is suitable to test the database lookup system and **verify** the contents and structure of mission kernel configurations in $ISISDATA. However, it has been generalized to use for any directory structure. The application help documentation describes the parameter and behavioir of the script. Use the command `isisdata_mockup.py -h` to produce the documentation.
+A tool has been provided with the `isisdataeval` application that generates ISISDATA mockups for this and potentially other uses. This Python tool will convert an ISISDATA installation into a mockup that is suitable to test the database lookup system and **verify** the contents and structure of mission kernel configurations in $ISISDATA. However, it has been generalized to use for any directory structure. The application help documentation describes the parameter and behavioir of the script. Use the command `isisdata_mockup -h` to produce the documentation.
 
 In general, if you want to produce a complete inventory of the ISISDATA directory, the form to use is:
 ```
-isisdata_mockup.py --saveconfig --hasher all --isisdata /opt/isis/data  --outpath $PWD/mockisisdata --ghostdir '$ISISDATA' --tojson isisdata_complete_mockup.json
+isisdata_mockup --saveconfig --hasher all --isisdata /opt/isis/data  --outpath $PWD/mockisisdata --ghostdir '$ISISDATA' --tojson isisdata_complete_mockup.json
 ```
 
 You can also choose to process only a single directory, as shown in the following example:
 ```
-isisdata_mockup.py --saveconfig --hasher all --isisdata /opt/isis/data/voyager1  --outpath $PWD/mockisisdata/voyager1 --ghostdir '$ISISDATA/voyager1' --tojson isisdata_voyager_mockup.json
+isisdata_mockup --saveconfig --hasher all --isisdata /opt/isis/data/voyager1  --outpath $PWD/mockisisdata/voyager1 --ghostdir '$ISISDATA/voyager1' --tojson isisdata_voyager_mockup.json
 ```
 Processing times can be significant since these examples are computing 3 different hash values per file. For this purpose, the `md5` hash algorithm is probably sufficient for ISISDATA file comparisons.
 
@@ -44,11 +44,11 @@ With this tool and the files listed in `isisdataeval_isisdata_mockup_files.lis`,
 cd ISIS3/isis/test/data/isisdata
 mkdir -p mockup mockprocessing
 
-# Produce the mockup data. Its assumed isisdata_mockup.py is in a runtime path.
-isisdata_mockup.py --saveconfig --hasher all --isisdata $ISISDATA/base     --outpath mockprocessing/isisdatamockup/base     --ghostdir '$ISISDATA/base'     --tojson isisdata_mockup_base.json
-isisdata_mockup.py --saveconfig --hasher all --isisdata $ISISDATA/hayabusa --outpath mockprocessing/isisdatamockup/hayabusa --ghostdir '$ISISDATA/hayabusa' --tojson isisdata_mockup_hayabusa.json
-isisdata_mockup.py --saveconfig --hasher all --isisdata $ISISDATA/smart1   --outpath mockprocessing/isisdatamockup/smart1   --ghostdir '$ISISDATA/smart1'   --tojson isisdata_mockup_smart1.json
-isisdata_mockup.py --saveconfig --hasher all --isisdata $ISISDATA/voyager1 --outpath mockprocessing/isisdatamockup/voyager1 --ghostdir '$ISISDATA/voyager1' --tojson isisdata_mockup_voyager1.json
+# Produce the mockup data. Its assumed isisdata_mockup is in a runtime path.
+isisdata_mockup --saveconfig --hasher all --isisdata $ISISDATA/base     --outpath mockprocessing/isisdatamockup/base     --ghostdir '$ISISDATA/base'     --tojson isisdata_mockup_base.json
+isisdata_mockup --saveconfig --hasher all --isisdata $ISISDATA/hayabusa --outpath mockprocessing/isisdatamockup/hayabusa --ghostdir '$ISISDATA/hayabusa' --tojson isisdata_mockup_hayabusa.json
+isisdata_mockup --saveconfig --hasher all --isisdata $ISISDATA/smart1   --outpath mockprocessing/isisdatamockup/smart1   --ghostdir '$ISISDATA/smart1'   --tojson isisdata_mockup_smart1.json
+isisdata_mockup --saveconfig --hasher all --isisdata $ISISDATA/voyager1 --outpath mockprocessing/isisdatamockup/voyager1 --ghostdir '$ISISDATA/voyager1' --tojson isisdata_mockup_voyager1.json
 
 # Copy/install the desired files for the test
 rsync -av --files-from=isisdataeval_isisdata_mockup_files.lis mockprocessing/isisdatamockup/ mockup/
@@ -59,22 +59,22 @@ isisdataeval isisdata=mockup datadir=mockup toinventory=isisdata_mockup_inventor
 ```
 
 # Other products
-The `isisdata_mockup.py` application can also produce a summary procesing log file of the run used to create a mockup. It can also be ran standalone on any system to provide as an comparison dataset for any mockup. This command produces a summary of the full ISISDATA installation without producing the mockup in `--outpath` (it is now an optional parameter), computes only the md5 hash and writes the entire contents to the JSON output file specified in `--tojson`:
+The `isisdata_mockup` application can also produce a summary procesing log file of the run used to create a mockup. It can also be ran standalone on any system to provide as an comparison dataset for any mockup. This command produces a summary of the full ISISDATA installation without producing the mockup in `--outpath` (it is now an optional parameter), computes only the md5 hash and writes the entire contents to the JSON output file specified in `--tojson`:
 
 ```
-isisdata_mockup.py -v  --hasher=md5 --isisdata /opt/isis3/data --ghostdir '$ISISDATA' --tojson isisdata_full_md5.json
+isisdata_mockup -v  --hasher=md5 --isisdata /opt/isis3/data --ghostdir '$ISISDATA' --tojson isisdata_full_md5.json
 ```
 
 This example provides the results of a much smaller directory, $ISISDATA/base/dems, that also computes the md5 hash, including all `*.db` and `*.conf` files, does not generate, unless given, any absolute paths, and **does not** produce the mockup directory:
 ```
-isisdata_mockup.py --hasher md5 --isisdata /opt/isis3/data/base/dems --ghostdir '$ISISDATA/base/dems' --tojson isisdata_base_dem_md5.json
+isisdata_mockup --hasher md5 --isisdata /opt/isis3/data/base/dems --ghostdir '$ISISDATA/base/dems' --tojson isisdata_base_dem_md5.json
 ```
 
 And here is portion of the contents of the output JSON file, `isisdata_base_dem_md5.json`:
 ```
 {
   "program": {
-    "name": "isisdata_mockup.py",
+    "name": "isisdata_mockup",
     "version": "0.2",
     "date": "2023-03-29",
     "runtime": "2023-03-29T21:02:03.721127 UTC",

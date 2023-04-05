@@ -244,7 +244,7 @@ def main():
     """
 
     # Program details
-    program_name     = 'isisdata_mockup.py'
+    program_name     = 'isisdata_mockup'
     program_version  = "0.2"
     program_date     = "2023-03-29"
     program_runtime  = datetime.datetime.now(datetime.timezone.utc)
