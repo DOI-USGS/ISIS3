@@ -349,7 +349,7 @@ def findFeaturesSegment(ui):
     pool = ThreadPool(ceil(nthreads/len(job_dicts)))
     starmap_args = list(zip([params]*len(job_dicts), job_dicts))
     output = pool.starmap_async(generate_cnet, starmap_args)
-    pool.close()``
+    pool.close()
     pool.join()
     output = output.get()
     log.debug(f"output: {output}")

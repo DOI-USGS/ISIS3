@@ -12,25 +12,35 @@ message(STATUS "SWIG flags: " ${CMAKE_SWIG_FLAGS} )
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
 # Setup for wrapper library
-set(ISISPY_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/astroset")
-set(ISISPY_SOURCES astroset.i
+set(ASTROSET_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/astroset")
+set(ASTROSET_SOURCES astroset.i
                    UserInterface.i 
                    )
-set_source_files_properties(${ISISPY_SOURCES} PROPERTIES CPLUSPLUS ON)
+
+set(ASTROSET_APPS apps/)
+
+set_source_files_properties(${ASTROSET_SOURCES} PROPERTIES CPLUSPLUS ON)
 swig_add_library(astroset
                  LANGUAGE python
-                 SOURCES ${ISISPY_SOURCES}
-                 OUTPUT_DIR ${ISISPY_OUTPUT_DIR})
+                 SOURCES ${ASTROSET_SOURCES}
+                 OUTPUT_DIR ${ASTROSET_OUTPUT_DIR})
 swig_link_libraries(astroset isis Python3::Module)
 set_target_properties(astroset PROPERTIES SWIG_USE_TARGET_INCLUDE_DIRECTORIES TRUE)
-set_target_properties(astroset PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${ISISPY_OUTPUT_DIR})
+set_target_properties(astroset PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${ASTROSET_OUTPUT_DIR})
 
 # Create the files to install the Python wrapper
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in
                ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
-               ${ISISPY_OUTPUT_DIR}/__init__.py
+               ${ASTROSET_OUTPUT_DIR}/__init__.py
                COPYONLY)
+
+file(COPY ${ASTROSET_APPS}
+          DESTINATION
+          ${ASTROSET_OUTPUT_DIR}/apps/)
+
+set(ASTROSET_APP_XML_FILES "apps/findFeaturesSegment/findFeaturesSegment.xml")
+install(FILES ${ASTROSET_APP_XML_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/xml/)
 
 # Setup to run setup tools on install 
 install(CODE "execute_process(COMMAND $ENV{CONDA_PREFIX}/bin/python ${CMAKE_CURRENT_BINARY_DIR}/setup.py install --single-version-externally-managed --prefix=${CMAKE_INSTALL_PREFIX} --record=record.txt

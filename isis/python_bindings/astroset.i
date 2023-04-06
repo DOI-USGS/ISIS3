@@ -1,5 +1,9 @@
 %module astroset
 
+%pythoncode %{
+from . import apps
+%}
+
 %include "std_vector.i"
 %include "std_string.i"
 %include "std_array.i"
@@ -146,8 +150,6 @@ namespace std {
     SWIG_exception(SWIG_UnknownError, "Unknown error");
   }
 }
-
-
 
 
 %include "UserInterface.i"

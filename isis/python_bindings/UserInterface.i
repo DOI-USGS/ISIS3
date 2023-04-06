@@ -2,6 +2,7 @@
 
 
 %{
+  #include "Gui.h"
   #include "Pvl.h"
   #include "UserInterface.h"
 %}
@@ -35,7 +36,7 @@
 %rename(GetBoolean) IsisAml::GetBoolean(const QString &) const;
 %rename(GetBooleans) IsisAml::GetBoolean(const QString &, std::vector<bool> &) const;
 
-
+%include "Pvl.h"
 %include "IsisAml.h"
 %include "UserInterface.h"
 
