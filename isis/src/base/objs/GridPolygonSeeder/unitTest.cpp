@@ -146,8 +146,6 @@ int main() {
 
         geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys);
 
-        delete polys;
-
         cout << "Lon/Lat polygon = " << mp->toString() << endl;
 
         // Create the projection necessary for seeding
