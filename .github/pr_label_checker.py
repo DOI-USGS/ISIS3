@@ -10,7 +10,7 @@ GITHUB_TOKEN=os.environ["GITHUB_TOKEN"]
 GITHUB_API_URL=os.environ["GITHUB_API_URL"]
 GITHUB_SHA=os.environ["GITHUB_SHA"]
 
-BASE_URL=f'{GITHUB_API_URL}/repos/chkim-usgs/ISIS3'
+BASE_URL=f'{GITHUB_API_URL}/repos/DOI_USGS/ISIS3'
 PULLS_URL=f'{BASE_URL}/pulls'
 COMMITS_URL=f'{BASE_URL}/commits'
 ISSUES_URL=f'{BASE_URL}/issues'
@@ -39,7 +39,7 @@ def get_pr_attributes(response: Response) -> tuple:
     """
     pull_response_json = response.json()
     if len(pull_response_json) == 0:
-        # No PRs in commit
+        # No PRs attributed to the commit
         print(False)
         sys.exit(0)
     pull_number = pull_response_json[0].get("number")
