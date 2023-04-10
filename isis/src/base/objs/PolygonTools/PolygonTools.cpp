@@ -14,8 +14,6 @@ find files of those names at the top level of this repository. **/
 
 #include <QDebug>
 
-//#include "geos/geom/BinaryOp.h"
-
 #include "geos/geom/CoordinateArraySequence.h"
 #include "geos/geom/CoordinateSequence.h"
 #include "geos/geom/LinearRing.h"

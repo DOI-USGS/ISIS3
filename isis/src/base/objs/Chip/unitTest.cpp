@@ -145,6 +145,8 @@ int main() {
   polys->push_back(gf->createPolygon(gf->createLinearRing(pts), NULL));
   geos::geom::MultiPolygon *mPolygon = gf->createMultiPolygon(polys);
 
+  delete polys;
+
   chip.SetClipPolygon(*mPolygon);
   chip.Load(junk, 45.0);
   for(int i = 1; i <= chip.Lines(); i++) {
