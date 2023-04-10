@@ -47,7 +47,9 @@ release.
 ### Deprecated
 
 ### Fixed
+- Updated README.md to remove remaining references to downloading data from discontinued rsync server [#5152](https://github.com/DOI-USGS/ISIS3/issues/5152)
 - Fixed users not being able to modify planetographic projections in qmos
+- Modified spice::readValue to add check for numValuesRead to stop reading garbase values [#4928](https://github.com/USGS-Astrogeology/ISIS3/issues/4928)
 
 ## [7.2.0] - 2022-12-07
 
