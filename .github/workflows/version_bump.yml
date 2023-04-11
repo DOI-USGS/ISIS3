@@ -1,0 +1,27 @@
+name: versionbump
+on:
+  push:
+    branches:
+    - master
+    - main
+
+  pull_request:
+    branches:
+    - master
+    - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Bump version
+        run: |
+          git config --global user.name 'ProjectBot'
+          git config --global user.email 'bot@users.noreply.github.com'
+          VERSION=$(sed -n '0,/.*<Version>\(.*\)<\/Version>.*/s//\1/p' module.xml)
+          VERSION=`echo $VERSION | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.`
+          sed -i "0,/<Version>\(.*\)<\/Version>/s//<Version>$VERSION<\/Version>/" module.xml
+          git add module.xml
+          git commit -m 'auto bump version'
+          git push
