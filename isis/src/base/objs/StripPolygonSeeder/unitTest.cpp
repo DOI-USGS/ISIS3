@@ -57,11 +57,11 @@ int main() {
     std::cout << "MinimumThickness = " << ps->MinimumThickness() << std::endl;
     std::cout << "MinimumArea = " << ps->MinimumArea() << std::endl;
 
-    cout << "Test 2, test a square polygon" << endl;
+    std::cout << "Test 2, test a square polygon" << std::endl;
     try {
       // Call the seed member with a polygon
-      geos::geom::CoordinateSequence *pts;
-      vector<geos::geom::Geometry *> polys;
+      geos::geom::CoordinateArraySequence *pts;
+      vector<const geos::geom::Geometry *> polys;
 
       // Create the A polygon
       pts = new geos::geom::CoordinateArraySequence();
@@ -136,8 +136,8 @@ int main() {
     cout << "Test 3, test for too thin" << endl;
     try {
       // Call the seed member with a polygon
-      geos::geom::CoordinateSequence *pts;
-      vector<geos::geom::Geometry *> polys;
+      geos::geom::CoordinateArraySequence *pts;
+      vector<const geos::geom::Geometry *> polys;
 
       // Create the A polygon
       pts = new geos::geom::DefaultCoordinateSequence();

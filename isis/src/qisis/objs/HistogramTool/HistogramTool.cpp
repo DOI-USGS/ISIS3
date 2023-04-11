@@ -175,7 +175,7 @@ namespace Isis {
 
       if(rubberBandTool()->currentMode() == RubberBandTool::CircleMode) {
         geos::geom::Geometry *p = rubberBandTool()->geometry();
-        geos::geom::CoordinateSequence *c = p->getCoordinates();
+        geos::geom::CoordinateSequence *c = p->getCoordinates().release();
         for(int i = 0; i < (int)c->getSize(); i++) {
           QPoint point((int)(c->getX(i) + 0.5), (int)(c->getY(i) + 0.5));
           vertices.append(point);
