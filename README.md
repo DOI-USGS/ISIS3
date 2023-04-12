@@ -51,14 +51,25 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
 1. If you are running Mac OS X, a pkg file (which looks similar to Anaconda3-5.3.0-MacOSX-x86\_64.pkg) will be downloaded. Double-click on the file to start the installation process.
 1. After the installation has finished, open up a bash prompt in your terminal window.
+1. If you have an ARM64 Mac (M1/M2) running Catalina (or later), additional prerequisites must be installed for ISIS to run in emulation:
+ - Install [XQuartz](https://www.xquartz.org/). (Tested with XQuartz 2.8.5 on MacOS Catalina)
+ - Install Rosetta2. From the terminal run: `/usr/sbin/softwareupdate --install-rosetta --agree-to-license`
+ - Include the `# MacOS ARM64 Only` lines below
 1. Next setup your Anaconda environment for ISIS. In the bash prompt, run the following commands:
 
     ```bash
+    
+    #MacOS ARM64 Only - Setup the new environment as an x86_64 environment
+    export CONDA_SUBDIR=osx-64
+    
     #Create a new conda environment to install ISIS in
     conda create -n isis
 
     #Activate the environment
     conda activate isis
+    
+    #MacOS ARM64 Only - Force installation of x86_64 packages instead of ARM64
+    conda config --env --set subdir osx-64
 
     #Add the following channels to the environment
     conda config --env --add channels conda-forge
@@ -388,9 +399,7 @@ If you plan to work with data from all missions, then the download will require 
 
 ### Full ISIS Data Download
 
-> Warning if you are looking to download ISIS data via rsync the servers will be shutdown in November of 2022.
-the outdated rsync download information can be found [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Outdated-ISIS-Data-Information)
-
+> Warning: if you are looking to download ISIS data via rsync, this is no longer supported. The rsync server isisdist.astrogeology.usgs.gov was shutdown in November 30, 2022 and replaced with an Amazon S3 storage bucket specified in [rclone.conf](isis/config/rclone.conf). The outdated rsync download information can be found [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Outdated-ISIS-Data-Information) and updated instructions for downloading ISIS data are provided below.
 
 The ISIS Data Area is hosted on a combination of AWS S3 buckets and public http servers e.g. NAIF, Jaxa, ESA and not through conda channels like the ISIS binaries. This requires using the `downloadIsisData` script from within a terminal window within your Unix distribution, or from within WSL if running Windows 10. Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
 
@@ -424,9 +433,7 @@ ISIS can now use a service to retrieve the SPICE data for all instruments ISIS s
 
 For example:
 
-<pre>
-downloadIsisData cassini $ISISDATA --exclude="kernels/**"
-</pre>
+    downloadIsisData cassini $ISISDATA --exclude="kernels/**"
 
 You can also use `include` argument to partially download specific kernels. For example, download only cks and fks of LRO mission:
 

@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/hayabusa/calibration/flatfield/flat_v.cub",
+    "filesize": 4262739,
+    "createtime": "2022-08-12T22:29:57.000000",
+    "modifiedtime": "2022-11-23T23:37:20.307406",
+    "md5hash": "993227ac5b91239498e4d1c60b7d6e3c",
+    "sha256hash": "e0129fba3da4f60dba990eacc3b47dd21878d7f3e74f63fd4e9bf8a524201e93",
+    "sha1hash": "005bd5364523ae71e5d1354ba3096ae8928a37b6"
+}

@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/kernels/ck/vg1_sat_qmw_na_fc-31100_t2.bc",
+    "filesize": 918528,
+    "createtime": "2022-08-12T23:56:40.000000",
+    "modifiedtime": "2022-11-24T12:14:42.144779",
+    "md5hash": "b16b41e707eaed27b2faabf95f195102",
+    "sha256hash": "d07bd5c07a473326687163f68bee2e8bb58e5dd2f669d53f795fa489e90c4afb",
+    "sha1hash": "49561b7b83bc27c0fe0ec73dc3af150ac918b232"
+}

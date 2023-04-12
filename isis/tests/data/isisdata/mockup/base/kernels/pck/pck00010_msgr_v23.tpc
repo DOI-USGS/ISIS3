@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/base/kernels/pck/pck00010_msgr_v23.tpc",
+    "filesize": 141312,
+    "createtime": "2022-08-12T22:13:16.000000",
+    "modifiedtime": "2022-11-24T12:25:33.634842",
+    "md5hash": "53a01ac2fa2cc43c047cda82562b12c2",
+    "sha256hash": "22053addfd96409e927ec2d04b3682f271cc2f77f12cf6f2b74a8f09b3a914f6",
+    "sha1hash": "e1e4b10f432eb408eca593b837737004948a09b8"
+}

@@ -68,8 +68,8 @@ int main() {
       cout << "Test 2, test a square polygon" << endl;
       try {
         // Call the seed member with a polygon
-        geos::geom::CoordinateSequence *pts;
-        vector<geos::geom::Geometry *> polys;
+        geos::geom::CoordinateArraySequence *pts;
+        auto *polys = new vector<geos::geom::Geometry *>;
 
         // Create the A polygon
         pts = new geos::geom::CoordinateArraySequence();
@@ -79,7 +79,7 @@ int main() {
         pts->add(geos::geom::Coordinate(0.5, 0));
         pts->add(geos::geom::Coordinate(0, 0));
 
-        polys.push_back(Isis::globalFactory->createPolygon(
+        polys->push_back(Isis::globalFactory->createPolygon(
                           Isis::globalFactory->createLinearRing(pts), NULL));
 
         geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys);
@@ -130,8 +130,8 @@ int main() {
       cout << "Test 3, test for too thin" << endl;
       try {
         // Call the seed member with a polygon
-        geos::geom::CoordinateSequence *pts;
-        vector<geos::geom::Geometry *> polys;
+        geos::geom::CoordinateArraySequence *pts;
+        auto *polys = new vector<geos::geom::Geometry *>;
 
         // Create the A polygon
         pts = new geos::geom::CoordinateArraySequence();
@@ -141,8 +141,8 @@ int main() {
         pts->add(geos::geom::Coordinate(0.0125, 0));
         pts->add(geos::geom::Coordinate(0, 0));
 
-        polys.push_back(Isis::globalFactory->createPolygon(
-                          Isis::globalFactory->createLinearRing(pts), NULL));
+        polys->push_back(Isis::globalFactory->createPolygon(
+                         Isis::globalFactory->createLinearRing(pts), NULL));
 
         geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys);
 

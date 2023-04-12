@@ -1,0 +1,8 @@
+Object = TargetPosition
+  Group = Selection
+    Time = ("2005 SEP 16 00:00:00.000 TDB", "2010 JAN 01 00:00:00.000 TDB")
+    File = ("hayabusa", "kernels/tspk/de403s.bsp")
+    File = ("hayabusa", "kernels/tspk/sb_25143_140.bsp")
+  EndGroup
+EndObject
+

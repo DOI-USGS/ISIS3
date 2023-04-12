@@ -440,8 +440,6 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/appdata/translations
                     ${CMAKE_BINARY_DIR}/appdata/export
                     ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen
                     ${CMAKE_BINARY_DIR}/appdata/import
-                    ${CMAKE_BINARY_DIR}/appdata/import/PDS3
-                    ${CMAKE_BINARY_DIR}/appdata/import/PDS4
                     ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures
                     ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff
                     ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw
@@ -545,41 +543,32 @@ add_custom_target(photometry ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/templates/photometry/* ${CMAKE_BINARY_DIR}/appdata/templates/photometry/)
 add_dependencies(isis photometry)
 
-add_custom_target(icons ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/images/icons/* ${CMAKE_SOURCE_DIR}/appdata/images/icons/licenses/*
-  ${CMAKE_BINARY_DIR}/appdata/images/icons)
+add_custom_target(icons ALL COMMAND ${CMAKE_COMMAND} -E copy_directory
+  ${CMAKE_SOURCE_DIR}/appdata/images/icons/ ${CMAKE_BINARY_DIR}/appdata/images/icons/)
 add_dependencies(isis icons)
 
 add_custom_target(targets ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/images/targets/* ${CMAKE_BINARY_DIR}/appdata/images/targets)
+  ${CMAKE_SOURCE_DIR}/appdata/images/targets/* ${CMAKE_BINARY_DIR}/appdata/images/targets/)
 add_dependencies(isis targets)
 
 add_custom_target(maps ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/maps/* ${CMAKE_BINARY_DIR}/appdata/templates/maps)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/maps/* ${CMAKE_BINARY_DIR}/appdata/templates/maps/)
 add_dependencies(isis maps)
 
 add_custom_target(labels ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/labels/* ${CMAKE_BINARY_DIR}/appdata/templates/labels)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/labels/* ${CMAKE_BINARY_DIR}/appdata/templates/labels/)
 add_dependencies(isis labels)
 
 add_custom_target(hidtmgen ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/appdata/templates/hidtmgen/* ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen/)
 add_dependencies(isis hidtmgen)
 
-add_custom_target(import ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/import/* ${CMAKE_BINARY_DIR}/appdata/import)
-add_dependencies(isis import importpds3 importpds4)
-
-add_custom_target(importpds3 ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/import/PDS3/* ${CMAKE_BINARY_DIR}/appdata/import/PDS3)
-add_dependencies(isis importpds3)
-
-add_custom_target(importpds4 ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/import/PDS4/* ${CMAKE_BINARY_DIR}/appdata/import/PDS4)
-add_dependencies(isis importpds4)
+add_custom_target(import ALL COMMAND ${CMAKE_COMMAND} -E copy_directory
+  ${CMAKE_SOURCE_DIR}/appdata/import/ ${CMAKE_BINARY_DIR}/appdata/import/)
+add_dependencies(isis import)
 
 add_custom_target(export ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/export/* ${CMAKE_BINARY_DIR}/appdata/export)
+  ${CMAKE_SOURCE_DIR}/appdata/export/* ${CMAKE_BINARY_DIR}/appdata/export/)
 add_dependencies(isis export)
 
 # Create the updateBuildPlugins.sh.in file

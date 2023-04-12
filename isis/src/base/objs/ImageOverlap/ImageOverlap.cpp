@@ -67,8 +67,7 @@ namespace Isis {
     multiPolygon << fileData;
     multiPolygon.seekg(0, std::ios::beg);
 
-    p_polygon = PolygonTools::MakeMultiPolygon(
-        geosReader.readHEX(multiPolygon));
+    p_polygon = PolygonTools::MakeMultiPolygon(geosReader.readHEX(multiPolygon).release());
   }
 
 

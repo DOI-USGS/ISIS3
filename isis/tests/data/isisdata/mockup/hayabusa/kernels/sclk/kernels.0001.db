@@ -1,0 +1,5 @@
+Object = SpacecraftClock
+  Group = Selection
+    File = ("hayabusa", "kernels/sclk/hayabusa.tsc")
+  EndGroup
+EndObject

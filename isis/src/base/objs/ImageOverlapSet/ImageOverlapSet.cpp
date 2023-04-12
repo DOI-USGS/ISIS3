@@ -16,7 +16,9 @@ find files of those names at the top level of this repository. **/
 #include "geos/operation/distance/DistanceOp.h"
 #include "geos/util/IllegalArgumentException.h"
 #include "geos/geom/Point.h"
-#include "geos/opOverlay.h"
+//#include "geos/opOverlay.h"
+#include "geos/operation/overlay/OverlayOp.h"
+
 #include "IException.h"
 #include "ImageOverlapSet.h"
 #include "ImagePolygon.h"
@@ -387,7 +389,7 @@ namespace Isis {
     if (!multiPolygon->isValid() ||
         (multiPolygon->getArea() < 1.0e-10 && !multiPolygon->isEmpty())) {
       delete multiPolygon;
-      multiPolygon = Isis::globalFactory->createMultiPolygon();
+      multiPolygon = Isis::globalFactory->createMultiPolygon().release();
     }
 
     if (position > p_lonLatOverlaps.size()) {
@@ -545,7 +547,7 @@ namespace Isis {
     p.SetMaximumSteps(p_lonLatOverlaps.size() - 1);
     p.CheckStatus();
 
-    geos::geom::MultiPolygon *emptyPolygon = Isis::globalFactory->createMultiPolygon();
+    geos::geom::MultiPolygon *emptyPolygon = Isis::globalFactory->createMultiPolygon().release();
 
     // Compare each polygon with all of the others
     for (int outside = 0; outside < p_lonLatOverlaps.size() - 1; ++outside) {
@@ -761,7 +763,7 @@ namespace Isis {
             }
 
             if (!SetPolygon(tmpGeom, outside)) {
-              if (SetPolygon(Isis::globalFactory->createMultiPolygon(), outside))
+              if (SetPolygon(Isis::globalFactory->createMultiPolygon().release(), outside))
                 foundOverlap = true;
             }
 
