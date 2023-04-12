@@ -2,12 +2,7 @@ name: versionbump
 on:
   push:
     branches:
-    - master
-    - main
-
-  pull_request:
-    branches:
-    - master
+    - dev
     - main
 
 jobs:
@@ -19,9 +14,9 @@ jobs:
         run: |
           git config --global user.name 'ProjectBot'
           git config --global user.email 'bot@users.noreply.github.com'
-          VERSION=$(sed -n '0,/.*<Version>\(.*\)<\/Version>.*/s//\1/p' module.xml)
+          version=$(sed -n '0,/^{% set version = "\([^"]*\)" %}/s//\1/p' meta.yaml)
           VERSION=`echo $VERSION | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.`
-          sed -i "0,/<Version>\(.*\)<\/Version>/s//<Version>$VERSION<\/Version>/" module.xml
+          sed -i "0,/^{%.*version.*\"\([^\"]*\)\".*/s//{% set version = "${version}" %}/" meta.yaml
           git add module.xml
           git commit -m 'auto bump version'
           git push
