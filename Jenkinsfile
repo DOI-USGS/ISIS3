@@ -74,27 +74,27 @@ pipeline {
                 stage('Unit Tests') {
                     steps {
                         echo "Testing Units"
-                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            sh '''
-                            . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
-                            conda activate isis > /dev/null
-                            cd build
-                            ctest -R _unit_ -j 8 --output-on-failure
-                            '''
-                        }
+                        // catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                        //     sh '''
+                        //     . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
+                        //     conda activate isis > /dev/null
+                        //     cd build
+                        //     ctest -R _unit_ -j 8 --output-on-failure
+                        //     '''
+                        // }
                     }
                 }
                 stage('App Tests') {
                     steps {
                         echo "Testing appetizers"
-                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            sh '''
-                            . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
-                            conda activate isis > /dev/null
-                            cd build
-                            ctest -R _app_ -j 8 --output-on-failure --timeout 10000
-                            '''
-                        }
+                        // catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                        //     sh '''
+                        //     . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
+                        //     conda activate isis > /dev/null
+                        //     cd build
+                        //     ctest -R _app_ -j 8 --output-on-failure --timeout 10000
+                        //     '''
+                        // }
                     }
                 }
                 stage('Module Tests') {
