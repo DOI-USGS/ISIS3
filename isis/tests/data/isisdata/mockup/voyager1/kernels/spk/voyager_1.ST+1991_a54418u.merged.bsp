@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/kernels/spk/voyager_1.ST+1991_a54418u.merged.bsp",
+    "filesize": 5268480,
+    "createtime": "2013-01-26T00:12:37.000000",
+    "modifiedtime": "2022-11-24T12:13:59.964955",
+    "md5hash": "0c8c067f5c96586a5eeffb3005aeb3f8",
+    "sha256hash": "35c471f379c27f2215504be6ed63fce839c6b2ad231110ea91c8355d36ef8a8c",
+    "sha1hash": "9675e55568ed13cb75779e35a979fecb97eadb3a"
+}

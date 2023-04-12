@@ -1,15 +1,9 @@
 ---
-name: ⛔ Support Question
-about: See https://astrodiscuss.usgs.gov for questions about using ISIS and other Astrogeology Science Center software.
+name: ⛔ Support Question / New Idea / General Discussion
+about: See https://github.com/DOI-USGS/ISIS3/discussions for questions about using ISIS and other Astrogeology Science Center software.
 
 ---
 
-We use Github issues solely for discussing bugs, documentation issues, and new features.
+For questions about using ISIS or the ISIS data area please [open a new discussion]([https://github.com/DOI-USGS/ISIS3/discussions](https://github.com/DOI-USGS/ISIS3/discussions/new/choose)). You can share a new idea, open a Q&A style question, or start a general discussion in that area. 
 
-For
-questions about using ISIS or other ASC software, please use
-any of the support alternatives: https://astrodiscuss.usgs.gov or https://gitter.im/USGS-Astrogeology/IAA
-
-A great resource about asking high quality questions that generate high quality answers is available from the StackOverflow community: [How do I ask a good question?](https://stackoverflow.com/help/how-to-ask)
-
-Thanks!
+The contirbutors on this project (developers and users) really appreciate the community interaction, so no discussion is too small to get started!

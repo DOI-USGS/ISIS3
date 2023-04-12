@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/hayabusa/kernels/lsk/naif0009.tls",
+    "filesize": 4733,
+    "createtime": "2022-08-12T22:29:58.000000",
+    "modifiedtime": "2022-11-23T23:37:22.671880",
+    "md5hash": "edb3986f6a0e6669a08cc3ef6bf00234",
+    "sha256hash": "374905df51e719026795c3553702b5a4374179d89486af81e12a92ca1e8429cb",
+    "sha1hash": "7c5b0f06324f1df4941ba33b8c7a50b24ff8e769"
+}

@@ -1,0 +1,7 @@
+Object = InstrumentAddendum
+  Group = Selection
+    File = ("voyager1","kernels/iak/voyagerAddendum???.ti")
+  EndGroup
+EndObject
+
+

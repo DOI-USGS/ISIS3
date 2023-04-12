@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/base/dems/vesta_hst_dem_0001.cub",
+    "filesize": 78316,
+    "createtime": "2022-08-12T22:13:15.000000",
+    "modifiedtime": "2022-11-24T12:24:00.732266",
+    "md5hash": "a2186af2bc310e424a1a45feafbacf98",
+    "sha256hash": "a7c0b308520477b40d701ffecc486f68785d8c52144d30116821f518f290d9a8",
+    "sha1hash": "c5ed9480bb3b2febe38dc899e88e0fb4e9b9ec2e"
+}

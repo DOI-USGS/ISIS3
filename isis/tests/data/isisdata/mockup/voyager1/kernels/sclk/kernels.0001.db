@@ -1,0 +1,7 @@
+Object = SpacecraftClock
+  Group = Selection
+    File = ("voyager1","kernels/sclk/vg1?????.tsc")
+  EndGroup
+EndObject
+
+

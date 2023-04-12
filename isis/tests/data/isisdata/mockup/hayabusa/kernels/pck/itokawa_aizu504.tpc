@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/hayabusa/kernels/pck/itokawa_aizu504.tpc",
+    "filesize": 1320,
+    "createtime": "2007-10-16T00:49:24.000000",
+    "modifiedtime": "2022-11-23T23:36:57.922283",
+    "md5hash": "ef6066b4fc8320758da9dab16ab9f2be",
+    "sha256hash": "46154bdf46eac1075a53e6cd7861e492c5adf2d50c2f51519940783da1ba73c1",
+    "sha1hash": "7741c0e0dbaa21e81dc2b59d05e577f0e4741f1b"
+}

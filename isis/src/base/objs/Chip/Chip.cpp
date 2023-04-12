@@ -61,7 +61,7 @@ namespace Isis {
 
     if (other.m_clipPolygon) {
       m_clipPolygon = PolygonTools::MakeMultiPolygon(
-          other.m_clipPolygon->clone());
+          other.m_clipPolygon->clone().release());
     }
     else {
       m_clipPolygon = NULL;
@@ -1015,7 +1015,7 @@ namespace Isis {
    * Copy assignment operator.
    *
    * @param other chip to be copied to this
-   * 
+   *
    * @returns The chip that was copied from the other
    */
   Chip &Chip::operator=(const Chip &other) {
@@ -1044,7 +1044,7 @@ namespace Isis {
 
     if (other.m_clipPolygon) {
       m_clipPolygon = PolygonTools::MakeMultiPolygon(
-          other.m_clipPolygon->clone());
+          other.m_clipPolygon->clone().release());
     }
 
     m_affine = other.m_affine;

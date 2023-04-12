@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/kernels/ck/vg1_jup_qmw_wa_fc-31100_t2.bc",
+    "filesize": 320512,
+    "createtime": "2022-08-12T23:56:40.000000",
+    "modifiedtime": "2022-11-24T12:14:41.215298",
+    "md5hash": "fb70a5b0322489e59de46ee247d3d2ae",
+    "sha256hash": "235084c21640f9024c91a6e93fc3acfc1e4639633964194f2c29cb66ad8fa946",
+    "sha1hash": "840a649467e20060a03e2f06a5eab063d49b1ed0"
+}

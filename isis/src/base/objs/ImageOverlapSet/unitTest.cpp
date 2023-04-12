@@ -73,8 +73,8 @@ int main() {
   vector<QString> sns;
 
   // Reusable variables
-  geos::geom::CoordinateSequence *pts;
-  vector<geos::geom::Geometry *> polys;
+  geos::geom::CoordinateArraySequence *pts;
+  vector<const geos::geom::Geometry *> polys;
 
   // Create the A polygon
   pts = new geos::geom::CoordinateArraySequence();

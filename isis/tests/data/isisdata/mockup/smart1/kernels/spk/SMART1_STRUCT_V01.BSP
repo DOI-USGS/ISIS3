@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/smart1/kernels/spk/SMART1_STRUCT_V01.BSP",
+    "filesize": 26624,
+    "createtime": "2022-07-01T07:23:32.000000",
+    "modifiedtime": "2022-11-24T05:59:11.364989",
+    "md5hash": "7ad61e0c9cc73c7aab7cf81ae36ef6f9",
+    "sha256hash": "d06c57a570b5e545348471cb237a4d99302069769a77782f6b8a2105b1c663c9",
+    "sha1hash": "6e90eff6cbc8ea972eb3019c12565e501ea2f4f9"
+}

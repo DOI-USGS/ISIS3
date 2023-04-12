@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/hayabusa/kernels/pck/itokawa_gaskell_n3.tpc",
+    "filesize": 3784,
+    "createtime": "2022-08-12T22:29:58.000000",
+    "modifiedtime": "2022-11-23T23:37:24.282146",
+    "md5hash": "fc6f5f9ef9850d698ea8b8087f775472",
+    "sha256hash": "7aea8d6817ed607cc5d57043d1539419cf26ca767387f7a5eb8673f65c6edac0",
+    "sha1hash": "b9691f53f648393a8dc055735f671c46ee21e842"
+}

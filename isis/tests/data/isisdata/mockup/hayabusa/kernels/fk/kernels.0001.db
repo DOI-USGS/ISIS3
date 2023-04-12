@@ -1,0 +1,7 @@
+Object = Frame
+  Group = Selection
+    File  = ("hayabusa", "kernels/fk/hayabusa_hp.tf")
+    File  = ("hayabusa", "kernels/fk/itokawa_fixed.tf")
+  EndGroup
+EndObject
+
