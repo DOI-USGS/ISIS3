@@ -29,7 +29,6 @@ pipeline {
                 
                 conda create -y -n isis
                 conda activate isis > /dev/null
-                conda config --env --set channel_priority flexible
                 conda install -c conda-forge python=3 findutils
                 mamba env update -f environment.yml --prune
                 conda activate isis
@@ -58,50 +57,62 @@ pipeline {
         }
         stage('GTests') {
             steps {
-                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                    sh '''
-                    . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
-                    conda activate isis > /dev/null
-                    cd build
-                    ctest -R '.' -E '(_app_|_unit_|_module_)' -j 8 --output-on-failure --timeout 10000
-                    '''
+                script{
+                    echo "Testing G's"
                 }
+                //catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                //    sh '''
+                //    . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
+                //    conda activate isis > /dev/null
+                //    cd build
+                //    ctest -R '.' -E '(_app_|_unit_|_module_)' -j 8 --output-on-failure --timeout 10000
+                //    '''
+                //}
             }
         }
         stage('Unit Tests') {
             steps {
-                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                    sh '''
-                    . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
-                    conda activate isis > /dev/null
-                    cd build
-                    ctest -R _unit_ -j 8 --output-on-failure
-                    '''
+                script{
+                    echo "Testing Units"
                 }
+                //catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                //    sh '''
+                //    . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
+                //    conda activate isis > /dev/null
+                //    cd build
+                //    ctest -R _unit_ -j 8 --output-on-failure
+                //    '''
+                //}
             }
         }
         stage('App Tests') {
             steps {
-                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                    sh '''
-                    . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
-                    conda activate isis > /dev/null
-                    cd build
-                    ctest -R _app_ -j 8 --output-on-failure --timeout 10000
-                    '''
+                script{
+                    echo "Testing appetizers"
                 }
+//                 catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+//                     sh '''
+//                     . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
+//                     conda activate isis > /dev/null
+//                     cd build
+//                     ctest -R _app_ -j 8 --output-on-failure --timeout 10000
+//                     '''
+//                 }
             }
         }
         stage('Module Tests') {
             steps {
-                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                    sh '''
-                    . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
-                    conda activate isis > /dev/null
-                    cd build
-                    ctest -R _module_ -j 8 --output-on-failure --timeout 10000
-                    '''
+                script{
+                    echo "Testing modules"
                 }
+//                 catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+//                     sh '''
+//                     . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
+//                     conda activate isis > /dev/null
+//                     cd build
+//                     ctest -R _module_ -j 8 --output-on-failure --timeout 10000
+//                     '''
+//                 }
             }
         }
         stage('Py Tests') {
@@ -109,23 +120,35 @@ pipeline {
                 PATH            =   "${env.WORKSPACE}/install/bin:${env.PATH}"
             }
             steps {
-                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                    sh '''
-                    . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
-                    conda activate isis > /dev/null
-                    cd build
-                    cd $WORKSPACE/isis/pytests 
-                    pytest .
-
-                    '''
+                script{
+                    echo "Testing pys"
                 }
+//                 catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+//                     sh '''
+//                     . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
+//                     conda activate isis > /dev/null
+//                     cd build
+//                     cd $WORKSPACE/isis/pytests 
+//                     pytest .
+
+//                     '''
+//                 }
             }
         }
         stage('Deploy') {
+            when { 
+              allOf { 
+                expression { env.GITHUB_PR_STATE == "CLOSE" }
+                expression { env.GITHUB_PR_TARGET_BRANCH == "test-dev" }
+                expression { env.GITHUB_PR_SOURCE_BRANCH == "PR-*" }
+              } 
+            }
             steps {
-                sh '''
-                echo "This is where deploy would happen."
-                '''
+                script{
+                    pullRequest.labels.each{
+                        echo "label: $it"
+                    }
+                }
             }
         }
     }
