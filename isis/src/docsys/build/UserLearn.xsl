@@ -167,7 +167,7 @@ Deborah Lee Soltesz
                 <a href="https://doi-usgs.github.io/ISIS3/The_Power_of_Spatial_Filters.html">
                 The Power of Spatial Filters</a><br/>
                 A description of spatial filter applications in ISIS and common use cases.<br/>
-                <a href="https://doi-usgsy.github.io/ISIS3/Removing_Striping_Noise_from_Image_Data.html">
+                <a href="https://doi-usgs.github.io/ISIS3/Removing_Striping_Noise_from_Image_Data.html">
                 Removing Striping Noise from Image Data</a><br/>
                 Procedures for removing horizontal or vertical noise in an image.
               </p>
