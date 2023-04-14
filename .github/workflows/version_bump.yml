@@ -14,9 +14,10 @@ jobs:
         run: |
           git config --global user.name 'ProjectBot'
           git config --global user.email 'bot@users.noreply.github.com'
-          version=$(sed -n '0,/^{% set version = "\([^"]*\)" %}/s//\1/p' meta.yaml)
-          VERSION=`echo $VERSION | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.`
-          sed -i "0,/^{%.*version.*\"\([^\"]*\)\".*/s//{% set version = "${version}" %}/" meta.yaml
+          CURRENTVERSION=$(sed -n '0,/^{% set version = "\([^"]*\)" %}/s//\1/p' meta.yaml)
+          NEWVERSION=`echo $current_version | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.`
+          sed -i "0,/^{%.*version.*\"\([^\"]*\)\".*/s//{% set version = "${NEWVERSION}" %}/" meta.yaml
+          sed -i "0,/"$CURRENTVERSION"/s//"${NEWVERSION}" %}/" cmakelists.txt
           git add module.xml
           git commit -m 'auto bump version'
           git push
