@@ -128,7 +128,7 @@ Deborah Lee Soltesz
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">
+            <a href="https://github.com/DOI-USGS/ISIS3#installation">
             ISIS Installation Guide</a>
           </th>
           <td>
@@ -195,7 +195,7 @@ Deborah Lee Soltesz
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS">
+            <a href="https://github.com/DOI-USGS/ISIS3/wiki/Introduction_to_ISIS">
             Introduction to ISIS</a>
           </th>
           <td>
@@ -204,7 +204,7 @@ Deborah Lee Soltesz
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data">
+            <a href="https://github.com/DOI-USGS/ISIS3/wiki/Locating_and_Ingesting_Image_Data">
             Locating and Ingesting Image Data</a>
           </th>
           <td>
@@ -235,7 +235,7 @@ Deborah Lee Soltesz
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/blob/dev/Code-Of-Conduct.md">
+            <a href="https://github.com/DOI-USGS/ISIS3/blob/dev/Code-Of-Conduct.md">
             Code of Conduct</a>
           </th>
           <td>
@@ -245,7 +245,7 @@ Deborah Lee Soltesz
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/issues">
+            <a href="https://github.com/DOI-USGS/ISIS3/issues">
             Github Issues</a>
           </th>
           <td>

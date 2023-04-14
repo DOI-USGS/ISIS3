@@ -145,7 +145,7 @@ Deborah Lee Soltesz
           <td style="width:50%">
             <dl>
               <dt><h4>About ISIS Applications</h4></dt>
-              <dd><a href="https://doi-usgs.github.io/ISIS3/ISIS_Cube_Format.html">
+              <dd><a href="https://isis.astrogeology.usgs.gov/documents/CommandLine/CommandLine.html">
               Command Line Reference</a></dd>
               <dd><a href="../documents/Glossary/Glossary.html">
               Glossary</a></dd>
