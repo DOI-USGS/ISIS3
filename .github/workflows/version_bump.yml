@@ -7,17 +7,19 @@ on:
 
 jobs:
   build:
+    if: ${{ github.event.label.name == 'bug' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Bump version
         run: |
+          pwd
           git config --global user.name 'ProjectBot'
           git config --global user.email 'bot@users.noreply.github.com'
-          CURRENTVERSION=$(sed -n '0,/^{% set version = "\([^"]*\)" %}/s//\1/p' meta.yaml)
+          CURRENTVERSION=$(sed -n '0,/^{% set version = "\([^"]*\)" %}/s//\1/p' ${{github.workspace}}/recipe/meta.yaml)
           NEWVERSION=`echo $current_version | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.`
-          sed -i "0,/^{%.*version.*\"\([^\"]*\)\".*/s//{% set version = "${NEWVERSION}" %}/" meta.yaml
-          sed -i "0,/"$CURRENTVERSION"/s//"${NEWVERSION}" %}/" cmakelists.txt
+          sed -i "0,/^{%.*version.*\"\([^\"]*\)\".*/s//{% set version = "${NEWVERSION}" %}/" ${{github.workspace}}/recipe/meta.yaml
+          sed -i "0,/"$CURRENTVERSION"/s//"${NEWVERSION}" %}/" ${{github.workspace}}/isis/CMakeLists.txt
           git add module.xml
           git commit -m 'auto bump version'
           git push
