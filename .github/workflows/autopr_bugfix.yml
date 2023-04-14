@@ -7,19 +7,35 @@ jobs:
   # Check if the PR is a bugfix
   check_labels:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     name: Check PR labels action step
     # Make the output of this job available to other jobs
     outputs: 
-      result: ${{steps.check_pr_labels.outputs.result}}
+      result: ${{steps.execute_py_script.outputs.result}}
     steps:
-    - id: check_pr_labels
-      uses: 3pointer/check-pr-labels-on-push-action@v1.0.3
+    - name: checkout repo content
+      uses: actions/checkout@v2 # checkout the repository content
+    - name: setup python
+      uses: actions/setup-python@v4
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        labels: '["bug"]'
+        python-version: '3.10'
+        cache: 'pip'
+    - name: install python packages
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r ./.github/requirements.txt
+    - name: Set output
+      id: execute_py_script
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_API_URL: ${{ secrets.GITHUB_API_URL }}
+        GITHUB_SHA: ${{ secrets.GITHUB_SHA }}
+      run: |
+        echo "result=$(python ./.github/pr_label_checker.py)" >> $GITHUB_OUTPUT
     # Print the result to the log
     - name: See result
-      run: echo "${{ steps.check_pr_labels.outputs.result }}"
+      run: echo "${{ steps.execute_py_script.outputs.result }}"
   release_pull_request:
     needs: check_labels
     # Only run this step if the code was a bugfix
