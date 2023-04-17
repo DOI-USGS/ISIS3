@@ -46,6 +46,12 @@ release.
 
 ### Deprecated
 
+### Removed
+- edrget application [#4665](https://github.com/DOI-USGS/ISIS3/issues/4665)
+
+### Removed
+- edrget application [#4665](https://github.com/DOI-USGS/ISIS3/issues/4665)
+
 ### Fixed
 - Updated README.md to remove remaining references to downloading data from discontinued rsync server [#5152](https://github.com/DOI-USGS/ISIS3/issues/5152)
 - Fixed users not being able to modify planetographic projections in qmos
