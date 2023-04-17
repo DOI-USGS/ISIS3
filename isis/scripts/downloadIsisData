@@ -39,7 +39,8 @@ filter_list = [
         '- document/',
         '- *.csv',
         '- toolkit/',
-        '- kernels_ORG/'
+        '- kernels_ORG/',
+        '- mro/kernels/spk/spk_psp_rec*'
     ]
 
 SOURCE_PATH = {
