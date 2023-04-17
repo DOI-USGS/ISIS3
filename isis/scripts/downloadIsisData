@@ -30,7 +30,7 @@ filter_list = [
         '- ck/GEM/',
         '- ck/save/',
         '- spk/SAVE_SCS_2017-11-22/',
-        '- /MRO/kernels/spk/spk_psp_rec*'
+        '- /MRO/kernels/spk/spk_psp_rec*',
         '- release*/',
         '- Archive/',
         '- ek/',
