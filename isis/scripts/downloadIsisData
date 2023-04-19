@@ -75,7 +75,7 @@ def call_subprocess(command, redirect_stdout=True, redirect_stderr=False):
         return proc.communicate()
     
 
-def rclone(command, config=None, _args=[], redirect_stdout=True, redirect_stderr=False): 
+def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_stderr=False): 
     try:
         if path.isfile(config):
             log.debug(f"rclone() : using config file {config}")
@@ -159,8 +159,7 @@ def create_rclone_arguments(destination, mission_name, parsedArgs, rclone_kwargs
                   f"--checkers={parsedArgs.num_transfers}",
                   f"--transfers={parsedArgs.num_transfers}",
                   "--track-renames",
-                  f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}",
-                  f"--dry-run"]
+                  f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
     extra_args.extend(filter_args)
     log.debug(f"Args created: {extra_args}")
     return extra_args
