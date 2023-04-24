@@ -226,24 +226,9 @@ Back up the build by copying the .tar.bz2 to:
 ## Step 8: Update Data and TestData Areas on rsync Servers 
 
 
-This step covers how to update the data on the rysnc servers. This is where our external users will have access to the data necessary for running ISIS. One server is located on campus, while the other server is located in Phoenix. These commands must be run as isis3mgr for permission purposes. 
+This step covers how to update the data on the public s3 buckets. This is where our external users will have access to the data necessary for running ISIS. There are two locations, one is the S3 bucket where users directly download data from. The other is and EFS drive that only accessible internally and is mounted for daily use. See the [internal only documentation](https://code.chs.usgs.gov/asc/ASC_Software_Docs/-/blob/main/ISIS/Maintaining%20ISIS%20Data.md) for more info on how these are setup. Action is only required if there are smithed kernels that need to be uploaded to /usgs_data/. 
 
-**Please pay careful attention to where you are rsync'ing the data to on the remote servers. It is going to depend on the type of build you just completed (Public Release, Release Candidate, custom build, etc).** 
-
-
-### Part A: Update the Local Server 
-
-* Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/isis_data/ isisdist:/work1/dist/isis3/<isisdata or mission specific>/data/``` and ensure that the output is reasonable. You should see kernel updates for active missions and a smaller number of other updates made by developers. 
-
-* Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/isis_data/ isisdist:/work1/dist/isis3/<isisdata or mission specific>/data/```. 
-
-
-### Part B: Update the Remote Server 
-
-* Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/isis_data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isisdata or mission specific>/data/```. 
-
-* Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/isis_data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isisdata or mission specific>/data/```. 
-
+**Please pay careful attention to where you are rclone'ing the data to on the S3 buckets.
 
 ## Step 9: Create Internal Builds/Installs for Astro 
 
