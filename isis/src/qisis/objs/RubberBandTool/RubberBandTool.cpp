@@ -829,8 +829,8 @@ namespace Isis {
           if(verticesList.size() != 3)
             break;
 
-          geos::geom::CoordinateSequence *points1 = new geos::geom::CoordinateArraySequence();
-          geos::geom::CoordinateSequence *points2 = new geos::geom::CoordinateArraySequence();
+          geos::geom::CoordinateArraySequence *points1 = new geos::geom::CoordinateArraySequence();
+          geos::geom::CoordinateArraySequence *points2 = new geos::geom::CoordinateArraySequence();
 
           points1->add(geos::geom::Coordinate(verticesList[0].x(), verticesList[0].y()));
           points1->add(geos::geom::Coordinate(verticesList[1].x(), verticesList[1].y()));
@@ -871,7 +871,7 @@ namespace Isis {
 
           // We're ready to try to solve
           double originalX = 0.0, originalY = 0.0;
-          geos::geom::CoordinateSequence *points = new geos::geom::CoordinateArraySequence();
+          geos::geom::CoordinateArraySequence *points = new geos::geom::CoordinateArraySequence();
 
           // Now iterate through our domain, solving for y positive, using 1/5th of a pixel increments
           for(double x = h - a; x <= h + a; x += 0.2) {
@@ -904,7 +904,7 @@ namespace Isis {
           if(verticesList.size() < 3)
             break;
 
-          geos::geom::CoordinateSequence *points = new geos::geom::CoordinateArraySequence();
+          geos::geom::CoordinateArraySequence *points = new geos::geom::CoordinateArraySequence();
 
           for(int vertex = 0; vertex < verticesList.size(); vertex++) {
             points->add(geos::geom::Coordinate(verticesList[vertex].x(), verticesList[vertex].y()));
@@ -921,7 +921,7 @@ namespace Isis {
           if(verticesList.size() != 2)
             break;
 
-          geos::geom::CoordinateSequence *points = new geos::geom::CoordinateArraySequence();
+          geos::geom::CoordinateArraySequence *points = new geos::geom::CoordinateArraySequence();
           points->add(geos::geom::Coordinate(verticesList[0].x(), verticesList[0].y()));
           points->add(geos::geom::Coordinate(verticesList[1].x(), verticesList[1].y()));
           geos::geom::LineString *line = globalFactory->createLineString(points);
@@ -932,7 +932,7 @@ namespace Isis {
       case SegmentedLineMode: {
           if(verticesList.size() < 2)
             break;
-          geos::geom::CoordinateSequence *points = new geos::geom::CoordinateArraySequence();
+          geos::geom::CoordinateArraySequence *points = new geos::geom::CoordinateArraySequence();
 
           for(int vertex = 0; vertex < verticesList.size(); vertex++) {
             points->add(geos::geom::Coordinate(verticesList[vertex].x(), verticesList[vertex].y()));

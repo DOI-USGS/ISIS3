@@ -36,18 +36,36 @@ release.
 ## [Unreleased]
 
 ### Changed
-- Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
-- Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083)
-- Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
 
 ### Added
-- Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
-- Added a new application, _isisdataeval_, that validates/verifies ISISDATA installations and aids in the development and management of this resource. Users can use _isisdataeval_ to help resolve runtime problems related to ISIS kernels and calibration processing. In fact, it is designed to be used on any directory as it will create a detailed install volume inventory with file/volume hashes and is not restricted to ISIS use. [#5110](https://github.com/USGS-Astrogeology/ISIS3/issues/5110) [#5111](https://github.com/USGS-Astrogeology/ISIS3/pull/5111) [#5163](https://github.com/DOI-USGS/ISIS3/pull/5163)
 
 ### Deprecated
 
+### Removed
+
 ### Fixed
+
+## [8.0.0] - 2023-04-19
+
+### Changed
+- Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
+- Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
+- Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
+- Updated Geos from version 3.7 to 3.9 [#3627](https://github.com/DOI-USGS/ISIS3/issues/3627)
+
+### Added
+- Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
+- Added additional filters to downloadIsisData to reduce download of extraneous kernels [#5143](https://github.com/DOI-USGS/ISIS3/issues/5143) 
+
+### Deprecated
+
+### Removed
+- edrget application [#4665](https://github.com/DOI-USGS/ISIS3/issues/4665)
+
+### Fixed
+- Updated README.md to remove remaining references to downloading data from discontinued rsync server [#5152](https://github.com/DOI-USGS/ISIS3/issues/5152)
 - Fixed users not being able to modify planetographic projections in qmos
+- Modified spice::readValue to add check for numValuesRead to stop reading garbase values [#4928](https://github.com/USGS-Astrogeology/ISIS3/issues/4928)
 
 ## [7.2.0] - 2022-12-07
 
@@ -56,7 +74,7 @@ release.
 
 ### Added
 - Added LatLonGrid Tool to Qview to view latitude and longitude lines if camera model information is present.
-
+- Added a new application, _isisdataeval_, that validates/verifies ISISDATA installations and aids in the development and management of this resource. Users can use _isisdataeval_ to help resolve runtime problems related to ISIS kernels and calibration processing. In fact, it is designed to be used on any directory as it will create a detailed install volume inventory with file/volume hashes and is not restricted to ISIS use. [#5110](https://github.com/USGS-Astrogeology/ISIS3/issues/5110) [#5111](https://github.com/USGS-Astrogeology/ISIS3/pull/5111)
 
 ### Deprecated
 
