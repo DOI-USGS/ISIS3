@@ -7,7 +7,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "CSMCamera.h"
-#include "CameraSkyMap.h"
+#include "CSMSkyMap.h"
 
 #include <fstream>
 #include <iostream>
@@ -20,9 +20,6 @@ find files of those names at the top level of this repository. **/
 
 #include "Affine.h"
 #include "Blob.h"
-#include "CameraDetectorMap.h"
-#include "CameraDistortionMap.h"
-#include "CameraFocalPlaneMap.h"
 #include "Constants.h"
 #include "Displacement.h"
 #include "Distance.h"
@@ -131,40 +128,7 @@ void sanitize(std::string &input);
 
     }
 
-    if (cube.hasTable("InstrumentPointing")) {
-      Table instRotTable("InstrumentPointing", cube.fileName(), *cube.label());
-      PvlObject instRotPvlObject = instRotTable.Label();
-      int ikCode = toInt(instRotPvlObject["TimeDependentFrames"][0]);
-      if (instRotPvlObject.hasKeyword("ConstantFrames")) {
-        ikCode = toInt(instRotPvlObject["ConstantFrames"][0]);
-      }
-      m_instrumentRotation = new SpiceRotation(ikCode);
-      m_instrumentRotation->LoadCache(instRotTable);
-
-      json isdJson = stateAsJson(stateString.toStdString());
-
-      SetFocalLength(isdJson["m_focalLength"]);
-
-      Affine::AMatrix matrix(3, 3, 0.0);
-
-      matrix[0][0] = isdJson["m_transX"][1];
-      matrix[1][1] = isdJson["m_transY"][2];
-      matrix[2][2] = 1;
-      Affine affine(matrix);
-
-      CameraDetectorMap *detMap = new CameraDetectorMap(this);
-      detMap->SetStartingDetectorSample(0);
-      detMap->SetStartingDetectorLine(0);
-
-      // Affine affine;
-      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, affine);
-      focalMap->SetDetectorOrigin(isdJson["m_ccdCenter"][1], isdJson["m_ccdCenter"][0]);
-
-      // Setup distortion map
-      new CameraDistortionMap(this);
-      new CameraSkyMap(this);
-    }
-
+    new CSMSkyMap(this);
     setTime(m_refTime);
   }
 
@@ -306,42 +270,42 @@ void sanitize(std::string &input);
   }
 
 
-  // /**
-  //  * Given the ra/dec compute the look direction.
-  //  *
-  //  * @param ra    Right ascension in degrees (sky longitude).
-  //  * @param dec   Declination in degrees (sky latitude).
-  //  *
-  //  * @return @b bool True if successful.
-  //  */
-  // bool CSMCamera::SetRightAscensionDeclination(const double ra, const double dec) {
-  //   double raRad = ra * DEG2RAD;
-  //   double decRad = dec * DEG2RAD;
+  /**
+   * Given the ra/dec compute the look direction.
+   *
+   * @param ra    Right ascension in degrees (sky longitude).
+   * @param dec   Declination in degrees (sky latitude).
+   *
+   * @return @b bool True if successful.
+   */
+  bool CSMCamera::SetRightAscensionDeclination(const double ra, const double dec) {
+    double raRad = ra * DEG2RAD;
+    double decRad = dec * DEG2RAD;
 
-  //   // Make the radius bigger, some multiple of the body radius -or- use sensor position at the reference point
-  //   SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 10e12};
-  //   SensorUtilities::Vec rectPt = SensorUtilities::sphericalToRect(sphericalPt);
+    // Make the radius bigger, some multiple of the body radius -or- use sensor position at the reference point
+    SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 1};
+    SensorUtilities::Vec rectPt = SensorUtilities::sphericalToRect(sphericalPt);
 
-  //   // vector<double> lookC = instrumentRotation()->ReferenceVector(rectPt);
-  //   csm::EcefCoord lookPt = {rectPt.x, rectPt.y, rectPt.x};
-  //   double achievedPrecision = 0;
-  //   csm::WarningList warnings;
-  //   bool validBackProject;
-  //   csm::ImageCoord imagePt;
+    // vector<double> lookC = instrumentRotation()->ReferenceVector(rectPt);
+    csm::EcefCoord lookPt = {rectPt.x, rectPt.y, rectPt.z};
+    double achievedPrecision = 0;
+    csm::WarningList warnings;
+    bool validBackProject;
+    csm::ImageCoord imagePt;
 
-  //   try {
-  //     imagePt = m_model->groundToImage(lookPt, 0.01, &achievedPrecision, &warnings);
-  //     double sample;
-  //     double line;
-  //     csmToIsisPixel(imagePt, line, sample);
-  //     validBackProject = SetImage(sample, line);
-  //   }
-  //   catch (csm::Error &e) {
-  //     validBackProject = false;
-  //   }
+    try {
+      imagePt = m_model->groundToImage(lookPt, 0.01, &achievedPrecision, &warnings);
+      double sample;
+      double line;
+      csmToIsisPixel(imagePt, line, sample);
+      validBackProject = SetImage(sample, line);
+    }
+    catch (csm::Error &e) {
+      validBackProject = false;
+    }
 
-  //   return validBackProject;
-  // }
+    return validBackProject;
+  }
 
 
   /**
@@ -367,8 +331,7 @@ void sanitize(std::string &input);
     m_newLookB = true;
 
     // Don't try to intersect the sky
-    if (target()->isSky())
-    {
+    if (target()->isSky()) {
       target()->shape()->setHasIntersection(false);
       return false;
     }
@@ -1144,7 +1107,6 @@ void sanitize(std::string &input);
   void CSMCamera::setTime(const iTime &time) {
     if(bodyRotation() != NULL) {
       bodyRotation()->SetEphemerisTime(time.Et());
-      instrumentRotation()->SetEphemerisTime(time.Et());
     }
   }
 
@@ -1154,14 +1116,15 @@ void sanitize(std::string &input);
    * positive east, ocentric).
    *
    * This is not supported for CSM sensors because we cannot get the position
-   * of the sun, only the illumination direction.
+   * of the sun, only the illumination direction. To prevent Qview from erroring
+   * this function returns 0, 0
    *
    * @param lat Sub-solar latitude
    * @param lon Sub-solar longitude
    */
   void CSMCamera::subSolarPoint(double &lat, double &lon) {
-    QString msg = "Sub solar point is not supported for CSM camera models";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
+    lat = 0;
+    lon = 0;
   }
 
 
@@ -1220,7 +1183,6 @@ void sanitize(std::string &input);
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
-
   /**
    * Get the SpiceRotation object the contains the orientation of the target body
    * relative to J2000.
@@ -1245,7 +1207,8 @@ void sanitize(std::string &input);
    * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the sensor orientation
    */
   SpiceRotation *CSMCamera::instrumentRotation() const {
-    return m_instrumentRotation;
+    QString msg = "Instrument rotation is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
@@ -1276,47 +1239,54 @@ void sanitize(std::string &input);
   }
 
 
-  // /**
-  //  * Computes the Right Ascension of the currently set image coordinate.
-  //  *
-  //  * This is not supported for CSM sensors because the CSM API only supports the
-  //  * body fixed coordinate system and does not provide rotations to any others.
-  //  *
-  //  * @returns @b double The Right Ascension
-  //  */
-  // double CSMCamera::RightAscension() {
-  //   if (m_bodyRot == NULL || m_model == NULL) {
-  //     QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
-  //     throw IException(IException::Programmer, msg, _FILEINFO_);
-  //   }
+  /**
+   * Computes the Right Ascension of the currently set image coordinate.
+   *
+   * This is not supported for CSM sensors because the CSM API only supports the
+   * body fixed coordinate system and does not provide rotations to any others.
+   *
+   * @returns @b double The Right Ascension
+   */
+  double CSMCamera::RightAscension() {
+    if (m_bodyRotation == NULL || m_model == NULL) {
+      QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
 
-  //   double precision;
-  //   csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(Lines()/2, Samples()/2), 0.00001, &precision);
-  //   csm::EcefVector v = locus.direction;
-  //   std::vector<double> jvec = m_bodyRot->J2000Vector({v.x, v.y, v.z});
-  //   return v.x;
-  // }
+    double precision;
+    csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(p_childLine, p_childSample), 0.00001, &precision);
+    csm::EcefVector v = locus.direction;
+    // std::vector<double> jvec = m_bodyRotation->J2000Vector({v.x, v.y, v.z});
+    SensorUtilities::GroundPt3D sphere_v = SensorUtilities::rectToSpherical({v.x, v.y, v.z});
+    double lon = sphere_v.lon;
+    if (lon < 0) {
+      lon += 2 * PI;
+    }
+    return lon * RAD2DEG;
+  }
 
 
-  // /**
-  //  * Computes the Declination of the currently set image coordinate.
-  //  *
-  //  * This is not supported for CSM sensors because the CSM API only supports the
-  //  * body fixed coordinate system and does not provide rotations to any others.
-  //  *
-  //  * @returns @b double The Declination
-  //  */
-  // double CSMCamera::Declination() {
-  //   if (m_bodyRot == NULL || m_model == NULL) {
-  //     QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
-  //     throw IException(IException::Programmer, msg, _FILEINFO_);
-  //   }
-  //   double precision;
-  //   csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(Lines()/2, Samples()/2), 0.00001, &precision);
-  //   csm::EcefVector v = locus.direction;
-  //   std::vector<double> jvec = m_bodyRot->J2000Vector({v.x, v.y, v.z});
-  //   return v.y;
-  // }
+  /**
+   * Computes the Declination of the currently set image coordinate.
+   *
+   * This is not supported for CSM sensors because the CSM API only supports the
+   * body fixed coordinate system and does not provide rotations to any others.
+   *
+   * @returns @b double The Declination
+   */
+  double CSMCamera::Declination() {
+    if (m_bodyRotation == NULL || m_model == NULL) {
+      QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    double precision;
+    csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(p_childLine, p_childSample), 0.00001, &precision);
+    csm::EcefVector v = locus.direction;
+    // std::vector<double> jvec = m_bodyRotation->J2000Vector({v.x, v.y, v.z});
+    SensorUtilities::GroundPt3D sphere_v = SensorUtilities::rectToSpherical({v.x, v.y, v.z});
+    return sphere_v.lat * RAD2DEG;
+  }
+
   json stateAsJson(std::string modelState) {
     // Remove special characters from string
     sanitize(modelState);

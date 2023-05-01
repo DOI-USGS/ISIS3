@@ -445,21 +445,6 @@ namespace Isis {
           cube->write(bodyTable);
         }
 
-        if (isd.contains("instrument_pointing")) {
-          int ikCode = isd["instrument_pointing"]["time_dependent_frames"][0];
-          if (isd["instrument_pointing"].contains("constant_frames")) {
-            ikCode = isd["instrument_pointing"]["constant_frames"][0];
-          }
-
-          SpiceRotation instrumentRotation(ikCode);
-          instrumentRotation.LoadCache(isd["instrument_pointing"]);
-
-          Table instrumentTable = instrumentRotation.Cache("InstrumentPointing");
-          instrumentTable.Label() += PvlKeyword("Description", "Created by csminit");
-          cube->write(instrumentTable);
-          kernelsGroup.addKeyword(PvlKeyword("NaifFrameCode", QString::number(ikCode)), Pvl::Replace);
-        }
-
         if (isd.contains("naif_keywords")) {
           json aleNaifKeywords = isd["naif_keywords"];
           PvlObject naifKeywords = PvlObject("NaifKeywords", aleNaifKeywords);
