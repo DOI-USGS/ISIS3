@@ -123,7 +123,7 @@ History 2023-03-15 Kris Becker Original verison
         hasher     = None  # or ['all'], ['md5'], ['md5', 'sha1', 'md5', 'sha1', 'sha1']
         outpath    = None
         ghostdir   =  '$ISISDATA/base/dems'
-        tojson     = '/Users/kbecker/ISIS/Isis4Dev/IsisData/IsisDataEval/isisdata_dem_data_none.json'
+        tojson     = 'isisdata_dem_data_none.json'
         saveconfig = True
         dryrun     = True
         verbose    = True
