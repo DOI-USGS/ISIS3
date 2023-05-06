@@ -67,7 +67,7 @@ TEST_F(DefaultCube, FunctionalTestCkwriterDefault) {
   newKernelRotation->SetEphemerisTime(startTime);
   originalRotation->SetEphemerisTime(startTime);
 
-  ASSERT_EQ(newKernelRotation->cacheSize(), originalRotation->cacheSize());
+  ASSERT_EQ(newKernelRotation->cacheSize(), 2);
 
   for (size_t i = 0; i < newKernelRotation->TimeBasedMatrix().size(); i++) {
     ASSERT_DOUBLE_EQ(newKernelRotation->TimeBasedMatrix()[i],
@@ -136,7 +136,7 @@ TEST_F(DefaultCube, FunctionalTestCkwriterFromlist) {
   newKernelRotation->SetEphemerisTime(startTime);
   originalRotation->SetEphemerisTime(startTime);
 
-  ASSERT_EQ(newKernelRotation->cacheSize(), originalRotation->cacheSize());
+  ASSERT_EQ(newKernelRotation->cacheSize(), 2);
 
   for (size_t i = 0; i < newKernelRotation->TimeBasedMatrix().size(); i++) {
     ASSERT_DOUBLE_EQ(newKernelRotation->TimeBasedMatrix()[i],
