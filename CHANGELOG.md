@@ -44,6 +44,7 @@ release.
 ### Removed
 
 ### Fixed
+- Updated History constructor to check for invalid BLOB before copying History BLOB to output cube [#4966](https://github.com/DOI-USGS/ISIS3/issues/4966)
 
 ## [8.0.0] - 2023-04-19
 
