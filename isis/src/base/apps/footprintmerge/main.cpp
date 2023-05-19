@@ -33,7 +33,7 @@ void IsisMain() {
   prog.CheckStatus();
 
   //  For this first loop union all image polygons
-  vector<geos::geom::Geometry *> allPolys;
+  vector<const geos::geom::Geometry *> allPolys;
   vector<QString> files;
   bool conv360 = false;
 
@@ -84,7 +84,7 @@ void IsisMain() {
   //  Create union poly
   geos::geom::GeometryCollection *polyCollection =
     Isis::globalFactory->createGeometryCollection(allPolys);
-  geos::geom::Geometry *unionPoly = polyCollection->buffer(0);
+  geos::geom::Geometry *unionPoly = polyCollection->buffer(0).release();
 
 
   //  How many polygons are in unionPoly
@@ -98,7 +98,7 @@ void IsisMain() {
   else if(unionPoly->getGeometryTypeId() == geos::geom::GEOS_MULTIPOLYGON) {
     geos::geom::MultiPolygon *multi = PolygonTools::MakeMultiPolygon(unionPoly);
     for(unsigned int i = 0; i < multi->getNumGeometries(); ++i) {
-      islandPolys.push_back(multi->getGeometryN(i)->clone());
+      islandPolys.push_back(multi->getGeometryN(i)->clone().release());
     }
   }
 
