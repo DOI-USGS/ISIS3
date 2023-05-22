@@ -46,8 +46,11 @@ namespace Isis {
       virtual ~MinnaertEmpirical();
 
       void SetPhotoPhaseList(QString phasestrlist);
+      void SetPhotoPhaseList(PvlKeyword phaselist);
       void SetPhotoKList(QString kstrlist);
+      void SetPhotoKList(PvlKeyword kstrlist);
       void SetPhotoPhaseCurveList(QString phasecurvestrlist);
+      void SetPhotoPhaseCurveList(PvlKeyword phasecurvestrlist);
 
       //! Return photometric phase angle list
 //      inline std::vector<double> PhotoPhaseList() const {
