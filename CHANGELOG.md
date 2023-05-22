@@ -43,9 +43,6 @@ release.
 - Report better information regarding the behavior of <i>findfeatures</i>, FASTGEOM algorithms, and creation of the output network. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Modified tgocassisstitch to optionally allow either a outputprefix or an
   outputsuffix, both, or neither for naming convention purposes. [#5162](https://github.com/DOI-USGS/ISIS3/pull/5162)
-- Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
-- Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
-- Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
 
 ### Added
 - Added rclone to run dependencies in meta.yaml [#5183](https://github.com/DOI-USGS/ISIS3/issues/5183)

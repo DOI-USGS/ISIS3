@@ -84,19 +84,18 @@ namespace Isis {
     foreach(QString frameKey, frameKeys) {
       try {
         QString frameIdentifier = frameKey.split("/").last();
+        FileName frameFileName;
         if (frameletCubeName != "") {
-          FileName frameFileName(outputPrefBaseName +
+          frameFileName = FileName(outputPrefBaseName + "-" +
                                frameletCubeName +
                                outputSuffBaseName + ".cub");
-          stitchFrame( frameMap.values(frameKey), frameFileName );
-          stitchProgress.CheckStatus();
         } else {
-          FileName frameFileName(outputPrefBaseName +
+          frameFileName = FileName(outputPrefBaseName +
                                  frameIdentifier +
                                  outputSuffBaseName + ".cub");
-          stitchFrame( frameMap.values(frameKey), frameFileName );
-          stitchProgress.CheckStatus();
         }
+        stitchFrame( frameMap.values(frameKey), frameFileName );
+        stitchProgress.CheckStatus();
       }
       catch (IException &e) {
         QString msg = "Failed stitch frame for observation ["
