@@ -26,3 +26,27 @@ Albedo = 0.008174
 Test phase=180.0, incidence=90.0, emission=90.0 ...
 Albedo = 0
 
+Object = PhotometricModel
+  Group = Algorithm
+    Name           = MinnaertEmpirical
+    PhaseList      = (0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120,
+                      130, 140)
+    KList          = (0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1,
+                      1.2, 1.3, 1.4)
+    PhaseCurveList = (0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, 3, 3.3,
+                      3.6, 3.9, 4.2)
+  End_Group
+End_Object
+End
+
+Test phase=0.0, incidence=0.0, emission=0.0 ...
+Albedo = 0
+Test phase=38.0, incidence=11.0, emission=20.0 ...
+Albedo = 1.1765
+Test phase=65.0, incidence=45.0, emission=30.0 ...
+Albedo = 1.63706
+Test phase=127.0, incidence=52.0, emission=33.0 ...
+Albedo = 1.96227
+Test phase=180.0, incidence=90.0, emission=90.0 ...
+Albedo = 0
+

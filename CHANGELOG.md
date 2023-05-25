@@ -36,15 +36,34 @@ release.
 ## [Unreleased]
 
 ### Changed
+- Removed the `.py` extention from the _isisdataeval_ tool `isisdata_mockup` for consistency and install it in $ISISROOT/bin; added the `--tojson` and `--hasher` option to _isisdata_mockup_ tool improve utility; updated the tool `README.md` documentation to reflect this change, removed help output and trimmed example results;  fixed paths to test data in `make_isisdata_mockup.sh`. [#5163](https://github.com/DOI-USGS/ISIS3/pull/5163)
+
+### Added
+
+### Deprecated
+
+### Removed
+
+### Fixed
+- Updated History constructor to check for invalid BLOB before copying History BLOB to output cube [#4966](https://github.com/DOI-USGS/ISIS3/issues/4966)
+- Updated photomet MinnaertEmpirical model to support photemplate-style PVL format [#3621](https://github.com/DOI-USGS/ISIS3/issues/3621)
+
+## [8.0.0] - 2023-04-19
+
+### Changed
 - Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
-- Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
+- Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083)
 - Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
 - Updated Geos from version 3.7 to 3.9 [#3627](https://github.com/DOI-USGS/ISIS3/issues/3627)
 
 ### Added
 - Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
+- Added additional filters to downloadIsisData to reduce download of extraneous kernels [#5143](https://github.com/DOI-USGS/ISIS3/issues/5143)
 
 ### Deprecated
+
+### Removed
+- edrget application [#4665](https://github.com/DOI-USGS/ISIS3/issues/4665)
 
 ### Fixed
 - Updated README.md to remove remaining references to downloading data from discontinued rsync server [#5152](https://github.com/DOI-USGS/ISIS3/issues/5152)

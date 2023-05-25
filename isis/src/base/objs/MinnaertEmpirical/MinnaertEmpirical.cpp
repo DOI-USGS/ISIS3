@@ -74,7 +74,7 @@ namespace Isis {
     * phase curve values that exist between the given phase angles. The values
     * in the phase angle list are limited to values that are >=0 and <=180.
     *
-    * @param phaselist  List of phase angles to interpolate
+    * @param phasestrlist  List of phase angles to interpolate
     */
   void MinnaertEmpirical::SetPhotoPhaseList(QString phasestrlist) {
     double phaseangle;
@@ -93,13 +93,45 @@ namespace Isis {
   }
 
   /**
+    * Set the empirical Minnaert function phase angle list.  This is the list
+    * of phase angles that Minnaert K values and phase curve list values will
+    * be provided for. A spline curve will be used to interpolate K values and
+    * phase curve values that exist between the given phase angles. The values
+    * in the phase angle list are limited to values that are >=0 and <=180.
+    *
+    * @param phaselist  PvlKeyword containing phase angles to interpolate
+    */
+  void MinnaertEmpirical::SetPhotoPhaseList(PvlKeyword phaseList) {
+
+    // If the format is Keyword="1,2,3,4,5" rather than Keyword = (1,2,3,4,5) 
+    if (phaseList.size() == 1) {
+      SetPhotoPhaseList(QString(phaseList));
+      return;
+    }
+
+    double phaseAngle;
+    p_photoPhaseList.clear();
+
+    for (int i=0; i< phaseList.size(); i++) {
+      phaseAngle = phaseList[i].toDouble();
+
+      if (phaseAngle < 0.0 || phaseAngle > 180.0) {
+        QString msg = "Invalid value of empirical Minnaert phase angle list value [" +
+                          toString(phaseAngle) + "]";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      p_photoPhaseList.push_back(phaseAngle);
+    }
+  }
+
+  /**
     * Set the empirical Minnaert function K exponent list.  This is used to
     * govern the limb-darkening in the Minnaert photometric function.  Values
     * of the Minnaert exponent generally fall in the range from 0.5 ("lunar-like",
     * almost no limb darkening) to 1.0 (Lambert function).  This
     * parameter is limited to values that are >=0.
     *
-    * @param klist  List of Minnaert function exponents to interpolate
+    * @param kstrlist  List of Minnaert function exponents to interpolate
     */
   void MinnaertEmpirical::SetPhotoKList(QString kstrlist) {
     double kvalue;
@@ -118,6 +150,29 @@ namespace Isis {
   }
 
   /**
+    * Set the empirical Minnaert function K exponent list.  This is used to
+    * govern the limb-darkening in the Minnaert photometric function.  Values
+    * of the Minnaert exponent generally fall in the range from 0.5 ("lunar-like",
+    * almost no limb darkening) to 1.0 (Lambert function).  This
+    * parameter is limited to values that are >=0.
+    *
+    * @param kstrList  PvkKeyword containing List of Minnaert function exponents to interpolate
+    */
+  void MinnaertEmpirical::SetPhotoKList(PvlKeyword kstrList) {
+
+    // If the format is Keyword="1,2,3,4,5" rather than Keyword = (1,2,3,4,5) 
+    if (kstrList.size() == 1) {
+      SetPhotoKList(QString(kstrList));
+      return;
+    }
+
+    p_photoKList.clear();
+    for (int i=0; i<kstrList.size(); i++) {
+      p_photoKList.push_back(kstrList[i].toDouble());
+    }
+  }
+
+  /**
     * Set the empirical Minnaert function phase curve list.  This list provides
     * the brightness values that correspond to the limb-darkening values in the
     * empirical Minnaert photometric function.
@@ -132,6 +187,28 @@ namespace Isis {
     while (strlist.length()) {
       phasecurve = strlist.Token(",");
       p_photoPhaseCurveList.push_back(phasecurve);
+    }
+  }
+
+  /**
+    * Set the empirical Minnaert function phase curve list.  This list provides
+    * the brightness values that correspond to the limb-darkening values in the
+    * empirical Minnaert photometric function.
+    *
+    * @param phasecurvelist  PvlKeyword containing list of brightness values corresponding 
+    * to Minnaert function exponents
+    */
+  void MinnaertEmpirical::SetPhotoPhaseCurveList(PvlKeyword photocurvestrList) {
+
+    // If the format is Keyword="1,2,3,4,5" rather than Keyword = (1,2,3,4,5) 
+    if (photocurvestrList.size() == 1) {
+      SetPhotoPhaseCurveList(QString(photocurvestrList));
+      return;
+    }
+
+    p_photoPhaseCurveList.clear();
+    for (int i=0; i<photocurvestrList.size(); i++) {
+      p_photoPhaseCurveList.push_back(photocurvestrList[i].toDouble());
     }
   }
 

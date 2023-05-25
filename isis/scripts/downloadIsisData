@@ -11,21 +11,39 @@ import tempfile
 from shutil import which
 from os import path
 from collections import OrderedDict
+from pathlib import Path
+import sys
+import re
 
-SOURCE_PATH = {
-    "naifKernels": "kernels",
-    "pck": "kernels/pck",
-    "ck":"kernels/ck",
-    "spk":"kernels/spk",
-    "fk": "kernels/fk",
-    "iak":"kernels/iak",
-    "sclk":"kernels/sclk",
-    "tspk":"kernels/tspk",
-    "usgs":""
-}
+# priority is: lowest index is highest priority 
+filter_list = [
+        '+ calibration/**' # we generally want everything in calibration 
+        '- source/',
+        '- /a_older_versions/',
+        '- /former_versions/',
+        '- corrupt_files/',
+        '- zzarchive/',
+        '- /original/',
+        '- ck/prime_mission/',
+        '- extended_mission/',
+        '- /prime_mission/',
+        '- ck/GEM/',
+        '- ck/save/',
+        '- spk/SAVE_SCS_2017-11-22/',
+        '- spk/spk_psp_rec*',
+        '- release*/', 
+        '- Archive/',
+        '- ek/',
+        '- *.lbl',
+        '- *.txt',
+        '- misc/',
+        '- document/',
+        '- *.csv',
+        '- toolkit/',
+        '- kernels_ORG/'
+    ]
 
 def find_conf():
-    from pathlib import Path
     local_path = Path("rclone.conf")
     # this should be installed in scripts folder, so config is one directory up in etc 
     install_path = Path(os.path.dirname(__file__)) / '..' / "etc" / "isis" / 'rclone.conf'
@@ -54,28 +72,19 @@ def call_subprocess(command, redirect_stdout=True, redirect_stderr=False):
             command,
             stdout=stdout,
             stderr=stderr) as proc:
-        (out, err) = proc.communicate()
+        return proc.communicate()
+    
 
-        if out:
-            log.debug("Process output: ")
-            log.debug(out.decode())
-        if err:
-            log.warning(err.decode("utf-8").replace("\\n", "\n"))
-
-        return {
-            "code": proc.returncode,
-            "out": out,
-            "error": err
-        }
-
-
-def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_stderr=False):
+def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_stderr=False): 
     try:
         if path.isfile(config):
             log.debug(f"rclone() : using config file {config}")
 
             # this is probably a config file on disk so pass it through
             config_path = config
+
+            for arg in extra_args:
+                arg = re.sub(r'--filter=- ([^ ]+)', r'--filter="- \1"', arg)
             command_with_args = ["rclone", command, f'--config={config_path}', *extra_args]
             log.debug("Invoking : %s", " ".join(command_with_args))
             return call_subprocess(command_with_args, redirect_stdout, redirect_stderr)
@@ -89,6 +98,9 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
                 log.debug(f"USING CONFIG:\n{config}")
 
                 f.write(config.encode())
+
+                for arg in extra_args:
+                    arg = re.sub(r'--filter=- ([^ ]+)', r'--filter="- \1"', arg)
                 command_with_args = ["rclone", command, f"--config={config_path}", *extra_args]
                 return call_subprocess(command_with_args, redirect_stdout, redirect_stderr)
     except ProcessLookupError as not_found_e:
@@ -99,48 +111,60 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
         log.exception(message)
         raise Exception(message)
 
-
-def get_kernel_destination_path(source_type):
-
-    try:
-        source_path = SOURCE_PATH.get(source_type)
-    except KeyError as e:
-        
-        raise KeyError(f"kernel path not found. Source type {source_type} is invalid")
-
-    log.debug(f"source path for {source_type} is {source_path}" )
-    return source_path
-
-
-def create_rclone_arguments(destination, mission_name, ntransfers=10, rclone_kwargs=[]):
+def create_rclone_arguments(destination, mission_name, parsedArgs, rclone_kwargs=[]):
     """
     Parameters
     ----------
 
-    destination str
-            path to location where files will be copied/downloaded too
+    destination : str
+        path to location where files will be copied/downloaded too
 
     set_of_pub : set(str)
-            set of kernels that will be downloaded
+        set of kernels that will be downloaded
     """
     log.debug(f"Creating RClone command for {mission_name}")
     mission_dir_name, source_type = mission_name.replace(":", "").split("_")
+    
     if (mission_dir_name == "legacybase"):
         # We still want things to go into base
         mission_dir_name = "base"
+        
     log.debug(f"Mission_dir_name: {mission_dir_name}, source_type: {source_type}")
 
     destination = os.path.join(destination, str(mission_dir_name).replace(":",""))
-    #add kernel directory path if needed
-    destination = os.path.join(destination, get_kernel_destination_path(source_type))
-    extra_args=[f"{mission_name}",f"{destination}", "--progress", f"--checkers={ntransfers}", f"--transfers={ntransfers}", "--track-renames", f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
+    if source_type == "naifKernels":
+        destination = os.path.join(destination, "kernels")
 
-    extra_args.extend(rclone_kwargs)
+    if args.filter: 
+        filters = [f"- {arg}" for arg in args.filters]
+        filter_list.extend(filters)    
+
+    # Check for additional include and exclude flags
+    if args.include:
+        includes = [f"+ {arg}" for arg in args.include]
+        filter_list.extend(includes)
+
+    if args.exclude: 
+        excludes = [f"- {arg}" for arg in args.exclude]
+        filter_list.extend(excludes)    
+
+    # we need to add this to the end  
+    if args.include: 
+        filter_list.append("- *")
+
+    filter_args = [f'--filter={item}' for item in filter_list]
+    extra_args = [f"{mission_name}",
+                  f"{destination}", 
+                  "--progress",
+                  f"--checkers={parsedArgs.num_transfers}",
+                  f"--transfers={parsedArgs.num_transfers}",
+                  "--track-renames",
+                  f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
+    extra_args.extend(filter_args)
     log.debug(f"Args created: {extra_args}")
     return extra_args
-
-
-def main(mission, dest, cfg_path, ntransfers, kwargs):
+    
+def main(mission, dest, cfg_path, parsedArgs, kwargs):
     """
     Parameters
     ----------
@@ -156,10 +180,10 @@ def main(mission, dest, cfg_path, ntransfers, kwargs):
           
     """
     log.info("---Script starting---")
-
+            
     log.debug(f"Using config: {cfg_path}")
     result = rclone("listremotes", config=cfg_path)
-    config_sources = result.get('out').decode("utf-8").split("\n")
+    config_sources = result[0].decode("utf-8").split("\n")
     if config_sources == ['']:
         log.error("Remote sources came back empty. Get more info by re-running with verbose flag.")
         quit(-1)
@@ -169,7 +193,7 @@ def main(mission, dest, cfg_path, ntransfers, kwargs):
     for source in sorted(config_sources, key=lambda x: x.split("_")[-1]):
         parsed_name = source.split("_")
         # If it is a mission, it should be in the format <mission_nam>_<source_type>
-        if len(parsed_name) == 2 and parsed_name[1].replace(":","") in SOURCE_PATH.keys():
+        if len(parsed_name) == 2 and parsed_name[1] in ["usgs:", "naifKernels:"]:
             remotes_mission_name = parsed_name[0]
             supported_missions[remotes_mission_name] = supported_missions.get(remotes_mission_name, []) + [source]
 
@@ -180,18 +204,18 @@ def main(mission, dest, cfg_path, ntransfers, kwargs):
         raise LookupError(f"{mission} is not in the list of supported missions: {supported_missions.keys()}")
 
     if mission == "legacybase":
-        args = create_rclone_arguments(dest, "legacybase_usgs:", ntransfers, kwargs)
-        rclone(command="copy", extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
+        args = create_rclone_arguments(dest, "legacybase_usgs:", parsedArgs, kwargs)
+        rclone(command=parsedArgs.command, extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
     elif(mission.upper() == "ALL"):
         supported_missions.pop("legacybase")
         for mission, remotes in supported_missions.items():
             for remote in remotes:
-                args = create_rclone_arguments(dest, remote, ntransfers, kwargs)
-                rclone(command="copy", extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
+                args = create_rclone_arguments(dest, remote, parsedArgs, kwargs)
+                rclone(command=parsedArgs.command, extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
     else:
         for remote in supported_missions[mission]:
-            args = create_rclone_arguments(dest, remote,  ntransfers, kwargs)
-            rclone(command="copy", extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
+            args = create_rclone_arguments(dest, remote,  parsedArgs, kwargs)
+            rclone(command=parsedArgs.command, extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
 
 
 if __name__ == '__main__':
@@ -223,8 +247,13 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='count', default=0)
     parser.add_argument('-n', '--num-transfers', action='store', default=10)
     parser.add_argument('--config', action='store', default=find_conf())
+    parser.add_argument('--filter', help='Additional filters for files', nargs='*')
+    parser.add_argument('--include', help='files and patterns to include while downloading', nargs='*')
+    parser.add_argument('--exclude', help='files and patterns to ignore while downloading', nargs='*')
+    parser.add_argument('-c', '--command', choices=["copy", "sync", "ls", "lsd", "size"], help='files and patterns to ignore while downloading', default="copy")
+
     args, kwargs = parser.parse_known_args()
-    
+ 
     log_kwargs = {
       'format': '%(asctime)s %(levelname)-8s %(message)s',
       'level': log.WARN,
@@ -239,7 +268,7 @@ if __name__ == '__main__':
         log_kwargs['level'] = log.DEBUG
 
     log.basicConfig(**log_kwargs)
-    log.debug("Additional Args:", kwargs)
+    log.debug("args: ", args)
+    log.debug("Additional Args:", *kwargs)
 
-    main(args.mission, args.dest, os.path.expanduser(args.config), args.num_transfers, kwargs)
-
+    main(args.mission, args.dest, os.path.expanduser(args.config), args, kwargs)
