@@ -6,7 +6,9 @@
   </brief>
 
   <description>
-    SOMETHING
+    "Tgocassisrdrgen" is an app that converts CaSSIS cubes, which are 3D images
+    captured by the CaSSIS camera on board the European Space Agency's ExoMars
+    Trace Gas Orbiter, into PDS 4 standard format.
   </description>
 
   <history>
