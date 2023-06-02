@@ -52,6 +52,7 @@ release.
 - Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
 - Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
 - Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
+- Updated documentation for `tgocassisrdrgen` to be more descriptive and accurate.
 - Updated Geos from version 3.7 to 3.9 [#3627](https://github.com/DOI-USGS/ISIS3/issues/3627)
 - Updated Ale to version 0.9.1 [#5209](https://github.com/DOI-USGS/ISIS3/pull/5209)
 - Changed buildCondaRelease.py numpy version from 1.23 to 1.22 to resolve spiceinit warning messages [#5224](https://github.com/DOI-USGS/ISIS3/issues/5224)
