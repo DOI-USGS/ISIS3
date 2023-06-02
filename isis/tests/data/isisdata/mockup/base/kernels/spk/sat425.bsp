@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/base/kernels/spk/sat425.bsp",
+    "filesize": 254218240,
+    "createtime": "2022-08-12T22:13:38.000000",
+    "modifiedtime": "2022-11-24T12:25:28.873070",
+    "md5hash": "9ebc18ef42565274de13119f2dae9caf",
+    "sha256hash": "2120505b93fe2c70f52a399f770a4e75dbb35fb44922ede48a18de71abb2d574",
+    "sha1hash": "5ff7aa22e15b43483918527d1b3d6a579618a79c"
+}

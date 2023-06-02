@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/hayabusa/kernels/spk/hay_jaxa_050916_051119_v1n.bsp",
+    "filesize": 13445120,
+    "createtime": "2022-08-12T22:29:59.000000",
+    "modifiedtime": "2022-11-23T23:37:25.580467",
+    "md5hash": "660d404fe9a8018fee9f71a3be25ecbf",
+    "sha256hash": "89d87303d7f18651e19224c2870673935183a8f3f047892a09a6372ad63bdf48",
+    "sha1hash": "f1d97547551f57c79a37415b1e02c33ef8283db8"
+}

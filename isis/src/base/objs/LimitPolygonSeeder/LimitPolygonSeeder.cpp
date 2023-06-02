@@ -87,7 +87,7 @@ namespace Isis {
         geos::geom::Geometry *gridSquarePolygon = GetMultiPolygon(x - xSpacing / 2.0, y - ySpacing / 2,
             x + xSpacing / 2.0, y + ySpacing / 2, *multiPoly);
 
-        geos::geom::Point *centroid = gridSquarePolygon->getCentroid();
+        geos::geom::Point *centroid = gridSquarePolygon->getCentroid().release();
 
         delete gridSquarePolygon;
         if(centroid == NULL) continue;
@@ -121,7 +121,7 @@ namespace Isis {
   geos::geom::Geometry *LimitPolygonSeeder::GetMultiPolygon(double dMinX, double dMinY,
       double dMaxX, double dMaxY,
       const geos::geom::MultiPolygon &orig) {
-    geos::geom::CoordinateSequence *points = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *points = new geos::geom::CoordinateArraySequence();
 
     points->add(geos::geom::Coordinate(dMinX, dMinY));
     points->add(geos::geom::Coordinate(dMaxX, dMinY));
@@ -130,7 +130,7 @@ namespace Isis {
     points->add(geos::geom::Coordinate(dMinX, dMinY));
 
     geos::geom::Polygon *poly = Isis::globalFactory->createPolygon(Isis::globalFactory->createLinearRing(points), NULL);
-    geos::geom::Geometry *overlap = poly->intersection(&orig);
+    geos::geom::Geometry *overlap = poly->intersection(&orig).release();
 
     return overlap;
   }

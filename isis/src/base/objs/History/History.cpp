@@ -34,7 +34,11 @@ namespace Isis {
     char *blob_buffer = blob.getBuffer();
     p_bufferSize = blob.Size();
     p_histBuffer = new char[p_bufferSize];
-    memcpy(p_histBuffer, blob_buffer, p_bufferSize);
+
+    if (blob_buffer != NULL) {
+      // Copy existing history
+      memcpy(p_histBuffer, blob_buffer, p_bufferSize);
+    }
   }
 
 

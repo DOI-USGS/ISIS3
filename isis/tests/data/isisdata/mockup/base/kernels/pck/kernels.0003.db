@@ -1,0 +1,19 @@
+Object = TargetAttitudeShape
+  Group = Selection
+    File = ("base", "kernels/pck/pck?????.tpc")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Moon")
+    File = ("base", "kernels/pck/pck?????.tpc")
+    File = ("base", "kernels/pck/lunar_de403_1950-2199_pa.bpc")
+    File = ("base", "kernels/fk/lunarMeanEarth???.tf")
+  EndGroup
+
+  Group = Selection
+    Match = ("Instrument","TargetName","Mercury")
+    File = ("base", "kernels/pck/pck00010_msgr_v??.tpc")
+  EndGroup
+EndObject
+
+
