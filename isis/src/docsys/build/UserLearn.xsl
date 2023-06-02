@@ -164,10 +164,10 @@ Deborah Lee Soltesz
             <td style="width:33%">
               <h4>General Image Processing Tutorials</h4>
               <p>
-                <a href="https://usgs-astrogeology.github.io/ISIS3/The_Power_of_Spatial_Filters.html">
+                <a href="https://doi-usgs.github.io/ISIS3/The_Power_of_Spatial_Filters.html">
                 The Power of Spatial Filters</a><br/>
                 A description of spatial filter applications in ISIS and common use cases.<br/>
-                <a href="https://usgs-astrogeology.github.io/ISIS3/Removing_Striping_Noise_from_Image_Data.html">
+                <a href="https://doi-usgs.github.io/ISIS3/Removing_Striping_Noise_from_Image_Data.html">
                 Removing Striping Noise from Image Data</a><br/>
                 Procedures for removing horizontal or vertical noise in an image.
               </p>
@@ -176,16 +176,16 @@ Deborah Lee Soltesz
             <td style="width:33%">
               <h4>Interactive Tool Demos</h4>
               <p>
-                <a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/972/Qnet.pdf">
+                <a href="https://raw.githubusercontent.com/wiki/DOI-USGS/ISIS3/attachments/download/972/Qnet.pdf">
                 Qnet</a><br/>
                 An interactive tool to create and edit control networks.<br/>
-                <a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/974/Qtie.pdf">
+                <a href="https://raw.githubusercontent.com/wiki/DOI-USGS/ISIS3/attachments/download/974/Qtie.pdf">
                 Qtie</a><br/>
                 An interactive tool to update the camera geometry of a single cube.<br/>
-                <a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/975/Qview.pdf">
+                <a href="https://raw.githubusercontent.com/wiki/DOI-USGS/ISIS3/attachments/download/975/Qview.pdf">
                 Qview</a><br/>
                 An interactive tool to display and analyze cubes.<br/>
-                <a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/976/Qmos.pdf">
+                <a href="https://raw.githubusercontent.com/wiki/DOI-USGS/ISIS3/attachments/download/976/Qmos.pdf">
                 Qmos</a><br/>
                 An interactive tool to display and analyze cube footprints.
               </p>
@@ -194,10 +194,10 @@ Deborah Lee Soltesz
             <td style="width:33%">
               <h4>Cartography Concepts</h4>
               <p>
-                <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">
+                <a href="https://github.com/DOI-USGS/ISIS3/wiki/Learning_About_Map_Projections">
                 Learning About Map Projection</a><br/>
                 An introduction to map projections and utilizing them in ISIS.<br/>
-                <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Camera_Geometry">
+                <a href="https://github.com/DOI-USGS/ISIS3/wiki/Camera_Geometry">
                 Camera Geometry</a><br/>
                 A description of camera geometry within ISIS and some of the ISIS applications that have access to it.
               </p>
@@ -248,7 +248,7 @@ Deborah Lee Soltesz
             <h4>Moon</h4>
             <dl>
               <dt>Lunar Reconnaissance Orbiter</dt>
-              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data">
+              <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data">
               MiniRF</a></dd>
             </dl>
           </td>
@@ -256,19 +256,19 @@ Deborah Lee Soltesz
           <td style="width:33%">
             <h4>Mars</h4>
             <dl>
-              <dt><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_(MRO)_Data">
+              <dt><a href="https://github.com/DOI-USGS/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_(MRO)_Data">
               Mars Reconnaissance Orbiter</a></dt>
-                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_HiRISE_Data">
+                <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_HiRISE_Data">
                 High Resolution Imaging Science Experiment (HiRise)</a></dd>
-                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_CTX_Data">
+                <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_CTX_Data">
                 Context Imager (CTX)</a></dd>
-              <dt><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Mars_Global_Surveyor_Mission">
+              <dt><a href="https://github.com/DOI-USGS/ISIS3/wiki/Mars_Global_Surveyor_Mission">
               Mars Global Surveyor</a></dt>
-                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Orbiter_Camera_Data">
+                <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Working_with_Mars_Orbiter_Camera_Data">
                 Mars Orbiter Camera (MOC)</a></dd>
-              <dt><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Viking_Orbiter_Mission">
+              <dt><a href="https://github.com/DOI-USGS/ISIS3/wiki/Viking_Orbiter_Mission">
               Mars Viking Orbiter</a></dt>
-                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Viking_Orbiter_Data">
+                <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Working_with_Mars_Viking_Orbiter_Data">
                 Narrow Angle Camera (NAC) and Wide Angle Camera (WAC)</a></dd>
             </dl>
           </td>
@@ -276,13 +276,13 @@ Deborah Lee Soltesz
           <td style="width:33%">
             <h4>Other</h4>
             <dl>
-              <dt><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/CSS">
+              <dt><a href="https://github.com/DOI-USGS/ISIS3/wiki/CSS">
               Cassini-Huygens</a></dt>
-                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_ISS_Data">
+                <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Working_with_Cassini_ISS_Data">
                 Imaging Science Subsystem (ISS)</a></dd>
-                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_RADAR">
+                <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Working_with_Cassini_RADAR">
                 Radar</a></dd>
-                <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_VIMS">
+                <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Working_with_Cassini_VIMS">
                 Visual and Infrared Mapping Spectrometer (VIMS)</a></dd>
             </dl>
           </td>

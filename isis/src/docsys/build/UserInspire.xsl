@@ -105,7 +105,7 @@ Deborah Lee Soltesz
               </p>
               <p>
                 If you have examples you would like to add to this page, submit a pull request on
-                <a href="https://github.com/USGS-Astrogeology/ISIS3">GitHub</a>!
+                <a href="https://github.com/DOI-USGS/ISIS3">GitHub</a>!
               </p>
             </td>
             <td align="right" class="caption">
