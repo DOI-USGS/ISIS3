@@ -1,5 +1,5 @@
 # What is this document?
-This is the companion to the core SpicePosition requirements [document](https://github.com/USGS-Astrogeology/ISIS3/wiki/SpicePosition-requirements). This document contains every public method that is not mentioned in the other document. This will be an evolving document where we can collect what each method does, where it is used, and why it is used.
+This is the companion to the core SpicePosition requirements [document](https://github.com/DOI-USGS/ISIS3/wiki/SpicePosition-requirements). This document contains every public method that is not mentioned in the other document. This will be an evolving document where we can collect what each method does, where it is used, and why it is used.
 
 # Methods
 

@@ -6,7 +6,7 @@ Quick rundown of what LTS entails:
 - An LTS version is supported for at least 18 months before End of Life (EoL)
 - At maximum **two** LTS versions to support concurrently 
 
-For a more in-depth overview regarding our LTS approach, check out [RFC8 - ISIS Long Term Support](https://github.com/USGS-Astrogeology/ISIS3/discussions/4691).
+For a more in-depth overview regarding our LTS approach, check out [RFC8 - ISIS Long Term Support](https://github.com/DOI-USGS/ISIS3/discussions/4691).
 
 # Instructions to Create a New LTS Release
 * Tag the Feature Release as `LTS`

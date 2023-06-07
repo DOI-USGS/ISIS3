@@ -1,7 +1,7 @@
 - Feature/Process Name: Migration of ISIS Data to Git
 - Start Date: 5.21.19
-- RFC PR: [#3804](https://github.com/USGS-Astrogeology/ISIS3/pull/3804)
-- Issue: [#3727](https://github.com/USGS-Astrogeology/ISIS3/issues/3727)
+- RFC PR: [#3804](https://github.com/DOI-USGS/ISIS3/pull/3804)
+- Issue: [#3727](https://github.com/DOI-USGS/ISIS3/issues/3727)
 - Author: Laura
 
 # Updates

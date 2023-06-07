@@ -13,7 +13,7 @@ been replaced and is no longer available to report issues.
 
 To ask questions please use our discussion server
 <https://astrodiscuss.usgs.gov/> and to report issues go to the GitHub
-repository <https://github.com/USGS-Astrogeology/ISIS3/issues> .
+repository <https://github.com/DOI-USGS/ISIS3/issues> .
 
 </div>
 

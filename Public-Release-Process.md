@@ -23,14 +23,14 @@ In this step we will update the documents that are stored in the Github reposito
 ### Part A: Collecting the Changes in the Release
 
 * Update the Changelog 
-  * For release candidates we need to update the Changelog to label all of the currently unreleased changes as part of this release. Follow the instructions in [CHANGELOG.md](https://raw.githubusercontent.com/USGS-Astrogeology/ISIS3/dev/CHANGELOG.md) for how to do this.
-  * For bug fix releases we need to update the Changelog to label **only the bug fixes** as part of this release. Follow the instructions in [CHANGELOG.md](https://raw.githubusercontent.com/USGS-Astrogeology/ISIS3/dev/CHANGELOG.md) for how to do this.
+  * For release candidates we need to update the Changelog to label all of the currently unreleased changes as part of this release. Follow the instructions in [CHANGELOG.md](https://raw.githubusercontent.com/DOI-USGS/ISIS3/dev/CHANGELOG.md) for how to do this.
+  * For bug fix releases we need to update the Changelog to label **only the bug fixes** as part of this release. Follow the instructions in [CHANGELOG.md](https://raw.githubusercontent.com/DOI-USGS/ISIS3/dev/CHANGELOG.md) for how to do this.
 * Update code.json with the new version number and the date last modified.
   
 
 ### Part B: Update the Authors List 
 
-* If there are any new contributors to the project since the last release ensure that they are added to the [.zenodo.json](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/.zenodo.json) document, and update the `AUTHORS.rst` file from the .zenodo.json file by running `python $ISISROOT/scripts/zenodo_to_authors.py <path_to_your_clone>/.zenodo.json <path_to_your_clone>/AUTHORS.rst`.
+* If there are any new contributors to the project since the last release ensure that they are added to the [.zenodo.json](https://github.com/DOI-USGS/ISIS3/blob/dev/.zenodo.json) document, and update the `AUTHORS.rst` file from the .zenodo.json file by running `python $ISISROOT/scripts/zenodo_to_authors.py <path_to_your_clone>/.zenodo.json <path_to_your_clone>/AUTHORS.rst`.
 
 
 ### Part C: Submit a Pull Request
@@ -191,7 +191,7 @@ After the conda build completes, it should be tested by uploading it to your per
 
 * Use the command ```anaconda upload -u <conda-cloud-username> <path-to-the-.tar.bz2-file>``` to upload the conda build to your personal anaconda channel. 
 
-* Follow the standard [installation instructions](https://github.com/USGS-Astrogeology/ISIS3#isis3-installation-with-conda) to install this package locally for testing, but at the installation step, instead of running `conda install -c usgs-astrogeology isis`, run `conda install -c <conda-cloud-username> -c usgs-astrogeology isis`  
+* Follow the standard [installation instructions](https://github.com/DOI-USGS/ISIS3#isis3-installation-with-conda) to install this package locally for testing, but at the installation step, instead of running `conda install -c usgs-astrogeology isis`, run `conda install -c <conda-cloud-username> -c usgs-astrogeology isis`  
 
 * Run an ISIS application, like `spiceinit -h` and insure that it runs without error. This is testing whether the conda environment set up during the install is complete enough to run ISIS.   
 
@@ -247,7 +247,7 @@ This step covers creating the builds and the installation environments of ISIS f
 
 ### Part B: Installing ISIS 
 
-* Follow the standard [installation instructions](https://github.com/USGS-Astrogeology/ISIS3#isis3-installation-with-conda) to install the latest version of ISIS into a new environment. 
+* Follow the standard [installation instructions](https://github.com/DOI-USGS/ISIS3#isis3-installation-with-conda) to install the latest version of ISIS into a new environment. 
 
     * For a standard release, the environment should be named `isisX.Y.Z`. 
 
@@ -271,7 +271,7 @@ This step will update the ISIS documentation on our [website](https://isis.astro
 ### Part A: Build the documentation 
 
 
-* Perform a local build (not a conda build) using the instructions available [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake) 
+* Perform a local build (not a conda build) using the instructions available [here](https://github.com/DOI-USGS/ISIS3/wiki/Developing-ISIS3-with-cmake) 
 
 * setisis to the build directory from [Step 3 Part A](#part-a-setup-repository). 
 
@@ -305,7 +305,7 @@ This step will will communicate that a new version of ISIS is available.
 ## How to install or update to <X.Y.Z> 
 
 
-Installation instructions of ISIS can be found in the README on our [github page ](https://github.com/USGS-Astrogeology/ISIS3). 
+Installation instructions of ISIS can be found in the README on our [github page ](https://github.com/DOI-USGS/ISIS3). 
 
 
 If you already have a version of ISIS 4.0.0 or later installed in an anaconda environment, you can update to <X.Y.Z> by activating your existing isis conda environment and running `conda update isis` . 
@@ -339,7 +339,7 @@ The following operating systems are supported for this release:
 (Other Linux/macOS variants may be able to run this release, but are not officially supported.) 
 
 
-If you find a problem with this release, please create an issue on our [github issues page](https://github.com/USGS-Astrogeology/ISIS3/issues/new/choose/) 
+If you find a problem with this release, please create an issue on our [github issues page](https://github.com/DOI-USGS/ISIS3/issues/new/choose/) 
 
 ``` 
 
@@ -366,7 +366,7 @@ There are some important considerations to keep in mind when using this release 
 
 ## Step 12: Update the Release Schedule
 
-Update the [release schedule](https://github.com/USGS-Astrogeology/ISIS3/wiki/Release-Schedule) with the date of the release and update any future releases with the appropriate dates. Releases should be nominally 3 months apart.
+Update the [release schedule](https://github.com/DOI-USGS/ISIS3/wiki/Release-Schedule) with the date of the release and update any future releases with the appropriate dates. Releases should be nominally 3 months apart.
 
 
 ## Problems 

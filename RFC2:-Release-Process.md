@@ -1,7 +1,7 @@
 - Feature/Process Name: ISIS3 Release Process
 - Start Date: 1.18.19
 - RFC PR: (empty until a PR is opened)
-- Issue: https://github.com/USGS-Astrogeology/ISIS3/issues/684
+- Issue: https://github.com/DOI-USGS/ISIS3/issues/684
 - Author: jlaura
 - **Status: This RFC has been adopted as the release cadence.**
 
@@ -60,7 +60,7 @@ As described above, we will release on a three month cadence. Releases will be l
 | 3.11.x | Release | 4.30.20 |
 
 ## Bug Fixes
-In isolation, the above release model would require that bug fixes be deployed on the same three month cadence as feature releases. This pace is unreasonably long as contributors (issue openers, issue commenters, and PR creators) wish to see their bug fixes in a release as soon as is reasonably possible. The recent changes in how ISIS3 is built and [deployed](https://github.com/USGS-Astrogeology/ISIS3#installation) have allowed the development team to streamline the creation and release of binaries. In line with the above versioning discussion, the ISIS3 software will be compiled and uploaded to the Anaconda.org cloud provider with each bug fix. This implies a number of things
+In isolation, the above release model would require that bug fixes be deployed on the same three month cadence as feature releases. This pace is unreasonably long as contributors (issue openers, issue commenters, and PR creators) wish to see their bug fixes in a release as soon as is reasonably possible. The recent changes in how ISIS3 is built and [deployed](https://github.com/DOI-USGS/ISIS3#installation) have allowed the development team to streamline the creation and release of binaries. In line with the above versioning discussion, the ISIS3 software will be compiled and uploaded to the Anaconda.org cloud provider with each bug fix. This implies a number of things
 
   - each fix increments the PATCH version of ISIS3. 
   - each fix is applied in isolation.

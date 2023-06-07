@@ -12,18 +12,16 @@
 
 # ISIS Online Workshops [¶](#ISIS-Online-Workshops-)
 
-  - [ISIS Online Workshops](#ISIS-Online-Workshops-)
-      - [Welcome to the ISIS Training
-        Workshop](#Welcome-to-the-ISIS-Training-Workshop-)
-      - [Fundamentals](#Fundamentals-)
-      - [General Image Processing](#General-Image-Processing-)
-      - [Cartography](#Cartography-)
-      - [Advanced](#Advanced-)
-      - [Mission Specific ISIS3
-        Processing](#Mission-Specific-ISIS3-Processing-)
-      - [Programming in ISIS3](#Programming-in-ISIS3-)
-      - [Demonstration Material](#Demonstration-Material-)
-	  - [Workshops](#Workshops-)
+- [ISIS Online Workshops ¶](#isis-online-workshops-)
+  - [Welcome to the ISIS Training Workshop ¶](#welcome-to-the-isis-training-workshop-)
+  - [Fundamentals ¶](#fundamentals-)
+  - [General Image Processing ¶](#general-image-processing-)
+  - [Cartography ¶](#cartography-)
+  - [Advanced ¶](#advanced-)
+  - [Mission Specific ISIS3 Processing ¶](#mission-specific-isis3-processing-)
+  - [Programming in ISIS3 ¶](#programming-in-isis3-)
+  - [Demonstration Material ¶](#demonstration-material-)
+  - [Workshops ¶](#workshops-)
 
 <span id="Welcome-to-the-ISIS-Training-Workshop"></span>
 
@@ -57,15 +55,15 @@ Notes
     Data](Locating_and_Ingesting_Image_Data) : Overview of finding image
     data and importing it into ISIS3
   - [ISIS Cube
-    Format](https://USGS-Astrogeology.github.io/ISIS3/ISIS_Cube_Format.html)
+    Format](https://DOI-USGS.github.io/ISIS3/ISIS_Cube_Format.html)
     : Understanding the ISIS3 image cube format
   - [Understanding Bit Types](Understanding_Bit_Types) : Introduction to
     image data bit types
   - [Core Base and
-    Multiplier](https://USGS-Astrogeology.github.io/ISIS3/Core_Base_and_Multiplier.html)
+    Multiplier](https://DOI-USGS.github.io/ISIS3/Core_Base_and_Multiplier.html)
     : Understanding core base and multiplier ISIS3 cube attributes
   - [Special
-    Pixels](https://USGS-Astrogeology.github.io/ISIS3/Special_Pixels.html)
+    Pixels](https://DOI-USGS.github.io/ISIS3/Special_Pixels.html)
     : Understanding what special pixels are and how they are used in
     ISIS3
 
@@ -74,10 +72,10 @@ Notes
 ## General Image Processing [¶](#General-Image-Processing-)
 
   - [The Power of Spatial
-    Filters](https://USGS-Astrogeology.github.io/ISIS3/The_Power_of_Spatial_Filters.html)
+    Filters](https://DOI-USGS.github.io/ISIS3/The_Power_of_Spatial_Filters.html)
     : Introduction to spatial filters
   - [Removing Striping Noise from Image
-    Data](https://USGS-Astrogeology.github.io/ISIS3/Removing_Striping_Noise_from_Image_Data.html)
+    Data](https://DOI-USGS.github.io/ISIS3/Removing_Striping_Noise_from_Image_Data.html)
     : General destriping procedure
   - [GeneralUtility- **fx**](General_Utility) : Apply arithmetic
     operations with the
@@ -148,7 +146,7 @@ Notes
 
   - [Demonstrations of ISIS3 Interactive Tools](ISIS_Demo)
   - [Example ISIS
-    Demos](https://USGS-Astrogeology.github.io/ISIS3/Example_ISIS_Demos.html)
+    Demos](https://DOI-USGS.github.io/ISIS3/Example_ISIS_Demos.html)
 	
 ## Workshops [¶](#Workshops-)
   - [ISIS Training 2016](ISIS_Training_2016)

@@ -1,7 +1,7 @@
 - Action Name: Remove Old LOLA/GRAIL SPKs
 - Start Date: 2020-02-18
 - RFC PR: (empty until a PR is opened)
-- Issue: [https://github.com/USGS-Astrogeology/ISIS3/issues/3689](https://github.com/USGS-Astrogeology/ISIS3/issues/3689) (Please comment here!)
+- Issue: [https://github.com/DOI-USGS/ISIS3/issues/3689](https://github.com/DOI-USGS/ISIS3/issues/3689) (Please comment here!)
 - Author: Stuart Sides
 
 # Summary

@@ -355,8 +355,8 @@ Scope - 500 PersonHours
 * In ISIS3, do not modify the Spice class or spiceinit 
 * ISIS handles all kernel loading and unloading
    * ALE just makes SPICE calls to query data
-* In ISIS3, keep the API of the SpicePosition and SpiceRotation classes, but change the underlying implementation to use ALE (See: https://github.com/USGS-Astrogeology/ISIS3/wiki/SpicePosition-requirements)
-   * Add any functionality to ale which is necessary to do this (See: https://github.com/USGS-Astrogeology/ale/labels/required)
+* In ISIS3, keep the API of the SpicePosition and SpiceRotation classes, but change the underlying implementation to use ALE (See: https://github.com/DOI-USGS/ISIS3/wiki/SpicePosition-requirements)
+   * Add any functionality to ale which is necessary to do this (See: https://github.com/DOI-USGS/ale/labels/required)
 Benefits
 * We already have a proof-of-concept PR that demonstrates that SpicePosition::SetEphemerisTimePolyFunction() works with some of the existing code replaced with ale::getPosition() and ale::getVelocity().
 * Maintain a single library for generating exterior orientation that can be used in USGS CSM and ISIS

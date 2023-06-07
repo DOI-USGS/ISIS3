@@ -1,6 +1,6 @@
 These are alpha instructions describing how to install ISIS3 via the cross platform [Anaconda package manager](https://conda.io/docs/). These instructions have been tested in linux environments; we do not yet support OS X using this method. The below has also been tested on windows using the Ubuntu subsystem!
 
-If you test this method and run into any issues, please [open an issue](https://github.com/USGS-Astrogeology/ISIS3/issues/new)
+If you test this method and run into any issues, please [open an issue](https://github.com/DOI-USGS/ISIS3/issues/new)
 
 ```
 #first also need libGL in system
@@ -47,7 +47,7 @@ Here is an example use case. This is 'regular old ISIS3' from here on out.
 ```
 mkdir ~/isis3_test
 cd ~/isis3_test
-wget https://raw.githubusercontent.com/USGS-Astrogeology/ISIS3_scripts/master/MRO_CTX_process_all/CTX_process_all.csh
+wget https://raw.githubusercontent.com/DOI-USGS/ISIS3_scripts/master/MRO_CTX_process_all/CTX_process_all.csh
 wget -nd http://pdsimage.wr.usgs.gov/Missions/Mars_Reconnaissance_Orbiter/CTX/mrox_0674/data/P22_009816_1745_XI_05S073W.IMG
 printf "Group = Mapping\n  ProjectionName  = SimpleCylindrical\n   CenterLongitude = 0.0\n  CenterLatitude  = 0.0\nEnd_Group\nEnd" > simp0.map
 csh CTX_process_all.csh simp0.map  0

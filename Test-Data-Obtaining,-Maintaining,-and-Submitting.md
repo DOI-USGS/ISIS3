@@ -7,10 +7,10 @@ Application and module tests are regression tests designed to test all of the fu
 ### Setting Up an ISIS Development Environment
 In order to run existing tests and develop new tests a full development environment is required. The public releases do not contain the tests or test data or the source code for the tests. Follow these steps to get a working ISIS development environment with all of the data.
 
-1) Fork the ISIS source code repository (https://github.com/USGS-Astrogeology/ISIS3)
+1) Fork the ISIS source code repository (https://github.com/DOI-USGS/ISIS3)
 1) Get the ISIS source code on your local machine by cloning your fork
-1) Build the ISIS library and applications (https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake)
-1) Download the ISIS data files see the [Full ISIS3 Data Download](https://gith**ub.com/USGS-Astrogeology/ISIS3). **NOTE: Be careful where you put the ISISDATA area. It is several hundred GB and growing.**
+1) Build the ISIS library and applications (https://github.com/DOI-USGS/ISIS3/wiki/Developing-ISIS3-with-cmake)
+1) Download the ISIS data files see the [Full ISIS3 Data Download](https://gith**ub.com/DOI-USGS/ISIS3). **NOTE: Be careful where you put the ISISDATA area. It is several hundred GB and growing.**
 
 ### Downloading Test Data
 ISIS unit and regression tests require the data and test data directories to be available and their respective environment variables (ISISDATA, ISIS3TESTDATA) be set. This allows the tests to read files from these areas and compare results to known truth data. The ISIS tests data is currently distributed using rsync servers, but work is underway to put the test data under full version control in a Git repository. To download all of the test data, use a terminal window, set your current working directory to where you want the test data to be stored, and use the rsync command below to copy it to your computer:
@@ -46,6 +46,6 @@ Efforts are underway to make all of the test data available in a publicly access
 If you are writing or modifying ISIS library classes or applications it is required they be well tested. This may include modifications to existing test data and/or new test data. Once a GitHub pull request has been created for ISIS source code changes the data needs to be made available to USGS personnel through a web or ftp link. If this is not an option for you, please contact the USGS through the [discussion forum](https://astrodiscuss.usgs.gov/) and we can make other arrangements.
 
 ## Where to go now
-* Running tests (https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests)
-* Writing Unit Tests (https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests)
-* Writing Application and Module Tests (https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests)
+* Running tests (https://github.com/DOI-USGS/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests)
+* Writing Unit Tests (https://github.com/DOI-USGS/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests)
+* Writing Application and Module Tests (https://github.com/DOI-USGS/ISIS3/wiki/Developing-ISIS3-with-cmake#running-tests)

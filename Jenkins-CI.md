@@ -1,6 +1,6 @@
 # Jenkins Pipeline
 
-Most of the build process is specified in a groovy script: https://github.com/USGS-Astrogeology/ISIS3/blob/dev/Jenkinsfile
+Most of the build process is specified in a groovy script: https://github.com/DOI-USGS/ISIS3/blob/dev/Jenkinsfile
 
 Refer to this for syntax: https://jenkins.io/doc/book/pipeline/syntax/
 
@@ -24,7 +24,7 @@ To specify a container for use in a Jenkins pipeline, label your agent with one 
 * isis-debian-9
 * isis-centos-7
 
-The labels above tell the Jenkins server that you want to create your agent using a USGS-Astrogeology Docker image. We currently maintain containers specs for building isis on the systems listed above. Their Dockerfiles can be found here: [link](https://github.com/USGS-Astrogeology/docker_linux_isisdeps/tree/master/jenkins)
+The labels above tell the Jenkins server that you want to create your agent using a DOI-USGS Docker image. We currently maintain containers specs for building isis on the systems listed above. Their Dockerfiles can be found here: [link](https://github.com/DOI-USGS/docker_linux_isisdeps/tree/master/jenkins)
 
 These files are automatically pulled and built for DockerHub whenever new changes are made. Their images can be found here: [link](https://hub.docker.com/r/usgsastro/docker_linux_isisdeps/)
 

@@ -1,12 +1,14 @@
 - [Creating a new test suite](#creating-a-new-test-suite)
+  - [For a Class](#for-a-class)
+  - [For an Application](#for-an-application)
 - [Test names](#test-names)
   - [Basic tests](#basic-tests)
-  - [Test fixtures](#test-fixtures-1)
+  - [Test fixtures](#test-fixtures)
   - [Parameterized tests](#parameterized-tests)
 - [General Testing Tips](#general-testing-tips)
   - [Testing exceptions](#testing-exceptions)
   - [Testing floating point numbers](#testing-floating-point-numbers)
-  - [Test fixtures](#test-fixtures)
+  - [Test fixtures](#test-fixtures-1)
   - [Test parameterization](#test-parameterization)
 - [Refactoring ISIS3 Applications](#refactoring-isis3-applications)
   - [Creating a basic callable function](#creating-a-basic-callable-function)
@@ -128,7 +130,7 @@ This is a first step towards several places:
 
 ## Creating a basic callable function
 
-For the rest of this document, we will use `appname` as the name of the application that is being worked on. Simple example at https://github.com/USGS-Astrogeology/ISIS3/tree/dev/isis/src/base/apps/crop 
+For the rest of this document, we will use `appname` as the name of the application that is being worked on. Simple example at https://github.com/DOI-USGS/ISIS3/tree/dev/isis/src/base/apps/crop 
 
 1. In the `appname` folder create two new files, `appname.cpp` and `appname.h`. These files are where the application logic will live.
 1. In `appname.h` and `appname.cpp` create a new function in the `Isis` namespace with the following signature `void appname(UserInterface &ui)`. If the application has a `from` cube, add a second function with the input cube as the first argument `void appname(Cube incube, UserInterface &ui)`. 

@@ -6,8 +6,8 @@ __As a user__: ISIS releases are distributed using the Anaconda package manager.
 
 __As a developer__: Anaconda is also used to maintain ISIS dependencies, so we generally advise developers to use Anaconda environments and provided environment files to build ISIS. You can find the instructions [here][9].
 
-[8]: https://github.com/USGS-Astrogeology/ISIS3/blob/dev/README.md#isis3-installation-with-conda
-[9]: https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake
+[8]: https://github.com/DOI-USGS/ISIS3/blob/dev/README.md#isis3-installation-with-conda
+[9]: https://github.com/DOI-USGS/ISIS3/wiki/Developing-ISIS3-with-cmake
 
 
 ## How do I install a specific version of ISIS/update my current copy of ISIS?
@@ -31,7 +31,7 @@ Info on maintaining your anaconda packages:https://docs.conda.io/projects/conda/
 ## How do I keep two different versions of ISIS on my system and switch between them?
 An example of when this functionality may be useful is to test out a release candidate (RC) version of the ISIS3 software (if you have questions about RC’s, click [here][1]). The solution is to use multiple environments. Follow the steps for installing ISIS using a new environment with a different name (e.g. `isis3.9` vs `isis3.9_RC`).
 
-[1]: https://github.com/USGS-Astrogeology/ISIS3/wiki/Release-Schedule
+[1]: https://github.com/DOI-USGS/ISIS3/wiki/Release-Schedule
 
 ## I Installed ISIS but I get “<app>: command not found” or similar error.
 If you successfully installed ISIS with Anaconda, but still get this error, it’s because the installation directory was not added to your PATH. It’s generally not recommended you manually set your PATH to your Anaconda environment and instead should ensure your environment is activated by running “conda activate <isis3 env name>”. 
@@ -52,7 +52,7 @@ Spiceinit attaches kernel information to ingested ISIS cubes for later use in co
 
 These errors can also be remedied by using the [SPICE Web Server][6] (web=true in command line or activating the web check box in GUI). __However__, some instruments require mission data to be present for calibration, which may not be supported by the SPICE Web Server exclusively, and some programs that are designed to run an image from ingestion through the mapping phase do not have an option to use the SPICE Web Service. For information specific to an instrument, see the documentation for radiometric calibration programs. 
 
-If spiceinit fails with “**PROGRAMMER ERROR** No value or default value to translate for translation group [MissionName]”, this is typical behavior in `spiceinit` when `spiceinit` input was output from `pds2isis`. `pds2isis` generates a cube without instrument specific data. Instead use an ingestion app specific to the image’s instrument. See https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data for basic ingestion workflows in ISIS. 
+If spiceinit fails with “**PROGRAMMER ERROR** No value or default value to translate for translation group [MissionName]”, this is typical behavior in `spiceinit` when `spiceinit` input was output from `pds2isis`. `pds2isis` generates a cube without instrument specific data. Instead use an ingestion app specific to the image’s instrument. See https://github.com/DOI-USGS/ISIS3/wiki/Locating_and_Ingesting_Image_Data for basic ingestion workflows in ISIS. 
 
 ## Why is my mission calibration command (‘ctxcal’,’lronaccal’, etc.) producing cubes filled with zero data?
 The default setting for ‘RadiometricType’ on a lot of calibration commands is ‘IOF’ which stands for incidence solar flux. The calculation of this metric requires knowledge of the distance from the target body to the sun. Currently, the SPICE Web Server currently does not attach this information to the cube, so local version of the mission data are still necessary for this calculation. Using ‘RadiometricType=RADIANCE’ will not result in this error. To fix this error, download the base ISIS3 data and the mission specific data:

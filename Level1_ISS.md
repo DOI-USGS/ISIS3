@@ -14,19 +14,16 @@
 
 -----
 
-  - [Level 1 ISS](#Level-1-ISS-)
-      - [ISS Radiometric Calibration](#ISS-Radiometric-Calibration-)
-      - [Noise Removal](#Noise-Removal-)
-      - [Remove random pixel noise](#Remove-random-pixel-noise-)
-  - [\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!ENTER CASSINI ISS JAVASCRIPT
-    WIDGET\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!](#ENTER-CASSINI-ISS-JAVASCRIPT-WIDGET-)
-      - [Fill-in NULL pixels](#Fill-in-NULL-pixels-)
-      - [Random NULL pixels](#Random-NULL-pixels-)
-      - [Truncated lines](#Truncated-lines-)
-      - [Remove frame-edge noise](#Remove-frame-edge-noise-)
-  - [\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!ENTER
-    JAVASCRIPT
-    WIDGET\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!](#ENTER-JAVASCRIPT-WIDGET-)
+- [Level 1 ISS ¶](#level-1-iss-)
+  - [ISS Radiometric Calibration ¶](#iss-radiometric-calibration-)
+  - [Noise Removal ¶](#noise-removal-)
+  - [Remove random pixel noise ¶](#remove-random-pixel-noise-)
+- [**!!!!!!!!!!!!!!!!ENTER CASSINI ISS JAVASCRIPT WIDGET!!!!!!!!!!!!!!!!** ¶](#enter-cassini-iss-javascript-widget-)
+  - [Fill-in NULL pixels ¶](#fill-in-null-pixels-)
+  - [Random NULL pixels ¶](#random-null-pixels-)
+  - [Truncated lines ¶](#truncated-lines-)
+  - [Remove frame-edge noise ¶](#remove-frame-edge-noise-)
+- [**!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ENTER JAVASCRIPT WIDGET!!!!!!!!!!!!!!!!!!!!!!!!!!** ¶](#enter-javascript-widget-)
 
 <span id="ISS-Radiometric-Calibration"></span>
 
@@ -113,7 +110,7 @@ Hit **refresh** if an image is not displayed in black box
 -----
 
   - **Overview of Spacial Filters:** [The Power of Spatial
-    Filters](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html)
+    Filters](https://DOI-USGS.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html)
 
 <span id="Random-NULL-pixels"></span>
 
@@ -127,7 +124,7 @@ by applying the low pass filter application (
 [lowpass](http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/lowpass/lowpass.html)
 ) with specific parameters settings to replace only NULL pixels. See
 [Fill-in Null
-Pixels](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html)
+Pixels](https://DOI-USGS.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html)
 .
 
   - Filling in the random NULL pixels at this stage will also fill-in
@@ -154,7 +151,7 @@ A number of ISS images have truncated lines. These truncated lines will
 contain valid data half way across in the sample direction with lines
 above and below containing valid data across the entire sample
 direction. The method to [Fill-in Null
-Pixels](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html)
+Pixels](https://DOI-USGS.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html)
 using the (
 [lowpass](http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/lowpass/lowpass.html)
 ) application works nicely in this case.
@@ -191,7 +188,7 @@ The
 [trim](http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/trim/trim.html)
 application will replace the specified number of pixels along the edges
 with NULL values ( [What Are Special
-Pixels?](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Special_Pixels.html)
+Pixels?](https://DOI-USGS.github.io/ISIS3/gh-pages/Special_Pixels.html)
 ).
 
 *Hit* ***refresh*** *if an image is not displayed in black box*

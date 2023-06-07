@@ -14,26 +14,23 @@
 
 -----
 
-  - [Automatic Registration](#Automatic-Registration)
-      - [Introduction](#Introduction)
-      - [Match Algorithm Definition Files
-        (PVL)](#Match-Algorithm-Definition-Files-PVL)
-      - [Match Algorithms](#Match-Algorithms)
-          - [Maximum Correlation](#Maximum-Correlation)
-          - [Minimum Difference](#Minimum-Difference)
-      - [Tolerance](#Tolerance)
-      - [Chips](#Chips)
-          - [Pattern Chip](#Pattern-Chip)
-          - [Search Chip](#Search-Chip)
-      - [Restricting Input Pixel
-        Ranges](#Restricting-Input-Pixel-Ranges)
-          - [Valid Minimum/Maximum](#Valid-MinimumMaximum)
-          - [Valid Pixel Count
-            (ValidPercent)](#Valid-Pixel-Count-ValidPercent)
-      - [Fit Chip](#Fit-Chip)
-      - [Sub-Pixel Accuracy](#Sub-Pixel-Accuracy)
-          - [Surface Modeling](#Surface-Modeling)
-      - [AutoRegDefaults](#AutoRegDefaults)
+- [Automatic Registration ¶](#automatic-registration-)
+  - [Introduction ¶](#introduction-)
+  - [Match Algorithm Definition Files (PVL) ¶](#match-algorithm-definition-files-pvl-)
+  - [Match Algorithms ¶](#match-algorithms-)
+    - [Maximum Correlation ¶](#maximum-correlation-)
+    - [Minimum Difference ¶](#minimum-difference-)
+  - [Tolerance ¶](#tolerance-)
+  - [Chips ¶](#chips-)
+    - [Pattern Chip ¶](#pattern-chip-)
+    - [Search Chip ¶](#search-chip-)
+  - [Restricting Input Pixel Ranges ¶](#restricting-input-pixel-ranges-)
+    - [Valid Minimum/Maximum ¶](#valid-minimummaximum-)
+    - [Valid Pixel Count (ValidPercent) ¶](#valid-pixel-count-validpercent-)
+  - [Fit Chip ¶](#fit-chip-)
+  - [Sub-Pixel Accuracy ¶](#sub-pixel-accuracy-)
+    - [Surface Modeling ¶](#surface-modeling-)
+  - [AutoRegDefaults ¶](#autoregdefaults-)
 
 <span id="Introduction"></span>
 
@@ -272,7 +269,7 @@ is:
 N(search) \>= N(pattern) + 2 and similarly for M. This ensures that the
 Pattern Chip spans at least a 3x3 window within the Search Chip. An
 important requirement for surface fitting in order to compute sub-pixel
-accuracy. (Refer to: [Sub-Pixel\_Definition](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/ISIS_Cube_Format) ).
+accuracy. (Refer to: [Sub-Pixel\_Definition](https://DOI-USGS.github.io/ISIS3/gh-pages/ISIS_Cube_Format) ).
 
 **TIPS:**
 
@@ -306,13 +303,13 @@ accuracy. (Refer to: [Sub-Pixel\_Definition](https://USGS-Astrogeology.github.io
 
 -----
 
-The validity of the input pixels ( [What\_Are\_Pixels](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/ISIS_Cube_Format)
+The validity of the input pixels ( [What\_Are\_Pixels](https://DOI-USGS.github.io/ISIS3/gh-pages/ISIS_Cube_Format)
 ) of the [Pattern Chip](fixit.wr.usgs.gov) is the very first test
 performed. Prior to the match algorithm being invoked during the walk
 process, a simple test is performed to ensure there are enough pixels to
 work with. Pixels are deemed valid if they are in the minimum/maximum
 range and/or they are not special pixel values. (
-[What\_Are\_Special\_Pixels](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Special_Pixels.html)
+[What\_Are\_Special\_Pixels](https://DOI-USGS.github.io/ISIS3/gh-pages/Special_Pixels.html)
 ).
 
 The Pattern Chip is only checked once. If it does not contain enough
@@ -428,7 +425,7 @@ Chip](fixit.wr.usgs.gov) . The Fit Chip contains the resulting
 correlation position between the two chips of a maximum of ONE pixel
 accuracy. In many cases, the actual, ultimate registration may lie
 somewhere between two pixels. (Refer to:
-[Sub-Pixel\_Definition](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/ISIS_Cube_Format) ).
+[Sub-Pixel\_Definition](https://DOI-USGS.github.io/ISIS3/gh-pages/ISIS_Cube_Format) ).
 
 The sub-pixel accuracy can be turned off through the PVL settings as
 follows:

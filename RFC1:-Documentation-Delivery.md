@@ -1,7 +1,7 @@
 - Feature/Process Name: Removed Documentation from Anaconda Tarball
 - Start Date: 12.21.18
 - RFC PR: (empty until a PR is opened)
-- Issue: https://github.com/USGS-Astrogeology/ISIS3/issues/674#issuecomment-449488114
+- Issue: https://github.com/DOI-USGS/ISIS3/issues/674#issuecomment-449488114
 - Author: jlaura
 - **Status: This RFC has been adopted. Documentation is no longer shipped with the ISIS binaries.**
 
@@ -16,7 +16,7 @@ Finally, we have been in contact with the Anaconda cloud team and it is not poss
 # Proposed Solution / Explanation
 The ISIS3 user and developer documentation should be removed from the binary distributions being shipped via Anaconda cloud in order to reduce total data volumes. Said documentation must be made widely accessible to the user community though. Therefore, the following options could be utilized:
 
-1. Make the HTML user and developer documentation available via https://usgs-astrogeology.github.io/isis3/<rest_of_the_url>. This can be fully automated in the CI environment and we could utilize [breathe](https://github.com/michaeljones/breathe) to maintain documentation for multiple versions in a manner similar to how the Python community does this.
+1. Make the HTML user and developer documentation available via https://DOI-USGS.github.io/isis3/<rest_of_the_url>. This can be fully automated in the CI environment and we could utilize [breathe](https://github.com/michaeljones/breathe) to maintain documentation for multiple versions in a manner similar to how the Python community does this.
 1. Use pandoc to take the printer friendly documentation and generate a PDF that would be made available via our standard data download mechanisms (perhaps Astropedia?). I would suggest that said document only exist for the user level docs at the present.
 
 # Drawbacks

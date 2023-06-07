@@ -1,7 +1,7 @@
 - Feature/Process Name: BLOB Redesign
 - Start Date: October 23, 2020
 - RFC PR: forethcoming
-- Issue: [#4082](https://github.com/USGS-Astrogeology/ISIS3/issues/4082)
+- Issue: [#4082](https://github.com/DOI-USGS/ISIS3/issues/4082)
 - Author: Jesse Mapel, Adam Paquette, & Austin Sanders
 
 <!-- This is a comment block that is not visible. We provide some instructions in here. When submitting an RFC please copy this template into a new wiki page titled RFC#:Title, where the number is the next incrementing number. If you would like to submit an RFC, but are unable to edit the wiki, please open an issue and we will assist you in getting your RFC posted. Please fill in, to the largest extent possible, the template below describing your RFC. After that, be active on the associated issue and we can move the RFC through the process.-->
@@ -131,7 +131,7 @@ The following classes have also been changed in more specific ways:
     - Creation of a Geos MultiPolygon for the footprint of an image is handled in
     a separate class or function.
   - Stretch
-    - PR [#3972](https://github.com/USGS-Astrogeology/ISIS3/pull/3972) makes significant
+    - PR [#3972](https://github.com/DOI-USGS/ISIS3/pull/3972) makes significant
     modifications to this class. Regardless of its outcome, Stretch and the clases
     that is uses will manage the conversion of a stretch into bytes and then pack
     that into a Blob similar to the other container classes.

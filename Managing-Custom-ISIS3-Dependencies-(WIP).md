@@ -8,13 +8,13 @@ With the release of isis3.6.0, the ISIS3 dependencies are being managed with a p
 
 One of the primary benefits of using conda is that we do not have to internally build and manage as many libraries that ISIS3 depends on; instead, we can use "channels" that already maintain hundreds of packages (e.g. [conda-forge](https://conda-forge.org/)). 
 
-If we do need to build a custom version of a library, we can build our own with the conda-build system and upload them to our own [usgs-astrogeology channel](https://anaconda.org/usgs-astrogeology). All of these recipes are publicly accessible via our [isis3_dependencies GitHub repo](https://github.com/usgs-astrogeology/isis3_dependencies).
+If we do need to build a custom version of a library, we can build our own with the conda-build system and upload them to our own [usgs-astrogeology channel](https://anaconda.org/usgs-astrogeology). All of these recipes are publicly accessible via our [isis3_dependencies GitHub repo](https://github.com/DOI-USGS/isis3_dependencies).
 
 ## How are dependencies specified for ISIS3?
 
-The third-party dependencies required to build and run ISIS3 versions 3.6.0 and above are specified in the [environment.yml](https://github.com/USGS-Astrogeology/ISIS3/blob/cmake/environment.yml) file located at the root of the ISIS3 repo. For more info on editing a conda environment file, view the [Conda Documentation](https://conda.io/docs/user-guide/tasks/manage-environments.html)
+The third-party dependencies required to build and run ISIS3 versions 3.6.0 and above are specified in the [environment.yml](https://github.com/DOI-USGS/ISIS3/blob/cmake/environment.yml) file located at the root of the ISIS3 repo. For more info on editing a conda environment file, view the [Conda Documentation](https://conda.io/docs/user-guide/tasks/manage-environments.html)
 
-Most of the packages listed in this environment file are pulled from conda-forge, but there are a few custom builds that we have uploaded to [our usgs-astrogeology channel](https://anaconda.org/usgs-astrogeology/repo), such as Qt. The recipes to build and upload these packages can be found on the [isis3_dependencies](https://github.com/USGS-Astrogeology/isis3_dependencies) repo.
+Most of the packages listed in this environment file are pulled from conda-forge, but there are a few custom builds that we have uploaded to [our usgs-astrogeology channel](https://anaconda.org/usgs-astrogeology/repo), such as Qt. The recipes to build and upload these packages can be found on the [isis3_dependencies](https://github.com/DOI-USGS/isis3_dependencies) repo.
  
 
 :building_construction: _**should the following sections be on a page on the isis3_dependencies wiki?**_
@@ -22,7 +22,7 @@ Most of the packages listed in this environment file are pulled from conda-forge
 # Environment Setup
 
 1. [Download and install the latest version of Anaconda](https://www.anaconda.com/download).
-1. Fork and clone the [isis3_dependencies repo](https://github.com/usgs-astrogeology/isis3_depenedencies).
+1. Fork and clone the [isis3_dependencies repo](https://github.com/DOI-USGS/isis3_depenedencies).
 1. Change directory into the isis3_dependencies clone (e.g. ```cd isis3_dependencies```)
 1. Since we pull most of our dependencies from conda-forge and some custom ones from our usgs-astrogeology account, add the conda-forge and usgs-astrogeology anaconda.org channels to your anaconda configuration:
 ```bash
