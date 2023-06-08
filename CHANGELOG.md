@@ -46,6 +46,8 @@ release.
 ### Removed
 
 ### Fixed
+- Updated History constructor to check for invalid BLOB before copying History BLOB to output cube [#4966](https://github.com/DOI-USGS/ISIS3/issues/4966)
+- Updated photomet MinnaertEmpirical model to support photemplate-style PVL format [#3621](https://github.com/DOI-USGS/ISIS3/issues/3621)
 
 ## [8.0.0] - 2023-04-19
 
@@ -53,7 +55,9 @@ release.
 - Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
 - Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083)
 - Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
+- Updated documentation for `tgocassisrdrgen` to be more descriptive and accurate.
 - Updated Geos from version 3.7 to 3.9 [#3627](https://github.com/DOI-USGS/ISIS3/issues/3627)
+- Updated Ale to version 0.9.1 [#5209](https://github.com/DOI-USGS/ISIS3/pull/5209)
 
 ### Added
 - Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
