@@ -23,7 +23,7 @@
 # This is the build number for the current version you are building. If this is the first build of
 # this version, the build number will be 0. It is incremented by 1 with every consecutive build of
 # the same version.
-{% set build_number = "0" %}
+{% set build_number = "1" %}
 
 package:
   name: isis
