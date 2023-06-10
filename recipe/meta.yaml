@@ -68,7 +68,7 @@ requirements:
    - gmp
    - graphviz
    # This needs to remained pinned at 2.6
-   - gsl>=2.6, 2.7
+   - gsl>=2.6, <2.7
    - hdf5
    - icu
    - inja
