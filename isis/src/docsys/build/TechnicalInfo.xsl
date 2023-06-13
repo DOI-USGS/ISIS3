@@ -176,7 +176,7 @@ Deborah Lee Soltesz
         <tbody>
           <tr valign="top">
             <th style="width:25%">
-              <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">Installing ISIS</a>
+              <a href="https://github.com/DOI-USGS/ISIS3#installation">Installing ISIS</a>
             </th>
             <td>
               Downloading and installing ISIS
