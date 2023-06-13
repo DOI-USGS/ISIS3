@@ -600,6 +600,9 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTA
 install(PROGRAMS ${CMAKE_BINARY_DIR}/lib/Camera.plugin DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
 install(PROGRAMS ${CMAKE_SOURCE_DIR}/scripts/downloadIsisData DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
 install(FILES ${CMAKE_SOURCE_DIR}/config/rclone.conf DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/isis/)
+install(FILES ${CMAKE_SOURCE_DIR}/src/system/apps/isisdataeval/tools/isisdata_mockup
+              PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+              DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
 
 # Trigger all post-install behavior.
 # - The only way to run commands post-install in CMake is to add a subdirectory at

@@ -47,7 +47,7 @@
     "name": "ISIS3",
     "organization": "U.S. Geological Survey",
     "description": "GitHub code repository for the Integrated Software for Imagers and Spectrometers (ISIS)",
-    "version": "7.1.0",
+    "version": "8.0.0",
     "status": "Production",
 
     "permissions": {
@@ -85,7 +85,7 @@
     },
 
     "date": {
-      "metadataLastUpdated": "2022-02-08"
+      "metadataLastUpdated": "2023-04-19"
     }
   }
 ]

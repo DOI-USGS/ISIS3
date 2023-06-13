@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/kernels/sclk/vg100010.tsc",
+    "filesize": 70562,
+    "createtime": "2022-08-12T23:56:41.000000",
+    "modifiedtime": "2022-11-24T12:14:39.909542",
+    "md5hash": "1e629510ddb73bce2560a740179ba5d9",
+    "sha256hash": "f9d8d6ec91d76ac692b22b472682de32262ad7787705c56d559f897fb4d72df4",
+    "sha1hash": "c1ccbd4076a55acf7b8cfe49339d53f7da67a0dd"
+}

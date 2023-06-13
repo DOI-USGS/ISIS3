@@ -1,0 +1,15 @@
+Object = SpacecraftPointing
+  RunTime = 2013-11-25T15:55:12
+
+  Group = Dependencies
+    SpacecraftClockKernel = $hayabusa/kernels/sclk/hayabusa.tsc
+    LeapsecondKernel      = $base/kernels/lsk/naif0010.tls
+  End_Group
+
+  Group = Selection
+    Time = ("2005 SEP 02 02:01:12.604 TDB", "2005 NOV 26 02:17:34.027 TDB")
+    File = $hayabusa/kernels/ck/hayabusa_itokawarendezvous_v02n.bc
+    Type = Reconstructed
+  End_Group
+End_Object
+End

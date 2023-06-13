@@ -1,0 +1,7 @@
+Object = Instrument
+  Group = Selection
+    Match = ("Instrument","InstrumentId","AMIE")
+    File  = ("smart1", "kernels/ik/SMART1_AMIE_V??.TI")
+  EndGroup
+EndObject
+

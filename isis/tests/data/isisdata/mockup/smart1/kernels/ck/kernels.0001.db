@@ -1,0 +1,27 @@
+Object = SpacecraftPointing
+  RunTime = 2008-09-05T15:48:10
+
+  Group = Dependencies
+    SpacecraftClockKernel = $smart1/kernels/sclk/SMART1_070227_STEP.TSC
+    LeapsecondKernel      = $base/kernels/lsk/naif0008.tls
+  End_Group
+
+  Group = Selection
+    Time = ("2006 MAR 01 00:42:12.668 TDB", "2006 SEP 03 05:43:25.562 TDB")
+    File = $smart1/kernels/ck/ATNS_P060301004212_00233.BC
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2005 SEP 30 15:09:47.181 TDB", "2006 JUL 11 00:01:05.183 TDB")
+    File = $smart1/kernels/ck/ATNS_P050930150947_00220.BC
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("2003 SEP 29 01:00:23.182 TDB", "2005 NOV 29 05:26:00.680 TDB")
+    File = $smart1/kernels/ck/ATNS_P030929010023_00188.BC
+    Type = Reconstructed
+  End_Group
+End_Object
+End

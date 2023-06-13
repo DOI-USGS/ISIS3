@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/smart1/kernels/pck/PCK00010.TPC",
+    "filesize": 126143,
+    "createtime": "2011-10-25T08:29:15.000000",
+    "modifiedtime": "2022-11-24T05:59:21.781436",
+    "md5hash": "da153641f7346bd5b6a1226778e0d51b",
+    "sha256hash": "59468328349aa730d18bf1f8d7e86efe6e40b75dfb921908f99321b3a7a701d2",
+    "sha1hash": "cbae4dbfcf6419571f1ab24c7fc2e17e55356f0f"
+}

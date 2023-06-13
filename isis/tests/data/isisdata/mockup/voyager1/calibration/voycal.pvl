@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/calibration/voycal.pvl",
+    "filesize": 100345,
+    "createtime": "2022-08-12T23:56:40.000000",
+    "modifiedtime": "2022-11-24T12:14:38.263654",
+    "md5hash": "1370287c54a95f413428d3834500385f",
+    "sha256hash": "d23d0accc753cba228e9960694b4ea2810ff73f508b5d242540f6a58464d9c28",
+    "sha1hash": "b64734e1d9fbea03e241c189e640c94a993e18c5"
+}

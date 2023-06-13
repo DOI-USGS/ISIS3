@@ -317,14 +317,14 @@ namespace Isis {
         poly.Create(cube, _sampleInc, _lineInc, 1, 1, 0, 0, band + 1,
             increasePrecision);
         geos::geom::MultiPolygon *multiP = poly.Polys();
-        _polys.push_back(multiP->clone());
+        _polys.push_back(multiP->clone().release());
         if(_combined == 0) {
-          _combined = multiP->clone();
+          _combined = multiP->clone().release();
         }
         else {
           //  Construct composite (union) polygon
           geos::geom::Geometry *old(_combined);
-          _combined = old->Union(multiP);
+          _combined = old->Union(multiP).release();
           delete old;
         }
 
@@ -336,8 +336,8 @@ namespace Isis {
         // Read the footprint from the image labels
         ImagePolygon poly = cube.readFootprint();
         geos::geom::MultiPolygon *multiP = poly.Polys();
-        _polys.push_back(multiP->clone());
-        _combined = multiP->clone();
+        _polys.push_back(multiP->clone().release());
+        _combined = multiP->clone().release();
         _mapping = getProjGeometry(camera, multiP, g);
       }
 
@@ -472,7 +472,7 @@ namespace Isis {
     //  Get the centroid point of the union polygon
     double plon(Null), plat(Null);
     if(_combined != 0) {
-      geos::geom::Point *center = _combined->getCentroid();
+      geos::geom::Point *center = _combined->getCentroid().release();
       plon = center->getX();
       plat = center->getY();
       delete center;
@@ -604,7 +604,7 @@ namespace Isis {
 
     TProjection *sinu = (TProjection *) ProjectionFactory::Create(sinuMap, true);
     geos::geom::MultiPolygon *sPoly = PolygonTools::LatLonToXY(*poly, sinu);
-    geos::geom::Point *center = sPoly->getCentroid();
+    geos::geom::Point *center = sPoly->getCentroid().release();
 
     sinu->SetCoordinate(center->getX(), center->getY());
     g.centroidLongitude = TProjection::To360Domain(sinu->UniversalLongitude());
@@ -731,7 +731,7 @@ namespace Isis {
 
   geos::geom::MultiPolygon *BandGeometry::makeMultiPolygon(
     geos::geom::Geometry *g) const {
-    vector<geos::geom::Geometry *> polys;
+    vector<const geos::geom::Geometry *> polys;
     polys.push_back(g);
     const geos::geom::GeometryFactory *gfactory = geos::geom::GeometryFactory::getDefaultInstance();
     return (gfactory->createMultiPolygon(polys));

@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/base/dems/Ceres_Dawn_FC_HAMO_DTM_DLR_Global_60ppd_Oct2016_prep.cub",
+    "filesize": 467404363,
+    "createtime": "2022-08-12T22:10:44.000000",
+    "modifiedtime": "2022-11-24T12:20:56.522490",
+    "md5hash": "e8e8763630d938caf9cfc52b2820f35b",
+    "sha256hash": "b0433aa9b460bda0a2ce7802acf8895ab6216d525095c9e9dc2ad7fe67a07f75",
+    "sha1hash": "1b4d8c0dcf1054470ff00e32598b93b546ace79f"
+}

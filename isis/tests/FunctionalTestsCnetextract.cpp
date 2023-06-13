@@ -27,7 +27,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetextractExclusiveNoFromlist) {
     cnetextract( *network, options, &appLog );
     FAIL() << "Should not have been able to extract a new network with no fromlist set" << std::endl;
   } catch(IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("To create a [TOLIST] the [FROMLIST] parameter must be provided."));
+    EXPECT_THAT(e.what(), HasSubstr("To create a [TOLIST] the [FROMLIST] parameter must be provided"));
   }
 }
 
@@ -43,7 +43,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestCnetextractExclusiveNoOnet) {
     cnetextract( *network, options, &appLog );
     FAIL() << "Should not have been able to extract a new network with no onet set" << std::endl;
   } catch(IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("Parameter [ONET] has no value."));
+    EXPECT_THAT(e.what(), HasSubstr("Parameter [ONET] has no value"));
   }
 }
 

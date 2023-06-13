@@ -1,0 +1,6 @@
+Object = LeapSecond
+  Group = Selection
+    File = ("base", "kernels/lsk/naif????.tls")
+  EndGroup
+EndObject
+

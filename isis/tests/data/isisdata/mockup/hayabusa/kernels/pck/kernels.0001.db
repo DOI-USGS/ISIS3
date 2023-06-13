@@ -1,0 +1,6 @@
+Object = TargetAttitudeShape
+  Group = Selection
+    File = ("base", "kernels/pck/pck?????.tpc")
+    File = ("hayabusa", "kernels/pck/itokawa_gaskell_n?.tpc")
+  EndGroup
+EndObject

@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/kernels/ik/vg1_issna_v02.ti",
+    "filesize": 1245,
+    "createtime": "2022-08-12T23:56:41.000000",
+    "modifiedtime": "2022-11-24T12:14:35.255955",
+    "md5hash": "0a9f2d91f8a846091002bd5e9aca3875",
+    "sha256hash": "b21f948cedbab7a7d2f3ed35d77466f114c7067c40a7e80b26b528c9e43ced3f",
+    "sha1hash": "18215377347abaf4ba329fc25608ae9b40749223"
+}

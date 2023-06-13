@@ -66,7 +66,6 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindimageoverlapsNoOverlap) {
     EXPECT_TRUE(e.toString().toLatin1().contains("No overlaps were found"))
       << e.toString().toStdString();
   }
-
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestFindimageoverlapsTwoImageOverlap) {

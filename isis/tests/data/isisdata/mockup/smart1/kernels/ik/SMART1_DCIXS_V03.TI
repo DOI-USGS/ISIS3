@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/smart1/kernels/ik/SMART1_DCIXS_V03.TI",
+    "filesize": 16384,
+    "createtime": "2005-06-22T08:50:45.000000",
+    "modifiedtime": "2022-11-24T05:59:07.989916",
+    "md5hash": "5b96512022df6e255525dc79e045669b",
+    "sha256hash": "e9ce308966a2b5221d20130d5bb8d8f8508e65582499c8cec66f6a5dd3599082",
+    "sha1hash": "50932f1e838e2d4e54c22485fcda9bb18977468c"
+}

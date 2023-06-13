@@ -3,7 +3,7 @@ channels:
   - defaults
 
 dependencies:
-  - ale=0.8.6
+  - ale=0.9.1
   - armadillo
   - boost=1.72
   - boost-cpp=1.72
@@ -20,7 +20,7 @@ dependencies:
   - eigen < 3.4
   - embree>=2.17,<3
   - ffmpeg
-  - geos>=3.7,<3.8
+  - geos>=3.9,<3.10
   - geotiff
   - gmp
   - graphviz

@@ -1,0 +1,16 @@
+Object = SpacecraftPosition
+  RunTime = 2013-11-25T15:49:40
+
+  Group = Dependencies
+    LeapsecondKernel = $base/kernels/lsk/naif0010.tls
+  End_Group
+
+  Group = Selection
+    Time = ("2005 SEP 11 05:52:42.327 TDB", "2005 NOV 19 23:55:07.665 TDB")
+    File = $hayabusa/kernels/spk/hay_jaxa_050916_051119_v1n.bsp
+    File = $hayabusa/kernels/spk/hay_osbj_050911_051118_v1n.bsp
+    Type = Reconstructed
+  End_Group
+
+End_Object
+End

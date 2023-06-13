@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/base/kernels/pck/lunar_de403_1950-2199_pa.bpc",
+    "filesize": 2925568,
+    "createtime": "2022-08-12T22:13:16.000000",
+    "modifiedtime": "2022-11-24T12:25:33.327522",
+    "md5hash": "c3a4c8d3b0d6df045f41ff713b4348a5",
+    "sha256hash": "76456c2fd38ec3bc50fbf0378ee8398ba703c341921563c2b047879a8c973816",
+    "sha1hash": "ab7da3465f3e6353ce96fc800274740f03b21a49"
+}

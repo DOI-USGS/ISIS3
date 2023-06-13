@@ -196,6 +196,10 @@
       "name": "Hahn, Marjorie"
     },
     {
+      "name": "Hanson, Lavender",
+      "orcid": "0000-0003-2298-8382"
+    },
+    {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
       "name": "Hare, Trent"
     },
@@ -469,7 +473,7 @@
     {
       "name": "Jia, Bojun",
       "orcid": "0000-0001-7218-6746"
-    },
+    }
   ],
   "title": "Integrated Software for Imagers and Spectrometers",
   "description": "A software library and set of tools to support ingestion, processing, and analysis of planetary science data.",

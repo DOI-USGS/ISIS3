@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/hayabusa/kernels/spk/hayabusa_itokawarendezvous_v01.bsp",
+    "filesize": 17321984,
+    "createtime": "2006-01-13T08:03:41.000000",
+    "modifiedtime": "2022-11-23T23:36:55.320880",
+    "md5hash": "caa8b7b91f558e0145683677dcf871d2",
+    "sha256hash": "5223e3e861fcc390a55c979162fc0213093b1903a37e67485cc120450864ec5b",
+    "sha1hash": "31328105a265c5d69ea3e68349a1aa2e2703c293"
+}

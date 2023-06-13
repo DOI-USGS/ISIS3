@@ -58,6 +58,9 @@ install/
 !isis/tests/data/near/msi2isis/*.lbl
 !isis/tests/data/near/msicamera/*.cub
 
+# Ensure the contents of ISISDATA mockup tests are preserved
+!isis/tests/data/isisdata/mockup/**/*
+
 # Ignore vs code
 .vscode
 

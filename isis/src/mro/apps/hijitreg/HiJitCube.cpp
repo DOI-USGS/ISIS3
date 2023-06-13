@@ -129,7 +129,7 @@ namespace Isis {
   }
 
   bool HiJitCube::overlap(const HiJitCube &cube, Corners &ovlCorners) {
-    geos::geom::Geometry *ovl = fpGeom->intersection(cube.Poly());
+    geos::geom::Geometry *ovl = fpGeom->intersection(cube.Poly()).release();
 //  cout << "Overlap: " << ovl->toString() << std::endl;
     ovlCorners = FocalPlaneToImage(getCorners(*ovl));
     delete ovl;
@@ -353,7 +353,7 @@ namespace Isis {
     int line0(jdata.fpLine0 + jdata.lineOffset), lineN(line0 + lineCount() - 1);
 
 //  Allocate a new coordinate sequence and define it
-    geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
     pts->add(geos::geom::Coordinate(samp0, lineN));
     pts->add(geos::geom::Coordinate(sampN, lineN));
     pts->add(geos::geom::Coordinate(sampN, line0));
@@ -395,7 +395,7 @@ namespace Isis {
     if((poly.isValid()) && (!poly.isEmpty())) {
 
 //  Get the coordinate list
-      geos::geom::CoordinateSequence *clist = poly.getCoordinates();
+      geos::geom::CoordinateSequence *clist = poly.getCoordinates().release();
       const geos::geom::Coordinate *minpt = clist->minCoordinate();
 //    cout << "MinPoint: " << minpt->x << ", " << minpt->y << std::endl;
 

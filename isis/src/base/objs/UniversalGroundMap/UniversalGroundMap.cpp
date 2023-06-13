@@ -337,10 +337,10 @@ namespace Isis {
       if (cube) {
         ImagePolygon poly = cube->readFootprint();
         geos::geom::MultiPolygon *footprint = PolygonTools::MakeMultiPolygon(
-            poly.Polys()->clone());
+            poly.Polys()->clone().release());
 
-        geos::geom::Geometry *envelope = footprint->getEnvelope();
-        geos::geom::CoordinateSequence *coords = envelope->getCoordinates();
+        geos::geom::Geometry *envelope = footprint->getEnvelope().release();
+        geos::geom::CoordinateSequence *coords = envelope->getCoordinates().release();
 
         for (unsigned int i = 0; i < coords->getSize(); i++) {
           const geos::geom::Coordinate &coord = coords->getAt(i);

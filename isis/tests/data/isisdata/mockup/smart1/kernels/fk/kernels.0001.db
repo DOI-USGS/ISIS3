@@ -1,0 +1,5 @@
+Object = Frame
+  Group = Selection
+    File = ("smart1", "kernels/fk/SMART1_V????.TF")
+  EndGroup
+EndObject

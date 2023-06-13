@@ -1,0 +1,20 @@
+Object = SpacecraftPosition
+  RunTime = 2008-09-11T16:08:37
+
+  Group = Dependencies
+    LeapsecondKernel = $base/kernels/lsk/naif0009.tls
+  End_Group
+
+  Group = Selection
+    Time = ("2005 AUG 01 00:00:00.000 TDB", "2006 SEP 03 20:00:00.000 TDB")
+    File = $smart1/kernels/spk/ORMS_______________00233.BSP
+    Type = Predicted
+  End_Group
+
+  Group = Selection
+    Time = ("2004 NOV 11 02:05:17.979 TDB", "2005 OCT 01 00:00:00.000 TDB")
+    File = $smart1/kernels/spk/ORMS__041111020517_00206.BSP
+    Type = Reconstructed
+  End_Group
+End_Object
+End

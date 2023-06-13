@@ -36,17 +36,42 @@ release.
 ## [Unreleased]
 
 ### Changed
-- Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
-- Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
-- Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
+- Removed the `.py` extention from the _isisdataeval_ tool `isisdata_mockup` for consistency and install it in $ISISROOT/bin; added the `--tojson` and `--hasher` option to _isisdata_mockup_ tool improve utility; updated the tool `README.md` documentation to reflect this change, removed help output and trimmed example results;  fixed paths to test data in `make_isisdata_mockup.sh`. [#5163](https://github.com/DOI-USGS/ISIS3/pull/5163)
 
 ### Added
-- Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
+- Added rclone to run dependencies in meta.yaml [#5183](https://github.com/DOI-USGS/ISIS3/issues/5183)
 
 ### Deprecated
 
+### Removed
+
 ### Fixed
+- Updated History constructor to check for invalid BLOB before copying History BLOB to output cube [#4966](https://github.com/DOI-USGS/ISIS3/issues/4966)
+- Updated photomet MinnaertEmpirical model to support photemplate-style PVL format [#3621](https://github.com/DOI-USGS/ISIS3/issues/3621)
+
+## [8.0.0] - 2023-04-19
+
+### Changed
+- Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
+- Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083)
+- Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
+- Updated documentation for `tgocassisrdrgen` to be more descriptive and accurate.
+- Updated Geos from version 3.7 to 3.9 [#3627](https://github.com/DOI-USGS/ISIS3/issues/3627)
+- Updated Ale to version 0.9.1 [#5209](https://github.com/DOI-USGS/ISIS3/pull/5209)
+
+### Added
+- Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
+- Added additional filters to downloadIsisData to reduce download of extraneous kernels [#5143](https://github.com/DOI-USGS/ISIS3/issues/5143)
+
+### Deprecated
+
+### Removed
+- edrget application [#4665](https://github.com/DOI-USGS/ISIS3/issues/4665)
+
+### Fixed
+- Updated README.md to remove remaining references to downloading data from discontinued rsync server [#5152](https://github.com/DOI-USGS/ISIS3/issues/5152)
 - Fixed users not being able to modify planetographic projections in qmos
+- Modified spice::readValue to add check for numValuesRead to stop reading garbase values [#4928](https://github.com/USGS-Astrogeology/ISIS3/issues/4928)
 
 ## [7.2.0] - 2022-12-07
 
@@ -55,13 +80,14 @@ release.
 
 ### Added
 - Added LatLonGrid Tool to Qview to view latitude and longitude lines if camera model information is present.
+- Added a new application, _isisdataeval_, that validates/verifies ISISDATA installations and aids in the development and management of this resource. Users can use _isisdataeval_ to help resolve runtime problems related to ISIS kernels and calibration processing. In fact, it is designed to be used on any directory as it will create a detailed install volume inventory with file/volume hashes and is not restricted to ISIS use. [#5110](https://github.com/USGS-Astrogeology/ISIS3/issues/5110) [#5111](https://github.com/USGS-Astrogeology/ISIS3/pull/5111)
 
 ### Deprecated
 
 ### Fixed
 - Fixed some wrong parameter types [#4780](https://github.com/USGS-Astrogeology/ISIS3/issues/4780)
 - Added mapping group to track cube via processmosaic [#4810](https://github.com/USGS-Astrogeology/ISIS3/issues/4810)
-- Fixed bugs in downloadIsisData script [#5024](https://github.com/USGS-Astrogeology/ISIS3/issues/5024) 
+- Fixed bugs in downloadIsisData script [#5024](https://github.com/USGS-Astrogeology/ISIS3/issues/5024)
 - Fixed shadow shifting image by 2 pixels to the upper left corner. [#5035](https://github.com/USGS-Astrogeology/ISIS3/issues/5035)
 - Fixed compiler warnings on ubuntu [#4911](https://github.com/USGS-Astrogeology/ISIS3/issues/4911)
 - Fixes embree shape models not being from .BDS extension files [5064](https://github.com/USGS-Astrogeology/ISIS3/issues/5064)

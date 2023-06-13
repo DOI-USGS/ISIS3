@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/calibration/WA1OFF.CAL.cub",
+    "filesize": 3278825,
+    "createtime": "2022-08-12T23:56:39.000000",
+    "modifiedtime": "2022-11-24T12:14:38.115968",
+    "md5hash": "469ab2059ea0a9737d6562c98282af1a",
+    "sha256hash": "7262ce685382f6e5b64c5fd67030b9e2433bbd7cf55fbc7c410efe9b518fe63b",
+    "sha1hash": "8be1f1f435f8aba8ee92625a7a1645c88e72d414"
+}
