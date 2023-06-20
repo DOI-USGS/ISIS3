@@ -149,10 +149,10 @@ pipeline {
 //            }
             steps {
                 script{
-                    echo ${env.GITHUB_PR_STATE}
-                    echo ${env.GITHUB_PR_SOURCE_BRANCH}
-                    echo ${env.GITHUB_PR_TARGET_BRANCH}
-                    echo ${env.BRANCH_NAME}
+                    echo 'PR state: ' + env.GITHUB_PR_STATE
+                    echo 'Source branch: ' + env.GITHUB_PR_SOURCE_BRANCH
+                    echo 'Target branch: ' + env.GITHUB_PR_TARGET_BRANCH
+                    echo 'Branch name: ' + env.BRANCH_NAME
                     pullRequest.labels.each{
                         echo "label: $it"
                     }
