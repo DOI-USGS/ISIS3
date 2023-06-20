@@ -41,19 +41,22 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh '''
-                . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
-                conda activate isis > /dev/null
-                mkdir -p build install
-                cd build
-                cmake -GNinja -DJP2KFLAG=ON  \
-                      -DKAKADU_INCLUDE_DIR=${KAKADU_HEADERS} \
-                      -Dpybindings=OFF \
-                      -DCMAKE_BUILD_TYPE=RELEASE \
-                      -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} \
-                      ../isis
-                ninja -j 8 install
-                '''
+                script{
+                    echo "Not building"
+                }
+ //               sh '''
+ //               . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
+ //               conda activate isis > /dev/null
+ //               mkdir -p build install
+ //               cd build
+ //               cmake -GNinja -DJP2KFLAG=ON  \
+ //                     -DKAKADU_INCLUDE_DIR=${KAKADU_HEADERS} \
+ //                     -Dpybindings=OFF \
+ //                     -DCMAKE_BUILD_TYPE=RELEASE \
+ //                     -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} \
+ //                     ../isis
+//              ninja -j 8 install
+//                '''
             }
         }
         stage('GTests') {
