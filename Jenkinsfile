@@ -137,15 +137,19 @@ pipeline {
             }
         }
         stage('Deploy') {
-            when { 
-              allOf { 
-                expression { env.GITHUB_PR_STATE == "CLOSE" }
-                expression { env.GITHUB_PR_TARGET_BRANCH == "dev" }
-                expression { env.GITHUB_PR_SOURCE_BRANCH == "PR-*" }
-              } 
-            }
+//            when { 
+//              allOf { 
+//                expression { env.GITHUB_PR_STATE == "CLOSE" }
+//                expression { env.GITHUB_PR_TARGET_BRANCH == "dev" }
+//                expression { env.GITHUB_PR_SOURCE_BRANCH == "PR-*" }
+//              } 
+//            }
             steps {
                 script{
+                    echo ${env.GITHUB_PR_STATE}
+                    echo ${env.GITHUB_PR_SOURCE_BRANCH}
+                    echo ${env.GITHUB_PR_TARGET_BRANCH}
+                    echo ${env.BRANCH_NAME}
                     pullRequest.labels.each{
                         echo "label: $it"
                     }
