@@ -71,6 +71,15 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 namespace Isis {
 
+  inline PvlGroup pvlmap_to_group( const PvlFlatMap &pvlmap, const QString &grpnam ) {
+    PvlGroup pgrp( grpnam );
+    for ( auto pkey : pvlmap.values() ) {
+      pgrp.addKeyword( pkey );
+    }
+    return ( pgrp );
+  }
+
+
   static void writeInfo(const QString &toname, Pvl &data, UserInterface &ui, Pvl *log) {
       if ( !toname.isEmpty() ) {
         FileName toinfo(toname);
@@ -149,8 +158,8 @@ namespace Isis {
 
     //  Program constants
     const QString findfeatures_program = "findfeatures";
-    const QString findfeatures_version = "1.1";
-    const QString findfeatures_revision = "2021-10-29";  // Now is the date of revision!
+    const QString findfeatures_version = "1.2";
+    const QString findfeatures_revision = "2023-06-21";  // Now is the date of revision!
     // const QString findfeatures_runtime = Application::DateTime();
 
     // Track runtime...
@@ -209,8 +218,15 @@ namespace Isis {
     if ( ui.WasEntered("PARAMETERS") ) {
       QString pfilename = ui.GetAsString("PARAMETERS");
       Pvl pfile(pfilename);
-      parameters.merge( PvlFlatMap(pfile) );
+      PvlFlatMap parms =  PvlFlatMap(pfile);
+      parameters.merge( parms );
       parameters.add("ParameterFile", pfilename);
+
+      // Log parameters loaded from the PARAMETERS file
+      if ( log ) {
+        auto parmgrp = pvlmap_to_group( parms, "Parameters");
+        log->addLogGroup( parmgrp );
+      }
     }
 
     // Get individual parameters if provided
@@ -251,20 +267,35 @@ namespace Isis {
     // Now reset any global parameters provided by the user
     if ( ui.WasEntered("GLOBALS") ) {
       QString gblparms = ui.GetString("GLOBALS");
-      factory->addGlobalParameters(factory->parseGlobalParameters(gblparms));
+      PvlFlatMap globals = factory->parseGlobalParameters(gblparms);
+      factory->addGlobalParameters( globals );
       factory->addParameter("GLOBALS", gblparms);
+
+        // Load values parsed from the GLOBALS string
+       if ( log ) {
+        auto globalgrp = pvlmap_to_group( globals, "Globals");
+        log->addLogGroup( globalgrp );
+      }
+    }
+
+    // Now report the list of all global parameters in the pool
+    if ( log ) {
+      auto gpool = pvlmap_to_group( factory->globalParameters(), "GlobalParameterPool");
+      log->addLogGroup( gpool );
     }
 
     // Create a list of algorithm specifications from user specs and log it
     // if requested
     RobustMatcherList algorithms = factory->create(aspec);
     if ( ui.GetBoolean("LISTSPEC") ) {
+
       Pvl info;
       info.addObject(factory->info(algorithms));
       writeInfo(toinfo, info, ui, log);
 
       // If no input files are provided exit here
-      if ( ! ( ui.WasEntered("FROM") && ui.WasEntered("FROMLIST") ) ) {
+      if ( !( ui.WasEntered("MATCH") && ( ui.WasEntered("FROM") ||
+                                          ui.WasEntered("FROMLIST") ) ) ) {
         return;
       }
     }
@@ -491,18 +522,27 @@ namespace Isis {
     }
 
     // If user wants a list of failed matched images, write the list to the
-    // TONOTMATCHED file in append mode (assuming other runs will accumulate
-    // failed matches)
+    // TONOTMATCHED file if any are found
     if ( ui.WasEntered("TONOTMATCHED") ) {
-      QLogger fout( QDebugLogger::create( ui.GetAsString("TONOTMATCHED"),
-                                                (QIODevice::WriteOnly |
-                                              QIODevice::Truncate) ) );
+      QStringList nomatches;
+
+      // Search for unmatched files in the matcher network
       MatcherSolution::MatchPairConstIterator mpair = best->begin();
       while ( mpair != best->end() ) {
         if ( mpair->size() == 0 ) {
-            fout.logger() << mpair->train().source().name() << "\n";
+          nomatches.append( mpair->train().source().name() );
         }
         ++mpair;
+      }
+
+      // Only write the output file if there are any unmatched image files
+      if ( nomatches.size() > 0) {
+        QLogger fout( QDebugLogger::create( ui.GetAsString("TONOTMATCHED"),
+                                                  (QIODevice::WriteOnly |
+                                                  QIODevice::Truncate) ) );
+        for ( auto const &imgfile : nomatches ) {
+          fout.logger() << imgfile << "\n";
+        }
       }
     }
 

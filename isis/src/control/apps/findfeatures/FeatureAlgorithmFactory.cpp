@@ -415,7 +415,7 @@ RobustMatcherList FeatureAlgorithmFactory::create(const QString &specs,
  *
  *  In addition, parameters that alter the behavior of the outlier detection
  *  processing, among oother things, in the RobustMatcher can be specified as an
- *  additional part of the string using the "/paramters@name:value..."
+ *  additional part of the string using the "/parameters@name:value..."
  *  specification.
  *
  * @param definition A single string specification for an OpencCV feature-based

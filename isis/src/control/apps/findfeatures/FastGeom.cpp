@@ -37,7 +37,6 @@ FastGeom::FastGeom(const PvlFlatMap &parameters) : m_fastpts(25),
   m_fastpts   = toInt(m_parameters.get("FastGeomPoints", "25"));
   m_tolerance = toDouble(m_parameters.get("FastGeomTolerance", "3.0"));
   m_geomtype  = m_parameters.get("GeomType", "camera").toLower();
-  m_maxarea   = toDouble(m_parameters.get("GeomScaleLimit", "3.0"));
   validate(m_geomtype);
 }
 
@@ -724,7 +723,7 @@ void FastGeom::dump_point_mapping(MatchImage &query, MatchImage &train,
 
     // Open output file for writing
     QDebugStream csvstrm = QDebugLogger::create( csvout,
-                                                (QIODevice::WriteOnly |
+                                                 (QIODevice::WriteOnly |
                                                  QIODevice::Truncate) );
     QDebugStreamType &csv(csvstrm->dbugout());
 
