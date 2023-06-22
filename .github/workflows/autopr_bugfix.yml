@@ -2,7 +2,7 @@ name: Cherrypick bugfixes to release branch
 on:
   push:
     branches:
-      - dev
+      - pr_autolabeler_fix
 jobs:
   # Check if the PR is a bugfix
   check_labels:
