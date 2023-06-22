@@ -441,6 +441,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/appdata/translations
                     ${CMAKE_BINARY_DIR}/appdata/templates/hidtmgen
                     ${CMAKE_BINARY_DIR}/appdata/import
                     ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures
+                    ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures/mosaics
                     ${CMAKE_BINARY_DIR}/appdata/templates/fullcnetdiff
                     ${CMAKE_BINARY_DIR}/appdata/templates/jigsaw
                     ${CMAKE_BINARY_DIR}/appdata/templates/kernels
@@ -524,7 +525,8 @@ add_custom_target(controlnetworks ALL COMMAND ${CMAKE_COMMAND} -E copy_if_differ
 add_dependencies(isis controlnetworks)
 
 add_custom_target(findfeatures ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/appdata/templates/findfeatures/* ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures/)
+  ${CMAKE_SOURCE_DIR}/appdata/templates/findfeatures/* ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures/
+  ${CMAKE_SOURCE_DIR}/appdata/templates/findfeatures/mosaics/* ${CMAKE_BINARY_DIR}/appdata/templates/findfeatures/mosaics/)
 add_dependencies(isis findfeatures)
 
 add_custom_target(fullcnetdiff ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
