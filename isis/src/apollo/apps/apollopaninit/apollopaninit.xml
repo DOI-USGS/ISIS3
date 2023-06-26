@@ -27,6 +27,9 @@
     <change name="Jacob Cain" date="2022-11-22">
         Changed FROM type to cube. Fixes #4780.
     </change>
+    <change name="Anton Hibl" date="2023-06-26">
+      Changed FROM type back to filename as apollopaninit doesn't utilize cubes.
+    </change>
   </history>
 
   <category>
@@ -42,13 +45,13 @@
   <groups>
     <group name="Files">
       <parameter name="FROM">
-        <type>cube</type>
+        <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
           Input Cube
         </brief>
         <description>
-          Use this parameter to select the cube filename to import.
+          Use this parameter to select the filename to import; expects a TIFF image.
         </description>
         <filter>
           *.cub
