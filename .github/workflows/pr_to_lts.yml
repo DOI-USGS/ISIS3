@@ -14,4 +14,4 @@ jobs:
     steps:
     - run: gh pr create -B lts -H dev --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.LTS }}
