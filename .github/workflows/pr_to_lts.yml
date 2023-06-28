@@ -7,7 +7,7 @@ on:
 
 jobs:
   if_merged:
-    if: github.event.pull_request.merged == true && github.event.label.name == 'bug'
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.label.name, 'bug')
     runs-on: ubuntu-latest
     steps:
     - run: gh pr create -B lts -H dev --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
