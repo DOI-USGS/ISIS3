@@ -12,6 +12,6 @@ jobs:
     if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'bug')
     runs-on: ubuntu-latest
     steps:
-    - run: gh pr create -B lts -H dev --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
+    - run: gh pr create -B lts -H dev --title 'Merge dev into lts branch' --body 'Created by Github action'
       env:
-          GITHUB_TOKEN: ${{ secrets.LTS }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
