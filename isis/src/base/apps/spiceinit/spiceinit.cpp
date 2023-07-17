@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <QVector>
 
+#include "Application.h"
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "FileName.h"
@@ -473,10 +474,7 @@ namespace Isis {
 
         currentKernels += source;
         icube->putGroup(currentKernels);
-        if (log){
-          log->addLogGroup(currentKernels);
-        }
-
+        Application::Log(currentKernels);
       }
       catch(IException &e) {
         Pvl errPvl = e.toPvl();
@@ -484,9 +482,7 @@ namespace Isis {
         if (errPvl.groups() > 0) {
           currentKernels += PvlKeyword("Error", errPvl.group(errPvl.groups() - 1)["Message"][0]);
         }
-        if (log) {
-          log->addLogGroup(currentKernels);
-        }
+        Application::Log(currentKernels);
         icube->putGroup(originalKernels);
 
         // restore CSM State blob if spiceinit failed
@@ -680,9 +676,7 @@ namespace Isis {
 
     icube->putGroup(kernelsGroup);
 
-    if (log) {
-      log->addLogGroup(kernelsGroup);
-    }
+    Application::Log(kernelsGroup);
 
     Pvl *icubeLabel = icube->label();
 

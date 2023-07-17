@@ -12,7 +12,6 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 #include "Message.h"
 #include "PvlFormat.h"
-#include "Application.h"
 
 #include <QList>
 
@@ -157,8 +156,8 @@ namespace Isis {
    * @param group The PvlGroup object to add.
    */
   void PvlObject::addLogGroup(Isis::PvlGroup &group) {
-    addGroup(group);
-    Application::Log(group);
+    // addGroup(group);
+    // Application::Log(group);
   };
 
   /**

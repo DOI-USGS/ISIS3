@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <QSharedPointer>
 #include <QString>
 
+#include "Application.h"
 #include "Blob.h"
 #include "BundleAdjust.h"
 #include "BundleObservationSolveSettings.h"
@@ -71,9 +72,7 @@ namespace Isis {
                                                    under review and is likely resulting \
                                                    in addition error in the bundle adjust. \
                                                    We recommend that you do not solve for radii at this moment."));
-         if(log) {
-           log->addLogGroup(radiusSolveWarning);
-         }
+        Application::Log(radiusSolveWarning);
       }
     }
     settings->setCubeList(cubeList);
@@ -202,17 +201,17 @@ namespace Isis {
       else {
         gp += PvlKeyword("Status", "Camera pointing NOT updated");
       }
-      if (log) {
-        Pvl summary;
-        std::istringstream iss (bundleAdjustment->iterationSummaryGroup().toStdString());
-        iss >> summary;
 
-        for (auto grpIt = summary.beginGroup(); grpIt!= summary.endGroup(); grpIt++) {
-          log->addLogGroup(*grpIt);
-        }
+      Pvl summary;
+      std::istringstream iss (bundleAdjustment->iterationSummaryGroup().toStdString());
+      iss >> summary;
 
-        log->addLogGroup(gp);
+      for (auto grpIt = summary.beginGroup(); grpIt!= summary.endGroup(); grpIt++) {
+        Application::Log(*grpIt);
       }
+
+      Application::Log(gp);
+
       delete bundleSolution;
     }
     catch(IException &e) {
