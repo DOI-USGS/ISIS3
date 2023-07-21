@@ -267,7 +267,7 @@ namespace Isis{
       }
 
       // we still want to output the results
-      Application::Log((*point));
+      Application::AppendAndLog((*point), log);
       delete point;
       point = NULL;
     }
