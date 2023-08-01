@@ -58,6 +58,7 @@ release.
 - Updated documentation for `tgocassisrdrgen` to be more descriptive and accurate.
 - Updated Geos from version 3.7 to 3.9 [#3627](https://github.com/DOI-USGS/ISIS3/issues/3627)
 - Updated Ale to version 0.9.1 [#5209](https://github.com/DOI-USGS/ISIS3/pull/5209)
+- Changed buildCondaRelease.py numpy version from 1.23 to 1.22 to resolve spiceinit warning messages [#5224](https://github.com/DOI-USGS/ISIS3/issues/5224)
 
 ### Added
 - Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
