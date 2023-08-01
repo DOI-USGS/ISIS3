@@ -37,7 +37,6 @@ release.
 
 ### Changed
 - Removed the `.py` extention from the _isisdataeval_ tool `isisdata_mockup` for consistency and install it in $ISISROOT/bin; added the `--tojson` and `--hasher` option to _isisdata_mockup_ tool improve utility; updated the tool `README.md` documentation to reflect this change, removed help output and trimmed example results;  fixed paths to test data in `make_isisdata_mockup.sh`. [#5163](https://github.com/DOI-USGS/ISIS3/pull/5163)
-- Changed buildCondaRelease.py numpy version from 1.23 to 1.22 to resolve spiceinit warning messages [#5224](https://github.com/DOI-USGS/ISIS3/issues/5224)
 
 ### Added
 - Added rclone to run dependencies in meta.yaml [#5183](https://github.com/DOI-USGS/ISIS3/issues/5183)
@@ -59,6 +58,7 @@ release.
 - Updated documentation for `tgocassisrdrgen` to be more descriptive and accurate.
 - Updated Geos from version 3.7 to 3.9 [#3627](https://github.com/DOI-USGS/ISIS3/issues/3627)
 - Updated Ale to version 0.9.1 [#5209](https://github.com/DOI-USGS/ISIS3/pull/5209)
+- Changed buildCondaRelease.py numpy version from 1.23 to 1.22 to resolve spiceinit warning messages [#5224](https://github.com/DOI-USGS/ISIS3/issues/5224)
 
 ### Added
 - Instructions on setting `channel_priority=flexible` for isis environment manually during installation [#5158](https://github.com/DOI-USGS/ISIS3/issues/5158)
