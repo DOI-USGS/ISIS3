@@ -15,15 +15,15 @@
       area-based image matching (ABM) techniques. Control points are at the
       center of these grids and they are not necessarily associated with any
       particular feature or interest point.
-      <i>findfeatures</i> applies  feature-based matching (FBM) algorihms using
+      <i>findfeatures</i> applies  feature-based matching (FBM) algorithms using
       the full suite of <a href="http://opencv.org/">OpenCV</a>
-      <a href="http://docs.opencv.org/3.1.0/d0/d13/classcv_1_1Feature2D.html">
+      <a href="https://docs.opencv.org/4.5.5/d0/d13/classcv_1_1Feature2D.html">
       detection and descriptor extraction algorithms</a> and
-      <a href="http://docs.opencv.org/3.1.0/db/d39/classcv_1_1DescriptorMatcher.html">
+      <a href="https://docs.opencv.org/4.5.5/db/d39/classcv_1_1DescriptorMatcher.html">
       descriptor matchers</a>. The points detected by these
       algorithms are associated with surface features identified by
       the type of detector algorithm designed to represent certain
-      charcteristics. Feature based matching has a
+      characteristics. Feature based matching has a
       <a href="http://www.computervisionblog.com/2015/01/from-feature-descriptors-to-deep.html">
       twenty year history</a> in computer vision and continues to benefit
       from improvements and advancements to make development of applications
@@ -32,7 +32,7 @@
     <p>
       This application offers alternatives to traditional image matching options
       such as <i>autoseed</i>, <i>seedgrid</i> and <i>coreg</i>. Applications
-      like <i>coreg</i> and <i>pointreg</i> are area-based matching,
+      like <i>coreg</i> and <i>pointreg</i> are area-based matching, whereas
       <i>findfeatures</i> utilizes feature-based matching techniques.  The
       <a href="http://opencv.org/">OpenCV</a> feature matching framework is used
       extensively in this application to implement the concepts commonly found in
@@ -42,23 +42,23 @@
     </p>
     <h3>Overview</h3>
     <p>
-      <i>findfeatures</i> uses <a href="http://opencv.org/">OpenCV 3.1's</a>
+      <i>findfeatures</i> uses <a href="http://opencv.org/">OpenCV's</a>
       FBM algorithms to match a single image, or set of images, called the
-      trainer image(s) (FROM/FROMLIST) to a different image, called the query image
-      (MATCH).
+      trainer image(s) (<b>FROM</b>/<b>FROMLIST</b>) to a different image, called the query image
+      (<b>MATCH</b>).
     </p>
     <p>
       Feature based algorithms are comprised of three basic processes:
       detection of features (or keypoints), extraction of feature descriptors
       and finally matching of feature descriptors from two image sources.
       To improve the quality of matches, <i>findfeatures</i> applies a fourth
-      process, robust outlier detection.
+      process - robust outlier detection.
     </p>
     <p>
       Feature detection is the search for features of interest (or key
       points) in an image. The ultimate goal is to find features that can
       also be found in another image of the same object or location.
-      Feature detection algorithms are often refered to as detectors.
+      Feature detection algorithms are often refered to as <em>detectors</em>.
     </p>
     <p>
       Detectors describe key points based on their location in a specific
@@ -67,7 +67,7 @@
       could be described by their roundness or how much they contrast the
       surrounding area. Feature descriptors provide a way to compare key
       points from different images. Algorithms that extract feature
-      descriptors from keypoints in an image are called extractors.
+      descriptors from keypoints in an image are called <em>extractors</em>.
     </p>
     <p>
       The third process is to match key points from different images based on
@@ -76,7 +76,7 @@
       matched to the trainer images (called a query to trainer match).
       <i>findfeatures</i> performs both a trainer to query match and a query
       to trainer match. Algorithms for matching feature descriptors are
-      called matchers.
+      called <em>matchers</em>.
     </p>
     <p>
       The final step is to remove outlier matches. This helps improve the
@@ -123,7 +123,7 @@
       OpenCV detector and extractor, including algorithms that are not scale
       and rotation invariant. Other popular image formats are supported using
       OpenCV
-      <a href="http://docs.opencv.org/3.1.0/d4/da8/group__imgcodecs.html">
+      <a href="https://docs.opencv.org/4.5.5/d4/da8/group__imgcodecs.html">
       imread()</a> image reader API. Images supported here can be provided as
       the image input files. However, these images will not have geometric
       functionality so  support for the fast geometric option is not
@@ -148,7 +148,7 @@
     </p>
     <br/>
     <code>
-      detector[@param1:value1@...]/extractor[@param1:value@...][/matcher@param1@value1@...][/parameters@param1:value1@...]
+      detector[@param1:value1@...]/extractor[@param1:value@...][/matcher@param1:value1@...][/parameters@param1:value1@...]
     </code>
     <p>
     <br/>
@@ -166,7 +166,7 @@
       begins the extractor algorithm specification,
       <code>extractor[@param1:value@...]</code>. Following the extractor
       specification is another <code>/</code> and the matcher algorithm,
-      <code>[matcher@param1@value1@...]</code>. The extractor and matcher
+      <code>[matcher@param1:value1@...]</code>. The extractor and matcher
       specifications are formatted the same way as the detector component. The
       final component of the specification string,
       <code>[/parameters@param1:value1@...]</code> defines the robust matcher
@@ -191,7 +191,7 @@
     <p>
     <br/>
       Many FBM algorithms are designed to use a specific detector, extractor
-      pair with shared parameters (SIFT and SURF are good examples of this).
+      pair with shared parameters (SIFT and ORB are good examples of this).
       For these cases, the alternative specification scheme allows for the
       detector and extractor to be defined in a single component with shared
       parameters. To do this, begin the first entry with
@@ -247,12 +247,12 @@
       use of <i>findfeatures</i>. If a poor choice of algorithms and/or
       parameters is made, <i>findfeatures</i> will usually complete,
       but excessive computation time and/or poor quality control network will
-      result. <i>findfeatures</i> supports all of the OpenCV 3.1
-      <a href="http://docs.opencv.org/3.1.0/d0/d13/classcv_1_1Feature2D.html">
+      result. <i>findfeatures</i> supports all of the OpenCV
+      <a href="https://docs.opencv.org/4.5.5/d0/d13/classcv_1_1Feature2D.html">
       detectors, extractors</a>, and
-      <a href="http://docs.opencv.org/3.1.0/db/d39/classcv_1_1DescriptorMatcher.html">
+      <a href="https://docs.opencv.org/4.5.5/db/d39/classcv_1_1DescriptorMatcher.html">
       matchers</a>. Some algorithms work well in a wide range of scenarios
-      (SURF and SIFT are both well tested and very robust), while others are
+      (BRISK and SIFT are both well tested and very robust), while others are
       highly specialized. The following section provides guidelines to
       determine which algorithms and parameters to use.
     </p>
@@ -260,7 +260,7 @@
       <i>findfeatures</i> gives users a wide range of options to alter
       algorithms functionaility. Such a broad range of choices/combinations
       can be intimidating for users who are unfamiliar with FBM. The following
-      are some sugestions to help make reasonable decision. First,
+      are some suggestions to help make reasonable decision. First,
       when in doubt, trust the defaults. The defaults in <i>findfeatures</i>
       are designed to be a reasonable choice for a wide range of conditions.
       They may not be suitable for every situation but special configurations
@@ -272,16 +272,18 @@
       speed and efficiency.
     </p>
     <p>
-      If at all possible, always use the FASTGEOM parameter. The
+      If at all possible, always use the <b>FASTGEOM</b> parameter. The
       majority of problems when using FBM arise when trainer and query images
       have inconsistent spatial geometry and/or significant variations in
-      observing conditions during image acquisition. The FASTGEOM parameter
+      observing conditions during image acquisition. The <b>FASTGEOM</b> parameter
       helps minimize these challenges by using a priori ephemeris SPICE data
       to create and apply a perspective matrix warp projection using the
-      query and training geometry. Combining the FASTGEOM option with
+      query and training geometry. Combining the <b>FASTGEOM</b> option with
       algorithms that are designed for speed (the FAST descriptor and BRIEF
-      extractor are reasonable options) will quickly produce a high quality
-      control network.
+      extractor are reasonable options) will quickly produce a control network.
+      Keep in mind these networks are whole-pixel accuracy and will likely
+      require refinement to subpixel accuracy with <i>pointreg</i> prior to
+      bundle adjustment with <i>jigsaw</i>.
     </p>
     <p>
       Different detectors search for different types of features. For
@@ -312,7 +314,7 @@
       from similar sensors and under similar conditions, then an
       extractor that uses smaller descriptors (BRISK, BRIEF, etc.) will be
       faster and just as accurate as extractors that use larger, more robust
-      descriptors (SIFT, SURF, etc.). If your images are from very different
+      descriptors (SIFT, etc.). If your images are from very different
       sensors (a line scanner matched to a highly distorted framing camera, a
       low resolution framing camera and a high resolution push broom camera,
       etc...) or under very different conditions (very oblique and nadir,
@@ -347,7 +349,7 @@
       <b>HMGTOLERANCE</b> parameter controls how outliers are found after the
       homography matrices are computed. This parameter will have the highest
       impact when the query and trainer images have very different exterior
-      orientations. When using FASTGEOM, it is recommended to use higher
+      orientations. When using <b>FASTGEOM</b>, it is recommended to use higher
       values for these tolerances due to distortions that are introduced
       by image size perspective warping using the homography matrix.
     </p>
@@ -358,8 +360,8 @@
       <b>FASTGEOMPOINTS</b> parameters allow for reprojection of the trainer
       images into the query image's geometry prior to FBM. (This algorithm is
       very similar to processing by the ISIS <i>cam2cam</i> application.
-      FASTGEOM differs in that it is not as robust or accurate as
-      <i>cam2cam</i> because FASTGEOM applies a single matrix to warp the
+      <b>FASTGEOM</b> differs in that it is not as robust or accurate as
+      <i>cam2cam</i> because <b>FASTGEOM</b> applies a single matrix to warp the
       entire image - <i>cam2cam</i> uses a rubber sheet projection which is
       significantly more robust and accurate but can take significantly
       longer to project images.) These parameters can be used to achieve
@@ -368,7 +370,7 @@
       parameters require that the trainer and query images
       be ISIS cubes with geometry/cartography capabilites established by
       running the <i>spiceinit</i> application on all images. For rotation
-      and scale invariant algorithms (SIFT, SURF, etc.), these parameters
+      and scale invariant algorithms (SIFT etc.), these parameters
       may have very little or significant adverse effects.
     </p>
     <p>
@@ -385,7 +387,7 @@
     <p>
       The OpenCV methods used in the outlier rejection process have several
       options that can be set along with the algorithms. The available
-      parameters for are robust marcher algorithms are listed in the following
+      parameters for are robust matcher algorithms are listed in the following
       <a href="#MatcherParameters">Robust Matcher Parameters</a> table.
       Feature matching algorithms and their descriptions and references are
       listed in the <a href="#Algorithms">Algorithms</a> table.
@@ -409,9 +411,9 @@
         <TD>
             Option to save the images that are matched
             after all transforms (e.g., fast geom, filtered, etc...)
-            have been applied. The query (MATCH) image will have
+            have been applied. The query (<b>MATCH</b>) image will have
             "_query" will be appended to the base name. All
-            FROM/FROMLIST images will have "_train" appended to their
+            <b>FROM</b>/<b>FROMLIST</b> images will have "_train" appended to their
             names. They are saved as PNG images in the directory
             specifed by the SavePath parameter.
         </TD>
@@ -520,8 +522,8 @@
         <TD>
           <UL>
             <LI>
-              <a href="http://docs.opencv.org/3.1.0/d0/d7a/classcv_1_1SimpleBlobDetector.html">
-              OpenCV 3.1.0 Documentation</a>
+              <a href="https://docs.opencv.org/4.5.5/d0/d7a/classcv_1_1SimpleBlobDetector.html">
+              OpenCV Documentation</a>
             </LI>
           </UL>
         </TD>
@@ -606,8 +608,8 @@
         <TD>
           <UL>
             <LI>
-              <a href="http://docs.opencv.org/3.1.0/d3/d28/classcv_1_1MSER.html">
-              OpenCV 3.1.0 Documentation</a>
+              <a href="https://docs.opencv.org/4.5.5/d3/d28/classcv_1_1MSER.html">
+              OpenCV Documentation</a>
             </LI>
             <LI>
               <a href="http://cmp.felk.cvut.cz/~matas/papers/matas-bmvc02.pdf">
@@ -689,7 +691,7 @@
         <TD>Detector, Extractor</TD>
         <TD>
           The KAZE algorithm is a very robust algorithm that attempts to
-          provide improved invariance to scale. The method that SIFT and SURF
+          provide improved invariance to scale. The method that SIFT
           use to provide scale invariance can result in proliferation of noise.
           The KAZE algorithm employs a non-linear scaling method that helps
           prevent this. Hence, the KAZE algorithm provides very strong
@@ -764,7 +766,7 @@
           the query and trainer images are very similar, then the BRIEF
           algorithm offers unmatched speed. This speed comes at a cost, the
           BRIEF algorithm behaves very poorly if the query and trainer images
-          vary significantly. The FASTGEOM parameter can help improve
+          vary significantly. The <b>FASTGEOM</b> parameter can help improve
           the quality of the match when using the BRIEF algorithm with varied
           query and trainer images.
         </TD>
@@ -836,8 +838,8 @@
           The LATCH algorithm extracts a fast binary descriptor that offers
           greater invariance than other binary descriptor extractors. It lies
           between the extremely fast binary descriptor extractors (BRIEF and
-          BRISK) and the very invariant but slow descriptor extractors (SURF
-          and SIFT). The LATCH algorithm also offers a CUDA implementation
+          BRISK) and the very invariant but slow descriptor extractors (SIFT).
+          The LATCH algorithm also offers a CUDA implementation
           that allows for extremely fast computation times when using multiple
           GPUs in parallel.
         </TD>
@@ -887,8 +889,8 @@
         <TD>
           <UL>
             <LI>
-              <a href="http://docs.opencv.org/3.1.0/db/d39/classcv_1_1DescriptorMatcher.html">
-              OpenCV 3.1.0 Documentation</a>
+              <a href="https://docs.opencv.org/4.5.5/db/d39/classcv_1_1DescriptorMatcher.html">
+              OpenCV Documentation</a>
             </LI>
           </UL>
         </TD>
@@ -909,8 +911,8 @@
         <TD>
           <UL>
             <LI>
-              <a href="http://docs.opencv.org/3.1.0/dc/de2/classcv_1_1FlannBasedMatcher.html">
-              OpenCV 3.1.0 Documentation</a>
+              <a href="https://docs.opencv.org/4.5.5/dc/de2/classcv_1_1FlannBasedMatcher.html">
+              OpenCV Documentation</a>
             </LI>
             <LI>
               <a href="http://www.cs.ubc.ca/research/flann/">
@@ -926,62 +928,60 @@
       There are four options to select and customize Feature Matching
       algorithms and their parameters. The two <i>findfeatures</i>
       parameters that specify Feature Matching algorithms
-      are the ALGORITHM and ALGOSPECFILE parameters.
-      The ALGORITHM parameter accepts a string that adheres to the
+      are the <b>ALGORITHM</b> and <b>ALGOSPECFILE</b> parameters.
+      The <b>ALGORITHM</b> parameter accepts a string that adheres to the
       specifications as described above that select the detector,
       extractor and matcher algorithms. Parameters for each of
       those algorithms can be provided in the string as well.
-      The ALGOSPECFILE parameter accepts the name of a file
+      The <b>ALGOSPECFILE</b> parameter accepts the name of a file
       containing one or more Feature Matching algorithm configurations
       that also adhere to the specification.
     </p>
     <p>
-      The ALGORITHM and ALGOSPECFILE parameters should contain the full
+      The <b>ALGORITHM</b> and <b>ALGOSPECFILE</b> parameters should contain the full
       specification of the Feature Matching algorithms, including the
       optional "/parameters" of the algorithm. At times, its
       useful to alter this component of the algorithm to customize for
       each set of data without having to maintain seperate files (although
       maintaining specs in those file is recommended practice). The
-      <i>findfeatures</i> ALGORITHM "/parameters" component of the feature
+      <i>findfeatures</i> <b>ALGORITHM</b> "/parameters" component of the feature
       matching specification command line overrides the contents of
-      the file specified in the PARAMETERS program parameter. This allows
-      runtime specification of mainly the ALGOSPECFILE PVL-type file
+      the file specified in the <b>PARAMETERS</b> program parameter. This allows
+      runtime specification of mainly the <b>ALGOSPECFILE</b> PVL-type file
       contents to alter behavior of this component of the feature matching
       algorithm.
     </p>
     <p>
       Initial values of outlier matching parameters that can be specified in
-      the PARAMETERS program option are those found in the
+      the <b>PARAMETERS</b> program option can be found in the
       <a href="#MatcherParameters">Robust Matcher Parameters</a> table.
-      These keywords are SaveRenderedImages, SavePath, RootSift,
-      MinimumFundamentalPoints, RefineFundamentalMatrix, and
-      MinimumHomographyPoints. Use of PARAMETERS excludes the need for these
+      Use of <b>PARAMETERS</b> excludes the need for these
       values to be specified in the command line without having to explicitly
-      add them to the ALGORITHM string specification or ALGOSPECFILE.
+      add them to the <b>ALGORITHM</b> string specification or <b>ALGOSPECFILE</b>.
     </p>
     <p>
-      The <i>findfeatures</i> GLOBALS program option allows users to specify
+      The <i>findfeatures</i> <b>GLOBALS</b> program option allows users to specify
       "/parameters" keywords that are applied in the Feature Matching
-      algorithms (as well as FASTGEOM algorithms). Individual parameters
-      are specifed in accordance with the ALGORITHM string specification
+      algorithms (as well as <b>FASTGEOM</b> algorithms). Individual parameters
+      are specifed in accordance with the <b>ALGORITHM</b> string specification
       described above. For example, users can select to have all matched
-      files saved as PNGs by specifying "GLOBALS=SaveRenderedImages:true".
+      files saved as PNGs by specifying "<b>GLOBALS</b>=SaveRenderedImages:true".
       This allows the most convenient method to alter or fully specify
       feature matching parameters at runtime without having to edit or
       provide any parameterization files.
     </p>
     <p>
       The order of precedence of Feature Matching parameterization is
-      (lowest to highest) PARAMETERS, ALGOSPECFILE, ALGORITHM and finally
-      GLOBALS.
+      (lowest to highest) <b>PARAMETERS</b>, <b>ALGOSPECFILE</b>, <b>ALGORITHM</b> and finally
+      <b>GLOBALS</b>.
     </p>
-    <h3>The FASTGEOM Algorithm</h3>
+    <h3>The <b>FASTGEOM</b> Algorithm</h3>
     <p>
-      The FASTGEOM option provides advanced geometric processing of
-      training images (FROM, FROMLIST) before they are matched to the query
-      (MATCH) image. The application of the FASTGEOM option is
+      The <b>FASTGEOM</b> option provides advanced geometric processing of
+      training images (<b>FROM</b>, <b>FROMLIST</b>) before they are matched to the query
+      (<b>MATCH</b>) image. The application of the <b>FASTGEOM</b> option is
       indicated when a wide variety of observation geometry is present in
-      the FROM/FROMLIST images. Once applied, all OpenCV feature matching
+      the <b>FROM</b>/<b>FROMLIST</b> images. Once applied, all OpenCV feature matching
       algorithms can be used particularly those that are not
       <a href="https://www.cs.princeton.edu/courses/archive/fall08/cos429/features">
       rotation and scale invariant</a>.
@@ -999,15 +999,15 @@
       geometric properties of the query image. Applying the transformation
       matrix to each trainer image results in a (fast) projection, or warp,
       of the image into the image space of the query image, thus minimizing
-      scale and rotation invariance. This defines the FASTGEOM processing
-      objectives in <i>findfeatures</i>. Note, however, that translation,
+      scale and rotation invariance. This defines the <b>FASTGEOM</b> processing
+      objectives in <i>findfeatures</i>. Note that translation,
       or spatial offsets, may likely exist between images due to the inherent
-      nature of a priori ephemeris data. And, for some image data sets,
-      particularly irregular bodies, this option may not work well,
-      especially for images acquired along the long axis of the target body.
+      nature of a priori ephemeris data. This option is known to have problems
+      with image sets of irregular bodies, especially for images acquired along
+      the long axis of the target body..
     </p>
     <p>
-      The FASTGEOM algorithms requires all input images to have
+      The <b>FASTGEOM</b> algorithms requires all input images to have
       ISIS-based SPICE ephemeris applied by the <i>spiceinit</i> application.
       If any image does not have SPICE or no common latitude/longitude
       coordinates can be determined between the trainer image and the
@@ -1015,9 +1015,9 @@
       recorded in the <b>TONOGEOM</b> file. Feature matching will continue
       if one or more trainer image is successfully transformed.
     </p>
-    <h3>Effective Use of FASTGEOM Algorithms</h3>
+    <h3>Effective Use of <b>FASTGEOM</b> Algorithms</h3>
     <p>
-      The FASTGEOM option provides two different algorithms - grid
+      The <b>FASTGEOM</b> option provides two different algorithms - grid
       and radial - that can be used to associate common latitude/longitude
       coordinates between two images. These common latitude/longitude
       coordinates are translated to line/sample image coordinates in both
@@ -1036,10 +1036,10 @@
     </p>
     <p>
       Several common parameters govern behavior of both the grid and
-      radial FASTGEOM algorithms. Note each algorithm is applied
+      radial <b>FASTGEOM</b> algorithms. Note each algorithm is applied
       independently to every query/trainer image pair. For each image pair,
       the values used/computed and the resulting homography matrix are
-      logged in the <b>DEBUGLOG</b> file (when DEBUG=true). The algorithm
+      logged in the <b>DEBUGLOG</b> file (when <b>DEBUG</b>=true). The algorithm
       parameters are described in the following table.
     </p>
     <TABLE border = "1">
@@ -1057,7 +1057,7 @@
           <TD>FastGeomAlgorithm</TD>
           <TD>Radial</TD>
           <TD>
-            Specifies the name of the FASTGEOM point mapping algorithm
+            Specifies the name of the <b>FASTGEOM</b> point mapping algorithm
             to use to compute common latitude/longitude and line/sample
             coordinates in the query and trainer images. Valid options are
             <b>Radial</b> and <b>Grid</b>.
@@ -1081,7 +1081,7 @@
           <TD>
             The maximum pixel outlier tolerance allowed in computing the
             homography matrix from query and trainer image mapped points
-            generated from the FASTGEOM algorithms. The outlier for
+            generated from the <b>FASTGEOM</b> algorithms. The outlier for
             each mapping point is computed by using the homography matrix
             to translate each trainer point to the perspective query point
             and calculating the Euclidean distance from the actual query
@@ -1146,13 +1146,13 @@
           <TD>FastGeomDumpMapping</TD>
           <TD>false</TD>
           <TD>
-            This parameter informs the FASTGEOM algorithm to dump the
+            This parameter informs the <b>FASTGEOM</b> algorithm to dump the
             mapping points of every query/trainer image pair to a CSV file.
             This will produce a file in the current directory of the form
             <i>queryfile_trainerfile_{FastGeomAlgorithm}.fastgeom.csv</i>
-            where <i>queryfile</i> is the base name of the MATCH file with no
+            where <i>queryfile</i> is the base name of the <b>MATCH</b> file with no
             directory or file extension, the <i>trainerfile</i> is the base
-            name of the FROM/FROMLIST file with no directory or file extension,
+            name of the <b>FROM</b>/<b>FROMLIST</b> file with no directory or file extension,
             and <i>{FastGeomAlgorithm}</i> is the type of algorithm specified
             in that parameter. The columns written to the file are:
             <em>QuerySample, QueryLine, TrainSample, TrainLine,
@@ -1166,9 +1166,9 @@
       </TR>
     </TABLE>
     <br/>
-    <h4>FASTGEOM Grid Algorithm</h4>
+    <h4><b>FASTGEOM</b> Grid Algorithm</h4>
     <p>
-      The FASTGEOM Grid algorithm computes a <i>coreg</i>-like
+      The <b>FASTGEOM</b> Grid algorithm computes a <i>coreg</i>-like
       rectangular set of grid points that are evenly space in each image axis.
       This algorithm will continue to refine the grid by decreasing the spacing
       between each iteration until at least <b>FastGeomPoints</b> valid mapping
@@ -1247,13 +1247,13 @@
       are little or no discontinuities in geometry and no limbs. It also
       can result in excessively long run times and/or significant computed
       resources for approach images where valid geometry is only in a small
-      localized region in the image FOV. In those cases, the FASTGEOM radial
+      localized region in the image FOV. In those cases, the <b>FASTGEOM</b> radial
       algorithm is recommended.
     </p>
     <br/>
     <h4>FASTGEOM Radial Algorithm</h4>
     <p>
-      The FASTGEOM Radial algorithm computes common geometric mapping
+      The <b>FASTGEOM</b> Radial algorithm computes common geometric mapping
       points in the query and trainer images that are generated from a radial
       pattern originated at the center of the query image. The radial algorithm
       differs most from the grid algorithm because it is not iterative. It is
@@ -1338,14 +1338,14 @@
     </p>
     <h4>Customizing the FASTGEOM Algorithms</h4>
     <p>
-      The default parameters for FASTGEOM "grid" and "radial" algorithms
-      are used if FASTGEOM=true when <i>findfeatures</i> is run on a set of
-      images. The default values for FASTGEOM are described in the
+      The default parameters for <b>FASTGEOM</b> "grid" and "radial" algorithms
+      are used if <b>FASTGEOM</b>=true when <i>findfeatures</i> is run on a set of
+      images. The default values for <b>FASTGEOM</b> are described in the
       table above and available in
       $ISISROOT/appdata/templates/findfeatures/findfeatures_fastgeom_defaults.pvl.
       This file can be copied and edited as needed for project wide application
-      of FASTGEOM parameters. This file is intended to be provided in the
-      <i>findfeatures</i> PARAMETERS program option. It can coexist along with
+      of <b>FASTGEOM</b> parameters. This file is intended to be provided in the
+      <i>findfeatures</i> <b>PARAMETERS</b> program option. It can coexist along with
       Feature Matching PVL parameters. Note this combination of parameters
       neatly centralizes all algorithms and their parameters in one file
       specifed at runtime to achieve desired behavior in all <i>findfeatures</i>
@@ -1355,23 +1355,23 @@
     </p>
     <p>
       However, as is with the Feature Matching parameterization, the
-      <i>findfeatures</i> GLOBAL program option can also be used to specify
-      or alter each FASTGEOM algorithm in the same way it is used to
-      change Feature Matching behavior. Any FASTGEOM parameter in both
+      <i>findfeatures</i> <b>GLOBALS</b> program option can also be used to specify
+      or alter each <b>FASTGEOM</b> algorithm in the same way it is used to
+      change Feature Matching behavior. Any <b>FASTGEOM</b> parameter in both
       the Grid and Radial algorithms can be specifed according to the
-      ALGORITHM string specification described above. Perhaps the most
+      <b>ALGORITHM</b> string specification described above. Perhaps the most
       useful aspect of this program option is to directly specify the
-      FASTGEOM option to use at runtime. For example, the "grid" algorithm
-      can be selected at runtime as "GLOBALS=FastGeomAlgorithm:grid" thus
+      <b>FASTGEOM</b> option to use at runtime. For example, the "grid" algorithm
+      can be selected at runtime as "<b>GLOBALS</b>=FastGeomAlgorithm:grid" thus
       overriding the default "radial" algorithm. Note all algorithm keywords
       specified in the Grid and Radial parameter tables can be provided in
-      the GLOBALS parameter separated by the <code>@</code> symbol.
+      the <b>GLOBALS</b> parameter separated by the <code>@</code> symbol.
     </p>
     <p>
       Note, as is with the Feature Matching algorithms, any "keyword:value"
-      pair specified in the GLOBALS option takes highest precidence and
+      pair specified in the <b>GLOBALS</b> option takes highest precidence and
       overrides values specifed by other means, such as contained in the
-      PVL file provided in PARAMETERS or algorithm defaults.
+      PVL file provided in <b>PARAMETERS</b> or algorithm defaults.
     </p>
     <h3>Using Debugging to Diagnose Behavior</h3>
     <p>
@@ -1380,16 +1380,16 @@
       outlier detection algorithms. The data produced by this option is
       very useful to identify the exact processing step where some matching
       operations may result in failed matching operations. In turn, this
-      will allow users to alter parameters to address these issues to lead
-      to better matches that would otherwise not be achieved.
+      will allow users to alter parameters to address these issues that
+      can lead to better matches that would otherwise not be achieved.
     </p>
     <p>
-      To invoke this option, users set DEBUG=TRUE and provide an optional
-      output file (DEBUGLOG=filename) where the debug data is written. If
+      To invoke this option, users set <b>DEBUG</b>=TRUE and provide an optional
+      output file (<b>DEBUGLOG</b>=filename) where the debug data is written. If
       no file is specified, output defaults to the terminal device. Below is
       an example (see the example section for details) of a debug session
       with line numbers added for reference of the description that
-      follows. The findfeatures command used to generate this example is:
+      follows. The <i>findfeatures</i> command used to generate this example is:
     </p>
     <br/>
 <PRE>
@@ -1416,9 +1416,9 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@maxpoints:500
 </PRE>
      <br/>
     <p>
-        Note the file TONOGEOM is not created since there were no failures
-        in FASTGEOM processing. The TONOTMATCHED file is also not created
-        because all files in FROM/FROMLIST were successfully included in
+        Note the file <b>TONOGEOM</b> is not created since there were no failures
+        in <b>FASTGEOM</b> processing. The <b>TONOTMATCHED</b> file is also not created
+        because all files in <b>FROM</b>/<b>FROMLIST</b> were successfully included in
         the output control network.
     </p>
 <PRE>
@@ -1581,15 +1581,15 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@maxpoints:500
 </PRE>
     <p>
         In the above example, lines 2-11 provide general information about the
-        program and compute environment. If MAXTHREADS were set to a value less
+        program and compute environment. If <b>MAXTHREADS</b> were set to a value less
         than 8, the number of total threads (line 11) would reflect this number.
         Lines 13 indicates the time when image loading was initiated.
     </p>
     <p>
         Lines 15-55
-        reports the results of FASTGEOM processing for all input images. In this
+        reports the results of <b>FASTGEOM</b> processing for all input images. In this
         case, there is only one image processed. Lines 16-55 would repeat for
-        every image pair that is processed by the FASTGEOM algorithm. Lines 18-24
+        every image pair that is processed by the <b>FASTGEOM</b> algorithm. Lines 18-24
         indicate the values determined the common algorithm parameters as shown in
         the <a href="#FastGeomCommonParameters">FASTGEOM Common Parameters</a> table.
         Lines 26-31 indicate the parameters determined/used for the radial mapping
@@ -1607,28 +1607,28 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@maxpoints:500
         algorithm on the train image. Lines 46-50 report the results of the
         generation of the homography matrix. And finally, lines 52-55 show the
         actual homography matrix produced for this image pair. After all images
-        are processed by the FASTGEOM algorithm, line 57 reports the processing
+        are processed by the <b>FASTGEOM</b> algorithm, line 57 reports the processing
         time the algorithm completed.
     </p>
     <p>
         Line 61 specifies the precise time the matcher algorithm was invoked.
         Line 64-71 shows the algorithm string specification, names of query
-        (MATCH) and train (FROM/FROLIST) images and the full and rendered sizes
+        (<b>MATCH</b>) and train (<b>FROM</b>/FROLIST) images and the full and rendered sizes
         of images. Lines 74 and 75 show the total number of keypoints or
         features that were returned [detected] by the FASTX detector for both
         the query (512 [14121]) and train (518 [9511]) images.  Lines 78-80
         indicate the descriptors of all the feature keypoints are being
         extracted. Extraction of keypoint descriptors can be costly under some
         conditions. Users can restrict the number of features detected by using
-        the MAXPOINTS parameter, which was provided in the parameters of the
-        ALGORITHM specification for this run. The values in brackets in
+        the <b>MAXPOINTS</b> parameter, which was provided in the parameters of the
+        <b>ALGORITHM</b> specification for this run. The values in brackets in
         lines 74 and 75 will show (and differ from) the total amount of
-        features detected if MAXPOINTS is provided.
+        features detected if <b>MAXPOINTS</b> is provided.
     </p>
     <p>
         Outlier detection begins at line 82. The Ratio test is performed first.
         Here the matcher algorithm is invoked for each match pair, regardless
-        of the number of train (FROMLIST) images provided. For each keypoint in
+        of the number of train (<b>FROMLIST</b>) images provided. For each keypoint in
         the query image, the two nearest matches in the train image are
         computed and the results are reported in lines 86-89. Then the
         bi-directional matches are computed in lines 90-93.  A bi-directional
@@ -1639,7 +1639,7 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@maxpoints:500
         1.0. The symmetry test, ensuring matches from query->train have the same
         match as train->query, is reported in lines 110-114. In lines 115-121,
         the homography matrix is computed and outliers are removed where the
-        tolerance exceeds HMGTOLERANCE. Lines 122-130 shows the results of the
+        tolerance exceeds <b>HMGTOLERANCE</b>. Lines 122-130 shows the results of the
         epipolar fundamental matrix computation and outlier detection. Matching
         is completed in lines 131-137 which report the final spatial homography
         computations to produce the final transformation matrix between the
@@ -1654,10 +1654,10 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@maxpoints:500
         connects all the same features in the each of the images (control measures)
         into individual sets of control points. Users can also choose to preserve
         all ignored control points by adding "PreserveIgnoredControl:true" in
-        the GLOBALS parameter. The value used specified is reported on line 146.
+        the <b>GLOBALS</b> parameter. The value used specified is reported on line 146.
         If true, this will result in some control points being marked as ignored
         in the output control point. These kinds of points will typically be
-        created when GEOMSOURCE=both and all control measures within a control
+        created when <b>GEOMSOURCE</b>=both and all control measures within a control
         point fails valid geometry tests when the output network is created.
     </p>
      <h3>Evaluation of Matcher Algorithm Performance</h3>
@@ -1671,7 +1671,7 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@maxpoints:500
       make a determination as to which algorithm performs best.
     </p>
     <p>
-      Using the ALGOSPECFILE parameter, users can specify one or more
+      Using the <b>ALGOSPECFILE</b> parameter, users can specify one or more
       algorithms to apply to a given image matching process. Each algorithm
       specified, one per line in the input file, results in the creation of
       a unique robust matcher algorithm that is applied to the input files in
@@ -1744,10 +1744,11 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@maxpoints:500
       MatchSolution group. Here is an example:
       <pre>
 Group = MatchSolution
-    Matcher      = surf@hessianThreshold:100/surf/BFMatcher@NormType:NORM_L2@CrossCheck:false
-    MatchedPairs = 1
-    Efficiency   = 0.040744395883265
-  End_Group
+  Matcher      = orb@nfeatures:3000/sift/BFMatcher@NormType:NORM_L2@CrossCheck:false
+  MatchedPairs = 1
+  ValidPairs   = 1
+  Efficiency   = 0.019733333333333
+End_Group
       </pre>
     </p>
     </description>
@@ -1814,7 +1815,7 @@ Group = MatchSolution
     <change name="Kris Becker" date="2021-10-29">
         Fix matrix inversion error on empty matrix. (Fixes #4639)
         Identify images that fail FastGeom transform and exclude from matching.
-        Add TONOGEOM parameter to write failed file loads or FastGeom error
+        Add <b>TONOGEOM</b> parameter to write failed file loads or FastGeom error
         file list if the transform cannot be determined. Improve FastGeom
         transform algorithm using new radial point mapping scheme. Add more
         debugging output to help diagnose problem images/procedures.
@@ -1822,16 +1823,21 @@ Group = MatchSolution
     <change name="Kris Becker" date="2022-02-08">
         Reorganized FastGeom (added methods radial_algorithm(), grid_algorithm()
         and dump_point_mapping()) and cleaned up code after USGS/Astro code
-        review. Added new parameter GLOBALS that provides convenience for setting
+        review. Added new parameter <b>GLOBALS</b> that provides convenience for setting
         or resetting algorithm or processing variables. (Fixes #4772)
     </change>
     <change name="Kris Becker" date="2023-06-21">
-        Prevent the creation of the TONOTMATCHED file if all images are
+        Prevent the creation of the <b>TONOTMATCHED</b> file if all images are
         successfully paired with another image. Significantly updated and
-        improved all documentation. Thoroughly explain the FASTGEOM option.
+        improved all documentation. Thoroughly explain the <b>FASTGEOM</b> option.
         Describe how to apply and parameterize the new radial and improved grid
-        FASTGEOM mapping algorithms. Add two new examples to show how to
-        use findfeatures. (References #4772)
+        <b>FASTGEOM</b> mapping algorithms. Add two new examples to show how to
+        use <i>findfeatures</i>. (References #4772)
+    </change>
+    <change name="Kris Becker" date="2023-08-04">
+        Fix bug when using projected images and mosaics. Instantiation and use
+        of projection class was fixed to correctly return geometry data for
+        these images.
     </change>
   </history>
 
@@ -1844,7 +1850,7 @@ Group = MatchSolution
           Input Image to be Translated
         </brief>
         <description>
-          This cube/image (train) will be translated to register to the MATCH
+          This cube/image (train) will be translated to register to the <b>MATCH</b>
           (query) cube/image. This application supports other common image
           formats such as PNG, TIFF or JPEG. Essentially any image that can be
           read by OpenCV's
@@ -1870,7 +1876,7 @@ Group = MatchSolution
           cube filenames. The cubes identified inside this file will be used
           to create the control network. All input images are converted to
           8-bit when they are read. The following is an example of the
-          contents of a typical FROMLIST file:
+          contents of a typical <b>FROMLIST</b> file:
           </p>
           <pre>
             AS15-M-0582_16b.cub
@@ -1881,7 +1887,7 @@ Group = MatchSolution
             AS15-M-0587_16b.cub
           </pre>
           <p>
-            Each file name in a FROMLIST file should be on a separate line.
+            Each file name in a <b>FROMLIST</b> file should be on a separate line.
           </p>
         </description>
         <internalDefault>None</internalDefault>
@@ -1914,10 +1920,10 @@ Group = MatchSolution
           <brief>Output ControlNet network file of matched features</brief>
           <description>
                This file will contain the Control Point network results of
-               findfeatures in a binary format.  There will be no false or
+               <i>findfeatures</i> in a binary format.  There will be no false or
                failed matches in the output control network file. Using this
                control network and TOLIST in the qnet application, the results
-               of findfeatures can be visually assessed.
+               of <i>findfeatures</i> can be visually assessed.
           </description>
           <internalDefault>None</internalDefault>
           <filter>
@@ -1932,10 +1938,10 @@ Group = MatchSolution
           <description>
              This file will contain the list of (cube) files in the control
              network. For multi-image matching, some files may not have matches
-             detected. These files will not be written to TOLIST. The MATCH file
+             detected. These files will not be written to TOLIST. The <b>MATCH</b> file
              is always added first and all other images that have matches are
              added to TOLIST. Using this list and the ONET in the qnet
-             application, the results of findfeatures can be visually assessed.
+             application, the results of <i>findfeatures</i> can be visually assessed.
           </description>
           <internalDefault>None</internalDefault>
           <filter>*.lis</filter>
@@ -1945,7 +1951,7 @@ Group = MatchSolution
           <type>filename</type>
           <fileMode>output</fileMode>
           <brief>
-              Output list of FROM/FROMLIST cube files that were not
+              Output list of <b>FROM</b>/<b>FROMLIST</b> cube files that were not
               successfully matched
           </brief>
           <description>
@@ -1967,7 +1973,7 @@ Group = MatchSolution
           <type>filename</type>
           <fileMode>output</fileMode>
           <brief>
-              Output list of FROM/FROMLIST cube files that failed FastGeom
+              Output list of <b>FROM</b>/<b>FROMLIST</b> cube files that failed FastGeom
           </brief>
           <description>
               <p>
@@ -1976,13 +1982,13 @@ Group = MatchSolution
                  that this process uses the current state of geometry for each
                  image, which is likely to be a prior SPICE. This could be the
                  cause of failures rather than no common ground coverage between
-                 the MATCH and FROM/FROMLIST images.
+                 the <b>MATCH</b> and <b>FROM</b>/<b>FROMLIST</b> images.
 
               </p>
               <p>
                   NOTE this option supports the scenario where users cannot
-                  verify the FROM/FROMLIST images have any common coverage with
-                  the MATCH image. Large lists of images will have significantly
+                  verify the <b>FROM</b>/<b>FROMLIST</b> images have any common coverage with
+                  the <b>MATCH</b> image. Large lists of images will have significantly
                   compute overhead, so use sparingly.
               </p>
               <p>
@@ -2019,7 +2025,7 @@ Group = MatchSolution
             <description>
                To accomodate a potentially large set of feature algorithms,
                you can provide them in a file.  This format is the same as the
-               ALGORITHM format, but each unique algorithm must be specifed
+               <b>ALGORITHM</b> format, but each unique algorithm must be specifed
                on a seperate line.  Thoeretically, the number you specify is
                unlimited. This option is particularly useful to generate a
                series of algorithms that vary parameters for any of the
@@ -2032,11 +2038,11 @@ Group = MatchSolution
        <parameter name= "LISTSPEC">
             <type>boolean</type>
             <brief>
-               List result of ALGORITHM specification
+               List result of <b>ALGORITHM</b> specification
             </brief>
             <description>
               If true, information about the detector, extractor, matcher, and
-              parameters specified in the ALGORITHM or ALGOSPECFILE parameters
+              parameters specified in the <b>ALGORITHM</b> or <b>ALGOSPECFILE</b> parameters
               will be output. If multiple sets of algorithms are specified,
               then the details for each set will be output.
             </description>
@@ -2193,7 +2199,7 @@ End
             <type>boolean</type>
             <brief>Print debugging statements of the matcher algorithm</brief>
             <description>
-              At times, things go wrong. By setting DEBUG=TRUE, information is
+              At times, things go wrong. By setting <b>DEBUG</b>=TRUE, information is
               printed as elements of the matching algorithm are executed. This
               option is very helpful to monitor the entire matching and outlier
               detection processing to determine where adjustments in the
@@ -2223,7 +2229,7 @@ End
             <brief>File containing special algorithm parameters</brief>
             <description>
                 This file can contain specialized parameters that will modify
-                certain behaviors in the robust matcher and FASTGEOM
+                certain behaviors in the robust matcher and <b>FASTGEOM</b>
                 algorithms. They can vary over time and are documented in the
                 application descriptions.
             </description>
@@ -2244,9 +2250,9 @@ End
                 </p>
                 <p>
                     For example, using this parameter is the most straightforward
-                    way to select the FASTGEOM algorithm. To select the FastGeom
+                    way to select the <b>FASTGEOM</b> algorithm. To select the <b>FASTGEOM</b>
                     Grid algorithm and constrain the number of interations to 10,
-                    use GLOBALS=FastGeomAlgorithm:Grid@FastGeomGridStopIteration:10".
+                    use <b>GLOBALS</b>=FastGeomAlgorithm:Grid@FastGeomGridStopIteration:10".
                 </p>
                 <p>
                     There is very little robust error detection or any confirmation
@@ -2267,7 +2273,7 @@ End
                 detection phase. If a value is not provided for this
                 parameter, there will be no restriction set on the number of
                 keypoints that will be used to match. If specified, then
-                approximately MAXPOINTS keypoints with the highest/best detector
+                approximately <b>MAXPOINTS</b> keypoints with the highest/best detector
                 response values are retained and passed on to the extractor and
                 matcher algorithms. This parameter is useful for detectors that
                 produce a high number of features. A large number of features
@@ -2351,7 +2357,7 @@ End
                 <p>
                      The parameter is used as a tolerance in the computation of
                      the distance between keypoints using the homography matrix
-                     relationship between the MATCH image and each FROM/FROMLIST
+                     relationship between the <b>MATCH</b> image and each <b>FROM</b>/<b>FROMLIST</b>
                      image.  This will throw points out that are (dist >
                      TOLERANCE * min_dist), the smallest distance between
                      points.
@@ -2368,9 +2374,9 @@ End
            <description>
                This parameter allows users to control the number of threads to
                use for image matching. A default is to use all available threads
-               on system. If MAXTHREADS is specified, the maximum number of CPUs
+               on system. If <b>MAXTHREADS</b> is specified, the maximum number of CPUs
                are used if it exceeds the number of CPUs physically available
-               on the system or no more than MAXTHREADS will be used.
+               on the system or no more than <b>MAXTHREADS</b> will be used.
            </description>
            <default><item>0</item></default>
        </parameter>
@@ -2382,8 +2388,8 @@ End
             <brief>Perform fast geometry image transform</brief>
             <description>
                When TRUE, this option will perform a fast geometric linear
-               transformation that <em>projects</em> each FROM/FROMLIST image to
-               the camera space of the MATCH image. Note this option
+               transformation that <em>projects</em> each <b>FROM</b>/<b>FROMLIST</b> image to
+               the camera space of the <b>MATCH</b> image. Note this option
               <em>theoretically</em> is not needed for scale/rotation invariant
               feature matchers such as SIFT and SURF but there are limitations as
               to the invariance of these matchers. For matchers that are not scale
@@ -2397,13 +2403,13 @@ End
        <parameter name="FASTGEOMPOINTS">
            <type>integer</type>
            <brief>
-              Minimium points to compute perspective matrix in FASTGEOM
+              Minimium points to compute perspective matrix in <b>FASTGEOM</b>
            </brief>
            <description>
               Specify the minimun number of common geometry mapping points
               used to compute the FASTGEOM homography transformation matrix
-              that is used in the perspective warp of a FROM/FROMLIST image
-              into the camera space of the MATCH image.
+              that is used in the perspective warp of a <b>FROM</b>/<b>FROMLIST</b> image
+              into the camera space of the <b>MATCH</b> image.
            </description>
            <default><item>25</item></default>
        </parameter>
@@ -2413,29 +2419,29 @@ End
         <default><item>CAMERA</item></default>
         <brief>Type of fast geom mapping to apply</brief>
         <description>
-           Provide options as to how FASTGEOM projects data in the FROM (train)
-           image to the MATCH (query) image space.
+           Provide options as to how <b>FASTGEOM</b> projects data in the <b>FROM</b> (train)
+           image to the <b>MATCH</b> (query) image space.
         </description>
         <list>
            <option value="CAMERA">
                <brief>
-                  Fastgeom will project the FROM image into the MATCH space
+                  Fastgeom will project the <b>FROM</b> image into the <b>MATCH</b> space
                </brief>
                <description>
                    This option projects the image in the same manner as cam2map.
-                   The common area of the FROM image is projected into an image
-                   of the same size as the MATCH image. This is comparable to
-                   cam2map in that it projects the FROM image into the camera
-                   space of the MATCH image. Features should be located at the
+                   The common area of the <b>FROM</b> image is projected into an image
+                   of the same size as the <b>MATCH</b> image. This is comparable to
+                   cam2map in that it projects the <b>FROM</b> image into the camera
+                   space of the <b>MATCH</b> image. Features should be located at the
                    same general line and sample location in both images.
                </description>
            </option>
            <option value="CROP">
                <brief>
-                  Fastgeom will crop the FROM image to common area of MATCH
+                  Fastgeom will crop the <b>FROM</b> image to common area of <b>MATCH</b>
                </brief>
                <description>
-                  Fastgeom will crop the FROM image to common area of MATCH and
+                  Fastgeom will crop the <b>FROM</b> image to common area of <b>MATCH</b> and
                   retain on the approximate size of the cropped region. This
                   option is useful to limit features to be identified in the
                   common region in both images.
@@ -2444,14 +2450,14 @@ End
 
            <option value="MAP">
                <brief>
-                   Fastgeom will fully map project all of the FROM image
+                   Fastgeom will fully map project all of the <b>FROM</b> image
                </brief>
                <description>
-                   Fastgeom will preserve all of the FROM image using the
+                   Fastgeom will preserve all of the <b>FROM</b> image using the
                    translation computed from common space. This is comparable
                    to map2map in that the whole from is projected using the
-                   MATCH geometry. The size of the image is determined by
-                   projecting the corners of the FROM image using the MATCH
+                   <b>MATCH</b> geometry. The size of the image is determined by
+                   projecting the corners of the <b>FROM</b> image using the <b>MATCH</b>
                    geometry. Images can be quite large or small if there is a
                    large resolution difference.
                </description>
@@ -2482,11 +2488,11 @@ End
 
            <option value="SOBEL">
                <brief>
-                  Apply Sobel filtering to both FROM and MATCH images
+                  Apply Sobel filtering to both <b>FROM</b> and <b>MATCH</b> images
                </brief>
                <description>
                   The <a href="http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=sobel#sobel ">
-                  Sobel</a> filter to both the FROM and MATCH images for
+                  Sobel</a> filter to both the <b>FROM</b> and <b>MATCH</b> images for
                   enhanced edge detection. The 8-bit images are first scaled to
                   16-bit and a Gaussian Blur noise reduction filter is applied
                   before the 3x3 Sobel filter is applied. The BORDER_REFLECT
@@ -2496,11 +2502,11 @@ End
 
            <option value="SCHARR">
                <brief>
-                  Apply Scharr filtering to both FROM and MATCH images for enhanced edges.
+                  Apply Scharr filtering to both <b>FROM</b> and <b>MATCH</b> images for enhanced edges.
                </brief>
                <description>
                  A <a href="http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=sobel#scharr">
-                  Scharr</a> filtering to both FROM and MATCH images for
+                  Scharr</a> filtering to both <b>FROM</b> and <b>MATCH</b> images for
                   enhanced edge detection. The 8-bit images are first scaled to
                   16-bit and a 3x3 Gaussian Blur noise reduction filter is
                   applied before the 3x3 Scharr filter is applied. The
@@ -2599,7 +2605,7 @@ End
                There are two types of control network files that can be created
                in this application: IMAGE and GROUND.  For IMAGE types, the pair
                is assumed to be overlapping pairs where control measures for
-               both images are created.  For NETTYPE=GROUND, only the FROM file
+               both images are created.  For NETTYPE=GROUND, only the <b>FROM</b> file
                measure is recorded for purposes of dead reckoning of the image
                using jigsaw.
             </description>
@@ -2619,7 +2625,7 @@ End
                         Only create a ground network file for dead reckoning
                     </brief>
                     <description>
-                       Create a control network with only the FROM image so that
+                       Create a control network with only the <b>FROM</b> image so that
                        only its pointing will be updated.
                     </description>
                 </option>
@@ -2633,7 +2639,7 @@ End
                For input files that provide geometry, specify which one provides
                the latitude/longitude values for each control point.  NONE is
                an acceptable option for which there is no geometry available.
-               Otherwise, the user must choose FROM or MATCH as the cube file
+               Otherwise, the user must choose <b>FROM</b> or <b>MATCH</b> as the cube file
                that wil provide geometry.
             </description>
             <default><item>MATCH</item></default>
@@ -2644,27 +2650,27 @@ End
                     </brief>
                     <description>
                         Use this option if geometry is not available in either
-                        the FROM or MATCH image
+                        the <b>FROM</b> or <b>MATCH</b> image
                     </description>
                 </option>
                 <option value="FROM">
                     <brief>
-                       Use the FROM file to compute geometries for control points
+                       Use the <b>FROM</b> file to compute geometries for control points
                     </brief>
                     <description>
-                        Selection of the FROM option indicates use of the FROM
+                        Selection of the <b>FROM</b> option indicates use of the <b>FROM</b>
                         file to compute the latitude and longitude of each
                         control point.   Note this option cannot be used when
-                        there are more than one FROM (via FROMLIST) is given.
-                        Must use MATCH for these cases.
+                        there are more than one <b>FROM</b> (via <b>FROMLIST</b>) is given.
+                        Must use <b>MATCH</b> for these cases.
                     </description>
                 </option>
                <option value="MATCH">
                     <brief>
-                       Use the MATCH file to compute geometries for control points
+                       Use the <b>MATCH</b> file to compute geometries for control points
                     </brief>
                     <description>
-                        Selection of the MATCH option indicates use of the MATCH
+                        Selection of the <b>MATCH</b> option indicates use of the <b>MATCH</b>
                         file to compute the latitude and longitude of each
                         control point.
                     </description>
@@ -2674,8 +2680,8 @@ End
                        Use BOTH files to compute/verify geometries for control points
                     </brief>
                     <description>
-                        Selection of the BOTH option indicates that the MATCH
-                        and FROM/FROMLIST measures will be verified by computing
+                        Selection of the BOTH option indicates that the <b>MATCH</b>
+                        and <b>FROM</b>/<b>FROMLIST</b> measures will be verified by computing
                         a valid latitude/longitude at the matched line/sample for
                         each measure. If the match point contains at least
                         two valid measures, the ControlPoint is writen to the output
@@ -2845,7 +2851,7 @@ This provides a reference for all the current algorithms and their default param
         <PRE>
 Object = Algorithms
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = AGAST
     Type         = Feature2D
     Features     = Detector
@@ -2864,7 +2870,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = AKAZE
     Type         = Feature2D
     Features     = (Detector, Extractor)
@@ -2886,7 +2892,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = Blob
     Type         = Feature2D
     Features     = Detector
@@ -2921,7 +2927,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = BRISK
     Type         = Feature2D
     Features     = (Detector, Extractor)
@@ -2939,7 +2945,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = FAST
     Type         = Feature2D
     Features     = Detector
@@ -2958,7 +2964,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = GFTT
     Type         = Feature2D
     Features     = Detector
@@ -2980,7 +2986,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = KAZE
     Type         = Feature2D
     Features     = (Detector, Extractor)
@@ -3001,7 +3007,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = MSD
     Type         = Feature2D
     Features     = Detector
@@ -3026,7 +3032,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = MSER
     Type         = Feature2D
     Features     = Detector
@@ -3050,7 +3056,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = ORB
     Type         = Feature2D
     Features     = (Detector, Extractor)
@@ -3074,7 +3080,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = SIFT
     Type         = Feature2D
     Features     = (Detector, Extractor)
@@ -3095,7 +3101,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = Star
     Type         = Feature2D
     Features     = Detector
@@ -3116,28 +3122,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
-    Name         = SURF
-    Type         = Feature2D
-    Features     = (Detector, Extractor)
-    Description  = "The OpenCV SURF Feature2D detector/extractor algorithm.
-                    See the documentation at
-                    http://docs.opencv.org/3.1.0/d5/df7/classcv_1_1xfeatures2d-
-                    _1_1SURF.html"
-    CreatedUsing = surf
-    Aliases      = (detector.surf, extractor.surf, feature2d.surf, surf)
-
-    Group = Parameters
-      Extended         = No
-      HessianThreshold = 100.0
-      NOctaveLayers    = 3
-      NOctaves         = 4
-      Upright          = No
-    End_Group
-  End_Object
-
-  Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = Brief
     Type         = Feature2D
     Features     = Extractor
@@ -3155,7 +3140,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = DAISY
     Type         = Feature2D
     Features     = Extractor
@@ -3179,7 +3164,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = FREAK
     Type         = Feature2D
     Features     = Extractor
@@ -3200,7 +3185,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = LATCH
     Type         = Feature2D
     Features     = Extractor
@@ -3219,7 +3204,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = LUCID
     Type         = Feature2D
     Features     = Extractor
@@ -3237,7 +3222,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = BFMatcher
     Type         = DecriptorMatcher
     Features     = Matcher
@@ -3255,7 +3240,7 @@ Object = Algorithms
   End_Object
 
   Object = Algorithm
-    CVVersion    = 3.1.0
+    CVVersion    = 4.5.5
     Name         = FlannBasedMatcher
     Type         = DecriptorMatcher
     Features     = Matcher
@@ -3279,21 +3264,21 @@ End
     </example>
     <example>
       <brief>
-          Process three images using the default radial FASTGEOM option
+          Process three images using the default radial <b>FASTGEOM</b> option
       </brief>
       <description>
         <p>
-          This example is a variation of example 1 that runs the imates in
-          different way. This example uses the FASTGEOM option with the
+          This example is a variation of example 1 that runs the images in
+          a different way. This example uses the <b>FASTGEOM</b> option with the
           default settings applied to the same images. There is an additional
-          image included that has no overlap with the MATCH image. When
-          FASTGEOM is used, all images that cannot be mapped usings ISIS
-          geometry are excluded from the matcing process. If a filename
-          is provided in TONOGEOM option, images that do not have any
-          common mapping points generated by the FASTGEOM pattern algorithm
+          image included that has no overlap with the <b>MATCH</b> image. When
+          <b>FASTGEOM</b> is used, all images that cannot be mapped using ISIS
+          geometry are excluded from the matching process. If a filename
+          is provided in <b>TONOGEOM</b> option, images that do not have any
+          common mapping points generated by the <b>FASTGEOM</b> pattern algorithm
           are written/recorded in this file. Images that are included in
           the matching process but do not have any control measures in common
-          with the MATCH image will be recorded in the TONOTMATCHED filename
+          with the <b>MATCH</b> image will be recorded in the <b>TONOTMATCHED</b> filename
           if given.
         </p>
         <p>
@@ -3326,40 +3311,37 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@maxpoints:500
         <p>
           In this case, since we are matching more than one file, all the
           files to be matched must be listed, one per line, in the file
-          specified in the FROMFILE, <i>fromlist.lis</i>. Here is the contents
+          specified in the <b>FROMFILE</b>, <i>fromlist.lis</i>. Here is the contents
           of this file:
-          <br/>
-          <code>
-            EW0242463603G.cub
-            EW0218118239G.cub
-          </code>
-          <br/><br/>
+<PRE>
+EW0242463603G.cub
+EW0218118239G.cub
+</PRE>
         </p>
         <p>
-          There are two additional parameters added in GLOBALS parameter. The
-          paramter <b>FastGeomDumpMapping:true</b> will notify the radial
+          There are two additional parameters added in <b>GLOBALS</b> parameter. The
+          parameter <b>FastGeomDumpMapping:true</b> will notify the radial
           mapping algorithm to dump a CSV file containing the results of the
           common mapping points generated from the radial pattern. Recall that
           the radial algorithm produces only one pattern from which it
           calculates the perspective warping matrix for each image
-          in the FROMLIST. This option generates a file containing the data
-          made up of the basenames of the MATCH and FROMLIST image pairs. In
+          in the <b>FROMLIST</b>. This option generates a file containing the data
+          made up of the basenames of the <b>MATCH</b> and <b>FROMLIST</b> image pairs. In
           this example, the file <i>EW0211981114G_EW0242463603G.radial.fastgeom.csv</i>
           is created. Even files that cannot be mapped will have a file
           generated but they will be empty.
-          This matrix is then applied to the FROMLIST image
-          that is intended to better correspond spatially with the MATCH
-          image. The <b>SaveRenderedImages:true</b> parameter tells the
+          This matrix is then applied to the <b>FROMLIST</b> image
+          that is intended to better correspond spatially with the <b>MATCH</b>
+          image. The <b>SaveRenderedImages:true</b> parameter tells
           <i>findfeatures</i> to save the warped images to a PNG file. This
-          will allow users to evaluate how well the FASTGEOM algorithm
+          will allow users to evaluate how well the <b>FASTGEOM</b> algorithm
           performed. This option creates PNG files generated from their
           base file names, such as <i>EW0211981114G_query.png</i> from the
-          MATCH file and <i>EW0242463603G_train.png</i> from the FROMLIST
-          file name. The processing of FASTGEOM is logged in the DEBUGLOG
-          file if given and DEBUG=true is set. Here is the portion of the
+          <b>MATCH</b> file and <i>EW0242463603G_train.png</i> from the <b>FROMLIST</b>
+          file name. The processing of <b>FASTGEOM</b> is logged in the <b>DEBUGLOG</b>
+          file if given and <b>DEBUG</b>=true is set. Here is the portion of the
           log file <i>EW0211981114G.debug.log</i> that is created from the
-          FASTGEOM algorithm:
-          The
+          <b>FASTGEOM</b> algorithm:
         </p>
 <PRE>
 ---------------------------------------------------
@@ -3466,17 +3448,17 @@ Total Algorithms to Run:     1
         <p>
           Note that an error is shown for the file <i>EW0218118239G.cub</i>.
           This is because no common points were found for this file and the
-          MATCH file, <i>EW0211981114G</i>. Using the "keyword:value" pairs
-          in the GLOBALS parameters, the results can be analyzed as shown in
-          panel shown below.  The plot in the lower left corner of the panel
-          shows the results of the FASTGEOM Radial parameter geometry mapping
-          of common/cooresponding points of the MATCH and FROM image. The
-          points in red are outside the FROM image FOV and do not contribute
+          <b>MATCH</b> file, <i>EW0211981114G</i>. Using the "keyword:value" pairs
+          in the <b>GLOBALS</b> parameters, the results can be analyzed as shown in
+          the panel below.  The plot in the lower left corner of the panel
+          shows the results of the <b>FASTGEOM</b> Radial parameter geometry mapping
+          of common/cooresponding points of the <b>MATCH</b> and <b>FROM</b> image. The
+          points in red are outside the <b>FROM</b> image FOV and do not contribute
           to the computation of the homography matrix for the perspective
-          warp for spatial consistency with the MATCH image. The blue
+          warp for spatial consistency with the <b>MATCH</b> image. The blue
           points are the ones used in to produce the homography matrix.
           The image in the lower right corner is the result of the
-          warp of the FROM image.
+          warp of the <b>FROM</b> image.
         </p>
         <br/><br/>
         <img src='assets/EW0211981114G_EW0242463603G_findfeatures_small.png' alt='FASTEGEOM results using RADIAL algorithm' width='650' height='650' />
@@ -3496,7 +3478,7 @@ Total Algorithms to Run:     1
 
     <example>
       <brief>
-          Create a controlled mosaic using findfeatures
+          Create a controlled mosaic using <i>findfeatures</i>
       </brief>
       <description>
         <h3>Overview</h3>
@@ -3505,8 +3487,8 @@ Total Algorithms to Run:     1
           produces a controlled mosaic using <i>findfeatures</i>. The data
           used for this mosaic is MESSENGER MDIS NAC and WAC images of
           Mercury. A complete set of scripts are provided with this
-          example begins with the download of the images from the
-          MESSENGER MDIS PDS archive that are ingested into ISIS where
+          example beginnng with the download of the images from the
+          MESSENGER MDIS PDS archive. These EDRs are ingested into ISIS where
           standard processing is applied and the entire procedure to
           produce a regional controlled mosaic using <i>findfeatures</i>
           is demonstrated. These scripts are designed to be adaptable
@@ -3515,13 +3497,13 @@ Total Algorithms to Run:     1
         <p>
           It is important to recognize the procedures shown here are effective
           under limited conditions. Namely, all the images included here
-          have some common overlap with the carefully chosen MATCH image.
-          Adding additional images that do not overlap the MATCH image will
+          have some common overlap with the carefully chosen <b>MATCH</b> image.
+          Adding additional images that do not overlap the <b>MATCH</b> image will
           be excluded by <i>findfeatures</i> and requires additional steps
           that utilize techniques outside the scope of this example.
           It would involve repeatedly running <i>findfeatures</i> where every
-          image is used as the MATCH image and all other images are included in
-          the FROMLIST (with common ground coverage) and the resulting
+          image is used as the <b>MATCH</b> image and all other images are included in
+          the <b>FROMLIST</b> (with common ground coverage) and the resulting
           image-based networks are combined into a single network. This
           technique is also used for larger, global networks that frequently
           have images with largely varying resolutions and observing
@@ -3718,11 +3700,11 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@Maxpoints:700
           number of keypoints. This may seem like a lot of keypoints per image
           pair, but is likely a good choice for some images sets that contain
           different pixel resolutions or largely varying observation conditions
-          like what is seen in this dataset. We are using the FASTGEOM Grid
+          like what is seen in this dataset. We are using the <b>FASTGEOM</b> Grid
           algorithm (specified in the <b>GLOBALS</b> program option) because the
           default Radial will have a difficult time meeting the minimum number
           of <b>FASTGEOMPOINTS</b> points due to large variations in pixel
-          resolutions. The transformed files are retained so the FASTGEOM
+          resolutions. The transformed files are retained so the <b>FASTGEOM</b>
           performance can be evaluated. The <b>HMGTOLERANCE</b> and
           <b>EPITOLERANCE</b> are both set to 7 pixels to account for
           uncertainty in SPICE data and distortions in the translated images
@@ -3733,13 +3715,13 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@Maxpoints:700
           size of the tolerances). We expect no files in the <b>TONOGEOM</b>
           and <b>TONOTMATCHED</b> because no such problems exist in this
           example. And you should have a look at the <b>DEBUGLOG</b> file for
-          detailed performance information for <i>findfeatures</i>.
+          detailed performance and behavior information for <i>findfeatures</i>.
         </p>
         <p>
-          The MATCH image, EW0218118239G, was carefully chosen in this dataset
+          The <b>MATCH</b> image, EW0218118239G, was carefully chosen in this dataset
           because it has common ground coverage/overlap with all the other
           eight MDIS images. <i>qmos</i> is most helpful to determine this
-          image as a MATCH candidate as is shown in this screen shot. Image
+          image as a <b>MATCH</b> candidate as is shown in this screen shot. Image
           EW0218118239G is the one outlined with the dashed square. It is
           clear there are images with largely varying pixel resolutions.
           Users will be able to select any image by changing the "base"
@@ -3752,10 +3734,10 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@Maxpoints:700
         <p>
           The control network created by <i>findfeatures</i> is an image-based
           network. This type of network will contain no points outside the FOV
-          of the MATCH image. In most cases when building a larger network,
+          of the <b>MATCH</b> image. In most cases when building a larger network,
           a single image-based network is insufficient to produce a large
           connected network, so successive runs of <i>findfeatures</i> using
-          different MATCH files is required. This image-based network contains
+          different <b>MATCH</b> files is required. This image-based network contains
           3940 control points. The best networks will have the deepest control
           points (i.e., contains many measures that includes all images
           matched). Typically this is not realistic so additional
@@ -3803,7 +3785,7 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@Maxpoints:700
           to control your mosaic to ground truth but that is outside the
           scope of this example (and they are typically a great deal of work!).
           With that said, the spacecraft position serves as our "ground truth"
-          but you may also see the MATCH image will have the least adjustment
+          but you may also see the <b>MATCH</b> image will have the least adjustment
           because it is highly biased since it has the most control measures
           (see the <i>jigsaw</i> bundle out file, <i>EW0218118239G_bundleout.txt</i>
           to inspect the bundle adjustment results).

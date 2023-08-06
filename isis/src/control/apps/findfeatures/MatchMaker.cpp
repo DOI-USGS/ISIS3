@@ -147,8 +147,8 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
 }
 
 
- PvlGroup MatchMaker::network(ControlNet &cnet, 
-                              const MatcherSolution &solution, 
+ PvlGroup MatchMaker::network(ControlNet &cnet,
+                              const MatcherSolution &solution,
                               ID &pointMaker) const {
 
 
@@ -370,7 +370,7 @@ ControlMeasure *MatchMaker::makeMeasure(const MatchImage &image,
   return ( v_measure.take() );
 }
 
-SurfacePoint MatchMaker::getSurfacePoint( const ControlMeasure &measure, 
+SurfacePoint MatchMaker::getSurfacePoint( const ControlMeasure &measure,
                                          const MatchImage &image) const {
   // Check if the source has geometry
   if ( !image.source().hasGeometry() ) { return (SurfacePoint()); }
@@ -383,8 +383,8 @@ SurfacePoint MatchMaker::getSurfacePoint( const ControlMeasure &measure,
   return (latlon);
 }
 
-bool MatchMaker::setAprioriLatLon(ControlPoint &point, 
-                                  const ControlMeasure &measure, 
+bool MatchMaker::setAprioriLatLon(ControlPoint &point,
+                                  const ControlMeasure &measure,
                                   const MatchImage &image) const {
   SurfacePoint latlon = getSurfacePoint(measure, image);
   if ( latlon.Valid() )  { // Only set if its valid

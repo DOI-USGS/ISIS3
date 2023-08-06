@@ -34,25 +34,21 @@ release.
 -->
 
 ## [Unreleased]
-- Bug fixes and improvements have been made to <i>findfeatures</i>.
-  - Fix matrix inversion errors due to bad FASTGEOM matrix transforms using a more robust implementation to detect these errors and throw exceptions. Images with these errors are captured and logged to the <b>TONOTMATCHED</b> file. Fixes [#4639](https://github.com/DOI-USGS/ISIS3/issues/4639)
-  - Fixed use of projected mosaics with correct check for <b>TargetName</b> in the Mapping labels.
-  - Add new program optiom <b>TONOGEOM</b> that logs captures geometry errors in the FASTGEOM algorithm and records them to the file provided in this parameter. These images are excluded from the matching process. References [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
-  - Added a new Radial FASTGEOM transform mapping algorithm to address performance problems with the Grid algorithm. This is now the default algorithm none are selected by the user (see the new <b>GLOBALS</b> parameter to specify the algorithm)
-  - Added new parameter <b>GLOBALS</b> to make parameterization of <i>findfeatures</i> behavior significantly easier and convenient. Wrote significant documentation for the parameter and provide several examples showing its use.
-  - Significantly refactored FASTGEOM processing to accomodate stabilility and functionality. The scope of the algorithm was taken out of the ImageSource class and isolated to support this feature.
-  - Added new gtests for <i>findfeatures</i> that replaces all the old application tests. These tests are <i>FunctionalTestFindfeaturesFastGeomDefault</i>, <i>FunctionalTestFindfeaturesFastGeomRadialConfig</i>, <i>FunctionalTestFindfeaturesFastGeomGridDefault</i> and <i>FunctionalTestFindfeaturesFastGeomGridConfig</i>.
-  - Fixed a bug in the <i>cnetwinnow</i> test that did not clean/remove it during test runs.
-  - Added new option <b>GEOMSOURCE=BOTH</b> to check both the MATCH and FROM/FROMLIST images for valid control measure geometry to produce better networks and prevent downstream processing errors. Ignore points that end up with no valid measures (but can retained with use of <b>PreserveIgnoredControl</b> via GLOBALS parameterization).
-  - Report better information regarding the behavior of <i>findfeatures</i>, FASTGEOM algorithms, and creation of the output network.
-  - Added two new examples demonstrating/documenting the use of FASTGEOM algorithm, parameterization using <b>GLOBALS</b> and how to produce a regional mosaic using <i>findfeatures</i> with batch scripts.
 
 
 ### Changed
 - Removed the `.py` extention from the _isisdataeval_ tool `isisdata_mockup` for consistency and install it in $ISISROOT/bin; added the `--tojson` and `--hasher` option to _isisdata_mockup_ tool improve utility; updated the tool `README.md` documentation to reflect this change, removed help output and trimmed example results;  fixed paths to test data in `make_isisdata_mockup.sh`. [#5163](https://github.com/DOI-USGS/ISIS3/pull/5163)
+- Significantly refactored FASTGEOM processing in <i>findfeatures</i> to accommodate stability and functionality. The scope of the algorithm was taken out of the ImageSource class and isolated to support this feature. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
+- Report better information regarding the behavior of <i>findfeatures</i>, FASTGEOM algorithms, and creation of the output network. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 
 ### Added
 - Added rclone to run dependencies in meta.yaml [#5183](https://github.com/DOI-USGS/ISIS3/issues/5183)
+- Add new program optiom <b>TONOGEOM</b> that logs captures geometry errors in the FASTGEOM algorithm and records them to the file provided in this parameter. These images are excluded from the matching process. References [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
+- Added a new Radial FASTGEOM transform mapping algorithm to address performance problems with the Grid algorithm. This is now the default algorithm none are selected by the user (see the new <b>GLOBALS</b> parameter to specify the algorithm) [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
+- Added new parameter <b>GLOBALS</b> to make parameterization of <i>findfeatures</i> behavior significantly easier and convenient. Wrote significant documentation for the parameter and provide several examples showing its use. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
+- Added two new examples demonstrating/documenting the use of FASTGEOM algorithm, parameterization using <b>GLOBALS</b> and how to produce a regional mosaic using <i>findfeatures</i> with batch scripts. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
+- Added new option <b>GEOMSOURCE=BOTH</b> to check both the MATCH and FROM/FROMLIST images for valid control measure geometry to produce better networks and prevent downstream processing errors. Ignore points that end up with no valid measures (but can retained with use of <b>PreserveIgnoredControl</b> via GLOBALS parameterization). [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
+- Added new gtests for <i>findfeatures</i> that replaces all the old application tests. These tests are <i>FunctionalTestFindfeaturesFastGeomDefault</i>, <i>FunctionalTestFindfeaturesFastGeomRadialConfig</i>, <i>FunctionalTestFindfeaturesFastGeomGridDefault</i> and <i>FunctionalTestFindfeaturesFastGeomGridConfig</i>. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 
 ### Deprecated
 
@@ -61,6 +57,10 @@ release.
 ### Fixed
 - Updated History constructor to check for invalid BLOB before copying History BLOB to output cube [#4966](https://github.com/DOI-USGS/ISIS3/issues/4966)
 - Updated photomet MinnaertEmpirical model to support photemplate-style PVL format [#3621](https://github.com/DOI-USGS/ISIS3/issues/3621)
+- Fix matrix inversion errors in findfeatures due to bad FASTGEOM matrix transforms using a more robust implementation to detect these errors and throw exceptions. Images with these errors are captured and logged to the <b>TONOTMATCHED</b> file. Fixes [#4639](https://github.com/DOI-USGS/ISIS3/issues/4639)
+- Fixed use of projected mosaics with correct check for <b>TargetName</b> in the Mapping labels. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
+- Fixed a bug in the <i>cnetwinnow</i> test that did not clean/remove it during test runs.
+- Fixed instantiation and use of projection classes to correctly return geometry data from projected images and mosaics. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 
 ## [8.0.0] - 2023-04-19
 
