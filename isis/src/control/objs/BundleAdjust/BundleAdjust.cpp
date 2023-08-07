@@ -1883,8 +1883,8 @@ namespace Isis {
       m_cholmodTriplet->nnz = 0;
     }
 
-    int *tripletColumns = (int*) m_cholmodTriplet->i;
-    int *tripletRows = (int*) m_cholmodTriplet->j;
+    long *tripletColumns = (long*) m_cholmodTriplet->i;
+    long *tripletRows = (long*) m_cholmodTriplet->j;
     double *tripletValues = (double*)m_cholmodTriplet->x;
 
     double entryValue;
