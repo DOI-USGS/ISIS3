@@ -24,6 +24,9 @@
     <change name="Lynn Weller" date="2012-01-22">
       Application category name changed from Import and Export to Apollo.  Fixes mantis ticket #951.
     </change>
+    <change name="Jacob Cain" date="2022-11-22">
+        Changed FROM type to cube. Fixes #4780.
+    </change>
   </history>
 
   <category>
@@ -39,13 +42,13 @@
   <groups>
     <group name="Files">
       <parameter name="FROM">
-        <type>filename</type>
+        <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
           Input Cube
         </brief>
         <description>
-          Use this parameter to select the filename to import.
+          Use this parameter to select the cube filename to import.
         </description>
         <filter>
           *.cub

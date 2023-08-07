@@ -142,6 +142,47 @@ TEST_F(DefaultCube, FunctionalTestAutomosPriority) {
   EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 79.757668686375951);
 }
 
+TEST_F(DefaultCube, FunctionalTestAutomosTracking) {
+  QString outPath = tempDir.path() + "/mosaic.cub";
+  QString singleCubeListPath = tempDir.path() + "/newCubeList.lis";
+  QString trackingPath = tempDir.path() + "/mosaic_tracking.cub";
+
+  FileList singleCubeList;
+  singleCubeList.append(projTestCube->fileName());
+  singleCubeList.write(singleCubeListPath);
+
+  QVector<QString> args = {"fromlist=" + singleCubeListPath, "mosaic=" + outPath,
+                           "priority=band", "highsat=true", "lowsat=true", "null=true", "track=true"};
+
+  UserInterface options(APP_XML, args);
+
+  automos(options);
+
+  Cube mos(outPath);
+  Cube track(trackingPath);
+  Pvl label = *mos.label();
+  Pvl trackingLabel = *track.label();
+
+  PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping");
+  PvlGroup tMapping = trackingLabel.findObject("IsisCube").findGroup("Mapping");
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("ProjectionName"), (QString)tMapping.findKeyword("ProjectionName"));
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("TargetName"), (QString)tMapping.findKeyword("TargetName"));
+  EXPECT_EQ((double)mapping.findKeyword("UpperLeftCornerX"), (double)mapping.findKeyword("UpperLeftCornerX"));
+  EXPECT_EQ((double)mapping.findKeyword("UpperLeftCornerY"), (double)tMapping.findKeyword("UpperLeftCornerY"));
+  EXPECT_EQ((double)mapping.findKeyword("PixelResolution"), (double)tMapping.findKeyword("PixelResolution"));
+  EXPECT_EQ((double)mapping.findKeyword("Scale"), (double)tMapping.findKeyword("Scale"));
+  EXPECT_EQ(mapping.findKeyword("LatitudeType")[0], tMapping.findKeyword("LatitudeType")[0]);
+  EXPECT_EQ(mapping.findKeyword("LongitudeDirection")[0], tMapping.findKeyword("LongitudeDirection")[0]);
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("EquatorialRadius"), (double)tMapping.findKeyword("EquatorialRadius"));
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("PolarRadius"), (double)tMapping.findKeyword("PolarRadius"));
+  EXPECT_EQ((int)mapping.findKeyword("LongitudeDomain"), (int)tMapping.findKeyword("LongitudeDomain"));
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MinimumLongitude"), (double)tMapping.findKeyword("MinimumLongitude"));
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MaximumLongitude"), (double)tMapping.findKeyword("MaximumLongitude"));
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MinimumLatitude"), (double)tMapping.findKeyword("MinimumLatitude"));
+  EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MaximumLatitude"), (double)tMapping.findKeyword("MaximumLatitude"));
+}
+
 
 TEST_F(DefaultCube, FunctionalTestAutomosBandSelect) {
   QString outPath = tempDir.path() + "/mosaic.cub";

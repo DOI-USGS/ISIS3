@@ -1,0 +1,6 @@
+Object = Instrument
+  Group = Selection
+    File  = ("hayabusa", "kernels/ik/amica??.ti")
+  EndGroup
+EndObject
+

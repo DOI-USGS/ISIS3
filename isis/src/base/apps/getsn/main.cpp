@@ -30,11 +30,5 @@ void IsisMain() {
   getsn(ui, &appLog);
 
   PvlGroup results = appLog.findGroup("Results");
-
-  if( ui.WasEntered("TO") && ui.IsInteractive() ) {
-    Application::GuiLog(results);
-  }
-
   SessionLog::TheLog().AddResults(results);
-  
 }

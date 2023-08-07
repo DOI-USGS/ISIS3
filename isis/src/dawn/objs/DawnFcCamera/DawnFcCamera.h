@@ -38,7 +38,7 @@ namespace Isis {
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these methods.
    *   @history 2015-10-01 Ian Humphrey and Makayla Shepherd - Modified check for determing
-   *                           the instrument name to also accept filter instrument kernal codes.
+   *                           the instrument name to also accept filter instrument kernel codes.
    *                           References #2335.
    *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument
    *                           members and methods and removed implementation of these methods

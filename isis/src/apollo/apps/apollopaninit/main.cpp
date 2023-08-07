@@ -117,11 +117,11 @@ void IsisMain() {
   insCode = scFrameCode - 230;
 
   try {
-    panCube.open(ui.GetFileName("FROM"),"rw");
+    panCube.open(ui.GetCubeName("FROM"),"rw");
   }
   catch (IException &e) {
     throw IException(IException::User,
-                     "Unable to open the file [" + ui.GetFileName("FROM") + "] as a cube.",
+                     "Unable to open the file [" + ui.GetCubeName("FROM") + "] as a cube.",
                      _FILEINFO_);
   }
 
@@ -186,7 +186,7 @@ void IsisMain() {
 
   panCube.putGroup(inst_pvlG);
 
-  ///////////////////////////////////The kernals group
+  ///////////////////////////////////The kernels group
   kernels_pvlG.setName("Kernels");
   kernels_pvlG.clear();
 
@@ -228,7 +228,7 @@ void IsisMain() {
 
   panCube.putGroup(kernels_pvlG);
 
-  //Load all the kernals
+  //Load all the kernels
   Load_Kernel(kernels_pvlG["TargetPosition"]);
   Load_Kernel(kernels_pvlG["TargetAttitudeShape"]);
   Load_Kernel(kernels_pvlG["LeapSecond"]);
@@ -639,7 +639,7 @@ void IsisMain() {
   CentroidApolloPan centroid(resolution);
   Chip inputChip,selectionChip;
   inputChip.SetSize(int(ceil(200*5.0/resolution)), int(ceil(200*5.0/resolution)));
-  fileName = ui.GetFileName("FROM");
+  fileName = ui.GetCubeName("FROM");
   if( panCube.pixelType() == 1)  //UnsignedByte
     centroid.setDNRange(12, 1e99);  //8 bit bright target
   else
@@ -768,7 +768,7 @@ void IsisMain() {
   panCube.write(tableFid);
   //close the new cube
   panCube.close(false);
-  panCube.open(ui.GetFileName("FROM"),"rw");
+  panCube.open(ui.GetCubeName("FROM"),"rw");
 
   delete spPos;
   delete spRot;
@@ -792,7 +792,7 @@ void IsisMain() {
 //  without shoe-horning the input to please the rest of the Spice::Init() funciton
 void Load_Kernel(Isis::PvlKeyword &key) {
 
-  //Load all the kernal files (file names are stored as values of the PvlKeyword)
+  //Load all the kernel files (file names are stored as values of the PvlKeyword)
   NaifStatus::CheckErrors();
 
   for(int i = 0; i < key.size(); i++) {

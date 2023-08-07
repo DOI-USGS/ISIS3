@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/hayabusa/kernels/pck/itokawa_gaskell.tpc",
+    "filesize": 1375,
+    "createtime": "2007-10-16T00:49:24.000000",
+    "modifiedtime": "2022-11-23T23:36:57.813706",
+    "md5hash": "9a4dc59a40d371ffe72d5f909d0b1cad",
+    "sha256hash": "5a15970e5cef749b2aae07a1b1c9b7f024ef79d0b2326720dd14b71dde233292",
+    "sha1hash": "f2bf17eeba79c635879519af478c9abd46d768f2"
+}

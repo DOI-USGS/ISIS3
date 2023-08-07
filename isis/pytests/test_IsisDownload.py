@@ -7,16 +7,16 @@ import pytest
 from unittest import mock
 from tempfile import TemporaryDirectory
 from pathlib import Path
+import tempfile
 
 from importlib.util import spec_from_loader, module_from_spec
-from importlib.machinery import SourceFileLoader 
+from importlib.machinery import SourceFileLoader
 
 spec = spec_from_loader("downloadIsisData", SourceFileLoader("downloadIsisData", "../scripts/downloadIsisData"))
 downloadIsisData = module_from_spec(spec)
 spec.loader.exec_module(downloadIsisData)
 did = downloadIsisData
 
-# from downloadIsisData import rclone, create_rclone_arguments
 
 class MockedPopen:
     def __init__(self, args, **kwargs):
@@ -29,7 +29,7 @@ class MockedPopen:
     def __exit__(self, exc_type, value, traceback):
         pass
 
-    def communicate(self, input=None, timeout=None): 
+    def communicate(self, input=None, timeout=None):
         if self.args[0] == 'rclone':
             stdout = "Success".encode("utf-8")
             stderr = ''.encode("utf-8")
@@ -37,7 +37,7 @@ class MockedPopen:
         else:
             raise Exception()
 
-        return stdout, stderr
+        return {'out': stdout, 'stderr': stderr, 'args': self.args, 'returncode': self.returncode}
 
 
 class MockedBustedPopen:
@@ -56,11 +56,21 @@ def test_rclone_unknown_exception():
         res = did.rclone("lsf", "test", extra_args=["-l", "-R", "--format", "p", "--files-only"], redirect_stdout=True, redirect_stderr=True)
 
 
-def test_create_rclone_args():
-    with TemporaryDirectory() as tdir: 
-        dest = Path(tdir) / "test"
-        args = did.create_rclone_arguments(str(dest), "lro_naifKernels:", dry_run=False, ntransfers=100)
-        assert args == ['lro_naifKernels:', str(dest/"lro"/"kernels"), '--progress', '--checkers=100', '--transfers=100', '--track-renames', '--log-level=WARNING']
-        assert dest.exists()
+def test_rclone():
+    with mock.patch("subprocess.Popen", MockedPopen):
+        res = did.rclone("lsf", "test", extra_args=["-l", "-R", "--format", "p", "--files-only"], redirect_stdout=True, redirect_stderr=True)
+        assert res["out"].decode() == "Success"
 
 
+def test_rclone_unknown_exception():
+    with mock.patch("subprocess.Popen", MockedBustedPopen):
+        with pytest.raises(Exception, match="idk"):
+            did.rclone("lsf", "test", extra_args=["-l", "-R", "--format", "p", "--files-only"], redirect_stdout=True, redirect_stderr=True)
+
+
+def test_rclone_with_auth():
+    # Test the rclone function when auth is required
+    with mock.patch("subprocess.Popen", MockedPopen):
+        res = did.rclone("lsf", "test", extra_args=["-l", "-R", "--format", "p", "--files-only", "--rc-web-gui", "user:pass"], redirect_stdout=True, redirect_stderr=True)
+        assert res["out"].decode() == "Success"
+        assert '--rc-web-gui' in res['args']

@@ -322,6 +322,9 @@ sumspice from=st_2395699394_v.lev0.cub sumfile=N2395699394.SUM  update=spice sum
       Added a call to writeHistory() of the SumFinder class that will add a sumspice
       entry to each input cube's History blob after a successful run. Fixes #4972.
     </change>
+    <change name="Jacob Cain" date="2022-11-22">
+        Changed FROM type to cube. Fixes #4780.
+    </change>
   </history>
 
   <category>
@@ -332,7 +335,8 @@ sumspice from=st_2395699394_v.lev0.cub sumfile=N2395699394.SUM  update=spice sum
     <group name="Files">
 
       <parameter name= "FROM">
-        <type>filename</type>
+        <type>cube</type>
+        <filter>*.cub</filter>
         <fileMode>input</fileMode>
         <brief>
           A single cube to process.

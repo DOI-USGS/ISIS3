@@ -42,6 +42,9 @@
     <change name="Sharmila Prasad" date="2011-02-22">
      Use updated hinoise instead of hinoise2
    </change>
+   <change name="Jacob Cain" date="2022-11-22">
+     Changed TO type to cube. Fixes #4780.
+   </change>
   </history>
 
    <groups>
@@ -58,7 +61,7 @@
       </parameter>
 
       <parameter name="TO">
-        <type>filename</type>
+        <type>cube</type>
         <fileMode>output</fileMode>
         <brief>Radiometrically caliberated and corrected image</brief>
         <description>

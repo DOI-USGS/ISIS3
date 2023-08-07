@@ -1,0 +1,11 @@
+Object = Instrument
+  Group = Selection
+    Match = ("Instrument","InstrumentId","AMICA")
+    File  = ("hayabusa", "kernels/ik/amica??.ti")
+  EndGroup
+  Group = Selection
+    Match = ("Instrument","InstrumentId","NIRS")
+    File  = ("hayabusa", "kernels/ik/nirs??.ti")
+  EndGroup
+EndObject
+

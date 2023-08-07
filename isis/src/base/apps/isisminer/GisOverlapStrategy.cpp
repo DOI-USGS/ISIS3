@@ -377,6 +377,7 @@ namespace Isis {
       if ( !resource->isEqual(*candidate)) {
         double ratioA = rgeom->intersectRatio(*candidate->geometry()); 
         double ratioB = candidate->geometry()->intersectRatio(*rgeom); 
+        double EPSILON = 1e-9;
 
         if ( isDebug() ) {
           cout << "\nSource " << resource->name() << " overlaps "
@@ -388,7 +389,7 @@ namespace Isis {
         // no matter what the OverlapMinimum is set to. Note a NULL Resource may
         // be returned by processOverlap() so make sure we check validity.
         if ( ratioA > 0.0 ) {
-          if ( (ratioA >= m_overlapMin) && (ratioA <= m_overlapMax) ) {
+          if ( (ratioA > m_overlapMin || fabs(ratioA - m_overlapMin) < EPSILON) && (ratioA < m_overlapMax || fabs(ratioA - m_overlapMax) < EPSILON) ) {
             SharedResource composite = processOverlap(resource, candidate, 
                                                       ratioA, ratioB,
                                                       globals);

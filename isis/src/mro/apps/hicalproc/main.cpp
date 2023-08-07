@@ -50,7 +50,7 @@ void IsisMain() {
 
     // Get the cube info
     inFile  = ui.GetCubeName("FROM");
-    outFile = ui.GetFileName("TO");
+    outFile = ui.GetCubeName("TO");
     Pvl cubeLabel;
     if (bIngestion) {
       int sDotPos = outFile.indexOf('.');

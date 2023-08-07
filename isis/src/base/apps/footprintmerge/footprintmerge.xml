@@ -32,7 +32,7 @@
           List of Input cubes
         </brief>
         <description>
-          The list of  cubes used to find footprint islands.
+          The list of cubes used to find footprint islands.
         </description>
         <filter>
           *.lis *.lst *.txt

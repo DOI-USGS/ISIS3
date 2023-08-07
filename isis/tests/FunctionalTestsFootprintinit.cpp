@@ -32,7 +32,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitDefault) {
   ImagePolygon poly = testCube->readFootprint();
 
   ASSERT_EQ(49, poly.numVertices());
-  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
+  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope().release();
 
   std::vector<double> lons = {255.645358, 256.146267, 256.146267, 255.645358, 255.645358};
   std::vector<double> lats = {9.928502, 9.928502, 10.434859, 10.434859, 9.928502};
@@ -54,7 +54,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitLincSinc) {
   ImagePolygon poly = testCube->readFootprint();
 
   ASSERT_EQ(95, poly.numVertices());
-  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
+  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope().release();
 
   std::vector<double> lons = {255.645390, 256.146233, 256.146233, 255.645390, 255.645390};
   std::vector<double> lats = {9.928500, 9.928500, 10.434861, 10.434861, 9.928500};
@@ -76,7 +76,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitVertices) {
   ImagePolygon poly = testCube->readFootprint();
 
   ASSERT_EQ(43, poly.numVertices());
-  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
+  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope().release();
 
   std::vector<double> lons = {255.645374, 256.146251, 256.146251, 255.645374, 255.645374};
   std::vector<double> lats = {9.928456, 9.928456, 10.434903, 10.434903, 9.928456};
@@ -98,7 +98,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitCamera) {
   ImagePolygon poly = testCube->readFootprint();
 
   ASSERT_EQ(34, poly.numVertices());
-  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
+  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope().release();
 
   std::vector<double> lons = {255.923821, 256.215272, 256.215272, 255.923821, 255.923821};
   std::vector<double> lats = {9.924583, 9.924583, 10.329275, 10.329275, 9.924583};
@@ -120,7 +120,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitTestXY) {
   ImagePolygon poly = testCube->readFootprint();
 
   ASSERT_EQ(49, poly.numVertices());
-  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
+  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope().release();
 
   std::vector<double> lons = {255.645358, 256.146267, 256.146267, 255.645358, 255.645358};
   std::vector<double> lats = {9.928502, 9.928502, 10.434859, 10.434859, 9.928502};
@@ -148,7 +148,7 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitPrecision) {
   ImagePolygon poly = testCube->readFootprint();
 
   ASSERT_EQ(49, poly.numVertices());
-  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope();
+  geos::geom::Geometry* boundary = poly.Polys()->getEnvelope().release();
 
   std::vector<double> lons = {255.645358, 256.146267, 256.146267, 255.645358, 255.645358};
   std::vector<double> lats = {9.928502, 9.928502, 10.434859, 10.434859, 9.928502};

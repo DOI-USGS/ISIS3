@@ -575,7 +575,7 @@ namespace Isis {
     double controlFitness = 0;
 
     static  geos::geom::GeometryFactory::Ptr geosFactory = geos::geom::GeometryFactory::create();
-    geos::geom::CoordinateSequence * pts = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence * pts = new geos::geom::CoordinateArraySequence();
     QList< ControlMeasure * > measures = cnet.GetMeasuresInCube(sn);
 
     // Populate pts with a list of control points
@@ -588,7 +588,7 @@ namespace Isis {
 
       // Calculate the convex hull
       geos::geom::Geometry * convexHull = geosFactory->createPolygon(
-          geosFactory->createLinearRing(pts), 0)->convexHull();
+          geosFactory->createLinearRing(pts), 0)->convexHull().release();
 
       // Calculate the area of the convex hull
       double convexArea = convexHull->getArea();

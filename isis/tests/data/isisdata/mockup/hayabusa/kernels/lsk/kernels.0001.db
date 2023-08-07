@@ -1,0 +1,6 @@
+Object = LeapSecond
+  Group = Selection
+    File = ("hayabusa", "kernels/lsk/naif????.tls")
+  EndGroup
+EndObject
+

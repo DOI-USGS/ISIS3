@@ -271,7 +271,7 @@ namespace Isis {
          *
          * This program has read and write access on the spice server in /tmp/spice_web_service.
          */
-        inputLabels = FileName::createTempFile( ui.GetFileName("TEMPFILE") );
+        inputLabels = FileName::createTempFile( ui.GetCubeName("TEMPFILE") );
         label.write( inputLabels.expanded() );
         Cube cube;
         cube.open(inputLabels.expanded(), "rw");

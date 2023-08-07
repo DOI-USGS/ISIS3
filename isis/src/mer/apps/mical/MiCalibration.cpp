@@ -48,7 +48,7 @@ namespace Isis {
      * use the instrumentSerialnumber to determain what rover
      * the image is from that get the values for that rover.
      *
-     * @param kernel - the kernal from the  data area or user
+     * @param kernel - the kernel from the  data area or user
      *               entered.
      */
     void MiCalibration::ReadKernel(Pvl &kernel) {

@@ -51,14 +51,25 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
 
 1. If you are running Mac OS X, a pkg file (which looks similar to Anaconda3-5.3.0-MacOSX-x86\_64.pkg) will be downloaded. Double-click on the file to start the installation process.
 1. After the installation has finished, open up a bash prompt in your terminal window.
+1. If you have an ARM64 Mac (M1/M2) running Catalina (or later), additional prerequisites must be installed for ISIS to run in emulation:
+ - Install [XQuartz](https://www.xquartz.org/). (Tested with XQuartz 2.8.5 on MacOS Catalina)
+ - Install Rosetta2. From the terminal run: `/usr/sbin/softwareupdate --install-rosetta --agree-to-license`
+ - Include the `# MacOS ARM64 Only` lines below
 1. Next setup your Anaconda environment for ISIS. In the bash prompt, run the following commands:
 
     ```bash
+    
+    #MacOS ARM64 Only - Setup the new environment as an x86_64 environment
+    export CONDA_SUBDIR=osx-64
+    
     #Create a new conda environment to install ISIS in
     conda create -n isis
 
     #Activate the environment
     conda activate isis
+    
+    #MacOS ARM64 Only - Force installation of x86_64 packages instead of ARM64
+    conda config --env --set subdir osx-64
 
     #Add the following channels to the environment
     conda config --env --add channels conda-forge
@@ -77,12 +88,15 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
     #The order is important.  If conda-forge is before usgs-astrogeology, you will need to run:
 
     conda config --env --add channels usgs-astrogeology
+    
+    #Then set channel_priority to flexible in case there is a global channel_priority=strict setting
+    conda config --env --set channel_priority flexible
     ```
 
 1. The environment is now ready to download ISIS and its dependencies:
 
     ```bash
-    conda install -c usgs-astrogeology isis=7.0.0
+    conda install -c usgs-astrogeology isis
     ```
 
 1. Finally, setup the environment variables:
@@ -385,17 +399,16 @@ If you plan to work with data from all missions, then the download will require 
 
 ### Full ISIS Data Download
 
-> Warning if you are looking to download ISIS data via rsync the servers will be shutdown in November of 2022.
-the outdated rsync download information can be found [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Outdated-ISIS-Data-Information)
-
+> Warning: if you are looking to download ISIS data via rsync, this is no longer supported. The rsync server isisdist.astrogeology.usgs.gov was shutdown in November 30, 2022 and replaced with an Amazon S3 storage bucket specified in [rclone.conf](isis/config/rclone.conf). The outdated rsync download information can be found [here](https://github.com/USGS-Astrogeology/ISIS3/wiki/Outdated-ISIS-Data-Information) and updated instructions for downloading ISIS data are provided below.
 
 The ISIS Data Area is hosted on a combination of AWS S3 buckets and public http servers e.g. NAIF, Jaxa, ESA and not through conda channels like the ISIS binaries. This requires using the `downloadIsisData` script from within a terminal window within your Unix distribution, or from within WSL if running Windows 10. Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#Mission-Specific-Data-Downloads). To download all ISIS data files, continue reading.
 
 To download all ISIS data, use the following command:
 
-    downloadIsisData  all $ISISDATA
+    downloadIsisData all $ISISDATA
 
-> Note: this applicaion takes in 3 parameters in the following order \<rclone command> \<mission> \<download destination>
+> Note: this applicaion takes in 3 parameters in the following order \<mission> \<download destination> \<rclone command>  
+> For more usage, run `downloadIsisData --help` or `downloadIsisData -h`.
 
 > Note: The above command downloads all ISIS data including the required base data area and all of the optional mission data areas.
 
@@ -414,16 +427,17 @@ There are many missions supported by ISIS. If you are only working with a few mi
 
 ### ISIS SPICE Web Service
 
-ISIS can now use a service to retrieve the SPICE data for all instruments ISIS supports via the internet. To use this service instead of your local SPICE data, click the WEB check box in the spiceinit program GUI or type spiceinit web=yes at the command line. Using the ISIS SPICE Web Service will significantly reduce the size of the downloads from our data area. If you want to use this new service, without having to download all the SPICE data, add the following argument to the mission-specific rsync command:
+ISIS can now use a service to retrieve the SPICE data for all instruments ISIS supports via the internet. To use this service instead of your local SPICE data, click the WEB check box in the spiceinit program GUI or type spiceinit web=yes at the command line. Using the ISIS SPICE Web Service will significantly reduce the size of the downloads from our data area. If you want to use this new service, without having to download all the SPICE data, add the following argument to the mission-specific downloadIsisData command:
 
-    --exclude='kernels'
+    --exclude="kernels/**"
 
 For example:
 
-<pre>
-cd $ISISDATA
-rsync -azv <b>--exclude='kernels'</b> --delete --partial isisdist.astrogeology.usgs.gov::isisdata/data/cassini .
-</pre>
+    downloadIsisData cassini $ISISDATA --exclude="kernels/**"
+
+You can also use `include` argument to partially download specific kernels. For example, download only cks and fks of LRO mission:
+
+    downloadIsisData lro $ISISDATA --include="{ck/**,fk/**}"
 
 **WARNING:** Some instruments require mission data to be present for radiometric calibration, which is not supported by the SPICE Web Server, and some programs that are designed to run an image from ingestion through the mapping phase do not have an option to use the SPICE Web Service. For information specific to an instrument, see the documentation for radiometric calibration programs.
 

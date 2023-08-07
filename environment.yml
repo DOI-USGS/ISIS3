@@ -4,7 +4,7 @@ channels:
 
 dependencies:
   - kalasiris 
-  - ale>=0.8.8
+  - ale=0.9.1
   - armadillo
   - boost=1.72
   - boost-cpp=1.72
@@ -13,15 +13,15 @@ dependencies:
   - bz2file
   - bzip2
   - cmake >=3.15
-  - cspice
+  - cspice=67
   - csm>=3.0.3,<3.0.4
   - curl
   - cxx-compiler=1.1.2
   - doxygen
   - eigen < 3.4
-  - embree
+  - embree>=2.17,<3
   - ffmpeg
-  - geos>=3.7,<3.8
+  - geos>=3.9,<3.10
   - geotiff
   - gmp
   - graphviz

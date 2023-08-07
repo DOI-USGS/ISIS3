@@ -307,6 +307,12 @@ namespace Isis {
           bandBin.addKeyword(trackBand);
           trackingLabel->findObject("IsisCube").addGroup(bandBin);
 
+          // Write the mapping group to the tracking cube label
+          if (inLab->findObject("IsisCube").hasGroup("Mapping")) {
+            PvlGroup & mappingGroup = inLab->findGroup("Mapping", Pvl::Traverse);
+            trackingLabel->findObject("IsisCube").addGroup(mappingGroup);
+          }
+
           // Initialize an empty TrackingTable object to manage tracking table in tracking cube
           trackingTable = new TrackingTable();
         }

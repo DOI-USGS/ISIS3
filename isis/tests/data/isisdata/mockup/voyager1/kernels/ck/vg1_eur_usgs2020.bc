@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/kernels/ck/vg1_eur_usgs2020.bc",
+    "filesize": 87040,
+    "createtime": "2022-08-12T23:56:40.000000",
+    "modifiedtime": "2022-11-24T12:14:40.873008",
+    "md5hash": "48240ae8ff6a9e6d6b2bb9033b6ee161",
+    "sha256hash": "f90f02939825ecaf0ca747c44056df9145560da9481d2845cfd777e98b7a941f",
+    "sha1hash": "9b577f56fa6bb64f2261e97214a98d526b5bc933"
+}

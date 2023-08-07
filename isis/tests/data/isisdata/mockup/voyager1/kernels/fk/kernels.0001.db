@@ -1,0 +1,5 @@
+Object = Frame
+  Group = Selection
+    File = ("voyager1","kernels/fk/vg1_v??.tf")
+  EndGroup
+EndObject

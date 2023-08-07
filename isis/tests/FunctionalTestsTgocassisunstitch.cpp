@@ -390,7 +390,7 @@ TEST(TgoCassisunstitch, TgoCassisunstitchDefaultTest) {
 TEST(TgoCassisunstitch, TgoCassisunstitchSpiceTest) {
   QTemporaryDir prefix;
 
-  QVector<QString> args = {"from=data/tgoCassis/tgocassisunstitch/stitched-spice-2016-11-26T22:50:27.381_crop.cub",
+  QVector<QString> args = {"from=data/tgoCassis/tgocassisunstitch/stitched-spice-2016-11-26T22-50-27.381_crop.cub",
                            "outputprefix=" + prefix.path() + "/unstitched"};
   UserInterface options(APP_XML, args);
 

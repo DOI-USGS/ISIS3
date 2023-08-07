@@ -227,7 +227,7 @@ namespace Isis {
       const Geometry *geom = mp->getGeometryN(i);
       CoordinateSequence *pts;
 
-      pts = geom->getCoordinates();
+      pts = geom->getCoordinates().release();
       double lat, lon;
       QVector<QPointF> polyPoints;
 

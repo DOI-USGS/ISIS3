@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/base/dems/Vesta_Dawn_HAMO_DTM_DLR_Global_48ppd.cub",
+    "filesize": 601826360,
+    "createtime": "2022-08-12T22:11:00.000000",
+    "modifiedtime": "2022-11-24T12:21:21.742130",
+    "md5hash": "a488e544c685ae511ea0ed355a30fdbc",
+    "sha256hash": "93fec79380f101b6a5b9378b4e1b86ee452abf58ba849abfdae1cb040d8ed929",
+    "sha1hash": "ba8bb28f414909c12c1c910a562c16b0af92ac5f"
+}

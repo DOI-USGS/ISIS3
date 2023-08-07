@@ -569,7 +569,7 @@ namespace Isis {
 
       if (obj["BaseLatitude"][0] != "Null")
         m_baseLat = Latitude(toDouble(obj["BaseLatitude"][0]), equatorialRadius, polarRadius,
-                             Latitude::Planetocentric, Angle::Degrees);
+            Latitude::Planetocentric, Angle::Degrees);
 
       if (obj["BaseLongitude"][0] != "Null")
         m_baseLon = Longitude(toDouble(obj["BaseLongitude"][0]), Angle::Degrees);
@@ -810,20 +810,25 @@ namespace Isis {
   void MosaicGridTool::onProjectionChanged() {
     TProjection * tproj = (TProjection *)getWidget()->getProjection();
     
+    PvlGroup mappingGroup(tproj->Mapping());
+
     // If Projection changed from a file, force extents to come from 
     // the new map file
     m_latExtents = Map;
     m_lonExtents = Map; 
 
-    Latitude minLat = Latitude(tproj->MinimumLatitude(), Angle::Degrees);
-    Latitude maxLat = Latitude(tproj->MaximumLatitude(), Angle::Degrees);
+    Latitude minLat = Latitude(tproj->MinimumLatitude(), mappingGroup, Angle::Degrees);
+    Latitude maxLat = Latitude(tproj->MaximumLatitude(), mappingGroup, Angle::Degrees);
     
     setLatExtents(m_latExtents, minLat, maxLat);
   
-    Longitude minLon = Longitude(tproj->MinimumLongitude(), Angle::Degrees);
-    Longitude maxLon = Longitude(tproj->MaximumLongitude(), Angle::Degrees);
+    Longitude minLon = Longitude(tproj->MinimumLongitude(), mappingGroup, Angle::Degrees);
+    Longitude maxLon = Longitude(tproj->MaximumLongitude(), mappingGroup, Angle::Degrees);
   
     setLonExtents(m_lonExtents, minLon, maxLon);
+
+    setBaseLat(Latitude(baseLat().angle(Angle::Degrees), mappingGroup, Angle::Degrees));
+    setBaseLon(Longitude(baseLon().angle(Angle::Degrees), mappingGroup, Angle::Degrees));
   }
 
 

@@ -1,0 +1,5 @@
+Object = TargetAttitudeShape
+  Group = Selection
+    File = ("smart1", "kernels/pck/PCK?????.TPC")
+  EndGroup
+EndObject

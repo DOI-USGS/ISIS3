@@ -1,0 +1,6 @@
+Object = SpacecraftClock
+  Group = Selection
+    File = ("smart1", "kernels/sclk/SMART1_??????_STEP.TSC")
+  EndGroup
+EndObject
+

@@ -85,6 +85,11 @@
       "name": "Brownsberger, Sasha"
     },
     {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Cain, Jacob",
+      "orcid": "0000-0002-7734-2485"
+    },
+    {
       "name": "Chaves, Pat"
     },
     {
@@ -191,6 +196,10 @@
       "name": "Hahn, Marjorie"
     },
     {
+      "name": "Hanson, Lavender",
+      "orcid": "0000-0003-2298-8382"
+    },
+    {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
       "name": "Hare, Trent"
     },
@@ -243,6 +252,10 @@
     },
     {
       "name": "Kieffer, Hugh"
+    },
+    {
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Kim, Christine"
     },
     {
       "affiliation": "United States Geological Survey, Astro Geology Science Center",
@@ -324,8 +337,8 @@
       "name": "Miller-Ribelin, Elizabeth"
     },
     {
-        "affiliation": "United States Geological Survey, Astro Geology Science Center",
-        "name": "Nelson, Gavin"
+      "affiliation": "United States Geological Survey, Astro Geology Science Center",
+      "name": "Nelson, Gavin"
     },
     {
       "name": "Neubauer, Cole"
@@ -456,6 +469,10 @@
     },
     {
       "name": "Young, Aaron"
+    },
+    {
+      "name": "Jia, Bojun",
+      "orcid": "0000-0001-7218-6746"
     }
   ],
   "title": "Integrated Software for Imagers and Spectrometers",

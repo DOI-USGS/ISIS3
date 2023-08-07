@@ -1,0 +1,9 @@
+{
+    "source": "$ISISDATA/voyager1/kernels/spk/vg1_jup.bsp",
+    "filesize": 719872,
+    "createtime": "2022-08-12T23:56:41.000000",
+    "modifiedtime": "2022-11-24T12:14:39.819238",
+    "md5hash": "a947845cba6ae5f22e422717926226de",
+    "sha256hash": "40819675c44331b375fab4be23ee052483be3220e151e8fb498b76a3051758c7",
+    "sha1hash": "0d4757422cd1cbc51f3aa2ead46a793f42c87c03"
+}

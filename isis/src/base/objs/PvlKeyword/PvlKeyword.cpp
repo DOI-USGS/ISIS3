@@ -7,7 +7,7 @@ find files of those names at the top level of this repository. **/
 
 #include <QDebug>
 #include <QString>
-
+#include <QRegularExpression>
 #include "PvlKeyword.h"
 #include "IException.h"
 #include "Message.h"
@@ -1583,6 +1583,14 @@ namespace Isis {
 
         keyword = "";
       }
+    }
+
+    // check for extraneous data in the keyword ... ,2,3
+    QRegularExpression regex("^,");
+    QRegularExpressionMatch match = regex.match(keyword);
+    if (!keyword.isEmpty() && match.hasMatch()) {
+          keywordValues.at(0).first += keyword;
+          keyword = "";
     }
 
     /*

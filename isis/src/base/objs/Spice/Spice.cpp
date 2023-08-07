@@ -209,7 +209,7 @@ namespace Isis {
           json props;
           props["kernels"] = kernel_pvl.str();
 
-          isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale", false);
+          isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale", false, false, true);
         }
 
         json aleNaifKeywords = isd["naif_keywords"];
@@ -1118,7 +1118,7 @@ namespace Isis {
         gdpool_c(key.toLatin1().data(), (SpiceInt)index, 1,
                  &numValuesRead, &kernelValue, &found);
 
-        if (found)
+        if (found && numValuesRead > 0)
           result = kernelValue;
       }
       else if (type == SpiceStringType) {
@@ -1126,7 +1126,7 @@ namespace Isis {
         gcpool_c(key.toLatin1().data(), (SpiceInt)index, 1, sizeof(kernelValue),
                  &numValuesRead, kernelValue, &found);
 
-        if (found)
+        if (found && numValuesRead > 0)
           result = kernelValue;
       }
       else if (type == SpiceIntType) {
@@ -1134,12 +1134,16 @@ namespace Isis {
         gipool_c(key.toLatin1().data(), (SpiceInt)index, 1, &numValuesRead,
                  &kernelValue, &found);
 
-        if (found)
+        if (found && numValuesRead > 0)
           result = (int)kernelValue;
       }
 
       if (!found) {
         QString msg = "Can not find [" + key + "] in text kernels";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+      else if (numValuesRead == 0){
+        QString msg = "Found " + key + "] in text kernels, but no values were identified and read.";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 

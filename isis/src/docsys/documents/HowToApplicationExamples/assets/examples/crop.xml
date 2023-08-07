@@ -42,7 +42,9 @@
     <change name="Stuart Sides" date="2003-04-04">
       Fixed problem with isiscvs not checking in the thumb and image directories.
     </change>
-
+    <change name="Jacob Cain" date="2022-11-23">
+      Changed FROM type to cube.
+    </change>
   </history>
 
   <oldName>
@@ -52,7 +54,7 @@
   <groups>
     <group name="Files">
       <parameter name="FROM">
-        <type>filename</type>
+        <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
           Input cube

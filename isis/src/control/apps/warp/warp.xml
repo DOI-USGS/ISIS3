@@ -63,6 +63,9 @@
         Updated documentation with review and contributions from Chris Isbell 
         and Annie Howington. 
     </change>
+    <change name="Jacob Cain" date="2022-11-22">
+        Changed CUBE type to cube. Fixes #4780.
+    </change>
   </history>
 
   <oldName>
@@ -208,7 +211,7 @@
       </parameter>
 
       <parameter name="CUBE">
-          <type>filename</type>
+          <type>cube</type>
           <fileMode>input</fileMode>
         <brief>Match Output cube to this Cube's Size</brief>
         <description>

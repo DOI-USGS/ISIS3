@@ -431,7 +431,7 @@ namespace Isis {
     bool ignorMeas;
     QList<ControlMeasure *> cubeMeasures = net.GetMeasuresInCube(serialNum);
     static  geos::geom::GeometryFactory::Ptr geosFactory = geos::geom::GeometryFactory::create();
-    geos::geom::CoordinateSequence * pts = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateArraySequence * pts = new geos::geom::CoordinateArraySequence();
     for (i=0;i<cubeMeasures.size();i++) {
       if (cubeMeasures[i]->IsIgnored()) continue;  //skip ignored measures
       if (cubeMeasures[i]->Parent()->IsIgnored()) continue; //skip measures of ignored points
@@ -459,7 +459,7 @@ namespace Isis {
     if (pts->size() >= 4) {
       // Calculate the convex hull
       geos::geom::Geometry * convexHull = geosFactory->createPolygon(
-          geosFactory->createLinearRing(pts), 0)->convexHull();
+          geosFactory->createLinearRing(pts), 0)->convexHull().release();
       // Calculate the area of the convex hull
       area = convexHull->getArea();
     }

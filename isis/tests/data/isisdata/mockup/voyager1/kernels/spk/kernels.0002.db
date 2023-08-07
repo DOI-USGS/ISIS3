@@ -1,0 +1,29 @@
+Object = SpacecraftPosition
+  RunTime = 2019-08-06T09:08:39
+
+  Group = Dependencies
+    LeapsecondKernel = $base/kernels/lsk/naif0012.tls
+  End_Group
+
+  Group = Selection
+    Time = ("1980 AUG 23 00:00:51.182766 TDB",
+            "1981 JAN 01 00:00:51.183939 TDB")
+    File = $voyager1/kernels/spk//vg1_sat.bsp
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("1979 FEB 01 00:00:00.000000 TDB",
+            "1979 MAR 19 00:00:00.000000 TDB")
+    File = $voyager1/kernels/spk//vgr1_jup230.bsp
+    Type = Reconstructed
+  End_Group
+
+  Group = Selection
+    Time = ("1980 AUG 07 00:00:00.000000 TDB",
+            "1980 NOV 20 00:00:00.000000 TDB")
+    File = $voyager1/kernels/spk//vgr1_sat336.bsp
+    Type = Reconstructed
+  End_Group
+End_Object
+End
