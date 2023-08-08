@@ -48,6 +48,7 @@ release.
 ### Fixed
 - Updated History constructor to check for invalid BLOB before copying History BLOB to output cube [#4966](https://github.com/DOI-USGS/ISIS3/issues/4966)
 - Updated photomet MinnaertEmpirical model to support photemplate-style PVL format [#3621](https://github.com/DOI-USGS/ISIS3/issues/3621)
+- Fixed downloadIsisData script copying existing files with every rclone download [#5245](https://github.com/DOI-USGS/ISIS3/issues/5245)
 
 ## [8.0.0] - 2023-04-19
 
