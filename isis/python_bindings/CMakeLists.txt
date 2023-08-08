@@ -40,9 +40,10 @@ file(COPY ${ASTROSET_APPS}
           ${ASTROSET_OUTPUT_DIR}/apps/)
 
 set(ASTROSET_APP_XML_FILES "apps/findFeaturesSegment/findFeaturesSegment.xml")
+file(COPY ${ASTROSET_APP_XML_FILES} DESTINATION ${CMAKE_BINARY_DIR}/bin/xml/ )
 install(FILES ${ASTROSET_APP_XML_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/xml/)
 
 # Setup to run setup tools on install 
-install(CODE "execute_process(COMMAND $ENV{CONDA_PREFIX}/bin/python ${CMAKE_CURRENT_BINARY_DIR}/setup.py install --single-version-externally-managed --prefix=${CMAKE_INSTALL_PREFIX} --record=record.txt
+install(CODE "execute_process(COMMAND $ENV{CONDA_PREFIX}/bin/pip install ${CMAKE_CURRENT_BINARY_DIR}/ --prefix=${CMAKE_INSTALL_PREFIX}
                               WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})")
 
