@@ -117,6 +117,8 @@ pipeline {
                     cd $WORKSPACE/isis/pytests 
                     pytest .
 
+                    cd $WORKSPACE/isis/python_bindings/tests  
+                    pytest .
                     '''
                 }
             }
