@@ -17,7 +17,7 @@ using namespace std;
 using namespace Isis;
 
 class CubicFunction :
-public std::unary_function <double, double> {
+public std::function <double(double)> {
   public:
    double operator()(double x) {
      return -4.0+5.0*x-8.0*x*x+6.0*x*x*x;
@@ -25,7 +25,7 @@ public std::unary_function <double, double> {
 };
 
 class ErrorFunction :
-public std::unary_function <double, double> {
+public std::function <double(double)> {
   public:
    double operator()(double x) {
      IString msg = "This functor always throws an error\n";

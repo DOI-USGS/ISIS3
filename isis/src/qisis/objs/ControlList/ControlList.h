@@ -123,7 +123,7 @@ namespace Isis {
        *   @history 2012-10-11 Tracie Sucharski - Original version.
        *
        */
-      class CopyControlDataFunctor : public std::unary_function<Control * const &, void *> {
+      class CopyControlDataFunctor : public std::function<void *(Control * const &)> {
         public:
           CopyControlDataFunctor(const Project *project, FileName newProjectRoot);
           CopyControlDataFunctor(const CopyControlDataFunctor &other);

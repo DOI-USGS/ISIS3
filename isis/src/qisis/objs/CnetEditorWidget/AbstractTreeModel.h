@@ -179,7 +179,7 @@ namespace Isis {
        * @internal
        */
       class FilterFunctor
-          : public std::unary_function< AbstractTreeItem *const &, bool > {
+          : public std::function<bool(AbstractTreeItem *const &)> {
         public:
           FilterFunctor(FilterWidget *fw);
           FilterFunctor(FilterFunctor const &other);
