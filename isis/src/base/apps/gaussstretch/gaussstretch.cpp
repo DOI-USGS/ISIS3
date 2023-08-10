@@ -37,7 +37,15 @@ namespace Isis {
       stretch.push_back(new GaussianStretch(*hist, mean, stdev));
     }
 
-    p.StartProcess(gauss);
+    // Processing routine for the pca with one input cube
+    auto gaussProcess = [&](Buffer &in, Buffer &out)->void {
+      for(int i = 0; i < in.size(); i++) {
+        if(IsSpecial(in[i])) out[i] = in[i];
+        out[i] = stretch[in.Band(i)-1]->Map(in[i]);
+      }
+    };
+
+    p.StartProcess(gaussProcess);
     for(int i = icube->bandCount()-1; i >= 0 ; i--) {
       delete stretch[i];
       stretch.pop_back();
@@ -45,13 +53,5 @@ namespace Isis {
     p.EndProcess();
 
     stretch.clear();
-  }
-
-  // Processing routine for the pca with one input cube
-  void gauss(Buffer &in, Buffer &out) {
-    for(int i = 0; i < in.size(); i++) {
-      if(IsSpecial(in[i])) out[i] = in[i];
-      out[i] = stretch[in.Band(i)-1]->Map(in[i]);
-    }
   }
 }
