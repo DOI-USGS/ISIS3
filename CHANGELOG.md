@@ -43,6 +43,8 @@ release.
 - Report better information regarding the behavior of <i>findfeatures</i>, FASTGEOM algorithms, and creation of the output network. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Modified tgocassisstitch to optionally allow either a outputprefix or an
   outputsuffix, both, or neither for naming convention purposes. [#5162](https://github.com/DOI-USGS/ISIS3/pull/5162)
+- Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
+- Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
 
 ### Added
 - Added rclone to run dependencies in meta.yaml [#5183](https://github.com/DOI-USGS/ISIS3/issues/5183)
@@ -52,10 +54,9 @@ release.
 - Added two new examples demonstrating/documenting the use of FASTGEOM algorithm, parameterization using <b>GLOBALS</b> and creation of a regional mosaic using <i>findfeatures</i>. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Added new option <b>GEOMSOURCE=BOTH</b> to <i>findfeatures</i> to check both the MATCH and FROM/FROMLIST images for valid control measure geometry to produce better networks and prevent downstream processing errors. Ignore points that end up with no valid measures (but can be retained with use of <b>PreserveIgnoredControl</b> via GLOBALS parameterization). [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Added new gtests for <i>findfeatures</i> that replaces all the old application tests. These tests are <i>FunctionalTestFindfeaturesFastGeomDefault</i>, <i>FunctionalTestFindfeaturesFastGeomRadialConfig</i>, <i>FunctionalTestFindfeaturesFastGeomGridDefault</i> and <i>FunctionalTestFindfeaturesFastGeomGridConfig</i>. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
-
 - Added an optional cubename parameter to tgocassisstitch which lets the user
   override the timestamp style naming convention of the output cube with their
-  own name; if not specified retains existing behavior [#5125](https://github.com/USGS-Astrogeology/ISIS3/issues/5125)
+  own name; if not specified retains existing behavior [#5125](https://github.com/USGS-Astrogeology/ISIS3/issues/5162)
 
 ### Deprecated
 
