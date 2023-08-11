@@ -11,7 +11,7 @@ MAC_ARCH_FLAGS = $(MAC_ARCH) $(MAC_XARCH) $(MAC_OS_MIN)
 
 QTDEFINES= -DQT_GUI_LIB -DQT_CORE_LIB DQT_NO_DEBUG
 
-ISIS_MACOSX_TARGET=13.4
+ISIS_MACOSX_TARGET=13.5
 
 ISIS_CFLAGS= -pipe -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.3.sdk -Wall -W -Wno-unused-parameter -fPIC $(MAC_ARCH_FLAGS) $(QTDEFINES)
 
