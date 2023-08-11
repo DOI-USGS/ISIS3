@@ -62,6 +62,7 @@ release.
 - Fixes embree shape models not being from .BDS extension files [5064](https://github.com/USGS-Astrogeology/ISIS3/issues/5064)
 - Fixed failing shapemodel parameters when bullet was the preferred ray tracing engine but could not be created. [#5062](https://github.com/USGS-Astrogeology/ISIS3/issues/5062)
 - Fixed version for Qt to prevent depreciations. [#5070](https://github.com/USGS-Astrogeology/ISIS3/issues/5070)
+- Fixed gaussstretch segmentation fault error and refactored gaussstretch files/tests to use gtest. [#5240](https://github.com/DOI-USGS/ISIS3/issues/5240)
 
 ## [7.1.0] - 2022-07-27
 
