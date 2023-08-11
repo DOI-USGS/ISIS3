@@ -382,7 +382,7 @@ namespace Isis {
       char line[1024];
 
       for( int j=0;j<measGroup.size();j++) {
-        sprintf(line,"%s,%s,%s,%lf,%4.2lf,%4.2lf,%d,%d,%s,%s,%s\n",
+        snprintf(line, sizeof(line), "%s,%s,%s,%lf,%4.2lf,%4.2lf,%d,%d,%s,%s,%s\n",
                       measGroup[j]->Parent()->GetId().toStdString().data(),
                       serialNumList.fileName(measGroup[j]->GetCubeSerialNumber()
                         ).toLatin1().data(),

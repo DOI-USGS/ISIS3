@@ -321,7 +321,7 @@ namespace Isis {
        */
       template <typename T>
       class ProcessCubeInPlaceFunctor :
-          public std::unary_function<const int &, void *> {
+          public std::function<void*(int)> {
         public:
           /**
            * Construct a ProcessCubeInPlaceFunctor. This doesn't take ownership
@@ -445,7 +445,7 @@ namespace Isis {
        */
       template <typename T>
       class ProcessCubeFunctor :
-          public std::unary_function<const int &, void *> {
+          public std::function<void *(const int &)> {
         public:
           /**
            * Construct a ProcessCubeFunctor. This doesn't take ownership
@@ -572,7 +572,7 @@ namespace Isis {
        */
       template <typename T>
       class ProcessCubesFunctor :
-          public std::unary_function<const int &, void *> {
+          public std::function<void *(const int &)> {
         public:
           /**
            * Construct a ProcessCubesFunctor. This doesn't take ownership

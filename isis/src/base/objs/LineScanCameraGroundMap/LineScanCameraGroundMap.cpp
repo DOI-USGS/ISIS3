@@ -41,7 +41,7 @@ bool ptXLessThan(const QList<double> l1, const QList<double> l2);
  * @internal
  */
 class LineOffsetFunctor :
-  public std::unary_function<double, double > {
+  public std::function<double(double)> {
   public:
 
     LineOffsetFunctor(Isis::Camera *camera, const Isis::SurfacePoint &surPt) {
@@ -146,7 +146,7 @@ class LineOffsetFunctor :
  * @internal
  */
 class SensorSurfacePointDistanceFunctor :
-  public std::unary_function<double, double > {
+  public std::function<double(double)> {
 
   public:
     SensorSurfacePointDistanceFunctor(Isis::Camera *camera, const Isis::SurfacePoint &surPt) {

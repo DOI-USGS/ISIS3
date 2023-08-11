@@ -54,7 +54,7 @@ void image_change_header(struct image_header *header)
   hdr_buf[1] = header->height;
   hdr_buf[2] = header->width;
   hdr_buf[3] = header->bpe;
-  sprintf((char *)hdr_buf + IMAGE_LABEL_OFFSET, "%s", header->label);
+  snprintf((char *)hdr_buf + IMAGE_LABEL_OFFSET, sizeof((char *)hdr_buf + IMAGE_LABEL_OFFSET), "%s", header->label);
 
   /* write the new header */
   lseek(header->fd, 0L, 0);
@@ -78,7 +78,7 @@ void image_open(char *filename, struct image_header *header, char *mode)
     strcpy(buf, filename);
   }
   else {
-    sprintf(buf, "%s.ddd", filename);
+    snprintf(buf, sizeof(buf), "%s.ddd", filename);
   }
   if(((*mode == 'r') && (mode[1] != 'w')) || (*mode == 'u')) {
     if(strcmp(buf, "-.ddd")) fd = open(buf, (*mode == 'r') ? 0 : 2);
@@ -128,7 +128,7 @@ void image_open(char *filename, struct image_header *header, char *mode)
     hdr_buf[1] = header->height;
     hdr_buf[2] = header->width;
     hdr_buf[3] = header->bpe;
-    sprintf((char *)hdr_buf + IMAGE_LABEL_OFFSET, "%s", header->label);
+    snprintf((char *)hdr_buf + IMAGE_LABEL_OFFSET, sizeof((char *)hdr_buf + IMAGE_LABEL_OFFSET), "%s", header->label);
     if(write(fd, hdr_buf, IMAGE_HEADER_LENGTH) < IMAGE_HEADER_LENGTH) {
       printf("image_open : unable to write header for %s\n", buf);
       exit(1);

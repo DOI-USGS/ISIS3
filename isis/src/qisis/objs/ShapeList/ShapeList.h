@@ -134,7 +134,7 @@ namespace Isis {
        *
        * @internal
        */
-      class CopyShapeDataFunctor : public std::unary_function<Shape * const &, void *> {
+      class CopyShapeDataFunctor : public std::function<void *(Shape * const &)> {
         public:
           CopyShapeDataFunctor(const Project *project, FileName newProjectRoot);
           CopyShapeDataFunctor(const CopyShapeDataFunctor &other);
