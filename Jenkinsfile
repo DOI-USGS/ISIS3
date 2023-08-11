@@ -31,7 +31,7 @@ pipeline {
                 conda activate isis > /dev/null
                 conda config --env --set channel_priority flexible
                 conda install -c conda-forge python=3 findutils
-                mamba env update -f environment.yml --prune
+                conda env update -f environment.yml --prune
                 conda activate isis
                 mamba install -c conda-forge git
                 git submodule update --init --recursive
