@@ -7,9 +7,6 @@ using namespace std;
 using namespace Isis;
 
 namespace Isis {
-  void gauss(Buffer &in, Buffer &out);
-
-  vector<GaussianStretch *> stretch;
 
   void gaussstretch(UserInterface &ui) {
     Cube icube;
@@ -30,6 +27,7 @@ namespace Isis {
                     icube->sampleCount(), icube->lineCount(), icube->bandCount());
     double gsigma = ui.GetDouble("GSIGMA");
 
+    vector<GaussianStretch *> stretch;
     for(int i = 0; i < icube->bandCount(); i++) {
       Histogram *hist = icube->histogram(i + 1);
       double mean = (hist->Maximum() + hist->Minimum()) / 2.0;
