@@ -402,8 +402,8 @@ namespace Isis {
        * @internal
        */
       class ControlMeasureLessThanFunctor :
-          public std::binary_function<ControlMeasure* const &,
-          ControlMeasure * const &, bool > {
+          public std::function<bool(ControlMeasure* const &,
+          ControlMeasure * const &)> {
         public:
           ControlMeasureLessThanFunctor(double(ControlMeasure::*accessorMethod)() const) {
             m_accessor = accessorMethod;

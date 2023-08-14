@@ -61,7 +61,7 @@ namespace Isis {
       bool normalized() const;
       double photometry(double i, double e, double g, int band = 1) const override;
       double photometry(double i, double e, double g, double lat, double lon, int band = 1) const;
-      void report(PvlContainer &pvl);
+      void report(PvlContainer &pvl) override;
       void setNormalized(bool normalized);
 
     private:

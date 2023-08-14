@@ -117,8 +117,8 @@ namespace Isis {
        *
        * @internal
        */
-      class VariantToImageFunctor : public std::unary_function<
-          const QVariant &, Image *> {
+      class VariantToImageFunctor : public std::function<
+          Image *(const QVariant &)> {
 
         public:
           VariantToImageFunctor(QMutex *cameraMutex, bool requireFootprints, QThread *targetThread,
