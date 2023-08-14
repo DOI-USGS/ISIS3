@@ -138,7 +138,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
   cubeList->write(cubeListFile);
 
   QVector<QString> stitchArgs = {"fromlist=" + cubeListFile,
-                "outputprefix=" + prefix.path() + "/stitched-"};
+                "outputprefix=" + prefix.path() + "/stitched"};
   UserInterface stitchOptions(STITCH_XML, stitchArgs);
 
   try {
