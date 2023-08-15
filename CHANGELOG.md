@@ -45,6 +45,7 @@ release.
 
 ### Fixed
 - Updated History constructor to check for invalid BLOB before copying History BLOB to output cube [#4966](https://github.com/DOI-USGS/ISIS3/issues/4966)
+- Fixed gaussstretch segmentation fault error and refactored gaussstretch files/tests to use gtest [#5240](https://github.com/DOI-USGS/ISIS3/issues/5240)
 
 ## [8.0.0] - 2023-04-19
 
