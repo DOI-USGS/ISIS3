@@ -1889,9 +1889,9 @@ namespace Isis {
 
     double entryValue;
 
-    int numEntries = 0;
+    long numEntries = 0;
 
-    int numBlockcolumns = m_sparseNormals.size();
+    long numBlockcolumns = m_sparseNormals.size();
     for (int columnIndex = 0; columnIndex < numBlockcolumns; columnIndex++) {
 
       SparseBlockColumnMatrix *normalsColumn = m_sparseNormals[columnIndex];
@@ -2557,7 +2557,7 @@ namespace Isis {
     cholmod_dense *x;        // solution vector
     cholmod_dense *b;        // right-hand side (column vectors of identity)
 
-    b = cholmod_zeros ( m_rank, 1, CHOLMOD_REAL, &m_cholmodCommon );
+    b = cholmod_l_zeros ( m_rank, 1, CHOLMOD_REAL, &m_cholmodCommon );
     double *pb = (double*)b->x;
 
     double *px = NULL;
