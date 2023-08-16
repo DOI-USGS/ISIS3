@@ -1837,7 +1837,7 @@ End_Group
     <change name="Kris Becker" date="2023-08-04">
         Fix bug when using projected images and mosaics. Instantiation and use
         of projection class was fixed to correctly return geometry data for
-        these images.
+        these images. (References #4772)
     </change>
   </history>
 
@@ -1951,7 +1951,7 @@ End_Group
           <type>filename</type>
           <fileMode>output</fileMode>
           <brief>
-              Output list of <b>FROM</b>/<b>FROMLIST</b> cube files that were not
+              Output list of FROM/FROMLIST cube files that were not
               successfully matched
           </brief>
           <description>
@@ -1973,7 +1973,7 @@ End_Group
           <type>filename</type>
           <fileMode>output</fileMode>
           <brief>
-              Output list of <b>FROM</b>/<b>FROMLIST</b> cube files that failed FastGeom
+              Output list of FROM/FROMLIST cube files that failed FastGeom
           </brief>
           <description>
               <p>
@@ -2038,13 +2038,14 @@ End_Group
        <parameter name= "LISTSPEC">
             <type>boolean</type>
             <brief>
-               List result of <b>ALGORITHM</b> specification
+               List result of ALGORITHM specification
             </brief>
             <description>
               If true, information about the detector, extractor, matcher, and
-              parameters specified in the <b>ALGORITHM</b> or <b>ALGOSPECFILE</b> parameters
-              will be output. If multiple sets of algorithms are specified,
-              then the details for each set will be output.
+              parameters specified in the <b>ALGORITHM</b> or
+              <b>ALGOSPECFILE</b> parameters will be output. If multiple sets
+              of algorithms are specified, then the details for each set will
+              be output.
             </description>
            <default><item>No</item></default>
         </parameter>
@@ -2210,7 +2211,7 @@ End
 
       <parameter name= "DEBUGLOG">
             <type>filename</type>
-            <brief>File to write (append) debugging information  to</brief>
+            <brief>File to write (append) debugging information to</brief>
             <description>
                 Provide a file that will have all the debugging content appended
                 as it is generated in the processing steps. This file can be
@@ -2403,7 +2404,7 @@ End
        <parameter name="FASTGEOMPOINTS">
            <type>integer</type>
            <brief>
-              Minimium points to compute perspective matrix in <b>FASTGEOM</b>
+              Minimium points to compute perspective matrix in FASTGEOM
            </brief>
            <description>
               Specify the minimun number of common geometry mapping points
@@ -2425,7 +2426,7 @@ End
         <list>
            <option value="CAMERA">
                <brief>
-                  Fastgeom will project the <b>FROM</b> image into the <b>MATCH</b> space
+                  Fastgeom will project the FROM image into the MATCH space
                </brief>
                <description>
                    This option projects the image in the same manner as cam2map.
@@ -2438,7 +2439,7 @@ End
            </option>
            <option value="CROP">
                <brief>
-                  Fastgeom will crop the <b>FROM</b> image to common area of <b>MATCH</b>
+                  Fastgeom will crop the FROM image to common area of MATCH
                </brief>
                <description>
                   Fastgeom will crop the <b>FROM</b> image to common area of <b>MATCH</b> and
@@ -2450,7 +2451,7 @@ End
 
            <option value="MAP">
                <brief>
-                   Fastgeom will fully map project all of the <b>FROM</b> image
+                   Fastgeom will fully map project all of the FROM image
                </brief>
                <description>
                    Fastgeom will preserve all of the <b>FROM</b> image using the
@@ -2488,7 +2489,7 @@ End
 
            <option value="SOBEL">
                <brief>
-                  Apply Sobel filtering to both <b>FROM</b> and <b>MATCH</b> images
+                  Apply Sobel filtering to both FROM and MATCH images
                </brief>
                <description>
                   The <a href="http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=sobel#sobel ">
@@ -2502,7 +2503,7 @@ End
 
            <option value="SCHARR">
                <brief>
-                  Apply Scharr filtering to both <b>FROM</b> and <b>MATCH</b> images for enhanced edges.
+                  Apply Scharr filtering to both FROM and MATCH images for enhanced edges.
                </brief>
                <description>
                  A <a href="http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=sobel#scharr">
@@ -2655,7 +2656,7 @@ End
                 </option>
                 <option value="FROM">
                     <brief>
-                       Use the <b>FROM</b> file to compute geometries for control points
+                       Use the FROM file to compute geometries for control points
                     </brief>
                     <description>
                         Selection of the <b>FROM</b> option indicates use of the <b>FROM</b>
@@ -2667,7 +2668,7 @@ End
                 </option>
                <option value="MATCH">
                     <brief>
-                       Use the <b>MATCH</b> file to compute geometries for control points
+                       Use the MATCH file to compute geometries for control points
                     </brief>
                     <description>
                         Selection of the <b>MATCH</b> option indicates use of the <b>MATCH</b>
@@ -3478,24 +3479,32 @@ Total Algorithms to Run:     1
 
     <example>
       <brief>
-          Create a controlled mosaic using <i>findfeatures</i>
+          Create a controlled mosaic using findfeatures
       </brief>
       <description>
         <h3>Overview</h3>
         <p>
-          This example provides a comprehensive processing sequence that
-          produces a controlled mosaic using <i>findfeatures</i>. The data
-          used for this mosaic is MESSENGER MDIS NAC and WAC images of
-          Mercury. A complete set of scripts are provided with this
-          example beginnng with the download of the images from the
-          MESSENGER MDIS PDS archive. These EDRs are ingested into ISIS where
-          standard processing is applied and the entire procedure to
-          produce a regional controlled mosaic using <i>findfeatures</i>
-          is demonstrated. These scripts are designed to be adaptable
-          to control other datasets with minor changes.
+          This example shows the results of a comprehensive processing sequence
+          that produces a controlled mosaic using <i>findfeatures</i>. The data
+          used for this mosaic is MESSENGER MDIS NAC and WAC EDR images of
+          Mercury taken from the MESSENGER MDIS PDS archive. These
+          EDRs are ingested into ISIS and standard processing is then
+          applied producing the regional controlled mosaic using
+          <i>findfeatures</i>. The EDR images used for this example are:
         </p>
+        <PRE>
+EN0108828436M.IMG
+EN0108828483M.IMG
+EN0108828488M.IMG
+EN0217733143M.IMG
+EN0217733334M.IMG
+EN0218118182M.IMG
+EW0215590428G.IMG
+EW0218075871G.IMG
+EW0218118239G.IMG
+        </PRE>
         <p>
-          It is important to recognize the procedures shown here are effective
+          It is important to recognize the procedures applied here are effective
           under limited conditions. Namely, all the images included here
           have some common overlap with the carefully chosen <b>MATCH</b> image.
           Adding additional images that do not overlap the <b>MATCH</b> image will
@@ -3511,168 +3520,19 @@ Total Algorithms to Run:     1
           global networks for Mercury using MESSENGER MDIS images and
           Bennu using OSIRIS-REx OCAMS images.
         </p>
-        <h3>Prerequisites</h3>
-        <p>
-          Before attempting this example, users must take a few additional
-          steps that are required to complete this example. First, ensure you
-          have installed the latest version of ISIS. Also the ISIS base and
-          MESSENGER ISISDATA components must be installed. This provides the
-          fundamental mission requirements to process MESSENGER MDS images.
-          Second, the scripts use two utilities that may not be available
-          on a clean conda ISIS install environment. These utilities are
-          <b>wget</b> and <b>parallel</b>. These utilities are both available
-          from Anaconda and can easily be installed once you have initialized
-          your ISIS environment for processing by running the following
-          conda install command in an interactive terminal/shell:
-          <code>conda install wget parallel</code>.
-        </p>
-        <h3>Processing Scripts and Other Required Files</h3>
-        <p>
-          Provided in this example are eight processing scripts and two
-          additional configuration files required in the processing steps.
-          The scripts are described in the table below along with brief
-          explanations of their function and neccessary ancillary files
-          where indicated. Be sure to create a new directory to run this
-          process in as a script is provided that will remove/delete all
-          unneccessary files at any time so that a complete reprocess can be
-          applied. Note these scripts are written using the Bash shell syntax
-          but should run with any shell. However, some modifications may be
-          required due to limited testing. Note they are listed in the order
-          in which they are executed in the procedure. These files are located
-          in the directory
-          <b>$ISISROOT/appdata/templates/findfeatures/mosaics</b> and can be
-          copied to a local directory for your own use.
-        </p>
-        <TABLE border = "1">
-          <CAPTION>
-            <h4>
-                <a name="MosaicProcessingScripts">Controlled Mosaic Processing Scripts</a>
-            </h4>
-          </CAPTION>
-          <TR>
-            <TH>Script</TH>
-            <TH>Description</TH>
-          </TR>
-          <TR>
-            <TD>fetch_edrs.sh</TD>
-            <TD>
-              This scripts downloads the MESSENGER MDIS EDRs used in this
-              example and needs to be executed once. This is the first script
-              that must be executed before any other processing can occur.
-            </TD>
-          </TR>
-          <TR>
-            <TD>00_basic_proc.sh</TD>
-            <TD>
-              This scripts ingests the raw MESSENGER MDIS EDRs using
-              <i>mdis2isis</i>, applies <i>spiceinit</i> to establish
-              emphemeris/geometry function with SPICE kernels and
-              calibrates the images with <i>mdiscal</i>. It also computes
-              image data and geometry statistics using <i>camstats</i> and
-              generates the GIS FOV surface footprints using
-              <i>footprintinit</i>.
-            </TD>
-          </TR>
-          <TR>
-            <TD>run_findfeatures.sh</TD>
-            <TD>
-              This script runs <i>findfeatures</i> on the images to produces a
-              clean network prepared for bundle adjustment with <i>jigsaw</i>.
-              Other ISIS applications used in this script are <i>pointreg</i>
-              to register control measures to subpixel accuracy and eliminate
-              problematic measures/points, <i>cnetcombinept</i> to only clean
-              the network of ignored measures/points, and <i>cnetcheck</i>
-              to evaluate the validity of the network. Note that
-              <i>pointreg</i> requires the file
-              <em>pointreg_P31x31_S51x51.def</em> to configure chip parameters
-              and define general registration constraints.
-            </TD>
-          </TR>
-          <TR>
-            <TD>run_cam2map.sh</TD>
-            <TD>
-              This script projects all the images into a standard
-              equirectangular projection specific to this regional
-              mosaic. <i>cam2map</i> is applied to each image using
-              the map definition file <b>equi_clon180_PosEast_200m.map</b>.
-              It is used to produce two mosaics - uncontrolled and controlled -
-              for comparison purposes.
-            </TD>
-          </TR>
-          <TR>
-            <TD>run_photomet.sh</TD>
-            <TD>
-              This script contains very specific parameters to the MDIS images
-              that corrects the images for photometric properties. It runs the
-              <i>photomet</i> application on each MDIS image with a 30 degree
-              standard incidence reference using a Henyey-Greenstein
-              single-particle phase function.
-            </TD>
-          </TR>
-          <TR>
-            <TD>run_jigsaw.sh</TD>
-            <TD>
-              This script runs <i>jigsaw</i> on the resulting network produced
-              by the <i>run_findfeatures.sh</i> script. It is mostly customized
-              for this particular dataset in that it only solves for camera
-              angles with a camera angle sigma of 0.025. It can be altered to
-              suite other datasets but will generally require some
-              trial-and-error. This configuration does not solve for spacecraft
-              position because something needs to be deemed <em>truth</em>. In
-              this case, we are trusting the spacecraft positions are good.
-            </TD>
-          </TR>
-          <TR>
-            <TD>run_em_all.sh</TD>
-            <TD>
-              This is the main batch script that runs all the other scripts
-              producing the results of this example. The script
-              <b>fetch_edrs.csh</b> must be run before this script can be run.
-              You must also create a list of the image EDRS (with an IMG file
-              extension) to a file that is the only input requirement to run
-              this script.
-            </TD>
-          </TR>
-          <TR>
-            <TD>clean_restart.sh</TD>
-            <TD>
-              This is a standalone script which removes all the files produced
-              by this example except the EDRS. It should be used with caution
-              as it uses file globs (e.g., *.cub) to clean up the files. This
-              implies this example should be run in a new directory.
-            </TD>
-          </TR>
-        </TABLE>
         <h3>Making a Controlled Mosaic with <i>findfeatures</i></h3>
         <p>
-          The files described above are used to create a controlled mosaic
-          comprised of MESSENGER MDIS NAC and WAC images of Mercury. These files
-          can be copied from the directory
-          <b>$ISISROOT/appdata/templates/findfeatures/mosaics</b>
-          into an empty/dedicated directory for processing. Before running the
-          scripts ensure the prerequisites are installed as described above in
-          the <b>Prerequisites</b> section. Here are the commands used to run
-          the example:
-          <br/>
-          <PRE>
-            mkdir MdisMosaics
-            cd MdisMosaics
-            cp -p $ISISROOT/appdata/templates/findfeatures/mosaics/* $PWD/
-            ./fetch_edrs.sh
-            ls -1 $PWD/*.IMG > mdis_edrs.lis
-            ./run_em_all.sh mdis_edrs.lis
-          </PRE>
-          <br/>
-          This will produce two regional mosaics, one uncontrolled and one
-          controlled, where <i>findfeatures</i> was used to produce the
-          controlled mosaic. The <i>findfeatures</i> command used, found in
-          <i>run_findfeatures.sh</i>, for image matching and network creation
-          process is:
+          The MESSENGER NAC and WAC images must be processed with the ISIS
+          application processing sequence of <i>mdis2isis</i>, <i>spiceinit</i>,
+          <i>mdiscal</i>, <i>camstats</i> and <i>footprintinit</i>. This will
+          prepare the images for <i>findfeatures</i> which will create an
+          image-based network.  The <i>findfeatures</i> command used on these
+          nine images which performs image matching and creates the network is:
         </p>
 <PRE>
 base="EW0218118239G"
 findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@Maxpoints:7000' \
-             match="$PWD/Lev1/${base}.cal.cub" \
+             match="${base}.cal.cub" \
              fromlist=fromlist.lis \
              fastgeom=true \
              geomtype=camera \
@@ -3709,24 +3569,25 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@Maxpoints:700
           <b>EPITOLERANCE</b> are both set to 7 pixels to account for
           uncertainty in SPICE data and distortions in the translated images
           due to the linear nature of the perspective warp transform caused
-          by topography differences (which is accounted for in the
-          <i>pointreg</i> definition file <i>pointreg_P31x31_S51x51.def</i> by
-          setting the size of the SearchChip to be larger that twice the
-          size of the tolerances). We expect no files in the <b>TONOGEOM</b>
+          by topography differences (which should be accounted for in an
+          ensuing run of <i>pointreg</i> in the definition file by setting the
+          size of the SearchChip to be larger that twice the size of the
+          tolerances). We expect no files in the <b>TONOGEOM</b>
           and <b>TONOTMATCHED</b> because no such problems exist in this
-          example. And you should have a look at the <b>DEBUGLOG</b> file for
-          detailed performance and behavior information for <i>findfeatures</i>.
+          example. And you should have a look at the output <b>DEBUGLOG</b>
+          file for detailed performance and behavior information for
+          <i>findfeatures</i> that may indicate the need for adjustments of
+          the matching parameters.
         </p>
         <p>
-          The <b>MATCH</b> image, EW0218118239G, was carefully chosen in this dataset
-          because it has common ground coverage/overlap with all the other
-          eight MDIS images. <i>qmos</i> is most helpful to determine this
-          image as a <b>MATCH</b> candidate as is shown in this screen shot. Image
-          EW0218118239G is the one outlined with the dashed square. It is
-          clear there are images with largely varying pixel resolutions.
+          The <b>MATCH</b> image, EW0218118239G, was carefully chosen in this
+          dataset because it has common ground coverage/overlap with all the
+          other eight MDIS images. <i>qmos</i> is most helpful to determine
+          this image as a <b>MATCH</b> candidate as is shown in this screen
+          shot. Image EW0218118239G is the one outlined with the dashed square.
+          It is clear there are images with largely varying pixel resolutions.
           Users will be able to select any image by changing the "base"
-          variable in <i>run_em_all.sh</i> prior to the execution of
-          <i>run_findfeatures.sh</i>.
+          variable in prior to the execution of <i>findfeatures</i>.
         </p>
         <br/><br/>
         <img src='assets/messenger_mdis_qmos.png' alt='qmos of MESSENGER MDIS footprints' width='1125' height='650' />
@@ -3743,7 +3604,9 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@Maxpoints:700
           matched). Typically this is not realistic so additional
           options can be considered. For example, success in <i>jigsaw</i> is
           greatly increased by the quality of the control points/measures.
-          The <i>pointreg</i> step is where this result can be achieved by
+          The <i>pointreg</i> application is used to refine control measures in
+          the output network produced by <i>findfeatures</i> to sub-pixel
+          accuracy. This step is where this result can be achieved by
           setting a high <i>Tolerance</i> in the <i>Algorithm</i> group of
           the <b>REGDEF</b> file. For great control points, use
           <b>Tolerance = 0.9</b>, which is what was used in this example.
@@ -3768,27 +3631,17 @@ findfeatures algorithm='fastx@threshold:25@type:2/brief/parameters@Maxpoints:700
         <img src='assets/messenger_qnet_control_result.jpg' alt='qnet of MESSENGER MDIS control network' width='1125' height='650' />
         <br/><br/>
         <p>
-          Producing a mosaic is the best way to assess the quality of the network.
-          A controlled mosaic is created to visually inspection with <i>qview</i> or
-          an alternative image viewer. It is also helpful to create an initial
-          uncontrolled mosaic for a baseline of how much the control process
-          improved the image registration. This procedure creates both an
-          uncontrolled and controlled mosaic for this comparison. These
-          results can be viewed using <i>qview</i> using the command
-          <code>qview messenger_uncontrolled_phot_mos.cub
-          messenger_controlled_phot_mos.cub</code>. These mosaics have also
-          been photometrically corrected. There are also mosaics created prior
-          to this step where you can see the importance of photometric correction
-          in a final mosaic product. The screen shot below shows a portion of the two
-          mosaics. One important thing to note is this process does not
-          control to a ground truth source. There are at least several ways
+          Producing a mosaic is the best way to assess the quality of the
+          network. It is recommended to create both an uncontrolled and
+          controlled mosaic to visually inspect/compare with <i>qview</i> or
+          an alternative image viewer. The screen shot below shows a portion
+          of the two mosaics. One important thing to note is this example does
+          not control to a ground truth source. There are at least several ways
           to control your mosaic to ground truth but that is outside the
           scope of this example (and they are typically a great deal of work!).
           With that said, the spacecraft position serves as our "ground truth"
           but you may also see the <b>MATCH</b> image will have the least adjustment
-          because it is highly biased since it has the most control measures
-          (see the <i>jigsaw</i> bundle out file, <i>EW0218118239G_bundleout.txt</i>
-          to inspect the bundle adjustment results).
+          because it is highly biased since it has the most control measures.
         </p>
         <br/><br/>
         <img src='assets/messenger_control_mosaic_comparison.jpg' alt='qview comparison of MESSENGER MDIS mosaic control region' width='1192' height='650' />
