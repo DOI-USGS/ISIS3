@@ -246,7 +246,7 @@ Deborah Lee Soltesz
               <dt><h4>Specialized Method References</h4></dt>
               <dd><a href="https://isis.astrogeology.usgs.gov/documents/ControlNetworks/index.html">
               Control Network Reference</a></dd>
-              <dd><a href="">
+              <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Learning_About_Map_Projections#Defining-a-Map-in-ISIS3-">
               Map Definition Reference</a></dd>
             </dl>
           </td>
