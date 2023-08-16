@@ -160,8 +160,7 @@ namespace Isis {
        *
        * @internal
        */
-      class LessThanFunctor : public std::binary_function <
-          AbstractTreeItem *const &, AbstractTreeItem *const &, bool > {
+      class LessThanFunctor : public std::function <bool(AbstractTreeItem *const &, AbstractTreeItem *const &)> {
         public:
           LessThanFunctor(TableColumn const *someColumn);
           LessThanFunctor(LessThanFunctor const &);
