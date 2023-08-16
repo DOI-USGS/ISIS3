@@ -123,12 +123,14 @@ def create_rclone_arguments(destination, mission_name, parsedArgs, rclone_kwargs
         set of kernels that will be downloaded
     """
     log.debug(f"Creating RClone command for {mission_name}")
+
+    mission_dir_name = mission_name
     
     if (mission_name == "legacybase"):
         # We still want things to go into base
-        mission_name = "base"
+        mission_dir_name = "base"
 
-    destination = os.path.join(destination, str(mission_name))
+    destination = os.path.join(destination, str(mission_dir_name))
 
     if args.filter: 
         filters = [f"- {arg}" for arg in args.filters]
@@ -186,7 +188,7 @@ def main(mission, dest, cfg_path, parsedArgs, kwargs):
 
     supported_missions = []
     for source in config_sources:
-        if not any(x in source for x in ["asc_s3:", "esa:", "naif:", "jaxa:", "sbn:", "usgs:", "naifKernels:", "legacybase"]):
+        if not any(x in source for x in ["_", "esa", "naif", "jaxa", "sbn"]):
             if source != "":
                 supported_missions.append(source.replace(":", ""))
 
@@ -196,13 +198,13 @@ def main(mission, dest, cfg_path, parsedArgs, kwargs):
         raise LookupError(f"{mission} is not in the list of supported missions: {supported_missions}")
 
     if(mission.upper() == "ALL"):
+        supported_missions.remove("legacybase")
         for mission in supported_missions:
             args = create_rclone_arguments(dest, mission, parsedArgs, kwargs)
             rclone(command=parsedArgs.command, extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
     else:
         args = create_rclone_arguments(dest, mission,  parsedArgs, kwargs)
         rclone(command=parsedArgs.command, extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
-
 
 if __name__ == '__main__':
     usageString = "usage: downloadIsisData mission dest [-h] [-v] [-n NUM_TRANSFERS] [--config CONFIG] [rclone flags]"
