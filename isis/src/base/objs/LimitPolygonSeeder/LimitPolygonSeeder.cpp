@@ -90,7 +90,7 @@ namespace Isis {
         geos::geom::Point *centroid = gridSquarePolygon->getCentroid().release();
 
         delete gridSquarePolygon;
-        if(centroid == NULL) continue;
+        if(centroid->isEmpty()) continue;
 
         double gridCenterX = centroid->getX();
         double gridCenterY = centroid->getY();
