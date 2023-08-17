@@ -36,6 +36,7 @@ release.
 ## [Unreleased]
 
 ### Changed
+- Changed cholmod 32 bit calls to 64 bit calls [#5173](https://github.com/DOI-USGS/ISIS3/issues/5173) and [#5176](https://github.com/DOI-USGS/ISIS3/issues/5176)
 
 ### Added
 
