@@ -1,0 +1,40 @@
+Group = FastGeomCommonParameters
+  # Defaults used for findfeatures FastGeom Algorithms
+
+  # FastGeomAlgorithm           = radial
+  FastGeomPoints               = 25
+  FastGeomTolerance            = 3
+  # GeomType                    = camera
+
+  FastGeomQuerySampleTolerance = 0
+  FastGeomQueryLineTolerance   = 0
+  FastGeomTrainSampleTolerance = 0
+  FastGeomTrainLineTolerance   = 0
+
+  FastGeomDumpMapping = false
+EndGroup = FastGeomCommonParameters
+
+
+Group = FastGeomGridParameters
+  # FastGeomAlgorithm            =  grid
+
+  FastGeomGridStartIteration   = 0
+  # FastGeomGridStopIteration    = 1 to N
+  FastGeomGridIterationStep    = 1
+
+  FastGeomTotalGridIterations  = 1
+
+  FastGeomGridSaveAllPoints    = false
+EndGroup = FastGeomGridParameters
+
+
+Group = FastGeomRadialParameters
+  # FastGeomAlgorithm           = radial
+
+  FastGeomRadialSegmentLength  = 25
+  FastGeomRadialPointCount     = 5
+  FastGeomRadialPointFactor    = 1.0
+
+  # FastGeomRadialSegments       = N
+EndGroup = FastGeomRadialParameters
+End

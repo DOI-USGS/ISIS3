@@ -19,6 +19,7 @@ find files of those names at the top level of this repository. **/
 #include "GenericTransform.h"
 #include "MatchImage.h"
 #include "PvlFlatMap.h"
+#include "QDebugLogger.h"
 
 namespace Isis {
 
@@ -52,19 +53,62 @@ class ImageTransform;
  * @internal
  *   @history 2015-10-01 Kris Becker - Original Version
  *   @history 2016-04-06 Kris Becker Created .cpp file and completed documentation
+ *   @history 2021-10-29 Kris Becker Added const qualifier to all compute() and
+ *                                     apply() methods
+ *   @history 2022-02-02 Kris Becker Added Grid implementation resulting in
+ *                                     consolidation/abstraction of Radial
+ *                                     algorithm code
+ *   @history 2022-02-07 Kris Becker Modifications in response to USGS/Astro
+ *                                     code review in PR #4772
  */
 
 class FastGeom {
   public:
     typedef GenericTransform::RectArea   RectArea;
+    typedef cv::Point2d                  FGPoint;
+    typedef cv::Rect2d                   FGFov;
+
     FastGeom();
     FastGeom(const PvlFlatMap &parameters);
     FastGeom(const int maxpts, const double tolerance, const bool crop = false,
              const bool preserve = false, const double &maxarea = 3.0);
     virtual ~FastGeom();
 
-    ImageTransform *compute(MatchImage &query, MatchImage &train);
-    void apply(MatchImage &query, MatchImage &train);
+    // ImageTransform *compute(MatchImage &query, MatchImage &train) const;
+    ImageTransform *compute(MatchImage &query, MatchImage &train,
+                            QLogger logger = QLogger() ) const;
+
+    int radial_algorithm(MatchImage &query, MatchImage &train,
+                        const FGFov &q_fov, const FGFov &t_fov,
+                        const PvlFlatMap &parameters,
+                        std::vector<FGPoint> &q_infov_points,
+                        std::vector<FGPoint> &t_infov_points,
+                        QLogger logger = QLogger()) const;
+
+    int  grid_algorithm(MatchImage &query, MatchImage &train,
+                        const FGFov &q_fov, const FGFov &t_fov,
+                        const PvlFlatMap &parameters,
+                        std::vector<FGPoint> &q_infov_points,
+                        std::vector<FGPoint> &t_infov_points,
+                        QLogger logger = QLogger()) const;
+
+    void apply(MatchImage &query, MatchImage &train, QLogger logger = QLogger() ) const;
+
+    static cv::Mat getTransformMatrix(const std::vector<FGPoint> &querypts,
+                                      const std::vector<FGPoint> &trainpts,
+                                      std::vector<uchar>         &inliers,
+                                      const double tolerance,
+                                      QLogger logger = QLogger() );
+
+    PvlFlatMap getParameters() const;
+
+    void dump_point_mapping(MatchImage &query, MatchImage &train,
+                          const QString &method, const PvlFlatMap &parameters,
+                          const std::vector<FGPoint> &q_points,
+                          const std::vector<FGPoint> &t_points,
+                          const std::vector<SurfacePoint> &q_surface_points,
+                          const std::vector<bool> &t_inFOV,
+                          QLogger logger = QLogger()) const;
 
   private:
     int        m_fastpts;    //!< Number of points to use for geom
@@ -75,6 +119,7 @@ class FastGeom {
     PvlFlatMap m_parameters; //!< Parameters of transform
 
     void validate( const QString &geomtype ) const;
+
 };
 
 }  // namespace Isis

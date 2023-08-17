@@ -21,6 +21,7 @@ find files of those names at the top level of this repository. **/
 #include "Camera.h"
 #include "Cube.h"
 #include "SurfacePoint.h"
+#include "Projection.h"
 #include "TProjection.h"
 
 namespace Isis {
@@ -39,6 +40,10 @@ namespace Isis {
  *   @history 2014-07-01 Kris Becker - Original Version
  *   @history 2016-02-08 Kris Becker - Changed call to ISIS Histogram class for
  *                           recent changes
+ *   @history 2019-11-19 Kris Becker - Correctly return of target name from the
+ *                           Mapping group of projected images. Incorrect
+ *                           keyword Target used instead of TargetName
+ *   @history 2023-08-03 Kris J. Becker - Use Projection rather than TProjection
  */
 
 class ImageSource {
@@ -88,6 +93,8 @@ class ImageSource {
      * @author 2014-07-01 Kris Becker
      * @internal
      *   @history 2014-07-01 Kris Becker - Original Version
+     *   @history 2023-08-03 Kris J. Becker  Use Projection rather than
+     *                         TProjection; add getters
      */
     class SourceData : public QSharedData {
       public:
@@ -101,7 +108,7 @@ class ImageSource {
                                               m_projection(0), m_camera(0),
                                               m_image(image), m_mutex(new QMutex()) { }
         SourceData(const QString &name, const QString &serialno,
-                   TProjection *proj, Camera *camera, const cv::Mat &image) :
+                   Projection *proj, Camera *camera, const cv::Mat &image) :
                    m_name(name), m_serialno(serialno),
                    m_projection(proj), m_camera(camera),
                    m_image(image), m_mutex(new QMutex()) { }
@@ -119,11 +126,27 @@ class ImageSource {
           delete m_mutex;
         }
 
+        QString name() const {
+          return ( m_name );
+        }
+
+        QString serialnumber() const {
+          return ( m_serialno );
+        }
+
+        TProjection *projection() const {
+          return ( (TProjection *) m_projection );
+        }
+
+        Camera *camera() const {
+          return ( m_camera );
+        }
+
         // Data....
         QString     m_name;
         QString     m_serialno;
 
-        TProjection *m_projection;
+        Projection  *m_projection;
         Camera      *m_camera;
 
         cv::Mat     m_image;

@@ -15,6 +15,7 @@ find files of those names at the top level of this repository. **/
 #include <QSharedPointer>
 #include <QFile>
 #include <QTextStream>
+#include <QTime>
 
 // OpenCV stuff
 #include "opencv2/core.hpp"
@@ -24,6 +25,7 @@ find files of those names at the top level of this repository. **/
 
 #define HAVE_ISNAN
 
+#include "Application.h"
 #include "Camera.h"
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
@@ -67,7 +69,16 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 
 using namespace std;
-namespace Isis{
+namespace Isis {
+
+  inline PvlGroup pvlmap_to_group( const PvlFlatMap &pvlmap, const QString &grpnam ) {
+    PvlGroup pgrp( grpnam );
+    for ( auto pkey : pvlmap.values() ) {
+      pgrp.addKeyword( pkey );
+    }
+    return ( pgrp );
+  }
+
 
   static void writeInfo(const QString &toname, Pvl &data, UserInterface &ui, Pvl *log) {
       if ( !toname.isEmpty() ) {
@@ -88,12 +99,71 @@ namespace Isis{
       return;
   }
 
+  /**
+   * @brief Loads train images and applies geometry if provided
+   *
+   * This function loads a trainer image and optionally applies geometry using
+   * a FastGeom transform.
+   *
+   * A MatchImage is added to the MatchMaker as a trainer image. YOU SHOULD NOT
+   * USE THIS FUNCTION TO SET THE QUERY IMAGE. Once loaded, a FastGeom is
+   * optionally applied to the image before adding it to the matcher.
+   *
+   * Errors are trapped here if the file cannot be loaded or the geometry proess
+   * in FastGeom fails. In this case, false is returned without adding the image
+   * to the matcher.
+   *
+   * @author 2021-10-29 Kris J. Becker
+   * @history 2022-02-08 Kris J. Becker Clarified parameter description and added
+   *                       explanation of return function return condition; modified
+   *                       return logic
+   *
+   * @param matcher    The source reponsible for managing the matcher process
+   * @param trainfile  File name to load
+   * @param fastgeom   Apply FastGeom if provided
+   *
+   * @return bool      Any errors encountered will return false without adding
+   *                      the train image to the matcher
+   */
+  static bool load_train_with_geom(MatchMaker &matcher, const QString trainfile,
+                                  QDebugStream &logger,
+                                  const FastGeom *fastgeom = 0) {
+
+    try {
+      MatchImage t_image = MatchImage( ImageSource(trainfile) );
+
+      // Compute a FastGeom transform if requested
+      if ( fastgeom ) {
+        // This will typically throw an exception for bad geometry.
+        //  Will return false with no addition to matcher.
+
+        // Note if FastGeom is successful, it adds a transform on
+        // the trainer that computes geometric relationships with
+        // the query image.
+        fastgeom->apply(matcher.query(), t_image, QLogger(logger));
+      }
+
+      // If alls good...expection should be thrown above otherwise
+      matcher.addTrainImage( t_image );
+    }
+    catch ( IException &ie ) {
+      logger->dbugout() << "Failed to load " << trainfile << "\n\n";
+      return ( false );
+    }
+
+    return ( true );
+  }
+
   void findfeatures(UserInterface &ui, Pvl *log) {
 
     //  Program constants
     const QString findfeatures_program = "findfeatures";
-    const QString findfeatures_version = "1.0";
-    const QString findfeatures_revision = "$Revision$";
+    const QString findfeatures_version = "1.2";
+    const QString findfeatures_revision = "2023-06-21";  // Now is the date of revision!
+    // const QString findfeatures_runtime = Application::DateTime();
+
+    // Track runtime...
+    QTime runTime = QTime::currentTime();
 
     // Get time for findfeatures_runtime
     time_t startTime = time(NULL);
@@ -148,8 +218,15 @@ namespace Isis{
     if ( ui.WasEntered("PARAMETERS") ) {
       QString pfilename = ui.GetAsString("PARAMETERS");
       Pvl pfile(pfilename);
-      parameters.merge( PvlFlatMap(pfile) );
+      PvlFlatMap parms =  PvlFlatMap(pfile);
+      parameters.merge( parms );
       parameters.add("ParameterFile", pfilename);
+
+      // Log parameters loaded from the PARAMETERS file
+      if ( log ) {
+        auto parmgrp = pvlmap_to_group( parms, "Parameters");
+        log->addLogGroup( parmgrp );
+      }
     }
 
     // Get individual parameters if provided
@@ -187,17 +264,38 @@ namespace Isis{
       aspec.append( algos.join("|") );
     }
 
+    // Now reset any global parameters provided by the user
+    if ( ui.WasEntered("GLOBALS") ) {
+      QString gblparms = ui.GetString("GLOBALS");
+      PvlFlatMap globals = factory->parseGlobalParameters(gblparms);
+      factory->addGlobalParameters( globals );
+      factory->addParameter("GLOBALS", gblparms);
+
+        // Load values parsed from the GLOBALS string
+       if ( log ) {
+        auto globalgrp = pvlmap_to_group( globals, "Globals");
+        log->addLogGroup( globalgrp );
+      }
+    }
+
+    // Now report the list of all global parameters in the pool
+    if ( log ) {
+      auto gpool = pvlmap_to_group( factory->globalParameters(), "GlobalParameterPool");
+      log->addLogGroup( gpool );
+    }
 
     // Create a list of algorithm specifications from user specs and log it
     // if requested
     RobustMatcherList algorithms = factory->create(aspec);
     if ( ui.GetBoolean("LISTSPEC") ) {
+
       Pvl info;
       info.addObject(factory->info(algorithms));
       writeInfo(toinfo, info, ui, log);
 
       // If no input files are provided exit here
-      if ( ! ( ui.WasEntered("FROM") && ui.WasEntered("FROMLIST") ) ) {
+      if ( !( ui.WasEntered("MATCH") && ( ui.WasEntered("FROM") ||
+                                          ui.WasEntered("FROMLIST") ) ) ) {
         return;
       }
     }
@@ -223,41 +321,84 @@ namespace Isis{
 
     //-------------Matching Business--------------------------
     // Make the matcher class
-    MatchMaker matcher(ui.GetString("NETWORKID"));
-    matcher.setDebugLogger(logger, p_debug );
+    MatchMaker matcher(ui.GetString("NETWORKID"), factory->globalParameters() );
+    matcher.setDebugLogger( logger, p_debug );
 
-    // Acquire query image
-    matcher.setQueryImage(MatchImage(ImageSource(ui.GetAsString("MATCH"))));
-
-    // Get the trainer images
-    if ( ui.WasEntered("FROM") ) {
-      matcher.addTrainImage(MatchImage(ImageSource(ui.GetAsString("FROM"))));
-    }
-
-    // If there is a list provided, get that too
-    if ( ui.WasEntered("FROMLIST") ) {
-      FileList trainers(ui.GetFileName("FROMLIST"));
-      BOOST_FOREACH ( FileName tfile, trainers ) {
-        matcher.addTrainImage(MatchImage(ImageSource(tfile.original())));
-      }
-    }
-
-    // Got to have both file names provided at this point
-    if ( matcher.size() <= 0 ) {
-      throw IException(IException::User,
-                       "Must provide both a FROM/FROMLIST and MATCH cube or image filename",
-                       _FILEINFO_);
-    }
-
+    // *** Set up fast geom processing ***
     // Define which geometry source we should use.  None is the default
     QString geomsource = ui.GetString("GEOMSOURCE").toLower();
     if ( "match" == geomsource ) { matcher.setGeometrySourceFlag(MatchMaker::Query); }
     if ( "from"  == geomsource ) { matcher.setGeometrySourceFlag(MatchMaker::Train); }
+    if ( "both"  == geomsource ) { matcher.setGeometrySourceFlag(MatchMaker::Both); }
 
-    // Check for FASTGEOM option
-    if ( ui.GetBoolean("FASTGEOM") ) {
-      FastGeom geom( factory->globalParameters() );
-      matcher.foreachPair( geom );
+    // Trap load errors. Maintain a bad geom/load file list
+    FileList badgeom;
+    try {
+
+      logger->dbugout() << "\nImage load started at  " << Application::DateTime() << "\n";
+
+      // Check for FASTGEOM option
+      QScopedPointer<FastGeom> fastgeom;
+      if ( ui.GetBoolean("FASTGEOM") ) {
+        fastgeom.reset( new FastGeom( factory->globalParameters() ) );
+      }
+
+      // Acquire query image. Do not use load_train_with_geom()!!!
+      matcher.setQueryImage(MatchImage(ImageSource(ui.GetAsString("MATCH"))));
+
+      // Get the trainer image and apply geom if requested
+      if ( ui.WasEntered("FROM") ) {
+        QString tname = ui.GetAsString("FROM");
+        if ( !load_train_with_geom(matcher, tname, logger, fastgeom.data()) ) {
+          badgeom.append(tname);
+        }
+      }
+
+      // If there is a list provided, get that too
+      if ( ui.WasEntered("FROMLIST") ) {
+        FileList trainers(ui.GetFileName("FROMLIST"));
+        BOOST_FOREACH ( FileName tfile, trainers ) {
+          if ( !load_train_with_geom(matcher, tfile.original(), logger,
+                                     fastgeom.data()) ) {
+            badgeom.append(tfile.original());
+          }
+        }
+      }
+
+      // Load complete
+      logger->dbugout() << "Image load complete at " << Application::DateTime() << "\n";
+
+      // Check load/geom status and report bad ones before potential
+      // app abort
+      if ( badgeom.size() > 0 ) {
+        logger->dbugout() << "\nTotal failed image loads/FastGeoms excluded: " << badgeom.size() << "\n";
+        for ( int f = 0 ; f < badgeom.size() ; f++ ) {
+          logger->dbugout() << badgeom[f].toString() << "\n";
+        }
+
+        if ( ui.WasEntered("TONOGEOM") ) {
+          QString tonogeom(ui.GetAsString("TONOGEOM"));
+          badgeom.write(tonogeom);
+          logger->dbugout() << "\nSee also " << tonogeom << "\n\n";
+        }
+      }
+
+      // Force output to show progress
+      logger->flush();
+    }
+    catch (IException &ie) {
+      QString msg = "Fatal load errors encountered";
+      logger->dbugout() << "\n\n### " << msg << " - aborting..." << "\n";
+      throw IException(ie, IException::Programmer, msg, _FILEINFO_);
+    }
+
+    // Got to have both file names provided at this point
+    if ( matcher.size() <= 0 ) {
+      logger->dbugout() << "\n\n###   No valid files loaded - aborting...\n";
+      logger->dbugout() <<     "Time: " << Application::DateTime() << "\n";
+      QString msg = "Input cubes (" + QString::number(badgeom.size()) + ") failed to load. " +
+                    "Must provide valid FROM/FROMLIST and MATCH cube or image filenames";
+      throw IException(IException::User, msg,  _FILEINFO_);
     }
 
     // Check for Sobel/Scharr filtering options for both Train and Images
@@ -297,7 +438,7 @@ namespace Isis{
       logger->dbugout() << "Shucks! Insufficient matches were found ("
                         << best->size() << ")\n";
       QString mess = "Shucks! Insufficient matches were found (" +
-                     QString::number(best->size()) + ")";
+                      QString::number(best->size()) + ")";
       throw IException(IException::User, mess, _FILEINFO_);
     }
 
@@ -306,10 +447,11 @@ namespace Isis{
     PvlGroup bestinfo("MatchSolution");
     bestinfo += PvlKeyword("Matcher", best->matcher()->name());
     bestinfo += PvlKeyword("MatchedPairs", toString(best->size()));
+    bestinfo += PvlKeyword("ValidPairs", toString(quality.ValidPixels()));
     bestinfo += PvlKeyword("Efficiency",  toString(quality.Average()));
     if ( quality.ValidPixels() > 1 ) {
       bestinfo += PvlKeyword("StdDevEfficiency",
-                             toString(quality.StandardDeviation()));
+                              toString(quality.StandardDeviation()));
     }
 
     if(log){
@@ -327,15 +469,22 @@ namespace Isis{
       cnet.SetDescription(best->matcher()->name());
       cnet.SetCreatedDate(findfeatures_runtime);
       QString target = ( ui.WasEntered("TARGET") ) ? ui.GetString("TARGET") :
-                                                     best->target();
+                                                      best->target();
       cnet.SetTarget( target );
       ID pointId( ui.GetString("POINTID"), ui.GetInteger("POINTINDEX") );
-      matcher.setDebugOff();
+
       PvlGroup cnetinfo = matcher.network(cnet, *best, pointId);
 
       if ( cnet.GetNumPoints() <= 0 ) {
         QString mess = "No control points found!!";
         logger->dbugout() << mess << "\n";
+
+        // Get total elapded time
+        QTime totalE(0,0);
+        totalE = totalE.addMSecs(runTime.msecsTo(QTime::currentTime()));
+        logger->dbugout() << "\nSession complete in " << totalE.toString("hh:mm:ss.zzz")
+                          << " of elapsed time\n";
+
         throw IException(IException::User, mess, _FILEINFO_);
       }
 
@@ -360,34 +509,48 @@ namespace Isis{
     // If user wants a list of matched images, write the list to the TOLIST filename
     if ( ui.WasEntered("TOLIST") ) {
       QLogger fout( QDebugLogger::create( ui.GetAsString("TOLIST"),
-                                               (QIODevice::WriteOnly |
+                                                (QIODevice::WriteOnly |
                                                 QIODevice::Truncate) ) );
       fout.logger() << matcher.query().name() << "\n";
       MatcherSolution::MatchPairConstIterator mpair = best->begin();
       while ( mpair != best->end() ) {
         if ( mpair->size() > 0 ) {
-           fout.logger() << mpair->train().source().name() << "\n";
+            fout.logger() << mpair->train().source().name() << "\n";
         }
         ++mpair;
       }
     }
 
-
     // If user wants a list of failed matched images, write the list to the
-    // TONOTMATCHED file in append mode (assuming other runs will accumulate
-    // failed matches)
+    // TONOTMATCHED file if any are found
     if ( ui.WasEntered("TONOTMATCHED") ) {
-      QLogger fout( QDebugLogger::create( ui.GetAsString("TONOTMATCHED"),
-                                               (QIODevice::WriteOnly |
-                                                QIODevice::Append) ) );
+      QStringList nomatches;
+
+      // Search for unmatched files in the matcher network
       MatcherSolution::MatchPairConstIterator mpair = best->begin();
       while ( mpair != best->end() ) {
         if ( mpair->size() == 0 ) {
-           fout.logger() << mpair->train().source().name() << "\n";
+          nomatches.append( mpair->train().source().name() );
         }
         ++mpair;
       }
+
+      // Only write the output file if there are any unmatched image files
+      if ( nomatches.size() > 0) {
+        QLogger fout( QDebugLogger::create( ui.GetAsString("TONOTMATCHED"),
+                                                  (QIODevice::WriteOnly |
+                                                  QIODevice::Truncate) ) );
+        for ( auto const &imgfile : nomatches ) {
+          fout.logger() << imgfile << "\n";
+        }
+      }
     }
+
+    // Get total elapded time
+    QTime totalT(0,0);
+    totalT = totalT.addMSecs(runTime.msecsTo(QTime::currentTime()));
+    logger->dbugout() << "\nSession complete in " << totalT.toString("hh:mm:ss.zzz")
+                    << " of elapsed time\n";
 
     return;
   }

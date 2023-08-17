@@ -31,6 +31,11 @@ namespace Isis {
  *   @history 2014-07-01 Kris Becker - Original Version
  *   @history 2016-03-08 Kris Becker Created .cpp from header and completed
  *                           documentation
+ *   @history 2021-10-30 Kris J. Becker Added verify parameter to
+ *                           calculateInverse() method; if verify==true, the
+ *                           matrix is tested if it is indeed
+ *                           invertable.
+ *   @history 2022-02-07 Kris Becker Modifications in response to code review
  */
 class GenericTransform : public ImageTransform {
   public:
@@ -55,11 +60,17 @@ class GenericTransform : public ImageTransform {
     virtual cv::Point2f forward(const cv::Point2f &point) const;
     virtual cv::Point2f inverse(const cv::Point2f &point) const;
 
+    static cv::Mat computeInverse(const cv::Mat &matrix,
+                                  const bool verify = true);
+
   protected:
     void setMatrix(const cv::Mat &matrix);
     void setInverse(const cv::Mat &matrix);
 
-    virtual cv::Mat calculateInverse(const cv::Mat &matrix);
+
+    // Use in deriving clases for differnt behavior
+    virtual cv::Mat calculateInverse(const cv::Mat &matrix,
+                                     const bool verify = true);
 
     void setSize(const cv::Size &mSize);
 
