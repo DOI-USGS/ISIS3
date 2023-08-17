@@ -123,17 +123,14 @@ def create_rclone_arguments(destination, mission_name, parsedArgs, rclone_kwargs
         set of kernels that will be downloaded
     """
     log.debug(f"Creating RClone command for {mission_name}")
-    mission_dir_name, source_type = mission_name.replace(":", "").split("_")
+
+    mission_dir_name = mission_name
     
-    if (mission_dir_name == "legacybase"):
+    if (mission_name == "legacybase"):
         # We still want things to go into base
         mission_dir_name = "base"
-        
-    log.debug(f"Mission_dir_name: {mission_dir_name}, source_type: {source_type}")
 
-    destination = os.path.join(destination, str(mission_dir_name).replace(":",""))
-    if source_type == "naifKernels":
-        destination = os.path.join(destination, "kernels")
+    destination = os.path.join(destination, str(mission_dir_name))
 
     if args.filter: 
         filters = [f"- {arg}" for arg in args.filters]
@@ -153,7 +150,7 @@ def create_rclone_arguments(destination, mission_name, parsedArgs, rclone_kwargs
         filter_list.append("- *")
 
     filter_args = [f'--filter={item}' for item in filter_list]
-    extra_args = [f"{mission_name}",
+    extra_args = [f"{mission_name}:",
                   f"{destination}", 
                   "--progress",
                   f"--checkers={parsedArgs.num_transfers}",
@@ -189,34 +186,25 @@ def main(mission, dest, cfg_path, parsedArgs, kwargs):
         quit(-1)
     log.debug(f"Remote Sources: {config_sources}")
 
-    supported_missions = OrderedDict({})
-    for source in sorted(config_sources, key=lambda x: x.split("_")[-1]):
-        parsed_name = source.split("_")
-        # If it is a mission, it should be in the format <mission_nam>_<source_type>
-        if len(parsed_name) == 2 and parsed_name[1] in ["usgs:", "naifKernels:"]:
-            remotes_mission_name = parsed_name[0]
-            supported_missions[remotes_mission_name] = supported_missions.get(remotes_mission_name, []) + [source]
+    supported_missions = []
+    for source in config_sources:
+        if not any(x in source for x in ["_", "esa", "naif", "jaxa", "sbn"]):
+            if source != "":
+                supported_missions.append(source.replace(":", ""))
 
-    log.debug(f"Supported missions:\n {supported_missions.keys()}")
-    log.debug(f"Complete Dictionary:\n {json.dumps(supported_missions, indent=2)}")
+    log.debug(f"Supported missions:\n {supported_missions}")
 
-    if not mission in supported_missions.keys() and mission.upper() not in ("ALL", "LEGACYBASE"):
-        raise LookupError(f"{mission} is not in the list of supported missions: {supported_missions.keys()}")
+    if not mission in supported_missions and mission.upper() not in ("ALL", "LEGACYBASE"):
+        raise LookupError(f"{mission} is not in the list of supported missions: {supported_missions}")
 
-    if mission == "legacybase":
-        args = create_rclone_arguments(dest, "legacybase_usgs:", parsedArgs, kwargs)
-        rclone(command=parsedArgs.command, extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
-    elif(mission.upper() == "ALL"):
-        supported_missions.pop("legacybase")
-        for mission, remotes in supported_missions.items():
-            for remote in remotes:
-                args = create_rclone_arguments(dest, remote, parsedArgs, kwargs)
-                rclone(command=parsedArgs.command, extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
-    else:
-        for remote in supported_missions[mission]:
-            args = create_rclone_arguments(dest, remote,  parsedArgs, kwargs)
+    if(mission.upper() == "ALL"):
+        supported_missions.remove("legacybase")
+        for mission in supported_missions:
+            args = create_rclone_arguments(dest, mission, parsedArgs, kwargs)
             rclone(command=parsedArgs.command, extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
-
+    else:
+        args = create_rclone_arguments(dest, mission,  parsedArgs, kwargs)
+        rclone(command=parsedArgs.command, extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
 
 if __name__ == '__main__':
     usageString = "usage: downloadIsisData mission dest [-h] [-v] [-n NUM_TRANSFERS] [--config CONFIG] [rclone flags]"
