@@ -49,6 +49,7 @@ release.
 - Fixed downloadIsisData script copying existing files with every rclone download [#5245](https://github.com/DOI-USGS/ISIS3/issues/5245)
 - Fixed gaussstretch segmentation fault error and refactored gaussstretch files/tests to use gtest [#5240](https://github.com/DOI-USGS/ISIS3/issues/5240)
 - Fixed `cubeit` attribute error to allow attribute specification on the output cube filename [#5234](https://github.com/DOI-USGS/ISIS3/issues/5234)
+- Fixed `campt` to handle input band selection attribute correctly [#5234](https://github.com/DOI-USGS/ISIS3/issues/5235)
 
 ## [8.0.0] - 2023-04-19
 
