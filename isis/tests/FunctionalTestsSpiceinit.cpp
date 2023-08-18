@@ -25,6 +25,7 @@ using json = nlohmann::json;
 #include "gmock/gmock.h"
 
 using namespace Isis;
+using ::testing::HasSubstr;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
 
@@ -710,3 +711,84 @@ TEST_F(SmallCube, FunctionalTestSpiceinitCsminitRestorationOnFail) {
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, csmInfoGroup, outputCube.group("CsmInfo"));
 }
 
+
+TEST(Spiceinit, TestSpiceinitHrscWebError) {
+
+  std::istringstream labelStrm(R"(
+    Object = IsisCube
+      Object = Core
+        StartByte   = 65537
+        Format      = Tile
+        TileSamples = 323
+        TileLines   = 409
+
+        Group = Dimensions
+          Samples = 2584
+          Lines   = 19632
+          Bands   = 1
+        End_Group
+
+        Group = Pixels
+          Type       = Real
+          ByteOrder  = Lsb
+          Base       = 0.0
+          Multiplier = 1.0
+        End_Group
+      End_Object
+
+      Group = Instrument
+        SpacecraftName            = "MARS EXPRESS"
+        InstrumentId              = HRSC
+        StartTime                 = 2019-01-16T13:11:27.926
+        StopTime                  = 2019-01-16T13:13:37.796
+        SpacecraftClockStartCount = 1/0495724211.25691
+        SpacecraftClockStopCount  = 1/0495724397.63935
+        MissionPhaseName          = ME_Phase_40
+        TargetName                = Mars
+        Summing                   = 2
+        FocalPlaneTemperature     = 8.9911 <degC>
+        LensTemperature           = 9.6028 <degC>
+        InstrumentTemperature     = 11.8457 <degC>
+      End_Group
+
+      Group = Archive
+        DataSetId   = MEX-M-HRSC-3-RDR-V3.0
+        DetectorId  = MEX_HRSC_P1
+        EventType   = MARS-REGIONAL-MAPPING-Im-Gl-Pf
+        OrbitNumber = 19029
+        ProductId   = HJ029_0000_P12.IMG
+      End_Group
+
+      Group = BandBin
+        Width  = 174.0 <nm>
+        Center = 675.0 <nm>
+      End_Group
+
+      Group = Kernels
+        NaifIkCode = -41217
+      End_Group
+    End_Object
+  End
+  )");
+
+  Pvl label;
+  labelStrm >> label;
+
+  QTemporaryFile tempFile;
+  tempFile.open();
+  Cube testCube;
+
+  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+
+  QVector<QString> args = {"web=true"};
+  UserInterface options(APP_XML, args);
+  
+
+  try {
+    spiceinit(&testCube, options);
+    FAIL() << "Should throw an exception" << std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Spice Server does not support MEX HRSC images. Please rerun spiceinit with local MEX data."));
+  }
+}
