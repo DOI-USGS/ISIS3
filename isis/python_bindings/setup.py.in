@@ -1,0 +1,14 @@
+import setuptools
+
+from setuptools import find_packages
+
+if __name__ == '__main__':
+    setuptools.setup(
+        name='astroset',
+        version='${CMAKE_PROJECT_VERSION}',
+        packages=find_packages(),
+        package_data={'':['_astroset.so']},
+        scripts=["astroset/apps/findFeaturesSegment/findFeaturesSegment.py"],
+        zip_safe=False,  # Some OSes can not dynamically load an so from an egg (zipfile)
+        license='CC0-1.0',
+)

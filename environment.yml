@@ -3,6 +3,7 @@ channels:
   - defaults
 
 dependencies:
+  - kalasiris 
   - ale=0.9.1
   - armadillo
   - boost=1.72
@@ -48,6 +49,7 @@ dependencies:
   - opencv>=4.5.2
   - openssl>=1.1.1k
   - pcl >= 1.10.0
+  - plio
   - protobuf<3.20
   - python>=3.7.11
   - pytest

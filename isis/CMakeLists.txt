@@ -78,7 +78,7 @@ option(buildMissions   "Build the mission specific modules"             ON  )
 option(buildStaticCore "Build libisis static as well as dynamic"        OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
 option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
-option(pybindings      "Turn on to build Python bindings"               OFF )
+option(pybindings      "Turn on to build Python bindings"               ON )
 
 # if cmake install prefix is not set, and conda env is activated, use the
 # conda env as the install directory.
@@ -309,10 +309,6 @@ if(APPLE)
   find_package(OpenGL REQUIRED)
 endif(APPLE)
 
-if(pybindings)
- find_package(Python REQUIRED)
-endif()
-
 # Iterate through all variables and extract the libraries and include directories
 get_cmake_property(_variableNames VARIABLES) # Get All VARIABLES
 
@@ -378,6 +374,9 @@ include_directories(${CMAKE_BINARY_DIR}/inc)
 set(CORE_LIB_NAME isis)
 message(STATUS "CORE LIB:  ${CORE_LIB_NAME}")
 
+if(pybindings)
+ add_subdirectory(python_bindings)
+endif()
 
 # Specify relative library include paths which will be set up on
 #  the installed files.
