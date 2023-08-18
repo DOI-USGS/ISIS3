@@ -42,7 +42,14 @@ namespace Isis{
     else
         campt.SetCSVOutput(true);
 
-    campt.SetCube(cube->fileName());
+    QString inputCubePath = "";
+    try {
+      inputCubePath = ui.GetCubeName("FROM");
+    }
+    catch (IException &e) {
+      inputCubePath = cube->fileName();
+    }
+    campt.SetCube(inputCubePath);
 
     // Grab the provided points (coordinates)
     QList< QPair<double, double> > points = getPoints(ui, ui.WasEntered("COORDLIST"));
