@@ -63,7 +63,6 @@
         </filter>
       </parameter>
 
-<<<<<<< HEAD
       <parameter name="CUBENAME">
         <type>cube</type>
         <default><item></item></default>
@@ -83,11 +82,6 @@
       <parameter name="OUTPUTPREFIX">
         <type>cube</type>
         <default><item></item></default>
-=======
-      <parameter name="OUTPUTPREFIX">
-        <type>cube</type>
-        <default><item>nil</item></default>
->>>>>>> db928751e (modified to allow prefix, suffix, both, or neither for better extensibility)
          <fileMode>output</fileMode>
          <brief>
            Output ISIS cube basename prefix.
@@ -104,11 +98,7 @@
 
       <parameter name="OUTPUTSUFFIX">
          <type>cube</type>
-<<<<<<< HEAD
          <default><item></item></default>
-=======
-         <default><item>nil</item></default>
->>>>>>> db928751e (modified to allow prefix, suffix, both, or neither for better extensibility)
          <fileMode>output</fileMode>
          <brief>
            output ISIS cube basename suffix.
