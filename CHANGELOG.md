@@ -41,6 +41,8 @@ release.
 - Removed the `.py` extention from the _isisdataeval_ tool `isisdata_mockup` for consistency and install it in $ISISROOT/bin; added the `--tojson` and `--hasher` option to _isisdata_mockup_ tool improve utility; updated the tool `README.md` documentation to reflect this change, removed help output and trimmed example results;  fixed paths to test data in `make_isisdata_mockup.sh`. [#5163](https://github.com/DOI-USGS/ISIS3/pull/5163)
 - Significantly refactored FASTGEOM processing in <i>findfeatures</i> to accommodate stability and functionality. The scope of the algorithm was taken out of the ImageSource class and isolated to support this feature. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Report better information regarding the behavior of <i>findfeatures</i>, FASTGEOM algorithms, and creation of the output network. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
+- Modified tgocassisstitch to optionally allow either a outputprefix or an
+  outputsuffix, both, or neither for naming convention purposes. [#5162](https://github.com/DOI-USGS/ISIS3/pull/5162)
 
 ### Added
 - Added rclone to run dependencies in meta.yaml [#5183](https://github.com/DOI-USGS/ISIS3/issues/5183)
@@ -50,6 +52,9 @@ release.
 - Added two new examples demonstrating/documenting the use of FASTGEOM algorithm, parameterization using <b>GLOBALS</b> and creation of a regional mosaic using <i>findfeatures</i>. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Added new option <b>GEOMSOURCE=BOTH</b> to <i>findfeatures</i> to check both the MATCH and FROM/FROMLIST images for valid control measure geometry to produce better networks and prevent downstream processing errors. Ignore points that end up with no valid measures (but can be retained with use of <b>PreserveIgnoredControl</b> via GLOBALS parameterization). [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Added new gtests for <i>findfeatures</i> that replaces all the old application tests. These tests are <i>FunctionalTestFindfeaturesFastGeomDefault</i>, <i>FunctionalTestFindfeaturesFastGeomRadialConfig</i>, <i>FunctionalTestFindfeaturesFastGeomGridDefault</i> and <i>FunctionalTestFindfeaturesFastGeomGridConfig</i>. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
+- Added an optional cubename parameter to tgocassisstitch which lets the user
+  override the timestamp style naming convention of the output cube with their
+  own name; if not specified retains existing behavior [#5125](https://github.com/USGS-Astrogeology/ISIS3/issues/5162)
 
 ### Deprecated
 
