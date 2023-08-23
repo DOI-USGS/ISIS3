@@ -2,7 +2,7 @@ name: Cherrypick bugfixes to release branch
 on:
   push:
     branches:
-      - test-dev
+      - dev
 jobs:
   # Check if the PR is a bugfix
   check_labels:
