@@ -109,8 +109,6 @@ namespace Isis {
     if (searchResult == p_cubes.end()) {
       p_cubes.insert(fileName, new Cube());
       searchResult = p_cubes.find(fileName);
-      // Bands are the only thing input attributes can affect
-      (*searchResult)->setVirtualBands(attIn.bands());
 
       // Need to clean up memory if there is a problem opening a cube
       // This allows the CubeManager class to clean up the dynamically alloc'd

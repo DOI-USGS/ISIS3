@@ -106,8 +106,8 @@ namespace Isis {
        *
        * @internal
        */
-      class VariantToShapeFunctor : public std::unary_function<
-          const QVariant &, Shape *> {
+      class VariantToShapeFunctor : public std::function<
+          Shape *(const QVariant &)> {
 
         public:
           VariantToShapeFunctor(QMutex *cameraMutex, bool requireFootprints, QThread *targetThread,

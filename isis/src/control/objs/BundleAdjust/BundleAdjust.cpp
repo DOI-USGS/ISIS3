@@ -713,7 +713,7 @@ namespace Isis {
 
     m_cholmodTriplet = NULL;
 
-    cholmod_start(&m_cholmodCommon);
+    cholmod_l_start(&m_cholmodCommon);
 
     // set user-defined cholmod error handler
     m_cholmodCommon.error_handler = cholmodErrorHandler;
@@ -736,11 +736,11 @@ namespace Isis {
    */
   bool BundleAdjust::freeCHOLMODLibraryVariables() {
 
-    cholmod_free_triplet(&m_cholmodTriplet, &m_cholmodCommon);
-    cholmod_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
-    cholmod_free_factor(&m_L, &m_cholmodCommon);
+    cholmod_l_free_triplet(&m_cholmodTriplet, &m_cholmodCommon);
+    cholmod_l_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
+    cholmod_l_free_factor(&m_L, &m_cholmodCommon);
 
-    cholmod_finish(&m_cholmodCommon);
+    cholmod_l_finish(&m_cholmodCommon);
 
     return true;
   }
@@ -1076,7 +1076,7 @@ namespace Isis {
         // if we're using CHOLMOD and still going, release cholmod_factor
         // (if we don't, memory leaks will occur), otherwise we need it for error propagation
         if (!m_bundleResults.converged() || !m_bundleSettings->errorPropagation()) {
-          cholmod_free_factor(&m_L, &m_cholmodCommon);
+          cholmod_l_free_factor(&m_L, &m_cholmodCommon);
         }
 
         iterationSummary();
@@ -1807,17 +1807,17 @@ namespace Isis {
     }
 
     // convert triplet to sparse matrix
-    m_cholmodNormal = cholmod_triplet_to_sparse(m_cholmodTriplet,
+    m_cholmodNormal = cholmod_l_triplet_to_sparse(m_cholmodTriplet,
                                                 m_cholmodTriplet->nnz,
                                                 &m_cholmodCommon);
 
     // analyze matrix
     // TODO should we analyze just 1st iteration?
-    m_L = cholmod_analyze(m_cholmodNormal, &m_cholmodCommon);
+    m_L = cholmod_l_analyze(m_cholmodNormal, &m_cholmodCommon);
 
     // create cholmod cholesky factor
     // CHOLMOD will choose LLT or LDLT decomposition based on the characteristics of the matrix.
-    cholmod_factorize(m_cholmodNormal, m_L, &m_cholmodCommon);
+    cholmod_l_factorize(m_cholmodNormal, m_L, &m_cholmodCommon);
 
     // check for "matrix not positive definite" error
     if (m_cholmodCommon.status == CHOLMOD_NOT_POSDEF) {
@@ -1832,7 +1832,7 @@ namespace Isis {
     cholmod_dense *x, *b;
 
     // initialize right-hand side vector
-    b = cholmod_zeros(m_cholmodNormal->nrow, 1, m_cholmodNormal->xtype, &m_cholmodCommon);
+    b = cholmod_l_zeros(m_cholmodNormal->nrow, 1, m_cholmodNormal->xtype, &m_cholmodCommon);
 
     // copy right-hand side vector into b
     double *px = (double*)b->x;
@@ -1841,7 +1841,7 @@ namespace Isis {
     }
 
     // cholmod solve
-    x = cholmod_solve(CHOLMOD_A, m_L, b, &m_cholmodCommon);
+    x = cholmod_l_solve(CHOLMOD_A, m_L, b, &m_cholmodCommon);
 
     // copy solution vector x out into m_imageSolution
     double *sx = (double*)x->x;
@@ -1850,9 +1850,9 @@ namespace Isis {
     }
 
     // free cholmod structures
-    cholmod_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
-    cholmod_free_dense(&b, &m_cholmodCommon);
-    cholmod_free_dense(&x, &m_cholmodCommon);
+    cholmod_l_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
+    cholmod_l_free_dense(&b, &m_cholmodCommon);
+    cholmod_l_free_dense(&x, &m_cholmodCommon);
 
     return true;
   }
@@ -1873,7 +1873,7 @@ namespace Isis {
 
     if ( m_iteration == 1 ) {
       int numElements = m_sparseNormals.numberOfElements();
-      m_cholmodTriplet = cholmod_allocate_triplet(m_rank, m_rank, numElements,
+      m_cholmodTriplet = cholmod_l_allocate_triplet(m_rank, m_rank, numElements,
                                                   -1, CHOLMOD_REAL, &m_cholmodCommon);
 
       if ( !m_cholmodTriplet ) {
@@ -1883,15 +1883,15 @@ namespace Isis {
       m_cholmodTriplet->nnz = 0;
     }
 
-    int *tripletColumns = (int*) m_cholmodTriplet->i;
-    int *tripletRows = (int*) m_cholmodTriplet->j;
+    long *tripletColumns = (long*) m_cholmodTriplet->i;
+    long *tripletRows = (long*) m_cholmodTriplet->j;
     double *tripletValues = (double*)m_cholmodTriplet->x;
 
     double entryValue;
 
-    int numEntries = 0;
+    long numEntries = 0;
 
-    int numBlockcolumns = m_sparseNormals.size();
+    long numBlockcolumns = m_sparseNormals.size();
     for (int columnIndex = 0; columnIndex < numBlockcolumns; columnIndex++) {
 
       SparseBlockColumnMatrix *normalsColumn = m_sparseNormals[columnIndex];
@@ -2529,8 +2529,8 @@ namespace Isis {
   bool BundleAdjust::errorPropagation() {
     emit(statusBarUpdate("Error Propagation"));
     // free unneeded memory
-    cholmod_free_triplet(&m_cholmodTriplet, &m_cholmodCommon);
-    cholmod_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
+    cholmod_l_free_triplet(&m_cholmodTriplet, &m_cholmodCommon);
+    cholmod_l_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
 
     LinearAlgebra::Matrix T(3, 3);
     // *** TODO ***
@@ -2557,7 +2557,7 @@ namespace Isis {
     cholmod_dense *x;        // solution vector
     cholmod_dense *b;        // right-hand side (column vectors of identity)
 
-    b = cholmod_zeros ( m_rank, 1, CHOLMOD_REAL, &m_cholmodCommon );
+    b = cholmod_l_zeros ( m_rank, 1, CHOLMOD_REAL, &m_cholmodCommon );
     double *pb = (double*)b->x;
 
     double *px = NULL;
@@ -2623,7 +2623,7 @@ namespace Isis {
         }
         pb[columnIndex] = 1.0;
 
-        x = cholmod_solve ( CHOLMOD_A, m_L, b, &m_cholmodCommon );
+        x = cholmod_l_solve ( CHOLMOD_A, m_L, b, &m_cholmodCommon );
         px = (double*)x->x;
         int rp = 0;
 
@@ -2642,7 +2642,7 @@ namespace Isis {
         columnIndex++;
         localCol++;
 
-        cholmod_free_dense(&x,&m_cholmodCommon);
+        cholmod_l_free_dense(&x,&m_cholmodCommon);
       }
 
       // save adjusted target body sigmas if solving for target
@@ -2770,7 +2770,7 @@ namespace Isis {
     m_sparseNormals.wipe();
 
     // free b (right-hand side vector)
-    cholmod_free_dense(&b,&m_cholmodCommon);
+    cholmod_l_free_dense(&b,&m_cholmodCommon);
 
     outputBundleStatus("\n\n");
 

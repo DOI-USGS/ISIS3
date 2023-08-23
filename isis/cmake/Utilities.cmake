@@ -171,7 +171,7 @@ function(get_os_version text)
     # Format the string
     string(REGEX MATCH "[0-9]+.[0-9]+.[0-9]+" version "${result}")
     string(REGEX MATCH "^[0-9]+.[0-9]+" version "${version}")
-    string(REPLACE "." "_" version ${version})
+    string(REPLACE "." "_" version "${version}")
 
     set(name   "MacOSX")
     set(prefix "Darwin_x86_64_")

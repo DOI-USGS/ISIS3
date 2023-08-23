@@ -284,7 +284,7 @@ namespace Isis {
     int hours = minutes / 60;
     minutes = minutes - hours * 60;
     char temp[80];
-    sprintf(temp, "%02d:%02d:%04.1f", hours, minutes, seconds);
+    snprintf(temp, sizeof(temp), "%02d:%02d:%04.1f", hours, minutes, seconds);
     QString conTime = temp;
 
     //cerr << "Accounting GUI end time=" << endTime <<  " start time=" << p_startTime << "  total=" << seconds << endl;
@@ -296,7 +296,7 @@ namespace Isis {
     seconds = seconds - minutes * 60.0;
     hours = minutes / 60;
     minutes = minutes - hours * 60;
-    sprintf(temp, "%02d:%02d:%04.1f", hours, minutes, seconds);
+    snprintf(temp, sizeof(temp), "%02d:%02d:%04.1f", hours, minutes, seconds);
     QString cpuTime = temp;
 
     // Add this information to the log

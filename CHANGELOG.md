@@ -36,6 +36,7 @@ release.
 ## [Unreleased]
 
 ### Changed
+- Changed cholmod 32 bit calls to 64 bit calls [#5173](https://github.com/DOI-USGS/ISIS3/issues/5173) and [#5176](https://github.com/DOI-USGS/ISIS3/issues/5176)
 
 ### Added
 
@@ -44,6 +45,11 @@ release.
 ### Removed
 
 ### Fixed
+- Updated History constructor to check for invalid BLOB before copying History BLOB to output cube [#4966](https://github.com/DOI-USGS/ISIS3/issues/4966)
+- Fixed downloadIsisData script copying existing files with every rclone download [#5245](https://github.com/DOI-USGS/ISIS3/issues/5245)
+- Fixed gaussstretch segmentation fault error and refactored gaussstretch files/tests to use gtest [#5240](https://github.com/DOI-USGS/ISIS3/issues/5240)
+- Fixed `cubeit` attribute error to allow attribute specification on the output cube filename [#5234](https://github.com/DOI-USGS/ISIS3/issues/5234)
+- Fixed `campt` to handle input band selection attribute correctly [#5234](https://github.com/DOI-USGS/ISIS3/issues/5235)
 
 ## [8.0.0] - 2023-04-19
 
@@ -51,6 +57,7 @@ release.
 - Updated download location for Dawn source files to include updated pck from HAMO Dawn mosaic [#4001](https://github.com/USGS-Astrogeology/ISIS3/issues/4001)
 - Pinned cspice version to 67 [#5083](https://github.com/USGS-Astrogeology/ISIS3/issues/5083) 
 - Changed the `rsync` related commands in the ISIS SPICE Web Service document to `downloadIsisData` command
+- Updated documentation for `tgocassisrdrgen` to be more descriptive and accurate.
 - Updated Geos from version 3.7 to 3.9 [#3627](https://github.com/DOI-USGS/ISIS3/issues/3627)
 - Updated Ale to version 0.9.1 [#5209](https://github.com/DOI-USGS/ISIS3/pull/5209)
 - Changed buildCondaRelease.py numpy version from 1.23 to 1.22 to resolve spiceinit warning messages [#5224](https://github.com/DOI-USGS/ISIS3/issues/5224)
