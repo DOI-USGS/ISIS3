@@ -128,13 +128,13 @@ Deborah Lee Soltesz
           <td style="width:50%">
             <dl>
               <dt><h4>About ISIS Cubes</h4></dt>
-              <dd><a href="https://usgs-astrogeology.github.io/ISIS3/ISIS_Cube_Format.html">
+              <dd><a href="https://doi-usgs.github.io/ISIS3/ISIS_Cube_Format.html">
               ISIS Cube Format</a></dd>
-              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Understanding_Bit_Types">
+              <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Understanding_Bit_Types">
               Understanding Bit Types</a></dd>
-              <dd><a href="https://usgs-astrogeology.github.io/ISIS3/Core_Base_and_Multiplier.html">
+              <dd><a href="https://doi-usgs.github.io/ISIS3/Core_Base_and_Multiplier.html">
               Core Base and Multipliers</a></dd>
-              <dd><a href="https://usgs-astrogeology.github.io/ISIS3/Special_Pixels.html">
+              <dd><a href="https://doi-usgs.github.io/ISIS3/Special_Pixels.html">
               Special Pixels</a></dd>
               <dd><a href="../documents/LabelDictionary/LabelDictionary.html">
               Label Dictionary</a></dd>
@@ -145,7 +145,7 @@ Deborah Lee Soltesz
           <td style="width:50%">
             <dl>
               <dt><h4>About ISIS Applications</h4></dt>
-              <dd><a href="https://usgs-astrogeology.github.io/ISIS3/ISIS_Cube_Format.html">
+              <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Introduction_to_ISIS#Reserved-Command-Line-Arguments-">
               Command Line Reference</a></dd>
               <dd><a href="../documents/Glossary/Glossary.html">
               Glossary</a></dd>
@@ -214,15 +214,15 @@ Deborah Lee Soltesz
           <td style="width:33%">
             <dl>
               <dt><h4>About Specific Applications</h4></dt>
-              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/General_Utility">
+              <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/General_Utility">
               fx Guide</a></dd>
-              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Autoseed">
+              <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Autoseed">
               autoseed Guide</a></dd>
-              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/SPICE">
+              <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/SPICE">
               SPICE in ISIS</a></dd>
               <dd><a href="../documents/PatternMatch/PatternMatch.html">
               Pattern Matching Guide</a></dd>
-              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Automatic_Registration">
+              <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Automatic_Registration">
               autoreg Guide</a></dd>
             </dl>
           </td>
@@ -230,13 +230,13 @@ Deborah Lee Soltesz
           <td style="width:33%">
             <dl>
               <dt><h4>About Specialized Methods</h4></dt>
-              <dd><a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/971/IsisDemoIntro.pdf">
+              <dd><a href="https://raw.githubusercontent.com/wiki/DOI-USGS/ISIS3/attachments/download/971/IsisDemoIntro.pdf">
               Photogrammetry in ISIS</a></dd>
-              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Image_Registration">
+              <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Image_Registration">
               Image Registration</a></dd>
-              <dd><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Multi-Instrument_Registration">
+              <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Multi-Instrument_Registration">
               Multi-Instrument Registration</a></dd>
-              <dd><a href="https://raw.githubusercontent.com/wiki/USGS-Astrogeology/ISIS3/attachments/download/973/Jigsaw.pdf">
+              <dd><a href="https://raw.githubusercontent.com/wiki/DOI-USGS/ISIS3/attachments/download/973/Jigsaw.pdf">
               Jigsaw Overview</a></dd>
             </dl>
           </td>
@@ -246,7 +246,7 @@ Deborah Lee Soltesz
               <dt><h4>Specialized Method References</h4></dt>
               <dd><a href="https://isis.astrogeology.usgs.gov/documents/ControlNetworks/index.html">
               Control Network Reference</a></dd>
-              <dd><a href="">
+              <dd><a href="https://github.com/DOI-USGS/ISIS3/wiki/Learning_About_Map_Projections#Defining-a-Map-in-ISIS3-">
               Map Definition Reference</a></dd>
             </dl>
           </td>
@@ -265,7 +265,7 @@ Deborah Lee Soltesz
         <!-- hardcoded links -->
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Release-Schedule">
+            <a href="https://github.com/DOI-USGS/ISIS3/wiki/Release-Schedule">
             Release Schedule</a>
           </th>
           <td>
@@ -285,7 +285,7 @@ Deborah Lee Soltesz
 
         <tr valign="top">
           <th style="width:25%">
-            <a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Deprecation">
+            <a href="https://github.com/DOI-USGS/ISIS3/wiki/Deprecation">
             Deprecation Policy</a>
           </th>
           <td>

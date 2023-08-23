@@ -80,8 +80,8 @@ namespace Isis {
        *
        * @internal
        */
-      class FileNameToControlFunctor : public std::unary_function<
-          const QPair<FileName, Progress *> &, Control *> {
+      class FileNameToControlFunctor : public std::function<
+          Control *(const QPair<FileName, Progress *> &)> {
         public:
           FileNameToControlFunctor(QThread *);
           FileNameToControlFunctor(const FileNameToControlFunctor &);

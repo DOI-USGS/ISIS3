@@ -63,7 +63,7 @@ requirements:
    - eigen<3.4
    - embree>=2.17,<3
    - ffmpeg
-   - geos>=3.9,<3.10
+   - geos =3.11.1
    - geotiff
    - gmp
    - graphviz
@@ -155,6 +155,7 @@ requirements:
   - {{ pin_compatible('opencv', max_pin='x.x') }}
   - {{ pin_compatible('openssl', min_pin='x', max_pin='x.x') }}
   - pcl
+  - {{ pin_compatible('proj', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('protobuf', max_pin='x.x') }}
   - qhull
   - {{ pin_compatible('qt', max_pin='x.x') }}

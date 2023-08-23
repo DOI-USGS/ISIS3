@@ -770,7 +770,7 @@ void init_output(struct msdp_header h)
 
   height = MAKESHORT(h.down_total) * 16;
   width = h.edit_length * 16;
-  sprintf(label, "decompressed-from %s\nid %d time %u:%d\ngain 0x%x \
+  snprintf(label, sizeof(label), "decompressed-from %s\nid %d time %u:%d\ngain 0x%x \
 offset %d\nstart %d cross %d down %d\ncmd ", infname,
           MAKESHORT(h.id),
           MAKELONG(h.time + 1), h.time[0],
@@ -806,11 +806,11 @@ offset %d\nstart %d cross %d down %d\ncmd ", infname,
       break;
   }
   for(i = 0; i < 17; i++) {
-    sprintf(s, "%02x", h.cmd[i]);
+    snprintf(s, sizeof(s), "%02x", h.cmd[i]);
     strcat(label, s);
   }
 
-  sprintf(buf, "\nsensor %d clocking %d system-id 0x%x",
+  snprintf(buf, sizeof(buf), "\nsensor %d clocking %d system-id 0x%x",
           MAKESHORT(h.sensors),
           MAKESHORT(h.other + 1),
           h.other[3]);

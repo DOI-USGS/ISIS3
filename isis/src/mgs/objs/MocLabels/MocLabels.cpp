@@ -13,6 +13,7 @@ find files of those names at the top level of this repository. **/
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <boost/core/ignore_unused.hpp>
 
 #include "Cube.h"
 #include "IException.h"
@@ -598,7 +599,7 @@ namespace Isis {
 
     // Ok sort and unique the wago list by time
     sort(p_wagos.begin(), p_wagos.end());
-    unique(p_wagos.begin(), p_wagos.end());
+    boost::ignore_unused((unique(p_wagos.begin(), p_wagos.end())));
 
     // Unload the naif kernels
     unload_c(lskKern.toLatin1().data());
