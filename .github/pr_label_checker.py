@@ -67,7 +67,7 @@ def search_for_linked_issues(pull_body: str) -> list:
     for section in pull_body_list:
         # Find section with heading 'Related Issue'
         if section != None and 'Related Issue' in section:
-            # Find items that match the regex patters
+            # Find items that match the regex pattern
             matched_items = rgx.findall(regex_pattern, section)
             # Convert list of tuples to list of all items
             flattened_list = list(chain.from_iterable(matched_items))
