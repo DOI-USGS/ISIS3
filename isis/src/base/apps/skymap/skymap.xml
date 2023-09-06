@@ -52,7 +52,7 @@
 
   <p>
     In addition skymap can be used to produce landed mosaics from rovers like MSL. This can be done using ALE to generate an ISD
-    then that ISD can be attached to the cube via <def link="csminit">csminit</def>. The user would then have to update there map file 
+    then that ISD can be attached to the cube via <def link="csminit">csminit</def>. The user would then have to update their map file 
     to generate a PositiveWest map. This converts the projection from an right ascension/declination projection to azimuth and elevation.
     Once that is done, the user would run their ISIS cube through "skymap" and see that the landed rover data would project relative to
     other images in the same image sequence.

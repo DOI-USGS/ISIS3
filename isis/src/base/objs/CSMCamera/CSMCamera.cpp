@@ -1117,7 +1117,7 @@ void sanitize(std::string &input);
    *
    * This is not supported for CSM sensors because we cannot get the position
    * of the sun, only the illumination direction. To prevent Qview from erroring
-   * this function returns 0, 0
+   * this function sets both lat and lon to 0
    *
    * @param lat Sub-solar latitude
    * @param lon Sub-solar longitude
