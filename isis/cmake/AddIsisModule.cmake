@@ -6,7 +6,6 @@ include(CodeGeneration)
 
 # Incorporate an application folder
 function(add_isis_app folder libDependencies)
-
   # The internal build name will be different than the output name
   # - This deals with problems compiling same-named targets on case-insensitive machines.
   get_filename_component(appName ${folder}  NAME)

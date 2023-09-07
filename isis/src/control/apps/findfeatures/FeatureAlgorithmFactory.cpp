@@ -207,6 +207,30 @@ const PvlFlatMap &FeatureAlgorithmFactory::globalParameters() const {
 
 
 /**
+ * @brief Parse global parameters into a Pvl flat map strucure
+ *
+ * This method will accept a string that contain variables structured according
+ * to specifications used in the algorithm string. It only recognizes
+ * keyword/variable structures of the form "keyword1:value1@keyword2:value2".
+ *
+ * @param globals String of global parameters
+ */
+PvlFlatMap FeatureAlgorithmFactory::parseGlobalParameters(const QString &globals) {
+  PvlFlatMap pvlmap;
+  QStringList parms = globals.split("@", QString::SkipEmptyParts);
+  for (int i = 0 ; i < parms.size() ; i++ ) {
+
+    // Only parse substrings that have 2 distinct parts separated by :
+    QStringList parts = parms[i].split(":", QString::SkipEmptyParts);
+    if ( parts.size() == 2 ) {
+      pvlmap.add(parts[0], parts[1]);
+    }
+  }
+
+  return ( pvlmap );
+}
+
+/**
  * @brief Set the global parameters to use in all matchers created
  *
  * This method will accept a set of global paramters that will be applied to
@@ -391,7 +415,7 @@ RobustMatcherList FeatureAlgorithmFactory::create(const QString &specs,
  *
  *  In addition, parameters that alter the behavior of the outlier detection
  *  processing, among oother things, in the RobustMatcher can be specified as an
- *  additional part of the string using the "/paramters@name:value..."
+ *  additional part of the string using the "/parameters@name:value..."
  *  specification.
  *
  * @param definition A single string specification for an OpencCV feature-based

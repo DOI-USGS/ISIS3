@@ -6,7 +6,6 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
-#include "FileName.h"
 #include "Gui.h"
 #include "IsisAml.h"
 #include "PvlTokenizer.h"
@@ -188,6 +187,15 @@ namespace Isis {
         return p_gui;
       };
 
+      /**
+      * @brief Get the the preference path passed in by the user. Otherwise an empty string
+      * 
+      * @return QString 
+      */
+      QString GetParamPreference() { 
+        return p_preference; 
+      }
+
       QString GetInfoFileName();
       bool GetInfoFlag();
 
@@ -238,6 +246,7 @@ namespace Isis {
       QString p_progName;
       //! FileName to save last history to.
       QString p_saveFile;
+      QString p_preference; 
   };
 };
 

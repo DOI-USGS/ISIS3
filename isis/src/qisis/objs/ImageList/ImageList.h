@@ -167,7 +167,7 @@ namespace Isis {
        *
        * @internal
        */
-      class CopyImageDataFunctor : public std::unary_function<Image * const &, void *> {
+      class CopyImageDataFunctor : public std::function<void *(Image * const &)> {
         public:
           CopyImageDataFunctor(const Project *project, FileName newProjectRoot);
           CopyImageDataFunctor(const CopyImageDataFunctor &other);

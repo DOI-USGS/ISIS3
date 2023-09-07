@@ -7,7 +7,7 @@
  * what ever you want with it.
  *
  * Feb. 2005
- * Benjamin Grüdelbach
+ * Benjamin Grï¿½delbach
  */
 
 //----------------------------------------------------------------------
@@ -54,7 +54,7 @@ QString md5wrapper::convToString(unsigned char *bytes) {
 
   int p = 0;
   for(int i = 0; i < 16; i++) {
-    ::sprintf(&asciihash[p], "%02x", bytes[i]);
+    ::snprintf(&asciihash[p], sizeof(asciihash), "%02x", bytes[i]);
     p += 2;
   }
   asciihash[32] = '\0';

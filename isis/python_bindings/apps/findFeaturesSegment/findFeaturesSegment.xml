@@ -1,0 +1,1435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: findfeatures.xml 6564 2016-02-11 00:14:44Z kbecker@GS.DOI.NET $ -->
+<application name="findFeaturesSegment" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+      Feature-based matching algorithms used to create ISIS control networks with segmented images. 
+  </brief>
+
+  <description>
+      <h3>Overview</h3>
+      
+      <p>
+        <i>findFeaturesSegment</i> is developed on top of <i>findfeatures</i> as a way to overcome 
+        <i>findfeatures</i> image size limitations. This is done by segmenting the images and running
+        <i>findfeatures</i> on the sub images. See the documentation for <i>findfeatures</i> for more 
+        information on how that application works as <i>findFeaturesSegment</i> works with the same matching 
+        parameters.  
+      </p>
+
+      <p>
+        <i>findFeaturesSegment</i> works by splitting the MATCH and FROM images into segments defined by NL with 0 
+        pixel overlaps. The match image segments are then matched with every FROM/FROMLIST image semgnet that overlap 
+        enough as defined by max/min overlap and area parameters. 
+      </p>
+    </description>
+
+  <category>
+    <categoryItem>Registration and Pattern Matching</categoryItem>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <history>
+    
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Image to be Translated
+        </brief>
+        <description>
+          This cube/image (train) will be translated to register to the MATCH
+          (query) cube/image. This application supports other common image
+          formats such as PNG, TIFF or JPEG. Essentially any image that can be
+          read by OpenCV's
+          <a href="http://docs.opencv.org/2.4/modules/highgui/doc/reading_and_writing_images_and_video.html?highlight=imread#imread">
+          imread()</a>routine is supported. All input images are converted to
+          8-bit when they are read.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>None</item></default>
+      </parameter>
+
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of input cubes/images for which to create a control network
+        </brief>
+        <description>
+          <p>
+          Use this parameter to select a filename which contains a list of
+          cube filenames. The cubes identified inside this file will be used
+          to create the control network. All input images are converted to
+          8-bit when they are read. The following is an example of the
+          contents of a typical FROMLIST file:
+          </p>
+          <pre>
+            AS15-M-0582_16b.cub
+            AS15-M-0583_16b.cub
+            AS15-M-0584_16b.cub
+            AS15-M-0585_16b.cub
+            AS15-M-0586_16b.cub
+            AS15-M-0587_16b.cub
+          </pre>
+          <p>
+            Each file name in a FROMLIST file should be on a separate line.
+          </p>
+        </description>
+        <internalDefault>None</internalDefault>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+
+      <parameter name="MATCH">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The input reference image (query)
+        </brief>
+        <description>
+            Name of the image to match to. This will be the reference image in
+            the output control network. It is also referred to as the query
+            image in OpenCV documentation. All input images are converted to
+            8-bit when they are read.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>None</item></default>
+      </parameter>
+
+        <parameter name="ONET">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>Output ControlNet network file of matched features</brief>
+          <description>
+               This file will contain the Control Point network results of
+               findfeatures in a binary format.  There will be no false or
+               failed matches in the output control network file. Using this
+               control network and TOLIST in the qnet application, the results
+               of findfeatures can be visually assessed.
+          </description>
+          <internalDefault>None</internalDefault>
+          <filter>
+            *.net *.txt
+          </filter>
+        </parameter>
+
+        <parameter name="TOLIST">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>Output list of ControlNet network cube files</brief>
+          <description>
+             This file will contain the list of (cube) files in the control
+             network. For multi-image matching, some files may not have matches
+             detected. These files will not be written to TOLIST. The MATCH file
+             is always added first and all other images that have matches are
+             added to TOLIST. Using this list and the ONET in the qnet
+             application, the results of findfeatures can be visually assessed.
+          </description>
+          <internalDefault>None</internalDefault>
+          <filter>*.lis</filter>
+        </parameter>
+
+        <parameter name="NL">
+          <type>integer</type>
+          <fileMode>output</fileMode>
+          <brief>Number of Lines for each new cube segment</brief>
+          <description>
+         	    Specifies the total number of lines of overlap each segment will have with the previous segment as well as the next segment.
+          </description>
+          <default><item>30000</item></default>
+          <minimum inclusive="yes">3</minimum>
+          <maximum inclusive="yes">30000</maximum>
+        </parameter>
+
+        <parameter name="MINAREA">
+          <type>integer</type>
+          <fileMode>output</fileMode>
+          <brief>Number of Lines for each new cube segment</brief>
+          <description>
+         	    Specifies the minimum area of overlapping images 
+          </description>
+          <default><item>0</item></default>
+        </parameter>
+
+        <parameter name="MINTHICKNESS">
+          <type>integer</type>
+          <fileMode>output</fileMode>
+          <brief>Number of Lines for each new cube segment</brief>
+          <description>
+          Specifies the minimum thickness of overlapping images 
+          </description>
+          <default><item>0</item></default>
+        </parameter>
+
+        <parameter name="TONOTMATCHED">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>
+              Output list of FROM/FROMLIST cube files that were not
+              successfully matched
+          </brief>
+          <description>
+              <p>
+                 This file will contain the list of (cube) files that were not
+                 successfully matched. This can be used to run through individually
+                 with more specifically tailored matcher algorithm specifications.
+              </p>
+              <p>
+                  NOTE this file is appended to so that continual runs will
+              accumulate failures making it easier to handle failed runs.
+              </p>
+          </description>
+          <internalDefault>None</internalDefault>
+          <filter>*.lis</filter>
+        </parameter>
+    </group>
+
+    <group name= "Algorithms">
+        <parameter name= "ALGORITHM">
+            <type>string</type>
+            <brief>
+               Provide one or more algorithm specifications to apply
+            </brief>
+            <description>
+                This parameter provides user control over selecting a wide
+                variety of feature detectors, extractors and matcher
+                combinations.  This parameter also provides a mechanism to set
+                any of the valid parameters of the algoritms.
+            </description>
+            <internalDefault>None</internalDefault>
+        </parameter>
+
+        <parameter name= "ALGOSPECFILE">
+            <type>filename</type>
+            <brief>
+               Provide one or more algorithms in a text file
+            </brief>
+            <description>
+               To accomodate a potentially large set of feature algorithms,
+               you can provide them in a file.  This format is the same as the
+               ALGORITHM format, but each unique algorithm must be specifed
+               on a seperate line.  Thoeretically, the number you specify is
+               unlimited. This option is particularly useful to generate a
+               series of algorithms that vary parameters for any of the
+               elements of the feature algorithm.
+            </description>
+            <internalDefault>None</internalDefault>
+            <filter>*.lis</filter>
+        </parameter>
+
+       <parameter name= "LISTSPEC">
+            <type>boolean</type>
+            <brief>
+               List result of ALGORITHM specification
+            </brief>
+            <description>
+              If true, information about the detector, extractor, matcher, and
+              parameters specified in the ALGORITHM or ALGOSPECFILE parameters
+              will be output. If multiple sets of algorithms are specified,
+              then the details for each set will be output.
+            </description>
+           <default><item>No</item></default>
+        </parameter>
+
+        <parameter name= "LISTALL">
+            <type>boolean</type>
+            <brief>
+               List all OpenCV algorithms irregardles of origin
+            </brief>
+            <description>
+              This parameter will retrieve all the registered OpenCV
+              algorithms  available that can created by name.
+            </description>
+           <default><item>No</item></default>
+        </parameter>
+
+        <parameter name= "TOINFO">
+            <type>filename</type>
+            <brief>
+               Optional output file/device to write information requests to
+            </brief>
+            <description>
+              <p>
+                When an information option is requested (LISTSPEC),
+                the user can provide the name of an output file here where the
+                information, in the form of a PVL structure, will be written.
+                If any of those options are selected by the user, and
+                a file is not provided in this option, the output is written
+                to the screen or GUI.
+              </p>
+              <p>
+                One very nifty option that works well is to specify the
+                terminal device as the output file.  This will list the
+                results to the screen so that your input can be quickly
+                checked for accuracy.  Here is an example using the algorithm
+                listing option and the result:
+                <br/><br/>
+                <b>
+                     findfeatures listspec=true
+                     algorithm=detector.Blob@minrepeatability:1/orb
+                     toinfo=/dev/tty
+                </b>
+                <PRE>
+Object = FeatureAlgorithms
+  Object = RobustMatcher
+    OpenCVVersion = 3.1.0
+    Name          = detector.Blob@minrepeatability:1/orb/BFMatcher@NormType:N-
+                    ORM_HAMMING@CrossCheck:false
+
+    Object = Detector
+      CVVersion    = 3.1.0
+      Name         = Blob
+      Type         = Feature2D
+      Features     = Detector
+      Description  = "The OpenCV simple blob detection algorithm. See the
+                      documentation at
+                      http://docs.opencv.org/3.1.0/d0/d7a/classcv_1_1SimpleBlo-
+                      bDetector.html"
+      CreatedUsing = detector.Blob@minrepeatability:1
+
+      Group = Parameters
+        BlobColor           = 0
+        FilterByArea        = true
+        FilterByCircularity = false
+        FilterByColor       = true
+        FilterByConvexity   = true
+        FilterByInertia     = true
+        MaxArea             = 5000
+        maxCircularity      = inf
+        MaxConvexity        = inf
+        MaxInertiaRatio     = inf
+        MaxThreshold        = 220
+        MinArea             = 25
+        MinCircularity      = 0.8
+        MinConvexity        = 0.95
+        MinDistance         = 10
+        MinInertiaRatio     = 0.1
+        minrepeatability    = 1
+        MinThreshold        = 50
+        ThresholdStep       = 10
+      End_Group
+    End_Object
+
+    Object = Extractor
+      CVVersion    = 3.1.0
+      Name         = ORB
+      Type         = Feature2D
+      Features     = (Detector, Extractor)
+      Description  = "The OpenCV ORB Feature2D detector/extractor algorithm.
+                      See the documentation at
+                      http://docs.opencv.org/3.1.0/db/d95/classcv_1_1ORB.html"
+      CreatedUsing = orb
+
+      Group = Parameters
+        edgeThreshold = 31
+        fastThreshold = 20
+        firstLevel    = 0
+        nfeatures     = 500
+        nlevels       = 8
+        patchSize     = 31
+        scaleFactor   = 1.2000000476837
+        scoreType     = HARRIS_SCORE
+        WTA_K         = 2
+      End_Group
+    End_Object
+
+    Object = Matcher
+      CVVersion    = 3.1.0
+      Name         = BFMatcher
+      Type         = DecriptorMatcher
+      Features     = Matcher
+      Description  = "The OpenCV BFMatcher DescriptorMatcher matcher
+                      algorithm. See the documentation at
+                      http://docs.opencv.org/3.1.0/d3/da1/classcv_1_1BFMatcher-
+                      .html"
+      CreatedUsing = BFMatcher@NormType:NORM_HAMMING@CrossCheck:false
+
+      Group = Parameters
+        CrossCheck = No
+        NormType   = NORM_HAMMING
+      End_Group
+    End_Object
+
+    Object = Parameters
+      EpiConfidence            = 0.99
+      EpiTolerance             = 3.0
+      FastGeom                 = false
+      FastGeomPoints           = 25
+      Filter                   = None
+      GeomSource               = MATCH
+      GeomType                 = CAMERA
+      HmgTolerance             = 3.0
+      MaxPoints                = 0
+      MinimumFundamentalPoints = 8
+      MinimumHomographyPoints  = 8
+      Ratio                    = 0.65
+      RefineFundamentalMatrix  = true
+      RootSift                 = false
+      SavePath                 = $PWD
+      SaveRenderedImages       = false
+    End_Object
+  End_Object
+End_Object
+End
+                </PRE>
+              </p>
+            </description>
+          <default><item>/dev/tty</item></default>
+        </parameter>
+
+      <parameter name= "DEBUG">
+            <type>boolean</type>
+            <brief>Print debugging statements of the matcher algorithm</brief>
+            <description>
+              At times, things go wrong. By setting DEBUG=TRUE, information is
+              printed as elements of the matching algorithm are executed. This
+              option is very helpful to monitor the entire matching and outlier
+              detection processing to determine where adjustments in the
+              parameters can be made to produce better results.
+            </description>
+          <default><item>false</item></default>
+        </parameter>
+
+      <parameter name= "DEBUGLOG">
+            <type>filename</type>
+            <brief>File to write (append) debugging information  to</brief>
+            <description>
+                Provide a file that will have all the debugging content appended
+                as it is generated in the processing steps. This file can be
+                very useful to determine, for example, where in the matching and
+                or outlier detection most of the matches are being rejected. The
+                output can be lengthy and detailed, but is critical in the
+                determination where adjustments to the parameters can be made to
+                provide better results.
+            </description>
+          <internalDefault>None</internalDefault>
+          <filter>*.log</filter>
+        </parameter>
+
+      <parameter name= "PARAMETERS">
+            <type>filename</type>
+            <brief>File containing special algorithm parameters</brief>
+            <description>
+                This file can contain specialized parameters that will modify
+                certain  behaviors in the robust matcher algorithm. They can
+                vary over time and are documented in the application
+                descriptions.
+            </description>
+          <internalDefault>None</internalDefault>
+          <filter>*.conf</filter>
+      </parameter>
+
+
+      <parameter name= "MAXPOINTS">
+            <type>integer</type>
+          <brief>Maximum number of keypoints to detect</brief>
+            <description>
+                Specifies the maximum number of keypoints to save in the
+                detection phase. If a value is not provided for this
+                parameter, there will be no restriction set on the number of
+                keypoints that will be used to match. If specified, then
+                approximately MAXPOINTS keypoints with the highest/best detector
+                response values are retained and passed on to the extractor and
+                matcher algorithms. This parameter is useful for detectors that
+                produce a high number of features. A large number of features
+                will cause the matching phase and outlier detection to become
+                costly and inefficient.
+            </description>
+          <default><item>0</item></default>
+      </parameter>
+
+    </group>
+
+     <group name= "Constraints">
+
+       <parameter name="RATIO">
+           <type>double</type>
+           <brief>
+              Specify the maximum distance allowed between ratio test points
+           </brief>
+           <description>
+               For each feature point, we have two candidate matches
+               in the other image. These are the two best ones based on the
+               distance between their descriptors. If this measured distance is
+               very low for the best match, and much larger for the second best
+               match, we can safely accept the first match as a good one since
+               it is unambiguously the best choice. Reciprocally, if the two
+               best matches are relatively close in distance, then there exists
+               a possibility that we make an error if we select one or the
+               other. In this case, we should reject both matches. Here, we
+               perform this test by verifying that the ratio of the distance of
+               the best match over the distance of the second best match is not
+               greater than a given RATIO threshold. Most of the matches will be
+               removed by this test. The farther from 1.0, the more matches will
+               be rejected.
+           </description>
+           <default><item>0.65</item></default>
+       </parameter>
+
+          <parameter name= "EPITOLERANCE">
+              <type>double</type>
+              <brief>
+                  Specifes tolerance for determining good epipolar points
+              </brief>
+              <description>
+                   The tolerance specifies the maximum distance in pixels that
+                   feature may deviate from the Epipolar lines for each matching
+                   feature.
+              </description>
+            <default><item>3.0</item></default>
+          </parameter>
+
+         <parameter name= "EPICONFIDENCE">
+              <type>double</type>
+              <brief>
+                  Specifes the level of confidence required in epipolar quality
+              </brief>
+              <description>
+                   This parameter indicates the confidence level of the epipolar
+                   determination ratio. A value of 1.0 requires that all pixels
+                   be valid in the epipolar computation.
+              </description>
+            <default><item>0.99</item></default>
+          </parameter>
+
+          <parameter name= "HMGTOLERANCE">
+              <type>double</type>
+              <brief>
+                  Specifes tolerance for determining good homography points
+              </brief>
+              <description>
+                <p>
+                    If we consider the special case where two views of a scene are
+                    separated by a pure rotation, then it can be observed that the
+                    fourth column of the extrinsic matrix will be made of all 0s
+                    (that is, translation is null). As a result, the projective
+                    relation in this special case becomes a 3x3 matrix. This
+                    matrix is called a homography and it implies that, under
+                    special circumstances (here, a pure rotation), the image of a
+                    point in one view is related to the image of the same point in
+                    another by a linear relation.
+                </p>
+                <p>
+                     The parameter is used as a tolerance in the computation of
+                     the distance between keypoints using the homography matrix
+                     relationship between the MATCH image and each FROM/FROMLIST
+                     image.  This will throw points out that are (dist >
+                     TOLERANCE * min_dist), the smallest distance between
+                     points.
+                </p>
+              </description>
+            <default><item>3.0</item></default>
+          </parameter>
+
+       <parameter name="MAXTHREADS">
+           <type>integer</type>
+           <brief>
+              Specify the maximum threads to use
+           </brief>
+           <description>
+               This parameter allows users to control the number of threads to
+               use for image matching. A default is to use all available threads
+               on system. If MAXTHREADS is specified, the maximum number of CPUs
+               are used if it exceeds the number of CPUs physically available
+               on the system or no more than MAXTHREADS will be used.
+           </description>
+           <default><item>0</item></default>
+       </parameter>
+     </group>
+
+    <group name="Image Transformation Options">
+      <parameter name= "FASTGEOM">
+            <type>boolean</type>
+            <brief>Perform fast geometry image transform</brief>
+            <description>
+               When TRUE, this option will perform a fast geometric linear
+               transformation that <em>projects</em> each FROM/FROMLIST image to
+               the camera space of the MATCH image. Note this option
+              <em>theoretically</em> is not needed for scale/rotation invariant
+              feature matchers such as SIFT and SURF but there are limitations as
+              to the invariance of these matchers. For matchers that are not scale
+              and rotation invariant, this (or something like it) will be required
+              to orient each images to similar spatial consistency. Users should
+              determine the capabilities of the matchers used.
+            </description>
+          <default><item>false</item></default>
+        </parameter>
+
+       <parameter name="FASTGEOMPOINTS">
+           <type>integer</type>
+           <brief>
+              Specify the maximum number of geometry points used to compute the
+              fast geometry reprojection
+           </brief>
+           <description>
+           </description>
+           <default><item>25</item></default>
+       </parameter>
+
+      <parameter name="GEOMTYPE">
+        <type>string</type>
+        <default><item>CAMERA</item></default>
+        <brief>Type of fast geom mapping to apply</brief>
+        <description>
+           Provide options as to how FASTGEOM projects data in the FROM (train)
+           image to the MATCH (query) image space.
+        </description>
+        <list>
+           <option value="CAMERA">
+               <brief>
+                  Fastgeom will project the FROM image into the MATCH space
+               </brief>
+               <description>
+                   This option projects the image in the same manner as cam2map.
+                   The common area of the FROM image is projected into an image
+                   of the same size as the MATCH image. This is comparable to
+                   cam2map in that it projects the FROM image into the camera
+                   space of the MATCH image. Features should be located at the
+                   same general line and sample location in both images.
+               </description>
+           </option>
+           <option value="CROP">
+               <brief>
+                  Fastgeom will crop the FROM image to common area of MATCH
+               </brief>
+               <description>
+                  Fastgeom will crop the FROM image to common area of MATCH and
+                  retain on the approximate size of the cropped region. This
+                  option is useful to limit features to be identified in the
+                  common region in both images.
+               </description>
+           </option>
+
+           <option value="MAP">
+               <brief>
+                   Fastgeom will fully map project all of the FROM image
+               </brief>
+               <description>
+                   Fastgeom will preserve all of the FROM image using the
+                   translation computed from common space. This is comparable
+                   to map2map in that the whole from is projected using the
+                   MATCH geometry. The size of the image is determined by
+                   projecting the corners of the FROM image using the MATCH
+                   geometry. Images can be quite large or small if there is a
+                   large resolution difference.
+               </description>
+           </option>
+        </list>
+      </parameter>
+
+      <parameter name="FILTER">
+        <type>string</type>
+        <default><item>None</item></default>
+        <brief>Image filtering options for enhanced matching</brief>
+        <description>
+           Apply an image filter to both images before matching. These filters
+           are typically used in cases of low emission or incidence angles are
+           present. They are intended to remove albedo and highlight edges and
+           are well-suited for these types of feature detectors.
+        </description>
+        <list>
+            <option value="None">
+                <brief>
+                   No filters will be applied
+                </brief>
+                <description>
+                    The default condition is that no filters will be applied to
+                    the images.
+                </description>
+            </option>
+
+           <option value="SOBEL">
+               <brief>
+                  Apply Sobel filtering to both FROM and MATCH images
+               </brief>
+               <description>
+                  The <a href="http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=sobel#sobel ">
+                  Sobel</a> filter to both the FROM and MATCH images for
+                  enhanced edge detection. The 8-bit images are first scaled to
+                  16-bit and a Gaussian Blur noise reduction filter is applied
+                  before the 3x3 Sobel filter is applied. The BORDER_REFLECT
+                  option is used for pixel extrapolation at the edges.
+               </description>
+           </option>
+
+           <option value="SCHARR">
+               <brief>
+                  Apply  Scharr filtering to both FROM and MATCH images for
+                  enhanced edges.
+               </brief>
+               <description>
+                 A <a href="http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=sobel#scharr">
+                  Scharr</a> filtering to both FROM and MATCH images for
+                  enhanced edge detection. The 8-bit images are first scaled to
+                  16-bit and a 3x3 Gaussian Blur noise reduction filter is
+                  applied before the 3x3 Scharr filter is applied. The
+                  BORDER_REFLECT option is used for pixel extrapolation at the
+                  edges.
+               </description>
+           </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Control">
+      <parameter name="NETWORKID">
+        <type>string</type>
+        <brief>Name of this control network</brief>
+        <description>
+            The ID or name of this particular control network. This string
+            will be added to the output control network file, and can be used
+            to identify the network.
+        </description>
+       <default><item>Features</item></default>
+      </parameter>
+
+      <parameter name="POINTID">
+        <type>string</type>
+        <brief>
+            The pattern to be used to create point ids.
+        </brief>
+        <description>
+          <p>
+            This string will be used to create unique IDs for each control
+            point created by this program. The string must contain a
+            single series
+            of question marks ("?"). For example: "VallesMarineris????"
+          </p>
+          <p>
+            The question marks will be replaced
+            with a number beginning with zero and incremented by one each time
+            a new control point is created. The example above would cause the
+            first control point to have an ID of "VallesMarineris0000", the
+            second ID would be "VallesMarineris0001" and so on.
+            The maximum number of new control points for this example would be
+            10000 with the final ID being "VallesMarineris9999".
+          </p>
+          <p>
+            Note: Make sure there are enough "?"s for all the control
+            points that might be created during this run. If all the possible
+            point IDs are exhausted the program will exit with an error, and
+            will not produce an output control network file. The number of
+            control points created depends on the size and quantity of
+            image overlaps and the density of control points as defined
+            by the DEFFILE parameter.
+          </p>
+          <p>
+            Examples of POINTID:
+          </p>
+          <ul>
+            <li>POINTID="JohnDoe?????"</li>
+            <li>POINTID="Quad1_????"</li>
+            <li>POINTID="JD_???_test1"</li>
+          </ul>
+        </description>
+        <default><item>FeatureId_?????</item></default>
+      </parameter>
+
+      <parameter name= "POINTINDEX">
+          <type>integer</type>
+          <brief>Start numerical POINTID index with this number</brief>
+          <description>
+              This parameter can be used to specify the starting POINTID index
+              number to assist in the creation of unique control point
+              identifiers. Users must determine the highest used index and use
+              the next number in the sequence to provide unique point ids.
+          </description>
+        <default><item>1</item></default>
+      </parameter>
+
+      <parameter name="DESCRIPTION">
+        <type>string</type>
+        <brief>
+            The description of the network.
+        </brief>
+        <description>
+            A text description of the contents of the output control network.
+            The text can contain anything the user wants. For example it
+            could be used to describe the area of interest the control network
+            is being made for.
+        </description>
+        <default><item>Find features in image pairs or list</item></default>
+      </parameter>
+
+       <parameter name="NETTYPE">
+            <type>string</type>
+            <brief>Specify type of control network to create</brief>
+            <description>
+               There are two types of control network files that can be created
+               in this application: IMAGE and GROUND.  For IMAGE types, the pair
+               is assumed to be overlapping pairs where control measures for
+               both images are created.  For NETTYPE=GROUND, only the FROM file
+               measure is recorded for purposes of dead reckoning of the image
+               using jigsaw.
+            </description>
+            <default><item>IMAGE</item></default>
+            <list>
+                <option value="IMAGE">
+                    <brief>
+                       Create control network using both images
+                    </brief>
+                    <description>
+                        Create a control network of image pairs that have been
+                        measured for both to be controlled.
+                    </description>
+                </option>
+               <option value="GROUND">
+                    <brief>
+                        Only create a ground network file for dead reckoning
+                    </brief>
+                    <description>
+                       Create a control network with only the FROM image so that
+                       only its pointing will be updated.
+                    </description>
+                </option>
+            </list>
+        </parameter>
+
+       <parameter name="GEOMSOURCE">
+            <type>string</type>
+            <brief>Specify which input file provides lat/lons for control
+              point</brief>
+            <description>
+               For input files that provide geometry, specify which one provides
+               the latitude/longitude values for each control point.  NONE is
+               an acceptable option for which there is no geometry available.
+               Otherwise, the user must choose FROM or MATCH as the cube file
+               that wil provide geometry.
+            </description>
+            <default><item>MATCH</item></default>
+            <list>
+                <option value="NONE">
+                    <brief>
+                        Neither image provides geometry
+                    </brief>
+                    <description>
+                        Use this option if geometry is not available in either
+                        the FROM or MATCH image
+                    </description>
+                </option>
+                <option value="FROM">
+                    <brief>
+                       Use the FROM file to compute geometries for control points
+                    </brief>
+                    <description>
+                        Selection of the FROM option indicates use of the FROM
+                        file to compute the latitude and longitude of each
+                        control point.   Note this option cannot be used when
+                        there are more than one FROM (via FROMLIST) is given.
+                        Must use MATCH for these cases.
+                    </description>
+                </option>
+               <option value="MATCH">
+                    <brief>
+                       Use the MATCH file to compute geometries for control
+                    points
+                    </brief>
+                    <description>
+                        Selection of the MATCH option indicates use of the MATCH
+                        file to compute the latitude and longitude of each
+                        control point.
+                    </description>
+                </option>
+            </list>
+        </parameter>
+
+
+        <parameter name="TARGET">
+          <type>string</type>
+          <brief>
+              Target parameter for the control network
+          </brief>
+          <description>
+             This parameter is optional and not neccessary if using Level 1 ISIS
+             cube files. It specifies the name of the target body that the input
+             images are acquired of. If the input images are ISIS images, this
+             value is retrieved from the camera model or map projection.
+          </description>
+          <internalDefault>None</internalDefault>
+        </parameter>
+
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>
+          Run matcher on pair of MESSENGER images
+      </brief>
+      <description>
+          This example shows the results of matching two overlapping messenger
+          images of  different scales.  The following command was used to
+          produce the output network:
+        <PRE>
+findfeatures algorithm="surf@hessianThreshold:100/surf" \
+             match=EW0211981114G.lev1.cub  \
+             from=EW0242463603G.lev1.cub \
+             epitolerance=1.0 ratio=0.650 hmgtolerance=1.0 \
+             networkid="EW0211981114G_EW0242463603G" \
+             pointid="EW0211981114G_?????" \
+             onet=EW0211981114G.net \
+             description="Test MESSENGER pair" debug=true \
+             debuglog=EW0211981114G.log
+        </PRE>
+        <p>
+             Note that the fast geom option is not used for this example because
+             the SURF algorithm is scale and rotation invariant.  Here is the
+             algorithm information for the specification of the matcher
+             parameters:
+                <br/><br/>
+                <b>
+                     findfeatures algorithm="surf@hessianThreshold:100/surf" listspec=true
+                </b>
+        </p>
+        <PRE>
+Object = FeatureAlgorithms
+  Object = RobustMatcher
+    OpenCVVersion = 3.1.0
+    Name          = surf@hessianThreshold:100/surf/BFMatcher
+
+    Object = Detector
+      CVVersion    = 3.1.0
+      Name         = SURF
+      Type         = Feature2D
+      Features     = (Detector, Extractor)
+      Description  = "The OpenCV SURF Feature2D detector/extractor algorithm.
+                      See the documentation at
+                      http://docs.opencv.org/3.1.0/d5/df7/classcv_1_1xfeatures-
+                      2d_1_1SURF.html"
+      CreatedUsing = surf@hessianThreshold:100
+
+      Group = Parameters
+        Extended         = No
+        hessianThreshold = 100
+        NOctaveLayers    = 3
+        NOctaves         = 4
+        Upright          = No
+      End_Group
+    End_Object
+
+    Object = Extractor
+      CVVersion    = 3.1.0
+      Name         = SURF
+      Type         = Feature2D
+      Features     = (Detector, Extractor)
+      Description  = "The OpenCV SURF Feature2D detector/extractor algorithm.
+                      See the documentation at
+                      http://docs.opencv.org/3.1.0/d5/df7/classcv_1_1xfeatures-
+                      2d_1_1SURF.html"
+      CreatedUsing = surf
+
+      Group = Parameters
+        Extended         = No
+        HessianThreshold = 100.0
+        NOctaveLayers    = 3
+        NOctaves         = 4
+        Upright          = No
+      End_Group
+    End_Object
+
+    Object = Matcher
+      CVVersion    = 3.1.0
+      Name         = BFMatcher
+      Type         = DecriptorMatcher
+      Features     = Matcher
+      Description  = "The OpenCV BFMatcher DescriptorMatcher matcher
+                      algorithm. See the documentation at
+                      http://docs.opencv.org/3.1.0/d3/da1/classcv_1_1BFMatcher-
+                      .html"
+      CreatedUsing = BFMatcher
+
+      Group = Parameters
+        CrossCheck = No
+        NormType   = NORM_L2
+      End_Group
+    End_Object
+
+    Object = Parameters
+      EpiConfidence            = 0.99
+      EpiTolerance             = 3.0
+      FastGeom                 = false
+      FastGeomPoints           = 25
+      Filter                   = None
+      GeomSource               = MATCH
+      GeomType                 = CAMERA
+      HmgTolerance             = 3.0
+      MaxPoints                = 0
+      MinimumFundamentalPoints = 8
+      MinimumHomographyPoints  = 8
+      Ratio                    = 0.65
+      RefineFundamentalMatrix  = true
+      RootSift                 = false
+      SavePath                 = $PWD
+      SaveRenderedImages       = false
+    End_Object
+  End_Object
+End_Object
+End
+        </PRE>
+        <p>
+             The output debug log file and a line-by-line description of the
+             result is shown in the main application documention. And here is
+             the screen shot of qnet for the resulting network:
+        </p>
+        <img src='assets/qnet.png' alt='qnet result of first control point' width='984' height='604' />
+      </description>
+    </example>
+    <example>
+      <brief>
+        Show all the available algorithms and their default parameters
+      </brief>
+      <description>
+This provides a reference for all the current algorithms and their default parameters. This list may not include all the available OpenCV algorithms nor may all algorithms be applicable. Users should rerun this command to get the current options available on your system as they may differ.
+          <p>
+	  <b>
+               findfeatures listall=yes
+          </b>
+	  </p>
+        <PRE>
+Object = Algorithms
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = AGAST
+    Type         = Feature2D
+    Features     = Detector
+    Description  = "The OpenCV AGAST Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/d7/d19/classcv_1_1AgastFeatur-
+                    eDetector.html"
+    CreatedUsing = agast
+    Aliases      = (agast, detector.agast)
+
+    Group = Parameters
+      NonmaxSuppression = Yes
+      Threshold         = 10
+      Type              = OAST_9_16
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = AKAZE
+    Type         = Feature2D
+    Features     = (Detector, Extractor)
+    Description  = "The OpenCV AKAZE Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/d8/d30/classcv_1_1AKAZE.html"
+    CreatedUsing = akaze
+    Aliases      = (akaze, detector.akaze, extractor.akaze, feature2d.akaze)
+
+    Group = Parameters
+      DescriptorChannels = 3
+      DescriptorSize     = 0
+      DescriptorType     = DESCRIPTOR_MLDB
+      Diffusivity        = DIFF_PM_G2
+      NOctaveLayers      = 4
+      NOctaves           = 4
+      Threshold          = 0.0010000000474975
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = Blob
+    Type         = Feature2D
+    Features     = Detector
+    Description  = "The OpenCV simple blob detection algorithm. See the
+                    documentation at
+                    http://docs.opencv.org/3.1.0/d0/d7a/classcv_1_1SimpleBlobD-
+                    etector.html"
+    CreatedUsing = blob
+    Aliases      = (blob, detector.blob)
+
+    Group = Parameters
+      BlobColor           = 0
+      FilterByArea        = true
+      FilterByCircularity = false
+      FilterByColor       = true
+      FilterByConvexity   = true
+      FilterByInertia     = true
+      MaxArea             = 5000
+      maxCircularity      = inf
+      MaxConvexity        = inf
+      MaxInertiaRatio     = inf
+      MaxThreshold        = 220
+      MinArea             = 25
+      MinCircularity      = 0.8
+      MinConvexity        = 0.95
+      MinDistance         = 10
+      MinInertiaRatio     = 0.1
+      MinRepeatability    = 2
+      MinThreshold        = 50
+      ThresholdStep       = 10
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = BRISK
+    Type         = Feature2D
+    Features     = (Detector, Extractor)
+    Description  = "The OpenCV BRISK Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/de/dbf/classcv_1_1BRISK.html"
+    CreatedUsing = brisk
+    Aliases      = (brisk, detector.brisk, extractor.brisk, feature2d.brisk)
+
+    Group = Parameters
+      NOctaves     = 3
+      PatternScale = 1.0
+      Threshold    = 30
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = FAST
+    Type         = Feature2D
+    Features     = Detector
+    Description  = "The OpenCV FAST Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/df/d74/classcv_1_1FASTFeature-
+                    Detector.html"
+    CreatedUsing = fast
+    Aliases      = (detector.fast, fast, fastx)
+
+    Group = Parameters
+      NonmaxSuppression = Yes
+      Threshold         = 10
+      Type              = TYPE_9_16
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = GFTT
+    Type         = Feature2D
+    Features     = Detector
+    Description  = "The OpenCV GFTT Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/df/d21/classcv_1_1GFTTDetecto-
+                    r.html"
+    CreatedUsing = gftt
+    Aliases      = (detector.gftt, gftt)
+
+    Group = Parameters
+      BlockSize      = 3
+      HarrisDetector = No
+      K              = 0.04
+      MaxFeatures    = 1000
+      MinDistance    = 1.0
+      QualityLevel   = 0.01
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = KAZE
+    Type         = Feature2D
+    Features     = (Detector, Extractor)
+    Description  = "The OpenCV KAZE Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/d3/d61/classcv_1_1KAZE.html"
+    CreatedUsing = kaze
+    Aliases      = (detector.kaze, extractor.kaze, feature2d.kaze, kaze)
+
+    Group = Parameters
+      Diffusivity   = DIFF_PM_G2
+      Extended      = No
+      NOctaveLayers = 4
+      NOctaves      = 4
+      Threshold     = 0.0010000000474975
+      Upright       = No
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = MSD
+    Type         = Feature2D
+    Features     = Detector
+    Description  = "The OpenCV MSD Feature2D detector/extractor algorithm. See
+                    the documentation at
+                    http://docs.opencv.org/3.1.0/d6/d36/classcv_1_1xfeatures2d-
+                    _1_1MSD.html"
+    CreatedUsing = msd
+    Aliases      = (detector.msd, msd)
+
+    Group = Parameters
+      ComputeOrientation = false
+      KNN                = 4
+      NMSRadius          = 5
+      NMSScaleRadius     = 0
+      NScales            = -1
+      PatchRadius        = 3
+      ScaleFactor        = 1.25
+      SearchAreaRadius   = 5
+      THSaliency         = 250.0
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = MSER
+    Type         = Feature2D
+    Features     = Detector
+    Description  = "The OpenCV MSER Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/d3/d28/classcv_1_1MSER.html"
+    CreatedUsing = mser
+    Aliases      = (detector.mser, mser)
+
+    Group = Parameters
+      AreaThreshold = 1.01
+      Delta         = 5
+      EdgeBlurSize  = 5
+      MaxArea       = 14400
+      MaxEvolution  = 200
+      MaxVariation  = 0.25
+      MinArea       = 60
+      MinDiversity  = 0.2
+      MinMargin     = 0.003
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = ORB
+    Type         = Feature2D
+    Features     = (Detector, Extractor)
+    Description  = "The OpenCV ORB Feature2D detector/extractor algorithm. See
+                    the documentation at
+                    http://docs.opencv.org/3.1.0/db/d95/classcv_1_1ORB.html"
+    CreatedUsing = orb
+    Aliases      = (detector.orb, extractor.orb, feature2d.orb, orb)
+
+    Group = Parameters
+      edgeThreshold = 31
+      fastThreshold = 20
+      firstLevel    = 0
+      nfeatures     = 500
+      nlevels       = 8
+      patchSize     = 31
+      scaleFactor   = 1.2000000476837
+      scoreType     = HARRIS_SCORE
+      WTA_K         = 2
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = SIFT
+    Type         = Feature2D
+    Features     = (Detector, Extractor)
+    Description  = "The OpenCV SIFT Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/d5/d3c/classcv_1_1xfeatures2d-
+                    _1_1SIFT.html"
+    CreatedUsing = sift
+    Aliases      = (detector.sift, extractor.sift, feature2d.sift, sift)
+
+    Group = Parameters
+      constrastThreshold = 0.04
+      edgeThreshold      = 10
+      nfeatures          = 0
+      nOctaveLayers      = 3
+      sigma              = 1.6
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = Star
+    Type         = Feature2D
+    Features     = Detector
+    Description  = "The OpenCV Star Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/d6/d36/classcv_1_1xfeatures2d-
+                    _1_1Star.html"
+    CreatedUsing = star
+    Aliases      = (detector.star, star)
+
+    Group = Parameters
+      LineThresholdBinarized = 8
+      LineThresholdProjected = 10
+      MaxSize                = 45
+      ResponseThreshold      = 30
+      SuppressNonmaxSize     = 5
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = SURF
+    Type         = Feature2D
+    Features     = (Detector, Extractor)
+    Description  = "The OpenCV SURF Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/d5/df7/classcv_1_1xfeatures2d-
+                    _1_1SURF.html"
+    CreatedUsing = surf
+    Aliases      = (detector.surf, extractor.surf, feature2d.surf, surf)
+
+    Group = Parameters
+      Extended         = No
+      HessianThreshold = 100.0
+      NOctaveLayers    = 3
+      NOctaves         = 4
+      Upright          = No
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = Brief
+    Type         = Feature2D
+    Features     = Extractor
+    Description  = "The OpenCV simple blob detection algorithm. See the
+                    documentation at
+                    http://docs.opencv.org/3.1.0/d0/d7a/classcv_1_1SimpleBlobD-
+                    etector.html"
+    CreatedUsing = brief
+    Aliases      = (brief, extractor.brief)
+
+    Group = Parameters
+      Bytes          = 32
+      UseOrientation = true
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = DAISY
+    Type         = Feature2D
+    Features     = Extractor
+    Description  = "The OpenCV DAISY Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/d9/d37/classcv_1_1xfeatures2d-
+                    _1_1DAISY.html"
+    CreatedUsing = daisy
+    Aliases      = (daisy, extractor.daisy)
+
+    Group = Parameters
+      H               = "1,0,0,0,1,0,0,0,1"
+      interpolation   = true
+      norm            = NRM_NONE
+      q_hist          = 8
+      q_radius        = 3
+      q_theta         = 8
+      radius          = 15
+      use_orientation = false
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = FREAK
+    Type         = Feature2D
+    Features     = Extractor
+    Description  = "The OpenCV FREAK Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/df/db4/classcv_1_1xfeatures2d-
+                    _1_1FREAK.html"
+    CreatedUsing = freak
+    Aliases      = (extractor.freak, freak)
+
+    Group = Parameters
+      NOctaves              = 4
+      OrientationNormalized = true
+      PatternScale          = 22.0
+      ScaleNormalized       = true
+      SelectedPairs         = Null
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = LATCH
+    Type         = Feature2D
+    Features     = Extractor
+    Description  = "The OpenCV LATCH Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/d6/d36/classcv_1_1xfeatures2d-
+                    _1_1LATCH.html"
+    CreatedUsing = latch
+    Aliases      = (extractor.latch, latch)
+
+    Group = Parameters
+      Bytes              = 32
+      HalfSSDSize        = 3
+      RotationInvariance = true
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = LUCID
+    Type         = Feature2D
+    Features     = Extractor
+    Description  = "The OpenCV LUCID Feature2D detector/extractor algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/d6/d36/classcv_1_1xfeatures2d-
+                    _1_1LUCID.html"
+    CreatedUsing = lucid
+    Aliases      = (extractor.lucid, lucid)
+
+    Group = Parameters
+      BlurKernel  = 1
+      LucidKernel = 1
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = BFMatcher
+    Type         = DecriptorMatcher
+    Features     = Matcher
+    Description  = "The OpenCV BFMatcher DescriptorMatcher matcher algorithm.
+                    See the documentation at
+                    http://docs.opencv.org/3.1.0/d3/da1/classcv_1_1BFMatcher.h-
+                    tml"
+    CreatedUsing = bfmatcher
+    Aliases      = (bfmatcher, matcher.bfmatcher)
+
+    Group = Parameters
+      CrossCheck = No
+      NormType   = NORM_L2
+    End_Group
+  End_Object
+
+  Object = Algorithm
+    CVVersion    = 3.1.0
+    Name         = FlannBasedMatcher
+    Type         = DecriptorMatcher
+    Features     = Matcher
+    Description  = "The OpenCV FlannBasedMatcher DescriptorMatcher matcher
+                    algorithm. See the documentation at
+                    http://docs.opencv.org/3.1.0/dc/de2/classcv_1_1FlannBasedM-
+                    atcher.html"
+    CreatedUsing = flannbasedmatcher
+    Aliases      = (flannbasedmatcher, matcher.flannbasedmatcher)
+
+    Group = Parameters
+      Checks  = 32
+      Epsilon = 0.0
+      Sorted  = Yes
+    End_Group
+  End_Object
+End_Object
+End
+	</PRE>
+      </description>
+    </example>
+   </examples>
+
+</application>

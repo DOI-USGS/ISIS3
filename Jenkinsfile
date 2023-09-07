@@ -31,7 +31,7 @@ pipeline {
                 conda activate isis > /dev/null
                 conda config --env --set channel_priority flexible
                 conda install -c conda-forge python=3 findutils
-                mamba env update -f environment.yml --prune
+                conda env update -f environment.yml --prune
                 conda activate isis
                 mamba install -c conda-forge git
                 git submodule update --init --recursive
@@ -48,7 +48,7 @@ pipeline {
                 cd build
                 cmake -GNinja -DJP2KFLAG=ON  \
                       -DKAKADU_INCLUDE_DIR=${KAKADU_HEADERS} \
-                      -Dpybindings=OFF \
+                      -Dpybindings=ON \
                       -DCMAKE_BUILD_TYPE=RELEASE \
                       -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} \
                       ../isis
@@ -117,6 +117,8 @@ pipeline {
                     cd $WORKSPACE/isis/pytests 
                     pytest .
 
+                    cd $WORKSPACE/isis/python_bindings/tests  
+                    pytest .
                     '''
                 }
             }

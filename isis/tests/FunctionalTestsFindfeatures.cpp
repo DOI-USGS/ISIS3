@@ -5,6 +5,7 @@
 #include <QStringList>
 
 #include "NetworkFixtures.h"
+#include "PvlFlatMap.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
 #include "SurfacePoint.h"
@@ -12,6 +13,7 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "SerialNumber.h"
+#include "TextFile.h"
 
 #include "gmock/gmock.h"
 
@@ -19,6 +21,37 @@ using namespace Isis;
 using ::testing::HasSubstr;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/findfeatures.xml").expanded();
+
+// All FastGeom Keys expected in logs for algorithms
+static const QStringList fastgeom_generic_keywords = { "FastGeomAlgorithm",
+                                                       "FastGeomPoints",
+                                                       "FastGeomTolerance",
+                                                       "FastGeomQuerySampleTolerance",
+                                                       "FastGeomQueryLineTolerance",
+                                                       "FastGeomTrainSampleTolerance",
+                                                       "FastGeomTrainLineTolerance" };
+static const QStringList fastgeom_radial_keywords =  { "FastGeomMaximumRadius",
+                                                       "FastGeomRadialSegmentLength",
+                                                       "FastGeomRadialPointCount",
+                                                       "FastGeomRadialPointFactor",
+                                                       "FastGeomRadialSegments" };
+static const QStringList fastgeom_grid_keywords =    { "FastGeomGridStartIteration",
+                                                       "FastGeomGridStopIteration",
+                                                       "FastGeomGridIterationStep",
+                                                       "FastGeomGridSaveAllPoints",
+                                                       "FastGeomPointIncrement",
+                                                       "FastGeomTotalGridIterations" };
+
+
+
+/** Helper function to load findfeatures debug log file */
+inline QStringList filter_strings( const std::vector<QString> &strlist, const QString &pattern ) {
+  QStringList found;
+  for ( auto const &line : strlist ) {
+    if ( line.contains( pattern ) ) found += line;
+  }
+  return ( found );
+}
 
 TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesDefault) {
   // Setup output file
@@ -215,7 +248,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesErrorNoInput) {
     FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("**USER ERROR** Must provide both a FROM/FROMLIST and MATCH cube or image filename"));
+    EXPECT_THAT(e.what(), HasSubstr("**USER ERROR** Input cubes (0) failed to load. Must provide valid FROM/FROMLIST and MATCH cube or image filenames"));
   }
 }
 
@@ -248,3 +281,274 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesErrorNoMatch) {
     EXPECT_THAT(e.what(), HasSubstr("**USER ERROR** No control points found!"));
   }
 }
+
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomDefault) {
+  // Setup output file
+  const QString debuglogfile = tempDir.path() + "/default_fastgeom_algorithm.log";
+
+  // Needs no additional parameters to test the default case - just add log params
+  QVector<QString> args = {"algorithm=orb@hessianThreshold:100/orb",
+                           "match=" + tempDir.path() + "/cube3.cub",
+                           "from=" + tempDir.path() + "/cube2.cub",
+                           "tolist=" + tempDir.path() + "/toList.txt",
+                           "tonotmatched=" + tempDir.path() + "/unmatched.txt",
+                           "maxpoints=5000",
+                           "fastgeom=true",
+                           "epitolerance=3.0",
+                           "ratio=.9",
+                           "hmgtolerance=3.0",
+                           "onet=" + tempDir.path() + "/default_fastgeom_network.net",
+                           "networkid=default_fastgeom",
+                           "pointid=test_network_????",
+                           "description=default_fastgeom",
+                           "target=MARS",
+                           "debug=true",
+                           "debuglog=" + debuglogfile };
+  UserInterface options(APP_XML, args);
+  findfeatures(options);
+  ControlNet network(options.GetFileName("ONET"));
+
+  // Tests are based upon these condtions
+  ASSERT_EQ(network.GetNetworkId(), "default_fastgeom");
+  ASSERT_EQ(network.Description().toStdString(), "orb@hessianThreshold:100/orb/BFMatcher@NormType:NORM_HAMMING@CrossCheck:false");
+  ASSERT_EQ(network.GetNumPoints(), 30);
+
+  // Load the log file and parse it looking for FastGeom signatures
+  std::vector<QString> logdata;
+  TextFile(debuglogfile, "input", logdata );
+  QStringList fgeomkeys = filter_strings( logdata, "FastGeom" );
+
+  QStringList expected = fastgeom_generic_keywords + fastgeom_radial_keywords;
+  PvlFlatMap keyvalues;
+
+  for ( auto const &key : expected ) {
+    QStringList parsed = fgeomkeys.filter( key );
+    ASSERT_EQ( parsed.size(), 1 );
+    if ( parsed.size() == 1 ) {
+      QStringList fgline = parsed[0].simplified().split(':');
+      ASSERT_EQ( fgline.size(), 2 );
+      ASSERT_EQ( fgline[0], key );
+      if ( fgline.size() == 2 ) keyvalues.add(key, fgline[1].simplified());
+    }
+  }
+
+  // Check for expected values here
+  ASSERT_EQ( keyvalues.get( "FastGeomAlgorithm",            "null"), "radial");
+  ASSERT_EQ( keyvalues.get( "FastGeomPoints",               "null"), "25");
+  ASSERT_EQ( keyvalues.get( "FastGeomTolerance",            "null"), "3");
+  ASSERT_EQ( keyvalues.get( "FastGeomQuerySampleTolerance", "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomQueryLineTolerance",   "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomTrainSampleTolerance", "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomTrainLineTolerance",   "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomRadialSegmentLength",  "null"), "25");
+  ASSERT_EQ( keyvalues.get( "FastGeomRadialPointCount",     "null"), "5");
+  ASSERT_EQ( keyvalues.get( "FastGeomRadialPointFactor",    "null"), "1");
+  ASSERT_EQ( keyvalues.get( "FastGeomRadialSegments",       "null"), "14");
+
+  // Do the floating point special
+  EXPECT_NEAR( toDouble(keyvalues.get( "FastGeomMaximumRadius",        "-1") ), 339.411, 1.0E-4);
+}
+
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomRadialConfig) {
+  // Setup output file
+  const QString debuglogfile = tempDir.path() + "/radial_config_fastgeom_algorithm.log";
+
+  // Needs no additional parameters to test the default case - just add log params
+  QVector<QString> args = {"algorithm=orb@hessianThreshold:100/orb",
+                           "match=" + tempDir.path() + "/cube3.cub",
+                           "from=" + tempDir.path() + "/cube2.cub",
+                           "tolist=" + tempDir.path() + "/toList.txt",
+                           "tonotmatched=" + tempDir.path() + "/unmatched.txt",
+                           "parameters=" + radial_fastgeom_config,
+                           "maxpoints=5000",
+                           "fastgeom=true",
+                           "epitolerance=3.0",
+                           "ratio=.9",
+                           "hmgtolerance=3.0",
+                           "onet=" + tempDir.path() + "/radial_config_fastgeom_network.net",
+                           "networkid=radial_config_fastgeom",
+                           "pointid=test_network_????",
+                           "description=radial_config_fastgeom",
+                           "target=MARS",
+                           "debug=true",
+                           "debuglog=" + debuglogfile };
+  UserInterface options(APP_XML, args);
+  findfeatures(options);
+  ControlNet network(options.GetFileName("ONET"));
+
+  // Tests are based upon these condtions
+  ASSERT_EQ(network.GetNetworkId(), "radial_config_fastgeom");
+  ASSERT_EQ(network.Description().toStdString(), "orb@hessianThreshold:100/orb/BFMatcher@NormType:NORM_HAMMING@CrossCheck:false");
+  ASSERT_EQ(network.GetNumPoints(), 35);
+
+  // Load the log file and parse it looking for FastGeom signatures
+  std::vector<QString> logdata;
+  TextFile(debuglogfile, "input", logdata );
+  QStringList fgeomkeys = filter_strings( logdata, "FastGeom" );
+
+  QStringList expected = fastgeom_generic_keywords + fastgeom_radial_keywords;
+  PvlFlatMap keyvalues;
+
+  for ( auto const &key : expected ) {
+    QStringList parsed = fgeomkeys.filter( key );
+    ASSERT_EQ( parsed.size(), 1 );
+    if ( parsed.size() == 1 ) {
+      QStringList fgline = parsed[0].simplified().split(':');
+      ASSERT_EQ( fgline.size(), 2 );
+      ASSERT_EQ( fgline[0], key );
+      if ( fgline.size() == 2 ) keyvalues.add(key, fgline[1].simplified());
+    }
+  }
+
+  // Check for expected values here
+  ASSERT_EQ( keyvalues.get( "FastGeomAlgorithm",            "null"), "radial");
+  ASSERT_EQ( keyvalues.get( "FastGeomPoints",               "null"), "25");
+  ASSERT_EQ( keyvalues.get( "FastGeomTolerance",            "null"), "3");
+  ASSERT_EQ( keyvalues.get( "FastGeomQuerySampleTolerance", "null"), "15");
+  ASSERT_EQ( keyvalues.get( "FastGeomQueryLineTolerance",   "null"), "15");
+  ASSERT_EQ( keyvalues.get( "FastGeomTrainSampleTolerance", "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomTrainLineTolerance",   "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomRadialSegmentLength",  "null"), "10");
+  ASSERT_EQ( keyvalues.get( "FastGeomRadialPointCount",     "null"), "7");
+  ASSERT_EQ( keyvalues.get( "FastGeomRadialPointFactor",    "null"), "0.5");
+  ASSERT_EQ( keyvalues.get( "FastGeomRadialSegments",       "null"), "37");
+
+  // Do the floating point special
+  EXPECT_NEAR( toDouble(keyvalues.get( "FastGeomMaximumRadius",        "-1") ), 360.624, 1.0E-4);
+}
+
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomGridDefault) {
+  // Setup output file
+  const QString debuglogfile = tempDir.path() + "/grid_default_fastgeom_algorithm.log";
+
+  // Needs no additional parameters to test the default case - just add log params
+  QVector<QString> args = {"algorithm=orb@hessianThreshold:100/orb",
+                           "match=" + tempDir.path() + "/cube3.cub",
+                           "from=" + tempDir.path() + "/cube2.cub",
+                           "tolist=" + tempDir.path() + "/toList.txt",
+                           "tonotmatched=" + tempDir.path() + "/unmatched.txt",
+                           "globals=FastGeomAlgorithm:grid",
+                           "maxpoints=5000",
+                           "fastgeom=true",
+                           "epitolerance=3.0",
+                           "ratio=.9",
+                           "hmgtolerance=3.0",
+                           "onet=" + tempDir.path() + "/grid_default_fastgeom_network.net",
+                           "networkid=grid_default_fastgeom",
+                           "pointid=test_network_????",
+                           "description=grid_default_fastgeom",
+                           "target=MARS",
+                           "debug=true",
+                           "debuglog=" + debuglogfile };
+  UserInterface options(APP_XML, args);
+  findfeatures(options);
+  ControlNet network(options.GetFileName("ONET"));
+
+  // Tests are based upon these condtions
+  ASSERT_EQ(network.GetNetworkId(), "grid_default_fastgeom");
+  ASSERT_EQ(network.Description().toStdString(), "orb@hessianThreshold:100/orb/BFMatcher@NormType:NORM_HAMMING@CrossCheck:false");
+  ASSERT_EQ(network.GetNumPoints(), 38);
+
+  // Load the log file and parse it looking for FastGeom signatures
+  std::vector<QString> logdata;
+  TextFile(debuglogfile, "input", logdata );
+  QStringList fgeomkeys = filter_strings( logdata, "FastGeom" );
+
+  QStringList expected = fastgeom_generic_keywords + fastgeom_grid_keywords;
+  PvlFlatMap keyvalues;
+
+  for ( auto const &key : expected ) {
+    QStringList parsed = fgeomkeys.filter( key );
+    ASSERT_EQ( parsed.size(), 1 );
+    if ( parsed.size() == 1 ) {
+      QStringList fgline = parsed[0].simplified().split(':');
+      ASSERT_EQ( fgline.size(), 2 );
+      ASSERT_EQ( fgline[0], key );
+      if ( fgline.size() == 2 ) keyvalues.add(key, fgline[1].simplified());
+    }
+  }
+
+  // Check for expected values here
+  ASSERT_EQ( keyvalues.get( "FastGeomAlgorithm",            "null"), "grid");
+  ASSERT_EQ( keyvalues.get( "FastGeomPoints",               "null"), "25");
+  ASSERT_EQ( keyvalues.get( "FastGeomTolerance",            "null"), "3");
+  ASSERT_EQ( keyvalues.get( "FastGeomQuerySampleTolerance", "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomQueryLineTolerance",   "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomTrainSampleTolerance", "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomTrainLineTolerance",   "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomGridStartIteration",   "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomGridStopIteration",    "null"), "239");
+  ASSERT_EQ( keyvalues.get( "FastGeomGridIterationStep",    "null"), "1");
+  ASSERT_EQ( keyvalues.get( "FastGeomGridSaveAllPoints",    "null"), "No");
+  ASSERT_EQ( keyvalues.get( "FastGeomPointIncrement",       "null"), "5");
+  ASSERT_EQ( keyvalues.get( "FastGeomTotalGridIterations",  "null"), "2");
+}
+
+TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomGridConfig) {
+  // Setup output file
+  const QString debuglogfile = tempDir.path() + "/grid_config_fastgeom_algorithm.log";
+
+  // Needs no additional parameters to test the default case - just add log params
+  QVector<QString> args = {"algorithm=orb@hessianThreshold:100/orb",
+                           "match=" + tempDir.path() + "/cube3.cub",
+                           "from=" + tempDir.path() + "/cube2.cub",
+                           "tolist=" + tempDir.path() + "/toList.txt",
+                           "tonotmatched=" + tempDir.path() + "/unmatched.txt",
+                           "parameters=" + grid_fastgeom_config,
+                           "maxpoints=5000",
+                           "fastgeom=true",
+                           "epitolerance=3.0",
+                           "ratio=.9",
+                           "hmgtolerance=3.0",
+                           "onet=" + tempDir.path() + "/grid_default_fastgeom_network.net",
+                           "networkid=grid_config_fastgeom",
+                           "pointid=test_network_????",
+                           "description=grid_config_fastgeom",
+                           "target=MARS",
+                           "debug=true",
+                           "debuglog=" + debuglogfile };
+  UserInterface options(APP_XML, args);
+  findfeatures(options);
+  ControlNet network(options.GetFileName("ONET"));
+
+  // Tests are based upon these condtions
+  ASSERT_EQ(network.GetNetworkId(), "grid_config_fastgeom");
+  ASSERT_EQ(network.Description().toStdString(), "orb@hessianThreshold:100/orb/BFMatcher@NormType:NORM_HAMMING@CrossCheck:false");
+  ASSERT_EQ(network.GetNumPoints(), 31);
+
+  // Load the log file and parse it looking for FastGeom signatures
+  std::vector<QString> logdata;
+  TextFile(debuglogfile, "input", logdata );
+  QStringList fgeomkeys = filter_strings( logdata, "FastGeom" );
+
+  QStringList expected = fastgeom_generic_keywords + fastgeom_grid_keywords;
+  PvlFlatMap keyvalues;
+
+  for ( auto const &key : expected ) {
+    QStringList parsed = fgeomkeys.filter( key );
+    ASSERT_EQ( parsed.size(), 1 );
+    if ( parsed.size() == 1 ) {
+      QStringList fgline = parsed[0].simplified().split(':');
+      ASSERT_EQ( fgline.size(), 2 );
+      ASSERT_EQ( fgline[0], key );
+      if ( fgline.size() == 2 ) keyvalues.add(key, fgline[1].simplified());
+    }
+  }
+
+  // Check for expected values here
+  ASSERT_EQ( keyvalues.get( "FastGeomAlgorithm",            "null"), "grid");
+  ASSERT_EQ( keyvalues.get( "FastGeomPoints",               "null"), "25");
+  ASSERT_EQ( keyvalues.get( "FastGeomTolerance",            "null"), "3");
+  ASSERT_EQ( keyvalues.get( "FastGeomQuerySampleTolerance", "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomQueryLineTolerance",   "null"), "0");
+  ASSERT_EQ( keyvalues.get( "FastGeomTrainSampleTolerance", "null"), "15");
+  ASSERT_EQ( keyvalues.get( "FastGeomTrainLineTolerance",   "null"), "15");
+  ASSERT_EQ( keyvalues.get( "FastGeomGridStartIteration",   "null"), "5");
+  ASSERT_EQ( keyvalues.get( "FastGeomGridStopIteration",    "null"), "10");
+  ASSERT_EQ( keyvalues.get( "FastGeomGridIterationStep",    "null"), "2");
+  ASSERT_EQ( keyvalues.get( "FastGeomGridSaveAllPoints",    "null"), "No");
+  ASSERT_EQ( keyvalues.get( "FastGeomPointIncrement",       "null"), "5");
+  ASSERT_EQ( keyvalues.get( "FastGeomTotalGridIterations",  "null"), "1");
+}
+
+

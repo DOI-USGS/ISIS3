@@ -37,6 +37,10 @@ namespace Isis {
       QString cubeListFile;
       QString twoCubeListFile;
 
+      // Optional use of FastGeom algorithms
+      QString grid_fastgeom_config;
+      QString radial_fastgeom_config;
+
       std::vector<std::vector<double>> coords;
 
       void SetUp() override;

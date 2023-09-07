@@ -32,6 +32,7 @@ find files of those names at the top level of this repository. **/
 #include "QDebugLogger.h"
 #include "RobustMatcher.h"
 #include "Statistics.h"
+#include "SurfacePoint.h"
 
 namespace Isis {
 
@@ -104,6 +105,7 @@ MatchImage MatchMaker::getGeometrySource() const {
   }
 
   if ( Query == m_geomFlag )  return ( query() );
+  if ( Both  == m_geomFlag )  return ( query() );
   if ( Train == m_geomFlag )  return ( train() );
   return ( MatchImage() );  // Got none
 }
@@ -145,7 +147,8 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
 }
 
 
- PvlGroup MatchMaker::network(ControlNet &cnet, const MatcherSolution &solution,
+ PvlGroup MatchMaker::network(ControlNet &cnet,
+                              const MatcherSolution &solution,
                               ID &pointMaker) const {
 
 
@@ -179,14 +182,26 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
     logger().flush();
   }
 
-  // Create control network
+  // Create control network. This will transfer all points to the network
+  // and any ones that don't make will be deleted.
   int nPoints = 0;
-  int nBad = 0;
+  int nBadPoints = 0;
+  int nBadMeasures = 0;
+  bool preserve_ignored = toBool(m_parameters.get("PreserveIgnoredControl", "False"));
   Statistics pointStats;
   for (int i = 0 ; i < points.size() ; i++) {
-    if ( points[i] != 0 ) {
-      if ( points[i]->GetNumValidMeasures() > 1 ) {
-        pointStats.AddData((double)points[i]->GetNumValidMeasures());
+    if ( (points[i] != 0)  ) {
+      bool isValid = ( !points[i]->IsIgnored() ) && (points[i]->GetNumValidMeasures() > 1);
+      nBadMeasures += (points[i]->GetNumMeasures() - points[i]->GetNumValidMeasures());
+      if ( preserve_ignored || isValid ) {
+        if ( isValid ) {
+          pointStats.AddData((double)points[i]->GetNumValidMeasures());
+        }
+        else {
+          // Ensure the point is ignored
+          points[i]->SetIgnored( true );
+          nBadPoints++;
+        }
         points[i]->SetId(pointMaker.Next());
         cnet.AddPoint(points[i]);
         points[i] = 0;
@@ -197,7 +212,7 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
         // other place to do it.
         delete points[i];
         points[i] = 0;
-        nBad++;
+        nBadPoints++;
       }
     }
   }
@@ -205,23 +220,40 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
   cnetinfo += PvlKeyword("ImagesMatched", toString(nImages) );
   cnetinfo += PvlKeyword("ControlPoints", toString(nPoints) );
   cnetinfo += PvlKeyword("ControlMeasures", toString(nMeasures) );
-  cnetinfo += PvlKeyword("SingleMeasurePoints", toString(nBad) );
+  cnetinfo += PvlKeyword("InvalidIgnoredPoints", toString(nBadPoints) );
+  cnetinfo += PvlKeyword("InvalidIgnoredMeasures", toString(nBadMeasures) );
+  cnetinfo += PvlKeyword("PreserveIgnoredControl", toString(preserve_ignored) );
   if ( isDebug() ) {
     logger() << "  Images Matched:                 " << nImages << "\n";
     logger() << "  ControlPoints created:          " << nPoints << "\n";
     logger() << "  ControlMeasures created:        " << nMeasures << "\n";
-    logger() << "  Excluded single measure points: " << nBad << "\n";
+    logger() << "  InvalidIgnoredPoints:           " << nBadPoints << "\n";
+    logger() << "  InvalidIgnoredMeasures:         " << nBadMeasures << "\n";
+    logger() << "  PreserveIgnoredControl          " << toString(preserve_ignored) << "\n";
     logger().flush();
+  }
+
+  // Report measure statistics
+  PvlKeyword mkey = PvlKeyword("ValidPoints", toString(pointStats.ValidPixels()) );
+  mkey.addComment(" -- Valid Point/Measure Statistics ---");
+  cnetinfo += mkey;
+  if ( isDebug() ) {
+      logger() << "\n  -- Valid Point/Measure Statistics -- \n";
+      logger() << "  ValidPoints            " << pointStats.ValidPixels() << "\n";
   }
 
   if ( pointStats.ValidPixels() > 0 ) {
     cnetinfo += PvlKeyword("MinimumMeasures", toString(pointStats.Minimum()) );
     cnetinfo += PvlKeyword("MaximumMeasures", toString(pointStats.Maximum()) );
+    cnetinfo += PvlKeyword("AverageMeasures", toString(pointStats.Average()) );
     cnetinfo += PvlKeyword("StdDevMeasures", toString(pointStats.StandardDeviation()) );
+    cnetinfo += PvlKeyword("TotalMeasures", toString((int) pointStats.Sum()) );
     if ( isDebug() ) {
       logger() << "  MinimumMeasures:       " << pointStats.Minimum() << "\n";
       logger() << "  MaximumMeasures:       " << pointStats.Maximum() << "\n";
+      logger() << "  AverageMeasures:       " << pointStats.Average() << "\n";
       logger() << "  StdDevMeasures:        " << pointStats.StandardDeviation() << "\n";
+      logger() << "  TotalMeasures:         " << (int) pointStats.Sum() << "\n";
       logger().flush();
     }
   }
@@ -256,9 +288,11 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
     (*cpt)->SetRefMeasure(reference);
 
     // Set lat/lon if requested for Query image
-    if ( Query == m_geomFlag ) {
-      // What to do when it fails??
-      (void) setAprioriLatLon(*(*cpt), *reference, mpair.query());
+    if ( (Query == m_geomFlag) || (Both == m_geomFlag) ) {
+      // We'll set the reference to ignore if this fails
+      if ( !setAprioriLatLon(*(*cpt), *reference, mpair.query() ) ) {
+        reference->SetIgnored( true );
+      }
     }
     nMade++;
   }
@@ -298,8 +332,19 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
 
     // Set lat/lon if requested for train image
     if ( Train == m_geomFlag ) {
-      // What to do when it fails??
-      (void) setAprioriLatLon(*(*cpt), *trainpt, mpair.train() );
+      // If it fails, ignore the point
+      if ( !setAprioriLatLon(*(*cpt), *trainpt, mpair.train() ) ) {
+        (*cpt)->SetIgnored( true );
+      }
+    }
+    else if ( Both == m_geomFlag ) {
+      // Check for valid ground mapping.
+      SurfacePoint latlon = getSurfacePoint( *trainpt, mpair.train() );
+
+      // If it fails, ignore the measure
+      if ( !latlon.Valid() ) {
+        trainpt->SetIgnored( true );
+      }
     }
 
     nMade++;
@@ -325,20 +370,26 @@ ControlMeasure *MatchMaker::makeMeasure(const MatchImage &image,
   return ( v_measure.take() );
 }
 
-bool MatchMaker::setAprioriLatLon(ControlPoint &point,
-                                  const ControlMeasure &measure,
-                                  const MatchImage &image) const {
+SurfacePoint MatchMaker::getSurfacePoint( const ControlMeasure &measure,
+                                         const MatchImage &image) const {
   // Check if the source has geometry
-  if ( !image.source().hasGeometry() ) { return (false); }
+  if ( !image.source().hasGeometry() ) { return (SurfacePoint()); }
 
   // Compute lat/lon
   double samp = measure.GetSample();
   double line = measure.GetLine();
   SurfacePoint latlon = image.source().getLatLon(line,samp);
 
-  // std::cout << "  Lat/Lon Coordinate: " << latlon.GetLatitude().degrees() << ", "
-  //           << latlon.GetLongitude().degrees() << "\n";
-  point.SetAprioriSurfacePoint(latlon);
+  return (latlon);
+}
+
+bool MatchMaker::setAprioriLatLon(ControlPoint &point,
+                                  const ControlMeasure &measure,
+                                  const MatchImage &image) const {
+  SurfacePoint latlon = getSurfacePoint(measure, image);
+  if ( latlon.Valid() )  { // Only set if its valid
+    point.SetAprioriSurfacePoint(latlon);
+  }
   return ( latlon.Valid() );
 }
 

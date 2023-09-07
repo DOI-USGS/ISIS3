@@ -66,18 +66,34 @@ namespace Isis {
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
 
+    // read the optional cubename
+    FileName frameletCubeFlag(ui.GetCubeName("CUBENAME"));
+    QString frameletCubeName = frameletCubeFlag.expanded();
+
     // Stitch together the individual frames
-    FileName outputFileName(ui.GetCubeName("OUTPUTPREFIX"));
-    QString outputBaseName = outputFileName.expanded();
+    FileName outputPrefix(ui.GetCubeName("OUTPUTPREFIX"));
+    FileName outputSuffix(ui.GetCubeName("OUTPUTSUFFIX"));
+    QString outputPrefBaseName = outputPrefix.expanded();
+    QString outputSuffBaseName = outputSuffix.expanded();
     QStringList frameKeys = frameMap.uniqueKeys();
     Progress stitchProgress;
     stitchProgress.SetText("Stitching Frames");
     stitchProgress.SetMaximumSteps(frameKeys.size());
     stitchProgress.CheckStatus();
+    
     foreach(QString frameKey, frameKeys) {
       try {
         QString frameIdentifier = frameKey.split("/").last();
-        FileName frameFileName(outputBaseName + "-" + frameIdentifier + ".cub");
+        FileName frameFileName;
+        if (frameletCubeName != "") {
+          frameFileName = FileName(outputPrefBaseName + "-" +
+                               frameletCubeName +
+                               outputSuffBaseName + ".cub");
+        } else {
+          frameFileName = FileName(outputPrefBaseName + "-" +
+                                 frameIdentifier +
+                                 outputSuffBaseName + ".cub");
+        }
         stitchFrame( frameMap.values(frameKey), frameFileName );
         stitchProgress.CheckStatus();
       }

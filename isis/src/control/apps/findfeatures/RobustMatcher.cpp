@@ -851,8 +851,8 @@ cv::Mat RobustMatcher::ransacTest(const std::vector<cv::DMatch>& matches,
     return ( fundamental );
   }
 
-  // extract the surviving (inliers) matches (only valid for CV_FM_RANSAC and
-  // CV_FM_LMEDS methods)!!!!
+  // extract the surviving (inliers) matches (only valid for cv::FM_RANSAC and
+  // cv::FM_LMEDS methods)!!!!
   std::vector<uchar>::const_iterator      itIn = inliers.begin();
   std::vector<cv::DMatch>::const_iterator itM  = matches.begin();
   for ( ;itIn != inliers.end(); ++itIn, ++itM) {
