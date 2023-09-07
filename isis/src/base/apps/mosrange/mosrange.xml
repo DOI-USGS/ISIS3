@@ -9,7 +9,7 @@ xsi:noNamespaceSchemaLocation=
 
   <description>
     <p>
-      <i>Mosrange</i> computes and outputs the <def link="Latitude">latitude</def>
+      <i>mosrange</i> computes and outputs the <def link="Latitude">latitude</def>
       and <def link="Longitude">longitude</def> ranges of a set of <def link="Level1">Level1</def>
       images (i.e. non-projected), as well as the <def link="Pixel Resolution"> pixel
       resolution</def> and the <def link="Oblique Pixel Resolution"> oblique pixel resolution</def>.
@@ -26,7 +26,7 @@ xsi:noNamespaceSchemaLocation=
     </p>
 
     <p>
-      <i>Mosrange</i> provides better control over the values of the latitude/longitude 
+      <i>mosrange</i> provides better control over the values of the latitude/longitude 
       ranges by providing a PRECISION parameter.  This parameter specifies the 
       maximum number of digits of precision for many of the Mapping group parameters 
       used to project images.
@@ -40,12 +40,12 @@ xsi:noNamespaceSchemaLocation=
       without generating a map file. If ONERROR=CONTINUE, <i>mosrange</i> produces
       an output map file with data collected from all successfully processed images.
       A detailed list of files that fail and their associated errors are written to
-      ERRORLOG if provided. A simple list of failed files is written to ERRORLIST if
-      provided.
+      the ERRORLOG file if provided. A simple list of failed files is written to the
+      ERRORLIST file if provided.
     </p>
  
     <p>
-      The primary use of <i>mosrange</i>is to provide a quick, simple and batchable means of 
+      The primary use of <i>mosrange</i> is to provide a quick, simple and batchable means of
       creating map files for projections.
     </p>
     
@@ -125,16 +125,16 @@ End
     <change name="Tyler Wilson" date="2016-08-25">
        Updated to use updated Camera/CameraPointInfo classes which include improved approximations
        to Pixel/Detector/Line/Sample resolutions, as well as providing the ability for developers
-       to order the fields in CSV/Pvl output.  References #476"
+       to order the fields in CSV/Pvl output.  References #476.
     </change>
     <change name="Kris Becker" date="2019-03-11">
         Added ERRORLOG, ERRORLIST and ONERROR flags to provide better control
         error behavior and provide diagnostics when problems are encountered
         processing input file list.
     </change>
-    <change name="Ken Edmundson" date="2023-08-02">
-        Moved Kris Becker's changes of 2019-03-11 from UofA code base to USGS
-        and updated documentation.
+    <change name="Ken Edmundson" date="2023-09-07">
+        Moved Kris Becker's 2019-03-11 changes from UofA code base to USGS. Updated documentation.
+        Cleaned up unnecessary blank lines and commented code in mosrange.cpp. References #3606.
     </change>
  </history>
   <groups>
