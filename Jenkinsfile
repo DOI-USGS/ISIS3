@@ -29,10 +29,6 @@ pipeline {
                 sh '''
                 . /home/conda/mambaforge3/etc/profile.d/conda.sh > /dev/null
                 echo "ISISROOT: ${ISISROOT}"
-                conda create -y -n git_env -c conda-forge git
-                conda activate git_env > /dev/null
-                git submodule update --init --recursive
-                conda deactivate
                 
                 conda create -y -n isis
                 conda activate isis > /dev/null
