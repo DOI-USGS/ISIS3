@@ -254,7 +254,7 @@ bool sky2map::Xform(double &inSample, double &inLine,
 
   p_incam->SetImage(p_incam->Sample(), p_incam->Line());
   
-  // Check that the new line and sample is projects close to the input Right Ascension 
+  // Check that the new line and sample projects close to the input Right Ascension 
   // and Declination
   if (abs(p_incam->RightAscension() - lon) > 0.1) return false;
   if (abs(p_incam->Declination() - lat) > 0.1) return false;

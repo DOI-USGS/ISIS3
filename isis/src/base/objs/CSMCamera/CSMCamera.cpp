@@ -1207,7 +1207,7 @@ void sanitize(std::string &input);
    * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the sensor orientation
    */
   SpiceRotation *CSMCamera::instrumentRotation() const {
-    QString msg = "Instrument rotation is not supported for CSM camera models";
+    QString msg = "Instrument orientation is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1248,7 +1248,7 @@ void sanitize(std::string &input);
    * @returns @b double The Right Ascension
    */
   double CSMCamera::RightAscension() {
-    if (m_bodyRotation == NULL || m_model == NULL) {
+    if (bodyRotation() == NULL || m_model == NULL) {
       QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1275,7 +1275,7 @@ void sanitize(std::string &input);
    * @returns @b double The Declination
    */
   double CSMCamera::Declination() {
-    if (m_bodyRotation == NULL || m_model == NULL) {
+    if (bodyRotation() == NULL || m_model == NULL) {
       QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
