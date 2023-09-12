@@ -444,14 +444,21 @@ namespace Isis {
           p_tableWin->table()->item(row, getIndex("North Azimuth"))->setText("");
         }
 
-        double sunAzi = cvp->camera()->SunAzimuth();
-        if (Isis::IsValidPixel(sunAzi)) {
-          p_tableWin->table()->item(row, getIndex("Sun Azimuth"))->
-                               setText(QString::number(sunAzi));
+
+        try {
+          double sunAzi = cvp->camera()->SunAzimuth();
+          if (Isis::IsValidPixel(sunAzi)) {
+            p_tableWin->table()->item(row, getIndex("Sun Azimuth"))->
+                                setText(QString::number(sunAzi));
+          }
+          else { // sun azimuth is null
+            p_tableWin->table()->item(row, getIndex("Sun Azimuth"))->setText("");
+          }
         }
-        else { // sun azimuth is null
+        catch(IException &e) {
           p_tableWin->table()->item(row, getIndex("Sun Azimuth"))->setText("");
         }
+
 
         double spacecraftAzi = cvp->camera()->SpacecraftAzimuth();
         if (Isis::IsValidPixel(spacecraftAzi)) {

@@ -1123,8 +1123,8 @@ void sanitize(std::string &input);
    * @param lon Sub-solar longitude
    */
   void CSMCamera::subSolarPoint(double &lat, double &lon) {
-    lat = 0;
-    lon = 0;
+    QString msg = "Sub solar point is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
