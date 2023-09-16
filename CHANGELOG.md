@@ -71,6 +71,7 @@ release.
 - Fixed <i>findfeatures</i> instantiation and use of projection classes to correctly return geometry data from projected images and mosaics. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Fixed `cubeit` attribute error to allow attribute specification on the output cube filename [#5234](https://github.com/DOI-USGS/ISIS3/issues/5234)
 - Fixed `campt` to handle input band selection attribute correctly [#5234](https://github.com/DOI-USGS/ISIS3/issues/5235)
+- Fixed target name translation for any dawn images with target "4 CERES" [#5294](https://github.com/DOI-USGS/ISIS3/pull/5294)
 
 ## [8.0.0] - 2023-04-19
 
