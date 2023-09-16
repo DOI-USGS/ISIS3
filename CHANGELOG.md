@@ -71,6 +71,7 @@ release.
 - Fixed <i>findfeatures</i> instantiation and use of projection classes to correctly return geometry data from projected images and mosaics. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Fixed `cubeit` attribute error to allow attribute specification on the output cube filename [#5234](https://github.com/DOI-USGS/ISIS3/issues/5234)
 - Fixed `campt` to handle input band selection attribute correctly [#5234](https://github.com/DOI-USGS/ISIS3/issues/5235)
+- Fixed exception pop ups in qview when viewing images created using the CSM Camera [#5259](https://github.com/DOI-USGS/ISIS3/pull/5295/files)
 
 ## [8.0.0] - 2023-04-19
 
