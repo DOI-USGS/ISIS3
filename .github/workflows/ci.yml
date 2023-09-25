@@ -41,7 +41,7 @@ jobs:
       - name: Build ISIS
         run: |
           mkdir -p build
-          cp ${GITHUB_WORKSPACE}/isis/IsisPreferences ${GITHUB_WORKSPACES}/build/
+          cp ${GITHUB_WORKSPACE}/isis/IsisPreferences ${GITHUB_WORKSPACE}/build/
           cd build
           cmake -DisisData=${GITHUB_WORKSPACE}/isis_data -DisisTestData=${GITHUB_WORKSPACE}/isis_testData -DJP2KFLAG=OFF -DCMAKE_BUILD_TYPE=RELEASE -Wdeprecated -GNinja ../isis
           ninja
