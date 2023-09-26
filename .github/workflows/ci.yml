@@ -22,6 +22,7 @@ jobs:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
         with:
           submodules: true
+          ref: dev
       - uses: conda-incubator/setup-miniconda@3b0f2504dd76ef23b6d31f291f4913fb60ab5ff3
         with:
           miniconda-version: "latest"
@@ -47,7 +48,7 @@ jobs:
           export ISISROOT=${GITHUB_WORKSPACE}/build/
           export PATH=$PATH:${GITHUB_WORKSPACE}/build/bin/
           cd build
-          cmake -DisisData=${GITHUB_WORKSPACE}/isis_data -DisisTestData=${GITHUB_WORKSPACE}/isis_testData -DJP2KFLAG=OFF -DCMAKE_BUILD_TYPE=RELEASE -Wdeprecated -GNinja ../isis
+          cmake -DisisData=${GITHUB_WORKSPACE}/isis_data -DisisTestData=${GITHUB_WORKSPACE}/isis_testData -DSWIG_DIR=$CONDA_PREFIX/bin/swig -DJP2KFLAG=OFF -DCMAKE_BUILD_TYPE=RELEASE -Wdeprecated -GNinja ../isis
           ninja
       - name: Run ISIS tests
         run: |
