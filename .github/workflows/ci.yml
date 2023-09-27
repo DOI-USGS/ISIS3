@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir isis_data
           mkdir isis_testData
-          rclone selfupdate
+          rclone -VV selfupdate
           rclone mount asc_s3://asc-isisdata/usgs_data isis_data --config=${GITHUB_WORKSPACE}/isis/config/rclone.conf 
           rclone mount asc_s3://asc-isisdata/isis_testData isis_testData --config=${GITHUB_WORKSPACE}/isis/config/rclone.conf
       - name: Build ISIS
