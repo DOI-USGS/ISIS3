@@ -40,7 +40,23 @@ jobs:
           which rclone
           rclone mount asc_s3://asc-isisdata/usgs_data isis_data --config=${GITHUB_WORKSPACE}/isis/config/rclone.conf --daemon
           rclone mount asc_s3://asc-isisdata/isis_testData isis_testData --config=${GITHUB_WORKSPACE}/isis/config/rclone.conf --daemon
-      - name: LS
+      - name: Build ISIS
         run: |
-          ls ${GITHUB_WORKSPACE}/isis_data 
+          mkdir -p build
+          cp ${GITHUB_WORKSPACE}/isis/IsisPreferences ${GITHUB_WORKSPACE}/build/
+          export ISISDATA=${GITHUB_WORKSPACE}/isis_data
+          export ISISTESTDATA=${GITHUB_WORKSPACE}/isis_testData
+          export ISISROOT=${GITHUB_WORKSPACE}/build/
+          export PATH=$PATH:${GITHUB_WORKSPACE}/build/bin/
+          cd build
+          cmake -DisisData=${GITHUB_WORKSPACE}/isis_data -DisisTestData=${GITHUB_WORKSPACE}/isis_testData -DSWIG_DIR=$CONDA_PREFIX/bin/swig -DJP2KFLAG=OFF -DCMAKE_BUILD_TYPE=RELEASE -Wdeprecated -GNinja ../isis
+          ninja
+      - name: Run ISIS tests
+        run: |
+          cd build
+          export ISISDATA=${GITHUB_WORKSPACE}/isis_data
+          export ISISTESTDATA=${GITHUB_WORKSPACE}/isis_testData
+          export ISISROOT=${GITHUB_WORKSPACE}/build/
+          export PATH=$PATH:${GITHUB_WORKSPACE}/build/bin/
+          ctest -VV
 
