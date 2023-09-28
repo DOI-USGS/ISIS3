@@ -74,19 +74,12 @@ namespace Isis {
    *
    * @param ui UserInterface object containing parameters
    * @return Pvl results log file
-   *
-   * @throws IException::User "The list file [FILENAME] does not contain any filenames"
    */
   Pvl mosrange(UserInterface &ui) {
 
     // Get the list of names of input cubes to stitch together
     FileList cubeFileList;
     cubeFileList.read(ui.GetFileName("FROMLIST"));
-    if ( cubeFileList.size() < 1)  {
-      QString msg = "The list file[" + ui.GetFileName("FROMLIST") +
-                    " does not contain any filenames";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
 
     return mosrange(cubeFileList, ui);
   }
@@ -98,10 +91,17 @@ namespace Isis {
    * @param FileList List of cube filenames
    * @return Pvl results log file
    *
+   * @throws IException::User "The list file [FILENAME] does not contain any filenames"
    * @throws IException::User "--> Fatal Errors Encountered <___ [FILENAMES]"
    * @throws IException::User "Unable to open/create error list file [FILENAME]"
    */
   Pvl mosrange(FileList &cubeFileList, UserInterface &ui) {
+    if ( cubeFileList.size() < 1)  {
+      QString msg = "The list file[" + ui.GetFileName("FROMLIST") +
+                    " does not contain any filenames";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     Pvl log;
     Process p;
 
