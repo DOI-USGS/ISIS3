@@ -33,6 +33,7 @@ jobs:
       - name: Check build environment
         run: |
           conda list
+          conda env export
       - name: Download ISIS data
         run: |
           mkdir isis_data
