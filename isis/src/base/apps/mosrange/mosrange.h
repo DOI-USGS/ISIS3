@@ -8,10 +8,12 @@ find files of those names at the top level of this repository. **/
 #ifndef mosrange_h
 #define mosrange_h
 
+#include "FileList.h"
 #include "UserInterface.h"
 
 namespace Isis{
-  extern void mosrange(UserInterface &ui, Pvl *log=nullptr);
+  extern Pvl mosrange(UserInterface &ui);
+  extern Pvl mosrange(FileList &cubeList, UserInterface &ui);
 }
 
 #endif

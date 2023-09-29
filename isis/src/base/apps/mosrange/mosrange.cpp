@@ -9,10 +9,12 @@ find files of those names at the top level of this repository. **/
 
 #include <cmath>
 
+#include <QPair>
+#include <QList>
+
 #include "Camera.h"
 #include "Cube.h"
 #include "Distance.h"
-#include "FileList.h"
 #include "Process.h"
 #include "Pvl.h"
 #include "Statistics.h"
@@ -67,17 +69,41 @@ namespace Isis {
     return (localRadius / pixres * pi_c() / 180.0);
   }
 
-  void mosrange(UserInterface &ui, Pvl *log) {
-    Process p;
+  /**
+   * Compute lat/lon range of a set of camera images for mosaicking
+   *
+   * @param ui UserInterface object containing parameters
+   * @return Pvl results log file
+   */
+  Pvl mosrange(UserInterface &ui) {
 
-    // Get the list of names of input CCD cubes to stitch together
-    FileList flist;
-    flist.read(ui.GetFileName("FROMLIST"));
-    if(flist.size() < 1) {
+    // Get the list of names of input cubes to stitch together
+    FileList cubeFileList;
+    cubeFileList.read(ui.GetFileName("FROMLIST"));
+
+    return mosrange(cubeFileList, ui);
+  }
+
+
+  /**
+   * Compute lat/lon range of a set of camera images for mosaicking
+   *
+   * @param FileList List of cube filenames
+   * @return Pvl results log file
+   *
+   * @throws IException::User "The list file [FILENAME] does not contain any filenames"
+   * @throws IException::User "--> Fatal Errors Encountered <___ [FILENAMES]"
+   * @throws IException::User "Unable to open/create error list file [FILENAME]"
+   */
+  Pvl mosrange(FileList &cubeFileList, UserInterface &ui) {
+    if ( cubeFileList.size() < 1)  {
       QString msg = "The list file[" + ui.GetFileName("FROMLIST") +
                     " does not contain any filenames";
       throw IException(IException::User, msg, _FILEINFO_);
     }
+
+    Pvl log;
+    Process p;
 
     QString projection("Equirectangular");
     if(ui.WasEntered("MAP")) {
@@ -100,149 +126,156 @@ namespace Isis {
     londir = (londir == "POSITIVEEAST") ? "PositiveEast" : "PositiveWest";
 
     Progress prog;
-    prog.SetMaximumSteps(flist.size());
+    prog.SetMaximumSteps(cubeFileList.size());
     prog.CheckStatus();
 
     Statistics scaleStat;
-
-    
     Statistics obliqueScaleStat;
-
     Statistics longitudeStat;
     Statistics latitudeStat;
     Statistics equiRadStat;
     Statistics poleRadStat;
     PvlObject fileset("FileSet");
+    PvlObject errorset("ErrorSet");
 
-    // Save major equitorial and polar radii for last occuring
+    // Save major equitorial and polar radii for last occurring
     double eqRad;
     double poleRad;
 
     QString target("Unknown");
-    for(int i = 0 ; i < flist.size() ; i++) {
-      try {
-        // Set the input image, get the camera model, and a basic mapping
-        // group
-        Cube cube;
-        cube.open(flist[i].toString());
-
-        int lines = cube.lineCount();
-        int samples = cube.sampleCount();
-
+    QList<QPair<QString, QString> > badfiles;
+    for(int i = 0 ; i < cubeFileList.size() ; i++) {
 
         PvlObject fmap("File");
-        fmap += PvlKeyword("Name", flist[i].toString());
-        fmap += PvlKeyword("Lines", toString(lines));
-        fmap += PvlKeyword("Samples", toString(samples));
+        fmap += PvlKeyword("Name", cubeFileList[i].toString());
 
-        Camera *cam = cube.camera();
-        Pvl mapping;
-        cam->BasicMapping(mapping);
-        PvlGroup &mapgrp = mapping.findGroup("Mapping");
-        mapgrp.addKeyword(PvlKeyword("ProjectionName", projection), Pvl::Replace);
-        mapgrp.addKeyword(PvlKeyword("LatitudeType", lattype), Pvl::Replace);
-        mapgrp.addKeyword(PvlKeyword("LongitudeDirection", londir), Pvl::Replace);
-        mapgrp.addKeyword(PvlKeyword("LongitudeDomain", londom), Pvl::Replace);
+        try {
+          // Set input image, get camera model, and a basic mapping group
+          Cube cube;
+          cube.open(cubeFileList[i].toString());
 
-        // Get the radii
-        Distance radii[3];
-        cam->radii(radii);
+          int lines = cube.lineCount();
+          int samples = cube.sampleCount();
 
-        eqRad   = radii[0].meters();
-        poleRad = radii[2].meters();
+          PvlObject fmap("File");
+          fmap += PvlKeyword("Name", cubeFileList[i].toString());
+          fmap += PvlKeyword("Lines", toString(lines));
+          fmap += PvlKeyword("Samples", toString(samples));
 
-        target = cam->target()->name();
-        equiRadStat.AddData(&eqRad, 1);
-        poleRadStat.AddData(&poleRad, 1);
+          Camera *cam = cube.camera();
+          Pvl mapping;
+          cam->BasicMapping(mapping);
+          PvlGroup &mapgrp = mapping.findGroup("Mapping");
+          mapgrp.addKeyword(PvlKeyword("ProjectionName", projection), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("LatitudeType", lattype), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("LongitudeDirection", londir), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("LongitudeDomain", londom), Pvl::Replace);
 
-        // Get resolution
-        double lowres = cam->LowestImageResolution();
-        double hires = cam->HighestImageResolution();
+          // Get the radii
+          Distance radii[3];
+          cam->radii(radii);
 
-        
-        double lowObliqueRes = cam->LowestObliqueImageResolution();
+          eqRad   = radii[0].meters();
+          poleRad = radii[2].meters();
 
+          target = cam->target()->name();
+          equiRadStat.AddData(&eqRad, 1);
+          poleRadStat.AddData(&poleRad, 1);
 
-        
-        double hiObliqueRes= cam->HighestObliqueImageResolution();
+          // Get resolution
+          double lowres = cam->LowestImageResolution();
+          double hires = cam->HighestImageResolution();
 
+          double lowObliqueRes = cam->LowestObliqueImageResolution();
+          double hiObliqueRes= cam->HighestObliqueImageResolution();
 
-        scaleStat.AddData(&hires, 1);
-        scaleStat.AddData(&lowres, 1);
+          scaleStat.AddData(&hires, 1);
+          scaleStat.AddData(&lowres, 1);
 
-        
-        obliqueScaleStat.AddData(&hiObliqueRes,1);
-        obliqueScaleStat.AddData(&lowObliqueRes,1);
+          obliqueScaleStat.AddData(&hiObliqueRes,1);
+          obliqueScaleStat.AddData(&lowObliqueRes,1);
 
+          double pixres = (lowres + hires) / 2.0;
+          double scale = Scale(pixres, poleRad, eqRad);
 
-        double pixres = (lowres + hires) / 2.0;
+          mapgrp.addKeyword(PvlKeyword("PixelResolution", toString(pixres)), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("Scale", toString(scale), "pixels/degree"), Pvl::Replace);
+          mapgrp += PvlKeyword("MinPixelResolution", toString(lowres), "meters/pixel");
+          mapgrp += PvlKeyword("MaxPixelResolution", toString(hires), "meters/pixel");
+          mapgrp += PvlKeyword("MinObliquePixelResolution", toString(lowObliqueRes), "meters/pixel");
+          mapgrp += PvlKeyword("MaxObliquePixelResolution", toString(hiObliqueRes), "meters/pixel");
 
-        
-        //double obliquePixRes = (lowObliqueRes+hiObliqueRes)/2.0;
+          // Get the universal ground range
+          double minlat, maxlat, minlon, maxlon;
+          cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
+          mapgrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
 
-        double scale = Scale(pixres, poleRad, eqRad);
+          fmap.addGroup(mapgrp);
+          fileset.addObject(fmap);
 
-        
-        //double obliqueScale = Scale(obliquePixRes,poleRad,eqRad);
+          longitudeStat.AddData(&minlon, 1);
+          longitudeStat.AddData(&maxlon, 1);
+          latitudeStat.AddData(&minlat, 1);
+          latitudeStat.AddData(&maxlat, 1);
+        }
+        catch(IException &ie) {
+          QString mess = cubeFileList[i].toString() + " - " + ie.what();
+          fmap += PvlKeyword("Error", mess);
+          errorset.addObject(fmap);
 
+          badfiles.append(qMakePair(cubeFileList[i].toString(), ie.what()));
+        }
 
-        mapgrp.addKeyword(PvlKeyword("PixelResolution", toString(pixres)), Pvl::Replace);
-
-        
-        //mapgrp.addKeyword(PvlKeyword("ObliquePixelResolution", toString(obliquePixRes)),
-        //                  Pvl::Replace);
-
-        mapgrp.addKeyword(PvlKeyword("Scale", toString(scale), "pixels/degree"), Pvl::Replace);
-
-        
-        //mapgrp.addKeyword(PvlKeyword("ObliqueScale", toString(obliqueScale), "pixels/degree"),
-        //                  Pvl::Replace);
-        mapgrp += PvlKeyword("MinPixelResolution", toString(lowres), "meters/pixel");
-        mapgrp += PvlKeyword("MaxPixelResolution", toString(hires), "meters/pixel");
-
-        
-        mapgrp += PvlKeyword("MinObliquePixelResolution", toString(lowObliqueRes), "meters/pixel");
-        mapgrp += PvlKeyword("MaxObliquePixelResolution", toString(hiObliqueRes), "meters/pixel");
-
-        // Get the universal ground range
-        double minlat, maxlat, minlon, maxlon;
-        cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
-        mapgrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
-        mapgrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
-        mapgrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
-        mapgrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
-
-        fmap.addGroup(mapgrp);
-        fileset.addObject(fmap);
-
-        longitudeStat.AddData(&minlon, 1);
-        longitudeStat.AddData(&maxlon, 1);
-        latitudeStat.AddData(&minlat, 1);
-        latitudeStat.AddData(&maxlat, 1);
-      }
-      catch(IException &ie) {
-        QString mess = "Problems with file " + flist[i].toString() + "\n" +
-                       ie.what();
-        throw IException(IException::User, mess, _FILEINFO_);
-      }
-
-      p.ClearInputCubes();
-      prog.CheckStatus();
+        p.ClearInputCubes();
+        prog.CheckStatus();
     }
 
-  //  Construct the output mapping group with statistics
+    // Now check for error behavior if a problem was encountered
+    if ( badfiles.size() > 0 ) {
+
+        if (  ui.WasEntered("ERRORLOG") ) {
+          Pvl temp;
+          temp.addObject(errorset);
+          temp.write(ui.GetFileName("ERRORLOG", "log"));
+        }
+
+        if ( ui.WasEntered("ERRORLIST") ) {
+          FileName filename( ui.GetFileName("ERRORLIST") );
+          QFile logfile(filename.expanded());
+          if ( !logfile.open(QIODevice::WriteOnly | QIODevice::Truncate |
+                             QIODevice::Text | QIODevice::Unbuffered) ) {
+            QString mess = "Unable to open/create error list file " + filename.name();
+            throw IException(IException::User, mess, _FILEINFO_);
+          }
+
+          QTextStream lout(&logfile);
+          for ( int f = 0  ; f < badfiles.size() ; f++) {
+             lout << badfiles[f].first << "\n";
+          }
+        }
+
+        // Now check onerror status
+        if ( ("FAIL" == ui.GetString("ONERROR").toUpper()) ||
+             (badfiles.size() == cubeFileList.size()) ) {
+          QString errors("--> Fatal Errors Encountered <___\n");
+          for (int i = 0 ; i < badfiles.size() ; i++) {
+              errors += badfiles[i].first + " - " + badfiles[i].second + "\n";
+          }
+          throw IException(IException::User, errors, _FILEINFO_);
+        }
+    }
+
+    // Construct the output mapping group with statistics
     PvlGroup mapping("Mapping");
     double avgPixRes( (scaleStat.Minimum() + scaleStat.Maximum() ) / 2.0);
-
-    
-    //double avgObliquePixRes( (obliqueScaleStat.Minimum() + obliqueScaleStat.Maximum() ) / 2.0);
-
     double avgLat((latitudeStat.Minimum() + latitudeStat.Maximum()) / 2.0);
     double avgLon((longitudeStat.Minimum() + longitudeStat.Maximum()) / 2.0);
     double avgEqRad((equiRadStat.Minimum() + equiRadStat.Maximum()) / 2.0);
     double avgPoleRad((poleRadStat.Minimum() + poleRadStat.Maximum()) / 2.0);
     double scale  = Scale(avgPixRes, avgPoleRad, avgEqRad);
-    //double obliqueScale = Scale(avgObliquePixRes,avgPoleRad,avgEqRad);
 
     mapping += PvlKeyword("ProjectionName", projection);
     mapping += PvlKeyword("TargetName", target);
@@ -252,27 +285,13 @@ namespace Isis {
     mapping += PvlKeyword("LongitudeDirection", londir);
     mapping += PvlKeyword("LongitudeDomain", londom);
     mapping += PvlKeyword("PixelResolution", toString(SetRound(avgPixRes, digits)), "meters/pixel");
-
-    
-    //mapping += PvlKeyword("ObliquePixelResolution", toString(SetRound(avgObliquePixRes, digits)),
-    //                      "meters/pixel");
-
-
     mapping += PvlKeyword("Scale", toString(SetRound(scale, digits)), "pixels/degree");
-
-    
-    //mapping += PvlKeyword("ObliqueScale", toString(SetRound(obliqueScale, digits)), "pixels/degree");
-
-
     mapping += PvlKeyword("MinPixelResolution", toString(scaleStat.Minimum()), "meters/pixel");
     mapping += PvlKeyword("MaxPixelResolution", toString(scaleStat.Maximum()), "meters/pixel");
-
-    
     mapping += PvlKeyword("MinObliquePixelResolution", toString(obliqueScaleStat.Minimum()),
                           "meters/pixel");
     mapping += PvlKeyword("MaxObliquePixelResolution", toString(obliqueScaleStat.Maximum()),
                           "meters/pixel");
-
     mapping += PvlKeyword("CenterLongitude", toString(SetRound(avgLon, digits)));
     mapping += PvlKeyword("CenterLatitude",  toString(SetRound(avgLat, digits)));
     mapping += PvlKeyword("MinimumLatitude", toString(MAX(SetFloor(latitudeStat.Minimum(),
@@ -293,10 +312,8 @@ namespace Isis {
     mapping += PvlKeyword("PreciseMinimumLongitude", toString(longitudeStat.Minimum()));
     mapping += PvlKeyword("PreciseMaximumLongitude", toString(longitudeStat.Maximum()));
 
-    if (log){
-      log->addLogGroup(mapping);
-    }
-    
+    log.addGroup(mapping);
+
     // Write the output file if requested
     if(ui.WasEntered("TO")) {
       Pvl temp;
@@ -311,6 +328,8 @@ namespace Isis {
     }
 
     p.EndProcess();
+
+    return log;
   }
 }
 
