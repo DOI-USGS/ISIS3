@@ -463,37 +463,70 @@ namespace Isis {
         }
 
         // Write out columns solar lon, slant distance, local solar time
-        double solarLon = cvp->camera()->solarLongitude().degrees();
-        p_tableWin->table()->item(row, getIndex("Solar Longitude"))->
-                             setText(QString::number(solarLon));
+        try {
+          double solarLon = cvp->camera()->solarLongitude().degrees();
+          p_tableWin->table()->item(row, getIndex("Solar Longitude"))->
+                               setText(QString::number(solarLon));
+        }
+        catch (IException &e) {
+          p_tableWin->table()->item(row, getIndex("Solar Longitude"))->
+                               setText("");
+        }
+
         double slantDistance = cvp->camera()->SlantDistance();
         p_tableWin->table()->item(row, getIndex("Slant Distance"))->
                              setText(QString::number(slantDistance));
-        double lst = cvp->camera()->LocalSolarTime();
-        p_tableWin->table()->item(row, getIndex("Local Solar Time"))->
-                             setText(QString::number(lst));
+        try {
+          double lst = cvp->camera()->LocalSolarTime();
+          p_tableWin->table()->item(row, getIndex("Local Solar Time"))->
+                               setText(QString::number(lst));
+        }
+        catch (IException &e) {
+          p_tableWin->table()->item(row, getIndex("Local Solar Time"))->
+                               setText("");
+        }
+
       } // end if set image succeeds
 
       // Always write out the x/y/z of the undistorted focal plane
-      CameraDistortionMap *distortedMap = cvp->camera()->DistortionMap();
-      double undistortedFocalPlaneX = distortedMap->UndistortedFocalPlaneX();
-      p_tableWin->table()->item(row, getIndex("Undistorted Focal X"))->
-                           setText(QString::number(undistortedFocalPlaneX));
-      double undistortedFocalPlaneY = distortedMap->UndistortedFocalPlaneY();
-      p_tableWin->table()->item(row, getIndex("Undistorted Focal Y"))->
-                           setText(QString::number(undistortedFocalPlaneY));
-      double undistortedFocalPlaneZ = distortedMap->UndistortedFocalPlaneZ();
-      p_tableWin->table()->item(row, getIndex("Undistorted Focal Z"))->
-                           setText(QString::number(undistortedFocalPlaneZ));
+      if (cvp->camera()->DistortionMap() != NULL) {
+        CameraDistortionMap *distortedMap = cvp->camera()->DistortionMap();
+        double undistortedFocalPlaneX = distortedMap->UndistortedFocalPlaneX();
+        p_tableWin->table()->item(row, getIndex("Undistorted Focal X"))->
+                             setText(QString::number(undistortedFocalPlaneX));
+        double undistortedFocalPlaneY = distortedMap->UndistortedFocalPlaneY();
+        p_tableWin->table()->item(row, getIndex("Undistorted Focal Y"))->
+                             setText(QString::number(undistortedFocalPlaneY));
+        double undistortedFocalPlaneZ = distortedMap->UndistortedFocalPlaneZ();
+        p_tableWin->table()->item(row, getIndex("Undistorted Focal Z"))->
+                             setText(QString::number(undistortedFocalPlaneZ));
+      }
+      else {
+        p_tableWin->table()->item(row, getIndex("Undistorted Focal X"))->
+                             setText("");
+        p_tableWin->table()->item(row, getIndex("Undistorted Focal Y"))->
+                             setText("");
+        p_tableWin->table()->item(row, getIndex("Undistorted Focal Z"))->
+                             setText("");
+      }
 
       // Always write out the x/y of the distorted focal plane
-      CameraFocalPlaneMap *focalPlaneMap = cvp->camera()->FocalPlaneMap();
-      double distortedFocalPlaneX = focalPlaneMap->FocalPlaneX();
-      p_tableWin->table()->item(row, getIndex("Focal Plane X"))->
-                           setText(QString::number(distortedFocalPlaneX));
-      double distortedFocalPlaneY = focalPlaneMap->FocalPlaneY();
-      p_tableWin->table()->item(row, getIndex("Focal Plane Y"))->
-                           setText(QString::number(distortedFocalPlaneY));
+      if (cvp->camera()->FocalPlaneMap() != NULL) {
+        CameraFocalPlaneMap *focalPlaneMap = cvp->camera()->FocalPlaneMap();
+        double distortedFocalPlaneX = focalPlaneMap->FocalPlaneX();
+        p_tableWin->table()->item(row, getIndex("Focal Plane X"))->
+                             setText(QString::number(distortedFocalPlaneX));
+        double distortedFocalPlaneY = focalPlaneMap->FocalPlaneY();
+        p_tableWin->table()->item(row, getIndex("Focal Plane Y"))->
+                             setText(QString::number(distortedFocalPlaneY));
+      }
+      else {
+        p_tableWin->table()->item(row, getIndex("Focal Plane X"))->
+                             setText("");
+        p_tableWin->table()->item(row, getIndex("Focal Plane Y"))->
+                             setText("");  
+      }
+
 
       // Always write out columns ra/dec, regardless of whether set image succeeds
       double ra = cvp->camera()->RightAscension();
