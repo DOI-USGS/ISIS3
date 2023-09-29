@@ -4,36 +4,48 @@
 xsi:noNamespaceSchemaLocation=
 "http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Compute the lat/lon range of a set camera images for mosaicking
+    Compute the lat/lon range of a set of camera images for mosaicking
   </brief>
 
   <description>
     <p>
-      This program computes and outputs the 
-      <def link="Latitude">latitude</def>/<def link="Longitude">longitude</def>
-      range of a set of images in camera space, as well as the <def link="Pixel Resolution">
-      pixel resolution</def> and the <def link="Oblique Pixel Resolution"> 
-      oblique pixel resolution.</def>.  It creates a <i>cam2map</i> ready map file with 
-      the extents of the latitude/longitude ranges of the image set.  
+      <i>mosrange</i> computes and outputs the <def link="Latitude">latitude</def>
+      and <def link="Longitude">longitude</def> ranges of a set of <def link="Level1">Level1</def>
+      images (i.e. non-projected), as well as the <def link="Pixel Resolution"> pixel
+      resolution</def> and the <def link="Oblique Pixel Resolution"> oblique pixel resolution</def>.
+      It creates a <a href="../cam2map/cam2map.html" target="_blank">cam2map</a> ready map file
+      with the extents of the latitude/longitude ranges of the image set.
     </p>
 
     <p>
       The user can select the type of <def link="Map Projection">map projection</def>
-      preferred by two different means. The PROJECTION parameter allows direct 
+      preferred by two different ways. The PROJECTION parameter allows direct 
       specification of an ISIS supported projection.  Or, the user can select a 
       map file from the ISIS map template system that contains the projection name.  
       If none of these options are used, then <b>Equirectangular</b> is the default.
     </p>
 
     <p>
-      mosrange provides better control over the values of the latitude/longitude 
+      <i>mosrange</i> provides better control over the values of the latitude/longitude 
       ranges by providing a PRECISION parameter.  This parameter specifies the 
-      maximum nuber of digits precision for many of the Mapping group parameters 
+      maximum number of digits of precision for many of the Mapping group parameters 
       used to project images.
     </p>
-
+    
     <p>
-      Its primary use is to provide a quick, simple and batchable means of 
+      ONERROR, ERRORLOG, and ERRORLIST parameters offer better error handling and
+      diagnostics when problems are encountered processing the input file list.
+      ONERROR dictates whether <i>mosrange</i> will abort or continue when an error
+      occurs. If ONERROR=FAIL (default behavior), <i>mosrange</i> aborts upon error
+      without generating a map file. If ONERROR=CONTINUE, <i>mosrange</i> produces
+      an output map file with data collected from all successfully processed images.
+      A detailed list of files that fail and their associated errors are written to
+      the ERRORLOG file if provided. A simple list of failed files is written to the
+      ERRORLIST file if provided.
+    </p>
+ 
+    <p>
+      The primary use of <i>mosrange</i> is to provide a quick, simple and batchable means of
       creating map files for projections.
     </p>
     
@@ -111,12 +123,20 @@ End
        Updated to use new Target class. References Mantis tickets #775 and #1114.
     </change>
     <change name="Tyler Wilson" date="2016-08-25">
-       Updated to use upated Camera/CameraPointInfo classes which include improved approximations
+       Updated to use updated Camera/CameraPointInfo classes which include improved approximations
        to Pixel/Detector/Line/Sample resolutions, as well as providing the ability for developers
-       to order the fields in CSV/Pvl output.  References #476"
+       to order the fields in CSV/Pvl output.  References #476.
     </change>
-</history>
-
+    <change name="Kris Becker" date="2019-03-11">
+        Added ERRORLOG, ERRORLIST and ONERROR flags to provide better control
+        error behavior and provide diagnostics when problems are encountered
+        processing input file list.
+    </change>
+    <change name="Ken Edmundson" date="2023-09-07">
+        Moved Kris Becker's 2019-03-11 changes from UofA code base to USGS. Updated documentation.
+        Cleaned up unnecessary blank lines and commented code in mosrange.cpp. References #3606.
+    </change>
+ </history>
   <groups>
     <group name="Files">
       <parameter name="FROMLIST">
@@ -364,6 +384,84 @@ End
                        <TD>0.0 (Bad!)</TD>
                     </TR>
                 </TABLE>
+        </description>
+      </parameter>
+    </group>
+    
+    <group name="Errorhandling">
+      <parameter name="ONERROR">
+        <type>string</type>
+        <brief>
+          Define behavior when a file error occurs
+        </brief>
+        <description>
+          This flag is provided to specify what action is to be
+          taken should an error occur processing the input file
+          list. A detailed list of errors for each file will be
+          recorded to ERRORLOG if a file name is provided. A list
+          containing the file names that failed will be written
+          to ERRORLIST if provided. If ONERROR=FAIL, a single
+          error will result in an abort. FAIL is the default
+          (to preserve existing behavior).
+        </description>
+        <default>
+          <item>FAIL</item>
+        </default>
+        <list>
+          <option value="CONTINUE">
+            <brief>
+              Continue processing all the input file list if an error occurs
+            </brief>
+            <description>
+              Continue to produce an output map file with data collected from
+              any number of successfully processed images when one or more
+              errors are encountered with the input processing list. This option
+              will cause the application to continue processing all files and
+              generate a mapping file if at least one is successful.
+            </description>
+          </option>
+          <option value="FAIL">
+            <brief>
+              Terminate the application when an error occurs
+            </brief>
+            <description>
+              If any file produces an error when determining mapping statistics,
+              ONERROR=FAIL will cause the application to abort with an error
+              without generating a map file. The filename and detailed error are
+              written to ERRORLOG if provided. The filename alone is written to
+              ERRORLIST if provided.
+            </description>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="ERRORLOG">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Writes detailed information for each failed file to a PVL file
+        </brief>
+        <description>
+            Each file that encounters an error will produce the issue
+            that cased the error. The ERRORLOG file can be specified to
+            get a detailed account of why each file failed to successfully
+            complete. Data collected from this process will be written
+            to the specified ERRORLOG in the form of a PVL object.
+        </description>
+      </parameter>
+
+      <parameter name="ERRORLIST">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Record filename of each cube that failed to this file
+        </brief>
+        <description>
+            The filename of each cube that encountered an error will be
+            written to this file if provided. The ERRORLIST file can be
+            used to difference against the input list to determine all
+            the successful files included in the mapping statistics.
         </description>
       </parameter>
     </group>
