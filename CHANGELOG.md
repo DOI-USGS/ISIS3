@@ -43,11 +43,8 @@ release.
 - Fixed gaussstretch segmentation fault error and refactored gaussstretch files/tests to use gtest [#5240](https://github.com/DOI-USGS/ISIS3/issues/5240)
 - Fixed `cubeit` attribute error to allow attribute specification on the output cube filename [#5234](https://github.com/DOI-USGS/ISIS3/issues/5234)
 - Fixed `campt` to handle input band selection attribute correctly [#5234](https://github.com/DOI-USGS/ISIS3/issues/5235)
-<<<<<<< HEAD
-- Fixed problem networks segfaulting in jigsaw by updating cholmod 32 bit calls to 64 bit calls [#5173](https://github.com/DOI-USGS/ISIS3/issues/5173) and [#5176](https://github.com/DOI-USGS/ISIS3/issues/5176)
-=======
 - Fixed target name translation for any dawn images with target "4 CERES" [#5294](https://github.com/DOI-USGS/ISIS3/pull/5294)
->>>>>>> 0761d7e2e (Dawn Target Translation Fix (#5294))
+- Fixed exception pop ups in qview when viewing images created using the CSM Camera [#5259](https://github.com/DOI-USGS/ISIS3/pull/5295/files)
 
 ## [8.0.0] - 2023-04-19
 
