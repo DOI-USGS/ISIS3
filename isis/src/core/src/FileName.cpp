@@ -810,7 +810,6 @@ namespace Isis {
     int varStartPos = -1;
     if(Preference::Preferences().hasGroup("DataDirectory")) {
       PvlGroup &testing = Preference::Preferences().findGroup("DataDirectory");
-      cout << testing << endl;
     }
     // Loop while there are any "$" at the current position or after
     // Some "$" might be skipped if no translation can be found
@@ -855,7 +854,6 @@ namespace Isis {
           }
         }
       }
-      cout << expandedStr << endl;
 
       if (variableValid) {
         // We could expand multiple times...
