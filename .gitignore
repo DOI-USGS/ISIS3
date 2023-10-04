@@ -58,6 +58,9 @@ install/
 !isis/tests/data/near/msi2isis/*.lbl
 !isis/tests/data/near/msicamera/*.cub
 
+# Unignore mosrange cube files in data area as input files require these
+!isis/tests/data/mosrange/*.cub
+
 # Ensure the contents of ISISDATA mockup tests are preserved
 !isis/tests/data/isisdata/mockup/**/*
 
