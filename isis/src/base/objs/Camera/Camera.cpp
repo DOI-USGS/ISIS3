@@ -951,7 +951,7 @@ namespace Isis {
         } // end if set ground (lat, 0)
 
         // Another special test for ground range as we could have the
-        // -180-180 seam running right through the image so
+        // 0-360 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
         if (SetGround(lat, Longitude(180.0, Angle::Degrees))) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&

@@ -153,7 +153,6 @@ namespace Isis {
     // Convert it to body-fixed
     const vector<double> &lookJ = instrumentRotation()->J2000Vector(lookC);
     const vector<double> &lookB = bodyRotation()->ReferenceVector(lookJ);
-    // cout << lookB[0] << ", " << lookB[1] << ", " << lookB[2] << endl;
 
     // This memcpy does:
     // m_lookB[0] = lookB[0];

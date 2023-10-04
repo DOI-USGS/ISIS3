@@ -659,8 +659,8 @@ TEST_F(CSMCameraFixture, RightAscension) {
   }
   catch(Isis::IException &e)
   {
-    EXPECT_TRUE(e.toString().toLatin1().contains("Image doesn't have attached body rotations,"
-                " try running csminit again with an ISD")) << e.toString().toStdString();
+    EXPECT_TRUE(e.toString().toLatin1().contains("Image doesn't have attached body rotations, try running csminit"
+                " again with an ISD that contains body rotations")) << e.toString().toStdString();
   }
   catch(...)
   {
@@ -677,8 +677,8 @@ TEST_F(CSMCameraFixture, Declination) {
   }
   catch(Isis::IException &e)
   {
-    EXPECT_TRUE(e.toString().toLatin1().contains("Image doesn't have attached body rotations,"
-                " try running csminit again with an ISD")) << e.toString().toStdString();
+    EXPECT_TRUE(e.toString().toLatin1().contains("Image doesn't have attached body rotations, try running csminit"
+                " again with an ISD that contains body rotations")) << e.toString().toStdString();
   }
   catch(...)
   {

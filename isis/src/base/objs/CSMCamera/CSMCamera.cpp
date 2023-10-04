@@ -1249,13 +1249,18 @@ void sanitize(std::string &input);
    */
   double CSMCamera::RightAscension() {
     if (bodyRotation() == NULL || m_model == NULL) {
-      QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
+      QString msg = "Image doesn't have attached body rotations, try running csminit " + 
+                    "again with an ISD that contains body rotations";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     double precision;
     csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(p_childLine, p_childSample), 0.00001, &precision);
     csm::EcefVector v = locus.direction;
+    // Leaving this line as we may revisit in the future
+    // Since the ALE isd is being placed at the center of the body we don't have
+    // to rotate the vector into J2000. If that changes we may need to
+    // Apply the rotation
     // std::vector<double> jvec = m_bodyRotation->J2000Vector({v.x, v.y, v.z});
     SensorUtilities::GroundPt3D sphere_v = SensorUtilities::rectToSpherical({v.x, v.y, v.z});
     double lon = sphere_v.lon;
