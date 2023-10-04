@@ -43,6 +43,7 @@ jobs:
           rclone mount asc_s3://asc-isisdata/isis_testData isis_testData --config=${GITHUB_WORKSPACE}/isis/config/rclone.conf --daemon
       - name: Build ISIS
         run: |
+          sudo apt autoremove python3 -y
           mkdir -p build
           cp ${GITHUB_WORKSPACE}/isis/IsisPreferences ${GITHUB_WORKSPACE}/build/
           export ISISDATA=${GITHUB_WORKSPACE}/isis_data
