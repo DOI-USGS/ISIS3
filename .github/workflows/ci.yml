@@ -50,7 +50,7 @@ jobs:
           export ISISROOT=${GITHUB_WORKSPACE}/build/
           export PATH=$PATH:${GITHUB_WORKSPACE}/build/bin/
           cd build
-          cmake -DisisData=${GITHUB_WORKSPACE}/isis_data -DisisTestData=${GITHUB_WORKSPACE}/isis_testData -DSWIG_DIR=$CONDA_PREFIX/bin/swig -DJP2KFLAG=OFF -DCMAKE_BUILD_TYPE=RELEASE -Wdeprecated -GNinja ../isis
+          cmake -DisisData=${GITHUB_WORKSPACE}/isis_data -DisisTestData=${GITHUB_WORKSPACE}/isis_testData -DJP2KFLAG=OFF -DCMAKE_BUILD_TYPE=RELEASE -Wdeprecated -GNinja ../isis
           ninja
       - name: Run ISIS tests
         run: |
