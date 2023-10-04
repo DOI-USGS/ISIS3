@@ -9,7 +9,7 @@ list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
 message(STATUS "SWIG flags: " ${CMAKE_SWIG_FLAGS} )
 
 # Setup for Python linking
-list(APPEND CMAKE_PREFIX_PATH $ENV{CONDA_PREFIX})
+list(TRANSFORM CMAKE_PREFIX_PATH PREPEND $ENV{CONDA_PREFIX})
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
 # Setup for wrapper library
