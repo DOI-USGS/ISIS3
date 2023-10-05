@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-       os: [ubuntu-latest, macos-latest]
+       os: [ubuntu-latest-xlarge, macos-latest-xlarge]
     defaults:
       run:
         shell: bash -l {0}
@@ -60,5 +60,5 @@ jobs:
           export ISISTESTDATA=${GITHUB_WORKSPACE}/isis_testData
           export ISISROOT=${GITHUB_WORKSPACE}/build/
           export PATH=$PATH:${GITHUB_WORKSPACE}/build/bin/
-          ctest -VV
+          ctest -VV -j8
 
