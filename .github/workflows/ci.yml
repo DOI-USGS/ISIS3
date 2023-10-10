@@ -51,8 +51,9 @@ jobs:
           export ISISROOT=${GITHUB_WORKSPACE}/build/
           export PATH=$PATH:${GITHUB_WORKSPACE}/build/bin/
           cd build
+          ls ${GITHUB_WORKSPACE}/isis_data 
           cmake -DisisData=${GITHUB_WORKSPACE}/isis_data -DisisTestData=${GITHUB_WORKSPACE}/isis_testData -DJP2KFLAG=OFF -DCMAKE_BUILD_TYPE=RELEASE -Wdeprecated -GNinja ../isis
-          ninja
+          ninja -j8
       - name: Run ISIS tests
         run: |
           cd build
@@ -60,5 +61,5 @@ jobs:
           export ISISTESTDATA=${GITHUB_WORKSPACE}/isis_testData
           export ISISROOT=${GITHUB_WORKSPACE}/build/
           export PATH=$PATH:${GITHUB_WORKSPACE}/build/bin/
-          ctest -VV -j8
+          ctest -VV 
 
