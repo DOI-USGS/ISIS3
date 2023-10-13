@@ -462,9 +462,6 @@ namespace Isis {
     // TODO: we need to validate this pointer (somewhere)
     ShapeModel *shape = target()->shape();
 
-    //cout << "undistorted focal plane: " << ux << " " << uy << endl; //debug
-    //cout.precision(15);
-    //cout << "Backward Time: " << Time().Et() << endl;
     // Convert undistorted x/y to distorted x/y
     bool success = p_distortionMap->SetUndistortedFocalPlane(ux, uy);
     if (success) {
@@ -951,7 +948,7 @@ namespace Isis {
         } // end if set ground (lat, 0)
 
         // Another special test for ground range as we could have the
-        // 0-360 seam running right through the image so
+        // -180-180 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
         if (SetGround(lat, Longitude(180.0, Angle::Degrees))) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
@@ -1845,7 +1842,7 @@ namespace Isis {
         }
 
         // Another special test for ground range as we could have the
-        // -180-180 seam running right through the image so
+        // 0-360 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
         for (double dec = p_mindec; dec <= p_maxdec; dec += (p_maxdec - p_mindec) / 10.0) {
           if (SetRightAscensionDeclination(180.0, dec)) {
