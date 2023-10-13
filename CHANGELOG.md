@@ -35,6 +35,11 @@ release.
 
 ## [Unreleased]
 
+### Added
+
+- CSMCamera can now read and use the body rotation from ALE produced ISDs [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
+- CSMSkyMap added to CSMCamera for use with local rover projections in ISIS [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
+
 ## [8.1.0] - 2023-12-05
 
 ### Changed
