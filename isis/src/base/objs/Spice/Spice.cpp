@@ -197,7 +197,7 @@ namespace Isis {
         // At this time ALE does not compute pointing for the nadir option in spiceinit
         // If NADIR is turned on fail here so ISIS can create nadir pointing
         if (kernels["InstrumentPointing"][0].toUpper() == "NADIR") {
-          QString msg = "Falling back to ISIS generation of nadir pointing";
+          std::string msg = "Falling back to ISIS generation of nadir pointing";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -373,7 +373,7 @@ namespace Isis {
           frameCode = getInteger("BODY_FRAME_CODE", 0);
         }
         catch(IException &e) {
-          QString msg = "Unable to read BODY_FRAME_CODE from naifkeywords group";
+          std::string msg = "Unable to read BODY_FRAME_CODE from naifkeywords group";
           throw IException(IException::Io, msg, _FILEINFO_);
         }
       }
@@ -655,22 +655,22 @@ namespace Isis {
 
     // Check for errors
     if (cacheSize <= 0) {
-      QString msg = "Argument cacheSize must be greater than zero";
+      std::string msg = "Argument cacheSize must be greater than zero";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (startTime > endTime) {
-      QString msg = "Argument startTime must be less than or equal to endTime";
+      std::string msg = "Argument startTime must be less than or equal to endTime";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (*m_cacheSize > 0) {
-      QString msg = "A cache has already been created";
+      std::string msg = "A cache has already been created";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (cacheSize == 1 && (*m_startTimePadding != 0 || *m_endTimePadding != 0)) {
-      QString msg = "This instrument does not support time padding";
+      std::string msg = "This instrument does not support time padding";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -844,7 +844,7 @@ namespace Isis {
    */
   void Spice::instrumentBodyFixedPosition(double p[3]) const {
     if (m_et == NULL) {
-      QString msg = "Unable to retrieve instrument's body fixed position."
+      std::string msg = "Unable to retrieve instrument's body fixed position."
                     " Spice::SetTime must be called first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -862,7 +862,7 @@ namespace Isis {
    */
   void Spice::instrumentBodyFixedVelocity(double v[3]) const {
     if (m_et == NULL) {
-      QString msg = "Unable to retrieve instrument's body fixed velocity."
+      std::string msg = "Unable to retrieve instrument's body fixed velocity."
                     " Spice::SetTime must be called first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -893,7 +893,7 @@ namespace Isis {
     */
   iTime Spice::time() const {
     if (m_et == NULL) {
-      QString msg = "Unable to retrieve the time."
+      std::string msg = "Unable to retrieve the time."
                     " Spice::SetTime must be called first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -911,7 +911,7 @@ namespace Isis {
    */
   void Spice::sunPosition(double p[3]) const {
     if (m_et == NULL) {
-      QString msg = "Unable to retrieve sun's position."
+      std::string msg = "Unable to retrieve sun's position."
                     " Spice::SetTime must be called first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1294,7 +1294,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     if (m_et == NULL) {
-      QString msg = "Unable to retrieve subspacecraft position."
+      std::string msg = "Unable to retrieve subspacecraft position."
                     " Spice::SetTime must be called first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1345,7 +1345,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     if (m_et == NULL) {
-      QString msg = "Unable to retrieve subsolar point."
+      std::string msg = "Unable to retrieve subsolar point."
                     " Spice::SetTime must be called first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
