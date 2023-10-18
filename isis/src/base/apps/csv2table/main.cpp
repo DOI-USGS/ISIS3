@@ -76,7 +76,7 @@ void IsisMain() {
       // If the next column header is different, create a field for this one
       QRegularExpressionMatch nextMatch = (columnIndex<numColumns-1)?rex.match(header[columnIndex+1]):QRegularExpressionMatch();
       if ((columnIndex == numColumns-1) || (nextMatch.hasMatch() && (name != nextMatch.captured("name")))) {
-        TableField columnField(name, TableField::Double, (index.length()>0)?(index.toInt()+1):1);
+        TableField columnField(name.toStdString(), TableField::Double, (index.length()>0)?(index.toInt()+1):1);
         tableRow += columnField;
       }
     }
