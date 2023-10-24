@@ -270,6 +270,7 @@ format. A priori coordinate sigmas can now be edited in both formats. New filter
 - Added --no-kernels flag to downloadIsisData [#5264](https://github.com/DOI-USGS/ISIS3/issues/5264)
 - Added notice for depreciation to PvlObject::addLogGroup function which will be depreciated in favor of Application::appendAndLog(https://github.com/DOI-USGS/ISIS3/issues/5310)
 - Added new csm plugins path to IsisPreferences [#5397](https://github.com/DOI-USGS/ISIS3/pull/5397)
+- Adds PROJ into ISIS, and exposes the capability with a new class called IProj. [#5317](https://github.com/DOI-USGS/ISIS3/pull/5317)
 
 ### Deprecated
 
