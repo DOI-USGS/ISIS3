@@ -581,7 +581,7 @@ namespace Isis {
                                  setText(QString::number(TProjection::To180Domain(lon), 'f', 15));
             p_tableWin->table()->item(row, getIndex("360 Positive West Longitude"))->
                                  setText(QString::number(wlon, 'f', 15));
-            p_tableWin->table()->item(row, getIndex("180 Positive East Longitude"))->
+            p_tableWin->table()->item(row, getIndex("180 Positive West Longitude"))->
                                  setText(QString::number(TProjection::To180Domain(wlon), 'f', 15));
             p_tableWin->table()->item(row, getIndex("Local Radius"))->setText(QString::number(radius, 'f', 15));
           }
