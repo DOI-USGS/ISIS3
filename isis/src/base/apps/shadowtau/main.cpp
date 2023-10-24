@@ -250,17 +250,45 @@ void IsisMain() {
   // rejected if there aren't enough words or if any of them don't make
   // sense as the corresponding parameter.
   FileName sInFileName(sInFile);
-  TextFile infile(sInFileName.expanded());
-  QString infileString;
-  while (infile.GetLine(infileString)) {
-    QStringList tokens = infileString.split(QRegExp("[ ,]"));
+  // Try with the default ',' delimieter, if that only produces one row
+  // item, try with spaces
+  CSVReader inFile(sInFileName.expanded());
+  if (inFile.getRow(0).dim() <= 1) {
+    inFile = CSVReader(sInFileName.expanded(), false, 0, ' ');
+  }
 
-    QString imgId = tokens.takeFirst();
-    double inc    = toDouble(tokens.takeFirst());
-    double ema    = toDouble(tokens.takeFirst());
-    double phase  = toDouble(tokens.takeFirst());
-    double pflat  = toDouble(tokens.takeFirst());
-    double pshad  = toDouble(tokens.takeFirst());
+  if (inFile.getRow(0).dim() <= 1) {
+    QString msg = "File [" + sInFileName.expanded() + "] either has only one line item or is not delimited by a ',' or ' '.";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
+  QString infileString;
+  for (int i = 0; i < inFile.rows(); i++) {
+    CSVReader::CSVAxis row = inFile.getRow(i);
+
+    if (row.dim1() < 6) {
+      continue;
+    }
+
+    QString imgId = row[0];
+    std::vector<double> angles = {};
+    for (int j = 1; j < row.dim(); j++) {
+      try {
+        angles.push_back(toDouble(row[j]));
+      }
+      catch (IException &e) {
+        QString msg = "Unable to convert (" + toString(i) + ", " + toString(j) + 
+        ") element [" + row[j] + "] to double. You may want to check for excess delimiters." + 
+        "Current delimiter is set to '" + inFile.getDelimiter() + "'";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
+
+    double inc    = angles[0];
+    double ema    = angles[1];
+    double phase  = angles[2];
+    double pflat  = angles[3];
+    double pshad  = angles[4];
 
     // checking validity
     if (!imgId.length() || (inc < 0 || inc >= 89.9) || (ema < 0 || ema >= 89.9) ||
