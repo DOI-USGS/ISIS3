@@ -250,7 +250,7 @@ void IsisMain() {
   // rejected if there aren't enough words or if any of them don't make
   // sense as the corresponding parameter.
   FileName sInFileName(sInFile);
-  // Try with the default ',' delimieter, if that only produces one row
+  // Try with the default ',' delimiter, if that only produces one row
   // item, try with spaces
   CSVReader inFile(sInFileName.expanded());
   if (inFile.getRow(0).dim() <= 1) {
