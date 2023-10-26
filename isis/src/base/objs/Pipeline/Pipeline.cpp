@@ -881,7 +881,7 @@ namespace Isis {
    */
   QString Pipeline::TemporaryFolder() {
     Pvl &pref = Preference::Preferences();
-    return pref.findGroup("DataDirectory")["Temporary"];
+    return QString::fromStdString(pref.findGroup("DataDirectory")["Temporary"]);
   }
 
 
