@@ -342,7 +342,7 @@ namespace Isis {
       PvlObject &obj = m_label->object(i);
       if (obj.isNamed("Table") || obj.isNamed("Polygon") || obj.isNamed("OriginalLabel") ||
           obj.isNamed("History")) {
-        Isis::Blob t((QString)obj["Name"], obj.name());
+        Isis::Blob t(QString::fromStdString(obj["Name"]), obj.name());
         read(t);
         result->write(t);
       }
@@ -468,14 +468,14 @@ namespace Isis {
       // See if we have attached or detached labels
       if (m_attached) {
         // StartByte is 1-based (why!!) so we need to do + 1
-        core += PvlKeyword("StartByte", toString(m_labelBytes + 1));
+        core += PvlKeyword("StartByte", std::to_string(m_labelBytes + 1));
         m_labelFileName = new FileName(cubFile);
         m_dataFileName = new FileName(cubFile);
         m_labelFile = new QFile(m_labelFileName->expanded());
       }
       else {
-        core += PvlKeyword("StartByte", toString(1));
-        core += PvlKeyword("^Core", cubFile.name());
+        core += PvlKeyword("StartByte", std::to_string(1));
+        core += PvlKeyword("^Core", cubFile.name().toStdString());
         m_dataFileName = new FileName(cubFile);
         m_dataFile = new QFile(realDataFileName().expanded());
 
@@ -487,25 +487,25 @@ namespace Isis {
 
       // Create the size of the core
       PvlGroup dims("Dimensions");
-      dims += PvlKeyword("Samples", toString(m_samples));
-      dims += PvlKeyword("Lines",   toString(m_lines));
-      dims += PvlKeyword("Bands",   toString(m_bands));
+      dims += PvlKeyword("Samples", std::to_string(m_samples));
+      dims += PvlKeyword("Lines",   std::to_string(m_lines));
+      dims += PvlKeyword("Bands",   std::to_string(m_bands));
       core.addGroup(dims);
 
       // Create the pixel type
       PvlGroup ptype("Pixels");
-      ptype += PvlKeyword("Type", PixelTypeName(m_pixelType));
+      ptype += PvlKeyword("Type", PixelTypeName(m_pixelType).toStdString());
 
       // And the byte ordering
-      ptype += PvlKeyword("ByteOrder", ByteOrderName(m_byteOrder));
-      ptype += PvlKeyword("Base", toString(m_base));
-      ptype += PvlKeyword("Multiplier", toString(m_multiplier));
+      ptype += PvlKeyword("ByteOrder", ByteOrderName(m_byteOrder).toStdString());
+      ptype += PvlKeyword("Base", std::to_string(m_base));
+      ptype += PvlKeyword("Multiplier", std::to_string(m_multiplier));
       core.addGroup(ptype);
     }
     else {
       cubFile = cubFile.addExtension("ecub");
 
-      core += PvlKeyword("^DnFile", m_dataFileName->original());
+      core += PvlKeyword("^DnFile", m_dataFileName->original().toStdString());
 //       m_dataFileName = new FileName(cubFile);
       m_dataFile = new QFile(realDataFileName().expanded());
 
@@ -520,12 +520,12 @@ namespace Isis {
 
     // Setup storage reserved for the label
     PvlObject lbl("Label");
-    lbl += PvlKeyword("Bytes", toString(m_labelBytes));
+    lbl += PvlKeyword("Bytes", std::to_string(m_labelBytes));
     m_label->addObject(lbl);
 
     const PvlGroup &pref =
         Preference::Preferences().findGroup("CubeCustomization");
-    bool overwrite = pref["Overwrite"][0].toUpper() == "ALLOW";
+    bool overwrite = QString::fromStdString(pref["Overwrite"][0]).toUpper() == "ALLOW";
     if (!overwrite && m_labelFile->exists() && m_labelFile->size()) {
       QString msg = "Cube file [" + m_labelFileName->original() + "] exists, " +
                    "user preference does not allow overwrite";
@@ -645,7 +645,7 @@ namespace Isis {
       PvlObject &core = m_label->findObject("IsisCube").findObject("Core");
       // Detached labels
       if (core.hasKeyword("^Core")) {
-        FileName temp(core["^Core"][0]);
+        FileName temp(QString::fromStdString(core["^Core"][0]));
 
         if (!temp.originalPath().startsWith("/")) {
           m_dataFileName = new FileName(m_labelFileName->path() + "/" + temp.original());
@@ -661,7 +661,7 @@ namespace Isis {
       }
       // External cube files (ecub), ecub contains all labels and SPICE blobs, history
       else if (core.hasKeyword("^DnFile")) {
-        FileName dataFileName(core["^DnFile"][0]);
+        FileName dataFileName(QString::fromStdString(core["^DnFile"][0]));
 
         if (dataFileName.originalPath() == ".") {
           m_dataFileName = new FileName(m_labelFileName->path() + "/" + dataFileName.name());
@@ -747,7 +747,7 @@ namespace Isis {
 
     QPair<bool, Pvl *> dataLabel = qMakePair(false, m_label);
     if (!m_storesDnData) {
-      dataLabel = qMakePair(true, new Pvl(m_dataFileName->expanded()));
+      dataLabel = qMakePair(true, new Pvl(m_dataFileName->expanded().toStdString()));
     }
 
     // Now examine the format to see which type of handler to create
@@ -1018,7 +1018,7 @@ namespace Isis {
     else {
       FileName blobFileName = fileName();
       blobFileName = blobFileName.removeExtension();
-      blobFileName = blobFileName.addExtension(blob.Type());
+      blobFileName = blobFileName.addExtension(QString::fromStdString(blob.Type()));
       blobFileName = blobFileName.addExtension(blob.Name());
       QString blobFile(blobFileName.expanded());
       ios::openmode flags = ios::in | ios::binary | ios::out | ios::trunc;
@@ -1388,7 +1388,7 @@ namespace Isis {
     }
 
     m_label->findObject("IsisCube").findObject("Core").findKeyword("^DnFile")[0] =
-        dnDataFile.original();
+        dnDataFile.original().toStdString();
     reopen(m_labelFile->isWritable()? "rw" : "r");
   }
 
@@ -1499,7 +1499,7 @@ namespace Isis {
       bodyTable.Label()["Kernels"].addValue(pckKeyword[i]);
 
     bodyTable.Label() += PvlKeyword("SolarLongitude",
-        toString(spice.solarLongitude().degrees()));
+        std::to_string(spice.solarLongitude().degrees()));
     this->write(bodyTable);
 
     Table sunTable = spice.sunPosition()->Cache("SunPosition");
@@ -1556,7 +1556,7 @@ namespace Isis {
 
    PvlObject &core = m_label->findObject("IsisCube").findObject("Core");
 
-    return core["^DnFile"][0];
+    return QString::fromStdString(core["^DnFile"][0]);
   }
 
 
@@ -1782,7 +1782,7 @@ namespace Isis {
     if (m_virtualBandList) {
       if ((virtualBand < 1) ||
           (virtualBand > m_virtualBandList->size())) {
-        QString msg = "Out of array bounds [" + toString(virtualBand) + "]";
+        std::string msg = "Out of array bounds [" + std::to_string(virtualBand) + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       physicalBand = m_virtualBandList->at(virtualBand - 1);
@@ -1961,8 +1961,8 @@ namespace Isis {
   bool Cube::deleteBlob(QString BlobName, QString BlobType) {
     for(int i = 0; i < m_label->objects(); i++) {
       PvlObject obj = m_label->object(i);
-      if (obj.name().compare(BlobType) == 0) {
-        if (obj.findKeyword("Name")[0] == BlobName) {
+      if (QString::fromStdString(obj.name()).compare(BlobType) == 0) {
+        if (obj.findKeyword("Name")[0] == BlobName.toStdString()) {
           m_label->deleteObject(i);
           return true;
         }
@@ -1982,8 +1982,8 @@ namespace Isis {
    */
   void Cube::deleteGroup(const QString &group) {
     PvlObject &isiscube = label()->findObject("IsisCube");
-    if (!isiscube.hasGroup(group)) return;
-    isiscube.deleteGroup(group);
+    if (!isiscube.hasGroup(group.toStdString())) return;
+    isiscube.deleteGroup(group.toStdString());
   }
 
 
@@ -1996,7 +1996,7 @@ namespace Isis {
    */
   PvlGroup &Cube::group(const QString &group) const {
     PvlObject &isiscube = label()->findObject("IsisCube");
-    return isiscube.findGroup(group);
+    return isiscube.findGroup(group.toStdString());
   }
 
 
@@ -2009,7 +2009,7 @@ namespace Isis {
    */
   bool Cube::hasGroup(const QString &group) const {
     const PvlObject &isiscube = label()->findObject("IsisCube");
-    if (isiscube.hasGroup(group)) return true;
+    if (isiscube.hasGroup(group.toStdString())) return true;
     return false;
   }
 
@@ -2025,9 +2025,9 @@ namespace Isis {
   bool Cube::hasBlob(const QString &name, const QString &type) {
     for(int o = 0; o < label()->objects(); o++) {
       PvlObject &obj = label()->object(o);
-      if (obj.isNamed(type)) {
+      if (obj.isNamed(type.toStdString())) {
         if (obj.hasKeyword("Name")) {
-          QString temp = (QString) obj["Name"];
+          QString temp = QString::fromStdString(obj["Name"]);
           temp = temp.toUpper();
           QString temp2 = name;
           temp2 = temp2.toUpper();
@@ -2100,7 +2100,7 @@ namespace Isis {
     }
 
     // Change the number of bands in the labels of the cube
-    if (m_virtualBandList && core.hasGroup("Dimensions")) core.findGroup("Dimensions")["Bands"] = toString(m_virtualBandList->size());
+    if (m_virtualBandList && core.hasGroup("Dimensions")) core.findGroup("Dimensions")["Bands"] = std::to_string(m_virtualBandList->size());
   }
 
 
@@ -2228,20 +2228,20 @@ namespace Isis {
         guess = dir2.absolutePath() + "/" + guess.name();
       }
       do {
-        Pvl guessLabel(guess.expanded());
+        Pvl guessLabel(guess.expanded().toStdString());
 
         PvlObject &core = guessLabel.findObject("IsisCube").findObject("Core");
 
         if (core.hasKeyword("^DnFile")) {
           FileName currentGuess = guess;
-          guess = core["^DnFile"][0];
+          guess = QString::fromStdString(core["^DnFile"][0]);
 
           if (!guess.path().startsWith("/")) {
             guess = currentGuess.path() + "/" + guess.original();
           }
         }
         else if (core.hasKeyword("^Core")) {
-          result = core["^Core"][0];
+          result = QString::fromStdString(core["^Core"][0]);
         }
         else {
           result = guess;
@@ -2302,13 +2302,13 @@ namespace Isis {
 
       // Stored pixel information
       const PvlGroup &pixelsGroup = core.findGroup("Pixels");
-      m_byteOrder = ByteOrderEnumeration(pixelsGroup["ByteOrder"]);
+      m_byteOrder = ByteOrderEnumeration(QString::fromStdString(pixelsGroup["ByteOrder"]));
       m_base = pixelsGroup["Base"];
       m_multiplier = pixelsGroup["Multiplier"];
-      m_pixelType = PixelTypeEnumeration(pixelsGroup["Type"]);
+      m_pixelType = PixelTypeEnumeration(QString::fromStdString(pixelsGroup["Type"]));
 
       // Now examine the format to see which type of handler to create
-      if ((QString) core["Format"] == "BandSequential") {
+      if ((std::string)core["Format"] == "BandSequential") {
         m_format = Bsq;
       }
       else {
@@ -2316,12 +2316,12 @@ namespace Isis {
       }
     }
     else {
-      FileName temp(core["^DnFile"][0]);
+      FileName temp(QString::fromStdString(core["^DnFile"][0]));
       if (!temp.expanded().startsWith("/")) {
         temp = FileName(m_labelFileName->path() + "/" + temp.original());
       }
 
-      initCoreFromLabel(Pvl(temp.toString()));
+      initCoreFromLabel(Pvl(temp.toString().toStdString()));
     }
   }
 
@@ -2338,7 +2338,7 @@ namespace Isis {
 
     try {
       if (labelFileName.fileExists()) {
-        m_label = new Pvl(labelFileName.expanded());
+        m_label = new Pvl(labelFileName.expanded().toStdString());
         if (!m_label->objects()) {
           throw IException();
         }
@@ -2356,7 +2356,7 @@ namespace Isis {
         FileName tmp(labelFileName);
         tmp = tmp.addExtension("cub");
         if (tmp.fileExists()) {
-          m_label = new Pvl(tmp.expanded());
+          m_label = new Pvl(tmp.expanded().toStdString());
           if (!m_label->objects()) {
             throw IException();
           }
@@ -2376,7 +2376,7 @@ namespace Isis {
         FileName tmp(labelFileName);
         tmp = tmp.setExtension("lbl");
         if (tmp.fileExists()) {
-          m_label = new Pvl(tmp.expanded());
+          m_label = new Pvl(tmp.expanded().toStdString());
           if (!m_label->objects()) {
             throw IException();
           }
@@ -2396,7 +2396,7 @@ namespace Isis {
         FileName tmp(labelFileName);
         tmp = tmp.addExtension("ecub");
         if (tmp.fileExists()) {
-          m_label = new Pvl(tmp.expanded());
+          m_label = new Pvl(tmp.expanded().toStdString());
           if (!m_label->objects()) {
             throw IException();
           }
@@ -2462,12 +2462,12 @@ namespace Isis {
 
       if (core->hasKeyword("^DnFile")) {
 
-        FileName temp((*core)["^DnFile"][0]);
+        FileName temp(QString::fromStdString((*core)["^DnFile"][0]));
         if (!temp.expanded().startsWith("/")) {
           temp = realDataFileName();
         }
 
-        label = Pvl(temp.toString());
+        label = Pvl(temp.toString().toStdString());
         core = NULL;
       }
     }
@@ -2499,7 +2499,7 @@ namespace Isis {
     }
 
     m_tempCube = new FileName(tempCube);
-    *m_label = Pvl(m_tempCube->toString());
+    *m_label = Pvl(m_tempCube->toString().toStdString());
     m_labelFile = new QFile(m_tempCube->expanded());
   }
 
@@ -2607,7 +2607,7 @@ namespace Isis {
     }
 
     // Set the pvl's format template
-    m_label->setFormatTemplate(m_formatTemplateFile->original());
+    m_label->setFormatTemplate(m_formatTemplateFile->original().toStdString());
 
     // Write them with attached data
     if (m_attached) {
@@ -2637,7 +2637,7 @@ namespace Isis {
 
     // or detached label
     else {
-      m_label->write(m_labelFileName->expanded());
+      m_label->write(m_labelFileName->expanded().toStdString());
     }
   }
 }
