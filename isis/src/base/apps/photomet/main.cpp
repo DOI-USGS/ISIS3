@@ -60,7 +60,7 @@ void PrintPvl() {
   // Write file out to log
   QString inFile(ui.GetFileName("FROMPVL"));
   Pvl inPvl;
-  inPvl.read(ui.GetFileName("FROMPVL"));
+  inPvl.read(ui.GetFileName("FROMPVL").toStdString());
   QString OQString = "***** Output of [" + inFile + "] *****";
   Application::GuiLog(OQString);
   Application::GuiLog(inPvl);
@@ -72,7 +72,7 @@ void LoadPvl() {
   UserInterface &ui = Application::GetUserInterface();
   QString inFile(ui.GetFileName("FROMPVL"));
   Pvl inPvl;
-  inPvl.read(inFile);
+  inPvl.read(inFile.toStdString());
   QString phtName = ui.GetAsString("PHTNAME");
   phtName = phtName.toUpper();
   QString atmName = ui.GetAsString("ATMNAME");
@@ -92,9 +92,9 @@ void LoadPvl() {
       PvlObject::PvlGroupIterator phtGrp = phtObj.beginGroup();
       bool wasFound = false;
       if (phtGrp->hasKeyword("PHTNAME")) {
-        phtVal = (QString)phtGrp->findKeyword("PHTNAME");
+        phtVal = QString::fromStdString(phtGrp->findKeyword("PHTNAME"));
       } else if (phtGrp->hasKeyword("NAME")) {
-        phtVal = (QString)phtGrp->findKeyword("NAME");
+        phtVal = QString::fromStdString(phtGrp->findKeyword("NAME"));
       } else {
         QString message = "The input PVL does not contain a valid photometric model so you must specify one ";
         message += "- the [Phtname] keyword is missing in your [Algorithm] group";
@@ -108,9 +108,9 @@ void LoadPvl() {
         while (phtGrp != phtObj.endGroup()) {
           if (phtGrp->hasKeyword("PHTNAME") || phtGrp->hasKeyword("NAME")) {
             if (phtGrp->hasKeyword("PHTNAME")) {
-              phtVal = (QString)phtGrp->findKeyword("PHTNAME");
+              phtVal = QString::fromStdString(phtGrp->findKeyword("PHTNAME"));
             } else if (phtGrp->hasKeyword("NAME")) {
-              phtVal = (QString)phtGrp->findKeyword("NAME");
+              phtVal = QString::fromStdString(phtGrp->findKeyword("NAME"));
             } else {
               QString message = "The input PVL does not contain a valid photometric model so you must specify one ";
               message += "- the [Phtname] keyword is missing in your [Algorithm] group";
@@ -168,7 +168,7 @@ void LoadPvl() {
             ui.PutAsString("B0", os.str().c_str());
           }
           if (phtGrp->hasKeyword("ZEROB0STANDARD")) {
-            QString zerob0 = (QString)phtGrp->findKeyword("ZEROB0STANDARD");
+            QString zerob0 = QString::fromStdString(phtGrp->findKeyword("ZEROB0STANDARD"));
             QString izerob0 = zerob0;
             izerob0 = izerob0.toUpper();
             if (izerob0 == "TRUE") {
@@ -210,22 +210,22 @@ void LoadPvl() {
           }
         } else if (phtVal == "LUNARLAMBERTEMPIRICAL" || phtVal == "MINNAERTEMPIRICAL") {
           if (phtGrp->hasKeyword("PHASELIST")) {
-            QString phaselist = (QString)phtGrp->findKeyword("PHASELIST");
+            QString phaselist = QString::fromStdString(phtGrp->findKeyword("PHASELIST"));
             ui.PutAsString("PHASELIST", phaselist);
           }
           if (phtGrp->hasKeyword("PHASECURVELIST")) {
-            QString phasecurvelist = (QString)phtGrp->findKeyword("PHASECURVELIST");
+            QString phasecurvelist = QString::fromStdString(phtGrp->findKeyword("PHASECURVELIST"));
             ui.PutAsString("PHASECURVELIST", phasecurvelist);
           }
           if (phtVal == "LUNARLAMBERTEMPIRICAL") {
             if (phtGrp->hasKeyword("LLIST")) {
-              QString llist = (QString)phtGrp->findKeyword("LLIST");
+              QString llist = QString::fromStdString(phtGrp->findKeyword("LLIST"));
               ui.PutAsString("LLIST", llist);
             }
           }
           if (phtVal == "MINNAERTEMPIRICAL") {
             if (phtGrp->hasKeyword("KLIST")) {
-              QString klist = (QString)phtGrp->findKeyword("KLIST");
+              QString klist = QString::fromStdString(phtGrp->findKeyword("KLIST"));
               ui.PutAsString("KLIST", klist);
             }
           }
@@ -265,9 +265,9 @@ void LoadPvl() {
       PvlObject::PvlGroupIterator nrmGrp = nrmObj.beginGroup();
       bool wasFound = false;
       if (nrmGrp->hasKeyword("NORMNAME")) {
-        nrmVal = (QString)nrmGrp->findKeyword("NORMNAME");
+        nrmVal = QString::fromStdString(nrmGrp->findKeyword("NORMNAME"));
       } else if (nrmGrp->hasKeyword("NAME")) {
-        nrmVal = (QString)nrmGrp->findKeyword("NAME");
+        nrmVal = QString::fromStdString(nrmGrp->findKeyword("NAME"));
       } else {
         QString message = "The input PVL does not contain a valid normalization model so you must specify one ";
         message += "- the [Normname] keyword is missing in your [Algorithm] group";
@@ -281,9 +281,9 @@ void LoadPvl() {
         while (nrmGrp != nrmObj.endGroup()) {
           if (nrmGrp->hasKeyword("NORMNAME") || nrmGrp->hasKeyword("NAME")) {
             if (nrmGrp->hasKeyword("NORMNAME")) {
-              nrmVal = (QString)nrmGrp->findKeyword("NORMNAME");
+              nrmVal = QString::fromStdString(nrmGrp->findKeyword("NORMNAME"));
             } else if (nrmGrp->hasKeyword("NAME")) {
-              nrmVal = (QString)nrmGrp->findKeyword("NAME");
+              nrmVal = QString::fromStdString(nrmGrp->findKeyword("NAME"));
             } else {
               QString message = "The input PVL does not contain a valid normalization model so you must specify one ";
               message += "- the [Normname] keyword is missing in your [Algorithm] group";
@@ -499,9 +499,9 @@ void LoadPvl() {
       PvlObject::PvlGroupIterator atmGrp = atmObj.beginGroup();
       bool wasFound = false;
       if (atmGrp->hasKeyword("ATMNAME")) {
-        atmVal = (QString)atmGrp->findKeyword("ATMNAME");
+        atmVal = QString::fromStdString(atmGrp->findKeyword("ATMNAME"));
       } else if (atmGrp->hasKeyword("NAME")) {
-        atmVal = (QString)atmGrp->findKeyword("NAME");
+        atmVal = QString::fromStdString(atmGrp->findKeyword("NAME"));
       } else {
         QString message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
         message += "- the [Atmname] keyword is missing in your [Algorithm] group";
@@ -515,9 +515,9 @@ void LoadPvl() {
         while (atmGrp != atmObj.endGroup()) {
           if (atmGrp->hasKeyword("ATMNAME") || atmGrp->hasKeyword("NAME")) {
             if (atmGrp->hasKeyword("ATMNAME")) {
-              atmVal = (QString)atmGrp->findKeyword("ATMNAME");
+              atmVal = QString::fromStdString(atmGrp->findKeyword("ATMNAME"));
             } else if (atmGrp->hasKeyword("NAME")) {
-              atmVal = (QString)atmGrp->findKeyword("NAME");
+              atmVal = QString::fromStdString(atmGrp->findKeyword("NAME"));
             } else {
               QString message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
               message += "- the [Atmname] keyword is missing in your [Algorithm] group";
@@ -569,7 +569,7 @@ void LoadPvl() {
             ui.PutAsString("WHA", os.str().c_str());
           }
           if (atmGrp->hasKeyword("NULNEG")) {
-            QString nulneg = (QString)atmGrp->findKeyword("NULNEG");
+            QString nulneg = QString::fromStdString(atmGrp->findKeyword("NULNEG"));
             QString inulneg = nulneg;
             inulneg = inulneg.toUpper();
             if (inulneg == "YES") {
@@ -656,15 +656,15 @@ void IsisMain() {
     PvlObject fromNormObj;
     PvlGroup fromNormGrp;
     QString input = ui.GetFileName("FROMPVL");
-    fromNormPvl.read(input);
+    fromNormPvl.read(input.toStdString());
     if (fromNormPvl.hasObject("NormalizationModel")) {
       fromNormObj = fromNormPvl.findObject("NormalizationModel");
       if (fromNormObj.hasGroup("Algorithm")) {
         PvlObject::PvlGroupIterator fromNormGrp = fromNormObj.beginGroup();
         if (fromNormGrp->hasKeyword("NORMNAME")) {
-          normVal = (QString)fromNormGrp->findKeyword("NORMNAME");
+          normVal = QString::fromStdString(fromNormGrp->findKeyword("NORMNAME"));
         } else if (fromNormGrp->hasKeyword("NAME")) {
-          normVal = (QString)fromNormGrp->findKeyword("NAME");
+          normVal = QString::fromStdString(fromNormGrp->findKeyword("NAME"));
         } else {
           normVal = "NONE";
         }
@@ -680,9 +680,9 @@ void IsisMain() {
           while (fromNormGrp != fromNormObj.endGroup()) {
             if (fromNormGrp->hasKeyword("NORMNAME") || fromNormGrp->hasKeyword("NAME")) {
               if (fromNormGrp->hasKeyword("NORMNAME")) {
-                normVal = (QString)fromNormGrp->findKeyword("NORMNAME");
+                normVal = QString::fromStdString(fromNormGrp->findKeyword("NORMNAME"));
               } else if (fromNormGrp->hasKeyword("NAME")) {
-                normVal = (QString)fromNormGrp->findKeyword("NAME");
+                normVal = QString::fromStdString(fromNormGrp->findKeyword("NAME"));
               } else {
                 normVal = "NONE";
               }
@@ -715,7 +715,7 @@ void IsisMain() {
       toNormPvl.addObject(PvlObject("NormalizationModel"));
       toNormPvl.findObject("NormalizationModel").addGroup(PvlGroup("Algorithm"));
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("NORMNAME",normName),Pvl::Replace);
+                addKeyword(PvlKeyword("NORMNAME",normName.toStdString()),Pvl::Replace);
     }
   } else {
     // Check to make sure that a normalization model was specified
@@ -728,19 +728,19 @@ void IsisMain() {
     toNormPvl.addObject(PvlObject("NormalizationModel"));
     toNormPvl.findObject("NormalizationModel").addGroup(PvlGroup("Algorithm"));
     toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-              addKeyword(PvlKeyword("NORMNAME",normName),Pvl::Replace);
+              addKeyword(PvlKeyword("NORMNAME",normName.toStdString()),Pvl::Replace);
   }
-  normLog += PvlKeyword("NORMNAME", normName);
+  normLog += PvlKeyword("NORMNAME", normName.toStdString());
 
   if (normName == "ALBEDO" || normName == "MIXED") {
     if (parMap.contains("INCREF")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("INCREF",toString(toDouble(parMap["INCREF"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("INCREF",std::to_string(toDouble(parMap["INCREF"]))),Pvl::Replace);
     } else if (ui.WasEntered("INCREF")) {
       QString keyval = ui.GetString("INCREF");
       double incref = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("INCREF",toString(incref)),Pvl::Replace);
+                addKeyword(PvlKeyword("INCREF",std::to_string(incref)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("INCREF")) {
@@ -752,12 +752,12 @@ void IsisMain() {
     if (normName == "MIXED") {
       if (parMap.contains("INCMAT")) {
         toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                  addKeyword(PvlKeyword("INCMAT",toString(toDouble(parMap["INCMAT"]))),Pvl::Replace);
+                  addKeyword(PvlKeyword("INCMAT",std::to_string(toDouble(parMap["INCMAT"]))),Pvl::Replace);
       } else if (ui.WasEntered("INCMAT")) {
         QString keyval = ui.GetString("INCMAT");
         double incmat = toDouble(keyval);
         toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                  addKeyword(PvlKeyword("INCMAT",toString(incmat)),Pvl::Replace);
+                  addKeyword(PvlKeyword("INCMAT",std::to_string(incmat)),Pvl::Replace);
       } else {
         if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                        hasKeyword("INCMAT")) {
@@ -770,12 +770,12 @@ void IsisMain() {
     }
     if (parMap.contains("THRESH")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("THRESH",toString(toDouble(parMap["THRESH"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("THRESH",std::to_string(toDouble(parMap["THRESH"]))),Pvl::Replace);
     } else if (ui.WasEntered("THRESH")) {
       QString keyval = ui.GetString("THRESH");
       double thresh = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("THRESH",toString(thresh)),Pvl::Replace);
+                addKeyword(PvlKeyword("THRESH",std::to_string(thresh)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("THRESH")) {
@@ -786,12 +786,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("THRESH");
     if (parMap.contains("ALBEDO")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("ALBEDO",toString(toDouble(parMap["ALBEDO"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("ALBEDO",std::to_string(toDouble(parMap["ALBEDO"]))),Pvl::Replace);
     } else if (ui.WasEntered("ALBEDO")) {
       QString keyval = ui.GetString("ALBEDO");
       double albedo = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("ALBEDO",toString(albedo)),Pvl::Replace);
+                addKeyword(PvlKeyword("ALBEDO",std::to_string(albedo)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("ALBEDO")) {
@@ -804,12 +804,12 @@ void IsisMain() {
   } else if (normName == "MOONALBEDO") {
     if (parMap.contains("D")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("D",toString(toDouble(parMap["D"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("D",std::to_string(toDouble(parMap["D"]))),Pvl::Replace);
     } else if (ui.WasEntered("D")) {
       QString keyval = ui.GetString("D");
       double d = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("D",toString(d)),Pvl::Replace);
+                addKeyword(PvlKeyword("D",std::to_string(d)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("D")) {
@@ -821,12 +821,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("D");
     if (parMap.contains("E")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("E",toString(toDouble(parMap["E"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("E",std::to_string(toDouble(parMap["E"]))),Pvl::Replace);
     } else if (ui.WasEntered("E")) {
       QString keyval = ui.GetString("E");
       double e = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("E",toString(e)),Pvl::Replace);
+                addKeyword(PvlKeyword("E",std::to_string(e)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("E")) {
@@ -838,12 +838,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("E");
     if (parMap.contains("F")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("F",toString(toDouble(parMap["F"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("F",std::to_string(toDouble(parMap["F"]))),Pvl::Replace);
     } else if (ui.WasEntered("F")) {
       QString keyval = ui.GetString("F");
       double f = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("F",toString(f)),Pvl::Replace);
+                addKeyword(PvlKeyword("F",std::to_string(f)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("F")) {
@@ -855,12 +855,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("F");
     if (parMap.contains("G2")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("G2",toString(toDouble(parMap["G2"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("G2",std::to_string(toDouble(parMap["G2"]))),Pvl::Replace);
     } else if (ui.WasEntered("G2")) {
       QString keyval = ui.GetString("G2");
       double g2 = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("G2",toString(g2)),Pvl::Replace);
+                addKeyword(PvlKeyword("G2",std::to_string(g2)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("G2")) {
@@ -872,12 +872,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("G2");
     if (parMap.contains("XMUL")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("XMUL",toString(toDouble(parMap["XMUL"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("XMUL",std::to_string(toDouble(parMap["XMUL"]))),Pvl::Replace);
     } else if (ui.WasEntered("XMUL")) {
       QString keyval = ui.GetString("XMUL");
       double xmul = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("XMUL",toString(xmul)),Pvl::Replace);
+                addKeyword(PvlKeyword("XMUL",std::to_string(xmul)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("XMUL")) {
@@ -889,12 +889,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("XMUL");
     if (parMap.contains("WL")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("WL",toString(toDouble(parMap["WL"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("WL",std::to_string(toDouble(parMap["WL"]))),Pvl::Replace);
     } else if (ui.WasEntered("WL")) {
       QString keyval = ui.GetString("WL");
       double wl = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("WL",toString(wl)),Pvl::Replace);
+                addKeyword(PvlKeyword("WL",std::to_string(wl)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("WL")) {
@@ -906,12 +906,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("WL");
     if (parMap.contains("H")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("H",toString(toDouble(parMap["H"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("H",std::to_string(toDouble(parMap["H"]))),Pvl::Replace);
     } else if (ui.WasEntered("H")) {
       QString keyval = ui.GetString("H");
       double h = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("H",toString(h)),Pvl::Replace);
+                addKeyword(PvlKeyword("H",std::to_string(h)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("H")) {
@@ -923,12 +923,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("H");
     if (parMap.contains("BSH1")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("BSH1",toString(toDouble(parMap["BSH1"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("BSH1",std::to_string(toDouble(parMap["BSH1"]))),Pvl::Replace);
     } else if (ui.WasEntered("BSH1")) {
       QString keyval = ui.GetString("BSH1");
       double bsh1 = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("BSH1",toString(bsh1)),Pvl::Replace);
+                addKeyword(PvlKeyword("BSH1",std::to_string(bsh1)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("BSH1")) {
@@ -940,12 +940,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("BSH1");
     if (parMap.contains("XB1")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("XB1",toString(toDouble(parMap["XB1"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("XB1",std::to_string(toDouble(parMap["XB1"]))),Pvl::Replace);
     } else if (ui.WasEntered("XB1")) {
       QString keyval = ui.GetString("XB1");
       double xb1 = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("XB1",toString(xb1)),Pvl::Replace);
+                addKeyword(PvlKeyword("XB1",std::to_string(xb1)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("XB1")) {
@@ -957,12 +957,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("XB1");
     if (parMap.contains("XB2")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("XB2",toString(toDouble(parMap["XB2"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("XB2",std::to_string(toDouble(parMap["XB2"]))),Pvl::Replace);
     } else if (ui.WasEntered("XB2")) {
       QString keyval = ui.GetString("XB2");
       double xb2 = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("XB2",toString(xb2)),Pvl::Replace);
+                addKeyword(PvlKeyword("XB2",std::to_string(xb2)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("XB2")) {
@@ -975,12 +975,12 @@ void IsisMain() {
   } else if (normName == "SHADE") {
     if (parMap.contains("INCREF")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("INCREF",toString(toDouble(parMap["INCREF"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("INCREF",std::to_string(toDouble(parMap["INCREF"]))),Pvl::Replace);
     } else if (ui.WasEntered("INCREF")) {
       QString keyval = ui.GetString("INCREF");
       double incref = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("INCREF",toString(incref)),Pvl::Replace);
+                addKeyword(PvlKeyword("INCREF",std::to_string(incref)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("INCREF")) {
@@ -992,12 +992,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("INCREF");
     if (parMap.contains("ALBEDO")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("ALBEDO",toString(toDouble(parMap["ALBEDO"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("ALBEDO",std::to_string(toDouble(parMap["ALBEDO"]))),Pvl::Replace);
     } else if (ui.WasEntered("ALBEDO")) {
       QString keyval = ui.GetString("ALBEDO");
       double albedo = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("ALBEDO",toString(albedo)),Pvl::Replace);
+                addKeyword(PvlKeyword("ALBEDO",std::to_string(albedo)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("ALBEDO")) {
@@ -1009,12 +1009,12 @@ void IsisMain() {
   } else if (normName == "TOPO") {
     if (parMap.contains("INCREF")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("INCREF",toString(toDouble(parMap["INCREF"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("INCREF",std::to_string(toDouble(parMap["INCREF"]))),Pvl::Replace);
     } else if (ui.WasEntered("INCREF")) {
       QString keyval = ui.GetString("INCREF");
       double incref = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("INCREF",toString(incref)),Pvl::Replace);
+                addKeyword(PvlKeyword("INCREF",std::to_string(incref)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("INCREF")) {
@@ -1025,12 +1025,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("INCREF");
     if (parMap.contains("THRESH")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("THRESH",toString(toDouble(parMap["THRESH"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("THRESH",std::to_string(toDouble(parMap["THRESH"]))),Pvl::Replace);
     } else if (ui.WasEntered("THRESH")) {
       QString keyval = ui.GetString("THRESH");
       double thresh = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("THRESH",toString(thresh)),Pvl::Replace);
+                addKeyword(PvlKeyword("THRESH",std::to_string(thresh)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("THRESH")) {
@@ -1042,12 +1042,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("THRESH");
     if (parMap.contains("ALBEDO")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("ALBEDO",toString(toDouble(parMap["ALBEDO"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("ALBEDO",std::to_string(toDouble(parMap["ALBEDO"]))),Pvl::Replace);
     } else if (ui.WasEntered("ALBEDO")) {
       QString keyval = ui.GetString("ALBEDO");
       double albedo = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("ALBEDO",toString(albedo)),Pvl::Replace);
+                addKeyword(PvlKeyword("ALBEDO",std::to_string(albedo)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("ALBEDO")) {
@@ -1059,12 +1059,12 @@ void IsisMain() {
   } else if (normName == "ALBEDOATM") {
     if (parMap.contains("INCREF")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("INCREF",toString(toDouble(parMap["INCREF"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("INCREF",std::to_string(toDouble(parMap["INCREF"]))),Pvl::Replace);
     } else if (ui.WasEntered("INCREF")) {
       QString keyval = ui.GetString("INCREF");
       double incref = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("INCREF",toString(incref)),Pvl::Replace);
+                addKeyword(PvlKeyword("INCREF",std::to_string(incref)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("INCREF")) {
@@ -1076,12 +1076,12 @@ void IsisMain() {
   } else if (normName == "SHADEATM") {
     if (parMap.contains("INCREF")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("INCREF",toString(toDouble(parMap["INCREF"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("INCREF",std::to_string(toDouble(parMap["INCREF"]))),Pvl::Replace);
     } else if (ui.WasEntered("INCREF")) {
       QString keyval = ui.GetString("INCREF");
       double incref = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("INCREF",toString(incref)),Pvl::Replace);
+                addKeyword(PvlKeyword("INCREF",std::to_string(incref)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("INCREF")) {
@@ -1092,12 +1092,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("INCREF");
     if (parMap.contains("ALBEDO")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("ALBEDO",toString(toDouble(parMap["ALBEDO"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("ALBEDO",std::to_string(toDouble(parMap["ALBEDO"]))),Pvl::Replace);
     } else if (ui.WasEntered("ALBEDO")) {
       QString keyval = ui.GetString("ALBEDO");
       double albedo = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("ALBEDO",toString(albedo)),Pvl::Replace);
+                addKeyword(PvlKeyword("ALBEDO",std::to_string(albedo)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("ALBEDO")) {
@@ -1109,12 +1109,12 @@ void IsisMain() {
   } else if (normName == "TOPOATM") {
     if (parMap.contains("INCREF")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("INCREF",toString(toDouble(parMap["INCREF"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("INCREF",std::to_string(toDouble(parMap["INCREF"]))),Pvl::Replace);
     } else if (ui.WasEntered("INCREF")) {
       QString keyval = ui.GetString("INCREF");
       double incref = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("INCREF",toString(incref)),Pvl::Replace);
+                addKeyword(PvlKeyword("INCREF",std::to_string(incref)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("INCREF")) {
@@ -1125,12 +1125,12 @@ void IsisMain() {
     normLog += toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").findKeyword("INCREF");
     if (parMap.contains("ALBEDO")) {
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("ALBEDO",toString(toDouble(parMap["ALBEDO"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("ALBEDO",std::to_string(toDouble(parMap["ALBEDO"]))),Pvl::Replace);
     } else if (ui.WasEntered("ALBEDO")) {
       QString keyval = ui.GetString("ALBEDO");
       double albedo = toDouble(keyval);
       toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("ALBEDO",toString(albedo)),Pvl::Replace);
+                addKeyword(PvlKeyword("ALBEDO",std::to_string(albedo)),Pvl::Replace);
     } else {
       if (!toNormPvl.findObject("NormalizationModel").findGroup("Algorithm").
                      hasKeyword("ALBEDO")) {
@@ -1156,15 +1156,15 @@ void IsisMain() {
       PvlObject fromAtmObj;
       PvlGroup fromAtmGrp;
       QString input = ui.GetFileName("FROMPVL");
-      fromAtmPvl.read(input);
+      fromAtmPvl.read(input.toStdString());
       if (fromAtmPvl.hasObject("AtmosphericModel")) {
         fromAtmObj = fromAtmPvl.findObject("AtmosphericModel");
         if (fromAtmObj.hasGroup("Algorithm")) {
           PvlObject::PvlGroupIterator fromAtmGrp = fromAtmObj.beginGroup();
           if (fromAtmGrp->hasKeyword("ATMNAME")) {
-            atmVal = (QString)fromAtmGrp->findKeyword("ATMNAME");
+            atmVal = QString::fromStdString(fromAtmGrp->findKeyword("ATMNAME"));
           } else if (fromAtmGrp->hasKeyword("NAME")) {
-            atmVal = (QString)fromAtmGrp->findKeyword("NAME");
+            atmVal = QString::fromStdString(fromAtmGrp->findKeyword("NAME"));
           } else {
             atmVal = "NONE";
           }
@@ -1180,9 +1180,9 @@ void IsisMain() {
             while (fromAtmGrp != fromAtmObj.endGroup()) {
               if (fromAtmGrp->hasKeyword("ATMNAME") || fromAtmGrp->hasKeyword("NAME")) {
                 if (fromAtmGrp->hasKeyword("ATMNAME")) {
-                  atmVal = (QString)fromAtmGrp->findKeyword("ATMNAME");
+                  atmVal = QString::fromStdString(fromAtmGrp->findKeyword("ATMNAME"));
                 } else if (fromAtmGrp->hasKeyword("NAME")) {
-                  atmVal = (QString)fromAtmGrp->findKeyword("NAME");
+                  atmVal = QString::fromStdString(fromAtmGrp->findKeyword("NAME"));
                 } else {
                   atmVal = "NONE";
                 }
@@ -1214,7 +1214,7 @@ void IsisMain() {
         toAtmPvl.addObject(PvlObject("AtmosphericModel"));
         toAtmPvl.findObject("AtmosphericModel").addGroup(PvlGroup("Algorithm"));
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("ATMNAME",atmName),Pvl::Replace);
+                 addKeyword(PvlKeyword("ATMNAME",atmName.toStdString()),Pvl::Replace);
       }
     } else {
       if (atmName == "NONE" || atmName == "FROMPVL") {
@@ -1226,21 +1226,21 @@ void IsisMain() {
       toAtmPvl.addObject(PvlObject("AtmosphericModel"));
       toAtmPvl.findObject("AtmosphericModel").addGroup(PvlGroup("Algorithm"));
       toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("ATMNAME",atmName),Pvl::Replace);
+               addKeyword(PvlKeyword("ATMNAME",atmName.toStdString()),Pvl::Replace);
     }
-    atmLog += PvlKeyword("ATMNAME", atmName);
+    atmLog += PvlKeyword("ATMNAME", atmName.toStdString());
 
     if (atmName == "ANISOTROPIC1" || atmName == "ANISOTROPIC2" ||
         atmName == "HAPKEATM1" || atmName == "HAPKEATM2" ||
         atmName == "ISOTROPIC1" || atmName == "ISOTROPIC2") {
       if (parMap.contains("HNORM")) {
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("HNORM",toString(toDouble(parMap["HNORM"]))),Pvl::Replace);
+                 addKeyword(PvlKeyword("HNORM",std::to_string(toDouble(parMap["HNORM"]))),Pvl::Replace);
       } else if (ui.WasEntered("HNORM")) {
         QString keyval = ui.GetString("HNORM");
         double hnorm = toDouble(keyval);
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("HNORM",toString(hnorm)),Pvl::Replace);
+                 addKeyword(PvlKeyword("HNORM",std::to_string(hnorm)),Pvl::Replace);
       } else {
         if (!toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
                       hasKeyword("HNORM")) {
@@ -1252,12 +1252,12 @@ void IsisMain() {
       atmLog += toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").findKeyword("HNORM");
       if (parMap.contains("TAU")) {
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("TAU",toString(toDouble(parMap["TAU"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("TAU",std::to_string(toDouble(parMap["TAU"]))),Pvl::Replace);
       } else if (ui.WasEntered("TAU")) {
         QString keyval = ui.GetString("TAU");
         double tau = toDouble(keyval);
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("TAU",toString(tau)),Pvl::Replace);
+                addKeyword(PvlKeyword("TAU",std::to_string(tau)),Pvl::Replace);
       } else {
         if (!toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
                       hasKeyword("TAU")) {
@@ -1269,12 +1269,12 @@ void IsisMain() {
       atmLog += toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").findKeyword("TAU");
       if (parMap.contains("TAUREF")) {
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("TAUREF",toString(toDouble(parMap["TAUREF"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("TAUREF",std::to_string(toDouble(parMap["TAUREF"]))),Pvl::Replace);
       } else if (ui.WasEntered("TAUREF")) {
         QString keyval = ui.GetString("TAUREF");
         double tauref = toDouble(keyval);
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("TAUREF",toString(tauref)),Pvl::Replace);
+                addKeyword(PvlKeyword("TAUREF",std::to_string(tauref)),Pvl::Replace);
       } else {
         if (!toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
                       hasKeyword("TAUREF")) {
@@ -1286,12 +1286,12 @@ void IsisMain() {
       atmLog += toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").findKeyword("TAUREF");
       if (parMap.contains("WHA")) {
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("WHA",toString(toDouble(parMap["WHA"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("WHA",std::to_string(toDouble(parMap["WHA"]))),Pvl::Replace);
       } else if (ui.WasEntered("WHA")) {
         QString keyval = ui.GetString("WHA");
         double wha = toDouble(keyval);
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("WHA",toString(wha)),Pvl::Replace);
+                addKeyword(PvlKeyword("WHA",std::to_string(wha)),Pvl::Replace);
       } else {
         if (!toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
                       hasKeyword("WHA")) {
@@ -1333,12 +1333,12 @@ void IsisMain() {
     if (atmName == "ANISOTROPIC1" || atmName == "ANISOTROPIC2") {
       if (parMap.contains("BHA")) {
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("BHA",toString(toDouble(parMap["BHA"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("BHA",std::to_string(toDouble(parMap["BHA"]))),Pvl::Replace);
       } else if (ui.WasEntered("BHA")) {
         QString keyval = ui.GetString("BHA");
         double bha = toDouble(keyval);
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("BHA",toString(bha)),Pvl::Replace);
+                addKeyword(PvlKeyword("BHA",std::to_string(bha)),Pvl::Replace);
       } else {
         if (!toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
                       hasKeyword("BHA")) {
@@ -1352,12 +1352,12 @@ void IsisMain() {
     if (atmName == "HAPKEATM1" || atmName == "HAPKEATM2") {
       if (parMap.contains("HGA")) {
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("HGA",toString(toDouble(parMap["HGA"]))),Pvl::Replace);
+                addKeyword(PvlKeyword("HGA",std::to_string(toDouble(parMap["HGA"]))),Pvl::Replace);
       } else if (ui.WasEntered("HGA")) {
         QString keyval = ui.GetString("HGA");
         double hga = toDouble(keyval);
         toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
-                addKeyword(PvlKeyword("HGA",toString(hga)),Pvl::Replace);
+                addKeyword(PvlKeyword("HGA",std::to_string(hga)),Pvl::Replace);
       } else {
         if (!toAtmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
                       hasKeyword("HGA")) {
@@ -1383,15 +1383,15 @@ void IsisMain() {
     PvlObject fromPhtObj;
     PvlGroup fromPhtGrp;
     QString input = ui.GetFileName("FROMPVL");
-    fromPhtPvl.read(input);
+    fromPhtPvl.read(input.toStdString());
     if (fromPhtPvl.hasObject("PhotometricModel")) {
       fromPhtObj = fromPhtPvl.findObject("PhotometricModel");
       if (fromPhtObj.hasGroup("Algorithm")) {
         PvlObject::PvlGroupIterator fromPhtGrp = fromPhtObj.beginGroup();
         if (fromPhtGrp->hasKeyword("PHTNAME")) {
-          phtVal = (QString)fromPhtGrp->findKeyword("PHTNAME");
+          phtVal = QString::fromStdString(fromPhtGrp->findKeyword("PHTNAME"));
         } else if (fromPhtGrp->hasKeyword("NAME")) {
-          phtVal = (QString)fromPhtGrp->findKeyword("NAME");
+          phtVal = QString::fromStdString(fromPhtGrp->findKeyword("NAME"));
         } else {
           phtVal = "NONE";
         }
@@ -1407,9 +1407,9 @@ void IsisMain() {
           while (fromPhtGrp != fromPhtObj.endGroup()) {
             if (fromPhtGrp->hasKeyword("PHTNAME") || fromPhtGrp->hasKeyword("NAME")) {
               if (fromPhtGrp->hasKeyword("PHTNAME")) {
-                phtVal = (QString)fromPhtGrp->findKeyword("PHTNAME");
+                phtVal = QString::fromStdString(fromPhtGrp->findKeyword("PHTNAME"));
               } else if (fromPhtGrp->hasKeyword("NAME")) {
-                phtVal = (QString)fromPhtGrp->findKeyword("NAME");
+                phtVal = QString::fromStdString(fromPhtGrp->findKeyword("NAME"));
               } else {
                 phtVal = "NONE";
               }
@@ -1442,7 +1442,7 @@ void IsisMain() {
       toPhtPvl.addObject(PvlObject("PhotometricModel"));
       toPhtPvl.findObject("PhotometricModel").addGroup(PvlGroup("Algorithm"));
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("PHTNAME",phtName),Pvl::Replace);
+               addKeyword(PvlKeyword("PHTNAME",phtName.toStdString()),Pvl::Replace);
     }
   } else {
     // Check to make sure that a photometric model was specified
@@ -1455,19 +1455,19 @@ void IsisMain() {
     toPhtPvl.addObject(PvlObject("PhotometricModel"));
     toPhtPvl.findObject("PhotometricModel").addGroup(PvlGroup("Algorithm"));
     toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-             addKeyword(PvlKeyword("PHTNAME",phtName),Pvl::Replace);
+             addKeyword(PvlKeyword("PHTNAME",phtName.toStdString()),Pvl::Replace);
   }
-  phtLog += PvlKeyword("PHTNAME", phtName);
+  phtLog += PvlKeyword("PHTNAME", phtName.toStdString());
 
   if (phtName == "HAPKEHEN" || phtName == "HAPKELEG") {
     if (parMap.contains("THETA")) {
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("THETA",toString(toDouble(parMap["THETA"]))),Pvl::Replace);
+               addKeyword(PvlKeyword("THETA",std::to_string(toDouble(parMap["THETA"]))),Pvl::Replace);
     } else if (ui.WasEntered("THETA")) {
       QString keyval = ui.GetString("THETA");
       double theta = toDouble(keyval);
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("THETA",toString(theta)),Pvl::Replace);
+               addKeyword(PvlKeyword("THETA",std::to_string(theta)),Pvl::Replace);
     } else {
       if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                     hasKeyword("THETA")) {
@@ -1479,12 +1479,12 @@ void IsisMain() {
     phtLog += toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").findKeyword("THETA");
     if (parMap.contains("WH")) {
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("WH",toString(toDouble(parMap["WH"]))),Pvl::Replace);
+               addKeyword(PvlKeyword("WH",std::to_string(toDouble(parMap["WH"]))),Pvl::Replace);
     } else if (ui.WasEntered("WH")) {
       QString keyval = ui.GetString("WH");
       double wh = toDouble(keyval);
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("WH",toString(wh)),Pvl::Replace);
+               addKeyword(PvlKeyword("WH",std::to_string(wh)),Pvl::Replace);
     } else {
       if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                     hasKeyword("WH")) {
@@ -1496,12 +1496,12 @@ void IsisMain() {
     phtLog += toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").findKeyword("WH");
     if (parMap.contains("HH")) {
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("HH",toString(toDouble(parMap["HH"]))),Pvl::Replace);
+               addKeyword(PvlKeyword("HH",std::to_string(toDouble(parMap["HH"]))),Pvl::Replace);
     } else if (ui.WasEntered("HH")) {
       QString keyval = ui.GetString("HH");
       double hh = toDouble(keyval);
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("HH",toString(hh)),Pvl::Replace);
+               addKeyword(PvlKeyword("HH",std::to_string(hh)),Pvl::Replace);
     } else {
       if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                     hasKeyword("HH")) {
@@ -1513,12 +1513,12 @@ void IsisMain() {
     phtLog += toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").findKeyword("HH");
     if (parMap.contains("B0")) {
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("B0",toString(toDouble(parMap["B0"]))),Pvl::Replace);
+               addKeyword(PvlKeyword("B0",std::to_string(toDouble(parMap["B0"]))),Pvl::Replace);
     } else if (ui.WasEntered("B0")) {
       QString keyval = ui.GetString("B0");
       double b0 = toDouble(keyval);
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("B0",toString(b0)),Pvl::Replace);
+               addKeyword(PvlKeyword("B0",std::to_string(b0)),Pvl::Replace);
     } else {
       if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                     hasKeyword("B0")) {
@@ -1553,7 +1553,7 @@ void IsisMain() {
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                addKeyword(PvlKeyword("ZEROB0STANDARD","TRUE"),Pvl::Replace);
     }
-    QString zerob0 = (QString)toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").findKeyword("ZEROB0STANDARD");
+    QString zerob0 = QString::fromStdString(toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").findKeyword("ZEROB0STANDARD"));
     QString izerob0 = zerob0;
     izerob0 = izerob0.toUpper();
     if (izerob0 != "TRUE" && izerob0 != "FALSE") {
@@ -1565,12 +1565,12 @@ void IsisMain() {
     if (phtName == "HAPKEHEN") {
       if (parMap.contains("HG1")) {
         toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("HG1",toString(toDouble(parMap["HG1"]))),Pvl::Replace);
+                 addKeyword(PvlKeyword("HG1",std::to_string(toDouble(parMap["HG1"]))),Pvl::Replace);
       } else if (ui.WasEntered("HG1")) {
         QString keyval = ui.GetString("HG1");
         double hg1 = toDouble(keyval);
         toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("HG1",toString(hg1)),Pvl::Replace);
+                 addKeyword(PvlKeyword("HG1",std::to_string(hg1)),Pvl::Replace);
       } else {
         if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                       hasKeyword("HG1")) {
@@ -1582,12 +1582,12 @@ void IsisMain() {
       phtLog += toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").findKeyword("HG1");
       if (parMap.contains("HG2")) {
         toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("HG2",toString(toDouble(parMap["HG2"]))),Pvl::Replace);
+                 addKeyword(PvlKeyword("HG2",std::to_string(toDouble(parMap["HG2"]))),Pvl::Replace);
       } else if (ui.WasEntered("HG2")) {
         QString keyval = ui.GetString("HG2");
         double hg2 = toDouble(keyval);
         toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("HG2",toString(hg2)),Pvl::Replace);
+                 addKeyword(PvlKeyword("HG2",std::to_string(hg2)),Pvl::Replace);
       } else {
         if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                       hasKeyword("HG2")) {
@@ -1600,12 +1600,12 @@ void IsisMain() {
     } else {
       if (parMap.contains("BH")) {
         toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("BH",toString(toDouble(parMap["BH"]))),Pvl::Replace);
+                 addKeyword(PvlKeyword("BH",std::to_string(toDouble(parMap["BH"]))),Pvl::Replace);
       } else if (ui.WasEntered("BH")) {
         QString keyval = ui.GetString("BH");
         double bh = toDouble(keyval);
         toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("BH",toString(bh)),Pvl::Replace);
+                 addKeyword(PvlKeyword("BH",std::to_string(bh)),Pvl::Replace);
       } else {
         if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                       hasKeyword("BH")) {
@@ -1617,12 +1617,12 @@ void IsisMain() {
       phtLog += toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").findKeyword("BH");
       if (parMap.contains("CH")) {
         toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("CH",toString(toDouble(parMap["CH"]))),Pvl::Replace);
+                 addKeyword(PvlKeyword("CH",std::to_string(toDouble(parMap["CH"]))),Pvl::Replace);
       } else if (ui.WasEntered("CH")) {
         QString keyval = ui.GetString("CH");
         double ch = toDouble(keyval);
         toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("CH",toString(ch)),Pvl::Replace);
+                 addKeyword(PvlKeyword("CH",std::to_string(ch)),Pvl::Replace);
       } else {
         if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                       hasKeyword("CH")) {
@@ -1636,11 +1636,11 @@ void IsisMain() {
   } else if (phtName == "LUNARLAMBERTEMPIRICAL" || phtName == "MINNAERTEMPIRICAL") {
     if (parMap.contains("PHASELIST")) {
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("PHASELIST",parMap["PHASELIST"]),Pvl::Replace);
+               addKeyword(PvlKeyword("PHASELIST",parMap["PHASELIST"].toStdString()),Pvl::Replace);
     } else if (ui.WasEntered("PHASELIST")) {
       QString keyval = ui.GetString("PHASELIST");
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("PHASELIST",keyval),Pvl::Replace);
+               addKeyword(PvlKeyword("PHASELIST",keyval.toStdString()),Pvl::Replace);
     } else {
       if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                     hasKeyword("PHASELIST")) {
@@ -1651,11 +1651,11 @@ void IsisMain() {
     phtLog += toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").findKeyword("PHASELIST");
     if (parMap.contains("PHASECURVELIST")) {
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("PHASECURVELIST",parMap["PHASECURVELIST"]),Pvl::Replace);
+               addKeyword(PvlKeyword("PHASECURVELIST",parMap["PHASECURVELIST"].toStdString()),Pvl::Replace);
     } else if (ui.WasEntered("PHASECURVELIST")) {
       QString keyval = ui.GetString("PHASECURVELIST");
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("PHASECURVELIST",keyval),Pvl::Replace);
+               addKeyword(PvlKeyword("PHASECURVELIST",keyval.toStdString()),Pvl::Replace);
     } else {
       if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                     hasKeyword("PHASECURVELIST")) {
@@ -1667,11 +1667,11 @@ void IsisMain() {
     if (phtName == "LUNARLAMBERTEMPIRICAL") {
       if (parMap.contains("LLIST")) {
         toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("LLIST",parMap["LLIST"]),Pvl::Replace);
+                 addKeyword(PvlKeyword("LLIST",parMap["LLIST"].toStdString()),Pvl::Replace);
       } else if (ui.WasEntered("LLIST")) {
         QString keyval = ui.GetString("LLIST");
         toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("LLIST",keyval),Pvl::Replace);
+                 addKeyword(PvlKeyword("LLIST",keyval.toStdString()),Pvl::Replace);
       } else {
         if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                       hasKeyword("LLIST")) {
@@ -1683,11 +1683,11 @@ void IsisMain() {
     } else {
       if (parMap.contains("KLIST")) {
         toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("KLIST",parMap["KLIST"]),Pvl::Replace);
+                 addKeyword(PvlKeyword("KLIST",parMap["KLIST"].toStdString()),Pvl::Replace);
       } else if (ui.WasEntered("KLIST")) {
         QString keyval = ui.GetString("KLIST");
         toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-                 addKeyword(PvlKeyword("KLIST",keyval),Pvl::Replace);
+                 addKeyword(PvlKeyword("KLIST",keyval.toStdString()),Pvl::Replace);
       } else {
         if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                       hasKeyword("KLIST")) {
@@ -1700,12 +1700,12 @@ void IsisMain() {
   } else if (phtName == "LUNARLAMBERT") {
     if (parMap.contains("L")) {
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("L",toString(toDouble(parMap["L"]))),Pvl::Replace);
+               addKeyword(PvlKeyword("L",std::to_string(toDouble(parMap["L"]))),Pvl::Replace);
     } else if (ui.WasEntered("L")) {
       QString keyval = ui.GetString("L");
       double l = toDouble(keyval);
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("L",toString(l)),Pvl::Replace);
+               addKeyword(PvlKeyword("L",std::to_string(l)),Pvl::Replace);
     } else {
       if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                     hasKeyword("L")) {
@@ -1718,12 +1718,12 @@ void IsisMain() {
   } else if (phtName == "MINNAERT") {
     if (parMap.contains("K")) {
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("K",toString(toDouble(parMap["K"]))),Pvl::Replace);
+               addKeyword(PvlKeyword("K",std::to_string(toDouble(parMap["K"]))),Pvl::Replace);
     } else if (ui.WasEntered("K")) {
       QString keyval = ui.GetString("K");
       double k = toDouble(keyval);
       toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
-               addKeyword(PvlKeyword("K",toString(k)),Pvl::Replace);
+               addKeyword(PvlKeyword("K",std::to_string(k)),Pvl::Replace);
     } else {
       if (!toPhtPvl.findObject("PhotometricModel").findGroup("Algorithm").
                     hasKeyword("K")) {
@@ -1761,7 +1761,7 @@ void IsisMain() {
   if ((normName == "TOPO" || normName == "MIXED") && angleSource == "DEM") {
     QString message = "The " + normName + " Normalized model is not recommended for use with the " + angleSource + " Angle Source option";
     PvlGroup warning("Warnings");
-    warning.addKeyword(PvlKeyword("Warning",message));
+    warning.addKeyword(PvlKeyword("Warning",message.toStdString()));
     Application::Log(warning);
   }
   // Get camera information if needed
@@ -1779,7 +1779,7 @@ void IsisMain() {
   p.SetOutputCube("TO");
 
   Pvl inLabel;
-  inLabel.read(ui.GetCubeName("FROM"));
+  inLabel.read(ui.GetCubeName("FROM").toStdString());
 
   // If the source of photometric angles is the center of the image,
   // then get the angles at the center of the image.
@@ -1836,7 +1836,7 @@ void IsisMain() {
   double wl;
   if(pvlg.hasKeyword("Center")) {
     PvlKeyword &wavelength = pvlg.findKeyword("Center");
-    wl = toDouble(wavelength[0]);
+    wl = std::stod(wavelength[0]);
   }
   else {
     wl = 1.0;
@@ -1845,7 +1845,7 @@ void IsisMain() {
   // Create the photometry object and set the wavelength
   PvlGroup &algo = par.findObject("NormalizationModel").findGroup("Algorithm", Pvl::Traverse);
   if(!algo.hasKeyword("Wl")) {
-    algo.addKeyword(Isis::PvlKeyword("Wl", toString(wl)));
+    algo.addKeyword(Isis::PvlKeyword("Wl", std::to_string(wl)));
   }
   pho = new Photometry(par);
   pho->SetPhotomWl(wl);

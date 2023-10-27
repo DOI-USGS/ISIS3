@@ -371,7 +371,7 @@ void IsisMain() {
   qDebug() << endl;
 
   PvlObject o = dstrat4.getDefinitionA();
-  qDebug() << o.name() << endl;
+  qDebug() << QString::fromStdString(o.name()) << endl;
 
   qDebug() << endl;
   qDebug() << endl;

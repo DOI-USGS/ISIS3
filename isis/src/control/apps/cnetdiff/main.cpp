@@ -48,7 +48,7 @@ void IsisMain() {
     filesMatch = true;
 
     if(ui.WasEntered("DIFF")) {
-      Pvl diffFile(ui.GetFileName("DIFF"));
+      Pvl diffFile(ui.GetFileName("DIFF").toStdString());
 
       if(diffFile.hasGroup("Tolerances")) {
         tolerances = diffFile.findGroup("Tolerances");
@@ -73,7 +73,7 @@ void IsisMain() {
     }
     else {
       differences += PvlKeyword("Compare", "Different");
-      differences += PvlKeyword("Reason", differenceReason);
+      differences += PvlKeyword("Reason", differenceReason.toStdString());
     }
 
     Application::Log(differences);
@@ -81,7 +81,7 @@ void IsisMain() {
     if(ui.WasEntered("TO")) {
       Pvl out;
       out.addGroup(differences);
-      out.write(ui.GetFileName("TO"));
+      out.write(ui.GetFileName("TO").toStdString());
     }
 
     differenceReason = "";
@@ -92,12 +92,12 @@ void IsisMain() {
 
     ControlNetDiff differencer;
     if (ui.WasEntered("DIFF")) {
-      Pvl diffFile(ui.GetFileName("DIFF"));
+      Pvl diffFile(ui.GetFileName("DIFF").toStdString());
       differencer.addTolerances(diffFile);
     }
 
     Pvl results = differencer.compare(f1, f2);
-    if (ui.WasEntered("TO")) results.write(ui.GetFileName("TO"));
+    if (ui.WasEntered("TO")) results.write(ui.GetFileName("TO").toStdString());
 
     PvlGroup log("Results");
 
@@ -134,8 +134,8 @@ void Compare(QString net1Path, QString net2Path) {
     return;
   }
 
-  QString id1 = net1Obj["NetworkId"][0];
-  QString id2 = net2Obj["NetworkId"][0];
+  QString id1 = QString::fromStdString(net1Obj["NetworkId"][0]);
+  QString id2 = QString::fromStdString(net2Obj["NetworkId"][0]);
 
   if(id1 != id2) {
     differenceReason = "The network IDs [" +
@@ -145,8 +145,8 @@ void Compare(QString net1Path, QString net2Path) {
     return;
   }
 
-  QString target1 = net1Obj["TargetName"][0];
-  QString target2 = net2Obj["TargetName"][0];
+  QString target1 = QString::fromStdString(net1Obj["TargetName"][0]);
+  QString target2 = QString::fromStdString(net2Obj["TargetName"][0]);
 
   if(target1 != target2) {
     differenceReason = "The TargetName values [" +
@@ -176,7 +176,7 @@ void Compare(QString net1Path, QString net2Path) {
 void Compare(const PvlObject &point1Pvl, const PvlObject &point2Pvl) {
   // both names must be at least equal, should be named ControlPoint
   if(point1Pvl.name() != point2Pvl.name()) {
-    QString msg = "The control points' CreatePvlOject method returned an "
+    std::string msg = "The control points' CreatePvlOject method returned an "
                   "unexpected result.";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
@@ -200,12 +200,12 @@ void Compare(const PvlObject &point1Pvl, const PvlObject &point2Pvl) {
 
     if(!filesMatch) {
       differenceReason = "Control Measure for Cube [" +
-                         measure1["SerialNumber"][0] + "] " + differenceReason;
+                         QString::fromStdString(measure1["SerialNumber"][0]) + "] " + differenceReason;
     }
   }
 
   if(!filesMatch) {
-    differenceReason = "Control Point [" + point1Pvl["PointId"][0] +
+    differenceReason = "Control Point [" + QString::fromStdString(point1Pvl["PointId"][0]) +
                        "] " + differenceReason;
   }
 }
@@ -248,21 +248,21 @@ void CompareGroups(const PvlContainer &pvl1, const PvlContainer &pvl2) {
 
 void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   if(pvl1.name().compare(pvl2.name()) != 0) {
-    QString msg = "CompareKeywords should always be called with keywords that "
+    std::string msg = "CompareKeywords should always be called with keywords that "
                   "have the same name.";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   if(pvl1.size() != pvl2.size()) {
     filesMatch = false;
-    differenceReason = "Value '" + pvl1.name() + "' array size does not match.";
+    differenceReason = "Value '" + QString::fromStdString(pvl1.name()) + "' array size does not match.";
     return;
   }
 
   if(tolerances.hasKeyword(pvl1.name()) &&
       tolerances[pvl1.name()].size() > 1 &&
       pvl1.size() != tolerances[pvl1.name()].size()) {
-    QString msg = "Size of value '" + pvl1.name() + "' does not match with ";
+    std::string msg = "Size of value '" + pvl1.name() + "' does not match with ";
     msg += "its number of tolerances in the DIFF file.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -270,16 +270,16 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   if(ignorekeys.hasKeyword(pvl1.name()) &&
       ignorekeys[pvl1.name()].size() > 1 &&
       pvl1.size() != ignorekeys[pvl1.name()].size()) {
-    QString msg = "Size of value '" + pvl1.name() + "' does not match with ";
+    std::string msg = "Size of value '" + pvl1.name() + "' does not match with ";
     msg += "its number of ignore keys in the DIFF file.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   for(int i = 0; i < pvl1.size() && filesMatch; i++) {
-    QString val1 = pvl1[i];
-    QString val2 = pvl2[i];
-    QString unit1 = pvl1.unit(i);
-    QString unit2 = pvl2.unit(i);
+    QString val1 = QString::fromStdString(pvl1[i]);
+    QString val2 = QString::fromStdString(pvl2[i]);
+    QString unit1 = QString::fromStdString(pvl1.unit(i));
+    QString unit2 = QString::fromStdString(pvl2.unit(i));
 
     int ignoreIndex = 0;
     if(ignorekeys.hasKeyword(pvl1.name()) && ignorekeys[pvl1.name()].size() > 1) {
@@ -292,7 +292,7 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
 
         if(unit1.toLower() != unit2.toLower()) {
           filesMatch = false;
-          differenceReason = "Value '" + pvl1.name() + "': units do not match.";
+          differenceReason = "Value '" + QString::fromStdString(pvl1.name()) + "': units do not match.";
           return;
         }
 
@@ -300,18 +300,18 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
         double difference = abs(toDouble(val1) - toDouble(val2));
 
         if(tolerances.hasKeyword(pvl1.name())) {
-          tolerance = toDouble((tolerances[pvl1.name()].size() == 1) ?
+          tolerance = std::stod((tolerances[pvl1.name()].size() == 1) ?
                       tolerances[pvl1.name()][0] : tolerances[pvl1.name()][i]);
         }
 
         if(difference > tolerance) {
           filesMatch = false;
           if(pvl1.size() == 1) {
-            differenceReason = "Value [" + pvl1.name() + "] difference is " +
+            differenceReason = "Value [" + QString::fromStdString(pvl1.name()) + "] difference is " +
                                toString(difference);
           }
           else {
-            differenceReason = "Value [" + pvl1.name() + "] at index " +
+            differenceReason = "Value [" + QString::fromStdString(pvl1.name()) + "] at index " +
                                toString(i) + ": difference is " + toString(difference);
           }
           differenceReason += " (values are [" + val1 + "] and [" +
@@ -322,7 +322,7 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
     catch(IException &e) {
       if(val1.toLower() != val2.toLower()) {
         filesMatch = false;
-        differenceReason = "Value '" + pvl1.name() + "': values do not match.";
+        differenceReason = "Value '" + QString::fromStdString(pvl1.name()) + "': values do not match.";
       }
     }
   }

@@ -724,7 +724,7 @@ namespace Isis {
       editorWidget->connectionFilterWidget());
 
     setFileState(HasFile, *curFile);
-    saveAsPvl = !Pvl(*curFile).hasObject("ProtoBuffer");
+    saveAsPvl = !Pvl(curFile->toStdString()).hasObject("ProtoBuffer");
   }
 
 

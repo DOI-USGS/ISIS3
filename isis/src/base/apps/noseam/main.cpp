@@ -26,7 +26,7 @@ void IsisMain() {
   FileName inFile = cubes[0];
 
   Pvl &pref = Preference::Preferences();
-  QString pathName = (QString)pref.findGroup("DataDirectory")["Temporary"] + "/";
+  QString pathName = QString::fromStdString(pref.findGroup("DataDirectory")["Temporary"]) + "/";
 
   /**
    * Creates a mosaic from the original images.  It is placed here

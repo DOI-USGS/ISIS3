@@ -419,7 +419,7 @@ namespace Isis {
           PvlKeyword tempKeyword = objIter->findKeyword("Name");
           int bandNumber = int(objIter->findKeyword("BandNumber"));
           if (cvp->grayBand() == bandNumber) {
-            QString tempName = tempKeyword[0];
+            QString tempName = QString::fromStdString(tempKeyword[0]);
             namelist.append(tempName);
           }
         }
@@ -438,7 +438,7 @@ namespace Isis {
           int bandNumber = int(objIter->findKeyword("BandNumber"));
           if (bandNumber == redBandNumber || bandNumber == greenBandNumber
               || bandNumber == blueBandNumber) {
-            QString tempName = tempKeyword[0];
+            QString tempName = QString::fromStdString(tempKeyword[0]);
             if (tempNameMap.contains(tempName)) {
               tempNameMap[tempName].append(bandNumber);
             }
@@ -486,13 +486,13 @@ namespace Isis {
       }
       else {
         std::vector<PvlKeyword> keywordValueRed;
-        keywordValueRed.push_back(PvlKeyword("BandNumber",  QString::number(cvp->redBand())));
+        keywordValueRed.push_back(PvlKeyword("BandNumber",  std::to_string(cvp->redBand())));
 
         std::vector<PvlKeyword> keywordValueGreen;
-        keywordValueGreen.push_back(PvlKeyword("BandNumber", QString::number(cvp->greenBand())));
+        keywordValueGreen.push_back(PvlKeyword("BandNumber", std::to_string(cvp->greenBand())));
 
         std::vector<PvlKeyword> keywordValueBlue;
-        keywordValueBlue.push_back(PvlKeyword("BandNumber", QString::number(cvp->blueBand())));
+        keywordValueBlue.push_back(PvlKeyword("BandNumber", std::to_string(cvp->blueBand())));
 
         CubeStretch redStretch = icube->readCubeStretch(stretchName, keywordValueRed);
         CubeStretch greenStretch = icube->readCubeStretch(stretchName, keywordValueGreen);
@@ -537,7 +537,7 @@ namespace Isis {
         PvlKeyword tempKeyword = objIter->findKeyword("Name");
         int bandNumber = int(objIter->findKeyword("BandNumber"));
         if (cvp->grayBand() == bandNumber) {
-          QString tempName = tempKeyword[0];
+          QString tempName = QString::fromStdString(tempKeyword[0]);
           namelist.append(tempName);
         }
       }
@@ -601,7 +601,7 @@ namespace Isis {
     for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
       if (objIter->name() == "Stretch") {
         PvlKeyword tempKeyword = objIter->findKeyword("Name");
-        QString tempName = tempKeyword[0];
+        QString tempName = QString::fromStdString(tempKeyword[0]);
         namelist.append(tempName);
       }
     }

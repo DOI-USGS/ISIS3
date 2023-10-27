@@ -77,9 +77,9 @@ void IsisMain() {
       // Now split multi string values and construct the Pvl keyword
       QString keyname = keyval[0];
       QStringList values =  keyval[1].split(",", QString::SkipEmptyParts);
-      PvlKeyword keyword(keyname);
+      PvlKeyword keyword(keyname.toStdString());
       BOOST_FOREACH ( QString val, values) {
-        keyword.addValue(val);
+        keyword.addValue(val.toStdString());
       }
 
       // Add the parameter to global parameters
@@ -93,7 +93,7 @@ void IsisMain() {
   // Load global parameter file for use in global variable pool
   if ( ui.WasEntered("GLOBALS") ) {
     QString globalfile = ui.GetFileName("GLOBALS");
-    Pvl pvl_globals(globalfile);
+    Pvl pvl_globals(globalfile.toStdString());
     SharedResource gfile(new Resource("GlobalFileResources", PvlFlatMap(pvl_globals)));
     factory->addGlobal(gfile);
     globals->add("GLOBALS", globalfile);

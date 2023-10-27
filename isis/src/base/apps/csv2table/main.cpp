@@ -83,7 +83,7 @@ void IsisMain() {
   }
 
   QString tableName = ui.GetString("tablename");
-  Table table(tableName, tableRow);
+  Table table(tableName.toStdString(), tableRow);
 
   // Fill the table from the csv
   for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
@@ -109,7 +109,7 @@ void IsisMain() {
     QString labelPvlFilename = ui.GetFileName("label");
     Pvl labelPvl;
     try {
-      labelPvl.read(labelPvlFilename);
+      labelPvl.read(labelPvlFilename.toStdString());
     }
     catch(IException &e) {
       QString msg = "Failed to read PVL label file [" + labelPvlFilename + "].";
