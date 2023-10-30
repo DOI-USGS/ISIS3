@@ -91,7 +91,7 @@ namespace Isis {
     }
 
     // Get the name of the parameter files
-    Pvl par(ui.GetFileName("PHOALGO"));
+    Pvl par(ui.GetFileName("PHOALGO").toStdString());
     Cube *parCube = new Cube();
     CubeAttributeInput parCubeAtt = ui.GetInputAttribute("PHOPARCUBE");
     if (parCubeAtt.bands().size() != 0) {
