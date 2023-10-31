@@ -45,7 +45,7 @@ release.
   outputsuffix, both, or neither for naming convention purposes. [#5162](https://github.com/DOI-USGS/ISIS3/pull/5162)
 
 ### Added
-- Added rclone to run dependencies in meta.yaml [#5183](https://github.com/DOI-USGS/ISIS3/issues/5183)
+- Cnetedit has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5322](https://github.com/USGS-Astrogeology/ISIS3/issues/5322), 
 - Add new program option <b>TONOGEOM</b> to <i>findfeatures</i> that logs captures geometry errors in the FASTGEOM algorithm and records them to the file provided in this parameter. These images are excluded from the matching process. References [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Added a new Radial FASTGEOM transform mapping algorithm to <i>findfeatures</i> to address performance problems with the Grid algorithm. This is now the default algorithm if none are selected by the user (see the new <b>GLOBALS</b> parameter to specify the algorithm) [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Added new parameter <b>GLOBALS</b> to make parameterization of <i>findfeatures</i> behavior significantly easier and convenient. Wrote significant documentation for the parameter and provide several examples showing its use. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)

@@ -15,7 +15,7 @@ template< typename A, typename B > class QMap;
 template< typename T > class QSet;
 
 namespace Isis {
-  class ControlNet;
+  class ControlNetVersioner;
   class FileName;
   class Pvl;
   class PvlContainer;
@@ -23,12 +23,14 @@ namespace Isis {
   class PvlObject;
 
   /**
-   * @brief Compares two Control Networks and reports their differences
+   * @brief Compares two Control Networks in ControlNetVersioner form and
+   * reports their differences
    *
-   * This class opens two Control Networks from Filenames and returns their
-   * differences as a PVL structure.  It is generally stateless, able to compare
-   * multiple networks in succession without needing to reset anything.
-   * However, the tolerances that are added are persistent.
+   * This class takes two Control Networks in ControlNetVersioner form and their
+   * corresponding Filenames and returns their differences as a PVL structure. It
+   * is generally stateless, able to compare multiple networks in succession
+   * without needing to reset anything. However, the tolerances that are added are
+   * persistent.
    *
    * Differences will be reported as PvlKeywords with two to three values.  The
    * first value is from the first network, the second from the second network,
@@ -48,6 +50,11 @@ namespace Isis {
    *   @history 2012-04-26 Travis Addair - Added documentation.
    *   @history 2018-01-02 Kristin Berry - Modified to use ControlNetVersioner instead of
    *                           LatestControlNetFile.
+   *   @history 2023-10-30 Ken Edmundson - Added compare method with ControlNetVersioner
+   *                           arguments in addition to control net Filenames to support
+   *                           conversion of cnetdiff app to a callable function and
+   *                           gtests. Modified original compare method to call the new
+   *                           method above.
    *
    */
   class ControlNetDiff {
@@ -57,8 +64,10 @@ namespace Isis {
       virtual ~ControlNetDiff();
 
       void addTolerances(Pvl &diffFile);
-      Pvl compare(FileName &net1Name, FileName &net2Name);
 
+      Pvl compare(FileName &net1Name, FileName &net2Name);
+      Pvl compare(ControlNetVersioner &cnv1, ControlNetVersioner &cnv2,
+                  FileName &net1Name, FileName &net2Name);
 
     protected:
       void compare(PvlObject &point1Pvl, PvlObject &point2Pvl, PvlObject &report);
