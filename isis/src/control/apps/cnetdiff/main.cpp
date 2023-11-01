@@ -18,7 +18,4 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Pvl results = cnetdiff(ui);
-  for (int resultIndex = 0; resultIndex < results.groups(); resultIndex++) {
-    Application::Log(results.group(resultIndex));
-  }
 }

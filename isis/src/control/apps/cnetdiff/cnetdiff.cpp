@@ -96,7 +96,7 @@ namespace Isis {
 
       // compare ControlNetVersioners
       Compare(cnv1, cnv2);
-    
+
       PvlGroup differences("Results");
       if (filesMatch) {
         differences += PvlKeyword("Compare", "Identical");
@@ -106,7 +106,7 @@ namespace Isis {
         differences += PvlKeyword("Reason", differenceReason);
       }
 
-      log.addGroup(differences);
+      log.addLogGroup(differences);
 
       if (ui.WasEntered("TO")) log.write(ui.GetFileName("TO"));
 
@@ -123,7 +123,7 @@ namespace Isis {
          differencer.addTolerances(*diffFile);
       }
 
-      Pvl out = differencer.compare(cnv1, cnv2, fileName1, fileName2);
+      Pvl out = differencer.compare(fileName1, fileName2);
       if (ui.WasEntered("TO")) out.write(ui.GetFileName("TO"));
 
       PvlGroup results("Results");
@@ -137,7 +137,7 @@ namespace Isis {
       if (differences.hasKeyword("Filename")) count--;
 
       results += PvlKeyword("Compare", count > 0 ? "Different" : "Identical");
-      log += results;
+      log.addLogGroup(results);
       return log;
     }
   }
