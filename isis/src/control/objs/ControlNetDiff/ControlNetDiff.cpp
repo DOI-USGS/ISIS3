@@ -15,6 +15,7 @@ find files of those names at the top level of this repository. **/
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlNetVersioner.h"
+#include "ControlPoint.h"
 #include "FileName.h"
 #include "Pvl.h"
 #include "PvlContainer.h"
@@ -48,10 +49,10 @@ namespace Isis {
    */
   ControlNetDiff::~ControlNetDiff() {
     delete m_tolerances;
-    m_tolerances = nullptr;
+    m_tolerances = NULL;
 
     delete m_ignoreKeys;
-    m_ignoreKeys = nullptr;
+    m_ignoreKeys = NULL;
   }
 
 
@@ -87,30 +88,13 @@ namespace Isis {
    * @return Pvl The collection of all differences
    */
   Pvl ControlNetDiff::compare(FileName &net1Name, FileName &net2Name) {
-
-    ControlNetVersioner cnv1(net1Name);
-    ControlNetVersioner cnv2(net2Name);
-
-    return compare(cnv1, cnv2, net1Name, net2Name);
-  }
-
-
-  /**
-   * Compare two Control Networks in ControNetVersioner form, and return their
-   * differences.
-   *
-   * @param cnv1 first Control Network
-   * @param cnv2 second Control Network
-   * @param net1Name FileName of the first Control Network
-   * @param net2Name FileName of the second Control Network
-   * @return Pvl The collection of all differences
-   */
-  Pvl ControlNetDiff::compare(ControlNetVersioner &cnv1, ControlNetVersioner &cnv2,
-                              FileName &net1Name, FileName &net2Name) {
     Pvl results;
     PvlObject report("Differences");
 
     diff("Filename", net1Name.name(), net2Name.name(), report);
+
+    ControlNetVersioner cnv1(net1Name);
+    ControlNetVersioner cnv2(net2Name);
 
     BigInt net1NumPts = cnv1.numPoints();
     BigInt net2NumPts = cnv2.numPoints();
@@ -429,8 +413,8 @@ namespace Isis {
    * "DateTime" keyword.
    */
   void ControlNetDiff::init() {
-    m_tolerances = nullptr;
-    m_ignoreKeys = nullptr;
+    m_tolerances = NULL;
+    m_ignoreKeys = NULL;
 
     m_tolerances = new QMap<QString, double>;
     m_ignoreKeys = new QSet<QString>;
