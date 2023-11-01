@@ -37,6 +37,7 @@ release.
 
 
 ### Changed
+- Cnetedit has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5322](https://github.com/USGS-Astrogeology/ISIS3/issues/5322), 
 - Changed cholmod 32 bit calls to 64 bit calls [#5173](https://github.com/DOI-USGS/ISIS3/issues/5173) and [#5176](https://github.com/DOI-USGS/ISIS3/issues/5176)
 - Removed the `.py` extention from the _isisdataeval_ tool `isisdata_mockup` for consistency and install it in $ISISROOT/bin; added the `--tojson` and `--hasher` option to _isisdata_mockup_ tool improve utility; updated the tool `README.md` documentation to reflect this change, removed help output and trimmed example results;  fixed paths to test data in `make_isisdata_mockup.sh`. [#5163](https://github.com/DOI-USGS/ISIS3/pull/5163)
 - Significantly refactored FASTGEOM processing in <i>findfeatures</i> to accommodate stability and functionality. The scope of the algorithm was taken out of the ImageSource class and isolated to support this feature. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
@@ -45,7 +46,6 @@ release.
   outputsuffix, both, or neither for naming convention purposes. [#5162](https://github.com/DOI-USGS/ISIS3/pull/5162)
 
 ### Added
-- Cnetedit has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5322](https://github.com/USGS-Astrogeology/ISIS3/issues/5322), 
 - Add new program option <b>TONOGEOM</b> to <i>findfeatures</i> that logs captures geometry errors in the FASTGEOM algorithm and records them to the file provided in this parameter. These images are excluded from the matching process. References [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Added a new Radial FASTGEOM transform mapping algorithm to <i>findfeatures</i> to address performance problems with the Grid algorithm. This is now the default algorithm if none are selected by the user (see the new <b>GLOBALS</b> parameter to specify the algorithm) [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Added new parameter <b>GLOBALS</b> to make parameterization of <i>findfeatures</i> behavior significantly easier and convenient. Wrote significant documentation for the parameter and provide several examples showing its use. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
