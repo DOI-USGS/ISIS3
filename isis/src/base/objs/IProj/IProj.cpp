@@ -20,77 +20,63 @@ namespace Isis {
   IProj::IProj(Pvl &label, bool allowDefaults) :
       TProjection::TProjection(label) {
     PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
-    if (!mapGroup.hasKeyword("ProjectionType")) {
-      QString message = "No ProjectionType keyword in mapping group, either add a ProjectionType or select a different projection method";
+    if (!mapGroup.hasKeyword("ProjStr")) {
+      QString message = "No ProjStr keyword in mapping group, either add a ProjStr or select a different projection method";
       throw IException(IException::User, message, _FILEINFO_);
     }
     m_C = proj_context_create();
 
-    m_userOutputProjType = new QString(mapGroup["ProjectionType"]);
-    std::string userOutputProjStr = "+proj=" + (*m_userOutputProjType).toStdString();
-    userOutputProjStr += " +x_0=0 +y_0=0";
-    addRadii(userOutputProjStr);
-
-    std::string llaProjString = "+proj=latlong";
-    addRadii(llaProjString);
-
-    if (LongitudeDomainString() == "360") {
-      llaProjString += " +lon_0=180";
-    }
-
-    if (LongitudeDirectionString() == "PositiveEast" || LongitudeDomainString() == "180") {
-      llaProjString += " +axis=enu";
-      userOutputProjStr += " +axis=enu";
-    }
-    else {
-      llaProjString += " +axis=wnu";
-      userOutputProjStr += " +axis=wnu";
-    }
-
-    // We will likely need to add more proj parameters to proj strings
-    // to support individual proj projections in ISIS
-    
-    llaProjString += " +type=crs";
-    userOutputProjStr += " +type=crs";
-    m_userOutputProjStr = new QString(userOutputProjStr.c_str());
-
-    m_llaProj = proj_create(m_C, llaProjString.c_str());
-
-    if (0 == m_llaProj) {
-      QString msg = "Unable to create projection from [" + QString(llaProjString.c_str()) + "]";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    /* Get the geodetic CRS for that projection. */
-    m_geocentricProj = proj_crs_get_geodetic_crs(m_C, m_llaProj);
-
-    if (0 == m_geocentricProj) {
-      QString msg = "Unable to create geocentric projection";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    m_geocentProj2llaProj = proj_create_crs_to_crs_from_pj(m_C, m_geocentricProj, m_llaProj, 0, 0);
+    m_userOutputProjStr = new QString(mapGroup["ProjStr"]);
 
     /* Create a projection. */
     std::string projString = m_userOutputProjStr->toStdString();
     m_outputProj = proj_create(m_C, projString.c_str());
+
     if (0 == m_outputProj) {
       QString msg = "Unable to create projection from [" + QString(projString.c_str()) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
+    PJ *outputEllipsoid = proj_get_ellipsoid(m_C, m_outputProj);
+
+    if (outputEllipsoid == 0) {
+      QString msg = "Unable to get ellipsoid from [" + *m_userOutputProjStr + "]. " + 
+      "Please add a radii definition to your proj string.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    int res = proj_ellipsoid_get_parameters(m_C, outputEllipsoid, 
+                                            &m_equatorialRadius,
+                                            &m_polarRadius,
+                                            nullptr,
+                                            nullptr);
+    proj_destroy(outputEllipsoid);
+
+    if (res == 0) {
+      QString msg = "Unable to get ellipsoid information from [" + *m_userOutputProjStr + "]";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    m_llaProj = proj_crs_get_geodetic_crs(m_C, m_outputProj);
+
+    if (0 == m_llaProj) {
+      QString msg = "Unable to create projection from []";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
     m_llaProj2outputProj = proj_create_crs_to_crs_from_pj(m_C, m_llaProj, m_outputProj, 0, 0);
+    if (0 == m_llaProj2outputProj) {
+      QString msg = "Unable to create transform from [" + QString(projString.c_str()) + "]";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
   }
 
   //! Destroys the IProj object
   IProj::~IProj() {
-    delete m_userOutputProjType;
     delete m_userOutputProjStr;
     proj_destroy(m_llaProj);
     proj_destroy(m_outputProj);
-    proj_destroy(m_geocentricProj);
     proj_destroy(m_llaProj2outputProj);
-    proj_destroy(m_geocentProj2llaProj);
     proj_context_destroy(m_C);
   }
 
@@ -113,8 +99,12 @@ namespace Isis {
   PvlGroup IProj::Mapping()  {
     PvlGroup mapping = TProjection::Mapping();
 
+    mapping.addKeyword(PvlKeyword("EquatorialRadius", toString(m_equatorialRadius, 15), "meters"), PvlContainer::InsertMode::Replace);
+    mapping.addKeyword(PvlKeyword("PolarRadius", toString(m_polarRadius, 15), "meters"), PvlContainer::InsertMode::Replace);
+    mapping.addKeyword(PvlKeyword("LatitudeType", "Planetographic"), PvlContainer::InsertMode::Replace);
+    mapping.addKeyword(PvlKeyword("LongitudeDomain", "180"), PvlContainer::InsertMode::Replace);
+
     mapping += PvlKeyword("ProjStr", *m_userOutputProjStr);
-    mapping += PvlKeyword("ProjectionType", *m_userOutputProjType);
 
     return mapping;
   }
@@ -135,18 +125,10 @@ namespace Isis {
 
     PJ_COORD c_in;
     c_in.lpz.lam = m_longitude;
-    c_in.lpz.phi = m_latitude;
+    // Convert to ographic as proj defaults to operating in ographic latitudes
+    c_in.lpz.phi = ToPlanetographic(m_latitude);
 
-    PJ_COORD c_out;
-
-    if (LatitudeTypeString() == "Planetographic") {
-      c_out = proj_trans(m_geocentProj2llaProj, PJ_FWD, c_in);
-
-      c_in.lpz.lam = c_out.lpz.lam;
-      c_in.lpz.phi = c_out.lpz.phi;
-    }
-
-    c_out = proj_trans(m_llaProj2outputProj, PJ_FWD, c_in);
+    PJ_COORD c_out = proj_trans(m_llaProj2outputProj, PJ_FWD, c_in);
     SetComputedXY(c_out.xy.x, c_out.xy.y);
     m_good = true;
     return m_good;
@@ -161,15 +143,9 @@ namespace Isis {
 
     PJ_COORD c_out = proj_trans(m_llaProj2outputProj, PJ_INV, c_in);
 
-    if (LatitudeTypeString() == "Planetographic") {
-      c_in.lpz.lam = c_out.lpz.lam;
-      c_in.lpz.phi = c_out.lpz.phi;
-
-      c_out = proj_trans(m_geocentProj2llaProj, PJ_INV, c_in);
-    }
-
-    m_longitude  = c_out.lpz.lam;
-    m_latitude = c_out.lpz.phi;
+    m_longitude = c_out.lpz.lam;
+    // Convert back to ocentric as ISIS defaults to operating in ocentric latitudes
+    m_latitude = ToPlanetocentric(c_out.lpz.phi);
     m_good = true;
     return m_good;
   }
@@ -223,15 +199,6 @@ namespace Isis {
     minY = m_minimumY;
     maxY = m_maximumY;
     return true;
-  }
-
-  void IProj::addRadii(std::string &projString) {
-    std::string radiiStr = " +a=" +
-                           toString(m_equatorialRadius, 16).toStdString() +
-                           " +b=" +
-                           toString(m_polarRadius, 16).toStdString() +
-                           " +units=m";
-    projString += radiiStr;
   }
 
   /**

@@ -49,15 +49,10 @@ namespace Isis {
                    double &minY, double &maxY);
 
     private:
-      void addRadii(std::string &projString);
-
       QString *m_userOutputProjStr;
-      QString *m_userOutputProjType;
       PJ_CONTEXT *m_C;
-      PJ *m_geocentricProj;
       PJ *m_llaProj;
       PJ *m_outputProj;
-      PJ *m_geocentProj2llaProj;
       PJ *m_llaProj2outputProj;
   };
 };
