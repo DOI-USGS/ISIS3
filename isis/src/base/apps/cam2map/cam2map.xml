@@ -381,6 +381,28 @@
           <item>LONSEAM</item>
         </exclusions>
       </parameter>
+
+      <parameter name="USEPROJ">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <exclusions>
+          <item>MAP</item>
+        </exclusions>
+        <inclusions>
+          <item>PROJString</item>
+        </inclusions>
+      </parameter>
+    </group>
+
+    <group name="PROJ">
+      <parameter name="PROJString">
+        <type>string</type>
+        <brief>A PROJ4 string that defines the projection</brief>
+        <description>
+          This parameters is used instead of the map file to define the projection to
+          transform into. For help with PROJ strings visit https://proj.org/en/9.3/index.html
+        </description>
+      </parameter>
     </group>
 
     <group name="Output Map Resolution">
