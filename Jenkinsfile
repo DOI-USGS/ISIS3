@@ -33,8 +33,6 @@ pipeline {
                 conda install -c conda-forge python=3 findutils
                 conda env update -f environment.yml --prune
                 conda activate isis
-                mamba install -c conda-forge git
-                git submodule update --init --recursive
                 conda list
                 '''
             }
