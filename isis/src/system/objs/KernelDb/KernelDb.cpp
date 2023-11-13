@@ -740,7 +740,7 @@ namespace Isis {
     // Load the leapsecond DB
     loadKernelDbFiles(dataDir, baseDir + "/kernels/lsk", lab);
     // Load the target attitude shape DB
-    // Try to get a mission specific pck data, if that
+    // Try to get mission specific pck data, if that
     // fails, fallback to the base pck data
     try {
       loadKernelDbFiles(dataDir, missionDir + "/kernels/pck", lab);
