@@ -35,10 +35,8 @@ release.
 
 ## [Unreleased]
 
-
 ### Changed
 - Cnetedit has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5322](https://github.com/USGS-Astrogeology/ISIS3/issues/5322), 
-- Changed cholmod 32 bit calls to 64 bit calls [#5173](https://github.com/DOI-USGS/ISIS3/issues/5173) and [#5176](https://github.com/DOI-USGS/ISIS3/issues/5176)
 - Removed the `.py` extention from the _isisdataeval_ tool `isisdata_mockup` for consistency and install it in $ISISROOT/bin; added the `--tojson` and `--hasher` option to _isisdata_mockup_ tool improve utility; updated the tool `README.md` documentation to reflect this change, removed help output and trimmed example results;  fixed paths to test data in `make_isisdata_mockup.sh`. [#5163](https://github.com/DOI-USGS/ISIS3/pull/5163)
 - Significantly refactored FASTGEOM processing in <i>findfeatures</i> to accommodate stability and functionality. The scope of the algorithm was taken out of the ImageSource class and isolated to support this feature. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Report better information regarding the behavior of <i>findfeatures</i>, FASTGEOM algorithms, and creation of the output network. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
@@ -63,19 +61,24 @@ release.
 ### Removed
 
 ### Fixed
-- Updated History constructor to check for invalid BLOB before copying History BLOB to output cube [#4966](https://github.com/DOI-USGS/ISIS3/issues/4966)
 - Updated photomet MinnaertEmpirical model to support photemplate-style PVL format [#3621](https://github.com/DOI-USGS/ISIS3/issues/3621)
-- Fixed downloadIsisData script copying existing files with every rclone download [#5245](https://github.com/DOI-USGS/ISIS3/issues/5245)
-- Fixed gaussstretch segmentation fault error and refactored gaussstretch files/tests to use gtest [#5240](https://github.com/DOI-USGS/ISIS3/issues/5240)
 - Fix matrix inversion errors in <i>findfeatures</i> due to bad FASTGEOM matrix transforms using a more robust implementation to detect these errors and throw exceptions. Images with these errors are captured and logged to the <b>TONOTMATCHED</b> file. Fixes [#4639](https://github.com/DOI-USGS/ISIS3/issues/4639)
 - Fixed <i>findfeatures</i> use of projected mosaics with correct check for <b>TargetName</b> in the Mapping labels. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Fixed a bug in the <i>cnetwinnow</i> test that did not clean/remove it during test runs.
 - Fixed <i>findfeatures</i> instantiation and use of projection classes to correctly return geometry data from projected images and mosaics. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
-- Fixed `cubeit` attribute error to allow attribute specification on the output cube filename [#5234](https://github.com/DOI-USGS/ISIS3/issues/5234)
-- Fixed `campt` to handle input band selection attribute correctly [#5234](https://github.com/DOI-USGS/ISIS3/issues/5235)
 - Fixed target name translation for any dawn images with target "4 CERES" [#5294](https://github.com/DOI-USGS/ISIS3/pull/5294)
 - Fixed exception pop ups in qview when viewing images created using the CSM Camera [#5259](https://github.com/DOI-USGS/ISIS3/pull/5295/files)
 - Fixed shadowtau input file parseing errors when using example file [#5316](https://github.com/DOI-USGS/ISIS3/pull/5316)
+
+## [8.0.1] - 2023-08-23
+
+### Fixed
+- Updated History constructor to check for invalid BLOB before copying History BLOB to output cube [#4966](https://github.com/DOI-USGS/ISIS3/issues/4966)
+- Fixed downloadIsisData script copying existing files with every rclone download [#5245](https://github.com/DOI-USGS/ISIS3/issues/5245)
+- Fixed gaussstretch segmentation fault error and refactored gaussstretch files/tests to use gtest [#5240](https://github.com/DOI-USGS/ISIS3/issues/5240)
+- Fixed `cubeit` attribute error to allow attribute specification on the output cube filename [#5234](https://github.com/DOI-USGS/ISIS3/issues/5234)
+- Fixed `campt` to handle input band selection attribute correctly [#5234](https://github.com/DOI-USGS/ISIS3/issues/5235)
+- Fixed problem networks segfaulting in jigsaw by updating cholmod 32 bit calls to 64 bit calls [#5173](https://github.com/DOI-USGS/ISIS3/issues/5173) and [#5176](https://github.com/DOI-USGS/ISIS3/issues/5176)
 
 ## [8.0.0] - 2023-04-19
 
