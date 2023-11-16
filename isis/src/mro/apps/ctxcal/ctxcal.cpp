@@ -68,6 +68,11 @@ namespace Isis {
 
               QStringRef month(&outputFile, 0, 3);
               flat = FileName("$mro/calibration/ctxFlatFiles/" + month + ".flat.cub");
+              if (!flat.fileExists()) {
+                QString msg = "Could not find flat file [" + flat.expanded() "]. "
+                              "Either the data area is not set or a month is missing.";
+                throw IException(IException::Unknown, msg, _FILEINFO_);
+              }
           }
           else {
               flat = FileName("$mro/calibration/ctxFlat_????.cub").highestVersion();
