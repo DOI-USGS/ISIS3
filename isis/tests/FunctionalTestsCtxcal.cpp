@@ -63,6 +63,29 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalFlatfile) {
   EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0018248585597074806);
 }
 
+TEST_F(MroCtxCube, FunctionalTestCtxcalMonthlyFlatfile) {
+  QString outCubeFileName = tempDir.path() + "/outTemp.cub";
+  QVector<QString> args = {"to="+outCubeFileName, "monthlyflat=True"};
+
+  UserInterface options(APP_XML, args);
+
+  try {
+    ctxcal(testCube.get(), options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open image: " << e.what() << std::endl;
+  }
+
+  Cube oCube(outCubeFileName, "r");
+
+  Histogram *oCubeStats = oCube.histogram();
+
+  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.10046864503994585);
+  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 40.187458015978336);
+  EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
+  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0018248585597074806);
+}
+
 
 TEST_F(MroCtxCube, FunctionalTestCtxcalIofFalse) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";

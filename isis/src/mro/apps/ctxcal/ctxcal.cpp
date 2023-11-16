@@ -64,12 +64,13 @@ namespace Isis {
       else {
           FileName flat;
           if (ui.GetBoolean("MONTHLYFLAT")) {
-              QString outputFile = ui.GetCubeName("TO");
+              FileName outputFileName(icube->fileName());
+              QString outputFileBase = outputFileName.baseName();
 
-              QStringRef month(&outputFile, 0, 3);
+              QStringRef month(&outputFileBase, 0, 3);
               flat = FileName("$mro/calibration/ctxFlatFiles/" + month + ".flat.cub");
               if (!flat.fileExists()) {
-                QString msg = "Could not find flat file [" + flat.expanded() "]. "
+                QString msg = "Could not find flat file [" + flat.expanded() + "]. "
                               "Either the data area is not set or a month is missing.";
                 throw IException(IException::Unknown, msg, _FILEINFO_);
               }
