@@ -1628,7 +1628,7 @@ namespace Isis {
     }
 
     // restore input state if calculation failed and clean up.
-    if (!shapeModel->hasNormal()) {
+    if (!shapeModel->hasLocalNormal()) {
       p_pointComputed = false;
       return;
     }
@@ -1640,7 +1640,7 @@ namespace Isis {
 
     // Set the method normal values
     std::vector<double> localNormal(3);
-    localNormal = shapeModel->normal();
+    localNormal = shapeModel->localNormal();
     memcpy(normal, (double *) &localNormal[0], sizeof(double) * 3);
   }
 

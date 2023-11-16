@@ -442,7 +442,7 @@ namespace Isis {
     }
 
     btVector3 normal = m_intercept.normal();
-    setNormal(normal[0], normal[1], normal[2]);
+    setLocalNormal(normal[0], normal[1], normal[2]);
   }
 
 

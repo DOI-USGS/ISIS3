@@ -232,7 +232,7 @@ namespace Isis {
   double ShapeModel::incidenceAngle(const std::vector<double> &illuminatorBodyFixedPosition) {
 
     // Calculate the surface normal if we haven't yet.
-    if (!m_hasNormal) calculateDefaultNormal();
+    if (!hasNormal()) calculateDefaultNormal();
 
     // Get vector from center of body to surface point
     SpiceDouble pB[3];
@@ -381,6 +381,16 @@ namespace Isis {
 
 
   /**
+   * Returns surface point local normal status.
+   *
+   * @return @b Indicates whether this ShapeModel has a surface normal.
+   */
+  bool ShapeModel::hasLocalNormal() const {
+    return m_hasLocalNormal;
+  }
+
+
+  /**
    * Clears or resets the current surface point.
    */
   void ShapeModel::clearSurfacePoint() {
@@ -390,7 +400,7 @@ namespace Isis {
 
 
   /**
-   * Returns the local surface normal at the current intersection point.
+   * Returns the surface normal at the current intersection point.
    * Note: This method will throw an error if the normal doesn't exist. Use the
    * hasNormal() method to verify before calling this method.
    *
@@ -403,10 +413,28 @@ namespace Isis {
       return m_normal;
     }
     else {
+      QString message = "The normal has not been computed.";
+      throw IException(IException::Unknown, message, _FILEINFO_);
+    }
+  }
+
+    /**
+   * Returns the local surface normal at the current intersection point.
+   * Note: This method will throw an error if the normal doesn't exist. Use the
+   * hasLocalNormal() method to verify before calling this method.
+   *
+   * @see hasLocalNormal()
+   *
+   * @return A local surface normal vector, if it exists.
+   */
+  std::vector<double> ShapeModel::localNormal() {
+    if (m_hasLocalNormal ) {
+      return m_localNormal;
+    }
+    else {
       QString message = "The local normal has not been computed.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
-
   }
 
 /**
@@ -495,6 +523,28 @@ namespace Isis {
     }
   }
 
+    /**
+   * Sets the normal for the currect intersection point.
+   * Note: This method will throw an error if this ShapeModel doesn't have
+   * and intersection. Use the hasIntersection() method to verify before
+   * calling this method.
+   *
+   * @see hasIntersection()
+   *
+   * @param normal Three dimensional surface normal vector.
+   *
+   */
+  void ShapeModel::setLocalNormal(const std::vector<double> normal) {
+    if (m_hasIntersection) {
+      m_localNormal = normal;
+      m_hasLocalNormal = true;
+    }
+    else {
+      QString message = "No intersection point in known.  A local normal can not be set.";
+      throw IException(IException::Unknown, message, _FILEINFO_);
+    }
+  }
+
 
   /**
    * Sets the normal for the currect intersection point.
@@ -522,6 +572,31 @@ namespace Isis {
     }
   }
 
+  /**
+   * Sets the normal for the currect intersection point.
+   * Note: This method will throw an error if this ShapeModel doesn't have and
+   * intersection. Use the hasIntersection() method to verify before calling
+   * this method.
+   *
+   * @see hasIntersection()
+   *
+   * @param a First coordinate value for the three dimensional surface normal.
+   * @param b Second coordinate value for the three dimensional surface normal.
+   * @param c Third coordinate value for the three dimensional surface normal.
+   *
+   */
+  void ShapeModel::setLocalNormal(const double a, const double b, const double c) {
+    if (m_hasIntersection) {
+      m_localNormal[0] = a;
+      m_localNormal[1] = b;
+      m_localNormal[2] = c;
+      m_hasLocalNormal = true;
+    }
+    else {
+      QString message = "No intersection point in known.  A local normal can not be set.";
+      throw IException(IException::Unknown, message, _FILEINFO_);
+    }
+  }
 
   /**
    * Sets the shape name.
@@ -580,6 +655,16 @@ namespace Isis {
    */
   void ShapeModel::setHasNormal(bool status) {
     m_hasNormal = status;
+  }
+
+    /**
+   * Sets the flag to indicate whether this ShapeModel has a surface normal.
+   *
+   * @param b Indicates whether there is a normal.
+   *
+   */
+  void ShapeModel::setHasLocalNormal(bool status) {
+    m_hasLocalNormal = status;
   }
 
 

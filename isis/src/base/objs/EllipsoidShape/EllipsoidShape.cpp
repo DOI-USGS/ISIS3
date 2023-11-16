@@ -129,8 +129,8 @@ namespace Isis {
     surfnm_c(a, b, c, pB, (SpiceDouble *) &normal[0]);
     NaifStatus::CheckErrors();
 
-    setNormal(normal);
-    setHasNormal(true);
+    setLocalNormal(normal);
+    setHasLocalNormal(true);
   }
 
 

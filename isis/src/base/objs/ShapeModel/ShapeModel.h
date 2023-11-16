@@ -93,6 +93,7 @@ namespace Isis {
 
       bool hasIntersection();
       bool hasNormal() const;
+      bool hasLocalNormal() const;
 
       // Calculate the default normal of the current intersection point
       virtual void calculateDefaultNormal() = 0;
@@ -140,8 +141,11 @@ namespace Isis {
       // Set current surface point
       virtual void setSurfacePoint(const SurfacePoint &surfacePoint);
 
-      // Return the normal (surface or local) of the current intersection point
+      // Return the surface normal of the current intersection point
       virtual std::vector<double>  normal();
+
+      // Return the local normal of the current intersection point
+      virtual std::vector<double> localNormal();
 
       // Determine if the internal intercept is occluded from the observer/lookdir
       virtual bool isVisibleFrom(const std::vector<double> observerPos,
@@ -152,6 +156,8 @@ namespace Isis {
       // Set the normal (surface or local) of the current intersection point
       void setNormal(const std::vector<double>);
       void setNormal(const double a, const double b, const double c);
+      void setLocalNormal(const std::vector<double>);
+      void setLocalNormal(const double a, const double b, const double c);
 
       // Set shape name
       void setName(QString name);
@@ -165,13 +171,16 @@ namespace Isis {
       bool hasValidTarget() const;
       std::vector<Distance> targetRadii() const;
       void setHasNormal(bool status);
+      void setHasLocalNormal(bool status);
       double resolution();
 
     private:
       bool m_hasEllipsoidIntersection; //!< Indicates the ellipsoid was successfully intersected
       bool m_hasIntersection;          //!< indicates good intersection exists
       bool m_hasNormal;                //!< indicates normal has been computed
+      bool m_hasLocalNormal;                //!< indicates normal has been computed
       std::vector<double> m_normal;    //!< Local normal of current intersection point
+      std::vector<double> m_localNormal;    //!< Local normal of current intersection point
       QString *m_name;                 //! < Name of the shape
       SurfacePoint *m_surfacePoint;    //!< Current intersection point
 
