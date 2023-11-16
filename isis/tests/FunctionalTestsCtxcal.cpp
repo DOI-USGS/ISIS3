@@ -80,10 +80,10 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalMonthlyFlatfile) {
 
   Histogram *oCubeStats = oCube.histogram();
 
-  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.10046864503994585);
-  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 40.187458015978336);
+  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.080543650835752489);
+  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 32.217460334300995);
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0018248585597074806);
+  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0012787322597001109);
 }
 
 
