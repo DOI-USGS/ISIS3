@@ -56,25 +56,6 @@ namespace Isis {
   }
 
 
-  /** Calculate default normal
-   *
-   */
-  void EllipsoidShape::calculateDefaultNormal()  {
-    calculateSurfaceNormal();
-  }
-
-
-  /** Calculate surface normal
-   *
-   */
-  void EllipsoidShape::calculateSurfaceNormal()  {
-    QVector <double *> points;
-    calculateLocalNormal(points);
-
-    setNormal(localNormal());
-  }
-
-
   /**
    * Indicates that this shape model is not from a DEM. Since this method
    * returns false for this class, the Camera class will not calculate the
@@ -107,31 +88,11 @@ namespace Isis {
    * @param cornerNeighborPoints
    */
   void EllipsoidShape::calculateLocalNormal(QVector<double *> cornerNeighborPoints)  {
-
-    if (!surfaceIntersection()->Valid() || !hasIntersection()) {
-     IString msg = "A valid intersection must be defined before computing the surface normal";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
+    if(!hasNormal()) {
+      calculateSurfaceNormal();
     }
 
-    // Get the coordinates of the current surface point
-    SpiceDouble pB[3];
-    pB[0] = surfaceIntersection()->GetX().kilometers();
-    pB[1] = surfaceIntersection()->GetY().kilometers();
-    pB[2] = surfaceIntersection()->GetZ().kilometers();
-
-    // Get the radii of the ellipsoid
-    vector<Distance> radii = targetRadii();
-    double a = radii[0].kilometers();
-    double b = radii[1].kilometers();
-    double c = radii[2].kilometers();
-
-    vector<double> normal(3,0.);
-    NaifStatus::CheckErrors();
-    surfnm_c(a, b, c, pB, (SpiceDouble *) &normal[0]);
-    NaifStatus::CheckErrors();
-
-    setLocalNormal(normal);
-    setHasLocalNormal(true);
+    setLocalNormal(normal());
   }
 
 

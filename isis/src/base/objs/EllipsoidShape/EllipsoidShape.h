@@ -59,17 +59,11 @@ namespace Isis {
       bool intersectSurface(std::vector<double> observerPos,
                             std::vector<double> lookDirection);
 
-      //! Calculate the default normal of the current intersection point
-      virtual void calculateDefaultNormal();
-
       // implement pure virtual method from ShapeModel class
       bool isDEM() const;
 
       //! Calculate the local surface normal of the current intersection point
       void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
-
-      //! Calculate the surface normal of the current intersection point
-      void calculateSurfaceNormal();
 
       //! Get the local radius for a point on the surface
       Distance localRadius(const Latitude &lat, const Longitude &lon);

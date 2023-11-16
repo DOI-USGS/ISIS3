@@ -60,19 +60,14 @@ namespace Isis {
                             const std::vector<double> &observerPos,
                             const bool &backCheck=true);
 
-      // Calculate the default normal of the current intersection point
-      void calculateDefaultNormal();
-
       bool isDEM() const;
 
       // Calculate the surface normal of the current intersection point
       void setLocalNormalFromIntercept();
       void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
-      void calculateSurfaceNormal();
 
       Distance localRadius(const Latitude &lat, const Longitude &lon);
 
-      QVector<double> ellipsoidNormal();
 
       const NaifDskPlateModel &model() const;
       const Intercept *intercept() const;
