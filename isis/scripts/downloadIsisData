@@ -229,7 +229,7 @@ if __name__ == '__main__':
         $ downloadIsisData tgo $ISISDATA
     
         # download everything except kernels with debug output
-        $ downloadIsisData all $ISISDATA --dry-run --exclude="kernels/**" -vv
+        $ downloadIsisData all $ISISDATA --dry-run --no-kernels -vv
         
         # download only cks and fks
         $ downloadIsisData all $ISISDATA --include="{ck/**,fk/**}" 
