@@ -161,6 +161,9 @@
     <change name="Kelvin Rodriguez" date="2021-02-24">
       Added ability to get the sun distance from the camera.
     </change>
+    <change name="Adam Paquette" date="2023-11-15">
+      Added ability to get the sun distance from the camera.
+    </change>
   </history>
 
   <category>
@@ -213,6 +216,17 @@
           Flat Field file (pixel dependent gain).  If no file is entered, the
           default will be used.
         </description>
+      </parameter>
+      <parameter name="MONTHLYFLAT">
+      <brief> Change the default flat file to a monthly mission flat file</brief>
+      <description>
+          If turned on, ctxcal will use the default mission monthly flat file
+          for calibration.
+      </description>
+      <type>boolean</type>
+      <default>
+        <item>No</item>
+      </default>
       </parameter>
     </group>
 

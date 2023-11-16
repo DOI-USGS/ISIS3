@@ -62,7 +62,16 @@ namespace Isis {
           flatFile.open(ui.GetCubeName("FLATFILE"));
       }
       else {
-          FileName flat = FileName("$mro/calibration/ctxFlat_????.cub").highestVersion();
+          FileName flat;
+          if (ui.GetBoolean("MONTHLYFLAT")) {
+              QString outputFile = ui.GetCubeName("TO");
+
+              QStringRef month(&outputFile, 0, 3);
+              flat = FileName("$mro/calibration/ctxFlatFiles/" + month + ".flat.cub");
+          }
+          else {
+              flat = FileName("$mro/calibration/ctxFlat_????.cub").highestVersion();
+          }
           flatFile.open(flat.expanded());
       }
       flat = new Brick(5000, 1, 1, flatFile.pixelType());
