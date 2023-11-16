@@ -162,7 +162,7 @@
       Added ability to get the sun distance from the camera.
     </change>
     <change name="Adam Paquette" date="2023-11-15">
-      Added ability to get the sun distance from the camera.
+      Exposed new calibration files to users via a new flag. Addresses #5338
     </change>
   </history>
 
