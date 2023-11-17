@@ -40,7 +40,10 @@ filter_list = [
         '- document/',
         '- *.csv',
         '- toolkit/',
-        '- kernels_ORG/'
+        '- kernels_ORG/',
+        '- orbnum/**',
+        '- old/**',
+        '- SpecialProducts/**'
     ]
 
 def find_conf():
