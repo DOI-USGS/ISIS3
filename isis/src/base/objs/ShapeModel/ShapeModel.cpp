@@ -67,7 +67,9 @@ namespace Isis {
     m_surfacePoint = new SurfacePoint();
     m_hasIntersection = false;
     m_hasNormal = false;
+    m_hasLocalNormal = false;
     m_normal.resize(3,0.);
+    m_localNormal.resize(3, 0.);
     m_hasEllipsoidIntersection = false;
   }
 
