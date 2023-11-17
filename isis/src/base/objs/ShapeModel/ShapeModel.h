@@ -58,6 +58,10 @@ namespace Isis {
    *                            setSurfacePoint() & clearSurfacePoint() virtual
    *                            to give some hope of a consistent internal state
    *                            in derived models.
+   *   @history 2023-11-17 Adam Paquette - Added new localNormal variable with same interface
+   *                                       as the surface normal. This ensures that the currently
+   *                                       stored m_normal is always the surface normal, and that 
+   *                                       the local normal is always stored in m_localNormal.
    */
   class ShapeModel {
     public:
@@ -153,9 +157,11 @@ namespace Isis {
 
     protected:
 
-      // Set the normal (surface or local) of the current intersection point
+      // Set the surface normal of the current intersection point
       void setNormal(const std::vector<double>);
       void setNormal(const double a, const double b, const double c);
+
+      // Set the local normal of the current intersection point
       void setLocalNormal(const std::vector<double>);
       void setLocalNormal(const double a, const double b, const double c);
 
@@ -178,8 +184,8 @@ namespace Isis {
       bool m_hasEllipsoidIntersection; //!< Indicates the ellipsoid was successfully intersected
       bool m_hasIntersection;          //!< indicates good intersection exists
       bool m_hasNormal;                //!< indicates normal has been computed
-      bool m_hasLocalNormal;                //!< indicates normal has been computed
-      std::vector<double> m_normal;    //!< Local normal of current intersection point
+      bool m_hasLocalNormal;                //!< indicates local normal has been computed
+      std::vector<double> m_normal;    //!< Surface normal of current intersection point
       std::vector<double> m_localNormal;    //!< Local normal of current intersection point
       QString *m_name;                 //! < Name of the shape
       SurfacePoint *m_surfacePoint;    //!< Current intersection point
