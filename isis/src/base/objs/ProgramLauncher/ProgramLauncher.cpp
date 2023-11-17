@@ -178,7 +178,6 @@ namespace Isis {
 
       for(int i = 0; i < errorPvl.groups(); i++) {
         PvlGroup &g = errorPvl.group(i);
-        QString eclass = g["Class"];
         QString emsg = g["Message"];
         int ecode = g["Code"];
         QString efile = g["File"];
