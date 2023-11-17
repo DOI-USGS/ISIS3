@@ -478,9 +478,16 @@ namespace Isis {
     QString baseDir = dataDir["Base"];
     baseDir += "/kernels/lsk/";
     FileName leapSecond(baseDir + "naif????.tls");
+    QString leapSecondName;
+    try {
+      leapSecondName = QString(leapSecond.highestVersion().expanded());
+    }
+    catch (IException &e) {
+      QString msg = "Unable to load leadsecond file. Either the data area is not set or there are no naif####.tls files present";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
 
     NaifStatus::CheckErrors();
-    QString leapSecondName(leapSecond.highestVersion().expanded());
     furnsh_c(leapSecondName.toLatin1().data());
     NaifStatus::CheckErrors();
 
