@@ -504,7 +504,7 @@ namespace Isis {
 
 
   /**
-   * Sets the normal for the currect intersection point.
+   * Sets the surface normal for the currect intersection point.
    * Note: This method will throw an error if this ShapeModel doesn't have
    * and intersection. Use the hasIntersection() method to verify before
    * calling this method.
@@ -526,14 +526,14 @@ namespace Isis {
   }
 
     /**
-   * Sets the normal for the currect intersection point.
+   * Sets the local normal for the currect intersection point.
    * Note: This method will throw an error if this ShapeModel doesn't have
    * and intersection. Use the hasIntersection() method to verify before
    * calling this method.
    *
    * @see hasIntersection()
    *
-   * @param normal Three dimensional surface normal vector.
+   * @param normal Three dimensional local normal vector.
    *
    */
   void ShapeModel::setLocalNormal(const std::vector<double> normal) {
@@ -549,7 +549,7 @@ namespace Isis {
 
 
   /**
-   * Sets the normal for the currect intersection point.
+   * Sets the surface normal for the currect intersection point.
    * Note: This method will throw an error if this ShapeModel doesn't have and
    * intersection. Use the hasIntersection() method to verify before calling
    * this method.
@@ -575,16 +575,16 @@ namespace Isis {
   }
 
   /**
-   * Sets the normal for the currect intersection point.
+   * Sets the local normal for the currect intersection point.
    * Note: This method will throw an error if this ShapeModel doesn't have and
    * intersection. Use the hasIntersection() method to verify before calling
    * this method.
    *
    * @see hasIntersection()
    *
-   * @param a First coordinate value for the three dimensional surface normal.
-   * @param b Second coordinate value for the three dimensional surface normal.
-   * @param c Third coordinate value for the three dimensional surface normal.
+   * @param a First coordinate value for the three dimensional local normal.
+   * @param b Second coordinate value for the three dimensional local normal.
+   * @param c Third coordinate value for the three dimensional local normal.
    *
    */
   void ShapeModel::setLocalNormal(const double a, const double b, const double c) {
@@ -630,7 +630,8 @@ namespace Isis {
    */
   void ShapeModel::setHasIntersection(bool b) {
     m_hasIntersection  = b;
-    m_hasNormal = false;
+    setHasNormal(false);
+    setHasLocalNormal(false);
   }
 
 
@@ -646,13 +647,14 @@ namespace Isis {
     m_hasIntersection  = true;
     // Set normal as not calculated
     setHasNormal(false);
+    setHasLocalNormal(false);
   }
 
 
   /**
    * Sets the flag to indicate whether this ShapeModel has a surface normal.
    *
-   * @param b Indicates whether there is a normal.
+   * @param status Indicates whether there is a normal.
    *
    */
   void ShapeModel::setHasNormal(bool status) {
@@ -660,9 +662,9 @@ namespace Isis {
   }
 
     /**
-   * Sets the flag to indicate whether this ShapeModel has a surface normal.
+   * Sets the flag to indicate whether this ShapeModel has a local normal.
    *
-   * @param b Indicates whether there is a normal.
+   * @param status Indicates whether there is a normal.
    *
    */
   void ShapeModel::setHasLocalNormal(bool status) {

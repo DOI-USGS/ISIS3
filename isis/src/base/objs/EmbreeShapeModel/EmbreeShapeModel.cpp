@@ -385,6 +385,7 @@ namespace Isis {
   void EmbreeShapeModel::clearSurfacePoint() {
     ShapeModel::clearSurfacePoint();
     setHasNormal(false);
+    setHasLocalNormal(false);
     return;
   }
 
