@@ -63,7 +63,7 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
     export CONDA_SUBDIR=osx-64
     
     #Create a new conda environment to install ISIS in
-    conda create -n isis
+    conda create -n isis python=3.9
 
     #Activate the environment
     conda activate isis
