@@ -30,7 +30,15 @@ namespace Isis {
 
     // Get the map projection file provided by the user
     Pvl userMap;
-    userMap.read(ui.GetFileName("MAP"));
+    if (ui.GetBoolean("USEPROJ")) {
+      PvlGroup mappingGroup("Mapping");
+      mappingGroup.addKeyword(PvlKeyword("ProjectionName", "IProj"));
+      mappingGroup.addKeyword(PvlKeyword("ProjStr", ui.GetAsString("PROJString")));
+      userMap.addGroup(mappingGroup);
+    }
+    else {
+      userMap.read(ui.GetFileName("MAP"));
+    }
     PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
     cam2map(&icube, userMap, userGrp, ui, log);
