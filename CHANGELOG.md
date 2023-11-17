@@ -56,7 +56,6 @@ release.
   override the timestamp style naming convention of the output cube with their
   own name; if not specified retains existing behavior [#5125](https://github.com/USGS-Astrogeology/ISIS3/issues/5162)
 - Added new parameters <b>ONERROR</b>, <b>ERRORLOG</b>, and <b>ERRORLIST</b> to <i>mosrange</i> to provide better control over error behavior and provide diagnostics when problems are encountered processing the input file list.[#3606](https://github.com/DOI-USGS/ISIS3/issues/3606)
-- Added high/low filter functionality to trimfilter using existing parameters [#5311](https://github.com/DOI-USGS/ISIS3/issues/5311)
 
 ### Deprecated
 
@@ -71,7 +70,7 @@ release.
 - Fixed target name translation for any dawn images with target "4 CERES" [#5294](https://github.com/DOI-USGS/ISIS3/pull/5294)
 - Fixed exception pop ups in qview when viewing images created using the CSM Camera [#5259](https://github.com/DOI-USGS/ISIS3/pull/5295/files)
 - Fixed shadowtau input file parseing errors when using example file [#5316](https://github.com/DOI-USGS/ISIS3/pull/5316)
-
+- Fixed high/low filter functionality in trimfilter [#5311](https://github.com/DOI-USGS/ISIS3/issues/5311)
 ## [8.0.1] - 2023-08-23
 
 ### Fixed
