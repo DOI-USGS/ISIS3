@@ -60,8 +60,7 @@ namespace Isis {
    *
    */
   void EllipsoidShape::calculateDefaultNormal()  {
-    QVector <double *> points;
-    calculateLocalNormal(points);
+    calculateSurfaceNormal();
   }
 
 
@@ -71,6 +70,8 @@ namespace Isis {
   void EllipsoidShape::calculateSurfaceNormal()  {
     QVector <double *> points;
     calculateLocalNormal(points);
+
+    setNormal(localNormal());
   }
 
 
