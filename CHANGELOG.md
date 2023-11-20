@@ -58,6 +58,7 @@ release.
 - Added new parameters <b>ONERROR</b>, <b>ERRORLOG</b>, and <b>ERRORLIST</b> to <i>mosrange</i> to provide better control over error behavior and provide diagnostics when problems are encountered processing the input file list.[#3606](https://github.com/DOI-USGS/ISIS3/issues/3606)
 - Added ability to delegate calculation of nadir pointing to ALE [#5117](https://github.com/USGS-Astrogeology/ISIS3/issues/5117)
 - Added --no-kernels flag to downloadIsisData [#5264](https://github.com/DOI-USGS/ISIS3/issues/5264)
+- Added new option in `ctxcal` to use monthly computed flatfield files for "Frown" removal in CTX images. [#5338](https://github.com/DOI-USGS/ISIS3/pull/5338)
 
 ### Deprecated
 
