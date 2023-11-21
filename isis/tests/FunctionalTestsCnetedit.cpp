@@ -25,8 +25,6 @@ class CneteditCheckValid : public TempTestingFiles {
     QString cnet11File;
     QString chkValidCubeListFile;
     QString defFile;
-    Pvl label1;
-    Pvl label2;
 
     void SetUp() override {
       TempTestingFiles::SetUp();
