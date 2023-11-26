@@ -11,6 +11,8 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
+#include "LineManager.h"
+#include "spiceinit.h"
 #include "TempFixtures.h"
 #include "TestUtilities.h"
 
@@ -18,7 +20,7 @@
 
 using namespace Isis;
 
-static QString APP1_XML = FileName("$ISISROOT/bin/xml/cnetedit.xml").expanded();
+static QString APP_XML = FileName("$ISISROOT/bin/xml/cnetedit.xml").expanded();
 
 class CneteditCheckValid : public TempTestingFiles {
   protected:
@@ -33,16 +35,51 @@ class CneteditCheckValid : public TempTestingFiles {
       cnet11File = "data/cnetedit/cnet_11pts.pvl";
       defFile = tempDir.path() + "/defFile.def";
 
+      std::ifstream label1Strm("data/cnetedit/PSP_002733_1880_RED4.crop.pvl");
+      std::ifstream label2Strm("data/cnetedit/PSP_002733_1880_RED5.crop.pvl");
+
+      Pvl label1;
+      Pvl label2;
+
+      label1Strm >> label1;
+      label2Strm >> label2;
+      
+      Cube cube1;
+      Cube cube2;
+
+      cube1.fromLabel(tempDir.path() + "/PSP_002733_1880_RED4.crop.cub",
+                    label1, "rw");
+      cube2.fromLabel(tempDir.path() + "/PSP_002733_1880_RED5.crop.cub",
+                    label2, "rw");
+
+      LineManager line(cube1);
+      LineManager line2(cube2);
+
+      for(line.begin(); !line.end(); line++) {
+          for(int i = 0; i < line.size(); i++) {
+            line[i] = (double)(i+1);
+          }
+          cube1.write(line);
+      }
+      for(line2.begin(); !line2.end(); line2++) {
+          for(int i = 0; i < line2.size(); i++) {
+            line2[i] = (double)(i+1);
+          }
+          cube2.write(line2);
+      }
+      cube1.reopen("rw");
+      cube2.reopen("rw");
+
       // set up cube list for checkValid tests
       FileList chkValidCubeList;
-      chkValidCubeList.append("data/cnetedit/PSP_002733_1880_RED4.crop.cub");
-      chkValidCubeList.append("data/cnetedit/PSP_002733_1880_RED5.crop.cub");
+      chkValidCubeList.append(cube1.fileName());
+      chkValidCubeList.append(cube2.fileName());
       chkValidCubeList.write(chkValidCubeListFile);
 
       // set up pvl def file
       PvlGroup validMeasureGroup("ValidMeasure");
-      validMeasureGroup.addKeyword(PvlKeyword("MinDN", "-1000000")); 
-      validMeasureGroup.addKeyword(PvlKeyword("MaxDN", "1000000")); 
+     validMeasureGroup.addKeyword(PvlKeyword("MinDN", "-1000000")); 
+     validMeasureGroup.addKeyword(PvlKeyword("MaxDN", "1000000")); 
       validMeasureGroup.addKeyword(PvlKeyword("MinEmission", "0")); 
       validMeasureGroup.addKeyword(PvlKeyword("MaxEmission", "135")); 
       validMeasureGroup.addKeyword(PvlKeyword("MinIncidence", "0")); 
@@ -161,7 +198,7 @@ TEST_F(CneteditCheckValid, FunctionalTestCneteditCheckValid) {
                            "onet=" + tempDir.path() + "/out.net"
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditLog;
 
@@ -284,7 +321,7 @@ TEST_F(CneteditCheckValid, FunctionalTestCneteditCheckValidIgnoreAll) {
                            "onet=" + tempDir.path() + "/out.net"
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditLog;
 
@@ -419,7 +456,7 @@ TEST_F(Cnetedit, FunctionalTestCneteditDefault) {
                            "onet=" + tempDir.path() + "/out.net"
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditLog;
 
@@ -583,7 +620,7 @@ TEST_F(Cnetedit, FunctionalTestCneteditEditlock) {
                            "onet=" + tempDir.path() + "/out.net"
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditLog;
 
@@ -703,7 +740,7 @@ TEST_F(Cnetedit, FunctionalTestCneteditEditUnlock) {
                            "onet=" + tempDir.path() + "/out.net"
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditLog;
 
@@ -805,7 +842,7 @@ TEST_F(Cnetedit, FunctionalTestCneteditError) {
                            "onet=cnet.net",
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl log;
 
@@ -849,7 +886,7 @@ TEST_F(Cnetedit, CneteditIgnore) {
 //                           "log=/Users/kledmundson/ISISDev/cnetedit/Oct242023cne/ISIS3/isis/tests/data/cnetedit/ignore/truth/gtestLog1.txt",
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditlog;
 
@@ -1174,7 +1211,7 @@ TEST_F(Cnetedit, CneteditIgnoreMeasuresPoints) {
                            "onet=" + tempDir.path() + "/out.net",
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditlog;
 
@@ -1522,7 +1559,7 @@ TEST_F(Cnetedit, CneteditIgnorePoints) {
                            "onet=" + tempDir.path() + "/out.net"
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditlog;
 
@@ -1734,7 +1771,7 @@ TEST_F(Cnetedit, CneteditIgnoreAllPoints) {
                            "onet=" + tempDir.path() + "/out.net"
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditlog;
 
@@ -1988,7 +2025,7 @@ TEST_F(Cnetedit, CneteditNoDelete) {
                            "onet=" + tempDir.path() + "/out.net",
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditlog;
 
@@ -2252,7 +2289,7 @@ TEST_F(Cnetedit, CneteditPreservePoints) {
                            "onet=" + tempDir.path() + "/out.net",
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditlog;
 
@@ -2579,7 +2616,7 @@ TEST_F(CneteditMeasureList, CneteditMeasureListGeneral) {
                            "onet=" + tempDir.path() + "/out.net",
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditlog;
 
@@ -2687,7 +2724,7 @@ TEST_F(CneteditMeasureList, CneteditMeasureListIgnoreAll) {
                            "onet=" + tempDir.path() + "/out.net",
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditlog;
 
@@ -2793,7 +2830,7 @@ TEST_F(CneteditMeasureList, CneteditMeasureListDelete) {
                            "onet=" + tempDir.path() + "/out.net",
                            };
 
-  UserInterface ui(APP1_XML, args);
+  UserInterface ui(APP_XML, args);
 
   Pvl cneteditlog;
 
