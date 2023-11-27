@@ -56,6 +56,9 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
  - Install Rosetta2. From the terminal run: `/usr/sbin/softwareupdate --install-rosetta --agree-to-license`
  - Include the `# MacOS ARM64 Only` lines below
 1. Next setup your Anaconda environment for ISIS. In the bash prompt, run the following commands:
+    > [!WARNING]
+    > ISIS 8.1.0 is incompatible with Python 3.10, 3.11, and 3.12
+    > The `conda create` command below creates a conda environment with Python 3.9
 
     ```bash
     
@@ -92,12 +95,21 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
     #Then set channel_priority to flexible in case there is a global channel_priority=strict setting
     conda config --env --set channel_priority flexible
     ```
+    
 
 1. The environment is now ready to download ISIS and its dependencies:
 
     ```bash
     conda install -c usgs-astrogeology isis
     ```
+    > [!NOTE]
+    > The install may take 1 to 2 hours.
+
+    If you would like to download an LTS version, follow the following format below:
+    ```bash
+    conda install -c "usgs-astrogeology/label/LTS" isis=8.0.1
+    ```
+    
 
 1. Finally, setup the environment variables:
 
