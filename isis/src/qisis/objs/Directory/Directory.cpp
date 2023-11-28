@@ -92,7 +92,6 @@ find files of those names at the top level of this repository. **/
 #include "WorkOrder.h"
 #include "Workspace.h"
 #include "XmlStackedHandler.h"
-#include "XmlStackedHandlerReader.h"
 
 using namespace std;
 
@@ -1505,15 +1504,6 @@ namespace Isis {
 
 
   /**
-   * @brief Loads the Directory from an XML file.
-   * @param xmlReader  The reader that takes in and parses the XML file.
-   */
-  void Directory::load(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler( new XmlHandler(this) );
-  }
-
-
-  /**
    * @brief Save the directory to an XML file.
    * @param stream  The XML stream writer
    * @param newProjectRoot The FileName of the project this Directory is attached to.
@@ -1611,15 +1601,15 @@ namespace Isis {
       QString viewObjectName;
       if (localName == "footprint2DView") {
         viewObjectName = atts.value("objectName");
-        m_directory->addFootprint2DView(viewObjectName)->load(reader());
+        m_directory->addFootprint2DView(viewObjectName);
       }
       else if (localName == "imageFileList") {
         viewObjectName = atts.value("objectName");
-        m_directory->addImageFileListView(viewObjectName)->load(reader());
+        m_directory->addImageFileListView(viewObjectName);
       }
       else if (localName == "cubeDnView") {
         viewObjectName = atts.value("objectName");
-        m_directory->addCubeDnView(viewObjectName)->load(reader(), m_directory->project());
+        m_directory->addCubeDnView(viewObjectName);
       }
       else if (localName == "cnetEditorView") {
         viewObjectName = atts.value("objectName");

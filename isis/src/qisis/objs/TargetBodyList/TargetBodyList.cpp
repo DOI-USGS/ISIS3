@@ -24,7 +24,6 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 #include "Project.h"
 #include "TargetBody.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -58,19 +57,6 @@ namespace Isis {
    */
   TargetBodyList::TargetBodyList(QList<TargetBodyQsp> targetBodys, QObject *parent) : QObject(parent) {
     append(targetBodys);
-  }
-
-
-  /**
-   * Create an image list from XML
-   *
-   * @param project The project with the target body list
-   * @param xmlReader The XML reader currently at an <TargetBodyList /> tag.
-   * @param parent The Qt-relationship parent
-   */
-  TargetBodyList::TargetBodyList(Project *project, XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent) : QObject(parent) {
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 
@@ -921,11 +907,6 @@ namespace Isis {
                                               const QString &localName,
                                               const QString &qName) {
     if (localName == "TargetBodyList") {
-      XmlHandler handler(m_TargetBodyList, m_project);
-
-      XmlStackedHandlerReader reader;
-      reader.pushContentHandler(&handler);
-      reader.setErrorHandler(&handler);
 
       QString TargetBodyListXmlPath = m_project->targetBodyRoot() + "/" +
                                 m_TargetBodyList->path() + "/targets.xml";
@@ -938,13 +919,16 @@ namespace Isis {
                          _FILEINFO_);
       }
 
-      QXmlInputSource xmlInputSource(&file);
-      if (!reader.parse(xmlInputSource))
+      QXmlStreamReader reader(&file);
+      while (!reader.atEnd()) {
+        reader.readNext();
+      }
+      if (reader.hasError()) {
         throw IException(IException::Io,
                          tr("Failed to open target body list XML [%1]").arg(TargetBodyListXmlPath),
                          _FILEINFO_);
+      }
     }
-
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }

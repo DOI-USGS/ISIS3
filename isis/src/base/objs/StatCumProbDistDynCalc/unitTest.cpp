@@ -7,7 +7,6 @@ find files of those names at the top level of this repository. **/
 #include <QDataStream>
 #include <QDebug>
 #include <QXmlStreamWriter>
-#include <QXmlInputSource>
 
 #include <iostream>
 
@@ -15,7 +14,6 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "Preference.h"
 #include "StatCumProbDistDynCalc.h"
-#include "XmlStackedHandlerReader.h"
 
 using namespace std;
 using namespace Isis;
@@ -38,8 +36,7 @@ using namespace Isis;
 namespace Isis {
   class StatisticsXmlHandlerTester : public StatCumProbDistDynCalc {
     public:
-      StatisticsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, 
-                                     FileName xmlFile) : StatCumProbDistDynCalc(project, reader) {
+      StatisticsXmlHandlerTester(FileName xmlFile) : StatCumProbDistDynCalc() {
 
         QString xmlPath(xmlFile.expanded());
         QFile file(xmlPath);
@@ -49,15 +46,16 @@ namespace Isis {
                            QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
                            _FILEINFO_);
         }
+        QXmlStreamReader reader(&file);
 
-        QXmlInputSource xmlInputSource(&file);
-        bool success = reader->parse(xmlInputSource);
-        if (!success) {
-          throw IException(IException::Unknown, 
-                           QString("Failed to parse xml file, [%1]").arg(xmlPath),
-                            _FILEINFO_);
+        while (!reader.atEnd()) {
+            reader.readNext();
         }
-
+        if (reader.hasError()) {
+          throw IException(IException::Unknown, 
+                QString("Failed to parse xml file, [%1]").arg(xmlPath),
+                _FILEINFO_);
+        }
       }
 
       ~StatisticsXmlHandlerTester() {
@@ -174,8 +172,7 @@ int main(int argc, char *argv[]) {
     // read xml with no attributes or values
     FileName emptyXmlFile("./unitTest_NoElementValues.xml");
     Project *project = NULL;
-    XmlStackedHandlerReader reader;
-    StatisticsXmlHandlerTester statsFromEmptyXml(project, &reader, emptyXmlFile);
+    StatisticsXmlHandlerTester statsFromEmptyXml(emptyXmlFile);
     qDebug() << "Testing XML: read XML with no attributes or values "
                 "to StatCumProbDistDynCalc object... Then try to get "
                 "min from object with no observations.";
@@ -633,7 +630,7 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml    
     qDebug() << "Testing XML: read XML to StatCumProbDistDynCalc object...";
-    StatisticsXmlHandlerTester statsFromXml(project, &reader, xmlFile);
+    StatisticsXmlHandlerTester statsFromXml(xmlFile);
     qDebug() << "Min = " << statsFromXml.min();
     qDebug() << "Max = " << statsFromXml.max();
     qDebug() << "";

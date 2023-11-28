@@ -41,7 +41,6 @@
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -74,19 +73,6 @@ namespace Isis {
    */
   ImageList::ImageList(QList<Image *> images, QObject *parent) : QObject(parent) {
     append(images);
-  }
-
-
-  /**
-   * Creates an image list from XML.
-   *
-   * @param project The project with the image list.
-   * @param xmlReader The XML reader currently at an <imageList /> tag.
-   * @param parent The Qt-relationship parent.
-   */
-  ImageList::ImageList(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) :
-      QObject(parent) {
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 
@@ -1386,7 +1372,7 @@ namespace Isis {
       }
       else if (localName == "image") {
         m_imageList->append(new Image(
-           m_project->projectRoot() + "/" + m_imageDataRoot + "/" + m_imageList->path(), reader()));
+           m_project->projectRoot() + "/" + m_imageDataRoot + "/" + m_imageList->path()));
       }
     }
 
@@ -1406,11 +1392,6 @@ namespace Isis {
   bool ImageList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                          const QString &qName) {
     if (localName == "imageList") {
-      XmlHandler handler(m_imageList, m_project, m_imageDataRoot);
-
-      XmlStackedHandlerReader reader;
-      reader.pushContentHandler(&handler);
-      reader.setErrorHandler(&handler);
 
       QDir projectPath = QDir(m_project->projectRoot()).dirName();
       QString imageListXmlPath = m_project->projectRoot() + "/" + m_imageDataRoot + "/" +
@@ -1426,13 +1407,16 @@ namespace Isis {
                          _FILEINFO_);
       }
 
-      QXmlInputSource xmlInputSource(&file);
-      if (!reader.parse(xmlInputSource))
+      QXmlStreamReader reader(&file);
+      while (!reader.atEnd()) {
+        reader.readNext();
+      }
+      if (reader.hasError()) {
         throw IException(IException::Io,
                          tr("Failed to open image list XML [%1]").arg(imageListXmlPath),
                          _FILEINFO_);
+      }
     }
-
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }

@@ -15,7 +15,6 @@ find files of those names at the top level of this repository. **/
 #include <QSet>
 #include <QString>
 #include <QUuid>
-#include <QXmlInputSource>
 #include <QXmlStreamWriter>
 
 #include "BundleImage.h"
@@ -26,7 +25,6 @@ find files of those names at the top level of this repository. **/
 #include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
-#include "XmlStackedHandlerReader.h"
 
 
 namespace Isis {
@@ -36,22 +34,6 @@ namespace Isis {
    */
   BundleObservationSolveSettings::BundleObservationSolveSettings() {
     initialize();
-  }
-
-
-  /**
-   * Construct this BundleObservationSolveSettings object from XML.
-   *
-   * @param bundleSettingsFolder Where this settings XML resides -
-   *                             /work/.../projectRoot/images/import1
-   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   */
-  BundleObservationSolveSettings::BundleObservationSolveSettings(
-                                                             Project *project,
-                                                             XmlStackedHandlerReader *xmlReader) {
-    initialize();
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
-    xmlReader->setErrorHandler(new XmlHandler(this, project));
   }
 
 

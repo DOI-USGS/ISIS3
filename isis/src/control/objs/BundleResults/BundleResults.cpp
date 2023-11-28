@@ -34,7 +34,6 @@ find files of those names at the top level of this repository. **/
 #include "SerialNumberList.h"
 #include "StatCumProbDistDynCalc.h"
 #include "Statistics.h"
-#include "XmlStackedHandlerReader.h"
 
 using namespace boost::numeric::ublas;
 
@@ -56,26 +55,6 @@ namespace Isis {
     // residual prob distribution is calculated even if there is no maximum likelihood estimation.
     // so set up the solver to have a node at every percent of the distribution
     initializeResidualsProbabilityDistribution(101);
-
-  }
-
-
-  /**
-   * Construct this BundleResults object from XML.
-   *
-   * @param bundleSettingsFolder Where the settings XML for this bundle adjustment
-   *                             resides - /work/.../projectRoot/images/import1
-   * @param xmlReader An XML reader that's up to a <bundleSettings/> tag.
-   * @param parent The Qt-relationship parent.
-   */
-  BundleResults::BundleResults(Project *project, XmlStackedHandlerReader *xmlReader,
-                               QObject *parent) : QObject(parent) {
-                               // TODO: does xml stuff need project???
-
-    initialize();
-
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
-    xmlReader->setErrorHandler(new XmlHandler(this, project));
 
   }
 
@@ -2135,7 +2114,7 @@ namespace Isis {
       else if (qName == "statisticsItem") {
         // add statistics object to the xml handler's current statistics list.
         m_xmlHandlerStatisticsList.append(
-            new Statistics(m_xmlHandlerProject, reader()));
+            new Statistics());
       }
       else if (qName == "elapsedTime") {
         QString time = atts.value("time");
@@ -2340,12 +2319,11 @@ namespace Isis {
       else if (qName == "cumulativeProbabilityCalculator") {
         m_xmlHandlerBundleResults->m_cumPro = NULL;
         m_xmlHandlerBundleResults->m_cumPro =
-          new StatCumProbDistDynCalc(m_xmlHandlerProject, reader());
+          new StatCumProbDistDynCalc();
       }
       else if (qName == "residualsCumulativeProbabilityCalculator") {
         m_xmlHandlerBundleResults->m_cumProRes = NULL;
-        m_xmlHandlerBundleResults->m_cumProRes = new StatCumProbDistDynCalc(m_xmlHandlerProject,
-                                                                            reader());
+        m_xmlHandlerBundleResults->m_cumProRes = new StatCumProbDistDynCalc();
       }
     }
     return true;

@@ -31,7 +31,6 @@ find files of those names at the top level of this repository. **/
 #include "Spice.h"
 #include "SurfacePoint.h"
 #include "Target.h"
-#include "XmlStackedHandlerReader.h"
 
 #include <QByteArray>
 #include <QDebug>
@@ -39,7 +38,6 @@ find files of those names at the top level of this repository. **/
 #include <QFile>
 #include <QIODevice>
 #include <QString>
-#include <QXmlInputSource>
 #include <QXmlStreamWriter>
 
 #include <boost/numeric/ublas/symmetric.hpp>
@@ -82,8 +80,8 @@ void printXml(const BundleObservationSolveSettings &);
 namespace Isis {
   class XmlHandlerTester : public BundleObservationSolveSettings {
     public:
-      XmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, FileName xmlFile)
-          : BundleObservationSolveSettings(project, reader) {
+      XmlHandlerTester(FileName xmlFile)
+          : BundleObservationSolveSettings() {
 
         QString xmlPath(xmlFile.expanded());
         QFile file(xmlPath);
@@ -94,14 +92,16 @@ namespace Isis {
                            _FILEINFO_);
         }
 
-        QXmlInputSource xmlInputSource(&file);
-        bool success = reader->parse(xmlInputSource);
-        if (!success) {
+        QXmlStreamReader reader(&file);
+
+        while (!reader.atEnd()) {
+            reader.readNext();
+        }
+        if (reader.hasError()) {
           throw IException(IException::Unknown,
                            QString("Failed to parse xml file, [%1]").arg(xmlPath),
                             _FILEINFO_);
         }
-
       }
 
       ~XmlHandlerTester() {
@@ -267,8 +267,7 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
-    XmlStackedHandlerReader reader;
-    XmlHandlerTester bsFromXml1(project, &reader, xmlFile);
+    XmlHandlerTester bsFromXml1(xmlFile);
     printXml(bsFromXml1);
 
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
@@ -283,7 +282,7 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
-    XmlHandlerTester bsFromXml2(project, &reader, xmlFile);
+    XmlHandlerTester bsFromXml2(xmlFile);
     printXml(bsFromXml2);
 
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
@@ -298,7 +297,7 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
-    XmlHandlerTester bsFromXml3(project, &reader, xmlFile);
+    XmlHandlerTester bsFromXml3(xmlFile);
     printXml(bsFromXml3);
 
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
@@ -313,7 +312,7 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
-    XmlHandlerTester bsFromXml4(project, &reader, xmlFile);
+    XmlHandlerTester bsFromXml4(xmlFile);
     printXml(bsFromXml4);
 
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
@@ -328,14 +327,14 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
-    XmlHandlerTester bossToFill(project, &reader, xmlFile);
+    XmlHandlerTester bossToFill(xmlFile);
 //    BundleObservationSolveSettings bossToFill(xmlFile, project, &reader);
     printXml(bossToFill);
 
     // read xml with no attributes or values
     qDebug() << "Testing XML: read XML with no attributes or values to object...";
     FileName emptyXmlFile("./unitTest_NoElementValues.xml");
-    XmlHandlerTester bsFromEmptyXml(project, &reader, emptyXmlFile);
+    XmlHandlerTester bsFromEmptyXml(emptyXmlFile);
     printXml(bsFromEmptyXml);
 
     qXmlFile.remove();

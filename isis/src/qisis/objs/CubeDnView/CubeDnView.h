@@ -35,7 +35,6 @@ namespace Isis {
   class Project;
   class ToolPad;
   class Workspace;
-  class XmlStackedHandlerReader;
   class ProjectItemViewMenu;
 
   /**
@@ -104,7 +103,6 @@ namespace Isis {
 
       bool viewportContainsShape(MdiCubeViewport *viewport);
 
-      void load(XmlStackedHandlerReader *xmlReader, Project *project);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
     signals:

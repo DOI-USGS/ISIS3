@@ -75,7 +75,6 @@
 #include "TemplateList.h"
 #include "WorkOrder.h"
 #include "WorkOrderFactory.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
 
@@ -1389,40 +1388,37 @@ namespace Isis {
     m_clearing = false;
     m_isTemporaryProject = false;
 
-    XmlHandler handler(this);
-
-    XmlStackedHandlerReader reader;
-    reader.pushContentHandler(&handler);
-    reader.setErrorHandler(&handler);
-
     QDir oldProjectRoot(*m_projectRoot);
     *m_projectRoot =  QDir(projectAbsolutePathStr);
 
-    QXmlInputSource xmlInputSource(&file);
+    QXmlStreamReader reader(&file);
 
     //This prevents the project from not loading if everything
     //can't be loaded, and outputs the warnings/errors to the
     //Warnings Tab
     try {
-      reader.parse(xmlInputSource);
-        }
+      while (!reader.atEnd()) {
+        reader.readNext();
+      }
+    }
     catch (IException &e) {
       directory()->showWarning(QString("Failed to open project completely [%1]")
                                .arg(projectAbsolutePathStr));
       directory()->showWarning(e.toString());
-      }
+    }
     catch (std::exception &e) {
       directory()->showWarning(QString("Failed to open project completely[%1]")
                                .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
 
-    reader.pushContentHandler(&handler);
-    QXmlInputSource xmlHistoryInputSource(&historyFile);
+    QXmlStreamReader reader2(&historyFile);
 
     try {
-      reader.parse(xmlHistoryInputSource);
+      while (!reader2.atEnd()) {
+        reader2.readNext();
       }
+    }
 
     catch (IException &e) {
       directory()->showWarning(QString("Failed to read history from project[%1]")
@@ -1434,28 +1430,29 @@ namespace Isis {
                                 .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
+    
+    QXmlStreamReader reader3(&warningsFile);
 
-    reader.pushContentHandler(&handler);
-
-    QXmlInputSource xmlWarningsInputSource(&warningsFile);
-
-    if (!reader.parse(xmlWarningsInputSource)) {
+    while (!reader3.atEnd()) {
+      reader3.readNext();
+    }
+    if (reader3.hasError()) {
       warn(tr("Failed to read warnings from project [%1]").arg(projectAbsolutePathStr));
     }
 
-    reader.pushContentHandler(&handler);
-
-    QXmlInputSource xmlDirectoryInputSource(&directoryFile);
+    QXmlStreamReader reader4(&directoryFile);
 
     try {
-      reader.parse(xmlDirectoryInputSource);
-         }
+      while (!reader4.atEnd()) {
+        reader4.readNext();
+      }
+    }
     catch (IException &e) {
       directory()->showWarning(QString("Failed to read GUI state from project[%1]")
                                .arg(projectAbsolutePathStr));
       directory()->showWarning(e.toString());
 
-      }
+    }
     catch (std::exception &e) {
       directory()->showWarning(QString("Failed to read GUI state from project[%1]")
                                .arg(projectAbsolutePathStr));
@@ -2996,19 +2993,19 @@ namespace Isis {
         }
       }
       else if (localName == "controlNets") {
-        m_controls.append(new ControlList(m_project, reader()));
+        m_controls.append(new ControlList());
       }
       else if (localName == "imageList") {
-        m_imageLists.append(new ImageList(m_project, reader()));
+        m_imageLists.append(new ImageList());
       }
       else if (localName == "shapeList") {
-        m_shapeLists.append(new ShapeList(m_project, reader()));
+        m_shapeLists.append(new ShapeList());
       }
       else if (localName == "mapTemplateList") {
-        m_mapTemplateLists.append( new TemplateList(m_project, reader()));
+        m_mapTemplateLists.append( new TemplateList());
       }
       else if (localName == "regTemplateList") {
-        m_regTemplateLists.append( new TemplateList(m_project, reader()));
+        m_regTemplateLists.append( new TemplateList());
       }
       //  workOrders are stored in history.xml, using same reader as project.xml
       else if (localName == "workOrder") {
@@ -3016,7 +3013,6 @@ namespace Isis {
 
         m_workOrder = WorkOrderFactory::create(m_project, type);
 
-        m_workOrder->read(reader());
       }
       //  warnings stored in warning.xml, using same reader as project.xml
       else if (localName == "warning") {
@@ -3027,7 +3023,7 @@ namespace Isis {
         }
       }
       else if (localName == "directory") {
-        m_project->directory()->load(reader());
+        m_project->directory();
       }
       else if (localName == "dockRestore") {
 //    QVariant geo_data = QVariant(atts.value("geometry"));
@@ -3037,7 +3033,7 @@ namespace Isis {
       }
 
       else if (localName == "bundleSolutionInfo") {
-        m_bundleSolutionInfos.append(new BundleSolutionInfo(m_project, reader()));
+        m_bundleSolutionInfos.append(new BundleSolutionInfo());
       }
       else if (localName == "activeImageList") {
         QString displayName = atts.value("displayName");

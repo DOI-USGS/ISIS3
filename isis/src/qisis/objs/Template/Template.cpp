@@ -5,7 +5,6 @@
 #include "FileName.h"
 #include "IException.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis{
   /**
@@ -21,18 +20,6 @@ namespace Isis{
     m_templateType = templateType;
     m_importName = importName;
 
-  }
-
-  /**
-   * Construct this template from XML.
-   *
-   * @param templateFolder Location of template xml
-   * @param xmlReader An XML reader that's up to an <template/> tag.
-   * @param parent The Qt-relationship parent
-   */
-  Template::Template(FileName templateFolder, XmlStackedHandlerReader *xmlReader, QObject *parent) :
-      QObject(parent) {
-    xmlReader->pushContentHandler(new XmlHandler(this, templateFolder));
   }
 
 

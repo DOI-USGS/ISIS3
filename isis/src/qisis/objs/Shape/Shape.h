@@ -42,7 +42,6 @@ namespace Isis {
   class Project;
   class PvlObject;
   class ShapeDisplayProperties;
-  class XmlStackedHandlerReader;
 
   /**
    * This represents a shape in a project-based GUI interface. The actual cube doesn't have to be
@@ -76,7 +75,6 @@ namespace Isis {
 
       explicit Shape(QString shapeFileName, QObject *parent = 0);
       explicit Shape(Cube *shapeCube, QObject *parent = 0);
-      Shape(FileName shapeFolder, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
       ~Shape();
 
       void fromPvl(const PvlObject &pvl);

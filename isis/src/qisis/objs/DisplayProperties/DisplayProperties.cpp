@@ -14,7 +14,6 @@ find files of those names at the top level of this repository. **/
 
 #include "FileName.h"
 #include "Pvl.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -33,14 +32,6 @@ namespace Isis {
     m_propertyValues = new QMap<int, QVariant>;
 
     m_displayName = displayName;
-  }
-
-
-  DisplayProperties::DisplayProperties(XmlStackedHandlerReader *xmlReader, QObject *parent) {
-    m_propertiesUsed = 0;
-    m_propertyValues = new QMap<int, QVariant>;
-
-    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 

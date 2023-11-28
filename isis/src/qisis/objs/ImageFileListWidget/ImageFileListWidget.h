@@ -70,7 +70,6 @@ namespace Isis {
       QProgressBar *getProgress();
       void fromPvl(PvlObject &pvl);
       PvlObject toPvl() const;
-      void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
       QList<QAction *> actions();

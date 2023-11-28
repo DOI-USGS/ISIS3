@@ -44,7 +44,6 @@ namespace Isis {
   class PvlObject;
   class SerialNumberList;
   class StatCumProbDistDynCalc;
-  class XmlStackedHandlerReader;
 
   /**
    * A container class for statistical results from a BundleAdjust solution.
@@ -92,8 +91,6 @@ namespace Isis {
     Q_OBJECT
     public:
       BundleResults(QObject *parent = 0);
-      // TODO: does xml stuff need project???
-      BundleResults(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
       BundleResults(const BundleResults &src);
       ~BundleResults();
       BundleResults &operator=(const BundleResults &src);

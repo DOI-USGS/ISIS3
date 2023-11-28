@@ -41,7 +41,6 @@ find files of those names at the top level of this repository. **/
 #include "ProjectItemModel.h"
 #include "Shape.h"
 #include "ToolPad.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -343,15 +342,6 @@ namespace Isis {
 
 
   /**
-   * @brief Loads the Footprint2DView from an XML file.
-   * @param xmlReader  The reader that takes in and parses the XML file.
-   */
-  void Footprint2DView::load(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler( new XmlHandler(this) );
-  }
-
-
-  /**
    * @brief Save the footprint view widgets (ImageFileListWidget and MosaicSceneWidget to an XML
    *        file.
    * @param stream  The XML stream writer
@@ -412,10 +402,10 @@ namespace Isis {
 
     if (result) {
       if (localName == "mosaicScene") {
-        m_footprintView->mosaicSceneWidget()->load(reader());
+        m_footprintView->mosaicSceneWidget();
       }
       if (localName == "imageFileList") {
-        m_footprintView->m_fileListWidget->load(reader());
+        m_footprintView->m_fileListWidget;
       }
     }
     return result;

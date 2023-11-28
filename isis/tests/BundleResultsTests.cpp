@@ -11,7 +11,6 @@
 #include <QString>
 #include <QtDebug>
 #include <QXmlStreamWriter>
-#include <QXmlInputSource>
 
 #include "BundleControlPoint.h"
 #include "IsisBundleObservation.h"
@@ -27,7 +26,6 @@
 #include "MaximumLikelihoodWFunctions.h"
 #include "Preference.h"
 #include "PvlObject.h"
-#include "XmlStackedHandlerReader.h"
 
 #include "gmock/gmock.h"
 
@@ -45,12 +43,9 @@ namespace Isis {
       /**
        * Constructs the tester object from an xml file.
        *
-       * @param project The project object the tester belongs to.
-       * @param reader The XmlStackedHandlerReader that reads the xml file.
        * @param xmlFile The xml file to construct the tester from.
        */
-      BundleResultsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader,
-                                     FileName xmlFile) : BundleResults(project, reader) {
+      BundleResultsXmlHandlerTester(FileName xmlFile) : BundleResults() {
 
         m_file.setFileName(xmlFile.expanded());
 
@@ -60,14 +55,15 @@ namespace Isis {
                            _FILEINFO_);
         }
 
-        QXmlInputSource xmlInputSource(&m_file);
-        bool success = reader->parse(xmlInputSource);
-        if (!success) {
+        QXmlStreamReader reader(&m_file);
+        while (!reader.atEnd()) {
+          reader.readNext();
+        }
+        if (reader.hasError()) {
           throw IException(IException::Unknown,
                            QString("Failed to parse xml file, [%1]").arg(m_file.fileName()),
                             _FILEINFO_);
         }
-
       }
 
       /**
@@ -603,8 +599,7 @@ TEST_F(BundleResultsPopulated, Serialization) {
   writer.writeEndDocument();
   qXmlFile.close();
 
-  XmlStackedHandlerReader reader;
-  BundleResultsXmlHandlerTester newResults(NULL, &reader, saveFile);
+  BundleResultsXmlHandlerTester newResults(saveFile);
 
   EXPECT_EQ(newResults.numberFixedPoints(), results.numberFixedPoints());
   EXPECT_EQ(newResults.numberHeldImages(), results.numberHeldImages());

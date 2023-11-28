@@ -40,7 +40,6 @@ namespace Isis {
   class ProjectItem;
   class ShapeList;
   class Template;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Provide Undo/redo abilities, serialization, and history for an operation.
@@ -358,7 +357,6 @@ namespace Isis {
       virtual bool isExecutable(FileItemQsp fileItem);
       virtual bool isExecutable(ProjectItem *item);
 
-      void read(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream) const;
 
       virtual void setData(Context);

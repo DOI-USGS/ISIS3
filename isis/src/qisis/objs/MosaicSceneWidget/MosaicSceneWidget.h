@@ -199,7 +199,6 @@ namespace Isis {
       QProgressBar *getProgress();
       PvlObject toPvl() const;
       void fromPvl(const PvlObject &);
-      void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
 //    QPointF currentLatLonPosition();

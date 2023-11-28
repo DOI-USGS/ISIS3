@@ -23,7 +23,6 @@ class QXmlStreamWriter;
 
 namespace Isis {
   class FileName;
-  class XmlStackedHandlerReader;
 
   /**
    * Maintains a list of Controls so that control nets can easily be copied from one Project to
@@ -49,8 +48,6 @@ namespace Isis {
       ControlList(QString name, QString path, QObject *parent = NULL);
       explicit ControlList(QObject *parent = NULL);
       explicit ControlList(QList<Control *>, QObject *parent = NULL);
-      explicit ControlList(Project *project, XmlStackedHandlerReader *xmlReader,
-                           QObject *parent = NULL);
       explicit ControlList(QStringList &);
       ControlList(const ControlList &);
       ~ControlList();

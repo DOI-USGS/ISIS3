@@ -14,7 +14,6 @@ find files of those names at the top level of this repository. **/
 #include <QString>
 #include <QtDebug>
 #include <QXmlStreamWriter>
-#include <QXmlInputSource>
 
 #include "BundleControlPoint.h"
 #include "BundleObservation.h"
@@ -31,7 +30,6 @@ find files of those names at the top level of this repository. **/
 #include "ImageList.h"
 #include "Preference.h"
 #include "PvlObject.h"
-#include "XmlStackedHandlerReader.h"
 
 
 using namespace std;
@@ -49,8 +47,7 @@ void printXml(const BundleSolutionInfo &);
 namespace Isis {
   class BundleSolutionInfoXmlHandlerTester : public BundleSolutionInfo {
     public:
-      BundleSolutionInfoXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader,
-                                     FileName xmlFile) : BundleSolutionInfo(project, reader) {
+      BundleSolutionInfoXmlHandlerTester(FileName xmlFile) : BundleSolutionInfo() {
 
         QString xmlPath(xmlFile.expanded());
         QFile file(xmlPath);
@@ -61,14 +58,16 @@ namespace Isis {
                            _FILEINFO_);
         }
 
-        QXmlInputSource xmlInputSource(&file);
-        bool success = reader->parse(xmlInputSource);
-        if (!success) {
+        QXmlStreamReader reader(&file);
+
+        while (!reader.atEnd()) {
+            reader.readNext();
+        }
+        if (reader.hasError()) {
           throw IException(IException::Unknown,
                            QString("Failed to parse xml file, [%1]").arg(xmlPath),
                             _FILEINFO_);
         }
-
       }
 
       ~BundleSolutionInfoXmlHandlerTester() {
@@ -184,8 +183,7 @@ int main(int argc, char *argv[]) {
     qXmlFile1.close();
 
     qDebug() << "Testing XML: reading serialized BundleResults back in...";
-    XmlStackedHandlerReader reader1;
-    BundleSolutionInfoXmlHandlerTester bsFromXml1(project, &reader1, xmlFile1);
+    BundleSolutionInfoXmlHandlerTester bsFromXml1(xmlFile1);
     // Now manually set the control net in BundleSolutionInfo's BundleResults to
     //  complete its initialization.  This seems awkward.
     bsFromXml1.bundleResults().setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
@@ -313,8 +311,7 @@ int main(int argc, char *argv[]) {
     qXmlFile2.close();
 
     qDebug() << "Testing XML: reading serialized BundleResults back in...";
-    XmlStackedHandlerReader reader;
-    BundleSolutionInfoXmlHandlerTester bsFromXml2(project, &reader, xmlFile2);
+    BundleSolutionInfoXmlHandlerTester bsFromXml2(xmlFile2);
     qDebug() << "Testing XML: Object deserialized as (should match object above):";
     printXml(bsFromXml2);  // Save comparison output to log file
 

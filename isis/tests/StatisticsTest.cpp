@@ -4,13 +4,11 @@
 #include "Preference.h"
 #include "Project.h"
 #include "Statistics.h"
-#include "XmlStackedHandlerReader.h"
 
 #include <QDebug>
 #include <QDataStream>
 #include <QFile>
 #include <QXmlStreamWriter>
-#include <QXmlInputSource>
 #include <QDomDocument>
 
 #include <float.h>

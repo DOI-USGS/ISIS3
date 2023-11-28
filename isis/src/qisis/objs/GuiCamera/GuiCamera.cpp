@@ -12,7 +12,6 @@
 #include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
 
@@ -46,16 +45,6 @@ namespace Isis {
 
     m_id = new QUuid(QUuid::createUuid());
   }
-
-
-
-//  GuiCamera::GuiCamera(Project *project, XmlStackedHandlerReader *xmlReader,
-//                         QObject *parent) : QObject(parent) {
-// TODO: does xml stuff need project???
-//    m_id = NULL;
-//    xmlReader->pushContentHandler(new XmlHandler(this, project));
-//    xmlReader->setErrorHandler(new XmlHandler(this, project));
-//  }
 
 
 

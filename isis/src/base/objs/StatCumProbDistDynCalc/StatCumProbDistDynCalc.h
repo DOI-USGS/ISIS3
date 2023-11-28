@@ -19,7 +19,6 @@ class QXmlStreamWriter;
 
 namespace Isis {
   class Project;// ??? does xml stuff need project???
-  class XmlStackedHandlerReader;
 
  /**
   * @brief This class is used to approximate cumulative probibility distributions of a stream of
@@ -70,8 +69,6 @@ namespace Isis {
     //  Observations"
     public:
       StatCumProbDistDynCalc(unsigned int nodes=20, QObject *parent = 0);  //individual qunatile value to be calculated
-      StatCumProbDistDynCalc(Project *project, XmlStackedHandlerReader *xmlReader, 
-                             QObject *parent = 0);   // TODO: does xml stuff need project???
       StatCumProbDistDynCalc(const StatCumProbDistDynCalc &other);
       ~StatCumProbDistDynCalc();
       StatCumProbDistDynCalc &operator=(const StatCumProbDistDynCalc &other);

@@ -14,7 +14,6 @@ find files of those names at the top level of this repository. **/
 #include <QString>
 #include <QtDebug>
 #include <QXmlStreamWriter>
-#include <QXmlInputSource>
 
 #include "BundleControlPoint.h"
 #include "IsisBundleObservation.h"
@@ -29,7 +28,6 @@ find files of those names at the top level of this repository. **/
 #include "MaximumLikelihoodWFunctions.h"
 #include "Preference.h"
 #include "PvlObject.h"
-#include "XmlStackedHandlerReader.h"
 
 
 using namespace std;
@@ -51,12 +49,9 @@ namespace Isis {
       /**
        * Constructs the tester object from an xml file.
        *
-       * @param project The project object the tester belongs to.
-       * @param reader The XmlStackedHandlerReader that reads the xml file.
        * @param xmlFile The xml file to construct the tester from.
        */
-      BundleResultsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader,
-                                     FileName xmlFile) : BundleResults(project, reader) {
+      BundleResultsXmlHandlerTester(FileName xmlFile) : BundleResults() {
 
         m_file.setFileName(xmlFile.expanded());
 
@@ -66,14 +61,16 @@ namespace Isis {
                            _FILEINFO_);
         }
 
-        QXmlInputSource xmlInputSource(&m_file);
-        bool success = reader->parse(xmlInputSource);
-        if (!success) {
+        QXmlStreamReader reader(&m_file);
+
+        while (!reader.atEnd()) {
+            reader.readNext();
+        }
+        if (reader.hasError()) {
           throw IException(IException::Unknown,
                            QString("Failed to parse xml file, [%1]").arg(m_file.fileName()),
                             _FILEINFO_);
         }
-
       }
 
       /**
@@ -330,8 +327,7 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
 
     qDebug() << "Testing XML: reading serialized BundleResults back in...";
-    XmlStackedHandlerReader reader;
-    BundleResultsXmlHandlerTester bsFromXml(project, &reader, xmlFile);
+    BundleResultsXmlHandlerTester bsFromXml(xmlFile);
     qDebug() << "Testing XML: Object deserialized as (should match object above):";
     printXml(bsFromXml);
 
@@ -381,7 +377,7 @@ int main(int argc, char *argv[]) {
     qXmlFileR.close();
 
     qDebug() << "Testing rectangular XML: reading serialized BundleResults back in...";
-    BundleResultsXmlHandlerTester bsRectFromXml(project, &reader, xmlFileR);
+    BundleResultsXmlHandlerTester bsRectFromXml(xmlFileR);
     // Set the output control net in bsRectFromXml in order to get the desired coordinate type
     bsRectFromXml.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
     qDebug() << "Testing rectangular XML: Object deserialized as (should match object above):";

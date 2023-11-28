@@ -29,7 +29,6 @@
 #include "Project.h"
 #include "SerialNumber.h"
 #include "Target.h"
-#include "XmlStackedHandlerReader.h"
 
 
 namespace Isis {
@@ -129,29 +128,6 @@ namespace Isis {
     m_displayProperties = new ImageDisplayProperties(FileName(m_fileName).name(), this);
 
     setId(id);
-  }
-
-
-  /**
-   * @brief Construct this image from XML.
-   * @param imageFolder Where this image XML resides - /work/.../projectRoot/images/import1
-   * @param xmlReader An XML reader that's up to an <image/> tag.
-   * @param parent The Qt-relationship parent
-   */
-  Image::Image(FileName imageFolder, XmlStackedHandlerReader *xmlReader, QObject *parent) :
-      QObject(parent) {
-    m_bodyCode = NULL;
-    m_cube = NULL;
-    m_displayProperties = NULL;
-    m_footprint = NULL;
-    m_id = NULL;
-
-    m_aspectRatio = Null;
-    m_resolution = Null;
-    m_lineResolution = Null;
-    m_sampleResolution = Null;
-
-    xmlReader->pushContentHandler(new XmlHandler(this, imageFolder));
   }
 
 
@@ -924,7 +900,7 @@ namespace Isis {
         }
       }
       else if (localName == "displayProperties") {
-        m_image->m_displayProperties = new ImageDisplayProperties(reader());
+        m_image->m_displayProperties = new ImageDisplayProperties("");
       }
     }
 

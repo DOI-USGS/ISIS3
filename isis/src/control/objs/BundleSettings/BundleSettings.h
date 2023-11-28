@@ -36,7 +36,6 @@ namespace Isis {
   class FileName;
   class Project;
   class PvlObject;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Container class for BundleAdjustment settings.
@@ -111,7 +110,6 @@ namespace Isis {
    *   @history 2019-05-17 Tyler Wilson - Added QString m_cubeList member function as well
    *                           as get/set member functions.  References #3267.
    *
-   *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    *   @todo Determine which XmlStackedHandler needs a Project pointer (see constructors)
    *   @todo Determine whether QList<BundleObservationSolveSettings> m_observationSolveSettings
    *         should be a list of pointers, or a pointer to a list, or a pointer to a list of
@@ -130,16 +128,6 @@ namespace Isis {
       //=====================================================================//
       BundleSettings();
       BundleSettings(const BundleSettings &other);
-      BundleSettings(Project *project,
-                     XmlStackedHandlerReader *xmlReader);
-#if 0
-      BundleSettings(FileName xmlFile,
-                     Project *project,
-                     XmlStackedHandlerReader *xmlReader,
-                     QObject *parent = NULL);
-      BundleSettings(XmlStackedHandlerReader *xmlReader,
-                     QObject *parent = NULL);
-#endif
       ~BundleSettings();
       BundleSettings &operator=(const BundleSettings &other);
 

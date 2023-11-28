@@ -12,7 +12,6 @@
 
 #include "FileName.h"
 #include "Pvl.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -33,19 +32,6 @@ namespace Isis {
     setSelected(false);
 
     setValue(Color, QVariant::fromValue(randomColor()));
-  }
-
-  /**
-   * @brief TargetBodyDisplayProperties constructor
-   * @param xmlReader The XML reader parsing the XML file containing the display properties.
-   * @param parent The Qt parent object (this is destroyed when the parent is destroyed).
-   */
-  TargetBodyDisplayProperties::TargetBodyDisplayProperties(XmlStackedHandlerReader *xmlReader,
-      QObject *parent) : DisplayProperties("", parent) {
-    m_propertiesUsed = None;
-    m_propertyValues = new QMap<int, QVariant>;
-
-    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 

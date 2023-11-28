@@ -12,7 +12,6 @@
 
 #include "FileName.h"
 #include "Pvl.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -33,21 +32,6 @@ namespace Isis {
     setSelected(false);
 
     setValue(Color, QVariant::fromValue(randomColor()));
-  }
-
-
-  /**
-   * @brief GuiCameraDisplayProperties constructor
-   * @param xmlReader  XML reader class for loading the Gui Camera Display Properties
-   * @param parent
-   */
-
-  GuiCameraDisplayProperties::GuiCameraDisplayProperties(XmlStackedHandlerReader *xmlReader,
-      QObject *parent) : DisplayProperties("", parent) {
-    m_propertiesUsed = None;
-    m_propertyValues = new QMap<int, QVariant>;
-
-    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 

@@ -24,7 +24,6 @@ namespace Isis {
   class Project;
   class Pvl;
   class PvlObject;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief This is the GUI communication mechanism for cubes
@@ -75,7 +74,6 @@ namespace Isis {
 
 
       ControlDisplayProperties(QString displayName, QObject *parent = NULL);
-      ControlDisplayProperties(XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
       virtual ~ControlDisplayProperties();
 
 //      void fromPvl(const PvlObject &pvl);

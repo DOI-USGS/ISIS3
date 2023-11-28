@@ -38,7 +38,6 @@
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -72,19 +71,6 @@ namespace Isis {
    */
   GuiCameraList::GuiCameraList(QList<GuiCameraQsp> guiCameras, QObject *parent) : QObject(parent) {
     append(guiCameras);
-  }
-
-
-  /**
-   * Create an image list from XML
-   *
-   * @param project The project with the gui camera list
-   * @param xmlReader The XML reader currently at an <GuiCameraList /> tag.
-   * @param parent The Qt-relationship parent
-   */
-  GuiCameraList::GuiCameraList(Project *project, XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent) : QObject(parent) {
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 
@@ -934,11 +920,6 @@ namespace Isis {
   bool GuiCameraList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                              const QString &qName) {
     if (localName == "GuiCameraList") {
-      XmlHandler handler(m_GuiCameraList, m_project);
-
-      XmlStackedHandlerReader reader;
-      reader.pushContentHandler(&handler);
-      reader.setErrorHandler(&handler);
 
       QString GuiCameraListXmlPath = m_project->targetBodyRoot() + "/" + m_GuiCameraList->path() +
                                  "/targets.xml";
@@ -951,11 +932,15 @@ namespace Isis {
                          _FILEINFO_);
       }
 
-      QXmlInputSource xmlInputSource(&file);
-      if (!reader.parse(xmlInputSource))
+      QXmlStreamReader reader(&file);
+      while (!reader.atEnd()) {
+        reader.readNext();
+      }
+      if (reader.hasError()) {
         throw IException(IException::Io,
                          tr("Failed to open target body list XML [%1]").arg(GuiCameraListXmlPath),
                          _FILEINFO_);
+      }
     }
 
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);

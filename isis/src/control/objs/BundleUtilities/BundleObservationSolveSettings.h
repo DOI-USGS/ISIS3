@@ -28,7 +28,6 @@ namespace Isis {
   class FileName;
   class Project;  // TODO: does xml stuff need project???
   class PvlObject;
-  class XmlStackedHandlerReader;
   /**
    * This class is used to modify and manage solve settings for 1 to many BundleObservations. These
    * settings indicate how any associated observations should be solved.
@@ -76,18 +75,12 @@ namespace Isis {
    *                           References #3369.
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
    *   @todo Determine whether xml stuff needs a Project pointer.
-   *   @todo Determine which XmlStackedHandlerReader constructor is preferred.
    */
 
 class BundleObservationSolveSettings {
 
     public:
       BundleObservationSolveSettings();
-      BundleObservationSolveSettings(Project *project,
-                                     XmlStackedHandlerReader *xmlReader);  // TODO: does xml stuff need project???
-      BundleObservationSolveSettings(FileName xmlFile,
-                                     Project *project,
-                                     XmlStackedHandlerReader *xmlReader);  // TODO: does xml stuff need project???
       BundleObservationSolveSettings(const BundleObservationSolveSettings &src);
       BundleObservationSolveSettings(const PvlGroup &scParameterGroup);
       ~BundleObservationSolveSettings();

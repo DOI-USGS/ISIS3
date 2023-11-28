@@ -19,7 +19,6 @@ find files of those names at the top level of this repository. **/
 #include "Project.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include "XmlStackedHandlerReader.h"
 
 using namespace std;
 
@@ -30,14 +29,6 @@ namespace Isis {
 //    m_id = new QUuid(QUuid::createUuid());
     SetValidRange();
     Reset(); // initialize
-  }
-
-
-  Statistics::Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) {   // TODO: does xml stuff need project???
-//    m_id = NULL;
-    SetValidRange();
-    Reset(); // initialize
-    xmlReader->pushContentHandler(new XmlHandler(this, project));   // TODO: does xml stuff need project???
   }
 
   /**

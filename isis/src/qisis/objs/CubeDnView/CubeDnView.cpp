@@ -67,7 +67,6 @@ find files of those names at the top level of this repository. **/
 #include "ViewportMdiSubWindow.h"
 #include "Workspace.h"
 #include "WindowTool.h"
-#include "XmlStackedHandlerReader.h"
 #include "ZoomTool.h"
 
 #include "ProjectItemViewMenu.h"
@@ -527,11 +526,6 @@ namespace Isis {
 
     // Activating the subwindow activates the view, which is annoying
     //m_workspace->mdiArea()->setActiveSubWindow(subWindow);
-  }
-
-
-  void CubeDnView::load(XmlStackedHandlerReader *xmlReader, Project *project) {
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 

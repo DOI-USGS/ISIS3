@@ -20,7 +20,6 @@ find files of those names at the top level of this repository. **/
 
 #include "FileName.h"
 #include "Pvl.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -43,15 +42,6 @@ namespace Isis {
     setSelected(false);
 
     setValue(Color, QVariant::fromValue(randomColor()));
-  }
-
-
-  ControlDisplayProperties::ControlDisplayProperties(XmlStackedHandlerReader *xmlReader,
-      QObject *parent) : DisplayProperties("", parent) {
-    m_propertiesUsed = None;
-    m_propertyValues = new QMap<int, QVariant>;
-
-    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 

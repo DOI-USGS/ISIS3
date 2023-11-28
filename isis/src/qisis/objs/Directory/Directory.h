@@ -387,7 +387,6 @@ namespace Isis {
       QAction *redoAction();
       QAction *undoAction();
 
-      void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, FileName newProjectRoot) const;
 
     signals:

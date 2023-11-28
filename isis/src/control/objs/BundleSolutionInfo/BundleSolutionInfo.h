@@ -31,7 +31,6 @@ namespace Isis {
   class ImageList;
   class Project;  //TODO does xml stuff need project???
   class PvlObject;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Container class for BundleAdjustment results.
@@ -173,9 +172,6 @@ namespace Isis {
                     BundleResults outputStatistics,
                     QList<ImageList *> imgList,
                     QObject *parent = 0);
-      BundleSolutionInfo(Project *project,
-                    XmlStackedHandlerReader *xmlReader,
-                    QObject *parent = 0);  //TODO does xml stuff need project???
       BundleSolutionInfo() = default;
 
       ~BundleSolutionInfo();

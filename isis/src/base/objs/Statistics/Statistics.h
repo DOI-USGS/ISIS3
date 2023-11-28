@@ -21,7 +21,6 @@ class QXmlStreamWriter;
 
 namespace Isis {
   class Project;// ??? does xml stuff need project???
-  class XmlStackedHandlerReader;
   /**
    * @brief This class is used to accumulate statistics on double arrays.
    *
@@ -95,7 +94,6 @@ namespace Isis {
     Q_OBJECT
     public:
       Statistics(QObject *parent = 0);
-      Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
       Statistics(const PvlGroup &inStats, QObject *parent = 0);
       // TODO: does xml read/write stuff need Project input???
       Statistics(const Statistics &other);

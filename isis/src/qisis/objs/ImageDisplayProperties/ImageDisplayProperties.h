@@ -40,7 +40,6 @@ namespace Isis {
   class Pvl;
   class PvlObject;
   class UniversalGroundMap;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief This is the GUI communication mechanism for cubes
@@ -113,7 +112,6 @@ namespace Isis {
        };
 
       ImageDisplayProperties(QString displayName, QObject *parent = NULL);
-      ImageDisplayProperties(XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
       virtual ~ImageDisplayProperties();
 
       static QColor randomColor();

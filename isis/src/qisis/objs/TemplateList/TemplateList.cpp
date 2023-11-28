@@ -12,7 +12,6 @@ find files of those names at the top level of this repository. **/
 #include "FileName.h"
 #include "IException.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -49,19 +48,6 @@ namespace Isis {
     m_path = other.m_path;
     m_name = other.m_name;
     m_type = other.m_type;
-  }
-
-
-  /**
-   * Create an TemplateList from XML
-   *
-   * @param project The project with the TemplateList
-   * @param xmlReader The XML reader currently at an <templateList /> tag.
-   * @param parent The Qt-relationship parent
-   */
-  TemplateList::TemplateList(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) :
-      QObject(parent) {
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 
@@ -283,7 +269,7 @@ namespace Isis {
         }
       }
       else if (localName == "template") {
-        m_templateList->append(new Template(m_project->templateRoot(), reader()));
+        m_templateList->append(new Template(m_project->templateRoot(), "", ""));
       }
     }
 
@@ -307,11 +293,6 @@ namespace Isis {
   bool TemplateList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                            const QString &qName) {
     if (localName == "mapTemplateList" || localName == "regTemplateList") {
-      XmlHandler handler(m_templateList, m_project);
-
-      XmlStackedHandlerReader reader;
-      reader.pushContentHandler(&handler);
-      reader.setErrorHandler(&handler);
 
       QString templateListXmlPath = m_project->templateRoot() + "/" + m_templateList->type() + "/"
                                     + m_templateList->name() + "/templates.xml";
@@ -326,11 +307,15 @@ namespace Isis {
                          _FILEINFO_);
       }
 
-      QXmlInputSource xmlInputSource(&file);
-      if (!reader.parse(xmlInputSource))
+      QXmlStreamReader reader(&file);
+      while (!reader.atEnd()) {
+        reader.readNext();
+      }
+      if (reader.hasError()) {       
         throw IException(IException::Io,
                          tr("Failed to open TemplateList XML [%1]").arg(templateListXmlPath),
                          _FILEINFO_);
+      }
     }
 
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);

@@ -32,7 +32,6 @@
 #include "PvlObject.h"
 #include "Shape.h"
 #include "TextFile.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
 
@@ -602,16 +601,6 @@ namespace Isis {
     }
 
     return result;
-  }
-
-
-  /**
-   * This method pushes a new XmlHandler into the parser stack.
-   *
-   * @param xmlReader This is the parser stack.
-   */
-  void ImageFileListWidget::load(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 

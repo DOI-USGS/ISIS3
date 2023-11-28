@@ -33,7 +33,6 @@ find files of those names at the top level of this repository. **/
 #include "PvlObject.h"
 #include "StatCumProbDistDynCalc.h"
 #include "Statistics.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
 
@@ -91,35 +90,6 @@ namespace Isis {
     m_statisticsResults = new BundleResults(outputStatistics);
     m_images = new QList<ImageList *>(imgList);
     m_adjustedImages = new QList<ImageList *>;
-  }
-
-
-  /**
-   * Constructor. Creates a BundleSolutionInfo from disk.
-   *
-   * @param project The current project
-   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   * @param parent The Qt-relationship parent
-   */
-  BundleSolutionInfo::BundleSolutionInfo(Project *project,
-                                         XmlStackedHandlerReader *xmlReader,
-                                         QObject *parent) : QObject(parent) {
-                                         //TODO does xml stuff need project???
-    m_id = new QUuid(QUuid::createUuid());
-    m_runTime = "";
-    m_name = m_runTime;
-    m_inputControlNetFileName = NULL;
-    m_outputControl = NULL;
-    m_outputControlName="";
-    m_inputLidarDataFileName = NULL;
-    m_outputLidarDataSet = NULL;
-    m_statisticsResults = NULL;
-    // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
-    m_images = new QList<ImageList *>;
-    m_adjustedImages = new QList<ImageList *>;
-
-    xmlReader->setErrorHandler(new XmlHandler(this, project));
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 
@@ -2024,21 +1994,20 @@ namespace Isis {
 
       if (localName == "bundleSettings") {
         m_xmlHandlerBundleSolutionInfo->m_settings =
-            BundleSettingsQsp(new BundleSettings(m_xmlHandlerProject, reader()));
+            BundleSettingsQsp(new BundleSettings());
       }
       else if (localName == "bundleResults") {
-        m_xmlHandlerBundleSolutionInfo->m_statisticsResults = new BundleResults(m_xmlHandlerProject,
-                                                                                reader());
+        m_xmlHandlerBundleSolutionInfo->m_statisticsResults = new BundleResults();
       }
       else if (localName == "imageList") {
         m_xmlHandlerBundleSolutionInfo->m_adjustedImages->append(
-            new ImageList(m_xmlHandlerProject, reader()));
+            new ImageList());
       }
       else if (localName == "outputControl") {
         FileName outputControlPath = FileName(m_xmlHandlerProject->bundleSolutionInfoRoot() + "/"
                                               + m_xmlHandlerBundleSolutionInfo->runTime());
 
-        m_xmlHandlerBundleSolutionInfo->m_outputControl = new Control(outputControlPath, reader());
+        m_xmlHandlerBundleSolutionInfo->m_outputControl = new Control(outputControlPath.toString());
       }
     }
     return true;

@@ -28,7 +28,6 @@ find files of those names at the top level of this repository. **/
 #include "Directory.h"
 #include "FileName.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 #include "ProjectItemViewMenu.h"
 
 namespace Isis {
@@ -170,16 +169,6 @@ namespace Isis {
    */
   Control *CnetEditorView::control() {
     return m_control;
-  }
-
-
-  /**
-   * This method pushes a new XmlHandler into the parser stack.
-   *
-   * @param xmlReader This is the parser stack.
-   */
-  void CnetEditorView::load(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 

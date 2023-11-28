@@ -23,7 +23,6 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 #include "Project.h"
 #include "PvlObject.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -98,25 +97,6 @@ namespace Isis {
         = new ControlDisplayProperties(FileName(m_fileName).name(), this);
 
     m_id = new QUuid(QUuid::createUuid());
-  }
-
-
-  /**
-   * Construct this control from XML.
-   *
-   * @param cnetFolder Location of control xml
-   * @param xmlReader An XML reader that's up to an <control/> tag.
-   * @param parent The Qt-relationship parent
-   */
-  Control::Control(FileName cnetFolder, XmlStackedHandlerReader *xmlReader, QObject *parent) :
-      QObject(parent) {
-    m_controlNet = NULL;
-    m_displayProperties = NULL;
-    m_id = NULL;
-    m_project = NULL;
-    m_modified = false;
-
-    xmlReader->pushContentHandler(new XmlHandler(this, cnetFolder));
   }
 
 
@@ -427,7 +407,7 @@ namespace Isis {
         }
       }
       else if (localName == "displayProperties") {
-        m_xmlHandlerControl->m_displayProperties = new ControlDisplayProperties(reader());
+        m_xmlHandlerControl->m_displayProperties = new ControlDisplayProperties("");
       }
     }
 

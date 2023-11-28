@@ -15,7 +15,6 @@ find files of those names at the top level of this repository. **/
 #include <QtGlobal> // qMax()
 #include <QUuid>
 #include <QXmlStreamWriter>
-#include <QXmlInputSource>
 
 #include "BundleObservationSolveSettings.h"
 #include "IException.h"
@@ -24,7 +23,6 @@ find files of those names at the top level of this repository. **/
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "SpecialPixel.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
 
@@ -91,28 +89,6 @@ namespace Isis {
   }
 
 
-  /**
-   * Construct a BundleSettings object from member data read from an XML file.
-   *
-   * @code
-   *   FileName xmlFile("bundleSettingsFileName.xml");
-   *
-   *   QString xmlPath = xmlFile.expanded();
-   *   QFile file(xmlPath);
-   *   file.open(QFile::ReadOnly);
-   *   XmlStackedHandlerReader reader;
-   *   BundleSettings settings(project, reader);
-   * @endcode
-   *
-   * @param project A pointer to the project where the Settings will be saved.
-   * @param xmlReader The Content handler to parse the BundleSettings XML
-   */
-  BundleSettings::BundleSettings(Project *project,
-                                 XmlStackedHandlerReader *xmlReader) {
-    init();
-    xmlReader->setErrorHandler(new XmlHandler(this, project));
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
-  }
 
 
   /**
@@ -1310,7 +1286,7 @@ namespace Isis {
       }
       else if (localName == "bundleObservationSolveSettings") {
         m_xmlHandlerObservationSettings.append(
-            new BundleObservationSolveSettings(m_xmlHandlerProject, reader()));
+            new BundleObservationSolveSettings());
       }
     }
     return true;

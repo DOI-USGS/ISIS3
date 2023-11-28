@@ -22,7 +22,6 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -55,19 +54,6 @@ namespace Isis {
    */
   ShapeList::ShapeList(QList<Shape *> shapes, QObject *parent) : QObject(parent) {
     append(shapes);
-  }
-
-
-  /**
-   * Creates an shape list from XML.
-   *
-   * @param project The project with the shape list.
-   * @param xmlReader The XML reader currently at an <shapeList /> tag.
-   * @param parent The Qt-relationship parent.
-   */
-  ShapeList::ShapeList(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) :
-      QObject(parent) {
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 
@@ -780,8 +766,7 @@ namespace Isis {
         }
       }
       else if (localName == "shape") {
-        m_shapeList->append(new Shape(m_project->shapeDataRoot() + "/" + m_shapeList->path(),
-                                      reader()));
+        m_shapeList->append(new Shape(m_project->shapeDataRoot() + "/" + m_shapeList->path()));
       }
     }
 
@@ -801,11 +786,6 @@ namespace Isis {
   bool ShapeList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                          const QString &qName) {
     if (localName == "shapeList") {
-      XmlHandler handler(m_shapeList, m_project);
-
-      XmlStackedHandlerReader reader;
-      reader.pushContentHandler(&handler);
-      reader.setErrorHandler(&handler);
 
       QString shapeListXmlPath = m_project->shapeDataRoot() + "/" + m_shapeList->path() +
                                  "/shapes.xml";
@@ -818,13 +798,16 @@ namespace Isis {
                          _FILEINFO_);
       }
 
-      QXmlInputSource xmlInputSource(&file);
-      if (!reader.parse(xmlInputSource))
+      QXmlStreamReader reader(&file);
+      while (!reader.atEnd()) {
+        reader.readNext();
+      }
+      if (reader.hasError()) {
         throw IException(IException::Io,
                          tr("Failed to open shape list XML [%1]").arg(shapeListXmlPath),
                          _FILEINFO_);
+      }
     }
-
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }

@@ -33,7 +33,6 @@
 #include "SerialNumber.h"
 #include "ShapeDisplayProperties.h"
 #include "Target.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -65,21 +64,6 @@ namespace Isis {
     initMemberData();
     m_cube = shapeCube;
     initShape();
-  }
-
-
-  /**
-   * Construct this shape from XML.
-   *
-   * @param shapeFolder Where this shape XML resides - /work/.../projectRoot/shapes/import1
-   * @param xmlReader An XML reader that's up to an <shape/> tag.
-   * @param parent The Qt-relationship parent
-   */
-  Shape::Shape(FileName shapeFolder, XmlStackedHandlerReader *xmlReader, QObject *parent) :
-      QObject(parent) {
-
-    initMemberData();
-    xmlReader->pushContentHandler(new XmlHandler(this, shapeFolder));
   }
 
 
@@ -1039,7 +1023,7 @@ namespace Isis {
 
       }
       else if (localName == "displayProperties") {
-        m_shape->m_displayProperties = new ShapeDisplayProperties(reader());
+        m_shape->m_displayProperties = new ShapeDisplayProperties("");
       }
     }
 

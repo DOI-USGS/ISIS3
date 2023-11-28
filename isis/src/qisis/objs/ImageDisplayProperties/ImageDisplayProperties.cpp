@@ -11,7 +11,6 @@
 
 #include "FileName.h"
 #include "Pvl.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -33,11 +32,6 @@ namespace Isis {
     setShowDNs(false);
 
     setValue(Color, QVariant::fromValue(randomColor()));
-  }
-
-
-  ImageDisplayProperties::ImageDisplayProperties(XmlStackedHandlerReader *xmlReader,
-      QObject *parent) : DisplayProperties(xmlReader, parent) {
   }
 
 

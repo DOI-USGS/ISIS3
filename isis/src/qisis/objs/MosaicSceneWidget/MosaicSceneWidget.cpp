@@ -55,7 +55,6 @@
 #include "TextFile.h"
 #include "Target.h"
 #include "ToolPad.h"
-#include "XmlStackedHandlerReader.h"
 
 using namespace std;
 
@@ -616,11 +615,6 @@ namespace Isis {
         m_projectViewTransform = new PvlObject(positionInfo);
       }
     }
-  }
-
-
-  void MosaicSceneWidget::load(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 

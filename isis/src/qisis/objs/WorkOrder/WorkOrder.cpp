@@ -26,7 +26,6 @@ find files of those names at the top level of this repository. **/
 #include "ProjectItem.h"
 #include "ShapeList.h"
 #include "Template.h"
-#include "XmlStackedHandlerReader.h"
 
 
 namespace Isis {
@@ -510,14 +509,6 @@ namespace Isis {
     }
 
     return false;
-  }
-
-
-  /**
-   * @brief Read this work order's data from disk.
-   */
-  void WorkOrder::read(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 

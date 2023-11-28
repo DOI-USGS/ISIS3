@@ -17,7 +17,6 @@ class QXmlStreamWriter;
 
 namespace Isis {
   class FileName;
-  class XmlStackedHandlerReader;
 
   /**
    * List for holding TargetBodies.  Overrides several QList methods in order to emit
@@ -39,8 +38,6 @@ namespace Isis {
       TargetBodyList(QString name, QString path, QObject *parent = NULL);
       explicit TargetBodyList(QObject *parent = NULL);
       explicit TargetBodyList(QList<TargetBodyQsp>, QObject *parent = NULL);
-      explicit TargetBodyList(Project *project,
-          XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
 //    explicit TargetBodyList(QStringList &);
       TargetBodyList(const TargetBodyList &);
       ~TargetBodyList();

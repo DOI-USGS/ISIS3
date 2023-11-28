@@ -15,7 +15,6 @@ find files of those names at the top level of this repository. **/
 #include <QString>
 #include <QtDebug>
 #include <QXmlStreamWriter>
-#include <QXmlInputSource>
 
 #include "BundleObservationSolveSettings.h"
 #include "BundleSettings.h"
@@ -24,7 +23,6 @@ find files of those names at the top level of this repository. **/
 #include "MaximumLikelihoodWFunctions.h"
 #include "Preference.h"
 #include "PvlObject.h"
-#include "XmlStackedHandlerReader.h"
 
 
 using namespace std;
@@ -84,7 +82,6 @@ namespace Isis {
        * Constructs BundleSettings using XML handler.
        *
        * @param project A pointer to the project.
-       * @param reader A pointer to a XmlStackedHandlerReader.
        * @param xmlFile The name of the XML file to be used to create a
        *                BundleSettings object.
        *
@@ -92,8 +89,7 @@ namespace Isis {
        * @throw Isis::Exception::Io "Unable to open XML file with read access."
        * @throw Isis::Exception::Unknown "Failed to parse XML file."
        */
-      BundleSettingsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader,
-                                     FileName xmlFile) : BundleSettings(project, reader) {
+      BundleSettingsXmlHandlerTester(FileName xmlFile) : BundleSettings() {
 
         QString xmlPath(xmlFile.expanded());
         QFile file(xmlPath);
@@ -104,14 +100,16 @@ namespace Isis {
                            _FILEINFO_);
         }
 
-        QXmlInputSource xmlInputSource(&file);
-        bool success = reader->parse(xmlInputSource);
-        if (!success) {
+        QXmlStreamReader reader(&file);
+
+        while (!reader.atEnd()) {
+            reader.readNext();
+        }
+        if (reader.hasError()) {
           throw IException(IException::Unknown,
                            QString("Failed to parse xml file, [%1]").arg(xmlPath),
                             _FILEINFO_);
         }
-
       }
 
       ~BundleSettingsXmlHandlerTester() {
@@ -278,8 +276,7 @@ int main(int argc, char *argv[]) {
 
     // read serialized xml into object and then write object to log file
     qDebug() << "Testing XML: Object deserialized as (should match object above):";
-    XmlStackedHandlerReader reader;
-    BundleSettingsXmlHandlerTester bsFromXml(project, &reader, xmlFile);
+    BundleSettingsXmlHandlerTester bsFromXml(xmlFile);
     printXml<BundleSettings>(bsFromXml);
 
     qDebug() << "Testing XML serialization 2: write XML from BundleSettings object...";
@@ -302,7 +299,7 @@ int main(int argc, char *argv[]) {
 
     // read serialized xml into object and then write object to log file
     qDebug() << "Testing XML: Object deserialized as (should match object above):";
-    BundleSettingsXmlHandlerTester bsFromXml2(project, &reader, xmlFile);
+    BundleSettingsXmlHandlerTester bsFromXml2(xmlFile);
     printXml<BundleSettings>(bsFromXml2);
     qXmlFile.remove();
 

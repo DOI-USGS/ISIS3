@@ -7,7 +7,6 @@
 #include <QString>
 #include <QtDebug>
 #include <QXmlStreamWriter>
-#include <QXmlInputSource>
 
 #include "BundleControlPoint.h"
 #include "BundleObservation.h"
@@ -26,7 +25,6 @@
 #include "ImageList.h"
 #include "Preference.h"
 #include "PvlObject.h"
-#include "XmlStackedHandlerReader.h"
 
 #include "gmock/gmock.h"
 
@@ -40,8 +38,7 @@
 namespace Isis {
   class BundleSolutionInfoXmlHandlerTester : public BundleSolutionInfo {
     public:
-      BundleSolutionInfoXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader,
-                                     FileName xmlFile) : BundleSolutionInfo(project, reader) {
+      BundleSolutionInfoXmlHandlerTester(FileName xmlFile) : BundleSolutionInfo() {
 
         QString xmlPath(xmlFile.expanded());
         QFile file(xmlPath);
@@ -52,14 +49,16 @@ namespace Isis {
                            _FILEINFO_);
         }
 
-        QXmlInputSource xmlInputSource(&file);
-        bool success = reader->parse(xmlInputSource);
-        if (!success) {
+        QXmlStreamReader reader(&file);
+
+        while (!reader.atEnd()) {
+            reader.readNext();
+        }
+        if (reader.hasError()) {
           throw IException(IException::Unknown,
                            QString("Failed to parse xml file, [%1]").arg(xmlPath),
                             _FILEINFO_);
         }
-
       }
 
       ~BundleSolutionInfoXmlHandlerTester() {
@@ -99,8 +98,7 @@ TEST_F(ThreeImageNetwork, BundleSolutionInfoSerialization) {
   writer.writeEndDocument();
   qXmlFile.close();
 
-  XmlStackedHandlerReader reader;
-  BundleSolutionInfoXmlHandlerTester newSolution(NULL, &reader, saveFile);
+  BundleSolutionInfoXmlHandlerTester newSolution(saveFile);
 
   EXPECT_EQ(solution.adjustedImages().size(), newSolution.adjustedImages().size());
   EXPECT_EQ(solution.bundleResults().numberObservations(), newSolution.bundleResults().numberObservations());

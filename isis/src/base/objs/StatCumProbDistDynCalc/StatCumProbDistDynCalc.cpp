@@ -20,7 +20,6 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 
 #include "Pvl.h"
 #include <iostream>
@@ -40,15 +39,6 @@ namespace Isis {
       : QObject(parent) {
     initialize();
     setQuantiles(nodes);
-  }
-
-
-// TODO: should project be const ???
-  StatCumProbDistDynCalc::StatCumProbDistDynCalc(Project *project, 
-                                                 XmlStackedHandlerReader *xmlReader, 
-                                                 QObject *parent) {   // TODO: does xml stuff need project???
-    initialize();
-    xmlReader->pushContentHandler(new XmlHandler(this, project));   // TODO: does xml stuff need project???
   }
 
 

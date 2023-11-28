@@ -17,7 +17,6 @@ class QXmlStreamWriter;
 
 namespace Isis {
   class FileName;
-  class XmlStackedHandlerReader;
 
   /**
    * List of GuiCameras saved as QSharedPointers.  Overrides many QList methods in order to
@@ -41,8 +40,6 @@ namespace Isis {
       GuiCameraList(QString name, QString path, QObject *parent = NULL);
       explicit GuiCameraList(QObject *parent = NULL);
       explicit GuiCameraList(QList<GuiCameraQsp>, QObject *parent = NULL);
-      explicit GuiCameraList(Project *project,
-                         XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
 //    explicit GuiCameraList(QStringList &);
       GuiCameraList(const GuiCameraList &);
       ~GuiCameraList();

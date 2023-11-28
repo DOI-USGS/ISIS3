@@ -7,7 +7,6 @@ find files of those names at the top level of this repository. **/
 #include <QDebug>
 #include <QDataStream>
 #include <QXmlStreamWriter>
-#include <QXmlInputSource>
 
 #include <iostream>
 
@@ -15,7 +14,6 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "Preference.h"
 #include "Statistics.h"
-#include "XmlStackedHandlerReader.h"
 
 using namespace std;
 using namespace Isis;
@@ -33,8 +31,7 @@ using namespace Isis;
 namespace Isis {
   class StatisticsXmlHandlerTester : public Statistics {
     public:
-      StatisticsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, 
-                                     FileName xmlFile) : Statistics(project, reader) {
+      StatisticsXmlHandlerTester(FileName xmlFile) : Statistics() {
 
         QString xmlPath(xmlFile.expanded());
         QFile file(xmlPath);
@@ -45,14 +42,16 @@ namespace Isis {
                            _FILEINFO_);
         }
 
-        QXmlInputSource xmlInputSource(&file);
-        bool success = reader->parse(xmlInputSource);
-        if (!success) {
+        QXmlStreamReader reader(&file);
+
+        while (!reader.atEnd()) {
+            reader.readNext();
+        }
+        if (reader.hasError()) {
           throw IException(IException::Unknown, 
                            QString("Failed to parse xml file, [%1]").arg(xmlPath),
                             _FILEINFO_);
         }
-
       }
 
       ~StatisticsXmlHandlerTester() {
@@ -388,8 +387,7 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml    
     qDebug() << "Testing XML: read XML to Statistics object...";
-    XmlStackedHandlerReader reader;
-    StatisticsXmlHandlerTester statsFromXml(project, &reader, xmlFile);
+    StatisticsXmlHandlerTester statsFromXml(xmlFile);
     qDebug() << "Average:             " << statsFromXml.Average();
     qDebug() << "Variance:            " << statsFromXml.Variance();
     qDebug() << "Rms:                 " << statsFromXml.Rms();
@@ -421,7 +419,7 @@ int main(int argc, char *argv[]) {
     // read xml with no attributes or values
     qDebug() << "Testing XML: read XML with no attributes or values to Statistics object...";
     FileName emptyXmlFile("./unitTest_NoElementValues.xml");
-    StatisticsXmlHandlerTester statsFromEmptyXml(project, &reader, emptyXmlFile);
+    StatisticsXmlHandlerTester statsFromEmptyXml(emptyXmlFile);
     qDebug() << "Average:             " << statsFromEmptyXml.Average();
     qDebug() << "Variance:            " << statsFromEmptyXml.Variance();
     qDebug() << "Rms:                 " << statsFromEmptyXml.Rms();
