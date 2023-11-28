@@ -161,7 +161,7 @@ namespace Isis {
     Application::Log(group);
     QString msg = "This function(PvlObject::addLogGroup) will be depreciated in ISIS3 v9.0 in "
                   "favor of Application::appendLogGroup";
-    std::cout << msg << std::endl;
+    std::cerr << msg << std::endl;
   };
 
   /**
