@@ -102,6 +102,15 @@
       "NADIR" options typically have less accuracy than reconstructed and smithed
       kernels which is why they are disabled by default.
     </p>
+    <p><b>Issues running HRSC using ISIS SPICE Web Service:</b> 
+    Currently HRSC images cannot be spiceinit'd using ISIS SPICE web services. 
+    This is due to the HRSC camera model relying on cube data to process
+    line scan times. When using the SPICE server, only the label is returned 
+    causing the camera model to fail initialization. In order to run spiceinit on 
+    HRSC images, download the MEX data locally. See download instructions at 
+    https://github.com/DOI-USGS/ISIS3/blob/dev/README.md#mission-specific-data-downloads.
+    </p> 
+
   </description>
 
   <category>

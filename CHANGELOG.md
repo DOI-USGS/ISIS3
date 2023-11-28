@@ -43,6 +43,7 @@ release.
 - Modified tgocassisstitch to optionally allow either a outputprefix or an
   outputsuffix, both, or neither for naming convention purposes. [#5162](https://github.com/DOI-USGS/ISIS3/pull/5162)
 - Changed the default PCK load behavior to try and load mission specific PCKs, if that fails we default to the base PCKs [#5335](https://github.com/DOI-USGS/ISIS3/pull/5335)
+- Disabled option to use web=true when running spiceinit with HRSC images. [#5223](https://github.com/DOI-USGS/ISIS3/issues/5223)
 
 ### Added
 - Added rclone to run dependencies in meta.yaml [#5183](https://github.com/DOI-USGS/ISIS3/issues/5183)
@@ -56,6 +57,8 @@ release.
   override the timestamp style naming convention of the output cube with their
   own name; if not specified retains existing behavior [#5125](https://github.com/USGS-Astrogeology/ISIS3/issues/5162)
 - Added new parameters <b>ONERROR</b>, <b>ERRORLOG</b>, and <b>ERRORLIST</b> to <i>mosrange</i> to provide better control over error behavior and provide diagnostics when problems are encountered processing the input file list.[#3606](https://github.com/DOI-USGS/ISIS3/issues/3606)
+- Added ability to delegate calculation of nadir pointing to ALE [#5117](https://github.com/USGS-Astrogeology/ISIS3/issues/5117)
+- Added --no-kernels flag to downloadIsisData [#5264](https://github.com/DOI-USGS/ISIS3/issues/5264)
 
 ### Deprecated
 
@@ -70,7 +73,9 @@ release.
 - Fixed target name translation for any dawn images with target "4 CERES" [#5294](https://github.com/DOI-USGS/ISIS3/pull/5294)
 - Fixed exception pop ups in qview when viewing images created using the CSM Camera [#5259](https://github.com/DOI-USGS/ISIS3/pull/5295/files)
 - Fixed shadowtau input file parseing errors when using example file [#5316](https://github.com/DOI-USGS/ISIS3/pull/5316)
+- Fixed ProgramLauncher failing while reporting errors from launched programs [#5331](https://github.com/DOI-USGS/ISIS3/pull/5331)
 - Fixed high/low filter functionality in trimfilter [#5311](https://github.com/DOI-USGS/ISIS3/issues/5311)
+
 ## [8.0.1] - 2023-08-23
 
 ### Fixed

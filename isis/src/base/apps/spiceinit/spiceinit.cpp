@@ -255,7 +255,6 @@ namespace Isis {
         kernelSuccess = tryKernels(icube, p, ui, log, lk, pck, targetSpk,
                                    realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
       }
-
       if (!kernelSuccess) {
         throw IException(IException::Unknown,
                          "Unable to initialize camera model",
@@ -614,6 +613,11 @@ namespace Isis {
   void requestSpice(Cube *icube, UserInterface &ui, Pvl *log, Pvl &labels, QString missionName) {
     QString instrumentId =
         labels.findGroup("Instrument", Pvl::Traverse)["InstrumentId"][0];
+
+    if (instrumentId == "HRSC"){
+      QString msg = "Spice Server does not support MEX HRSC images. Please rerun spiceinit with local MEX data.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
 
     QString url       = ui.GetString("URL") + "?mission=" + missionName +
                                               "&instrument=" + instrumentId;

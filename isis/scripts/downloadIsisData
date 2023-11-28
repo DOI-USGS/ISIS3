@@ -40,7 +40,10 @@ filter_list = [
         '- document/',
         '- *.csv',
         '- toolkit/',
-        '- kernels_ORG/'
+        '- kernels_ORG/',
+        '- orbnum/**',
+        '- old/**',
+        '- SpecialProducts/**'
     ]
 
 def find_conf():
@@ -145,6 +148,11 @@ def create_rclone_arguments(destination, mission_name, parsedArgs, rclone_kwargs
         excludes = [f"- {arg}" for arg in args.exclude]
         filter_list.extend(excludes)    
 
+    if args.no_kernels:
+        excludes = [f"- {arg}" for arg in ['ck/**','ek/**','fk/**','ik/**','iak/**','lsk/**','mk/**','pck/**','sclk/**','spk/**','tspk/**','dsk/**']]
+        filter_list.extend(excludes)
+        
+
     # we need to add this to the end  
     if args.include: 
         filter_list.append("- *")
@@ -224,7 +232,7 @@ if __name__ == '__main__':
         $ downloadIsisData tgo $ISISDATA
     
         # download everything except kernels with debug output
-        $ downloadIsisData all $ISISDATA --dry-run --exclude="kernels/**" -vv
+        $ downloadIsisData all $ISISDATA --dry-run --no-kernels -vv
         
         # download only cks and fks
         $ downloadIsisData all $ISISDATA --include="{ck/**,fk/**}" 
@@ -238,6 +246,7 @@ if __name__ == '__main__':
     parser.add_argument('--filter', help='Additional filters for files', nargs='*')
     parser.add_argument('--include', help='files and patterns to include while downloading', nargs='*')
     parser.add_argument('--exclude', help='files and patterns to ignore while downloading', nargs='*')
+    parser.add_argument('--no-kernels', help='Exclude all kernel files from download.  Analogous to --exclude="{ck/**,ek/**,fk/**,ik/**,iak/**,lsk/**,mk/**,pck/**,sclk/**,spk/**,tspk/**,dsk/**}"', default=False, action='store_true')
     parser.add_argument('-c', '--command', choices=["copy", "sync", "ls", "lsd", "size"], help='files and patterns to ignore while downloading', default="copy")
 
     args, kwargs = parser.parse_known_args()
