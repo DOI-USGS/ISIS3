@@ -506,7 +506,7 @@ namespace Isis {
   /**
    * Sets the surface normal for the currect intersection point.
    * Note: This method will throw an error if this ShapeModel doesn't have
-   * and intersection. Use the hasIntersection() method to verify before
+   * an intersection. Use the hasIntersection() method to verify before
    * calling this method.
    *
    * @see hasIntersection()
@@ -520,7 +520,7 @@ namespace Isis {
       m_hasNormal = true;
     }
     else {
-      QString message = "No intersection point in known.  A normal can not be set.";
+      QString message = "No intersection point is known.  A normal cannot be set.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
   }
@@ -528,7 +528,7 @@ namespace Isis {
     /**
    * Sets the local normal for the currect intersection point.
    * Note: This method will throw an error if this ShapeModel doesn't have
-   * and intersection. Use the hasIntersection() method to verify before
+   * an intersection. Use the hasIntersection() method to verify before
    * calling this method.
    *
    * @see hasIntersection()
@@ -542,7 +542,7 @@ namespace Isis {
       m_hasLocalNormal = true;
     }
     else {
-      QString message = "No intersection point in known.  A local normal can not be set.";
+      QString message = "No intersection point is known.  A local normal cannot be set.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
   }
