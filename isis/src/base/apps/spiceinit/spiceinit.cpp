@@ -615,6 +615,11 @@ namespace Isis {
     QString instrumentId =
         labels.findGroup("Instrument", Pvl::Traverse)["InstrumentId"][0];
 
+    if (instrumentId == "HRSC"){
+      QString msg = "Spice Server does not support MEX HRSC images. Please rerun spiceinit with local MEX data.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     QString url       = ui.GetString("URL") + "?mission=" + missionName +
                                               "&instrument=" + instrumentId;
     int port          = ui.GetInteger("PORT");

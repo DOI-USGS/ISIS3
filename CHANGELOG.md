@@ -35,6 +35,11 @@ release.
 
 ## [Unreleased]
 
+## [8.0.3] - 2023-04-18
+
+### Changed
+- Disabled option to use web=true when running spiceinit with HRSC images. [#5223](https://github.com/DOI-USGS/ISIS3/issues/5223)
+
 ## [8.0.2] - 2023-12-05
 ### Changed
 - Cnetedit has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5346](https://github.com/USGS-Astrogeology/ISIS3/issues/5346), 
