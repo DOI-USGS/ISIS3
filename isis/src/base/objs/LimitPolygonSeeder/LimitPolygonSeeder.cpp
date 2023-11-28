@@ -97,7 +97,7 @@ namespace Isis {
         delete centroid;
 
         geos::geom::Coordinate c(gridCenterX, gridCenterY);
-        points.push_back(Isis::globalFactory->createPoint(c));
+        points.push_back(Isis::globalFactory->createPoint(c).release());
       }
     }
 
@@ -121,7 +121,7 @@ namespace Isis {
   geos::geom::Geometry *LimitPolygonSeeder::GetMultiPolygon(double dMinX, double dMinY,
       double dMaxX, double dMaxY,
       const geos::geom::MultiPolygon &orig) {
-    geos::geom::CoordinateArraySequence *points = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateSequence *points = new geos::geom::CoordinateSequence();
 
     points->add(geos::geom::Coordinate(dMinX, dMinY));
     points->add(geos::geom::Coordinate(dMaxX, dMinY));
@@ -129,7 +129,7 @@ namespace Isis {
     points->add(geos::geom::Coordinate(dMinX, dMaxY));
     points->add(geos::geom::Coordinate(dMinX, dMinY));
 
-    geos::geom::Polygon *poly = Isis::globalFactory->createPolygon(Isis::globalFactory->createLinearRing(points), NULL);
+    std::unique_ptr<geos::geom::Polygon> poly = Isis::globalFactory->createPolygon(Isis::globalFactory->createLinearRing(*points));
     geos::geom::Geometry *overlap = poly->intersection(&orig).release();
 
     return overlap;

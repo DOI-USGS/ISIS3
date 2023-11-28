@@ -11,7 +11,6 @@
 #include <QPoint>
 #include <QRect>
 
-#include "geos/geom/CoordinateArraySequence.h"
 #include "geos/geom/CoordinateSequence.h"
 #include "geos/geom/Coordinate.h"
 #include "geos/geom/LineString.h"
@@ -829,21 +828,21 @@ namespace Isis {
           if(verticesList.size() != 3)
             break;
 
-          geos::geom::CoordinateArraySequence *points1 = new geos::geom::CoordinateArraySequence();
-          geos::geom::CoordinateArraySequence *points2 = new geos::geom::CoordinateArraySequence();
+          geos::geom::CoordinateSequence points1;
+          geos::geom::CoordinateSequence points2;
 
-          points1->add(geos::geom::Coordinate(verticesList[0].x(), verticesList[0].y()));
-          points1->add(geos::geom::Coordinate(verticesList[1].x(), verticesList[1].y()));
-          points2->add(geos::geom::Coordinate(verticesList[1].x(), verticesList[1].y()));
-          points2->add(geos::geom::Coordinate(verticesList[2].x(), verticesList[2].y()));
+          points1.add(geos::geom::Coordinate(verticesList[0].x(), verticesList[0].y()));
+          points1.add(geos::geom::Coordinate(verticesList[1].x(), verticesList[1].y()));
+          points2.add(geos::geom::Coordinate(verticesList[1].x(), verticesList[1].y()));
+          points2.add(geos::geom::Coordinate(verticesList[2].x(), verticesList[2].y()));
 
-          geos::geom::LineString *line1 = globalFactory->createLineString(points1);
-          geos::geom::LineString *line2 = globalFactory->createLineString(points2);
-          std::vector<geos::geom::Geometry *> *lines = new std::vector<geos::geom::Geometry *>;
-          lines->push_back(line1);
-          lines->push_back(line2);
+          geos::geom::LineString *line1 = globalFactory->createLineString(points1).release();
+          geos::geom::LineString *line2 = globalFactory->createLineString(points2).release();
+          std::vector<const geos::geom::Geometry *> lines;
+          lines.push_back(line1);
+          lines.push_back(line2);
 
-          geos::geom::MultiLineString *angle = globalFactory->createMultiLineString(lines);
+          geos::geom::MultiLineString *angle = globalFactory->createMultiLineString(lines).release();
           geometry = angle;
         }
         break;
@@ -871,12 +870,12 @@ namespace Isis {
 
           // We're ready to try to solve
           double originalX = 0.0, originalY = 0.0;
-          geos::geom::CoordinateArraySequence *points = new geos::geom::CoordinateArraySequence();
+          geos::geom::CoordinateSequence points;
 
           // Now iterate through our domain, solving for y positive, using 1/5th of a pixel increments
           for(double x = h - a; x <= h + a; x += 0.2) {
             double y = sqrt(pow(b, 2) * (1.0 - pow((x - h), 2) / pow(a, 2))) + k;
-            points->add(geos::geom::Coordinate(x, y));
+            points.add(geos::geom::Coordinate(x, y));
 
             if(x == h - a) {
               originalX = x;
@@ -887,14 +886,13 @@ namespace Isis {
           // Iterate through our domain backwards, solving for y negative, using 1/5th of a pixel decrements
           for(double x = h + a; x >= h - a; x -= 0.2) {
             double y = -1.0 * sqrt(pow(b, 2) * (1.0 - pow((x - h), 2) / pow(a, 2))) + k;
-            points->add(geos::geom::Coordinate(x, y));
+            points.add(geos::geom::Coordinate(x, y));
           }
 
-          points->add(geos::geom::Coordinate(originalX, originalY));
+          points.add(geos::geom::Coordinate(originalX, originalY));
 
           geometry = globalFactory->createPolygon(
-                       globalFactory->createLinearRing(points), NULL
-                     );
+                       globalFactory->createLinearRing(points)).release();
         }
         break;
 
@@ -904,15 +902,15 @@ namespace Isis {
           if(verticesList.size() < 3)
             break;
 
-          geos::geom::CoordinateArraySequence *points = new geos::geom::CoordinateArraySequence();
+          geos::geom::CoordinateSequence points;
 
           for(int vertex = 0; vertex < verticesList.size(); vertex++) {
-            points->add(geos::geom::Coordinate(verticesList[vertex].x(), verticesList[vertex].y()));
+            points.add(geos::geom::Coordinate(verticesList[vertex].x(), verticesList[vertex].y()));
           }
 
-          points->add(geos::geom::Coordinate(verticesList[0].x(), verticesList[0].y()));
+          points.add(geos::geom::Coordinate(verticesList[0].x(), verticesList[0].y()));
 
-          geometry = globalFactory->createPolygon(globalFactory->createLinearRing(points), NULL);
+          geometry = globalFactory->createPolygon(globalFactory->createLinearRing(points)).release();
 
         }
         break;
@@ -921,10 +919,10 @@ namespace Isis {
           if(verticesList.size() != 2)
             break;
 
-          geos::geom::CoordinateArraySequence *points = new geos::geom::CoordinateArraySequence();
-          points->add(geos::geom::Coordinate(verticesList[0].x(), verticesList[0].y()));
-          points->add(geos::geom::Coordinate(verticesList[1].x(), verticesList[1].y()));
-          geos::geom::LineString *line = globalFactory->createLineString(points);
+          geos::geom::CoordinateSequence points;
+          points.add(geos::geom::Coordinate(verticesList[0].x(), verticesList[0].y()));
+          points.add(geos::geom::Coordinate(verticesList[1].x(), verticesList[1].y()));
+          geos::geom::LineString *line = globalFactory->createLineString(points).release();
           geometry = line;
         }
         break;
@@ -932,13 +930,13 @@ namespace Isis {
       case SegmentedLineMode: {
           if(verticesList.size() < 2)
             break;
-          geos::geom::CoordinateArraySequence *points = new geos::geom::CoordinateArraySequence();
+          geos::geom::CoordinateSequence points;
 
           for(int vertex = 0; vertex < verticesList.size(); vertex++) {
-            points->add(geos::geom::Coordinate(verticesList[vertex].x(), verticesList[vertex].y()));
+            points.add(geos::geom::Coordinate(verticesList[vertex].x(), verticesList[vertex].y()));
           }
 
-          geos::geom::LineString *line = globalFactory->createLineString(points);
+          geos::geom::LineString *line = globalFactory->createLineString(points).release();
           geometry = line;
         }
         break;

@@ -20,7 +20,6 @@ find files of those names at the top level of this repository. **/
 #include <geos_c.h>
 #include <geos/algorithm/ConvexHull.h>
 #include <geos/geom/CoordinateSequence.h>
-#include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/Envelope.h>
 #include <geos/geom/Geometry.h>
 #include <geos/geom/GeometryFactory.h>
@@ -575,31 +574,26 @@ namespace Isis {
     double controlFitness = 0;
 
     static  geos::geom::GeometryFactory::Ptr geosFactory = geos::geom::GeometryFactory::create();
-    geos::geom::CoordinateArraySequence * pts = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateSequence pts;
     QList< ControlMeasure * > measures = cnet.GetMeasuresInCube(sn);
 
     // Populate pts with a list of control points
     foreach (ControlMeasure * measure, measures) {
-      pts->add(geos::geom::Coordinate(measure->GetSample(), measure->GetLine()));
+      pts.add(geos::geom::Coordinate(measure->GetSample(), measure->GetLine()));
     }
-    pts->add(geos::geom::Coordinate(measures[0]->GetSample(), measures[0]->GetLine()));
+    pts.add(geos::geom::Coordinate(measures[0]->GetSample(), measures[0]->GetLine()));
 
-    if (pts->size() >= 4) {
+    if (pts.size() >= 4) {
 
       // Calculate the convex hull
       geos::geom::Geometry * convexHull = geosFactory->createPolygon(
-          geosFactory->createLinearRing(pts), 0)->convexHull().release();
+          geosFactory->createLinearRing(pts))->convexHull().release();
 
       // Calculate the area of the convex hull
       double convexArea = convexHull->getArea();
       double cubeArea = cube->sampleCount() * cube->lineCount();
 
       controlFitness = convexArea / cubeArea;
-
-      if (pts) {
-        delete pts;
-        pts = NULL;
-      }
     }
 
     return controlFitness;

@@ -2,7 +2,6 @@
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
 
-using namespace std;
 using namespace Isis;
 
 void SumLineSample(Buffer &in, Buffer &out);
