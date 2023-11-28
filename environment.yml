@@ -3,40 +3,43 @@ channels:
   - defaults
 
 dependencies:
-  - kalasiris 
-  - ale=0.9.1
+  - ale>=0.9.1, <1
   - armadillo
-  - boost=1.72
-  - boost-cpp=1.72
+  - boost>=1.72.0, <2
+  - boost-cpp>=1.72.0, <2
   - blas
   - usgs-astrogeology::bullet
   - bz2file
   - bzip2
-  - cmake >=3.15
+  - cmake >=3.15, <4
   - cspice=67
   - csm>=3.0.3,<3.0.4
-  - curl
-  - cxx-compiler=1.1.2
+  - curl>=8.3.0,<9.0a0
+  - cxx-compiler>=1.1.2
   - doxygen
-  - eigen < 3.4
-  - embree>=2.17,<3
+  - eigen>=3, <4
+  - embree>=2.17, <3
   - ffmpeg
-  - geos =3.11.1
+  - geos>=3.11
   - geotiff
   - gmp
   - graphviz
   - gsl>=2.6
-  - hdf5
+  - hdf5>=1.14.2,<1.14.3.0a0
   - icu
   - inja
   - jama
-  - jpeg
+  # - jpeg
   - usgs-astrogeology::kakadu==1
+  - kalasiris
   - krb5
-  - libopencv>=4.5.2
-  - libpng>=1.6.34
-  - libprotobuf<3.20
-  - libtiff>=4.0
+  - libboost>=1.72.0, <2
+  - libgdal >=3.7.2,<3.8.0a0
+  # - libjpeg-turbo >=2.1.5.1,<3.0a0
+  - libopencv>=4.5.2, <5
+  - libpng>=1.6.34, <2
+  - libprotobuf
+  - libtiff>=4.0, <5
   - libxml2
   - make
   - mesalib
@@ -44,20 +47,22 @@ dependencies:
   - mysql-connector-c
   - nanoflann<1.4
   - nlohmann_json
-  - ninja==1.7.2
+  - ninja>=1.7.2, <2
   - nn
-  - opencv>=4.5.2
-  - openssl>=1.1.1k
-  - pcl >= 1.10.0
+  - opencv>=4.5.2, <5
+  - openssl>=3.1.2,<4.0a0
+  - pcl >=1.10, <2
+  - pdal>=2.6, <3
   - plio
-  - protobuf<3.20
-  - python>=3.7.11
+  - protobuf
+  - python=3.12
+  - python_abi=3.12
   - pytest
-  - rclone
   - qhull
-  - qt>=5.9.6,<5.15.0
+  - qt-main
   - qwt
-  - sqlite
+  - rclone
+  - sqlite>=3.43.0,<4.0a0
   - suitesparse
   - superlu
   - swig
@@ -65,10 +70,10 @@ dependencies:
   - tnt
   - x264
   - xalan-c
-  - xerces-c=3
+  - xerces-c>=3.2.4,<3.3.0a0
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm
   - xorg-libx11
   - xorg-libxi
-  - zlib
+  - zlib>=1.2.13,<1.3.0a0

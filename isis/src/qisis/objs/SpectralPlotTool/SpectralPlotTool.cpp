@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "geos/geom/Polygon.h"
-#include "geos/geom/CoordinateArraySequence.h"
+#include "geos/geom/CoordinateSequence.h"
 #include "geos/geom/Point.h"
 
 #include <QAction>
@@ -592,19 +592,19 @@ namespace Isis {
 
     if (rubberBandTool()->currentMode() == RubberBandTool::PolygonMode) {
 //       samps = 1;
-      geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
+      geos::geom::CoordinateSequence pts;
       for (int i = 0; i < vertices.size(); i++) {
         viewport->viewportToCube(vertices[i].x(), vertices[i].y(), x, y);
         // add the x,y vertices (double) to the pts CoordinateSequence
-        pts->add(geos::geom::Coordinate(x, y));
+        pts.add(geos::geom::Coordinate(x, y));
       }/*end for*/
 
       /*Add the first point again in order to make a closed line string*/
       viewport->viewportToCube(vertices[0].x(), vertices[0].y(), x, y);
-      pts->add(geos::geom::Coordinate(x, y));
+      pts.add(geos::geom::Coordinate(x, y));
 
       geos::geom::Polygon *poly = globalFactory->createPolygon(
-          globalFactory->createLinearRing(pts), NULL);
+          globalFactory->createLinearRing(pts)).release();
 
       const geos::geom::Envelope *envelope = poly->getEnvelopeInternal();
 
@@ -615,7 +615,7 @@ namespace Isis {
              x <= (int)round(envelope->getMaxX()); x++) {
           // create a point at the center of the pixel
           geos::geom::Coordinate c(x, y);
-          geos::geom::Point *p = globalFactory->createPoint(c);
+          geos::geom::Point *p = globalFactory->createPoint(c).release();
           // check if the center of the pixel is in the polygon's envelope (the selection)
           bool contains = p->within(poly);
           delete p;
