@@ -217,11 +217,11 @@ const PvlFlatMap &FeatureAlgorithmFactory::globalParameters() const {
  */
 PvlFlatMap FeatureAlgorithmFactory::parseGlobalParameters(const QString &globals) {
   PvlFlatMap pvlmap;
-  QStringList parms = globals.split("@", QString::SkipEmptyParts);
+  QStringList parms = globals.split("@", Qt::SkipEmptyParts);
   for (int i = 0 ; i < parms.size() ; i++ ) {
 
     // Only parse substrings that have 2 distinct parts separated by :
-    QStringList parts = parms[i].split(":", QString::SkipEmptyParts);
+    QStringList parts = parms[i].split(":", Qt::SkipEmptyParts);
     if ( parts.size() == 2 ) {
       pvlmap.add(parts[0], parts[1]);
     }
