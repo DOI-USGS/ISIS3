@@ -12,7 +12,7 @@
     have nothing wrong will be set to 1. 
     NOTE: Please be aware that refining the reseaux locations will modify the image distortion 
     once applications that utilize the camera model (campt, qview, etc) are used. Thus findrx has 
-    the practical affect of changing the geometry of the image.
+    the practical effect of changing the geometry of the image.
   </description>
 
   <category>
