@@ -10,7 +10,6 @@
 #include "TargetBodyDisplayProperties.h"
 //#include "TargetBodyListActionWorkOrder.h"  TODO - will we need this?
 #include "WorkOrder.h"
-#include "XmlStackedHandler.h"
 
 class QStringList;
 class QXmlStreamWriter;
@@ -96,29 +95,6 @@ namespace Isis {
       void countChanged(int newCount);
 
     private:
-      /**
-       * XmlReader for working with TargetBody XML files
-       * 
-       * @author 2012-07-01 Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(TargetBodyList *TargetBodyList, Project *project);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          TargetBodyList *m_TargetBodyList; //!< The TargetBodyList to read into/save from
-          Project *m_project; //!< The project that contains the TargetBodies
-      };
-
 
       /**
        * This functor is used for copying the TargetBody objects between two projects quickly. This

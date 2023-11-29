@@ -98,31 +98,6 @@ namespace Isis {
       QVariant saveExpandedStates(QTreeWidgetItem *item);
 
     private:
-      /**
-       * @author 2012-09-?? Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(ImageFileListWidget *fileList);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          ImageFileListWidget *m_fileList; //!< The widget we are working with
-          ImageList *m_currentImageList; //!< The list of images being worked on
-          QTreeWidgetItem *m_currentImageListItem; //!< The image being worked on
-          QTreeWidgetItem *m_currentGroup; //!< The group of cubes being worked on
-      };
-
-    private:
       QPointer<ProgressBar> m_progress; //!< The ProgressBar of the ImageFileListWidget
       //! Serialized (file) version of this object
       QScopedPointer<PvlObject> m_serialized;

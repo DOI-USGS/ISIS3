@@ -164,44 +164,4 @@ namespace Isis {
 
     stream.writeEndElement();
   }
-
-
-  DisplayProperties::XmlHandler::XmlHandler(DisplayProperties *displayProperties) {
-    m_displayProperties = displayProperties;
-  }
-
-
-  bool DisplayProperties::XmlHandler::startElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName, const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "displayProperties") {
-        QString displayName = atts.value("displayName");
-
-        if (!displayName.isEmpty()) {
-          m_displayProperties->setDisplayName(displayName);
-        }
-      }
-    }
-
-    return true;
-  }
-
-
-  bool DisplayProperties::XmlHandler::characters(const QString &ch) {
-    m_hexData += ch;
-
-    return XmlStackedHandler::characters(ch);
-  }
-
-
-  bool DisplayProperties::XmlHandler::endElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName) {
-    if (localName == "displayProperties") {
-      QByteArray hexValues(m_hexData.toLatin1());
-      QDataStream valuesStream(QByteArray::fromHex(hexValues));
-      valuesStream >> *m_displayProperties->m_propertyValues;
-    }
-
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
-  }
 }

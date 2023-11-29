@@ -435,25 +435,6 @@ namespace Isis {
       void newActiveControl(bool newControl);
       void reloadActiveControlInCnetEditorView();
 
-    private:
-      /**
-       * @author 2012-08-?? Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(Directory *directory);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          Directory *m_directory;  //!< Pointer to a Directory which is set by the XmlHandler class.
-      };
 
     private:
       Directory(const Directory &other);

@@ -12,7 +12,6 @@ find files of those names at the top level of this repository. **/
 
 #include <QWidget>
 
-#include "XmlStackedHandler.h"
 
 class QAction;
 class QBoxLayout;
@@ -24,7 +23,6 @@ class QSplitter;
 class QString;
 class QToolBar;
 class QXmlStreamWriter;
-class QXmlAttributes;
 
 namespace Isis {
   class AbstractTableModel;

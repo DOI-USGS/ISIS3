@@ -18,8 +18,6 @@ find files of those names at the top level of this repository. **/
 #include "LidarData.h"
 #include "SurfacePoint.h"
 
-#include "XmlStackedHandler.h"
-
 class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
@@ -217,39 +215,6 @@ namespace Isis {
 
     public slots:
       void updateFileName(Project *);
-
-    private:
-      /**
-       * This class is used to read an images.xml file into an image list
-       *
-       * @see QXmlDefaultHandler documentation
-       * @author 2014-07-21 Ken Edmundson
-       *
-       * @internal
-       *   @history 2016-06-13 Makayla Shepherd - Added updateFileName() and updated documentation.
-       *                           Fixes #2298.
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          //TODO does xml stuff need project???
-          XmlHandler(BundleSolutionInfo *bundleSolutionInfo, Project *project);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName);
-          QString surfacePointCoordName(SurfacePoint::CoordinateType type,
-                                        SurfacePoint::CoordIndex coordIdx) const;
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          BundleSolutionInfo *m_xmlHandlerBundleSolutionInfo; //!< The bundleSolutionInfo object
-          Project *m_xmlHandlerProject;  //TODO does xml stuff need project???
-          QString m_xmlHandlerCharacters; //!< List of characters that have been handled
-      };
 
     private:
 

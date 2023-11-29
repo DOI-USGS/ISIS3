@@ -18,7 +18,6 @@ find files of those names at the top level of this repository. **/
 
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
-#include "XmlStackedHandler.h"
 
 class QDataStream;
 class QUuid;
@@ -180,36 +179,6 @@ class BundleObservationSolveSettings {
 
       // TODO: does xml stuff need project???
       void save(QXmlStreamWriter &stream, const Project *project) const;
-
-
-    private:
-      /**
-       *
-       * @author 2014-07-28 Jeannie Backer
-       *
-       * @internal
-       *   @todo To be docuemnted if XML handler code is used for serialization.
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          // TODO: does xml stuff need project???
-          XmlHandler(BundleObservationSolveSettings *settings, Project *project);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          BundleObservationSolveSettings *m_xmlHandlerObservationSettings;
-          Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
-          QString m_xmlHandlerCharacters;
-          QStringList m_xmlHandlerAprioriSigmas;
-      };
 
       /**
        * A unique ID for this object (useful for others to reference this object

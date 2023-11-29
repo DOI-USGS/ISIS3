@@ -1850,11 +1850,11 @@ TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
   EXPECT_THAT(lidarRangeConstraints[0].trimmed().toStdString(), HasSubstr("Lidar Range Constraints"));
   EXPECT_EQ(lidarRangeConstraints[1].trimmed().toInt(), lidarDataIn.numberSimultaneousMeasures());
 
-  QStringList columns = lines[136].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  QStringList columns = lines[136].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   ASSERT_GE(columns.size(), 10);
   EXPECT_EQ(columns[6].toInt(), nValidMeasuresCube1);
   EXPECT_EQ(columns[7].toInt(), nMeasuresCube1);
-  columns = lines[137].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[137].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   ASSERT_GE(columns.size(), 10);
   EXPECT_EQ(columns[6].toInt(), nValidMeasuresCube2);
   EXPECT_EQ(columns[7].toInt(), nMeasuresCube2);

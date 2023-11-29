@@ -12,7 +12,6 @@
 #include "ImageListActionWorkOrder.h"
 #include "SerialNumberList.h"
 #include "WorkOrder.h"
-#include "XmlStackedHandler.h"
 
 class QStringList;
 class QXmlStreamWriter;
@@ -120,39 +119,6 @@ namespace Isis {
       void countChanged(int newCount);
 
     private:
-      /**
-       * This class is used to read an images.xml file into an image list
-       *
-       * @author 2012-07-01 Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(ImageList *imageList, Project *project, QString dataRoot="");
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          /**
-           * This stores a pointer to the image list that will be read into
-           */
-          ImageList *m_imageList;
-          /**
-           * This stores a pointer to the project that the images in the image list will be a part of
-           */
-          Project *m_project;
-          /**
-           * This is a relative path to the image data.
-           *   e.g. project/images or project/bundle/results/TIMESTAMP/images
-           */
-          QString m_imageDataRoot;
-      };
 
 
       /**

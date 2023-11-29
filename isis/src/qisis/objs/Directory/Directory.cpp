@@ -91,7 +91,6 @@ find files of those names at the top level of this repository. **/
 #include "WarningTreeWidget.h"
 #include "WorkOrder.h"
 #include "Workspace.h"
-#include "XmlStackedHandler.h"
 
 using namespace std;
 
@@ -1561,66 +1560,6 @@ namespace Isis {
 
     stream.writeEndElement();
   }
-
-
-  /**
-   * @brief This function sets the Directory pointer for the Directory::XmlHandler class
-   * @param directory The new directory we are setting XmlHandler's member variable to.
-   */
-  Directory::XmlHandler::XmlHandler(Directory *directory) {
-    m_directory = directory;
-  }
-
-
-  /**
-   * @brief The Destructor for Directory::XmlHandler
-   */
-  Directory::XmlHandler::~XmlHandler() {
-  }
-
-
-  /**
-   * @brief The XML reader invokes this method at the start of every element in the
-   * XML document.  This method expects <footprint2DView/> and <imageFileList/>
-   * elements.
-   * A quick example using this function:
-   *     startElement("xsl","stylesheet","xsl:stylesheet",attributes)
-   *
-   * @param namespaceURI The Uniform Resource Identifier of the element's namespace
-   * @param localName The local name string
-   * @param qName The XML qualified string (or empty, if QNames are not available).
-   * @param atts The XML attributes attached to each element
-   * @return @b bool  Returns True signalling to the reader the start of a valid XML element.  If
-   * False is returned, something bad happened.
-   *
-   */
-  bool Directory::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                           const QString &qName, const QXmlAttributes &atts) {
-    bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
-    if (result) {
-      QString viewObjectName;
-      if (localName == "footprint2DView") {
-        viewObjectName = atts.value("objectName");
-        m_directory->addFootprint2DView(viewObjectName);
-      }
-      else if (localName == "imageFileList") {
-        viewObjectName = atts.value("objectName");
-        m_directory->addImageFileListView(viewObjectName);
-      }
-      else if (localName == "cubeDnView") {
-        viewObjectName = atts.value("objectName");
-        m_directory->addCubeDnView(viewObjectName);
-      }
-      else if (localName == "cnetEditorView") {
-        viewObjectName = atts.value("objectName");
-        QString id = atts.value("id");
-        m_directory->addCnetEditorView(m_directory->project()->control(id), viewObjectName);
-      }
-    }
-
-    return result;
-  }
-
 
   /**
    * @brief Reformat actionPairings to be user friendly for use in menus.

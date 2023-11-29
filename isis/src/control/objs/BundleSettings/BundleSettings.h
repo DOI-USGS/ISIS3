@@ -23,7 +23,6 @@ find files of those names at the top level of this repository. **/
 #include "MaximumLikelihoodWFunctions.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
-#include "XmlStackedHandler.h"
 
 class QDataStream;
 class QUuid;
@@ -110,7 +109,6 @@ namespace Isis {
    *   @history 2019-05-17 Tyler Wilson - Added QString m_cubeList member function as well
    *                           as get/set member functions.  References #3267.
    *
-   *   @todo Determine which XmlStackedHandler needs a Project pointer (see constructors)
    *   @todo Determine whether QList<BundleObservationSolveSettings> m_observationSolveSettings
    *         should be a list of pointers, or a pointer to a list, or a pointer to a list of
    *         pointers, etc...
@@ -283,42 +281,6 @@ namespace Isis {
       //=====================================================================//
       //============= Saving/Restoring a BundleSettings object ==============//
       //=====================================================================//
-
-      /**
-       * This class is needed to read/write BundleSettings from/to an XML
-       * formateed file.
-       *
-       * @author 2014-07-21 Ken Edmundson
-       *
-       * @internal
-       *   @history 2014-07-21 Ken Edmundson - Original version.
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(BundleSettings *bundleSettings,
-                     Project *project);
-          XmlHandler(BundleSettings *bundleSettings);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI,
-                                    const QString &localName,
-                                    const QString &qName,
-                                    const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI,
-                                  const QString &localName,
-                                  const QString &qName);
-          bool fatalError(const QXmlParseException &exception);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          BundleSettings *m_xmlHandlerBundleSettings ;
-          Project *m_xmlHandlerProject; // TODO: does xml stuff need project???
-          QString m_xmlHandlerCharacters;
-          QList<BundleObservationSolveSettings *> m_xmlHandlerObservationSettings;
-      };
-
 
       /**
        * This struct is needed to write the m_maximumLikelihood variable as an

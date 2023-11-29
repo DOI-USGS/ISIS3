@@ -30,7 +30,6 @@
 
 class QMutex;
 class QProgressBar;
-class QXmlAttributes;
 class QXmlStreamWriter;
 
 #include "ControlList.h"
@@ -40,7 +39,6 @@ class QXmlStreamWriter;
 #include "ShapeList.h"
 #include "TargetBody.h"
 #include "TemplateList.h"
-#include "XmlStackedHandler.h"
 
 namespace Isis {
   class BundleSolutionInfo;
@@ -586,34 +584,6 @@ namespace Isis {
 
       void storeWarning(QString text);
       void storeWarning(QString text, const ImageList &relevantData);
-
-    private:
-      /**
-       * @author 2012-09-?? Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(Project *project);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          Project *m_project;
-          QList<ImageList *> m_imageLists;
-          QList<ShapeList *> m_shapeLists;
-          QList<ControlList *> m_controls;
-          QList<BundleSolutionInfo *> m_bundleSolutionInfos;
-          QList<TemplateList *> m_mapTemplateLists;
-          QList<TemplateList *> m_regTemplateLists;
-          WorkOrder *m_workOrder;
-      };
 
     private:
 

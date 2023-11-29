@@ -11,8 +11,6 @@ find files of those names at the top level of this repository. **/
 #include <QObject>
 #include <QVector>
 
-#include "XmlStackedHandler.h"
-
 class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
@@ -96,24 +94,6 @@ namespace Isis {
        *
        * @internal
        */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(StatCumProbDistDynCalc *probabilityCalc, Project *project);   // TODO: does xml stuff need project???
-          ~XmlHandler();
-   
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName);
-   
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-   
-          StatCumProbDistDynCalc *m_xmlHandlerCumProbCalc;
-          Project *m_xmlHandlerProject;   // TODO: does xml stuff need project???
-          QString m_xmlHandlerCharacters;
-      };
 
       unsigned int m_numberCells; /**< The number of cells or histogram bins that are being used to
                                       model the probility density function.*/

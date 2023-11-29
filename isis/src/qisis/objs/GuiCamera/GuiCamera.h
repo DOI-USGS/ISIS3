@@ -32,7 +32,6 @@
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
-#include "XmlStackedHandler.h"
 
 class QDataStream;
 class QUuid;
@@ -107,33 +106,6 @@ namespace Isis {
 
 //      QDataStream &write(QDataStream &stream) const;
 //      QDataStream &read(QDataStream &stream);
-
-
-    private:
-      /**
-       *
-       * @author 2015-06-08 Ken Edmundson
-       *
-       * @internal
-       */
-//      class XmlHandler : public XmlStackedHandler {
-//        public:
-//          XmlHandler(GuiCamera *GuiCamera, Project *project);  // TODO: does xml stuff need project???
-//          ~XmlHandler();
-
-//          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-//                                    const QString &qName, const QXmlAttributes &atts);
-//          virtual bool characters(const QString &ch);
-//          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-//                                    const QString &qName);
-
-//        private:
-//          Q_DISABLE_COPY(XmlHandler);
-
-//          GuiCamera *m_xmlHandlerGuiCamera;
-//          Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
-//          QString m_xmlHandlerCharacters;
-//      };
 
     private:
       GuiCamera(const GuiCamera &other);          // NOTE: copy constructor & assignment operators

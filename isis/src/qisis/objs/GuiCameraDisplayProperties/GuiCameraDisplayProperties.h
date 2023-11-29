@@ -28,7 +28,6 @@
 
 
 #include "DisplayProperties.h"
-#include "XmlStackedHandler.h"
 
 class QAction;
 class QXmlStreamWriter;
@@ -116,51 +115,6 @@ namespace Isis {
 
     private slots:
       void toggleShowLabel();
-
-    private:
-      /**
-       * @brief Process a GuiCameraDisplayProperties in a stack-oriented way
-       *
-       * Child class for XmlStackedHandler which is used to process XML in
-       * a stack-oriented way.  It's been modified to process a GuiCameraDisplayProperties
-       * object.
-       *
-       * @author 2015-09-08 Ken Edmundson
-       *
-       * @internal 
-       *   @history 2015-09-08 Ken Edmundson - Creation.
-       *   @history 2016-06-08 Tyler Wilson - Added documentation to many of the
-       *                           member functions, and cleaned up the formatting.
-       *                           Fixes #3997.
-       * 
-       *
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(GuiCameraDisplayProperties *displayProperties);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-
-          virtual bool characters(const QString &ch);
-
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          /**
-           * An internal pointer to GuiCameraDisplayProperties object.
-           */
-          GuiCameraDisplayProperties *m_displayProperties;
-
-          /**
-           * An internal QString variable used to store character data found in the
-           * content of XML elements.
-           */
-          QString m_hexData;
-      };
 
     private:
       GuiCameraDisplayProperties(const GuiCameraDisplayProperties &);

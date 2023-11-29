@@ -7,6 +7,7 @@ find files of those names at the top level of this repository. **/
 #include <QDebug>
 #include <QDataStream>
 #include <QXmlStreamWriter>
+#include <QFile>
 
 #include <iostream>
 
