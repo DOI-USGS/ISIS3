@@ -569,7 +569,7 @@ namespace Isis {
       m_hasNormal = true;
     }
     else {
-      QString message = "No intersection point in known.  A normal can not be set.";
+      QString message = "No intersection point is known.  A normal cannot be set.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
   }
@@ -595,7 +595,7 @@ namespace Isis {
       m_hasLocalNormal = true;
     }
     else {
-      QString message = "No intersection point in known.  A local normal can not be set.";
+      QString message = "No intersection point is known.  A local normal cannot be set.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
   }
