@@ -78,8 +78,8 @@ class CneteditCheckValid : public TempTestingFiles {
 
       // set up pvl def file
       PvlGroup validMeasureGroup("ValidMeasure");
-     validMeasureGroup.addKeyword(PvlKeyword("MinDN", "-1000000")); 
-     validMeasureGroup.addKeyword(PvlKeyword("MaxDN", "1000000")); 
+      validMeasureGroup.addKeyword(PvlKeyword("MinDN", "-1000000")); 
+      validMeasureGroup.addKeyword(PvlKeyword("MaxDN", "1000000")); 
       validMeasureGroup.addKeyword(PvlKeyword("MinEmission", "0")); 
       validMeasureGroup.addKeyword(PvlKeyword("MaxEmission", "135")); 
       validMeasureGroup.addKeyword(PvlKeyword("MinIncidence", "0")); 

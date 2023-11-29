@@ -78,22 +78,22 @@ namespace Isis {
       QMap<QString, QString> *pointsMap, QMap<QString, PvlGroup> *measuresMap);
 
   // Global variables
-  int numPointsDeleted;
-  int numMeasuresDeleted;
+  static int numPointsDeleted;
+  static int numMeasuresDeleted;
 
-  bool deleteIgnored;
-  bool preservePoints;
-  bool retainRef;
-  bool keepLog;
-  bool ignoreAll;
+  static bool deleteIgnored;
+  static bool preservePoints;
+  static bool retainRef;
+  static bool keepLog;
+  static bool ignoreAll;
 
-  QMap<QString, QString> *ignoredPoints;
-  QMap<QString, PvlGroup> *ignoredMeasures;
-  QMap<QString, QString> *retainedReferences;
-  QMap<QString, QString> *editLockedPoints;
-  QMap<QString, PvlGroup> *editLockedMeasures;
+  static QMap<QString, QString> *ignoredPoints;
+  static QMap<QString, PvlGroup> *ignoredMeasures;
+  static QMap<QString, QString> *retainedReferences;
+  static QMap<QString, QString> *editLockedPoints;
+  static QMap<QString, PvlGroup> *editLockedMeasures;
 
-  ControlNetValidMeasure *cneteditValidator;
+  static ControlNetValidMeasure *cneteditValidator;
 
   /**
    * Edit a control network
