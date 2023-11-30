@@ -1,0 +1,387 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 320
+    TileLines   = 472
+
+    Group = Dimensions
+      Samples = 320
+      Lines   = 17936
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName        = MARS_ODYSSEY
+    InstrumentId          = THEMIS_IR
+    TargetName            = MARS
+    MissionPhaseName      = MAPPING
+    StartTime             = 2003-09-23T15:42:25.400
+    StopTime              = 2003-09-23T15:52:23.262
+    SpacecraftClockCount  = 748799078.000
+    GainNumber            = 16
+    OffsetNumber          = 2
+    MissingScanLines      = 0
+    TimeDelayIntegration  = ENABLED
+    SpacecraftClockOffset = 0.0 <seconds>
+  End_Group
+
+  Group = Archive
+    DataSetId               = ODY-M-THM-3-IRRDR-V1.0
+    ProducerId              = ODY_THM_TEAM
+    ProductId               = I07873009RDR
+    ProductCreationTime     = 2004-10-14T00:21:58
+    ProductVersionId        = 1.1
+    OrbitNumber             = 07873
+    FlightSoftwareVersionId = 1.00
+    CommandSequenceNumber   = 7873
+    Description             = "No Description Given"
+  End_Group
+
+  Group = BandBin
+    OriginalBand = 2
+    Center       = 12.57
+    Width        = 0.81
+    FilterNumber = 9
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -53031
+    LeapSecond                = $base/kernels/lsk/naif0009.tls
+    TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
+    TargetPosition            = (Table, $base/kernels/spk/de405.bsp)
+    InstrumentPointing        = (Table, $odyssey/kernels/ck/m01_sc_map7.bc,
+                                 $odyssey/kernels/fk/m01_v29.tf)
+    Instrument                = Null
+    SpacecraftClock           = $odyssey/kernels/sclk/ORB1_SCLKSCET.00184.tsc
+    InstrumentPosition        = (Table, $odyssey/kernels/spk/m01_map7.bsp)
+    InstrumentAddendum        = $odyssey/kernels/iak/themisAddendum003.ti
+    ShapeModel                = $base/dems/molaMarsPlanetaryRadius0005.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 2
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 23023617
+  Bytes               = 8960
+  Records             = 140
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-53000, 16, 1)
+  ConstantFrames      = (-53031, -53030, -53000)
+  ConstantRotation    = (0.0013835021734055, 0.011529976186854,
+                         0.99993257051207, 0.28811330695433, 0.95752799265849,
+                         -0.011439651709814, -0.95759532594806,
+                         0.28810970640458, -0.0019971975093594)
+  CkTableStartTime    = 117603812.11191
+  CkTableEndTime      = 117604414.30884
+  CkTableOriginalSize = 17937
+  Description         = "Created by spiceinit"
+  Kernels             = ($odyssey/kernels/ck/m01_sc_map7.bc,
+                         $odyssey/kernels/fk/m01_v29.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 23032577
+  Bytes                = 4200
+  Records              = 75
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 117603812.11191
+  SpkTableEndTime      = 117604414.30884
+  SpkTableOriginalSize = 17937.0
+  Description          = "Created by spiceinit"
+  Kernels              = $odyssey/kernels/spk/m01_map7.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 23036777
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10014, 1)
+  CkTableStartTime    = 117603812.11191
+  CkTableEndTime      = 117604414.30884
+  CkTableOriginalSize = 2
+  Description         = "Created by spiceinit"
+  Kernels             = ($base/kernels/spk/de405.bsp,
+                         $base/kernels/pck/pck00009.tpc)
+  SolarLongitude      = 266.33576028989
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 23036905
+  Bytes                = 112
+  Records              = 2
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 117603812.11191
+  SpkTableEndTime      = 117604414.30884
+  SpkTableOriginalSize = 2.0
+  Description          = "Created by spiceinit"
+  Kernels              = $base/kernels/spk/de405.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name      = CameraStatistics
+  StartByte = 23037017
+  Bytes     = 624
+  Records   = 12
+  ByteOrder = Lsb
+
+  Group = Field
+    Name = Name
+    Type = Text
+    Size = 20
+  End_Group
+
+  Group = Field
+    Name = Minimum
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = Maximum
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = Average
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = StandardDeviation
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 23073798
+  Bytes     = 4311
+End_Object
+
+Object = NaifKeywords
+  BODY499_RADII                       = (3396.19, 3396.19, 3376.2)
+  BODY_FRAME_CODE                     = 10014
+  CLOCK_ET_-53_748799078.000_COMPUTED = b4105486f7099c41
+  INS-53031_TRANSX                    = (0.0, 0.05, 0.0)
+  INS-53031_TRANSY                    = (0.0, 0.0, 0.05)
+  INS-53031_ITRANSS                   = (0.0, 20.0, 0.0)
+  INS-53031_ITRANSL                   = (0.0, 0.0, 20.0)
+End_Object
+
+Object = Polygon
+  Name      = Footprint
+  StartByte = 23037641
+  Bytes     = 31880
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 23069521
+  Bytes     = 4277
+End_Object
+End
