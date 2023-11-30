@@ -1,0 +1,344 @@
+Object = ControlNetwork
+  NetworkId    = pointregTest
+  TargetName   = Mars
+  UserName     = jwalldren
+  Created      = Null
+  LastModified = Null
+  Description  = pointregAppTest
+  Version      = 5
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = pointregTest0001
+    ChooserName = cnetbin2pvl
+    DateTime    = 2023-11-15T08:30:46
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED4/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 2024.9426496396
+      Line           = 1002.2851420811
+      SampleResidual = 10.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED5/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 24.231028472272
+      Line           = 1003.4315948486
+      AprioriSample  = 25.0
+      AprioriLine    = 1000.0
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = pointregTest0002
+    ChooserName = cnetbin2pvl
+    DateTime    = 2023-11-15T08:30:46
+    Ignore      = True
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED4/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 2037.6533300862
+      Line           = 1184.6426576887
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED5/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 36.997759287231
+      Line           = 1185.8466715131
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = pointregTest0003
+    ChooserName = cnetbin2pvl
+    DateTime    = 2023-11-15T08:30:46
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED4/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 2003.8286760498
+      Line           = 1361.3694076538
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED5/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 3.217924722872
+      Line           = 1362.6534620013
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 6.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = pointregTest0004
+    ChooserName = cnetbin2pvl
+    DateTime    = 2023-11-15T08:30:46
+    Ignore      = True
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED4/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 2016.6480691753
+      Line           = 1543.6421143668
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED5/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 16.046408804032
+      Line           = 1545.0106370108
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = pointregTest0005
+    ChooserName = cnetbin2pvl
+    DateTime    = 2023-11-15T08:30:46
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED4/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 2029.5446002794
+      Line           = 1725.8194536482
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED5/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 28.925844700071
+      Line           = 1727.3395423889
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = pointregTest0006
+    ChooserName = cnetbin2pvl
+    DateTime    = 2023-11-15T08:30:46
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED4/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 2042.5256884771
+      Line           = 1907.9279921395
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED5/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 41.865298408191
+      Line           = 1909.6773033142
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = pointregTest0007
+    ChooserName = cnetbin2pvl
+    DateTime    = 2023-11-15T08:30:46
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED4/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 2012.201404177
+      Line           = 819.94669995989
+      SampleResidual = 11.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED5/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 11.40926078542
+      Line           = 821.0601147243
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = pointregTest0008
+    ChooserName = cnetbin2pvl
+    DateTime    = 2023-11-15T08:30:46
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED4/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 2045.9696349664
+      Line           = 643.09835651943
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED5/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 45.063543577348
+      Line           = 644.22982297625
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = pointregTest0009
+    ChooserName = cnetbin2pvl
+    DateTime    = 2023-11-15T08:30:46
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED4/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 2033.1477595262
+      Line           = 460.74015971592
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED5/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 32.112688695736
+      Line           = 461.86277062552
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = pointregTest0010
+    ChooserName = cnetbin2pvl
+    DateTime    = 2023-11-15T08:30:46
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED4/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 2020.272346886
+      Line           = 278.31520571027
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED5/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 19.083908218492
+      Line           = 279.54408318656
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = pointregTest0011
+    ChooserName = cnetbin2pvl
+    DateTime    = 2023-11-15T08:30:46
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED4/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 2007.3360059905
+      Line           = 95.954965318952
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = MRO/HIRISE/856864216:41044/RED5/2
+      MeasureType    = Candidate
+      ChooserName    = "Application autoseed"
+      DateTime       = 2008-02-19T14:31:39
+      Sample         = 5.9696691241626
+      Line           = 97.276485443115
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+    End_Group
+  End_Object
+End_Object
+End

@@ -1,0 +1,1623 @@
+Object = ControlNetwork
+  NetworkId    = I24827003RDR_BOUNDARY_NET
+  TargetName   = Mars
+  UserName     = lweller
+  Created      = 2011-12-15T23:19:37
+  LastModified = 2011-12-15T23:19:37
+  Description  = "I24827003RDR IMAGE BOUNDARY NETWORK"
+  Version      = 5
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_UL
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 27.607059317834
+      Line                  = 18.295111585227
+      AprioriSample         = 27.592145368644
+      AprioriLine           = 18.277370871022
+      MinimumPixelZScore    = -9.1101292766656
+      MaximumPixelZScore    = 7.1550838917398
+      GoodnessOfFit         = 0.42491860555961
+      SubPixelCorrelation   = 0.42491860555961
+      Obsolete_Eccentricity = 0.82500889401041
+      WholePixelCorrelation = 0.48094671315067
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/764644820.000
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 142.0
+      Line          = 5710.0
+      AprioriSample = 137.85157104559
+      AprioriLine   = 5723.5583837946
+      Reference     = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/766864399.204
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 224.84594511441
+      Line                  = 1114.556157076
+      AprioriSample         = 224.86109569625
+      AprioriLine           = 1114.5366784126
+      MinimumPixelZScore    = -9.1101292766656
+      MaximumPixelZScore    = 7.1550838917398
+      GoodnessOfFit         = 0.6301057592872
+      SubPixelCorrelation   = 0.6301057592872
+      Obsolete_Eccentricity = 0.85464446637656
+      WholePixelCorrelation = 0.91990818731499
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/860700556.051
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 241.70373879742
+      Line                  = 4170.1757137588
+      AprioriSample         = 241.66704417356
+      AprioriLine           = 4170.1768448015
+      MinimumPixelZScore    = -9.1101292766656
+      MaximumPixelZScore    = 7.1550838917398
+      GoodnessOfFit         = 0.52130053192069
+      SubPixelCorrelation   = 0.52130053192069
+      Obsolete_Eccentricity = 0.87083916894004
+      WholePixelCorrelation = 0.68332380944365
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_UR
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 126.11723415114
+      Line                  = 14.624031718257
+      AprioriSample         = 126.13262109331
+      AprioriLine           = 14.60864867694
+      MinimumPixelZScore    = -7.7826442877901
+      MaximumPixelZScore    = 6.4531771874365
+      GoodnessOfFit         = 0.54141035408281
+      SubPixelCorrelation   = 0.54141035408281
+      Obsolete_Eccentricity = 0.80166834482906
+      WholePixelCorrelation = 0.59126689617359
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 167.0
+      Line          = 4129.0
+      AprioriSample = 185.89330945024
+      AprioriLine   = 4149.8781759925
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_LL
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 15.994142166447
+      Line                  = 5351.59876634
+      AprioriSample         = 15.988352444663
+      AprioriLine           = 5351.6271443448
+      MinimumPixelZScore    = -1.3323758785145
+      MaximumPixelZScore    = 1.7088719658458
+      GoodnessOfFit         = 0.97152986956068
+      SubPixelCorrelation   = 0.97152986956068
+      Obsolete_Eccentricity = 0.84992032708551
+      WholePixelCorrelation = 0.97231368866292
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/823680993.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 276.0
+      Line          = 10691.0
+      AprioriSample = 294.45457233458
+      AprioriLine   = 10704.104037218
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_CTR
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 72.351376549012
+      Line                  = 2683.7835945571
+      AprioriSample         = 72.31156993241
+      AprioriLine           = 2683.7871073413
+      MinimumPixelZScore    = -10.556951321328
+      MaximumPixelZScore    = 7.6843165392047
+      GoodnessOfFit         = 0.42694248853572
+      SubPixelCorrelation   = 0.42694248853572
+      Obsolete_Eccentricity = 0.86764337082849
+      WholePixelCorrelation = 0.47513217291136
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 62.0
+      Line          = 9450.0
+      AprioriSample = 78.035822649479
+      AprioriLine   = 9466.8664683336
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_1
+    ChooserName = cnetadd
+    DateTime    = 2012-01-13T13:06:19
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 48.760708608846
+      Line                  = 34.687788591
+      AprioriSample         = 48.783779645185
+      AprioriLine           = 34.690686342128
+      MinimumPixelZScore    = -10.336933423527
+      MaximumPixelZScore    = 8.3466298590249
+      GoodnessOfFit         = 0.42219888501096
+      SubPixelCorrelation   = 0.42219888501096
+      Obsolete_Eccentricity = 0.81654602547138
+      WholePixelCorrelation = 0.4842514894252
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/764644820.000
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 185.0
+      Line          = 5743.0
+      AprioriSample = 192.35430957356
+      AprioriLine   = 5723.6616154452
+      Reference     = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/766864399.204
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 268.02675159169
+      Line                  = 1147.6104906502
+      AprioriSample         = 268.09033141866
+      AprioriLine           = 1147.56287184
+      MinimumPixelZScore    = -10.336933423527
+      MaximumPixelZScore    = 8.3466298590249
+      GoodnessOfFit         = 0.59150804215855
+      SubPixelCorrelation   = 0.59150804215855
+      Obsolete_Eccentricity = 0.87243685463714
+      WholePixelCorrelation = 0.90247447994431
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/860700556.051
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 284.81369462788
+      Line                  = 4203.1792327291
+      AprioriSample         = 284.85045436259
+      AprioriLine           = 4203.2511600821
+      MinimumPixelZScore    = -10.336933423527
+      MaximumPixelZScore    = 8.3466298590249
+      GoodnessOfFit         = 0.47601397505042
+      SubPixelCorrelation   = 0.47601397505042
+      Obsolete_Eccentricity = 0.89216340544699
+      WholePixelCorrelation = 0.67632719937417
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_2
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 64.553532057187
+      Line                  = 16.16468261595
+      AprioriSample         = 64.572486285992
+      AprioriLine           = 16.159319580388
+      MinimumPixelZScore    = -10.851025717118
+      MaximumPixelZScore    = 9.0681589770554
+      GoodnessOfFit         = 0.36725373651513
+      SubPixelCorrelation   = 0.36725373651513
+      Obsolete_Eccentricity = 0.82699300047967
+      WholePixelCorrelation = 0.42843510599361
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/760206015.230
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 42.01598881521
+      Line                  = 4131.262421516
+      AprioriSample         = 42.019306132363
+      AprioriLine           = 4131.2821435604
+      MinimumPixelZScore    = -10.851025717118
+      MaximumPixelZScore    = 9.0681589770554
+      GoodnessOfFit         = 0.58620780317928
+      SubPixelCorrelation   = 0.58620780317928
+      Obsolete_Eccentricity = 0.85025939150097
+      WholePixelCorrelation = 0.85996682715537
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/764644820.000
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 217.0
+      Line          = 5706.0
+      AprioriSample = 246.84321887463
+      AprioriLine   = 5723.765018548
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_3
+    ChooserName = cnetadd
+    DateTime    = 2012-01-13T13:06:19
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 121.11506062968
+      Line                  = 31.572854327236
+      AprioriSample         = 121.14548884404
+      AprioriLine           = 31.572969450255
+      MinimumPixelZScore    = -8.5291500072502
+      MaximumPixelZScore    = 7.7800103958966
+      GoodnessOfFit         = 0.50147560129106
+      SubPixelCorrelation   = 0.50147560129106
+      Obsolete_Eccentricity = 0.82257001244825
+      WholePixelCorrelation = 0.54888811579928
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 157.0
+      Line          = 4163.0
+      AprioriSample = 126.98178618374
+      AprioriLine   = 4149.931145305
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_4
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 138.20448769735
+      Line                  = 228.14972149796
+      AprioriSample         = 138.2463996157
+      AprioriLine           = 228.15056835088
+      MinimumPixelZScore    = -8.3439788918745
+      MaximumPixelZScore    = 6.8503359515919
+      GoodnessOfFit         = 0.58524107005789
+      SubPixelCorrelation   = 0.58524107005789
+      Obsolete_Eccentricity = 0.79963813984092
+      WholePixelCorrelation = 0.61793743687586
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 192.0
+      Line          = 4555.0
+      AprioriSample = 186.03957998842
+      AprioriLine   = 4558.6289790526
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_5
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 149.20509521588
+      Line                  = 423.93494885646
+      AprioriSample         = 149.18783166409
+      AprioriLine           = 423.90617198328
+      MinimumPixelZScore    = -6.9567313793804
+      MaximumPixelZScore    = 7.116669122997
+      GoodnessOfFit         = 0.58378259591105
+      SubPixelCorrelation   = 0.58378259591105
+      Obsolete_Eccentricity = 0.81140407536592
+      WholePixelCorrelation = 0.62604756787944
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 214.0
+      Line          = 4945.0
+      AprioriSample = 186.32462775985
+      AprioriLine   = 4967.2377534825
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_6
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 128.28737710591
+      Line                  = 651.23659834539
+      AprioriSample         = 128.29832945259
+      AprioriLine           = 651.26409956921
+      MinimumPixelZScore    = -6.0616802552658
+      MaximumPixelZScore    = 5.8974339078448
+      GoodnessOfFit         = 0.46624774328617
+      SubPixelCorrelation   = 0.46624774328617
+      Obsolete_Eccentricity = 0.66978571811643
+      WholePixelCorrelation = 0.50483735035139
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 173.0
+      Line          = 5399.0
+      AprioriSample = 186.47612972153
+      AprioriLine   = 5375.9772827805
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_8
+    ChooserName = cnetadd
+    DateTime    = 2012-01-13T13:25:48
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/748799078.000
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 28.513330924664
+      Line                  = 15802.82320805
+      AprioriSample         = 28.577348166348
+      AprioriLine           = 15802.74722498
+      MinimumPixelZScore    = -3.3013168477769
+      MaximumPixelZScore    = 2.2949036325521
+      GoodnessOfFit         = 0.71147478712267
+      SubPixelCorrelation   = 0.71147478712267
+      Obsolete_Eccentricity = 0.93900106979889
+      WholePixelCorrelation = 0.71074079991412
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 197.0
+      Line          = 6217.0
+      AprioriSample = 187.20197125496
+      AprioriLine   = 6193.3583087996
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_9
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 132.43324628739
+      Line                  = 1244.9963043389
+      AprioriSample         = 132.41230089305
+      AprioriLine           = 1244.9968964388
+      MinimumPixelZScore    = -4.3267682575543
+      MaximumPixelZScore    = 3.3036547408159
+      GoodnessOfFit         = 0.64094554586329
+      SubPixelCorrelation   = 0.64094554586329
+      Obsolete_Eccentricity = 0.69326613917787
+      WholePixelCorrelation = 0.70413968240039
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/748799078.000
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 139.20929458768
+      Line                  = 15461.410830143
+      AprioriSample         = 139.07279851894
+      AprioriLine           = 15461.411736985
+      MinimumPixelZScore    = -4.3267682575543
+      MaximumPixelZScore    = 3.3036547408159
+      GoodnessOfFit         = 0.57147470389177
+      SubPixelCorrelation   = 0.57147470389177
+      Obsolete_Eccentricity = 0.46252692121887
+      WholePixelCorrelation = 0.63489389099904
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 182.0
+      Line          = 6582.0
+      AprioriSample = 187.43332157572
+      AprioriLine   = 6601.9213229651
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_10
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber = Odyssey/THEMIS_IR/869400711.102
+      MeasureType  = Candidate
+      ChooserName  = cnetref
+      DateTime     = 2011-12-15T23:20:28
+      Sample       = 119.0
+      Line         = 1437.0
+      Reference    = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/748799078.000
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 273.65933086114
+      Line                  = 15088.126010294
+      AprioriSample         = 273.79775945033
+      AprioriLine           = 15088.279072135
+      MinimumPixelZScore    = -4.5982076153028
+      MaximumPixelZScore    = 5.1547250339538
+      GoodnessOfFit         = 0.46437443646356
+      SubPixelCorrelation   = 0.46437443646356
+      Obsolete_Eccentricity = 0.5755806348777
+      WholePixelCorrelation = 0.47471560826242
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/760206015.230
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 155.87633505028
+      Line                  = 6965.8249656384
+      AprioriSample         = 155.75079341732
+      AprioriLine           = 6965.8015269146
+      MinimumPixelZScore    = -4.5982076153028
+      MaximumPixelZScore    = 5.1547250339538
+      GoodnessOfFit         = 0.6221840844042
+      SubPixelCorrelation   = 0.6221840844042
+      Obsolete_Eccentricity = 0.78095310139119
+      WholePixelCorrelation = 0.67240071516507
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_11
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber = Odyssey/THEMIS_IR/869400711.102
+      MeasureType  = Candidate
+      ChooserName  = cnetref
+      DateTime     = 2011-12-15T23:20:28
+      Sample       = 118.0
+      Line         = 1634.0
+      Reference    = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/760206015.230
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 153.15891256983
+      Line                  = 7357.6539686369
+      AprioriSample         = 153.22494967358
+      AprioriLine           = 7357.6402737744
+      MinimumPixelZScore    = -8.8742551139388
+      MaximumPixelZScore    = 4.4648645875177
+      GoodnessOfFit         = 0.43246786725171
+      SubPixelCorrelation   = 0.43246786725171
+      Obsolete_Eccentricity = 0.84442625710954
+      WholePixelCorrelation = 0.57817462187924
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_12
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 121.49478999227
+      Line                  = 1856.731446573
+      AprioriSample         = 121.50516007892
+      AprioriLine           = 1856.7635557292
+      MinimumPixelZScore    = -6.8138683213418
+      MaximumPixelZScore    = 2.9308636161718
+      GoodnessOfFit         = 0.64478667558312
+      SubPixelCorrelation   = 0.64478667558312
+      Obsolete_Eccentricity = 0.72771562095133
+      WholePixelCorrelation = 0.66352150232528
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 161.0
+      Line          = 7802.0
+      AprioriSample = 188.35852324024
+      AprioriLine   = 7828.0151912856
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_13
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 137.57913021604
+      Line                  = 2075.8951198701
+      AprioriSample         = 137.58325445598
+      AprioriLine           = 2075.9164372763
+      MinimumPixelZScore    = -5.1298466964338
+      MaximumPixelZScore    = 3.768980062869
+      GoodnessOfFit         = 0.63467767714999
+      SubPixelCorrelation   = 0.63467767714999
+      Obsolete_Eccentricity = 0.74702153978772
+      WholePixelCorrelation = 0.66651958106393
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 194.0
+      Line          = 8239.0
+      AprioriSample = 188.7116242464
+      AprioriLine   = 8236.611878563
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_14
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 143.29125188489
+      Line                  = 2295.6657077538
+      AprioriSample         = 143.27818713457
+      AprioriLine           = 2295.7018251456
+      MinimumPixelZScore    = -2.8495963378738
+      MaximumPixelZScore    = 4.2726177946745
+      GoodnessOfFit         = 0.50555393181678
+      SubPixelCorrelation   = 0.50555393181678
+      Obsolete_Eccentricity = 0.84376716040979
+      WholePixelCorrelation = 0.52159173578701
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 207.0
+      Line          = 8675.0
+      AprioriSample = 189.16494375722
+      AprioriLine   = 8645.4100113685
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_15
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 145.30808018025
+      Line                  = 2477.1515954142
+      AprioriSample         = 145.33233846913
+      AprioriLine           = 2477.1921753136
+      MinimumPixelZScore    = -3.5474697309863
+      MaximumPixelZScore    = 2.6587565865915
+      GoodnessOfFit         = 0.74011087203503
+      SubPixelCorrelation   = 0.74011087203503
+      Obsolete_Eccentricity = 0.64299738534369
+      WholePixelCorrelation = 0.74945020462948
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 211.0
+      Line          = 9039.0
+      AprioriSample = 189.75749469492
+      AprioriLine   = 9054.1180252552
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_16
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 140.38785971346
+      Line                  = 2681.7415355665
+      AprioriSample         = 140.40848396701
+      AprioriLine           = 2681.7274129245
+      MinimumPixelZScore    = -3.1758333116921
+      MaximumPixelZScore    = 9.0338725240029
+      GoodnessOfFit         = 0.64015829348973
+      SubPixelCorrelation   = 0.64015829348973
+      Obsolete_Eccentricity = 0.83201034936892
+      WholePixelCorrelation = 0.66279412202517
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 200.0
+      Line          = 9446.0
+      AprioriSample = 189.74898445243
+      AprioriLine   = 9462.737163363
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_17
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 124.74745142602
+      Line                  = 2886.7706306145
+      AprioriSample         = 124.71763854068
+      AprioriLine           = 2886.7534192259
+      MinimumPixelZScore    = -5.0257793273488
+      MaximumPixelZScore    = 4.5136102504828
+      GoodnessOfFit         = 0.64224423008729
+      SubPixelCorrelation   = 0.64224423008729
+      Obsolete_Eccentricity = 0.88553794865542
+      WholePixelCorrelation = 0.6693638769383
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 169.0
+      Line          = 9855.0
+      AprioriSample = 190.17574850163
+      AprioriLine   = 9871.5220697322
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_19
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 133.32938592698
+      Line                  = 3304.5102172403
+      AprioriSample         = 133.33076800753
+      AprioriLine           = 3304.5111192353
+      MinimumPixelZScore    = -3.5877838148283
+      MaximumPixelZScore    = 5.9675648071378
+      GoodnessOfFit         = 0.57259590692606
+      SubPixelCorrelation   = 0.57259590692606
+      Obsolete_Eccentricity = 0.61612921400087
+      WholePixelCorrelation = 0.59797982339977
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/760206015.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 188.0
+      Line          = 10688.0
+      AprioriSample = 191.38234151276
+      AprioriLine   = 10688.903800361
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_32
+    ChooserName = cnetadd
+    DateTime    = 2012-01-13T13:25:48
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/764644820.000
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 131.10154251818
+      Line                  = 6114.7427251932
+      AprioriSample         = 131.08464580002
+      AprioriLine           = 6114.72255253
+      MinimumPixelZScore    = -6.7883347305594
+      MaximumPixelZScore    = 3.0268974724574
+      GoodnessOfFit         = 0.46612674246283
+      SubPixelCorrelation   = 0.46612674246283
+      Obsolete_Eccentricity = 0.92407264183803
+      WholePixelCorrelation = 0.55739606549034
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/766864399.204
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 213.1699011323
+      Line                  = 1518.9151968876
+      AprioriSample         = 213.26905955464
+      AprioriLine           = 1518.9193152579
+      MinimumPixelZScore    = -6.7883347305594
+      MaximumPixelZScore    = 3.0268974724574
+      GoodnessOfFit         = 0.41028456857734
+      SubPixelCorrelation   = 0.41028456857734
+      Obsolete_Eccentricity = 0.91737961021451
+      WholePixelCorrelation = 0.49561038667554
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/860700556.051
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 231.0
+      Line          = 4574.0
+      AprioriSample = 235.04493503215
+      AprioriLine   = 4589.2309851386
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_33
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 32.243849071197
+      Line                  = 443.99293787456
+      AprioriSample         = 32.267286312846
+      AprioriLine           = 443.93790066253
+      MinimumPixelZScore    = -9.4814064508761
+      MaximumPixelZScore    = 7.613279128717
+      GoodnessOfFit         = 0.35909430591995
+      SubPixelCorrelation   = 0.35909430591995
+      Obsolete_Eccentricity = 0.86088783993688
+      WholePixelCorrelation = 0.42439889849862
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/764644820.000
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 150.0
+      Line          = 6561.0
+      AprioriSample = 136.08250364324
+      AprioriLine   = 6542.0592380917
+      Reference     = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/766864399.204
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 231.61495841089
+      Line                  = 1964.6495319857
+      AprioriSample         = 231.58016101587
+      AprioriLine           = 1964.5656483556
+      MinimumPixelZScore    = -9.4814064508761
+      MaximumPixelZScore    = 7.613279128717
+      GoodnessOfFit         = 0.63763367292373
+      SubPixelCorrelation   = 0.63763367292373
+      Obsolete_Eccentricity = 0.88928007456266
+      WholePixelCorrelation = 0.9083985074489
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/860700556.051
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 248.64525826167
+      Line                  = 5019.6082778839
+      AprioriSample         = 248.66537068953
+      AprioriLine           = 5019.6509310444
+      MinimumPixelZScore    = -9.4814064508761
+      MaximumPixelZScore    = 7.613279128717
+      GoodnessOfFit         = 0.47134697831144
+      SubPixelCorrelation   = 0.47134697831144
+      Obsolete_Eccentricity = 0.90697269892977
+      WholePixelCorrelation = 0.67790447057524
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_34
+    ChooserName = cnetadd
+    DateTime    = 2012-01-13T13:06:19
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 39.377323532456
+      Line                  = 644.45059392332
+      AprioriSample         = 39.422550221501
+      AprioriLine           = 644.48255376688
+      MinimumPixelZScore    = -3.6303773877818
+      MaximumPixelZScore    = 3.9449657352508
+      GoodnessOfFit         = 0.68219867118992
+      SubPixelCorrelation   = 0.68219867118992
+      Obsolete_Eccentricity = 0.6687629032313
+      WholePixelCorrelation = 0.69541576692436
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/764644820.000
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 165.0
+      Line          = 6962.0
+      AprioriSample = 135.40596122852
+      AprioriLine   = 6951.3519736314
+      Reference     = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/766864399.204
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 245.82294568014
+      Line                  = 2365.749168986
+      AprioriSample         = 245.80677488643
+      AprioriLine           = 2365.659647922
+      MinimumPixelZScore    = -3.6303773877818
+      MaximumPixelZScore    = 3.9449657352508
+      GoodnessOfFit         = 0.88500611615228
+      SubPixelCorrelation   = 0.88500611615228
+      Obsolete_Eccentricity = 0.79641849988017
+      WholePixelCorrelation = 0.93879938608019
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/860700556.051
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 262.99285894944
+      Line                  = 5419.5752950317
+      AprioriSample         = 262.93741513321
+      AprioriLine           = 5419.5000790279
+      MinimumPixelZScore    = -3.6303773877818
+      MaximumPixelZScore    = 3.9449657352508
+      GoodnessOfFit         = 0.8384872040154
+      SubPixelCorrelation   = 0.8384872040154
+      Obsolete_Eccentricity = 0.80938385565388
+      WholePixelCorrelation = 0.88811262489038
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_35
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 38.84105669372
+      Line                  = 832.10752901602
+      AprioriSample         = 38.80553051742
+      AprioriLine           = 832.12557774503
+      MinimumPixelZScore    = -3.8007083634248
+      MaximumPixelZScore    = 4.4757735324342
+      GoodnessOfFit         = 0.42116724718091
+      SubPixelCorrelation   = 0.42116724718091
+      Obsolete_Eccentricity = 0.73339213911551
+      WholePixelCorrelation = 0.4230891360784
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/748799078.000
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 122.65301115881
+      Line                  = 16293.50679139
+      AprioriSample         = 122.78458208301
+      AprioriLine           = 16293.419624892
+      MinimumPixelZScore    = -3.8007083634248
+      MaximumPixelZScore    = 4.4757735324342
+      GoodnessOfFit         = 0.44965842923952
+      SubPixelCorrelation   = 0.44965842923952
+      Obsolete_Eccentricity = 0.84701026248297
+      WholePixelCorrelation = 0.45019255138853
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/764644820.000
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 150.0
+      Line          = 7353.0
+      AprioriSample = 134.63818771615
+      AprioriLine   = 7360.5513465387
+      Reference     = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/766864399.204
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 230.33072524429
+      Line                  = 2756.0791608266
+      AprioriSample         = 230.33084176063
+      AprioriLine           = 2756.1290924305
+      MinimumPixelZScore    = -3.8007083634248
+      MaximumPixelZScore    = 4.4757735324342
+      GoodnessOfFit         = 0.90144944908857
+      SubPixelCorrelation   = 0.90144944908857
+      Obsolete_Eccentricity = 0.82298722113186
+      WholePixelCorrelation = 0.96435572021431
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/860700556.051
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 248.02226348435
+      Line                  = 5809.3611366058
+      AprioriSample         = 248.02655270592
+      AprioriLine           = 5809.4447753716
+      MinimumPixelZScore    = -3.8007083634248
+      MaximumPixelZScore    = 4.4757735324342
+      GoodnessOfFit         = 0.71300187736795
+      SubPixelCorrelation   = 0.71300187736795
+      Obsolete_Eccentricity = 0.8291423602584
+      WholePixelCorrelation = 0.76584458449782
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_36
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 19.767099267132
+      Line                  = 1053.224776834
+      AprioriSample         = 19.768653236342
+      AprioriLine           = 1053.2080015315
+      MinimumPixelZScore    = -2.0483817202699
+      MaximumPixelZScore    = 2.8640554045295
+      GoodnessOfFit         = 0.58115488237753
+      SubPixelCorrelation   = 0.58115488237753
+      Obsolete_Eccentricity = 0.85917790473711
+      WholePixelCorrelation = 0.5848321471167
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/748799078.000
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 291.4370894032
+      Line                  = 15864.748037614
+      AprioriSample         = 291.36469422798
+      AprioriLine           = 15864.232672573
+      MinimumPixelZScore    = -2.0483817202699
+      MaximumPixelZScore    = 2.8640554045295
+      GoodnessOfFit         = 0.58326123746324
+      SubPixelCorrelation   = 0.58326123746324
+      Obsolete_Eccentricity = 0.90296752695405
+      WholePixelCorrelation = 0.58348490860222
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/764644820.000
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 124.0
+      Line          = 7777.0
+      AprioriSample = 133.54370444799
+      AprioriLine   = 7769.8770322264
+      Reference     = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/766864399.204
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 203.98302895363
+      Line                  = 3179.4605858777
+      AprioriSample         = 203.85450286355
+      AprioriLine           = 3179.5000595293
+      MinimumPixelZScore    = -2.0483817202699
+      MaximumPixelZScore    = 2.8640554045295
+      GoodnessOfFit         = 0.97240168667426
+      SubPixelCorrelation   = 0.97240168667426
+      Obsolete_Eccentricity = 0.85995206536045
+      WholePixelCorrelation = 0.98978024760144
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/860700556.051
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 220.86690968465
+      Line                  = 6234.9839367112
+      AprioriSample         = 220.81710118731
+      AprioriLine           = 6234.7801259019
+      MinimumPixelZScore    = -2.0483817202699
+      MaximumPixelZScore    = 2.8640554045295
+      GoodnessOfFit         = 0.90014960228514
+      SubPixelCorrelation   = 0.90014960228514
+      Obsolete_Eccentricity = 0.89695661349753
+      WholePixelCorrelation = 0.91793725667105
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_37
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 36.888733189199
+      Line                  = 1242.731084961
+      AprioriSample         = 36.911483608247
+      AprioriLine           = 1242.6935558131
+      MinimumPixelZScore    = -3.5448692768999
+      MaximumPixelZScore    = 3.21268016751
+      GoodnessOfFit         = 0.59407851965547
+      SubPixelCorrelation   = 0.59407851965547
+      Obsolete_Eccentricity = 0.74709296406025
+      WholePixelCorrelation = 0.60911835276394
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/764644820.000
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 157.0
+      Line          = 8156.0
+      AprioriSample = 132.61992449207
+      AprioriLine   = 8178.9207494154
+      Reference     = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/766864399.204
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 236.2196163681
+      Line                  = 3558.0866737144
+      AprioriSample         = 236.22665154064
+      AprioriLine           = 3558.2674905463
+      MinimumPixelZScore    = -3.5448692768999
+      MaximumPixelZScore    = 3.21268016751
+      GoodnessOfFit         = 0.92551012715239
+      SubPixelCorrelation   = 0.92551012715239
+      Obsolete_Eccentricity = 0.79541873154535
+      WholePixelCorrelation = 0.96799250418854
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/860700556.051
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 253.44978676116
+      Line                  = 6612.4380581812
+      AprioriSample         = 253.5215797661
+      AprioriLine           = 6612.5086541373
+      MinimumPixelZScore    = -3.5448692768999
+      MaximumPixelZScore    = 3.21268016751
+      GoodnessOfFit         = 0.81024350233636
+      SubPixelCorrelation   = 0.81024350233636
+      Obsolete_Eccentricity = 0.83198975240015
+      WholePixelCorrelation = 0.85543090385472
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_38
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 34.966885270204
+      Line                  = 1445.2306971316
+      AprioriSample         = 34.976625619327
+      AprioriLine           = 1445.2507961096
+      MinimumPixelZScore    = -2.7649404184731
+      MaximumPixelZScore    = 3.885430669618
+      GoodnessOfFit         = 0.50123049691391
+      SubPixelCorrelation   = 0.50123049691391
+      Obsolete_Eccentricity = 0.71542230034353
+      WholePixelCorrelation = 0.52019516111106
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/764644820.000
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 152.0
+      Line          = 8559.0
+      AprioriSample = 131.66372638651
+      AprioriLine   = 8588.1443315449
+      Reference     = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/860700556.051
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 248.54298985524
+      Line                  = 7015.0925938841
+      AprioriSample         = 248.47477041243
+      AprioriLine           = 7015.0708018329
+      MinimumPixelZScore    = -2.7649404184731
+      MaximumPixelZScore    = 3.885430669618
+      GoodnessOfFit         = 0.57404993830787
+      SubPixelCorrelation   = 0.57404993830787
+      Obsolete_Eccentricity = 0.79975823900933
+      WholePixelCorrelation = 0.61126341945065
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_39
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 21.124305682401
+      Line                  = 1660.7015570648
+      AprioriSample         = 21.244027873838
+      AprioriLine           = 1660.6652772725
+      MinimumPixelZScore    = -9.91464328244
+      MaximumPixelZScore    = 6.6095255951013
+      GoodnessOfFit         = 0.40060655379026
+      SubPixelCorrelation   = 0.40060655379026
+      Obsolete_Eccentricity = 0.8842462315449
+      WholePixelCorrelation = 0.42777155677984
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/764644820.000
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 122.0
+      Line          = 8990.0
+      AprioriSample = 130.84304170727
+      AprioriLine   = 8997.4098805041
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_41
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 39.651442821199
+      Line                  = 2081.9946567966
+      AprioriSample         = 39.640958585734
+      AprioriLine           = 2081.9963499484
+      MinimumPixelZScore    = -2.0151952076585
+      MaximumPixelZScore    = 1.89602994523
+      GoodnessOfFit         = 0.91233424417264
+      SubPixelCorrelation   = 0.91233424417264
+      Obsolete_Eccentricity = 0.8685408387441
+      WholePixelCorrelation = 0.91685736046086
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/764644820.000
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 158.0
+      Line          = 9831.0
+      AprioriSample = 128.74374032515
+      AprioriLine   = 9815.6199810588
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_43
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 40.331922777574
+      Line                  = 2498.4634598633
+      AprioriSample         = 40.342396523112
+      AprioriLine           = 2498.4688726782
+      MinimumPixelZScore    = -2.1929700186508
+      MaximumPixelZScore    = 2.6406477049999
+      GoodnessOfFit         = 0.87903042477486
+      SubPixelCorrelation   = 0.87903042477486
+      Obsolete_Eccentricity = 0.80945067719471
+      WholePixelCorrelation = 0.88307243605489
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/764644820.000
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 158.0
+      Line          = 10661.0
+      AprioriSample = 126.82388485966
+      AprioriLine   = 10634.051423648
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_50
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 14.277915476186
+      Line                  = 3935.2833714183
+      AprioriSample         = 14.234425279049
+      AprioriLine           = 3935.2313000495
+      MinimumPixelZScore    = -3.2207280824112
+      MaximumPixelZScore    = 2.179464511159
+      GoodnessOfFit         = 0.61079317083437
+      SubPixelCorrelation   = 0.61079317083437
+      Obsolete_Eccentricity = 0.83055975470962
+      WholePixelCorrelation = 0.621385909313
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/823680993.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 296.0
+      Line          = 7863.0
+      AprioriSample = 317.16905352284
+      AprioriLine   = 7832.2439273096
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_51
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 11.30320020209
+      Line                  = 4130.0913785706
+      AprioriSample         = 11.27822009864
+      AprioriLine           = 4130.0656229356
+      MinimumPixelZScore    = -5.5551124504224
+      MaximumPixelZScore    = 5.3507909286785
+      GoodnessOfFit         = 0.43949327976759
+      SubPixelCorrelation   = 0.43949327976759
+      Obsolete_Eccentricity = 0.76159002924015
+      WholePixelCorrelation = 0.46446010837209
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/823680993.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 286.0
+      Line          = 8252.0
+      AprioriSample = 314.07066277501
+      AprioriLine   = 8241.2675814639
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_53
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 30.377263509207
+      Line                  = 4535.7660808899
+      AprioriSample         = 30.440341462824
+      AprioriLine           = 4535.748993877
+      MinimumPixelZScore    = -3.7311603048292
+      MaximumPixelZScore    = 2.4776325037694
+      GoodnessOfFit         = 0.61516820087654
+      SubPixelCorrelation   = 0.61516820087654
+      Obsolete_Eccentricity = 0.74206145332326
+      WholePixelCorrelation = 0.61756685189949
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/823680993.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 297.0
+      Line          = 9048.0
+      AprioriSample = 307.37707389729
+      AprioriLine   = 9059.4587520006
+      Reference     = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = I24827003RDR_bndry_56
+    ChooserName = cnetadd
+    DateTime    = 2011-12-15T23:20:27
+
+    Group = ControlMeasure
+      SerialNumber          = Odyssey/THEMIS_IR/869400711.102
+      MeasureType           = RegisteredSubPixel
+      ChooserName           = pointreg
+      DateTime              = 2012-01-13T13:24:49
+      Sample                = 28.435531108092
+      Line                  = 5157.421973579
+      AprioriSample         = 28.433104417652
+      AprioriLine           = 5157.4175236742
+      MinimumPixelZScore    = -2.608895713487
+      MaximumPixelZScore    = 3.0009659960998
+      GoodnessOfFit         = 0.80009655417522
+      SubPixelCorrelation   = 0.80009655417522
+      Obsolete_Eccentricity = 0.91052297013589
+      WholePixelCorrelation = 0.80523427372119
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber  = Odyssey/THEMIS_IR/823680993.230
+      MeasureType   = Candidate
+      ChooserName   = cnetref
+      DateTime      = 2011-12-15T23:20:28
+      Sample        = 305.0
+      Line          = 10302.0
+      AprioriSample = 297.73233806667
+      AprioriLine   = 10286.943394023
+      Reference     = True
+    End_Group
+  End_Object
+End_Object
+End
