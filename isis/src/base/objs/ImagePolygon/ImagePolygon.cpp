@@ -1349,13 +1349,14 @@ namespace Isis {
    * @return @b Blob
    */
   Blob ImagePolygon::toBlob() const {
-    geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
-
     // Check to see p_polygons is valid data
     if (!p_polygons) {
       string msg = "Cannot write a NULL polygon!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    
+    geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
+    wkt->setTrim(true);
 
     string polyStr = wkt->write(p_polygons);
     delete wkt;
