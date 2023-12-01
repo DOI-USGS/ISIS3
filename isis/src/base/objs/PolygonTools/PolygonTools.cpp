@@ -255,7 +255,7 @@ namespace Isis {
       return globalFactory->createMultiPolygon().release();
     }
     else {
-      vector<const geos::geom::Geometry *> *slPolys = new vector<const geos::geom::Geometry *>;
+      vector<const geos::geom::Geometry *> slPolys;
       // Convert each polygon in this multi-polygon
       for(unsigned int g = 0; g < lonLatPolygon.getNumGeometries(); g++) {
         const geos::geom::Polygon *poly =
@@ -301,8 +301,8 @@ namespace Isis {
         }
 
         try {
-          slPolys->push_back(globalFactory->createPolygon(
-                              globalFactory->createLinearRing(*slcoords), std::move(holes)).release());
+          slPolys.push_back(globalFactory->createPolygon(
+                            globalFactory->createLinearRing(*slcoords), std::move(holes)).release());
         }
         catch (std::exception &e) {
           throw IException(IException::Unknown,
@@ -315,7 +315,7 @@ namespace Isis {
       } // end num geometry in multi-poly
 
       // Create a new multipoly from all the new Sample/Line polygon(s)
-      geos::geom::MultiPolygon *spikedPoly = globalFactory->createMultiPolygon(*slPolys).release();
+      geos::geom::MultiPolygon *spikedPoly = globalFactory->createMultiPolygon(slPolys).release();
 
       if(spikedPoly->isValid() && !spikedPoly->isEmpty()) {
         return spikedPoly;
@@ -531,30 +531,28 @@ namespace Isis {
       //   >180). Move this intersection to the left. Then make a poly that fits
       //   0 to 180 and intersect with the original. These two combined are the
       //   result.
-      geos::geom::CoordinateSequence *leftOf180Pts =
-          new geos::geom::CoordinateSequence();
-      leftOf180Pts->add(geos::geom::Coordinate(0, -90));
-      leftOf180Pts->add(geos::geom::Coordinate(0, 90));
-      leftOf180Pts->add(geos::geom::Coordinate(180, 90));
-      leftOf180Pts->add(geos::geom::Coordinate(180, -90));
-      leftOf180Pts->add(geos::geom::Coordinate(0, -90));
+      geos::geom::CoordinateSequence leftOf180Pts;
+      leftOf180Pts.add(geos::geom::Coordinate(0, -90));
+      leftOf180Pts.add(geos::geom::Coordinate(0, 90));
+      leftOf180Pts.add(geos::geom::Coordinate(180, 90));
+      leftOf180Pts.add(geos::geom::Coordinate(180, -90));
+      leftOf180Pts.add(geos::geom::Coordinate(0, -90));
 
       unique_ptr<geos::geom::LinearRing> leftOf180Geom =
-          globalFactory->createLinearRing(*leftOf180Pts);
+          globalFactory->createLinearRing(leftOf180Pts);
 
       geos::geom::Polygon *leftOf180Poly =
           globalFactory->createPolygon(std::move(leftOf180Geom)).release();
 
-      geos::geom::CoordinateSequence *rightOf180Pts =
-          new geos::geom::CoordinateSequence();
-      rightOf180Pts->add(geos::geom::Coordinate(180, -90));
-      rightOf180Pts->add(geos::geom::Coordinate(180, 90));
-      rightOf180Pts->add(geos::geom::Coordinate(360, 90));
-      rightOf180Pts->add(geos::geom::Coordinate(360, -90));
-      rightOf180Pts->add(geos::geom::Coordinate(180, -90));
+      geos::geom::CoordinateSequence rightOf180Pts;
+      rightOf180Pts.add(geos::geom::Coordinate(180, -90));
+      rightOf180Pts.add(geos::geom::Coordinate(180, 90));
+      rightOf180Pts.add(geos::geom::Coordinate(360, 90));
+      rightOf180Pts.add(geos::geom::Coordinate(360, -90));
+      rightOf180Pts.add(geos::geom::Coordinate(180, -90));
 
       unique_ptr<geos::geom::LinearRing> rightOf180Geom =
-          globalFactory->createLinearRing(*rightOf180Pts);
+          globalFactory->createLinearRing(rightOf180Pts);
 
       geos::geom::Polygon *rightOf180Poly =
           globalFactory->createPolygon(std::move(rightOf180Geom)).release();
@@ -563,29 +561,27 @@ namespace Isis {
       geos::geom::Geometry *moving = Intersect(rightOf180Poly, poly360);
 
       geos::geom::CoordinateSequence *movingPts = moving->getCoordinates().release();
-      geos::geom::CoordinateSequence *movedPts =
-          new geos::geom::CoordinateSequence();
+      geos::geom::CoordinateSequence movedPts;
 
       for(unsigned int i = 0; i < movingPts->getSize(); i ++) {
-        movedPts->add(geos::geom::Coordinate(movingPts->getAt(i).x - 360.0,
-                                             movingPts->getAt(i).y));
+        movedPts.add(geos::geom::Coordinate(movingPts->getAt(i).x - 360.0,
+                                            movingPts->getAt(i).y));
       }
 
-      if(movedPts->getSize()) {
-        movedPts->add(geos::geom::Coordinate(movedPts->getAt(0).x,
-                                            movedPts->getAt(0).y));
+      if(movedPts.getSize()) {
+        movedPts.add(geos::geom::Coordinate(movedPts.getAt(0).x,
+                                             movedPts.getAt(0).y));
       }
 
       geos::geom::Geometry *moved = globalFactory->createPolygon(
-          globalFactory->createLinearRing(*movedPts)).release();
+          globalFactory->createLinearRing(movedPts)).release();
 
-      std::vector<const geos::geom::Geometry *> *geomsForCollection = new
-          std::vector<const geos::geom::Geometry *>;
-      geomsForCollection->push_back(preserved);
-      geomsForCollection->push_back(moved);
+      std::vector<const geos::geom::Geometry *> geomsForCollection;
+      geomsForCollection.push_back(preserved);
+      geomsForCollection.push_back(moved);
 
       geos::geom::GeometryCollection *the180Polys =
-          Isis::globalFactory->createGeometryCollection(*geomsForCollection).release();
+          Isis::globalFactory->createGeometryCollection(geomsForCollection).release();
 
       geos::geom::MultiPolygon *result = MakeMultiPolygon(the180Polys);
       delete the180Polys;
@@ -1671,7 +1667,7 @@ namespace Isis {
       unique_ptr<geos::geom::LinearRing> newExterior;
 
       if(exterior->getGeometryTypeId() == geos::geom::GEOS_LINEARRING) {
-        newExterior.reset(FixGeometry((geos::geom::LinearRing *)exterior));
+        newExterior.reset(ReducePrecision((geos::geom::LinearRing *)exterior, precision));
       }
       else {
         IString msg = "Failed when attempting to fix exterior ring of polygon. The exterior "

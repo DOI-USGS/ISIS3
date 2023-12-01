@@ -376,6 +376,7 @@ namespace Isis {
   GEOSWKTWriter *GisTopology::wktWriter() {
     if (!m_WKTwriter) {
       m_WKTwriter = GEOSWKTWriter_create();
+      GEOSWKTWriter_setTrim(m_WKTwriter, 1);
     }
     return (m_WKTwriter);
   }
