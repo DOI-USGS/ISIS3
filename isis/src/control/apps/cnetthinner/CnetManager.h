@@ -30,26 +30,28 @@ find files of those names at the top level of this repository. **/
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
-#include "ControlMeasureLogData.h"
-
-
-#include "tnt/tnt_array2d.h"
-#include "tnt/tnt_array2d_utils.h"
+#include "IException.h"
 
 namespace Isis {
 
   class CnetManager;
 
-/**
- * Class to store control points with a weight and computed strength for CnetManager.
- *
- * @author 2016-09-30 Kris Becker
- *
- * @internal
- *   @history 2016-09-30 Kris Becker - Original Version
- *   @history 2016-12-28 Kristin Berry - Added documentation and tests for checkin
- *
- */
+  /**
+   * Class to store control points with a weight and computed strength for CnetManager.
+   *
+   * @author 2016-09-30 Kris Becker
+   *
+   * @internal
+   *   @history 2016-09-30 Kris Becker - Original Version
+   *   @history 2016-12-28 Kristin Berry - Added documentation and tests for checkin
+   *   @history 2020-01-20 Kris Becker - Fix failed assert/abort in point depth
+   *                            weight calculation
+   *   @history 2023-11-28 Ken Edmundson - Moved Kris Beckers fix of 2020-01-20 from
+   *                            UofA code base to USGS code base. Removed all BOOST
+   *                            ASSERTS from CnetManager.cpp;h per Kris' suggestion.
+   *                            Removed all unused #include.
+   *
+   */
   class KPoint {
 
     friend class CnetManager;
@@ -102,27 +104,26 @@ namespace Isis {
         return (m_sourceIndex);
       }
 
-  private:
+    private:
       ControlPoint *m_point; //! The original ControlPoint used to construct the KPoint.
-      double        m_strength; //! The calulated strength of this KPoint.
+      double        m_strength; //! The calculated strength of this KPoint.
       int           m_sourceIndex; //! The original index of this KPoint.
       int           m_index; //! The calculated index of this KPoint.
       bool          m_selected; //! Flag to indicated whether to use this KPoint or not.
 
       double calculateStrength(const ControlPoint *point, const double &weight) const;
-
   };
 
 
-/**
- * Container class for the network and suppression data.
- *
- * @author 2016-09-30 Kris Becker
- *
- * @internal
- *   @history 2016-09-30 Kris Becker - Original Version
- *   @history 2016-12-28 Kristin Berry - Added documentation and tests for checkin
- */
+  /**
+   * Container class for the network and suppression data.
+   *
+   * @author 2016-09-30 Kris Becker
+   *
+   * @internal
+   *   @history 2016-09-30 Kris Becker - Original Version
+   *   @history 2016-12-28 Kristin Berry - Added documentation and tests for checkin
+   */
   class CnetManager {
     public:
       typedef QPair<int, ControlMeasure *> IndexPoint; //!
@@ -169,8 +170,6 @@ namespace Isis {
             return  ( a.strength() >  b.strength() );
           }
       };
-
-
   };
 
 
