@@ -36,6 +36,7 @@ release.
 ## [Unreleased]
 
 ### Changed
+- Cnetthinner has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5354](https://github.com/USGS-Astrogeology/ISIS3/issues/5354), 
 - Cnetedit has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5346](https://github.com/USGS-Astrogeology/ISIS3/issues/5346), 
 - Cnetdiff has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5322](https://github.com/USGS-Astrogeology/ISIS3/issues/5322), 
 - Removed the `.py` extention from the _isisdataeval_ tool `isisdata_mockup` for consistency and install it in $ISISROOT/bin; added the `--tojson` and `--hasher` option to _isisdata_mockup_ tool improve utility; updated the tool `README.md` documentation to reflect this change, removed help output and trimmed example results;  fixed paths to test data in `make_isisdata_mockup.sh`. [#5163](https://github.com/DOI-USGS/ISIS3/pull/5163)
@@ -66,6 +67,7 @@ release.
 ### Removed
 
 ### Fixed
+- Bug fix for Cnetthinner app resolving divide by zero in CnetManager.cpp. Issue: [#5354](https://github.com/USGS-Astrogeology/ISIS3/issues/5354), 
 - Updated photomet MinnaertEmpirical model to support photemplate-style PVL format [#3621](https://github.com/DOI-USGS/ISIS3/issues/3621)
 - Fix matrix inversion errors in <i>findfeatures</i> due to bad FASTGEOM matrix transforms using a more robust implementation to detect these errors and throw exceptions. Images with these errors are captured and logged to the <b>TONOTMATCHED</b> file. Fixes [#4639](https://github.com/DOI-USGS/ISIS3/issues/4639)
 - Fixed <i>findfeatures</i> use of projected mosaics with correct check for <b>TargetName</b> in the Mapping labels. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
