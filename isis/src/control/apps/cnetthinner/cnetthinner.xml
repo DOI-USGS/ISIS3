@@ -58,7 +58,7 @@ End_Group
     <change name="Kris Becker" date="2020-01-20">
         In file CnetManager.cpp, method KPoint::calculateStrength.
         Replaced BOOST ASSERT (abort) with the line "if ( count LE 0 ) return ( 0 )"
-        to prevent a divide by zero and subseqent seg fault if a point doesn't
+        to prevent a divide by zero and subsequent seg fault if a point doesn't
         contain valid measures when computing the point depth weight.
     </change>
     <change name="Ken Edmundson" date="2023-11-30">
