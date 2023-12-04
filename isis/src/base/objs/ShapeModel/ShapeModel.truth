@@ -6,9 +6,9 @@ Begin testing Shape Model base class....
     Test resolution() error message when there is no intersection:
 **PROGRAMMER ERROR** No valid intersection point for computing resolution.
     Test setNormal(double,double,double) error message when there is no intersection:
-**ERROR** No intersection point in known.  A normal can not be set.
+**ERROR** No intersection point is known.  A normal cannot be set.
     Test setNormal(vector) error message when there is no intersection:
-**ERROR** No intersection point in known.  A normal can not be set.
+**ERROR** No intersection point is known.  A normal cannot be set.
     Set a pixel in the image and check again.
 
     Testing pure virtual method intersectSurface...

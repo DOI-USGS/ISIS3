@@ -86,16 +86,16 @@ TEST_F(DefaultCube, FunctionalTestCamstatsDefaultParameters) {
   EXPECT_NEAR( (double) group.findKeyword("PhaseStandardDeviation"), 0.444208835, 1e-8);
 
   group = appLog.findGroup("EmissionAngle");
-  EXPECT_NEAR( (double) group.findKeyword("EmissionMinimum"), 10.798462835, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("EmissionMaximum"), 13.502630463, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("EmissionAverage"), 12.15148695101, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("EmissionStandardDeviation"), 0.565437913, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("EmissionMinimum"), 10.79846217733, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("EmissionMaximum"), 13.502631152501, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("EmissionAverage"), 12.151486966752, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("EmissionStandardDeviation"), 0.56543820137524, 1e-8);
 
   group = appLog.findGroup("IncidenceAngle");
-  EXPECT_NEAR( (double) group.findKeyword("IncidenceMinimum"), 69.941096124, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("IncidenceMaximum"), 70.311944975, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("IncidenceAverage"), 70.127459134, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("IncidenceStandardDeviation"), 0.102490391, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("IncidenceMinimum"), 69.941096029946, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("IncidenceMaximum"), 70.311945067319, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("IncidenceAverage"), 70.127459134001, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("IncidenceStandardDeviation"), 0.10249044009735, 1e-8);
 
   group = appLog.findGroup("LocalSolarTime");
   EXPECT_NEAR( (double) group.findKeyword("LocalSolarTimeMinimum"), 7.7698055422, 1e-8);
