@@ -50,7 +50,6 @@ dependencies:
   - opencv>=4.5.2, <5
   - openssl>=3.1.2,<4.0a0
   - pcl >=1.10, <2
-  - pdal>=2.6, <3
   - plio
   - protobuf
   - python=3.12
