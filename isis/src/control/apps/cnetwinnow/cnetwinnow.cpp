@@ -11,7 +11,6 @@ find files of those names at the top level of this repository. **/
 #include <geos_c.h>
 #include <geos/algorithm/ConvexHull.h>
 #include <geos/geom/CoordinateSequence.h>
-#include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/Envelope.h>
 #include <geos/geom/Geometry.h>
 #include <geos/geom/GeometryFactory.h>
@@ -431,7 +430,7 @@ namespace Isis {
     bool ignorMeas;
     QList<ControlMeasure *> cubeMeasures = net.GetMeasuresInCube(serialNum);
     static  geos::geom::GeometryFactory::Ptr geosFactory = geos::geom::GeometryFactory::create();
-    geos::geom::CoordinateArraySequence * pts = new geos::geom::CoordinateArraySequence();
+    geos::geom::CoordinateSequence pts;
     for (i=0;i<cubeMeasures.size();i++) {
       if (cubeMeasures[i]->IsIgnored()) continue;  //skip ignored measures
       if (cubeMeasures[i]->Parent()->IsIgnored()) continue; //skip measures of ignored points
@@ -451,22 +450,22 @@ namespace Isis {
         firstIndex =i;
       }
       //build point sequence
-      pts->add(geos::geom::Coordinate(cubeMeasures[i]->GetSample(), cubeMeasures[i]->GetLine()));
+      pts.add(geos::geom::Coordinate(cubeMeasures[i]->GetSample(), cubeMeasures[i]->GetLine()));
     }
     //Adding the first active point again closes the "linestring"
-    pts->add(geos::geom::Coordinate(cubeMeasures[firstIndex]->GetSample(),
+    pts.add(geos::geom::Coordinate(cubeMeasures[firstIndex]->GetSample(),
                                     cubeMeasures[firstIndex]->GetLine()));
-    if (pts->size() >= 4) {
+    if (pts.size() >= 4) {
       // Calculate the convex hull
       geos::geom::Geometry * convexHull = geosFactory->createPolygon(
-          geosFactory->createLinearRing(pts), 0)->convexHull().release();
+          geosFactory->createLinearRing(pts))->convexHull().release();
       // Calculate the area of the convex hull
       area = convexHull->getArea();
     }
     else {
       area = 0.0;
     }
-    validMeasures = pts->size()-1; //subtract one because one point is in there twice
+    validMeasures = pts.size()-1; //subtract one because one point is in there twice
     return;
   }
 }

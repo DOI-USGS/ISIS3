@@ -9,7 +9,7 @@ find files of those names at the top level of this repository. **/
 
 #include <geos/geom/Point.h>
 #include <geos/geom/MultiPolygon.h>
-#include <geos/geom/CoordinateArraySequence.h>
+#include <geos/geom/CoordinateSequence.h>
 #include <geos/geom/Polygon.h>
 
 #include "PolygonSeeder.h"

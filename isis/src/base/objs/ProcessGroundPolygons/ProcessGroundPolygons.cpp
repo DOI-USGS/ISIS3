@@ -9,7 +9,6 @@ find files of those names at the top level of this repository. **/
 #include <vector>
 
 #include "geos/geom/CoordinateSequence.h"
-#include "geos/geom/CoordinateArraySequence.h"
 #include "geos/geom/LineString.h"
 
 #include "Application.h"
@@ -53,14 +52,14 @@ namespace Isis {
 
     if (crosses) {
       // Make a polygon from the lat/lon vectors and split it on 360
-      geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
+      geos::geom::CoordinateSequence pts;
       for (unsigned int i = 0; i < lat.size(); i++) {
-        pts->add(geos::geom::Coordinate(lon[i], lat[i]));
+        pts.add(geos::geom::Coordinate(lon[i], lat[i]));
       }
-      pts->add(geos::geom::Coordinate(lon[0], lat[0]));
+      pts.add(geos::geom::Coordinate(lon[0], lat[0]));
 
       geos::geom::Polygon *crossingPoly = Isis::globalFactory->createPolygon(
-          globalFactory->createLinearRing(pts), NULL);
+          globalFactory->createLinearRing(pts)).release();
 
       geos::geom::MultiPolygon *splitPoly = NULL;
       try {

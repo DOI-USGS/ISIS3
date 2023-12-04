@@ -15,7 +15,6 @@ find files of those names at the top level of this repository. **/
 #include "geos/geom/CoordinateSequence.h"
 #include "geos/geom/Envelope.h"
 #include "geos/geom/GeometryFactory.h"
-#include "geos/geom/CoordinateArraySequence.h"
 
 namespace Isis {
 
