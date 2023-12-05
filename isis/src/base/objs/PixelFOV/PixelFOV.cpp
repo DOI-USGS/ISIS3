@@ -12,7 +12,7 @@ find files of those names at the top level of this repository. **/
 #include <QPointF>
 #include <QScopedPointer>
 
-#include <geos/geom/CoordinateSequence.h>
+#include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/CoordinateSequence.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/MultiPolygon.h>
@@ -231,13 +231,13 @@ namespace Isis {
   QList<QPointF> PixelFOV::envelope(QList<QPointF> vertices) const{
 
     //Put the vertices in a line string
-    QScopedPointer<geos::geom::CoordinateSequence> points(new geos::geom::CoordinateSequence());
+    QScopedPointer<geos::geom::CoordinateArraySequence> points(new geos::geom::CoordinateArraySequence());
 
     for (int i = 0; i < vertices.size(); i++) {
       points->add(geos::geom::Coordinate(vertices[i].x(), vertices[i].y()));
     }
     QScopedPointer<geos::geom::LineString> pointString(Isis::globalFactory->createLineString(
-                                                                           *points).release());
+                                                                           points.take()));
 
     //Compute a convex hull for the line string
     QScopedPointer<geos::geom::Geometry> boundingHull(pointString->convexHull().release());
@@ -270,13 +270,14 @@ namespace Isis {
     QList< QList<QPointF> > splitPoints;
 
     // Create a polygon to split.
-    QScopedPointer<geos::geom::CoordinateSequence> pts(new geos::geom::CoordinateSequence());
+    QScopedPointer<geos::geom::CoordinateArraySequence> pts(new geos::geom::CoordinateArraySequence());
     for (int i = 0; i < vertices.size(); i++) {
       pts->add(geos::geom::Coordinate(vertices[i].y(), vertices[i].x()));
     }
     pts->add(geos::geom::Coordinate(vertices[0].y(), vertices[0].x()));
     QScopedPointer<geos::geom::Polygon> originalPoly(Isis::globalFactory->createPolygon(
-                                                       globalFactory->createLinearRing(*pts)).release());
+                                                       globalFactory->createLinearRing(pts.take()),
+                                                       NULL));
 
     // Split the polygon
     QScopedPointer<geos::geom::MultiPolygon> splitPolygons(

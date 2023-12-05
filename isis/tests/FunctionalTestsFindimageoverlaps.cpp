@@ -15,6 +15,7 @@
 
 #include <geos/io/WKTReader.h>
 #include <geos/io/WKTWriter.h>
+#include "geos/geom/CoordinateArraySequence.h"
 #include "geos/geom/CoordinateSequence.h"
 #include "geos/geom/LinearRing.h"
 #include "geos/geom/Polygon.h"

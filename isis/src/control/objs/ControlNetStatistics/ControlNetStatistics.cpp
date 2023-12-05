@@ -13,6 +13,7 @@ find files of those names at the top level of this repository. **/
 #include <geos_c.h>
 #include <geos/algorithm/ConvexHull.h>
 #include <geos/geom/CoordinateSequence.h>
+#include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/Envelope.h>
 #include <geos/geom/Geometry.h>
 #include <geos/geom/GeometryFactory.h>
@@ -231,7 +232,8 @@ namespace Isis {
     }
 
     foreach (QString sn, cnetSerials) {
-      geos::geom::CoordinateSequence ptCoordinates;
+      geos::geom::CoordinateArraySequence * ptCoordinates =
+          new geos::geom::CoordinateArraySequence();
 
       // setup vector for number of image properties and init to 0
       QVector<double> imgStats(numImageStats, 0);
@@ -271,22 +273,22 @@ namespace Isis {
           if (measure->IsEditLocked()) {
             imgStats[imgLocked]++;
           }
-          ptCoordinates.add(geos::geom::Coordinate(measure->GetSample(),
+          ptCoordinates->add(geos::geom::Coordinate(measure->GetSample(),
                                                     measure->GetLine()));
         }
 
-        ptCoordinates.add(geos::geom::Coordinate(measures[0]->GetSample(),
+        ptCoordinates->add(geos::geom::Coordinate(measures[0]->GetSample(),
                                                   measures[0]->GetLine()));
       }
 
-      if (ptCoordinates.size() >= 4) {
+      if (ptCoordinates->size() >= 4) {
         // Calculate the convex hull
 
         // Even though geos doesn't create valid linear rings/polygons from this set of coordinates,
         //   because it self-intersects many many times, it still correctly does a convex hull
         //   calculation on the points in the polygon.
         geos::geom::Geometry * convexHull = geosFactory->createPolygon(
-          geosFactory->createLinearRing(ptCoordinates))->convexHull().release();
+          geosFactory->createLinearRing(ptCoordinates), 0)->convexHull().release();
 
         // Calculate the area of the convex hull
         imgStats[imgConvexHullArea] = convexHull->getArea();
@@ -298,6 +300,9 @@ namespace Isis {
       mConvexHullRatioStats.AddData(imgStats[imgConvexHullRatio]);
 
       mImageMap[sn] = imgStats;
+
+      delete ptCoordinates;
+      ptCoordinates = NULL;
 
       // Update Progress
       if (mProgress != NULL)

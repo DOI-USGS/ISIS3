@@ -9,7 +9,7 @@ find files of those names at the top level of this repository. **/
 #include <cmath>
 #include <iomanip>
 
-#include <geos/geom/CoordinateSequence.h>
+#include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/Geometry.h>
 #include <geos/geom/Polygon.h>
 
@@ -60,20 +60,21 @@ int main() {
     std::cout << "Test 2, test a triangular polygon" << std::endl;
     try {
       // Call the seed member with a polygon
-      geos::geom::CoordinateSequence pts;
+      geos::geom::CoordinateArraySequence *pts;
       vector<const geos::geom::Geometry *> polys;
 
       // Create the A polygon
-      pts.add(geos::geom::Coordinate(0, 0));
-      pts.add(geos::geom::Coordinate(0, 1));
-      pts.add(geos::geom::Coordinate(0.5, 0.5));
-      pts.add(geos::geom::Coordinate(1, 0));
-      pts.add(geos::geom::Coordinate(0, 0));
+      pts = new geos::geom::CoordinateArraySequence();
+      pts->add(geos::geom::Coordinate(0, 0));
+      pts->add(geos::geom::Coordinate(0, 1));
+      pts->add(geos::geom::Coordinate(0.5, 0.5));
+      pts->add(geos::geom::Coordinate(1, 0));
+      pts->add(geos::geom::Coordinate(0, 0));
 
       polys.push_back(Isis::globalFactory->createPolygon(
-                        Isis::globalFactory->createLinearRing(pts)).release());
+                        Isis::globalFactory->createLinearRing(pts), NULL));
 
-      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys).release();
+      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys);
 
       std::cout << "Lon/Lat polygon = " << mp->toString() << std::endl;
       // Create the projection necessary for seeding
@@ -100,7 +101,7 @@ int main() {
         if(proj->SetCoordinate(seedValues[pt]->getX(), seedValues[pt]->getY())) {
           points.push_back(Isis::globalFactory->createPoint(
                              geos::geom::Coordinate(proj->UniversalLongitude(),
-                                 proj->UniversalLatitude())).release());
+                                 proj->UniversalLatitude())));
         }
         else {
           IString msg = "Unable to convert to a (lon,lat)";
@@ -121,20 +122,21 @@ int main() {
     cout << "Test 3, test for too thin" << endl;
     try {
       // Call the seed member with a polygon
-      geos::geom::CoordinateSequence pts;
-      vector <const geos::geom::Geometry *> polys;
+      geos::geom::CoordinateArraySequence *pts;
+      vector<const geos::geom::Geometry *> polys;
 
       // Create the A polygon
-      pts.add(geos::geom::Coordinate(0, 0));
-      pts.add(geos::geom::Coordinate(0, 0.5));
-      pts.add(geos::geom::Coordinate(0.0125, 0.5));
-      pts.add(geos::geom::Coordinate(0.0125, 0));
-      pts.add(geos::geom::Coordinate(0, 0));
+      pts = new geos::geom::CoordinateArraySequence();
+      pts->add(geos::geom::Coordinate(0, 0));
+      pts->add(geos::geom::Coordinate(0, 0.5));
+      pts->add(geos::geom::Coordinate(0.0125, 0.5));
+      pts->add(geos::geom::Coordinate(0.0125, 0));
+      pts->add(geos::geom::Coordinate(0, 0));
 
       polys.push_back(Isis::globalFactory->createPolygon(
-                        Isis::globalFactory->createLinearRing(pts)).release());
+                        Isis::globalFactory->createLinearRing(pts), NULL));
 
-      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys).release();
+      geos::geom::MultiPolygon *mp = Isis::globalFactory->createMultiPolygon(polys);
 
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
 
