@@ -26,24 +26,24 @@ namespace Isis {
    * Default constructor for RTCMultiHitRay.
    */
   RTCMultiHitRay::RTCMultiHitRay() {
-    tnear   = 0.0;
-    tfar    = std::numeric_limits<float>::infinity(); // Should be INF
-    mask    = 0xFFFFFFFF;
+    ray.tnear   = 0.0;
+    ray.tfar    = std::numeric_limits<float>::infinity(); // Should be INF
+    ray.mask    = 0xFFFFFFFF;
     lastHit = -1;
-    u       = 0.0;
-    v       = 0.0;
-    geomID  = RTC_INVALID_GEOMETRY_ID;
-    primID  = RTC_INVALID_GEOMETRY_ID;
-    instID  = RTC_INVALID_GEOMETRY_ID;
-    org[0] = 0.0;
-    org[1] = 0.0;
-    org[2] = 0.0;
-    dir[0] = 0.0;
-    dir[1] = 0.0;
-    dir[2] = 0.0;
-    Ng[0] = 0.0;
-    Ng[1] = 0.0;
-    Ng[2] = 0.0;
+    hit.u       = 0.0;
+    hit.v       = 0.0;
+    hit.geomID  = RTC_INVALID_GEOMETRY_ID;
+    hit.primID  = RTC_INVALID_GEOMETRY_ID;
+    hit.instID[0]  = RTC_INVALID_GEOMETRY_ID;
+    ray.org_x = 0.0;
+    ray.org_y = 0.0;
+    ray.org_z = 0.0;
+    ray.dir_x = 0.0;
+    ray.dir_y = 0.0;
+    ray.dir_z = 0.0;
+    hit.Ng_x = 0.0;
+    hit.Ng_y = 0.0;
+    hit.Ng_z = 0.0;
   }
 
 
@@ -55,24 +55,24 @@ namespace Isis {
    */
   RTCMultiHitRay::RTCMultiHitRay(const std::vector<double> &origin,
                                  const std::vector<double> &direction) {
-    tnear   = 0.0;
-    tfar    = std::numeric_limits<float>::infinity(); // Should be INF
-    mask    = 0xFFFFFFFF;
+    ray.tnear   = 0.0;
+    ray.tfar    = std::numeric_limits<float>::infinity(); // Should be INF
+    ray.mask    = 0xFFFFFFFF;
     lastHit = -1;
-    u       = 0.0;
-    v       = 0.0;
-    geomID  = RTC_INVALID_GEOMETRY_ID;
-    primID  = RTC_INVALID_GEOMETRY_ID;
-    instID  = RTC_INVALID_GEOMETRY_ID;
-    org[0] = origin[0];
-    org[1] = origin[1];
-    org[2] = origin[2];
-    dir[0] = direction[0];
-    dir[1] = direction[1];
-    dir[2] = direction[2];
-    Ng[0] = 0.0;
-    Ng[1] = 0.0;
-    Ng[2] = 0.0;
+    hit.u       = 0.0;
+    hit.v       = 0.0;
+    hit.geomID  = RTC_INVALID_GEOMETRY_ID;
+    hit.primID  = RTC_INVALID_GEOMETRY_ID;
+    hit.instID[0]  = RTC_INVALID_GEOMETRY_ID;
+    ray.org_x = origin[0];
+    ray.org_y = origin[1];
+    ray.org_z = origin[2];
+    ray.dir_x = direction[0];
+    ray.dir_y = direction[1];
+    ray.dir_z = direction[2];
+    hit.Ng_x = 0.0;
+    hit.Ng_y = 0.0;
+    hit.Ng_z = 0.0;
   }
 
 
@@ -85,24 +85,24 @@ namespace Isis {
    */
   RTCMultiHitRay::RTCMultiHitRay(LinearAlgebra::Vector origin,
                                  LinearAlgebra::Vector direction) {
-    tnear   = 0.0;
-    tfar    = std::numeric_limits<float>::infinity(); // Should be INF
-    mask    = 0xFFFFFFFF;
+    ray.tnear   = 0.0;
+    ray.tfar    = std::numeric_limits<float>::infinity(); // Should be INF
+    ray.mask    = 0xFFFFFFFF;
     lastHit = -1;
-    u       = 0.0;
-    v       = 0.0;
-    geomID  = RTC_INVALID_GEOMETRY_ID;
-    primID  = RTC_INVALID_GEOMETRY_ID;
-    instID  = RTC_INVALID_GEOMETRY_ID;
-    org[0] = origin[0];
-    org[1] = origin[1];
-    org[2] = origin[2];
-    dir[0] = direction[0];
-    dir[1] = direction[1];
-    dir[2] = direction[2];
-    Ng[0] = 0.0;
-    Ng[1] = 0.0;
-    Ng[2] = 0.0;
+    hit.u       = 0.0;
+    hit.v       = 0.0;
+    hit.geomID  = RTC_INVALID_GEOMETRY_ID;
+    hit.primID  = RTC_INVALID_GEOMETRY_ID;
+    hit.instID[0]  = RTC_INVALID_GEOMETRY_ID;
+    ray.org_x = origin[0];
+    ray.org_y = origin[1];
+    ray.org_z = origin[2];
+    ray.dir_x = direction[0];
+    ray.dir_y = direction[1];
+    ray.dir_z = direction[2];
+    hit.Ng_x = 0.0;
+    hit.Ng_y = 0.0;
+    hit.Ng_z = 0.0;
   }
 
 
@@ -110,25 +110,25 @@ namespace Isis {
    * Default constructor for RTCOcclussionRay.
    */
   RTCOcclusionRay::RTCOcclusionRay() {
-    tnear   = 0.0;
-    tfar    = std::numeric_limits<float>::infinity(); // Should be INF
-    mask    = 0xFFFFFFFF;
+    ray.tnear   = 0.0;
+    ray.tfar    = std::numeric_limits<float>::infinity(); // Should be INF
+    ray.mask    = 0xFFFFFFFF;
     lastHit = -1;
-    u       = 0.0;
-    v       = 0.0;
+    hit.u       = 0.0;
+    hit.v       = 0.0;
     ignorePrimID = -1;
-    geomID  = RTC_INVALID_GEOMETRY_ID;
-    primID  = RTC_INVALID_GEOMETRY_ID;
-    instID  = RTC_INVALID_GEOMETRY_ID;
-    org[0] = 0.0;
-    org[1] = 0.0;
-    org[2] = 0.0;
-    dir[0] = 0.0;
-    dir[1] = 0.0;
-    dir[2] = 0.0;
-    Ng[0] = 0.0;
-    Ng[1] = 0.0;
-    Ng[2] = 0.0;
+    hit.geomID  = RTC_INVALID_GEOMETRY_ID;
+    hit.primID  = RTC_INVALID_GEOMETRY_ID;
+    hit.instID[0]  = RTC_INVALID_GEOMETRY_ID;
+    ray.org_x = 0.0;
+    ray.org_y = 0.0;
+    ray.org_z = 0.0;
+    ray.dir_x = 0.0;
+    ray.dir_y = 0.0;
+    ray.dir_z = 0.0;
+    hit.Ng_x = 0.0;
+    hit.Ng_y = 0.0;
+    hit.Ng_z = 0.0;
   }
 
 
@@ -140,24 +140,24 @@ namespace Isis {
    */
   RTCOcclusionRay::RTCOcclusionRay(const std::vector<double> &origin,
                                  const std::vector<double> &direction) {
-    tnear   = 0.0;
-    tfar    = std::numeric_limits<float>::infinity(); // Should be INF
-    mask    = 0xFFFFFFFF;
+    ray.tnear   = 0.0;
+    ray.tfar    = std::numeric_limits<float>::infinity(); // Should be INF
+    ray.mask    = 0xFFFFFFFF;
     lastHit = -1;
-    u       = 0.0;
-    v       = 0.0;
-    geomID  = RTC_INVALID_GEOMETRY_ID;
+    hit.u       = 0.0;
+    hit.v       = 0.0;
+    hit.geomID  = RTC_INVALID_GEOMETRY_ID;
     ignorePrimID  = -1;
-    instID  = RTC_INVALID_GEOMETRY_ID;
-    org[0] = origin[0];
-    org[1] = origin[1];
-    org[2] = origin[2];
-    dir[0] = direction[0];
-    dir[1] = direction[1];
-    dir[2] = direction[2];
-    Ng[0] = 0.0;
-    Ng[1] = 0.0;
-    Ng[2] = 0.0;
+    hit.instID[0]  = RTC_INVALID_GEOMETRY_ID;
+    ray.org_x = origin[0];
+    ray.org_y = origin[1];
+    ray.org_z = origin[2];
+    ray.dir_x = direction[0];
+    ray.dir_y = direction[1];
+    ray.dir_z = direction[2];
+    hit.Ng_x = 0.0;
+    hit.Ng_y = 0.0;
+    hit.Ng_z = 0.0;
   }
 
   /**
@@ -169,24 +169,24 @@ namespace Isis {
    */
   RTCOcclusionRay::RTCOcclusionRay(LinearAlgebra::Vector origin,
                                    LinearAlgebra::Vector direction) {
-    tnear   = 0.0;
-    tfar    = std::numeric_limits<float>::infinity(); // Should be INF
-    mask    = 0xFFFFFFFF;
+    ray.tnear   = 0.0;
+    ray.tfar    = std::numeric_limits<float>::infinity(); // Should be INF
+    ray.mask    = 0xFFFFFFFF;
     lastHit = -1;
-    u       = 0.0;
-    v       = 0.0;
-    geomID  = RTC_INVALID_GEOMETRY_ID;
-    ignorePrimID  = -1; 
-    instID  = RTC_INVALID_GEOMETRY_ID;
-    org[0] = origin[0];
-    org[1] = origin[1];
-    org[2] = origin[2];
-    dir[0] = direction[0];
-    dir[1] = direction[1];
-    dir[2] = direction[2];
-    Ng[0] = 0.0;
-    Ng[1] = 0.0;
-    Ng[2] = 0.0;
+    hit.u       = 0.0;
+    hit.v       = 0.0;
+    hit.geomID  = RTC_INVALID_GEOMETRY_ID;
+    ignorePrimID  = -1;
+    hit.instID[0]  = RTC_INVALID_GEOMETRY_ID;
+    ray.org_x = origin[0];
+    ray.org_y = origin[1];
+    ray.org_z = origin[2];
+    ray.dir_x = direction[0];
+    ray.dir_y = direction[1];
+    ray.dir_z = direction[2];
+    hit.Ng_x = 0.0;
+    hit.Ng_y = 0.0;
+    hit.Ng_z = 0.0;
   }
 
 
@@ -227,10 +227,10 @@ namespace Isis {
         m_mesh(),
         m_cloud(),
         m_device(rtcNewDevice(NULL)),
-        m_scene(rtcDeviceNewScene(m_device,
-                                  RTC_SCENE_STATIC | RTC_SCENE_HIGH_QUALITY | RTC_SCENE_ROBUST,
-                                  RTC_INTERSECT1)) { }
-
+        m_scene(rtcNewScene(m_device)) 
+  {
+    rtcSetSceneFlags(m_scene, RTC_SCENE_FLAG_NONE | RTC_SCENE_FLAG_ROBUST);
+  }
 
   /** 
    * Constructs an EmbreeTargetShape from a PointCloudLibrary polygon mesh.
@@ -243,12 +243,11 @@ namespace Isis {
         m_mesh(),
         m_cloud(),
         m_device(rtcNewDevice(NULL)),
-        m_scene(rtcDeviceNewScene(m_device,
-                                  RTC_SCENE_STATIC | RTC_SCENE_HIGH_QUALITY | RTC_SCENE_ROBUST,
-                                  RTC_INTERSECT1)) {
+        m_scene(rtcNewScene(m_device))
+  {
     initMesh(mesh);
+    rtcSetSceneFlags(m_scene, RTC_SCENE_FLAG_NONE | RTC_SCENE_FLAG_ROBUST);
   }
-
 
   /**
    * Constructs an EmbreeTargetShape from a file.
@@ -265,9 +264,8 @@ namespace Isis {
         m_mesh(),
         m_cloud(),
         m_device(rtcNewDevice(NULL)),
-        m_scene(rtcDeviceNewScene(m_device,
-                                  RTC_SCENE_STATIC | RTC_SCENE_HIGH_QUALITY | RTC_SCENE_ROBUST,
-                                  RTC_INTERSECT1)) {
+        m_scene(rtcNewScene(m_device)) {
+    rtcSetSceneFlags(m_scene, RTC_SCENE_FLAG_NONE | RTC_SCENE_FLAG_ROBUST);
     FileName file(dem);
     pcl::PolygonMesh::Ptr mesh;
     m_name = file.baseName();
@@ -454,25 +452,45 @@ namespace Isis {
     pcl::fromPCLPointCloud2(mesh->cloud, m_cloud);
 
     // Create a static geometry (the body) in our scene
-    unsigned geomID = rtcNewTriangleMesh(m_scene,
-                                         RTC_GEOMETRY_STATIC,
-                                         numberOfPolygons(),
-                                         numberOfVertices(),
-                                         1);
+    RTCGeometry rtcMesh = rtcNewGeometry(m_device, RTC_GEOMETRY_TYPE_TRIANGLE);
     // Add vertices and faces (indices)
-    addVertices(geomID); // add cloud of points
-    addIndices(geomID);  // connect dots of cloud into triangles
+    if (!isValid()) {
+      return;
+    }
+    // Add the body's vertices to the Embree ray tracing device's vertex buffer
+    Vertex *vertices = (Vertex *)rtcSetNewGeometryBuffer(rtcMesh, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3, sizeof(Vertex), numberOfVertices());
+    for (int v = 0; v < numberOfVertices(); ++v) {
+      vertices[v].x = m_cloud.points[v].x;
+      vertices[v].y = m_cloud.points[v].y;
+      vertices[v].z = m_cloud.points[v].z;
+    }
+
+    if (!isValid()) {
+      return;
+    }
+    int tri = 0;
+    Triangle *triangles = (Triangle *)rtcSetNewGeometryBuffer(rtcMesh, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(Triangle), numberOfPolygons());
+    // Add the body's face (vertex indices) to the Embree device's index buffer
+    for (int t = 0; t < numberOfPolygons(); ++t) {
+      triangles[t].v0 = m_mesh->polygons[t].vertices[0];
+      triangles[t].v1 = m_mesh->polygons[t].vertices[1];
+      triangles[t].v2 = m_mesh->polygons[t].vertices[2];
+    }
 
     // Add the multi-hit filter
-    rtcSetIntersectionFilterFunction(m_scene, geomID,
-                                     (RTCFilterFunc)&EmbreeTargetShape::multiHitFilter);
+    rtcSetGeometryIntersectFilterFunction(rtcMesh, EmbreeTargetShape::multiHitFilter);
 
     // Add the occlusion filter
-    rtcSetOcclusionFilterFunction(m_scene, geomID,
-                                    (RTCFilterFunc)&EmbreeTargetShape::occlusionFilter);
+    rtcSetGeometryOccludedFilterFunction(rtcMesh, EmbreeTargetShape::occlusionFilter);
+
+    rtcSetGeometryVertexAttributeCount(rtcMesh, 1);
+
+    rtcCommitGeometry(rtcMesh);
+    unsigned int geomID = rtcAttachGeometry(m_scene, rtcMesh);
+    rtcReleaseGeometry(rtcMesh);
 
     // Done, now we can perform some ray tracing
-    rtcCommit(m_scene);
+    rtcCommitScene(m_scene);
   }
 
 
@@ -486,18 +504,18 @@ namespace Isis {
    * @see EmbreeTargetShape::initMesh
    */
   void EmbreeTargetShape::addVertices(int geomID) {
-    if (!isValid()) {
-      return;
-    }
-    // Add the body's vertices to the Embree ray tracing device's vertex buffer
-    Vertex *vertices = (Vertex *) rtcMapBuffer(m_scene, geomID, RTC_VERTEX_BUFFER);
-    for (int v = 0; v < numberOfVertices(); ++v) {
-      vertices[v].x = m_cloud.points[v].x;
-      vertices[v].y = m_cloud.points[v].y;
-      vertices[v].z = m_cloud.points[v].z;
-    }
-    // Flush buffer
-    rtcUnmapBuffer(m_scene, geomID, RTC_VERTEX_BUFFER);
+    // if (!isValid()) {
+    //   return;
+    // }
+    // // Add the body's vertices to the Embree ray tracing device's vertex buffer
+    // Vertex *vertices = (Vertex *) rtcMapBuffer(m_scene, geomID, RTC_VERTEX_BUFFER);
+    // for (int v = 0; v < numberOfVertices(); ++v) {
+    //   vertices[v].x = m_cloud.points[v].x;
+    //   vertices[v].y = m_cloud.points[v].y;
+    //   vertices[v].z = m_cloud.points[v].z;
+    // }
+    // // Flush buffer
+    // rtcUnmapBuffer(m_scene, geomID, RTC_VERTEX_BUFFER);
   }
 
 
@@ -511,18 +529,18 @@ namespace Isis {
    * @see EmbreeTargetShape::initMesh
    */
   void EmbreeTargetShape::addIndices(int geomID) {
-    if (!isValid()) {
-      return;
-    }
-    // Add the body's face (vertex indices) to the Embree device's index buffer
-    Triangle *triangles = (Triangle *) rtcMapBuffer(m_scene, geomID, RTC_INDEX_BUFFER);
-    for (int t = 0; t < numberOfPolygons(); ++t) {
-      triangles[t].v0 = m_mesh->polygons[t].vertices[0];
-      triangles[t].v1 = m_mesh->polygons[t].vertices[1];
-      triangles[t].v2 = m_mesh->polygons[t].vertices[2];
-    }
-    // Flush buffer
-    rtcUnmapBuffer(m_scene, geomID, RTC_INDEX_BUFFER);
+    // if (!isValid()) {
+    //   return;
+    // }
+    // // Add the body's face (vertex indices) to the Embree device's index buffer
+    // Triangle *triangles = (Triangle *) rtcMapBuffer(m_scene, geomID, RTC_INDEX_BUFFER);
+    // for (int t = 0; t < numberOfPolygons(); ++t) {
+    //   triangles[t].v0 = m_mesh->polygons[t].vertices[0];
+    //   triangles[t].v1 = m_mesh->polygons[t].vertices[1];
+    //   triangles[t].v2 = m_mesh->polygons[t].vertices[2];
+    // }
+    // // Flush buffer
+    // rtcUnmapBuffer(m_scene, geomID, RTC_INDEX_BUFFER);
   }
 
 
@@ -531,8 +549,8 @@ namespace Isis {
    * but the Embree scene and device must be manually cleaned up.
    */
   EmbreeTargetShape::~EmbreeTargetShape() {
-    rtcDeleteScene(m_scene);
-    rtcDeleteDevice(m_device);
+    rtcReleaseScene(m_scene);
+    rtcReleaseDevice(m_device);
   }
 
 
@@ -577,7 +595,7 @@ namespace Isis {
   RTCBounds EmbreeTargetShape::sceneBounds() const {
     RTCBounds sceneBounds;
     if (isValid()) {
-      rtcGetBounds(m_scene, sceneBounds);
+      rtcGetSceneBounds(m_scene, &sceneBounds);
     }
     else {
       sceneBounds.lower_x = 0.0;
@@ -638,7 +656,10 @@ namespace Isis {
    */
   void EmbreeTargetShape::intersectRay(RTCMultiHitRay &ray) {
     if (isValid()) {
-      rtcIntersect(m_scene, *((RTCRay*)&ray));
+      RTCIntersectContext context;
+      rtcInitIntersectContext(&context);
+
+      rtcIntersect1(m_scene, &context, (RTCRayHit *)&ray);
     }
   }
 
@@ -651,10 +672,13 @@ namespace Isis {
    * @see embree::rtcOccluded
    */
   bool EmbreeTargetShape::isOccluded(RTCOcclusionRay &ray) {
-    rtcOccluded(m_scene, ray);
+    RTCIntersectContext context;
+    rtcInitIntersectContext(&context);
+
+    rtcOccluded1(m_scene,  &context, (RTCRay*)&ray);
 
     // rtcOccluded sets the geomID to 0 if the ray hits anything
-    if (ray.geomID == 0) {
+    if (ray.hit.geomID == 0) {
       return true;
     }
     return false;
@@ -751,19 +775,32 @@ namespace Isis {
    * @param[in,out] ray The ray being traced. Information about the
    *                    intersection will be stored in the ray.
    */
-  void EmbreeTargetShape::multiHitFilter(void* userDataPtr, RTCMultiHitRay& ray) {
+  void EmbreeTargetShape::multiHitFilter(const RTCFilterFunctionNArguments* args) {
+    /* avoid crashing when debug visualizations are used */
+    if (args->context == nullptr)
+      return;
+
+    assert(args->N == 1);
+    int *valid = args->valid;
+    if (valid[0] != -1) {
+      return;
+    }
+    RTCMultiHitRay *ray = (RTCMultiHitRay *)args->ray;
+    RTCHit *hit = (RTCHit *)args->hit;
+
     // Calculate the index to store the hit in
-    ray.lastHit ++;
+    ray->lastHit++;
 
     // Store the hits
-    ray.hitGeomIDs[ray.lastHit] = ray.geomID;
-    ray.hitPrimIDs[ray.lastHit] = ray.primID;
-    ray.hitUs[ray.lastHit] = ray.u;
-    ray.hitVs[ray.lastHit] = ray.v;
+    ray->hitGeomIDs[ray->lastHit] = hit->geomID;
+    ray->hitPrimIDs[ray->lastHit] = hit->primID;
+    ray->hitUs[ray->lastHit] = hit->u;
+    ray->hitVs[ray->lastHit] = hit->v;
 
     // If there are less than 16 hits, continue ray tracing.
-    if (ray.lastHit < 15) {
-      ray.geomID = RTC_INVALID_GEOMETRY_ID;
+    if (ray->lastHit < 15) {
+      ray->hit.geomID = RTC_INVALID_GEOMETRY_ID;
+      hit->geomID = RTC_INVALID_GEOMETRY_ID;
     }
   }
 
@@ -776,12 +813,24 @@ namespace Isis {
    * @param[in,out] ray The ray being traced. Information about the
    *                    intersection will be stored in the ray.
    */
-  void EmbreeTargetShape::occlusionFilter(void* userDataPtr, RTCOcclusionRay& ray) {
-        
+  void EmbreeTargetShape::occlusionFilter(const RTCFilterFunctionNArguments* args) {
+    /* avoid crashing when debug visualizations are used */
+    if (args->context == nullptr)
+      return;
+
+    assert(args->N == 1);
+    int *valid = args->valid;
+    if (valid[0] != -1) {
+      return;
+    }
+    RTCOcclusionRay *ray = (RTCOcclusionRay *)args->ray;
+    RTCHit *hit = (RTCHit *)args->hit;
+
     // This is the case where we've re-intersected the occluded plate. If this happens, ignore 
     // and keep tracing
-    if ( ray.primID == ray.ignorePrimID) {
-      ray.geomID = RTC_INVALID_GEOMETRY_ID;
+    if (ray->hit.primID == ray->ignorePrimID) {
+      ray->hit.geomID = RTC_INVALID_GEOMETRY_ID;
+      hit->geomID = RTC_INVALID_GEOMETRY_ID;
     }
   }
 
