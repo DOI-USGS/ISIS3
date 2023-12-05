@@ -18,7 +18,7 @@
 #       A Public Release for ISIS3.6.1:                        {% set version = "3.6.1" %}
 #       A Release Candidate for ISIS3.6.1:                     {% set version = "3.6.1_RC" %}
 #       A custom build of ISIS3.6.1 for the CaSSIS mission:    {% set version = "3.6.1_cassis" %}
-{% set version = "8.0.0_RC1" %}
+{% set version = "8.1.0_RC1" %}
 
 # This is the build number for the current version you are building. If this is the first build of
 # this version, the build number will be 0. It is incremented by 1 with every consecutive build of
@@ -45,8 +45,8 @@ build:
 # Shotgun strat on requirements until we can narrow them down
 requirements:
   build:
+   - kalasiris 
    - ale=0.9.1
-   - aom
    - armadillo
    - boost=1.72
    - boost-cpp=1.72
@@ -54,13 +54,13 @@ requirements:
    - usgs-astrogeology::bullet
    - bz2file
    - bzip2
-   - cmake>=3.15
+   - cmake >=3.15
    - cspice=67
    - csm>=3.0.3,<3.0.4
    - curl
    - cxx-compiler=1.1.2
    - doxygen
-   - eigen<3.4
+   - eigen < 3.4
    - embree>=2.17,<3
    - ffmpeg
    - geos =3.11.1
@@ -90,7 +90,8 @@ requirements:
    - nn
    - opencv>=4.5.2
    - openssl>=1.1.1k
-   - pcl>=1.10.0
+   - pcl >= 1.10.0
+   - plio
    - protobuf<3.20
    - python>=3.7.11
    - pytest
@@ -115,9 +116,9 @@ requirements:
    - zlib
 
   run:
+  - kalasiris
   - {{ pin_compatible('ale', max_pin='x.x.x') }}
   - {{ pin_compatible('armadillo', max_pin='x.x.x') }}
-  - {{ pin_compatible('aom', max_pin='x.x') }}
   - {{ pin_compatible('boost', max_pin='x.x') }}
   - {{ pin_compatible('boost-cpp', max_pin='x.x') }}
   - blas
@@ -154,6 +155,7 @@ requirements:
   - {{ pin_compatible('opencv', max_pin='x.x') }}
   - {{ pin_compatible('openssl', min_pin='x', max_pin='x.x') }}
   - pcl
+  - plio
   - {{ pin_compatible('proj', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('protobuf', max_pin='x.x') }}
   - qhull
