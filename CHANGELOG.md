@@ -35,6 +35,8 @@ release.
 
 ## [Unreleased]
 
+## [8.1.0] - 2023-12-05
+
 ### Changed
 - Cnetthinner has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5354](https://github.com/USGS-Astrogeology/ISIS3/issues/5354), 
 - Cnetedit has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5346](https://github.com/USGS-Astrogeology/ISIS3/issues/5346), 
