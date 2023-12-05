@@ -959,8 +959,8 @@ namespace Isis {
             interp.Interpolate(CubeSample(), CubeLine(), port.DoubleBuffer());
         }
         else {
-          std::unique_ptr<geos::geom::Point> pnt = globalFactory->createPoint(
-              geos::geom::Coordinate(CubeSample(), CubeLine()));
+          geos::geom::Point *pnt = globalFactory->createPoint(
+                                     geos::geom::Coordinate(CubeSample(), CubeLine()));
           if (pnt->within(m_clipPolygon)) {
             port.SetPosition(CubeSample(), CubeLine(), band);
             cube.read(port);
@@ -970,7 +970,7 @@ namespace Isis {
           else {
             m_buf[line-1][samp-1] = Isis::NULL8;
           }
-          pnt.reset();
+          delete pnt;
         }
       }
     }

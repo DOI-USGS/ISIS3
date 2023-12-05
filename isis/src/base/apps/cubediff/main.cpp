@@ -14,11 +14,12 @@
 #include "IString.h"
 #include "Pixel.h"
 
+using namespace std;
 using namespace Isis;
 
-void compare(std::vector<Buffer *> &in, std::vector<Buffer *> &out);
+void compare(vector<Buffer *> &in, vector<Buffer *> &out);
 
-void diffTable(std::ofstream &target, int precision);
+void diffTable(ofstream &target, int precision);
 
 // This is only used for the difference table
 struct Difference {
@@ -35,7 +36,7 @@ int sample, line, band, spCount, diffCount, colWidth;
 Statistics stats;
 bool doTable;
 unsigned int sigFigAccuracy = DBL_DIG; // DBL_DIG is maximum accuracy for a double
-std::vector<Difference> diffset;
+vector<Difference> diffset;
 int sigFigLine = 0;
 int sigFigSample = 0;
 int sigFigBand = 0;
@@ -63,7 +64,7 @@ void IsisMain() {
     doTable = true;
     diffCount = ui.GetInteger("COUNT");
     if(!ui.WasEntered("TO")) {
-      std::string message = "A target file is required for difference output";
+      string message = "A target file is required for difference output";
       throw IException(IException::User, message, _FILEINFO_);
     }
 
@@ -122,7 +123,7 @@ void IsisMain() {
   }
   if(doTable) {
     QString filename = FileName(ui.GetFileName("TO", "txt")).expanded();
-    std::ofstream ofile(filename.toLatin1().data(), std::ios_base::app);
+    ofstream ofile(filename.toLatin1().data(), ios_base::app);
     diffTable(ofile, ui.GetInteger("PRECISION"));
   }
 
@@ -130,7 +131,7 @@ void IsisMain() {
   filesEqual = true;
 }
 
-void compare(std::vector<Buffer *> &in, std::vector<Buffer *> &out) {
+void compare(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer &input1 = *in[0];
   Buffer &input2 = *in[1];
   int inputSize = input1.size();
@@ -251,8 +252,8 @@ void compare(std::vector<Buffer *> &in, std::vector<Buffer *> &out) {
 }
 
 //Function to prepare the table to append to the
-void diffTable(std::ofstream &target, int precision) {
-  std::vector<int> temp;
+void diffTable(ofstream &target, int precision) {
+  vector<int> temp;
 
   //Make a list of all samples present
   for(unsigned int i = 0; i < diffset.size(); i++) {
@@ -263,14 +264,14 @@ void diffTable(std::ofstream &target, int precision) {
   sort(temp.begin(), temp.end());
 
   //Remove duplicates
-  std::vector<int> samps;
+  vector<int> samps;
   samps.push_back(temp[0]);
   for(unsigned int i = 1; i < temp.size(); i++) {
     if(temp[i] != samps.back()) {
       samps.push_back(temp[i]);
     }
   }
-  std::vector<Column> cols;
+  vector<Column> cols;
   //Add the first Column
   Column first("Line#", 7, Column::Integer);
   cols.push_back(first);

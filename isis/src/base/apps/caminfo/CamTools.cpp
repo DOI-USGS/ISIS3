@@ -734,7 +734,7 @@ namespace Isis {
     vector<const geos::geom::Geometry *> polys;
     polys.push_back(g);
     const geos::geom::GeometryFactory *gfactory = geos::geom::GeometryFactory::getDefaultInstance();
-    return (gfactory->createMultiPolygon(polys).release());
+    return (gfactory->createMultiPolygon(polys));
   }
 
 

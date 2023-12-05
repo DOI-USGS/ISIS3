@@ -21,7 +21,7 @@ find files of those names at the top level of this repository. **/
 #include "Blob.h"
 #include "geos/geom/Coordinate.h"
 #include "geos/geom/MultiPolygon.h"
-#include "geos/geom/CoordinateSequence.h"
+#include "geos/geom/CoordinateArraySequence.h"
 
 namespace Isis {
 
@@ -155,7 +155,6 @@ namespace Isis {
     public:
       ImagePolygon();
       ImagePolygon(Blob &blob);
-      ImagePolygon(const ImagePolygon &other);
       ~ImagePolygon();
 
       void Create(Cube &cube, int sinc = 1, int linc = 1,
@@ -270,7 +269,7 @@ namespace Isis {
 
       Brick *p_brick;     //!< Used to check for valid DNs
 
-      geos::geom::CoordinateSequence *p_pts; //!< The sequence of coordinates that compose the boundary of the image
+      geos::geom::CoordinateArraySequence *p_pts; //!< The sequence of coordinates that compose the boundary of the image
 
       geos::geom::MultiPolygon *p_polygons;  //!< The multipolygon of the image
 

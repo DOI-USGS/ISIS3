@@ -83,15 +83,15 @@ namespace Isis {
       //printf("Grid Line,%.10f,%.10f,Through,%.10f,%.10f\n",dRealMinX, y, xyBoundBox->getMaxX(), y);
       for(double x = dRealMinX; x <= polyBoundBox->getMaxX(); x += p_Xspacing) {
         geos::geom::Coordinate c(x + dDeltaXToReal, y + dDeltaYToReal);
-        geos::geom::Point *p = Isis::globalFactory->createPoint(c).release();
+        geos::geom::Point *p = Isis::globalFactory->createPoint(c);
         if(p->within(multiPoly)) {
-          points.push_back(Isis::globalFactory->createPoint(c).release());
+          points.push_back(Isis::globalFactory->createPoint(c));
         }
 
         geos::geom::Coordinate c2(x - dDeltaXToReal, y - dDeltaYToReal);
-        p = Isis::globalFactory->createPoint(c2).release();
+        p = Isis::globalFactory->createPoint(c2);
         if(p->within(multiPoly)) {
-          points.push_back(Isis::globalFactory->createPoint(c2).release());
+          points.push_back(Isis::globalFactory->createPoint(c2));
         }
       }
     }

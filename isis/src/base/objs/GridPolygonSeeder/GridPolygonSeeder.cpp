@@ -97,10 +97,10 @@ namespace Isis {
     for(double y = dRealMinY; y <= polyBoundBox->getMaxY(); y += p_Yspacing) {
       for(double x = dRealMinX; x <= polyBoundBox->getMaxX(); x += p_Xspacing) {
         geos::geom::Coordinate c(x, y);
-        geos::geom::Point *p = Isis::globalFactory->createPoint(c).release();
+        geos::geom::Point *p = Isis::globalFactory->createPoint(c);
 
         if(p->within(multiPoly)) {
-          points.push_back(Isis::globalFactory->createPoint(c).release());
+          points.push_back(Isis::globalFactory->createPoint(c));
         }
         else {
           delete p;
@@ -224,7 +224,7 @@ namespace Isis {
               throw iException::Message(iException::Programmer, msg, _FILEINFO_);
             }*/
             points.push_back(Isis::globalFactory->createPoint(
-                               geos::geom::Coordinate(p->getX(), p->getY())).release());
+                               geos::geom::Coordinate(p->getX(), p->getY())));
 
             // We found something new and need a new pass
             bGridCleared = false;
@@ -359,9 +359,9 @@ namespace Isis {
         double xPos = centerX + (x - gridSize / 2) * deltaXSize;
         double yPos = centerY + (y - gridSize / 2) * deltaYSize;
         geos::geom::Coordinate c(xPos, yPos);
-        geos::geom::Point *p = Isis::globalFactory->createPoint(c).release();
+        geos::geom::Point *p = Isis::globalFactory->createPoint(c);
         if(p->within(&xymp)) {
-          result = p->clone().release();
+          result = p;
         }
         else {
           delete p;

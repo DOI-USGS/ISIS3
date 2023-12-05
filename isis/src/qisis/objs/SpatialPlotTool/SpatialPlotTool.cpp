@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <geos/geom/Polygon.h>
+#include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/Point.h>
 
 #include <QHBoxLayout>

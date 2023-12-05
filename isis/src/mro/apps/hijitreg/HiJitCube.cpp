@@ -353,18 +353,18 @@ namespace Isis {
     int line0(jdata.fpLine0 + jdata.lineOffset), lineN(line0 + lineCount() - 1);
 
 //  Allocate a new coordinate sequence and define it
-    geos::geom::CoordinateSequence pts;
-    pts.add(geos::geom::Coordinate(samp0, lineN));
-    pts.add(geos::geom::Coordinate(sampN, lineN));
-    pts.add(geos::geom::Coordinate(sampN, line0));
-    pts.add(geos::geom::Coordinate(samp0, line0));
-    pts.add(geos::geom::Coordinate(samp0, lineN));
+    geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
+    pts->add(geos::geom::Coordinate(samp0, lineN));
+    pts->add(geos::geom::Coordinate(sampN, lineN));
+    pts->add(geos::geom::Coordinate(sampN, line0));
+    pts->add(geos::geom::Coordinate(samp0, line0));
+    pts->add(geos::geom::Coordinate(samp0, lineN));
 
 
 //  Make this reentrant and delete previous one if it exists and get the
 //  new one
     delete fpGeom;
-    fpGeom = geosFactory->createPolygon(geosFactory->createLinearRing(pts)).release();
+    fpGeom = geosFactory->createPolygon(geosFactory->createLinearRing(pts), 0);
     return;
   }
 
@@ -396,7 +396,7 @@ namespace Isis {
 
 //  Get the coordinate list
       geos::geom::CoordinateSequence *clist = poly.getCoordinates().release();
-      const geos::geom::CoordinateXY *minpt = clist->minCoordinate();
+      const geos::geom::Coordinate *minpt = clist->minCoordinate();
 //    cout << "MinPoint: " << minpt->x << ", " << minpt->y << std::endl;
 
       geos::geom::Coordinate maxpt(clist->getAt(0));

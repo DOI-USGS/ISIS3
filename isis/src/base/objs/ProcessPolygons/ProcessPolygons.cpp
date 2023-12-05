@@ -11,6 +11,7 @@ find files of those names at the top level of this repository. **/
 #include "SpecialPixel.h"
 
 #include "geos/geom/CoordinateSequence.h"
+#include "geos/geom/CoordinateArraySequence.h"
 #include "geos/geom/Coordinate.h"
 #include "geos/geom/Envelope.h"
 #include "geos/geom/LineString.h"
@@ -88,18 +89,18 @@ namespace Isis {
   void ProcessPolygons::FillPolygon(int Flag) {
 
     // Create a sample/line polygon for the input pixel vertices
-    geos::geom::CoordinateSequence pts;
+    geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
     for (unsigned int i = 0; i < m_sampleVertices.size(); i++) {
-      pts.add(geos::geom::Coordinate(m_sampleVertices[i], m_lineVertices[i]));
+      pts->add(geos::geom::Coordinate(m_sampleVertices[i], m_lineVertices[i]));
     }
-    pts.add(geos::geom::Coordinate(m_sampleVertices[0], m_lineVertices[0]));
+    pts->add(geos::geom::Coordinate(m_sampleVertices[0], m_lineVertices[0]));
 
     try {
       //  Create a polygon from the pixel vertices.  This polygon may have spikes or other
       //  problems such as multiple polygons.  Despike, then make sure we have a single polygon.
       //  Do not rasterize pixel if despiking fails or there are multiple polygons.
       geos::geom::Polygon *spikedPixelPoly = Isis::globalFactory->createPolygon(
-          globalFactory->createLinearRing(pts)).release();
+          globalFactory->createLinearRing(pts), NULL);
 
       const geos::geom::Polygon *projectedInputPixelPoly;
 
@@ -149,20 +150,20 @@ namespace Isis {
 
           if (m_useCenter) {
             geos::geom::Coordinate c(x, y);
-            geos::geom::Point *p = Isis::globalFactory->createPoint(c).release();
+            geos::geom::Point *p = Isis::globalFactory->createPoint(c);
             contains = preparedPoly->contains(p);
             delete p;
           }
           else {
-            geos::geom::CoordinateSequence tpts;
-            tpts.add(geos::geom::Coordinate(x - 0.5, y - 0.5));
-            tpts.add(geos::geom::Coordinate(x + 0.5, y - 0.5));
-            tpts.add(geos::geom::Coordinate(x + 0.5, y + 0.5));
-            tpts.add(geos::geom::Coordinate(x - 0.5, y + 0.5));
-            tpts.add(geos::geom::Coordinate(x - 0.5, y - 0.5));
+            geos::geom::CoordinateArraySequence *tpts = new geos::geom::CoordinateArraySequence();
+            tpts->add(geos::geom::Coordinate(x - 0.5, y - 0.5));
+            tpts->add(geos::geom::Coordinate(x + 0.5, y - 0.5));
+            tpts->add(geos::geom::Coordinate(x + 0.5, y + 0.5));
+            tpts->add(geos::geom::Coordinate(x - 0.5, y + 0.5));
+            tpts->add(geos::geom::Coordinate(x - 0.5, y - 0.5));
 
             geos::geom::Polygon *outPixelFootPrint = Isis::globalFactory->createPolygon(
-                                      globalFactory->createLinearRing(tpts)).release();
+                                      globalFactory->createLinearRing(tpts), NULL);
             contains = preparedPoly->intersects(outPixelFootPrint);
             delete outPixelFootPrint;
           }
@@ -325,7 +326,7 @@ namespace Isis {
     OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
     OutputCubes[1]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
 
-    geos::geom::CoordinateSequence imagePts;
+    geos::geom::CoordinateArraySequence imagePts;
 
     imagePts.add(geos::geom::Coordinate(0.0, 0.0));
     imagePts.add(geos::geom::Coordinate(0.0, this->OutputCubes[0]->lineCount()));
@@ -335,7 +336,7 @@ namespace Isis {
     imagePts.add(geos::geom::Coordinate(0.0, 0.0));
 
     m_imagePoly = Isis::globalFactory->createPolygon(
-                    globalFactory->createLinearRing(imagePts)).release();
+                    globalFactory->createLinearRing(imagePts), NULL);
 
     m_average = new Brick(*this->OutputCubes[0], 1, 1, nbands);
     m_count = new Brick(*this->OutputCubes[1], 1, 1, nbands);
