@@ -35,7 +35,7 @@ release.
 
 ## [Unreleased]
 
-## [8.0.2] - 2023-9-05
+## [8.0.2] - 2023-12-05
 ### Fixed
 - Bug fix for Cnetthinner app resolving divide by zero in CnetManager.cpp. Issue: [#5354](https://github.com/USGS-Astrogeology/ISIS3/issues/5354), 
 - Updated photomet MinnaertEmpirical model to support photemplate-style PVL format [#3621](https://github.com/DOI-USGS/ISIS3/issues/3621)
