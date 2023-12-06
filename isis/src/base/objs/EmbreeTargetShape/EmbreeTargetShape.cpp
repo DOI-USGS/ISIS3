@@ -229,7 +229,8 @@ namespace Isis {
         m_device(rtcNewDevice(NULL)),
         m_scene(rtcNewScene(m_device)) 
   {
-    rtcSetSceneFlags(m_scene, RTC_SCENE_FLAG_NONE | RTC_SCENE_FLAG_ROBUST);
+    rtcSetSceneFlags(m_scene, RTC_SCENE_FLAG_ROBUST | RTC_SCENE_FLAG_CONTEXT_FILTER_FUNCTION);
+    rtcSetSceneBuildQuality(m_scene, RTC_BUILD_QUALITY_HIGH);
   }
 
   /** 
@@ -245,8 +246,9 @@ namespace Isis {
         m_device(rtcNewDevice(NULL)),
         m_scene(rtcNewScene(m_device))
   {
+    rtcSetSceneFlags(m_scene, RTC_SCENE_FLAG_ROBUST | RTC_SCENE_FLAG_CONTEXT_FILTER_FUNCTION);
+    rtcSetSceneBuildQuality(m_scene, RTC_BUILD_QUALITY_HIGH);
     initMesh(mesh);
-    rtcSetSceneFlags(m_scene, RTC_SCENE_FLAG_NONE | RTC_SCENE_FLAG_ROBUST);
   }
 
   /**
@@ -265,7 +267,8 @@ namespace Isis {
         m_cloud(),
         m_device(rtcNewDevice(NULL)),
         m_scene(rtcNewScene(m_device)) {
-    rtcSetSceneFlags(m_scene, RTC_SCENE_FLAG_NONE | RTC_SCENE_FLAG_ROBUST);
+    rtcSetSceneFlags(m_scene, RTC_SCENE_FLAG_ROBUST | RTC_SCENE_FLAG_CONTEXT_FILTER_FUNCTION);
+    rtcSetSceneBuildQuality(m_scene, RTC_BUILD_QUALITY_HIGH);
     FileName file(dem);
     pcl::PolygonMesh::Ptr mesh;
     m_name = file.baseName();
@@ -483,8 +486,6 @@ namespace Isis {
     // Add the occlusion filter
     rtcSetGeometryOccludedFilterFunction(rtcMesh, EmbreeTargetShape::occlusionFilter);
 
-    rtcSetGeometryVertexAttributeCount(rtcMesh, 1);
-
     rtcCommitGeometry(rtcMesh);
     unsigned int geomID = rtcAttachGeometry(m_scene, rtcMesh);
     rtcReleaseGeometry(rtcMesh);
@@ -677,8 +678,8 @@ namespace Isis {
 
     rtcOccluded1(m_scene,  &context, (RTCRay*)&ray);
 
-    // rtcOccluded sets the geomID to 0 if the ray hits anything
-    if (ray.hit.geomID == 0) {
+    // rtcOccluded sets the ray.tfar to -inf if the ray hits anything
+    if (isinf(ray.ray.tfar) && ray.ray.tfar < 0) {
       return true;
     }
     return false;
@@ -799,6 +800,7 @@ namespace Isis {
 
     // If there are less than 16 hits, continue ray tracing.
     if (ray->lastHit < 15) {
+      valid[0] = 0;
       ray->hit.geomID = RTC_INVALID_GEOMETRY_ID;
       hit->geomID = RTC_INVALID_GEOMETRY_ID;
     }
@@ -825,12 +827,14 @@ namespace Isis {
     }
     RTCOcclusionRay *ray = (RTCOcclusionRay *)args->ray;
     RTCHit *hit = (RTCHit *)args->hit;
+    ray->hit.primID = hit->primID;
 
     // This is the case where we've re-intersected the occluded plate. If this happens, ignore 
     // and keep tracing
     if (ray->hit.primID == ray->ignorePrimID) {
-      ray->hit.geomID = RTC_INVALID_GEOMETRY_ID;
-      hit->geomID = RTC_INVALID_GEOMETRY_ID;
+      valid[0] = 0;
+      // ray->hit.geomID = RTC_INVALID_GEOMETRY_ID;
+      // hit->geomID = RTC_INVALID_GEOMETRY_ID;
     }
   }
 
