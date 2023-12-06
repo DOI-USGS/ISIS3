@@ -42,10 +42,6 @@ release.
 ### Fixed
 - Bug fix for Cnetthinner app resolving divide by zero in CnetManager.cpp. Issue: [#5354](https://github.com/USGS-Astrogeology/ISIS3/issues/5354), 
 - Updated photomet MinnaertEmpirical model to support photemplate-style PVL format [#3621](https://github.com/DOI-USGS/ISIS3/issues/3621)
-- Fix matrix inversion errors in <i>findfeatures</i> due to bad FASTGEOM matrix transforms using a more robust implementation to detect these errors and throw exceptions. Images with these errors are captured and logged to the <b>TONOTMATCHED</b> file. Fixes [#4639](https://github.com/DOI-USGS/ISIS3/issues/4639)
-- Fixed <i>findfeatures</i> use of projected mosaics with correct check for <b>TargetName</b> in the Mapping labels. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
-- Fixed a bug in the <i>cnetwinnow</i> test that did not clean/remove it during test runs.
-- Fixed <i>findfeatures</i> instantiation and use of projection classes to correctly return geometry data from projected images and mosaics. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
 - Fixed target name translation for any dawn images with target "4 CERES" [#5294](https://github.com/DOI-USGS/ISIS3/pull/5294)
 - Fixed exception pop ups in qview when viewing images created using the CSM Camera [#5259](https://github.com/DOI-USGS/ISIS3/pull/5295/files)
 - Fixed shadowtau input file parseing errors when using example file [#5316](https://github.com/DOI-USGS/ISIS3/pull/5316)
