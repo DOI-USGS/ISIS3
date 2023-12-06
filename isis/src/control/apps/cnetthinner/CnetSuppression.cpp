@@ -15,7 +15,6 @@ find files of those names at the top level of this repository. **/
 #include <QPair>
 #include <QRectF>
 #include <QSizeF>
-#include <QSharedPointer>
 #include <QString>
 #include <QStringList>
 
@@ -27,9 +26,6 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "Progress.h"
 
-#include "tnt/tnt_array2d.h"
-#include "tnt/tnt_array2d_utils.h"
-
 #define EARLY_TERMINATION  true
 #define RADIUS_CELLS        100
 
@@ -37,30 +33,31 @@ find files of those names at the top level of this repository. **/
 
 namespace Isis {
 
-/**
- * Constructs an empty CnetSuppression object.
- *
- */
+  /**
+   * Constructs an empty CnetSuppression object.
+   *
+   */
   CnetSuppression::CnetSuppression() : CnetManager(), m_cnet(), m_points(), m_results(),
                                        m_early_term(EARLY_TERMINATION),
                                        m_area() { }
 
-/**
- * Constructs a CentSuppression object using a filename and a weight.
- *
- * @param cnetfile Filename of the controlnet file.
- * @param weight Weight to apply to all points in controlnet.
- *
- * @throws IException::User "Control Net filename [FILENAME] is invalid."
- */
+  /**
+   * Constructs a CnetSuppression object using a filename and a weight.
+   *
+   * @param cnetfile Filename of the controlnet file.
+   * @param weight Weight to apply to all points in controlnet.
+   *
+   * @throws IException::User "Control Net filename [FILENAME] is invalid."
+   */
   CnetSuppression::CnetSuppression(const QString &cnetfile, const double &weight) :
                                    CnetManager( ), m_cnet(), m_points(), m_results(),
                                    m_early_term(EARLY_TERMINATION),
                                    m_area() {
 
     Progress progress;
+
     try {
-    m_cnet.reset(new ControlNet(cnetfile, &progress));
+      m_cnet.reset(new ControlNet(cnetfile, &progress));
     }
     catch (IException &e) {
       throw e;
@@ -71,11 +68,30 @@ namespace Isis {
   }
 
 
-/**
- * Constructs a CnetSuppression object using a CnetManager
- *
- * @param cman CnetManager used to construct a CnetSuppression.
- */
+  /**
+   * Constructs a CnetSuppression object using a QSharedPointer to a
+   * ControlNet object and a weight.
+   *
+   * @param cnet QSharedPointer to ControlNet object.
+   * @param weight Weight to apply to all points in ControlNet.
+   */
+  CnetSuppression::CnetSuppression(QSharedPointer<ControlNet> &cnet, const double &weight) :
+                                   CnetManager( ), m_cnet(), m_points(), m_results(),
+                                   m_early_term(EARLY_TERMINATION),
+                                   m_area() {
+
+    m_cnet = cnet;
+
+    m_points = m_cnet->take();
+    load(m_points, weight);
+  }
+
+
+  /**
+   * Constructs a CnetSuppression object using a CnetManager
+   *
+   * @param cman CnetManager used to construct a CnetSuppression.
+   */
   CnetSuppression::CnetSuppression(const CnetManager &cman) :
                                    CnetManager(cman),
                                    m_cnet(), m_points(),
@@ -83,42 +99,38 @@ namespace Isis {
                                    m_early_term(EARLY_TERMINATION),
                                    m_area() { }
 
-/**
- *
- * Destructor. Cleans up dynamically allocated control points.
- *
- */
-   CnetSuppression::~CnetSuppression() {
-     BOOST_FOREACH ( ControlPoint *p, m_points ) {
-       delete p;
-     }
-   }
+  /**
+   *
+   * Destructor.
+   *
+   */
+  CnetSuppression::~CnetSuppression() { }
 
 
-/**
- * Sets the early termiation flag
- *
- * @param state Will terminate early if true
- */
+  /**
+   * Sets the early termination flag
+   *
+   * @param state Will terminate early if true
+   */
   void CnetSuppression::setEarlyTermination(const bool &state) { //TODO this is not used right now at all?
     m_early_term = state;
     return;
   }
 
 
-/**
- * Performs a suppression on all cubes associated with the CnetSuppression object and returns the
- * results as a Results object. An input bitmask will be used to mask all pointsets associated with
- * all cubes before running the suppression.
- *
- * @param minpts minimum points to keep in the result set
- * @param maxpts maximum points to keep in the result set.
- * @param min_radius The minimum radius to use for the suppression calculation.
- * @param tolerance A multiplicative tolerance on the number of maxpoints to return.
- * @param bm A BitMask to apply to the input point set.
- *
- * @return @b CnetSuppression::Results The Results set for the suppression run.
- */
+  /**
+   * Performs a suppression on all cubes associated with the CnetSuppression object and returns the
+   * results as a Results object. An input bitmask will be used to mask all pointsets associated with
+   * all cubes before running the suppression.
+   *
+   * @param minpts minimum points to keep in the result set
+   * @param maxpts maximum points to keep in the result set.
+   * @param min_radius The minimum radius to use for the suppression calculation.
+   * @param tolerance A multiplicative tolerance on the number of maxpoints to return.
+   * @param bm A BitMask to apply to the input point set.
+   *
+   * @return @b CnetSuppression::Results The Results set for the suppression run.
+   */
   CnetSuppression::Results CnetSuppression::suppress(const int &minpts, const int &maxpts,
                                                      const double &min_radius,
                                                      const double &tolerance,
@@ -171,20 +183,20 @@ namespace Isis {
   }
 
 
-/**
- * Performs a suppression on the PointSet associated with a single cube as indicated by
- * its serial number and returns the results as a new PointSet. An input bitmask will
- * be used to mask the input pointset before running the suppression.
- *
- * @param serialno The serial number for the image/cube to run suppression on.
- * @param minpts The minimum possible points to keep after a suppression run.
- * @param maxpts The maximum possible points to keep after a suppression run.
- * @param min_radius The minimum radius to use for the suppression calculation.
- * @param tolerance A multiplicative tolerance on the number of maxpoints to return.
- * @param bm A BitMask to apply to the input point set.
- *
- * @return @b CnetSuppression::Results The Result set for the suppression run.
- */
+  /**
+   * Performs a suppression on the PointSet associated with a single cube as indicated by
+   * its serial number and returns the results as a new PointSet. An input bitmask will
+   * be used to mask the input pointset before running the suppression.
+   *
+   * @param serialno The serial number for the image/cube to run suppression on.
+   * @param minpts The minimum possible points to keep after a suppression run.
+   * @param maxpts The maximum possible points to keep after a suppression run.
+   * @param min_radius The minimum radius to use for the suppression calculation.
+   * @param tolerance A multiplicative tolerance on the number of maxpoints to return.
+   * @param bm A BitMask to apply to the input point set.
+   *
+   * @return @b CnetSuppression::Results The Result set for the suppression run.
+   */
   CnetSuppression::Results CnetSuppression::suppress(const QString &serialno, const int minpts,
                                                      const int &maxpts, const double &min_radius,
                                                      const double &tolerance,
@@ -199,19 +211,19 @@ namespace Isis {
   }
 
 
-/**
- * Performs a suppression on the input PointSet and returns the result as a new PointSet.
- * An input bitmask will be used to mask the input pointset before running the suppression.
- *
- * @param points The point set to run suppression on.
- * @param minpts The minimum possible points to keep after a suppression run.
- * @param maxpts The maximum possible points to keep after a suppression run.
- * @param min_radius The minimum radius to use for the suppression calculation.
- * @param tolerance A tolerance factor which scales the size of the search space for suppression.
- * @param bm A BitMask to apply to the input point set.
- *
- * @return @b CnetSuppression::Results The Result set for the suppression run.
- */
+  /**
+   * Performs a suppression on the input PointSet and returns the result as a new PointSet.
+   * An input bitmask will be used to mask the input pointset before running the suppression.
+   *
+   * @param points The point set to run suppression on.
+   * @param minpts The minimum possible points to keep after a suppression run.
+   * @param maxpts The maximum possible points to keep after a suppression run.
+   * @param min_radius The minimum radius to use for the suppression calculation.
+   * @param tolerance A tolerance factor which scales the size of the search space for suppression.
+   * @param bm A BitMask to apply to the input point set.
+   *
+   * @return @b CnetSuppression::Results The Result set for the suppression run.
+   */
   CnetSuppression::Results CnetSuppression::suppress(const CnetSuppression::PointSet &points,
                                                      const int &minpts, const int &maxpts,
                                                      const double &min_radius,
@@ -353,14 +365,14 @@ namespace Isis {
   }
 
 
-/**
- * Write out a Results object to an output control network.
- *
- * @param onetfile Filename for output control network
- * @param result Object containin the results of a suppression calculation
- * @param saveall If true, copies all points to the output control net, even if ignored.
- * @param netid Control networkd id
- */
+  /**
+   * Write out a Results object to an output control network.
+   *
+   * @param onetfile Filename for output control network
+   * @param result Object containing the results of a suppression calculation
+   * @param saveall If true, copies all points to the output control net, even if ignored.
+   * @param netid Control network id
+   */
   void CnetSuppression::write(const QString &onetfile, const Results &result,
                               const bool saveall, const QString &netid) {
     // Create new network
@@ -399,49 +411,49 @@ namespace Isis {
   }
 
 
-/**
- * Gets the control net associated with the CnetSuppresssion.
- *
- * @return @b const ControlNet* The control net for this CnetSuppression
- */
+  /**
+   * Gets the control net associated with the CnetSuppresssion.
+   *
+   * @return @b const ControlNet* The control net for this CnetSuppression
+   */
   const ControlNet *CnetSuppression::net() const {
     return ( m_cnet.data() );
   }
 
 
-/**
- * Gets the index of an input IndexPoint
- *
- * @param p An IndexPoint to get the index of.
- *
- * @return @b int The index of the input index point.
- */
+  /**
+   * Gets the index of an input IndexPoint
+   *
+   * @param p An IndexPoint to get the index of.
+   *
+   * @return @b int The index of the input index point.
+   */
   int CnetSuppression::index(const CnetSuppression::IndexPoint &p) const {
     return (p.first);
   }
 
 
-/**
- * Gets the control measure from the input IndexPoint.
- *
- * @param p The IndexPoint to get the control measure from
- *
- * @return @b ControlMeasure* The control measure of the input IndexPoint
- */
-   ControlMeasure *CnetSuppression::measure(const CnetSuppression::IndexPoint &p) const {
+  /**
+   * Gets the control measure from the input IndexPoint.
+   *
+   * @param p The IndexPoint to get the control measure from
+   *
+   * @return @b ControlMeasure* The control measure of the input IndexPoint
+   */
+  ControlMeasure *CnetSuppression::measure(const CnetSuppression::IndexPoint &p) const {
     return ( p.second );
   }
 
 
-/**
- * Create a BitMask of a specified size for an input PointSet.
- *
- * @param nbits The size of a BitMask to create.
- * @param p The PointSet used to create a BitMask.
- *
- * @return @b CnetSuppression::BitMask A bit mask with entires set to true if their index is in the
- *                             input PointSet.
- */
+  /**
+   * Create a BitMask of a specified size for an input PointSet.
+   *
+   * @param nbits The size of a BitMask to create.
+   * @param p The PointSet used to create a BitMask.
+   *
+   * @return @b CnetSuppression::BitMask A bit mask with entires set to true if their index is in
+   *                             the input PointSet.
+   */
   CnetSuppression::BitMask CnetSuppression::maskPoints(int nbits,
                                                         const CnetSuppression::PointSet &p)
                                                         const {
@@ -455,19 +467,18 @@ namespace Isis {
   }
 
 
-/**
- * Use an input BitMask to mask the input PointSet, and return the results.
- *
- * @param bm BitMask contining true for indices to keep and false for indicies to get rid of.
- * @param pset The PointSet to apply the BitMask to.
- *
- * @return @b CnetSuppression::PointSet A PointSet containing only the points not masked out.
- */
+  /**
+   * Use an input BitMask to mask the input PointSet, and return the results.
+   *
+   * @param bm BitMask contining true for indices to keep and false for indicies to get rid of.
+   * @param pset The PointSet to apply the BitMask to.
+   *
+   * @return @b CnetSuppression::PointSet A PointSet containing only the points not masked out.
+   */
   CnetSuppression::PointSet CnetSuppression::contains(const CnetSuppression::BitMask &bm,
                                                       const CnetSuppression::PointSet &pset) const {
     PointSet result;
     if ( bm.dim1() == 0 ) { return (result); }
-
 
     BOOST_FOREACH ( const IndexPoint &p, pset) {
       BOOST_ASSERT ( index(p) < bm.dim1() );
@@ -479,15 +490,15 @@ namespace Isis {
   }
 
 
-/**
- * Calculates the (x,y) coordinates for an IndexPoint inside of a cell
- * of input size.
- *
- * @param p The index point to calculate the x_center and y_center of.
- * @param cell_size Size of the cell.
- * @param x_center The x-coordinate of the center of the cell (Result).
- * @param y_center The y-coordinate of the center of the cell (Result).
- */
+  /**
+   * Calculates the (x,y) coordinates for an IndexPoint inside of a cell
+   * of input size.
+   *
+   * @param p The index point to calculate the x_center and y_center of.
+   * @param cell_size Size of the cell.
+   * @param x_center The x-coordinate of the center of the cell (Result).
+   * @param y_center The y-coordinate of the center of the cell (Result).
+   */
   void CnetSuppression::cellIndex(const CnetSuppression::IndexPoint &p,
                                   const double &cell_size,
                                   int &x_center, int &y_center) const {
@@ -497,14 +508,14 @@ namespace Isis {
   }
 
 
-/**
- * Determine the number of (x,y) positions in the input grid which are set to true.
- *
- * @param grid The grid to calculate the number of covered points from.
- *
- * @return @b int The number of convered points; the number of (x,y) positions for which the bitmask
- *                is set to true.
- */
+  /**
+   * Determine the number of (x,y) positions in the input grid which are set to true.
+   *
+   * @param grid The grid to calculate the number of covered points from.
+   *
+   * @return @b int The number of convered points; the number of (x,y) positions for which the
+   *                bitmask is set to true.
+   */
   int CnetSuppression::nCovered(const CnetSuppression::GridMask &grid) const {
     int ncov(0);
     for ( int x = 0 ; x < grid.dim1() ; x++) {
@@ -516,17 +527,17 @@ namespace Isis {
   }
 
 
-/**
- * Update a grid to contain true values where it is covered by cells as defined by the input
- * PointSet.
- *
- * @param grid The grid to update by setting to true grid entries which are contained within cells
- *             definted by the input PointSet.
- * @param points The input PointSet to use to update the grid.
- * @param cell_size The size of a cell.
- *
- * @return @b int The number of grid entries updated.
- */
+  /**
+   * Update a grid to contain true values where it is covered by cells as defined by the input
+   * PointSet.
+   *
+   * @param grid The grid to update by setting to true grid entries which are contained within cells
+   *             definted by the input PointSet.
+   * @param points The input PointSet to use to update the grid.
+   * @param cell_size The size of a cell.
+   *
+   * @return @b int The number of grid entries updated.
+   */
   int CnetSuppression::cover(CnetSuppression::GridMask &grid,
                              const CnetSuppression::PointSet &points,
                              const double &cell_size) const {
@@ -540,18 +551,18 @@ namespace Isis {
   }
 
 
-/**
- * Update a grid to contain true values where it overlaps a rectangle defined by the
- * input paramters and return the number of values contained in this rectange.
- *
- * @param grid The grid to update by setting to true grid entries contained within the
- *             rectangle defined by the paramters passed to this function.
- * @param x_center The x-coordinate of the center of the grid.
- * @param y_center The y-coordinate of the center of the grid.
- * @param cell_size The size of a cell.
- *
- * @return @b int The number of covered cells.
- */
+  /**
+   * Update a grid to contain true values where it overlaps a rectangle defined by the
+   * input paramters and return the number of values contained in this rectange.
+   *
+   * @param grid The grid to update by setting to true grid entries contained within the
+   *             rectangle defined by the paramters passed to this function.
+   * @param x_center The x-coordinate of the center of the grid.
+   * @param y_center The y-coordinate of the center of the grid.
+   * @param cell_size The size of a cell.
+   *
+   * @return @b int The number of covered cells.
+   */
   int CnetSuppression::cover(CnetSuppression::GridMask &grid,
                              const int &x_center, const int &y_center,
                              const double &cell_size) const {
@@ -576,14 +587,14 @@ namespace Isis {
   }
 
 
-/**
- * Merge two PointSets together and return the result.
- *
- * @param s1 The first PointSet to be merged.
- * @param s2 The second PointSet to be merged.
- *
- * @return @b CnetSuppression::PointSet The merged PointSet.
- */
+  /**
+   * Merge two PointSets together and return the result.
+   *
+   * @param s1 The first PointSet to be merged.
+   * @param s2 The second PointSet to be merged.
+   *
+   * @return @b CnetSuppression::PointSet The merged PointSet.
+   */
   CnetSuppression::PointSet CnetSuppression::merge(const CnetSuppression::PointSet &s1,
                                                    const CnetSuppression::PointSet &s2) const {
     BitMask bm2 = maskPoints(size(), s2);
@@ -597,14 +608,14 @@ namespace Isis {
   }
 
 
-/**
- * Merge two CnetSuppression::Results objects together and return the result.
- *
- * @param r1 The first Results to be merged.
- * @param r2 The second Results to be merged.
- *
- * @return @b CnetSuppression::Results The merged Results.
- */
+  /**
+   * Merge two CnetSuppression::Results objects together and return the result.
+   *
+   * @param r1 The first Results to be merged.
+   * @param r2 The second Results to be merged.
+   *
+   * @return @b CnetSuppression::Results The merged Results.
+   */
   CnetSuppression::Results CnetSuppression::merge(const CnetSuppression::Results &r1,
                                                   const CnetSuppression::Results &r2) const {
     if ( !r1.isValid() ) { return (r2); }
@@ -633,14 +644,14 @@ namespace Isis {
   }
 
 
-/**
- * Calculates the ratio between the area contained in a square of side-length d and the area
- * of the CnetSuppression.
- *
- * @param d The length of a side of a square.
- *
- * @return @b double The fraction: area of a square of size d / the area of the CnetSuppression.
- */
+  /**
+   * Calculates the ratio between the area contained in a square of side-length d and the area
+   * of the CnetSuppression.
+   *
+   * @param d The length of a side of a square.
+   *
+   * @return @b double The fraction: area of a square of size d / the area of the CnetSuppression.
+   */
   double CnetSuppression::getScale(const QSizeF &d) const {
     if ( m_area.isEmpty() ) {  m_area = d;  }
     double area = d.width() * d.height();
@@ -649,14 +660,14 @@ namespace Isis {
   }
 
 
-/**
- * Computes and returns the bitwise 'or' of the two input bitmasks.
- *
- * @param b1 First input BitMask
- * @param b2 Second input BitMask
- *
- * @return @b CnetSuppression::BitMask A BitMask which is the bitwise result of 'b1 or b2'
- */
+  /**
+   * Computes and returns the bitwise 'or' of the two input bitmasks.
+   *
+   * @param b1 First input BitMask
+   * @param b2 Second input BitMask
+   *
+   * @return @b CnetSuppression::BitMask A BitMask which is the bitwise result of 'b1 or b2'
+   */
    CnetSuppression::BitMask CnetSuppression::orMasks(const CnetSuppression::BitMask &b1,
                                                      const CnetSuppression::BitMask &b2) const {
     BOOST_ASSERT ( b1.dim1() == b2.dim1() );
@@ -668,20 +679,20 @@ namespace Isis {
   }
 
 
-/**
- * Creates and returns a vector which contains num entries, starting at dmin and ending at dmax.
- * The entires in-between span the space between dmin and dmax with equal steps each time. The
- * entire vector is multiplied by an input scale factor.
- *
- * @param dmin The minimum value of the vector.
- * @param dmax The maximum value of the vector.
- * @param num The number of entries that should be in the returned vector.
- * @param scale Multiplicative scale factor to multiply the entire vector by.
- *
- * @return @b QVector<double> A vector of size num with entries starting at dmin and ending
- *            at dmax with values of equal increment spanning the space between them and
- *            with all entries multiplied by scale.
- */
+  /**
+   * Creates and returns a vector which contains num entries, starting at dmin and ending at dmax.
+   * The entires in-between span the space between dmin and dmax with equal steps each time. The
+   * entire vector is multiplied by an input scale factor.
+   *
+   * @param dmin The minimum value of the vector.
+   * @param dmax The maximum value of the vector.
+   * @param num The number of entries that should be in the returned vector.
+   * @param scale Multiplicative scale factor to multiply the entire vector by.
+   *
+   * @return @b QVector<double> A vector of size num with entries starting at dmin and ending
+   *            at dmax with values of equal increment spanning the space between them and
+   *            with all entries multiplied by scale.
+   */
   QVector<double> CnetSuppression::linspace(const double dmin,
                                             const double dmax,
                                             const int num,
