@@ -10,7 +10,7 @@ find files of those names at the top level of this repository. **/
 
 #include <vector>
 
-#include <embree2/rtcore.h>
+#include <embree3/rtcore.h>
 
 #include <QMap>
 #include <QVector>

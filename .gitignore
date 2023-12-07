@@ -47,6 +47,7 @@ print.prt
 */tsts/*/output/*
 */build/
 build/
+*build*/
 install/
 
 # Unignore the documentation build
