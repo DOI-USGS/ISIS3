@@ -30,10 +30,10 @@
     </p>
 
     <p>
-      This program should be started by typing its name in a terminal, with no arguments. 
-      This will start blank versions of the main Qnet window and the control network 
-      navigator window.
-      
+      This program is an ISIS GUI application. To run it, type its name in a
+      terminal, with no arguments. This will start a blank session, having the
+      main Qnet window and the control network navigator window.
+
       There are 3 core windows used in this application.
     </p>
 
