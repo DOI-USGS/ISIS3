@@ -183,7 +183,7 @@ void sanitize(std::string &input);
                                     imageLocus.direction.z};
 
     // Save off the look vector
-    bool intersect = SetLookDirection(locusVec);
+    SetLookDirection(locusVec);
     if (!m_et) {
       m_et = new iTime();
     }
@@ -191,7 +191,7 @@ void sanitize(std::string &input);
     setTime(*m_et);
     if (target()->isSky()) {
       target()->shape()->setHasIntersection(false);
-      return false;
+      return true;
     }
 
     // Check for a ground intersection
@@ -460,10 +460,14 @@ void sanitize(std::string &input);
    * @returns @b double The line resolution in meters per pixel
    */
   double CSMCamera::LineResolution() {
-    vector<double> imagePartials = ImagePartials();
-    return sqrt(imagePartials[0]*imagePartials[0] +
-                imagePartials[2]*imagePartials[2] +
-                imagePartials[4]*imagePartials[4]);
+    if (HasSurfaceIntersection()) {
+      vector<double> imagePartials = ImagePartials();
+      return sqrt(imagePartials[0]*imagePartials[0] +
+                  imagePartials[2]*imagePartials[2] +
+                  imagePartials[4]*imagePartials[4]);
+    }
+
+    return Isis::Null;
   }
 
 
@@ -477,10 +481,14 @@ void sanitize(std::string &input);
    * @returns @b double The sample resolution in meters per pixel
    */
   double CSMCamera::SampleResolution() {
-    vector<double> imagePartials = ImagePartials();
-    return sqrt(imagePartials[1]*imagePartials[1] +
-                imagePartials[3]*imagePartials[3] +
-                imagePartials[5]*imagePartials[5]);
+    if (HasSurfaceIntersection()) {
+      vector<double> imagePartials = ImagePartials();
+      return sqrt(imagePartials[1] * imagePartials[1] +
+                  imagePartials[3] * imagePartials[3] +
+                  imagePartials[5] * imagePartials[5]);
+    }
+
+    return Isis::Null;
   }
 
 
@@ -494,16 +502,20 @@ void sanitize(std::string &input);
    * @returns @b double The detector resolution in meters per pixel
    */
   double CSMCamera::DetectorResolution() {
-    // Redo the line and sample resolution calculations because it avoids
-    // a call to ImagePartials which could be a costly call
-    vector<double> imagePartials = ImagePartials();
-    double lineRes =  sqrt(imagePartials[0]*imagePartials[0] +
-                           imagePartials[2]*imagePartials[2] +
-                           imagePartials[4]*imagePartials[4]);
-    double sampRes =  sqrt(imagePartials[1]*imagePartials[1] +
-                           imagePartials[3]*imagePartials[3] +
-                           imagePartials[5]*imagePartials[5]);
-    return (sampRes + lineRes) / 2.0;
+    if (HasSurfaceIntersection()) {
+      // Redo the line and sample resolution calculations because it avoids
+      // a call to ImagePartials which could be a costly call
+      vector<double> imagePartials = ImagePartials();
+      double lineRes =  sqrt(imagePartials[0]*imagePartials[0] +
+                            imagePartials[2]*imagePartials[2] +
+                            imagePartials[4]*imagePartials[4]);
+      double sampRes =  sqrt(imagePartials[1]*imagePartials[1] +
+                            imagePartials[3]*imagePartials[3] +
+                            imagePartials[5]*imagePartials[5]);
+      return (sampRes + lineRes) / 2.0;
+    }
+    
+    return Isis::Null;
   }
 
 
@@ -1249,7 +1261,7 @@ void sanitize(std::string &input);
    */
   double CSMCamera::RightAscension() {
     if (bodyRotation() == NULL || m_model == NULL) {
-      QString msg = "Image doesn't have attached body rotations, try running csminit " + 
+      QString msg = "Image doesn't have attached body rotations, try running csminit "
                     "again with an ISD that contains body rotations";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
