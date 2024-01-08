@@ -35,10 +35,7 @@ release.
 
 ## [Unreleased]
 
-### Added
-- Added new csm plugins path to IsisPreferences [#5397](https://github.com/DOI-USGS/ISIS3/pull/5397)
-
-## [8.1.0] - 2023-12-05
+## [8.1.0] - 2024-01-08
 
 ### Changed
 - Cnetthinner has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5354](https://github.com/USGS-Astrogeology/ISIS3/issues/5354), 
@@ -67,6 +64,7 @@ release.
 - Added ability to delegate calculation of nadir pointing to ALE [#5117](https://github.com/USGS-Astrogeology/ISIS3/issues/5117)
 - Added --no-kernels flag to downloadIsisData [#5264](https://github.com/DOI-USGS/ISIS3/issues/5264)
 - Added notice for depreciation to PvlObject::addLogGroup function which will be depreciated in favor of Application::appendAndLog(https://github.com/DOI-USGS/ISIS3/issues/5310)
+- Added new csm plugins path to IsisPreferences [#5397](https://github.com/DOI-USGS/ISIS3/pull/5397)
 
 ### Deprecated
 
