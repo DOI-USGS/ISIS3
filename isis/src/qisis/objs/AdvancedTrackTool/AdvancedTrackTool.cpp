@@ -387,7 +387,7 @@ namespace Isis {
 
           /*180 Positive West Lon.  */
           p_tableWin->table()->item(row, getIndex("180 Positive West Longitude"))->setText(
-                              QString::number(TProjection::To180Domain(lon), 'f', 15));
+                               QString::number(TProjection::To180Domain(lon), 'f', 15));
 
           // Next write out columns, the x/y/z position of the lat/lon, only if set image succeeds
           double pos[3];
