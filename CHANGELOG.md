@@ -48,6 +48,7 @@ release.
   outputsuffix, both, or neither for naming convention purposes. [#5162](https://github.com/DOI-USGS/ISIS3/pull/5162)
 - Changed the default PCK load behavior to try and load mission specific PCKs, if that fails we default to the base PCKs [#5335](https://github.com/DOI-USGS/ISIS3/pull/5335)
 - Disabled option to use web=true when running spiceinit with HRSC images. [#5223](https://github.com/DOI-USGS/ISIS3/issues/5223)
+- Set build option `pybindings=ON` in `build.sh` to turn on python bindings. [#5389](https://github.com/DOI-USGS/ISIS3/pull/5389)
 
 ### Added
 - Added rclone to run dependencies in meta.yaml [#5183](https://github.com/DOI-USGS/ISIS3/issues/5183)
