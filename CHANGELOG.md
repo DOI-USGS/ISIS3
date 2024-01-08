@@ -35,6 +35,9 @@ release.
 
 ## [Unreleased]
 
+### Added
+- Added new csm plugins path to IsisPreferences [#5397](https://github.com/DOI-USGS/ISIS3/pull/5397)
+
 ## [8.1.0] - 2023-12-05
 
 ### Changed
