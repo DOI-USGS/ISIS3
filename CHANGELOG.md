@@ -38,6 +38,9 @@ release.
 ### Added
 - Added new csm plugins path to IsisPreferences [#5397](https://github.com/DOI-USGS/ISIS3/pull/5397)
 
+### Fixed
+- Fixed <i>noproj</i> bug where missing shapemodel-related keywords (RayTraceEngine, BulletParts, Tolerance) are dropped when the output label is created. This resulted in the Bullet collision detection engine not being used. Issue: [#5377](https://github.com/USGS-Astrogeology/ISIS3/issues/5377)
+
 ## [8.1.0] - 2023-12-05
 
 ### Changed
@@ -73,7 +76,7 @@ release.
 ### Removed
 
 ### Fixed
-- Bug fix for Cnetthinner app resolving divide by zero in CnetManager.cpp. Issue: [#5354](https://github.com/USGS-Astrogeology/ISIS3/issues/5354), 
+- Bug fix for Cnetthinner app resolving divide by zero in CnetManager.cpp. Issue: [#5354](https://github.com/USGS-Astrogeology/ISIS3/issues/5354) 
 - Updated photomet MinnaertEmpirical model to support photemplate-style PVL format [#3621](https://github.com/DOI-USGS/ISIS3/issues/3621)
 - Fix matrix inversion errors in <i>findfeatures</i> due to bad FASTGEOM matrix transforms using a more robust implementation to detect these errors and throw exceptions. Images with these errors are captured and logged to the <b>TONOTMATCHED</b> file. Fixes [#4639](https://github.com/DOI-USGS/ISIS3/issues/4639)
 - Fixed <i>findfeatures</i> use of projected mosaics with correct check for <b>TargetName</b> in the Mapping labels. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)
