@@ -67,6 +67,15 @@
     <change name="Kaitlyn Lee" date="2021-03-31">
       Refactored app to be callable and converted its tests to GTests.
     </change>
+    <change name="Kris Becker" date="2021-05-06">
+          Added checks for ray tracing options in UofA OSIRIS-REx ISIS code base.
+          The keywords needed for Bullet to operate properly are RayTraceEngine,
+          BulletParts, and Tolerance. These parameters must be included in the
+          output label in order for cam2cam to run and subsequent use is consistent.
+    </change>
+    <change name="Ken Edmundson" date="2023-12-14">
+          Incorporated Kris Becker's 2021-05-06 bug fix above into USGS code base.
+    </change>
   </history>
 
   <category>
