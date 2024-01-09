@@ -45,7 +45,7 @@ build:
 # Shotgun strat on requirements until we can narrow them down
 requirements:
   build:
-   - ale=0.9.1
+   - ale=0.10.0
    - aom
    - armadillo
    - boost=1.72

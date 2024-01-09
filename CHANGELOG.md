@@ -49,6 +49,7 @@ release.
 - Changed the default PCK load behavior to try and load mission specific PCKs, if that fails we default to the base PCKs [#5335](https://github.com/DOI-USGS/ISIS3/pull/5335)
 - Disabled option to use web=true when running spiceinit with HRSC images. [#5223](https://github.com/DOI-USGS/ISIS3/issues/5223)
 - Set build option `pybindings=ON` in `build.sh` to turn on python bindings. [#5389](https://github.com/DOI-USGS/ISIS3/pull/5389)
+- Updated Ale to version 0.10.0 [#5399](https://github.com/DOI-USGS/ISIS3/pull/5399)
 
 ### Added
 - Added rclone to run dependencies in meta.yaml [#5183](https://github.com/DOI-USGS/ISIS3/issues/5183)
