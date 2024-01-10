@@ -95,8 +95,8 @@ requirements:
    - pcl >=1.10,<2
    - plio
    - protobuf
-   - python =3.12
-   - python_abi =3.12
+   - python >=3.10
+   - python_abi >=3.10
    - pytest
    - rclone
    - qhull
