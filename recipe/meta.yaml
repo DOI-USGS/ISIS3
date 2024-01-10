@@ -141,7 +141,6 @@ requirements:
   - inja
   - jama
   - {{ pin_compatible('jasper', max_pin='x.x') }}
-  - {{ pin_compatible('jpeg', max_pin='x') }}
   - {{ pin_compatible('kakadu', max_pin='x') }}
   - libcxx
   - libopenblas
