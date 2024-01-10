@@ -72,7 +72,6 @@ requirements:
    - icu
    - inja
    - jama
-   - jpeg
    - usgs-astrogeology::kakadu==1
    - krb5
    - libboost >=1.72.0,<2
@@ -95,8 +94,8 @@ requirements:
    - pcl >=1.10,<2
    - plio
    - protobuf
-   - python =3.12
-   - python_abi =3.12
+   - python >=3.11
+   - python_abi >=3.11
    - pytest
    - rclone
    - qhull
