@@ -260,7 +260,10 @@ namespace Isis {
         bool isTable = false;
         bool isFrameCode = kernelsKeyword.isNamed("NaifFrameCode") ||
                            kernelsKeyword.isNamed("NaifIkCode");
-        bool isShapeModel = kernelsKeyword.isNamed("ShapeModel");
+        bool isShapeModel = kernelsKeyword.isNamed("ShapeModel") ||
+                            kernelsKeyword.isNamed("RayTraceEngine") ||
+                            kernelsKeyword.isNamed("BulletParts") ||
+                            kernelsKeyword.isNamed("Tolerance");
 
         for (int keyValueIndex = 0; keyValueIndex < kernelsKeyword.size(); keyValueIndex++) {
           if (kernelsKeyword[keyValueIndex] == "Table") {
