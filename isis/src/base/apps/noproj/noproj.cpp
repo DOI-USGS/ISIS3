@@ -3,17 +3,14 @@
 #include <iostream>
 #include <sstream>
 #include <QString>
+#include <QStringList>
 
 #include "AlphaCube.h"
-#include "Application.h"
-#include "Blob.h"
 #include "cam2cam.h"
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
-#include "History.h"
 #include "iTime.h"
 #include "Process.h"
-#include "ProgramLauncher.h"
 #include "Pvl.h"
 #include "PvlObject.h"
 
@@ -26,6 +23,8 @@ namespace Isis {
   static void storeSpice(PvlGroup *instrumentGroup, PvlObject *naifKeywordsObject,
                   QString oldName, QString spiceName,
                   double constantCoeff, double multiplierCoeff, bool putMultiplierInX);
+
+  QStringList findAllDetachedFiles(const PvlObject &object);
 
   /**
    * Remove camera distortions in a raw level 1 cube.
@@ -44,7 +43,7 @@ namespace Isis {
     if((ui.WasEntered("MATCH"))) {
       mcube.open(ui.GetCubeName("MATCH"));
     }
-
+    
     noproj(&icube, &mcube, ui);
   }
 
@@ -191,6 +190,7 @@ namespace Isis {
     //   1) the idealInstrument pvl if there or
     //   2) the input size expanded by user specified percentage
     Cube *ocube = p.SetOutputCube(matchCubeFile.expanded(), cao, 1, 1, 1);
+    
     // Extract the times and the target from the instrument group
     QString startTime = inst["StartTime"];
     QString stopTime;
@@ -352,40 +352,39 @@ namespace Isis {
 
     p.EndProcess();
 
-  // Now adjust the label to fake the true size of the image to match without
-  // taking all the space it would require for the image data
+    // Now adjust the label to fake the true size of the image to match without
+    // taking all the space it would require for the image data
     Pvl label;
-    label.read(matchCubeFileNoExt + ".lbl");
+    QString matchLbl = matchCubeFileNoExt + ".lbl";
+    label.read(matchLbl);
     PvlGroup &dims = label.findGroup("Dimensions", Pvl::Traverse);
     dims["Lines"] = toString(numberLines);
     dims["Samples"] = toString(detectorSamples);
     dims["Bands"] = toString(numberBands);
-    label.write(matchCubeFileNoExt + ".lbl");
+    label.write(matchLbl);
 
-  // And run cam2cam to apply the transformation
+    // And run cam2cam to apply the transformation
     QVector<QString> args = {"to=" + ui.GetCubeName("TO"), "INTERP=" + ui.GetString("INTERP")};
     UserInterface cam2camUI(FileName("$ISISROOT/bin/xml/cam2cam.xml").expanded(), args);
     Cube matchCube;
     matchCube.open(matchCubeFile.expanded(), "rw");
     cam2cam(icube, &matchCube, cam2camUI);
 
-  //  Cleanup by deleting the match files
-    remove((matchCubeFileNoExt + ".History.IsisCube").toStdString().c_str());
-    remove((matchCubeFileNoExt + ".lbl").toStdString().c_str());
-    remove(matchCubeFile.expanded().toStdString().c_str());
-    remove((matchCubeFileNoExt + ".OriginalLabel.IsisCube").toStdString().c_str());
-    remove((matchCubeFileNoExt + ".Table.BodyRotation").toStdString().c_str());
-    remove((matchCubeFileNoExt + ".Table.HiRISE Ancillary").toStdString().c_str());
-    remove((matchCubeFileNoExt + ".Table.HiRISE Calibration Ancillary").toStdString().c_str());
-    remove((matchCubeFileNoExt + ".Table.HiRISE Calibration Image").toStdString().c_str());
-    remove((matchCubeFileNoExt + ".Table.InstrumentPointing").toStdString().c_str());
-    remove((matchCubeFileNoExt + ".Table.InstrumentPosition").toStdString().c_str());
-    remove((matchCubeFileNoExt + ".Table.SunPosition").toStdString().c_str());
+    // Cleanup by deleting the match files
+    QStringList detfiles = findAllDetachedFiles( label );
+    detfiles.append(matchLbl);
 
-  // Finally finish by adding the OriginalInstrument group to the TO cube
+    // Now actually remove the files
+    foreach (const QString &dfile, detfiles ) {
+      std::string  dtf = dfile.toStdString();
+      remove ( dtf.c_str() );
+    }
+
+    // Finally finish by adding the OriginalInstrument group to the TO cube
     Cube toCube;
     toCube.open(ui.GetCubeName("TO"), "rw");
-  // Extract label and create cube object
+  
+    // Extract label and create cube object
     Pvl *toLabel = toCube.label();
     PvlObject &o = toLabel->findObject("IsisCube");
     o.deleteGroup("OriginalInstrument");
@@ -396,6 +395,7 @@ namespace Isis {
     if (o.hasGroup("AlphaCube")) {
       o.deleteGroup("AlphaCube");
     }
+
     toCube.close();
   }
 
@@ -421,4 +421,27 @@ namespace Isis {
       naifKeywordsObject->addKeyword(spiceKeyword, Pvl::Replace);
     }
   }
+
+  // Find all detached filenames specified in objects in the label
+  QStringList findAllDetachedFiles(const PvlObject &object) {
+
+    // Check this object for a detached file spec
+    QStringList detfiles;
+    QString dfilename = "^" + object.name();
+    if ( object.hasKeyword(dfilename) ) {
+      QString detname = object[dfilename];
+      detfiles.append(detname);
+    }
+
+    // Now check all objects contain in this object
+    for (int i_obj = 0; i_obj <  object.objects(); i_obj++) {
+      const PvlObject &obj = object.object(i_obj);
+      QStringList files = findAllDetachedFiles(obj);
+      if ( files.size() > 0 ) {
+        detfiles.append(files);
+      }    
+    }
+  
+    return ( detfiles );
+  }  
 }

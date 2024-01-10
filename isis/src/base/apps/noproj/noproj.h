@@ -5,8 +5,8 @@
 #include "UserInterface.h"
 
 namespace Isis{
-  extern void noproj(Cube *icube, Cube *mcube, UserInterface &ui);
   extern void noproj(UserInterface &ui);
+  extern void noproj(Cube *icube, Cube *mcube, UserInterface &ui);
 }
 
 #endif
