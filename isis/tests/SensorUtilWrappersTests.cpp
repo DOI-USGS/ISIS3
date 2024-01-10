@@ -11,6 +11,7 @@
 #include "IsisIlluminator.h"
 #include "IsisSensor.h"
 #include "IsisShape.h"
+#include "IsisBody.h"
 #include "SurfacePoint.h"
 
 // Custom csm equality operators for mock matching
@@ -64,6 +65,23 @@ TEST(IsisIlluminator, PositionOldTime) {
   IsisIlluminator testIlluminator(&mockSpice);
 
   EXPECT_EQ(testIlluminator.position(testTime), testPosM);
+}
+
+TEST(IsisIlluminator, Velocity) {
+  double testTime = 10.0;
+  std::vector<double> testVelKm = {-1.0, 1.0, 2.0};
+  SensorUtilities::Vec testVelM = {-1000.0, 1000.0, 2000.0};
+
+  MockSpicePosition mockSpice(0, 1);
+  EXPECT_CALL(mockSpice, EphemerisTime)
+        .WillRepeatedly(::testing::Return(testTime));
+
+  EXPECT_CALL(mockSpice, Velocity)
+        .WillRepeatedly(::testing::ReturnRef(testVelKm));
+
+  IsisIlluminator testIlluminator(&mockSpice);
+
+  EXPECT_EQ(testIlluminator.velocity(testTime), testVelM);
 }
 
 TEST(IsisShape, IntersectStandardNormal) {

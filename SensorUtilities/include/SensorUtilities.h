@@ -9,7 +9,6 @@
 
 namespace SensorUtilities {
 
-
   /**
    * Structure for storing the state of an observer at a specific image coordinate
    * and time.
@@ -85,8 +84,30 @@ namespace SensorUtilities {
        * Get the position for the illumination source at a given time.
        */
       virtual Vec position(double time) = 0;
+      /**
+       * Get the velocity for the illumination source at a given time.
+       */
+      virtual Vec velocity(double time) = 0;
   };
 
+  /**
+   * Interface for the location of the body source.
+   * Implementations of this interface operate in object space.
+   */
+  class Body {
+    public:
+      /**
+       * Get the rotation matrix for the body source at a given time.
+       */
+      virtual std::vector<double> rotation(double time) = 0;
+
+      /**
+       * J2000 position vector to BodyFixed position vector. 
+       * 
+       * @param pos J2000 position to get as a bodyFixed vector   
+      */
+      virtual Vec fixedVector(Vec pos) = 0;
+  };
 
   /**
    * Compute the phase angle at an image point.
@@ -125,6 +146,22 @@ namespace SensorUtilities {
    * @return The distance to the illuminator in meters
    */
   double illuminationDistance(const ImagePt &imagePoint, Sensor *sensor, Shape *shape, Illuminator *illuminator);
+
+
+  /**
+   * Return the distance between the spacecraft and surface point.
+   *
+   * @return the distance in meters
+   */
+  double slantDistance(ImagePt imagePoint, Sensor *sensor, Shape *shape);
+
+
+  /**
+   * Return the distance between the spacecraft and center point of a body.
+   *
+   * @return the distance in meters
+   */
+  double targetCenterDistance(ImagePt &imagePoint, Sensor *sensor, Body *body);
 
 
   /**
@@ -173,7 +210,63 @@ namespace SensorUtilities {
    * @return The local radius in meters
    */
   double localRadius(const GroundPt2D &groundPt, Shape *shape, double maxRadius=1e9);
+
+
+  /**
+   * Computes the right ascension angle (sky longitude) and declination angle (sky latitude).
+   * 
+   * @returns right ascension angle in degrees and declination angle in degrees.
+   */
+  RaDec rightAscensionDeclination(ImagePt &imagePoint, Sensor *sensor);
+
+
+  /**
+   * Computes the local solar time in hours
+   * 
+   * @param imagePoint The line and sample
+   * @param sensor The sensor model used to calculate ground coordinates
+   * @param shape The shape to compute the local radius of
+   * @param illuminator The illumination model
+   * 
+   * @returns local solar time in hours
+   */
+  double localSolarTime(ImagePt &imagePoint, Sensor *sensor, Shape *shape, Illuminator *illuminator);
+
+  /**
+   * @brief Returns the line resolution at the current position in meters.
+   *
+   * @return @b double The line resolution
+   */
+  double lineResolution(const ImagePt &imagePoint, Sensor *sensor, Shape *shape, double focalLength, double pixelPitch, double lineScaleFactor=1);
+
+
+  /**
+   * @brief Returns the sample resolution at the current position in meters.
+   *
+   * @return @b double The sample resolution
+   */ 
+  double sampleResolution(const ImagePt &imagePoint, Sensor *sensor, Shape *shape, double focalLength, double pixelPitch, double sampleScaleFactor=1);
+
+
+  /**
+   * @brief Returns the pixel resolution at the current position in meters/pixel.
+   * 
+   * @return @b double The pixel resolution
+   */
+  double pixelResolution(const ImagePt &imagePoint, Sensor *sensor, Shape *shape, double focalLength, double pixelPitch, double lineScaleFactor=1, double sampleScaleFactor=1);
+
+
+  /**
+   * 
+   * Computes the solar longitude for the given ephemeris time.
+   * 
+   * @param imagePoint The line and sample
+   * @param sensor The sensor model used to calculate ground coordinates
+   * @param illuminator The illumination model
+   * @param body The target body
+   * 
+   * @returns solar longitude in degrees.
+   */
+  double solarLongitude(ImagePt &imagePoint, Sensor *sensor, Illuminator *illuminator, Body *body);
 }
-
 #endif
-
