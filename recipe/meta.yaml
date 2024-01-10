@@ -58,7 +58,7 @@ requirements:
    - cspice =67
    - csm >=3.0.3,<3.0.4
    - curl >=8.3.0,<9.0a0
-   - cxx-compiler =1.1.2
+   - cxx-compiler >=1.1.2
    - doxygen
    - eigen >=3, <4
    - embree >=3, <4
@@ -95,8 +95,8 @@ requirements:
    - pcl >=1.10,<2
    - plio
    - protobuf
-   - python >=3.10
-   - python_abi >=3.10
+   - python =3.12
+   - python_abi =3.12
    - pytest
    - rclone
    - qhull
