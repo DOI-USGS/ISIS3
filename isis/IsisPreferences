@@ -178,7 +178,7 @@ EndGroup
 ########################################################
 
 Group = Plugins
-  CSMDirectory = ("$CONDA_PREFIX/lib/csmplugins/", -
+  CSMDirectory = ("$ISISROOT/lib/csmplugins/", -
                   "$ISISROOT/lib/isis/csm3.0.3/", -
                   "$ISISROOT/csmlibs/3.0.3/", -
                   "$HOME/.Isis/csm3.0.3/")

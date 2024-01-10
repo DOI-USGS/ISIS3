@@ -46,7 +46,7 @@ build:
 requirements:
   build:
    - kalasiris 
-   - ale=0.9.1
+   - ale=0.10.0
    - armadillo
    - boost=1.72
    - boost-cpp=1.72
