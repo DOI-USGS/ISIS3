@@ -31,6 +31,7 @@
 class QMutex;
 class QProgressBar;
 class QXmlStreamWriter;
+class QXmlStreamReader;
 
 #include "ControlList.h"
 #include "Directory.h"
@@ -342,6 +343,8 @@ namespace Isis {
       QList<WorkOrder *> workOrderHistory();
       void writeSettings(FileName projName) const;
 
+      void readProjectXml(QXmlStreamReader *xmlReader);
+
       void setActiveControl(QString displayName);
       Control  *activeControl();
       void setActiveImageList(QString displayName);
@@ -647,6 +650,13 @@ namespace Isis {
 
       QUndoStack m_undoStack;
 
+      Project *m_project;
+      QList<ImageList *> m_imageLists;
+      QList<ShapeList *> m_shapeLists;
+      QList<BundleSolutionInfo *> m_bundleSolutionInfos;
+      QList<TemplateList *> m_mapTemplateLists;
+      QList<TemplateList *> m_regTemplateLists;
+      WorkOrder *m_workOrder;
   };
 }
 

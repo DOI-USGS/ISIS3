@@ -16,6 +16,7 @@ find files of those names at the top level of this repository. **/
 #include <QStringList>
 #include <QUuid>
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 #include "BundleLidarRangeConstraint.h"
 #include "BundleResults.h"
@@ -92,6 +93,67 @@ namespace Isis {
     m_adjustedImages = new QList<ImageList *>;
   }
 
+
+  /**
+   * Handle an XML start element. This expects <image/> and <displayProperties/> elements.
+   *
+   * @param namespaceURI ???
+   * @param localName The keyword name given to the member variable in the XML.
+   * @param qName ???
+   * @param atts The attribute containing the keyword value for the given local name.
+   *
+   * @return @b bool True if we should continue reading the XML.
+   */
+  BundleSolutionInfo::BundleSolutionInfo(Project *project,
+                                         QXmlStreamReader *xmlReader,
+                                         QObject *parent) : QObject(parent)
+  {
+    m_id = new QUuid(QUuid::createUuid());
+    m_runTime = "";
+    m_name = m_runTime;
+    m_inputControlNetFileName = NULL;
+    m_outputControl = NULL;
+    m_outputControlName = "";
+    m_inputLidarDataFileName = NULL;
+    m_outputLidarDataSet = NULL;
+    m_statisticsResults = NULL;
+    // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
+    m_images = new QList<ImageList *>;
+    m_adjustedImages = new QList<ImageList *>;
+
+    m_xmlHandlerProject = project;
+    m_xmlHandlerCharacters = "";
+
+    readBundleSolutionInfo(xmlReader);
+  }
+
+  void BundleSolutionInfo::readBundleSolutionInfo(QXmlStreamReader *xmlReader) {
+    m_xmlHandlerCharacters = "";
+
+    if (xmlReader->readNextStartElement()) {
+
+      if (xmlReader->name() == "bundleSettings") {
+        // m_xmlHandlerBundleSolutionInfo->m_settings =
+        //     BundleSettingsQsp(new BundleSettings(m_xmlHandlerProject, xmlReader));
+      }
+      else if (xmlReader->name() == "bundleResults") {
+        m_statisticsResults = new BundleResults(xmlReader);
+      }
+      else if (xmlReader->name() == "imageList") {
+        // m_xmlHandlerBundleSolutionInfo->m_adjustedImages->append(
+        //     new ImageList(m_xmlHandlerProject, xmlReader));
+      }
+      else if (xmlReader->name() == "outputControl") {
+        // FileName outputControlPath = FileName(m_xmlHandlerProject->bundleSolutionInfoRoot() + "/"
+        //                                       + m_xmlHandlerBundleSolutionInfo->runTime());
+
+        // m_xmlHandlerBundleSolutionInfo->m_outputControl = new Control(outputControlPath, xmlReader);
+      }
+      else {
+        xmlReader->raiseError(QObject::tr("Incorrect file"));
+      }
+    }
+  }
 
   /**
    * Destructor

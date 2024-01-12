@@ -21,6 +21,7 @@ find files of those names at the top level of this repository. **/
 class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
+class QXmlStreamReader;
 
 namespace Isis {
   class BundleResults;
@@ -170,6 +171,10 @@ namespace Isis {
                     BundleResults outputStatistics,
                     QList<ImageList *> imgList,
                     QObject *parent = 0);
+      BundleSolutionInfo(Project *project,
+                         QXmlStreamReader *xmlReader,
+                         QObject *parent = 0);
+      void readBundleSolutionInfo(QXmlStreamReader *xmlReader);
       BundleSolutionInfo() = default;
 
       ~BundleSolutionInfo();
@@ -239,6 +244,10 @@ namespace Isis {
       QString m_csvSavedImagesFilename;
       QString m_csvSavedPointsFilename;
       QString m_csvSavedResidualsFilename;
+
+      // BundleSolutionInfo *m_xmlHandlerBundleSolutionInfo; //!< The bundleSolutionInfo object
+      Project *m_xmlHandlerProject;                       // TODO does xml stuff need project???
+      QString m_xmlHandlerCharacters;                     //!< List of characters that have been handled
 
   }; // end BundleSolutionInfo class
 

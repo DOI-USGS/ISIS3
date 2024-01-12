@@ -33,6 +33,7 @@ find files of those names at the top level of this repository. **/
 class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
+class QXmlStreamReader;
 
 namespace Isis {
   // Isis Library
@@ -90,6 +91,19 @@ namespace Isis {
     Q_OBJECT
     public:
       BundleResults(QObject *parent = 0);
+      BundleResults(QXmlStreamReader *xmlReader,
+                    QObject *parent = 0);
+      void readBundleResults(QXmlStreamReader *xmlReader);
+      void readCorrelationMatrix(QXmlStreamReader *xmlReader);
+      void readGenStatsValues(QXmlStreamReader *xmlReader);
+      void readRms(QXmlStreamReader *xmlReader);
+      void readImageResidualsLists(QXmlStreamReader *xmlReader);
+      void readSigmasLists(QXmlStreamReader *xmlReader);
+      void readStatsToList(QList<Statistics> &list, QXmlStreamReader *xmlReader);
+      void readStatsToVector(QVector<Statistics> &vec, QXmlStreamReader *xmlReader);
+      void readMinMaxSigmas(QXmlStreamReader *xmlReader);
+      void readSigma(Distance &dist, QString &pointId, QXmlStreamReader *xmlReader);
+      void readMaxLikelihoodEstimation(QXmlStreamReader *xmlReader);
       BundleResults(const BundleResults &src);
       ~BundleResults();
       BundleResults &operator=(const BundleResults &src);
@@ -333,7 +347,7 @@ namespace Isis {
                                                              stats for each image in the bundle  */
 
       //!< The root mean square image x sigmas.
-      QVector<Statistics> m_rmsImageXSigmas;     // unset and unused ???
+      QVector<Statistics> m_rmsImageXSigmas; // unset and unused ???
       //!< The root mean square image y sigmas.
       QVector<Statistics> m_rmsImageYSigmas;     // unset and unused ???
       //!< The root mean square image z sigmas.
@@ -395,7 +409,25 @@ namespace Isis {
                                                     reporting, and not for computation.*/
       double m_maximumLikelihoodMedianR2Residuals; /**< Median of R^2 residuals.*/
 
-  };
+   private:
+      BundleResults *m_xmlHandlerBundleResults;
+      QString m_xmlHandlerCharacters;
+      int m_xmlHandlerResidualsListSize;
+      int m_xmlHandlerSampleResidualsListSize;
+      int m_xmlHandlerLineResidualsListSize;
+      int m_xmlHandlerXSigmasListSize;
+      int m_xmlHandlerYSigmasListSize;
+      int m_xmlHandlerZSigmasListSize;
+      int m_xmlHandlerRASigmasListSize;
+      int m_xmlHandlerDECSigmasListSize;
+      int m_xmlHandlerTWISTSigmasListSize;
+      QList<Statistics *> m_xmlHandlerStatisticsList;
+      StatCumProbDistDynCalc *m_xmlHandlerCumProCalc;
+
+      QString m_xmlHandlerCorrelationImageId;
+      QStringList m_xmlHandlerCorrelationParameterList;
+      QMap<QString, QStringList> m_xmlHandlerCorrelationMap;
+};
 
 };
 

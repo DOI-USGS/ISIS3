@@ -43,6 +43,7 @@
 #include <QTextStream>
 #include <QWidget>
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 #include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
@@ -1391,15 +1392,13 @@ namespace Isis {
     QDir oldProjectRoot(*m_projectRoot);
     *m_projectRoot =  QDir(projectAbsolutePathStr);
 
-    QXmlStreamReader reader(&file);
+    QXmlStreamReader projectXmlReader(&file);
 
     //This prevents the project from not loading if everything
     //can't be loaded, and outputs the warnings/errors to the
     //Warnings Tab
     try {
-      while (!reader.atEnd()) {
-        reader.readNext();
-      }
+      readProjectXml(&projectXmlReader);
     }
     catch (IException &e) {
       directory()->showWarning(QString("Failed to open project completely [%1]")
@@ -1489,6 +1488,74 @@ namespace Isis {
     emit projectLoaded(this);
   }
 
+
+  void Project::readProjectXml(QXmlStreamReader *xmlReader) {
+    if (xmlReader->readNextStartElement()) {
+      if (xmlReader->name() == "project") {
+        QStringRef name = xmlReader->attributes().value("name");
+        if (!name.isEmpty()) {
+          m_project->setName(*(name.string()));
+        }
+      }
+      else if (xmlReader->name() == "controlNets") {
+        // m_controls.append(new ControlList(m_project, xmlReader));
+      }
+      else if (xmlReader->name() == "imageList") {
+        // m_imageLists.append(new ImageList(m_project, xmlReader));
+      }
+      else if (xmlReader->name() == "shapeList") {
+        // m_shapeLists.append(new ShapeList(m_project, xmlReader));
+      }
+      else if (xmlReader->name() == "mapTemplateList") {
+        // m_mapTemplateLists.append(new TemplateList(m_project, xmlReader));
+      }
+      else if (xmlReader->name() == "regTemplateList") {
+        // m_regTemplateLists.append(new TemplateList(m_project, xmlReader));
+      }
+      //  workOrders are stored in history.xml, using same reader as project.xml
+      else if (xmlReader->name() == "workOrder") {
+        QString type = *(xmlReader->attributes().value("type").string());
+
+        m_workOrder = WorkOrderFactory::create(m_project, type);
+
+        // m_workOrder->read(xmlReader);
+      }
+      //  warnings stored in warning.xml, using same reader as project.xml
+      else if (xmlReader->name() == "warning") {
+        QString warningText = *(xmlReader->attributes().value("text").string());
+
+        if (!warningText.isEmpty())
+        {
+          m_project->warn(warningText);
+        }
+      }
+      else if (xmlReader->name() == "directory") {
+        // m_project->directory()->load(xmlReader);
+      }
+      else if (xmlReader->name() == "dockRestore") {
+        //    QVariant geo_data = QVariant(atts.value("geometry"));
+        //    restoreGeometry(geo_data);
+        //    QVariant layout_data = QVariant(atts.value("state"));
+        //    restoreState(layout_data);
+      }
+      else if (xmlReader->name() == "bundleSolutionInfo") {
+        m_bundleSolutionInfos.append(new BundleSolutionInfo(m_project, xmlReader));
+      }
+      else if (xmlReader->name() == "activeImageList") {
+        QString displayName = *(xmlReader->attributes().value("displayName").string());
+        m_project->setActiveImageList(displayName);
+      }
+      else if (xmlReader->name() == "activeControl") {
+        // Find Control
+        QString displayName = *(xmlReader->attributes().value("displayName").string());
+        m_project->setActiveControl(displayName);
+      }
+      else
+      {
+        xmlReader->raiseError(QObject::tr("Incorrect file"));
+      }
+    }
+  }
 
   QProgressBar *Project::progress() {
     return m_imageReader->progress();

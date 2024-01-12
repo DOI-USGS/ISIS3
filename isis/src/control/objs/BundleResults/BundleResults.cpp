@@ -11,9 +11,11 @@ find files of those names at the top level of this repository. **/
 #include <QDataStream>
 #include <QDebug>
 #include <QString>
+#include <QStringRef>
 #include <QtGlobal> // qMax()
 #include <QUuid>
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -34,6 +36,8 @@ find files of those names at the top level of this repository. **/
 #include "SerialNumberList.h"
 #include "StatCumProbDistDynCalc.h"
 #include "Statistics.h"
+
+#include <iostream>
 
 using namespace boost::numeric::ublas;
 
@@ -58,6 +62,410 @@ namespace Isis {
 
   }
 
+  /**
+   * Construct this BundleResults object from XML.
+   *
+   * @param bundleSettingsFolder Where the settings XML for this bundle adjustment
+   *                             resides - /work/.../projectRoot/images/import1
+   * @param xmlReader An XML reader that's up to a <bundleSettings/> tag.
+   * @param parent The Qt-relationship parent.
+   */
+  BundleResults::BundleResults(QXmlStreamReader *xmlReader, 
+                               QObject *parent) : QObject(parent)
+  {
+    // TODO: does xml stuff need project???
+
+    initialize();
+
+    readBundleResults(xmlReader);
+  }
+
+  void BundleResults::readBundleResults(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "bundleResults");
+    while(xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "correlationMatrix") {
+        readCorrelationMatrix(xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "generalStatisticsValues") {
+        readGenStatsValues(xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "rms") {
+        readRms(xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "elapsedTime") {
+
+        QStringRef time = xmlReader->attributes().value("time");
+        if (!time.isEmpty()) {
+          m_elapsedTime = time.toDouble();
+        }
+
+        QStringRef errorProp = xmlReader->attributes().value("errorProp");
+        if (!errorProp.isEmpty()) {
+          m_elapsedTimeErrorProp = errorProp.toDouble();
+        }
+        xmlReader->skipCurrentElement();
+      }
+      else if (xmlReader->qualifiedName() == "minMaxSigmas") {
+        readMinMaxSigmas(xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "maximumLikelihoodEstimation") {
+        readMaxLikelihoodEstimation(xmlReader);
+      }
+
+      // ???      else if (xmlReader->qualifiedName() == "minMaxSigmaDistances") {
+      // ???        QStringRef units = xmlReader->attributes().value("units");
+      // ???        if (!QStringRef::compare(units, "meters", Qt::CaseInsensitive)) {
+      // ???          QStringRef msg = "Unable to read BundleResults xml. Sigma distances must be "
+      // ???                        "provided in meters.";
+      // ???          throw IException(IException::Io, msg, _FILEINFO_);
+      // ???        }
+      // ???      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
+
+  void BundleResults::readCorrelationMatrix(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "correlationMatrix");
+    m_correlationMatrix = NULL;
+    m_correlationMatrix = new CorrelationMatrix();
+
+    QString correlationFileName = *(xmlReader->attributes().value("correlationFileName").string());
+    if (!correlationFileName.isEmpty()) {
+      FileName correlationFile(correlationFileName);
+      m_correlationMatrix->setCorrelationFileName(correlationFile);
+    }
+
+    QString covarianceFileName = *(xmlReader->attributes().value("covarianceFileName").string());
+    if (!covarianceFileName.isEmpty()) {
+      FileName covarianceFile(covarianceFileName);
+      m_correlationMatrix->setCovarianceFileName(covarianceFile);
+    }
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "image") {
+        QString correlationMatrixImageId = *(xmlReader->attributes().value("id").string());
+        if (!correlationMatrixImageId.isEmpty()) {
+          m_xmlHandlerCorrelationImageId = correlationMatrixImageId;
+        }
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
+
+  void BundleResults::readGenStatsValues(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "generalStatisticsValues");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "numberFixedPoints") {
+        m_numberFixedPoints = toInt(xmlReader->readElementText());
+      }
+      else if (xmlReader->qualifiedName() == "numberIgnoredPoints") {
+        m_numberIgnoredPoints = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberHeldImages") {
+        m_numberHeldImages = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "rejectionLimit") {
+        m_rejectionLimit = xmlReader->readElementText().toDouble();
+      }
+      else if (xmlReader->qualifiedName() == "numberRejectedObservations") {
+        m_numberRejectedObservations = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberLidarRangeConstraintEquations") {
+        m_numberLidarRangeConstraintEquations = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberObservations") {
+        m_numberObservations = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberImageObservations") {
+        m_numberImageObservations = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberLidarImageObservations") {
+        m_numberLidarImageObservations = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberImageParameters") {
+        m_numberImageParameters = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberConstrainedPointParameters") {
+        m_numberConstrainedPointParameters =
+                                       xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberConstrainedImageParameters") {
+        m_numberConstrainedImageParameters =
+                                       xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberConstrainedTargetParameters") {
+        m_numberConstrainedTargetParameters =
+                                       xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberUnknownParameters") {
+        m_numberUnknownParameters = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "degreesOfFreedom") {
+        m_degreesOfFreedom = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "sigma0") {
+        m_sigma0 = xmlReader->readElementText().toDouble();
+      }
+      else if (xmlReader->qualifiedName() == "converged") {
+        m_converged = toBool(xmlReader->readElementText());
+      }
+      else if (xmlReader->qualifiedName() == "iterations") {
+        m_iterations = xmlReader->readElementText().toInt();
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
+
+  void BundleResults::readRms(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "rms");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "residuals") {
+        QStringRef rx = xmlReader->attributes().value("x");
+        if (!rx.isEmpty()) {
+          m_rmsXResiduals = rx.toDouble();
+        }
+
+        QStringRef ry = xmlReader->attributes().value("y");
+        if (!ry.isEmpty()) {
+          m_rmsYResiduals = ry.toDouble();
+        }
+
+        QStringRef rxy = xmlReader->attributes().value("xy");
+        if (!rxy.isEmpty()) {
+          m_rmsXYResiduals = rxy.toDouble();
+        }
+        xmlReader->skipCurrentElement();
+      }
+      else if (xmlReader->qualifiedName() == "sigmas")
+      {
+        QStringRef lat = xmlReader->attributes().value("lat");
+        if (!lat.isEmpty()){
+          m_rmsSigmaCoord1Stats = lat.toDouble();
+        }
+
+        QStringRef lon = xmlReader->attributes().value("lon");
+        if (!lon.isEmpty()){
+          m_rmsSigmaCoord2Stats = lon.toDouble();
+        }
+
+        QStringRef rad = xmlReader->attributes().value("rad");
+        if (!rad.isEmpty()){
+          m_rmsSigmaCoord3Stats = rad.toDouble();
+        }
+
+        QStringRef x = xmlReader->attributes().value("x");
+        if (!x.isEmpty()){
+          m_rmsSigmaCoord1Stats = x.toDouble();
+        }
+
+        QStringRef y = xmlReader->attributes().value("y");
+        if (!y.isEmpty()){
+          m_rmsSigmaCoord2Stats = y.toDouble();
+        }
+
+        QStringRef z = xmlReader->attributes().value("z");
+        if (!z.isEmpty()){
+          m_rmsSigmaCoord3Stats = z.toDouble();
+        }
+        xmlReader->skipCurrentElement();
+      }
+      else if (xmlReader->qualifiedName() == "imageResidualsLists") {
+        readImageResidualsLists(xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "imageSigmasLists") {
+        readSigmasLists(xmlReader);
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
+
+  void BundleResults::readImageResidualsLists(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "imageResidualsLists");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() ==  "residualsList") {
+        readStatsToList(m_rmsImageResiduals, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "sampleList") {
+        readStatsToList(m_rmsImageSampleResiduals, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "lineList") {
+        readStatsToList(m_rmsImageLineResiduals, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "lidarResidualsList") {
+        readStatsToList(m_rmsLidarImageResiduals, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "lidarSampleList") {
+        readStatsToList(m_rmsLidarImageSampleResiduals, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "lidarLineList") {
+        readStatsToList(m_rmsLidarImageLineResiduals, xmlReader);
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
+
+  void BundleResults::readSigmasLists(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "imageSigmasLists");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() ==  "xSigmas") {
+        readStatsToVector(m_rmsImageXSigmas, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "ySigmas") {
+        readStatsToVector(m_rmsImageYSigmas, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "zSigmas") {
+        readStatsToVector(m_rmsImageZSigmas, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "raSigmas") {
+        readStatsToVector(m_rmsImageRASigmas, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "decSigmas") {
+        readStatsToVector(m_rmsImageDECSigmas, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "twistSigmas") {
+        readStatsToVector(m_rmsImageTWISTSigmas, xmlReader);
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
+
+  void BundleResults::readStatsToList(QList<Statistics> &list, QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->attributes().hasAttribute("listSize"));
+    int listSize = xmlReader->attributes().value("listSize").toInt();
+    for (int i = 0; i < listSize; i++) {
+      xmlReader->readNextStartElement();
+      Q_ASSERT(xmlReader->name() == "statisticsItem");
+      xmlReader->readNextStartElement();
+      Q_ASSERT(xmlReader->name() == "statistics");
+      list.append(new Statistics(xmlReader));
+      xmlReader->readNextStartElement();
+    }
+    xmlReader->readNextStartElement();
+  }
+
+  void BundleResults::readStatsToVector(QVector<Statistics> &vec, QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->attributes().hasAttribute("listSize"));
+    int listSize = xmlReader->attributes().value("listSize").toInt();
+    for (int i = 0; i < listSize; i++) {
+      xmlReader->readNextStartElement();
+      Q_ASSERT(xmlReader->name() == "statisticsItem");
+      xmlReader->readNextStartElement();
+      Q_ASSERT(xmlReader->name() == "statistics");
+      vec.append(new Statistics(xmlReader));
+      xmlReader->readNextStartElement();
+    }
+    xmlReader->readNextStartElement();
+  }
+
+  void BundleResults::readMinMaxSigmas(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "minMaxSigmas");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "minLat" ||
+          xmlReader->qualifiedName() == "minX") {
+        readSigma(m_minSigmaCoord1Distance, m_minSigmaCoord1PointId, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "maxLat" || 
+               xmlReader->qualifiedName() == "maxX") {
+        readSigma(m_maxSigmaCoord1Distance, m_maxSigmaCoord1PointId, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "minLon" || 
+               xmlReader->qualifiedName() == "minY") {
+        readSigma(m_minSigmaCoord2Distance, m_minSigmaCoord2PointId, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "maxLon" || 
+               xmlReader->qualifiedName() == "maxY") {
+        readSigma(m_maxSigmaCoord2Distance, m_maxSigmaCoord2PointId, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "minRad" || 
+               xmlReader->qualifiedName() == "minZ") {
+        readSigma(m_minSigmaCoord3Distance, m_minSigmaCoord3PointId, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "maxRad" || 
+               xmlReader->qualifiedName() == "maxZ") {
+        readSigma(m_maxSigmaCoord3Distance, m_maxSigmaCoord3PointId, xmlReader);
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    } 
+  }
+
+  void BundleResults::readSigma(Distance &dist, QString &pointId, QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->attributes().hasAttribute("value"));
+    Q_ASSERT(xmlReader->attributes().hasAttribute("pointId"));
+    QStringRef sigmaValue = xmlReader->attributes().value("value");
+    if (!sigmaValue.isEmpty()) {
+      dist.setMeters(sigmaValue.toDouble());
+    }
+
+    QString sigmaPointId = xmlReader->attributes().value("pointId").toString();
+    if (!sigmaPointId.isEmpty()) {
+      pointId = sigmaPointId;
+    }
+    xmlReader->skipCurrentElement();
+  }
+
+  void BundleResults::readMaxLikelihoodEstimation(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "maximumLikelihoodEstimation");
+    QStringRef maximumLikelihoodIndex = xmlReader->attributes().value("maximumLikelihoodIndex");
+    if (!maximumLikelihoodIndex.isEmpty()) {
+      m_maximumLikelihoodIndex = maximumLikelihoodIndex.toInt();
+    }
+
+    QStringRef maximumLikelihoodMedianR2Residuals =
+        xmlReader->attributes().value("maximumLikelihoodMedianR2Residuals");
+    if (!maximumLikelihoodMedianR2Residuals.isEmpty()) {
+      m_maximumLikelihoodMedianR2Residuals =
+          maximumLikelihoodMedianR2Residuals.toDouble();
+    }
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "cumulativeProbabilityCalculator") {
+        m_cumPro = NULL;
+        // m_cumPro =  new StatCumProbDistDynCalc(m_xmlHandlerProject, xmlReader);
+        xmlReader->skipCurrentElement();
+      }
+      else if (xmlReader->qualifiedName() == "residualsCumulativeProbabilityCalculator") {
+        m_cumProRes = NULL;
+        // m_cumProRes = new StatCumProbDistDynCalc(m_xmlHandlerProject, xmlReader);
+        xmlReader->skipCurrentElement();
+      }
+      else if (xmlReader->qualifiedName() == "model") {
+        QString model = xmlReader->attributes().value("modelSelection").toString();
+        QStringRef tweakingConstant = xmlReader->attributes().value("tweakingConstant");
+        QStringRef quantile = xmlReader->attributes().value("quantile");
+        bool validModel = true;
+        if (model.isEmpty())
+          validModel = false;
+        if (tweakingConstant.isEmpty())
+          validModel = false;
+        if (quantile.isEmpty())
+          validModel = false;
+        if (validModel)
+        {
+          m_maximumLikelihoodFunctions.append(
+              qMakePair(MaximumLikelihoodWFunctions(
+                            MaximumLikelihoodWFunctions::stringToModel(model),
+                            tweakingConstant.toDouble()),
+                        quantile.toDouble()));
+        }
+        xmlReader->skipCurrentElement();
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
 
   /**
    * Copy constructor for BundleResults.  Creates this BundleResults object as a copy
@@ -127,9 +535,9 @@ namespace Isis {
         m_maximumLikelihoodIndex(src.m_maximumLikelihoodIndex),
         m_cumPro(new StatCumProbDistDynCalc(*src.m_cumPro)),
         m_cumProRes(new StatCumProbDistDynCalc(*src.m_cumProRes)),
-        m_maximumLikelihoodMedianR2Residuals(src.m_maximumLikelihoodMedianR2Residuals) {
+        m_maximumLikelihoodMedianR2Residuals(src.m_maximumLikelihoodMedianR2Residuals)
+  {
   }
-
 
   /**
    * Destroys this BundleResults object.
