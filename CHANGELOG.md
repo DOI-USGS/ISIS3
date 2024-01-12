@@ -38,6 +38,9 @@ release.
 ### Fixed
 - Fixed <i>noproj</i> bug where missing shapemodel-related keywords (RayTraceEngine, BulletParts, Tolerance) are dropped when the output label is created. This resulted in the Bullet collision detection engine not being used. Issue: [#5377](https://github.com/USGS-Astrogeology/ISIS3/issues/5377)
 
+### Added
+- Added 8 new functions to the Sensor Utility Library: Slant Distance, Target Center Distance, Right Ascension Declination, Local Solar Time, Line Resolution, Sample Resolution, Pixel Resolution, and Solar Longitude.
+
 ## [8.1.0] - 2024-01-08
 
 ### Changed
