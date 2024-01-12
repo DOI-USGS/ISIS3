@@ -250,7 +250,7 @@ TEST(Photomet, FunctionalTestPhotometTestAngleSourceDemUseDemFalse) {
 
   std::unique_ptr<Histogram> hist (cube.histogram(0));
   EXPECT_NEAR(hist->Average(), 14792.766568847655, .000001);
-  EXPECT_NEAR(hist->Sum(), 147927665.69042969, .000001);
+  EXPECT_NEAR(hist->Sum(), 147927665.68847656, .000001);
   EXPECT_EQ(hist->ValidPixels(),  10000);
   EXPECT_NEAR(hist->StandardDeviation(), 658.03703524802904, .000001);
 }
@@ -310,7 +310,7 @@ TEST(Photomet, FunctionalTestPhotometTestAngleSourceDemUseDemTrue) {
 
   std::unique_ptr<Histogram> hist (cube.histogram(0));
   EXPECT_NEAR(hist->Average(), 14792.766568847655, .000001);
-  EXPECT_NEAR(hist->Sum(), 147927665.69042969, .000001);
+  EXPECT_NEAR(hist->Sum(), 147927665.68847656, .000001);
   EXPECT_EQ(hist->ValidPixels(),  10000);
   EXPECT_NEAR(hist->StandardDeviation(), 658.03703524802904, .000001);
 }
