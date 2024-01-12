@@ -30,7 +30,6 @@ class MockSpicePosition : public SpicePosition {
     MOCK_METHOD(const std::vector<double>&, SetEphemerisTime, (double et));
     MOCK_METHOD(double, EphemerisTime, (), (const));
     MOCK_METHOD(const std::vector<double>&, Coordinate, ());
-    MOCK_METHOD(const std::vector<double>&, Velocity, ());
 };
 
 class MockCube : public Cube {

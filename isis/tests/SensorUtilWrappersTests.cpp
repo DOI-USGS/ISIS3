@@ -108,22 +108,22 @@ TEST(IsisIlluminator, PositionOldTime) {
   EXPECT_EQ(testIlluminator.position(testTime), testPosM);
 }
 
-// TEST(IsisIlluminator, Velocity) {
-//   double testTime = 10.0;
-//   std::vector<double> testVelKm = {-1.0, 1.0, 2.0};
-//   SensorUtilities::Vec testVelM = {-1000.0, 1000.0, 2000.0};
+TEST(IsisIlluminator, Velocity) {
+  double testTime = 10.0;
+  SensorUtilities::Vec testVelM = {-1000.0, 1000.0, 2000.0};
 
-//   MockSpicePosition mockSpice(0, 1);
-//   EXPECT_CALL(mockSpice, EphemerisTime)
-//         .WillRepeatedly(::testing::Return(testTime));
+  MockSpicePosition mockSpice(0, 1);
 
-//   EXPECT_CALL(mockSpice, Velocity)
-//         .WillRepeatedly(::testing::ReturnRef(testVelKm));
+  const double state[6] = {0.0, 0,0, -1.0, 1.0, 2.0};
+  mockSpice.setStateVector(state, true);
 
-//   IsisIlluminator testIlluminator(&mockSpice);
+  EXPECT_CALL(mockSpice, EphemerisTime)
+        .WillRepeatedly(::testing::Return(testTime));
 
-//   EXPECT_EQ(testIlluminator.velocity(testTime), testVelM);
-// }
+  IsisIlluminator testIlluminator(&mockSpice);
+
+  EXPECT_EQ(testIlluminator.velocity(testTime), testVelM);
+}
 
 TEST(IsisShape, IntersectStandardNormal) {
   SensorUtilities::Vec sensorPos = {1000.0, 0.0, 0.0};
