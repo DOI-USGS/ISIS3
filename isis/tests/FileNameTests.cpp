@@ -84,14 +84,14 @@ TEST(FileName, Extension) {
   EXPECT_EQ("cub", file.extension());
 }
 
-TEST(FileName, Expanded1) {
+TEST(FileName, ExpandedDefault) {
   QString relativeFileName("test.cub");
   FileName file("$ISISROOT/" + relativeFileName);
   QString isisRoot(getenv("ISISROOT"));
   EXPECT_EQ(isisRoot + "/" + relativeFileName, file.expanded());
 }
 
-TEST(FileName, Expanded2) {
+TEST(FileName, ExpandedUnderscore) {
   QString relativeFileName("test.cub");
   setenv("SOME_FILE_PATH", getenv("ISISROOT"), 1);
   FileName file("$SOME_FILE_PATH/" + relativeFileName);
