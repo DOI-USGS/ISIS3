@@ -17,6 +17,7 @@ find files of those names at the top level of this repository. **/
 class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
+class QXmlStreamReader;
 
 namespace Isis {
   class Project;// ??? does xml stuff need project???
@@ -93,6 +94,8 @@ namespace Isis {
     Q_OBJECT
     public:
       Statistics(QObject *parent = 0);
+      Statistics(QXmlStreamReader *xmlReader, QObject *parent = 0);
+      void readStatistics(QXmlStreamReader *xmlReader);
       Statistics(const PvlGroup &inStats, QObject *parent = 0);
       // TODO: does xml read/write stuff need Project input???
       Statistics(const Statistics &other);

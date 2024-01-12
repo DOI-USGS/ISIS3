@@ -11,6 +11,7 @@ find files of those names at the top level of this repository. **/
 #include <QString>
 #include <QUuid>
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 #include <float.h>
 
@@ -29,6 +30,84 @@ namespace Isis {
 //    m_id = new QUuid(QUuid::createUuid());
     SetValidRange();
     Reset(); // initialize
+  }
+
+  Statistics::Statistics(QXmlStreamReader *xmlReader, QObject *parent) {   // TODO: does xml stuff need project???
+//    m_id = NULL;
+    SetValidRange();
+    Reset(); // initialize
+    readStatistics(xmlReader);
+  }
+
+  void Statistics::readStatistics(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "statistics");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "sum") {
+        m_sum = toDouble(xmlReader->readElementText());
+      }
+      else if (xmlReader->qualifiedName() == "sumSquares") {
+        m_sumsum = toDouble(xmlReader->readElementText());
+      }
+      else if (xmlReader->qualifiedName() == "range") {
+        while (xmlReader->readNextStartElement()) {
+          if (xmlReader->qualifiedName() == "minimum") {
+            m_minimum = toDouble(xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "maximum") {
+            m_maximum = toDouble(xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "validMinimum") {
+            m_validMinimum = toDouble(xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "validMaximum") {
+            m_validMaximum = toDouble(xmlReader->readElementText());
+          }
+          else {
+            xmlReader->skipCurrentElement();
+          }
+        }
+      }
+      else if (xmlReader->qualifiedName() == "pixelCounts") {
+        while (xmlReader->readNextStartElement()) {
+          if (xmlReader->qualifiedName() == "totalPixels") {
+            m_totalPixels = toBigInt(xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "validPixels") {
+            m_validPixels = toBigInt(xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "nullPixels") {
+            m_nullPixels = toBigInt(xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "lisPixels") {
+            m_lisPixels = toBigInt(xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "lrsPixels") {
+            m_lrsPixels = toBigInt(xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "hisPixels") {
+            m_hisPixels = toBigInt(xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "hrsPixels") {
+            m_hrsPixels = toBigInt(xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "underRangePixels") {
+            m_underRangePixels = toBigInt(xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "overRangePixels") {
+            m_overRangePixels = toBigInt(xmlReader->readElementText());
+          }
+          else {
+            xmlReader->skipCurrentElement();
+          }
+        }
+      }
+      else if (xmlReader->qualifiedName() == "removedData") {
+        m_removedData = toBool(xmlReader->readElementText());
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
   }
 
   /**
