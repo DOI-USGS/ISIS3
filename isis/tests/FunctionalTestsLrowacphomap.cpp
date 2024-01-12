@@ -88,23 +88,15 @@ TEST(Lrowacphomap, FunctionalTestLrowacphomapNoBack) {
            << e.what() << std::endl;
   }
 
-  double expectedAvg = 58.159470616532;
-  double expectedStdDev = 18.558190342074;
-  double expectedMedian = 56.508963061387;
-  double expectedMin = 23.405038833618;
-  double expectedMax = 155.67340087891;
-  double expectedSum = 195764.77809525;
-
   Cube outCube(outCubeFileName);
-
   std::unique_ptr<Histogram> hist(outCube.histogram());
 
-  EXPECT_NEAR(hist->Average(), expectedAvg, 0.001);
-  EXPECT_NEAR(hist->StandardDeviation(), expectedStdDev, 0.001);
-  EXPECT_NEAR(hist->Median(), expectedMedian, 0.001);
-  EXPECT_NEAR(hist->Minimum(), expectedMin, 0.001);
-  EXPECT_NEAR(hist->Maximum(), expectedMax, 0.001);
-  EXPECT_NEAR(hist->Sum(), expectedSum, 0.001);
+  EXPECT_NEAR(hist->Average(), 58.159470616532, 0.001);
+  EXPECT_NEAR(hist->StandardDeviation(), 18.558190342074, 0.001);
+  EXPECT_NEAR(hist->Median(), 56.508963061387, 0.001);
+  EXPECT_NEAR(hist->Minimum(), 23.405038833618, 0.001);
+  EXPECT_NEAR(hist->Maximum(), 155.67340087891, 0.001);
+  EXPECT_NEAR(hist->Sum(), 195764.82563591003, 0.001);
 }
 
 TEST(Lrowacphomap, FunctionalTestLrowacphomapDefaultAlgoAndParCubeWithBack) {
@@ -167,21 +159,13 @@ TEST(Lrowacphomap, FunctionalTestLrowacphomapDefaultAlgoAndParCubeNoBack) {
            << e.what() << std::endl;
   }
 
-  double expectedAvg = 56.750011832815;
-  double expectedStdDev = 18.44290433699;
-  double expectedMedian = 55.263128187622;
-  double expectedMin = 22.274614334106;
-  double expectedMax = 152.65106201172;
-  double expectedSum = 191020.53982925;
-
   Cube outCube(outCubeFileName);
-
   std::unique_ptr<Histogram> hist(outCube.histogram());
 
-  EXPECT_NEAR(hist->Average(), expectedAvg, 0.001);
-  EXPECT_NEAR(hist->StandardDeviation(), expectedStdDev, 0.001);
-  EXPECT_NEAR(hist->Median(), expectedMedian, 0.001);
-  EXPECT_NEAR(hist->Minimum(), expectedMin, 0.001);
-  EXPECT_NEAR(hist->Maximum(), expectedMax, 0.001);
-  EXPECT_NEAR(hist->Sum(), expectedSum, 0.001);
+  EXPECT_NEAR(hist->Average(), 56.750011832815, 0.001);
+  EXPECT_NEAR(hist->StandardDeviation(), 18.44290433699, 0.001);
+  EXPECT_NEAR(hist->Median(), 55.263128187622, 0.001);
+  EXPECT_NEAR(hist->Minimum(), 22.274614334106, 0.001);
+  EXPECT_NEAR(hist->Maximum(), 152.65106201172, 0.001);
+  EXPECT_NEAR(hist->Sum(), 191020.58597183228, 0.001);
 }

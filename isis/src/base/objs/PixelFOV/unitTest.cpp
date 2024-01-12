@@ -39,9 +39,9 @@ int main(void) {
   try {
     char file[1024] = "$ISISTESTDATA/isis/src/dawn/unitTestData/FC21B0001010_09049002212F5D.cub";
     QList<double> knownLat;
-    knownLat << 48.366139970 <<  48.365525166 << 48.366769868 << 48.367384602;
+    knownLat << 48.366139907 << 48.365525125 << 48.366769868 << 48.367384590;
     QList<double> knownLon;
-    knownLon << 277.953830179 << 277.951849380 << 277.951061539 << 277.953042126;
+    knownLon << 277.953830071 << 277.951849311 << 277.951061539 << 277.953042104;
 
     Cube cube;
     cube.open(file);

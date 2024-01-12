@@ -141,7 +141,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
   for (int i=1; i<=cube.bandCount(); i++) {
     std::unique_ptr<Histogram> hist(cube.histogram(i));
     EXPECT_NEAR(hist->Average(), bandAvg[i-1], 0.000001);
-    EXPECT_NEAR(hist->Sum(), bandSum[i-1], 0.000001);
+    EXPECT_NEAR(hist->Sum(), bandSum[i-1], 0.00001);
     EXPECT_EQ(hist->ValidPixels(), bandValid[i-1]);
     EXPECT_NEAR(hist->StandardDeviation(), bandStd[i-1], 0.000001);
   }

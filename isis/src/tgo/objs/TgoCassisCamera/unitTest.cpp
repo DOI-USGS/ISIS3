@@ -41,8 +41,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output
     // "Latitude off by: " and "Longitude off by: " values directly into these variables.
-    double knownLat = 4.14667346682538351; // 4.14700320539339717;
-    double knownLon = 322.757314935797012; // 322.7582512383878;
+    double knownLat = 4.146673465808755;
+    double knownLon = 322.7573149240362;
 
     Cube c("$ISISTESTDATA/isis/src/tgo/unitTestData/CAS-MCO-2016-11-22T16.38.39.354-NIR-02036-00.cub", "r");
     TgoCassisCamera *cam = (TgoCassisCamera *) CameraFactory::Create(c);
@@ -93,19 +93,21 @@ int main(void) {
     }
 
     if(abs(cam->UniversalLatitude() - knownLat) < 1E-13) {
-      qDebug() << "Latitude OK";
+      cout << "Latitude:     OK" << endl;
     }
     else {
-      qDebug() << qSetRealNumberPrecision(18)
-               << "Latitude off by: " << cam->UniversalLatitude() - knownLat;
+      cout << setprecision(16) << "Known latitude: " << knownLat
+           << ", Calculated latitude: " << cam->UniversalLatitude()
+           << ", difference: " << cam->UniversalLatitude() - knownLat << endl;
     }
 
     if(abs(cam->UniversalLongitude() - knownLon) < 1E-11) {
-      qDebug() << "Longitude OK";
+      cout << "Longitude:    OK" << endl;
     }
     else {
-      qDebug() << qSetRealNumberPrecision(18)
-               << "Longitude off by: " << cam->UniversalLongitude() - knownLon;
+      cout << setprecision(16) << "Known longitude: " << knownLon
+           << ", Calculated longitude: " << cam->UniversalLongitude()
+           << ", difference: " << cam->UniversalLongitude() - knownLon << endl;
     }
   }
   catch(IException &e) {

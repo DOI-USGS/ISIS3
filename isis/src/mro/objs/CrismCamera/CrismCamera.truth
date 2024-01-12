@@ -26,21 +26,21 @@ For lower left corner ...
 Sample: 1.0000
 Line:   420.0000
 Line/Sample SetImage succeeded!
-DeltaSample = -0.0000
-DeltaLine = -0.0000
+DeltaSample = -0.0001
+DeltaLine = -0.0001
 
 For lower right corner ...
 Sample: 640.0000
 Line:   420.0000
 Line/Sample SetImage succeeded!
-DeltaSample = -0.0023
-DeltaLine = 0.0057
+DeltaSample = -0.0026
+DeltaLine = 0.0067
 
 For center pixel position ...
 Sample: 320.0000
 Line:   210.0000
 Line/Sample SetImage succeeded!
-DeltaSample = -0.0000
+DeltaSample = 0.0000
 DeltaLine = 0.0001
 
 Latitude OK

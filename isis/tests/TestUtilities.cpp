@@ -346,11 +346,12 @@ namespace Isis {
   }
 
   // Compares CSV lines
-  void compareCsvLine(CSVReader::CSVAxis csvLine, QString headerStr, int initialIndex) {
+  void compareCsvLine(CSVReader::CSVAxis csvLine, QString headerStr, int initialIndex,
+                      double tol) {
     QStringList compareMe = headerStr.split(",");
     for (int i=initialIndex; i<compareMe.size(); i++) {
       if (isNumeric(compareMe[i].trimmed()) && isNumeric(QString(csvLine[i].trimmed()))) {
-        EXPECT_NEAR(csvLine[i].toDouble(), compareMe[i].toDouble(), 0.000001);
+        EXPECT_NEAR(csvLine[i].toDouble(), compareMe[i].toDouble(), tol);
       }
       else{
         EXPECT_EQ(QString(csvLine[i].trimmed()).toStdString(), compareMe[i].trimmed().toStdString());

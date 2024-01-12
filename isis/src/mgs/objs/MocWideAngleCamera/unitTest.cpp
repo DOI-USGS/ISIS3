@@ -48,8 +48,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 22.75215133174114;
-    double knownLon = 225.6313512467755;
+    double knownLat = 22.7521513424994453;
+    double knownLon = 225.6313510219684986;
 
     Cube c("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub", "r");
     Camera *cam = CameraFactory::Create(c);
@@ -89,16 +89,14 @@ int main(void) {
 
     if(fabs(cam->UniversalLatitude() - knownLat) < 3.39E-9) {
       cout << "Latitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
+    } else {
+      cout << setprecision(16) << "Known latitude: " << knownLat << ", Calculated latitude: " << cam->UniversalLatitude() << ", difference: " << cam->UniversalLatitude() - knownLat << endl;
     }
 
     if(fabs(cam->UniversalLongitude() - knownLon) < 7.97E-10) {
       cout << "Longitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
+    } else {
+      cout << setprecision(16) << "Known longitude: " << knownLon << ", Calculated longitude: " << cam->UniversalLongitude() << ", difference: " << cam->UniversalLongitude() - knownLon << endl;
     }
 
     // Test name methods

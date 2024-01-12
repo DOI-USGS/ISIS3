@@ -33,10 +33,14 @@ int main(int argc, char *argv[]) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat[4] = { -12.0400820752276996, 47.7445483329470406,
-                            60.8041933170744215, 60.1567063916710580};
-    double knownLon[4] = { 355.7272261079595523, 42.9611485167199660,
-                           135.3886983694549713, 135.3809757236753057};
+    double knownLat[4] = {-12.0400820754849036,
+                          47.7445483408955909,
+                          60.8041933172991946,
+                          60.1567063664606110};
+    double knownLon[4] = {355.7272261079595523,
+                          42.9611485170859666,
+                          135.3886983694549713, 
+                          135.3809757217490812};
 
     char files[4][1024] = { "$ISISTESTDATA/isis/src/kaguya/unitTestData/MI_VIS.cub", "$ISISTESTDATA/isis/src/kaguya/unitTestData/MI_NIR.cub",
                             "$ISISTESTDATA/isis/src/kaguya/unitTestData/MVA_2B2_01_01228N608E1354.cub",
@@ -87,18 +91,14 @@ int main(int argc, char *argv[]) {
 
       if(abs(cam->UniversalLatitude() - knownLat[i]) < 1E-10) {
         cout << "Latitude OK" << endl;
-      }
-      else {
-        //cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat[i] << endl;
-        cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() << endl;
+      } else {
+        cout << setprecision(16) << "Index: " << i << ", Known latitude: " << knownLat[i] << ", Calculated latitude: " << cam->UniversalLatitude() << ", difference: " << cam->UniversalLatitude() - knownLat[i] << endl;
       }
 
       if(abs(cam->UniversalLongitude() - knownLon[i]) < 1E-10) {
         cout << "Longitude OK" << endl;
-      }
-      else {
-//        cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon[i] << endl;
-        cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude()  << endl;
+      } else {
+        cout << setprecision(16) << "Index: " << i << ", Known longitude: " << knownLon[i] << ", Calculated longitude: " << cam->UniversalLongitude() << ", difference: " << cam->UniversalLongitude() - knownLon[i] << endl;
       }
       cout << endl << "--------------------------------------------" << endl;
     }

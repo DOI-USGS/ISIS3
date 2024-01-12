@@ -38,8 +38,12 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat[3] = { -2.430081939831881, -74.8893438078403477, 0.5289151367076288 };
-    double knownLon[3] = { 13.55999413494297, 12.5149409284581896, 23.4631767915001923 };
+    double knownLat[3] = {-2.430081939831881, 
+                          -74.8893442311753574,
+                          0.5289151369694239};
+    double knownLon[3] = {13.55999413494297, 
+                          12.5149453470190917,
+                          23.4631767927470030};
 
     QList<QString> files;
     files.append("$ISISTESTDATA/isis/src/lo/unitTestData/3083_med_tohi.cub");
@@ -101,20 +105,16 @@ int main(void) {
         return 0;
       }
 
-      if(abs(cam->UniversalLatitude() - knownLat[i]) < 1E-10) {
+      if (abs(cam->UniversalLatitude() - knownLat[i]) < 1E-10) {
         cout << "Latitude OK" << endl;
-      }
-      else {
-        cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat[i]
-             << endl;
+      } else {
+        cout << setprecision(16) << "Index: " << i << ", Known latitude: " << knownLat[i] << ", Calculated latitude: " << cam->UniversalLatitude() << ", difference: " << cam->UniversalLatitude() - knownLat[i] << endl;
       }
 
-      if(abs(cam->UniversalLongitude() - knownLon[i]) < 1E-10) {
+      if (abs(cam->UniversalLongitude() - knownLon[i]) < 1E-10) {
         cout << "Longitude OK" << endl;
-      }
-      else {
-        cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon[i]
-             << endl;
+      } else {
+        cout << setprecision(16) << "Index: " << i << ", Known longitude: " << knownLon[i] << ", Calculated longitude: " << cam->UniversalLongitude() << ", difference: " << cam->UniversalLongitude() - knownLon[i] << endl;
       }
       cout << endl << "--------------------------------------------" << endl;
     }

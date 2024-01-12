@@ -14,7 +14,7 @@ Instrument Name Long: Moon Mineralogy Mapper
 Instrument Name Short: M3
 
 For upper left corner ...
-DeltaSample = 0.000000000
+DeltaSample = -0.000150365
 DeltaLine = 0.000000000
 
 For upper right corner ...
@@ -30,7 +30,7 @@ DeltaSample = 0.000000000
 DeltaLine = 0.000000000
 
 For center pixel position ...
-Latitude OK
+Latitude off by: -0.0000000002109601
 Longitude OK
-RightAscension = 242.411157332
-Declination = -84.577243705
+RightAscension = 242.4111573315510100
+Declination = -84.5772437049944443

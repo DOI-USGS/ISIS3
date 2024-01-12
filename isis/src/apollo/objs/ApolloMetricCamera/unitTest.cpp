@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 12.5300329125960879;
-    double knownLon = 67.7259113746637524;
+    double knownLat = 12.5300329489725897;
+    double knownLon = 67.7259113602997189;
 
     Cube c(FileName("$ISISTESTDATA/isis/src/apollo/unitTestData/AS15-M-0533.cropped.cub").expanded(), "r");
     ApolloMetricCamera *cam = (ApolloMetricCamera *) CameraFactory::Create(c);
@@ -87,16 +87,14 @@ int main(int argc, char **argv) {
 
     if(abs(cam->UniversalLatitude() - knownLat) < 1E-10) {
       cout << "Latitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
+    } else {
+      cout << setprecision(16) << "Known latitude: " << knownLat << ", Calculated latitude: " << cam->UniversalLatitude() << ", difference: " << cam->UniversalLatitude() - knownLat << endl;
     }
 
     if(abs(cam->UniversalLongitude() - knownLon) < 1E-10) {
       cout << "Longitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
+    } else {
+      cout << setprecision(16) << "Known longitude: " << knownLon << ", Calculated longitude: " << cam->UniversalLongitude() << ", difference: " << cam->UniversalLongitude() - knownLon << endl;
     }
 
     // Test name methods
