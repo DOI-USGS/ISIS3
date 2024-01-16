@@ -220,14 +220,15 @@ namespace Isis {
     surfpt_c((SpiceDouble *) &observerPos[0], &lookDirection[0], r, r, r, newIntersectPt,
                (SpiceBoolean*) &status);
   
-    if (!status) {  
-      return false;
+    if (!status) { 
+        // If no luck, start at the observer, and will try points along the ray.
+        for (size_t i = 0; i < 3; i++)
+          newIntersectPt[i] = observerPos[i];           
     }
     
-    // Before calling resolution(), must ensure the intersection point is set 
+    // Ensure the intersection point is set 
     surfaceIntersection()->FromNaifArray(newIntersectPt);
     setHasIntersection(true);
-    double tol = resolution()/100;  // 1/100 of a pixel
     
     // Find the current position along the ray, relative to the observer
     // Equation: newIntersectPt = observerPos + t * lookDirection
@@ -241,17 +242,30 @@ namespace Isis {
     bool success = false;
     double intersectionPoint[3];
     
-    // Initial guess
+    // Initial guess. If no luck, wiggle it around.
     double f0 = demError(observerPos, lookDirection, t0, intersectionPoint, success); 
     if (!success) {
+      std::vector<double> delta = {1.0, 0.1, 10.0, 100.0, 1000.0, 5000.0, 10000.0};
+      for (size_t i = 0; i < delta.size(); i++) {
+        double try_t = t0 + delta[i] / 1000.0; // convert to km
+        f0 = demError(observerPos, lookDirection, try_t, intersectionPoint, success);
+        if (success) {
+          t0 = try_t;
+          break;
+        }
+      }
+    }
+    if (!success) {
+      setHasIntersection(false);
       return false;
     }
     
-    // Form the next guess. Try to add 0.1, 1, 10, 0.01 meters.
-    double delta[4] = {0.1, 1.0, 10.0, 0.01};
+    // Form the next guess (secant method needs two guesses). Try to add this
+    // many meters to the current guess.
+    std::vector<double> delta = {1.0, 0.1, 10.0, 0.01, 100.0};
     double t1 = 0, f1 = 0;
     success = false;
-    for (int i = 0; i < 4; i++) {
+    for (size_t i = 0; i < delta.size(); i++) {
       t1 = t0 + delta[i] / 1000.0; // convert to km
       f1 = demError(observerPos, lookDirection, t1, intersectionPoint, success);
       if (f1 == f0)
@@ -259,16 +273,20 @@ namespace Isis {
       if (success) 
         break;
     }
-    if (!success)
+    if (!success) {
+      setHasIntersection(false);
       return false;
+    }
 
-    // Do secant method with at most 100 iterations
+    // Secant method with at most 15 iterations. This method converges fast. 
+    // If it does not converge in this many iterations, it never will. 
     bool converged = false;
-    for (int i = 1; i <= 100; i++) {
+    double tol = resolution()/100;  // 1/100 of a pixel
+    for (int i = 1; i <= 15; i++) {
       
-      // Now recompute tolerance at updated surface point and recheck
       if (std::abs(f1) * 1000.0 < tol) {
         
+        // Recompute tolerance at updated surface point and recheck
         surfaceIntersection()->FromNaifArray(intersectionPoint);
         tol = resolution() / 100.0;
 
@@ -292,6 +310,7 @@ namespace Isis {
       
       if (!success) {
         converged = false;
+        setHasIntersection(false);
         break;
       }
       
