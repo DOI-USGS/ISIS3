@@ -47,6 +47,7 @@ release.
 - Fixed a bug in which the IrregularBodyCameraGroundMap unit test was removed but not the associated truth file. [#5461](https://github.com/DOI-USGS/ISIS3/issues/5461)
 - Fixed a bug in which the histogram tool used the entire image to calculate bin size, which caused an issue with high dynamic range images. [#5371](https://github.com/DOI-USGS/ISIS3/issues/5371)
 - Fixed a bug in which 'version' file was compiled as source and prevented subsequent ISIS recompilation [#5374](https://github.com/DOI-USGS/ISIS3/issues/5374)
+- Fixed <i>noproj</i> bug where some temporary files were not deleted after call to cam2cam.  Issue: [#4813](https://github.com/USGS-Astrogeology/ISIS3/issues/4813)
 - Fixed <i>noproj</i> bug where missing shapemodel-related keywords (RayTraceEngine, BulletParts, Tolerance) are dropped when the output label is created. This resulted in the Bullet collision detection engine not being used. Issue: [#5377](https://github.com/USGS-Astrogeology/ISIS3/issues/5377)
 
 ## [8.0.2] - 2023-12-05
