@@ -115,21 +115,6 @@ void sanitize(std::string &input);
     m_refTime.setUtc(timeString);
 
     setTarget(*cube.label());
-
-    // Setup a bunch of ISIS stuff
-    if (cube.hasTable("BodyRotation")) {
-      Table bodyRotTable("BodyRotation", cube.fileName(), *cube.label());
-      m_bodyRotation = new SpiceRotation(1);
-      m_bodyRotation->LoadCache(bodyRotTable);
-
-      PvlKeyword solarLonKey = bodyRotTable.Label().findKeyword("SolarLongitude");
-      m_solarLongitude = new Longitude((double)solarLonKey, Angle::Radians);
-      m_solarLongitude->force360Domain();
-
-    }
-
-    new CSMSkyMap(this);
-    setTime(m_refTime);
   }
 
 
@@ -188,7 +173,6 @@ void sanitize(std::string &input);
       m_et = new iTime();
     }
     *m_et = m_refTime + m_model->getImageTime(imagePt);
-    setTime(*m_et);
     if (target()->isSky()) {
       target()->shape()->setHasIntersection(false);
       return true;
@@ -286,7 +270,6 @@ void sanitize(std::string &input);
     SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 1};
     SensorUtilities::Vec rectPt = SensorUtilities::sphericalToRect(sphericalPt);
 
-    // vector<double> lookC = instrumentRotation()->ReferenceVector(rectPt);
     csm::EcefCoord lookPt = {rectPt.x, rectPt.y, rectPt.z};
     double achievedPrecision = 0;
     csm::WarningList warnings;
@@ -1117,9 +1100,8 @@ void sanitize(std::string &input);
    * @param time The time to set
    */
   void CSMCamera::setTime(const iTime &time) {
-    if(bodyRotation() != NULL) {
-      bodyRotation()->SetEphemerisTime(time.Et());
-    }
+    QString msg = "Setting the image time is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
@@ -1128,8 +1110,7 @@ void sanitize(std::string &input);
    * positive east, ocentric).
    *
    * This is not supported for CSM sensors because we cannot get the position
-   * of the sun, only the illumination direction. To prevent Qview from erroring
-   * this function sets both lat and lon to 0
+   * of the sun, only the illumination direction
    *
    * @param lat Sub-solar latitude
    * @param lon Sub-solar longitude
@@ -1205,7 +1186,8 @@ void sanitize(std::string &input);
    * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the body orientation
    */
   SpiceRotation *CSMCamera::bodyRotation() const {
-    return m_bodyRotation;
+    QString msg = "Body orientation is not supported for CSM camera models";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
@@ -1254,26 +1236,12 @@ void sanitize(std::string &input);
   /**
    * Computes the Right Ascension of the currently set image coordinate.
    *
-   * This is not supported for CSM sensors because the CSM API only supports the
-   * body fixed coordinate system and does not provide rotations to any others.
-   *
    * @returns @b double The Right Ascension
    */
   double CSMCamera::RightAscension() {
-    if (bodyRotation() == NULL || m_model == NULL) {
-      QString msg = "Image doesn't have attached body rotations, try running csminit "
-                    "again with an ISD that contains body rotations";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
     double precision;
     csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(p_childLine, p_childSample), 0.00001, &precision);
     csm::EcefVector v = locus.direction;
-    // Leaving this line as we may revisit in the future
-    // Since the ALE isd is being placed at the center of the body we don't have
-    // to rotate the vector into J2000. If that changes we may need to
-    // Apply the rotation
-    // std::vector<double> jvec = m_bodyRotation->J2000Vector({v.x, v.y, v.z});
     SensorUtilities::GroundPt3D sphere_v = SensorUtilities::rectToSpherical({v.x, v.y, v.z});
     double lon = sphere_v.lon;
     if (lon < 0) {
@@ -1286,20 +1254,12 @@ void sanitize(std::string &input);
   /**
    * Computes the Declination of the currently set image coordinate.
    *
-   * This is not supported for CSM sensors because the CSM API only supports the
-   * body fixed coordinate system and does not provide rotations to any others.
-   *
    * @returns @b double The Declination
    */
   double CSMCamera::Declination() {
-    if (bodyRotation() == NULL || m_model == NULL) {
-      QString msg = "Image doesn't have attached body rotations, try running csminit again with an ISD";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
     double precision;
     csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(p_childLine, p_childSample), 0.00001, &precision);
     csm::EcefVector v = locus.direction;
-    // std::vector<double> jvec = m_bodyRotation->J2000Vector({v.x, v.y, v.z});
     SensorUtilities::GroundPt3D sphere_v = SensorUtilities::rectToSpherical({v.x, v.y, v.z});
     return sphere_v.lat * RAD2DEG;
   }
