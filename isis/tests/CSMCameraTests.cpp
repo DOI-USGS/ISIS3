@@ -587,7 +587,7 @@ TEST_F(CSMCameraFixture, BodyRotation) {
   }
   catch(Isis::IException &e)
   {
-    EXPECT_TRUE(e.toString().toLatin1().contains("Target body orientation is not supported "
+    EXPECT_TRUE(e.toString().toLatin1().contains("Body orientation is not supported "
         "for CSM camera models")) << e.toString().toStdString();
   }
   catch(...)
