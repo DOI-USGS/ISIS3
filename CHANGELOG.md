@@ -40,7 +40,12 @@ release.
 - CSMCamera can now read and use the body rotation from ALE produced ISDs [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 - CSMSkyMap added to CSMCamera for use with local rover projections in ISIS [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 
-## [8.1.0] - 2023-12-05
+### Fixed
+- Fixed <i>noproj</i> bug where some temporary files were not deleted after call to cam2cam.  Issue: [#4813](https://github.com/USGS-Astrogeology/ISIS3/issues/4813)
+- Fixed <i>noproj</i> bug where missing shapemodel-related keywords (RayTraceEngine, BulletParts, Tolerance) are dropped when the output label is created. This resulted in the Bullet collision detection engine not being used. Issue: [#5377](https://github.com/USGS-Astrogeology/ISIS3/issues/5377)
+- Fixed ISIS failing to expand env variables with an "_" in them. [#5402](https://github.com/DOI-USGS/ISIS3/pull/5402)
+
+## [8.1.0] - 2024-01-08
 
 ### Changed
 - Cnetthinner has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5354](https://github.com/USGS-Astrogeology/ISIS3/issues/5354), 
@@ -53,6 +58,8 @@ release.
   outputsuffix, both, or neither for naming convention purposes. [#5162](https://github.com/DOI-USGS/ISIS3/pull/5162)
 - Changed the default PCK load behavior to try and load mission specific PCKs, if that fails we default to the base PCKs [#5335](https://github.com/DOI-USGS/ISIS3/pull/5335)
 - Disabled option to use web=true when running spiceinit with HRSC images. [#5223](https://github.com/DOI-USGS/ISIS3/issues/5223)
+- Set build option `pybindings=ON` in `build.sh` to turn on python bindings. [#5389](https://github.com/DOI-USGS/ISIS3/pull/5389)
+- Updated Ale to version 0.10.0 [#5399](https://github.com/DOI-USGS/ISIS3/pull/5399)
 
 ### Added
 - Added rclone to run dependencies in meta.yaml [#5183](https://github.com/DOI-USGS/ISIS3/issues/5183)
@@ -69,13 +76,14 @@ release.
 - Added ability to delegate calculation of nadir pointing to ALE [#5117](https://github.com/USGS-Astrogeology/ISIS3/issues/5117)
 - Added --no-kernels flag to downloadIsisData [#5264](https://github.com/DOI-USGS/ISIS3/issues/5264)
 - Added notice for depreciation to PvlObject::addLogGroup function which will be depreciated in favor of Application::appendAndLog(https://github.com/DOI-USGS/ISIS3/issues/5310)
+- Added new csm plugins path to IsisPreferences [#5397](https://github.com/DOI-USGS/ISIS3/pull/5397)
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
-- Bug fix for Cnetthinner app resolving divide by zero in CnetManager.cpp. Issue: [#5354](https://github.com/USGS-Astrogeology/ISIS3/issues/5354), 
+- Bug fix for Cnetthinner app resolving divide by zero in CnetManager.cpp. Issue: [#5354](https://github.com/USGS-Astrogeology/ISIS3/issues/5354) 
 - Updated photomet MinnaertEmpirical model to support photemplate-style PVL format [#3621](https://github.com/DOI-USGS/ISIS3/issues/3621)
 - Fix matrix inversion errors in <i>findfeatures</i> due to bad FASTGEOM matrix transforms using a more robust implementation to detect these errors and throw exceptions. Images with these errors are captured and logged to the <b>TONOTMATCHED</b> file. Fixes [#4639](https://github.com/DOI-USGS/ISIS3/issues/4639)
 - Fixed <i>findfeatures</i> use of projected mosaics with correct check for <b>TargetName</b> in the Mapping labels. [#4772](https://github.com/DOI-USGS/ISIS3/issues/4772)

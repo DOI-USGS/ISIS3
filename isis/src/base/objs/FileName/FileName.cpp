@@ -846,7 +846,7 @@ namespace Isis {
     // Loop while there are any "$" at the current position or after
     // Some "$" might be skipped if no translation can be found
     while((varStartPos = expandedStr.indexOf("$", varSearchStartPos)) != -1) {
-      int varEndPos = expandedStr.indexOf(QRegExp("[^a-zA-Z{}0-9]"), varStartPos + 1);
+      int varEndPos = expandedStr.indexOf(QRegExp("[^a-zA-Z{}0-9_]"), varStartPos + 1);
       if (varEndPos == -1)
         varEndPos = expandedStr.length();
 
