@@ -51,35 +51,6 @@ class CSMPluginFixture : public TempTestingFiles {
       file << isd;
       file.flush();
 
-      // Taken from msl mastcsm ISD (shouldn't matter though)
-      isd["body_rotation"] = {
-        {"time_dependent_frames", {
-          10014,
-          1
-        }},
-        {"ck_table_start_time", 598481006.3095651},
-        {"ck_table_end_time", 598481006.3095651},
-        {"ck_table_original_size", 1},
-        {"ephemeris_times", {598481006.3095651}},
-        {"quaternions", {{
-          -0.6980532256833364,
-          0.3170871114443887,
-          0.02820811335664892,
-          0.6413904896471425
-        }}},
-        {"angular_velocities" , {{
-          3.1623010866149816e-05,
-          -2.881378556904996e-05,
-          5.65157890696139e-05
-        }}},
-        {"reference_frame", 1}
-      };
-      bodyRotationIsdPath = tempDir.path() + "/body_rotation.json";
-      std::ofstream bodyRotationFile(bodyRotationIsdPath.toStdString());
-      bodyRotationFile << isd;
-      bodyRotationFile.flush();
-      isd.erase("body_rotation");
-
       json altIsd;
       altIsd["test_param_one"] = 1.0;
       altIsd["test_param_two"] = 2.0;
@@ -173,74 +144,6 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
 
   // Check that the BodyRotation table does not exist
   ASSERT_FALSE(testCube->hasTable("BodyRotation"));
-}
-
-TEST_F(CSMPluginFixture, CSMInitBodyRotation) {
-  // Run csminit with defaults for everything besides FROM and ISD
-  QVector<QString> args = {
-    "from="+filename,
-    "isd="+bodyRotationIsdPath
-  };
-
-  UserInterface options(APP_XML, args);
-  csminit(options);
-
-  testCube->open(filename);
-
-  // Most of this is copied from the Default test but
-  // we want to make sure we retain all functionality if
-  // a BodyRotation is present
-
-  // Get a model and a state string
-  Blob stateString("CSMState", "String");
-  testCube->read(stateString);
-
-  // Verify contents of the Blob's PVL label
-  PvlObject blobPvl = stateString.Label();
-
-  // Check that the plugin can create a model from the state string
-  std::string modelName = QString(blobPvl.findKeyword("ModelName")).toStdString();
-  std::string modelState(stateString.getBuffer(), stateString.Size());
-  EXPECT_TRUE(plugin->canModelBeConstructedFromState(modelName, modelState));
-
-  // Check blob label ModelName and Plugin Name
-  EXPECT_EQ(QString(blobPvl.findKeyword("PluginName")).toStdString(), plugin->getPluginName());
-  EXPECT_EQ(modelName, TestCsmModel::SENSOR_MODEL_NAME);
-
-  // Check the Instrument group
-  ASSERT_TRUE(testCube->hasGroup("Instrument"));
-  PvlGroup &instGroup = testCube->group("Instrument");
-  EXPECT_TRUE(instGroup.hasKeyword("TargetName"));
-
-  // Check the CsmInfo group
-  ASSERT_TRUE(testCube->hasGroup("CsmInfo"));
-  PvlGroup &infoGroup = testCube->group("CsmInfo");
-  ASSERT_TRUE(infoGroup.hasKeyword("CSMPlatformID"));
-  EXPECT_EQ(infoGroup["CSMPlatformID"][0].toStdString(), model.getPlatformIdentifier());
-  ASSERT_TRUE(infoGroup.hasKeyword("CSMInstrumentId"));
-  EXPECT_EQ(infoGroup["CSMInstrumentId"][0].toStdString(), model.getSensorIdentifier());
-  ASSERT_TRUE(infoGroup.hasKeyword("ReferenceTime"));
-  EXPECT_EQ(infoGroup["ReferenceTime"][0].toStdString(), model.getReferenceDateAndTime());
-  ASSERT_TRUE(infoGroup.hasKeyword("ModelParameterNames"));
-  ASSERT_EQ(infoGroup["ModelParameterNames"].size(), 3);
-  EXPECT_EQ(infoGroup["ModelParameterNames"][0].toStdString(), TestCsmModel::PARAM_NAMES[0]);
-  EXPECT_EQ(infoGroup["ModelParameterNames"][1].toStdString(), TestCsmModel::PARAM_NAMES[1]);
-  ASSERT_TRUE(infoGroup.hasKeyword("ModelParameterUnits"));
-  ASSERT_EQ(infoGroup["ModelParameterUnits"].size(), 3);
-  EXPECT_EQ(infoGroup["ModelParameterUnits"][0].toStdString(), TestCsmModel::PARAM_UNITS[0]);
-  EXPECT_EQ(infoGroup["ModelParameterUnits"][1].toStdString(), TestCsmModel::PARAM_UNITS[1]);
-  ASSERT_TRUE(infoGroup.hasKeyword("ModelParameterTypes"));
-  ASSERT_EQ(infoGroup["ModelParameterTypes"].size(), 3);
-  EXPECT_EQ(infoGroup["ModelParameterTypes"][0].toStdString(), "REAL");
-  EXPECT_EQ(infoGroup["ModelParameterTypes"][1].toStdString(), "REAL");
-
-  // Check the Kernels group
-  ASSERT_TRUE(testCube->hasGroup("Kernels"));
-  PvlGroup &kernGroup = testCube->group("Kernels");
-  EXPECT_TRUE(kernGroup.hasKeyword("ShapeModel"));
-
-  // Check for BodyRotation table
-  ASSERT_TRUE(testCube->hasTable("BodyRotation"));
 }
 
 TEST_F(CSMPluginFixture, CSMInitRunTwice) {

@@ -585,13 +585,13 @@ namespace Isis {
         gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[2]), "DEGREE");
         gp->findKeyword("LookDirectionBodyFixed").addComment("Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.");
 
-        if (m_camera->bodyRotation() != NULL) {
+        try {
           std::vector<double>lookJ = m_camera->lookDirectionJ2000();
           gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[0]), "DEGREE");
           gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[1]), "DEGREE");
           gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[2]), "DEGREE");
         }
-        else {
+        catch (IException &e) {
           gp->findKeyword("LookDirectionJ2000").addValue("Null");
           gp->findKeyword("LookDirectionJ2000").addValue("Null");
           gp->findKeyword("LookDirectionJ2000").addValue("Null");
