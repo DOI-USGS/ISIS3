@@ -1258,7 +1258,6 @@ void sanitize(std::string &input);
    */
   double CSMCamera::Declination() {
     double precision;
-    cout << p_childLine << ", " << p_childSample << endl;
     csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(p_childLine, p_childSample), 0.00001, &precision);
     csm::EcefVector v = locus.direction;
     SensorUtilities::GroundPt3D sphere_v = SensorUtilities::rectToSpherical({v.x, v.y, v.z});
