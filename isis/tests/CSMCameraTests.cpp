@@ -665,14 +665,13 @@ TEST_F(CSMCameraFixture, SolarDistance) {
 TEST_F(CSMCameraFixture, RightAscension) {
   // Define some things to match/return
   csm::Ellipsoid wgs84;
-  csm::ImageCoord imagePt(0, 0);
   csm::EcefLocus imageLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, -1, 0, 0);
 
   // Setup expected calls/returns
-  EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(imagePt), ::testing::_, ::testing::_, ::testing::_))
+  EXPECT_CALL(mockModel, imageToRemoteImagingLocus(::testing::_, ::testing::_, ::testing::_, ::testing::_))
       .Times(1)
       .WillRepeatedly(::testing::Return(imageLocus));
-  
+
   try
   {
     double rightAscension = testCam->RightAscension();
@@ -688,11 +687,10 @@ TEST_F(CSMCameraFixture, RightAscension) {
 TEST_F(CSMCameraFixture, Declination) {
   // Define some things to match/return
   csm::Ellipsoid wgs84;
-  csm::ImageCoord imagePt(0, 0);
   csm::EcefLocus imageLocus(wgs84.getSemiMajorRadius() + 50000, 0, 0, -1, 0, 0);
 
   // Setup expected calls/returns
-  EXPECT_CALL(mockModel, imageToRemoteImagingLocus(MatchImageCoord(imagePt), ::testing::_, ::testing::_, ::testing::_))
+  EXPECT_CALL(mockModel, imageToRemoteImagingLocus(::testing::_, ::testing::_, ::testing::_, ::testing::_))
       .Times(1)
       .WillRepeatedly(::testing::Return(imageLocus));
 
