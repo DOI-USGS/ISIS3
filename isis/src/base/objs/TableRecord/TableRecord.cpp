@@ -8,6 +8,7 @@ find files of those names at the top level of this repository. **/
 #include "TableRecord.h"
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -19,6 +20,21 @@ using namespace std;
 namespace Isis {
   //! Constructs an empty TableRecord object. No member variables are set.
   TableRecord::TableRecord(){
+  }
+
+  TableRecord::TableRecord(std::string tableRecordStr, char fieldDelimiter, 
+                            std::vector<QString> fieldNames, int numOfFieldValues) {
+    std::stringstream tableRecordStream;
+    tableRecordStream << tableRecordStr;
+
+    std::string fieldStr;
+    int i = 0;
+    while(std::getline(tableRecordStream, fieldStr, fieldDelimiter)) {
+      TableField tableField(fieldNames[i], TableField::Double);
+      tableField = std::stod(fieldStr); // convert string to double
+      p_fields.push_back(tableField);
+      i++;
+    }
   }
 
   //! Destroys the TableRecord object
@@ -155,7 +171,7 @@ namespace Isis {
       Isis::TableField &field = p_fields[f];
       field = (void *)&buf[sbyte];
       sbyte += field.bytes();
-    }
+    } 
   }
 
   /**

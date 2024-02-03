@@ -680,6 +680,34 @@
         </filter>
       </parameter>
 
+      <parameter name="ADJUSTMENT_OUTPUT">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Outputs adjustment values
+        </brief>
+        <description>
+          "Outputs adjustment values"
+        </description>
+        <filter>
+          *.h5
+        </filter>
+      </parameter>
+
+      <parameter name="ADJUSTMENT_INPUT">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Reads in adjustment values
+        </brief>
+        <description>
+          "Reads in adjustment values"
+        </description>
+        <filter>
+          *.h5
+        </filter>
+      </parameter>
+
       <parameter name="HELDLIST">
         <type>filename</type>
         <internalDefault>none</internalDefault>
