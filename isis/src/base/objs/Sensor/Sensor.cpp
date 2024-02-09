@@ -141,13 +141,13 @@ namespace Isis {
    *
    */
   bool Sensor::SetLookDirection(const double v[3]) {
-    //std::cout << "Sensor::SetLookDirection()\n";
+    // std::cout << "Sensor::SetLookDirection()\n";
     // The look vector must be in the camera coordinate system
 
     // copy v to LookC
     // lookC[0] = v[0];
     // lookC[1] = v[1];
-    // lookC[2] = v[2];
+    // lookC[2] = v[2]
     vector<double> lookC(v, v + 3);
 
     // Convert it to body-fixed
@@ -613,7 +613,9 @@ namespace Isis {
   bool Sensor::SetRightAscensionDeclination(const double ra, const double dec) {
     double raRad = ra * DEG2RAD;
     double decRad = dec * DEG2RAD;
-    SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 1.0};
+
+    // Make the radius bigger, some multiple of the body radius -or- use sensor position at the reference point 
+    SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 1};
     SensorUtilities::Vec rectPt = SensorUtilities::sphericalToRect(sphericalPt);
 
     vector<double> lookC = instrumentRotation()->ReferenceVector(rectPt);
