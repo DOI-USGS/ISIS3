@@ -35,4 +35,22 @@ namespace Isis {
     // ISIS uses Km, so convert to meters
     return {coord[0] * 1000.0, coord[1] * 1000.0, coord[2] * 1000.0};
   }
+
+
+  /**
+   * Get the velocity in meters at a given time.
+   */
+  SensorUtilities::Vec IsisIlluminator::velocity(double time) {
+    double oldTime = m_pos->EphemerisTime();
+    bool timeChanged = oldTime != time;
+    if (timeChanged) {
+      m_pos->SetEphemerisTime(time);
+    }
+    vector<double> vel = m_pos->Velocity();
+    if (timeChanged) {
+      m_pos->SetEphemerisTime(oldTime);
+    }
+    // ISIS uses Km, so convert to meters
+    return {vel[0] * 1000.0, vel[1] * 1000.0, vel[2] * 1000.0};
+  }
 }
