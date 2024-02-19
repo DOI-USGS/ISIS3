@@ -1,5 +1,5 @@
-#ifndef IsisIlluminator_h
-#define IsisIlluminator_h
+#ifndef IsisBody_h
+#define IsisBody_h
 /** This is free and unencumbered software released into the public domain.
 The authors of ISIS do not claim copyright on the contents of this file.
 For more details about the LICENSE terms and the AUTHORS, you will
@@ -9,19 +9,20 @@ find files of those names at the top level of this repository. **/
 #include "SensorUtilities.h"
 
 namespace Isis {
-  class SpicePosition;
+  class SpiceRotation;
 
   /**
-   * Implementation of SensorUtilities::Illuminator backed by an ISIS SpicePosition.
+   * Implementation of SensorUtilities::Body backed by an ISIS SpiceRotation.
    */
-  class IsisIlluminator : SensorUtilities::Illuminator {
+  class IsisBody : SensorUtilities::Body {
     public:
-      IsisIlluminator(SpicePosition* pos);
+      IsisBody(SpiceRotation* rot);
 
-      SensorUtilities::Vec position(double time);
-      SensorUtilities::Vec velocity(double time);
+      std::vector<double> rotation(double time);
+
+      SensorUtilities::Vec fixedVector(SensorUtilities::Vec pos);
     private:
-      SpicePosition* m_pos;
+      SpiceRotation* m_rot;
   };
 };
 

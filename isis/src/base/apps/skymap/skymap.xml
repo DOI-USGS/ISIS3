@@ -29,9 +29,10 @@
     MaximumLatitude        = Computed from the input camera cube or map file
     MinimumLongitude       = Computed from the input camera cube or map file
     MaximumLongitude       = Computed from the input camera cube or map file
+    CenterLongitude        = Computed from the input camera cube at the center of the image
 
     ProjectionName         = Projection name in the map file
-    Scale                 = Computed from the input camera cube or map file
+    Scale                  = Computed from the input camera cube or map file
   EndGroup
     </pre>
 
@@ -47,6 +48,14 @@
   <p>
     Finally, the user has the option to override the pixel resolution and the ground range (latitude/longitude).  These changes can be
     facilitied through the parameters SCALE, SRA, ERA, SDEC, and EDEC.
+  </p>
+
+  <p>
+    In addition, skymap can be used to produce landed mosaics from rovers like MSL. This can be done using ALE to generate an ISD
+    which can be attached to the cube via <def link="csminit">csminit</def>. The user would then have to update the LongitudeDirection 
+    their map file to PositiveWest. This converts the projection from a right ascension/declination projection to an azimuth/elevation 
+    projection. Once that is done, the user would run their ISIS cube through <def link="skymap">skymap</def> and see that the landed 
+    rover data would project relative to other images in the same image sequence.
   </p>
   </description>
 
@@ -100,6 +109,10 @@
       </change>
       <change name="Debbie A. Cook" date="2012-12-10">
         Changed to use TProjection instead of Projection.  References #775
+      </change>
+      <change name="Adam Paquette" date="2023-05-01">
+        Updated camera to properly calculate the center longitude. Also
+        allowed users to select PositiveEast in there mapping file.
       </change>
  </history>
 

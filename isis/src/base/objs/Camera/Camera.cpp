@@ -462,27 +462,21 @@ namespace Isis {
     // TODO: we need to validate this pointer (somewhere)
     ShapeModel *shape = target()->shape();
 
-    //cout << "undistorted focal plane: " << ux << " " << uy << endl; //debug
-    //cout.precision(15);
-    //cout << "Backward Time: " << Time().Et() << endl;
     // Convert undistorted x/y to distorted x/y
     bool success = p_distortionMap->SetUndistortedFocalPlane(ux, uy);
     if (success) {
       double focalPlaneX = p_distortionMap->FocalPlaneX();
       double focalPlaneY = p_distortionMap->FocalPlaneY();
-      //cout << "focal plane: " << focalPlaneX << " " << focalPlaneY << endl; //debug
       // Convert distorted x/y to detector position
       success = p_focalPlaneMap->SetFocalPlane(focalPlaneX, focalPlaneY);
       if (success) {
         double detectorSample = p_focalPlaneMap->DetectorSample();
         double detectorLine = p_focalPlaneMap->DetectorLine();
-        //cout << "detector: " << detectorSample << " " << detectorLine << endl;
         // Convert detector to parent position
         success = p_detectorMap->SetDetector(detectorSample, detectorLine);
         if (success) {
           double parentSample = p_detectorMap->ParentSample();
           double parentLine = p_detectorMap->ParentLine();
-          //cout << "cube: " << parentSample << " " << parentLine << endl; //debug
           if (p_projection == NULL || p_ignoreProjection) {
             p_childSample = p_alphaCube->BetaSample(parentSample);
             p_childLine = p_alphaCube->BetaLine(parentLine);

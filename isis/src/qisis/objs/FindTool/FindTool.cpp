@@ -459,8 +459,16 @@ namespace Isis {
 
     if (groundMap) {
       if ( groundMap->SetImage(samp, line) ) {
-        p_lat = groundMap->UniversalLatitude();
-        p_lon = groundMap->UniversalLongitude();
+        if (activeViewport->camera() != NULL) {
+          if (activeViewport->camera()->target()->isSky()) {
+            p_lat = activeViewport->camera()->Declination();
+            p_lon = activeViewport->camera()->RightAscension();
+          }
+        }
+        else {
+          p_lat = groundMap->UniversalLatitude();
+          p_lon = groundMap->UniversalLongitude();
+        }
       }
     }
     else {
@@ -621,6 +629,11 @@ namespace Isis {
                                       double lat, double lon) {
     UniversalGroundMap *groundMap = viewport->universalGroundMap();
     Distance viewportResolution;
+    if (viewport->camera() != NULL){
+      if (groundMap->Camera()->target()->isSky()) {
+        return Distance(groundMap->Camera()->RaDecResolution(), Distance::Units::Meters);
+      }
+    }
 
     try {
       if ( groundMap && !IsSpecial(lat) && !IsSpecial(lon) &&
