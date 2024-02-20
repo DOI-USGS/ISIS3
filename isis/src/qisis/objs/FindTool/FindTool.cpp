@@ -464,6 +464,10 @@ namespace Isis {
             p_lat = activeViewport->camera()->Declination();
             p_lon = activeViewport->camera()->RightAscension();
           }
+          else {
+            p_lat = groundMap->UniversalLatitude();
+            p_lon = groundMap->UniversalLongitude();
+          }
         }
         else {
           p_lat = groundMap->UniversalLatitude();
