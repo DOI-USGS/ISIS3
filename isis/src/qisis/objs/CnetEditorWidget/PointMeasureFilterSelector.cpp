@@ -27,7 +27,20 @@ find files of those names at the top level of this repository. **/
 #include "APrioriLongitudeSigmaFilter.h"
 #include "APrioriRadiusFilter.h"
 #include "APrioriRadiusSigmaFilter.h"
+#include "AdjustedXFilter.h"
+#include "AdjustedXSigmaFilter.h"
+#include "AdjustedYFilter.h"
+#include "AdjustedYSigmaFilter.h"
+#include "AdjustedZFilter.h"
+#include "AdjustedZSigmaFilter.h"
+#include "AprioriXFilter.h"
+#include "AprioriXSigmaFilter.h"
+#include "AprioriYFilter.h"
+#include "AprioriYSigmaFilter.h"
+#include "AprioriZFilter.h"
+#include "AprioriZSigmaFilter.h"
 #include "ChooserNameFilter.h"
+#include "CnetDisplayProperties.h"
 #include "GoodnessOfFitFilter.h"
 #include "ImageIdFilter.h"
 #include "LineFilter.h"
@@ -79,19 +92,36 @@ namespace Isis {
 
   void PointMeasureFilterSelector::createSelector() {
     AbstractFilterSelector::createSelector();
+    CnetDisplayProperties *displayProperties = CnetDisplayProperties::getInstance();
 
-    getSelector()->addItem("Adjusted SP Latitude");
-    getSelector()->addItem("Adjusted SP Latitude Sigma");
-    getSelector()->addItem("Adjusted SP Longitude");
-    getSelector()->addItem("Adjusted SP Longitude Sigma");
-    getSelector()->addItem("Adjusted SP Radius");
-    getSelector()->addItem("Adjusted SP Radius Sigma");
-    getSelector()->addItem("A Priori SP Latitude");
-    getSelector()->addItem("A Priori SP Latitude Sigma");
-    getSelector()->addItem("A Priori SP Longitude");
-    getSelector()->addItem("A Priori SP Longitude Sigma");
-    getSelector()->addItem("A Priori SP Radius");
-    getSelector()->addItem("A Priori SP Radius Sigma");
+    if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+        getSelector()->addItem("Adjusted SP Latitude");
+        getSelector()->addItem("Adjusted SP Latitude Sigma");
+        getSelector()->addItem("Adjusted SP Longitude");
+        getSelector()->addItem("Adjusted SP Longitude Sigma");
+        getSelector()->addItem("Adjusted SP Radius");
+        getSelector()->addItem("Adjusted SP Radius Sigma");
+        getSelector()->addItem("A Priori SP Latitude");
+        getSelector()->addItem("A Priori SP Latitude Sigma");
+        getSelector()->addItem("A Priori SP Longitude");
+        getSelector()->addItem("A Priori SP Longitude Sigma");
+        getSelector()->addItem("A Priori SP Radius");
+        getSelector()->addItem("A Priori SP Radius Sigma");
+    }
+    else {
+        getSelector()->addItem("Adjusted SP X");
+        getSelector()->addItem("Adjusted SP X Sigma");
+        getSelector()->addItem("Adjusted SP Y");
+        getSelector()->addItem("Adjusted SP Y Sigma");
+        getSelector()->addItem("Adjusted SP Z");
+        getSelector()->addItem("Adjusted SP Z Sigma");
+        getSelector()->addItem("A Priori SP X");
+        getSelector()->addItem("A Priori SP X Sigma");
+        getSelector()->addItem("A Priori SP Y");
+        getSelector()->addItem("A Priori SP Y Sigma");
+        getSelector()->addItem("A Priori SP Z");
+        getSelector()->addItem("A Priori SP Z Sigma");
+    }
     getSelector()->addItem("Chooser Name");
     getSelector()->addItem("Edit Locked Points");
     getSelector()->addItem("Ignored Points");
@@ -118,43 +148,105 @@ namespace Isis {
   void PointMeasureFilterSelector::changeFilter(int index) {
     deleteFilter();
 
+    CnetDisplayProperties *displayProperties = CnetDisplayProperties::getInstance();
+
     if (index != 0) {
       switch (index) {
         case 2:
-          setFilter(new AdjustedLatitudeFilter(AbstractFilter::Points));
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            setFilter(new AdjustedLatitudeFilter(AbstractFilter::Points));
+          }
+          else {
+            setFilter(new AdjustedXFilter(AbstractFilter::Points));
+          }
           break;
         case 3:
-          setFilter(new AdjustedLatitudeSigmaFilter(AbstractFilter::Points));
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            setFilter(new AdjustedLatitudeSigmaFilter(AbstractFilter::Points));
+          }
+          else {
+            setFilter(new AdjustedXSigmaFilter(AbstractFilter::Points));
+          }
           break;
         case 4:
-          setFilter(new AdjustedLongitudeFilter(AbstractFilter::Points));
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            setFilter(new AdjustedLongitudeFilter(AbstractFilter::Points));
+          }
+          else {
+            setFilter(new AdjustedYFilter(AbstractFilter::Points));
+          }
           break;
         case 5:
-          setFilter(new AdjustedLongitudeSigmaFilter(AbstractFilter::Points));
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            setFilter(new AdjustedLongitudeSigmaFilter(AbstractFilter::Points));
+          }
+          else {
+              setFilter(new AdjustedYSigmaFilter(AbstractFilter::Points));
+          }
           break;
         case 6:
-          setFilter(new AdjustedRadiusFilter(AbstractFilter::Points));
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            setFilter(new AdjustedRadiusFilter(AbstractFilter::Points));
+          }
+          else {
+            setFilter(new AdjustedZFilter(AbstractFilter::Points));
+          }
           break;
         case 7:
-          setFilter(new AdjustedRadiusSigmaFilter(AbstractFilter::Points));
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            setFilter(new AdjustedRadiusSigmaFilter(AbstractFilter::Points));
+          }
+          else {
+            setFilter(new AdjustedZSigmaFilter(AbstractFilter::Points));
+          }
           break;
         case 8:
-          setFilter(new APrioriLatitudeFilter(AbstractFilter::Points));
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            setFilter(new APrioriLatitudeFilter(AbstractFilter::Points));
+          }
+          else {
+            setFilter(new AprioriXFilter(AbstractFilter::Points));
+          }
           break;
         case 9:
-          setFilter(new APrioriLatitudeSigmaFilter(AbstractFilter::Points));
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            setFilter(new APrioriLatitudeSigmaFilter(AbstractFilter::Points));
+          }
+          else {
+            setFilter(new AprioriXSigmaFilter(AbstractFilter::Points));
+          }
           break;
         case 10:
-          setFilter(new APrioriLongitudeFilter(AbstractFilter::Points));
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            setFilter(new APrioriLongitudeFilter(AbstractFilter::Points));
+          }
+          else {
+            setFilter(new AprioriYFilter(AbstractFilter::Points));
+          }
           break;
         case 11:
-          setFilter(new APrioriLongitudeSigmaFilter(AbstractFilter::Points));
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            setFilter(new APrioriLongitudeSigmaFilter(AbstractFilter::Points));
+          }
+          else {
+            setFilter(new AprioriYSigmaFilter(AbstractFilter::Points));
+          }
           break;
         case 12:
-          setFilter(new APrioriRadiusFilter(AbstractFilter::Points));
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            setFilter(new APrioriRadiusFilter(AbstractFilter::Points));
+          }
+          else {
+            setFilter(new AprioriZFilter(AbstractFilter::Points));
+          }
           break;
         case 13:
-          setFilter(new APrioriRadiusSigmaFilter(AbstractFilter::Points));
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            setFilter(new APrioriRadiusSigmaFilter(AbstractFilter::Points));
+          }
+          else {
+            setFilter(new AprioriZSigmaFilter(AbstractFilter::Points));
+          }
           break;
         case 14:
           setFilter(new ChooserNameFilter(AbstractFilter::Points));

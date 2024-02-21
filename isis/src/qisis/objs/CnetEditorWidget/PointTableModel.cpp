@@ -16,6 +16,7 @@ find files of those names at the top level of this repository. **/
 #include <QStringList>
 #include <QVariant>
 
+#include "CnetDisplayProperties.h"
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "Distance.h"
@@ -93,6 +94,12 @@ namespace Isis {
   }
 
 
+  void PointTableModel::resetColumnHeaders() {
+    TableColumnList *columns = getColumns();
+    AbstractPointItem::resetColumnHeaders(columns);
+  }
+
+
   QString PointTableModel::getPointWarningMessage(
     AbstractTreeItem const *row, TableColumn const *column,
     QString valueToSave) {
@@ -101,6 +108,7 @@ namespace Isis {
       AbstractPointItem::getColumn(colTitle);
 
     QString warningText;
+    CnetDisplayProperties *displayProperties = CnetDisplayProperties::getInstance();
 
     switch (colType) {
       case AbstractPointItem::EditLock:
@@ -110,46 +118,83 @@ namespace Isis {
               row->getFormattedData() + "] for editing?";
         }
         break;
-      case AbstractPointItem::APrioriSPLatSigma:
-      case AbstractPointItem::APrioriSPLonSigma:
-      case AbstractPointItem::APrioriSPRadiusSigma: {
+      case AbstractPointItem::APrioriSPCoord1Sigma:
+      case AbstractPointItem::APrioriSPCoord2Sigma:
+      case AbstractPointItem::APrioriSPCoord3Sigma: {
+          ASSERT(row->getPointerType() == AbstractTreeItem::Point);
           ControlPoint *point = (ControlPoint *) row->getPointer();
 
           // Check to see if any of the sigma values are null.
-          bool latSigmaValid = (point->GetAprioriSurfacePoint().
-              GetLatSigmaDistance().isValid());
-          bool lonSigmaValid = (point->GetAprioriSurfacePoint().
-              GetLonSigmaDistance().isValid());
-          bool radiusSigmaValid = (point->GetAprioriSurfacePoint().
-              GetLocalRadiusSigma().isValid());
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            bool latSigmaValid = (point->GetAprioriSurfacePoint().
+                GetLatSigmaDistance().isValid());
+            bool lonSigmaValid = (point->GetAprioriSurfacePoint().
+                GetLonSigmaDistance().isValid());
+            bool radiusSigmaValid = (point->GetAprioriSurfacePoint().
+                GetLocalRadiusSigma().isValid());
 
-          if (!latSigmaValid && !lonSigmaValid && !radiusSigmaValid &&
-              valueToSave.toLower() != "null") {
-            warningText = "The sigma values are currently null. The other "
-                "sigmas will be set to 10,000, which currently represents "
-                "'free'. Is this okay?";
+            if (!latSigmaValid && !lonSigmaValid && !radiusSigmaValid &&
+                valueToSave.toLower() != "null") {
+              warningText = "The sigma values are currently null. The other "
+                  "sigmas will be set to 10,000, which currently represents "
+                  "'free'. Is this okay?";
+            }
+            else {
+              bool xSigmaValid = (point->GetAprioriSurfacePoint().
+                  GetXSigma().isValid());
+              bool ySigmaValid = (point->GetAprioriSurfacePoint().
+                  GetYSigma().isValid());
+              bool zSigmaValid = (point->GetAprioriSurfacePoint().
+                  GetZSigma().isValid());
+
+              if (!xSigmaValid && !ySigmaValid && !zSigmaValid &&
+                  valueToSave.toLower() != "null") {
+                warningText = "The sigma values are currently null. The other "
+                    "sigmas will be set to 10,000, which currently represents "
+                    "'free'. Is this okay?";
+              }
+            }
           }
           break;
         }
-      case AbstractPointItem::APrioriSPLat:
-      case AbstractPointItem::APrioriSPLon:
-      case AbstractPointItem::APrioriSPRadius: {
+      case AbstractPointItem::APrioriSPCoord1:
+      case AbstractPointItem::APrioriSPCoord2:
+      case AbstractPointItem::APrioriSPCoord3: {
+          ASSERT(row->getPointerType() == AbstractTreeItem::Point);
           ControlPoint *point = (ControlPoint *) row->getPointer();
 
           // Check to see if any of the surface point values are null.
-          bool latValid = (point->GetAprioriSurfacePoint().
-              GetLatitude().isValid());
-          bool lonValid = (point->GetAprioriSurfacePoint().
-              GetLongitude().isValid());
-          bool radiusValid = (point->GetAprioriSurfacePoint().
-              GetLocalRadius().isValid());
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            bool latValid = (point->GetAprioriSurfacePoint().
+                GetLatitude().isValid());
+            bool lonValid = (point->GetAprioriSurfacePoint().
+                GetLongitude().isValid());
+            bool radiusValid = (point->GetAprioriSurfacePoint().
+                GetLocalRadius().isValid());
 
-          if (!latValid && !lonValid && !radiusValid &&
-              valueToSave.toLower() != "null") {
-            warningText = "Some of the a priori surface point values are "
-                "currently null. The surface point lat and lon will be set "
-                "to 0 if they are null, and the radius will be set to "
-                "10,000 if it is null. Is this okay?";
+            if (!latValid && !lonValid && !radiusValid &&
+                valueToSave.toLower() != "null") {
+              warningText = "Some of the a priori surface point values are "
+                  "currently null. The surface point lat and lon will be set "
+                  "to 0 if they are null, and the radius will be set to "
+                  "10,000 if it is null. Is this okay?";
+            }
+          }
+          else {
+            bool xValid = (point->GetAprioriSurfacePoint().
+                GetX().isValid());
+            bool yValid = (point->GetAprioriSurfacePoint().
+                GetY().isValid());
+            bool zValid = (point->GetAprioriSurfacePoint().
+                GetZ().isValid());
+
+            if (!xValid && !yValid && !zValid &&
+                valueToSave.toLower() != "null") {
+              warningText = "Some of the a priori surface point values are "
+                  "currently null. The surface point lat and lon will be set "
+                  "to 0 if they are null, and the radius will be set to "
+                  "10,000 if it is null. Is this okay?";
+            }
           }
           break;
         }

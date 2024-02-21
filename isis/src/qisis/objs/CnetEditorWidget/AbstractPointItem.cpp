@@ -23,58 +23,144 @@ find files of those names at the top level of this repository. **/
 #include "TableColumn.h"
 #include "TableColumnList.h"
 
-
 namespace Isis {
   QString AbstractPointItem::getColumnName(Column col) {
+
+    CnetDisplayProperties *displayProperties = CnetDisplayProperties::getInstance();
+
     switch (col) {
       case Id:
         return "Point ID";
+        break;
       case PointType:
         return "Point Type";
+        break;
       case ChooserName:
         return "Chooser Name";
+        break;
       case DateTime:
         return "Date Time";
+        break;
       case EditLock:
         return "Edit Lock";
+        break;
       case Ignored:
         return "Ignored";
+        break;
       case Reference:
         return "Reference";
-      case AdjustedSPLat:
-        return "Adjusted SP Lat";
-      case AdjustedSPLon:
-        return "Adjusted SP Lon";
-      case AdjustedSPRadius:
-        return "Adjusted SP Radius";
-      case AdjustedSPLatSigma:
-        return "Adjusted SP Lat Sigma";
-      case AdjustedSPLonSigma:
-        return "Adjusted SP Lon Sigma";
-      case AdjustedSPRadiusSigma:
-        return "Adjusted SP Radius Sigma";
-      case APrioriSPLat:
-        return "A Priori SP Lat";
-      case APrioriSPLon:
-        return "A Priori SP Lon";
-      case APrioriSPRadius:
-        return "A Priori SP Radius";
-      case APrioriSPLatSigma:
-        return "A Priori SP Lat Sigma";
-      case APrioriSPLonSigma:
-        return "A Priori SP Lon Sigma";
-      case APrioriSPRadiusSigma:
-        return "A Priori SP Radius Sigma";
+        break;
+      case AdjustedSPCoord1:
+        if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+          return "Adjusted SP Lat";
+        }
+        else {
+          return "Adjusted SP X";
+        }
+        break;
+      case AdjustedSPCoord2:
+        if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+          return "Adjusted SP Lon";
+        }
+        else {
+          return "Adjusted SP Y";
+        }
+        break;
+      case AdjustedSPCoord3:
+        if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+          return "Adjusted SP Radius";
+        }
+        else {
+          return "Adjusted SP Z";
+        }
+        break;
+      case AdjustedSPCoord1Sigma:
+        if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+          return "Adjusted SP Lat Sigma";
+        }
+        else {
+          return "Adjusted SP X Sigma";
+        }
+      case AdjustedSPCoord2Sigma:
+        if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+          return "Adjusted SP Lon Sigma";
+        }
+        else {
+          return "Adjusted SP Y Sigma";
+        }
+        break;
+      case AdjustedSPCoord3Sigma:
+        if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+          return "Adjusted SP Radius Sigma";
+        }
+        else {
+          return "Adjusted SP Z Sigma";
+        }
+        break;
+      case APrioriSPCoord1:
+        if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+          return "A Priori SP Lat";
+        }
+        else {
+          return "A Priori SP X";
+        }
+        break;
+      case APrioriSPCoord2:
+        if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+          return "A Priori SP Lon";
+        }
+        else {
+          return "A Priori SP Y";
+        }
+        break;
+      case APrioriSPCoord3:
+        if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+          return "A Priori SP Radius";
+        }
+        else {
+          return "A Priori SP Z";
+        }
+        break;
+      case APrioriSPCoord1Sigma:
+        if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+          return "A Priori SP Lat Sigma";
+        }
+        else {
+          return "A Priori SP X Sigma";
+        }
+        break;
+      case APrioriSPCoord2Sigma:
+        if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+          return "A Priori SP Lon Sigma";
+        }
+        else {
+          return "A Priori SP Y Sigma";
+        }
+        break;
+      case APrioriSPCoord3Sigma:
+        if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+          return "A Priori SP Radius Sigma";
+        }
+        else {
+          return "A Priori SP Z Sigma";
+        }
+        break;
       case APrioriSPSource:
         return "A Priori SP Source";
+        break;
       case APrioriSPSourceFile:
         return "A Priori SP Source File";
+        break;
       case APrioriRadiusSource:
         return "A Priori Radius Source";
+        break;
       case APrioriRadiusSourceFile:
         return "A Priori Radius Source File";
       case JigsawRejected:
         return "Jigsaw Rejected";
+        break;
+    default:
+        break;
     }
 
     return QString();
@@ -110,29 +196,29 @@ namespace Isis {
     columnList->append(
       new TableColumn(getColumnName(Reference), false, false));
     columnList->append(
-      new TableColumn(getColumnName(AdjustedSPLat), true, false));
+      new TableColumn(getColumnName(AdjustedSPCoord1), true, false));
     columnList->append(
-      new TableColumn(getColumnName(AdjustedSPLon), true, false));
+      new TableColumn(getColumnName(AdjustedSPCoord2), true, false));
     columnList->append(
-      new TableColumn(getColumnName(AdjustedSPRadius), true, false));
+      new TableColumn(getColumnName(AdjustedSPCoord3), true, false));
     columnList->append(
-      new TableColumn(getColumnName(AdjustedSPLatSigma), true, false));
+      new TableColumn(getColumnName(AdjustedSPCoord1Sigma), true, false));
     columnList->append(
-      new TableColumn(getColumnName(AdjustedSPLonSigma), true, false));
+      new TableColumn(getColumnName(AdjustedSPCoord2Sigma), true, false));
     columnList->append(
-      new TableColumn(getColumnName(AdjustedSPRadiusSigma), true, false));
+      new TableColumn(getColumnName(AdjustedSPCoord3Sigma), true, false));
     columnList->append(
-      new TableColumn(getColumnName(APrioriSPLat), false, false));
+      new TableColumn(getColumnName(APrioriSPCoord1), false, false));
     columnList->append(
-      new TableColumn(getColumnName(APrioriSPLon), false, false));
+      new TableColumn(getColumnName(APrioriSPCoord2), false, false));
     columnList->append(
-      new TableColumn(getColumnName(APrioriSPRadius), false, false));
+      new TableColumn(getColumnName(APrioriSPCoord3), false, false));
     columnList->append(
-      new TableColumn(getColumnName(APrioriSPLatSigma), false, false));
+      new TableColumn(getColumnName(APrioriSPCoord1Sigma), false, false));
     columnList->append(
-      new TableColumn(getColumnName(APrioriSPLonSigma), false, false));
+      new TableColumn(getColumnName(APrioriSPCoord2Sigma), false, false));
     columnList->append(
-      new TableColumn(getColumnName(APrioriSPRadiusSigma), false, false));
+      new TableColumn(getColumnName(APrioriSPCoord3Sigma), false, false));
     columnList->append(
       new TableColumn(getColumnName(APrioriSPSource), false, false));
     columnList->append(
@@ -169,21 +255,65 @@ namespace Isis {
   }
 
 
+  /**
+   * Resets the point table column headers based on the active control point display type (Lat, Lon,
+   * Radius) or XYZ.
+   *
+   * TODO: feels pretty kludgy and will likely need to be revisited.
+   *
+   */
+  void AbstractPointItem::resetColumnHeaders(TableColumnList *columns) {
+    TableColumn *col = (*columns)[8];
+    col->setTitle(getColumnName(AdjustedSPCoord1));
+    col = (*columns)[9];
+    col->setTitle(getColumnName(AdjustedSPCoord2));
+    col = (*columns)[10];
+    col->setTitle(getColumnName(AdjustedSPCoord3));
+
+    col = (*columns)[11];
+    col->setTitle(getColumnName(AdjustedSPCoord1Sigma));
+    col = (*columns)[12];
+    col->setTitle(getColumnName(AdjustedSPCoord2Sigma));
+    col = (*columns)[13];
+    col->setTitle(getColumnName(AdjustedSPCoord3Sigma));
+
+    col = (*columns)[14];
+    col->setTitle(getColumnName(APrioriSPCoord1));
+    col = (*columns)[15];
+    col->setTitle(getColumnName(APrioriSPCoord2));
+    col = (*columns)[16];
+    col->setTitle(getColumnName(APrioriSPCoord3));
+
+    col = (*columns)[17];
+    col->setTitle(getColumnName(APrioriSPCoord1Sigma));
+    col = (*columns)[18];
+    col->setTitle(getColumnName(APrioriSPCoord2Sigma));
+    col = (*columns)[19];
+    col->setTitle(getColumnName(APrioriSPCoord3Sigma));
+  }
+
+
   QVariant AbstractPointItem::getData(QString columnTitle) const {
-    if (m_point) {
+      CnetDisplayProperties *displayProperties = CnetDisplayProperties::getInstance();
+
+      if (m_point) {
       Column column = getColumn(columnTitle);
 
       switch ((Column) column) {
         case Id:
           return QVariant((QString)m_point->GetId());
+          break;
         case PointType:
           return QVariant((QString)m_point->GetPointTypeString());
+          break;
         case ChooserName:
           return QVariant((QString)m_point->GetChooserName());
+          break;
         case DateTime:
           //          return QVariant(QDateTime::fromString(
           //              m_point->GetDateTime(), "yyyy-MM-ddTHH:mm:ss"));
           return QVariant((QString)m_point->GetDateTime());
+          break;
         case EditLock:
           if (m_point->IsEditLocked())
             return QVariant("Yes");
@@ -195,68 +325,130 @@ namespace Isis {
             return QVariant("Yes");
           else
             return QVariant("No");
+          break;
         case Reference:
           if (m_point->GetNumMeasures())
-            return QVariant(
-                CnetDisplayProperties::getInstance()->getImageName(
-                    (QString) m_point->GetRefMeasure()->GetCubeSerialNumber()));
+            return QVariant(displayProperties->
+                getImageName((QString) m_point->GetRefMeasure()->GetCubeSerialNumber()));
           else
             return QVariant();
-        case AdjustedSPLat:
-          return QVariant(
-              m_point->GetAdjustedSurfacePoint().GetLatitude().degrees());
-        case AdjustedSPLon:
-          return QVariant(
-              m_point->GetAdjustedSurfacePoint().GetLongitude().degrees());
-        case AdjustedSPRadius:
-          return QVariant(
-              m_point->GetAdjustedSurfacePoint().GetLocalRadius().meters());
-        case AdjustedSPLatSigma:
-          return QVariant(
-              m_point->GetAdjustedSurfacePoint().
-              GetLatSigmaDistance().meters());
-        case AdjustedSPLonSigma:
-          return QVariant(
-              m_point->GetAdjustedSurfacePoint().
-              GetLonSigmaDistance().meters());
-        case AdjustedSPRadiusSigma:
-          return QVariant(
-              m_point->GetAdjustedSurfacePoint().
-              GetLocalRadiusSigma().meters());
-        case APrioriSPLat:
-          return QVariant(
-              m_point->GetAprioriSurfacePoint().GetLatitude().degrees());
-        case APrioriSPLon:
-          return QVariant(
-              m_point->GetAprioriSurfacePoint().GetLongitude().degrees());
-        case APrioriSPRadius:
-          return QVariant(
-              m_point->GetAprioriSurfacePoint().GetLocalRadius().meters());
-        case APrioriSPLatSigma:
-          return QVariant(
-              m_point->GetAprioriSurfacePoint().
-              GetLatSigmaDistance().meters());
-        case APrioriSPLonSigma:
-          return QVariant(
-              m_point->GetAprioriSurfacePoint().
-              GetLonSigmaDistance().meters());
-        case APrioriSPRadiusSigma:
-          return QVariant(
-              m_point->GetAprioriSurfacePoint().
-              GetLocalRadiusSigma().meters());
+          break;
+        case AdjustedSPCoord1:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            return QVariant(m_point->GetAdjustedSurfacePoint().GetLatitude().degrees());
+          }
+          else {
+            return QVariant(m_point->GetAdjustedSurfacePoint().GetX().kilometers());
+          }
+          break;
+        case AdjustedSPCoord2:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            return QVariant(m_point->GetAdjustedSurfacePoint().GetLongitude().degrees());
+          }
+          else {
+            return QVariant(m_point->GetAdjustedSurfacePoint().GetY().kilometers());
+          }
+          break;
+        case AdjustedSPCoord3:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            return QVariant(m_point->GetAdjustedSurfacePoint().GetLocalRadius().meters());
+          }
+          else {
+            return QVariant(m_point->GetAdjustedSurfacePoint().GetZ().kilometers());
+          }
+          break;
+        case AdjustedSPCoord1Sigma:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            return QVariant(m_point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters());
+          }
+          else {
+            return QVariant(m_point->GetAdjustedSurfacePoint().GetXSigma().meters());
+          }
+          break;
+        case AdjustedSPCoord2Sigma:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            return QVariant(m_point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters());
+          }
+          else {
+            return QVariant(m_point->GetAdjustedSurfacePoint().GetYSigma().meters());
+          }
+          break;
+        case AdjustedSPCoord3Sigma:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            return QVariant(m_point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters());
+          }
+          else {
+            return QVariant(m_point->GetAdjustedSurfacePoint().GetZSigma().meters());
+          }
+          break;
+        case APrioriSPCoord1:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            return QVariant(m_point->GetAprioriSurfacePoint().GetLatitude().degrees());
+          }
+          else {
+            return QVariant(m_point->GetAprioriSurfacePoint().GetX().kilometers());
+          }
+          break;
+        case APrioriSPCoord2:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            return QVariant(m_point->GetAprioriSurfacePoint().GetLongitude().degrees());
+          }
+          else {
+            return QVariant(m_point->GetAprioriSurfacePoint().GetY().kilometers());
+          }
+          break;
+        case APrioriSPCoord3:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            return QVariant(m_point->GetAprioriSurfacePoint().GetLocalRadius().meters());
+          }
+          else {
+            return QVariant(m_point->GetAprioriSurfacePoint().GetZ().kilometers());
+          }
+          break;
+        case APrioriSPCoord1Sigma:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            return QVariant(m_point->GetAprioriSurfacePoint().GetLatSigmaDistance().meters());
+          }
+          else {
+            return QVariant(m_point->GetAprioriSurfacePoint().GetXSigma().meters());
+          }
+          break;
+        case APrioriSPCoord2Sigma:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            return QVariant(m_point->GetAprioriSurfacePoint().GetLonSigmaDistance().meters());
+          }
+          else {
+            return QVariant(m_point->GetAprioriSurfacePoint().GetYSigma().meters());
+          }
+          break;
+        case APrioriSPCoord3Sigma:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            return QVariant(m_point->GetAprioriSurfacePoint().GetLocalRadiusSigma().meters());
+          }
+          else {
+            return QVariant(m_point->GetAprioriSurfacePoint().GetZSigma().meters());
+          }
+          break;
         case APrioriSPSource:
           return QVariant((QString)m_point->GetSurfacePointSourceString());
+          break;
         case APrioriSPSourceFile:
           return QVariant((QString)m_point->GetAprioriSurfacePointSourceFile());
+          break;
         case APrioriRadiusSource:
           return QVariant((QString)m_point->GetRadiusSourceString());
+          break;
         case APrioriRadiusSourceFile:
           return QVariant((QString)m_point->GetAprioriRadiusSourceFile());
+          break;
         case JigsawRejected:
           if (m_point->IsRejected())
             return QVariant("Yes");
           else
             return QVariant("No");
+          break;
+        default:
+          break;
       }
     }
 
@@ -264,8 +456,9 @@ namespace Isis {
   }
 
 
-  void AbstractPointItem::setData(QString const &columnTitle,
-      QString const &newData) {
+  void AbstractPointItem::setData(QString const &columnTitle, QString const &newData) {
+      CnetDisplayProperties *displayProperties = CnetDisplayProperties::getInstance();
+
     if (m_point) {
       Column column = getColumn(columnTitle);
 
@@ -294,109 +487,227 @@ namespace Isis {
         case Reference:
           m_point->SetRefMeasure(newData);
           break;
-        case AdjustedSPLat:
-          m_point->SetAdjustedSurfacePoint(SurfacePoint(
-              Latitude(catchNull(newData), Angle::Degrees),
-              m_point->GetAdjustedSurfacePoint().GetLongitude(),
-              m_point->GetAdjustedSurfacePoint().GetLocalRadius()));
+        case AdjustedSPCoord1:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            m_point->SetAdjustedSurfacePoint(SurfacePoint(
+                Latitude(catchNull(newData), Angle::Degrees),
+                m_point->GetAdjustedSurfacePoint().GetLongitude(),
+                m_point->GetAdjustedSurfacePoint().GetLocalRadius()));
+          }
+          else {
+              m_point->SetAdjustedSurfacePoint(SurfacePoint(
+                  Distance(catchNull(newData), Distance::Kilometers),
+                  m_point->GetAdjustedSurfacePoint().GetY(),
+                  m_point->GetAdjustedSurfacePoint().GetZ()));
+          }
           break;
-        case AdjustedSPLon:
-          m_point->SetAdjustedSurfacePoint(SurfacePoint(
-              m_point->GetAdjustedSurfacePoint().GetLatitude(),
-              Longitude(catchNull(newData), Angle::Degrees),
-              m_point->GetAdjustedSurfacePoint().GetLocalRadius()));
+        case AdjustedSPCoord2:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            m_point->SetAdjustedSurfacePoint(SurfacePoint(
+                m_point->GetAdjustedSurfacePoint().GetLatitude(),
+                Longitude(catchNull(newData), Angle::Degrees),
+                m_point->GetAdjustedSurfacePoint().GetLocalRadius()));
+          }
+          else {
+              m_point->SetAdjustedSurfacePoint(SurfacePoint(
+                  m_point->GetAdjustedSurfacePoint().GetX(),
+                  Distance(catchNull(newData), Distance::Kilometers),
+                  m_point->GetAdjustedSurfacePoint().GetZ()));
+          }
           break;
-        case AdjustedSPRadius:
-          m_point->SetAdjustedSurfacePoint(SurfacePoint(
-              m_point->GetAdjustedSurfacePoint().GetLatitude(),
-              m_point->GetAdjustedSurfacePoint().GetLongitude(),
-              Distance(catchNull(newData), Distance::Meters)));
+        case AdjustedSPCoord3:
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            m_point->SetAdjustedSurfacePoint(SurfacePoint(
+                m_point->GetAdjustedSurfacePoint().GetLatitude(),
+                m_point->GetAdjustedSurfacePoint().GetLongitude(),
+                Distance(catchNull(newData), Distance::Meters)));
+          }
+          else {
+              m_point->SetAdjustedSurfacePoint(SurfacePoint(
+                  m_point->GetAdjustedSurfacePoint().GetX(),
+                  m_point->GetAdjustedSurfacePoint().GetY(),
+                  Distance(catchNull(newData), Distance::Kilometers)));
+          }
           break;
-        case AdjustedSPLatSigma: {
-          QString msg = "Cannot set adjusted surface point latitude sigma";
+        case AdjustedSPCoord1Sigma: {
+          QString msg;
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            msg = "Cannot set adjusted surface point latitude sigma";
+          }
+          else {
+            msg = "Cannot set adjusted surface point X sigma";
+          }
           throw IException(IException::Programmer, msg, _FILEINFO_);
           break;
         }
-        case AdjustedSPLonSigma: {
-          QString msg = "Cannot set adjusted surface point longitude sigma";
+        case AdjustedSPCoord2Sigma: {
+          QString msg;
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            msg = "Cannot set adjusted surface point longitude sigma";
+          }
+          else {
+            msg = "Cannot set adjusted surface point Y sigma";
+          }
           throw IException(IException::Programmer, msg, _FILEINFO_);
           break;
         }
-        case AdjustedSPRadiusSigma: {
-          QString msg = "Cannot set adjusted surface point radius sigma";
+        case AdjustedSPCoord3Sigma: {
+          QString msg;
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            msg = "Cannot set adjusted surface point radius sigma";
+          }
+          else {
+            msg = "Cannot set adjusted surface point Z sigma";
+          }
           throw IException(IException::Programmer, msg, _FILEINFO_);
           break;
         }
-        case APrioriSPLat: {
-          Latitude newLat(catchNull(newData), Angle::Degrees);
-          SurfacePoint newSurfacePoint(prepareSurfacePoint(newLat,
-              m_point->GetAprioriSurfacePoint()));
+        case APrioriSPCoord1: {
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            Latitude newLat(catchNull(newData), Angle::Degrees);
+            SurfacePoint newSurfacePoint(prepareSurfacePoint(newLat,
+                m_point->GetAprioriSurfacePoint()));
 
-          newSurfacePoint.SetSphericalCoordinates(newLat,
-              newSurfacePoint.GetLongitude(),
+            newSurfacePoint.SetSphericalCoordinates(newLat,
+                newSurfacePoint.GetLongitude(),
+                newSurfacePoint.GetLocalRadius());
+            m_point->SetAprioriSurfacePoint(newSurfacePoint);
+          }
+          else {
+              Distance newX(catchNull(newData), Distance::Meters);
+              SurfacePoint newSurfacePoint(prepareSurfacePoint(newX,
+                  m_point->GetAprioriSurfacePoint()));
+
+              newSurfacePoint.SetRectangularCoordinates(newX,
+                  newSurfacePoint.GetY(),
+                  newSurfacePoint.GetZ());
+              m_point->SetAprioriSurfacePoint(newSurfacePoint);
+          }
+          break;
+        }
+        case APrioriSPCoord2: {
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            Longitude newLon(catchNull(newData), Angle::Degrees);
+            SurfacePoint newSurfacePoint(prepareSurfacePoint(newLon,
+                m_point->GetAprioriSurfacePoint()));
+
+            newSurfacePoint.SetSphericalCoordinates(
+              newSurfacePoint.GetLatitude(),
+              newLon,
               newSurfacePoint.GetLocalRadius());
-          m_point->SetAprioriSurfacePoint(newSurfacePoint);
+            m_point->SetAprioriSurfacePoint(newSurfacePoint);
+          }
+          else {
+            Distance newY(catchNull(newData), Distance::Meters);
+            SurfacePoint newSurfacePoint(prepareSurfacePoint(newY,
+                m_point->GetAprioriSurfacePoint()));
+
+            newSurfacePoint.SetRectangularCoordinates(newSurfacePoint.GetX(),
+                newY,
+                newSurfacePoint.GetZ());
+            m_point->SetAprioriSurfacePoint(newSurfacePoint);
+          }
           break;
         }
-        case APrioriSPLon: {
-          Longitude newLon(catchNull(newData), Angle::Degrees);
-          SurfacePoint newSurfacePoint(prepareSurfacePoint(newLon,
-              m_point->GetAprioriSurfacePoint()));
+        case APrioriSPCoord3: {
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            Distance newRadius(catchNull(newData), Distance::Meters);
+            SurfacePoint newSurfacePoint(prepareSurfacePoint(newRadius,
+                m_point->GetAprioriSurfacePoint()));
 
-          newSurfacePoint.SetSphericalCoordinates(
-            newSurfacePoint.GetLatitude(),
-            newLon,
-            newSurfacePoint.GetLocalRadius());
-          m_point->SetAprioriSurfacePoint(newSurfacePoint);
+            newSurfacePoint.SetSphericalCoordinates(
+              newSurfacePoint.GetLatitude(),
+              newSurfacePoint.GetLongitude(),
+              newRadius);
+            m_point->SetAprioriSurfacePoint(newSurfacePoint);
+          }
+          else {
+              Distance newZ(catchNull(newData), Distance::Meters);
+              SurfacePoint newSurfacePoint(prepareSurfacePoint(newZ,
+                  m_point->GetAprioriSurfacePoint()));
+
+              newSurfacePoint.SetRectangularCoordinates(newSurfacePoint.GetX(),
+                  newSurfacePoint.GetY(),
+                  newZ);
+              m_point->SetAprioriSurfacePoint(newSurfacePoint);
+          }
           break;
         }
-        case APrioriSPRadius: {
-          Distance newRadius(catchNull(newData), Distance::Meters);
-          SurfacePoint newSurfacePoint(prepareSurfacePoint(newRadius,
-              m_point->GetAprioriSurfacePoint()));
+        case APrioriSPCoord1Sigma: {
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            Distance newSigma(catchNull(newData), Distance::Meters);
+            SurfacePoint newSurfacePoint(prepareSigmas(newSigma,
+                m_point->GetAprioriSurfacePoint()));
 
-          newSurfacePoint.SetSphericalCoordinates(
-            newSurfacePoint.GetLatitude(),
-            newSurfacePoint.GetLongitude(),
-            newRadius);
-          m_point->SetAprioriSurfacePoint(newSurfacePoint);
+            newSurfacePoint.SetSphericalSigmasDistance(
+                newSigma, newSurfacePoint.GetLonSigmaDistance(),
+                newSurfacePoint.GetLocalRadiusSigma());
+
+            m_point->SetAprioriSurfacePoint(newSurfacePoint);
+          }
+          else {
+              Distance newSigma(catchNull(newData), Distance::Meters);
+              SurfacePoint newSurfacePoint(prepareXYZSigmas(newSigma,
+                  m_point->GetAprioriSurfacePoint()));
+
+              newSurfacePoint.SetRectangularSigmas(
+                  newSigma, newSurfacePoint.GetYSigma(),
+                  newSurfacePoint.GetZSigma());
+
+              m_point->SetAprioriSurfacePoint(newSurfacePoint);
+          }
           break;
         }
-        case APrioriSPLatSigma: {
-          Distance newSigma(catchNull(newData), Distance::Meters);
-          SurfacePoint newSurfacePoint(prepareSigmas(newSigma,
-              m_point->GetAprioriSurfacePoint()));
+        case APrioriSPCoord2Sigma: {
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+            Distance newSigma(catchNull(newData), Distance::Meters);
+            SurfacePoint newSurfacePoint(prepareSigmas(newSigma,
+                m_point->GetAprioriSurfacePoint()));
 
-          newSurfacePoint.SetSphericalSigmasDistance(
-            newSigma, newSurfacePoint.GetLonSigmaDistance(),
-            newSurfacePoint.GetLocalRadiusSigma());
+            newSurfacePoint.SetSphericalSigmasDistance(
+              newSurfacePoint.GetLatSigmaDistance(), newSigma,
+              newSurfacePoint.GetLocalRadiusSigma());
 
-          m_point->SetAprioriSurfacePoint(newSurfacePoint);
+            m_point->SetAprioriSurfacePoint(newSurfacePoint);
+          }
+          else {
+              Distance newSigma(catchNull(newData), Distance::Meters);
+              SurfacePoint newSurfacePoint(prepareXYZSigmas(newSigma,
+                  m_point->GetAprioriSurfacePoint()));
+
+              newSurfacePoint.SetRectangularSigmas(
+                newSurfacePoint.GetXSigma(), newSigma,
+                newSurfacePoint.GetZSigma());
+
+              m_point->SetAprioriSurfacePoint(newSurfacePoint);
+          }
           break;
         }
-        case APrioriSPLonSigma: {
-          Distance newSigma(catchNull(newData), Distance::Meters);
-          SurfacePoint newSurfacePoint(prepareSigmas(newSigma,
-              m_point->GetAprioriSurfacePoint()));
+        case APrioriSPCoord3Sigma: {
+          if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+              Distance newSigma(catchNull(newData), Distance::Meters);
+              SurfacePoint newSurfacePoint(prepareSigmas(newSigma,
+                  m_point->GetAprioriSurfacePoint()));
 
-          newSurfacePoint.SetSphericalSigmasDistance(
-            newSurfacePoint.GetLatSigmaDistance(), newSigma,
-            newSurfacePoint.GetLocalRadiusSigma());
+              newSurfacePoint.SetSphericalSigmasDistance(
+                newSurfacePoint.GetLatSigmaDistance(),
+                newSurfacePoint.GetLonSigmaDistance(),
+                newSigma);
 
-          m_point->SetAprioriSurfacePoint(newSurfacePoint);
-          break;
-        }
-        case APrioriSPRadiusSigma: {
-          Distance newSigma(catchNull(newData), Distance::Meters);
-          SurfacePoint newSurfacePoint(prepareSigmas(newSigma,
-              m_point->GetAprioriSurfacePoint()));
+              m_point->SetAprioriSurfacePoint(newSurfacePoint);
+          }
+          else {
+              Distance newSigma(catchNull(newData), Distance::Meters);
+              SurfacePoint newSurfacePoint(prepareXYZSigmas(newSigma,
+                  m_point->GetAprioriSurfacePoint()));
 
-          newSurfacePoint.SetSphericalSigmasDistance(
-            newSurfacePoint.GetLatSigmaDistance(),
-            newSurfacePoint.GetLonSigmaDistance(),
-            newSigma);
+              newSurfacePoint.SetRectangularSigmas(
+                newSurfacePoint.GetXSigma(),
+                newSurfacePoint.GetYSigma(),
+                newSigma);
 
-          m_point->SetAprioriSurfacePoint(newSurfacePoint);
+              m_point->SetAprioriSurfacePoint(newSurfacePoint);
+          }
           break;
         }
         case APrioriSPSource:
@@ -415,6 +726,8 @@ namespace Isis {
           break;
         case JigsawRejected:
           // jigsaw rejected is not editable!
+          break;
+        default:
           break;
       }
     }
@@ -500,6 +813,32 @@ namespace Isis {
 
     surfacePoint.SetSphericalSigmasDistance(
       latSigDist, lonSigDist, radiusSigDist);
+    return surfacePoint;
+  }
+
+
+  SurfacePoint AbstractPointItem::prepareXYZSigmas(Distance newSigma,
+      SurfacePoint surfacePoint) {
+    const Distance free(10000, Distance::Meters);
+    Distance xSigma = surfacePoint.GetXSigma();
+    Distance ySigma = surfacePoint.GetYSigma();
+    Distance zSigma = surfacePoint.GetZSigma();
+
+    if (newSigma.isValid()) {
+      if (!xSigma.isValid())
+        xSigma = free;
+      if (!ySigma.isValid())
+        ySigma = free;
+      if (!zSigma.isValid())
+        zSigma = free;
+    }
+    else {
+      xSigma = Distance();
+      ySigma = Distance();
+      zSigma = Distance();
+    }
+
+    surfacePoint.SetRectangularSigmas(xSigma, ySigma, zSigma);
     return surfacePoint;
   }
 

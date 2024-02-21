@@ -33,8 +33,15 @@ namespace Isis {
    *
    * @author ????-??-?? Eric Hyer
    *
-   * @internal
-   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   * @internal 
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054. 
+   *   @history 2019-07-26 Ken Edmundson - Modifications to support display/editing of control point
+   *                           coordinates in either Lat, Lon, Radius or XYZ...
+   *                           1) Added public slot resetColumnHeaders. The header text has to be
+   *                              updated prior to updating the point table because what is
+   *                              displayed in the table is dependent on the header, e.g.
+   *                              "Apriori SP Latitude" or Apriori SP X".
+   *                           2) Changed getPointWarningMessage method.
    */
   class PointTableModel : public AbstractTableModel {
       Q_OBJECT
@@ -56,9 +63,9 @@ namespace Isis {
       static QString getPointWarningMessage(AbstractTreeItem const *,
           TableColumn const *, QString valueToSave);
 
-
     public slots:
       void handleTreeSelectionChanged(QList< AbstractTreeItem * >);
+      void resetColumnHeaders();
 
 
     protected:

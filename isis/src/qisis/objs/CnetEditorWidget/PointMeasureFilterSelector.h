@@ -23,8 +23,17 @@ namespace Isis {
    *
    * @author ????-??-?? Eric Hyer
    *
-   * @internal
-   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   * @internal 
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054. 
+   *   @history 2019-07-26 Ken Edmundson - Modifications...
+   *                           1) Added additional filters to support display of control point
+   *                              coordinates in either Lat, Lon, Radius or XYZ. These are
+   *                              AprioriXFilter, AprioriYFilter, AprioriZFilter,
+   *                              AprioriXFilterSigma, AprioriYFilterSigma, AprioriZFilterSigma,
+   *                              AdjustedXFilter, AdjustedYFilter, AdjustedZFilter,
+   *                              AdjustedXFilterSigma, AdjustedYFilterSigma, AdjustedZFilterSigma.
+   *                            2) Methods createSelector and changeFilter modified to accomodate
+   *                               the above new filters.
    */
   class PointMeasureFilterSelector : public AbstractFilterSelector {
       Q_OBJECT
