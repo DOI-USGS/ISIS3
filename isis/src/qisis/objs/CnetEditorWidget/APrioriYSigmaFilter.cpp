@@ -14,7 +14,6 @@ find files of those names at the top level of this repository. **/
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
-#include "Longitude.h"
 
 
 namespace Isis {

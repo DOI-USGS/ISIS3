@@ -37,13 +37,13 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
-   *   @history 2019-07-26 Ken Edmundson - Modifications...
-   *                           1) Added enum coordinateDisplayType and associated member variable
-   *                              m_coordinateDisplayType to store current display of point
-   *                              coordinates in either Lat, Lon, Radius or XYZ.
-   *                           2) Added setter coordinateDisplayType() and getter
-   *                              setCoordinateDisplayType() methods to set/get
-   *                              m_coordinateDisplayType.
+   *   @history 2019-07-26 Ken Edmundson - OSIRIS-REx modifications...
+   *                           1) Added enum coordinateDisplayType and associated
+   *                              member variable m_coordinateDisplayType to store
+   *                              current display of point coordinates in either
+   *                              Lat/Lon/Radius or XYZ.
+   *                           2) Added coordinateDisplayType() and
+   *                              setCoordinateDisplayType() methods.
    *                           3) Modified getInstance method, primarily for readibility.
    */
   class CnetDisplayProperties : public QObject {
@@ -67,7 +67,7 @@ namespace Isis {
       QString getImageName(QString cubeSerialNumber,
           bool forceFullPaths = false) const;
       QString getSerialNumber(QString imageId);
-      bool getShowsFullPaths() const; 
+      bool getShowsFullPaths() const;
       CnetDisplayProperties::coordinateDisplayType coordinateDisplayType();
 
       void setCubeList(QString fileName);

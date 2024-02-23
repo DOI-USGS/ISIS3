@@ -30,18 +30,12 @@ find files of those names at the top level of this repository. **/
 #include "SerialNumber.h"
 
 
-
-
 namespace Isis {
   CnetDisplayProperties *CnetDisplayProperties::m_instance = NULL;
 
+
   CnetDisplayProperties *CnetDisplayProperties::getInstance() {
-
-    if (!m_instance) {
-      m_instance = new CnetDisplayProperties();
-    }
-
-    return m_instance;
+    return m_instance ? m_instance : m_instance = new CnetDisplayProperties;
   }
 
 

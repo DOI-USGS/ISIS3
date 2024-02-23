@@ -336,18 +336,15 @@ namespace Isis {
     configureSortLocation.append(tr("&Tables"));
     m_menuActions->insert(configureSortAct, configureSortLocation);
 
-    
-    // 2019-07-08 Ken Edmundson: added option to choose display coordinates in either lat, lon,
-    // radius or XYZ
-    QAction *xyzDisplayAct = new QAction(QIcon(FileName("$base/icons/xyzIcon.png").expanded()),
+    QAction *xyzDisplayAct = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/xyz.png").expanded()),
         tr("&X,Y,Z"), this);
     xyzDisplayAct->setCheckable(true);
-    xyzDisplayAct->setChecked(false);
+    xyzDisplayAct->setChecked(false);    
     QString configureXYZDisplayToolTipText = tr("X,Y,Z Coordinate Display");
     xyzDisplayAct->setToolTip(configureXYZDisplayToolTipText);
     xyzDisplayAct->setStatusTip(configureXYZDisplayToolTipText);
     xyzDisplayAct->setWhatsThis(tr("<html>Click here to select coordinate display in : "
-        "X, Y, Z</html>"));
+        "X, Y, Z</html>"));    
     connect(xyzDisplayAct, SIGNAL(triggered()),
         this, SLOT(setXYZCoordinateDisplay()));
     QList< QString > xyzDisplayLocation;
@@ -357,7 +354,7 @@ namespace Isis {
     m_menuActions->insert(xyzDisplayAct, xyzDisplayLocation);
 
     QAction *latLonRadiusDisplayAct
-        = new QAction(QIcon(FileName("$base/icons/latlonIcon.png").expanded()),
+        = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/latlonrad.png").expanded()),
           tr("&Lat,Lon,Radius"), this);
     latLonRadiusDisplayAct->setCheckable(true);
     latLonRadiusDisplayAct->setChecked(true);

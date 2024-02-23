@@ -40,6 +40,7 @@ find files of those names at the top level of this repository. **/
 #include "APrioriZFilter.h"
 #include "APrioriZSigmaFilter.h"
 #include "ChooserNameFilter.h"
+#include "CnetDisplayProperties.h"
 #include "GoodnessOfFitFilter.h"
 #include "ImageIdFilter.h"
 #include "LineFilter.h"
@@ -92,33 +93,41 @@ namespace Isis {
   void PointMeasureFilterSelector::createSelector() {
     AbstractFilterSelector::createSelector();
 
-    getSelector()->addItem("Adjusted SP Latitude");
-    getSelector()->addItem("Adjusted SP Latitude Sigma");
-    getSelector()->addItem("Adjusted SP Longitude");
-    getSelector()->addItem("Adjusted SP Longitude Sigma");
-    getSelector()->addItem("Adjusted SP Radius");
-    getSelector()->addItem("Adjusted SP Radius Sigma");
-    getSelector()->addItem("A Priori SP Latitude");
-    getSelector()->addItem("A Priori SP Latitude Sigma");
-    getSelector()->addItem("A Priori SP Longitude");
-    getSelector()->addItem("A Priori SP Longitude Sigma");
-    getSelector()->addItem("A Priori SP Radius");
-    getSelector()->addItem("A Priori SP Radius Sigma");
-    getSelector()->insertSeparator(getSelector()->count());
+    CnetDisplayProperties *displayProperties = CnetDisplayProperties::getInstance();
+    bool latLonRadDisplay = true;
+    if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::XYZ)
+      latLonRadDisplay = false;
 
-    getSelector()->addItem("Adjusted SP X");
-    getSelector()->addItem("Adjusted SP X Sigma");
-    getSelector()->addItem("Adjusted SP Y");
-    getSelector()->addItem("Adjusted SP Y Sigma");
-    getSelector()->addItem("Adjusted SP Z");
-    getSelector()->addItem("Adjusted SP Z Sigma");
-    getSelector()->addItem("A Priori SP X");
-    getSelector()->addItem("A Priori SP X Sigma");
-    getSelector()->addItem("A Priori SP Y");
-    getSelector()->addItem("A Priori SP Y Sigma");
-    getSelector()->addItem("A Priori SP Z");
-    getSelector()->addItem("A Priori SP Z Sigma");
-    getSelector()->insertSeparator(getSelector()->count());
+    if (latLonRadDisplay == true) {
+      getSelector()->addItem("Adjusted SP Latitude");
+      getSelector()->addItem("Adjusted SP Latitude Sigma");
+      getSelector()->addItem("Adjusted SP Longitude");
+      getSelector()->addItem("Adjusted SP Longitude Sigma");
+      getSelector()->addItem("Adjusted SP Radius");
+      getSelector()->addItem("Adjusted SP Radius Sigma");
+      getSelector()->addItem("A Priori SP Latitude");
+      getSelector()->addItem("A Priori SP Latitude Sigma");
+      getSelector()->addItem("A Priori SP Longitude");
+      getSelector()->addItem("A Priori SP Longitude Sigma");
+      getSelector()->addItem("A Priori SP Radius");
+      getSelector()->addItem("A Priori SP Radius Sigma");
+      getSelector()->insertSeparator(getSelector()->count());
+    }
+    else {
+      getSelector()->addItem("Adjusted SP X");
+      getSelector()->addItem("Adjusted SP X Sigma");
+      getSelector()->addItem("Adjusted SP Y");
+      getSelector()->addItem("Adjusted SP Y Sigma");
+      getSelector()->addItem("Adjusted SP Z");
+      getSelector()->addItem("Adjusted SP Z Sigma");
+      getSelector()->addItem("A Priori SP X");
+      getSelector()->addItem("A Priori SP X Sigma");
+      getSelector()->addItem("A Priori SP Y");
+      getSelector()->addItem("A Priori SP Y Sigma");
+      getSelector()->addItem("A Priori SP Z");
+      getSelector()->addItem("A Priori SP Z Sigma");
+      getSelector()->insertSeparator(getSelector()->count());
+    }
 
     getSelector()->addItem("Chooser Name");
     getSelector()->addItem("Edit Locked Points");
@@ -147,156 +156,159 @@ namespace Isis {
   void PointMeasureFilterSelector::changeFilter(int index) {
     deleteFilter();
 
+    CnetDisplayProperties *displayProperties = CnetDisplayProperties::getInstance();
+    bool latLonRadDisplay = true;
+    if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::XYZ)
+      latLonRadDisplay = false;
+
     if (index != 0) {
       switch (index) {
         case 0:         // this is the ----Select----- line at the top of the drop down
           break;
         case 1:         // separator
-          break;
+          break;          
         case 2:
-          setFilter(new AdjustedLatitudeFilter(AbstractFilter::Points));
+          if (latLonRadDisplay == true)
+            setFilter(new AdjustedLatitudeFilter(AbstractFilter::Points));
+          else
+            setFilter(new AdjustedXFilter(AbstractFilter::Points));
           break;
         case 3:
-          setFilter(new AdjustedLatitudeSigmaFilter(AbstractFilter::Points));
+          if (latLonRadDisplay == true)
+            setFilter(new AdjustedLatitudeSigmaFilter(AbstractFilter::Points));
+          else
+            setFilter(new AdjustedXSigmaFilter(AbstractFilter::Points));
           break;
         case 4:
-          setFilter(new AdjustedLongitudeFilter(AbstractFilter::Points));
+          if (latLonRadDisplay == true)
+            setFilter(new AdjustedLongitudeFilter(AbstractFilter::Points));
+          else
+            setFilter(new AdjustedYFilter(AbstractFilter::Points));
           break;
         case 5:
-          setFilter(new AdjustedLongitudeSigmaFilter(AbstractFilter::Points));
+          if (latLonRadDisplay == true)
+            setFilter(new AdjustedLongitudeSigmaFilter(AbstractFilter::Points));
+          else
+            setFilter(new AdjustedYSigmaFilter(AbstractFilter::Points));
           break;
         case 6:
-          setFilter(new AdjustedRadiusFilter(AbstractFilter::Points));
+          if (latLonRadDisplay == true)
+            setFilter(new AdjustedRadiusFilter(AbstractFilter::Points));
+          else
+            setFilter(new AdjustedZFilter(AbstractFilter::Points));
           break;
         case 7:
-          setFilter(new AdjustedRadiusSigmaFilter(AbstractFilter::Points));
+          if (latLonRadDisplay == true)
+            setFilter(new AdjustedRadiusSigmaFilter(AbstractFilter::Points));
+          else
+            setFilter(new AdjustedZSigmaFilter(AbstractFilter::Points));
           break;
         case 8:
-          setFilter(new APrioriLatitudeFilter(AbstractFilter::Points));
+          if (latLonRadDisplay == true)
+            setFilter(new APrioriLatitudeFilter(AbstractFilter::Points));
+          else
+            setFilter(new APrioriXFilter(AbstractFilter::Points));
           break;
         case 9:
-          setFilter(new APrioriLatitudeSigmaFilter(AbstractFilter::Points));
+          if (latLonRadDisplay == true)
+            setFilter(new APrioriLatitudeSigmaFilter(AbstractFilter::Points));
+          else
+            setFilter(new APrioriXSigmaFilter(AbstractFilter::Points));
           break;
         case 10:
-          setFilter(new APrioriLongitudeFilter(AbstractFilter::Points));
+          if (latLonRadDisplay == true)
+            setFilter(new APrioriLongitudeFilter(AbstractFilter::Points));
+          else
+            setFilter(new APrioriYFilter(AbstractFilter::Points));
           break;
         case 11:
-          setFilter(new APrioriLongitudeSigmaFilter(AbstractFilter::Points));
+          if (latLonRadDisplay == true)
+            setFilter(new APrioriLongitudeSigmaFilter(AbstractFilter::Points));
+          else
+            setFilter(new APrioriYSigmaFilter(AbstractFilter::Points));
           break;
         case 12:
-          setFilter(new APrioriRadiusFilter(AbstractFilter::Points));
+          if (latLonRadDisplay == true)
+            setFilter(new APrioriRadiusFilter(AbstractFilter::Points));
+          else
+            setFilter(new APrioriZFilter(AbstractFilter::Points));
           break;
         case 13:
-          setFilter(new APrioriRadiusSigmaFilter(AbstractFilter::Points));
+          if (latLonRadDisplay == true)
+            setFilter(new APrioriRadiusSigmaFilter(AbstractFilter::Points));
+          else
+            setFilter(new APrioriZSigmaFilter(AbstractFilter::Points));
           break;
         case 14:         // separator
           break;
         case 15:
-          setFilter(new AdjustedXFilter(AbstractFilter::Points));
-          break;
-        case 16:
-          setFilter(new AdjustedXSigmaFilter(AbstractFilter::Points));
-          break;
-        case 17:
-          setFilter(new AdjustedYFilter(AbstractFilter::Points));
-          break;
-        case 18:
-          setFilter(new AdjustedYSigmaFilter(AbstractFilter::Points));
-          break;
-        case 19:
-          setFilter(new AdjustedZFilter(AbstractFilter::Points));
-          break;
-        case 20:
-          setFilter(new AdjustedZSigmaFilter(AbstractFilter::Points));
-          break;
-        case 21:
-          setFilter(new APrioriXFilter(AbstractFilter::Points));
-          break;
-        case 22:
-          setFilter(new APrioriXSigmaFilter(AbstractFilter::Points));
-          break;
-        case 23:
-          setFilter(new APrioriYFilter(AbstractFilter::Points));
-          break;
-        case 24:
-          setFilter(new APrioriYSigmaFilter(AbstractFilter::Points));
-          break;
-        case 25:
-          setFilter(new APrioriZFilter(AbstractFilter::Points));
-          break;
-        case 26:
-          setFilter(new APrioriZSigmaFilter(AbstractFilter::Points));
-          break;
-        case 27:         // separator
-          break;
-        case 28:
           setFilter(new ChooserNameFilter(AbstractFilter::Points));
           break;
-        case 29:
+        case 16:
           setFilter(new PointEditLockedFilter(AbstractFilter::Points));
           break;
-        case 30:
+        case 17:
           setFilter(new PointIgnoredFilter(AbstractFilter::Points));
           break;
-        case 31:
+        case 18:
           setFilter(new PointJigsawRejectedFilter(AbstractFilter::Points));
           break;
-        case 32:
+        case 19:
           setFilter(new MeasureCountFilter(AbstractFilter::Points));
           break;
-        case 33:
+        case 20:
           setFilter(new PointIdFilter(AbstractFilter::Points));
           break;
-        case 34:
+        case 21:
           setFilter(new PointTypeFilter(AbstractFilter::Points));
           break;
-        case 35:         // separator
+        case 22:         // separator
           break;
-        case 36:
+        case 23:
           setFilter(new GoodnessOfFitFilter(AbstractFilter::Points |
               AbstractFilter::Measures, 1));
           break;
-        case 37:
+        case 24:
           setFilter(new MeasureIgnoredFilter(AbstractFilter::Points |
               AbstractFilter::Measures, 1));
           break;
-        case 38:
+        case 25:
           setFilter(new ImageIdFilter(AbstractFilter::Points |
               AbstractFilter::Measures, 1));
           break;
-        case 39:
+        case 26:
           setFilter(new MeasureJigsawRejectedFilter(AbstractFilter::Points |
               AbstractFilter::Measures, 1));
           break;
-        case 40:
+        case 27:
           setFilter(new LineFilter(AbstractFilter::Points |
               AbstractFilter::Measures, 1));
           break;
-        case 41:
+        case 28:
           setFilter(new LineResidualFilter(AbstractFilter::Points |
               AbstractFilter::Measures, 1));
           break;
-        case 42:
+        case 29:
           setFilter(new LineShiftFilter(AbstractFilter::Points |
               AbstractFilter::Measures, 1));
           break;
-        case 43:
+        case 30:
           setFilter(new MeasureTypeFilter(AbstractFilter::Points |
               AbstractFilter::Measures, 1));
           break;
-        case 44:
+        case 31:
           setFilter(new ResidualMagnitudeFilter(AbstractFilter::Points |
               AbstractFilter::Measures, 1));
           break;
-        case 45:
+        case 32:
           setFilter(new SampleFilter(AbstractFilter::Points |
               AbstractFilter::Measures, 1));
           break;
-        case 46:
+        case 33:
           setFilter(new SampleResidualFilter(AbstractFilter::Points |
               AbstractFilter::Measures, 1));
           break;
-        case 47:
+        case 34:
           setFilter(new SampleShiftFilter(AbstractFilter::Points |
               AbstractFilter::Measures, 1));
           break;

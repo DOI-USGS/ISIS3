@@ -25,8 +25,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
-   *   @history 2019-11-22 Ken Edmundson - Modifications for coordinate display in either Lat, Lon,
-   *                         Radius, or XYZ...
+   *   @history 2019-11-22 Ken Edmundson - OSIRIS-REx modifications for coordinate display
+   *                         in either Lat, Lon, Radius, or XYZ...
    *                           1) Changed header file names in #includes for APrioriXFilter.h,
    *                              APrioriXSigmaFilter.h, APrioriYFilter.h, APrioriYSigmaFilter.h,
    *                              APrioriZFilter.h, APrioriZSigmaFilter.h as class names changed

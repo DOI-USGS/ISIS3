@@ -54,12 +54,6 @@ namespace Isis {
   class TreeView;
   class CnetEditorSortConfigDialog;
 
-//  enum coordinateDisplay {                               //!< coordinate display (LLR or XYZ)
-//    LatLonRadius = 0,
-//    XYZ = 1
-//  };
-
-
   /**
    * This widget provides full editing, filtering and viewing capabilities for
    * the raw data in a control network. The raw data is, for example, chooser
@@ -98,8 +92,8 @@ namespace Isis {
    *                           active control. So, when a user changed any cnets, the only cnet that
    *                           was recognized as being modified was the active. Adding this allows
    *                           a user to save changes made to a nonactive cnet. Fixes #5414.
-   *   @history 2019-07-26 Ken Edmundson - Modifications to support display/edit of control point
-   *                           coordinates/sigmas in either Lat, Lon, Radius or XYZ.
+   *   @history 2019-07-26 Ken Edmundson - OSIRIS-REx modifications to support display/edit of
+   *                           control point coordinates/sigmas in either Lat, Lon, Radius or XYZ.
    *                           1) Modified the createActions() method to add a main menu item called
    *                              "Coordinate Display" which contains two submenu items (QActions)
    *                              called "Lat, Lon, Radius" and "XYZ". The active coordinate type
@@ -163,6 +157,7 @@ namespace Isis {
       void setMeasureTableSortLimit(int limit);
       void setPointTableSortingEnabled(bool enabled);
       void setPointTableSortLimit(int limit);
+
 
     public slots:
       void configSorting();

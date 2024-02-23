@@ -14,7 +14,6 @@ find files of those names at the top level of this repository. **/
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
-#include "Longitude.h"
 
 
 namespace Isis {
@@ -41,7 +40,7 @@ namespace Isis {
 
   bool APrioriYFilter::evaluate(const ControlPoint *point) const {
     return AbstractNumberFilter::evaluate(
-          point->GetAprioriSurfacePoint().GetY().kilometers());
+          point->GetAprioriSurfacePoint().GetY().meters());
   }
 
 

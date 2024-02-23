@@ -121,7 +121,6 @@ namespace Isis {
       case AbstractPointItem::APrioriSPCoord1Sigma:
       case AbstractPointItem::APrioriSPCoord2Sigma:
       case AbstractPointItem::APrioriSPCoord3Sigma: {
-          ASSERT(row->getPointerType() == AbstractTreeItem::Point);
           ControlPoint *point = (ControlPoint *) row->getPointer();
 
           // Check to see if any of the sigma values are null.
@@ -160,7 +159,6 @@ namespace Isis {
       case AbstractPointItem::APrioriSPCoord1:
       case AbstractPointItem::APrioriSPCoord2:
       case AbstractPointItem::APrioriSPCoord3: {
-          ASSERT(row->getPointerType() == AbstractTreeItem::Point);
           ControlPoint *point = (ControlPoint *) row->getPointer();
 
           // Check to see if any of the surface point values are null.

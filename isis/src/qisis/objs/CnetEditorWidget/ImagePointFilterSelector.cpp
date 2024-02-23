@@ -39,6 +39,7 @@ find files of those names at the top level of this repository. **/
 #include "APrioriZFilter.h"
 #include "APrioriZSigmaFilter.h"
 #include "ChooserNameFilter.h"
+#include "CnetDisplayProperties.h"
 #include "ImageIdFilter.h"
 #include "GoodnessOfFitFilter.h"
 #include "LineFilter.h"
@@ -90,37 +91,46 @@ namespace Isis {
 
   void ImagePointFilterSelector::createSelector() {
     AbstractFilterSelector::createSelector();
+    
+    CnetDisplayProperties *displayProperties = CnetDisplayProperties::getInstance();
 
     getSelector()->addItem("Image ID");
     getSelector()->insertSeparator(getSelector()->count());
 
-    getSelector()->addItem("Adjusted SP Latitude");
-    getSelector()->addItem("Adjusted SP Latitude Sigma");
-    getSelector()->addItem("Adjusted SP Longitude");
-    getSelector()->addItem("Adjusted SP Longitude Sigma");
-    getSelector()->addItem("Adjusted SP Radius");
-    getSelector()->addItem("Adjusted SP Radius Sigma");
-    getSelector()->addItem("A Priori SP Latitude");
-    getSelector()->addItem("A Priori SP Latitude Sigma");
-    getSelector()->addItem("A Priori SP Longitude");
-    getSelector()->addItem("A Priori SP Longitude Sigma");
-    getSelector()->addItem("A Priori SP Radius");
-    getSelector()->addItem("A Priori SP Radius Sigma");
-    getSelector()->insertSeparator(getSelector()->count());
+    bool latLonRadDisplay = true;
+    if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::XYZ)
+      latLonRadDisplay = false;
 
-    getSelector()->addItem("Adjusted SP X");
-    getSelector()->addItem("Adjusted SP X Sigma");
-    getSelector()->addItem("Adjusted SP Y");
-    getSelector()->addItem("Adjusted SP Y Sigma");
-    getSelector()->addItem("Adjusted SP Z");
-    getSelector()->addItem("Adjusted SP Z Sigma");
-    getSelector()->addItem("A Priori SP X");
-    getSelector()->addItem("A Priori SP X Sigma");
-    getSelector()->addItem("A Priori SP Y");
-    getSelector()->addItem("A Priori SP Y Sigma");
-    getSelector()->addItem("A Priori SP Z");
-    getSelector()->addItem("A Priori SP Z Sigma");
-    getSelector()->insertSeparator(getSelector()->count());
+    if (latLonRadDisplay == true) {
+      getSelector()->addItem("Adjusted SP Latitude");
+      getSelector()->addItem("Adjusted SP Latitude Sigma");
+      getSelector()->addItem("Adjusted SP Longitude");
+      getSelector()->addItem("Adjusted SP Longitude Sigma");
+      getSelector()->addItem("Adjusted SP Radius");
+      getSelector()->addItem("Adjusted SP Radius Sigma");
+      getSelector()->addItem("A Priori SP Latitude");
+      getSelector()->addItem("A Priori SP Latitude Sigma");
+      getSelector()->addItem("A Priori SP Longitude");
+      getSelector()->addItem("A Priori SP Longitude Sigma");
+      getSelector()->addItem("A Priori SP Radius");
+      getSelector()->addItem("A Priori SP Radius Sigma");
+      getSelector()->insertSeparator(getSelector()->count());
+    }
+    else {
+      getSelector()->addItem("Adjusted SP X");
+      getSelector()->addItem("Adjusted SP X Sigma");
+      getSelector()->addItem("Adjusted SP Y");
+      getSelector()->addItem("Adjusted SP Y Sigma");
+      getSelector()->addItem("Adjusted SP Z");
+      getSelector()->addItem("Adjusted SP Z Sigma");
+      getSelector()->addItem("A Priori SP X");
+      getSelector()->addItem("A Priori SP X Sigma");
+      getSelector()->addItem("A Priori SP Y");
+      getSelector()->addItem("A Priori SP Y Sigma");
+      getSelector()->addItem("A Priori SP Z");
+      getSelector()->addItem("A Priori SP Z Sigma");
+      getSelector()->insertSeparator(getSelector()->count());
+    }
 
     getSelector()->addItem("Chooser Name");
     getSelector()->addItem("Edit Locked Points");

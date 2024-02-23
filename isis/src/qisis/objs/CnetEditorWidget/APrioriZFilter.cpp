@@ -39,7 +39,7 @@ namespace Isis {
 
   bool APrioriZFilter::evaluate(const ControlPoint *point) const {
     return AbstractNumberFilter::evaluate(
-          point->GetAprioriSurfacePoint().GetZ().kilometers());
+          point->GetAprioriSurfacePoint().GetZ().meters());
   }
 
 
