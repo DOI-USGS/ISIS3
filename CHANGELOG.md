@@ -36,9 +36,9 @@ release.
 ## [Unreleased]
 
 ### Added
-
 - CSMCamera can now read and use the body rotation from ALE produced ISDs [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 - CSMSkyMap added to CSMCamera for use with local rover projections in ISIS [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
+- OSIRIS-REx Tagcams instrument support, tests, and test data added [#5424](https://github.com/DOI-USGS/ISIS3/issues/5424)
 
 ### Fixed
 - Fixed <i>noproj</i> bug where some temporary files were not deleted after call to cam2cam.  Issue: [#4813](https://github.com/USGS-Astrogeology/ISIS3/issues/4813)
