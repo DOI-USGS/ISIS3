@@ -1,22 +1,11 @@
-/**
- * @file
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include <iomanip>
 #include <iostream>
 
@@ -24,7 +13,7 @@
 #include "CameraFactory.h"
 #include "IException.h"
 #include "iTime.h"
-#include "OsirisRexOcamsCamera.h"
+#include "OsirisRexTagcamsCamera.h"
 #include "Preference.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -36,70 +25,58 @@ void testCamera(Cube &c, double sample, double line, double knownLat, double kno
 void testLineSamp(Camera *cam, double sample, double line);
 
 /**
- * This is the unit test for the Osiris Rex Camera model. 
+ * OSIRIS-REx Tagcams Camera model unit test for instruments NAVCam, NFTCam
+ * (and perhaps someday, StowCam). 
  *
- * @author  2015-11-10 Stuart C. Sides
+ * @author  2024-03-01 Ken Edmundson
  * @internal
- *   @history 2015-11-10 Stuart C. Sides - Original version (PolyCam test).
- *   @history 2016-12-27 Jeannie Backer - Added test for MapCam. Added placeholder
- *                           for SamCam test (when we have an image we can spiceinit).
- *   @history 2017-08-29 Jeannie Backer - Added test for PolyCam and MapCam with
- *                           PolyCamFocusPositionNaifId keyword.
- *   @history 2017-09-18 Kristin Berry - Updated known latitudes and longitudes for the addition of
- *                           the distortion model. (For non-backwards compatibility MapCam cube
- *                           only, since we do not yet have a PolyCam cube with a motor position 
- *                           that we have a distortion solution for.) 
+ *   @history 2024-03-01 Ken Edmundson - Initial version. 
  * 
  */
 
 int main(void) {
   Preference::Preferences(true);
 
-  cout << "Unit Test for OsirisRexOcamsCamera..." << endl;
+  cout << "Unit Test for OsirisRexTagcamsCamera..." << endl;
   try {
+    cout << "\nTesting NAVCam (backwards compatibility)..." << endl;
+    Cube navCube(FileName("$ISISROOT/../isis/tests/data/osirisRexImages/20200303T213031S138_ncm_L0-reduced.cub").expanded(), "r");    
+ 
+    // checking at center of format of NavCam
+    double knownLat = 49.7487786981275;
+    double knownLon = 43.7549667753273;
+    double sample = 129.5; 
+    double line = 97.0;
 
-    cout << "\nTesting PolyCam (backwards compatibility)..." << endl;
-    Cube polyCamCube("$osirisrex/testData/2019-01-13T23_36_05.000_PCAM_L2b_V001.cub", "r");
-    double knownLat = 13.9465663689936950;
-    double knownLon = 349.0213035062322433;
-    double sample = 512.0; 
-    double line = 512.0;
-    testCamera(polyCamCube, sample, line, knownLat, knownLon);
-    cout << "\nTesting PolyCam (with PolyCamFocusPositionNaifId keyword)..." << endl;
-    Cube polyCamCube2("$osirisrex/testData/20190113T191852S740_pol_iofL2pan_V001.cub", "r");
-    knownLat = -5.5191879351483450;
-    knownLon = 349.6939492565607566;
-    sample = 512.0; 
-    line = 512.0;
-    testCamera(polyCamCube2, sample, line, knownLat, knownLon);
+    testCamera(navCube, sample, line, knownLat, knownLon);
     cout << "============================================================================" << endl;
 
-    cout << "\nTesting MapCam (backwards compatibility)..." << endl;
-    Cube mapCamCube("$osirisrex/testData/D19030320000.cub", "r");
-    knownLat = 73.9976065262802933;
-    knownLon = 149.3814386120742768;
-    sample = 512.0; 
-    line = 512.0;
-    testCamera(mapCamCube, sample, line, knownLat, knownLon);
-    cout << "\nTesting MapCam (with PolyCamFocusPositionNaifId keyword)..." << endl;
-    Cube mapCamCube2("$osirisrex/testData/20190303T100344S990_map_iofL2pan_V001.cub", "r");
-    knownLat = -19.2946930665326732;
-    knownLon = 145.9510736765638512;
-    sample = 512.0; 
-    line = 512.0;
-    testCamera(mapCamCube2, sample, line, knownLat, knownLon);
+    cout << "\nTesting NFTCam (backwards compatibility)..." << endl;
+    Cube nftCube(FileName("$ISISROOT/../isis/tests/data/osirisRexImages/20201020T214241S004_nft_L0-reduced.cub").expanded(), "r");    
+    
+    // checking at center of format of NftCam
+    knownLat = 53.7314045659365;
+    knownLon = 45.4736806050086;
+    sample = 129.5; 
+    line = 97.0;
+
+    testCamera(nftCube, sample, line, knownLat, knownLon);
     cout << "============================================================================" << endl;
 
+    // TODO: COMPLETE IF/WHEN NAIF HAS PROVIDED KERNELS FOR STOWCAM. CURRENT IK IS LABELED AS
+    //       PLACEHOLDER ONLY.
+
+    cout << "\nTesting StowCam (backwards compatibility)..." << endl;
+    cout << "\nTODO: COMPLETE IF/WHEN NAIF KERNELS AVAILABLE; CURRENT IK IS PLACEHOLDER." << endl;
 /*
-    cout << "\nTesting SamCam..." << endl;
-    Cube samCamCube("$osirisrex/testData/20141111T202650_SCAM_L2_V001_SCAM.cub", "r");
+    Cube stowCube(placeholder, "r");    
     knownLat = 0.0;
     knownLon = 0.0;
-    sample = 512.0; 
-    line = 512.0;
-    testCamera(samCamCube, sample, line, knownLat, knownLon);
-    cout << "============================================================================" << endl;
+    sample = 1296.0; 
+    line = 972.0;
+    testCamera(stowCube, sample, line, knownLat, knownLon);
 */
+    cout << "============================================================================" << endl;
   }
   catch (IException &e) {
     cout << "Failed unitTest." << endl;
@@ -111,7 +88,7 @@ void testCamera(Cube &cube,
                 double sample, double line,
                 double knownLat, double knownLon) {
 
-  OsirisRexOcamsCamera *cam = (OsirisRexOcamsCamera *) CameraFactory::Create(cube);
+  OsirisRexTagcamsCamera *cam = (OsirisRexTagcamsCamera *) CameraFactory::Create(cube);
   cout << "FileName: " << FileName(cube.fileName()).name() << endl;
   cout << "NAIF Frame ID: " << cam->instrumentRotation()->Frame() << endl << endl;
   cout.setf(std::ios::fixed);
@@ -145,15 +122,18 @@ void testCamera(Cube &cube,
   testLineSamp(cam, 1.0, 1.0);
 
   cout << "For upper right corner ..." << endl;
-  testLineSamp(cam, 1024.0, 1.0);
+//  testLineSamp(cam, 2596.0, 1.0);
+  testLineSamp(cam, 259.0, 1.0);
 
   cout << "For lower left corner ..." << endl;
-  testLineSamp(cam, 1.0, 1024.0);
+//  testLineSamp(cam, 1.0, 1944.0);
+  testLineSamp(cam, 1.0, 194.0);
 
   cout << "For lower right corner ..." << endl;
-  testLineSamp(cam, 1024.0, 1024.0);
+//  testLineSamp(cam, 2596.0, 1944.0);
+  testLineSamp(cam, 259.0, 194.0);
 
-  cout << "For known pixel position ..." << endl;
+  cout << "For known pixel position (" << sample << ", " << line << "..." << endl;
   if (!cam->SetImage(sample, line)) {
     throw IException(IException::Unknown, "ERROR setting image to known position.", _FILEINFO_);
   }
@@ -174,9 +154,9 @@ void testCamera(Cube &cube,
 
 void testLineSamp(Camera *cam, double samp, double line) {
   bool success = cam->SetImage(samp, line);
-
+  
   if (success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());    
   }
 
   if (success) {
