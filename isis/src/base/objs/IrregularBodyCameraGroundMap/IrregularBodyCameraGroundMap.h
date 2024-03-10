@@ -1,33 +1,15 @@
-/**
- * @file
- * $Revision: 1.7 $
- * $Date: 2010/03/27 06:36:41 $
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
- *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
-
 #ifndef IrregularBodyCameraGroundMap_h
 #define IrregularBodyCameraGroundMap_h
 
+/** This is free and unencumbered software released into the public domain.
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "Camera.h"
-#include "CameraDistortionMap.h"
 #include "CameraGroundMap.h"
-#include "SpicePosition.h"
 #include "SurfacePoint.h"
 
 namespace Isis {
@@ -35,9 +17,11 @@ namespace Isis {
    * Convert between undistorted focal plane and ground coordinates
    * 
    * This class is derived from CameraGroundMap to support the special case of
-   * irregular bodies. Particularly, only the GetXY() method is reimplemented here
-   * because it uses the ellipsiod to validate ground point visibility along the
-   * look vector to the surface. This is not adequate for most irregular bodies.
+   * irregular bodies. Particularly, only the GetXY() method is reimplemented
+   * here to never perform the "emission angle" (in places called "back-of-the-
+   * planet") test. This is because the test uses the ellipsoidd to validate
+   * ground point visibility along the look vector to the surface. This is not
+   * adequate for most irregular bodies.
    *
    * @ingroup Camera
    *
@@ -48,18 +32,22 @@ namespace Isis {
    * @internal
    *  @history 2018-07-26 UA/OSIRIS-REx IPWG Team  - Developed to support control
    *                         of irregular bodies
+   *  @history 2024-03-10 Ken Edmundson - Modified per Kris Becker such that the
+   *                         emission angle (or back-of-the-planet) test is never
+   *                         performed in the GetXY method (see class description
+   *                         above). 
    */
   class IrregularBodyCameraGroundMap : public CameraGroundMap {
     public:
-      IrregularBodyCameraGroundMap(Camera *parent, const bool isIrregular = true);
-
+      IrregularBodyCameraGroundMap(Camera *parent, const bool clip_emission_angles = false);
+      
       //! Destructor
       virtual ~IrregularBodyCameraGroundMap() {};
 
       virtual bool GetXY(const SurfacePoint &spoint, double *cudx, double *cudy);
 
     protected:
-      bool   m_isBodyIrregular;   /**! Is the body irregular */
+      bool   m_clip_emission;   /**! Test for emission angles? */
 
   };
 };
