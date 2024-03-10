@@ -1,23 +1,13 @@
 #ifndef OsirisRexTagcamsDistortionMap_h
 #define OsirisRexTagcamsDistortionMap_h
-/**
- * @file
- *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for
- *   intellectual property information,user agreements, and related information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
- *   warranty, and no responsibility is assumed by the USGS in connection
- *   therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
- *   the Privacy &amp; Disclaimers page on the Isis website,
- *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QSharedPointer>
 
@@ -39,7 +29,7 @@ namespace Isis {
    * This model is an image line/sample coordinate-based model that is computed 
    * from star positions in several images. The actual positions of the stars are 
    * determined where they should be seen in the undistorted image plane and the 
-   * model produces the distorted location of the star inthe image. Therefore, the 
+   * model produces the distorted location of the star in the image. Therefore, the 
    * model is implemented such that the computation of distorted pixel location is 
    * a direct computation of the model and the undistorted location is iterative. 
    *  
