@@ -58,6 +58,10 @@ namespace Isis {
    *                            setSurfacePoint() & clearSurfacePoint() virtual
    *                            to give some hope of a consistent internal state
    *                            in derived models.
+   *   @history 2023-11-17 Adam Paquette - Added new localNormal variable with same interface
+   *                                       as the surface normal. This ensures that the currently
+   *                                       stored m_normal is always the surface normal, and that 
+   *                                       the local normal is always stored in m_localNormal.
    */
   class ShapeModel {
     public:
@@ -93,6 +97,7 @@ namespace Isis {
 
       bool hasIntersection();
       bool hasNormal() const;
+      bool hasLocalNormal() const;
 
       // Calculate the default normal of the current intersection point
       virtual void calculateDefaultNormal() = 0;
@@ -140,8 +145,11 @@ namespace Isis {
       // Set current surface point
       virtual void setSurfacePoint(const SurfacePoint &surfacePoint);
 
-      // Return the normal (surface or local) of the current intersection point
+      // Return the surface normal of the current intersection point
       virtual std::vector<double>  normal();
+
+      // Return the local normal of the current intersection point
+      virtual std::vector<double> localNormal();
 
       // Determine if the internal intercept is occluded from the observer/lookdir
       virtual bool isVisibleFrom(const std::vector<double> observerPos,
@@ -149,9 +157,13 @@ namespace Isis {
 
     protected:
 
-      // Set the normal (surface or local) of the current intersection point
+      // Set the surface normal of the current intersection point
       void setNormal(const std::vector<double>);
       void setNormal(const double a, const double b, const double c);
+
+      // Set the local normal of the current intersection point
+      void setLocalNormal(const std::vector<double>);
+      void setLocalNormal(const double a, const double b, const double c);
 
       // Set shape name
       void setName(QString name);
@@ -165,13 +177,16 @@ namespace Isis {
       bool hasValidTarget() const;
       std::vector<Distance> targetRadii() const;
       void setHasNormal(bool status);
+      void setHasLocalNormal(bool status);
       double resolution();
 
     private:
       bool m_hasEllipsoidIntersection; //!< Indicates the ellipsoid was successfully intersected
       bool m_hasIntersection;          //!< indicates good intersection exists
       bool m_hasNormal;                //!< indicates normal has been computed
-      std::vector<double> m_normal;    //!< Local normal of current intersection point
+      bool m_hasLocalNormal;                //!< indicates local normal has been computed
+      std::vector<double> m_normal;    //!< Surface normal of current intersection point
+      std::vector<double> m_localNormal;    //!< Local normal of current intersection point
       QString *m_name;                 //! < Name of the shape
       SurfacePoint *m_surfacePoint;    //!< Current intersection point
 
