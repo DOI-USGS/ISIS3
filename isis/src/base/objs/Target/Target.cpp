@@ -108,16 +108,41 @@ namespace Isis {
    */
   Target::Target(Pvl &label) {
     // Initialize everything to null
-    m_bodyCode = NULL;
-    m_systemCode = NULL;
+    m_bodyCode = new SpiceInt;
+    m_systemCode = new SpiceInt;
     m_name = NULL;
     m_systemName = NULL;
     m_spice = NULL;
+    m_radii.resize(3, Distance());
     init();
 
     PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
     QString targetName = inst["TargetName"][0];
     setName(targetName);
+
+    PvlGroup &kernels = label.findGroup("Kernels", Pvl::Traverse);
+
+    QString trykey = "NaifIkCode";
+
+    m_systemName = new QString;
+
+    if (kernels.hasKeyword("NaifFrameCode")) {
+      trykey = "NaifFrameCode";
+    }
+
+    if (name().toUpper() == "SKY" && kernels.hasKeyword(trykey)) {
+      m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
+      m_sky = true;
+      int ikCode = toInt(kernels[trykey][0]);
+      *m_bodyCode  = ikCode / 1000;
+      // Check for override in kernel group
+      if (kernels.hasKeyword("NaifSpkCode")) {
+        *m_bodyCode = (int) kernels["NaifSpkCode"];
+      }
+
+      *m_systemCode = -1;
+      (*m_systemName).append("THE COSMOS");
+    }
 
     m_shape = ShapeModelFactory::create(this, label);
   }

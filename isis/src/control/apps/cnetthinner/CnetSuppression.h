@@ -24,10 +24,8 @@ find files of those names at the top level of this repository. **/
 #include <boost/foreach.hpp>
 
 #include "CnetManager.h"
-#include "Progress.h"
 
 #include "tnt/tnt_array2d.h"
-#include "tnt/tnt_array2d_utils.h"
 
 namespace Isis {
 
@@ -41,6 +39,7 @@ namespace Isis {
  *   @history 2016-12-28 Kristin Berry - Added documentation and tests for checkin
  *   @history 2017-08-09 Summer Stapleton - Added a try-catch in constructor to throw proper
  *                         error for invalid control net. Fixes #5068.
+ *   @history 2023-11-28 Ken Edmundson - Removed all BOOST_ASSERTS and unnecessary #includes.
  *
  */
   class CnetSuppression : public CnetManager {
@@ -123,6 +122,7 @@ namespace Isis {
 
       CnetSuppression();
       CnetSuppression(const QString &cnetfile, const double &weight = 0.0);
+      CnetSuppression(QSharedPointer<ControlNet> &cnet, const double &weight = 0.0);
       CnetSuppression(const CnetManager &cman);
 
       virtual ~CnetSuppression();
@@ -152,7 +152,7 @@ namespace Isis {
       const ControlNet *net() const;
 
     private:
-      QScopedPointer<ControlNet> m_cnet; //!
+      QSharedPointer<ControlNet> m_cnet; //!
       QList<ControlPoint *>      m_points; //!
       BitMask                    m_saved; //!
       QVector<Results>           m_results; //!

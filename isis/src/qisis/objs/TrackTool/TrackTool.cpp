@@ -210,10 +210,18 @@ namespace Isis {
 
       if(cvp->camera()->SetImage(sample, line)) {
         if (cvp->camera()->target()->shape()->name() != "Plane") {
-          double lat = cvp->camera()->UniversalLatitude();
-          double lon = cvp->camera()->UniversalLongitude();
-          p_latLabel->setText(QString("Lat %1").arg(lat));
-          p_lonLabel->setText(QString("Lon %1").arg(lon));
+          if (cvp->camera()->target()->isSky()) {
+            double dec = cvp->camera()->Declination();
+            double ra = cvp->camera()->RightAscension();
+            p_latLabel->setText(QString("DEC %1").arg(dec));
+            p_lonLabel->setText(QString("RA %1").arg(ra));
+          }
+          else {
+            double lat = cvp->camera()->UniversalLatitude();
+            double lon = cvp->camera()->UniversalLongitude();
+            p_latLabel->setText(QString("Lat %1").arg(lat));
+            p_lonLabel->setText(QString("Lon %1").arg(lon));
+          }
         }
         else {
           double rad = cvp->camera()->LocalRadius().meters();

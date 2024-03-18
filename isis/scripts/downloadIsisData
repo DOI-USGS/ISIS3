@@ -17,7 +17,7 @@ import re
 
 # priority is: lowest index is highest priority 
 filter_list = [
-        '+ calibration/**' # we generally want everything in calibration 
+        '+ calibration/**', # we generally want everything in calibration 
         '- source/',
         '- /a_older_versions/',
         '- /former_versions/',

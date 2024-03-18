@@ -332,16 +332,16 @@ void outputOcclusion(EmbreeTargetShape &embreeShape,
 
 void outputMultiHitRay(RTCMultiHitRay &ray) {
   qDebug() << "Multi Hit Ray Status";
-  qDebug() << "  Origin: (" << ray.org[0] << "," << ray.org[1] << "," << ray.org[2] << ")";
-  qDebug() << "  Direction: (" << ray.dir[0] << "," << ray.dir[1] << "," << ray.dir[2] << ")";
-  qDebug() << "  Near distance: " << ray.tnear;
-  qDebug() << "  Far distance: " << ray.tfar;
-  qDebug() << "  Normal: (" << ray.Ng[0] << "," << ray.Ng[1] << "," << ray.Ng[2] << ")";
-  qDebug() << "  Intersection U: " << ray.u;
-  qDebug() << "  Intersection V: " << ray.v;
-  qDebug() << "  Geometry ID: " << ray.geomID;
-  qDebug() << "  Primitive ID: " << ray.primID;
-  qDebug() << "  Instance ID: " << ray.instID;
+  qDebug() << "  Origin: (" << ray.ray.org_x << "," << ray.ray.org_y << "," << ray.ray.org_z << ")";
+  qDebug() << "  Direction: (" << ray.ray.dir_x << "," << ray.ray.dir_y << "," << ray.ray.dir_z << ")";
+  qDebug() << "  Near distance: " << ray.ray.tnear;
+  qDebug() << "  Far distance: " << ray.ray.tfar;
+  qDebug() << "  Normal: (" << ray.hit.Ng_x << "," << ray.hit.Ng_y << "," << ray.hit.Ng_z << ")";
+  qDebug() << "  Intersection U: " << ray.hit.u;
+  qDebug() << "  Intersection V: " << ray.hit.v;
+  qDebug() << "  Geometry ID: " << ray.hit.geomID;
+  qDebug() << "  Primitive ID: " << ray.hit.primID;
+  qDebug() << "  Instance ID: " << ray.hit.instID[0];
   qDebug() << "  Number of Intersections: " << ray.lastHit + 1;
   for (int i = 0; i <= ray.lastHit; i++) {
     qDebug() << "  Intersection" << i + 1;
@@ -354,15 +354,15 @@ void outputMultiHitRay(RTCMultiHitRay &ray) {
 
 void outputOcclusionRay(RTCOcclusionRay &ray) {
   qDebug() << "Occlusion Ray Status";
-  qDebug() << "  Origin: (" << ray.org[0] << "," << ray.org[1] << "," << ray.org[2] << ")";
-  qDebug() << "  Direction: (" << ray.dir[0] << "," << ray.dir[1] << "," << ray.dir[2] << ")";
-  qDebug() << "  Near distance: " << ray.tnear;
-  qDebug() << "  Far distance: " << ray.tfar;
-  qDebug() << "  Normal: (" << ray.Ng[0] << "," << ray.Ng[1] << "," << ray.Ng[2] << ")";
-  qDebug() << "  Intersection U: " << ray.u;
-  qDebug() << "  Intersection V: " << ray.v;
-  qDebug() << "  Geometry ID: " << ray.geomID;
-  qDebug() << "  Instance ID: " << ray.instID;
+  qDebug() << "  Origin: (" << ray.ray.org_x << "," << ray.ray.org_y << "," << ray.ray.org_z << ")";
+  qDebug() << "  Direction: (" << ray.ray.dir_x << "," << ray.ray.dir_y << "," << ray.ray.dir_z << ")";
+  qDebug() << "  Near distance: " << ray.ray.tnear;
+  qDebug() << "  Far distance: " << ray.ray.tfar;
+  qDebug() << "  Normal: (" << ray.hit.Ng_x << "," << ray.hit.Ng_y << "," << ray.hit.Ng_z << ")";
+  qDebug() << "  Intersection U: " << ray.hit.u;
+  qDebug() << "  Intersection V: " << ray.hit.v;
+  qDebug() << "  Geometry ID: " << ray.hit.geomID;
+  qDebug() << "  Instance ID: " << ray.hit.instID[0];
   qDebug() << "  Ignored Primitive ID: " << ray.ignorePrimID;
 }
 

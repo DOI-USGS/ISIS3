@@ -10,7 +10,7 @@ find files of those names at the top level of this repository. **/
 #include <geos/util/GEOSException.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/LinearRing.h>
-#include <geos/geom/CoordinateArraySequence.h>
+#include <geos/geom/CoordinateSequence.h>
 
 #include "IException.h"
 #include "SerialNumberList.h"
@@ -73,104 +73,104 @@ int main() {
   vector<QString> sns;
 
   // Reusable variables
-  geos::geom::CoordinateArraySequence *pts;
+  geos::geom::CoordinateSequence pts;
   vector<const geos::geom::Geometry *> polys;
 
   // Create the A polygon
-  pts = new geos::geom::CoordinateArraySequence();
-  pts->add(geos::geom::Coordinate(1, 9));
-  pts->add(geos::geom::Coordinate(6, 9));
-  pts->add(geos::geom::Coordinate(6, 4));
-  pts->add(geos::geom::Coordinate(1, 4));
-  pts->add(geos::geom::Coordinate(1, 9));
+  pts.add(geos::geom::Coordinate(1, 9));
+  pts.add(geos::geom::Coordinate(6, 9));
+  pts.add(geos::geom::Coordinate(6, 4));
+  pts.add(geos::geom::Coordinate(1, 4));
+  pts.add(geos::geom::Coordinate(1, 9));
 
   polys.push_back(globalFactory->createPolygon(
-                    globalFactory->createLinearRing(pts), NULL));
+                    globalFactory->createLinearRing(pts)).release());
 
-  boundaries.push_back(globalFactory->createMultiPolygon(polys));
+  boundaries.push_back(globalFactory->createMultiPolygon(polys).release());
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
+  pts.clear();
   sns.push_back("A");
 
   // Create the B polygon
-  pts = new geos::geom::DefaultCoordinateSequence();
-  pts->add(geos::geom::Coordinate(3, 10));
-  pts->add(geos::geom::Coordinate(12, 10));
-  pts->add(geos::geom::Coordinate(12, 7));
-  pts->add(geos::geom::Coordinate(3, 7));
-  pts->add(geos::geom::Coordinate(3, 10));
+  pts.add(geos::geom::Coordinate(3, 10));
+  pts.add(geos::geom::Coordinate(12, 10));
+  pts.add(geos::geom::Coordinate(12, 7));
+  pts.add(geos::geom::Coordinate(3, 7));
+  pts.add(geos::geom::Coordinate(3, 10));
 
   polys.push_back(globalFactory->createPolygon(
-                    globalFactory->createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory->createMultiPolygon(polys));
+                    globalFactory->createLinearRing(pts)).release());
+  boundaries.push_back(globalFactory->createMultiPolygon(polys).release());
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
+  pts.clear();
   sns.push_back("B");
 
   // Create the C polygon
-  pts = new geos::geom::CoordinateArraySequence();
-  pts->add(geos::geom::Coordinate(11, 5));
-  pts->add(geos::geom::Coordinate(11, 9));
-  pts->add(geos::geom::Coordinate(15, 9));
-  pts->add(geos::geom::Coordinate(15, 5));
-  pts->add(geos::geom::Coordinate(11, 5));
+  pts.add(geos::geom::Coordinate(11, 5));
+  pts.add(geos::geom::Coordinate(11, 9));
+  pts.add(geos::geom::Coordinate(15, 9));
+  pts.add(geos::geom::Coordinate(15, 5));
+  pts.add(geos::geom::Coordinate(11, 5));
 
   polys.push_back(globalFactory->createPolygon(
-                    globalFactory->createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory->createMultiPolygon(polys));
+                    globalFactory->createLinearRing(pts)).release());
+  boundaries.push_back(globalFactory->createMultiPolygon(polys).release());
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
+  pts.clear();
   sns.push_back("C");
 
   // Create the D polygon
-  pts = new geos::geom::CoordinateArraySequence();
-  pts->add(geos::geom::Coordinate(14, 8));
-  pts->add(geos::geom::Coordinate(14, 2));
-  pts->add(geos::geom::Coordinate(5, 2));
-  pts->add(geos::geom::Coordinate(5, 8));
-  pts->add(geos::geom::Coordinate(14, 8));
+  pts.add(geos::geom::Coordinate(14, 8));
+  pts.add(geos::geom::Coordinate(14, 2));
+  pts.add(geos::geom::Coordinate(5, 2));
+  pts.add(geos::geom::Coordinate(5, 8));
+  pts.add(geos::geom::Coordinate(14, 8));
 
   polys.push_back(globalFactory->createPolygon(
-                    globalFactory->createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory->createMultiPolygon(polys));
+                    globalFactory->createLinearRing(pts)).release());
+  boundaries.push_back(globalFactory->createMultiPolygon(polys).release());
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
+  pts.clear();
   sns.push_back("D");
 
   // Create the E polygon
-  pts = new geos::geom::CoordinateArraySequence();
-  pts->add(geos::geom::Coordinate(10, 6));
-  pts->add(geos::geom::Coordinate(13, 6));
-  pts->add(geos::geom::Coordinate(13, 4));
-  pts->add(geos::geom::Coordinate(10, 4));
-  pts->add(geos::geom::Coordinate(10, 6));
+  pts.add(geos::geom::Coordinate(10, 6));
+  pts.add(geos::geom::Coordinate(13, 6));
+  pts.add(geos::geom::Coordinate(13, 4));
+  pts.add(geos::geom::Coordinate(10, 4));
+  pts.add(geos::geom::Coordinate(10, 6));
 
   polys.push_back(globalFactory->createPolygon(
-                    globalFactory->createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory->createMultiPolygon(polys));
+                    globalFactory->createLinearRing(pts)).release());
+  boundaries.push_back(globalFactory->createMultiPolygon(polys).release());
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
+  pts.clear();
   sns.push_back("E");
 
   // Create the F polygon
-  pts = new geos::geom::CoordinateArraySequence();
-  pts->add(geos::geom::Coordinate(1, 1));
-  pts->add(geos::geom::Coordinate(1, 2));
-  pts->add(geos::geom::Coordinate(4, 2));
-  pts->add(geos::geom::Coordinate(4, 1));
-  pts->add(geos::geom::Coordinate(1, 1));
+  pts.add(geos::geom::Coordinate(1, 1));
+  pts.add(geos::geom::Coordinate(1, 2));
+  pts.add(geos::geom::Coordinate(4, 2));
+  pts.add(geos::geom::Coordinate(4, 1));
+  pts.add(geos::geom::Coordinate(1, 1));
 
   polys.push_back(globalFactory->createPolygon(
-                    globalFactory->createLinearRing(pts), NULL));
-  boundaries.push_back(globalFactory->createMultiPolygon(polys));
+                    globalFactory->createLinearRing(pts)).release());
+  boundaries.push_back(globalFactory->createMultiPolygon(polys).release());
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
+  pts.clear();
   sns.push_back("F");
 
   // Create a ImageOverlapSet object with the multipolys and sns from above

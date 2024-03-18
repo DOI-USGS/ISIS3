@@ -161,7 +161,7 @@ endif()
 # sometimes third parties do not set their rpaths correctly
 set(thirdPartyCppFlags -Wall
                        -fPIC
-                       -std=c++14
+                       -std=c++17
                        -DISIS_LITTLE_ENDIAN=1
                        -Wno-unused-parameter
                        -Wno-overloaded-virtual
@@ -171,7 +171,7 @@ set(thirdPartyCppFlags -Wall
                        -DENABLEJP2K=${JP2KFLAG}
                      )
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # Append CPP flags set in the third party lib file to the string set in this file.
 string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
@@ -183,8 +183,8 @@ set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 # Add gold linker (and therefore, phtread) to speed up linux (spec. Ubuntu18.04) builds
 if(NOT APPLE)
   set(thirdPartyCppFlags ${thirdPartyCppFlags} -fuse-ld=gold
-	                                       -pthread
-					       -fext-numeric-literals
+	                                             -pthread
+					                                     -fext-numeric-literals
                                                -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
 endif()
 
@@ -270,7 +270,7 @@ find_package(Cholmod   4.4.5   REQUIRED)
 find_package(CSM       3.0.3.3 REQUIRED)
 find_package(CSPICE    65      REQUIRED)
 find_package(Eigen             REQUIRED)
-find_package(Embree    2.15.0  REQUIRED)
+find_package(Embree    3.13.0  REQUIRED)
 find_package(GeoTIFF   2       REQUIRED)
 SET(GSL_ROOT_DIR $ENV{CONDA_PREFIX})
 find_package(GSL       2.2.1   REQUIRED)
@@ -279,7 +279,7 @@ find_package(Jama      125     REQUIRED)
 find_package(NN                REQUIRED)
 find_package(OpenCV    3.1.0   REQUIRED)
 find_package(PCL               REQUIRED)
-find_package(Protobuf  2.6.1   REQUIRED)
+find_package(protobuf          REQUIRED CONFIG)
 find_package(Qwt       6       REQUIRED)
 find_package(SuperLU   4.3     REQUIRED)
 find_package(TIFF      4.0.0   REQUIRED)
@@ -352,7 +352,7 @@ foreach (_variableName ${_variableNames})
 endforeach()
 
 # add target based linkages to ALLLIBS variable
-list(APPEND ALLLIBS pantor::inja sensorutilities)
+list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree)
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)

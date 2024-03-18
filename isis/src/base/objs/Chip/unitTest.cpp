@@ -17,7 +17,7 @@ find files of those names at the top level of this repository. **/
 #include "Preference.h"
 #include "SpecialPixel.h"
 #include "geos/geom/Coordinate.h"
-#include "geos/geom/CoordinateArraySequence.h"
+#include "geos/geom/CoordinateSequence.h"
 #include "geos/geom/GeometryFactory.h"
 #include "geos/geom/Polygon.h"
 #include "geos/geom/MultiPolygon.h"
@@ -134,16 +134,16 @@ int main() {
   cout << "Test load chip from cube with rotation and clipping polygon " << endl;
   chip.TackCube(26.0, 25.0);
 
-  geos::geom::CoordinateArraySequence *pts = new geos::geom::CoordinateArraySequence();
-  pts->add(geos::geom::Coordinate(23.0, 22.0));
-  pts->add(geos::geom::Coordinate(28.0, 22.0));
-  pts->add(geos::geom::Coordinate(28.0, 27.0));
-  pts->add(geos::geom::Coordinate(25.0, 28.0));
-  pts->add(geos::geom::Coordinate(23.0, 22.0));
-  vector<geos::geom::Geometry *> *polys = new vector<geos::geom::Geometry *>;
+  geos::geom::CoordinateSequence pts;
+  pts.add(geos::geom::Coordinate(23.0, 22.0));
+  pts.add(geos::geom::Coordinate(28.0, 22.0));
+  pts.add(geos::geom::Coordinate(28.0, 27.0));
+  pts.add(geos::geom::Coordinate(25.0, 28.0));
+  pts.add(geos::geom::Coordinate(23.0, 22.0));
+  vector <const geos::geom::Geometry *> polys;
   geos::geom::GeometryFactory::Ptr gf = geos::geom::GeometryFactory::create();
-  polys->push_back(gf->createPolygon(gf->createLinearRing(pts), NULL));
-  geos::geom::MultiPolygon *mPolygon = gf->createMultiPolygon(polys);
+  polys.push_back(gf->createPolygon(gf->createLinearRing(pts)).release());
+  geos::geom::MultiPolygon *mPolygon = gf->createMultiPolygon(polys).release();
 
   chip.SetClipPolygon(*mPolygon);
   chip.Load(junk, 45.0);

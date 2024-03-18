@@ -4,6 +4,7 @@
 #include "Mocks.h"
 
 #include "csm.h"
+#include <vector>
 
 #include "CsmSensor.h"
 #include "Cube.h"
@@ -11,7 +12,48 @@
 #include "IsisIlluminator.h"
 #include "IsisSensor.h"
 #include "IsisShape.h"
+#include "IsisBody.h"
 #include "SurfacePoint.h"
+
+using namespace std;
+
+class SpiceKernels : public ::testing::Test {
+  protected:
+    vector<QString> kernels;
+    double startTime;
+    double endTime;
+    int frameCode;
+    int targetCode;
+
+  void SetUp() {
+    startTime = -69382819.0;
+    endTime = -69382512.0;
+    frameCode = -94031;
+    targetCode = 499;
+
+    QString dir = FileName("$ISISTESTDATA/isis/src/base/unitTestData/kernels").expanded() + "/";
+    kernels.clear();
+    kernels.push_back(dir + "naif0007.tls");
+    kernels.push_back(dir + "MGS_SCLKSCET.00045.tsc");
+    kernels.push_back(dir + "moc13.ti");
+    kernels.push_back(dir + "moc.bc");
+    kernels.push_back(dir + "moc.bsp");
+    kernels.push_back(dir + "de405.bsp");
+    kernels.push_back(dir + "pck00009.tpc");
+    kernels.push_back(dir + "mocSpiceRotationUnitTest.ti");
+    kernels.push_back(dir + "ROS_V29.TF");
+    kernels.push_back(dir + "CATT_DV_145_02_______00216.BC");
+    for (QString& kernel : kernels) {
+      furnsh_c(kernel.toLatin1().data());
+    }
+  }
+
+  void TearDown() {
+    for (QString& kernel : kernels) {
+      unload_c(kernel.toLatin1().data());
+    }
+  }
+};
 
 // Custom csm equality operators for mock matching
 namespace csm {
@@ -64,6 +106,23 @@ TEST(IsisIlluminator, PositionOldTime) {
   IsisIlluminator testIlluminator(&mockSpice);
 
   EXPECT_EQ(testIlluminator.position(testTime), testPosM);
+}
+
+TEST(IsisIlluminator, Velocity) {
+  double testTime = 10.0;
+  SensorUtilities::Vec testVelM = {-1000.0, 1000.0, 2000.0};
+
+  MockSpicePosition mockSpice(0, 1);
+
+  const double state[6] = {0.0, 0,0, -1.0, 1.0, 2.0};
+  mockSpice.setStateVector(state, true);
+
+  EXPECT_CALL(mockSpice, EphemerisTime)
+        .WillRepeatedly(::testing::Return(testTime));
+
+  IsisIlluminator testIlluminator(&mockSpice);
+
+  EXPECT_EQ(testIlluminator.velocity(testTime), testVelM);
 }
 
 TEST(IsisShape, IntersectStandardNormal) {
@@ -409,4 +468,32 @@ TEST_F(DefaultCube, IsisSensorGetStateGroundOldPoint) {
   EXPECT_EQ(obsState.sensorPos, sensorPos);
   EXPECT_EQ(obsState.time, testTime);
   EXPECT_EQ(obsState.imagePoint, testImagePt);
+}
+
+TEST_F(SpiceKernels, IsisBodyRotation) {
+  std::vector<double> expectedResult = { -617.29587681050612, 406.01820331225525, -673.86572776172341, 
+                                           10.22369321950767, 860.60644926850875, 509.16796401030905, 
+                                           786.66465318438088, 307.41788831578776, -535.39981824218091 };
+  
+  SpiceRotation rot(frameCode);
+  rot.SetEphemerisTime(startTime);
+
+  IsisBody testBody(&rot);
+  std::vector<double> rotation = testBody.rotation(-69382512);
+
+  EXPECT_EQ(testBody.rotation(-69382512), expectedResult);
+}
+
+TEST_F(SpiceKernels, IsisBodyFixedVector) {
+  SpiceRotation rot(frameCode);
+  rot.SetEphemerisTime(startTime);
+  IsisBody testBody(&rot);
+
+  SensorUtilities::Vec pos = {-0.1, 0.0, 0.0};
+  SensorUtilities::Vec expectResult = {87.506927366393171, -1.1442263253059641, -48.386241939308213};
+  SensorUtilities::Vec result = testBody.fixedVector(pos);
+
+  EXPECT_EQ(result.x, expectResult.x);
+  EXPECT_EQ(result.y, expectResult.y);
+  EXPECT_EQ(result.z, expectResult.z);
 }

@@ -8,6 +8,7 @@
 #include "TestCsmPlugin.h"
 #include "TempFixtures.h"
 #include "CameraFixtures.h"
+#include "Table.h"
 #include "TestUtilities.h"
 #include "TestCsmModel.h"
 #include "FileName.h"
@@ -28,6 +29,7 @@ class CSMPluginFixture : public TempTestingFiles {
     Pvl label;
     QString isdPath;
     QString altIsdPath;
+    QString bodyRotationIsdPath;
     QString filename;
     TestCsmModel model;
     AlternativeTestCsmModel altModel;
@@ -139,6 +141,9 @@ TEST_F(CSMPluginFixture, CSMInitDefault) {
   ASSERT_TRUE(testCube->hasGroup("Kernels"));
   PvlGroup &kernGroup = testCube->group("Kernels");
   EXPECT_TRUE(kernGroup.hasKeyword("ShapeModel"));
+
+  // Check that the BodyRotation table does not exist
+  ASSERT_FALSE(testCube->hasTable("BodyRotation"));
 }
 
 TEST_F(CSMPluginFixture, CSMInitRunTwice) {

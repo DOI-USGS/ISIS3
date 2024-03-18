@@ -5,6 +5,8 @@
 
 namespace SensorUtilities {
 
+  const double RAD2DEG = 57.29577951308232087679815481;
+
   /**
    * Structure for a 2-dimensional spherical ground point.
    * Latitude and longitude are in radians.
@@ -30,6 +32,17 @@ namespace SensorUtilities {
 
 
   /**
+   * Structure for right ascension and declination angles.
+   * Right Ascenion angle in degrees.
+   * Declination angle in degrees.
+   */
+  struct RaDec {
+    double ra;
+    double dec;
+  };
+
+
+  /**
    * Structure for a point in an image.
    * The line and sample origin is the upper-left corner at (0, 0).
    * The first band in the image is 0.
@@ -51,6 +64,11 @@ namespace SensorUtilities {
     double z;
 
     /**
+     * Default Vec constructor needed for python wrapper.
+     */
+    Vec() {};
+
+    /**
      * Construct a vector from 3 values
      */
     Vec(double a, double b, double c);
@@ -66,6 +84,15 @@ namespace SensorUtilities {
      * The data in the std:vector is a copy.
      */
     operator std::vector<double>() const;
+  };
+
+  /**
+   * Structure for a 3 by 3 Matrix.
+   */
+  struct Matrix {
+    Vec a;
+    Vec b;
+    Vec c;
   };
 
 
@@ -130,6 +157,16 @@ namespace SensorUtilities {
 
 
   /**
+   * Converts coordinate from radians to degrees
+   * 
+   * @param radianLatLon coordinate in radians
+   * 
+   * @return Coordinate in degrees
+   */
+  GroundPt2D radiansToDegrees(GroundPt2D radianLatLon);
+
+
+  /**
    * Convert spherical coordinates to rectangular coordinates
    *
    * @param spherical The spherical coordinate as geocentric latitude, longitude, radius
@@ -149,7 +186,49 @@ namespace SensorUtilities {
    */
    GroundPt3D rectToSpherical(Vec rectangular);
 
+    
+    
+  /**
+   * Computes and returns the ground azimuth between the ground point and
+   * another point of interest, such as the subspacecraft point or the
+   * subsolar point. 
+   *
+   * @param groundPt Ground point latitude and longitude
+   * @param subPt latitude and longitude of a point of interest (e.g. subspacecraft or subsolar)
+   *
+   * @return double The azimuth in degrees
+   */
+  double groundAzimuth(GroundPt2D groundPt, GroundPt2D subPt);
+
+
+  /**
+   * Find the component of a vector that is perpendicular to a second vector.
+   */
+  Vec perpendicularVec(Vec aVec, Vec bVec);
+
+
+  /**
+   * Compute the cross product of two Vecs.
+   */
+  Vec crossProduct(Vec aVec, Vec bVec);
+
+
+  /**
+   * Multiply a scalar and a Vec.
+   */
+  Vec scaleVector(Vec vec, double scalar);
+
+
+  /**
+   * Find the unit vector along a Vec.
+   */
+  Vec unitVector(Vec vec);
+
+
+  /**
+   * Multiply a Matrix with a Vec.
+   */
+  Vec matrixVecProduct(Matrix mat, Vec vec);
 }
 
 #endif
-

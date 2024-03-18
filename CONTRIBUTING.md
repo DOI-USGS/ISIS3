@@ -43,6 +43,9 @@ In the case of an objection being raised in a pull request by another committer,
 committers should seek to arrive at a consensus by way of addressing concerns being expressed
 by discussion, compromise on the proposed change, or withdrawal of the proposed change.
 
-When making a bug fix contribution, please add the [bug](https://github.com/USGS-Astrogeology/ISIS3/pulls?q=is%3Apr+label%3Abug+) label to your pull request. This will automatically cherry-pick your PR into the latest release branch so that it can be distributed in the next bug fix release.
+When making a bug fix contribution, please add the [bug](https://github.com/USGS-Astrogeology/ISIS3/pulls?q=is%3Apr+label%3Abug+) label to your pull request. This will automatically cherry-pick your PR into the latest release branch so that it can be distributed in the next bug fix release. 
+
+Every pull request making changes to ISIS's source needs a [changelog entry](https://raw.githubusercontent.com/DOI-USGS/ISIS3/dev/CHANGELOG.md). PRs are limited to one changelog entry per PR. If you have multiple bug fixes or feature adds, they should be split up. If PRs need to be merged in a particular order, include that as a comment on your PRs. If PR is one changelog, but high-volume changes such as large feature branches (many changes across many files requiring several hours of review time), then the PR isn't guaranteed to be reviewed promptly. Authors should contact the repo owners, see [code.json](https://github.com/DOI-USGS/ISIS3/blob/dev/code.json), to coordinate reviews outside typical USGS Astro support hours. We plan out our schedules in 6 week increments, so plan to coordinate with repo owners a minimum of 6 weeks before you expect the changes to be ready. 
 
 When making a contribution for the first time, please add your name to the `.zenodo.json file.` We strongly recommend adding your affiliation and ORCiD to the `zenodo.json` file. These additions only have to happen once.
+

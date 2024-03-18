@@ -21,6 +21,7 @@
 * [ISIS Data Area](README.md#The-ISIS-Data-Area)
 * [ISIS Test Data](README.md#ISIS-Test-Data)
 * [Installing Older Versions of ISIS](README.md#Installing-older-versions-of-ISIS)
+* [Semantic Versioning and It's Role in Describing the Software](README.md#Semantic-Versioning-and-It's-Role-in-Describing-the-Software)
 
 
 ## Requests for Comment
@@ -56,6 +57,9 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
  - Install Rosetta2. From the terminal run: `/usr/sbin/softwareupdate --install-rosetta --agree-to-license`
  - Include the `# MacOS ARM64 Only` lines below
 1. Next setup your Anaconda environment for ISIS. In the bash prompt, run the following commands:
+    > [!WARNING]
+    > ISIS 8.1.0 is incompatible with Python 3.10, 3.11, and 3.12
+    > The `conda create` command below creates a conda environment with Python 3.9
 
     ```bash
     
@@ -92,12 +96,21 @@ This installation guide is for ISIS users interested in installing ISIS (3.6.0)+
     #Then set channel_priority to flexible in case there is a global channel_priority=strict setting
     conda config --env --set channel_priority flexible
     ```
+    
 
 1. The environment is now ready to download ISIS and its dependencies:
 
     ```bash
     conda install -c usgs-astrogeology isis
     ```
+    > [!NOTE]
+    > The install may take 1 to 2 hours.
+
+    If you would like to download an LTS version, follow the following format below:
+    ```bash
+    conda install -c "usgs-astrogeology/label/LTS" isis=8.0.1
+    ```
+    
 
 1. Finally, setup the environment variables:
 
@@ -537,3 +550,21 @@ python downloadIsisData --config rclone.conf <mission> $ISISDATA
 ```
 
 > The script does not support python2, sometimes you need to explicitly use python3 with `python3 downloadIsisData <mission> $ISISDATA --config rclone.conf` 
+
+## Semantic Versioning and Its Role in Describing the Software
+In 2019, the ISIS project adopted [semantic versioning](https://semver.org/) via its second [Request for Comment](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC2:-Release-Process) (RFC). Semantic versioning was adopted as a tool to help quickly describe how changes to the software impact users and developers. Versions of ISIS are now using a Major.Minor.Bug scheme (e.g., 7.1.0). 
+
+The Major, Minor and Bug numbers are in order of importance. The final (Bug) number is incremented whenever one or more bug fixes are included in a version. Neither users nor developers should see any changes in the way ISIS programs are called or how the [API](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/APIdefinition.md) operates as the final (Bug) number increments.
+
+The first two numbers indicate whether the change(s) are breaking or non-breaking. What is a [breaking change](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC2:-Release-Process#terms)? If a change to [the API](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/APIdefinition.md), defined as programs (e.g., `spiceinit` or `cam2map` or `pds2isis`) and some text output (e.g., CSV output, but not `.txt`), alters how a user calls the program or parses the program output in a way that a scripted solution would fail, that change would be considered a breaking change. In other words, if a CSV output file removed or renamed a column, that would be breaking. If a CSV file added a new column, that would not be breaking. Likewise, if an application `spiceinit` adds a new argument, that is non-breaking. If the change removes, reorders, or changes how the application (CLI) is called, the change is breaking.
+
+### Users
+Users of ISIS benefit from semantic versioning because they can quickly determine whether or not an upgrade of their current version could include changes that would be breaking. When deciding whether or not to upgrade, users can safely assume that an upgrade of the minor version number will **only** add capabilities. Users should be more cautious with changes to the major version, as some breaking change(s) are included. How should a user proceed? Users should reference the [Changelog](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/CHANGELOG.md) to understand what changes have been made that necessitated an increase in the Major version number.
+
+### Developers
+Developers writing against the ISIS API or writing code for submission to the ISIS project also benefit from semantic versioning. For the former use case, writing against ISIS, developer concerns are similar to user concerns. When has the API made of command line tools and program outputs changed? Does that change impact my pipeline or code? Do I need to adjust my work before updating versions (for example, to gain access to new features)? These questions are answered by checking the versioning and the Changelog.
+
+Developers should ensure that changes that break the API are well-marked. Before making a breaking change to the API, we require an [RFC](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC%23:-Template) to solicit input from the broader community. The RFC process allows impacted persons to discuss the change, propose alterations, and finally adopt or pause the inclusion of the change in the code base.
+
+### What update cadence does the project anticipate from users and developers?
+The project is in the process of adopting a [Long Term Support](https://github.com/USGS-Astrogeology/ISIS3/discussions/4691)(LTS) model. Once fully adopted, the project assumes that either (1) users and developers will freeze the version they are using with no expectation of updates or (2) users and developers will update at either each LTS version increment (updating every 18 months) or work on the quarterly release (therefore updating every 3 months). Users and developers using the LTS or current release versions will benefit from bug fixes and new non-API breaking features.

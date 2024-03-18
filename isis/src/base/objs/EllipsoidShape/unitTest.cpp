@@ -119,7 +119,7 @@ int main() {
 
     shape.calculateLocalNormal(notUsed);
     vector<double> myNormal(3);
-    myNormal = shape.normal();
+    myNormal = shape.localNormal();
 
     //Hand-calculated truth value:  [-0.6196003462957385, -0.7004971412244801, 0.3541174466282787]
 

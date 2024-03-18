@@ -12,6 +12,9 @@ pipeline {
                 args '--entrypoint= -v /astro_efs:/astro_efs'
                }
     }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
     environment {
         ISISDATA        =   '/astro_efs/isis_data'
         ISISTESTDATA    =   '/astro_efs/isis_testData'

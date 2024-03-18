@@ -88,7 +88,9 @@ void IsisMain() {
   userGrp.addKeyword(PvlKeyword("EquatorialRadius", toString(1.0)), Pvl::Replace);
   userGrp.addKeyword(PvlKeyword("PolarRadius", toString(1.0)), Pvl::Replace);
   userGrp.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"), Pvl::Replace);
-  userGrp.addKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"), Pvl::Replace);
+  if (!userGrp.hasKeyword("LongitudeDirection")) {
+    userGrp.addKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"), Pvl::Replace);
+  }
   userGrp.addKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
   if(userGrp.hasKeyword("PixelResolution")) {
     userGrp.deleteKeyword("PixelResolution");
@@ -102,6 +104,9 @@ void IsisMain() {
     userGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxRa)), Pvl::Replace);
     userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minDec)), Pvl::Replace);
     userGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxDec)), Pvl::Replace);
+    incam->SetImage(icube->sampleCount() / 2.0, icube->lineCount() / 2.0);
+    double centerRa = incam->RightAscension();
+    userGrp.addKeyword(PvlKeyword("CenterLongitude", toString(centerRa)), Pvl::Replace);
   }
   if(ui.GetString("DEFAULTSCALE") == "CAMERA") {
     double res = incam->RaDecResolution();
@@ -246,6 +251,13 @@ bool sky2map::Xform(double &inSample, double &inLine,
   if(p_incam->Line() < 0.5) return false;
   if(p_incam->Sample() > p_inputSamples + 0.5) return false;
   if(p_incam->Line() > p_inputLines + 0.5) return false;
+
+  p_incam->SetImage(p_incam->Sample(), p_incam->Line());
+  
+  // Check that the new line and sample projects close to the input Right Ascension 
+  // and Declination
+  if (abs(p_incam->RightAscension() - lon) > 0.1) return false;
+  if (abs(p_incam->Declination() - lat) > 0.1) return false;
 
   // Everything is good
   inSample = p_incam->Sample();

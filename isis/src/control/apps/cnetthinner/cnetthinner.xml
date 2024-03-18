@@ -51,7 +51,19 @@ End_Group
         Original Version
     </change>
     <change name="Kristin Berry" date="2016-11-25">
-	Add documentation, error-checking, and updates to meet ISIS coding standards and get checked in. Changed application name from cnetsuppress to cnetthinner on Kris's request. 
+	      Add documentation, error-checking, and updates to meet ISIS coding
+        standards and get checked in. Changed application name from
+        cnetsuppress to cnetthinner on Kris's request. 
+    </change>
+    <change name="Kris Becker" date="2020-01-20">
+        In file CnetManager.cpp, method KPoint::calculateStrength.
+        Replaced BOOST ASSERT (abort) with the line "if ( count LE 0 ) return ( 0 )"
+        to prevent a divide by zero and subsequent seg fault if a point doesn't
+        contain valid measures when computing the point depth weight.
+    </change>
+    <change name="Ken Edmundson" date="2023-11-30">
+        Moved Kris Becker's bug fix of 2020-01-20 from UofA code base to USGS
+        code base and updated documentation. References #5354.
     </change>
 </history>
 

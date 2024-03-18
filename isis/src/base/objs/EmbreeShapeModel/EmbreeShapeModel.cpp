@@ -8,6 +8,7 @@ find files of those names at the top level of this repository. **/
 #include "EmbreeShapeModel.h"
 
 #include <numeric>
+#include <float.h>
 
 #include <QtGlobal>
 #include <QList>
@@ -233,18 +234,18 @@ namespace Isis {
 
         // Cast a ray from the observer to the intersection and check if it is occluded
         RTCOcclusionRay obsRay;
-        obsRay.org[0] = observerPos[0];
-        obsRay.org[1] = observerPos[1];
-        obsRay.org[2] = observerPos[2];
-        obsRay.dir[0] = lookVector[0];
-        obsRay.dir[1] = lookVector[1];
-        obsRay.dir[2] = lookVector[2];
-        obsRay.tnear = 0.0;
-        obsRay.tfar = LinearAlgebra::magnitude(obsToIntersection) - 0.0005;
-        obsRay.instID = RTC_INVALID_GEOMETRY_ID;
-        obsRay.geomID = RTC_INVALID_GEOMETRY_ID;
-        obsRay.primID = RTC_INVALID_GEOMETRY_ID;
-        obsRay.mask = 0xFFFFFFFF;
+        obsRay.ray.org_x = observerPos[0];
+        obsRay.ray.org_y = observerPos[1];
+        obsRay.ray.org_z = observerPos[2];
+        obsRay.ray.dir_x = lookVector[0];
+        obsRay.ray.dir_y = lookVector[1];
+        obsRay.ray.dir_z = lookVector[2];
+        obsRay.ray.tnear = 0.0;
+        obsRay.ray.tfar = LinearAlgebra::magnitude(obsToIntersection) - 0.0005;
+        obsRay.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
+        obsRay.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+        obsRay.hit.primID = RTC_INVALID_GEOMETRY_ID;
+        obsRay.ray.mask = 0xFFFFFFFF;
         obsRay.ignorePrimID = hits[i].primID;
 
         // If the intersection point is not occluded,
@@ -291,7 +292,7 @@ namespace Isis {
     RTCMultiHitRay ray = pointToRay(surfpt);
 
     // Extend the ray to be 1.5 times the length of the SurfacePoint's radius
-    ray.tfar *= 1.5;
+    ray.ray.tfar *= 1.5;
 
     m_targetShape->intersectRay(ray);
 
@@ -319,18 +320,18 @@ namespace Isis {
 
         // Cast a ray from the observer to the intersection and check if it is occluded
         RTCOcclusionRay obsRay;
-        obsRay.org[0] = observerPos[0];
-        obsRay.org[1] = observerPos[1];
-        obsRay.org[2] = observerPos[2];
-        obsRay.dir[0] = lookVector[0];
-        obsRay.dir[1] = lookVector[1];
-        obsRay.dir[2] = lookVector[2];
-        obsRay.tnear = 0.0;
-        obsRay.tfar = LinearAlgebra::magnitude(obsToIntersection);
-        obsRay.instID = RTC_INVALID_GEOMETRY_ID;
-        obsRay.geomID = RTC_INVALID_GEOMETRY_ID;
-        obsRay.primID = RTC_INVALID_GEOMETRY_ID;
-        obsRay.mask = 0xFFFFFFFF;
+        obsRay.ray.org_x = observerPos[0];
+        obsRay.ray.org_y = observerPos[1];
+        obsRay.ray.org_z = observerPos[2];
+        obsRay.ray.dir_x = lookVector[0];
+        obsRay.ray.dir_y = lookVector[1];
+        obsRay.ray.dir_z = lookVector[2];
+        obsRay.ray.tnear = 0.0;
+        obsRay.ray.tfar = LinearAlgebra::magnitude(obsToIntersection);
+        obsRay.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
+        obsRay.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+        obsRay.hit.primID = RTC_INVALID_GEOMETRY_ID;
+        obsRay.ray.mask = 0xFFFFFFFF;
         obsRay.ignorePrimID = hits[i].primID; 
 
         // If the intersection point is no occluded,
@@ -384,6 +385,7 @@ namespace Isis {
   void EmbreeShapeModel::clearSurfacePoint() {
     ShapeModel::clearSurfacePoint();
     setHasNormal(false);
+    setHasLocalNormal(false);
     return;
   }
 
@@ -406,7 +408,7 @@ namespace Isis {
     RTCMultiHitRay ray = latlonToRay(lat,lon);
 
     // Extend the ray to 2.5 times the maximum radius
-    ray.tfar *= 2.5;
+    ray.ray.tfar *= 2.5;
 
     m_targetShape->intersectRay(ray);
 
@@ -632,19 +634,19 @@ namespace Isis {
   RTCMultiHitRay EmbreeShapeModel::latlonToRay(const Latitude &lat, const Longitude &lon) const {
     // Initialize ray
     RTCMultiHitRay ray;
-    ray.org[0] = 0.0;
-    ray.org[1] = 0.0;
-    ray.org[2] = 0.0;
+    ray.ray.org_x = 0.0;
+    ray.ray.org_y = 0.0;
+    ray.ray.org_z = 0.0;
 
     // Convert the lat, lon to a unit look direction
     double latAngle = lat.radians();
     double lonAngle = lon.radians();
-    ray.dir[0] = cos(latAngle) * cos(lonAngle);
-    ray.dir[1] = cos(latAngle) * sin(lonAngle);
-    ray.dir[2] = sin(latAngle);
+    ray.ray.dir_x = cos(latAngle) * cos(lonAngle);
+    ray.ray.dir_y = cos(latAngle) * sin(lonAngle);
+    ray.ray.dir_z = sin(latAngle);
 
     // Set the ray's length to extend to the scene boundary
-    ray.tfar = m_targetShape->maximumSceneDistance();
+    ray.ray.tfar = m_targetShape->maximumSceneDistance();
 
     return (ray);
   }
@@ -662,14 +664,14 @@ namespace Isis {
   RTCMultiHitRay EmbreeShapeModel::pointToRay(const SurfacePoint &surfpt) const {
     // Setup everything but the direction component
     RTCMultiHitRay ray;
-    ray.org[0] = 0.0;
-    ray.org[1] = 0.0;
-    ray.org[2] = 0.0;
-    ray.tnear = 0.0;
-    ray.instID = RTC_INVALID_GEOMETRY_ID; // instance
-    ray.geomID = RTC_INVALID_GEOMETRY_ID;
-    ray.primID = RTC_INVALID_GEOMETRY_ID; // primitive id (triangle id)
-    ray.mask = 0xFFFFFFFF;
+    ray.ray.org_x = 0.0;
+    ray.ray.org_y = 0.0;
+    ray.ray.org_z = 0.0;
+    ray.ray.tnear = 0.0;
+    ray.hit.instID[0] = RTC_INVALID_GEOMETRY_ID; // instance
+    ray.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+    ray.hit.primID = RTC_INVALID_GEOMETRY_ID; // primitive id (triangle id)
+    ray.ray.mask = 0xFFFFFFFF;
     ray.lastHit = -1;
 
     // Get the vector from the origin to the surface point
@@ -681,12 +683,12 @@ namespace Isis {
 
     // Normalize the vector and store it in the ray
     direction = LinearAlgebra::normalize(direction);
-    ray.dir[0] = direction[0];
-    ray.dir[1] = direction[1];
-    ray.dir[2] = direction[2];
+    ray.ray.dir_x = direction[0];
+    ray.ray.dir_y = direction[1];
+    ray.ray.dir_z = direction[2];
 
     // Extend the ray to the surface point
-    ray.tfar = surfpt.GetLocalRadius().kilometers();
+    ray.ray.tfar = surfpt.GetLocalRadius().kilometers();
     return (ray);
   }
 
