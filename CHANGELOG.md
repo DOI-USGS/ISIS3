@@ -49,6 +49,8 @@ release.
 ### Added
 - Added 8 new functions to the Sensor Utility Library: Slant Distance, Target Center Distance, Right Ascension Declination, Local Solar Time, Line Resolution, Sample Resolution, Pixel Resolution, and Solar Longitude.
 - Fixed TrackTool, FindTool, and AdvancedTrackTool not reporting RA and DEC for images targeting the Sky. [#5409](https://github.com/DOI-USGS/ISIS3/pull/5409) 
+- Added new option in `ctxcal` to use monthly computed flatfield files for "Frown" removal in CTX images. [#5338](https://github.com/DOI-USGS/ISIS3/pull/5338)
+
 
 ## [8.1.0] - 2024-01-08
 
