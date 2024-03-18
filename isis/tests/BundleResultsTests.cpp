@@ -589,8 +589,7 @@ TEST(BundleResults, NoOutputNet) {
 
 
 TEST_F(BundleResultsPopulated, Serialization) {
-  QString saveFile = "/Users/acpaquette/BundleResultsTestData.xml";
-  // QString saveFile = tempDir.path() + "/BundleResultsTestData.xml";
+  QString saveFile = tempDir.path() + "/BundleResultsTestData.xml";
   QFile qXmlFile(saveFile);
   qXmlFile.open(QIODevice::ReadWrite);
   QXmlStreamWriter writer(&qXmlFile);
