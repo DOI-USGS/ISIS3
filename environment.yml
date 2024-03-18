@@ -3,7 +3,7 @@ channels:
   - defaults
 
 dependencies:
-  - ale>=0.9.1, <1
+  - ale>=0.10.0, <1
   - armadillo
   - boost>=1.72.0, <2
   - boost-cpp>=1.72.0, <2
@@ -18,7 +18,7 @@ dependencies:
   - cxx-compiler>=1.1.2
   - doxygen
   - eigen>=3, <4
-  - embree>=2.17, <3
+  - embree>=3, <4
   - ffmpeg
   - geos>=3.12.1, <4
   - geotiff

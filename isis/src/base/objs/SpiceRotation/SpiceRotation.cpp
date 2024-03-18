@@ -491,10 +491,7 @@ namespace Isis {
       p_hasAngularVelocity = true;
     }
 
-    bool hasConstantFrames = isdRot.find("constant_frames") != isdRot.end();
-
-
-    if (hasConstantFrames) {
+    if (isdRot.contains("constant_frames")) {
       p_constantFrames = isdRot["constant_frames"].get<std::vector<int>>();
       p_TC = isdRot["constant_rotation"].get<std::vector<double>>();
       m_orientation = new ale::Orientations(rotationCache, p_cacheTime, avCache,

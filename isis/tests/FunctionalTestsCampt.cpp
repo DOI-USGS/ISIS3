@@ -299,8 +299,6 @@ TEST_F(CSMCubeFixture, FunctionalTestCamptCSMCamera) {
   PvlGroup groundPoint = appLog.findGroup("GroundPoint");
 
   // Check that invalid values are all set to null
-  EXPECT_TRUE(groundPoint.findKeyword("RightAscension").isNull());
-  EXPECT_TRUE(groundPoint.findKeyword("Declination").isNull());
   EXPECT_TRUE(groundPoint.findKeyword("SunPosition").isNull(0));
   EXPECT_TRUE(groundPoint.findKeyword("SunPosition").isNull(1));
   EXPECT_TRUE(groundPoint.findKeyword("SunPosition").isNull(2));

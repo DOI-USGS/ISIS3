@@ -40,6 +40,12 @@
     </p>
 
     <p>
+      The input control net may be created by finding each image footprint with <b>footprintinit</b>,
+      computing the image overlaps with <b>findimageoverlaps</b>, creating guess measurements with 
+      <b>autoseed</b>, then registering them with <b>pointreg</b>.
+    </p>
+
+    <p>
       Optional output files can be enabled to provide more information for analyzing the results of
       the bundle. <b>BUNDLEOUT_TXT</b> provides an overall summary of the bundle adjustment;
       it lists the user input parameters selected and tables of statistics for both the
