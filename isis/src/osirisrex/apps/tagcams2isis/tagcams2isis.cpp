@@ -37,17 +37,17 @@ namespace Isis {
    */
   void tagcams2isis(UserInterface &ui) {
 
-    // open fits file
-    ProcessImportFits importFits;
+    FileName fitsFileName(ui.GetFileName("FROM"));
 
-    FileName from(ui.GetFileName("FROM"));
-    importFits.setFitsFile(from);
-
-    return tagcams2isis(importFits, ui);
+    return tagcams2isis(fitsFileName, ui);
   }
 
 
-  void tagcams2isis(ProcessImportFits &importFits, UserInterface &ui) {
+  void tagcams2isis(FileName &fitsFileName, UserInterface &ui) {
+    
+    // open fits file
+    ProcessImportFits importFits;
+    importFits.setFitsFile(fitsFileName);
 
     // Get the primary FITS label so we can confirm its the proper format
     // and get some values for processing

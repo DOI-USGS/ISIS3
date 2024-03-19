@@ -9,12 +9,12 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "ProcessImportFits.h"
+#include "FileName.h"
 #include "UserInterface.h"
 
 namespace Isis{
   extern void tagcams2isis(UserInterface &ui);
-  extern void tagcams2isis(ProcessImportFits &importFits, UserInterface &ui);
+  extern void tagcams2isis(FileName &fitsFileName, UserInterface &ui);
 }
 
 #endif
