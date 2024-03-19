@@ -19,7 +19,7 @@ namespace Isis {
    * This class is derived from CameraGroundMap to support the special case of
    * irregular bodies. Particularly, only the GetXY() method is reimplemented
    * here to never perform the "emission angle" (in places called "back-of-the-
-   * planet") test. This is because the test uses the ellipsoidd to validate
+   * planet") test. This is because the test uses the ellipsoid to validate
    * ground point visibility along the look vector to the surface. This is not
    * adequate for most irregular bodies.
    *
