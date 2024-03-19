@@ -7,20 +7,21 @@
 
   <description>
     <p>
-      Cneteditor allows a user to edit attributes of control points and measures
-      interactively. Select keywords from a control network file are imported
-      into a table of editable rows and columns. <strong>Always make a
-      backup copy of the input file before using this program. There is no
-      "undo" capability yet.</strong>
+      Cneteditor allows a user to visualize control point and measure attributes
+      and to edit them interactively. The user can toggle between control point
+      coordinate and sigma display in Latitude, Longitude, Radius or XYZ format.
+      Select keywords from a control network file are imported into a table of
+      editable rows and columns. <strong>Always make a backup copy of the input
+      file before using this program. There is no "undo" capability yet.</strong>
     </p>
     <p>
       The basic utility of this program is to set control points or control
-      measures to "ignore" or "EditLock," and to modify values assigned to
-      "A Priori SP Lat Sigma," "A Priori SP Lon Sigma," and "A Priori SP Radius
-      Sigma." The control point type can be changed to "Constrained," "Fixed,"
-      or "Free." There are columns such as PointID or Reference which should not
-      be changed. If control points or measures are set to "yes" for EditLock,
-      the user is prompted to verify updated values.
+      measures to "ignore" or "EditLock," and to modify A Priori SP coordinate
+      sigma values (in either lat/lon/radius or XYZ format). The control point
+      type can be changed to "Constrained," "Fixed," or "Free." There are columns
+      such as PointID or Reference which should not be changed. If control points
+      or measures are set to "yes" for EditLock, the user is prompted to verify
+      updated values.
     </p>
     <p>
       The control network file is loaded either by entering the filename after
@@ -32,14 +33,16 @@
       <pre>cneteditor control_network_file.net</pre>
     </p>
     <p>
-      On the menu bar are drop down menus "File," "Tables," and "Help."  The
-      options under "File" are "Open," "Save," "Save As," "Close," and "Quit."
-      The options under "Tables" are "Freeze Tables" and "Enable Sorting."
-      The icons are activated only after a control network file has been loaded.
-      When the sorting icon is enabled, the <strong>"^" (ascending)</strong> or
-      <strong>"v" (descending)</strong> symbol appears in the activated column
-      heading. The sort is performed by clicking on the symbol or by clicking on
-      a different column of interest while sorting is enabled.
+      On the menu bar are drop down menus "File," "Tables," "Coordinate Display,"
+      and "Help."  The options under "File" are "Open," "Save," "Save As,"
+      "Close," and "Quit." The options under "Tables" are "Freeze Tables" and
+      "Enable Sorting." The options under "Coordinate Display" are "X,Y,Z" and
+      "Lat,Lon,Radius." The icons are activated only after a control network file
+      has been loaded. When the sorting icon is enabled, the <strong>"^"
+      (ascending)</strong> or <strong>"v" (descending)</strong> symbol appears in
+      the activated column heading. The sort is performed by clicking on the
+      symbol or by clicking on a different column of interest while sorting is
+      enabled.
     </p>
     <p>
       The "Freeze Tables" icon (ice cube) is used to temporarily turn off the
@@ -56,10 +59,17 @@
       the cells.
     </p>
     <p>
+      The "Coordinate Display" icons ("X,Y,Z" and "Lat, Lon, Radius") toggle
+      display of coordinates and sigmas between the two formats. Latitude/Longitude
+      coordinate units are decimal degrees. Radius and XYZ coordinate units are
+      meters. All coordinate sigma units are meters.
+    </p>
+    <p>
       The filters tabs presently available are "Control Points and Measures" and
-      "Images and Points." The tab for "Connections" is displayed but not
-      implemented yet so there are no keyword options available when the tab is
-      selected.
+      "Images and Points." Filters for points and sigmas correspond to the active
+      coordinate display format ("X,Y,Z" or "Lat, Lon, Radius"). The tab for
+      "Connections" is displayed but not implemented yet so there are no keyword
+      options available when the tab is selected.
     </p>
     <p>
       The results of the filters are displayed in the "Control Point Table,
@@ -186,6 +196,12 @@
     </change>
     <change name="Ian Humphrey" date="2015-11-16">
       Fixed a couple missing icons. References #1041.
+    </change>
+    <change name="Ken Edmundson" date="2024-02-23">
+      Added 1) capability to display point coordinates and sigmas in either
+      lat/lon/radius or XYZ format; 2) menu items and menu bar icons to toggle
+      between coordinate formats; 3) new filters for the XYZ coordinate format;
+      4) updated documentation. References #5421.
     </change>
   </history>
 </application>

@@ -43,6 +43,8 @@ namespace Isis {
    *   @history 2017-09-19 Tracie Sucharski - Fixed bug introduced from last changes which caused a
    *                           seg fault when saving a control net.  In ::networkLoaded, cnet
    *                           (member variable) was deleted.
+   *   @history 2019-11-22 Ken Edmundson - Added coordinate display options to menubar in
+   *                           CreateMenus() method.
    */
   class CnetEditorWindow : public QMainWindow {
       Q_OBJECT

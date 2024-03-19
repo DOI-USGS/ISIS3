@@ -92,6 +92,27 @@ namespace Isis {
    *                           active control. So, when a user changed any cnets, the only cnet that
    *                           was recognized as being modified was the active. Adding this allows
    *                           a user to save changes made to a nonactive cnet. Fixes #5414.
+   *   @history 2019-07-26 Ken Edmundson - OSIRIS-REx modifications to support display/edit of
+   *                           control point coordinates/sigmas in either Lat, Lon, Radius or XYZ.
+   *                           1) Modified the createActions() method to add a main menu item called
+   *                              "Coordinate Display" which contains two submenu items (QActions)
+   *                              called "Lat, Lon, Radius" and "XYZ". The active coordinate type
+   *                              appears as checked in the dropdown menu. Selecting these menu
+   *                              items emits a "triggered" SIGNAL calling either the
+   *                              setLatLonRadiusCoordinateDisplay() or setXYZCoordinateDisplay()
+   *                              SLOT. These slots in turn emit the coordinateDisplayTypeChanged()
+   *                              SIGNAL which is connected to the m_pointTableModel member SLOT
+   *                              resetColumnHeaders(). This has to be called prior to updating the
+   *                              point table display.
+   *   @history 2019-11-22 Ken Edmundson - Modifications to support display/edit of control point
+   *                           coordinates/sigmas in either Lat, Lon, Radius or XYZ in the
+   *                           CreateActions() method.
+   *                           1) Fixed text error for QString configureSortToolTipText.
+   *                           2) Added dedicated icons for Lat, Lon, Radius and X,Y,Z menu and
+   *                              toolbar items.
+   *                           3) Made Lat, Lon, Radius display the default checked item.
+   *                           4) Added Lat, Lon, Radius and X,Y,Z coordinate display items to
+   *                              toolbar.
    */
   class CnetEditorWidget : public QWidget {
       Q_OBJECT
@@ -140,6 +161,8 @@ namespace Isis {
 
     public slots:
       void configSorting();
+      void setLatLonRadiusCoordinateDisplay();
+      void setXYZCoordinateDisplay();
       void setTablesFrozen(bool);
       void rebuildModels();
 
@@ -147,6 +170,7 @@ namespace Isis {
     signals:
       void cnetModified();
       void editControlPoint(ControlPoint *controlPoint, QString serialNumber);
+      void coordinateDisplayTypeChanged();
 
     private slots:
       void rebuildModels(QList< AbstractTreeItem * > itemsToDelete);
@@ -176,44 +200,43 @@ namespace Isis {
                                           QGroupBox *box, QString initialText);
 
       // data
-      bool m_updatingSelection;                                 //!< Updates selection
-      Control *m_control;                                       //!< Control for this widget
-      QString *m_workingVersion;                                //!< Working version
-      static const QString VERSION;                             //!< Version
+      bool m_updatingSelection;                                //!< Updates selection
+      Control *m_control;                                      //!< Control for this widget
+      QString *m_workingVersion;                               //!< Working version
+      static const QString VERSION;                            //!< Version
 
       //widgets
-      TreeView *m_pointTreeView;                       //!< Point tree view
-      TreeView *m_imageTreeView;                       //!< Image tree view
-      TreeView *m_connectionTreeView;                  //!< Connection tree view
+      TreeView *m_pointTreeView;                               //!< Point tree view
+      TreeView *m_imageTreeView;                               //!< Image tree view
+      TreeView *m_connectionTreeView;                          //!< Connection tree view
 
-      TableView *m_pointTableView;                     //!< Point table view
-      TableView *m_measureTableView;                   //!< Measure table view
+      TableView *m_pointTableView;                             //!< Point table view
+      TableView *m_measureTableView;                           //!< Measure table view
 
-      QGroupBox *m_pointTableBox;                               //!< Point table box
-      QGroupBox *m_measureTableBox;                             //!< Measure table box
+      QGroupBox *m_pointTableBox;                              //!< Point table box
+      QGroupBox *m_measureTableBox;                            //!< Measure table box
 
-      QScrollArea *m_filterArea;                                //!< Scroll area for filters
+      QScrollArea *m_filterArea;                               //!< Scroll area for filters
 
-      QWidget *m_pointFilterWidget;                             //!< Point filter widget
-      QWidget *m_serialFilterWidget;                            //!< Serial filter widget
-      QWidget *m_connectionFilterWidget;                        //!< Connection filter widget
+      QWidget *m_pointFilterWidget;                            //!< Point filter widget
+      QWidget *m_serialFilterWidget;                           //!< Serial filter widget
+      QWidget *m_connectionFilterWidget;                       //!< Connection filter widget
 
-      PointMeasureTreeModel *m_pointModel;             //!< Point tree model
-      ImagePointTreeModel *m_imageModel;               //!< Image tree model
-      ImageImageTreeModel *m_connectionModel;          //!< Connection tree model
+      PointMeasureTreeModel *m_pointModel;                     //!< Point tree model
+      ImagePointTreeModel *m_imageModel;                       //!< Image tree model
+      ImageImageTreeModel *m_connectionModel;                  //!< Connection tree model
 
-      PointTableModel *m_pointTableModel;              //!< Point table model
-      MeasureTableModel *m_measureTableModel;          //!< Measure table model
+      PointTableModel *m_pointTableModel;                      //!< Point table model
+      MeasureTableModel *m_measureTableModel;                  //!< Measure table model
 
-      QSplitter *m_mainSplitter;                                //!< Splitter
+      QSplitter *m_mainSplitter;                               //!< Splitter
 
-      QMap< QAction *, QList< QString > > * m_menuActions;      //!< QMap of menu actions
-      QMap< QString, QList< QAction * > > * m_toolBarActions;   //!< QMap of tool bar actions
+      QMap< QAction *, QList< QString > > * m_menuActions;     //!< QMap of menu actions
+      QMap< QString, QList< QAction * > > * m_toolBarActions;  //!< QMap of tool bar actions
 
       QString *m_settingsPath; //!< Path to read/write settings
 
       CnetEditorSortConfigDialog *m_sortDialog; //!< Sorting dialog
-
   };
 }
 
