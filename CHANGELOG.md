@@ -39,6 +39,7 @@ release.
 
 ### Changed
 - Disabled option to use web=true when running spiceinit with HRSC images. [#5223](https://github.com/DOI-USGS/ISIS3/issues/5223)
+- Changed the default spiceinit url to https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/ and added deprecation warning for use of https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi url. [#5327](https://github.com/USGS-Astrogeology/ISIS3/issues/5327)
 
 ## [8.0.2] - 2023-12-05
 ### Changed
