@@ -34,7 +34,7 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "8.1.0")
+set(VERSION            "7.2.0")
 string(REPLACE "." ";" VERSION_LIST ${VERSION})
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
@@ -418,7 +418,7 @@ set(sourceXmlFolder ${CMAKE_BINARY_DIR}/bin/xml)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/xml)
 
 # Create the version file
-configure_file(${CMAKE_SOURCE_DIR}/cmake/version.in ${CMAKE_BINARY_DIR}/version)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/version.in ${CMAKE_BINARY_DIR}/isis_version.txt)
 
 # Set up install of the make folder.
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/make DESTINATION ${CMAKE_INSTALL_PREFIX})
@@ -594,7 +594,7 @@ install(FILES     ${CMAKE_SOURCE_DIR}/IsisPreferences DESTINATION  ${CMAKE_INSTA
 install(FILES     ${CMAKE_SOURCE_DIR}/../LICENSE.md   DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_SOURCE_DIR}/../AUTHORS.rst  DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_SOURCE_DIR}/../CHANGELOG.md DESTINATION  ${CMAKE_INSTALL_PREFIX})
-install(FILES     ${CMAKE_BINARY_DIR}/version         DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES     ${CMAKE_BINARY_DIR}/isis_version.txt DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(PROGRAMS ${CMAKE_BINARY_DIR}/lib/Camera.plugin DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
 install(PROGRAMS ${CMAKE_SOURCE_DIR}/scripts/downloadIsisData DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
