@@ -104,6 +104,7 @@ release.
 - Fixed ProgramLauncher failing while reporting errors from launched programs [#5331](https://github.com/DOI-USGS/ISIS3/pull/5331)
 - Fixed high/low filter functionality in trimfilter [#5311](https://github.com/DOI-USGS/ISIS3/issues/5311)
 - Fixed downloadIsisData script excluding needed files in the calibration folder [#5272](https://github.com/DOI-USGS/ISIS3/issues/5272)
+- Fixed tgocassis2isis cas_cal_sc ingest errors and added error for cas_raw_sc images [#5413](https://github.com/DOI-USGS/ISIS3/issues/5413)
 
 ## [8.0.1] - 2023-08-23
 
