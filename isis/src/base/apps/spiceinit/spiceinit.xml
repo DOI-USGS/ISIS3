@@ -868,7 +868,7 @@
         <description>
           This is where a request for SPICE data is sent. The default is the USGS SPICE server.
         </description>
-        <default><item>https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi</item></default>
+        <default><item>https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/</item></default>
       </parameter>
       <parameter name="PORT">
         <type>integer</type>
