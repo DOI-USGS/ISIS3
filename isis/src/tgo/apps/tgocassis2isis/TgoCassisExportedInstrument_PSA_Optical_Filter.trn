@@ -77,7 +77,7 @@ Group = Expanded
 End_Group
 
 Group = ObservationId
-  Optional
+  Auto
   InputPosition      = (Identification_Area, Alias_List, Alias)
   InputKey           = alternate_id
   OutputName         = ObservationId
@@ -113,7 +113,7 @@ Group = ExposureDuration
 End_Group
 
 Group = Filter
-  Optional
+  Auto
   InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
   InputKey             = img:filter_name
   OutputName           = Filter
@@ -122,7 +122,7 @@ Group = Filter
 End_Group
 
 Group = FilterName
-  Optional
+  Auto
   InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
   InputKey             = img:filter_name
   OutputName           = Filter
@@ -130,26 +130,8 @@ Group = FilterName
   Translation          = (*, *)
 End_Group
 
-Group = Filter
-  Optional
-  InputPosition        = (Observation_Area, Mission_Area, em16_tgo_cas:Cassis_Data, em16_tgo_cas:HK_Derived_Data)
-  InputKey             = em16_tgo_cas:filter
-  OutputName           = Filter
-  OutputPosition       = (Object,IsisCube,Group,Instrument)
-  Translation          = (*, *)
-End_Group
-
-Group = FilterName
-  Optional
-  InputPosition        = (Observation_Area, Mission_Area, em16_tgo_cas:Cassis_Data, em16_tgo_cas:HK_Derived_Data)
-  InputKey             = em16_tgo_cas:filter
-  OutputName           = Filter
-  OutputPosition       = (Object,IsisCube,Group,BandBin)
-  Translation          = (*, *)
-End_Group
-
 Group = Center
-  Optional
+  Auto
   InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
   InputKey       = img:filter_name
   OutputName     = Center
@@ -158,36 +140,13 @@ Group = Center
   Translation    = (494.8, BLU)
   Translation    = (836.0, RED)
   Translation    = (939.3, NIR)
-End_Group
 
-Group = Center
-  Optional
-  InputPosition  = (Observation_Area, Mission_Area, em16_tgo_cas:Cassis_Data, em16_tgo_cas:HK_Derived_Data)
-  InputKey       = em16_tgo_cas:filter
-  OutputName     = Center
-  OutputPosition = (Object, IsisCube, Group, BandBin)
-  Translation    = (678.2, PAN)
-  Translation    = (494.8, BLU)
-  Translation    = (836.0, RED)
-  Translation    = (939.3, NIR)
 End_Group
 
 Group = Width
-  Optional
+  Auto
   InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
   InputKey       = img:filter_name
-  OutputName     = Width
-  OutputPosition = (Object, IsisCube, Group, BandBin)
-  Translation    = (231.9, PAN)
-  Translation    = (121.8, BLU)
-  Translation    = (98.5, RED)
-  Translation    = (133.6, NIR)
-End_Group
-
-Group = Width
-  Optional
-  InputPosition  = (Observation_Area, Mission_Area, em16_tgo_cas:Cassis_Data, em16_tgo_cas:HK_Derived_Data)
-  InputKey       = em16_tgo_cas:filter
   OutputName     = Width
   OutputPosition = (Object, IsisCube, Group, BandBin)
   Translation    = (231.9, PAN)
