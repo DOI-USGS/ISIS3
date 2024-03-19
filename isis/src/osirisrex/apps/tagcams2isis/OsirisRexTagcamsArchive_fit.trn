@@ -1,0 +1,92 @@
+#
+# This translation file is used to produce the ISIS Archive label group
+# for the Osiris-REx Tagcams cameras (NAVCam, StowCam, NFTCam).
+#
+# Translation = (left,right) convert the input "right" to "left"
+#
+# history 2019-01-10 Kris Becker - Original version added to UofA codebase. 
+#
+Group = ProducerId
+  Auto
+  Optional
+  InputKey       = ORIGIN
+  InputPosition  = FITSLABELS
+  OutputName     = ProducerId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = CheckSumStatus
+  Auto
+  Optional
+  InputKey       = CKPASS
+  InputPosition  = FITSLABELS
+  OutputName     = CheckSumStatus
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = MetaKernel
+  Auto
+  Optional
+  InputKey       = META_KER
+  InputPosition  = FITSLABELS
+  OutputName     = MetaKernel
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = TAGCAMSCommandedSequenceId
+  Auto
+  Optional
+  InputKey       = TCSEQID
+  InputPosition  = FITSLABELS
+  OutputName     = TagcamsCommandedSequenceId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = TAGCAMSCommandedImageId
+  Auto
+  Optional
+  InputKey       = TCIMGID
+  InputPosition  = FITSLABELS
+  OutputName     = TagcamsCommandedImageId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RawCameraHeadTemperature
+  Auto
+  Optional
+  InputKey       = TCCHTEMP
+  InputPosition  = FITSLABELS
+  InputDefault   = 0
+  OutputName     = RawCameraHeadTemperature
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = RAAtReferencePixel
+  Auto
+  Optional
+  InputKey       = CRVAL1
+  InputPosition  = FITSLABELS
+  InputDefault   = 0
+  OutputName     = RAAtReferencePixel
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = DecAtReferencePixel
+  Auto
+  Optional
+  InputKey       = CRVAL2
+  InputPosition  = FITSLABELS
+  InputDefault   = 0
+  OutputName     = DecAtReferencePixel
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+End

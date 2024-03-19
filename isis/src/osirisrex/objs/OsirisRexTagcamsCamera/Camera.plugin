@@ -1,0 +1,18 @@
+Group = OSIRIS-REX/NAVCAM
+  Version = 1
+  Library = OsirisRexTagcamsCamera
+  Routine = OsirisRexTagcamsCameraPlugin
+EndGroup
+ 
+Group = OSIRIS-REX/NFTCAM
+  Version = 1
+  Library = OsirisRexTagcamsCamera
+  Routine = OsirisRexTagcamsCameraPlugin
+EndGroup
+ 
+Group = OSIRIS-REX/STOWCAM
+  Version = 1
+  Library = OsirisRexTagcamsCamera
+  Routine = OsirisRexTagcamsCameraPlugin
+EndGroup
+ 

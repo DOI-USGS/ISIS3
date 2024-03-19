@@ -1,0 +1,210 @@
+#
+# This translation file is used to produce the ISIS Instrument label group
+# for the OSIRIS-REx Tagcams cameras (NAVCam, StowCam and NFTCam).
+#
+# Translation = (left,right) convert the input "right" to "left"
+#
+# history 2019-01-10 Kris Becker - Original version added to UofA codebase. 
+
+Group = MissionName
+  Auto
+  InputKey       = MISSION
+  InputPosition  = FITSLABELS
+  OutputName     = MissionName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftName
+  Auto
+  InputKey       = HOSTNAME
+  InputPosition  = FITSLABELS
+  OutputName     = SpacecraftName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = ("OSIRIS-REX", "OSIRIS-REX")
+  Translation    = ("OSIRIS-REX", "OREX")
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUME
+  InputPosition  = FITSLABELS
+  OutputName     = InstrumentId
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (NAVCam, NCM)
+  Translation    = (NFTCam, NFT)
+  Translation    = (StowCam, STO)
+End_Group
+
+Group = InstrumentName
+  Auto
+  InputKey       = INSTRUME
+  InputPosition  = FITSLABELS
+  InputDefault   = TAGCAMS
+  OutputName     = InstrumentName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (TAGCAMS, NCM)
+  Translation    = (TAGCAMS, NFT)
+  Translation    = (TAGCAMS, STO)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET
+  InputPosition  = FITSLABELS
+  InputDefault   = Bennu
+  OutputName     = TargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (Bennu, BENNU)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = DATE_OBS
+  InputPosition  = FITSLABELS
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = MidObservationTime
+  Auto
+  InputKey       = MIDOBS
+  InputPosition  = FITSLABELS
+  OutputName     = MidObservationTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureDuration
+  Auto
+  InputKey       = EXPTIME
+  InputPosition  = FITSLABELS
+  OutputName     = ExposureDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+  Unit = seconds
+End_Group
+
+Group = SpacecraftClockStartCount
+  Auto
+  InputKey       = SCLK_STR
+  InputPosition  = FITSLABELS
+  InputDefault   = UNKNOWN
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = EphemerisTime
+  Auto
+  Optional
+  InputKey       = ET
+  InputPosition  = FITSLABELS
+  OutputName     = EphemerisTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = Binning
+  Auto
+  InputKey       = TCSSMPL
+  InputPosition  = FITSLABELS
+  InputDefault   = 0
+  OutputName     = Binning
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = Summing
+  Auto
+  InputKey       = TCSUM
+  InputPosition  = FITSLABELS
+  InputDefault   = 1
+  OutputName     = Summing
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = BScale
+  Auto
+  InputKey       = BSCALE
+  InputPosition  = FITSLABELS
+  InputDefault   = 1
+  OutputName     = BScale
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = DataCollectionMode
+  Auto
+  InputKey       = TCMODE
+  InputPosition  = FITSLABELS
+  InputDefault   = 0
+  OutputName     = DataCollectionMode
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = CompressionMode
+  Auto
+  InputKey       = TCCOMP
+  InputPosition  = FITSLABELS
+  InputDefault   = 0
+  OutputName     = CompressionMode
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TCGain
+  Auto
+  Optional
+  InputKey       = TCGAIN
+  InputPosition  = FITSLABELS
+  OutputName     = SensorAnalogGain
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = XReferenceCoordinate
+  Auto
+  InputKey       = CRPIX1
+  InputPosition  = FITSLABELS
+  InputDefault   = 1044.5
+  OutputName     = XReferenceCoordinate
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = YReferenceCoordinate
+  Auto
+  InputKey       = CRPIX2
+  InputPosition  = FITSLABELS
+  InputDefault   = 1026.5
+  OutputName     = YReferenceCoordinate
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartXFactor
+  Auto
+  InputKey       = TCSX
+  InputPosition  = FITSLABELS
+  InputDefault   = 0
+  OutputName     = StartXFactor
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartYFactor
+  Auto
+  InputKey       = TCSY
+  InputPosition  = FITSLABELS
+  InputDefault   = 0
+  OutputName     = StartYFactor
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+End

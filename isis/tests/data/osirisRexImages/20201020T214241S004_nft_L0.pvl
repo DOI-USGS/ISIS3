@@ -1,0 +1,131 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 864
+    TileLines   = 972
+
+    Group = Dimensions
+      Samples = 2592
+      Lines   = 1944
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = SignedWord
+      ByteOrder  = Lsb
+      Base       = 32768.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    MissionName               = OSIRIS-REx
+    SpacecraftName            = OSIRIS-REX
+    InstrumentId              = NFTCam
+    InstrumentName            = TAGCAMS
+    TargetName                = Bennu
+    StartTime                 = 2020-10-20T21:42:40.974
+    MidObservationTime        = 2020-10-20T21:42:40.976
+    ExposureDuration          = 0.005894 <Sec>
+    SpacecraftClockStartCount = 3/0656502090.40704
+    EphemerisTime             = 656502230.158404 <Sec>
+    Binning                   = 0
+    Summing                   = 0
+    BScale                    = 1
+    DataCollectionMode        = 75
+    CompressionMode           = 0
+    SensorAnalogGain          = 10 <Gain Factor>
+    XReferenceCoordinate      = 1310.53
+    YReferenceCoordinate      = 969.487
+    StartXFactor              = 0 <Pixel>
+    StartYFactor              = 0 <Pixel>
+    CameraHeadTemperature     = -21.04614 <celsius>
+  End_Group
+
+  Group = Archive
+    SourceProductId            = 20201020T214241S004_nft_L0
+    ProducerId                 = SPOC
+    MetaKernel                 = spoc-digestfits-2021-02-13T22_56_01.274Z.mk
+    TagcamsCommandedSequenceId = 200
+    TagcamsCommandedImageId    = 21
+    RawCameraHeadTemperature   = 1654 <DN>
+    RAAtReferencePixel         = 208.903477375357 <Deg>
+    DecAtReferencePixel        = 16.5614025290341 <Deg>
+    YearDoy                    = 2020294
+  End_Group
+
+  Group = BandBin
+    FilterName = Monochrome
+    Name       = NFTCam
+    Number     = 1
+    Center     = 550
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -64082
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = $osirisrex/kernels/pck/bennu_v17.tpc
+    TargetPosition            = ($osirisrex/kernels/tspk/de424.bsp,
+                                 $osirisrex/kernels/tspk/bennu_refdrmc_v1.bsp,
+                                 $osirisrex/kernels/tspk/sb-101955-76.bsp,
+                                 $osirisrex/kernels/pck/pck00010.tpc)
+    InstrumentPointing        = ($osirisrex/kernels/ck/orx_sc_rel_201019_20102-
+                                 5_v01.bc, $osirisrex/kernels/fk/orx_v14.tf)
+    Instrument                = ($osirisrex/kernels/ik/orx_navcam_v02.ti,
+                                 $osirisrex/kernels/spk/orx_struct_v04.bsp)
+    SpacecraftClock           = $osirisrex/kernels/sclk/orx_sclkscet_00074.tsc
+    InstrumentPosition        = ($osirisrex/kernels/spk/orx_200827_201020_2010-
+                                 20_od294_v1.bsp)
+    InstrumentAddendum        = $osirisrex/kernels/iak/orex_tagcams_addendum_-
+                                v06.ti
+    ShapeModel                = Null
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+    Source                    = isis
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 10149700
+  Bytes     = 1564
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 10143825
+  Bytes     = 5635
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                                = 2101955
+  BODY2101955_RADII                        = (0.283065, 0.271215, 0.24972)
+  BODY_FRAME_CODE                          = 10106
+  INS-64082_SWAP_OBSERVER_TARGET           = TRUE
+  INS-64082_LIGHTTIME_CORRECTION           = NONE
+  INS-64082_LT_SURFACE_CORRECT             = FALSE
+  INS-64082_FOCAL_LENGTH                   = 0.00761
+  INS-64082_PIXEL_SIZE                     = 2.2
+  CLOCK_ET_-64_3/0656502090.40704_COMPUTED = ac1314ebb690c341
+  INS-64082_TRANSX                         = (0.0, 0.0022, 0.0)
+  INS-64082_TRANSY                         = (0.0, 0.0, -0.0022)
+  INS-64082_ITRANSS                        = (0.0, 454.5454545454, 0.0)
+  INS-64082_ITRANSL                        = (0.0, 0.0, -454.5454545454)
+  INS-64082_CCD_CENTER                     = (1309.53, 968.487)
+  INS-64082_DISTORTION_MODEL               = OPENCV
+  INS-64082_OPENCV_OD_K                    = (-0.53831, 0.38214, -0.20281,
+                                              0.0, 0.0, 0.0)
+  INS-64082_OPENCV_OD_P                    = (-6.2239e-04, -1.2388e-04)
+  INS-64082_OPENCV_OD_F                    = (3462.53, 3462.532)
+  INS-64082_OPENCV_OD_C                    = (1310.53, 969.487)
+  INS-64082_OPENCV_OD_A                    = 1.9876e-05
+  INS-64082_TOLERANCE                      = 1.0e-10
+  INS-64082_DEBUG_MODEL                    = FALSE
+End_Object
+End

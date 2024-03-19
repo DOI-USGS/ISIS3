@@ -1,0 +1,132 @@
+\begintext
+
+  This kernel is used by the ISIS software to supply required keywords for
+  the ISIS camera models. This kernel is furnished to the NAIF SPICE pool as 
+  one of the very last kernels. This allows it to overide keywords from other
+  kernels.
+
+  History:
+  v01:
+  2018-12-09 Kris Becker - Original version. Transformations from line/samp
+
+  v02:
+  2019-01-09 Kris Becker - Updated with new boresights, minor adjustments
+                           to focal lengths from distortion model. Added
+			   tangential distortion model.
+  v03:
+  2019-01-22 Kris Becker - Renamed the OpenCV parameters to better conform
+                           and coorelate with the OpenCV calibration parameter
+			   names. Added inital values of 0.0 for the additional
+			   OpenCV k4-k6 parameters to complete the full
+			   model definition.
+-------------------------------------------------------------------------------
+The coefficients below are for transforming focal plane X,Y (mm) to/from Line,
+Sample. The numbers are from the CCD pixel pitch.
+
+The following TRANS values are for ISIS cubes assuming no distortion
+First pixel in the input file is line 1 sample 1, second pixel in the input file
+is line 1 sample 2.
+
+There are three different distortion models to choose from for the TAGCAMS
+camera model:
+
+OCAMS - This one is based upon the OCAMS model but requires the OPENCV
+        parameters to be transformed into compatible parameters. Currently,
+	only the NCMCam (Navcam 1) camera has had this done.
+
+OPENCV - A direct implementation of the OPENCV stereo model as produced by
+         the stereo calibration OPENCV routines. This is a 10 parameter model
+	 but is limited to 7 since the focal length is provided in the API (and
+	 doesn't support focal lenghts for each axis) and the temperature
+	 dependent focal lengh is part of the camera model.
+
+NONE   - No distortion is applied.
+
+\begintext
+
+NAVCam (NCM) data
+---------------------------------------------
+
+
+\begindata
+
+INS-64081_TRANSX  = (0.0, 0.00220, 0.0)
+INS-64081_TRANSY  = (0.0, 0.0, -0.00220)
+INS-64081_ITRANSS = (0.0, 454.5454545454, 0.0)
+INS-64081_ITRANSL = (0.0, 0.0, -454.5454545454)
+INS-64081_FOCAL_LENGTH = 0.0076
+INS-64081_PIXEL_SIZE   = 2.2
+INS-64081_BORESIGHT   = ( 1295.5,  971.5 )
+INS-64081_FOCAL_LENGTH = 0.0076412391
+
+INS-64081_DISTORTION_MODEL = 'OPENCV'
+INS-64081_TOLERANCE        = 1.0E-10
+INS-64081_DEBUG_MODEL      = 'FALSE'
+
+INS-64081_OD_CENTER  = ( 1275.9, 952.4 )
+INS-64081_OD_K = ( 0.0073, -0.0112,  0.0135, 0.0, 0.0 )
+
+INS-64081_OPENCV_OD_K  = ( -0.5372, 0.3739, -0.1839, 0.0, 0.0, 0.0 )
+INS-64081_OPENCV_OD_P  = ( -2.3050E-4, -9.1007E-4 )
+INS-64081_OPENCV_OD_F  = ( 3473.260, 3473.321 )
+INS-64081_OPENCV_OD_C  = ( 1269.082, 950.746 )
+INS-64081_OPENCV_OD_A  = 2.526E-5
+
+\begintext
+
+NAVCam2 (NFT) data
+---------------------------------------------
+
+\begindata
+
+INS-64082_TRANSX  = (0.0, 0.00220, 0.0)
+INS-64082_TRANSY  = (0.0, 0.0, -0.00220)
+INS-64082_ITRANSS = (0.0, 454.5454545454, 0.0)
+INS-64082_ITRANSL = (0.0, 0.0, -454.5454545454)
+
+INS-64082_FOCAL_LENGTH = 0.00761
+INS-64082_PIXEL_SIZE   = 2.2
+INS-64082_BORESIGHT    = ( 1295.5,  971.5 )
+
+INS-64082_DISTORTION_MODEL = 'OPENCV'
+INS-64082_TOLERANCE        = 1.0E-10
+INS-64082_DEBUG_MODEL      = 'FALSE'
+
+INS-64082_OD_CENTER  = (1295.5, 971.5 )
+INS-64082_OD_K       = ( 0.0, 0.0, 0.0, 0.0, 0.0 )
+
+INS-64082_OPENCV_OD_K  = ( -0.5384, 0.3826, -0.2041, 0.0, 0.0, 0.0 )
+INS-64082_OPENCV_OD_P  = ( -6.2311E-4, -1.2370E-4 )
+INS-64082_OPENCV_OD_F  = ( 3462.596, 3462.446 )
+INS-64082_OPENCV_OD_C  = ( 1310.530,  969.487)
+INS-64082_OPENCV_OD_A  = 2.018E-5
+
+\begintext
+
+StowCam (STO) data
+
+No information for the camera distortion model
+---------------------------------------------
+
+\begindata
+
+INS-64071_TRANSX  = (0.0, 0.00220, 0.0)
+INS-64071_TRANSY  = (0.0, 0.0, -0.00220)
+INS-64071_ITRANSS = (0.0, 454.5454545454, 0.0)
+INS-64071_ITRANSL = (0.0, 0.0, -454.5454545454)
+
+INS-64071_FOCAL_LENGTH = 0.00778
+INS-64071_PIXEL_SIZE   = 2.2
+INS-64071_BORESIGHT    = (1296.5,  972.5 )
+
+INS-64071_DISTORTION_MODEL = 'NONE'
+INS-64071_TOLERANCE        = 1.0E-6
+INS-64071_DEBUG_MODEL      = 'FALSE'
+
+INS-64071_OPENCV_OD_K  = ( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 )
+INS-64071_OPENCV_OD_P  = ( 0.0, 0.0 )
+INS-64071_OPENCV_OD_F  = ( 3536.3636, 3536.3636 )
+INS-64071_OPENCV_OD_C  = ( 1296.5,  972.5 )
+INS-64071_OPENCV_OD_A  = 0.0
+
+\begintext

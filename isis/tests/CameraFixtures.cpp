@@ -752,7 +752,7 @@ namespace Isis {
   }
 
 
-  void OsirisRexCube::setInstrument(QString ikid, QString instrumentId) {
+  void OsirisRexOcamsCube::setInstrument(QString ikid, QString instrumentId) {
     delete testCube;
     testCube = new Cube();
 
@@ -788,7 +788,10 @@ namespace Isis {
     PvlGroup &bandBin = label.findObject("IsisCube").findGroup("BandBin");
     std::istringstream bss(R"(
       Group = BandBin
-        FilterName = Unknown
+        FilterName = Monochrome
+        Name       = NAVCam
+        Number     = 1
+        Center     = 550
       End_Group
     )");
 
@@ -815,6 +818,31 @@ namespace Isis {
     QString fileName = testCube->fileName();
     delete testCube;
     testCube = new Cube(fileName, "rw");
+  }
+
+  void OsirisRexTagcamsNAVCamCube::setInstrument(QString ikid, QString instrumentId) {
+    delete testCube;
+    testCube = new Cube();
+
+    std::ifstream cubeLabel("data/osirisRexImages/20200303T213031S138_ncm_L0.pvl");
+
+    Pvl testLabel;
+    cubeLabel >> testLabel;
+
+    testCube->fromLabel(tempDir.path() + "/testCube.cub", testLabel, "rw");
+  }
+
+
+  void OsirisRexTagcamsNFTCamCube::setInstrument(QString ikid, QString instrumentId) {
+    delete testCube;
+    testCube = new Cube();
+
+    std::ifstream cubeLabel("data/osirisRexImages/20201020T214241S004_nft_L0.pvl");
+
+    Pvl testLabel;
+    cubeLabel >> testLabel;
+
+    testCube->fromLabel(tempDir.path() + "/testCube.cub", testLabel, "rw");
   }
 
 

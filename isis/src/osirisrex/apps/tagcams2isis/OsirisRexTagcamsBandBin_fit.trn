@@ -1,0 +1,57 @@
+#
+# This translation file is used to produce the ISIS BandBin label group
+# for the OSIRIS-REx Tagcams cameras (NAVCam, StowCam, NFTCam).
+# Translation = (left,right) convert the input "right" to "left"
+# 
+# history 2019-01-19 Kris Becker - Original version added to UofA codebase.
+
+Group = FilterName
+  Auto
+  InputKey       = FILTNAME
+  InputPosition  = FITSLABELS
+  InputDefault   = Monochrome
+  OutputName     = FilterName
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  InputDefault   = Unknown
+  Translation    = (*, *)
+End_Group
+
+Group = Name
+  Auto
+  InputKey       = INSTRUME
+  InputPosition  = FITSLABELS
+  InputDefault   = TagCams
+  OutputName     = Name
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  InputDefault   = Unknown
+  Translation    = (NAVCam, NCM)
+  Translation    = (NFTCam, NFT)
+  Translation    = (StowCam, STO)
+  Translation    = (TagCams, *)
+End_Group
+
+Group = FilterNumber
+  Auto
+  InputKey       = FILTNUMB
+  InputPosition  = FITSLABELS
+  InputDefault = 1
+  OutputName     = Number
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  InputDefault   = Unknown
+  Translation    = (*, *)
+End_Group
+
+Group = FilterCenter
+  Auto
+  InputKey       = INSTRUME
+  InputPosition  = FITSLABELS
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (550 <nm>, N/A)
+  Translation    = (550 <nm>, NCM)
+  Translation    = (550 <nm>, NFT)
+  Translation    = (550 <nm>, STO)
+  Translation    = (*, *)
+End_Group
+
+End

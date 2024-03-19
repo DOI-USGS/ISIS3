@@ -9,7 +9,7 @@
 using namespace Isis;
 using namespace std;
 
-TEST_F(OsirisRexCube, PolyMath) {
+TEST_F(OsirisRexOcamsCube, PolyMath) {
   setInstrument("-64360", "PolyCam");
 
   OsirisRexOcamsCamera *cam = (OsirisRexOcamsCamera *)testCube->camera();
@@ -48,7 +48,7 @@ TEST_F(OsirisRexCube, PolyMath) {
 }
 
 
-TEST_F(OsirisRexCube, MappingCam) {
+TEST_F(OsirisRexOcamsCube, MappingCam) {
   setInstrument("-64361", "MapCam");
 
   OsirisRexOcamsCamera *cam = (OsirisRexOcamsCamera *)testCube->camera();
@@ -60,7 +60,7 @@ TEST_F(OsirisRexCube, MappingCam) {
 }
 
 
-TEST_F(OsirisRexCube, SamplingCam) {
+TEST_F(OsirisRexOcamsCube, SamplingCam) {
   setInstrument("-64362", "SamCam");
 
   OsirisRexOcamsCamera *cam = (OsirisRexOcamsCamera *)testCube->camera();
@@ -96,7 +96,7 @@ TEST_F(OsirisRexCube, SamplingCam) {
   EXPECT_NEAR(cam->Sample(), 5, 0.01);
 }
 
-TEST_F(OsirisRexCube, PolyCamUpdatedIkCodes){
+TEST_F(OsirisRexOcamsCube, PolyCamUpdatedIkCodes){
 setInstrument("-64500", "PolyCam");
 
   OsirisRexOcamsCamera *cam = (OsirisRexOcamsCamera *)testCube->camera();
