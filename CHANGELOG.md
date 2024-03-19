@@ -44,10 +44,13 @@ release.
 - Fixed <i>noproj</i> bug where some temporary files were not deleted after call to cam2cam.  Issue: [#4813](https://github.com/USGS-Astrogeology/ISIS3/issues/4813)
 - Fixed <i>noproj</i> bug where missing shapemodel-related keywords (RayTraceEngine, BulletParts, Tolerance) are dropped when the output label is created. This resulted in the Bullet collision detection engine not being used. Issue: [#5377](https://github.com/USGS-Astrogeology/ISIS3/issues/5377)
 - Fixed ISIS failing to expand env variables with an "_" in them. [#5402](https://github.com/DOI-USGS/ISIS3/pull/5402)
+- Fixed <i>noproj</i> bug where match cube not NULL when not specifying MATCH parameter [#5381](https://github.com/USGS-Astrogeology/ISIS3/issues/5381)
 
 ### Added
 - Added 8 new functions to the Sensor Utility Library: Slant Distance, Target Center Distance, Right Ascension Declination, Local Solar Time, Line Resolution, Sample Resolution, Pixel Resolution, and Solar Longitude.
 - Fixed TrackTool, FindTool, and AdvancedTrackTool not reporting RA and DEC for images targeting the Sky. [#5409](https://github.com/DOI-USGS/ISIS3/pull/5409) 
+- Added new option in `ctxcal` to use monthly computed flatfield files for "Frown" removal in CTX images. [#5338](https://github.com/DOI-USGS/ISIS3/pull/5338)
+
 
 ## [8.1.0] - 2024-01-08
 
@@ -62,6 +65,7 @@ release.
   outputsuffix, both, or neither for naming convention purposes. [#5162](https://github.com/DOI-USGS/ISIS3/pull/5162)
 - Changed the default PCK load behavior to try and load mission specific PCKs, if that fails we default to the base PCKs [#5335](https://github.com/DOI-USGS/ISIS3/pull/5335)
 - Disabled option to use web=true when running spiceinit with HRSC images. [#5223](https://github.com/DOI-USGS/ISIS3/issues/5223)
+- Seperated `normal` and `localNormal` in ISIS shapemodels, now the local normal is stored in its own member variable with setters and getters. [#5345](https://github.com/DOI-USGS/ISIS3/pull/5345)
 - Set build option `pybindings=ON` in `build.sh` to turn on python bindings. [#5389](https://github.com/DOI-USGS/ISIS3/pull/5389)
 - Updated Ale to version 0.10.0 [#5399](https://github.com/DOI-USGS/ISIS3/pull/5399)
 

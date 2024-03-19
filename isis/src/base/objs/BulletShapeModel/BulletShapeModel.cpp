@@ -442,7 +442,7 @@ namespace Isis {
     }
 
     btVector3 normal = m_intercept.normal();
-    setNormal(normal[0], normal[1], normal[2]);
+    setLocalNormal(normal[0], normal[1], normal[2]);
   }
 
 
@@ -719,11 +719,11 @@ namespace Isis {
       ShapeModel::setSurfacePoint( makeSurfacePoint(m_intercept.point()) ); // sets ShapeModel::m_hasIntersection=t, ShapeModel::m_hasNormal=f
 
       btVector3 normal = m_intercept.normal();
-      setNormal(normal[0], normal[1], normal[2]);
+      setLocalNormal(normal[0], normal[1], normal[2]);
     }
     else {
       ShapeModel::clearSurfacePoint();
-      setHasNormal(false);
+      setHasLocalNormal(false);
     }
 
     return;

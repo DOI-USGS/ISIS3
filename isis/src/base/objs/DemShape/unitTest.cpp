@@ -137,7 +137,7 @@ int main() {
 
     shape.calculateLocalNormal(neighborPoints);
     vector<double> myNormal(3);
-    myNormal = shape.normal();
+    myNormal = shape.localNormal();
     cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
     cout << endl << "  Testing class method calculateSurfaceNormal..." << endl;
@@ -212,7 +212,7 @@ int main() {
     neighborPoints[3][2]  = 1193.88;
     cout << endl << "  Testing method calculateLocalNormal with vector pointing outward" << endl;
     shape.calculateLocalNormal(neighborPoints);
-    myNormal = shape.normal();
+    myNormal = shape.localNormal();
     cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
     // Test calculateLocalNormal with magnitude = 0
@@ -221,7 +221,7 @@ int main() {
     neighborPoints[3][1]  = -2380.59;
     cout << endl << "  Testing method calculateLocalNormal with magnitude = 0" << endl;
     shape.calculateLocalNormal(neighborPoints);
-    myNormal = shape.normal();
+    myNormal = shape.localNormal();
     cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
     }
     catch(Isis::IException &e) {
