@@ -115,13 +115,6 @@ Group = GroundPoint
   Error                      = NULL
 End_Group
     </pre>
-
-    <p>
-    Note: The "Error" keyword will only appear when using a coordinate list. The value of
-    "Error" will be NULL unless an error occurs during the processing of a coordinate in the
-    <a href="#FilesCOORDLIST">coordinate list</a>. Then, the value of this keyword will be the error
-    message.
-    </p>
   </description>
 
   <category>
@@ -431,6 +424,24 @@ End_Group
           </p>
         </description>
         <default><item>TRUE</item></default>
+      </parameter>
+      <parameter name="ALLOWERROR">
+        <type>boolean</type>
+        <brief>
+          Allow campt to output results regardless of errors. 
+        </brief>
+        <description>
+          The Allowerror parameter enables <i>campt</i> to return results despite any errors. 
+          Errors will be listed under "Error" in the result table, providing the user with information 
+          about points that may lack surface intersection.
+          <p>
+            By default, <i>campt</i> is set to False, causing it to throw an error if any occur.
+          </p>
+          <p>
+            If <i>campt</i> is set to True, errors will be displayed in the error section of the results table instead of being thrown.
+          </p>
+        </description>
+        <default><item>FALSE</item></default>
       </parameter>
     </group>
 
