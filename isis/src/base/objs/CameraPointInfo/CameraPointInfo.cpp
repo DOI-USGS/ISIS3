@@ -622,14 +622,19 @@ namespace Isis {
         try {
           gp->findKeyword("Phase").setValue(toString(m_camera->PhaseAngle()), "DEGREE");
           gp->findKeyword("Phase").addComment("Illumination and Other");
-          gp->findKeyword("Incidence").setValue(toString(
-                          m_camera->IncidenceAngle()), "DEGREE");
-          gp->findKeyword("Emission").setValue(toString(
-                          m_camera->EmissionAngle()), "DEGREE");
         }
         catch(IException &e) {
           gp->findKeyword("Phase").setValue("NULL");
           gp->findKeyword("Phase").addComment("Illumination and Other");
+        }
+
+        try {
+          gp->findKeyword("Incidence").setValue(toString(
+                          m_camera->IncidenceAngle()), "DEGREE");
+          gp->findKeyword("Emission").setValue(toString(
+                          m_camera->EmissionAngle()), "DEGREE");    
+        }
+        catch(IException &e) {
           gp->findKeyword("Incidence").setValue("NULL");
           gp->findKeyword("Emission").setValue("NULL");
         }
@@ -714,9 +719,9 @@ namespace Isis {
           gp->findKeyword("LookDirectionCamera").addValue("Null");
           gp->findKeyword("LookDirectionCamera").addValue("Null");
         }
-        
 
-        if (allowErrors) gp->findKeyword("Error").setValue("NULL");
+
+        if (allowErrors) gp->findKeyword("Error").setValue(error);
       }
     }
     return gp;
