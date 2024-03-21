@@ -721,7 +721,14 @@ namespace Isis {
         }
 
 
-        if (allowErrors) gp->findKeyword("Error").setValue(error);
+        if (allowErrors) {
+          if (!error.isEmpty()) {
+            gp->findKeyword("Error").setValue(error);
+          }
+          else {
+            gp->findKeyword("Error").setValue("NULL");
+          }
+        }
       }
     }
     return gp;
