@@ -108,7 +108,12 @@ Deborah Lee Soltesz
     <div>
       <label for="Versions"></label>
       <select name="Versions" id="Versions">
-        <option value="Public Release" onClick="location.href='https://isis.astrogeology.usgs.gov'" selected="Public Release">Public Release</option> 
+        <option value="Public Release" onClick="location.href='https://isis.astrogeology.usgs.gov'" selected="Public Release">Public Release</option>
+        <option value="8.1.0" onClick="location.href='https://isis.astrogeology.usgs.gov/8.1.0/index.html'">8.1.0</option>
+        <option value="8.0.0" onClick="location.href='https://isis.astrogeology.usgs.gov/8.0.0/index.html'">8.0.0</option>
+        <option value="7.2.0" onClick="location.href='https://isis.astrogeology.usgs.gov/7.2.0/index.html'">7.2.0</option>
+        <option value="7.1.0" onClick="location.href='https://isis.astrogeology.usgs.gov/7.1.0/index.html'">7.1.0</option>
+        <option value="7.0.0" onClick="location.href='https://isis.astrogeology.usgs.gov/7.0.0/index.html'">7.0.0</option>
         <option value="6.0.0" onClick="location.href='https://isis.astrogeology.usgs.gov/6.0.0/index.html'">6.0.0</option>
         <option value="3.9.0" onClick="location.href='https://isis.astrogeology.usgs.gov/3.9.0/index.html'">3.9.0</option>
         <option value="3.5.0" onClick="location.href='https://isis.astrogeology.usgs.gov/3.5.0/index.html'">3.5.0</option>
