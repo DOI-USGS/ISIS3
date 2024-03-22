@@ -313,7 +313,6 @@ def findFeaturesSegment(ui):
     else: 
         nthreads = int(multiprocessing.cpu_count())
 
-    log.debug("")
     pool = ThreadPool(ceil(nthreads/len(img_list)))
     output = pool.map_async(segment, img_list)
     pool.close()
@@ -387,7 +386,7 @@ def findFeaturesSegment(ui):
         # Dont merge 
         shutil.copy(onets[0], ui.GetFileName("onet"))
 
-    log.debug(f"COMPLETE, wrote { ui.GetFileName("onet")}")
+    log.info(f"COMPLETE, wrote { ui.GetFileName("onet")}")
 
 if __name__ == "__main__": 
     ui = astroset.init_application(sys.argv)
