@@ -91,7 +91,7 @@ Deborah Lee Soltesz
     </div>
 
     <div>
-      <a href="https://github.com/USGS-Astrogeology/ISIS3">
+      <a href="https://github.com/DOI-USGS/ISIS3">
       GitHub</a>
     </div>
 
@@ -106,18 +106,31 @@ Deborah Lee Soltesz
     </h2>
 
     <div>
-      <label for="Versions"></label>
-      <select name="Versions" id="Versions">
-        <option value="Public Release" onClick="location.href='https://isis.astrogeology.usgs.gov'" selected="Public Release">Public Release</option>
-        <option value="8.1.0" onClick="location.href='https://isis.astrogeology.usgs.gov/8.1.0/index.html'">8.1.0</option>
-        <option value="8.0.0" onClick="location.href='https://isis.astrogeology.usgs.gov/8.0.0/index.html'">8.0.0</option>
-        <option value="7.2.0" onClick="location.href='https://isis.astrogeology.usgs.gov/7.2.0/index.html'">7.2.0</option>
-        <option value="7.1.0" onClick="location.href='https://isis.astrogeology.usgs.gov/7.1.0/index.html'">7.1.0</option>
-        <option value="7.0.0" onClick="location.href='https://isis.astrogeology.usgs.gov/7.0.0/index.html'">7.0.0</option>
-        <option value="6.0.0" onClick="location.href='https://isis.astrogeology.usgs.gov/6.0.0/index.html'">6.0.0</option>
-        <option value="3.9.0" onClick="location.href='https://isis.astrogeology.usgs.gov/3.9.0/index.html'">3.9.0</option>
-        <option value="3.5.0" onClick="location.href='https://isis.astrogeology.usgs.gov/3.5.0/index.html'">3.5.0</option>
-      </select>
+      <a href="https://isis.astrogeology.usgs.gov">Public Release</a>
+    </div>
+    <div>
+      <a href="https://isis.astrogeology.usgs.gov/8.1.0/">8.1.0</a>
+    </div>
+    <div>
+      <a href="https://isis.astrogeology.usgs.gov/8.0.0/">8.0.0</a>
+    </div>  
+    <div>
+      <a href="https://isis.astrogeology.usgs.gov/7.2.0/">7.2.0</a>
+    </div>
+    <div>
+      <a href="https://isis.astrogeology.usgs.gov/7.1.0/">7.1.0</a>
+    </div>
+    <div>
+      <a href="https://isis.astrogeology.usgs.gov/7.0.0/">7.0.0</a>
+    </div>
+    <div>
+      <a href="https://isis.astrogeology.usgs.gov/6.0.0/">6.0.0</a>
+    </div>
+    <div>
+      <a href="https://isis.astrogeology.usgs.gov/3.9.0/">3.9.0</a>
+    </div>
+    <div>
+      <a href="https://isis.astrogeology.usgs.gov/3.5.0/">3.5.0</a>
     </div>
 
     <hr/>
