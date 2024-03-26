@@ -348,20 +348,74 @@ namespace Isis {
       if (!allowErrors) throw IException(IException::Unknown, error, _FILEINFO_);
     }
 
-    if (!noErrors && !allowErrors) {
-      for (int i = 0; i < gp->keywords(); i++) {
-        QString name = (*gp)[i].name();
-        // These three keywords have 3 values, so they must have 3 NULLs
-        if (name == "BodyFixedCoordinate" || name == "SpacecraftPosition" ||
-            name == "SunPosition") {
-          (*gp)[i].addValue("NULL");
-          (*gp)[i].addValue("NULL");
-          (*gp)[i].addValue("NULL");
-        }
-        else {
-          (*gp)[i].setValue("NULL");
+    if (!noErrors) {
+      if (!allowErrors) {
+        for (int i = 0; i < gp->keywords(); i++) {
+          QString name = (*gp)[i].name();
+          // These three keywords have 3 values, so they must have 3 NULLs
+          if (name == "BodyFixedCoordinate" || name == "SpacecraftPosition" ||
+              name == "SunPosition") {
+            (*gp)[i].addValue("NULL");
+            (*gp)[i].addValue("NULL");
+            (*gp)[i].addValue("NULL");
+          }
+          else {
+            (*gp)[i].setValue("NULL");
+          }
         }
       }
+      else {
+        double pB[3], spB[3], sB[3];
+
+        m_camera->instrumentPosition(spB);
+        gp->findKeyword("SpacecraftPosition").addValue(toString(spB[0]), "km");
+        gp->findKeyword("SpacecraftPosition").addValue(toString(spB[1]), "km");
+        gp->findKeyword("SpacecraftPosition").addValue(toString(spB[2]), "km");
+
+        try {
+          m_camera->sunPosition(sB);
+          gp->findKeyword("SunPosition").addValue(toString(sB[0]), "km");
+          gp->findKeyword("SunPosition").addValue(toString(sB[1]), "km");
+          gp->findKeyword("SunPosition").addValue(toString(sB[2]), "km");
+        }
+        catch (IException &e) {
+          gp->findKeyword("SunPosition").addValue("Null");
+          gp->findKeyword("SunPosition").addValue("Null");
+          gp->findKeyword("SunPosition").addValue("Null");
+        }
+
+        std::vector<double>lookB = m_camera->lookDirectionBodyFixed();
+        gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[0]), "DEGREE");
+        gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[1]), "DEGREE");
+        gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[2]), "DEGREE");
+
+        try {
+          std::vector<double>lookJ = m_camera->lookDirectionJ2000();
+          gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[0]), "DEGREE");
+          gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[1]), "DEGREE");
+          gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[2]), "DEGREE");
+        }
+        catch (IException &e) {
+          gp->findKeyword("LookDirectionJ2000").addValue("Null");
+          gp->findKeyword("LookDirectionJ2000").addValue("Null");
+          gp->findKeyword("LookDirectionJ2000").addValue("Null");
+        }
+
+        try {
+          double lookC[3];
+          m_camera->LookDirection(lookC);
+          gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[0]), "DEGREE");
+          gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[1]), "DEGREE");
+          gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[2]), "DEGREE");
+        }
+        catch (IException &e) {
+          gp->findKeyword("LookDirectionCamera").addValue("Null");
+          gp->findKeyword("LookDirectionCamera").addValue("Null");
+          gp->findKeyword("LookDirectionCamera").addValue("Null");
+        }
+
+      }
+
       // Set all keywords that still have valid information
       gp->findKeyword("Error").setValue(error);
       gp->findKeyword("FileName").setValue(m_currentCube->fileName());
@@ -394,7 +448,6 @@ namespace Isis {
         gp->findKeyword("Sample").setValue(toString(m_camera->Sample()));
         gp->findKeyword("Line").setValue(toString(m_camera->Line()));
         gp->findKeyword("PixelValue").setValue(PixelToString(b[0]));
-
         try {
           gp->findKeyword("RightAscension").setValue(toString(
                           m_camera->RightAscension()), "DEGREE");
@@ -409,159 +462,85 @@ namespace Isis {
         catch (IException &e) {
           gp->findKeyword("Declination").setValue("Null");
         }
-        try {
-          ocentricLat = m_camera->UniversalLatitude();
-          gp->findKeyword("PlanetocentricLatitude").setValue(toString(ocentricLat), "DEGREE");
-        }
-        catch (IException &e) {
-          gp->findKeyword("PlanetocentricLatitude").setValue("NULL");
-        }
+        ocentricLat = m_camera->UniversalLatitude();
+        gp->findKeyword("PlanetocentricLatitude").setValue(toString(ocentricLat), "DEGREE");
 
-        try {
-          // Convert lat to planetographic
-          Distance radii[3];
-          m_camera->radii(radii);
-          ographicLat = TProjection::ToPlanetographic(ocentricLat,
-                                                radii[0].kilometers(),
-                                                radii[2].kilometers());
-          gp->findKeyword("PlanetographicLatitude").setValue(toString(ographicLat), "DEGREE");
-        }
-        catch (IException &e) {
-          gp->findKeyword("PlanetographicLatitude").setValue("NULL");
-        }
+        // Convert lat to planetographic
+        Distance radii[3];
+        m_camera->radii(radii);
+        ographicLat = TProjection::ToPlanetographic(ocentricLat,
+                                              radii[0].kilometers(),
+                                              radii[2].kilometers());
+        gp->findKeyword("PlanetographicLatitude").setValue(toString(ographicLat), "DEGREE");
 
-        try {
-          pe360Lon = m_camera->UniversalLongitude();
-          gp->findKeyword("PositiveEast360Longitude").setValue(toString(pe360Lon), "DEGREE");
+        pe360Lon = m_camera->UniversalLongitude();
+        gp->findKeyword("PositiveEast360Longitude").setValue(toString(pe360Lon), "DEGREE");
 
-          //Convert lon to -180 - 180 range
-          gp->findKeyword("PositiveEast180Longitude").setValue(toString(
-                                                TProjection::To180Domain(pe360Lon)), "DEGREE");
+        //Convert lon to -180 - 180 range
+        gp->findKeyword("PositiveEast180Longitude").setValue(toString(
+                                              TProjection::To180Domain(pe360Lon)), "DEGREE");
 
-          //Convert lon to positive west
-          pw360Lon = TProjection::ToPositiveWest(pe360Lon, 360);
-          gp->findKeyword("PositiveWest360Longitude").setValue(toString(pw360Lon), "DEGREE");
+        //Convert lon to positive west
+        pw360Lon = TProjection::ToPositiveWest(pe360Lon, 360);
+        gp->findKeyword("PositiveWest360Longitude").setValue(toString(pw360Lon), "DEGREE");
 
-          //Convert pwlon to -180 - 180 range
-          gp->findKeyword("PositiveWest180Longitude").setValue(
-                                    toString( TProjection::To180Domain(pw360Lon)), "DEGREE");
-        }
-        catch (IException &e) {
-          gp->findKeyword("PositiveEast360Longitude").setValue("NULL");
-          gp->findKeyword("PositiveEast180Longitude").setValue("NULL");
-          gp->findKeyword("PositiveWest360Longitude").setValue("NULL");
-          gp->findKeyword("PositiveWest180Longitude").setValue("NULL");
-        }
+        //Convert pwlon to -180 - 180 range
+        gp->findKeyword("PositiveWest180Longitude").setValue(
+                                   toString( TProjection::To180Domain(pw360Lon)), "DEGREE");
 
-        try {
-          m_camera->Coordinate(pB);
-          gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[0]), "km");
-          gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[1]), "km");
-          gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[2]), "km");
-        }
-        catch (IException &e) {
-          gp->findKeyword("BodyFixedCoordinate").addValue("NULL");
-          gp->findKeyword("BodyFixedCoordinate").addValue("NULL");
-          gp->findKeyword("BodyFixedCoordinate").addValue("NULL");
-        }
-        
-        try {
-          gp->findKeyword("LocalRadius").setValue(toString(
-                          m_camera->LocalRadius().meters()), "meters");
-          gp->findKeyword("SampleResolution").setValue(toString(
-                          m_camera->SampleResolution()), "meters/pixel");
-          gp->findKeyword("LineResolution").setValue(toString(
-                          m_camera->LineResolution()), "meters/pixel");
-        }
-        catch (IException &e) {
-          gp->findKeyword("LocalRadius").setValue("NULL");
-          gp->findKeyword("SampleResolution").setValue("NULL");
-          gp->findKeyword("LineResolution").setValue("NULL");
-        }
+        m_camera->Coordinate(pB);
+        gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[0]), "km");
+        gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[1]), "km");
+        gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[2]), "km");
 
-        try {
-          gp->findKeyword("ObliqueDetectorResolution").setValue(
-                      toString(m_camera->ObliqueDetectorResolution()),"meters");
-          gp->findKeyword("ObliqueLineResolution").setValue(
-                      toString(m_camera->ObliqueLineResolution()),"meters");
-          gp->findKeyword("ObliqueSampleResolution").setValue(
-                      toString(m_camera->ObliqueSampleResolution()),"meters");
-          gp->findKeyword("ObliquePixelResolution").setValue(
-                      toString(m_camera->ObliquePixelResolution()), "meters/pix");
-        }
-        catch (IException &e) {
-          gp->findKeyword("ObliqueDetectorResolution").setValue("NULL");
-          gp->findKeyword("ObliqueLineResolution").setValue("NULL");
-          gp->findKeyword("ObliqueSampleResolution").setValue("NULL");
-          gp->findKeyword("ObliquePixelResolution").setValue("NULL");
-        }
+        gp->findKeyword("LocalRadius").setValue(toString(
+                        m_camera->LocalRadius().meters()), "meters");
+        gp->findKeyword("SampleResolution").setValue(toString(
+                        m_camera->SampleResolution()), "meters/pixel");
+        gp->findKeyword("LineResolution").setValue(toString(
+                        m_camera->LineResolution()), "meters/pixel");
 
-        try {
-          //body fixed
-          m_camera->instrumentPosition(spB);
-          gp->findKeyword("SpacecraftPosition").addValue(toString(spB[0]), "km");
-          gp->findKeyword("SpacecraftPosition").addValue(toString(spB[1]), "km");
-          gp->findKeyword("SpacecraftPosition").addValue(toString(spB[2]), "km");
-          gp->findKeyword("SpacecraftPosition").addComment("Spacecraft Information");
-        }
-        catch (IException &e) {
-          gp->findKeyword("SpacecraftPosition").addValue("NULL");
-          gp->findKeyword("SpacecraftPosition").addValue("NULL");
-          gp->findKeyword("SpacecraftPosition").addValue("NULL");
-          gp->findKeyword("SpacecraftPosition").addComment("Spacecraft Information");
-        }
+        gp->findKeyword("ObliqueDetectorResolution").setValue(
+                    toString(m_camera->ObliqueDetectorResolution()),"meters");
+        gp->findKeyword("ObliqueLineResolution").setValue(
+                    toString(m_camera->ObliqueLineResolution()),"meters");
+        gp->findKeyword("ObliqueSampleResolution").setValue(
+                    toString(m_camera->ObliqueSampleResolution()),"meters");
+        gp->findKeyword("ObliquePixelResolution").setValue(
+                    toString(m_camera->ObliquePixelResolution()), "meters/pix");
 
-        try {
-          double spacecraftAzi = m_camera->SpacecraftAzimuth();
-          if (Isis::IsValidPixel(spacecraftAzi)) {
-            gp->findKeyword("SpacecraftAzimuth").setValue(toString(spacecraftAzi), "DEGREE");
-          }
-          else {
-            gp->findKeyword("SpacecraftAzimuth").setValue("NULL");
-          }
+
+        //body fixed
+        m_camera->instrumentPosition(spB);
+        gp->findKeyword("SpacecraftPosition").addValue(toString(spB[0]), "km");
+        gp->findKeyword("SpacecraftPosition").addValue(toString(spB[1]), "km");
+        gp->findKeyword("SpacecraftPosition").addValue(toString(spB[2]), "km");
+        gp->findKeyword("SpacecraftPosition").addComment("Spacecraft Information");
+
+        double spacecraftAzi = m_camera->SpacecraftAzimuth();
+        if (Isis::IsValidPixel(spacecraftAzi)) {
+          gp->findKeyword("SpacecraftAzimuth").setValue(toString(spacecraftAzi), "DEGREE");
         }
-        catch (IException &e) {
+        else {
           gp->findKeyword("SpacecraftAzimuth").setValue("NULL");
         }
 
-
-        try {
-          gp->findKeyword("SlantDistance").setValue(toString(
-                          m_camera->SlantDistance()), "km");
-          gp->findKeyword("TargetCenterDistance").setValue(toString(
-                          m_camera->targetCenterDistance()), "km");
-        }
-        catch (IException &e) {
-          gp->findKeyword("SlantDistance").setValue("NULL");
-          gp->findKeyword("TargetCenterDistance").setValue("NULL");
-        }
-          
-        try {
-          m_camera->subSpacecraftPoint(ssplat, ssplon);
-          gp->findKeyword("SubSpacecraftLatitude").setValue(toString(ssplat), "DEGREE");
-          gp->findKeyword("SubSpacecraftLongitude").setValue(toString(ssplon), "DEGREE");
-          gp->findKeyword("SpacecraftAltitude").setValue(toString(
-                          m_camera->SpacecraftAltitude()), "km");
-          gp->findKeyword("OffNadirAngle").setValue(toString(
-                          m_camera->OffNadirAngle()), "DEGREE");
-        }
-        catch (IException &e) {
-          gp->findKeyword("SubSpacecraftLatitude").setValue("NULL");
-          gp->findKeyword("SubSpacecraftLongitude").setValue("NULL");
-          gp->findKeyword("SpacecraftAltitude").setValue("NULL");
-          gp->findKeyword("OffNadirAngle").setValue("NULL");
-        }
-
-        try {
-          double subspcgrdaz = m_camera->GroundAzimuth(m_camera->UniversalLatitude(),
-                                                m_camera->UniversalLongitude(),
-                                                ssplat, ssplon);
-          gp->findKeyword("SubSpacecraftGroundAzimuth").setValue(
-                                                  toString(subspcgrdaz), "DEGREE");
-        }
-        catch(IException &e) {
-          gp->findKeyword("SubSpacecraftGroundAzimuth").setValue("NULL");
-        }
+        gp->findKeyword("SlantDistance").setValue(toString(
+                        m_camera->SlantDistance()), "km");
+        gp->findKeyword("TargetCenterDistance").setValue(toString(
+                        m_camera->targetCenterDistance()), "km");
+        m_camera->subSpacecraftPoint(ssplat, ssplon);
+        gp->findKeyword("SubSpacecraftLatitude").setValue(toString(ssplat), "DEGREE");
+        gp->findKeyword("SubSpacecraftLongitude").setValue(toString(ssplon), "DEGREE");
+        gp->findKeyword("SpacecraftAltitude").setValue(toString(
+                        m_camera->SpacecraftAltitude()), "km");
+        gp->findKeyword("OffNadirAngle").setValue(toString(
+                        m_camera->OffNadirAngle()), "DEGREE");
+        double subspcgrdaz = m_camera->GroundAzimuth(m_camera->UniversalLatitude(),
+                                              m_camera->UniversalLongitude(),
+                                              ssplat, ssplon);
+        gp->findKeyword("SubSpacecraftGroundAzimuth").setValue(
+                                                 toString(subspcgrdaz), "DEGREE");
 
         try {
           m_camera->sunPosition(sB);
@@ -619,53 +598,26 @@ namespace Isis {
           gp->findKeyword("SubSolarGroundAzimuth").setValue("NULL");
         }
 
-        try {
-          gp->findKeyword("Phase").setValue(toString(m_camera->PhaseAngle()), "DEGREE");
-          gp->findKeyword("Phase").addComment("Illumination and Other");
-        }
-        catch(IException &e) {
-          gp->findKeyword("Phase").setValue("NULL");
-          gp->findKeyword("Phase").addComment("Illumination and Other");
-        }
+        gp->findKeyword("Phase").setValue(toString(m_camera->PhaseAngle()), "DEGREE");
+        gp->findKeyword("Phase").addComment("Illumination and Other");
+        gp->findKeyword("Incidence").setValue(toString(
+                        m_camera->IncidenceAngle()), "DEGREE");
+        gp->findKeyword("Emission").setValue(toString(
+                        m_camera->EmissionAngle()), "DEGREE");
 
-        try {
-          gp->findKeyword("Incidence").setValue(toString(
-                          m_camera->IncidenceAngle()), "DEGREE");
-          gp->findKeyword("Emission").setValue(toString(
-                          m_camera->EmissionAngle()), "DEGREE");    
+        double northAzi = m_camera->NorthAzimuth();
+        if (Isis::IsValidPixel(northAzi)) {
+          gp->findKeyword("NorthAzimuth").setValue(toString(northAzi), "DEGREE");
         }
-        catch(IException &e) {
-          gp->findKeyword("Incidence").setValue("NULL");
-          gp->findKeyword("Emission").setValue("NULL");
-        }
-
-        try {
-          double northAzi = m_camera->NorthAzimuth();
-
-          if (Isis::IsValidPixel(northAzi)) {
-              gp->findKeyword("NorthAzimuth").setValue(toString(northAzi), "DEGREE");
-          }
-          else {
-            gp->findKeyword("NorthAzimuth").setValue("NULL");
-          }
-        }
-        catch(IException &e) { 
+        else {
           gp->findKeyword("NorthAzimuth").setValue("NULL");
         }
-        
-        try {
-          gp->findKeyword("EphemerisTime").setValue(toString(
-                                    m_camera->time().Et()), "seconds");
-          gp->findKeyword("EphemerisTime").addComment("Time");
-          utc = m_camera->time().UTC();
-          gp->findKeyword("UTC").setValue(utc);
-        }
-        catch(IException &e) { 
-          gp->findKeyword("EphemerisTime").setValue("NULL");
-          gp->findKeyword("EphemerisTime").addComment("Time");
-          gp->findKeyword("UTC").setValue("NULL");
-        }
 
+        gp->findKeyword("EphemerisTime").setValue(toString(
+                        m_camera->time().Et()), "seconds");
+        gp->findKeyword("EphemerisTime").addComment("Time");
+        utc = m_camera->time().UTC();
+        gp->findKeyword("UTC").setValue(utc);
         try {
           gp->findKeyword("LocalSolarTime").setValue(toString(
                           m_camera->LocalSolarTime()), "hour");
@@ -681,20 +633,12 @@ namespace Isis {
           gp->findKeyword("SolarLongitude").setValue("Null");
         }
 
-        try {
-          std::vector<double>lookB = m_camera->lookDirectionBodyFixed();
-          gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[0]), "DEGREE");
-          gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[1]), "DEGREE");
-          gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[2]), "DEGREE");
-          gp->findKeyword("LookDirectionBodyFixed").addComment("Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.");
-        }
-        catch (IException &e) {
-          gp->findKeyword("LookDirectionBodyFixed").addValue("NULL");
-          gp->findKeyword("LookDirectionBodyFixed").addValue("NULL");
-          gp->findKeyword("LookDirectionBodyFixed").addValue("NULL");
-          gp->findKeyword("LookDirectionBodyFixed").addComment("Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.");
-        }
-        
+        std::vector<double>lookB = m_camera->lookDirectionBodyFixed();
+        gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[0]), "DEGREE");
+        gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[1]), "DEGREE");
+        gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[2]), "DEGREE");
+        gp->findKeyword("LookDirectionBodyFixed").addComment("Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.");
+
         try {
           std::vector<double>lookJ = m_camera->lookDirectionJ2000();
           gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[0]), "DEGREE");
@@ -721,14 +665,7 @@ namespace Isis {
         }
 
 
-        if (allowErrors) {
-          if (!error.isEmpty()) {
-            gp->findKeyword("Error").setValue(error);
-          }
-          else {
-            gp->findKeyword("Error").setValue("NULL");
-          }
-        }
+        if (allowErrors) gp->findKeyword("Error").setValue("NULL");
       }
     }
     return gp;
