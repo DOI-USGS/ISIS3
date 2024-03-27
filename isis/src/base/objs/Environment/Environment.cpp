@@ -106,7 +106,7 @@ namespace Isis {
    * @returns the Isis version in the format isis?.?.?.?qualifier | date
    */
   QString Environment::isisVersion() {
-    TextFile versionFile("$ISISROOT/version");
+    TextFile versionFile("$ISISROOT/isis_version.txt");
     QString line1, line2, line3, line4;
     versionFile.GetLine(line1);
     versionFile.GetLine(line2);

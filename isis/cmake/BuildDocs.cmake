@@ -84,9 +84,7 @@ function(build_upper_level)
   copy_folder(${docBuildFolder}/w3c    ${docInstallFolder}/${docVersion})
 
   # These folders are populated inside "build_documents_folder"
-
-  # Create a redirect for the top level index file. It points to the version index file
-  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"${docVersion}/\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/redirect.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/redirect.xsl)
+  
   # Create the main documentaion page. This is located in the version directory 
   execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
 
