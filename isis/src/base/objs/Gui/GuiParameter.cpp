@@ -274,7 +274,7 @@ namespace Isis {
         helper->setIcon(QIcon(QPixmap(file)));
       }
       else {
-        helper->setFixedWidth(helper->fontMetrics().width(
+        helper->setFixedWidth(helper->fontMetrics().horizontalAdvance(
                                 " " + helper->text() + " "));
       }
       RememberWidget(helper);
@@ -326,7 +326,7 @@ namespace Isis {
         helper->setIcon(QIcon(QPixmap(file)));
       }
       else {
-        helper->setFixedWidth(helper->fontMetrics().width(
+        helper->setFixedWidth(helper->fontMetrics().horizontalAdvance(
                                 "  " + helper->text() + "  "));
       }
 

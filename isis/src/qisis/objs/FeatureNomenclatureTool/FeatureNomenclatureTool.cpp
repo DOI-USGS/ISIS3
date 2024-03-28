@@ -1800,7 +1800,7 @@ namespace Isis {
 
         QString featureName = feature.name();
         QRect textDisplayArea(QPoint(viewportX, viewportY),
-                              QSize(fontMetrics.width(featureName) + 4,
+                              QSize(fontMetrics.horizontalAdvance(featureName) + 4,
                                     fontMetrics.height()));
         // Center the text on the viewportX,Y instead of starting it there...
         textDisplayArea.moveTopLeft(textDisplayArea.topLeft() -
