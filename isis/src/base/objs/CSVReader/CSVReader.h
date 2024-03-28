@@ -137,7 +137,7 @@ namespace Isis {
       int parse(const QString &str, const char &delimiter = ',',
                 bool keepEmptyParts = true) {
         QStringList tokens =
-            str.split(delimiter, keepEmptyParts? QString::KeepEmptyParts : Qt::SkipEmptyParts);
+            str.split(delimiter, keepEmptyParts? Qt::KeepEmptyParts : Qt::SkipEmptyParts);
         TokenList slist(tokens.size());
         for(int i = 0 ; i < tokens.size() ; i++) {
           slist[i] = TokenType(tokens[i]);

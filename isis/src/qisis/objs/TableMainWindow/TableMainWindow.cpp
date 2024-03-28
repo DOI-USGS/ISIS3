@@ -424,7 +424,7 @@ namespace Isis {
       }
     }
 
-    qSort(selectedRows.begin(), selectedRows.end());
+    std::sort(selectedRows.begin(), selectedRows.end());
     for(int d = selectedRows.size(); d > 0; d--) {
       p_table->removeRow(selectedRows[d-1]);
     }
