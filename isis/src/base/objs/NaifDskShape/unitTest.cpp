@@ -159,13 +159,13 @@ int main(int argc, char *argv[]) {
     shapeModelFromPvlElevation.setLocalNormalFromIntercept();
     qDebug() << "Has intercept normal?                " << shapeModelFromPvlElevation.hasLocalNormal();
     qDebug() << "Normal set from Intercept:           "
-             QVector<double>(localNormal.begin(), localNormal.end());
+             << QVector<double>(shapeModelFromPvlElevation.localNormal().begin(), shapeModelFromPvlElevation.localNormal().end());
     // no need to call calculateSurfaceNormal() or ellipsoidNormal()
     // directly. these methods are called by calculateDefaultNormal()
     shapeModelFromPvlElevation.calculateDefaultNormal(); 
     qDebug() << "Has default normal?                  " << shapeModelFromPvlElevation.hasNormal();
     qDebug() << "Default normal:                      "
-             << QVector<double>(normal.begin(), normal.end());
+             << QVector<double>(shapeModelFromPvlElevation.normal().begin(), shapeModelFromPvlElevation.normal().end());
 
     QVector <double *> cornerNeighborPoints;
     double point[3];
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
     shapeModelFromPvlElevation.calculateLocalNormal(cornerNeighborPoints); 
     qDebug() << "Has local normal?                    " << shapeModelFromPvlElevation.hasLocalNormal();
     qDebug() << "Local normal from neighbor points:   "
-             QVector<double>(localNormal.begin(), localNormal.end());
+             << QVector<double>(shapeModelFromPvlElevation.localNormal().begin(), shapeModelFromPvlElevation.localNormal().end());
     qDebug() << "";
 
     qDebug() << "================================= Error Throws ==================================";
