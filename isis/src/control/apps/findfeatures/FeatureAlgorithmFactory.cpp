@@ -217,11 +217,11 @@ const PvlFlatMap &FeatureAlgorithmFactory::globalParameters() const {
  */
 PvlFlatMap FeatureAlgorithmFactory::parseGlobalParameters(const QString &globals) {
   PvlFlatMap pvlmap;
-  QStringList parms = globals.split("@", QString::SkipEmptyParts);
+  QStringList parms = globals.split("@", Qt::SkipEmptyParts);
   for (int i = 0 ; i < parms.size() ; i++ ) {
 
     // Only parse substrings that have 2 distinct parts separated by :
-    QStringList parts = parms[i].split(":", QString::SkipEmptyParts);
+    QStringList parts = parms[i].split(":", Qt::SkipEmptyParts);
     if ( parts.size() == 2 ) {
       pvlmap.add(parts[0], parts[1]);
     }
@@ -383,7 +383,7 @@ RobustMatcherList FeatureAlgorithmFactory::create(const QString &specs,
   RobustMatcherList algoList;
 
   // Individual algorithm specifications are separated by vertical bars
-  QStringList algorithms = specs.split("|", QString::SkipEmptyParts);
+  QStringList algorithms = specs.split("|", Qt::SkipEmptyParts);
   if ( algorithms.size() == 0 ) {
     if ( errorIfEmpty ) {
       QString mess = "No feature matcher algorithms provided!";
@@ -523,10 +523,10 @@ QStringList FeatureAlgorithmFactory::formatSpecifications(QString specification)
   QStringList parts;
   if ( specification.contains(QRegularExpression("@savepath", QRegularExpression::CaseInsensitiveOption)) ) {
     QRegularExpression sep("/(?=(.*(@savepath)))",QRegularExpression::CaseInsensitiveOption);
-    parts = specification.split(sep, QString::SkipEmptyParts);
+    parts = specification.split(sep, Qt::SkipEmptyParts);
   }
   else {
-    parts = specification.split("/", QString::SkipEmptyParts);
+    parts = specification.split("/", Qt::SkipEmptyParts);
   }
   // Componenet specifications
   QString feature2dSpec;
@@ -624,7 +624,7 @@ QStringList FeatureAlgorithmFactory::formatSpecifications(QString specification)
 
   // If a parameter specification was found get it
   if ( !parametersSpec.isEmpty() ) {
-    if ( parametersSpec.split("@", QString::SkipEmptyParts).takeFirst().toLower() !=
+    if ( parametersSpec.split("@", Qt::SkipEmptyParts).takeFirst().toLower() !=
          "parameters" ) {
       QString mess = "Invalid specification:\n" +
                      specification + "\n" +

@@ -551,7 +551,7 @@ namespace Isis {
         }
       }
       //If the line is not empty, add it to the file
-      if (line.split(",", QString::SkipEmptyParts).count() != 0)
+      if (line.split(",", Qt::SkipEmptyParts).count() != 0)
         t << line << endl;
     }
     p_currentFile.close();
