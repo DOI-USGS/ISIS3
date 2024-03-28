@@ -46,6 +46,7 @@ release.
 - Fixed ISIS failing to expand env variables with an "_" in them. [#5402](https://github.com/DOI-USGS/ISIS3/pull/5402)
 - Fixed <i>noproj</i> bug where match cube not NULL when not specifying MATCH parameter [#5381](https://github.com/USGS-Astrogeology/ISIS3/issues/5381)
 - Fixed findFeaturesSegment trying to merge networks when only 1 segmented network was successfully created [5416](https://github.com/DOI-USGS/ISIS3/issues/5416)
+- Fixed rclone.conf/downloadIsisData pointing to old naif kernel location, updated to archived locations and https [5394](https://github.com/DOI-USGS/ISIS3/issues/5394)
 
 ### Added
 - Added 8 new functions to the Sensor Utility Library: Slant Distance, Target Center Distance, Right Ascension Declination, Local Solar Time, Line Resolution, Sample Resolution, Pixel Resolution, and Solar Longitude.
