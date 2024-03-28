@@ -172,7 +172,7 @@ namespace Isis {
     }
 
     // Sort the points based upon strength
-    qSort(m_kpts.begin(), m_kpts.end(), SortStrengthDescending());
+    std::sort(m_kpts.begin(), m_kpts.end(), SortStrengthDescending());
 
 #if defined(DEBUG)
     for (int p = 0; p < qMin(m_kpts.size(), 5); p++) {

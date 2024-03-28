@@ -985,7 +985,7 @@ End)");
   EXPECT_THAT(lines[76].toStdString(), HasSubstr("RADII: MEAN"));
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[77].trimmed(), "");
 
-  QStringList columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  QStringList columns = lines[160].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "RA");
   EXPECT_NEAR(columns[2].toDouble(), 269.9949, 0.0001);
@@ -994,7 +994,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
   EXPECT_NEAR(columns[6].toDouble(), 0.00167495, 0.0001);
 
-  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[161].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "DEC");
   EXPECT_NEAR(columns[2].toDouble(), 66.5392, 0.0001);
@@ -1003,7 +1003,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
   EXPECT_NEAR(columns[6].toDouble(), 0.00068524, 0.0001);
 
-  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[162].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PM");
   EXPECT_NEAR(columns[1].toDouble(), 38.32132, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -383.36347956, 0.0001);
@@ -1011,7 +1011,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 1.55731615, 0.0001);
 
-  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[163].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PMv");
   EXPECT_NEAR(columns[1].toDouble(), 13.17635815, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -0.03669501, 0.0001);
@@ -1019,7 +1019,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 0.00015007, 0.0001);
 
-  columns = lines[164].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[164].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "MeanRadius");
   EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -1.67807036, 0.0001);
@@ -1145,7 +1145,7 @@ End)");
   EXPECT_THAT(lines[76].toStdString(), HasSubstr("RADII: TRIAXIAL"));
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, lines[77].trimmed(), "");
 
-  QStringList columns = lines[160].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  QStringList columns = lines[160].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "RA");
   EXPECT_NEAR(columns[2].toDouble(), 269.9949, 0.0001);
@@ -1154,7 +1154,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
   EXPECT_NEAR(columns[6].toDouble(), 0.00199725, 0.0001);
 
-  columns = lines[161].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[161].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "POLE");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[1], "DEC");
   EXPECT_NEAR(columns[2].toDouble(), 66.5392, 0.0001);
@@ -1163,7 +1163,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[5], "FREE");
   EXPECT_NEAR(columns[6].toDouble(), 0.00149539, 0.0001);
 
-  columns = lines[162].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[162].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PM");
   EXPECT_NEAR(columns[1].toDouble(), 38.32132, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -291.78617547, 0.0001);
@@ -1171,7 +1171,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 2.00568417, 0.0001);
 
-  columns = lines[163].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[163].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "PMv");
   EXPECT_NEAR(columns[1].toDouble(), 13.17635815, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -0.02785056, 0.0001);
@@ -1179,7 +1179,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 0.00019333, 0.0001);
 
-  columns = lines[164].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[164].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusA");
   EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), 6.87282091, 0.0001);
@@ -1187,7 +1187,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 1.23289971, 0.0001);
 
-  columns = lines[165].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[165].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusB");
   EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), 2.34406319, 0.0001);
@@ -1195,7 +1195,7 @@ End)");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[4], "FREE");
   EXPECT_NEAR(columns[5].toDouble(), 12.52974045, 0.0001);
 
-  columns = lines[166].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[166].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, columns[0], "RadiusC");
   EXPECT_NEAR(columns[1].toDouble(), 1737.4, 0.0001);
   EXPECT_NEAR(columns[2].toDouble(), -37.55670044, 0.0001);
@@ -1843,11 +1843,11 @@ TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
   EXPECT_THAT(lidarRangeConstraints[0].trimmed().toStdString(), HasSubstr("Lidar Range Constraints"));
   EXPECT_EQ(lidarRangeConstraints[1].trimmed().toInt(), lidarDataIn.numberSimultaneousMeasures());
 
-  QStringList columns = lines[136].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  QStringList columns = lines[136].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   ASSERT_GE(columns.size(), 10);
   EXPECT_EQ(columns[6].toInt(), nValidMeasuresCube1);
   EXPECT_EQ(columns[7].toInt(), nMeasuresCube1);
-  columns = lines[137].split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  columns = lines[137].split(QRegExp("\\s+"), Qt::SkipEmptyParts);
   ASSERT_GE(columns.size(), 10);
   EXPECT_EQ(columns[6].toInt(), nValidMeasuresCube2);
   EXPECT_EQ(columns[7].toInt(), nMeasuresCube2);

@@ -146,7 +146,7 @@ namespace Isis {
     }
 
     // Sort to find the image with the highest measure count as a starting point
-    qSort(pntcount.begin(), pntcount.end(), SortSerialsByPntSize());
+    std::sort(pntcount.begin(), pntcount.end(), SortSerialsByPntSize());
 
 #if defined(DEBUG)
     for (int i = 0; i < pntcount.size() ; i++) {

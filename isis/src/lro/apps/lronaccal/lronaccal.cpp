@@ -521,7 +521,7 @@ namespace Isis {
       vector<double> line;
       lineString = lineString.simplified().remove(QRegExp("^[ ,]*")).trimmed();
 
-      QStringList lineTokens = lineString.split(QRegExp("[ ,]"), QString::SkipEmptyParts);
+      QStringList lineTokens = lineString.split(QRegExp("[ ,]"), Qt::SkipEmptyParts);
       foreach (QString value, lineTokens) {
         line.push_back(toDouble(value));
       }

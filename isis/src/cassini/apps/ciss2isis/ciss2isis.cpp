@@ -209,7 +209,7 @@ namespace Isis{
       stretchPairs->GetLine(line);  //assigns value to line
       line = line.simplified();
 
-      foreach (QString value, line.split(QRegExp("[\\s,]"), QString::SkipEmptyParts)) {
+      foreach (QString value, line.split(QRegExp("[\\s,]"), Qt::SkipEmptyParts)) {
         stretch.AddPair(temp1, toDouble(value));
         temp1++;
       }

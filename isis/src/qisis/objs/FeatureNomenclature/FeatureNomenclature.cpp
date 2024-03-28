@@ -182,7 +182,7 @@ namespace Isis {
 
   /**
    * Compare the diameter of two features. This is very useful for sorting with
-   *   qSort(). If lhs > rhs, then this returns true. This considers valid data
+   *   std::sort(). If lhs > rhs, then this returns true. This considers valid data
    *   > invalid data.
    *
    * @param lhs The left hand side of the '>' operator

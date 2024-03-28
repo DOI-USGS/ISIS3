@@ -58,7 +58,7 @@ namespace Isis {
 
 
     for(size_t iline = 0; iline < lines.size(); iline++) {
-      fields = lines[iline].simplified().split(" ", QString::SkipEmptyParts);
+      fields = lines[iline].simplified().split(" ", Qt::SkipEmptyParts);
       if(fields.count() != 3) {
         QString msg = "Three fields are required:  sample, line, and ephemeris time.";
         throw IException(IException::Io, msg, _FILEINFO_);

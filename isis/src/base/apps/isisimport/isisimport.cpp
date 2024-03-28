@@ -181,7 +181,7 @@ namespace Isis {
         stretchPairs->GetLine(line);  //assigns value to line
         line = line.simplified();
 
-        for (QString value: line.split(QRegExp("[\\s,]"), QString::SkipEmptyParts)) {
+        for (QString value: line.split(QRegExp("[\\s,]"), Qt::SkipEmptyParts)) {
           vectorStretchPairs.push_back(temp1);
           vectorStretchPairs.push_back(toDouble(value));
           temp1++;

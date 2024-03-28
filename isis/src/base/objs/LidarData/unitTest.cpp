@@ -172,7 +172,7 @@ void print(const LidarData &lidarData) {
   QList< QSharedPointer<LidarControlPoint> > points = lidarData.points();
   
   // Order the control points so test runs will list points in a consistent order
-  qSort(points.begin(), points.end(), cmpLessThan);
+  std::sort(points.begin(), points.end(), cmpLessThan);
   
   std::cout << "LidarData:" << std::endl;
   foreach (QSharedPointer<LidarControlPoint> point, points) {

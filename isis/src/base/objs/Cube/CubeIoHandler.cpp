@@ -1921,7 +1921,7 @@ namespace Isis {
     // Sorting the buffers didn't seem to have a large positive impact on speed,
     //   but does increase complexity so it's disabled.
 //     QList<Buffer * > buffersToWrite(*m_buffersToWrite);
-//     qSort(buffersToWrite.begin(), buffersToWrite.end(), bufferLessThan);
+//     std::sort(buffersToWrite.begin(), buffersToWrite.end(), bufferLessThan);
 
     // If the buffers have any overlap at all then we can't sort them and still
     //   guarantee the last write() call makes it into the correct place. The

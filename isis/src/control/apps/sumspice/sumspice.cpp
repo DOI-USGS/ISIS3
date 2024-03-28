@@ -106,7 +106,7 @@ namespace Isis {
     SumFileList sumFiles = loadSumFiles(sumFileNameList);
 
     // Sort the sum file list in ascending order by ET
-    qSort(sumFiles.begin(), sumFiles.end(), SortEtAscending());
+    std::sort(sumFiles.begin(), sumFiles.end(), SortEtAscending());
 
     // check for uniqueness of sum files
     PvlGroup duplicates("SumFileWarnings");

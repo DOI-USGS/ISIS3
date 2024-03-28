@@ -84,7 +84,7 @@ namespace Isis {
 
     QString str = toString().remove(QRegExp("^\\+"));
 
-    QStringList strSplit = str.split(",", QString::SkipEmptyParts);
+    QStringList strSplit = str.split(",", Qt::SkipEmptyParts);
     foreach (QString commaTok, strSplit) {
       // Is this token a range of bands
       if (commaTok.contains('-')) {

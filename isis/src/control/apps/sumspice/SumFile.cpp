@@ -474,7 +474,7 @@ namespace Isis {
     // Copy string and parse results
     QString line = data.simplified();
     line.replace(",", " ");
-    QStringList values = line.split(" ", QString::SkipEmptyParts);
+    QStringList values = line.split(" ", Qt::SkipEmptyParts);
 
     if ( nexpected > 0 ) {
       if ( values.size() != nexpected ) {

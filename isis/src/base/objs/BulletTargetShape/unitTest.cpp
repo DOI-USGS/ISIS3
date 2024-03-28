@@ -19,7 +19,7 @@ using namespace Isis;
 int main(int argc, char *argv[]) {
   try {
     qDebug() << "Testing BulletTargetShape";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Testing default constructor";
     qDebug() << "";
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Target name: " << defaultTargetShape.name();
     qDebug() << "Maximum distance in kilometers: " << defaultTargetShape.maximumDistance();
     qDebug() << "btCollisionBody pointer is valid? " << (bool) defaultTargetShape.body();
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Testing load constructor";
     QString dskfile("$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Target name: " << itokawaTargetShape->name();
     qDebug() << "Maximum distance in kilometers: " << itokawaTargetShape->maximumDistance();
     qDebug() << "btCollisionBody pointer is valid? " << (bool) itokawaTargetShape->body();
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Testing load constructor with cube";
     QString itokawaCube = "$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2391934788_v.cub";
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     BulletTargetShape *cubeTargetShape = BulletTargetShape::load(itokawaCube);
     qDebug() << "Target shape pointer is valid?" << (bool) cubeTargetShape;
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Testing load constructor with other extension";
     QString otherFile = "$ISISTESTDATA/isis/src/base/unitTestData/xmlTestLabel.xml";
@@ -53,14 +53,14 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     BulletTargetShape *otherTargetShape = BulletTargetShape::load(otherFile);
     qDebug() << "Target shape pointer is valid?" << (bool) otherTargetShape;
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Testing collision body constructor";
     BulletTargetShape collisionTargetShape(itokawaTargetShape->body(), "Itokawa");
     qDebug() << "Target name: " << collisionTargetShape.name();
     qDebug() << "Maximum distance in kilometers: " << collisionTargetShape.maximumDistance();
     qDebug() << "btCollisionBody pointer is valid? " << (bool) collisionTargetShape.body();
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Testing null collision body constructor";
     BulletTargetShape nullTargetShape(0, "Null");

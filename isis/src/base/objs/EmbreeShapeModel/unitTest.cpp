@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 
     QString dskfile("$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
     qDebug() << "Testing with " << dskfile << "...";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Get an instance of the target manager";
     qDebug() << "";
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Testing observer look direction intersection";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
     std::vector<double> observerVec(3, 0.0);
     std::vector<double> lookVec(3, 0.0);
     observerVec[0] = 1000.0;
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Testing observer look direction non-intersection";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
     observerVec[0] = 1000.0;
     observerVec[1] = 1000.0;
     observerVec[2] = 1000.0;
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Testing latitude, longitude intersection";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     Latitude testLat(45, Angle::Degrees);
     Longitude testLon(85, Angle::Degrees);
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Testing latitude, longitude occlusion";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Using " << itokawaCubeFile;
     Latitude occLat(0, Angle::Degrees);
@@ -175,7 +175,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Testing surface point intersection";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     testLat.setDegrees(0.0);
     testLon.setDegrees(200.0);
@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Testing surface point occlusion";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     testLat.setDegrees(-45.0);
     testLon.setDegrees(80.0);
@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Testing local radius";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     testLat.setDegrees(35.0);
     testLon.setDegrees(270.0);
@@ -232,7 +232,7 @@ int main(int argc, char *argv[]) {
     outputModelStatus(itokawaModel);
 
     qDebug() << "Testing visibility check";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observerVec[0] = 1000.0;
     observerVec[1] = 0.0;
@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
              << itokawaModel.isVisibleFrom(observerVec, lookVec);
 
     qDebug() << "Testing default ellipsoid normal";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Starting model status";
     outputModelStatus(itokawaModel);
@@ -276,7 +276,7 @@ int main(int argc, char *argv[]) {
     outputModelStatus(itokawaModel);
 
     qDebug() << "Testing photometric angles";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     outputModelStatus(itokawaModel);
     observerVec[0] = 1000.0;
@@ -289,7 +289,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Incidence angle: " << itokawaModel.incidenceAngle(observerVec);
 
     qDebug() << "Testing errors";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
   }
   catch (IException &e) {

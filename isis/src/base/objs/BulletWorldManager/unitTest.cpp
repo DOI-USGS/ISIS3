@@ -21,20 +21,20 @@ using namespace Isis;
 int main(int argc, char *argv[]) {
   try {
     qDebug() << "Testing BulletWorldManager";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Testing default constructor";
     qDebug() << "";
     BulletWorldManager defaultWorld;
     qDebug() << "World name: " << defaultWorld.name();
     qDebug() << "World size: " << defaultWorld.size();
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Testing with a name";
     BulletWorldManager namedWorld("TestWorld");
     qDebug() << "World name: " << namedWorld.name();
     qDebug() << "World size: " << namedWorld.size();
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
 
     QString dskfile("$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds");

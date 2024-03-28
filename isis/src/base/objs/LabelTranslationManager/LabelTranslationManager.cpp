@@ -174,8 +174,8 @@ QStringList LabelTranslationManager::parseSpecification(QString specification) c
   QStringList parsedSpecification;
 
   try {
-    QStringList typeSplit = specification.split("@", QString::SkipEmptyParts); 
-    QStringList barSplit = specification.split("|", QString::SkipEmptyParts);
+    QStringList typeSplit = specification.split("@", Qt::SkipEmptyParts); 
+    QStringList barSplit = specification.split("|", Qt::SkipEmptyParts);
    
     if (typeSplit.size() == 2) { //handle tag@elementname|value
       if (typeSplit[0].toLower() != "att" &&
@@ -187,7 +187,7 @@ QStringList LabelTranslationManager::parseSpecification(QString specification) c
       }
       parsedSpecification.append(typeSplit[0].toLower());
 
-      QStringList nameValueSplit = typeSplit[1].split("|", QString::SkipEmptyParts);
+      QStringList nameValueSplit = typeSplit[1].split("|", Qt::SkipEmptyParts);
       if (nameValueSplit.size() == 2) {
         parsedSpecification.append(nameValueSplit);
       }

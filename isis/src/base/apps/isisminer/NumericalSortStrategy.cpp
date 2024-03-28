@@ -108,10 +108,10 @@ namespace Isis {
   int NumericalSortStrategy::apply(ResourceList &resources, 
                                    const ResourceList &globals) { 
     if ( "ascending" == m_order) {
-      qSort(resources.begin(), resources.end(), SortAscending(m_sortKey));
+      std::sort(resources.begin(), resources.end(), SortAscending(m_sortKey));
     }
     else {  // ("descending" == m_order) 
-      qSort(resources.begin(), resources.end(), SortDescending(m_sortKey));
+      std::sort(resources.begin(), resources.end(), SortDescending(m_sortKey));
     }
   
     //  Keeps the Resource by just running the counter

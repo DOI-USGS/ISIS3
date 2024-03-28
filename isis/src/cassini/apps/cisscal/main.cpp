@@ -506,7 +506,7 @@ void gbl::CreateBitweightStretch(FileName bitweightTable) {
     stretchPairs->GetLine(line);
     line = line.simplified().trimmed();
 
-    QStringList tokens = line.split(QRegExp("[, ]"), QString::SkipEmptyParts);
+    QStringList tokens = line.split(QRegExp("[, ]"), Qt::SkipEmptyParts);
     foreach (QString token, tokens) {
       stretch2 = toDouble(token);
       gbl::stretch.AddPair(stretch1, stretch2);

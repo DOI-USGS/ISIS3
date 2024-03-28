@@ -198,7 +198,7 @@ int main() {
 
   }
   catch(IException &e) {
-    qDebug() << "ControlNetVitals unit test failed!" << endl;
+    qDebug() << "ControlNetVitals unit test failed!" << Qt::endl;
     e.print();
   }
 }
