@@ -15,6 +15,7 @@
 #include <QString>
 #include <QStringList>
 #include <QTime>
+#include <QElapsedTimer>
 
 // boost library
 #include <boost/foreach.hpp>
@@ -113,13 +114,14 @@ void IsisMain() {
          << " (TimeIn:  " << stime.toString("hh:mm:ss.zzz") 
          << ")\n"
          << "Description: " << strategy->description() << "\n";
-    stime.start();
+    QElapsedTimer stimer;
+    stimer.start();
     int n = strategy->apply(resources);
     unsigned int ntotal = strategy->totalProcessed();
     cout << n << " of " << ntotal << " processed in " 
          << strategy->type() << "::" << strategy->name() 
          << " (TimeOut: " << QTime::currentTime().toString("hh:mm:ss.zzz") << ")\n";
-    cout << "ElapsedTime(s): " << stime.elapsed() / 1000  << "\n";
+    cout << "ElapsedTime(s): " << stimer.elapsed() / 1000  << "\n";
   }
 
   // Get total elapded time

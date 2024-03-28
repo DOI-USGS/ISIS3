@@ -158,7 +158,7 @@ MatchPair RobustMatcher::match(MatchImage &query, MatchImage &train) const {
   }
 
    // Do not include in timer up to here
-   QTime stime;
+   QElapsedTimer stime;
    stime.start();
 
    // 1a. Detection of the features
@@ -1154,7 +1154,7 @@ void RobustMatcher::RootSift(cv::Mat &descriptors, const float eps) const {
 
 
 /** Returns elapsed time since the timer was started in seconds */
-double RobustMatcher::elapsed(const QTime &runtime) const {
+double RobustMatcher::elapsed(const QElapsedTimer &runtime) const {
   return (runtime.elapsed() / 1000.0);
 }
 
