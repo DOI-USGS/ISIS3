@@ -51,6 +51,7 @@ release.
 - Fixed <i>noproj</i> bug where missing shapemodel-related keywords (RayTraceEngine, BulletParts, Tolerance) are dropped when the output label is created. This resulted in the Bullet collision detection engine not being used. Issue: [#5377](https://github.com/USGS-Astrogeology/ISIS3/issues/5377)
 - Fixed ISIS failing to expand env variables with an "_" in them. [#5402](https://github.com/DOI-USGS/ISIS3/pull/5402)
 - Fixed <i>noproj</i> bug where match cube not NULL when not specifying MATCH parameter [#5381](https://github.com/USGS-Astrogeology/ISIS3/issues/5381)
+- Fixed rclone.conf/downloadIsisData pointing to old naif kernel location, updated to archived locations and https [5394](https://github.com/DOI-USGS/ISIS3/issues/5394)
 
 ## [8.0.2] - 2023-12-05
 ### Changed
