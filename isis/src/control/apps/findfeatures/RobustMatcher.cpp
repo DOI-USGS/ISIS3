@@ -346,7 +346,7 @@ MatchPairQList RobustMatcher::match(MatchImage &query,
    }
 
    // Start timer
-   QTime stime;
+   QElapsedTimer stime;
    stime.start();
 
    // 1a. Run detection of features
@@ -541,7 +541,7 @@ bool RobustMatcher::removeOutliers(const cv::Mat &queryDescriptors,
   matches.clear();
 
   // Start the timer
-  QTime stime;
+  QElapsedTimer stime;
   stime.start();
   double v_time;  // Ratio test timing
 
@@ -665,7 +665,7 @@ int RobustMatcher::ratioTest(std::vector<std::vector<cv::DMatch> > &matches,
     logger().flush();
   }
 
-  QTime stime;
+  QElapsedTimer stime;
   stime.start();  // Start the timer
 
   int removed(0);
@@ -723,7 +723,7 @@ void RobustMatcher::symmetryTest(const std::vector<std::vector<cv::DMatch> >& ma
   symMatches.clear();
   // Do not include in timer
 
-  QTime stime;
+  QElapsedTimer stime;
   stime.start();  // Start the timer
 
   // for all matches image 1 -> image 2
@@ -814,7 +814,7 @@ cv::Mat RobustMatcher::ransacTest(const std::vector<cv::DMatch>& matches,
   }
 
   // Got some points, get the timer started
-  QTime stime;
+  QElapsedTimer stime;
   stime.start();
 
   // Convert keypoints into Point2f
@@ -977,7 +977,7 @@ cv::Mat RobustMatcher::computeHomography(const std::vector<cv::KeyPoint>& query,
   mtime = 0.0;
   cv::Mat homography = cv::Mat::eye(3,3,CV_64F);
 
-  QTime stime;
+  QElapsedTimer stime;
   stime.start();  // Start the timer
 
   // Prepare source and train points
