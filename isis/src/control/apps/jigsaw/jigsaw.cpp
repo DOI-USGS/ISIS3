@@ -7,12 +7,18 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include <iostream>
+#include <highfive/H5File.hpp>
+#include <highfive/H5DataType.hpp>
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5Group.hpp>
+#include <vector>
 
 #include <QDir>
 #include <QList>
 #include <QObject>
 #include <QSharedPointer>
 #include <QString>
+
 
 #include "Blob.h"
 #include "BundleAdjust.h"
@@ -35,6 +41,8 @@ find files of those names at the top level of this repository. **/
 #include "jigsaw.h"
 
 using namespace std;
+using namespace HighFive;
+
 
 namespace Isis {
 
@@ -130,24 +138,25 @@ namespace Isis {
         bundleSolution->outputResiduals();
       }
 
-    // write lidar csv output file
-    if (ui.GetBoolean("LIDAR_CSV")) {
-      bundleSolution->outputLidarCSV();
-    }
+      // write lidar csv output file
+      if (ui.GetBoolean("LIDAR_CSV")) {
+        bundleSolution->outputLidarCSV();
+      }
 
       // write updated control net
       bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
 
-    // write updated lidar data file
-    if (ui.WasEntered("LIDARDATA")) {
-      if (ui.GetString("OLIDARFORMAT") == "JSON") {
-        bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA"),LidarData::Format::Json);
+      // write updated lidar data file
+      if (ui.WasEntered("LIDARDATA")) {
+        if (ui.GetString("OLIDARFORMAT") == "JSON") {
+          bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA"),LidarData::Format::Json);
+        }
+        else {
+          bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA"),LidarData::Format::Binary);
+        }
       }
-      else {
-        bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA"),LidarData::Format::Binary);
-      }
-    }
       PvlGroup gp("JigsawResults");
+      QString adjustmentOutputFilename;
       // Update the cube pointing if requested but ONLY if bundle has converged
       if (ui.GetBoolean("UPDATE") ) {
         if ( !bundleAdjustment->isConverged() ) {
@@ -156,6 +165,19 @@ namespace Isis {
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
         else {
+          if (ui.GetFileName("ADJUSTMENT_OUTPUT") == NULL) {
+            gp += PvlKeyword("Status","If UPDATE=True then must specify bundle adjustment values to update cube files.");
+            QString msg = "ADJUSTMENT_OUTPUT value is missing";
+            throw IException(IException::Unknown, msg, _FILEINFO_);
+          }
+          adjustmentOutputFilename = ui.GetFileName("ADJUSTMENT_OUTPUT");
+          std::cout << "AdjustmentOutputFilename=" << adjustmentOutputFilename << std::endl;
+          // Initialize dataset for adjustment tables
+          File file(adjustmentOutputFilename.toStdString(), File::Truncate);
+
+          
+          std::vector<std::string> adjustment_list;
+
           for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
             Process p;
             CubeAttributeInput inAtt;
@@ -176,7 +198,9 @@ namespace Isis {
 
             //  Update the image parameters
             QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
+
             if (c->hasBlob("CSMState", "String")) {
+              std::cout << "Cube has CSMState blob" << std::endl;
               Blob csmStateBlob("CSMState", "String");
               // Read the BLOB from the cube to propagate things like the model
               // and plugin name
@@ -193,9 +217,46 @@ namespace Isis {
               spvector.Label().addComment(jigComment);
               c->write(cmatrix);
               c->write(spvector);
+
+              QString serialNumber = bundleAdjustment->serialNumberList()->serialNumber(i);
+              QString cmatrixName = cmatrix.Name();
+              QString spvectorName = spvector.Name();
+              std::cout << "serialNumber=" << serialNumber.toStdString() << std::endl;
+
+              std::string cmatrixKey = serialNumber.toStdString() + "/" + cmatrixName.toStdString();
+              std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
+
+              if (adjustmentOutputFilename != NULL) {
+
+                std::string cmatrixTableStr = Table::toString(cmatrix).toStdString();
+                DataSet dataset = file.createDataSet<std::string>(cmatrixKey, cmatrixTableStr);
+                std::string spvectorTableStr = Table::toString(spvector).toStdString();
+                dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
+
+                // TODO: Add metadata to h5 file
+                PvlKeyword timeDependentFrames = c->label()->findObject(cmatrixName).findKeyword("TimeDependentFrames");
+              }
+              if (ui.WasEntered("ADJUSTMENT_INPUT")) {
+                QString adjustmentInputFilename = ui.GetFileName("ADJUSTMENT_INPUT");
+                std::cout << "AdjustmentInputFilename=" << adjustmentInputFilename << std::endl;
+                File fileRead(adjustmentInputFilename.toStdString(), File::ReadOnly);
+                DataSet datasetRead = fileRead.getDataSet(cmatrixKey);
+                std::vector<std::string> cmatrixData;
+                datasetRead.read(cmatrixData);
+                for (int i = 0; i < cmatrixData.size(); i++) {
+                  Table cmatrixTable(QString::fromStdString(cmatrixKey), cmatrixData[i], ',');
+                  // WIP <---
+                }
+              }
+              
+              // flag = output to this file
             }
             p.WriteHistory(*c);
           }
+          // std::cout << "Writing out dataset" << std::endl;
+          // dataset.write(adjustment_list);
+          // std::cout <<"After writing to dataset" << std::endl;
+
           gp += PvlKeyword("Status", "Camera pointing updated");
         }
       }
