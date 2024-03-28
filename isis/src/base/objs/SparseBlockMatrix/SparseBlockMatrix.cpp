@@ -386,7 +386,7 @@ namespace Isis {
    * @param sbcm SparseBlockColumnMatrix to write to debug stream
    */
   QDebug operator<<(QDebug dbg, const SparseBlockColumnMatrix &sbcm) {
-    dbg.space() << "New Block" << endl;
+    dbg.space() << "New Block" << Qt::endl;
 
     QMapIterator<int, LinearAlgebra::Matrix *> it(sbcm);
     while ( it.hasNext() ) {
@@ -409,10 +409,10 @@ namespace Isis {
         for ( int c = 0; c < nCols; c++ ) {
           dbg.space() << (*matrix)(r,c);
         }
-        dbg.space() << endl;
+        dbg.space() << Qt::endl;
       }
 
-      dbg.space() << endl;
+      dbg.space() << Qt::endl;
     }
 
     return dbg;
@@ -768,7 +768,7 @@ namespace Isis {
    * @param sbcm SparseBlockRowMatrix to write to debug stream
    */
   QDebug operator<<(QDebug dbg, const SparseBlockRowMatrix &sbrm) {
-    dbg.space() << "New Block" << endl;
+    dbg.space() << "New Block" << Qt::endl;
 
     QMapIterator<int, LinearAlgebra::Matrix *> it(sbrm);
     while ( it.hasNext() ) {
@@ -791,9 +791,9 @@ namespace Isis {
         for ( int c = 0; c < nCols; c++ ) {
           dbg.space() << (*matrix)(r,c);
         }
-        dbg.space() << endl;
+        dbg.space() << Qt::endl;
       }
-      dbg.space() << endl;
+      dbg.space() << Qt::endl;
     }
 
     return dbg;
