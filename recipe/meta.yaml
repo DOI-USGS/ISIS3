@@ -57,7 +57,7 @@ requirements:
    - cmake >=3.15,<4
    - cspice =67
    - csm >=3.0.3,<3.0.4
-   - curl >=8.3.0,<9.0a0
+   - curl >=8.7.0,<9.0a0
    - cxx-compiler >=1.1.2
    - doxygen
    - eigen >=3, <4
