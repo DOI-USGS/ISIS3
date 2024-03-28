@@ -117,6 +117,7 @@ namespace Isis{
     QList<PvlGroup*> cameraPoints;
     bool usePointList = ui.WasEntered("COORDLIST");
     bool allowOutside = ui.GetBoolean("ALLOWOUTSIDE");
+    bool allowError = ui.GetBoolean("ALLOWERROR");
     QString type;
     if (ui.WasEntered("COORDLIST")) {
       type = ui.GetString("COORDTYPE");
@@ -131,7 +132,12 @@ namespace Isis{
 
       QPair<double, double> pt = points[i];
       if (type == "GROUND") {
-        camPoint = campt.SetGround(pt.first, pt.second, allowOutside, usePointList);
+        if (allowError) {
+          camPoint = campt.SetGround(pt.first, pt.second, allowOutside, allowError);
+        }
+        else {
+          camPoint = campt.SetGround(pt.first, pt.second, allowOutside, usePointList);
+        }      
       }
       else {
         if (usePointList) {
@@ -139,17 +145,17 @@ namespace Isis{
         }
         else {
           if (ui.WasEntered("SAMPLE") && ui.WasEntered("LINE")) {
-            camPoint = campt.SetImage(pt.first, pt.second, allowOutside);
+            camPoint = campt.SetImage(pt.first, pt.second, allowOutside, allowError);
           }
           else {
             if (ui.WasEntered("SAMPLE")) {
-              camPoint = campt.SetSample(pt.first, allowOutside);
+              camPoint = campt.SetSample(pt.first, allowOutside, allowError);
             }
             else if (ui.WasEntered("LINE")) {
-              camPoint = campt.SetLine(pt.second, allowOutside);
+              camPoint = campt.SetLine(pt.second, allowOutside, allowError);
             }
             else {
-              camPoint = campt.SetCenter(allowOutside);
+              camPoint = campt.SetCenter(allowOutside, allowError);
             }
           }
         }

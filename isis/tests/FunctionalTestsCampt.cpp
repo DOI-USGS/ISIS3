@@ -266,6 +266,17 @@ TEST_F(DefaultCube, FunctionalTestCamptAllowOutside) {
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), -1.0);
 }
 
+TEST_F(DefaultCube, FunctionalTestCamptAllowError) {
+  QVector<QString> args = {"sample=-100", "line=-100", "allowerror=true"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+
+  campt(testCube, options, &appLog);
+  PvlGroup groundPoint = appLog.findGroup("GroundPoint");
+  QString ErrorMsg = "Requested position does not project in camera model; no surface intersection";
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("Error"), ErrorMsg);
+}
+
 TEST_F(CSMCubeFixture, FunctionalTestCamptCSMCamera) {
 
   double pointRadius = csm::Ellipsoid().getSemiMajorRadius();
