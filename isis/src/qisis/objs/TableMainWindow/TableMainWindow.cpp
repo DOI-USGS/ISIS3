@@ -424,7 +424,7 @@ namespace Isis {
       }
     }
 
-    qSort(selectedRows.begin(), selectedRows.end());
+    std::sort(selectedRows.begin(), selectedRows.end());
     for(int d = selectedRows.size(); d > 0; d--) {
       p_table->removeRow(selectedRows[d-1]);
     }
@@ -551,7 +551,7 @@ namespace Isis {
         }
       }
       //If the line is not empty, add it to the file
-      if (line.split(",", QString::SkipEmptyParts).count() != 0)
+      if (line.split(",", Qt::SkipEmptyParts).count() != 0)
         t << line << endl;
     }
     p_currentFile.close();

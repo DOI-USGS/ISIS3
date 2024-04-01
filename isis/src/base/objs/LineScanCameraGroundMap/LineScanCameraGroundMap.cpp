@@ -554,7 +554,7 @@ namespace Isis {
       pts << pt;
     }
 
-    qSort(pts.begin(), pts.end(), ptXLessThan);
+    std::sort(pts.begin(), pts.end(), ptXLessThan);
 
     root.clear();
     for (int i=1; i<pts.size(); i++) {
