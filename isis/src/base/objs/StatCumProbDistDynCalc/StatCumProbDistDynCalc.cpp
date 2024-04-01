@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
 #include <QList>
 #include <QUuid>
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 #include <float.h>
 #include <math.h>
@@ -20,7 +21,6 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 
 #include "Pvl.h"
 #include <iostream>
@@ -41,14 +41,75 @@ namespace Isis {
   }
 
 
-// TODO: should project be const ???
-  StatCumProbDistDynCalc::StatCumProbDistDynCalc(Project *project, 
-                                                 XmlStackedHandlerReader *xmlReader, 
-                                                 QObject *parent) {   // TODO: does xml stuff need project???
+  StatCumProbDistDynCalc::StatCumProbDistDynCalc(QXmlStreamReader *xmlReader, QObject *parent) {
     initialize();
-    xmlReader->pushContentHandler(new XmlHandler(this, project));   // TODO: does xml stuff need project???
+    readStatistics(xmlReader);
   }
 
+  void StatCumProbDistDynCalc::readStatistics(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "statCumProbDistDynCalc");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "numberCells") {
+        try {
+          m_numberCells = toDouble(xmlReader->readElementText());
+        }
+        catch (IException &e) {
+          m_numberCells = 0.0;
+        }
+      }
+      else if (xmlReader->qualifiedName() == "numberQuantiles") {
+        try {
+          m_numberQuantiles = toDouble(xmlReader->readElementText());
+        }
+        catch (IException &e) {
+          m_numberQuantiles = 0.0;
+        }
+      }
+      else if (xmlReader->qualifiedName() == "numberObservations") {
+        try {
+          m_numberObservations = toDouble(xmlReader->readElementText());
+        }
+        catch (IException &e) {
+          m_numberObservations = 0.0;
+        }
+      }
+      else if (xmlReader->qualifiedName() == "distributionData") {
+        m_quantiles.clear();
+        m_observationValues.clear();
+        m_idealNumObsBelowQuantile.clear();
+        m_numObsBelowQuantile.clear();
+        for (unsigned int i = 0; i < m_numberQuantiles; i++) {
+          while (xmlReader->readNextStartElement()) {
+            if (xmlReader->qualifiedName() == "quantileInfo") {
+              QStringRef quantile = xmlReader->attributes().value("quantile");
+              if (!quantile.isEmpty()) {
+                m_quantiles.append(quantile.toDouble());
+              }
+              QStringRef dataValue = xmlReader->attributes().value("dataValue");
+              if (!dataValue.isEmpty()) {
+                m_observationValues.append(dataValue.toDouble());
+              }
+              QStringRef idealNumObsBelowQuantile = xmlReader->attributes().value("idealNumObsBelowQuantile");
+              if (!idealNumObsBelowQuantile.isEmpty()) {
+                m_idealNumObsBelowQuantile.append(idealNumObsBelowQuantile.toDouble());
+              }
+              QStringRef actualNumObsBelowQuantile = xmlReader->attributes().value("actualNumObsBelowQuantile");
+              
+              if (!actualNumObsBelowQuantile.isEmpty()) {
+                m_numObsBelowQuantile.append(actualNumObsBelowQuantile.toInt());
+              }
+            }
+            else {
+              xmlReader->skipCurrentElement();
+            }
+          }
+        }
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
 
 
   StatCumProbDistDynCalc::StatCumProbDistDynCalc(const StatCumProbDistDynCalc &other)
@@ -512,83 +573,6 @@ namespace Isis {
 
   }
 
-
-
-// TODO: should project be const ???
-  StatCumProbDistDynCalc::XmlHandler::XmlHandler(StatCumProbDistDynCalc *probabilityCalc, 
-                                                 Project *project) {   // TODO: does xml stuff need project???
-    m_xmlHandlerCumProbCalc = probabilityCalc;
-    m_xmlHandlerProject = project;   // TODO: does xml stuff need project???
-    m_xmlHandlerCharacters = "";
-  }
-
-
-
-  StatCumProbDistDynCalc::XmlHandler::~XmlHandler() {
-    // do not delete this pointer... we don't own it, do we??? passed into StatCumProbDistDynCalc constructor as pointer
-//    delete m_xmlHandlerProject;    // TODO: does xml stuff need project???
-    m_xmlHandlerProject = NULL;
-  }
-
-
-
-  bool StatCumProbDistDynCalc::XmlHandler::startElement(const QString &namespaceURI, 
-                                                                const QString &localName,
-                                                                const QString &qName,
-                                                                const QXmlAttributes &atts) {
-
-    m_xmlHandlerCharacters = "";
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (qName == "quantileInfo") {
-
-        QString quantile  = atts.value("quantile");
-        QString obsValue  = atts.value("dataValue");
-        QString idealObs  = atts.value("idealNumObsBelowQuantile");
-        QString actualObs = atts.value("actualNumObsBelowQuantile");
-
-        if (!quantile.isEmpty() && !obsValue.isEmpty()
-            && !idealObs.isEmpty() && !actualObs.isEmpty()) {
-          m_xmlHandlerCumProbCalc->m_quantiles.append(toDouble(quantile));
-          m_xmlHandlerCumProbCalc->m_observationValues.append(toDouble(obsValue));
-          m_xmlHandlerCumProbCalc->m_idealNumObsBelowQuantile.append(toDouble(idealObs));
-          m_xmlHandlerCumProbCalc->m_numObsBelowQuantile.append(toDouble(actualObs));
-        }
-      }
-      
-    }
-    return true;
-  }
-
-
-
-  bool StatCumProbDistDynCalc::XmlHandler::characters(const QString &ch) {
-    m_xmlHandlerCharacters += ch;
-    return XmlStackedHandler::characters(ch);
-  }
-
-
-
-  bool StatCumProbDistDynCalc::XmlHandler::endElement(const QString &namespaceURI, 
-                                                      const QString &localName,
-                                                      const QString &qName) {
-    if (!m_xmlHandlerCharacters.isEmpty()) {
-      if (qName == "numberCells") {
-        m_xmlHandlerCumProbCalc->m_numberCells = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberQuantiles") {
-        m_xmlHandlerCumProbCalc->m_numberQuantiles = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberObservations") {
-        m_xmlHandlerCumProbCalc->m_numberObservations = toInt(m_xmlHandlerCharacters);
-      }
-                                           
-      m_xmlHandlerCharacters = "";
-    }
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
-  }
-
-
-
   QDataStream &StatCumProbDistDynCalc::write(QDataStream &stream) const {
     stream << (qint32)m_numberCells
            << (qint32)m_numberQuantiles
@@ -599,8 +583,6 @@ namespace Isis {
            << m_numObsBelowQuantile;
     return stream;
   }
-
-
 
   QDataStream &StatCumProbDistDynCalc::read(QDataStream &stream) {
     QString id;

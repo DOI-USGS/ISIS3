@@ -28,12 +28,12 @@ find files of those names at the top level of this repository. **/
 #include "PvlObject.h"
 #include "Statistics.h" // ???
 #include "SurfacePoint.h"
-#include "XmlStackedHandler.h"
 
 // Qt Library
 class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
+class QXmlStreamReader;
 
 namespace Isis {
   // Isis Library
@@ -44,7 +44,6 @@ namespace Isis {
   class PvlObject;
   class SerialNumberList;
   class StatCumProbDistDynCalc;
-  class XmlStackedHandlerReader;
 
   /**
    * A container class for statistical results from a BundleAdjust solution.
@@ -92,8 +91,19 @@ namespace Isis {
     Q_OBJECT
     public:
       BundleResults(QObject *parent = 0);
-      // TODO: does xml stuff need project???
-      BundleResults(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
+      BundleResults(QXmlStreamReader *xmlReader,
+                    QObject *parent = 0);
+      void readBundleResults(QXmlStreamReader *xmlReader);
+      void readCorrelationMatrix(QXmlStreamReader *xmlReader);
+      void readGenStatsValues(QXmlStreamReader *xmlReader);
+      void readRms(QXmlStreamReader *xmlReader);
+      void readImageResidualsLists(QXmlStreamReader *xmlReader);
+      void readSigmasLists(QXmlStreamReader *xmlReader);
+      void readStatsToList(QList<Statistics> &list, QXmlStreamReader *xmlReader);
+      void readStatsToVector(QVector<Statistics> &vec, QXmlStreamReader *xmlReader);
+      void readMinMaxSigmas(QXmlStreamReader *xmlReader);
+      void readSigma(Distance &dist, QString &pointId, QXmlStreamReader *xmlReader);
+      void readMaxLikelihoodEstimation(QXmlStreamReader *xmlReader);
       BundleResults(const BundleResults &src);
       ~BundleResults();
       BundleResults &operator=(const BundleResults &src);
@@ -265,52 +275,6 @@ namespace Isis {
       // TODO: does xml stuff need project???
       void save(QXmlStreamWriter &stream, const Project *project) const;
 
-
-    private:
-      /**
-       * This class is an XmlHandler used to read and write BundleResults objects
-       * from and to XML files.  Documentation will be updated when it is decided
-       * if XML support will remain.
-       *
-       * @author 2014-07-28 Jeannie Backer
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          // TODO: does xml stuff need project???
-          XmlHandler(BundleResults *statistics, Project *project);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          BundleResults *m_xmlHandlerBundleResults;
-          Project *m_xmlHandlerProject;   // TODO: does xml stuff need project???
-          QString m_xmlHandlerCharacters;
-          int m_xmlHandlerResidualsListSize;
-          int m_xmlHandlerSampleResidualsListSize;
-          int m_xmlHandlerLineResidualsListSize;
-          int m_xmlHandlerXSigmasListSize;
-          int m_xmlHandlerYSigmasListSize;
-          int m_xmlHandlerZSigmasListSize;
-          int m_xmlHandlerRASigmasListSize;
-          int m_xmlHandlerDECSigmasListSize;
-          int m_xmlHandlerTWISTSigmasListSize;
-          QList<Statistics *> m_xmlHandlerStatisticsList;
-          StatCumProbDistDynCalc *m_xmlHandlerCumProCalc;
-
-          QString m_xmlHandlerCorrelationImageId;
-          QStringList m_xmlHandlerCorrelationParameterList;
-          QMap<QString, QStringList> m_xmlHandlerCorrelationMap;
-      };
-
       CorrelationMatrix *m_correlationMatrix; //!< The correlation matrix from the BundleAdjust.
 
       int m_numberFixedPoints;                //!< number of 'fixed' (ground) points (define)
@@ -383,7 +347,7 @@ namespace Isis {
                                                              stats for each image in the bundle  */
 
       //!< The root mean square image x sigmas.
-      QVector<Statistics> m_rmsImageXSigmas;     // unset and unused ???
+      QVector<Statistics> m_rmsImageXSigmas; // unset and unused ???
       //!< The root mean square image y sigmas.
       QVector<Statistics> m_rmsImageYSigmas;     // unset and unused ???
       //!< The root mean square image z sigmas.
@@ -445,7 +409,25 @@ namespace Isis {
                                                     reporting, and not for computation.*/
       double m_maximumLikelihoodMedianR2Residuals; /**< Median of R^2 residuals.*/
 
-  };
+   private:
+      BundleResults *m_xmlHandlerBundleResults;
+      QString m_xmlHandlerCharacters;
+      int m_xmlHandlerResidualsListSize;
+      int m_xmlHandlerSampleResidualsListSize;
+      int m_xmlHandlerLineResidualsListSize;
+      int m_xmlHandlerXSigmasListSize;
+      int m_xmlHandlerYSigmasListSize;
+      int m_xmlHandlerZSigmasListSize;
+      int m_xmlHandlerRASigmasListSize;
+      int m_xmlHandlerDECSigmasListSize;
+      int m_xmlHandlerTWISTSigmasListSize;
+      QList<Statistics *> m_xmlHandlerStatisticsList;
+      StatCumProbDistDynCalc *m_xmlHandlerCumProCalc;
+
+      QString m_xmlHandlerCorrelationImageId;
+      QStringList m_xmlHandlerCorrelationParameterList;
+      QMap<QString, QStringList> m_xmlHandlerCorrelationMap;
+};
 
 };
 

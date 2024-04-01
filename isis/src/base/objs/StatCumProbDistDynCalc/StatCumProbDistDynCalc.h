@@ -16,10 +16,10 @@ find files of those names at the top level of this repository. **/
 class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
+class QXmlStreamReader;
 
 namespace Isis {
   class Project;// ??? does xml stuff need project???
-  class XmlStackedHandlerReader;
 
  /**
   * @brief This class is used to approximate cumulative probibility distributions of a stream of
@@ -70,8 +70,8 @@ namespace Isis {
     //  Observations"
     public:
       StatCumProbDistDynCalc(unsigned int nodes=20, QObject *parent = 0);  //individual qunatile value to be calculated
-      StatCumProbDistDynCalc(Project *project, XmlStackedHandlerReader *xmlReader, 
-                             QObject *parent = 0);   // TODO: does xml stuff need project???
+      StatCumProbDistDynCalc(QXmlStreamReader *xmlReader, QObject *parent = 0);
+      void readStatistics(QXmlStreamReader *xmlReader);
       StatCumProbDistDynCalc(const StatCumProbDistDynCalc &other);
       ~StatCumProbDistDynCalc();
       StatCumProbDistDynCalc &operator=(const StatCumProbDistDynCalc &other);

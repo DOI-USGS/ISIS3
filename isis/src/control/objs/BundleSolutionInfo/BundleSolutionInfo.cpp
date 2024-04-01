@@ -16,6 +16,7 @@ find files of those names at the top level of this repository. **/
 #include <QStringList>
 #include <QUuid>
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 #include "BundleLidarRangeConstraint.h"
 #include "BundleResults.h"
@@ -33,7 +34,6 @@ find files of those names at the top level of this repository. **/
 #include "PvlObject.h"
 #include "StatCumProbDistDynCalc.h"
 #include "Statistics.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
 
@@ -95,22 +95,25 @@ namespace Isis {
 
 
   /**
-   * Constructor. Creates a BundleSolutionInfo from disk.
+   * Handle an XML start element. This expects <image/> and <displayProperties/> elements.
    *
-   * @param project The current project
-   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   * @param parent The Qt-relationship parent
+   * @param namespaceURI ???
+   * @param localName The keyword name given to the member variable in the XML.
+   * @param qName ???
+   * @param atts The attribute containing the keyword value for the given local name.
+   *
+   * @return @b bool True if we should continue reading the XML.
    */
   BundleSolutionInfo::BundleSolutionInfo(Project *project,
-                                         XmlStackedHandlerReader *xmlReader,
-                                         QObject *parent) : QObject(parent) {
-                                         //TODO does xml stuff need project???
+                                         QXmlStreamReader *xmlReader,
+                                         QObject *parent) : QObject(parent)
+  {
     m_id = new QUuid(QUuid::createUuid());
     m_runTime = "";
     m_name = m_runTime;
     m_inputControlNetFileName = NULL;
     m_outputControl = NULL;
-    m_outputControlName="";
+    m_outputControlName = "";
     m_inputLidarDataFileName = NULL;
     m_outputLidarDataSet = NULL;
     m_statisticsResults = NULL;
@@ -118,10 +121,39 @@ namespace Isis {
     m_images = new QList<ImageList *>;
     m_adjustedImages = new QList<ImageList *>;
 
-    xmlReader->setErrorHandler(new XmlHandler(this, project));
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
+    m_xmlHandlerProject = project;
+    m_xmlHandlerCharacters = "";
+
+    readBundleSolutionInfo(xmlReader);
   }
 
+  void BundleSolutionInfo::readBundleSolutionInfo(QXmlStreamReader *xmlReader) {
+    m_xmlHandlerCharacters = "";
+
+    if (xmlReader->readNextStartElement()) {
+
+      if (xmlReader->name() == "bundleSettings") {
+        // m_xmlHandlerBundleSolutionInfo->m_settings =
+        //     BundleSettingsQsp(new BundleSettings(m_xmlHandlerProject, xmlReader));
+      }
+      else if (xmlReader->name() == "bundleResults") {
+        m_statisticsResults = new BundleResults(xmlReader);
+      }
+      else if (xmlReader->name() == "imageList") {
+        // m_xmlHandlerBundleSolutionInfo->m_adjustedImages->append(
+        //     new ImageList(m_xmlHandlerProject, xmlReader));
+      }
+      else if (xmlReader->name() == "outputControl") {
+        // FileName outputControlPath = FileName(m_xmlHandlerProject->bundleSolutionInfoRoot() + "/"
+        //                                       + m_xmlHandlerBundleSolutionInfo->runTime());
+
+        // m_xmlHandlerBundleSolutionInfo->m_outputControl = new Control(outputControlPath, xmlReader);
+      }
+      else {
+        xmlReader->raiseError(QObject::tr("Incorrect file"));
+      }
+    }
+  }
 
   /**
    * Destructor
@@ -1966,139 +1998,6 @@ namespace Isis {
     }
 
     stream.writeEndElement(); //end bundleSolutionInfo
-  }
-
-
-  /**
-   * Create an XML Handler (reader) that can populate the BundleSolutionInfo class data. See
-   *   BundleSolutionInfo::save() for the expected format.
-   *
-   * @param bundleSolutionInfo The bundle solution we're going to be initializing
-   * @param project The project we are working in
-   */
-  BundleSolutionInfo::XmlHandler::XmlHandler(BundleSolutionInfo *bundleSolutionInfo,
-                                             Project *project) {
-    m_xmlHandlerBundleSolutionInfo = bundleSolutionInfo;
-    m_xmlHandlerProject = project;
-    m_xmlHandlerCharacters = "";
-  }
-
-
-  /**
-   * Destructor
-   */
-  BundleSolutionInfo::XmlHandler::~XmlHandler() {
-  }
-
-
-  /**
-   * Adds characters to m_xmlHandlerCharacters
-   *
-   * @param ch QString of characters to add
-   *
-   * @return @b bool Almost always true. Only false if the characters cannot be read
-   */
-  bool BundleSolutionInfo::XmlHandler::characters(const QString &ch) {
-    m_xmlHandlerCharacters += ch;
-    return XmlStackedHandler::characters(ch);
-  }
-
-
-  /**
-   * Handle an XML start element. This expects <image/> and <displayProperties/> elements.
-   *
-   * @param namespaceURI ???
-   * @param localName The keyword name given to the member variable in the XML.
-   * @param qName ???
-   * @param atts The attribute containing the keyword value for the given local name.
-   *
-   * @return @b bool True if we should continue reading the XML.
-   */
-  bool BundleSolutionInfo::XmlHandler::startElement(const QString &namespaceURI,
-                                                    const QString &localName,
-                                                    const QString &qName,
-                                                    const QXmlAttributes &atts) {
-    m_xmlHandlerCharacters = "";
-
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-
-      if (localName == "bundleSettings") {
-        m_xmlHandlerBundleSolutionInfo->m_settings =
-            BundleSettingsQsp(new BundleSettings(m_xmlHandlerProject, reader()));
-      }
-      else if (localName == "bundleResults") {
-        m_xmlHandlerBundleSolutionInfo->m_statisticsResults = new BundleResults(m_xmlHandlerProject,
-                                                                                reader());
-      }
-      else if (localName == "imageList") {
-        m_xmlHandlerBundleSolutionInfo->m_adjustedImages->append(
-            new ImageList(m_xmlHandlerProject, reader()));
-      }
-      else if (localName == "outputControl") {
-        FileName outputControlPath = FileName(m_xmlHandlerProject->bundleSolutionInfoRoot() + "/"
-                                              + m_xmlHandlerBundleSolutionInfo->runTime());
-
-        m_xmlHandlerBundleSolutionInfo->m_outputControl = new Control(outputControlPath, reader());
-      }
-    }
-    return true;
-  }
-
-
-  /**
-   * Handle an XML end element.
-   *
-   * @param namespaceURI ???
-   * @param localName The keyword name given to the member variable in the XML.
-   * @param qName ???
-   *
-   * @return @b bool Returns XmlStackedHandler's endElement()
-   */
-  bool BundleSolutionInfo::XmlHandler::endElement(const QString &namespaceURI,
-                                                  const QString &localName,
-                                                  const QString &qName) {
-    // This is done for unitTest which has no Project
-    QString projectRoot;
-    if (m_xmlHandlerProject) {
-      projectRoot = m_xmlHandlerProject->projectRoot() + "/";
-    }
-
-    if (localName == "id") {
-      // all constructors assign a Uuid - we need to give it a one from the XML
-      assert(m_xmlHandlerBundleSolutionInfo->m_id);
-      delete m_xmlHandlerBundleSolutionInfo->m_id;
-      m_xmlHandlerBundleSolutionInfo->m_id = new QUuid(m_xmlHandlerCharacters);
-    }
-    else if (localName == "name") {
-      m_xmlHandlerBundleSolutionInfo->m_name = m_xmlHandlerCharacters;
-    }
-    else if (localName == "runTime") {
-      m_xmlHandlerBundleSolutionInfo->m_runTime = m_xmlHandlerCharacters;
-    }
-    else if (localName == "inputFileName") {
-      assert(m_xmlHandlerBundleSolutionInfo->m_inputControlNetFileName == NULL);
-      m_xmlHandlerBundleSolutionInfo->m_inputControlNetFileName = new FileName(
-        projectRoot + m_xmlHandlerCharacters);
-    }
-    else if (localName == "bundleOutTXT") {
-      m_xmlHandlerBundleSolutionInfo->m_txtBundleOutputFilename =
-        projectRoot + m_xmlHandlerCharacters;
-    }
-    else if (localName == "imagesCSV") {
-      m_xmlHandlerBundleSolutionInfo->m_csvSavedImagesFilename =
-        projectRoot + m_xmlHandlerCharacters;
-    }
-    else if (localName == "pointsCSV") {
-      m_xmlHandlerBundleSolutionInfo->m_csvSavedPointsFilename =
-        projectRoot + m_xmlHandlerCharacters;
-    }
-    else if (localName == "residualsCSV") {
-      m_xmlHandlerBundleSolutionInfo->m_csvSavedResidualsFilename =
-        projectRoot + m_xmlHandlerCharacters;
-    }
-
-    m_xmlHandlerCharacters = "";
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
 

@@ -11,6 +11,7 @@ find files of those names at the top level of this repository. **/
 #include <QString>
 #include <QUuid>
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 #include <float.h>
 
@@ -19,7 +20,6 @@ find files of those names at the top level of this repository. **/
 #include "Project.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include "XmlStackedHandlerReader.h"
 
 using namespace std;
 
@@ -32,12 +32,163 @@ namespace Isis {
     Reset(); // initialize
   }
 
-
-  Statistics::Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) {   // TODO: does xml stuff need project???
+  Statistics::Statistics(QXmlStreamReader *xmlReader, QObject *parent) {   // TODO: does xml stuff need project???
 //    m_id = NULL;
     SetValidRange();
     Reset(); // initialize
-    xmlReader->pushContentHandler(new XmlHandler(this, project));   // TODO: does xml stuff need project???
+    readStatistics(xmlReader);
+  }
+
+  void Statistics::readStatistics(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "statistics");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "sum") {
+        try {
+          m_sum = toDouble(xmlReader->readElementText());
+        }
+        catch (IException &e) {
+          m_sum = 0.0;
+        }
+      }
+      else if (xmlReader->qualifiedName() == "sumSquares") {
+        try {
+          m_sumsum = toDouble(xmlReader->readElementText());
+        }
+        catch (IException &e) {
+          m_sumsum = 0.0;
+        }
+      }
+      else if (xmlReader->qualifiedName() == "range") {
+        while (xmlReader->readNextStartElement()) {
+          if (xmlReader->qualifiedName() == "minimum") {
+            try {
+              m_minimum = toDouble(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_minimum = DBL_MAX;
+            }
+          }
+          else if (xmlReader->qualifiedName() == "maximum") {
+            try {
+              m_maximum = toDouble(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_maximum = -DBL_MAX;
+            }
+          }
+          else if (xmlReader->qualifiedName() == "validMinimum") {
+            try {
+              m_validMinimum = toDouble(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_validMinimum = Isis::ValidMinimum;
+            }
+          }
+          else if (xmlReader->qualifiedName() == "validMaximum") {
+            try {
+              m_validMaximum = toDouble(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_validMaximum = Isis::ValidMaximum;
+            }
+          }
+          else {
+            xmlReader->skipCurrentElement();
+          }
+        }
+      }
+      else if (xmlReader->qualifiedName() == "pixelCounts") {
+        while (xmlReader->readNextStartElement()) {
+          if (xmlReader->qualifiedName() == "totalPixels") {
+            try {
+              m_totalPixels = toBigInt(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_totalPixels = 0.0;
+            }
+          }
+          else if (xmlReader->qualifiedName() == "validPixels") {
+            try {
+              m_validPixels = toBigInt(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_validPixels = 0.0;
+            }
+          }
+          else if (xmlReader->qualifiedName() == "nullPixels") {
+            try {
+              m_nullPixels = toBigInt(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_nullPixels = 0.0;
+            }
+
+          }
+          else if (xmlReader->qualifiedName() == "lisPixels") {
+            try {
+              m_lisPixels = toBigInt(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_lisPixels = 0.0;
+            }
+          }
+          else if (xmlReader->qualifiedName() == "lrsPixels") {
+            try {
+              m_lrsPixels = toBigInt(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_lrsPixels = 0.0;
+            }
+          }
+          else if (xmlReader->qualifiedName() == "hisPixels") {
+            try {
+              m_hisPixels = toBigInt(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_hisPixels = 0.0;
+            }
+          }
+          else if (xmlReader->qualifiedName() == "hrsPixels") {
+            try {
+              m_hrsPixels = toBigInt(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_hrsPixels = 0.0;
+            }
+          }
+          else if (xmlReader->qualifiedName() == "underRangePixels") {
+            try {
+              m_underRangePixels = toBigInt(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_underRangePixels = 0.0;
+            }
+          }
+          else if (xmlReader->qualifiedName() == "overRangePixels") {
+            try {
+              m_overRangePixels = toBigInt(xmlReader->readElementText());
+            }
+            catch (IException &e) {
+              m_overRangePixels = 0.0;
+            }
+          }
+          else {
+            xmlReader->skipCurrentElement();
+          }
+        }
+      }
+      else if (xmlReader->qualifiedName() == "removedData") {
+        try {
+          m_removedData = toBool(xmlReader->readElementText());
+        }
+        catch (IException &e) {
+          m_removedData = false;
+        }
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
   }
 
   /**
@@ -753,99 +904,6 @@ namespace Isis {
     stream.writeTextElement("removedData", toString(m_removedData));
     stream.writeEndElement(); // end statistics
 
-  }
-
-
-  Statistics::XmlHandler::XmlHandler(Statistics *statistics, Project *project) {   // TODO: does xml stuff need project???
-    m_xmlHandlerStatistics = statistics;
-    m_xmlHandlerProject = project;   // TODO: does xml stuff need project???
-    m_xmlHandlerCharacters = "";
-  }
-
-
-  Statistics::XmlHandler::~XmlHandler() {
-    // do not delete this pointer... we don't own it, do we??? passed into StatCumProbDistDynCalc constructor as pointer
-    // delete m_xmlHandlerProject;    // TODO: does xml stuff need project???
-    m_xmlHandlerProject = NULL;
-  }
-
-
-  bool Statistics::XmlHandler::startElement(const QString &namespaceURI, 
-                                                                const QString &localName,
-                                                                const QString &qName,
-                                                                const QXmlAttributes &atts) {
-    m_xmlHandlerCharacters = "";
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      // no element attibutes to evaluate
-    }
-    return true;
-  }
-
-
-  bool Statistics::XmlHandler::characters(const QString &ch) {
-    m_xmlHandlerCharacters += ch;
-    return XmlStackedHandler::characters(ch);
-  }
-
-
-  bool Statistics::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                     const QString &qName) {
-    if (!m_xmlHandlerCharacters.isEmpty()) {
-      if (localName == "id") {
-//        m_xmlHandlerStatistics->m_id = NULL;
-//        m_xmlHandlerStatistics->m_id = new QUuid(m_xmlHandlerCharacters);
-      }
-      if (localName == "sum") {
-        m_xmlHandlerStatistics->m_sum = toDouble(m_xmlHandlerCharacters);
-      }
-      if (localName == "sumSquares") {
-        m_xmlHandlerStatistics->m_sumsum = toDouble(m_xmlHandlerCharacters);
-      }
-      if (localName == "minimum") {
-        m_xmlHandlerStatistics->m_minimum = toDouble(m_xmlHandlerCharacters);
-      }
-      if (localName == "maximum") {
-        m_xmlHandlerStatistics->m_maximum = toDouble(m_xmlHandlerCharacters);
-      }
-      if (localName == "validMinimum") {
-        m_xmlHandlerStatistics->m_validMinimum = toDouble(m_xmlHandlerCharacters);
-      }
-      if (localName == "validMaximum") {
-        m_xmlHandlerStatistics->m_validMaximum = toDouble(m_xmlHandlerCharacters);
-      }
-      if (localName == "totalPixels") {
-        m_xmlHandlerStatistics->m_totalPixels = toBigInt(m_xmlHandlerCharacters);
-      }
-      if (localName == "validPixels") {
-        m_xmlHandlerStatistics->m_validPixels = toBigInt(m_xmlHandlerCharacters);
-      }
-      if (localName == "nullPixels") {
-        m_xmlHandlerStatistics->m_nullPixels = toBigInt(m_xmlHandlerCharacters);
-      }
-      if (localName == "lisPixels") {
-        m_xmlHandlerStatistics->m_lisPixels = toBigInt(m_xmlHandlerCharacters);
-      }
-      if (localName == "lrsPixels") {
-        m_xmlHandlerStatistics->m_lrsPixels = toBigInt(m_xmlHandlerCharacters);
-      }
-      if (localName == "hisPixels") {
-        m_xmlHandlerStatistics->m_hisPixels = toBigInt(m_xmlHandlerCharacters);
-      }
-      if (localName == "hrsPixels") {
-        m_xmlHandlerStatistics->m_hrsPixels = toBigInt(m_xmlHandlerCharacters);
-      }
-      if (localName == "underRangePixels") {
-        m_xmlHandlerStatistics->m_underRangePixels = toBigInt(m_xmlHandlerCharacters);
-      }
-      if (localName == "overRangePixels") {
-        m_xmlHandlerStatistics->m_overRangePixels = toBigInt(m_xmlHandlerCharacters);
-      }
-      if (localName == "removedData") {
-        m_xmlHandlerStatistics->m_removedData = toBool(m_xmlHandlerCharacters);
-      }
-      m_xmlHandlerCharacters = "";
-    }
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
 
