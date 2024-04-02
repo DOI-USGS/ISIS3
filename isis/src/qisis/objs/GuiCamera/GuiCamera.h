@@ -110,32 +110,6 @@ namespace Isis {
 
 
     private:
-      /**
-       *
-       * @author 2015-06-08 Ken Edmundson
-       *
-       * @internal
-       */
-//      class XmlHandler : public XmlStackedHandler {
-//        public:
-//          XmlHandler(GuiCamera *GuiCamera, Project *project);  // TODO: does xml stuff need project???
-//          ~XmlHandler();
-
-//          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-//                                    const QString &qName, const QXmlAttributes &atts);
-//          virtual bool characters(const QString &ch);
-//          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-//                                    const QString &qName);
-
-//        private:
-//          Q_DISABLE_COPY(XmlHandler);
-
-//          GuiCamera *m_xmlHandlerGuiCamera;
-//          Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
-//          QString m_xmlHandlerCharacters;
-//      };
-
-    private:
       GuiCamera(const GuiCamera &other);          // NOTE: copy constructor & assignment operators
       GuiCamera &operator=(const GuiCamera &src);   // are private so compiler will generate error
                                                     // if trying to use them (because parent is

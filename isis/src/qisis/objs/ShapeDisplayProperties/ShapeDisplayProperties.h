@@ -102,34 +102,6 @@ namespace Isis {
       void toggleShowLabel();
 
     private:
-      /**
-       * @brief This class is used for processing an XML file containing information
-       * about a WorkOrder.
-       *
-       * @author 2012-??-?? Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(ShapeDisplayProperties *displayProperties);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-
-          virtual bool characters(const QString &ch);
-
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          ShapeDisplayProperties *m_displayProperties;
-          QString m_hexData;
-      };
-
-    private:
       ShapeDisplayProperties(const ShapeDisplayProperties &);
       ShapeDisplayProperties &operator=(const ShapeDisplayProperties &);
 

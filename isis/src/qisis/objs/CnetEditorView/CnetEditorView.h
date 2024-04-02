@@ -80,29 +80,6 @@ class CnetEditorView : public AbstractProjectItemView {
     void createMenus();
     void leaveEvent(QEvent *event);
 
-
-      /**
-       * @author 2012-09-?? Steven Lambright
-       *
-       * @internal
-       *   @history 2018-04-04 Tracie Sucharski - Implemented for CnetEditorView
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(CnetEditorView *cnetEditorView);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          CnetEditorView *m_cnetEditorView; //!< The view we are working with
-      };
-
   private:
     QPointer<CnetEditorWidget> m_cnetEditorWidget;
     QPointer<Control> m_control;

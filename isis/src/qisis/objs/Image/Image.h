@@ -152,40 +152,6 @@ namespace Isis {
       void initCamStats();
       void initQuickFootprint();
 
-
-    private:
-      /**
-       * @brief Process XML in a stack-oriented fashion
-       *
-       * Child class for XmlStackedHandler which is used to process XML in
-       * a stack-oriented way.  It's been modified to process an Image object
-       * object.
-       * @author 2012-??-?? Steven Lambright
-       *
-       * @history 2016-06-23 Tyler Wilson - Added documention to the member functions.
-       *                        Fixes #3950.
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(Image *image, FileName imageFolder);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          Image *m_image;  //!< Pointer to the Image.
-          FileName m_imageFolder;  //!< The Name/path of the image.
-          QString m_characters;  //!< Character data storage found in the content of XML elements.
-
-      };
-
     private:
       Image(const Image &other);
       Image &operator=(const Image &rhs);

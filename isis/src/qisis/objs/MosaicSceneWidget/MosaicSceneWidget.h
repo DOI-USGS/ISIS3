@@ -324,36 +324,6 @@ namespace Isis {
                                     MosaicSceneItem *second);
 
     private:
-      /**
-       * @author 2012-09-?? Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(MosaicSceneWidget *scene);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          QString m_characterData;
-          MosaicSceneWidget *m_scene;
-
-          int m_scrollBarXValue;
-          int m_scrollBarYValue;
-
-          ImageList *m_imagesToAdd;
-          QList<double> m_imageZValues;
-      };
-
-    private:
       Directory *m_directory;
 
       bool m_cubesSelectable;

@@ -101,31 +101,6 @@ namespace Isis {
       void toggleShowLabel();
 
     private:
-      /**
-       * @author 2012-??-?? ???
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(ControlDisplayProperties *displayProperties);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-
-          virtual bool characters(const QString &ch);
-
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          ControlDisplayProperties *m_displayProperties;
-          QString m_hexData;
-      };
-
-    private:
       ControlDisplayProperties(const ControlDisplayProperties &);
       ControlDisplayProperties &operator=(const ControlDisplayProperties &);
 

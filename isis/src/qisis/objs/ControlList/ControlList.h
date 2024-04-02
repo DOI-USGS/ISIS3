@@ -135,34 +135,6 @@ namespace Isis {
           FileName m_newProjectRoot; //!< The filename of the destination project's root
       };
 
-      /**
-       * Nested class used to write the ControlList object information to an XML file for the
-       * purposes of saving an restoring the state of the object.
-       *
-       * @see ControlList::save for the expected format
-       *
-       * @author 2012-09-27 Tracie Sucharski - Adapted from ImageList::XmlHandler
-       *
-       * @internal
-       *   @history 2012-09-27 Tracie Sucharski - Original version.
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(ControlList *controlList, Project *project);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          ControlList *m_controlList; //!< Control list to be read or written
-          Project *m_project; //!< Project that contains the control list
-      };
-
-
     private:
       QString m_name; //!< Name of the ControlList
 

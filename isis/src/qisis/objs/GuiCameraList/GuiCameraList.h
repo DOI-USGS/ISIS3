@@ -101,33 +101,6 @@ namespace Isis {
        */
       void countChanged(int newCount);
 
-    private:
-      /**
-       * XmlHandler used to save to xml files.
-       * 
-       * JAM - The save() method that uses this is currently not implemented.
-       * 
-       * @author 2012-07-01 Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(GuiCameraList *GuiCameraList, Project *project);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          GuiCameraList *m_GuiCameraList;
-          Project *m_project;
-      };
-
-
       /**
        * This functor is used for copying the GuiCamera objects between two projects quickly. This is designed
        *   to work with QtConcurrentMap, though the results are all NULL (QtConcurrentMap is much

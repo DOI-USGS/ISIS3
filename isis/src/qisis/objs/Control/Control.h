@@ -94,30 +94,6 @@ namespace Isis {
       void closeControlNet();
 
     private:
-      /**
-       * Nested class used to write the Control object information to an XML file for the
-       * purpose of saving and restoring the state of the project.
-       *
-       * @author 2012-??-?? Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(Control *control, FileName cnetFolder);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          Control *m_xmlHandlerControl;        /**< A pointer to the Control object to be read or
-                                                    written.*/
-          FileName m_xmlHandlerCnetFolderName; /**< The name of the folder for the control xml.*/
-      };
-
-    private:
       Control(const Control &other);
       Control &operator=(const Control &rhs);
 

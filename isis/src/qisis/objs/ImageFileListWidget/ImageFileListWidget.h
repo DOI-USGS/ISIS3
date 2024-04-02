@@ -97,22 +97,6 @@ namespace Isis {
       void restoreExpandedStates(QVariant expandedStates, QTreeWidgetItem *item);
       QVariant saveExpandedStates(QTreeWidgetItem *item);
 
-    private:
-      /**
-       * @author 2012-09-?? Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(ImageFileListWidget *fileList);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
         private:
           Q_DISABLE_COPY(XmlHandler);
 

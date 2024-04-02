@@ -127,30 +127,6 @@ namespace Isis {
       geos::geom::MultiPolygon *createFootprint(QMutex *cameraMutex);
       void initQuickFootprint();
 
-      /**
-       *
-       * @author 2012-??-?? Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(Shape *shape, FileName shapeFolder);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          Shape *m_shape;
-          FileName m_shapeFolder;
-          QString m_characters;
-      };
-
     private:
       SpiceInt *m_bodyCode;    /**< The NaifBodyCode value, if it exists in the
                                     labels. Otherwise, if the target is sky,
