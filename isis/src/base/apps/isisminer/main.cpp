@@ -66,10 +66,10 @@ void IsisMain() {
     globals->add("PARAMETERS", parameters);
     
     // Split by separate parameters
-    QStringList parmlist = parameters.split("@", QString::SkipEmptyParts);
+    QStringList parmlist = parameters.split("@", Qt::SkipEmptyParts);
     BOOST_FOREACH (QString parm, parmlist) {
       // Split values from keyword name
-      QStringList keyval = parm.split(":", QString::SkipEmptyParts);
+      QStringList keyval = parm.split(":", Qt::SkipEmptyParts);
       if ( keyval.size() != 2 ) {
         QString mess = "Ill-formed PARAMETERS (" + parm + ") - use form @key:val";
         throw IException(IException::User, mess, _FILEINFO_);
@@ -77,7 +77,7 @@ void IsisMain() {
 
       // Now split multi string values and construct the Pvl keyword
       QString keyname = keyval[0];
-      QStringList values =  keyval[1].split(",", QString::SkipEmptyParts);
+      QStringList values =  keyval[1].split(",", Qt::SkipEmptyParts);
       PvlKeyword keyword(keyname);
       BOOST_FOREACH ( QString val, values) {
         keyword.addValue(val);
