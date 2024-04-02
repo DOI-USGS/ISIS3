@@ -38,8 +38,6 @@ find files of those names at the top level of this repository. **/
      public:
        TemplateList(QString name, QString type, QString path, QObject *parent = NULL);
        explicit TemplateList(QObject *parent = NULL);
-       explicit TemplateList(Project *project, XmlStackedHandlerReader *xmlReader,
-                            QObject *parent = NULL);
        TemplateList(const TemplateList &);
        ~TemplateList();
 

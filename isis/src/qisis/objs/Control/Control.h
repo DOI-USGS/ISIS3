@@ -71,7 +71,6 @@ namespace Isis {
       explicit Control(QString cnetFileName, QObject *parent = 0);
       explicit Control(Project *project, QString cnetFileName, QObject *parent = 0);
       explicit Control(ControlNet *controlNet, QString cnetFileName, QObject *parent = 0);
-      Control(FileName cnetFolder, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
       ~Control();
 
       ControlNet *controlNet();

@@ -24,7 +24,6 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 #include "Project.h"
 #include "TargetBody.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -58,19 +57,6 @@ namespace Isis {
    */
   TargetBodyList::TargetBodyList(QList<TargetBodyQsp> targetBodys, QObject *parent) : QObject(parent) {
     append(targetBodys);
-  }
-
-
-  /**
-   * Create an image list from XML
-   *
-   * @param project The project with the target body list
-   * @param xmlReader The XML reader currently at an <TargetBodyList /> tag.
-   * @param parent The Qt-relationship parent
-   */
-  TargetBodyList::TargetBodyList(Project *project, XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent) : QObject(parent) {
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 
@@ -851,100 +837,4 @@ namespace Isis {
 //    return results;
 //  }
 
-
-  /**
-   * Create an XML Handler (reader) that can populate the TargetBodyList class data. See
-   *   TargetBodyList::save() for the expected format.
-   *
-   * @param TargetBodyList The target body list we're going to be initializing
-   * @param project The project that contains the target body list
-   */
-  TargetBodyList::XmlHandler::XmlHandler(TargetBodyList *TargetBodyList, Project *project) {
-    m_TargetBodyList = TargetBodyList;
-    m_project = project;
-  }
-
-
-  /**
-   * Handle an XML start element. This expects <TargetBodyList/> and <target/> elements
-   *   (it reads both the project XML and the targets.xml file).
-   *
-   * @param namespaceURI ???
-   * @param localName The name of the element the XmlReader is at
-   * @param qName ???
-   * @param atts The attributes of the element the XmlReader is at
-   *
-   * @return @b bool If we should continue reading the XML (usually true).
-   */
-  bool TargetBodyList::XmlHandler::startElement(const QString &namespaceURI,
-                                                const QString &localName,
-                                                const QString &qName,
-                                                const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "TargetBodyList") {
-        QString name = atts.value("name");
-        QString path = atts.value("path");
-
-        if (!name.isEmpty()) {
-          m_TargetBodyList->setName(name);
-        }
-
-        if (!path.isEmpty()) {
-          m_TargetBodyList->setPath(path);
-        }
-      }
-      else if (localName == "target") {
-//        m_TargetBodyList->append(TargetBodyQsp(new TargetBody(m_project->targetBodyRoot()
-//                                           + "/" + m_TargetBodyList->path(),
-//                                           reader())));
-      }
-    }
-
-    return true;
-  }
-
-
-  /**
-   * Handle an XML end element. This handles <TargetBodyList /> by opening and reading the
-   *   images.xml file.
-   *
-   * @param namespaceURI ???
-   * @param localName The name of the element the XmlReader is at
-   * @param qName ???
-   *
-   * @return @b bool If we should continue reading the XML (usually true).
-   *
-   * @throws IException::Io "Unable to open with read access"
-   * @throws IException::Io "Failed to open target body list XML"
-   */
-  bool TargetBodyList::XmlHandler::endElement(const QString &namespaceURI,
-                                              const QString &localName,
-                                              const QString &qName) {
-    if (localName == "TargetBodyList") {
-      XmlHandler handler(m_TargetBodyList, m_project);
-
-      XmlStackedHandlerReader reader;
-      reader.pushContentHandler(&handler);
-      reader.setErrorHandler(&handler);
-
-      QString TargetBodyListXmlPath = m_project->targetBodyRoot() + "/" +
-                                m_TargetBodyList->path() + "/targets.xml";
-      QFile file(TargetBodyListXmlPath);
-
-      if (!file.open(QFile::ReadOnly)) {
-        throw IException(IException::Io,
-                         QString("Unable to open [%1] with read access")
-                           .arg(TargetBodyListXmlPath),
-                         _FILEINFO_);
-      }
-
-      QXmlInputSource xmlInputSource(&file);
-      if (!reader.parse(xmlInputSource))
-        throw IException(IException::Io,
-                         tr("Failed to open target body list XML [%1]").arg(TargetBodyListXmlPath),
-                         _FILEINFO_);
-    }
-
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
-  }
 }

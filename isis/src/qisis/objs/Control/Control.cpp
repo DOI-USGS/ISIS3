@@ -23,7 +23,6 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 #include "Project.h"
 #include "PvlObject.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -98,25 +97,6 @@ namespace Isis {
         = new ControlDisplayProperties(FileName(m_fileName).name(), this);
 
     m_id = new QUuid(QUuid::createUuid());
-  }
-
-
-  /**
-   * Construct this control from XML.
-   *
-   * @param cnetFolder Location of control xml
-   * @param xmlReader An XML reader that's up to an <control/> tag.
-   * @param parent The Qt-relationship parent
-   */
-  Control::Control(FileName cnetFolder, XmlStackedHandlerReader *xmlReader, QObject *parent) :
-      QObject(parent) {
-    m_controlNet = NULL;
-    m_displayProperties = NULL;
-    m_id = NULL;
-    m_project = NULL;
-    m_modified = false;
-
-    xmlReader->pushContentHandler(new XmlHandler(this, cnetFolder));
   }
 
 
@@ -380,57 +360,5 @@ namespace Isis {
     m_displayProperties->save(stream, project, newProjectRoot);
 
     stream.writeEndElement();
-  }
-
-
-  /**
-   * Constructor for the Control object's XmlHandler
-   *
-   * @param control A pointer to the Control object.
-   * @param cnetFolder The name of the folder for the Control xml
-   *
-   */
-  Control::XmlHandler::XmlHandler(Control *control, FileName cnetFolder) {
-    m_xmlHandlerControl = control;
-    m_xmlHandlerCnetFolderName = cnetFolder;
-  }
-
-
-  /**
-   * Method to read the given XML formatted attribute for a Control object
-   * into the XmlHandler.
-   *
-   * @param namespaceURI ???
-   * @param localName The keyword name given to the member variable in the XML.
-   * @param qName ???
-   * @param atts The attribute containing the keyword value for the given
-   *             localName.
-   *
-   * @return @b bool Indicates whether the localName is recognized.
-   */
-  bool Control::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                         const QString &qName, const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "controlNet") {
-        QString id = atts.value("id");
-        QString path = atts.value("path");
-        QString fileName = atts.value("fileName");
-
-        if (!id.isEmpty()) {
-          delete m_xmlHandlerControl->m_id;
-          m_xmlHandlerControl->m_id = NULL;
-          m_xmlHandlerControl->m_id = new QUuid(id.toLatin1());
-        }
-
-        if (!fileName.isEmpty()) {
-          m_xmlHandlerControl->m_fileName = m_xmlHandlerCnetFolderName.expanded() + "/" + fileName;
-        }
-      }
-      else if (localName == "displayProperties") {
-        m_xmlHandlerControl->m_displayProperties = new ControlDisplayProperties(reader());
-      }
-    }
-
-    return true;
   }
 }

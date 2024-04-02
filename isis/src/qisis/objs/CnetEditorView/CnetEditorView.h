@@ -30,7 +30,6 @@ namespace Isis {
   class FileName;
   class Project;
   class ToolPad;
-  class XmlStackedHandlerReader;
   class ProjectItemViewMenu;
 
   /**
@@ -74,7 +73,6 @@ class CnetEditorView : public AbstractProjectItemView {
     CnetEditorWidget *cnetEditorWidget();
     Control *control();
 
-    void load(XmlStackedHandlerReader *xmlReader);
     void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
   private:

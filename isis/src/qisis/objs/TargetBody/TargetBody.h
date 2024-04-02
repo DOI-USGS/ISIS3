@@ -37,7 +37,6 @@ namespace Isis {
   class Project;  // TODO: does xml stuff need project???
   class PvlObject;
   class TargetBodyDisplayProperties;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Container class for TargetBody.
@@ -68,9 +67,6 @@ namespace Isis {
 
     public:
       TargetBody(Target *target, QObject *parent = 0);
-      //TargetBody(BundleTargetBodyQsp bundleTargetBody, QObject *parent = 0);
-//      TargetBody(Project *project, XmlStackedHandlerReader *xmlReader,
-//                 QObject *parent = 0);  // TODO: does xml stuff need project???
       ~TargetBody();
 
       bool operator==(const TargetBody &src) const;

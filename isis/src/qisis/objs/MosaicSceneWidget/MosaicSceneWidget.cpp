@@ -55,7 +55,6 @@
 #include "TextFile.h"
 #include "Target.h"
 #include "ToolPad.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -614,11 +613,6 @@ namespace Isis {
         m_projectViewTransform = new PvlObject(positionInfo);
       }
     }
-  }
-
-
-  void MosaicSceneWidget::load(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 
@@ -2102,120 +2096,5 @@ namespace Isis {
   bool MosaicSceneWidget::zOrderGreaterThan(MosaicSceneItem *first,
                                             MosaicSceneItem *second) {
     return first->zValue() > second->zValue();
-  }
-
-
-  MosaicSceneWidget::XmlHandler::XmlHandler(MosaicSceneWidget *scene) {
-    m_scene = scene;
-    m_scrollBarXValue = -1;
-    m_scrollBarYValue = -1;
-    m_imagesToAdd = NULL;
-
-    m_imagesToAdd = new ImageList;
-  }
-
-
-  MosaicSceneWidget::XmlHandler::~XmlHandler() {
-    delete m_imagesToAdd;
-    m_imagesToAdd = NULL;
-  }
-
-
-  bool MosaicSceneWidget::XmlHandler::startElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName, const QXmlAttributes &atts) {
-    bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
-
-    m_characterData = "";
-
-    if (result) {
-      if (localName == "image" && m_scene->m_directory) {
-        QString id = atts.value("id");
-        double zValue = atts.value("zValue").toDouble();
-        Image *image = m_scene->m_directory->project()->image(id);
-        // If Image for id doesn't exist, check shapes.  If corresponds to Shape, new Image will
-        // need to be created.
-        if (!image) {
-          Shape *shape = m_scene->m_directory->project()->shape(id);
-          if (shape) {
-            image = new Image(shape->cube(), shape->footprint(), id);
-          }
-        }
-        if (image) {
-          m_imagesToAdd->append(image);
-          m_imageZValues.append(zValue);
-//           m_scene->cubeToMosaic(image)->setZValue(zValue);
-        }
-      }
-      else if (localName == "viewTransform") {
-        m_scrollBarXValue = atts.value("scrollBarXValue").toInt();
-        m_scrollBarYValue = atts.value("scrollBarYValue").toInt();
-      }
-    }
-
-    return result;
-  }
-
-
-  bool MosaicSceneWidget::XmlHandler::characters(const QString &ch) {
-    bool result = XmlStackedHandler::characters(ch);
-
-    if (result) {
-      m_characterData += ch;
-    }
-
-    return result;
-  }
-
-
-  bool MosaicSceneWidget::XmlHandler::endElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName) {
-    bool result = XmlStackedHandler::endElement(namespaceURI, localName, qName);
-
-    if (result) {
-      if (localName == "projection") {
-        std::stringstream strStream(m_characterData.toStdString());
-        PvlGroup mappingGroup;
-        strStream >> mappingGroup;
-        m_scene->setProjection(mappingGroup);
-      }
-      else if (localName == "viewTransform") {
-        QByteArray hexValues(m_characterData.toLatin1());
-        QDataStream transformStream(QByteArray::fromHex(hexValues));
-
-        QTransform viewTransform;
-        transformStream >> viewTransform;
-        m_scene->getView()->show();
-        QCoreApplication::processEvents();
-        m_scene->getView()->setTransform(viewTransform);
-        m_scene->getView()->horizontalScrollBar()->setValue(m_scrollBarXValue);
-        m_scene->getView()->verticalScrollBar()->setValue(m_scrollBarYValue);
-      }
-      else if (localName == "toolData") {
-        PvlObject toolSettings;
-        std::stringstream strStream(m_characterData.toStdString());
-        strStream >> toolSettings;
-
-        foreach (MosaicTool *tool, *m_scene->m_tools) {
-          if (tool->projectPvlObjectName() == toolSettings.name()) {
-            tool->fromPvl(toolSettings);
-          }
-        }
-      }
-      else if (localName == "images" && m_imagesToAdd->count()) {
-        m_scene->addImages(*m_imagesToAdd);
-
-        for (int i = 0; i < m_imageZValues.count(); i++) {
-          m_scene->cubeToMosaic(m_imagesToAdd->at(i))->setZValue(m_imageZValues[i]);
-          m_scene->m_currentMinimumFootprintZ = qMin(m_scene->m_currentMinimumFootprintZ,
-              m_imageZValues[i]);
-          m_scene->m_currentMaximumFootprintZ = qMax(m_scene->m_currentMaximumFootprintZ,
-              m_imageZValues[i]);
-        }
-      }
-    }
-
-    m_characterData = "";
-
-    return result;
   }
 }

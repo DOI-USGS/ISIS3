@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
  #include <QObject>
  #include <QString>
  #include <QXmlStreamWriter>
+ #include <QXmlStreamReader>
 
  #include "FileName.h"
  #include "XmlStackedHandler.h"
@@ -32,7 +33,7 @@ find files of those names at the top level of this repository. **/
 
    public:
      explicit Template(QString fileName, QString templateType, QString importName, QObject *parent = 0);
-     Template(FileName templateFolder, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
+     Template(FileName templateFolder, QXmlStreamReader *xmlReader, QObject *parent = 0);
      ~Template();
 
      QString importName() const;

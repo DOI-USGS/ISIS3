@@ -35,7 +35,6 @@ namespace Isis {
       Q_OBJECT
     public:
       DisplayProperties(QString displayName, QObject *parent = NULL);
-      DisplayProperties(XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
       virtual ~DisplayProperties();
 
       void fromPvl(const PvlObject &pvl);

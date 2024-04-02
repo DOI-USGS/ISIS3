@@ -24,7 +24,6 @@ namespace Isis {
   class Project;
   class Pvl;
   class PvlObject;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief This is the GUI communication mechanism for shape objects.
@@ -76,7 +75,6 @@ namespace Isis {
 
 
       ShapeDisplayProperties(QString displayName, QObject *parent = NULL);
-      ShapeDisplayProperties(XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
       virtual ~ShapeDisplayProperties();
 
 //      void fromPvl(const PvlObject &pvl);

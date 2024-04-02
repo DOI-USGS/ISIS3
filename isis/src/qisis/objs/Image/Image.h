@@ -52,7 +52,6 @@ namespace Isis {
   class ImageDisplayProperties;
   class Project;
   class PvlObject;
-  class XmlStackedHandlerReader;
 
   /**
    * This represents a cube in a project-based GUI interface. The actual cube doesn't have to be
@@ -111,7 +110,6 @@ namespace Isis {
       explicit Image(Cube *imageCube, QObject *parent = 0);
       explicit Image(Cube *imageCube, geos::geom::MultiPolygon *footprint, QString id,
                      QObject *parent = 0);
-      Image(FileName imageFolder, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
       ~Image();
 
       void fromPvl(const PvlObject &pvl);

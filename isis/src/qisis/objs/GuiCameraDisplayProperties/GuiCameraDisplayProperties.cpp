@@ -12,7 +12,6 @@
 
 #include "FileName.h"
 #include "Pvl.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -33,21 +32,6 @@ namespace Isis {
     setSelected(false);
 
     setValue(Color, QVariant::fromValue(randomColor()));
-  }
-
-
-  /**
-   * @brief GuiCameraDisplayProperties constructor
-   * @param xmlReader  XML reader class for loading the Gui Camera Display Properties
-   * @param parent
-   */
-
-  GuiCameraDisplayProperties::GuiCameraDisplayProperties(XmlStackedHandlerReader *xmlReader,
-      QObject *parent) : DisplayProperties("", parent) {
-    m_propertiesUsed = None;
-    m_propertyValues = new QMap<int, QVariant>;
-
-    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 
@@ -213,86 +197,6 @@ namespace Isis {
     foreach(display, displays) {
       display->setShowLabel(value);
     }
-  }
-
-
-  /**
-   * @brief Sets the GuiCameraDisplayProperties variable pointer.
-   * @param displayProperties  The new pointer.
-   */
-
-  GuiCameraDisplayProperties::XmlHandler::XmlHandler(GuiCameraDisplayProperties *displayProperties) {
-    m_displayProperties = displayProperties;
-  }
-
-
-  /**
-   * @brief The XML reader invokes this method at the start of every element in the
-   *        XML document.
-   * A quick example using this function:
-   *     startElement("xsl","stylesheet","xsl:stylesheet",attributes)
-   *
-   * @param namespaceURI The Uniform Resource Identifier of the element's namespace
-   * @param localName The local name string
-   * @param qName The XML qualified string (or empty, if QNames are not available).
-   * @param atts The XML attributes attached to each element
-   * @return @b bool  Returns True signalling to the reader the start of a valid XML element.  If
-   * False is returned, something bad happened.
-   *
-   */
-  bool GuiCameraDisplayProperties::XmlHandler::startElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName, const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "displayProperties") {
-        QString displayName = atts.value("displayName");
-
-        if (!displayName.isEmpty()) {
-          m_displayProperties->setDisplayName(displayName);
-        }
-      }
-    }
-
-    return true;
-  }
-
-
-  /**
-   * @brief This implementation of a virtual function calls
-   * QXmlDefaultHandler::characters(QString &ch)
-   * which in turn calls QXmlContentHandler::characters(QString &ch) which
-   * is called when the XML processor has parsed a chunk of character data.
-   * @see XmlStackedHandler, QXmlDefaultHandler,QXmlContentHandler
-   * @param ch The character data.
-   * @return @b bool Returns True if there were no problems with the character processing.
-   * It returns False if there was a problem, and the XML reader stops.
-   */
-  bool GuiCameraDisplayProperties::XmlHandler::characters(const QString &ch) {
-    m_hexData += ch;
-
-    return XmlStackedHandler::characters(ch);
-  }
-
-
-  /**
-   * @brief The XML reader invokes this method at the end of every element in the
-   *        XML document.
-   * @param namespaceURI  The Uniform Resource Identifier of the namespace (eg. "xmlns")
-   * @param localName The local name string (eg. "xhtml")
-   * @param qName The XML qualified string (eg.  "xmlns:xhtml"). This can be empty if
-   *        QNames are not available.
-   * @return @b bool If this function returns True, then a signal is sent to the reader indicating
-   * the end of the element.  If this function returns False, something bad
-   * happened and processing stops.
-   */
-  bool GuiCameraDisplayProperties::XmlHandler::endElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName) {
-    if (localName == "displayProperties") {
-      QByteArray hexValues(m_hexData.toLatin1());
-      QDataStream valuesStream(QByteArray::fromHex(hexValues));
-      valuesStream >> *m_displayProperties->m_propertyValues;
-    }
-
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
 

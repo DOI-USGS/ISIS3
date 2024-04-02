@@ -56,7 +56,6 @@ find files of those names at the top level of this repository. **/
 #include "TableViewHeader.h"
 #include "TreeView.h"
 #include "XmlStackedHandler.h"
-#include "XmlStackedHandlerReader.h"
 
 
 namespace Isis {

@@ -19,7 +19,6 @@ class QXmlStreamWriter;
 
 namespace Isis {
   class FileName;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Internalizes a list of images and allows for operations on the entire list
@@ -61,8 +60,6 @@ namespace Isis {
       ImageList(QString name, QString path, QObject *parent = NULL);
       explicit ImageList(QObject *parent = NULL);
       explicit ImageList(QList<Image *>, QObject *parent = NULL);
-      explicit ImageList(Project *project,
-                         XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
       explicit ImageList(QStringList &);
       ImageList(const ImageList &);
       ~ImageList();

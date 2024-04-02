@@ -16,7 +16,7 @@ find files of those names at the top level of this repository. **/
 #include <QMetaType>
 #include <QPointer>
 #include <QUndoCommand>
-
+#include <QXmlStreamReader>
 
 
 #include "CorrelationMatrix.h"
@@ -39,7 +39,6 @@ namespace Isis {
   class ProjectItem;
   class ShapeList;
   class Template;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Provide Undo/redo abilities, serialization, and history for an operation.
@@ -357,7 +356,6 @@ namespace Isis {
       virtual bool isExecutable(FileItemQsp fileItem);
       virtual bool isExecutable(ProjectItem *item);
 
-      void read(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream) const;
 
       virtual void setData(Context);

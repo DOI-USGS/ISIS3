@@ -17,7 +17,6 @@ class QXmlStreamWriter;
 
 namespace Isis {
   class FileName;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Internalizes a list of shapes and allows for operations on the entire list
@@ -37,8 +36,6 @@ namespace Isis {
       ShapeList(QString name, QString path, QObject *parent = NULL);
       explicit ShapeList(QObject *parent = NULL);
       explicit ShapeList(QList<Shape *>, QObject *parent = NULL);
-      explicit ShapeList(Project *project,
-                         XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
       explicit ShapeList(QStringList &);
       ShapeList(const ShapeList &);
       ~ShapeList();

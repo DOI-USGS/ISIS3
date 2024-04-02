@@ -24,7 +24,6 @@ namespace Isis {
   class Project;
   class Pvl;
   class PvlObject;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief This is the GUI communication mechanism for target body objects.
@@ -79,7 +78,6 @@ namespace Isis {
 
 
       TargetBodyDisplayProperties(QString displayName, QObject *parent = NULL);
-      TargetBodyDisplayProperties(XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
       virtual ~TargetBodyDisplayProperties();
 
 //      void fromPvl(const PvlObject &pvl);

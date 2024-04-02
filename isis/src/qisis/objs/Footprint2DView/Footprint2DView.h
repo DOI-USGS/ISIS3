@@ -34,7 +34,6 @@ namespace Isis {
   class MosaicSceneWidget;
   class Project;
   class ToolPad;
-  class XmlStackedHandlerReader;
 
   /**
    * View for displaying footprints of images in a QMos like way.
@@ -110,7 +109,6 @@ namespace Isis {
       MosaicSceneWidget *mosaicSceneWidget();
       ImageFileListWidget *fileListWidget();
 
-      void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
     signals:

@@ -45,7 +45,6 @@ namespace Isis {
   class GuiCameraDisplayProperties;
   class Project;  // TODO: does xml stuff need project???
   class PvlObject;  
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Container class for GuiCamera.
@@ -73,8 +72,6 @@ namespace Isis {
     Q_OBJECT
     public:
       GuiCamera(Camera *camera, QObject *parent = 0);
-//      GuiCamera(Project *project, XmlStackedHandlerReader *xmlReader,
-//                 QObject *parent = 0);  // TODO: does xml stuff need project???
       ~GuiCamera();
 
       bool operator==(const GuiCamera &srcGuiCamera) const;
