@@ -184,14 +184,14 @@ namespace Isis {
 
     int w = 0;
     for(int i = minimum(); i <= maximum(); i++) {
-      w = qMax(w, fm.width(((BandSpinBox *) this)->textFromValue(i)));
+      w = qMax(w, fm.horizontalAdvance(((BandSpinBox *) this)->textFromValue(i)));
     }
 
     QSize s = QSpinBox::sizeHint();
     int neww = s.width() + w;
 
-    int minw = fm.width(((BandSpinBox *) this)->textFromValue(minimum()));
-    int maxw = fm.width(((BandSpinBox *) this)->textFromValue(maximum()));
+    int minw = fm.horizontalAdvance(((BandSpinBox *) this)->textFromValue(minimum()));
+    int maxw = fm.horizontalAdvance(((BandSpinBox *) this)->textFromValue(maximum()));
 
     if(minw < maxw) {
       neww -= maxw;

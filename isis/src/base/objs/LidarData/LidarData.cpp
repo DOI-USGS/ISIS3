@@ -289,11 +289,8 @@ namespace Isis {
 
     // Load file
     QByteArray saveData = loadFile.readAll();
-    // Try to load from JSON (ASCII); if it can not, load as binary.
-    QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
-    if (loadDoc.isNull()) {
-      loadDoc = QJsonDocument::fromBinaryData(saveData);
-    }
+    QCborValue loadData(saveData);
+    QJsonDocument loadDoc(QJsonDocument::fromJson(loadData.toByteArray()));
 
     int totalMeasures = 0;
 
@@ -613,7 +610,8 @@ namespace Isis {
       saveFile.write(lidarDataDoc.toJson());
     }
     else {
-      saveFile.write(lidarDataDoc.toBinaryData());
+      QCborValue json(lidarDataDoc.toJson());
+      saveFile.write(json.toByteArray());
     }
   }
 
