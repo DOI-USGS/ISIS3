@@ -272,6 +272,10 @@
     <change name="Cordell Michaud" date="2022-05-10">
       Refactored lrowacphomap for testability and added functional tests.
     </change>
+    <change name="Cordell Michaud" date="2024-04-02">
+      Added new default for PHOALGO.
+      Added new default for PHOPARCUBE.
+    </change>
   </history>
 
   <category>
@@ -326,6 +330,8 @@
       <parameter name="PHOALGO">
         <type>filename</type>
         <fileMode>input</fileMode>
+        <defaultPath>$lro/calibration</defaultPath>
+        <default><item>$lro/calibration/WAC_hapke_full.????.pvl</item></default>
         <brief>
           Pvl file
         </brief>
@@ -353,6 +359,7 @@
       <parameter name="PHOPARCUBE">
         <type>cube</type>
         <fileMode>input</fileMode>
+        <default><item>$lro/calibration/WAC_global_7bands_1x1_wbhs70NS_const_each_pole.????.cub</item></default>
         <brief>
           Parameter cube
         </brief>
