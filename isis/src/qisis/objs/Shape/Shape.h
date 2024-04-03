@@ -19,7 +19,6 @@ find files of those names at the top level of this repository. **/
 #include "FileName.h"
 #include "Latitude.h"
 #include "Longitude.h"
-#include "XmlStackedHandler.h"
 
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>

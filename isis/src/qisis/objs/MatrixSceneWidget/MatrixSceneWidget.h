@@ -3,8 +3,6 @@
 
 #include <QWidget>
 
-#include "XmlStackedHandler.h"
-
 template <typename A> class QList;
 class QGraphicsPolygonItem;
 class QGraphicsRectItem;

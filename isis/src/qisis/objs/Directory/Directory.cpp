@@ -91,7 +91,6 @@ find files of those names at the top level of this repository. **/
 #include "WarningTreeWidget.h"
 #include "WorkOrder.h"
 #include "Workspace.h"
-#include "XmlStackedHandler.h"
 
 namespace Isis {
 

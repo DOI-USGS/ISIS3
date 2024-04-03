@@ -16,7 +16,6 @@ find files of those names at the top level of this repository. **/
 
 #include "Control.h"
 #include "ControlDisplayProperties.h"
-#include "XmlStackedHandler.h"
 
 class QStringList;
 class QXmlStreamWriter;

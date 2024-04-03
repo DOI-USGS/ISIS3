@@ -97,15 +97,6 @@ namespace Isis {
       void restoreExpandedStates(QVariant expandedStates, QTreeWidgetItem *item);
       QVariant saveExpandedStates(QTreeWidgetItem *item);
 
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          ImageFileListWidget *m_fileList; //!< The widget we are working with
-          ImageList *m_currentImageList; //!< The list of images being worked on
-          QTreeWidgetItem *m_currentImageListItem; //!< The image being worked on
-          QTreeWidgetItem *m_currentGroup; //!< The group of cubes being worked on
-      };
-
     private:
       QPointer<ProgressBar> m_progress; //!< The ProgressBar of the ImageFileListWidget
       //! Serialized (file) version of this object

@@ -12,7 +12,6 @@
 #include "ImageListActionWorkOrder.h"
 #include "SerialNumberList.h"
 #include "WorkOrder.h"
-#include "XmlStackedHandler.h"
 
 class QStringList;
 class QXmlStreamWriter;

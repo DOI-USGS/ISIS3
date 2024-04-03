@@ -16,7 +16,6 @@ find files of those names at the top level of this repository. **/
 
 #include "AbstractProjectItemView.h"
 #include "FileName.h"
-#include "XmlStackedHandler.h"
 
 class QAction;
 class QToolBar;

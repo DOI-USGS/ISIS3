@@ -32,7 +32,6 @@
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
-#include "XmlStackedHandler.h"
 
 class QDataStream;
 class QUuid;

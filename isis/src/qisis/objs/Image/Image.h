@@ -30,7 +30,6 @@
 #include "Angle.h"
 #include "Distance.h"
 #include "FileName.h"
-#include "XmlStackedHandler.h"
 
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>

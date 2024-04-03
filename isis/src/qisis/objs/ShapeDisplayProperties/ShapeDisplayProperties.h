@@ -14,7 +14,6 @@ find files of those names at the top level of this repository. **/
 #include <QObject>
 
 #include "DisplayProperties.h"
-#include "XmlStackedHandler.h"
 
 class QAction;
 class QXmlStreamWriter;

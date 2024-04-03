@@ -14,8 +14,6 @@ find files of those names at the top level of this repository. **/
 // This is required since QColor is in a slot
 #include <QColor>
 
-#include "XmlStackedHandler.h"
-
 class QAction;
 class QBitArray;
 class QXmlStreamWriter;

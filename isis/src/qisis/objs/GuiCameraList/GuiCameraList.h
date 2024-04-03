@@ -10,7 +10,6 @@
 #include "GuiCameraDisplayProperties.h"
 //#include "GuiCameraListActionWorkOrder.h"  TODO - will we need this?
 #include "WorkOrder.h"
-#include "XmlStackedHandler.h"
 
 class QStringList;
 class QXmlStreamWriter;

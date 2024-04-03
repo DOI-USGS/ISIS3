@@ -28,7 +28,6 @@
 
 
 #include "DisplayProperties.h"
-#include "XmlStackedHandler.h"
 
 class QAction;
 class QXmlStreamWriter;

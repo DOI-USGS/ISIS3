@@ -15,7 +15,6 @@ find files of those names at the top level of this repository. **/
  #include <QXmlStreamReader>
 
  #include "FileName.h"
- #include "XmlStackedHandler.h"
 
  namespace Isis {
    class FileName;
@@ -45,31 +44,6 @@ find files of those names at the top level of this repository. **/
 
    public slots:
      void updateFileName(Project * project);
-
-   private:
-     /**
-      * @author ????-??-?? Steven Lambright
-      *
-      * @internal
-      *   @history ????-??-?? Steven Lambright -  Nested class used to write the Template object
-      *                             information to an XML file for the purpose of saving and
-      *                             restoring the state of the project.
-      */
-     class XmlHandler : public XmlStackedHandler {
-       public:
-         XmlHandler(Template *currentTemplate, FileName templateFolder);
-
-         virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                   const QString &qName, const QXmlAttributes &atts);
-
-       private:
-         Q_DISABLE_COPY(XmlHandler);
-
-         Template *m_xmlHandlerTemplate;        /**< A pointer to the Template object to be read or
-                                                   written.*/
-         FileName m_xmlHandlerTemplateFolderName; /**< The name of the folder for the template xml.*/
-     };
-
    private:
      QString m_fileName; // File name of the template associated with this object
      QString m_templateType; // Type of template (maps/registrations)

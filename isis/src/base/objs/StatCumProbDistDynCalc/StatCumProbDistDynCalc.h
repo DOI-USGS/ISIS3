@@ -11,8 +11,6 @@ find files of those names at the top level of this repository. **/
 #include <QObject>
 #include <QVector>
 
-#include "XmlStackedHandler.h"
-
 class QDataStream;
 class QUuid;
 class QXmlStreamWriter;

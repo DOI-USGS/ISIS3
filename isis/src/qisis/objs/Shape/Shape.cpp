@@ -897,41 +897,4 @@ namespace Isis {
 
     stream.writeEndElement();
   }
-
-
-
-  bool Shape::XmlHandler::characters(const QString &ch) {
-    m_characters += ch;
-
-    return XmlStackedHandler::characters(ch);
-  }
-
-
-
-  bool Shape::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                     const QString &qName) {
-    if (localName == "footprint" && !m_characters.isEmpty()) {
-      geos::io::WKTReader wktReader(*globalFactory);
-      try {
-        m_shape->m_footprint = PolygonTools::MakeMultiPolygon(
-            wktReader.read(m_characters.toStdString()).release());
-      }
-      catch (IException &e) {
-        e.print();
-      }
-    }
-    else if (localName == "shape" && !m_shape->m_footprint) {
-      try {
-        QMutex mutex;
-        m_shape->initFootprint(&mutex);
-        m_shape->closeCube();
-      }
-      catch (IException &e) {
-        e.print();
-      }
-    }
-
-    m_characters = "";
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
-  }
 }
