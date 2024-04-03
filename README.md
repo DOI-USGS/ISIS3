@@ -4,11 +4,9 @@
 
 # ISIS
 
-[![Join the chat at https://gitter.im/USGS-Astrogeology/isis3_cmake](https://badges.gitter.im/USGS-Astrogeology/isis3_cmake.svg)](https://gitter.im/USGS-Astrogeology/isis3_cmake?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Join the discourse at https://astrodiscuss.usgs.gov](https://img.shields.io/discourse/https/astrodiscuss.usgs.gov/topics.svg?style=flat)](https://astrodiscuss.usgs.gov/)
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis3/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis3)
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2563341.svg)](https://doi.org/10.5281/zenodo.2563341)
+[![Badge for DOI 10.5066/P1374ZGR](https://img.shields.io/badge/DOI-10.5066%2FP1374ZGR-blue)](https://doi.org/10.5066/P1374ZGR)
 
 ## Table of Contents
 
@@ -389,7 +387,10 @@ To build and compile ISIS requires following the instructions listed below, whic
 Please refer to the GitHub wiki page [ISIS Online Workshops](https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops) for current ISIS tutorials.
 
 ## Citing ISIS
-This project uses a [Zenodo](https://zenodo.org) generated DOI. The badge at the top of this README links to the DOI for the [latest release](https://doi.org/10.5281/zenodo.2563341). It is [good practice](https://help.zenodo.org) (See 'Which DOI Should I Use in Citations?') to cite the version of the software being used by the citing work. To obtain this DOI, one can follow the [link to the latest version](https://doi.org/10.5281/zenodo.2563341) and then check the right sidebar area titled **Versions** for a listing of all ISIS versions that currently have a Zenodo DOI.
+
+As of 04/03/2024, the latest release of ISIS is version 8.0.2, and its DOI is [`10.5066/P1374ZGR`](https://doi.org/10.5066/P1374ZGR).
+
+Since ISIS 8.0.1, The [Releases Page]() list the DOI for each version of ISIS.  Before ISIS 8.0.0, the DOIs for some versions are listed on [Zenodo](https://doi.org/10.5281/zenodo.2563341) in the Versions sidebar on the right.  It is good practice to cite the version of the software being used by the citing work, so others can reproduce your exact results.
 
 ## The ISIS Data Area
 
