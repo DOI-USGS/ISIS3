@@ -388,9 +388,9 @@ Please refer to the GitHub wiki page [ISIS Online Workshops](https://github.com/
 
 ## Citing ISIS
 
-As of 04/03/2024, the latest release of ISIS is version 8.0.2, and its DOI is [`10.5066/P1374ZGR`](https://doi.org/10.5066/P1374ZGR).
+The badge at the top of this README lists the DOI of the most recent ISIS version.  As of 04/03/2024, the latest release of ISIS is version 8.0.2, and its DOI is [`10.5066/P1374ZGR`](https://doi.org/10.5066/P1374ZGR).
 
-Since ISIS 8.0.1, The [Releases Page]() list the DOI for each version of ISIS.  Before ISIS 8.0.0, the DOIs for some versions are listed on [Zenodo](https://doi.org/10.5281/zenodo.2563341) in the Versions sidebar on the right.  It is good practice to cite the version of the software being used by the citing work, so others can reproduce your exact results.
+Since ISIS 8.0.1, The [Releases Page on GitHub](https://github.com/DOI-USGS/ISIS3/releases) list the DOI for each version of ISIS.  Before ISIS 8.0.0, the DOIs for some versions are listed on [Zenodo](https://doi.org/10.5281/zenodo.2563341) in the versions sidebar on the right.  It is good practice to cite the version of the software being used by the citing work, so others can reproduce your exact results.
 
 ## The ISIS Data Area
 
