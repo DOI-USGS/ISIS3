@@ -82,7 +82,7 @@ namespace Isis {
       /**
        * Constructs BundleSettings using XML handler.
        *
-       * @param reader A pointer to a XmlStackedHandlerReader.
+       * @param reader A pointer to a QXmlStreamReader.
        * @param xmlFile The name of the XML file to be used to create a
        *                BundleSettings object.
        *
