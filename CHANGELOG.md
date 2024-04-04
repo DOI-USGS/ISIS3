@@ -39,7 +39,6 @@ release.
 - Changed the default spiceinit url to https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/ and added deprecation warning for use of https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi url. [#5327](https://github.com/USGS-Astrogeology/ISIS3/issues/5327)
 - Skypt has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5443](https://github.com/USGS-Astrogeology/ISIS3/issues/5443)
 
-
 ### Fixed
 - Fixed a bug in which the histogram tool used the entire image to calculate bin size, which caused an issue with high dynamic range images. [#5371](https://github.com/DOI-USGS/ISIS3/issues/5371)
 - Fixed a bug in which 'version' file was compiled as source and prevented subsequent ISIS recompilation [#5374](https://github.com/DOI-USGS/ISIS3/issues/5374)
@@ -56,6 +55,7 @@ release.
 - Added new option in `ctxcal` to use monthly computed flatfield files for "Frown" removal in CTX images. [#5338](https://github.com/DOI-USGS/ISIS3/pull/5338)
 - CSMCamera can now read and use the body rotation from ALE produced ISDs [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 - CSMSkyMap added to CSMCamera for use with local rover projections in ISIS [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
+- OSIRIS-REx Tagcams instrument support, tests, and test data added [#5424](https://github.com/DOI-USGS/ISIS3/issues/5424)
 
 
 ## [8.1.0] - 2024-01-08
