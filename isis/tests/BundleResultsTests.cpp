@@ -668,50 +668,50 @@ TEST_F(BundleResultsPopulated, Serialization) {
 
   EXPECT_EQ(newResults.coordTypeReports(), results.coordTypeReports());
 
-  // // The Statistics class handles saving itself, so just make sure we have the correct amount
-  // EXPECT_EQ(newResults.rmsImageSampleResiduals().size(), results.rmsImageSampleResiduals().size());
-  // EXPECT_EQ(newResults.rmsImageLineResiduals().size(), results.rmsImageLineResiduals().size());
-  // EXPECT_EQ(newResults.rmsImageResiduals().size(), results.rmsImageResiduals().size());
-  // EXPECT_EQ(newResults.rmsLidarImageSampleResiduals().size(), results.rmsLidarImageSampleResiduals().size());
-  // EXPECT_EQ(newResults.rmsLidarImageLineResiduals().size(), results.rmsLidarImageLineResiduals().size());
-  // EXPECT_EQ(newResults.rmsLidarImageResiduals().size(), results.rmsLidarImageResiduals().size());
-  // EXPECT_EQ(newResults.minSigmaCoord1Distance().meters(), results.minSigmaCoord1Distance().meters());
-  // EXPECT_EQ(newResults.maxSigmaCoord1Distance().meters(), results.maxSigmaCoord1Distance().meters());
-  // EXPECT_EQ(newResults.minSigmaCoord2Distance().meters(), results.minSigmaCoord2Distance().meters());
-  // EXPECT_EQ(newResults.maxSigmaCoord2Distance().meters(), results.maxSigmaCoord2Distance().meters());
-  // EXPECT_EQ(newResults.minSigmaCoord3Distance().meters(), results.minSigmaCoord3Distance().meters());
-  // EXPECT_EQ(newResults.maxSigmaCoord3Distance().meters(), results.maxSigmaCoord3Distance().meters());
-  // EXPECT_EQ(newResults.minSigmaCoord1PointId().toStdString(), results.minSigmaCoord1PointId().toStdString());
-  // EXPECT_EQ(newResults.maxSigmaCoord1PointId().toStdString(), results.maxSigmaCoord1PointId().toStdString());
-  // EXPECT_EQ(newResults.minSigmaCoord2PointId().toStdString(), results.minSigmaCoord2PointId().toStdString());
-  // EXPECT_EQ(newResults.maxSigmaCoord2PointId().toStdString(), results.maxSigmaCoord2PointId().toStdString());
-  // EXPECT_EQ(newResults.minSigmaCoord3PointId().toStdString(), results.minSigmaCoord3PointId().toStdString());
-  // EXPECT_EQ(newResults.maxSigmaCoord3PointId().toStdString(), results.maxSigmaCoord3PointId().toStdString());
-  // EXPECT_EQ(newResults.rmsRx(), results.rmsRx());
-  // EXPECT_EQ(newResults.rmsRy(), results.rmsRy());
-  // EXPECT_EQ(newResults.rmsRxy(), results.rmsRxy());
-  // EXPECT_EQ(newResults.rejectionLimit(), results.rejectionLimit());
-  // EXPECT_EQ(newResults.sigma0(), results.sigma0());
-  // EXPECT_EQ(newResults.elapsedTime(), results.elapsedTime());
-  // EXPECT_EQ(newResults.elapsedTimeErrorProp(), results.elapsedTimeErrorProp());
-  // EXPECT_EQ(newResults.iterations(), results.iterations());
-  // EXPECT_EQ(newResults.converged(), results.converged());
+  // The Statistics class handles saving itself, so just make sure we have the correct amount
+  EXPECT_EQ(newResults.rmsImageSampleResiduals().size(), results.rmsImageSampleResiduals().size());
+  EXPECT_EQ(newResults.rmsImageLineResiduals().size(), results.rmsImageLineResiduals().size());
+  EXPECT_EQ(newResults.rmsImageResiduals().size(), results.rmsImageResiduals().size());
+  EXPECT_EQ(newResults.rmsLidarImageSampleResiduals().size(), results.rmsLidarImageSampleResiduals().size());
+  EXPECT_EQ(newResults.rmsLidarImageLineResiduals().size(), results.rmsLidarImageLineResiduals().size());
+  EXPECT_EQ(newResults.rmsLidarImageResiduals().size(), results.rmsLidarImageResiduals().size());
+  EXPECT_EQ(newResults.minSigmaCoord1Distance().meters(), results.minSigmaCoord1Distance().meters());
+  EXPECT_EQ(newResults.maxSigmaCoord1Distance().meters(), results.maxSigmaCoord1Distance().meters());
+  EXPECT_EQ(newResults.minSigmaCoord2Distance().meters(), results.minSigmaCoord2Distance().meters());
+  EXPECT_EQ(newResults.maxSigmaCoord2Distance().meters(), results.maxSigmaCoord2Distance().meters());
+  EXPECT_EQ(newResults.minSigmaCoord3Distance().meters(), results.minSigmaCoord3Distance().meters());
+  EXPECT_EQ(newResults.maxSigmaCoord3Distance().meters(), results.maxSigmaCoord3Distance().meters());
+  EXPECT_EQ(newResults.minSigmaCoord1PointId().toStdString(), results.minSigmaCoord1PointId().toStdString());
+  EXPECT_EQ(newResults.maxSigmaCoord1PointId().toStdString(), results.maxSigmaCoord1PointId().toStdString());
+  EXPECT_EQ(newResults.minSigmaCoord2PointId().toStdString(), results.minSigmaCoord2PointId().toStdString());
+  EXPECT_EQ(newResults.maxSigmaCoord2PointId().toStdString(), results.maxSigmaCoord2PointId().toStdString());
+  EXPECT_EQ(newResults.minSigmaCoord3PointId().toStdString(), results.minSigmaCoord3PointId().toStdString());
+  EXPECT_EQ(newResults.maxSigmaCoord3PointId().toStdString(), results.maxSigmaCoord3PointId().toStdString());
+  EXPECT_EQ(newResults.rmsRx(), results.rmsRx());
+  EXPECT_EQ(newResults.rmsRy(), results.rmsRy());
+  EXPECT_EQ(newResults.rmsRxy(), results.rmsRxy());
+  EXPECT_EQ(newResults.rejectionLimit(), results.rejectionLimit());
+  EXPECT_EQ(newResults.sigma0(), results.sigma0());
+  EXPECT_EQ(newResults.elapsedTime(), results.elapsedTime());
+  EXPECT_EQ(newResults.elapsedTimeErrorProp(), results.elapsedTimeErrorProp());
+  EXPECT_EQ(newResults.iterations(), results.iterations());
+  EXPECT_EQ(newResults.converged(), results.converged());
 
-  // EXPECT_EQ(newResults.numberMaximumLikelihoodModels(), results.numberMaximumLikelihoodModels());
+  EXPECT_EQ(newResults.numberMaximumLikelihoodModels(), results.numberMaximumLikelihoodModels());
 
-  // // Reset the MLE index so we can compare them one by one
-  // newResults.printMaximumLikelihoodTierInformation();
-  // results.printMaximumLikelihoodTierInformation();
+  // Reset the MLE index so we can compare them one by one
+  newResults.printMaximumLikelihoodTierInformation();
+  results.printMaximumLikelihoodTierInformation();
 
-  // EXPECT_EQ(newResults.maximumLikelihoodMedianR2Residuals(), results.maximumLikelihoodMedianR2Residuals());
+  EXPECT_EQ(newResults.maximumLikelihoodMedianR2Residuals(), results.maximumLikelihoodMedianR2Residuals());
 
-  // newResults.incrementMaximumLikelihoodModelIndex();
-  // results.incrementMaximumLikelihoodModelIndex();
-  // EXPECT_EQ(newResults.maximumLikelihoodMedianR2Residuals(), results.maximumLikelihoodMedianR2Residuals());
+  newResults.incrementMaximumLikelihoodModelIndex();
+  results.incrementMaximumLikelihoodModelIndex();
+  EXPECT_EQ(newResults.maximumLikelihoodMedianR2Residuals(), results.maximumLikelihoodMedianR2Residuals());
 
-  // newResults.incrementMaximumLikelihoodModelIndex();
-  // results.incrementMaximumLikelihoodModelIndex();
-  // EXPECT_EQ(newResults.maximumLikelihoodMedianR2Residuals(), results.maximumLikelihoodMedianR2Residuals());
+  newResults.incrementMaximumLikelihoodModelIndex();
+  results.incrementMaximumLikelihoodModelIndex();
+  EXPECT_EQ(newResults.maximumLikelihoodMedianR2Residuals(), results.maximumLikelihoodMedianR2Residuals());
 
-  // EXPECT_EQ(newResults.coordTypeReports(), results.coordTypeReports());
+  EXPECT_EQ(newResults.coordTypeReports(), results.coordTypeReports());
 }
