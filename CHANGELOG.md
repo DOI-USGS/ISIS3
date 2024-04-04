@@ -37,13 +37,17 @@ release.
 
 ### Changed
 - Changed the default spiceinit url to https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/ and added deprecation warning for use of https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi url. [#5327](https://github.com/USGS-Astrogeology/ISIS3/issues/5327)
-
+- Skypt has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5443](https://github.com/USGS-Astrogeology/ISIS3/issues/5443)
 
 ### Fixed
+- Fixed a bug in which the histogram tool used the entire image to calculate bin size, which caused an issue with high dynamic range images. [#5371](https://github.com/DOI-USGS/ISIS3/issues/5371)
+- Fixed a bug in which 'version' file was compiled as source and prevented subsequent ISIS recompilation [#5374](https://github.com/DOI-USGS/ISIS3/issues/5374)
 - Fixed <i>noproj</i> bug where some temporary files were not deleted after call to cam2cam.  Issue: [#4813](https://github.com/USGS-Astrogeology/ISIS3/issues/4813)
 - Fixed <i>noproj</i> bug where missing shapemodel-related keywords (RayTraceEngine, BulletParts, Tolerance) are dropped when the output label is created. This resulted in the Bullet collision detection engine not being used. Issue: [#5377](https://github.com/USGS-Astrogeology/ISIS3/issues/5377)
 - Fixed ISIS failing to expand env variables with an "_" in them. [#5402](https://github.com/DOI-USGS/ISIS3/pull/5402)
 - Fixed <i>noproj</i> bug where match cube not NULL when not specifying MATCH parameter [#5381](https://github.com/USGS-Astrogeology/ISIS3/issues/5381)
+- Fixed findFeaturesSegment trying to merge networks when only 1 segmented network was successfully created [5416](https://github.com/DOI-USGS/ISIS3/issues/5416)
+- Fixed rclone.conf/downloadIsisData pointing to old naif kernel location, updated to archived locations and https [5394](https://github.com/DOI-USGS/ISIS3/issues/5394)
 
 ### Added
 - Added 8 new functions to the Sensor Utility Library: Slant Distance, Target Center Distance, Right Ascension Declination, Local Solar Time, Line Resolution, Sample Resolution, Pixel Resolution, and Solar Longitude.
@@ -52,7 +56,7 @@ release.
 - CSMCamera can now read and use the body rotation from ALE produced ISDs [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 - CSMSkyMap added to CSMCamera for use with local rover projections in ISIS [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 - Added ALLOWERROR parameter to campt [#5393](https://github.com/DOI-USGS/ISIS3/pull/5393)
-
+- OSIRIS-REx Tagcams instrument support, tests, and test data added [#5424](https://github.com/DOI-USGS/ISIS3/issues/5424)
 
 ## [8.1.0] - 2024-01-08
 
@@ -105,6 +109,7 @@ release.
 - Fixed ProgramLauncher failing while reporting errors from launched programs [#5331](https://github.com/DOI-USGS/ISIS3/pull/5331)
 - Fixed high/low filter functionality in trimfilter [#5311](https://github.com/DOI-USGS/ISIS3/issues/5311)
 - Fixed downloadIsisData script excluding needed files in the calibration folder [#5272](https://github.com/DOI-USGS/ISIS3/issues/5272)
+- Fixed tgocassis2isis cas_cal_sc ingest errors and added error for cas_raw_sc images [#5413](https://github.com/DOI-USGS/ISIS3/issues/5413)
 
 ## [8.0.1] - 2023-08-23
 

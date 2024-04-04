@@ -1444,7 +1444,7 @@ namespace Isis {
     m_featureScreenAreas = new QList<FeatureDisplayPosition>;
     m_viewportCubeRange = new QPair<QPointF, QPointF>;
 
-    qSort(features.begin(), features.end(),
+    std::sort(features.begin(), features.end(),
           &FeatureNomenclature::featureDiameterGreaterThan);
 
     for (int i = 0; i < features.count(); i++) {
@@ -1800,7 +1800,7 @@ namespace Isis {
 
         QString featureName = feature.name();
         QRect textDisplayArea(QPoint(viewportX, viewportY),
-                              QSize(fontMetrics.width(featureName) + 4,
+                              QSize(fontMetrics.horizontalAdvance(featureName) + 4,
                                     fontMetrics.height()));
         // Center the text on the viewportX,Y instead of starting it there...
         textDisplayArea.moveTopLeft(textDisplayArea.topLeft() -
