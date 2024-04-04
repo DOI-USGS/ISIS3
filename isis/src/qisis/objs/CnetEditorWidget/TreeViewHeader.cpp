@@ -60,7 +60,7 @@ namespace Isis {
 
 
   QSize TreeViewHeader::minimumSizeHint() const {
-    return QSize(QFontMetrics(font()).width(*m_headerText) + 15,
+    return QSize(QFontMetrics(font()).horizontalAdvance(*m_headerText) + 15,
         QFontMetrics(font()).height() + 6);
   }
 

@@ -18,7 +18,7 @@ find files of those names at the top level of this repository. **/
 #include <iostream>
 #include <fstream>
 #include <QString>
-#include <QTime>
+#include <QElapsedTimer>
 #include <string>
 #include <ctime>
 
@@ -148,7 +148,7 @@ namespace Isis {
       QLocalSocket *p_connectionToParent; //!<
       time_t p_startTime;                 //!<
       clock_t p_startClock;               //!<
-      QTime m_connectTime;                //!< Used to calculate program's run time
+      QElapsedTimer m_connectTime;                //!< Used to calculate program's run time
       QString p_datetime;                 //!<
       int p_startDirectIO;                //!<
       int p_startPageFaults;              //!<

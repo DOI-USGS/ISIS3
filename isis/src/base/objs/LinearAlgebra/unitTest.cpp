@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
   try {
     LinearAlgebra::Matrix emptyMatrix(0, 0);
-    qDebug() << "UnitTest for LinearAlgebra" << endl;
+    qDebug() << "UnitTest for LinearAlgebra" << Qt::endl;
 
     qDebug() << "";
     TestLinearAlgebra constructorTest;

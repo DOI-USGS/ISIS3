@@ -268,7 +268,7 @@ namespace Isis {
   /** Split the string with the provided separator in individual parts   */
    QStringList FeatureInventory::parse(const QString &config,
                                        const QString &sep) const {
-     return ( config.split(sep, QString::SkipEmptyParts) );
+     return ( config.split(sep, Qt::SkipEmptyParts) );
    }
 
    PvlFlatMap FeatureInventory::parameters(const QStringList &fromConfig) const {
