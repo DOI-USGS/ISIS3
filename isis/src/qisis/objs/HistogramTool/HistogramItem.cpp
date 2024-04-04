@@ -314,8 +314,8 @@ namespace Isis {
     const QRect r = rect.normalized();
 
     const int factor = 125;
-    const QColor light(color.light(factor));
-    const QColor dark(color.dark(factor));
+    const QColor light(color.lighter(factor));
+    const QColor dark(color.darker(factor));
 
     painter->setBrush(color);
     painter->setPen(Qt::NoPen);

@@ -833,7 +833,7 @@ namespace Isis {
       results.append(NULL);
 
       QAction *zoomFitAct = new QAction(tr("Zoom Fit"), this);
-      zoomFitAct->setData(qVariantFromValue(images));
+      zoomFitAct->setData(QVariant::fromValue(images));
       connect(zoomFitAct, SIGNAL(triggered()), this, SLOT(fitInView()));
       results.append(zoomFitAct);
     }

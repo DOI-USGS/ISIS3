@@ -1102,7 +1102,7 @@ namespace Isis {
         m_progressBar->update();
 
         delete m_elapsedTimer;
-        m_elapsedTimer = new QTime;
+        m_elapsedTimer = new QElapsedTimer;
         m_elapsedTimer->start();
 
         if (isSynchronous()) {
@@ -1173,7 +1173,7 @@ namespace Isis {
         m_progressBar->update();
 
         delete m_elapsedTimer;
-        m_elapsedTimer = new QTime;
+        m_elapsedTimer = new QElapsedTimer;
         m_elapsedTimer->start();
 
         if (isSynchronous()) {

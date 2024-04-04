@@ -523,7 +523,7 @@ namespace Isis {
         pen.setWidth(3);
         pen.setStyle(Qt::SolidLine);
         painter->setPen(pen);
-        painter->drawRoundRect(x - 2, y - 2, 4, 4);
+        painter->drawRoundedRect(x - 2, y - 2, 4, 4, 1, 1, Qt::RelativeSize);
       }
     }
   }

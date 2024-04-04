@@ -80,7 +80,7 @@ TEST(HicalTest, Default) {
 
   // ZeroBufferSmooth parameters
   EXPECT_TRUE(logText[16].startsWith("ZeroBufferSmooth")) << logText[16].toStdString();
-  QStringList zeroBufferSmoothParams = logText[16].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList zeroBufferSmoothParams = logText[16].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(zeroBufferSmoothParams.size(), 6);
   // AveCols(Buffer[ ])
   paramString = zeroBufferSmoothParams[1];
@@ -115,7 +115,7 @@ TEST(HicalTest, Default) {
 
   // ZeroBufferFit parameters
   EXPECT_TRUE(logText[18].startsWith("ZeroBufferFit")) << logText[18].toStdString();
-  QStringList zeroBufferFitParams = logText[18].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList zeroBufferFitParams = logText[18].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(zeroBufferFitParams.size(), 5);
   // ZeroBufferFit(AbsErr[ ],RelErr[ ],MaxIter[ ])
   paramString = zeroBufferFitParams[1];
@@ -140,7 +140,7 @@ TEST(HicalTest, Default) {
 
   // ZeroReverse parameters
   EXPECT_TRUE(logText[20].startsWith("ZeroReverse")) << logText[20].toStdString();
-  QStringList zeroReverseParams = logText[20].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList zeroReverseParams = logText[20].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(zeroReverseParams.size(), 7);
   // RevClock(CropLines[ ],Mean[ ],StdDev[ ],LisPixels[ ],HisPixels[ ],NulPixels[ ])
   paramString = zeroReverseParams[1];
@@ -184,7 +184,7 @@ TEST(HicalTest, Default) {
 
   // ZeroDark parameters
   EXPECT_TRUE(logText[22].startsWith("ZeroDark")) << logText[22].toStdString();
-  QStringList zeroDarkParams = logText[22].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList zeroDarkParams = logText[22].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(zeroDarkParams.size(), 9);
   // Smooth(Width[ ],Iters[ ])
   paramString = zeroDarkParams[4];
@@ -213,14 +213,14 @@ TEST(HicalTest, Default) {
 
   // ZeroDarkRate parameters
   EXPECT_TRUE(logText[24].startsWith("ZeroDarkRate")) << logText[24].toStdString();
-  QStringList zeroDarkRateParams = logText[24].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList zeroDarkRateParams = logText[24].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(zeroDarkRateParams.size(), 3);
   // Skipped, module not in config file
   EXPECT_EQ(zeroDarkRateParams[1].toStdString(), " Skipped, module not in config file");
 
   // GainLineDrift parameters
   EXPECT_TRUE(logText[26].startsWith("GainLineDrift")) << logText[26].toStdString();
-  QStringList gainLineDriftParams = logText[26].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList gainLineDriftParams = logText[26].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(gainLineDriftParams.size(), 4);
   // Coefs[ , , , ]
   paramString = gainLineDriftParams[2];
@@ -234,7 +234,7 @@ TEST(HicalTest, Default) {
 
   // GainNonLinearity parameters
   EXPECT_TRUE(logText[28].startsWith("GainNonLinearity")) << logText[28].toStdString();
-  QStringList gainNonLinearityParams = logText[28].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList gainNonLinearityParams = logText[28].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(gainNonLinearityParams.size(), 4);
   // NonLinearityGainFactor[ ]
   paramString = gainNonLinearityParams[2];
@@ -245,7 +245,7 @@ TEST(HicalTest, Default) {
 
   // GainChannelNormalize parameters
   EXPECT_TRUE(logText[30].startsWith("GainChannelNormalize")) << logText[30].toStdString();
-  QStringList gainChannelNormalizeParams = logText[30].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList gainChannelNormalizeParams = logText[30].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(gainChannelNormalizeParams.size(), 4);
   // ModeNormalizer[ ]
   paramString = gainChannelNormalizeParams[1];
@@ -256,7 +256,7 @@ TEST(HicalTest, Default) {
 
   // GainFlatField parameters
   EXPECT_TRUE(logText[32].startsWith("GainFlatField")) << logText[32].toStdString();
-  QStringList gainFlatFieldParams = logText[32].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList gainFlatFieldParams = logText[32].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(gainFlatFieldParams.size(), 4);
   // Statistics(Average[ ],StdDev[ ])
   paramString = gainFlatFieldParams[2];
@@ -270,7 +270,7 @@ TEST(HicalTest, Default) {
 
   // GainTemperature parameters
   EXPECT_TRUE(logText[34].startsWith("GainTemperature")) << logText[34].toStdString();
-  QStringList gainTemperatureParams = logText[34].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList gainTemperatureParams = logText[34].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(gainTemperatureParams.size(), 7);
   // FpaTemperatureFactor[ ]
   paramString = gainTemperatureParams[2];
@@ -299,7 +299,7 @@ TEST(HicalTest, Default) {
 
   // GainUnitConversion parameters
   EXPECT_TRUE(logText[36].startsWith("GainUnitConversion")) << logText[36].toStdString();
-  QStringList gainUnitConversionParams = logText[36].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList gainUnitConversionParams = logText[36].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(gainUnitConversionParams.size(), 13);
   // SunDist[  (AU)]
   paramString = gainUnitConversionParams[1];
@@ -401,7 +401,7 @@ TEST(HicalTest, Dns) {
 
   // The only difference for DNs is the GainUnitConversion line
   EXPECT_TRUE(logText[36].startsWith("GainUnitConversion")) << logText[36].toStdString();
-  QStringList gainUnitConversionParams = logText[36].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList gainUnitConversionParams = logText[36].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(gainUnitConversionParams.size(), 4);
   EXPECT_EQ(gainUnitConversionParams[1].toStdString(), " DN_Factor[1.0]");
   EXPECT_EQ(gainUnitConversionParams[2].toStdString(), " Units[DN]");
@@ -452,7 +452,7 @@ TEST(HicalTest, DnsPerMicrosecond) {
 
   // The only difference for DNs per microsecond is the GainUnitConversion line
   EXPECT_TRUE(logText[36].startsWith("GainUnitConversion")) << logText[36].toStdString();
-  QStringList gainUnitConversionParams = logText[36].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList gainUnitConversionParams = logText[36].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(gainUnitConversionParams.size(), 5);
   // ScanExposureDuration[ ]
   paramString = gainUnitConversionParams[1];
@@ -515,7 +515,7 @@ TEST(HicalTest, DarkRate) {
 
   // The only difference for ZeroDarkRate is the ZeroDarkRate line
   EXPECT_TRUE(logText[24].startsWith("ZeroDarkRate")) << logText[24].toStdString();
-  QStringList zeroDarkRateParams = logText[24].split(";", QString::SplitBehavior::SkipEmptyParts);
+  QStringList zeroDarkRateParams = logText[24].split(";", Qt::SkipEmptyParts);
   ASSERT_EQ(zeroDarkRateParams.size(), 4);
   // BaseTemperature[ ]
   paramString = zeroDarkRateParams[1];

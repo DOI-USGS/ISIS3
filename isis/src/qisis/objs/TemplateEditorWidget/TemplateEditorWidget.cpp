@@ -163,7 +163,7 @@ namespace Isis {
     if (m_textChanged) {
       QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Template Has Unsaved Changes"),
                              QString("Would you like to save your current template?"),
-                             NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
+                             QMessageBox::NoButton, qobject_cast<QWidget *>(parent()), Qt::Dialog);
       QPushButton *save = box->addButton("Save", QMessageBox::AcceptRole);
       box->addButton("Don't Save", QMessageBox::RejectRole);
       QPushButton *cancel = box->addButton("Cancel", QMessageBox::NoRole);

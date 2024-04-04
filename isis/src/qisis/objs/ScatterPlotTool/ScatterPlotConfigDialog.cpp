@@ -192,9 +192,9 @@ namespace Isis {
 
     if (activeViewport) {
       m_xAxisCubeCombo->setCurrentIndex(
-          m_xAxisCubeCombo->findData(qVariantFromValue(activeViewport->cube())));
+          m_xAxisCubeCombo->findData(QVariant::fromValue(activeViewport->cube())));
       m_yAxisCubeCombo->setCurrentIndex(
-          m_yAxisCubeCombo->findData(qVariantFromValue(activeViewport->cube())));
+          m_yAxisCubeCombo->findData(QVariant::fromValue(activeViewport->cube())));
       m_yAxisCubeBandSpinBox->setValue(2);
     }
   }
@@ -356,15 +356,15 @@ namespace Isis {
     QList<Cube *> extraXCubes = removeFromList(listedXCubes, allXCubes);
     foreach (Cube *cubeToRemove, extraXCubes) {
       m_xAxisCubeCombo->removeItem(
-          m_xAxisCubeCombo->findData(qVariantFromValue(cubeToRemove)));
+          m_xAxisCubeCombo->findData(QVariant::fromValue(cubeToRemove)));
     }
 
     // Now let's add items that are missing from the list
     QList<Cube *> missingXCubes = removeFromList(allXCubes, listedXCubes);
     foreach (Cube *cubeToAdd, missingXCubes) {
-      if (m_xAxisCubeCombo->findData(qVariantFromValue(cubeToAdd)) == -1) {
+      if (m_xAxisCubeCombo->findData(QVariant::fromValue(cubeToAdd)) == -1) {
         QString cubeName = QFileInfo(cubeToAdd->fileName()).baseName();
-        m_xAxisCubeCombo->addItem(cubeName, qVariantFromValue(cubeToAdd));
+        m_xAxisCubeCombo->addItem(cubeName, QVariant::fromValue(cubeToAdd));
       }
     }
 
@@ -397,15 +397,15 @@ namespace Isis {
       QList<Cube *> extraYCubes = removeFromList(listedYCubes, allYCubes);
       foreach (Cube *cubeToRemove, extraYCubes) {
         m_yAxisCubeCombo->removeItem(
-            m_yAxisCubeCombo->findData(qVariantFromValue(cubeToRemove)));
+            m_yAxisCubeCombo->findData(QVariant::fromValue(cubeToRemove)));
       }
 
       // Now let's add items that are missing from the list
       QList<Cube *> missingYCubes = removeFromList(allYCubes, listedYCubes);
       foreach (Cube *cubeToAdd, missingYCubes) {
-        if (m_yAxisCubeCombo->findData(qVariantFromValue(cubeToAdd)) == -1) {
+        if (m_yAxisCubeCombo->findData(QVariant::fromValue(cubeToAdd)) == -1) {
           QString cubeName = QFileInfo(cubeToAdd->fileName()).baseName();
-          m_yAxisCubeCombo->addItem(cubeName, qVariantFromValue(cubeToAdd));
+          m_yAxisCubeCombo->addItem(cubeName, QVariant::fromValue(cubeToAdd));
         }
       }
 
@@ -416,7 +416,7 @@ namespace Isis {
       if (xAxisCube() != m_oldXAxisCube) {
         m_oldXAxisCube = xAxisCube();
         m_yAxisCubeCombo->setCurrentIndex(
-            m_yAxisCubeCombo->findData(qVariantFromValue(xAxisCube())));
+            m_yAxisCubeCombo->findData(QVariant::fromValue(xAxisCube())));
       }
 
       m_yAxisCubeBandSpinBox->setMinimum(1);
