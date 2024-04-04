@@ -56,6 +56,7 @@ release.
 - CSMCamera can now read and use the body rotation from ALE produced ISDs [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 - CSMSkyMap added to CSMCamera for use with local rover projections in ISIS [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 - OSIRIS-REx Tagcams instrument support, tests, and test data added [#5424](https://github.com/DOI-USGS/ISIS3/issues/5424)
+- Added min/max type drop-down selection option in QView's Stretch tool [#5289](https://github.com/DOI-USGS/ISIS3/issues/5289)
 
 
 ## [8.1.0] - 2024-01-08

@@ -183,6 +183,29 @@ namespace Isis {
     connect(m_stretchBandComboBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(stretchBandChanged(int)));
 
+    // Create drop-down selection option to set min/max type
+    p_minMaxTypeSelection = new QComboBox();
+    p_minMaxTypeSelection->setToolTip("Min/Max Type");
+    text =
+      "<b>Function:</b> Select the minimum & maximum value types to \
+      set the stretch to. The three options are: \
+      <p>- Best: (default) The better of the absolute min/max or the \
+        Chebyshev min/max. The better value is considered the value \
+        closest to the mean. \
+      <p>- Absolute: The absolute min/max value of all valid pixels. \
+      <p>- Chebyshev: The min/max value such that a certain percentage \
+        of data will fall within K standard deviations of the average \
+        (Chebyshev's Theorem). It can be used to obtain a value that \
+        does not include statistical outliers. \
+      <p><b>Hint:</b> Percentages are set to mininum of 0.5 and \
+      maximum of 99.5.";
+    p_minMaxTypeSelection->setWhatsThis(text);
+    p_minMaxTypeSelection->addItem("Best",      0);
+    p_minMaxTypeSelection->addItem("Absolute",  1);
+    p_minMaxTypeSelection->addItem("Chebyshev", 2);
+
+    connect(p_minMaxTypeSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(changeStretch()));
+
     QDoubleValidator *dval = new QDoubleValidator(hbox);
     m_stretchMinEdit = new QLineEdit(hbox);
     m_stretchMinEdit->setValidator(dval);
@@ -306,6 +329,7 @@ namespace Isis {
     layout->addWidget(m_globalButton);
     layout->addWidget(m_stretchRegionalButton);
     layout->addWidget(m_stretchBandComboBox);
+    layout->addWidget(p_minMaxTypeSelection);
     layout->addWidget(m_stretchMinEdit);
     layout->addWidget(m_stretchMaxEdit);
     layout->addWidget(advancedButton);
@@ -1035,6 +1059,9 @@ namespace Isis {
     MdiCubeViewport *cvp = cubeViewport();
     if(cvp == NULL) return;
 
+    // Set the min/max based on selected type
+    stretchMinMaxType(cvp);
+    
     // Make sure the user didn't enter bad min/max and if so fix it
     double min = m_stretchMinEdit->text().toDouble();
     double max = m_stretchMaxEdit->text().toDouble();
@@ -1086,6 +1113,54 @@ namespace Isis {
     }
 
     stretchChanged();
+  }
+
+  /**
+   * Sets stretch for current band in active viewport given
+   * the min/max type selection.
+  */
+  void StretchTool::stretchMinMaxType(CubeViewport *cvp) {
+    // Get current band
+    int bandId = m_stretchBandComboBox->currentIndex();
+    int bandNum = cvp->grayBand();
+    if(bandId == (int)Red) {
+      bandNum = cvp->redBand();
+    }
+    else if(bandId == (int)Green) {
+      bandNum = cvp->greenBand();
+    }
+    else if(bandId == (int)Blue) {
+      bandNum = cvp->blueBand();
+    }
+
+    // Get current band statistics
+    Statistics stats = statsFromCube(cvp->cube(), bandNum);
+    
+    // Set min/max given ComboBox selection
+    int minMaxIndex = p_minMaxTypeSelection->currentIndex();
+    double selectedMin = 0;
+    double selectedMax = 0;
+
+    if (minMaxIndex == 0) {
+      // Best
+      selectedMin = stats.BestMinimum();
+      selectedMax = stats.BestMaximum();
+    } else if (minMaxIndex == 1) {
+      // Absolute
+      selectedMin = stats.Minimum();
+      selectedMax = stats.Maximum();
+    } else if (minMaxIndex == 2) {
+      // Chebyshev
+      selectedMin = stats.ChebyshevMinimum();
+      selectedMax = stats.ChebyshevMaximum();
+    }
+
+    QString qMin = QString::number(selectedMin);
+    QString qMax = QString::number(selectedMax);
+
+    // Set the min/max text
+    m_stretchMinEdit->setText(qMin);
+    m_stretchMaxEdit->setText(qMax);
   }
 
 
@@ -1526,7 +1601,7 @@ namespace Isis {
       cube->read(brick);
       hist.AddData(brick.DoubleBuffer(), cube->sampleCount());
     }
-
+ 
     return hist;
   }
 
@@ -1541,7 +1616,7 @@ namespace Isis {
   Histogram StretchTool::histFromBuffer(ViewportBuffer *buffer) {
     Statistics stats = statsFromBuffer(buffer, buffer->bufferXYRect());
     return histFromBuffer(buffer, buffer->bufferXYRect(),
-                          stats.BestMinimum(), stats.BestMaximum());
+        stats.BestMinimum(), stats.BestMaximum());
 
   }
 

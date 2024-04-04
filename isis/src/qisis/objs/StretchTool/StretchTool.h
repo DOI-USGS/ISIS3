@@ -177,6 +177,7 @@ namespace Isis {
 
     private:
       void stretchRect(CubeViewport *cvp, QRect rect);
+      void stretchMinMaxType(CubeViewport *cvp);
 
     private:
       AdvancedStretchDialog *m_advancedStretch; //!< The advanced dialog
@@ -192,6 +193,7 @@ namespace Isis {
       QAction *m_copyBands;              //!< Copy band stretch action
 
       QComboBox *m_stretchBandComboBox;  //!< Stretch combo box
+      QComboBox *p_minMaxTypeSelection;  //!< Min/Max type combo box
 
       QLineEdit *m_stretchMinEdit;       //!< Min. line edit
       QLineEdit *m_stretchMaxEdit;       //!< Max. line edit
