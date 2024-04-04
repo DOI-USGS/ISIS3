@@ -100,7 +100,7 @@ namespace Isis {
           imageListNames.append(list->name());
         }
 
-        qSort(imageListNames);
+        imageListNames.sort();
 
         QString choice = QInputDialog::getItem(NULL, tr("Select Image List"),
             tr("Please choose a list of images to export."), imageListNames, 0, false, &success);

@@ -68,7 +68,7 @@ DatumFunctoidList DatumFunctoidFactory::create(const QString &specs,
   DatumFunctoidList functoids;
 
   // Individual algorithm specifications are separated by vertical bars
-  QStringList algorithms = specs.split(",", QString::SkipEmptyParts);
+  QStringList algorithms = specs.split(",", Qt::SkipEmptyParts);
   // cout << "create: got " << algorithms.size() << " algorithms...\n";
   if ( algorithms.size() == 0 ) {
     if ( errorIfEmpty ) {

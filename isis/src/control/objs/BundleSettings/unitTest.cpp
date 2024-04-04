@@ -379,5 +379,5 @@ void printXml(const T &printable) {
   printable.save(writer, NULL);
   // needed to remove UUids from sub-object serialization.
   output.remove(QRegExp("<id>[^<]*</id>"));
-  qDebug().noquote() << output << endl << endl;
+  qDebug().noquote() << output << Qt::endl << Qt::endl;
 }

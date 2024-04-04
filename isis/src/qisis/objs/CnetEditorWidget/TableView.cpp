@@ -57,7 +57,7 @@ namespace Isis {
     for (int i = 0; i < m_columns->size(); i++) {
       TableColumn *const &col = (*m_columns)[i];
       QString colTitle = col->getTitle();
-      int defaultWidth = QFontMetrics(font()).width(colTitle) + 40;
+      int defaultWidth = QFontMetrics(font()).horizontalAdvance(colTitle) + 40;
       if (colTitle.size()) {
         key = objectName() + " " + colTitle + " width";
         key.replace(" ", "_");
@@ -229,7 +229,7 @@ namespace Isis {
   //       {
   //         TableColumn * column = (*m_columns)[i];
   //
-  //         column->setWidth(QFontMetrics(font()).width(column->getTitle()) + 25);
+  //         column->setWidth(QFontMetrics(font()).horizontalAdvance(column->getTitle()) + 25);
   //         connect(column, SIGNAL(visibilityChanged()), m_header, SLOT(update()));
   //         connect(column, SIGNAL(visibilityChanged()), m_content, SLOT(refresh()));
   //         connect(column, SIGNAL(visibilityChanged()),

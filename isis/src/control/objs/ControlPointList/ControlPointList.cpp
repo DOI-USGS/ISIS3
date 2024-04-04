@@ -32,7 +32,7 @@ namespace Isis {
       }
       mqCpList = QStringList(qList);
 
-      //sort the list for faster searches - internally uses qsort()
+      //sort the list for faster searches - internally uses std::sort()
       mqCpList.sort();
     }
     catch(IException &e) {

@@ -722,7 +722,7 @@ namespace Isis {
     if ( 0 == cdesc.m_itemBytes ) {
       if ( delimiter.isEmpty() ) return ( QStringList(value));
 
-      return ( value.split(delimiter, QString::SkipEmptyParts) );
+      return ( value.split(delimiter, Qt::SkipEmptyParts) );
     }
 
     // Have an item size specified.  Assume it has single character separator

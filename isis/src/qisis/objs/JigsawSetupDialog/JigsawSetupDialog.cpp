@@ -172,15 +172,15 @@ namespace Isis {
     m_ui->pointingAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
 
     // Set the default size of the columns
-    m_ui->positionAprioriSigmaTable->setColumnWidth(0, fontMetrics().width(tableHeaders.at(0)) + 10);
-    m_ui->positionAprioriSigmaTable->setColumnWidth(1, fontMetrics().width(tableHeaders.at(1)) + 10);
-    m_ui->positionAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)) + 10);
-    m_ui->positionAprioriSigmaTable->setColumnWidth(3, fontMetrics().width(tableHeaders.at(3)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(0, fontMetrics().horizontalAdvance(tableHeaders.at(0)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(1, fontMetrics().horizontalAdvance(tableHeaders.at(1)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(2, fontMetrics().horizontalAdvance(tableHeaders.at(2)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(3, fontMetrics().horizontalAdvance(tableHeaders.at(3)) + 10);
 
-    m_ui->pointingAprioriSigmaTable->setColumnWidth(0, fontMetrics().width(tableHeaders.at(0)) + 10);
-    m_ui->pointingAprioriSigmaTable->setColumnWidth(1, fontMetrics().width(tableHeaders.at(1)) + 10);
-    m_ui->pointingAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)) + 10);
-    m_ui->pointingAprioriSigmaTable->setColumnWidth(3, fontMetrics().width(tableHeaders.at(3)) + 10);
+    m_ui->pointingAprioriSigmaTable->setColumnWidth(0, fontMetrics().horizontalAdvance(tableHeaders.at(0)) + 10);
+    m_ui->pointingAprioriSigmaTable->setColumnWidth(1, fontMetrics().horizontalAdvance(tableHeaders.at(1)) + 10);
+    m_ui->pointingAprioriSigmaTable->setColumnWidth(2, fontMetrics().horizontalAdvance(tableHeaders.at(2)) + 10);
+    m_ui->pointingAprioriSigmaTable->setColumnWidth(3, fontMetrics().horizontalAdvance(tableHeaders.at(3)) + 10);
 
 
     // Add validators to the tables in the observation solve settings tab to validate the a priori
