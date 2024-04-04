@@ -24,7 +24,6 @@ find files of those names at the top level of this repository. **/
 #include "MaximumLikelihoodWFunctions.h"
 #include "Preference.h"
 #include "PvlObject.h"
-#include "XmlStackedHandlerReader.h"
 
 
 using namespace std;
@@ -83,7 +82,6 @@ namespace Isis {
       /**
        * Constructs BundleSettings using XML handler.
        *
-       * @param project A pointer to the project.
        * @param reader A pointer to a XmlStackedHandlerReader.
        * @param xmlFile The name of the XML file to be used to create a
        *                BundleSettings object.
@@ -92,8 +90,8 @@ namespace Isis {
        * @throw Isis::Exception::Io "Unable to open XML file with read access."
        * @throw Isis::Exception::Unknown "Failed to parse XML file."
        */
-      BundleSettingsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader,
-                                     FileName xmlFile) : BundleSettings(project, reader) {
+      BundleSettingsXmlHandlerTester(QXmlStreamReader *reader,
+                                     FileName xmlFile) : BundleSettings() {
 
         QString xmlPath(xmlFile.expanded());
         QFile file(xmlPath);
@@ -104,12 +102,13 @@ namespace Isis {
                            _FILEINFO_);
         }
 
-        QXmlInputSource xmlInputSource(&file);
-        bool success = reader->parse(xmlInputSource);
-        if (!success) {
-          throw IException(IException::Unknown,
-                           QString("Failed to parse xml file, [%1]").arg(xmlPath),
-                            _FILEINFO_);
+        if (reader->readNextStartElement()) {
+          if (reader->name() == "bundleSettings") {
+            readBundleSettings(reader);
+          }
+          else {
+            reader->raiseError(QObject::tr("Incorrect file"));
+          }
         }
 
       }
@@ -276,11 +275,18 @@ int main(int argc, char *argv[]) {
     writer.writeEndDocument();
     qXmlFile.close();
 
+    if(!qXmlFile.open(QFile::ReadOnly | QFile::Text)){
+      throw IException(IException::Unknown,
+                        QString("Failed to parse xml file, [%1]").arg(qXmlFile.fileName()),
+                        _FILEINFO_);
+    }
+
     // read serialized xml into object and then write object to log file
     qDebug() << "Testing XML: Object deserialized as (should match object above):";
-    XmlStackedHandlerReader reader;
-    BundleSettingsXmlHandlerTester bsFromXml(project, &reader, xmlFile);
+    QXmlStreamReader reader(&qXmlFile);
+    BundleSettingsXmlHandlerTester bsFromXml(&reader, xmlFile);
     printXml<BundleSettings>(bsFromXml);
+    qXmlFile.close();
 
     qDebug() << "Testing XML serialization 2: write XML from BundleSettings object...";
     // for test coverage, read/write the copySettings object with
@@ -300,10 +306,18 @@ int main(int argc, char *argv[]) {
     writer.writeEndDocument();
     qXmlFile.close();
 
+    if(!qXmlFile.open(QFile::ReadOnly | QFile::Text)){
+      throw IException(IException::Unknown,
+                        QString("Failed to parse xml file, [%1]").arg(qXmlFile.fileName()),
+                        _FILEINFO_);
+    }
+
     // read serialized xml into object and then write object to log file
     qDebug() << "Testing XML: Object deserialized as (should match object above):";
-    BundleSettingsXmlHandlerTester bsFromXml2(project, &reader, xmlFile);
+    QXmlStreamReader reader2(&qXmlFile);
+    BundleSettingsXmlHandlerTester bsFromXml2(&reader2, xmlFile);
     printXml<BundleSettings>(bsFromXml2);
+    qXmlFile.close();
     qXmlFile.remove();
 
 

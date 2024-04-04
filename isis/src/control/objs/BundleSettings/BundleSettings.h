@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <QPair>
 #include <QSharedPointer>
 #include <QString>
+#include <QXmlStreamReader>
 
 
 
@@ -23,7 +24,6 @@ find files of those names at the top level of this repository. **/
 #include "MaximumLikelihoodWFunctions.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
-#include "XmlStackedHandler.h"
 
 class QDataStream;
 class QUuid;
@@ -36,7 +36,6 @@ namespace Isis {
   class FileName;
   class Project;
   class PvlObject;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Container class for BundleAdjustment settings.
@@ -130,16 +129,6 @@ namespace Isis {
       //=====================================================================//
       BundleSettings();
       BundleSettings(const BundleSettings &other);
-      BundleSettings(Project *project,
-                     XmlStackedHandlerReader *xmlReader);
-#if 0
-      BundleSettings(FileName xmlFile,
-                     Project *project,
-                     XmlStackedHandlerReader *xmlReader,
-                     QObject *parent = NULL);
-      BundleSettings(XmlStackedHandlerReader *xmlReader,
-                     QObject *parent = NULL);
-#endif
       ~BundleSettings();
       BundleSettings &operator=(const BundleSettings &other);
 
@@ -288,6 +277,8 @@ namespace Isis {
       QString SCPVLFilename() const;
 
       void save(QXmlStreamWriter &stream, const Project *project) const;
+
+      void readBundleSettings(QXmlStreamReader *xmlReader);
 
     private:
       void init();
