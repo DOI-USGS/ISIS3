@@ -39,7 +39,6 @@ release.
 - Changed the default spiceinit url to https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/ and added deprecation warning for use of https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi url. [#5327](https://github.com/USGS-Astrogeology/ISIS3/issues/5327)
 - Skypt has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5443](https://github.com/USGS-Astrogeology/ISIS3/issues/5443)
 
-
 ### Fixed
 - Fixed a bug in which the histogram tool used the entire image to calculate bin size, which caused an issue with high dynamic range images. [#5371](https://github.com/DOI-USGS/ISIS3/issues/5371)
 - Fixed a bug in which 'version' file was compiled as source and prevented subsequent ISIS recompilation [#5374](https://github.com/DOI-USGS/ISIS3/issues/5374)
@@ -57,6 +56,9 @@ release.
 - CSMCamera can now read and use the body rotation from ALE produced ISDs [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 - CSMSkyMap added to CSMCamera for use with local rover projections in ISIS [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 - Added versioned default values to lrowacphomap's PHOALGO and PHOPARCUBE parameters and updated lrowacphomap to handle them properly. [#5452](https://github.com/DOI-USGS/ISIS3/pull/5452)
+- Added new Hayabusa2 translation for `SpacecraftName` to accept `HAYABUSA2` [#5395](https://github.com/DOI-USGS/ISIS3/issues/5395)
+- Added ALLOWERROR parameter to campt [#5393](https://github.com/DOI-USGS/ISIS3/pull/5393)
+- OSIRIS-REx Tagcams instrument support, tests, and test data added [#5424](https://github.com/DOI-USGS/ISIS3/issues/5424)
 
 ## [8.1.0] - 2024-01-08
 
@@ -109,6 +111,7 @@ release.
 - Fixed ProgramLauncher failing while reporting errors from launched programs [#5331](https://github.com/DOI-USGS/ISIS3/pull/5331)
 - Fixed high/low filter functionality in trimfilter [#5311](https://github.com/DOI-USGS/ISIS3/issues/5311)
 - Fixed downloadIsisData script excluding needed files in the calibration folder [#5272](https://github.com/DOI-USGS/ISIS3/issues/5272)
+- Fixed tgocassis2isis cas_cal_sc ingest errors and added error for cas_raw_sc images [#5413](https://github.com/DOI-USGS/ISIS3/issues/5413)
 
 ## [8.0.1] - 2023-08-23
 

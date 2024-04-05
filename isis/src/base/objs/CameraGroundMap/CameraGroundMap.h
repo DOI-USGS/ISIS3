@@ -1,5 +1,6 @@
 #ifndef CameraGroundMap_h
 #define CameraGroundMap_h
+
 /** This is free and unencumbered software released into the public domain.
 The authors of ISIS do not claim copyright on the contents of this file.
 For more details about the LICENSE terms and the AUTHORS, you will
@@ -69,6 +70,9 @@ namespace Isis {
    *                          allow the bundle adjustment to skip the back of planet test during iterations. 
    *                          Also changed the name of the angle variable to cosangle to be more 
    *                          descriptive. References #2591.
+   *  @history 2018-07-26 Kris Becker - Move all local variables  and methods to
+   *                         protected scope so derived objects can be developed
+   *                         properly
    */
   class CameraGroundMap {
     public:
@@ -135,7 +139,6 @@ namespace Isis {
       double p_focalPlaneX; //!< Camera's x focal plane coordinate
       double p_focalPlaneY; //!< Camera's y focal plane coordinate
 
-    private:
       void LookCtoFocalPlaneXY();  //!< Calculate focalplane x/y from lookvector in camera
       /** Surface point calculated from ground coordinates in GetXY and used for partials*/
       std::vector<double> m_pB;

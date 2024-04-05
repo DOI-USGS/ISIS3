@@ -1,0 +1,168 @@
+# Translates CaSSIS xml labels into the Instrument PvlGroup values
+# for the ingested ISIS cube labels.
+#
+# The Dependencies keyword specifies a tag or attribute at the same level as
+# the InputKey that uniquely identifies the InputKey.
+#
+# Consider the following translation group and xml
+#
+# Group = Samples
+#   Auto
+#   InputPosition  = (Array_2D_Image, Axis_Array)
+#   Dependencies   = "tag@axis_name|Sample"
+#   InputKey       = elements
+#   OutputName     = Samples
+#   OutputPosition = (Group, Dimensions)
+#   Translation    = (*, *)
+# End_Group
+#
+# <Array_2D_Image>
+#   <Axis_Array>
+#     <axis_name>Line</axis_name>
+#     <sequence_number>1</sequence_number>
+#     <elements>2048</elements>
+#   </Axis_Array>
+#   <Axis_Array>
+#     <axis_name>Sample</axis_name>
+#     <sequence_number>2</sequence_number>
+#     <elements>279</elements>
+#   </Axis_Array>
+# </Array_2D_Image>
+#
+# There are two Axis_Array tags below Array_2D_Image and both of them have an
+# elements tag.  So, the Dependencies keyword specifies to take the value of
+# the elements tag under the second Axis_Array array tag because it also has a
+# axis_name tag with a value of Sample.
+#
+#
+# This translation table is for translating CaSSIS xml labels into pvl cube
+# labels.
+#
+# See $ISISROOT/appdata/translations/XmlExample.trn for an example xml translation table
+# and documentation for the different options.
+#
+# history 2018-05-17 Kaitlyn Lee - Added ObservationId with a placeholder value for now.
+
+Group = SpacecraftName
+  Auto
+  InputPosition        = (Observation_Area, Observing_System, Observing_System_Component)
+  InputKeyDependencies = "tag@type|Host"
+  InputKey             = name
+  OutputName           = SpacecraftName
+  OutputPosition       = (Object,IsisCube,Group,Instrument)
+  Translation          = (*, *)
+End_Group
+
+
+
+Group = InstrumentId
+  Auto
+  InputPosition        = (Observation_Area, Observing_System, Observing_System_Component)
+  InputKeyDependencies = "tag@type|Instrument"
+  InputKey             = name
+  OutputName           = InstrumentId
+  OutputPosition       = (Object,IsisCube,Group,Instrument)
+  Translation          = (*, *)
+End_Group
+
+Group = Expanded
+  Auto
+  InputDefault         = 1
+  InputPosition        = (Observation_Area, Observing_System, Observing_System_Component)
+  InputKeyDependencies = "tag@type|Host"
+  InputKey             = name
+  OutputName           = Expanded
+  OutputPosition       = (Object,IsisCube,Group,Instrument)
+  Translation          = (1, *)
+End_Group
+
+Group = ObservationId
+  Auto
+  InputPosition      = (Identification_Area, Alias_List, Alias)
+  InputKey           = alternate_id
+  OutputName         = ObservationId
+  OutputPosition     = (Object, IsisCube, Group, Archive)
+  Translation        = (*, *)
+End_Group
+
+Group = TargetName
+  Auto
+  InputPosition        = (Observation_Area, Target_Identification)
+  InputKey             = name
+  OutputName           = TargetName
+  OutputPosition       = (Object,IsisCube,Group,Instrument)
+  Translation          = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputPosition        = (Observation_Area, Time_Coordinates)
+  InputKey             = start_date_time
+  OutputName           = StartTime
+  OutputPosition       = (Object,IsisCube,Group,Instrument)
+  Translation          = (*, *)
+End_Group
+
+Group = ExposureDuration
+  Auto
+  InputPosition        = (Observation_Area, Mission_Area, em16_tgo_cas:Cassis_Data, em16_tgo_cas:PEHK_Derived_Data)
+  InputKey             = em16_tgo_cas:exposure_time
+  OutputName           = ExposureDuration
+  OutputPosition       = (Object, IsisCube, Group, Instrument)
+  Translation          = (*, *)
+End_Group
+
+Group = Filter
+  Auto
+  InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
+  InputKey             = img:filter_name
+  OutputName           = Filter
+  OutputPosition       = (Object,IsisCube,Group,Instrument)
+  Translation          = (*, *)
+End_Group
+
+Group = FilterName
+  Auto
+  InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
+  InputKey             = img:filter_name
+  OutputName           = Filter
+  OutputPosition       = (Object,IsisCube,Group,BandBin)
+  Translation          = (*, *)
+End_Group
+
+Group = Center
+  Auto
+  InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
+  InputKey       = img:filter_name
+  OutputName     = Center
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (678.2, PAN)
+  Translation    = (494.8, BLU)
+  Translation    = (836.0, RED)
+  Translation    = (939.3, NIR)
+
+End_Group
+
+Group = Width
+  Auto
+  InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
+  InputKey       = img:filter_name
+  OutputName     = Width
+  OutputPosition = (Object, IsisCube, Group, BandBin)
+  Translation    = (231.9, PAN)
+  Translation    = (121.8, BLU)
+  Translation    = (98.5, RED)
+  Translation    = (133.6, NIR)
+End_Group
+
+Group = Expanded
+  Auto
+  Optional
+  InputPosition        = (CaSSIS_Header, DERIVED_HEADER_DATA)
+  InputKey             = Expanded
+  OutputName           = Expanded
+  OutputPosition       = (Object, IsisCube, Group, Instrument)
+  Translation          = (*, *)
+End_Group
+
+End

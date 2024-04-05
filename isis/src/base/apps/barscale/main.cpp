@@ -225,13 +225,13 @@ void IsisMain() {
   int lblStrWidth;
   if (leftLimit > 0) {
     lblStr.setNum(leftLimit);
-    lblStrWidth = metric.width(lblStr);
+    lblStrWidth = metric.horizontalAdvance(lblStr);
     totalWidth = totalWidth + lblStrWidth / 2;
     cornerSample = cornerSample + lblStrWidth / 2;
     leftDisplayRect.setRect( ( cornerSample - lblStrWidth / 2), (textCtrLine - fontHeight / 2 - 2),
                             (lblStrWidth + 10), (fontHeight + 8) );
   }
-  lblStrWidth = metric.width("0");
+  lblStrWidth = metric.horizontalAdvance("0");
   ctrDisplayRect.setRect( (cornerSample + leftLimit * scaleUnit / resolution + .5 - lblStrWidth / 2),
                          (textCtrLine - fontHeight / 2 - 2), (lblStrWidth + 10), (fontHeight + 8) );
 
@@ -250,7 +250,7 @@ void IsisMain() {
     }
   }
   lblStr = lblStr + " " + unitStr;
-  lblStrWidth = metric.width(lblStr);
+  lblStrWidth = metric.horizontalAdvance(lblStr);
   totalWidth = totalWidth + lblStrWidth + (textHt + 1) / 2 + 10;
   rightDisplayRect.setRect( (barWidth + cornerSample - lblStrWidth / 2),
                            (textCtrLine - fontHeight / 2 - 2),
@@ -431,11 +431,11 @@ void IsisMain() {
   painter.setLayoutDirection(Qt::LeftToRight);
   if (leftLimit > 0) {
     lblStr.setNum(leftLimit);
-    lblStrWidth = metric.width(lblStr);
+    lblStrWidth = metric.horizontalAdvance(lblStr);
     painter.drawText(leftDisplayRect, lblStr);
   }
   lblStr.setNum(0);
-  lblStrWidth = metric.width(lblStr);
+  lblStrWidth = metric.horizontalAdvance(lblStr);
   painter.drawText(ctrDisplayRect, lblStr);
   lblStr.setNum(rightLimit);
   lblStr = lblStr + " " + unitStr;

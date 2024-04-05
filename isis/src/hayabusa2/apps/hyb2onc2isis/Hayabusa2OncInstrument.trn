@@ -10,6 +10,7 @@ Group = SpacecraftName
   InputPosition  = FitsLabels
   OutputName     = SpacecraftName
   OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (HAYABUSA-2, HAYABUSA2)
   Translation    = (*, *)
 End_Group
 

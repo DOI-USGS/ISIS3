@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="tagcams2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import OSIRIS-REx TAGCAMS images into ISIS format
+  </brief>
+  <description>
+    <p>
+      This program will import FITS (Flexible Image Transport System) formatted 
+      files from the OSIRIS-REx TAGCAMS instrument suite, NavCam, NFTCam and
+      StowCam, into the ISIS3 cube format.
+    </p>
+    <p>
+       The instruments use an Aptina MT9P031 1/2.5 inch 5MP Digital Image
+       Sensor where the pixel array consists of a 2752-column by 2004-row
+       matrix of pixels. The manufacturer sets the physical origin of 0, 0
+       in the upper right corner of the entire array. The active array
+       region consists of 2592-columns and 1944-rows. The NAV team will 
+       typicall acquire all pixels in the pixel array (i.e., 2752x2004)
+       during operations. Reference [4] describes the pixel array and
+       details on operations and image acquisition. Note that this
+       application will result in the proper image orientation consistent
+       with the Kinetx system in the output ISIS cube image. The pixel
+       (1,1) at the upper left the ISIS cube is consistent with the
+       Kinetx system.
+    </p>
+    <p>
+      All three instrument files can be imported by tagcams2isis but the StowCam
+      is not properly converted to 3-color band cube. All instrument data will
+      typically contain boundary data around the borders of the image. These
+      data are comprised of dark pixels and several rows/columns of active
+      boundary pixels to minimize edge effects. These boundary pixels would
+      be removed by calibration processes, but at this time, there is no
+      plan to implement radiometric calibration. As such, the default behaviour
+      is to remove all boundary pixel data. See the REMOVECALPIXELS parameter.
+    </p>
+    <br/>
+    <h2>References</h2>
+    <br/>
+    <cite>
+      1) Bos, Brent, et al. (2018). Touch And Go Camera System (TAGCAMS) for the OSIRIS-REx
+      Asteroid Sample Return Mission. Space Science Reviews. 214. 10.1007/s11214-017-0465-2. 
+    </cite>
+    <br/>
+    <br/>
+    <cite>
+      2) Crombie, K, et al. (2017) OSIRIS-REx Touch-and-Go Camera Suite (TAGCAMS) Data Product Software 
+      Interface Specification, UA-SIS-9.4.4-322, Rev. 3.0 (03/09/2017)
+    </cite>
+    <br/>
+    <br/>
+    <cite>
+      3) Caplinger, M., et al. (2016) TAGCAMS Users Guide MSSS-TAG-REQ-4401 Final,
+      Malin Space Science Systems, Inc.
+    </cite>
+    <br/>
+    <br/>
+    <cite>
+      4) Aptina Imaging Corporation. (2005) 1/2.5-Inch 5Mp CMOS Digital Image Sensor (MT9P031),
+      https://www.mouser.com/pdfdocs/Leopard_Imaging_Aptina_931LI5M03.pdf
+    </cite>
+    <br/>
+    <br/>
+  </description>
+
+  <history>
+    <change name="Kris Becker" date="2018-03-07">
+      Original version
+    </change>
+    <change name="Kris Becker" date="2019-01-11">
+      Add new FITS keywords to propagate into labels from input FITS file.
+      Add parameter to remove calibration pixels from input image if they
+      are present in the input (raw L0) image. Compute inital camera head
+      temperature for use in camera model. Add SourceProductId keyword.
+    </change>
+    <change name="Kris Becker" date="2019-01-25">
+      Updated parameters for conversion of raw camera head temperature from
+      DNs to degrees Celsius as provided by NAV team.
+    </change>
+  </history>
+
+  <seeAlso>
+    <applications>
+      <item>fits2isis</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <missionItem>OSIRIS-REx</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          An OSIRIS-REx TAGCAMS FITS file to be converted to an ISIS cube
+        </brief>
+        <description>
+          Use this parameter to select the filename of an OSIRIS-REx TAGCAMS
+          file to be converted to an ISIS cube. This is expected to be a
+          FITS formatted file.
+        </description>
+        <filter>
+          *.fits
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output ISIS cube file
+        </brief>
+        <description>
+          The output cube file that will contain the OSIRIS-REx TAGCAMS
+          image in ISIS format.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Parameters">
+      <parameter name="REMOVECALPIXELS">
+        <type>boolean</type>
+        <brief>Remove image boundary calibration pixels</brief>
+        <description>
+          <p>
+            This parameter allows users to remove the boundary calibration
+            pixels from the input image. Raw TAGVCAMS frames will have
+            2752 samples and 2004 lines. The active region of the image
+            is 2592 samples and 1944 lines.
+          </p>
+          <p>
+            The border region of TAGCAMS images has 50 dark and 4 boundary
+            pixels (54 total) at the top of the image. The bottom has 2 dark
+            and 4 boundary pixels (6 total). The left side of the image has
+            134 dark and 10 bounary pixels (144 total). The right side of
+            the imagehas 10 dark and 6 boundary pixels (16 total).
+            All of these pixels will be removed if this parameter is set
+            to TRUE/YES.
+          </p>
+          <p>
+            The OSIRIS-REx mission provides the TAGCAMs images in raw
+            form so these boundaries are generally present in these images.
+            Due to the lack of a calibration application in ISIS3, it is
+            recommended these pixels be removed on import so that they
+            are conveniently excluded for subsequent processing. For this
+            reason, the default is (TRUE) to remove these pixels.
+          </p>
+        </description>
+        <default><item>True</item></default> 
+      </parameter>
+      <parameter name="TARGET">
+        <type>string</type>
+        <brief>Provide observation target if not in EDR</brief>
+        <description>
+            This parameter may be necessary as some FITS labels do not adequately defined
+            the TARGET keyword in the labels.  OSIRIS-REx takes a very long trip to 
+            finally arrive at Bennu orbit in 2018.  During cruise, several flybys occur.  The
+            proper specification of the TARGET is critical to valid instantiation of
+            ISIS camera models.  
+        </description>
+        <internalDefault>Label Value</internalDefault> 
+      </parameter>
+    </group>
+  </groups>
+
+</application>

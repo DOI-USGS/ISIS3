@@ -142,6 +142,10 @@ Group = InstrumentName
   Translation   = (OCams, SamCam)
   Translation   = (OCams, PolyCam)
 
+  Translation   = (TagCams, NAVCam)
+  Translation   = (TagCams, NFTCam)
+  Translation   = (TagCams, StowCam)
+
   # Rosetta
   Translation   = (Osiris, OSINAC)
   Translation   = (Osiris, OSIWAC)
