@@ -58,6 +58,7 @@ release.
 - Added new Hayabusa2 translation for `SpacecraftName` to accept `HAYABUSA2` [#5395](https://github.com/DOI-USGS/ISIS3/issues/5395)
 - Added ALLOWERROR parameter to campt [#5393](https://github.com/DOI-USGS/ISIS3/pull/5393)
 - OSIRIS-REx Tagcams instrument support, tests, and test data added [#5424](https://github.com/DOI-USGS/ISIS3/issues/5424)
+- Added min/max type drop-down selection option in QView's Stretch tool [#5289](https://github.com/DOI-USGS/ISIS3/issues/5289)
 
 ## [8.1.0] - 2024-01-08
 
