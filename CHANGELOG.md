@@ -54,6 +54,9 @@ release.
 - Fixed rclone.conf/downloadIsisData pointing to old naif kernel location, updated to archived locations and https [5394](https://github.com/DOI-USGS/ISIS3/issues/5394)
 - Fixed a parsing error in FitsToJson when an empty comment was reached. [#5469](https://github.com/DOI-USGS/ISIS3/pull/5469)
 
+### Added
+- Added new Hayabusa2 translation for `SpacecraftName` to accept `HAYABUSA2` [#5395](https://github.com/DOI-USGS/ISIS3/issues/5395)
+
 ## [8.0.2] - 2023-12-05
 ### Changed
 - Cnetedit has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5346](https://github.com/USGS-Astrogeology/ISIS3/issues/5346), 
