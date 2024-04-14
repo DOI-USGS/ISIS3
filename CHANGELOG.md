@@ -44,6 +44,7 @@ release.
 ### Fixed
 - Fixed a bug in which capital E was problematic for OSX / Ubuntu
 - Fixed bug in which not all references to 'version' file were replaced with new 'isis_version.txt' file [#5374](https://github.com/DOI-USGS/ISIS3/issues/5374)
+- Fixed a bug in which the IrregularBodyCameraGroundMap unit test was removed but not the associated truth file. [#5461](https://github.com/DOI-USGS/ISIS3/issues/5461)
 
 ## [8.0.2] - 2023-12-05
 ### Changed
