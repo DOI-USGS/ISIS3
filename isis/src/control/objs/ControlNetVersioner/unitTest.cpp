@@ -324,11 +324,11 @@ void TestNetwork(const QString &filename, Progress *progress, bool printNetwork,
       cNet2->write( FileName("./tmpCNet2") );
 
       //if there are differences between the pvls.
-      QString cmd = "diff -EbB --suppress-common-lines -I 'Version.*' " + networkFileName.expanded() + " ./tmp.pvl";
+      QString cmd = "diff -bB --suppress-common-lines -I 'Version.*' " + networkFileName.expanded() + " ./tmp.pvl";
       if(system(cmd.toStdString().c_str())) {
 
         //if the binary files are different.
-        if(system("diff -EbB --suppress-common-lines ./tmp ./tmpCNet2")){
+        if(system("diff -bB --suppress-common-lines ./tmp ./tmpCNet2")){
           cout << "The conversion from binary to pvl is incorrect." << endl;
         }
         else {
