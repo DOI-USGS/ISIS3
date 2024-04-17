@@ -40,6 +40,7 @@ release.
 - Skypt has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5443](https://github.com/USGS-Astrogeology/ISIS3/issues/5443)
 
 ### Fixed
+- Fixed a bug in which capital E was problematic for OSX / Ubuntu
 - Fixed bug in which not all references to 'version' file were replaced with new 'isis_version.txt' file [#5374](https://github.com/DOI-USGS/ISIS3/issues/5374)
 - Fixed a bug in which the IrregularBodyCameraGroundMap unit test was removed but not the associated truth file. [#5461](https://github.com/DOI-USGS/ISIS3/issues/5461)
 - Fixed a bug in which the histogram tool used the entire image to calculate bin size, which caused an issue with high dynamic range images. [#5371](https://github.com/DOI-USGS/ISIS3/issues/5371)
