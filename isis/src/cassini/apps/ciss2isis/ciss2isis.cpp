@@ -99,7 +99,7 @@ namespace Isis{
     }
 
     Pvl inputLabel(in.expanded());
-    if (inputLabel.hasKeyword"VALID_MAXIMUM"()) {
+    if (inputLabel.hasKeyword("VALID_MAXIMUM")) {
       PvlKeyword labelValidMax = inputLabel.findKeyword("VALID_MAXIMUM");
       if (labelValidMax[1] != "UNK") {
         validMax = toInt(labelValidMax[1]);
