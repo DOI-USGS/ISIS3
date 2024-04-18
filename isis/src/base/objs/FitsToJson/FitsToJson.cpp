@@ -85,7 +85,7 @@ namespace Isis {
               line.TrimHead(" ");
             }
             // If the line still has anything in it, treat it is as a comment.
-            if (line.size() > 0) {
+            if (line.size() > 2) {
               line.TrimHead(" /");
               label.addComment(line.ToQt());
               if (line != line.Token("[")) {
@@ -101,9 +101,13 @@ namespace Isis {
         line = readBuf;
         place += 80;
       }
+
+      // Save off the PvlGroup and the number of records read from this label
       fitsPvl.addGroup(*fitsLabel);
+      headerSizes->append((int)ceil(place / 2880.0));
+
       // Move the file pointer past the padding after the "END" (i.e., points to start of data)
-      std::streamoff jump;
+      std::streamoff jump = 0;
       jump = headerSizes->last() * 2880 - place;
       fileStream.seekg(jump, std::ios_base::cur);
 
