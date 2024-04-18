@@ -82,10 +82,8 @@ release.
 - Fixed <i>noproj</i> bug where missing shapemodel-related keywords (RayTraceEngine, BulletParts, Tolerance) are dropped when the output label is created. This resulted in the Bullet collision detection engine not being used. Issue: [#5377](https://github.com/USGS-Astrogeology/ISIS3/issues/5377)
 - Fixed ISIS failing to expand env variables with an "_" in them. [#5402](https://github.com/DOI-USGS/ISIS3/pull/5402)
 - Fixed <i>noproj</i> bug where match cube not NULL when not specifying MATCH parameter [#5381](https://github.com/USGS-Astrogeology/ISIS3/issues/5381)
-- Fixed findFeaturesSegment trying to merge networks when only 1 segmented network was successfully created [5416](https://github.com/DOI-USGS/ISIS3/issues/5416)
 - Fixed rclone.conf/downloadIsisData pointing to old naif kernel location, updated to archived locations and https [5394](https://github.com/DOI-USGS/ISIS3/issues/5394)
 - Fixed a parsing error in FitsToJson when an empty comment was reached. [#5469](https://github.com/DOI-USGS/ISIS3/pull/5469)
-- Fixed TrackTool, FindTool, and AdvancedTrackTool not reporting RA and DEC for images targeting the Sky. [#5409](https://github.com/DOI-USGS/ISIS3/pull/5409) 
 
 ### Added
 - Added new Hayabusa2 translation for `SpacecraftName` to accept `HAYABUSA2` [#5395](https://github.com/DOI-USGS/ISIS3/issues/5395)
