@@ -66,7 +66,7 @@ release.
 - OSIRIS-REx Tagcams instrument support, tests, and test data added [#5424](https://github.com/DOI-USGS/ISIS3/issues/5424)
 - Added min/max type drop-down selection option in QView's Stretch tool [#5289](https://github.com/DOI-USGS/ISIS3/issues/5289)
 
-## [8.0.2] - 2024-04-18
+## [8.0.3] - 2024-04-18
 
 ### Changed
 - Changed the default spiceinit url to https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/ and added deprecation warning for use of https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi url. [#5327](https://github.com/USGS-Astrogeology/ISIS3/issues/5327)
@@ -89,6 +89,21 @@ release.
 
 ### Added
 - Added new Hayabusa2 translation for `SpacecraftName` to accept `HAYABUSA2` [#5395](https://github.com/DOI-USGS/ISIS3/issues/5395)
+
+## [8.0.2] - 2023-12-05
+
+### Changed
+- Cnetedit has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5346](https://github.com/USGS-Astrogeology/ISIS3/issues/5346), 
+- Cnetdiff has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5322](https://github.com/USGS-Astrogeology/ISIS3/issues/5322), 
+### Fixed
+- Bug fix for Cnetthinner app resolving divide by zero in CnetManager.cpp. Issue: [#5354](https://github.com/USGS-Astrogeology/ISIS3/issues/5354), 
+- Updated photomet MinnaertEmpirical model to support photemplate-style PVL format [#3621](https://github.com/DOI-USGS/ISIS3/issues/3621)
+- Fixed target name translation for any dawn images with target "4 CERES" [#5294](https://github.com/DOI-USGS/ISIS3/pull/5294)
+- Fixed exception pop ups in qview when viewing images created using the CSM Camera [#5259](https://github.com/DOI-USGS/ISIS3/pull/5295/files)
+- Fixed shadowtau input file parseing errors when using example file [#5316](https://github.com/DOI-USGS/ISIS3/pull/5316)
+- Fixed ProgramLauncher failing while reporting errors from launched programs [#5331](https://github.com/DOI-USGS/ISIS3/pull/5331)
+- Fixed high/low filter functionality in trimfilter [#5311](https://github.com/DOI-USGS/ISIS3/issues/5311)
+- Fixed downloadIsisData script excluding needed files in the calibration folder [#5272](https://github.com/DOI-USGS/ISIS3/issues/5272)
 
 ## [8.1.0] - 2024-01-08
 
