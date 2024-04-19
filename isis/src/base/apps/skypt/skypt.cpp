@@ -13,6 +13,7 @@ find files of those names at the top level of this repository. **/
 
 #include "Brick.h"
 #include "Camera.h"
+#include "CSMCamera.h"
 #include "IException.h"
 #include "iTime.h"
 #include "PvlGroup.h"
@@ -63,7 +64,12 @@ namespace Isis{
     b.SetBasePosition(intSamp, intLine, 1);
     cube->read(b);
 
-    double rot = cam->CelestialNorthClockAngle();
+    double rot;
+    if (cube.hasBlob("CSMState", "String")) {
+      rot = ((CSMCamera*)cam)->CelestialNorthClockAngle();
+    } else {
+      rot = cam->CelestialNorthClockAngle();
+    }
 
     // Create group with sky position
     PvlGroup sp("SkyPoint");
