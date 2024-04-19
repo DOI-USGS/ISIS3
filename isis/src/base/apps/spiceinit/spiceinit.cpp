@@ -615,6 +615,16 @@ namespace Isis {
     QString instrumentId =
         labels.findGroup("Instrument", Pvl::Traverse)["InstrumentId"][0];
 
+    if (instrumentId == "HRSC"){
+      QString msg = "Spice Server does not support MEX HRSC images. Please rerun spiceinit with local MEX data.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    if (ui.GetString("URL") == "https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi"){
+      QString msg = "USER WARNING: The URL you entered has been deprecated and no longer recommended for use.";
+      std::cerr << msg << std::endl;
+    }
+
     QString url       = ui.GetString("URL") + "?mission=" + missionName +
                                               "&instrument=" + instrumentId;
     int port          = ui.GetInteger("PORT");
