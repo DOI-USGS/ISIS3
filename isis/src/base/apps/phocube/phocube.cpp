@@ -122,6 +122,7 @@ namespace Isis {
     bool bodyFixedZ = false;
     bool localSolarTime = false;
     bool sunilluminationmask = false;
+    bool surfaceobliquedetectorresolution = false;
     int raBandNum = 0;  // 0 based, if RA is 5th band, raBandNum will be 4
 
     if (!noCamera) {
@@ -152,6 +153,7 @@ namespace Isis {
       if ((bodyFixedZ = ui.GetBoolean("BODYFIXED"))) nbands++;
       if ((localSolarTime = ui.GetBoolean("LOCALTIME"))) nbands++;
       if ((sunilluminationmask = ui.GetBoolean("SUNILLUMINATIONMASK"))) nbands++;
+      if ((surfaceobliquedetectorresolution = ui.GetBoolean("SURFACEOBLIQUEDETECTORRESOLUTION"))) nbands++;
     }
 
     // ALLDN includes DN so if both are set ignore DN
@@ -340,6 +342,9 @@ namespace Isis {
     }
     if (sunilluminationmask) {
       name += "Sun Illumination Mask";
+    }
+    if (surfaceobliquedetectorresolution) {
+      name += "Surface Oblique Detector Resolution";
     }
     bool specialPixels = ui.GetBoolean("SPECIALPIXELS");
 
@@ -591,6 +596,7 @@ namespace Isis {
                 out[index] = pB[0];
                 index += 64 * 64;
               }
+
               if (bodyFixedY) {
                 out[index] = pB[1];
                 index += 64 * 64;

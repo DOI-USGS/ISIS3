@@ -1,6 +1,7 @@
 #include "phocube.h"
 
 #include <QTemporaryFile>
+#include <QTemporaryDir>
 #include <QTextStream>
 #include <QStringList>
 
@@ -57,8 +58,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
 
 
 TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
-//  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
-  QString cubeFileName = "phocubeTEMP.cub";
+  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
   QVector<QString> args = {"to=" + cubeFileName, "dn=true", "phase=true", "emission=true",
                            "incidence=true", "localemission=true", "localincidence=true",
                            "latitude=true", "longitude=true", "pixelresolution=true",
@@ -451,3 +451,109 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllDnBands) {
   cube.close();
 }
 
+
+/**
+   * FunctionalTestPhocubeSunIlluminationMask
+   * 
+   * phocube test of sunilluminationmask backplane.
+   * Input ...
+   *   1) Cropped OSIRIS-REx MapCam cube
+   *      (data/phocube/20190425T211232S312_map_iofL2pan-crop.cub)
+   *   2) phase, emission, incidence, latitude, longitude = no
+   *   3) sunilluminationmask = yes
+   * 
+   * Output ...
+   *      cube with sunilluminationmask backplane
+   */
+TEST(Phocube, FunctionalTestPhocubeSunIlluminationMask) {
+  QTemporaryDir tempDir;
+
+  // instantiate test cube
+  Cube testCube("data/phocube/20190425T211232S312_map_iofL2pan-crop.cub");
+  
+  QString outCubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+  QVector<QString> args = {"to=" + outCubeFileName, "phase=no", "emission=no",
+                           "incidence=no", "latitude=no", "longitude=no",
+                           "sunilluminationmask=yes"};
+  UserInterface options(APP_XML, args);
+  phocube(&testCube, options);
+
+  // open output cube and retrieve label
+  Cube cube(outCubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  ASSERT_EQ(cube.sampleCount(), testCube.sampleCount());
+  ASSERT_EQ(cube.lineCount(), testCube.lineCount());
+  ASSERT_EQ(cube.bandCount(), 1);
+
+  PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0],
+                      "Sun Illumination Mask");
+
+  for (int i = 0; i < cube.bandCount(); i++) {
+    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Center")[i].toDouble(), 650.0);
+    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Width")[i].toDouble(), 1.0);
+  }
+
+  // verify statistics of SunIlluminationMask band
+  std::unique_ptr<Histogram> hist (cube.histogram(1));
+  EXPECT_NEAR(hist->Average(), 0.44588570919140591, .000001);
+  EXPECT_NEAR(hist->Sum(), 30009, .000001);
+  EXPECT_EQ(hist->ValidPixels(), 67302);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.49706671048663414, .000001);
+
+  cube.close();
+}
+
+
+/**
+   * FunctionalTestPhocubeSurfaceObliqueDetectorResolution
+   * 
+   * phocube test of surfaceobliquedetectorresolution backplane.
+   * Input ...
+   *   1) Cropped OSIRIS-REx MapCam cube
+   *      (data/phocube/20190425T211232S312_map_iofL2pan-crop.cub)
+   *   2) phase, emission, incidence, latitude, longitude = no
+   *   3) surfaceobliquedetectorresolution = yes
+   * 
+   * Output ...
+   *      cube with surfaceobliquedetectorresolution backplane
+   */
+TEST(Phocube, FunctionalTestPhocubeSurfaceObliqueDetectorResolution) {
+  QTemporaryDir tempDir;
+
+  // instantiate test cube
+  Cube testCube("data/phocube/20190425T211232S312_map_iofL2pan-crop.cub");
+  
+  QString outCubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+  QVector<QString> args = {"to=" + outCubeFileName, "phase=no", "emission=no",
+                           "incidence=no", "latitude=no", "longitude=no",
+                           "surfaceobliquedetectorresolution=yes"};
+  UserInterface options(APP_XML, args);
+  phocube(&testCube, options);
+
+  // open output cube and retrieve label
+  Cube cube(outCubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  ASSERT_EQ(cube.sampleCount(), testCube.sampleCount());
+  ASSERT_EQ(cube.lineCount(), testCube.lineCount());
+  ASSERT_EQ(cube.bandCount(), 1);
+
+  PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Surface Oblique Detector Resolution");
+
+  for (int i = 0; i < cube.bandCount(); i++) {
+    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Center")[i].toDouble(), 650.0);
+    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Width")[i].toDouble(), 1.0);
+  }
+
+  // verify statistics of SunIlluminationMask band
+  std::unique_ptr<Histogram> hist (cube.histogram(1));
+  EXPECT_NEAR(hist->Average(), 1.9283095245704811, .000001);
+  EXPECT_NEAR(hist->Sum(), 129779.08762264252, .000001);
+  EXPECT_EQ(hist->ValidPixels(), 67302);
+  EXPECT_NEAR(hist->StandardDeviation(), 67.195033751062496, .000001);
+
+  cube.close();
+}
