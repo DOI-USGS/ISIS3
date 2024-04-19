@@ -65,7 +65,7 @@ namespace Isis{
     cube->read(b);
 
     double rot;
-    if (cube.hasBlob("CSMState", "String")) {
+    if (cube->hasBlob("CSMState", "String")) {
       rot = ((CSMCamera*)cam)->CelestialNorthClockAngle();
     } else {
       rot = cam->CelestialNorthClockAngle();
