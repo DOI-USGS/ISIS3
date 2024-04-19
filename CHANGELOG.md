@@ -42,7 +42,7 @@ release.
 - Changed the default spiceinit url to https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/ and added deprecation warning for use of https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi url. [#5327](https://github.com/USGS-Astrogeology/ISIS3/issues/5327)
 
 ### Fixed
-- Fixed a bug in which capital E was problematic for OSX / Ubuntu
+- Fixed a bug in which capital E was problematic for OSX / Ubuntu [#5466](https://github.com/DOI-USGS/ISIS3/pull/5466)
 - Fixed bug in which not all references to 'version' file were replaced with new 'isis_version.txt' file [#5374](https://github.com/DOI-USGS/ISIS3/issues/5374)
 - Fixed a bug in which the IrregularBodyCameraGroundMap unit test was removed but not the associated truth file. [#5461](https://github.com/DOI-USGS/ISIS3/issues/5461)
 - Fixed a bug in which the histogram tool used the entire image to calculate bin size, which caused an issue with high dynamic range images. [#5371](https://github.com/DOI-USGS/ISIS3/issues/5371)
