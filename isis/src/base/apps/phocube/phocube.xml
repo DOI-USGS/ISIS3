@@ -328,7 +328,7 @@ xsi:noNamespaceSchemaLocation=
       Added initial slope and backplane options for the local normal and the
       ellipsoid normal.
     </change>
-    <change name="Ken Edmundson" date="2024-04-17">
+    <change name="Ken Edmundson" date="2024-04-24">
       Added Sunilluminationmask and SurfaceObliqueDetectorResolution backplanes.
       SurfaceObliqueDetectorResolution is in addition to the existing
       ObliqueDetectorResolution. The difference is that ObliqueDetectorResolution
@@ -863,54 +863,70 @@ xsi:noNamespaceSchemaLocation=
       <parameter name="SUNILLUMINATIONMASK">
          <type>boolean</type>
          <default><item>FALSE</item></default>
-         <brief>Create band of 1 (illuminated) or 0 (shadowed) indicating sun illumination state</brief>
+         <brief>Create band with pixel values of 1 (illuminated) or 0 (shadowed) indicating
+                sun illumination state</brief>
          <description>
-             <p>
+            <p>
     	        If this parameter is true, the <b>Solar Illumination Mask</b>
-                or shadow mask, will be determined for every pixel. This option is mainly
-                useful for small irregular bodies, such as comets, where terrain is
-                occluded from solar illumination at the surface intersection point at
-                a given pixel. This information cannot be provided solely by incidence
-                or local incidence angles because the occlusion occurs due to
-                foreground terrain, such as lobes in comets, at much larger distances
-                than the proximity of the initial surface point of intersection. 
+              (or shadow mask), will be determined for every pixel. This option is
+              primarily useful for small irregular bodies (e.g. comets, asteroids),
+              where terrain is occluded from solar illumination at the surface
+              intersection point at a given pixel. This information cannot be provided
+              solely by incidence or local incidence angles as the occlusion occurs due
+              to foreground terrain, such as lobes in comets, at much larger distances
+              than the proximity of the initial surface point of intersection. The
+              output cube label will contain "Sun Illumination Mask" in the BandBin group,
+              in band sequence of the output file. 
             </p>
             <p>
-                The output mask pixel is a boolean value computed using ray tracing
-                functions whereby a look direction from the sun is computed to the
-                spacecraft (camera) pixel intercept location on the surface. If the solar
-                intercept point on the surface is not the same point as seen from the
-                spacecraft/camera perspective, it is deemed occluded (shadowed). 
-                For tessellated plate shape models, which are often used to represent
-                the shape of irregular bodies, both camera and solar surface
-                intercept points must occur on the same triangle at approximately
-                the same location.
+              The output mask pixel is a boolean value computed using ray trace
+              functions. Pixels are either 1 (illuminated) or 0 (shadowed). A look
+              direction from the sun is computed to the spacecraft (camera) pixel
+              intercept location on the surface. If the solar intercept point on the
+              surface is not the same point as seen from the spacecraft/camera
+              perspective, it is deemed occluded (shadowed).  For tessellated plate shape
+              models, which are often used to represent the shape of irregular bodies, both
+              camera and solar surface intercept points must occur on the same triangle at
+              approximately the same location.
             </p>
             <p>
-                If the surface point is occluded/shadowed, a 0 (false) value is
-                written as the output pixel mask value indicating it is not
-                illuminated by the sun. All other cases will result in setting
-                the output pixel mask value to 1 (true) indicating illumination by
-                the sun. Note this mask will also include (i.e., identify pixels in)
-                the <b>local</b> incidence backplane where the angles are greater
-                than 90 degrees.
+              If the surface point is occluded/shadowed, a 0 (false) value is
+              written as the output pixel mask value indicating it is not
+              illuminated by the sun. All other cases will result in setting
+              the output pixel mask value to 1 (true) indicating illumination by
+              the sun. Note this mask will also include (i.e., identify pixels in)
+              the <b>local</b> incidence backplane where the angles are greater
+              than 90 degrees.
             </p>
-	 </description>
+            <p>
+              Note: The computation of this backplane is not supported for all ISIS
+              shape models or for the ellipsoid. At this time we know that it functions
+              properly using the Bullet ray trace engine.
+            </p>
+         </description>
        </parameter>
        <parameter name="SURFACEOBLIQUEDETECTORRESOLUTION">
         <type>boolean</type>
         <default><item>FALSE</item></default>
         <brief>Create the surface oblique detector resolution band</brief>
         <description>
-          If this parameter is true, the <def>Surface Oblique Detector Resolution</def>
-          will be computed for every pixel and placed in a band in the output cube. This
-          value differs from the Oblique Detector Resolution due to use of the local
-          emission angle for that data. This value is computed using the emission angle
-          computed from the ellipsoid, which will produce a smoother data plane. 
-          The output cube labels will contain "Surface Oblique Detector Resolution"
-          in the BandBin group, in band sequence of the output file.  
-          SurfaceObliqueDetectorResolution is in millimeters.
-        </description>
+            <p>
+              If this parameter is true, the <def>Surface Oblique Detector
+              Resolution</def> will be computed for every pixel and placed
+              in a band in the output cube. This value differs from the
+              Oblique Detector Resolution due to use of the local emission
+              angle for that data. It is computed using the emission angle
+              computed from the ellipsoid, which will produce a smoother
+              data plane. The output cube label will contain "Surface Oblique
+              Detector Resolution" in the BandBin group, in band sequence of
+              the output file. SurfaceObliqueDetectorResolution is in millimeters.
+            </p>
+            <p>
+              Note: The computation of this backplane is not supported for all ISIS
+              shape models or for the ellipsoid. At this time we know that it functions
+              properly using the Bullet ray trace engine.
+            </p>
+         </description>
       </parameter>
     </group>
   </groups>

@@ -18,7 +18,6 @@ using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/phocube.xml").expanded();
 
-
 TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
   QVector<QString> args = {"to=" + cubeFileName};
@@ -482,14 +481,17 @@ TEST(Phocube, FunctionalTestPhocubeSunIlluminationMask) {
   Cube cube(outCubeFileName);
   Pvl *isisLabel = cube.label();
 
+  // verify sample, line, and band counts
   ASSERT_EQ(cube.sampleCount(), testCube.sampleCount());
   ASSERT_EQ(cube.lineCount(), testCube.lineCount());
   ASSERT_EQ(cube.bandCount(), 1);
 
+  // confirm "Sun Illumination Mask" is in BandBin group
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0],
                       "Sun Illumination Mask");
 
+  // verify center and width entries in BandBin group
   for (int i = 0; i < cube.bandCount(); i++) {
     EXPECT_DOUBLE_EQ(bandBin.findKeyword("Center")[i].toDouble(), 650.0);
     EXPECT_DOUBLE_EQ(bandBin.findKeyword("Width")[i].toDouble(), 1.0);
@@ -497,10 +499,10 @@ TEST(Phocube, FunctionalTestPhocubeSunIlluminationMask) {
 
   // verify statistics of SunIlluminationMask band
   std::unique_ptr<Histogram> hist (cube.histogram(1));
-  EXPECT_NEAR(hist->Average(), 0.44588570919140591, .000001);
-  EXPECT_NEAR(hist->Sum(), 30009, .000001);
-  EXPECT_EQ(hist->ValidPixels(), 67302);
-  EXPECT_NEAR(hist->StandardDeviation(), 0.49706671048663414, .000001);
+  EXPECT_NEAR(hist->Average(), 0.069599999999999995, .000001);
+  EXPECT_NEAR(hist->Sum(), 696, .000001);
+  EXPECT_EQ(hist->ValidPixels(), 10000);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.25448441255138432, .000001);
 
   cube.close();
 }
@@ -536,24 +538,28 @@ TEST(Phocube, FunctionalTestPhocubeSurfaceObliqueDetectorResolution) {
   Cube cube(outCubeFileName);
   Pvl *isisLabel = cube.label();
 
+  // verify sample, line, and band counts
   ASSERT_EQ(cube.sampleCount(), testCube.sampleCount());
   ASSERT_EQ(cube.lineCount(), testCube.lineCount());
   ASSERT_EQ(cube.bandCount(), 1);
 
+  // confirm "Surface Oblique Detector Resolution" is in BandBin group
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Surface Oblique Detector Resolution");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0],
+                      "Surface Oblique Detector Resolution");
 
+  // verify center and width entries in BandBin group
   for (int i = 0; i < cube.bandCount(); i++) {
     EXPECT_DOUBLE_EQ(bandBin.findKeyword("Center")[i].toDouble(), 650.0);
     EXPECT_DOUBLE_EQ(bandBin.findKeyword("Width")[i].toDouble(), 1.0);
   }
 
-  // verify statistics of SunIlluminationMask band
+  // verify statistics of SurfaceObliqueDetectorResolution band
   std::unique_ptr<Histogram> hist (cube.histogram(1));
-  EXPECT_NEAR(hist->Average(), 1.9283095245704811, .000001);
-  EXPECT_NEAR(hist->Sum(), 129779.08762264252, .000001);
-  EXPECT_EQ(hist->ValidPixels(), 67302);
-  EXPECT_NEAR(hist->StandardDeviation(), 67.195033751062496, .000001);
+  EXPECT_NEAR(hist->Average(), 1.0194664368391038, .000001);
+  EXPECT_NEAR(hist->Sum(), 10194.664368391037, .000001);
+  EXPECT_EQ(hist->ValidPixels(), 10000);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.87629359782481731, .000001);
 
   cube.close();
 }

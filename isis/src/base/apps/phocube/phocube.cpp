@@ -183,7 +183,7 @@ namespace Isis {
       throw IException(IException::User, message, _FILEINFO_);
     }
 
-    // If outputting a dn band, retrieve the orignal values for the filter name(s) from the input cube,
+    // If outputting a dn band, retrieve the original values for the filter name(s) from the input cube,
     // if they are in the band bin group.  Otherwise, the default will be "DN"
     QString bname = "DN";
     PvlKeyword bnames;
