@@ -35,6 +35,9 @@ release.
 
 ## [Unreleased]
 
+### Added
+- Added backplane options for SunIllumination and SurfaceObliqueDetectorResolution to phocube [#5467](https://github.com/DOI-USGS/ISIS3/issues/5467)
+
 ## [8.2.0] - 2024-04-18
 
 ### Changed
