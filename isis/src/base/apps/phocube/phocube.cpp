@@ -23,7 +23,6 @@ find files of those names at the top level of this repository. **/
 #include "TProjection.h"
 
 #include <cmath>
-//#include <SpiceUsr.h>
 
 using namespace std;
 

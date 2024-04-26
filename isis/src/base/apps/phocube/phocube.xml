@@ -899,9 +899,9 @@ xsi:noNamespaceSchemaLocation=
               than 90 degrees.
             </p>
             <p>
-              Note: The computation of this backplane is not supported for all ISIS
+              <b>Note: The computation of this backplane is not supported for all ISIS
               shape models or for the ellipsoid. At this time we know that it functions
-              properly using the Bullet ray trace engine.
+              properly using the Bullet ray trace engine.</b>
             </p>
          </description>
        </parameter>
@@ -922,9 +922,9 @@ xsi:noNamespaceSchemaLocation=
               the output file. SurfaceObliqueDetectorResolution is in millimeters.
             </p>
             <p>
-              Note: The computation of this backplane is not supported for all ISIS
+              <b>Note: The computation of this backplane is not supported for all ISIS
               shape models or for the ellipsoid. At this time we know that it functions
-              properly using the Bullet ray trace engine.
+              properly using the Bullet ray trace engine.</b>
             </p>
          </description>
       </parameter>
