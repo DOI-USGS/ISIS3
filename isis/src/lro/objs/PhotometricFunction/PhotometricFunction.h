@@ -20,46 +20,6 @@ find files of those names at the top level of this repository. **/
 
 namespace Isis {
 
-  /**
-   * @brief Implement templatized MIN fumnction
-   *
-   * Returns mininum value of both inputs of a specific type
-   *
-   * @param A first constant value of a type for comparison
-   * @param B second constant value of a type for comparison
-   *
-   * @return @b T type value
-   *
-   */
-  template<typename T> inline T MIN( const T &A, const T &B ) {
-    if (A < B) {
-      return (A);
-    }
-    else {
-      return (B);
-    }
-  }
-
-  /**
-   * @brief Implement templatized MAX fumnction
-   *
-   * Returns maximum value of both inputs of a specifific type
-   *
-   * @param A first constant value of a type for comparison
-   * @param B second constant value of a type for comparison
-   *
-   * @return @b T type value
-   *
-   */
-  template<typename T> inline T MAX( const T &A, const T &B ) {
-    if (A > B) {
-      return (A);
-    }
-    else {
-      return (B);
-    }
-  }
-
   class PvlObject;
   class Camera;
 

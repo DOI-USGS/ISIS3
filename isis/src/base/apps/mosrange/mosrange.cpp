@@ -23,24 +23,6 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
-  
-  template <typename T> inline T MIN(const T &A, const T &B) {
-    if(A < B) {
-      return (A);
-    }
-    else         {
-      return (B);
-    }
-  }
-
-  template <typename T> inline T MAX(const T &A, const T &B) {
-    if(A > B) {
-      return (A);
-    }
-    else         {
-      return (B);
-    }
-  }
 
   static inline double SetFloor(double value, const int precision) {
     double scale = pow(10.0, precision);
@@ -294,13 +276,13 @@ namespace Isis {
                           "meters/pixel");
     mapping += PvlKeyword("CenterLongitude", toString(SetRound(avgLon, digits)));
     mapping += PvlKeyword("CenterLatitude",  toString(SetRound(avgLat, digits)));
-    mapping += PvlKeyword("MinimumLatitude", toString(MAX(SetFloor(latitudeStat.Minimum(),
+    mapping += PvlKeyword("MinimumLatitude", toString(std::max(SetFloor(latitudeStat.Minimum(),
                                                                    digits), -90.0)));
-    mapping += PvlKeyword("MaximumLatitude", toString(MIN(SetCeil(latitudeStat.Maximum(),
+    mapping += PvlKeyword("MaximumLatitude", toString(std::min(SetCeil(latitudeStat.Maximum(),
                                                                    digits), 90.0)));
-    mapping += PvlKeyword("MinimumLongitude", toString(MAX(SetFloor(longitudeStat.Minimum(),
+    mapping += PvlKeyword("MinimumLongitude", toString(std::max(SetFloor(longitudeStat.Minimum(),
                                                                     digits), -180.0)));
-    mapping += PvlKeyword("MaximumLongitude", toString(MIN(SetCeil(longitudeStat.Maximum(),
+    mapping += PvlKeyword("MaximumLongitude", toString(std::min(SetCeil(longitudeStat.Maximum(),
                                                                    digits), 360.0)));
 
     PvlKeyword clat("PreciseCenterLongitude", toString(avgLon));

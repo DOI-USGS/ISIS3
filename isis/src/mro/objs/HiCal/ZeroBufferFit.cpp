@@ -175,7 +175,7 @@ namespace Isis {
     Statistics s;
 
     //  Get the head of the data set
-    int n0 = MIN(nb, 20);
+    int n0 = std::min(nb, 20);
     for ( int k = 0 ; k < n0 ; k++ ) {
       double d = _b2[k] - (cc[0] + cc[1] * _timet(k));
       s.AddData(&d, 1);
@@ -235,7 +235,7 @@ namespace Isis {
     for (int i = 0 ; i < n ; i++) {
         double lt = _timet(i);
         double et = a3 * lt;
-        double Yi = a0 + (a1 * lt) + a2 * exp(MIN(et,_maxLog));
+        double Yi = a0 + (a1 * lt) + a2 * exp(std::min(et,_maxLog));
         f[i] = (Yi - _b2[i]);
     }
     return (f);
@@ -253,7 +253,7 @@ namespace Isis {
     for (int i = 0; i < n; i++) {
       double lt = _timet(i);
       double et = a3 * lt;
-      double p0 = exp (MIN(et,_maxLog));
+      double p0 = exp (std::min(et,_maxLog));
       J[i][0] = 1.0;
       J[i][1] = lt;
       J[i][2] = p0;

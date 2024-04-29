@@ -132,17 +132,17 @@ void IsisMain() {
   // Determine number of valid darks.  For no binning will have 3.  All combos
   // that have 2x2 total binning will give 1 valid dark.  All other options
   // have no valid dark columns.
-  g_nValidDark = MIN(g_nDarkColumns, 3);
+  g_nValidDark = std::min(g_nDarkColumns, 3);
   if (g_nValidDark < 3) {
     if ((fpuBin + pxlBin) > 1) g_nValidDark = 0;
-    else g_nValidDark = MIN(g_nValidDark, 1);
+    else g_nValidDark = std::min(g_nValidDark, 1);
   }
 
   // Determine number of samples/columns to NULL.  For no binning it will yield 4
   // columns to NULL.  For DPU but no MP binning, 3;  For no DPU but MP binning,
   // 2x2 yields 3, 4x4 and 8x8 yields 1.
   g_nSampsToNull = (pxlBin < 2) ? 0 : ((pxlBin > 2) ? 1 : 3);  // Only MP here
-  g_nSampsToNull = MIN(MAX(g_nDarkColumns + 1, g_nSampsToNull), 4);  // No more than 4!
+  g_nSampsToNull = std::min(std::max(g_nDarkColumns + 1, g_nSampsToNull), 4);  // No more than 4!
   g_darkStrip.Reset();
 
   g_ccdTemperature = icube->group("Archive")["CCDTemperature"];
