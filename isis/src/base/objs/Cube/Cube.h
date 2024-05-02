@@ -30,9 +30,9 @@ namespace Isis {
   class Camera;
   class CubeAttributeOutput;
   class CubeCachingAlgorithm;
-  class CubeIoHandler;
   class CubeStretch;
   class FileName;
+  class ImageIoHandler;
   class Projection;
   class Pvl;
   class PvlGroup;
@@ -230,7 +230,8 @@ namespace Isis {
          * The symbol '*' denotes tile boundaries.
          * The symbols '-' and '|' denote cube boundaries.
          */
-        Tile
+        Tile,
+        Tiff
       };
 
       void fromIsd(const FileName &fileName, Pvl &label, nlohmann::json &isd, QString access);
@@ -243,6 +244,7 @@ namespace Isis {
       bool isReadOnly() const;
       bool isReadWrite() const;
       bool labelsAttached() const;
+      bool labelsExternal() const;
 
       void attachSpiceFromIsd(nlohmann::json Isd);
 
@@ -279,6 +281,7 @@ namespace Isis {
       void setExternalDnData(FileName cubeFileWithDnData);
       void setFormat(Format format);
       void setLabelsAttached(bool attached);
+      void setLabelsExternal(bool external);
       void setLabelSize(int labelBytes);
       void setPixelType(PixelType pixelType);
       void setVirtualBands(const QList<QString> &vbands);
@@ -326,14 +329,13 @@ namespace Isis {
       void latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude,
                        double &maxLongitude);
 
-
+      FileName realDataFileName() const;
     private:
       void applyVirtualBandsToLabel();
       void cleanUp(bool remove);
 
       void construct();
       QFile *dataFile() const;
-      FileName realDataFileName() const;
 
       void initialize();
       void initCoreFromLabel(const Pvl &label);
@@ -364,7 +366,7 @@ namespace Isis {
        * This does the heavy lifting for cube DN IO and is always allocated
        *   when isOpen() is true.
        */
-      CubeIoHandler *m_ioHandler;
+      ImageIoHandler *m_ioHandler;
 
       /**
        * The byte order of the opened cube; if there is no open cube then
@@ -415,6 +417,9 @@ namespace Isis {
       //! True if labels are attached
       bool m_attached;
 
+      //! True if labels are external
+      bool m_external;
+
       /**
        * True (most common case) when the cube DN data is inside the file we're writing to. False
        *   means we're referencing another cube's internal DN data for reading, and writing buffers
@@ -451,6 +456,7 @@ namespace Isis {
 
       //! If allocated, converts from physical on-disk band # to virtual band #
       QList<int> *m_virtualBandList;
+  };
 }
 
 //! This allows Cube *'s to be stored in a QVariant.
