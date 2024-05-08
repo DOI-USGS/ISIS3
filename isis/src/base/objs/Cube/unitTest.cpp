@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
     cerr << "Creating 8-bit cube ... " << endl;
     Cube out2;
     out2.setDimensions(150, 200, 1);
-    out2.setLabelsAttached(false);
+    out2.setLabelsAttached(Cube::DetachedLabel);
     out2.setBaseMultiplier(200.0, -1.0);
 //  out2.SetByteOrder(Msb);
     out2.setByteOrder(ISIS_LITTLE_ENDIAN ? Msb : Lsb);
