@@ -67,7 +67,8 @@ endfunction(copy_app_docs_info)
 function(build_upper_level)
 
   # Copy the assets folder to the specific version directory
-  copy_folder(${docBuildFolder}/assets/ ${docInstallFolder}/${docVersion}/assets)
+  file(MAKE_DIRECTORY "${docInstallFolder}/${docVersion}/assets")
+  copy_folder(${docBuildFolder}/assets ${docInstallFolder}/${docVersion})
   
   # Create the main documentaion page. This is located in the version directory 
   execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
