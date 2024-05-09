@@ -13,20 +13,18 @@
 using namespace std;
 
 namespace Isis {
-  GdalIoHandler::GdalIoHandler(QString &dataFilePath, const QList<int> *virtualBandList, const Pvl &label) : 
+  GdalIoHandler::GdalIoHandler(QString &dataFilePath, const QList<int> *virtualBandList, GDALDataType pixelType) : 
                  ImageIoHandler(virtualBandList) {
     GDALAllRegister();
     const GDALAccess eAccess = GA_Update;
     std::string dataFilePathStr = dataFilePath.toUtf8().constData();
     const char *charDataFilePath = dataFilePathStr.c_str();
     m_geodataSet = GDALDatasetUniquePtr(GDALDataset::FromHandle(GDALOpen(charDataFilePath, eAccess)));
-    std::cout << m_geodataSet->GetRasterXSize() << std::endl;
-    std::cout << m_geodataSet->GetRasterYSize() << std::endl;
-    std::cout << m_geodataSet->GetRasterCount() << std::endl;
     if (!m_geodataSet) {
       QString msg = "Constructing GdalIoHandler failed";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    m_pixelType = pixelType;
   }
 
   GdalIoHandler::~GdalIoHandler() {
@@ -45,7 +43,7 @@ namespace Isis {
                      bufferToFill.SampleDimension(), bufferToFill.LineDimension(),
                      bufferToFill.DoubleBuffer(), 
                      bufferToFill.SampleDimension(), bufferToFill.LineDimension(), 
-                     GDT_Float64,
+                     m_pixelType,
                      0, 0);
   }
 
@@ -62,7 +60,7 @@ namespace Isis {
                      bufferToWrite.SampleDimension(), bufferToWrite.LineDimension(),
                      bufferToWrite.DoubleBuffer(), 
                      bufferToWrite.SampleDimension(), bufferToWrite.LineDimension(), 
-                     GDT_Float64,
+                     m_pixelType,
                      0, 0);
   }
 

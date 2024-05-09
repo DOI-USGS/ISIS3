@@ -231,7 +231,7 @@ namespace Isis {
          * The symbols '-' and '|' denote cube boundaries.
          */
         Tile,
-        Tiff
+        GTiff
       };
 
       /**
@@ -358,6 +358,8 @@ namespace Isis {
 
       void initialize();
       void initCoreFromLabel(const Pvl &label);
+      void initCoreFromGdal(const QString &labelFile);
+      void initLabelState(const Pvl &label);
       void initLabelFromFile(FileName labelFileName, bool readWrite);
       void openCheck();
       Pvl realDataFileLabel() const;
