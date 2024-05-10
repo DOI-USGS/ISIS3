@@ -6,7 +6,7 @@
 
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis3/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis3)
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis)
-[![Badge for DOI 10.5066/P1374ZGR](https://img.shields.io/badge/DOI-10.5066%2FP1374ZGR-blue)](https://doi.org/10.5066/P1374ZGR)
+[![Badge for DOI 10.5066/P13YBMZA](https://img.shields.io/badge/DOI-10.5066%2FP13YBMZA-blue)](https://doi.org/10.5066/P13YBMZA)
 
 ## Table of Contents
 
@@ -388,9 +388,9 @@ Please refer to the GitHub wiki page [ISIS Online Workshops](https://github.com/
 
 ## Citing ISIS
 
-The badge at the top of this README lists the DOI of the most recent ISIS version.  As of 04/03/2024, the latest release of ISIS is version 8.0.2, and its DOI is [`10.5066/P1374ZGR`](https://doi.org/10.5066/P1374ZGR).
+The badge at the top of this README lists the DOI of the most recent ISIS version.  As of 05/09/2024, the latest release of ISIS is version 8.0.3, and its DOI is [`10.5066/P13YBMZA`](https://doi.org/10.5066/P13YBMZA).
 
-Since ISIS 8.0.1, The [Releases Page on GitHub](https://github.com/DOI-USGS/ISIS3/releases) list the DOI for each version of ISIS.  Before ISIS 8.0.0, the DOIs for some versions are listed on [Zenodo](https://doi.org/10.5281/zenodo.2563341) in the versions sidebar on the right.  It is good practice to cite the version of the software being used by the citing work, so others can reproduce your exact results.
+The [Releases Page on GitHub](https://github.com/DOI-USGS/ISIS3/releases) lists the DOI for each version of ISIS.  Older versions may be listed on [Zenodo](https://doi.org/10.5281/zenodo.2563341).  It is good practice to cite the version of the software being used by the citing work, so others can reproduce your exact results.
 
 ## The ISIS Data Area
 
