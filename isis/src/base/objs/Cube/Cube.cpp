@@ -539,6 +539,7 @@ namespace Isis {
             m_dataFileName = new FileName(cubFile);
             std::string dataFileName = m_dataFileName->expanded().toStdString();
             char **papszOptions = NULL;
+            papszOptions = CSLSetNameValue(papszOptions, "COMPRESS", "DEFLATE");
             GDALDataset *dataset = driver->Create(dataFileName.c_str(), sampleCount(), lineCount(), bandCount(), IsisPixelToGdal(pixelType()), papszOptions);
             for (int i = 1; i <= bandCount(); i++) {
               GDALRasterBand *band = dataset->GetRasterBand(i);
@@ -548,6 +549,7 @@ namespace Isis {
             if (dataset) {
               delete dataset;
             }
+            CSLDestroy( papszOptions );
           }
         }
         
@@ -1239,18 +1241,21 @@ namespace Isis {
     if (m_pixelType == UnsignedByte) {
       x1 = VALID_MIN1;
       x2 = VALID_MAX1;
+      m_multiplier = (max - min) / (x2 - x1);
+      m_base = min - m_multiplier * x1;
     }
     else if (m_pixelType == SignedWord) {
       x1 = VALID_MIN2;
       x2 = VALID_MAX2;
+      m_multiplier = (max - min) / (x2 - x1);
+      m_base = min - m_multiplier * x1;
     }
     else if (m_pixelType == UnsignedWord) {
       x1 = VALID_MINU2;
       x2 = VALID_MAXU2;
+      m_multiplier = (max - min) / (x2 - x1);
+      m_base = min - m_multiplier * x1;
     }
-    
-    m_multiplier = (max - min) / (x2 - x1);
-    m_base = min - m_multiplier * x1;
   }
 
 
