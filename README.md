@@ -12,9 +12,9 @@
 
 * [Requests for Comment](README.md#Requests-for-Comment)
 * [FAQ](README.md#FAQ)
-* [Installation](README.md#Installation)
 * [ISIS Tutorials](README.md#ISIS-Tutorials)
 * [Citing ISIS](README.md#Citing-ISIS)
+* [Installation](README.md#Installation)
 * [Start Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
 * [ISIS Data Area](README.md#The-ISIS-Data-Area)
 * [ISIS Test Data](README.md#ISIS-Test-Data)
