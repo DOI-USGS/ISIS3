@@ -23,15 +23,24 @@
 
 
 ## Requests for Comment
-The ISIS project uses a Request for Comment (RFC) model whereby major potential changes to the code base, data area, or binary delivery process are proposed, iterated on by any interested parties, and potentially adopted. Right now, RFCs are being housed in this repository's [wiki](https://github.com/USGS-Astrogeology/ISIS3/wiki) with associated discussions occurring on [astrodiscuss](https://astrodiscuss.usgs.gov).
+The ISIS project uses a Request for Comment (RFC) model where major changes to the code base, data area, or binary delivery process are proposed, iterated on, and potentially adopted. Right now, RFCs are being housed in this repository's [wiki](https://github.com/USGS-Astrogeology/ISIS3/wiki).
 
 Current open RFCs:
   * No Requests for Comment are currently open
 
-  We encourage all contributors and users to review open RFCs and comment as these proposed changes will impact use of the software.
+  We encourage all contributors and users to review open RFCs and comment, as these proposed changes will impact use of the software.
 
 ## FAQ
 We maintain a list of frequently encountered questions and issues. Before opening a new issue, please take a look at the [FAQ](https://github.com/USGS-Astrogeology/ISIS3/wiki/FAQ).
+
+## ISIS Tutorials
+Please refer to the GitHub wiki page [ISIS Online Workshops](https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops) for current ISIS tutorials.
+
+## Citing ISIS
+
+The badge at the top of this README lists the DOI of the most recent ISIS version.  As of 05/09/2024, the latest release of ISIS is version 8.0.3, and its DOI is [`10.5066/P13YBMZA`](https://doi.org/10.5066/P13YBMZA).
+
+The [Releases Page on GitHub](https://github.com/DOI-USGS/ISIS3/releases) lists the DOI for each version of ISIS.  Older versions may be listed on [Zenodo](https://doi.org/10.5281/zenodo.2563341).  It is good practice to cite the version of the software being used by the citing work, so others can reproduce your exact results.
 
 ## Installation
 
@@ -382,15 +391,6 @@ To build and compile ISIS requires following the instructions listed below, whic
 -   [Building individual applications/objects](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-individual-isis3-applicationsobjects)
 -   [Building ISIS documentation](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3-documentation)
 -   [What to do if you encounter any problems](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#problems)
-
-## ISIS Tutorials
-Please refer to the GitHub wiki page [ISIS Online Workshops](https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops) for current ISIS tutorials.
-
-## Citing ISIS
-
-The badge at the top of this README lists the DOI of the most recent ISIS version.  As of 05/09/2024, the latest release of ISIS is version 8.0.3, and its DOI is [`10.5066/P13YBMZA`](https://doi.org/10.5066/P13YBMZA).
-
-The [Releases Page on GitHub](https://github.com/DOI-USGS/ISIS3/releases) lists the DOI for each version of ISIS.  Older versions may be listed on [Zenodo](https://doi.org/10.5281/zenodo.2563341).  It is good practice to cite the version of the software being used by the citing work, so others can reproduce your exact results.
 
 ## The ISIS Data Area
 
