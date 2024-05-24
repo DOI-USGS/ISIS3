@@ -200,7 +200,7 @@ namespace Isis {
 
     p_pixmapPaintRects = new QList<QRect *>();
     p_progressTimer = new QTimer();
-    p_progressTimer->setInterval(250);
+    p_progressTimer->setInterval(20);
 
     p_knownStretches = new QVector< Stretch * >();
     p_globalStretches = new QVector< Stretch * >();
