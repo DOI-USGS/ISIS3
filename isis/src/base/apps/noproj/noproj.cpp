@@ -46,12 +46,12 @@ namespace Isis {
     }
     icube.open(ui.GetCubeName("FROM"));
 
-    Cube *mcube = NULL;
+    Cube mcube;
     if((ui.WasEntered("MATCH"))) {
-      mcube->open(ui.GetCubeName("MATCH"));
+      mcube.open(ui.GetCubeName("MATCH"));
     }
     
-    noproj(&icube, mcube, ui);
+    noproj(&icube, &mcube, ui);
   }
 
   /**
