@@ -560,7 +560,7 @@ namespace Isis {
       else if (ui.WasEntered("CSMSOLVELIST")) {
         std::vector<QString> csmParamVector;
         ui.GetString("CSMSOLVELIST", csmParamVector);
-        QStringList csmParamList = QStringList::fromVector(QVector<QString>::fromStdVector(csmParamVector));
+        QStringList csmParamList = QStringList::fromVector(QVector<QString>(csmParamVector.begin(), csmParamVector.end()));
         observationSolveSettings.setCSMSolveParameterList(csmParamList);
       }
 

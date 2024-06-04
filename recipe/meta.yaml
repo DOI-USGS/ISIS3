@@ -73,6 +73,7 @@ requirements:
    - inja
    - jama
    - usgs-astrogeology::kakadu==1
+   - kalasiris
    - krb5
    - libboost >=1.72.0,<2
    - libgdal >=3.7.2,<3.8.0a0
@@ -100,7 +101,7 @@ requirements:
    - rclone
    - qhull
    - qt-main
-   - qwt
+   - qwt <6.3.0
    - sqlite >=3.43.0,<4.0a0
    - suitesparse
    - superlu
@@ -142,6 +143,7 @@ requirements:
   - jama
   - {{ pin_compatible('jasper', max_pin='x.x') }}
   - {{ pin_compatible('kakadu', max_pin='x') }}
+   - kalasiris
   - libcxx
   - libopenblas
   - {{ pin_compatible('libopencv', max_pin='x.x') }}
@@ -155,6 +157,7 @@ requirements:
   - {{ pin_compatible('opencv', max_pin='x.x') }}
   - {{ pin_compatible('openssl', min_pin='x', max_pin='x.x') }}
   - {{ pin_compatible('pcl', min_pin='x', max_pin='x.x') }}
+   - plio
   - {{ pin_compatible('proj', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('protobuf', max_pin='x.x') }}
   - qhull

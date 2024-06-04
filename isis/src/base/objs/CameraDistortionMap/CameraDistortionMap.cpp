@@ -56,6 +56,7 @@ namespace Isis {
    * @todo Add latex equation to the documentation
    */
   void CameraDistortionMap::SetDistortion(int naifIkCode) {
+    p_odk.clear();
     QString odkkey = "INS" + toString(naifIkCode) + "_OD_K";
     for (int i = 0; i < 3; ++i) {
       p_odk.push_back(p_camera->Spice::getDouble(odkkey, i));

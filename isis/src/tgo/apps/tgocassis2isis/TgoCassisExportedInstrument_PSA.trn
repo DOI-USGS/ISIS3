@@ -1,47 +1,5 @@
-# Translates CaSSIS xml labels into the Instrument PvlGroup values
+# Translates CaSSIS PSA Calibrated xml labels into the Instrument PvlGroup values
 # for the ingested ISIS cube labels.
-#
-# The Dependencies keyword specifies a tag or attribute at the same level as
-# the InputKey that uniquely identifies the InputKey.
-#
-# Consider the following translation group and xml
-#
-# Group = Samples
-#   Auto
-#   InputPosition  = (Array_2D_Image, Axis_Array)
-#   Dependencies   = "tag@axis_name|Sample"
-#   InputKey       = elements
-#   OutputName     = Samples
-#   OutputPosition = (Group, Dimensions)
-#   Translation    = (*, *)
-# End_Group
-#
-# <Array_2D_Image>
-#   <Axis_Array>
-#     <axis_name>Line</axis_name>
-#     <sequence_number>1</sequence_number>
-#     <elements>2048</elements>
-#   </Axis_Array>
-#   <Axis_Array>
-#     <axis_name>Sample</axis_name>
-#     <sequence_number>2</sequence_number>
-#     <elements>279</elements>
-#   </Axis_Array>
-# </Array_2D_Image>
-#
-# There are two Axis_Array tags below Array_2D_Image and both of them have an
-# elements tag.  So, the Dependencies keyword specifies to take the value of
-# the elements tag under the second Axis_Array array tag because it also has a
-# axis_name tag with a value of Sample.
-#
-#
-# This translation table is for translating CaSSIS xml labels into pvl cube
-# labels.
-#
-# See $ISISROOT/appdata/translations/XmlExample.trn for an example xml translation table
-# and documentation for the different options.
-#
-# history 2018-05-17 Kaitlyn Lee - Added ObservationId with a placeholder value for now.
 
 Group = SpacecraftName
   Auto
@@ -50,10 +8,8 @@ Group = SpacecraftName
   InputKey             = name
   OutputName           = SpacecraftName
   OutputPosition       = (Object,IsisCube,Group,Instrument)
-  Translation          = (*, *)
+  Translation          = ("TRACE GAS ORBITER", "TGO")
 End_Group
-
-
 
 Group = InstrumentId
   Auto
@@ -74,15 +30,6 @@ Group = Expanded
   OutputName           = Expanded
   OutputPosition       = (Object,IsisCube,Group,Instrument)
   Translation          = (1, *)
-End_Group
-
-Group = ObservationId
-  Auto
-  InputPosition      = (Identification_Area, Alias_List, Alias)
-  InputKey           = alternate_id
-  OutputName         = ObservationId
-  OutputPosition     = (Object, IsisCube, Group, Archive)
-  Translation        = (*, *)
 End_Group
 
 Group = TargetName
@@ -114,8 +61,8 @@ End_Group
 
 Group = Filter
   Auto
-  InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
-  InputKey             = img:filter_name
+  InputPosition        = (Observation_Area, Mission_Area, em16_tgo_cas:Cassis_Data, em16_tgo_cas:HK_Derived_Data)
+  InputKey             = em16_tgo_cas:filter
   OutputName           = Filter
   OutputPosition       = (Object,IsisCube,Group,Instrument)
   Translation          = (*, *)
@@ -123,8 +70,8 @@ End_Group
 
 Group = FilterName
   Auto
-  InputPosition        = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
-  InputKey             = img:filter_name
+  InputPosition        = (Observation_Area, Mission_Area, em16_tgo_cas:Cassis_Data, em16_tgo_cas:HK_Derived_Data)
+  InputKey             = em16_tgo_cas:filter
   OutputName           = Filter
   OutputPosition       = (Object,IsisCube,Group,BandBin)
   Translation          = (*, *)
@@ -132,28 +79,26 @@ End_Group
 
 Group = Center
   Auto
-  InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
-  InputKey       = img:filter_name
+  InputPosition  = (Observation_Area, Mission_Area, em16_tgo_cas:Cassis_Data, em16_tgo_cas:HK_Derived_Data)
+  InputKey       = em16_tgo_cas:filter
   OutputName     = Center
   OutputPosition = (Object, IsisCube, Group, BandBin)
   Translation    = (678.2, PAN)
   Translation    = (494.8, BLU)
   Translation    = (836.0, RED)
   Translation    = (939.3, NIR)
-
 End_Group
 
 Group = Width
   Auto
-  InputPosition  = (Observation_Area, Discipline_Area, img:Imaging, img:Optical_Filter)
-  InputKey       = img:filter_name
+  InputPosition  = (Observation_Area, Mission_Area, em16_tgo_cas:Cassis_Data, em16_tgo_cas:HK_Derived_Data)
+  InputKey       = em16_tgo_cas:filter
   OutputName     = Width
   OutputPosition = (Object, IsisCube, Group, BandBin)
   Translation    = (231.9, PAN)
   Translation    = (121.8, BLU)
   Translation    = (98.5, RED)
   Translation    = (133.6, NIR)
-
 End_Group
 
 Group = Expanded
@@ -164,6 +109,16 @@ Group = Expanded
   OutputName           = Expanded
   OutputPosition       = (Object, IsisCube, Group, Instrument)
   Translation          = (*, *)
+End_Group
+
+Group = UniqueIdentifier
+  Auto
+  Optional
+  InputPosition  = (Observation_Area, Mission_Area, em16_tgo_cas:Cassis_Data, em16_tgo_cas:Image_Command)
+  InputKey       = em16_tgo_cas:unique_identifier
+  OutputName     = UniqueIdentifier
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
 End_Group
 
 End

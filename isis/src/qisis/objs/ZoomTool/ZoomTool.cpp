@@ -545,10 +545,10 @@ namespace Isis {
       if(rubberBandTool()->mouseButton() & Qt::RightButton) {
         factor = 1.0 / factor;
       }
-      if(rubberBandTool()->mouseButton() & Qt::MidButton) {
+      if(rubberBandTool()->mouseButton() & Qt::MiddleButton) {
         factor = 1.0;
       }
-      if(rubberBandTool()->mouseButton() == Qt::MidButton + Qt::ControlModifier) {
+      if(rubberBandTool()->mouseButton() == Qt::MiddleButton + Qt::ControlModifier) {
         factor = 0.0;
       }
 //      MdiCubeViewport *d = cubeViewport();

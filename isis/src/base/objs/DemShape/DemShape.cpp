@@ -369,8 +369,8 @@ namespace Isis {
     std::vector<SpiceDouble> normal(3);
     if (neighborPoints.isEmpty()) {
       normal[0] = normal[1] = normal[2] = 0.0;
-      setNormal(normal);
-      setHasNormal(false);
+      setLocalNormal(normal);
+      setHasLocalNormal(false);
       return;
     }
 
@@ -389,12 +389,12 @@ namespace Isis {
 
     if (mag == 0.0) {
       normal[0] = normal[1] = normal[2] = 0.0;
-      setNormal(normal);
-      setHasNormal(false);
+      setLocalNormal(normal);
+      setHasLocalNormal(false);
       return;
    }
     else {
-      setHasNormal(true);
+      setHasLocalNormal(true);
     }
 
     // Check to make sure that the normal is pointing outward from the planet
@@ -410,7 +410,7 @@ namespace Isis {
       vminus_c((SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0]);
     }
 
-    setNormal(normal);
+    setLocalNormal(normal);
   }
 
 

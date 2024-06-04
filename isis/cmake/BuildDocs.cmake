@@ -84,9 +84,7 @@ function(build_upper_level)
   copy_folder(${docBuildFolder}/w3c    ${docInstallFolder}/${docVersion})
 
   # These folders are populated inside "build_documents_folder"
-
-  # Create a redirect for the top level index file. It points to the version index file
-  execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"${docVersion}/\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/redirect.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/redirect.xsl)
+  
   # Create the main documentaion page. This is located in the version directory 
   execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
 
@@ -363,7 +361,7 @@ function(build_object_conf)
   # apps_tag.conf doesnt exist?
   cat(${objConfDir}/apps_tag.conf ${appsConf})
   file(APPEND ${appsConf} "LATEX_CMD_NAME   = ${LATEX}\n")
-  file(APPEND ${appsConf} "OUTPUT_DIRECTORY = ${docInstallDir}/${docVersion}\n")
+  file(APPEND ${appsConf} "OUTPUT_DIRECTORY = ${docInstallDir}/\n")
   file(APPEND ${appsConf} "STRIP_FROM_PATH  = ${PROJECT_SOURCE_DIR}/\n")
   file(APPEND ${appsConf} "INPUT            = ${PROJECT_SOURCE_DIR}/src/ ${objConfDir}/isisDoxyDefs.doxydef\n")
   file(APPEND ${appsConf} "HTML_HEADER      = ${objConfDir}/IsisObjectHeader.html\n")
@@ -377,7 +375,7 @@ function(build_object_conf)
 
   # Append to the programmer conf file
   cat(${objConfDir}/Programmer.conf ${programmerConf})
-  file(APPEND ${programmerConf} "OUTPUT_DIRECTORY = ${docInstallDir}/${docVersion}\n")
+  file(APPEND ${programmerConf} "OUTPUT_DIRECTORY = ${docInstallDir}/\n")
   file(APPEND ${programmerConf} "FILE_PATTERNS    = *objs*.h")
   file(APPEND ${programmerConf} " *objs*.cpp")
   file(APPEND ${programmerConf} " *build/isisDoxyDefs.doxydef\n")
@@ -414,7 +412,7 @@ function(build_object_conf)
   # Append to the developer conf file
   cat(${objConfDir}/Developer.conf ${developerConf})
   file(APPEND ${developerConf} "LATEX_CMD_NAME   = ${LATEX}\n")
-  file(APPEND ${developerConf} "OUTPUT_DIRECTORY = ${docInstallDir}/${docVersion}\n")
+  file(APPEND ${developerConf} "OUTPUT_DIRECTORY = ${docInstallDir}/\n")
   file(APPEND ${developerConf} "STRIP_FROM_PATH  = ${CMAKE_INSTALL_PREFIX}/\n")
   file(APPEND ${developerConf} "INPUT            = ${PROJECT_SOURCE_DIR}/src/ ${objConfDir}/isisDoxyDefs.doxydef\n")
   file(APPEND ${developerConf} "HTML_HEADER      = ${objConfDir}/IsisObjectHeader.html\n")

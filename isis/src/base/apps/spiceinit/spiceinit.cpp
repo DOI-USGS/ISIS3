@@ -220,7 +220,7 @@ namespace Isis {
           vector<QString> userEnteredCks;
           ui.GetAsString("CK", userEnteredCks);
           // convert user entered std vector to QStringList and add to ckKernelList
-          ckKernelList = QVector<QString>::fromStdVector(userEnteredCks).toList();
+          ckKernelList = QVector<QString>(userEnteredCks.begin(),userEnteredCks.end()).toList();
         }
         else {// loop through cks found in the system
 
@@ -283,7 +283,7 @@ namespace Isis {
       // NOTE: This is using GetAsString so that vars like $mgs can be used.
       vector<QString> kernels;
       ui.GetAsString(param, kernels);
-      kernel.setKernels(QVector<QString>::fromStdVector(kernels).toList());
+      kernel.setKernels(QVector<QString>(kernels.begin(),kernels.end()).toList());
     }
   }
 
@@ -617,6 +617,11 @@ namespace Isis {
     if (instrumentId == "HRSC"){
       QString msg = "Spice Server does not support MEX HRSC images. Please rerun spiceinit with local MEX data.";
       throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    if (ui.GetString("URL") == "https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi"){
+      QString msg = "USER WARNING: The URL you entered has been deprecated and no longer recommended for use.";
+      std::cerr << msg << std::endl;
     }
 
     QString url       = ui.GetString("URL") + "?mission=" + missionName +

@@ -1488,7 +1488,7 @@ namespace Isis {
 
       modifyPoint(point);
     }
-    else if (s == Qt::MidButton) {
+    else if (s == Qt::MiddleButton) {
       if (!m_controlNet || m_controlNet->GetNumPoints() == 0) {
         QString message = "No points exist for deleting.  Create points ";
         message += "using the right mouse button.";

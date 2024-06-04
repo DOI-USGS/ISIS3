@@ -21,6 +21,8 @@ find files of those names at the top level of this repository. **/
 
 #include <nlohmann/json.hpp>
 
+class  IsisIlluminator_Velocity_Test;
+
 namespace Isis {
   class NumericalApproximation;
 
@@ -292,6 +294,7 @@ namespace Isis {
       std::vector<double> Extrapolate(double timeEt);
       std::vector<double> HermiteCoordinate();
     protected:
+      friend class ::IsisIlluminator_Velocity_Test;
       void SetEphemerisTimeMemcache();
       void SetEphemerisTimeHermiteCache();
       virtual void SetEphemerisTimeSpice();
