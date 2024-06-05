@@ -148,9 +148,14 @@ namespace Isis {
     }
     CubeAttributeInput parCubeAtt(parCubeFileName);
     Cube parCube(parCubeFileName);
-    std::vector<QString> parCubeBands = parCubeAtt.bands();
+    std::vector<QString> parCubeBandsVector = parCubeAtt.bands();
+    QList<QString> parCubeBands;
+    parCubeBands.reserve(parCubeBandsVector.size());
+    for (const QString &band : parCubeBandsVector) {
+      parCubeBands.push_back(band);
+    }
     if (parCubeBands.size() != 0) {
-      parCube.setVirtualBands(QList<QString>(parCubeBands.begin(), parCubeBands.end()));
+      parCube.setVirtualBands(parCubeBands);
     }
 
     p.SetBrickSize(128, 128, icube->bandCount());
