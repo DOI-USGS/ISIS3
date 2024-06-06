@@ -1,0 +1,601 @@
+#--------------------------------------------------------------------------
+# Compiler options
+#---------------------------------------------------------------------------
+#  Build architecture now automatically determined at build time via isis.conf
+# include $(ISISROOT)/make/isis.conf
+
+MAC_ARCH=-arch x86_64
+MAC_XARCH=-Xarch_x86_64
+MAC_OS_MIN=-mmacosx-version-min=13.3
+MAC_ARCH_FLAGS = $(MAC_ARCH) $(MAC_XARCH) $(MAC_OS_MIN)
+
+QTDEFINES= -DQT_GUI_LIB -DQT_CORE_LIB DQT_NO_DEBUG
+
+ISIS_MACOSX_TARGET=14.5
+
+ISIS_CFLAGS= -pipe -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -Wall -W -Wno-unused-parameter -fPIC $(MAC_ARCH_FLAGS) $(QTDEFINES)
+
+ISIS_CPPFLAGS= -pipe -stdlib=libc++ -std=c++14 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -Wall -W -Wno-unused-parameter -fPIC $(MAC_ARCH_FLAGS) $(QTDEFINES)
+
+ISIS_LFLAGS=-headerpad_max_install_names -stdlib=libc++ -Wl,-syslibroot,/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk $(MAC_ARCH_FLAGS)
+
+ISIS_INC_PATH=  -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks/AGL.framework/Headers
+
+# flags to be used only when compiling protobuf generated source files
+ISIS_PROTOBUF_FLAGS= -w
+
+#  Basically is GNU g++/gcc
+CXX = g++
+CC  = gcc
+
+ifeq ($(HOST_PROC), powerpc)
+  # Powerpc support
+  ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=0
+else
+  # Assumes Intel Mac
+  ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=1
+endif
+ISISCPPFLAGS += -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE
+ISISCPPFLAGS += -fPIC
+ISISCPPFLAGS += -DGMM_USES_SUPERLU
+ISISCPPFLAGS += -std=c++14
+
+#ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
+  ISISCPPFLAGS  += -g
+  ISISCPPFLAGS  += -O0
+#else
+  ISISCPPFLAGS  += -O2
+#endif
+ISISCFLAGS = $(ISIS_CFLAGS)
+
+#---------------------------------------------------------------------------
+# Linker options.  Runtime paths for Mac is rooted to $ISISROOT
+#---------------------------------------------------------------------------
+#ISISLDFLAGS = -headerpad_max_install_names $(MAC_ARCH_FLAGS) -bind_at_load -Wl,-w
+#ISISLDFLAGS += $(ISIS_LFLAGS) -bind_at_load -Wl,-w
+ISISLDFLAGS += $(ISIS_LFLAGS) -Wl,-w
+ISISLDRPATH = -Wl,-rpath,@loader_path/..  -Wl,-rpath,$(ISISROOT)
+ISISSYSLIBS = -lz -lm -framework ApplicationServices
+ISISSTATIC  =
+ISISDYNAMIC =
+
+#---------------------------------------------------------------------------
+# Shared library options
+#---------------------------------------------------------------------------
+#RANLIB          = /usr/bin/ranlib
+RANLIB          = /usr/bin/true
+SHAREDLIBEXT    = dylib
+DYLIBVERSION    = -compatibility_version $(ISISMAJOR).$(ISISMINOR) \
+                  -current_version $(ISISLIBVERSION)
+DYLIBFLAGS      = $(MAC_ARCH_FLAGS)  -dynamiclib -flat_namespace \
+	   	   -single_module -undefined suppress
+ISISSHAREDFLAGS = $(MAC_ARCH_FLAGS) -bundle -flat_namespace -dynamic \
+		  -undefined suppress
+ISISSHAREDON    =
+ISISSHAREDOFF   =
+ISISARFLAGS     =
+
+#---------------------------------------------------------------------------
+#  Set ISIS Dev Kit (IDK) paths.  This setting of ISISLOCALVERSION here will
+#  override this macro set in isismake.os (KJB 2013-12-12)
+#---------------------------------------------------------------------------
+#ISISLOCALVERSION := v006
+IDK_ROOT         ?= /opt/usgs/$(ISISLOCALVERSION)
+ISIS3OPT         ?= $(IDK_ROOT)/ports
+ISIS3EXEC        ?= $(ISIS3OPT)/libexec
+ISIS3LOCAL       ?= $(IDK_ROOT)/3rdparty
+ISIS3PROP        ?= $(IDK_ROOT)/proprietary
+
+#  Set up paths to needed for doxygen
+DOXYGEN     = $(ISIS3OPT)/bin/doxygen
+DOT_PATH    = $(ISIS3OPT)/bin
+GREP        = /usr/bin/grep
+
+# Set up path for OS specific locations of 3rd party licenses
+THIRDPARTYLICPATH := /opt/usgs/$(ISISLOCALVERSION)/3rdParty/license/
+
+#---------------------------------------------------------------------------
+# Set up for cwd
+#---------------------------------------------------------------------------
+CWDINCDIR =
+CWDLIBDIR =
+CWDLIB    =
+
+#---------------------------------------------------------------------------
+# Set up for Qt
+#---------------------------------------------------------------------------
+QTDIR        = $(ISIS3EXEC)/qt5
+
+QTFRAMEWORKDIR   = $(QTDIR)/lib
+
+QTINCDIR  = -I$(QTDIR)/mkspecs/macx-clang
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtCore.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtConcurrent.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtDBus.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtGui.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtMultimedia.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtMultimediaWidgets.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtNetwork.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtNfc.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtOpenGL.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtPositioning.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtPrintSupport.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtQml.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtQuick.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtQuickParticles.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtQuickTest.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtQuickWidgets.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtScript.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtScriptTools.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtSensors.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtSerialPort.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtSql.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtSvg.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtTest.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtWebChannel.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtWebEngine.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtWebKit.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtWebKitWidgets.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtWebSockets.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtWidgets.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtXml.framework/Headers
+QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtXmlPatterns.framework/Headers
+#QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtAssistant.framework/Headers
+#QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtUiPlugin.framework/Headers
+
+QTINCDIR += -iframework $(QTFRAMEWORKDIR)
+
+# turn -isystem to -I and -framework to -F for QT MOC includes
+QTINCDIR_MOC = $(subst -iframework ,-F,$(subst -isystem ,-I,$(QTINCDIR)))
+
+QTLIBDIR  = -L$(QTFRAMEWORKDIR) -F$(QTFRAMEWORKDIR)
+
+QTFRAMEWORKS        = -framework QtXmlPatterns -framework QtXml -framework QtNetwork \
+                      -framework QtSql -framework QtGui -framework QtCore -framework QtSvg \
+                      -framework QtTest -framework QtWebKit -framework QtOpenGL \
+                      -framework QtConcurrent -framework QtDBus \
+                      -framework QtMultimedia -framework QtMultimediaWidgets \
+                      -framework QtNfc -framework QtPositioning -framework QtPrintSupport \
+                      -framework QtQml -framework QtQuick -framework QtQuickParticles \
+                      -framework QtQuickTest -framework QtQuickWidgets -framework QtScript \
+                      -framework QtScriptTools -framework QtSensors -framework QtSerialPort \
+                      -framework QtWebKitWidgets -framework QtWebSockets -framework QtWidgets \
+                      -framework QtTest -framework QtWebChannel -framework QtWebEngine
+
+QTCOMMONFRAMEWORKS  =  -framework DiskArbitration -framework IOKit
+QTLIB               = $(QTFRAMEWORKS) $(QTCOMMONFRAMEWORKS)
+
+QTOPENGL     = -framework OpenGL -framework AGL
+
+UIC          = $(QTDIR)/bin/uic
+RCC          = $(QTDIR)/bin/rcc
+RCCDEFINES   =
+MOC          = $(QTDIR)/bin/moc
+MOCDEFINES   += $(QTDARWINFLAGS)
+MOCDEFINES   += $(QTINCDIR_MOC) # Moc may not need QT includes
+MOCDEFINES   += -D__APPLE__ -D__GNUC__
+
+#---------------------------------------------------------------------------
+# Set up for Qwt
+#---------------------------------------------------------------------------
+QWTDIR      = $(ISIS3OPT)
+QWTFRAMES   = $(QWTDIR)/Library/Frameworks
+ifeq (,$(findstring $(QWTFRAMES)/qwt.framework,$(wildcard $(QWTFRAMES)/qwt.framework )))
+  QWTFRAMES  = $(ISIS3OPT)/lib
+endif
+
+QWTINCDIR = -I$(QWTFRAMES)/qwt.framework/Headers
+QWTLIBDIR = -L$(QWTFRAMES) -F$(QWTFRAMES)
+QWTLIB    = -framework qwt
+
+#---------------------------------------------------------------------------
+# Set up for Xerces
+#---------------------------------------------------------------------------
+XERCESINCDIR = -I$(ISIS3OPT)/include/xercesc
+XERCESLIBDIR = -L$(ISIS3OPT)/lib
+XERCESLIB    = -lxerces-c
+
+XALAN        = $(ISIS3OPT)/bin/Xalan
+
+#---------------------------------------------------------------------------
+# Set up for GeoTiff
+#---------------------------------------------------------------------------
+GEOTIFFINCDIR = -I$(ISIS3OPT)/include
+GEOTIFFLIBDIR = -L$(ISIS3OPT)/lib
+GEOTIFFLIB    = -lgeotiff
+
+#---------------------------------------------------------------------------
+# Set up for proj (Needed on Macs for geotiff)
+#---------------------------------------------------------------------------
+PROJINCDIR = -I$(ISIS3OPT)/include
+PROJLIBDIR = -L$(ISIS3OPT)/lib
+PROJLIB    = -lproj
+
+#---------------------------------------------------------------------------
+# Set up for Tiff
+#---------------------------------------------------------------------------
+TIFFINCDIR = -I$(ISIS3OPT)/include
+TIFFLIBDIR = -L$(ISIS3OPT)/lib
+TIFFLIB    = -ltiff
+
+#---------------------------------------------------------------------------
+# Set up for naif cspice libraries. Update for N0066 Release (KJB 2017-06-28)
+#---------------------------------------------------------------------------
+NAIFINCDIR = -I$(ISIS3LOCAL)/include/naif/
+NAIFLIBDIR = -L$(ISIS3LOCAL)/lib
+NAIFLIB    = -lcspice
+
+#---------------------------------------------------------------------------
+# Set up for TNT
+#---------------------------------------------------------------------------
+TNTINCDIR = -I$(ISIS3LOCAL)/include/tnt
+TNTLIBDIR =
+TNTLIB    =
+
+#---------------------------------------------------------------------------
+# Set up for JAMA
+#---------------------------------------------------------------------------
+JAMAINCDIR = -I$(ISIS3LOCAL)/include/jama
+JAMALIBDIR =
+JAMALIB    =
+
+#---------------------------------------------------------------------------
+# Set up for GEOS
+#---------------------------------------------------------------------------
+GEOSINCDIR = -isystem $(ISIS3OPT)/include/geos
+GEOSLIBDIR = -L$(ISIS3OPT)/lib
+GEOSLIB    = -lgeos -lgeos_c
+
+#---------------------------------------------------------------------------
+# Set up for the GNU Scientific Library (GSL).  Note that this setup
+# suppports include patterns such as <gsl/gsl_errno.h>.  With this
+# format, any other include spec that points to the general include
+# directory, such as GEOS, will suffice.  Therefore, an explicit
+# include directive is ommitted but provided as an empty reference
+# in cases where it may be located elsewhere.  This also goes for the
+# library reference.
+#---------------------------------------------------------------------------
+GSLINCDIR =  -I$(ISIS3OPT)/include/gsl
+GSLLIBDIR =  -L$(ISIS3OPT)/lib
+GSLLIB    = -lgsl -lgslcblas
+
+#---------------------------------------------------------------------------
+# Set up for GMM
+#---------------------------------------------------------------------------
+GMMINCDIR = -isystem $(ISIS3LOCAL)/include
+GMMLIBDIR =
+GMMLIB    =
+
+#---------------------------------------------------------------------------
+# Set up for SuperLU
+#---------------------------------------------------------------------------
+SUPERLUINCDIR = -I$(ISIS3LOCAL)/include/superlu
+SUPERLULIBDIR = -L$(ISIS3LOCAL)/lib
+ifeq ($(HOST_PROC), powerpc)
+#  Powerpc support
+  SUPERLULIB    = -lsuperlu_3.0 -framework vecLib
+else
+#  Assumes Intel Mac
+  SUPERLULIB    = -lsuperlu -lblas
+endif
+
+#---------------------------------------------------------------------------
+# Set up for Google Protocol Buffers (ProtoBuf)
+#---------------------------------------------------------------------------
+PROTOBUFINCDIR = -isystem $(ISIS3OPT)/include/google
+PROTOBUFLIBDIR = -L$(ISIS3OPT)/lib
+PROTOBUFLIB    = -lprotobuf
+PROTOC         = $(ISIS3OPT)/bin/protoc
+
+#---------------------------------------------------------------------------
+# Set up for kakadu
+# The Kakadu library is proprietary. The source files cannot be distributed
+# with ISIS. If you need to rebuild ISIS on your system, then you will
+# need to modify the lines below that pertain to the location of the
+# header files and library on your system. The compilation flag, ENABLEJP2K,
+# should be set to true if you are building with the Kakadu library and
+# you want to use the JPEG2000 specific code in the ISIS system. Otherwise,
+# set the ENABLEJP2K flag to false.
+#
+#  Added abililty to automatically detect the existance of the Kakadu include
+#  directory.  One can set the environment variable JP2KFLAG with a 1 or 0
+#  depending upon need.  Developers can define appropriate enviroment variables
+#  for the complete JP2K environment.  Just redefine them based upon the usage
+#  below (i.e., be sure to add -I, -L and -l to the variables for KAKADUINCDIR,
+#  KAKADULIBDIR and KAKADULIB, respectively).
+#---------------------------------------------------------------------------
+KAKADUINCDIR := "-isystem$(ISIS3PROP)/include/kakadu/v7_9_1-01762L"
+KAKADULIBDIR := -L$(ISIS3PROP)/lib
+KAKADULIB    := -lkdu_a79R -lkdu_v79R
+#  Strip -I from Kakadu include directory macro and check for existance
+JP2KFLAG ?= $(shell if [ -d $(subst -isystem,,$(KAKADUINCDIR)) ]; then echo "1"; else echo "0"; fi;)
+ISISCPPFLAGS += -DENABLEJP2K=$(JP2KFLAG)
+
+#---------------------------------------------------------------------------
+# Set up for Boost Library
+#---------------------------------------------------------------------------
+BOOSTINCDIR = "-isystem $(ISIS3OPT)/include"
+BOOSTLIBDIR = -L$(ISIS3OPT)/lib
+BOOSTLIB    = -lboost_date_time-mt -lboost_filesystem-mt -lboost_graph-mt \
+              -lboost_math_c99f-mt -lboost_math_c99l-mt -lboost_math_c99-mt \
+              -lboost_math_tr1f-mt -lboost_math_tr1l-mt -lboost_math_tr1-mt \
+              -lboost_prg_exec_monitor-mt -lboost_program_options-mt \
+              -lboost_regex-mt -lboost_serialization-mt -lboost_signals-mt \
+              -lboost_system-mt -lboost_thread-mt -lboost_unit_test_framework-mt \
+              -lboost_wave-mt -lboost_wserialization-mt -lboost_timer-mt \
+              -lboost_chrono-mt
+
+#---------------------------------------------------------------------------
+# Set up for Cholmod Libraries
+#---------------------------------------------------------------------------
+CHOLMODINCDIR = -I$(ISIS3LOCAL)/include/SuiteSparse
+CHOLMODLIBDIR = -L$(ISIS3LOCAL)/lib
+CHOLMODLIB   = -lcholmod -lamd -lcolamd -lcamd -framework Accelerate
+
+#---------------------------------------------------------------------------
+# Set up for HDF5 libraries
+#---------------------------------------------------------------------------
+#HDF5INCDIR = -I$(ISIS3OPT)/include
+HDF5LIBDIR = -L$(ISIS3OPT)/lib
+HDF5LIB    = -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
+
+#---------------------------------------------------------------------------
+# Set up for OpenCV libraries
+#
+# Add the following line to your app's Makefile (see the NN notes)
+# ALLLIBS += $(OPENCVLIBS)
+#---------------------------------------------------------------------------
+#OPENCVINCDIR =  -I$(ISIS3OPT)/include
+#OPENCVLIBDIR =  -L$(ISIS3OPT)/lib   # Redundant
+OPENCVLIBS   = -lopencv_calib3d -lopencv_core \
+	       -lopencv_features2d -lopencv_xfeatures2d \
+               -lopencv_flann -lopencv_highgui \
+	        -lopencv_imgproc -lopencv_imgcodecs \
+               -lopencv_ml -lopencv_objdetect \
+               -lopencv_photo -lopencv_stitching -lopencv_superres \
+               -lopencv_video -lopencv_videostab
+
+#---------------------------------------------------------------------------
+# Set up for Natural Neighbor Library (NN)
+#
+# * Note that NNINCDIR is not added to ALLINCDIRS in isismake.os
+# * and NNLIB is not added to ALLLIBDIRS in isismake.os
+#
+# For now, if you want to use this library, modify your app's Makefile.
+# Add an empty line after the last line in the Makefile, then add
+# ALLLIBS += $(NNLIB)
+# on a new line.
+#---------------------------------------------------------------------------
+NNINCDIR = -I$(ISIS3LOCAL)/include/nn
+#NNLIBDIR = -L$(ISIS3LOCAL)/lib
+NNLIB = -lnn
+
+#---------------------------------------------------------------------------
+# Setup for Bullet Physics library
+#---------------------------------------------------------------------------
+BULLETLIB     = -lBullet3OpenCL_clew     -lBullet3Common    -lBullet3Geometry   \
+                -lBulletSoftBody         -lBulletDynamics   -lBullet3Dynamics   \
+                -lBulletInverseDynamics  -lBulletCollision  -lBullet3Collision  \
+                -lLinearMath
+BULLETINCDIR  = -I$(ISIS3LOCAL)/include/bullet
+BULLETLIBDIR  = -L$(ISIS3LOCAL)/lib
+
+#---------------------------------------------------------------------------
+# Set up for PCL Python framework
+#---------------------------------------------------------------------------
+PCLPYDIR      = $(ISIS3OPT)
+PCLPYFRAMES   = $(PCLPYDIR)/Library/Frameworks
+ifeq (,$(findstring $(PCLPYFRAMES)/Python.framework,$(wildcard $(PCLPYFRAMES)/Python.framework )))
+  PCLPYFRAMES  = $(ISIS3OPT)/lib
+endif
+
+#---------------------------------------------------------------------------
+# Set up for PCL libraries
+#---------------------------------------------------------------------------
+PCLINCDIR = -I$(ISIS3LOCAL)/include/pcl-1.8
+PCLLIBDIR = -L$(ISIS3LOCAL)/lib
+PCLLIB    = -lpcl_common -lpcl_octree -lpcl_io                                \
+            -framework Python -lintl
+VTKLIB    = -lvtksys-7.0.1
+EMBREELIB = -lembree
+
+#---------------------------------------------------------------------------
+# Set up for Eigen (link to include files only, no library)
+#---------------------------------------------------------------------------
+EIGENINCDIR = -I$(ISIS3OPT)/include/eigen3
+
+#---------------------------------------------------------------------------
+# Final generic setup for includes at the top level
+#---------------------------------------------------------------------------
+DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
+
+#---------------------------------------------------------------------------
+#  Define the third party distribution libraries (patterns)
+#---------------------------------------------------------------------------
+
+# Qt Libraries
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtXmlPatterns.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtXml.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtNetwork.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtSql.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtGui.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtCore.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtSvg.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtTest.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtWebEngine.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtWebEngineCore.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtWebKit.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtOpenGL.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtConcurrent.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtDBus.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtMultimedia.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtMultimediaWidgets.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtNfc.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtPositioning.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtPrintSupport.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtQml.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtQuick.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtQuickParticles.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtQuickTest.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtQuickWidgets.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtScript.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtScriptTools.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtSensors.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtSerialPort.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtWebKitWidgets.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtWebSockets.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtWidgets.framework"
+THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtWebChannel.framework"
+THIRDPARTYLIBS    += "$(QWTFRAMES)/qwt.framework"
+
+#  Qt dependencies
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libpcre16*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgthread-*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libpcre.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libharfbuzz*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgraphite2.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libleveldb*.dylib*"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libsnappy.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libwebp*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libdbus*.dylib"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libprotobuf*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libiconv*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxerces-c*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgeotiff*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtiff*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/liblzma*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgsl*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libz*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libssl*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libcrypto*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libpng*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtiff.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libjpeg.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libmng.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/liblcms2.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgeos*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libsqlite3.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/postgresql*/libpq.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/mysql56/mysql/libmysqlclient*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libiodbc*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3PROP)/lib/libkdu_a79R.dylib"
+THIRDPARTYLIBS    += "$(ISIS3PROP)/lib/libkdu_v79R.dylib"
+
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libamd*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcamd*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcholmod*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuitesparseconfig*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libccolamd*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcolamd*.dylib"
+#THIRDPARTYLIBS    += "/System/Library/Frameworks/Accelerate.framework"
+
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libhdf5*.dylib"
+
+# Add all the OpenCV libraries and its dependancies
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libopencv_*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtbb*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libjasper*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libImath*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libIlmImf*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libIex*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libHalf*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libIlmThread*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libavcodec*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libavformat*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libavutil*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libswscale*.dylib"
+
+# Secondary requirements to all OpenCV dependancies (Yuck!)
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libSDL-1*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libnettle*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libhogweed*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgmp*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxvidcore*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libx264*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libvorbisenc*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libvorbis*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libogg*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtheoraenc*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtheoradec*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libspeex*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libschroedinger-1*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libopus*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libopenjpeg*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libmp3lame*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libmodplug*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libfreetype*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libbluray*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libass*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgnutls*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libbz2*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libXrandr*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libXext*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libXrender*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libX11*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxcb*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libXau*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libXdmcp*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/liborc-0*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxml2*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libfribidi*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libfontconfig*.dylib"
+#THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libenca*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libexpat*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libintl*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libglib-*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libp11-kit*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libffi*.dylib"
+
+# OpenCV3 dependencies
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libavresample*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxcb-shm*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libsoxr*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libopenjp2*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libOpenNI*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libswresample*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libidn*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtasn1*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libusb*.dylib"
+
+# libxerces-c depends on these libraries
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicui18n*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicuuc*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicudata*.dylib"
+
+# libgeotiff depends on these libraries
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libproj*.dylib"
+
+# Bullet Libraries
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libLinearMath*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet2FileLoader*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Collision*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Common*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Dynamics*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3Geometry*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBullet3OpenCL_clew*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletCollision*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletDynamics*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletInverseDynamics*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libBulletSoftBody*.dylib"
+
+# Add the Point Cloud Libraries and PCL dependencies
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libpcl_*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libflann*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libqhull*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libvtk*.dylib"
+THIRDPARTYLIBS    += "$(PCLPYFRAMES)/Python.framework"
+
+# Add the Embree library
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libembree*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtbb*.dylib"
+
+# Add the Boost libraries
+#THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libboost_system-mt*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libboost*.dylib"
+
+#  Plugins
+THIRDPARTYPLUGINS +=  "$(QTDIR)/plugins/"

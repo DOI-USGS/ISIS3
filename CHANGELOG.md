@@ -35,6 +35,9 @@ release.
 
 ## [Unreleased]
 
+### Added
+- Added ISIS version config file for OSX 14.5 (config.darwin-MacOSX14_5) in isis/make folder. [#5514](https://github.com/DOI-USGS/ISIS3/issues/5514)
+
 ### Changed
 - Changed `qwt` dependency version to 6.2.0 or below [#5498](https://github.com/DOI-USGS/ISIS3/issues/5498)
 
