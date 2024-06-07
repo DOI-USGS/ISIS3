@@ -9,5 +9,10 @@ HOST_MACH := $(shell uname -m)
 NODE_NAME := $(shell uname -n)
 
 ifeq ($(HOST_ARCH),Darwin)
-  include $(ISISROOT)/make/config.darwin-$(HOST_OS)
+  ifneq ("$(wildcard $(ISISROOT)/make/config.darwin-$(HOST_OS))","")
+    include $(ISISROOT)/make/config.darwin-$(HOST_OS)
+  else
+    $(info includeing $(ISISROOT)/make/config.darwin-MacOSX)
+    include $(ISISROOT)/make/config.darwin-MacOSX
+  endif
 endif
