@@ -682,6 +682,7 @@
 
       <parameter name="ADJUSTMENT_OUTPUT">
         <type>filename</type>
+        <internalDefault>none</internalDefault>
         <fileMode>input</fileMode>
         <brief>
           Outputs adjustment values
@@ -696,6 +697,7 @@
 
       <parameter name="ADJUSTMENT_INPUT">
         <type>filename</type>
+        <internalDefault>none</internalDefault>
         <fileMode>input</fileMode>
         <brief>
           Reads in adjustment values

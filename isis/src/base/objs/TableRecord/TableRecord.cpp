@@ -22,6 +22,14 @@ namespace Isis {
   TableRecord::TableRecord(){
   }
 
+  /**
+  * TableRecord constructor
+  * 
+  * @param tableRecordStr Table record string
+  * @param fieldDelimiter The delimiter to separate fields with
+  * @param fieldNames Table header names
+  * @param numOfFieldValues Number of fields (rows)
+  */
   TableRecord::TableRecord(std::string tableRecordStr, char fieldDelimiter, 
                             std::vector<QString> fieldNames, int numOfFieldValues) {
     std::stringstream tableRecordStream;
@@ -32,7 +40,7 @@ namespace Isis {
     while(std::getline(tableRecordStream, fieldStr, fieldDelimiter)) {
       TableField tableField(fieldNames[i], TableField::Double);
       tableField = std::stod(fieldStr); // convert string to double
-      p_fields.push_back(tableField);
+      this->operator+=(tableField);
       i++;
     }
   }

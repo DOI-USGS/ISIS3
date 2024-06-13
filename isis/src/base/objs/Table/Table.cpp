@@ -141,7 +141,7 @@ namespace Isis {
   /**
    * This constructor takes in a string to create a Table object.
    * 
-   * @param tableName The name o the Table to be read
+   * @param tableName The name of the Table to be read
    * @param tableStr The table string
    * @param fieldDelimiter The delimiter to separate fields with
   */
@@ -151,7 +151,6 @@ namespace Isis {
     std::stringstream tableStream;
     tableStream << tableString;
 
-    // Create fieldNames  <-- refactor in progress
     std::vector<std::string> tableLinesStringList;
     std::string line;
     while(std::getline(tableStream, line, '\n')) {
@@ -186,9 +185,13 @@ namespace Isis {
       
       TableRecord tableRecord(recordString, fieldDelimiter, fieldNames, numOfFieldValues);
       p_record = tableRecord;
-      std::cout << "Adding record" << std::endl;
       this->operator+=(tableRecord);
       index++;
+    }
+
+    // Add fields
+    for (int f = 0; f < p_record.Fields(); f++) {
+      p_label.addGroup(p_record[f].pvlGroup());
     }
   }
 

@@ -26,6 +26,7 @@ dependencies:
   - graphviz
   - gsl>=2.6
   - hdf5>=1.14.2,<1.14.3.0a0
+  - highfive
   - icu
   - inja
   - jama
