@@ -156,8 +156,6 @@ namespace Isis {
         }
       }
       PvlGroup gp("JigsawResults");
-      QString adjustmentOutputFilename;
-      QString adjustmentInputFilename;
       // Update the cube pointing if requested but ONLY if bundle has converged
       if (ui.GetBoolean("UPDATE") ) {
         if ( !bundleAdjustment->isConverged() ) {
@@ -225,7 +223,7 @@ namespace Isis {
                 std::string spvectorTableStr = Table::toString(spvector).toStdString();
                 dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
               } else if (ui.WasEntered("ADJUSTMENT_INPUT")) {
-                adjustmentInputFilename = ui.GetFileName("ADJUSTMENT_INPUT");
+                QString adjustmentInputFilename = ui.GetFileName("ADJUSTMENT_INPUT");
                 File file(adjustmentInputFilename.toStdString(), File::ReadOnly);
                 Table cmatrix = bundleAdjustment->cMatrix(i);
                 Table spvector = bundleAdjustment->spVector(i);
