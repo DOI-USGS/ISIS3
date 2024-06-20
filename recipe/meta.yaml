@@ -143,7 +143,7 @@ requirements:
   - jama
   - {{ pin_compatible('jasper', max_pin='x.x') }}
   - {{ pin_compatible('kakadu', max_pin='x') }}
-   - kalasiris
+  - kalasiris
   - libcxx
   - libopenblas
   - {{ pin_compatible('libopencv', max_pin='x.x') }}
@@ -157,7 +157,7 @@ requirements:
   - {{ pin_compatible('opencv', max_pin='x.x') }}
   - {{ pin_compatible('openssl', min_pin='x', max_pin='x.x') }}
   - {{ pin_compatible('pcl', min_pin='x', max_pin='x.x') }}
-   - plio
+  - plio
   - {{ pin_compatible('proj', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('protobuf', max_pin='x.x') }}
   - qhull
