@@ -48,10 +48,12 @@ namespace Isis {
 
     Cube *mcube = NULL;
     if((ui.WasEntered("MATCH"))) {
-      mcube->open(ui.GetCubeName("MATCH"));
+      mcube = new Cube(ui.GetCubeName("MATCH"));
     }
     
     noproj(&icube, mcube, ui);
+    
+    free(mcube);
   }
 
   /**

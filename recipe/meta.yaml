@@ -27,7 +27,7 @@
 
 package:
   name: isis
-  version: {{ version }}.0_RC1
+  version: {{ version }}.0_RC2
 
 source:
   git_url: 'https://github.com/DOI-USGS/ISIS3.git'
@@ -45,7 +45,7 @@ build:
 # Shotgun strat on requirements until we can narrow them down
 requirements:
   build:
-   - ale =0.10.0
+   - ale =0.10.0,<1
    - aom
    - armadillo
    - boost >=1.72.0,<2
@@ -73,6 +73,7 @@ requirements:
    - inja
    - jama
    - usgs-astrogeology::kakadu==1
+   - kalasiris
    - krb5
    - libboost >=1.72.0,<2
    - libgdal >=3.7.2,<3.8.0a0
@@ -94,8 +95,8 @@ requirements:
    - pcl >=1.10,<2
    - plio
    - protobuf
-   - python >=3.11
-   - python_abi >=3.11
+   - python =3.12
+   - python_abi =3.12
    - pytest
    - rclone
    - qhull
@@ -142,6 +143,7 @@ requirements:
   - jama
   - {{ pin_compatible('jasper', max_pin='x.x') }}
   - {{ pin_compatible('kakadu', max_pin='x') }}
+  - kalasiris
   - libcxx
   - libopenblas
   - {{ pin_compatible('libopencv', max_pin='x.x') }}
@@ -155,6 +157,7 @@ requirements:
   - {{ pin_compatible('opencv', max_pin='x.x') }}
   - {{ pin_compatible('openssl', min_pin='x', max_pin='x.x') }}
   - {{ pin_compatible('pcl', min_pin='x', max_pin='x.x') }}
+  - plio
   - {{ pin_compatible('proj', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('protobuf', max_pin='x.x') }}
   - qhull

@@ -35,7 +35,7 @@ release.
 
 ## [Unreleased]
 
-## [8.2.0] - 2024-04-18
+## [8.2.0] - 2024-06-18
 
 ### Changed
 - Changed the default spiceinit url to https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/ and added deprecation warning for use of https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi url. [#5327](https://github.com/USGS-Astrogeology/ISIS3/issues/5327)
@@ -55,6 +55,9 @@ release.
 - Fixed rclone.conf/downloadIsisData pointing to old naif kernel location, updated to archived locations and https [5394](https://github.com/DOI-USGS/ISIS3/issues/5394)
 - Fixed a parsing error in FitsToJson when an empty comment was reached. [#5469](https://github.com/DOI-USGS/ISIS3/pull/5469)
 - Fixed TrackTool, FindTool, and AdvancedTrackTool not reporting RA and DEC for images targeting the Sky. [#5409](https://github.com/DOI-USGS/ISIS3/pull/5409)
+- Fixed a bug in QVIEW's Stretch tool where the default min/max type was not an available option [#5289](https://github.com/DOI-USGS/ISIS3/issues/5289)
+- Fixed a bug in QVIEW where images would double load if loaded from the commandline [#5505](https://github.com/DOI-USGS/ISIS3/pull/5505)
+- Fixed <i>noproj</i> bug where segfault occurs if match cube is provided [#5507](https://github.com/DOI-USGS/ISIS3/pull/5507)
 
 ### Added
 - Added 8 new functions to the Sensor Utility Library: Slant Distance, Target Center Distance, Right Ascension Declination, Local Solar Time, Line Resolution, Sample Resolution, Pixel Resolution, and Solar Longitude.
