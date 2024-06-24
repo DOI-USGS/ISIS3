@@ -37,6 +37,8 @@ release.
 
 ### Changed
 - Changed `qwt` dependency version to 6.2.0 or below [#5498](https://github.com/DOI-USGS/ISIS3/issues/5498)
+- Pinned `suitesparse` dependency version to maximum not including 7.7.0 [#5496](https://github.com/DOI-USGS/ISIS3/issues/5496)
+
 
 ### Fixed
 - Fixed a bug in QVIEW's Stretch tool where the default min/max type was not an available option [#5289](https://github.com/DOI-USGS/ISIS3/issues/5289)
