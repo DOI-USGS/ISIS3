@@ -33,14 +33,13 @@ heading to indicate that only the bug fixes and security fixes are in the bug fi
 release.
 -->
 
-## [Unreleased]
-
-## [8.2.0] - 2024-06-18
+## [8.2.0] - 2024-06-24
 
 ### Changed
 - Changed the default spiceinit url to https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/ and added deprecation warning for use of https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi url. [#5327](https://github.com/USGS-Astrogeology/ISIS3/issues/5327)
 - Skypt has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5443](https://github.com/USGS-Astrogeology/ISIS3/issues/5443)
 - Changed `qwt` dependency version to 6.2.0 or below [#5498](https://github.com/DOI-USGS/ISIS3/issues/5498)
+- Pinned `suitesparse` dependency version to maximum not including 7.7.0 [#5496](https://github.com/DOI-USGS/ISIS3/issues/5496)
 
 ### Fixed
 - Fixed a bug in which capital E was problematic for OSX / Ubuntu [#5466](https://github.com/DOI-USGS/ISIS3/pull/5466)
