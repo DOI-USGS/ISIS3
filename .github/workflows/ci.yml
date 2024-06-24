@@ -52,6 +52,7 @@ jobs:
           export PATH=$PATH:${GITHUB_WORKSPACE}/build/bin/
           cd build
           ls ${GITHUB_WORKSPACE}/isis_data 
+          ls ${CONDA_PREFIX}/include/cholmod*
           cmake -DisisData=${GITHUB_WORKSPACE}/isis_data -DisisTestData=${GITHUB_WORKSPACE}/isis_testData -DJP2KFLAG=OFF -DCMAKE_BUILD_TYPE=RELEASE -Wdeprecated -GNinja ../isis
           ninja -j8
       - name: Run ISIS tests
