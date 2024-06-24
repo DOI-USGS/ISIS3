@@ -29,8 +29,10 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
+#include "SpiceRotation.h"
 
 using namespace std;
+using json = nlohmann::json;
 
 namespace Isis {
 
@@ -416,6 +418,24 @@ namespace Isis {
     blobLabel += PvlKeyword("ModelName", modelName);
     blobLabel += PvlKeyword("PluginName", pluginName);
     cube->write(csmStateBlob);
+
+    // Try to add naif keywords
+    if (ui.WasEntered("ISD")) {
+      QString isdFilePath = ui.GetFileName("ISD");
+      std::ifstream isdFileStream(isdFilePath.toStdString());
+      try {
+        json isd = json::parse(isdFileStream);
+
+        if (isd.contains("naif_keywords")) {
+          json aleNaifKeywords = isd["naif_keywords"];
+          PvlObject naifKeywords = PvlObject("NaifKeywords", aleNaifKeywords);
+          *cube->label() += naifKeywords;
+        }
+      }
+      catch (json::parse_error &e) {
+        // continue if we hit a parse error
+      }
+    }
 
     try {
       CameraFactory::Create(*cube);

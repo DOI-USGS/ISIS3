@@ -111,7 +111,7 @@ namespace Isis {
       QString fileLine = in.readLine();
 
       // parse line into separate pieces(tokens) with "," as the delimiter
-      QStringList lineToken = fileLine.split(",", QString::SkipEmptyParts);
+      QStringList lineToken = fileLine.split(",", Qt::SkipEmptyParts);
 
       bool rejected = false;
       if (lineToken.at(lineToken.size()-1) == "*") {

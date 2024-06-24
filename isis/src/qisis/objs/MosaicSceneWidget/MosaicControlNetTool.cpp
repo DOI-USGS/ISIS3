@@ -691,7 +691,7 @@ namespace Isis {
       }
       emit modifyControlPoint(cp);
     }
-    else if (mouseButton == Qt::MidButton) {
+    else if (mouseButton == Qt::MiddleButton) {
       
 
       cp = m_controlNetGraphics->findClosestControlPoint(point);

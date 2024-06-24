@@ -445,7 +445,7 @@ namespace Isis {
   void ControlNetFilter::PointIDFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
     QString sPointIDExpr = pvlGrp["Expression"][0];
     QString sSeparator("*");
-    QStringList strTokens = sPointIDExpr.split(sSeparator, QString::SkipEmptyParts);
+    QStringList strTokens = sPointIDExpr.split(sSeparator, Qt::SkipEmptyParts);
 
     int iTokenSize = (int)strTokens.size();
     int iNumPoints = mCNet->GetNumPoints();
@@ -1177,7 +1177,7 @@ namespace Isis {
     }
 
     QString sSeparator("*");
-    QStringList strTokens = sCubeExpr.split(sSeparator, QString::SkipEmptyParts);
+    QStringList strTokens = sCubeExpr.split(sSeparator, Qt::SkipEmptyParts);
 
     int iTokenSize = (int)strTokens.size();
     int iNumCubes  = mSerialNumFilter.size();

@@ -12,6 +12,9 @@ pipeline {
                 args '--entrypoint= -v /astro_efs:/astro_efs'
                }
     }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
     environment {
         ISISDATA        =   '/astro_efs/isis_data'
         ISISTESTDATA    =   '/astro_efs/isis_testData'
@@ -33,8 +36,6 @@ pipeline {
                 conda install -c conda-forge python=3 findutils
                 conda env update -f environment.yml --prune
                 conda activate isis
-                mamba install -c conda-forge git
-                git submodule update --init --recursive
                 conda list
                 '''
             }

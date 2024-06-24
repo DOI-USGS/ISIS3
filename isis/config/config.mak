@@ -5,7 +5,7 @@
 SHELL=bash
 .SILENT:
 
-ISISLOCALVERSION := $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
+ISISLOCALVERSION := $(shell head -n 3 $(ISISROOT)/isis_version.txt | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
 QMAKE ?= $(shell which qmake 2 >& /dev/null)
 
 ifeq ($(QMAKE),)

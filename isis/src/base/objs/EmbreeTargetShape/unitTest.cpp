@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     Preference::Preferences(true);
 
     qDebug() << "RTCMultiHitRay";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Creating default ray";
     RTCMultiHitRay defaultRay;
@@ -75,10 +75,10 @@ int main(int argc, char *argv[]) {
     LinearAlgebra::Vector linRayDirection = LinearAlgebra::vector(32.4, 15, -1.6);
     RTCMultiHitRay linRay(linRayOrigin, linRayDirection);
     outputMultiHitRay(linRay);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "RTCOcclusionRay";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Creating default ray";
     RTCOcclusionRay defaultOccRay;
@@ -93,10 +93,10 @@ int main(int argc, char *argv[]) {
     qDebug() << "Creating ray from linear algebra vectors";
     RTCOcclusionRay linOccRay(linRayOrigin, linRayDirection);
     outputOcclusionRay(linOccRay);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "RayHitInformation";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Creating default ray hit information";
     RayHitInformation defaultHit;
@@ -106,10 +106,10 @@ int main(int argc, char *argv[]) {
     qDebug() << "Creating ray hit information from intersection, normal, and primitive ID";
     RayHitInformation testHit(linRayOrigin, linRayDirection, -10);
     outputRayHitInformation(testHit);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "EmbreeTargetShape";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Creating default target shape";
     EmbreeTargetShape defaultShape;
@@ -126,14 +126,14 @@ int main(int argc, char *argv[]) {
     qDebug() << "  Z min: " << defaultBounds.lower_z;
     qDebug() << "  Z max: " << defaultBounds.upper_z;
     qDebug() << "  Maximum distance: " << defaultShape.maximumSceneDistance();
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     QString dskfile("$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
     qDebug() << "Testing with " << dskfile << "...";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Loading shapefile";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     EmbreeTargetShape itokawaShape(dskfile);
     qDebug() << "Target shape name: " << itokawaShape.name();
@@ -149,98 +149,98 @@ int main(int argc, char *argv[]) {
     qDebug() << "  Z min: " << itokawaBounds.lower_z;
     qDebug() << "  Z max: " << itokawaBounds.upper_z;
     qDebug() << "  Maximum distance: " << itokawaShape.maximumSceneDistance();
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     // Vectors for observer-look direction intersections
     LinearAlgebra::Vector observer(3);
     LinearAlgebra::Vector lookDirection(3);
 
     qDebug() << "Testing axes ray intersection:";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 1000.0; observer[1] = 0.0; observer[2] = 0.0;
     lookDirection[0] = -1.0; lookDirection[1] = 0.0; lookDirection[2] = 0.0;
     outputIntersection(itokawaShape, observer, lookDirection);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 0.0; observer[1] = 1000.0; observer[2] = 0.0;
     lookDirection[0] = 0.0; lookDirection[1] = -1.0; lookDirection[2] = 0.0;
     outputIntersection(itokawaShape, observer, lookDirection);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 0.0; observer[1] = 0.0; observer[2] = 1000.0;
     lookDirection[0] = 0.0; lookDirection[1] = 0.0; lookDirection[2] = -1.0;
     outputIntersection(itokawaShape, observer, lookDirection);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Testing offset ray intersection:";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 100.0; observer[1] = 0.05; observer[2] = 0.0;
     lookDirection[0] = -1.0; lookDirection[1] = 0.0; lookDirection[2] = 0.0;
     outputIntersection(itokawaShape, observer, lookDirection);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 0.0; observer[1] = 100.0; observer[2] = 0.05;
     lookDirection[0] = 0.0; lookDirection[1] = -1.0; lookDirection[2] = 0.0;
     outputIntersection(itokawaShape, observer, lookDirection);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 0.05; observer[1] = 0.0; observer[2] = 100.0;
     lookDirection[0] = 0.0; lookDirection[1] = 0.0; lookDirection[2] = -1.0;
     outputIntersection(itokawaShape, observer, lookDirection);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Testing diagonal ray intersection:";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 10.0; observer[1] = 10.05; observer[2] = 0.0;
     lookDirection[0] = -1.0; lookDirection[1] = -1.0; lookDirection[2] = 0.0;
     lookDirection = LinearAlgebra::normalize(lookDirection);
     outputIntersection(itokawaShape, observer, lookDirection);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 0.0; observer[1] = 10.0; observer[2] = 10.05;
     lookDirection[0] = 0.0; lookDirection[1] = -1.0; lookDirection[2] = -1.0;
     lookDirection = LinearAlgebra::normalize(lookDirection);
     outputIntersection(itokawaShape, observer, lookDirection);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 10.05; observer[1] = 0.0; observer[2] = 10.0;
     lookDirection[0] = -1.0; lookDirection[1] = 0.0; lookDirection[2] = -1.0;
     lookDirection = LinearAlgebra::normalize(lookDirection);
     outputIntersection(itokawaShape, observer, lookDirection);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 10.0; observer[1] = 10.0; observer[2] = 10.0;
     lookDirection[0] = -1.0; lookDirection[1] = -1.0; lookDirection[2] = -1.0;
     lookDirection = LinearAlgebra::normalize(lookDirection);
     outputIntersection(itokawaShape, observer, lookDirection);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Testing ray occlusion:";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 3.0; observer[1] = 2.0; observer[2] = 1.0;
     lookDirection[0] = -3.0; lookDirection[1] = -2.0; lookDirection[2] = -1.0;
     lookDirection = LinearAlgebra::normalize(lookDirection);
     outputOcclusion(itokawaShape, observer, lookDirection);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 3.0; observer[1] = 2.0; observer[2] = 1.0;
     lookDirection[0] = -3.1; lookDirection[1] = -1.9; lookDirection[2] = -1.1;
     lookDirection = LinearAlgebra::normalize(lookDirection);
     outputOcclusion(itokawaShape, observer, lookDirection);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     observer[0] = 1.0; observer[1] = 1.0; observer[2] = 1.0;
     lookDirection[0] = -0.9; lookDirection[1] = -1.1; lookDirection[2] = -1.0;
     lookDirection = LinearAlgebra::normalize(lookDirection);
     outputOcclusion(itokawaShape, observer, lookDirection, 36496);
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Testing error throws";
-    qDebug() << endl;
+    qDebug() << Qt::endl;
 
     qDebug() << "Invalid shapefile";
     try {
@@ -332,16 +332,16 @@ void outputOcclusion(EmbreeTargetShape &embreeShape,
 
 void outputMultiHitRay(RTCMultiHitRay &ray) {
   qDebug() << "Multi Hit Ray Status";
-  qDebug() << "  Origin: (" << ray.org[0] << "," << ray.org[1] << "," << ray.org[2] << ")";
-  qDebug() << "  Direction: (" << ray.dir[0] << "," << ray.dir[1] << "," << ray.dir[2] << ")";
-  qDebug() << "  Near distance: " << ray.tnear;
-  qDebug() << "  Far distance: " << ray.tfar;
-  qDebug() << "  Normal: (" << ray.Ng[0] << "," << ray.Ng[1] << "," << ray.Ng[2] << ")";
-  qDebug() << "  Intersection U: " << ray.u;
-  qDebug() << "  Intersection V: " << ray.v;
-  qDebug() << "  Geometry ID: " << ray.geomID;
-  qDebug() << "  Primitive ID: " << ray.primID;
-  qDebug() << "  Instance ID: " << ray.instID;
+  qDebug() << "  Origin: (" << ray.ray.org_x << "," << ray.ray.org_y << "," << ray.ray.org_z << ")";
+  qDebug() << "  Direction: (" << ray.ray.dir_x << "," << ray.ray.dir_y << "," << ray.ray.dir_z << ")";
+  qDebug() << "  Near distance: " << ray.ray.tnear;
+  qDebug() << "  Far distance: " << ray.ray.tfar;
+  qDebug() << "  Normal: (" << ray.hit.Ng_x << "," << ray.hit.Ng_y << "," << ray.hit.Ng_z << ")";
+  qDebug() << "  Intersection U: " << ray.hit.u;
+  qDebug() << "  Intersection V: " << ray.hit.v;
+  qDebug() << "  Geometry ID: " << ray.hit.geomID;
+  qDebug() << "  Primitive ID: " << ray.hit.primID;
+  qDebug() << "  Instance ID: " << ray.hit.instID[0];
   qDebug() << "  Number of Intersections: " << ray.lastHit + 1;
   for (int i = 0; i <= ray.lastHit; i++) {
     qDebug() << "  Intersection" << i + 1;
@@ -354,15 +354,15 @@ void outputMultiHitRay(RTCMultiHitRay &ray) {
 
 void outputOcclusionRay(RTCOcclusionRay &ray) {
   qDebug() << "Occlusion Ray Status";
-  qDebug() << "  Origin: (" << ray.org[0] << "," << ray.org[1] << "," << ray.org[2] << ")";
-  qDebug() << "  Direction: (" << ray.dir[0] << "," << ray.dir[1] << "," << ray.dir[2] << ")";
-  qDebug() << "  Near distance: " << ray.tnear;
-  qDebug() << "  Far distance: " << ray.tfar;
-  qDebug() << "  Normal: (" << ray.Ng[0] << "," << ray.Ng[1] << "," << ray.Ng[2] << ")";
-  qDebug() << "  Intersection U: " << ray.u;
-  qDebug() << "  Intersection V: " << ray.v;
-  qDebug() << "  Geometry ID: " << ray.geomID;
-  qDebug() << "  Instance ID: " << ray.instID;
+  qDebug() << "  Origin: (" << ray.ray.org_x << "," << ray.ray.org_y << "," << ray.ray.org_z << ")";
+  qDebug() << "  Direction: (" << ray.ray.dir_x << "," << ray.ray.dir_y << "," << ray.ray.dir_z << ")";
+  qDebug() << "  Near distance: " << ray.ray.tnear;
+  qDebug() << "  Far distance: " << ray.ray.tfar;
+  qDebug() << "  Normal: (" << ray.hit.Ng_x << "," << ray.hit.Ng_y << "," << ray.hit.Ng_z << ")";
+  qDebug() << "  Intersection U: " << ray.hit.u;
+  qDebug() << "  Intersection V: " << ray.hit.v;
+  qDebug() << "  Geometry ID: " << ray.hit.geomID;
+  qDebug() << "  Instance ID: " << ray.hit.instID[0];
   qDebug() << "  Ignored Primitive ID: " << ray.ignorePrimID;
 }
 

@@ -190,7 +190,7 @@ namespace Isis {
 
       Cube *cube = activeViewport->cube();
       int band = activeViewport->grayBand();
-      ImageHistogram hist(*cube, band);
+      std::unique_ptr<ImageHistogram> hist;
 
       //If the rubber band is a line
       if (rubberBandTool()->currentMode() == RubberBandTool::LineMode) {
@@ -272,6 +272,7 @@ namespace Isis {
           return;
         }
 
+        hist = std::make_unique<ImageHistogram>(ImageHistogram(*cube, band, NULL, ssamp, sline, esamp, eline));
         Brick *brick = new Brick(*cube, 1, 1, 1);
 
         //For each point read that value from the cube and add it to the histogram
@@ -281,7 +282,7 @@ namespace Isis {
           int il = pt->y();
           brick->SetBasePosition(is, il, band);
           cube->read(*brick);
-          hist.AddData(brick->DoubleBuffer(), 1);
+          hist->AddData(brick->DoubleBuffer(), 1);
         }
         delete brick;
 
@@ -304,6 +305,7 @@ namespace Isis {
         esamp = round(esamp);
         eline = round(eline);
 
+        hist = std::make_unique<ImageHistogram>(ImageHistogram(*cube, band, NULL, ssamp, sline, esamp, eline));
         int nsamps = (int)(std::fabs(esamp - ssamp) + 1);
 
         Brick *brick = new Brick(*cube, nsamps, 1, 1);
@@ -313,7 +315,7 @@ namespace Isis {
           int isamp = std::min(ssamp,esamp);
           brick->SetBasePosition(isamp, line, band);
           cube->read(*brick);
-          hist.AddData(brick->DoubleBuffer(), nsamps);
+          hist->AddData(brick->DoubleBuffer(), nsamps);
         }
         delete brick;
       }
@@ -333,12 +335,13 @@ namespace Isis {
                                          esamp, eline);
 
 
+          hist = std::make_unique<ImageHistogram>(ImageHistogram(*cube, band, NULL, ssamp, sline, esamp, eline));
           for(int y = (int)sline; y <= (int)eline; y++) {
             for(int x = (int)ssamp; x <= (int)esamp; x++) {
               int x1, y1;
               activeViewport->cubeToViewport(x, y, x1, y1);
               geos::geom::Coordinate c(x1, y1);
-              geos::geom::Point *p = globalFactory->createPoint(c);
+              geos::geom::Point *p = globalFactory->createPoint(c).release();
               bool contains = p->within(polygon);
               delete p;
 
@@ -357,7 +360,7 @@ namespace Isis {
           for(unsigned int j = 0; j < x_contained.size(); j++) {
             brick->SetBasePosition(x_contained[j], y_contained[j], band);
             cube->read(*brick);
-            hist.AddData(brick->DoubleBuffer(), 1);
+            hist->AddData(brick->DoubleBuffer(), 1);
           }
           delete brick;
         }
@@ -368,13 +371,13 @@ namespace Isis {
       QVector<QPointF> binCountData;
       QVector<QPointF> cumPctData;
       double cumpct = 0.0;
-      for(int i = 0; i < hist.Bins(); i++) {
-        if(hist.BinCount(i) > 0) {
-          binCountData.append(QPointF(hist.BinMiddle(i), hist.BinCount(i)));
+      for(int i = 0; i < hist->Bins(); i++) {
+        if(hist->BinCount(i) > 0) {
+          binCountData.append(QPointF(hist->BinMiddle(i), hist->BinCount(i)));
 
-          double pct = (double)hist.BinCount(i) / hist.ValidPixels() * 100.;
+          double pct = (double)hist->BinCount(i) / hist->ValidPixels() * 100.;
           cumpct += pct;
-          cumPctData.append(QPointF(hist.BinMiddle(i), cumpct));
+          cumPctData.append(QPointF(hist->BinMiddle(i), cumpct));
         }
       }
 
@@ -389,7 +392,7 @@ namespace Isis {
       // ---------------------------------------------
 
       for(int y = 0; y < binCountData.size(); y++) {
-        intervals[y].interval = QwtInterval(binCountData[y].x(), binCountData[y].x() + hist.BinSize());
+        intervals[y].interval = QwtInterval(binCountData[y].x(), binCountData[y].x() + hist->BinSize());
 
         intervals[y].value = binCountData[y].y();
         if(binCountData[y].y() > maxYValue) maxYValue = binCountData[y].y();
@@ -405,14 +408,14 @@ namespace Isis {
       }
 
 
-      QLabel *label = new QLabel("  Average = " + QString::number(hist.Average()) + '\n' +
-                                "\n  Minimum = " + QString::number(hist.Minimum()) + '\n' +
-                                "\n  Maximum = " + QString::number(hist.Maximum()) + '\n' +
-                                "\n  Stand. Dev.= " + QString::number(hist.StandardDeviation()) + '\n' +
-                                "\n  Variance = " + QString::number(hist.Variance()) + '\n' +
-                                "\n  Median = " + QString::number(hist.Median()) + '\n' +
-                                "\n  Mode = " + QString::number(hist.Mode()) + '\n' +
-                                "\n  Skew = " + QString::number(hist.Skew()), targetWindow);
+      QLabel *label = new QLabel("  Average = " + QString::number(hist->Average()) + '\n' +
+                                "\n  Minimum = " + QString::number(hist->Minimum()) + '\n' +
+                                "\n  Maximum = " + QString::number(hist->Maximum()) + '\n' +
+                                "\n  Stand. Dev.= " + QString::number(hist->StandardDeviation()) + '\n' +
+                                "\n  Variance = " + QString::number(hist->Variance()) + '\n' +
+                                "\n  Median = " + QString::number(hist->Median()) + '\n' +
+                                "\n  Mode = " + QString::number(hist->Mode()) + '\n' +
+                                "\n  Skew = " + QString::number(hist->Skew()), targetWindow);
 
 
       QVBoxLayout *dockLayout = new QVBoxLayout;

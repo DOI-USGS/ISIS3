@@ -7,7 +7,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "CSMCamera.h"
-#include "CameraSkyMap.h"
+#include "CSMSkyMap.h"
 
 #include <fstream>
 #include <iostream>
@@ -18,10 +18,8 @@ find files of those names at the top level of this repository. **/
 #include <QPointF>
 #include <QString>
 
+#include "Affine.h"
 #include "Blob.h"
-#include "CameraDetectorMap.h"
-#include "CameraDistortionMap.h"
-#include "CameraFocalPlaneMap.h"
 #include "Constants.h"
 #include "Displacement.h"
 #include "Distance.h"
@@ -35,6 +33,8 @@ find files of those names at the top level of this repository. **/
 #include "NaifStatus.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
+#include "Table.h"
+#include "SensorUtilities.h"
 
 #include "csm/Warning.h"
 #include "csm/Error.h"
@@ -42,9 +42,15 @@ find files of those names at the top level of this repository. **/
 #include "csm/Ellipsoid.h"
 #include "csm/SettableEllipsoid.h"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 using namespace std;
 
 namespace Isis {
+
+json stateAsJson(std::string modelState);
+void sanitize(std::string &input);
 
   /**
    * Constructor for an ISIS Camera model that uses a Community Sensor Model (CSM)
@@ -57,6 +63,7 @@ namespace Isis {
     Blob state("CSMState", "String");
     cube.read(state);
     PvlObject &blobLabel = state.Label();
+
     QString pluginName = blobLabel.findKeyword("PluginName")[0];
     QString modelName = blobLabel.findKeyword("ModelName")[0];
     QString stateString = QString::fromUtf8(state.getBuffer(), state.Size());
@@ -72,7 +79,7 @@ namespace Isis {
    * @param modelName The name of the CSM::Model that will be created
    * @param stateString The state string the the CSM::Model will be created from
    */
-  void CSMCamera::init(Cube &cube, QString pluginName, QString modelName, QString stateString){
+  void CSMCamera::init(Cube &cube, QString pluginName, QString modelName, QString stateString) {
     const csm::Plugin *plugin = csm::Plugin::findPlugin(pluginName.toStdString());
     if (!plugin) {
       QStringList availablePlugins;
@@ -161,10 +168,15 @@ namespace Isis {
                                     imageLocus.direction.z};
 
     // Save off the look vector
-    m_lookB[0] = locusVec[0];
-    m_lookB[1] = locusVec[1];
-    m_lookB[2] = locusVec[2];
-    m_newLookB = true;
+    SetLookDirection(locusVec);
+    if (!m_et) {
+      m_et = new iTime();
+    }
+    *m_et = m_refTime + m_model->getImageTime(imagePt);
+    if (target()->isSky()) {
+      target()->shape()->setHasIntersection(false);
+      return true;
+    }
 
     // Check for a ground intersection
     if(!target()->shape()->intersectSurface(obsPosition, locusVec)) {
@@ -172,10 +184,6 @@ namespace Isis {
     }
 
     p_pointComputed = true;
-    if (!m_et) {
-      m_et = new iTime();
-    }
-    *m_et = m_refTime + m_model->getImageTime(imagePt);
     return true;
   }
 
@@ -243,6 +251,106 @@ namespace Isis {
     }
 
     return SetGround(SurfacePoint(latitude, longitude, localRadius));
+  }
+
+
+  /**
+   * Given the ra/dec compute the look direction.
+   *
+   * @param ra    Right ascension in degrees (sky longitude).
+   * @param dec   Declination in degrees (sky latitude).
+   *
+   * @return @b bool True if successful.
+   */
+  bool CSMCamera::SetRightAscensionDeclination(const double ra, const double dec) {
+    double raRad = ra * DEG2RAD;
+    double decRad = dec * DEG2RAD;
+
+    // Make the radius bigger, some multiple of the body radius -or- use sensor position at the reference point
+    SensorUtilities::GroundPt3D sphericalPt = {decRad, raRad, 1};
+    SensorUtilities::Vec rectPt = SensorUtilities::sphericalToRect(sphericalPt);
+
+    csm::EcefCoord lookPt = {rectPt.x, rectPt.y, rectPt.z};
+    double achievedPrecision = 0;
+    csm::WarningList warnings;
+    bool validBackProject;
+    csm::ImageCoord imagePt;
+
+    try {
+      imagePt = m_model->groundToImage(lookPt, 0.01, &achievedPrecision, &warnings);
+      double sample;
+      double line;
+      csmToIsisPixel(imagePt, line, sample);
+      validBackProject = SetImage(sample, line);
+    }
+    catch (csm::Error &e) {
+      validBackProject = false;
+    }
+
+    return validBackProject;
+  }
+
+
+  /**
+   * Sets the look direction of the spacecraft. This routine will then attempt to
+   * intersect the look direction with the target. If successful you can utilize
+   * the methods which return the lat/lon, phase, incidence, etc. This routine
+   * returns false if the look direction does not intersect the target.
+   *
+   * @param v[] A look vector in camera coordinates. For example, (0,0,1) is
+   *            usually the look direction out of the boresight of a camera.
+   *
+   * @return @b bool Indicates whether the given look direction intersects the target.
+   * 
+   */
+  bool CSMCamera::SetLookDirection(const std::vector<double> lookB) {
+    // The look vector must be in the camera coordinate system
+
+    // This memcpy does:
+    // m_lookB[0] = lookB[0];
+    // m_lookB[1] = lookB[1];
+    // m_lookB[2] = lookB[2];
+    memcpy(m_lookB, &lookB[0], sizeof(double) * 3);
+    m_newLookB = true;
+
+    // Don't try to intersect the sky
+    if (target()->isSky()) {
+      target()->shape()->setHasIntersection(false);
+      return false;
+    }
+
+    return false;
+  }
+
+
+  /**
+   * Computes the celestial north clock angle at the current
+   * line/sample or ra/dec. The reference vector is a vecor from the
+   * current pixel pointed directly "upward". Celetial North
+   * is a vector from the current pixel poiting towards celetial north.
+   * The Celestial North Clock Angle is the angle between these two vectors
+   * on the image.
+   *
+   * @return @b double The resultant Celestial North Clock Angle
+   */
+  double CSMCamera::CelestialNorthClockAngle() {
+    double orgLine = Line();
+    double orgSample = Sample();
+    double orgDec = Declination();
+    double orgRa = RightAscension();
+
+    SetRightAscensionDeclination(orgRa, orgDec + (2 * RaDecResolution()));
+    double y = Line() - orgLine;
+    double x = Sample() - orgSample;
+    double celestialNorthClockAngle = atan2(-y, x) * 180.0 / Isis::PI;
+    celestialNorthClockAngle = 90.0 - celestialNorthClockAngle;
+
+    if (celestialNorthClockAngle < 0.0) {
+       celestialNorthClockAngle += 360.0;
+    }
+
+    SetImage(orgSample, orgLine);
+    return celestialNorthClockAngle;
   }
 
 
@@ -335,10 +443,14 @@ namespace Isis {
    * @returns @b double The line resolution in meters per pixel
    */
   double CSMCamera::LineResolution() {
-    vector<double> imagePartials = ImagePartials();
-    return sqrt(imagePartials[0]*imagePartials[0] +
-                imagePartials[2]*imagePartials[2] +
-                imagePartials[4]*imagePartials[4]);
+    if (HasSurfaceIntersection()) {
+      vector<double> imagePartials = ImagePartials();
+      return sqrt(imagePartials[0]*imagePartials[0] +
+                  imagePartials[2]*imagePartials[2] +
+                  imagePartials[4]*imagePartials[4]);
+    }
+
+    return Isis::Null;
   }
 
 
@@ -352,10 +464,14 @@ namespace Isis {
    * @returns @b double The sample resolution in meters per pixel
    */
   double CSMCamera::SampleResolution() {
-    vector<double> imagePartials = ImagePartials();
-    return sqrt(imagePartials[1]*imagePartials[1] +
-                imagePartials[3]*imagePartials[3] +
-                imagePartials[5]*imagePartials[5]);
+    if (HasSurfaceIntersection()) {
+      vector<double> imagePartials = ImagePartials();
+      return sqrt(imagePartials[1] * imagePartials[1] +
+                  imagePartials[3] * imagePartials[3] +
+                  imagePartials[5] * imagePartials[5]);
+    }
+
+    return Isis::Null;
   }
 
 
@@ -369,16 +485,20 @@ namespace Isis {
    * @returns @b double The detector resolution in meters per pixel
    */
   double CSMCamera::DetectorResolution() {
-    // Redo the line and sample resolution calculations because it avoids
-    // a call to ImagePartials which could be a costly call
-    vector<double> imagePartials = ImagePartials();
-    double lineRes =  sqrt(imagePartials[0]*imagePartials[0] +
-                           imagePartials[2]*imagePartials[2] +
-                           imagePartials[4]*imagePartials[4]);
-    double sampRes =  sqrt(imagePartials[1]*imagePartials[1] +
-                           imagePartials[3]*imagePartials[3] +
-                           imagePartials[5]*imagePartials[5]);
-    return (sampRes + lineRes) / 2.0;
+    if (HasSurfaceIntersection()) {
+      // Redo the line and sample resolution calculations because it avoids
+      // a call to ImagePartials which could be a costly call
+      vector<double> imagePartials = ImagePartials();
+      double lineRes =  sqrt(imagePartials[0]*imagePartials[0] +
+                            imagePartials[2]*imagePartials[2] +
+                            imagePartials[4]*imagePartials[4]);
+      double sampRes =  sqrt(imagePartials[1]*imagePartials[1] +
+                            imagePartials[3]*imagePartials[3] +
+                            imagePartials[5]*imagePartials[5]);
+      return (sampRes + lineRes) / 2.0;
+    }
+    
+    return Isis::Null;
   }
 
 
@@ -990,7 +1110,7 @@ namespace Isis {
    * positive east, ocentric).
    *
    * This is not supported for CSM sensors because we cannot get the position
-   * of the sun, only the illumination direction.
+   * of the sun, only the illumination direction
    *
    * @param lat Sub-solar latitude
    * @param lon Sub-solar longitude
@@ -1056,7 +1176,6 @@ namespace Isis {
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
-
   /**
    * Get the SpiceRotation object the contains the orientation of the target body
    * relative to J2000.
@@ -1067,7 +1186,7 @@ namespace Isis {
    * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the body orientation
    */
   SpiceRotation *CSMCamera::bodyRotation() const {
-    QString msg = "Target body orientation is not supported for CSM camera models";
+    QString msg = "Body orientation is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1117,27 +1236,49 @@ namespace Isis {
   /**
    * Computes the Right Ascension of the currently set image coordinate.
    *
-   * This is not supported for CSM sensors because the CSM API only supports the
-   * body fixed coordinate system and does not provide rotations to any others.
-   *
    * @returns @b double The Right Ascension
    */
   double CSMCamera::RightAscension() {
-    QString msg = "Right Ascension is not supported for CSM camera models";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
+    double precision;
+    csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(p_childLine, p_childSample), 0.00001, &precision);
+    csm::EcefVector v = locus.direction;
+    SensorUtilities::GroundPt3D sphere_v = SensorUtilities::rectToSpherical({v.x, v.y, v.z});
+    double lon = sphere_v.lon;
+    if (lon < 0) {
+      lon += 2 * PI;
+    }
+    return lon * RAD2DEG;
   }
 
 
   /**
    * Computes the Declination of the currently set image coordinate.
    *
-   * This is not supported for CSM sensors because the CSM API only supports the
-   * body fixed coordinate system and does not provide rotations to any others.
-   *
    * @returns @b double The Declination
    */
   double CSMCamera::Declination() {
-    QString msg = "Declination is not supported for CSM camera models";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
+    double precision;
+    csm::EcefLocus locus = m_model->imageToRemoteImagingLocus(csm::ImageCoord(p_childLine, p_childSample), 0.00001, &precision);
+    csm::EcefVector v = locus.direction;
+    SensorUtilities::GroundPt3D sphere_v = SensorUtilities::rectToSpherical({v.x, v.y, v.z});
+    return sphere_v.lat * RAD2DEG;
+  }
+
+  json stateAsJson(std::string modelState) {
+    // Remove special characters from string
+    sanitize(modelState);
+
+    std::size_t foundFirst = modelState.find_first_of("{");
+    std::size_t foundLast = modelState.find_last_of("}");
+
+    if (foundFirst == std::string::npos) {
+      foundFirst = 0;
+    }
+    return json::parse(modelState.begin() + foundFirst, modelState.begin() + foundLast + 1);
+  }
+
+  void sanitize(std::string &input){
+    // Replaces characters from the string that are not printable with newlines
+    std::replace_if(input.begin(), input.end(), [](int c){return !::isprint(c);}, '\n');
   }
 }

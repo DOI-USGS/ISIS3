@@ -17,7 +17,7 @@ find files of those names at the top level of this repository. **/
 #include "geos/util/IllegalArgumentException.h"
 #include "geos/geom/Point.h"
 //#include "geos/opOverlay.h"
-#include "geos/operation/overlay/OverlayOp.h"
+#include "geos/operation/overlay/snap/SnapOverlayOp.h"
 
 #include "IException.h"
 #include "ImageOverlapSet.h"

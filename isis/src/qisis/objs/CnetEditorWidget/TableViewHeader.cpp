@@ -89,7 +89,7 @@ namespace Isis {
     */
   QSize TableViewHeader::minimumSizeHint() const {
     return QSize(0, QFontMetrics(font()).height() + 6);
-    /*QFontMetrics(font()).width(text->join("")) + 15,
+    /*QFontMetrics(font()).horizontalAdvance(text->join("")) + 15,
         QFontMetrics(font()).height() + 6);*/
   }
 
@@ -185,7 +185,7 @@ namespace Isis {
         TableColumn *& col = visibleCols[i];
 
         if (col->getTitle().isEmpty())
-          col->setWidth(QFontMetrics(font()).width(
+          col->setWidth(QFontMetrics(font()).horizontalAdvance(
               QString::number(m_visibleCount)) + 22);
       }
     }

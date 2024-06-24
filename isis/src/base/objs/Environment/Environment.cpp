@@ -106,7 +106,7 @@ namespace Isis {
    * @returns the Isis version in the format isis?.?.?.?qualifier | date
    */
   QString Environment::isisVersion() {
-    TextFile versionFile("$ISISROOT/version");
+    TextFile versionFile("$ISISROOT/isis_version.txt");
     QString line1, line2, line3, line4;
     versionFile.GetLine(line1);
     versionFile.GetLine(line2);
@@ -118,7 +118,7 @@ namespace Isis {
       line1 = validPartOfLine.cap();
     }
     else {
-      IString msg = "$ISISROOT/version line 1, no valid text found";
+      IString msg = "$ISISROOT/isis_version.txt line 1, no valid text found";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -126,7 +126,7 @@ namespace Isis {
       line2 = validPartOfLine.cap();
     }
     else {
-      IString msg = "$ISISROOT/version line 2, no valid text found";
+      IString msg = "$ISISROOT/isis_version.txt line 2, no valid text found";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -134,7 +134,7 @@ namespace Isis {
       line4 = validPartOfLine.cap();
     }
     else {
-      IString msg = "$ISISROOT/version line 4, no valid text found";
+      IString msg = "$ISISROOT/isis_version.txt line 4, no valid text found";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

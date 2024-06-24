@@ -19,6 +19,7 @@ namespace Isis {
       IsisIlluminator(SpicePosition* pos);
 
       SensorUtilities::Vec position(double time);
+      SensorUtilities::Vec velocity(double time);
     private:
       SpicePosition* m_pos;
   };

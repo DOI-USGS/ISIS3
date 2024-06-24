@@ -10,8 +10,8 @@ find files of those names at the top level of this repository. **/
 #include <QString>
 
 // Embree includes
-#include <embree2/rtcore.h>
-#include <embree2/rtcore_ray.h>
+#include <embree3/rtcore.h>
+#include <embree3/rtcore_ray.h>
 
 // PointCloudLibrary includes
 #include <pcl/io/auto_io.h>
@@ -41,7 +41,7 @@ namespace Isis {
    * @internal 
    *   @history 2017-05-11 Jesse Mapel - Original Version
    */
-  struct RTCMultiHitRay : RTCRay {
+  struct RTCMultiHitRay : RTCRayHit {
     RTCMultiHitRay();
     RTCMultiHitRay(const std::vector<double> &origin,
                    const std::vector<double> &direction);
@@ -80,7 +80,7 @@ namespace Isis {
    * @internal 
    *   @history 2017-05-15 Kristin Berry - Original Version
    */
-  struct RTCOcclusionRay : RTCRay {
+  struct RTCOcclusionRay : RTCRayHit {
     RTCOcclusionRay();
     RTCOcclusionRay(const std::vector<double> &origin,
                    const std::vector<double> &direction);
@@ -157,8 +157,8 @@ namespace Isis {
 
       RayHitInformation getHitInformation(RTCMultiHitRay &ray, int hitIndex);
 
-      static void multiHitFilter(void* userDataPtr, RTCMultiHitRay& ray);
-      static void occlusionFilter(void* userDataPtr, RTCOcclusionRay& ray);
+      static void multiHitFilter(const RTCFilterFunctionNArguments *args);
+      static void occlusionFilter(const RTCFilterFunctionNArguments *args);
 
     protected:
       pcl::PolygonMesh::Ptr readDSK(FileName file);

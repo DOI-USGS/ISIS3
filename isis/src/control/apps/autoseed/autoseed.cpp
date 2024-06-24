@@ -237,7 +237,7 @@ namespace Isis {
 
 
         points.push_back(Isis::globalFactory->createPoint(geos::geom::Coordinate(
-                           cam->UniversalLongitude(), cam->UniversalLatitude())));
+                           cam->UniversalLongitude(), cam->UniversalLatitude())).release());
 
         delete cam;
         cam = NULL;
@@ -333,7 +333,7 @@ namespace Isis {
           if (proj->SetCoordinate(points[pt]->getX(), points[pt]->getY())) {
             seed.push_back(Isis::globalFactory->createPoint(
                              geos::geom::Coordinate(proj->UniversalLongitude(),
-                                                    proj->UniversalLatitude())));
+                                                    proj->UniversalLatitude())).release());
           }
           else {
             IString msg = "Unable to convert from X/Y to a (lon,lat)";
@@ -347,7 +347,7 @@ namespace Isis {
           if (ugmap->SetImage(points[pt]->getX(), points[pt]->getY())) {
             seed.push_back(Isis::globalFactory->createPoint(
                              geos::geom::Coordinate(ugmap->UniversalLongitude(),
-                                                    ugmap->UniversalLatitude())));
+                                                    ugmap->UniversalLatitude())).release());
           }
           else {
             IString msg = "Unable to convert from Sample/Line to a (lon,lat)";

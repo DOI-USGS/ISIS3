@@ -127,7 +127,7 @@ void IsisMain() {
   // Read line 2, the column header line
   mpFile.GetLine(currLine);
   currLine = currLine.simplified();
-  QStringList tokens = currLine.split(" ", QString::SkipEmptyParts);
+  QStringList tokens = currLine.split(" ", Qt::SkipEmptyParts);
   while (!tokens.isEmpty()) {
     QString label = tokens.takeFirst();
     // this line should contain only text labels,
