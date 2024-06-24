@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-       os: [ubuntu-latest, macos-latest-large]
+       os: [ubuntu, macos-latest]
     defaults:
       run:
         shell: bash -l {0}
