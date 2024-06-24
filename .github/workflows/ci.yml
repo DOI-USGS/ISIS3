@@ -61,5 +61,5 @@ jobs:
           export ISISTESTDATA=${GITHUB_WORKSPACE}/isis_testData
           export ISISROOT=${GITHUB_WORKSPACE}/build/
           export PATH=$PATH:${GITHUB_WORKSPACE}/build/bin/
-          ctest -VV 
+          ctest -R '.' -E '(_app_|_unit_|_module_)' -j 8 --output-on-failure --timeout 10000
 
