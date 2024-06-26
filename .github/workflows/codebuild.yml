@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - dev
+  push:
+    branches:
+      - dev
+      
+jobs:
+  run-build-and-tests:
+    runs-on: linux
+    steps:
+      - name: Set AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+         inline-session-policy: >-
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": ["codebuild:StartBuild", "codebuild:BatchGetBuilds"],
+                "Resource": ["arn:aws:codebuild:us-west-2:950438895271:project/IsisCodeBuild-52nifRxFNgrA"]
+              },
+              {
+                "Effect": "Allow",
+                "Action": ["logs:GetLogEvents"],
+                "Resource": [
+                  "arn:aws:logs:us-west-2:950438895271:log-group:isisbuild-cloudwatch:*"
+                ]
+              }
+            ]
+          }
+      - name: Run CodeBuild
+        uses: aws-actions/aws-codebuild-run-build@v1
+        with:
+          project-name: IsisCodeBuild-52nifRxFNgrA
