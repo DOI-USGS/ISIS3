@@ -15,6 +15,7 @@ jobs:
       - name: Set AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
+         aws-region: us-west-2
          inline-session-policy: >-
           {
             "Version": "2012-10-17",
