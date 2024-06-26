@@ -1,4 +1,4 @@
-name: CI
+name: CodeBuild
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ on:
       
 jobs:
   run-build-and-tests:
-    runs-on: linux
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Set AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
