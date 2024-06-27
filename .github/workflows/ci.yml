@@ -18,8 +18,6 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
-    container:
-      image: ubuntu:20.04
     steps:
       - name: update git 
         run: | 
