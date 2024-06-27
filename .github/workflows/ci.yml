@@ -63,7 +63,7 @@ jobs:
           ls ${GITHUB_WORKSPACE}/isis_data 
           ls ${CONDA_PREFIX}/include/cholmod*
           cmake -DisisData=${GITHUB_WORKSPACE}/isis_data -DisisTestData=${GITHUB_WORKSPACE}/isis_testData -DJP2KFLAG=OFF -DCMAKE_BUILD_TYPE=RELEASE -Wdeprecated -GNinja ../isis
-          ninja -j8
+          ninja -j1
       - name: Run ISIS tests
         run: |
           cd build
