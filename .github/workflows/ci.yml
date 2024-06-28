@@ -41,13 +41,6 @@ jobs:
         run: |
           conda list
           conda env export
-      - name: Download ISIS data
-        run: |
-          mkdir isis_data
-          mkdir isis_testData
-          which rclone
-          # rclone mount asc_s3://asc-isisdata/usgs_data isis_data --config=${GITHUB_WORKSPACE}/isis/config/rclone.conf --daemon
-          # rclone mount asc_s3://asc-isisdata/isis_testData isis_testData --config=${GITHUB_WORKSPACE}/isis/config/rclone.conf --daemon
       - name: Build ISIS
         run: |
           # apt autoremove python3 -y
@@ -64,6 +57,11 @@ jobs:
           ninja -j1
       - name: Run ISIS tests
         run: |
+          mkdir isis_data
+          mkdir isis_testData
+          which rclone
+          rclone mount asc_s3://asc-isisdata/usgs_data isis_data --config=${GITHUB_WORKSPACE}/isis/config/rclone.conf --daemon
+          rclone mount asc_s3://asc-isisdata/isis_testData isis_testData --config=${GITHUB_WORKSPACE}/isis/config/rclone.conf --daemon
           cd build
           export ISISDATA=${GITHUB_WORKSPACE}/isis_data
           export ISISTESTDATA=${GITHUB_WORKSPACE}/isis_testData
