@@ -50,16 +50,16 @@ jobs:
           export ISISTESTDATA=${GITHUB_WORKSPACE}/isis_testData
           export ISISROOT=${GITHUB_WORKSPACE}/build/
           export PATH=$PATH:${GITHUB_WORKSPACE}/build/bin/
+
+          mkdir isis_data
+          mkdir isis_testData
+          downloadIsisData base isis_data/ --exclude "dems/" 
+          ls isis_data/ 
           cd build 
           cmake -DisisData=${GITHUB_WORKSPACE}/isis_data -DisisTestData=${GITHUB_WORKSPACE}/isis_testData -DJP2KFLAG=OFF -DCMAKE_BUILD_TYPE=RELEASE -Wdeprecated -GNinja ../isis
           ninja -j1
       - name: Run ISIS tests
         run: |
-          mkdir isis_data
-          mkdir isis_testData
-          which rclone
-          downloadIsisData base isis_data/ --exclude "dems/" 
-          ls isis_data/ 
           # rclone mount asc_s3://asc-isisdata/usgs_data isis_data --config=${GITHUB_WORKSPACE}/isis/config/rclone.conf --daemon
           # rclone mount asc_s3://asc-isisdata/isis_testData isis_testData --config=${GITHUB_WORKSPACE}/isis/config/rclone.conf --daemon
           cd build
