@@ -8,8 +8,16 @@ list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
 
 message(STATUS "SWIG flags: " ${CMAKE_SWIG_FLAGS} )
 
+if(EXISTS $ENV{CONDA_PREFIX})
+  message("Searching Anaconda environment at $ENV{CONDA_PREFIX} for Python libraries")
+  set(Python_FIND_VIRTUALENV FIRST)
+  set(Python_FIND_REGISTRY LAST)
+  set(Python_FIND_FRAMEWORK LAST)
+  set(Python_FIND_STRATEGY LOCATION)
+endif()
+
 # Setup for Python linking
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+find_package(Python3 REQUIRED COMPONENTS Development)
 
 # Setup for wrapper library
 set(ASTROSET_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/astroset")

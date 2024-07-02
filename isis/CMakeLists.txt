@@ -62,10 +62,6 @@ message("Detected Operating System: ${osVersionString}")
 #===============================================================================
 # Configuration options
 
-# All libraries are build as shared.  The main library is also built
-#  as a static library using some specialized code in Utilities.cmake.
-set(BUILD_SHARED_LIBS ON)
-
 # make sure to leave rpaths untouched on install
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -301,6 +297,11 @@ if(buildTests)
 else()
   set(SENSOR_UTILITIES_BUILD_TESTS OFF CACHE BOOL "Disable SensorUtilities Tests")
 endif()
+
+
+# All libraries are build as shared.  The main library is also built
+#  as a static library using some specialized code in Utilities.cmake.
+set(BUILD_SHARED_LIBS ON)
 
 add_subdirectory(../SensorUtilities SensorUtilities)
 
