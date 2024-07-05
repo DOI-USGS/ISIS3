@@ -61,7 +61,8 @@ jobs:
           
           mkdir isis_data
           mkdir isis_testData
-          ./build/scripts/downloadIsisData --config isis/config/rclone.conf base isis_data/ 
+          cp ${GITHUB_WORKSPACE}/isis/config/rclone.conf  . 
+          ./build/scripts/downloadIsisData --exclude "dems/"  base isis_data/ 
           ls isis_data/ 
           
           cd build
