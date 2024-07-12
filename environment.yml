@@ -5,8 +5,7 @@ channels:
 dependencies:
   - ale>=0.10.0, <1
   - armadillo
-  - boost>=1.72.0, <2
-  - boost-cpp>=1.72.0, <2
+  - boost>=1.60.0, <2
   - blas
   - usgs-astrogeology::bullet
   - bz2file
@@ -15,7 +14,7 @@ dependencies:
   - cspice=67
   - csm>=3.0.3,<3.0.4
   - curl>=8.3.0,<9.0a0
-  - cxx-compiler>=1.1.2
+  - cxx-compiler=1.1.2
   - doxygen
   - eigen>=3, <4
   - embree>=3, <4
@@ -25,16 +24,13 @@ dependencies:
   - gmp
   - graphviz
   - gsl>=2.6
-  - hdf5>=1.14.2,<1.14.3.0a0
-  - icu
+  - hdf5>=1.10.0,<1.14.3.0a0
+  - icu>=70.1,<71.0a0
   - inja
   - jama
   - usgs-astrogeology::kakadu==1
   - kalasiris
   - krb5
-  - libboost>=1.72.0, <2
-  - libgdal >=3.7.2,<3.8.0a0
-  - libopencv>=4.5.2, <5
   - libpng>=1.6.34, <2
   - libprotobuf
   - libtiff>=4.0, <5
@@ -45,18 +41,18 @@ dependencies:
   - mysql-connector-c
   - nanoflann<1.4
   - nlohmann_json
-  - ninja>=1.7.2, <2
+  - ninja>=1.7, <1.8
   - nn
-  - opencv>=4.5.2, <5
+  - opencv>=4.0, <5
   - openssl>=3.1.2,<4.0a0
   - pcl >=1.10, <2
   - plio
   - protobuf
-  - python=3.12
-  - python_abi=3.12
+  - python=3.10
+  - python_abi=3.10
   - pytest
   - qhull
-  - qt-main
+  - qt-main=5.15.6
   - qwt<6.3.0
   - rclone
   - sqlite>=3.43.0,<4.0a0
