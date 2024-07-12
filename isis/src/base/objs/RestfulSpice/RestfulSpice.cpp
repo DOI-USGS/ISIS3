@@ -49,6 +49,7 @@ namespace Isis::RestfulSpice{
     if (useWeb){
       json args = json::object({
         {"frameCode", frameCode},
+        {"sclk", sclk},
         {"mission", mission}
       });
       json out = spiceAPIQuery("strSclkToEt", args);
@@ -221,6 +222,7 @@ namespace Isis::RestfulSpice{
         queryString+= "&";
     }
     json j;
+    // @TODO throw exception if no json or invalid json is returned
     client.Build()->Get(queryString).Option(CURLOPT_FOLLOWLOCATION, 1L).AcceptJson().WithCompletion([&](const restincurl::Result& result) {
       j = json::parse(result.body);
     }).ExecuteSynchronous();
