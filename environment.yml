@@ -16,7 +16,7 @@ dependencies:
   - cspice =67
   - csm >=3.0.3,<3.0.4
   - curl >=8.4.0,<8.5
-  - cxx-compiler=1.1.2
+  - cxx-compiler=1.7
   - doxygen
   - eigen >=3, <4
   - embree >=3, <4
