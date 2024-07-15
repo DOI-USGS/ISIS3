@@ -5,7 +5,9 @@ env:
   GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
 
 on:
-  pull_request_target
+  pull_request_target:
+    branches:  
+      - '**' 
 
 jobs:
   build:
