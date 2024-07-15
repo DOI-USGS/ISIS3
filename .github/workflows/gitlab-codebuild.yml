@@ -1,4 +1,4 @@
-name: Octo Organization CI
+name: Github to Gitlab CI - Run CodeBuild
 
 env:
   PR_NUMBER: ${{ github.event.number }}
@@ -13,8 +13,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Run a one-line script
+      - name: Run script
         run: |
           git clone https://gitlab-ci-token:${GITLAB_TOKEN}@code.chs.usgs.gov/asc/isis-codebuild-ci.git
           cd isis-codebuild-ci
