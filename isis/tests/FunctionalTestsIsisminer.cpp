@@ -944,7 +944,7 @@ TEST(Isisminer, IsisminerTestCsvWriter) {
     CsvWriter.addKeyword(PvlKeyword("Description", "Tests writing the geometry in well-known-text format."), Pvl::Replace);
     CsvWriter.addKeyword(PvlKeyword("CsvFile", "\"%1/csvwriter_test_wkt.csv\""), Pvl::Replace);
     CsvWriter.addKeyword(PvlKeyword("Keywords", "(SourceProductId, Geometry)"), Pvl::Replace);
-    CsvWriter.addKeyword(PvlKeyword("Delimiter", "\";\""), Pvl::Replace);
+    CsvWriter.addKeyword(PvlKeyword("Delimiter", ";"), Pvl::Replace);
     CsvWriter.addKeyword(PvlKeyword("GisGeometryKey", "Geometry"));
     CsvWriter.addKeyword(PvlKeyword("GisType", "wkt"));
     isisminerObject.addObject(CsvWriter);
@@ -1091,25 +1091,25 @@ TEST(Isisminer, IsisminerTestCsvWriter) {
   // csvwriter_test_wkt.csv
   // file, header, skip, delimiter, keepEmptyParts, ignore comments
   line = CSVReader(tempDir.path() + "/csvwriter_test_wkt.csv",
-                   false, 0, ';', false, true);
+                   false, 0, ';', true, true);
 
   ASSERT_EQ(line.columns(), 2);
   ASSERT_EQ(line.rows(), 13);
 
   // Verify each line
   compareCsvLine(line.getRow(0), "SourceProductId,Geometry");
-  compareCsvLine(line.getRow(1), "EN0253077000M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ';');
-  compareCsvLine(line.getRow(2), "EN0253133950M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ';');
-  compareCsvLine(line.getRow(3), "EN0254615176M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ';');
-  compareCsvLine(line.getRow(4), "EN0253077000M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ';');
-  compareCsvLine(line.getRow(5), "EN0253105125M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ';');
-  compareCsvLine(line.getRow(6), "EN0254615176M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ';');
-  compareCsvLine(line.getRow(7), "EN0253105125M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ';');
-  compareCsvLine(line.getRow(8), "EN0254962699M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ';');
-  compareCsvLine(line.getRow(9), "EN0254615176M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ';');
-  compareCsvLine(line.getRow(10), "EN0253077000M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ';');
-  compareCsvLine(line.getRow(11), "EN0254615176M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ';');
-  compareCsvLine(line.getRow(12), "EN0253077000M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ';');
+  compareCsvLineCustomDelimiter(line.getRow(1), "EN0253077000M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
+  compareCsvLineCustomDelimiter(line.getRow(2), "EN0253133950M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
+  compareCsvLineCustomDelimiter(line.getRow(3), "EN0254615176M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
+  compareCsvLineCustomDelimiter(line.getRow(4), "EN0253077000M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
+  compareCsvLineCustomDelimiter(line.getRow(5), "EN0253105125M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
+  compareCsvLineCustomDelimiter(line.getRow(6), "EN0254615176M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
+  compareCsvLineCustomDelimiter(line.getRow(7), "EN0253105125M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
+  compareCsvLineCustomDelimiter(line.getRow(8), "EN0254962699M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
+  compareCsvLineCustomDelimiter(line.getRow(9), "EN0254615176M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
+  compareCsvLineCustomDelimiter(line.getRow(10), "EN0253077000M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
+  compareCsvLineCustomDelimiter(line.getRow(11), "EN0254615176M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
+  compareCsvLineCustomDelimiter(line.getRow(12), "EN0253077000M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
 }
 
 
@@ -3785,11 +3785,6 @@ TEST(Isisminer, IsisminerTestPdsTableFormat) {
   of << "\"h10_18kmgrid_00026              \",\"FREE        \", 12,0,  0.22,    -11.01150092,    288.39887243,   2439.32466332,     10.16152580,     14.11302242,     27.47206892,    -50.20803105,   -524.84921633,   -675.33668451,    755.74973572,  -2272.01680623,   -465.92572609\n";
   of.close();  
 
-  // test output csv file
-  // ifstream f1(tempDir.path().toStdString() + "/pdstableformat_data.csv");
-  // cout << f1.rdbuf() << endl;
-  // f1.close();
-
   // create input file pdsExportRootGenModified.typ
   of.open(tempDir.path().toStdString() + "/pdsExportRootGenModified.typ");
   of << "PDS_VERSION_ID = Enum\n";
@@ -3814,11 +3809,6 @@ TEST(Isisminer, IsisminerTestPdsTableFormat) {
   of << "ACCEPTED_MEASURES = Integer\n";
   of << "POINT_ID = Character\n";
   of.close();
-
-  // test output csv file
-  // ifstream f2(tempDir.path().toStdString() + "/pdsExportRootGenModified.typ");
-  // cout << f2.rdbuf() << endl;
-  // f2.close();
 
   // create input config file pdstableformat_test.conf in tempDir
   Pvl conf;
@@ -3943,11 +3933,6 @@ TEST(Isisminer, IsisminerTestPdsTableFormat) {
 
   conf.addObject(isisminerObject);
   conf.write(tempDir.path() + "/pdstableformat_test.conf");
-
-  // test output conf files
-  ifstream f3(tempDir.path().toStdString() + "/pdstableformat_test.conf");
-  cout << f3.rdbuf() << endl;
-  f3.close();
 
   // run isisminer
   QVector<QString> args = {"config=" + tempDir.path() + "/pdstableformat_test.conf",
