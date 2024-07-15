@@ -6,8 +6,7 @@ env:
 
 on:
   pull_request_target:
-    branches:  
-      - '**' 
+    branches: [ dev ]
 
 jobs:
   build:
