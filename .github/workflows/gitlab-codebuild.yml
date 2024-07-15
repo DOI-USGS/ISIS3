@@ -1,0 +1,26 @@
+name: Octo Organization CI
+
+env:
+  PR_NUMBER: ${{ github.event.number }}
+
+on:
+  pull_request:
+    branches: [ dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run a one-line script
+        run: |
+          git clone https://gitlab-ci-token:${GITLAB_TOKEN}@code.chs.usgs.gov/asc/isis-codebuild-ci.git
+          cd isis-codebuild-ci
+          git checkout -b PR_$PR_NUMBER
+          echo -e "\nenv: \n  shell: bash \n  variables: \n    PR_NUMBER: $PR_NUMBER \n    MERGE_BRANCH: "dev"" >> buildspec.yml
+          git commit -a -m "pr_5504"
+          git push origin PR_$PR_NUMBER
+          
+          
