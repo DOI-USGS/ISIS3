@@ -188,21 +188,22 @@ namespace Isis {
     p_minMaxTypeSelection->setToolTip("Min/Max Type");
     text =
       "<b>Function:</b> Select the minimum & maximum value types to \
-      set the stretch to. The three options are: \
-      <p>- Best: (default) The better of the absolute min/max or the \
+      set the stretch to. The four options are: \
+      <p>- Default: Min and max values are set to the \
+        0.5 and 99.5 percentiles, respectively. \
+      <p>- Best: The better of the absolute min/max or the \
         Chebyshev min/max. The better value is considered the value \
         closest to the mean. \
       <p>- Absolute: The absolute min/max value of all valid pixels. \
       <p>- Chebyshev: The min/max value such that a certain percentage \
         of data will fall within K standard deviations of the average \
         (Chebyshev's Theorem). It can be used to obtain a value that \
-        does not include statistical outliers. \
-      <p><b>Hint:</b> Percentages are set to mininum of 0.5 and \
-      maximum of 99.5.";
+        does not include statistical outliers.";
     p_minMaxTypeSelection->setWhatsThis(text);
-    p_minMaxTypeSelection->addItem("Best",      0);
-    p_minMaxTypeSelection->addItem("Absolute",  1);
-    p_minMaxTypeSelection->addItem("Chebyshev", 2);
+    p_minMaxTypeSelection->addItem("Default",      0);
+    p_minMaxTypeSelection->addItem("Best",         1);
+    p_minMaxTypeSelection->addItem("Absolute",     2);
+    p_minMaxTypeSelection->addItem("Chebyshev",    3);
 
     connect(p_minMaxTypeSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(changeStretch()));
 
@@ -1135,6 +1136,7 @@ namespace Isis {
 
     // Get current band statistics
     Statistics stats = statsFromCube(cvp->cube(), bandNum);
+    Histogram hist = histFromCube(cvp->cube(), bandNum, stats.BestMinimum(), stats.BestMaximum());
     
     // Set min/max given ComboBox selection
     int minMaxIndex = p_minMaxTypeSelection->currentIndex();
@@ -1142,14 +1144,17 @@ namespace Isis {
     double selectedMax = 0;
 
     if (minMaxIndex == 0) {
+      selectedMin = hist.Percent(0.5);
+      selectedMax = hist.Percent(99.5);
+    } else if (minMaxIndex == 1) {
       // Best
       selectedMin = stats.BestMinimum();
       selectedMax = stats.BestMaximum();
-    } else if (minMaxIndex == 1) {
+    } else if (minMaxIndex == 2) {
       // Absolute
       selectedMin = stats.Minimum();
       selectedMax = stats.Maximum();
-    } else if (minMaxIndex == 2) {
+    } else if (minMaxIndex == 3) {
       // Chebyshev
       selectedMin = stats.ChebyshevMinimum();
       selectedMax = stats.ChebyshevMaximum();

@@ -8,14 +8,14 @@ include $(ISISROOT)/make/isismake.init
 #---------------------------------------------------------------------------
 #  Set up ISIS versioning
 #---------------------------------------------------------------------------
-ISISVERSIONFULL      := $(shell $(HEAD) -n 1 $(ISISROOT)/version | $(SED) 's/\#.*//' | $(SED) 's/ *$$//')
+ISISVERSIONFULL      := $(shell $(HEAD) -n 1 $(ISISROOT)/isis_version.txt | $(SED) 's/\#.*//' | $(SED) 's/ *$$//')
 ISISMAJOR            := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f1)
 ISISMINOR            := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f2)
 ISISMINORMINOR       := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f3)
 ISISMINORMINORMINOR  := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f4)
 ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
 ISISLIBVERSION       := $(shell $(ECHO) $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | $(SED) 's/[a-z].*$$//')
-ISISLOCALVERSION     := $(shell $(HEAD) -n 3 $(ISISROOT)/version | $(TAIL) -n 1 | $(SED) 's/\#.*//' | $(SED) 's/ *$$//')
+ISISLOCALVERSION     := $(shell $(HEAD) -n 3 $(ISISROOT)/isis_version.txt | $(TAIL) -n 1 | $(SED) 's/\#.*//' | $(SED) 's/ *$$//')
 ISISRELEASE          := REL_0_0
 
 # Set up HOST_OS
