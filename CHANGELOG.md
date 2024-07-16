@@ -44,6 +44,9 @@ release.
 - Fixed a bug in QVIEW's Stretch tool where the default min/max type was not an available option [#5289](https://github.com/DOI-USGS/ISIS3/issues/5289)
 - Fixed a bug in QVIEW where images would double load if loaded from the commandline [#5505](https://github.com/DOI-USGS/ISIS3/pull/5505)
 
+### Added
+- Added versioned default values to lrowacphomap's PHOALGO and PHOPARCUBE parameters and updated lrowacphomap to handle them properly. [#5452](https://github.com/DOI-USGS/ISIS3/pull/5452)
+
 ## [8.2.0] - 2024-04-18
 
 ### Changed
@@ -70,7 +73,6 @@ release.
 - Added new option in `ctxcal` to use monthly computed flatfield files for "Frown" removal in CTX images. [#5338](https://github.com/DOI-USGS/ISIS3/pull/5338)
 - CSMCamera can now read and use the body rotation from ALE produced ISDs [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 - CSMSkyMap added to CSMCamera for use with local rover projections in ISIS [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
-- Added versioned default values to lrowacphomap's PHOALGO and PHOPARCUBE parameters and updated lrowacphomap to handle them properly. [#5452](https://github.com/DOI-USGS/ISIS3/pull/5452)
 - Added new Hayabusa2 translation for `SpacecraftName` to accept `HAYABUSA2` [#5395](https://github.com/DOI-USGS/ISIS3/issues/5395)
 - Added ALLOWERROR parameter to campt [#5393](https://github.com/DOI-USGS/ISIS3/pull/5393)
 - OSIRIS-REx Tagcams instrument support, tests, and test data added [#5424](https://github.com/DOI-USGS/ISIS3/issues/5424)
