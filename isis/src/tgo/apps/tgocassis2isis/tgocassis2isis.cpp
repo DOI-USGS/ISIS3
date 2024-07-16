@@ -71,11 +71,14 @@ namespace Isis {
       xmlDoc.setContent(&xmlFile, true);
       // If any instances of "Optical_Filter" or "Mission_Area" exist, use PSA .trn file
       QString transExportFile;
-      if (xmlDoc.elementsByTagName("Optical_Filter").size()){
+      if (!xmlDoc.elementsByTagName("Optical_Filter").isEmpty() &&
+          !xmlDoc.elementsByTagName("Cassis_Data").isEmpty()) {
         transExportFile = "TgoCassisExportedInstrument_PSA_Optical_Filter.trn";
-      } else if (xmlDoc.elementsByTagName("Mission_Area").size()) {
+      }
+      else if (!xmlDoc.elementsByTagName("Cassis_Data").isEmpty()) {
         transExportFile = "TgoCassisExportedInstrument_PSA.trn";
-      } else {
+      }
+      else {
         transExportFile = "TgoCassisExportedInstrument.trn";
       }
       // first assume lev1b image

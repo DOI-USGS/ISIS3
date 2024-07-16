@@ -185,7 +185,7 @@ namespace Isis {
     output->putGroup(instGrp);
 
     // Create a Band Bin group
-    FileName bandTransFile(transDir + "OsirisRExTagcamsBandBin_fit.trn");
+    FileName bandTransFile(transDir + "OsirisRexTagcamsBandBin_fit.trn");
     PvlToPvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
     bandBinXlater.Auto(outLabel);
     output->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));

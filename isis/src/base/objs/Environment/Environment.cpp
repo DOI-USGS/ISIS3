@@ -118,7 +118,7 @@ namespace Isis {
       line1 = validPartOfLine.cap();
     }
     else {
-      IString msg = "$ISISROOT/version line 1, no valid text found";
+      IString msg = "$ISISROOT/isis_version.txt line 1, no valid text found";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -126,7 +126,7 @@ namespace Isis {
       line2 = validPartOfLine.cap();
     }
     else {
-      IString msg = "$ISISROOT/version line 2, no valid text found";
+      IString msg = "$ISISROOT/isis_version.txt line 2, no valid text found";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -134,7 +134,7 @@ namespace Isis {
       line4 = validPartOfLine.cap();
     }
     else {
-      IString msg = "$ISISROOT/version line 4, no valid text found";
+      IString msg = "$ISISROOT/isis_version.txt line 4, no valid text found";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

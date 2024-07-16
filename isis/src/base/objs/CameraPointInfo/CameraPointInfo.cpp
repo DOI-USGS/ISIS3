@@ -349,23 +349,21 @@ namespace Isis {
     }
 
     if (!noErrors) {
-      if (!allowErrors) {
-        for (int i = 0; i < gp->keywords(); i++) {
-          QString name = (*gp)[i].name();
-          // These three keywords have 3 values, so they must have 3 NULLs
-          if (name == "BodyFixedCoordinate" || name == "SpacecraftPosition" ||
-              name == "SunPosition") {
-            (*gp)[i].addValue("NULL");
-            (*gp)[i].addValue("NULL");
-            (*gp)[i].addValue("NULL");
-          }
-          else {
-            (*gp)[i].setValue("NULL");
-          }
+      for (int i = 0; i < gp->keywords(); i++) {
+        QString name = (*gp)[i].name();
+        // These three keywords have 3 values, so they must have 3 NULLs
+        if (name == "BodyFixedCoordinate" || name == "SpacecraftPosition" ||
+            name == "SunPosition") {
+          (*gp)[i].addValue("NULL");
+          (*gp)[i].addValue("NULL");
+          (*gp)[i].addValue("NULL");
+        }
+        else {
+          (*gp)[i].setValue("NULL");
         }
       }
-      else {
-        double pB[3], spB[3], sB[3];
+      if (!allowErrors) {
+        double spB[3], sB[3];
 
         m_camera->instrumentPosition(spB);
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[0]), "km");
@@ -413,7 +411,6 @@ namespace Isis {
           gp->findKeyword("LookDirectionCamera").addValue("Null");
           gp->findKeyword("LookDirectionCamera").addValue("Null");
         }
-
       }
 
       // Set all keywords that still have valid information
