@@ -62,7 +62,22 @@ namespace Isis {
           flatFile.open(ui.GetCubeName("FLATFILE"));
       }
       else {
-          FileName flat = FileName("$mro/calibration/ctxFlat_????.cub").highestVersion();
+          FileName flat;
+          if (ui.GetBoolean("MONTHLYFLAT")) {
+              FileName outputFileName(icube->fileName());
+              QString outputFileBase = outputFileName.baseName();
+
+              QStringRef month(&outputFileBase, 0, 3);
+              flat = FileName("$mro/calibration/ctxFlatFiles/" + month + ".flat.cub");
+              if (!flat.fileExists()) {
+                QString msg = "Could not find flat file [" + flat.expanded() + "]. "
+                              "Either the data area is not set or a month is missing.";
+                throw IException(IException::Unknown, msg, _FILEINFO_);
+              }
+          }
+          else {
+              flat = FileName("$mro/calibration/ctxFlat_????.cub").highestVersion();
+          }
           flatFile.open(flat.expanded());
       }
       flat = new Brick(5000, 1, 1, flatFile.pixelType());

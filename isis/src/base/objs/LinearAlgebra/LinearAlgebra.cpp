@@ -1832,7 +1832,7 @@ namespace Isis {
       for (unsigned int j = 0; j < matrix.size2(); j++) {
         dbg.noquote() << toString(matrix(i, j), 15) << "     ";
       }
-      dbg.noquote() << endl;
+     dbg.noquote() << Qt::endl;
     }
     return dbg;
   }

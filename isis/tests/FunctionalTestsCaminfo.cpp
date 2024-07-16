@@ -266,14 +266,14 @@ TEST_F(DefaultCube, FunctionalTestCaminfoDefault) {
     EXPECT_NEAR(camstats.findKeyword("PhaseMaximum"), 81.304900313013, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("PhaseAverage"), 80.529097153288, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("PhaseStandardDeviation"), 0.44420861263609, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("EmissionMinimum"), 6.5875955784639002, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("EmissionMaximum"), 26.933702102375999, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("EmissionAverage"), 14.577804851994999, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("EmissionStandardDeviation"), 1.9856896435092, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("IncidenceMinimum"), 53.332095294516002, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("IncidenceMaximum"), 73.850710962080996, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("IncidenceAverage"), 66.178552657137004, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("IncidenceStandardDeviation"), 1.7434735102028001, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("EmissionMinimum"), 10.798462835458, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("EmissionMaximum"), 13.502630463571, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("EmissionAverage"), 12.15148695101, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("EmissionStandardDeviation"), 0.56543791358689, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("IncidenceMinimum"), 69.941096124192, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("IncidenceMaximum"), 70.311944975377, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("IncidenceAverage"), 70.127459134075, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("IncidenceStandardDeviation"), 0.10249039125851, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("LocalSolarTimeMinimum"), 7.7698055422189, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("LocalSolarTimeMaximum"), 7.8031735959943, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("LocalSolarTimeAverage"), 7.7863626216564, 0.001 );
@@ -433,10 +433,10 @@ TEST_F(DefaultCube, FunctionalTestCaminfoBoundary) {
     EXPECT_NEAR(camstats.findKeyword("ResolutionMaximum"), 18.985953877821999, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("PhaseMinimum"), 79.756145388578005, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("PhaseMaximum"), 81.304900313013, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("EmissionMinimum"), 7.4919183637178, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("EmissionMaximum"), 21.091782435858001, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("IncidenceMinimum"), 60.113879909235997, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("IncidenceMaximum"), 72.470329236867997, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("EmissionMinimum"), 10.798462835458, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("EmissionMaximum"), 13.502630463571, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("IncidenceMinimum"), 69.941096124192, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("IncidenceMaximum"), 70.311944975377, 0.001);
     EXPECT_NEAR(camstats.findKeyword("LocalSolarTimeMinimum"), 7.7698055422189, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("LocalSolarTimeMaximum"), 7.8031735959943, 0.001 );
 }
@@ -503,10 +503,10 @@ TEST_F(DefaultCube, FunctionalTestCaminfoCamStatsTable) {
     EXPECT_NEAR(camstats.findKeyword("MaximumResolution"), 18.985953877821999, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("MinimumPhase"), 79.756145388578005, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("MaximumPhase"), 81.304900313013, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("MinimumEmission"), 9.8943199851049997, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("MaximumEmission"), 19.639762075680999, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("MinimumIncidence"), 61.658112222808001, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("MaximumIncidence"), 71.417244415552005, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("MinimumEmission"), 10.798462835458, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("MaximumEmission"), 13.502630463571, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("MinimumIncidence"), 69.941096124192, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("MaximumIncidence"), 70.311944975377, 0.001);
     EXPECT_NEAR(camstats.findKeyword("LocalTimeMinimum"), 7.7698055422189, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("LocalTimeMaximum"), 7.8031735959943, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("ObliqueResolutionMinimum"), 19.183652922680999, 0.001 );
@@ -562,15 +562,15 @@ TEST_F(DefaultCube, FunctionalTestCaminfoCamStatsTable) {
     EXPECT_NEAR(camstats.findKeyword("PhaseAngleAverage"), 80.556249549336, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("PhaseAngleStandardDeviation"), 0.496128069014, 0.001 );
 
-    EXPECT_NEAR(camstats.findKeyword("EmissionAngleMinimum"), 9.8943199851049997, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("EmissionAngleMaximum"), 19.639762075680999, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("EmissionAngleAverage"), 14.638344628861001, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("EmissionAngleStandardDeviation"), 1.9665305080041, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("EmissionAngleMinimum"), 10.798462835458, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("EmissionAngleMaximum"), 13.502630463571, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("EmissionAngleAverage"), 12.222241624466, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("EmissionAngleStandardDeviation"), 0.63393199155819, 0.001);
 
-    EXPECT_NEAR(camstats.findKeyword("IncidenceAngleMinimum"), 61.658112222808001, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("IncidenceAngleMaximum"), 71.417244415552005, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("IncidenceAngleAverage"), 66.194841491336007, 0.001 );
-    EXPECT_NEAR(camstats.findKeyword("IncidenceAngleStandardDeviation"), 1.7313642198304, 0.001 );
+    EXPECT_NEAR(camstats.findKeyword("IncidenceAngleMinimum"), 69.941096124192, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("IncidenceAngleMaximum"), 70.311944975377, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("IncidenceAngleAverage"), 70.121640864056, 0.001);
+    EXPECT_NEAR(camstats.findKeyword("IncidenceAngleStandardDeviation"), 0.1144744474437, 0.001);
 
     EXPECT_NEAR(camstats.findKeyword("LocalSolarTimeMinimum"), 7.7698055422189, 0.001 );
     EXPECT_NEAR(camstats.findKeyword("LocalSolarTimeMaximum"), 7.8031735959943, 0.001 );

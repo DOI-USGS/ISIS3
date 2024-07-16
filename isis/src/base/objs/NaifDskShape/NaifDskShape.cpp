@@ -202,7 +202,7 @@ namespace Isis {
 
 
   /**
-   * @brief Set the normal vector to the intercept point normal
+   * @brief Set the local normal vector to the intercept point normal
    *
    * This method will reassign the ShapeModel normal to the current intecept point
    * shape (which is a triangular plate) normal.  If an intercept point is not
@@ -220,7 +220,7 @@ namespace Isis {
 
     // Got it, use the existing intercept point (plate) normal
     NaifVector norm(m_intercept->normal());
-    setNormal(norm[0], norm[1], norm[2]); // this also takes care of setHasNormal(true);
+    setLocalNormal(norm[0], norm[1], norm[2]); // this also takes care of setHasLocalNormal(true);
     return;
   }
 
@@ -281,10 +281,11 @@ namespace Isis {
   }
 
 
-  /** Return the surface normal of the ellipsi=oud */
+  /** Return the surface normal of the ellipsoid */
   void NaifDskShape::calculateSurfaceNormal() {
     // ShapeModel (parent class) throws error if no intersection
-    setNormal(ellipsoidNormal().toStdVector());// this takes care of setHasNormal(true);
+    QVector<double> norm = ellipsoidNormal(); 
+    setNormal(std::vector<double>(norm.begin(), norm.end()));// this takes care of setHasNormal(true);
     return;
   }
 
@@ -326,7 +327,8 @@ namespace Isis {
     // Get the body radii and compute the true normal of the ellipsoid
     QVector<double> norm(3);
     // need a case for target == NULL
-    QVector<Distance> radii = QVector<Distance>::fromStdVector(targetRadii());
+    std::vector<Distance> stdRadii = targetRadii();
+    QVector<Distance> radii = QVector<Distance>(stdRadii.begin(), stdRadii.end());
     NaifStatus::CheckErrors();
     surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(),
              pB, &norm[0]);

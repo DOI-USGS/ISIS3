@@ -591,7 +591,7 @@ namespace Isis {
 
           QTextStream ts(&newCubeListFile);
           foreach (QString cubeFileName, cubeFileNames) {
-            ts << cubeFileName << endl;
+            ts << cubeFileName << Qt::endl;
           }
 
           newCubeListFile.close();

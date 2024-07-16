@@ -129,7 +129,12 @@ function(add_isis_obj folder reqLibs)
   # If there are multiple truth files, select based on the OS.
   list(LENGTH thisTestFiles numTest)
   list(LENGTH thisTruthFiles numTruth)
-  if(NOT (${numTest} EQUAL ${numTruth}) )
+  if(((${numTruth} EQUAL 0) OR (${numTest} EQUAL 0)) AND NOT (${numTruth} EQUAL ${numTest}))
+    message( FATAL_ERROR "Error: Found different number of truth {${numTruth}} and test {${numTest}} files for ${folderName}!\n"
+                         "There should be at least one object.truth file and one unittest.cpp file." )
+  endif()
+
+  if(${numTruth} GREATER ${numTest})
 
     # Look for a truth file that contains the OS string
     set(matchedTruth "NONE")

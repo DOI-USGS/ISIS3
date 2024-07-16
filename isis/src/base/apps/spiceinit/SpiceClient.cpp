@@ -644,9 +644,7 @@ namespace Isis {
     QString encodedString = elementContents(pointingTag);
 
     QByteArray encodedArray;
-    for (int i = 0; i < encodedString.size(); i++) {
-      encodedArray.append(encodedString.data()[i]);
-    }
+    encodedArray.append(encodedString.toUtf8());
 
     QByteArray unencodedArray(QByteArray::fromHex(encodedArray));
 

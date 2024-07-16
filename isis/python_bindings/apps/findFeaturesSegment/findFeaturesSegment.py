@@ -8,9 +8,9 @@ import kalasiris as kisis
 
 import subprocess
 import pvl
+import shutil
 
 from glob import glob
-import logging
 from pathlib import Path
 import logging as log
 from copy import deepcopy
@@ -180,6 +180,7 @@ def generate_cnet(params, images):
             tmpdir = Path(tmpdir)
             overlapfromlist = tmpdir / "fromlist.lis"
             overlaptolist = tmpdir / "tolist.lis"
+
             kisis.fromlist.make([*from_images, new_params["MATCH"]], overlapfromlist)
 
             try:
@@ -212,7 +213,6 @@ def generate_cnet(params, images):
 
 
     if from_images:
-
         log.debug(f"FROMLIST: {from_images}")
 
         if not fromlist_path.exists():
@@ -230,6 +230,7 @@ def generate_cnet(params, images):
             log.debug(' '.join(err.cmd))
             log.debug(err.stdout)
             log.debug(err.stderr)
+            return "ERROR"
 
         segmented_net = cnet.from_isis(new_params["ONET"])
 
@@ -246,7 +247,8 @@ def generate_cnet(params, images):
         
         from_originals = [image["Original"] for image in images["from"]]
         return {"onet": new_params["ONET"], "original_images": from_originals}
-
+    else: 
+        return "No Overlap"
 
 def merge(d1, d2, k): 
     """
@@ -293,9 +295,9 @@ def findFeaturesSegment(ui):
         dictionary containing output cnet and image list
     """
     if ui.GetBoolean("debug"):
-        log.basicConfig(level=logging.DEBUG)
+        log.basicConfig(level=log.DEBUG)
     else: 
-        log.basicConfig(level=logging.INFO)    
+        log.basicConfig(level=log.INFO)    
 
     img_list = []
     if ui.WasEntered("From"):
@@ -310,7 +312,6 @@ def findFeaturesSegment(ui):
         nthreads = ui.GetInteger("maxthreads")
     else: 
         nthreads = int(multiprocessing.cpu_count())
-
 
     pool = ThreadPool(ceil(nthreads/len(img_list)))
     output = pool.map_async(segment, img_list)
@@ -357,26 +358,35 @@ def findFeaturesSegment(ui):
     # merge the networks 
     onets = [o["onet"] for o in output if isinstance(o, dict)]
     log.debug(f"onets: {onets}")
+
+    if len(onets) == 0:
+        raise Exception("No Control Points Found!")
+
     onet_list = Path(ui.GetFileName("onet")).with_suffix(".segmented.lis")
     kisis.fromlist.make(onets, onet_list)
     
     # merge the filelists 
     tolists = [set(o["original_images"]) for o in output if isinstance(o, dict)] 
-    
+
     final_images = set.union(*tolists)
     final_images.add(ui.GetCubeName("match"))
-    
+
     log.debug(f"merged images: {final_images}")
     kisis.fromlist.make(final_images, Path(ui.GetFileName("tolist")))
-        
-    try:
-        kisis.cnetmerge(clist = onet_list, onet=ui.GetFileName("onet"), networkid=ui.GetAsString("networkid"), description=f"{ui.GetString('description')}")
-    except subprocess.CalledProcessError as err:
-        log.debug('Had an ISIS error:')
-        log.debug(' '.join(err.cmd))
-        log.debug(err.stdout)
-        log.debug(err.stderr)
+     
+    if len(onets) > 1: 
+        try:
+            kisis.cnetmerge(clist = onet_list, onet=ui.GetFileName("onet"), networkid=ui.GetAsString("networkid"), description=f"{ui.GetString('description')}")
+        except subprocess.CalledProcessError as err:
+            log.debug('Had an ISIS error:')
+            log.debug(' '.join(err.cmd))
+            log.debug(err.stdout)
+            log.debug(err.stderr)
+    elif len(onets) == 1: 
+        # Dont merge 
+        shutil.copy(onets[0], ui.GetFileName("onet"))
 
+    log.info(f"COMPLETE, wrote { ui.GetFileName("onet")}")
 
 if __name__ == "__main__": 
     ui = astroset.init_application(sys.argv)

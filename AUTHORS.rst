@@ -158,6 +158,8 @@ Integrated Software for Imagers and Spectrometers Contributors
 - Stebenne, Andrew
 - Sucharski, Robert
 - Sucharski, Tracie
+- Sutton, Sarah S. (University of Arizona, Lunar and Planetary
+  Laboratory)
 - Takir, Driss
 - Thomas, Orrin
 - Thompson, Teal

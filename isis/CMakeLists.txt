@@ -34,7 +34,7 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "7.2.0")
+set(VERSION            "8.1.0")
 string(REPLACE "." ";" VERSION_LIST ${VERSION})
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
@@ -61,10 +61,6 @@ message("Detected Operating System: ${osVersionString}")
 #===============================================================================
 #===============================================================================
 # Configuration options
-
-# All libraries are build as shared.  The main library is also built
-#  as a static library using some specialized code in Utilities.cmake.
-set(BUILD_SHARED_LIBS ON)
 
 # make sure to leave rpaths untouched on install
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -279,7 +275,7 @@ find_package(Jama      125     REQUIRED)
 find_package(NN                REQUIRED)
 find_package(OpenCV    3.1.0   REQUIRED)
 find_package(PCL               REQUIRED)
-find_package(protobuf          REQUIRED CONFIG)
+find_package(Protobuf          REQUIRED)
 find_package(Qwt       6       REQUIRED)
 find_package(SuperLU   4.3     REQUIRED)
 find_package(TIFF      4.0.0   REQUIRED)
@@ -301,6 +297,11 @@ if(buildTests)
 else()
   set(SENSOR_UTILITIES_BUILD_TESTS OFF CACHE BOOL "Disable SensorUtilities Tests")
 endif()
+
+
+# All libraries are build as shared.  The main library is also built
+#  as a static library using some specialized code in Utilities.cmake.
+set(BUILD_SHARED_LIBS ON)
 
 add_subdirectory(../SensorUtilities SensorUtilities)
 
@@ -418,7 +419,7 @@ set(sourceXmlFolder ${CMAKE_BINARY_DIR}/bin/xml)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/xml)
 
 # Create the version file
-configure_file(${CMAKE_SOURCE_DIR}/cmake/version.in ${CMAKE_BINARY_DIR}/version)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/version.in ${CMAKE_BINARY_DIR}/isis_version.txt)
 
 # Set up install of the make folder.
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/make DESTINATION ${CMAKE_INSTALL_PREFIX})
@@ -594,7 +595,7 @@ install(FILES     ${CMAKE_SOURCE_DIR}/IsisPreferences DESTINATION  ${CMAKE_INSTA
 install(FILES     ${CMAKE_SOURCE_DIR}/../LICENSE.md   DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_SOURCE_DIR}/../AUTHORS.rst  DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_SOURCE_DIR}/../CHANGELOG.md DESTINATION  ${CMAKE_INSTALL_PREFIX})
-install(FILES     ${CMAKE_BINARY_DIR}/version         DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES     ${CMAKE_BINARY_DIR}/isis_version.txt DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(PROGRAMS ${CMAKE_BINARY_DIR}/lib/Camera.plugin DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
 install(PROGRAMS ${CMAKE_SOURCE_DIR}/scripts/downloadIsisData DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
