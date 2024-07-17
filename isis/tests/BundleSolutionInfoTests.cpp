@@ -38,26 +38,22 @@
 namespace Isis {
   class BundleSolutionInfoXmlHandlerTester : public BundleSolutionInfo {
     public:
-      BundleSolutionInfoXmlHandlerTester(FileName xmlFile) : BundleSolutionInfo() {
-
+      BundleSolutionInfoXmlHandlerTester(QXmlStreamReader *reader, FileName xmlFile) : BundleSolutionInfo() {
         QString xmlPath(xmlFile.expanded());
         QFile file(xmlPath);
 
         if (!file.open(QFile::ReadOnly) ) {
           throw IException(IException::Io,
-                           QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
+                           QString("Unable to open xml file, [%1],  with read access").arg(xmlFile.expanded()),
                            _FILEINFO_);
         }
-
-        QXmlStreamReader reader(&file);
-
-        while (!reader.atEnd()) {
-            reader.readNext();
-        }
-        if (reader.hasError()) {
-          throw IException(IException::Unknown,
-                           QString("Failed to parse xml file, [%1]").arg(xmlPath),
-                            _FILEINFO_);
+        if (reader->readNextStartElement()) {
+          if (reader->name() == "bundleSolutionInfo") {
+            readBundleSolutionInfo(reader);
+          }
+          else {
+            reader->raiseError(QObject::tr("Incorrect file"));
+          }
         }
       }
 
@@ -98,7 +94,15 @@ TEST_F(ThreeImageNetwork, BundleSolutionInfoSerialization) {
   writer.writeEndDocument();
   qXmlFile.close();
 
-  BundleSolutionInfoXmlHandlerTester newSolution(saveFile);
+  QFile xml(saveFile);
+  if(!xml.open(QFile::ReadOnly | QFile::Text)){
+    throw IException(IException::Unknown,
+                      QString("Failed to parse xml file, [%1]").arg(xml.fileName()),
+                      _FILEINFO_);
+  }
+
+  QXmlStreamReader reader(&xml);
+  BundleSolutionInfoXmlHandlerTester newSolution(&reader, saveFile);
 
   EXPECT_EQ(solution.adjustedImages().size(), newSolution.adjustedImages().size());
   EXPECT_EQ(solution.bundleResults().numberObservations(), newSolution.bundleResults().numberObservations());

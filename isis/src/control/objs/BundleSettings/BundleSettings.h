@@ -128,6 +128,7 @@ namespace Isis {
       //================ constructors, destructor, operators ================//
       //=====================================================================//
       BundleSettings();
+      BundleSettings(QXmlStreamReader *xmlReader);
       BundleSettings(const BundleSettings &other);
       ~BundleSettings();
       BundleSettings &operator=(const BundleSettings &other);

@@ -128,31 +128,56 @@ namespace Isis {
   }
 
   void BundleSolutionInfo::readBundleSolutionInfo(QXmlStreamReader *xmlReader) {
-    m_xmlHandlerCharacters = "";
-
-    if (xmlReader->readNextStartElement()) {
-
-      if (xmlReader->name() == "bundleSettings") {
-        // m_xmlHandlerBundleSolutionInfo->m_settings =
-        //     BundleSettingsQsp(new BundleSettings(m_xmlHandlerProject, xmlReader));
+    QString projectRoot;
+    if (m_xmlHandlerProject) {
+      projectRoot = m_xmlHandlerProject->projectRoot() + "/";
+    }
+    Q_ASSERT(xmlReader->name() == "bundleSolutionInfo");
+    while(xmlReader->readNextStartElement()) {
+      std::cout << xmlReader->name() << std::endl;
+      if (xmlReader->qualifiedName() == "generalAttributes") {
+        while (xmlReader->readNextStartElement()) {
+          if (xmlReader->qualifiedName() == "id") {
+            m_id = new QUuid(xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "name") {
+            m_name = xmlReader->readElementText();
+          }
+          else if (xmlReader->qualifiedName() == "runTime") {
+            m_runTime = xmlReader->readElementText();
+          }
+          else if (xmlReader->qualifiedName() == "inputFileName") {
+            m_inputControlNetFileName = new FileName(projectRoot + xmlReader->readElementText());
+          }
+          else if (xmlReader->qualifiedName() == "bundleOutTXT") {
+            m_txtBundleOutputFilename = projectRoot + xmlReader->readElementText();
+          }
+          else if (xmlReader->qualifiedName() == "imagesCSV") {
+            m_csvSavedImagesFilename = projectRoot + xmlReader->readElementText();
+          }
+          else if (xmlReader->qualifiedName() == "pointsCSV") {
+            m_csvSavedPointsFilename = projectRoot + xmlReader->readElementText();
+          }
+          else if (xmlReader->qualifiedName() == "residualsCSV") {
+            m_csvSavedResidualsFilename = projectRoot + xmlReader->readElementText();
+          }
+          else {
+            xmlReader->skipCurrentElement();
+          }
+        }
+      }
+      else if (xmlReader->name() == "bundleSettings") {
+        m_settings = NULL;
+        m_settings = BundleSettingsQsp(new BundleSettings(xmlReader));
       }
       else if (xmlReader->name() == "bundleResults") {
+        m_statisticsResults = NULL;
         m_statisticsResults = new BundleResults(xmlReader);
       }
-      else if (xmlReader->name() == "imageList") {
-        // m_xmlHandlerBundleSolutionInfo->m_adjustedImages->append(
-        //     new ImageList(m_xmlHandlerProject, xmlReader));
-      }
-      else if (xmlReader->name() == "outputControl") {
-        // FileName outputControlPath = FileName(m_xmlHandlerProject->bundleSolutionInfoRoot() + "/"
-        //                                       + m_xmlHandlerBundleSolutionInfo->runTime());
-
-        // m_xmlHandlerBundleSolutionInfo->m_outputControl = new Control(outputControlPath, xmlReader);
-      }
       else {
-        xmlReader->raiseError(QObject::tr("Incorrect file"));
+        xmlReader->skipCurrentElement();
       }
-    }
+    }  
   }
 
   /**
