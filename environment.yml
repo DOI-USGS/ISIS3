@@ -6,8 +6,8 @@ dependencies:
   - kalasiris 
   - ale>=0.10.0, <1
   - armadillo
-  - boost=1.72.0, <1.73
-  - boost-cpp=1.72.0, <1.73
+  - boost>=1.72.0, <1.73
+  - boost-cpp>=1.72.0, <1.73
   - blas
   - usgs-astrogeology::bullet
   - bz2file
@@ -18,14 +18,14 @@ dependencies:
   - curl
   - cxx-compiler=1.1.2
   - doxygen
-  - eigen < 3.4
+  - eigen<3.4
   - embree>=2.17,<3
   - ffmpeg
-  - geos =3.11.1
+  - geos=3.11.1
   - geotiff
   - gmp
   - graphviz
-  - conda-forge::gsl>=2.6, <3
+  - conda-forge::gsl>=2.6, <2.7
   - hdf5
   - icu
   - inja
@@ -49,7 +49,7 @@ dependencies:
   - nn
   - opencv>=4.5.2, <4.6
   - openssl>=1.1.1k, <2
-  - pcl >= 1.11.0, <1.12
+  - pcl>=1.11.0, <1.12
   - plio
   - protobuf<3.20
   - python>=3.9
@@ -57,9 +57,9 @@ dependencies:
   - rclone
   - qhull
   - qt>=5.12.9,<5.13
-  - qwt
+  - qwt<6.3.0
   - sqlite
-  - suitesparse
+  - suitesparse<7.7.0
   - superlu
   - swig
   - texlive-core
