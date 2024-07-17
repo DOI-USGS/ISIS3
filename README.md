@@ -4,19 +4,17 @@
 
 # ISIS
 
-[![Join the chat at https://gitter.im/USGS-Astrogeology/isis3_cmake](https://badges.gitter.im/USGS-Astrogeology/isis3_cmake.svg)](https://gitter.im/USGS-Astrogeology/isis3_cmake?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Join the discourse at https://astrodiscuss.usgs.gov](https://img.shields.io/discourse/https/astrodiscuss.usgs.gov/topics.svg?style=flat)](https://astrodiscuss.usgs.gov/)
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis3/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis3)
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2563341.svg)](https://doi.org/10.5281/zenodo.2563341)
+[![Badge for DOI 10.5066/P13YBMZA](https://img.shields.io/badge/DOI-10.5066%2FP13YBMZA-blue)](https://doi.org/10.5066/P13YBMZA)
 
 ## Table of Contents
 
 * [Requests for Comment](README.md#Requests-for-Comment)
 * [FAQ](README.md#FAQ)
-* [Installation](README.md#Installation)
 * [ISIS Tutorials](README.md#ISIS-Tutorials)
 * [Citing ISIS](README.md#Citing-ISIS)
+* [Installation](README.md#Installation)
 * [Start Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
 * [ISIS Data Area](README.md#The-ISIS-Data-Area)
 * [ISIS Test Data](README.md#ISIS-Test-Data)
@@ -25,15 +23,24 @@
 
 
 ## Requests for Comment
-The ISIS project uses a Request for Comment (RFC) model whereby major potential changes to the code base, data area, or binary delivery process are proposed, iterated on by any interested parties, and potentially adopted. Right now, RFCs are being housed in this repository's [wiki](https://github.com/USGS-Astrogeology/ISIS3/wiki) with associated discussions occurring on [astrodiscuss](https://astrodiscuss.usgs.gov).
+The ISIS project uses a Request for Comment (RFC) model where major changes to the code base, data area, or binary delivery process are proposed, iterated on, and potentially adopted. Right now, RFCs are being housed in this repository's [wiki](https://github.com/USGS-Astrogeology/ISIS3/wiki).
 
 Current open RFCs:
   * No Requests for Comment are currently open
 
-  We encourage all contributors and users to review open RFCs and comment as these proposed changes will impact use of the software.
+  We encourage all contributors and users to review open RFCs and comment, as these proposed changes will impact use of the software.
 
 ## FAQ
 We maintain a list of frequently encountered questions and issues. Before opening a new issue, please take a look at the [FAQ](https://github.com/USGS-Astrogeology/ISIS3/wiki/FAQ).
+
+## ISIS Tutorials
+Please refer to the GitHub wiki page [ISIS Online Workshops](https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops) for current ISIS tutorials.
+
+## Citing ISIS
+
+The badge at the top of this README lists the DOI of the most recent ISIS version.  As of 05/09/2024, the latest release of ISIS is version 8.0.3, and its DOI is [`10.5066/P13YBMZA`](https://doi.org/10.5066/P13YBMZA).
+
+The [Releases Page on GitHub](https://github.com/DOI-USGS/ISIS3/releases) lists the DOI for each version of ISIS.  Older versions may be listed on [Zenodo](https://doi.org/10.5281/zenodo.2563341).  It is good practice to cite the version of the software being used by the citing work, so others can reproduce your exact results.
 
 ## Installation
 
@@ -384,12 +391,6 @@ To build and compile ISIS requires following the instructions listed below, whic
 -   [Building individual applications/objects](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-individual-isis3-applicationsobjects)
 -   [Building ISIS documentation](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3-documentation)
 -   [What to do if you encounter any problems](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#problems)
-
-## ISIS Tutorials
-Please refer to the GitHub wiki page [ISIS Online Workshops](https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops) for current ISIS tutorials.
-
-## Citing ISIS
-This project uses a [Zenodo](https://zenodo.org) generated DOI. The badge at the top of this README links to the DOI for the [latest release](https://doi.org/10.5281/zenodo.2563341). It is [good practice](https://help.zenodo.org) (See 'Which DOI Should I Use in Citations?') to cite the version of the software being used by the citing work. To obtain this DOI, one can follow the [link to the latest version](https://doi.org/10.5281/zenodo.2563341) and then check the right sidebar area titled **Versions** for a listing of all ISIS versions that currently have a Zenodo DOI.
 
 ## The ISIS Data Area
 

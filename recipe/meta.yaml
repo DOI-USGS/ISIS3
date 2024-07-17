@@ -45,42 +45,41 @@ build:
 # Shotgun strat on requirements until we can narrow them down
 requirements:
   build:
-   - ale =0.10.0
+   - ale =0.10.0,<1
    - aom
    - armadillo
-   - boost >=1.72.0,<2
-   - boost-cpp >=1.72.0,<2
+   - boost >=1.78.0,<1.79
+   - boost-cpp >=1.78.0,<1.79
    - blas
    - usgs-astrogeology::bullet
    - bz2file
    - bzip2
-   - cmake >=3.15,<4
+   - cmake >=3.27,<3.28
    - cspice =67
    - csm >=3.0.3,<3.0.4
-   - curl >=8.3.0,<9.0a0
-   - cxx-compiler >=1.1.2
+   - curl >=8.4.0,<8.5
+   - cxx-compiler=1.1.2
    - doxygen
    - eigen >=3, <4
    - embree >=3, <4
    - ffmpeg
-   - geos >=3.12.1, <4
+   - geos >=3.12, <3.13
    - geotiff
    - gmp
    - graphviz
-   - gsl >=2.6
-   - hdf5 >=1.14.2,<1.14.3.0a0
+   - conda-forge::gsl >=2.6, <2.7
+   - hdf5
    - icu
    - inja
    - jama
    - usgs-astrogeology::kakadu==1
    - kalasiris
    - krb5
-   - libboost >=1.72.0,<2
-   - libgdal >=3.7.2,<3.8.0a0
-   - libopencv >=4.5.2,<5
-   - libpng >=1.6.34,<2
+   - libgdal >=3.7.0,<3.8
+   - libopencv >=4.7,<4.8
+   - libpng >=1.6.34,<1.7
    - libprotobuf
-   - libtiff >=4.0,<5
+   - libtiff >=4.5,<4.6
    - libxml2
    - make
    - mesalib
@@ -88,22 +87,22 @@ requirements:
    - mysql-connector-c
    - nanoflann <1.4
    - nlohmann_json
-   - ninja >=1.7.2,<2
+   - ninja >=1.7.2,<1.8
    - nn
-   - opencv >=4.5.2,<5
-   - openssl >=3.1.2,<4.0a0
-   - pcl >=1.10,<2
+   - opencv >=4.7,<4.8
+   - openssl >=3.1.2,<3.2
+   - pcl >=1.13,<1.14
    - plio
    - protobuf
-   - python >=3.11
-   - python_abi >=3.11
+   - python >=3.10
+   - python_abi >=3.10
    - pytest
    - rclone
    - qhull
-   - qt-main
-   - qwt
-   - sqlite >=3.43.0,<4.0a0
-   - suitesparse
+   - qt-main=5.15.8
+   - qwt <6.3.0
+   - sqlite >=3.46.0,<3.47
+   - suitesparse <7.7.0
    - superlu
    - swig
    - texlive-core
@@ -116,7 +115,7 @@ requirements:
    - xorg-libsm
    - xorg-libx11
    - xorg-libxi
-   - zlib >=1.2.13,<1.3.0a0
+   - zlib >=1.3,<1.4
 
   run:
   - {{ pin_compatible('ale', max_pin='x.x.x') }}
@@ -143,7 +142,7 @@ requirements:
   - jama
   - {{ pin_compatible('jasper', max_pin='x.x') }}
   - {{ pin_compatible('kakadu', max_pin='x') }}
-   - kalasiris
+  - kalasiris
   - libcxx
   - libopenblas
   - {{ pin_compatible('libopencv', max_pin='x.x') }}
@@ -157,13 +156,14 @@ requirements:
   - {{ pin_compatible('opencv', max_pin='x.x') }}
   - {{ pin_compatible('openssl', min_pin='x', max_pin='x.x') }}
   - {{ pin_compatible('pcl', min_pin='x', max_pin='x.x') }}
-   - plio
+  - plio
   - {{ pin_compatible('proj', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('protobuf', max_pin='x.x') }}
   - qhull
-  - {{ pin_compatible('qt', max_pin='x.x') }}
+  - {{ pin_compatible('qt-main', max_pin='x.x') }}
   - {{ pin_compatible('qwt', max_pin='x.x') }}
   - rclone
+  - {{ pin_compatible('suitesparse', min_pin='x.x', max_pin='x.x') }}
   - superlu
   - tnt
   - x264

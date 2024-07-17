@@ -62,10 +62,6 @@ message("Detected Operating System: ${osVersionString}")
 #===============================================================================
 # Configuration options
 
-# All libraries are build as shared.  The main library is also built
-#  as a static library using some specialized code in Utilities.cmake.
-set(BUILD_SHARED_LIBS ON)
-
 # make sure to leave rpaths untouched on install
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -279,7 +275,7 @@ find_package(Jama      125     REQUIRED)
 find_package(NN                REQUIRED)
 find_package(OpenCV    3.1.0   REQUIRED)
 find_package(PCL               REQUIRED)
-find_package(protobuf          REQUIRED CONFIG)
+find_package(Protobuf          REQUIRED)
 find_package(Qwt       6       REQUIRED)
 find_package(SuperLU   4.3     REQUIRED)
 find_package(TIFF      4.0.0   REQUIRED)
@@ -301,6 +297,11 @@ if(buildTests)
 else()
   set(SENSOR_UTILITIES_BUILD_TESTS OFF CACHE BOOL "Disable SensorUtilities Tests")
 endif()
+
+
+# All libraries are build as shared.  The main library is also built
+#  as a static library using some specialized code in Utilities.cmake.
+set(BUILD_SHARED_LIBS ON)
 
 add_subdirectory(../SensorUtilities SensorUtilities)
 
