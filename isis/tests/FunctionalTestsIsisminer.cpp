@@ -1,5 +1,8 @@
 #include "isisminer.h"
 
+#include "camstats.h"
+#include "footprintinit.h"
+
 #include "ControlNet.h"
 #include "CSVReader.h"
 #include "SqlQuery.h"
@@ -13,6 +16,8 @@ using namespace std;
 using namespace Isis;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/isisminer.xml").expanded();
+static QString APP_XML2 = FileName("$ISISROOT/bin/xml/camstats.xml").expanded();
+static QString APP_XML3 = FileName("$ISISROOT/bin/xml/footprintinit.xml").expanded();
 
 /**
    * IsisminerResourceManager
@@ -44,6 +49,7 @@ class IsisminerResourceManager : public TempTestingFiles {
       of.close();
     }
 };
+
 
 /**
    * IsisminerMainProgram
@@ -1533,7 +1539,8 @@ TEST(Isisminer, IsisminerTestFilter) {
    * 
    * Tests GIS intersection behavior
    * 
-   * INPUT: 1) EN0240208184M.lev1.cub (stored in isis/tests/data/isisminer/gisintersect)
+   * INPUT: 1) EN0240208184M.lev1.isd (in isis/tests/data/isisminer/gisintersect)
+   *        2) EN0240208184M.lev1.pvl (in isis/tests/data/isisminer/gisintersect)
    *        2) gisfile.pvl
    *        3) pvlList.lis
    *        4) MercuryQuadGeoms.pvl
@@ -1546,14 +1553,53 @@ TEST(Isisminer, IsisminerTestFilter) {
    *         5) gisintersect_test_wkt_bb.csv
    *         6) gisintersect_test_wkt.csv
    * 
-   *          commands:
-   *                  $(CP) $(INPUT)/MercuryQuadGeoms.pvl . > /dev/null;
-   *                  $(APPNAME) config=$(INPUT)/gisintersect_test.conf \
-   *                  parameters="inputdir:$(INPUT)@outputdir:$(OUTPUT)"  > /dev/null;
-   *                  $(RM) MercuryQuadGeoms.pvl > /dev/null;   * 
    */  
 TEST(Isisminer, IsisminerTestGisIntersect) {
   QTemporaryDir tempDir;
+
+  // create cube from isd and label files
+  FileName isdFile("$ISISROOT/../isis/tests/data/isisminer/gisintersect/EN0240208184M.lev1.isd");
+  FileName labelFile("$ISISROOT/../isis/tests/data/isisminer/gisintersect/EN0240208184M.lev1.pvl");
+
+  Cube cube;
+  cube.fromIsd(tempDir.path() + "/EN0240208184M.lev1.cub", labelFile, isdFile, "rw");
+  
+  // run camstats and footprintinit on newly created cube
+  QVector<QString> args = {"from=" + tempDir.path() + "/EN0240208184M.lev1.cub",
+                                  "attach=yes",
+                                  "linc=10",
+                                  "sinc=10"
+                          };
+
+  UserInterface ui1(APP_XML2, args);
+
+  try {
+    Pvl camstatsLog;
+    camstats(ui1, &camstatsLog);
+  }
+  catch(IException &e) {
+    FAIL() << e.toString().toStdString().c_str() << endl;
+  }
+  
+  args = {"from=" + tempDir.path() + "/EN0240208184M.lev1.cub",
+          "increaseprecision=true",
+          "linc=10",
+          "sinc=10",
+          "maxemission=89",
+          "maxincidence=89",
+          "limbtest=ellipsoid",
+          "testxy=false"
+                          };
+
+  UserInterface ui2(APP_XML3, args);
+
+  try {
+    Pvl fpinitLog;
+    footprintinit(ui2, &fpinitLog);
+  }
+  catch(IException &e) {
+    FAIL() << e.toString().toStdString().c_str() << endl;
+  }
 
   // create input file gisfile.pvl
   ofstream of;
@@ -1717,7 +1763,7 @@ TEST(Isisminer, IsisminerTestGisIntersect) {
     // add 6th GisIntersect strategy, GisType=IsisCube
     GisIntersect.addKeyword(PvlKeyword("Name", "GisIntersectIsisCubeTest"), Pvl::Replace);
     GisIntersect.addKeyword(PvlKeyword("GisType", "IsisCube"), Pvl::Replace);
-    GisIntersect.addKeyword(PvlKeyword("GisGeometryArgs", "\"inputdir2\""), Pvl::Replace);
+    GisIntersect.addKeyword(PvlKeyword("GisGeometryArgs", "\"inputdir1\""), Pvl::Replace);
     GisIntersect.addKeyword(PvlKeyword("GisGeometry", "\"%1/EN0240208184M.lev1.cub\""), Pvl::Replace);
     GisIntersect.deleteKeyword("ComputeRatio");
     GisIntersect.deleteKeyword("RatioRef");
@@ -1732,12 +1778,12 @@ TEST(Isisminer, IsisminerTestGisIntersect) {
   conf.addObject(isisminerObject);
   conf.write(tempDir.path() + "/gisintersect_test.conf");
 
-  QVector<QString> args = {"config=" + tempDir.path() + "/gisintersect_test.conf",
-                           "parameters=inputdir1:" + tempDir.path()
-                                                  + "@inputdir2:data/isisminer/gisintersect"
-                                                  + "@outputdir:"
-                                                  + tempDir.path()
-                          };
+  args = {"config=" + tempDir.path() + "/gisintersect_test.conf",
+          "parameters=inputdir1:" + tempDir.path()
+                                + "@inputdir2:data/isisminer/gisintersect"
+                                + "@outputdir:"
+                                + tempDir.path()
+        };
 
   UserInterface ui(APP_XML, args);
 
@@ -1854,7 +1900,7 @@ TEST(Isisminer, IsisminerTestGisIntersect) {
    *        11) EN1052152435M.csv
    *        12) EN1052152463M.csv
    * 
-   * NOTE: Original test has many output files, I cut it to 12, evenly
+   * NOTE: Original test has 78 output files, I cut it to 12, evenly
    *       distributed through original output.
    */  
 TEST(Isisminer, IsisminerTestGisOverlap) {
@@ -3390,6 +3436,7 @@ TEST(Isisminer, IsisminerTestNumericalSortError) {
   }
 }
 
+
 /**
    * IsisminerTestPdsTableCreator
    * 
@@ -3905,7 +3952,6 @@ TEST(Isisminer, IsisminerTestPdsTableFormat) {
           " target body to the surface coordinate location.",
       "Body-fixed Z coordinate of the vector from the center of the"
           " target body to the surface coordinate location."};
-// POINTCLOUDTAB.FMT   *** what's with this?
 
   PvlKeyword dataDescription("DataDescription");
   for (auto const &v : stringList4) {
@@ -5626,7 +5672,9 @@ TEST_F(IsisminerResourceManager, FunctionalTestIsisminerResourceManagerNoAssetEx
    *        3) calculate_area.conf
    *        4) sidebar_test.conf
    * 
-   * OUTPUT: None
+   * OUTPUT: 1) sidebar_test.csv
+   *         2) sidebar_savedelete_false.csv
+   *         3) sidebar_savepoint_false.csv
    * 
    */  
 TEST(Isisminer, IsisminerTestSidebar) {
@@ -5658,10 +5706,6 @@ TEST(Isisminer, IsisminerTestSidebar) {
   isisminerCalcArea.addObject(Calculator);
   conf.addObject(isisminerCalcArea);
   conf.write(tempDir.path() + "/calculate_area.conf");
-
-  // ifstream f0(tempDir.path().toStdString() + "/calculate_area.conf");
-  // cout << f0.rdbuf() << endl;
-  // f0.close();
 
   // create input config file sidebar_test.conf in tempDir
   Pvl conf1;
@@ -6035,7 +6079,6 @@ TEST(Isisminer, IsisminerTestSidebarDebug) {
   ASSERT_TRUE(content.contains("4 of 5 processed in Sidebar::TestSidebarDebug"));
   ASSERT_TRUE(content.contains("Session complete in"));
 }
-
 
 
 /**
