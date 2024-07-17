@@ -24,6 +24,6 @@ jobs:
           git checkout -b PR_$PR_NUMBER
           echo -e "\nenv: \n  shell: bash \n  variables: \n    PR_NUMBER: $PR_NUMBER \n    MERGE_BRANCH: $GITHUB_BASE_REF" >> buildspec.yml
           git commit -a -m "$PR_NUMBER"
-          git push origin PR_$PR_NUMBER
+          git push origin PR_$PR_NUMBER --force
           
           
