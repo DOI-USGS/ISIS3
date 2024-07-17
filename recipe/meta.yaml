@@ -54,7 +54,7 @@ requirements:
    - usgs-astrogeology::bullet
    - bz2file
    - bzip2
-   - cmake >=3.27, <3.28
+   - cmake>=3.25, <3.26
    - cspice=67
    - csm>=3.0.3,<3.0.4
    - curl
