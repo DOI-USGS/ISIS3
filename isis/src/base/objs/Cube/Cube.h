@@ -451,6 +451,7 @@ namespace Isis {
 
       //! If allocated, converts from physical on-disk band # to virtual band #
       QList<int> *m_virtualBandList;
+  };
 }
 
 //! This allows Cube *'s to be stored in a QVariant.
