@@ -170,7 +170,7 @@ namespace Isis {
       }
       else if (xmlReader->name() == "bundleSettings") {
         m_settings = NULL;
-        BundleSettings settings = new BundleSettings();
+        BundleSettings *settings = new BundleSettings();
         settings->readBundleSettings(xmlReader);
         m_settings = BundleSettingsQsp(settings);
       }
