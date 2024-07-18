@@ -73,6 +73,10 @@ release.
 - Added new option in `ctxcal` to use monthly computed flatfield files for "Frown" removal in CTX images. [#5338](https://github.com/DOI-USGS/ISIS3/pull/5338)
 - CSMCamera can now read and use the body rotation from ALE produced ISDs [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 - CSMSkyMap added to CSMCamera for use with local rover projections in ISIS [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
+
+- Cneteditor can now display point coordinates and sigmas in either lat/lon/radius or XYZ
+format. A priori coordinate sigmas can now be edited in both formats. New filters have been implemented for coordinates and sigmas in XYZ. [#5421](https://github.com/DOI-USGS/ISIS3/issues/5421)
+
 - Added new Hayabusa2 translation for `SpacecraftName` to accept `HAYABUSA2` [#5395](https://github.com/DOI-USGS/ISIS3/issues/5395)
 - Added ALLOWERROR parameter to campt [#5393](https://github.com/DOI-USGS/ISIS3/pull/5393)
 - OSIRIS-REx Tagcams instrument support, tests, and test data added [#5424](https://github.com/DOI-USGS/ISIS3/issues/5424)

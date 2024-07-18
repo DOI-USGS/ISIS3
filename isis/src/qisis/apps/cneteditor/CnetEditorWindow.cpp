@@ -350,6 +350,8 @@ namespace Isis {
 
     menuBar()->addMenu("&Tables");
 
+    menuBar()->addMenu("&Coordinate Display");
+
     helpMenu = menuBar()->addMenu("&Help");
   }
 

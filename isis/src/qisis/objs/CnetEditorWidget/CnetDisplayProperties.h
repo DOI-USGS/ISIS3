@@ -37,6 +37,14 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
+   *   @history 2019-07-26 Ken Edmundson - OSIRIS-REx modifications...
+   *                           1) Added enum coordinateDisplayType and associated
+   *                              member variable m_coordinateDisplayType to store
+   *                              current display of point coordinates in either
+   *                              Lat/Lon/Radius or XYZ.
+   *                           2) Added coordinateDisplayType() and
+   *                              setCoordinateDisplayType() methods.
+   *                           3) Modified getInstance method, primarily for readibility.
    */
   class CnetDisplayProperties : public QObject {
       Q_OBJECT
@@ -48,16 +56,24 @@ namespace Isis {
 
       bool currentlyComposing() const;
 
+      // enumeration of coordinate display type
+      enum coordinateDisplayType {
+          LatLonRadius = 0,
+          XYZ = 1
+      };
+
       QList<QString> getCubeList(ControlNet *cnet) const;
       QString getFileName(QString fileName, bool forceFullPaths = false) const;
       QString getImageName(QString cubeSerialNumber,
           bool forceFullPaths = false) const;
       QString getSerialNumber(QString imageId);
       bool getShowsFullPaths() const;
+      CnetDisplayProperties::coordinateDisplayType coordinateDisplayType();
 
       void setCubeList(QString fileName);
       void setFileNameUsage(bool preferFileNames);
       void setShowsFullPaths(bool newState);
+      void setCoordinateDisplayType(enum coordinateDisplayType coordDisplay);
 
 
     private:
@@ -97,6 +113,7 @@ namespace Isis {
       bool m_curComposing;
       bool m_showFullPath;
       QReadWriteLock *m_readWriteLock;
+      enum Isis::CnetDisplayProperties::coordinateDisplayType m_coordinateDisplayType;
 
       static CnetDisplayProperties *m_instance;
   };
