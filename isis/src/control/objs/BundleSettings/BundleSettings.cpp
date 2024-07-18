@@ -42,26 +42,6 @@ namespace Isis {
   }
 
   /**
-   * Construct a BundleSettings object from member data read from an XML file.
-   *
-   * @code
-   *   FileName xmlFile("bundleSettingsFileName.xml");
-   *
-   *   QString xmlPath = xmlFile.expanded();
-   *   QFile file(xmlPath);
-   *   file.open(QFile::ReadOnly);
-   *   QXmlStreamReader reader;
-   *   BundleSettings settings(project, reader);
-   * @endcode
-   *
-   * @param xmlReader The Content handler to parse the BundleSettings XML
-   */
-  BundleSettings::BundleSettings(QXmlStreamReader *xmlReader) {
-    init();
-    readBundleSettings(xmlReader);
-  }
-
-  /**
    * @brief Set Default vales for a BundleSettings object.
    * Note we call the default constructor to initialize the TargetBody information
    * that is not currently in the XML.

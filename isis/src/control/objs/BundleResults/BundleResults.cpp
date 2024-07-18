@@ -433,12 +433,11 @@ namespace Isis {
       if (xmlReader->qualifiedName() == "cumulativeProbabilityCalculator") {
         m_cumPro = NULL;
         m_cumPro =  new StatCumProbDistDynCalc(xmlReader);
-        xmlReader->skipCurrentElement();
       }
       else if (xmlReader->qualifiedName() == "residualsCumulativeProbabilityCalculator") {
         m_cumProRes = NULL;
-        m_cumProRes = new StatCumProbDistDynCalc(xmlReader);
-        xmlReader->skipCurrentElement();
+        m_cumProRes = new StatCumProbDistDynCalc();
+        m_cumProRes->readStatistics(xmlReader);
       }
       else if (xmlReader->qualifiedName() == "model") {
         QString model = xmlReader->attributes().value("modelSelection").toString();
