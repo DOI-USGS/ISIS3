@@ -132,9 +132,11 @@ namespace Isis {
     if (m_xmlHandlerProject) {
       projectRoot = m_xmlHandlerProject->projectRoot() + "/";
     }
+    if (!m_adjustedImages){
+      m_adjustedImages = new QList<ImageList *>;
+    }
     Q_ASSERT(xmlReader->name() == "bundleSolutionInfo");
     while(xmlReader->readNextStartElement()) {
-      std::cout << xmlReader->name() << std::endl;
       if (xmlReader->qualifiedName() == "generalAttributes") {
         while (xmlReader->readNextStartElement()) {
           if (xmlReader->qualifiedName() == "id") {
@@ -172,7 +174,8 @@ namespace Isis {
       }
       else if (xmlReader->name() == "bundleResults") {
         m_statisticsResults = NULL;
-        m_statisticsResults = new BundleResults(xmlReader);
+        m_statisticsResults = new BundleResults();
+        m_statisticsResults->readBundleResults(xmlReader);
       }
       else {
         xmlReader->skipCurrentElement();

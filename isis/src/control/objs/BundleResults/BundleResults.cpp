@@ -432,12 +432,12 @@ namespace Isis {
     while (xmlReader->readNextStartElement()) {
       if (xmlReader->qualifiedName() == "cumulativeProbabilityCalculator") {
         m_cumPro = NULL;
-        // m_cumPro =  new StatCumProbDistDynCalc(m_xmlHandlerProject, xmlReader);
+        m_cumPro =  new StatCumProbDistDynCalc(xmlReader);
         xmlReader->skipCurrentElement();
       }
       else if (xmlReader->qualifiedName() == "residualsCumulativeProbabilityCalculator") {
         m_cumProRes = NULL;
-        // m_cumProRes = new StatCumProbDistDynCalc(m_xmlHandlerProject, xmlReader);
+        m_cumProRes = new StatCumProbDistDynCalc(xmlReader);
         xmlReader->skipCurrentElement();
       }
       else if (xmlReader->qualifiedName() == "model") {
