@@ -21,7 +21,6 @@ find files of those names at the top level of this repository. **/
 #include "geos/operation/distance/DistanceOp.h"
 #include "geos/operation/overlay/snap/SnapOverlayOp.h"
 #include "geos/operation/overlay/snap/GeometrySnapper.h"
-#include "geos/operation/valid/isValidOp.h"
 
 #include "SpecialPixel.h"
 #include "PolygonTools.h"
