@@ -20,7 +20,6 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 
 using namespace std;
-
 namespace Isis {
   /**
    * Executes the Isis program with the given arguments. This will handle logs,
@@ -45,7 +44,8 @@ namespace Isis {
       program = isisExecutableFileName;
     }
 
-    QString command = program.expanded();
+    QString command = program.expanded() + " " + parameters +
+        " -pid=" + toString(getpid());
 
     if(!isIsisProgram) {
       QString msg = "Program [" + programName + "] does not appear to be a "
@@ -61,7 +61,7 @@ namespace Isis {
 
     QProcess childProcess;
     childProcess.setProcessChannelMode(QProcess::ForwardedChannels);
-    childProcess.start(command, QStringList() << parameters << "-pid=" << toString(getpid()));
+    childProcess.start(command);
     childProcess.waitForStarted();
 
     bool connected = false;
