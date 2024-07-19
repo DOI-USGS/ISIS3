@@ -24,7 +24,6 @@ find files of those names at the top level of this repository. **/
 //#include "BundleTargetBody.h"
 #include "Distance.h"
 #include "Target.h"
-#include "XmlStackedHandler.h"
 
 
 class QDataStream;
@@ -37,7 +36,6 @@ namespace Isis {
   class Project;  // TODO: does xml stuff need project???
   class PvlObject;
   class TargetBodyDisplayProperties;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Container class for TargetBody.
@@ -68,9 +66,6 @@ namespace Isis {
 
     public:
       TargetBody(Target *target, QObject *parent = 0);
-      //TargetBody(BundleTargetBodyQsp bundleTargetBody, QObject *parent = 0);
-//      TargetBody(Project *project, XmlStackedHandlerReader *xmlReader,
-//                 QObject *parent = 0);  // TODO: does xml stuff need project???
       ~TargetBody();
 
       bool operator==(const TargetBody &src) const;
@@ -115,33 +110,6 @@ namespace Isis {
 //
 //      QDataStream &write(QDataStream &stream) const;
 //      QDataStream &read(QDataStream &stream);
-
-    private:
-      /**
-       *
-       * @author 2015-06-08 Ken Edmundson
-       *
-       * @internal
-       */
-//      class XmlHandler : public XmlStackedHandler {
-//        public:
-//          XmlHandler(TargetBody *TargetBody, Project *project);
-//      TODO: does xml stuff need project???
-//          ~XmlHandler();
-//
-//          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-//                                    const QString &qName, const QXmlAttributes &atts);
-//          virtual bool characters(const QString &ch);
-//          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-//                                    const QString &qName);
-//
-//        private:
-//          Q_DISABLE_COPY(XmlHandler);
-//
-//          TargetBody *m_xmlHandlerTargetBody;
-//          Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
-//          QString m_xmlHandlerCharacters;
-//      };
 
     private:
       TargetBody(const TargetBody &other);          // NOTE: copy constructor & assignment operators

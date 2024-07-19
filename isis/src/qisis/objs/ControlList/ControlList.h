@@ -16,14 +16,12 @@ find files of those names at the top level of this repository. **/
 
 #include "Control.h"
 #include "ControlDisplayProperties.h"
-#include "XmlStackedHandler.h"
 
 class QStringList;
 class QXmlStreamWriter;
 
 namespace Isis {
   class FileName;
-  class XmlStackedHandlerReader;
 
   /**
    * Maintains a list of Controls so that control nets can easily be copied from one Project to
@@ -49,8 +47,6 @@ namespace Isis {
       ControlList(QString name, QString path, QObject *parent = NULL);
       explicit ControlList(QObject *parent = NULL);
       explicit ControlList(QList<Control *>, QObject *parent = NULL);
-      explicit ControlList(Project *project, XmlStackedHandlerReader *xmlReader,
-                           QObject *parent = NULL);
       explicit ControlList(QStringList &);
       ControlList(const ControlList &);
       ~ControlList();
@@ -137,34 +133,6 @@ namespace Isis {
           const Project *m_project;  //!< Project to copy the control list to
           FileName m_newProjectRoot; //!< The filename of the destination project's root
       };
-
-      /**
-       * Nested class used to write the ControlList object information to an XML file for the
-       * purposes of saving an restoring the state of the object.
-       *
-       * @see ControlList::save for the expected format
-       *
-       * @author 2012-09-27 Tracie Sucharski - Adapted from ImageList::XmlHandler
-       *
-       * @internal
-       *   @history 2012-09-27 Tracie Sucharski - Original version.
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(ControlList *controlList, Project *project);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          ControlList *m_controlList; //!< Control list to be read or written
-          Project *m_project; //!< Project that contains the control list
-      };
-
 
     private:
       QString m_name; //!< Name of the ControlList

@@ -28,7 +28,6 @@ find files of those names at the top level of this repository. **/
 #include "Directory.h"
 #include "FileName.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 #include "ProjectItemViewMenu.h"
 
 namespace Isis {
@@ -174,16 +173,6 @@ namespace Isis {
 
 
   /**
-   * This method pushes a new XmlHandler into the parser stack.
-   *
-   * @param xmlReader This is the parser stack.
-   */
-  void CnetEditorView::load(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler(new XmlHandler(this));
-  }
-
-
-  /**
    * This method saves the Controls object ids to the stream.
    *
    * @param stream The stream that will output to directory.xml
@@ -196,61 +185,5 @@ namespace Isis {
     stream.writeAttribute("objectName", objectName());
     stream.writeAttribute("id", m_control->id());
     stream.writeEndElement();
-  }
-
-
-  /**
-   * Creates an XmlHandler for cnetEditor
-   *
-   * @param cnetEditor The widget to be serialized
-   */
-  CnetEditorView::XmlHandler::XmlHandler(CnetEditorView *cnetEditorView) {
-    m_cnetEditorView = cnetEditorView;
-  }
-
-
-  /**
-   * Destructor
-   */
-  CnetEditorView::XmlHandler::~XmlHandler() {
-    delete m_cnetEditorView;
-    m_cnetEditorView = NULL;
-  }
-
-
-  /**
-   * Placeholder for later serialization of CnetEditorViews
-   *
-   * @param cnetEditor The CnetEditorView to be serialized
-   * @param namespaceURI ???
-   * @param localName Determines what attributes to retrieve from atts.
-   * @param qName ???
-   * @param atts Stores the attributes.
-   *
-   * @return @b bool The result of XmlStackedHandler's startElement() method.
-   */
-  bool CnetEditorView::XmlHandler::startElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName, const QXmlAttributes &atts) {
-
-    bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
-    return result;
-  }
-
-
-  /**
-   * This method calls XmlStackedHandler's endElement() and dereferences pointers according to
-   * the value of localName.
-   *
-   * @param namespaceURI ???
-   * @param localName Determines which pointers to dereference.
-   * @param qName ???
-   *
-   * @return @b bool The result of XmlStackedHandler's endElement() method.
-   */
-  bool CnetEditorView::XmlHandler::endElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName) {
-
-    bool result = XmlStackedHandler::endElement(namespaceURI, localName, qName);
-    return result;
   }
 }

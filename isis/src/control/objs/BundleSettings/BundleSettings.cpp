@@ -24,7 +24,6 @@ find files of those names at the top level of this repository. **/
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "SpecialPixel.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
 
@@ -88,30 +87,6 @@ namespace Isis {
 
     // Output Options
     m_outputFilePrefix = "";
-  }
-
-
-  /**
-   * Construct a BundleSettings object from member data read from an XML file.
-   *
-   * @code
-   *   FileName xmlFile("bundleSettingsFileName.xml");
-   *
-   *   QString xmlPath = xmlFile.expanded();
-   *   QFile file(xmlPath);
-   *   file.open(QFile::ReadOnly);
-   *   XmlStackedHandlerReader reader;
-   *   BundleSettings settings(project, reader);
-   * @endcode
-   *
-   * @param project A pointer to the project where the Settings will be saved.
-   * @param xmlReader The Content handler to parse the BundleSettings XML
-   */
-  BundleSettings::BundleSettings(Project *project,
-                                 XmlStackedHandlerReader *xmlReader) {
-    init();
-    xmlReader->setErrorHandler(new XmlHandler(this, project));
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 
@@ -1133,241 +1108,162 @@ namespace Isis {
     stream.writeEndElement();
   }
 
-
-  /**
-   * @brief Create an XML Handler (reader) that can populate the BundleSettings class data.
-   * See BundleSettings::save() for the expected format. This contructor is called
-   * inside the BundleSettings constructor that takes an XmlStackedHandlerReader.
-   *
-   * @param bundleSettings The BundleSettings we're going to be initializing
-   * @param project The project that contains the settings
-   */
-  BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings, Project *project) {
-    m_xmlHandlerBundleSettings = bundleSettings;
-    m_xmlHandlerProject = project;
-    m_xmlHandlerCharacters = "";
-    m_xmlHandlerObservationSettings.clear();
-  }
-
-
-  /**
-   * @brief Destroys BundleSettings::XmlHandler object.
-   */
-  BundleSettings::XmlHandler::~XmlHandler() {
-  }
-
-
-  /**
-   * Handle an XML start element. This method is called when the reader finds an open tag.
-   * handle the read when the startElement with the name localName has been found.
-   *
-   * @param qName SAX namespace for this tag
-   * @param localName SAX local name
-   * @param qName SAX qualified name of the tag.
-   * @param attributes The list of attributes for the tag.
-   *
-   * @return @b bool Indicates whether to continue reading the XML (usually true).
-   *
-   * @internal
-   *   @history 2017-05-30 Debbie A. Cook - Added controlPointCoordTypes to the pvl
-   *                           and made global coordinate names generic.
-   */
-  bool BundleSettings::XmlHandler::startElement(const QString &namespaceURI,
-                                                const QString &localName,
-                                                const QString &qName,
-                                                const QXmlAttributes &attributes) {
-    m_xmlHandlerCharacters = "";
-
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, attributes)) {
-
-      if (localName == "solveOptions") {
-
-        QString solveObservationModeStr = attributes.value("solveObservationMode");
-        if (!solveObservationModeStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_solveObservationMode = toBool(solveObservationModeStr);
-        }
-
-        QString solveRadiusStr = attributes.value("solveRadius");
-        if (!solveRadiusStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_solveRadius = toBool(solveRadiusStr);
-        }
-
-        QString coordTypeReportsStr = attributes.value("controlPointCoordinateTypeReports");
-        if (!coordTypeReportsStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_cpCoordTypeReports =
-            SurfacePoint::stringToCoordinateType(coordTypeReportsStr);
-        }
-
-        QString coordTypeBundleStr = attributes.value("controlPointCoordinateTypeBundle");
-        if (!coordTypeBundleStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_cpCoordTypeBundle =
-            SurfacePoint::stringToCoordinateType(coordTypeBundleStr);
-        }
-
-        QString updateCubeLabelStr = attributes.value("updateCubeLabel");
-        if (!updateCubeLabelStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_updateCubeLabel = toBool(updateCubeLabelStr);
-        }
-
-        QString errorPropagationStr = attributes.value("errorPropagation");
-        if (!errorPropagationStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_errorPropagation = toBool(errorPropagationStr);
-        }
-
-        QString createInverseMatrixStr = attributes.value("createInverseMatrix");
-        if (!createInverseMatrixStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_createInverseMatrix = toBool(createInverseMatrixStr);
-        }
-      }
-      else if (localName == "aprioriSigmas") {
-
-        QString globalPointCoord1AprioriSigmaStr = attributes.value("pointCoord1");
-        m_xmlHandlerBundleSettings->m_globalPointCoord1AprioriSigma = Isis::Null;
-        // TODO: why do I need to init this one and not other sigmas???
-        if (!globalPointCoord1AprioriSigmaStr.isEmpty()) {
-          if (globalPointCoord1AprioriSigmaStr == "N/A") {
-            m_xmlHandlerBundleSettings->m_globalPointCoord1AprioriSigma = Isis::Null;
+  void BundleSettings::readBundleSettings(QXmlStreamReader *xmlReader) {
+    init();
+    Q_ASSERT(xmlReader->name() == "bundleSettings");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "globalSettings") {
+        while (xmlReader->readNextStartElement()) {
+          if (xmlReader->qualifiedName() == "validateNetwork") {
+            QString validateNetwork = xmlReader->readElementText();
+            if (!validateNetwork.isEmpty()) {
+              m_validateNetwork = toBool(validateNetwork);
+            }       
+          }
+          else if (xmlReader->qualifiedName() == "solveOptions") {
+            QStringRef solveObservationMode = xmlReader->attributes().value("solveObservationMode");
+            if (!solveObservationMode.isEmpty()) {
+              m_solveObservationMode = toBool(solveObservationMode.toString());
+            }
+            QStringRef solveRadius = xmlReader->attributes().value("solveRadius");
+            if (!solveRadius.isEmpty()) {
+              m_solveRadius = toBool(solveRadius.toString());
+            }
+            QStringRef controlPointCoordTypeReports = xmlReader->attributes().value("controlPointCoordTypeReports");
+            if (!controlPointCoordTypeReports.isEmpty()) {
+              if (controlPointCoordTypeReports == "0") {
+                m_cpCoordTypeReports = SurfacePoint::Latitudinal;
+              }
+              else if (controlPointCoordTypeReports == "1") {
+                m_cpCoordTypeReports = SurfacePoint::Rectangular;
+              }           
+            }
+            QStringRef controlPointCoordTypeBundle = xmlReader->attributes().value("controlPointCoordTypeBundle");
+            if (!controlPointCoordTypeBundle.isEmpty()) {
+              if (controlPointCoordTypeBundle == "0") {
+                m_cpCoordTypeBundle = SurfacePoint::Latitudinal;
+              }
+              else if (controlPointCoordTypeBundle == "1") {
+                m_cpCoordTypeBundle = SurfacePoint::Rectangular;
+              }   
+            }
+            QStringRef updateCubeLabel = xmlReader->attributes().value("updateCubeLabel");
+            if (!updateCubeLabel.isEmpty()) {
+              m_updateCubeLabel = toBool(updateCubeLabel.toString());
+            }
+            QStringRef errorPropagation = xmlReader->attributes().value("errorPropagation");
+            if (!errorPropagation.isEmpty()) {
+              m_errorPropagation = toBool(errorPropagation.toString());
+            }
+            QStringRef createInverseMatrix = xmlReader->attributes().value("createInverseMatrix");
+            if (!createInverseMatrix.isEmpty()) {
+              m_createInverseMatrix = toBool(createInverseMatrix.toString());
+            }
+            xmlReader->skipCurrentElement();
+          }
+          else if (xmlReader->qualifiedName() == "aprioriSigmas") {
+            QStringRef globalPointCoord1AprioriSigma = xmlReader->attributes().value("pointCoord1");
+            if (!globalPointCoord1AprioriSigma.isEmpty()) {
+              if (globalPointCoord1AprioriSigma == "N/A") {
+                m_globalPointCoord1AprioriSigma = Isis::Null;
+              }
+              else {
+                m_globalPointCoord1AprioriSigma = globalPointCoord1AprioriSigma.toDouble();
+              }
+            }
+            QStringRef globalPointCoord2AprioriSigma = xmlReader->attributes().value("pointCoord2");
+            if (!globalPointCoord2AprioriSigma.isEmpty()) {
+              if (globalPointCoord2AprioriSigma == "N/A") {
+                m_globalPointCoord2AprioriSigma = Isis::Null;
+              }
+              else {
+                m_globalPointCoord2AprioriSigma = globalPointCoord2AprioriSigma.toDouble();
+              }
+            }
+            QStringRef globalPointCoord3AprioriSigma = xmlReader->attributes().value("radius");
+            if (!globalPointCoord3AprioriSigma.isEmpty()) {
+              if (globalPointCoord3AprioriSigma == "N/A") {
+                m_globalPointCoord3AprioriSigma = Isis::Null;
+              }
+              else {
+                m_globalPointCoord3AprioriSigma = globalPointCoord3AprioriSigma.toDouble();
+              }
+            }
+            xmlReader->skipCurrentElement();
+          }
+          else if (xmlReader->qualifiedName() == "outlierRejectionOptions") {
+            QStringRef outlierRejection = xmlReader->attributes().value("rejection");
+            if (!outlierRejection.isEmpty()) {
+              m_outlierRejection = toBool(outlierRejection.toString());
+            }
+            QStringRef outlierRejectionMultiplier = xmlReader->attributes().value("multiplier");
+            if (!outlierRejectionMultiplier.isEmpty()) {
+              if (outlierRejectionMultiplier != "N/A") {
+                m_outlierRejectionMultiplier = outlierRejectionMultiplier.toDouble();
+              }
+              else {
+                m_outlierRejectionMultiplier = 3.0;
+              }
+            }
+            xmlReader->skipCurrentElement();
+          }
+          else if (xmlReader->qualifiedName() == "convergenceCriteriaOptions") {
+            QStringRef convergenceCriteria = xmlReader->attributes().value("convergenceCriteria");
+            if (!convergenceCriteria.isEmpty()) {
+              m_convergenceCriteria = stringToConvergenceCriteria(convergenceCriteria.toString());
+            }
+            QStringRef threshold = xmlReader->attributes().value("threshold");
+            if (!threshold.isEmpty()) {
+              m_convergenceCriteriaThreshold = threshold.toDouble();
+            }
+            QStringRef maximumIterations = xmlReader->attributes().value("maximumIterations");
+            if (!maximumIterations.isEmpty()) {
+              m_convergenceCriteriaMaximumIterations = maximumIterations.toInt();
+            }
+            xmlReader->skipCurrentElement();
+          }
+          else if (xmlReader->qualifiedName() == "maximumLikelihoodEstimation") {
+            while (xmlReader->readNextStartElement()) {
+              if (xmlReader->qualifiedName() == "model") {
+                QStringRef type = xmlReader->attributes().value("type");
+                QStringRef quantile = xmlReader->attributes().value("quantile");
+                if (!type.isEmpty() && !quantile.isEmpty()) {
+                  m_maximumLikelihood.append(qMakePair(MaximumLikelihoodWFunctions::stringToModel(type.toString()), quantile.toDouble()));
+                }
+                xmlReader->skipCurrentElement();
+              }
+              else {
+                xmlReader->skipCurrentElement();
+              }
+            }
+          }
+          else if (xmlReader->qualifiedName() == "outputFileOptions") {
+            QStringRef fileNamePrefix = xmlReader->attributes().value("fileNamePrefix");
+            if (!fileNamePrefix.isEmpty()) {
+              m_outputFilePrefix = fileNamePrefix.toString();
+            }
+            xmlReader->skipCurrentElement();
           }
           else {
-            m_xmlHandlerBundleSettings->m_globalPointCoord1AprioriSigma
-                = toDouble(globalPointCoord1AprioriSigmaStr);
+            xmlReader->skipCurrentElement();
           }
         }
-
-        QString globalPointCoord2AprioriSigmaStr = attributes.value("pointCoord2");
-        if (!globalPointCoord2AprioriSigmaStr.isEmpty()) {
-          if (globalPointCoord2AprioriSigmaStr == "N/A") {
-            m_xmlHandlerBundleSettings->m_globalPointCoord2AprioriSigma = Isis::Null;
+      }
+      else if (xmlReader->qualifiedName() == "observationSolveSettingsList") {
+        m_observationSolveSettings.clear();
+        while (xmlReader->readNextStartElement()) {
+          if (xmlReader->qualifiedName() == "bundleObservationSolveSettings") {
+            BundleObservationSolveSettings *settings = new BundleObservationSolveSettings(xmlReader);
+            m_observationSolveSettings.append(*settings);
           }
           else {
-            m_xmlHandlerBundleSettings->m_globalPointCoord2AprioriSigma
-                = toDouble(globalPointCoord2AprioriSigmaStr);
-          }
-        }
-
-        QString globalPointCoord3AprioriSigmaStr = attributes.value("radius");
-        if (!globalPointCoord3AprioriSigmaStr.isEmpty()) {
-          if (globalPointCoord3AprioriSigmaStr == "N/A") {
-            m_xmlHandlerBundleSettings->m_globalPointCoord3AprioriSigma = Isis::Null;
-          }
-          else {
-            m_xmlHandlerBundleSettings->m_globalPointCoord3AprioriSigma
-                = toDouble(globalPointCoord3AprioriSigmaStr);
+            xmlReader->skipCurrentElement();
           }
         }
       }
-      else if (localName == "outlierRejectionOptions") {
-        QString outlierRejectionStr = attributes.value("rejection");
-        if (!outlierRejectionStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_outlierRejection = toBool(outlierRejectionStr);
-        }
-
-        QString outlierRejectionMultiplierStr = attributes.value("multiplier");
-        if (!outlierRejectionMultiplierStr.isEmpty()) {
-          if (outlierRejectionMultiplierStr != "N/A") {
-            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier
-                = toDouble(outlierRejectionMultiplierStr);
-          }
-          else {
-            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = 3.0;
-          }
-        }
-      }
-      else if (localName == "convergenceCriteriaOptions") {
-
-        QString convergenceCriteriaStr = attributes.value("convergenceCriteria");
-        if (!convergenceCriteriaStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_convergenceCriteria
-              = stringToConvergenceCriteria(convergenceCriteriaStr);
-        }
-
-        QString convergenceCriteriaThresholdStr = attributes.value("threshold");
-        if (!convergenceCriteriaThresholdStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_convergenceCriteriaThreshold
-              = toDouble(convergenceCriteriaThresholdStr);
-        }
-
-        QString convergenceCriteriaMaximumIterationsStr = attributes.value("maximumIterations");
-        if (!convergenceCriteriaMaximumIterationsStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_convergenceCriteriaMaximumIterations
-              = toInt(convergenceCriteriaMaximumIterationsStr);
-        }
-      }
-      else if (localName == "model") {
-        QString type = attributes.value("type");
-        QString quantile = attributes.value("quantile");
-        if (!type.isEmpty() && !quantile.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_maximumLikelihood.append(
-              qMakePair(MaximumLikelihoodWFunctions::stringToModel(type),
-                        toDouble(quantile)));
-        }
-      }
-      else if (localName == "outputFileOptions") {
-        QString outputFilePrefixStr = attributes.value("fileNamePrefix");
-        if (!outputFilePrefixStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_outputFilePrefix = outputFilePrefixStr;
-        }
-      }
-      else if (localName == "bundleObservationSolveSettings") {
-        m_xmlHandlerObservationSettings.append(
-            new BundleObservationSolveSettings(m_xmlHandlerProject, reader()));
+      else {
+        xmlReader->skipCurrentElement();
       }
     }
-    return true;
-  }
-
-
-  /**
-   * @brief Add a character from an XML element to the content handler.
-   *
-   * @param ch charater from XML element
-   * @return true
-   */
-  bool BundleSettings::XmlHandler::characters(const QString &ch) {
-    m_xmlHandlerCharacters += ch;
-    return XmlStackedHandler::characters(ch);
-  }
-
-
-  /**
-   * @brief Handle end tags for the BundleSettings serialized XML.
-   *
-   * @param namespaceURI URI of the specified tags namespce
-   * @param localName SAX localName
-   * @param qName SAX qualified name
-   *
-   * @return true
-   */
-  bool BundleSettings::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                     const QString &qName) {
-    if (!m_xmlHandlerCharacters.isEmpty()) {
-      if (localName == "validateNetwork") {
-        m_xmlHandlerBundleSettings->m_validateNetwork = toBool(m_xmlHandlerCharacters);
-      }
-      else if (localName == "observationSolveSettingsList") {
-        for (int i = 0; i < m_xmlHandlerObservationSettings.size(); i++) {
-          m_xmlHandlerBundleSettings->m_observationSolveSettings.append(
-              *m_xmlHandlerObservationSettings[i]);
-        }
-        m_xmlHandlerObservationSettings.clear();
-      }
-
-      m_xmlHandlerCharacters = "";
-    }
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
-  }
-
-
-  /**
-   * @brief Format an error message indicating a problem with BundleSettings.
-   *
-   * @param QXmlParseException Execption thrown by parser.
-   * @return false
-   */
-  bool BundleSettings::XmlHandler::fatalError(const QXmlParseException &exception) {
-    qDebug() << "Parse error with BundleSettings at line " << exception.lineNumber()
-             << ", " << "column " << exception.columnNumber() << ": "
-             << qPrintable(exception.message());
-    return false;
   }
 }

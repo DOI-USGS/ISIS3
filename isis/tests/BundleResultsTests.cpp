@@ -11,7 +11,7 @@
 #include <QString>
 #include <QtDebug>
 #include <QXmlStreamWriter>
-#include <QXmlInputSource>
+#include <QXmlStreamReader>
 
 #include "BundleControlPoint.h"
 #include "IsisBundleObservation.h"
@@ -27,7 +27,6 @@
 #include "MaximumLikelihoodWFunctions.h"
 #include "Preference.h"
 #include "PvlObject.h"
-#include "XmlStackedHandlerReader.h"
 
 #include "gmock/gmock.h"
 
@@ -45,12 +44,9 @@ namespace Isis {
       /**
        * Constructs the tester object from an xml file.
        *
-       * @param project The project object the tester belongs to.
-       * @param reader The XmlStackedHandlerReader that reads the xml file.
        * @param xmlFile The xml file to construct the tester from.
        */
-      BundleResultsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader,
-                                     FileName xmlFile) : BundleResults(project, reader) {
+      BundleResultsXmlHandlerTester(QXmlStreamReader *reader, FileName xmlFile) : BundleResults() {
 
         m_file.setFileName(xmlFile.expanded());
 
@@ -60,23 +56,20 @@ namespace Isis {
                            _FILEINFO_);
         }
 
-        QXmlInputSource xmlInputSource(&m_file);
-        bool success = reader->parse(xmlInputSource);
-        if (!success) {
-          throw IException(IException::Unknown,
-                           QString("Failed to parse xml file, [%1]").arg(m_file.fileName()),
-                            _FILEINFO_);
+        if (reader->readNextStartElement()) {
+          if (reader->name() == "bundleResults") {
+            readBundleResults(reader);
+          }
+          else {
+            reader->raiseError(QObject::tr("Incorrect file"));
+          }
         }
-
       }
 
       /**
        * Destroys the tester object
        */
       ~BundleResultsXmlHandlerTester() {
-        if (m_file.exists()) {
-          m_file.remove();
-        }
       }
 
       QFile m_file;
@@ -603,8 +596,15 @@ TEST_F(BundleResultsPopulated, Serialization) {
   writer.writeEndDocument();
   qXmlFile.close();
 
-  XmlStackedHandlerReader reader;
-  BundleResultsXmlHandlerTester newResults(NULL, &reader, saveFile);
+  QFile xml(saveFile);
+  if(!xml.open(QFile::ReadOnly | QFile::Text)){
+    throw IException(IException::Unknown,
+                      QString("Failed to parse xml file, [%1]").arg(xml.fileName()),
+                      _FILEINFO_);
+  }
+
+  QXmlStreamReader reader(&xml);
+  BundleResultsXmlHandlerTester newResults(&reader, saveFile);
 
   EXPECT_EQ(newResults.numberFixedPoints(), results.numberFixedPoints());
   EXPECT_EQ(newResults.numberHeldImages(), results.numberHeldImages());
@@ -620,6 +620,53 @@ TEST_F(BundleResultsPopulated, Serialization) {
   EXPECT_EQ(newResults.numberLidarRangeConstraintEquations(), results.numberLidarRangeConstraintEquations());
   EXPECT_EQ(newResults.numberUnknownParameters(), results.numberUnknownParameters());
   EXPECT_EQ(newResults.degreesOfFreedom(), results.degreesOfFreedom());
+
+  // The Statistics class handles saving itself, so just make sure we have the correct amount
+  EXPECT_EQ(newResults.rmsImageSampleResiduals().size(), results.rmsImageSampleResiduals().size());
+  EXPECT_EQ(newResults.rmsImageLineResiduals().size(), results.rmsImageLineResiduals().size());
+  EXPECT_EQ(newResults.rmsImageResiduals().size(), results.rmsImageResiduals().size());
+  EXPECT_EQ(newResults.rmsLidarImageSampleResiduals().size(), results.rmsLidarImageSampleResiduals().size());
+  EXPECT_EQ(newResults.rmsLidarImageLineResiduals().size(), results.rmsLidarImageLineResiduals().size());
+  EXPECT_EQ(newResults.rmsLidarImageResiduals().size(), results.rmsLidarImageResiduals().size());
+  EXPECT_EQ(newResults.minSigmaCoord1Distance().meters(), results.minSigmaCoord1Distance().meters());
+  EXPECT_EQ(newResults.maxSigmaCoord1Distance().meters(), results.maxSigmaCoord1Distance().meters());
+  EXPECT_EQ(newResults.minSigmaCoord2Distance().meters(), results.minSigmaCoord2Distance().meters());
+  EXPECT_EQ(newResults.maxSigmaCoord2Distance().meters(), results.maxSigmaCoord2Distance().meters());
+  EXPECT_EQ(newResults.minSigmaCoord3Distance().meters(), results.minSigmaCoord3Distance().meters());
+  EXPECT_EQ(newResults.maxSigmaCoord3Distance().meters(), results.maxSigmaCoord3Distance().meters());
+  EXPECT_EQ(newResults.minSigmaCoord1PointId().toStdString(), results.minSigmaCoord1PointId().toStdString());
+  EXPECT_EQ(newResults.maxSigmaCoord1PointId().toStdString(), results.maxSigmaCoord1PointId().toStdString());
+  EXPECT_EQ(newResults.minSigmaCoord2PointId().toStdString(), results.minSigmaCoord2PointId().toStdString());
+  EXPECT_EQ(newResults.maxSigmaCoord2PointId().toStdString(), results.maxSigmaCoord2PointId().toStdString());
+  EXPECT_EQ(newResults.minSigmaCoord3PointId().toStdString(), results.minSigmaCoord3PointId().toStdString());
+  EXPECT_EQ(newResults.maxSigmaCoord3PointId().toStdString(), results.maxSigmaCoord3PointId().toStdString());
+  EXPECT_EQ(newResults.rmsRx(), results.rmsRx());
+  EXPECT_EQ(newResults.rmsRy(), results.rmsRy());
+  EXPECT_EQ(newResults.rmsRxy(), results.rmsRxy());
+  EXPECT_EQ(newResults.rejectionLimit(), results.rejectionLimit());
+  EXPECT_EQ(newResults.sigma0(), results.sigma0());
+  EXPECT_EQ(newResults.elapsedTime(), results.elapsedTime());
+  EXPECT_EQ(newResults.elapsedTimeErrorProp(), results.elapsedTimeErrorProp());
+  EXPECT_EQ(newResults.iterations(), results.iterations());
+  EXPECT_EQ(newResults.converged(), results.converged());
+
+  EXPECT_EQ(newResults.numberMaximumLikelihoodModels(), results.numberMaximumLikelihoodModels());
+
+  // Reset the MLE index so we can compare them one by one
+  newResults.printMaximumLikelihoodTierInformation();
+  results.printMaximumLikelihoodTierInformation();
+
+  EXPECT_EQ(newResults.maximumLikelihoodMedianR2Residuals(), results.maximumLikelihoodMedianR2Residuals());
+
+  newResults.incrementMaximumLikelihoodModelIndex();
+  results.incrementMaximumLikelihoodModelIndex();
+  EXPECT_EQ(newResults.maximumLikelihoodMedianR2Residuals(), results.maximumLikelihoodMedianR2Residuals());
+
+  newResults.incrementMaximumLikelihoodModelIndex();
+  results.incrementMaximumLikelihoodModelIndex();
+  EXPECT_EQ(newResults.maximumLikelihoodMedianR2Residuals(), results.maximumLikelihoodMedianR2Residuals());
+
+  EXPECT_EQ(newResults.coordTypeReports(), results.coordTypeReports());
 
   // The Statistics class handles saving itself, so just make sure we have the correct amount
   EXPECT_EQ(newResults.rmsImageSampleResiduals().size(), results.rmsImageSampleResiduals().size());

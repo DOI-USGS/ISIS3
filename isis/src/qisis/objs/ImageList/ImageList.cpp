@@ -41,7 +41,6 @@
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -74,19 +73,6 @@ namespace Isis {
    */
   ImageList::ImageList(QList<Image *> images, QObject *parent) : QObject(parent) {
     append(images);
-  }
-
-
-  /**
-   * Creates an image list from XML.
-   *
-   * @param project The project with the image list.
-   * @param xmlReader The XML reader currently at an <imageList /> tag.
-   * @param parent The Qt-relationship parent.
-   */
-  ImageList::ImageList(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) :
-      QObject(parent) {
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 
@@ -1344,95 +1330,5 @@ namespace Isis {
     }
 
     return results;
-  }
-
-
-  /**
-   * Create an XML Handler (reader) that can populate the Image list class data.
-   *
-   * @param imageList The image list we're going to be initializing
-   * @param project The project that contains the image list
-   *
-   * @see ImageList::save()
-   */
-  ImageList::XmlHandler::XmlHandler(ImageList *imageList, Project *project, QString dataRoot) {
-    m_imageList = imageList;
-    m_project = project;
-    m_imageDataRoot = dataRoot;
-  }
-
-
-  /**
-   * Handle an XML start element. This expects <imageList/> and <image/> elements (it reads both
-   * the project XML and the images.xml file).
-   *
-   * @return @b bool If we should continue reading the XML (usually true).
-   */
-  bool ImageList::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                           const QString &qName, const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "imageList") {
-        QString name = atts.value("name");
-        QString path = atts.value("path");
-        m_imageDataRoot = atts.value("dataRoot");
-
-        if (!name.isEmpty()) {
-          m_imageList->setName(name);
-        }
-
-        if (!path.isEmpty()) {
-          m_imageList->setPath(path);
-        }
-      }
-      else if (localName == "image") {
-        m_imageList->append(new Image(
-           m_project->projectRoot() + "/" + m_imageDataRoot + "/" + m_imageList->path(), reader()));
-      }
-    }
-
-    return true;
-  }
-
-
-  /**
-   * Handle an XML end element. This handles <imageList /> by opening and reading the images.xml
-   * file.
-   *
-   * @return @b bool If we should continue reading the XML (usually true).
-   *
-   * @throws IException::Io "Unable to open with read access"
-   * @throws IException::Io "Failed to open image list XML"
-   */
-  bool ImageList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                         const QString &qName) {
-    if (localName == "imageList") {
-      XmlHandler handler(m_imageList, m_project, m_imageDataRoot);
-
-      XmlStackedHandlerReader reader;
-      reader.pushContentHandler(&handler);
-      reader.setErrorHandler(&handler);
-
-      QDir projectPath = QDir(m_project->projectRoot()).dirName();
-      QString imageListXmlPath = m_project->projectRoot() + "/" + m_imageDataRoot + "/" +
-                                 m_imageList->path() + "/images.xml";
-      imageListXmlPath = QDir::cleanPath(imageListXmlPath);
-
-      QFile file(imageListXmlPath);
-
-      if (!file.open(QFile::ReadOnly)) {
-        throw IException(IException::Io,
-                         QString("Unable to open [%1] with read access")
-                           .arg(imageListXmlPath),
-                         _FILEINFO_);
-      }
-
-      QXmlInputSource xmlInputSource(&file);
-      if (!reader.parse(xmlInputSource))
-        throw IException(IException::Io,
-                         tr("Failed to open image list XML [%1]").arg(imageListXmlPath),
-                         _FILEINFO_);
-    }
-
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }

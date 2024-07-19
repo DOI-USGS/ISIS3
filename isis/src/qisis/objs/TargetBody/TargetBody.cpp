@@ -12,7 +12,6 @@
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "TargetBodyDisplayProperties.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
 /**
@@ -101,15 +100,6 @@ TargetBody::TargetBody(Target *target, QObject *parent) : QObject(parent) {
     m_id = new QUuid(QUuid::createUuid());
   }
 */
-
-//  TargetBody::TargetBody(Project *project, XmlStackedHandlerReader *xmlReader,
-//                         QObject *parent) : QObject(parent) {
-// TODO: does xml stuff need project???
-//    m_id = NULL;
-
-//    xmlReader->pushContentHandler(new XmlHandler(this, project));
-//    xmlReader->setErrorHandler(new XmlHandler(this, project));
-//  }
 
 
 
@@ -415,161 +405,6 @@ TargetBody::TargetBody(Target *target, QObject *parent) : QObject(parent) {
 
     return sigmaMeanRadius;
   }
-
-
-  /**
-   * Output format:
-   *
-   *
-   * <image id="..." fileName="...">
-   *   ...
-   * </image>
-   *
-   * (fileName attribute is just the base name)
-   */
-//  void TargetBody::save(QXmlStreamWriter &stream, const Project *project,
-//                            FileName newProjectRoot) const {
-
-//    stream.writeStartElement("TargetBody");
-//    // save ID, cnet file name, and run time to stream
-//    stream.writeStartElement("generalAttributes");
-//    stream.writeTextElement("id", m_id->toString());
-//    stream.writeTextElement("runTime", runTime());
-//    stream.writeTextElement("fileName", m_controlNetworkFileName->expanded());
-//    stream.writeEndElement(); // end general attributes
-
-//    // save settings to stream
-//    m_settings->save(stream, project);
-
-//    // save statistics to stream
-//    m_statisticsResults->save(stream, project);
-
-//    // save image lists to stream
-//    if ( !m_images->isEmpty() ) {
-//      stream.writeStartElement("imageLists");
-
-//      for (int i = 0; i < m_images->count(); i++) {
-//        m_images->at(i)->save(stream, project, "");
-//      }
-
-//      stream.writeEndElement();
-//    }
-//    stream.writeEndElement(); //end TargetBody
-//  }
-
-
-
-//  void TargetBody::save(QXmlStreamWriter &stream, const Project *project) const {
-
-//    stream.writeStartElement("TargetBody");
-
-//    // save ID, attributes, and run time to stream
-//    stream.writeStartElement("generalAttributes");
-//    stream.writeTextElement("id", m_id->toString());
-//    stream.writeTextElement("runTime", runTime());
-//    stream.writeEndElement(); // end general attributes
-
-//    stream.writeEndElement(); //end TargetBody
-//  }
-
-
-
-  /**
-   * Create an XML Handler (reader) that can populate the BundleSettings class data. See
-   *   BundleSettings::save() for the expected format.
-   *
-   * @param bundleSettings The image we're going to be initializing
-   * @param imageFolder The folder that contains the Cube
-   */
-//  TargetBody::XmlHandler::XmlHandler(TargetBody *TargetBody, Project *project) {
-//    m_xmlHandlerTargetBody = TargetBody;
-//    m_xmlHandlerProject = NULL;
-//    m_xmlHandlerProject = project;
-//    m_xmlHandlerCharacters = "";
-//  }
-
-
-
-//  TargetBody::XmlHandler::~XmlHandler() {
-    // TargetBody passed in is "this" delete+null will cause problems,no?
-//    delete m_xmlHandlerTargetBody;
-//    m_xmlHandlerTargetBody = NULL;
-
-    // we do not delete this pointer since it was set to a passed in pointer in constructor and we
-    // don't own it... is that right???
-//    delete m_xmlHandlerProject;
-//    m_xmlHandlerProject = NULL;
-//  }
-
-
-
-  /**
-   * Handle an XML start element. This expects <image/> and <displayProperties/> elements.
-   *
-   * @return If we should continue reading the XML (usually true).
-   */
-//  bool TargetBody::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-//                                       const QString &qName, const QXmlAttributes &atts) {
-//    m_xmlHandlerCharacters = "";
-//
-//    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-//
-//      if (localName == "targetBody") {
-//        m_xmlHandlerTargetBody =
-//            BundleSettingsQsp(new TargetBody(m_xmlHandlerProject, reader()));
-//      }
-//      else if (localName == "bundleResults") {
-//        delete m_xmlHandlerBundleResults;
-//        m_xmlHandlerBundleResults = NULL;
-//        m_xmlHandlerBundleResults = new BundleResults(m_xmlHandlerProject, reader());
-//TODO: need to add constructor for this???
-//      }
-//      else if (localName == "imageList") {
-//        m_xmlHandlerImages->append(new ImageList(m_xmlHandlerProject, reader()));
-//      }
-//    }
-//    return true;
-//  }
-
-
-
-//  bool TargetBody::XmlHandler::characters(const QString &ch) {
-//    m_xmlHandlerCharacters += ch;
-//    return XmlStackedHandler::characters(ch);
-//  }
-
-
-
-//  bool TargetBody::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-//                                             const QString &qName) {
-//    if (localName == "id") {
-//      m_xmlHandlerTargetBody->m_id = NULL;
-//      m_xmlHandlerTargetBody->m_id = new QUuid(m_xmlHandlerCharacters);
-//    }
-//    else if (localName == "runTime") {
-//      m_xmlHandlerTargetBody->m_runTime = m_xmlHandlerCharacters;
-//    }
-//    else if (localName == "fileName") {
-//      m_xmlHandlerTargetBody->m_controlNetworkFileName = NULL;
-//      m_xmlHandlerTargetBody->m_controlNetworkFileName = new FileName(m_xmlHandlerCharacters);
-//    }
-//    else if (localName == "bundleSettings") {
-//      m_xmlHandlerTargetBody->m_settings =
-//          BundleSettingsQsp(new BundleSettings(*m_xmlHandlerBundleSettings));
-//    }
-//    else if (localName == "bundleResults") {
-//      m_xmlHandlerTargetBody->m_statisticsResults = new BundleResults(*m_xmlHandlerBundleResults);
-//    }
-//    if (localName == "imageLists") {
-//      for (int i = 0; i < m_xmlHandlerImages->size(); i++) {
-//        m_xmlHandlerTargetBody->m_images->append(m_xmlHandlerImages->at(i));
-//      }
-//      m_xmlHandlerImages->clear();
-//    }
-//    m_xmlHandlerCharacters = "";
-//    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
-//  }
-
 
 
   /**

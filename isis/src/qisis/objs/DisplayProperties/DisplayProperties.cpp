@@ -14,7 +14,6 @@ find files of those names at the top level of this repository. **/
 
 #include "FileName.h"
 #include "Pvl.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -33,14 +32,6 @@ namespace Isis {
     m_propertyValues = new QMap<int, QVariant>;
 
     m_displayName = displayName;
-  }
-
-
-  DisplayProperties::DisplayProperties(XmlStackedHandlerReader *xmlReader, QObject *parent) {
-    m_propertiesUsed = 0;
-    m_propertyValues = new QMap<int, QVariant>;
-
-    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 
@@ -172,45 +163,5 @@ namespace Isis {
     stream.writeCharacters(dataBuffer.data().toHex());
 
     stream.writeEndElement();
-  }
-
-
-  DisplayProperties::XmlHandler::XmlHandler(DisplayProperties *displayProperties) {
-    m_displayProperties = displayProperties;
-  }
-
-
-  bool DisplayProperties::XmlHandler::startElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName, const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "displayProperties") {
-        QString displayName = atts.value("displayName");
-
-        if (!displayName.isEmpty()) {
-          m_displayProperties->setDisplayName(displayName);
-        }
-      }
-    }
-
-    return true;
-  }
-
-
-  bool DisplayProperties::XmlHandler::characters(const QString &ch) {
-    m_hexData += ch;
-
-    return XmlStackedHandler::characters(ch);
-  }
-
-
-  bool DisplayProperties::XmlHandler::endElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName) {
-    if (localName == "displayProperties") {
-      QByteArray hexValues(m_hexData.toLatin1());
-      QDataStream valuesStream(QByteArray::fromHex(hexValues));
-      valuesStream >> *m_displayProperties->m_propertyValues;
-    }
-
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }

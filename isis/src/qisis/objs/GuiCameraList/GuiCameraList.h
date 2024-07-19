@@ -10,14 +10,12 @@
 #include "GuiCameraDisplayProperties.h"
 //#include "GuiCameraListActionWorkOrder.h"  TODO - will we need this?
 #include "WorkOrder.h"
-#include "XmlStackedHandler.h"
 
 class QStringList;
 class QXmlStreamWriter;
 
 namespace Isis {
   class FileName;
-  class XmlStackedHandlerReader;
 
   /**
    * List of GuiCameras saved as QSharedPointers.  Overrides many QList methods in order to
@@ -41,8 +39,6 @@ namespace Isis {
       GuiCameraList(QString name, QString path, QObject *parent = NULL);
       explicit GuiCameraList(QObject *parent = NULL);
       explicit GuiCameraList(QList<GuiCameraQsp>, QObject *parent = NULL);
-      explicit GuiCameraList(Project *project,
-                         XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
 //    explicit GuiCameraList(QStringList &);
       GuiCameraList(const GuiCameraList &);
       ~GuiCameraList();
@@ -103,33 +99,6 @@ namespace Isis {
        * Not currently connected to anything.
        */
       void countChanged(int newCount);
-
-    private:
-      /**
-       * XmlHandler used to save to xml files.
-       * 
-       * JAM - The save() method that uses this is currently not implemented.
-       * 
-       * @author 2012-07-01 Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(GuiCameraList *GuiCameraList, Project *project);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          GuiCameraList *m_GuiCameraList;
-          Project *m_project;
-      };
-
 
       /**
        * This functor is used for copying the GuiCamera objects between two projects quickly. This is designed

@@ -32,7 +32,6 @@
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
-#include "XmlStackedHandler.h"
 
 class QDataStream;
 class QUuid;
@@ -45,7 +44,6 @@ namespace Isis {
   class GuiCameraDisplayProperties;
   class Project;  // TODO: does xml stuff need project???
   class PvlObject;  
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Container class for GuiCamera.
@@ -73,8 +71,6 @@ namespace Isis {
     Q_OBJECT
     public:
       GuiCamera(Camera *camera, QObject *parent = 0);
-//      GuiCamera(Project *project, XmlStackedHandlerReader *xmlReader,
-//                 QObject *parent = 0);  // TODO: does xml stuff need project???
       ~GuiCamera();
 
       bool operator==(const GuiCamera &srcGuiCamera) const;
@@ -111,32 +107,6 @@ namespace Isis {
 //      QDataStream &write(QDataStream &stream) const;
 //      QDataStream &read(QDataStream &stream);
 
-
-    private:
-      /**
-       *
-       * @author 2015-06-08 Ken Edmundson
-       *
-       * @internal
-       */
-//      class XmlHandler : public XmlStackedHandler {
-//        public:
-//          XmlHandler(GuiCamera *GuiCamera, Project *project);  // TODO: does xml stuff need project???
-//          ~XmlHandler();
-
-//          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-//                                    const QString &qName, const QXmlAttributes &atts);
-//          virtual bool characters(const QString &ch);
-//          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-//                                    const QString &qName);
-
-//        private:
-//          Q_DISABLE_COPY(XmlHandler);
-
-//          GuiCamera *m_xmlHandlerGuiCamera;
-//          Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
-//          QString m_xmlHandlerCharacters;
-//      };
 
     private:
       GuiCamera(const GuiCamera &other);          // NOTE: copy constructor & assignment operators

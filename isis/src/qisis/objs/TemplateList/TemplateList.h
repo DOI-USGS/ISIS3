@@ -38,8 +38,6 @@ find files of those names at the top level of this repository. **/
      public:
        TemplateList(QString name, QString type, QString path, QObject *parent = NULL);
        explicit TemplateList(QObject *parent = NULL);
-       explicit TemplateList(Project *project, XmlStackedHandlerReader *xmlReader,
-                            QObject *parent = NULL);
        TemplateList(const TemplateList &);
        ~TemplateList();
 
@@ -58,31 +56,6 @@ find files of those names at the top level of this repository. **/
        QString m_path;
        QString m_name;
        QString m_type;
-
-       /**
-        *
-        * @author 2017-11-01 Christopher Combs
-        * @internal
-        *   @history 2017-11-01 Christopher Combs - Maintains a list of Templates so that templates
-        *     can easily be copied from one Project to another, saved to disk, or deleted from disk.
-        *     Adapted from ControlList.
-        */
-       class XmlHandler : public XmlStackedHandler {
-
-         public:
-           XmlHandler(TemplateList *templateList, Project *project);
-
-           virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                     const QString &qName, const QXmlAttributes &atts);
-           virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                   const QString &qName);
-
-         private:
-           Q_DISABLE_COPY(XmlHandler);
-
-           TemplateList *m_templateList; //!< TemplateList to be read or written
-           Project *m_project; //!< Project that contains the template list
-       };
 
    };
  }

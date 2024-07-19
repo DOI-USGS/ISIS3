@@ -24,7 +24,6 @@ find files of those names at the top level of this repository. **/
 #include "FileName.h"
 #include "IException.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -58,20 +57,6 @@ namespace Isis {
   ControlList::ControlList(QList<Control *> controls, QObject *parent) : QObject(parent) {
     append(controls);
   }
-
-
-  /**
-   * Create an control list from XML
-   *
-   * @param project The project with the control list
-   * @param xmlReader The XML reader currently at an <controlList /> tag.
-   * @param parent The Qt-relationship parent
-   */
-  ControlList::ControlList(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) :
-      QObject(parent) {
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
-  }
-
 
   /**
    * Copy constructor.
@@ -725,98 +710,5 @@ namespace Isis {
     m_project = rhs.m_project;
     m_newProjectRoot = rhs.m_newProjectRoot;
     return *this;
-  }
-
-
-  /**
-   * Create an XML Handler (reader/writer) that can populate the ControlList class data. See
-   * ControlList::save() for the expected format.
-   *
-   * @param controlList The control list we're going to be initializing
-   * @param project The project that contains the control list
-   */
-  ControlList::XmlHandler::XmlHandler(ControlList *controlList, Project *project) {
-    m_controlList = controlList;
-    m_project = project;
-  }
-
-
-  /**
-   * Handle an XML start element. This expects <controlList/> and <control/> elements (it reads both
-   * the project XML and the controls.xml file).
-   *
-   * @param namespaceURI ???
-   * @param localName The keyword name given to the member variable in the XML
-   * @param qName ???
-   * @param atts The attribute containing the keyword value given for the given localName
-   *
-   * @return @b bool If we should continue reading the XML (usually true).
-   */
-  bool ControlList::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                           const QString &qName, const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "controlList") {
-        QString name = atts.value("name");
-        QString path = atts.value("path");
-
-        if (!name.isEmpty()) {
-          m_controlList->setName(name);
-        }
-
-        if (!path.isEmpty()) {
-          m_controlList->setPath(path);
-        }
-      }
-      else if (localName == "controlNet") {
-        m_controlList->append(new Control(m_project->cnetRoot() + "/" +
-                                          m_controlList->path(), reader()));
-      }
-    }
-
-    return true;
-  }
-
-
-  /**
-   * Handle an XML end element. This handles <controlList /> by opening and reading the controls.xml
-   * file.
-   *
-   * @param namespaceURI ???
-   * @param localName The keyword name given to the member variable in the XML
-   * @param qName ???
-   *
-   * @return @b bool If we should continue reading the XML (usually true).
-   *
-   * @throws IException::Io "Unable to open with read access"
-   * @throws IException::Io "Failed to open control list XML"
-   */
-  bool ControlList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                           const QString &qName) {
-    if (localName == "controlList") {
-      XmlHandler handler(m_controlList, m_project);
-
-      XmlStackedHandlerReader reader;
-      reader.pushContentHandler(&handler);
-      reader.setErrorHandler(&handler);
-
-      QString controlListXmlPath = m_project->cnetRoot() + "/" + m_controlList->path() +
-                                 "/controlNetworks.xml";
-      QFile file(controlListXmlPath);
-
-      if (!file.open(QFile::ReadOnly)) {
-        throw IException(IException::Io,
-                         QString("Unable to open [%1] with read access")
-                           .arg(controlListXmlPath),
-                         _FILEINFO_);
-      }
-
-      QXmlInputSource xmlInputSource(&file);
-      if (!reader.parse(xmlInputSource))
-        throw IException(IException::Io,
-                         tr("Failed to open control list XML [%1]").arg(controlListXmlPath),
-                         _FILEINFO_);
-    }
-
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }

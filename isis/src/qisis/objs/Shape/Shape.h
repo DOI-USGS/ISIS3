@@ -19,7 +19,6 @@ find files of those names at the top level of this repository. **/
 #include "FileName.h"
 #include "Latitude.h"
 #include "Longitude.h"
-#include "XmlStackedHandler.h"
 
 #include <SpiceUsr.h>
 #include <SpiceZfc.h>
@@ -42,7 +41,6 @@ namespace Isis {
   class Project;
   class PvlObject;
   class ShapeDisplayProperties;
-  class XmlStackedHandlerReader;
 
   /**
    * This represents a shape in a project-based GUI interface. The actual cube doesn't have to be
@@ -76,7 +74,6 @@ namespace Isis {
 
       explicit Shape(QString shapeFileName, QObject *parent = 0);
       explicit Shape(Cube *shapeCube, QObject *parent = 0);
-      Shape(FileName shapeFolder, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
       ~Shape();
 
       void fromPvl(const PvlObject &pvl);
@@ -128,30 +125,6 @@ namespace Isis {
 
       geos::geom::MultiPolygon *createFootprint(QMutex *cameraMutex);
       void initQuickFootprint();
-
-      /**
-       *
-       * @author 2012-??-?? Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(Shape *shape, FileName shapeFolder);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          Shape *m_shape;
-          FileName m_shapeFolder;
-          QString m_characters;
-      };
 
     private:
       SpiceInt *m_bodyCode;    /**< The NaifBodyCode value, if it exists in the

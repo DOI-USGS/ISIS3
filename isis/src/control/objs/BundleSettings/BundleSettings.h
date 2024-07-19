@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <QPair>
 #include <QSharedPointer>
 #include <QString>
+#include <QXmlStreamReader>
 
 
 
@@ -23,7 +24,6 @@ find files of those names at the top level of this repository. **/
 #include "MaximumLikelihoodWFunctions.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
-#include "XmlStackedHandler.h"
 
 class QDataStream;
 class QUuid;
@@ -36,7 +36,6 @@ namespace Isis {
   class FileName;
   class Project;
   class PvlObject;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Container class for BundleAdjustment settings.
@@ -130,16 +129,6 @@ namespace Isis {
       //=====================================================================//
       BundleSettings();
       BundleSettings(const BundleSettings &other);
-      BundleSettings(Project *project,
-                     XmlStackedHandlerReader *xmlReader);
-#if 0
-      BundleSettings(FileName xmlFile,
-                     Project *project,
-                     XmlStackedHandlerReader *xmlReader,
-                     QObject *parent = NULL);
-      BundleSettings(XmlStackedHandlerReader *xmlReader,
-                     QObject *parent = NULL);
-#endif
       ~BundleSettings();
       BundleSettings &operator=(const BundleSettings &other);
 
@@ -289,48 +278,10 @@ namespace Isis {
 
       void save(QXmlStreamWriter &stream, const Project *project) const;
 
+      void readBundleSettings(QXmlStreamReader *xmlReader);
+
     private:
       void init();
-
-      //=====================================================================//
-      //============= Saving/Restoring a BundleSettings object ==============//
-      //=====================================================================//
-
-      /**
-       * This class is needed to read/write BundleSettings from/to an XML
-       * formateed file.
-       *
-       * @author 2014-07-21 Ken Edmundson
-       *
-       * @internal
-       *   @history 2014-07-21 Ken Edmundson - Original version.
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(BundleSettings *bundleSettings,
-                     Project *project);
-          XmlHandler(BundleSettings *bundleSettings);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI,
-                                    const QString &localName,
-                                    const QString &qName,
-                                    const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI,
-                                  const QString &localName,
-                                  const QString &qName);
-          bool fatalError(const QXmlParseException &exception);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          BundleSettings *m_xmlHandlerBundleSettings ;
-          Project *m_xmlHandlerProject; // TODO: does xml stuff need project???
-          QString m_xmlHandlerCharacters;
-          QList<BundleObservationSolveSettings *> m_xmlHandlerObservationSettings;
-      };
-
 
       /**
        * This struct is needed to write the m_maximumLikelihood variable as an
