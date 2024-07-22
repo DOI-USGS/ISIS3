@@ -34,6 +34,7 @@
 #include "Target.h"
 #include "ToolPad.h"
 
+using namespace std;
 
 namespace Isis {
 
@@ -672,11 +673,11 @@ namespace Isis {
           QMap<QString, QVariant> data;
           data["Feature"] = QVariant::fromValue<FeatureNomenclature::Feature>(
               feature);
-          data["Viewport"] = qVariantFromValue(vp);
-          data["Target"] = qVariantFromValue(targetName);
+          data["Viewport"] = QVariant::fromValue(vp);
+          data["Target"] = QVariant::fromValue(targetName);
 
           m_foundFeaturesCombo->insertItem(insertPos, displayName,
-              qVariantFromValue(data));
+              QVariant::fromValue(data));
         }
       }
      updatingFeaturesProgress.setValue( features.count() );
@@ -1013,7 +1014,7 @@ namespace Isis {
     QSettings settings(
         config.expanded(), QSettings::NativeFormat);
     settings.setValue("fontSize", m_fontSize);
-    settings.setValue("fontColor", qVariantFromValue(*m_fontColor));
+    settings.setValue("fontColor", QVariant::fromValue(*m_fontColor));
     settings.setValue("defaultEnabled", m_defaultEnabled);
     settings.setValue("disclaimerShown", m_disclaimedAlready);
     settings.setValue("showApprovedOnly", m_showApprovedOnly);
@@ -1444,7 +1445,7 @@ namespace Isis {
     m_featureScreenAreas = new QList<FeatureDisplayPosition>;
     m_viewportCubeRange = new QPair<QPointF, QPointF>;
 
-    std::sort(features.begin(), features.end(),
+    sort(features.begin(), features.end(),
           &FeatureNomenclature::featureDiameterGreaterThan);
 
     for (int i = 0; i < features.count(); i++) {
@@ -1622,7 +1623,7 @@ namespace Isis {
               QPointF intersectionPoint;
 
               if (point.y() < textArea.top()) {
-                if (topTextBorder.intersect(fullVector, &intersectionPoint) ==
+                if (topTextBorder.intersects(fullVector, &intersectionPoint) ==
                     QLineF::BoundedIntersection) {
                   newVectorStart = QPoint(qRound(intersectionPoint.x()),
                                           qRound(intersectionPoint.y()));
@@ -1630,7 +1631,7 @@ namespace Isis {
               }
 
               if (point.x() > textArea.right()) {
-                if (rightTextBorder.intersect(fullVector, &intersectionPoint) ==
+                if (rightTextBorder.intersects(fullVector, &intersectionPoint) ==
                     QLineF::BoundedIntersection) {
                   newVectorStart = QPoint(qRound(intersectionPoint.x()),
                                           qRound(intersectionPoint.y()));
@@ -1638,7 +1639,7 @@ namespace Isis {
               }
 
               if (point.y() > textArea.bottom()) {
-                if (bottomTextBorder.intersect(fullVector, &intersectionPoint) ==
+                if (bottomTextBorder.intersects(fullVector, &intersectionPoint) ==
                     QLineF::BoundedIntersection) {
                   newVectorStart = QPoint(qRound(intersectionPoint.x()),
                                           qRound(intersectionPoint.y()));
@@ -1646,7 +1647,7 @@ namespace Isis {
               }
 
               if (point.x() < textArea.left()) {
-                if (leftTextBorder.intersect(fullVector, &intersectionPoint) ==
+                if (leftTextBorder.intersects(fullVector, &intersectionPoint) ==
                     QLineF::BoundedIntersection) {
                   newVectorStart = QPoint(qRound(intersectionPoint.x()),
                                           qRound(intersectionPoint.y()));

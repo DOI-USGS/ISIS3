@@ -1700,7 +1700,7 @@ namespace Isis {
       for (int i=0; i<mCubes.size(); i++) {
         message += mCubes.at(i) + "\n";
       }
-      QMessageBox msgBox(QMessageBox::Critical, msgTitle, message, 0, m_matchTool,
+      QMessageBox msgBox(QMessageBox::Critical, msgTitle, message, QMessageBox::NoButton, m_matchTool,
                          Qt::Dialog);
       QPushButton *yesButton = msgBox.addButton("Yes", QMessageBox::AcceptRole);
       QPushButton *noButton = msgBox.addButton("No", QMessageBox::RejectRole);
@@ -1791,7 +1791,7 @@ namespace Isis {
         int lockedMeasures = 0;
         for (int i=0; i<deletePointDialog->fileList->count(); i++) {
           QListWidgetItem *item = deletePointDialog->fileList->item(i);
-          if (!deletePointDialog->fileList->isItemSelected(item)) continue;
+          if (!item->isSelected()) continue;
 
           //  Do not delete reference without asking user
           if (m_editPoint->IsReferenceExplicit() &&
@@ -1890,7 +1890,7 @@ namespace Isis {
       for (int i=0; i<mCubes.size(); i++) {
         message += mCubes.at(i) + "\n";
       }
-      QMessageBox msgBox(QMessageBox::Critical, msgTitle, message, 0, m_matchTool,
+      QMessageBox msgBox(QMessageBox::Critical, msgTitle, message, QMessageBox::NoButton, m_matchTool,
                          Qt::Dialog);
       msgBox.exec();
       return;

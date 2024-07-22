@@ -18,6 +18,8 @@ find files of those names at the top level of this repository. **/
 #include <QUndoCommand>
 #include <QXmlStreamReader>
 
+#include <QElapsedTimer>
+
 
 #include "CorrelationMatrix.h"
 #include "FileItem.h"
@@ -644,9 +646,9 @@ namespace Isis {
 
 
       /**
-       * A QTime object holding the excecution time of the WorkOrder.
+       * A QElapsedTimer object holding the excecution time of the WorkOrder.
        */
-      QTime *m_elapsedTimer;
+      QElapsedTimer *m_elapsedTimer;
 
       /**
        * @brief The seconds that have elapsed since the WorkOrder started executing.

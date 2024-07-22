@@ -208,14 +208,14 @@ namespace Isis {
 
       foreach (QwtPlotSpectrogram *spectrogram, spectrograms) {
         if (dynamic_cast<ScatterPlotData *>(spectrogram->data())) {
-          m_curvesCombo->addItem( spectrogram->title().text(), qVariantFromValue(spectrogram) );
+          m_curvesCombo->addItem( spectrogram->title().text(), QVariant::fromValue(spectrogram) );
         }
       }
 
       QList<CubePlotCurve *> curves = m_plotWindowWithCurves->plotCurves();
 
       foreach (CubePlotCurve *curve, curves) {
-          m_curvesCombo->addItem( curve->title().text(), qVariantFromValue(curve) );
+          m_curvesCombo->addItem( curve->title().text(), QVariant::fromValue(curve) );
       }
     }
   }

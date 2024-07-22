@@ -120,10 +120,10 @@ namespace Isis {
       bundleImage->setParentObservation(bundleObservation);
 
       // update observation number to observation ptr map
-      m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
+      m_observationNumberToObservationMap.insert(observationNumber, bundleObservation);
 
       // update image serial number to observation ptr map
-      m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
+      m_imageSerialToObservationMap.insert(bundleImage->serialNumber(), bundleObservation);
     }
     else {
       // create new BundleObservation and append to this vector
@@ -170,18 +170,18 @@ namespace Isis {
       append(bundleObservation);
 
       // update observation number to observation ptr map
-      m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
+      m_observationNumberToObservationMap.insert(observationNumber, bundleObservation);
 
       // update image serial number to observation ptr map
-      m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
+      m_imageSerialToObservationMap.insert(bundleImage->serialNumber(), bundleObservation);
 
       // update instrument ID to observation ptr map
       // separate held observations out into their own entry
       if (bundleObservation->numberParameters() == 0) {
-        m_instIdToObservationMap.insertMulti("held", bundleObservation);
+        m_instIdToObservationMap.insert("held", bundleObservation);
       }
       else {
-        m_instIdToObservationMap.insertMulti(instrumentId, bundleObservation);
+        m_instIdToObservationMap.insert(instrumentId, bundleObservation);
       }
 
     }

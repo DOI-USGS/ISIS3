@@ -78,9 +78,9 @@ namespace Isis {
 
   private:
       //! Map between observation number and pointer to observation.
-      QMap<QString, BundleObservationQsp> m_observationNumberToObservationMap;
+      QMultiMap<QString, BundleObservationQsp> m_observationNumberToObservationMap;
       //! Map between image serial number and pointer to observation.
-      QMap<QString, BundleObservationQsp> m_imageSerialToObservationMap;
+      QMultiMap<QString, BundleObservationQsp> m_imageSerialToObservationMap;
       //! Map between instrument ID and pointer to observation.
       QMultiMap<QString, BundleObservationQsp> m_instIdToObservationMap;
   };

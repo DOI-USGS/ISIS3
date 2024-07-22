@@ -70,7 +70,7 @@ namespace Isis {
       for (int j = 0; j < conlist->size(); j++) {
         Control *control = conlist->at(j);
 
-        QVariant v = qVariantFromValue((void*)control);
+        QVariant v = QVariant::fromValue((void*)control);
 
         m_ui->inputControlNetCombo->addItem(control->displayProperties()->displayName(), v);
       }
@@ -80,7 +80,7 @@ namespace Isis {
     for (int i = 0; i < numBundles; i++) {
       Control *bundleControl = project->bundleSolutionInfo().at(i)->control();
 
-      QVariant v = qVariantFromValue((void*)bundleControl);
+      QVariant v = QVariant::fromValue((void*)bundleControl);
 
       m_ui->inputControlNetCombo->addItem(bundleControl->displayProperties()->displayName(), v);
     }
@@ -196,7 +196,7 @@ namespace Isis {
     for (int i = 0; i < project->targetBodies().size(); i++) {
       TargetBodyQsp target = project->targetBodies().at(i);
 
-      QVariant v = qVariantFromValue((void*)target.data());
+      QVariant v = QVariant::fromValue((void*)target.data());
 
       QString name = target->displayProperties()->displayName();
 

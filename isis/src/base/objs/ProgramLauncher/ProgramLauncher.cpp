@@ -20,7 +20,6 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 
 using namespace std;
-
 namespace Isis {
   /**
    * Executes the Isis program with the given arguments. This will handle logs,

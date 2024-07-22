@@ -32,7 +32,7 @@ int main() {
   try {
     Preference::Preferences(true);
 
-    qDebug() << "Testing Control Net Vitals" << endl;
+    qDebug() << "Testing Control Net Vitals" << Qt::endl;
 
     qDebug() << "Loading Network";
 
