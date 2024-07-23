@@ -979,7 +979,7 @@ xsi:noNamespaceSchemaLocation=
             FROM
           </parameterName>
         </image>
-      </inputImages>S
+      </inputImages>
       <outputImages>
         <image src="assets/images/phocube_lat_band.png" width="496" height="496">
           <brief>Output file band 1 (Latitude)</brief>
