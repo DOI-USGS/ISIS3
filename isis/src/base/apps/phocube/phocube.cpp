@@ -622,10 +622,7 @@ namespace Isis {
               
               // Compute surface oblique detector resolution
               if ( surfaceobliquedetectorresolution ) {
-                  double emission = cam->EmissionAngle() * DEG2RAD;
-                  if ( emission < HALFPI ) {
-                      out[index] = cam->ObliqueDetectorResolution(false); // useLocal=false
-                  }
+                  out[index] = cam->ObliqueDetectorResolution(false);
                   index += 64 * 64;
               }
             }
