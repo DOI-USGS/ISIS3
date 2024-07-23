@@ -119,12 +119,12 @@ namespace Isis {
    *                                   files in that frame.
    */
   QMap<QString, FileName> sortFramelets(FileName frameletListFile) {
-    QMap<QString, FileName> frameMap;
+    QMultiMap<QString, FileName> frameMap;
 
     ObservationNumberList frameletList(frameletListFile.expanded(), false);
 
     for (int i = 0; i < frameletList.size(); i++) {
-      frameMap.insertMulti( frameletList.observationNumber(i),
+      frameMap.insert( frameletList.observationNumber(i),
                             frameletList.fileName(i) );
     }
 

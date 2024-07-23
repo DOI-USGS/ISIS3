@@ -67,7 +67,6 @@ find files of those names at the top level of this repository. **/
 #include "ViewportMdiSubWindow.h"
 #include "Workspace.h"
 #include "WindowTool.h"
-#include "XmlStackedHandlerReader.h"
 #include "ZoomTool.h"
 
 #include "ProjectItemViewMenu.h"
@@ -530,11 +529,6 @@ namespace Isis {
   }
 
 
-  void CubeDnView::load(XmlStackedHandlerReader *xmlReader, Project *project) {
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
-  }
-
-
   void CubeDnView::save(QXmlStreamWriter &stream, Project *, FileName) const {
     stream.writeStartElement("cubeDnView");
     stream.writeAttribute("objectName", objectName());
@@ -552,56 +546,5 @@ namespace Isis {
       stream.writeEndElement();
     }
     stream.writeEndElement();
-  }
-
-
-  CubeDnView::XmlHandler::XmlHandler(CubeDnView *cubeDnView, Project *project) {
-
-    m_cubeDnView = cubeDnView;
-    m_project = project;
-  }
-
-
-  CubeDnView::XmlHandler::~XmlHandler() {
-  }
-
-
-  bool CubeDnView::XmlHandler::startElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName, const QXmlAttributes &atts) {
-    bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
-
-    if (result) {
-      ProjectItemProxyModel *proxy = (ProjectItemProxyModel *) m_cubeDnView->internalModel();
-      ProjectItemModel *source = proxy->sourceModel();
-      QString id = atts.value("id");
-
-      ProjectItem *item = NULL;
-      if (localName == "image") {
-        Image *image = m_project->image(id);
-        if (image) {
-          // Find ProjectItem and append to list
-          item = source->findItemData(qVariantFromValue(image));
-        }
-      }
-      else if (localName == "shape") {
-        Shape *shape = m_project->shape(id);
-        if (shape) {
-          item = source->findItemData(qVariantFromValue(shape));
-        }
-      }
-      if (item) {
-        proxy->addItem(item);
-      }
-    }
-
-    return result;
-  }
-
-
-  bool CubeDnView::XmlHandler::endElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName) {
-    bool result = XmlStackedHandler::endElement(namespaceURI, localName, qName);
-
-    return result;
   }
 }

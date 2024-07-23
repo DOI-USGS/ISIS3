@@ -445,7 +445,7 @@ QByteArray pvlFix(QString fileName){
   QByteArray pvlData;
 
   QString pvlEnd("QUBE\nEND");
-  int ix = fileData.lastIndexOf(pvlEnd);
+  int ix = fileData.lastIndexOf(pvlEnd.toUtf8());
 
   pvlData = fileData.left(ix+pvlEnd.size());
 

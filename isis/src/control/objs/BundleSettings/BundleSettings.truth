@@ -385,7 +385,7 @@ Testing XML: Object deserialized as (should match object above):
 <bundleSettings>
     <globalSettings>
         <validateNetwork>Yes</validateNetwork>
-        <solveOptions solveObservationMode="Yes" solveRadius="Yes" controlPointCoordTypeReports="0" controlPointCoordTypeBundle="0" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="No"/>
+        <solveOptions solveObservationMode="Yes" solveRadius="Yes" controlPointCoordTypeReports="1" controlPointCoordTypeBundle="1" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="No"/>
         <aprioriSigmas pointCoord1="1000.0" pointCoord2="2000.0" pointCoord3="N/A"/>
         <outlierRejectionOptions rejection="Yes" multiplier="4.0"/>
         <convergenceCriteriaOptions convergenceCriteria="ParameterCorrections" threshold="0.25" maximumIterations="26"/>
@@ -402,9 +402,7 @@ Testing XML: Object deserialized as (should match object above):
             
             <instrumentId></instrumentId>
             <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
-                <aprioriPointingSigmas>
-                    <sigma>N/A</sigma>
-                </aprioriPointingSigmas>
+                <aprioriPointingSigmas/>
             </instrumentPointingOptions>
             <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="7" degree="5" solveDegree="6" solveOverHermiteSpline="Yes" interpolationType="4">
                 <aprioriPositionSigmas>

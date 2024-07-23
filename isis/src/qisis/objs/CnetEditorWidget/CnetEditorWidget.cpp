@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 #include "CnetEditorWidget.h"
 
 #include <QAction>
+#include <QActionGroup>
 #include <QApplication>
 #include <QBoxLayout>
 #include <QByteArray>
@@ -55,8 +56,6 @@ find files of those names at the top level of this repository. **/
 #include "TableView.h"
 #include "TableViewHeader.h"
 #include "TreeView.h"
-#include "XmlStackedHandler.h"
-#include "XmlStackedHandlerReader.h"
 
 
 namespace Isis {
@@ -335,6 +334,40 @@ namespace Isis {
     configureSortLocation.append(tr("&Tables"));
     m_menuActions->insert(configureSortAct, configureSortLocation);
 
+    QAction *xyzDisplayAct = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/xyz.png").expanded()),
+        tr("&X,Y,Z"), this);
+    xyzDisplayAct->setCheckable(true);
+    xyzDisplayAct->setChecked(false);    
+    QString configureXYZDisplayToolTipText = tr("X,Y,Z Coordinate Display");
+    xyzDisplayAct->setToolTip(configureXYZDisplayToolTipText);
+    xyzDisplayAct->setStatusTip(configureXYZDisplayToolTipText);
+    xyzDisplayAct->setWhatsThis(tr("<html>Click here to select coordinate display in : "
+        "X, Y, Z</html>"));    
+    connect(xyzDisplayAct, SIGNAL(triggered()),
+        this, SLOT(setXYZCoordinateDisplay()));
+    QList< QString > xyzDisplayLocation;
+    xyzDisplayLocation.append(tr("&Coordinate Display"));
+    QActionGroup *coordDisplayGroup = new QActionGroup(this);
+    coordDisplayGroup->addAction(xyzDisplayAct);
+    m_menuActions->insert(xyzDisplayAct, xyzDisplayLocation);
+
+    QAction *latLonRadiusDisplayAct
+        = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/latlonrad.png").expanded()),
+          tr("&Lat,Lon,Radius"), this);
+    latLonRadiusDisplayAct->setCheckable(true);
+    latLonRadiusDisplayAct->setChecked(true);
+    QString configureLatLonRadiusDisplayToolTipText = tr("Lat,Lon,Radius Coordinate Display");
+    latLonRadiusDisplayAct->setToolTip(configureLatLonRadiusDisplayToolTipText);
+    latLonRadiusDisplayAct->setStatusTip(configureLatLonRadiusDisplayToolTipText);
+    latLonRadiusDisplayAct->setWhatsThis(tr("<html>Click here to select coordinate display in : "
+        "latitude, longitude, radius</html>"));
+    connect(latLonRadiusDisplayAct, SIGNAL(triggered()),
+        this, SLOT(setLatLonRadiusCoordinateDisplay()));
+    QList< QString > latLonRadiusDisplayLocation;
+    latLonRadiusDisplayLocation.append(tr("&Coordinate Display"));
+    coordDisplayGroup->addAction(latLonRadiusDisplayAct);
+    m_menuActions->insert(latLonRadiusDisplayAct, latLonRadiusDisplayLocation);
+
     QAction *whatsThisAct = QWhatsThis::createAction(this);
     QList< QString > whatsThisLocation;
     whatsThisLocation.append(tr("&Help"));
@@ -343,6 +376,8 @@ namespace Isis {
     QList< QAction * > tbActionList;
     tbActionList.append(freezeTablesAct);
     tbActionList.append(configureSortAct);
+    tbActionList.append(latLonRadiusDisplayAct);
+    tbActionList.append(xyzDisplayAct);
     m_toolBarActions->insert("settingsToolBar", tbActionList);
   }
 
@@ -434,6 +469,10 @@ namespace Isis {
    */
   void CnetEditorWidget::createPointTableView() {
     m_pointTableModel = new PointTableModel(m_pointModel);
+
+    connect(this, SIGNAL(coordinateDisplayTypeChanged()),
+            m_pointTableModel, SLOT(resetColumnHeaders()));
+
     m_pointTableView = new TableView(m_pointTableModel, *m_settingsPath,
         "m_pointTableView");
     m_pointTableView->setWhatsThis("<html>Each row in the table is a control "
@@ -1026,6 +1065,42 @@ namespace Isis {
       m_sortDialog = new CnetEditorSortConfigDialog(this);
     }
     m_sortDialog->show();
+  }
+
+
+  /**
+   * Set control point coordinate display type to latitude, longitude, radius.
+   *
+   * TODO: can we selectively rebuild only the columns that need to be re-displayed?
+   */
+  void CnetEditorWidget::setLatLonRadiusCoordinateDisplay() {
+    CnetDisplayProperties *displayProperties = CnetDisplayProperties::getInstance();
+
+    if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::LatLonRadius) {
+      return;
+    }
+
+    displayProperties->setCoordinateDisplayType(CnetDisplayProperties::LatLonRadius);
+    emit(coordinateDisplayTypeChanged());
+    m_pointModel->rebuildItems();
+  }
+
+
+  /**
+   * Set control point coordinate display type to X,Y,Z.
+   *
+   * TODO: can we selectively rebuild only the columns that need to be re-displayed?
+   */
+  void CnetEditorWidget::setXYZCoordinateDisplay() {
+    CnetDisplayProperties *displayProperties = CnetDisplayProperties::getInstance();
+
+    if (displayProperties->coordinateDisplayType() == CnetDisplayProperties::XYZ) {
+      return;
+    }
+
+    displayProperties->setCoordinateDisplayType(CnetDisplayProperties::XYZ);
+    emit(coordinateDisplayTypeChanged());
+    m_pointModel->rebuildItems();
   }
 
 

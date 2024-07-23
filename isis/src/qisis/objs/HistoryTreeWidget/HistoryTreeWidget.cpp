@@ -58,7 +58,7 @@ namespace Isis {
     int result = -1;
 
     QFontMetrics metrics(invisibleRootItem()->font(1));
-    int dateTimeColumnWidth = qRound(metrics.width(QDateTime::currentDateTime().toString()) * 1.10);
+    int dateTimeColumnWidth = qRound(metrics.horizontalAdvance(QDateTime::currentDateTime().toString()) * 1.10);
 
     int progressBarColumnWidth = 200;
 
@@ -118,7 +118,7 @@ namespace Isis {
     columnData.append(workOrder->executionTime().toString());
 
     QTreeWidgetItem *newItem = new QTreeWidgetItem(columnData);
-    newItem->setData(0, Qt::UserRole, qVariantFromValue(workOrder));
+    newItem->setData(0, Qt::UserRole, QVariant::fromValue(workOrder));
 
     // Do font for save work orders or work orders not on QUndoStack
     if (workOrder->createsCleanState() || !workOrder->isUndoable()) {

@@ -279,7 +279,7 @@ void IsisMain() {
   qDebug() << "Type:         " << strat1.type();
   qDebug() << "Description:  " << strat1.description();
 
-  qDebug() << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
+  qDebug() << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << Qt::endl;
 
   qDebug() << "Testing Strategy(const PvlObject &def,const ResourceList &globals) constructor:";
   qDebug() << Qt::endl;
@@ -457,7 +457,7 @@ void IsisMain() {
   qDebug() << "Number of resources processed (after discarding resource 0) = ";
   qDebug() << resourcesProcessed << Qt::endl;
 
-  qDebug() << "Call setApplyToDiscarded:" <<endl;
+  qDebug() << "Call setApplyToDiscarded:" <<Qt::endl;
   dstrat4.setApplyToDiscardedA();
   resourcesProcessed = dstrat4.applyToResourcesA(lstA,globals);
   qDebug() << "Number of resources processed (after discarding resource 0) = ";

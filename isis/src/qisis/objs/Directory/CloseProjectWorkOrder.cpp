@@ -78,7 +78,7 @@ namespace Isis {
       QMessageBox *box = new QMessageBox(QMessageBox::NoIcon,
               QString("Current Project Has Unsaved Changes"),
               QString("Would you like to save your current project?"),
-              NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
+              QMessageBox::NoButton, qobject_cast<QWidget *>(parent()), Qt::Dialog);
       QPushButton *save = box->addButton("Save", QMessageBox::AcceptRole);
       QPushButton *dontsave = box->addButton("Don't Save", QMessageBox::RejectRole);
       QPushButton *cancel = box->addButton("Cancel", QMessageBox::NoRole);

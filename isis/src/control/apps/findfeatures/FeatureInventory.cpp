@@ -242,9 +242,10 @@ namespace Isis {
 
 
   QStringList FeatureInventory::feature2DNames() const {
-    QSet<QString> nameSet = m_detectorNames.toSet();
-    nameSet.intersect( m_extractorNames.toSet() );
-    QStringList nameList = QList<QString>::fromSet( nameSet );
+    QSet<QString> nameSet(m_detectorNames.begin(), m_detectorNames.end());
+    QSet<QString> extractorSet(m_extractorNames.begin(), m_extractorNames.end());
+    nameSet.intersect(extractorSet);
+    QStringList nameList(nameSet.begin(), nameSet.end());
 
     return ( nameList );
   }

@@ -11,9 +11,11 @@ find files of those names at the top level of this repository. **/
 #include <QDataStream>
 #include <QDebug>
 #include <QString>
+#include <QStringRef>
 #include <QtGlobal> // qMax()
 #include <QUuid>
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -34,7 +36,8 @@ find files of those names at the top level of this repository. **/
 #include "SerialNumberList.h"
 #include "StatCumProbDistDynCalc.h"
 #include "Statistics.h"
-#include "XmlStackedHandlerReader.h"
+
+#include <iostream>
 
 using namespace boost::numeric::ublas;
 
@@ -59,7 +62,6 @@ namespace Isis {
 
   }
 
-
   /**
    * Construct this BundleResults object from XML.
    *
@@ -68,17 +70,401 @@ namespace Isis {
    * @param xmlReader An XML reader that's up to a <bundleSettings/> tag.
    * @param parent The Qt-relationship parent.
    */
-  BundleResults::BundleResults(Project *project, XmlStackedHandlerReader *xmlReader,
-                               QObject *parent) : QObject(parent) {
-                               // TODO: does xml stuff need project???
+  BundleResults::BundleResults(QXmlStreamReader *xmlReader, 
+                               QObject *parent) : QObject(parent)
+  {
+    // TODO: does xml stuff need project???
 
     initialize();
 
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
-    xmlReader->setErrorHandler(new XmlHandler(this, project));
-
+    readBundleResults(xmlReader);
   }
 
+  void BundleResults::readBundleResults(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "bundleResults");
+    while(xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "correlationMatrix") {
+        readCorrelationMatrix(xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "generalStatisticsValues") {
+        readGenStatsValues(xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "rms") {
+        readRms(xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "elapsedTime") {
+
+        QStringRef time = xmlReader->attributes().value("time");
+        if (!time.isEmpty()) {
+          m_elapsedTime = time.toDouble();
+        }
+
+        QStringRef errorProp = xmlReader->attributes().value("errorProp");
+        if (!errorProp.isEmpty()) {
+          m_elapsedTimeErrorProp = errorProp.toDouble();
+        }
+        xmlReader->skipCurrentElement();
+      }
+      else if (xmlReader->qualifiedName() == "minMaxSigmas") {
+        readMinMaxSigmas(xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "maximumLikelihoodEstimation") {
+        readMaxLikelihoodEstimation(xmlReader);
+      }
+
+      // ???      else if (xmlReader->qualifiedName() == "minMaxSigmaDistances") {
+      // ???        QStringRef units = xmlReader->attributes().value("units");
+      // ???        if (!QStringRef::compare(units, "meters", Qt::CaseInsensitive)) {
+      // ???          QStringRef msg = "Unable to read BundleResults xml. Sigma distances must be "
+      // ???                        "provided in meters.";
+      // ???          throw IException(IException::Io, msg, _FILEINFO_);
+      // ???        }
+      // ???      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
+
+  void BundleResults::readCorrelationMatrix(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "correlationMatrix");
+    m_correlationMatrix = NULL;
+    m_correlationMatrix = new CorrelationMatrix();
+
+    QString correlationFileName = *(xmlReader->attributes().value("correlationFileName").string());
+    if (!correlationFileName.isEmpty()) {
+      FileName correlationFile(correlationFileName);
+      m_correlationMatrix->setCorrelationFileName(correlationFile);
+    }
+
+    QString covarianceFileName = *(xmlReader->attributes().value("covarianceFileName").string());
+    if (!covarianceFileName.isEmpty()) {
+      FileName covarianceFile(covarianceFileName);
+      m_correlationMatrix->setCovarianceFileName(covarianceFile);
+    }
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "image") {
+        QString correlationMatrixImageId = *(xmlReader->attributes().value("id").string());
+        if (!correlationMatrixImageId.isEmpty()) {
+          m_xmlHandlerCorrelationImageId = correlationMatrixImageId;
+        }
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
+
+  void BundleResults::readGenStatsValues(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "generalStatisticsValues");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "numberFixedPoints") {
+        m_numberFixedPoints = toInt(xmlReader->readElementText());
+      }
+      else if (xmlReader->qualifiedName() == "numberIgnoredPoints") {
+        m_numberIgnoredPoints = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberHeldImages") {
+        m_numberHeldImages = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "rejectionLimit") {
+        m_rejectionLimit = xmlReader->readElementText().toDouble();
+      }
+      else if (xmlReader->qualifiedName() == "numberRejectedObservations") {
+        m_numberRejectedObservations = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberLidarRangeConstraintEquations") {
+        m_numberLidarRangeConstraintEquations = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberObservations") {
+        m_numberObservations = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberImageObservations") {
+        m_numberImageObservations = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberLidarImageObservations") {
+        m_numberLidarImageObservations = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberImageParameters") {
+        m_numberImageParameters = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberConstrainedPointParameters") {
+        m_numberConstrainedPointParameters =
+                                       xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberConstrainedImageParameters") {
+        m_numberConstrainedImageParameters =
+                                       xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberConstrainedTargetParameters") {
+        m_numberConstrainedTargetParameters =
+                                       xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "numberUnknownParameters") {
+        m_numberUnknownParameters = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "degreesOfFreedom") {
+        m_degreesOfFreedom = xmlReader->readElementText().toInt();
+      }
+      else if (xmlReader->qualifiedName() == "sigma0") {
+        m_sigma0 = xmlReader->readElementText().toDouble();
+      }
+      else if (xmlReader->qualifiedName() == "converged") {
+        m_converged = toBool(xmlReader->readElementText());
+      }
+      else if (xmlReader->qualifiedName() == "iterations") {
+        m_iterations = xmlReader->readElementText().toInt();
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
+
+  void BundleResults::readRms(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "rms");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "residuals") {
+        QStringRef rx = xmlReader->attributes().value("x");
+        if (!rx.isEmpty()) {
+          m_rmsXResiduals = rx.toDouble();
+        }
+
+        QStringRef ry = xmlReader->attributes().value("y");
+        if (!ry.isEmpty()) {
+          m_rmsYResiduals = ry.toDouble();
+        }
+
+        QStringRef rxy = xmlReader->attributes().value("xy");
+        if (!rxy.isEmpty()) {
+          m_rmsXYResiduals = rxy.toDouble();
+        }
+        xmlReader->skipCurrentElement();
+      }
+      else if (xmlReader->qualifiedName() == "sigmas")
+      {
+        QStringRef lat = xmlReader->attributes().value("lat");
+        if (!lat.isEmpty()){
+          m_rmsSigmaCoord1Stats = lat.toDouble();
+        }
+
+        QStringRef lon = xmlReader->attributes().value("lon");
+        if (!lon.isEmpty()){
+          m_rmsSigmaCoord2Stats = lon.toDouble();
+        }
+
+        QStringRef rad = xmlReader->attributes().value("rad");
+        if (!rad.isEmpty()){
+          m_rmsSigmaCoord3Stats = rad.toDouble();
+        }
+
+        QStringRef x = xmlReader->attributes().value("x");
+        if (!x.isEmpty()){
+          m_rmsSigmaCoord1Stats = x.toDouble();
+        }
+
+        QStringRef y = xmlReader->attributes().value("y");
+        if (!y.isEmpty()){
+          m_rmsSigmaCoord2Stats = y.toDouble();
+        }
+
+        QStringRef z = xmlReader->attributes().value("z");
+        if (!z.isEmpty()){
+          m_rmsSigmaCoord3Stats = z.toDouble();
+        }
+        xmlReader->skipCurrentElement();
+      }
+      else if (xmlReader->qualifiedName() == "imageResidualsLists") {
+        readImageResidualsLists(xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "imageSigmasLists") {
+        readSigmasLists(xmlReader);
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
+
+  void BundleResults::readImageResidualsLists(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "imageResidualsLists");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() ==  "residualsList") {
+        readStatsToList(m_rmsImageResiduals, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "sampleList") {
+        readStatsToList(m_rmsImageSampleResiduals, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "lineList") {
+        readStatsToList(m_rmsImageLineResiduals, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "lidarResidualsList") {
+        readStatsToList(m_rmsLidarImageResiduals, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "lidarSampleList") {
+        readStatsToList(m_rmsLidarImageSampleResiduals, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "lidarLineList") {
+        readStatsToList(m_rmsLidarImageLineResiduals, xmlReader);
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
+
+  void BundleResults::readSigmasLists(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "imageSigmasLists");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() ==  "xSigmas") {
+        readStatsToVector(m_rmsImageXSigmas, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "ySigmas") {
+        readStatsToVector(m_rmsImageYSigmas, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "zSigmas") {
+        readStatsToVector(m_rmsImageZSigmas, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "raSigmas") {
+        readStatsToVector(m_rmsImageRASigmas, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "decSigmas") {
+        readStatsToVector(m_rmsImageDECSigmas, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "twistSigmas") {
+        readStatsToVector(m_rmsImageTWISTSigmas, xmlReader);
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
+
+  void BundleResults::readStatsToList(QList<Statistics> &list, QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->attributes().hasAttribute("listSize"));
+    int listSize = xmlReader->attributes().value("listSize").toInt();
+    for (int i = 0; i < listSize; i++) {
+      xmlReader->readNextStartElement();
+      Q_ASSERT(xmlReader->name() == "statisticsItem");
+      xmlReader->readNextStartElement();
+      Q_ASSERT(xmlReader->name() == "statistics");
+      list.append(new Statistics(xmlReader));
+      xmlReader->readNextStartElement();
+    }
+    xmlReader->readNextStartElement();
+  }
+
+  void BundleResults::readStatsToVector(QVector<Statistics> &vec, QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->attributes().hasAttribute("listSize"));
+    int listSize = xmlReader->attributes().value("listSize").toInt();
+    for (int i = 0; i < listSize; i++) {
+      xmlReader->readNextStartElement();
+      Q_ASSERT(xmlReader->name() == "statisticsItem");
+      xmlReader->readNextStartElement();
+      Q_ASSERT(xmlReader->name() == "statistics");
+      vec.append(new Statistics(xmlReader));
+      xmlReader->readNextStartElement();
+    }
+    xmlReader->readNextStartElement();
+  }
+
+  void BundleResults::readMinMaxSigmas(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "minMaxSigmas");
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "minLat" ||
+          xmlReader->qualifiedName() == "minX") {
+        readSigma(m_minSigmaCoord1Distance, m_minSigmaCoord1PointId, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "maxLat" || 
+               xmlReader->qualifiedName() == "maxX") {
+        readSigma(m_maxSigmaCoord1Distance, m_maxSigmaCoord1PointId, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "minLon" || 
+               xmlReader->qualifiedName() == "minY") {
+        readSigma(m_minSigmaCoord2Distance, m_minSigmaCoord2PointId, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "maxLon" || 
+               xmlReader->qualifiedName() == "maxY") {
+        readSigma(m_maxSigmaCoord2Distance, m_maxSigmaCoord2PointId, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "minRad" || 
+               xmlReader->qualifiedName() == "minZ") {
+        readSigma(m_minSigmaCoord3Distance, m_minSigmaCoord3PointId, xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "maxRad" || 
+               xmlReader->qualifiedName() == "maxZ") {
+        readSigma(m_maxSigmaCoord3Distance, m_maxSigmaCoord3PointId, xmlReader);
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    } 
+  }
+
+  void BundleResults::readSigma(Distance &dist, QString &pointId, QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->attributes().hasAttribute("value"));
+    Q_ASSERT(xmlReader->attributes().hasAttribute("pointId"));
+    QStringRef sigmaValue = xmlReader->attributes().value("value");
+    if (!sigmaValue.isEmpty()) {
+      dist.setMeters(sigmaValue.toDouble());
+    }
+
+    QString sigmaPointId = xmlReader->attributes().value("pointId").toString();
+    if (!sigmaPointId.isEmpty()) {
+      pointId = sigmaPointId;
+    }
+    xmlReader->skipCurrentElement();
+  }
+
+  void BundleResults::readMaxLikelihoodEstimation(QXmlStreamReader *xmlReader) {
+    Q_ASSERT(xmlReader->name() == "maximumLikelihoodEstimation");
+    QStringRef maximumLikelihoodIndex = xmlReader->attributes().value("maximumLikelihoodIndex");
+    if (!maximumLikelihoodIndex.isEmpty()) {
+      m_maximumLikelihoodIndex = maximumLikelihoodIndex.toInt();
+    }
+
+    QStringRef maximumLikelihoodMedianR2Residuals =
+        xmlReader->attributes().value("maximumLikelihoodMedianR2Residuals");
+    if (!maximumLikelihoodMedianR2Residuals.isEmpty()) {
+      m_maximumLikelihoodMedianR2Residuals =
+          maximumLikelihoodMedianR2Residuals.toDouble();
+    }
+    while (xmlReader->readNextStartElement()) {
+      if (xmlReader->qualifiedName() == "cumulativeProbabilityCalculator") {
+        m_cumPro = NULL;
+        m_cumPro =  new StatCumProbDistDynCalc(xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "residualsCumulativeProbabilityCalculator") {
+        m_cumProRes = NULL;
+        m_cumProRes = new StatCumProbDistDynCalc();
+        m_cumProRes->readStatistics(xmlReader);
+      }
+      else if (xmlReader->qualifiedName() == "model") {
+        QString model = xmlReader->attributes().value("modelSelection").toString();
+        QStringRef tweakingConstant = xmlReader->attributes().value("tweakingConstant");
+        QStringRef quantile = xmlReader->attributes().value("quantile");
+        bool validModel = true;
+        if (model.isEmpty())
+          validModel = false;
+        if (tweakingConstant.isEmpty())
+          validModel = false;
+        if (quantile.isEmpty())
+          validModel = false;
+        if (validModel)
+        {
+          m_maximumLikelihoodFunctions.append(
+              qMakePair(MaximumLikelihoodWFunctions(
+                            MaximumLikelihoodWFunctions::stringToModel(model),
+                            tweakingConstant.toDouble()),
+                        quantile.toDouble()));
+        }
+        xmlReader->skipCurrentElement();
+      }
+      else {
+        xmlReader->skipCurrentElement();
+      }
+    }
+  }
 
   /**
    * Copy constructor for BundleResults.  Creates this BundleResults object as a copy
@@ -148,9 +534,9 @@ namespace Isis {
         m_maximumLikelihoodIndex(src.m_maximumLikelihoodIndex),
         m_cumPro(new StatCumProbDistDynCalc(*src.m_cumPro)),
         m_cumProRes(new StatCumProbDistDynCalc(*src.m_cumProRes)),
-        m_maximumLikelihoodMedianR2Residuals(src.m_maximumLikelihoodMedianR2Residuals) {
+        m_maximumLikelihoodMedianR2Residuals(src.m_maximumLikelihoodMedianR2Residuals)
+  {
   }
-
 
   /**
    * Destroys this BundleResults object.
@@ -1946,640 +2332,5 @@ namespace Isis {
     }
     stream.writeEndElement(); // end maximumLikelihoodEstimation
     stream.writeEndElement(); // end bundleResults
-  }
-
-
-  /**
-   * Constructs an XmlHandler used to save a BundleResults object.
-   *
-   * @param statistics The BundleResults that the XmlHandler will save.
-   * @param project The project that the BundleResults object belongs to.
-   */
-  BundleResults::XmlHandler::XmlHandler(BundleResults *statistics, Project *project) {
-    // TODO: does xml stuff need project???
-    m_xmlHandlerCumProCalc = NULL;
-    m_xmlHandlerBundleResults = NULL;
-    m_xmlHandlerProject = NULL;
-
-    m_xmlHandlerBundleResults = statistics;
-    m_xmlHandlerProject = project;   // TODO: does xml stuff need project???
-    m_xmlHandlerCharacters = "";
-
-    m_xmlHandlerResidualsListSize = 0;
-    m_xmlHandlerSampleResidualsListSize = 0;
-    m_xmlHandlerLineResidualsListSize = 0;
-    m_xmlHandlerXSigmasListSize = 0;
-    m_xmlHandlerYSigmasListSize = 0;
-    m_xmlHandlerZSigmasListSize = 0;
-    m_xmlHandlerRASigmasListSize = 0;
-    m_xmlHandlerDECSigmasListSize = 0;
-    m_xmlHandlerTWISTSigmasListSize = 0;
-    m_xmlHandlerStatisticsList.clear();
-
-  }
-
-
-  /**
-   * Destroys an XmlHandler.
-   */
-  BundleResults::XmlHandler::~XmlHandler() {
-    // do not delete this pointer... we don't own it, do we???
-    // passed into StatCumProbDistDynCalc constructor as pointer
-    // delete m_xmlHandlerProject;    // TODO: does xml stuff need project???
-    m_xmlHandlerProject = NULL;
-
-    // delete m_xmlHandlerBundleResults;
-    // m_xmlHandlerBundleResults = NULL;
-
-  }
-
-
-  /**
-   * Handle an XML start element. This method is called when the reader finds an open tag.
-   * handle the read when the startElement with the name localName has been found.
-   *
-   * @param qName SAX namespace for this tag
-   * @param localName SAX local name
-   * @param qName SAX qualified name of the tag.
-   * @param attributes The list of attributes for the tag.
-   *
-   * @return @b bool Indicates whether to continue reading the XML (usually true).
-   */
-  bool BundleResults::XmlHandler::startElement(const QString &namespaceURI,
-                                               const QString &localName,
-                                               const QString &qName,
-                                               const QXmlAttributes &atts) {
-    m_xmlHandlerCharacters = "";
-
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-
-      if (qName == "correlationMatrix") {
-        m_xmlHandlerBundleResults->m_correlationMatrix = NULL;
-        m_xmlHandlerBundleResults->m_correlationMatrix = new CorrelationMatrix();
-
-        QString correlationFileName = atts.value("correlationFileName");
-        if (!correlationFileName.isEmpty()) {
-          FileName correlationFile(correlationFileName);
-          m_xmlHandlerBundleResults->m_correlationMatrix->setCorrelationFileName(correlationFile);
-        }
-
-        QString covarianceFileName = atts.value("covarianceFileName");
-        if (!covarianceFileName.isEmpty()) {
-          FileName covarianceFile(covarianceFileName);
-          m_xmlHandlerBundleResults->m_correlationMatrix->setCovarianceFileName(covarianceFile);
-        }
-      }
-      else if (qName == "image") {
-        QString correlationMatrixImageId = atts.value("id");
-        if (!correlationMatrixImageId.isEmpty()) {
-          m_xmlHandlerCorrelationImageId = correlationMatrixImageId;
-        }
-      }
-      else if (qName == "residuals") {
-        QString rx = atts.value("x");
-        if (!rx.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rmsXResiduals = toDouble(rx);
-        }
-
-        QString ry = atts.value("y");
-        if (!ry.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rmsYResiduals = toDouble(ry);
-        }
-
-        QString rxy = atts.value("xy");
-        if (!rxy.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rmsXYResiduals = toDouble(rxy);
-        }
-      }
-      else if (qName == "sigmas") {
-        QString lat = atts.value("lat");
-        if (!lat.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rmsSigmaCoord1Stats = toDouble(lat);
-        }
-        QString lon = atts.value("lon");
-        if (!lon.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rmsSigmaCoord2Stats = toDouble(lon);
-        }
-        QString rad = atts.value("rad");
-        if (!rad.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rmsSigmaCoord3Stats = toDouble(rad);
-        }
-        QString x = atts.value("x");
-        if (!x.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rmsSigmaCoord1Stats = toDouble(x);
-        }
-        QString y = atts.value("y");
-        if (!y.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rmsSigmaCoord2Stats = toDouble(y);
-        }
-        QString z = atts.value("z");
-        if (!z.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rmsSigmaCoord3Stats = toDouble(z);
-        }
-      }
-      else if (qName == "residualsList") {
-        QString listSizeStr = atts.value("listSize");
-        if (!listSizeStr.isEmpty()) {
-          m_xmlHandlerResidualsListSize = toInt(listSizeStr);
-        }
-      }
-      else if (qName == "sampleList") {
-        QString listSizeStr = atts.value("listSize");
-        if (!listSizeStr.isEmpty()) {
-          m_xmlHandlerSampleResidualsListSize = toInt(listSizeStr);
-        }
-      }
-      else if (qName == "lineList") {
-        QString listSizeStr = atts.value("listSize");
-        if (!listSizeStr.isEmpty()) {
-          m_xmlHandlerLineResidualsListSize = toInt(listSizeStr);
-        }
-      }
-      else if (qName == "xSigmas") {
-        QString listSizeStr = atts.value("listSize");
-        if (!listSizeStr.isEmpty()) {
-          m_xmlHandlerXSigmasListSize = toInt(listSizeStr);
-        }
-      }
-      else if (qName == "ySigmas") {
-        QString listSizeStr = atts.value("listSize");
-        if (!listSizeStr.isEmpty()) {
-          m_xmlHandlerYSigmasListSize = toInt(listSizeStr);
-        }
-      }
-      else if (qName == "zSigmas") {
-        QString listSizeStr = atts.value("listSize");
-        if (!listSizeStr.isEmpty()) {
-          m_xmlHandlerZSigmasListSize = toInt(listSizeStr);
-        }
-      }
-      else if (qName == "raSigmas") {
-        QString listSizeStr = atts.value("listSize");
-        if (!listSizeStr.isEmpty()) {
-          m_xmlHandlerRASigmasListSize = toInt(listSizeStr);
-        }
-
-      }
-      else if (qName == "decSigmas") {
-        QString listSizeStr = atts.value("listSize");
-        if (!listSizeStr.isEmpty()) {
-          m_xmlHandlerDECSigmasListSize = toInt(listSizeStr);
-        }
-      }
-      else if (qName == "twistSigmas") {
-        QString listSizeStr = atts.value("listSize");
-        if (!listSizeStr.isEmpty()) {
-          m_xmlHandlerTWISTSigmasListSize = toInt(listSizeStr);
-        }
-      }
-      else if (qName == "statisticsItem") {
-        // add statistics object to the xml handler's current statistics list.
-        m_xmlHandlerStatisticsList.append(
-            new Statistics(m_xmlHandlerProject, reader()));
-      }
-      else if (qName == "elapsedTime") {
-        QString time = atts.value("time");
-        if (!time.isEmpty()) {
-          m_xmlHandlerBundleResults->m_elapsedTime = toDouble(time);
-        }
-
-        QString errorProp = atts.value("errorProp");
-        if (!errorProp.isEmpty()) {
-          m_xmlHandlerBundleResults->m_elapsedTimeErrorProp = toDouble(errorProp);
-        }
-
-      }
-// ???      else if (qName == "minMaxSigmaDistances") {
-// ???        QString units = atts.value("units");
-// ???        if (!QString::compare(units, "meters", Qt::CaseInsensitive)) {
-// ???          QString msg = "Unable to read BundleResults xml. Sigma distances must be "
-// ???                        "provided in meters.";
-// ???          throw IException(IException::Io, msg, _FILEINFO_);
-// ???        }
-// ???      }
-      else if (qName == "minLat") {
-        QString minLat = atts.value("value");
-        if (!minLat.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaCoord1Distance.setMeters(toDouble(minLat));
-        }
-
-        QString minLatPointId = atts.value("pointId");
-        if (!minLatPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaCoord1PointId = minLatPointId;
-        }
-
-      }
-      else if (qName == "minX") {
-        QString minX = atts.value("value");
-        if (!minX.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaCoord1Distance.setMeters(toDouble(minX));
-        }
-
-        QString minXPointId = atts.value("pointId");
-        if (!minXPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaCoord1PointId = minXPointId;
-        }
-      }
-      else if (qName == "maxLat") {
-        QString maxLat = atts.value("value");
-        if (!maxLat.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaCoord1Distance.setMeters(toDouble(maxLat));
-        }
-
-        QString maxLatPointId = atts.value("pointId");
-        if (!maxLatPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaCoord1PointId = maxLatPointId;
-        }
-
-      }
-      else if (qName == "maxX") {
-
-        QString maxX = atts.value("value");
-        if (!maxX.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaCoord1Distance.setMeters(toDouble(maxX));
-        }
-
-        QString maxXPointId = atts.value("pointId");
-        if (!maxXPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaCoord1PointId = maxXPointId;
-        }
-
-      }
-      else if (qName == "minLon") {
-
-        QString minLon = atts.value("value");
-        if (!minLon.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaCoord2Distance.setMeters(toDouble(minLon));
-        }
-
-        QString minLonPointId = atts.value("pointId");
-        if (!minLonPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaCoord2PointId = minLonPointId;
-        }
-
-      }
-      else if (qName == "minY") {
-
-        QString minY = atts.value("value");
-        if (!minY.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaCoord2Distance.setMeters(toDouble(minY));
-        }
-
-        QString minYPointId = atts.value("pointId");
-        if (!minYPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaCoord2PointId = minYPointId;
-        }
-
-      }
-      else if (qName == "maxLon") {
-
-        QString maxLon = atts.value("value");
-        if (!maxLon.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaCoord2Distance.setMeters(toDouble(maxLon));
-        }
-
-        QString maxLonPointId = atts.value("pointId");
-        if (!maxLonPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaCoord2PointId = maxLonPointId;
-        }
-
-      }
-      else if (qName == "maxY") {
-        QString maxY = atts.value("value");
-        if (!maxY.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaCoord2Distance.setMeters(toDouble(maxY));
-        }
-
-        QString maxYPointId = atts.value("pointId");
-        if (!maxYPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaCoord2PointId = maxYPointId;
-        }
-
-      }
-      else if (qName == "minRad") {
-
-        QString minRad = atts.value("value");
-        if (!minRad.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaCoord3Distance.setMeters(toDouble(minRad));
-        }
-
-        QString minRadPointId = atts.value("pointId");
-        if (!minRadPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaCoord3PointId = minRadPointId;
-        }
-
-      }
-      else if (qName == "minZ") {
-
-        QString minZ = atts.value("value");
-        if (!minZ.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaCoord3Distance.setMeters(toDouble(minZ));
-        }
-
-        QString minZPointId = atts.value("pointId");
-        if (!minZPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_minSigmaCoord3PointId = minZPointId;
-        }
-
-      }
-      else if (qName == "maxRad") {
-
-        QString maxRad = atts.value("value");
-        if (!maxRad.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaCoord3Distance.setMeters(toDouble(maxRad));
-        }
-
-        QString maxRadPointId = atts.value("pointId");
-        if (!maxRadPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaCoord3PointId = maxRadPointId;
-        }
-
-      }
-      else if (qName == "maxZ") {
-
-        QString maxZ = atts.value("value");
-        if (!maxZ.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaCoord3Distance.setMeters(toDouble(maxZ));
-        }
-
-        QString maxZPointId = atts.value("pointId");
-        if (!maxZPointId.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maxSigmaCoord3PointId = maxZPointId;
-        }
-
-      }
-      else if (qName == "maximumLikelihoodEstimation") {
-        QString maximumLikelihoodIndex = atts.value("maximumLikelihoodIndex");
-        if (!maximumLikelihoodIndex.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maximumLikelihoodIndex = toInt(maximumLikelihoodIndex);
-        }
-
-        QString maximumLikelihoodMedianR2Residuals =
-        atts.value("maximumLikelihoodMedianR2Residuals");
-        if (!maximumLikelihoodMedianR2Residuals.isEmpty()) {
-          m_xmlHandlerBundleResults->m_maximumLikelihoodMedianR2Residuals =
-            toDouble(maximumLikelihoodMedianR2Residuals);
-        }
-      }
-      else if (qName == "model") {
-        QString model = atts.value("modelSelection");
-        QString tweakingConstant = atts.value("tweakingConstant");
-        QString quantile = atts.value("quantile");
-        bool validModel = true;
-        if (model.isEmpty())            validModel = false;
-        if (tweakingConstant.isEmpty()) validModel = false;
-        if (quantile.isEmpty())         validModel = false;
-        if (validModel) {
-          m_xmlHandlerBundleResults->m_maximumLikelihoodFunctions.append(
-              qMakePair(MaximumLikelihoodWFunctions(
-                            MaximumLikelihoodWFunctions::stringToModel(model),
-                            toDouble(tweakingConstant)),
-                        toDouble(quantile)));
-        }
-      }
-      else if (qName == "cumulativeProbabilityCalculator") {
-        m_xmlHandlerBundleResults->m_cumPro = NULL;
-        m_xmlHandlerBundleResults->m_cumPro =
-          new StatCumProbDistDynCalc(m_xmlHandlerProject, reader());
-      }
-      else if (qName == "residualsCumulativeProbabilityCalculator") {
-        m_xmlHandlerBundleResults->m_cumProRes = NULL;
-        m_xmlHandlerBundleResults->m_cumProRes = new StatCumProbDistDynCalc(m_xmlHandlerProject,
-                                                                            reader());
-      }
-    }
-    return true;
-  }
-
-
-  /**
-   * Adds a QString to the XmlHandler's internal character data.
-   *
-   * @param ch The data to be added.
-   *
-   * @return @b bool true
-   */
-  bool BundleResults::XmlHandler::characters(const QString &ch) {
-    m_xmlHandlerCharacters += ch;
-    return XmlStackedHandler::characters(ch);
-  }
-
-
-  /**
-   * @brief Handle end tags for the BundleResults serialized XML.
-   *
-   * @param namespaceURI URI of the specified tags namespce
-   * @param localName SAX localName
-   * @param qName SAX qualified name
-   *
-   * @return true
-   */
-  bool BundleResults::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                             const QString &qName) {
-
-    if (!m_xmlHandlerCharacters.isEmpty()) {
-      if (qName == "parameter") {
-        // add the parameter to the current list
-        m_xmlHandlerCorrelationParameterList.append(m_xmlHandlerCharacters);
-      }
-      if (qName == "image") {
-        // add this image and its parameters to the map
-        if (m_xmlHandlerCorrelationImageId != "") {
-          m_xmlHandlerCorrelationMap.insert(m_xmlHandlerCorrelationImageId,
-                                            m_xmlHandlerCorrelationParameterList);
-        }
-        m_xmlHandlerCorrelationImageId = "";
-        m_xmlHandlerCorrelationParameterList.clear();
-
-      }
-      if (qName == "imagesAndParameters") {
-        // set the map after all images and parameters have been added
-        if (!m_xmlHandlerCorrelationMap.isEmpty()) {
-          m_xmlHandlerBundleResults->setCorrMatImgsAndParams(m_xmlHandlerCorrelationMap);
-        }
-      }
-      else if (qName == "numberFixedPoints") {
-        m_xmlHandlerBundleResults->m_numberFixedPoints = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberIgnoredPoints") {
-        m_xmlHandlerBundleResults->m_numberIgnoredPoints = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberHeldImages") {
-        m_xmlHandlerBundleResults->m_numberHeldImages = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "rejectionLimit") {
-        m_xmlHandlerBundleResults->m_rejectionLimit = toDouble(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberRejectedObservations") {
-        m_xmlHandlerBundleResults->m_numberRejectedObservations = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberLidarRangeConstraintEquations") {
-        m_xmlHandlerBundleResults->m_numberLidarRangeConstraintEquations = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberObservations") {
-        m_xmlHandlerBundleResults->m_numberObservations = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberImageObservations") {
-        m_xmlHandlerBundleResults->m_numberImageObservations = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberLidarImageObservations") {
-        m_xmlHandlerBundleResults->m_numberLidarImageObservations = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberImageParameters") {
-        m_xmlHandlerBundleResults->m_numberImageParameters = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberConstrainedPointParameters") {
-        m_xmlHandlerBundleResults->m_numberConstrainedPointParameters =
-                                       toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberConstrainedImageParameters") {
-        m_xmlHandlerBundleResults->m_numberConstrainedImageParameters =
-                                       toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberConstrainedTargetParameters") {
-        m_xmlHandlerBundleResults->m_numberConstrainedTargetParameters =
-                                       toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "numberUnknownParameters") {
-        m_xmlHandlerBundleResults->m_numberUnknownParameters = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "degreesOfFreedom") {
-        m_xmlHandlerBundleResults->m_degreesOfFreedom = toInt(m_xmlHandlerCharacters);
-      }
-      else if (qName == "sigma0") {
-        m_xmlHandlerBundleResults->m_sigma0 = toDouble(m_xmlHandlerCharacters);
-      }
-      else if (qName == "converged") {
-        m_xmlHandlerBundleResults->m_converged = toBool(m_xmlHandlerCharacters);
-      }
-      else if (qName == "iterations") {
-        m_xmlHandlerBundleResults->m_iterations = toInt(m_xmlHandlerCharacters);
-      }
-      // copy the xml handler's statistics list to the appropriate bundle statistics list
-      else if (qName == "residualsList") {
-        if (m_xmlHandlerResidualsListSize != m_xmlHandlerStatisticsList.size()) {
-          throw IException(IException::Unknown,
-                           "Unable to read xml file. Invalid residualsList", _FILEINFO_);
-        }
-        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsImageResiduals.append(m_xmlHandlerStatisticsList[i]);
-        }
-        m_xmlHandlerStatisticsList.clear();
-      }
-      else if (qName == "sampleList") {
-        if (m_xmlHandlerSampleResidualsListSize != m_xmlHandlerStatisticsList.size()) {
-          throw IException(IException::Unknown,
-                           "Unable to read xml file. Invalid sampleList", _FILEINFO_);
-        }
-        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsImageSampleResiduals.append(
-                                                                   m_xmlHandlerStatisticsList[i]);
-        }
-        m_xmlHandlerStatisticsList.clear();
-      }
-      else if (qName == "lineList") {
-        if (m_xmlHandlerLineResidualsListSize != m_xmlHandlerStatisticsList.size()) {
-          throw IException(IException::Unknown,
-                           "Unable to read xml file. Invalid lineList", _FILEINFO_);
-        }
-        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsImageLineResiduals.append(m_xmlHandlerStatisticsList[i]);
-        }
-        m_xmlHandlerStatisticsList.clear();
-      }
-      else if (qName == "lidarResidualsList") {
-        if (m_xmlHandlerResidualsListSize != m_xmlHandlerStatisticsList.size()) {
-          throw IException(IException::Unknown,
-                           "Unable to read xml file. Invalid residualsList", _FILEINFO_);
-        }
-        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsLidarImageResiduals.append(m_xmlHandlerStatisticsList[i]);
-        }
-        m_xmlHandlerStatisticsList.clear();
-      }
-      else if (qName == "lidarSampleList") {
-        if (m_xmlHandlerSampleResidualsListSize != m_xmlHandlerStatisticsList.size()) {
-          throw IException(IException::Unknown,
-                           "Unable to read xml file. Invalid sampleList", _FILEINFO_);
-        }
-        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsLidarImageSampleResiduals.append(
-                                                                   m_xmlHandlerStatisticsList[i]);
-        }
-        m_xmlHandlerStatisticsList.clear();
-      }
-      else if (qName == "lidarLineList") {
-        if (m_xmlHandlerLineResidualsListSize != m_xmlHandlerStatisticsList.size()) {
-          throw IException(IException::Unknown,
-                           "Unable to read xml file. Invalid lineList", _FILEINFO_);
-        }
-        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsLidarImageLineResiduals.append(m_xmlHandlerStatisticsList[i]);
-        }
-        m_xmlHandlerStatisticsList.clear();
-      }
-      else if (qName == "xSigmas") {
-        if (m_xmlHandlerXSigmasListSize != m_xmlHandlerStatisticsList.size()) {
-          throw IException(IException::Unknown,
-                           "Unable to read xml file. Invalid xSigmas", _FILEINFO_);
-        }
-        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsImageXSigmas.append(m_xmlHandlerStatisticsList[i]);
-        }
-        m_xmlHandlerStatisticsList.clear();
-      }
-      else if (qName == "ySigmas") {
-        if (m_xmlHandlerYSigmasListSize != m_xmlHandlerStatisticsList.size()) {
-          throw IException(IException::Unknown,
-                           "Unable to read xml file. Invalid ySigmas", _FILEINFO_);
-        }
-        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsImageYSigmas.append(m_xmlHandlerStatisticsList[i]);
-        }
-        m_xmlHandlerStatisticsList.clear();
-      }
-      else if (qName == "zSigmas") {
-        if (m_xmlHandlerZSigmasListSize != m_xmlHandlerStatisticsList.size()) {
-          throw IException(IException::Unknown,
-                           "Unable to read xml file. Invalid zSigmas", _FILEINFO_);
-        }
-        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsImageZSigmas.append(m_xmlHandlerStatisticsList[i]);
-        }
-        m_xmlHandlerStatisticsList.clear();
-      }
-      else if (qName == "raSigmas") {
-        if (m_xmlHandlerRASigmasListSize != m_xmlHandlerStatisticsList.size()) {
-          throw IException(IException::Unknown,
-                           "Unable to read xml file. Invalid raSigmas", _FILEINFO_);
-        }
-        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsImageRASigmas.append(m_xmlHandlerStatisticsList[i]);
-        }
-        m_xmlHandlerStatisticsList.clear();
-      }
-      else if (qName == "decSigmas") {
-        if (m_xmlHandlerDECSigmasListSize != m_xmlHandlerStatisticsList.size()) {
-          throw IException(IException::Unknown,
-                           "Unable to read xml file. Invalid decSigmas", _FILEINFO_);
-        }
-        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsImageDECSigmas.append(m_xmlHandlerStatisticsList[i]);
-        }
-        m_xmlHandlerStatisticsList.clear();
-      }
-      else if (qName == "twistSigmas") {
-          if (m_xmlHandlerTWISTSigmasListSize != m_xmlHandlerStatisticsList.size()) {
-            throw IException(IException::Unknown,
-                             "Unable to read xml file. Invalid twistSigmas", _FILEINFO_);
-          }
-        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
-          m_xmlHandlerBundleResults->m_rmsImageTWISTSigmas.append(m_xmlHandlerStatisticsList[i]);
-        }
-        m_xmlHandlerStatisticsList.clear();
-      }
-    }
-    m_xmlHandlerCharacters = "";
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }

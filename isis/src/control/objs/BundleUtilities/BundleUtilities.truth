@@ -197,9 +197,7 @@ Testing XML: read XML to BundleObservationSolveSettings object...
     
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
-        <aprioriPointingSigmas>
-            <sigma>N/A</sigma>
-        </aprioriPointingSigmas>
+        <aprioriPointingSigmas/>
     </instrumentPointingOptions>
     <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
@@ -295,9 +293,7 @@ Testing XML: read XML with no attributes or values to object...
     
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
-        <aprioriPointingSigmas>
-            <sigma>N/A</sigma>
-        </aprioriPointingSigmas>
+        <aprioriPointingSigmas/>
     </instrumentPointingOptions>
     <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
@@ -488,9 +484,7 @@ TWI  (dd)          0.00000000            0.00000000               0.00000000    
     
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
-        <aprioriPointingSigmas>
-            <sigma>N/A</sigma>
-        </aprioriPointingSigmas>
+        <aprioriPointingSigmas/>
     </instrumentPointingOptions>
     <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
@@ -505,18 +499,18 @@ parameter list:  ("X", "Y", "Z", "RA", "DEC", "TWIST")
 image names:     ()
 parameter weights :     0.0     0.0     0.0     
 parameter corrections : 0.0     0.0     0.0     
-apriori sigmas :        -1.79769313486231e+308     -1.79769313486231e+308     -1.79769313486231e+308     
+apriori sigmas :        0.0     0.0     0.0     
 adjusted sigmas :       0.0     0.0     0.0     
     output bundle observation...
-0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,
+0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,0.0,N/A,0.0,0.0,0.0,0.0,N/A,0.0,0.0,0.0,0.0,N/A,
   X  (km)          0.00000000            0.00000000               0.00000000                 N/A            N/A        m
   Y  (km)          0.00000000            0.00000000               0.00000000                 N/A            N/A        m
   Z  (km)          0.00000000            0.00000000               0.00000000                 N/A            N/A        m
- RA  (dd)          0.00000000            0.00000000               0.00000000                FREE            N/A        dd
-DEC  (dd)          0.00000000            0.00000000               0.00000000                FREE            N/A        dd
-TWI  (dd)          0.00000000            0.00000000               0.00000000                FREE            N/A        dd
+ RA  (dd)          0.00000000            0.00000000               0.00000000                 0.0            N/A        dd
+DEC  (dd)          0.00000000            0.00000000               0.00000000                 0.0            N/A        dd
+TWI  (dd)          0.00000000            0.00000000               0.00000000                 0.0            N/A        dd
 
-0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,
+0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,0.0,0.00000000,0.0,0.0,0.0,0.0,0.00000000,0.0,0.0,0.0,0.0,0.00000000,
 init exterior orientiation successful?   "Yes"
 apply param corrections successful?
 **ERROR** Unable to apply parameter corrections to IsisBundleObservation.

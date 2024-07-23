@@ -38,7 +38,6 @@
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -72,19 +71,6 @@ namespace Isis {
    */
   GuiCameraList::GuiCameraList(QList<GuiCameraQsp> guiCameras, QObject *parent) : QObject(parent) {
     append(guiCameras);
-  }
-
-
-  /**
-   * Create an image list from XML
-   *
-   * @param project The project with the gui camera list
-   * @param xmlReader The XML reader currently at an <GuiCameraList /> tag.
-   * @param parent The Qt-relationship parent
-   */
-  GuiCameraList::GuiCameraList(Project *project, XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent) : QObject(parent) {
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 
@@ -867,97 +853,4 @@ namespace Isis {
 
 //    return results;
 //  }
-
-
-  /**
-   * Create an XML Handler (reader) that can populate the GuiCameraList class data. See
-   *   GuiCameraList::save() for the expected format.
-   *
-   * @param GuiCameraList The gui camera list we're going to be initializing
-   * @param project The project that contains the gui camera list
-   */
-  GuiCameraList::XmlHandler::XmlHandler(GuiCameraList *GuiCameraList, Project *project) {
-    m_GuiCameraList = GuiCameraList;
-    m_project = project;
-  }
-
-
-  /**
-   * Handle an XML start element. This expects <GuiCameraList/> and <target/> elements (it reads both
-   *   the project XML and the targets.xml file).
-   * 
-   * @param namespaceURI ???
-   * @param localName The name of the element the XmlHandler is at
-   * @param qName ???
-   * @param atts The attributes of the element the XmlHanler is at
-   *
-   * @return @b bool If we should continue reading the XML (usually true).
-   */
-  bool GuiCameraList::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                               const QString &qName, const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "GuiCameraList") {
-        QString name = atts.value("name");
-        QString path = atts.value("path");
-
-        if (!name.isEmpty()) {
-          m_GuiCameraList->setName(name);
-        }
-
-        if (!path.isEmpty()) {
-          m_GuiCameraList->setPath(path);
-        }
-      }
-      else if (localName == "target") {
-//        m_GuiCameraList->append(GuiCameraQsp(new TargetBody(m_project->targetBodyRoot() + "/" + m_GuiCameraList->path(),
-//                                           reader())));
-      }
-    }
-
-    return true;
-  }
-
-
-  /**
-   * Handle an XML end element. This handles <GuiCameraList /> by opening and reading the images.xml
-   *   file.
-   * 
-   * @param namespaceURI ???
-   * @param localName The name of the element the XmlHandler is at
-   * @param qName ???
-   *
-   * @return @b bool If we should continue reading the XML (usually true).
-   * 
-   * @throws IException::Io "Unable to open with read access"
-   * @throws IException::Io "Failed to open target body list XML"
-   */
-  bool GuiCameraList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                             const QString &qName) {
-    if (localName == "GuiCameraList") {
-      XmlHandler handler(m_GuiCameraList, m_project);
-
-      XmlStackedHandlerReader reader;
-      reader.pushContentHandler(&handler);
-      reader.setErrorHandler(&handler);
-
-      QString GuiCameraListXmlPath = m_project->targetBodyRoot() + "/" + m_GuiCameraList->path() +
-                                 "/targets.xml";
-      QFile file(GuiCameraListXmlPath);
-
-      if (!file.open(QFile::ReadOnly)) {
-        throw IException(IException::Io,
-                         QString("Unable to open [%1] with read access")
-                           .arg(GuiCameraListXmlPath),
-                         _FILEINFO_);
-      }
-
-      QXmlInputSource xmlInputSource(&file);
-      if (!reader.parse(xmlInputSource))
-        throw IException(IException::Io,
-                         tr("Failed to open target body list XML [%1]").arg(GuiCameraListXmlPath),
-                         _FILEINFO_);
-    }
-
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
-  }
 }

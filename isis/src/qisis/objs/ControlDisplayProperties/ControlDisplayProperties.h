@@ -14,7 +14,6 @@ find files of those names at the top level of this repository. **/
 #include <QColor> // This is required since QColor is in a slot
 
 #include "DisplayProperties.h"
-#include "XmlStackedHandler.h"
 
 class QAction;
 class QXmlStreamWriter;
@@ -24,7 +23,6 @@ namespace Isis {
   class Project;
   class Pvl;
   class PvlObject;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief This is the GUI communication mechanism for cubes
@@ -75,7 +73,6 @@ namespace Isis {
 
 
       ControlDisplayProperties(QString displayName, QObject *parent = NULL);
-      ControlDisplayProperties(XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
       virtual ~ControlDisplayProperties();
 
 //      void fromPvl(const PvlObject &pvl);
@@ -101,31 +98,6 @@ namespace Isis {
 
     private slots:
       void toggleShowLabel();
-
-    private:
-      /**
-       * @author 2012-??-?? ???
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(ControlDisplayProperties *displayProperties);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-
-          virtual bool characters(const QString &ch);
-
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          ControlDisplayProperties *m_displayProperties;
-          QString m_hexData;
-      };
 
     private:
       ControlDisplayProperties(const ControlDisplayProperties &);

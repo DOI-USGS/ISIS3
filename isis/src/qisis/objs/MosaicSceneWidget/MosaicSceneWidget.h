@@ -199,7 +199,6 @@ namespace Isis {
       QProgressBar *getProgress();
       PvlObject toPvl() const;
       void fromPvl(const PvlObject &);
-      void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
 //    QPointF currentLatLonPosition();
@@ -323,36 +322,6 @@ namespace Isis {
 
       static bool zOrderGreaterThan(MosaicSceneItem *first,
                                     MosaicSceneItem *second);
-
-    private:
-      /**
-       * @author 2012-09-?? Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(MosaicSceneWidget *scene);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          QString m_characterData;
-          MosaicSceneWidget *m_scene;
-
-          int m_scrollBarXValue;
-          int m_scrollBarYValue;
-
-          ImageList *m_imagesToAdd;
-          QList<double> m_imageZValues;
-      };
 
     private:
       Directory *m_directory;

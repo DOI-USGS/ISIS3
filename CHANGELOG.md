@@ -43,8 +43,13 @@ release.
 - Pinned `suitesparse` dependency version to maximum not including 7.7.0 [#5496](https://github.com/DOI-USGS/ISIS3/issues/5496)
 
 ### Fixed
+- Fixed a bug in QVIEW's FindTool in which camera was prioritized over projction [#5508](https://github.com/DOI-USGS/ISIS3/issues/5508)
+- Fixed a bug in PolygonTools in which the program exited before attempting to fix an invalid Polygon [#5520](https://github.com/DOI-USGS/ISIS3/issues/5520)
 - Fixed a bug in QVIEW's Stretch tool where the default min/max type was not an available option [#5289](https://github.com/DOI-USGS/ISIS3/issues/5289)
 - Fixed a bug in QVIEW where images would double load if loaded from the commandline [#5505](https://github.com/DOI-USGS/ISIS3/pull/5505)
+
+### Added
+- Added versioned default values to lrowacphomap's PHOALGO and PHOPARCUBE parameters and updated lrowacphomap to handle them properly. [#5452](https://github.com/DOI-USGS/ISIS3/pull/5452)
 
 ## [8.2.0] - 2024-04-18
 
@@ -72,6 +77,10 @@ release.
 - Added new option in `ctxcal` to use monthly computed flatfield files for "Frown" removal in CTX images. [#5338](https://github.com/DOI-USGS/ISIS3/pull/5338)
 - CSMCamera can now read and use the body rotation from ALE produced ISDs [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
 - CSMSkyMap added to CSMCamera for use with local rover projections in ISIS [#5072](https://github.com/DOI-USGS/ISIS3/pull/5072)
+
+- Cneteditor can now display point coordinates and sigmas in either lat/lon/radius or XYZ
+format. A priori coordinate sigmas can now be edited in both formats. New filters have been implemented for coordinates and sigmas in XYZ. [#5421](https://github.com/DOI-USGS/ISIS3/issues/5421)
+
 - Added new Hayabusa2 translation for `SpacecraftName` to accept `HAYABUSA2` [#5395](https://github.com/DOI-USGS/ISIS3/issues/5395)
 - Added ALLOWERROR parameter to campt [#5393](https://github.com/DOI-USGS/ISIS3/pull/5393)
 - OSIRIS-REx Tagcams instrument support, tests, and test data added [#5424](https://github.com/DOI-USGS/ISIS3/issues/5424)

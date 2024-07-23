@@ -855,8 +855,10 @@ namespace Isis {
       QString msgTitle = "Update camera pointing?";
 //      QDialog resultsDialog((QWidget *)parent(),"Bundle Adjust Summary",true);
 
-      QMessageBox msgBox(QMessageBox::Question, msgTitle, message, 0, p_tieTool,
-                         Qt::Dialog);
+      QMessageBox msgBox;
+      msgBox.setIcon(QMessageBox::Question);
+      msgBox.setWindowTitle(msgTitle);
+      msgBox.setText(message);
       QPushButton *update = msgBox.addButton("Update", QMessageBox::AcceptRole);
       update->setToolTip("Update camera pointing on \"Match\" cube labels.");
       update->setWhatsThis("Update the camera angles on the \"Match\" cube "

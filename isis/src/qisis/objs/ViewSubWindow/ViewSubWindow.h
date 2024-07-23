@@ -33,7 +33,7 @@ namespace Isis {
       void closeWindow(); //!< Signal called when the window receives a close event
 
     public:
-      ViewSubWindow(QWidget *parent, Qt::WindowFlags flags = 0);
+      ViewSubWindow(QWidget *parent, Qt::WindowFlags flags = Qt::WindowFlags());
       virtual ~ViewSubWindow();
 
     protected:

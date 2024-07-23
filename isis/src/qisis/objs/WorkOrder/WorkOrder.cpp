@@ -25,7 +25,6 @@ find files of those names at the top level of this repository. **/
 #include "ProjectItem.h"
 #include "ShapeList.h"
 #include "Template.h"
-#include "XmlStackedHandlerReader.h"
 
 
 namespace Isis {
@@ -510,15 +509,6 @@ namespace Isis {
 
     return false;
   }
-
-
-  /**
-   * @brief Read this work order's data from disk.
-   */
-  void WorkOrder::read(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler(new XmlHandler(this));
-  }
-
 
   /**
    * @brief:  Saves a WorkOrder to a data stream.
@@ -1112,7 +1102,7 @@ namespace Isis {
         m_progressBar->update();
 
         delete m_elapsedTimer;
-        m_elapsedTimer = new QTime;
+        m_elapsedTimer = new QElapsedTimer;
         m_elapsedTimer->start();
 
         if (isSynchronous()) {
@@ -1183,7 +1173,7 @@ namespace Isis {
         m_progressBar->update();
 
         delete m_elapsedTimer;
-        m_elapsedTimer = new QTime;
+        m_elapsedTimer = new QElapsedTimer;
         m_elapsedTimer->start();
 
         if (isSynchronous()) {
@@ -1671,75 +1661,5 @@ namespace Isis {
    */
   void WorkOrder::setModifiesDiskState(bool changesProjectOnDisk) {
     m_modifiesDiskState = changesProjectOnDisk;
-  }
-
-
-  /**
-   * @brief Passes a pointer to a WorkOrder to the WorkOrder::XmlHandler class.
-   * @param workOrder.  A pointer to a WorkOrder.
-   */
-  WorkOrder::XmlHandler::XmlHandler(WorkOrder *workOrder) {
-    m_workOrder = workOrder;
-  }
-
-
-  /**
-   * @brief The XML reader invokes this method at the start of every element in the
-   *        XML document.  This expects <workOrder/> and <dataValue/> elements.
-   * A quick example using this function:
-   *     startElement("xsl","stylesheet","xsl:stylesheet",attributes)
-   *
-   * @param namespaceURI The Uniform Resource Identifier of the element's namespace
-   * @param localName The local name string
-   * @param qName The XML qualified string (or empty, if QNames are not available).
-   * @param atts The XML attributes attached to each element
-   * @return @b bool  Returns True signalling to the reader the start of a valid XML element.  If
-   * False is returned, something bad happened.
-   *
-   */
-  bool WorkOrder::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                           const QString &qName, const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "workOrder") {
-        QString actionText = atts.value("actionText");
-        QString undoText = atts.value("undoText");
-        QString executionTime = atts.value("executionTime");
-        QString statusStr = atts.value("status");
-
-        if (!actionText.isEmpty()) {
-          ((QAction *)m_workOrder)->setText(actionText);
-        }
-
-        if (!undoText.isEmpty()) {
-          ((QUndoCommand *)m_workOrder)->setText(undoText);
-        }
-
-        if (!executionTime.isEmpty()) {
-          m_workOrder->m_executionTime = QDateTime::fromString(executionTime);
-        }
-
-        if (!statusStr.isEmpty()) {
-          m_workOrder->m_status = fromStatusString(statusStr);
-        }
-        else {
-          if (m_workOrder->createsCleanState()) {
-            m_workOrder->m_status = WorkOrderFinished;
-          }
-          else {
-            m_workOrder->m_status = WorkOrderRedone;
-          }
-        }
-      }
-      else if (localName == "dataValue") {
-        m_workOrder->m_internalData.append(atts.value("value"));
-      }
-      else if (localName == "context") {
-        if (atts.value("value") == "ProjectContext") {
-          m_workOrder->m_context = ProjectContext;
-        }
-      }
-    }
-
-    return true;
   }
 }

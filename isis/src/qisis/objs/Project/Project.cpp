@@ -43,6 +43,7 @@
 #include <QTextStream>
 #include <QWidget>
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 #include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
@@ -75,11 +76,8 @@
 #include "TemplateList.h"
 #include "WorkOrder.h"
 #include "WorkOrderFactory.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
-
-
 
   /**
    * Create a new Project. This creates a project on disk at /tmp/username_appname_pid.
@@ -1391,40 +1389,35 @@ namespace Isis {
     m_clearing = false;
     m_isTemporaryProject = false;
 
-    XmlHandler handler(this);
-
-    XmlStackedHandlerReader reader;
-    reader.pushContentHandler(&handler);
-    reader.setErrorHandler(&handler);
-
     QDir oldProjectRoot(*m_projectRoot);
     *m_projectRoot =  QDir(projectAbsolutePathStr);
 
-    QXmlInputSource xmlInputSource(&file);
+    QXmlStreamReader projectXmlReader(&file);
 
     //This prevents the project from not loading if everything
     //can't be loaded, and outputs the warnings/errors to the
     //Warnings Tab
     try {
-      reader.parse(xmlInputSource);
-        }
+      readProjectXml(&projectXmlReader);
+    }
     catch (IException &e) {
       directory()->showWarning(QString("Failed to open project completely [%1]")
                                .arg(projectAbsolutePathStr));
       directory()->showWarning(e.toString());
-      }
+    }
     catch (std::exception &e) {
       directory()->showWarning(QString("Failed to open project completely[%1]")
                                .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
 
-    reader.pushContentHandler(&handler);
-    QXmlInputSource xmlHistoryInputSource(&historyFile);
+    QXmlStreamReader reader2(&historyFile);
 
     try {
-      reader.parse(xmlHistoryInputSource);
+      while (!reader2.atEnd()) {
+        reader2.readNext();
       }
+    }
 
     catch (IException &e) {
       directory()->showWarning(QString("Failed to read history from project[%1]")
@@ -1436,28 +1429,29 @@ namespace Isis {
                                 .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
+    
+    QXmlStreamReader reader3(&warningsFile);
 
-    reader.pushContentHandler(&handler);
-
-    QXmlInputSource xmlWarningsInputSource(&warningsFile);
-
-    if (!reader.parse(xmlWarningsInputSource)) {
+    while (!reader3.atEnd()) {
+      reader3.readNext();
+    }
+    if (reader3.hasError()) {
       warn(tr("Failed to read warnings from project [%1]").arg(projectAbsolutePathStr));
     }
 
-    reader.pushContentHandler(&handler);
-
-    QXmlInputSource xmlDirectoryInputSource(&directoryFile);
+    QXmlStreamReader reader4(&directoryFile);
 
     try {
-      reader.parse(xmlDirectoryInputSource);
-         }
+      while (!reader4.atEnd()) {
+        reader4.readNext();
+      }
+    }
     catch (IException &e) {
       directory()->showWarning(QString("Failed to read GUI state from project[%1]")
                                .arg(projectAbsolutePathStr));
       directory()->showWarning(e.toString());
 
-      }
+    }
     catch (std::exception &e) {
       directory()->showWarning(QString("Failed to read GUI state from project[%1]")
                                .arg(projectAbsolutePathStr));
@@ -1494,6 +1488,74 @@ namespace Isis {
     emit projectLoaded(this);
   }
 
+
+  void Project::readProjectXml(QXmlStreamReader *xmlReader) {
+    if (xmlReader->readNextStartElement()) {
+      if (xmlReader->name() == "project") {
+        QStringRef name = xmlReader->attributes().value("name");
+        if (!name.isEmpty()) {
+          m_project->setName(*(name.string()));
+        }
+      }
+      else if (xmlReader->name() == "controlNets") {
+        // m_controls.append(new ControlList(m_project, xmlReader));
+      }
+      else if (xmlReader->name() == "imageList") {
+        // m_imageLists.append(new ImageList(m_project, xmlReader));
+      }
+      else if (xmlReader->name() == "shapeList") {
+        // m_shapeLists.append(new ShapeList(m_project, xmlReader));
+      }
+      else if (xmlReader->name() == "mapTemplateList") {
+        // m_mapTemplateLists.append(new TemplateList(m_project, xmlReader));
+      }
+      else if (xmlReader->name() == "regTemplateList") {
+        // m_regTemplateLists.append(new TemplateList(m_project, xmlReader));
+      }
+      //  workOrders are stored in history.xml, using same reader as project.xml
+      else if (xmlReader->name() == "workOrder") {
+        QString type = *(xmlReader->attributes().value("type").string());
+
+        m_workOrder = WorkOrderFactory::create(m_project, type);
+
+        // m_workOrder->read(xmlReader);
+      }
+      //  warnings stored in warning.xml, using same reader as project.xml
+      else if (xmlReader->name() == "warning") {
+        QString warningText = *(xmlReader->attributes().value("text").string());
+
+        if (!warningText.isEmpty())
+        {
+          m_project->warn(warningText);
+        }
+      }
+      else if (xmlReader->name() == "directory") {
+        // m_project->directory()->load(xmlReader);
+      }
+      else if (xmlReader->name() == "dockRestore") {
+        //    QVariant geo_data = QVariant(atts.value("geometry"));
+        //    restoreGeometry(geo_data);
+        //    QVariant layout_data = QVariant(atts.value("state"));
+        //    restoreState(layout_data);
+      }
+      else if (xmlReader->name() == "bundleSolutionInfo") {
+        m_bundleSolutionInfos.append(new BundleSolutionInfo(m_project, xmlReader));
+      }
+      else if (xmlReader->name() == "activeImageList") {
+        QString displayName = *(xmlReader->attributes().value("displayName").string());
+        m_project->setActiveImageList(displayName);
+      }
+      else if (xmlReader->name() == "activeControl") {
+        // Find Control
+        QString displayName = *(xmlReader->attributes().value("displayName").string());
+        m_project->setActiveControl(displayName);
+      }
+      else
+      {
+        xmlReader->raiseError(QObject::tr("Incorrect file"));
+      }
+    }
+  }
 
   QProgressBar *Project::progress() {
     return m_imageReader->progress();
@@ -2302,7 +2364,7 @@ namespace Isis {
    * @param newProjectRoot The new root directory for the project.
    */
   void Project::relocateProjectRoot(QString newProjectRoot) {
-    *m_projectRoot = newProjectRoot;
+    m_projectRoot->setPath(newProjectRoot);
     emit projectRelocated(this);
   }
 
@@ -2965,13 +3027,6 @@ namespace Isis {
     m_idToShapeMap->remove(m_idToShapeMap->key((Shape *)imageObj));
   }
 
-
-  Project::XmlHandler::XmlHandler(Project *project) {
-    m_project = project;
-    m_workOrder = NULL;
-  }
-
-
  /**
   * This function returns a QMutex. This was needed to be able to deal with a threading issue with
   * Work Order functions returning a member variable. This is used by creating a QMutexLocker
@@ -2984,137 +3039,5 @@ namespace Isis {
   */
   QMutex *Project::workOrderMutex() {
     return m_workOrderMutex;
-  }
-
-
-  bool Project::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                         const QString &qName, const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-
-      if (localName == "project") {
-        QString name = atts.value("name");
-        if (!name.isEmpty()) {
-          m_project->setName(name);
-        }
-      }
-      else if (localName == "controlNets") {
-        m_controls.append(new ControlList(m_project, reader()));
-      }
-      else if (localName == "imageList") {
-        m_imageLists.append(new ImageList(m_project, reader()));
-      }
-      else if (localName == "shapeList") {
-        m_shapeLists.append(new ShapeList(m_project, reader()));
-      }
-      else if (localName == "mapTemplateList") {
-        m_mapTemplateLists.append( new TemplateList(m_project, reader()));
-      }
-      else if (localName == "regTemplateList") {
-        m_regTemplateLists.append( new TemplateList(m_project, reader()));
-      }
-      //  workOrders are stored in history.xml, using same reader as project.xml
-      else if (localName == "workOrder") {
-        QString type = atts.value("type");
-
-        m_workOrder = WorkOrderFactory::create(m_project, type);
-
-        m_workOrder->read(reader());
-      }
-      //  warnings stored in warning.xml, using same reader as project.xml
-      else if (localName == "warning") {
-        QString warningText = atts.value("text");
-
-        if (!warningText.isEmpty()) {
-          m_project->warn(warningText);
-        }
-      }
-      else if (localName == "directory") {
-        m_project->directory()->load(reader());
-      }
-      else if (localName == "dockRestore") {
-//    QVariant geo_data = QVariant(atts.value("geometry"));
-//    restoreGeometry(geo_data);
-//    QVariant layout_data = QVariant(atts.value("state"));
-//    restoreState(layout_data);
-      }
-
-      else if (localName == "bundleSolutionInfo") {
-        m_bundleSolutionInfos.append(new BundleSolutionInfo(m_project, reader()));
-      }
-      else if (localName == "activeImageList") {
-        QString displayName = atts.value("displayName");
-        m_project->setActiveImageList(displayName);
-      }
-      else if (localName == "activeControl") {
-        // Find Control
-        QString displayName = atts.value("displayName");
-        m_project->setActiveControl(displayName);
-      }
-    }
-
-    return true;
-  }
-
-
-  /**
-   * The xml parser for ending tags
-   *
-   * @internal
-   *   @history 2016-12-02 Tracie Sucharski - Changed localName == "project" to
-   *                           localName == "imageLists", so that images and shapes
-   *                           are added to the project as soon as their end tag is found.
-   *                           Restoring activeImageList was not working since the project had
-   *                           no images until the end tag for "project" was reached.
-   *
-   */
-  bool Project::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                       const QString &qName) {
-    if (localName == "imageLists") {
-      foreach (ImageList *imageList, m_imageLists) {
-        m_project->imagesReady(*imageList);
-      }
-    }
-    else if (localName == "shapeLists") {
-      // TODO does this go here under project or should it be under shapes?
-      foreach (ShapeList *shapeList, m_shapeLists) {
-        m_project->shapesReady(*shapeList);
-      }
-    }
-    else if (localName == "mapTemplateLists") {
-      foreach (TemplateList *templateList, m_mapTemplateLists) {
-        m_project->addTemplates(templateList);
-      }
-    }
-    else if (localName == "regTemplateLists") {
-      foreach (TemplateList *templateList, m_regTemplateLists) {
-        m_project->addTemplates(templateList);
-      }
-    }
-    else if (localName == "workOrder") {
-      m_project->m_workOrderHistory->append(m_workOrder);
-      m_workOrder = NULL;
-    }
-    else if (localName == "controlNets") {
-      foreach (ControlList *list, m_controls) {
-        foreach (Control *control, *list) {
-          m_project->addControl(control);
-        }
-        delete list;
-      }
-      m_controls.clear();
-    }
-    else if (localName == "results") {
-      foreach (BundleSolutionInfo *bundleInfo, m_bundleSolutionInfos) {
-        m_project->addBundleSolutionInfo(bundleInfo);
-
-        // If BundleSolutionInfo contains adjusted images, add to the project id map.
-        if (bundleInfo->adjustedImages().count()) {
-          foreach (ImageList *adjustedImageList, bundleInfo->adjustedImages()) {
-            m_project->addImagesToIdMap(*adjustedImageList);
-          }
-        }
-      }
-    }
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }
