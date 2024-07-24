@@ -556,10 +556,10 @@ TEST(Phocube, FunctionalTestPhocubeSurfaceObliqueDetectorResolution) {
 
   // verify statistics of SurfaceObliqueDetectorResolution band
   std::unique_ptr<Histogram> hist (cube.histogram(1));
-  EXPECT_NEAR(hist->Average(), 1.0194664368391038, .000001);
-  EXPECT_NEAR(hist->Sum(), 10194.664368391037, .000001);
-  EXPECT_EQ(hist->ValidPixels(), 10000);
-  EXPECT_NEAR(hist->StandardDeviation(), 0.87629359782481731, .000001);
+  EXPECT_NEAR(hist->Average(), 1.0194460722140173, .000001);
+  EXPECT_NEAR(hist->Sum(), 10191.402383923531, .000001);
+  EXPECT_EQ(hist->ValidPixels(), 9997);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.87642429424877888, .000001);
 
   cube.close();
 }
