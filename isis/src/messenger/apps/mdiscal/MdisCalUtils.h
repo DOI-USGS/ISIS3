@@ -45,14 +45,6 @@ namespace Isis {
     return toInt(QString(value).trimmed());
   }
 
-  template <typename T> inline T MIN(const T &A, const T &B) {
-    return (((A) < (B)) ? (A) : (B));
-  }
-
-  template <typename T> inline T MAX(const T &A, const T &B) {
-    return (((A) > (B)) ? (A) : (B));
-  }
-
   inline QString quote(const QString &value) {
     if (value.isEmpty()) return (value);
     if (value[0] == '"') return (value);

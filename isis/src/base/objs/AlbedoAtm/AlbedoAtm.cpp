@@ -4,9 +4,6 @@
 #include "IException.h"
 #include "IString.h"
 
-#define MIN(x,y) (((x) < (y)) ? (x) : (y))
-#define MAX(x,y) (((x) > (y)) ? (x) : (y))
-
 namespace Isis {
   /**
    * Constructs AlbedoAtm object using a Pvl, PhotoModel, and
