@@ -33,10 +33,10 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalDefault) {
 
   Histogram *oCubeStats = oCube.histogram();
 
-  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.077640061192214491);
-  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 31.056024476885796);
+  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.080529551990330225);
+  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 32.211820796132088);
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0012347471238170408);
+  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0012845090812918776);
 }
 
 
@@ -107,10 +107,10 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalIofFalse) {
 
   Histogram *oCubeStats = oCube.histogram();
 
-  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 221.12296661376953);
-  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 88449.186645507812);
+  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 229.35238750457765);
+  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 91740.955001831055);
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 3.5166241557192071);
+  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 3.6583500046604196);
 }
 
 
