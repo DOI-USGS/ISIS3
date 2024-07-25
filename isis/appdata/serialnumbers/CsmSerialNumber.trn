@@ -1,6 +1,6 @@
 Group = Keyword1
   Auto
-  InputKey       = CSMPlatformId
+  InputKey       = CSMPlatformID
   InputGroup     = "IsisCube,CsmInfo"
   InputPosition  = (IsisCube, CsmInfo)
   OutputName     = Keyword1
