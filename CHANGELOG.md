@@ -51,6 +51,7 @@ release.
 - Fixed qmos segfault under GEOS 3.12 [#5539](https://github.com/DOI-USGS/ISIS3/issues/5539)
 - Fixed CSMSerialNumber.trn typo [#5485](https://github.com/DOI-USGS/ISIS3/issues/5485)
 - Fixed CSMSerialNumber.trn to be PVL compliant [#5484](https://github.com/DOI-USGS/ISIS3/issues/5484)
+- Fixed hrsc2isis to support level 3 hrsc images [#5497](https://github.com/DOI-USGS/ISIS3/issues/5497)
 
 ### Added
 - Added versioned default values to lrowacphomap's PHOALGO and PHOPARCUBE parameters and updated lrowacphomap to handle them properly. [#5452](https://github.com/DOI-USGS/ISIS3/pull/5452)
