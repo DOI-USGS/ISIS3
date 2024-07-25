@@ -69,15 +69,6 @@ namespace Isis{
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // This program is setup to work with Mex HRSC processing level 1 and 2 only.
-    // Not level 3 (Mapped)
-    if ((int)label["PROCESSING_LEVEL_ID"] >= 3) {
-      QString msg = "File [" + ui.GetFileName("FROM");
-      msg += "] has keyword [PROCESSING_LEVEL_ID = " + label["PROCESSING_LEVEL_ID"][0] + "]";
-      msg += " and can not be read by this program.";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-
     // The processing for Stereo and SRC are significantly different. Call the
     // appropriate processing function
     if (isSrcFile) {
