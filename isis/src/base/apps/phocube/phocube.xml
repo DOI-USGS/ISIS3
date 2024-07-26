@@ -109,6 +109,8 @@ xsi:noNamespaceSchemaLocation=
      <li><def link="Body Fixed Coordinate">BODYFIXED</def></li>
      <li>RADEC (<def link="Right Ascension">Right Ascension</def>, <def link="Declination">Declination</def> )</li>
      <li><def link="Local Solar Time">LOCALTIME</def></li>
+     <li>SUNILLUMINATIONMASK</li>
+     <li>SURFACEOBLIQUEDETECTORRESOLUTION</li>
      </ul>
        The following options are available for Level2 images:
      <ul>
@@ -326,6 +328,15 @@ xsi:noNamespaceSchemaLocation=
       Added initial slope and backplane options for the local normal and the
       ellipsoid normal.
     </change>
+    <change name="Ken Edmundson" date="2024-04-24">
+      Added Sunilluminationmask and SurfaceObliqueDetectorResolution backplanes.
+      SurfaceObliqueDetectorResolution is in addition to the existing
+      ObliqueDetectorResolution. The difference is that ObliqueDetectorResolution
+      uses the local emission angle while SurfaceObliqueDetectorResolution uses
+      the emission angle calculated from the ellipsoid. Sunilluminationmask and
+      SurfaceObliqueDetectorResolution were added to the U. of Arizona code base
+      by the UA/OSIRIS-REx IPWG Team on 2018-09-19 and 2019-03-29 respectively.
+    </change>
   </history>
 
   <category>
@@ -418,6 +429,8 @@ xsi:noNamespaceSchemaLocation=
               <item>RADEC</item>
               <item>BODYFIXED</item>
               <item>LOCALTIME</item>
+              <item>SUNILLUMINATIONMASK</item>
+              <item>SURFACEOBLIQUEDETECTORRESOLUTION</item>
             </exclusions>
           </option>
         </list>
@@ -428,13 +441,13 @@ xsi:noNamespaceSchemaLocation=
       <parameter name="SPECIALPIXELS">
         <type>boolean</type>
         <default><item>TRUE</item></default>
-        <brief>Include special pixels in the ouptut image</brief>
+        <brief>Include special pixels in the output image</brief>
         <description>
           Controls the output of the values phocube calculates based on the DN from the first band.
           If this parameter is true, phocube will always attempt to calculate values for the requested bands.
           If this parameter is false, and the DN is a special pixel value, phocube will not
           calculate values, and will instead place ISIS Null values in all requested photometry bands.
-          The DN bands, if requested, will be transfered to the output cube regardless of this setting.
+          The DN bands, if requested, will be transferred to the output cube regardless of this setting.
         </description>
       </parameter>
       <parameter name="DN">
@@ -461,14 +474,14 @@ xsi:noNamespaceSchemaLocation=
             Calculations for the other bands that require a sensor model (e.g., phase) will be
             based on the first band, again subject to the cube attribute.
             This doesn't affect the values calculated for those bands when the
-            input image bands are spatially allinged,
+            input image bands are spatially aligned,
             but it is very import when the bands of the input image are not
-            spatially alligned (e.g., Level 1, Odyssey, Themis IR).
+            spatially aligned (e.g., Level 1, Odyssey, Themis IR).
             Use the input cube attribute to select the band used to calculate
             the other phocube values (e.g., ThemisIR.cub+9,1-5).
             The geometry of the first band or the first band in the input attribute,
             will be used to calculate the phocube values.
-            NOTE: If the DN parameter is also set then ALLDNS will take presidence,
+            NOTE: If the DN parameter is also set then ALLDNS will take precedence,
             and DN will be ignored.
           </p>
         </description>
@@ -700,7 +713,7 @@ xsi:noNamespaceSchemaLocation=
           three bands (X, Y, Z) in the output cube. Meaning if your cube has an
           ellipsoid shapemodel rather than a DEM, the local normal and the
           ellipsoid normal will look the same. The output cube labels will contain
-          three "Local Normal (coord)" keywordsin the BandBin group, in band
+          three "Local Normal (coord)" keywords in the BandBin group, in band
           sequence of the output file.
 
           <p>
@@ -847,6 +860,74 @@ xsi:noNamespaceSchemaLocation=
            in the BandBin group. Local Solar Time is in hours.
          </description>
        </parameter>
+      <parameter name="SUNILLUMINATIONMASK">
+         <type>boolean</type>
+         <default><item>FALSE</item></default>
+         <brief>Create band with pixel values of 1 (illuminated) or 0 (shadowed) indicating
+                sun illumination state</brief>
+         <description>
+            <p>
+    	        If this parameter is true, the <b>Solar Illumination Mask</b>
+              (or shadow mask), will be determined for every pixel. This option is
+              primarily useful for small irregular bodies (e.g. comets, asteroids),
+              where terrain is occluded from solar illumination at the surface
+              intersection point at a given pixel. This information cannot be provided
+              solely by incidence or local incidence angles as the occlusion occurs due
+              to foreground terrain, such as lobes in comets, at much larger distances
+              than the proximity of the initial surface point of intersection. The
+              output cube label will contain "Sun Illumination Mask" in the BandBin group,
+              in band sequence of the output file. 
+            </p>
+            <p>
+              The output mask pixel is a boolean value computed using ray trace
+              functions. Pixels are either 1 (illuminated) or 0 (shadowed). A look
+              direction from the sun is computed to the spacecraft (camera) pixel
+              intercept location on the surface. If the solar intercept point on the
+              surface is not the same point as seen from the spacecraft/camera
+              perspective, it is deemed occluded (shadowed).  For tessellated plate shape
+              models, which are often used to represent the shape of irregular bodies, both
+              camera and solar surface intercept points must occur on the same triangle at
+              approximately the same location.
+            </p>
+            <p>
+              If the surface point is occluded/shadowed, a 0 (false) value is
+              written as the output pixel mask value indicating it is not
+              illuminated by the sun. All other cases will result in setting
+              the output pixel mask value to 1 (true) indicating illumination by
+              the sun. Note this mask will also include (i.e., identify pixels in)
+              the <b>local</b> incidence backplane where the angles are greater
+              than 90 degrees.
+            </p>
+            <p>
+              <b>Note: The computation of this backplane is not supported for all ISIS
+              shape models or for the ellipsoid. At this time we know that it functions
+              properly using the Bullet ray trace engine.</b>
+            </p>
+         </description>
+       </parameter>
+       <parameter name="SURFACEOBLIQUEDETECTORRESOLUTION">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create the surface oblique detector resolution band</brief>
+        <description>
+            <p>
+              If this parameter is true, the <def>Surface Oblique Detector
+              Resolution</def> will be computed for every pixel and placed
+              in a band in the output cube. This value differs from the
+              Oblique Detector Resolution due to use of the local emission
+              angle for that data. It is computed using the emission angle
+              computed from the ellipsoid, which will produce a smoother
+              data plane. The output cube label will contain "Surface Oblique
+              Detector Resolution" in the BandBin group, in band sequence of
+              the output file. SurfaceObliqueDetectorResolution is in millimeters.
+            </p>
+            <p>
+              <b>Note: The computation of this backplane is not supported for all ISIS
+              shape models or for the ellipsoid. At this time we know that it functions
+              properly using the Bullet ray trace engine.</b>
+            </p>
+         </description>
+      </parameter>
     </group>
   </groups>
 
@@ -922,6 +1003,81 @@ xsi:noNamespaceSchemaLocation=
             DN values.
           </description>
           <thumbnail src="assets/thumbs/thumb_phocube_morph_band.png" caption="Output image band 2 (morphologyRank)" width="200" height="200"/>
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief>Create "sun illumination mask" and "surface oblique detector resolution" backplane bands</brief>
+      <description>
+        In this example, <i>phocube</i> creates an output cube file with a
+        sun illumination backplane and a surface oblique detector resolution
+        backplane. These backplanes are shown below as separate snapshots
+        under "Output Images." The input image file shown below under "Input
+        Image" was not propagated to the <i>phocube</i> output file because DN
+        is set to false. The "DN" parameter must be set to "true" if the output
+        product is expected to contain the input image.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=20190425T211232S312_map_iofL2pan.cub to=20190425T211232S312_map_iofL2pan.pho.cub specialpixels=no
+          phase=no emission=no incidence=no latitude=no longitude=no sunilluminationmask=yes
+          surfaceobliquedetectorresolution=yes
+        </commandLine>
+        <description>Run <i>phocube</i> to create sunilluminationmask and surfaceobliquedetectorresolution bands.</description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/phocube_gui_example2.jpg" width="458" height="764">
+            <brief>Example GUI</brief>
+            <description>
+              Screenshot of GUI version of the application.<br />  For this example,
+              only "SUNILLUMINATIONMASK" and "SURFACEOBLIQUEDETECTORRESOLUTION" are selected.  The pre-selected
+              options "PHASE," "EMISSION," "INCIDENCE," "LATITUDE," and "LONGITUDE" are
+              deselected to avoid creating these unwanted backplanes.
+            </description>
+            <thumbnail src="assets/thumbs/thumb_phocube_gui_example2.jpg" caption="phocube GUI" width="147" height="245"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image src="assets/images/20190425T211232S312_map_iofL2pan.png" width="496" height="522">
+          <brief>Input file </brief>
+          <description>
+            Screenshot of the input cube file.
+          </description>
+          <thumbnail src="assets/thumbs/20190425T211232S312_map_iofL2pan_thumb.png" caption="Input image" width="200" height="210"/>
+          <parameterName>
+            FROM
+          </parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/phocube_sun_illumination_band.png" width="496" height="522">
+          <brief>Output file band 1 (SunIlluminationMask)</brief>
+          <description>
+            Screenshot of the first band in the output file.  This band contains
+            sun illumination information. Occluded and illuminated pixel values
+            are 0 and 1 respectively.
+          </description>
+          <thumbnail src="assets/thumbs/thumb_phocube_sun_illumination_band.png" caption="Output image band 1 (Sun Illumination Mask)" width="200" height="210"/>
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+        <image src="assets/images/phocube_surface_oblique_detector_resolution_band.png" width="496" height="496">
+          <brief>Output file band 2 (SurfaceObliqueDetectorResolution)</brief>
+          <description>
+            Screenshot of the second band in the output file containing
+            Surface Oblique Detector Resolution information computed using the
+            emission angle determined from the ellipsoid. This produces a
+            smoother data plane compared to that created with the Oblique
+            Detector Resolution option, which is computed using the local
+            emission angle from the shape model.
+          </description>
+          <thumbnail src="assets/thumbs/thumb_phocube_surface_oblique_detector_resolution_band.png" caption="Output image band 2 (Surface Oblique Detector Resolution)" width="200" height="200"/>
           <parameterName>
             TO
           </parameterName>
