@@ -134,7 +134,7 @@ def segment(img_path : Path, nlines : int = MAX_LEN):
 
 def generate_cnet(params, images):
 
-    match_segment_n = images["match"]["Segment"]
+    match_segment_n = images["match"][0]["Segment"]
     from_segment_n = images["from"][0]["Segment"]
 
     new_params = deepcopy(params)
@@ -145,7 +145,7 @@ def generate_cnet(params, images):
     # make sure none of these keys are still in the params
     new_params.pop("FROMLIST", None)
     new_params.pop("FROM", None)
-    new_params["MATCH"] = images["match"]["Path"]
+    new_params["MATCH"] = images["match"][0]["Path"]
 
     og_onet = Path(params["ONET"])
     og_tolist = Path(params["TOLIST"])
@@ -175,7 +175,7 @@ def generate_cnet(params, images):
 
     # check for overlaps
     is_overlapping = []
-    for image in from_images: 
+    for image in from_images:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir = Path(tmpdir)
             overlapfromlist = tmpdir / "fromlist.lis"
@@ -197,7 +197,7 @@ def generate_cnet(params, images):
             log.debug(f"overlap stats: {ret.stdout}")
 
             # first, throw it out if there is no overlap whatsoever 
-            is_pair_overlapping = not any([k[1].get("NoOverlap", "") == new_params["MATCH"] for k in stats])
+            is_pair_overlapping = any([k[1].get("NoOverlap", "") == new_params["MATCH"] for k in stats])
             
             if is_pair_overlapping:
                 is_thick_enough = stats["Results"]["ThicknessMinimum"] > float(params.get("MINTHICKNESS", 0))
@@ -206,6 +206,9 @@ def generate_cnet(params, images):
                 is_overlapping.append(is_pair_overlapping)
             else: # not overlapping 
                 is_overlapping.append(False) 
+
+    if not any(is_overlapping):
+        log.info("No overlaps were found.")
 
     # mask images
     from_images = list(compress(from_images, is_overlapping))
@@ -318,12 +321,19 @@ def findFeaturesSegment(ui):
     pool.close()
     pool.join()
     output = output.get()
-    
     match_segments = segment(ui.GetCubeName("match"), ui.GetInteger("NL"))
-    from_segments = reduce(lambda d1,d2: {k: merge(d1, d2, k) for k in set(d1)|set(d2)}, output)
+    if len(img_list) > 1:
+        from_segments = reduce(lambda d1,d2: {k: merge(d1, d2, k) for k in set(d1)|set(d2)}, output)
+    else:
+        # img_list = 1
+        from_segments = output[0]
+        for seg, value in from_segments.items():
+            og_value = value
+            from_segments[seg] = [og_value]
+
     segment_paths = [s["Path"] for sublist in list(from_segments.values()) for s in sublist]
     segment_paths = segment_paths + [s["Path"] for s in list(match_segments.values())]
-    
+
     # re-generate footprints
     pool = ThreadPool(ceil(nthreads/len(segment_paths)))
     output = pool.map_async(footprintinit, segment_paths)
@@ -332,28 +342,47 @@ def findFeaturesSegment(ui):
     output = output.get()
     log.debug(f"{output}")
     
-    image_sets = list(itertools.product(match_segments.values(), from_segments.values())) 
-    
+    image_sets = list(itertools.product(match_segments.values(), from_segments.values()))
+    x = match_segments.values()
+    y = from_segments.values()
+    x,y = (x,y) if len(x) > len(y) else (y,x)
+    image_cartesian = list(itertools.product(x, y))
+    image_sets = []
+    for i in image_cartesian:
+        if i[0][0]["Segment"] >= i[1]["Segment"]:
+            image_sets.append(i) 
+
     # restructure things to be easier to manage
     job_dicts = []
     for im in image_sets:
         match = im[0]
         from_images = im[1]
+        if not isinstance(from_images, list):
+            # from_images must be list type
+            from_images_list = []
+            from_images_list.append(from_images)
+            from_images = from_images_list
         job_dicts.append({
           "match" : match,
           "from" : from_images
-        }) 
-    
+        })
+
     # get params as a dictionary
     params = ui.GetParams()
-
-    pool = ThreadPool(ceil(nthreads/len(job_dicts)))
-    starmap_args = list(zip([params]*len(job_dicts), job_dicts))
-    output = pool.starmap_async(generate_cnet, starmap_args)
-    pool.close()
-    pool.join()
-    output = output.get()
-    log.debug(f"output: {output}")
+    try:
+        pool = ThreadPool(ceil(nthreads/len(job_dicts)))
+        starmap_args = list(zip([params]*len(job_dicts), job_dicts))
+        output = pool.starmap_async(generate_cnet, starmap_args)
+        pool.close()
+        pool.join()
+        output = output.get()
+        log.debug(f"output: {output}")
+    except Exception as err:
+        log.debug('generate_cnet error')
+        log.debug(' '.join(err.cmd))
+        log.debug(err.stdout)
+        log.debug(err.stderr)
+        return err
 
     # merge the networks 
     onets = [o["onet"] for o in output if isinstance(o, dict)]
