@@ -69,6 +69,13 @@ namespace Isis{
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
+    if ((int)label["PROCESSING_LEVEL_ID"] >= 4) {
+      QString msg = "File [" + ui.GetFileName("FROM");
+      msg += "] has keyword [PROCESSING_LEVEL_ID = " + label["PROCESSING_LEVEL_ID"][0] + "]";
+      msg += " and can not be read by this program.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     // The processing for Stereo and SRC are significantly different. Call the
     // appropriate processing function
     if (isSrcFile) {
