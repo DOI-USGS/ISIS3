@@ -322,6 +322,7 @@ def findFeaturesSegment(ui):
     pool.join()
     output = output.get()
     match_segments = segment(ui.GetCubeName("match"), ui.GetInteger("NL"))
+    
     if len(img_list) > 1:
         from_segments = reduce(lambda d1,d2: {k: merge(d1, d2, k) for k in set(d1)|set(d2)}, output)
     else:
@@ -331,6 +332,7 @@ def findFeaturesSegment(ui):
             og_value = value
             from_segments[seg] = [og_value]
 
+    print("FROM_SEGMENTS = " + str(from_segments))
     segment_paths = [s["Path"] for sublist in list(from_segments.values()) for s in sublist]
     segment_paths = segment_paths + [s["Path"] for s in list(match_segments.values())]
 
@@ -342,6 +344,7 @@ def findFeaturesSegment(ui):
     output = output.get()
     log.debug(f"{output}")
     
+    # Remove redundant overlapping pairs
     image_sets = list(itertools.product(match_segments.values(), from_segments.values()))
     x = match_segments.values()
     y = from_segments.values()
