@@ -25,8 +25,17 @@ void IsisMain() {
   ProcessImportPds p;
   UserInterface &ui = Application::GetUserInterface();
 
-  FileName inFile = ui.GetFileName("FROM");
-  Pvl lab(inFile.expanded());
+  QString inFile = ui.GetFileName("FROM");
+  Pvl lab(inFile);
+  QString dataFile = lab.findKeyword("FILE_NAME")[0];
+
+  // Detached labels use format keyword = "dataFile" value <unit>
+  int keywordIndex = 1;
+
+  if (inFile == dataFile){
+    // Attached labels use format keyword = value <units>
+    keywordIndex = 0;
+  }
 
   ofstream os;
   QString outFile = FileName(ui.GetFileName("TO")).expanded();
@@ -59,32 +68,32 @@ void IsisMain() {
   int qaptr = 0;
 
   if (lab.hasKeyword("^SP_SPECTRUM_WAV")) {
-    wavptr = toInt(lab.findKeyword("^SP_SPECTRUM_WAV")[0]) - 1;
+    wavptr = toInt(lab.findKeyword("^SP_SPECTRUM_WAV")[keywordIndex]) - 1;
   }
   if (lab.hasKeyword("^SP_SPECTRUM_RAW")) {
-    rawptr = toInt(lab.findKeyword("^SP_SPECTRUM_RAW")[0]) - 1;
+    rawptr = toInt(lab.findKeyword("^SP_SPECTRUM_RAW")[keywordIndex]) - 1;
   }
   if (lab.hasKeyword("^SP_SPECTRUM_RAD")) {
-    radptr = toInt(lab.findKeyword("^SP_SPECTRUM_RAD")[0]) - 1;
+    radptr = toInt(lab.findKeyword("^SP_SPECTRUM_RAD")[keywordIndex]) - 1;
   }
   //older-format file without calibrated NIR2 data
   if (lab.hasKeyword("^SP_SPECTRUM_REF")) {
-    refptr1 = toInt(lab.findKeyword("^SP_SPECTRUM_REF")[0]) - 1;
+    refptr1 = toInt(lab.findKeyword("^SP_SPECTRUM_REF")[keywordIndex]) - 1;
   }
   //newer-format file with calibrated NIR2 data and 2 different Reflectances
   if (lab.hasKeyword("^SP_SPECTRUM_REF1")) {
-    refptr1 = toInt(lab.findKeyword("^SP_SPECTRUM_REF1")[0]) - 1;
+    refptr1 = toInt(lab.findKeyword("^SP_SPECTRUM_REF1")[keywordIndex]) - 1;
   }
   if (lab.hasKeyword("^SP_SPECTRUM_REF2")) {
-    refptr2 = toInt(lab.findKeyword("^SP_SPECTRUM_REF2")[0]) - 1;
+    refptr2 = toInt(lab.findKeyword("^SP_SPECTRUM_REF2")[keywordIndex]) - 1;
   }
   if (lab.hasKeyword("^SP_SPECTRUM_QA")) {
-    qaptr = toInt(lab.findKeyword("^SP_SPECTRUM_QA")[0]) - 1;
+    qaptr = toInt(lab.findKeyword("^SP_SPECTRUM_QA")[keywordIndex]) - 1;
   }
 
   FILE *spcptr;
-  if ((spcptr = fopen(inFile.expanded().toLatin1().data(),"rb")) == 0) {
-    QString msg = "Error opening input Kaguya SP file [" + inFile.expanded() + "]";
+  if ((spcptr = fopen(dataFile.toLatin1().data(),"rb")) == 0) {
+    QString msg = "Error opening input Kaguya SP file [" + dataFile + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -101,7 +110,7 @@ void IsisMain() {
   if (!lab.hasObject("SP_SPECTRUM_WAV") || !lab.hasObject("SP_SPECTRUM_QA") ||
       !lab.hasObject("SP_SPECTRUM_RAD") || !(lab.hasObject("SP_SPECTRUM_REF") ||
       (lab.hasObject("SP_SPECTRUM_REF1") && lab.hasObject("SP_SPECTRUM_REF2")))) {
-    QString msg = "Input file [" + inFile.expanded() + "] is not a valid ";
+    QString msg = "Input file [" + inFile + "] is not a valid ";
     msg += "Kaguya Spectral Profiler file";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -261,6 +270,7 @@ void IsisMain() {
 
   PvlObject refobj;
   PvlObject refobj2;
+
   if (lab.hasKeyword("^SP_SPECTRUM_REF")) {
     refobj = lab.findObject("SP_SPECTRUM_REF");
   }
