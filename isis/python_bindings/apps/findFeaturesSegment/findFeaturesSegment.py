@@ -345,7 +345,6 @@ def findFeaturesSegment(ui):
     log.debug(f"{output}")
     
     # Remove redundant overlapping pairs
-    image_sets = list(itertools.product(match_segments.values(), from_segments.values()))
     x = match_segments.values()
     y = from_segments.values()
     x,y = (x,y) if len(x) > len(y) else (y,x)
