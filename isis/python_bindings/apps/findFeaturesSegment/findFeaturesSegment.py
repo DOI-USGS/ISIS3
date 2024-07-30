@@ -134,7 +134,10 @@ def segment(img_path : Path, nlines : int = MAX_LEN):
 
 def generate_cnet(params, images):
 
-    match_segment_n = images["match"][0]["Segment"]
+    if isinstance(images["match"], list):
+        match_segment_n = images["match"][0]["Segment"]
+    else:
+        match_segment_n = images["match"]["Segment"]
     from_segment_n = images["from"][0]["Segment"]
 
     new_params = deepcopy(params)
@@ -332,7 +335,6 @@ def findFeaturesSegment(ui):
             og_value = value
             from_segments[seg] = [og_value]
 
-    print("FROM_SEGMENTS = " + str(from_segments))
     segment_paths = [s["Path"] for sublist in list(from_segments.values()) for s in sublist]
     segment_paths = segment_paths + [s["Path"] for s in list(match_segments.values())]
 
