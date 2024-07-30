@@ -342,7 +342,7 @@ namespace Isis {
 
   // Check to see if a QString contains only numeric values.
   bool isNumeric(QString str){
-    QRegExp re("-*\\d*.*\\d*");
+    QRegExp re("^(?:[+-]?(?:\\d+|\\d*\\.(?=\\d)\\d*)(?:[eE][+-]?\\d+)?)$");
     return re.exactMatch(str);
   }
 
