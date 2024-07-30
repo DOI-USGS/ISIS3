@@ -32,7 +32,10 @@ void IsisMain() {
   // Detached labels use format keyword = "dataFile" value <unit>
   int keywordIndex = 1;
 
-  if (inFile == dataFile){
+  if (FileName(inFile).baseName() == FileName(dataFile).baseName()){
+    // data files usually do not include path information.  If input basename matches datafile basename, include path information
+    // this allows users to specify data that is not in the current directory.
+    dataFile = inFile;
     // Attached labels use format keyword = value <units>
     keywordIndex = 0;
   }
