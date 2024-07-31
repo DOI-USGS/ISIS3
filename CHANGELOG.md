@@ -40,6 +40,7 @@ release.
 
 ### Changed
 - Bandtrim has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5571](https://github.com/USGS-Astrogeology/ISIS3/issues/5571)
+- Modified kaguyasp2isis to work with new (detached) data [#5436](https://github.com/DOI-USGS/ISIS3/issues/5436)
 - Added jigsaw error message for csminit'd images without csm parameters[#5486](https://github.com/DOI-USGS/ISIS3/issues/5486)
 - Changed `qwt` dependency version to 6.2.0 or below [#5498](https://github.com/DOI-USGS/ISIS3/issues/5498)
 - Pinned `suitesparse` dependency version to maximum not including 7.7.0 [#5496](https://github.com/DOI-USGS/ISIS3/issues/5496)
@@ -53,6 +54,7 @@ release.
 - Fixed CSMSerialNumber.trn typo [#5485](https://github.com/DOI-USGS/ISIS3/issues/5485)
 - Fixed CSMSerialNumber.trn to be PVL compliant [#5484](https://github.com/DOI-USGS/ISIS3/issues/5484)
 - Fixed hrsc2isis to support level 3 hrsc images [#5497](https://github.com/DOI-USGS/ISIS3/issues/5497)
+- Fixed gllssi2isis to support V1.1 data [#5396](https://github.com/DOI-USGS/ISIS3/issues/5396)
 
 ### Added
 - Added versioned default values to lrowacphomap's PHOALGO and PHOPARCUBE parameters and updated lrowacphomap to handle them properly. [#5452](https://github.com/DOI-USGS/ISIS3/pull/5452)
