@@ -135,9 +135,11 @@ def segment(img_path : Path, nlines : int = MAX_LEN):
 def generate_cnet(params, images):
 
     if isinstance(images["match"], list):
-        match_segment_n = images["match"][0]["Segment"]
+        images_match_n = images["match"][0]
     else:
-        match_segment_n = images["match"]["Segment"]
+
+        images_match_n = images["match"]
+    match_segment_n = images_match_n["Segment"]
     from_segment_n = images["from"][0]["Segment"]
 
     new_params = deepcopy(params)
@@ -148,7 +150,7 @@ def generate_cnet(params, images):
     # make sure none of these keys are still in the params
     new_params.pop("FROMLIST", None)
     new_params.pop("FROM", None)
-    new_params["MATCH"] = images["match"][0]["Path"]
+    new_params["MATCH"] = images_match_n["Path"]
 
     og_onet = Path(params["ONET"])
     og_tolist = Path(params["TOLIST"])
@@ -200,7 +202,7 @@ def generate_cnet(params, images):
             log.debug(f"overlap stats: {ret.stdout}")
 
             # first, throw it out if there is no overlap whatsoever 
-            is_pair_overlapping = any([k[1].get("NoOverlap", "") == new_params["MATCH"] for k in stats])
+            is_pair_overlapping = not any([k[1].get("NoOverlap", "") == new_params["MATCH"] for k in stats])
             
             if is_pair_overlapping:
                 is_thick_enough = stats["Results"]["ThicknessMinimum"] > float(params.get("MINTHICKNESS", 0))
@@ -209,9 +211,6 @@ def generate_cnet(params, images):
                 is_overlapping.append(is_pair_overlapping)
             else: # not overlapping 
                 is_overlapping.append(False) 
-
-    if not any(is_overlapping):
-        log.info("No overlaps were found.")
 
     # mask images
     from_images = list(compress(from_images, is_overlapping))
@@ -236,12 +235,11 @@ def generate_cnet(params, images):
             log.debug(' '.join(err.cmd))
             log.debug(err.stdout)
             log.debug(err.stderr)
-            return "ERROR"
 
         segmented_net = cnet.from_isis(new_params["ONET"])
 
         # starting sample in inclusive, so subtract 1
-        segmented_net.loc[segmented_net.serialnumber == images["match"]["SN"], "line"] += images["match"]["StartingLine"]-1 
+        segmented_net.loc[segmented_net.serialnumber == images_match_n["SN"], "line"] += images_match_n["StartingLine"]-1 
 
         # offset the images 
         for k, image in enumerate(images["from"]):
@@ -373,20 +371,13 @@ def findFeaturesSegment(ui):
 
     # get params as a dictionary
     params = ui.GetParams()
-    try:
-        pool = ThreadPool(ceil(nthreads/len(job_dicts)))
-        starmap_args = list(zip([params]*len(job_dicts), job_dicts))
-        output = pool.starmap_async(generate_cnet, starmap_args)
-        pool.close()
-        pool.join()
-        output = output.get()
-        log.debug(f"output: {output}")
-    except Exception as err:
-        log.debug('generate_cnet error')
-        log.debug(' '.join(err.cmd))
-        log.debug(err.stdout)
-        log.debug(err.stderr)
-        return err
+    pool = ThreadPool(ceil(nthreads/len(job_dicts)))
+    starmap_args = list(zip([params]*len(job_dicts), job_dicts))
+    output = pool.starmap_async(generate_cnet, starmap_args)
+    pool.close()
+    pool.join()
+    output = output.get()
+    log.debug(f"output: {output}")
 
     # merge the networks 
     onets = [o["onet"] for o in output if isinstance(o, dict)]
