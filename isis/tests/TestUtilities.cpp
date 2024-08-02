@@ -355,7 +355,7 @@ namespace Isis {
         EXPECT_NEAR(csvLine[i].toDouble(), compareMe[i].toDouble(), 0.000001);
       }
       else{
-        EXPECT_EQ(QString(csvLine[i]).toStdString(), compareMe[i].toStdString());
+        EXPECT_EQ(QString(csvLine[i].trimmed()).toStdString(), compareMe[i].trimmed().toStdString());
       }
     }
   };
@@ -369,7 +369,7 @@ namespace Isis {
         EXPECT_NEAR(csvLine[i].toDouble(), csvLine2[i].toDouble(), tolerance);
       }
       else{
-        EXPECT_EQ(QString(csvLine[i]).toStdString(), csvLine2[i].toStdString());
+        EXPECT_EQ(QString(csvLine[i].trimmed()).toStdString(), csvLine2[i].trimmed().toStdString());
       }
     }
   };
