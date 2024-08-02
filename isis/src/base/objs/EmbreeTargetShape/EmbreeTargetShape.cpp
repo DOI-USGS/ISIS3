@@ -471,7 +471,6 @@ namespace Isis {
     if (!isValid()) {
       return;
     }
-    int tri = 0;
     Triangle *triangles = (Triangle *)rtcSetNewGeometryBuffer(rtcMesh, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(Triangle), numberOfPolygons());
     // Add the body's face (vertex indices) to the Embree device's index buffer
     for (int t = 0; t < numberOfPolygons(); ++t) {
