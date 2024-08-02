@@ -41,5 +41,5 @@ jobs:
             
             To view your [build log](https://us-west-2.codebuild.aws.amazon.com/project/eyJlbmNyeXB0ZWREYXRhIjoiNDJNZ2MxbHFKTkwxV1RyQUxJekdJY3FIanNqU29rMHB4Nk1YUzk4REIrZUZDeEtEaW9HQlZ1dTZOSHpML2VUTGVDekYydmVFcU9sUHJKN20wQzd1Q0UzSzJscnB0MElDb1M3Ti9GTlJYR1RuMWJTV3V1SkJTa3NoYmc9PSIsIml2UGFyYW1ldGVyU3BlYyI6IjF3U2NTSGlDcEtCc29YVnEiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D), please reference the build with source version: "PR_${{ github.event.number }}". 
             
-            Also, check the latest "dev" source version to identify which existing tests are failing on the dev branch.
+            Additionally, check the latest "dev" source version to identify existing test failures. Please note that you are not responsible for the test failures that exist on both your PR and the dev branch.
           
