@@ -1,25 +1,4 @@
-#include <map>
-#include <cmath>
-
-#include <QtMath>
-#include <QFile>
-#include <QScopedPointer>
-
-// #include "Pvl.h"
-// #include "PvlGroup.h"
-// #include "Statistics.h"
-#include "CSVReader.h"
-// #include "Latitude.h"
-// #include "Longitude.h"
-// #include "ControlPoint.h"
-// #include "CSMCamera.h"
-// #include "LidarData.h"
-// #include "SerialNumber.h"
-
 #include "TestUtilities.h"
-#include "NetworkFixtures.h"
-#include "CsmFixtures.h"
-
 #include "gmock/gmock.h"
 #include "gtest/gtest-spi.h"
 
