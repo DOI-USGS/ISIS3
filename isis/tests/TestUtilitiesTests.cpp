@@ -54,6 +54,7 @@ TEST(TestUtilities, IsNumeric) {
     EXPECT_FALSE(isNumeric("2024.07.31")        ); // Decimal Date
     EXPECT_FALSE(isNumeric("2/3/2007")          ); // Date
     EXPECT_FALSE(isNumeric("6A1F")              ); // Hexadecimal
+    EXPECT_FALSE(isNumeric("89-e3")             );
 }
 
 TEST(TestUtilities, CompareCsvLine) {
@@ -63,7 +64,7 @@ TEST(TestUtilities, CompareCsvLine) {
     CSVReader::CSVAxis csvLine2;
     
 
-    // Standard line found in another test
+    // Sample line with many words
     csvLine = csv.getRow(0);
     compareCsvLine(csvLine, "3-d,3-d,3-d,Sigma,Sigma,Sigma,Correction,Correction,Correction,Coordinate,Coordinate,Coordinate");
 
@@ -123,5 +124,35 @@ TEST(TestUtilities, CompareCsvLine) {
         EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, csvLine2), "");
     }, "Actual: 6");
 
-    
+
+    // Sample line with lots of numbers
+    csvLine = csv.getRow(7);
+    compareCsvLine(csvLine, "AS15_000031957,FREE,3,0,0.33,24.25013429,6.15097050,1735.93990543,270.68671676,265.71819251,500.96944842,860.25781493,-1823.63228489,-677.74533463,1573.65050943,169.59077243,712.98695596");
+    EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "AS15_000031957,FREE,3,0,0.33,24.25013429,6.15097050,1742.85730233,270.68671676,265.71819251,500.96944842,860.25781493,-1823.63228489,-677.74533463,1573.65050943,169.59077243,712.98695596"), "");
+
+
+    // long numbers
+    csvLine = csv.getRow(8);
+    compareCsvLine(csvLine, "Long Numbers, 3.14159265358979323846264338327950288419716939937510");
+    compareCsvLine(csvLine, "Long Numbers, 3.14159265358979323846264338327950288419716939937510e0");
+    compareCsvLine(csvLine, "Long Numbers, 3.1415926535898");
+    EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Long Numbers, 3.1417"), "");
+
+
+    // plus and minus
+    csvLine = csv.getRow(9);
+    compareCsvLine(csvLine, "Plus and Minus, 0, -1, +302, 5.46e-3, -4.7e4, 3+4, 56-62, 89-e3");
+    compareCsvLine(csvLine, "Plus and Minus, 0, -1, 302, .00546, -4.7e4, 3+4, 56-62, 89-e3");
+    EXPECT_NONFATAL_FAILURE({
+        EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Plus and Minus, 0, -1, +302, 5.46e3, 4.7e4, 3+A, 56-62, 89-e3"), "");
+    }, "Actual: 3");
+
+
+    // very small
+    csvLine = csv.getRow(10);
+    csvLine2 = csv.getRow(11);
+    compareCsvLine(csvLine, "Very Small, 3.685e-38");
+    compareCsvLine(csvLine, "Very Small, 4.152e-36");
+    compareCsvLine(csvLine, csvLine, 1, 1e-42);
+    EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, csvLine2, 1, 1e-39), "");
 }
