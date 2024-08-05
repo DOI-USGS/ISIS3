@@ -126,7 +126,7 @@ TEST_F(DefaultCube, FunctionalTestBandtrimDefault) {
 /**
    * BandtrimOneBand Test
    * 
-   * BandtrimDefault test given a single 5x5 input cube with 1 band.
+   * BandtrimOneBand test given a single 5x5 input cube with 1 band.
    * The four pixels in the upper left corner are set to Isis::Null
    * as below. N implies a Null pixel.
    * 
@@ -148,7 +148,7 @@ TEST_F(DefaultCube, FunctionalTestBandtrimOneBand) {
   resizeCube(5, 5, 1);
 
   // set 4 pixel block in upper left corner to Isis::Null
-  Brick b(1, 1, 1, testCube->pixelType()); // create buffer of size 4 pixels
+  Brick b(1, 1, 1, testCube->pixelType()); // create buffer of size 1 pixels
   b.SetBasePosition(1, 1, 1);
   b[0] = Isis::Null;
   testCube->write(b);
