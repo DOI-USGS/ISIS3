@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "phocube.h"
 
 #include "Angle.h"
@@ -9,6 +17,7 @@
 #include "ProjectionFactory.h"
 #include "ProcessByBrick.h"
 #include "ProcessByLine.h"
+#include "ShapeModel.h"
 #include "SpecialPixel.h"
 #include "Target.h"
 #include "TProjection.h"
@@ -111,6 +120,8 @@ namespace Isis {
     bool bodyFixedY = false;
     bool bodyFixedZ = false;
     bool localSolarTime = false;
+    bool sunilluminationmask = false;
+    bool surfaceobliquedetectorresolution = false;
     int raBandNum = 0;  // 0 based, if RA is 5th band, raBandNum will be 4
 
     if (!noCamera) {
@@ -140,6 +151,8 @@ namespace Isis {
       if ((bodyFixedY = ui.GetBoolean("BODYFIXED"))) nbands++;
       if ((bodyFixedZ = ui.GetBoolean("BODYFIXED"))) nbands++;
       if ((localSolarTime = ui.GetBoolean("LOCALTIME"))) nbands++;
+      if ((sunilluminationmask = ui.GetBoolean("SUNILLUMINATIONMASK"))) nbands++;
+      if ((surfaceobliquedetectorresolution = ui.GetBoolean("SURFACEOBLIQUEDETECTORRESOLUTION"))) nbands++;
     }
 
     // ALLDN includes DN so if both are set ignore DN
@@ -169,7 +182,7 @@ namespace Isis {
       throw IException(IException::User, message, _FILEINFO_);
     }
 
-    // If outputting a dn band, retrieve the orignal values for the filter name(s) from the input cube,
+    // If outputting a dn band, retrieve the original values for the filter name(s) from the input cube,
     // if they are in the band bin group.  Otherwise, the default will be "DN"
     QString bname = "DN";
     PvlKeyword bnames;
@@ -325,6 +338,12 @@ namespace Isis {
     }
     if (localSolarTime) {
       name += "Local Solar Time";
+    }
+    if (sunilluminationmask) {
+      name += "Sun Illumination Mask";
+    }
+    if (surfaceobliquedetectorresolution) {
+      name += "Surface Oblique Detector Resolution";
     }
     bool specialPixels = ui.GetBoolean("SPECIALPIXELS");
 
@@ -585,7 +604,29 @@ namespace Isis {
                 out[index] = pB[2];
                 index += 64 * 64;
               }
+              
+              // Compute the solar illumination mask
+              if ( sunilluminationmask ) {
+                  vector<double> sB(3), pB(3);
+                  cam->sunPosition(&sB[0]);
+                  cam->Coordinate(&pB[0]);
+
+                  // Look direction is the sun position to the surface point
+                  // in body-fixed
+                  vector<double> slookdir(3);
+                  vsub_c(&pB[0], &sB[0], &slookdir[0]);
+
+                  out[index]= (int) cam->target()->shape()->isVisibleFrom(sB, slookdir);
+                  index += 64 * 64;
+              }
+              
+              // Compute surface oblique detector resolution
+              if ( surfaceobliquedetectorresolution ) {
+                  out[index] = cam->ObliqueDetectorResolution(false);
+                  index += 64 * 64;
+              }
             }
+
             if (localSolarTime) {
               out[index] = cam->LocalSolarTime();
               index += 64 * 64;

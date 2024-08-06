@@ -13,12 +13,12 @@ find files of those names at the top level of this repository. **/
 #include <QSet>
 #include <QString>
 #include <QStringList>
+#include <QXmlStreamReader>
 
 #include <csm.h>
 
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
-#include "XmlStackedHandler.h"
 
 class QDataStream;
 class QUuid;
@@ -28,7 +28,6 @@ namespace Isis {
   class FileName;
   class Project;  // TODO: does xml stuff need project???
   class PvlObject;
-  class XmlStackedHandlerReader;
   /**
    * This class is used to modify and manage solve settings for 1 to many BundleObservations. These
    * settings indicate how any associated observations should be solved.
@@ -83,11 +82,9 @@ class BundleObservationSolveSettings {
 
     public:
       BundleObservationSolveSettings();
-      BundleObservationSolveSettings(Project *project,
-                                     XmlStackedHandlerReader *xmlReader);  // TODO: does xml stuff need project???
+      BundleObservationSolveSettings(QXmlStreamReader *xmlReader);
       BundleObservationSolveSettings(FileName xmlFile,
-                                     Project *project,
-                                     XmlStackedHandlerReader *xmlReader);  // TODO: does xml stuff need project???
+                                     QXmlStreamReader *xmlReader);
       BundleObservationSolveSettings(const BundleObservationSolveSettings &src);
       BundleObservationSolveSettings(const PvlGroup &scParameterGroup);
       ~BundleObservationSolveSettings();
@@ -185,38 +182,8 @@ class BundleObservationSolveSettings {
       QList<double> aprioriPositionSigmas() const;
       SpicePosition::Source positionInterpolationType() const;
 
-      // TODO: does xml stuff need project???
       void save(QXmlStreamWriter &stream, const Project *project) const;
-
-
-    private:
-      /**
-       *
-       * @author 2014-07-28 Jeannie Backer
-       *
-       * @internal
-       *   @todo To be docuemnted if XML handler code is used for serialization.
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          // TODO: does xml stuff need project???
-          XmlHandler(BundleObservationSolveSettings *settings, Project *project);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          BundleObservationSolveSettings *m_xmlHandlerObservationSettings;
-          Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
-          QString m_xmlHandlerCharacters;
-          QStringList m_xmlHandlerAprioriSigmas;
-      };
+      void readSolveSettings(QXmlStreamReader *xmlReader);
 
       /**
        * A unique ID for this object (useful for others to reference this object

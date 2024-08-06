@@ -15,7 +15,6 @@ find files of those names at the top level of this repository. **/
 
 #include "AbstractProjectItemView.h"
 #include "FileName.h"
-#include "XmlStackedHandler.h"
 
 class QAction;
 class QMenu;
@@ -35,7 +34,6 @@ namespace Isis {
   class Project;
   class ToolPad;
   class Workspace;
-  class XmlStackedHandlerReader;
   class ProjectItemViewMenu;
 
   /**
@@ -104,7 +102,6 @@ namespace Isis {
 
       bool viewportContainsShape(MdiCubeViewport *viewport);
 
-      void load(XmlStackedHandlerReader *xmlReader, Project *project);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
     signals:
@@ -135,30 +132,6 @@ namespace Isis {
       void setWorkspaceActiveCube(Image *image);
       void leaveEvent(QEvent *event);
       void enableActions();
-
-    private:
-      /**
-       * @author 2012-09-?? Steven Lambright
-       *
-       * @internal
-       *   @history 2016-11-07 Tracie Sucharski - Implemented for CubeDnView
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(CubeDnView *cubeDnView, Project *project);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          Project *m_project;       //!< The current project
-          CubeDnView *m_cubeDnView; //!< The view we are working with
-      };
 
     private:
       QMap<Cube *, ProjectItem *> m_cubeItemMap; //!< Maps cubes to their items

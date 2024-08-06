@@ -10,14 +10,12 @@
 #include "ShapeDisplayProperties.h"
 #include "SerialNumberList.h"
 #include "WorkOrder.h"
-#include "XmlStackedHandler.h"
 
 class QStringList;
 class QXmlStreamWriter;
 
 namespace Isis {
   class FileName;
-  class XmlStackedHandlerReader;
 
   /**
    * @brief Internalizes a list of shapes and allows for operations on the entire list
@@ -37,8 +35,6 @@ namespace Isis {
       ShapeList(QString name, QString path, QObject *parent = NULL);
       explicit ShapeList(QObject *parent = NULL);
       explicit ShapeList(QList<Shape *>, QObject *parent = NULL);
-      explicit ShapeList(Project *project,
-                         XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
       explicit ShapeList(QStringList &);
       ShapeList(const ShapeList &);
       ~ShapeList();
@@ -94,36 +90,7 @@ namespace Isis {
     signals:
       void countChanged(int newCount);
 
-    private:
-      /**
-       * This class is used to read an shapes.xml file into an shape list
-       * 
-       * @author 2012-07-01 Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(ShapeList *shapeList, Project *project);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          /**
-           * This stores a pointer to the shape list that will be read into
-           */
-          ShapeList *m_shapeList;
-          /**
-           * This stores a pointer to the project that the shapes in the shape list will be a part of
-           */
-          Project *m_project;
-      };
-
+  private:
 
       /**
        * This functor is used for copying the shapes between two projects quickly. This is designed

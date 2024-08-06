@@ -25,7 +25,7 @@ namespace Isis {
     Q_OBJECT
 
     public:
-      explicit HistogramItem(const QString &title = QString::null);
+      explicit HistogramItem(const QString &title = QString());
       explicit HistogramItem(const QwtText &title);
       virtual ~HistogramItem();
 

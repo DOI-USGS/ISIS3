@@ -34,27 +34,6 @@
 
 namespace Isis {
 
-  /** Implement templatized MIN fumnction */
-  template <typename T> inline T MIN(const T &A, const T &B) {
-    if(A < B) {
-      return (A);
-    }
-    else         {
-      return (B);
-    }
-  }
-
-  /** Implement templatized MAX function */
-  template <typename T> inline T MAX(const T &A, const T &B) {
-    if(A > B) {
-      return (A);
-    }
-    else         {
-      return (B);
-    }
-  }
-
-
   class PvlObject;
   class Camera;
 

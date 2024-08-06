@@ -5,7 +5,6 @@
 #include "FileName.h"
 #include "IException.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis{
   /**
@@ -30,9 +29,9 @@ namespace Isis{
    * @param xmlReader An XML reader that's up to an <template/> tag.
    * @param parent The Qt-relationship parent
    */
-  Template::Template(FileName templateFolder, XmlStackedHandlerReader *xmlReader, QObject *parent) :
+  Template::Template(FileName templateFolder, QXmlStreamReader *xmlReader, QObject *parent) :
       QObject(parent) {
-    xmlReader->pushContentHandler(new XmlHandler(this, templateFolder));
+    // readTemplate(xmlReader);
   }
 
 
@@ -110,58 +109,5 @@ namespace Isis{
         stream.writeAttribute("importName", m_importName);
         stream.writeEndElement();
 
-  }
-
-
-  /**
-   * Constructor for the Template object's XmlHandler
-   *
-   * @param currentTemplate A pointer to the Template object.
-   * @param templateFolder The name of the folder for the Template xml
-   *
-   */
-  Template::XmlHandler::XmlHandler(Template *currentTemplate, FileName templateFolder) {
-    m_xmlHandlerTemplate = currentTemplate;
-    m_xmlHandlerTemplateFolderName = templateFolder;
-  }
-
-
-  /**
-   * Method to read the given XML formatted attribute for a Template object
-   * into the XmlHandler.
-   *
-   * @param namespaceURI ???
-   * @param localName The keyword name given to the member variable in the XML.
-   * @param qName ???
-   * @param atts The attribute containing the keyword value for the given
-   *             localName.
-   *
-   * @return @b bool Indicates whether the localName is recognized.
-   */
-  bool Template::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                         const QString &qName, const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "template") {
-        QString fileName = atts.value("fileName");
-        QString templateType = atts.value("templateType");
-        QString importName = atts.value("importName");
-
-        if (!fileName.isEmpty()) {
-          m_xmlHandlerTemplate->m_fileName = m_xmlHandlerTemplateFolderName.expanded() 
-                                             + "/" + templateType 
-                                             + "/" + importName
-                                             + "/" + fileName;
-        }
-        
-        if (!templateType.isEmpty()) {
-          m_xmlHandlerTemplate->m_templateType = templateType;
-        }
-        
-        if (!importName.isEmpty()) {
-          m_xmlHandlerTemplate->m_importName = importName;
-        }
-      }
-    }
-    return true;
   }
 }

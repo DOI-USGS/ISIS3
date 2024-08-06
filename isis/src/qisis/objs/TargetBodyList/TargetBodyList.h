@@ -10,14 +10,12 @@
 #include "TargetBodyDisplayProperties.h"
 //#include "TargetBodyListActionWorkOrder.h"  TODO - will we need this?
 #include "WorkOrder.h"
-#include "XmlStackedHandler.h"
 
 class QStringList;
 class QXmlStreamWriter;
 
 namespace Isis {
   class FileName;
-  class XmlStackedHandlerReader;
 
   /**
    * List for holding TargetBodies.  Overrides several QList methods in order to emit
@@ -39,9 +37,6 @@ namespace Isis {
       TargetBodyList(QString name, QString path, QObject *parent = NULL);
       explicit TargetBodyList(QObject *parent = NULL);
       explicit TargetBodyList(QList<TargetBodyQsp>, QObject *parent = NULL);
-      explicit TargetBodyList(Project *project,
-          XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
-//    explicit TargetBodyList(QStringList &);
       TargetBodyList(const TargetBodyList &);
       ~TargetBodyList();
 
@@ -97,31 +92,6 @@ namespace Isis {
 
     signals:
       void countChanged(int newCount);
-
-    private:
-      /**
-       * XmlReader for working with TargetBody XML files
-       * 
-       * @author 2012-07-01 Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(TargetBodyList *TargetBodyList, Project *project);
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          TargetBodyList *m_TargetBodyList; //!< The TargetBodyList to read into/save from
-          Project *m_project; //!< The project that contains the TargetBodies
-      };
-
 
       /**
        * This functor is used for copying the TargetBody objects between two projects quickly. This

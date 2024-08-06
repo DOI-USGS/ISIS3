@@ -27,16 +27,6 @@ find files of those names at the top level of this repository. **/
 
 namespace Isis {
 
- template <typename T> inline T MIN(const T &A, const T &B) {
-   if ( A < B ) { return (A); }
-   else         { return (B); }
- }
-
- template <typename T> inline T MAX(const T &A, const T &B) {
-   if ( A > B ) { return (A); }
-   else         { return (B); }
- }
-
 /**
  * @brief Counts number of valid pixels in vector
  * @param v Vector to inspect

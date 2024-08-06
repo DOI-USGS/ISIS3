@@ -223,7 +223,7 @@ namespace Isis {
 
     if (image) {
       ImageList::iterator foundElement;
-      foundElement = qFind(m_images.begin(), m_images.end(), image);
+      foundElement = std::find(m_images.begin(), m_images.end(), image);
       m_images.erase(foundElement);
 
       if(m_images.empty())

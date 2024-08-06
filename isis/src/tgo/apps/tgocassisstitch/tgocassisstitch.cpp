@@ -52,7 +52,7 @@ namespace Isis {
 
   void tgocassisstitch(UserInterface &ui) {
 
-    QMap<QString, FileName> frameMap;
+    QMultiMap<QString, FileName> frameMap;
 
     try {
       // Open up the list of framelet files
@@ -119,16 +119,16 @@ namespace Isis {
    *                                   files in that frame.
    */
   QMap<QString, FileName> sortFramelets(FileName frameletListFile) {
-    QMap<QString, FileName> frameMap;
+    QMultiMap<QString, FileName> frameMap;
 
     ObservationNumberList frameletList(frameletListFile.expanded(), false);
 
     for (int i = 0; i < frameletList.size(); i++) {
-      frameMap.insertMulti( frameletList.observationNumber(i),
+      frameMap.insert( frameletList.observationNumber(i),
                             frameletList.fileName(i) );
     }
 
-    return frameMap;
+    return std::move(frameMap);
   }
 
 

@@ -9,9 +9,6 @@ find files of those names at the top level of this repository. **/
 #include "SpecialPixel.h"
 #include "IException.h"
 
-#define MIN(x,y) (((x) < (y)) ? (x) : (y))
-#define MAX(x,y) (((x) > (y)) ? (x) : (y))
-
 namespace Isis {
   MoonAlbedo::MoonAlbedo(Pvl &pvl, PhotoModel &pmodel) :
     NormModel(pvl, pmodel) {

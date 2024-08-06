@@ -22,7 +22,6 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
-#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -55,19 +54,6 @@ namespace Isis {
    */
   ShapeList::ShapeList(QList<Shape *> shapes, QObject *parent) : QObject(parent) {
     append(shapes);
-  }
-
-
-  /**
-   * Creates an shape list from XML.
-   *
-   * @param project The project with the shape list.
-   * @param xmlReader The XML reader currently at an <shapeList /> tag.
-   * @param parent The Qt-relationship parent.
-   */
-  ShapeList::ShapeList(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) :
-      QObject(parent) {
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
   }
 
 
@@ -741,90 +727,5 @@ namespace Isis {
     m_project = rhs.m_project;
     m_newProjectRoot = rhs.m_newProjectRoot;
     return *this;
-  }
-
-
-  /**
-   * Create an XML Handler (reader) that can populate the Shape list class data.
-   *
-   * @param shapeList The shape list we're going to be initializing
-   * @param project The project that contains the shape list
-   *
-   * @see ShapeList::save()
-   */
-  ShapeList::XmlHandler::XmlHandler(ShapeList *shapeList, Project *project) {
-    m_shapeList = shapeList;
-    m_project = project;
-  }
-
-
-  /**
-   * Handle an XML start element. This expects <shapeList/> and <shape/> elements (it reads both
-   * the project XML and the shapes.xml file).
-   *
-   * @return @b bool If we should continue reading the XML (usually true).
-   */
-  bool ShapeList::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                           const QString &qName, const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "shapeList") {
-        QString name = atts.value("name");
-        QString path = atts.value("path");
-
-        if (!name.isEmpty()) {
-          m_shapeList->setName(name);
-        }
-
-        if (!path.isEmpty()) {
-          m_shapeList->setPath(path);
-        }
-      }
-      else if (localName == "shape") {
-        m_shapeList->append(new Shape(m_project->shapeDataRoot() + "/" + m_shapeList->path(),
-                                      reader()));
-      }
-    }
-
-    return true;
-  }
-
-
-  /**
-   * Handle an XML end element. This handles <shapeList /> by opening and reading the shapes.xml
-   * file.
-   *
-   * @return @b bool If we should continue reading the XML (usually true).
-   *
-   * @throws IException::Io "Unable to open with read access"
-   * @throws IException::Io "Failed to open shape list XML"
-   */
-  bool ShapeList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                         const QString &qName) {
-    if (localName == "shapeList") {
-      XmlHandler handler(m_shapeList, m_project);
-
-      XmlStackedHandlerReader reader;
-      reader.pushContentHandler(&handler);
-      reader.setErrorHandler(&handler);
-
-      QString shapeListXmlPath = m_project->shapeDataRoot() + "/" + m_shapeList->path() +
-                                 "/shapes.xml";
-      QFile file(shapeListXmlPath);
-
-      if (!file.open(QFile::ReadOnly)) {
-        throw IException(IException::Io,
-                         QString("Unable to open [%1] with read access")
-                           .arg(shapeListXmlPath),
-                         _FILEINFO_);
-      }
-
-      QXmlInputSource xmlInputSource(&file);
-      if (!reader.parse(xmlInputSource))
-        throw IException(IException::Io,
-                         tr("Failed to open shape list XML [%1]").arg(shapeListXmlPath),
-                         _FILEINFO_);
-    }
-
-    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }

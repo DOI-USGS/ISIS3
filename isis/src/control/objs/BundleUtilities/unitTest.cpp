@@ -31,7 +31,6 @@ find files of those names at the top level of this repository. **/
 #include "Spice.h"
 #include "SurfacePoint.h"
 #include "Target.h"
-#include "XmlStackedHandlerReader.h"
 
 #include <QByteArray>
 #include <QDebug>
@@ -82,8 +81,8 @@ void printXml(const BundleObservationSolveSettings &);
 namespace Isis {
   class XmlHandlerTester : public BundleObservationSolveSettings {
     public:
-      XmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, FileName xmlFile)
-          : BundleObservationSolveSettings(project, reader) {
+      XmlHandlerTester(QXmlStreamReader *reader, FileName xmlFile)
+          : BundleObservationSolveSettings() {
 
         QString xmlPath(xmlFile.expanded());
         QFile file(xmlPath);
@@ -94,12 +93,13 @@ namespace Isis {
                            _FILEINFO_);
         }
 
-        QXmlInputSource xmlInputSource(&file);
-        bool success = reader->parse(xmlInputSource);
-        if (!success) {
-          throw IException(IException::Unknown,
-                           QString("Failed to parse xml file, [%1]").arg(xmlPath),
-                            _FILEINFO_);
+        if (reader->readNextStartElement()) {
+          if (reader->name() == "bundleObservationSolveSettings") {
+            readSolveSettings(reader);
+          }
+          else {
+            reader->raiseError(QObject::tr("Incorrect file"));
+          }
         }
 
       }
@@ -267,9 +267,15 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
-    XmlStackedHandlerReader reader;
-    XmlHandlerTester bsFromXml1(project, &reader, xmlFile);
+    if(!qXmlFile.open(QFile::ReadOnly | QFile::Text)){
+      throw IException(IException::Unknown,
+                        QString("Failed to parse xml file, [%1]").arg(qXmlFile.fileName()),
+                        _FILEINFO_);
+    }
+    QXmlStreamReader reader2(&qXmlFile);
+    XmlHandlerTester bsFromXml1(&reader2, xmlFile);
     printXml(bsFromXml1);
+    qXmlFile.close();
 
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
       throw IException(IException::Io,
@@ -282,9 +288,16 @@ int main(int argc, char *argv[]) {
     writer.writeEndDocument();
     qXmlFile.close();
     // read xml
+    if(!qXmlFile.open(QFile::ReadOnly | QFile::Text)){
+      throw IException(IException::Unknown,
+                        QString("Failed to parse xml file, [%1]").arg(qXmlFile.fileName()),
+                        _FILEINFO_);
+    }
+    QXmlStreamReader reader3(&qXmlFile);
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
-    XmlHandlerTester bsFromXml2(project, &reader, xmlFile);
+    XmlHandlerTester bsFromXml2(&reader3, xmlFile);
     printXml(bsFromXml2);
+    qXmlFile.close();
 
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
       throw IException(IException::Io,
@@ -298,8 +311,15 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
-    XmlHandlerTester bsFromXml3(project, &reader, xmlFile);
+    if(!qXmlFile.open(QFile::ReadOnly | QFile::Text)){
+      throw IException(IException::Unknown,
+                        QString("Failed to parse xml file, [%1]").arg(qXmlFile.fileName()),
+                        _FILEINFO_);
+    }
+    QXmlStreamReader reader4(&qXmlFile);
+    XmlHandlerTester bsFromXml3(&reader4, xmlFile);
     printXml(bsFromXml3);
+    qXmlFile.close();
 
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
       throw IException(IException::Io,
@@ -313,8 +333,15 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
-    XmlHandlerTester bsFromXml4(project, &reader, xmlFile);
+    if(!qXmlFile.open(QFile::ReadOnly | QFile::Text)){
+      throw IException(IException::Unknown,
+                        QString("Failed to parse xml file, [%1]").arg(qXmlFile.fileName()),
+                        _FILEINFO_);
+    }
+    QXmlStreamReader reader5(&qXmlFile);
+    XmlHandlerTester bsFromXml4(&reader5, xmlFile);
     printXml(bsFromXml4);
+    qXmlFile.close();
 
     if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
       throw IException(IException::Io,
@@ -328,15 +355,30 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml
     qDebug() << "Testing XML: read XML to BundleObservationSolveSettings object...";
-    XmlHandlerTester bossToFill(project, &reader, xmlFile);
-//    BundleObservationSolveSettings bossToFill(xmlFile, project, &reader);
+    if(!qXmlFile.open(QFile::ReadOnly | QFile::Text)){
+      throw IException(IException::Unknown,
+                        QString("Failed to parse xml file, [%1]").arg(qXmlFile.fileName()),
+                        _FILEINFO_);
+    }
+    QXmlStreamReader reader6(&qXmlFile);
+    XmlHandlerTester bossToFill(&reader6, xmlFile);
     printXml(bossToFill);
+    qXmlFile.close();
 
     // read xml with no attributes or values
     qDebug() << "Testing XML: read XML with no attributes or values to object...";
     FileName emptyXmlFile("./unitTest_NoElementValues.xml");
-    XmlHandlerTester bsFromEmptyXml(project, &reader, emptyXmlFile);
+    QFile xml(emptyXmlFile.expanded());
+    if(!xml.open(QFile::ReadOnly | QFile::Text)){
+      throw IException(IException::Unknown,
+                        QString("Failed to parse xml file, [%1]").arg(xml.fileName()),
+                        _FILEINFO_);
+    }
+
+    QXmlStreamReader reader7(&xml);
+    XmlHandlerTester bsFromEmptyXml(&reader7, emptyXmlFile);
     printXml(bsFromEmptyXml);
+    xml.close();
 
     qXmlFile.remove();
 

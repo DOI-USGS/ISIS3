@@ -18,7 +18,7 @@ find files of those names at the top level of this repository. **/
 #include <QMutex>
 #include <QPair>
 #include <QRect>
-#include <QTime>
+#include <QElapsedTimer>
 
 #include "Area3D.h"
 #include "Brick.h"
@@ -1866,7 +1866,7 @@ namespace Isis {
       CubeIoHandler * ioHandler, QList<Buffer *> buffersToWrite) {
     m_ioHandler = ioHandler;
     m_buffersToWrite = new QList<Buffer *>(buffersToWrite);
-    m_timer = new QTime;
+    m_timer = new QElapsedTimer;
     m_timer->start();
 
     m_ioHandler->m_writeThreadMutex->lock();

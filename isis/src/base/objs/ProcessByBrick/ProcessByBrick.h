@@ -748,12 +748,17 @@ namespace Isis {
        *
        * @internal
        */
-      class ProcessIterator : public std::iterator<
-          std::forward_iterator_tag, int> {
+      class ProcessIterator {
         public:
           ProcessIterator(int position);
           ProcessIterator(const ProcessIterator &other);
           virtual ~ProcessIterator();
+
+          using value_type = int;
+          using iterator_category = std::forward_iterator_tag;
+          using difference_type = std::ptrdiff_t;
+          using pointer = int*;
+          using reference = int&;
 
           ProcessIterator &operator++();
 

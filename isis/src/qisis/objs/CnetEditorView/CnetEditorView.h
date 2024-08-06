@@ -16,7 +16,6 @@ find files of those names at the top level of this repository. **/
 
 #include "AbstractProjectItemView.h"
 #include "FileName.h"
-#include "XmlStackedHandler.h"
 
 class QAction;
 class QToolBar;
@@ -30,7 +29,6 @@ namespace Isis {
   class FileName;
   class Project;
   class ToolPad;
-  class XmlStackedHandlerReader;
   class ProjectItemViewMenu;
 
   /**
@@ -74,36 +72,12 @@ class CnetEditorView : public AbstractProjectItemView {
     CnetEditorWidget *cnetEditorWidget();
     Control *control();
 
-    void load(XmlStackedHandlerReader *xmlReader);
     void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
   private:
     void createToolBars();
     void createMenus();
     void leaveEvent(QEvent *event);
-
-
-      /**
-       * @author 2012-09-?? Steven Lambright
-       *
-       * @internal
-       *   @history 2018-04-04 Tracie Sucharski - Implemented for CnetEditorView
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(CnetEditorView *cnetEditorView);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          CnetEditorView *m_cnetEditorView; //!< The view we are working with
-      };
 
   private:
     QPointer<CnetEditorWidget> m_cnetEditorWidget;

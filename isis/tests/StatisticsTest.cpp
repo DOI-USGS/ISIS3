@@ -4,7 +4,6 @@
 #include "Preference.h"
 #include "Project.h"
 #include "Statistics.h"
-#include "XmlStackedHandlerReader.h"
 
 #include <QDebug>
 #include <QDataStream>

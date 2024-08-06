@@ -104,7 +104,7 @@ namespace Isis {
         geos::geom::Polygon *newPoly = globalFactory->createPolygon(
                                          globalFactory->createLinearRing(*xycoords), std::move(holes)).release();
 
-        if(newPoly->isValid() && !newPoly->isEmpty() && newPoly->getArea() > 1.0e-14) {
+        if(!newPoly->isEmpty() && newPoly->getArea() > 1.0e-14) {
           xyPolys->push_back(newPoly);
         }
         else {
@@ -132,7 +132,6 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
-
     } // end else
   }
 
@@ -587,6 +586,7 @@ namespace Isis {
       delete the180Polys;
       the180Polys = NULL;
 
+      result->normalize();
       geos::geom::MultiPolygon *fixedResult = FixSeam(result);
       delete result;
       result = NULL;

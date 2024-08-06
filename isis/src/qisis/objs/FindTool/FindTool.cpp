@@ -523,7 +523,7 @@ namespace Isis {
         pen.setWidth(3);
         pen.setStyle(Qt::SolidLine);
         painter->setPen(pen);
-        painter->drawRoundRect(x - 2, y - 2, 4, 4);
+        painter->drawRoundedRect(x - 2, y - 2, 4, 4, 1, 1, Qt::RelativeSize);
       }
     }
   }
@@ -631,9 +631,10 @@ namespace Isis {
    */
   Distance FindTool::distancePerPixel(MdiCubeViewport *viewport,
                                       double lat, double lon) {
-    UniversalGroundMap *groundMap = viewport->universalGroundMap();
+    // UniversalGroundMaps default to camera priority, so create a new one so that we can use projection if it exists.
+    std::unique_ptr<UniversalGroundMap> groundMap(new UniversalGroundMap(*(viewport->cube()), UniversalGroundMap::ProjectionFirst));
     Distance viewportResolution;
-    if (viewport->camera() != NULL){
+    if (groundMap->Camera() != NULL){
       if (groundMap->Camera()->target()->isSky()) {
         return Distance(groundMap->Camera()->RaDecResolution(), Distance::Units::Meters);
       }

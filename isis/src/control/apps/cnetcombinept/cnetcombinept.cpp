@@ -479,7 +479,7 @@ namespace Isis{
         mergeLogStream << mergeLogIt.key() << ","
                        << startingPointSizes[mergeLogIt.key()] << ","
                        << endingPointSizes[mergeLogIt.key()] << ","
-                       << QStringList(mergeLogIt.value().toList()).join(" ")
+                       << QStringList(mergeLogIt.value().values()).join(" ")
                        << "\n";
       }
 

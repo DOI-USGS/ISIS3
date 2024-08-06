@@ -17,7 +17,7 @@ find files of those names at the top level of this repository. **/
 
 class QFile;
 class QMutex;
-class QTime;
+class QElapsedTimer;
 template <typename A> class QList;
 template <typename A, typename B> class QMap;
 template <typename A, typename B> struct QPair;
@@ -209,7 +209,7 @@ namespace Isis {
           //! The buffers that need pushed into the IO handler; we own these
           QList<Buffer * > * m_buffersToWrite;
           //! Used to calculate the lifetime of an instance of this class
-          QTime *m_timer;
+          QElapsedTimer *m_timer;
       };
 
 

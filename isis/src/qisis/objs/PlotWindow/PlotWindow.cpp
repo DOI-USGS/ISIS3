@@ -28,6 +28,7 @@
 #include <QSet>
 #include <QTableWidget>
 #include <QToolBar>
+#include <QPageSize>
 
 #include "Cube.h"
 #include "CubePlotCurve.h"
@@ -574,7 +575,8 @@ namespace Isis {
     /* Initialize a printer*/
     static QPrinter *printer = NULL;
     if (printer == NULL) printer = new QPrinter;
-    printer->setPageSize(QPrinter::Letter);
+    QPageSize pageSize(QPageSize::Letter);
+    printer->setPageSize(pageSize);
     printer->setColorMode(QPrinter::Color);
 
     QPrintDialog printDialog(printer, (QWidget *)parent());
@@ -1464,11 +1466,9 @@ namespace Isis {
             qRound( ((curveIndex * percentPerCurve) +
                      (inverseDataIndex * percentPerDataIndex)) * 1000.0));
 
-        // It turns out that qBinaryFind(container, value) is NOT the same as
-        //   qBinaryFind(container.begin(), container.end(), value). Use the one
-        //   that works right.
+
         QList<QString>::const_iterator foundPos =
-            qBinaryFind(xAxisPoints.begin(), xAxisPoints.end(), xValueString);
+            std::lower_bound(xAxisPoints.begin(), xAxisPoints.end(), xValueString);
 
         if (foundPos == xAxisPoints.end()) {
           bool inserted = false;
@@ -1488,7 +1488,7 @@ namespace Isis {
       }
     }
 
-    std::sort(xAxisPoints.begin(), xAxisPoints.end(), &numericStringLessThan);
+    sort(xAxisPoints.begin(), xAxisPoints.end(), &numericStringLessThan);
 
     m_tableWindow->table()->setRowCount(xAxisPoints.size());
 
