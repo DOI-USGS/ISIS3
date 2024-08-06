@@ -165,6 +165,10 @@ namespace Isis {
         }
         else {
 
+          // Update the image parameters
+          QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
+
+          // Loop through images
           for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
             Process p;
             CubeAttributeInput inAtt;
@@ -183,9 +187,6 @@ namespace Isis {
               break;
             }
 
-            //  Update the image parameters
-            QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
-
             if (c->hasBlob("CSMState", "String")) {
               std::cout << "Cube has CSMState blob" << std::endl;
               Blob csmStateBlob("CSMState", "String");
@@ -197,65 +198,83 @@ namespace Isis {
               csmStateBlob.Label().addComment(jigComment);
               c->write(csmStateBlob);
             }
-            else {
-              if (ui.WasEntered("ADJUSTMENT_OUTPUT")) {
-                QString adjustmentOutputFilename = ui.GetFileName("ADJUSTMENT_OUTPUT");
-                File file(adjustmentOutputFilename.toStdString(), File::Truncate);
 
-                // Write bundle adjustment values to cube
-                Table cmatrix = bundleAdjustment->cMatrix(i);
-                cmatrix.Label().addComment(jigComment);
-                Table spvector = bundleAdjustment->spVector(i);
-                spvector.Label().addComment(jigComment);
-                c->write(cmatrix);
-                c->write(spvector);
-
-                QString serialNumber = bundleAdjustment->serialNumberList()->serialNumber(i);
-                QString cmatrixName = cmatrix.Name();
-                QString spvectorName = spvector.Name();
-
-                std::string cmatrixKey = serialNumber.toStdString() + "/" + cmatrixName.toStdString();
-                std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
-
-                // Save bundle adjustment values to HDF5 file
-                std::string cmatrixTableStr = Table::toString(cmatrix).toStdString();
-                DataSet dataset = file.createDataSet<std::string>(cmatrixKey, cmatrixTableStr);
-                std::string spvectorTableStr = Table::toString(spvector).toStdString();
-                dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
-              } else if (ui.WasEntered("ADJUSTMENT_INPUT")) {
-                QString adjustmentInputFilename = ui.GetFileName("ADJUSTMENT_INPUT");
-                File file(adjustmentInputFilename.toStdString(), File::ReadOnly);
-                Table cmatrix = bundleAdjustment->cMatrix(i);
-                Table spvector = bundleAdjustment->spVector(i);
-
-                QString serialNumber = bundleAdjustment->serialNumberList()->serialNumber(i);
-                QString cmatrixName = cmatrix.Name();
-                QString spvectorName = spvector.Name();
-
-                std::string cmatrixKey = serialNumber.toStdString() + "/" + cmatrixName.toStdString();
-                std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
-
-                // Read h5 into table
-                DataSet datasetRead = file.getDataSet(cmatrixKey);
-                auto cmatrixData = datasetRead.read<std::string>();
-                Table cmatrixTable(cmatrixName, cmatrixData, ',');
-
-                datasetRead = file.getDataSet(spvectorKey);
-                auto spvectorData = datasetRead.read<std::string>();
-                Table spvectorTable(spvectorName, spvectorData, ',');
-
-                // Write bundle adjustment values out
-                cmatrixTable.Label().addComment(jigComment);
-                c->write(cmatrixTable);
-                spvectorTable.Label().addComment(jigComment);
-                c->write(spvectorTable);
-              } else {
-                gp += PvlKeyword("Status","If UPDATE=True then must specify either ADJUSTMENT_OUTPUT or ADJUSTMENT_INPUT.");
-                QString msg = "Either ADJUSTMENT_OUTPUT or ADJUSTMENT_INPUT is missing.";
-                throw IException(IException::Unknown, msg, _FILEINFO_);
-              }
-            }
             p.WriteHistory(*c);
+          }
+
+          // Check for adjustment files
+          if (ui.WasEntered("ADJUSTMENT_OUTPUT")) {
+            QString adjustmentOutputFilename = ui.GetFileName("ADJUSTMENT_OUTPUT");
+            File file(adjustmentOutputFilename.toStdString(), File::Truncate);
+
+            // Loop through images
+            for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
+              Process p;
+              CubeAttributeInput inAtt;
+              Cube *c = p.SetInputCube(bundleAdjustment->fileName(i), inAtt, ReadWrite);
+
+              // Write bundle adjustment values to cube
+              Table cmatrix = bundleAdjustment->cMatrix(i);
+              cmatrix.Label().addComment(jigComment);
+              Table spvector = bundleAdjustment->spVector(i);
+              spvector.Label().addComment(jigComment);
+              c->write(cmatrix);
+              c->write(spvector);
+
+              QString serialNumber = bundleAdjustment->serialNumberList()->serialNumber(i);
+              QString cmatrixName = cmatrix.Name();
+              QString spvectorName = spvector.Name();
+
+              std::string cmatrixKey = serialNumber.toStdString() + "/" + cmatrixName.toStdString();
+              std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
+
+              // Save bundle adjustment values to HDF5 file
+              std::string cmatrixTableStr = Table::toString(cmatrix).toStdString();
+              DataSet dataset = file.createDataSet<std::string>(cmatrixKey, cmatrixTableStr);
+              std::string spvectorTableStr = Table::toString(spvector).toStdString();
+              dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
+
+              p.WriteHistory(*c);
+            }
+          } else if (ui.WasEntered("ADJUSTMENT_INPUT")) {
+            QString adjustmentInputFilename = ui.GetFileName("ADJUSTMENT_INPUT");
+            File file(adjustmentInputFilename.toStdString(), File::ReadOnly);
+            for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
+              Process p;
+              CubeAttributeInput inAtt;
+              Cube *c = p.SetInputCube(bundleAdjustment->fileName(i), inAtt, ReadWrite);
+              
+              Table cmatrix = bundleAdjustment->cMatrix(i);
+              Table spvector = bundleAdjustment->spVector(i);
+
+              QString serialNumber = bundleAdjustment->serialNumberList()->serialNumber(i);
+              QString cmatrixName = cmatrix.Name();
+              QString spvectorName = spvector.Name();
+
+              std::string cmatrixKey = serialNumber.toStdString() + "/" + cmatrixName.toStdString();
+              std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
+
+              // Read h5 into table
+              DataSet datasetRead = file.getDataSet(cmatrixKey);
+              auto cmatrixData = datasetRead.read<std::string>();
+              Table cmatrixTable(cmatrixName, cmatrixData, ',');
+
+              datasetRead = file.getDataSet(spvectorKey);
+              auto spvectorData = datasetRead.read<std::string>();
+              Table spvectorTable(spvectorName, spvectorData, ',');
+
+              // Write bundle adjustment values out
+              cmatrixTable.Label().addComment(jigComment);
+              c->write(cmatrixTable);
+              spvectorTable.Label().addComment(jigComment);
+              c->write(spvectorTable);
+
+              p.WriteHistory(*c);
+            }
+          } else {
+            gp += PvlKeyword("Status","If UPDATE=True then must specify either ADJUSTMENT_OUTPUT or ADJUSTMENT_INPUT.");
+            QString msg = "Either ADJUSTMENT_OUTPUT or ADJUSTMENT_INPUT is missing.";
+            throw IException(IException::Unknown, msg, _FILEINFO_);
           }
           gp += PvlKeyword("Status", "Camera pointing updated");
         }
