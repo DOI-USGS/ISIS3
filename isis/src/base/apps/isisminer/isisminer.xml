@@ -4694,7 +4694,7 @@ End
         the number of keywords created/Resource. This allows the jigsaw residual 
         file to read the rejected column.
     </change>
-    <change name="Ken Edmundson" date="2024-07-17">
+    <change name="Ken Edmundson" date="2024-08-07">
         Converted isisminer to callable function. Also converted all Makefile
         tests to gtest format. Moved some data from isis data area to
         "isis/tests/data/isisminer".

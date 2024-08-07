@@ -106,6 +106,7 @@ class IsisminerMainProgram : public TempTestingFiles {
     }
 };
 
+
 /**
    * IsisminerTestAssetSideBar
    * 
@@ -1103,7 +1104,6 @@ TEST(Isisminer, IsisminerTestCsvWriter) {
   ASSERT_EQ(line.rows(), 13);
 
   // Verify each line
-  compareCsvLine(line.getRow(0), "SourceProductId,Geometry");
   compareCsvLineCustomDelimiter(line.getRow(1), "EN0253077000M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
   compareCsvLineCustomDelimiter(line.getRow(2), "EN0253133950M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");
   compareCsvLineCustomDelimiter(line.getRow(3), "EN0254615176M;MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))", ";");

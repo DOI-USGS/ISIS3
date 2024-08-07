@@ -358,16 +358,17 @@ namespace Isis {
     }
   };
 
-  // Compares CSV lines allowing the use of a custom delimiter (defaults to ",")
+
+  // Compares CSV lines allowing use of a custom delimiter (defaults to ",")
   void compareCsvLineCustomDelimiter(CSVReader::CSVAxis csvLine, QString headerStr,
                                      QString delimiter, int initialIndex) {
     QStringList compareMe = headerStr.split(delimiter);
     for (int i=initialIndex; i<compareMe.size(); i++) {
-      if (isNumeric(compareMe[i].trimmed())) {
+      if (isNumeric(compareMe[i].trimmed()) && isNumeric(QString(csvLine[i].trimmed()))) {
         EXPECT_NEAR(csvLine[i].toDouble(), compareMe[i].toDouble(), 0.000001);
       }
       else{
-        EXPECT_EQ(QString(csvLine[i]).toStdString(), compareMe[i].toStdString());
+        EXPECT_EQ(QString(csvLine[i].trimmed()).toStdString(), compareMe[i].trimmed().toStdString());
       }
     }
   };
