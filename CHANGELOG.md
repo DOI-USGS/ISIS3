@@ -46,6 +46,7 @@ release.
 - Pinned `suitesparse` dependency version to maximum not including 7.7.0 [#5496](https://github.com/DOI-USGS/ISIS3/issues/5496)
 
 ### Fixed
+- Fixed a bug in noproj.cpp which left a persisent lbl file after running noproj. [#5577] (https://github.com/DOI-USGS/ISIS3/issues/5577)
 - Fixed a bug in QVIEW's FindTool in which camera was prioritized over projction [#5508](https://github.com/DOI-USGS/ISIS3/issues/5508)
 - Fixed a bug in PolygonTools in which the program exited before attempting to fix an invalid Polygon [#5520](https://github.com/DOI-USGS/ISIS3/issues/5520)
 - Fixed a bug in QVIEW's Stretch tool where the default min/max type was not an available option [#5289](https://github.com/DOI-USGS/ISIS3/issues/5289)
