@@ -10,6 +10,7 @@ find files of those names at the top level of this repository. **/
 #include "Buffer.h"
 #include "Camera.h"
 #include "iTime.h"
+#include "RestfulSpice.h"
 #include "SpecialPixel.h"
 #include "Spice.h"
 #include "TextFile.h"
@@ -483,11 +484,8 @@ namespace Isis {
           QString sclkName(sclk.expanded());
   
           NaifStatus::CheckErrors();
-          furnsh_c(sclkName.toLatin1().data());
-          NaifStatus::CheckErrors();
   
-          double obsStartTime;
-          scs2e_c(-77, startTime.toLatin1().data(), &obsStartTime);
+          double obsStartTime = Isis::RestfulSpice::strSclkToEt(-77, startTime.toStdString(), "galileo", false);
           spicegll.setTime(obsStartTime);
           double sunv[3];
           spicegll.sunPosition(sunv);
