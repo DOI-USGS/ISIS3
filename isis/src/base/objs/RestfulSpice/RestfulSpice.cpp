@@ -25,7 +25,7 @@ namespace Isis::RestfulSpice{
       json out = spiceAPIQuery("getTargetStates", args);
       return out["body"]["return"].get<std::vector<std::vector<double>>>();
     }else{
-      return SpiceQL::getTargetStates(ets, target, observer, frame, abcorr, mission, ckQuality, spkQuality, false);
+      return SpiceQL::getTargetStates(ets, target, observer, frame, abcorr, mission, ckQuality, spkQuality, true);
     }
   }
 
@@ -41,7 +41,7 @@ namespace Isis::RestfulSpice{
       json out = spiceAPIQuery("getTargetOrientations", args);
       return out["body"]["return"].get<std::vector<std::vector<double>>>();
     }else{
-      return SpiceQL::getTargetOrientations(ets, toFrame, refFrame, mission, ckQuality, false);
+      return SpiceQL::getTargetOrientations(ets, toFrame, refFrame, mission, ckQuality, true);
     }
   }
 
@@ -55,7 +55,7 @@ namespace Isis::RestfulSpice{
       json out = spiceAPIQuery("strSclkToEt", args);
       return out["body"]["return"].get<double>();
     }else{
-      return SpiceQL::strSclkToEt(frameCode, sclk, mission, false);
+      return SpiceQL::strSclkToEt(frameCode, sclk, mission, true);
     }
   }
 
@@ -69,7 +69,7 @@ namespace Isis::RestfulSpice{
       json out = spiceAPIQuery("doubleSclkToEt", args);
       return out["body"]["return"].get<double>();
    }else{
-      return SpiceQL::doubleSclkToEt(frameCode, sclk, mission, false);
+      return SpiceQL::doubleSclkToEt(frameCode, sclk, mission, true);
     }
   }
 
@@ -82,8 +82,38 @@ namespace Isis::RestfulSpice{
       return out["body"]["return"].get<double>();
 
     }else{
-      return SpiceQL::utcToEt(utc, false);
+      return SpiceQL::utcToEt(utc, true);
     }
+  }
+
+
+  std::string etToUtc(double et, std::string format, double precision, bool useWeb){
+    if (useWeb){
+      json args = json::object({
+        {"et", et},
+        {"format", format},
+        {"precision", precision}
+      });
+      json out = spiceAPIQuery("etToUtc", args);
+      return out["body"]["return"].get<std::string>();
+    }else{
+      return SpiceQL::etToUtc(et, format, precision, true);
+    }
+  }
+
+  std::string etToStrSclk(int frameCode, double et, std::string mission, bool useWeb) {
+    if (useWeb){
+      json args = json::object({
+        {"frameCode", frameCode},
+        {"et", et},
+        {"mission", mission}
+      });
+      json out = spiceAPIQuery("etToStrSclk", args);
+      return out["body"]["return"].get<std::string>();
+    }else{
+      return SpiceQL::etToStrSclk(frameCode, et, mission, true);
+    }
+
   }
 
   int translateNameToCode(std::string frame, std::string mission, bool useWeb){
@@ -95,7 +125,7 @@ namespace Isis::RestfulSpice{
       json out = spiceAPIQuery("translateNameToCode", args);
       return out["body"]["return"].get<int>();
     }else{
-      return SpiceQL::translateNameToCode(frame, mission, false);
+      return SpiceQL::translateNameToCode(frame, mission, true);
     }
   }
 
@@ -108,7 +138,7 @@ namespace Isis::RestfulSpice{
       json out = spiceAPIQuery("translateCodeToame", args);
       return out["body"]["return"].get<std::string>();
     }else{
-      return SpiceQL::translateCodeToName(code, mission, false);
+      return SpiceQL::translateCodeToName(code, mission, true);
     }
   }
 
@@ -122,7 +152,7 @@ namespace Isis::RestfulSpice{
       return out["body"]["return"].get<std::vector<int>>();
 
     }else{
-      return SpiceQL::getFrameInfo(frame, mission, false);
+      return SpiceQL::getFrameInfo(frame, mission, true);
     }
   }
 
@@ -135,7 +165,7 @@ namespace Isis::RestfulSpice{
       json out = spiceAPIQuery("getTargetFrameInfo", args);
       return out["body"]["return"];
     }else{
-      return SpiceQL::getTargetFrameInfo(targetId, mission, false);
+      return SpiceQL::getTargetFrameInfo(targetId, mission, true);
     }
   }
 
@@ -148,7 +178,7 @@ namespace Isis::RestfulSpice{
       json out = spiceAPIQuery("findMissionKeywords", args);
       return out["body"]["return"];
     }else{
-      return SpiceQL::findMissionKeywords(key, mission, false);
+      return SpiceQL::findMissionKeywords(key, mission, true);
     }
   }
 
@@ -161,7 +191,7 @@ namespace Isis::RestfulSpice{
       json out = spiceAPIQuery("findTargetKeywords", args);
       return out["body"]["return"];
     }else{
-      return SpiceQL::findTargetKeywords(key, mission, false);
+      return SpiceQL::findTargetKeywords(key, mission, true);
     }
   }
 
@@ -176,7 +206,7 @@ namespace Isis::RestfulSpice{
       json out = spiceAPIQuery("frameTrace", args);
       return out["body"]["return"].get<std::vector<std::vector<int>>>();
     }else{
-      return SpiceQL::frameTrace(et, initialFrame, mission, ckQuality, false);
+      return SpiceQL::frameTrace(et, initialFrame, mission, ckQuality, true);
     }
   }
 
@@ -192,13 +222,13 @@ namespace Isis::RestfulSpice{
       json out = spiceAPIQuery("extractExactCkTimes", args);
       return out["body"]["return"].get<std::vector<double>>();
     }else{
-      return SpiceQL::extractExactCkTimes(observStart, observEnd, targetFrame, mission, ckQuality, false);
+      return SpiceQL::extractExactCkTimes(observStart, observEnd, targetFrame, mission, ckQuality, true);
     }
   }
 
   json spiceAPIQuery(std::string functionName, json args){
     restincurl::Client client;
-    std::string queryString = "http://10.12.56.68/" + functionName +"/?";
+    std::string queryString = "https://spiceql-slot1.prod-asc.chs.usgs.gov/" + functionName +"/?";
 
     for (auto x : args.items())
     {
@@ -222,6 +252,7 @@ namespace Isis::RestfulSpice{
         queryString+= "&";
     }
     json j;
+    std::cout << queryString << std::endl;
     // @TODO throw exception if no json or invalid json is returned
     client.Build()->Get(queryString).Option(CURLOPT_FOLLOWLOCATION, 1L).AcceptJson().WithCompletion([&](const restincurl::Result& result) {
       j = json::parse(result.body);
