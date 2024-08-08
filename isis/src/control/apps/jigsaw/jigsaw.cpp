@@ -261,10 +261,12 @@ namespace Isis {
               spvectorTable.Label().addComment(jigComment);
               c->write(spvectorTable);
             } else {
-              std::cout << "ADJUSTMENT ERROR????" << std::endl;
-              gp += PvlKeyword("Status","If UPDATE=True then must specify either ADJUSTMENT_OUTPUT or ADJUSTMENT_INPUT or must be csminit'd.");
-              QString msg = "If UPDATE=True, must run csminit on cubes or specify either ADJUSTMENT_OUTPUT or ADJUSTMENT_INPUT.";
-              throw IException(IException::Unknown, msg, _FILEINFO_);
+              Table cmatrix = bundleAdjustment->cMatrix(i);
+              cmatrix.Label().addComment(jigComment);
+              Table spvector = bundleAdjustment->spVector(i);
+              spvector.Label().addComment(jigComment);
+              c->write(cmatrix);
+              c->write(spvector);
             }
             p.WriteHistory(*c);
           }
