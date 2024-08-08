@@ -168,6 +168,24 @@ namespace Isis {
           // Update the image parameters
           QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
 
+          // Need to prep the adjustment file first
+          QString adjustmentType;
+          unsigned adjustmentFileEnum = 0;
+          QString adjustmentFilename;
+          bool placeholderAdjustmentFileExists = false;
+          if (ui.WasEntered("ADJUSTMENT_OUTPUT")) {
+            adjustmentFilename = ui.GetFileName("ADJUSTMENT_OUTPUT");
+            adjustmentFileEnum = File::Truncate;
+          } else if (ui.WasEntered("ADJUSTMENT_INPUT")) {
+            adjustmentFilename = ui.GetFileName("ADJUSTMENT_INPUT");
+            adjustmentFileEnum = File::ReadOnly;
+          } else {
+            placeholderAdjustmentFileExists = true;
+            adjustmentFilename = "/tmp/placeholder_adj.tmp";
+            adjustmentFileEnum = File::Create;
+          }
+          File file(adjustmentFilename.toStdString(), adjustmentFileEnum);
+
           // Loop through images
           for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
             Process p;
@@ -188,7 +206,6 @@ namespace Isis {
             }
 
             if (c->hasBlob("CSMState", "String")) {
-              std::cout << "Cube has CSMState blob" << std::endl;
               Blob csmStateBlob("CSMState", "String");
               // Read the BLOB from the cube to propagate things like the model
               // and plugin name
@@ -197,22 +214,7 @@ namespace Isis {
               csmStateBlob.setData(modelState.c_str(), modelState.size());
               csmStateBlob.Label().addComment(jigComment);
               c->write(csmStateBlob);
-            }
-
-            p.WriteHistory(*c);
-          }
-
-          // Check for adjustment files
-          if (ui.WasEntered("ADJUSTMENT_OUTPUT")) {
-            QString adjustmentOutputFilename = ui.GetFileName("ADJUSTMENT_OUTPUT");
-            File file(adjustmentOutputFilename.toStdString(), File::Truncate);
-
-            // Loop through images
-            for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
-              Process p;
-              CubeAttributeInput inAtt;
-              Cube *c = p.SetInputCube(bundleAdjustment->fileName(i), inAtt, ReadWrite);
-
+            } else if (ui.WasEntered("ADJUSTMENT_OUTPUT")) {
               // Write bundle adjustment values to cube
               Table cmatrix = bundleAdjustment->cMatrix(i);
               cmatrix.Label().addComment(jigComment);
@@ -233,17 +235,7 @@ namespace Isis {
               DataSet dataset = file.createDataSet<std::string>(cmatrixKey, cmatrixTableStr);
               std::string spvectorTableStr = Table::toString(spvector).toStdString();
               dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
-
-              p.WriteHistory(*c);
-            }
-          } else if (ui.WasEntered("ADJUSTMENT_INPUT")) {
-            QString adjustmentInputFilename = ui.GetFileName("ADJUSTMENT_INPUT");
-            File file(adjustmentInputFilename.toStdString(), File::ReadOnly);
-            for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
-              Process p;
-              CubeAttributeInput inAtt;
-              Cube *c = p.SetInputCube(bundleAdjustment->fileName(i), inAtt, ReadWrite);
-              
+            } else if (ui.WasEntered("ADJUSTMENT_INPUT")) {
               Table cmatrix = bundleAdjustment->cMatrix(i);
               Table spvector = bundleAdjustment->spVector(i);
 
@@ -268,13 +260,28 @@ namespace Isis {
               c->write(cmatrixTable);
               spvectorTable.Label().addComment(jigComment);
               c->write(spvectorTable);
-
-              p.WriteHistory(*c);
+            } else {
+              std::cout << "ADJUSTMENT ERROR????" << std::endl;
+              gp += PvlKeyword("Status","If UPDATE=True then must specify either ADJUSTMENT_OUTPUT or ADJUSTMENT_INPUT or must be csminit'd.");
+              QString msg = "If UPDATE=True, must run csminit on cubes or specify either ADJUSTMENT_OUTPUT or ADJUSTMENT_INPUT.";
+              throw IException(IException::Unknown, msg, _FILEINFO_);
             }
-          } else {
-            gp += PvlKeyword("Status","If UPDATE=True then must specify either ADJUSTMENT_OUTPUT or ADJUSTMENT_INPUT.");
-            QString msg = "Either ADJUSTMENT_OUTPUT or ADJUSTMENT_INPUT is missing.";
-            throw IException(IException::Unknown, msg, _FILEINFO_);
+            p.WriteHistory(*c);
+          }
+          
+          // Check if temp adjustment file was created
+          // Delete if so
+          if (placeholderAdjustmentFileExists) {
+            int status = remove(adjustmentFilename.toStdString().c_str());
+            if (status != 0) {
+              PvlGroup tempAdjustmentFileWarning("TemporaryAdjustmentFileWarning");
+              tempAdjustmentFileWarning.addKeyword(PvlKeyword("Warning", "The placeholder adjustment file \
+                                                                              " + adjustmentFilename + "was \
+                                                                              not removed properly."));
+              if(log) {
+                log->addLogGroup(tempAdjustmentFileWarning);
+              }
+            }
           }
           gp += PvlKeyword("Status", "Camera pointing updated");
         }

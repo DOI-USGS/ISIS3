@@ -680,36 +680,6 @@
         </filter>
       </parameter>
 
-      <parameter name="ADJUSTMENT_OUTPUT">
-        <type>filename</type>
-        <internalDefault>none</internalDefault>
-        <fileMode>input</fileMode>
-        <brief>
-          Outputs adjustment values
-        </brief>
-        <description>
-          "Outputs adjustment values"
-        </description>
-        <filter>
-          *.h5
-        </filter>
-      </parameter>
-
-      <parameter name="ADJUSTMENT_INPUT">
-        <type>filename</type>
-        <internalDefault>none</internalDefault>
-        <fileMode>input</fileMode>
-        <brief>
-          Reads in adjustment values
-        </brief>
-        <description>
-          "Reads in adjustment values"
-        </description>
-        <filter>
-          *.h5
-        </filter>
-      </parameter>
-
       <parameter name="HELDLIST">
         <type>filename</type>
         <internalDefault>none</internalDefault>
@@ -915,7 +885,9 @@
           from the solution if the adjustment converges.  The results are written
           to the <def>SPICE</def> blobs attached to the cube, overwriting the previous
           values.  If this option is not selected, the <def>cube</def> files are not
-          changed.  All other output files are still created.
+          changed.  All other output files are still created. Unless the cubes have a
+          CSMState blob attached, must either define ADJUSTMENT_OUTPUT or ADJUSTMENT_INPUT
+          if UPDATE is true.
         </description>
         <type>boolean</type>
         <default>
@@ -1864,6 +1836,36 @@
           <default>
             <item>no</item>
           </default>
+        </parameter>
+
+        <parameter name="ADJUSTMENT_OUTPUT">
+          <type>filename</type>
+          <internalDefault>none</internalDefault>
+          <fileMode>input</fileMode>
+          <brief>
+            Outputs adjustment values
+          </brief>
+          <description>
+            "Outputs adjustment values"
+          </description>
+          <filter>
+            *.h5
+          </filter>
+        </parameter>
+
+        <parameter name="ADJUSTMENT_INPUT">
+          <type>filename</type>
+          <internalDefault>none</internalDefault>
+          <fileMode>input</fileMode>
+          <brief>
+            Reads in adjustment values
+          </brief>
+          <description>
+            "Reads in adjustment values"
+          </description>
+          <filter>
+            *.h5
+          </filter>
         </parameter>
       </group>
 

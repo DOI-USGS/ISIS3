@@ -491,7 +491,8 @@ TEST_F(ObservationPair, FunctionalTestJigsawCamSolveAll) {
   QString outCnetFileName = prefix.path() + "/outTemp.net";
   QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName,
                            "observations=yes", "update=yes", "Cksolvedegree=3",
-                           "Camsolve=all", "twist=no", "Spsolve=none", "Radius=no", "imagescsv=on", "file_prefix="+prefix.path()+"/"};
+                           "Camsolve=all", "twist=no", "Spsolve=none", "Radius=no", "imagescsv=on", "file_prefix="+prefix.path()+"/",
+                           "adjustment_output=adj_temp.h5"};
 
   UserInterface options(APP_XML, args);
 
@@ -1744,7 +1745,8 @@ TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
                             "cnet=" + controlNetPath,
                             "fromlist=" + cubeListFile,
                             "onet=" + tempDir.path() + "/no_lidar.net",
-                            "file_prefix=" + tempDir.path() + "/no_lidar"};
+                            "file_prefix=" + tempDir.path() + "/no_lidar",
+                            "adjustment_output=" + tempDir.path() + "/adj_out.h5"};
 
   UserInterface ui1(APP_XML, args1);
   jigsaw(ui1);
@@ -1768,7 +1770,8 @@ TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
                             "lidardata=" + lidarDataPath,
                             "olidardata=" + tempDir.path() + "/lidar_out.json",
                             "olidarformat=json",
-                            "lidar_csv=yes"};
+                            "lidar_csv=yes",
+                            "adjustment_output=" + tempDir.path() + "/adj_out.h5"};
 
   UserInterface ui2(APP_XML, args2);
   jigsaw(ui2);
