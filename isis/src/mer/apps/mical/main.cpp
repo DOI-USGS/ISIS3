@@ -8,15 +8,16 @@ find files of those names at the top level of this repository. **/
 
 #define GUIHELPERS
 
-#include "Isis.h"
-#include "ProcessByLine.h"
-#include "Pvl.h"
-#include "UserInterface.h"
-#include "IException.h"
-#include "MiCalibration.h"
-#include "iTime.h"
 #include "Brick.h"
 #include "Histogram.h"
+#include "IException.h"
+#include "Isis.h"
+#include "iTime.h"
+#include "MiCalibration.h"
+#include "ProcessByLine.h"
+#include "Pvl.h"
+#include "RestfulSpice.h"
+#include "UserInterface.h"
 
 #include <cmath>
 #include <map>
@@ -92,23 +93,17 @@ void IsisMain() {
   }
 
   iTime startTime = gbl::mi->StartTime();
-  double ETstartTime = startTime.Et();
   //Get the distance between Mars and the Sun at the given time in
   // Astronomical Units (AU)
-  QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
-  furnsh_c(bspKernel.toLatin1().data());
-  QString satKernel = p.MissionData("base", "/kernels/spk/mar???.bsp", true);
-  furnsh_c(satKernel.toLatin1().data());
-  QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-  furnsh_c(pckKernel.toLatin1().data());
+
   double sunpos[6], lt;
-  spkezr_c("sun", ETstartTime, "iau_mars", "LT+S", "mars", sunpos, &lt);
+  std::vector<double> etStart = {startTime.Et()};
+  std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, "mars", "sun", "iau_mars", "LT+S", "mer2", "reconstructed", "reconstructed", false);
+  std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunpos);
+
   double dist = vnorm_c(sunpos);
   double kmperAU = 1.4959787066E8;
   gbl::sunAU = dist / kmperAU;
-  unload_c(bspKernel.toLatin1().data());
-  unload_c(satKernel.toLatin1().data());
-  unload_c(pckKernel.toLatin1().data());
 
 
   //See what calibtation values the user wants to apply
