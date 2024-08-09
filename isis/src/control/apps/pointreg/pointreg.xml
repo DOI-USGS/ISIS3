@@ -888,22 +888,25 @@ every other measure in the point to that reference location.  An
       </description>
       <terminalInterface>
         <commandLine>
-          files=../IN/fileList.lis cnet=../IN/controlNet.net
-          template=../IN/autoRegTemplate.def
-          to=../OUT/discardIgnoredAndUnmeasured.net
-          flatfile=../OUT/discardIgnoredAndUnmeasured.txt
-          outputignored=no outputunmeasured=no
+          fromlist=fileList.lis 
+          cnet=controlNet.net 
+          deffile=autoRegTemplate.def 
+          onet=discardIgnoredAndUnmeasured.net 
+          flatfile=discardIgnoredAndUnmeasured.txt 
+          outputignored=no 
+          outputfailed=no
         </commandLine>
         <description>
            This example shows the use of pointreg with the OUTPUTIGNORED,
-           OUTPUTUNMEASURED and REGISTERIGNOREDONLY parameters set to "False".
-           This implies that only "valid" points will be  registered and
-           included inthe output control network.
+           and OUTPUTFAILED parameters set to "False", and the POINTS 
+           parameter set to the default "NONIGNORED". This implies that 
+           only "valid" points will be registered and included in the 
+           output control network.
         </description>
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
-          <image src="assets/images/discardIgnoredAndUnmeasuredGui.jpg" width="652" height="550">
+          <image src="assets/images/ex3discardIgnoredAndUnmeasuredGui.png" width="664" height="1239">
             <brief>
               Example GUI
             </brief>
@@ -912,7 +915,7 @@ every other measure in the point to that reference location.  An
               registration that omits ignored control points and unmeasured
               control measures from the output.
             </description>
-            <thumbnail src="assets/thumbs/discardIgnoredAndUnmeasuredGuiThumb.jpg" width="200" height="169" caption="pointreg GUI" />
+            <thumbnail src="assets/thumbs/ex3discardIgnoredAndUnmeasuredGuiThumb.png" width="83" height="155" caption="pointreg GUI" />
           </image>
         </guiInterface>
       </guiInterfaces>
