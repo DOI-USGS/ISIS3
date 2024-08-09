@@ -80,6 +80,16 @@ every other measure in the point to that reference location.  An
       measures within a control point are ignored (Ignore=True), then the entire
       control point is set to ignored (Ignore=True) at the control point level.
     </p>
+
+    <p>
+      ISIS programs that must be run prior to running <i>autoseed</i>:
+    </p>
+    <ul>
+      <li>spiceinit</li>
+      <li>footprintint</li>
+      <li>findimageoverlaps</li>
+      <li>autoseed</li>
+    </ul>
   </description>
 
   <category>
@@ -638,32 +648,33 @@ every other measure in the point to that reference location.  An
       </description>
       <terminalInterface>
         <commandLine>
-          files=../IN/fileList.lis cnet=../IN/controlNet.net
-          template=../IN/autoRegTemplate.def
-          to=../OUT/outputIgnoredAndUnmeasured.net
-          flatfile=../OUT/outputIgnoredAndUnmeasured.txt
+          fromlist=fileList.lis 
+          cnet=controlNet.net 
+          deffile=autoRegTemplate.def 
+          onet=outputIgnoredAndUnmeasured.net 
+          flatfile=outputIgnoredAndUnmeasured.txt
         </commandLine>
         <description>
            This example shows the use of pointreg with the OUTPUTIGNORED and
-           OUTPUTUNMEASURED parameters left with the default values of "True" and
-           REGISTERIGNOREDONLY with the default value of "False".  This implies
-           that only "non-ignored" points will be registered but all control
+           OUTPUTFAILED parameters left with the default values of "True" and
+           POINTS with the default value of "NONIGNORED".  This implies
+           that only non-ignored points will be registered but all control
            points and control measures will be included in the output.
         </description>
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
-          <image src="assets/images/outputIgnoredAndUnmeasuredGui.jpg" width="652" height="550">
+          <image src="assets/images/ex1outputIgnoredAndUnmeasuredGui.png" width="648" height="1239">
             <brief>
               Example GUI
             </brief>
             <description>
               Screen shot of GUI with parameters filled in to perform point
               registration that includes ignored control points and unmeasured
-              control measures in the output but does not register the ignore
+              control measures in the output but does not register the ignored
               points.
             </description>
-            <thumbnail src="assets/thumbs/outputIgnoredAndUnmeasuredGuiThumb.jpg" width="200" height="169" caption="pointreg GUI" />
+            <thumbnail src="assets/thumbs/ex1outputIgnoredAndUnmeasuredGuiThumb.jpg" width="81" height="155" caption="pointreg GUI" />
           </image>
         </guiInterface>
       </guiInterfaces>
