@@ -56,8 +56,8 @@
 
     <p>
       Once "pointreg" has a reference measure for a point, it attempts to
-every other measure in the point to that reference location.  An
-      implicit reference will then be made explicit, and if any of the
+      register every other measure in the point to that reference location. 
+      An implicit reference will then be made explicit, and if any of the
       registrations succeed, the reference will also be made valid.
     </p>
 
@@ -290,7 +290,8 @@ every other measure in the point to that reference location.  An
           accept set to their default values, or common example values where
           defaults do not exist.  For an in-depth discussion of all the options
           available to the user in this definition file, please see the Pattern
-          Matching guide referenced above.
+          Matching guide referenced above.  Sample deffiles can be found in the
+          ISIS3 git repository under isis/appdata/templates/autoreg.
         </description>
         <helpers >
           <helper name="H1">
