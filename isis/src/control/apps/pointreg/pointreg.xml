@@ -674,7 +674,7 @@ every other measure in the point to that reference location.  An
               control measures in the output but does not register the ignored
               points.
             </description>
-            <thumbnail src="assets/thumbs/ex1outputIgnoredAndUnmeasuredGuiThumb.jpg" width="81" height="155" caption="pointreg GUI" />
+            <thumbnail src="assets/thumbs/ex1outputIgnoredAndUnmeasuredGuiThumb.png" width="81" height="155" caption="pointreg GUI" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -784,7 +784,7 @@ every other measure in the point to that reference location.  An
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
-          <image src="assets/images/ex2outputIgnoredAndUnmeasuredRegIgnoreGui.jpg" width="667" height="1239">
+          <image src="assets/images/ex2outputIgnoredAndUnmeasuredRegIgnoreGui.png" width="667" height="1239">
             <brief>
               Example GUI
             </brief>
@@ -794,7 +794,7 @@ every other measure in the point to that reference location.  An
               unmeasured control measures in the output but does not register
               the "valid" points.
             </description>
-            <thumbnail src="assets/thumbs/ex2outputIgnoredAndUnmeasuredRegIgnoreGuiThumb.jpg" width="84" height="155" caption="pointreg GUI" />
+            <thumbnail src="assets/thumbs/ex2outputIgnoredAndUnmeasuredRegIgnoreGuiThumb.png" width="84" height="155" caption="pointreg GUI" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -1121,32 +1121,33 @@ every other measure in the point to that reference location.  An
     </example>
     <example>
       <brief>
-        Register "new" measures in a control network only and leave previously
-        processed as they are in the output control net.
+        Register new "candidate" measures in a control network only and leave 
+        previously processed as they are in the output control net.
       </brief>
       <description>
-        In this example, the pointreg application is used to register only "new"
-        measures that have been added to the control net after a prior run in
-        pointreg.
+        In this example, the pointreg application is used to register only new 
+        "candidate" measures that have been added to the control net after a 
+        prior run in pointreg.
       </description>
       <terminalInterface>
         <commandLine>
-          files=../IN/fileList.lis cnet=../IN/controlNet.net
-          template=../IN/autoRegTemplate.def
-          to=../OUT/registerNewOnly.net
-          flatfile=../OUT/registerNewOnly.txt
-          registernewonly=yes
+          fromlist=fileList2.lis 
+          cnet=controlNet2.net 
+          deffile=autoRegTemplate.def 
+          onet=registerNewOnly.net 
+          flatfile=registerNewOnly.txt 
+          measures=candidates
         </commandLine>
         <description>
-           This example shows the use of pointreg with the REGISTERNEWONLY set
-           to "True". This implies that only "new" measurements will be
-           registered while measures that have been previously registered are
-           not reprocessed.
+           This example shows the use of pointreg with the MEASURES set
+           to "CANDIDATES". This implies that only new "candidate" 
+           measurements will be registered while measures that have been 
+           previously registered will not be reprocessed.
         </description>
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
-          <image src="assets/images/registerNewOnlyGui.jpg" width="728" height="550">
+          <image src="assets/images/ex5registerNewOnlyGui.png" width="676" height="1239">
             <brief>
               Example GUI
             </brief>
@@ -1154,7 +1155,7 @@ every other measure in the point to that reference location.  An
               Screen shot of GUI with parameters filled in to perform new
                measure registration only.
             </description>
-            <thumbnail src="assets/thumbs/registerNewOnlyThumb.jpg" width="200" height="151" caption="pointreg GUI" />
+            <thumbnail src="assets/thumbs/ex5registerNewOnlyThumb.png" width="84" height="155" caption="pointreg GUI" />
           </image>
         </guiInterface>
       </guiInterfaces>
