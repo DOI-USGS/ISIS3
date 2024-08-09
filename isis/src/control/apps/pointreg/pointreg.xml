@@ -82,7 +82,9 @@
     </p>
 
     <p>
-      ISIS programs that must be run before running <i>pointreg</i>:
+      Pointreg requires SPICE data and an associated control network, 
+      so you may need to run the following ISIS programs on your images 
+      beforehand. See <a href="https://astrogeology.usgs.gov/docs/how-to-guides/image-processing/bundle-adjustment-in-isis/">Bundle Adjustment</a> for more info.
     </p>
     <ul>
       <li>spiceinit</li>
