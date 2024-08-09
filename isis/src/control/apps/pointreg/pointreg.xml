@@ -82,7 +82,7 @@
     </p>
 
     <p>
-      ISIS programs that must be run prior to running <i>autoseed</i>:
+      ISIS programs that must be run before running <i>pointreg</i>:
     </p>
     <ul>
       <li>spiceinit</li>
