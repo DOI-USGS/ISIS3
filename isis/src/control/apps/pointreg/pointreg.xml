@@ -999,33 +999,36 @@ every other measure in the point to that reference location.  An
     </example>
     <example>
       <brief>
-        Register "ignored" points in a control network and omit ignored and
-        unmeasured points in the output control net.
+        Register "ignored" points in a control network and omit ignored points 
+        and failed measures the output control net.
       </brief>
       <description>
-        In this example, the pointreg application is used to register "ignore"
+        In this example, the pointreg application is used to register "ignored"
         points from two images and output a new control network that omits
         ignored control points and unmeasured control measures.
       </description>
       <terminalInterface>
         <commandLine>
-          files=../IN/fileList.lis cnet=../IN/controlNet.net
-          template=../IN/autoRegTemplate.def
-          to=../OUT/discardIgnoredAndUnmeasuredRegIgnored.net
-          flatfile=../OUT/discardIgnoredAndUnmeasuredRegIgnored.txt
-          outputignored=no outputunmeasured=no registerignoredonly=yes
+          fromlist=fileList.lis 
+          cnet=controlNet.net 
+          deffile=autoRegTemplate.def 
+          onet=discardIgnoredAndUnmeasuredRegIgnored.net 
+          flatfile=discardIgnoredAndUnmeasuredRegIgnored.txt 
+          outputignored=no 
+          outputfailed=no 
+          points=ignored
         </commandLine>
         <description>
            This example shows the use of pointreg with the OUTPUTIGNORED and
-           OUTPUTUNMEASURED parameters set to "False" and REGISTERIGNOREDONLY
-           set to "True". This implies that only "ignored" points will be
-           registered while ignored control points and unmeasured control
-           measures are omitted from the output.
+           OUTPUTFAILED parameters set to "False" and POINTS set to "IGNORED". 
+           This implies that only "ignored" points will be registered while 
+           ignored control points and failed control measures are omitted 
+           from the output.
         </description>
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
-          <image src="assets/images/discardIgnoredAndUnmeasuredRegIgnoreGui.jpg" width="652" height="550">
+          <image src="assets/images/ex4discardIgnoredAndUnmeasuredRegIgnoreGui.png" width="664" height="1239">
             <brief>
               Example GUI
             </brief>
@@ -1034,7 +1037,7 @@ every other measure in the point to that reference location.  An
               point registration that omits ignored control points and
               unmeasured control measures from the output.
             </description>
-            <thumbnail src="assets/thumbs/discardIgnoredAndUnmeasuredRegIgnoreGuiThumb.jpg" width="200" height="169" caption="pointreg GUI" />
+            <thumbnail src="assets/thumbs/ex4discardIgnoredAndUnmeasuredRegIgnoreGuiThumb.png" width="83" height="155" caption="pointreg GUI" />
           </image>
         </guiInterface>
       </guiInterfaces>
