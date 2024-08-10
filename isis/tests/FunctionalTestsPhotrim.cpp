@@ -124,7 +124,7 @@ TEST_F(DefaultCube, FunctionalTestsPhotrimEmission) {
   // validate histogram statistics for output cube
   std::unique_ptr<Histogram> hist (outCube.histogram(1));
   EXPECT_EQ(hist->ValidPixels(), 14);
-  EXPECT_EQ(hist->Average(), 9.6428571428571423);
+  EXPECT_NEAR(hist->Average(), 9.642857, 0.000001);
   EXPECT_EQ(hist->Sum(), 135);
   
   outCube.close();
@@ -307,7 +307,7 @@ TEST_F(DefaultCube, FunctionalTestsPhotrimUseDEM) {
   // validate histogram statistics for output cube
   std::unique_ptr<Histogram> hist (outCube.histogram(1));
   EXPECT_EQ(hist->ValidPixels(),17);
-  EXPECT_EQ(hist->Average(), 11.117647058823529);
+  EXPECT_NEAR(hist->Average(), 11.117647, 0.000001);
   EXPECT_EQ(hist->Sum(), 189);
 
   outCube.close();
