@@ -500,19 +500,12 @@ ISIS is comprised of two types of tests, custom Makefile based tests, and GTest 
 ### How to download the ISIS test data with rclone  
 Test data is hosted using Amazon S3 storage buckets. We recommend using rclone to pull the data into a local directory. You can download rclone using their instructions (see: https://rclone.org/downloads/) or by using an anaconda environment (see: https://docs.anaconda.com/anaconda/install/). If you already have an anaconda environment up, install rclone with: `conda install –c conda-forge rclone` 
 
-Next, you will want to configure rclone using a default S3 configuration. See: https://rclone.org/s3/ for detailed information on how to configure S3, but for the purposes of downloading the ISIS3 test data, you simply run rclone config which will start an interactive menu. Press enter through it all except for these details: 
-
-1. Set S3 as both your storage type and storage provider
-2. Set us-west-2 as both your region to connect to and as the location constraint. 
-3. Everything else, just leave as the default. 
-
-Example output: https://gist.github.com/Kelvinrr/706bbd54b1c2c30d0ce3d12f7dcaa10a
-
-Once rclone is configured, simply run: `rclone sync remote:asc-isisdata/isis_testData/ $ISISTESTDATA`
+Once rclone is installed, with `$ISISROOT` set, simply run: `rclone --config $ISISROOT/etc/isis/rclone.conf sync asc_s3:asc-isisdata/isis_testData/ $ISISTESTDATA`
 where:
-  - $ISISTESTDATA is the environment variable defining the location of the ISISTESTDATA
-  - remote: is the name of the configuration you created earlier. This can be whatever you want to name it, in this case it is named remote. 
-  - asc-isisdata/isis_testData/ is the name of the S3 bucket you’re downloading from
+  - `$ISISTESTDATA` is the environment variable defining the location of the isis test data. 
+  - `--config` overwrites the default config path, you want to use the rclone config that ships with ISIS.
+  - `asc_s3:` is the name of S3 configuration in the configuration file that ships with ISIS. This can be whatever you want to name it, in this case it is named remote. 
+  - `asc-isisdata/isis_testData/` is the name of the S3 bucket you’re downloading from
 
 $ISISTESTDATA should now contain a full clone of the ISIS test data for running Makefile based tests. 
 
