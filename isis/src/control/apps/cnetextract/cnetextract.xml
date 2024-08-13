@@ -894,7 +894,7 @@
 
       <guiInterfaces>
         <guiInterface>
-          <image width="820" height="1239" src="assets/images/cnetextract-cube-filter.png">
+          <image width="535" height="550" src="assets/images/cubes_535w_550h.jpg">
           <brief>
             Example GUI
           </brief>
@@ -902,7 +902,7 @@
               An example of how to run this program using the GUI. Note that the
               results summary can be seen in the log window.
             </description>
-            <thumbnail width="102" height="155" src="assets/thumbs/cnetextract-cube-filter-thumb.png" caption="Example of GUI command"/>
+            <thumbnail width="195" height="200" src="assets/thumbs/cubes_195w_200h.jpg" caption="Example of GUI command"/>
           </image>
         </guiInterface>
       </guiInterfaces>
