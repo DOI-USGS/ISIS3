@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run script
         run: |
-          git config --global user.name "github-workflow"
+          git config --global user.name "github-actions"
           git config --global user.email "abc@example.com"
           git clone https://isis-codebuild-ci:$GITLAB_TOKEN@code.usgs.gov/astrogeology/isis-codebuild-ci.git
           cd isis-codebuild-ci
