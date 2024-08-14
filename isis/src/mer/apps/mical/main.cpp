@@ -96,10 +96,10 @@ void IsisMain() {
   //Get the distance between Mars and the Sun at the given time in
   // Astronomical Units (AU)
 
-  double sunpos[6], lt;
+  double sunpos[6];
   std::vector<double> etStart = {startTime.Et()};
-  std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, "mars", "sun", "iau_mars", "LT+S", "mer2", "reconstructed", "reconstructed", false);
-  std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunpos);
+  std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, "mars", "sun", "iau_mars", "LT+S", "mer1", "reconstructed", "reconstructed", false);
+  std::copy(sunLt[0].begin(), sunLt[0].begin()+6, sunpos);
 
   double dist = vnorm_c(sunpos);
   double kmperAU = 1.4959787066E8;
