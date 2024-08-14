@@ -17,6 +17,7 @@
 #include "IString.h"
 #include "iTime.h"
 #include "IException.h"
+#include "RestfulSpice.h"
 #include "Table.h"
 #include "NaifStatus.h"
 
@@ -111,7 +112,6 @@ namespace Isis {
 
     // Loop and load the cache
     double state[6];
-    double lt;
     NaifStatus::CheckErrors();
 
     double R[3];  // Direction of radial axis of line scan camera
@@ -131,8 +131,12 @@ namespace Isis {
       crot->SetEphemerisTime(et);
 
       // The following code will be put into method LoadIBcache()
-      spkezr_c("MRO", et, "IAU_MARS", "NONE", "MARS", state, &lt);
-      NaifStatus::CheckErrors();
+      
+      std::vector<double> etStart = {et};
+      // @TODO move getTargetStates outside of for loop
+      std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, "MRO", "mars", "IAU_MARS", "NONE", "base", "reconstructed", "reconstructed", false);
+      std::copy(sunLt[0].begin(), sunLt[0].begin()+6, state);
+
 
       // Compute the direction of the radial axis (3) of the line scan camera
       vscl_c(1. / vnorm_c(state), state, R); // vscl and vnorm only operate on first 3 members of state
