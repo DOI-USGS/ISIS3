@@ -679,7 +679,6 @@ QString loadCalibrationVariables(const QString &config, Cube *iCube)  {
     }
   }
 
-  std::cout << "Test1" << std::endl;
   tsecs = obsStartTime - g_launchTime.Et();
   tdays = tsecs / 86400;
   g_bias = g_b0
@@ -732,14 +731,12 @@ QString loadCalibrationVariables(const QString &config, Cube *iCube)  {
  * @param out  Radometrically corrected image
  */
 void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
-  std::cout << "Test2" << std::endl;
   Buffer& imageIn   = *in[0];
   Buffer& flatField = *in[1];
   Buffer& imageOut  = *out[0];
 
   int pixelsToNull = 12;
 
-  std::cout << "Test3" << std::endl;
   int currentSample = imageIn.Sample();
   int alphaSample = alpha->AlphaSample(currentSample);
 
@@ -752,18 +749,15 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
   }
 
 
-  std::cout << "Test4" << std::endl;
   // Compute smear component here as its a constant for the entire sample
   double t1 = g_timeRatio / imageIn.size();
   double b = binning;
   double c1 = 1.0;  //default if no binning
-  std::cout << "Test5" << std::endl;
 
   if (binning > 1) {
     c1 = 1.0 / (1.0 + t1 * ((b - 1.0) / (2.0 * b) ) );
   }
 
-  std::cout << "Test6" << std::endl;
   double smear = 0;
   for (int j = 0; j < imageIn.size(); j++ ) {
     if ( !IsSpecial(imageIn[j]) ) {
@@ -771,7 +765,6 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     }
   }
 
-  std::cout << "Test7" << std::endl;
 
   // Iterate over the line space
   for (int i = 0; i < imageIn.size(); i++) {
@@ -840,6 +833,5 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // 7) I/F or Radiance Conversion (or g_calibrationScale might = 1, in which case the output will be in DNs)
     imageOut[i] *= g_calibrationScale;
   }
-  std::cout << "Test8" << std::endl;
   return;
 }
