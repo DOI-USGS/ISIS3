@@ -404,8 +404,8 @@ void IsisMain ()
     PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
 
 
-    double etStart = Isis::RestfulSpice::strSclkToEt(-226, startScet.toLatin1().data(), "virtis", false);
-    double etEnd = Isis::RestfulSpice::strSclkToEt(-226, stopScet.toLatin1().data(), "virtis", false);
+    double etStart = Isis::RestfulSpice::strSclkToEt(-226, startScet.toLatin1().data(), "virtis", true);
+    double etEnd = Isis::RestfulSpice::strSclkToEt(-226, stopScet.toLatin1().data(), "virtis", true);
 
     scs2e_c( (SpiceInt) -226, startScet.toLatin1().data(), &etStart);
     scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
@@ -417,8 +417,8 @@ void IsisMain ()
     QString stopTime = iTime(etEnd-exposureTime).UTC();
 
 
-    std::string startSclkString = Isis::RestfulSpice::etToStrSclk( -226, etStart-exposureTime, "virtis", false);
-    std::string endSclkString = Isis::RestfulSpice::etToStrSclk( -226, etEnd-exposureTime, "virtis", false);
+    std::string startSclkString = Isis::RestfulSpice::doubleEtToSclk( -226, etStart-exposureTime, "virtis", true);
+    std::string endSclkString = Isis::RestfulSpice::doubleEtToSclk( -226, etEnd-exposureTime, "virtis", true);
 
     inst.findKeyword("StartTime").setValue(startTime);
     inst.findKeyword("StopTime").setValue(stopTime);

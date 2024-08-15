@@ -73,9 +73,6 @@ namespace Isis {
   }
 
   void hicrop(Cube *cube, UserInterface &ui, Pvl *log) {
-    //   Isis::Preference::Preferences(true); // delete ???
-    cout << setprecision(25);// ???
-
     g_cube = cube;
     QString inputFileName = g_cube->fileName();
     // get user inputs for input cube and open
@@ -236,18 +233,18 @@ namespace Isis {
                         ckCoverage.first, ckCoverage.second);
 
       // HiRise spacecraft clock format is P/SSSSSSSSSS:FFFFF
-      IString actualCropStartClockCount = Isis::RestfulSpice::etToStrSclk(-74999, cropStartTime.Et(), "hirise", false);
-      IString actualCropStopClockCount = Isis::RestfulSpice::etToStrSclk(-74999, cropStopTime.Et(), "hirise", false);
+      IString actualCropStartClockCount = Isis::RestfulSpice::doubleEtToSclk(-74999, cropStartTime.Et(), "hirise", false);
+      IString actualCropStopClockCount = Isis::RestfulSpice::doubleEtToSclk(-74999, cropStopTime.Et(), "hirise", false);
 
 
       // readjust the time to get the appropriate label value for the
       // spacecraft clock start count for the labels of the cropped cube
       iTime adjustedCropStartTime = labelClockCountTime(cropStartTime, tdiMode,
                                                         unbinnedRate, binMode);
-      QString adjustedCropStartClockCount = QString::fromStdString(Isis::RestfulSpice::etToStrSclk(-74999, adjustedCropStartTime.Et(), "hirise", false));
+      QString adjustedCropStartClockCount = QString::fromStdString(Isis::RestfulSpice::doubleEtToSclk(-74999, adjustedCropStartTime.Et(), "hirise", false));
       iTime adjustedCropStopTime = labelClockCountTime(cropStopTime, tdiMode,
                                                        unbinnedRate, binMode);
-      QString adjustedCropStopClockCount = QString::fromStdString(Isis::RestfulSpice::etToStrSclk(-74999, adjustedCropStopTime.Et(), "hirise", false));
+      QString adjustedCropStopClockCount = QString::fromStdString(Isis::RestfulSpice::doubleEtToSclk(-74999, adjustedCropStopTime.Et(), "hirise", false));
 
 
 

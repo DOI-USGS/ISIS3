@@ -368,7 +368,7 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   int spacecraftClockNumber = -30;
   spacecraftClockNumber -= toInt(spacecraftNumber);
   std::string confId = "voyager" + spacecraftNumber.toStdString();
-  std::string approxSpacecraftClock = Isis::RestfulSpice::etToStrSclk(spacecraftClockNumber, approxEphemeris, confId, false);
+  std::string approxSpacecraftClock = Isis::RestfulSpice::doubleEtToSclk(spacecraftClockNumber, approxEphemeris, confId, false);
 
   /*
    * For our next trick, we will substitute the image number we got earlier
