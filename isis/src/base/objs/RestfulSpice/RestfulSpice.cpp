@@ -25,6 +25,7 @@ namespace Isis::RestfulSpice{
     {"HAYABUSA_NIRS", "nirs"},
     {"HAYABUSA2_ONC-W2", ""},
     {"JUNO_JUNOCAM", "juno"},
+    {"JUPITER", "voyager1"},
     {"LRO_LROCNACL", "lroc"},
     {"LRO_LROCNACR", "lroc"},
     {"LRO_LROCWAC_UV", "lroc"},
@@ -32,6 +33,7 @@ namespace Isis::RestfulSpice{
     {"LRO_MINIRF", ""},
     {"M10_VIDICON_A", "m10_vidicon_a"},
     {"M10_VIDICON_B", "m10_vidicon_b"},
+    {"MARS", "mro"},
     {"MSGR_MDIS_WAC", "mdis"},
     {"MSGR_MDIS_NAC", "mdis"},
     {"MEX_HRSC_SRC", "src"},
@@ -39,6 +41,7 @@ namespace Isis::RestfulSpice{
     {"MGS_MOC_NA", "mgs"},
     {"MGS_MOC_WA_RED", "mgs"},
     {"MGS_MOC_WA_BLUE", "mgs"},
+    {"MOON", "apollo15"},
     {"MRO_MARCI_VIS", "marci"},
     {"MRO_MARCI_UV", "marci"},
     {"MRO_CTX", "ctx"},
@@ -83,6 +86,8 @@ namespace Isis::RestfulSpice{
     {"LO3_HIGH_RESOLUTION_CAMERA", ""},
     {"LO4_HIGH_RESOLUTION_CAMERA", ""},
     {"LO5_HIGH_RESOLUTION_CAMERA", ""},
+    {"NEPTUNE", "voyager1"}, 
+    {"SATURN", "voyager1"},
     {"TGO_CASSIS", "cassis"},
     {"VIKING ORBITER 1", "viking1"},
     {"VIKING ORBITER 2", "viking2"},
@@ -101,11 +106,11 @@ namespace Isis::RestfulSpice{
     if (useWeb){
       // @TODO validity checks
       json args = json::object({
-          {"ets", ets},
           {"target", target},
           {"observer", observer},
           {"frame", frame},
           {"abcorr", abcorr},
+          {"ets", ets},
           {"mission", mission},
           {"ckQuality", ckQuality},
           {"spkQuality", spkQuality}
@@ -190,17 +195,17 @@ namespace Isis::RestfulSpice{
     }
   }
 
-  std::string etToStrSclk(int frameCode, double et, std::string mission, bool useWeb) {
+  std::string doubleEtToSclk(int frameCode, double et, std::string mission, bool useWeb) {
     if (useWeb){
       json args = json::object({
         {"frameCode", frameCode},
         {"et", et},
         {"mission", mission}
       });
-      json out = spiceAPIQuery("etToStrSclk", args);
+      json out = spiceAPIQuery("doubleEtToSclk", args);
       return out["body"]["return"].get<std::string>();
     }else{
-      return SpiceQL::etToStrSclk(frameCode, et, mission, true);
+      return SpiceQL::doubleEtToSclk(frameCode, et, mission, true);
     }
 
   }
@@ -317,7 +322,8 @@ namespace Isis::RestfulSpice{
 
   json spiceAPIQuery(std::string functionName, json args){
     restincurl::Client client;
-    std::string queryString = "https://spiceql-slot1.prod-asc.chs.usgs.gov/" + functionName +"/?";
+    //std::string queryString = "https://spiceql-slot1.prod-asc.chs.usgs.gov/" + functionName +"/?";
+    std::string queryString = "127.0.0.1:8080/" + functionName +"/?";
 
     for (auto x : args.items())
     {
@@ -341,14 +347,37 @@ namespace Isis::RestfulSpice{
         queryString+= "&";
     }
     json j;
-    std::cout << queryString << std::endl;
+    std::string encodedString = url_encode(queryString);
     // @TODO throw exception if no json or invalid json is returned
-    client.Build()->Get(queryString).Option(CURLOPT_FOLLOWLOCATION, 1L).AcceptJson().WithCompletion([&](const restincurl::Result& result) {
+    client.Build()->Get(encodedString).Option(CURLOPT_FOLLOWLOCATION, 1L).AcceptJson().WithCompletion([&](const restincurl::Result& result) {
       j = json::parse(result.body);
     }).ExecuteSynchronous();
     client.CloseWhenFinished();
     client.WaitForFinish();
     return j;
+  }
+
+  std::string url_encode(const std::string &value) {
+      std::ostringstream escaped;
+      escaped.fill('0');
+      escaped << std::hex;
+
+      for (std::string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
+          std::string::value_type c = (*i);
+
+          // Keep alphanumeric and other accepted characters intact
+          if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~' || c == '&' || c == '/' || c == '?' || c == '=' || c == ':') {
+              escaped << c;
+              continue;
+          }
+
+          // Any other characters are percent-encoded
+          escaped << std::uppercase;
+          escaped << '%' << std::setw(2) << int((unsigned char) c);
+          escaped << std::nouppercase;
+      }
+
+      return escaped.str();
   }
 
 }

@@ -21,7 +21,7 @@ namespace Isis::RestfulSpice {
   double doubleSclkToEt(int frameCode, double sclk, std::string mission, bool useWeb);
   double utcToEt(std::string utc, bool useWeb);
   std::string etToUtc(double et, std::string format, double precision, bool useWeb);
-  std::string etToStrSclk(int frameCode, double et, std::string mission, bool useWeb);
+  std::string doubleEtToSclk(int frameCode, double et, std::string mission, bool useWeb);
   int translateNameToCode(std::string frame, std::string mission, bool useWeb);
   std::string translateCodeToName(int code, std::string mission, bool useWeb);
   std::vector<int> getFrameInfo(int frame, std::string mission, bool useWeb) ;
@@ -32,4 +32,5 @@ namespace Isis::RestfulSpice {
   std::vector<double> extractExactCkTimes(double observStart, double observEnd, int targetFrame, std::string mission, std::string ckQuality, bool useWeb);
 
   json spiceAPIQuery(std::string functionName, json args);
+  std::string url_encode(const std::string &value);
 }
