@@ -2,15 +2,10 @@
 
 #include <QFileInfo> 
 #include <QString>
-//#include <QTextStream>
 
 #include "CameraFixtures.h"
 #include "Cube.h"
 #include "Histogram.h"
-//#include "LineManager.h"
-//#include "Pvl.h"
-//#include "PvlGroup.h"
-//#include "TestUtilities.h"
 
 #include "gtest/gtest.h"
 
