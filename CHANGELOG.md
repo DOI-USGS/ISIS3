@@ -39,6 +39,7 @@ release.
 - Added backplane options for SunIllumination and SurfaceObliqueDetectorResolution to phocube [#5467](https://github.com/DOI-USGS/ISIS3/issues/5467)
 
 ### Changed
+- Photrim has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5581](https://github.com/USGS-Astrogeology/ISIS3/issues/5581)
 - Bandtrim has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5571](https://github.com/USGS-Astrogeology/ISIS3/issues/5571)
 - Modified kaguyasp2isis to work with new (detached) data [#5436](https://github.com/DOI-USGS/ISIS3/issues/5436)
 - Added jigsaw error message for csminit'd images without csm parameters[#5486](https://github.com/DOI-USGS/ISIS3/issues/5486)
