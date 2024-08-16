@@ -156,9 +156,9 @@ namespace Isis {
    * @param group The PvlGroup object to add.
    */
   void PvlObject::addLogGroup(Isis::PvlGroup &group) {
-    addGroup(group);
-    Application::Log(group);
-    QString msg = "This function(PvlObject::addLogGroup) will be depreciated in ISIS3 v9.0 in "
+    // addGroup(group);
+    // Application::Log(group);
+    std::string msg = "This function(PvlObject::addLogGroup) will be depreciated in ISIS3 v9.0 in "
                   "favor of Application::appendLogGroup";
     std::cerr << msg << std::endl;
   };

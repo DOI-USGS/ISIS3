@@ -163,7 +163,7 @@ namespace Isis {
         cneteditValidator = nullptr;
 
         // Open DefFile and validate its' keywords and value type
-        defFile = new Pvl(ui.GetFileName("DEFFILE"));
+        defFile = new Pvl(ui.GetFileName("DEFFILE").toStdString());
 
         // create cube serial number validation list
         snValidationList = new SerialNumberList(ui.GetFileName("FROMLIST"));
@@ -330,7 +330,7 @@ namespace Isis {
             cneteditValidator = NULL;
 
             // First validate DefFile's keywords and value type
-            Pvl defFile(ui.GetFileName("DEFFILE"));
+            Pvl defFile(ui.GetFileName("DEFFILE").toStdString());
             Pvl pvlTemplate("$ISISROOT/appdata/templates/cnet_validmeasure/validmeasure.def");
             Pvl pvlResults;
             pvlTemplate.validatePvl(defFile, pvlResults);
@@ -369,8 +369,8 @@ namespace Isis {
     if (keepLog) {
         Pvl outputLog;
 
-        outputLog.addKeyword(PvlKeyword("PointsDeleted", toString(numPointsDeleted)));
-        outputLog.addKeyword(PvlKeyword("MeasuresDeleted", toString(numMeasuresDeleted)));
+        outputLog.addKeyword(PvlKeyword("PointsDeleted", std::to_string(numPointsDeleted)));
+        outputLog.addKeyword(PvlKeyword("MeasuresDeleted", std::to_string(numMeasuresDeleted)));
 
         PvlObject lockedLog = createLog(
             "EditLocked", editLockedPoints, editLockedMeasures);
@@ -387,7 +387,7 @@ namespace Isis {
 
         // Write the log
         QString logFileName = ui.GetFileName("LOG");
-        outputLog.write(logFileName);
+        outputLog.write(logFileName.toStdString());
 
         // Delete the structures keeping track of the ignored points and measures
         delete ignoredPoints;
@@ -1054,7 +1054,7 @@ namespace Isis {
     if (keepLog) {
       // Make the keyword label the measure Serial Number, and the cause into the
       // value
-      PvlKeyword measureMessage(PvlKeyword(serial, cause));
+      PvlKeyword measureMessage(PvlKeyword(serial.toStdString(), cause.toStdString()));
 
       // Using a map to make accessing by Point ID a O(1) to O(lg n) operation
       if (measuresLog->contains(pointId)) {
@@ -1066,7 +1066,7 @@ namespace Isis {
       else {
         // Else there is no group for the Point ID of the measure being ignored,
         // so make a new group, add the measure, and insert it into the map
-        PvlGroup pointGroup(pointId);
+        PvlGroup pointGroup(pointId.toStdString());
         pointGroup.addKeyword(measureMessage);
         (*measuresLog)[pointId] = pointGroup;
       }
@@ -1083,12 +1083,12 @@ namespace Isis {
    * @return PvlObject             Points log
    */
   PvlObject createLog(QString label, QMap<QString, QString> *pointsMap) {
-    PvlObject pointsLog(label);
+    PvlObject pointsLog(label.toStdString());
 
     QList<QString> pointIds = pointsMap->keys();
     for (int i = 0; i < pointIds.size(); i++) {
       QString pointId = pointIds.at(i);
-      pointsLog.addKeyword(PvlKeyword(pointId, (*pointsMap)[pointId]));
+      pointsLog.addKeyword(PvlKeyword(pointId.toStdString(), (*pointsMap)[pointId].toStdString()));
     }
 
     return pointsLog;
@@ -1107,7 +1107,7 @@ namespace Isis {
   PvlObject createLog(QString label,
       QMap<QString, QString> *pointsMap, QMap<QString, PvlGroup> *measuresMap) {
 
-    PvlObject editLog(label);
+    PvlObject editLog(label.toStdString());
 
     PvlObject pointsLog = createLog("Points", pointsMap);
     editLog.addObject(pointsLog);

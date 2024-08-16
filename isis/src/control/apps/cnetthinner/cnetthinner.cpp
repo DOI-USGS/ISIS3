@@ -102,10 +102,10 @@ namespace Isis {
     // Report results
     Pvl log;
     PvlGroup results("Results");
-    results += PvlKeyword("Points", toString(totalLoaded) );
-    results += PvlKeyword("Saved",  toString(nsaved) );
-    results += PvlKeyword("Suppressed",  toString(nremoved) );
-    results += PvlKeyword("Efficiency", toString(efficiency, 4), "percent" );
+    results += PvlKeyword("Points", std::to_string(totalLoaded) );
+    results += PvlKeyword("Saved",  std::to_string(nsaved) );
+    results += PvlKeyword("Suppressed",  std::to_string(nremoved) );
+    results += PvlKeyword("Efficiency", toString(efficiency, 4).toStdString(), "percent" );
     log.addLogGroup(results);
 
     p.EndProcess();

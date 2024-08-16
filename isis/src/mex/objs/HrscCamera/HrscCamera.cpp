@@ -46,7 +46,7 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    ReadLineRates(lab.fileName());
+    ReadLineRates( QString::fromStdString(lab.fileName()));
 
     // Setup detector map for transform of image pixels to detector position
     new VariableLineScanCameraDetectorMap(this, p_lineRates);
