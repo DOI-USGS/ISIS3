@@ -166,7 +166,7 @@ requirements:
   - {{ pin_compatible('suitesparse', min_pin='x.x', max_pin='x.x') }}
   - superlu
   - tnt
-  - usgscsm >= 2.0.2
+  - usgscsm >=2.0.2
   - x264
   - x265
   - {{ pin_compatible('xerces-c', max_pin='x.x.x') }}
