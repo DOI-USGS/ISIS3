@@ -156,13 +156,14 @@ def generate_cnet(params, images):
     from_segment_n = images["from"][0]["Segment"]
 
     print(images)
-    workdir = params["workdir"]
+    workdir = Path(params["WORKDIR"])
 
     new_params = deepcopy(params)
     new_params.pop("NL")
     new_params.pop("MINAREA")
     new_params.pop("MINTHICKNESS") 
-    new_params.pop("workdir")
+    new_params.pop("WORKDIR")
+
 
     # make sure none of these keys are still in the params
     new_params.pop("FROMLIST", None)
@@ -190,13 +191,13 @@ def generate_cnet(params, images):
 
     new_params["NETWORKID"] = og_networkid + f"_{match_segment_n}_{from_stem}"
     new_params["POINTID"] = og_pointid + f"_{match_segment_n}_{from_stem}"
-    new_params["ONET"] = f"{workdir/og_onet.stem}_{match_segment_n}_{from_stem}.net"
-    new_params["TOLIST"] = f"{workdir/og_tolist.stem}_{match_segment_n}_{from_stem}.lis"
+    new_params["ONET"] = f"{og_onet.stem}_{match_segment_n}_{from_stem}.net"
+    new_params["TOLIST"] = f"{og_tolist.stem}_{match_segment_n}_{from_stem}.lis"
     
     log.debug(new_params)
 
-    overlapfromlist = workdir / f"{workdir/og_tolist.stem}_{match_segment_n}_{from_stem}_overlap_fromlist.lis"
-    overlaptolist = workdir / f"{workdir/og_tolist.stem}_{match_segment_n}_{from_stem}.overlaps"
+    overlapfromlist = workdir / f"{workdir / og_tolist.stem}_{match_segment_n}_{from_stem}_overlap_fromlist.lis"
+    overlaptolist = workdir / f"{og_tolist.stem}_{match_segment_n}_{from_stem}.overlaps"
     
     # check for overlaps
     is_overlapping = []
@@ -207,7 +208,7 @@ def generate_cnet(params, images):
     try:
         kisis.findimageoverlaps(fromlist=overlapfromlist, overlaplist=overlaptolist)
     except subprocess.CalledProcessError as err:
-        print('Had an ISIS error:')
+        print('Find Image Overlaps Had an ISIS error:')
         print(' '.join(err.cmd))
         print(err.stdout)
         print(err.stderr)
@@ -242,12 +243,14 @@ def generate_cnet(params, images):
         else:
             log.debug(f"{fromlist_path} already exists")
         new_params["FROMLIST"] = str(fromlist_path)
+        
+        log.debug(f"Running FindFeatures with Params: {new_params}")
 
         try:
             ret = kisis.findfeatures(**new_params)
             log.debug(f"returned: {ret}")
         except subprocess.CalledProcessError as err:
-            log.debug('Had an ISIS error:')
+            log.debug('Find Features Had an ISIS error:')
             log.debug(' '.join(err.cmd))
             log.debug(err.stdout)
             log.debug(err.stderr)
@@ -296,7 +299,7 @@ def merge(d1, d2, k):
         return v1+v2
 
 
-def findFeaturesSegment(ui):
+def findFeaturesSegment(ui, workdir):
     """
     findFeaturesSegment Calls FindFeatures on segmented images  
 
@@ -320,11 +323,6 @@ def findFeaturesSegment(ui):
         log.basicConfig(level=log.DEBUG)
     else: 
         log.basicConfig(level=log.INFO)    
-
-    workdir = Path(tempfile.TemporaryDirectory().name) 
-
-    if ui.WasEntered("Workdir"):
-        workdir = Path(ui.GetFileName("Workdir"))
 
     img_list = []
     if ui.WasEntered("From"):
@@ -398,11 +396,12 @@ def findFeaturesSegment(ui):
 
     # get params as a dictionary
     params = ui.GetParams()
-    params["workdir"] = workdir
+    if is_workdir_temp:
+        params["WORKDIR"] = workdir
 
     # findfeatures is already threaded, limit python threads by the maxthreads 
     # parameter, no maththreads_findfeatures * maxthreads_python <= maxthreads  
-    pool = ThreadPool(nthreads/len(job_dicts))
+    pool = ThreadPool(int(nthreads/len(job_dicts)))
     starmap_args = list(zip([params]*len(job_dicts), job_dicts))
     output = pool.starmap_async(generate_cnet, starmap_args)
     pool.close()
@@ -441,9 +440,22 @@ def findFeaturesSegment(ui):
         # Dont merge 
         shutil.copy(onets[0], ui.GetFileName("onet"))
 
-    log.info(f"COMPLETE, wrote: {ui.GetFileName("onet")}")
-    log.info(f"Intermediate files written to: {workdir}")
-
-if __name__ == "__main__": 
+if __name__ == "__main__":
     ui = astroset.init_application(sys.argv)
-    findFeaturesSegment(ui) 
+    is_workdir_temp = not ui.WasEntered("WorkDir") 
+    workdir = Path(tempfile.TemporaryDirectory().name) 
+    if ui.WasEntered("Workdir"):
+        workdir = Path(ui.GetFileName("Workdir"))
+    
+    try: 
+        findFeaturesSegment(ui, workdir) 
+    except Exception as e: 
+        if is_workdir_temp:
+            shutil.rmtree(workdir) 
+        raise e 
+    
+    log.info(f"COMPLETE, wrote: {ui.GetFileName("onet")}")
+    if is_workdir_temp: 
+        shutil.rmtree(workdir)
+    else:
+        log.info(f"Intermediate files written to: {workdir}")
