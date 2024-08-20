@@ -196,7 +196,7 @@ def generate_cnet(params, images):
     
     log.debug(new_params)
 
-    overlapfromlist = workdir / f"{workdir / og_tolist.stem}_{match_segment_n}_{from_stem}_overlap_fromlist.lis"
+    overlapfromlist = workdir / f"{og_tolist.stem}_{match_segment_n}_{from_stem}_overlap_fromlist.lis"
     overlaptolist = workdir / f"{og_tolist.stem}_{match_segment_n}_{from_stem}.overlaps"
     
     # check for overlaps
@@ -341,7 +341,6 @@ def findFeaturesSegment(ui, workdir):
     pool = ThreadPool(nthreads)
     starmap_args = []
     for image in img_list: 
-        print(image)
         starmap_args.append([image, workdir, ui.GetInteger("NL")])
     output = pool.starmap_async(segment, starmap_args)
     pool.close()
@@ -427,7 +426,7 @@ def findFeaturesSegment(ui, workdir):
 
     log.debug(f"merged images: {final_images}")
     kisis.fromlist.make(final_images, Path(ui.GetFileName("tolist")))
-     
+    
     if len(onets) > 1: 
         try:
             kisis.cnetmerge(clist = onet_list, onet=ui.GetFileName("onet"), networkid=ui.GetAsString("networkid"), description=f"{ui.GetString('description')}")
@@ -454,8 +453,8 @@ if __name__ == "__main__":
             shutil.rmtree(workdir) 
         raise e 
     
-    log.info(f"COMPLETE, wrote: {ui.GetFileName("onet")}")
+    # log.info(f"COMPLETE, wrote: {ui.GetFileName("onet")}")
     if is_workdir_temp: 
         shutil.rmtree(workdir)
     else:
-        log.info(f"Intermediate files written to: {workdir}")
+        log.info("Intermediate files written to")
