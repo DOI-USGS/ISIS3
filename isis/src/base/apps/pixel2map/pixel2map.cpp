@@ -3,7 +3,6 @@
 #include "pixel2map.h"
 
 #include "Process.h"
-#include "Pvl.h"
 
 using namespace std;
 using namespace Isis;
@@ -29,7 +28,7 @@ namespace Isis {
   		
   // This is the SECOND required function ////////////////////////////////////////////////	
   //void pixel2map(Cube *inCube, UserInterface &ui){	
-    void pixel2map(UserInterface &ui){	 
+  void pixel2map(UserInterface &ui){	 
 	
     //Camera *g_incam;
 	//Camera g_incam;
