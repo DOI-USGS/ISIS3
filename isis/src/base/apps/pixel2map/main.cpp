@@ -1,7 +1,6 @@
 #define GUIHELPERS
 
 #include "Isis.h"
-
 #include <QDebug>
 #include <QList>
 #include <QPointF>
@@ -18,16 +17,21 @@
 #include "ProcessRubberSheet.h"
 #include "ProjectionFactory.h"
 #include "Pvl.h"
+
 #include "PvlGroup.h"
 #include "Target.h"
 
 #include "pixel2map.h"
+
+#include "geos/geom/Geometry.h"
+#include "geos/io/WKTWriter.h"
 
 using namespace std;
 using namespace Isis;
 
 void PrintMap();
 void rasterizePixel(Isis::Buffer &in);
+void vectorizePixel(Isis::Buffer &in);
 
 map <QString, void *> GuiHelpers() {
   map <QString, void *> helper;
@@ -39,6 +43,18 @@ map <QString, void *> GuiHelpers() {
 ProcessGroundPolygons g_processGroundPolygons;
 Camera *g_incam;
 int g_numIFOVs = 0;
+int g_vectorOut = 0;  // to be set bool in future
+
+int csamples;
+int clines;
+
+QString vectOut;
+QString outvect;
+
+ofstream fout_csv;
+QString ogc_SRS;
+
+
 
 void IsisMain() {
 
@@ -64,6 +80,7 @@ void IsisMain() {
     }
   }
 
+
   if (ui.GetString("FOVRANGE") == "INSTANTANEOUS") {
     g_numIFOVs = 1;
   }
@@ -78,6 +95,8 @@ void IsisMain() {
   double maxlon = 0;
   PvlGroup camGrp;
   QString lastBandString;
+  
+
 
   // Get the combined lat/lon range for all input cubes
   int bands = 1;
@@ -93,6 +112,14 @@ void IsisMain() {
     icube.open( list[i].toString() );
     bands = icube.bandCount();
     g_incam = icube.camera();
+	
+	csamples = g_incam->Samples();
+	clines =  g_incam->Lines();
+	
+	
+	Spice spi(icube);
+	ogc_SRS = "IAU:" + Isis::toString(spi.target()->naifBodyCode())  + "00";
+	//cout << ogc_SRS << endl;
 
     // Make sure it is not the sky
     if (g_incam->target()->isSky()) {
@@ -298,6 +325,7 @@ void IsisMain() {
   Pvl pvl;
   pvl.addGroup(userGrp);
 
+
   // If there is only one input cube, we need to attach an AlphaCube to the outputs.
   if (list.size() == 1) {
     Cube parent(list[0].toString());
@@ -315,7 +343,14 @@ void IsisMain() {
     }
   }
 
-  g_processGroundPolygons.SetStatCubes("TO", pvl, bands);
+  if ( ui.WasEntered("TO") ) {
+      g_processGroundPolygons.SetStatCubes("TO", pvl, bands);
+  }
+  
+  if ( ui.WasEntered("TOVECT") ) {
+      g_vectorOut = 1;
+	  outvect = ui.GetFileName("TOVECT");  
+  }
 
   bool useCenter = true;
   if (ui.GetString("METHOD") == "CENTER") {
@@ -326,6 +361,7 @@ void IsisMain() {
   }
  
   g_processGroundPolygons.SetIntersectAlgorithm(useCenter);
+
 
   for (int f = 0; f < list.size(); f++) {
 
@@ -338,13 +374,55 @@ void IsisMain() {
     CubeAttributeInput atts0(list[f]);
     Cube *icube = processBrick.SetInputCube(list[f].toString(), atts0, 0);
     g_incam = icube->camera();
+    
+    if ( ui.WasEntered("TO") )  { 
+    	processBrick.StartProcess(rasterizePixel);
+		processBrick.EndProcess();
+		}
+	if ( ui.WasEntered("TOVECT") )  {
+				
+	    ofstream fout_vrt;
+  
+	    QString outFileNameVRT = FileName( outvect.toLatin1().data() ).removeExtension().addExtension("vrt").expanded();
+		QString layer_name = FileName( outvect.toLatin1().data() ).baseName();
+		QString csv_fname = FileName( outvect.toLatin1().data() ).name();
+		
+	    fout_vrt.open( outFileNameVRT.toLatin1().data()  );
+  
+	    fout_vrt << "<OGRVRTDataSource>" << endl;
+	    fout_vrt << "    <OGRVRTLayer name=\""<< layer_name.toLatin1().data() << "\"> " << endl;
+	    fout_vrt << "            <SrcDataSource relativeToVRT=\"1\">" << csv_fname.toLatin1().data() << "</SrcDataSource>" << endl;
+	    fout_vrt << "            <GeometryType>wkbPolygon</GeometryType>" << endl;
+	    fout_vrt << "            <LayerSRS>"<<  ogc_SRS.toLatin1().data() << "</LayerSRS>" << endl;
+		fout_vrt << "            <Field name=\"sample\" src=\"sampleno\" type=\"Integer\"/> "<< endl;
+		fout_vrt << "            <Field name=\"line\" src=\"lineno\" type=\"Integer\"/> "<< endl;
+		fout_vrt << "            <Field name=\"pixelvalue\" src=\"pixelvalue\" type=\"Real\"/>" << endl;
+	    fout_vrt << "          <GeometryField encoding=\"WKT\" field=\"geom\" reportSrcColumn=\"FALSE\" />" << endl;
+	    fout_vrt << "    </OGRVRTLayer>" << endl;
+	    fout_vrt << "</OGRVRTDataSource>" << endl;
+  
+	    fout_vrt.close();
+		
 
-    processBrick.StartProcess(rasterizePixel);
-    processBrick.EndProcess();
+   
+	    // write the header
+	    fout_csv.open( outvect.toLatin1().data()  );  
+	    fout_csv << "sampleno" << "," << "lineno" << "," << "pixelvalue" << "," << "geom" << endl;
+		fout_csv.close();
+		// open in append mode
+		fout_csv.open( outvect.toLatin1().data(), std::ios_base::app  );
+		
+		processBrick.StartProcess(vectorizePixel);	
+		processBrick.EndProcess();
+		fout_csv.close();
+	} // IF TOVECT
+    
   }
   
+  if ( ui.WasEntered("TO") ) {
   // When there is only one input cube, we want to propagate IsisCube labels to output cubes
   if (list.size() == 1) {
+    // g_incam->SetImage(csamples,clines);
     // Note that polygons and original labels are not propagated
     g_processGroundPolygons.PropagateLabels(list[0].toString());
     // Tell Process which tables we want to propagate
@@ -352,6 +430,7 @@ void IsisMain() {
     tablesToPropagate << "InstrumentPointing" << "InstrumentPosition" << "BodyRotation"
         << "SunPosition";
     g_processGroundPolygons.PropagateTables(list[0].toString(), tablesToPropagate);
+    }
   }
   g_processGroundPolygons.EndProcess();
 
@@ -419,3 +498,60 @@ void rasterizePixel(Isis::Buffer &in) {
     }
   }
 }
+
+/**
+  * This method uses the ProcessGroundPolygons object to vectorize each 
+  * pixel in the given buffer. 
+  *  
+  * @param in Input ProcessByBrick buffer. 
+  */
+void vectorizePixel(Isis::Buffer &in) {
+
+  std::vector<double>lat, lon;
+  std::vector<double>dns;
+  geos::geom::Geometry* GndPixel;
+
+  
+  // Setup the WKT writer
+  geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
+
+
+  for (int i = 0; i < in.size(); i++) {
+    dns.push_back(in[i]);
+  }
+
+  int l = in.Line();
+  int s = in.Sample();
+
+  // DO: This needs to be done for each band for band dependent instruments
+  // Note: This can slow this down a lot
+
+  // Get the IFOVs in lat/lon space
+  PixelFOV fov;
+  QList< QList< QPointF > > fovVertices = fov.latLonVertices(*g_incam, l, s, g_numIFOVs);
+  
+
+  // loop through each ifov list
+  for (int ifov = 0; ifov < fovVertices.size(); ifov++) {
+    // we need at least 3 vertices for a polygon
+    if (fovVertices[ifov].size() > 3) {
+      //  Get lat/lon for each vertex of the ifov
+      for (int point = 0; point < fovVertices[ifov].size(); point++) {
+        lat.push_back(fovVertices[ifov][point].x());
+        lon.push_back(fovVertices[ifov][point].y());
+      }
+      // rasterize this ifov and clear vectors for next ifov
+      // add Vectorize method
+	  GndPixel = g_processGroundPolygons.Vectorize(lat, lon, dns);
+	  //cout << dns[0] << endl;
+	  if ( dns[0] != Isis::Null ) 
+	  { fout_csv <<  s << "," << l << "," << dns[0] << ",\"" << wkt->write(GndPixel)  << "\"" << endl;}
+	  	  
+      lat.clear();
+      lon.clear();
+    }	
+  }  
+}
+
+  
+
