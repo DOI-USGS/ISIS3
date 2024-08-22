@@ -10,7 +10,7 @@ namespace Isis {
     g_incam = NULL;
 
     // Get the map projection file provided by the user
-    UserInterface &ui = Application::GetUserInterface();
+    // UserInterface &ui = Application::GetUserInterface();
     Pvl userMap;
     userMap.read(ui.GetFileName("MAP"));
     PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
