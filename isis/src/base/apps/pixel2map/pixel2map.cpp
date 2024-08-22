@@ -523,7 +523,8 @@ namespace Isis {
         // rasterize this ifov and clear vectors for next ifov
         // add Vectorize method
   	  GndPixel = g_processGroundPolygons.Vectorize(lat, lon, dns);
-  	  //cout << dns[0] << endl;
+  	  // cout << dns[0] << endl;
+	  // Generate only non null pixel
   	  if ( dns[0] != Isis::Null ) 
   	  { fout_csv <<  s << "," << l << "," << dns[0] << ",\"" << wkt->write(GndPixel)  << "\"" << endl;}
 	  	  

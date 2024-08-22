@@ -28,18 +28,17 @@ TEST_F(DefaultCube, FunctionalTestPixel2mapVector) {
 
   UserInterface options(PIXEL2MAP_XML, args);
 
-  //try {
-  //  pixel2map(options);
-  //}
-  //catch (IException &e) {
-  //  FAIL() << "Unable to open image: " << e.what() << std::endl;
-  //}
+  try {
+    pixel2map(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open image: " << e.what() << std::endl;
+  }
 
-  // TEST 1: Check we have both csv and vrt file
+  // TEST 1: Check we have both csv and vrt output files
   
   FileName csvFileOut(tempDir.path() + "/vect.csv");
   EXPECT_TRUE(csvFileOut.fileExists());
-  
   FileName vrtFileOut(tempDir.path() + "/vect.vrt");
   EXPECT_TRUE(vrtFileOut.fileExists());
   
