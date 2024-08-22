@@ -2,17 +2,45 @@
 
 #include "pixel2map.h"
 
+#include "Process.h"
+#include "Pvl.h"
+
 using namespace std;
+using namespace Isis;
 
 namespace Isis {
 	
-
-    g_incam = NULL;
+  static void rasterizePixel(Isis::Buffer &in);
+  static void vectorizePixel(Isis::Buffer &in);	
+	
+  // Global variables
+  Cube *incube;
+  
+  // This is the FIRST required function /////////////////////////////////////////////////
+  //void pixel2map(UserInterface &ui){
+  //    // Open the input cube
+  //    //Cube *incube;
+  //    //CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");	  
+  //	  Cube *inCube = new Cube( ui.GetCubeName("FROM"), "r");
+  //	  
+  //	  // Now we got the Cube, we call the SECOND function
+  //	  pixel2map(inCube, ui);
+  //}
+  		
+  // This is the SECOND required function ////////////////////////////////////////////////	
+  //void pixel2map(Cube *inCube, UserInterface &ui){	
+    void pixel2map(UserInterface &ui){	 
+	
+    //Camera *g_incam;
+	//Camera g_incam;
+	//Pvl userMap;
+	
 
     // Get the map projection file provided by the user
     // UserInterface &ui = Application::GetUserInterface();
-    Pvl userMap;
-    userMap.read(ui.GetFileName("MAP"));
+    
+    //Pvl userMap.read(ui.GetFileName("MAP"));
+	Pvl userMap(ui.GetFileName("MAP"));
     PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
     FileList list;
@@ -87,7 +115,7 @@ namespace Isis {
       }
 
       // Get the mapping group
-      Pvl camMap;
+      Isis::Pvl camMap;
       g_incam->BasicMapping(camMap);
       camGrp = camMap.findGroup("Mapping");
 
@@ -386,23 +414,26 @@ namespace Isis {
     // WARNING: rasterizePixel() method alters the current state of the camera.
     // If any code is added after this point, you must call setImage to return
     // to original camera state before rasterization.
-
+	
   }
 
 
   /**
     * Helper function to print out mapfile to session log
     */
-  void PrintMap() {
-    UserInterface &ui = Application::GetUserInterface();
+  void PrintMap(UserInterface &ui) {
+	//removed in the refactoring process 
+	//UserInterface &ui = Application::GetUserInterface();
 
     // Get mapping group from map file
-    Pvl userMap;
-    userMap.read(ui.GetFileName("MAP"));
+    //Pvl userMap;
+    //userMap.read(ui.GetFileName("MAP"));
+	Pvl userMap(ui.GetFileName("MAP"));
     PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
     //Write map file out to the log
-    Isis::Application::GuiLog(userGrp);
+	//
+    //Isis::Application::GuiLog(userGrp);
   }
 
 
@@ -499,8 +530,11 @@ namespace Isis {
         lat.clear();
         lon.clear();
       }	
+	
     }  // main
 	
-	
+  	
+    
+  } // pixel2map void 	
 } // namespace Isis
 
