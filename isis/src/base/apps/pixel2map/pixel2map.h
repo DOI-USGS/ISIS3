@@ -25,10 +25,10 @@
 
 #include "UserInterface.h"
 
-void PrintMap();
-//void rasterizePixel(Isis::Buffer &in);
-//void vectorizePixel(Isis::Buffer &in);
+//void PrintMap();
 
+
+// Check for docs for GUI helpers -> KEEP and move it to pixel2map.cpp 
 //std::map <QString, void *> GuiHelpers() {
 //  map <QString, void *> helper;
 //  helper ["PrintMap"] = (void *) PrintMap;
@@ -38,27 +38,10 @@ void PrintMap();
 
 
 
-// Global variables
-Isis::ProcessGroundPolygons g_processGroundPolygons;
-Isis::Camera *g_incam;
-int g_numIFOVs = 0;
-int g_vectorOut = 0;  // to be set bool in future
-
-int csamples;
-int clines;
-
-QString vectOut;
-QString outvect;
-
-std::ofstream fout_csv;
-QString ogc_SRS;
-
-
 namespace Isis {
-  extern void pixel2map(UserInterface &ui);	
-  extern void pixel2map(Cube* incube, UserInterface &ui);
-  //extern void pixel2map(UserInterface &ui);	
-  //extern void pixel2map(UserInterface &ui, Pvl *log=nullptr);
+
+  //extern void pixel2map(Cube* incube, UserInterface &ui);
+  extern void pixel2map(UserInterface &ui, Pvl *log=nullptr);
   //extern void pixel2map(Cube *incube, Pvl &userMap);
   
   //static void rasterizePixel(Isis::Buffer &in);
@@ -72,6 +55,8 @@ namespace Isis {
  * @internal 
  *   @history 2013-07-30 Stuart C. Sides & Tracie Sucharski Renamed from vim2map
  */
+
+  /**
 class pixel2mapForward : public Isis::Transform {
   private:
     Isis::Camera *p_incam;
@@ -88,6 +73,7 @@ class pixel2mapForward : public Isis::Transform {
 
 
 };
+**/
 
 } // namespace Isis
 

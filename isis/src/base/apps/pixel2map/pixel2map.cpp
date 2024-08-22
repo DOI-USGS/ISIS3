@@ -13,7 +13,20 @@ namespace Isis {
   static void vectorizePixel(Isis::Buffer &in);	
 	
   // Global variables
-  Cube *incube;
+  static Cube *incube;
+  static Isis::ProcessGroundPolygons g_processGroundPolygons;
+  static Isis::Camera *g_incam;
+  static int g_numIFOVs = 0;
+  static int g_vectorOut = 0;  // to be set bool in future
+
+  static int csamples;
+  static int clines;
+
+  static QString vectOut;
+  static QString outvect;
+
+  static std::ofstream fout_csv;
+  static QString ogc_SRS;
   
   // This is the FIRST required function /////////////////////////////////////////////////
   //void pixel2map(UserInterface &ui){
@@ -28,7 +41,7 @@ namespace Isis {
   		
   // This is the SECOND required function ////////////////////////////////////////////////	
   //void pixel2map(Cube *inCube, UserInterface &ui){	
-  void pixel2map(UserInterface &ui){	 
+  void pixel2map(UserInterface &ui, Pvl *appLog){	 
 	
     //Camera *g_incam;
 	//Camera g_incam;
@@ -414,26 +427,9 @@ namespace Isis {
     // If any code is added after this point, you must call setImage to return
     // to original camera state before rasterization.
 	
-  }
+  } // void pixel2map 
 
 
-  /**
-    * Helper function to print out mapfile to session log
-    */
-  void PrintMap(UserInterface &ui) {
-	//removed in the refactoring process 
-	//UserInterface &ui = Application::GetUserInterface();
-
-    // Get mapping group from map file
-    //Pvl userMap;
-    //userMap.read(ui.GetFileName("MAP"));
-	Pvl userMap(ui.GetFileName("MAP"));
-    PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
-
-    //Write map file out to the log
-	//
-    //Isis::Application::GuiLog(userGrp);
-  }
 
 
   /**
@@ -476,7 +472,7 @@ namespace Isis {
         lon.clear();
       }
     }
-  }
+  } // rasterizePixel
 
   /**
     * This method uses the ProcessGroundPolygons object to vectorize each 
@@ -489,11 +485,9 @@ namespace Isis {
     std::vector<double>lat, lon;
     std::vector<double>dns;
     geos::geom::Geometry* GndPixel;
-
   
     // Setup the WKT writer
     geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
-
 
     for (int i = 0; i < in.size(); i++) {
       dns.push_back(in[i]);
@@ -531,10 +525,8 @@ namespace Isis {
         lon.clear();
       }	
 	
-    }  // main
-	
-  	
-    
-  } // pixel2map void 	
+    }  
+	      
+  } // vectorizePixel 	
 } // namespace Isis
 
