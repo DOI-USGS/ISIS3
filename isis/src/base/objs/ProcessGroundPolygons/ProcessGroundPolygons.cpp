@@ -109,20 +109,21 @@ namespace Isis {
 
 /**
  * This method gets called from the application with the lat/lon
- * vertices of a polygon along with a vector of values.
+ * vertices of a polygon.
  *
- * it returns a geos::geom::Geometry* WKT representation of the 
+ * it returns a geos::geom::Geometry* representation of the 
  * geometry
  *
  * @param lat
  * @param lon
- * @param values
+ * 
  */
 geos::geom::Geometry* ProcessGroundPolygons::Vectorize(std::vector<double> &lat,
-                                         std::vector<double> &lon,
-                                         std::vector<double> &values) 
+                                         std::vector<double> &lon)
+                                         //std::vector<double> &values) 
 										 {
 
+											 
   
   // Decide if we need to split the poly on the 360 boundry
   // Yes, we can do this better. The lat and lon vectors should be passed in as polygons, but
@@ -157,7 +158,6 @@ geos::geom::Geometry* ProcessGroundPolygons::Vectorize(std::vector<double> &lat,
       // See leading comment
     }
 
- 
     delete crossingPoly;
 
     if (splitPoly != NULL) {
@@ -178,12 +178,8 @@ geos::geom::Geometry* ProcessGroundPolygons::Vectorize(std::vector<double> &lat,
           tlat.push_back(llcoords->getAt(cord).y);
         }
 
-        
-        Convert(tlat, tlon);
-        //ProcessPolygons::Rasterize(p_samples, p_lines, values);
       }
       return splitPoly;
-      delete splitPoly;
     }
   }
   else { // if does not crosses
@@ -195,10 +191,10 @@ geos::geom::Geometry* ProcessGroundPolygons::Vectorize(std::vector<double> &lat,
     }
     pts.add(geos::geom::Coordinate(lon[0], lat[0]));
 
-    geos::geom::Polygon *crossingPoly = Isis::globalFactory->createPolygon(
+    geos::geom::Polygon *singlePoly = Isis::globalFactory->createPolygon(
         globalFactory->createLinearRing(pts)).release();
 
-    return crossingPoly;
+    return singlePoly;
     //ProcessPolygons::Rasterize(p_samples, p_lines, values);
   }
   

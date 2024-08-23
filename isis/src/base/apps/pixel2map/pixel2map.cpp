@@ -526,7 +526,7 @@ namespace Isis {
         }
         // rasterize this ifov and clear vectors for next ifov
         // add Vectorize method
-  	  GndPixel = g_processGroundPolygons.Vectorize(lat, lon, dns);
+  	  GndPixel = g_processGroundPolygons.Vectorize(lat, lon);
 	  
       // Using back() function to retrieve the last element 
       //float pixelvalue = dns.back(); 

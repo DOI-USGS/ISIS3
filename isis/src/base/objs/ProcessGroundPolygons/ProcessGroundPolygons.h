@@ -75,8 +75,8 @@ namespace Isis {
                      int &band, double &value);
  
       geos::geom::Geometry* Vectorize   (std::vector<double> &lat,
-                                         std::vector<double> &lon,
-                                         std::vector<double> &values);
+                                         std::vector<double> &lon);
+                                         //std::vector<double> &values);
 
       void EndProcess();
       void Finalize();

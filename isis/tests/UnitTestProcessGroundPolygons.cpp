@@ -17,7 +17,8 @@
 
 using namespace Isis;
 
-TEST_F(DefaultCube, UnitTestVectorize) {
+// Default test to check integrity of the geometry
+TEST( UnitTestVectorize, Default ) {
 	
   /*	
   ImagePolygon poly;
@@ -41,13 +42,17 @@ TEST_F(DefaultCube, UnitTestVectorize) {
  
   std::vector<double> lons = {255.645377, 256.146301, 256.146301, 255.645377};
   std::vector<double> lats = {9.928429, 9.928429, 10.434929, 10.434929};
-  std::vector<double> dns =  {1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10.10};
+  //std::vector<double> dns =  {1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10.10};
 
-  groundpixel = g_processGroundPolygons.Vectorize(lats, lons, dns);
+  groundpixel = g_processGroundPolygons.Vectorize(lats, lons);
 
   // Check that the geometry is valid
   EXPECT_EQ( groundpixel->isValid(), 1 );
-  EXPECT_EQ( groundpixel->getNumPoints(),  );
+  EXPECT_EQ( groundpixel->isPolygonal(), 1 );
+  EXPECT_EQ( groundpixel->getGeometryType(), "Polygon");
+  EXPECT_EQ( groundpixel->getNumGeometries(), 1); 
+  EXPECT_EQ( groundpixel->getNumPoints(), lons.size() + 1 );
+  
 
   //geos::geom::CoordinateSequence coordArray = *(boundary->getCoordinates().release());
   
@@ -60,4 +65,32 @@ TEST_F(DefaultCube, UnitTestVectorize) {
   //EXPECT_NEAR(10.182391, centroid->getY(), 1e-6);
   
   
-}
+};
+
+TEST( UnitTestVectorize, Crosses360 ) {
+	
+    Isis::ProcessGroundPolygons g_processGroundPolygons;
+    geos::geom::Geometry* groundpixel;
+    //geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
+ 
+    
+	
+    std::vector<double> lons = {359.0,   1.0,   1.0, 359.0, 359.0};
+    std::vector<double> lats = {  0.0,   0.0,   1.0,   1.0,   0.0};	
+	
+	
+	/*
+    std::vector<double> lons = {350, 351, 351, 350};
+    std::vector<double> lats = {0  ,   0,   1,   1};
+    */
+	
+	groundpixel = g_processGroundPolygons.Vectorize(lats, lons);
+	
+    // Check that the geometry is valid
+    EXPECT_EQ( groundpixel->isValid(), 1 );
+    EXPECT_EQ( groundpixel->isPolygonal(), 1 );
+	EXPECT_EQ( groundpixel->getGeometryType(), "MultiPolygon");
+    EXPECT_EQ( groundpixel->getNumGeometries(), 2); 
+
+	
+};
