@@ -13,11 +13,10 @@ namespace Isis {
   static void vectorizePixel(Isis::Buffer &in);	
 	
   // Global variables
-  static Cube *incube;
   static Isis::ProcessGroundPolygons g_processGroundPolygons;
   static Isis::Camera *g_incam;
   static int g_numIFOVs = 0;
-  static int g_vectorOut = 0;  // to be set bool in future
+  static int g_vectorOut = 0;
 
   static int csamples;
   static int clines;
@@ -27,31 +26,9 @@ namespace Isis {
 
   static std::ofstream fout_csv;
   static QString ogc_SRS;
-  
-  // This is the FIRST required function /////////////////////////////////////////////////
-  //void pixel2map(UserInterface &ui){
-  //    // Open the input cube
-  //    //Cube *incube;
-  //    //CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");	  
-  //	  Cube *inCube = new Cube( ui.GetCubeName("FROM"), "r");
-  //	  
-  //	  // Now we got the Cube, we call the SECOND function
-  //	  pixel2map(inCube, ui);
-  //}
-  		
-  // This is the SECOND required function ////////////////////////////////////////////////	
-  //void pixel2map(Cube *inCube, UserInterface &ui){	
+  	
   void pixel2map(UserInterface &ui, Pvl *appLog){	 
 	
-    //Camera *g_incam;
-	//Camera g_incam;
-	//Pvl userMap;
-	
-
-    // Get the map projection file provided by the user
-    // UserInterface &ui = Application::GetUserInterface();
-    
-    //Pvl userMap.read(ui.GetFileName("MAP"));
 	Pvl userMap(ui.GetFileName("MAP"));
     PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
@@ -69,7 +46,6 @@ namespace Isis {
       }
     }
 
-
     if (ui.GetString("FOVRANGE") == "INSTANTANEOUS") {
       g_numIFOVs = 1;
     }
@@ -85,8 +61,6 @@ namespace Isis {
     PvlGroup camGrp;
     QString lastBandString;
   
-
-
     // Get the combined lat/lon range for all input cubes
     int bands = 1;
     for (int i = 0; i < list.size(); i++) {
@@ -105,10 +79,9 @@ namespace Isis {
   	csamples = g_incam->Samples();
   	clines =  g_incam->Lines();
 	
-	
+	// Preparing the OGC IAU code for the vector data being generated
   	Spice spi(icube);
   	ogc_SRS = "IAU:" + Isis::toString(spi.target()->naifBodyCode())  + "00";
-  	//cout << ogc_SRS << endl;
 
       // Make sure it is not the sky
       if (g_incam->target()->isSky()) {
@@ -310,10 +283,8 @@ namespace Isis {
       g_incam = NULL;
     }
 
-
     Pvl pvl;
     pvl.addGroup(userGrp);
-
 
     // If there is only one input cube, we need to attach an AlphaCube to the outputs.
     if (list.size() == 1) {
@@ -371,9 +342,7 @@ namespace Isis {
   	if ( ui.WasEntered("TOVECT") )  {
 		 		
   	    ofstream fout_vrt;
-  
-  	    cout << "==========Pixel Type: " << PixelTypeName(cube.pixelType()) << " code:" << cube.pixelType() << endl;
-  
+    
   	    QString outFileNameVRT = FileName( outvect.toLatin1().data() ).removeExtension().addExtension("vrt").expanded();
   		QString layer_name = FileName( outvect.toLatin1().data() ).baseName();
   		QString csv_fname = FileName( outvect.toLatin1().data() ).name();
@@ -393,9 +362,7 @@ namespace Isis {
   	    fout_vrt << "</OGRVRTDataSource>" << endl;
   
   	    fout_vrt.close();
-		
-
-   
+		  
   	    // write the header
   	    fout_csv.open( outvect.toLatin1().data()  );  
   	    fout_csv << "sampleno" << "," << "lineno" << "," << "pixelvalue" << "," << "geom" << endl;
@@ -406,6 +373,7 @@ namespace Isis {
   		processBrick.StartProcess(vectorizePixel);	
   		processBrick.EndProcess();
   		fout_csv.close();
+		
   	} // IF TOVECT
     
     }
@@ -413,7 +381,6 @@ namespace Isis {
     if ( ui.WasEntered("TO") ) {
     // When there is only one input cube, we want to propagate IsisCube labels to output cubes
     if (list.size() == 1) {
-      // g_incam->SetImage(csamples,clines);
       // Note that polygons and original labels are not propagated
       g_processGroundPolygons.PropagateLabels(list[0].toString());
       // Tell Process which tables we want to propagate
@@ -430,9 +397,6 @@ namespace Isis {
     // to original camera state before rasterization.
 	
   } // void pixel2map 
-
-
-
 
   /**
     * This method uses the ProcessGroundPolygons object to rasterize each 
@@ -490,25 +454,15 @@ namespace Isis {
   
     // Setup the WKT writer
     geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
-
-    //cout << "dns Size: " << in.size() << endl;
     
 	// With one band at input, size will be 1
     for (int i = 0; i < in.size(); i++) {
 	    // adds the element at the end of the vector	
-	    if(IsNullPixel(in[i])){
-		dns.push_back( 999.999 );
-	   }
-	   else {
-     	dns.push_back(in[i]);
-	   } 
-     }
+	    dns.push_back(in[i]);
+	    }
 
     int l = in.Line();
     int s = in.Sample();
-
-    // DO: This needs to be done for each band for band dependent instruments
-    // Note: This can slow this down a lot
 
     // Get the IFOVs in lat/lon space
     PixelFOV fov;
@@ -524,33 +478,22 @@ namespace Isis {
           lat.push_back(fovVertices[ifov][point].x());
           lon.push_back(fovVertices[ifov][point].y());
         }
-        // rasterize this ifov and clear vectors for next ifov
-        // add Vectorize method
+       
+      // vectorize this ifov and clear coordinate vectors for next ifov
   	  GndPixel = g_processGroundPolygons.Vectorize(lat, lon);
 	  
-      // Using back() function to retrieve the last element 
-      //float pixelvalue = dns.back(); 
-
-      //QString myvalue = printf ("%4.2f ", dns[0]);
-	  //QString myvalue = QString("%4.2f").arg(dns[0]);
 	  QString v = QString::number(dns[0]);
 	  
-	  // Generate only non null pixel
+	  // Generate vectors of only non null pixel
   	  if ( dns[0] != Isis::Null ) { 
 		  fout_csv <<  s << "," << l << "," << dns[0] << ",\"" << wkt->write(GndPixel)  << "\"" << endl;
 	      }
-	  	
-		//fout_csv <<  s << "," << l << "," << v << ",\"" << wkt->write(GndPixel)  << "\"" << endl;  
-		  
+	  	  
         lat.clear();
-        lon.clear();
-		
-		
+        lon.clear();			
       }	
 	
-    }
-	
-	
+    }		
 	      
   } // vectorizePixel 	
 } // namespace Isis

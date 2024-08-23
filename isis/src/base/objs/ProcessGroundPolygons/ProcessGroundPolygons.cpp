@@ -195,7 +195,6 @@ geos::geom::Geometry* ProcessGroundPolygons::Vectorize(std::vector<double> &lat,
         globalFactory->createLinearRing(pts)).release();
 
     return singlePoly;
-    //ProcessPolygons::Rasterize(p_samples, p_lines, values);
   }
   
 }

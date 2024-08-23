@@ -23,26 +23,16 @@ using namespace Isis;
 
 static QString PIXEL2MAP_XML = FileName("$ISISROOT/bin/xml/pixel2map.xml").expanded();
 
-// DefaultCube
-// MroCtxCube
 TEST_F(MroCtxCube, FunctionalTestPixel2mapVector) {
-  
-  // DefaultCube only
-  //resizeCube(5,5,1);
-  
+    
   QString csvFileName = tempDir.path() + "/vect.csv";
   QString vrtFileName = tempDir.path() + "/vect.vrt";
-  //QString csvFileName = "/Users/alf/gitwrk/ISIS3dev-b/build/DefaultCube.csv";
-  //QString vrtFileName = "/Users/alf/gitwrk/ISIS3dev-b/build/DefaultCube.vrt";	
 	
   QFile csvFile( csvFileName );
   QFile vrtFile( vrtFileName );
-  //QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   
   QVector<QString> args = {"TOVECT="+csvFile.fileName(), "FROM="+ testCube->fileName() };
   
-  //QVector<QString> args = {"tovect="+csvFile.fileName(), "from=/Users/alf/gitwrk/ISIS3dev-b/isis/tests/data/mroCtxImage/ctxTestImage.cub"};
-
   UserInterface options(PIXEL2MAP_XML, args);
 
   try {
@@ -52,7 +42,7 @@ TEST_F(MroCtxCube, FunctionalTestPixel2mapVector) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
 
-  // pre-TEST: Check that we have no null values in the cube
+  // pre-TEST: Check that we have no null values in the test cube
   std::unique_ptr<Histogram> hist (testCube->histogram());
 
   EXPECT_EQ(hist->ValidPixels(), testCube->sampleCount()*testCube->lineCount());
@@ -60,14 +50,12 @@ TEST_F(MroCtxCube, FunctionalTestPixel2mapVector) {
 
 
   // TEST 1a: Check we have both csv and vrt output files
-  
-  FileName csvFileOut( csvFileName );
+    FileName csvFileOut( csvFileName );
   EXPECT_TRUE(csvFileOut.fileExists());
   FileName vrtFileOut( vrtFileName );
   EXPECT_TRUE(vrtFileOut.fileExists());
   
-  // TEST 1b: Check the output csv file header
-  
+  // TEST 1b: Check the output csv file header  
   CSVReader::CSVAxis csvLine;
   CSVReader csvout = CSVReader( csvFileName , false, 0, ',');
   
@@ -78,11 +66,11 @@ TEST_F(MroCtxCube, FunctionalTestPixel2mapVector) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[2], "pixelvalue");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, csvLine[3], "geom");
   
-  //std::cout << "Number of rows in the CSV: " << csvout.size() << '\n';
-  //std::cout <<  testCube.sampleCount() << '\n';
-  
   // The number of lines must be equal to the number of pixels
   EXPECT_EQ(testCube->sampleCount()*testCube->lineCount(), csvout.rows()-1);
   
-  
 }
+
+
+
+
