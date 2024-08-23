@@ -185,7 +185,7 @@ namespace Isis {
     projCubeLabel >> projLabel;
 
     testCube = new Cube();
-    testCube->fromIsd(tempDir.path() + "/default.cub", label, isd, "rw");
+    testCube->fromIsd("tempDir.path() + default.cub", label, isd, "rw");
 
     LineManager line(*testCube);
     int pixelValue = 1;

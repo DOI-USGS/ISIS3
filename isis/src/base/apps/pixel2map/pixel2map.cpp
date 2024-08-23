@@ -369,8 +369,10 @@ namespace Isis {
   		processBrick.EndProcess();
   		}
   	if ( ui.WasEntered("TOVECT") )  {
-				
+		 		
   	    ofstream fout_vrt;
+  
+  	    cout << "==========Pixel Type: " << PixelTypeName(cube.pixelType()) << " code:" << cube.pixelType() << endl;
   
   	    QString outFileNameVRT = FileName( outvect.toLatin1().data() ).removeExtension().addExtension("vrt").expanded();
   		QString layer_name = FileName( outvect.toLatin1().data() ).baseName();
@@ -398,9 +400,9 @@ namespace Isis {
   	    fout_csv.open( outvect.toLatin1().data()  );  
   	    fout_csv << "sampleno" << "," << "lineno" << "," << "pixelvalue" << "," << "geom" << endl;
   		fout_csv.close();
-  		// open in append mode
+  		// re-open in append mode
   		fout_csv.open( outvect.toLatin1().data(), std::ios_base::app  );
-		
+		//fout_csv << std::setprecision(7);  // see isis2ascii		
   		processBrick.StartProcess(vectorizePixel);	
   		processBrick.EndProcess();
   		fout_csv.close();
@@ -489,9 +491,18 @@ namespace Isis {
     // Setup the WKT writer
     geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
 
+    //cout << "dns Size: " << in.size() << endl;
+    
+	// With one band at input, size will be 1
     for (int i = 0; i < in.size(); i++) {
-      dns.push_back(in[i]);
-    }
+	    // adds the element at the end of the vector	
+	    if(IsNullPixel(in[i])){
+		dns.push_back( 999.999 );
+	   }
+	   else {
+     	dns.push_back(in[i]);
+	   } 
+     }
 
     int l = in.Line();
     int s = in.Sample();
@@ -516,16 +527,30 @@ namespace Isis {
         // rasterize this ifov and clear vectors for next ifov
         // add Vectorize method
   	  GndPixel = g_processGroundPolygons.Vectorize(lat, lon, dns);
-  	  // cout << dns[0] << endl;
+	  
+      // Using back() function to retrieve the last element 
+      //float pixelvalue = dns.back(); 
+
+      //QString myvalue = printf ("%4.2f ", dns[0]);
+	  //QString myvalue = QString("%4.2f").arg(dns[0]);
+	  QString v = QString::number(dns[0]);
+	  
 	  // Generate only non null pixel
-  	  if ( dns[0] != Isis::Null ) 
-  	  { fout_csv <<  s << "," << l << "," << dns[0] << ",\"" << wkt->write(GndPixel)  << "\"" << endl;}
-	  	  
+  	  if ( dns[0] != Isis::Null ) { 
+		  fout_csv <<  s << "," << l << "," << dns[0] << ",\"" << wkt->write(GndPixel)  << "\"" << endl;
+	      }
+	  	
+		//fout_csv <<  s << "," << l << "," << v << ",\"" << wkt->write(GndPixel)  << "\"" << endl;  
+		  
         lat.clear();
         lon.clear();
+		
+		
       }	
 	
-    }  
+    }
+	
+	
 	      
   } // vectorizePixel 	
 } // namespace Isis
