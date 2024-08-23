@@ -1,8 +1,9 @@
 
 #include <iostream>
-#include <string>
+#include <Preference.h>
 #include "RestfulSpice.h"
 #include "restincurl.h"
+#include <string>
 
 using json=nlohmann::json;
 
@@ -102,7 +103,9 @@ namespace Isis::RestfulSpice{
     {"Visual and Infrared Spectrometer", "vir"}
   };
 
-  std::vector<std::vector<double>> getTargetStates(std::vector<double> ets, std::string target, std::string observer, std::string frame, std::string abcorr, std::string mission, std::string ckQuality, std::string spkQuality, bool useWeb){
+
+  std::vector<std::vector<double>> getTargetStates(std::vector<double> ets, std::string target, std::string observer, std::string frame, std::string abcorr, std::string mission, std::string ckQuality, std::string spkQuality){
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       // @TODO validity checks
       json args = json::object({
@@ -116,14 +119,15 @@ namespace Isis::RestfulSpice{
           {"spkQuality", spkQuality}
           });
       // @TODO check that json exists / contains what we're looking for
-      json out = spiceAPIQuery("getTargetStates", args);
+      json out = spiceAPIQuery("getTargetStates", args, "POST");
       return out["body"]["return"].get<std::vector<std::vector<double>>>();
     }else{
       return SpiceQL::getTargetStates(ets, target, observer, frame, abcorr, mission, ckQuality, spkQuality, true);
     }
   }
 
-  std::vector<std::vector<double>> getTargetOrientations(std::vector<double> ets, int toFrame, int refFrame, std::string mission, std::string ckQuality, bool useWeb) {
+  std::vector<std::vector<double>> getTargetOrientations(std::vector<double> ets, int toFrame, int refFrame, std::string mission, std::string ckQuality) {
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"ets", ets},
@@ -132,14 +136,15 @@ namespace Isis::RestfulSpice{
         {"mission", mission},
         {"ckQuality", ckQuality}
       });
-      json out = spiceAPIQuery("getTargetOrientations", args);
+      json out = spiceAPIQuery("getTargetOrientations", args, "POST");
       return out["body"]["return"].get<std::vector<std::vector<double>>>();
     }else{
       return SpiceQL::getTargetOrientations(ets, toFrame, refFrame, mission, ckQuality, true);
     }
   }
 
-  double strSclkToEt(int frameCode, std::string sclk, std::string mission, bool useWeb) {
+  double strSclkToEt(int frameCode, std::string sclk, std::string mission) {
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"frameCode", frameCode},
@@ -153,7 +158,8 @@ namespace Isis::RestfulSpice{
     }
   }
 
-  double doubleSclkToEt(int frameCode, double sclk, std::string mission, bool useWeb){
+  double doubleSclkToEt(int frameCode, double sclk, std::string mission){
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"frameCode", frameCode},
@@ -167,7 +173,8 @@ namespace Isis::RestfulSpice{
     }
   }
 
-  double utcToEt(std::string utc, bool useWeb){
+  double utcToEt(std::string utc){
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"utc", utc}
@@ -181,8 +188,10 @@ namespace Isis::RestfulSpice{
   }
 
 
-  std::string etToUtc(double et, std::string format, double precision, bool useWeb){
-    if (useWeb){
+  std::string etToUtc(double et, std::string format, double precision){
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+    // TODO Add etToUtc to web api
+    if (false){
       json args = json::object({
         {"et", et},
         {"format", format},
@@ -195,7 +204,8 @@ namespace Isis::RestfulSpice{
     }
   }
 
-  std::string doubleEtToSclk(int frameCode, double et, std::string mission, bool useWeb) {
+  std::string doubleEtToSclk(int frameCode, double et, std::string mission) {
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"frameCode", frameCode},
@@ -210,7 +220,8 @@ namespace Isis::RestfulSpice{
 
   }
 
-  int translateNameToCode(std::string frame, std::string mission, bool useWeb){
+  int translateNameToCode(std::string frame, std::string mission){
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"frame", frame},
@@ -223,7 +234,8 @@ namespace Isis::RestfulSpice{
     }
   }
 
-  std::string translateCodeToName(int code, std::string mission, bool useWeb){
+  std::string translateCodeToName(int code, std::string mission){
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"code", code},
@@ -236,7 +248,8 @@ namespace Isis::RestfulSpice{
     }
   }
 
-  std::vector<int> getFrameInfo(int frame, std::string mission, bool useWeb) {
+  std::vector<int> getFrameInfo(int frame, std::string mission) {
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"frame", frame},
@@ -250,7 +263,8 @@ namespace Isis::RestfulSpice{
     }
   }
 
-  json getTargetFrameInfo(int targetId, std::string mission, bool useWeb) {
+  json getTargetFrameInfo(int targetId, std::string mission) {
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"targetId", targetId},
@@ -263,7 +277,8 @@ namespace Isis::RestfulSpice{
     }
   }
 
-  json findMissionKeywords(std::string key, std::string mission, bool useWeb){
+  json findMissionKeywords(std::string key, std::string mission){
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"key", key},
@@ -276,7 +291,8 @@ namespace Isis::RestfulSpice{
     }
   }
 
-  json findTargetKeywords(std::string key, std::string mission, bool useWeb){
+  json findTargetKeywords(std::string key, std::string mission){
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"key", key},
@@ -289,7 +305,8 @@ namespace Isis::RestfulSpice{
     }
   }
 
-  std::vector<std::vector<int>> frameTrace(double et, int initialFrame, std::string mission, std::string ckQuality, bool useWeb) {
+  std::vector<std::vector<int>> frameTrace(double et, int initialFrame, std::string mission, std::string ckQuality) {
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"et", et},
@@ -304,7 +321,8 @@ namespace Isis::RestfulSpice{
     }
   }
 
-  std::vector<double> extractExactCkTimes(double observStart, double observEnd, int targetFrame, std::string mission, std::string ckQuality, bool useWeb) {
+  std::vector<double> extractExactCkTimes(double observStart, double observEnd, int targetFrame, std::string mission, std::string ckQuality) {
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     if (useWeb){
       json args = json::object({
         {"observStart", observStart},
@@ -320,40 +338,34 @@ namespace Isis::RestfulSpice{
     }
   }
 
-  json spiceAPIQuery(std::string functionName, json args){
+  json spiceAPIQuery(std::string functionName, json args, std::string method){
     restincurl::Client client;
     //std::string queryString = "https://spiceql-slot1.prod-asc.chs.usgs.gov/" + functionName +"/?";
-    std::string queryString = "127.0.0.1:8080/" + functionName +"/?";
+    std::string queryString = "127.0.0.1:8080/" + functionName +"/";
 
-    for (auto x : args.items())
-    {
-        queryString+= x.key();
-        queryString+= "=";
-        try{
-          queryString+= x.value();
-        }catch(...){
-          // @TODO get rid of catch alls
-          std::string tmp = x.value().dump();
-          try{
-            // @TODO mystical nonsense, find a better way to do this. This is checking if the value is numeric or a list.
-            (int)x.value();
-          }catch(...){
-          // if list, get rid of brackets for api call
-            tmp.replace(tmp.begin(), tmp.begin()+1, "");
-            tmp.replace(tmp.end()-1, tmp.end(), "");
-          }
-          queryString+= tmp;
-        }
-        queryString+= "&";
-    }
     json j;
-    std::string encodedString = url_encode(queryString);
-    // @TODO throw exception if no json or invalid json is returned
-    client.Build()->Get(encodedString).Option(CURLOPT_FOLLOWLOCATION, 1L).AcceptJson().WithCompletion([&](const restincurl::Result& result) {
-      j = json::parse(result.body);
-    }).ExecuteSynchronous();
+
+    if (method == "GET"){
+      queryString += "?";
+      for (auto x : args.items()) {
+          queryString+= x.key();
+          queryString+= "=";
+          queryString+= x.value().dump();
+          queryString+= "&";
+      }
+      std::string encodedString = url_encode(queryString);
+      client.Build()->Get(encodedString).Option(CURLOPT_FOLLOWLOCATION, 1L).AcceptJson().WithCompletion([&](const restincurl::Result& result) {
+        j = json::parse(result.body);
+      }).ExecuteSynchronous();
+    }else{
+      client.Build()->Post(queryString).Option(CURLOPT_FOLLOWLOCATION, 1L).AcceptJson().WithJson(args.dump()).WithCompletion([&](const restincurl::Result& result) {
+        j = json::parse(result.body);
+      }).ExecuteSynchronous();
+    }
     client.CloseWhenFinished();
     client.WaitForFinish();
+
+    // @TODO throw exception if no json or invalid json is returned
     return j;
   }
 
@@ -369,6 +381,10 @@ namespace Isis::RestfulSpice{
           if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~' || c == '&' || c == '/' || c == '?' || c == '=' || c == ':') {
               escaped << c;
               continue;
+          }
+
+          if (c == '"'){
+            continue;
           }
 
           // Any other characters are percent-encoded
