@@ -63,20 +63,20 @@ static bool sunDistanceAU(Cube *iCube,
 
     //  Determine if the target is a valid NAIF target
     try{
-      Isis::RestfulSpice::translateNameToCode(target.toLatin1().data(), "amica", false);
+      Isis::RestfulSpice::translateNameToCode(target.toLatin1().data(), "amica");
     }catch(invalid_argument){
       return false;
     }
 
     //  Convert starttime to et
     try{
-      double obsStartTime = Isis::RestfulSpice::strSclkToEt(-130, scStartTime.toLatin1().data(), "amica", false);
+      double obsStartTime = Isis::RestfulSpice::strSclkToEt(-130, scStartTime.toLatin1().data(), "amica");
 
       //  Get the vector from target to sun and determine its length
       double sunv[3];
 
       std::vector<double> etStart = {obsStartTime};
-      std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, target.toLatin1().data(), "sun", "J2000", "LT+S", "amica", "reconstructed", "reconstructed", false);
+      std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, target.toLatin1().data(), "sun", "J2000", "LT+S", "amica", "reconstructed", "reconstructed");
       std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunv);
 
       NaifStatus::CheckErrors();

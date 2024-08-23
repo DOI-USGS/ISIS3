@@ -248,10 +248,8 @@ namespace Isis {
     }
 
     QString scTime = inst["SpacecraftClockStartCount"];
-    double et = Isis::RestfulSpice::strSclkToEt(sclkCode, scTime.toLatin1().data(), "mvic", false);
-    //std::string utc = Isis::RestfulSpice::etToUtc(et, "ISOC", 3, false);
-    SpiceChar utc[30];
-    et2utc_c(et, "ISOC", 3, 30, utc);
+    double et = Isis::RestfulSpice::strSclkToEt(sclkCode, scTime.toLatin1().data(), "mvic");
+    std::string utc = Isis::RestfulSpice::etToUtc(et, "ISOC", 3);
     inst.addKeyword(PvlKeyword("StartTime", QString::fromStdString(utc)));
 
     // Create a Band Bin group

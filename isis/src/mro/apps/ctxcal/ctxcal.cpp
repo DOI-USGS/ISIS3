@@ -171,7 +171,7 @@ namespace Isis {
           double sunpos[6];
 
           std::vector<double> etStartVec = {etStart};
-          std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStartVec, "mars", "sun", "iau_mars", "LT+S", "mro", "reconstructed", "reconstructed", false);
+          std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStartVec, "mars", "sun", "iau_mars", "LT+S", "mro", "reconstructed", "reconstructed");
           std::copy(sunLt[0].begin(), sunLt[0].begin()+6, sunpos);
 
           dist1 = vnorm_c(sunpos);

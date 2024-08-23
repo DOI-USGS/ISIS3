@@ -98,7 +98,7 @@ void IsisMain() {
 
   double sunpos[6];
   std::vector<double> etStart = {startTime.Et()};
-  std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, "mars", "sun", "iau_mars", "LT+S", "mer1", "reconstructed", "reconstructed", false);
+  std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, "mars", "sun", "iau_mars", "LT+S", "mer1", "reconstructed", "reconstructed");
   std::copy(sunLt[0].begin(), sunLt[0].begin()+6, sunpos);
 
   double dist = vnorm_c(sunpos);

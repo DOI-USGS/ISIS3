@@ -310,7 +310,7 @@ bool HiCalConf::_naifLoaded = false;
       try {
         QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
         NaifStatus::CheckErrors();
-        double obsStartTime = Isis::RestfulSpice::strSclkToEt(-74999, scStartTime.toLatin1().data(), "hirise", false);
+        double obsStartTime = Isis::RestfulSpice::strSclkToEt(-74999, scStartTime.toLatin1().data(), "hirise");
 
         QString targetName = getKey("TargetName", "Instrument");
         if (targetName.toLower() == "sky" ||
@@ -322,7 +322,7 @@ bool HiCalConf::_naifLoaded = false;
         double sunv[3];
 
         std::vector<double> etStart = {obsStartTime};
-        std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, targetName.toLatin1().data(), "sun", "J2000", "LT+S", "hirise", "reconstructed", "reconstructed", false);
+        std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, targetName.toLatin1().data(), "sun", "J2000", "LT+S", "hirise", "reconstructed", "reconstructed");
         std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunv);
 
         sunkm = vnorm_c(sunv);

@@ -512,7 +512,7 @@ namespace Isis {
     // Compute start SCLK if present on labels
     if ( origStartClock.size() > 0 ) {
       NaifStatus::CheckErrors();
-      std::string newSCLK = Isis::RestfulSpice::doubleEtToSclk(camera->naifSclkCode(), newStartClock.Et(), "base", false);
+      std::string newSCLK = Isis::RestfulSpice::doubleEtToSclk(camera->naifSclkCode(), newStartClock.Et(), "base");
 
       NaifStatus::CheckErrors();
 
@@ -527,7 +527,7 @@ namespace Isis {
     // Compute end SCLK if present on labels
     if ( origStopClock.size() > 0 ) {
       NaifStatus::CheckErrors();
-      std::string newSCLK = Isis::RestfulSpice::doubleEtToSclk(camera->naifSclkCode(), newStopClock.Et(), "base", false);
+      std::string newSCLK = Isis::RestfulSpice::doubleEtToSclk(camera->naifSclkCode(), newStopClock.Et(), "base");
       NaifStatus::CheckErrors();
 
       sumtStopClock.addValue(origStopClock[0], origStopClock.unit());

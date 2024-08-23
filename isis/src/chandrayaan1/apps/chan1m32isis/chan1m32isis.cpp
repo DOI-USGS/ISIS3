@@ -384,12 +384,12 @@ namespace Isis {
       }
 
       inst.findKeyword("StartTime").setValue(firstEt.UTC());
-      std::string startClockString = Isis::RestfulSpice::doubleEtToSclk(sclkCode, firstEt.Et(), "chandrayaan1", false);
+      std::string startClockString = Isis::RestfulSpice::doubleEtToSclk(sclkCode, firstEt.Et(), "chandrayaan1");
       QString startClock = QString::fromStdString(startClockString);
       inst.findKeyword("SpacecraftClockStartCount").setValue(startClock);
 
       inst.findKeyword("StopTime").setValue(lastEt.UTC());
-      std::string stopClockString= Isis::RestfulSpice::doubleEtToSclk(sclkCode, lastEt.Et(), "chandrayaan1", false);
+      std::string stopClockString= Isis::RestfulSpice::doubleEtToSclk(sclkCode, lastEt.Et(), "chandrayaan1");
       QString stopClock = QString::fromStdString(stopClockString);
       inst.findKeyword("SpacecraftClockStopCount").setValue(stopClock);
     }

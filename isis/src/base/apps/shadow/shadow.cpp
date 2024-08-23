@@ -82,7 +82,7 @@ namespace Isis {
       if (userKernels){
         sunLt = SpiceQL::getTargetStates(etStart, "sun", observer, bff, "NONE", "base", "reconstructed", "reconstructed", true);
       }else{
-        sunLt = Isis::RestfulSpice::getTargetStates(etStart, "sun", observer, bff, "NONE", RestfulSpice::spiceql_mission_map[observer], "reconstructed", "reconstructed", false);
+        sunLt = Isis::RestfulSpice::getTargetStates(etStart, "sun", observer, bff, "NONE", RestfulSpice::spiceql_mission_map[observer], "reconstructed", "reconstructed");
       }
 
       NaifStatus::CheckErrors();
@@ -94,7 +94,7 @@ namespace Isis {
       if (userKernels){
         sunLt = SpiceQL::getTargetStates(etStart, "sun", observer, bff, "NONE", "base", "reconstructed", "reconstructed", true);
       }else{
-        sunLt = Isis::RestfulSpice::getTargetStates(etStart, "sun", observer, bff, "NONE", RestfulSpice::spiceql_mission_map[observer], "reconstructed", "reconstructed", false);
+        sunLt = Isis::RestfulSpice::getTargetStates(etStart, "sun", observer, bff, "NONE", RestfulSpice::spiceql_mission_map[observer], "reconstructed", "reconstructed");
       }
       
       std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunPosition);

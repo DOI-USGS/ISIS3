@@ -386,10 +386,10 @@ namespace Isis {
       try {
         NaifStatus::CheckErrors();
         double sunv[3];
-        double et = Isis::RestfulSpice::utcToEt(t.toLatin1().data(), false);
+        double et = Isis::RestfulSpice::utcToEt(t.toLatin1().data());
 
         std::vector<double> etStart = {et};
-        std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, "sun", "mars", "J2000", "LT+S", "viking2", "reconstructed", "reconstructed", false);
+        std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, "sun", "mars", "J2000", "LT+S", "viking2", "reconstructed", "reconstructed");
         std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunv);
 
         return sqrt(sunv[0] * sunv[0] + sunv[1] * sunv[1] + sunv[2] * sunv[2]);

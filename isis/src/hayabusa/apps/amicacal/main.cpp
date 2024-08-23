@@ -671,7 +671,7 @@ QString loadCalibrationVariables(const QString &config, Cube *iCube)  {
   }
   catch(IException &e) {
     try{
-      obsStartTime = Isis::RestfulSpice::strSclkToEt(g_hayabusaNaifCode, g_startTime.toLatin1().data(), "amica", false);
+      obsStartTime = Isis::RestfulSpice::strSclkToEt(g_hayabusaNaifCode, g_startTime.toLatin1().data(), "amica");
     }
     catch (IException &e) {
         QString message = "IOF option does not work with non-spiceinited cubes.";

@@ -485,7 +485,7 @@ namespace Isis {
   
           NaifStatus::CheckErrors();
   
-          double obsStartTime = Isis::RestfulSpice::strSclkToEt(-77, startTime.toStdString(), "galileo", false);
+          double obsStartTime = Isis::RestfulSpice::strSclkToEt(-77, startTime.toStdString(), "galileo");
           spicegll.setTime(obsStartTime);
           double sunv[3];
           spicegll.sunPosition(sunv);

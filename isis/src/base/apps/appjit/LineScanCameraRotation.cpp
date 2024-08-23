@@ -55,8 +55,6 @@ namespace Isis {
     p_ckKeyword = kernels["InstrumentPointing"];
 
     p_cacheTime = timeCache;
-//    std::cout<<std::setprecision(24);
-//    std::cout<<timeCache.at(0)<<"-"<<timeCache.at(50000)<<std::endl;
 
     InitConstantRotation(p_cacheTime[0]);
 
@@ -111,7 +109,6 @@ namespace Isis {
     // *** May need to do a frame trace and load the frames (at least the constant ones) ***
 
     // Loop and load the cache
-    double state[6];
     NaifStatus::CheckErrors();
 
     double R[3];  // Direction of radial axis of line scan camera
@@ -124,18 +121,25 @@ namespace Isis {
     SpiceRotation *crot = p_spi->instrumentRotation();
 
     std::vector<ale::Rotation> rotationCache;
+
+    std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(p_cacheTime, "MRO", "mars", "IAU_MARS", "NONE", "mro", "reconstructed", "reconstructed");
+
+    double state[6];
     for(std::vector<double>::iterator i = p_cacheTime.begin(); i < p_cacheTime.end(); i++) {
+      // Clear state array before copying new values
+      std::fill_n(state, 6, 0);
+
       double et = *i;
+
+      // Get the index from the iterator
+      size_t idx = i - p_cacheTime.begin();
 
       prot->SetEphemerisTime(et);
       crot->SetEphemerisTime(et);
 
       // The following code will be put into method LoadIBcache()
       
-      std::vector<double> etStart = {et};
-      // @TODO move getTargetStates outside of for loop
-      std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, "MRO", "mars", "IAU_MARS", "NONE", "base", "reconstructed", "reconstructed", false);
-      std::copy(sunLt[0].begin(), sunLt[0].begin()+6, state);
+      std::copy(sunLt[idx].begin(), sunLt[idx].begin()+6, state);
 
 
       // Compute the direction of the radial axis (3) of the line scan camera

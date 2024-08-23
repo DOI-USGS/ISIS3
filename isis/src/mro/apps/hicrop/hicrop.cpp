@@ -77,10 +77,25 @@ namespace Isis {
     QString inputFileName = g_cube->fileName();
     // get user inputs for input cube and open
     try {
-
       // read kernel files and furnish these kernels for naif routines used in
       // originalStartTime() and time2clock()
       IString ckFileName = ui.GetFileName("CK");
+
+      SpiceQL::KernelPool &kPool =  SpiceQL::KernelPool::getInstance();
+      kPool.load(FileName(QString::fromStdString(ckFileName)).expanded().toLatin1().data());
+
+      if (ui.WasEntered("LSK")) {
+        IString lskFileName = ui.GetFileName("LSK");
+        kPool.load(FileName(QString::fromStdString(lskFileName)).expanded().toLatin1().data());
+      }else{
+      }
+
+      if (ui.WasEntered("SCLK")) {
+        IString sclkFileName = ui.GetFileName("SCLK");
+        kPool.load(FileName(QString::fromStdString(sclkFileName)).expanded().toLatin1().data());
+      }else{
+        kPool.loadClockKernels();
+      }
 
       // get values from the labels needed to compute the line rate and the
       // actual start time of the input cube
@@ -104,7 +119,7 @@ namespace Isis {
 
       // get the actual original start time by making adjustments to the
       // spacecraft clock start count in the labels
-      iTime timeFromLabelClockCount = Isis::RestfulSpice::strSclkToEt(-74999, labelStartClockCount.toLatin1().data(), "hirise", false);
+      iTime timeFromLabelClockCount = Isis::RestfulSpice::strSclkToEt(-74999, labelStartClockCount.toLatin1().data(), "hirise");
       iTime originalStart = actualTime(timeFromLabelClockCount, tdiMode,
                                        unbinnedRate, binMode);
       double originalStartEt = originalStart.Et();
@@ -233,18 +248,18 @@ namespace Isis {
                         ckCoverage.first, ckCoverage.second);
 
       // HiRise spacecraft clock format is P/SSSSSSSSSS:FFFFF
-      IString actualCropStartClockCount = Isis::RestfulSpice::doubleEtToSclk(-74999, cropStartTime.Et(), "hirise", false);
-      IString actualCropStopClockCount = Isis::RestfulSpice::doubleEtToSclk(-74999, cropStopTime.Et(), "hirise", false);
+      IString actualCropStartClockCount = Isis::RestfulSpice::doubleEtToSclk(-74999, cropStartTime.Et(), "hirise");
+      IString actualCropStopClockCount = Isis::RestfulSpice::doubleEtToSclk(-74999, cropStopTime.Et(), "hirise");
 
 
       // readjust the time to get the appropriate label value for the
       // spacecraft clock start count for the labels of the cropped cube
       iTime adjustedCropStartTime = labelClockCountTime(cropStartTime, tdiMode,
                                                         unbinnedRate, binMode);
-      QString adjustedCropStartClockCount = QString::fromStdString(Isis::RestfulSpice::doubleEtToSclk(-74999, adjustedCropStartTime.Et(), "hirise", false));
+      QString adjustedCropStartClockCount = QString::fromStdString(Isis::RestfulSpice::doubleEtToSclk(-74999, adjustedCropStartTime.Et(), "hirise"));
       iTime adjustedCropStopTime = labelClockCountTime(cropStopTime, tdiMode,
                                                        unbinnedRate, binMode);
-      QString adjustedCropStopClockCount = QString::fromStdString(Isis::RestfulSpice::doubleEtToSclk(-74999, adjustedCropStopTime.Et(), "hirise", false));
+      QString adjustedCropStopClockCount = QString::fromStdString(Isis::RestfulSpice::doubleEtToSclk(-74999, adjustedCropStopTime.Et(), "hirise"));
 
 
 

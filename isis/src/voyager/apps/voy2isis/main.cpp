@@ -361,14 +361,14 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   // The purpose of the next two steps, getting the spacecraft clock count,
   // are simply to get the partition, the very first number 1/...
 
-  double approxEphemeris = Isis::RestfulSpice::utcToEt(inst["StartTime"][0].toLatin1().data(), false);
+  double approxEphemeris = Isis::RestfulSpice::utcToEt(inst["StartTime"][0].toLatin1().data());
 
   // sce2s_c requires the spacecraft number, not the instrument number as
   // we've found elsewhere, either -31 or -32 in this case.
   int spacecraftClockNumber = -30;
   spacecraftClockNumber -= toInt(spacecraftNumber);
   std::string confId = "voyager" + spacecraftNumber.toStdString();
-  std::string approxSpacecraftClock = Isis::RestfulSpice::doubleEtToSclk(spacecraftClockNumber, approxEphemeris, confId, false);
+  std::string approxSpacecraftClock = Isis::RestfulSpice::doubleEtToSclk(spacecraftClockNumber, approxEphemeris, confId);
 
   /*
    * For our next trick, we will substitute the image number we got earlier
@@ -394,10 +394,10 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   newClockCount.append(":");
   newClockCount.append(imgNumber.mid(5, 2));
 
-  approxEphemeris = Isis::RestfulSpice::strSclkToEt(spacecraftClockNumber, newClockCount.toStdString(), confId, false);
+  approxEphemeris = Isis::RestfulSpice::strSclkToEt(spacecraftClockNumber, newClockCount.toStdString(), confId);
 
   //* 4 *//
-  std::string utcOut = Isis::RestfulSpice::etToUtc(approxEphemeris, "ISOC", 3, false);
+  std::string utcOut = Isis::RestfulSpice::etToUtc(approxEphemeris, "ISOC", 3);
   NaifStatus::CheckErrors();
   inst["StartTime"].setValue(QString::fromStdString(utcOut));
 

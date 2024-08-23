@@ -673,7 +673,7 @@ namespace Isis {
             double sunpos[6];
 
             std::vector<double> etStartVec = {etStart};
-            std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStartVec, "sun", "moon", "MOON_ME", "LT+S", "lroc", "reconstructed", "reconstructed", false);
+            std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStartVec, "sun", "moon", "MOON_ME", "LT+S", "lroc", "reconstructed", "reconstructed");
             std::copy(sunLt[0].begin(), sunLt[0].begin()+6, sunpos);
 
             g_solarDistance = vnorm_c(sunpos) / KM_PER_AU;

@@ -78,19 +78,19 @@ namespace Isis {
         
         //  Determine if the target is a valid NAIF target
         try{
-          Isis::RestfulSpice::translateNameToCode(target.toLatin1().data(), "mdis", false);
+          Isis::RestfulSpice::translateNameToCode(target.toLatin1().data(), "mdis");
         }catch(std::invalid_argument){
           return false;
         }
 
         
         //  Convert starttime to et
-        double obsStartTime = Isis::RestfulSpice::strSclkToEt(-236, scStartTime.toLatin1().data(), "mdis", false);
+        double obsStartTime = Isis::RestfulSpice::strSclkToEt(-236, scStartTime.toLatin1().data(), "mdis");
         
         //  Get the vector from target to sun and determine its length
         double sunv[3];
         std::vector<double> etStart = {obsStartTime};
-        std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, target.toLatin1().data(), "sun", "J2000", "LT+S", "mdis", "reconstructed", "reconstructed", false);
+        std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, target.toLatin1().data(), "sun", "J2000", "LT+S", "mdis", "reconstructed", "reconstructed");
         std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunv);
 
         double sunkm = vnorm_c(sunv);
@@ -371,7 +371,7 @@ namespace Isis {
         NaifStatus::CheckErrors();
 
         //  Convert s/c clock start time to et
-        obsStartTime = Isis::RestfulSpice::strSclkToEt(-236, scStartTime.toLatin1().data(), "mdis", false);
+        obsStartTime = Isis::RestfulSpice::strSclkToEt(-236, scStartTime.toLatin1().data(), "mdis");
       } 
       catch (IException &e) {
         QString message = "Could not convert spacecraft clock start count to ET.";

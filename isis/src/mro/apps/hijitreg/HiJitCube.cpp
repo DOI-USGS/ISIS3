@@ -158,7 +158,7 @@ namespace Isis {
       } catch (IException &e) {
         try {
           QString scStartTimeString = jdata.scStartTime;
-          jdata.obsStartTime = Isis::RestfulSpice::strSclkToEt(-74999, scStartTimeString.toLatin1().data(), "hirise", false);
+          jdata.obsStartTime = Isis::RestfulSpice::strSclkToEt(-74999, scStartTimeString.toLatin1().data(), "hirise");
         } catch (IException &e) {
             QString message = "Start time of the image can not be determined.";
             throw IException(e, IException::User, message, _FILEINFO_);
