@@ -448,12 +448,12 @@
 	  <parameter name="TOVECT">
 	    <type>filename</type>
 	        <fileMode>output</fileMode>
-			<default><item>Null</item></default>
+			<default><item>output.csv</item></default>
 	          <brief>
 	            Geospatial CSV/BVRT Vector File   
 	          </brief>
 	          <description>
-	              The output file is a comma-delimited file and a VRT sidecar file with geospatial metadata. The coordinate are spherical, unprojected. This file is interoperable with <i>Open Gis Consortium (OGC)</i> compatible Geospatial tools.
+	              The output file is a comma-delimited file (.csv). An XML VRT sidecar file with geospatial metadata will be generated automatically. The vector pixel will include the values of the first band of the input cube.  The coordinate are spherical, unprojected. This file is interoperable with <i>Open Gis Consortium (OGC)</i> compatible geospatial tools and desktop GIS.
 	          </description>
 	          <exclusions>
 	            <item>TO</item>
