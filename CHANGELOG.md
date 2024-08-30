@@ -35,11 +35,14 @@ release.
 
 ## [Unreleased]
 
+## [8.3.0] - 2024-08-16
+
 ### Added
 - Added backplane options for SunIllumination and SurfaceObliqueDetectorResolution to phocube [#5467](https://github.com/DOI-USGS/ISIS3/issues/5467)
 
 ### Changed
 - Isisminer has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5516](https://github.com/USGS-Astrogeology/ISIS3/issues/5516)
+- Photrim has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5581](https://github.com/USGS-Astrogeology/ISIS3/issues/5581)
 - Bandtrim has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5571](https://github.com/USGS-Astrogeology/ISIS3/issues/5571)
 - Modified kaguyasp2isis to work with new (detached) data [#5436](https://github.com/DOI-USGS/ISIS3/issues/5436)
 - Added jigsaw error message for csminit'd images without csm parameters[#5486](https://github.com/DOI-USGS/ISIS3/issues/5486)
@@ -48,6 +51,7 @@ release.
 
 
 ### Fixed
+- Fixed a bug in noproj.cpp which left a persisent lbl file after running noproj. [#5577] (https://github.com/DOI-USGS/ISIS3/issues/5577)
 - Fixed a bug in QVIEW's FindTool in which camera was prioritized over projction [#5508](https://github.com/DOI-USGS/ISIS3/issues/5508)
 - Fixed a bug in PolygonTools in which the program exited before attempting to fix an invalid Polygon [#5520](https://github.com/DOI-USGS/ISIS3/issues/5520)
 - Fixed a bug in QVIEW's Stretch tool where the default min/max type was not an available option [#5289](https://github.com/DOI-USGS/ISIS3/issues/5289)
