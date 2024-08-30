@@ -35,6 +35,10 @@ release.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed a bug in kaguyasp2isis that doesn't work for data with a detached label.
+
 ## [8.3.0] - 2024-08-16
 
 ### Added
