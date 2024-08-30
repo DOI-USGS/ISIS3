@@ -12,10 +12,7 @@
 #include "PixelFOV.h"
 #include "ProcessByBrick.h"
 #include "ProcessGroundPolygons.h"
-//#include "ProcessRubberSheet.h"
-//#include "ProjectionFactory.h"
 #include "Pvl.h"
-//#include "PvlGroup.h"
 #include "Target.h"
 
 #include "Transform.h"
@@ -25,29 +22,10 @@
 
 #include "UserInterface.h"
 
-//void PrintMap();
 
 
-// Check for docs for GUI helpers -> KEEP and move it to pixel2map.cpp 
-//std::map <QString, void *> GuiHelpers() {
-//  map <QString, void *> helper;
-//  helper ["PrintMap"] = (void *) PrintMap;
-//  return helper;
-//}
-
-
-
-
-namespace Isis {
-
-  //extern void pixel2map(Cube* incube, UserInterface &ui);
-  extern void pixel2map(UserInterface &ui, Pvl *log=nullptr);
-  //extern void pixel2map(Cube *incube, Pvl &userMap);
+extern void pixel2map(UserInterface &ui, Pvl *log=nullptr);
   
-  //static void rasterizePixel(Isis::Buffer &in);
-  //static void vectorizePixel(Isis::Buffer &in);	
-
-
 
 /**
  * @author 2008-02-13 Stacy Alley
