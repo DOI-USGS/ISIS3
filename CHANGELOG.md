@@ -40,12 +40,12 @@ release.
 - Added Vectorize to ProcessGroundPolygon library
 - Added gtest files for the app and unit test 
 
-## Changed
+### Changed
 - Refactored the pixel2map app
 - Updated pixel2map documentation
 
-## Fixed
-
+### Fixed
+- Fixed a bug in kaguyasp2isis that doesn't work for data with a detached label.
 
 ## [8.3.0] - 2024-08-16
 
