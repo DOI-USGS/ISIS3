@@ -11,7 +11,7 @@ find files of those names at the top level of this repository. **/
 #include <iostream>
 #include <fstream>
 
-#include "automos.h"
+//#include "automos.h"
 #include "FileList.h"
 #include "FileName.h"
 #include "Cube.h"
@@ -32,7 +32,7 @@ namespace Isis {
 
     // Get Filename with list of cubes to mosaic
     FileName cubeListFileName(ui.GetFileName("FROMLIST"));
-
+    std::cout << "***going to run 2nd noseam method\n";
     return noseam(cubeListFileName, ui);
   }
 
@@ -46,19 +46,44 @@ namespace Isis {
    */
   void noseam(FileName &cubeListFileName, UserInterface &ui) {
 
+    // Boxcar samples and lines must be odd and 1 or greater
+    int samples;
+    if (ui.WasEntered("SAMPLES")) {
+      samples = ui.GetInteger("SAMPLES");
+      
+      if (samples < 1 || samples % 2 == 0) {
+        string msg = "Value for [SAMPLES] must be odd and greater or equal to 1.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
+    else {
+      string msg = "Parameter [SAMPLES] must be entered.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    int lines;
+    if (ui.WasEntered("LINES")) {
+      lines = ui.GetInteger("LINES");
+
+      if (lines < 1 || lines % 2 == 0) {
+        string msg = "Value for [LINES] must be odd and greater or equal to 1.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
+    else {
+      string msg = "Parameter [LINES] must be entered.";
+      throw IException(IException::User, msg, _FILEINFO_);      
+    }
     // Get user parameters
     FileList cubes;
     cubes.read(cubeListFileName);
 
-    int samples = ui.GetInteger("SAMPLES");
-    int lines = ui.GetInteger("LINES");
     QString match = ui.GetAsString("MATCHBANDBIN");
 
     // Sets up the pathName to be used for most application calls
     FileName inFile = cubes[0];
 
-    Pvl &pref = Preference::Preferences();
-    QString pathName = (QString)pref.findGroup("DataDirectory")["Temporary"] + "/";
+    QString pathName = FileName("$TEMPORARY/").expanded();
 
     /**
      * Creates a mosaic from the original images.  It is placed here

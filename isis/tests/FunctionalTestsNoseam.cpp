@@ -70,6 +70,12 @@ TEST_F(ThreeImageNetwork, FunctionalTestNoseamDefault) {
   EXPECT_EQ(double(mapping["MaximumLatitude"]), 3.3932951263901);
   EXPECT_EQ(double(mapping["MinimumLongitude"]), -0.94830771139743);
   EXPECT_EQ(double(mapping["MaximumLongitude"]), 1.4318179715731);
+
+  // remove print.prt file if it has been created
+  FileName printFile("print.prt");
+  if (printFile.fileExists()) {
+    remove("print.prt");
+  }
 }
 
 
@@ -84,21 +90,23 @@ TEST_F(ThreeImageNetwork, FunctionalTestNoseamDefault) {
    *        3) matchbandbin = yes (default)
    *        4) removetemp = yes (default)
    * 
-   * THROWS: **USER ERROR** Value for [SAMPLES] must be odd.
+   * THROWS: Value for [SAMPLES] must be odd and greater or equal to 1.
   */
 TEST_F(ThreeImageNetwork, FunctionalTestNoseamEvenBoxFilterSamples) {
+  
+  // create list of input projected cube files
+  FileName cubeListFileName(tempDir.path() + "/cubes.lis");
 
   // create list of input cube files
   ofstream of;
-  of.open(tempDir.path().toStdString() + "/cubes.lis");
+  of.open((cubeListFileName.original()).toStdString());
   of << cube1map->fileName() << "\n";
   of << cube2map->fileName() << "\n";
   of << cube3map->fileName() << "\n";
   of.close();
 
   // run noseam
-  QVector<QString> args = {"fromlist=" + tempDir.path() + "/cubes.lis",
-                           "to=" + tempDir.path() + "/result.cub",
+  QVector<QString> args = {"to=" + tempDir.path() + "/result.cub",
                            "samples=12",
                            "lines=11"
                            };
@@ -106,12 +114,18 @@ TEST_F(ThreeImageNetwork, FunctionalTestNoseamEvenBoxFilterSamples) {
   UserInterface ui(APP_XML, args);
 
   try {
-    noseam(ui);
+    noseam(cubeListFileName, ui);
     FAIL() << "Expected Exception for boxcar even sample input";
   }
   catch (IException &e) {
     EXPECT_TRUE(e.toString().toLatin1().contains("[SAMPLES] must be odd"))
       << e.toString().toStdString();
+  }
+
+  // remove print.prt file if it has been created
+  FileName printFile("print.prt");
+  if (printFile.fileExists()) {
+    remove("print.prt");
   }
 }
 
@@ -127,21 +141,23 @@ TEST_F(ThreeImageNetwork, FunctionalTestNoseamEvenBoxFilterSamples) {
    *        3) matchbandbin = yes (default)
    *        4) removetemp = yes (default)
    * 
-   * THROWS: **USER ERROR** Value for [LINES] must be odd.
+   * THROWS: Value for [LINES] must be odd and greater or equal to 1.
   */
 TEST_F(ThreeImageNetwork, FunctionalTestNoseamEvenBoxFilterLines) {
 
+  // create list of input projected cube files
+  FileName cubeListFileName(tempDir.path() + "/cubes.lis");
+
   // create list of input cube files
   ofstream of;
-  of.open(tempDir.path().toStdString() + "/cubes.lis");
+  of.open((cubeListFileName.original()).toStdString());
   of << cube1map->fileName() << "\n";
   of << cube2map->fileName() << "\n";
   of << cube3map->fileName() << "\n";
   of.close();
 
   // run noseam
-  QVector<QString> args = {"fromlist=" + tempDir.path() + "/cubes.lis",
-                           "to=" + tempDir.path() + "/result.cub",
+  QVector<QString> args = {"to=" + tempDir.path() + "/result.cub",
                            "samples=11",
                            "lines=12"
                            };
@@ -149,12 +165,18 @@ TEST_F(ThreeImageNetwork, FunctionalTestNoseamEvenBoxFilterLines) {
   UserInterface ui(APP_XML, args);
 
   try {
-    noseam(ui);
+    noseam(cubeListFileName, ui);
     FAIL() << "Expected Exception for boxcar even line input";
   }
   catch (IException &e) {
     EXPECT_TRUE(e.toString().toLatin1().contains("[LINES] must be odd"))
       << e.toString().toStdString();
+  }
+
+  // remove print.prt file if it has been created
+  FileName printFile("print.prt");
+  if (printFile.fileExists()) {
+    remove("print.prt");
   }
 }
 
@@ -169,33 +191,41 @@ TEST_F(ThreeImageNetwork, FunctionalTestNoseamEvenBoxFilterLines) {
    *        3) matchbandbin = yes (default)
    *        4) removetemp = yes (default)
    * 
-   * THROWS: **USER ERROR** Parameter [SAMPLES] has no value.
+   * THROWS: Parameter [SAMPLES] must be entered.
   */
 TEST_F(ThreeImageNetwork, FunctionalTestNoseamNoBoxFilterSamples) {
 
+  // create list of input projected cube files
+  FileName cubeListFileName(tempDir.path() + "/cubes.lis");
+
   // create list of input cube files
   ofstream of;
-  of.open(tempDir.path().toStdString() + "/cubes.lis");
+  of.open((cubeListFileName.original()).toStdString());
   of << cube1map->fileName() << "\n";
   of << cube2map->fileName() << "\n";
   of << cube3map->fileName() << "\n";
   of.close();
 
   // run noseam
-  QVector<QString> args = {"fromlist=" + tempDir.path() + "/cubes.lis",
-                           "to=" + tempDir.path() + "/result.cub",
+  QVector<QString> args = {"to=" + tempDir.path() + "/result.cub",
                            "lines=11"
                            };
 
   UserInterface ui(APP_XML, args);
 
   try {
-    noseam(ui);
+    noseam(cubeListFileName, ui);
     FAIL() << "Expected Exception for no input for boxcar samples";
   }
   catch (IException &e) {
-    EXPECT_TRUE(e.toString().toLatin1().contains("[SAMPLES] has no value"))
+    EXPECT_TRUE(e.toString().toLatin1().contains("[SAMPLES] must be entered"))
       << e.toString().toStdString();
+  }
+
+  // remove print.prt file if it has been created
+  FileName printFile("print.prt");
+  if (printFile.fileExists()) {
+    remove("print.prt");
   }
 }
 
@@ -210,32 +240,40 @@ TEST_F(ThreeImageNetwork, FunctionalTestNoseamNoBoxFilterSamples) {
    *        3) matchbandbin = yes (default)
    *        4) removetemp = yes (default)
    * 
-   * THROWS: **USER ERROR** Parameter [LINES] has no value.
+   * THROWS: Parameter [LINES] must be entered.
   */
 TEST_F(ThreeImageNetwork, FunctionalTestNoseamNoBoxFilterLines) {
 
+  // create list of input projected cube files
+  FileName cubeListFileName(tempDir.path() + "/cubes.lis");
+
   // create list of input cube files
   ofstream of;
-  of.open(tempDir.path().toStdString() + "/cubes.lis");
+  of.open((cubeListFileName.original()).toStdString());
   of << cube1map->fileName() << "\n";
   of << cube2map->fileName() << "\n";
   of << cube3map->fileName() << "\n";
   of.close();
 
   // run noseam
-  QVector<QString> args = {"fromlist=" + tempDir.path() + "/cubes.lis",
-                           "to=" + tempDir.path() + "/result.cub",
+  QVector<QString> args = {"to=" + tempDir.path() + "/result.cub",
                            "samples=11"
                            };
 
   UserInterface ui(APP_XML, args);
 
   try {
-    noseam(ui);
+    noseam(cubeListFileName, ui);
     FAIL() << "Expected Exception for no input for boxcar lines";
   }
   catch (IException &e) {
-    EXPECT_TRUE(e.toString().toLatin1().contains("[LINES] has no value"))
+    EXPECT_TRUE(e.toString().toLatin1().contains("[LINES] must be entered"))
       << e.toString().toStdString();
+  }
+
+  // determine if print.prt has been generated and if so, remove it
+  FileName printFile("print.prt");
+  if (printFile.fileExists()) {
+    remove("print.prt");
   }
 }
