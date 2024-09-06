@@ -36,7 +36,10 @@
       adjustment.  The initial states of the points are tagged as <def>a priori</def> in the
       <def>control network</def>, and their final states are tagged as <def>adjusted</def>.
       Updated camera information is only written to the <def>cube</def> labels if the bundle
-      converges and the <b>UPDATE</b> parameter is selected.
+      converges and the <b>UPDATE</b> parameter is selected. In addition to <b>UPDATE</b> being
+      true and bundle converging, if the <b>ADJUSTMENT_INPUT</b> is set to an HDF5 file containing 
+      bundle adjustment values (usually the HDF5 output file from <b>ADJUSTMENTOUT_H5</b>), those 
+      values can be applied to the <def>cube</def> labels.
     </p>
 
     <p>
@@ -53,7 +56,8 @@
       file with the <b>IMAGESCSV</b> option and likewise for the point statistics with the
       <b>OUTPUT_CSV</b> option. <b>RESIDUALS_CSV</b> provides a table of the measured image
       coordinates, the final <def>sample</def>, <def>line</def>, and overall residuals
-      of every control measure in both millimeters and pixels.
+      of every control measure in both millimeters and pixels. <b>ADJUSTMENTOUT_H5</b> stores bundle 
+      adjustment values in an HDF5 file. Currently, only ISIS adjustment values are saved to file.
     </p>
 
     <h3>Observation Equations</h3>
@@ -1769,7 +1773,7 @@
          <brief>Output file prefix</brief>
          <description>
            File prefix to prepend for the generated output files. Any prefix that is not a
-	   file path will have an underscore placed between the prefix and file name.
+	         file path will have an underscore placed between the prefix and file name.
          </description>
         </parameter>
 
@@ -1836,19 +1840,16 @@
           </default>
         </parameter>
 
-        <parameter name="ADJUSTMENT_OUTPUT">
-          <type>filename</type>
-          <internalDefault>none</internalDefault>
-          <fileMode>input</fileMode>
-          <brief>
-            Outputs adjustment values
-          </brief>
+        <parameter name="ADJUSTMENTOUT_H5">
+          <brief> Outputs bundle adjustment values to HDF5 file - adjustment_out.h5</brief>
           <description>
-            "Outputs adjustment values"
+            Selection of this parameter flags output of bundle adjustment
+            values to a HDF5 file
           </description>
-          <filter>
-            *.h5
-          </filter>
+          <type>boolean</type>
+          <default>
+            <item>yes</item>
+          </default>
         </parameter>
 
         <parameter name="ADJUSTMENT_INPUT">
