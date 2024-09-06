@@ -96,14 +96,14 @@ void IsisMain() {
 
     // Make sure it is not the sky
     if (g_incam->target()->isSky()) {
-      QString msg = "The image [" + list[i].toString() +
+      std::string msg = "The image [" + list[i].toString() +
                     "] is targeting the sky, use skymap instead.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Make sure all the bands for all the files match
     if (i >= 1 && atts0.bandsString() != lastBandString) {
-      QString msg = "The Band numbers for all the files do not match.";
+      std::string msg = "The Band numbers for all the files do not match.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     else {
@@ -284,7 +284,7 @@ void IsisMain() {
       }
 
       else if (ui.GetString("LONSEAM") == "ERROR") {
-        QString msg = "The image [" + ui.GetCubeName("FROM") + "] crosses the " +
+        std::string msg = "The image [" + ui.GetCubeName("FROM") + "] crosses the " +
                      "longitude seam";
         throw IException(IException::User, msg, _FILEINFO_);
       }

@@ -751,7 +751,7 @@ int main(int argc, char *argv[]) {
       in4.reopen("rw");
     }
     catch (IException &e) {
-      QString error = e.toString();
+      std::string error = e.toString();
       error = error.replace(QRegExp("\\[[^\\]]*\\]"), "[...]");
       cerr << error.toStdString() << endl;
     }

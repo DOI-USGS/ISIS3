@@ -101,7 +101,7 @@ namespace Isis {
     // newInput.Rewind();//start at begining
     // newInput.PutLine(hexCode);
     // newInput.Close();
-    // QString msg = "Exporting expected server input to: " + serverInputFile;
+    // std::string msg = "Exporting expected server input to: " + serverInputFile;
     // throw IException(IException::Programmer, msg, _FILEINFO_);
 
     int contentLength = p_xml->length();
@@ -428,12 +428,12 @@ namespace Isis {
    */
   QDomElement SpiceClient::rootXMLElement() {
     if(!p_response || !p_rawResponse) {
-      QString error = "No server response available";
+      std::string error = "No server response available";
       throw IException(IException::Io, error, _FILEINFO_);
     }
 
     QDomDocument document;
-    QString errorMsg;
+    std::string errorMsg;
     int errorLine, errorCol;
 
     if(!p_response->isEmpty() &&
@@ -442,7 +442,7 @@ namespace Isis {
       return document.firstChild().toElement();
     }
     else {
-      QString msg = "Unexpected response from spice server [";
+      std::string msg = "Unexpected response from spice server [";
       msg += *p_rawResponse;
       msg += "]";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -471,7 +471,7 @@ namespace Isis {
       }
     }
 
-    QString msg = "Server response missing XML Tag [" + name + "]";
+    std::string msg = "Server response missing XML Tag [" + name + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 

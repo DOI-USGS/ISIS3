@@ -55,7 +55,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
   //  double HRSCNadirCenterTime = ui.GetDouble("HRSC_NADIRCENTERTIME");
 
   if (input->isProjected()) {
-    QString msg = "Input images is a map projected cube ... not a level 1 image";
+    std::string msg = "Input images is a map projected cube ... not a level 1 image";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -74,7 +74,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
   PvlGroup test = input->label()->findGroup("Kernels", Pvl::Traverse);
   QString InstrumentPointing = QString::fromStdString(test["InstrumentPointing"]);
   if (InstrumentPointing != "Table") {
-    QString msg = "Input image does not contain needed SPICE blobs...run spiceinit with attach=yes.";
+    std::string msg = "Input image does not contain needed SPICE blobs...run spiceinit with attach=yes.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -82,7 +82,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
   ofstream toStrm;
   toStrm.open(to.toLatin1().data(), ios::trunc);
   if (toStrm.bad()) {
-    QString msg = "Unable to open output TO file";
+    std::string msg = "Unable to open output TO file";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -108,7 +108,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
 //    else if (strcmp(filter.toLatin1().data(), "RED") == 0)
 //      isMocWARed = true;
 //    else if (strcmp(filter.toLatin1().data(), "BLUE") == 0) {
-//      QString msg = "MOC WA Blue filter images not supported for Socet Set mapping";
+//      std::string msg = "MOC WA Blue filter images not supported for Socet Set mapping";
 //      throw IException(IException::User, msg, _FILEINFO_);
 //    }
 //  }
@@ -121,7 +121,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
       isHiRise = true;
     }
     else {
-      QString msg = "Unsupported instrument: " + origInstrumentId;
+      std::string msg = "Unsupported instrument: " + origInstrumentId;
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -140,7 +140,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
 //TO DO: UNCOMMENT THIS LINE ONCE HRSC IS WORKING IN SS
 //  else if (instrumentId == "HRSC") isHRSC = true;
   else {
-    QString msg = "Unsupported instrument: " + instrumentId;
+    std::string msg = "Unsupported instrument: " + instrumentId;
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -246,7 +246,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
 //      intTime = lrc.GetLineScanRate();
 //    }
 //    if (numIntTimes <= 0) {
-//      QString msg = "HRSC: Invalid number of scan times";
+//      std::string msg = "HRSC: Invalid number of scan times";
 //      throw IException(IException::Programmer, msg, _FILEINFO_);
 //    }
 //    else
@@ -708,7 +708,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
       cam->radii(targetRadii);
     }
     catch (IException &e) {
-      QString msg = "Failed to get target body radii from cube.";
+      std::string msg = "Failed to get target body radii from cube.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
   }

@@ -170,7 +170,7 @@ namespace Isis {
       int status = system(cmd.toLatin1().data());
       if ( 0 != status) {
         if ( !m_onPreCommandErrorContinue ) {
-          QString mess = command.m_name + " RunCommand::PreCommand failed - " + 
+          std::string mess = command.m_name + " RunCommand::PreCommand failed - " + 
                          cmd + " - you are terminated!";
           throw IException(IException::User, mess, _FILEINFO_);
         }
@@ -198,7 +198,7 @@ namespace Isis {
       int status = system(cmd.toLatin1().data());
       if ( 0 != status) {
         if ( !m_onPostCommandErrorContinue ) {
-          QString mess = command.m_name + " RunCommand::PostCommand failed - " + 
+          std::string mess = command.m_name + " RunCommand::PostCommand failed - " + 
                          cmd + " - you are terminated!";
           throw IException(IException::User, mess, _FILEINFO_);
         }
@@ -223,7 +223,6 @@ namespace Isis {
   int RunCommandStrategy::apply(SharedResource &resource, 
                                 const ResourceList &globals) { 
 
-    int n_good(0);
     BOOST_FOREACH ( Command command, m_commands ) {
       QString cmd = processArgs(command.m_command, m_argKeys, 
                                 getGlobals(resource, globals));
@@ -245,10 +244,9 @@ namespace Isis {
         return (0);
       }
       else {
-      if ( isDebug() ) { 
-        cout << "Command " << command.m_name << " succeeded\n"; 
-      }
-        n_good++;
+        if ( isDebug() ) { 
+          cout << "Command " << command.m_name << " succeeded\n"; 
+        }
       }
     }
     return (1); 

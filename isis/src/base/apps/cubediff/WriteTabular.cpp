@@ -69,7 +69,7 @@ namespace Isis {
       QString thisTitle = thisCol.Name();
 
       if((int)thisTitle.length() > (int)thisCol.Width()) {
-        QString message = "Column header [" + thisTitle + "] is wider " +
+        std::string message = "Column header [" + thisTitle + "] is wider " +
                               "than the set width for column [" + toString((int)index) + "]";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -84,7 +84,7 @@ namespace Isis {
           thisTitle = " " + thisTitle;
         }
         else {
-          QString message = "Alignment is improperly set";
+          std::string message = "Alignment is improperly set";
           throw IException(IException::User, message, _FILEINFO_);
         }
         iteration++;
@@ -142,7 +142,7 @@ namespace Isis {
         Write((double)item);
         return;
       }
-      QString message = "Wrong data type for this Column";
+      std::string message = "Wrong data type for this Column";
       throw IException(IException::User, message, _FILEINFO_);
     }
     QString thisItem(toString(item));
@@ -188,7 +188,7 @@ namespace Isis {
     Column thisCol = p_cols[p_curCol];
     if(thisCol.DataType() != Column::String &&
         thisCol.DataType() != Column::Pixel) {
-      QString message = "Wrong data type for this Column";
+      std::string message = "Wrong data type for this Column";
       throw IException(IException::User, message, _FILEINFO_);
     }
 
@@ -235,7 +235,7 @@ namespace Isis {
     Column thisCol = p_cols[p_curCol];
     if(thisCol.DataType() != Column::Real &&
         thisCol.DataType() != Column::Pixel) {
-      QString message = "Wrong data type for this Column";
+      std::string message = "Wrong data type for this Column";
       throw IException(IException::User, message, _FILEINFO_);
     }
 

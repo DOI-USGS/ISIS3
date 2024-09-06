@@ -50,13 +50,13 @@ void IsisMain() {
     reader = CSVReader(csvFileName, true);
   }
   catch(IException &e) {
-    QString msg = "Failed to read CSV file [" + csvFileName + "].";
+    std::string msg = "Failed to read CSV file [" + csvFileName + "].";
     throw IException(e, IException::Io, msg, _FILEINFO_);
   }
   int numColumns = reader.columns();
   int numRows = reader.rows();
   if (numColumns < 1 || numRows < 1) {
-    QString msg = "CSV file does not have data.\nFile has [" + toString(numRows) +
+    std::string msg = "CSV file does not have data.\nFile has [" + toString(numRows) +
                   "] rows and [" + toString(numColumns) +"] columns.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -112,7 +112,7 @@ void IsisMain() {
       labelPvl.read(labelPvlFilename.toStdString());
     }
     catch(IException &e) {
-      QString msg = "Failed to read PVL label file [" + labelPvlFilename + "].";
+      std::string msg = "Failed to read PVL label file [" + labelPvlFilename + "].";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
@@ -129,7 +129,7 @@ void IsisMain() {
     outCube.open(outCubeFileName, "rw");
   }
   catch(IException &e) {
-    QString msg = "Could not open output cube [" + outCubeFileName + "].";
+    std::string msg = "Could not open output cube [" + outCubeFileName + "].";
     throw IException(e, IException::Io, msg, _FILEINFO_);
   }
 
@@ -137,7 +137,7 @@ void IsisMain() {
     outCube.write(table);
   }
   catch(IException &e) {
-    QString msg = "Could not write output table [" + tableName +
+    std::string msg = "Could not write output table [" + tableName +
                   "] to output cube [" + outCubeFileName + "].";
     throw IException(e, IException::Io, msg, _FILEINFO_);
   }
