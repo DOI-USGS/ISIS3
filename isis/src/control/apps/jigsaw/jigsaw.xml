@@ -1857,10 +1857,13 @@
           <internalDefault>none</internalDefault>
           <fileMode>input</fileMode>
           <brief>
-            Reads in adjustment values
+            Reads in and applies adjustment values
           </brief>
           <description>
-            "Reads in adjustment values"
+            Reads in and applies bundle adjustment values from an HDF5 file,
+            usually the outputted adjustment_out.h5 file. Along with the three
+            required parameters, UPDATE must be set to YES for the input values 
+            to be read and applied.
           </description>
           <filter>
             *.h5
