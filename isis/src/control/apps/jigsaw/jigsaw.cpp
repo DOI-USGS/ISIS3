@@ -266,7 +266,7 @@ namespace Isis {
       if (ui.GetBoolean("UPDATE") ) {
         if ( !bundleAdjustment->isConverged() ) {
           gp += PvlKeyword("Status","Bundle did not converge, camera pointing NOT updated");
-          std::string msg = "Bundle did not converge within MAXITS [" + toString(ui.GetInteger("MAXITS")) + "] iterations [" + cnetFile +  "]";
+          std::string msg = "Bundle did not converge within MAXITS [" + toString(ui.GetInteger("MAXITS")) + "] iterations [" + cnetFile.toStdString() +  "]";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
         else {
@@ -333,7 +333,7 @@ namespace Isis {
     }
     catch(IException &e) {
       bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
-      std::string msg = "Unable to bundle adjust network [" + cnetFile + "]";
+      std::string msg = "Unable to bundle adjust network [" + cnetFile.toStdString() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
@@ -493,7 +493,7 @@ namespace Isis {
     // Inform the user which images are not in the second list
     if (!imagesNotFound.isEmpty()) {
       std::string msg = "The following images are not in the FROMLIST:";
-      msg += imagesNotFound + ".";
+      msg += imagesNotFound.toStdString() + ".";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -536,7 +536,7 @@ namespace Isis {
           }
         }
         if (!found){
-          std::string msg = "No BundleObservationSolveSettings found for " + snInstId;
+          std::string msg = "No BundleObservationSolveSettings found for " + snInstId.toStdString();
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
@@ -736,8 +736,8 @@ namespace Isis {
           pt->SetAprioriSurfacePoint(cam->GetSurfacePoint());
         }
         else {
-          std::string msg = "Cannot compute surface point for control point [" + pt->GetId() +
-              "], measure [" + cm->GetCubeSerialNumber() + "].";
+          std::string msg = "Cannot compute surface point for control point [" + pt->GetId().toStdString() +
+              "], measure [" + cm->GetCubeSerialNumber().toStdString() + "].";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
