@@ -38,7 +38,6 @@ Deborah Lee Soltesz
         </title>
         <link rel="stylesheet" href="../../../../assets/styles/IsisStyleCommon.css"></link>
         <link rel="stylesheet" href="../styles/IsisApplicationDocStyle.css"></link>
-        <link rel="stylesheet" href="../../../../assets/styles/menu.css"/>
         <link rel="stylesheet" media="print" href="../../../../assets/styles/print.css"/>
 
         <xsl:variable name="keywordList">

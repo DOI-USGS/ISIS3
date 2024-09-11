@@ -7,121 +7,151 @@
    */
 
 
-    body     {
-               background-color: #FAF0D4 ;
-               background-image: URL(../banners/isis_wallpaper.jpg) ;
-               background-repeat: repeat-y ;
-               background-attachment: fixed ;
-               font-family: Arial, Helvetica, Geneva, sans-serif ;
-             }
+    /* Page Layout */
 
-    /* ----------------------------------------------------------------
-     * HEADINGS */
+    #page {
+      display: flex;
+      flex-direction: row;
+      margin: 1rem 2rem;
+    }
 
-     h1       {
-               font-family:     Arial Black, Arial, Geneva, sans-serif ;
-               font-size:       150% ;
-               font-weight:     bold ;
-               font-variant:    small-caps ;
-               text-decoration: none ;
-               margin-top:      2px;
-               margin-bottom:   3px;
-              }
+    .sidenav {
+      margin: 0rem 2rem 4rem;
+      width: 14rem;
+      flex-shrink: 0;
+    }
 
-     h1.subtitle
-              {
-               font-family:      Arial, Geneva, sans-serif ;
-               font-variant:     normal ;
-               font-size:        100% ;
-               font-style:       italic ;
-               font-weight:      normal ;
-               text-decoration:  none ;
-               color:            black ;
-               margin-top:       0px;
-               margin-bottom:    3px;
-              }
-
-     h2       {
-               font-family: Arial, Helvetica, Geneva, sans-serif ;
-               font-size: 110% ;
-               font-weight: bold ;
-               font-variant: small-caps ;
-               text-decoration: none ;
-               margin-top:2px;
-               margin-bottom:3px;
-               padding: 3px ;
-              }
-
-     h3       {
-               font-family: serif ;
-               font-size: 110% ;
-               font-weight: bold ;
-               font-variant:    small-caps ;
-               text-decoration: none ;
-               margin-top:10px;
-               margin-bottom:5px;
-              }
+    main {
+      margin: 0rem 3rem;
+    }
 
 
-     h4       {
-               font-family: Arial, Helvetica, Geneva, sans-serif ;
-               font-size: 100% ;
-               font-weight: bold ;
-               text-decoration: underline ;
-               font-style: italic;
-               margin-top:10px;
-               margin-bottom:5px;
+    /* Elements */
 
-              }
+    h1, h2, h3 {
+      color: #336699 ;
+    }
 
-     h5       {
-               font-family: serif ;
-               font-size: 90% ;
-               font-weight: bold ;
-               text-decoration: none ;
-               margin-top:10px;
-               margin-bottom:5px;
-              }
-
-     h6       {
-               font-family: Arial, Helvetica, Geneva, sans-serif ;
-               font-size: 80% ;
-               font-weight: bold ;
-               font-variant: small-caps ;
-               text-decoration: underline ;
-               margin-top:10px;
-               margin-bottom:5px;
-              }
-
-     hr       {
-               height: 1px ;
-              }
+    a {
+      color: #005ea2
+    }
 
 
-     p        {
-                margin: 0px;
-                padding-bottom: 5px;
-                padding-top:    5px;
-              }
+    /* Logo/Brand */
 
-     a        {
-                font-weight: bold;
-              }
+    #isis-banner {
+      background: 
+        linear-gradient(
+            rgba(0, 0, 0, 0.2), 
+            rgba(0, 0, 0, 0.3)
+          ),
+        url(../banners/moon-cr.jpg);
+      color: white;
+      padding: 4rem;
+      background-size: cover;
+    }
 
-     li       {
-                padding-bottom: 5px;
-              }
+    .isis-logo {
+      background-image: url(../img/isis-logo-br.svg);
+      background-repeat: no-repeat;
+      background-size: contain;
+      height: 12rem;
+      width: 15rem;
+    }
 
-     tt       {
-                font-size: 110% ;
-                font-weight: bolder ;
-              }
+    #nav-title {
+      display: flex;
+      flex-wrap: nowrap;
+      padding: 13px;
+      height: 95px;
+      align-items: center;
+    }
+
+    #nav-title-logo {
+      height: 65px;
+      width: 65px;
+      max-width: unset;
+    }
+
+    #nav-title-text-box {
+      height: fit-content;
+      margin-bottom: 6px;
+      margin-left: 4px;
+    }
+
+    #nav-title-text {
+      font-family: Source Sans Pro Web, Helvetica Neue, Helvetica, Roboto, Arial, sans-serif;
+      font-weight: 700;
+      font-size: large;
+      font-style: normal;
+    }
 
 
-     div {
-       font-weight: normal ;
-     }
+    /* Header Search Customization */
 
+    #usgs-header-search-button {
+      position: static;
+      margin-top: 18px;
+      height: 32px;
+      padding: 0 12px;
+      width: 45px;
+      min-width: 2rem;
+    }
+
+
+    /* Card List (applications by category) */
+
+    .card-list-sm {
+      column-count: auto;
+      column-width: 14rem;
+      gap: 1rem;
+      padding: 0;
+    }
+
+    .card-list-sm > li {
+      border: 2px solid #e6e6e6;
+      border-radius: .25rem;
+      list-style-type: none;
+      width: 14rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .card-list-sm > li > a {
+      display: block;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+    }
+
+    .card-list-sm > li > a:hover {
+      background-color: #f0f0f0;
+    }
+
+
+    /* Tables */
+
+    tbody tr:nth-child(odd) {
+      background-color: #D8F2FF;
+    }
+
+    tbody > tr > th {
+      text-align: left;
+      padding: 6px;
+    }
+
+    tbody > tr > td {
+      padding: 6px;
+    }
+
+    td > ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .old-name {
+      font-weight: 500;
+      font-style: italic;
+    }
 
 
     /* -------------------------------------------------------------
@@ -131,7 +161,8 @@
                {
                  font-family: Arial, Helvetica, Geneva, sans-serif ;
                  font-size: 90% ;
-                 border: 3px solid brown ;
+                 border: 3px solid #e6e6e6 ;
+                 border-radius: .25rem;
                }
 
      table.tableTOC
@@ -141,12 +172,12 @@
 
      table.tableTOC th
                {
-                 padding: 3px;
+                 padding: 3rem;
                }
 
      table.tableTOC td
                {
-                 padding: 3px;
+                 padding: 3rem;
                }
 
 
@@ -165,11 +196,6 @@
      table.tablePoll th
                {
                  background-color: #DDCCAA ;
-               }
-
-     table.tablePoll td
-               {
-
                }
 
 
@@ -495,24 +521,6 @@
   table.cheatSheet th {
     background-color: #999999 ;
     color:            white ;
-  }
-
-
-  div.isisMenu {
-    width: 155px ;
-    overflow: hidden ;
-    position: absolute ;
-    top: 5px ;
-    left: 5px ;
-  }
-
-  div.isisContent {
-    padding-left: 10px;
-    padding-right: 20px;
-    position: absolute ;
-    left: 170px;
-    top: 5px ;
-    width: 80% ;
   }
 
   /** Added by Ryan Raub, for use in the documentation (Warning Messages)*/

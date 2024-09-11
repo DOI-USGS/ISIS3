@@ -11,22 +11,7 @@
     /* ----------------------------------------------------------------
      * HEADINGS */
 
-     h1       {
-               color: #336699 ;
-              }
-
-     h2       {
-               background-color: #88AACC ;
-              }
-
-     h3       {
-               color: #336699 ;
-              }
-
-
-     hr       {
-               color: #000099 ;
-              }
+     
 
 
     /* ----------------------------------------------------------------
@@ -36,7 +21,7 @@
 
      /* LEVEL 1: outside level of table cells*/
 
-    .tableCellLevel1
+    /* .tableCellLevel1
               {
                 border:       1px ;
                 border-color: #88AACC ;
@@ -49,7 +34,7 @@
                 border-color:     #88AACC ;
                 border-style:     solid ;
                 background-color: #BBDDEE ;
-              }
+              } */
 
 
     .tableCellLevel1_type

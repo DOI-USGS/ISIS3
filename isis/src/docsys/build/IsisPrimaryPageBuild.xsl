@@ -67,7 +67,6 @@ Deborah Lee Soltesz
 
         <link rel="stylesheet" href="../../assets/styles/IsisStyleCommon.css"/>
         <link rel="stylesheet" href="../../assets/styles/main.css"/>
-        <link rel="stylesheet" href="../../assets/styles/menu.css"/>
         <link rel="stylesheet" media="print" href="../assets/styles/print.css"/>
         <!-- Dynamic analytics insertion to prevent running on local URLs -->
         <xsl:text>&#xa;</xsl:text>

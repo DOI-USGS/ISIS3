@@ -40,7 +40,8 @@ Deborah Lee Soltesz
         </title>
         <link rel="stylesheet" href="../../../../assets/styles/IsisStyleCommon.css"></link>
         <link rel="stylesheet" href="../styles/IsisApplicationDocStyle.css"></link>
-        <link rel="stylesheet" href="../../../../assets/styles/menu.css"/>
+        <link rel="stylesheet" href="../../../../assets/styles/uswds.css"/>
+        <script src="../../../../assets/scripts/uswds-init.min.js"></script>
         <link rel="stylesheet" media="print" href="../../../../assets/styles/print.css"/>
 
         <xsl:variable name="keywordList">
@@ -219,6 +220,8 @@ Deborah Lee Soltesz
       </head>
 
       <body onload="checkBrowser (); contentToggleVisibility('Overview');">
+
+        <script src="../../../../assets/scripts/uswds.min.js"></script>
 
         <noscript>
             <div style="margin: 0px; padding: 10px; font-weight: bold; background-color: gold;">
