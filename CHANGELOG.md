@@ -45,6 +45,7 @@ release.
 - Added backplane options for SunIllumination and SurfaceObliqueDetectorResolution to phocube [#5467](https://github.com/DOI-USGS/ISIS3/issues/5467)
 
 ### Changed
+- Explode has been refactored to be callable; old Makefile test has been removed and replaced by a gtest. Issue: [#5557](https://github.com/USGS-Astrogeology/ISIS3/issues/5557)
 - Isisminer has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5516](https://github.com/USGS-Astrogeology/ISIS3/issues/5516)
 - Algebra has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5594](https://github.com/USGS-Astrogeology/ISIS3/issues/5594)
 - Photrim has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5581](https://github.com/USGS-Astrogeology/ISIS3/issues/5581)
