@@ -1880,15 +1880,14 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawSaveApplyValues) {
                             "cnet="+controlNetPath,
                             "fromlist="+tempDir.path() + "/cubes.lis",
                             "onet="+tempDir.path()+"/apollo_out.net",
-                            "file_prefix="+tempDir.path()+"/",
-                            "adjustment_output="+tempDir.path()+"/apollo_jigsaw.h5",};
+                            "file_prefix="+tempDir.path()+"/"};
 
   UserInterface ui(APP_XML, args);
 
   jigsaw(ui);
 
-  // Check apollow_jigsaw.h5 was created
-  QString bundleOutput = tempDir.path()+"/apollo_jigsaw.h5";
+  // Check apollo_jigsaw.h5 was created
+  QString bundleOutput = tempDir.path()+"/adjustment_out.h5";
   HighFive::File file(bundleOutput.toStdString(), HighFive::File::ReadWrite);
 
   std::string datasetName = "/APOLLO15/METRIC/1971-08-01T15:37:39.428";

@@ -155,8 +155,11 @@ namespace Isis {
           bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA"),LidarData::Format::Binary);
         }
       }
+
       PvlGroup gp("JigsawResults");
       QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
+
+      std::string outputFilePrefix = settings->outputFilePrefix().toStdString();
 
       // ALWAYS* WRITE OUT ADJUSTMENT VALUES 
       // Do NOT write out if ADJUSTMENT_INPUT is set bc 
@@ -165,16 +168,15 @@ namespace Isis {
       if (ui.GetBoolean("ADJUSTMENTOUT_H5")) {
         if (!ui.WasEntered("ADJUSTMENT_INPUT"))
         {
-          // Prep file config
-          std::filesystem::path cwd = std::filesystem::current_path();
-          std::string cwdPath = cwd.string();
-          std::string adjustmentFilename = cwdPath + "/adjustment_out.h5";
+          std::string adjustmentFilename = outputFilePrefix + "adjustment_out.h5";
+          
           File file(adjustmentFilename, File::Truncate);
 
           for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
             Process p;
             CubeAttributeInput inAtt;
             Cube *c = p.SetInputCube(bundleAdjustment->fileName(i), inAtt, ReadWrite);
+
             // Only for ISIS adjustment values
             if (!c->hasBlob("CSMState", "String")) {
               Table cmatrix = bundleAdjustment->cMatrix(i);
@@ -197,7 +199,7 @@ namespace Isis {
           file.flush();
         }
       }
-      
+
       // Update the cube pointing if requested but ONLY if bundle has converged
       if (ui.GetBoolean("UPDATE") ) {
         if ( !bundleAdjustment->isConverged() ) {
@@ -216,7 +218,7 @@ namespace Isis {
             adjustmentFileEnum = File::ReadOnly;
           } else {
             placeholderAdjustmentFileExists = true;
-            adjustmentFilename = "/tmp/placeholder_adj.tmp";
+            adjustmentFilename = QString::fromStdString(outputFilePrefix + "placeholder_adj.tmp");
             adjustmentFileEnum = File::Create;
           }
           File fileRead(adjustmentFilename.toStdString(), adjustmentFileEnum);
@@ -240,6 +242,7 @@ namespace Isis {
               break;
             }
 
+            // Only apply adjustment_input values for non-CSM for now
             if (c->hasBlob("CSMState", "String")) {
               Blob csmStateBlob("CSMState", "String");
               // Read the BLOB from the cube to propagate things like the model
@@ -249,9 +252,7 @@ namespace Isis {
               csmStateBlob.setData(modelState.c_str(), modelState.size());
               csmStateBlob.Label().addComment(jigComment);
               c->write(csmStateBlob);
-            }
-            
-            if (ui.WasEntered("ADJUSTMENT_INPUT")) {
+            } else if (ui.WasEntered("ADJUSTMENT_INPUT")) {
               Table cmatrix = bundleAdjustment->cMatrix(i);
               Table spvector = bundleAdjustment->spVector(i);
 
