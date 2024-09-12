@@ -112,6 +112,7 @@ def segment(img_path : Path, workdir : Path, nlines : int = MAX_LEN):
         work_img = workdir / img_path.name
         shutil.copyfile(img_path, work_img)
         ret = kisis.segment(work_img, nl=nlines, overlap=0, pref__="$ISISROOT/IsisPreferences")
+        os.remove(work_img)
 
         log.debug(f"{ret}")
         segment_metadata = pvl.loads(filter_progress(ret.stdout))
@@ -133,7 +134,7 @@ def segment(img_path : Path, workdir : Path, nlines : int = MAX_LEN):
             log.debug(f"sn: {serial}")
             meta["SN"] = serial 
             meta["Segment"] = i
-            meta["Original"] = str(work_img)
+            meta["Original"] = str(img_path)
         
         seg_dict_keys = [f"seg{n}" for n in range(1,len(segments)+1)]
         segment_dict = dict(zip(seg_dict_keys, segment_metadata))
@@ -221,14 +222,6 @@ def generate_cnet(params, images):
     # # first, throw it out if there is no overlap whatsoever 
     # has_overlap = not any([len(k[1].get("NoOverlap", "")) == new_params["MATCH"] for k in stats])
     
-    # if has_overlap:
-    #     is_thick_enough = stats["Results"]["ThicknessMinimum"] > float(params.get("MINTHICKNESS", 0))
-    #     is_area_large_enough = stats["Results"]["AreaMinimum"] > float(params.get("MINAREA", 0))
-    #     is_pair_overlapping = all([is_thick_enough, is_area_large_enough])
-    #     is_overlapping.append(has_overlap)
-    # else: # not overlapping 
-    #     is_overlapping.append(False) 
-
     # # mask images
     # from_images = list(compress(from_images, is_overlapping))
     log.debug(f"From images overlapping Match: {from_images}")
@@ -422,7 +415,7 @@ def findFeaturesSegment(ui, workdir):
     tolists = [set(o["original_images"]) for o in output if isinstance(o, dict)] 
 
     final_images = set.union(*tolists)
-    final_images.add(ui.GetCubeName("match"))
+    final_images.add(os.path.abspath(ui.GetCubeName("match")))
 
     log.debug(f"merged images: {final_images}")
     kisis.fromlist.make(final_images, Path(ui.GetFileName("tolist")))
@@ -456,5 +449,6 @@ if __name__ == "__main__":
     # log.info(f"COMPLETE, wrote: {ui.GetFileName("onet")}")
     if is_workdir_temp: 
         shutil.rmtree(workdir)
+        log.info("Complete")
     else:
-        log.info("Intermediate files written to")
+        log.info("Intermediate files written to %s", workdir)
