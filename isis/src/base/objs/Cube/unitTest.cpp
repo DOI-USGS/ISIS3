@@ -21,6 +21,8 @@ find files of those names at the top level of this repository. **/
 #include "SpecialPixel.h"
 #include "Statistics.h"
 
+#include <regex>
+
 using namespace std;
 using namespace Isis;
 
@@ -530,7 +532,7 @@ int main(int argc, char *argv[]) {
       for (int i = 0; i < readLineBrick.size(); i++) {
         if (readLineBrick[i] != (i + virtualBands[readLineBrick.Band()-1].toInt())) {
           cerr << "Virtual bands accessed incorrectly at virtual band "
-               << virtualBands[readLineBrick.Band() - 1] << endl;
+               << virtualBands[readLineBrick.Band() - 1].toStdString() << endl;
           return 1;
         }
       }
@@ -552,14 +554,14 @@ int main(int argc, char *argv[]) {
         if (readLineBrick.Band() == 1) {
           if (readLineBrick[i] != (i + virtualBands[readLineBrick.Band()-1].toInt())) {
             cerr << "Virtual bands accessed incorrectly at virtual band "
-                 << virtualBands[readLineBrick.Band() - 1] << endl;
+                 << virtualBands[readLineBrick.Band() - 1].toStdString() << endl;
             return 1;
           }
         }
         else {
           if (readLineBrick[i] != Null) {
             cerr << "Value outside cube boundary at virtual band "
-                 << virtualBands[readLineBrick.Band() - 1] << endl;
+                 << virtualBands[readLineBrick.Band() - 1].toStdString() << endl;
           }
         }
       }
@@ -581,7 +583,7 @@ int main(int argc, char *argv[]) {
       for (int i = 0; i < readLineBrick.size(); i++) {
         if (readLineBrick[i] != (i + virtualBands[readLineBrick.Band()-1].toInt())) {
           cerr << "Virtual bands accessed incorrectly at virtual band "
-               << virtualBands[readLineBrick.Band() - 1] << endl;
+               << virtualBands[readLineBrick.Band() - 1].toStdString() << endl;
           return 1;
         }
       }
@@ -752,8 +754,9 @@ int main(int argc, char *argv[]) {
     }
     catch (IException &e) {
       std::string error = e.toString();
-      error = error.replace(QRegExp("\\[[^\\]]*\\]"), "[...]");
-      cerr << error.toStdString() << endl;
+      std::regex pattern("\\[[^\\]]*\\]");
+      error = std::regex_replace(error, pattern, "[...]");
+      cerr << error << endl;
     }
 
     in4.setPixelType(None);
@@ -976,7 +979,7 @@ int main(int argc, char *argv[]) {
 
 
 void Report(Cube &c) {
-  cerr << "File   = " << IString(QFileInfo(c.fileName()).fileName()) << endl;
+  cerr << "File   = " << IString(QFileInfo(c.fileName()).fileName().toStdString()) << endl;
   cerr << "Samps  = " << c.sampleCount() << endl;
   cerr << "Lines  = " << c.lineCount() << endl;
   cerr << "Bands  = " << c.bandCount() << endl;
