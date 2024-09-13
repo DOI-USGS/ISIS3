@@ -150,6 +150,7 @@ Deborah Lee Soltesz
     /* ----------------------------------------------------------------
      * HEADINGS */
 
+    /*
      H1       {
                font-family:     Arial Black, Arial, Geneva, sans-serif ;
                font-size:       150% ;
@@ -168,7 +169,6 @@ Deborah Lee Soltesz
                text-decoration: none ;
                margin-top:2px;
                margin-bottom:3px;
-               background-color: #88AACC ;
                padding: 3px ;
               }
 
@@ -220,6 +220,7 @@ Deborah Lee Soltesz
      body     {
                background-color: #FFFFFF;
               }
+    */
 
 
     /* ----------------------------------------------------------------

@@ -23,6 +23,7 @@
 
     main {
       margin: 0rem 3rem;
+      flex-grow: 1;
     }
 
 
