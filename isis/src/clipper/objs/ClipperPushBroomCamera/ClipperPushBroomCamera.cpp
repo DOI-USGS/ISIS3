@@ -38,7 +38,7 @@ namespace Isis {
      }
      else {
        std::string msg = "Unable to construct Clipper Push Broom camera model. "
-                     "Unrecognized NaifFrameCode [" + toString(frameCode) + "].";
+                     "Unrecognized NaifFrameCode [" + std::to_string(frameCode) + "].";
        throw IException(IException::User, msg, _FILEINFO_);
      }
 
@@ -47,7 +47,7 @@ namespace Isis {
      Pvl &lab = *cube.label();
 
      PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
-     QString key = "INS" + toString(naifIkCode()) + "_" + QString::fromStdString(bandBin["FilterName"][0]) + "_FOCAL_LENGTH";
+     QString key = "INS" + QString::number(naifIkCode()) + "_" + QString::fromStdString(bandBin["FilterName"][0]) + "_FOCAL_LENGTH";
      SetFocalLength(Spice::getDouble(key));
 
      SetPixelPitch();
@@ -124,11 +124,11 @@ namespace Isis {
     * @param filename
     */
    void ClipperPushBroomCamera::ReadLineRates(QString filename) {
-     Table timesTable("LineScanTimes", filename);
+     Table timesTable("LineScanTimes", filename.toStdString());
 
      if(timesTable.Records() <= 0) {
        std::string msg = "Table [LineScanTimes] in [";
-       msg += filename + "] must not be empty";
+       msg += filename.toStdString() + "] must not be empty";
        throw IException(IException::Unknown, msg, _FILEINFO_);
      }
 
@@ -140,7 +140,7 @@ namespace Isis {
 
      if(p_lineRates.size() <= 0) {
        std::string msg = "There is a problem with the data within the Table ";
-       msg += "[LineScanTimes] in [" + filename + "]";
+       msg += "[LineScanTimes] in [" + filename.toStdString() + "]";
        throw IException(IException::Unknown, msg, _FILEINFO_);
      }
    }

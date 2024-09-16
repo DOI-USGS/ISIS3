@@ -50,7 +50,7 @@ void IsisMain() {
     reader = CSVReader(csvFileName, true);
   }
   catch(IException &e) {
-    std::string msg = "Failed to read CSV file [" + csvFileName + "].";
+    std::string msg = "Failed to read CSV file [" + csvFileName.toStdString() + "].";
     throw IException(e, IException::Io, msg, _FILEINFO_);
   }
   int numColumns = reader.columns();
@@ -90,12 +90,12 @@ void IsisMain() {
     CSVReader::CSVAxis csvRow = reader.getRow(rowIndex);
     for (int columnIndex = 0, fieldIndex = 0; columnIndex < numColumns; ) {
       if (tableRow[fieldIndex].size() == 1) {
-        tableRow[fieldIndex] = toDouble(csvRow[columnIndex++]);
+        tableRow[fieldIndex] = csvRow[columnIndex++].toDouble();
       }
       else {
         std::vector<double> dblVector;
         for (int arrayLen = 0; arrayLen < tableRow[fieldIndex].size(); arrayLen++) {
-          dblVector.push_back(toDouble(csvRow[columnIndex++]));
+          dblVector.push_back(csvRow[columnIndex++].toDouble());
         }
         tableRow[fieldIndex] = dblVector;
       }
@@ -112,7 +112,7 @@ void IsisMain() {
       labelPvl.read(labelPvlFilename.toStdString());
     }
     catch(IException &e) {
-      std::string msg = "Failed to read PVL label file [" + labelPvlFilename + "].";
+      std::string msg = "Failed to read PVL label file [" + labelPvlFilename.toStdString() + "].";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
@@ -129,7 +129,7 @@ void IsisMain() {
     outCube.open(outCubeFileName, "rw");
   }
   catch(IException &e) {
-    std::string msg = "Could not open output cube [" + outCubeFileName + "].";
+    std::string msg = "Could not open output cube [" + outCubeFileName.toStdString() + "].";
     throw IException(e, IException::Io, msg, _FILEINFO_);
   }
 
@@ -137,8 +137,8 @@ void IsisMain() {
     outCube.write(table);
   }
   catch(IException &e) {
-    std::string msg = "Could not write output table [" + tableName +
-                  "] to output cube [" + outCubeFileName + "].";
+    std::string msg = "Could not write output table [" + tableName.toStdString() +
+                  "] to output cube [" + outCubeFileName.toStdString() + "].";
     throw IException(e, IException::Io, msg, _FILEINFO_);
   }
 

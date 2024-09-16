@@ -53,11 +53,11 @@ void IsisMain() {
   FileList list;
   if (ui.GetString("FROMTYPE") == "FROM") {
     // GetAsString will capture the entire string, including attributes
-    list.push_back(FileName(ui.GetAsString("FROM")));
+    list.push_back(FileName(ui.GetAsString("FROM").toStdString()));
   }
   else {
     try {
-      list.read(ui.GetFileName("FROMLIST"));
+      list.read(ui.GetFileName("FROMLIST").toStdString());
     }
     catch (IException &e) {
       throw IException(e);
@@ -90,7 +90,7 @@ void IsisMain() {
       vector<QString> lame = atts0.bands();
       icube.setVirtualBands(lame);
     }
-    icube.open( list[i].toString() );
+    icube.open(QString::fromStdString(list[i].toString()));
     bands = icube.bandCount();
     g_incam = icube.camera();
 
@@ -241,7 +241,7 @@ void IsisMain() {
       vector<QString> lame = atts0.bands();
       icube.setVirtualBands(lame);
     }
-    icube.open( list.back().toString() );
+    icube.open(QString::fromStdString(list.back().toString()));
     g_incam = icube.camera();
 
     if (g_incam->IntersectsLongitudeDomain(userMap)) {
@@ -284,7 +284,7 @@ void IsisMain() {
       }
 
       else if (ui.GetString("LONSEAM") == "ERROR") {
-        std::string msg = "The image [" + ui.GetCubeName("FROM") + "] crosses the " +
+        std::string msg = "The image [" + ui.GetCubeName("FROM").toStdString() + "] crosses the " +
                      "longitude seam";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -332,11 +332,11 @@ void IsisMain() {
     Cube cube(list[f].toString(), "r");
     // Loop through the input cube and get the all pixels values for all bands
     ProcessByBrick processBrick;
-    processBrick.Progress()->SetText("Working on file:  " + list[f].toString());
+    processBrick.Progress()->SetText("Working on file:  " + QString::fromStdString(list[f].toString()));
     processBrick.SetBrickSize(1, 1, bands);
     // Recall list[f] is a FileName, which stores the attributes
     CubeAttributeInput atts0(list[f]);
-    Cube *icube = processBrick.SetInputCube(list[f].toString(), atts0, 0);
+    Cube *icube = processBrick.SetInputCube(QString::fromStdString(list[f].toString()), atts0, 0);
     g_incam = icube->camera();
 
     processBrick.StartProcess(rasterizePixel);
@@ -346,12 +346,12 @@ void IsisMain() {
   // When there is only one input cube, we want to propagate IsisCube labels to output cubes
   if (list.size() == 1) {
     // Note that polygons and original labels are not propagated
-    g_processGroundPolygons.PropagateLabels(list[0].toString());
+    g_processGroundPolygons.PropagateLabels(QString::fromStdString(list[0].toString()));
     // Tell Process which tables we want to propagate
     QList<QString> tablesToPropagate;
     tablesToPropagate << "InstrumentPointing" << "InstrumentPosition" << "BodyRotation"
         << "SunPosition";
-    g_processGroundPolygons.PropagateTables(list[0].toString(), tablesToPropagate);
+    g_processGroundPolygons.PropagateTables(QString::fromStdString(list[0].toString()), tablesToPropagate);
   }
   g_processGroundPolygons.EndProcess();
 
