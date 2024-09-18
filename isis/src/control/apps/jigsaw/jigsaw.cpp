@@ -55,6 +55,77 @@ namespace Isis {
 
   void jigsaw(UserInterface &ui, Pvl *log) {
 
+    QString cubeList = ui.GetFileName("FROMLIST");
+
+    // Check for ADJUSTMENT_INPUT file and apply
+    try {
+      if (ui.WasEntered("ADJUSTMENT_INPUT")) {
+        
+        // Set default values
+        ui.Clear("TWIST");
+        ui.PutBoolean("TWIST", false);
+        ui.PutBoolean("BUNDLEOUT_TXT", false);
+        ui.PutBoolean("IMAGESCSV", false);
+        ui.PutBoolean("OUTPUT_CSV", false);
+        ui.PutBoolean("RESIDUALS_CSV", false);
+        ui.PutBoolean("LIDAR_CSV", false);
+        ui.PutBoolean("OUTADJUSTMENTH5", false);
+        
+        File fileRead(ui.GetFileName("ADJUSTMENT_INPUT").toStdString(), File::ReadOnly);
+        SerialNumberList *snList = new SerialNumberList(cubeList);
+
+        QString jigApplied = "JigApplied = " + Isis::iTime::CurrentLocalTime();
+
+        for (int i = 0; i < snList->size(); i++) {
+          Process p;
+          CubeAttributeInput inAtt;
+          Cube *c = p.SetInputCube(snList->fileName(i), inAtt, ReadWrite);
+
+          if (c->hasBlob("CSMState", "String")) {
+            QString msg = "Unable to apply bundle adjustment values to cubes with CSMState blobs.";
+            throw IException(IException::User, msg, _FILEINFO_);
+          }
+
+          QString serialNumber = snList->serialNumber(i);
+          QString cmatrixName = "InstrumentPointing";
+          QString spvectorName = "InstrumentPosition";
+
+          std::string cmatrixKey = serialNumber.toStdString() + "/" + cmatrixName.toStdString();
+          std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
+
+          // Read h5 into table
+          DataSet datasetRead = fileRead.getDataSet(cmatrixKey);
+          auto cmatrixData = datasetRead.read<std::string>();
+          Table cmatrixTable(cmatrixName, cmatrixData, ',');
+
+          datasetRead = fileRead.getDataSet(spvectorKey);
+          auto spvectorData = datasetRead.read<std::string>();
+          Table spvectorTable(spvectorName, spvectorData, ',');
+
+          // Write bundle adjustment values out
+          cmatrixTable.Label().addComment(jigApplied);
+          c->write(cmatrixTable);
+          spvectorTable.Label().addComment(jigApplied);
+          c->write(spvectorTable);
+
+          p.WriteHistory(*c);
+        }
+
+        if (log) {
+          PvlGroup gp("JigsawResults");
+          
+          gp += PvlKeyword("Status", "Bundle adjustment values from [" + ui.GetFileName("ADJUSTMENT_INPUT") 
+                            + "] were applied to the cubes in [" + cubeList+ "]");
+          log->addLogGroup(gp);
+        }
+
+        return;
+      }
+    } catch (IException &e) {
+      QString msg = "Unable to apply bundle adjustment values from [" + ui.GetFileName("ADJUSTMENT_INPUT") + "]";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+
     // Check to make sure user entered something to adjust... Or can just points be in solution?
     // YES - we should be able to just TRIANGULATE the points in the control net
     // right now to do this we have to fake out jigsaw by
@@ -67,7 +138,6 @@ namespace Isis {
     }
 
     QString cnetFile = ui.GetFileName("CNET");
-    QString cubeList = ui.GetFileName("FROMLIST");
 
     // retrieve settings from jigsaw gui
     BundleSettingsQsp settings = bundleSettings(ui);
@@ -85,6 +155,7 @@ namespace Isis {
       }
     }
     settings->setCubeList(cubeList);
+
     BundleAdjust *bundleAdjustment = NULL;
     try {
       // Get the held list if entered and prep for bundle adjustment
@@ -161,43 +232,38 @@ namespace Isis {
 
       std::string outputFilePrefix = settings->outputFilePrefix().toStdString();
 
-      // ALWAYS* WRITE OUT ADJUSTMENT VALUES 
-      // Do NOT write out if ADJUSTMENT_INPUT is set bc 
-      // the tables will be overwritten anyway
+      // ALWAYS* WRITE OUT ADJUSTMENT VALUES
       // Do NOT write out for cubes w/ CSMState (TODO)
-      if (ui.GetBoolean("ADJUSTMENTOUT_H5")) {
-        if (!ui.WasEntered("ADJUSTMENT_INPUT"))
-        {
-          std::string adjustmentFilename = outputFilePrefix + "adjustment_out.h5";
-          
-          File file(adjustmentFilename, File::Truncate);
+      if (ui.GetBoolean("OUTADJUSTMENTH5")) {
+        std::string adjustmentFilename = outputFilePrefix + "adjustment_out.h5";
+        
+        File file(adjustmentFilename, File::Truncate);
 
-          for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
-            Process p;
-            CubeAttributeInput inAtt;
-            Cube *c = p.SetInputCube(bundleAdjustment->fileName(i), inAtt, ReadWrite);
+        for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
+          Process p;
+          CubeAttributeInput inAtt;
+          Cube *c = p.SetInputCube(bundleAdjustment->fileName(i), inAtt, ReadWrite);
 
-            // Only for ISIS adjustment values
-            if (!c->hasBlob("CSMState", "String")) {
-              Table cmatrix = bundleAdjustment->cMatrix(i);
-              Table spvector = bundleAdjustment->spVector(i);
+          // Only for ISIS adjustment values
+          if (!c->hasBlob("CSMState", "String")) {
+            Table cmatrix = bundleAdjustment->cMatrix(i);
+            Table spvector = bundleAdjustment->spVector(i);
 
-              QString serialNumber = bundleAdjustment->serialNumberList()->serialNumber(i);
-              QString cmatrixName = cmatrix.Name();
-              QString spvectorName = spvector.Name();
+            QString serialNumber = bundleAdjustment->serialNumberList()->serialNumber(i);
+            QString cmatrixName = cmatrix.Name();
+            QString spvectorName = spvector.Name();
 
-              std::string cmatrixKey = serialNumber.toStdString() + "/" + cmatrixName.toStdString();
-              std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
+            std::string cmatrixKey = serialNumber.toStdString() + "/" + cmatrixName.toStdString();
+            std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
 
-              // Save bundle adjustment values to HDF5 file
-              std::string cmatrixTableStr = Table::toString(cmatrix).toStdString();
-              DataSet dataset = file.createDataSet<std::string>(cmatrixKey, cmatrixTableStr);
-              std::string spvectorTableStr = Table::toString(spvector).toStdString();
-              dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
-            }
+            // Save bundle adjustment values to HDF5 file
+            std::string cmatrixTableStr = Table::toString(cmatrix).toStdString();
+            DataSet dataset = file.createDataSet<std::string>(cmatrixKey, cmatrixTableStr);
+            std::string spvectorTableStr = Table::toString(spvector).toStdString();
+            dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
           }
-          file.flush();
         }
+        file.flush();
       }
 
       // Update the cube pointing if requested but ONLY if bundle has converged
@@ -208,20 +274,6 @@ namespace Isis {
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
         else {
-          // Need to prep the adjustment file first
-          QString adjustmentType;
-          unsigned adjustmentFileEnum = 0;
-          QString adjustmentFilename;
-          bool placeholderAdjustmentFileExists = false;
-          if (ui.WasEntered("ADJUSTMENT_INPUT")) {
-            adjustmentFilename = ui.GetFileName("ADJUSTMENT_INPUT");
-            adjustmentFileEnum = File::ReadOnly;
-          } else {
-            placeholderAdjustmentFileExists = true;
-            adjustmentFilename = QString::fromStdString(outputFilePrefix + "placeholder_adj.tmp");
-            adjustmentFileEnum = File::Create;
-          }
-          File fileRead(adjustmentFilename.toStdString(), adjustmentFileEnum);
 
           // Loop through images
           for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
@@ -252,31 +304,6 @@ namespace Isis {
               csmStateBlob.setData(modelState.c_str(), modelState.size());
               csmStateBlob.Label().addComment(jigComment);
               c->write(csmStateBlob);
-            } else if (ui.WasEntered("ADJUSTMENT_INPUT")) {
-              Table cmatrix = bundleAdjustment->cMatrix(i);
-              Table spvector = bundleAdjustment->spVector(i);
-
-              QString serialNumber = bundleAdjustment->serialNumberList()->serialNumber(i);
-              QString cmatrixName = cmatrix.Name();
-              QString spvectorName = spvector.Name();
-
-              std::string cmatrixKey = serialNumber.toStdString() + "/" + cmatrixName.toStdString();
-              std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
-
-              // Read h5 into table
-              DataSet datasetRead = fileRead.getDataSet(cmatrixKey);
-              auto cmatrixData = datasetRead.read<std::string>();
-              Table cmatrixTable(cmatrixName, cmatrixData, ',');
-
-              datasetRead = fileRead.getDataSet(spvectorKey);
-              auto spvectorData = datasetRead.read<std::string>();
-              Table spvectorTable(spvectorName, spvectorData, ',');
-
-              // Write bundle adjustment values out
-              cmatrixTable.Label().addComment(jigComment);
-              c->write(cmatrixTable);
-              spvectorTable.Label().addComment(jigComment);
-              c->write(spvectorTable);
             } else {
               // Write bundle adjustment values to cube
               Table cmatrix = bundleAdjustment->cMatrix(i);
@@ -288,21 +315,6 @@ namespace Isis {
             }
 
             p.WriteHistory(*c);
-          }
-          
-          // Check if temp adjustment file was created
-          // Delete if so
-          if (placeholderAdjustmentFileExists) {
-            int status = remove(adjustmentFilename.toStdString().c_str());
-            if (status != 0) {
-              PvlGroup tempAdjustmentFileWarning("TemporaryAdjustmentFileWarning");
-              tempAdjustmentFileWarning.addKeyword(PvlKeyword("Warning", "The placeholder adjustment file \
-                                                                              " + adjustmentFilename + "was \
-                                                                              not removed properly."));
-              if(log) {
-                log->addLogGroup(tempAdjustmentFileWarning);
-              }
-            }
           }
           gp += PvlKeyword("Status", "Camera pointing updated");
         }
