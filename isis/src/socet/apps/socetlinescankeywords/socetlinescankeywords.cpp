@@ -869,7 +869,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
 //  // system call to ISIS function tabledump to dump LineScanTimes
 //  char syscmd[1056];
 //  sprintf(syscmd, "tabledump from=%s to=%s name=LineScanTimes",
-//          cubefname.expanded().toLatin1().data(), tablefname.expanded().toAscii().data());
+//          cubefname.expanded().c_str(), tablefname.expanded().toAscii().data());
 //
 //  int n = system(syscmd);
 //  if (n != 0)
@@ -879,7 +879,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
 //  // HrscCamera::ReadLineRates(IString filename) is private
 //
 //  // open tabledump.txt for reading
-//  ifstream fpIn(tablefname.expanded().toLatin1().data(), ifstream::in);
+//  ifstream fpIn(tablefname.expanded().c_str(), ifstream::in);
 //  if (!fpIn)
 //    return -1;
 //
