@@ -176,8 +176,6 @@ Deborah Lee Soltesz
 
           </main>
         </div>
-        <!-- FOOTER -->
-        <script type="text/javascript" language="JavaScript" src="../assets/scripts/footer.js"></script>
         <xsl:call-template name="writeFooter"/>
       </body>
     </html>

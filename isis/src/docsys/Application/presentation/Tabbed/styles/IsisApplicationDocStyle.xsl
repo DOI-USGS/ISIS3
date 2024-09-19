@@ -162,9 +162,8 @@
 
             <noscript>
               <div style="margin: 0px; padding: 10px; font-weight: bold; background-color: gold;">
-                  JavaScript is not enabled. Please enable JavaScript for this site or
-                  <a href="../../PrinterFriendly/{@name}/{@name}.html">
-                  view <em>Printer Friendly</em> version of this document</a>.
+                  JavaScript is not enabled, using print styling.
+                  Please note, this may disable the navigation menu.
               </div>
             </noscript>
 
