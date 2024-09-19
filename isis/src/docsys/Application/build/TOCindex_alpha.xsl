@@ -25,6 +25,7 @@ Deborah Lee Soltesz
 
   <xsl:include href="../../build/menu.xsl"/>
   <xsl:include href="../../build/header.xsl"/>
+  <xsl:include href="../../build/footer.xsl"/>
 
 
   <xsl:key name="categoryMatch" match="/tableofcontents/application" use="category/categoryItem"/>
@@ -45,7 +46,6 @@ Deborah Lee Soltesz
         <!-- ISIS Docs -->
         <link rel="stylesheet" href="../assets/styles/IsisStyleCommon.css"/>
         <link rel="stylesheet" media="print" href="../assets/styles/print.css"/>
-        <link rel="stylesheet" href="presentation/PrinterFriendly/styles/IsisApplicationDocStyle.css"></link>
 
         <!-- USGS -->
         <link rel="stylesheet" href="../assets/styles/usgs/common.css" />
@@ -108,7 +108,7 @@ Deborah Lee Soltesz
         </div>
         <!-- FOOTER -->
         <script type="text/javascript" language="JavaScript" src="../assets/scripts/footer.js"></script>
-
+        <xsl:call-template name="writeFooter"/>
       </body>
     </html>
 

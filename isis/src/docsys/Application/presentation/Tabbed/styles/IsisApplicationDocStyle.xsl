@@ -4,7 +4,6 @@
     xmlns:fo="http://www.w3.org/1999/XSL/Format"
     exclude-result-prefixes="xmlns fo">
 
-
   <!--
 
   This stylesheet generates the TABBED HTML version of the application documentation
@@ -25,6 +24,7 @@
 
   <xsl:include href="../../../../build/menu.xsl"/>
   <xsl:include href="../../../../build/header.xsl"/>
+  <xsl:include href="../../../../build/footer.xsl"/>
 
   <xsl:template match="/">
      <xsl:apply-templates select="application" />
@@ -49,6 +49,10 @@
         <link rel="stylesheet" href="../../../../assets/styles/IsisStyleCommon.css"></link>
         <link rel="stylesheet" href="../styles/IsisApplicationDocStyle.css"></link>
         <link rel="stylesheet" media="print" href="../../../../assets/styles/print.css"/>
+        
+        <noscript> <!-- Use Print stylesheet, unhide all sections if no script -->
+          <link rel="stylesheet" href="../../../../assets/styles/print.css"/>
+        </noscript> <!-- Note: currently hides header/menu -->
 
         <xsl:variable name="keywordList">
           Isis, image processing,
@@ -88,37 +92,9 @@
           appName = "<xsl:value-of select="normalize-space(//application/@name)"/>" ;
 
           //<xsl:comment><![CDATA[
-          ns4    = (document.layers) ? true:false ;
-          ns6    = (document.getElementById) ? true:false ;
-
-          function checkBrowser () {
-            if (ns4 == true) {
-              printerFriendlyURL = "../../PrinterFriendly/" + appName + "/" + appName + ".html"
-              location.replace(printerFriendlyURL) ;
-            }
-          }
-
-          // REPOSITION LAYER
-          // moves a layer to be visible in the window
-
-          function repositionLayer (moveMe) {
-            positionLayer = document.getElementById([moveMe]) ;
-
-            //define universal dsoc left point
-            leftpos = document.all ? document.body.scrollLeft : pageXOffset ;
-
-            //define universal dsoc top point
-            toppos = document.all ? document.body.scrollTop : pageYOffset ;
-
-            //define universal browser window width
-            window_width = document.all ? document.body.clientWidth : window.innerWidth ;
-
-            positionLayer.style.left = (window_width * .1) - 30 + leftpos + "px" ;
-            positionLayer.style.top = toppos + 60 + "px" ;
-          }
 
           layerArray = new Array (2 + numExamples) ;
-          layerArray[0] = "Overview" ;
+          layerArray[0] = "overview" ;
           layerArray[1] = "Parameters" ;
 
           for (i = 1, j = 2 ; i <= numExamples ; i++, j++) {
@@ -141,31 +117,15 @@
           }
 
 
-          // FUNCTION DESCRIPTION TOGGLE DISPLAY
-          // changes page view
-
-          function functionDescriptionToggleVisibility(showMe) {
-            m_layer = document.getElementById([showMe]) ;
-            if (m_layer && (m_layer.style.display == "block")) {
-              m_layer.style.display = "none" ;
-              return ;
-            }
-            document.getElementById([showMe]).style.display = "block" ;
-            // repositionLayer (showMe) ;
-          }
-
-
-
-
           tabArray = new Array (2 + numExamples) ;
-          tabArray[0] = "OverviewTab" ;
+          tabArray[0] = "overviewTab" ;
           tabArray[1] = "ParametersTab" ;
 
           for (i = 1, j = 2 ; i <= numExamples ; i++, j++) {
             tabArray[j] = "Example" + i + "Tab" ;
           }
           tabArrLength = tabArray.length ;
-          currentView = "OverviewTab" ;
+          currentView = "overviewTab" ;
 
 
           // CONTENT TOGGLE TAB
@@ -186,7 +146,7 @@
         </script>
       </head>
 
-      <body onload="checkBrowser (); contentToggleVisibility('Overview');">
+      <body onload="contentToggleVisibility('overview');">
 
         <script src="../../../../assets/scripts/uswds.min.js"></script>
 
@@ -223,8 +183,8 @@
 
                 <!-- Overview and Parameter Tabs -->
                 <li>
-                  <a class="tab tabOn"  id="OverviewTab" 
-                      onclick="contentToggleTab('OverviewTab');   contentToggleVisibility('Overview');"
+                  <a class="tab tabOn"  id="overviewTab" 
+                      onclick="contentToggleTab('overviewTab');   contentToggleVisibility('overview');"
                   >
                     Overview
                   </a>
@@ -254,7 +214,7 @@
 
             <!-- OVERVIEW PAGE VIEW -->
 
-            <div id="Overview">
+            <div id="overview">
               <!-- Description  -->
               <a name="Description"></a>
 
@@ -395,11 +355,11 @@
                 <table>
                   <xsl:for-each select="history/change[(@hidden != 'yes' and @hidden != 'true') or not(@hidden)]">
                     <tr>
-                      <td class="tableCellHistory_name" nowrap="nowrap">
+                      <td class="tableCellHistory_name">
                         <xsl:value-of select="@name"/>
                       </td>
 
-                      <td class="tableCellHistory_date" nowrap="nowrap">
+                      <td class="tableCellHistory_date">
                         <xsl:value-of select="@date"/>
                       </td>
 
@@ -426,12 +386,6 @@
                 </ul>
               </xsl:if>
 
-              <!-- FOOTER -->
-              <script type="text/javascript" src="../../../../assets/scripts/footer.js">
-                        <xsl:comment><![CDATA[
-                        ]]></xsl:comment>
-              </script>
-
             </div>
 
 
@@ -441,6 +395,10 @@
             <xsl:if test="groups">
 
               <div id="Parameters">
+
+                <h1 class="print-only">
+                  Parameters
+                </h1>
                 
                 <a name="Groups"></a>
                 <!-- table of groups links -->
@@ -449,7 +407,7 @@
                     <xsl:variable name="groupName" select="@name"/>
                     <h2><xsl:value-of select="@name"/></h2>
 
-                    <div class="usa-accordion usa-accordion--bordered usa-accordion--multiselectable" data-allow-multiple="">
+                    <div class="usa-accordion usa-accordion--bordered usa-accordion--multiselectable acc-param" data-allow-multiple="">
 
                       <xsl:for-each select="parameter">
                         <h4 class="usa-accordion__heading">
@@ -766,7 +724,6 @@
                           </div>
 
 
-
                         </div>
                       </xsl:for-each>
 
@@ -775,8 +732,6 @@
                   </xsl:for-each>
                 </xsl:for-each>
 
-                <!-- FOOTER -->
-                <script type="text/javascript" src="../../../../assets/scripts/footer.js"></script>
               </div>
             </xsl:if>
 
@@ -787,31 +742,36 @@
                 <xsl:for-each select="example">
                 <xsl:variable name="curExample"><xsl:number/></xsl:variable>
                   <div id="Example{$curExample}">
+
+                    <h1 class="print-only">
+                      Example <xsl:value-of select="$curExample"/>
+                    </h1>
                     
-                    <h3>
+                    <h2>
                       <xsl:value-of select="brief"/>
-                    </h3>
+                    </h2>
 
                     <div>
                       <xsl:apply-templates select="description/* | description/text()" mode="copyContents"/>
                     </div>
 
                     <xsl:if test="terminalInterface">
-                      <h4>
+                      <h3>
                       Command Line
-                      </h4>
+                      </h3>
 
                       <div>
                         <xsl:for-each select="terminalInterface">
-                              <tt style="font-weight:bold;">
-                                <xsl:value-of select="/application/@name"/>
-                                <xsl:text> </xsl:text>
-                                <xsl:value-of select="commandLine"/>
-                              </tt>
-                              <br/>
-                              <div style="font-style:italic; font-size:X-SMALL;margin-left:20px; width:400px;">
-                                <xsl:apply-templates select="description/* | description/text()" mode="copyContents"/>
-                              </div>
+                          <div class="cmd-line-caption">
+                            <xsl:apply-templates select="description/* | description/text()" mode="copyContents"/>
+                          </div>
+                          <div>
+                            <code class="cmd-line">
+                              <xsl:value-of select="/application/@name"/>
+                              <xsl:text> </xsl:text>
+                              <xsl:value-of select="commandLine"/>
+                            </code>
+                          </div>
                         </xsl:for-each>
                       </div>
 
@@ -819,43 +779,35 @@
 
                     <!-- GUI Screenshots -->
                     <xsl:if test="guiInterfaces">
-                      <h4>GUI Screenshot</h4>
-                      <div>
-                        <table cellpadding="5" width="600">
-                          <xsl:for-each select="guiInterfaces/guiInterface/image">
-                          <xsl:apply-templates mode="tabledImages" select="."/>
-                          </xsl:for-each>
-                        </table>
-                      </div>
+                      <h3>GUI Screenshot</h3>
+                      <xsl:for-each select="guiInterfaces/guiInterface/image">
+                        <xsl:apply-templates mode="cardImages" select="."/>
+                      </xsl:for-each>
                     </xsl:if>
 
                     <!-- Input Images -->
                     <xsl:if test="inputImages">
-                      <h4>
+                      <h3>
                         <xsl:choose>
-                    <xsl:when test="count(inputImages/image) > 1">
-                            Input Images
-                    </xsl:when>
-                    <xsl:otherwise>
-                      Input Image
-                    </xsl:otherwise>
+                          <xsl:when test="count(inputImages/image) > 1">
+                                  Input Images
+                          </xsl:when>
+                          <xsl:otherwise>
+                            Input Image
+                          </xsl:otherwise>
                         </xsl:choose>
-                      </h4>
+                      </h3>
 
-                      <div>
-                        <table cellpadding="5" width="600">
-                          <xsl:for-each select="inputImages/image">
-                            <xsl:apply-templates mode="tabledImages" select="."/>
-                          </xsl:for-each>
-                        </table>
-                      </div>
+                      <xsl:for-each select="inputImages/image">
+                        <xsl:apply-templates mode="cardImages" select="."/>
+                      </xsl:for-each>
 
                     </xsl:if>
 
 
                     <!-- Data Files -->
                     <xsl:if test="dataFiles">
-                      <h4>
+                      <h3>
                         <xsl:choose>
                     <xsl:when test="count(dataFiles/dataFile) > 1">
                             Data Files
@@ -864,13 +816,13 @@
                       Data File
                     </xsl:otherwise>
                         </xsl:choose>
-                      </h4>
+                      </h3>
                       <span class="caption">
                       Links open in a new window.
                       </span>
 
                       <div>
-                        <table cellpadding="5" width="600">
+                        <table cellpadding="5">
                           <xsl:for-each select="dataFiles/dataFile">
                             <tr>
                               <th class="tableCellLevel1_th">
@@ -887,86 +839,51 @@
                     </xsl:if>
 
 
-
                     <xsl:if test="outputImages">
-                      <h4>
+                      <h3>
                         <xsl:choose>
-                    <xsl:when test="count(outputImages/image) > 1">
-                            Output Images
-                    </xsl:when>
-                    <xsl:otherwise>
-                      Output Image
-                    </xsl:otherwise>
+                          <xsl:when test="count(outputImages/image) > 1">
+                                  Output Images
+                          </xsl:when>
+                          <xsl:otherwise>
+                            Output Image
+                          </xsl:otherwise>
                         </xsl:choose>
-                      </h4>
+                      </h3>
 
-                      <div>
-                        <table cellpadding="5" width="600">
-                          <xsl:for-each select="outputImages/image">
-                            <xsl:apply-templates mode="tabledImages" select="."/>
-                          </xsl:for-each>
-                        </table>
-                      </div>
+                      <xsl:for-each select="outputImages/image">
+                        <xsl:apply-templates mode="cardImages" select="."/>
+                      </xsl:for-each>
 
                     </xsl:if>
-
-                    <!-- FOOTER -->
-                    <script type="text/javascript" src="../../../../assets/scripts/footer.js">
-                              <xsl:comment><![CDATA[
-                              ]]></xsl:comment>
-                    </script>
-
 
                   </div>
                 </xsl:for-each>
               </xsl:for-each>
             </xsl:if>
 
-            <a href="../../PrinterFriendly/{@name}/{@name}.html">Printer Friendly View</a> 
-
           </main>
         </div>
+        <xsl:call-template name="writeFooter"/>
       </body>
     </html>
   </xsl:template>
 
-  <xsl:template match="image" mode="tabledImages">
 
-    <tr valign="top">
-      <td class="tableCellLevel1_th" width="{thumbnail/@width}" align="center">
-        <!-- start IMAGE LINK TAG: pop up window if javascript, otherwise normal link -->
-        <script type="text/javascript">
-          <xsl:comment>
-            <![CDATA[
-              //<!--
-                document.write("<a title='Click to view larger image' href='javascript:popUpNewWindow (\"]]><xsl:value-of select="@src"/><![CDATA[\","  + ]]>
-                <xsl:value-of select="@width"/><![CDATA[+ ", " + ]]><xsl:value-of select="@height"/><![CDATA[+ ")'>") ;
+  <xsl:template match="image" mode="cardImages">
 
-                document.write("<img src=\"]]><xsl:value-of select="normalize-space(thumbnail/@src)"/><![CDATA[\""
-                + " width=" + ]]><xsl:value-of select="normalize-space(thumbnail/@width)"/><![CDATA[
-                + " height=" + ]]><xsl:value-of select="normalize-space(thumbnail/@height)"/><![CDATA[
-                + " alt=\"]]><xsl:value-of select="normalize-space(thumbnail/@caption)"/><![CDATA[\" class='blackBorderedImage'><" + "/a><br>") ;
-              //-->
-            ]]>
-          </xsl:comment>
-        </script>
-
-        <noscript>
-          <a title='Click to view larger image' href="{@src}" target="_new">
-          <img src="{normalize-space(thumbnail/@src)}" width="{normalize-space(thumbnail/@width)}" height="{normalize-space(thumbnail/@height)}" alt="{normalize-space(thumbnail/@caption)}" class="blackBorderedImage"/></a><br/>
-        </noscript>
-        <!-- end IMAGE LINK TAG: pop up window if javascript, otherwise normal link -->
-
-        <div class="caption">
-          <xsl:value-of select="thumbnail/@caption"/>
-        </div>
-
-      </td>
-      <td class="tableCellLevel1">
-        <p style="font-weight:bold;">
-          <xsl:value-of select="brief"/>
-        </p>
-
+    <div class="ex-image-box">
+      <div class="ex-image-img-div">
+        <a title="View Image" href="{normalize-space(@src)}" target="_blank" rel="noopener noreferrer">
+          <img class="ex-image-img" src="{normalize-space(thumbnail/@src)}" alt="{normalize-space(thumbnail/@caption)}"/>
+        </a>
+        
+      </div>
+      <div class="ex-image-desc">
+        <h4 class="usa-card__heading">
+          <xsl:value-of select="brief"/> <!-- Not sure if brief and caption should be switched here -->
+        </h4>
+        <em style="font-style: italic;"><xsl:value-of select="thumbnail/@caption"/></em>
         <xsl:if test="parameterName">
           <p>
             <span style="font-weight:bold;">
@@ -977,13 +894,11 @@
             <xsl:value-of select="parameterName/description"/>
           </p>
         </xsl:if>
-
         <p>
           <xsl:apply-templates select="description/* | description/text()" mode="copyContents"/>
         </p>
-
-      </td>
-    </tr>
+      </div>
+    </div>
 
   </xsl:template>
 
