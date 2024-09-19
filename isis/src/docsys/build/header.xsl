@@ -79,14 +79,14 @@ Deborah Lee Soltesz
                 <div class="usa-media-block__body">
                   <p>
                     <strong>Secure .gov websites use HTTPS</strong><br />A
-                    <strong>lock</strong> (
-                    <span class="icon-lock"
+                    <strong>lock</strong>
+                    (<span class="icon-lock"
                       ><svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="52"
                         height="64"
-                        viewBox="0 0 52 64"
-                        class="usa-banner__lock-image"
+                        viewBox="300 100 800 1000"
+                        class="usa-banner__lock-image-pd"
                         role="img"
                         aria-labelledby="banner-lock-description-default"
                         focusable="false"
@@ -96,7 +96,7 @@ Deborah Lee Soltesz
                         <path
                           fill="#000000"
                           fill-rule="evenodd"
-                          d="M26 0c10.493 0 19 8.507 19 19v9h3a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V32a4 4 0 0 1 4-4h3v-9C7 8.507 15.507 0 26 0zm0 8c-5.979 0-10.843 4.77-10.996 10.712L15 19v9h22v-9c0-6.075-4.925-11-11-11z"
+                          d="M955.5,560.9v471.4c0,14.3-5.7,28-15.9,38.1-10.1,10.1-23.8,15.8-38.1,15.9H302.5c-14.3,0-28-5.8-38.1-15.9-10.1-10.1-15.8-23.8-15.9-38.1v-471.4c0-14.3,5.7-28,15.9-38.1,10.1-10.1,23.8-15.8,38.1-15.9h58.4v-120.6c0-63.9,25.4-125.2,70.6-170.4,45.2-45.2,106.5-70.6,170.5-70.6s125.2,25.4,170.5,70.6c45.2,45.2,70.6,106.5,70.6,170.5v120.6h58.4,0c14.3,0,28,5.7,38.1,15.9,10.1,10.1,15.8,23.8,15.9,38.1h0ZM767.5,386.3c0-43.9-17.4-86-48.5-117-31-31-73.1-48.5-117-48.5s-86,17.4-117,48.5-48.5,73.1-48.5,117v120.6h330.9v-120.6Z"
                         />
                       </svg> </span
                     >) or <strong>https://</strong> means you’ve safely connected to

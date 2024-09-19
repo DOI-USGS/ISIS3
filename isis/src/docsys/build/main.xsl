@@ -16,6 +16,7 @@ Deborah Lee Soltesz
 
 <xsl:include href="menu.xsl"/>
 <xsl:include href="header.xsl"/>
+<xsl:include href="footer.xsl"/>
 
 <xsl:output 
   media-type="text/html" 
@@ -78,7 +79,7 @@ Deborah Lee Soltesz
             <xsl:apply-templates select="* | text()" mode="copyContents"/>
           </main>
         </div>
-
+        <xsl:call-template name="writeFooter"/>
       <!-- end of body -->
       </body>
       </html>
