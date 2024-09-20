@@ -15,6 +15,11 @@
 #include "CSMCamera.h"
 #include "LidarData.h"
 #include "SerialNumber.h"
+#include "BundleAdjust.h"
+#include "BundleSettings.h"
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5File.hpp>
+
 
 #include "jigsaw.h"
 
@@ -1866,4 +1871,48 @@ TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
     // EXPECT_NEAR(csvLine[5].toDouble(), lidarDataOut.point(pointId)->sigmaRange() * 0.001, 0.0001);
   }
 
+}
+
+TEST_F(ApolloNetwork, FunctionalTestJigsawSaveApplyValues) {
+  QVector<QString> args = {"spsolve=position",
+                            "update=yes",
+                            "bundleout_txt=no",
+                            "cnet="+controlNetPath,
+                            "fromlist="+tempDir.path() + "/cubes.lis",
+                            "onet="+tempDir.path()+"/apollo_out.net",
+                            "file_prefix="+tempDir.path()+"/"};
+
+  UserInterface ui(APP_XML, args);
+
+  jigsaw(ui);
+
+  // Check apollo_jigsaw.h5 was created
+  QString bundleOutput = tempDir.path()+"/adjustment_out.h5";
+  HighFive::File file(bundleOutput.toStdString(), HighFive::File::ReadWrite);
+
+  std::string datasetName = "/APOLLO15/METRIC/1971-08-01T15:37:39.428";
+  QString cmatrixName = "InstrumentPointing";
+  QString spvectorName = "InstrumentPosition";
+  std::string cmatrixKey = datasetName + "/" + cmatrixName.toStdString();
+  std::string spvectorKey = datasetName + "/" + spvectorName.toStdString();
+
+  HighFive::DataSet datasetRead = file.getDataSet(cmatrixKey);
+  auto cmatrixData = datasetRead.read<std::string>();
+  Table cmatrixTable(cmatrixName, cmatrixData, ',');
+  std::string cmatrixTableStr = Table::toString(cmatrixTable).toStdString();  
+
+  datasetRead = file.getDataSet(spvectorKey);
+  auto spvectorData = datasetRead.read<std::string>();
+  Table spvectorTable(spvectorName, spvectorData, ',');
+  std::string spvectorTableStr = Table::toString(spvectorTable).toStdString();
+
+  EXPECT_EQ(cmatrixTable.RecordFields(), 8);
+  EXPECT_EQ(spvectorTable.RecordFields(), 7);
+
+  EXPECT_EQ(cmatrixTableStr,
+            "J2000Q0,J2000Q1,J2000Q2,J2000Q3,AV1,AV2,AV3,ET\n0.72889620121855,0.66172757646101,-0.1261913882606,0.12207651669777,4.29360266307594e-04,6.9419874212449e-04,-6.23609851587137e-04,-896818899.38874\n");
+  EXPECT_EQ(spvectorTableStr, 
+            "J2000X,J2000Y,J2000Z,J2000XV,J2000YV,J2000ZV,ET\n491.19844009026,1198.1045282857,1313.7703671439,1.5198029518433,-0.58925196165899,-0.046463883259045,-896818899.38874\n");
+
+  file.flush();
 }

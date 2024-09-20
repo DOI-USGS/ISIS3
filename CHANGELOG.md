@@ -70,6 +70,7 @@ release.
 - Fixed gllssi2isis to support V1.1 data [#5396](https://github.com/DOI-USGS/ISIS3/issues/5396)
 
 ### Added
+- Added option to save and apply bundle adjustment values in `jigsaw` [#4474](https://github.com/DOI-USGS/ISIS3/issues/4474)
 - Added versioned default values to lrowacphomap's PHOALGO and PHOPARCUBE parameters and updated lrowacphomap to handle them properly. [#5452](https://github.com/DOI-USGS/ISIS3/pull/5452)
 
 ## [8.2.0] - 2024-04-18
