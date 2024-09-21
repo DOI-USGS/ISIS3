@@ -44,7 +44,7 @@ div {
 
 /* Hide Menu and Tab Controls */
 .isisMenu, .tab-line, header, footer {
-  display: none;
+  display: none !important;
 }
 
 /* Show all tabs/expand all accordions */

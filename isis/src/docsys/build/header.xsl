@@ -15,6 +15,7 @@ Deborah Lee Soltesz
 12/13/2002
 
 -->
+
   <xsl:template mode="writeHeader" name="writeHeader">
 
     <header>
@@ -141,6 +142,25 @@ Deborah Lee Soltesz
       </div>
     </header>
 
+    <header class="usa-header usa-header--extended narrow-only">
+      <nav aria-label="Mobile navigation" class="usa-nav">
+        <div class="usa-nav__inner">
+          <button type="button" class="usa-nav__close">
+            <img src="/assets/img/usa-icons/close.svg" role="img" alt="Close" />
+          </button>
+          <xsl:call-template  name="writeMenu"/>
+        </div>
+      </nav>
+    </header>
+
+    <div class="topnav-container narrow-only">
+      <div class="logo-bar">
+        <img class="nav-m-logo"
+          src="/assets/img/isis-logo-yellow-notxt.svg"/>
+        <div class="name-bar"><em class="isis-name">ISIS Documentation</em></div>
+      </div>
+      <button class="usa-menu-btn" type="button">Menu</button>
+    </div>
   </xsl:template>
 
 </xsl:stylesheet>

@@ -14,6 +14,8 @@
 
   -->
 
+  <xsl:param name="menuPath"/>
+
   <xsl:output
     media-type="text/html"
     doctype-public="-//W3C//DTD HTML 4.01 Transitional//EN"

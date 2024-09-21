@@ -21,7 +21,10 @@ Deborah Lee Soltesz
     doctype-system="http://www.w3.org/TR/html4/loose.dtd"
     indent="yes"
     encoding="utf-8"
-    omit-xml-declaration="yes"/>
+    omit-xml-declaration="yes"
+  />
+
+  <xsl:param name="menuPath"/>
 
   <xsl:include href="../../build/menu.xsl"/>
   <xsl:include href="../../build/header.xsl"/>
@@ -78,7 +81,9 @@ Deborah Lee Soltesz
 
         <div id="page">
 
-          <xsl:call-template  name="writeMenu"/>
+          <div class="isisMenu">
+            <xsl:call-template  name="writeMenu"/>
+          </div>
 
           <main class="isisContent">
 

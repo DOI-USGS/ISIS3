@@ -15,8 +15,6 @@ Deborah Lee Soltesz
 12/13/2002
 
 -->
-  <xsl:param name="menuPath"/>
-
   <xsl:template mode="writeMenu" name="writeMenu">
 
     <nav aria-label="usa-sidenav" class="sidenav">

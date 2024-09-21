@@ -14,6 +14,8 @@ Deborah Lee Soltesz
 
 -->
 
+<xsl:param name="menuPath"/>
+
 <xsl:include href="menu.xsl"/>
 <xsl:include href="header.xsl"/>
 <xsl:include href="footer.xsl"/>
@@ -59,6 +61,12 @@ Deborah Lee Soltesz
         <link rel="stylesheet" href="assets/styles/uswds.css"/>
         <script src="assets/scripts/uswds-init.min.js"></script>
 
+        <style>
+          .topnav-container {
+            border-top-color: black;
+          }
+        </style>
+
       </head>
 
       <body>
@@ -73,7 +81,9 @@ Deborah Lee Soltesz
         </div>
 
         <div id="page">
-          <xsl:call-template  name="writeMenu"/>
+          <div class="isisMenu">
+            <xsl:call-template  name="writeMenu"/>
+          </div>
           <main class="isisContent">
             <!--xsl:copy-of select="."/-->
             <xsl:apply-templates select="* | text()" mode="copyContents"/>
