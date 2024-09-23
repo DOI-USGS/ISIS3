@@ -56,7 +56,7 @@ namespace Isis {
    * @internal 
    *   @history 2012-07-15 Kris Becker - Original version.
    *   @history 2015-03-18 Jeannie Backer - Brought class files closer to ISIS coding standards.
-   *   @history 2015-04-07 Kristin Berry - Modified applytoIntserectedGeometry to deal
+   *   @history 2015-04-07 Kristin Berry - Modified applytoIntersectedGeometry to deal
    *   @history 2015-03-26 Jeannie Backer - Updated documentation.
    *   @history 2015-03-28 Kris Becker - Added the composite(Resource, Resource)
    *                          method

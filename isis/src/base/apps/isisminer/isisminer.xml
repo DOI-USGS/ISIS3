@@ -49,8 +49,8 @@
       in well-known-text (WKT) or well-known-binary (WKB) as conversions are 
       restricted to text representations of geometries (format requirements are 
       the same as functions like 
-      <a href="http://www.postgis.org/docs/ST_GeomFromText.html">ST_GeomFromWKT</a> and 
-      <a href="http://www.postgis.org/docs/ST_GeomFromWKB.html">ST_GeomFromWKB</a>, 
+      <a href="http://postgis.net/docs/ST_GeomFromText.html">ST_GeomFromWKT</a> and 
+      <a href="http://postgis.net/docs/ST_GeomFromWKB.html">ST_GeomFromWKB</a>, 
       respectively). Resources may also contain Assets. Assets are typically 
       another list of Resources created from Strategies that are attached to a 
       (parent) Resource. If Assets are represented as Resource lists, they can 
@@ -366,7 +366,7 @@
           and is either not repaired (RepairInvalidGeometry = False) or could not be
           sucessfully repaired (RepairInvalidGeometry = True). The options are:
           continue, disable or error. For InvalidGeometryAction = continue, the state
-          of the invalid geoemtry is retained in the Resource (some GIS operations
+          of the invalid geometry is retained in the Resource (some GIS operations
           still function) and it is not disabled and no error occurs - the issue is
           ignored. If InvalidGeometryAction = disable, then the geometry is retained
           in the Resource but the status is set to "discard". It can be re-enabled by
@@ -4707,14 +4707,14 @@ End
        feature.
     </change>
     <change name="Kris Becker" date="2015-06-12">
-      Improved GisOverlap and StereoPair strategies. StereoAngle can now be
-      computed from the GIS centroid of the overlapping region, providing a
-      much higher degree of accuracy. Improved global variable pool management
-      whilst traversing through Strategy/Resource depths in the mining process.
-      Ensure Asset is cleared when Mode = Create is used in AssetSideBar strategy.
+       Improved GisOverlap and StereoPair strategies. StereoAngle can now be
+       computed from the GIS centroid of the overlapping region, providing a
+       much higher degree of accuracy. Improved global variable pool management
+       whilst traversing through Strategy/Resource depths in the mining process.
+       Ensure Asset is cleared when Mode = Create is used in AssetSideBar strategy.
     </change>
     <change name="Kris Becker" date="2015-06-17">
-        Fixed bug in creation of GEOS SRTree when only one geometry occurs 
+       Fixed bug in creation of GEOS SRTree when only one geometry occurs 
        (requires two or more).  Changed name of IsisMiner objects within the 
        GisOverlap strategy (since we now have two of them) to CandidateMiner and 
        OverlapMiner. Added feature to simplify geometry whilst preserving 
@@ -4726,21 +4726,21 @@ End
        Add ability to process the set of GisOverlap results for each Resource
        as they are matched. This is handled in the OverlapMiner Strategy object.
     </change>
-   <change name="Kris Becker" date="2015-07-07">
+    <change name="Kris Becker" date="2015-07-07">
        Added more content to documentation and added an example demonstrating a 
        real application of the isisminer application.
-   </change>
-   <change name="Kris Becker" date="2015-09-27">
+    </change>
+    <change name="Kris Becker" date="2015-09-27">
        Refactored the Resource class to contain all but the active status so 
        that copies can be maintained in separate instances. Reworked the 
        AssetSidebar strategy to take advantage of this work.
-   </change>
-   <change name="Kris Becker" date="2015-10-11">
+    </change>
+    <change name="Kris Becker" date="2015-10-11">
        Fixed bug in argument scanning when the number of arguments reached 10 or 
        more as %1 was replacing %10, etc... Scan and replace i reverse order 
        corrected this problem. Enhanced the Calculator strategy to provide 
        argument replacement in the Initializers group.
-   </change> 
+    </change> 
     <change name="Kris Becker" date="2015-11-01">
         Modified CsvReader strategy to have the provided header length determine 
         the number of keywords created/Resource. This allows the jigsaw residual 
@@ -4750,12 +4750,14 @@ End
         Converted isisminer to callable function. Also converted all Makefile
         tests to gtest format. Moved some data from isis data area to
         "isis/tests/data/isisminer".
-    <change name="Ken Edmundson" date="2024-09-12">
+    </change>
+    <change name="Ken Edmundson" date="2024-09-23">
         Originally implemented in UofA OSIRIS-REx code by Kris Becker, 2018-07-31.
-        Corrected problems with invalid geometries aborting isisminer. Added two
-        new parameters, RepairInvalidGeometry and InvalidGeometryAction, to allow user
-        more control over how invalid geometries are managed. Update some of the
-        documentation.
+        Corrected problems with invalid geometries causeing isisminer to abort.
+        Added two new parameters, RepairInvalidGeometry and InvalidGeometryAction,
+        to allow user more control over how invalid geometries are managed. Updated
+        documentation. Ken Edmundson added unit tests to GisGeometry and Strategy
+        classes to address these changes.
     </change>
   </history>
 

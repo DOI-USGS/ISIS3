@@ -728,6 +728,7 @@ namespace Isis {
 
         // Get decision keys
         bool repairGeom = toBool(keys.get("RepairInvalidGeometry", "true"));
+
         QString geomAction = keys.get("InvalidGeometryAction", "disable").toLower();
         if ( !QString("disable error continue").contains(geomAction) ) {
             if ( isDebug() ) {
@@ -786,7 +787,7 @@ namespace Isis {
             geosgeom.reset( geosgeom->buffer(0) );
             if ( isDebug() ) {
               if (geosgeom.isNull() || !geosgeom->isValid() ) {
-                 cout << "  Geomtry could not be repaired!\n";
+                 cout << "  Geometry could not be repaired!\n";
               }
               else {
                 cout << "  Geometry was successfully repaired!\n";
@@ -808,7 +809,7 @@ namespace Isis {
             }
 
             // Throw an error
-            QString mess = resource->name() + " failed to construct geomtry - Error: " +
+            QString mess = resource->name() + " failed to construct geometry - Error: " +
                             geomError;
             throw IException(IException::Programmer, mess, _FILEINFO_);
           }

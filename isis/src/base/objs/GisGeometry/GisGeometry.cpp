@@ -63,7 +63,7 @@ namespace Isis {
    * This constructor will read the contents of the Polygon blob of an ISIS cube
    * file and create a geometry from its contents.
    *
-   * @param cube  Cube object to create the geomtery from
+   * @param cube  Cube object to create the geometry from
    */
   GisGeometry::GisGeometry(Cube &cube) : m_type(IsisCube), m_geom(0), m_preparedGeom(0) {
 
@@ -623,8 +623,8 @@ namespace Isis {
  * 
  * @author 2018-07-29 Kris Becker
  * 
- * @param width    With to enlarge or shrink polygon 
- * @param quadsegs Numnber of segments to define a circle on corners
+ * @param width    Width to enlarge or shrink polygon 
+ * @param quadsegs Number of segments to define a circle on corners
  * 
  * @return GisGeometry* Pointer to new GisGeometry with buffer applied
  */
@@ -825,7 +825,7 @@ namespace Isis {
   /**
    * Reads Polygon from ISIS Cube and returns geometry from contents
    *
-   * @param cube ISIS Cube contaning a Polygon geometry object
+   * @param cube ISIS Cube containing a Polygon geometry object
    * @return GEOSGeometry Pointer to GEOS-C type geometry from Polygon BLOB
    */
   GEOSGeometry *GisGeometry::fromCube(Cube &cube) const {
