@@ -28,7 +28,7 @@ Deborah Lee Soltesz
                 <img
                   aria-hidden="true"
                   class="usa-banner__header-flag"
-                  src="/assets/img/us_flag_small.png"
+                  src="{$menuPath}assets/img/us_flag_small.png"
                   alt=""
                 />
               </div>
@@ -56,7 +56,7 @@ Deborah Lee Soltesz
               <div class="usa-banner__guidance tablet:grid-col-6">
                 <img
                   class="usa-banner__icon usa-media-block__img"
-                  src="/assets/img/icon-dot-gov.svg"
+                  src="{$menuPath}assets/img/icon-dot-gov.svg"
                   role="img"
                   alt=""
                   aria-hidden="true"
@@ -72,7 +72,7 @@ Deborah Lee Soltesz
               <div class="usa-banner__guidance tablet:grid-col-6">
                 <img
                   class="usa-banner__icon usa-media-block__img"
-                  src="/assets/img/icon-https.svg"
+                  src="{$menuPath}assets/img/icon-https.svg"
                   role="img"
                   alt=""
                   aria-hidden="true"
@@ -117,7 +117,7 @@ Deborah Lee Soltesz
       <div class="tmp-container">
         <div class="header-search">
           <a class="logo-header" href="https://www.usgs.gov/" title="Home">
-            <img src="/assets/img/logo.png"
+            <img src="https://asc-docs.s3.us-west-2.amazonaws.com/common/img/usgs-vis-2x.png"
               style="height: 50px; margin-top: 8px; margin-bottom: 8px;" alt="Home" class="img" border="0" />
           </a>
         </div>
@@ -128,7 +128,7 @@ Deborah Lee Soltesz
       <nav aria-label="Mobile navigation" class="usa-nav">
         <div class="usa-nav__inner">
           <button type="button" class="usa-nav__close">
-            <img src="/assets/img/usa-icons/close.svg" role="img" alt="Close" />
+            <img src="{$menuPath}assets/img/usa-icons/close.svg" role="img" alt="Close" />
           </button>
           <xsl:call-template  name="writeMenu"/>
         </div>
@@ -138,7 +138,7 @@ Deborah Lee Soltesz
     <div class="topnav-container narrow-only">
       <div class="logo-bar">
         <img class="nav-m-logo"
-          src="/assets/img/isis-logo-yellow-notxt.svg"/>
+          src="{$menuPath}assets/img/isis-logo-yellow-notxt.svg"/>
         <div class="name-bar"><em class="isis-name">ISIS Documentation</em></div>
       </div>
       <button class="usa-menu-btn" type="button">Menu</button>
