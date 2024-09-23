@@ -120,24 +120,6 @@ Deborah Lee Soltesz
             <img src="/assets/img/logo.png"
               style="height: 50px; margin-top: 8px; margin-bottom: 8px;" alt="Home" class="img" border="0" />
           </a>
-          <form class="usa-search usa-search--small hide-xnarrow" role="search" action="/SearchResults" method="post">
-            <label class="usa-sr-only" for="header-search-field">Search</label>
-            <input
-              class="usa-input"
-              id="header-search-field"
-              type="search"
-              name="Feature Name"
-              alt="Search ISIS Docs"
-              placeholder="Search ISIS Docs"
-            />
-            <button class="usa-button" id="usgs-header-search-button" type="submit">
-              <img
-                src="/assets/img/usa-icons-bg/search--white.svg"
-                class="usa-search__submit-icon"
-                alt="Search"
-              />
-            </button>
-          </form>
         </div>
       </div>
     </header>
