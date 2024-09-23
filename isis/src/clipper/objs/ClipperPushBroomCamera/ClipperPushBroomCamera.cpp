@@ -38,7 +38,7 @@ namespace Isis {
      }
      else {
        std::string msg = "Unable to construct Clipper Push Broom camera model. "
-                     "Unrecognized NaifFrameCode [" + std::to_string(frameCode) + "].";
+                     "Unrecognized NaifFrameCode [" + toString(frameCode) + "].";
        throw IException(IException::User, msg, _FILEINFO_);
      }
 

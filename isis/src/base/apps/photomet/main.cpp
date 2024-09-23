@@ -1836,7 +1836,7 @@ void IsisMain() {
   double wl;
   if(pvlg.hasKeyword("Center")) {
     PvlKeyword &wavelength = pvlg.findKeyword("Center");
-    wl = std::stod(wavelength[0]);
+    wl = IString::ToDouble(wavelength[0]);
   }
   else {
     wl = 1.0;
