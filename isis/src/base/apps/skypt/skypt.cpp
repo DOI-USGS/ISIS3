@@ -85,7 +85,7 @@ namespace Isis{
      }
 
     //Write the group to the screen
-    log->addLogGroup(sp);
+    log->addGroup(sp);
 
     // Write an output label file if necessary
     if (ui.WasEntered("TO")) {
@@ -134,7 +134,7 @@ namespace Isis{
         }
 
         for(int i = 0; i < sp.keywords(); i++) {
-          os << sp[i];
+          os << sp[i][0];
           if (i < sp.keywords() - 1) {
             os << ",";
           }
