@@ -36,6 +36,8 @@ filter_list = [
         '- ek/',
         '- *.lbl',
         '- *.txt',
+        '- *.bck', 
+        '- *.log', 
         '- *.history',
         '- misc/',
         '- document/',
