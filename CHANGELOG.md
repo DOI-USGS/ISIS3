@@ -39,7 +39,7 @@ release.
 
 - Fixed a bug in kaguyasp2isis that doesn't work for data with a detached label.
 
-## [8.3.0] - 2024-08-16
+## [8.3.0] - 2024-09-30
 
 ### Added
 - Added backplane options for SunIllumination and SurfaceObliqueDetectorResolution to phocube [#5467](https://github.com/DOI-USGS/ISIS3/issues/5467)
