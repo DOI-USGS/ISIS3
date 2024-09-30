@@ -27,7 +27,7 @@
 
 package:
   name: isis
-  version: {{ version }}.0_RC1
+  version: {{ version }}.0
 
 source:
   git_url: 'https://github.com/DOI-USGS/ISIS3.git'
