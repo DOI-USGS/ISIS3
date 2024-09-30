@@ -28,17 +28,17 @@ void IsisMain() {
   // Get user interface
   UserInterface &ui = Application::GetUserInterface();
   // Copy the input image to specified output cube in BSQ format
-  FileName from = ui.GetFileName("FROM");
-  QString pdsLabelFile = from.expanded();
+  FileName from = ui.GetFileName("FROM").toStdString();
+  QString pdsLabelFile = QString::fromStdString(from.expanded());
   Pvl pdsLabelPvl;
   ProcessImportPds p;
   p.SetPdsFile(pdsLabelFile, "", pdsLabelPvl);
 
-  QString instId = pdsLabelPvl["INSTRUMENT_ID"][0];
+  QString instId = QString::fromStdString(pdsLabelPvl["INSTRUMENT_ID"][0]);
   if(instId != "HIRISE_IDEAL_CAMERA") {
-    QString msg = "Invalid PDS label [" + from.expanded() + "]. The PDS product"
+    std::string msg = "Invalid PDS label [" + from.expanded() + "]. The PDS product"
                   " must be from an Ideal camera model derived from a HiRISE"
-                  " image. The INSTRUMENT_ID = [" + instId + "] is unsupported"
+                  " image. The INSTRUMENT_ID = [" + instId.toStdString() + "] is unsupported"
                   " by pds2hideal.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -59,7 +59,7 @@ void IsisMain() {
   outputCube->putGroup(otherGroups.findGroup("Archive"));
 
   PvlGroup kernelGroup("Kernels");
-  kernelGroup += PvlKeyword("NaifIkCode", toString(-74699));
+  kernelGroup += PvlKeyword("NaifIkCode", Isis::toString(-74699));
   kernelGroup += PvlKeyword("TargetPosition", "Table");
   kernelGroup += PvlKeyword("InstrumentPointing", "Table");
   kernelGroup += PvlKeyword("InstrumentPosition", "Table");
@@ -67,8 +67,8 @@ void IsisMain() {
   if (!shapeModelPath.endsWith('/')) {
     shapeModelPath += "/";
   }
-  QString shapeModelValue = shapeModelPath + pdsLabelPvl["SHAPE_MODEL"][0];
-  kernelGroup += PvlKeyword("ShapeModel", shapeModelValue);
+  QString shapeModelValue = shapeModelPath + QString::fromStdString(pdsLabelPvl["SHAPE_MODEL"][0]);
+  kernelGroup += PvlKeyword("ShapeModel", shapeModelValue.toStdString());
   outputCube->putGroup(kernelGroup);
 
 
@@ -79,9 +79,9 @@ void IsisMain() {
 
   PvlObject &naifKeywords = isisLabel->findObject("NaifKeywords");
   PvlKeyword bodyRadii("BODY499_RADII");
-  bodyRadii.addValue(QString(pdsLabelPvl["A_AXIS_RADIUS"]));
-  bodyRadii.addValue(QString(pdsLabelPvl["B_AXIS_RADIUS"]));
-  bodyRadii.addValue(QString(pdsLabelPvl["C_AXIS_RADIUS"]));
+  bodyRadii.addValue(pdsLabelPvl["A_AXIS_RADIUS"]);
+  bodyRadii.addValue(pdsLabelPvl["B_AXIS_RADIUS"]);
+  bodyRadii.addValue(pdsLabelPvl["C_AXIS_RADIUS"]);
   naifKeywords += bodyRadii;
 
   PvlObject &isisCubeObject = isisLabel->findObject("IsisCube");
@@ -89,7 +89,7 @@ void IsisMain() {
   QString sfname = "Isis " + Application::Version() + " " +
             Application::GetUserInterface().ProgramName();
   PvlGroup &archiveGroup = isisCubeObject.findGroup("Archive");
-  archiveGroup += PvlKeyword("SOFTWARE_NAME", sfname);
+  archiveGroup += PvlKeyword("SOFTWARE_NAME", sfname.toStdString());
 
   PvlObject &pdsImageObj = pdsLabelPvl.findObject("IMAGE");
   double samples = double(pdsImageObj["LINE_SAMPLES"]);
@@ -101,14 +101,14 @@ void IsisMain() {
   if (sourceLines != lines) {
     // this image is cropped, create an AlphaCube group
     PvlGroup alphaCube("AlphaCube");
-    alphaCube += PvlKeyword("AlphaSamples", toString(sourceSamps));
-    alphaCube += PvlKeyword("AlphaLines", toString(sourceLines));
-    alphaCube += PvlKeyword("AlphaStartingSample", toString(firstSamp));
-    alphaCube += PvlKeyword("AlphaEndingSample", toString((double) firstSamp + samples));
-    alphaCube += PvlKeyword("AlphaStartingLine", toString(firstLine));
-    alphaCube += PvlKeyword("AlphaEndingLine", toString((double) firstLine + lines));
-    alphaCube += PvlKeyword("BetaSamples", toString(samples));
-    alphaCube += PvlKeyword("BetaLines", toString(lines));
+    alphaCube += PvlKeyword("AlphaSamples", Isis::toString(sourceSamps));
+    alphaCube += PvlKeyword("AlphaLines", Isis::toString(sourceLines));
+    alphaCube += PvlKeyword("AlphaStartingSample", Isis::toString(firstSamp));
+    alphaCube += PvlKeyword("AlphaEndingSample", Isis::toString((double) firstSamp + samples));
+    alphaCube += PvlKeyword("AlphaStartingLine", Isis::toString(firstLine));
+    alphaCube += PvlKeyword("AlphaEndingLine", Isis::toString((double) firstLine + lines));
+    alphaCube += PvlKeyword("BetaSamples", Isis::toString(samples));
+    alphaCube += PvlKeyword("BetaLines", Isis::toString(lines));
     isisCubeObject += alphaCube;
   }
 
@@ -129,7 +129,7 @@ void addTableKeywords(Pvl *isisLabel, Pvl pdsLabelPvl) {
    for (int i = 0; i < isisLabel->objects(); i++) {
      if (isisLabel->object(i).name() == "Table") {
        PvlKeyword keyword;
-       if (QString(isisLabel->object(i)["Name"]) == "InstrumentPointing") {
+       if (QString::fromStdString((isisLabel->object(i)["Name"])) == "InstrumentPointing") {
          keyword = pdsLabelPvl.findObject("INSTRUMENT_POINTING_TABLE")["TIME_DEPENDENT_FRAMES"];
          keyword.setName("TimeDependentFrames");
          isisLabel->object(i) += keyword;
@@ -149,7 +149,7 @@ void addTableKeywords(Pvl *isisLabel, Pvl pdsLabelPvl) {
          keyword.setName("CkTableOriginalSize");
          isisLabel->object(i) += keyword;
        }
-       if (QString(isisLabel->object(i)["Name"]) == "InstrumentPosition") {
+       if (QString::fromStdString((isisLabel->object(i)["Name"])) == "InstrumentPosition") {
          keyword = pdsLabelPvl.findObject("INSTRUMENT_POSITION_TABLE")["CACHE_TYPE"];
          keyword.setName("CacheType");
          isisLabel->object(i) += keyword;
@@ -163,7 +163,7 @@ void addTableKeywords(Pvl *isisLabel, Pvl pdsLabelPvl) {
          keyword.setName("SpkTableOriginalSize");
          isisLabel->object(i) += keyword;
        }
-       if (QString(isisLabel->object(i)["Name"]) == "BodyRotation") {
+       if (QString::fromStdString((isisLabel->object(i)["Name"])) == "BodyRotation") {
          keyword = pdsLabelPvl.findObject("BODY_ROTATION_TABLE")["TIME_DEPENDENT_FRAMES"];
          keyword.setName("TimeDependentFrames");
          isisLabel->object(i) += keyword;
@@ -180,7 +180,7 @@ void addTableKeywords(Pvl *isisLabel, Pvl pdsLabelPvl) {
          keyword.setName("SolarLongitude");
          isisLabel->object(i) += keyword;
        }
-       if (QString(isisLabel->object(i)["Name"]) == "SunPosition") {
+       if (QString::fromStdString((isisLabel->object(i)["Name"])) == "SunPosition") {
          keyword = pdsLabelPvl.findObject("SUN_POSITION_TABLE")["CACHE_TYPE"];
          keyword.setName("CacheType");
          isisLabel->object(i) += keyword;

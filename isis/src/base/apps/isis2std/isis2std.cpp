@@ -60,7 +60,7 @@ namespace Isis  {
       }
     }
 
-    FileName outputName = ui.GetFileName("TO");
+    FileName outputName = ui.GetFileName("TO").toStdString();
     int quality = ui.GetInteger("QUALITY");
 
 
@@ -116,7 +116,7 @@ namespace Isis  {
 
 
   int addChannel(UserInterface &ui, ExportDescription &desc, QString param, QString mode) {
-    FileName name = ui.GetCubeName(param);
+    FileName name = ui.GetCubeName(param).toStdString();
     CubeAttributeInput &att = ui.GetInputAttribute(param);
 
     int index = -1;
@@ -138,8 +138,8 @@ namespace Isis  {
   void addResults(PvlGroup &results, ImageExporter *exporter,
       QString channel, int index) {
 
-    results += PvlKeyword(channel + "InputMinimum", toString(exporter->inputMinimum(index)));
-    results += PvlKeyword(channel + "InputMaximum", toString(exporter->inputMaximum(index)));
+    results += PvlKeyword(channel.toStdString() + "InputMinimum", Isis::toString(exporter->inputMinimum(index)));
+    results += PvlKeyword(channel.toStdString() + "InputMaximum", Isis::toString(exporter->inputMaximum(index)));
   }
 
 }

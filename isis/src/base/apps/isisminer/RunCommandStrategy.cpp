@@ -80,7 +80,7 @@ namespace Isis {
     // Flatten RunCommand Strategy object definition
     PvlObject config( getDefinition() );
     if ( config.hasKeyword("Command") ) {
-      m_commands.push_back(Command("Command", config["Command"][0]));
+      m_commands.push_back(Command("Command", QString::fromStdString(config["Command"][0])));
     }
 
     // Read and store all PRE commands
@@ -88,7 +88,7 @@ namespace Isis {
       PvlGroup &commands = config.findGroup("PreCommands");
       PvlContainer::ConstPvlKeywordIterator key = commands.begin();
       while ( key != commands.end() ) {
-         m_preCommands.push_back(Command(key->name(), (*key)[0]));
+         m_preCommands.push_back(Command(QString::fromStdString(key->name()), QString::fromStdString((*key)[0])));
          ++key;
       }
     }
@@ -98,7 +98,7 @@ namespace Isis {
       PvlGroup &commands = config.findGroup("Commands");
       PvlContainer::ConstPvlKeywordIterator key = commands.begin();
       while ( key != commands.end() ) {
-         m_commands.push_back(Command(key->name(), (*key)[0]));
+         m_commands.push_back(Command(QString::fromStdString(key->name()), QString::fromStdString((*key)[0])));
          ++key;
       }
     }
@@ -108,7 +108,7 @@ namespace Isis {
       PvlGroup &commands = config.findGroup("PostCommands");
       PvlContainer::ConstPvlKeywordIterator key = commands.begin();
       while ( key != commands.end() ) {
-         m_postCommands.push_back(Command(key->name(), (*key)[0]));
+         m_postCommands.push_back(Command(QString::fromStdString(key->name()), QString::fromStdString((*key)[0])));
          ++key;
       }
     }
@@ -119,9 +119,9 @@ namespace Isis {
     QStringList excludes;
     excludes << "Commands" << "PreCommands" << "PostCommands";
     PvlFlatMap skeys( getDefinition(), PvlConstraints::withExcludes(excludes));
-    m_skipAllNoData   = toBool(skeys.get("SkipCommandsIfNoData", "true"));
-    m_onPreCommandErrorContinue = toBool(skeys.get("OnPreCommandErrorContinue", "false"));
-    m_onPostCommandErrorContinue = toBool(skeys.get("OnPostCommandErrorContinue", "false"));
+    m_skipAllNoData   = toBool(skeys.get("SkipCommandsIfNoData", "true").toStdString());
+    m_onPreCommandErrorContinue = toBool(skeys.get("OnPreCommandErrorContinue", "false").toStdString());
+    m_onPostCommandErrorContinue = toBool(skeys.get("OnPostCommandErrorContinue", "false").toStdString());
 
     return; 
   }
@@ -165,13 +165,13 @@ namespace Isis {
       cmd = scanAndReplace(cmd, "&apos;", "\'");
 
       if ( isDebug() ) { 
-        cout << "Running " << command.m_name << " PRE command: " << cmd << "\n"; 
+        cout << "Running " << command.m_name.toStdString() << " PRE command: " << cmd.toStdString() << "\n"; 
       }
       int status = system(cmd.toLatin1().data());
       if ( 0 != status) {
         if ( !m_onPreCommandErrorContinue ) {
-          QString mess = command.m_name + " RunCommand::PreCommand failed - " + 
-                         cmd + " - you are terminated!";
+          std::string mess = command.m_name.toStdString() + " RunCommand::PreCommand failed - " + 
+                         cmd.toStdString() + " - you are terminated!";
           throw IException(IException::User, mess, _FILEINFO_);
         }
       }
@@ -191,15 +191,15 @@ namespace Isis {
       cmd = scanAndReplace(cmd, "&apos;", "\'");
 
       if ( isDebug() ) { 
-        cout << "Running " << command.m_name << " POST command: " << cmd << "\n"; 
+        cout << "Running " << command.m_name.toStdString() << " POST command: " << cmd.toStdString() << "\n"; 
       }
 
       // Check status and disposition
       int status = system(cmd.toLatin1().data());
       if ( 0 != status) {
         if ( !m_onPostCommandErrorContinue ) {
-          QString mess = command.m_name + " RunCommand::PostCommand failed - " + 
-                         cmd + " - you are terminated!";
+          std::string mess = command.m_name.toStdString() + " RunCommand::PostCommand failed - " + 
+                         cmd.toStdString() + " - you are terminated!";
           throw IException(IException::User, mess, _FILEINFO_);
         }
       }
@@ -223,7 +223,6 @@ namespace Isis {
   int RunCommandStrategy::apply(SharedResource &resource, 
                                 const ResourceList &globals) { 
 
-    int n_good(0);
     BOOST_FOREACH ( Command command, m_commands ) {
       QString cmd = processArgs(command.m_command, m_argKeys, 
                                 getGlobals(resource, globals));
@@ -231,24 +230,23 @@ namespace Isis {
       cmd = scanAndReplace(cmd, "&apos;", "\'");
 
       if ( isDebug() ) { 
-        cout << "Running " << command.m_name << " command: " << cmd << "\n"; 
+        cout << "Running " << command.m_name.toStdString() << " command: " << cmd.toStdString() << "\n"; 
       }
       int status = system(cmd.toLatin1().data());
 
       // If command failed, deactivate the resource
       if (status != 0 ) {
         if ( isDebug() ) { 
-          cout << "Command " << command.m_name 
+          cout << "Command " << command.m_name.toStdString() 
                << " failed with status = " << status << "\n"; 
         }
         resource->discard();
         return (0);
       }
       else {
-      if ( isDebug() ) { 
-        cout << "Command " << command.m_name << " succeeded\n"; 
-      }
-        n_good++;
+        if ( isDebug() ) { 
+          cout << "Command " << command.m_name.toStdString() << " succeeded\n"; 
+        }
       }
     }
     return (1); 

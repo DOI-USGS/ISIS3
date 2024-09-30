@@ -119,7 +119,7 @@ namespace Isis {
     m_orientation = NULL;
 
     // Determine the axis for the velocity vector
-    QString key = "INS" + toString(frameCode) + "_TRANSX";
+    QString key = "INS" + QString::number(frameCode) + "_TRANSX";
     SpiceDouble transX[2];
     SpiceInt number;
     SpiceBoolean found;
@@ -127,7 +127,7 @@ namespace Isis {
     gdpool_c(key.toLatin1().data(), 1, 2, &number, transX, &found);
 
     if (!found) {
-      QString msg = "Cannot find [" + key + "] in text kernels";
+      std::string msg = "Cannot find [" + key.toStdString() + "] in text kernels";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
@@ -350,23 +350,23 @@ namespace Isis {
 
     // Check for valid arguments
     if (size <= 0) {
-      QString msg = "Argument cacheSize must not be less or equal to zero";
+      std::string msg = "Argument cacheSize must not be less or equal to zero";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (startTime > endTime) {
-      QString msg = "Argument startTime must be less than or equal to endTime";
+      std::string msg = "Argument startTime must be less than or equal to endTime";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if ((startTime != endTime) && (size == 1)) {
-      QString msg = "Cache size must be more than 1 if startTime and endTime differ";
+      std::string msg = "Cache size must be more than 1 if startTime and endTime differ";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Make sure cache isn't already loaded
     if (p_source == Memcache) {
-      QString msg = "A SpiceRotation cache has already been created";
+      std::string msg = "A SpiceRotation cache has already been created";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -551,7 +551,7 @@ namespace Isis {
     if (table.Label().hasKeyword("TimeDependentFrames")) {
       PvlKeyword labelTimeFrames = table.Label()["TimeDependentFrames"];
       for (int i = 0; i < labelTimeFrames.size(); i++) {
-        p_timeFrames.push_back(toInt(labelTimeFrames[i]));
+        p_timeFrames.push_back(Isis::toInt(labelTimeFrames[i]));
       }
     }
     else {
@@ -564,12 +564,12 @@ namespace Isis {
       p_constantFrames.clear();
 
       for (int i = 0; i < labelConstantFrames.size(); i++) {
-        p_constantFrames.push_back(toInt(labelConstantFrames[i]));
+        p_constantFrames.push_back(Isis::toInt(labelConstantFrames[i]));
       }
       PvlKeyword labelConstantRotation = table.Label()["ConstantRotation"];
 
       for (int i = 0; i < labelConstantRotation.size(); i++) {
-        p_TC.push_back(toDouble(labelConstantRotation[i]));
+        p_TC.push_back(Isis::toDouble(labelConstantRotation[i]));
       }
     }
     else {
@@ -579,18 +579,18 @@ namespace Isis {
 
     // Load the full cache time information from the label if available
     if (table.Label().hasKeyword("CkTableStartTime")) {
-      p_fullCacheStartTime = toDouble(table.Label().findKeyword("CkTableStartTime")[0]);
+      p_fullCacheStartTime = Isis::toDouble(table.Label().findKeyword("CkTableStartTime")[0]);
     }
     if (table.Label().hasKeyword("CkTableEndTime")) {
-      p_fullCacheEndTime = toDouble(table.Label().findKeyword("CkTableEndTime")[0]);
+      p_fullCacheEndTime = Isis::toDouble(table.Label().findKeyword("CkTableEndTime")[0]);
     }
     if (table.Label().hasKeyword("CkTableOriginalSize")) {
-      p_fullCacheSize = toInt(table.Label().findKeyword("CkTableOriginalSize")[0]);
+      p_fullCacheSize = Isis::toInt(table.Label().findKeyword("CkTableOriginalSize")[0]);
     }
 
     // Load FrameTypeCode from labels if available and the planetary constants keywords
     if (table.Label().hasKeyword("FrameTypeCode")) {
-      m_frameType = (FrameType) toInt(table.Label().findKeyword("FrameTypeCode")[0]);
+      m_frameType = (FrameType) Isis::toInt(table.Label().findKeyword("FrameTypeCode")[0]);
     }
     else {
       m_frameType = UNKNOWN;
@@ -710,7 +710,7 @@ namespace Isis {
       }
     }
     else  {
-      QString msg = "Expecting either three, five, or eight fields in the SpiceRotation table";
+      std::string msg = "Expecting either three, five, or eight fields in the SpiceRotation table";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -776,7 +776,7 @@ namespace Isis {
       }
     }
     else { //(p_source < PolyFunction)
-      QString msg = "The SpiceRotation has not yet been fit to a function";
+      std::string msg = "The SpiceRotation has not yet been fit to a function";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -822,7 +822,7 @@ namespace Isis {
     if (p_source >= PolyFunction)  ReloadCache();
 
     if (p_source != Memcache) {
-      QString msg = "Only cached rotations can be returned as a line cache of quaternions and time";
+      std::string msg = "Only cached rotations can be returned as a line cache of quaternions and time";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     // Load the table and return it to caller
@@ -891,7 +891,7 @@ namespace Isis {
       }
 
       record += t;
-      Table table(tableName, record);
+      Table table(tableName.toStdString(), record);
 
       std::vector<ale::Rotation> rots = m_orientation->getRotations();
       std::vector<ale::Vec3d> angularVelocities = m_orientation->getAngularVelocities();
@@ -941,7 +941,7 @@ namespace Isis {
       record += angle2;
       record += angle3;
 
-      Table table(tableName, record);
+      Table table(tableName.toStdString(), record);
 
       for (int cindex = 0; cindex < p_degree + 1; cindex++) {
         record[0] = p_coefficients[0][cindex];
@@ -962,7 +962,7 @@ namespace Isis {
     }
     else {
       // throw an error -- should not get here -- invalid Spice Source
-      QString msg = "To create table source of data must be either Memcache or PolyFunction";
+      std::string msg = "To create table source of data must be either Memcache or PolyFunction";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -993,7 +993,7 @@ namespace Isis {
       // added, this case is not being used in the pck file.  It is mentioned in the Naif required
       // reading file, pck.req, as a possibility for future pck files.
       // Look for a reference frame keyword for the body.  The default is J2000.
-      QString naifKeyword = "BODY" + toString(centerBodyCode) + "_CONSTANTS_REF_FRAME" ;
+      QString naifKeyword = "BODY" + QString::number(centerBodyCode) + "_CONSTANTS_REF_FRAME" ;
       SpiceInt numExpected;
       SpiceInt numReturned;
       SpiceChar naifType;
@@ -1012,7 +1012,7 @@ namespace Isis {
 
         // Make sure the standard coefficients are available for the body code by
         // checking for ra
-        naifKeyword = "BODY" + toString(centerBodyCode) + "_POLE_RA" ;
+        naifKeyword = "BODY" + QString::number(centerBodyCode) + "_POLE_RA" ;
         dtpool_c(naifKeyword.toLatin1().data(), &found, &numExpected, &naifType);
 
         if (found) {
@@ -1041,13 +1041,13 @@ namespace Isis {
 
           // Now check for nutation/precession terms.  Check for nut/prec ra values
           // first to see if the terms are even used for this body.
-          naifKeyword = "BODY" + toString(centerBodyCode) + "_NUT_PREC_RA" ;
+          naifKeyword = "BODY" + QString::number(centerBodyCode) + "_NUT_PREC_RA" ;
           dtpool_c(naifKeyword.toLatin1().data(), &found, &numReturned, &naifType);
           if (found) {
             // Get the barycenter (bc) linear coefficients first (2 for each period).
             // Then we can get the maximum expected coefficients.
             SpiceInt bcCode = centerBodyCode/100;  // Ex: bc code for Jupiter (599) & its moons is 5
-            naifKeyword = "BODY" + toString(bcCode) + "_NUT_PREC_ANGLES" ;
+            naifKeyword = "BODY" + QString::number(bcCode) + "_NUT_PREC_ANGLES" ;
             dtpool_c(naifKeyword.toLatin1().data(), &found, &numExpected, &naifType);
             std::vector<double>npAngles(numExpected, 0.);
             bodvcd_c(bcCode, "NUT_PREC_ANGLES", numExpected, &numReturned, &npAngles[0]);
@@ -1104,21 +1104,21 @@ namespace Isis {
     if (label.hasKeyword("PoleRa")) {
       PvlKeyword labelCoeffs = label["PoleRa"];
       for (int i = 0; i < labelCoeffs.size(); i++){
-        m_raPole.push_back(Angle(toDouble(labelCoeffs[i]), Angle::Degrees));
+        m_raPole.push_back(Angle(Isis::toDouble(labelCoeffs[i]), Angle::Degrees));
       }
       numLoaded += 1;
     }
     if (label.hasKeyword("PoleDec")) {
       PvlKeyword labelCoeffs = label["PoleDec"];
       for (int i = 0; i < labelCoeffs.size(); i++){
-        m_decPole.push_back(Angle(toDouble(labelCoeffs[i]), Angle::Degrees));
+        m_decPole.push_back(Angle(Isis::toDouble(labelCoeffs[i]), Angle::Degrees));
       }
       numLoaded += 1;
     }
     if (label.hasKeyword("PrimeMeridian")) {
       PvlKeyword labelCoeffs = label["PrimeMeridian"];
       for (int i = 0; i < labelCoeffs.size(); i++){
-        m_pm.push_back(Angle(toDouble(labelCoeffs[i]), Angle::Degrees));
+        m_pm.push_back(Angle(Isis::toDouble(labelCoeffs[i]), Angle::Degrees));
       }
       numLoaded += 1;
     }
@@ -1127,31 +1127,31 @@ namespace Isis {
     if (label.hasKeyword("PoleRaNutPrec")) {
       PvlKeyword labelCoeffs = label["PoleRaNutPrec"];
       for (int i = 0; i < labelCoeffs.size(); i++){
-        m_raNutPrec.push_back(toDouble(labelCoeffs[i]));
+        m_raNutPrec.push_back(Isis::toDouble(labelCoeffs[i]));
       }
     }
     if (label.hasKeyword("PoleDecNutPrec")) {
       PvlKeyword labelCoeffs = label["PoleDecNutPrec"];
       for (int i = 0; i < labelCoeffs.size(); i++){
-        m_decNutPrec.push_back(toDouble(labelCoeffs[i]));
+        m_decNutPrec.push_back(Isis::toDouble(labelCoeffs[i]));
       }
     }
     if (label.hasKeyword("PmNutPrec")) {
       PvlKeyword labelCoeffs = label["PmNutPrec"];
       for (int i = 0; i < labelCoeffs.size(); i++){
-        m_pmNutPrec.push_back(toDouble(labelCoeffs[i]));
+        m_pmNutPrec.push_back(Isis::toDouble(labelCoeffs[i]));
       }
     }
     if (label.hasKeyword("SysNutPrec0")) {
       PvlKeyword labelCoeffs = label["SysNutPrec0"];
       for (int i = 0; i < labelCoeffs.size(); i++){
-        m_sysNutPrec0.push_back(Angle(toDouble(labelCoeffs[i]), Angle::Degrees));
+        m_sysNutPrec0.push_back(Angle(Isis::toDouble(labelCoeffs[i]), Angle::Degrees));
       }
     }
     if (label.hasKeyword("SysNutPrec1")) {
       PvlKeyword labelCoeffs = label["SysNutPrec1"];
       for (int i = 0; i < labelCoeffs.size(); i++){
-        m_sysNutPrec1.push_back(Angle(toDouble(labelCoeffs[i]), Angle::Degrees));
+        m_sysNutPrec1.push_back(Angle(Isis::toDouble(labelCoeffs[i]), Angle::Degrees));
       }
     }
 
@@ -1174,7 +1174,7 @@ namespace Isis {
       table.Label() += PvlKeyword("TimeDependentFrames");
 
       for (int i = 0; i < (int) p_timeFrames.size(); i++) {
-        table.Label()["TimeDependentFrames"].addValue(toString(p_timeFrames[i]));
+        table.Label()["TimeDependentFrames"].addValue(Isis::toString(p_timeFrames[i]));
       }
     }
 
@@ -1182,33 +1182,33 @@ namespace Isis {
       table.Label() += PvlKeyword("ConstantFrames");
 
       for (int i = 0; i < (int) p_constantFrames.size(); i++) {
-        table.Label()["ConstantFrames"].addValue(toString(p_constantFrames[i]));
+        table.Label()["ConstantFrames"].addValue(Isis::toString(p_constantFrames[i]));
       }
 
       table.Label() += PvlKeyword("ConstantRotation");
 
       for (int i = 0; i < (int) p_TC.size(); i++) {
-        table.Label()["ConstantRotation"].addValue(toString(p_TC[i]));
+        table.Label()["ConstantRotation"].addValue(Isis::toString(p_TC[i]));
       }
     }
 
     // Write original time coverage
     if (p_fullCacheStartTime != 0) {
       table.Label() += PvlKeyword("CkTableStartTime");
-      table.Label()["CkTableStartTime"].addValue(toString(p_fullCacheStartTime));
+      table.Label()["CkTableStartTime"].addValue(Isis::toString(p_fullCacheStartTime));
     }
     if (p_fullCacheEndTime != 0) {
       table.Label() += PvlKeyword("CkTableEndTime");
-      table.Label()["CkTableEndTime"].addValue(toString(p_fullCacheEndTime));
+      table.Label()["CkTableEndTime"].addValue(Isis::toString(p_fullCacheEndTime));
     }
     if (p_fullCacheSize != 0) {
       table.Label() += PvlKeyword("CkTableOriginalSize");
-      table.Label()["CkTableOriginalSize"].addValue(toString(p_fullCacheSize));
+      table.Label()["CkTableOriginalSize"].addValue(Isis::toString(p_fullCacheSize));
     }
 
  // Begin section added 06-20-2015 DAC
     table.Label() += PvlKeyword("FrameTypeCode");
-    table.Label()["FrameTypeCode"].addValue(toString(m_frameType));
+    table.Label()["FrameTypeCode"].addValue(Isis::toString(m_frameType));
 
     if (m_frameType == PCK) {
       // Write out all the body orientation constants
@@ -1216,50 +1216,50 @@ namespace Isis {
       table.Label() += PvlKeyword("PoleRa");
 
       for (int i = 0; i < (int) m_raPole.size(); i++) {
-        table.Label()["PoleRa"].addValue(toString(m_raPole[i].degrees()));
+        table.Label()["PoleRa"].addValue(Isis::toString(m_raPole[i].degrees()));
       }
 
       // Pole right ascension, declination coefficients for a quadratic equation
       table.Label() += PvlKeyword("PoleDec");
       for (int i = 0; i < (int) m_decPole.size(); i++) {
-        table.Label()["PoleDec"].addValue(toString(m_decPole[i].degrees()));
+        table.Label()["PoleDec"].addValue(Isis::toString(m_decPole[i].degrees()));
       }
 
       // Prime meridian coefficients for a quadratic equation
       table.Label() += PvlKeyword("PrimeMeridian");
       for (int i = 0; i < (int) m_pm.size(); i++) {
-        table.Label()["PrimeMeridian"].addValue(toString(m_pm[i].degrees()));
+        table.Label()["PrimeMeridian"].addValue(Isis::toString(m_pm[i].degrees()));
       }
 
       if (m_raNutPrec.size() > 0) {
         // Pole right ascension nutation precision coefficients to the trig terms
         table.Label() += PvlKeyword("PoleRaNutPrec");
         for (int i = 0; i < (int) m_raNutPrec.size(); i++) {
-          table.Label()["PoleRaNutPrec"].addValue(toString(m_raNutPrec[i]));
+          table.Label()["PoleRaNutPrec"].addValue(Isis::toString(m_raNutPrec[i]));
         }
 
         // Pole declination nutation precision coefficients to the trig terms
         table.Label() += PvlKeyword("PoleDecNutPrec");
         for (int i = 0; i < (int) m_decNutPrec.size(); i++) {
-          table.Label()["PoleDecNutPrec"].addValue(toString(m_decNutPrec[i]));
+          table.Label()["PoleDecNutPrec"].addValue(Isis::toString(m_decNutPrec[i]));
         }
 
         // Prime meridian nutation precision coefficients to the trig terms
         table.Label() += PvlKeyword("PmNutPrec");
         for (int i = 0; i < (int) m_pmNutPrec.size(); i++) {
-          table.Label()["PmNutPrec"].addValue(toString(m_pmNutPrec[i]));
+          table.Label()["PmNutPrec"].addValue(Isis::toString(m_pmNutPrec[i]));
         }
 
         // System nutation precision constant terms of linear model of periods
         table.Label() += PvlKeyword("SysNutPrec0");
         for (int i = 0; i < (int) m_sysNutPrec0.size(); i++) {
-          table.Label()["SysNutPrec0"].addValue(toString(m_sysNutPrec0[i].degrees()));
+          table.Label()["SysNutPrec0"].addValue(Isis::toString(m_sysNutPrec0[i].degrees()));
         }
 
         // System nutation precision linear terms of linear model of periods
         table.Label() += PvlKeyword("SysNutPrec1");
         for (int i = 0; i < (int) m_sysNutPrec1.size(); i++) {
-          table.Label()["SysNutPrec1"].addValue(toString(m_sysNutPrec1[i].degrees()));
+          table.Label()["SysNutPrec1"].addValue(Isis::toString(m_sysNutPrec1[i].degrees()));
         }
       }
     }
@@ -1613,7 +1613,7 @@ namespace Isis {
 
     // Get the derivative of the polynomial with respect to partialVar
     double dpoly = 0.;
-    QString msg;
+    std::string msg;
     switch (m_frameType) {
      case CK:
      case DYN:
@@ -1731,7 +1731,7 @@ namespace Isis {
     if (p_source == PolyFunction) {
       // Nothing to do
       return;
-//      QString msg = "Rotation already fit to a polynomial -- spiceint first to refit";
+//      std::string msg = "Rotation already fit to a polynomial -- spiceint first to refit";
 //      throw IException(IException::User,msg,_FILEINFO_);
     }
 
@@ -1881,7 +1881,7 @@ namespace Isis {
                                     const Source type) {
 
     if (type == PolyFunctionOverSpice && !m_orientation) {
-      QString msg = "The quaternion SPICE tables are no longer available. " 
+      std::string msg = "The quaternion SPICE tables are no longer available. " 
                     "Either re-run spiceinit or set OVEREXISTING to False.";
       throw IException(IException::User, msg, _FILEINFO_);
     }                             
@@ -1947,7 +1947,7 @@ namespace Isis {
 
     // No target body orientation information available -- throw an error
     if (!m_tOrientationAvailable) {
-      QString msg = "Target body orientation information not available.  Rerun spiceinit.";
+      std::string msg = "Target body orientation information not available.  Rerun spiceinit.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -2137,7 +2137,7 @@ namespace Isis {
       derivative = 1;
     }
     else {
-      QString msg = "Unable to evaluate the derivative of the SPICE rotation fit polynomial for "
+      std::string msg = "Unable to evaluate the derivative of the SPICE rotation fit polynomial for "
                     "the given coefficient index [" + toString(coeffIndex) + "]. "
                     "Index is negative or exceeds degree of polynomial ["
                     + toString(p_degree) + "]";
@@ -2189,7 +2189,7 @@ namespace Isis {
       derivative = pow(time, coeffIndex);
       break;
     default:
-      QString msg = "Unable to evaluate the derivative of the target body rotation fit polynomial "
+      std::string msg = "Unable to evaluate the derivative of the target body rotation fit polynomial "
                     "for the given coefficient index [" + toString(coeffIndex) + "]. "
                     "Index is negative or exceeds degree of polynomial ["
                     + toString(p_degree) + "]";
@@ -2251,7 +2251,7 @@ namespace Isis {
        dpoly = DPckPolynomial(partialVar, coeffIndex);
        break;
      default:
-      QString msg = "Only CK, DYN, and PCK partials can be calculated";
+      std::string msg = "Only CK, DYN, and PCK partials can be calculated";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -2441,7 +2441,7 @@ namespace Isis {
    */
   void SpiceRotation::SetAxes(int axis1, int axis2, int axis3) {
     if (axis1 < 1  ||  axis2 < 1  || axis3 < 1  || axis1 > 3  || axis2 > 3  || axis3 > 3) {
-      QString msg = "A rotation axis is outside the valid range of 1 to 3";
+      std::string msg = "A rotation axis is outside the valid range of 1 to 3";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_axis1 = axis1;
@@ -2482,7 +2482,7 @@ namespace Isis {
       //  final step -- downsize loaded cache and reload
 
       if (p_fullCacheSize != (int) p_cacheTime.size()) {
-        QString msg =
+        std::string msg =
           "Full cache size does NOT match cache size in LoadTimeCache -- should never happen";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -2610,7 +2610,7 @@ namespace Isis {
             // Check for a gap in the time coverage by making sure the time span of the observation
             //  does not cross a segment unless the next segment starts where the current one ends
             if (observationSpansToNextSegment && currentTime > segStartEt) {
-              QString msg = "Observation crosses segment boundary--unable to interpolate pointing";
+              std::string msg = "Observation crosses segment boundary--unable to interpolate pointing";
               throw IException(IException::Programmer, msg, _FILEINFO_);
             }
             if (observEnd > segStopEt) {
@@ -2670,7 +2670,7 @@ namespace Isis {
       }
     }
     else if (count == 0  &&  p_source != Nadir  &&  p_minimizeCache == Yes) {
-      QString msg = "No camera kernels loaded...Unable to determine time cache to downsize";
+      std::string msg = "No camera kernels loaded...Unable to determine time cache to downsize";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -2701,7 +2701,7 @@ namespace Isis {
 
     // No time cache was initialized -- throw an error
     if (p_fullCacheSize < 1) {
-      QString msg = "Time cache not available -- rerun spiceinit";
+      std::string msg = "Time cache not available -- rerun spiceinit";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -2765,7 +2765,7 @@ namespace Isis {
           break;
         }
 
-        QString msg = "The frame" + toString((int) frameCodes[frmidx]) + " is not supported by Naif";
+        std::string msg = "The frame" + toString((int) frameCodes[frmidx]) + " is not supported by Naif";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -2785,7 +2785,7 @@ namespace Isis {
             break;
           }
 
-          QString msg = "The ck rotation from frame " + toString(frameCodes[frmidx]) + " can not "
+          std::string msg = "The ck rotation from frame " + toString(frameCodes[frmidx]) + " can not "
                + "be found due to no pointing available at requested time or a problem with the "
                + "frame";
           throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -2794,7 +2794,7 @@ namespace Isis {
       else if (type == TK) {
         tkfram_((SpiceInt *) &typid, (double *) matrix, &nextFrame, (logical *) &found);
         if (!found) {
-          QString msg = "The tk rotation from frame " + toString(frameCodes[frmidx]) +
+          std::string msg = "The tk rotation from frame " + toString(frameCodes[frmidx]) +
                         " can not be found";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
@@ -2810,7 +2810,7 @@ namespace Isis {
       }
 
       else {
-        QString msg = "The frame " + toString(frameCodes[frmidx]) +
+        std::string msg = "The frame " + toString(frameCodes[frmidx]) +
             " has a type " + toString(type) + " not supported by your version of Naif Spicelib."
             + "You need to update.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -2976,12 +2976,12 @@ namespace Isis {
 
     // Make sure the angles have been fit to polynomials so we can calculate the derivative
     if (p_source < PolyFunction ) {
-      QString msg = "The SpiceRotation pointing angles must be fit to polynomials in order to ";
+      std::string msg = "The SpiceRotation pointing angles must be fit to polynomials in order to ";
       msg += "compute angular velocity.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if (p_source == PckPolyFunction) {
-      QString msg = "Planetary angular velocity must be fit computed with PCK polynomials ";
+      std::string msg = "Planetary angular velocity must be fit computed with PCK polynomials ";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     std::vector<double> dCJdt;

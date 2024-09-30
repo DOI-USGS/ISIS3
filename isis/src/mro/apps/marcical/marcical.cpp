@@ -162,7 +162,7 @@ namespace Isis {
       icube.setVirtualBands(inAtt.bands());
     }
 
-    icube.open(FileName(ui.GetCubeName("FROM")).expanded());
+    icube.open(QString::fromStdString(FileName(ui.GetCubeName("FROM").toStdString()).expanded()));
 
     // Make sure it is a Marci cube
     try {
@@ -175,14 +175,14 @@ namespace Isis {
       }
     }
     catch (IException &) {
-      FileName inFileName = ui.GetCubeName("FROM");
-      QString msg = "This program is intended for use on MARCI images only. [";
+      FileName inFileName = ui.GetCubeName("FROM").toStdString();
+      std::string msg = "This program is intended for use on MARCI images only. [";
       msg += inFileName.expanded() + "] does not appear to be a MARCI image.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (icube.group("Archive")["SampleBitModeId"][0] != "SQROOT") {
-      QString msg = "Sample bit mode [" + icube.group("Archive")["SampleBitModeId"][0] + "] is not supported.";
+      std::string msg = "Sample bit mode [" + icube.group("Archive")["SampleBitModeId"][0] + "] is not supported.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -198,7 +198,7 @@ namespace Isis {
       decimation.push_back(1.0);
     }
 
-    QString startTime = icube.label()->findGroup("Instrument", Pvl::Traverse)["StartTime"][0];
+    QString startTime = QString::fromStdString(icube.label()->findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
     iTime start(startTime);
     iTime changeTime("November 6, 2006 21:30:00 UTC");
 
@@ -211,15 +211,15 @@ namespace Isis {
 
     // Get the LUT data
     FileName temp = FileName("$mro/calibration/marcisqroot_???.lut").highestVersion();
-    TextFile stretchPairs(temp.expanded());
+    TextFile stretchPairs(QString::fromStdString(temp.expanded()));
 
     // Create the stretch pairs
     stretch.ClearPairs();
     for (int i = 0; i < stretchPairs.LineCount(); i++) {
       QString line;
       stretchPairs.GetLine(line, true);
-      int temp1 = toInt(line.split(" ").first());
-      int temp2 = toInt(line.split(" ").last());
+      int temp1 = line.split(" ").first().toInt();
+      int temp2 = line.split(" ").last().toInt();
       stretch.AddPair(temp1, temp2);
     }
 
@@ -236,8 +236,8 @@ namespace Isis {
 
     // Check our coefficient file
     if (calibrationData.objects() != 7) {
-      QString msg = "Calibration file [" + calFile.expanded() + "] must contain data for 7 filters in ascending order;";
-      msg += " only [" + QString::number(calibrationData.objects()) + "] objects were found";
+      std::string msg = "Calibration file [" + calFile.expanded() + "] must contain data for 7 filters in ascending order;";
+      msg += " only [" + toString(calibrationData.objects()) + "] objects were found";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -246,7 +246,7 @@ namespace Isis {
       PvlObject calObj = calibrationData.object(obj);
 
       if ((int)calObj["FilterNumber"] != obj + 1) {
-        QString msg = "Calibration file [" + calFile.expanded() + "] must have the filters in ascending order";
+        std::string msg = "Calibration file [" + calFile.expanded() + "] must have the filters in ascending order";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -256,9 +256,9 @@ namespace Isis {
 
     vector<Cube *> flatcubes;
     vector<LineManager *> fcubeMgrs;
-    int summing = toInt(icube.group("Instrument")["SummingMode"][0]);
-    double ifdelay = toDouble(icube.group("Instrument")["InterframeDelay"][0]) * 1000.0;
-    int flipped = toInt(icube.group("Instrument")["DataFlipped"][0]);
+    int summing = Isis::toInt(icube.group("Instrument")["SummingMode"][0]);
+    double ifdelay = Isis::toDouble(icube.group("Instrument")["InterframeDelay"][0]) * 1000.0;
+    int flipped = Isis::toInt(icube.group("Instrument")["DataFlipped"][0]);
 
     // Read in the flat files
     for (int band = 0; band < 7; band++) {
@@ -277,12 +277,12 @@ namespace Isis {
         continue;
       }
 
-      filePattern += "flat_band" + toString(band + 1);
-      filePattern += "_summing" + toString(summing) + "_v???.cub";
+      filePattern += "flat_band" + QString::number(band + 1);
+      filePattern += "_summing" + QString::number(summing) + "_v???.cub";
 
-      FileName flatFile = FileName(filePattern).highestVersion();
+      FileName flatFile = FileName(filePattern.toStdString()).highestVersion();
       Cube *fcube = new Cube();
-      fcube->open(flatFile.expanded());
+      fcube->open(QString::fromStdString(flatFile.expanded()));
       flatcubes.push_back(fcube);
 
       LineManager * fcubeMgr = new LineManager(*fcube);
@@ -300,7 +300,7 @@ namespace Isis {
     ocube.setLabelsAttached(outAtt.labelAttachment() == AttachedLabel);
     ocube.setPixelType(outAtt.pixelType());
 
-    ocube.create(FileName(ui.GetCubeName("TO")).expanded());
+    ocube.create(QString::fromStdString(FileName(ui.GetCubeName("TO").toStdString()).expanded()));
 
     LineManager icubeMgr(icube);
 
@@ -320,26 +320,26 @@ namespace Isis {
     PvlKeyword filtNames = icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"];
     int numFilters = filtNames.size();
     for (int i = 0; i < filtNames.size(); i++) {
-      if (filterNameToFilterNumber.find(filtNames[i]) != filterNameToFilterNumber.end()) {
-        filter.push_back(filterNameToFilterNumber.find(filtNames[i])->second);
+      if (filterNameToFilterNumber.find(QString::fromStdString(filtNames[i])) != filterNameToFilterNumber.end()) {
+        filter.push_back(filterNameToFilterNumber.find(QString::fromStdString(filtNames[i]))->second);
       }
       else {
-        QString msg = "Unrecognized filter name [" + QString(filtNames[i]) + "]";
+        std::string msg = "Unrecognized filter name [" + filtNames[i] + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
 
     PvlKeyword &sumMode = icube.label()->findGroup("Instrument", Pvl::Traverse)["SummingMode"];
-    int summingMode = toInt(sumMode[0]);
+    int summingMode = Isis::toInt(sumMode[0]);
     int filterHeight = 16 / summingMode;
     std::vector<int> padding;
     padding.resize(numFilters);
     PvlKeyword &colOff = icube.label()->findGroup("Instrument", Pvl::Traverse)["ColorOffset"];
-    int colorOffset = toInt(colOff[0]);
+    int colorOffset = Isis::toInt(colOff[0]);
 
     for (int i = 0; i < numFilters; i++) {
       if (colorOffset > 0) {
-        int filtNum = filterNameToFilterNumber[filtNames[i]] - 1; // if first vis filter (Blue) there is no offset 1 -> 0
+        int filtNum = filterNameToFilterNumber[QString::fromStdString(filtNames[i])] - 1; // if first vis filter (Blue) there is no offset 1 -> 0
 
         padding[i] = (colorOffset * filterHeight) * filtNum;
       }
@@ -351,7 +351,7 @@ namespace Isis {
     int maxOffset = *max_element(padding.begin(),padding.end());
 
 
-    QString prodId = icube.label()->findGroup("Archive", Pvl::Traverse)["ProductId"][0];
+    QString prodId = QString::fromStdString(icube.label()->findGroup("Archive", Pvl::Traverse)["ProductId"][0]);
     prodId = prodId.toUpper();
     vector<int> frameseq;
     vector<double> exptime;
@@ -360,7 +360,7 @@ namespace Isis {
     PvlGroup inst = icube.group("Instrument");
 
     if (!inst.hasKeyword("VariableExposureDuration") || !inst.hasKeyword("FrameNumber")) {
-      QString msg = "The instrument keywords VariableExposureDuration and FrameNumber"
+      std::string msg = "The instrument keywords VariableExposureDuration and FrameNumber"
                     "must exist to calibrate this MARCI file. Prior to isis3.10.0 these"
                     "keywords were not added by marci2isis; you may need to rerun isis3.10+"
                     "marci2isis on your images.";
@@ -377,9 +377,9 @@ namespace Isis {
     PvlKeyword expTimesKey = inst["VariableExposureDuration"];
     PvlKeyword frameNumbersKey = inst["FrameNumber"];
     for (int i=0; i<expTimesKey.size(); i++) {
-      if (toInt(frameNumbersKey[i]) != 0) {
-        exptime.push_back(toDouble(expTimesKey[i]));
-        frameseq.push_back(toInt(frameNumbersKey[i]));
+      if (Isis::toInt(frameNumbersKey[i]) != 0) {
+        exptime.push_back(Isis::toDouble(expTimesKey[i]));
+        frameseq.push_back(Isis::toInt(frameNumbersKey[i]));
       }
     }
 
@@ -458,8 +458,8 @@ namespace Isis {
                 exposure = ((double)icube.label()->findGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
               }
               // Exposure duration for the UV filters are calculated from the non-UV exposure duration
-              if ((QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "LONG_UV" ||
-                  (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "SHORT_UV") {
+              if (QString::fromStdString(icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1]) == "LONG_UV" ||
+                  QString::fromStdString(icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1]) == "SHORT_UV") {
                 exposure = ifdelay - 57.763 - exposure;
               }
               seqno++;
@@ -471,8 +471,8 @@ namespace Isis {
             if (frame < frameseq[seqno]) {
               exposure = exptime[seqno];
               seqno++;
-              if ((QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "LONG_UV" ||
-                  (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "SHORT_UV") {
+              if (QString::fromStdString(icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1]) == "LONG_UV" ||
+                  QString::fromStdString(icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1]) == "SHORT_UV") {
                 exposure = ifdelay - 57.763 - exposure;
               }
             }

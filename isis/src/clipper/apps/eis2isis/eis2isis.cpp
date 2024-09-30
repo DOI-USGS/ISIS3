@@ -44,17 +44,17 @@ namespace Isis {
   void modifyNacRollingShutterLabel(UserInterface &ui, Cube *outputCube, FileName xmlFileName, OriginalXmlLabel xmlLabel);
 
   void eis2isis(UserInterface &ui) {
-    FileName xmlFileName = ui.GetFileName("FROM");
+    FileName xmlFileName = ui.GetFileName("FROM").toStdString();
 
     try {
       ProcessImport p;
       translateCoreInfo(xmlFileName, p);
 
       if (xmlFileName.removeExtension().addExtension("dat").fileExists()) {
-        p.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
+        p.SetInputFile(QString::fromStdString(xmlFileName.removeExtension().addExtension("dat").expanded()));
       }
       else {
-        QString msg = "Cannot find image file for [" + xmlFileName.name() + "]. Confirm the "
+        std::string msg = "Cannot find image file for [" + xmlFileName.name() + "]. Confirm the "
           ".dat file for this XML exists and is located in the same directory.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -64,7 +64,7 @@ namespace Isis {
 
       translateEISLabels(xmlFileName, outputLabel);
 
-      FileName outputCubeFileName(ui.GetCubeName("TO"));
+      FileName outputCubeFileName(ui.GetCubeName("TO").toStdString());
 
       OriginalXmlLabel xmlLabel;
       xmlLabel.readFromXmlFile(xmlFileName);
@@ -84,26 +84,26 @@ namespace Isis {
 
       // Remove trailing "Z" from StartTime for ISIS label
       PvlKeyword *startTime = &outputLabel->findGroup("Instrument", Pvl::Traverse)["StartTime"];
-      QString startTimeString = startTime[0];
+      QString startTimeString = QString::fromStdString(startTime[0]);
       if (startTimeString.endsWith("Z", Qt::CaseInsensitive)) {
         startTimeString.chop(1);
-        startTime->setValue(startTimeString);
+        startTime->setValue(startTimeString.toStdString());
       }
 
       PvlKeyword *instrumentName = &outputLabel->findGroup("Instrument", Pvl::Traverse)["InstrumentId"];
-      QString instrumentNameString = instrumentName[0];
+      QString instrumentNameString = QString::fromStdString(instrumentName[0]);
 
       PvlGroup kerns("Kernels");
       if (instrumentNameString == "EIS-NAC-RS") {
         // This ID will need to be updated. It is temporarily used for testing but is NOT the actual
         // NAC ID.
-        kerns += PvlKeyword("NaifFrameCode", toString(-159101));
+        kerns += PvlKeyword("NaifFrameCode", Isis::toString(-159101));
       }
       else if (instrumentNameString == "EIS-WAC-FC") {
-        kerns += PvlKeyword("NaifFrameCode", toString(-159102));
+        kerns += PvlKeyword("NaifFrameCode", Isis::toString(-159102));
       }
       else {
-        QString msg = "Input file [" + xmlFileName.expanded() + "] has an invalid " +
+        std::string msg = "Input file [" + xmlFileName.expanded() + "] has an invalid " +
                   "InstrumentId.";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -114,7 +114,7 @@ namespace Isis {
     }
     catch (IException &e) {
 
-      QString msg = "Given file [" + xmlFileName.expanded() + "] does not appear to be a valid "
+      std::string msg = "Given file [" + xmlFileName.expanded() + "] does not appear to be a valid "
                     "Clipper EIS label or associated line times files are not provided.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
@@ -137,7 +137,7 @@ namespace Isis {
 
     // Get the translation manager ready
     FileName transFile = "$ISISROOT/appdata/translations/ClipperEisCore.trn";
-    XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
+    XmlToPvlTranslationManager labelXlater(inputLabel, QString::fromStdString(transFile.expanded()));
     translateCoreInfo(labelXlater, importer);
   }
 
@@ -158,25 +158,25 @@ namespace Isis {
     // Set up the ProcessImport
     QString str;
     str = labelXlater.Translate("CoreSamples");
-    int ns = toInt(str);
+    int ns = str.toInt();
     str = labelXlater.Translate("CoreLines");
-    int nl = toInt(str);
+    int nl = str.toInt();
     str = labelXlater.Translate("CoreBands");
-    int nb = toInt(str);
+    int nb = str.toInt();
     importer.SetDimensions(ns, nl, nb);
 
     str = labelXlater.Translate("CoreType");
     importer.SetPixelType(PixelTypeEnumeration(str));
 
     str = labelXlater.Translate("CoreByteOrder");
-    importer.SetByteOrder(ByteOrderEnumeration(str));
+    importer.SetByteOrder(ByteOrderEnumeration(str.toStdString()));
 
     importer.SetFileHeaderBytes(0);
 
     str = labelXlater.Translate("CoreBase");
-    importer.SetBase(toDouble(str));
+    importer.SetBase(str.toDouble());
     str = labelXlater.Translate("CoreMultiplier");
-    importer.SetMultiplier(toDouble(str));
+    importer.SetMultiplier(str.toDouble());
 
     // These are hard-coded to ISIS values, but the team may choose to set them
     // differently and include them in the imported xml file in the future
@@ -210,7 +210,7 @@ namespace Isis {
    */
   void translateLabels(FileName &inputLabel, Pvl *outputLabel, FileName transFile) {
     // Get the translation manager ready for translating the label
-    XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
+    XmlToPvlTranslationManager labelXlater(inputLabel, QString::fromStdString(transFile.expanded()));
 
     // Translate the output label
     labelXlater.Auto(*(outputLabel));
@@ -229,14 +229,14 @@ namespace Isis {
 
     // Set a default value for the JitterSampleCoefficients and the JitterLineCoefficient keywords in the Instrument group.
     // These values are overwritten with a call to the jitterfit application.
-    PvlKeyword jitterLineCoefficients = PvlKeyword("JitterLineCoefficients", (toString(0.0)));
-    jitterLineCoefficients += toString(0.0);
-    jitterLineCoefficients += toString(0.0);
+    PvlKeyword jitterLineCoefficients = PvlKeyword("JitterLineCoefficients", (Isis::toString(0.0)));
+    jitterLineCoefficients += Isis::toString(0.0);
+    jitterLineCoefficients += Isis::toString(0.0);
     outputLabel->findGroup("Instrument", PvlObject::Traverse).addKeyword(jitterLineCoefficients);
 
-    PvlKeyword jitterSampleCoefficients = PvlKeyword("JitterSampleCoefficients", (toString(0.0)));
-    jitterSampleCoefficients += toString(0.0);
-    jitterSampleCoefficients += toString(0.0);
+    PvlKeyword jitterSampleCoefficients = PvlKeyword("JitterSampleCoefficients", (Isis::toString(0.0)));
+    jitterSampleCoefficients += Isis::toString(0.0);
+    jitterSampleCoefficients += Isis::toString(0.0);
     outputLabel->findGroup("Instrument", PvlObject::Traverse).addKeyword(jitterSampleCoefficients);
 
 
@@ -244,7 +244,7 @@ namespace Isis {
     if (ui.WasEntered("MAINREADOUT")) {
 
       // Create and write normalized time values in the range [-1,1] to the primary EIS cube
-      Table normalizedReadout = normalizeTimeTable(FileName(ui.GetFileName("MAINREADOUT")),
+      Table normalizedReadout = normalizeTimeTable(FileName(ui.GetFileName("MAINREADOUT").toStdString()),
                                   "Normalized Main Readout Line Times",
                                   outputCube->lineCount());
 
@@ -257,7 +257,7 @@ namespace Isis {
     // the camera object to be able to handle when a table does not exist and
     // this will be able to be refactored to not require a line times file.
     else {
-      QString msg = "This image appears to be a Narrow Angle Rolling Shutter Camera. "
+      std::string msg = "This image appears to be a Narrow Angle Rolling Shutter Camera. "
                     "You must provide the line times file associated with [" + xmlFileName.name() +
                     "] as the [MAINREADOUT] parameter.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -265,7 +265,7 @@ namespace Isis {
 
     // Handle an optional checkline cube.
     if (ui.WasEntered("FROM2")) {
-      FileName checklineXmlFileName = ui.GetFileName("FROM2");
+      FileName checklineXmlFileName = ui.GetFileName("FROM2").toStdString();
 
       if (ui.WasEntered("CHECKLINEREADOUT")) {
         // Process the checkline image to an ISIS cube and write the checkline tables
@@ -274,12 +274,12 @@ namespace Isis {
         if (checklineXmlFileName.removeExtension()
                                 .addExtension("dat")
                                 .fileExists()) {
-          p2.SetInputFile(checklineXmlFileName.removeExtension()
+          p2.SetInputFile(QString::fromStdString(checklineXmlFileName.removeExtension()
                                             .addExtension("dat")
-                                            .expanded());
+                                            .expanded()));
         }
         else {
-          QString msg = "Cannot find image file for [" + checklineXmlFileName.name() + "]. Confirm the "
+          std::string msg = "Cannot find image file for [" + checklineXmlFileName.name() + "]. Confirm the "
           ".dat file for this XML exists and is located in the same directory.";
           throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -293,13 +293,13 @@ namespace Isis {
         xmlLabel.readFromXmlFile(checklineXmlFileName);
         p2.StartProcess();
         // Create and write regular checkline time values to the checkline cube
-        Table checkLineReadout = createTable(FileName(ui.GetFileName("CHECKLINEREADOUT")),
+        Table checkLineReadout = createTable(FileName(ui.GetFileName("CHECKLINEREADOUT").toStdString()),
                                             "Checkline Readout Line Times",
                                             60);
 
         // Create and write normalized checkline time values in the range
         // [-1,1] to the checkline cube
-        Table checkLineNormalizedReadout = normalizeTimeTable(FileName(ui.GetFileName("CHECKLINEREADOUT")),
+        Table checkLineNormalizedReadout = normalizeTimeTable(FileName(ui.GetFileName("CHECKLINEREADOUT").toStdString()),
                                     "Normalized Checkline Readout Line Times",
                                     60);
 
@@ -317,7 +317,7 @@ namespace Isis {
       // Since the checkline cube is not worth anything without the associated
       // times, require that the line times for the checkline cube be provided.
       else {
-        QString msg = "Must provide the line times file associated with [" + checklineXmlFileName.name() + "] as the [CHECKLINEREADOUT] parameter.";
+        std::string msg = "Must provide the line times file associated with [" + checklineXmlFileName.name() + "] as the [CHECKLINEREADOUT] parameter.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -336,11 +336,11 @@ namespace Isis {
   Table normalizeTimeTable(const FileName &file, const QString &tableName, int numLines) {
     double tmin =DBL_MAX;
     double tmax = DBL_MIN;
-    CSVReader csv(file.expanded() );
+    CSVReader csv(QString::fromStdString(file.expanded()));
 
     // Number of lines provided must match number of rows in csv file
     if (numLines != csv.rows()) {
-      QString msg = "Readout table [" + file.expanded() +
+      std::string msg = "Readout table [" + file.expanded() +
                     "] does not have the same number of lines as the image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -353,7 +353,7 @@ namespace Isis {
     record += lineField;
     record += timeField;
 
-    Table table(tableName, record);
+    Table table(tableName.toStdString(), record);
 
     QVector<QPair<int,double> > tvector;
 
@@ -396,11 +396,11 @@ namespace Isis {
    * @return Table Returns the created table.
    */
   Table createTable(const FileName &file, const QString &tableName, int numLines) {
-    CSVReader csv(file.expanded());
+    CSVReader csv(QString::fromStdString(file.expanded()));
 
     // Number of lines provided must match number of rows in csv file
     if (numLines != csv.rows()) {
-      QString msg = "Readout table [" + file.expanded() +
+      std::string msg = "Readout table [" + file.expanded() +
                     "] does not have the same number of lines as the image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -414,7 +414,7 @@ namespace Isis {
     record += lineField;
     record += timeField;
 
-    Table table(tableName, record);
+    Table table(tableName.toStdString(), record);
 
     // Grab the values from the csv and put them into the table row-by-row
     for (int i = 0; i < csv.rows(); i++) {

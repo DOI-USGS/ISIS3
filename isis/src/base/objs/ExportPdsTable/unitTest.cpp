@@ -54,20 +54,20 @@ int main(int argc, char *argv[]) {
   PvlObject metadata = exportedTable.exportTable(buf, tableRecBytes, "lsb");
   // Create a label file containing the needed information.
   FileName lsbLabelFile("$temporary/lsbPdsTable.lbl");
-  ofstream outputLsbLabel((lsbLabelFile.expanded()).toLatin1().data());
+  ofstream outputLsbLabel((lsbLabelFile.expanded()).c_str());
   outputLsbLabel << PvlKeyword("RECORD_TYPE", "FIXED_LENGTH") << endl;
-  outputLsbLabel << PvlKeyword("RECORD_BYTES", toString(tableRecBytes)) << endl;
-  QString tableName = ExportPdsTable::formatPdsTableName(table.Name());
-  outputLsbLabel << PvlKeyword("^" + tableName, "lsbPdsTable.dat") << endl;
+  outputLsbLabel << PvlKeyword("RECORD_BYTES", Isis::toString(tableRecBytes)) << endl;
+  QString tableName = ExportPdsTable::formatPdsTableName(QString::fromStdString(table.Name()));
+  outputLsbLabel << PvlKeyword("^" + tableName.toStdString(), "lsbPdsTable.dat") << endl;
   outputLsbLabel << endl;
   // Add table object to label keywords
   outputLsbLabel << metadata;
   outputLsbLabel.close();
   FileName lsbTableFile("$temporary/lsbPdsTable.dat");
-  ofstream outputLsbTable((lsbTableFile.expanded()).toLatin1().data());
+  ofstream outputLsbTable((lsbTableFile.expanded()).c_str());
   outputLsbTable.write(buf, tableRecBytes*table.Records());
   outputLsbTable.close();
-  ImportPdsTable lsbTable(lsbLabelFile.expanded(), lsbTableFile.expanded(), tableName);
+  ImportPdsTable lsbTable(QString::fromStdString(lsbLabelFile.expanded()), QString::fromStdString(lsbTableFile.expanded()), tableName);
   Table reimportedLsbTable = lsbTable.importTable("ReimportedLsbTable");
   // Loop through for each record
   cout << reimportedLsbTable.Name() << endl;
@@ -76,14 +76,14 @@ int main(int argc, char *argv[]) {
   cout << reimportedLsbTable[0][2].name() << "\t";
   cout << reimportedLsbTable[0][3].name() << "\n";
   for (int i = 0; i < reimportedLsbTable.Records(); i++) {
-    cout << toString((double) reimportedLsbTable[i][0]) << "\t\t\t";
-    cout << toString((int)    reimportedLsbTable[i][1]) << "\t\t\t\t";
-    cout <<         (QString) reimportedLsbTable[i][2]  << "\t\t\t";
-    cout << toString((float)  reimportedLsbTable[i][3]) << "\n";
+    cout << Isis::toString((double) reimportedLsbTable[i][0]) << "\t\t\t";
+    cout << Isis::toString((int)    reimportedLsbTable[i][1]) << "\t\t\t\t";
+    cout <<         (std::string) reimportedLsbTable[i][2]  << "\t\t\t";
+    cout << Isis::toString((float)  reimportedLsbTable[i][3]) << "\n";
   }
   // remove files and reset buffer
-  QFile::remove((lsbLabelFile.expanded()));
-  QFile::remove((lsbTableFile.expanded()));
+  QFile::remove(QString::fromStdString(lsbLabelFile.expanded()));
+  QFile::remove(QString::fromStdString(lsbTableFile.expanded()));
   delete [] buf;
   buf = NULL;
   cout << endl;
@@ -96,19 +96,19 @@ int main(int argc, char *argv[]) {
   metadata = exportedTable.exportTable(buf, tableRecBytes, "msb");
   // Create a label file containing the needed information.
   FileName msbLabelFile("$temporary/msbPdsTable.lbl");
-  ofstream outputMsbLabel((msbLabelFile.expanded()).toLatin1().data());
+  ofstream outputMsbLabel((msbLabelFile.expanded()).c_str());
   outputMsbLabel << PvlKeyword("RECORD_TYPE", "FIXED_LENGTH") << endl;
-  outputMsbLabel << PvlKeyword("RECORD_BYTES", toString(tableRecBytes)) << endl;
-  outputMsbLabel << PvlKeyword("^" + tableName, "msbPdsTable.dat") << endl;
+  outputMsbLabel << PvlKeyword("RECORD_BYTES", Isis::toString(tableRecBytes)) << endl;
+  outputMsbLabel << PvlKeyword("^" + tableName.toStdString(), "msbPdsTable.dat") << endl;
   outputMsbLabel << endl;
   // Add table object to label keywords
   outputMsbLabel << metadata;
   outputMsbLabel.close();
   FileName msbTableFile("$temporary/msbPdsTable.dat");
-  ofstream outputMsbTable((msbTableFile.expanded()).toLatin1().data());
+  ofstream outputMsbTable((msbTableFile.expanded()).c_str());
   outputMsbTable.write(buf, tableRecBytes*table.Records());
   outputMsbTable.close();
-  ImportPdsTable msbTable(msbLabelFile.expanded(), msbTableFile.expanded(), tableName);
+  ImportPdsTable msbTable(QString::fromStdString(msbLabelFile.expanded()), QString::fromStdString(msbTableFile.expanded()), tableName);
   Table reimportedMsbTable = msbTable.importTable("ReimportedMsbTable");
   // print the table
   cout << reimportedMsbTable.Name() << endl;
@@ -119,12 +119,12 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < reimportedMsbTable.Records(); i++) {
     cout << IString((double) reimportedMsbTable[i][0]) << "\t\t\t";
     cout << IString((int)    reimportedMsbTable[i][1]) << "\t\t\t\t";
-    cout << IString((QString) reimportedMsbTable[i][2]) << "\t\t\t";
+    cout << IString((std::string) reimportedMsbTable[i][2]) << "\t\t\t";
     cout << IString((float)  reimportedMsbTable[i][3]) << "\n";
   }
   // remove files and reset buffer and tableRecBytes
-  QFile::remove((msbLabelFile.expanded()));
-  QFile::remove((msbTableFile.expanded()));
+  QFile::remove(QString::fromStdString(msbLabelFile.expanded()));
+  QFile::remove(QString::fromStdString(msbTableFile.expanded()));
   delete [] buf;
   buf = NULL;
   tableRecBytes -= 4;
@@ -155,10 +155,10 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing static method, formatPdsTableName()..." << endl;
-  cout << "formatPdsTableName(Table) = " << ExportPdsTable::formatPdsTableName("Table") << endl;
-  cout << "formatPdsTableName(IsisTable) = " << ExportPdsTable::formatPdsTableName("IsisTable") << endl;
-  cout << "formatPdsTableName(Isis) = " << ExportPdsTable::formatPdsTableName("Isis") << endl;
-  cout << "formatPdsTableName(CamelCase) = " << ExportPdsTable::formatPdsTableName("CamelCase") << endl;
-  cout << "formatPdsTableName(CamelCase2) = " << ExportPdsTable::formatPdsTableName("CamelCase2") << endl;
+  cout << "formatPdsTableName(Table) = " << ExportPdsTable::formatPdsTableName("Table").toStdString() << endl;
+  cout << "formatPdsTableName(IsisTable) = " << ExportPdsTable::formatPdsTableName("IsisTable").toStdString() << endl;
+  cout << "formatPdsTableName(Isis) = " << ExportPdsTable::formatPdsTableName("Isis").toStdString() << endl;
+  cout << "formatPdsTableName(CamelCase) = " << ExportPdsTable::formatPdsTableName("CamelCase").toStdString() << endl;
+  cout << "formatPdsTableName(CamelCase2) = " << ExportPdsTable::formatPdsTableName("CamelCase2").toStdString() << endl;
 }
 

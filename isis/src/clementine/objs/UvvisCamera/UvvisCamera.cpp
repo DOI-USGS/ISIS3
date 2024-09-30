@@ -47,7 +47,7 @@ namespace Isis {
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // set variables startTime and exposureDuration
-    double time = iTime((QString)inst["StartTime"]).Et();
+    double time = iTime(QString::fromStdString(inst["StartTime"])).Et();
 
     // divide exposure duration keyword value by 1000 to convert to seconds
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
@@ -62,14 +62,14 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
-      Spice::getDouble("INS" + toString(naifIkCode()) +
+      Spice::getDouble("INS" + QString::number(naifIkCode()) +
                        "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + toString(naifIkCode()) +
+      Spice::getDouble("INS" + QString::number(naifIkCode()) +
                        "_BORESIGHT_LINE"));
 
-    QString ppKey("INS" + toString(naifIkCode()) + "_PP");
-    QString odKey("INS" + toString(naifIkCode()) + "_OD_K");
-    QString decenterKey("INS" + toString(naifIkCode()) + "_DECENTER");
+    QString ppKey("INS" + QString::number(naifIkCode()) + "_PP");
+    QString odKey("INS" + QString::number(naifIkCode()) + "_OD_K");
+    QString decenterKey("INS" + QString::number(naifIkCode()) + "_DECENTER");
 
     // Setup distortion map
     new ClementineUvvisDistortionMap(this,

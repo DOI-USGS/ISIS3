@@ -245,12 +245,12 @@ template <class T> bool FeatureAlgorithm<T>::setVariable(const QString &var,
       variable.add(var, value);
       try {
         if (0 >= setAlgorithmVariables(variable)) {
-          QString mess = "Setting of variable " + var + " failed in " + name();
+          std::string mess = "Setting of variable " + var.toStdString() + " failed in " + name().toStdString();
           throw IException(IException::Programmer, mess, _FILEINFO_);
         }
       }
       catch (IException &ie) {
-        QString mess = "Error setting variable " + var + " in " + name();
+        std::string mess = "Error setting variable " + var.toStdString() + " in " + name().toStdString();
         throw IException(ie, IException::Programmer, mess, _FILEINFO_);
       }
 
@@ -302,15 +302,15 @@ template <class T> bool FeatureAlgorithm<T>::setVariable(const QString &vname,
                                                          const QVariant &var) {
       QString value = var.toString();
       if ( value.isEmpty() ) {
-        QString mess = "Variant/variable " + vname +
-                       " cannot be converted in " + name();
+        std::string mess = "Variant/variable " + vname.toStdString() +
+                       " cannot be converted in " + name().toStdString();
         throw IException(IException::Programmer, mess, _FILEINFO_);
       }
 
       PvlFlatMap variable;
       variable.add(vname, value);
       if ( 0 >= setAlgorithmVariables(variable) ) {
-        QString mess = "Setting of variable " + vname + " failed in " + name();
+        std::string mess = "Setting of variable " + vname.toStdString() + " failed in " + name().toStdString();
         throw IException(IException::Programmer, mess, _FILEINFO_);
       }
 
@@ -365,10 +365,10 @@ template <class T> const PvlFlatMap &FeatureAlgorithm<T>::variables() const {
  * @return PvlObject PvlObject containing a description of the algorithm
  */
 template <class T> PvlObject FeatureAlgorithm<T>::info(const QString &objname) const {
-    PvlObject data(objname);
+    PvlObject data(objname.toStdString());
     data.addKeyword(PvlKeyword("CVVersion", CV_VERSION));
-    data.addKeyword(PvlKeyword("Name", name()));
-    data.addKeyword(PvlKeyword("Type", type()));
+    data.addKeyword(PvlKeyword("Name", name().toStdString()));
+    data.addKeyword(PvlKeyword("Type", type().toStdString()));
 
     PvlKeyword options("Features");
     if ( hasDetector() ) { options += "Detector"; }
@@ -376,8 +376,8 @@ template <class T> PvlObject FeatureAlgorithm<T>::info(const QString &objname) c
     if ( hasMatcher() ) { options += "Matcher"; }
     data.addKeyword(options);
 
-    data.addKeyword(PvlKeyword("Description", description()));
-    data.addKeyword(PvlKeyword("CreatedUsing", config()));
+    data.addKeyword(PvlKeyword("Description", description().toStdString()));
+    data.addKeyword(PvlKeyword("CreatedUsing", config().toStdString()));
 
     QList<PvlKeyword> values = m_variables.values();
     PvlGroup parameters("Parameters");

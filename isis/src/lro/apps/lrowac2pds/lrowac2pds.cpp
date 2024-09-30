@@ -75,10 +75,10 @@ namespace Isis {
       Pvl pdsLab;
 
       FileList list;
-      list.read(ui.GetFileName("FROMLIST"));
+      list.read(ui.GetFileName("FROMLIST").toStdString());
 
       if (list.size() < 1) {
-          QString msg = "The list file [" + ui.GetFileName("FROMLIST") + "does not contain any data";
+          std::string msg = "The list file [" + ui.GetFileName("FROMLIST").toStdString() + "does not contain any data";
           throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -89,52 +89,52 @@ namespace Isis {
           Pvl tempPvl;
           tempPvl.read(list[i].toString());
 
-          OriginalLabel origLab(list[i].toString());
+          OriginalLabel origLab(QString::fromStdString(list[i].toString()));
           pdsLab = origLab.ReturnLabels();
 
-          QString prodId = pdsLab["PRODUCT_ID"][0];
+          QString prodId = QString::fromStdString(pdsLab["PRODUCT_ID"][0]);
           if (productId == "")
               productId = prodId;
 
           if (productId != prodId) {
-              QString msg = "This program is intended for use on a single LROC WAC images only.";
+              std::string msg = "This program is intended for use on a single LROC WAC images only.";
               msg += "The ProductIds do not match.";
               throw IException(IException::User, msg, _FILEINFO_);
           }
 
           Isis::PvlGroup &inst = tempPvl.findGroup("Instrument", Pvl::Traverse);
-          QString instId = (QString) inst["InstrumentId"];
-          QString framelets = (QString) inst["Framelets"];
-          QString numFrames = inst["NumFramelets"];
+          QString instId = QString::fromStdString(inst["InstrumentId"]);
+          QString framelets = QString::fromStdString(inst["Framelets"]);
+          QString numFrames = QString::fromStdString(inst["NumFramelets"]);
 
           if (instId != "WAC-VIS" && instId != "WAC-UV") {
-              QString msg = "This program is intended for use on LROC WAC images only. [";
+              std::string msg = "This program is intended for use on LROC WAC images only. [";
               msg += list[i].toString() + "] does not appear to be a WAC image.";
               throw IException(IException::User, msg, _FILEINFO_);
           }
 
-          QString instModeId = (QString) inst["InstrumentModeId"];
+          QString instModeId = QString::fromStdString(inst["InstrumentModeId"]);
           if (instrumentModeId == "")
               instrumentModeId = instModeId;
           if (numFramelets == 0)
-              numFramelets = toInt(numFrames);
-          g_isIoF = tempPvl.findGroup("Radiometry", Pvl::Traverse).findKeyword("RadiometricType")[0].toUpper() == "IOF";
+              numFramelets = numFrames.toInt();
+          g_isIoF = QString::fromStdString(tempPvl.findGroup("Radiometry", Pvl::Traverse).findKeyword("RadiometricType")[0]).toUpper() == "IOF";
 
           if (instId == "WAC-VIS" && framelets == "Even") {
               viseven = new Cube();
-              viseven->open(list[i].toString());
+              viseven->open(QString::fromStdString(list[i].toString()));
           }
           else if (instId == "WAC-VIS" && framelets == "Odd") {
               visodd = new Cube();
-              visodd->open(list[i].toString());
+              visodd->open(QString::fromStdString(list[i].toString()));
           }
           if (instId == "WAC-UV" && framelets == "Even") {
               uveven = new Cube();
-              uveven->open(list[i].toString());
+              uveven->open(QString::fromStdString(list[i].toString()));
           }
           else if (instId == "WAC-UV" && framelets == "Odd") {
               uvodd = new Cube();
-              uvodd->open(list[i].toString());
+              uvodd->open(QString::fromStdString(list[i].toString()));
           }
       }
 
@@ -173,8 +173,8 @@ namespace Isis {
       out->setPixelType(Isis::Real);
 
       FileName mergedCube = FileName::createTempFile(
-          "$TEMPORARY/" + FileName(ui.GetFileName("TO")).baseName() + ".cub");
-      out->create(mergedCube.expanded());
+          "$TEMPORARY/" + FileName(ui.GetFileName("TO").toStdString()).baseName() + ".cub");
+      out->create(QString::fromStdString(mergedCube.expanded()));
 
       mergeFramelets();
 
@@ -223,7 +223,7 @@ namespace Isis {
       ProcessExport pe;
 
       // Setup the input cube
-      Cube *inCube = pe.SetInputCube(mergedCube.expanded(), CubeAttributeInput());
+      Cube *inCube = pe.SetInputCube(QString::fromStdString(mergedCube.expanded()), CubeAttributeInput());
 
       pe.SetOutputType(Isis::Real);
       pe.SetOutputEndian(Isis::Lsb);
@@ -237,8 +237,8 @@ namespace Isis {
       pe.SetOutputHrs(Isis::HIGH_REPR_SAT4);
 
       FileName tempFile = FileName::createTempFile(
-          "$TEMPORARY/" + FileName(ui.GetFileName("TO")).baseName() + ".temp");
-      QString tempFileName(tempFile.expanded());
+          "$TEMPORARY/" + FileName(ui.GetFileName("TO").toStdString()).baseName() + ".temp");
+      QString tempFileName(QString::fromStdString(tempFile.expanded()));
       ofstream temporaryFile(tempFileName.toLatin1().data());
 
       pe.StartProcess(temporaryFile);
@@ -247,8 +247,8 @@ namespace Isis {
       // Calculate MD5 Checksum
       g_md5Checksum = MD5Checksum(tempFileName);
 
-      FileName outFile(ui.GetFileName("TO"));
-      QString outFileName(outFile.expanded());
+      FileName outFile(ui.GetFileName("TO").toStdString());
+      QString outFileName(QString::fromStdString(outFile.expanded()));
       ifstream inFile(tempFileName.toLatin1().data());
       ofstream pdsFile(outFileName.toLatin1().data());
 
@@ -262,7 +262,7 @@ namespace Isis {
 
       pe.EndProcess();
 
-      remove((mergedCube.expanded()).toLatin1().data());
+      remove((mergedCube.expanded()).c_str());
       remove(tempFileName.toLatin1().data());
       return;
   }
@@ -381,7 +381,7 @@ namespace Isis {
 
       //Translate the Original Pds Label
       FileName transFile("$ISISROOT/appdata/translations/LroWacPdsLabelExport.trn");
-      PvlToPvlTranslationManager labelXlator(labelPvl, transFile.expanded());
+      PvlToPvlTranslationManager labelXlator(labelPvl, QString::fromStdString(transFile.expanded()));
       labelXlator.Auto(outLabel);
 
       // Copy any Translation changes over
@@ -390,37 +390,37 @@ namespace Isis {
           QString unit = "";
           if (labelPvl[outLabel[i].name()].unit() != "") {
               hasUnit = true;
-              unit = labelPvl[outLabel[i].name()].unit();
+              unit = QString::fromStdString(labelPvl[outLabel[i].name()].unit());
           }
           bool hasComment = false;
           QString comment = "";
           if (labelPvl[outLabel[i].name()].comments() > 0) {
               hasComment = true;
-              comment = labelPvl[outLabel[i].name()].comment(0);
+              comment = QString::fromStdString(labelPvl[outLabel[i].name()].comment(0));
           }
           labelPvl[outLabel[i].name()] = outLabel[i];
 
           if (hasUnit)
-              labelPvl[outLabel[i].name()].setUnits(unit);
+              labelPvl[outLabel[i].name()].setUnits(unit.toStdString());
           if (hasComment)
-              labelPvl[outLabel[i].name()].addComment(comment);
+              labelPvl[outLabel[i].name()].addComment(comment.toStdString());
       }
 
       //Update the product ID
-      QString prod_id = labelPvl["PRODUCT_ID"][0];
+      QString prod_id = QString::fromStdString(labelPvl["PRODUCT_ID"][0]);
       labelPvl["PRODUCT_ID"][0].replace((prod_id.length()-1), 1, "C");
 
       // Update the product creation time
-      labelPvl["PRODUCT_CREATION_TIME"].setValue(iTime::CurrentGMT());
+      labelPvl["PRODUCT_CREATION_TIME"].setValue(iTime::CurrentGMT().toStdString());
 
-      labelPvl["PRODUCT_VERSION_ID"].setValue(g_productVersionId);
+      labelPvl["PRODUCT_VERSION_ID"].setValue(g_productVersionId.toStdString());
 
       // Update the "IMAGE" Object
       PvlObject &imageObject = labelPvl.findObject("IMAGE");
       imageObject.clear();
-      imageObject += PvlKeyword("LINES", toString(cube->lineCount()));
-      imageObject += PvlKeyword("LINE_SAMPLES", toString(cube->sampleCount()));
-      imageObject += PvlKeyword("SAMPLE_BITS", toString(32));
+      imageObject += PvlKeyword("LINES", Isis::toString(cube->lineCount()));
+      imageObject += PvlKeyword("LINE_SAMPLES", Isis::toString(cube->sampleCount()));
+      imageObject += PvlKeyword("SAMPLE_BITS", Isis::toString(32));
       imageObject += PvlKeyword("SAMPLE_TYPE", "PC_REAL");
       imageObject += PvlKeyword("VALID_MINIMUM", "16#FF7FFFFA#");
       imageObject += PvlKeyword("NULL", "16#FF7FFFFB#");
@@ -432,17 +432,17 @@ namespace Isis {
           imageObject += PvlKeyword("UNIT", "\"I/F\"");
       else
       imageObject += PvlKeyword("UNIT", "W / (m**2 micrometer sr)");
-      imageObject += PvlKeyword("MD5_CHECKSUM", g_md5Checksum);
+      imageObject += PvlKeyword("MD5_CHECKSUM", g_md5Checksum.toStdString());
 
       stream << labelPvl;
 
       int recordBytes = cube->sampleCount();
       int labelRecords = (int) ((stream.str().length()) / recordBytes) + 1;
 
-      labelPvl["RECORD_BYTES"] = toString(recordBytes);
-      labelPvl["FILE_RECORDS"] = toString((int) (cube->lineCount() * 4 + labelRecords));
-      labelPvl["LABEL_RECORDS"] = toString(labelRecords);
-      labelPvl["^IMAGE"] = toString((int) (labelRecords + 1));
+      labelPvl["RECORD_BYTES"] = Isis::toString(recordBytes);
+      labelPvl["FILE_RECORDS"] = Isis::toString((int) (cube->lineCount() * 4 + labelRecords));
+      labelPvl["LABEL_RECORDS"] = Isis::toString(labelRecords);
+      labelPvl["^IMAGE"] = Isis::toString((int) (labelRecords + 1));
 
       stream.str(std::string());
 
@@ -455,9 +455,9 @@ namespace Isis {
       while ((int)pdsLabel.length() + 2 > (int)(labelRecords * recordBytes)) {
           labelRecords++;
           // Refresh the label content
-          labelPvl["FILE_RECORDS"] = toString((int) (cube->lineCount() * 4 + labelRecords));
-          labelPvl["LABEL_RECORDS"] = toString(labelRecords);
-          labelPvl["^IMAGE"] = toString((int) (labelRecords + 1));
+          labelPvl["FILE_RECORDS"] = Isis::toString((int) (cube->lineCount() * 4 + labelRecords));
+          labelPvl["LABEL_RECORDS"] = Isis::toString(labelRecords);
+          labelPvl["^IMAGE"] = Isis::toString((int) (labelRecords + 1));
           stream.str(std::string());
           stream << labelPvl;
           pdsLabel = stream.str().c_str();
@@ -470,7 +470,7 @@ namespace Isis {
           pdsLabel += " ";
       }
 
-      fout << pdsLabel;
+      fout << pdsLabel.toStdString();
       return;
   }
 

@@ -32,7 +32,7 @@ namespace Isis {
         Isis::CubeAttributeInput inAtt;
 
         cubeFn = ui.GetCubeName("FROM");
-        icube = new Cube(cubeFn);
+        icube = new Cube(cubeFn.toStdString());
         inAtt = ui.GetInputAttribute("FROM");
 
         p.SetInputCube(cubeFn, inAtt);
@@ -52,7 +52,7 @@ namespace Isis {
             PvlGroup inst = icube->group("Instrument");
 
             // change flipped keyword
-            inst["DataFlipped"] = toString(((int)inst["DataFlipped"] + 1) % 2);
+            inst["DataFlipped"] = Isis::toString(((int)inst["DataFlipped"] + 1) % 2);
 
             outputCube->label()->findObject("IsisCube").addGroup(inst);
         }

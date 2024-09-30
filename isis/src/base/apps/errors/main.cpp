@@ -9,13 +9,13 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
   bool append = ui.GetBoolean("APPEND");
-  Pvl input(ui.GetFileName("FROM"));
+  Pvl input(ui.GetFileName("FROM").toStdString());
   Pvl output;
 
   // Check to see if output file exists
-  FileName outFile = ui.GetFileName("TO");
+  FileName outFile = ui.GetFileName("TO").toStdString();
   if(outFile.fileExists() && !append) {
-    QString msg = "Output file [" + outFile.expanded() + "] already exists.";
+    std::string msg = "Output file [" + outFile.expanded() + "] already exists.";
     msg += " Append option set to False.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -29,7 +29,7 @@ void IsisMain() {
       numErrors++;
     }
   }
-  PvlKeyword errors("TotalErrors", toString(numErrors));
+  PvlKeyword errors("TotalErrors", Isis::toString(numErrors));
   output.addKeyword(errors);
   // write output to file
   if(!append) {

@@ -30,13 +30,13 @@ void IsisMain() {
   QString in = ui.GetCubeName("FROM");
 
   // Check reseau status and make sure it is not nominal or removed
-  if((QString)status == "Nominal") {
-    QString msg = "Input file [" + in +
+  if(((std::string)status == "Nominal")) {
+    std::string msg = "Input file [" + in.toStdString() +
                  "] appears to have nominal reseau status. You must run findrx first.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  if((QString)status == "Removed") {
-    QString msg = "Input file [" + in +
+  if((std::string)status == "Removed") {
+    std::string msg = "Input file [" + in.toStdString() +
                  "] appears to already have reseaus removed.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -73,9 +73,9 @@ void IsisMain() {
 
   Brick brick(sdim, ldim, 1, cube.pixelType());
   for(int res = 0; res < numres; res++) {
-    if((resvalid == 0 || toInt(valid[res]) == 1) && toInt(type[res]) != 0) {
-      int baseSamp = (int)(toDouble(samps[res]) + 0.5) - (sdim / 2);
-      int baseLine = (int)(toDouble(lines[res]) + 0.5) - (ldim / 2);
+    if((resvalid == 0 || Isis::toInt(valid[res]) == 1) && Isis::toInt(type[res]) != 0) {
+      int baseSamp = (int)(Isis::toDouble(samps[res]) + 0.5) - (sdim / 2);
+      int baseLine = (int)(Isis::toDouble(lines[res]) + 0.5) - (ldim / 2);
       brick.SetBasePosition(baseSamp, baseLine, 1);
       cube.read(brick);
       if(action == "NULL") {
@@ -99,7 +99,7 @@ void IsisMain() {
         double sdev = stats.StandardDeviation();
 
         // Top Edge Reseau
-        if(toInt(type[res]) == 2) {
+        if(Isis::toInt(type[res]) == 2) {
           int l1 = 0;
           int l2 = ldim - 1;
           for(int s = 0; s < sdim; s++) {
@@ -107,7 +107,7 @@ void IsisMain() {
           }
         }
         // Left Edge Reseau
-        else if(toInt(type[res]) == 4) {
+        else if(Isis::toInt(type[res]) == 4) {
           int s1 = 0;
           int s2 = sdim - 1;
           for(int l = 0; l < ldim; l++) {
@@ -115,7 +115,7 @@ void IsisMain() {
           }
         }
         // Right Edge Reseau
-        else if(toInt(type[res]) == 6) {
+        else if(Isis::toInt(type[res]) == 6) {
           int s1 = 0;
           int s2 = sdim - 1;
           for(int l = 0; l < ldim; l++) {
@@ -123,7 +123,7 @@ void IsisMain() {
           }
         }
         // Bottom Edge Reseau
-        else if(toInt(type[res]) == 8) {
+        else if(Isis::toInt(type[res]) == 8) {
           int l1 = 0;
           int l2 = ldim - 1;
           for(int s = 0; s < sdim; s++) {
@@ -159,14 +159,14 @@ void IsisMain() {
         for(int l = 0; l < ldim; l++) {
           int c = l * sdim;  //count
           // Top Edge Reseau
-          if(toInt(type[res]) == 2 && l < (ldim / 2)) continue;
+          if(Isis::toInt(type[res]) == 2 && l < (ldim / 2)) continue;
           // Bottom Edge Reseau
-          if(toInt(type[res]) == 8 && l > (ldim / 2 + 1)) continue;
+          if(Isis::toInt(type[res]) == 8 && l > (ldim / 2 + 1)) continue;
           for(int s = 0; s < sdim; s++, c++) {
             // Left Edge Reseau
-            if(toInt(type[res]) == 4 && s < (sdim / 2)) continue;
+            if(Isis::toInt(type[res]) == 4 && s < (sdim / 2)) continue;
             // Right Edge Reseau
-            if(toInt(type[res]) == 6 && s > (sdim / 2 + 1)) continue;
+            if(Isis::toInt(type[res]) == 6 && s > (sdim / 2 + 1)) continue;
             double sum = 0.0;
             int gline1 = 0;
             int gline2 = ldim - 1;

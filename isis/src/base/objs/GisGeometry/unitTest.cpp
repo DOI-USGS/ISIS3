@@ -240,7 +240,7 @@ int main() {
   catch (IException &e) {
     qDebug() << "";
     qDebug() << "";
-    QString msg = "**************** UNIT TEST FAILED! **************** ";
+    std::string msg = "**************** UNIT TEST FAILED! **************** ";
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
 }
@@ -268,13 +268,13 @@ void printBasicInfo(GisGeometry geom, QString description) {
  */
 void printTargetInfo(GisGeometry geom,  GisGeometry target, QString description) {
   qDebug() << description;
-  qDebug() << "    distance?        " << toString(geom.distance(target));
-  qDebug() << "    intersects?      " << toString(geom.intersects(target));
-  qDebug() << "    contains?        " << toString(geom.contains(target));
-  qDebug() << "    disjoint?        " << toString(geom.disjoint(target));
-  qDebug() << "    overlaps?        " << toString(geom.overlaps(target));
-  qDebug() << "    equals?          " << toString(geom.equals(target));
-  qDebug() << "    intersect ratio? " << toString(geom.intersectRatio(target));
+  qDebug() << "    distance?        " << QString::fromStdString(Isis::toString(geom.distance(target)));
+  qDebug() << "    intersects?      " << QString::fromStdString(Isis::toString(geom.intersects(target)));
+  qDebug() << "    contains?        " << QString::fromStdString(Isis::toString(geom.contains(target)));
+  qDebug() << "    disjoint?        " << QString::fromStdString(Isis::toString(geom.disjoint(target)));
+  qDebug() << "    overlaps?        " << QString::fromStdString(Isis::toString(geom.overlaps(target)));
+  qDebug() << "    equals?          " << QString::fromStdString(Isis::toString(geom.equals(target)));
+  qDebug() << "    intersect ratio? " << QString::fromStdString(Isis::toString(geom.intersectRatio(target)));
   qDebug() << "";
 }
 

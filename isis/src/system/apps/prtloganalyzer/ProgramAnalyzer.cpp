@@ -146,7 +146,7 @@ void ProgramAnalyzer::include(const QString &name) {
  * @param logfile An ISIS print.prt file
  */
 void ProgramAnalyzer::add(const QString &logfile) {
-  Pvl plog(logfile);
+  Pvl plog(logfile.toStdString());
   for(int i = 0; i < plog.objects(); i++) {
     add(plog.object(i));
   }
@@ -164,7 +164,7 @@ void ProgramAnalyzer::add(const QString &logfile) {
  */
 void ProgramAnalyzer::add(PvlObject &program) {
   _count++;
-  QString prog(program.name());
+  QString prog(QString::fromStdString(program.name()));
   if ( _excludes.exists(prog) ) {
     _excludes.get(prog)++;
     return;
@@ -200,18 +200,18 @@ void ProgramAnalyzer::add(PvlObject &program) {
  * @return PvlGroup Pvl group containing program numbers/counts
  */
 PvlGroup ProgramAnalyzer::review(const QString &name) const {
-  PvlGroup pvl(name);
+  PvlGroup pvl(name.toStdString());
 
-  pvl += PvlKeyword("Programs", toString(size()));
-  pvl += PvlKeyword("Unique", toString(Programs()));
-  pvl += PvlKeyword("Included", toString(LimitTotals(_includes)));
-  pvl += PvlKeyword("Excluded", toString(LimitTotals(_excludes)));
-  pvl += PvlKeyword("Valid", toString(valid()));
-  pvl += PvlKeyword("Errors", toString(errors()));
-  pvl += PvlKeyword("ZeroTime", toString(zerotime()));
-  pvl += PvlKeyword("NoData", toString(nodata()));
-  pvl += PvlKeyword("BadData", toString(baddata()));
-  pvl += PvlKeyword("Total", toString(count()));
+  pvl += PvlKeyword("Programs", Isis::toString(size()));
+  pvl += PvlKeyword("Unique", Isis::toString(Programs()));
+  pvl += PvlKeyword("Included", Isis::toString(LimitTotals(_includes)));
+  pvl += PvlKeyword("Excluded", Isis::toString(LimitTotals(_excludes)));
+  pvl += PvlKeyword("Valid", Isis::toString(valid()));
+  pvl += PvlKeyword("Errors", Isis::toString(errors()));
+  pvl += PvlKeyword("ZeroTime", Isis::toString(zerotime()));
+  pvl += PvlKeyword("NoData", Isis::toString(nodata()));
+  pvl += PvlKeyword("BadData", Isis::toString(baddata()));
+  pvl += PvlKeyword("Total", Isis::toString(count()));
   return (pvl);
 }
 
@@ -292,13 +292,13 @@ ostream &ProgramAnalyzer::listify(ostream &out) const {
   vector<ProgramData>::const_iterator progs = _pdata.begin();
   while (progs != _pdata.end()) {
     if ( progs->status == VALID ) {
-      out << format(progs->name) << ",";
-      out << format(progs->from) << ",";
-      out << format(progs->to) << ",";
-      out << format(progs->runtime) << ",";
-      out << DblToStr(progs->connectTime, 2) << ",";
-      out << DblToStr(progs->cpuTime, 2) << ",";
-      out << DblToStr(progs->connectTime-progs->cpuTime, 2) << "\n";
+      out << format(progs->name).toStdString() << ",";
+      out << format(progs->from).toStdString() << ",";
+      out << format(progs->to).toStdString() << ",";
+      out << format(progs->runtime).toStdString() << ",";
+      out << DblToStr(progs->connectTime, 2).toStdString() << ",";
+      out << DblToStr(progs->cpuTime, 2).toStdString() << ",";
+      out << DblToStr(progs->connectTime-progs->cpuTime, 2).toStdString() << "\n";
     }
    ++progs;
   }
@@ -361,7 +361,7 @@ QString ProgramAnalyzer::getKey(PvlObject &obj, const QString &key,
 
   QString value("");
   if ( !grp.isEmpty() ) {
-    PvlGroup &g = obj.findGroup(grp);
+    PvlGroup &g = obj.findGroup(grp.toStdString());
     value = findKey(g, key);
   }
   else {
@@ -396,7 +396,7 @@ ProgramAnalyzer::Status ProgramAnalyzer::convertTime(const QString &atime,
   double toSeconds(3600.0);
   dtime = 0.0;
   for ( unsigned int i = 0 ; i < 3 ; i++ ) {
-    dtime += toDouble(t[i]) * toSeconds;
+    dtime += t[i].toDouble() * toSeconds;
     toSeconds /= 60.0;
   }
 
@@ -488,23 +488,23 @@ bool ProgramAnalyzer::analyze(const ProgramAnalyzer::ProgramData &data) {
  */
 PvlGroup ProgramAnalyzer::toPvl(const RunTimeStats &stats,
                                 const QString &name) const {
-  PvlGroup pvl((name.isEmpty() ? stats.pname : name));
+  PvlGroup pvl((name.isEmpty() ? stats.pname.toStdString() : name.toStdString()));
 
-  pvl += PvlKeyword("Hits", toString(stats.contime.TotalPixels()));
-  pvl += PvlKeyword("ConnectTimeMinimum", DblToStr(stats.contime.Minimum(), 2));
-  pvl += PvlKeyword("ConnectTimeMaximum", DblToStr(stats.contime.Maximum(), 2));
-  pvl += PvlKeyword("ConnectTimeAverage", DblToStr(stats.contime.Average(), 2));
-  pvl += PvlKeyword("ConnectTimeStdDev", DblToStr(stats.contime.StandardDeviation(), 4));
+  pvl += PvlKeyword("Hits", Isis::toString(stats.contime.TotalPixels()));
+  pvl += PvlKeyword("ConnectTimeMinimum", DblToStr(stats.contime.Minimum(), 2).toStdString());
+  pvl += PvlKeyword("ConnectTimeMaximum", DblToStr(stats.contime.Maximum(), 2).toStdString());
+  pvl += PvlKeyword("ConnectTimeAverage", DblToStr(stats.contime.Average(), 2).toStdString());
+  pvl += PvlKeyword("ConnectTimeStdDev", DblToStr(stats.contime.StandardDeviation(), 4).toStdString());
 
-  pvl += PvlKeyword("CpuTimeMinimum", DblToStr(stats.cputime.Minimum(), 2));
-  pvl += PvlKeyword("CpuTimeMaximum", DblToStr(stats.cputime.Maximum(), 2));
-  pvl += PvlKeyword("CpuTimeAverage", DblToStr(stats.cputime.Average(), 2));
-  pvl += PvlKeyword("CpuTimeStdDev", DblToStr(stats.cputime.StandardDeviation(), 4));
+  pvl += PvlKeyword("CpuTimeMinimum", DblToStr(stats.cputime.Minimum(), 2).toStdString());
+  pvl += PvlKeyword("CpuTimeMaximum", DblToStr(stats.cputime.Maximum(), 2).toStdString());
+  pvl += PvlKeyword("CpuTimeAverage", DblToStr(stats.cputime.Average(), 2).toStdString());
+  pvl += PvlKeyword("CpuTimeStdDev", DblToStr(stats.cputime.StandardDeviation(), 4).toStdString());
 
-  pvl += PvlKeyword("IOTimeMinimum", DblToStr(stats.iotime.Minimum(), 2));
-  pvl += PvlKeyword("IOTimeMaximum", DblToStr(stats.iotime.Maximum(), 2));
-  pvl += PvlKeyword("IOTimeAverage", DblToStr(stats.iotime.Average(), 2));
-  pvl += PvlKeyword("IOTimeStdDev", DblToStr(stats.iotime.StandardDeviation(), 4));
+  pvl += PvlKeyword("IOTimeMinimum", DblToStr(stats.iotime.Minimum(), 2).toStdString());
+  pvl += PvlKeyword("IOTimeMaximum", DblToStr(stats.iotime.Maximum(), 2).toStdString());
+  pvl += PvlKeyword("IOTimeAverage", DblToStr(stats.iotime.Average(), 2).toStdString());
+  pvl += PvlKeyword("IOTimeStdDev", DblToStr(stats.iotime.StandardDeviation(), 4).toStdString());
 
   return (pvl);
 }

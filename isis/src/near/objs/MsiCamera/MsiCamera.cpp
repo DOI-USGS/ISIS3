@@ -58,7 +58,7 @@ namespace Isis {
     // version of the msi2isis ensure updates by sumspice work
     // properly - ie., SpacecraftClockStartCount must be valid.
     // KJB/UA 2019-08-25
-    QString stime = inst["SpacecraftClockStartCount"];
+    QString stime = QString::fromStdString(inst["SpacecraftClockStartCount"]);
     stime.remove('.');  //  Backward compatability!!
 
     iTime etStart = getClockTime(stime);
@@ -79,12 +79,12 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     // Make sure to grab lines and samples in the correct order.
-    double line = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
-    double sample = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE");
+    double line = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_BORESIGHT_LINE");
+    double sample = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_BORESIGHT_SAMPLE");
     focalMap->SetDetectorOrigin(sample, line);
 
     // Setup distortion map
-    double k1 = Spice::getDouble("INS" + toString(naifIkCode()) + "_K1");
+    double k1 = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_K1");
     new RadialDistortionMap(this, k1, 1);
 
     // Setup the ground and sky map

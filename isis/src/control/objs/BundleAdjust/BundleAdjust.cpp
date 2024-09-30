@@ -81,11 +81,11 @@ namespace Isis {
     errlog = "SPARSE: ";
     errlog += message;
 
-    PvlGroup gp(errlog);
+    PvlGroup gp(errlog.toStdString());
 
     gp += PvlKeyword("File",file);
-    gp += PvlKeyword("Line_Number", toString(nLineNo));
-    gp += PvlKeyword("Status", toString(nStatus));
+    gp += PvlKeyword("Line_Number", Isis::toString(nLineNo));
+    gp += PvlKeyword("Status", Isis::toString(nStatus));
 
 //    Application::Log(gp);
 
@@ -166,7 +166,7 @@ namespace Isis {
     // read lidar point data file
     try {
       m_lidarDataSet = LidarDataQsp( new LidarData());
-      m_lidarDataSet->read(lidarDataFile);
+      m_lidarDataSet->read(lidarDataFile.toStdString());
     }
     catch (IException &e) {
       throw;
@@ -476,7 +476,7 @@ namespace Isis {
 
         // If any camera is initialized via CSMInit, but no csm solve options are specified, fail early.
         if (camera->GetCameraType() == Camera::Csm && m_bundleSettings->observationSolveSettings(observationNumber).csmSolveOption() == 0){
-          QString msg = fileName + " camera was initialized using CSMInit, so jigsaw must use CSM parameters." +
+          std::string msg = fileName.toStdString() + " camera was initialized using CSMInit, so jigsaw must use CSM parameters." +
                                    " Please refer to documentation for more information." + "\n";
           throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -486,7 +486,7 @@ namespace Isis {
         BundleImageQsp image = BundleImageQsp(new BundleImage(camera, serialNumber, fileName));
 
         if (!image) {
-          QString msg = "In BundleAdjust::init(): image " + fileName + "is null." + "\n";
+          std::string msg = "In BundleAdjust::init(): image " + fileName.toStdString() + "is null." + "\n";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -494,8 +494,8 @@ namespace Isis {
             m_bundleObservations.addNew(image, observationNumber, instrumentId, m_bundleSettings);
 
         if (!observation) {
-          QString msg = "In BundleAdjust::init(): observation "
-                        + observationNumber + "is null." + "\n";
+          std::string msg = "In BundleAdjust::init(): observation "
+                        + observationNumber.toStdString() + "is null." + "\n";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
@@ -679,7 +679,7 @@ namespace Isis {
     outputBundleStatus("\nValidating network...");
 
     int imagesWithInsufficientMeasures = 0;
-    QString msg = "Images with one or less measures:\n";
+    std::string msg = "Images with one or less measures:\n";
     int numObservations = m_bundleObservations.size();
     for (int i = 0; i < numObservations; i++) {
       int numImages = m_bundleObservations.at(i)->size();
@@ -693,7 +693,7 @@ namespace Isis {
         }
 
         imagesWithInsufficientMeasures++;
-        msg += bundleImage->fileName() + ": " + toString(numMeasures) + "\n";
+        msg += bundleImage->fileName().toStdString() + ": " + toString(numMeasures) + "\n";
       }
     }
 
@@ -846,7 +846,7 @@ namespace Isis {
   //      int numImages = images();
   //      for (int i = 0; i < numImages; i++) {
   //        if (m_controlNet->Camera(i)->GetCameraType() == 0) {
-  //          QString msg = "At least one sensor is a frame camera. "
+  //          std::string msg = "At least one sensor is a frame camera. "
   //                        "Spacecraft Option OVERHERMITE is not valid for frame cameras\n";
   //          throw IException(IException::User, msg, _FILEINFO_);
   //        }
@@ -1130,7 +1130,7 @@ namespace Isis {
       emit statusUpdate("\n aborting...");
       emit statusBarUpdate("Failed to Converge");
       emit finished();
-      QString msg = "Could not solve bundle adjust.";
+      std::string msg = "Could not solve bundle adjust.";
       throw IException(e, e.errorType(), msg, _FILEINFO_);
     }
 
@@ -1170,8 +1170,8 @@ namespace Isis {
    */
   BundleSolutionInfo *BundleAdjust::bundleSolveInformation() {
     BundleSolutionInfo *bundleSolutionInfo = new BundleSolutionInfo(m_bundleSettings,
-                                                                    FileName(m_cnetFileName),
-                                                                    FileName(m_lidarFileName),
+                                                                    FileName(m_cnetFileName.toStdString()),
+                                                                    FileName(m_lidarFileName.toStdString()),
                                                                     m_bundleResults,
                                                                     imageLists());
     bundleSolutionInfo->setRunTime("");
@@ -1809,7 +1809,7 @@ namespace Isis {
 
     // load cholmod triplet
     if ( !loadCholmodTriplet() ) {
-      QString msg = "CHOLMOD: Failed to load Triplet matrix";
+      std::string msg = "CHOLMOD: Failed to load Triplet matrix";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1828,9 +1828,9 @@ namespace Isis {
 
     // check for "matrix not positive definite" error
     if (m_cholmodCommon.status == CHOLMOD_NOT_POSDEF) {
-      QString msg = "Matrix NOT positive-definite: failure at column " + toString((int) m_L->minor);
+      std::string msg = "Matrix NOT positive-definite: failure at column " + Isis::toString((int) m_L->minor);
 //    throw IException(IException::User, msg, _FILEINFO_);
-      error(msg);
+      error(QString::fromStdString(msg));
       emit(finished());
       return false;
     }
@@ -2078,8 +2078,8 @@ namespace Isis {
       double computedX, computedY;
       if (!(measureCamera->GroundMap()->GetXY(point.adjustedSurfacePoint(),
                                               &computedX, &computedY, false))) {
-        QString msg = "Unable to map apriori surface point for measure ";
-        msg += measure.cubeSerialNumber() + " on point " + point.id() + " into focal plane";
+        std::string msg = "Unable to map apriori surface point for measure ";
+        msg += measure.cubeSerialNumber().toStdString() + " on point " + point.id().toStdString() + " into focal plane";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -2500,12 +2500,12 @@ namespace Isis {
         m_imageLists.append(imgList);
       }
       catch (IException &e) {
-        QString msg = "Invalid image in serial number list\n";
+        std::string msg = "Invalid image in serial number list\n";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
     else {
-      QString msg = "No images used in bundle adjust\n";
+      std::string msg = "No images used in bundle adjust\n";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -2572,11 +2572,11 @@ namespace Isis {
     SparseBlockColumnMatrix inverseMatrix;
 
     // Create unique file name
-    FileName matrixFile(m_bundleSettings->outputFilePrefix() + "inverseMatrix.dat");
+    FileName matrixFile(m_bundleSettings->outputFilePrefix().toStdString() + "inverseMatrix.dat");
     //???FileName matrixFile = FileName::createTempFile(m_bundleSettings.outputFilePrefix()
     //???                                               + "inverseMatrix.dat");
     // Create file handle
-    QFile matrixOutput(matrixFile.expanded());
+    QFile matrixOutput(QString::fromStdString(matrixFile.expanded()));
 
     // Check to see if creating the inverse correlation matrix is turned on
     if (m_bundleSettings->createInverseMatrix()) {
@@ -2757,7 +2757,7 @@ namespace Isis {
 
           catch (std::exception &e) {
             outputBundleStatus("\n\n");
-            QString msg = "Input data and settings are not sufficiently stable "
+            std::string msg = "Input data and settings are not sufficiently stable "
                           "for error propagation.";
             throw IException(IException::User, msg, _FILEINFO_);
           }
@@ -2981,7 +2981,7 @@ namespace Isis {
   QString BundleAdjust::modelState(int i) {
     Camera *imageCam = m_controlNet->Camera(i);
     if (imageCam->GetCameraType() != Camera::Csm) {
-      QString msg = "Cannot get model state for image [" + toString(i) +
+      std::string msg = "Cannot get model state for image [" + Isis::toString(i) +
                     "] because it is not a CSM camera model.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -3003,55 +3003,55 @@ namespace Isis {
     QString iterationNumber;
 
     if ( m_bundleResults.converged() ) {
-        iterationNumber = "Iteration" + toString(m_iteration) + ": Final";
+        iterationNumber = "Iteration" + QString::number(m_iteration) + ": Final";
     }
     else {
-        iterationNumber = "Iteration" + toString(m_iteration);
+        iterationNumber = "Iteration" + QString::number(m_iteration);
     }
 
-    PvlGroup summaryGroup(iterationNumber);
+    PvlGroup summaryGroup(iterationNumber.toStdString());
 
     summaryGroup += PvlKeyword("Sigma0",
-                               toString( m_bundleResults.sigma0() ) );
+                               Isis::toString( m_bundleResults.sigma0() ) );
     summaryGroup += PvlKeyword("Observations",
-                               toString( m_bundleResults.numberObservations() ) );
+                               Isis::toString( m_bundleResults.numberObservations() ) );
     summaryGroup += PvlKeyword("Constrained_Point_Parameters",
-                               toString( m_bundleResults.numberConstrainedPointParameters() ) );
+                               Isis::toString( m_bundleResults.numberConstrainedPointParameters() ) );
     summaryGroup += PvlKeyword("Constrained_Image_Parameters",
-                               toString( m_bundleResults.numberConstrainedImageParameters() ) );
+                               Isis::toString( m_bundleResults.numberConstrainedImageParameters() ) );
     if (m_bundleSettings->bundleTargetBody()) {
       summaryGroup += PvlKeyword("Constrained_Target_Parameters",
-                                toString( m_bundleResults.numberConstrainedTargetParameters() ) );
+                                Isis::toString( m_bundleResults.numberConstrainedTargetParameters() ) );
     }
     summaryGroup += PvlKeyword("Unknown_Parameters",
-                               toString( m_bundleResults.numberUnknownParameters() ) );
+                               Isis::toString( m_bundleResults.numberUnknownParameters() ) );
     summaryGroup += PvlKeyword("Degrees_of_Freedom",
-                               toString( m_bundleResults.degreesOfFreedom() ) );
+                               Isis::toString( m_bundleResults.degreesOfFreedom() ) );
     summaryGroup += PvlKeyword( "Rejected_Measures",
-                                toString( m_bundleResults.numberRejectedObservations()/2) );
+                                Isis::toString( m_bundleResults.numberRejectedObservations()/2) );
 
     if ( m_bundleResults.numberMaximumLikelihoodModels() >
          m_bundleResults.maximumLikelihoodModelIndex() ) {
       // if maximum likelihood estimation is being used
 
       summaryGroup += PvlKeyword("Maximum_Likelihood_Tier: ",
-                                 toString( m_bundleResults.maximumLikelihoodModelIndex() ) );
+                                 Isis::toString( m_bundleResults.maximumLikelihoodModelIndex() ) );
       summaryGroup += PvlKeyword("Median_of_R^2_residuals: ",
-                                 toString( m_bundleResults.maximumLikelihoodMedianR2Residuals() ) );
+                                 Isis::toString( m_bundleResults.maximumLikelihoodMedianR2Residuals() ) );
     }
 
     if ( m_bundleResults.converged() ) {
       summaryGroup += PvlKeyword("Converged", "TRUE");
-      summaryGroup += PvlKeyword("TotalElapsedTime", toString( m_bundleResults.elapsedTime() ) );
+      summaryGroup += PvlKeyword("TotalElapsedTime", Isis::toString( m_bundleResults.elapsedTime() ) );
 
       if (m_bundleSettings->errorPropagation()) {
         summaryGroup += PvlKeyword("ErrorPropagationElapsedTime",
-                                   toString( m_bundleResults.elapsedTimeErrorProp() ) );
+                                   Isis::toString( m_bundleResults.elapsedTimeErrorProp() ) );
       }
     }
     else {
       summaryGroup += PvlKeyword("Elapsed_Time",
-                                 toString( m_iterationTime ) );
+                                 Isis::toString( m_iterationTime ) );
     }
 
     std::ostringstream ostr;

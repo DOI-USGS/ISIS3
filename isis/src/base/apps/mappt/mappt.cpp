@@ -1,6 +1,7 @@
 #include <QString>
 #include <cmath>
 
+#include "Application.h"
 #include "Brick.h"
 #include "FileName.h"
 #include "IException.h"
@@ -41,24 +42,24 @@ void mappt(Cube *icube, UserInterface &ui, Pvl *log, CubeAttributeInput* inAtt) 
   if(log) {
     for(int i = 0; i < points.size(); i++) {
       PvlGroup g = getProjPointInfo(icube, points[i], ui, log);
-      log->addLogGroup(g);
+      Application::AppendAndLog(g, log);
     } 
   }
 
   // Write an output label file if necessary
   if(ui.WasEntered("TO")) {
     // Get user params from ui
-    QString outFile = FileName(ui.GetFileName("TO")).expanded();
-    bool exists = FileName(outFile).fileExists();
+    QString outFile = QString::fromStdString(FileName(ui.GetFileName("TO").toStdString()).expanded());
+    bool exists = FileName(outFile.toStdString()).fileExists();
     bool append = ui.GetBoolean("APPEND");
 
     // Write the pvl group out to the file
     if(ui.GetString("FORMAT") == "PVL") {
       if(append) {
-        log->append(outFile);
+        log->append(outFile.toStdString());
       }
       else {
-        log->write(outFile);
+        log->write(outFile.toStdString());
       }
     }
 
@@ -94,7 +95,7 @@ void mappt(Cube *icube, UserInterface &ui, Pvl *log, CubeAttributeInput* inAtt) 
       for(int i = 0; i < log->groups(); i++) {
         PvlGroup group = log->group(i);
         for(int j = 0; j < group.keywords(); j++) {
-          os << (QString)group[j];
+          os << group[j][0];
           if(j < group.keywords() - 1) {
             os << ",";
           }
@@ -105,7 +106,7 @@ void mappt(Cube *icube, UserInterface &ui, Pvl *log, CubeAttributeInput* inAtt) 
   
   }
   else if(ui.GetString("FORMAT") == "FLAT") {
-    QString msg = "Flat file must have a name.";
+    std::string msg = "Flat file must have a name.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }
@@ -125,7 +126,7 @@ PvlGroup getProjPointInfo(Cube *icube, QPair<double, double> point, UserInterfac
 
     if (!outsideAllowed) {
       if (samp < .5 || line < .5 || samp > cubeSampleLimit || line > cubeLineLimit) {
-        QString error = "Requested line,sample is not on the image";
+        std::string error = "Requested line,sample is not on the image";
         throw IException(IException::Unknown, error, _FILEINFO_);
       }
     }
@@ -139,13 +140,13 @@ PvlGroup getProjPointInfo(Cube *icube, QPair<double, double> point, UserInterfac
 
     // Make sure we have a valid latitude value
     if(fabs(lat) > 90.0) {
-      QString msg = "Invalid value for LATITUDE ["
-                   + toString(lat) + "] outside range of ";
+      std::string msg = "Invalid value for LATITUDE ["
+                   + Isis::toString(lat) + "] outside range of ";
       msg += "[-90,90]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    IString coordsys = ui.GetString("COORDSYS");
+    IString coordsys = ui.GetString("COORDSYS").toStdString();
     coordsys.UpCase();
 
     // All of these ifs will finish by setting the ground in the projection,
@@ -164,11 +165,11 @@ PvlGroup getProjPointInfo(Cube *icube, QPair<double, double> point, UserInterfac
 
     // Use the mapping group from a given file
     else if(coordsys == "MAP") {
-      FileName mapFile = ui.GetFileName("MAP");
+      FileName mapFile = ui.GetFileName("MAP").toStdString();
 
       // Does it exist?
       if(!mapFile.fileExists()) {
-        QString msg = "Filename [" + ui.GetFileName("MAP") + "] does not exist";
+        std::string msg = "Filename [" + ui.GetFileName("MAP").toStdString() + "] does not exist";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -225,7 +226,7 @@ PvlGroup getProjPointInfo(Cube *icube, QPair<double, double> point, UserInterfac
   if (proj->WorldX() < .5 || proj->WorldY() < .5 || proj->WorldX() > cubeSampleLimit ||
       proj->WorldY() > cubeLineLimit) {
     if (!outsideAllowed) {
-      QString error = "Resulting line,sample is not on the image";
+      std::string error = "Resulting line,sample is not on the image";
       throw IException(IException::Unknown, error, _FILEINFO_);
     }
     else {
@@ -246,44 +247,44 @@ PvlGroup getProjPointInfo(Cube *icube, QPair<double, double> point, UserInterfac
   if ( icube->label()->findObject("IsisCube").hasGroup("BandBin")) {
     PvlGroup bandBin = icube->label()->findObject("IsisCube").findGroup("BandBin");
     if (bandBin.hasKeyword("FilterName")) {
-        filterName = bandBin.findKeyword("FilterName")[0];
+        filterName = QString::fromStdString(bandBin.findKeyword("FilterName")[0]);
     }
   }
 
   // Log the position
   if(proj->IsGood()) {
     results += PvlKeyword("Filename",
-                          FileName(icube->fileName()).expanded());
-    results += PvlKeyword("Sample", toString(proj->WorldX()));
-    results += PvlKeyword("Line", toString(proj->WorldY()));
-    results += PvlKeyword("Band", toString(icube->physicalBand(1)));
-    results += PvlKeyword("FilterName", filterName);
+                          FileName(icube->fileName().toStdString()).expanded());
+    results += PvlKeyword("Sample", Isis::toString(proj->WorldX()));
+    results += PvlKeyword("Line", Isis::toString(proj->WorldY()));
+    results += PvlKeyword("Band", Isis::toString(icube->physicalBand(1)));
+    results += PvlKeyword("FilterName", filterName.toStdString());
     results += PvlKeyword("PixelValue", PixelToString(b[0]));
-    results += PvlKeyword("X", toString(proj->XCoord()));
-    results += PvlKeyword("Y", toString(proj->YCoord()));
+    results += PvlKeyword("X", Isis::toString(proj->XCoord()));
+    results += PvlKeyword("Y", Isis::toString(proj->YCoord()));
 
     // Put together all the keywords for different coordinate systems.
     PvlKeyword centLat =
-      PvlKeyword("PlanetocentricLatitude", toString(proj->UniversalLatitude()));
+      PvlKeyword("PlanetocentricLatitude", Isis::toString(proj->UniversalLatitude()));
 
     PvlKeyword graphLat =
       PvlKeyword("PlanetographicLatitude",
-                 toString(proj->ToPlanetographic(proj->UniversalLatitude())));
+                 Isis::toString(proj->ToPlanetographic(proj->UniversalLatitude())));
 
     PvlKeyword pE360 =
-      PvlKeyword("PositiveEast360Longitude", toString(proj->UniversalLongitude()));
+      PvlKeyword("PositiveEast360Longitude", Isis::toString(proj->UniversalLongitude()));
 
     PvlKeyword pW360 =
       PvlKeyword("PositiveWest360Longitude",
-                 toString(proj->ToPositiveWest(proj->UniversalLongitude(), 360)));
+                 Isis::toString(proj->ToPositiveWest(proj->UniversalLongitude(), 360)));
 
     PvlKeyword pE180 =
       PvlKeyword("PositiveEast180Longitude",
-                 toString(proj->To180Domain(proj->UniversalLongitude())));
+                 Isis::toString(proj->To180Domain(proj->UniversalLongitude())));
 
     PvlKeyword pW180 =
       PvlKeyword("PositiveWest180Longitude",
-                 toString(proj->To180Domain(proj->ToPositiveEast(
+                 Isis::toString(proj->To180Domain(proj->ToPositiveEast(
                             proj->UniversalLongitude(), 360))));
 
 
@@ -385,16 +386,16 @@ QList< QPair<double, double> > getMapPoints(const UserInterface &ui, bool usePoi
     if (usePointList) {
 
       CSVReader reader;
-      reader.read(FileName(ui.GetFileName("COORDLIST")).expanded());
+      reader.read(QString::fromStdString(FileName(ui.GetFileName("COORDLIST").toStdString()).expanded()));
 
       if (!reader.isTableValid(reader.getTable()) || reader.columns() != 2) {
-        QString msg = "Coordinate file formatted incorrectly.\n"
+        std::string msg = "Coordinate file formatted incorrectly.\n"
                       "Each row must have two columns: a sample,line or a latitude,longitude pair.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       for (int row = 0; row < reader.rows(); row++) {
-        point1 = toDouble(reader.getRow(row)[0]);
-        point2 = toDouble(reader.getRow(row)[1]);
+        point1 = reader.getRow(row)[0].toDouble();
+        point2 = reader.getRow(row)[1].toDouble();
         points.append(QPair<double, double>(point1, point2));
       }
     }

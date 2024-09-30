@@ -52,7 +52,7 @@ namespace Isis {
       m_instrumentNameShort = "ONC-W2";
     }
     else {
-      QString msg = "File does not appear to be a Hayabusa2 image";
+      std::string msg = "File does not appear to be a Hayabusa2 image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -66,7 +66,7 @@ namespace Isis {
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // set variables startTime and exposureDuration
-    QString stime = inst["SpacecraftClockStartCount"];
+    QString stime = QString::fromStdString(inst["SpacecraftClockStartCount"]);
     iTime etStart = getClockTime(stime);
 
     double exposureDuration = ((double) inst["ExposureDuration"]);
@@ -76,8 +76,8 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     // BORESIGHT SAMPLE AND LINE still need to be added to the IAK
-    double bLines = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
-    double bSamples = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE");
+    double bLines = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_BORESIGHT_LINE");
+    double bSamples = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_BORESIGHT_SAMPLE");
 
     focalMap->SetDetectorOrigin(bSamples, bLines);
 

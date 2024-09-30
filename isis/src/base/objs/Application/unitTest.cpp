@@ -18,8 +18,26 @@ void myFunct() {
 }
 
 void myError() {
-  QString msg = "testing an error";
+  std::string msg = "testing an error";
   throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
+}
+
+void errorFormatting() {
+  std::string msg = "local test error";
+  Isis::IException exception = Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
+
+  // Add test for formatError
+  Isis::Pvl &prefs = Isis::Preference::Preferences();
+  Isis::PvlGroup &errorPrefs = prefs.findGroup("ErrorFacility");
+
+  QString errorString = Isis::Application::formatError(exception);
+  std::cout << errorString.toStdString() << std::endl;
+
+  std::string &formatValue = errorPrefs["Format"][0];
+  formatValue = "Pvl";
+
+  errorString = Isis::Application::formatError(exception);
+  std::cout << errorString.toStdString() << std::endl;
 }
 
 using namespace std;
@@ -60,6 +78,9 @@ int main(int argc, char *argv[]) {
   std::cout << std::endl;
 
   a.Run(myError);
+  std::cout << std::endl;
+
+  a.Run(errorFormatting);
   std::cout << std::endl;
 
   Isis::Pvl p("print.prt");

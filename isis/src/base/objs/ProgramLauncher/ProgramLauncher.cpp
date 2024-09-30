@@ -35,7 +35,7 @@ namespace Isis {
    */
   void ProgramLauncher::RunIsisProgram(QString programName,
                                        QString parameters) {
-    FileName program(programName);
+    FileName program(programName.toStdString());
     FileName isisExecutableFileName("$ISISROOT/bin/" + program.name());
     bool isIsisProgram = false;
 
@@ -44,17 +44,17 @@ namespace Isis {
       program = isisExecutableFileName;
     }
 
-    QString command = program.expanded() + " " + parameters +
-        " -pid=" + toString(getpid());
+    QString command = QString::fromStdString(program.expanded()) + " " + parameters +
+        " -pid=" + QString::fromStdString(toString(getpid()));
 
     if(!isIsisProgram) {
-      QString msg = "Program [" + programName + "] does not appear to be a "
+      std::string msg = "Program [" + programName.toStdString() + "] does not appear to be a "
           "valid Isis program";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     QString serverName = "isis_" + Application::UserName() +
-        "_" + toString(getpid());
+        "_" + QString::fromStdString(toString(getpid()));
 
     QLocalServer server;
     server.listen(serverName);
@@ -74,7 +74,7 @@ namespace Isis {
     }
 
     if(!connected) {
-      QString msg = "Isis child process failed to communicate with parent";
+      std::string msg = "Isis child process failed to communicate with parent";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -127,7 +127,7 @@ namespace Isis {
     childProcess.waitForFinished();
 
     if(childProcess.exitCode() != 0) {
-      QString msg = "Running Isis program [" + programName + "] failed with "
+      std::string msg = "Running Isis program [" + programName.toStdString() + "] failed with "
                     "return status [" + toString(childProcess.exitCode()) + "]";
       throw IException(errors, IException::Unknown, msg, _FILEINFO_);
     }
@@ -152,11 +152,11 @@ namespace Isis {
       iApp->UpdateProgress(msg, true);
     }
     else if(code == "PROGRESS" && iApp) {
-      iApp->UpdateProgress(toInt(msg), true);
+      iApp->UpdateProgress(msg.toInt(), true);
     }
     else if(code == "LOG" && iApp) {
       stringstream msgStream;
-      msgStream << msg;
+      msgStream << msg.toStdString();
       Pvl logPvl;
       msgStream >> logPvl;
 
@@ -171,19 +171,19 @@ namespace Isis {
     }
     else if(code == "ERROR") {
       stringstream msgStream;
-      msgStream << msg;
+      msgStream << msg.toStdString();
       Pvl errorPvl;
       msgStream >> errorPvl;
 
       for(int i = 0; i < errorPvl.groups(); i++) {
         PvlGroup &g = errorPvl.group(i);
-        QString emsg = g["Message"];
+        std::string emsg = g["Message"];
         int ecode = g["Code"];
-        QString efile = g["File"];
+        std::string efile = g["File"];
         int eline = g["Line"];
 
         errors.append(
-          IException((IException::ErrorType)ecode, emsg, efile.toLatin1().data(), eline));
+          IException((IException::ErrorType)ecode, emsg, efile.c_str(), eline));
       }
     }
 
@@ -206,7 +206,7 @@ namespace Isis {
     int status = system(fullCommand.toLatin1().data());
 
     if(status != 0) {
-      QString msg = "Executing command [" + fullCommand +
+      std::string msg = "Executing command [" + fullCommand.toStdString() +
                     "] failed with return status [" + toString(status) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

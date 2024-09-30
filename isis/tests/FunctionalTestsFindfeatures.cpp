@@ -20,7 +20,7 @@
 using namespace Isis;
 using ::testing::HasSubstr;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/findfeatures.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/findfeatures.xml").expanded());
 
 // All FastGeom Keys expected in logs for algorithms
 static const QStringList fastgeom_generic_keywords = { "FastGeomAlgorithm",
@@ -346,7 +346,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomDefault) {
   ASSERT_EQ( keyvalues.get( "FastGeomRadialSegments",       "null"), "14");
 
   // Do the floating point special
-  EXPECT_NEAR( toDouble(keyvalues.get( "FastGeomMaximumRadius",        "-1") ), 339.411, 1.0E-4);
+  EXPECT_NEAR( keyvalues.get( "FastGeomMaximumRadius",        "-1").toDouble(), 339.411, 1.0E-4);
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomRadialConfig) {
@@ -414,7 +414,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomRadialConfig) {
   ASSERT_EQ( keyvalues.get( "FastGeomRadialSegments",       "null"), "37");
 
   // Do the floating point special
-  EXPECT_NEAR( toDouble(keyvalues.get( "FastGeomMaximumRadius",        "-1") ), 360.624, 1.0E-4);
+  EXPECT_NEAR( keyvalues.get( "FastGeomMaximumRadius",        "-1").toDouble(), 360.624, 1.0E-4);
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomGridDefault) {
@@ -479,7 +479,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomGridDefault) {
   ASSERT_EQ( keyvalues.get( "FastGeomGridStartIteration",   "null"), "0");
   ASSERT_EQ( keyvalues.get( "FastGeomGridStopIteration",    "null"), "239");
   ASSERT_EQ( keyvalues.get( "FastGeomGridIterationStep",    "null"), "1");
-  ASSERT_EQ( keyvalues.get( "FastGeomGridSaveAllPoints",    "null"), "No");
+  ASSERT_EQ( keyvalues.get( "FastGeomGridSaveAllPoints",    "null"), "0");
   ASSERT_EQ( keyvalues.get( "FastGeomPointIncrement",       "null"), "5");
   ASSERT_EQ( keyvalues.get( "FastGeomTotalGridIterations",  "null"), "2");
 }
@@ -546,7 +546,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomGridConfig) {
   ASSERT_EQ( keyvalues.get( "FastGeomGridStartIteration",   "null"), "5");
   ASSERT_EQ( keyvalues.get( "FastGeomGridStopIteration",    "null"), "10");
   ASSERT_EQ( keyvalues.get( "FastGeomGridIterationStep",    "null"), "2");
-  ASSERT_EQ( keyvalues.get( "FastGeomGridSaveAllPoints",    "null"), "No");
+  ASSERT_EQ( keyvalues.get( "FastGeomGridSaveAllPoints",    "null"), "0");
   ASSERT_EQ( keyvalues.get( "FastGeomPointIncrement",       "null"), "5");
   ASSERT_EQ( keyvalues.get( "FastGeomTotalGridIterations",  "null"), "1");
 }

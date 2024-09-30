@@ -26,7 +26,7 @@ void IsisMain() {
   // Setup the input cube
   Cube *icube = p.SetInputCube("FROM");
   if (icube->bandCount() != 1) {
-    QString msg = "center only works for single-band images.";
+    std::string msg = "center only works for single-band images.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   sumall.Reset();
@@ -52,10 +52,10 @@ void IsisMain() {
   if (sumall.ValidPixels() > 0) {
     csamp = sumX / sumall.Sum();
     cline = sumY / sumall.Sum();
-    results += PvlKeyword("CentroidLine", toString(cline));
-    results += PvlKeyword("CentroidSample", toString(csamp));
-    results += PvlKeyword("LineOffset", toString(lMiddle - cline));
-    results += PvlKeyword("SampleOffset", toString(sMiddle - csamp));
+    results += PvlKeyword("CentroidLine", Isis::toString(cline));
+    results += PvlKeyword("CentroidSample", Isis::toString(csamp));
+    results += PvlKeyword("LineOffset", Isis::toString(lMiddle - cline));
+    results += PvlKeyword("SampleOffset", Isis::toString(sMiddle - csamp));
   }
   else {
     PvlKeyword badl = PvlKeyword("CentroidLine", "Null");
@@ -70,15 +70,15 @@ void IsisMain() {
 
   if (ui.WasEntered("TO")) {
     if (sumall.ValidPixels() == 0) {
-      QString mess = "No valid pixels so cannot compute center in " + icube->fileName();
+      std::string mess = "No valid pixels so cannot compute center in " + icube->fileName().toStdString();
       throw IException(IException::User, mess, _FILEINFO_);
     }
     double sTrans = sMiddle - csamp;
     double lTrans = lMiddle - cline;
     QString params = "from=" + ui.GetCubeName("FROM") + 
                      " to=" + ui.GetCubeName("TO") + 
-                     " strans=" + toString(sTrans) + 
-                     " ltrans=" + toString(lTrans) + 
+                     " strans=" + QString::number(sTrans) + 
+                     " ltrans=" + QString::number(lTrans) + 
                      " interp=" + ui.GetString("INTERP");
     ProgramLauncher::RunIsisProgram("translate",params);
   }

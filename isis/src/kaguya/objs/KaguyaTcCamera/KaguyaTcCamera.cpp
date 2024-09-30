@@ -45,7 +45,7 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    QString clockCount = inst["SpacecraftClockStartCount"];
+    QString clockCount = QString::fromStdString(inst["SpacecraftClockStartCount"]);
     double time = getClockTime(clockCount, -1, true).Et();
 
     // Setup detector map
@@ -55,7 +55,7 @@ namespace Isis {
     LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, time, lineRate);
 
     // Detetermine what to set the starting detector sample to, based on swath mode
-    QString swathMode = inst["SwathModeId"];
+    QString swathMode = QString::fromStdString(inst["SwathModeId"]);
 
     double startingDetectorSample = 1;
     if (swathMode.compare("FULL") == 0) {
@@ -76,10 +76,10 @@ namespace Isis {
     // The detector offsets are 0,0 because the borsight is in the center of the array
     // The origin of the detector does not depend on swath mode.
     QString key;
-    key = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
+    key = "INS" + QString::number(naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoreSight = getDouble(key);
 
-    key = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
+    key = "INS" + QString::number(naifIkCode()) + "_BORESIGHT_LINE";
     double lineBoreSight = getDouble(key);
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
 

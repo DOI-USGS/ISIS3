@@ -37,7 +37,7 @@ namespace Isis {
     static double iof;          // conversion from counts/ms to IOF
 
     void ctxcal(UserInterface &ui) {
-      Cube icube(ui.GetCubeName("FROM"));
+      Cube icube(ui.GetCubeName("FROM").toStdString());
       ctxcal(&icube, ui);
     }
 
@@ -45,13 +45,13 @@ namespace Isis {
       // We will be processing by line
       ProcessByLine p;
 
-      Isis::Pvl lab(icube->fileName());
+      Isis::Pvl lab(icube->fileName().toStdString());
       Isis::PvlGroup &inst =
           lab.findGroup("Instrument", Pvl::Traverse);
 
-      QString instId = inst["InstrumentId"];
+      QString instId = QString::fromStdString(inst["InstrumentId"]);
       if(instId != "CTX") {
-          QString msg = "This is not a CTX image.  Ctxcal requires a CTX image.";
+          std::string msg = "This is not a CTX image.  Ctxcal requires a CTX image.";
           throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -64,13 +64,13 @@ namespace Isis {
       else {
           FileName flat;
           if (ui.GetBoolean("MONTHLYFLAT")) {
-              FileName outputFileName(icube->fileName());
-              QString outputFileBase = outputFileName.baseName();
+              FileName outputFileName(icube->fileName().toStdString());
+              QString outputFileBase = QString::fromStdString(outputFileName.baseName());
 
               QStringRef month(&outputFileBase, 0, 3);
-              flat = FileName("$mro/calibration/ctxFlatFiles/" + month + ".flat.cub");
+              flat = FileName("$mro/calibration/ctxFlatFiles/" + month.toString().toStdString() + ".flat.cub");
               if (!flat.fileExists()) {
-                QString msg = "Could not find flat file [" + flat.expanded() + "]. "
+                std::string msg = "Could not find flat file [" + flat.expanded() + "]. "
                               "Either the data area is not set or a month is missing.";
                 throw IException(IException::Unknown, msg, _FILEINFO_);
               }
@@ -78,7 +78,7 @@ namespace Isis {
           else {
               flat = FileName("$mro/calibration/ctxFlat_????.cub").highestVersion();
           }
-          flatFile.open(flat.expanded());
+          flatFile.open(QString::fromStdString(flat.expanded()));
       }
       flat = new Brick(5000, 1, 1, flatFile.pixelType());
       flat->SetBasePosition(1, 1, 1);
@@ -86,13 +86,13 @@ namespace Isis {
 
       // If it is already calibrated then complain
       if(icube->hasGroup("Radiometry")) {
-          QString msg = "The CTX image [" + icube->fileName() + "] has already "
+          std::string msg = "The CTX image [" + icube->fileName().toStdString() + "] has already "
                       "been radiometrically calibrated";
           throw IException(IException::User, msg, _FILEINFO_);
       }
 
       // Get label parameters we will need for calibration equation
-      iTime startTime((QString) inst["StartTime"]);
+      iTime startTime(QString::fromStdString(inst["StartTime"]));
       double etStart = startTime.Et();
 
       //  Read exposure and convert to milliseconds
@@ -194,7 +194,7 @@ namespace Isis {
         double w0 = 3660.5;
         double w1 = w0 * ((dist * dist) / (dist1 * dist1));
         if(exposure *w1 == 0.0) {
-          QString msg = icube->fileName() + ": exposure or w1 has value of 0.0 ";
+          std::string msg = icube->fileName().toStdString() + ": exposure or w1 has value of 0.0 ";
           throw IException(IException::User, msg, _FILEINFO_);
         }
         iof = 1.0 / (exposure * w1);
@@ -209,8 +209,8 @@ namespace Isis {
       // Add the radiometry group
       PvlGroup calgrp("Radiometry");
 
-      calgrp += PvlKeyword("FlatFile", flatFile.fileName());
-      calgrp += PvlKeyword("iof", toString(iof));
+      calgrp += PvlKeyword("FlatFile", flatFile.fileName().toStdString());
+      calgrp += PvlKeyword("iof", Isis::toString(iof));
 
 
       ocube->putGroup(calgrp);

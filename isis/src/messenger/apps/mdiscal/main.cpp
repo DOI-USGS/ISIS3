@@ -117,7 +117,7 @@ void IsisMain() {
 
   Cube *icube = p.SetInputCube("FROM");
   PvlGroup &inst = icube->group("Instrument");
-  g_isNarrowAngleCamera = ((QString)inst["InstrumentId"] == "MDIS-NAC");
+  g_isNarrowAngleCamera = (QString::fromStdString(inst["InstrumentId"]) == "MDIS-NAC");
   g_exposureDuration = inst["ExposureDuration"];
   g_exposureDuration /= 1000.0; // convert from milliseconds to seconds
 
@@ -174,7 +174,7 @@ void IsisMain() {
   }
 
   if (icube->sampleCount() < 3) {
-    QString msg = "Unable to obtain dark current data. Expected a sample dimension of at least 3";
+    std::string msg = "Unable to obtain dark current data. Expected a sample dimension of at least 3";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -191,8 +191,8 @@ void IsisMain() {
   if (g_nValidDark <= 0) {
     // Both cases require dark pixels, g_model does not
     if ((darkCurr == "STANDARD") || (darkCurr == "LINEAR")) {
-      QString mess = "Warning: There are no valid dark current pixels which are required"
-                     " for " + darkCurr + " calibration. Changing dark correction method to MODEL.";
+      std::string mess = "Warning: There are no valid dark current pixels which are required"
+                     " for " + darkCurr.toStdString() + " calibration. Changing dark correction method to MODEL.";
       IException ie(IException::User, mess, _FILEINFO_);
       ie.print();
       darkCurr = "MODEL";
@@ -201,7 +201,7 @@ void IsisMain() {
     // Model cannot be used for exposure times > 1.0 <sec>
     if ((darkCurr == "MODEL") && (g_exposureDuration > 1.0)) {
       darkCurr = "NONE";
-      QString mess = "Warning: There are no valid dark current pixels and the dark model correction"
+      std::string mess = "Warning: There are no valid dark current pixels and the dark model correction"
                      " can not be used when the exposure duration exceeds 1000 milliseconds."
                      " Changing dark correction method to NONE.";
       IException ie(IException::User, mess, _FILEINFO_);
@@ -228,7 +228,7 @@ void IsisMain() {
       g_calibrationValues.resize(icube->lineCount());
       darkCurr = "STANDARD";
 
-      QString mess = "Warning: Dark model correction can not be used when the"
+      std::string mess = "Warning: Dark model correction can not be used when the"
                      " exposure duration exceeds 1000 milliseconds."
                      " Changing dark correction method to STANDARD.";
       IException ie(IException::User, mess, _FILEINFO_);
@@ -304,7 +304,7 @@ void IsisMain() {
                                         smearfile);
 
   // Get s/c clock count
-  QString startTime = inst["SpacecraftClockCount"];
+  QString startTime =  QString::fromStdString(inst["SpacecraftClockCount"]);
 
   // Retrieve empirical correction parameter
   QString empiricalCorrectionFile   = "";
@@ -316,7 +316,7 @@ void IsisMain() {
     g_empiricalCorrectionFactor = loadEmpiricalCorrection(startTime, g_filterNumber + 1,
                                                           empiricalCorrectionFile,
                                                           empiricalCorrectionDate, icube);
-    empiricalCorrectionFactor = toString(g_empiricalCorrectionFactor);
+    empiricalCorrectionFactor = QString::number(g_empiricalCorrectionFactor);
   }
   else {
     // already initialized g_empiricalCorrectionFactor = 1.0;
@@ -333,8 +333,8 @@ void IsisMain() {
   QString solirrfile = "";
   if (applyIOF) {
     PvlGroup& inst = icube->group("Instrument");
-    QString target = inst["TargetName"];
-    QString startTime = inst["SpacecraftClockCount"];
+    QString target =  QString::fromStdString(inst["TargetName"]);
+    QString startTime =  QString::fromStdString(inst["SpacecraftClockCount"]);
     if (sunDistanceAU(startTime, target, g_solarDist, icube)) {
       vector<double> sol = loadSolarIrr(g_isNarrowAngleCamera, g_isBinnedData,
                                         g_filterNumber + 1, solirrfile);
@@ -353,19 +353,19 @@ void IsisMain() {
   QString reducedFlat = "";
   FileName flatfield = determineFlatFieldFile();
   if (pxlBin > 0) {
-    QString scale(toString(pxlBin));
+    QString scale(QString::number(pxlBin));
     FileName newflat = FileName::createTempFile("$temporary/"
                                                 + flatfield.baseName() + "_reduced.cub");
-    reducedFlat = newflat.expanded();
-    QString parameters = "FROM=" + flatfield.expanded() +
-       " TO="   + newflat.expanded() +
+    reducedFlat = QString::fromStdString(newflat.expanded());
+    QString parameters = "FROM=" + QString::fromStdString(flatfield.expanded()) +
+       " TO="   + QString::fromStdString(newflat.expanded()) +
        " MODE=SCALE" +
        " LSCALE=" + scale +
        " SSCALE=" + scale;
     try {
       // iApp->Exec("reduce", parameters);
       ProgramLauncher::RunIsisProgram("reduce", parameters);
-      reducedFlat = newflat.expanded();
+      reducedFlat = QString::fromStdString(newflat.expanded());
     }
     catch (IException&) {
       remove(reducedFlat.toLatin1().data());
@@ -376,7 +376,7 @@ void IsisMain() {
   }
   else {
     CubeAttributeInput att;
-    p.SetInputCube(flatfield.expanded(), att);
+    p.SetInputCube(QString::fromStdString(flatfield.expanded()), att);
   }
 
   // Set output file for processing
@@ -396,22 +396,22 @@ void IsisMain() {
 
   // Log calibration activity
   PvlGroup calibrationLog("RadiometricCalibration");
-  calibrationLog.addKeyword(PvlKeyword("SoftwareName", mdiscalProgram));
-  calibrationLog.addKeyword(PvlKeyword("SoftwareVersion", mdiscalVersion));
-  calibrationLog.addKeyword(PvlKeyword("ProcessDate", mdiscalRuntime));
-  calibrationLog.addKeyword(PvlKeyword("DarkCurrentModel", darkCurr));
+  calibrationLog.addKeyword(PvlKeyword("SoftwareName", mdiscalProgram.toStdString()));
+  calibrationLog.addKeyword(PvlKeyword("SoftwareVersion", mdiscalVersion.toStdString()));
+  calibrationLog.addKeyword(PvlKeyword("ProcessDate", mdiscalRuntime.toStdString()));
+  calibrationLog.addKeyword(PvlKeyword("DarkCurrentModel", darkCurr.toStdString()));
 
   if (g_darkCurrentMode == DarkCurrentLinear) {
-    QString equation = "Y = " + toString(g_calibrationValues[0]) + QString(" + ")
-                       + toString(g_calibrationValues[1]) + QString("x");
-    calibrationLog.addKeyword(PvlKeyword("DarkCurrentEquation", (QString)equation));
+    QString equation = "Y = " + QString::number(g_calibrationValues[0]) + QString(" + ")
+                       + QString::number(g_calibrationValues[1]) + QString("x");
+    calibrationLog.addKeyword(PvlKeyword("DarkCurrentEquation", equation.toStdString()));
   }
   else if (g_darkCurrentMode == DarkCurrentModel) {
-    calibrationLog.addKeyword(PvlKeyword("DarkCurrentFile", darkCurrentFile));
+    calibrationLog.addKeyword(PvlKeyword("DarkCurrentFile", darkCurrentFile.toStdString()));
   }
 
-  calibrationLog.addKeyword(PvlKeyword("BinnedImage", toString((int)g_isBinnedData)));
-  calibrationLog.addKeyword(PvlKeyword("FilterNumber", toString(g_filterNumber + 1)));
+  calibrationLog.addKeyword(PvlKeyword("BinnedImage", Isis::toString((int)g_isBinnedData)));
+  calibrationLog.addKeyword(PvlKeyword("FilterNumber", Isis::toString(g_filterNumber + 1)));
   if (g_applyFlatfield) {
     calibrationLog.addKeyword(PvlKeyword("FlatFieldFile",
                                          flatfield.originalPath() + "/" + flatfield.name()));
@@ -421,22 +421,22 @@ void IsisMain() {
   }
   calibrationLog.addKeyword(PvlKeyword("CalibrationFile",
                                        calibFile.originalPath() + "/" + calibFile.name()));
-  calibrationLog.addKeyword(PvlKeyword("ResponsivityFile", respfile));
-  calibrationLog.addKeyword(PvlKeyword("SmearCompFile", smearfile));
-  PvlKeyword rspKey("Response", toString(rsp[0]));
+  calibrationLog.addKeyword(PvlKeyword("ResponsivityFile", respfile.toStdString()));
+  calibrationLog.addKeyword(PvlKeyword("SmearCompFile", smearfile.toStdString()));
+  PvlKeyword rspKey("Response", Isis::toString(rsp[0]));
   for (unsigned int i = 1; i < rsp.size(); i++) {
-    rspKey.addValue(toString(rsp[i]));
+    rspKey.addValue(Isis::toString(rsp[i]));
   }
   calibrationLog.addKeyword(rspKey);
-  calibrationLog.addKeyword(PvlKeyword("SmearComponent", toString(g_smearComponent)));
+  calibrationLog.addKeyword(PvlKeyword("SmearComponent", Isis::toString(g_smearComponent)));
 
   QString calibType;
   if (applyIOF  && validIOF) {
     calibrationLog.addKeyword(PvlKeyword("Units", "I over F"));
-    calibrationLog.addKeyword(PvlKeyword("SolarDistance", toString(g_solarDist), "AU"));
-    calibrationLog.addKeyword(PvlKeyword("SolarIrrFile", solirrfile));
-    calibrationLog.addKeyword(PvlKeyword("FilterIrradianceFactor", toString(g_Ff)));
-    calibrationLog.addKeyword(PvlKeyword("IOFFactor", toString(g_iof)));
+    calibrationLog.addKeyword(PvlKeyword("SolarDistance", Isis::toString(g_solarDist), "AU"));
+    calibrationLog.addKeyword(PvlKeyword("SolarIrrFile", solirrfile.toStdString()));
+    calibrationLog.addKeyword(PvlKeyword("FilterIrradianceFactor", Isis::toString(g_Ff)));
+    calibrationLog.addKeyword(PvlKeyword("IOFFactor", Isis::toString(g_iof)));
     calibType = "IF";
   }
   else if (g_applyRadiometric) {
@@ -448,52 +448,52 @@ void IsisMain() {
     calibType = "DN";
   }
 
-  calibrationLog.addKeyword(PvlKeyword("EmpiricalCorrectionFile", empiricalCorrectionFile));
-  calibrationLog.addKeyword(PvlKeyword("EmpiricalCorrectionDate", empiricalCorrectionDate));
-  calibrationLog.addKeyword(PvlKeyword("EmpiricalCorrectionFactor", empiricalCorrectionFactor));
+  calibrationLog.addKeyword(PvlKeyword("EmpiricalCorrectionFile", empiricalCorrectionFile.toStdString()));
+  calibrationLog.addKeyword(PvlKeyword("EmpiricalCorrectionDate", empiricalCorrectionDate.toStdString()));
+  calibrationLog.addKeyword(PvlKeyword("EmpiricalCorrectionFactor", empiricalCorrectionFactor.toStdString()));
 
 
-  calibrationLog.addKeyword(PvlKeyword("DarkStripColumns", toString(g_nDarkColumns)),
+  calibrationLog.addKeyword(PvlKeyword("DarkStripColumns", Isis::toString(g_nDarkColumns)),
                             Pvl::Replace);
-  calibrationLog.addKeyword(PvlKeyword("ValidDarkColumns", toString(g_nValidDark)),
+  calibrationLog.addKeyword(PvlKeyword("ValidDarkColumns", Isis::toString(g_nValidDark)),
                             Pvl::Replace);
   if (g_darkStrip.TotalPixels() > 0) {
     double avgDark = (g_darkStrip.ValidPixels() > 0) ? g_darkStrip.Average() : 0.0;
-    calibrationLog.addKeyword(PvlKeyword("DarkStripMean", toString(avgDark)),
+    calibrationLog.addKeyword(PvlKeyword("DarkStripMean", Isis::toString(avgDark)),
                                          Pvl::Replace);
   }
 
   // Report nulled sample count
-  calibrationLog.addKeyword(PvlKeyword("LeftSamplesNulled", toString(g_nSampsToNull)));
+  calibrationLog.addKeyword(PvlKeyword("LeftSamplesNulled", Isis::toString(g_nSampsToNull)));
 
   // Handle updates of ProductId and SourceProduct Id keywords
   PvlGroup& archive = ocube->group("Archive");
   PvlKeyword key = archive["ProductId"];
-  QString orgProdId = key[0];
-  QString newProdId = orgProdId + "_" + calibType + "_" + toString(cdrVersion);
+  QString orgProdId =  QString::fromStdString(key[0]);
+  QString newProdId = orgProdId + "_" + calibType + "_" + QString::number(cdrVersion);
   newProdId[0] = 'C';
-  key.setValue(quote(newProdId));
+  key.setValue(quote(newProdId).toStdString());
   archive.addKeyword(key, Pvl::Replace);
 
   // Now SourceProductId
   if (archive.hasKeyword("SourceProductId")) {
     key = archive["SourceProductId"];
     for (int i = 0; i < key.size(); i++) {
-      key[i] = quote(key[i]);
+      key[i] = quote( QString::fromStdString(key[i])).toStdString();
     }
   }
   else {
-    key = PvlKeyword("SourceProductId", quote(orgProdId));
+    key = PvlKeyword("SourceProductId", quote(orgProdId).toStdString());
   }
 
   if (!darkCurrentFile.isEmpty()) {
-    key.addValue(quote(FileName(darkCurrentFile).baseName()));
+    key.addValue(quote(QString::fromStdString(FileName(darkCurrentFile.toStdString()).baseName())).toStdString());
   }
-  key.addValue(quote(flatfield.baseName()));
-  key.addValue(quote(FileName(respfile).baseName()));
+  key.addValue(quote(QString::fromStdString(flatfield.baseName())).toStdString());
+  key.addValue(quote(QString::fromStdString(FileName(respfile.toStdString()).baseName())).toStdString());
   // key.addValue(quote(FileName(smearfile).baseName()));
   if (validIOF) {
-    key.addValue(quote(FileName(solirrfile).baseName()));
+    key.addValue(quote(QString::fromStdString(FileName(solirrfile.toStdString()).baseName())).toStdString());
   }
   archive.addKeyword(key, Pvl::Replace);
 
@@ -519,11 +519,11 @@ FileName determineFlatFieldFile() {
     // add a zero if the filter is 1-digit
     filename += "_FIL";
     if (g_filterNumber < 9) filename += "0";
-    filename += toString(g_filterNumber + 1);
+    filename += QString::number(g_filterNumber + 1);
     filename += "_?.cub";
   }
 
-  FileName final(filename);
+  FileName final(filename.toStdString());
   final = final.highestVersion();
   return final;
 }

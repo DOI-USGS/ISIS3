@@ -128,18 +128,18 @@ void IsisMain() {
     throw IException(IException::Unknown, "Not enough information", _FILEINFO_);
   }
 
-  QString inEquationX = "X = " + toString(eq1[0]);
-  inEquationX += " + " + toString(eq1[1]) + "S";
-  inEquationX += " + " + toString(eq1[2]) + "L";
-  QString inEquationY = "Y = " + toString(eq2[0]);
-  inEquationY += " + " + toString(eq2[1]) + "S";
-  inEquationY += " + " + toString(eq2[2]) + "L";
-  QString outEquationS = "S = " + toString(res1[0]);
-  outEquationS += " + " + toString(res1[1]) + "X";
-  outEquationS += " + " + toString(res1[2]) + "Y";
-  QString outEquationL = "L = " + toString(res2[0]);
-  outEquationL += " + " + toString(res2[1]) + "X";
-  outEquationL += " + " + toString(res2[2]) + "Y";
+  QString inEquationX = "X = " + QString::number(eq1[0]);
+  inEquationX += " + " + QString::number(eq1[1]) + "S";
+  inEquationX += " + " + QString::number(eq1[2]) + "L";
+  QString inEquationY = "Y = " + QString::number(eq2[0]);
+  inEquationY += " + " + QString::number(eq2[1]) + "S";
+  inEquationY += " + " + QString::number(eq2[2]) + "L";
+  QString outEquationS = "S = " + QString::number(res1[0]);
+  outEquationS += " + " + QString::number(res1[1]) + "X";
+  outEquationS += " + " + QString::number(res1[2]) + "Y";
+  QString outEquationL = "L = " + QString::number(res2[0]);
+  outEquationL += " + " + QString::number(res2[1]) + "X";
+  outEquationL += " + " + QString::number(res2[2]) + "Y";
 
   // check....
   /*
@@ -160,22 +160,22 @@ void IsisMain() {
   PvlGroup res("Results");
 
   if(ui.WasEntered("IAKCODE")) {
-    PvlKeyword naifFormatX("INS" + ui.GetString("IAKCODE") + "_TRANSX");
-    naifFormatX += toString(eq1[0]);
-    naifFormatX += toString(eq1[1]);
-    naifFormatX += toString(eq1[2]);
-    PvlKeyword naifFormatY("INS" + ui.GetString("IAKCODE") + "_TRANSY");
-    naifFormatY += toString(eq2[0]);
-    naifFormatY += toString(eq2[1]);
-    naifFormatY += toString(eq2[2]);
-    PvlKeyword naifFormatS("INS" + ui.GetString("IAKCODE") + "_ITRANSS");
-    naifFormatS += toString(res1[0]);
-    naifFormatS += toString(res1[1]);
-    naifFormatS += toString(res1[2]);
-    PvlKeyword naifFormatL("INS" + ui.GetString("IAKCODE") + "_ITRANSL");
-    naifFormatL += toString(res2[0]);
-    naifFormatL += toString(res2[1]);
-    naifFormatL += toString(res2[2]);
+    PvlKeyword naifFormatX("INS" + ui.GetString("IAKCODE").toStdString() + "_TRANSX");
+    naifFormatX += Isis::toString(eq1[0]);
+    naifFormatX += Isis::toString(eq1[1]);
+    naifFormatX += Isis::toString(eq1[2]);
+    PvlKeyword naifFormatY("INS" + ui.GetString("IAKCODE").toStdString() + "_TRANSY");
+    naifFormatY += Isis::toString(eq2[0]);
+    naifFormatY += Isis::toString(eq2[1]);
+    naifFormatY += Isis::toString(eq2[2]);
+    PvlKeyword naifFormatS("INS" + ui.GetString("IAKCODE").toStdString() + "_ITRANSS");
+    naifFormatS += Isis::toString(res1[0]);
+    naifFormatS += Isis::toString(res1[1]);
+    naifFormatS += Isis::toString(res1[2]);
+    PvlKeyword naifFormatL("INS" + ui.GetString("IAKCODE").toStdString() + "_ITRANSL");
+    naifFormatL += Isis::toString(res2[0]);
+    naifFormatL += Isis::toString(res2[1]);
+    naifFormatL += Isis::toString(res2[2]);
 
     res += naifFormatX;
     res += naifFormatY;
@@ -183,10 +183,10 @@ void IsisMain() {
     res += naifFormatL;
   }
   else {
-    res += PvlKeyword("EquationX", inEquationX);
-    res += PvlKeyword("EquationY", inEquationY);
-    res += PvlKeyword("EquationS", outEquationS);
-    res += PvlKeyword("EquationL", outEquationL);
+    res += PvlKeyword("EquationX", inEquationX.toStdString());
+    res += PvlKeyword("EquationY", inEquationY.toStdString());
+    res += PvlKeyword("EquationS", outEquationS.toStdString());
+    res += PvlKeyword("EquationL", outEquationL.toStdString());
   }
 
   Application::Log(res);

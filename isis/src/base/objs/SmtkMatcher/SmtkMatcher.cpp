@@ -76,7 +76,7 @@ namespace Isis {
    * @param regdef Gruen definitions Pvl file
    */
   void SmtkMatcher::setGruenDef(const QString &regdef) {
-    Pvl reg(regdef);
+    Pvl reg(regdef.toStdString());
     m_gruen = QSharedPointer<Gruen> (new Gruen(reg));  // Deallocation automatic
     return;
   }
@@ -340,7 +340,7 @@ namespace Isis {
     // Test if the left point is defined. This will throw an error if this
     // situation occurs
     if (!lpg.getPoint().isValid()) {
-      QString mess = "Left point is not defined which is required";
+      std::string mess = "Left point is not defined which is required";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
@@ -520,7 +520,7 @@ namespace Isis {
     if (!m_rhCube) isGood = false;
     if (!m_gruen.data()) isGood = false;
     if ((!isGood) && throwError) {
-      QString mess = "Images/match algorithm not initialized!";
+      std::string mess = "Images/match algorithm not initialized!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
     return (isGood);

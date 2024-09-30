@@ -54,13 +54,13 @@ void IsisMain() {
     Pvl pvlTemplate, pvlResults;
     if (ui.WasEntered("DEFFILE")) {
       bDefFile = true;
-      pvlDefFile = new Pvl(ui.GetFileName("DEFFILE"));
+      pvlDefFile = new Pvl(ui.GetFileName("DEFFILE").toStdString());
 
       // Log the DefFile
       Application::Log(pvlDefFile->group(0));
 
       if (pvlDefFile->group(0).hasKeyword("PixelsFromEdge") && pvlDefFile->group(0).hasKeyword("MetersFromEdge")) {
-        QString message = "DefFile Error : Cannot have both \"PixelsFromEdge\" && \"MetersFromEdge\"" ;
+        std::string message = "DefFile Error : Cannot have both \"PixelsFromEdge\" && \"MetersFromEdge\"" ;
         throw IException(IException::User, message, _FILEINFO_);
       }
 
@@ -74,7 +74,7 @@ void IsisMain() {
       pvlTemplate.validatePvl(*pvlDefFile, pvlResults);
       if (pvlResults.groups() > 0 || pvlResults.keywords() > 0) {
         Application::Log(pvlResults.group(0));
-        QString sErrMsg = "Invalid Deffile\n";
+        std::string sErrMsg = "Invalid Deffile\n";
         throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }
@@ -124,7 +124,7 @@ void IsisMain() {
       if (sType == "NEAREST") {
         dResValue = ui.GetDouble("RESVALUE");
         if (dResValue < 0) {
-          QString message = "Invalid Nearest Resolution Value";
+          std::string message = "Invalid Nearest Resolution Value";
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
@@ -132,7 +132,7 @@ void IsisMain() {
         dMinRes = ui.GetDouble("MINRES");
         dMaxRes = ui.GetDouble("MAXRES");
         if (dMinRes < 0 || dMaxRes < 0 || dMinRes > dMaxRes) {
-          QString message = "Invalid Resolution Range";
+          std::string message = "Invalid Resolution Range";
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
@@ -143,13 +143,13 @@ void IsisMain() {
     // Process Reference by Interest
     else if (sCriteria == "INTEREST") {
       if (!bDefFile) {
-        QString msg = "Interest Option must have a DefFile";
+        std::string msg = "Interest Option must have a DefFile";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       QString sOverlapListFile = "";
       if (ui.WasEntered("LIMIT")) {
         if (ui.GetBoolean("LIMIT")) {
-          sOverlapListFile = FileName(ui.GetFileName("OVERLAPLIST")).expanded();
+          sOverlapListFile = QString::fromStdString(FileName(ui.GetFileName("OVERLAPLIST").toStdString()).expanded());
         }
       }
 
@@ -164,7 +164,7 @@ void IsisMain() {
       if (bLogFile) {
         Pvl pvlLog = interestOp->GetLogPvl();
         pvlLog += opGroup;
-        pvlLog.write(sLogFile);
+        pvlLog.write(sLogFile.toStdString());
       }
       Application::Log(interestOp->GetStdOptions());
       Application::Log(interestOp->GetStatistics());
@@ -182,7 +182,7 @@ void IsisMain() {
     if (cnetValidMeas) {
       Pvl pvlLog = cnetValidMeas->GetLogPvl();
       if (bLogFile) {
-        pvlLog.write(sLogFile);
+        pvlLog.write(sLogFile.toStdString());
       }
       Application::Log(cnetValidMeas->GetStdOptions());
       Application::Log(cnetValidMeas->GetStatistics());
@@ -196,16 +196,16 @@ void IsisMain() {
     throw;
   }
   catch (geos::util::GEOSException *exc) {
-    QString message = "GEOS Exception: " + (QString)exc->what();
+    std::string message = "GEOS Exception: " + (std::string)exc->what();
     delete exc;
     throw IException(IException::User, message, _FILEINFO_);
   }
   catch (std::exception const &se) {
-    QString message = "std::exception: " + (QString)se.what();
+    std::string message = "std::exception: " + (std::string)se.what();
     throw IException(IException::User, message, _FILEINFO_);
   }
   catch (...) {
-    QString message = "Other Error";
+    std::string message = "Other Error";
     throw IException(IException::User, message, _FILEINFO_);
   }
 }
@@ -244,7 +244,7 @@ void ViewDefFile() {
 
   // Get template PVL
   Pvl defFile;
-  defFile.read(ui.GetFileName("DEFFILE"));
+  defFile.read(ui.GetFileName("DEFFILE").toStdString());
 
   // Write deffile file out to the log
   Isis::Application::GuiLog(defFile);

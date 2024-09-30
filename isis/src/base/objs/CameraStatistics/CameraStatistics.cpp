@@ -281,10 +281,10 @@ namespace Isis {
       double value, QString unit="") const {
 
     if(IsSpecial(value)) {
-      return (PvlKeyword(keyname, "NULL"));
+      return (PvlKeyword(keyname.toStdString(), "NULL"));
     }
     else {
-      return (PvlKeyword(keyname, toString(value), unit));
+      return (PvlKeyword(keyname.toStdString(), Isis::toString(value), unit.toStdString()));
     }
   }
 
@@ -367,9 +367,9 @@ namespace Isis {
     // Set up the Pvl groups and get min, max, avg, and sd for each statstics
     // object
     PvlGroup pUser("User Parameters");
-    if (m_filename != "") pUser += PvlKeyword("Filename", m_filename);
-    pUser += PvlKeyword("Linc", toString(m_linc));
-    pUser += PvlKeyword("Sinc", toString(m_sinc));
+    if (m_filename != "") pUser += PvlKeyword("Filename", m_filename.toStdString());
+    pUser += PvlKeyword("Linc", Isis::toString(m_linc));
+    pUser += PvlKeyword("Sinc", Isis::toString(m_sinc));
 
     PvlGroup pLat("Latitude");
     pLat += constructKeyword("LatitudeMinimum", m_latStat->Minimum());

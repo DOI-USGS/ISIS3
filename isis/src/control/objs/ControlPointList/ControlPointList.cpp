@@ -27,7 +27,7 @@ namespace Isis {
       FileList list(psListFile);
       int size = list.size();
       for(int i = 0; i < size; i++) {
-        qList.insert(i, list[i].toString());
+        qList.insert(i, QString::fromStdString(list[i].toString()));
         mbFound.push_back(false);
       }
       mqCpList = QStringList(qList);
@@ -36,7 +36,7 @@ namespace Isis {
       mqCpList.sort();
     }
     catch(IException &e) {
-      QString msg = "Can't open or invalid file list [" +
+      std::string msg = "Can't open or invalid file list [" +
           psListFile.expanded() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
@@ -91,8 +91,8 @@ namespace Isis {
       return (mqCpList.value(piIndex));
     }
     else {
-      QString num = toString(piIndex);
-      QString msg = "Index [" + num + "] is invalid";
+      QString num = QString::number(piIndex);
+      std::string msg = "Index [" + num.toStdString() + "] is invalid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -109,7 +109,7 @@ namespace Isis {
       return mqCpList.indexOf(QString(psCpId));
     }
     else {
-      QString msg = "Requested control point id [" + psCpId + "] ";
+      std::string msg = "Requested control point id [" + psCpId.toStdString() + "] ";
       msg += "does not exist in the list";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -136,9 +136,9 @@ namespace Isis {
       }
     }
 
-    pcPvlLog += Isis::PvlKeyword("TotalPoints", toString(size));
-    pcPvlLog += Isis::PvlKeyword("ValidPoints", toString(size - iNotFound));
-    pcPvlLog += Isis::PvlKeyword("InvalidPoints", toString(iNotFound));
-    pcPvlLog += Isis::PvlKeyword("InvalidPointIds", sPointsNotFound);
+    pcPvlLog += Isis::PvlKeyword("TotalPoints", Isis::toString(size));
+    pcPvlLog += Isis::PvlKeyword("ValidPoints", Isis::toString(size - iNotFound));
+    pcPvlLog += Isis::PvlKeyword("InvalidPoints", Isis::toString(iNotFound));
+    pcPvlLog += Isis::PvlKeyword("InvalidPointIds", sPointsNotFound.toStdString());
   }
 }

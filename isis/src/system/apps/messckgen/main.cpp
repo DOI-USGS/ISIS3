@@ -55,11 +55,11 @@ void IsisMain() {
   // Fetch the pivot file
   FileName pivotFileName;
   if (ui.WasEntered("PIVOT")) {
-    pivotFileName = ui.GetFileName("PIVOT");
+    pivotFileName = ui.GetFileName("PIVOT").toStdString();
   }
   else {
     // If not provided, assume the latest pivot file in the data area
-    QString pivotString("$messenger/kernels/ck/pivot_kernels.????.db");
+    std::string pivotString("$messenger/kernels/ck/pivot_kernels.????.db");
     pivotFileName = FileName(pivotString).highestVersion();
   }
   Pvl pivot(pivotFileName.expanded());
@@ -67,11 +67,11 @@ void IsisMain() {
   // Fetch the atthist file
   FileName atthistFileName;
   if (ui.WasEntered("ATTHIST")) {
-    atthistFileName = ui.GetFileName("ATTHIST");
+    atthistFileName = ui.GetFileName("ATTHIST").toStdString();
   }
   else {
     // If not provided, assume the latest atthist file in the data area
-    QString atthistString("$messenger/kernels/ck/atthist_kernels.????.db");
+    std::string atthistString("$messenger/kernels/ck/atthist_kernels.????.db");
     atthistFileName = FileName(atthistString).highestVersion();
   }
   Pvl atthist(atthistFileName.expanded());
@@ -79,10 +79,10 @@ void IsisMain() {
   // Open the input file from the GUI or find the latest version of the DB file
   FileName dbFileName;
   if (ui.WasEntered("FROM")) {
-    dbFileName = ui.GetFileName("FROM");
+    dbFileName = ui.GetFileName("FROM").toStdString();
   }
   else {
-    QString dbString("$messenger/kernels/ck/kernels.????.db");
+    std::string dbString("$messenger/kernels/ck/kernels.????.db");
     dbFileName = FileName(dbString).highestVersion();
   }
   Pvl kernelDb(dbFileName.expanded());
@@ -118,7 +118,7 @@ void IsisMain() {
       // We're looking for the group with a comment that says MAPPING,
       // signifying the beginning of the section we wish to update
       for (int j = 0; j < ckGroup.comments(); j++) {
-        QString comment = ckGroup.comment(j);
+        QString comment = QString::fromStdString(ckGroup.comment(j));
         if (comment.contains("MAPPING")) {
           foundMapping = true;
           updatePointing(ckGroup, pivotPointing, atthistPointing);
@@ -132,7 +132,7 @@ void IsisMain() {
           for (int k = pivotSelection.keywords() - 1; k >= 0; k--) {
             PvlKeyword &keyword = pivotSelection[k];
             if (keyword.isNamed("Time")) {
-              pivotEndRaw = keyword[1];
+              pivotEndRaw = QString::fromStdString(keyword[1]);
               break;
             }
           }
@@ -143,7 +143,7 @@ void IsisMain() {
           QString pivotEnd = pivotEndRaw;
 
           PvlKeyword &time = ckGroup.findKeyword("Time");
-          QString currentStartRaw = time[0];
+          QString currentStartRaw = QString::fromStdString(time[0]);
           currentStartRaw.remove(QRegExp(" TDB$"));
           QString currentStart = currentStartRaw;
 
@@ -154,7 +154,7 @@ void IsisMain() {
 
           // See if a week has passed from the start time to the pivot end time
           iTime pivotEndTime(pivotEnd);
-          time[1] = newEnd;
+          time[1] = newEnd.toStdString();
 
           PvlGroup *currentGroup = &ckGroup;
 
@@ -181,16 +181,16 @@ void IsisMain() {
               bcFileName += "msgr" + year + month + day + ".bc";
 
               // Check that the current day's BC file exists
-              QString bcExpanded = FileName(bcFileName).expanded();
-              if (!QFile(bcExpanded).exists()) {
-                QString msg = "The BC file [" + bcExpanded + "] does not exist";
+              std::string bcExpanded = FileName(bcFileName.toStdString()).expanded();
+              if (!QFile(QString::fromStdString(bcExpanded)).exists()) {
+                std::string msg = "The BC file [" + bcExpanded + "] does not exist";
                 throw IException(IException::User, msg, _FILEINFO_);
               }
 
               // If the current day's file isn't already present in the group,
               // then go ahead and add it
-              if ((*itr)[0] != bcFileName) {
-                PvlKeyword bcKeyword("File", bcFileName);
+              if ((*itr)[0] != bcFileName.toStdString()) {
+                PvlKeyword bcKeyword("File", bcFileName.toStdString());
                 itr = currentGroup->addKeyword(bcKeyword, itr);
               }
               itr++;
@@ -213,10 +213,10 @@ void IsisMain() {
               weekFromStart += 7 * 24 * 3600;
 
               PvlKeyword &currentTime = currentGroup->findKeyword("Time");
-              currentTime[1] = newEndTime;
+              currentTime[1] = newEndTime.toStdString();
               PvlKeyword latestTime(currentTime);
-              latestTime[0] = newEndTime;
-              latestTime[1] = newEnd;
+              latestTime[0] = newEndTime.toStdString();
+              latestTime[1] = newEnd.toStdString();
 
               PvlGroup *latestGroup = new PvlGroup("Selection");
               latestGroup->addKeyword(latestTime);
@@ -245,7 +245,7 @@ void IsisMain() {
   // the kernels area (as run by makedb)
   FileName outDBfile;
   if (ui.WasEntered("TO")) {
-    outDBfile = ui.GetFileName("TO");
+    outDBfile = ui.GetFileName("TO").toStdString();
   }
   else {
     outDBfile = FileName("$messenger/kernels/ck/kernels.????.db").newVersion();
@@ -300,7 +300,7 @@ PvlGroup* insertGroup(PvlObject &object, PvlGroup &group, int index) {
       PvlGroup &currentGroup = object.group(i);
       bool foundMapping = false;
       for (int j = 0; j < currentGroup.comments(); j++) {
-        QString comment = currentGroup.comment(j);
+        QString comment = QString::fromStdString(currentGroup.comment(j));
         mappingComments.append(comment);
 
         if (comment.contains("MAPPING"))
@@ -326,7 +326,7 @@ PvlGroup* insertGroup(PvlObject &object, PvlGroup &group, int index) {
   // Add all the mapping comments
   PvlGroup &currentGroup = object.group(index);
   for (int i = 0; i < mappingComments.size(); i++)
-    currentGroup.addComment(mappingComments[i]);
+    currentGroup.addComment(mappingComments[i].toStdString());
 
   // Return the location of the new group
   return &currentGroup;

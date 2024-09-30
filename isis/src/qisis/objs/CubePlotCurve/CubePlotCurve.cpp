@@ -286,7 +286,7 @@ namespace Isis {
                  QFileInfo(m_sourceCube.at(m_sourceCube.size()-1)).baseName());
 
         if (band != -1) {
-          setTitle(title().text() + "+" + IString(band).ToQt());
+          setTitle(title().text() + "+" + QString::number(band));
         }
       }
 
@@ -461,7 +461,7 @@ namespace Isis {
       contextMenu.addSeparator();
 
       QString configureIconFile =
-          FileName("$ISISROOT/appdata/images/icons/plot_configure.png").expanded();
+          QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/plot_configure.png").expanded());
       QAction *configureAct = new QAction(QPixmap(configureIconFile),
                                           "Configure...", this);
       contextMenu.addAction(configureAct);

@@ -59,10 +59,10 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     // Get utc start time
-    QString stime = inst["StartTime"];
+    QString stime = QString::fromStdString(inst["StartTime"]);
 
     iTime startTime;
-    startTime.setUtc((QString)inst["StartTime"]);
+    startTime.setUtc(QString::fromStdString(inst["StartTime"]));
     setTime(startTime);
 
     // Setup detector map
@@ -71,17 +71,17 @@ namespace Isis {
     // Setup focal plane map, and detector origin
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    QString ikernKey = "INS" + toString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+    QString ikernKey = "INS" + QString::number((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoresight = getDouble(ikernKey);
-    ikernKey = "INS" + toString((int)naifIkCode()) + "_BORESIGHT_LINE";
+    ikernKey = "INS" + QString::number((int)naifIkCode()) + "_BORESIGHT_LINE";
     double lineBoresight = getDouble(ikernKey);
 
     focalMap->SetDetectorOrigin(sampleBoresight, lineBoresight);
 
     // Setup distortion map which is dependent on encounter, use start time
     // MOON:  1973-11-08T03:16:26.350
-    QString spacecraft = (QString)inst["SpacecraftName"];
-    QString instId = (QString)inst["InstrumentId"];
+    QString spacecraft = QString::fromStdString(inst["SpacecraftName"]);
+    QString instId = QString::fromStdString(inst["InstrumentId"]);
     QString cam;
     if(instId == "M10_VIDICON_A") {
       cam = "a";
@@ -94,13 +94,13 @@ namespace Isis {
       m_instrumentNameShort = "VIDICON B";
     }
     else {
-      QString msg = "File does not appear to be a Mariner10 image. InstrumentId ["
-          + instId + "] is invalid Mariner 10 value.";
+      std::string msg = "File does not appear to be a Mariner10 image. InstrumentId ["
+          + instId.toStdString() + "] is invalid Mariner 10 value.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    QString fname = FileName("$mariner10/reseaus/mar10" + cam
-                             + "MasterReseaus.pvl").expanded();
+    QString fname = QString::fromStdString(FileName("$mariner10/reseaus/mar10" + cam.toStdString()
+                             + "MasterReseaus.pvl").expanded());
 
     try {
       new ReseauDistortionMap(this, lab, fname);

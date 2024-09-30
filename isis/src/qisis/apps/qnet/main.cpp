@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 
     // Add the Qt plugin directory to the library path
     FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
-    QCoreApplication::addLibraryPath(qtpluginpath.expanded());
+    QCoreApplication::addLibraryPath(QString::fromStdString(qtpluginpath.expanded()));
 
 
     QIsisApplication *app = new QIsisApplication(argc,argv);
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     PvlGroup &uiPref = Preference::Preferences().findGroup(
         "UserInterface");
     if (uiPref.hasKeyword("GuiStyle")) {
-      QString style = uiPref["GuiStyle"];
+      QString style = QString::fromStdString(uiPref["GuiStyle"]);
       QApplication::setStyle((QString) style);
     }
 

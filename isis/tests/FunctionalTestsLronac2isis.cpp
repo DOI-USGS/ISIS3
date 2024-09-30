@@ -15,7 +15,7 @@
 using namespace Isis;
 using namespace testing;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/lronac2isis.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/lronac2isis.xml").expanded());
 
 TEST(Lronac2isisTests, Lro2isisNacLFull) {
   QTemporaryDir prefix;
@@ -29,10 +29,10 @@ TEST(Lronac2isisTests, Lro2isisNacLFull) {
     lronac2isis(options);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest LO image: " <<e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest LO image: " <<e.toString().c_str() << std::endl;
   }
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   // Dimensions group
@@ -48,21 +48,21 @@ TEST(Lronac2isisTests, Lro2isisNacLFull) {
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "LUNAR RECONNAISSANCE ORBITER");
-  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "NACL");
-  EXPECT_EQ(inst["TargetName"][0].toStdString(), "MOON");
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2009-11-29T14:51:21.968000");
+  EXPECT_EQ(inst["SpacecraftName"][0], "LUNAR RECONNAISSANCE ORBITER");
+  EXPECT_EQ(inst["InstrumentId"][0], "NACL");
+  EXPECT_EQ(inst["TargetName"][0], "MOON");
+  EXPECT_EQ(inst["StartTime"][0], "2009-11-29T14:51:21.968000");
 
-  EXPECT_EQ(inst["TemperatureSCS"][0].toStdString(), "3.88");
-  EXPECT_EQ(inst["TemperatureFPA"][0].toStdString(), "17.73");
-  EXPECT_EQ(inst["TemperatureFPGA"][0].toStdString(), "-12.94");
-  EXPECT_EQ(inst["TemperatureTelescope"][0].toStdString(), "8.89");
-  EXPECT_EQ(inst["SpatialSumming"][0].toStdString(), "1");
+  EXPECT_EQ(inst["TemperatureSCS"][0], "3.88");
+  EXPECT_EQ(inst["TemperatureFPA"][0], "17.73");
+  EXPECT_EQ(inst["TemperatureFPGA"][0], "-12.94");
+  EXPECT_EQ(inst["TemperatureTelescope"][0], "8.89");
+  EXPECT_EQ(inst["SpatialSumming"][0], "1");
 
-  EXPECT_EQ(inst["TemperatureSCSRaw"][0].toStdString(), "2770");
-  EXPECT_EQ(inst["TemperatureFPARaw"][0].toStdString(), "2115");
-  EXPECT_EQ(inst["TemperatureFPGARaw"][0].toStdString(), "3440");
-  EXPECT_EQ(inst["TemperatureTelescopeRaw"][0].toStdString(), "2536");
+  EXPECT_EQ(inst["TemperatureSCSRaw"][0], "2770");
+  EXPECT_EQ(inst["TemperatureFPARaw"][0], "2115");
+  EXPECT_EQ(inst["TemperatureFPGARaw"][0], "3440");
+  EXPECT_EQ(inst["TemperatureTelescopeRaw"][0], "2536");
 
   // Bandbin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
@@ -95,10 +95,10 @@ TEST(Lronac2isisTests, Lro2isisNacR) {
     lronac2isis(options);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest LO image: " <<e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest LO image: " <<e.toString().c_str() << std::endl;
   }
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   // Dimensions group
@@ -114,21 +114,21 @@ TEST(Lronac2isisTests, Lro2isisNacR) {
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "LUNAR RECONNAISSANCE ORBITER");
-  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "NACR");
-  EXPECT_EQ(inst["TargetName"][0].toStdString(), "MOON");
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2009-11-29T14:51:21.968000");
+  EXPECT_EQ(inst["SpacecraftName"][0], "LUNAR RECONNAISSANCE ORBITER");
+  EXPECT_EQ(inst["InstrumentId"][0], "NACR");
+  EXPECT_EQ(inst["TargetName"][0], "MOON");
+  EXPECT_EQ(inst["StartTime"][0], "2009-11-29T14:51:21.968000");
 
-  EXPECT_EQ(inst["TemperatureSCS"][0].toStdString(), "3.88");
-  EXPECT_EQ(inst["TemperatureFPA"][0].toStdString(), "17.67");
-  EXPECT_EQ(inst["TemperatureFPGA"][0].toStdString(), "-11.38");
-  EXPECT_EQ(inst["TemperatureTelescope"][0].toStdString(), "11.14");
-  EXPECT_EQ(inst["SpatialSumming"][0].toStdString(), "1");
+  EXPECT_EQ(inst["TemperatureSCS"][0], "3.88");
+  EXPECT_EQ(inst["TemperatureFPA"][0], "17.67");
+  EXPECT_EQ(inst["TemperatureFPGA"][0], "-11.38");
+  EXPECT_EQ(inst["TemperatureTelescope"][0], "11.14");
+  EXPECT_EQ(inst["SpatialSumming"][0], "1");
 
-  EXPECT_EQ(inst["TemperatureSCSRaw"][0].toStdString(), "2770");
-  EXPECT_EQ(inst["TemperatureFPARaw"][0].toStdString(), "2118");
-  EXPECT_EQ(inst["TemperatureFPGARaw"][0].toStdString(), "3388");
-  EXPECT_EQ(inst["TemperatureTelescopeRaw"][0].toStdString(), "2429");
+  EXPECT_EQ(inst["TemperatureSCSRaw"][0], "2770");
+  EXPECT_EQ(inst["TemperatureFPARaw"][0], "2118");
+  EXPECT_EQ(inst["TemperatureFPGARaw"][0], "3388");
+  EXPECT_EQ(inst["TemperatureTelescopeRaw"][0], "2429");
 
   // Bandbin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
@@ -157,7 +157,7 @@ TEST(Lronac2isisTests, Lro2isisLabelFail) {
   Pvl lab("data/lronac/nacr.img");
   PvlKeyword &bterm = lab.findKeyword("LRO:BTERM");
   bterm.setValue("fake");
-  lab.write(badLabelPath);
+  lab.write(badLabelPath.toStdString());
 
   QString cubeFileName = prefix.path() + "/doesntMatter.cub";
   QVector<QString> args = {"from="+badLabelPath, "to="+cubeFileName};

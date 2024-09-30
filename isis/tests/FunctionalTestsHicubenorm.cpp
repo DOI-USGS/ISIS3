@@ -11,7 +11,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/hicubenorm.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/hicubenorm.xml").expanded());
 
 TEST_F(MroHiriseCube, FunctionalTestHicubenormSubtract) {
   QTemporaryDir prefix;
@@ -52,7 +52,7 @@ TEST_F(MroHiriseCube, FunctionalTestHicubenormSubtract) {
   ASSERT_DOUBLE_EQ((double)res[9630], 1204);
   ASSERT_DOUBLE_EQ((double)res[9631], 1204);
 
-  Cube oCube(outCubeFileName, "r");
+  Cube oCube(outCubeFileName.toStdString(), "r");
 
   Histogram *oCubeStats = oCube.histogram();
 
@@ -80,7 +80,7 @@ TEST_F(MroHiriseCube, FunctionalTestHicubenormDivide) {
     FAIL() << "Unable to process HRISE image: " << e.what() << std::endl;
   }
 
-  Cube oCube(outCubeFileName, "r");
+  Cube oCube(outCubeFileName.toStdString(), "r");
 
   Histogram *oCubeStats = oCube.histogram();
 
@@ -107,7 +107,7 @@ TEST_F(MroHiriseCube, FunctionalTestHicubenormAverage) {
     FAIL() << "Unable to process HRISE image: " << e.what() << std::endl;
   }
 
-  Cube oCube(outCubeFileName, "r");
+  Cube oCube(outCubeFileName.toStdString(), "r");
 
   Histogram *oCubeStats = oCube.histogram();
 
@@ -130,10 +130,10 @@ TEST_F(MroHiriseCube, FunctionalTestHicubenormNewVersion) {
   PvlGroup stats("Results");
   for(int i = 1; i <= 1204; i++) {
     stats += PvlKeyword("Band", "1");
-    stats += PvlKeyword("RowCol", QString::number(i));
-    stats += PvlKeyword("ValidPixels", QString::number(1056));
-    stats += PvlKeyword("Mean", QString::number(i));
-    stats += PvlKeyword("Median", QString::number(i/2));
+    stats += PvlKeyword("RowCol", Isis::toString(i));
+    stats += PvlKeyword("ValidPixels", Isis::toString(1056));
+    stats += PvlKeyword("Mean", Isis::toString(i));
+    stats += PvlKeyword("Median", Isis::toString(i/2));
     // the rest shouldn't matter
     stats += PvlKeyword("Std", "0.0");
     stats += PvlKeyword("Minimum", "0.0");
@@ -142,7 +142,7 @@ TEST_F(MroHiriseCube, FunctionalTestHicubenormNewVersion) {
 
   Pvl table;
   table.addGroup(stats);
-  table.write(tablePath);
+  table.write(tablePath.toStdString());
 
   QVector<QString> args = {"to="+outCubeFileName, "mode=subtract", "fromstats="+tablePath, "statsource=pvl", "normalizer=average", "new_version=yes"};
 
@@ -154,7 +154,7 @@ TEST_F(MroHiriseCube, FunctionalTestHicubenormNewVersion) {
     FAIL() << "Unable to process HRISE image: " << e.what() << std::endl;
   }
 
-  Cube oCube(outCubeFileName, "r");
+  Cube oCube(outCubeFileName.toStdString(), "r");
 
   Histogram *oCubeStats = oCube.histogram();
 
@@ -193,7 +193,7 @@ TEST_F(MroHiriseCube, FunctionalTestHicubenormPreserve) {
     FAIL() << "Unable to process HRISE image: " << e.what() << std::endl;
   }
 
-  Cube oCube(outCubeFileName, "r");
+  Cube oCube(outCubeFileName.toStdString(), "r");
 
   Histogram *oCubeStats = oCube.histogram();
 

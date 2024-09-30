@@ -88,8 +88,8 @@ namespace Isis {
     // CSMState BLOB
     Blob csmStateBlob("CSMState", "String");
     csmStateBlob.setData(mockModelName.c_str(), mockModelName.size());
-    csmStateBlob.Label() += PvlKeyword("ModelName", QString::fromStdString(mockModelName));
-    csmStateBlob.Label() += PvlKeyword("PluginName", QString::fromStdString(loadablePlugin.getPluginName()));
+    csmStateBlob.Label() += PvlKeyword("ModelName", mockModelName);
+    csmStateBlob.Label() += PvlKeyword("PluginName", loadablePlugin.getPluginName());
     testCube->write(csmStateBlob);
     filename = testCube->fileName();
     testCube->close();
@@ -160,7 +160,7 @@ namespace Isis {
   }
 
   void CSMNetwork::SetUp(){
-    QString APP_XML = FileName("$ISISROOT/bin/xml/csminit.xml").expanded();
+    QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/csminit.xml").expanded());
     QVector<QString> fNames = {"/Test_A", "/Test_B",
                                "/Test_C", "/Test_D",
                                "/Test_E", "/Test_F",
@@ -176,10 +176,10 @@ namespace Isis {
     for (int i = 0; i < cubes.size() ; i++){
       cubes[i] = new Cube();
       cubes[i]->setDimensions(1024,1024,1);
-      FileName cubName = FileName(tempDir.path()+fNames[i]+".cub");
-      cubes[i]->create(cubName.expanded());
-      cubeList->append(cubes[i]->fileName());
-      QVector<QString> args = {"from="+cubName.expanded(),
+      FileName cubName = FileName(tempDir.path().toStdString()+fNames[i].toStdString()+".cub");
+      cubes[i]->create(QString::fromStdString(cubName.expanded()));
+      cubeList->append(cubes[i]->fileName().toStdString());
+      QVector<QString> args = {"from="+QString::fromStdString(cubName.expanded()),
                                "state=data/CSMNetwork/"+fNames[i]+".json",
                                "modelname=TestCsmModel",
                                "pluginname=TestCsmPlugin"
@@ -187,7 +187,7 @@ namespace Isis {
       UserInterface ui(APP_XML, args);
       csminit(ui);
     }
-    cubeList->write(cubeListFile);
+    cubeList->write(cubeListFile.toStdString());
   }
 
   void CSMNetwork::TearDown() {

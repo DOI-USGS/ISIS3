@@ -121,7 +121,7 @@ bool SpiceKernel::validate() const {
                     "images that overlap another.  Images with time overlap "
                     "conflicts are:   \n"
                     + errors.join("; ");
-     throw IException(IException::User, mess, _FILEINFO_);
+     throw IException(IException::User, mess.toStdString(), _FILEINFO_);
   }
 
   return (true);
@@ -158,14 +158,14 @@ bool SpiceKernel::validate() const {
          NaifStatus::CheckErrors();
        } catch ( IException &ie ) {
          ostringstream mess;
-         mess << "Failed to write segment, ID = " << seglist[i]->Id();
+         mess << "Failed to write segment, ID = " << seglist[i]->Id().toStdString();
          throw IException(ie, IException::Programmer, mess.str(), _FILEINFO_);
        }
      }
    }
    catch ( IException &ie ) {
      ostringstream mess;
-     mess << "Could not create output CK kernel file: " << kname;
+     mess << "Could not create output CK kernel file: " << kname.toStdString();
      throw IException(ie, IException::User, mess.str(), _FILEINFO_);
    }
    return;
@@ -183,8 +183,8 @@ bool SpiceKernel::validate() const {
    comment << "\
 ****************************************************************************\n\
   USGS ISIS (ckwriter) Generated CK Kernel\n\
-  Created By:   " << Application::UserName() << "\n\
-  Date Created: " << Application::DateTime() << "\n\
+  Created By:   " << Application::UserName().toStdString() << "\n\
+  Date Created: " << Application::DateTime().toStdString() << "\n\
 ****************************************************************************\n\
 \n\
 Orientation Data in the File\n\
@@ -257,7 +257,7 @@ User Comments\n\
      TextFile txt(comFile);
      QString cline;
      while ( txt.GetLineNoFilter(cline )) {
-       comment << cline << "\n";
+       comment << cline.toStdString() << "\n";
      }
    }
    else {

@@ -23,15 +23,15 @@ int main(int argc, char *argv[]) {
   Pvl lab;
   lab.addGroup(PvlGroup("Mapping"));
   PvlGroup &mapGroup = lab.findGroup("Mapping");
-  mapGroup += PvlKeyword("EquatorialRadius", toString(1.0));
-  mapGroup += PvlKeyword("PolarRadius", toString(1.0));
+  mapGroup += PvlKeyword("EquatorialRadius", Isis::toString(1.0));
+  mapGroup += PvlKeyword("PolarRadius", Isis::toString(1.0));
   mapGroup += PvlKeyword("LatitudeType", "Planetocentric");
   mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
-  mapGroup += PvlKeyword("LongitudeDomain", toString(180));
-  mapGroup += PvlKeyword("MinimumLatitude", toString(-90.0));
-  mapGroup += PvlKeyword("MaximumLatitude", toString(90.0));
-  mapGroup += PvlKeyword("MinimumLongitude", toString(-180.0));
-  mapGroup += PvlKeyword("MaximumLongitude", toString(180.0));
+  mapGroup += PvlKeyword("LongitudeDomain", Isis::toString(180));
+  mapGroup += PvlKeyword("MinimumLatitude", Isis::toString(-90.0));
+  mapGroup += PvlKeyword("MaximumLatitude", Isis::toString(90.0));
+  mapGroup += PvlKeyword("MinimumLongitude", Isis::toString(-180.0));
+  mapGroup += PvlKeyword("MaximumLongitude", Isis::toString(180.0));
   mapGroup += PvlKeyword("ProjectionName", "Equirectangular");
 
   cout << "Test missing center longitude keyword ..." << endl;
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  mapGroup += PvlKeyword("CenterLongitude", toString(-90.0));
+  mapGroup += PvlKeyword("CenterLongitude", Isis::toString(-90.0));
 
   cout << "Test missing center latitude keyword ..." << endl;
   try {
@@ -54,16 +54,16 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  mapGroup += PvlKeyword("CenterLatitude", toString(0.0));
+  mapGroup += PvlKeyword("CenterLatitude", Isis::toString(0.0));
 
   Projection &proj = *ProjectionFactory::Create(lab);
   TProjection *p = (TProjection *) &proj;
-  cout << "Projection Name:        " << p->Name() << endl;
-  cout << "Version:                " << p->Version() << endl;
+  cout << "Projection Name:        " << p->Name().toStdString() << endl;
+  cout << "Version:                " << p->Version().toStdString() << endl;
   cout << "Equatorial Cylindrical? " << p->IsEquatorialCylindrical() << endl;
   cout << endl;
-  cout << "Projection Name:        " << p->Name() << endl;
-  cout << "Version:                " << p->Version() << endl;
+  cout << "Projection Name:        " << p->Name().toStdString() << endl;
+  cout << "Version:                " << p->Version().toStdString() << endl;
   cout << "Equatorial Cylindrical? " << p->IsEquatorialCylindrical() << endl;
   cout << endl;
 
@@ -102,15 +102,15 @@ int main(int argc, char *argv[]) {
 
   Projection *s = &proj;
   cout << "Test Name and comparision methods ... " << endl;
-  cout << "Name:       " << s->Name() << endl;
+  cout << "Name:       " << s->Name().toStdString() << endl;
   cout << "operator==  " << (*s == *s) << endl;
   cout << endl;
 
   cout << "Testing allow defaults option ... " << endl;
   mapGroup.deleteKeyword("CenterLongitude");
   mapGroup.deleteKeyword("CenterLatitude");
-  mapGroup.findKeyword("MinimumLatitude").setValue(toString(0.0));
-  mapGroup.findKeyword("MinimumLongitude").setValue(toString(0.0));
+  mapGroup.findKeyword("MinimumLatitude").setValue(Isis::toString(0.0));
+  mapGroup.findKeyword("MinimumLongitude").setValue(Isis::toString(0.0));
   mapGroup.findKeyword("LongitudeDirection").setValue("PositiveWest");
   Equirectangular p2(lab, true);
   cout << lab << endl;
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   std::cout << "Check Invalid Latitude" << std::endl;
-  mapGroup.addKeyword(PvlKeyword("CenterLatitude", toString(90.0)), Pvl::Replace);
+  mapGroup.addKeyword(PvlKeyword("CenterLatitude", Isis::toString(90.0)), Pvl::Replace);
   std::cout << mapGroup << std::endl;
   try {
     Equirectangular p2(lab);

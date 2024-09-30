@@ -60,7 +60,7 @@ namespace Isis {
 
   void autoseed(UserInterface &ui, SerialNumberList &serialNumbers, ControlNet *precnet, Pvl *log) {
     // Get the AutoSeed PVL internalized
-    Pvl seedDef(ui.GetFileName("DEFFILE"));
+    Pvl seedDef(ui.GetFileName("DEFFILE").toStdString());
 
     PolygonSeeder *seeder = PolygonSeederFactory::Create(seedDef);
     Pvl invalidInput = seeder->InvalidInput();
@@ -137,7 +137,7 @@ namespace Isis {
     // Get seed domain for unit conversion, no keyword == XY
     SeedDomain seedDomain = XY;
     if (seedDef.hasKeyword("SeedDomain", Pvl::Traverse)) {
-      IString domain = (QString) seedDef.findKeyword("SeedDomain", Pvl::Traverse);
+      IString domain = (std::string)seedDef.findKeyword("SeedDomain", Pvl::Traverse);
       if (unusedDefKeywords.hasKeyword("SeedDomain"))
         unusedDefKeywords.deleteKeyword("SeedDomain");
 
@@ -153,7 +153,7 @@ namespace Isis {
 
     // Grab the labels from the first filename in the SerialNumberList to get
     // some info
-    Pvl cubeLab(serialNumbers.fileName(0));
+    Pvl cubeLab(serialNumbers.fileName(0).toStdString());
 
     // Construct a Projection for converting between Lon/Lat and X/Y
     // This is used inside the seeding algorithms.
@@ -207,7 +207,7 @@ namespace Isis {
     map<QString, UniversalGroundMap *> gMaps;
     for (int sn = 0; sn < serialNumbers.size(); ++sn) {
       // Create the UGM for the cube associated with this SN
-      Cube cube(serialNumbers.fileName(sn), "r");
+      Cube cube(serialNumbers.fileName(sn).toStdString(), "r");
       gMaps.insert(std::pair<QString, UniversalGroundMap *>
                    (serialNumbers.serialNumber(sn), new UniversalGroundMap(cube)));
     }
@@ -231,7 +231,7 @@ namespace Isis {
         ControlPoint *cp = precnet->GetPoint(i);
         ControlMeasure *cm = cp->GetRefMeasure();
         QString c = serialNumbers.fileName(cm->GetCubeSerialNumber());
-        Cube cube(c);
+        Cube cube(c.toStdString());
         Camera *cam = CameraFactory::Create(cube);
         cam->SetImage(cm->GetSample(), cm->GetLine());
 
@@ -313,7 +313,7 @@ namespace Isis {
             else {
               errors << ", ";
             }
-            errors << (*overlaps[ov])[serNum];
+            errors << (*overlaps[ov])[serNum].toStdString();
           }
         }
 
@@ -371,8 +371,8 @@ namespace Isis {
           UniversalGroundMap *gmap = gMaps[(*overlaps[ov])[sn]];
 
           if (!gmap) {
-            QString msg = "Unable to create a Universal Ground for Serial Number [";
-            msg += (*overlaps[ov])[sn] + "] The associated image is more than ";
+            std::string msg = "Unable to create a Universal Ground for Serial Number [";
+            msg += (*overlaps[ov])[sn].toStdString() + "] The associated image is more than ";
             msg += "likely missing from your FROMLIST.";
             throw IException(IException::User, msg, _FILEINFO_);
           }
@@ -474,7 +474,7 @@ namespace Isis {
 
     // Make sure the control network is not empty
     if (cnet.GetNumPoints() == 0) {
-      QString msg = "The ouput control network is empty. This is likely due";
+      std::string msg = "The ouput control network is empty. This is likely due";
       msg += " to the input cubes failing to overlap.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -484,19 +484,15 @@ namespace Isis {
 
     // create SeedDef group and add to print.prt
     PvlGroup pluginInfo = seeder->PluginParameters("SeedDefinition");
-    pluginInfo.addKeyword(PvlKeyword("MaxIncidence", toString(maxIncidence)));
-    pluginInfo.addKeyword(PvlKeyword("MaxEmission", toString(maxEmission)));
-    if (log) {
-      log->addLogGroup(pluginInfo);
-    }
+    pluginInfo.addKeyword(PvlKeyword("MaxIncidence", Isis::toString(maxIncidence)));
+    pluginInfo.addKeyword(PvlKeyword("MaxEmission", Isis::toString(maxEmission)));
+    Application::Log(pluginInfo);
 
     // inform user of any unused (invalid) keywords found in the def file
     if (unusedDefKeywords.keywords() != 0) {
       PvlGroup unusedKeywords(unusedDefKeywords);
       unusedKeywords.setName("InvalidKeyordsFoundInDefFile");
-      if (log) {
-        log->addLogGroup(unusedKeywords);
-      }
+      Application::Log(unusedKeywords);
     }
 
     // calc # of points and measures for results group in print.prt
@@ -507,19 +503,17 @@ namespace Isis {
     }
 
     // create Results group and add to print.prt
-    PvlKeyword cpCountKeyword("ControlPointCount", toString(cpCount));
-    PvlKeyword msCountKeyword("ControlMeasureCount", toString(msCount));
-    PvlKeyword cpIgnoredCountKeyword("ControlPointsIgnored", toString(cpIgnoredCount));
-    PvlKeyword cmIgnoredCountKeyword("ControlMeasuresIgnored", toString(cmIgnoredCount));
+    PvlKeyword cpCountKeyword("ControlPointCount", Isis::toString(cpCount));
+    PvlKeyword msCountKeyword("ControlMeasureCount", Isis::toString(msCount));
+    PvlKeyword cpIgnoredCountKeyword("ControlPointsIgnored", Isis::toString(cpIgnoredCount));
+    PvlKeyword cmIgnoredCountKeyword("ControlMeasuresIgnored", Isis::toString(cmIgnoredCount));
 
     PvlGroup resultsGrp("Results");
     resultsGrp.addKeyword(cpCountKeyword);
     resultsGrp.addKeyword(msCountKeyword);
     resultsGrp.addKeyword(cpIgnoredCountKeyword);
     resultsGrp.addKeyword(cmIgnoredCountKeyword);
-    if (log) {
-      log->addLogGroup(resultsGrp);
-    }
+    Application::Log(resultsGrp);
 
     if (seedDomain == XY) {
       delete proj;

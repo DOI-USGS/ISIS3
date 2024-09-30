@@ -50,9 +50,9 @@ namespace Isis {
 
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-    QString expDuration = inst["ExposureDuration"];
+    QString expDuration = QString::fromStdString(inst["ExposureDuration"]);
 
-    QString stime = inst["SpacecraftClockStartCount"];
+    QString stime = QString::fromStdString(inst["SpacecraftClockStartCount"]);
     double m_etStart = getClockTime(stime).Et();
 
     // The line rate is set to the time between each frame since we are treating LEASA as a linescan
@@ -91,7 +91,7 @@ namespace Isis {
     PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
     PvlKeyword &orgBand = bandBin["OriginalBand"];
     for (int i = 0; i < orgBand.size(); i++) {
-      m_originalBand.append(toInt(orgBand[i]));
+      m_originalBand.append(Isis::toInt(orgBand[i]));
     }
 
     // Use the defualt no correction distortion map.
@@ -121,7 +121,7 @@ namespace Isis {
      QString msg = QObject::tr("Band number out of array bounds in NewHorizonsLeisaCamera::SetBand "
                                "legal bands are [1-%1], input was [%2]").
                                arg(m_originalBand.size()).arg(vband);
-      throw IException(IException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Programmer, msg.toStdString(), _FILEINFO_);
     }
     int band;
     band = m_originalBand[vband-1];

@@ -18,52 +18,52 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   if(!ui.GetBoolean("INGESTION") && !ui.GetBoolean("MAPPING")) {
-    QString msg = "You must pick one of [INGESTION,MAPPING]";
+    std::string msg = "You must pick one of [INGESTION,MAPPING]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(ui.WasEntered("PCK")) {
-    FileName pckPreference = ui.GetFileName("PCK");
+    FileName pckPreference = ui.GetFileName("PCK").toStdString();
     if(!pckPreference.fileExists()){
-      QString msg = "Please provide a valid PCK preference file.";
+      std::string msg = "Please provide a valid PCK preference file.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
   if(ui.WasEntered("CK")) {
-    FileName ckPreference = ui.GetFileName("CK");
+    FileName ckPreference = ui.GetFileName("CK").toStdString();
     if(!ckPreference.fileExists()){
-      QString msg = "Please provide a valid CK preference file.";
+      std::string msg = "Please provide a valid CK preference file.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
   if(ui.WasEntered("SPK")) {
-    FileName spkPreference = ui.GetFileName("SPK");
+    FileName spkPreference = ui.GetFileName("SPK").toStdString();
     if(!spkPreference.fileExists()){
-      QString msg = "Please provide a valid SPK preference file.";
+      std::string msg = "Please provide a valid SPK preference file.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   if(ui.WasEntered("MAP")) {
-    FileName mapPreference = ui.GetFileName("MAP");
+    FileName mapPreference = ui.GetFileName("MAP").toStdString();
     if(!mapPreference.fileExists()){
-      QString msg = "Please provide a valid MAP preference file.";
+      std::string msg = "Please provide a valid MAP preference file.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   if(ui.WasEntered("MODEL")) {
-    FileName modelPreference = ui.GetCubeName("MODEL");
+    FileName modelPreference = ui.GetCubeName("MODEL").toStdString();
     if(!modelPreference.fileExists()){
-      QString msg = "Please provide a valid MODEL preference file.";
+      std::string msg = "Please provide a valid MODEL preference file.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   if(ui.GetBoolean("INGESTION")) {
-    Pvl labels(ui.GetFileName("FROM"));
+    Pvl labels(ui.GetFileName("FROM").toStdString());
 
-    if((QString)labels["DETECTOR_ID"][0] == "VIS") {
-      if(((QString)labels["DATA_SET_ID"]).contains("RDR")) {
+    if(QString::fromStdString(labels["DETECTOR_ID"][0]) == "VIS") {
+      if((QString::fromStdString(labels["DATA_SET_ID"])).contains("RDR")) {
         ProcessVis(true);
       }
       else {

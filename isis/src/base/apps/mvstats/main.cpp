@@ -24,7 +24,7 @@ void IsisMain() {
   //Check to see if an output file was specified
   UserInterface &ui = Application::GetUserInterface();
   if(!ui.WasEntered("CUBE") && !ui.WasEntered("FLATFILE")) {
-    QString message = "At least one output file must be entered";
+    std::string message = "At least one output file must be entered";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
@@ -37,7 +37,7 @@ void IsisMain() {
 
   //Check to see if the input cube has enough bands
   if(bands < 2) {
-    QString message = "Input band must have at least two bands!";
+    std::string message = "Input band must have at least two bands!";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
@@ -55,17 +55,17 @@ void IsisMain() {
     for(int j = i ; j <= bands ; j++) {
       //Reset Stat accumulators and set the Progress Display Text
       stats.Reset();
-      QString progText = "Band " + toString(i) +
+      QString progText = "Band " + QString::number(i) +
                         " vs. " +
-                        "Band " +  toString(j);
+                        "Band " +  QString::number(j);
 
       //Cube will be processed by line
       ProcessByLine p;
 
       //Set CubeAttributeInputs to tell the ProcessByLine which
       //bands to compare
-      CubeAttributeInput band_a("d+" + toString(icube->physicalBand(i)));
-      CubeAttributeInput band_b("d+" + toString(icube->physicalBand(j)));
+      CubeAttributeInput band_a("d+" + Isis::toString(icube->physicalBand(i)));
+      CubeAttributeInput band_b("d+" + Isis::toString(icube->physicalBand(j)));
 
       //Set Input files and process, to accumulate the statistics
       p.SetInputCube(file, band_a);
@@ -137,18 +137,18 @@ void WriteText(int size, QString filename) {
   outputFile << "Correlation:" << endl << endl;
   for(int i = 0; i < size; ++i) {
     for(int j = 0; j < size; ++j) {
-      line += " " + toString(correlation[i][j]) + " ";
+      line += " " + QString::number(correlation[i][j]) + " ";
     }
-    outputFile << line << endl;
+    outputFile << line.toStdString() << endl;
     line = " ";
   }
 
   outputFile << endl << endl << "Covariance:" << endl << endl;
   for(int i = 0; i < size; ++i) {
     for(int j = 0; j < size; ++j) {
-      line += " " + toString(covariance[i][j]) + " ";
+      line += " " + QString::number(covariance[i][j]) + " ";
     }
-    outputFile << line << endl;
+    outputFile << line.toStdString() << endl;
     line = " ";
   }
   outputFile.close();

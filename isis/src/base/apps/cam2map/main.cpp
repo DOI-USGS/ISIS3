@@ -44,7 +44,7 @@ void printMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
@@ -57,7 +57,7 @@ void loadMapRes() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Set resolution
@@ -74,7 +74,7 @@ void loadMapRes() {
     ui.PutAsString("PIXRES", "MPP");
   }
   else {
-    QString msg = "No resolution value found in [" + ui.GetFileName("MAP") + "]";
+    std::string msg = "No resolution value found in [" + ui.GetFileName("MAP").toStdString() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }
@@ -105,7 +105,7 @@ void loadMapRange() {
 
   // Get map file
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Set ground range keywords that are found in mapfile
@@ -136,8 +136,8 @@ void loadMapRange() {
   ui.PutAsString("DEFAULTRANGE", "MAP");
 
   if (count < 4) {
-    QString msg = "One or more of the values for the ground range was not found";
-    msg += " in [" + ui.GetFileName("MAP") + "]";
+    std::string msg = "One or more of the values for the ground range was not found";
+    msg += " in [" + ui.GetFileName("MAP").toStdString() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }
@@ -149,7 +149,7 @@ void loadCameraRange() {
 
   // Get the map projection file provided by the user
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;

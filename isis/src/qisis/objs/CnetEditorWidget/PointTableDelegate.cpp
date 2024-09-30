@@ -95,8 +95,8 @@ namespace Isis {
         return new QLineEdit();
     }
 
-    QString msg = "Could not create delegate widget for column ["
-        + col->getTitle() + "]";
+    std::string msg = "Could not create delegate widget for column ["
+        + col->getTitle().toStdString() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 

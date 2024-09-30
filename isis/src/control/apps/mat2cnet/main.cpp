@@ -45,16 +45,16 @@ void IsisMain() {
   Progress progress;
 
   // Prepare the ISIS2 list of file names
-  FileList list2(ui.GetFileName("LIST2"));
+  FileList list2(ui.GetFileName("LIST2").toStdString());
 
   // Prepare the ISIS SNs, pass the progress object to SerialNumberList
   SerialNumberList snl(ui.GetFileName("LIST3"), true, &progress);
   progress.CheckStatus();
 
   if (list2.size() != snl.size()) {
-    QString msg = "Invalid input file number of lines. The ISIS2 file list [";
-    msg += ui.GetAsString("LIST2") + "] must contain the same number of lines ";
-    msg += "as the ISIS file list [" + ui.GetAsString("LIST3") + "]";
+    std::string msg = "Invalid input file number of lines. The ISIS2 file list [";
+    msg += ui.GetAsString("LIST2").toStdString() + "] must contain the same number of lines ";
+    msg += "as the ISIS file list [" + ui.GetAsString("LIST3").toStdString() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -69,7 +69,7 @@ void IsisMain() {
   //   Jeannie Backer 2011-06-30
   for (int f = 0; f < list2.size(); f++) {
     progress.CheckStatus();
-    QString currFile(list2[f].toString());
+    std::string currFile(list2[f].toString());
     Pvl lab(currFile);
     PvlObject qube(lab.findObject("QUBE"));
 
@@ -113,12 +113,12 @@ void IsisMain() {
   currLine.remove(0, currLine.indexOf("="));
   currLine.remove(0, currLine.indexOf(" "));
   try {
-    inTotalMeas = toInt(currLine);
+    inTotalMeas = currLine.toInt();
   }
   catch (IException &e) {
     throw IException(e,
                        IException::User, "Invalid match point file "
-                       "header for [" + ui.GetAsString("MATCH")
+                       "header for [" + ui.GetAsString("MATCH").toStdString()
                        + "]. First line does not contain number of "
                        "measurements.",
                      _FILEINFO_);
@@ -133,10 +133,10 @@ void IsisMain() {
     // this line should contain only text labels,
     double error = 0;
     try {
-      error = toDouble(label);
+      error = (label).toDouble();
       // if we are able to convert label to a double, we have an error
       throw IException(IException::User, "Invalid match point file "
-                         "header for [" + ui.GetAsString("MATCH")
+                         "header for [" + ui.GetAsString("MATCH").toStdString()
                          + "]. Second line does not contain proper "
                          "non-numerical column labels.",
                        _FILEINFO_);
@@ -166,9 +166,9 @@ void IsisMain() {
       progress.CheckStatus();
     }
     catch (IException &e) {
-      QString msg = "\"Matchpoint total\" keyword at the top of the match point "
+      std::string msg = "\"Matchpoint total\" keyword at the top of the match point "
                    "file [";
-      msg += ui.GetAsString("MATCH") + "] equals [" + toString(inTotalMeas);
+      msg += ui.GetAsString("MATCH").toStdString() + "] equals [" + toString(inTotalMeas);
       msg += "] and is likely incorrect. Number of measures in match point file"
              " exceeds this value at line [";
       msg += toString(line) + "].";
@@ -194,27 +194,27 @@ void IsisMain() {
 
       pid = tokens.takeFirst();                // ID of the point
       fsc = tokens.takeFirst();                // FSC of the ISIS2 cube
-      lineNum = toDouble(tokens.takeFirst());  // line number
-      sampNum = toDouble(tokens.takeFirst());  // sample number
+      lineNum = (tokens.takeFirst()).toDouble();  // line number
+      sampNum = (tokens.takeFirst()).toDouble();  // sample number
       matClass = tokens.takeFirst();           // Match Point Class
-      diam = toDouble(tokens.takeFirst());     // Diameter, in case of a crater
+      diam = (tokens.takeFirst()).toDouble();     // Diameter, in case of a crater
     }
     catch (IException &e) {
-      QString msg = "Invalid value(s) in match point file [";
-      msg += ui.GetAsString("MATCH") + "] at line [" + toString(line);
+      std::string msg = "Invalid value(s) in match point file [";
+      msg += ui.GetAsString("MATCH").toStdString() + "] at line [" + toString(line);
       msg += "]. Verify line, sample, diameter values are doubles.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
     // Set the coordinate and serial number for this measure
     cmeasure->SetCoordinate(sampNum, lineNum);
-    cmeasure->SetCubeSerialNumber(snMap[toInt(fsc)]);
+    cmeasure->SetCubeSerialNumber(snMap[fsc.toInt()]);
 
-    if (snMap[toInt(fsc)].isEmpty()) {
-      QString msg = "None of the images specified in the ISIS2 file list [";
-      msg += ui.GetAsString("LIST2");
-      msg += "] have an IMAGE_NUMBER or IMAGE_ID that matches the FSC [" + fsc;
-      msg += "], from the match point file [" + ui.GetAsString("MATCH");
+    if (snMap[fsc.toInt()].isEmpty()) {
+      std::string msg = "None of the images specified in the ISIS2 file list [";
+      msg += ui.GetAsString("LIST2").toStdString();
+      msg += "] have an IMAGE_NUMBER or IMAGE_ID that matches the FSC [" + fsc.toStdString();
+      msg += "], from the match point file [" + ui.GetAsString("MATCH").toStdString();
       msg += "] at line [" + toString(line) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -242,8 +242,8 @@ void IsisMain() {
       cmeasure->SetType(ControlMeasure::Candidate);
     }
     else {
-      QString msg = "Unknown measurment type [" + matClass + "] ";
-      msg += "in match point file [" + ui.GetAsString("MATCH") + "] ";
+      std::string msg = "Unknown measurment type [" + matClass.toStdString() + "] ";
+      msg += "in match point file [" + ui.GetAsString("MATCH").toStdString() + "] ";
       msg += "at line [" + toString(line) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -281,8 +281,8 @@ void IsisMain() {
       }
     }
     catch (IException &e) {
-      QString msg = "Invalid match point file [" + ui.GetAsString("MATCH") +"]";
-      msg += ".  Repeated PointID/FSC combination [" + pid + ", " + fsc;
+      std::string msg = "Invalid match point file [" + ui.GetAsString("MATCH").toStdString() +"]";
+      msg += ".  Repeated PointID/FSC combination [" + pid.toStdString() + ", " + fsc.toStdString();
       msg += "] in match point file at line [" + toString(line) + "].";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
@@ -293,9 +293,9 @@ void IsisMain() {
     progress.CheckStatus();
   }
   catch (IException &e) {
-    QString msg = "\"Matchpoint total\" keyword at the top of the match point "
+    std::string msg = "\"Matchpoint total\" keyword at the top of the match point "
                  "file [";
-    msg += ui.GetAsString("MATCH") + "] equals [" + toString(inTotalMeas);
+    msg += ui.GetAsString("MATCH").toStdString() + "] equals [" + toString(inTotalMeas);
     msg += "] and is likely incorrect. Number of measures in match point file "
            "exceeds this value at line [";
     msg += toString(line) + "].";
@@ -326,9 +326,9 @@ void IsisMain() {
         progress.CheckStatus();
       }
       catch (IException &e) {
-        QString msg = "RAND PPP file may not be valid. Line count calculated [";
+        std::string msg = "RAND PPP file may not be valid. Line count calculated [";
         msg += toString(inTotalLine) + "] for RAND PPP file [";
-        msg += ui.GetAsString("PPP") + "] appears invalid at line [";
+        msg += ui.GetAsString("PPP").toStdString() + "] appears invalid at line [";
         msg += toString(line) + "].";
         throw IException(e, IException::Programmer, msg, _FILEINFO_);
       }
@@ -359,11 +359,11 @@ void IsisMain() {
       //col1.TrimHead(" ");
       try {
         // convert to double
-        lat = toDouble(col1);
+        lat = (col1).toDouble();
       }
       catch (IException &e) {
-        QString msg = "Invalid value(s) in RAND PPP file [";
-        msg += ui.GetAsString("PPP") + "] at line [" + toString(line);
+        std::string msg = "Invalid value(s) in RAND PPP file [";
+        msg += ui.GetAsString("PPP").toStdString() + "] at line [" + toString(line);
         msg += "]. Verify latitude value is a double.";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
@@ -375,11 +375,11 @@ void IsisMain() {
       //col2.TrimHead(" ");
       try {
         // convert to double
-        lon = toDouble(col2);
+        lon = col2.toDouble();
       }
       catch (IException &e) {
-        QString msg = "Invalid value(s) in RAND PPP file [";
-        msg += ui.GetAsString("PPP") + "] at line [" + toString(line);
+        std::string msg = "Invalid value(s) in RAND PPP file [";
+        msg += ui.GetAsString("PPP").toStdString() + "] at line [" + toString(line);
         msg += "]. Verify longitude value is a double.";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
@@ -391,12 +391,12 @@ void IsisMain() {
       //col3.TrimHead(" ");
       try {
         // convert to double and convert km to meters
-        rad = toDouble(col3);
+        rad = col3.toDouble();
         rad = rad * 1000;
       }
       catch (IException &e) {
-        QString msg = "Invalid value(s) in RAND PPP file [";
-        msg += ui.GetAsString("PPP") + "] at line [" + toString(line);
+        std::string msg = "Invalid value(s) in RAND PPP file [";
+        msg += ui.GetAsString("PPP").toStdString() + "] at line [" + toString(line);
         msg += "]. Verify radius value is a double.";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
@@ -406,9 +406,9 @@ void IsisMain() {
       // remove any white space from beginning of string
       pid = pid.remove(QRegExp("^ *"));
       if (pid.length() > 7) {
-        QString msg = "Invalid value(s) in RAND PPP file [";
-        msg += ui.GetAsString("PPP") + "] at line [" + toString(line);
-        msg += "]. Point ID [" + pid + "] has more than 7 characters.";
+        std::string msg = "Invalid value(s) in RAND PPP file [";
+        msg += ui.GetAsString("PPP").toStdString() + "] at line [" + toString(line);
+        msg += "]. Point ID [" + pid.toStdString() + "] has more than 7 characters.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -445,10 +445,10 @@ void IsisMain() {
           cpoint->SetEditLock(ui.GetBoolean("POINTLOCK"));
         }
         catch (IException &e) {
-          QString msg = "Unable to set universal ground point to control "
+          std::string msg = "Unable to set universal ground point to control "
                         "network from line [";
           msg += toString(line) + "] of RAND PPP file [";
-          msg += ui.GetAsString("PPP") + "]";
+          msg += ui.GetAsString("PPP").toStdString() + "]";
           throw IException(e, IException::User, msg, _FILEINFO_);
         }
       }
@@ -459,9 +459,9 @@ void IsisMain() {
       progress.CheckStatus();
     }
     catch (IException &e) {
-      QString msg = "RAND PPP file may not be valid.  Line count calculated [";
+      std::string msg = "RAND PPP file may not be valid.  Line count calculated [";
       msg += toString(inTotalLine) + "] for RAND PPP file [";
-      msg += ui.GetAsString("PPP");
+      msg += ui.GetAsString("PPP").toStdString();
       msg += "] appears invalid at line [" + toString(line) + "].";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
@@ -469,14 +469,14 @@ void IsisMain() {
     // Write results to Logs
     // Summary group is created with the counts of RAND PPP only points
     PvlGroup summaryGroup = PvlGroup("Summary");
-    summaryGroup.addKeyword(PvlKeyword("RandOnlyPoints", toString(numRandOnly)));
+    summaryGroup.addKeyword(PvlKeyword("RandOnlyPoints", Isis::toString(numRandOnly)));
 
     bool log;
     FileName logFile;
     // if a filename was entered, use it to create the log
     if (ui.WasEntered("LOG")) {
       log = true;
-      logFile = ui.GetFileName("LOG");
+      logFile = ui.GetFileName("LOG").toStdString();
     }
     // if no filename was entered, but there were some RAND PPP only points,
     // create an log named "pppOnlyPoints" in the current directory
@@ -502,7 +502,7 @@ void IsisMain() {
                                 "measures in the MATCH file.");
         summaryGroup.addComment("These Point IDs are contained "
                                 "in [" + logFile.name() + "].");
-        TextFile outlog(logFile.expanded(), "overwrite", randOnlyIDs);
+        TextFile outlog(QString::fromStdString(logFile.expanded()), "overwrite", randOnlyIDs);
       }
       else {
         // if there are no RAND PPP only points and user wanted to create a log,

@@ -41,20 +41,20 @@ namespace Isis {
     ResetGlobals();
 
     // Check that the file comes from the right camera
-    FileName inFile = ui.GetFileName("FROM");
+    FileName inFile = ui.GetFileName("FROM").toStdString();
     QString id;
     try {
       Pvl lab(inFile.expanded());
       if(lab.hasKeyword("DATA_SET_ID"))
-        id = (QString) lab.findKeyword("DATA_SET_ID");
+        id = QString::fromStdString(lab.findKeyword("DATA_SET_ID"));
       else {
-        QString msg = "Unable to read [DATA_SET_ID] from input file [" + inFile.expanded() + "]";
+        std::string msg = "Unable to read [DATA_SET_ID] from input file [" + inFile.expanded() + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       // Checks if in file is RDR
       bool projected = lab.hasObject("IMAGE_MAP_PROJECTION");
       if(projected) {
-        QString msg = "[" + inFile.name() + "] appears to be an RDR file.";
+        std::string msg = "[" + inFile.name() + "] appears to be an RDR file.";
         msg += " Use pds2isis.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -65,24 +65,24 @@ namespace Isis {
                  btermKeyword = lab.findKeyword("LRO:BTERM");
 
       if(mtermKeyword.size() != xtermKeyword.size() || btermKeyword.size() != xtermKeyword.size()) {
-        QString msg = "The decompanding terms do not have the same dimensions";
+        std::string msg = "The decompanding terms do not have the same dimensions";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       for(int i = 0; i < xtermKeyword.size(); i++) {
-        g_xterm.push_back(toDouble(xtermKeyword[i]));
-        g_mterm.push_back(toDouble(mtermKeyword[i]));
-        g_bterm.push_back(toDouble(btermKeyword[i]));
+        g_xterm.push_back(Isis::toDouble(xtermKeyword[i]));
+        g_mterm.push_back(Isis::toDouble(mtermKeyword[i]));
+        g_bterm.push_back(Isis::toDouble(btermKeyword[i]));
       }
 
-      double versionId = toDouble(lab.findKeyword("PRODUCT_VERSION_ID")[0].remove(QRegExp("^v")));
+      double versionId = QString::fromStdString(lab.findKeyword("PRODUCT_VERSION_ID")[0]).remove(QRegExp("^v")).toDouble();
       if(lab.findKeyword("FRAME_ID")[0] == "RIGHT" && versionId < 1.30)
         g_flip = true;
       else
         g_flip = false;
     }
     catch(IException &e) {
-      QString msg = "The PDS header is missing important keyword(s).";
+      std::string msg = "The PDS header is missing important keyword(s).";
       IException finalException(IException::Io, msg, _FILEINFO_);
       finalException.append(e);
       throw finalException;
@@ -90,8 +90,8 @@ namespace Isis {
 
     id = id.simplified().trimmed();
     if(id.mid(13, 3) != "EDR") {
-      QString msg = "Input file [" + inFile.expanded() + "] does not appear to be "
-                   + "in LROC-NAC EDR format. DATA_SET_ID is [" + id + "]"
+      std::string msg = "Input file [" + inFile.expanded() + "] does not appear to be "
+                   + "in LROC-NAC EDR format. DATA_SET_ID is [" + id.toStdString() + "]"
                    + " Use pds2isis for RDR or CDR.";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -99,7 +99,7 @@ namespace Isis {
     //Process the file
     Pvl pdsLab;
     ProcessImportPds p;
-    p.SetPdsFile(inFile.expanded(), "", pdsLab);
+    p.SetPdsFile(QString::fromStdString(inFile.expanded()), "", pdsLab);
     // Set the output bit type to Real
     CubeAttributeOutput &outAtt = ui.GetOutputAttribute("TO");
 
@@ -197,17 +197,17 @@ namespace Isis {
 
     //Translate the Instrument group
     FileName transFile("$ISISROOT/appdata/translations/LroNacInstrument.trn");
-    PvlToPvlTranslationManager instrumentXlator(labelPvl, transFile.expanded());
+    PvlToPvlTranslationManager instrumentXlator(labelPvl, QString::fromStdString(transFile.expanded()));
     instrumentXlator.Auto(outLabel);
 
     //Translate the Archive group
     transFile = "$ISISROOT/appdata/translations/LroNacArchive.trn";
-    PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
+    PvlToPvlTranslationManager archiveXlater(labelPvl, QString::fromStdString(transFile.expanded()));
     archiveXlater.Auto(outLabel);
 
     //Translate the BandBin group
     transFile = "$ISISROOT/appdata/translations/LroNacBandBin.trn";
-    PvlToPvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
+    PvlToPvlTranslationManager bandBinXlater(labelPvl, QString::fromStdString(transFile.expanded()));
     bandBinXlater.Auto(outLabel);
 
     Pvl lab(labelFile.expanded());

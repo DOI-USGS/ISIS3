@@ -57,14 +57,14 @@ namespace Isis {
       m_instrumentNameShort = "StowCam";
     }
     else {
-      QString msg = "Unable to construct OSIRIS-REx Navigation camera model. "
+      std::string msg = "Unable to construct OSIRIS-REx Navigation camera model. "
                     "Unrecognized NaifIkCode [" + toString(frameCode) + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
-    QString ikCode = toString(frameCode);
+    QString ikCode = QString::number(frameCode);
 
     // Kernel values are in meters so convert to millimeters
     QString focalLength = "INS" + ikCode + "_FOCAL_LENGTH";
@@ -78,7 +78,7 @@ namespace Isis {
 
     // Get the start time in et
     // Set the observation time and exposure duration
-    QString clockCount = inst["SpacecraftClockStartCount"];
+    QString clockCount = QString::fromStdString(inst["SpacecraftClockStartCount"]);
     double startTime = getClockTime(clockCount).Et();
     double exposureDuration = ((double) inst["ExposureDuration"]);
     pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(startTime, exposureDuration);

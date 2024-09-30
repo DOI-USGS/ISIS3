@@ -50,7 +50,7 @@ namespace Isis {
 
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     m_name = new QString;
-    *m_name = inst["TargetName"][0];
+    *m_name = QString::fromStdString(inst["TargetName"][0]);
     QString trykey = "NaifIkCode";
 
     m_systemName = new QString;
@@ -62,7 +62,7 @@ namespace Isis {
     if (name().toUpper() == "SKY") {
       m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
       m_sky = true;
-      int ikCode = toInt(kernels[trykey][0]);
+      int ikCode = Isis::toInt(kernels[trykey.toStdString()][0]);
       *m_bodyCode  = ikCode / 1000;
       // Check for override in kernel group
       if (kernels.hasKeyword("NaifSpkCode")) {
@@ -117,12 +117,12 @@ namespace Isis {
     init();
 
     PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);
-    QString targetName = inst["TargetName"][0];
+    QString targetName = QString::fromStdString(inst["TargetName"][0]);
     setName(targetName);
 
     PvlGroup &kernels = label.findGroup("Kernels", Pvl::Traverse);
 
-    QString trykey = "NaifIkCode";
+    std::string trykey = "NaifIkCode";
 
     m_systemName = new QString;
 
@@ -133,7 +133,7 @@ namespace Isis {
     if (name().toUpper() == "SKY" && kernels.hasKeyword(trykey)) {
       m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
       m_sky = true;
-      int ikCode = toInt(kernels[trykey][0]);
+      int ikCode = Isis::toInt(kernels[trykey][0]);
       *m_bodyCode  = ikCode / 1000;
       // Check for override in kernel group
       if (kernels.hasKeyword("NaifSpkCode")) {
@@ -273,7 +273,7 @@ namespace Isis {
     SpiceBoolean found;
     bodn2c_c(name.toLatin1().data(), &code, &found);
     if (!found) {
-      QString msg = "Could not convert Target [" + name +
+      std::string msg = "Could not convert Target [" + name.toStdString() +
                    "] to NAIF body code";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -313,7 +313,7 @@ namespace Isis {
     QString target = "";
     try {
       if (mapping.hasKeyword("TargetName")) {
-        target = mapping["TargetName"][0];
+        target = QString::fromStdString(mapping["TargetName"][0]);
       }
 
       // if target name not found in mapping group or value was empty string, try instrument group
@@ -322,8 +322,8 @@ namespace Isis {
         if (hasInstrumentGroup) {
           PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
           if (inst.hasKeyword("TargetName")) {
-            target = inst["TargetName"][0];
-            mapping.addKeyword( PvlKeyword("TargetName", target), PvlContainer::Replace );
+            target = QString::fromStdString(inst["TargetName"][0]);
+            mapping.addKeyword( PvlKeyword("TargetName", target.toStdString()), PvlContainer::Replace );
           }
         }
       }
@@ -368,15 +368,15 @@ namespace Isis {
           catch (IException &e2) {
             throw IException(e, IException::Unknown, e2.what(), _FILEINFO_);
           }
-          QString radiiKeyword = "BODY" + toString(int(bodyCode)) + "_RADII";
+          std::string radiiKeyword = "BODY" + Isis::toString(int(bodyCode)) + "_RADII";
 
           if (naifKeywords.hasKeyword(radiiKeyword)) {
             PvlKeyword radii =  naifKeywords.findKeyword(radiiKeyword);
             mapping.addKeyword( PvlKeyword("EquatorialRadius",
-                                           toString(toDouble(radii[0]) * 1000.0), "meters"),
+                                           Isis::toString(Isis::toDouble(radii[0]) * 1000.0), "meters"),
                                 PvlContainer::Replace);
             mapping.addKeyword( PvlKeyword("PolarRadius",
-                                           toString(toDouble(radii[2]) * 1000.0), "meters"),
+                                           Isis::toString(Isis::toDouble(radii[2]) * 1000.0), "meters"),
                                 PvlContainer::Replace);
             return mapping;
           }
@@ -386,16 +386,16 @@ namespace Isis {
           if (naifKeywords.hasKeyword("BODY_FRAME_CODE")) {
 
             PvlKeyword bodyFrame = naifKeywords.findKeyword("BODY_FRAME_CODE");
-            QString radiiKeyword = "BODY" + bodyFrame[0] + "_RADII";
+            QString radiiKeyword = "BODY" + QString::fromStdString(bodyFrame[0]) + "_RADII";
 
-            if (naifKeywords.hasKeyword(radiiKeyword)) {
-              PvlKeyword radii =  naifKeywords.findKeyword(radiiKeyword);
+            if (naifKeywords.hasKeyword(radiiKeyword.toStdString())) {
+              PvlKeyword radii =  naifKeywords.findKeyword(radiiKeyword.toStdString());
               mapping.addKeyword( PvlKeyword("EquatorialRadius",
-                                             toString(toDouble(radii[0]) * 1000.0),
+                                             Isis::toString(Isis::toDouble(radii[0]) * 1000.0),
                                              "meters"),
                                   PvlContainer::Replace);
               mapping.addKeyword( PvlKeyword("PolarRadius",
-                                             toString(toDouble(radii[2]) * 1000.0),
+                                             Isis::toString(Isis::toDouble(radii[2]) * 1000.0),
                                              "meters"),
                                   PvlContainer::Replace);
               return mapping;
@@ -406,7 +406,7 @@ namespace Isis {
 
       // If we get this far, we know the cube has no NaifKeywords object and previous attempts to
       // find radii in the mapping group or using spice IDs have failed
-      QString msg = "Unable to find Equatorial and Polar radii for target [" + target + "].";
+      std::string msg = "Unable to find Equatorial and Polar radii for target [" + target.toStdString() + "].";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
@@ -446,13 +446,13 @@ namespace Isis {
         bodyCode = lookupNaifBodyCode(target);
       }
       catch (IException &e) {
-        QString msg = "Unable to find target radii for given target ["
-                      + target + "].";
+        std::string msg = "Unable to find target radii for given target ["
+                      + target.toStdString() + "].";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       PvlGroup radiiGroup = Target::radiiGroup(int(bodyCode));
-      mapping += PvlKeyword("TargetName",  target);
+      mapping += PvlKeyword("TargetName",  target.toStdString());
       mapping += radiiGroup.findKeyword("EquatorialRadius");
       mapping += radiiGroup.findKeyword("PolarRadius");
       cachedResults[target] = mapping;
@@ -482,7 +482,7 @@ namespace Isis {
 
     FileName kern("$base/kernels/pck/pck?????.tpc");
     kern = kern.highestVersion();
-    QString kernName = kern.expanded();
+    QString kernName = QString::fromStdString(kern.expanded());
 
     if(!pckLoaded) {
       furnsh_c(kernName.toLatin1().data());
@@ -498,15 +498,15 @@ namespace Isis {
       NaifStatus::CheckErrors();
     }
     catch (IException &e) {
-      QString msg = "Unable to find radii for target code [" + toString(bodyCode)
+      std::string msg = "Unable to find radii for target code [" + Isis::toString(bodyCode)
                     + "]. Target code was not found in furnished kernels.";
 
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
 
     PvlGroup radiiGroup;
-    radiiGroup += PvlKeyword("EquatorialRadius", toString(radii[0] * 1000.0), "meters");
-    radiiGroup += PvlKeyword("PolarRadius", toString(radii[2] * 1000.0), "meters");
+    radiiGroup += PvlKeyword("EquatorialRadius", Isis::toString(radii[0] * 1000.0), "meters");
+    radiiGroup += PvlKeyword("PolarRadius", Isis::toString(radii[2] * 1000.0), "meters");
 
     return radiiGroup;
 

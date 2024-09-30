@@ -225,9 +225,9 @@ namespace Isis {
     gridLayout->addLayout(layout, 3, 0, 1, 2);
     m_navDialog->setLayout(gridLayout);
 
-    QString settingsFileName =
-        FileName("$HOME/.Isis/" + QApplication::applicationName() + "/NavTool.config").expanded();
-    QSettings settings(settingsFileName, QSettings::NativeFormat);
+    std::string settingsFileName =
+        FileName("$HOME/.Isis/" + QApplication::applicationName().toStdString() + "/NavTool.config").expanded();
+    QSettings settings(QString::fromStdString(settingsFileName), QSettings::NativeFormat);
     m_navDialog->resize(settings.value("size").toSize());
 
     // View the dialog - we need this to get the size of the dialog which we're using
@@ -245,9 +245,9 @@ namespace Isis {
 
 
   QnetNavTool::~QnetNavTool() {
-    QString settingsFileName =
-        FileName("$HOME/.Isis/" + QApplication::applicationName() + "/NavTool.config").expanded();
-    QSettings settings(settingsFileName, QSettings::NativeFormat);
+    std::string settingsFileName =
+        FileName("$HOME/.Isis/" + QApplication::applicationName().toStdString() + "/NavTool.config").expanded();
+    QSettings settings(QString::fromStdString(settingsFileName), QSettings::NativeFormat);
 
     settings.setValue("size", m_navDialog->size());
     settings.setValue("pos", m_navDialog->pos());
@@ -275,7 +275,7 @@ namespace Isis {
    *   @history  2018-01-10 Adam Goins - Added the Activity History tab to the window.
    *                           This tab will keep track of edits made to control points/measures.
    *                           More history entries can be kept track of
-   *                           by emitting the activityUpdate(QString message) signal.
+   *                           by emitting the activityUpdate(std::string message) signal.
    */
   void QnetNavTool::createFilters() {
     // Set up the point filters
@@ -569,9 +569,9 @@ namespace Isis {
           this, SLOT(load(QListWidgetItem *)), Qt::UniqueConnection);
       //m_listBox->setSelectionMode(QAbstractItemView::ExtendedSelection);
       for (int i = 0; i < serialNumberList()->size(); i++) {
-        FileName filename = FileName(serialNumberList()->fileName(i));
-        QString tempFileName = filename.name();
-        m_listBox->insertItem(i, tempFileName);
+        FileName filename = FileName(serialNumberList()->fileName(i).toStdString());
+        std::string tempFileName = filename.name();
+        m_listBox->insertItem(i, QString::fromStdString(tempFileName));
       }
       QString msg = "Filter Count: " + QString::number(m_listBox->count()) +
           " / " + QString::number(serialNumberList()->size());
@@ -701,9 +701,9 @@ namespace Isis {
       connect(m_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
           this, SLOT(load(QListWidgetItem *)), Qt::UniqueConnection);
       for (int i = 0; i < m_filteredImages.size(); i++) {
-        FileName filename = FileName(serialNumberList()->fileName(m_filteredImages[i]));
-        QString tempFileName = filename.name();
-        m_listBox->insertItem(i, tempFileName);
+        FileName filename = FileName(serialNumberList()->fileName(m_filteredImages[i]).toStdString());
+        std::string tempFileName = filename.name();
+        m_listBox->insertItem(i, QString::fromStdString(tempFileName));
       }
       QString msg = "Filter Count: " + QString::number(m_listBox->count()) +
           " / " + QString::number(serialNumberList()->size());

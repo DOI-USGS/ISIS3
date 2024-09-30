@@ -18,7 +18,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/shadow.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/shadow.xml").expanded());
 
 TEST_F(DemCube, FunctionalTestShadowMatch) {
   QVector<QString> shadowArgs = {"to=" + tempDir.path() + "/shadow.cub",
@@ -45,7 +45,7 @@ TEST_F(DemCube, FunctionalTestShadowMatch) {
   EXPECT_EQ(int(shadowStats["NumSpecialPixels"]), 2800);
   EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 0);
 
-  Cube shadowCube(shadowUi.GetCubeName("TO"));
+  Cube shadowCube(shadowUi.GetCubeName("TO").toStdString());
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
@@ -60,7 +60,7 @@ TEST_F(DemCube, FunctionalTestShadowTime) {
                                  "sunpositionsource=time",
                                  "time=1977-07-09T15:05:53"};
   PvlGroup kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
-  shadowArgs.push_back("spk=" + kernels["TargetPosition"][2]);
+  shadowArgs.push_back("spk=" + QString::fromStdString(kernels["TargetPosition"][2]));
 
   UserInterface shadowUi(APP_XML, shadowArgs);
   Pvl appLog;
@@ -84,7 +84,7 @@ TEST_F(DemCube, FunctionalTestShadowTime) {
   EXPECT_EQ(int(shadowStats["NumSpecialPixels"]), 2800);
   EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 104);
 
-  Cube shadowCube(shadowUi.GetCubeName("TO"));
+  Cube shadowCube(shadowUi.GetCubeName("TO").toStdString());
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
@@ -121,7 +121,7 @@ TEST_F(DemCube, FunctionalTestShadowNoShadow) {
   EXPECT_EQ(int(shadowStats["NumSpecialPixels"]), 2800);
   EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 0);
 
-  Cube shadowCube(shadowUi.GetCubeName("TO"));
+  Cube shadowCube(shadowUi.GetCubeName("TO").toStdString());
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
@@ -157,7 +157,7 @@ TEST_F(DemCube, FunctionalTestShadowAccurate) {
   EXPECT_EQ(int(shadowStats["NumSpecialPixels"]), 2800);
   EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 0);
 
-  Cube shadowCube(shadowUi.GetCubeName("TO"));
+  Cube shadowCube(shadowUi.GetCubeName("TO").toStdString());
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
@@ -193,7 +193,7 @@ TEST_F(DemCube, FunctionalTestShadowCustom) {
   EXPECT_EQ(int(shadowStats["NumSpecialPixels"]), 2800);
   EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 0);
 
-  Cube shadowCube(shadowUi.GetCubeName("TO"));
+  Cube shadowCube(shadowUi.GetCubeName("TO").toStdString());
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
@@ -249,7 +249,7 @@ TEST_F(DemCube, FunctionalTestShadowErrors) {
     shadow(demCube, shadowUi);
     FAIL() << "Shouldn't have been able to generate a shadow file" << std::endl;
   } catch(IException &e) {
-    std::string expectedStr = "the shadowing algorithm must be a DEM which stores radii; The input DEM contains zero or negative radii.";
+    std::string expectedStr = "the shadowing algorithm must be a DEM which stores radii; The input DEM contains zero or negative radii";
     EXPECT_THAT(e.what(), testing::HasSubstr(expectedStr));
   }
 

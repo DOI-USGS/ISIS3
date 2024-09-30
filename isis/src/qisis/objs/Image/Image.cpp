@@ -61,7 +61,7 @@ namespace Isis {
     catch (IException &) {
     }
 
-    m_displayProperties = new ImageDisplayProperties(FileName(m_fileName).name(), this);
+    m_displayProperties = new ImageDisplayProperties(QString::fromStdString(FileName(m_fileName.toStdString()).name()), this);
 
     m_id = new QUuid(QUuid::createUuid());
   }
@@ -94,7 +94,7 @@ namespace Isis {
     catch (IException &e) {
     }
 
-    m_displayProperties = new ImageDisplayProperties(FileName(m_fileName).name(), this);
+    m_displayProperties = new ImageDisplayProperties(QString::fromStdString(FileName(m_fileName.toStdString()).name()), this);
 
     m_id = new QUuid(QUuid::createUuid());
   }
@@ -124,7 +124,7 @@ namespace Isis {
 
     m_footprint = footprint;
 
-    m_displayProperties = new ImageDisplayProperties(FileName(m_fileName).name(), this);
+    m_displayProperties = new ImageDisplayProperties(QString::fromStdString(FileName(m_fileName.toStdString()).name()), this);
 
     setId(id);
   }
@@ -167,18 +167,16 @@ namespace Isis {
    * @throws IException::Unknown "Tried to load Image with properties/information"
    */
   void Image::fromPvl(const PvlObject &pvl) {
-    QString pvlFileName = ((IString)pvl["FileName"][0]).ToQt();
-    if (m_fileName != pvlFileName) {
-      throw IException(IException::Unknown,
-          tr("Tried to load Image [%1] with properties/information from [%2].")
-            .arg(m_fileName).arg(pvlFileName),
+    std::string pvlFileName = pvl["FileName"][0];
+    if (m_fileName.toStdString() != pvlFileName) {
+      throw IException(IException::Unknown,"Tried to load Image [" + m_fileName.toStdString() + "] with properties/information from [" + pvlFileName + "].",
           _FILEINFO_);
     }
 
     displayProperties()->fromPvl(pvl.findObject("DisplayProperties"));
 
     if (pvl.hasKeyword("ID")) {
-      QByteArray hexValues(pvl["ID"][0].toLatin1());
+      QByteArray hexValues(QString::fromStdString(pvl["ID"][0]).toLatin1());
       QDataStream valuesStream(QByteArray::fromHex(hexValues));
       valuesStream >> *m_id;
     }
@@ -201,7 +199,7 @@ namespace Isis {
   PvlObject Image::toPvl() const {
     PvlObject output("Image");
 
-    output += PvlKeyword("FileName", m_fileName);
+    output += PvlKeyword("FileName", m_fileName.toStdString());
 
     // Do m_id
     QBuffer dataBuffer;
@@ -212,7 +210,7 @@ namespace Isis {
 
     dataBuffer.seek(0);
 
-    output += PvlKeyword("ID", QString(dataBuffer.data().toHex()));
+    output += PvlKeyword("ID", std::string(dataBuffer.data().toHex()));
 
     output += displayProperties()->toPvl();
 
@@ -235,15 +233,15 @@ namespace Isis {
     if (!result && m_cube) {
       Blob example = ImagePolygon().toBlob();
 
-      QString blobType = example.Type();
-      QString blobName = example.Name();
+      QString blobType = QString::fromStdString(example.Type());
+      QString blobName = QString::fromStdString(example.Name());
 
       Pvl &labels = *m_cube->label();
 
       for (int i = 0; i < labels.objects(); i++) {
         PvlObject &obj = labels.object(i);
 
-        if (obj.isNamed(blobType) && obj.hasKeyword("Name") && obj["Name"][0] == blobName)
+        if (obj.isNamed(blobType.toStdString()) && obj.hasKeyword("Name") && QString::fromStdString(obj["Name"][0]) == blobName)
           result = true;
       }
     }
@@ -262,7 +260,7 @@ namespace Isis {
   Cube *Image::cube() {
     if (!m_cube) {
       try {
-        m_cube = new Cube(m_fileName);
+        m_cube = new Cube(m_fileName.toStdString());
       }
       catch (IException &e) {
         throw IException(e, IException::Programmer, "Cube cannot be created", _FILEINFO_);
@@ -392,7 +390,7 @@ namespace Isis {
         }
         catch (IException &e) {
           IString msg = "Could not read the footprint from cube [" +
-              displayProperties()->displayName() + "]. Please make "
+              displayProperties()->displayName().toStdString() + "]. Please make "
               "sure footprintinit has been run";
           throw IException(e, IException::Io, msg, _FILEINFO_);
         }
@@ -507,15 +505,15 @@ namespace Isis {
    * @param newProjectRoot  The root directory where the project is stored.
    */
   void Image::copyToNewProjectRoot(const Project *project, FileName newProjectRoot) {
-    if (FileName(newProjectRoot) != FileName(project->projectRoot())) {
-      Cube origImage(m_fileName);
+    if (FileName(newProjectRoot) != FileName(project->projectRoot().toStdString())) {
+      Cube origImage(m_fileName.toStdString());
 
       // The imageDataRoot will either be PROJECTROOT/images or PROJECTROOT/results/bundle/timestamp/images,
       // depending on how the newProjectRoot points to.
-      FileName newExternalLabelFileName(Project::imageDataRoot(newProjectRoot.toString()) + "/" +
-          FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name());
+      FileName newExternalLabelFileName(Project::imageDataRoot(QString::fromStdString(newProjectRoot.toString())).toStdString() + "/" +
+          FileName(m_fileName.toStdString()).dir().filename().string() + "/" + FileName(m_fileName.toStdString()).name());
 
-      if (m_fileName != newExternalLabelFileName.toString()) {
+      if (m_fileName != QString::fromStdString(newExternalLabelFileName.toString())) {
         // This cube copy creates a filename w/ecub extension in the new project root, but looks to
         // be a cube(internal vs external). It changes the DnFile pointer to the old ecub,
         // /tmp/tsucharski_ipce/tmpProject/images/import1/AS15-.ecub, but doing a less on file
@@ -528,7 +526,7 @@ namespace Isis {
         if (!origImage.storesDnData() ) {
           if (origImage.externalCubeFileName().path() == ".") {
             Cube dnFile(
-                FileName(m_fileName).path() + "/" + origImage.externalCubeFileName().name());
+                FileName(m_fileName.toStdString()).path() + "/" + origImage.externalCubeFileName().name());
             FileName newDnFileName = newExternalLabelFileName.setExtension("cub");
             QScopedPointer<Cube> newDnFile(dnFile.copy(newDnFileName, CubeAttributeOutput()));
             newDnFile->close();
@@ -538,10 +536,10 @@ namespace Isis {
           else {
             //  If the the ecub's external cube is pointing to the old project root, update to new
             //  project root.
-            if (origImage.externalCubeFileName().toString().contains(project->projectRoot())) {
-              QString newExternalCubeFileName = origImage.externalCubeFileName().toString();
+            if (QString::fromStdString(origImage.externalCubeFileName().toString()).contains(project->projectRoot())) {
+              QString newExternalCubeFileName = QString::fromStdString(origImage.externalCubeFileName().toString());
               newExternalCubeFileName.replace(project->projectRoot(), project->newProjectRoot());
-              newExternalLabel->relocateDnData(newExternalCubeFileName);
+              newExternalLabel->relocateDnData(newExternalCubeFileName.toStdString());
             }
             else {
               newExternalLabel->relocateDnData(origImage.externalCubeFileName());
@@ -563,23 +561,21 @@ namespace Isis {
     closeCube();
 
     if (!QFile::remove(m_fileName)) {
-      throw IException(IException::Io,
-                       tr("Could not remove file [%1]").arg(m_fileName),
+      throw IException(IException::Io,"Could not remove file [" + m_fileName.toStdString() + "]",
                        _FILEINFO_);
     }
 
     if (deleteCubAlso) {
-      FileName cubFile = FileName(m_fileName).setExtension("cub");
-      if (!QFile::remove(cubFile.expanded() ) ) {
-        throw IException(IException::Io,
-                         tr("Could not remove file [%1]").arg(m_fileName),
+      FileName cubFile = FileName(m_fileName.toStdString()).setExtension("cub");
+      if (!QFile::remove(QString::fromStdString(cubFile.expanded()) ) ) {
+        throw IException(IException::Io,"Could not remove file [" +  m_fileName.toStdString() + "]",
                          _FILEINFO_);
       }
     }
 
     // If we're the last thing in the folder, remove the folder too.
     QDir dir;
-    dir.rmdir(FileName(m_fileName).path());
+    dir.rmdir(QString::fromStdString(FileName(m_fileName.toStdString()).path()));
   }
 
 
@@ -603,44 +599,44 @@ namespace Isis {
     stream.writeStartElement("image");
 
     stream.writeAttribute("id", m_id->toString());
-    stream.writeAttribute("fileName", FileName(m_fileName).name());
+    stream.writeAttribute("fileName", QString::fromStdString(FileName(m_fileName.toStdString()).name()));
     stream.writeAttribute("instrumentId", m_instrumentId);
     stream.writeAttribute("spacecraftName", m_spacecraftName);
 
     if (!IsSpecial(m_aspectRatio) ) {
-      stream.writeAttribute("aspectRatio", IString(m_aspectRatio).ToQt());
+      stream.writeAttribute("aspectRatio", QString::number(m_aspectRatio));
     }
 
     if (!IsSpecial(m_resolution) ) {
-      stream.writeAttribute("resolution", IString(m_resolution).ToQt());
+      stream.writeAttribute("resolution", QString::number(m_resolution));
     }
 
     if (m_emissionAngle.isValid() ) {
-      stream.writeAttribute("emissionAngle", IString(m_emissionAngle.radians()).ToQt());
+      stream.writeAttribute("emissionAngle", QString::number(m_emissionAngle.radians()));
     }
 
     if (m_incidenceAngle.isValid() ) {
-      stream.writeAttribute("incidenceAngle", IString(m_incidenceAngle.radians()).ToQt());
+      stream.writeAttribute("incidenceAngle", QString::number(m_incidenceAngle.radians()));
     }
 
     if (!IsSpecial(m_lineResolution) ) {
-      stream.writeAttribute("lineResolution", IString(m_lineResolution).ToQt());
+      stream.writeAttribute("lineResolution", QString::number(m_lineResolution));
     }
 
     if (m_localRadius.isValid() ) {
-      stream.writeAttribute("localRadius", IString(m_localRadius.meters()).ToQt());
+      stream.writeAttribute("localRadius", QString::number(m_localRadius.meters()));
     }
 
     if (m_northAzimuth.isValid() ) {
-      stream.writeAttribute("northAzimuth", IString(m_northAzimuth.radians()).ToQt());
+      stream.writeAttribute("northAzimuth", QString::number(m_northAzimuth.radians()));
     }
 
     if (m_phaseAngle.isValid() ) {
-      stream.writeAttribute("phaseAngle", IString(m_phaseAngle.radians()).ToQt());
+      stream.writeAttribute("phaseAngle", QString::number(m_phaseAngle.radians()));
     }
 
     if (!IsSpecial(m_sampleResolution) ) {
-      stream.writeAttribute("sampleResolution", IString(m_sampleResolution).ToQt());
+      stream.writeAttribute("sampleResolution", QString::number(m_sampleResolution));
     }
 
     if (m_footprint) {
@@ -666,10 +662,10 @@ namespace Isis {
   void Image::updateFileName(Project *project) {
     closeCube();
 
-    FileName original(m_fileName);
-    FileName newName(project->imageDataRoot() + "/" +
-                     original.dir().dirName() + "/" + original.name());
-    m_fileName = newName.expanded();
+    FileName original(m_fileName.toStdString());
+    FileName newName(project->imageDataRoot().toStdString() + "/" +
+                     original.dir().filename().string() + "/" + original.name());
+    m_fileName = QString::fromStdString(newName.expanded());
   }
 
 
@@ -693,8 +689,7 @@ namespace Isis {
     imgPoly.Create(*cube(), sampleStepSize, lineStepSize);
 
     IException e = IException(IException::User,
-        tr("Warning: Polygon re-calculated for [%1] which can be very slow")
-          .arg(displayProperties()->displayName()),
+        "Warning: Polygon re-calculated for [" + displayProperties()->displayName().toStdString() + "] which can be very slow",
         _FILEINFO_);
     e.print();
 
@@ -725,7 +720,7 @@ namespace Isis {
     }
 
     if (hasCamStats) {
-      Table camStatsTable("CameraStatistics", m_fileName, label);
+      Table camStatsTable("CameraStatistics", m_fileName.toStdString(), label);
 
       int numRecords = camStatsTable.Records();
       for (int recordIndex = 0; recordIndex < numRecords; recordIndex++) {
@@ -733,7 +728,7 @@ namespace Isis {
 
         // The TableField class gives us a std::string with NULL (\0) characters... be careful not
         //   to keep them when going to QString.
-        QString recordName((QString)record["Name"]);
+        std::string recordName(record["Name"]);
         double avgValue = (double)record["Average"];
 
         if (recordName == "AspectRatio") {
@@ -773,10 +768,10 @@ namespace Isis {
           PvlGroup instGroup = obj.findGroup("Instrument");
 
           if (instGroup.hasKeyword("SpacecraftName"))
-            m_spacecraftName = obj.findGroup("Instrument")["SpacecraftName"][0];
+            m_spacecraftName = QString::fromStdString(obj.findGroup("Instrument")["SpacecraftName"][0]);
 
           if (instGroup.hasKeyword("InstrumentId"))
-            m_instrumentId = obj.findGroup("Instrument")["InstrumentId"][0];
+            m_instrumentId = QString::fromStdString(obj.findGroup("Instrument")["InstrumentId"][0]);
         }
       }
       catch (IException &) {

@@ -46,7 +46,7 @@ namespace Isis {
   CsmBundleObservation::CsmBundleObservation(BundleImageQsp image, QString observationNumber,
                                        QString instrumentId, BundleTargetBodyQsp bundleTargetBody) : BundleObservation(image, observationNumber, instrumentId, bundleTargetBody) {
     if (bundleTargetBody) {
-      QString msg = "Target body parameters cannot be solved for with CSM observations.";
+      std::string msg = "Target body parameters cannot be solved for with CSM observations.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -163,7 +163,7 @@ namespace Isis {
   bool CsmBundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
     // Check that the correction vector is the correct size
     if (corrections.size() != m_paramIndices.size()) {
-      QString msg = "Invalid correction vector passed to observation.";
+      std::string msg = "Invalid correction vector passed to observation.";
       IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -230,7 +230,7 @@ namespace Isis {
 
       correction = m_corrections(i);
       adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
-      sigma = (IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8));
+      sigma = (IsSpecial(m_aprioriSigmas[i]) ? "FREE" : QString::number(m_aprioriSigmas[i], 'g', 8));
 
       snprintf(buf, sizeof(buf), "%.11s", parameterNamesList.at(i).toStdString().c_str());
       fpOut << buf;
@@ -277,10 +277,10 @@ namespace Isis {
 
     for (size_t i = 0; i < m_paramIndices.size(); i++) {
       double finalValue = csmCamera->getParameterValue(m_paramIndices[i]);
-      finalqStr += toString(finalValue - m_corrections[i]) + ",";
-      finalqStr += toString(m_corrections[i]) + ",";
-      finalqStr += toString(finalValue) + ",";
-      finalqStr += toString(m_aprioriSigmas[i], 8) + ",";
+      finalqStr += QString::number(finalValue - m_corrections[i]) + ",";
+      finalqStr += QString::number(m_corrections[i]) + ",";
+      finalqStr += QString::number(finalValue) + ",";
+      finalqStr += QString::number(m_aprioriSigmas[i], 'g', 8) + ",";
       if (errorPropagation) {
         finalqStr += QString::number(m_adjustedSigmas[i], 'f', 8) + ",";
       }
@@ -328,7 +328,7 @@ namespace Isis {
    */
   bool CsmBundleObservation::computeTargetPartials(LinearAlgebra::Matrix &coeffTarget, BundleMeasure &measure, BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody) {
     if (bundleTargetBody) {
-      QString msg = "Target body parameters cannot be solved for with CSM observations.";
+      std::string msg = "Target body parameters cannot be solved for with CSM observations.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     return false;
@@ -447,8 +447,8 @@ namespace Isis {
 
     // Get ground-to-image computed coordinates for this point.
     if (!(measureCamera->SetGround(point->adjustedSurfacePoint()))) {
-      QString msg = "Unable to map apriori surface point for measure ";
-      msg += measure.cubeSerialNumber() + " on point " + point->id() + " back into image.";
+      std::string msg = "Unable to map apriori surface point for measure ";
+      msg += measure.cubeSerialNumber().toStdString() + " on point " + point->id().toStdString() + " back into image.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     double computedSample = measureCamera->Sample();

@@ -66,7 +66,7 @@ void IsisMain() {
     dccube = p.SetInputCube(dcfileloc, cubeAtt);
   }
 
-  QString filter = (QString)(icube->group("BandBin"))["FilterName"];
+  QString filter = QString::fromStdString((icube->group("BandBin"))["FilterName"]);
   filter = filter.toLower();
 
   Cube *ffcube;
@@ -94,9 +94,9 @@ void IsisMain() {
 
   Cube *ocube = p.SetOutputCube("TO");
 
-  avgFF = uvvisDef.findGroup("Filter" + filter.toUpper())["AVGFF"];
-  cr = uvvisDef.findGroup("Filter" + filter.toUpper())["CO"];
-  gain = uvvisDef.findGroup(QString("GainModeID") + QString(icube->group("Instrument")["GainModeID"][0]))["GAIN"];
+  avgFF = uvvisDef.findGroup("Filter" + filter.toUpper().toStdString())["AVGFF"];
+  cr = uvvisDef.findGroup("Filter" + filter.toUpper().toStdString())["CO"];
+  gain = uvvisDef.findGroup("GainModeID" + icube->group("Instrument")["GainModeID"][0])["GAIN"];
 
   useDcconst = ui.WasEntered("DCCONST");
   if(useDcconst) {
@@ -110,7 +110,7 @@ void IsisMain() {
   exposureDuration = icube->group("Instrument")["ExposureDuration"];
   offsetModeID = icube->group("Instrument")["OffsetModeID"];
 
-  if(((QString)icube->group("Instrument")["FocalPlaneTemperature"]).compare("UNK") == 0) {
+  if((QString::fromStdString(icube->group("Instrument")["FocalPlaneTemperature"])).compare("UNK") == 0) {
     //if FocalPlaneTemp is unknown set it to zero
     focalPlaneTemp = 0.0;
   }
@@ -131,12 +131,12 @@ void IsisMain() {
   if(ui.GetBoolean("TCOR") || abs(focalPlaneTemp) <= DBL_EPSILON) {
     // Temperature correction requires the use of the mission phase
     //   (PRELAUNCH, EARTH, LUNAR) and the product ID.
-    QString productID = (QString)(icube->group("Archive")["ProductID"]);
-    QChar missionPhase = ((QString)((icube->group("Archive"))["MissionPhase"])).at(0);
+    QString productID = QString::fromStdString((icube->group("Archive")["ProductID"]));
+    QChar missionPhase = (QString::fromStdString(((icube->group("Archive"))["MissionPhase"]))).at(0);
     QString n1subQString(productID.mid(productID.indexOf('.') + 1, productID.length() - 1));
     QString n2subQString(productID.mid(4, productID.indexOf('.') - 5));
-    int n1 = toInt(n1subQString);
-    int n2 = toInt(n2subQString);
+    int n1 = n1subQString.toInt();
+    int n2 = n2subQString.toInt();
     int phase = 0;
 
     if(missionPhase == 'L') {
@@ -169,31 +169,31 @@ void IsisMain() {
 
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
-  calgrp += PvlKeyword("FlatFieldFile", ffcube->fileName());
+  calgrp += PvlKeyword("FlatFieldFile", ffcube->fileName().toStdString());
 
   if(ui.GetString("DARKCURRENT").compare("DCFILE") == 0) {
-    calgrp += PvlKeyword("DarkCurrentFile", dccube->fileName());
+    calgrp += PvlKeyword("DarkCurrentFile", dccube->fileName().toStdString());
   }
   else {
-    calgrp += PvlKeyword("DarkCurrentConstant", toString(dcconst));
+    calgrp += PvlKeyword("DarkCurrentConstant", Isis::toString(dcconst));
   }
 
-  calgrp += PvlKeyword("CorrectedFocalPlaneTemp", toString(focalPlaneTemp));
-  calgrp += PvlKeyword("C1", toString(avgFF));
-  calgrp += PvlKeyword("C2", toString(C2));
-  calgrp += PvlKeyword("C3", toString(C3));
-  calgrp += PvlKeyword("C4", toString(C4));
-  calgrp += PvlKeyword("C5", toString(C5));
-  calgrp += PvlKeyword("CR", toString(cr));
-  calgrp += PvlKeyword("FrameTransferTimePerRow", toString(cr));
-  calgrp += PvlKeyword("Gain", toString(gain));
-  calgrp += PvlKeyword("CorrectedExposureDuration", toString(correctedExposureDuration));
-  calgrp += PvlKeyword("ConvertToRadiance", toString(conv));
+  calgrp += PvlKeyword("CorrectedFocalPlaneTemp", Isis::toString(focalPlaneTemp));
+  calgrp += PvlKeyword("C1", Isis::toString(avgFF));
+  calgrp += PvlKeyword("C2", Isis::toString(C2));
+  calgrp += PvlKeyword("C3", Isis::toString(C3));
+  calgrp += PvlKeyword("C4", Isis::toString(C4));
+  calgrp += PvlKeyword("C5", Isis::toString(C5));
+  calgrp += PvlKeyword("CR", Isis::toString(cr));
+  calgrp += PvlKeyword("FrameTransferTimePerRow", Isis::toString(cr));
+  calgrp += PvlKeyword("Gain", Isis::toString(gain));
+  calgrp += PvlKeyword("CorrectedExposureDuration", Isis::toString(correctedExposureDuration));
+  calgrp += PvlKeyword("ConvertToRadiance", Isis::toString(conv));
 
-  calgrp += PvlKeyword("ACO", toString(ACO));
-  calgrp += PvlKeyword("BCO", toString(BCO));
-  calgrp += PvlKeyword("CCO", toString(CCO));
-  calgrp += PvlKeyword("DCO", toString(DCO));
+  calgrp += PvlKeyword("ACO", Isis::toString(ACO));
+  calgrp += PvlKeyword("BCO", Isis::toString(BCO));
+  calgrp += PvlKeyword("CCO", Isis::toString(CCO));
+  calgrp += PvlKeyword("DCO", Isis::toString(DCO));
 
   ocube->putGroup(calgrp);
   p.EndProcess();
@@ -312,7 +312,7 @@ void UvVisCal(std::vector< Isis::Buffer * > &in, std::vector< Isis::Buffer * > &
  * in a loss in precision. We believe this makes the lookup table inaccurate.
  */
 void FixTemp(int imgID) {
-  QString table = "$clementine1/calibration/uvvis/uvvisTemperature.tbl";
+  std::string table = "$clementine1/calibration/uvvis/uvvisTemperature.tbl";
   Table t("FocalPlaneTemperatures", table);
   float currID = t[0]["ImageID"];
   int currIndex = 0;

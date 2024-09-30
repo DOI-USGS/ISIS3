@@ -40,11 +40,11 @@ namespace Isis {
     setConfig(config);
     PvlFlatMap variables = setupParameters();
     variables.merge(cvars);
-    const int maxSize = toInt(variables.get("MaxSize"));
-    const int responseThreshold = toInt(variables.get("ResponseThreshold"));
-    const int lineThresholdProjected = toInt(variables.get("LineThresholdProjected"));
-    const int lineThresholdBinarized = toInt(variables.get("LineThresholdBinarized"));
-    const int SuppressNonmaxSize = toInt(variables.get("SuppressNonmaxSize"));
+    const int maxSize = variables.get("MaxSize").toInt();
+    const int responseThreshold = variables.get("ResponseThreshold").toInt();
+    const int lineThresholdProjected = variables.get("LineThresholdProjected").toInt();
+    const int lineThresholdBinarized = variables.get("LineThresholdBinarized").toInt();
+    const int SuppressNonmaxSize = variables.get("SuppressNonmaxSize").toInt();
 
     m_algorithm = StarType::create(maxSize, responseThreshold, lineThresholdProjected,
                                    lineThresholdBinarized, SuppressNonmaxSize);
@@ -153,7 +153,7 @@ namespace Isis {
   *                                 to set algorithm parameters."
   */
   int StarAlgorithm::setAlgorithmVariables(const PvlFlatMap &variables) {
-    QString msg = "StarAlgorithm does not have the ability to set algorithm parameters.";
+    std::string msg = "StarAlgorithm does not have the ability to set algorithm parameters.";
     throw IException(IException::Programmer, msg, _FILEINFO_);
 
     return (-1);

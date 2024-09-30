@@ -51,7 +51,7 @@ namespace Isis {
       // necessary
       if ((allowDefaults) && (!mapGroup.hasKeyword("CenterLongitude"))) {
         double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLongitude", toString(lon));
+        mapGroup += PvlKeyword("CenterLongitude", Isis::toString(lon));
       }
 
       // Get the center longitude
@@ -62,7 +62,7 @@ namespace Isis {
       if (m_longitudeDirection == PositiveWest) m_centerLongitude *= -1.0;
     }
     catch(IException &e) {
-      QString message = "Invalid label group [Mapping]";
+      std::string message = "Invalid label group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }

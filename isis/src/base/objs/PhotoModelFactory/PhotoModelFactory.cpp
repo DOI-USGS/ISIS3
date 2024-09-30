@@ -39,13 +39,13 @@ namespace Isis {
 
     QString algorithm = "";
     if (algo.hasKeyword("PhtName")) {
-      algorithm = algo["PhtName"][0];
+      algorithm = QString::fromStdString(algo["PhtName"][0]);
     }
     else if (algo.hasKeyword("Name")) {
-      algorithm = algo["Name"][0];
+      algorithm = QString::fromStdString(algo["Name"][0]);
     }
     else {
-      QString msg = "Keyword [Name] or keyword [PhtName] must ";
+      std::string msg = "Keyword [Name] or keyword [PhtName] must ";
       msg += "exist in [Group = Algorithm]";
       throw IException(IException::User, msg, _FILEINFO_);
     }

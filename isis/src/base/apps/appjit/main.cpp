@@ -28,22 +28,22 @@ void IsisMain() {
 
   // Get the input file list to make sure it is not empty and the master cube is included
   FileList list;
-  list.read(ui.GetFileName("FROMLIST"));
+  list.read(ui.GetFileName("FROMLIST").toStdString());
 
   if(list.size() < 1) {
-    QString msg = "The input list file [" + ui.GetFileName("FROMLIST") + "is empty";
+    std::string msg = "The input list file [" + ui.GetFileName("FROMLIST").toStdString() + "is empty";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   int ifile = 0;
   // Make sure the master file is included in the input file list
-  while(ifile < (int) list.size() && list[ifile].toString() != FileName(ui.GetCubeName("MASTER")).expanded()) {
+  while(ifile < (int) list.size() && list[ifile].toString() != FileName(ui.GetCubeName("MASTER").toStdString()).expanded()) {
     ifile++;
   }
 
   if(ifile >= list.size()) {
-    QString msg = "The master file, [" + FileName(ui.GetCubeName("MASTER")).expanded() + " is not included in " +
-                 "the input list file " + ui.GetCubeName("FROMLIST") + "]";
+    std::string msg = "The master file, [" + FileName(ui.GetCubeName("MASTER").toStdString()).expanded() + " is not included in " +
+                 "the input list file " + ui.GetCubeName("FROMLIST").toStdString() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -65,7 +65,7 @@ void IsisMain() {
     // Get the camera
     Camera *cam = cube.camera();
     if(cam->DetectorMap()->LineRate() == 0.0) {
-      QString msg = "[" + ui.GetCubeName("MASTER") + "] is not a line scan camera image";
+      std::string msg = "[" + ui.GetCubeName("MASTER").toStdString() + "] is not a line scan camera image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -104,7 +104,7 @@ void IsisMain() {
     // Pull out the pointing cache as a table and write it
     Table cmatrix = crot.Cache("InstrumentPointing");
     //    cmatrix.Label().addComment("Corrected using appjit and" + ui.GetFileName("JITTERFILE"));
-    cmatrix.Label() += PvlKeyword("Description", "Corrected using appjit and" + ui.GetFileName("JITTERFILE"));
+    cmatrix.Label() += PvlKeyword("Description", "Corrected using appjit and" + ui.GetFileName("JITTERFILE").toStdString());
     cmatrix.Label() += PvlKeyword("Kernels");
     PvlKeyword ckKeyword = crot.InstrumentPointingValue();
 
@@ -127,14 +127,14 @@ void IsisMain() {
 
     cube.putGroup(kernels);
     cube.close();
-    gp += PvlKeyword("StatusMaster", ui.GetCubeName("MASTER") + ":  camera pointing updated");
+    gp += PvlKeyword("StatusMaster", ui.GetCubeName("MASTER").toStdString() + ":  camera pointing updated");
 
     // Apply the dejittered pointing to the rest of the files
     step2 = true;
     for(int ifile = 0; ifile < list.size(); ifile++) {
-      if(list[ifile].toString() != ui.GetCubeName("MASTER")) {
+      if(list[ifile].toString() != ui.GetCubeName("MASTER").toStdString()) {
         // Open the cube
-        cube.open(list[ifile].toString(), "rw");
+        cube.open(QString::fromStdString(list[ifile].toString()), "rw");
         //check for existing polygon, if exists delete it
         if(cube.label()->hasObject("Polygon")) {
           cube.label()->deleteObject("Polygon");
@@ -142,7 +142,7 @@ void IsisMain() {
         // Get the camera and make sure it is a line scan camera
         Camera *cam = cube.camera();
         if(cam->DetectorMap()->LineRate() == 0.0) {
-          QString msg = "[" + ui.GetCubeName("FROM") + "] is not a line scan camera";
+          std::string msg = "[" + ui.GetCubeName("FROM").toStdString() + "] is not a line scan camera";
           throw IException(IException::User, msg, _FILEINFO_);
         }
         // Write out the pointing cache as a table
@@ -160,15 +160,15 @@ void IsisMain() {
         }
         cube.putGroup(kernels);
         cube.close();
-        gp += PvlKeyword("Status" + toString(ifile), list[ifile].toString() + ":  camera pointing updated");
+        gp += PvlKeyword("Status" + Isis::toString(ifile), list[ifile].toString() + ":  camera pointing updated");
       }
     }
     Application::Log(gp);
   }
   catch(IException &e) {
-    QString msg;
+    std::string msg;
     if(!step2) {
-      msg = "Unable to fit pointing for [" + ui.GetCubeName("MASTER") + "]";
+      msg = "Unable to fit pointing for [" + ui.GetCubeName("MASTER").toStdString() + "]";
     }
     else {
       msg = "Unable to update pointing for nonMaster file(s)";

@@ -61,7 +61,7 @@ inline int InValidCount(const HiVector &v) {
 inline int CpmmToCcd(int cpmm) {
   const int cpmm2ccd[] = {0,1,2,3,12,4,10,11,5,13,6,7,8,9};
   if ( (cpmm < 0) || (cpmm >= (int)(sizeof(cpmm2ccd)/sizeof(int))) ) {
-    QString mess = "CpmmToCdd: Bad CpmmNumber (" + toString(cpmm) + ")";
+    std::string mess = "CpmmToCdd: Bad CpmmNumber (" + toString(cpmm) + ")";
     throw IException(IException::User, mess, _FILEINFO_);
   }
   return (cpmm2ccd[cpmm]);
@@ -75,7 +75,7 @@ inline int CpmmToCcd(int cpmm) {
  */
 inline QString CcdToFilter(int ccd) {
   if ( (ccd < 0) || (ccd > 13) ) {
-    QString mess = "CcdToFilter: Bad Ccd Number (" + toString(ccd) + ")";
+    std::string mess = "CcdToFilter: Bad Ccd Number (" + toString(ccd) + ")";
     throw IException(IException::User, mess, _FILEINFO_);
   }
 
@@ -210,7 +210,7 @@ template <typename T>
  * @return int Converted value
  */
 template <typename T> int ToInteger(const T &value) {
-    return toInt(QString(value).trimmed());
+    return QString(value).trimmed().toInt();
 }
 
 /**
@@ -222,7 +222,7 @@ template <typename T> int ToInteger(const T &value) {
  * @return double Converted value
  */
 template <typename T> double ToDouble(const T &value) {
-    return toDouble(QString(value).trimmed());
+    return QString(value).trimmed().toDouble();
 }
 
 /**
@@ -234,7 +234,7 @@ template <typename T> double ToDouble(const T &value) {
  * @return string Converted value
  */
 template <typename T> QString ToString(const T &value) {
-    return (toString(value).trimmed());
+    return (QString::fromStdString(toString(value)).trimmed());
 }
 
 /**
@@ -435,7 +435,7 @@ inline HiVector rebin(const HiVector &v, int n) {
 inline void RemoveHiBlobs(Pvl &label) {
   for ( int blob = 0 ; blob < label.objects() ; blob++ ) {
     if ( label.object(blob).isNamed("Table") ) {
-      QString name = label.object(blob)["Name"][0];
+      QString name = QString::fromStdString(label.object(blob)["Name"][0]);
       if ( name.toLower() == "hirise calibration ancillary" ||
            name.toLower() == "hirise calibration images" ||
            name.toLower() == "hirise ancillary") {

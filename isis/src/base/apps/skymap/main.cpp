@@ -71,7 +71,7 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Open the input cube, get the camera object, and the cam map projection
@@ -85,8 +85,8 @@ void IsisMain() {
 
   // Add the default mapping info to the user entered mapping group
   userGrp.addKeyword(PvlKeyword("TargetName", "Sky"), Pvl::Replace);
-  userGrp.addKeyword(PvlKeyword("EquatorialRadius", toString(1.0)), Pvl::Replace);
-  userGrp.addKeyword(PvlKeyword("PolarRadius", toString(1.0)), Pvl::Replace);
+  userGrp.addKeyword(PvlKeyword("EquatorialRadius", Isis::toString(1.0)), Pvl::Replace);
+  userGrp.addKeyword(PvlKeyword("PolarRadius", Isis::toString(1.0)), Pvl::Replace);
   userGrp.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"), Pvl::Replace);
   if (!userGrp.hasKeyword("LongitudeDirection")) {
     userGrp.addKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"), Pvl::Replace);
@@ -100,36 +100,36 @@ void IsisMain() {
     // Get the default ra/dec range
     double minRa, maxRa, minDec, maxDec;
     incam->RaDecRange(minRa, maxRa, minDec, maxDec);
-    userGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minRa)), Pvl::Replace);
-    userGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxRa)), Pvl::Replace);
-    userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minDec)), Pvl::Replace);
-    userGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxDec)), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MinimumLongitude", Isis::toString(minRa)), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MaximumLongitude", Isis::toString(maxRa)), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MinimumLatitude", Isis::toString(minDec)), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MaximumLatitude", Isis::toString(maxDec)), Pvl::Replace);
     incam->SetImage(icube->sampleCount() / 2.0, icube->lineCount() / 2.0);
     double centerRa = incam->RightAscension();
-    userGrp.addKeyword(PvlKeyword("CenterLongitude", toString(centerRa)), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("CenterLongitude", Isis::toString(centerRa)), Pvl::Replace);
   }
   if(ui.GetString("DEFAULTSCALE") == "CAMERA") {
     double res = incam->RaDecResolution();
-    userGrp.addKeyword(PvlKeyword("Scale", toString(1.0 / res)), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("Scale", Isis::toString(1.0 / res)), Pvl::Replace);
   }
 
   // Override computed range with the users request
   if(ui.WasEntered("SRA")) {
-    userGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(ui.GetDouble("SRA"))), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MinimumLongitude", Isis::toString(ui.GetDouble("SRA"))), Pvl::Replace);
   }
   if(ui.WasEntered("ERA")) {
-    userGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(ui.GetDouble("ERA"))), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MaximumLongitude", Isis::toString(ui.GetDouble("ERA"))), Pvl::Replace);
   }
   if(ui.WasEntered("SDEC")) {
-    userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(ui.GetDouble("SDEC"))), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MinimumLatitude", Isis::toString(ui.GetDouble("SDEC"))), Pvl::Replace);
   }
   if(ui.WasEntered("EDEC")) {
-    userGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(ui.GetDouble("EDEC"))), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MaximumLatitude", Isis::toString(ui.GetDouble("EDEC"))), Pvl::Replace);
   }
 
   // Get the resolution from the user if they decided to enter it
   if(ui.GetString("DEFAULTSCALE") == "USER") {
-    userGrp.addKeyword(PvlKeyword("Scale", toString(ui.GetDouble("SCALE"))), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("Scale", Isis::toString(ui.GetDouble("SCALE"))), Pvl::Replace);
   }
 
   // Create the projection
@@ -183,14 +183,14 @@ void IsisMain() {
   // Create an alpha cube group for the output cube
   if(!ocube->hasGroup("AlphaCube")) {
     PvlGroup alpha("AlphaCube");
-    alpha += PvlKeyword("AlphaSamples", toString(icube->sampleCount()));
-    alpha += PvlKeyword("AlphaLines", toString(icube->lineCount()));
-    alpha += PvlKeyword("AlphaStartingSample", toString(0.5));
-    alpha += PvlKeyword("AlphaStartingLine", toString(0.5));
-    alpha += PvlKeyword("AlphaEndingSample", toString(icube->sampleCount() + 0.5));
-    alpha += PvlKeyword("AlphaEndingLine", toString(icube->lineCount() + 0.5));
-    alpha += PvlKeyword("BetaSamples", toString(icube->sampleCount()));
-    alpha += PvlKeyword("BetaLines", toString(icube->lineCount()));
+    alpha += PvlKeyword("AlphaSamples", Isis::toString(icube->sampleCount()));
+    alpha += PvlKeyword("AlphaLines", Isis::toString(icube->lineCount()));
+    alpha += PvlKeyword("AlphaStartingSample", Isis::toString(0.5));
+    alpha += PvlKeyword("AlphaStartingLine", Isis::toString(0.5));
+    alpha += PvlKeyword("AlphaEndingSample", Isis::toString(icube->sampleCount() + 0.5));
+    alpha += PvlKeyword("AlphaEndingLine", Isis::toString(icube->lineCount() + 0.5));
+    alpha += PvlKeyword("BetaSamples", Isis::toString(icube->sampleCount()));
+    alpha += PvlKeyword("BetaLines", Isis::toString(icube->lineCount()));
     ocube->putGroup(alpha);
   }
 
@@ -279,7 +279,7 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
@@ -292,7 +292,7 @@ void LoadMapRes() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Set resolution
@@ -301,7 +301,7 @@ void LoadMapRes() {
     ui.PutDouble("SCALE", userGrp["Scale"]);
   }
   else {
-    QString msg = "Mapfile [" + ui.GetFileName("MAP") +
+    std::string msg = "Mapfile [" + ui.GetFileName("MAP").toStdString() +
                  "] does not have [SCALE] keyword to load";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -332,7 +332,7 @@ void LoadMapRange() {
 
   // Get map file
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Set ground range keywords that are found in mapfile
@@ -359,8 +359,8 @@ void LoadMapRange() {
   ui.PutAsString("DEFAULTRANGE", "MAP");
 
   if(count < 4) {
-    QString msg = "One or more of the values for the sky range was not found";
-    msg += " in [" + ui.GetFileName("MAP") + "]";
+    std::string msg = "One or more of the values for the sky range was not found";
+    msg += " in [" + ui.GetFileName("MAP").toStdString() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }

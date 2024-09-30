@@ -34,11 +34,11 @@ map <QString, void *> GuiHelpers() {
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  FileName file = ui.GetCubeName("FROM");
+  FileName file = ui.GetCubeName("FROM").toStdString();
   QString blobname = ui.GetString("NAME");
   QString blobtype = ui.GetString("TYPE");
-  Blob blob(blobname, blobtype, file.expanded());
-  FileName outfname = ui.GetFileName("TO");
+  Blob blob(blobname.toStdString(), blobtype.toStdString(), file.expanded());
+  FileName outfname = ui.GetFileName("TO").toStdString();
   blob.Write(outfname.expanded());
 }
 
@@ -49,7 +49,7 @@ void helperButtonGetBlobList() {
 
   UserInterface &ui = Application::GetUserInterface();
   QString currentFile = ui.GetCubeName("FROM");
-  const Pvl label(FileName(currentFile).expanded());
+  const Pvl label(FileName(currentFile.toStdString()).expanded());
 
   // Check to see if the "FILE" parameter has changed since last press
   if(currentFile != previousFile) {
@@ -65,7 +65,7 @@ void helperButtonGetBlobList() {
     // If we've gone through all objects and found nothing, throw an exception
     if(cnt >= label.objects()) {
       pos = 0;
-      QString msg = "Parameter [FROM] has no blobs.";
+      std::string msg = "Parameter [FROM] has no blobs.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     // When the end of the objects is hit,
@@ -81,8 +81,8 @@ void helperButtonGetBlobList() {
             label.object(pos).hasKeyword("Name") &&
             label.object(pos).hasKeyword("StartByte") &&
             label.object(pos).hasKeyword("Bytes")) {
-      name = label.object(pos)["Name"][0];
-      type = label.object(pos).name();
+      name = QString::fromStdString(label.object(pos)["Name"][0]);
+      type = QString::fromStdString(label.object(pos).name());
       match = true;
       pos++;
     }

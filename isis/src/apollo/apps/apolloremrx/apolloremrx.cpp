@@ -47,22 +47,22 @@ namespace Isis {
     PvlKeyword &status = info->group("RESEAUS")["STATUS"];
     QString in = info->fileName();
 
-    QString spacecraft = (info->group("Instrument")["SpacecraftName"]);
-    QString instrument = (info->group("Instrument")["InstrumentId"]);
+    QString spacecraft = QString::fromStdString(info->group("Instrument")["SpacecraftName"]);
+    QString instrument = QString::fromStdString(info->group("Instrument")["InstrumentId"]);
     if (spacecraft.mid(0,6) != "APOLLO") {
-      QString msg = "This application is for use with Apollo spacecrafts only. ";
+      std::string msg = "This application is for use with Apollo spacecrafts only. ";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     Apollo apollo(spacecraft, instrument);
 
     // Check reseau status and make sure it is not nominal or removed
-    if ((QString)status == "Nominal") {
-      QString msg = "Input file [" + in +
+    if ((std::string)status == "Nominal") {
+      std::string msg = "Input file [" + in.toStdString() +
             "] appears to have nominal reseau status. You must run findrx first.";
       throw IException(IException::User,msg, _FILEINFO_);
     }
-    if ((QString)status == "Removed") {
-      QString msg = "Input file [" + in +
+    if ((std::string)status == "Removed") {
+      std::string msg = "Input file [" + in.toStdString() +
             "] appears to already have reseaus removed.";
       throw IException(IException::User,msg, _FILEINFO_);
     }
@@ -99,9 +99,9 @@ namespace Isis {
     Brick brick(dim,dim,1,cube.pixelType());
     int width = ui.GetInteger("WIDTH");
     for (int res=0; res<numres; res++) {
-      if ((resvalid == 0 || toInt(valid[res]) == 1)) {
-        int baseSamp = (int)(toDouble(samps[res])+0.5) - (dim/2);
-        int baseLine = (int)(toDouble(lines[res])+0.5) - (dim/2);
+      if ((resvalid == 0 || Isis::toInt(valid[res]) == 1)) {
+        int baseSamp = (int)(Isis::toDouble(samps[res])+0.5) - (dim/2);
+        int baseLine = (int)(Isis::toDouble(lines[res])+0.5) - (dim/2);
         brick.SetBasePosition(baseSamp,baseLine,1);
         cube.read(brick);
         if (action == "NULL") {

@@ -55,17 +55,17 @@ void IsisMain() {
   Cube *ocube = p.SetOutputCube("TO");
   Cube *ffcube, *ofcube, *afcube, *dccube, *biascube, *bpcube;
 
-  QString filter = (QString)(icube->group("BandBin"))["FilterName"];
+  QString filter = QString::fromStdString((icube->group("BandBin"))["FilterName"]);
   filter = filter.toLower();
-  QString productID = (QString)(icube->group("Archive"))["ProductID"];
+  QString productID = QString::fromStdString((icube->group("Archive"))["ProductID"]);
   QString orbit = productID.mid(productID.indexOf('.') + 1, productID.length() - 1);
 
   // If hemisphere code greater than 'I' set to 'n' else set to 's'
   char hemisphereCode = (productID[productID.indexOf('.')-1] > 'I') ? 'n' : 's';
-  QString compressionType = (QString)(icube->group("Instrument"))["EncodingFormat"];
+  QString compressionType = QString::fromStdString((icube->group("Instrument"))["EncodingFormat"]);
   offsetModeID = (icube->group("Instrument"))["OffsetModeID"];
   int gainModeID = (icube->group("Instrument"))["GainModeID"];
-  QString gainModeIDStr = toString(gainModeID);
+  QString gainModeIDStr = QString::fromStdString(toString(gainModeID));
   double exposureDuration = (double)(icube->group("Instrument"))["ExposureDuration"];
   optimalExposureDuration = (exposureDuration * 0.984675) + 0.233398;
   cryocoolerDuration = (icube->group("Instrument"))["CryocoolerDuration"];
@@ -107,9 +107,9 @@ void IsisMain() {
       QStringList tokens = line.split(" ");
       if(tokens.count() > 6 && orbit == tokens.takeFirst() &&
           filter == tokens.takeFirst() &&
-          gainModeID == toInt(tokens.takeFirst()) &&
-          offsetModeID == toInt(tokens.takeFirst()) &&
-          (int)exposureDuration == toInt(tokens.takeFirst()) &&
+          gainModeID == (tokens.takeFirst().toInt()) &&
+          offsetModeID == (tokens.takeFirst().toInt()) &&
+          (int)exposureDuration == (tokens.takeFirst().toInt()) &&
           QString(hemisphereCode) == tokens.takeFirst()) {
         tokens.takeFirst();
         affileLoc = tokens.takeFirst();
@@ -123,22 +123,22 @@ void IsisMain() {
 
     QString gainFactorDef = "$clementine1/calibration/nir/";
     gainFactorDef += "clemnircal.def";
-    Pvl gainFactorData(gainFactorDef);
+    Pvl gainFactorData(gainFactorDef.toStdString());
     QString group = "GainModeID";
-    group += toString(gainModeID);
+    group += QString::fromStdString(toString(gainModeID));
 
-    if(!gainFactorData.hasGroup(group)) {
-      QString err = "The Gain Factor for Gain Mode ID [";
-      err += toString(gainModeID);
+    if(!gainFactorData.hasGroup(group.toStdString())) {
+      std::string err = "The Gain Factor for Gain Mode ID [";
+      err += Isis::toString(gainModeID);
       err += "] could not be found in clemnircal.def";
       throw IException(IException::Programmer, err, _FILEINFO_);
     }
 
-    gainFactor = (gainFactorData.findGroup(group))["GAIN"];
+    gainFactor = (gainFactorData.findGroup(group.toStdString()))["GAIN"];
 
     if(abs(gainFactor) < DBL_EPSILON) {
-      QString err = "The Gain Factor for Gain Mode ID [";
-      err += toString(gainModeID);
+      std::string err = "The Gain Factor for Gain Mode ID [";
+      err += Isis::toString(gainModeID);
       err += "] can not be zero.";
       throw IException(IException::Programmer, err, _FILEINFO_);
     }
@@ -215,22 +215,22 @@ void IsisMain() {
     line = line.simplified().trimmed();
     QStringList tokens = line.split(" ");
 
-    if(toInt(orbit) == toInt(tokens.takeFirst())) { // if orbits match, get data
-      cryonorm = toDouble(tokens.takeFirst());
-      numCoefficients = toInt(tokens.takeFirst());
+    if(orbit.toInt() == tokens.takeFirst().toInt()) { // if orbits match, get data
+      cryonorm = tokens.takeFirst().toDouble();
+      numCoefficients = tokens.takeFirst().toInt();
 
       // Read in coefficients
-      thermBgCoefficients.push_back(toDouble(tokens.takeFirst()));
+      thermBgCoefficients.push_back(tokens.takeFirst().toDouble());
 
       for(int iCoeff = 0; iCoeff < numCoefficients; iCoeff ++) {
-        thermBgCoefficients.push_back(toDouble(tokens.takeFirst()));
+        thermBgCoefficients.push_back(tokens.takeFirst().toDouble());
       }
       break;
     }
   }
 
   if(numCoefficients == 0) {
-    QString err = "The orbit [" + orbit + "] could not be located in the thermal corrections table [" + thermTbl + "].";
+    std::string err = "The orbit [" + orbit.toStdString() + "] could not be located in the thermal corrections table [" + thermTbl.toStdString() + "].";
     throw IException(IException::Unknown, err, _FILEINFO_);
   }
 
@@ -239,26 +239,26 @@ void IsisMain() {
 
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
-  calgrp += PvlKeyword("FlatFieldFile", ffcube->fileName());
-  calgrp += PvlKeyword("OrbitFlatFieldFile", ofcube->fileName());
-  calgrp += PvlKeyword("AdditiveFile", afcube->fileName());
-  calgrp += PvlKeyword("DarkCurrentFile", dccube->fileName());
-  calgrp += PvlKeyword("BiasFile", biascube->fileName());
-  calgrp += PvlKeyword("BadPixelFile", bpcube->fileName());
+  calgrp += PvlKeyword("FlatFieldFile", ffcube->fileName().toStdString());
+  calgrp += PvlKeyword("OrbitFlatFieldFile", ofcube->fileName().toStdString());
+  calgrp += PvlKeyword("AdditiveFile", afcube->fileName().toStdString());
+  calgrp += PvlKeyword("DarkCurrentFile", dccube->fileName().toStdString());
+  calgrp += PvlKeyword("BiasFile", biascube->fileName().toStdString());
+  calgrp += PvlKeyword("BadPixelFile", bpcube->fileName().toStdString());
 
   //Table files
-  calgrp += PvlKeyword("ThermalCorrectionTable", thermTbl);
-  calgrp += PvlKeyword("AdditiveFileTable", afFileTableLoc);
+  calgrp += PvlKeyword("ThermalCorrectionTable", thermTbl.toStdString());
+  calgrp += PvlKeyword("AdditiveFileTable", afFileTableLoc.toStdString());
 
-  calgrp += PvlKeyword("DigitalOffset", toString(digitalOffset));
-  calgrp += PvlKeyword("GlobalBias", toString(globalBias));
-  calgrp += PvlKeyword("GlobalDarkCoefficient", toString(globalDarkCoefficient));
-  calgrp += PvlKeyword("V", toString(vConstant));
+  calgrp += PvlKeyword("DigitalOffset", Isis::toString(digitalOffset));
+  calgrp += PvlKeyword("GlobalBias", Isis::toString(globalBias));
+  calgrp += PvlKeyword("GlobalDarkCoefficient", Isis::toString(globalDarkCoefficient));
+  calgrp += PvlKeyword("V", Isis::toString(vConstant));
   //Calculated in processing routine
-  calgrp += PvlKeyword("GainFactor", toString(gainFactor));
-  calgrp += PvlKeyword("AbsoluteCoefficient", toString(absoluteCoefficient));
-  calgrp += PvlKeyword("CryoNorm", toString(cryonorm));
-  calgrp += PvlKeyword("OptimalExposureDuration", toString(optimalExposureDuration));
+  calgrp += PvlKeyword("GainFactor", Isis::toString(gainFactor));
+  calgrp += PvlKeyword("AbsoluteCoefficient", Isis::toString(absoluteCoefficient));
+  calgrp += PvlKeyword("CryoNorm", Isis::toString(cryonorm));
+  calgrp += PvlKeyword("OptimalExposureDuration", Isis::toString(optimalExposureDuration));
 
   ocube->putGroup(calgrp);
   p.EndProcess();

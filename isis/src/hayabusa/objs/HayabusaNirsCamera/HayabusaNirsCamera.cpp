@@ -47,8 +47,8 @@ namespace Isis {
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // get the start and stop times
-    QString startTime = inst["SpacecraftClockStartCount"];
-    QString stopTime = inst["SpacecraftClockStopCount"];
+    QString startTime = QString::fromStdString(inst["SpacecraftClockStartCount"]);
+    QString stopTime = QString::fromStdString(inst["SpacecraftClockStopCount"]);
     iTime etStart = getClockTime(startTime);
     iTime etStop = getClockTime(stopTime);
 
@@ -60,8 +60,8 @@ namespace Isis {
 
     // lines and samples added to the pvl in the order you
     // call getDouble()
-    double bLines = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
-    double bSamples = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE");
+    double bLines = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_BORESIGHT_LINE");
+    double bSamples = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_BORESIGHT_SAMPLE");
 
     focalMap->SetDetectorOrigin(bSamples, bLines);
 

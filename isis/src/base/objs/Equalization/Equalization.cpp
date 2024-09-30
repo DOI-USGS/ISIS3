@@ -83,10 +83,10 @@ namespace Isis {
    */
   void Equalization::addHolds(QString holdListName) {
     FileList holdList;
-    holdList.read(FileName(holdListName));
+    holdList.read(FileName(holdListName.toStdString()));
 
     if (holdList.size() > m_imageList.size()) {
-      QString msg = "The list of identifiers to be held must be less than or ";
+      std::string msg = "The list of identifiers to be held must be less than or ";
       msg += "equal to the total number of identitifers.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -102,7 +102,7 @@ namespace Isis {
         }
       }
       if (!matched) {
-        QString msg = "The hold list file [" + holdList[i].toString() +
+        std::string msg = "The hold list file [" + holdList[i].toString() +
                           "] does not match a file in the from list";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -155,14 +155,14 @@ namespace Isis {
     for (int img = 0; img < m_imageList.size(); img++) {
       // Record name of each input cube without an overlap
       if (!m_doesOverlapList[img]) {
-        m_badFiles += m_imageList[img].toString();
+        m_badFiles += QString::fromStdString(m_imageList[img].toString());
       }
     }
     if (!m_badFiles.isEmpty()) {
       // Make sure we set the results for the already calculated overlap statistics
       setResults();
 
-      QString msg;
+      std::string msg;
       // Let user know where to find list of non-overlapping files so they can make corrections.
       msg = "There are input images that do not overlap with enough valid pixels. ";
       msg += "See application log or \"NonOverlaps\" keyword in output statistics file.";
@@ -193,7 +193,7 @@ namespace Isis {
     }
     catch (IException &e) {
       setResults();
-      QString msg = "Unable to calculate the equalization statistics. You may "
+      std::string msg = "Unable to calculate the equalization statistics. You may "
       "want to try another LeastSquares::SolveMethod.";
       throw IException(e, IException::Unknown,  msg, _FILEINFO_);
     }
@@ -217,13 +217,13 @@ namespace Isis {
       vector<Statistics *> statsList;
       for (int img = 0; img < (int) m_imageList.size(); img++) {
         ProcessByLine p;
-        QString bandStr(toString(band));
+        QString bandStr(QString::fromStdString(toString(band)));
         QString statMsg = "Calculating Statistics for Band " + bandStr +
-            " of " + toString(m_maxBand) + " in Cube " + toString(img + 1) +
-            " of " + toString(m_maxCube);
+            " of " + QString::fromStdString(toString(m_maxBand)) + " in Cube " + QString::fromStdString(toString(img + 1)) +
+            " of " + QString::fromStdString(toString(m_maxCube));
         p.Progress()->SetText(statMsg);
-        CubeAttributeInput att("+" + bandStr);
-        QString inp = m_imageList[img].toString();
+        CubeAttributeInput att("+" + bandStr.toStdString());
+        QString inp = QString::fromStdString(m_imageList[img].toString());
         p.SetInputCube(inp, att);
 
         Statistics *stats = new Statistics();
@@ -259,7 +259,7 @@ namespace Isis {
     // each band shared amongst cubes
     for (int i = 0; i < m_imageList.size(); i++) {
       Cube cube1;
-      cube1.open(m_imageList[i].toString());
+      cube1.open(QString::fromStdString(m_imageList[i].toString()));
 
       for (int j = (i + 1); j < m_imageList.size(); j++) {
         // Skip if overlap already calculated
@@ -271,12 +271,12 @@ namespace Isis {
         }
 
         Cube cube2;
-        cube2.open(m_imageList[j].toString());
-        QString cubeStr1 = toString((int)(i + 1));
-        QString cubeStr2 = toString((int)(j + 1));
+        cube2.open(QString::fromStdString(m_imageList[j].toString()));
+        QString cubeStr1 = QString::fromStdString(toString((int)(i + 1)));
+        QString cubeStr2 = QString::fromStdString(toString((int)(j + 1)));
         QString statMsg = "Gathering Overlap Statisitcs for Cube " +
                          cubeStr1 + " vs " + cubeStr2 + " of " +
-                         toString(m_maxCube);
+                         QString::fromStdString(toString(m_maxCube));
 
         // Get overlap statistics for new cubes
         OverlapStatistics *oStats = new OverlapStatistics(cube1, cube2, statMsg, m_samplingPercent);
@@ -332,19 +332,19 @@ namespace Isis {
 
     PvlObject equ("EqualizationInformation");
     PvlGroup gen("General");
-    gen += PvlKeyword("TotalOverlaps", toString(m_validCnt + m_invalidCnt));
-    gen += PvlKeyword("ValidOverlaps", toString(m_validCnt));
-    gen += PvlKeyword("InvalidOverlaps", toString(m_invalidCnt));
-    gen += PvlKeyword("MinCount", toString(m_mincnt));
-    gen += PvlKeyword("SamplingPercent", toString(m_samplingPercent));
+    gen += PvlKeyword("TotalOverlaps", Isis::toString(m_validCnt + m_invalidCnt));
+    gen += PvlKeyword("ValidOverlaps", Isis::toString(m_validCnt));
+    gen += PvlKeyword("InvalidOverlaps", Isis::toString(m_invalidCnt));
+    gen += PvlKeyword("MinCount", Isis::toString(m_mincnt));
+    gen += PvlKeyword("SamplingPercent", Isis::toString(m_samplingPercent));
     gen += PvlKeyword("Weighted", (m_wtopt) ? "true" : "false");
     int solType = m_sType;
     int lsqMethod = m_lsqMethod;
-    gen += PvlKeyword("SolutionType", toString(solType));
-    gen += PvlKeyword("SolveMethod" , toString(lsqMethod));
+    gen += PvlKeyword("SolutionType", Isis::toString(solType));
+    gen += PvlKeyword("SolveMethod" , Isis::toString(lsqMethod));
     PvlKeyword nonOverlaps("NonOverlaps");
     for (int img = 0; img < m_badFiles.size(); img++) {
-      nonOverlaps += m_badFiles[img];
+      nonOverlaps += m_badFiles[img].toStdString();
     }
     gen += nonOverlaps;
     gen += PvlKeyword("HasCorrections", (m_normsSolved) ? "true" : "false");
@@ -379,25 +379,25 @@ namespace Isis {
       if (m_normsSolved) {
         // Band by band statistics
         for (int band = 1; band <= m_maxBand; band++) {
-          QString bandNum = toString(band);
+          QString bandNum = QString::fromStdString(toString(band));
           QString bandStr = "Band" + bandNum;
-          PvlKeyword bandStats(bandStr);
+          PvlKeyword bandStats(bandStr.toStdString());
           // GAIN
           if (m_sType == OverlapNormalization::Both ||
               m_sType == OverlapNormalization::Gains ||
               m_sType == OverlapNormalization::GainsWithoutNormalization) {
-            bandStats += toString(m_adjustments[img]->getGain(band - 1));
+            bandStats += Isis::toString(m_adjustments[img]->getGain(band - 1));
           }
           // OFFSET
           if (m_sType == OverlapNormalization::Both ||
               m_sType == OverlapNormalization::Offsets) {
-            bandStats += toString(m_adjustments[img]->getOffset(band - 1));
+            bandStats += Isis::toString(m_adjustments[img]->getOffset(band - 1));
           }
           // AVERAGE
           if (m_sType == OverlapNormalization::Both ||
               m_sType == OverlapNormalization::Gains ||
               m_sType == OverlapNormalization::Offsets) {
-            bandStats += toString(m_adjustments[img]->getAverage(band - 1));
+            bandStats += Isis::toString(m_adjustments[img]->getAverage(band - 1));
           }
           norm += bandStats;
         }
@@ -427,7 +427,7 @@ namespace Isis {
    */
   void Equalization::recalculateStatistics(QString instatsFileName) {
     m_recalculating = true;
-    Pvl inStats(instatsFileName);
+    Pvl inStats(instatsFileName.toStdString());
     fromPvl(inStats);
     calculateStatistics(m_samplingPercent, m_mincnt, m_wtopt, m_lsqMethod);
   }
@@ -448,7 +448,7 @@ namespace Isis {
 
     // Check for errors with the input statistics
     QVector<int> normIndices = validateInputStatistics(instatsFileName);
-    Pvl inStats(instatsFileName);
+    Pvl inStats(instatsFileName.toStdString());
     PvlObject &equalInfo = inStats.findObject("EqualizationInformation");
     PvlGroup &general = equalInfo.findGroup("General");
 
@@ -468,9 +468,9 @@ namespace Isis {
 
         // Get and store the modifiers for each band
         for (int band = 1; band < normalization.keywords(); band++) {
-          adjustment->addGain(toDouble(normalization[band][0]));
-          adjustment->addOffset(toDouble(normalization[band][1]));
-          adjustment->addAverage(toDouble(normalization[band][2]));
+          adjustment->addGain(Isis::toDouble(normalization[band][0]));
+          adjustment->addOffset(Isis::toDouble(normalization[band][1]));
+          adjustment->addAverage(Isis::toDouble(normalization[band][2]));
         }
 
         addAdjustment(adjustment);
@@ -495,12 +495,12 @@ namespace Isis {
   */
   void Equalization::applyCorrection(QString toListName="") {
     if (!isSolved()) {
-      QString msg = "Corrective factors have not yet been determined. ";
+      std::string msg = "Corrective factors have not yet been determined. ";
       if (m_badFiles.size() > 0) {
         msg += "Fix any non-overlapping images and recalculate the image statistics. ";
         msg += "File(s) without overlaps: ";
         for (int img = 0; img < m_badFiles.size(); img++) {
-          msg += " [" + m_badFiles[img] + "] ";
+          msg += " [" + m_badFiles[img].toStdString() + "] ";
         }
       }
       else {
@@ -513,20 +513,20 @@ namespace Isis {
     FileList outList;
     fillOutList(outList, toListName);
 
-    QString maxCubeStr = toString((int) m_imageList.size());
+    QString maxCubeStr = QString::fromStdString(toString((int) m_imageList.size()));
     for (int img = 0; img < m_imageList.size(); img++) {
       // Set up for progress bar
       ProcessByLine p;
-      p.Progress()->SetText("Equalizing Cube " + toString((int) img + 1) +
+      p.Progress()->SetText("Equalizing Cube " + QString::fromStdString(toString((int) img + 1)) +
           " of " + maxCubeStr);
 
       // Open input cube
       CubeAttributeInput att;
-      const QString inp = m_imageList[img].toString();
+      const QString inp = QString::fromStdString(m_imageList[img].toString());
       Cube *icube = p.SetInputCube(inp, att);
 
       // Allocate output cube
-      QString out = outList[img].toString();
+      QString out = QString::fromStdString(outList[img].toString());
       CubeAttributeOutput outAtt;
       p.SetOutputCube(out, outAtt, icube->sampleCount(),
           icube->lineCount(), icube->bandCount());
@@ -557,15 +557,15 @@ namespace Isis {
 
         // Band by band statistics
         for (int band = 1; band <= m_maxBand; band++) {
-          QString mult = toString(m_adjustments[img]->getGain(band - 1));
-          QString base = toString(m_adjustments[img]->getOffset(band - 1));
-          QString avg = toString(m_adjustments[img]->getAverage(band - 1));
-          QString bandNum = toString(band);
+          QString mult = QString::fromStdString(toString(m_adjustments[img]->getGain(band - 1)));
+          QString base = QString::fromStdString(toString(m_adjustments[img]->getOffset(band - 1)));
+          QString avg = QString::fromStdString(toString(m_adjustments[img]->getAverage(band - 1)));
+          QString bandNum = QString::fromStdString(toString(band));
           QString bandStr = "Band" + bandNum;
-          PvlKeyword bandStats(bandStr);
-          bandStats += mult;
-          bandStats += base;
-          bandStats += avg;
+          PvlKeyword bandStats(bandStr.toStdString());
+          bandStats += mult.toStdString();
+          bandStats += base.toStdString();
+          bandStats += avg.toStdString();
           results += bandStats;
         }
       }
@@ -581,7 +581,7 @@ namespace Isis {
    */
   void Equalization::write(QString outstatsFileName) {
     // Write the equalization and overlap statistics to the file
-    m_results->write(outstatsFileName);
+    m_results->write(outstatsFileName.toStdString());
   }
 
 
@@ -601,17 +601,17 @@ namespace Isis {
    */
   void Equalization::loadInputs(QString fromListName) {
     // Get the list of cubes to mosaic
-    m_imageList.read(fromListName);
+    m_imageList.read(fromListName.toStdString());
     m_maxCube = m_imageList.size();
 
     if (m_imageList.size() < 2) {
-      QString msg = "The input file [" + fromListName +
+      std::string msg = "The input file [" + fromListName.toStdString() +
         "] must contain at least 2 file names";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     Cube tempCube;
-    tempCube.open(m_imageList[0].toString());
+    tempCube.open(QString::fromStdString(m_imageList[0].toString()));
     m_maxBand = tempCube.bandCount();
 
     m_doesOverlapList.resize(m_imageList.size(), false);
@@ -622,7 +622,7 @@ namespace Isis {
 
 
   void Equalization::setInput(int index, QString value) {
-    m_imageList[index] = value;
+    m_imageList[index] = value.toStdString();
   }
 
 
@@ -650,15 +650,15 @@ namespace Isis {
   void Equalization::errorCheck(QString fromListName) {
     for (int i = 0; i < m_imageList.size(); i++) {
       Cube cube1;
-      cube1.open(m_imageList[i].toString());
+      cube1.open(QString::fromStdString(m_imageList[i].toString()));
 
       for (int j = (i + 1); j < m_imageList.size(); j++) {
         Cube cube2;
-        cube2.open(m_imageList[j].toString());
+        cube2.open(QString::fromStdString(m_imageList[j].toString()));
 
         // Make sure number of bands match
         if (m_maxBand != cube2.bandCount()) {
-          QString msg = "Number of bands do not match between cubes [" +
+          std::string msg = "Number of bands do not match between cubes [" +
             m_imageList[i].toString() + "] and [" + m_imageList[j].toString() + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -669,7 +669,7 @@ namespace Isis {
 
         // Test to make sure projection parameters match
         if (*proj1 != *proj2) {
-          QString msg = "Mapping groups do not match between cubes [" +
+          std::string msg = "Mapping groups do not match between cubes [" +
             m_imageList[i].toString() + "] and [" + m_imageList[j].toString() + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -684,7 +684,7 @@ namespace Isis {
   void Equalization::generateOutputs(FileList &outList) {
     for (int img = 0; img < m_imageList.size(); img++) {
       FileName file(m_imageList[img]);
-      QString filename = file.path() + "/" + file.baseName() +
+      std::string filename = file.path() + "/" + file.baseName() +
         ".equ." + file.extension();
       outList.push_back(FileName(filename));
     }
@@ -700,11 +700,11 @@ namespace Isis {
    *                           fil."
    */
   void Equalization::loadOutputs(FileList &outList, QString toListName) {
-    outList.read(FileName(toListName));
+    outList.read(FileName(toListName.toStdString()));
 
     // Make sure each file in the tolist matches a file in the fromlist
     if (outList.size() != m_imageList.size()) {
-      QString msg = "Each input file in the FROM LIST must have a ";
+      std::string msg = "Each input file in the FROM LIST must have a ";
       msg += "corresponding output file in the TO LIST.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -713,7 +713,7 @@ namespace Isis {
     // corresponding input files
     for (int i = 0; i < outList.size(); i++) {
       if (outList[i].toString().compare(m_imageList[i].toString()) == 0) {
-        QString msg = "The to list file [" + outList[i].toString() +
+        std::string msg = "The to list file [" + outList[i].toString() +
           "] has the same name as its corresponding from list file.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -805,7 +805,7 @@ namespace Isis {
     // Make a copy of our image list with names only (instead of full path)
     QList<QString> imgNames;
     for (int img = 0; img < m_imageList.size(); img++) {
-      imgNames.append(m_imageList[img].name());
+      imgNames.append(QString::fromStdString(m_imageList[img].name()));
     }
 
     // Load in previous user params
@@ -815,18 +815,18 @@ namespace Isis {
     m_mincnt = eqGen["MinCount"];
     m_wtopt = (eqGen["Weighted"][0] == "true") ? true : false;
     m_sType = static_cast<OverlapNormalization::SolutionType>((int)eqGen["SolutionType"]);
-    m_lsqMethod = static_cast<LeastSquares::SolveMethod>(eqGen["SolveMethod"][0].toInt());
+    m_lsqMethod = static_cast<LeastSquares::SolveMethod>(Isis::toInt(eqGen["SolveMethod"][0]));
 
     // Unserialize previous overlap statistics
     PvlObject::ConstPvlObjectIterator curObj = inStats.beginObject();
-    while (curObj < inStats.endObject()) {
+    while (curObj != inStats.endObject()) {
       if (curObj->isNamed("OverlapStatistics")) {
         OverlapStatistics *o = new OverlapStatistics(*curObj);
         m_overlapStats.push_back(o);
 
         const PvlObject &oStat = *curObj;
-        QString fileX = oStat["File1"][0];
-        QString fileY = oStat["File2"][0];
+        QString fileX = QString::fromStdString(oStat["File1"][0]);
+        QString fileY = QString::fromStdString(oStat["File2"][0]);
 
         // Determine already calculated overlaps
         int x = imgNames.indexOf(fileX);
@@ -861,15 +861,15 @@ namespace Isis {
       // This means ensuring that each overlap has the X overlap statistics associated with
       // the X index and the Y overlap statistics associated with the Y index.
       for (int i = 0; i < m_imageList.size(); i++) {
-        QString imageName(m_imageList[i].name());
+        QString imageName(QString::fromStdString(m_imageList[i].name()));
 
         // Always push the X file index to the front (0)
-        if (oStat->FileNameX() == imageName)
+        if (oStat->FileNameX() == imageName.toStdString())
           //overlapIndices[o].insert(overlapIndices[o].begin(), i);
           //overlapIndices[o][0] = i;
           overlapIndices[o].push_front(i);
         // Always push the Y file index to the back (1)
-        if (oStat->FileNameY() == imageName)
+        if (oStat->FileNameY() == imageName.toStdString())
           //overlapIndices[o].push_back(i);
           //overlapIndices[o][1] = i;
           overlapIndices[o].push_back(i);
@@ -956,23 +956,23 @@ namespace Isis {
   QVector<int> Equalization::validateInputStatistics(QString instatsFileName) {
     QVector<int> normIndices;
 
-    Pvl inStats(instatsFileName);
+    Pvl inStats(instatsFileName.toStdString());
     PvlObject &equalInfo = inStats.findObject("EqualizationInformation");
 
     // Make sure each file in the instats matches a file in the fromlist
     if (m_imageList.size() > equalInfo.groups() - 1) {
-      QString msg = "Each input file in the FROM LIST must have a ";
+      std::string msg = "Each input file in the FROM LIST must have a ";
       msg += "corresponding input file in the INPUT STATISTICS.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Check that each file in the FROM LIST is present in the INPUT STATISTICS
     for (int i = 0; i < m_imageList.size(); i++) {
-      QString fromFile = m_imageList[i].original();
+      QString fromFile = QString::fromStdString(m_imageList[i].original());
       bool foundFile = false;
       for (int j = 1; j < equalInfo.groups(); j++) {
         PvlGroup &normalization = equalInfo.group(j);
-        QString normFile  = normalization["FileName"][0];
+        QString normFile  = QString::fromStdString(normalization["FileName"][0]);
         if (fromFile == normFile) {
 
           // Store the index in INPUT STATISTICS file corresponding to the
@@ -982,7 +982,7 @@ namespace Isis {
         }
       }
       if (!foundFile) {
-        QString msg = "The from list file [" + fromFile +
+        std::string msg = "The from list file [" + fromFile.toStdString() +
                           "] does not have any corresponding file in the stats list.";
         throw IException(IException::User, msg, _FILEINFO_);
       }

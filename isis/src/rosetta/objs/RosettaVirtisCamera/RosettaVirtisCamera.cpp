@@ -55,10 +55,10 @@ namespace Isis {
 //    PvlGroup &archive = lab.findGroup("Archive", Isis::Pvl::Traverse);
     PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
 
-    QString instrumentId = inst["InstrumentId"];
+    QString instrumentId = QString::fromStdString(inst["InstrumentId"]);
     if ( "virtis" != instrumentId.toLower()) {
-      QString mess = "This data is apparently not from the VIRTIS instrument but "
-                      + instrumentId;
+      std::string mess = "This data is apparently not from the VIRTIS instrument but "
+                      + instrumentId.toStdString();
       throw IException(IException::User, mess, _FILEINFO_);
     }
 
@@ -67,9 +67,9 @@ namespace Isis {
     m_is1BCalibrated = (procLevel > 2) ? true : false;
 
     // Get the start time from labels
-    QString channelId = inst["ChannelId"];
+    QString channelId = QString::fromStdString(inst["ChannelId"]);
 
-    QString instMode = inst["InstrumentModeId"];
+    QString instMode = QString::fromStdString(inst["InstrumentModeId"]);
     m_slitMode = instMode[14].toLatin1();   // "F" for full slit, Q for quarter slit
 
 
@@ -104,18 +104,18 @@ namespace Isis {
 
     // convert milliseconds to seconds
 
-    m_exposureTime = toDouble(frameParam[0]) * 0.001;
-    m_summing  = toDouble(frameParam[1]);
-    m_scanRate = toDouble(frameParam[2]);
+    m_exposureTime = Isis::toDouble(frameParam[0]) * 0.001;
+    m_summing  = Isis::toDouble(frameParam[1]);
+    m_scanRate = Isis::toDouble(frameParam[2]);
 
     // Setup detector map
     //  Get the line scan rates/times
 
     if (!m_is1BCalibrated) {
-      readHouseKeeping(lab.fileName(), m_scanRate);
+      readHouseKeeping(QString::fromStdString(lab.fileName()), m_scanRate);
     }
     else {
-      readSCET(lab.fileName());
+      readSCET(QString::fromStdString(lab.fileName()));
     }
 
     new VariableLineScanCameraDetectorMap(this, m_lineRates);
@@ -124,10 +124,10 @@ namespace Isis {
     // Setup focal plane map
     new CameraFocalPlaneMap(this, naifIkCode());
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-    QString ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
+    QString ikernKey = "INS" + QString::number(naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoreSight = getDouble(ikernKey);
 
-    ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
+    ikernKey = "INS" + QString::number(naifIkCode()) + "_BORESIGHT_LINE";
     double lineBoreSight = getDouble(ikernKey);
     FocalPlaneMap()->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
 
@@ -301,13 +301,13 @@ namespace Isis {
   void RosettaVirtisCamera::readSCET(const QString &filename) {
    //  Open the ISIS table object
    std::vector<double> cacheTime;
-   Table hktable("VIRTISHouseKeeping", filename);
+   Table hktable("VIRTISHouseKeeping", filename.toStdString());
    m_lineRates.clear();
    int lineno(1);
    double lineEndTime = 0;
    for (int i = 0; i < hktable.Records(); i++) {
      TableRecord &trec = hktable[i];
-     QString scetString = trec["dataSCET"];
+     QString scetString = QString::fromStdString(trec["dataSCET"]);
      lineEndTime = getClockTime(scetString, naifSpkCode()).Et();
      m_lineRates.push_back(LineRateChange(lineno,
                                           lineEndTime-exposureTime(),
@@ -356,7 +356,7 @@ namespace Isis {
   void RosettaVirtisCamera::readHouseKeeping(const QString &filename,
                                        double lineRate) {
    //  Open the ISIS table object
-   Table hktable("VIRTISHouseKeeping", filename);
+   Table hktable("VIRTISHouseKeeping", filename.toStdString());
 
    m_lineRates.clear();
    int lineno(1);
@@ -377,7 +377,7 @@ namespace Isis {
      ScanMirrorInfo smInfo;
      double lineMidTime;
      //  scs2e_c(naifSpkCode(), scet.c_str(), &lineMidTime);
-     lineMidTime = getClockTime(toString(scet), naifSpkCode()).Et();
+     lineMidTime = getClockTime(QString::number(scet), naifSpkCode()).Et();
      bool isDark = (shutterMode == 1);
 
      // Add fit data for all open angles
@@ -527,21 +527,21 @@ namespace Isis {
     }
 
     // Add some necessary keywords
-    quats.Label() += PvlKeyword("CkTableStartTime", toString(startTime()));
-    quats.Label() += PvlKeyword("CkTableEndTime", toString(endTime()));
-    quats.Label() += PvlKeyword("CkTableOriginalSize", toString(quats.Records()));
+    quats.Label() += PvlKeyword("CkTableStartTime", Isis::toString(startTime()));
+    quats.Label() += PvlKeyword("CkTableEndTime", Isis::toString(endTime()));
+    quats.Label() += PvlKeyword("CkTableOriginalSize", Isis::toString(quats.Records()));
 
     // Create the time dependant frames keyword
     int virZeroId = getInteger("FRAME_" + virZero);
-    PvlKeyword tdf("TimeDependentFrames", toString(virZeroId)); // ROS_VIRTIS_M_{ID}_ZERO
+    PvlKeyword tdf("TimeDependentFrames", Isis::toString(virZeroId)); // ROS_VIRTIS_M_{ID}_ZERO
     tdf.addValue("-226200");  //  ROS_VIRTIS
     tdf.addValue("-226000");  //  ROSETTA_SPACECRAFT
     tdf.addValue("1");        // J2000
     quats.Label() += tdf;
 
     //  Create constant rotation frames
-    PvlKeyword cf("ConstantFrames", toString(virZeroId));
-    cf.addValue(toString(virZeroId));
+    PvlKeyword cf("ConstantFrames", Isis::toString(virZeroId));
+    cf.addValue(Isis::toString(virZeroId));
     quats.Label() += cf;
 
     SpiceDouble identity[3][3];
@@ -551,7 +551,7 @@ namespace Isis {
     PvlKeyword crot("ConstantRotation");
     for (int i = 0 ; i < 3 ; i++) {
       for (int j = 0 ; j < 3 ; j++) {
-        crot.addValue(toString(identity[i][j]));
+        crot.addValue(Isis::toString(identity[i][j]));
       }
     }
 
@@ -601,8 +601,8 @@ namespace Isis {
       }
       catch (IException &ie2) {
         ostringstream mess;
-        mess << "Could not get state rotation for Frame1 (" << frame1
-             << ") to Frame2 (" <<  frame2 <<  ") at time " << etTime;
+        mess << "Could not get state rotation for Frame1 (" << frame1.toStdString()
+             << ") to Frame2 (" <<  frame2.toStdString() <<  ") at time " << etTime;
         throw IException(ie2, IException::User, mess.str(), _FILEINFO_);
       }
     }

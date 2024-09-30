@@ -44,7 +44,7 @@ namespace Isis {
     while (xmlReader->readNextStartElement()) {
       if (xmlReader->qualifiedName() == "sum") {
         try {
-          m_sum = toDouble(xmlReader->readElementText());
+          m_sum = xmlReader->readElementText().toDouble();
         }
         catch (IException &e) {
           m_sum = 0.0;
@@ -52,7 +52,7 @@ namespace Isis {
       }
       else if (xmlReader->qualifiedName() == "sumSquares") {
         try {
-          m_sumsum = toDouble(xmlReader->readElementText());
+          m_sumsum = xmlReader->readElementText().toDouble();
         }
         catch (IException &e) {
           m_sumsum = 0.0;
@@ -62,7 +62,7 @@ namespace Isis {
         while (xmlReader->readNextStartElement()) {
           if (xmlReader->qualifiedName() == "minimum") {
             try {
-              m_minimum = toDouble(xmlReader->readElementText());
+              m_minimum = xmlReader->readElementText().toDouble();
             }
             catch (IException &e) {
               m_minimum = DBL_MAX;
@@ -70,7 +70,7 @@ namespace Isis {
           }
           else if (xmlReader->qualifiedName() == "maximum") {
             try {
-              m_maximum = toDouble(xmlReader->readElementText());
+              m_maximum = xmlReader->readElementText().toDouble();
             }
             catch (IException &e) {
               m_maximum = -DBL_MAX;
@@ -78,7 +78,7 @@ namespace Isis {
           }
           else if (xmlReader->qualifiedName() == "validMinimum") {
             try {
-              m_validMinimum = toDouble(xmlReader->readElementText());
+              m_validMinimum = xmlReader->readElementText().toDouble();
             }
             catch (IException &e) {
               m_validMinimum = Isis::ValidMinimum;
@@ -86,7 +86,7 @@ namespace Isis {
           }
           else if (xmlReader->qualifiedName() == "validMaximum") {
             try {
-              m_validMaximum = toDouble(xmlReader->readElementText());
+              m_validMaximum = xmlReader->readElementText().toDouble();
             }
             catch (IException &e) {
               m_validMaximum = Isis::ValidMaximum;
@@ -101,7 +101,7 @@ namespace Isis {
         while (xmlReader->readNextStartElement()) {
           if (xmlReader->qualifiedName() == "totalPixels") {
             try {
-              m_totalPixels = toBigInt(xmlReader->readElementText());
+              m_totalPixels = toBigInt(xmlReader->readElementText().toStdString());
             }
             catch (IException &e) {
               m_totalPixels = 0.0;
@@ -109,7 +109,7 @@ namespace Isis {
           }
           else if (xmlReader->qualifiedName() == "validPixels") {
             try {
-              m_validPixels = toBigInt(xmlReader->readElementText());
+              m_validPixels = toBigInt(xmlReader->readElementText().toStdString());
             }
             catch (IException &e) {
               m_validPixels = 0.0;
@@ -117,7 +117,7 @@ namespace Isis {
           }
           else if (xmlReader->qualifiedName() == "nullPixels") {
             try {
-              m_nullPixels = toBigInt(xmlReader->readElementText());
+              m_nullPixels = toBigInt(xmlReader->readElementText().toStdString());
             }
             catch (IException &e) {
               m_nullPixels = 0.0;
@@ -126,7 +126,7 @@ namespace Isis {
           }
           else if (xmlReader->qualifiedName() == "lisPixels") {
             try {
-              m_lisPixels = toBigInt(xmlReader->readElementText());
+              m_lisPixels = toBigInt(xmlReader->readElementText().toStdString());
             }
             catch (IException &e) {
               m_lisPixels = 0.0;
@@ -134,7 +134,7 @@ namespace Isis {
           }
           else if (xmlReader->qualifiedName() == "lrsPixels") {
             try {
-              m_lrsPixels = toBigInt(xmlReader->readElementText());
+              m_lrsPixels = toBigInt(xmlReader->readElementText().toStdString());
             }
             catch (IException &e) {
               m_lrsPixels = 0.0;
@@ -142,7 +142,7 @@ namespace Isis {
           }
           else if (xmlReader->qualifiedName() == "hisPixels") {
             try {
-              m_hisPixels = toBigInt(xmlReader->readElementText());
+              m_hisPixels = toBigInt(xmlReader->readElementText().toStdString());
             }
             catch (IException &e) {
               m_hisPixels = 0.0;
@@ -150,7 +150,7 @@ namespace Isis {
           }
           else if (xmlReader->qualifiedName() == "hrsPixels") {
             try {
-              m_hrsPixels = toBigInt(xmlReader->readElementText());
+              m_hrsPixels = toBigInt(xmlReader->readElementText().toStdString());
             }
             catch (IException &e) {
               m_hrsPixels = 0.0;
@@ -158,7 +158,7 @@ namespace Isis {
           }
           else if (xmlReader->qualifiedName() == "underRangePixels") {
             try {
-              m_underRangePixels = toBigInt(xmlReader->readElementText());
+              m_underRangePixels = toBigInt(xmlReader->readElementText().toStdString());
             }
             catch (IException &e) {
               m_underRangePixels = 0.0;
@@ -166,7 +166,7 @@ namespace Isis {
           }
           else if (xmlReader->qualifiedName() == "overRangePixels") {
             try {
-              m_overRangePixels = toBigInt(xmlReader->readElementText());
+              m_overRangePixels = toBigInt(xmlReader->readElementText().toStdString());
             }
             catch (IException &e) {
               m_overRangePixels = 0.0;
@@ -179,7 +179,7 @@ namespace Isis {
       }
       else if (xmlReader->qualifiedName() == "removedData") {
         try {
-          m_removedData = toBool(xmlReader->readElementText());
+          m_removedData = toBool(xmlReader->readElementText().toStdString());
         }
         catch (IException &e) {
           m_removedData = false;
@@ -221,7 +221,6 @@ namespace Isis {
       m_overRangePixels(other.m_overRangePixels),
       m_removedData(other.m_removedData) {
   }
-   // : m_id(new QUuid(other.m_id->toString())),
 
 
   //! Destroys the IsisStats object.
@@ -396,7 +395,7 @@ namespace Isis {
     }
 
     if (m_totalPixels < 0) {
-      QString msg = "You are removing non-existant data in [Statistics::RemoveData]";
+      std::string msg = "You are removing non-existant data in [Statistics::RemoveData]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     // what happens to saved off min/max???
@@ -409,8 +408,8 @@ namespace Isis {
 
     if (m_validMaximum < m_validMinimum) {
       // get the min and max DN values in the chosen range
-      QString msg = "Invalid Range: Minimum [" + toString(minimum) 
-                    + "] must be less than the Maximum [" + toString(maximum) + "].";
+      std::string msg = "Invalid Range: Minimum [" + Isis::toString(minimum) 
+                    + "] must be less than the Maximum [" + Isis::toString(maximum) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     //??? throw exception if data has already been added???
@@ -532,7 +531,7 @@ namespace Isis {
    */
   double Statistics::Minimum() const {
     if (m_removedData) {
-      QString msg = "Minimum is invalid since you removed data";
+      std::string msg = "Minimum is invalid since you removed data";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -553,7 +552,7 @@ namespace Isis {
    */
   double Statistics::Maximum() const {
     if (m_removedData) {
-      QString msg = "Maximum is invalid since you removed data";
+      std::string msg = "Maximum is invalid since you removed data";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -695,7 +694,7 @@ namespace Isis {
    */
   double Statistics::ChebyshevMinimum(const double percent) const {
     if ((percent <= 0.0) || (percent >= 100.0)) {
-      QString msg = "Invalid value for percent";
+      std::string msg = "Invalid value for percent";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -722,7 +721,7 @@ namespace Isis {
    */
   double Statistics::ChebyshevMaximum(const double percent) const {
     if ((percent <= 0.0) || (percent >= 100.0)) {
-      QString msg = "Invalid value for percent";
+      std::string msg = "Invalid value for percent";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -801,8 +800,8 @@ namespace Isis {
     if (StandardDeviation() == 0) {
       if (value == Maximum()) return 0;
       else {
-        QString msg = "Undefined Z-score. Standard deviation is zero and the input value[" 
-                      + toString(value) + "] is out of range [" + toString(Maximum()) + "].";
+        std::string msg = "Undefined Z-score. Standard deviation is zero and the input value[" 
+                      + Isis::toString(value) + "] is out of range [" + Isis::toString(Maximum()) + "].";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
@@ -848,27 +847,27 @@ namespace Isis {
       name = "Statistics";
     }
     // Construct a label with the results
-    PvlGroup results(name);  
-    results += PvlKeyword("Sum", toString(Sum()));
-    results += PvlKeyword("SumSquare", toString(SumSquare()));
-    results += PvlKeyword("Minimum", toString(Minimum()));
-    results += PvlKeyword("Maximum", toString(Maximum()));
-    results += PvlKeyword("ValidMinimum", toString(ValidMinimum()));
-    results += PvlKeyword("ValidMaximum", toString(ValidMaximum()));
+    PvlGroup results(name.toStdString());  
+    results += PvlKeyword("Sum", Isis::toString(Sum()));
+    results += PvlKeyword("SumSquare", Isis::toString(SumSquare()));
+    results += PvlKeyword("Minimum", Isis::toString(Minimum()));
+    results += PvlKeyword("Maximum", Isis::toString(Maximum()));
+    results += PvlKeyword("ValidMinimum", Isis::toString(ValidMinimum()));
+    results += PvlKeyword("ValidMaximum", Isis::toString(ValidMaximum()));
     if (ValidPixels() != 0) {
-      results += PvlKeyword("Average", toString(Average()));
-      results += PvlKeyword("StandardDeviation", toString(StandardDeviation()));
-      results += PvlKeyword("Variance", toString(Variance()));
+      results += PvlKeyword("Average", Isis::toString(Average()));
+      results += PvlKeyword("StandardDeviation", Isis::toString(StandardDeviation()));
+      results += PvlKeyword("Variance", Isis::toString(Variance()));
     }
-    results += PvlKeyword("TotalPixels", toString(TotalPixels()));
-    results += PvlKeyword("ValidPixels", toString(ValidPixels()));
-    results += PvlKeyword("OverValidMaximumPixels", toString(OverRangePixels()));
-    results += PvlKeyword("UnderValidMinimumPixels", toString(UnderRangePixels()));
-    results += PvlKeyword("NullPixels", toString(NullPixels()));
-    results += PvlKeyword("LisPixels", toString(LisPixels()));
-    results += PvlKeyword("LrsPixels", toString(LrsPixels()));
-    results += PvlKeyword("HisPixels", toString(HisPixels()));
-    results += PvlKeyword("HrsPixels", toString(HrsPixels()));
+    results += PvlKeyword("TotalPixels", Isis::toString(TotalPixels()));
+    results += PvlKeyword("ValidPixels", Isis::toString(ValidPixels()));
+    results += PvlKeyword("OverValidMaximumPixels", Isis::toString(OverRangePixels()));
+    results += PvlKeyword("UnderValidMinimumPixels", Isis::toString(UnderRangePixels()));
+    results += PvlKeyword("NullPixels", Isis::toString(NullPixels()));
+    results += PvlKeyword("LisPixels", Isis::toString(LisPixels()));
+    results += PvlKeyword("LrsPixels", Isis::toString(LrsPixels()));
+    results += PvlKeyword("HisPixels", Isis::toString(HisPixels()));
+    results += PvlKeyword("HrsPixels", Isis::toString(HrsPixels()));
 
     return results;
   }
@@ -877,31 +876,31 @@ namespace Isis {
   void Statistics::save(QXmlStreamWriter &stream, const Project *project) const {   // TODO: does xml stuff need project???
 
     stream.writeStartElement("statistics");
-//    stream.writeTextElement("id", m_id->toString());
+//    stream.writeTextElement("id", m_id->Isis::toString());
  
-    stream.writeTextElement("sum", toString(m_sum));
-    stream.writeTextElement("sumSquares", toString(m_sumsum));
+    stream.writeTextElement("sum",QString::fromStdString(toString(m_sum)));
+    stream.writeTextElement("sumSquares",QString::fromStdString(toString(m_sumsum)));
 
     stream.writeStartElement("range");
-    stream.writeTextElement("minimum", toString(m_minimum));
-    stream.writeTextElement("maximum", toString(m_maximum));
-    stream.writeTextElement("validMinimum", toString(m_validMinimum));
-    stream.writeTextElement("validMaximum", toString(m_validMaximum));
+    stream.writeTextElement("minimum",QString::fromStdString(toString(m_minimum)));
+    stream.writeTextElement("maximum",QString::fromStdString(toString(m_maximum)));
+    stream.writeTextElement("validMinimum",QString::fromStdString(toString(m_validMinimum)));
+    stream.writeTextElement("validMaximum",QString::fromStdString(toString(m_validMaximum)));
     stream.writeEndElement(); // end range
     
     stream.writeStartElement("pixelCounts");
-    stream.writeTextElement("totalPixels", toString(m_totalPixels));
-    stream.writeTextElement("validPixels", toString(m_validPixels));
-    stream.writeTextElement("nullPixels", toString(m_nullPixels));
-    stream.writeTextElement("lisPixels", toString(m_lisPixels));
-    stream.writeTextElement("lrsPixels", toString(m_lrsPixels));
-    stream.writeTextElement("hisPixels", toString(m_hisPixels));
-    stream.writeTextElement("hrsPixels", toString(m_hrsPixels));
-    stream.writeTextElement("underRangePixels", toString(m_underRangePixels));
-    stream.writeTextElement("overRangePixels", toString(m_overRangePixels));
+    stream.writeTextElement("totalPixels",QString::fromStdString(toString(m_totalPixels)));
+    stream.writeTextElement("validPixels",QString::fromStdString(toString(m_validPixels)));
+    stream.writeTextElement("nullPixels",QString::fromStdString(toString(m_nullPixels)));
+    stream.writeTextElement("lisPixels",QString::fromStdString(toString(m_lisPixels)));
+    stream.writeTextElement("lrsPixels",QString::fromStdString(toString(m_lrsPixels)));
+    stream.writeTextElement("hisPixels",QString::fromStdString(toString(m_hisPixels)));
+    stream.writeTextElement("hrsPixels",QString::fromStdString(toString(m_hrsPixels)));
+    stream.writeTextElement("underRangePixels",QString::fromStdString(toString(m_underRangePixels)));
+    stream.writeTextElement("overRangePixels",QString::fromStdString(toString(m_overRangePixels)));
     stream.writeEndElement(); // end pixelCounts
     
-    stream.writeTextElement("removedData", toString(m_removedData));
+    stream.writeTextElement("removedData",QString::fromStdString(toString(m_removedData)));
     stream.writeEndElement(); // end statistics
 
   }
@@ -930,7 +929,6 @@ namespace Isis {
            << (qint64)m_overRangePixels
            << (qint32)m_removedData;
     return stream;
-//    stream << m_id->toString()
   }
 
 

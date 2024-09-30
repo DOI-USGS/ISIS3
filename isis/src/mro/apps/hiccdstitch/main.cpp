@@ -113,9 +113,9 @@ void IsisMain() {
   // Get the list of names of input CCD cubes to stitch together
   FileList list;
   UserInterface &ui = Application::GetUserInterface();
-  list.read(ui.GetFileName("FROMLIST"));
+  list.read(ui.GetFileName("FROMLIST").toStdString());
   if(list.size() < 1) {
-    QString msg = "The list file[" + ui.GetFileName("FROMLIST") +
+    std::string msg = "The list file[" + ui.GetFileName("FROMLIST").toStdString() +
                  " does not contain any filenames";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -124,7 +124,7 @@ void IsisMain() {
 //  Commented out as HiRISE Team is requesting a single file to be processed
 //  to simplify pipeline logic
   if(list.size() == 1) {
-    QString msg = "The list file[" + ui.GetFileName("FROMLIST") +
+    std::string msg = "The list file[" + ui.GetFileName("FROMLIST") +
                  " must contain at least two filenames";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
@@ -141,14 +141,14 @@ void IsisMain() {
     interp = new Interpolator(Interpolator::CubicConvolutionType);
   }
   else {
-    QString msg = "Unknow value for INTERP [" +
-                 ui.GetString("INTERP") + "]";
+    std::string msg = "Unknow value for INTERP [" +
+                 ui.GetString("INTERP").toStdString() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
 //  Open the shift definitions file
   Pvl shiftdef;
-  shiftdef.read(ui.GetFileName("SHIFTDEF"));
+  shiftdef.read(ui.GetFileName("SHIFTDEF").toStdString());
 
   PvlObject &stitch = shiftdef.findObject("Hiccdstitch", Pvl::Traverse);
 
@@ -163,16 +163,16 @@ void IsisMain() {
   for(int i = 0; i < list.size(); i++) {
     HiriseCCD CCDinfo;
     Cube *cube = new Cube();
-    cube->open(list[i].toString());
+    cube->open(QString::fromStdString(list[i].toString()));
 
     PvlGroup arch = cube->label()->findGroup("Archive", Pvl::Traverse);
     if(first) {
-      obsId = (QString) arch["ObservationId"];
+      obsId = QString::fromStdString(arch["ObservationId"]);
       first = false;
     }
     else {
-      if(obsId != (QString) arch["ObservationId"]) {
-        QString msg = "Input file " + list[i].toString()
+      if(obsId != QString::fromStdString(arch["ObservationId"])) {
+        std::string msg = "Input file " + list[i].toString()
                      + " has a different ObservationId";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -181,7 +181,7 @@ void IsisMain() {
     PvlGroup inst = cube->label()->findGroup("Instrument", Pvl::Traverse);
     int chan = inst["ChannelNumber"];
     if(chan != 2) {
-      QString msg = "Input file " + list[i].toString() + " contains a single channel";
+      std::string msg = "Input file " + list[i].toString() + " contains a single channel";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     int cpmm = inst["CpmmNumber"];
@@ -197,7 +197,7 @@ void IsisMain() {
     }
 
     CCDinfo.cube = cube;
-    CCDinfo.filename = list[i].toString();
+    CCDinfo.filename = QString::fromStdString(list[i].toString());
     CCDinfo.ccdName = ccdNames[ccd];
     CCDinfo.ccdNumber = ccd;
     CCDinfo.summing = inst["Summing"];
@@ -230,12 +230,12 @@ void IsisMain() {
 
     //  Determine if a shift of the CCD exists in the definitions file
     //  Combine summing/tdi into a QString
-    QString sumTdi = toString(CCDinfo.summing) + "/" +
-                     toString(CCDinfo.tdi);
+    QString sumTdi = QString::number(CCDinfo.summing) + "/" +
+                     QString::number(CCDinfo.tdi);
 
     QString ccdId = ccdNames[ccd];
-    if(stitch.hasObject(ccdId)) {
-      PvlObject &ccddef = stitch.findObject(ccdId, Pvl::Traverse);
+    if(stitch.hasObject(ccdId.toStdString())) {
+      PvlObject &ccddef = stitch.findObject(ccdId.toStdString(), Pvl::Traverse);
       if(ccddef.hasKeyword("MosaicOrder")) {
         CCDinfo.mosOrder = (int) ccddef["MosaicOrder"];
       }
@@ -246,8 +246,8 @@ void IsisMain() {
         CCDinfo.fpline = yoffset[ccd] + (int) ccddef["LineOffset"];
       }
       //  See if there is a binning group
-      if(ccddef.hasGroup(sumTdi)) {
-        PvlGroup &sumGroup = ccddef.findGroup(sumTdi);
+      if(ccddef.hasGroup(sumTdi.toStdString())) {
+        PvlGroup &sumGroup = ccddef.findGroup(sumTdi.toStdString());
         if(sumGroup.hasKeyword("SampleOffset")) {
           CCDinfo.fpsamp = xoffset[ccd] + (int) sumGroup["SampleOffset"];
         }
@@ -270,7 +270,7 @@ void IsisMain() {
 
   // Check for consistent filters
   if((gotRed && gotNir) || (gotRed && gotBg) || (gotNir && gotBg)) {
-    QString msg = "Cannot stitch together different filter images";
+    std::string msg = "Cannot stitch together different filter images";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -282,7 +282,7 @@ void IsisMain() {
   int prevCCD = CCDlist[0].ccdNumber;
   for(vec_sz i = 1; i < CCDlist.size(); ++i) {
     if(CCDlist[i].ccdNumber != prevCCD + 1) {
-      QString msg = "CCD numbers are not adjacent";
+      std::string msg = "CCD numbers are not adjacent";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     prevCCD = CCDlist[i].ccdNumber;
@@ -331,7 +331,7 @@ void IsisMain() {
     // Check for appropriate bands
     if(CCDlist[i].nb != maxBands) {
       ostringstream mess;
-      mess << "File " << CCDlist[i].filename << " does not have the required "
+      mess << "File " << CCDlist[i].filename.toStdString() << " does not have the required "
            << maxBands << " bands, but only " << CCDlist[i].nb;
       IException(IException::User, mess.str(), _FILEINFO_);
       nBandErrs++;
@@ -340,7 +340,7 @@ void IsisMain() {
 
 //  If we find any band count inconsistancies, gotta give up the ghost
   if(nBandErrs > 0) {
-    QString mess = "Band count inconsistancies exist in input cubes!";
+    std::string mess = "Band count inconsistancies exist in input cubes!";
     throw IException(IException::User, mess, _FILEINFO_);
   }
 
@@ -374,17 +374,17 @@ void IsisMain() {
   // Write ccd order to results
   for(CCDindex = 0; CCDindex < CCDlist.size(); CCDindex++) {
 
-    PvlGroup ccdGroup(CCDlist[CCDindex].ccdName);
+    PvlGroup ccdGroup(CCDlist[CCDindex].ccdName.toStdString());
 
-    ccdGroup += PvlKeyword("File", CCDlist[CCDindex].filename);
-    ccdGroup += PvlKeyword("FocalPlaneSample", toString(CCDlist[CCDindex].fpsamp));
-    ccdGroup += PvlKeyword("FocalPlaneLine", toString(CCDlist[CCDindex].fpline));
-    ccdGroup += PvlKeyword("ImageSample", toString(CCDlist[CCDindex].outss));
-    ccdGroup += PvlKeyword("ImageLine", toString(CCDlist[CCDindex].outsl));
+    ccdGroup += PvlKeyword("File", CCDlist[CCDindex].filename.toStdString());
+    ccdGroup += PvlKeyword("FocalPlaneSample", Isis::toString(CCDlist[CCDindex].fpsamp));
+    ccdGroup += PvlKeyword("FocalPlaneLine", Isis::toString(CCDlist[CCDindex].fpline));
+    ccdGroup += PvlKeyword("ImageSample", Isis::toString(CCDlist[CCDindex].outss));
+    ccdGroup += PvlKeyword("ImageLine", Isis::toString(CCDlist[CCDindex].outsl));
 
     int ccd =  CCDlist[CCDindex].ccdNumber;
-    ccdGroup += PvlKeyword("SampleOffset", toString(CCDlist[CCDindex].fpsamp - xoffset[ccd]));
-    ccdGroup += PvlKeyword("LineOffset", toString(CCDlist[CCDindex].fpline - yoffset[ccd]));
+    ccdGroup += PvlKeyword("SampleOffset", Isis::toString(CCDlist[CCDindex].fpsamp - xoffset[ccd]));
+    ccdGroup += PvlKeyword("LineOffset", Isis::toString(CCDlist[CCDindex].fpline - yoffset[ccd]));
 
     results.addGroup(ccdGroup);
   }
@@ -528,7 +528,7 @@ void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
   QString file(ui.GetFileName("SHIFTDEF"));
   Pvl p;
-  p.read(file);
+  p.read(file.toStdString());
   Application::GuiLog(p);
 }
 //...........end of helper function ........

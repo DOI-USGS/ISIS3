@@ -1,4 +1,6 @@
 #include <QString>
+
+#include "Application.h"
 #include "ProcessBySample.h"
 #include "ProcessByLine.h"
 #include "ProcessBySpectra.h"
@@ -76,8 +78,8 @@ namespace Isis {
     if(numSpecPixKept > 0) {
       PvlGroup mLog("Messages");
       mLog += PvlKeyword("Warning",
-                        "Unable to fill " + toString(numSpecPixKept) + " special pixels.");
-      log->addLogGroup(mLog);
+                        "Unable to fill " + Isis::toString(numSpecPixKept) + " special pixels.");
+      Application::AppendAndLog(mLog, log);
     }
     return;
   }

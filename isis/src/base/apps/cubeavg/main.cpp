@@ -3,7 +3,6 @@
 #include "Statistics.h"
 #include "Application.h"
 #include "PvlGroup.h"
-#include "PvlSequence.h"
 
 using namespace std;
 using namespace Isis;
@@ -41,21 +40,21 @@ void IsisMain() {
         std::vector<double> widths;
         widths.resize(icube->bandCount());
         for(int i = 0; i < pvlCenter.size(); i++) {
-          centers[i] = toDouble(pvlCenter[i]);
+          centers[i] = Isis::toDouble(pvlCenter[i]);
           if(hasWidth)
-            widths[i] = toDouble((*pvlWidth)[i]);
+            widths[i] = Isis::toDouble((*pvlWidth)[i]);
           else
             widths[i] = 0.0;
         }
         compute(centers, widths, ocube);
       }
       else {
-        QString message = "The BandBin in your input cube does not have a Center value.";
+        std::string message = "The BandBin in your input cube does not have a Center value.";
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
     else {
-      QString message = "There is not a BandBin Group in the input cube.";
+      std::string message = "There is not a BandBin Group in the input cube.";
       throw IException(IException::User, message, _FILEINFO_);
     }
   }
@@ -74,22 +73,22 @@ void IsisMain() {
     PvlKeyword pvlCenter;
     if(pvlg.hasKeyword("Center")) {
       pvlCenter = pvlg.findKeyword("Center");
-      Units = pvlCenter.unit();
+      Units = QString::fromStdString(pvlCenter.unit());
       pvlg.deleteKeyword("Center");
     }
 
     pvlCenter = PvlKeyword("Center");
-    pvlCenter.setValue(ui.GetAsString("CENTER"), Units);
+    pvlCenter.setValue(ui.GetAsString("CENTER").toStdString(), Units.toStdString());
     pvlg.addKeyword(pvlCenter);
     PvlKeyword pvlWidth;
     if(pvlg.hasKeyword("Width")) {
       pvlWidth = pvlg.findKeyword("Width");
-      Units = pvlWidth.unit();
+      Units = QString::fromStdString(pvlWidth.unit());
       pvlg.deleteKeyword("Width");
     }
 
     pvlWidth = PvlKeyword("Width");
-    pvlWidth.setValue(ui.GetAsString("WIDTH"), Units);
+    pvlWidth.setValue(ui.GetAsString("WIDTH").toStdString(), Units.toStdString());
     pvlg.addKeyword(pvlWidth);
     //Destroys the old and adds the new BandBin Group
     if(ocube->hasGroup("BandBin")) {
@@ -134,7 +133,7 @@ void compute(vector<double> centers, vector<double> widths,
              Cube *ocube) {
   PvlGroup &pvlg = ocube->group("BandBin");
   PvlKeyword &pvlCenter = pvlg.findKeyword("Center");
-  QString centerUnit = pvlCenter.unit();
+  QString centerUnit = QString::fromStdString(pvlCenter.unit());
   bool hasWidth  = pvlg.hasKeyword("Width");
   double large = centers[0] + widths[0] / 2;
   double small = centers[0] - widths[0] / 2;
@@ -146,14 +145,14 @@ void compute(vector<double> centers, vector<double> widths,
       small = (double)centers[i] - (double)widths[i] / 2.0;
     }
   }
-  pvlCenter.setValue(toString((large - small) / 2 + small), centerUnit);
+  pvlCenter.setValue(Isis::toString((large - small) / 2 + small), centerUnit.toStdString());
   if(hasWidth) {
     PvlKeyword &pvlWidth  = pvlg.findKeyword("Width");
-    pvlWidth.setValue(toString(large - small), pvlWidth.unit());
+    pvlWidth.setValue(Isis::toString(large - small), pvlWidth.unit());
   }
   else {
     PvlKeyword pvlWidth = PvlKeyword("Width");
-    pvlWidth.setValue(toString(large - small), centerUnit);
+    pvlWidth.setValue(Isis::toString(large - small), centerUnit.toStdString());
     pvlg.addKeyword(pvlWidth);
   }
 

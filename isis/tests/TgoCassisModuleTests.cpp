@@ -20,15 +20,15 @@
 
 using namespace Isis;
 
-static QString TGOCASSIS2ISIS_XML = FileName("$ISISROOT/bin/xml/tgocassis2isis.xml").expanded();
-static QString RDRGEN_XML = FileName("$ISISROOT/bin/xml/tgocassisrdrgen.xml").expanded();
-static QString MOS_XML = FileName("$ISISROOT/bin/xml/tgocassismos.xml").expanded();
-static QString SPICEINIT_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
-static QString STITCH_XML = FileName("$ISISROOT/bin/xml/tgocassisstitch.xml").expanded();
-static QString UNSTITCH_XML = FileName("$ISISROOT/bin/xml/tgocassisunstitch.xml").expanded();
-static QString MOSRANGE_XML = FileName("$ISISROOT/bin/xml/mosrange.xml").expanded();
-static QString CAM2MAP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
-static QString CUBEIT_XML = FileName("$ISISROOT/bin/xml/cubeit.xml").expanded();
+static QString TGOCASSIS2ISIS_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/tgocassis2isis.xml").expanded());
+static QString RDRGEN_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/tgocassisrdrgen.xml").expanded());
+static QString MOS_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/tgocassismos.xml").expanded());
+static QString SPICEINIT_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded());
+static QString STITCH_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/tgocassisstitch.xml").expanded());
+static QString UNSTITCH_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/tgocassisunstitch.xml").expanded());
+static QString MOSRANGE_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/mosrange.xml").expanded());
+static QString CAM2MAP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/cam2map.xml").expanded());
+static QString CUBEIT_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/cubeit.xml").expanded());
 
 
 TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
@@ -129,13 +129,13 @@ TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
 
   // run stitch and unstitch on cube list
   FileList *cubeList = new FileList();
-  cubeList->append(panFileName);
-  cubeList->append(redFileName);
-  cubeList->append(bluFileName);
-  cubeList->append(nirFileName);
+  cubeList->append(panFileName.toStdString());
+  cubeList->append(redFileName.toStdString());
+  cubeList->append(bluFileName.toStdString());
+  cubeList->append(nirFileName.toStdString());
 
   QString cubeListFile = prefix.path() + "/cubelist.lis";
-  cubeList->write(cubeListFile);
+  cubeList->write(cubeListFile.toStdString());
 
   QVector<QString> stitchArgs = {"fromlist=" + cubeListFile,
                 "outputprefix=" + prefix.path() + "/stitched"};
@@ -161,10 +161,10 @@ TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
 
   // Compare Pan unstitched cube to original cube
   QString panUnstitchFile = prefix.path() + "/unstitched_PAN.cub";
-  Cube panUnstitchCube(panUnstitchFile);
+  Cube panUnstitchCube(panUnstitchFile.toStdString());
   Pvl *panUnstitchLabel = panUnstitchCube.label();
 
-  Cube panOrigCube(panFileName);
+  Cube panOrigCube(panFileName.toStdString());
   Pvl *panOrigLabel = panOrigCube.label();
 
   // Dimensions group
@@ -260,10 +260,10 @@ TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
 
   // Compare Red unstitched cube to original cube
   QString redUnstitchFile = prefix.path() + "/unstitched_RED.cub";
-  Cube redUnstitchCube(redUnstitchFile);
+  Cube redUnstitchCube(redUnstitchFile.toStdString());
   Pvl *redUnstitchLabel = redUnstitchCube.label();
 
-  Cube redOrigCube(redFileName);
+  Cube redOrigCube(redFileName.toStdString());
   Pvl *redOrigLabel = redOrigCube.label();
 
   // Dimensions group
@@ -360,10 +360,10 @@ TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
 
   // compare Blu unstitched cube to original cube
   QString bluUnstitchFile = prefix.path() + "/unstitched_BLU.cub";
-  Cube bluUnstitchCube(bluUnstitchFile);
+  Cube bluUnstitchCube(bluUnstitchFile.toStdString());
   Pvl *bluUnstitchLabel = bluUnstitchCube.label();
 
-  Cube bluOrigCube(bluFileName);
+  Cube bluOrigCube(bluFileName.toStdString());
   Pvl *bluOrigLabel = bluOrigCube.label();
 
   // Dimensions group
@@ -460,10 +460,10 @@ TEST_F(TgoCassisModuleKernels, TgoCassisStitchUnstitch) {
 
   // compare Nir unstitched cube to original cube
   QString nirUnstitchFile = prefix.path() + "/unstitched_NIR.cub";
-  Cube nirUnstitchCube(nirUnstitchFile);
+  Cube nirUnstitchCube(nirUnstitchFile.toStdString());
   Pvl *nirUnstitchLabel = nirUnstitchCube.label();
 
-  Cube nirOrigCube(nirFileName);
+  Cube nirOrigCube(nirFileName.toStdString());
   Pvl *nirOrigLabel = nirOrigCube.label();
 
   // Dimensions group
@@ -657,13 +657,13 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
 
   // run mosrange on cube list
   FileList *cubeList = new FileList();
-  cubeList->append(panFileName);
-  cubeList->append(redFileName);
-  cubeList->append(bluFileName);
-  cubeList->append(nirFileName);
+  cubeList->append(panFileName.toStdString());
+  cubeList->append(redFileName.toStdString());
+  cubeList->append(bluFileName.toStdString());
+  cubeList->append(nirFileName.toStdString());
 
   QString cubeListFile = prefix.path() + "/cubelist.lis";
-  cubeList->write(cubeListFile);
+  cubeList->write(cubeListFile.toStdString());
 
   QString mapFile = prefix.path() + "/equi.map";
   QVector<QString> mosrangeArgs = {"fromlist=" + cubeListFile, "to=" + mapFile};
@@ -723,25 +723,25 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   }
 
   // PAN Cube
-  Cube panCube(panEquiFile);
+  Cube panCube(panEquiFile.toStdString());
   Pvl *panLabel = panCube.label();
 
   // Instrument Group
   PvlGroup &inst = panLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
-  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "CaSSIS");
-  EXPECT_EQ(inst["TargetName"][0].toStdString(), "Mars" );
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2016-11-26T22:58:02.583");
-  EXPECT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "2f0154373db1aa13");
-  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
+  EXPECT_EQ(inst["SpacecraftName"][0], "TRACE GAS ORBITER");
+  EXPECT_EQ(inst["InstrumentId"][0], "CaSSIS");
+  EXPECT_EQ(inst["TargetName"][0], "Mars" );
+  EXPECT_EQ(inst["StartTime"][0], "2016-11-26T22:58:02.583");
+  EXPECT_EQ(inst["SpacecraftClockStartCount"][0], "2f0154373db1aa13");
+  EXPECT_EQ(inst["ExposureDuration"][0], "1.920e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
-  EXPECT_EQ(inst["Filter"][0].toStdString(), "PAN");
+  EXPECT_EQ(inst["Filter"][0], "PAN");
 
   // Archive Group
   PvlGroup &archive = panLabel->findGroup("Archive", Pvl::Traverse);
-  EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
-  EXPECT_EQ(archive["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(archive["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:26");
+  EXPECT_EQ(archive["DataSetId"][0], "TBD");
+  EXPECT_EQ(archive["ProductVersionId"][0], "UNK");
+  EXPECT_EQ(archive["ProductCreationTime"][0], "2017-10-03T10:50:26");
   EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(archive["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(archive["PredictMaximumExposureTime"]), 3.4317);
@@ -758,7 +758,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(int(archive["ImageFrequency"]), 1200000);
   EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
   EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799468);
-  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f0154373db1aa13");
+  EXPECT_EQ(archive["ExposureTimestamp"][0], "2f0154373db1aa13");
   EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 0.00192);
   EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(archive["WindowCount"]), 0);
@@ -793,14 +793,14 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(int(archive["Window6StartLine"]), 1850);
   EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
   EXPECT_EQ(int(archive["YearDoy"]), 2016331);
-  EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
+  EXPECT_EQ(archive["ObservationId"][0], "CRUS_049218_251_0");
 
   // BandBin Group
   PvlGroup &bandbin = panLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "PAN");
+  EXPECT_EQ(bandbin["FilterName"][0], "PAN");
   EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 678.2);
   EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 231.9);
-  EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143421");
+  EXPECT_EQ(bandbin["NaifIkCode"][0], "-143421");
 
   // Kernels Group
   PvlGroup &kernels = panLabel->findGroup("Kernels", Pvl::Traverse);
@@ -814,25 +814,25 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   EXPECT_NEAR(hist->StandardDeviation(), 0.0010547865346787659, 0.0001);
 
   // NIR Cube
-  Cube nirCube(nirEquiFile);
+  Cube nirCube(nirEquiFile.toStdString());
   Pvl *nirLabel = nirCube.label();
 
   // Instrument Group
   inst = nirLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
-  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "CaSSIS");
-  EXPECT_EQ(inst["TargetName"][0].toStdString(), "Mars" );
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2016-11-26T22:58:02.583");
-  EXPECT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "2f0154373db1aa13");
-  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
+  EXPECT_EQ(inst["SpacecraftName"][0], "TRACE GAS ORBITER");
+  EXPECT_EQ(inst["InstrumentId"][0], "CaSSIS");
+  EXPECT_EQ(inst["TargetName"][0], "Mars" );
+  EXPECT_EQ(inst["StartTime"][0], "2016-11-26T22:58:02.583");
+  EXPECT_EQ(inst["SpacecraftClockStartCount"][0], "2f0154373db1aa13");
+  EXPECT_EQ(inst["ExposureDuration"][0], "1.920e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
-  EXPECT_EQ(inst["Filter"][0].toStdString(), "NIR");
+  EXPECT_EQ(inst["Filter"][0], "NIR");
 
   // Archive Group
   archive = nirLabel->findGroup("Archive", Pvl::Traverse);
-  EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
-  EXPECT_EQ(archive["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(archive["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:26");
+  EXPECT_EQ(archive["DataSetId"][0], "TBD");
+  EXPECT_EQ(archive["ProductVersionId"][0], "UNK");
+  EXPECT_EQ(archive["ProductCreationTime"][0], "2017-10-03T10:50:26");
   EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(archive["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(archive["PredictMaximumExposureTime"]), 3.4317);
@@ -849,7 +849,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(int(archive["ImageFrequency"]), 1200000);
   EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
   EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799468);
-  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f0154373db1aa13");
+  EXPECT_EQ(archive["ExposureTimestamp"][0], "2f0154373db1aa13");
   EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 0.00192);
   EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(archive["WindowCount"]), 2);
@@ -884,14 +884,14 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(int(archive["Window6StartLine"]), 1850);
   EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
   EXPECT_EQ(int(archive["YearDoy"]), 2016331);
-  EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
+  EXPECT_EQ(archive["ObservationId"][0], "CRUS_049218_251_0");
 
   // BandBin Group
   bandbin = nirLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "NIR");
+  EXPECT_EQ(bandbin["FilterName"][0], "NIR");
   EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 939.3);
   EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 121.8);
-  EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143423");
+  EXPECT_EQ(bandbin["NaifIkCode"][0], "-143423");
 
   // Kernels Group
   kernels = nirLabel->findGroup("Kernels", Pvl::Traverse);
@@ -905,25 +905,25 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   EXPECT_NEAR(hist->StandardDeviation(), 0.0015024999314775509, 0.0001);
 
   // RED Cube
-  Cube redCube(redEquiFile);
+  Cube redCube(redEquiFile.toStdString());
   Pvl *redLabel = redCube.label();
 
   // Instrument Group
   inst = redLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
-  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "CaSSIS");
-  EXPECT_EQ(inst["TargetName"][0].toStdString(), "Mars" );
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2016-11-26T22:58:02.583");
-  EXPECT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "2f0154373db1aa13");
-  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
+  EXPECT_EQ(inst["SpacecraftName"][0], "TRACE GAS ORBITER");
+  EXPECT_EQ(inst["InstrumentId"][0], "CaSSIS");
+  EXPECT_EQ(inst["TargetName"][0], "Mars" );
+  EXPECT_EQ(inst["StartTime"][0], "2016-11-26T22:58:02.583");
+  EXPECT_EQ(inst["SpacecraftClockStartCount"][0], "2f0154373db1aa13");
+  EXPECT_EQ(inst["ExposureDuration"][0], "1.920e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
-  EXPECT_EQ(inst["Filter"][0].toStdString(), "RED");
+  EXPECT_EQ(inst["Filter"][0], "RED");
 
   // Archive Group
   archive = redLabel->findGroup("Archive", Pvl::Traverse);
-  EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
-  EXPECT_EQ(archive["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(archive["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:26");
+  EXPECT_EQ(archive["DataSetId"][0], "TBD");
+  EXPECT_EQ(archive["ProductVersionId"][0], "UNK");
+  EXPECT_EQ(archive["ProductCreationTime"][0], "2017-10-03T10:50:26");
   EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(archive["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(archive["PredictMaximumExposureTime"]), 3.4317);
@@ -940,7 +940,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(int(archive["ImageFrequency"]), 1200000);
   EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
   EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799468);
-  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f0154373db1aa13");
+  EXPECT_EQ(archive["ExposureTimestamp"][0], "2f0154373db1aa13");
   EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 0.00192);
   EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(archive["WindowCount"]), 1);
@@ -975,14 +975,14 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(int(archive["Window6StartLine"]), 1850);
   EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
   EXPECT_EQ(int(archive["YearDoy"]), 2016331);
-  EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
+  EXPECT_EQ(archive["ObservationId"][0], "CRUS_049218_251_0");
 
   // BandBin Group
   bandbin = redLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "RED");
+  EXPECT_EQ(bandbin["FilterName"][0], "RED");
   EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 836);
   EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 98.5);
-  EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143422");
+  EXPECT_EQ(bandbin["NaifIkCode"][0], "-143422");
 
   // Kernels Group
   kernels = redLabel->findGroup("Kernels", Pvl::Traverse);
@@ -997,25 +997,25 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
 
 
   // BLU Cube
-  Cube bluCube(bluEquiFile);
+  Cube bluCube(bluEquiFile.toStdString());
   Pvl *bluLabel = bluCube.label();
 
   // Instrument Group
   inst = bluLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
-  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "CaSSIS");
-  EXPECT_EQ(inst["TargetName"][0].toStdString(), "Mars" );
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2016-11-26T22:58:02.583");
-  EXPECT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "2f0154373db1aa13");
-  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
+  EXPECT_EQ(inst["SpacecraftName"][0], "TRACE GAS ORBITER");
+  EXPECT_EQ(inst["InstrumentId"][0], "CaSSIS");
+  EXPECT_EQ(inst["TargetName"][0], "Mars" );
+  EXPECT_EQ(inst["StartTime"][0], "2016-11-26T22:58:02.583");
+  EXPECT_EQ(inst["SpacecraftClockStartCount"][0], "2f0154373db1aa13");
+  EXPECT_EQ(inst["ExposureDuration"][0], "1.920e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
-  EXPECT_EQ(inst["Filter"][0].toStdString(), "BLU");
+  EXPECT_EQ(inst["Filter"][0], "BLU");
 
   // Archive Group
   archive = bluLabel->findGroup("Archive", Pvl::Traverse);
-  EXPECT_EQ(archive["DataSetId"][0].toStdString(), "TBD");
-  EXPECT_EQ(archive["ProductVersionId"][0].toStdString(), "UNK");
-  EXPECT_EQ(archive["ProductCreationTime"][0].toStdString(), "2017-10-03T10:50:26");
+  EXPECT_EQ(archive["DataSetId"][0], "TBD");
+  EXPECT_EQ(archive["ProductVersionId"][0], "UNK");
+  EXPECT_EQ(archive["ProductCreationTime"][0], "2017-10-03T10:50:26");
   EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
   EXPECT_DOUBLE_EQ(double(archive["Offset"]), 0.0);
   EXPECT_DOUBLE_EQ(double(archive["PredictMaximumExposureTime"]), 3.4317);
@@ -1032,7 +1032,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(int(archive["ImageFrequency"]), 1200000);
   EXPECT_EQ(int(archive["NumberOfWindows"]), 6);
   EXPECT_EQ(int(archive["UniqueIdentifier"]), 100799468);
-  EXPECT_EQ(archive["ExposureTimestamp"][0].toStdString(), "2f0154373db1aa13");
+  EXPECT_EQ(archive["ExposureTimestamp"][0], "2f0154373db1aa13");
   EXPECT_DOUBLE_EQ(double(archive["ExposureTimePEHK"]), 0.00192);
   EXPECT_DOUBLE_EQ(double(archive["PixelsPossiblySaturated"]), 0.00);
   EXPECT_EQ(int(archive["WindowCount"]), 3);
@@ -1067,14 +1067,14 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   EXPECT_EQ(int(archive["Window6StartLine"]), 1850);
   EXPECT_EQ(int(archive["Window6EndLine"]), 1858);
   EXPECT_EQ(int(archive["YearDoy"]), 2016331);
-  EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
+  EXPECT_EQ(archive["ObservationId"][0], "CRUS_049218_251_0");
 
   // BandBin Group
   bandbin = bluLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "BLU");
+  EXPECT_EQ(bandbin["FilterName"][0], "BLU");
   EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 494.8);
   EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 133.6);
-  EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143424");
+  EXPECT_EQ(bandbin["NaifIkCode"][0], "-143424");
 
   // Kernels Group
   kernels = bluLabel->findGroup("Kernels", Pvl::Traverse);
@@ -1129,32 +1129,32 @@ TEST(TgoCassisModuleTests, TgoCassisIngestReingest) {
   }
 
   // RED Cube
-  Cube redCube(reingestedFile);
+  Cube redCube(reingestedFile.toStdString());
   Pvl *redLabel = redCube.label();
 
   // Instrument Group
   PvlGroup &inst = redLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(inst["SpacecraftName"][0].toStdString(), "TRACE GAS ORBITER");
-  EXPECT_EQ(inst["InstrumentId"][0].toStdString(), "CaSSIS");
-  EXPECT_EQ(inst["TargetName"][0].toStdString(), "Mars" );
-  EXPECT_EQ(inst["StartTime"][0].toStdString(), "2016-11-26T22:58:02.583");
-  EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.920e-003");
+  EXPECT_EQ(inst["SpacecraftName"][0], "TRACE GAS ORBITER");
+  EXPECT_EQ(inst["InstrumentId"][0], "CaSSIS");
+  EXPECT_EQ(inst["TargetName"][0], "Mars" );
+  EXPECT_EQ(inst["StartTime"][0], "2016-11-26T22:58:02.583");
+  EXPECT_EQ(inst["ExposureDuration"][0], "1.920e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
-  EXPECT_EQ(inst["Filter"][0].toStdString(), "RED");
+  EXPECT_EQ(inst["Filter"][0], "RED");
 
   // Archive Group
   PvlGroup &archive = redLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_DOUBLE_EQ(double(archive["ProductVersionId"]), 1.0);
   EXPECT_DOUBLE_EQ(double(archive["ScalingFactor"]), 1.0);
   EXPECT_EQ(int(archive["YearDoy"]), 2016331);
-  EXPECT_EQ(archive["ObservationId"][0].toStdString(), "CRUS_049218_251_0");
+  EXPECT_EQ(archive["ObservationId"][0], "CRUS_049218_251_0");
 
   // BandBin Group
   PvlGroup &bandbin = redLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_EQ(bandbin["FilterName"][0].toStdString(), "RED");
+  EXPECT_EQ(bandbin["FilterName"][0], "RED");
   EXPECT_DOUBLE_EQ(double(bandbin["Center"]), 836);
   EXPECT_DOUBLE_EQ(double(bandbin["Width"]), 98.5);
-  EXPECT_EQ(bandbin["NaifIkCode"][0].toStdString(), "-143422");
+  EXPECT_EQ(bandbin["NaifIkCode"][0], "-143422");
 
   // Kernels Group
   PvlGroup &kernels = redLabel->findGroup("Kernels", Pvl::Traverse);
@@ -1267,13 +1267,13 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestColorMosaic) {
 
   // run mosrange on cube list
   FileList *cubeList = new FileList();
-  cubeList->append(panFileName);
-  cubeList->append(redFileName);
-  cubeList->append(bluFileName);
-  cubeList->append(nirFileName);
+  cubeList->append(panFileName.toStdString());
+  cubeList->append(redFileName.toStdString());
+  cubeList->append(bluFileName.toStdString());
+  cubeList->append(nirFileName.toStdString());
 
   QString cubeListFile = prefix.path() + "/cubelist.lis";
-  cubeList->write(cubeListFile);
+  cubeList->write(cubeListFile.toStdString());
 
   QString mapFile = prefix.path() + "/equi.map";
   QVector<QString> mosrangeArgs = {"fromlist=" + cubeListFile, "to=" + mapFile};
@@ -1303,9 +1303,9 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestColorMosaic) {
   }
 
   FileList *panMosaicList = new FileList();
-  panMosaicList->append(panEquiFile);
+  panMosaicList->append(panEquiFile.toStdString());
   QString panListFile = prefix.path() + "/panMosaic.lis";
-  panMosaicList->write(panListFile);
+  panMosaicList->write(panListFile.toStdString());
 
   QString panCassisMosaic = prefix.path() + "/panCassisMosaic.cub";
   QVector<QString> cassismosArgs = {"fromlist=" + panListFile, "to=" + panCassisMosaic};
@@ -1334,9 +1334,9 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestColorMosaic) {
   }
 
   FileList *nirMosaicList = new FileList();
-  nirMosaicList->append(nirEquiFile);
+  nirMosaicList->append(nirEquiFile.toStdString());
   QString nirListFile = prefix.path() + "/nirMosaic.lis";
-  nirMosaicList->write(nirListFile);
+  nirMosaicList->write(nirListFile.toStdString());
 
   QString nirCassisMosaic = prefix.path() + "/nirCassisMosaic.cub";
   cassismosArgs = {"fromlist=" + nirListFile, "to=" + nirCassisMosaic};
@@ -1365,9 +1365,9 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestColorMosaic) {
   }
 
   FileList *bluMosaicList = new FileList();
-  bluMosaicList->append(bluEquiFile);
+  bluMosaicList->append(bluEquiFile.toStdString());
   QString bluListFile = prefix.path() + "/bluMosaic.lis";
-  bluMosaicList->write(bluListFile);
+  bluMosaicList->write(bluListFile.toStdString());
 
   QString bluCassisMosaic = prefix.path() + "/bluCassisMosaic.cub";
   cassismosArgs = {"fromlist=" + bluListFile, "to=" + bluCassisMosaic};
@@ -1396,9 +1396,9 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestColorMosaic) {
   }
 
   FileList *redMosaicList = new FileList();
-  redMosaicList->append(redEquiFile);
+  redMosaicList->append(redEquiFile.toStdString());
   QString redListFile = prefix.path() + "/redMosaic.lis";
-  redMosaicList->write(redListFile);
+  redMosaicList->write(redListFile.toStdString());
 
   QString redCassisMosaic = prefix.path() + "/redCassisMosaic.cub";
   cassismosArgs = {"fromlist=" + redListFile, "to=" + redCassisMosaic};
@@ -1413,12 +1413,12 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestColorMosaic) {
 
   // run cubeit
   FileList *MosaicList = new FileList();
-  MosaicList->append(redCassisMosaic);
-  MosaicList->append(bluCassisMosaic);
-  MosaicList->append(nirCassisMosaic);
-  MosaicList->append(panCassisMosaic);
+  MosaicList->append(redCassisMosaic.toStdString());
+  MosaicList->append(bluCassisMosaic.toStdString());
+  MosaicList->append(nirCassisMosaic.toStdString());
+  MosaicList->append(panCassisMosaic.toStdString());
   QString mosListFile = prefix.path() + "/mosaicList.lis";
-  MosaicList->write(mosListFile);
+  MosaicList->write(mosListFile.toStdString());
 
   QString coloredMosaic = prefix.path() + "/coloredMosaic.cub";
   QVector<QString> cubeitArgs = {"fromlist=" + mosListFile, "to=" + coloredMosaic};
@@ -1431,7 +1431,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestColorMosaic) {
   }
 
   // Mosaic Cube
-  Cube mosCube(coloredMosaic);
+  Cube mosCube(coloredMosaic.toStdString());
   Pvl *outLabel = mosCube.label();
 
   std::istringstream mos(R"(
@@ -1667,7 +1667,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisMapProjectedReingested) {
   }
 
   // RED Cube
-  Cube reingestCube(reingestedFile);
+  Cube reingestCube(reingestedFile.toStdString());
   Pvl *reingestLabel = reingestCube.label();
 
   // Instrument Group
@@ -1769,10 +1769,10 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleColorMosaicReingest) {
 
   // run mosrange on cube list
   FileList *cubeList = new FileList();
-  cubeList->append(panFileName);
+  cubeList->append(panFileName.toStdString());
 
   QString cubeListFile = prefix.path() + "/cubelist.lis";
-  cubeList->write(cubeListFile);
+  cubeList->write(cubeListFile.toStdString());
 
   QString mapFile = prefix.path() + "/equi.map";
   QVector<QString> mosrangeArgs = {"fromlist=" + cubeListFile, "to=" + mapFile};
@@ -1802,9 +1802,9 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleColorMosaicReingest) {
   }
 
   FileList *mosaicList = new FileList();
-  mosaicList->append(panEquiFile);
+  mosaicList->append(panEquiFile.toStdString());
   QString listFile = prefix.path() + "/cubelist.lis";
-  mosaicList->write(listFile);
+  mosaicList->write(listFile.toStdString());
 
   QString mosaicCubeFile = prefix.path() + "/mosaic.cub";
   QVector<QString> cassismosArgs = {"fromlist=" + listFile, "to=" + mosaicCubeFile};
@@ -1840,7 +1840,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleColorMosaicReingest) {
   }
 
   // Mosaic Cube
-  Cube mosCube(reingestedFile);
+  Cube mosCube(reingestedFile.toStdString());
   Pvl *outLabel = mosCube.label();
 
   std::istringstream inst(R"(
@@ -1961,10 +1961,10 @@ TEST(TgoCassisModuleTests, TgoCassisUncontrolledSingleColorMosaic) {
 
   // run mosrange on cube list
   FileList *cubeList = new FileList();
-  cubeList->append(panFileName);
+  cubeList->append(panFileName.toStdString());
 
   QString cubeListFile = prefix.path() + "/cubelist.lis";
-  cubeList->write(cubeListFile);
+  cubeList->write(cubeListFile.toStdString());
 
   QString mapFile = prefix.path() + "/equi.map";
   QVector<QString> mosrangeArgs = {"fromlist=" + cubeListFile, "to=" + mapFile};
@@ -1994,9 +1994,9 @@ TEST(TgoCassisModuleTests, TgoCassisUncontrolledSingleColorMosaic) {
   }
 
   FileList *mosaicList = new FileList();
-  mosaicList->append(panEquiFile);
+  mosaicList->append(panEquiFile.toStdString());
   QString listFile = prefix.path() + "/cubelist.lis";
-  mosaicList->write(listFile);
+  mosaicList->write(listFile.toStdString());
 
   QString mosaicCubeFile = prefix.path() + "/mosaic.cub";
   QVector<QString> cassismosArgs = {"fromlist=" + listFile, "to=" + mosaicCubeFile};
@@ -2009,7 +2009,7 @@ TEST(TgoCassisModuleTests, TgoCassisUncontrolledSingleColorMosaic) {
   }
 
   // Mosaic Cube
-  Cube mosCube(mosaicCubeFile);
+  Cube mosCube(mosaicCubeFile.toStdString());
   Pvl *outLabel = mosCube.label();
 
   std::istringstream arss(R"(
@@ -2279,13 +2279,13 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
 
   // run stitch on cube list
   FileList *cubeList = new FileList();
-  cubeList->append(panFileName);
-  cubeList->append(bluFileName);
-  cubeList->append(redFileName);
-  cubeList->append(nirFileName);
+  cubeList->append(panFileName.toStdString());
+  cubeList->append(bluFileName.toStdString());
+  cubeList->append(redFileName.toStdString());
+  cubeList->append(nirFileName.toStdString());
 
   QString cubeListFile = prefix.path() + "/cubelist.lis";
-  cubeList->write(cubeListFile);
+  cubeList->write(cubeListFile.toStdString());
 
   QVector<QString> stitchArgs = {"fromlist=" + cubeListFile,
                 "outputprefix=" + prefix.path() + "/stitched"};
@@ -2301,10 +2301,10 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   // run mosrange on cube list
   QString tgocassisstitchOutput = prefix.path() + "/stitched-2016-11-26T22:50:27.381.cub";
   FileList *mosrangeCubeList = new FileList();
-  mosrangeCubeList->append(tgocassisstitchOutput);
+  mosrangeCubeList->append(tgocassisstitchOutput.toStdString());
 
   QString mosrangeCubeListFile = prefix.path() + "/cubelist.lis";
-  mosrangeCubeList->write(mosrangeCubeListFile);
+  mosrangeCubeList->write(mosrangeCubeListFile.toStdString());
 
   QString mapFile = prefix.path() + "/stitched.map";
   QVector<QString> mosrangeArgs = {"fromlist=" + mosrangeCubeListFile, "to=" + mapFile};
@@ -2343,7 +2343,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   }
   
   // Mosaic Cube
-  Cube exportCube(projectedFile);
+  Cube exportCube(projectedFile.toStdString());
   Pvl *outLabel = exportCube.label();
 
   std::istringstream arnirss(R"(

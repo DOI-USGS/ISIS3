@@ -83,12 +83,12 @@ namespace Isis {
     ProcessImportPds importPds;
     importPds.Progress()->SetText((QString)"Writing " + outputParamName + " file");
 
-    FileName in = ui.GetFileName("FROM");
+    FileName in = ui.GetFileName("FROM").toStdString();
 
     Pvl pdsLabel(in.expanded());
     if (fileType == (ProcessImportPds::L0 | ProcessImportPds::Rdn)) {
       //  Is this a L0 or L1B product?
-      if ((QString) pdsLabel["PRODUCT_TYPE"] == "RAW_IMAGE") {
+      if ((std::string) pdsLabel["PRODUCT_TYPE"] == "RAW_IMAGE") {
         fileType = ProcessImportPds::L0;
       }
       else {
@@ -98,10 +98,10 @@ namespace Isis {
 
     // Convert the pds file to a cube
     try {
-      importPds.SetPdsFile(in.expanded(), "", pdsLabel, fileType);
+      importPds.SetPdsFile(QString::fromStdString(in.expanded()), "", pdsLabel, fileType);
     }
     catch(IException &e) {
-      QString msg = "Input file [" + in.expanded() +
+      std::string msg = "Input file [" + in.expanded() +
                    "] does not appear to be a Chandrayaan 1 M3 detached PDS label";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
@@ -121,8 +121,8 @@ namespace Isis {
       //                                          west side of image
       // 4.  Ascending yaw / Reverse orbit limb - Lines/times are reversed so northernmost image
       //                                          line first,
-      QString yawDirection = (QString) pdsLabel["CH1:SPACECRAFT_YAW_DIRECTION"];
-      QString limbDirection = (QString) pdsLabel["CH1:ORBIT_LIMB_DIRECTION"];
+      QString yawDirection = QString::fromStdString(pdsLabel["CH1:SPACECRAFT_YAW_DIRECTION"]);
+      QString limbDirection = QString::fromStdString(pdsLabel["CH1:ORBIT_LIMB_DIRECTION"]);
       samplesNeedFlipped = ( ((yawDirection == "REVERSE") && (limbDirection == "DESCENDING")) ||
                              ((yawDirection == "FORWARD") && (limbDirection == "ASCENDING")) );
       linesNeedFlipped = (limbDirection == "ASCENDING");
@@ -143,7 +143,7 @@ namespace Isis {
 
         if (g_utcTable->Records() >= 1) {
 
-          QString instMode = (QString) pdsLabel["INSTRUMENT_MODE_ID"];
+          QString instMode = QString::fromStdString(pdsLabel["INSTRUMENT_MODE_ID"]);
           // Initialize to the value for a GLOBAL mode observation
           g_expectedLineRate = 0.10176;
           if (instMode == "TARGET") {
@@ -161,8 +161,8 @@ namespace Isis {
           for (int rec = 0; rec < g_utcTable->Records() - 1; rec++) {
             outputLines++; // One for this line
 
-            iTime thisEt((QString)(*g_utcTable)[rec]["UtcTime"]);
-            iTime nextEt((QString)(*g_utcTable)[rec+1]["UtcTime"]);
+            iTime thisEt(QString::fromStdString((std::string)(*g_utcTable)[rec]["UtcTime"]));
+            iTime nextEt(QString::fromStdString((std::string)(*g_utcTable)[rec+1]["UtcTime"]));
             double delta = fabs(nextEt - thisEt); // Time table may be assending or decenting times
 
             while (delta > g_expectedLineRate * 1.9) {
@@ -172,13 +172,13 @@ namespace Isis {
           }
           outputLines++; // One more for the last line
 
-          iTime firstEt((QString)(*g_utcTable)[0]["UtcTime"]);
-          iTime lastEt((QString)(*g_utcTable)[g_utcTable->Records()-1]["UtcTime"]);
+          iTime firstEt(QString::fromStdString((std::string)(*g_utcTable)[0]["UtcTime"]));
+          iTime lastEt(QString::fromStdString((std::string)(*g_utcTable)[g_utcTable->Records()-1]["UtcTime"]));
           calcOutputLines = fabs((lastEt + g_expectedLineRate / 2.0) -
                                  (firstEt - g_expectedLineRate / 2.0)) / g_expectedLineRate;
         }
         else {
-          QString msg = "Input file [" + in.expanded() +
+          std::string msg = "Input file [" + in.expanded() +
                        "] does not appear to have any records in the UTC_FILE table";
           throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -207,11 +207,11 @@ namespace Isis {
       }
       else {
         importPds.StartProcess(writeCubeWithDroppedLines);
-        g_results += PvlKeyword("LinesFlipped", toString(linesNeedFlipped));
-        g_results += PvlKeyword("SamplesFlipped", toString(samplesNeedFlipped));
-        g_results += PvlKeyword("LinesAdded", toString(g_totalLinesAdded));
-        g_results += PvlKeyword("OutputLines", toString(outputLines));
-        g_results += PvlKeyword("CalculatedOutputLines", toString(calcOutputLines));
+        g_results += PvlKeyword("LinesFlipped", Isis::toString(linesNeedFlipped));
+        g_results += PvlKeyword("SamplesFlipped", Isis::toString(samplesNeedFlipped));
+        g_results += PvlKeyword("LinesAdded", Isis::toString(g_totalLinesAdded));
+        g_results += PvlKeyword("OutputLines", Isis::toString(outputLines));
+        g_results += PvlKeyword("CalculatedOutputLines", Isis::toString(calcOutputLines));
       }
 
       delete g_oBuff;
@@ -289,11 +289,11 @@ namespace Isis {
 
     if (in.Band() == g_oCube->bandCount() && in.Line() < g_utcTable->Records()) {
 
-      QString tt = (QString)(*g_utcTable)[in.Line() - 1]["UtcTime"];
-      QString ttt = (QString)(*g_utcTable)[in.Line()]["UtcTime"];
+      QString tt = QString::fromStdString((std::string)(*g_utcTable)[in.Line() - 1]["UtcTime"]);
+      QString ttt = QString::fromStdString((std::string)(*g_utcTable)[in.Line()]["UtcTime"]);
 
-      iTime thisEt((QString)(*g_utcTable)[in.Line() - 1]["UtcTime"]);
-      iTime nextEt((QString)(*g_utcTable)[in.Line()]["UtcTime"]);
+      iTime thisEt(QString::fromStdString((std::string)(*g_utcTable)[in.Line() - 1]["UtcTime"]));
+      iTime nextEt(QString::fromStdString((std::string)(*g_utcTable)[in.Line()]["UtcTime"]));
 
       double delta = fabs(nextEt - thisEt);
 
@@ -327,13 +327,13 @@ namespace Isis {
 
     // Translate the archive group
     FileName transFile("$ISISROOT/appdata/translations/Chandrayaan1M3Archive.trn");
-    PvlToPvlTranslationManager archiveXlator(pdsLabel, transFile.expanded());
+    PvlToPvlTranslationManager archiveXlator(pdsLabel, QString::fromStdString(transFile.expanded()));
     archiveXlator.Auto(outLabel);
     ocube->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
 
     // Translate the instrument group
     transFile = "$ISISROOT/appdata/translations/Chandrayaan1M3Instrument.trn";
-    PvlToPvlTranslationManager instrumentXlator(pdsLabel, transFile.expanded());
+    PvlToPvlTranslationManager instrumentXlator(pdsLabel, QString::fromStdString(transFile.expanded()));
     instrumentXlator.Auto(outLabel);
 
     PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
@@ -347,15 +347,15 @@ namespace Isis {
       // jigsaw, so use the clock counts to update these keywords.
       NaifStatus::CheckErrors();
 
-      QString lsk = "$base/kernels/lsk/naif????.tls";
+      std::string lsk = "$base/kernels/lsk/naif????.tls";
       FileName lskName(lsk);
       lskName = lskName.highestVersion();
-      furnsh_c(lskName.expanded().toLatin1().data());
+      furnsh_c(lskName.expanded().c_str());
 
-      QString sclk = "$chandrayaan1/kernels/sclk/aig_ch1_sclk_complete_biased_m1p???.tsc";
+      std::string sclk = "$chandrayaan1/kernels/sclk/aig_ch1_sclk_complete_biased_m1p???.tsc";
       FileName sclkName(sclk);
       sclkName = sclkName.highestVersion();
-      furnsh_c(sclkName.expanded().toLatin1().data());
+      furnsh_c(sclkName.expanded().c_str());
 
       SpiceInt sclkCode = -86;
 
@@ -377,8 +377,8 @@ namespace Isis {
       // Assume the UTC table times are better, so change the labels to match the table
       // The start and stop clock counts need to match the start/stop time, so convert the times
       // to new clock counts.
-      iTime firstEt((QString)(*g_utcTable)[0]["UtcTime"]);
-      iTime lastEt((QString)(*g_utcTable)[utcTable.Records()-1]["UtcTime"]);
+      iTime firstEt(QString::fromStdString((std::string)(*g_utcTable)[0]["UtcTime"]));
+      iTime lastEt(QString::fromStdString((std::string)(*g_utcTable)[utcTable.Records()-1]["UtcTime"]));
 
       // The table is in assending order
       // The table contains the middle of the exposure. include times to cover the beginning of
@@ -392,17 +392,17 @@ namespace Isis {
         lastEt = firstEt + (g_expectedLineRate / 2.0);
       }
 
-      inst.findKeyword("StartTime").setValue(firstEt.UTC());
+      inst.findKeyword("StartTime").setValue(firstEt.UTC().toStdString());
       SpiceChar startClockString[100];
       sce2s_c (sclkCode, firstEt.Et(), 100, startClockString);
       QString startClock(startClockString);
-      inst.findKeyword("SpacecraftClockStartCount").setValue(startClock);
+      inst.findKeyword("SpacecraftClockStartCount").setValue(startClock.toStdString());
 
-      inst.findKeyword("StopTime").setValue(lastEt.UTC());
+      inst.findKeyword("StopTime").setValue(lastEt.UTC().toStdString());
       SpiceChar stopClockString[100];
       sce2s_c (sclkCode, lastEt.Et(), 100, stopClockString);
       QString stopClock(stopClockString);
-      inst.findKeyword("SpacecraftClockStopCount").setValue(stopClock);
+      inst.findKeyword("SpacecraftClockStopCount").setValue(stopClock.toStdString());
     }
 
     ocube->putGroup(inst);
@@ -410,12 +410,12 @@ namespace Isis {
     if (fileType == ProcessImportPds::L0 || fileType == ProcessImportPds::Rdn) {
       // Setup the band bin group
       QString bandFile = "$chandrayaan1/bandBin/bandBin.pvl";
-      Pvl bandBinTemplate(bandFile);
+      Pvl bandBinTemplate(bandFile.toStdString());
       PvlObject modeObject = bandBinTemplate.findObject(pdsLabel["INSTRUMENT_MODE_ID"]);
       PvlGroup bandGroup = modeObject.findGroup("BandBin");
       //  Add OriginalBand
       int numBands;
-      if ((QString)pdsLabel["INSTRUMENT_MODE_ID"] == "TARGET") {
+      if ((std::string)pdsLabel["INSTRUMENT_MODE_ID"] == "TARGET") {
         numBands = 256;
       }
       else {
@@ -423,7 +423,7 @@ namespace Isis {
       }
       PvlKeyword originalBand("OriginalBand");
       for (int i = 1; i <= numBands; i++) {
-        originalBand.addValue(toString(i));
+        originalBand.addValue(Isis::toString(i));
       }
       bandGroup += originalBand;
       ocube->putGroup(bandGroup);
@@ -433,14 +433,14 @@ namespace Isis {
         PvlGroup calib("RadiometricCalibration");
         PvlKeyword solar = pdsLabel["SOLAR_DISTANCE"];
         calib += PvlKeyword("Units", "W/m2/um/sr");
-        calib += PvlKeyword("SolarDistance", toString((double)solar), solar.unit());
-        calib += PvlKeyword("DetectorTemperature", toString((double)pdsLabel["DETECTOR_TEMPERATURE"]));
+        calib += PvlKeyword("SolarDistance", Isis::toString((double)solar), solar.unit());
+        calib += PvlKeyword("DetectorTemperature", Isis::toString((double)pdsLabel["DETECTOR_TEMPERATURE"]));
         calib += PvlKeyword("SpectralCalibrationFileName",
-                            (QString)pdsLabel["CH1:SPECTRAL_CALIBRATION_FILE_NAME"]);
+                            pdsLabel["CH1:SPECTRAL_CALIBRATION_FILE_NAME"]);
         calib += PvlKeyword("RadGainFactorFileName",
-                            (QString)pdsLabel["CH1:RAD_GAIN_FACTOR_FILE_NAME"]);
+                            pdsLabel["CH1:RAD_GAIN_FACTOR_FILE_NAME"]);
         calib += PvlKeyword("GlobalBandpassFileName",
-                            (QString)pdsLabel["CH1:SPECTRAL_CALIBRATION_FILE_NAME"]);
+                            pdsLabel["CH1:SPECTRAL_CALIBRATION_FILE_NAME"]);
         ocube->putGroup(calib);
       }
     }

@@ -78,7 +78,7 @@ void IsisMain() {
   // If append is true, output will be appended or a new file created
   if (append) {
     // Check to see if its a new file or we open an existing file
-    FileName file(ui.GetFileName("FLATFILE"));
+    FileName file(ui.GetFileName("FLATFILE").toStdString());
     if (!file.fileExists()) {
       // It is new, so we aren't appending
       // Set this because it is used elsewhere
@@ -177,8 +177,8 @@ void IsisMain() {
     measureInfo += cpoint->GetPointTypeString() + ",";
     measureInfo += QString(cpoint->GetChooserName()) + ",";
     measureInfo += QString(cpoint->GetDateTime()) + ",";
-    measureInfo += toString((int)(cpoint->IsEditLocked())) + ",";
-    measureInfo += toString((int)(cpoint->IsIgnored())) + ",";
+    measureInfo += QString::number((int)(cpoint->IsEditLocked())) + ",";
+    measureInfo += QString::number((int)(cpoint->IsIgnored())) + ",";
 
     measureInfo += QString(cpoint->GetSurfacePointSourceString()) + ",";
     measureInfo += QString(cpoint->GetAprioriSurfacePointSourceFile()) + ",";
@@ -322,16 +322,16 @@ QString CheckValue(double value) {
     return QString("");
   }
   else {
-    return CheckValue(toString(value));
+    return CheckValue(QString::number(value));
   }
 }
 
 QString CheckValue(QString value) {
-  if (value == toString(Isis::Null) ||
-      value == toString(Isis::Hrs) ||
-      value == toString(Isis::His) ||
-      value == toString(Isis::Lrs) ||
-      value == toString(Isis::Lis) ||
+  if (value == QString::number(Isis::Null) ||
+      value == QString::number(Isis::Hrs) ||
+      value == QString::number(Isis::His) ||
+      value == QString::number(Isis::Lrs) ||
+      value == QString::number(Isis::Lis) ||
       value == QString::number(Isis::Null)) {
     return QString("");
   }
@@ -372,16 +372,16 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
     // point information
     for (int i = 0; i < maxCount; i++) {
       if ((*point)[i].size() == 3) {
-        output += QString((*point)[i].name()) + "X,";
-        output += QString((*point)[i].name()) + "Y,";
-        output += QString((*point)[i].name()) + "Z,";
+        output += QString::fromStdString((*point)[i].name()) + "X,";
+        output += QString::fromStdString((*point)[i].name()) + "Y,";
+        output += QString::fromStdString((*point)[i].name()) + "Z,";
       }
       else {
-        output += QString((*point)[i].name()) + ",";
+        output += QString::fromStdString((*point)[i].name()) + ",";
       }
     }
 
-    if (errors) output += QString((*point)[maxCount].name());
+    if (errors) output += QString::fromStdString((*point)[maxCount].name());
     isFirst = false;
     measureLabels += output;
     // In some cases, we need to trim a trailing comma:
@@ -403,16 +403,16 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
   // point information
   for (int i = 0; i < maxCount; i++) {
     if ((*point)[i].size() == 3) {
-      output += QString(CheckValue((*point)[i][0])) + ",";
-      output += QString(CheckValue((*point)[i][1])) + ",";
-      output += QString(CheckValue((*point)[i][2])) + ",";
+      output += QString(CheckValue(QString::fromStdString((*point)[i][0]))) + ",";
+      output += QString(CheckValue(QString::fromStdString((*point)[i][1]))) + ",";
+      output += QString(CheckValue(QString::fromStdString((*point)[i][2]))) + ",";
     }
     else {
-      output += QString(CheckValue((*point)[i][0])) + ",";
+      output += QString(CheckValue(QString::fromStdString((*point)[i][0]))) + ",";
     }
   }
 
-  if (errors) output += QString((*point)[maxCount][0]);
+  if (errors) output += QString::fromStdString((*point)[maxCount][0]);
 
   // Measure info comes first
   QString pri = "";

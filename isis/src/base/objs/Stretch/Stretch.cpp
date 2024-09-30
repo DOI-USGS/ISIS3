@@ -157,8 +157,8 @@ namespace Isis {
       QStringList firstPairValues = firstPair.split(":");
 
       if (firstPairValues.count() == 2) {
-        io.first = toDouble(firstPairValues.first());
-        io.second = toDouble(firstPairValues.last());
+        io.first = firstPairValues.first().toDouble();
+        io.second = firstPairValues.last().toDouble();
 
         pairs = pairList.join(" ");
       }
@@ -198,7 +198,7 @@ namespace Isis {
       }
     }
     catch(IException &e) {
-      throw IException(e, IException::User, "Invalid stretch pairs [" + pairs + "]", _FILEINFO_);
+      throw IException(e, IException::User, "Invalid stretch pairs [" + pairs.toStdString() + "]", _FILEINFO_);
     }
   }
 
@@ -255,7 +255,7 @@ namespace Isis {
 
     catch(IException &e) {
       throw IException(e, IException::User, "Invalid stretch pairs [" +
-                       pairs + "]", _FILEINFO_);
+                       pairs.toStdString() + "]", _FILEINFO_);
     }
   }
 
@@ -271,7 +271,7 @@ namespace Isis {
 
     QString p("");
     for(int i = 0; i < p_pairs; i++) {
-      p += toString(p_input[i]) + ":" + toString(p_output[i]) + " ";
+      p += QString::number(p_input[i]) + ":" + QString::number(p_output[i]) + " ";
     }
     return p.trimmed();
   }
@@ -321,7 +321,7 @@ namespace Isis {
    *                keywords from
    */
   void Stretch::Load(QString &file, QString &grpName) {
-    Pvl pvl(file);
+    Pvl pvl(file.toStdString());
     Load(pvl, grpName);
   }
 
@@ -340,16 +340,16 @@ namespace Isis {
    *                keywords from
    */
   void Stretch::Load(Isis::Pvl &pvl, QString &grpName) {
-    PvlGroup grp = pvl.findGroup(grpName, Isis::PvlObject::Traverse);
+    PvlGroup grp = pvl.findGroup(grpName.toStdString(), Isis::PvlObject::Traverse);
     PvlKeyword inputs = grp.findKeyword("Input");
     PvlKeyword outputs = grp.findKeyword("Output");
 
     if(inputs.size() != outputs.size()) {
-      QString msg = "Invalid Pvl file: The number of Input values must equal the number of Output values";
+      std::string msg = "Invalid Pvl file: The number of Input values must equal the number of Output values";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     for(int i = 0; i < inputs.size(); i++) {
-      AddPair(toDouble(inputs[i]), toDouble(outputs[i]));
+      AddPair(Isis::toDouble(inputs[i]), Isis::toDouble(outputs[i]));
     }
   }
 
@@ -367,16 +367,16 @@ namespace Isis {
   void Stretch::Save(QString &file, QString &grpName) {
     Pvl p;
     Save(p, grpName);
-    p.write(file);
+    p.write(file.toStdString());
   }
 
   void Stretch::Save(Isis::Pvl &pvl, QString &grpName) {
-    PvlGroup *grp = new PvlGroup(grpName);
+    PvlGroup *grp = new PvlGroup(grpName.toStdString());
     PvlKeyword inputs("Input");
     PvlKeyword outputs("Output");
     for(int i = 0; i < Pairs(); i++) {
-      inputs.addValue(toString(Input(i)));
-      outputs.addValue(toString(Output(i)));
+      inputs.addValue(Isis::toString(Input(i)));
+      outputs.addValue(Isis::toString(Output(i)));
     }
     grp->addKeyword(inputs);
     grp->addKeyword(outputs);

@@ -43,7 +43,7 @@ namespace Isis {
 
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-    QString stime = inst["SpacecraftClockStartCount"];
+    QString stime = QString::fromStdString(inst["SpacecraftClockStartCount"]);
 
     m_etStart = getClockTime(stime).Et();
     m_lineRate = 1.0 / (double)inst["TdiRate"];
@@ -78,8 +78,8 @@ namespace Isis {
 
     // read residual polynomial distortion coefs from the NAIF Kernels
     int code = naifIkCode();
-    QString naifCOLKey = "INS" + toString(code) + "_RESIDUAL_COL_DIST_COEF";
-    QString naifROWKey = "INS" + toString(code) + "_RESIDUAL_ROW_DIST_COEF";
+    QString naifCOLKey = "INS" + QString::number(code) + "_RESIDUAL_COL_DIST_COEF";
+    QString naifROWKey = "INS" + QString::number(code) + "_RESIDUAL_ROW_DIST_COEF";
 
     for (int i=0; i < 6; i++) {
       residualColumnDistCoefs.push_back(getDouble(naifCOLKey,i));

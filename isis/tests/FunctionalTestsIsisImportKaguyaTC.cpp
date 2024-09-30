@@ -1,7 +1,6 @@
 #include <iostream>
 #include <time.h>
 
-#include <QRegExp>
 #include <QString>
 #include <nlohmann/json.hpp>
 
@@ -19,7 +18,7 @@
 using namespace Isis;
 using json = nlohmann::json;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/isisimport.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/isisimport.xml").expanded());
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyaTC) {
   std::istringstream PvlInput(R"(
@@ -249,7 +248,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyaTC) {
 
   isisimport(options);
 
-  Pvl output = Pvl(tempDir.path() + "/kaguyatc.cub");
+  Pvl output = Pvl(tempDir.path().toStdString() + "/kaguyatc.cub");
   Pvl truth;
   PvlInput >> truth;
 

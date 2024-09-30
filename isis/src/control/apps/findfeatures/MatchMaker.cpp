@@ -86,7 +86,7 @@ MatchImage &MatchMaker::train(const int &index) {
 
 void MatchMaker::setGeometrySourceFlag(const MatchMaker::GeometrySourceFlag &source) {
   if ( (Train == source) && ( size() > 1) )  {
-    QString mess = "Cannot choose Train image as geometry source when matching "
+    std::string mess = "Cannot choose Train image as geometry source when matching "
                    "more than one train image to match";
     throw IException(IException::Programmer, mess, _FILEINFO_);
   }
@@ -99,7 +99,7 @@ MatchMaker::GeometrySourceFlag MatchMaker::getGeometrySourceFlag() const {
 
 MatchImage MatchMaker::getGeometrySource() const {
   if ( ( Train == m_geomFlag ) && ( size() > 1) )  {
-    QString mess = "Cannot choose Train image as geometry source when matching "
+    std::string mess = "Cannot choose Train image as geometry source when matching "
                    "more than one train image to match";
     throw IException(IException::Programmer, mess, _FILEINFO_);
   }
@@ -158,7 +158,7 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
     logger().flush();
   }
 
-  cnetinfo += PvlKeyword("SolutionSize", toString(solution.size()) );
+  cnetinfo += PvlKeyword("SolutionSize", Isis::toString(solution.size()) );
   if ( solution.size() <= 0 ) {
     cnetinfo += PvlKeyword("Error", "No matches, no network!!");
     return (cnetinfo);
@@ -187,7 +187,7 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
   int nPoints = 0;
   int nBadPoints = 0;
   int nBadMeasures = 0;
-  bool preserve_ignored = toBool(m_parameters.get("PreserveIgnoredControl", "False"));
+  bool preserve_ignored = toBool(m_parameters.get("PreserveIgnoredControl", "False").toStdString());
   Statistics pointStats;
   for (int i = 0 ; i < points.size() ; i++) {
     if ( (points[i] != 0)  ) {
@@ -217,24 +217,24 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
     }
   }
 
-  cnetinfo += PvlKeyword("ImagesMatched", toString(nImages) );
-  cnetinfo += PvlKeyword("ControlPoints", toString(nPoints) );
-  cnetinfo += PvlKeyword("ControlMeasures", toString(nMeasures) );
-  cnetinfo += PvlKeyword("InvalidIgnoredPoints", toString(nBadPoints) );
-  cnetinfo += PvlKeyword("InvalidIgnoredMeasures", toString(nBadMeasures) );
-  cnetinfo += PvlKeyword("PreserveIgnoredControl", toString(preserve_ignored) );
+  cnetinfo += PvlKeyword("ImagesMatched", Isis::toString(nImages) );
+  cnetinfo += PvlKeyword("ControlPoints", Isis::toString(nPoints) );
+  cnetinfo += PvlKeyword("ControlMeasures", Isis::toString(nMeasures) );
+  cnetinfo += PvlKeyword("InvalidIgnoredPoints", Isis::toString(nBadPoints) );
+  cnetinfo += PvlKeyword("InvalidIgnoredMeasures", Isis::toString(nBadMeasures) );
+  cnetinfo += PvlKeyword("PreserveIgnoredControl", Isis::toString(preserve_ignored) );
   if ( isDebug() ) {
     logger() << "  Images Matched:                 " << nImages << "\n";
     logger() << "  ControlPoints created:          " << nPoints << "\n";
     logger() << "  ControlMeasures created:        " << nMeasures << "\n";
     logger() << "  InvalidIgnoredPoints:           " << nBadPoints << "\n";
     logger() << "  InvalidIgnoredMeasures:         " << nBadMeasures << "\n";
-    logger() << "  PreserveIgnoredControl          " << toString(preserve_ignored) << "\n";
+    logger() << "  PreserveIgnoredControl          " << QString::number(preserve_ignored) << "\n";
     logger().flush();
   }
 
   // Report measure statistics
-  PvlKeyword mkey = PvlKeyword("ValidPoints", toString(pointStats.ValidPixels()) );
+  PvlKeyword mkey = PvlKeyword("ValidPoints", Isis::toString(pointStats.ValidPixels()) );
   mkey.addComment(" -- Valid Point/Measure Statistics ---");
   cnetinfo += mkey;
   if ( isDebug() ) {
@@ -243,11 +243,11 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
   }
 
   if ( pointStats.ValidPixels() > 0 ) {
-    cnetinfo += PvlKeyword("MinimumMeasures", toString(pointStats.Minimum()) );
-    cnetinfo += PvlKeyword("MaximumMeasures", toString(pointStats.Maximum()) );
-    cnetinfo += PvlKeyword("AverageMeasures", toString(pointStats.Average()) );
-    cnetinfo += PvlKeyword("StdDevMeasures", toString(pointStats.StandardDeviation()) );
-    cnetinfo += PvlKeyword("TotalMeasures", toString((int) pointStats.Sum()) );
+    cnetinfo += PvlKeyword("MinimumMeasures", Isis::toString(pointStats.Minimum()) );
+    cnetinfo += PvlKeyword("MaximumMeasures", Isis::toString(pointStats.Maximum()) );
+    cnetinfo += PvlKeyword("AverageMeasures", Isis::toString(pointStats.Average()) );
+    cnetinfo += PvlKeyword("StdDevMeasures", Isis::toString(pointStats.StandardDeviation()) );
+    cnetinfo += PvlKeyword("TotalMeasures", Isis::toString((int) pointStats.Sum()) );
     if ( isDebug() ) {
       logger() << "  MinimumMeasures:       " << pointStats.Minimum() << "\n";
       logger() << "  MaximumMeasures:       " << pointStats.Maximum() << "\n";
@@ -320,9 +320,9 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
   // network. Use 2 * homography tolerance as a limit unless the user has added
   // a ResidualTolerance parameter to the matcher.
   double residual = std::sqrt( diff.x*diff.x + diff.y*diff.y);
-  double residTol = toDouble(solution.matcher()->parameters().get("HmgTolerance")) * 2.0;
-  residTol = toDouble(solution.matcher()->parameters().get("ResidualTolerance",
-                                                          toString(residTol)));
+  double residTol = solution.matcher()->parameters().get("HmgTolerance").toDouble() * 2.0;
+  residTol = solution.matcher()->parameters().get("ResidualTolerance",
+                                                          QString::number(residTol)).toDouble();
 
   // Don't add the measure to the point if it exceeds tolerance
   if ( residual <= residTol ) {
@@ -401,7 +401,7 @@ double MatchMaker::getParameter(const QString &name,
   if ( parameters.count(name) > 0 ) {
     QString value = parameters.get(name);
     if ( !value.isEmpty() ) {
-      parm = toDouble(value);
+      parm = value.toDouble();
     }
   }
 

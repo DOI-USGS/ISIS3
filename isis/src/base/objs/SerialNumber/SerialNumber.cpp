@@ -46,9 +46,9 @@ namespace Isis {
       if(def2filename) {
         //  Try to return the filename if it exists in the label, otherwise use
         //  "Unknown" as a last resort.
-        QString snTemp = label.fileName();
+        QString snTemp = QString::fromStdString(label.fileName());
         if(!snTemp.isEmpty()) {
-          sn = FileName(snTemp).name();
+          sn = QString::fromStdString(FileName(snTemp.toStdString()).name());
         }
         else {
           sn = "Unknown";
@@ -84,7 +84,7 @@ namespace Isis {
    * @return Calculated SerialNumber or FileName
   */
   QString SerialNumber::Compose(const QString &filename, bool def2filename) {
-    Pvl p(filename);
+    Pvl p(filename.toStdString());
     return Compose(p, def2filename);
   }
 
@@ -135,11 +135,11 @@ namespace Isis {
       if(translationIterator == missionTranslators.end()) {
         // Get the file
 
-        FileName snFile((QString) "$ISISROOT/appdata/translations/" + mission + instrument + "SerialNumber.trn");
+        FileName snFile("$ISISROOT/appdata/translations/" + mission.toStdString() + instrument.toStdString() + "SerialNumber.trn");
 
         // use the translation file to generate keywords
         missionTranslators.insert(
-          std::pair<QString, PvlToPvlTranslationManager>(key, PvlToPvlTranslationManager(snFile.expanded()))
+          std::pair<QString, PvlToPvlTranslationManager>(key, PvlToPvlTranslationManager(QString::fromStdString(snFile.expanded())))
         );
 
         translationIterator = missionTranslators.find(key);
@@ -149,7 +149,7 @@ namespace Isis {
     }
 
     PvlGroup snGroup = outLabel.findGroup("SerialNumberKeywords");
-    snGroup += PvlKeyword("ObservationKeys", toString(snGroup.keywords()));
+    snGroup += PvlKeyword("ObservationKeys", Isis::toString(snGroup.keywords()));
 
     return snGroup;
   }
@@ -162,10 +162,10 @@ namespace Isis {
    * @param keys the number of strings to contatenate
    */
   QString SerialNumber::CreateSerialNumber(PvlGroup &snGroup, int keys) {
-    QString sn = snGroup["Keyword1"][0];
+    QString sn = QString::fromStdString(snGroup["Keyword1"][0]);
     for(int i = 2; i <= keys; i++) {
       QString keyword = QString("Keyword%1").arg(i);
-      sn += "/" + snGroup[keyword][0];
+      sn += "/" + QString::fromStdString(snGroup[keyword.toStdString()][0]);
     }
     return sn;
   }

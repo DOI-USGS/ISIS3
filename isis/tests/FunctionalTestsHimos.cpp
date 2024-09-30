@@ -13,17 +13,17 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/himos.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/himos.xml").expanded());
 
 TEST_F(MroHiriseCube, FunctionalTestHimosDefault) {
 
-  FileName mosFileList(tempDir.path() + "/himosFileList.lis");
+  FileName mosFileList(tempDir.path().toStdString() + "/himosFileList.lis");
 
   FileList * cubeList = new FileList();
-  cubeList->append(dejitteredCube.fileName());
+  cubeList->append(dejitteredCube.fileName().toStdString());
   cubeList->write(mosFileList);
 
-  QVector<QString> args = {"from=" + mosFileList.toString(),
+  QVector<QString> args = {"from=" + QString::fromStdString(mosFileList.toString()),
                            "to=" + tempDir.path() + "/outputMos.cub"};
 
   UserInterface options(APP_XML, args);
@@ -31,9 +31,9 @@ TEST_F(MroHiriseCube, FunctionalTestHimosDefault) {
    himos(options);
   }
   catch (IException &e) {
-    FAIL() << "Unable to create mosaic image: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to create mosaic image: " <<  e.toString().c_str() << std::endl;
   }
-  Cube outputMos(options.GetCubeName("TO"));
+  Cube outputMos(options.GetCubeName("TO").toStdString());
   PvlObject inputCubeLabel = dejitteredCube.label()->findObject("IsisCube");
   PvlObject outputCubeLabel = outputMos.label()->findObject("IsisCube");
   PvlGroup dimensions = outputCubeLabel.findObject("Core").findGroup("Dimensions");
@@ -53,36 +53,36 @@ TEST_F(MroHiriseCube, FunctionalTestHimosDefault) {
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, inputMappingGroup, outputMappingGroup);
 
   PvlGroup mos = outputCubeLabel.findGroup("Mosaic");
-  EXPECT_EQ(mos["ProductId"][0].toStdString(), "TRA_000823_1720_BLUEGREEN");
-  EXPECT_EQ(mos["SourceProductId"][0].toStdString(), "TRA_000823_1720_RED4_0");
-  EXPECT_EQ(mos["SourceProductId"][1].toStdString(), "TRA_000823_1720_RED4_1");
-  EXPECT_EQ(mos["StartTime"][0].toStdString(), "2006-09-29T15:16:33.385");
-  EXPECT_EQ(mos["SpacecraftClockStartCount"][0].toStdString(), "844010212:12516");
-  EXPECT_EQ(mos["StopTime"][0].toStdString(), "2006-09-29T15:16:35.036");
-  EXPECT_EQ(mos["SpacecraftClockStopCount"][0].toStdString(), "844010213:55196");
+  EXPECT_EQ(mos["ProductId"][0], "TRA_000823_1720_BLUEGREEN");
+  EXPECT_EQ(mos["SourceProductId"][0], "TRA_000823_1720_RED4_0");
+  EXPECT_EQ(mos["SourceProductId"][1], "TRA_000823_1720_RED4_1");
+  EXPECT_EQ(mos["StartTime"][0], "2006-09-29T15:16:33.385");
+  EXPECT_EQ(mos["SpacecraftClockStartCount"][0], "844010212:12516");
+  EXPECT_EQ(mos["StopTime"][0], "2006-09-29T15:16:35.036");
+  EXPECT_EQ(mos["SpacecraftClockStopCount"][0], "844010213:55196");
 
-  EXPECT_NEAR(mos["IncidenceAngle"][0].toDouble(), 59.687930340662, 1e-6);
-  EXPECT_NEAR(mos["EmissionAngle"][0].toDouble(), 0.091672512439956, 1e-6);
-  EXPECT_NEAR(mos["PhaseAngle"][0].toDouble(), 59.597812369363, 1e-6);
-  EXPECT_NEAR(mos["LocalTime"][0].toDouble(), 15.486088288555, 1e-6);
-  EXPECT_NEAR(mos["SolarLongitude"][0].toDouble(), 113.54746578654, 1e-6);
-  EXPECT_NEAR(mos["SubSolarAzimuth"][0].toDouble(), 212.41484032558 , 1e-6);
-  EXPECT_NEAR(mos["NorthAzimuth"][0].toDouble(), 270.00024569628, 1e-6);
+  EXPECT_NEAR(Isis::toDouble(mos["IncidenceAngle"][0]), 59.687930340662, 1e-6);
+  EXPECT_NEAR(Isis::toDouble(mos["EmissionAngle"][0]), 0.091672512439956, 1e-6);
+  EXPECT_NEAR(Isis::toDouble(mos["PhaseAngle"][0]), 59.597812369363, 1e-6);
+  EXPECT_NEAR(Isis::toDouble(mos["LocalTime"][0]), 15.486088288555, 1e-6);
+  EXPECT_NEAR(Isis::toDouble(mos["SolarLongitude"][0]), 113.54746578654, 1e-6);
+  EXPECT_NEAR(Isis::toDouble(mos["SubSolarAzimuth"][0]), 212.41484032558 , 1e-6);
+  EXPECT_NEAR(Isis::toDouble(mos["NorthAzimuth"][0]), 270.00024569628, 1e-6);
 
-  EXPECT_EQ(mos["cpmmTdiFlag"][5].toStdString(), "128");
-  EXPECT_EQ(mos["cpmmSummingFlag"][5].toStdString(), "1");
-  EXPECT_EQ(mos["SpecialProcessingFlag"][5].toStdString(), "NOMINAL");
+  EXPECT_EQ(mos["cpmmTdiFlag"][5], "128");
+  EXPECT_EQ(mos["cpmmSummingFlag"][5], "1");
+  EXPECT_EQ(mos["SpecialProcessingFlag"][5], "NOMINAL");
 }
 
 TEST_F(MroHiriseCube, FunctionalTestHimosError) {
 
-  FileName mosFileList(tempDir.path() + "/himosFileList.lis");
+  FileName mosFileList(tempDir.path().toStdString() + "/himosFileList.lis");
 
   FileList * cubeList = new FileList();
-  cubeList->append(testCube->fileName());
+  cubeList->append(testCube->fileName().toStdString());
   cubeList->write(mosFileList);
 
-  QVector<QString> args = {"from=" + mosFileList.toString(),
+  QVector<QString> args = {"from=" + QString::fromStdString(mosFileList.toString()),
                            "to=" + tempDir.path() + "/outputMos.cub"};
 
   UserInterface options(APP_XML, args);
@@ -96,19 +96,19 @@ TEST_F(MroHiriseCube, FunctionalTestHimosError) {
 }
 
 TEST_F(MroHiriseCube, FunctionalTestHimosMismatchObs) {
-  CubeAttributeOutput cubeAtts(FileName(dejitteredCube.fileName()));
-  Cube *copyDejitteredCube = dejitteredCube.copy(tempDir.path() + "/copyDejitteredCube.cub", cubeAtts);
+  CubeAttributeOutput cubeAtts(FileName(dejitteredCube.fileName().toStdString()));
+  Cube *copyDejitteredCube = dejitteredCube.copy(tempDir.path().toStdString() + "/copyDejitteredCube.cub", cubeAtts);
   copyDejitteredCube->label()->findObject("IsisCube").findGroup("Archive")["ObservationId"] = "Banana";
   copyDejitteredCube->reopen("rw");
 
-  FileName mosFileList(tempDir.path() + "/himosFileList.lis");
+  FileName mosFileList(tempDir.path().toStdString() + "/himosFileList.lis");
 
   FileList * cubeList = new FileList();
-  cubeList->append(dejitteredCube.fileName());
-  cubeList->append(copyDejitteredCube->fileName());
+  cubeList->append(dejitteredCube.fileName().toStdString());
+  cubeList->append(copyDejitteredCube->fileName().toStdString());
   cubeList->write(mosFileList);
 
-  QVector<QString> args = {"from=" + mosFileList.toString(),
+  QVector<QString> args = {"from=" + QString::fromStdString(mosFileList.toString()),
                            "to=" + tempDir.path() + "/outputMos.cub"};
 
   UserInterface options(APP_XML, args);
@@ -122,19 +122,19 @@ TEST_F(MroHiriseCube, FunctionalTestHimosMismatchObs) {
 }
 
 TEST_F(MroHiriseCube, FunctionalTestHimosMismatchFilter) {
-  CubeAttributeOutput cubeAtts(FileName(dejitteredCube.fileName()));
-  Cube *copyDejitteredCube = dejitteredCube.copy(tempDir.path() + "/copyDejitteredCube.cub", cubeAtts);
+  CubeAttributeOutput cubeAtts(FileName(dejitteredCube.fileName().toStdString()));
+  Cube *copyDejitteredCube = dejitteredCube.copy(tempDir.path().toStdString() + "/copyDejitteredCube.cub", cubeAtts);
   copyDejitteredCube->label()->findObject("IsisCube").findGroup("BandBin")["Name"] = "Red";
   copyDejitteredCube->reopen("rw");
 
-  FileName mosFileList(tempDir.path() + "/himosFileList.lis");
+  FileName mosFileList(tempDir.path().toStdString() + "/himosFileList.lis");
 
   FileList * cubeList = new FileList();
-  cubeList->append(dejitteredCube.fileName());
-  cubeList->append(copyDejitteredCube->fileName());
+  cubeList->append(dejitteredCube.fileName().toStdString());
+  cubeList->append(copyDejitteredCube->fileName().toStdString());
   cubeList->write(mosFileList);
 
-  QVector<QString> args = {"from=" + mosFileList.toString(),
+  QVector<QString> args = {"from=" + QString::fromStdString(mosFileList.toString()),
                            "to=" + tempDir.path() + "/outputMos.cub"};
 
   UserInterface options(APP_XML, args);

@@ -61,9 +61,9 @@ struct TemporaryCubeDeleter {
    static inline void cleanup(Cube *cube) {
      if ( cube ) {
 
-       FileName filename( cube->fileName() );
+       FileName filename( cube->fileName().toStdString() );
        delete cube;
-       remove( filename.expanded().toLatin1().data() );
+       remove( filename.expanded().c_str() );
      }
    }
 };
@@ -171,7 +171,7 @@ void IsisMain() {
   PvlGroup &bandbin = inputCube->group("BandBin");
   PvlGroup &archive = inputCube->group("Archive");
 
-  QString filter = bandbin["Name"];
+  QString filter = QString::fromStdString(bandbin["Name"]);
   g_filter=filter;
 
   binning = inst["Binning"];
@@ -195,8 +195,8 @@ void IsisMain() {
     g_exposureTime = inst["ExposureDuration"] ;
   }
   catch(IException &e) {
-    QString msg = "Unable to read [ExposureDuration] keyword in the Instrument group "
-                  "from input file [" + inputCube->fileName() + "]";
+    std::string msg = "Unable to read [ExposureDuration] keyword in the Instrument group "
+                  "from input file [" + inputCube->fileName().toStdString() + "]";
     throw IException(e, IException::Io, msg, _FILEINFO_);
   }
 
@@ -205,13 +205,13 @@ void IsisMain() {
     g_temperature = inst["CcdTemperature"] ;
   }
   catch(IException &e) {
-    QString msg = "Unable to read [CcdTemperature] keyword in the Instrument group "
-                  "from input file [" + inputCube->fileName() + "]";
+    std::string msg = "Unable to read [CcdTemperature] keyword in the Instrument group "
+                  "from input file [" + inputCube->fileName().toStdString() + "]";
     throw IException(e, IException::Io, msg, _FILEINFO_);
 
   }
 
-  QString startTime = inst["SpacecraftClockStartCount"];
+  QString startTime = QString::fromStdString(inst["SpacecraftClockStartCount"]);
 
   g_startTime = startTime;
   binning = inst["Binning"];
@@ -223,12 +223,12 @@ void IsisMain() {
   nsubImages = archive["SubImageCount"];  // If > 1, some correction is
                                           // not needed/performed
 
-  QString compmode = archive["OutputMode"];
+  QString compmode = QString::fromStdString(archive["OutputMode"]);
   g_compfactor = ( "lossy" == compmode.toLower() ) ? 16.0 : 1.0;
 
 
   // I/F values
-  QString target = inst["TargetName"];
+  QString target = QString::fromStdString(inst["TargetName"]);
   g_target = target;
 
   // Determine if we need to subsample the flat field should pixel binning
@@ -236,18 +236,18 @@ void IsisMain() {
   QScopedPointer<Cube, TemporaryCubeDeleter> flatcube;
   FileName flatfile = determineFlatFieldFile(g_filter, g_nullPolarizedPixels);
 
-  QString reducedFlat = flatfile.expanded();
+  std::string reducedFlat = flatfile.expanded();
 
   // Image is not cropped
   if (firstLine ==0 && startsample == 0){
 
     if (binning > 1) {
-      QString scale(toString(binning));
+      QString scale(QString::number(binning));
       FileName newflat = FileName::createTempFile("$TEMPORARY/" +
                                                   flatfile.baseName() + "_reduced.cub");
       reducedFlat = newflat.expanded();
-      QString parameters = "FROM=" + flatfile.expanded() +
-         " TO="   + newflat.expanded() +
+      QString parameters = "FROM=" + QString::fromStdString(flatfile.expanded()) +
+         " TO="   + QString::fromStdString(newflat.expanded()) +
          " MODE=SCALE" +
          " LSCALE=" + scale +
          " SSCALE=" + scale;
@@ -256,7 +256,7 @@ void IsisMain() {
         ProgramLauncher::RunIsisProgram("reduce", parameters);
       }
       catch (IException& ie) {
-        remove(reducedFlat.toLatin1().data());
+        remove(reducedFlat.c_str());
         throw ie;
       }
       QScopedPointer<Cube, TemporaryCubeDeleter> reduced(new Cube(reducedFlat, "r"));
@@ -265,7 +265,7 @@ void IsisMain() {
 
     // Set up processing for flat field as a second input file
     CubeAttributeInput att;
-    process.SetInputCube(reducedFlat, att);
+    process.SetInputCube(QString::fromStdString(reducedFlat), att);
   }
   else {
     // Image is cropped so we have to deal with it
@@ -280,13 +280,13 @@ void IsisMain() {
     // Translates and scales the flatfield image.  Scaling
     // might be necessary in the event that the raw image was also binned.
 
-    translate(flatOriginal, transform, transFlat.expanded());
+    translate(flatOriginal, transform, QString::fromStdString(transFlat.expanded()));
 
     QScopedPointer<Cube, TemporaryCubeDeleter> translated(new Cube(transFlat.expanded(), "r"));
     flatcube.swap(translated);
 
     CubeAttributeInput att;
-    process.SetInputCube(transFlat.expanded(), att);
+    process.SetInputCube(QString::fromStdString(transFlat.expanded()), att);
   }
 
   Cube *outputCube  = process.SetOutputCube("TO");
@@ -367,10 +367,10 @@ void IsisMain() {
 
   // Log calibration activity performed so far
   PvlGroup calibrationLog("RadiometricCalibration");
-  calibrationLog.addKeyword(PvlKeyword("SoftwareName", amicacalProgram));
-  calibrationLog.addKeyword(PvlKeyword("SoftwareVersion", amicacalVersion));
-  calibrationLog.addKeyword(PvlKeyword("ProcessDate", amicacalRuntime));
-  calibrationLog.addKeyword(PvlKeyword("CalibrationFile", calfile));
+  calibrationLog.addKeyword(PvlKeyword("SoftwareName", amicacalProgram.toStdString()));
+  calibrationLog.addKeyword(PvlKeyword("SoftwareVersion", amicacalVersion.toStdString()));
+  calibrationLog.addKeyword(PvlKeyword("ProcessDate", amicacalRuntime.toStdString()));
+  calibrationLog.addKeyword(PvlKeyword("CalibrationFile", calfile.toStdString()));
   calibrationLog.addKeyword(PvlKeyword("FlatFieldFile", flatfile.originalPath()
                                                         + "/" + flatfile.name()));
   calibrationLog.addKeyword(PvlKeyword("CompressionFactor", toString(g_compfactor, 2)));
@@ -391,13 +391,13 @@ void IsisMain() {
 
   calibrationLog.addKeyword(PvlKeyword("Smear_tvct", toString(g_tvct, 16)));
 
-  calibrationLog.addKeyword(PvlKeyword("CalibrationUnits", g_iofCorrection));
+  calibrationLog.addKeyword(PvlKeyword("CalibrationUnits", g_iofCorrection.toStdString()));
   calibrationLog.addKeyword(PvlKeyword("RadianceStandard", toString(g_radStd, 16)));
   calibrationLog.addKeyword(PvlKeyword("RadianceScaleFactor", toString(g_iofScale, 16)));
   calibrationLog.addKeyword(PvlKeyword("SolarDistance", toString(g_solarDist, 16), "AU"));
   calibrationLog.addKeyword(PvlKeyword("SolarFlux", toString(g_solarFlux, 16)));
   calibrationLog.addKeyword(PvlKeyword("IOFFactor", toString(g_calibrationScale, 16)));
-  calibrationLog.addKeyword(PvlKeyword("Units", g_units));
+  calibrationLog.addKeyword(PvlKeyword("Units", g_units.toStdString()));
 
 #if 0
 // PSF correction is currently not working and has been removed as an option.
@@ -435,7 +435,7 @@ void IsisMain() {
         processDiffusionModel.EndProcess();
         outputCube->putGroup(calibrationLog);
         process.EndProcess();
-        remove( psfModel.expanded().toLatin1().data() );
+        remove( psfModel.expanded().c_str() );
         throw IException(ie,
                          IException::Programmer,
                          "Calculating the diffusion model failed!",
@@ -461,21 +461,21 @@ void IsisMain() {
 
         // Add PSF parameter to the calibration reporting
         key = PvlKeyword("PSF_KernelSize");
-        key.addValue(toString(g_size));
-        key.addValue(toString(g_size));
+        key.addValue(Isis::toString(g_size));
+        key.addValue(Isis::toString(g_size));
         calibrationLog.addKeyword(key);
 
-        calibrationLog.addKeyword(PvlKeyword("PSF_Focused", toString(g_alpha, 6)));
+        calibrationLog.addKeyword(PvlKeyword("PSF_Focused", Isis::toString(g_alpha, 6)));
 
         key = PvlKeyword("PSF_Sigma");
         for (int i = 0 ; i < g_N ; i++ ) {
-          key.addValue(toString(g_sigma[i]));
+          key.addValue(Isis::toString(g_sigma[i]));
         }
         calibrationLog.addKeyword(key);
 
         key = PvlKeyword("PSF_Diffuse");
         for (int i = 0 ; i < g_N ; i++ ) {
-          key.addValue(toString(g_A[i]));
+          key.addValue(Isis::toString(g_A[i]));
         }
 
       }
@@ -484,7 +484,7 @@ void IsisMain() {
         processPSFCorrection.EndProcess();
         outputCube->putGroup(calibrationLog);
         process.EndProcess();
-        remove( psfModel.expanded().toLatin1().data() );
+        remove( psfModel.expanded().c_str() );
         throw IException(ie,
                          IException::Programmer,
                          "Applying the PSF correction failed!",
@@ -495,7 +495,7 @@ void IsisMain() {
       processPSFCorrection.EndProcess();
 
       // Remove the PSF file
-      remove( psfModel.expanded().toLatin1().data() );
+      remove( psfModel.expanded().c_str() );
   }
 #endif
 
@@ -529,7 +529,7 @@ FileName determineFlatFieldFile(const QString &filter, const bool nullPolarPix) 
     fileName += "flat_" + filter.toLower() + ".cub";
 
   }
-  FileName final(fileName);
+  FileName final(fileName.toStdString());
 
 
   //final = final.highestVersion();
@@ -605,7 +605,7 @@ QString loadCalibrationVariables(const QString &config, Cube *iCube)  {
 //  UserInterface& ui = Application::GetUserInterface();
 
 //  FileName calibFile("$hayabusa/calibration/amica/amicaCalibration????.trn");
-  FileName calibFile(config);
+  FileName calibFile(config.toStdString());
   if ( config.contains("?") ) calibFile = calibFile.highestVersion();
 
   // Pvl configFile;
@@ -629,8 +629,8 @@ QString loadCalibrationVariables(const QString &config, Cube *iCube)  {
   // Load the hot pixels into a vector
   for (int i = 0; i< hotPixelsGroup.keywords(); i++ ){
 
-    int samp(hotPixelsGroup[i][0].toInt());
-    int line (hotPixelsGroup[i][1].toInt());
+    int samp(Isis::toInt(hotPixelsGroup[i][0]));
+    int line (Isis::toInt(hotPixelsGroup[i][1]));
 
     hotPixelVector.append( Pixel(alpha->BetaSample(samp), alpha->BetaLine(line), 1, 0));
   }
@@ -639,23 +639,23 @@ QString loadCalibrationVariables(const QString &config, Cube *iCube)  {
   g_gamma = linearityGroup["Gamma"];
   g_gamma = 1.0 - g_gamma;
 
-  g_L0 = linearityGroup["L"][0].toDouble();
-  g_L1 = linearityGroup["L"][1].toDouble();
+  g_L0 = Isis::toDouble(linearityGroup["L"][0]);
+  g_L1 = Isis::toDouble(linearityGroup["L"][1]);
 
   // Load Smear Removal Variables
   g_tvct = smearGroup["tvct"];
 
   // Load DarkCurrent variables
-  g_d0 = darkCurrentGroup["D"][0].toDouble();
-  g_d1 = darkCurrentGroup["D"][1].toDouble();
+  g_d0 = Isis::toDouble(darkCurrentGroup["D"][0]);
+  g_d1 = Isis::toDouble(darkCurrentGroup["D"][1]);
 
   // Load Bias variables
-  g_b0 = biasGroup["B"][0].toDouble();
-  g_b1 = biasGroup["B"][1].toDouble();
-  g_b2 = biasGroup["B"][2].toDouble();
+  g_b0 = Isis::toDouble(biasGroup["B"][0]);
+  g_b1 = Isis::toDouble(biasGroup["B"][1]);
+  g_b2 = Isis::toDouble(biasGroup["B"][2]);
 
 
-  g_launchTimeStr = QString(biasGroup["launchTime"]);
+  g_launchTimeStr = QString::fromStdString(biasGroup["launchTime"]);
   g_launchTime = g_launchTimeStr;
 
   // Compute BIAS correction factor (it's a constant so do it once!)
@@ -675,7 +675,7 @@ QString loadCalibrationVariables(const QString &config, Cube *iCube)  {
       scs2e_c(g_hayabusaNaifCode, g_startTime.toLatin1().data(), &obsStartTime);
     }
     catch (IException &e) {
-        QString message = "IOF option does not work with non-spiceinited cubes.";
+        std::string message = "IOF option does not work with non-spiceinited cubes.";
         throw IException(e, IException::User, message, _FILEINFO_);
     }
   }
@@ -719,9 +719,9 @@ QString loadCalibrationVariables(const QString &config, Cube *iCube)  {
   g_solarFlux = solarFluxGroup["v"];
 
   g_radStd = radGroup["iof_standard"];
-  g_iofScale   = radGroup[g_filter];
+  g_iofScale   = radGroup[g_filter.toStdString()];
 
-  return ( calibFile.original() );
+  return ( QString::fromStdString(calibFile.original()) );
 }
 
 

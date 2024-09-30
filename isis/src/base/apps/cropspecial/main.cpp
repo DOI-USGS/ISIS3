@@ -55,7 +55,7 @@ void IsisMain() {
 
   if (g_minSample == cube.sampleCount() + 1) {
     cube.close();
-    QString msg = "There are no valid pixels in the [FROM] cube";
+    std::string msg = "There are no valid pixels in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -80,21 +80,21 @@ void IsisMain() {
     if (obj.name() != "Table") continue;
 
     // Read the table into a table object
-    Table table(obj["Name"], from);
+    Table table(obj["Name"], from.toStdString());
 
     ocube->write(table);
   }
 
   // Construct a label with the results
   PvlGroup results("Results");
-  results += PvlKeyword("InputLines", toString(cube.lineCount()));
-  results += PvlKeyword("InputSamples", toString(cube.sampleCount()));
-  results += PvlKeyword("StartingLine", toString(g_minLine));
-  results += PvlKeyword("StartingSample", toString(g_minSample));
-  results += PvlKeyword("EndingLine", toString(g_maxLine));
-  results += PvlKeyword("EndingSample", toString(g_maxSample));
-  results += PvlKeyword("OutputLines", toString(g_numLines));
-  results += PvlKeyword("OutputSamples", toString(g_numSamples));
+  results += PvlKeyword("InputLines", Isis::toString(cube.lineCount()));
+  results += PvlKeyword("InputSamples", Isis::toString(cube.sampleCount()));
+  results += PvlKeyword("StartingLine", Isis::toString(g_minLine));
+  results += PvlKeyword("StartingSample", Isis::toString(g_minSample));
+  results += PvlKeyword("EndingLine", Isis::toString(g_maxLine));
+  results += PvlKeyword("EndingSample", Isis::toString(g_maxSample));
+  results += PvlKeyword("OutputLines", Isis::toString(g_numLines));
+  results += PvlKeyword("OutputSamples", Isis::toString(g_numSamples));
 
   // Create a buffer for reading the input cube
   in = new LineManager(cube);

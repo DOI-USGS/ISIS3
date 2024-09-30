@@ -240,7 +240,7 @@ namespace Isis {
     foreach(TemplateList *templateList, regTemplates) {
       foreach(Template *templateFile, *templateList){
         m_templateComboBox->addItem(templateFile->importName()
-                                    + "/" + FileName(templateFile->fileName()).name());
+                                    + "/" + QString::fromStdString(FileName(templateFile->fileName().toStdString()).name()));
       }
     }
     QFormLayout *templateFileLayout = new QFormLayout();
@@ -508,7 +508,7 @@ namespace Isis {
    */
   void ControlPointEditWidget::createActions() {
 
-    m_closePointEditor = new QAction(QIcon(FileName("base/icons/fileclose.png").expanded()),
+    m_closePointEditor = new QAction(QIcon(QString::fromStdString(FileName("base/icons/fileclose.png").expanded())),
                                    "&Close", this);
     m_closePointEditor->setToolTip("Close this window");
     m_closePointEditor->setStatusTip("Close this window");
@@ -518,7 +518,7 @@ namespace Isis {
     m_closePointEditor->setWhatsThis(whatsThis);
     connect(m_closePointEditor, SIGNAL(triggered()), this, SLOT(close()));
 
-    m_showHideTemplateEditor = new QAction(QIcon(FileName("base/icons/view_text.png").expanded()),
+    m_showHideTemplateEditor = new QAction(QIcon(QString::fromStdString(FileName("base/icons/view_text.png").expanded())),
                                            "&View/edit registration template", this);
     m_showHideTemplateEditor->setCheckable(true);
     m_showHideTemplateEditor->setToolTip("View and/or edit the registration template");
@@ -529,7 +529,7 @@ namespace Isis {
     connect(m_showHideTemplateEditor, SIGNAL(triggered()), this,
         SLOT(showHideTemplateEditor()));
 
-    m_saveChips = new QAction(QIcon(FileName("base/icons/window_new.png").expanded()),
+    m_saveChips = new QAction(QIcon(QString::fromStdString(FileName("base/icons/window_new.png").expanded())),
                               "Save registration chips", this);
     m_saveChips->setToolTip("Save registration chips");
     m_saveChips->setStatusTip("Save registration chips");
@@ -538,7 +538,7 @@ namespace Isis {
     m_saveChips->setWhatsThis(whatsThis);
     connect(m_saveChips, SIGNAL(triggered()), this, SLOT(saveChips()));
 
-    m_openTemplateFile = new QAction(QIcon(FileName("base/icons/fileopen.png").expanded()),
+    m_openTemplateFile = new QAction(QIcon(QString::fromStdString(FileName("base/icons/fileopen.png").expanded())),
                                      "&Open registration template", this);
     m_openTemplateFile->setToolTip("Set registration template");
     m_openTemplateFile->setStatusTip("Set registration template");
@@ -547,7 +547,7 @@ namespace Isis {
     m_openTemplateFile->setWhatsThis(whatsThis);
     connect(m_openTemplateFile, SIGNAL(triggered()), this, SLOT(openTemplateFile()));
 
-    m_saveTemplateFile = new QAction(QIcon(FileName("base/icons/mActionFileSave.png").expanded()),
+    m_saveTemplateFile = new QAction(QIcon(QString::fromStdString(FileName("base/icons/mActionFileSave.png").expanded())),
                                      "&Save template file", this);
     m_saveTemplateFile->setToolTip("Save the template file");
     m_saveTemplateFile->setStatusTip("Save the template file");
@@ -555,7 +555,7 @@ namespace Isis {
     connect(m_saveTemplateFile, SIGNAL(triggered()), this,
         SLOT(saveTemplateFile()));
 
-    m_saveTemplateFileAs = new QAction(QIcon(FileName("base/icons/mActionFileSaveAs.png").expanded()),
+    m_saveTemplateFileAs = new QAction(QIcon(QString::fromStdString(FileName("base/icons/mActionFileSaveAs.png").expanded())),
                                        "&Save template as...", this);
     m_saveTemplateFileAs->setToolTip("Save the template file as");
     m_saveTemplateFileAs->setStatusTip("Save the template file as");
@@ -726,7 +726,7 @@ namespace Isis {
 
       // Add to measure combo boxes
       QString groundFile = m_serialNumberList->fileName(groundMeasure->GetCubeSerialNumber());
-      QString tempFileName = FileName(groundFile).name();
+      QString tempFileName = QString::fromStdString(FileName(groundFile.toStdString()).name());
 
       m_pointFiles<<groundFile;
       m_leftCombo->addItem(tempFileName);
@@ -824,13 +824,13 @@ namespace Isis {
       //  Chosen ground source is an imported shape in project
       if (m_groundSourceCombo->currentText().contains(".ecub")) {
         Shape *shape = m_nameToShapeMap[m_groundSourceCombo->currentText()];
-        groundFile = FileName(shape->fileName());
+        groundFile = FileName(shape->fileName().toStdString());
         //groundSourceType = shape->surfacePointSource();
         success = true;
       }
       //  Not imported shape, must be from m_editPoints AprioriXYZSource in the cnet
       else if (m_editPoint->HasAprioriSurfacePointSourceFile()) {
-        groundFile = FileName(m_groundSourceCombo->currentText());
+        groundFile = FileName(m_groundSourceCombo->currentText().toStdString());
         //  Apriori ground source does not exist and user chose not to give new location so simply
         //  return unsuccessful
         if (!groundFile.fileExists()) {
@@ -846,9 +846,9 @@ namespace Isis {
     // If a new ground file was found set ground source information for later use, first clearing
     // out the old ground source information.  If new ground same as old ground, we will not change
     // anything, simply return successful.
-    if (success && (groundFile.expanded() != m_groundFilename)) {
+    if (success && (QString::fromStdString(groundFile.expanded()) != m_groundFilename)) {
       clearGroundSource();
-      m_groundFilename = groundFile.expanded();
+      m_groundFilename = QString::fromStdString(groundFile.expanded());
 
       // Get cube, then universal groundmap
       QScopedPointer<Cube> groundCube(new Cube(groundFile, "r"));
@@ -857,7 +857,7 @@ namespace Isis {
       m_groundGmap.reset(newGroundGmap.take());
 
       //  Create new serial number for ground source and add to serial number list
-      m_groundSN = SerialNumber::Compose(groundFile.expanded(), true);
+      m_groundSN = SerialNumber::Compose(QString::fromStdString(groundFile.expanded()), true);
       m_serialNumberList->add(m_groundFilename, true);
 
       m_groundSourceType = groundSourceType;
@@ -892,10 +892,10 @@ namespace Isis {
       // fix this ground source to new location
       // If all groundLocations are to be changed...
       if (m_changeAllGroundLocation) {
-        QFileInfo oldFile(groundFile.expanded());
+        QFileInfo oldFile(QString::fromStdString(groundFile.expanded()));
         QFileInfo newFile(m_newGroundDir, oldFile.fileName());
 
-        newGroundFile = FileName(newFile.absoluteFilePath());
+        newGroundFile = FileName(newFile.absoluteFilePath().toStdString());
       }
 
       //  If can't find ground, re-prompt user for new location. Maybe it's a new ground source.
@@ -903,7 +903,7 @@ namespace Isis {
         //  Give options for finding ground source file location. A new location
         //  for new location or new source, either a Shape in the project, or import a new shape,
         //  or simplay choose file?
-        QString message = "Ground Source file " + groundFile.expanded();
+        QString message = "Ground Source file " + QString::fromStdString(groundFile.expanded());
         message += " doesn't exist.  Has the file moved?  Would you like to enter a new location for"
                    " this ground source?";
         int ret = QMessageBox::question(this, "Ground Source not found", message);
@@ -920,10 +920,10 @@ namespace Isis {
               changeGroundLocationsInNet();
             }
             //  Change location of apriori for current edit point so combo boxes updated properly
-            QFileInfo oldFile(groundFile.expanded());
+            QFileInfo oldFile(QString::fromStdString(groundFile.expanded()));
             QFileInfo newFile(m_newGroundDir, oldFile.fileName());
-            newGroundFile = newFile.absoluteFilePath();
-            m_editPoint->SetAprioriSurfacePointSourceFile(newGroundFile.toString());
+            newGroundFile = newFile.absoluteFilePath().toStdString();
+            m_editPoint->SetAprioriSurfacePointSourceFile(QString::fromStdString(newGroundFile.toString()));
           }
           else {
             //  Either user does not want to change location of ground source or the new location
@@ -952,11 +952,11 @@ namespace Isis {
     for (int i = 0; i < m_controlNet->GetNumPoints(); i++ ) {
       ControlPoint *cp = m_controlNet->GetPoint(i);
       if (cp->HasAprioriSurfacePointSourceFile()) {
-        FileName groundFile(cp->GetAprioriSurfacePointSourceFile());
-        QFileInfo oldFile(groundFile.expanded());
+        FileName groundFile(cp->GetAprioriSurfacePointSourceFile().toStdString());
+        QFileInfo oldFile(QString::fromStdString(groundFile.expanded()));
         QFileInfo newFile(m_newGroundDir, oldFile.fileName());
-        groundFile = newFile.absoluteFilePath();
-        cp->SetAprioriSurfacePointSourceFile(groundFile.expanded());
+        groundFile = newFile.absoluteFilePath().toStdString();
+        cp->SetAprioriSurfacePointSourceFile(QString::fromStdString(groundFile.expanded()));
       }
     }
     emit cnetModified();
@@ -974,9 +974,9 @@ namespace Isis {
     //Get the reference image's shape model
     QString referenceSN = m_editPoint->GetReferenceSN();
     QString referenceFileName = m_serialNumberList->fileName(referenceSN);
-    QScopedPointer<Cube> referenceCube(new Cube(referenceFileName, "r"));
+    QScopedPointer<Cube> referenceCube(new Cube(referenceFileName.toStdString(), "r"));
     PvlGroup kernels = referenceCube->group("Kernels");
-    QString shapeFile = kernels["ShapeModel"];
+    QString shapeFile = QString::fromStdString(kernels["ShapeModel"]);
 
     //  If the reference measure has a shape model cube then set that as the radius
     //  This will NOT WORK for shape model files (not the default of Null or Ellipsoid)
@@ -1029,13 +1029,13 @@ namespace Isis {
 
       QApplication::setOverrideCursor(Qt::WaitCursor);
       try {
-        QScopedPointer<Cube> newDemCube(new Cube(demFile, "r"));
+        QScopedPointer<Cube> newDemCube(new Cube(demFile.toStdString(), "r"));
 
-        m_demFile = FileName(newDemCube->fileName()).name();
+        m_demFile = QString::fromStdString(FileName(newDemCube->fileName().toStdString()).name());
         m_demCube.reset(newDemCube.take());
       }
       catch (IException &e) {
-        QMessageBox::critical(this, "Error", e.toString());
+        QMessageBox::critical(this, "Error", QString::fromStdString(e.toString()));
         QApplication::restoreOverrideCursor();
         return;
       }
@@ -1280,14 +1280,14 @@ namespace Isis {
 
     //  If available, add the CP AprioriSurfacePointSourceFile and AprioriRadiusSourceFile
     if (m_editPoint->HasAprioriSurfacePointSourceFile()) {
-      FileName aprioriSurfacePointFile = FileName(m_editPoint->GetAprioriSurfacePointSourceFile());
+      FileName aprioriSurfacePointFile = FileName(m_editPoint->GetAprioriSurfacePointSourceFile().toStdString());
       //  If file doesn't exist, prompt user for changing location before adding to combo
       if (!aprioriSurfacePointFile.fileExists()) {
         aprioriSurfacePointFile = checkGroundFileLocation(aprioriSurfacePointFile);
       }
-      if (!aprioriSurfacePointFile.toString().isEmpty()) {
-        m_groundSourceCombo->addItem(aprioriSurfacePointFile.toString());
-        m_groundSourceCombo->setCurrentText(aprioriSurfacePointFile.toString());
+      if (!aprioriSurfacePointFile.toString().empty()) {
+        m_groundSourceCombo->addItem(QString::fromStdString(aprioriSurfacePointFile.toString()));
+        m_groundSourceCombo->setCurrentText(QString::fromStdString(aprioriSurfacePointFile.toString()));
         m_groundSourceCombo->setItemData(m_groundSourceCombo->currentIndex(),
                                          QColor(Qt::darkGreen), Qt::ForegroundRole);
         m_groundSourceCombo->setItemData(m_groundSourceCombo->currentIndex(),
@@ -1361,7 +1361,7 @@ namespace Isis {
       ControlMeasure &m = *(*m_editPoint)[i];
       QString file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
       m_pointFiles<<file;
-      QString tempFileName = FileName(file).name();
+      QString tempFileName = QString::fromStdString(FileName(file.toStdString()).name());
 
       // This actually fills the right combo box for selecting measures.  A model was used to enable
       // drag & drop for ordering measures which will also set the blink order.
@@ -1392,7 +1392,7 @@ namespace Isis {
 
     if (!serialNumber.isEmpty() && serialNumber != referenceSerialNumber) {
       QString file = m_serialNumberList->fileName(serialNumber);
-      rightIndex = m_rightCombo->findText(FileName(file).name());
+      rightIndex = m_rightCombo->findText(QString::fromStdString(FileName(file.toStdString()).name()));
       if (leftIndex == -1) {
         if (rightIndex == 0) {
           leftIndex = 1;
@@ -1549,7 +1549,7 @@ namespace Isis {
         else {
           newPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::None);
         }
-        newPoint->SetAprioriSurfacePointSourceFile(shape->cube()->externalCubeFileName().expanded());
+        newPoint->SetAprioriSurfacePointSourceFile(QString::fromStdString(shape->cube()->externalCubeFileName().expanded()));
       }
 
       setEditPoint(newPoint);
@@ -1947,7 +1947,7 @@ namespace Isis {
           //  Update measure file combo boxes:  old reference normal font,
           //    new reference bold font
           QString file = m_serialNumberList->fileName(m_leftMeasure->GetCubeSerialNumber());
-          QString fname = FileName(file).name();
+          QString fname = QString::fromStdString(FileName(file.toStdString()).name());
           int iref = m_leftCombo->findText(fname);
 
           //  Save normal font from new reference measure
@@ -1957,7 +1957,7 @@ namespace Isis {
           m_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
 
           file = m_serialNumberList->fileName(refMeasure->GetCubeSerialNumber());
-          fname = FileName(file).name();
+          fname = QString::fromStdString(FileName(file.toStdString()).name());
           iref = m_leftCombo->findText(fname);
           m_leftCombo->setItemData(iref,font,Qt::FontRole);
           iref = m_rightCombo->findText(fname);
@@ -2008,7 +2008,7 @@ namespace Isis {
         //  Update measure file combo boxes:  old reference normal font,
         //    new reference bold font
         QString file = m_serialNumberList->fileName(m_leftMeasure->GetCubeSerialNumber());
-        QString fname = FileName(file).name();
+        QString fname = QString::fromStdString(FileName(file.toStdString()).name());
         int iref = m_leftCombo->findText(fname);
 
         //  Save normal font from new reference measure
@@ -2018,7 +2018,7 @@ namespace Isis {
         m_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
 
         file = m_serialNumberList->fileName(refMeasure->GetCubeSerialNumber());
-        fname = FileName(file).name();
+        fname = QString::fromStdString(FileName(file.toStdString()).name());
         iref = m_leftCombo->findText(fname);
         m_leftCombo->setItemData(iref,font,Qt::FontRole);
         iref = m_rightCombo->findText(fname);
@@ -2068,7 +2068,7 @@ namespace Isis {
     else {
       Shape *shape = m_nameToShapeMap[m_radiusSourceCombo->currentText()];
       if (shape) {
-        m_radiusFilename = shape->cube()->externalCubeFileName().toString();
+        m_radiusFilename = QString::fromStdString(shape->cube()->externalCubeFileName().toString());
         //m_radiusSourceType = shape->radiusSource();
       }
       // Radius source comes from what is already saved in the cnet as AprioriRadiusSourceFile
@@ -2153,7 +2153,7 @@ namespace Isis {
       message += "Latitude = " + QString::number(lat);
       message += "  Longitude = " + QString::number(lon);
       message += "  Radius = " + QString::number(radius) + "\n";
-      message += e.toString();
+      message += QString::fromStdString(e.toString());
       QMessageBox::critical(this,"Error",message);
       return;
     }
@@ -2162,7 +2162,7 @@ namespace Isis {
     QString fullGroundFilename;
     if (m_groundFilename.contains(".ecub")) {
       // Find shape to get external cube filename
-      fullGroundFilename = m_nameToShapeMap[m_groundFilename]->cube()->externalCubeFileName().expanded();
+      fullGroundFilename = QString::fromStdString(m_nameToShapeMap[m_groundFilename]->cube()->externalCubeFileName().expanded());
     }
     else {
       fullGroundFilename = m_groundFilename;
@@ -2550,13 +2550,13 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Make sure the correct cube is opened.\n\n";
-      message += e.toString();
+      message += QString::fromStdString(e.toString());
       QMessageBox::critical(this, "Error", message);
 
       //  Set index of combo back to what it was before user selected new.  Find the index
       //  of current left measure.
       QString file = m_serialNumberList->fileName(m_leftMeasure->GetCubeSerialNumber());
-      int i = m_leftCombo->findText(FileName(file).name());
+      int i = m_leftCombo->findText(QString::fromStdString(FileName(file.toStdString()).name()));
       if (i < 0) i = 0;
       m_leftCombo->setCurrentIndex(i);
       return;
@@ -2571,7 +2571,7 @@ namespace Isis {
     *m_leftMeasure = *((*m_editPoint)[serial]);
 
     //  If m_leftCube is not null, delete before creating new one
-    m_leftCube.reset(new Cube(file, "r"));
+    m_leftCube.reset(new Cube(file.toStdString(), "r"));
 
     //  Update left measure of pointEditor
     m_measureEditor->setLeftMeasure (m_leftMeasure, m_leftCube.data(), m_editPoint->GetId());
@@ -2599,13 +2599,13 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Make sure the correct cube is opened.\n\n";
-      message += e.toString();
+      message += QString::fromStdString(e.toString());
       QMessageBox::critical(this, "Error", message);
 
       //  Set index of combo back to what it was before user selected new.  Find the index
       //  of current left measure.
       QString file = m_serialNumberList->fileName(m_rightMeasure->GetCubeSerialNumber());
-      int i = m_rightCombo->findText(FileName(file).name());
+      int i = m_rightCombo->findText(QString::fromStdString(FileName(file.toStdString()).name()));
       if (i < 0) i = 0;
       m_rightCombo->setCurrentIndex(i);
       return;
@@ -2620,7 +2620,7 @@ namespace Isis {
     *m_rightMeasure = *((*m_editPoint)[serial]);
 
     //  If m_rightCube is not null, delete before creating new one
-    m_rightCube.reset(new Cube(file, "r"));
+    m_rightCube.reset(new Cube(file.toStdString(), "r"));
 
     //  Update left measure of pointEditor
     m_measureEditor->setRightMeasure (m_rightMeasure, m_rightCube.data(), m_editPoint->GetId());
@@ -2800,7 +2800,7 @@ namespace Isis {
    */
   void ControlPointEditWidget::loadTemplateFile(QString fn) {
 
-    QFile file(FileName((QString) fn).expanded());
+    QFile file(QString::fromStdString(FileName(fn.toStdString()).expanded()));
     if (!file.open(QIODevice::ReadOnly)) {
       QString msg = "Failed to open template file \"" + fn + "\"";
       QMessageBox::warning(this, "IO Error", msg);
@@ -2871,18 +2871,18 @@ namespace Isis {
 
     // catch errors in Pvl format when populating pvl object
     stringstream ss;
-    ss << contents;
+    ss << contents.toStdString();
     try {
       Pvl pvl;
       ss >> pvl;
     }
     catch(IException &e) {
-      QString message = e.toString();
+      QString message = QString::fromStdString(e.toString());
       QMessageBox::warning(this, "Error", message);
       return;
     }
 
-    QString expandedFileName(FileName((QString) fn).expanded());
+    QString expandedFileName(QString::fromStdString(FileName(fn.toStdString()).expanded()));
 
     QFile file(expandedFileName);
 
@@ -2921,17 +2921,17 @@ namespace Isis {
 
     try{
       // Get the template file from the ControlPointEditWidget object
-      Pvl templatePvl(m_measureEditor->templateFileName());
+      Pvl templatePvl(m_measureEditor->templateFileName().toStdString());
       // Create registration dialog window using PvlEditDialog class
       // to view and/or edit the template
       PvlEditDialog registrationDialog(templatePvl);
       registrationDialog.setWindowTitle("View or Edit Template File: "
-                                         + templatePvl.fileName());
+                                         + QString::fromStdString(templatePvl.fileName()));
       registrationDialog.resize(550,360);
       registrationDialog.exec();
     }
     catch (IException &e) {
-      QString message = e.toString();
+      QString message = QString::fromStdString(e.toString());
       QMessageBox::information(this, "Error", message);
     }
   }
@@ -2970,7 +2970,7 @@ namespace Isis {
     if(templateList->type() == "registrations") {
       for(int i = 0; i < templateList->size(); i++) {
         m_templateComboBox->addItem(templateList->at(i)->importName()
-                                    + "/" + FileName(templateList->at(i)->fileName()).name());
+                                    + "/" + QString::fromStdString(FileName(templateList->at(i)->fileName().toStdString()).name()));
       }
     }
   }

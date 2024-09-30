@@ -14,10 +14,10 @@ namespace Isis {
           const char* contents_expr,
           IException &e,
           QString contents) {
-    if (e.toString().contains(contents)) return ::testing::AssertionSuccess();
+    if (e.toString().find(contents.toStdString()) != std::string::npos) return ::testing::AssertionSuccess();
 
     return ::testing::AssertionFailure() << "IExeption "<< e_expr << "\'s error message (\""
-       << e.toString().toStdString() << "\") does not contain " << contents_expr << " (\""
+       <<  e.toString() << "\") does not contain " << contents_expr << " (\""
        << contents.toStdString() << "\").";
   }
 
@@ -34,8 +34,8 @@ namespace Isis {
     if (e.errorType() == errorType) return ::testing::AssertionSuccess();
 
     return ::testing::AssertionFailure() << "IExeption "<< e_expr << "\'s error type ("
-        << std::to_string(e.errorType()) << ") does not match expected error type ("
-        << std::to_string(errorType) << ").";
+        << Isis::toString(e.errorType()) << ") does not match expected error type ("
+        << Isis::toString(errorType) << ").";
   }
 
 
@@ -59,6 +59,25 @@ namespace Isis {
 
 
   /**
+   * Custom std::string assertion that properly outputs them as string if they
+   * are different.
+   */
+  ::testing::AssertionResult AssertStringsEqual(
+        const char* string1_expr,
+        const char* string2_expr,
+        std::string string1,
+        std::string string2) {
+    if (string1 != string2) {
+      return ::testing::AssertionFailure() << "std::strings " << string1_expr
+          << " (" << string1 << ") and " << string2_expr
+          << " (" << string2 << ") are not the same.";
+    }
+
+    return ::testing::AssertionSuccess();
+  }
+
+
+  /**
    * Custom PvlGroup assertion that compares the group names and
    * all of the PvlKeywords in the groups.
    */
@@ -69,33 +88,33 @@ namespace Isis {
       PvlGroup group2) {
     if (group1.name() != group2.name()) {
       return ::testing::AssertionFailure() << "PvlGroup " << group1_expr
-          << " has name (" << group1.name().toStdString() << ") and PvlGroup "
-          << group2_expr << " has name (" << group2.name().toStdString() << ").";
+          << " has name (" << group1.name() << ") and PvlGroup "
+          << group2_expr << " has name (" << group2.name() << ").";
     }
 
     for (auto grp1KeyIt = group1.begin(); grp1KeyIt != group1.end(); grp1KeyIt++) {
       if (!group2.hasKeyword(grp1KeyIt->name())) {
         return ::testing::AssertionFailure() << "PvlGroup " << group1_expr
-            << " contains keyword " << grp1KeyIt->name().toStdString()
+            << " contains keyword " << grp1KeyIt->name()
             << " that is not in PvlGroup " << group2_expr;
       }
       const PvlKeyword &group2Key = group2.findKeyword(grp1KeyIt->name());
       if (grp1KeyIt->size() != group2Key.size()) {
-        return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name().toStdString()
+        return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name()
             << ") has size (" << grp1KeyIt->size() << ") in PvlGroup " << group1_expr
             << " and size (" << group2Key.size() << ") in PvlGroup " << group2_expr;
       }
       for (int i = 0; i < grp1KeyIt->size(); i++) {
         if (!grp1KeyIt->isEquivalent(group2Key[i], i)) {
-          return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name().toStdString()
-              << ") has value (" << (*grp1KeyIt)[i].toStdString() << ") in PvlGroup "
-              << group1_expr << " and value (" << group2Key[i].toStdString()
+          return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name()
+              << ") has value (" << (*grp1KeyIt)[i] << ") in PvlGroup "
+              << group1_expr << " and value (" << group2Key[i]
               << ") in PvlGroup " << group2_expr << " at index " << i;
         }
         if (grp1KeyIt->unit(i) != group2Key.unit(i)) {
-          return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name().toStdString()
-              << ") has units (" << grp1KeyIt->unit(i).toStdString() << ") in PvlGroup "
-              << group1_expr << " and units (" << group2Key.unit(i).toStdString()
+          return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name()
+              << ") has units (" << grp1KeyIt->unit(i) << ") in PvlGroup "
+              << group1_expr << " and units (" << group2Key.unit(i)
               << ") in PvlGroup " << group2_expr << " at index " << i;
         }
       }
@@ -105,7 +124,7 @@ namespace Isis {
     for (auto grp2KeyIt = group2.begin(); grp2KeyIt != group2.end(); grp2KeyIt++) {
       if (!group1.hasKeyword(grp2KeyIt->name())) {
         return ::testing::AssertionFailure() << "PvlGroup " << group2_expr
-            << " contains keyword " << grp2KeyIt->name().toStdString()
+            << " contains keyword " << grp2KeyIt->name()
             << " that is not in PvlGroup " << group1_expr;
       }
     }
@@ -125,26 +144,26 @@ namespace Isis {
     for (auto grp1KeyIt = group1.begin(); grp1KeyIt != group1.end(); grp1KeyIt++) {
       if (!group2.hasKeyword(grp1KeyIt->name())) {
         return ::testing::AssertionFailure() << "PvlGroup " << group1_expr
-            << " contains keyword " << grp1KeyIt->name().toStdString()
+            << " contains keyword " << grp1KeyIt->name()
             << " that is not in PvlGroup " << group2_expr;
       }
       const PvlKeyword &group2Key = group2.findKeyword(grp1KeyIt->name());
       if (grp1KeyIt->size() != group2Key.size()) {
-        return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name().toStdString()
+        return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name()
             << ") has size (" << grp1KeyIt->size() << ") in PvlGroup " << group1_expr
             << " and size (" << group2Key.size() << ") in PvlGroup " << group2_expr;
       }
       for (int i = 0; i < grp1KeyIt->size(); i++) {
         if (!grp1KeyIt->isEquivalent(group2Key[i], i)) {
-          return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name().toStdString()
-              << ") has value (" << (*grp1KeyIt)[i].toStdString() << ") in PvlGroup "
-              << group1_expr << " and value (" << group2Key[i].toStdString()
+          return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name()
+              << ") has value (" << (*grp1KeyIt)[i] << ") in PvlGroup "
+              << group1_expr << " and value (" << group2Key[i]
               << ") in PvlGroup " << group2_expr << " at index " << i;
         }
         if (grp1KeyIt->unit(i) != group2Key.unit(i)) {
-          return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name().toStdString()
-              << ") has units (" << grp1KeyIt->unit(i).toStdString() << ") in PvlGroup "
-              << group1_expr << " and units (" << group2Key.unit(i).toStdString()
+          return ::testing::AssertionFailure() << "Keyword (" << grp1KeyIt->name()
+              << ") has units (" << grp1KeyIt->unit(i) << ") in PvlGroup "
+              << group1_expr << " and units (" << group2Key.unit(i)
               << ") in PvlGroup " << group2_expr << " at index " << i;
         }
       }
@@ -154,7 +173,7 @@ namespace Isis {
     for (auto grp2KeyIt = group2.begin(); grp2KeyIt != group2.end(); grp2KeyIt++) {
       if (!group1.hasKeyword(grp2KeyIt->name())) {
         return ::testing::AssertionFailure() << "PvlGroup " << group2_expr
-            << " contains keyword " << grp2KeyIt->name().toStdString()
+            << " contains keyword " << grp2KeyIt->name()
             << " that is not in PvlGroup " << group1_expr;
       }
     }
@@ -284,8 +303,8 @@ namespace Isis {
         if (numDiff > tolerance) {
           differences.push_back(
                 "Values [" + json1.dump() + "] and [" + json2.dump() + "] differ by ["
-                + std::to_string(numDiff) + "] which is greater than tolerance ["
-                + std::to_string(tolerance) + "] at [" + jsonPointer + "]");
+                + Isis::toString(numDiff) + "] which is greater than tolerance ["
+                + Isis::toString(tolerance) + "] at [" + jsonPointer + "]");
         }
 
         break;
@@ -393,18 +412,18 @@ namespace Isis {
     QVector<QString> binaryKernelList;
 
     for (QString kernel : kernelList) {
-      FileName file(kernel);
-      QString pathToBinaryKernel = file.path() + "/" + file.baseName() + "." + file.extension().replace('x', 'b');
-      FileName binaryFile(pathToBinaryKernel);
+      FileName file(kernel.toStdString());
+      QString pathToBinaryKernel = QString::fromStdString(file.path() + "/" + file.baseName()) + "." + QString::fromStdString(file.extension()).replace('x', 'b');
+      FileName binaryFile(pathToBinaryKernel.toStdString());
 
-      if (file.extension().contains("x") && !binaryFile.fileExists()) {
-        QString path = file.expanded();
+      if (file.extension().find("x") != std::string::npos && !binaryFile.fileExists()) {
+        QString path = QString::fromStdString(file.expanded());
         QString command = "tobin " + path;
-        command += " >nul 2>nul";
+        command += " >nul 2>nul"; 
         int status = system(command.toLatin1().data());
 
         if (status != 0) {
-          QString msg = "Executing command [" + command +
+          std::string msg = "Executing command [" + command.toStdString() +
                         "] failed with return status [" + toString(status) + "]";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
@@ -415,10 +434,10 @@ namespace Isis {
   }
 
   QString fileListToString(QVector<QString> fileList) {
-    QString filesAsString("(");
+    std::string filesAsString("(");
 
     for (int i = 0; i < fileList.size(); i++) {
-      FileName file(fileList[i]);
+      FileName file(fileList[i].toStdString());
 
       filesAsString += file.expanded();
       if (i != fileList.size() - 1) {
@@ -426,7 +445,7 @@ namespace Isis {
       }
     }
     filesAsString += ")";
-    return filesAsString;
+    return QString::fromStdString(filesAsString);
   }
 
 }

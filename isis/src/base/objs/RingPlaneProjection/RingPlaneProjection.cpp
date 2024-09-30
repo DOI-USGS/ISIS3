@@ -70,28 +70,28 @@ namespace Isis {
     try {
       // Mapping group is read by the parent (Projection)
       // Get the RingLongitude Direction
-      if ((QString) m_mappingGrp["RingLongitudeDirection"] == "Clockwise") {
+      if ((std::string)m_mappingGrp["RingLongitudeDirection"] == "Clockwise") {
         m_ringLongitudeDirection = Clockwise;
       }
-      else if ((QString) m_mappingGrp["RingLongitudeDirection"] == "CounterClockwise") {
+      else if ((std::string)m_mappingGrp["RingLongitudeDirection"] == "CounterClockwise") {
         m_ringLongitudeDirection = CounterClockwise;
       }
       else {
-        QString msg = "Projection failed. Invalid value for keyword "
+        std::string msg = "Projection failed. Invalid value for keyword "
                       "[RingLongitudeDirection] must be "
                       "[Clockwise or CounterClockwise]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       // Get the RingLongitudeDomain
-      if ((QString) m_mappingGrp["RingLongitudeDomain"] == "360") {
+      if ((std::string)m_mappingGrp["RingLongitudeDomain"] == "360") {
         m_ringLongitudeDomain = 360;
       }
-      else if ((QString) m_mappingGrp["RingLongitudeDomain"] == "180") {
+      else if ((std::string)m_mappingGrp["RingLongitudeDomain"] == "180") {
         m_ringLongitudeDomain = 180;
       }
       else {
-        QString msg = "Projection failed. Invalid value for keyword "
+        std::string msg = "Projection failed. Invalid value for keyword "
                       "[RingLongitudeDomain] must be [180 or 360]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }

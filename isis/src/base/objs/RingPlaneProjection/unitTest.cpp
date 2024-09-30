@@ -8,6 +8,7 @@ find files of those names at the top level of this repository. **/
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <climits>
 
 #include "Constants.h"
 #include "IException.h"
@@ -343,10 +344,10 @@ int main(int argc, char *argv[]) {
     error.print();
   }
 
-  cout << "Testing == operator Projection conditions..."  << p.Name() << endl;
-  cout << "Projection 1 name and resolution = " << p.Name() << " " << p.Resolution() << endl;
-  cout << "Projection 2 name and resolution = " << p2.Name() << " " << p2.Resolution() << endl;
-  cout << "Projection 3 name and resolution = " << radTestProjection->Name() << " " << radTestProjection->Resolution() << endl;
+  cout << "Testing == operator Projection conditions..."  << p.Name().toStdString() << endl;
+  cout << "Projection 1 name and resolution = " << p.Name().toStdString() << " " << p.Resolution() << endl;
+  cout << "Projection 2 name and resolution = " << p2.Name().toStdString() << " " << p2.Resolution() << endl;
+  cout << "Projection 3 name and resolution = " << radTestProjection->Name().toStdString() << " " << radTestProjection->Resolution() << endl;
 
   if (p == p2)
      cout << "Projection 1 = Projection 2" << endl;
@@ -404,9 +405,9 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing == operator condition in class..." << endl;
-  cout << "Projection 1 name and resolution             = " << p.Name() << " " << p.Resolution() << endl;
+  cout << "Projection 1 name and resolution             = " << p.Name().toStdString() << " " << p.Resolution() << endl;
   cout << "Projection 1 ring longitude direction        = " << p.RingLongitudeDirectionString() << endl;
-  cout << "Projection 4 name and resolution             = " << p3.Name() << " " << p3.Resolution() << endl;
+  cout << "Projection 4 name and resolution             = " << p3.Name().toStdString() << " " << p3.Resolution() << endl;
   cout << "Projection 4 ring longitude direction string = " << p3.RingLongitudeDirectionString() << endl;
   if (p == p3)
      cout << "Projection 1 = Projection 4" << endl;
@@ -421,8 +422,8 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing Name and comparision routines" << endl;
-  cout << "Name:        " << p2.Name() << endl;
-  cout << "Version:     " << p2.Version() << endl;
+  cout << "Name:        " << p2.Name().toStdString() << endl;
+  cout << "Version:     " << p2.Version().toStdString() << endl;
   cout << "operator==:  " << (p == p2) << endl;
   cout << "operator!=:  " << (p != p2) << endl;
 

@@ -13,6 +13,7 @@ find files of those names at the top level of this repository. **/
 #include <QList>
 #include <QFile>
 
+#include "Application.h"
 #include "Camera.h"
 #include "Cube.h"
 #include "Distance.h"
@@ -62,7 +63,7 @@ namespace Isis {
 
     // Get the list of names of input cubes to stitch together
     FileList cubeFileList;
-    cubeFileList.read(ui.GetFileName("FROMLIST"));
+    cubeFileList.read(ui.GetFileName("FROMLIST").toStdString());
 
     return mosrange(cubeFileList, ui);
   }
@@ -80,7 +81,7 @@ namespace Isis {
    */
   Pvl mosrange(FileList &cubeFileList, UserInterface &ui) {
     if ( cubeFileList.size() < 1)  {
-      QString msg = "The list file[" + ui.GetFileName("FROMLIST") +
+      std::string msg = "The list file[" + ui.GetFileName("FROMLIST").toStdString() +
                     " does not contain any filenames";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -90,8 +91,8 @@ namespace Isis {
 
     QString projection("Equirectangular");
     if(ui.WasEntered("MAP")) {
-      Pvl mapfile(ui.GetFileName("MAP"));
-      projection = (QString) mapfile.findGroup("Mapping")["ProjectionName"];
+      Pvl mapfile(ui.GetFileName("MAP").toStdString());
+      projection = QString::fromStdString(mapfile.findGroup("Mapping")["ProjectionName"]);
     }
 
     if(ui.WasEntered("PROJECTION")) {
@@ -135,24 +136,24 @@ namespace Isis {
         try {
           // Set input image, get camera model, and a basic mapping group
           Cube cube;
-          cube.open(cubeFileList[i].toString());
+          cube.open(QString::fromStdString(cubeFileList[i].toString()));
 
           int lines = cube.lineCount();
           int samples = cube.sampleCount();
 
           PvlObject fmap("File");
           fmap += PvlKeyword("Name", cubeFileList[i].toString());
-          fmap += PvlKeyword("Lines", toString(lines));
-          fmap += PvlKeyword("Samples", toString(samples));
+          fmap += PvlKeyword("Lines", Isis::toString(lines));
+          fmap += PvlKeyword("Samples", Isis::toString(samples));
 
           Camera *cam = cube.camera();
           Pvl mapping;
           cam->BasicMapping(mapping);
           PvlGroup &mapgrp = mapping.findGroup("Mapping");
-          mapgrp.addKeyword(PvlKeyword("ProjectionName", projection), Pvl::Replace);
-          mapgrp.addKeyword(PvlKeyword("LatitudeType", lattype), Pvl::Replace);
-          mapgrp.addKeyword(PvlKeyword("LongitudeDirection", londir), Pvl::Replace);
-          mapgrp.addKeyword(PvlKeyword("LongitudeDomain", londom), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("ProjectionName", projection.toStdString()), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("LatitudeType", lattype.toStdString()), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("LongitudeDirection", londir.toStdString()), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("LongitudeDomain", londom.toStdString()), Pvl::Replace);
 
           // Get the radii
           Distance radii[3];
@@ -181,20 +182,20 @@ namespace Isis {
           double pixres = (lowres + hires) / 2.0;
           double scale = Scale(pixres, poleRad, eqRad);
 
-          mapgrp.addKeyword(PvlKeyword("PixelResolution", toString(pixres)), Pvl::Replace);
-          mapgrp.addKeyword(PvlKeyword("Scale", toString(scale), "pixels/degree"), Pvl::Replace);
-          mapgrp += PvlKeyword("MinPixelResolution", toString(lowres), "meters/pixel");
-          mapgrp += PvlKeyword("MaxPixelResolution", toString(hires), "meters/pixel");
-          mapgrp += PvlKeyword("MinObliquePixelResolution", toString(lowObliqueRes), "meters/pixel");
-          mapgrp += PvlKeyword("MaxObliquePixelResolution", toString(hiObliqueRes), "meters/pixel");
+          mapgrp.addKeyword(PvlKeyword("PixelResolution", Isis::toString(pixres)), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("Scale", Isis::toString(scale), "pixels/degree"), Pvl::Replace);
+          mapgrp += PvlKeyword("MinPixelResolution", Isis::toString(lowres), "meters/pixel");
+          mapgrp += PvlKeyword("MaxPixelResolution", Isis::toString(hires), "meters/pixel");
+          mapgrp += PvlKeyword("MinObliquePixelResolution", Isis::toString(lowObliqueRes), "meters/pixel");
+          mapgrp += PvlKeyword("MaxObliquePixelResolution", Isis::toString(hiObliqueRes), "meters/pixel");
 
           // Get the universal ground range
           double minlat, maxlat, minlon, maxlon;
           cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
-          mapgrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
-          mapgrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
-          mapgrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
-          mapgrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("MinimumLatitude", Isis::toString(minlat)), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("MaximumLatitude", Isis::toString(maxlat)), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("MinimumLongitude", Isis::toString(minlon)), Pvl::Replace);
+          mapgrp.addKeyword(PvlKeyword("MaximumLongitude", Isis::toString(maxlon)), Pvl::Replace);
 
           fmap.addGroup(mapgrp);
           fileset.addObject(fmap);
@@ -205,11 +206,11 @@ namespace Isis {
           latitudeStat.AddData(&maxlat, 1);
         }
         catch(IException &ie) {
-          QString mess = cubeFileList[i].toString() + " - " + ie.what();
+          std::string mess = cubeFileList[i].toString() + " - " + ie.what();
           fmap += PvlKeyword("Error", mess);
           errorset.addObject(fmap);
 
-          badfiles.append(qMakePair(cubeFileList[i].toString(), ie.what()));
+          badfiles.append(qMakePair(QString::fromStdString(cubeFileList[i].toString()), ie.what()));
         }
 
         p.ClearInputCubes();
@@ -222,15 +223,15 @@ namespace Isis {
         if (  ui.WasEntered("ERRORLOG") ) {
           Pvl temp;
           temp.addObject(errorset);
-          temp.write(ui.GetFileName("ERRORLOG", "log"));
+          temp.write(ui.GetFileName("ERRORLOG", "log").toStdString());
         }
 
         if ( ui.WasEntered("ERRORLIST") ) {
-          FileName filename( ui.GetFileName("ERRORLIST") );
-          QFile logfile(filename.expanded());
+          FileName filename( ui.GetFileName("ERRORLIST").toStdString() );
+          QFile logfile(QString::fromStdString(filename.expanded()));
           if ( !logfile.open(QIODevice::WriteOnly | QIODevice::Truncate |
                              QIODevice::Text | QIODevice::Unbuffered) ) {
-            QString mess = "Unable to open/create error list file " + filename.name();
+            std::string mess = "Unable to open/create error list file " + filename.name();
             throw IException(IException::User, mess, _FILEINFO_);
           }
 
@@ -243,9 +244,9 @@ namespace Isis {
         // Now check onerror status
         if ( ("FAIL" == ui.GetString("ONERROR").toUpper()) ||
              (badfiles.size() == cubeFileList.size()) ) {
-          QString errors("--> Fatal Errors Encountered <___\n");
+          std::string errors("--> Fatal Errors Encountered <___\n");
           for (int i = 0 ; i < badfiles.size() ; i++) {
-              errors += badfiles[i].first + " - " + badfiles[i].second + "\n";
+              errors += badfiles[i].first.toStdString() + " - " + badfiles[i].second.toStdString() + "\n";
           }
           throw IException(IException::User, errors, _FILEINFO_);
         }
@@ -260,54 +261,54 @@ namespace Isis {
     double avgPoleRad((poleRadStat.Minimum() + poleRadStat.Maximum()) / 2.0);
     double scale  = Scale(avgPixRes, avgPoleRad, avgEqRad);
 
-    mapping += PvlKeyword("ProjectionName", projection);
-    mapping += PvlKeyword("TargetName", target);
-    mapping += PvlKeyword("EquatorialRadius", toString(eqRad), "meters");
-    mapping += PvlKeyword("PolarRadius", toString(poleRad), "meters");
-    mapping += PvlKeyword("LatitudeType", lattype);
-    mapping += PvlKeyword("LongitudeDirection", londir);
-    mapping += PvlKeyword("LongitudeDomain", londom);
-    mapping += PvlKeyword("PixelResolution", toString(SetRound(avgPixRes, digits)), "meters/pixel");
-    mapping += PvlKeyword("Scale", toString(SetRound(scale, digits)), "pixels/degree");
-    mapping += PvlKeyword("MinPixelResolution", toString(scaleStat.Minimum()), "meters/pixel");
-    mapping += PvlKeyword("MaxPixelResolution", toString(scaleStat.Maximum()), "meters/pixel");
-    mapping += PvlKeyword("MinObliquePixelResolution", toString(obliqueScaleStat.Minimum()),
+    mapping += PvlKeyword("ProjectionName", projection.toStdString());
+    mapping += PvlKeyword("TargetName", target.toStdString());
+    mapping += PvlKeyword("EquatorialRadius", Isis::toString(eqRad), "meters");
+    mapping += PvlKeyword("PolarRadius", Isis::toString(poleRad), "meters");
+    mapping += PvlKeyword("LatitudeType", lattype.toStdString());
+    mapping += PvlKeyword("LongitudeDirection", londir.toStdString());
+    mapping += PvlKeyword("LongitudeDomain", londom.toStdString());
+    mapping += PvlKeyword("PixelResolution", Isis::toString(SetRound(avgPixRes, digits)), "meters/pixel");
+    mapping += PvlKeyword("Scale", Isis::toString(SetRound(scale, digits)), "pixels/degree");
+    mapping += PvlKeyword("MinPixelResolution", Isis::toString(scaleStat.Minimum()), "meters/pixel");
+    mapping += PvlKeyword("MaxPixelResolution", Isis::toString(scaleStat.Maximum()), "meters/pixel");
+    mapping += PvlKeyword("MinObliquePixelResolution", Isis::toString(obliqueScaleStat.Minimum()),
                           "meters/pixel");
-    mapping += PvlKeyword("MaxObliquePixelResolution", toString(obliqueScaleStat.Maximum()),
+    mapping += PvlKeyword("MaxObliquePixelResolution", Isis::toString(obliqueScaleStat.Maximum()),
                           "meters/pixel");
-    mapping += PvlKeyword("CenterLongitude", toString(SetRound(avgLon, digits)));
-    mapping += PvlKeyword("CenterLatitude",  toString(SetRound(avgLat, digits)));
-    mapping += PvlKeyword("MinimumLatitude", toString(std::max(SetFloor(latitudeStat.Minimum(),
+    mapping += PvlKeyword("CenterLongitude", Isis::toString(SetRound(avgLon, digits)));
+    mapping += PvlKeyword("CenterLatitude",  Isis::toString(SetRound(avgLat, digits)));
+    mapping += PvlKeyword("MinimumLatitude", Isis::toString(std::max(SetFloor(latitudeStat.Minimum(),
                                                                    digits), -90.0)));
-    mapping += PvlKeyword("MaximumLatitude", toString(std::min(SetCeil(latitudeStat.Maximum(),
+    mapping += PvlKeyword("MaximumLatitude", Isis::toString(std::min(SetCeil(latitudeStat.Maximum(),
                                                                    digits), 90.0)));
-    mapping += PvlKeyword("MinimumLongitude", toString(std::max(SetFloor(longitudeStat.Minimum(),
+    mapping += PvlKeyword("MinimumLongitude", Isis::toString(std::max(SetFloor(longitudeStat.Minimum(),
                                                                     digits), -180.0)));
-    mapping += PvlKeyword("MaximumLongitude", toString(std::min(SetCeil(longitudeStat.Maximum(),
+    mapping += PvlKeyword("MaximumLongitude", Isis::toString(std::min(SetCeil(longitudeStat.Maximum(),
                                                                    digits), 360.0)));
 
-    PvlKeyword clat("PreciseCenterLongitude", toString(avgLon));
+    PvlKeyword clat("PreciseCenterLongitude", Isis::toString(avgLon));
     clat.addComment("Actual Parameters without precision applied");
     mapping += clat;
-    mapping += PvlKeyword("PreciseCenterLatitude",  toString(avgLat));
-    mapping += PvlKeyword("PreciseMinimumLatitude", toString(latitudeStat.Minimum()));
-    mapping += PvlKeyword("PreciseMaximumLatitude", toString(latitudeStat.Maximum()));
-    mapping += PvlKeyword("PreciseMinimumLongitude", toString(longitudeStat.Minimum()));
-    mapping += PvlKeyword("PreciseMaximumLongitude", toString(longitudeStat.Maximum()));
+    mapping += PvlKeyword("PreciseCenterLatitude",  Isis::toString(avgLat));
+    mapping += PvlKeyword("PreciseMinimumLatitude", Isis::toString(latitudeStat.Minimum()));
+    mapping += PvlKeyword("PreciseMaximumLatitude", Isis::toString(latitudeStat.Maximum()));
+    mapping += PvlKeyword("PreciseMinimumLongitude", Isis::toString(longitudeStat.Minimum()));
+    mapping += PvlKeyword("PreciseMaximumLongitude", Isis::toString(longitudeStat.Maximum()));
 
-    log.addGroup(mapping);
-
+    Application::Log(mapping);
+    
     // Write the output file if requested
     if(ui.WasEntered("TO")) {
       Pvl temp;
       temp.addGroup(mapping);
-      temp.write(ui.GetFileName("TO", "map"));
+      temp.write(ui.GetFileName("TO", "map").toStdString());
     }
 
     if(ui.WasEntered("LOG")) {
       Pvl temp;
       temp.addObject(fileset);
-      temp.write(ui.GetFileName("LOG", "log"));
+      temp.write(ui.GetFileName("LOG", "log").toStdString());
     }
 
     p.EndProcess();

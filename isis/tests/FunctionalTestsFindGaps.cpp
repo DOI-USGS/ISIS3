@@ -13,7 +13,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/findgaps.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/findgaps.xml").expanded());
 
 // Tests a basic gap detection
 TEST_F( SmallCube, FindGapsDefault )
@@ -48,10 +48,10 @@ TEST_F( SmallCube, FindGapsDefault )
     findgaps(options);
   }
   catch (IException &e) {
-    FAIL() << e.toString().toStdString().c_str() << std::endl;
+    FAIL() <<  e.toString().c_str() << std::endl;
   }
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
 
   // test that nullified gaps were written to output cube as expected
   std::unique_ptr<Histogram> outHist (outCube.histogram());
@@ -60,7 +60,7 @@ TEST_F( SmallCube, FindGapsDefault )
   EXPECT_EQ( outHist->ValidPixels(), 60 );
 
   // test that Gap group has been written to the logfile
-  Pvl logFile = Pvl(logFileName);
+  Pvl logFile = Pvl(logFileName.toStdString());
   EXPECT_TRUE(logFile.hasGroup("Gap"));
 }
 
@@ -99,10 +99,10 @@ TEST_F( SmallCube, FindGapsEndOfBand )
     findgaps(options);
   }
   catch (IException &e) {
-    FAIL() << e.toString().toStdString().c_str() << std::endl;
+    FAIL() <<  e.toString().c_str() << std::endl;
   }
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
 
   // test that nullified gaps were written to output cube as expected
   std::unique_ptr<Histogram> outHist (outCube.histogram());
@@ -111,7 +111,7 @@ TEST_F( SmallCube, FindGapsEndOfBand )
   EXPECT_EQ( outHist->ValidPixels(), 50 );
 
   // test that Gap group has been written to the logfile
-  Pvl logFile = Pvl(logFileName);
+  Pvl logFile = Pvl(logFileName.toStdString());
   EXPECT_TRUE(logFile.hasGroup("Gap"));
 }
 
@@ -162,10 +162,10 @@ TEST_F( SmallCube, FindGapsCorTol )
     findgaps(options);
   }
   catch (IException &e) {
-    FAIL() << e.toString().toStdString().c_str() << std::endl;
+    FAIL() <<  e.toString().c_str() << std::endl;
   }
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
 
   // test that nullified gaps were written to output cube as expected
   std::unique_ptr<Histogram> outHist (outCube.histogram());
@@ -174,7 +174,7 @@ TEST_F( SmallCube, FindGapsCorTol )
   EXPECT_EQ( outHist->ValidPixels(), 50 );
 
   // test that Gap group has been written to the logfile
-  Pvl logFile = Pvl(logFileName);
+  Pvl logFile = Pvl(logFileName.toStdString());
   ASSERT_TRUE(logFile.hasGroup("Gap"));
 
   // test that the gap correlation is >0 and < our correlation tolerence: 0.9

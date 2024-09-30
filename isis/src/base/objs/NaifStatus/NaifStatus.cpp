@@ -65,7 +65,7 @@ namespace Isis {
     getmsg_c("LONG", LONG_DESC_LEN, naifLong);
 
     // Search for known naif errors...
-    QString errMsg;
+    std::string errMsg;
 
     Pvl error;
     PvlGroup errorDescription("ErrorDescription");
@@ -76,14 +76,14 @@ namespace Isis {
     PvlToPvlTranslationManager trans(error, "$ISISROOT/appdata/translations/NaifErrors.trn");
 
     try {
-      errMsg = trans.Translate("ShortMessage");
+      errMsg = trans.Translate("ShortMessage").toStdString();
     }
     catch(IException &) {
       errMsg = "An unknown NAIF error has been encountered.";
     }
 
     try {
-      errMsg += " " + trans.Translate("LongMessage");
+      errMsg += " " + trans.Translate("LongMessage").toStdString();
     }
     catch(IException &) {
     }
@@ -94,8 +94,8 @@ namespace Isis {
     }
 
     errMsg += " The short explanation ";
-    errMsg += "provided by NAIF is [" + QString(naifShort) + "]. ";
-    errMsg += "The Naif error is [" + QString(naifLong) + "]";
+    errMsg += "provided by NAIF is [" + (std::string)naifShort + "]. ";
+    errMsg += "The Naif error is [" + (std::string)naifLong + "]";
 
     throw IException(IException::Unknown, errMsg, _FILEINFO_);
   }

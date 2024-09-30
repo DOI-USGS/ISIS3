@@ -65,12 +65,12 @@ void IsisMain() {
   // Algorithm: lowpass(from, temp) -> hipass(temp, noise) -> to = from-noise
 
   // Run lowpass filter on input
-  QString tempFileName = FileName::createTempFile("$TEMPORARY/dstripe.temporary.cub").expanded();
+  QString tempFileName = QString::fromStdString(FileName::createTempFile("$TEMPORARY/dstripe.temporary.cub").expanded());
   QString lowParams = "";
   lowParams += "from= " + ui.GetCubeName("FROM");
   lowParams += " to= " + tempFileName + " ";
-  lowParams += " samples= " + toString(lowSamples);
-  lowParams += " lines= " + toString(lowLines);
+  lowParams += " samples= " + QString::number(lowSamples);
+  lowParams += " lines= " + QString::number(lowLines);
 
   ProgramLauncher::RunIsisProgram("lowpass", lowParams);
   
@@ -79,18 +79,18 @@ void IsisMain() {
     QString lowParams = "";
     lowParams += "from= " + ui.GetCubeName("FROM");
     lowParams += " to= " + ui.GetCubeName("LPFNOISE");
-    lowParams += " samples= " + toString(lowSamples);
-    lowParams += " lines= " + toString(lowLines);
+    lowParams += " samples= " + QString::number(lowSamples);
+    lowParams += " lines= " + QString::number(lowLines);
     ProgramLauncher::RunIsisProgram("lowpass", lowParams);
   }
 
   // Run highpass filter after lowpass is done, i.e. highpass(lowpass(input))
-  QString tempNoiseFileName = FileName::createTempFile("$TEMPORARY/dstripe.noise.temporary.cub").expanded();
+  QString tempNoiseFileName = QString::fromStdString(FileName::createTempFile("$TEMPORARY/dstripe.noise.temporary.cub").expanded());
   QString highParams = "";
   highParams += " from= "+tempFileName + " ";
   highParams += " to= " + tempNoiseFileName + " ";
-  highParams += " samples= " + toString(highSamples);
-  highParams += " lines= " + toString(highLines);
+  highParams += " samples= " + QString::number(highSamples);
+  highParams += " lines= " + QString::number(highLines);
 
   ProgramLauncher::RunIsisProgram("highpass", highParams);
   QFile::remove(tempFileName);

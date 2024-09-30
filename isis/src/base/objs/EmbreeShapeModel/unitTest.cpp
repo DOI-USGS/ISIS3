@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Create an EmbreeShapeModel from a string";
     qDebug() << "";
     QString itokawaCubeFile("$ISISTESTDATA/isis/src/hayabusa/unitTestData/st_2391934788_v.cub");
-    Cube itokawaCube(itokawaCubeFile);
+    Cube itokawaCube(itokawaCubeFile.toStdString());
     Camera *itokawaCamera = itokawaCube.camera();
     Target *itokawaTarget = itokawaCamera->target();
     EmbreeShapeModel itokawaModel(itokawaTarget, dskfile, manager);
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     Pvl testLabel;
     PvlGroup testKernels("Kernels");
-    testKernels += PvlKeyword("ShapeModel", dskfile);
+    testKernels += PvlKeyword("ShapeModel", dskfile.toStdString());
     testLabel += testKernels;
     EmbreeShapeModel itokawaPvlModel(itokawaTarget, testLabel, manager);
     outputModelStatus(itokawaPvlModel);
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     Pvl elevationLabel;
     PvlGroup elevationKernels("Kernels");
-    elevationKernels += PvlKeyword("ElevationModel", dskfile);
+    elevationKernels += PvlKeyword("ElevationModel", dskfile.toStdString());
     elevationLabel += elevationKernels;
     EmbreeShapeModel itokawaElevationModel(itokawaTarget, elevationLabel, manager);
     outputModelStatus(itokawaElevationModel);
@@ -295,7 +295,7 @@ int main(int argc, char *argv[]) {
   catch (IException &e) {
     qDebug() << "";
     qDebug() << "";
-    QString msg = "**************** UNIT TEST FAILED! **************** ";
+    std::string msg = "**************** UNIT TEST FAILED! **************** ";
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
 }

@@ -18,7 +18,7 @@ namespace Isis {
                       UserInterface &ui);
 
   void shadow(UserInterface &ui, Pvl *log) {
-    Cube *demCube = new Cube(ui.GetCubeName("FROM"));
+    Cube *demCube = new Cube(ui.GetCubeName("FROM").toStdString());
 
     shadow(demCube, ui, log);
   }
@@ -38,7 +38,7 @@ namespace Isis {
                                   "spkpos_c.html");
 
     if (ui.GetString("SUNPOSITIONSOURCE") == "MATCH") {
-      functor.setSunPosition(ui.GetCubeName("MATCH"));
+      functor.setSunPosition(ui.GetCubeName("MATCH").toStdString());
     }
     else {
       QStringList allKernelFiles;
@@ -49,12 +49,12 @@ namespace Isis {
       NaifStatus::CheckErrors();
 
       foreach (QString kernelFile, allKernelFiles) {
-        kernelsUsed += kernelFile;
-        furnsh_c(FileName(kernelFile).expanded().toLatin1().data());
+        kernelsUsed += kernelFile.toStdString();
+        furnsh_c(FileName(kernelFile.toStdString()).expanded().c_str());
       }
 
       // Find the NAIF target code for the DEM's target
-      QString name = demCube->label()->findGroup("Mapping", Pvl::Traverse)["TargetName"];
+      QString name = QString::fromStdString(demCube->label()->findGroup("Mapping", Pvl::Traverse)["TargetName"]);
       SpiceDouble sunPosition[3];
       SpiceDouble lightTime;
 
@@ -81,7 +81,7 @@ namespace Isis {
       sunPosition[2] *= 1000;
 
       foreach (QString kernelFile, allKernelFiles) {
-        unload_c(FileName(kernelFile).expanded().toLatin1().data());
+        unload_c(FileName(kernelFile.toStdString()).expanded().c_str());
       }
 
       NaifStatus::CheckErrors();
@@ -128,9 +128,7 @@ namespace Isis {
       functorLogData += kernelsUsed;
     }
 
-    if (log) {
-      log->addLogGroup(functorLogData);
-    }
+    Application::AppendAndLog(functorLogData, log);
 
     // Look for shape model object and remove it from output
     Pvl &outputCubeLabel = *outputCube->label();
@@ -175,7 +173,7 @@ namespace Isis {
       int allowed = Kernel::typeEnum("PREDICTED") |
                     Kernel::typeEnum("RECONSTRUCTED") |
                     Kernel::typeEnum("SMITHED");
-      KernelDb kernelDb(FileName(kernelDbFile).highestVersion().expanded(), allowed);
+      KernelDb kernelDb(QString::fromStdString(FileName(kernelDbFile.toStdString()).highestVersion().expanded()), allowed);
 
       Kernel detectedKernels = (kernelDb.*kernelDbAccessor)(labels);
 

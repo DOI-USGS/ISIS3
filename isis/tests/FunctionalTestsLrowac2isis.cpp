@@ -12,7 +12,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/lrowac2isis.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/lrowac2isis.xml").expanded());
 
 TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
   QTemporaryDir prefix;
@@ -26,12 +26,12 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
     lrowac2isis(options);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest LROWAC image " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest LROWAC image " <<  e.toString().c_str() << std::endl;
   }
 
   // UV Even Cube
   QString cubeFileUvEven = prefix.path() + "/lrowac2isisTEMP.uv.even.cub";
-  Cube uvEvenCube(cubeFileUvEven);
+  Cube uvEvenCube(cubeFileUvEven.toStdString());
   Pvl *uvEvenLabel = uvEvenCube.label();
 
   // Dimensions group
@@ -46,34 +46,34 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
 
   // Instrument Group
   PvlGroup &uvEvenInst = uvEvenLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(uvEvenInst["SpacecraftName"][0].toStdString(), "LUNAR RECONNAISSANCE ORBITER");
-  EXPECT_EQ(uvEvenInst["InstrumentId"][0].toStdString(), "WAC-UV");
-  EXPECT_EQ(uvEvenInst["TargetName"][0].toStdString(), "Moon");
-  EXPECT_EQ(uvEvenInst["StartTime"][0].toStdString(), "2009-09-15T07:27:49.230000");
-  EXPECT_EQ(uvEvenInst["StopTime"][0].toStdString(), "2009-09-15T07:30:19.542000");
-  EXPECT_EQ(uvEvenInst["MissionPhaseName"][0].toStdString(), "COMMISSIONING");
-  EXPECT_EQ(uvEvenInst["BeginTemperatureFpa"][0].toDouble(), -1.66529297828674);
-  EXPECT_EQ(uvEvenInst["MiddleTemperatureFpa"][0].toDouble(), -1.12489998340607);
-  EXPECT_EQ(uvEvenInst["EndTemperatureFpa"][0].toDouble(), -0.669131994247437);
-  EXPECT_EQ(uvEvenInst["BeginTemperatureScs"][0].toDouble(), 10.8307619094849);
-  EXPECT_EQ(uvEvenInst["MiddleTemperatureScs"][0].toDouble(), 10.914568901062);
-  EXPECT_EQ(uvEvenInst["EndTemperatureScs"][0].toDouble(), 10.9736194610596);
-  EXPECT_EQ(uvEvenInst["Mode"][0].toStdString(), "0");
-  EXPECT_EQ(uvEvenInst["DataFlipped"][0].toStdString(), "No");
-  EXPECT_EQ(uvEvenInst["ColorOffset"][0].toStdString(), "0");
-  EXPECT_EQ(uvEvenInst["Decompanded"][0].toStdString(), "Yes");
-  EXPECT_EQ(uvEvenInst["Framelets"][0].toStdString(), "Even");
-  EXPECT_EQ(uvEvenInst["NumFramelets"][0].toStdString(), "1");
-  EXPECT_EQ(uvEvenInst["InstrumentModeId"][0].toStdString(), "COLOR");
+  EXPECT_EQ(uvEvenInst["SpacecraftName"][0], "LUNAR RECONNAISSANCE ORBITER");
+  EXPECT_EQ(uvEvenInst["InstrumentId"][0], "WAC-UV");
+  EXPECT_EQ(uvEvenInst["TargetName"][0], "Moon");
+  EXPECT_EQ(uvEvenInst["StartTime"][0], "2009-09-15T07:27:49.230000");
+  EXPECT_EQ(uvEvenInst["StopTime"][0], "2009-09-15T07:30:19.542000");
+  EXPECT_EQ(uvEvenInst["MissionPhaseName"][0], "COMMISSIONING");
+  EXPECT_EQ(Isis::toDouble(uvEvenInst["BeginTemperatureFpa"][0]), -1.66529297828674);
+  EXPECT_EQ(Isis::toDouble(uvEvenInst["MiddleTemperatureFpa"][0]), -1.12489998340607);
+  EXPECT_EQ(Isis::toDouble(uvEvenInst["EndTemperatureFpa"][0]), -0.669131994247437);
+  EXPECT_EQ(Isis::toDouble(uvEvenInst["BeginTemperatureScs"][0]), 10.8307619094849);
+  EXPECT_EQ(Isis::toDouble(uvEvenInst["MiddleTemperatureScs"][0]), 10.914568901062);
+  EXPECT_EQ(Isis::toDouble(uvEvenInst["EndTemperatureScs"][0]), 10.9736194610596);
+  EXPECT_EQ(uvEvenInst["Mode"][0], "0");
+  EXPECT_EQ(uvEvenInst["DataFlipped"][0], "No");
+  EXPECT_EQ(uvEvenInst["ColorOffset"][0], "0");
+  EXPECT_EQ(uvEvenInst["Decompanded"][0], "Yes");
+  EXPECT_EQ(uvEvenInst["Framelets"][0], "Even");
+  EXPECT_EQ(uvEvenInst["NumFramelets"][0], "1");
+  EXPECT_EQ(uvEvenInst["InstrumentModeId"][0], "COLOR");
 
   // Bandbin Group
   PvlGroup &uvEvenBandbin = uvEvenLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_EQ(uvEvenBandbin["FilterNumber"][0].toStdString(), "1");
-  EXPECT_EQ(uvEvenBandbin["FilterNumber"][1].toStdString(), "2");
-  EXPECT_EQ(uvEvenBandbin["Center"][0].toStdString(), "321");
-  EXPECT_EQ(uvEvenBandbin["Center"][1].toStdString(), "360");
-  EXPECT_EQ(uvEvenBandbin["Width"][0].toStdString(), "32");
-  EXPECT_EQ(uvEvenBandbin["Width"][1].toStdString(), "15");
+  EXPECT_EQ(uvEvenBandbin["FilterNumber"][0], "1");
+  EXPECT_EQ(uvEvenBandbin["FilterNumber"][1], "2");
+  EXPECT_EQ(uvEvenBandbin["Center"][0], "321");
+  EXPECT_EQ(uvEvenBandbin["Center"][1], "360");
+  EXPECT_EQ(uvEvenBandbin["Width"][0], "32");
+  EXPECT_EQ(uvEvenBandbin["Width"][1], "15");
 
 
   std::unique_ptr<Histogram> uvEvenHist (uvEvenCube.histogram());
@@ -85,7 +85,7 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
 
   // UV Odd Cube
   QString cubeFileUvOdd = prefix.path() + "/lrowac2isisTEMP.uv.odd.cub";
-  Cube uvOddCube(cubeFileUvOdd);
+  Cube uvOddCube(cubeFileUvOdd.toStdString());
   Pvl *uvOddLabel = uvOddCube.label();
 
   // Dimensions group
@@ -100,34 +100,34 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
 
   // Instrument Group
   PvlGroup &uvOddInst = uvOddLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(uvOddInst["SpacecraftName"][0].toStdString(), "LUNAR RECONNAISSANCE ORBITER");
-  EXPECT_EQ(uvOddInst["InstrumentId"][0].toStdString(), "WAC-UV");
-  EXPECT_EQ(uvOddInst["TargetName"][0].toStdString(), "Moon");
-  EXPECT_EQ(uvOddInst["StartTime"][0].toStdString(), "2009-09-15T07:27:49.230000");
-  EXPECT_EQ(uvOddInst["StopTime"][0].toStdString(), "2009-09-15T07:30:19.542000");
-  EXPECT_EQ(uvOddInst["MissionPhaseName"][0].toStdString(), "COMMISSIONING");
-  EXPECT_EQ(uvOddInst["BeginTemperatureFpa"][0].toDouble(), -1.66529297828674);
-  EXPECT_EQ(uvOddInst["MiddleTemperatureFpa"][0].toDouble(), -1.12489998340607);
-  EXPECT_EQ(uvOddInst["EndTemperatureFpa"][0].toDouble(), -0.669131994247437);
-  EXPECT_EQ(uvOddInst["BeginTemperatureScs"][0].toDouble(), 10.8307619094849);
-  EXPECT_EQ(uvOddInst["MiddleTemperatureScs"][0].toDouble(), 10.914568901062);
-  EXPECT_EQ(uvOddInst["EndTemperatureScs"][0].toDouble(), 10.9736194610596);
-  EXPECT_EQ(uvOddInst["Mode"][0].toStdString(), "0");
-  EXPECT_EQ(uvOddInst["DataFlipped"][0].toStdString(), "No");
-  EXPECT_EQ(uvOddInst["ColorOffset"][0].toStdString(), "0");
-  EXPECT_EQ(uvOddInst["Decompanded"][0].toStdString(), "Yes");
-  EXPECT_EQ(uvOddInst["Framelets"][0].toStdString(), "Odd");
-  EXPECT_EQ(uvOddInst["NumFramelets"][0].toStdString(), "1");
-  EXPECT_EQ(uvOddInst["InstrumentModeId"][0].toStdString(), "COLOR");
+  EXPECT_EQ(uvOddInst["SpacecraftName"][0], "LUNAR RECONNAISSANCE ORBITER");
+  EXPECT_EQ(uvOddInst["InstrumentId"][0], "WAC-UV");
+  EXPECT_EQ(uvOddInst["TargetName"][0], "Moon");
+  EXPECT_EQ(uvOddInst["StartTime"][0], "2009-09-15T07:27:49.230000");
+  EXPECT_EQ(uvOddInst["StopTime"][0], "2009-09-15T07:30:19.542000");
+  EXPECT_EQ(uvOddInst["MissionPhaseName"][0], "COMMISSIONING");
+  EXPECT_EQ(Isis::toDouble(uvOddInst["BeginTemperatureFpa"][0]), -1.66529297828674);
+  EXPECT_EQ(Isis::toDouble(uvOddInst["MiddleTemperatureFpa"][0]), -1.12489998340607);
+  EXPECT_EQ(Isis::toDouble(uvOddInst["EndTemperatureFpa"][0]), -0.669131994247437);
+  EXPECT_EQ(Isis::toDouble(uvOddInst["BeginTemperatureScs"][0]), 10.8307619094849);
+  EXPECT_EQ(Isis::toDouble(uvOddInst["MiddleTemperatureScs"][0]), 10.914568901062);
+  EXPECT_EQ(Isis::toDouble(uvOddInst["EndTemperatureScs"][0]), 10.9736194610596);
+  EXPECT_EQ(uvOddInst["Mode"][0], "0");
+  EXPECT_EQ(uvOddInst["DataFlipped"][0], "No");
+  EXPECT_EQ(uvOddInst["ColorOffset"][0], "0");
+  EXPECT_EQ(uvOddInst["Decompanded"][0], "Yes");
+  EXPECT_EQ(uvOddInst["Framelets"][0], "Odd");
+  EXPECT_EQ(uvOddInst["NumFramelets"][0], "1");
+  EXPECT_EQ(uvOddInst["InstrumentModeId"][0], "COLOR");
 
   // Bandbin Group
   PvlGroup &uvOddBandbin = uvOddLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_EQ(uvOddBandbin["FilterNumber"][0].toStdString(), "1");
-  EXPECT_EQ(uvOddBandbin["FilterNumber"][1].toStdString(), "2");
-  EXPECT_EQ(uvOddBandbin["Center"][0].toStdString(), "321");
-  EXPECT_EQ(uvOddBandbin["Center"][1].toStdString(), "360");
-  EXPECT_EQ(uvOddBandbin["Width"][0].toStdString(), "32");
-  EXPECT_EQ(uvOddBandbin["Width"][1].toStdString(), "15");
+  EXPECT_EQ(uvOddBandbin["FilterNumber"][0], "1");
+  EXPECT_EQ(uvOddBandbin["FilterNumber"][1], "2");
+  EXPECT_EQ(uvOddBandbin["Center"][0], "321");
+  EXPECT_EQ(uvOddBandbin["Center"][1], "360");
+  EXPECT_EQ(uvOddBandbin["Width"][0], "32");
+  EXPECT_EQ(uvOddBandbin["Width"][1], "15");
 
 
   std::unique_ptr<Histogram> uvOddHist (uvOddCube.histogram());
@@ -139,7 +139,7 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
 
   // VIS Even Cube
   QString cubeFileVisEven = prefix.path() + "/lrowac2isisTEMP.vis.even.cub";
-  Cube visEvenCube(cubeFileVisEven);
+  Cube visEvenCube(cubeFileVisEven.toStdString());
   Pvl *visEvenLabel = visEvenCube.label();
 
   // Dimensions group
@@ -154,34 +154,34 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
 
   // Instrument Group
   PvlGroup &visEvenInst = visEvenLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(visEvenInst["SpacecraftName"][0].toStdString(), "LUNAR RECONNAISSANCE ORBITER");
-  EXPECT_EQ(visEvenInst["InstrumentId"][0].toStdString(), "WAC-VIS");
-  EXPECT_EQ(visEvenInst["TargetName"][0].toStdString(), "Moon");
-  EXPECT_EQ(visEvenInst["StartTime"][0].toStdString(), "2009-09-15T07:27:49.230000");
-  EXPECT_EQ(visEvenInst["StopTime"][0].toStdString(), "2009-09-15T07:30:19.542000");
-  EXPECT_EQ(visEvenInst["MissionPhaseName"][0].toStdString(), "COMMISSIONING");
-  EXPECT_EQ(visEvenInst["BeginTemperatureFpa"][0].toDouble(), -1.66529297828674);
-  EXPECT_EQ(visEvenInst["MiddleTemperatureFpa"][0].toDouble(), -1.12489998340607);
-  EXPECT_EQ(visEvenInst["EndTemperatureFpa"][0].toDouble(), -0.669131994247437);
-  EXPECT_EQ(visEvenInst["BeginTemperatureScs"][0].toDouble(), 10.8307619094849);
-  EXPECT_EQ(visEvenInst["MiddleTemperatureScs"][0].toDouble(), 10.914568901062);
-  EXPECT_EQ(visEvenInst["EndTemperatureScs"][0].toDouble(), 10.9736194610596);
-  EXPECT_EQ(visEvenInst["Mode"][0].toStdString(), "0");
-  EXPECT_EQ(visEvenInst["DataFlipped"][0].toStdString(), "No");
-  EXPECT_EQ(visEvenInst["ColorOffset"][0].toStdString(), "0");
-  EXPECT_EQ(visEvenInst["Decompanded"][0].toStdString(), "Yes");
-  EXPECT_EQ(visEvenInst["Framelets"][0].toStdString(), "Even");
-  EXPECT_EQ(visEvenInst["NumFramelets"][0].toStdString(), "1");
-  EXPECT_EQ(visEvenInst["InstrumentModeId"][0].toStdString(), "COLOR");
+  EXPECT_EQ(visEvenInst["SpacecraftName"][0], "LUNAR RECONNAISSANCE ORBITER");
+  EXPECT_EQ(visEvenInst["InstrumentId"][0], "WAC-VIS");
+  EXPECT_EQ(visEvenInst["TargetName"][0], "Moon");
+  EXPECT_EQ(visEvenInst["StartTime"][0], "2009-09-15T07:27:49.230000");
+  EXPECT_EQ(visEvenInst["StopTime"][0], "2009-09-15T07:30:19.542000");
+  EXPECT_EQ(visEvenInst["MissionPhaseName"][0], "COMMISSIONING");
+  EXPECT_EQ(Isis::toDouble(visEvenInst["BeginTemperatureFpa"][0]), -1.66529297828674);
+  EXPECT_EQ(Isis::toDouble(visEvenInst["MiddleTemperatureFpa"][0]), -1.12489998340607);
+  EXPECT_EQ(Isis::toDouble(visEvenInst["EndTemperatureFpa"][0]), -0.669131994247437);
+  EXPECT_EQ(Isis::toDouble(visEvenInst["BeginTemperatureScs"][0]), 10.8307619094849);
+  EXPECT_EQ(Isis::toDouble(visEvenInst["MiddleTemperatureScs"][0]), 10.914568901062);
+  EXPECT_EQ(Isis::toDouble(visEvenInst["EndTemperatureScs"][0]), 10.9736194610596);
+  EXPECT_EQ(visEvenInst["Mode"][0], "0");
+  EXPECT_EQ(visEvenInst["DataFlipped"][0], "No");
+  EXPECT_EQ(visEvenInst["ColorOffset"][0], "0");
+  EXPECT_EQ(visEvenInst["Decompanded"][0], "Yes");
+  EXPECT_EQ(visEvenInst["Framelets"][0], "Even");
+  EXPECT_EQ(visEvenInst["NumFramelets"][0], "1");
+  EXPECT_EQ(visEvenInst["InstrumentModeId"][0], "COLOR");
 
   // Bandbin Group
   PvlGroup &visEvenBandbin = visEvenLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_EQ(visEvenBandbin["FilterNumber"][0].toStdString(), "3");
-  EXPECT_EQ(visEvenBandbin["FilterNumber"][1].toStdString(), "4");
-  EXPECT_EQ(visEvenBandbin["Center"][0].toStdString(), "415");
-  EXPECT_EQ(visEvenBandbin["Center"][1].toStdString(), "566");
-  EXPECT_EQ(visEvenBandbin["Width"][0].toStdString(), "36");
-  EXPECT_EQ(visEvenBandbin["Width"][1].toStdString(), "20");
+  EXPECT_EQ(visEvenBandbin["FilterNumber"][0], "3");
+  EXPECT_EQ(visEvenBandbin["FilterNumber"][1], "4");
+  EXPECT_EQ(visEvenBandbin["Center"][0], "415");
+  EXPECT_EQ(visEvenBandbin["Center"][1], "566");
+  EXPECT_EQ(visEvenBandbin["Width"][0], "36");
+  EXPECT_EQ(visEvenBandbin["Width"][1], "20");
 
 
   std::unique_ptr<Histogram> visEvenHist (visEvenCube.histogram());
@@ -193,7 +193,7 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
 
   // VIS Odd Cube
   QString cubeFileVisOdd = prefix.path() + "/lrowac2isisTEMP.vis.odd.cub";
-  Cube visOddCube(cubeFileVisOdd);
+  Cube visOddCube(cubeFileVisOdd.toStdString());
   Pvl *visOddLabel = visOddCube.label();
 
   // Dimensions group
@@ -208,34 +208,34 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisDefault) {
 
   // Instrument Group
   PvlGroup &visOddInst = visOddLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(visOddInst["SpacecraftName"][0].toStdString(), "LUNAR RECONNAISSANCE ORBITER");
-  EXPECT_EQ(visOddInst["InstrumentId"][0].toStdString(), "WAC-VIS");
-  EXPECT_EQ(visOddInst["TargetName"][0].toStdString(), "Moon");
-  EXPECT_EQ(visOddInst["StartTime"][0].toStdString(), "2009-09-15T07:27:49.230000");
-  EXPECT_EQ(visOddInst["StopTime"][0].toStdString(), "2009-09-15T07:30:19.542000");
-  EXPECT_EQ(visOddInst["MissionPhaseName"][0].toStdString(), "COMMISSIONING");
-  EXPECT_EQ(visOddInst["BeginTemperatureFpa"][0].toDouble(), -1.66529297828674);
-  EXPECT_EQ(visOddInst["MiddleTemperatureFpa"][0].toDouble(), -1.12489998340607);
-  EXPECT_EQ(visOddInst["EndTemperatureFpa"][0].toDouble(), -0.669131994247437);
-  EXPECT_EQ(visOddInst["BeginTemperatureScs"][0].toDouble(), 10.8307619094849);
-  EXPECT_EQ(visOddInst["MiddleTemperatureScs"][0].toDouble(), 10.914568901062);
-  EXPECT_EQ(visOddInst["EndTemperatureScs"][0].toDouble(), 10.9736194610596);
-  EXPECT_EQ(visOddInst["Mode"][0].toStdString(), "0");
-  EXPECT_EQ(visOddInst["DataFlipped"][0].toStdString(), "No");
-  EXPECT_EQ(visOddInst["ColorOffset"][0].toStdString(), "0");
-  EXPECT_EQ(visOddInst["Decompanded"][0].toStdString(), "Yes");
-  EXPECT_EQ(visOddInst["Framelets"][0].toStdString(), "Odd");
-  EXPECT_EQ(visOddInst["NumFramelets"][0].toStdString(), "1");
-  EXPECT_EQ(visOddInst["InstrumentModeId"][0].toStdString(), "COLOR");
+  EXPECT_EQ(visOddInst["SpacecraftName"][0], "LUNAR RECONNAISSANCE ORBITER");
+  EXPECT_EQ(visOddInst["InstrumentId"][0], "WAC-VIS");
+  EXPECT_EQ(visOddInst["TargetName"][0], "Moon");
+  EXPECT_EQ(visOddInst["StartTime"][0], "2009-09-15T07:27:49.230000");
+  EXPECT_EQ(visOddInst["StopTime"][0], "2009-09-15T07:30:19.542000");
+  EXPECT_EQ(visOddInst["MissionPhaseName"][0], "COMMISSIONING");
+  EXPECT_EQ(Isis::toDouble(visOddInst["BeginTemperatureFpa"][0]), -1.66529297828674);
+  EXPECT_EQ(Isis::toDouble(visOddInst["MiddleTemperatureFpa"][0]), -1.12489998340607);
+  EXPECT_EQ(Isis::toDouble(visOddInst["EndTemperatureFpa"][0]), -0.669131994247437);
+  EXPECT_EQ(Isis::toDouble(visOddInst["BeginTemperatureScs"][0]), 10.8307619094849);
+  EXPECT_EQ(Isis::toDouble(visOddInst["MiddleTemperatureScs"][0]), 10.914568901062);
+  EXPECT_EQ(Isis::toDouble(visOddInst["EndTemperatureScs"][0]), 10.9736194610596);
+  EXPECT_EQ(visOddInst["Mode"][0], "0");
+  EXPECT_EQ(visOddInst["DataFlipped"][0], "No");
+  EXPECT_EQ(visOddInst["ColorOffset"][0], "0");
+  EXPECT_EQ(visOddInst["Decompanded"][0], "Yes");
+  EXPECT_EQ(visOddInst["Framelets"][0], "Odd");
+  EXPECT_EQ(visOddInst["NumFramelets"][0], "1");
+  EXPECT_EQ(visOddInst["InstrumentModeId"][0], "COLOR");
 
   // Bandbin Group
   PvlGroup &visOddBandbin = visOddLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_EQ(visOddBandbin["FilterNumber"][0].toStdString(), "3");
-  EXPECT_EQ(visOddBandbin["FilterNumber"][1].toStdString(), "4");
-  EXPECT_EQ(visOddBandbin["Center"][0].toStdString(), "415");
-  EXPECT_EQ(visOddBandbin["Center"][1].toStdString(), "566");
-  EXPECT_EQ(visOddBandbin["Width"][0].toStdString(), "36");
-  EXPECT_EQ(visOddBandbin["Width"][1].toStdString(), "20");
+  EXPECT_EQ(visOddBandbin["FilterNumber"][0], "3");
+  EXPECT_EQ(visOddBandbin["FilterNumber"][1], "4");
+  EXPECT_EQ(visOddBandbin["Center"][0], "415");
+  EXPECT_EQ(visOddBandbin["Center"][1], "566");
+  EXPECT_EQ(visOddBandbin["Width"][0], "36");
+  EXPECT_EQ(visOddBandbin["Width"][1], "20");
 
   std::unique_ptr<Histogram> visOddHist (visOddCube.histogram());
 
@@ -258,12 +258,12 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
     lrowac2isis(options);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest LROWAC image " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest LROWAC image " <<  e.toString().c_str() << std::endl;
   }
 
   // UV Even Cube
   QString cubeFileUvEven = prefix.path() + "/lrowac2isisTEMP.uv.even.cub";
-  Cube uvEvenCube(cubeFileUvEven);
+  Cube uvEvenCube(cubeFileUvEven.toStdString());
   Pvl *uvEvenLabel = uvEvenCube.label();
 
   // Dimensions group
@@ -273,11 +273,11 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
 
   // Instrument Group
   PvlGroup &uvEvenInst = uvEvenLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(uvEvenInst["ColorOffset"][0].toStdString(), "2");
-  EXPECT_EQ(uvEvenInst["Decompanded"][0].toStdString(), "Yes");
-  EXPECT_EQ(uvEvenInst["Framelets"][0].toStdString(), "Even");
-  EXPECT_EQ(uvEvenInst["NumFramelets"][0].toStdString(), "3");
-  EXPECT_EQ(uvEvenInst["InstrumentModeId"][0].toStdString(), "COLOR");
+  EXPECT_EQ(uvEvenInst["ColorOffset"][0], "2");
+  EXPECT_EQ(uvEvenInst["Decompanded"][0], "Yes");
+  EXPECT_EQ(uvEvenInst["Framelets"][0], "Even");
+  EXPECT_EQ(uvEvenInst["NumFramelets"][0], "3");
+  EXPECT_EQ(uvEvenInst["InstrumentModeId"][0], "COLOR");
 
 
   std::unique_ptr<Histogram> uvEvenHist (uvEvenCube.histogram());
@@ -289,7 +289,7 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
 
   // UV Odd Cube
   QString cubeFileUvOdd = prefix.path() + "/lrowac2isisTEMP.uv.odd.cub";
-  Cube uvOddCube(cubeFileUvOdd);
+  Cube uvOddCube(cubeFileUvOdd.toStdString());
   Pvl *uvOddLabel = uvOddCube.label();
 
   // Dimensions group
@@ -299,11 +299,11 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
 
   // Instrument Group
   PvlGroup &uvOddInst = uvOddLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(uvOddInst["ColorOffset"][0].toStdString(), "2");
-  EXPECT_EQ(uvOddInst["Decompanded"][0].toStdString(), "Yes");
-  EXPECT_EQ(uvOddInst["Framelets"][0].toStdString(), "Odd");
-  EXPECT_EQ(uvOddInst["NumFramelets"][0].toStdString(), "3");
-  EXPECT_EQ(uvOddInst["InstrumentModeId"][0].toStdString(), "COLOR");
+  EXPECT_EQ(uvOddInst["ColorOffset"][0], "2");
+  EXPECT_EQ(uvOddInst["Decompanded"][0], "Yes");
+  EXPECT_EQ(uvOddInst["Framelets"][0], "Odd");
+  EXPECT_EQ(uvOddInst["NumFramelets"][0], "3");
+  EXPECT_EQ(uvOddInst["InstrumentModeId"][0], "COLOR");
 
 
   std::unique_ptr<Histogram> uvOddHist (uvOddCube.histogram());
@@ -315,7 +315,7 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
 
   // VIS Even Cube
   QString cubeFileVisEven = prefix.path() + "/lrowac2isisTEMP.vis.even.cub";
-  Cube visEvenCube(cubeFileVisEven);
+  Cube visEvenCube(cubeFileVisEven.toStdString());
   Pvl *visEvenLabel = visEvenCube.label();
 
   // Dimensions group
@@ -325,29 +325,29 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
 
   // Instrument Group
   PvlGroup &visEvenInst = visEvenLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(visEvenInst["ColorOffset"][0].toStdString(), "2");
-  EXPECT_EQ(visEvenInst["Decompanded"][0].toStdString(), "Yes");
-  EXPECT_EQ(visEvenInst["Framelets"][0].toStdString(), "Even");
-  EXPECT_EQ(visEvenInst["NumFramelets"][0].toStdString(), "9");
-  EXPECT_EQ(visEvenInst["InstrumentModeId"][0].toStdString(), "COLOR");
+  EXPECT_EQ(visEvenInst["ColorOffset"][0], "2");
+  EXPECT_EQ(visEvenInst["Decompanded"][0], "Yes");
+  EXPECT_EQ(visEvenInst["Framelets"][0], "Even");
+  EXPECT_EQ(visEvenInst["NumFramelets"][0], "9");
+  EXPECT_EQ(visEvenInst["InstrumentModeId"][0], "COLOR");
 
   // Bandbin Group
   PvlGroup &visEvenBandbin = visEvenLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_EQ(visEvenBandbin["FilterNumber"][0].toStdString(), "3");
-  EXPECT_EQ(visEvenBandbin["FilterNumber"][1].toStdString(), "4");
-  EXPECT_EQ(visEvenBandbin["FilterNumber"][2].toStdString(), "5");
-  EXPECT_EQ(visEvenBandbin["FilterNumber"][3].toStdString(), "6");
-  EXPECT_EQ(visEvenBandbin["FilterNumber"][4].toStdString(), "7");
-  EXPECT_EQ(visEvenBandbin["Center"][0].toStdString(), "415");
-  EXPECT_EQ(visEvenBandbin["Center"][1].toStdString(), "566");
-  EXPECT_EQ(visEvenBandbin["Center"][2].toStdString(), "604");
-  EXPECT_EQ(visEvenBandbin["Center"][3].toStdString(), "643");
-  EXPECT_EQ(visEvenBandbin["Center"][4].toStdString(), "689");
-  EXPECT_EQ(visEvenBandbin["Width"][0].toStdString(), "36");
-  EXPECT_EQ(visEvenBandbin["Width"][1].toStdString(), "20");
-  EXPECT_EQ(visEvenBandbin["Width"][2].toStdString(), "20");
-  EXPECT_EQ(visEvenBandbin["Width"][3].toStdString(), "23");
-  EXPECT_EQ(visEvenBandbin["Width"][4].toStdString(), "39");
+  EXPECT_EQ(visEvenBandbin["FilterNumber"][0], "3");
+  EXPECT_EQ(visEvenBandbin["FilterNumber"][1], "4");
+  EXPECT_EQ(visEvenBandbin["FilterNumber"][2], "5");
+  EXPECT_EQ(visEvenBandbin["FilterNumber"][3], "6");
+  EXPECT_EQ(visEvenBandbin["FilterNumber"][4], "7");
+  EXPECT_EQ(visEvenBandbin["Center"][0], "415");
+  EXPECT_EQ(visEvenBandbin["Center"][1], "566");
+  EXPECT_EQ(visEvenBandbin["Center"][2], "604");
+  EXPECT_EQ(visEvenBandbin["Center"][3], "643");
+  EXPECT_EQ(visEvenBandbin["Center"][4], "689");
+  EXPECT_EQ(visEvenBandbin["Width"][0], "36");
+  EXPECT_EQ(visEvenBandbin["Width"][1], "20");
+  EXPECT_EQ(visEvenBandbin["Width"][2], "20");
+  EXPECT_EQ(visEvenBandbin["Width"][3], "23");
+  EXPECT_EQ(visEvenBandbin["Width"][4], "39");
 
 
   std::unique_ptr<Histogram> visEvenHist (visEvenCube.histogram());
@@ -359,7 +359,7 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
 
   // VIS Odd Cube
   QString cubeFileVisOdd = prefix.path() + "/lrowac2isisTEMP.vis.odd.cub";
-  Cube visOddCube(cubeFileVisOdd);
+  Cube visOddCube(cubeFileVisOdd.toStdString());
   Pvl *visOddLabel = visOddCube.label();
 
   // Dimensions group
@@ -369,29 +369,29 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisColorOffset) {
 
   // Instrument Group
   PvlGroup &visOddInst = visOddLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(visOddInst["ColorOffset"][0].toStdString(), "2");
-  EXPECT_EQ(visOddInst["Decompanded"][0].toStdString(), "Yes");
-  EXPECT_EQ(visOddInst["Framelets"][0].toStdString(), "Odd");
-  EXPECT_EQ(visOddInst["NumFramelets"][0].toStdString(), "9");
-  EXPECT_EQ(visOddInst["InstrumentModeId"][0].toStdString(), "COLOR");
+  EXPECT_EQ(visOddInst["ColorOffset"][0], "2");
+  EXPECT_EQ(visOddInst["Decompanded"][0], "Yes");
+  EXPECT_EQ(visOddInst["Framelets"][0], "Odd");
+  EXPECT_EQ(visOddInst["NumFramelets"][0], "9");
+  EXPECT_EQ(visOddInst["InstrumentModeId"][0], "COLOR");
 
   // Bandbin Group
   PvlGroup &visOddBandbin = visOddLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_EQ(visOddBandbin["FilterNumber"][0].toStdString(), "3");
-  EXPECT_EQ(visOddBandbin["FilterNumber"][1].toStdString(), "4");
-  EXPECT_EQ(visOddBandbin["FilterNumber"][2].toStdString(), "5");
-  EXPECT_EQ(visOddBandbin["FilterNumber"][3].toStdString(), "6");
-  EXPECT_EQ(visOddBandbin["FilterNumber"][4].toStdString(), "7");
-  EXPECT_EQ(visOddBandbin["Center"][0].toStdString(), "415");
-  EXPECT_EQ(visOddBandbin["Center"][1].toStdString(), "566");
-  EXPECT_EQ(visOddBandbin["Center"][2].toStdString(), "604");
-  EXPECT_EQ(visOddBandbin["Center"][3].toStdString(), "643");
-  EXPECT_EQ(visOddBandbin["Center"][4].toStdString(), "689");
-  EXPECT_EQ(visOddBandbin["Width"][0].toStdString(), "36");
-  EXPECT_EQ(visOddBandbin["Width"][1].toStdString(), "20");
-  EXPECT_EQ(visOddBandbin["Width"][2].toStdString(), "20");
-  EXPECT_EQ(visOddBandbin["Width"][3].toStdString(), "23");
-  EXPECT_EQ(visOddBandbin["Width"][4].toStdString(), "39");
+  EXPECT_EQ(visOddBandbin["FilterNumber"][0], "3");
+  EXPECT_EQ(visOddBandbin["FilterNumber"][1], "4");
+  EXPECT_EQ(visOddBandbin["FilterNumber"][2], "5");
+  EXPECT_EQ(visOddBandbin["FilterNumber"][3], "6");
+  EXPECT_EQ(visOddBandbin["FilterNumber"][4], "7");
+  EXPECT_EQ(visOddBandbin["Center"][0], "415");
+  EXPECT_EQ(visOddBandbin["Center"][1], "566");
+  EXPECT_EQ(visOddBandbin["Center"][2], "604");
+  EXPECT_EQ(visOddBandbin["Center"][3], "643");
+  EXPECT_EQ(visOddBandbin["Center"][4], "689");
+  EXPECT_EQ(visOddBandbin["Width"][0], "36");
+  EXPECT_EQ(visOddBandbin["Width"][1], "20");
+  EXPECT_EQ(visOddBandbin["Width"][2], "20");
+  EXPECT_EQ(visOddBandbin["Width"][3], "23");
+  EXPECT_EQ(visOddBandbin["Width"][4], "39");
 
 
   std::unique_ptr<Histogram> visOddHist (visOddCube.histogram());
@@ -416,12 +416,12 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
     lrowac2isis(options);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest LROWAC image " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest LROWAC image " <<  e.toString().c_str() << std::endl;
   }
 
   // UV Even Cube
   QString cubeFileUvEven = prefix.path() + "/lrowac2isisTEMP.uv.even.cub";
-  Cube uvEvenCube(cubeFileUvEven);
+  Cube uvEvenCube(cubeFileUvEven.toStdString());
   Pvl *uvEvenLabel = uvEvenCube.label();
 
   // Dimensions group
@@ -431,11 +431,11 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
 
   // Instrument Group
   PvlGroup &uvEvenInst = uvEvenLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(uvEvenInst["ColorOffset"][0].toStdString(), "0");
-  EXPECT_EQ(uvEvenInst["Decompanded"][0].toStdString(), "No");
-  EXPECT_EQ(uvEvenInst["Framelets"][0].toStdString(), "Even");
-  EXPECT_EQ(uvEvenInst["NumFramelets"][0].toStdString(), "1");
-  EXPECT_EQ(uvEvenInst["InstrumentModeId"][0].toStdString(), "COLOR");
+  EXPECT_EQ(uvEvenInst["ColorOffset"][0], "0");
+  EXPECT_EQ(uvEvenInst["Decompanded"][0], "No");
+  EXPECT_EQ(uvEvenInst["Framelets"][0], "Even");
+  EXPECT_EQ(uvEvenInst["NumFramelets"][0], "1");
+  EXPECT_EQ(uvEvenInst["InstrumentModeId"][0], "COLOR");
 
 
   std::unique_ptr<Histogram> uvEvenHist (uvEvenCube.histogram());
@@ -447,7 +447,7 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
 
   // UV Odd Cube
   QString cubeFileUvOdd = prefix.path() + "/lrowac2isisTEMP.uv.odd.cub";
-  Cube uvOddCube(cubeFileUvOdd);
+  Cube uvOddCube(cubeFileUvOdd.toStdString());
   Pvl *uvOddLabel = uvOddCube.label();
 
   // Dimensions group
@@ -457,11 +457,11 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
 
   // Instrument Group
   PvlGroup &uvOddInst = uvOddLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(uvOddInst["ColorOffset"][0].toStdString(), "0");
-  EXPECT_EQ(uvOddInst["Decompanded"][0].toStdString(), "No");
-  EXPECT_EQ(uvOddInst["Framelets"][0].toStdString(), "Odd");
-  EXPECT_EQ(uvOddInst["NumFramelets"][0].toStdString(), "1");
-  EXPECT_EQ(uvOddInst["InstrumentModeId"][0].toStdString(), "COLOR");
+  EXPECT_EQ(uvOddInst["ColorOffset"][0], "0");
+  EXPECT_EQ(uvOddInst["Decompanded"][0], "No");
+  EXPECT_EQ(uvOddInst["Framelets"][0], "Odd");
+  EXPECT_EQ(uvOddInst["NumFramelets"][0], "1");
+  EXPECT_EQ(uvOddInst["InstrumentModeId"][0], "COLOR");
 
 
   std::unique_ptr<Histogram> uvOddHist (uvOddCube.histogram());
@@ -473,7 +473,7 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
 
   // VIS Even Cube
   QString cubeFileVisEven = prefix.path() + "/lrowac2isisTEMP.vis.even.cub";
-  Cube visEvenCube(cubeFileVisEven);
+  Cube visEvenCube(cubeFileVisEven.toStdString());
   Pvl *visEvenLabel = visEvenCube.label();
 
   // Dimensions group
@@ -483,11 +483,11 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
 
   // Instrument Group
   PvlGroup &visEvenInst = visEvenLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(visEvenInst["ColorOffset"][0].toStdString(), "0");
-  EXPECT_EQ(visEvenInst["Decompanded"][0].toStdString(), "No");
-  EXPECT_EQ(visEvenInst["Framelets"][0].toStdString(), "Even");
-  EXPECT_EQ(visEvenInst["NumFramelets"][0].toStdString(), "1");
-  EXPECT_EQ(visEvenInst["InstrumentModeId"][0].toStdString(), "COLOR");
+  EXPECT_EQ(visEvenInst["ColorOffset"][0], "0");
+  EXPECT_EQ(visEvenInst["Decompanded"][0], "No");
+  EXPECT_EQ(visEvenInst["Framelets"][0], "Even");
+  EXPECT_EQ(visEvenInst["NumFramelets"][0], "1");
+  EXPECT_EQ(visEvenInst["InstrumentModeId"][0], "COLOR");
 
 
   std::unique_ptr<Histogram> visEvenHist (visEvenCube.histogram());
@@ -499,7 +499,7 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
 
   // VIS Odd Cube
   QString cubeFileVisOdd = prefix.path() + "/lrowac2isisTEMP.vis.odd.cub";
-  Cube visOddCube(cubeFileVisOdd);
+  Cube visOddCube(cubeFileVisOdd.toStdString());
   Pvl *visOddLabel = visOddCube.label();
 
   // Dimensions group
@@ -509,11 +509,11 @@ TEST(Lrowac2isisTests, FunctionalTestLrowac2isisNoUnlut) {
 
   // Instrument Group
   PvlGroup &visOddInst = visOddLabel->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ(visOddInst["ColorOffset"][0].toStdString(), "0");
-  EXPECT_EQ(visOddInst["Decompanded"][0].toStdString(), "No");
-  EXPECT_EQ(visOddInst["Framelets"][0].toStdString(), "Odd");
-  EXPECT_EQ(visOddInst["NumFramelets"][0].toStdString(), "1");
-  EXPECT_EQ(visOddInst["InstrumentModeId"][0].toStdString(), "COLOR");
+  EXPECT_EQ(visOddInst["ColorOffset"][0], "0");
+  EXPECT_EQ(visOddInst["Decompanded"][0], "No");
+  EXPECT_EQ(visOddInst["Framelets"][0], "Odd");
+  EXPECT_EQ(visOddInst["NumFramelets"][0], "1");
+  EXPECT_EQ(visOddInst["InstrumentModeId"][0], "COLOR");
 
 
   std::unique_ptr<Histogram> visOddHist (visOddCube.histogram());

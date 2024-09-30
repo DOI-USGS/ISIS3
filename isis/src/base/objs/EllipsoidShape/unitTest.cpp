@@ -59,9 +59,9 @@ int main() {
     EllipsoidShape shape(&targ);
     EllipsoidShape shape2;
 
-    cout << "    Shape  name is " << shape.name() << endl;
-    cout << "    Shape2  name is " << shape2.name() << endl;
-    cout << "    Shape is DEM type?" << toString(shape.isDEM()) << endl;
+    cout << "    Shape  name is " << shape.name().toStdString() << endl;
+    cout << "    Shape2  name is " << shape2.name().toStdString() << endl;
+    cout << "    Shape is DEM type?" << Isis::toString((bool)shape.isDEM()) << endl;
 
     std::vector<double> sB(3);
     sB[0] = -2399.54;
@@ -158,7 +158,7 @@ int main() {
   }
   catch (IException &e) {
     cout << endl << endl;
-    QString msg = "**************** UNIT TEST FAILED! **************** ";
+    std::string msg = "**************** UNIT TEST FAILED! **************** ";
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
 }

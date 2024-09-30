@@ -56,10 +56,10 @@ namespace Isis {
       if (!mapGroup.hasKeyword("CenterLongitude")) {
         if (allowDefaults) {
           double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
-          mapGroup += PvlKeyword("CenterLongitude", toString(lon));
+          mapGroup += PvlKeyword("CenterLongitude", Isis::toString(lon));
         }
         else {
-          QString message = "Cannot project using Equirectangular Cylindrical";
+          std::string message = "Cannot project using Equirectangular Cylindrical";
           message += " without [CenterLongitude] value.  Keyword does not exist";
           message += " in labels and defaults are not allowed.";
           throw IException(IException::Unknown, message, _FILEINFO_);
@@ -69,10 +69,10 @@ namespace Isis {
       if (!mapGroup.hasKeyword("CenterLatitude")) {
         if (allowDefaults) {
           double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
-          mapGroup += PvlKeyword("CenterLatitude", toString(lat));
+          mapGroup += PvlKeyword("CenterLatitude", Isis::toString(lat));
         }
         else {
-          QString message = "Cannot project using Equirectangular Cylindrical";
+          std::string message = "Cannot project using Equirectangular Cylindrical";
           message += " without [CenterLatitude] value.  Keyword does not exist";
           message += " in labels and defaults are not allowed.";
           throw IException(IException::Unknown, message, _FILEINFO_);
@@ -95,19 +95,19 @@ namespace Isis {
         mapGroup += PvlKeyword("CenterLatitudeRadius");
       }
 
-      mapGroup["CenterLatitudeRadius"] = toString(m_clatRadius);
+      mapGroup["CenterLatitudeRadius"] = Isis::toString(m_clatRadius);
 
       // Compute cos of the center latitude and make sure it is valid as
       // we will be dividing with it later on
       m_cosCenterLatitude = cos(m_centerLatitude);
       if (fabs(m_cosCenterLatitude) < DBL_EPSILON) {
-        QString message = "Keyword value for CenterLatitude is "
+        std::string message = "Keyword value for CenterLatitude is "
                          "too close to the pole";
         throw IException(IException::Io, message, _FILEINFO_);
       }
     }
     catch(IException &e) {
-      QString message = "Invalid label group [Mapping]";
+      std::string message = "Invalid label group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }

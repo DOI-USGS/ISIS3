@@ -76,7 +76,7 @@ void IsisMain() {
   g_groundMap = 0;
   if(g_outputType == Aspect) {
     p.StartProcess(createAspectCube);
-    bbGroup.addKeyword( PvlKeyword( "Name", "Aspect", ui.GetString("UNITS").toLower() ) );
+    bbGroup.addKeyword( PvlKeyword( "Name", "Aspect", ui.GetString("UNITS").toLower().toStdString() ) );
   }
   else {
     if (ui.GetString("PIXRES") == "AUTOMATIC") {
@@ -100,7 +100,7 @@ void IsisMain() {
       bbGroup.addKeyword( PvlKeyword("Name", "Slope", "percent") );
     }
     else {
-      bbGroup.addKeyword( PvlKeyword( "Name", "Slope", ui.GetString("UNITS").toLower() ) );
+      bbGroup.addKeyword( PvlKeyword( "Name", "Slope", ui.GetString("UNITS").toLower().toStdString() ) );
     }
   }
 
@@ -138,10 +138,9 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
     Distance(in[4], Distance::Meters);
   }
   catch (IException &e) {
-    QString msg = QString("The input cube contains a negative DN at (sample,line,band) "
-        "[(%1,%2,%3)]. The automatic pixel resolution option requires the input cube contain "
-        "raduis values. It is possible the input cube contains elevation or other data.").
-        arg( in.Sample(4) ).arg( in.Line(4) ).arg( in.Band(4) );
+    std::string msg = "The input cube contains a negative DN at (sample,line,band) "
+        "[("+Isis::toString(in.Sample(4))+","+Isis::toString(in.Line(4))+","+Isis::toString(in.Band(4))+")]. The automatic pixel resolution option requires the input cube contain "
+        "raduis values. It is possible the input cube contains elevation or other data.";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 

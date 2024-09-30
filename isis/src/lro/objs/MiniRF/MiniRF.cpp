@@ -53,7 +53,7 @@ namespace Isis {
       m_spacecraftNameShort = "Chan1";
     }
     else {
-      QString msg = "Cube does not appear to be a mini RF image";
+      std::string msg = "Cube does not appear to be a mini RF image";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -73,7 +73,7 @@ namespace Isis {
 
     // Get the start time from labels (the SpacecraftClockStartCount is set to
     // is set to UNK in the PDS labels, so StartTime is used instead)
-    SpiceDouble etStart = iTime((QString)inst["StartTime"]).Et();
+    SpiceDouble etStart = iTime(QString::fromStdString(inst["StartTime"])).Et();
 
     // The line rate is in units of seconds in the PDS label. The exposure
     // is the sum of the burst and the delay for the return. The movement of the
@@ -104,7 +104,7 @@ namespace Isis {
 
     // Setup map from radar(sample,time) to radar(groundrange,time)
     Radar::LookDirection ldir = Radar::Right;
-    if((QString)inst["LookDirection"] == "LEFT") {
+    if(QString::fromStdString(inst["LookDirection"]) == "LEFT") {
       ldir = Radar::Left;
     }
     RadarGroundRangeMap::setTransform(naifIkCode(), groundRangeResolution,

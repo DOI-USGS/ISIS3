@@ -79,13 +79,13 @@ namespace Isis {
         IString lutPair = lutKeyword[i];
         lutPair.ConvertWhiteSpace();
         lutPair.Remove("() ");
-        QString outValueMin = lutPair.Token(" ,").ToQt();
-        QString outValueMax = lutPair.Token(" ,").ToQt();
-        lookupTable.AddPair(i, (toDouble(outValueMin) + toDouble(outValueMax)) / 2.0);
+        QString outValueMin = QString::fromStdString(lutPair.Token(" ,"));
+        QString outValueMax = QString::fromStdString(lutPair.Token(" ,"));
+        lookupTable.AddPair(i, (outValueMin.toDouble() + outValueMax.toDouble()) / 2.0);
       }
     }
 
-    QString instModeId = pdsLab["INSTRUMENT_MODE_ID"];
+    QString instModeId = QString::fromStdString(pdsLab["INSTRUMENT_MODE_ID"]);
 
     // this will be used to convert num input lines to num output lines,
     //   only changed for when both uv and vis exist (varying summing)
@@ -169,7 +169,7 @@ namespace Isis {
       }
     }
 
-    FileName baseFileName(ui.GetCubeName("TO"));
+    FileName baseFileName(ui.GetCubeName("TO").toStdString());
 
     if(uveven && uvodd) {
       // padding[1] is max padding for UV
@@ -181,13 +181,13 @@ namespace Isis {
       uveven->setDimensions(numSamples, numLines, numBands);
       uveven->setPixelType(Isis::Real);
 
-      QString filename = baseFileName.path() + "/" + baseFileName.baseName() + ".uv.even.cub";
+      QString filename = QString::fromStdString(baseFileName.path()) + "/" + QString::fromStdString(baseFileName.baseName()) + ".uv.even.cub";
       uveven->create(filename);
 
       uvodd->setDimensions(numSamples, numLines, numBands);
       uvodd->setPixelType(Isis::Real);
 
-      filename = baseFileName.path() + "/" + baseFileName.baseName() + ".uv.odd.cub";
+      filename = QString::fromStdString(baseFileName.path()) + "/" + QString::fromStdString(baseFileName.baseName()) + ".uv.odd.cub";
       uvodd->create(filename);
     }
 
@@ -200,13 +200,13 @@ namespace Isis {
       viseven->setDimensions(numSamples, numLines, numBands);
       viseven->setPixelType(Isis::Real);
 
-      QString filename = baseFileName.path() + "/" + baseFileName.baseName() + ".vis.even.cub";
+      QString filename = QString::fromStdString(baseFileName.path()) + "/" + QString::fromStdString(baseFileName.baseName()) + ".vis.even.cub";
       viseven->create(filename);
 
       visodd->setDimensions(numSamples, numLines, numBands);
       visodd->setPixelType(Isis::Real);
 
-      filename = baseFileName.path() + "/" + baseFileName.baseName() + ".vis.odd.cub";
+      filename = QString::fromStdString(baseFileName.path()) + "/" + QString::fromStdString(baseFileName.baseName()) + ".vis.odd.cub";
       visodd->create(filename);
     }
 
@@ -222,7 +222,7 @@ namespace Isis {
     OriginalLabel origLabel(pdsLab);
 
     int numFramelets = padding.size();
-    PvlKeyword numFrameletsKeyword("NumFramelets", toString(numFramelets));
+    PvlKeyword numFrameletsKeyword("NumFramelets", Isis::toString(numFramelets));
 
     if(uveven) {
       for(int grp = 0; grp < isis3UvEvenLab.groups(); grp++) {
@@ -429,7 +429,7 @@ namespace Isis {
     if(!extractMiddleSamples) {
       for(int i = 0; i < in.size(); i++) {
         if(i >= mgr.size()) {
-          QString msg = "The input file has an unexpected number of samples";
+          std::string msg = "The input file has an unexpected number of samples";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
@@ -442,7 +442,7 @@ namespace Isis {
       int endSamp = (in.size() / 2) + mgr.size() / 2;
 
       if(mgr.size() > in.size()) {
-        QString msg = "Output number of samples calculated is invalid";
+        std::string msg = "Output number of samples calculated is invalid";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
@@ -475,7 +475,7 @@ namespace Isis {
 
     // Translate the instrument group
     FileName transFile("$ISISROOT/appdata/translations/LroWacInstrument.trn");
-    PvlToPvlTranslationManager instrumentXlater(pdsLab, transFile.expanded());
+    PvlToPvlTranslationManager instrumentXlater(pdsLab, QString::fromStdString(transFile.expanded()));
     instrumentXlater.Auto(isis3VisEven);
     instrumentXlater.Auto(isis3VisOdd);
     instrumentXlater.Auto(isis3UvEven);
@@ -483,7 +483,7 @@ namespace Isis {
 
     // Translate the Archive group
     transFile = "$ISISROOT/appdata/translations/LroWacArchive.trn";
-    PvlToPvlTranslationManager archiveXlater(pdsLab, transFile.expanded());
+    PvlToPvlTranslationManager archiveXlater(pdsLab, QString::fromStdString(transFile.expanded()));
 
     archiveXlater.Auto(isis3VisEven);
     archiveXlater.Auto(isis3VisOdd);
@@ -495,10 +495,10 @@ namespace Isis {
 
     // color offset doesn't apply to BW mode (single band cubes)
     if(colorOffset && viseven && viseven->bandCount() == 1) {
-      genericInstrument.push_back(PvlKeyword("ColorOffset", QString::number(0)));
+      genericInstrument.push_back(PvlKeyword("ColorOffset", Isis::toString(0)));
     }
     else {
-      genericInstrument.push_back(PvlKeyword("ColorOffset", toString(colorOffset)));
+      genericInstrument.push_back(PvlKeyword("ColorOffset", Isis::toString(colorOffset)));
     }
 
     genericInstrument.push_back(PvlKeyword("Decompanded", (ui.GetBoolean("UNLUT") ? "Yes" : "No")));
@@ -520,16 +520,16 @@ namespace Isis {
     // add labels unique to particular files
     if(viseven) {
       visEvenInst.addKeyword(PvlKeyword("Framelets", "Even"));
-      visEvenInst.addKeyword(PvlKeyword("NumFramelets", toString(viseven->lineCount() / 14)));
+      visEvenInst.addKeyword(PvlKeyword("NumFramelets", Isis::toString(viseven->lineCount() / 14)));
       visEvenInst.addKeyword(PvlKeyword("InstrumentId", "WAC-VIS"), Pvl::Replace);
-      visEvenInst.addKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
+      visEvenInst.addKeyword(PvlKeyword("InstrumentModeId", pdsLab["INSTRUMENT_MODE_ID"]));
     }
 
     if(visodd) {
       visOddInst.addKeyword(PvlKeyword("Framelets", "Odd"));
-      visOddInst.addKeyword(PvlKeyword("NumFramelets", toString(visodd->lineCount() / 14)));
+      visOddInst.addKeyword(PvlKeyword("NumFramelets", Isis::toString(visodd->lineCount() / 14)));
       visOddInst.addKeyword(PvlKeyword("InstrumentId", "WAC-VIS"), Pvl::Replace);
-      visOddInst.addKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
+      visOddInst.addKeyword(PvlKeyword("InstrumentModeId", pdsLab["INSTRUMENT_MODE_ID"]));
     }
 
     // **TEMPORARY. This should be done by a translation table.
@@ -549,7 +549,7 @@ namespace Isis {
     }
     else {
       for(int i = 0; i < pdsLab["FILTER_NUMBER"].size(); i++) {
-        if(toInt(pdsLab["FILTER_NUMBER"][i]) > 2) {
+        if(Isis::toInt(pdsLab["FILTER_NUMBER"][i]) > 2) {
           visWavelength += pdsLab["CENTER_FILTER_WAVELENGTH"][i];
           visFilterNum += pdsLab["FILTER_NUMBER"][i];
 
@@ -577,16 +577,16 @@ namespace Isis {
 
     if(uveven) {
       uvEvenInst.addKeyword(PvlKeyword("Framelets", "Even"));
-      uvEvenInst.addKeyword(PvlKeyword("NumFramelets", toString(uveven->lineCount() / 4)));
+      uvEvenInst.addKeyword(PvlKeyword("NumFramelets", Isis::toString(uveven->lineCount() / 4)));
       uvEvenInst.addKeyword(PvlKeyword("InstrumentId", "WAC-UV"), Pvl::Replace);
-      uvEvenInst.addKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
+      uvEvenInst.addKeyword(PvlKeyword("InstrumentModeId", pdsLab["INSTRUMENT_MODE_ID"]));
     }
 
     if(uvodd) {
       uvOddInst.addKeyword(PvlKeyword("Framelets", "Odd"));
-      uvOddInst.addKeyword(PvlKeyword("NumFramelets", toString(uvodd->lineCount() / 4)));
+      uvOddInst.addKeyword(PvlKeyword("NumFramelets", Isis::toString(uvodd->lineCount() / 4)));
       uvOddInst.addKeyword(PvlKeyword("InstrumentId", "WAC-UV"), Pvl::Replace);
-      uvOddInst.addKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
+      uvOddInst.addKeyword(PvlKeyword("InstrumentModeId", pdsLab["INSTRUMENT_MODE_ID"]));
     }
 
     // Translate the BandBin group
@@ -596,7 +596,7 @@ namespace Isis {
     PvlKeyword uvBandwidth("Width");
 
     for(int i = 0; i < pdsLab["FILTER_NUMBER"].size(); i++) {
-      if(toInt(pdsLab["FILTER_NUMBER"][i]) <= 2) {
+      if(Isis::toInt(pdsLab["FILTER_NUMBER"][i]) <= 2) {
         uvWavelength += pdsLab["CENTER_FILTER_WAVELENGTH"][i];
         uvFilterNum += pdsLab["FILTER_NUMBER"][i];
 
@@ -681,50 +681,50 @@ namespace Isis {
       PvlKeyword &lut = pdsLab["LRO:LOOKUP_CONVERSION_TABLE"];
 
       if(lut.size() != 256) {
-        QString msg = "Keyword [LRO:LOOKUP_CONVERSION_TABLE] has the wrong number of values";
+        std::string msg = "Keyword [LRO:LOOKUP_CONVERSION_TABLE] has the wrong number of values";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       PvlKeyword &missionName = pdsLab["MISSION_NAME"];
 
       if(missionName.size() != 1 || missionName[0] != "LUNAR RECONNAISSANCE ORBITER") {
-        QString msg = "Keyword [MISSION_NAME] does not have a value of [LUNAR RECONNAISSANCER ORBITER]";
+        std::string msg = "Keyword [MISSION_NAME] does not have a value of [LUNAR RECONNAISSANCER ORBITER]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       PvlKeyword &instrumentId = pdsLab["INSTRUMENT_ID"];
 
       if(instrumentId.size() != 1 || instrumentId[0] != "LROC") {
-        QString msg = "Keyword [INSTRUMENT_ID] does not have a value of [LROC]";
+        std::string msg = "Keyword [INSTRUMENT_ID] does not have a value of [LROC]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       // Make sure CENTER_FILTER_WAVELENGTH/FILTER_NUMBER makes sense
       if(pdsLab["FILTER_NUMBER"].size() != pdsLab["CENTER_FILTER_WAVELENGTH"].size()) {
-        QString msg = "Keywords [FILTER_NUMBER,CENTER_FILTER_WAVELENGTH] must have the same number of values";
+        std::string msg = "Keywords [FILTER_NUMBER,CENTER_FILTER_WAVELENGTH] must have the same number of values";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       if(pdsLab["INSTRUMENT_MODE_ID"][0] == "BW" && pdsLab["FILTER_NUMBER"].size() != 1) {
-        QString msg = "Keyword [FILTER_NUMBER] must have size 1 if [INSTRUMENT_MODE_ID] is [BW]";
+        std::string msg = "Keyword [FILTER_NUMBER] must have size 1 if [INSTRUMENT_MODE_ID] is [BW]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "COLOR" && (pdsLab["FILTER_NUMBER"].size() < 5
               || pdsLab["FILTER_NUMBER"].size() > 7 || pdsLab["FILTER_NUMBER"].size() == 6)) {
-        QString msg = "Keyword [FILTER_NUMBER] must have size 5 or 7 if [INSTRUMENT_MODE_ID] is [COLOR]";
+        std::string msg = "Keyword [FILTER_NUMBER] must have size 5 or 7 if [INSTRUMENT_MODE_ID] is [COLOR]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "UV" && pdsLab["FILTER_NUMBER"].size() != 2) {
-        QString msg = "Keyword [FILTER_NUMBER] must have size 2 if [INSTRUMENT_MODE_ID] is [UV]";
+        std::string msg = "Keyword [FILTER_NUMBER] must have size 2 if [INSTRUMENT_MODE_ID] is [UV]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "VIS" && pdsLab["FILTER_NUMBER"].size() != 5) {
-        QString msg = "Keyword [FILTER_NUMBER] must have size 5 if [INSTRUMENT_MODE_ID] is [VIS]";
+        std::string msg = "Keyword [FILTER_NUMBER] must have size 5 if [INSTRUMENT_MODE_ID] is [VIS]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else if(pdsLab["INSTRUMENT_MODE_ID"][0] != "BW" && pdsLab["INSTRUMENT_MODE_ID"][0] != "COLOR" &&
               pdsLab["INSTRUMENT_MODE_ID"][0] != "UV" && pdsLab["INSTRUMENT_MODE_ID"][0] != "VIS") {
-        QString msg = "The value of keyword [INSTRUMENT_MODE_ID] is not recognized";
+        std::string msg = "The value of keyword [INSTRUMENT_MODE_ID] is not recognized";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
@@ -742,20 +742,20 @@ namespace Isis {
         bool found = false;
         bool match = false;
         for(int j = 0; !found && j < (int) filters.size(); j++) {
-          if(toInt(pdsLab["FILTER_NUMBER"][i]) == filters[j].first) {
+          if(Isis::toInt(pdsLab["FILTER_NUMBER"][i]) == filters[j].first) {
             found = true;
 
-            match = (pdsLab["CENTER_FILTER_WAVELENGTH"][i] == filters[j].second);
+            match = (pdsLab["CENTER_FILTER_WAVELENGTH"][i] == filters[j].second.toStdString());
           }
         }
 
         if(found && !match) {
-          QString msg = "The [FILTER_NUMBER] and [CENTER_FILTER_WAVELENGTH] keywords do not correspond properly";
+          std::string msg = "The [FILTER_NUMBER] and [CENTER_FILTER_WAVELENGTH] keywords do not correspond properly";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         if(!found) {
-          QString msg = "The value of the keyword [FILTER_NUMBER] is invalid";
+          std::string msg = "The value of the keyword [FILTER_NUMBER] is invalid";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }
@@ -766,9 +766,9 @@ namespace Isis {
       };
 
       for(unsigned int i = 0; i < sizeof(QString) / sizeof(invalidKeywords); i++) {
-        if(pdsLab.hasKeyword(invalidKeywords[i])) {
-          QString msg = "Keyword [";
-          msg += invalidKeywords[i];
+        if(pdsLab.hasKeyword(invalidKeywords[i].toStdString())) {
+          std::string msg = "Keyword [";
+          msg += invalidKeywords[i].toStdString();
           msg += "] must not exist";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
@@ -778,8 +778,8 @@ namespace Isis {
       PvlKeyword &orbitNumber = pdsLab["ORBIT_NUMBER"];
       QRegExp integerRegex("[0-9]+");
 
-      if(orbitNumber.size() != 1 || !integerRegex.exactMatch(orbitNumber[0])) {
-        QString msg = "The value of keyword [ORBIT_NUMBER] is not valid";
+      if(orbitNumber.size() != 1 || !integerRegex.exactMatch(QString::fromStdString(orbitNumber[0]))) {
+        std::string msg = "The value of keyword [ORBIT_NUMBER] is not valid";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
@@ -797,9 +797,9 @@ namespace Isis {
       };
 
       for(unsigned int i = 0; i < sizeof(numericKeywords) / sizeof(QString); i++) {
-        if(pdsLab[numericKeywords[i]].size() != 1 || !numberRegex.exactMatch(pdsLab[numericKeywords[i]][0])) {
-          QString msg = "The value of keyword [";
-          msg += numericKeywords[i];
+        if(pdsLab[numericKeywords[i].toStdString()].size() != 1 || !numberRegex.exactMatch(QString::fromStdString(pdsLab[numericKeywords[i].toStdString()][0]))) {
+          std::string msg = "The value of keyword [";
+          msg += numericKeywords[i].toStdString();
           msg += "] is not valid";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
@@ -813,9 +813,9 @@ namespace Isis {
       };
 
       for(unsigned int i = 0; i < sizeof(timeKeywords) / sizeof(QString); i++) {
-        if(pdsLab[timeKeywords[i]].size() != 1 || !timeRegex.exactMatch(pdsLab[timeKeywords[i]][0])) {
-          QString msg = "The value of keyword [";
-          msg += timeKeywords[i];
+        if(pdsLab[timeKeywords[i].toStdString()].size() != 1 || !timeRegex.exactMatch(QString::fromStdString(pdsLab[timeKeywords[i].toStdString()][0]))) {
+          std::string msg = "The value of keyword [";
+          msg += timeKeywords[i].toStdString();
           msg += "] is not valid";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
@@ -829,16 +829,16 @@ namespace Isis {
       };
 
       for(unsigned int i = 0; i < sizeof(clockKeywords) / sizeof(QString); i++) {
-        if(pdsLab[clockKeywords[i]].size() != 1 || !clockRegex.exactMatch(pdsLab[clockKeywords[i]][0])) {
-          QString msg = "The value of keyword [";
-          msg += clockKeywords[i];
+        if(pdsLab[clockKeywords[i].toStdString()].size() != 1 || !clockRegex.exactMatch(QString::fromStdString(pdsLab[clockKeywords[i].toStdString()][0]))) {
+          std::string msg = "The value of keyword [";
+          msg += clockKeywords[i].toStdString();
           msg += "] is not valid";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }
     }
     catch(IException &e) {
-      QString msg = "The input product is out of date and has invalid labels. Please get an up to date version from the ASU LROC Team";
+      std::string msg = "The input product is out of date and has invalid labels. Please get an up to date version from the ASU LROC Team";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }

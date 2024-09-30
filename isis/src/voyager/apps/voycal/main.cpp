@@ -66,7 +66,7 @@ void IsisMain() {
 
   // Check for projection
   if (incube->isProjected()) {
-    QString msg = "The cube [" + ui.GetCubeName("FROM") + "] has a projection" +
+    std::string msg = "The cube [" + ui.GetCubeName("FROM").toStdString() + "] has a projection" +
                   " and cannot be radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -79,36 +79,36 @@ void IsisMain() {
 
   // Verify not radiometrically corrected
   if (isiscube.hasGroup("Radiometry")) {
-    QString msg = "Cube [" + ui.GetCubeName("FROM") + "] has already been" +
+    std::string msg = "Cube [" + ui.GetCubeName("FROM").toStdString() + "] has already been" +
                   " radiometrically corrected";
     throw IException(IException::User,msg,_FILEINFO_);
   }
 
   // Verify Voyager spacecraft and get number, 1 or 2
-  QString scNumber = instrument["SpacecraftName"][0];
+  QString scNumber = QString::fromStdString(instrument["SpacecraftName"][0]);
   if (scNumber != "VOYAGER_1" && scNumber != "VOYAGER_2") {
-    QString msg = "The cube [" + ui.GetCubeName("FROM") + "] does not appear" +
+    std::string msg = "The cube [" + ui.GetCubeName("FROM").toStdString() + "] does not appear" +
                   " to be a Voyager image";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   scNumber = scNumber[8];
 
   // Open calibration file to find constants and files
-  Pvl calibra(FileName("$voyager" + scNumber +
+  Pvl calibra(FileName("$voyager" + scNumber.toStdString() +
                            "/calibration/voycal.pvl").expanded());
   PvlObject calib;
   QList<QString> hierarchy;
   try {
     // Search voycal.pvl for appropriate object
-    hierarchy.append(instrument.findKeyword("SpacecraftName")[0]);
-    hierarchy.append(instrument.findKeyword("InstrumentId")[0]);
+    hierarchy.append(QString::fromStdString(instrument.findKeyword("SpacecraftName")[0]));
+    hierarchy.append(QString::fromStdString(instrument.findKeyword("InstrumentId")[0]));
     hierarchy.append(
-        QString("ShutterMode" + instrument.findKeyword("CameraState2")[0]));
-    hierarchy.append(archive.findKeyword("MissionPhaseName")[0]);
+        QString("ShutterMode" + QString::fromStdString(instrument.findKeyword("CameraState2")[0])));
+    hierarchy.append(QString::fromStdString(archive.findKeyword("MissionPhaseName")[0]));
     hierarchy.append(
-        QString("ScanRate" + instrument.findKeyword("CameraState1")[0]));
+        QString("ScanRate" + QString::fromStdString(instrument.findKeyword("CameraState1")[0])));
     hierarchy.append(
-        QString(bandbin["FilterName"][0] + "_" + bandbin["FilterNumber"][0]));
+        QString(QString::fromStdString(bandbin["FilterName"][0]) + "_" + QString::fromStdString(bandbin["FilterNumber"][0])));
 
     calib = fetchCoefficients(calibra, hierarchy);
 
@@ -124,11 +124,11 @@ void IsisMain() {
 
   // Get appropriate calibration files
   CubeAttributeInput in1;
-  p.SetInputCube(FileName("$voyager" + scNumber + "/calibration/" +
-                          (QString)calib["OffsetCorrectionFile"]).expanded(), in1);
+  p.SetInputCube(QString::fromStdString(FileName("$voyager" + scNumber.toStdString() + "/calibration/" +
+                          (std::string)calib["OffsetCorrectionFile"]).expanded()), in1);
   CubeAttributeInput in2;
-  p.SetInputCube(FileName("$voyager" + scNumber + "/calibration/" +
-                          (QString)calib["GainCorrectionFile"]).expanded(), in2);
+  p.SetInputCube(QString::fromStdString(FileName("$voyager" + scNumber.toStdString() + "/calibration/" +
+                          (std::string)calib["GainCorrectionFile"]).expanded()), in2);
 
   // Constants from voycal.pvl for correction
   omegaNaught = calib["OmegaNaught"];
@@ -140,7 +140,7 @@ void IsisMain() {
   // If we are doing a linear correction as well, go here
   linear = ui.GetBoolean("LINEAR");
   if (linear) {
-    Pvl linearity(FileName("$voyager" + scNumber +
+    Pvl linearity(FileName("$voyager" + scNumber.toStdString() +
                      "/calibration/voylin.pvl").expanded());
 
     PvlObject lin;
@@ -199,11 +199,11 @@ void IsisMain() {
   calgrp.addKeyword(calib[4]);
   calgrp.addKeyword(calib[5]);
   calgrp.addKeyword(calib[6]);
-  calgrp.addKeyword(PvlKeyword("CalcSunDistance",toString(dist1)));
+  calgrp.addKeyword(PvlKeyword("CalcSunDistance",Isis::toString(dist1)));
   calgrp.addKeyword(instrument["ExposureDuration"]);
-  calgrp.addKeyword(PvlKeyword("XMLT",toString(XMLT)));
-  calgrp.addKeyword(PvlKeyword("Omega_W1",toString(w1)));
-  calgrp.addKeyword(PvlKeyword("CalcExpoDuration",toString(newExpo)));
+  calgrp.addKeyword(PvlKeyword("XMLT",Isis::toString(XMLT)));
+  calgrp.addKeyword(PvlKeyword("Omega_W1",Isis::toString(w1)));
+  calgrp.addKeyword(PvlKeyword("CalcExpoDuration",Isis::toString(newExpo)));
 
   // Linear correction equation and constants
   if (linear) {
@@ -215,10 +215,10 @@ void IsisMain() {
     linearity.addComment("XNORM = NormalizingPower");
     linearity.addComment("KPOWER = K_PowerOfNon-Linearity");
     calgrp.addKeyword(linearity);
-    calgrp.addKeyword(PvlKeyword("ACoefficient",toString(aCoef)));
-    calgrp.addKeyword(PvlKeyword("B_HighEndNon-LinearityCorrection",toString(bHighEnd)));
-    calgrp.addKeyword(PvlKeyword("K_PowerOfNon-Linearity",toString(kPowerOf)));
-    calgrp.addKeyword(PvlKeyword("NormalizingPower",toString(normalizingPower)));
+    calgrp.addKeyword(PvlKeyword("ACoefficient",Isis::toString(aCoef)));
+    calgrp.addKeyword(PvlKeyword("B_HighEndNon-LinearityCorrection",Isis::toString(bHighEnd)));
+    calgrp.addKeyword(PvlKeyword("K_PowerOfNon-Linearity",Isis::toString(kPowerOf)));
+    calgrp.addKeyword(PvlKeyword("NormalizingPower",Isis::toString(normalizingPower)));
   }
   else {
     calgrp.addKeyword(PvlKeyword("LinearityCorrection","False"));
@@ -297,10 +297,10 @@ PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy) {
   for (int o = 0; o < hierarchy.size() && validHierarchy; o++) {
     QString objectName = hierarchy[o];
 
-    if (parent->hasObject(objectName)) {
+    if (parent->hasObject(objectName.toStdString())) {
       // The object named in the hierarchy exists in the calibration file, so
       // grab it
-      PvlObject &object = parent->findObject(objectName);
+      PvlObject &object = parent->findObject(objectName.toStdString());
 
       // Find all the keywords at the object level
       for (int k = 0; k < object.keywords(); k++) {
@@ -337,14 +337,14 @@ PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy) {
 void checkCoefficients(PvlObject &coefficients, QStringList keyNames) {
   QStringList missingCoeffs;
   foreach(const QString &key, keyNames) {
-    if (!coefficients.hasKeyword(key)) {
+    if (!coefficients.hasKeyword(key.toStdString())) {
       missingCoeffs.append(key);
     }
   }
   if (!missingCoeffs.isEmpty()) {
     throw IException(
         IException::Programmer,
-        "Coefficients [" + missingCoeffs.join(", ") + "] were not found in the "
+        "Coefficients [" + missingCoeffs.join(", ").toStdString() + "] were not found in the "
         "calibration PVL for the input data.  Consider adding a default.",
         _FILEINFO_);
   }

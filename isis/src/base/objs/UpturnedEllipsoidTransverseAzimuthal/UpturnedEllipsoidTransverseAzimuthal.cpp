@@ -62,10 +62,10 @@ namespace Isis {
       if (!mapGroup.hasKeyword("CenterLongitude")) {
         if (allowDefaults) {
           // centerLongitude still 0.0 here
-          mapGroup += PvlKeyword("CenterLongitude", toString(centerLongitude), "Degrees");
+          mapGroup += PvlKeyword("CenterLongitude", Isis::toString(centerLongitude), "Degrees");
         }
         else {
-          QString message = "Cannot project using upturned ellipsoid Transverse Azimuthal";
+          std::string message = "Cannot project using upturned ellipsoid Transverse Azimuthal";
           message += " without [CenterLongitude] value.  Keyword does not exist";
           message += " in labels and defaults are not allowed.";
           throw IException(IException::Unknown, message, _FILEINFO_);
@@ -76,17 +76,17 @@ namespace Isis {
       }
 
       if (MinimumLongitude() < centerLongitude - 90.0) {
-        QString message = "MinimumLongitude ["  
-                          + toString(MinimumLongitude()) 
+        std::string message = "MinimumLongitude ["  
+                          + Isis::toString(MinimumLongitude()) 
                           + "] is invalid. Must be within -90 degrees of the CenterLongitude ["
-                          + toString(centerLongitude) + "].";
+                          + Isis::toString(centerLongitude) + "].";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
       if (MaximumLongitude() > centerLongitude + 90.0) {
-        QString message = "MaximumLongitude ["  
-                          + toString(MaximumLongitude()) 
+        std::string message = "MaximumLongitude ["  
+                          + Isis::toString(MaximumLongitude()) 
                           + "] is invalid. Must be within +90 degrees of the CenterLongitude ["
-                          + toString(centerLongitude) + "].";
+                          + Isis::toString(centerLongitude) + "].";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
 
@@ -95,7 +95,7 @@ namespace Isis {
       init(centerLongitude);
     }
     catch(IException &e) {
-      QString message = "Invalid label group [Mapping]";
+      std::string message = "Invalid label group [Mapping]";
       throw IException(e, IException::Unknown, message, _FILEINFO_);
     }
   }
@@ -682,7 +682,7 @@ namespace Isis {
    */
   PvlGroup UpturnedEllipsoidTransverseAzimuthal::Mapping() {
     PvlGroup mapping = TProjection::Mapping();
-    mapping += PvlKeyword("CenterLongitude", toString(m_lambda0 * RAD2DEG));
+    mapping += PvlKeyword("CenterLongitude", Isis::toString(m_lambda0 * RAD2DEG));
     return mapping;
   }
 
@@ -723,7 +723,7 @@ namespace Isis {
    */
   PvlGroup UpturnedEllipsoidTransverseAzimuthal::MappingLongitudes() {
     PvlGroup mapping = TProjection::MappingLongitudes();
-    mapping += PvlKeyword("CenterLongitude", toString(m_lambda0 * RAD2DEG));
+    mapping += PvlKeyword("CenterLongitude", Isis::toString(m_lambda0 * RAD2DEG));
     return mapping;
   }
 

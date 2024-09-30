@@ -24,7 +24,7 @@ namespace Isis {
 
 
   void apollocal(UserInterface &ui) {
-    Cube cube(ui.GetCubeName("FROM"), "r");
+    Cube cube(ui.GetCubeName("FROM").toStdString(), "r");
     apollocal(&cube, ui);
   }
 
@@ -39,10 +39,11 @@ namespace Isis {
     PvlGroup &dataDir =
         Preference::Preferences().findGroup("DataDirectory");
     PvlTranslationTable tTable("$ISISROOT/appdata/translations/MissionName2DataDir.trn");
-    QString missionDir = dataDir[tTable.Translate("MissionName",
-        (inCube->group("Instrument")).findKeyword("SpacecraftName")[0])][0];
+    QString missionDir = QString::fromStdString(
+      dataDir[tTable.Translate("MissionName", QString::fromStdString(
+        (inCube->group("Instrument")).findKeyword("SpacecraftName")[0])).toStdString()][0]);
     QString camera =
-        (inCube->group("Instrument")).findKeyword("InstrumentId")[0];
+        QString::fromStdString((inCube->group("Instrument")).findKeyword("InstrumentId")[0]);
 
     CubeAttributeInput cai;
     p.SetInputCube(missionDir + "/calibration/" + camera + "_flatfield.cub", cai);
@@ -50,7 +51,7 @@ namespace Isis {
     CubeAttributeOutput cao;
     cao.setPixelType(Real);
     p.SetOutputCube(
-        FileName(ui.GetAsString("TO")).expanded(),
+        QString::fromStdString(FileName(ui.GetAsString("TO").toStdString()).expanded()),
         cao, inCube->sampleCount(), inCube->lineCount(),
         inCube->bandCount());
 

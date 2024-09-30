@@ -46,7 +46,7 @@ namespace Isis {
     try {
       PvlGroup bandBin = lab.findGroup("BandBin", Pvl::Traverse);
       QString key = QString("INS%1_%2_FOCAL_LENGTH").
-                      arg(naifIkCode()).arg(bandBin["FilterName"][0]);
+                      arg(naifIkCode()).arg(QString::fromStdString(bandBin["FilterName"][0]));
       key = key.replace("/", "_");
       focalLength = getDouble(key);
     }
@@ -58,9 +58,9 @@ namespace Isis {
       catch (IException &secondException) {
         PvlGroup bandBin = lab.findGroup("BandBin", Pvl::Traverse);
         IException finalError(IException::Unknown,
-            QString("Unable to find a focal length for the requested Cassini ISS NA "
-                    "filter combination [%1] or the default focal length")
-                        .arg(bandBin["FilterName"][0]),
+            "Unable to find a focal length for the requested Cassini ISS NA "
+                    "filter combination [%1] or the default focal length" +
+                        bandBin["FilterName"][0],
             _FILEINFO_);
         finalError.append(firstException);
         finalError.append(secondException);
@@ -72,12 +72,12 @@ namespace Isis {
 
     SetFocalLength(focalLength);
     SetPixelPitch();
-    instrumentRotation()->SetFrame(Spice::getInteger("INS_" + toString(naifIkCode()) + "_FRAME_ID"));
+    instrumentRotation()->SetFrame(Spice::getInteger("INS_" + QString::number(naifIkCode()) + "_FRAME_ID"));
 
     // Get the start time in et
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    double et = iTime((QString)inst["StartTime"]).Et();
+    double et = iTime(QString::fromStdString(inst["StartTime"])).Et();
 
     // divide exposure duration keyword value by 1000 to convert to seconds
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
@@ -95,11 +95,11 @@ namespace Isis {
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    focalMap->SetDetectorOrigin(Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE"),
-                                Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE"));
+    focalMap->SetDetectorOrigin(Spice::getDouble("INS" + QString::number(naifIkCode()) + "_BORESIGHT_SAMPLE"),
+                                Spice::getDouble("INS" + QString::number(naifIkCode()) + "_BORESIGHT_LINE"));
 
     // Setup distortion map
-    double k1 = Spice::getDouble("INS" + toString(naifIkCode()) + "_K1");
+    double k1 = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_K1");
     new RadialDistortionMap(this, k1);
 
     // Setup the ground and sky map

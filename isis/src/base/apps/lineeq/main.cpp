@@ -45,14 +45,14 @@ void IsisMain() {
   }
 
   PvlGroup data("lineeq");
-  data += PvlKeyword("BoxcarSize", toString(boxcarSize), "lines");
-  data += PvlKeyword("OutputCsv", toString((int)ui.GetBoolean("AVERAGES")));
+  data += PvlKeyword("BoxcarSize", Isis::toString(boxcarSize), "lines");
+  data += PvlKeyword("OutputCsv", Isis::toString((int)ui.GetBoolean("AVERAGES")));
 
   TextFile *csvOutput = NULL;
   if(ui.GetBoolean("AVERAGES")) {
     csvOutput = new TextFile(ui.GetFileName("CSV"), "overwrite", "");
     csvOutput->PutLine("Average,SmoothedAvg");
-    data += PvlKeyword("CsvFile", ui.GetFileName("CSV"));
+    data += PvlKeyword("CsvFile", ui.GetFileName("CSV").toStdString());
   }
 
   Application::Log(data);
@@ -84,7 +84,7 @@ void IsisMain() {
       double filteredLine = filter.Average(line);
 
       if(csvOutput != NULL) {
-        csvOutput->PutLine(toString(lineAverages[band][line]) + (QString)"," + toString(filteredLine));
+        csvOutput->PutLine(QString::number(lineAverages[band][line]) + (QString)"," + QString::number(filteredLine));
       }
 
       lineAverages[band][line] = filteredLine;

@@ -64,20 +64,20 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
 
   for (unsigned int i = 0; i < filter.size(); ++i) {
     //Create a list of all of the files matching the current filter
-    QStringList files = GetFiles(FileName(location), filter[i]);
+    QStringList files = GetFiles(FileName(location.toStdString()), filter[i]);
 
     // Throw an error if no files are being added to this database for
     // this filter/regex
     if (files.size() == 0) {
-      QString message = "Your filter [" + location + "/" + filter[i] + "]"
-                       + "has not detected any " + quality + " kernels";
+      std::string message = "Your filter [" + location.toStdString() + "/" + filter[i].toStdString() + "]"
+                       + "has not detected any " + quality.toStdString() + " kernels";
       throw IException(IException::User, message, _FILEINFO_);
     }
 
     for (int fileNum = 0 ; fileNum < files.size() ; fileNum++) {
-      FileName currFile((QString) location + "/" + files[fileNum]);
+      FileName currFile(location.toStdString() + "/" + files[fileNum].toStdString());
       PvlGroup selection = AddSelection(currFile, startOffset, endOffset);
-      selection += PvlKeyword("Type", quality);
+      selection += PvlKeyword("Type", quality.toStdString());
       result.addGroup(selection);
     }
   }
@@ -90,12 +90,12 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
     if (grp->name() == "No coverage" || grp->name() == "Null") {
       result.deleteGroup(grp->name());
     }
-    else if (grp->name() == p_type) {
+    else if (grp->name() == p_type.toStdString()) {
       grp->setName("Selection");
       grp++;
     }
     else {
-      QString message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + p_type + "]" ;
+      std::string message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + p_type.toStdString() + "]" ;
       throw IException(IException::Programmer, message, _FILEINFO_);
       break;
     }
@@ -137,14 +137,14 @@ PvlObject SpiceDbGen::Direct(QString quality, FileList fileList,
   // Throw an error if no files are being added to this database for
   // this filter/regex
   if (fileList.empty()) {
-    QString message = "Input filelist is empty!";
+    std::string message = "Input filelist is empty!";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
   for (int fileNum = 0 ; fileNum < fileList.size() ; fileNum++) {
     FileName currFile = fileList[fileNum];
     PvlGroup selection = AddSelection(currFile, startOffset, endOffset);
-    selection += PvlKeyword("Type", quality);
+    selection += PvlKeyword("Type", quality.toStdString());
     result.addGroup(selection);
   }
 
@@ -156,12 +156,12 @@ PvlObject SpiceDbGen::Direct(QString quality, FileList fileList,
     if (grp->name() == "No coverage" || grp->name() == "Null") {
       result.deleteGroup(grp->name());
     }
-    else if (grp->name() == p_type) {
+    else if (grp->name() == p_type.toStdString()) {
       grp->setName("Selection");
       grp++;
     }
     else {
-      QString message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + p_type + "]" ;
+      std::string message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + p_type.toStdString() + "]" ;
       throw IException(IException::Programmer, message, _FILEINFO_);
       break;
     }
@@ -197,7 +197,7 @@ PvlObject SpiceDbGen::Direct(QString quality, FileList fileList,
   */
 QStringList SpiceDbGen::GetFiles(FileName location, QString filter) {
   filter.remove("\\");
-  QDir dir(location.expanded(), filter,
+  QDir dir(QString::fromStdString(location.expanded()), filter,
            QDir::Name, QDir::Files);
   return dir.entryList();
 }
@@ -227,7 +227,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
   NaifStatus::CheckErrors();
 
   //finalize the filename so that it may be used in spice routines
-  QString tmp = fileIn.expanded();
+  QString tmp = QString::fromStdString(fileIn.expanded());
   //  const char* file = fileIn.expanded().c_str();
   furnsh_c(tmp.toLatin1().data());
   SpiceChar fileType[32], source[2048];
@@ -331,16 +331,16 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
 
   // add instrument and timing offsets only if timing offsets found in comments
   if (!startoffset.isEmpty() || !endoffset.isEmpty()) {
-    result += PvlKeyword("Instrument", instrument);
+    result += PvlKeyword("Instrument", instrument.toStdString());
     if(!startoffset.isEmpty()){
-      result += PvlKeyword("StartOffset", startoffset);
+      result += PvlKeyword("StartOffset", startoffset.toStdString());
     }
     if(!endoffset.isEmpty()){
-      result += PvlKeyword("EndOffset", endoffset);
+      result += PvlKeyword("EndOffset", endoffset.toStdString());
     }
   }
 
-  QString outFile = fileIn.originalPath();
+  std::string outFile = fileIn.originalPath();
   result += PvlKeyword("File", outFile + "/" + fileIn.name());
 
   NaifStatus::CheckErrors();
@@ -356,7 +356,7 @@ PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type,
                                      double startOffset, double endOffset) {
   NaifStatus::CheckErrors();
 
-  PvlGroup result(type);
+  PvlGroup result(type.toStdString());
   SpiceChar begStr[35], endStr[35];
   //Get the number of intervals in the object.
   int niv = card_c(&coverage) / 2;
@@ -371,8 +371,8 @@ PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type,
     timout_c(begin, calForm, 35, begStr);
     timout_c(end, calForm, 35, endStr);
 
-    result += PvlKeyword("Time", "(\"" + (QString)begStr +
-                         "\", \"" + (QString)endStr + "\")");
+    result += PvlKeyword("Time", "(\"" + (std::string)begStr +
+                         "\", \"" + (std::string)endStr + "\")");
   }
 
   NaifStatus::CheckErrors();
@@ -387,17 +387,17 @@ void SpiceDbGen::FurnishDependencies(QList<FileName> sclks, QList<FileName> lsks
 
   // furnish the lsk files
   foreach (FileName lsk, lsks) {
-    furnsh_c(lsk.expanded().toLatin1().data());
+    furnsh_c(lsk.expanded().c_str());
   }
 
   // furnish the sclk files
   foreach (FileName sclk, sclks) {
-    furnsh_c(sclk.expanded().toLatin1().data());
+    furnsh_c(sclk.expanded().c_str());
   }
 
   // furnish the extra files
   foreach (FileName extra, extras) {
-    furnsh_c(extra.expanded().toLatin1().data());
+    furnsh_c(extra.expanded().c_str());
   }
 
   NaifStatus::CheckErrors();

@@ -195,7 +195,7 @@ namespace Isis {
       p_aberrationCorrection = abcorr;
     }
     else {
-      QString msg = "Invalid abberation correction [" + correction + "]";
+      std::string msg = "Invalid abberation correction [" + correction.toStdString() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -297,17 +297,17 @@ namespace Isis {
   void SpicePosition::LoadCache(double startTime, double endTime, int size) {
     // Make sure cache isn't already loaded
     if(p_source == Memcache || p_source == HermiteCache) {
-      QString msg = "A SpicePosition cache has already been created";
+      std::string msg = "A SpicePosition cache has already been created";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(startTime > endTime) {
-      QString msg = "Argument startTime must be less than or equal to endTime";
+      std::string msg = "Argument startTime must be less than or equal to endTime";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if((startTime != endTime) && (size == 1)) {
-      QString msg = "Cache size must be more than 1 if startTime endTime differ";
+      std::string msg = "Cache size must be more than 1 if startTime endTime differ";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -430,19 +430,19 @@ namespace Isis {
 
     // Make sure cache isn't alread loaded
     if(p_source == Memcache || p_source == HermiteCache) {
-      QString msg = "A SpicePosition cache has already been created";
+      std::string msg = "A SpicePosition cache has already been created";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Load the full cache time information from the label if available
     if(table.Label().hasKeyword("SpkTableStartTime")) {
-      p_fullCacheStartTime = toDouble(table.Label().findKeyword("SpkTableStartTime")[0]);
+      p_fullCacheStartTime = Isis::toDouble(table.Label().findKeyword("SpkTableStartTime")[0]);
     }
     if(table.Label().hasKeyword("SpkTableEndTime")) {
-      p_fullCacheEndTime = toDouble(table.Label().findKeyword("SpkTableEndTime")[0]);
+      p_fullCacheEndTime = Isis::toDouble(table.Label().findKeyword("SpkTableEndTime")[0]);
     }
     if(table.Label().hasKeyword("SpkTableOriginalSize")) {
-      p_fullCacheSize = toDouble(table.Label().findKeyword("SpkTableOriginalSize")[0]);
+      p_fullCacheSize = Isis::toDouble(table.Label().findKeyword("SpkTableOriginalSize")[0]);
     }
 
 
@@ -480,7 +480,7 @@ namespace Isis {
           p_hasVelocity = false;
         }
         else  {
-          QString msg = "Expecting four or seven fields in the SpicePosition table";
+          std::string msg = "Expecting four or seven fields in the SpicePosition table";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -579,7 +579,7 @@ namespace Isis {
       record += t;
 
     // create output table
-      Table table(tableName, record);
+      Table table(tableName.toStdString(), record);
 
       int inext = 0;
 
@@ -619,7 +619,7 @@ namespace Isis {
       record += spacecraftY;
       record += spacecraftZ;
 
-      Table table(tableName, record);
+      Table table(tableName.toStdString(), record);
 
       for(int cindex = 0; cindex < p_degree + 1; cindex++) {
         record[0] = p_coefficients[0][cindex];
@@ -669,20 +669,20 @@ namespace Isis {
       tabletype = "PolyFunction";
     }
 
-    table.Label() += PvlKeyword("CacheType", tabletype);
+    table.Label() += PvlKeyword("CacheType", tabletype.toStdString());
 
     // Write original time coverage
     if(p_fullCacheStartTime != 0) {
       table.Label() += PvlKeyword("SpkTableStartTime");
-      table.Label()["SpkTableStartTime"].addValue(toString(p_fullCacheStartTime));
+      table.Label()["SpkTableStartTime"].addValue(Isis::toString(p_fullCacheStartTime));
     }
     if(p_fullCacheEndTime != 0) {
       table.Label() += PvlKeyword("SpkTableEndTime");
-      table.Label()["SpkTableEndTime"].addValue(toString(p_fullCacheEndTime));
+      table.Label()["SpkTableEndTime"].addValue(Isis::toString(p_fullCacheEndTime));
     }
     if(p_fullCacheSize != 0) {
       table.Label() += PvlKeyword("SpkTableOriginalSize");
-      table.Label()["SpkTableOriginalSize"].addValue(toString(p_fullCacheSize));
+      table.Label()["SpkTableOriginalSize"].addValue(Isis::toString(p_fullCacheSize));
     }
   }
 
@@ -707,7 +707,7 @@ namespace Isis {
     if(p_source >= HermiteCache)  ReloadCache();
 
     if(p_source != Memcache) {
-      QString msg = "Only cached positions can be returned as a line cache of positions and time";
+      std::string msg = "Only cached positions can be returned as a line cache of positions and time";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     // Load the table and return it to caller
@@ -734,7 +734,7 @@ namespace Isis {
 
     // Make sure source is a function
     if(p_source < HermiteCache) {
-      QString msg = "The SpicePosition has not yet been fit to a function";
+      std::string msg = "The SpicePosition has not yet been fit to a function";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -806,7 +806,7 @@ namespace Isis {
 
     // Make sure a polynomial function is already loaded
     if(p_source != PolyFunction) {
-      QString msg = "A SpicePosition polynomial function has not been created yet";
+      std::string msg = "A SpicePosition polynomial function has not been created yet";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1174,7 +1174,7 @@ namespace Isis {
     int coordIndex = partialVar;
 
 //  if(coeffIndex > 2) {
-//    QString msg = "SpicePosition only supports up to a 2nd order fit for the spacecraft position";
+//    std::string msg = "SpicePosition only supports up to a 2nd order fit for the spacecraft position";
 //    throw IException(IException::Programmer, msg, _FILEINFO_);
 //  }
 //
@@ -1252,7 +1252,7 @@ namespace Isis {
       derivative = 1;
     }
     else {
-      QString msg = "Unable to evaluate the derivative of the SPICE position fit polynomial for "
+      std::string msg = "Unable to evaluate the derivative of the SPICE position fit polynomial for "
                     "the given coefficient index [" + toString(coeffIndex) + "]. "
                     "Index is negative or exceeds degree of polynomial ["
                     + toString(p_degree) + "]";
@@ -1271,7 +1271,7 @@ namespace Isis {
       return p_velocity;
     }
     else {
-      QString msg = "No velocity vector available";
+      std::string msg = "No velocity vector available";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

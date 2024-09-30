@@ -107,7 +107,7 @@ namespace Isis {
    */
   void ProcessExportPds4::CreateImageLabel() {
     if (InputCubes.size() == 0) {
-      QString msg("Must set an input cube before creating a PDS4 label.");
+      std::string msg("Must set an input cube before creating a PDS4 label.");
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if (m_domDoc->documentElement().isNull()) {
@@ -125,7 +125,7 @@ namespace Isis {
       identificationArea();
     }
     catch (IException &e) {
-      QString msg = "Unable to translate and export identification information.";
+      std::string msg = "Unable to translate and export identification information.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     try {
@@ -134,7 +134,7 @@ namespace Isis {
       standardInstrument();
     }
     catch (IException &e) {
-      QString msg = "Unable to translate and export instrument information.";
+      std::string msg = "Unable to translate and export instrument information.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     try {
@@ -145,7 +145,7 @@ namespace Isis {
       displaySettings();
     }
     catch (IException &e) {
-      QString msg = "Unable to translate and export display settings.";
+      std::string msg = "Unable to translate and export display settings.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -157,7 +157,7 @@ namespace Isis {
       standardBandBin();
     }
     catch (IException &e) {
-      QString msg = "Unable to translate and export spectral information.";
+      std::string msg = "Unable to translate and export spectral information.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -169,7 +169,7 @@ namespace Isis {
       StandardAllMapping();
     }
     catch (IException &e) {
-      QString msg = "Unable to translate and export mapping group.";
+      std::string msg = "Unable to translate and export mapping group.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     try {
@@ -178,7 +178,7 @@ namespace Isis {
       fileAreaObservational();
     }
     catch (IException &e) {
-      QString msg = "Unable to translate and export standard image information.";
+      std::string msg = "Unable to translate and export standard image information.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -196,7 +196,7 @@ namespace Isis {
 
       // Translate the Instrument group
       translationFileName = "$ISISROOT/appdata/translations/pds4ExportInstrument.trn";
-      PvlToXmlTranslationManager instXlator(*inputLabel, translationFileName.expanded());
+      PvlToXmlTranslationManager instXlator(*inputLabel, QString::fromStdString(translationFileName.expanded()));
       instXlator.Auto(*m_domDoc);
 
       // If instrument and spacecraft values were translated, create the combined name
@@ -258,7 +258,8 @@ namespace Isis {
 
       // Translate the Target name
       translationFileName = "$ISISROOT/appdata/translations/pds4ExportTargetFromInstrument.trn";
-      PvlToXmlTranslationManager targXlator(*inputLabel, translationFileName.expanded());
+      PvlToXmlTranslationManager targXlator(*inputLabel, QString::fromStdString(translationFileName.expanded())
+);
       targXlator.Auto(*m_domDoc);
 
       // Move target to just below Observing_System.
@@ -268,7 +269,8 @@ namespace Isis {
     else if (inputLabel->findObject("IsisCube").hasGroup("Mapping")) {
 
       translationFileName = "$ISISROOT/appdata/translations/pds4ExportTargetFromMapping.trn";
-      PvlToXmlTranslationManager targXlator(*inputLabel, translationFileName.expanded());
+      PvlToXmlTranslationManager targXlator(*inputLabel, QString::fromStdString(translationFileName.expanded())
+);
       targXlator.Auto(*m_domDoc);
     }
     else {
@@ -463,7 +465,8 @@ namespace Isis {
     Pvl *inputLabel = InputCubes[0]->label();
     FileName translationFileName;
     translationFileName = "$ISISROOT/appdata/translations/pds4ExportIdentificationArea.trn";
-    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
+    PvlToXmlTranslationManager xlator(*inputLabel, QString::fromStdString(translationFileName.expanded())
+);
     xlator.Auto(*m_domDoc);
 
     if (m_lid.isEmpty()) {
@@ -481,7 +484,7 @@ namespace Isis {
       }
     }
     catch(IException &e) {
-      QString msg = "Could not find Identification_Area element "
+      std::string msg = "Could not find Identification_Area element "
                     "to add modification history under.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -504,7 +507,7 @@ namespace Isis {
     // the Application::Version() return value.
     QRegularExpression versionRegex(" \\| \\d{4}\\-\\d{2}\\-\\d{2}");
     QString historyDescription = "Created PDS4 output product from ISIS cube with the "
-                                 + FileName(Application::Name()).baseName()
+                                 + QString::fromStdString(FileName(Application::Name().toStdString()).baseName())
                                  + " application from ISIS version "
                                  + Application::Version().remove(versionRegex) + ".";
     // This regular expression matches the time from the Application::DateTime return value.
@@ -528,7 +531,8 @@ namespace Isis {
     Pvl *inputLabel = InputCubes[0]->label();
     FileName translationFileName;
     translationFileName = "$ISISROOT/appdata/translations/pds4ExportDisplaySettings.trn";
-    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
+    PvlToXmlTranslationManager xlator(*inputLabel, QString::fromStdString(translationFileName.expanded())
+);
     xlator.Auto(*m_domDoc);
   }
 
@@ -572,8 +576,9 @@ namespace Isis {
   void ProcessExportPds4::translateBandBinImage(Pvl &inputLabel) {
     QString translationFile = "$ISISROOT/appdata/translations/";
     translationFile += "pds4ExportBandBinImage.trn";
-    FileName translationFileName(translationFile);
-    PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
+    FileName translationFileName(translationFile.toStdString());
+    PvlToXmlTranslationManager xlator(inputLabel, QString::fromStdString(translationFileName.expanded())
+);
     xlator.Auto(*m_domDoc);
   }
 
@@ -584,8 +589,9 @@ namespace Isis {
   void ProcessExportPds4::translateBandBinSpectrumUniform(Pvl &inputLabel) {
     QString translationFile = "$ISISROOT/appdata/translations/";
     translationFile += "pds4ExportBandBinSpectrumUniform.trn";
-    FileName translationFileName(translationFile);
-    PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
+    FileName translationFileName(translationFile.toStdString());
+    PvlToXmlTranslationManager xlator(inputLabel, QString::fromStdString(translationFileName.expanded())
+);
     xlator.Auto(*m_domDoc);
 
     PvlGroup bandBinGroup = inputLabel.findObject("IsisCube").findGroup("BandBin");
@@ -610,7 +616,7 @@ namespace Isis {
       center = bandBinGroup["FilterCenter"];
     }
     else {
-      QString msg = "Unable to translate BandBin info for BinSetSpectrum. "
+      std::string msg = "Unable to translate BandBin info for BinSetSpectrum. "
                     "Translation for PDS4 required value [center_value] not found.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -622,19 +628,19 @@ namespace Isis {
       width = bandBinGroup["FilterWidth"];
     }
     else {
-      QString msg = "Unable to translate BandBin info for BinSetSpectrum. "
+      std::string msg = "Unable to translate BandBin info for BinSetSpectrum. "
                     "Translation for PDS4 required value [bin_width] not found.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    QString units = center.unit();
+    QString units = QString::fromStdString(center.unit());
 
-    if (!width.unit().isEmpty() ) {
+    if (!QString::fromStdString(width.unit()).isEmpty() ) {
       if (units.isEmpty()) {
-        units = width.unit();
+        units = QString::fromStdString(width.unit());
       }
-      if (units.compare(width.unit(), Qt::CaseInsensitive) != 0) {
-        QString msg = "Unable to translate BandBin info for BinSetSpectrum. "
+      if (units.compare(QString::fromStdString(width.unit()), Qt::CaseInsensitive) != 0) {
+        std::string msg = "Unable to translate BandBin info for BinSetSpectrum. "
                       "Unknown or unmatching units for [center_value] and [bin_width].";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -678,26 +684,26 @@ namespace Isis {
       axisBinSetElement.appendChild(bin);
 
       QDomElement binSequenceNumber = m_domDoc->createElement("sp:bin_sequence_number");
-      PvlToXmlTranslationManager::setElementValue(binSequenceNumber, toString(i+1));
+      PvlToXmlTranslationManager::setElementValue(binSequenceNumber, QString::fromStdString(toString(i+1)));
       bin.appendChild(binSequenceNumber);
 
 
       QDomElement centerValue = m_domDoc->createElement("sp:center_value");
-      PvlToXmlTranslationManager::setElementValue(centerValue, center[i], units);
+      PvlToXmlTranslationManager::setElementValue(centerValue, QString::fromStdString(center[i]), units);
       bin.appendChild(centerValue);
 
       QDomElement binWidth = m_domDoc->createElement("sp:bin_width");
       if (width.size() == bands) {
-        PvlToXmlTranslationManager::setElementValue(binWidth, width[i] , units);
+        PvlToXmlTranslationManager::setElementValue(binWidth, QString::fromStdString(width[i]), units);
       }
       else {
-        PvlToXmlTranslationManager::setElementValue(binWidth, width[0] , units);
+        PvlToXmlTranslationManager::setElementValue(binWidth, QString::fromStdString(width[0]), units);
       }
       bin.appendChild(binWidth);
 
       QDomElement originalBinNumber = m_domDoc->createElement("sp:original_bin_number");
       if (originalBand.size() > 0) {
-        PvlToXmlTranslationManager::setElementValue(originalBinNumber, originalBand[i]);
+        PvlToXmlTranslationManager::setElementValue(originalBinNumber, QString::fromStdString(originalBand[i]));
         bin.appendChild(originalBinNumber);
       }
 
@@ -706,12 +712,12 @@ namespace Isis {
         bin.appendChild(filter);
         if (name.size() > 0) {
           QDomElement filterName = m_domDoc->createElement("sp:filter_name");
-          PvlToXmlTranslationManager::setElementValue(filterName, name[i]);
+          PvlToXmlTranslationManager::setElementValue(filterName, QString::fromStdString(name[i]));
           filter.appendChild(filterName);
         }
         if (number.size() > 0) {
           QDomElement filterNumber= m_domDoc->createElement("sp:filter_number");
-          PvlToXmlTranslationManager::setElementValue(filterNumber, number[i]);
+          PvlToXmlTranslationManager::setElementValue(filterNumber, QString::fromStdString(number[i]));
           filter.appendChild(filterNumber);
         }
       }
@@ -726,8 +732,9 @@ namespace Isis {
   void ProcessExportPds4::translateBandBinSpectrumBinSet(Pvl &inputLabel) {
     QString translationFile = "$ISISROOT/appdata/translations/";
     translationFile += "pds4ExportBandBinSpectrumBinSet.trn";
-    FileName translationFileName(translationFile);
-    PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
+    FileName translationFileName(translationFile.toStdString());
+    PvlToXmlTranslationManager xlator(inputLabel, QString::fromStdString(translationFileName.expanded())
+);
     xlator.Auto(*m_domDoc);
 
     PvlGroup bandBinGroup = inputLabel.findObject("IsisCube").findGroup("BandBin");
@@ -766,11 +773,11 @@ namespace Isis {
       center = bandBinGroup["Center"];
     }
     else {
-      QString msg = "Unable to translate BandBin info for UniformlySpacedSpectrum. "
+      std::string msg = "Unable to translate BandBin info for UniformlySpacedSpectrum. "
                     "Translation for PDS4 required value [last_center_value] not found.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    QString lastCenter = center[center.size() - 1];
+    QString lastCenter = QString::fromStdString(center[center.size() - 1]);
 
     QDomElement axisBinSetElement = spectralCharElement.firstChildElement("sp:Axis_Uniformly_Sampled");
     if (axisBinSetElement.isNull()) {
@@ -828,9 +835,10 @@ namespace Isis {
       }
     }
     translationFile += ".trn";
-    FileName translationFileName(translationFile);
+    FileName translationFileName(translationFile.toStdString());
 
-    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
+    PvlToXmlTranslationManager xlator(*inputLabel, QString::fromStdString(translationFileName.expanded())
+);
     xlator.Auto(*m_domDoc);
 
     QDomElement rootElement = m_domDoc->documentElement();
@@ -887,12 +895,12 @@ namespace Isis {
 
         QDomElement scalingFactorElement = m_domDoc->createElement("scaling_factor");
         PvlToXmlTranslationManager::setElementValue(scalingFactorElement,
-                                                    toString(multiplier));
+                                                    QString::fromStdString(Isis::toString(multiplier)));
         elementArrayElement.appendChild(scalingFactorElement);
 
         QDomElement offsetElement = m_domDoc->createElement("value_offset");
         PvlToXmlTranslationManager::setElementValue(offsetElement,
-                                                    toString(base));
+                                                    QString::fromStdString(Isis::toString(base)));
         elementArrayElement.appendChild(offsetElement);
       }
 
@@ -904,89 +912,89 @@ namespace Isis {
       switch (p_pixelType) {
         case Real:
           { QDomElement nullElement = m_domDoc->createElement("missing_constant");
-          PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL4, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(nullElement, QString::fromStdString(toString(NULL4, 18)));
           specialConstantElement.appendChild(nullElement);
 
           QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
-          PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT4, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::fromStdString(toString(HIGH_INSTR_SAT4, 18)));
           specialConstantElement.appendChild(highInstrumentSatElement);
 
           QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
-          PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SAT4, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::fromStdString(toString(HIGH_REPR_SAT4, 18)));
           specialConstantElement.appendChild(highRepresentationSatElement);
 
           QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
-          PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SAT4, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::fromStdString(toString(LOW_INSTR_SAT4, 18)));
           specialConstantElement.appendChild(lowInstrumentSatElement);
 
           QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
-          PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT4, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::fromStdString(toString(LOW_REPR_SAT4, 18)));
           specialConstantElement.appendChild(lowRepresentationSatElement);
           break;}
 
         case UnsignedByte:
           { QDomElement nullElement = m_domDoc->createElement("missing_constant");
-          PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL1, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(nullElement, QString::fromStdString(toString(NULL1, 18)));
           specialConstantElement.appendChild(nullElement);
 
           QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
-          PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT1, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::fromStdString(toString(HIGH_INSTR_SAT1, 18)));
           specialConstantElement.appendChild(highInstrumentSatElement);
 
           QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
-          PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SAT1, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::fromStdString(toString(HIGH_REPR_SAT1, 18)));
           specialConstantElement.appendChild(highRepresentationSatElement);
 
           QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
-          PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SAT1, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::fromStdString(toString(LOW_INSTR_SAT1, 18)));
           specialConstantElement.appendChild(lowInstrumentSatElement);
 
           QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
-          PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT1, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::fromStdString(toString(LOW_REPR_SAT1, 18)));
           specialConstantElement.appendChild(lowRepresentationSatElement);
           break; }
 
         case SignedWord:
           { QDomElement nullElement = m_domDoc->createElement("missing_constant");
-          PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL2, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(nullElement, QString::fromStdString(toString(NULL2, 18)));
           specialConstantElement.appendChild(nullElement);
 
           QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
-          PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT2, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::fromStdString(toString(HIGH_INSTR_SAT2, 18)));
           specialConstantElement.appendChild(highInstrumentSatElement);
 
           QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
-          PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SAT2, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::fromStdString(toString(HIGH_REPR_SAT2, 18)));
           specialConstantElement.appendChild(highRepresentationSatElement);
 
           QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
-          PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SAT2, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::fromStdString(toString(LOW_INSTR_SAT2, 18)));
           specialConstantElement.appendChild(lowInstrumentSatElement);
 
           QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
-          PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT2, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::fromStdString(toString(LOW_REPR_SAT2, 18)));
           specialConstantElement.appendChild(lowRepresentationSatElement);
           break; }
 
         case UnsignedWord:
           { QDomElement nullElement = m_domDoc->createElement("missing_constant");
-          PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULLU2, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(nullElement, QString::fromStdString(toString(NULLU2, 18)));
           specialConstantElement.appendChild(nullElement);
 
           QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
-          PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SATU2, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::fromStdString(toString(HIGH_INSTR_SATU2, 18)));
           specialConstantElement.appendChild(highInstrumentSatElement);
 
           QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
-          PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SATU2, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::fromStdString(toString(HIGH_REPR_SATU2, 18)));
           specialConstantElement.appendChild(highRepresentationSatElement);
 
           QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
-          PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SATU2, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::fromStdString(toString(LOW_INSTR_SATU2, 18)));
           specialConstantElement.appendChild(lowInstrumentSatElement);
 
           QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
-          PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SATU2, 'g', 18));
+          PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::fromStdString(toString(LOW_REPR_SATU2, 18)));
           specialConstantElement.appendChild(lowRepresentationSatElement);
           break; }
 
@@ -1064,7 +1072,7 @@ namespace Isis {
    * @param[out] os file stream to which the XML label will be written.
    */
   void ProcessExportPds4::OutputLabel(std::ofstream &os) {
-    os << m_domDoc->toString() << endl;
+    os << m_domDoc->toString().toStdString() << endl;
   }
 
 
@@ -1109,19 +1117,19 @@ namespace Isis {
    */
   void ProcessExportPds4::WritePds4(QString outFile) {
 
-    FileName outputFile(outFile);
+    FileName outputFile(outFile.toStdString());
 
     // Name for output label
-    QString path(outputFile.originalPath());
-    QString name(outputFile.baseName());
+    QString path(QString::fromStdString(outputFile.originalPath()));
+    QString name(QString::fromStdString(outputFile.baseName()));
     QString labelName = path + "/" + name + ".xml";
 
     // Name for output image
-    QString imageName = outputFile.expanded();
+    QString imageName = QString::fromStdString(outputFile.expanded());
 
     // If input file ends in .xml, the user entered a label name for the output file, not an
     // image name with a unique file extension.
-    if (QString::compare(outputFile.extension(), "xml", Qt::CaseInsensitive) == 0) {
+    if (QString::compare(QString::fromStdString(outputFile.extension()), "xml", Qt::CaseInsensitive) == 0) {
       imageName = path + "/" + name + ".img";
     }
 
@@ -1134,7 +1142,7 @@ namespace Isis {
                                               fileAreaObservationalElement.firstChildElement());
 
     QDomElement fileNameElement = m_domDoc->createElement("file_name");
-    PvlToXmlTranslationManager::setElementValue(fileNameElement, outputFile.name());
+    PvlToXmlTranslationManager::setElementValue(fileNameElement, QString::fromStdString(outputFile.name()));
     fileElement.appendChild(fileNameElement);
 
 //    QDomElement creationElement = m_domDoc->createElement("creation_date_time");
@@ -1183,7 +1191,7 @@ namespace Isis {
       xlatorSpecProj.Auto(*m_domDoc);
     }
     catch (IException &e) {
-      QString msg = "Unable to export projection [" + projName + "] to PDS4 product. " +
+      std::string msg = "Unable to export projection [" + projName.toStdString() + "] to PDS4 product. " +
                      "This projection is not supported in ISIS3.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
@@ -1208,9 +1216,9 @@ namespace Isis {
       if( units.compare("km", Qt::CaseInsensitive) != 0 && units.compare("kilometers", Qt::CaseInsensitive) != 0) {
 
         //if no units, assume in meters
-        double dValue = toDouble(semiMajorRadElement.text());
+        double dValue = toDouble(semiMajorRadElement.text().toStdString());
         dValue /= 1000.0;
-        PvlToXmlTranslationManager::resetElementValue(semiMajorRadElement, toString(dValue), "km");
+        PvlToXmlTranslationManager::resetElementValue(semiMajorRadElement, QString::fromStdString(toString(dValue)), "km");
       }
     }
 
@@ -1220,9 +1228,9 @@ namespace Isis {
       QString units = semiMinorRadElement.attribute("unit");
       if( units.compare("km", Qt::CaseInsensitive) != 0 && units.compare("kilometers", Qt::CaseInsensitive) != 0) {
         // If no units, assume in meters
-        double dValue = toDouble(semiMinorRadElement.text());
+        double dValue = toDouble(semiMinorRadElement.text().toStdString());
         dValue /= 1000.0;
-        PvlToXmlTranslationManager::resetElementValue(semiMinorRadElement, toString(dValue), "km");
+        PvlToXmlTranslationManager::resetElementValue(semiMinorRadElement, QString::fromStdString(toString(dValue)), "km");
       }
     }
 
@@ -1231,14 +1239,14 @@ namespace Isis {
       QString units = polarRadElement.attribute("unit");
       if( units.compare("km", Qt::CaseInsensitive) != 0 && units.compare("kilometers", Qt::CaseInsensitive) != 0) {
         // If no units, assume in meters
-        double dValue = toDouble(polarRadElement.text());
+        double dValue = toDouble(polarRadElement.text().toStdString());
         dValue /= 1000.0;
-        PvlToXmlTranslationManager::resetElementValue(polarRadElement, toString(dValue), "km");
+        PvlToXmlTranslationManager::resetElementValue(polarRadElement, QString::fromStdString(toString(dValue)), "km");
       }
     }
 
     PvlKeyword &isisLonDir = inputMapping.findKeyword("LongitudeDirection");
-    QString lonDir = isisLonDir[0];
+    QString lonDir = QString::fromStdString(isisLonDir[0]);
     lonDir = lonDir.toUpper();
 
     // Add Lat/Lon range
@@ -1262,16 +1270,16 @@ namespace Isis {
     // so if positive east, swap min/max
     if(QString::compare(lonDir, "PositiveEast", Qt::CaseInsensitive) == 0) {
       // west min, east max
-      PvlToXmlTranslationManager::resetElementValue(eastElement, toString(maxLon), "deg");
-      PvlToXmlTranslationManager::resetElementValue(westElement, toString(minLon), "deg");
+      PvlToXmlTranslationManager::resetElementValue(eastElement, QString::fromStdString(toString(maxLon)), "deg");
+      PvlToXmlTranslationManager::resetElementValue(westElement, QString::fromStdString(toString(minLon)), "deg");
     }
     else {
-      PvlToXmlTranslationManager::resetElementValue(eastElement, toString(minLon), "deg");
-      PvlToXmlTranslationManager::resetElementValue(westElement, toString(maxLon), "deg");
+      PvlToXmlTranslationManager::resetElementValue(eastElement, QString::fromStdString(toString(minLon)), "deg");
+      PvlToXmlTranslationManager::resetElementValue(westElement, QString::fromStdString(toString(maxLon)), "deg");
     }
 
-    PvlToXmlTranslationManager::resetElementValue(northElement, toString(maxLat), "deg");
-    PvlToXmlTranslationManager::resetElementValue(southElement, toString(minLat), "deg");
+    PvlToXmlTranslationManager::resetElementValue(northElement, QString::fromStdString(toString(maxLat)), "deg");
+    PvlToXmlTranslationManager::resetElementValue(southElement, QString::fromStdString(toString(minLat)), "deg");
 
     // longitude_of_central_meridian and latitude_of_projection_origin need to be converted to floats.
     xmlPath.clear();
@@ -1297,12 +1305,12 @@ namespace Isis {
 
     // Only update the ouput formatting if there are no digits after the decimal point.
     if (!longitudeElement.text().contains('.')) {
-      QString toset1 = QString::number(longitudeElementValue, 'f', 1);
+      QString toset1 = QString::fromStdString(toString(longitudeElementValue, 1));
       PvlToXmlTranslationManager::resetElementValue(longitudeElement, toset1, "deg");
     }
 
     if (!originElement.text().contains('.')) {
-      QString toset2 = QString::number(originElementValue, 'f', 1);
+      QString toset2 = QString::fromStdString(toString(originElementValue, 1));
       PvlToXmlTranslationManager::resetElementValue(originElement, toset2, "deg");
     }
   }
@@ -1330,12 +1338,12 @@ namespace Isis {
       baseElement = m_domDoc->documentElement();
     }
     if (baseElement.isNull()) {
-      QString msg = "Unable to get element from empty XML document.";
+      std::string msg = "Unable to get element from empty XML document.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     QString parentName = xmlPath[0];
     if (parentName != baseElement.tagName()) {
-      QString msg = "The tag name of the parent element passed in "
+      std::string msg = "The tag name of the parent element passed in "
                     "must be the first value in the given XML path.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1380,7 +1388,7 @@ namespace Isis {
       pds4Type = "IEEE754LSBSingle";
     }
     else {
-      QString msg = "Unsupported PDS pixel type or sample size";
+      std::string msg = "Unsupported PDS pixel type or sample size";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     return pds4Type;
@@ -1409,7 +1417,7 @@ namespace Isis {
       }
     }
     catch(IException &e) {
-      QString msg = "Could not find Identification_Area element "
+      std::string msg = "Could not find Identification_Area element "
                     "to add modification history under.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1464,10 +1472,10 @@ namespace Isis {
   void ProcessExportPds4::translateUnits(QDomDocument &label, QString transMapFile) {
     Pvl configPvl;
     try {
-      configPvl.read(transMapFile);
+      configPvl.read(transMapFile.toStdString());
     }
     catch(IException &e) {
-      QString msg = "Failed to read unit translation config file [" + transMapFile + "].";
+      std::string msg = "Failed to read unit translation config file [" + transMapFile.toStdString() + "].";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
@@ -1476,7 +1484,7 @@ namespace Isis {
       transMap = createUnitMap(configPvl);
     }
     catch(IException &e) {
-      QString msg = "Failed to load unit translation config file [" + transMapFile + "].";
+      std::string msg = "Failed to load unit translation config file [" + transMapFile.toStdString() + "].";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -1486,7 +1494,7 @@ namespace Isis {
       translateChildUnits( label.documentElement(), transMap );
     }
     catch(IException &e) {
-      QString msg = "Failed to translate units with config file [" + transMapFile + "].";
+      std::string msg = "Failed to translate units with config file [" + transMapFile.toStdString() + "].";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
@@ -1509,19 +1517,19 @@ namespace Isis {
       for (int j = 0; j < unitObject.groups(); j++) {
         PvlGroup unitGroup = unitObject.group(j);
         if (!unitGroup.hasKeyword("PDS4_Unit")) {
-          QString msg = "No PDS4 standard specified for for [" + unitGroup.name() + "]";
+          std::string msg = "No PDS4 standard specified for for [" + unitGroup.name() + "]";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         PvlKeyword pds4Key = unitGroup["PDS4_Unit"];
         // Add the PDS4 format for when the format is already correct.
         // This also handles case issues such as KM instead of km.
-        transMap.insert(pds4Key[0].toLower(), pds4Key[0]);
+        transMap.insert(QString::fromStdString(pds4Key[0]).toLower(), QString::fromStdString(pds4Key[0]));
 
         // If there are ISIS versions with different formats then add those.
         if (unitGroup.hasKeyword("ISIS_Units")) {
           PvlKeyword isisKey = unitGroup["ISIS_Units"];
           for (int k = 0; k < isisKey.size() ; k++) {
-            transMap.insert(isisKey[k].toLower(), pds4Key[0]);
+            transMap.insert(QString::fromStdString(isisKey[k]).toLower(), QString::fromStdString(pds4Key[0]));
           }
         }
       }
@@ -1552,7 +1560,7 @@ namespace Isis {
           childElement.setAttribute("unit", transMap.value( originalUnit.toLower() ) );
         }
         else {
-          QString msg = "Could not translate unit [" + originalUnit + "] to PDS4 format.";
+          std::string msg = "Could not translate unit [" + originalUnit.toStdString() + "] to PDS4 format.";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }

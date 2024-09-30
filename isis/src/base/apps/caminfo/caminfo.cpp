@@ -61,14 +61,14 @@ namespace Isis{
       PvlObject params("Caminfo");
       PvlObject common("Parameters");
       for(int i = 0; i < general->size(); i++)
-        common += PvlKeyword((*general)[i].first, (*general)[i].second);
+        common += PvlKeyword((*general)[i].first.toStdString(), (*general)[i].second.toStdString());
       params.addObject(common);
 
       // Add the camstats
       if(camstats) {
         PvlObject pcband("Camstats");
         for(int i = 0; i < camstats->size(); i++)
-          pcband += ValidateKey((*camstats)[i].first, toDouble((*camstats)[i].second));
+          pcband += ValidateKey((*camstats)[i].first, (*camstats)[i].second.toDouble());
         params.addObject(pcband);
       }
 
@@ -88,8 +88,8 @@ namespace Isis{
           params.addObject(p);
         }
         else {
-          QString msg = "Could not find OriginalLabel "
-                        "in input file [" + incube->fileName() + "].";
+          std::string msg = "Could not find OriginalLabel "
+                        "in input file [" + incube->fileName().toStdString() + "].";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
@@ -98,7 +98,7 @@ namespace Isis{
       if(statistics) {
         PvlObject sgroup("Statistics");
         for(int i = 0; i < statistics->size(); i++)
-          sgroup += ValidateKey((*statistics)[i].first, toDouble((*statistics)[i].second));
+          sgroup += ValidateKey((*statistics)[i].first, (*statistics)[i].second.toDouble());
         params.addObject(sgroup);
       }
 
@@ -123,9 +123,9 @@ namespace Isis{
       pout.addObject(params);
 
       if(ui.GetBoolean("APPEND"))
-        pout.append(outFile);
+        pout.append(outFile.toStdString());
       else
-        pout.write(outFile);
+        pout.write(outFile.toStdString());
     }
 
 
@@ -147,7 +147,7 @@ namespace Isis{
       // Output the result
       fstream outFile;
       QString sOutFile = ui.GetAsString("TO");
-      bool appending = ui.GetBoolean("APPEND") && FileName(sOutFile).fileExists();
+      bool appending = ui.GetBoolean("APPEND") && FileName(sOutFile.toStdString()).fileExists();
       if(appending)
         outFile.open(sOutFile.toLatin1().data(), std::ios::out | std::ios::app);
       else
@@ -181,17 +181,17 @@ namespace Isis{
         PvlObject geomGrp("Geometry");
         bandGeom->generateGeometryKeys(geomGrp);
         for(int i = 0; i < geomGrp.keywords(); i++) {
-          if(not appending) keys += "Geom_" + geomGrp[i].name() + delim;
-          values += geomGrp[i][0] + delim;
+          if(not appending) keys += "Geom_" + QString::fromStdString(geomGrp[i].name()) + delim;
+          values += QString::fromStdString(geomGrp[i][0]) + delim;
         }
       }
 
       if (not appending) {
         keys.remove(QRegExp(delim + "$")); // Get rid of the extra delim char (",")
-        outFile << keys << endl;
+        outFile << keys.toStdString() << endl;
       }
       values.remove(QRegExp(delim + "$")); // Get rid of the extra delim char (",")
-      outFile << values << endl;
+      outFile << values.toStdString() << endl;
       outFile.close();
     }
 
@@ -217,7 +217,7 @@ namespace Isis{
         QString sFormat = ui.GetAsString("FORMAT");
 
         if (!ui.GetBoolean("CAMSTATS") && ui.GetBoolean("USECAMSTATSTBL")){
-          QString msg = "[CAMSTATS] must be set to true when using [USECAMSTATSTBL].";
+          std::string msg = "[CAMSTATS] must be set to true when using [USECAMSTATSTBL].";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
@@ -237,7 +237,7 @@ namespace Isis{
         }
 
         if (incube->hasGroup("Mapping")) {
-          QString msg = "Caminfo expects a level 1 input cube. For more information, see:\n"
+          std::string msg = "Caminfo expects a level 1 input cube. For more information, see:\n"
           "https://isis.astrogeology.usgs.gov/documents/Glossary/Glossary.html#Level1";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
@@ -248,10 +248,10 @@ namespace Isis{
         general->append(MakePair("IsisVersion", Application::Version()));
         general->append(MakePair("RunDate",     iTime::CurrentGMT()));
         general->append(MakePair("IsisId",      SerialNumber::Compose(*incube)));
-        general->append(MakePair("From",        FileName(incube->fileName()).baseName() + ".cub"));
-        general->append(MakePair("Lines",       toString(incube->lineCount())));
-        general->append(MakePair("Samples",     toString(incube->sampleCount())));
-        general->append(MakePair("Bands",       toString(incube->bandCount())));
+        general->append(MakePair("From",        QString::fromStdString(FileName(incube->fileName().toStdString()).baseName() + ".cub")));
+        general->append(MakePair("Lines",       QString::fromStdString(toString(incube->lineCount()))));
+        general->append(MakePair("Samples",     QString::fromStdString(toString(incube->sampleCount()))));
+        general->append(MakePair("Bands",       QString::fromStdString(toString(incube->bandCount()))));
 
 
         // Extracts camstat data from existing CameraStatistics Table in cube label
@@ -262,7 +262,7 @@ namespace Isis{
           Table csTable = incube->readTable("CameraStatistics");
 
           for (int rec = 0; rec < csTable.Records(); rec++) {
-            QString tableRec = TableRecord::toString(csTable[rec]);
+            QString tableRec = QString::fromStdString(TableRecord::toString(csTable[rec]));
             QString recordName = tableRec.split(",").at(0);
 
             camstats->append(MakePair(recordName + "Minimum", tableRec.split(",").at(1)));
@@ -308,36 +308,36 @@ namespace Isis{
 
           // Add keywords for backwards comaptibility
           PvlGroup cg = camPvl.findGroup("Latitude", Pvl::Traverse);
-          camstats->append(MakePair("MinimumLatitude", cg["latitudeminimum"][0]));
-          camstats->append(MakePair("MaximumLatitude", cg["latitudemaximum"][0]));
+          camstats->append(MakePair("MinimumLatitude", QString::fromStdString(cg["latitudeminimum"][0])));
+          camstats->append(MakePair("MaximumLatitude", QString::fromStdString(cg["latitudemaximum"][0])));
 
           cg = camPvl.findGroup("Longitude", Pvl::Traverse);
-          camstats->append(MakePair("MinimumLongitude", cg["longitudeminimum"][0]));
-          camstats->append(MakePair("MaximumLongitude", cg["longitudemaximum"][0]));
+          camstats->append(MakePair("MinimumLongitude", QString::fromStdString(cg["longitudeminimum"][0])));
+          camstats->append(MakePair("MaximumLongitude", QString::fromStdString(cg["longitudemaximum"][0])));
 
           cg = camPvl.findGroup("Resolution", Pvl::Traverse);
-          camstats->append(MakePair("MinimumResolution", cg["resolutionminimum"][0]));
-          camstats->append(MakePair("MaximumResolution", cg["resolutionmaximum"][0]));
+          camstats->append(MakePair("MinimumResolution", QString::fromStdString(cg["resolutionminimum"][0])));
+          camstats->append(MakePair("MaximumResolution", QString::fromStdString(cg["resolutionmaximum"][0])));
 
           cg = camPvl.findGroup("PhaseAngle", Pvl::Traverse);
-          camstats->append(MakePair("MinimumPhase", cg["phaseminimum"][0]));
-          camstats->append(MakePair("MaximumPhase", cg["phasemaximum"][0]));
+          camstats->append(MakePair("MinimumPhase", QString::fromStdString(cg["phaseminimum"][0])));
+          camstats->append(MakePair("MaximumPhase", QString::fromStdString(cg["phasemaximum"][0])));
 
           cg = camPvl.findGroup("EmissionAngle", Pvl::Traverse);
-          camstats->append(MakePair("MinimumEmission", cg["emissionminimum"][0]));
-          camstats->append(MakePair("MaximumEmission", cg["emissionmaximum"][0]));
+          camstats->append(MakePair("MinimumEmission", QString::fromStdString(cg["emissionminimum"][0])));
+          camstats->append(MakePair("MaximumEmission", QString::fromStdString(cg["emissionmaximum"][0])));
 
           cg = camPvl.findGroup("IncidenceAngle", Pvl::Traverse);
-          camstats->append(MakePair("MinimumIncidence", cg["incidenceminimum"][0]));
-          camstats->append(MakePair("MaximumIncidence", cg["incidencemaximum"][0]));
+          camstats->append(MakePair("MinimumIncidence", QString::fromStdString(cg["incidenceminimum"][0])));
+          camstats->append(MakePair("MaximumIncidence", QString::fromStdString(cg["incidencemaximum"][0])));
 
           cg = camPvl.findGroup("LocalSolarTime", Pvl::Traverse);
-          camstats->append(MakePair("LocalTimeMinimum", cg["localsolartimeMinimum"][0]));
-          camstats->append(MakePair("LocalTimeMaximum", cg["localsolartimeMaximum"][0]));
+          camstats->append(MakePair("LocalTimeMinimum", QString::fromStdString(cg["localsolartimeMinimum"][0])));
+          camstats->append(MakePair("LocalTimeMaximum", QString::fromStdString(cg["localsolartimeMaximum"][0])));
 
           cg = camPvl.findGroup("ObliqueResolution", Pvl::Traverse);
-          camstats->append(MakePair("ObliqueResolutionMinimum", cg["ObliqueResolutionMinimum"][0]));
-          camstats->append(MakePair("ObliqueResolutionMaximum", cg["ObliqueResolutionMaximum"][0]));
+          camstats->append(MakePair("ObliqueResolutionMinimum", QString::fromStdString(cg["ObliqueResolutionMinimum"][0])));
+          camstats->append(MakePair("ObliqueResolutionMaximum", QString::fromStdString(cg["ObliqueResolutionMaximum"][0])));
 
           // Add keywords for all camera values
           // Skips first "User Parameters" group.
@@ -346,7 +346,7 @@ namespace Isis{
 
             for (int j = 0; j < group.keywords(); j++) {
               PvlKeyword &keyword = group[j];
-              camstats->append(MakePair(keyword.name(), keyword[0]));
+              camstats->append(MakePair(QString::fromStdString(keyword.name()), QString::fromStdString(keyword[0])));
             }
           }
         }
@@ -377,16 +377,16 @@ namespace Isis{
           double lrspercent  = (stats.LrsPixels() / (nPixels)) * 100;
 
           // Statistics output for band
-          statistics->append(MakePair("MeanValue", toString(stats.Average())));
-          statistics->append(MakePair("StandardDeviation", toString(stats.StandardDeviation())));
-          statistics->append(MakePair("MinimumValue", toString(stats.Minimum())));
-          statistics->append(MakePair("MaximumValue", toString(stats.Maximum())));
-          statistics->append(MakePair("PercentHIS", toString(hispercent)));
-          statistics->append(MakePair("PercentHRS", toString(hrspercent)));
-          statistics->append(MakePair("PercentLIS", toString(lispercent)));
-          statistics->append(MakePair("PercentLRS", toString(lrspercent)));
-          statistics->append(MakePair("PercentNull", toString(nullpercent)));
-          statistics->append(MakePair("TotalPixels", toString(stats.TotalPixels())));
+          statistics->append(MakePair("MeanValue", QString::fromStdString(toString(stats.Average()))));
+          statistics->append(MakePair("StandardDeviation", QString::fromStdString(toString(stats.StandardDeviation()))));
+          statistics->append(MakePair("MinimumValue", QString::fromStdString(toString(stats.Minimum()))));
+          statistics->append(MakePair("MaximumValue", QString::fromStdString(toString(stats.Maximum()))));
+          statistics->append(MakePair("PercentHIS", QString::fromStdString(toString(hispercent))));
+          statistics->append(MakePair("PercentHRS", QString::fromStdString(toString(hrspercent))));
+          statistics->append(MakePair("PercentLIS", QString::fromStdString(toString(lispercent))));
+          statistics->append(MakePair("PercentLRS", QString::fromStdString(toString(lrspercent))));
+          statistics->append(MakePair("PercentNull", QString::fromStdString(toString(nullpercent))));
+          statistics->append(MakePair("TotalPixels", QString::fromStdString(toString(stats.TotalPixels()))));
         }
 
         bool getFootBlob = ui.GetBoolean("USELABEL");
@@ -421,7 +421,7 @@ namespace Isis{
             }
           }
           else {
-            QString msg = "Invalid INCTYPE option[" + incType + "]";
+            std::string msg = "Invalid INCTYPE option[" + incType.toStdString() + "]";
             throw IException(IException::Programmer, msg, _FILEINFO_);
           }
 
@@ -440,18 +440,18 @@ namespace Isis{
             PvlObject::PvlObjectIterator objIter;
             bool found = false;
             PvlGroup fpgrp;
-            for (objIter=pvl.endObject()-1; objIter>=pvl.beginObject(); objIter--) {
-              if (objIter->name().toUpper() == "FOOTPRINTINIT") {
+            for (objIter = pvl.beginObject(); objIter != pvl.endObject(); objIter++) {
+              if (QString::fromStdString(objIter->name()).toUpper() == "FOOTPRINTINIT") {
                 found = true;
                 fpgrp = objIter->findGroup("UserParameters");
                 break;
               }
             }
             if (!found) {
-              QString msg = "Footprint blob was not found in input image history";
+              std::string msg = "Footprint blob was not found in input image history";
               throw IException(IException::User, msg, _FILEINFO_);
             }
-            QString prec = (QString)fpgrp.findKeyword("INCREASEPRECISION");
+            QString prec = QString::fromStdString(fpgrp.findKeyword("INCREASEPRECISION"));
             prec = prec.toUpper();
             if (prec == "TRUE") {
               precision = true;
@@ -459,7 +459,7 @@ namespace Isis{
             else {
               precision = false;
             }
-            QString inctype = (QString)fpgrp.findKeyword("INCTYPE");
+            QString inctype = QString::fromStdString(fpgrp.findKeyword("INCTYPE"));
             inctype = inctype.toUpper();
             if (inctype == "LINCSINC") {
               int linc = fpgrp.findKeyword("LINC");
@@ -489,7 +489,7 @@ namespace Isis{
 
           // Check if the user requires valid image center geometry
           if(ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
-            QString msg = "Image center does not project in camera model";
+            std::string msg = "Image center does not project in camera model";
             throw IException(IException::Unknown, msg, _FILEINFO_);
           }
         }

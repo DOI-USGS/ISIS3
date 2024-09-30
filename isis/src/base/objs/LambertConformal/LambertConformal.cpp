@@ -48,14 +48,14 @@ namespace Isis {
       // necessary
       if ((allowDefaults) && (!mapGroup.hasKeyword("CenterLongitude"))) {
         double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLongitude", toString(lon));
+        mapGroup += PvlKeyword("CenterLongitude", Isis::toString(lon));
       }
 
       // Compute and write the default center latitude if allowed and
       // necessary
       if ((allowDefaults) && (!mapGroup.hasKeyword("CenterLatitude"))) {
         double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLatitude", toString(lat));
+        mapGroup += PvlKeyword("CenterLatitude", Isis::toString(lat));
       }
 
       // Get the center longitude  & latitude
@@ -88,17 +88,17 @@ namespace Isis {
 
       // Test to make sure standard parallels are valid
       if (fabs(m_par1) > 90.0 || fabs(m_par2) > 90.0) {
-        QString message = "Standard Parallels must between -90 and 90";
+        std::string message = "Standard Parallels must between -90 and 90";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
       if (fabs(m_par1 + m_par2) < DBL_EPSILON) {
-        QString message = "Standard Parallels cannot be symmetric to the equator";
+        std::string message = "Standard Parallels cannot be symmetric to the equator";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
       // Removed because this test only works for northern hemisphere
       // Just reorder the parallels so p1 is at the larger radius of the two
       //if (m_par1 > m_par2) {
-      //  QString message = "Standard Parallels must be ordered";
+      //  std::string message = "Standard Parallels must be ordered";
       //  throw IException::Message(IException::Projection,message,_FILEINFO_);
       //}
 
@@ -164,7 +164,7 @@ namespace Isis {
       m_rho = m_equatorialRadius * m_f * pow(tclat, m_n);
     }
     catch(IException &e) {
-      QString message = "Invalid label group [Mapping]";
+      std::string message = "Invalid label group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }

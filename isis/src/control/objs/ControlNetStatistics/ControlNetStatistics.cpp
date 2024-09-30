@@ -117,94 +117,94 @@ namespace Isis {
     int numSN = mSerialNumList.size();
 
     if (numSN) {
-      pStatsGrp += PvlKeyword("TotalImages",             toString(numSN));
-      pStatsGrp += PvlKeyword("ImagesInControlNet", toString(numCNetImages));
+      pStatsGrp += PvlKeyword("TotalImages",             Isis::toString(numSN));
+      pStatsGrp += PvlKeyword("ImagesInControlNet", Isis::toString(numCNetImages));
     }
 
-    pStatsGrp += PvlKeyword("TotalPoints",       toString(mCNet->GetNumPoints()));
-    pStatsGrp += PvlKeyword("ValidPoints",       toString(NumValidPoints()));
-    pStatsGrp += PvlKeyword("IgnoredPoints",     toString(mCNet->GetNumPoints() - NumValidPoints()));
-    pStatsGrp += PvlKeyword("FixedPoints",       toString(NumFixedPoints()));
-    pStatsGrp += PvlKeyword("ConstrainedPoints", toString(NumConstrainedPoints()));
-    pStatsGrp += PvlKeyword("FreePoints",        toString(NumFreePoints()));
-    pStatsGrp += PvlKeyword("EditLockPoints",    toString(mCNet->GetNumEditLockPoints()));
+    pStatsGrp += PvlKeyword("TotalPoints",       Isis::toString(mCNet->GetNumPoints()));
+    pStatsGrp += PvlKeyword("ValidPoints",       Isis::toString(NumValidPoints()));
+    pStatsGrp += PvlKeyword("IgnoredPoints",     Isis::toString(mCNet->GetNumPoints() - NumValidPoints()));
+    pStatsGrp += PvlKeyword("FixedPoints",       Isis::toString(NumFixedPoints()));
+    pStatsGrp += PvlKeyword("ConstrainedPoints", Isis::toString(NumConstrainedPoints()));
+    pStatsGrp += PvlKeyword("FreePoints",        Isis::toString(NumFreePoints()));
+    pStatsGrp += PvlKeyword("EditLockPoints",    Isis::toString(mCNet->GetNumEditLockPoints()));
 
-    pStatsGrp += PvlKeyword("TotalMeasures",     toString(NumMeasures()));
-    pStatsGrp += PvlKeyword("ValidMeasures",     toString(NumValidMeasures()));
-    pStatsGrp += PvlKeyword("IgnoredMeasures",   toString(NumIgnoredMeasures()));
-    pStatsGrp += PvlKeyword("EditLockMeasures",  toString(mCNet->GetNumEditLockMeasures()));
+    pStatsGrp += PvlKeyword("TotalMeasures",     Isis::toString(NumMeasures()));
+    pStatsGrp += PvlKeyword("ValidMeasures",     Isis::toString(NumValidMeasures()));
+    pStatsGrp += PvlKeyword("IgnoredMeasures",   Isis::toString(NumIgnoredMeasures()));
+    pStatsGrp += PvlKeyword("EditLockMeasures",  Isis::toString(mCNet->GetNumEditLockMeasures()));
 
     double dValue = GetAverageResidual();
-    pStatsGrp += PvlKeyword("AvgResidual",       (dValue == Null ? "Null" : toString(dValue)));
+    pStatsGrp += PvlKeyword("AvgResidual",       (dValue == Null ? "Null" : Isis::toString(dValue)));
 
     dValue = GetMinimumResidual();
-    pStatsGrp += PvlKeyword("MinResidual",       (dValue == Null ? "Null" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MinResidual",       (dValue == Null ? "Null" : Isis::toString(dValue)));
 
     dValue = GetMaximumResidual();
-    pStatsGrp += PvlKeyword("MaxResidual",       (dValue == Null ? "Null" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MaxResidual",       (dValue == Null ? "Null" : Isis::toString(dValue)));
 
     dValue = GetMinLineResidual();
-    pStatsGrp += PvlKeyword("MinLineResidual",   (dValue == Null ? "Null" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MinLineResidual",   (dValue == Null ? "Null" : Isis::toString(dValue)));
 
     dValue = GetMaxLineResidual();
-    pStatsGrp += PvlKeyword("MaxLineResidual",   (dValue == Null ? "Null" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MaxLineResidual",   (dValue == Null ? "Null" : Isis::toString(dValue)));
 
     dValue = GetMinSampleResidual();
-    pStatsGrp += PvlKeyword("MinSampleResidual", (dValue == Null ? "Null" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MinSampleResidual", (dValue == Null ? "Null" : Isis::toString(dValue)));
 
     dValue = GetMaxSampleResidual();
-    pStatsGrp += PvlKeyword("MaxSampleResidual", (dValue == Null ? "Null" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MaxSampleResidual", (dValue == Null ? "Null" : Isis::toString(dValue)));
 
     // Shifts - Line, Sample, Pixel
     dValue = GetMinLineShift();
-    pStatsGrp += PvlKeyword("MinLineShift",      (dValue == Null ? "Null" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MinLineShift",      (dValue == Null ? "Null" : Isis::toString(dValue)));
 
     dValue = GetMaxLineShift();
-    pStatsGrp += PvlKeyword("MaxLineShift",      (dValue == Null ? "Null" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MaxLineShift",      (dValue == Null ? "Null" : Isis::toString(dValue)));
 
     dValue = GetMinSampleShift();
-    pStatsGrp += PvlKeyword("MinSampleShift",    (dValue == Null ? "Null" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MinSampleShift",    (dValue == Null ? "Null" : Isis::toString(dValue)));
 
     dValue = GetMaxSampleShift();
-    pStatsGrp += PvlKeyword("MaxSampleShift",    (dValue == Null ? "Null" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MaxSampleShift",    (dValue == Null ? "Null" : Isis::toString(dValue)));
 
     dValue = GetAvgPixelShift();
-    pStatsGrp += PvlKeyword("AvgPixelShift",     (dValue == Null ? "NA" : toString(dValue)));
+    pStatsGrp += PvlKeyword("AvgPixelShift",     (dValue == Null ? "NA" : Isis::toString(dValue)));
 
     dValue = GetMinPixelShift();
-    pStatsGrp += PvlKeyword("MinPixelShift",     (dValue == Null ? "NA" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MinPixelShift",     (dValue == Null ? "NA" : Isis::toString(dValue)));
 
     dValue = GetMaxPixelShift();
-    pStatsGrp += PvlKeyword("MaxPixelShift",     (dValue == Null ? "NA" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MaxPixelShift",     (dValue == Null ? "NA" : Isis::toString(dValue)));
 
     dValue = mPointDoubleStats[minGFit];
-    pStatsGrp += PvlKeyword("MinGoodnessOfFit",  (dValue == Null ? "NA" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MinGoodnessOfFit",  (dValue == Null ? "NA" : Isis::toString(dValue)));
 
     dValue = mPointDoubleStats[maxGFit];
-    pStatsGrp += PvlKeyword("MaxGoodnessOfFit",  (dValue == Null ? "NA" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MaxGoodnessOfFit",  (dValue == Null ? "NA" : Isis::toString(dValue)));
 
     dValue = mPointDoubleStats[minEccentricity];
-    pStatsGrp += PvlKeyword("MinEccentricity",   (dValue == Null ? "NA" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MinEccentricity",   (dValue == Null ? "NA" : Isis::toString(dValue)));
 
     dValue = mPointDoubleStats[maxEccentricity];
-    pStatsGrp += PvlKeyword("MaxEccentricity",   (dValue == Null ? "NA" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MaxEccentricity",   (dValue == Null ? "NA" : Isis::toString(dValue)));
 
     dValue = mPointDoubleStats[minPixelZScore];
-    pStatsGrp += PvlKeyword("MinPixelZScore",    (dValue == Null ? "NA" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MinPixelZScore",    (dValue == Null ? "NA" : Isis::toString(dValue)));
 
     dValue = mPointDoubleStats[maxPixelZScore];
-    pStatsGrp += PvlKeyword("MaxPixelZScore",    (dValue == Null ? "NA" : toString(dValue)));
+    pStatsGrp += PvlKeyword("MaxPixelZScore",    (dValue == Null ? "NA" : Isis::toString(dValue)));
 
     // Convex Hull
     if (mSerialNumList.size()) {
       dValue = mConvexHullRatioStats.Minimum();
-      pStatsGrp += PvlKeyword("MinConvexHullRatio", (dValue == Null ? "Null" : toString(dValue)));
+      pStatsGrp += PvlKeyword("MinConvexHullRatio", (dValue == Null ? "Null" : Isis::toString(dValue)));
 
       dValue = mConvexHullRatioStats.Maximum();
-      pStatsGrp += PvlKeyword("MaxConvexHullRatio", (dValue == Null ? "Null" : toString(dValue)));
+      pStatsGrp += PvlKeyword("MaxConvexHullRatio", (dValue == Null ? "Null" : Isis::toString(dValue)));
 
       dValue = mConvexHullRatioStats.Average();
-      pStatsGrp += PvlKeyword("AvgConvexHullRatio", (dValue == Null ? "Null" : toString(dValue)));
+      pStatsGrp += PvlKeyword("AvgConvexHullRatio", (dValue == Null ? "Null" : Isis::toString(dValue)));
     }
   }
 
@@ -318,17 +318,17 @@ namespace Isis {
   void ControlNetStatistics::PrintImageStats(const QString &psImageFile) {
     // Check if the image list has been provided
     if (!mSerialNumList.size()) {
-      QString msg = "Serial Number of Images has not been provided to get Image Stats";
+      std::string msg = "Serial Number of Images has not been provided to get Image Stats";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    FileName outFile(psImageFile);
+    FileName outFile(psImageFile.toStdString());
     ofstream ostm;
-    QString outName(outFile.expanded());
+    QString outName(QString::fromStdString(outFile.expanded()));
     ostm.open(outName.toLatin1().data(), std::ios::out);
 
     if ( ostm.fail() ) {
-      QString msg = QObject::tr("Cannot open file [%1]").arg(psImageFile);
+      std::string msg = "Cannot open file [" + psImageFile.toStdString() + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
      }
 
@@ -340,7 +340,7 @@ namespace Isis {
     //for (it = mImageMap.begin(); it != mImageMap.end(); it++) {
 
     for (it = mSerialNumMap.begin(); it != mSerialNumMap.end(); it++) {
-      ostm << mSerialNumList.fileName(it.key()) << ", " << it.key() << ", ";
+      ostm << mSerialNumList.fileName(it.key()).toStdString() << ", " << it.key().toStdString() << ", ";
       bool serialNumExists = it.value();
       if (serialNumExists) {
         QVector<double> imgStats = mImageMap[(it).key()] ;
@@ -355,7 +355,7 @@ namespace Isis {
     }
 
     if (!ostm) {
-      QString msg = QObject::tr("Error writing to file: [%1]").arg(psImageFile);
+      std::string msg = "Error writing to file: [" + psImageFile.toStdString() + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
     ostm.close();
@@ -386,14 +386,14 @@ namespace Isis {
    * @param psPointFile - Output Point Statisitics File
    */
   void ControlNetStatistics::GeneratePointStats(const QString &psPointFile) {
-    Isis::FileName outFile(psPointFile);
+    Isis::FileName outFile(psPointFile.toStdString());
 
     ofstream ostm;
-    QString outName(outFile.expanded());
+    QString outName(QString::fromStdString(outFile.expanded()));
     ostm.open(outName.toLatin1().data(), std::ios::out);
 
     if ( ostm.fail() ) {
-      QString msg = QObject::tr("Cannot open file [%1]").arg(psPointFile);
+      std::string msg = "Cannot open file [" + psPointFile.toStdString() + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
@@ -415,8 +415,8 @@ namespace Isis {
       int iIgnoredMeasures = iNumMeasures - iValidMeasures;
 
       // Log into the output file
-      ostm << cPoint->GetId()   << ", " << sPointType[(int)cPoint->GetType()] << ", " << sBoolean[(int)cPoint->IsIgnored()] << ", " ;
-      ostm << sBoolean[(int)cPoint->IsEditLocked()] << ", " << iNumMeasures << ", " << iValidMeasures << ", ";
+      ostm << cPoint->GetId().toStdString()   << ", " << sPointType[(int)cPoint->GetType()].toStdString() << ", " << sBoolean[(int)cPoint->IsIgnored()].toStdString() << ", " ;
+      ostm << sBoolean[(int)cPoint->IsEditLocked()].toStdString() << ", " << iNumMeasures << ", " << iValidMeasures << ", ";
       ostm << iIgnoredMeasures << ", " << cPoint->GetNumLockedMeasures() << endl;
 
       // Update Progress
@@ -425,7 +425,7 @@ namespace Isis {
     }
 
     if (!ostm) {
-      QString msg = QObject::tr("Error writing to file: [%1]").arg(psPointFile);
+      std::string msg = "Error writing to file: [" + psPointFile.toStdString() + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 

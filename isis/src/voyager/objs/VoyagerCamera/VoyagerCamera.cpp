@@ -59,8 +59,8 @@ namespace Isis {
     // and camera
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup ("Instrument",Pvl::Traverse);
-    QString spacecraft = (QString)inst["SpacecraftName"];
-    QString instId = (QString)inst["InstrumentId"];
+    QString spacecraft = QString::fromStdString(inst["SpacecraftName"]);
+    QString instId = QString::fromStdString(inst["InstrumentId"]);
 
     QString reseauFileName = "";
 
@@ -84,8 +84,8 @@ namespace Isis {
         m_instrumentNameShort = "WAC";
       }
       else {
-        QString msg = "File does not appear to be a Voyager image. InstrumentId ["
-            + instId + "] is invalid Voyager value.";
+        std::string msg = "File does not appear to be a Voyager image. InstrumentId ["
+            + instId.toStdString() + "] is invalid Voyager value.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -108,14 +108,14 @@ namespace Isis {
         m_instrumentNameShort = "WAC";
       }
       else {
-        QString msg = "File does not appear to be a Voyager image. InstrumentId ["
-            + instId + "] is invalid Voyager value.";
+        std::string msg = "File does not appear to be a Voyager image. InstrumentId ["
+            + instId.toStdString() + "] is invalid Voyager value.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
-      QString msg = "File does not appear to be a Voyager image. SpacecraftName ["
-          + spacecraft + "] is invalid Voyager value.";
+      std::string msg = "File does not appear to be a Voyager image. SpacecraftName ["
+          + spacecraft.toStdString() + "] is invalid Voyager value.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -127,9 +127,9 @@ namespace Isis {
 
     // Master reseau location file
     reseauFileName = "$voyager" + reseauFileName + "MasterReseaus.pvl";
-    FileName masterReseaus(reseauFileName);
+    FileName masterReseaus(reseauFileName.toStdString());
     try {
-      new ReseauDistortionMap(this, lab, masterReseaus.expanded());
+      new ReseauDistortionMap(this, lab, QString::fromStdString(masterReseaus.expanded()));
     } catch (IException &e) {
       e.print();
     }
@@ -143,7 +143,7 @@ namespace Isis {
     // exposure duration keyword value is measured in seconds
     double exposureDuration = inst["ExposureDuration"];
     iTime startTime;
-    startTime.setUtc((QString)inst["StartTime"]);
+    startTime.setUtc(QString::fromStdString(inst["StartTime"]));
 
     // set the start (shutter open) and end (shutter close) times for the image
     /*****************************************************************************

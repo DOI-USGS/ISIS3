@@ -88,37 +88,37 @@ void IsisMain() {
     // Execute the requested method
     //----------------------------------------------------------------------------------
     PvlGroup results("DeltackResults");
-    results += PvlKeyword("Method", method);
+    results += PvlKeyword("Method", method.toStdString());
     if ( "direct" == method ) {
       Camera *v_cam = c.camera();
 
       // Map the latitude/longitude to a line/sample of the desired update
       // cout << "Input Lat, Lon = " << lat1.degrees() << "," << lon1.degrees() << "\n";
-      results += PvlKeyword("Lat1", toString(lat1.degrees()), "degrees");
-      results += PvlKeyword("Lon1", toString(lon1.degrees()), "degrees");
+      results += PvlKeyword("Lat1", Isis::toString(lat1.degrees()), "degrees");
+      results += PvlKeyword("Lon1", Isis::toString(lon1.degrees()), "degrees");
       if ( !v_cam->SetUniversalGround(lat1.degrees(), lon1.degrees()) ) {
-        QString mess = "Geometry coordinate does not map into image at location (" +
-                       QString::number(lat1.degrees()) + "," + QString::number(lon1.degrees()) + ")";
+        std::string mess = "Geometry coordinate does not map into image at location (" +
+                       Isis::toString(lat1.degrees()) + "," + Isis::toString(lon1.degrees()) + ")";
         throw IException(IException::User, mess, _FILEINFO_);
       }
 
       // Get the surface coordinate in body fixed
       // cout << "Sample, Line = " << v_cam->Sample() << "," << v_cam->Line() << "\n";
-      results += PvlKeyword("Lat1Lon1Sample", toString(v_cam->Sample()));
-      results += PvlKeyword("Lat1Lon1Line", toString(v_cam->Line()));
+      results += PvlKeyword("Lat1Lon1Sample", Isis::toString(v_cam->Sample()));
+      results += PvlKeyword("Lat1Lon1Line", Isis::toString(v_cam->Line()));
       double pt2[3];
       v_cam->Coordinate(pt2);
 
 
       // Retrieve the current geometry of a point to use as reference for the update
-      results += PvlKeyword("Samp1", toString(samp1));
-      results += PvlKeyword("Line1", toString(line1));
+      results += PvlKeyword("Samp1", Isis::toString(samp1));
+      results += PvlKeyword("Line1", Isis::toString(line1));
       if ( !v_cam->SetImage(samp1, line1) ) {
         // Ignore the SetImage() error as long as the coordinate is a valid
         // image coordinate.
         if (!v_cam->InCube() ) {
-          QString mess = "Image coordinate is outside image coordinates at point (" +
-                         QString::number(samp1) + "," + QString::number(line1) + ")";
+          std::string mess = "Image coordinate is outside image coordinates at point (" +
+                         Isis::toString(samp1) + "," + Isis::toString(line1) + ")";
           throw IException(IException::User, mess, _FILEINFO_);
         }
 
@@ -130,8 +130,8 @@ void IsisMain() {
         results += PvlKeyword("Samp1Line1Lon");
       }
       else {
-        results += PvlKeyword("Samp1Line1Lat",  toString(v_cam->GetLatitude().degrees()), "degrees");
-        results += PvlKeyword("Samp1Line1Lon", toString(v_cam->GetLongitude().degrees()), "degrees");
+        results += PvlKeyword("Samp1Line1Lat",  Isis::toString(v_cam->GetLatitude().degrees()), "degrees");
+        results += PvlKeyword("Samp1Line1Lon", Isis::toString(v_cam->GetLongitude().degrees()), "degrees");
       }
 
       // Get vector to surface from S/C and S/C position in body-fixed.
@@ -155,7 +155,7 @@ void IsisMain() {
 
       // Compute angle difference of update
       double j2kAngle = vsep_c(&ldir1[0], &ldir2[0]);
-      results += PvlKeyword("AdjustedAngle", toString(j2kAngle * dpr_c()), "degrees");
+      results += PvlKeyword("AdjustedAngle", Isis::toString(j2kAngle * dpr_c()), "degrees");
 
       // Compute rotation of vectors
       SpiceDouble R[3][3];
@@ -178,14 +178,14 @@ void IsisMain() {
         // We only know how to handle a cache with just four records. Anything
         // else and we have to abort...
         if ( o_cmat.Records() != 4 ) {
-          QString mess = "Expect only 4 records for polynomial cache but got "
-                         + QString::number(o_cmat.Records()) + " instead!";
+          std::string mess = "Expect only 4 records for polynomial cache but got "
+                         + Isis::toString(o_cmat.Records()) + " instead!";
           throw IException(IException::User, mess, _FILEINFO_);
         }
 
         // Get the line cache and apply rotation using that cache. Then refit
         // to polynomials
-        Table lcache = v_cam->instrumentRotation()->LineCache(o_cmat.Name());
+        Table lcache = v_cam->instrumentRotation()->LineCache(QString::fromStdString(o_cmat.Name()));
         ApplyRotation(R, lcache);
         v_cam->instrumentRotation()->LoadCache(lcache);
         v_cam->instrumentRotation()->SetPolynomial();
@@ -193,9 +193,9 @@ void IsisMain() {
       }
 
       // Write out a description in the spice table
-      results += PvlKeyword("RecordsUpdated", toString(o_cmat.Records()));
+      results += PvlKeyword("RecordsUpdated", Isis::toString(o_cmat.Records()));
       QString deltackComment = "deltackDirectAdjusted = " + Isis::iTime::CurrentLocalTime();
-      o_cmat.Label().addComment(deltackComment);
+      o_cmat.Label().addComment(deltackComment.toStdString());
 
       // Write out the updated pointing dataset
       c.write(o_cmat);
@@ -280,7 +280,7 @@ void IsisMain() {
 
       // Write out a description in the spice table
       QString deltackComment = "deltackAdjusted = " + Isis::iTime::CurrentLocalTime();
-      cmatrix.Label().addComment(deltackComment);
+      cmatrix.Label().addComment(deltackComment.toStdString());
       //PvlKeyword description("Description");
       //description = "Camera pointing updated via deltack application";
       //cmatrix.Label().findObject("Table",Pvl::Traverse).addKeyword(description);
@@ -314,7 +314,7 @@ void IsisMain() {
     Application::Log(results);
   }
   catch (IException &e) {
-    QString msg = "Unable to update camera pointing for [" + filename + "]";
+    std::string msg = "Unable to update camera pointing for [" + filename.toStdString() + "]";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
@@ -325,13 +325,13 @@ void IsisMain() {
 
 // Compute the radius at the lat/lon
 Distance GetRadius(QString filename, Latitude lat, Longitude lon) {
-  Cube cube(filename, "r");
+  Cube cube(filename.toStdString(), "r");
   Camera *sensor = CameraFactory::Create(cube);
   sensor->SetGround(SurfacePoint(lat, lon, sensor->LocalRadius(lat, lon)));
   Distance radius = sensor->LocalRadius();
   if (!radius.isValid()) {
-    QString msg = "Could not determine radius from DEM at lat/lon [";
-    msg += toString(lat.degrees()) + "," + toString(lon.degrees()) + "]";
+    std::string msg = "Could not determine radius from DEM at lat/lon [";
+    msg += Isis::toString(lat.degrees()) + "," + Isis::toString(lon.degrees()) + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   return radius;
@@ -493,8 +493,8 @@ void ApplyRotation(const double R[3][3], Table &table) {
 
   // Sanity check...
   if ( table[0].Fields() < 4 ) {
-    QString mess = "Expect at least 4 fields for quaternion cache but got "
-                   + QString::number(table.Records()) + " instead!";
+    std::string mess = "Expect at least 4 fields for quaternion cache but got "
+                   + Isis::toString(table.Records()) + " instead!";
     throw IException(IException::User, mess, _FILEINFO_);
   }
 

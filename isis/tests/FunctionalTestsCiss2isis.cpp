@@ -10,7 +10,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/ciss2isis.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/ciss2isis.xml").expanded());
 
 TEST(Ciss2Isis, Ciss2isisTestNac) {
   Pvl appLog;
@@ -23,10 +23,10 @@ TEST(Ciss2Isis, Ciss2isisTestNac) {
     ciss2isis(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest file: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest file: " <<  e.toString().c_str() << std::endl;
   }
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
   Pvl *outLabel = outCube.label();
 
   PvlGroup dimensions = outLabel->findGroup("Dimensions", Pvl::Traverse);
@@ -35,8 +35,8 @@ TEST(Ciss2Isis, Ciss2isisTestNac) {
   ASSERT_EQ((int)dimensions["Bands"], 1);
 
   PvlGroup pixels = outLabel->findGroup("Pixels", Pvl::Traverse);
-  ASSERT_EQ(pixels["Type"][0].toStdString(), "SignedWord");
-  ASSERT_EQ(pixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(pixels["Type"][0], "SignedWord");
+  ASSERT_EQ(pixels["ByteOrder"][0], "Lsb");
   ASSERT_EQ((double)pixels["Base"], 0.0);
   ASSERT_EQ((double)pixels["Multiplier"], 1.0);
 
@@ -132,10 +132,10 @@ TEST(Ciss2Isis, Ciss2isisTestWac) {
     ciss2isis(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest file: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest file: " <<  e.toString().c_str() << std::endl;
   }
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
   Pvl *outLabel = outCube.label();
 
   PvlGroup dimensions = outLabel->findGroup("Dimensions", Pvl::Traverse);
@@ -144,8 +144,8 @@ TEST(Ciss2Isis, Ciss2isisTestWac) {
   ASSERT_EQ((int)dimensions["Bands"], 1);
 
   PvlGroup pixels = outLabel->findGroup("Pixels", Pvl::Traverse);
-  ASSERT_EQ(pixels["Type"][0].toStdString(), "SignedWord");
-  ASSERT_EQ(pixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(pixels["Type"][0], "SignedWord");
+  ASSERT_EQ(pixels["ByteOrder"][0], "Lsb");
   ASSERT_EQ((double)pixels["Base"], 0.0);
   ASSERT_EQ((double)pixels["Multiplier"], 1.0);
 
@@ -235,9 +235,9 @@ TEST(Ciss2Isis, Ciss2isisCustomMax) {
 
   QString inputLabel = "data/ciss2isis/W1472855646_5.cropped.lbl";
   QString updatedPvlLabel = prefix.path() + "/W1472855646_5.cropped.lbl";
-  Pvl inputPvl(inputLabel);
+  Pvl inputPvl(inputLabel.toStdString());
   inputPvl["VALID_MAXIMUM"][1] = "70";
-  inputPvl.write(updatedPvlLabel);
+  inputPvl.write(updatedPvlLabel.toStdString());
   QFile::copy("data/ciss2isis/W1472855646_5.cropped.img", prefix.path() + "/W1472855646_5.cropped.img");
 
   QVector<QString> args = { "from=" + updatedPvlLabel,
@@ -247,10 +247,10 @@ TEST(Ciss2Isis, Ciss2isisCustomMax) {
     ciss2isis(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest file: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest file: " <<  e.toString().c_str() << std::endl;
   }
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
   Pvl *outLabel = outCube.label();
 
   PvlGroup dimensions = outLabel->findGroup("Dimensions", Pvl::Traverse);
@@ -259,8 +259,8 @@ TEST(Ciss2Isis, Ciss2isisCustomMax) {
   ASSERT_EQ((int)dimensions["Bands"], 1);
 
   PvlGroup pixels = outLabel->findGroup("Pixels", Pvl::Traverse);
-  ASSERT_EQ(pixels["Type"][0].toStdString(), "SignedWord");
-  ASSERT_EQ(pixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(pixels["Type"][0], "SignedWord");
+  ASSERT_EQ(pixels["ByteOrder"][0], "Lsb");
   ASSERT_EQ((double)pixels["Base"], 0.0);
   ASSERT_EQ((double)pixels["Multiplier"], 1.0);
 

@@ -42,7 +42,7 @@ void IsisMain() {
 
   // get the pvl containing a mapping group
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
   PvlGroup &mapGroup = userMap.findGroup("Mapping", Pvl::Traverse);
 
   QString target;
@@ -50,16 +50,16 @@ void IsisMain() {
     target = ui.GetString("TARGET");
   }
   else if (mapGroup.hasKeyword("TargetName")) {
-    target = mapGroup.findKeyword("TargetName")[0];
+    target = QString::fromStdString(mapGroup.findKeyword("TargetName")[0]);
     ui.PutAsString("TARGET", target);
   }
   else {
-    QString msg = "A target must be specified either by the [TARGET] "
+    std::string msg = "A target must be specified either by the [TARGET] "
         "parameter or included as a value for keyword [TargetName] in the "
         "projection file [MAP].";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  mapGroup.addKeyword(PvlKeyword("TargetName", target), PvlContainer::Replace);
+  mapGroup.addKeyword(PvlKeyword("TargetName", target.toStdString()), PvlContainer::Replace);
 
   // Use the target name to create the control net to store the points in.
   ControlNet cnet;
@@ -74,12 +74,12 @@ void IsisMain() {
       mapGroup += PvlKeyword("PolarRadius", pvlRadii["PolarRadius"], "Meters");
     }
     catch (IException &e) {
-      QString msg = "Unable to get target radii values from the given target [" + target + "]. "
+      std::string msg = "Unable to get target radii values from the given target [" + target.toStdString() + "]. "
                     "User must add EquatorialRadius and PolarRadius values to the input MAP file.";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
-  double equatorialRadius = toDouble(mapGroup.findKeyword("EquatorialRadius")[0]);
+  double equatorialRadius = Isis::toDouble(mapGroup.findKeyword("EquatorialRadius")[0]);
 
   QString networkId;
   if (ui.WasEntered("NETWORKID")) {
@@ -102,7 +102,7 @@ void IsisMain() {
   checkLatitude(minLat, maxLat);
   int lonDomain =
       (mapGroup.hasKeyword("LongitudeDomain") ?
-          toInt(mapGroup.findKeyword("LongitudeDomain")[0]) :
+          Isis::toInt(mapGroup.findKeyword("LongitudeDomain")[0]) :
           360);
   checkLongitude(minLon, maxLon, lonDomain);
 
@@ -120,10 +120,10 @@ void IsisMain() {
       mapGroup += PvlKeyword("CenterLongitude", "0.0");
     }
 
-    mapGroup.addKeyword(PvlKeyword("MinimumLatitude", toString(minLat)), Pvl::Replace);
-    mapGroup.addKeyword(PvlKeyword("MaximumLatitude", toString(maxLat)), Pvl::Replace);
-    mapGroup.addKeyword(PvlKeyword("MinimumLongitude", toString(minLon)), Pvl::Replace);
-    mapGroup.addKeyword(PvlKeyword("MaximumLongitude", toString(maxLon)), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("MinimumLatitude", Isis::toString(minLat)), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("MaximumLatitude", Isis::toString(maxLat)), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("MinimumLongitude", Isis::toString(minLon)), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("MaximumLongitude", Isis::toString(maxLon)), Pvl::Replace);
 
     // create the projection from the editted map
     TProjection *proj = (TProjection *) ProjectionFactory::Create(userMap);
@@ -132,7 +132,7 @@ void IsisMain() {
     double minX, minY, maxX, maxY;
     bool foundRange = proj->XYRange(minX, maxX, minY, maxY);
     if (!foundRange) {
-      QString msg = "Cannot convert Lat/Long range to an X/Y range";
+      std::string msg = "Cannot convert Lat/Long range to an X/Y range";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -228,8 +228,8 @@ void IsisMain() {
   }
 
   PvlGroup results("Results");
-  results += PvlKeyword("EquatorialRadius", toString(equatorialRadius));
-  results += PvlKeyword("NumberControlPoints", toString(cnet.GetNumPoints()));
+  results += PvlKeyword("EquatorialRadius", Isis::toString(equatorialRadius));
+  results += PvlKeyword("NumberControlPoints", Isis::toString(cnet.GetNumPoints()));
   Application::Log(results);
 
   cnet.Write(ui.GetFileName("ONET"));
@@ -238,18 +238,18 @@ void IsisMain() {
 
 void checkLatitude(double minLat, double maxLat) {
   if (minLat > maxLat) {
-    QString msg = "MINLAT [" + toString(minLat) +
+    std::string msg = "MINLAT [" + toString(minLat) +
       "] is greater than MAXLAT [" + toString(maxLat) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (minLat < -90) {
-    QString msg = "MINLAT [" + toString(minLat) + "] is less than -90";
+    std::string msg = "MINLAT [" + toString(minLat) + "] is less than -90";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (maxLat > 90) {
-    QString msg = "MAXLAT [" + toString(maxLat) + "] is greater than 90";
+    std::string msg = "MAXLAT [" + toString(maxLat) + "] is greater than 90";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }
@@ -258,7 +258,7 @@ void checkLatitude(double minLat, double maxLat) {
 void checkLongitude(double minLon, double maxLon, int lonDomain) {
   if (minLon > maxLon) {
     double suggestedMaxLon = maxLon + lonDomain + (lonDomain - 360);
-    QString msg = "MINLON [" + toString(minLon) +
+    std::string msg = "MINLON [" + toString(minLon) +
       "] is greater than MAXLON [" + toString(maxLon) + "].  " +
       "If you meant to wrap around the [" + toString(lonDomain) +
       "] longitude " + "boundary, use a MAXLON of [" +
@@ -267,7 +267,7 @@ void checkLongitude(double minLon, double maxLon, int lonDomain) {
   }
 
   if (minLon < lonDomain - 360) {
-    QString msg = "MINLON [" + toString(minLon) +
+    std::string msg = "MINLON [" + toString(minLon) +
       "] is less than [" + toString(lonDomain) + "] domain minimum [" +
       toString(lonDomain - 360) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -276,7 +276,7 @@ void checkLongitude(double minLon, double maxLon, int lonDomain) {
   if (maxLon - minLon > 360) {
     int range = (int) (maxLon - minLon - 1);
     int loops = range / 360 + 1;
-    QString msg = "The specified longitude range [" + toString(minLon) +
+    std::string msg = "The specified longitude range [" + toString(minLon) +
       "] to [" + toString(maxLon) + "] seeds that same area of the target [" +
       toString(loops) + "] times";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -290,7 +290,7 @@ void printMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log

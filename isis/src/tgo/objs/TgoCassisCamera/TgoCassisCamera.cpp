@@ -46,7 +46,7 @@ namespace Isis {
 
     // CaSSIS codes
     int cassisCode = naifIkCode();
-    QString cassis = toString(cassisCode);
+    QString cassis = QString::number(cassisCode);
 
     // Get all the necessary stuff from the labels
     Pvl &lab = *cube.label();
@@ -60,8 +60,8 @@ namespace Isis {
     // Get the Start time from the labels
     // TODO: This is currently using UTC time. Once the timestamp is figured out,
     //       this will change to use SCLK. JAM 2017-02-06
-    QString stime = inst["SpacecraftClockStartCount"];
-    QString startT = inst["StartTime"];
+    QString stime = QString::fromStdString(inst["SpacecraftClockStartCount"]);
+    QString startT = QString::fromStdString(inst["StartTime"]);
     iTime et(startT);
 
     // Get summing mode
@@ -69,7 +69,7 @@ namespace Isis {
     //   0 = 1x1 (No summing)
     //   1 = 2x2
     //   2 = 4x4
-    int sumMode = toInt(inst["SummingMode"][0]);
+    int sumMode = Isis::toInt(inst["SummingMode"][0]);
     int summing = sumMode * 2;
 
     //  Setup camera detector map
@@ -94,7 +94,7 @@ namespace Isis {
     catch (IException &e) {
       // Set NULL so that cameras destructor wont seg fault trying to delete
       SetDistortionMap(NULL, false);
-      QString msg = "Unable to Create TgoCassisDistortionMap";
+      std::string msg = "Unable to Create TgoCassisDistortionMap";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     // Setup the ground and sky map
@@ -103,7 +103,7 @@ namespace Isis {
 
     // Set start time to center of exposure time to ensure
     // the proper SPICE data is cached.
-    double p_exposureDur = toDouble(inst["ExposureDuration"]);
+    double p_exposureDur = Isis::toDouble(inst["ExposureDuration"]);
     iTime p_etStart = et + ( p_exposureDur / 2.0);
 
     setTime(p_etStart);

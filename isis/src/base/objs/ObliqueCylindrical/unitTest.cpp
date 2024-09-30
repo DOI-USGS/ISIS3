@@ -76,15 +76,15 @@ int main(int argc, char *argv[]) {
     TProjection *p = (TProjection *) ProjectionFactory::Create(lab);
 
     cout << "Test X,Y,Z Axis Vector Calculations ... " << endl;
-    cout << "Map Group Data (X[0]):      " << toDouble(mapGrp["XAxisVector"][0]) << endl;
-    cout << "Map Group Data (X[1]):      " << toDouble(mapGrp["XAxisVector"][1]) << endl;
-    cout << "Map Group Data (X[2]):      " << toDouble(mapGrp["XAxisVector"][2]) << endl;
-    cout << "Map Group Data (Y[0]):      " << toDouble(mapGrp["YAxisVector"][0]) << endl;
-    cout << "Map Group Data (Y[1]):      " << toDouble(mapGrp["YAxisVector"][1]) << endl;
-    cout << "Map Group Data (Y[2]):      " << toDouble(mapGrp["YAxisVector"][2]) << endl;
-    cout << "Map Group Data (Z[0]):      " << toDouble(mapGrp["ZAxisVector"][0]) << endl;
-    cout << "Map Group Data (Z[1]):      " << toDouble(mapGrp["ZAxisVector"][1]) << endl;
-    cout << "Map Group Data (Z[2]):      " << toDouble(mapGrp["ZAxisVector"][2]) << endl;
+    cout << "Map Group Data (X[0]):      " << Isis::toDouble(mapGrp["XAxisVector"][0]) << endl;
+    cout << "Map Group Data (X[1]):      " << Isis::toDouble(mapGrp["XAxisVector"][1]) << endl;
+    cout << "Map Group Data (X[2]):      " << Isis::toDouble(mapGrp["XAxisVector"][2]) << endl;
+    cout << "Map Group Data (Y[0]):      " << Isis::toDouble(mapGrp["YAxisVector"][0]) << endl;
+    cout << "Map Group Data (Y[1]):      " << Isis::toDouble(mapGrp["YAxisVector"][1]) << endl;
+    cout << "Map Group Data (Y[2]):      " << Isis::toDouble(mapGrp["YAxisVector"][2]) << endl;
+    cout << "Map Group Data (Z[0]):      " << Isis::toDouble(mapGrp["ZAxisVector"][0]) << endl;
+    cout << "Map Group Data (Z[1]):      " << Isis::toDouble(mapGrp["ZAxisVector"][1]) << endl;
+    cout << "Map Group Data (Z[2]):      " << Isis::toDouble(mapGrp["ZAxisVector"][2]) << endl;
     cout << endl;
 
     const double X = -2646.237039, Y = -537.814519;
@@ -120,14 +120,14 @@ int main(int argc, char *argv[]) {
 
     Projection *s = p;
     cout << "Test Name and comparision method ... " << endl;
-    cout << "Name:       " << s->Name() << endl;
+    cout << "Name:       " << s->Name().toStdString() << endl;
     cout << "operator==  " << (*s == *s) << endl;
     cout << endl;
 
     mapGrp["PoleRotation"] = "43.8423";
     ObliqueCylindrical different(lab);
     cout << "Test Name and comparision method with differing data... " << endl;
-    cout << "Name:       " << s->Name() << endl;
+    cout << "Name:       " << s->Name().toStdString() << endl;
     cout << "operator==  " << (different == *s) << endl;
     cout << endl;
 

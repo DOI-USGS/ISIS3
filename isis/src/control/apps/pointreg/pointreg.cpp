@@ -10,6 +10,7 @@ find files of those names at the top level of this repository. **/
 
 #include "pointreg.h"
 
+#include "Application.h"
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
 #include "Camera.h"
@@ -24,7 +25,6 @@ find files of those names at the top level of this repository. **/
 #include "Progress.h"
 #include "SerialNumberList.h"
 #include "UserInterface.h"
-#include "Application.h"
 #include "IException.h"
 #include "iTime.h"
 
@@ -67,10 +67,10 @@ namespace Isis {
 
         m_test = test;
         m_pointId = registered->Parent()->GetId();
-        m_heldId = FileName(
-            files->fileName(held->GetCubeSerialNumber())).baseName();
-        m_registeredId = FileName(
-            files->fileName(registered->GetCubeSerialNumber())).baseName();
+        m_heldId = QString::fromStdString(FileName(
+            files->fileName(held->GetCubeSerialNumber()).toStdString()).baseName());
+        m_registeredId = QString::fromStdString(FileName(
+            files->fileName(registered->GetCubeSerialNumber()).toStdString()).baseName());
 
         m_aprioriSample = registered->GetSample();
         m_aprioriLine = registered->GetLine();
@@ -154,8 +154,8 @@ namespace Isis {
       QString toString() {
         stringstream stream;
         stream <<
-          resultString() << "," << m_test << "," << m_pointId << "," <<
-          m_heldId << "," << m_registeredId << "," <<
+          resultString().toStdString() << "," << m_test.toStdString() << "," << m_pointId.toStdString() << "," <<
+          m_heldId.toStdString() << "," << m_registeredId.toStdString() << "," <<
           m_aprioriSample << "," << m_aprioriLine << "," <<
           m_shiftSample << "," << m_shiftLine << "," <<
           m_resDiff << "," << m_resTolerance << "," <<
@@ -240,7 +240,7 @@ namespace Isis {
     ControlNet outNet(ui.GetFileName("CNET"));
 
     if (outNet.GetNumPoints() <= 0) {
-      QString msg = "Control network [" + ui.GetFileName("CNET") + "] ";
+      std::string msg = "Control network [" + ui.GetFileName("CNET").toStdString() + "] ";
       msg += "contains no points";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -248,7 +248,7 @@ namespace Isis {
     outNet.SetUserName(Application::UserName());
 
     // Create an AutoReg from the template file
-    Pvl pvl(ui.GetFileName("DEFFILE"));
+    Pvl pvl(ui.GetFileName("DEFFILE").toStdString());
     ar = AutoRegFactory::Create(pvl);
 
     Progress progress;
@@ -259,7 +259,7 @@ namespace Isis {
     //  Get the maximum allowable number of open files
     struct rlimit limit;
     if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
-      QString msg = "Cannot read the maximum allowable open files from system resources.";
+      std::string msg = "Cannot read the maximum allowable open files from system resources.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     //  Allow for library files, etc
@@ -364,7 +364,7 @@ namespace Isis {
     // The flatfile is comma seperated and can be imported into an excel
     // spreadsheet
     if (ui.WasEntered("FLATFILE")) {
-      QString fFile = FileName(ui.GetFileName("FLATFILE")).expanded();
+      QString fFile = QString::fromStdString(FileName(ui.GetFileName("FLATFILE").toStdString()).expanded());
 
       ofstream os;
       os.open(fFile.toLatin1().data(), ios::out);
@@ -397,7 +397,7 @@ namespace Isis {
             QString pointId = outPoint->GetId();
 
             QString fullName = files->fileName(cmTrans->GetCubeSerialNumber());
-            QString filename = FileName(fullName).baseName();
+            QString filename = QString::fromStdString(FileName(fullName.toStdString()).baseName());
 
             QString measureType = cmTrans->MeasureTypeToString(
                 cmTrans->GetType());
@@ -416,13 +416,13 @@ namespace Isis {
             double outLine = cmTrans->GetLine();
 
             os <<
-              pointId << "," <<
-              filename << "," <<
-              measureType << "," <<
-              reference << "," <<
-              editLock << "," <<
-              ignore << "," <<
-              registered << "," <<
+              pointId.toStdString() << "," <<
+              filename.toStdString() << "," <<
+              measureType.toStdString() << "," <<
+              reference.toStdString() << "," <<
+              editLock.toStdString() << "," <<
+              ignore.toStdString() << "," <<
+              registered.toStdString() << "," <<
               inSamp << "," <<
               inLine << "," <<
               outSamp << "," <<
@@ -454,11 +454,11 @@ namespace Isis {
     }
 
     if (logFalsePositives) {
-      QString filename = FileName(ui.GetFileName("FALSEPOSITIVES")).expanded();
+      QString filename = QString::fromStdString(FileName(ui.GetFileName("FALSEPOSITIVES").toStdString()).expanded());
       ofstream os;
       os.open(filename.toLatin1().data(), ios::out);
 
-      os << Validation::getHeader() << endl;
+      os << Validation::getHeader().toStdString() << endl;
       for (int i = 0; i < falsePositives->size(); i++) {
         os << (*falsePositives)[i].toStdString() << endl;
       }
@@ -467,27 +467,27 @@ namespace Isis {
     }
 
     PvlGroup pLog("Points");
-    pLog += PvlKeyword("Total", toString(outNet.GetNumPoints()));
-    pLog += PvlKeyword("Ignored", toString(ignored));
-    appLog->addLogGroup(pLog);
+    pLog += PvlKeyword("Total", Isis::toString(outNet.GetNumPoints()));
+    pLog += PvlKeyword("Ignored", Isis::toString(ignored));
+    Application::AppendAndLog(pLog, appLog);
 
     PvlGroup mLog("Measures");
-    mLog += PvlKeyword("Locked", toString(locked));
-    mLog += PvlKeyword("Registered", toString(registered));
-    mLog += PvlKeyword("NotIntersected", toString(notintersected));
-    mLog += PvlKeyword("Unregistered", toString(unregistered));
-    appLog->addLogGroup(mLog);
+    mLog += PvlKeyword("Locked", Isis::toString(locked));
+    mLog += PvlKeyword("Registered", Isis::toString(registered));
+    mLog += PvlKeyword("NotIntersected", Isis::toString(notintersected));
+    mLog += PvlKeyword("Unregistered", Isis::toString(unregistered));
+    Application::AppendAndLog(mLog, appLog);
 
     // Log Registration Statistics
     Pvl arPvl = ar->RegistrationStatistics();
 
     for (int i = 0; i < arPvl.groups(); i++) {
-      appLog->addLogGroup(arPvl.group(i));
+      Application::AppendAndLog(arPvl.group(i), appLog);
     }
 
     // add the auto registration information to print.prt
     PvlGroup autoRegTemplate = ar->RegTemplate();
-    appLog->addLogGroup(autoRegTemplate);
+    Application::AppendAndLog(autoRegTemplate, appLog);
 
     if (validator) {
       PvlGroup validationGroup("ValidationStatistics");
@@ -502,11 +502,11 @@ namespace Isis {
         }
       }
 
-      appLog->addLogGroup(validationGroup);
+      Application::AppendAndLog(validationGroup, appLog);
 
       PvlGroup validationTemplate = validator->UpdatedTemplate();
       validationTemplate.setName("ValidationTemplate");
-      appLog->addLogGroup(validationTemplate);
+      Application::AppendAndLog(validationTemplate, appLog);
     }
 
     outNet.Write(ui.GetFileName("ONET"));
@@ -835,7 +835,7 @@ namespace Isis {
 
     // Get template pvl
     Pvl userTemp;
-    userTemp.read(ui.GetFileName("DEFFILE"));
+    userTemp.read(ui.GetFileName("DEFFILE").toStdString());
 
     //Write template file out to the log
     Isis::Application::GuiLog(userTemp);

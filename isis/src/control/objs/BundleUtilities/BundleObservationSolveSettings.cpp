@@ -55,7 +55,7 @@ namespace Isis {
     initialize();
 
     // group name must be instrument id
-    m_instrumentId = (QString)scParameterGroup.nameKeyword();
+    m_instrumentId = QString::fromStdString(scParameterGroup.nameKeyword());
 
     // If CKDEGREE is not specified, then a default of 2 is used
     if (scParameterGroup.hasKeyword("CKDEGREE")) {
@@ -70,7 +70,7 @@ namespace Isis {
     // do we solve for No pointing, ANGLES only, ANGLES+ANGULAR VELOCITY, ANGLES+ANGULAR VELOCITY+
     // ANGULAR ACCELERATION, or a higher order polynomial
     QString csolve = "NONE";
-    csolve = (QString)scParameterGroup.findKeyword("CAMSOLVE");
+    csolve = QString::fromStdString(scParameterGroup.findKeyword("CAMSOLVE"));
     csolve = csolve.toUpper();
     if (csolve == "NONE") {
       m_instrumentPointingSolveOption = NoPointingFactors;
@@ -95,7 +95,7 @@ namespace Isis {
 
     // If OVEREXISTING is not specified, then a default of NO is used
     if (scParameterGroup.hasKeyword("OVEREXISTING")) {
-      QString parval = (QString)scParameterGroup.findKeyword("OVEREXISTING");
+      QString parval = QString::fromStdString(scParameterGroup.findKeyword("OVEREXISTING"));
       parval = parval.toUpper();
       if (parval == "TRUE" || parval == "YES") {
         m_solvePointingPolynomialOverExisting = true;
@@ -106,7 +106,7 @@ namespace Isis {
         m_pointingInterpolationType = SpiceRotation::PolyFunction;
       }
       else {
-        QString msg = "The OVEREXISTING parameter must be set to TRUE or FALSE; YES or NO";
+        std::string msg = "The OVEREXISTING parameter must be set to TRUE or FALSE; YES or NO";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -122,7 +122,7 @@ namespace Isis {
     // do we solve for No position, POSITION only, POSITION+VELOCITY, POSITION+VELOCITY+
     // ACCELERATION, or a higher order polynomial
     QString ssolve = "NONE";
-    ssolve = (QString)scParameterGroup.findKeyword("SPSOLVE");
+    ssolve = QString::fromStdString(scParameterGroup.findKeyword("SPSOLVE"));
     ssolve = ssolve.toUpper();
     if (ssolve == "NONE") {
       m_instrumentPositionSolveOption = NoPositionFactors;
@@ -147,7 +147,7 @@ namespace Isis {
 
     // If TWIST is not specified, then a default of YES is used
     if (scParameterGroup.hasKeyword("TWIST")) {
-      QString parval = (QString)scParameterGroup.findKeyword("TWIST");
+      QString parval = QString::fromStdString(scParameterGroup.findKeyword("TWIST"));
       parval = parval.toUpper();
       if (parval == "TRUE" || parval == "YES") { // is this necessary ??? i think pvl and toString can handle it...
         m_solveTwist = true;
@@ -156,13 +156,13 @@ namespace Isis {
         m_solveTwist = false;
       }
       else {
-        QString msg = "The TWIST parameter must be set to TRUE or FALSE; YES or NO";
+        std::string msg = "The TWIST parameter must be set to TRUE or FALSE; YES or NO";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     // If OVERHERMITE is not specified, then a default of NO is used
     if (scParameterGroup.hasKeyword("OVERHERMITE")) {
-     QString parval = (QString)scParameterGroup.findKeyword("OVERHERMITE");
+     QString parval = QString::fromStdString(scParameterGroup.findKeyword("OVERHERMITE"));
      parval = parval.toUpper();
      if (parval == "TRUE" || parval == "YES") {
        m_solvePositionOverHermiteSpline = true;
@@ -173,7 +173,7 @@ namespace Isis {
        m_positionInterpolationType = SpicePosition::PolyFunction;
      }
      else {
-       QString msg = "The OVERHERMITE parameter must be set to TRUE or FALSE; YES or NO";
+       std::string msg = "The OVERHERMITE parameter must be set to TRUE or FALSE; YES or NO";
        throw IException(IException::User, msg, _FILEINFO_);
      }
     }
@@ -202,7 +202,7 @@ namespace Isis {
       if (scParameterGroup.hasKeyword("ADDITIONAL_CAMERA_POINTING_SIGMAS")) {
         PvlKeyword additionalSigmas = scParameterGroup.findKeyword("ADDITIONAL_CAMERA_POINTING_SIGMAS");
         for (int i = 0; i < additionalSigmas.size(); i++ ) {
-          m_anglesAprioriSigma.append(toDouble(additionalSigmas[i]));
+          m_anglesAprioriSigma.append(Isis::toDouble(additionalSigmas[i]));
         }
       }
     }
@@ -229,23 +229,23 @@ namespace Isis {
       if (scParameterGroup.hasKeyword("ADDITIONAL_SPACECRAFT_POSITION_SIGMAS")) {
         PvlKeyword additionalSigmas = scParameterGroup.findKeyword("ADDITIONAL_SPACECRAFT_POSITION_SIGMAS");
         for (int i = 0; i < additionalSigmas.size(); i++ ) {
-          m_positionAprioriSigma.append(toDouble(additionalSigmas[i]));
+          m_positionAprioriSigma.append(Isis::toDouble(additionalSigmas[i]));
         }
       }
     }
 
     // CSM settings
     if (scParameterGroup.hasKeyword("CSMSOLVESET")) {
-      setCSMSolveSet(stringToCSMSolveSet(scParameterGroup.findKeyword("CSMSOLVESET")));
+      setCSMSolveSet(stringToCSMSolveSet(QString::fromStdString(scParameterGroup.findKeyword("CSMSOLVESET"))));
     }
     else if (scParameterGroup.hasKeyword("CSMSOLVETYPE")) {
-      setCSMSolveType(stringToCSMSolveType(scParameterGroup.findKeyword("CSMSOLVETYPE")));
+      setCSMSolveType(stringToCSMSolveType(QString::fromStdString(scParameterGroup.findKeyword("CSMSOLVETYPE"))));
     }
     else if (scParameterGroup.hasKeyword("CSMSOLVELIST")) {
       PvlKeyword csmSolveListKey = scParameterGroup.findKeyword("CSMSOLVELIST");
       QStringList csmSolveList;
       for (int i = 0; i < csmSolveListKey.size(); i++) {
-        csmSolveList.append(csmSolveListKey[i]);
+        csmSolveList.append(QString::fromStdString(csmSolveListKey[i]));
       }
       setCSMSolveParameterList(csmSolveList);
     }
@@ -478,7 +478,7 @@ namespace Isis {
     }
     else {
       throw IException(IException::Unknown,
-                       "Unknown bundle CSM solve option " + option + ".",
+                       "Unknown bundle CSM solve option " + option.toStdString() + ".",
                        _FILEINFO_);
     }
   }
@@ -531,7 +531,7 @@ namespace Isis {
     }
     else {
       throw IException(IException::Unknown,
-                       "Unknown bundle CSM parameter set " + set + ".",
+                       "Unknown bundle CSM parameter set " + set.toStdString() + ".",
                        _FILEINFO_);
     }
   }
@@ -584,7 +584,7 @@ namespace Isis {
     }
     else {
       throw IException(IException::Unknown,
-                       "Unknown bundle CSM parameter type " + type + ".",
+                       "Unknown bundle CSM parameter type " + type.toStdString() + ".",
                        _FILEINFO_);
     }
   }
@@ -742,7 +742,7 @@ namespace Isis {
     }
     else {
       throw IException(IException::Unknown,
-                       "Unknown bundle instrument pointing solve option " + option + ".",
+                       "Unknown bundle instrument pointing solve option " + option.toStdString() + ".",
                        _FILEINFO_);
     }
   }
@@ -1002,7 +1002,7 @@ namespace Isis {
     }
     else {
       throw IException(IException::Unknown,
-                          "Unknown bundle instrument position solve option " + option + ".",
+                          "Unknown bundle instrument position solve option " + option.toStdString() + ".",
                           _FILEINFO_);
     }
   }
@@ -1218,12 +1218,12 @@ namespace Isis {
     stream.writeStartElement("instrumentPointingOptions");
     stream.writeAttribute("solveOption",
                            instrumentPointingSolveOptionToString(m_instrumentPointingSolveOption));
-    stream.writeAttribute("numberCoefSolved", toString(m_numberCamAngleCoefSolved));
-    stream.writeAttribute("degree", toString(m_ckDegree));
-    stream.writeAttribute("solveDegree", toString(m_ckSolveDegree));
-    stream.writeAttribute("solveTwist", toString(m_solveTwist));
-    stream.writeAttribute("solveOverExisting", toString(m_solvePointingPolynomialOverExisting));
-    stream.writeAttribute("interpolationType", toString(m_pointingInterpolationType));
+    stream.writeAttribute("numberCoefSolved", QString::number(m_numberCamAngleCoefSolved));
+    stream.writeAttribute("degree", QString::number(m_ckDegree));
+    stream.writeAttribute("solveDegree", QString::number(m_ckSolveDegree));
+    stream.writeAttribute("solveTwist", QString::fromStdString(Isis::toString(m_solveTwist)));
+    stream.writeAttribute("solveOverExisting", QString::fromStdString(Isis::toString(m_solvePointingPolynomialOverExisting)));
+    stream.writeAttribute("interpolationType", QString::fromStdString(Isis::toString(m_pointingInterpolationType)));
 
     stream.writeStartElement("aprioriPointingSigmas");
     for (int i = 0; i < m_anglesAprioriSigma.size(); i++) {
@@ -1231,7 +1231,7 @@ namespace Isis {
         stream.writeTextElement("sigma", "N/A");
       }
       else {
-        stream.writeTextElement("sigma", toString(m_anglesAprioriSigma[i]));
+        stream.writeTextElement("sigma", QString::fromStdString(Isis::toString(m_anglesAprioriSigma[i])));
       }
     }
     stream.writeEndElement();// end aprioriPointingSigmas
@@ -1241,11 +1241,11 @@ namespace Isis {
     stream.writeStartElement("instrumentPositionOptions");
     stream.writeAttribute("solveOption",
                            instrumentPositionSolveOptionToString(m_instrumentPositionSolveOption));
-    stream.writeAttribute("numberCoefSolved", toString(m_numberCamPosCoefSolved));
-    stream.writeAttribute("degree", toString(m_spkDegree));
-    stream.writeAttribute("solveDegree", toString(m_spkSolveDegree));
-    stream.writeAttribute("solveOverHermiteSpline", toString(m_solvePositionOverHermiteSpline));
-    stream.writeAttribute("interpolationType", toString(m_positionInterpolationType));
+    stream.writeAttribute("numberCoefSolved", QString::number(m_numberCamPosCoefSolved));
+    stream.writeAttribute("degree", QString::number(m_spkDegree));
+    stream.writeAttribute("solveDegree", QString::number(m_spkSolveDegree));
+    stream.writeAttribute("solveOverHermiteSpline", QString::fromStdString(Isis::toString(m_solvePositionOverHermiteSpline)));
+    stream.writeAttribute("interpolationType", QString::number(m_positionInterpolationType));
 
     stream.writeStartElement("aprioriPositionSigmas");
     for (int i = 0; i < m_positionAprioriSigma.size(); i++) {
@@ -1253,7 +1253,7 @@ namespace Isis {
         stream.writeTextElement("sigma", "N/A");
       }
       else {
-        stream.writeTextElement("sigma", toString(m_positionAprioriSigma[i]));
+        stream.writeTextElement("sigma", QString::fromStdString(Isis::toString(m_positionAprioriSigma[i])));
       }
     }
     stream.writeEndElement();// end aprioriPositionSigmas
@@ -1292,11 +1292,11 @@ namespace Isis {
         }
         QStringRef solveTwist = xmlReader->attributes().value("solveTwist");
         if (!solveTwist.isEmpty()) {
-          m_solveTwist = toBool(solveTwist.toString());
+          m_solveTwist = toBool(solveTwist.toString().toStdString());
         }
         QStringRef solveOverExisting = xmlReader->attributes().value("solveOverExisting");
         if (!solveOverExisting.isEmpty()) {
-          m_solvePointingPolynomialOverExisting = toBool(solveOverExisting.toString());
+          m_solvePointingPolynomialOverExisting = toBool(solveOverExisting.toString().toStdString());
         }
         QStringRef interpolationType = xmlReader->attributes().value("interpolationType");
         if (!interpolationType.isEmpty()) {
@@ -1351,7 +1351,7 @@ namespace Isis {
         }
         QStringRef solveOverHermiteSpline = xmlReader->attributes().value("solveOverHermiteSpline");
         if (!solveOverHermiteSpline.isEmpty()) {
-          m_solvePositionOverHermiteSpline = toBool(solveOverHermiteSpline.toString());
+          m_solvePositionOverHermiteSpline = toBool(solveOverHermiteSpline.toString().toStdString());
         }
         QStringRef interpolationType = xmlReader->attributes().value("interpolationType");
         if (!interpolationType.isEmpty()) {

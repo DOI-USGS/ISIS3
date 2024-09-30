@@ -40,18 +40,18 @@ void IsisMain() {
   // Grab the file to import
   ProcessImportPds p;
   UserInterface &ui = Application::GetUserInterface();
-  FileName inFile = ui.GetFileName("FROM");
-  FileName outFile = ui.GetCubeName("TO");
+  FileName inFile = ui.GetFileName("FROM").toStdString();
+  FileName outFile = ui.GetCubeName("TO").toStdString();
 
   // Apply a fix to the gallileo pds labels so they can be read
-  fixPvl(inFile.toString());
+  fixPvl(QString::fromStdString(inFile.toString()));
 
   // Make sure it is a Galileo SSI image
   Pvl lab(inFile.expanded());
 
   //Checks if in file is rdr
   if(lab.hasObject("IMAGE_MAP_PROJECTION")) {
-    QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
+    std::string msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -59,11 +59,11 @@ void IsisMain() {
   // data set id value must contain "SSI-2-REDR-V1.0" or "SSI-2-REDR-V1.1" (valid SSI image)
   // or "SSI-4-REDR-V1.0" or "SSI-4-REDR-V1.1"(reconstructed from garbled SSI image)
   QString dataSetId;
-  dataSetId = (QString)lab["DATA_SET_ID"];
+  dataSetId = QString::fromStdString(lab["DATA_SET_ID"]);
 
   if(!dataSetId.contains("SSI-2-REDR-V1.0") && !dataSetId.contains("SSI-2-REDR-V1.1")
       && !dataSetId.contains("SSI-4-REDR-V1.0") && !dataSetId.contains("SSI-4-REDR-V1.1") ) {
-    QString msg = "Invalid DATA_SET_ID [" + dataSetId + "]" + 
+    std::string msg = "Invalid DATA_SET_ID [" + dataSetId.toStdString() + "]" + 
     " from input file [" + inFile.expanded() + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -95,7 +95,7 @@ void IsisMain() {
 
   Progress prog;
   Pvl pdsLabel;
-  p.SetPdsFile(inFile.expanded(), "", pdsLabel);
+  p.SetPdsFile(QString::fromStdString(inFile.expanded()), "", pdsLabel);
 
   // If summed handle the image similarly to pds2isis
   // with an extra translation step
@@ -112,7 +112,7 @@ void IsisMain() {
     summedOutput = new Cube();
     summedOutput->setDimensions(p.Samples() / 2, p.Lines() / 2, p.Bands());
     summedOutput->setPixelType(p.PixelType());
-    summedOutput->create(outFile.expanded());
+    summedOutput->create(QString::fromStdString(outFile.expanded()));
 
     p.StartProcess(translateData);
     translateLabels(pdsLabel, summedOutput);
@@ -175,7 +175,7 @@ void translateLabels(Pvl &pdsLabel, Cube *ocube) {
   FileName transFile("$ISISROOT/appdata/translations/GalileoSsi.trn");
 
   // Get the translation manager ready
-  PvlToPvlTranslationManager labelXlater(pdsLabel, transFile.expanded());
+  PvlToPvlTranslationManager labelXlater(pdsLabel, QString::fromStdString(transFile.expanded()));
   // Pvl outputLabels;
   Pvl *outputLabel = ocube->label();
   labelXlater.Auto(*(outputLabel));
@@ -184,20 +184,19 @@ void translateLabels(Pvl &pdsLabel, Cube *ocube) {
   PvlGroup &arch = outputLabel->findGroup("Archive", Pvl::Traverse);
   PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
   arch.addKeyword(PvlKeyword("DataType", "RADIANCE"));
-  QString CTC = (QString) arch.findKeyword("ObservationId");
+  QString CTC = QString::fromStdString(arch.findKeyword("ObservationId"));
   QString CTCout = CTC.mid(0, 2);
-  arch.addKeyword(PvlKeyword("CalTargetCode", CTCout));
+  arch.addKeyword(PvlKeyword("CalTargetCode", CTCout.toStdString()));
 
   // Add to the Instrument Group
-  QString itest = (QString) inst.findKeyword("StartTime");
+  QString itest = QString::fromStdString(inst.findKeyword("StartTime"));
   itest.remove("Z");
-  inst.findKeyword("StartTime").setValue(itest);
+  inst.findKeyword("StartTime").setValue(itest.toStdString());
   //change exposure duration to seconds
   double expDur = inst.findKeyword("exposureDuration");
   double expDurOut = expDur / 1000.0;
-  inst.findKeyword("exposureDuration").setValue(toString(expDurOut), "seconds");
-  inst.addKeyword(PvlKeyword("FrameDuration",
-                             (QString) pdsLabel["frameDuration"], "seconds"));
+  inst.findKeyword("exposureDuration").setValue(Isis::toString(expDurOut), "seconds");
+  inst.addKeyword(PvlKeyword("FrameDuration", pdsLabel["frameDuration"], "seconds"));
 
   //Calculate the Frame_Rate_Id keyword
   QString frameModeId = "FULL";
@@ -208,12 +207,12 @@ void translateLabels(Pvl &pdsLabel, Cube *ocube) {
     summingMode = 2;
   }
 
-  inst.addKeyword(PvlKeyword("Summing", toString(summingMode)));
-  inst.addKeyword(PvlKeyword("FrameModeId", frameModeId));
+  inst.addKeyword(PvlKeyword("Summing", Isis::toString(summingMode)));
+  inst.addKeyword(PvlKeyword("FrameModeId", frameModeId.toStdString()));
 
   // Create the Band bin Group
   PvlGroup &bandBin = outputLabel->findGroup("BandBin", Pvl::Traverse);
-  QString filterName = pdsLabel["FILTER_NAME"];
+  QString filterName = QString::fromStdString(pdsLabel["FILTER_NAME"]);
   QString waveLength = "";
   QString width = "";
   if(filterName == "CLEAR") {
@@ -248,8 +247,8 @@ void translateLabels(Pvl &pdsLabel, Cube *ocube) {
     waveLength = "0.986";
     width = ".04";
   }
-  bandBin.addKeyword(PvlKeyword("Center", waveLength, "micrometers"));
-  bandBin.addKeyword(PvlKeyword("Width", width, "micrometers"));
+  bandBin.addKeyword(PvlKeyword("Center", waveLength.toStdString(), "micrometers"));
+  bandBin.addKeyword(PvlKeyword("Width", width.toStdString(), "micrometers"));
 
   //create the kernel group
   PvlGroup kern("Kernels");

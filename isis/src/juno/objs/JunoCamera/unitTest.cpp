@@ -47,7 +47,7 @@ int main(void) {
 
     Cube c("$ISISTESTDATA/isis/src/juno/unitTestData/JNCE_2013282_00M00099_V01_METHANE_0003.cub", "r");
     JunoCamera *cam = (JunoCamera *) CameraFactory::Create(c);
-    qDebug() << "FileName: " << FileName(c.fileName()).name();
+    qDebug() << "FileName: " <<  QString::fromStdString(FileName(c.fileName().toStdString()).name());
     qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();
     qDebug() << "";
 
@@ -61,8 +61,8 @@ int main(void) {
 
     // Test Shutter Open/Close
     const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
-    double exposureDuration = toDouble( inst["ExposureDuration"][0] );
-    QString stime = inst["StartTime"];
+    double exposureDuration = Isis::toDouble( inst["ExposureDuration"][0] );
+    QString stime = QString::fromStdString(inst["StartTime"]);
     double et;
     str2et_c(stime.toLatin1().data(), &et);
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);

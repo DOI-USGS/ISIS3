@@ -29,7 +29,7 @@ namespace Isis {
    * Construct MocLabels object using the file name
    */
   MocLabels::MocLabels(const QString &file) {
-    Cube cube(file, "r");
+    Cube cube(file.toStdString(), "r");
     Init(cube);
   }
 
@@ -66,31 +66,31 @@ namespace Isis {
     // Get stuff out of the instrument group
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-    p_instrumentId = (QString) inst["InstrumentId"];
+    p_instrumentId =  QString::fromStdString(inst["InstrumentId"]);
     p_startingSample = inst["FirstLineSample"];
     p_crosstrackSumming = inst["CrosstrackSumming"];
     p_downtrackSumming = inst["DowntrackSumming"];
     p_exposureDuration = inst["LineExposureDuration"];
     p_focalPlaneTemp = inst["FocalPlaneTemperature"];
-    p_clockCount = (QString) inst["SpacecraftClockCount"];
+    p_clockCount =  QString::fromStdString(inst["SpacecraftClockCount"]);
     p_orbitNumber = 0;
     if(inst.hasKeyword("OrbitNumber")) {
       p_orbitNumber = inst["OrbitNumber"];
     }
-    p_gainModeId = (QString) inst["GainModeId"];
+    p_gainModeId =  QString::fromStdString(inst["GainModeId"]);
     p_offsetModeId = inst["OffsetModeId"];
-    p_startTime = (QString) inst["StartTime"];
+    p_startTime =  QString::fromStdString(inst["StartTime"]);
 
     // Get stuff out of the archive group
     p_dataQuality = "Unknown";
     PvlGroup &arch = lab.findGroup("Archive", Pvl::Traverse);
     if(arch.hasKeyword("DataQualityDesc")) {
-      p_dataQuality = (QString) arch["DataQualityDesc"];
+      p_dataQuality =  QString::fromStdString(arch["DataQualityDesc"]);
     }
 
     // Get Stuff out of the band bind group
     PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
-    p_filter = (QString) bandBin["FilterName"];
+    p_filter =  QString::fromStdString(bandBin["FilterName"]);
 
     // Get the number of samples in the initial cube as it may have been
     // cropped or projected
@@ -120,8 +120,8 @@ namespace Isis {
     }
 
     if(!p_mocNA && !p_mocRedWA && !p_mocBlueWA) {
-      QString msg = "InstrumentID [" + p_instrumentId + "] and/or FilterName ["
-                    + p_filter + "] are inappropriate for the MOC camera";
+      std::string msg = "InstrumentID [" + p_instrumentId.toStdString() + "] and/or FilterName ["
+                    + p_filter.toStdString() + "] are inappropriate for the MOC camera";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -173,16 +173,16 @@ namespace Isis {
     if(NarrowAngle()) {
       p = p_gainMapNA.find(p_gainModeId);
       if(p == p_gainMapNA.end()) {
-        QString msg = "Invalid value for PVL keyword GainModeId [" +
-                      p_gainModeId + "]";
+        std::string msg = "Invalid value for PVL keyword GainModeId [" +
+                      p_gainModeId.toStdString() + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
     else {
       p = p_gainMapWA.find(p_gainModeId);
       if(p == p_gainMapWA.end()) {
-        QString msg = "Invalid value for PVL keyword GainModeId [" +
-                      p_gainModeId + "]";
+        std::string msg = "Invalid value for PVL keyword GainModeId [" +
+                      p_gainModeId.toStdString() + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -226,8 +226,8 @@ namespace Isis {
     InitDetectorMaps();
 
     // Temporarily load some naif kernels
-    QString lsk = p_lsk.expanded();
-    QString sclk = p_sclk.expanded();
+    QString lsk = QString::fromStdString(p_lsk.expanded());
+    QString sclk = QString::fromStdString(p_sclk.expanded());
     furnsh_c(lsk.toLatin1().data());
     furnsh_c(sclk.toLatin1().data());
 
@@ -428,15 +428,15 @@ namespace Isis {
     firstTime = false;
 
     // Load naif kernels
-    QString lskKern = p_lsk.expanded();
-    QString sclkKern = p_sclk.expanded();
+    QString lskKern = QString::fromStdString(p_lsk.expanded());
+    QString sclkKern = QString::fromStdString(p_sclk.expanded());
     furnsh_c(lskKern.toLatin1().data());
     furnsh_c(sclkKern.toLatin1().data());
 
     //Set up file for reading
     FileName wagoFile("$mgs/calibration/MGSC_????_wago.tab");
     wagoFile = wagoFile.highestVersion();
-    QString nameOfFile = wagoFile.expanded();
+    QString nameOfFile = QString::fromStdString(wagoFile.expanded());
     ifstream temp(nameOfFile.toLatin1().data());
     vector<int> wholeFile;
 
@@ -553,7 +553,7 @@ namespace Isis {
           scs2e_c(-94, sclk.c_str(), &et);
 
           // Get the gain mode id
-          gainId = line.Token(",").ToQt().remove("\"").trimmed();
+          gainId = QString::fromStdString(line.Token(",")).remove("\"").trimmed();
 
           // Get the offset mode id
           offsetId = line;
@@ -569,7 +569,7 @@ namespace Isis {
             unload_c(lskKern.toLatin1().data());
             unload_c(sclkKern.toLatin1().data());
 
-            QString msg = "Invalid GainModeId [" + gainId + "] in wago table";
+            std::string msg = "Invalid GainModeId [" + gainId.toStdString() + "] in wago table";
             throw IException(IException::Unknown, msg, _FILEINFO_);
           }
           double gain = p->second;

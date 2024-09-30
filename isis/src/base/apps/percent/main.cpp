@@ -30,12 +30,12 @@ void IsisMain() {
   PvlKeyword kwValue("Value");
 
   for(int i = 0; i < tokens.size(); i++) {
-    double percentage = toDouble(tokens[i]);
+    double percentage = tokens[i].toDouble();
     // Obtain the Histogram and the value at the percentage
     Histogram *hist = icube->histogram();
     double value = hist->Percent(percentage);
-    kwPercent += toString(percentage);
-    kwValue += toString(value);
+    kwPercent += Isis::toString(percentage);
+    kwValue += Isis::toString(value);
   }
   results += kwPercent;
   results += kwValue;
@@ -46,6 +46,6 @@ void IsisMain() {
   if(ui.WasEntered("TO")) {
     Pvl temp;
     temp.addGroup(results);
-    temp.write(ui.GetFileName("TO", "txt"));
+    temp.write(ui.GetFileName("TO", "txt").toStdString());
   }
 }

@@ -51,7 +51,7 @@ namespace Isis {
     while (xmlReader->readNextStartElement()) {
       if (xmlReader->qualifiedName() == "numberCells") {
         try {
-          m_numberCells = toDouble(xmlReader->readElementText());
+          m_numberCells = xmlReader->readElementText().toDouble();
         }
         catch (IException &e) {
           m_numberCells = 0.0;
@@ -59,7 +59,7 @@ namespace Isis {
       }
       else if (xmlReader->qualifiedName() == "numberQuantiles") {
         try {
-          m_numberQuantiles = toDouble(xmlReader->readElementText());
+          m_numberQuantiles = xmlReader->readElementText().toDouble();
         }
         catch (IException &e) {
           m_numberQuantiles = 0.0;
@@ -67,7 +67,7 @@ namespace Isis {
       }
       else if (xmlReader->qualifiedName() == "numberObservations") {
         try {
-          m_numberObservations = toDouble(xmlReader->readElementText());
+          m_numberObservations = xmlReader->readElementText().toDouble();
         }
         catch (IException &e) {
           m_numberObservations = 0.0;
@@ -552,19 +552,19 @@ namespace Isis {
   void StatCumProbDistDynCalc::save(QXmlStreamWriter &stream, const Project *project) const {   // TODO: does xml stuff need project???
 
     stream.writeStartElement("statCumProbDistDynCalc");
-    stream.writeTextElement("numberCells", toString(m_numberCells));
-    stream.writeTextElement("numberQuantiles", toString(m_numberQuantiles));
-    stream.writeTextElement("numberObservations", toString(m_numberObservations));
+    stream.writeTextElement("numberCells", QString::fromStdString(toString(m_numberCells)));
+    stream.writeTextElement("numberQuantiles", QString::fromStdString(toString(m_numberQuantiles)));
+    stream.writeTextElement("numberObservations", QString::fromStdString(toString(m_numberObservations)));
 
     stream.writeStartElement("distributionData");
     for (unsigned int i = 0; i < m_numberQuantiles; i++) {
       stream.writeStartElement("quantileInfo");
        // we need to write out high precision for minDistance calculations in value() and cumProb()
-      stream.writeAttribute("quantile", toString(m_quantiles[i], 17));
-      stream.writeAttribute("dataValue", toString(m_observationValues[i], 17));
+      stream.writeAttribute("quantile", QString::fromStdString(toString(m_quantiles[i], 17)));
+      stream.writeAttribute("dataValue", QString::fromStdString(toString(m_observationValues[i], 17)));
       stream.writeAttribute("idealNumObsBelowQuantile", 
-                            toString(m_idealNumObsBelowQuantile[i]));
-      stream.writeAttribute("actualNumObsBelowQuantile", toString(m_numObsBelowQuantile[i]));
+                            QString::fromStdString(toString(m_idealNumObsBelowQuantile[i])));
+      stream.writeAttribute("actualNumObsBelowQuantile", QString::fromStdString(toString(m_numObsBelowQuantile[i])));
       stream.writeEndElement(); // end observation
     }
     stream.writeEndElement(); // end observationData
@@ -615,14 +615,14 @@ namespace Isis {
   void StatCumProbDistDynCalc::validate() {
     // if quantiles have not been set
     if (m_numberQuantiles == 0) {
-      QString msg = "StatCumProbDistDynCalc will return no data until the quantiles have been set. "
+      std::string msg = "StatCumProbDistDynCalc will return no data until the quantiles have been set. "
                     "Number of cells = [" + toString(m_numberCells) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     } 
 
     //if there isn't even as much data as there are quantiles to track
     if (m_numberObservations < m_numberQuantiles) {
-      QString msg = "StatCumProbDistDynCalc will return no data until the number of observations "
+      std::string msg = "StatCumProbDistDynCalc will return no data until the number of observations "
                     "added [" + toString(m_numberObservations) + "] matches the number of "
                     "quantiles [" + toString(m_numberQuantiles)
                     + "] (i.e. number of nodes) selected.";

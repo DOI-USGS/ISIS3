@@ -50,14 +50,14 @@ namespace Isis {
       CubeAttributeInput &att = ui.GetInputAttribute("FROM");
       Cube *inCube = p.SetInputCube(ui.GetCubeName("FROM"), att);
 
-      g_isIof = inCube->label()->findGroup("Radiometry", Pvl::Traverse).findKeyword("RadiometricType")[0].toUpper() == "IOF";
+      g_isIof = QString::fromStdString(inCube->label()->findGroup("Radiometry", Pvl::Traverse).findKeyword("RadiometricType")[0]).toUpper() == "IOF";
 
-      FileName scaledCube("$TEMPORARY/" + FileName(ui.GetCubeName("FROM")).name());
+      FileName scaledCube("$TEMPORARY/" + FileName(ui.GetCubeName("FROM").toStdString()).name());
       scaledCube.addExtension("cub");
 
       scaledCube = FileName::createTempFile(scaledCube);
       p.SetOutputCube(
-          scaledCube.expanded(), CubeAttributeOutput(),
+          QString::fromStdString(scaledCube.expanded()), CubeAttributeOutput(),
           inCube->sampleCount(), inCube->lineCount(),
           inCube->bandCount());
 
@@ -68,7 +68,7 @@ namespace Isis {
       ProcessExport pe;
 
       // Setup the input cube
-      inCube = pe.SetInputCube(scaledCube.expanded(), CubeAttributeInput());
+      inCube = pe.SetInputCube(QString::fromStdString(scaledCube.expanded()), CubeAttributeInput());
 
       if (g_isIof) {
           pe.SetOutputType(Isis::SignedWord);
@@ -96,8 +96,8 @@ namespace Isis {
       }
 
       FileName tempFile;
-      tempFile = FileName::createTempFile("$TEMPORARY/" + FileName(ui.GetFileName("TO")).baseName() + ".temp");
-      QString tempFileName(tempFile.expanded());
+      tempFile = FileName::createTempFile("$TEMPORARY/" + FileName(ui.GetFileName("TO").toStdString()).baseName() + ".temp");
+      QString tempFileName(QString::fromStdString(tempFile.expanded()));
       ofstream temporaryFile(tempFileName.toLatin1().data());
 
       pe.StartProcess(temporaryFile);
@@ -106,8 +106,8 @@ namespace Isis {
       // Calculate MD5 Checksum
       g_md5Checksum = MD5Checksum(tempFileName);
 
-      FileName outFile(ui.GetFileName("TO"));
-      QString outFileName(outFile.expanded());
+      FileName outFile(ui.GetFileName("TO").toStdString());
+      QString outFileName(QString::fromStdString(outFile.expanded()));
       ifstream inFile(tempFileName.toLatin1().data());
       ofstream pdsFile(outFileName.toLatin1().data());
 
@@ -121,7 +121,7 @@ namespace Isis {
 
       pe.EndProcess();
 
-      remove((scaledCube.expanded()).toLatin1().data());
+      remove((scaledCube.expanded()).c_str());
       remove(tempFileName.toLatin1().data());
       return;
   }
@@ -163,7 +163,7 @@ namespace Isis {
 
       //Translate the Original Pds Label
       FileName transFile("$ISISROOT/appdata/translations/LroNacPdsLabelExport.trn");
-      PvlToPvlTranslationManager labelXlator(labelPvl, transFile.expanded());
+      PvlToPvlTranslationManager labelXlator(labelPvl, QString::fromStdString(transFile.expanded()));
       labelXlator.Auto(outLabel);
 
       // Copy any Translation changes over
@@ -172,47 +172,47 @@ namespace Isis {
           QString unit = "";
           if (labelPvl[outLabel[i].name()].unit() != "") {
               hasUnit = true;
-              unit = labelPvl[outLabel[i].name()].unit();
+              unit = QString::fromStdString(labelPvl[outLabel[i].name()].unit());
           }
           bool hasComment = false;
           QString comment = "";
           if (labelPvl[outLabel[i].name()].comments() > 0) {
               hasComment = true;
-              comment = labelPvl[outLabel[i].name()].comment(0);
+              comment = QString::fromStdString(labelPvl[outLabel[i].name()].comment(0));
           }
           labelPvl[outLabel[i].name()] = outLabel[i];
 
           if (hasUnit)
-              labelPvl[outLabel[i].name()].setUnits(unit);
+              labelPvl[outLabel[i].name()].setUnits(unit.toStdString());
           if (hasComment)
-              labelPvl[outLabel[i].name()].addComment(comment);
+              labelPvl[outLabel[i].name()].addComment(comment.toStdString());
       }
 
       //Update the product ID
       //we switch the last char in the id from edr->cdr
-      QString prod_id = labelPvl["PRODUCT_ID"][0];
+      QString prod_id = QString::fromStdString(labelPvl["PRODUCT_ID"][0]);
       labelPvl["PRODUCT_ID"][0].replace((prod_id.length()-1), 1, "C");
 
       // Update the product creation time
-      labelPvl["PRODUCT_CREATION_TIME"].setValue(iTime::CurrentGMT());
+      labelPvl["PRODUCT_CREATION_TIME"].setValue(iTime::CurrentGMT().toStdString());
 
-      labelPvl["PRODUCT_VERSION_ID"].setValue(g_productVersionId);
+      labelPvl["PRODUCT_VERSION_ID"].setValue(g_productVersionId.toStdString());
 
       // Update the "IMAGE" Object
       PvlObject &imageObject = labelPvl.findObject("IMAGE");
       imageObject.clear();
-      imageObject += PvlKeyword("LINES", toString(cube->lineCount()));
-      imageObject += PvlKeyword("LINE_SAMPLES", toString(cube->sampleCount()));
+      imageObject += PvlKeyword("LINES", Isis::toString(cube->lineCount()));
+      imageObject += PvlKeyword("LINE_SAMPLES", Isis::toString(cube->sampleCount()));
       if (g_isIof) {
-          imageObject += PvlKeyword("SAMPLE_BITS", toString(16));
+          imageObject += PvlKeyword("SAMPLE_BITS", Isis::toString(16));
           imageObject += PvlKeyword("SAMPLE_TYPE", "LSB_INTEGER");
-          imageObject += PvlKeyword("SCALING_FACTOR", toString(1.0 / SCALING_FACTOR));
-          imageObject += PvlKeyword("VALID_MINIMUM", toString(Isis::VALID_MIN2));
-          imageObject += PvlKeyword("NULL", toString(Isis::NULL2));
-          imageObject += PvlKeyword("LOW_REPR_SATURATION", toString(Isis::LOW_REPR_SAT2));
-          imageObject += PvlKeyword("LOW_INSTR_SATURATION", toString(Isis::LOW_INSTR_SAT2));
-          imageObject += PvlKeyword("HIGH_INSTR_SATURATION", toString(Isis::HIGH_INSTR_SAT2));
-          imageObject += PvlKeyword("HIGH_REPR_SATURATION", toString(Isis::HIGH_REPR_SAT2));
+          imageObject += PvlKeyword("SCALING_FACTOR", Isis::toString(1.0 / SCALING_FACTOR));
+          imageObject += PvlKeyword("VALID_MINIMUM", Isis::toString(Isis::VALID_MIN2));
+          imageObject += PvlKeyword("NULL", Isis::toString(Isis::NULL2));
+          imageObject += PvlKeyword("LOW_REPR_SATURATION", Isis::toString(Isis::LOW_REPR_SAT2));
+          imageObject += PvlKeyword("LOW_INSTR_SATURATION", Isis::toString(Isis::LOW_INSTR_SAT2));
+          imageObject += PvlKeyword("HIGH_INSTR_SATURATION", Isis::toString(Isis::HIGH_INSTR_SAT2));
+          imageObject += PvlKeyword("HIGH_REPR_SATURATION", Isis::toString(Isis::HIGH_REPR_SAT2));
           imageObject += PvlKeyword("UNIT", "Scaled I/F");
       }
       else {
@@ -226,20 +226,20 @@ namespace Isis {
           imageObject += PvlKeyword("HIGH_REPR_SATURATION", "16#FF7FFFFF#");
           imageObject += PvlKeyword("UNIT", "W / (m**2 micrometer sr)");
       }
-      imageObject += PvlKeyword("MD5_CHECKSUM", g_md5Checksum);
+      imageObject += PvlKeyword("MD5_CHECKSUM", g_md5Checksum.toStdString());
 
       stream << labelPvl;
 
       int recordBytes = cube->sampleCount();
       int labelRecords = (int) ((stream.str().length()) / recordBytes) + 1;
 
-      labelPvl["RECORD_BYTES"] = toString(recordBytes);
+      labelPvl["RECORD_BYTES"] = Isis::toString(recordBytes);
       if (g_isIof)
-          labelPvl["FILE_RECORDS"] = toString((int) (cube->lineCount() * 2 + labelRecords));
+          labelPvl["FILE_RECORDS"] = Isis::toString((int) (cube->lineCount() * 2 + labelRecords));
       else
-          labelPvl["FILE_RECORDS"] = toString((int) (cube->lineCount() * 4 + labelRecords));
-      labelPvl["LABEL_RECORDS"] = toString(labelRecords);
-      labelPvl["^IMAGE"] = toString((int) (labelRecords + 1));
+          labelPvl["FILE_RECORDS"] = Isis::toString((int) (cube->lineCount() * 4 + labelRecords));
+      labelPvl["LABEL_RECORDS"] = Isis::toString(labelRecords);
+      labelPvl["^IMAGE"] = Isis::toString((int) (labelRecords + 1));
 
       stream.str(std::string());
 
@@ -251,9 +251,9 @@ namespace Isis {
       while ((int)pdsLabel.length() + 2 > (int)(labelRecords * recordBytes)) {
           labelRecords++;
           // Refresh the label content
-          labelPvl["FILE_RECORDS"] = toString((int) (cube->lineCount() * 4 + labelRecords));
-          labelPvl["LABEL_RECORDS"] = toString(labelRecords);
-          labelPvl["^IMAGE"] = toString((int) (labelRecords + 1));
+          labelPvl["FILE_RECORDS"] = Isis::toString((int) (cube->lineCount() * 4 + labelRecords));
+          labelPvl["LABEL_RECORDS"] = Isis::toString(labelRecords);
+          labelPvl["^IMAGE"] = Isis::toString((int) (labelRecords + 1));
           stream.str(std::string());
           stream << labelPvl;
           pdsLabel = stream.str().c_str();
@@ -268,7 +268,7 @@ namespace Isis {
           pdsLabel += " ";
       }
 
-      fout << pdsLabel;
+      fout << pdsLabel.toStdString();
       return;
   }
 

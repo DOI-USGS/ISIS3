@@ -105,8 +105,8 @@ namespace Isis {
       }
 
       // Find directory and save for use in file dialog for match cube
-      FileName fname(baseFile);
-      dir = fname.path();
+      FileName fname(baseFile.toStdString());
+      dir = QString::fromStdString(fname.path());
 
       //  Make sure base is projected
       try {
@@ -127,7 +127,7 @@ namespace Isis {
         }
         catch (IException &e) {
           QString message = "Cannot initialize universal ground map for basemap.\n";
-          QString errors = e.toString();
+          QString errors = QString::fromStdString(e.toString());
           message += errors;
           QMessageBox::critical((QWidget *)parent(), "Error", message);
           baseCube->close();
@@ -183,7 +183,7 @@ namespace Isis {
         }
         catch (IException &e) {
           QString message = "Cannot initialize universal ground map for match cube.\n";
-          QString errors = e.toString();
+          QString errors = QString::fromStdString(e.toString());
           message += errors;
           QMessageBox::critical((QWidget *)parent(), "Error", message);
           matchCube->close();
@@ -200,8 +200,8 @@ namespace Isis {
     QString target = matchCube->camera()->target()->name();
 
     // Find directory and save for use in file dialog for control net
-    FileName fname(matchFile);
-    dir = fname.path();
+    FileName fname(matchFile.toStdString());
+    dir = QString::fromStdString(fname.path());
 
     bool netOk = false;
 
@@ -236,7 +236,7 @@ namespace Isis {
         }
         catch (IException &e) {
           QString message = "Invalid control network.  \n";
-          QString errors = e.toString();
+          QString errors = QString::fromStdString(e.toString());
           message += errors;
           QMessageBox::information((QWidget *)parent(), "Error", message);
         }

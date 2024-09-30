@@ -90,8 +90,8 @@ namespace Isis {
         // Check for blank lines
         if (line.substr(0, 1) != " " && line.substr(0, 1) != "/") {
           // Name of keyword
-          PvlKeyword label(line.Token(" =").ToQt()); // Stop on spaces OR equal sign
-          if (QString::compare(label.name(), "OBJECT", Qt::CaseInsensitive) == 0) {
+          PvlKeyword label(line.Token(" =")); // Stop on spaces OR equal sign
+          if (QString::compare(QString::fromStdString(label.name()), "OBJECT", Qt::CaseInsensitive) == 0) {
             label.setName("TARGET");
             label.addComment("NOTE: This keyword name was changed from 'OBJECT' in the original "
                              "fit header file.");
@@ -100,13 +100,13 @@ namespace Isis {
           line.TrimHead(" =");
           line.TrimTail(" ");
           if (label.name() == "COMMENT" || label.name() == "HISTORY") {
-            label += line.ToQt();
+            label += line;
           }
           else {
             // Check for a quoted value
             if (line.substr(0,1) == "'") {
               line.TrimHead("'");
-              label += line.Token("'").TrimHead(" ").TrimTail(" ").ToQt();
+              label += line.Token("'").TrimHead(" ").TrimTail(" ");
               line.TrimHead(" '");
             }
             else {
@@ -114,16 +114,16 @@ namespace Isis {
               IString value = line.Token("/");
               // Clear to end of data
               value.TrimTail(" ");
-              label += value.ToQt();
+              label += value;
               line.TrimHead(" ");
             }
             // If the line still has anything in it, treat it is as a comment.
             if (line.size() > 2) {
               line.TrimHead(" /");
-              label.addComment(line.ToQt());
+              label.addComment(line);
               // A possible format for units, other possiblites exist.
               if (line != line.Token("[")) {
-                label.setUnits(line.Token("[").Token("]").ToQt());
+                label.setUnits(line.Token("[").Token("]"));
               }
             }
           }
@@ -162,16 +162,16 @@ namespace Isis {
           bytesPerPixel /= 8;
           
           unsigned int axis1 = 1;
-          axis1 = toInt((*fitsLabel)["NAXIS1"]);
+          axis1 = Isis::toInt((*fitsLabel)["NAXIS1"]);
           
           unsigned int axis2 = 1;
           if (fitsLabel->hasKeyword("NAXIS2")) {
-            axis2 = toInt((*fitsLabel)["NAXIS2"]);
+            axis2 = Isis::toInt((*fitsLabel)["NAXIS2"]);
           }
           
           unsigned int axis3 = 1;
           if (fitsLabel->hasKeyword("NAXIS3")) {
-            axis3 = toInt((*fitsLabel)["NAXIS3"]);
+            axis3 = Isis::toInt((*fitsLabel)["NAXIS3"]);
           }
           
           jump = (int)(ceil(bytesPerPixel * axis1 * axis2 * axis3 / 2880.0) * 2880.0);
@@ -202,8 +202,8 @@ namespace Isis {
       }
 
       else {
-        QString msg = QObject::tr("The FITS file does not contain a section header that appears "
-                                  "to describe an image [%1].").arg(m_name.toString());
+        std::string msg = "The FITS file does not contain a section header that appears "
+                                  "to describe an image [" + m_name.toString() + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -223,21 +223,19 @@ namespace Isis {
    */
   PvlGroup ProcessImportFits::extraFitsLabel(int labelNumber) const {
     if (labelNumber >= m_extraFitsLabels->size()) {
-      QString msg = QObject::tr("The requested label number [%1], from file [%2] is "
+      std::string msg = "The requested label number [" + Isis::toString(labelNumber) + "], from file [" + m_name.expanded() + "] is "
                                 "past the last extra group found in this FITS file. "
-                                "Extra label count is [%3]").arg(labelNumber).
-                                arg(m_name.expanded()).arg(m_extraFitsLabels->size()-1);
+                                "Extra label count is [" + Isis::toString(m_extraFitsLabels->size()-1) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (!m_extraFitsLabels) {
-      QString msg = QObject::tr("The FITS label has not been initialized, "
-                                "call setFitsFile() first.");
+      std::string msg = "The FITS label has not been initialized, "
+                                "call setFitsFile() first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if (m_extraFitsLabels->size() < labelNumber) {
-      QString msg = QObject::tr("The requested FITS label number "
-                                "was not found in file [%1].").arg(m_name.toString());
+      std::string msg = "The requested FITS label number was not found in file [" + m_name.toString() + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -259,21 +257,19 @@ namespace Isis {
   PvlGroup ProcessImportFits::fitsImageLabel(int labelNumber) const {
 
     if (labelNumber >= m_fitsImageLabels->size()) {
-      QString msg = QObject::tr("The requested label number [%1], from file [%2] is "
+      std::string msg = "The requested label number [" + Isis::toString(labelNumber) + "], from file [" + m_name.expanded() + "] is "
                                 "past the last image group found in this FITS file. "
-                                "Image label count is [%3]").arg(labelNumber).
-                                arg(m_name.expanded()).arg(m_fitsImageLabels->size()-1);
+                                "Image label count is [" + Isis::toString(m_fitsImageLabels->size()-1) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (!m_fitsImageLabels) {
-      QString msg = QObject::tr("The FITS label has not been initialized, "
-                                "call setFitsFile first.");
+      std::string msg = "The FITS label has not been initialized, "
+                                "call setFitsFile first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if (m_fitsImageLabels->size() < labelNumber) {
-      QString msg = QObject::tr("The requested FITS label number "
-                                "was not found in file [%1].").arg(m_name.toString());
+      std::string msg = "The requested FITS label number was not found in file [" +  m_name.toString() + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -324,13 +320,12 @@ namespace Isis {
   void ProcessImportFits::setFitsFile(FileName fitsFile) {
     m_name = fitsFile;
 
-    SetInputFile(fitsFile.toString()); // Make sure the file exists
+    SetInputFile(QString::fromStdString(fitsFile.toString())); // Make sure the file exists
 
-    m_file.open(fitsFile.expanded().toLocal8Bit().constData(), std::ios::in  | std::ios::binary);
+    m_file.open(fitsFile.expanded().c_str(), std::ios::in  | std::ios::binary);
 
     if (!m_file.is_open()) {
-      QString msg = QObject::tr("Unable to open FITS formatted file [%1].")
-                               .arg(fitsFile.toString());
+      std::string msg = "Unable to open FITS formatted file [" + fitsFile.toString() + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -340,9 +335,7 @@ namespace Isis {
     // Check to make sure it is a FITS file we can handle
     PvlGroup label = fitsImageLabel(0);
     if (label.hasKeyword("SIMPLE") && label["SIMPLE"][0] == "F") {
-      QString msg = QObject::tr("The file [%1] cannot be processed. "
-                                "It is an unsupported format.").
-          arg(fitsFile.toString());
+      std::string msg = "The file [" + fitsFile.toString() + "] cannot be processed. It is an unsupported format.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -363,9 +356,8 @@ namespace Isis {
   void ProcessImportFits::setProcessFileStructure(int labelNumber) {
 
     if (labelNumber >= m_fitsImageLabels->size()) {
-      QString msg = QObject::tr("The requested label number [%1], from file [%2] is "
-                                "past the last image in this FITS file [%3].").arg(labelNumber).
-                                arg(InputFile()).arg(m_fitsImageLabels->size()-1);
+      std::string msg = "The requested label number [" + Isis::toString(labelNumber) + "], from file [" + InputFile().toStdString() + "] is "
+                                "past the last image in this FITS file [" + Isis::toString(m_fitsImageLabels->size()-1) + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -377,8 +369,8 @@ namespace Isis {
 
     // Find pixel type. NOTE: There are several unsupported possiblites
     Isis::PixelType type;
-    QString msg = "";
-    switch (toInt(label["BITPIX"][0])) {
+    std::string msg = "";
+    switch (Isis::toInt(label["BITPIX"][0])) {
       case 8:
         type = Isis::UnsignedByte;
         break;
@@ -414,60 +406,60 @@ namespace Isis {
     // considered part of the DNs. So, use the parent class' prefix/suffix byte count to reduce
     // the number of samples.
     if (Organization() == BSQ) {
-      if (toInt(label["NAXIS"][0]) == 2) {
-        SetDimensions(toInt(label["NAXIS1"][0])
+      if (Isis::toInt(label["NAXIS"][0]) == 2) {
+        SetDimensions(Isis::toInt(label["NAXIS1"][0])
                       - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
-                      toInt(label["NAXIS2"][0]), 1);
+                      Isis::toInt(label["NAXIS2"][0]), 1);
       }
-      else if (toInt(label["NAXIS"][0]) == 3) {
-        SetDimensions(toInt(label["NAXIS1"][0]) 
+      else if (Isis::toInt(label["NAXIS"][0]) == 3) {
+        SetDimensions(Isis::toInt(label["NAXIS1"][0]) 
                       - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
-                      toInt(label["NAXIS2"][0]), toInt(label["NAXIS3"][0]));
+                      Isis::toInt(label["NAXIS2"][0]), Isis::toInt(label["NAXIS3"][0]));
       }
       else {
-        QString msg = "NAXIS count of [" 
+        std::string msg = "NAXIS count of [" 
                       + label["NAXIS"][0]
                       + "] is not supported for FITS imports.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else if (Organization() == BIL) {
-      if (toInt(label["NAXIS"][0]) == 2) {
-        SetDimensions(toInt(label["NAXIS1"][0]) 
+      if (Isis::toInt(label["NAXIS"][0]) == 2) {
+        SetDimensions(Isis::toInt(label["NAXIS1"][0]) 
                       - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
-                      1, toInt(label["NAXIS2"][0]));
+                      1, Isis::toInt(label["NAXIS2"][0]));
       }
-      else if (toInt(label["NAXIS"][0]) == 3) {
-        SetDimensions(toInt(label["NAXIS1"][0]) 
+      else if (Isis::toInt(label["NAXIS"][0]) == 3) {
+        SetDimensions(Isis::toInt(label["NAXIS1"][0]) 
                       - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
-                      toInt(label["NAXIS3"][0]), toInt(label["NAXIS2"][0]));
+                      Isis::toInt(label["NAXIS3"][0]), Isis::toInt(label["NAXIS2"][0]));
       }
       else {
-        QString msg = "NAXIS count of [" 
+        std::string msg = "NAXIS count of [" 
                       + label["NAXIS"][0] 
                       + "] is not supported for FITS imports.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else if (Organization() == BIP) {
-      QString msg = "BIP (Band Interleaved by Pixel) "
+      std::string msg = "BIP (Band Interleaved by Pixel) "
                     "organization is not supported for FITS imports.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     else {
-      QString msg = "Unknown organization is not supported for FITS imports.";
+      std::string msg = "Unknown organization is not supported for FITS imports.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Base and multiplier
     if (label.hasKeyword("BZERO")) {
-      SetBase(toDouble(label["BZERO"][0]));
+      SetBase(Isis::toDouble(label["BZERO"][0]));
     }
     else {
       SetBase(0.0);
     }
     if (label.hasKeyword("BSCALE")) {
-      SetMultiplier(toDouble(label["BSCALE"][0]));
+      SetMultiplier(Isis::toDouble(label["BSCALE"][0]));
     }
     else {
       SetMultiplier(1.0);

@@ -47,9 +47,9 @@ int main(void) {
     files.append("$ISISTESTDATA/isis/src/viking/unitTestData/f348b26.cub"); // Viking2 VISB
 
     for (int i = 0; i < files.size(); i++) {
-      Cube c(files[i], "r");
+      Cube c(files[i].toStdString(), "r");
       VikingCamera *cam = (VikingCamera *) CameraFactory::Create(c);
-      cout << "FileName: " << FileName(c.fileName()).name() << endl;
+      cout << "FileName: " << FileName(c.fileName().toStdString()).name() << endl;
       cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
       cout.setf(std::ios::fixed);
       cout << setprecision(9);
@@ -65,7 +65,7 @@ int main(void) {
       // Test Shutter Open/Close
       const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
       double exposureDuration = ((double) inst["ExposureDuration"])/1000;
-      QString stime = inst["StartTime"];
+      QString stime = QString::fromStdString(inst["StartTime"]);
       double et; // StartTime keyword is the center exposure time
       str2et_c(stime.toLatin1().data(), &et);
       pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
@@ -118,12 +118,12 @@ int main(void) {
     files.append("$ISISTESTDATA/isis/src/viking/unitTestData/f387a06.cropped.cub"); // Viking1 VISB
     files.append("$ISISTESTDATA/isis/src/viking/unitTestData/f004b33.cropped.cub"); // Viking2 VISA
     for (int i = 0; i < files.size(); i++) {
-      Cube c(files[i], "r");
+      Cube c(files[i].toStdString(), "r");
       VikingCamera *cam = (VikingCamera *) CameraFactory::Create(c);
-      cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
-      cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
-      cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
-      cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
+      cout << "Spacecraft Name Long: " << cam->spacecraftNameLong().toStdString() << endl;
+      cout << "Spacecraft Name Short: " << cam->spacecraftNameShort().toStdString() << endl;
+      cout << "Instrument Name Long: " << cam->instrumentNameLong().toStdString() << endl;
+      cout << "Instrument Name Short: " << cam->instrumentNameShort().toStdString() << endl << endl;
     }
 
     // Test exception: camera is not a supported Kaguya camera

@@ -48,7 +48,7 @@ void IsisMain() {
   if (ui.WasEntered("TO")) {
     if (ui.GetString("TRANSFORM") == "WARP") {
       if (!ui.WasEntered("ONET")) {
-        QString msg = "A Control Net file must be entered if the TO parameter is ";
+        std::string msg = "A Control Net file must be entered if the TO parameter is ";
         msg += "entered";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -68,12 +68,12 @@ void IsisMain() {
   // one band
   if ((trans.lineCount() != match.lineCount()) ||
       (trans.sampleCount() != match.sampleCount())) {
-    QString msg = "Input Cube Lines and Samples must be equal!";
+    std::string msg = "Input Cube Lines and Samples must be equal!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (trans.bandCount() != 1 || match.bandCount() != 1) {
-    QString msg = "Input Cubes must have only one band!";
+    std::string msg = "Input Cubes must have only one band!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -83,22 +83,22 @@ void IsisMain() {
 
 //  This still precludes band to band registrations.
   if (serialTrans == serialMatch) {
-    QString sTrans = FileName(trans.fileName()).name();
-    QString sMatch = FileName(match.fileName()).name();
+    std::string sTrans = FileName(trans.fileName().toStdString()).name();
+    std::string sMatch = FileName(match.fileName().toStdString()).name();
     if (sTrans == sMatch) {
-      QString msg = "Cube Serial Numbers must be unique - FROM=" + serialTrans +
-                   ", MATCH=" + serialMatch;
+      std::string msg = "Cube Serial Numbers must be unique - FROM=" + serialTrans.toStdString() +
+                   ", MATCH=" + serialMatch.toStdString();
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    serialTrans = sTrans;
-    serialMatch = sMatch;
+    serialTrans = QString::fromStdString(sTrans);
+    serialMatch = QString::fromStdString(sMatch);
   }
 
 
   // We need to get a user definition of how to auto correlate around each
   // of the control points.
   Pvl regdef;
-  regdef.read(ui.GetFileName("DEFFILE"));
+  regdef.read(ui.GetFileName("DEFFILE").toStdString());
   AutoReg *ar = AutoRegFactory::Create(regdef);
 
   // We want to create a grid of control points that is N rows by M columns.
@@ -178,7 +178,7 @@ void IsisMain() {
       }
 
       // Add the measures to a control point
-      QString str = "Row_" + toString(r) + "_Column_" + toString(c);
+      QString str = "Row_" + QString::number(r) + "_Column_" + QString::number(c);
       ControlPoint * cp = new ControlPoint(str);
       cp->SetType(ControlPoint::Free);
       cp->Add(cmTrans);
@@ -201,14 +201,14 @@ void IsisMain() {
   double lMax = (int)(lStats.Maximum() * 100.0) / 100.0;
   double lDev = (int)(lStats.StandardDeviation() * 100.0) / 100.0;
 
-  results += PvlKeyword("SampleMinimum", toString(sMin));
-  results += PvlKeyword("SampleAverage", toString(sTrans));
-  results += PvlKeyword("SampleMaximum", toString(sMax));
-  results += PvlKeyword("SampleStandardDeviation", toString(sDev));
-  results += PvlKeyword("LineMinimum", toString(lMin));
-  results += PvlKeyword("LineAverage", toString(lTrans));
-  results += PvlKeyword("LineMaximum", toString(lMax));
-  results += PvlKeyword("LineStandardDeviation", toString(lDev));
+  results += PvlKeyword("SampleMinimum", Isis::toString(sMin));
+  results += PvlKeyword("SampleAverage", Isis::toString(sTrans));
+  results += PvlKeyword("SampleMaximum", Isis::toString(sMax));
+  results += PvlKeyword("SampleStandardDeviation", Isis::toString(sDev));
+  results += PvlKeyword("LineMinimum", Isis::toString(lMin));
+  results += PvlKeyword("LineAverage", Isis::toString(lTrans));
+  results += PvlKeyword("LineMaximum", Isis::toString(lMax));
+  results += PvlKeyword("LineStandardDeviation", Isis::toString(lDev));
   Application::Log(results);
 
   Pvl arPvl = ar->RegistrationStatistics();
@@ -223,7 +223,7 @@ void IsisMain() {
 
   // If none of the points registered, throw an error
   if (sStats.TotalPixels() < 1) {
-    QString msg = "Coreg was unable to register any points. Check your algorithm definition.";
+    std::string msg = "Coreg was unable to register any points. Check your algorithm definition.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -240,9 +240,9 @@ void IsisMain() {
   // The flatfile is comma seperated and can be imported into an excel
   // spreadsheet
   if (ui.WasEntered("FLATFILE")) {
-    QString fFile = FileName(ui.GetFileName("FLATFILE")).expanded();
+    std::string fFile = FileName(ui.GetFileName("FLATFILE").toStdString()).expanded();
     ofstream os;
-    os.open(fFile.toLatin1().data(), ios::out);
+    os.open(fFile.c_str(), ios::out);
     os << "Sample,Line,TranslatedSample,TranslatedLine," <<
        "SampleDifference,LineDifference,GoodnessOfFit" << endl;
     for (int i = 0; i < cn.GetNumPoints(); i++) {
@@ -267,8 +267,8 @@ void IsisMain() {
     if (ui.GetString("TRANSFORM") == "TRANSLATE") {
       QString params = " from="   + ui.GetCubeName("FROM") +
                       " to="     + ui.GetCubeName("TO") +
-                      " strans=" + toString(sTrans) +
-                      " ltrans=" + toString(lTrans) +
+                      " strans=" + QString::number(sTrans) +
+                      " ltrans=" + QString::number(lTrans) +
                       " interp=" + ui.GetString("INTERP");
       ProgramLauncher::RunIsisProgram("translate", params);
     }
@@ -278,7 +278,7 @@ void IsisMain() {
                       " cube="   + ui.GetCubeName("MATCH") +
                       " cnet="   + ui.GetFileName("ONET") +
                       " interp=" + ui.GetString("INTERP") +
-                      " degree=" + toString(ui.GetInteger("DEGREE"));
+                      " degree=" + QString::number(ui.GetInteger("DEGREE"));
       ProgramLauncher::RunIsisProgram("warp", params);
     }
   }
@@ -289,7 +289,7 @@ void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
   QString file(ui.GetFileName("DEFFILE"));
   Pvl p;
-  p.read(file);
+  p.read(file.toStdString());
   Application::GuiLog(p);
 }
 //...........end of helper function ........

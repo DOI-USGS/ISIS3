@@ -142,12 +142,12 @@ void IsisMain() {
 
 
   try {
-    timeString = QString(inst["StartTime"]);
+    timeString = QString::fromStdString(inst["StartTime"]);
 
   }
   catch(IException &e) {
 
-    QString msg = "The label for the input cube [" + QString(ui.GetAsString("FROM")) +
+    std::string msg = "The label for the input cube [" + ui.GetAsString("FROM").toStdString() +
         "] does not have a start time in the Instrument group.";
     throw IException(IException::User,msg,_FILEINFO_);
 
@@ -155,17 +155,17 @@ void IsisMain() {
 
   iTime startTime(timeString);
   //Determine the year string to access the appropriate calibration file
-  yearString= QString::number(startTime.Year() );
+  yearString= QString::fromStdString(toString(startTime.Year() ));
 
 
   if(!isVims) {
-    QString msg = "The input cube [" + QString(ui.GetAsString("FROM")) +
+    std::string msg = "The input cube [" + ui.GetAsString("FROM").toStdString() +
         "] is not a Cassini VIMS cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(icube->label()->findObject("IsisCube").hasGroup("AlphaCube")) {
-    QString msg = "The input cube [" + QString(ui.GetAsString("FROM"))
+    std::string msg = "The input cube [" + ui.GetAsString("FROM").toStdString()
         + "] has had its dimensions modified and can not be calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -327,8 +327,8 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     cam = icube->camera();
   }
   catch(IException &e) {
-    QString msg = "Unable to create a camera model from [" +
-                  icube->fileName() + "]. Please run "
+    std::string msg = "Unable to create a camera model from [" +
+                  icube->fileName().toStdString() + "]. Please run "
                   "spiceinit on this file";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
@@ -382,7 +382,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   if(solarRemoveCoefficient < 0) {
     solarRemoveCoefficient = 81.595089;
     /*
-    QString msg = "Unable to project image at four corners, center of edges or ";
+    std::string msg = "Unable to project image at four corners, center of edges or ";
     msg += "at center. The solar distance can not be calculated, try using";
     msg += " [UNITS=SPECENERGY] on [";
     msg += icube->FileName() + "]";
@@ -403,20 +403,20 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     attributes = "+97-352";
   }
 
-  CubeAttributeInput iatt(attributes);
+  CubeAttributeInput iatt(attributes.toStdString());
 
   //QString solarFilePath = "$cassini/calibration/vims/solar_v????.cub";
   QString solarFilePath = "$cassini/calibration/vims/"+calVersion+
      "/solar-spectrum/"+"solar."+yearString+"_v????.cub";
 
-  FileName solarFileName(solarFilePath);
+  FileName solarFileName(solarFilePath.toStdString());
 
   solarFileName = solarFileName.highestVersion();
 
   calibInfo += PvlKeyword("SolarColorFile",
                           solarFileName.originalPath() + "/" + solarFileName.name());
 
-  p->SetInputCube(createCroppedFile(icube, solarFileName.expanded()), iatt);
+  p->SetInputCube(createCroppedFile(icube, QString::fromStdString(solarFileName.expanded())), iatt);
 }
 
 
@@ -434,23 +434,23 @@ void loadCalibrationValues() {
   g_configFile.read(calibFile.expanded());
   PvlGroup &multipliers = g_configFile.findGroup("CalibrationMultipliers");
 
-  calVersion = (QString)multipliers["version"];
+  calVersion = QString::fromStdString(multipliers["version"]);
 
-  g_solar = multipliers["solar"][0].toDouble();
+  g_solar = Isis::toDouble(multipliers["solar"][0]);
 
-  g_ir = multipliers["IR"][0].toDouble();
+  g_ir = Isis::toDouble(multipliers["IR"][0]);
 
-  g_vis = multipliers["VIS"][0].toDouble();
+  g_vis = Isis::toDouble(multipliers["VIS"][0]);
 
-  g_wavecal = multipliers["wave-cal"][0].toDouble();
+  g_wavecal = Isis::toDouble(multipliers["wave-cal"][0]);
 
 
 
-  calibInfo += PvlKeyword("CalibrationVersion", calVersion);
-  calibInfo += PvlKeyword("SolarMultiplier",QString::number(g_solar,'f',2));
-  calibInfo += PvlKeyword("IR_Multiplier",QString::number(g_ir,'f',2));
-  calibInfo += PvlKeyword("VIS_Multiplier",QString::number(g_vis,'f',2));
-  calibInfo += PvlKeyword("Wave-CalMultiplier",QString::number(g_wavecal,'f',2));
+  calibInfo += PvlKeyword("CalibrationVersion", calVersion.toStdString());
+  calibInfo += PvlKeyword("SolarMultiplier", toString(g_solar, 2));
+  calibInfo += PvlKeyword("IR_Multiplier", toString(g_ir, 2));
+  calibInfo += PvlKeyword("VIS_Multiplier", toString(g_vis, 2));
+  calibInfo += PvlKeyword("Wave-CalMultiplier", toString(g_wavecal, 2));
 
 
 }
@@ -477,15 +477,15 @@ void updateWavelengths(Cube *icube) {
       "wavelengths_average_v????.cub";
 
 
-  FileName bandwidthFileName = FileName(bandwidthFile);
-  FileName averageBandwidthFileName = FileName(averageBandwidthFile);
+  FileName bandwidthFileName = FileName(bandwidthFile.toStdString());
+  FileName averageBandwidthFileName = FileName(averageBandwidthFile.toStdString());
   bandwidthFileName =bandwidthFileName.highestVersion();
   averageBandwidthFileName = averageBandwidthFileName.highestVersion();
 
   Cube averageBandwidthCube;
   Cube bandwidthCube;
-  bandwidthCube.open(bandwidthFileName.expanded());
-  averageBandwidthCube.open(averageBandwidthFileName.expanded());
+  bandwidthCube.open(QString::fromStdString(bandwidthFileName.expanded()));
+  averageBandwidthCube.open(QString::fromStdString(averageBandwidthFileName.expanded()));
 
   calibInfo += PvlKeyword("BandwidthFile",
                           bandwidthFileName.originalPath() + "/" + bandwidthFileName.name());
@@ -525,28 +525,28 @@ void updateWavelengths(Cube *icube) {
   QString averageBandbinString("(");
 
   for (unsigned int i =0; i < bandwidthVector.size()-1; i++) {
-    bandbinCenterString+=QString::number(bandwidthVector[i]);
+    bandbinCenterString+=QString::fromStdString(toString(bandwidthVector[i]));
     bandbinCenterString+=",";
 
-    averageBandbinString+=QString::number(averageBandwidthVector[i]);
+    averageBandbinString+=QString::fromStdString(toString(averageBandwidthVector[i]));
     averageBandbinString+=",";
   }
 
-  bandbinCenterString+=QString::number(bandwidthVector[bandwidthVector.size()-1]);
+  bandbinCenterString+=QString::fromStdString(toString(bandwidthVector[bandwidthVector.size()-1]));
   bandbinCenterString+=")";
 
-  averageBandbinString+=QString::number(averageBandwidthVector[averageBandwidthVector.size()-1]);
+  averageBandbinString+=QString::fromStdString(toString(averageBandwidthVector[averageBandwidthVector.size()-1]));
   averageBandbinString+=")";
 
 
 
   PvlKeyword &centerBand = bandBin.findKeyword("Center");
-  centerBand.setValue(bandbinCenterString);
+  centerBand.setValue(bandbinCenterString.toStdString());
 
   PvlKeyword averageBand("MissionAverage");
-  averageBand.setValue(averageBandbinString);
+  averageBand.setValue(averageBandbinString.toStdString());
   bandBin.addKeyword(averageBand);
-  centerBand.setValue(bandbinCenterString);
+  centerBand.setValue(bandbinCenterString.toStdString());
 
 }
 
@@ -571,7 +571,7 @@ void calculateSpecificEnergy(Cube *icube) {
   }
 
   if(g_visBool) {
-    coefficient /= toDouble(inst["ExposureDuration"][1]) / 1000.0;
+    coefficient /= Isis::toDouble(inst["ExposureDuration"][1]) / 1000.0;
   }
   else {
 
@@ -608,7 +608,7 @@ void calculateSpecificEnergy(Cube *icube) {
     */
 
     //USGS
-    coefficient /= (toDouble(inst["ExposureDuration"][0]) * 1.01725) / 1000.0 - 0.004;
+    coefficient /= (Isis::toDouble(inst["ExposureDuration"][0]) * 1.01725) / 1000.0 - 0.004;
 
 
     //University of Arizona
@@ -634,24 +634,24 @@ void calculateSpecificEnergy(Cube *icube) {
       yearString+"_v????.cub";
 
 
-  FileName specEnergyFileName(specEnergyFile);
+  FileName specEnergyFileName(specEnergyFile.toStdString());
   specEnergyFileName = specEnergyFileName.highestVersion();
 
-  FileName visPerfFileName(visPerfFile);
+  FileName visPerfFileName(visPerfFile.toStdString());
   visPerfFileName = visPerfFileName.highestVersion();
 
-  FileName waveCalFileName(waveCalFile);
+  FileName waveCalFileName(waveCalFile.toStdString());
   waveCalFileName = waveCalFileName.highestVersion();
 
 
   Cube specEnergyCube;
-  specEnergyCube.open(specEnergyFileName.expanded());
+  specEnergyCube.open(QString::fromStdString(specEnergyFileName.expanded()));
 
   Cube visPerfCube;
-  visPerfCube.open(visPerfFileName.expanded());
+  visPerfCube.open(QString::fromStdString(visPerfFileName.expanded()));
 
   Cube waveCalCube;
-  waveCalCube.open(waveCalFileName.expanded());
+  waveCalCube.open(QString::fromStdString(waveCalFileName.expanded()));
 
   calibInfo += PvlKeyword("SpecificEnergyFile",
                           specEnergyFileName.originalPath() + "/" + specEnergyFileName.name());
@@ -762,18 +762,18 @@ void calculateVisDarkCurrent(Cube *icube) {
 
   calFile += "_dark_model_v????.tab";
 
-  FileName calFileName(calFile);
+  FileName calFileName(calFile.toStdString());
   calFileName = calFileName.highestVersion();
 
   calibInfo += PvlKeyword("DarkCurrentFile", calFileName.originalPath() + "/" + calFileName.name());
 
-  calFile = calFileName.expanded();
+  calFile = QString::fromStdString(calFileName.expanded());
 
   EndianSwapper swapper("LSB");
 
   FILE *calFilePtr = fopen(calFile.toLatin1().data(), "r");
 
-  double visExposure = toDouble(inst["ExposureDuration"][1]);
+  double visExposure = Isis::toDouble(inst["ExposureDuration"][1]);
 
   int sampleOffset, lineOffset;
   GetOffsets(*icube->label(), sampleOffset, lineOffset);
@@ -793,7 +793,7 @@ void calculateVisDarkCurrent(Cube *icube) {
 
         if(fread(&calData, sizeof(calData), 1, calFilePtr) != 1) {
           // error!
-          QString msg = "Error reading file [" + calFile + "]";
+          std::string msg = "Error reading file [" + calFile.toStdString() + "]";
           throw IException(IException::Io, msg, _FILEINFO_);
         }
 
@@ -873,7 +873,7 @@ void calculateIrDarkCurrent(Cube *icube) {
     return;
   }
 
-  Table sideplane("SideplaneIr", ui.GetCubeName("FROM"));
+  Table sideplane("SideplaneIr", ui.GetCubeName("FROM").toStdString());
 
   // If spectal summing is on OR compressor_id isnt N/A then
   //   just return.
@@ -1033,14 +1033,14 @@ if (!vis) {
 
   }
 
-  FileName calibrationFileName(calFile);
+  FileName calibrationFileName(calFile.toStdString());
   calibrationFileName = calibrationFileName.highestVersion();
 
   calibInfo += PvlKeyword("FlatFile", calibrationFileName.originalPath() +
                           "/" + calibrationFileName.name());
 
   CubeAttributeInput iatt;
-  p->SetInputCube(createCroppedFile(icube, calibrationFileName.expanded(), true), iatt);
+  p->SetInputCube(createCroppedFile(icube, QString::fromStdString(calibrationFileName.expanded()), true), iatt);
 }
 
 
@@ -1063,19 +1063,19 @@ QString createCroppedFile(Cube *icube, QString cubeFileName, bool flatFile) {
 
 
   QString appArgs = "from=" + cubeFileName + " ";
-  appArgs += "sample=" + toString(sampOffset) + " ";
-  appArgs += "line=" + toString(lineOffset) + " ";
-  appArgs += "nsamples=" + toString(icube->sampleCount()) + " ";
-  appArgs += "nlines=" + toString(icube->lineCount()) + " ";
+  appArgs += "sample=" + QString::fromStdString(toString(sampOffset)) + " ";
+  appArgs += "line=" + QString::fromStdString(toString(lineOffset)) + " ";
+  appArgs += "nsamples=" + QString::fromStdString(toString(icube->sampleCount())) + " ";
+  appArgs += "nlines=" + QString::fromStdString(toString(icube->lineCount())) + " ";
 
-  FileName tempFile("$TEMPORARY/tmp_" + FileName(cubeFileName).baseName() +
-                    "_" + FileName(icube->fileName()).name());
+  FileName tempFile("$TEMPORARY/tmp_" + FileName(cubeFileName.toStdString()).baseName() +
+                    "_" + FileName(icube->fileName().toStdString()).name());
 
-  appArgs += "to=" + tempFile.expanded();
+  appArgs += "to=" + QString::fromStdString(tempFile.expanded());
 
   ProgramLauncher::RunIsisProgram("crop", appArgs);
-  tempFiles.push_back(tempFile.expanded());
-  return tempFile.expanded();
+  tempFiles.push_back(QString::fromStdString(tempFile.expanded()));
+  return QString::fromStdString(tempFile.expanded());
 }
 
 
@@ -1094,7 +1094,7 @@ void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {
   finalSampOffset = sampOffset;
   finalLineOffset = lineOffset;
 
-  QString samplingMode = QString(inst["SamplingMode"]).toUpper();
+  QString samplingMode = QString::fromStdString(inst["SamplingMode"]).toUpper();
   if(vis) {
     if(samplingMode == "NORMAL") {
       finalSampOffset = sampOffset - 1;
@@ -1105,7 +1105,7 @@ void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {
       finalLineOffset = (3 * (lineOffset + swathLength / 2)) - swathLength / 2;
     }
     else {
-      QString msg = "Unsupported sampling mode [" + samplingMode + "]";
+      std::string msg = "Unsupported sampling mode [" + samplingMode.toStdString() + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
@@ -1119,11 +1119,11 @@ void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {
       finalLineOffset = lineOffset - 1;
     }
     else if(samplingMode == "NYQUIST") {
-      QString msg = "Cannot process NYQUIST (undersampled) mode ";
+      std::string msg = "Cannot process NYQUIST (undersampled) mode ";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else {
-      QString msg = "Unsupported sampling mode [" + samplingMode + "]";
+      std::string msg = "Unsupported sampling mode [" + samplingMode.toStdString() + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }

@@ -39,7 +39,7 @@ void IsisMain() {
 
   // Determine whether input is a raw Mariner 10 image or an Isis 2 cube
   bool isRaw = false;
-  FileName inputFile = ui.GetFileName("FROM");
+  FileName inputFile = ui.GetFileName("FROM").toStdString();
   Pvl label(inputFile.expanded());
 
   // If the PVL created from the input labels is empty, then input is raw
@@ -78,7 +78,7 @@ void IsisMain() {
     p.SetByteOrder(Lsb);
     p.SetDataSuffixBytes(136);
 
-    p.SetPdsFile(inputFile.expanded(), "", label);
+    p.SetPdsFile(QString::fromStdString(inputFile.expanded()), "", label);
     Cube *oCube = p.SetOutputCube("TO");
 
     TranslateIsis2Labels(inputFile, oCube);
@@ -144,7 +144,7 @@ void UpdateLabels(Cube *cube, const QString &labels) {
   filterName = filterName.trimmed();
 
   // Center wavelength
-  int fnum = toInt(filterNum);
+  int fnum = filterNum.toInt();
   double filterCenter = 0.;
   switch(fnum) {
     case 0:
@@ -179,10 +179,10 @@ void UpdateLabels(Cube *cube, const QString &labels) {
   // Create the instrument group
   PvlGroup inst("Instrument");
   inst += PvlKeyword("SpacecraftName", "Mariner_10");
-  inst += PvlKeyword("InstrumentId", "M10_VIDICON_" + ccamera);
+  inst += PvlKeyword("InstrumentId", "M10_VIDICON_" + ccamera.toStdString());
 
   // Get the date
-  int days = toInt(day);
+  int days = day.toInt();
   QString date = DaysToDate(days);
 
   // Get the time
@@ -196,22 +196,22 @@ void UpdateLabels(Cube *cube, const QString &labels) {
   // Create the archive group
   PvlGroup archive("Archive");
 
-  int year = toInt(yr);
+  int year = yr.toInt();
   year += 1900;
-  QString fullGMT = toString(year) + ":" + day + ":" + time;
-  archive += PvlKeyword("GMT", fullGMT);
-  archive += PvlKeyword("ImageNumber", fds);
+  QString fullGMT = QString::number(year) + ":" + day + ":" + time;
+  archive += PvlKeyword("GMT", fullGMT.toStdString());
+  archive += PvlKeyword("ImageNumber", fds.toStdString());
 
   // Create the band bin group
   PvlGroup bandBin("BandBin");
   QString filter = filterName;
   filter = filter.replace(")", "");
-  bandBin += PvlKeyword("FilterName", filter);
+  bandBin += PvlKeyword("FilterName", filter.toStdString());
   QString number = filterNum;
-  bandBin += PvlKeyword("FilterNumber", number);
+  bandBin += PvlKeyword("FilterNumber", number.toStdString());
   bandBin += PvlKeyword("OriginalBand", "1");
-  QString center = toString(filterCenter);
-  bandBin += PvlKeyword("Center", center);
+  QString center = QString::number(filterCenter);
+  bandBin += PvlKeyword("Center", center.toStdString());
   bandBin.findKeyword("Center").setUnits("micrometers");
 
   // Dates taken from ASU Mariner website - http://ser.ses.asu.edu/M10/TXT/encounters.html and
@@ -249,11 +249,11 @@ void UpdateLabels(Cube *cube, const QString &labels) {
   }
 
   // Place start time and exposure duration in intrument group
-  inst += PvlKeyword("StartTime", fullTime);
-  inst += PvlKeyword("ExposureDuration", exposure, "milliseconds");
+  inst += PvlKeyword("StartTime", fullTime.toStdString());
+  inst += PvlKeyword("ExposureDuration", exposure.toStdString(), "milliseconds");
 
   // Open nominal positions pvl named by QString encounter
-  Pvl nomRx(target);
+  Pvl nomRx(target.toStdString());
 
   // Allocate all keywords within reseaus groups well as the group its self
   PvlGroup rx("Reseaus");
@@ -273,7 +273,7 @@ void UpdateLabels(Cube *cube, const QString &labels) {
 
   // Camera dependent information
   QString camera = "";
-  if(QString("M10_VIDICON_A") == inst["InstrumentId"][0]) {
+  if(QString("M10_VIDICON_A") == QString::fromStdString(inst["InstrumentId"][0])) {
     templ = "$mariner10/reseaus/mar10a.template.cub";
     naif += "-76110";
     camera = "M10_VIDICON_A_RESEAUS";
@@ -288,7 +288,7 @@ void UpdateLabels(Cube *cube, const QString &labels) {
   kernels += naif;
 
   // Find the correct PvlKeyword corresponding to the camera for nominal positions
-  PvlKeyword resnom = nomRx[camera];
+  PvlKeyword resnom = nomRx[camera.toStdString()];
 
   // This loop goes through the PvlKeyword resnom which contains data
   // in the format: line, sample, type, on each line. There are 111 reseaus for
@@ -322,7 +322,7 @@ void UpdateLabels(Cube *cube, const QString &labels) {
   cubeLabels->findObject("IsisCube").addGroup(rx);
 
   PvlObject original("OriginalLabel");
-  original += PvlKeyword("Label", labels);
+  original += PvlKeyword("Label", labels.toStdString());
   Pvl olabel;
   olabel.addObject(original);
   OriginalLabel ol(olabel);
@@ -332,14 +332,14 @@ void UpdateLabels(Cube *cube, const QString &labels) {
 // Translate Isis 2 labels into Isis labels.
 void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   // Transfer the instrument group to the output cube
-  QString transDir = "$ISISROOT/appdata/translations/";
+  std::string transDir = "$ISISROOT/appdata/translations/";
   Pvl inputLabel(labelFile.expanded());
   FileName transFile;
 
   transFile = transDir + "Mariner10isis2.trn";
 
   // Get the translation manager ready
-  PvlToPvlTranslationManager translation(inputLabel, transFile.expanded());
+  PvlToPvlTranslationManager translation(inputLabel, QString::fromStdString(transFile.expanded()));
   Pvl *outputLabel = oCube->label();
   translation.Auto(*(outputLabel));
 
@@ -350,20 +350,20 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   instrumentId.setValue("M10_VIDICON_" + instrumentId[0]);
 
   PvlKeyword &targetName = inst.findKeyword("TargetName");
-  QString targetTail(targetName[0].mid(1));
+  QString targetTail(QString::fromStdString(targetName[0]).mid(1));
   targetTail = targetTail.toLower();
-  targetName.setValue(targetName[0].at(0) + targetTail);
+  targetName.setValue((QString::fromStdString(targetName[0]).at(0) + targetTail).toStdString());
 
   PvlKeyword &startTime = inst.findKeyword("StartTime");
-  startTime.setValue(startTime[0].mid(0, startTime[0].size() - 1));
+  startTime.setValue(QString::fromStdString(startTime[0]).mid(0, QString::fromStdString(startTime[0]).size() - 1).toStdString());
 
   PvlGroup &archive = outputLabel->findGroup("Archive", Pvl::Traverse);
   PvlKeyword &imgNo = archive.findKeyword("ImageNumber");
-  QString ino = imgNo[0];
+  QString ino = QString::fromStdString(imgNo[0]);
   ino = ino.trimmed();
-  imgNo.setValue(ino);
+  imgNo.setValue(ino.toStdString());
 
-  iTime time(startTime[0]);
+  iTime time(QString::fromStdString(startTime[0]));
   if(time < iTime("1974-2-3T12:00:00")) {
     archive += PvlKeyword("Encounter", "Moon");
   }
@@ -383,7 +383,7 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   inst.findKeyword("ExposureDuration").setUnits("milliseconds");
 
   PvlGroup &bBin = outputLabel->findGroup("BandBin", Pvl::Traverse);
-  QString filter = inputLabel.findObject("QUBE")["FILTER_NAME"];
+  QString filter = QString::fromStdString(inputLabel.findObject("QUBE")["FILTER_NAME"]);
   if(filter != "F") {
     //Band Bin group
     bBin.findKeyword("Center").setUnits("micrometers");
@@ -396,12 +396,12 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   PvlKeyword &valid = reseaus.findKeyword("Valid");
 
   for(int i = 0; i < valid.size(); i++) {
-    valid[i] = valid[i].mid(0, 1);
+    valid[i] = (QString::fromStdString(valid[i]).mid(0, 1)).toStdString();
   }
 
   // Camera dependent information
   QString camera = "";
-  if(QString("M10_VIDICON_A") == inst["InstrumentId"][0]) {
+  if(QString("M10_VIDICON_A") == QString::fromStdString(inst["InstrumentId"][0])) {
     templ = "$mariner10/reseaus/mar10a.template.cub";
     kernels.findKeyword("NaifFrameCode").setValue("-76110");
     camera = "M10_VIDICON_A_RESEAUS";
@@ -483,8 +483,8 @@ QString DaysToDate(int days) {
     }
     days--;
   }
-  QString year = toString(currentYear);
-  QString month = (currentMonth < 10) ? "0" + toString(currentMonth) : toString(currentMonth);
-  QString day = (currentDay < 10) ? "0" + toString(currentDay) : toString(currentDay);
+  QString year = QString::number(currentYear);
+  QString month = (currentMonth < 10) ? "0" + QString::number(currentMonth) : QString::number(currentMonth);
+  QString day = (currentDay < 10) ? "0" + QString::number(currentDay) : QString::number(currentDay);
   return year + "-" + month + "-" + day;
 }

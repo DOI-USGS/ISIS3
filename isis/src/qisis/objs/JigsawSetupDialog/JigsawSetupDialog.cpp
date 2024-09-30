@@ -86,8 +86,8 @@ namespace Isis {
     }
 
     // initialize default output control network filename
-    FileName fname = m_ui->inputControlNetCombo->currentText();
-    m_ui->outputControlNetLineEdit->setText(fname.baseName() + "-out.net");
+    FileName fname = m_ui->inputControlNetCombo->currentText().toStdString();
+    m_ui->outputControlNetLineEdit->setText(QString::fromStdString(fname.baseName()) + "-out.net");
 
     // initializations for observation solve settings tab
     createObservationSolveSettingsTreeView();
@@ -201,20 +201,20 @@ namespace Isis {
       QString name = target->displayProperties()->displayName();
 
       if (name == "MOON")
-        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
-                  "$ISISROOT/appdata/images/icons/weather-clear-night.png").expanded()), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(QString::fromStdString(FileName(
+                  "$ISISROOT/appdata/images/icons/weather-clear-night.png").expanded())), name, v);
       else if (name == "Enceladus")
-        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
-                  "$ISISROOT/appdata/images/icons/nasa_enceladus.png").expanded()), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(QString::fromStdString(FileName(
+                  "$ISISROOT/appdata/images/icons/nasa_enceladus.png").expanded())), name, v);
       else if (name == "Mars")
-        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
-                  "$ISISROOT/appdata/images/icons/nasa_mars.png").expanded()), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(QString::fromStdString(FileName(
+                  "$ISISROOT/appdata/images/icons/nasa_mars.png").expanded())), name, v);
       else if (name == "Titan")
-        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
-                  "$ISISROOT/appdata/images/icons/nasa_titan.png").expanded()), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(QString::fromStdString(FileName(
+                  "$ISISROOT/appdata/images/icons/nasa_titan.png").expanded())), name, v);
       else
-        m_ui->targetBodyComboBox->addItem(QIcon(FileName(
-                  "$ISISROOT/appdata/images/icons/weather-clear-night.png").expanded()), name, v);
+        m_ui->targetBodyComboBox->addItem(QIcon(QString::fromStdString(FileName(
+                  "$ISISROOT/appdata/images/icons/weather-clear-night.png").expanded())), name, v);
     }
 
     m_ui->radiiButtonGroup->setId(m_ui->noneRadiiRadioButton,0);
@@ -466,21 +466,21 @@ namespace Isis {
     // m_ui->updateCubeLabelCheckBox->setChecked(settings->updateCubeLabel());
     m_ui->errorPropagationCheckBox->setChecked(settings->errorPropagation());
     m_ui->outlierRejectionCheckBox->setChecked(settings->outlierRejection());
-    m_ui->outlierRejectionMultiplierLineEdit->setText(toString(settings->outlierRejectionMultiplier()));
-    m_ui->sigma0ThresholdLineEdit->setText(toString(settings->convergenceCriteriaThreshold()));
-    m_ui->maximumIterationsLineEdit->setText(toString(settings->convergenceCriteriaMaximumIterations()));
+    m_ui->outlierRejectionMultiplierLineEdit->setText(QString::number(settings->outlierRejectionMultiplier()));
+    m_ui->sigma0ThresholdLineEdit->setText(QString::number(settings->convergenceCriteriaThreshold()));
+    m_ui->maximumIterationsLineEdit->setText(QString::number(settings->convergenceCriteriaMaximumIterations()));
 
     // weighting tab
     if ( !IsNullPixel(settings->globalPointCoord1AprioriSigma()) ) {
-      m_ui->pointLatitudeSigmaLineEdit->setText(toString(settings->globalPointCoord1AprioriSigma()));
+      m_ui->pointLatitudeSigmaLineEdit->setText(QString::number(settings->globalPointCoord1AprioriSigma()));
       m_ui->pointLatitudeSigmaLineEdit->setModified(true);
     }
     if ( !IsNullPixel(settings->globalPointCoord2AprioriSigma()) ) {
-      m_ui->pointLongitudeSigmaLineEdit->setText(toString(settings->globalPointCoord2AprioriSigma()));
+      m_ui->pointLongitudeSigmaLineEdit->setText(QString::number(settings->globalPointCoord2AprioriSigma()));
       m_ui->pointLongitudeSigmaLineEdit->setModified(true);
     }
     if ( !IsNullPixel(settings->globalPointCoord3AprioriSigma()) ) {
-      m_ui->pointRadiusSigmaLineEdit->setText(toString(settings->globalPointCoord3AprioriSigma()));
+      m_ui->pointRadiusSigmaLineEdit->setText(QString::number(settings->globalPointCoord3AprioriSigma()));
       m_ui->pointRadiusSigmaLineEdit->setModified(true);
 
     }
@@ -704,7 +704,7 @@ namespace Isis {
    */
   void JigsawSetupDialog::selectControl(const QString &controlName) {
     QComboBox &cnetBox = *(m_ui->inputControlNetCombo);
-    int foundControlIndex = cnetBox.findText(FileName(controlName).name());
+    int foundControlIndex = cnetBox.findText(QString::fromStdString(FileName(controlName.toStdString()).name()));
     // We did not find it, so we need to see if the combo box is empty or not.
     if (foundControlIndex == -1) {
       if (cnetBox.count() == 0) {
@@ -1151,12 +1151,12 @@ namespace Isis {
 
         showTargetParametersGroupBox();
 
-        m_ui->rightAscensionLineEdit->setText(toString(raCoefs[0].degrees()));
-        m_ui->rightAscensionVelocityLineEdit->setText(toString(raCoefs[1].degrees()));
-        m_ui->declinationLineEdit->setText(toString(decCoefs[0].degrees()));
-        m_ui->declinationVelocityLineEdit->setText(toString(decCoefs[1].degrees()));
-        m_ui->primeMeridianOffsetLineEdit->setText(toString(pmCoefs[0].degrees()));
-        m_ui->spinRateLineEdit->setText(toString(pmCoefs[1].degrees()));
+        m_ui->rightAscensionLineEdit->setText(QString::number(raCoefs[0].degrees()));
+        m_ui->rightAscensionVelocityLineEdit->setText(QString::number(raCoefs[1].degrees()));
+        m_ui->declinationLineEdit->setText(QString::number(decCoefs[0].degrees()));
+        m_ui->declinationVelocityLineEdit->setText(QString::number(decCoefs[1].degrees()));
+        m_ui->primeMeridianOffsetLineEdit->setText(QString::number(pmCoefs[0].degrees()));
+        m_ui->spinRateLineEdit->setText(QString::number(pmCoefs[1].degrees()));
       }
       else {
         // Formulate message indicating why target parameters are disabled
@@ -1173,17 +1173,17 @@ namespace Isis {
         hideTargetParametersGroupBox();
       }
 
-      m_ui->aRadiusLineEdit->setText(toString(target->radiusA().kilometers()));
-      //m_ui->aRadiusSigmaLineEdit->setText(toString(target->sigmaRadiusA().kilometers()));
+      m_ui->aRadiusLineEdit->setText(QString::number(target->radiusA().kilometers()));
+      //m_ui->aRadiusSigmaLineEdit->setText(QString::number(target->sigmaRadiusA().kilometers()));
 
-      m_ui->bRadiusLineEdit->setText(toString(target->radiusB().kilometers()));
-      //m_ui->bRadiusSigmaLineEdit->setText(toString(target->sigmaRadiusB().kilometers()));
+      m_ui->bRadiusLineEdit->setText(QString::number(target->radiusB().kilometers()));
+      //m_ui->bRadiusSigmaLineEdit->setText(QString::number(target->sigmaRadiusB().kilometers()));
 
-      m_ui->cRadiusLineEdit->setText(toString(target->radiusC().kilometers()));
-      //m_ui->cRadiusSigmaLineEdit->setText(toString(target->sigmaRadiusC().kilometers()));
+      m_ui->cRadiusLineEdit->setText(QString::number(target->radiusC().kilometers()));
+      //m_ui->cRadiusSigmaLineEdit->setText(QString::number(target->sigmaRadiusC().kilometers()));
 
-      m_ui->meanRadiusLineEdit->setText(toString(target->meanRadius().kilometers()));
-      //m_ui->meanRadiusSigmaLineEdit->setText(toString(target->sigmaMeanRadius().kilometers()));
+      m_ui->meanRadiusLineEdit->setText(QString::number(target->meanRadius().kilometers()));
+      //m_ui->meanRadiusSigmaLineEdit->setText(QString::number(target->sigmaMeanRadius().kilometers()));
     }
   }
 
@@ -1398,8 +1398,8 @@ namespace Isis {
   }
 
   void Isis::JigsawSetupDialog::on_inputControlNetCombo_currentTextChanged(const QString &arg1) {
-    FileName fname = arg1;
-    m_ui->outputControlNetLineEdit->setText(fname.baseName() + "-out.net");
+    FileName fname = arg1.toStdString();
+    m_ui->outputControlNetLineEdit->setText(QString::fromStdString(fname.baseName()) + "-out.net");
   }
 
 

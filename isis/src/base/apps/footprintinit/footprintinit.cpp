@@ -58,7 +58,7 @@ namespace Isis {
 
     int sinc = 1;
     int linc = 1;
-    IString incType = ui.GetString("INCTYPE");
+    IString incType = ui.GetString("INCTYPE").toStdString();
     if (incType.UpCase() == "VERTICES") {
       poly.initCube(*cube);
       sinc = linc = (int)(0.5 + (((poly.validSampleDim() * 2) +
@@ -81,12 +81,12 @@ namespace Isis {
       poly.Create(*cube, sinc, linc, 1, 1, 0, 0, 1, precision);
     }
     catch (IException &e) {
-      QString msg = "Cannot generate polygon for [" + cube->fileName() + "]";
+      std::string msg = "Cannot generate polygon for [" + cube->fileName().toStdString() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
     if (testXY) {
-      Pvl map(ui.GetFileName("MAP"));
+      Pvl map(ui.GetFileName("MAP").toStdString());
       PvlGroup &mapGroup = map.findGroup("MAPPING");
 
       // This call adds TargetName, EquatorialRadius and PolarRadius to mapGroup
@@ -126,8 +126,8 @@ namespace Isis {
             delete proj;
             delete xyPoly;
             e.print(); // This should be a NAIF error
-            QString msg = "Cannot calculate XY for [";
-            msg += cube->fileName() + "]";
+            std::string msg = "Cannot calculate XY for [";
+            msg += cube->fileName().toStdString() + "]";
             throw IException(e, IException::User, msg, _FILEINFO_);
           }
         }
@@ -142,9 +142,9 @@ namespace Isis {
 
     if (precision) {
       PvlGroup results("Results");
-      results.addKeyword(PvlKeyword("SINC", toString(sinc)));
-      results.addKeyword(PvlKeyword("LINC", toString(linc)));
-      log->addLogGroup(results);
+      results.addKeyword(PvlKeyword("SINC", Isis::toString(sinc)));
+      results.addKeyword(PvlKeyword("LINC", Isis::toString(linc)));
+      Application::AppendAndLog(results, log);
     }
 
     Process p;

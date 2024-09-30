@@ -164,7 +164,7 @@ namespace Isis {
                                                 int index) {
     try {
     if (index != 0) {
-      QString msg = "Cannot translate value at index [" + toString(index) +
+      std::string msg = "Cannot translate value at index [" + toString(index) +
                     "]. Xml files can only store a single value in each element.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -172,10 +172,10 @@ namespace Isis {
     const Pvl &transTable = TranslationTable();
     PvlGroup transGroup;
     try {
-      transGroup = transTable.findGroup(translationGroupName);
+      transGroup = transTable.findGroup(translationGroupName.toStdString());
     }
     catch (IException &e){
-      QString msg = "Unable to retrieve translation group from translation table.";
+      std::string msg = "Unable to retrieve translation group from translation table.";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -185,25 +185,25 @@ namespace Isis {
       inputPosition = transGroup["InputPosition"];
     }
     catch (IException &e){
-      QString msg = "Unable to retrieve [InputPosition] keyword from "
+      std::string msg = "Unable to retrieve [InputPosition] keyword from "
                     "translation group.";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
-    QString inputParentName = inputPosition[inputPosition.size() - 1];
+    QString inputParentName = QString::fromStdString(inputPosition[inputPosition.size() - 1]);
 
     // get input key (tag or att)
     QString inputKey;
     try {
-      inputKey = transGroup["InputKey"][0];
+      inputKey = QString::fromStdString(transGroup["InputKey"][0]);
     }
     catch (IException &e){
-      QString msg = "Unable to retrieve [InputKey] keyword from "
+      std::string msg = "Unable to retrieve [InputKey] keyword from "
                     "translation group.";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     QString attributeName;
     if (transGroup.hasKeyword("InputKeyAttribute")) {
-      attributeName = transGroup["InputKeyAttribute"][0];
+      attributeName = QString::fromStdString(transGroup["InputKeyAttribute"][0]);
     }
 
     // get dependencies
@@ -218,7 +218,7 @@ namespace Isis {
     // Notify what we are translating and what the translating group is.
     if (isDebug) {
       cout << endl << "          ====================          " << endl;
-      cout << endl << "Translating output keyword: " << translationGroupName << endl;
+      cout << endl << "Translating output keyword: " << translationGroupName.toStdString() << endl;
       cout << endl << "Translation group:" << endl;
       cout << transGroup << endl << endl;
     }
@@ -228,7 +228,7 @@ namespace Isis {
     QString indent = "";
     if (isDebug) {
       cout << endl << "Finding input element:" << endl << endl;
-      cout << inputParentElement.tagName() << endl;
+      cout << inputParentElement.tagName().toStdString() << endl;
     }
     // traverse the input position path
     Pvl::ConstPvlKeywordIterator it = transGroup.findKeyword("InputPosition",
@@ -242,20 +242,20 @@ namespace Isis {
       inputParentElement = oldInputParentElement;
 
         for (int i = 0; i < inputPosition.size(); i++) {
-          childName = inputPosition[i];
+          childName = QString::fromStdString(inputPosition[i]);
           inputParentElement = inputParentElement.firstChildElement(childName);
           if(inputParentElement.isNull()) {
             break;
           }
           if (isDebug) {
             indent += "  ";
-            cout << indent << inputParentElement.tagName() << endl;
+            cout << indent.toStdString() << inputParentElement.tagName().toStdString() << endl;
           }
         }
         if (!inputParentElement.isNull()) {
           break;
         }
-        it = transGroup.findKeyword("InputPosition", it + 1, transGroup.end());
+        it = transGroup.findKeyword("InputPosition", std::next(it, 1), transGroup.end());
     }
 
     if (inputParentElement.isNull()) {
@@ -263,14 +263,14 @@ namespace Isis {
         if (isDebug) {
           cout << endl << "Could not traverse input position, " <<
             "using default value: " <<
-            InputDefault(translationGroupName) << endl;
+            InputDefault(translationGroupName).toStdString() << endl;
         }
         return PvlTranslationTable::Translate( translationGroupName );
       }
       else {
-        QString msg = "Failed traversing input position. [" +
+        std::string msg = "Failed traversing input position. [" +
           inputPosition.name() + "] element does not have a child element named [" +
-          childName + "].";
+          childName.toStdString() + "].";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -278,7 +278,7 @@ namespace Isis {
     QDomElement inputKeyElement = inputParentElement.firstChildElement(inputKey);
     if (isDebug) {
       indent += "  ";
-      cout << indent << inputKeyElement.tagName() << endl;
+      cout << indent.toStdString() << inputKeyElement.tagName().toStdString() << endl;
     }
 
     // Check dependencies
@@ -305,12 +305,12 @@ namespace Isis {
       if ( hasInputDefault(translationGroupName) ) {
         if (isDebug) {
           cout << endl << "No input value found, using default value: " <<
-                          InputDefault(translationGroupName) << endl;
+                          InputDefault(translationGroupName).toStdString() << endl;
         }
         return PvlTranslationTable::Translate( translationGroupName );
       }
       else {
-        QString msg = "Could not find an input or default value that fits the given input "
+        std::string msg = "Could not find an input or default value that fits the given input "
                       "keyword dependencies.";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -326,24 +326,24 @@ namespace Isis {
       else if (hasInputDefault(translationGroupName) ) {
         if (isDebug) {
           cout << endl << "No input value found, using default value: " <<
-                          InputDefault(translationGroupName) << endl;
+                          InputDefault(translationGroupName).toStdString() << endl;
         }
         return PvlTranslationTable::Translate( translationGroupName );
       }
       else {
-        QString msg = "Input element [" + inputKeyElement.tagName() +
+        std::string msg = "Input element [" + inputKeyElement.tagName().toStdString() +
                       "] does not have an attribute named [" +
-                      attributeName + "].";
+                      attributeName.toStdString() + "].";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
     if (isDebug) {
-          cout << endl << "Translating input value: " << inputValue << endl;
+          cout << endl << "Translating input value: " << inputValue.toStdString() << endl;
         }
     return PvlTranslationTable::Translate( translationGroupName, inputValue.trimmed() );
     }
     catch (IException &e){
-      QString msg = "Failed to translate output value for [" + translationGroupName + "].";
+      std::string msg = "Failed to translate output value for [" + translationGroupName.toStdString() + "].";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
@@ -377,7 +377,7 @@ namespace Isis {
       cout << endl << "Testing dependencies:" << endl;
     }
     for (int i = 0; i < dependencies.size(); i++) {
-      QStringList specification = parseSpecification(dependencies[i]);
+      QStringList specification = parseSpecification(QString::fromStdString(dependencies[i]));
 
       if (specification.size() != 3) { // the specification is not a dependancy
         return true;
@@ -386,9 +386,9 @@ namespace Isis {
         cout << endl << "Testing dependency number " << toString(i+1) << endl;
         cout << "  Specification:    " << dependencies[i] << endl;
         cout << endl;
-        cout << "  Dependency type:  " << specification[0] << endl;
-        cout << "  Dependency name:  " << specification[1] << endl;
-        cout << "  Dependency value: " << specification[2] << endl;
+        cout << "  Dependency type:  " << specification[0].toStdString() << endl;
+        cout << "  Dependency name:  " << specification[1].toStdString() << endl;
+        cout << "  Dependency value: " << specification[2].toStdString() << endl;
       }
       if (specification[0] == "att") {
         if ( element.hasAttributes() ) {
@@ -396,8 +396,8 @@ namespace Isis {
           QString attributeValue = atts.namedItem(specification[1]).nodeValue();
           if (isDebug) {
             cout << endl;
-            cout << "  Attribute name:   " << atts.namedItem(specification[1]).nodeName();
-            cout << "  Attribute value:  " << attributeValue << endl;
+            cout << "  Attribute name:   " << atts.namedItem(specification[1]).nodeName().toStdString();
+            cout << "  Attribute value:  " << attributeValue.toStdString() << endl;
           }
           if ( attributeValue != specification[2] ) {
             // attribute value does not match specification or
@@ -416,8 +416,8 @@ namespace Isis {
         QString siblingValue = candidateSibling.text();
         if (isDebug) {
           cout << endl;
-          cout << "  Tag name:         " << candidateSibling.tagName() << endl;
-          cout << "  Tag value:        " << siblingValue << endl;
+          cout << "  Tag name:         " << candidateSibling.tagName().toStdString() << endl;
+          cout << "  Tag value:        " << siblingValue.toStdString() << endl;
         }
         if (siblingValue != specification[2] ) {
           // sibling tag value does not match specification or
@@ -427,7 +427,7 @@ namespace Isis {
       }
 
       else {
-        QString msg = "Parsing error, dependency type [" + specification[0] +
+        std::string msg = "Parsing error, dependency type [" + specification[0].toStdString() +
                       "] is not [att] or [tag].";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -462,9 +462,9 @@ namespace Isis {
    * @throws IException::Unknown "XML read/parse error in file."
    */
   void XmlToPvlTranslationManager::parseFile(const FileName &xmlFileName) {
-     QFile xmlFile(xmlFileName.expanded());
+     QFile xmlFile(QString::fromStdString(xmlFileName.expanded()));
      if ( !xmlFile.open(QIODevice::ReadOnly) ) {
-       QString msg = "Could not open label file [" + xmlFileName.expanded() +
+       std::string msg = "Could not open label file [" + xmlFileName.expanded() +
                      "].";
        throw IException(IException::Unknown, msg, _FILEINFO_);
      }
@@ -473,9 +473,9 @@ namespace Isis {
      int errline, errcol;
      if ( !m_xmlLabel.setContent(&xmlFile, false, &errmsg, &errline, &errcol) ) {
        xmlFile.close();
-       QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
-            + "] at line [" + toString(errline) + "], column [" + toString(errcol)
-            + "], message: " + errmsg;
+       std::string msg = "XML read/parse error in file [" + xmlFileName.expanded()
+            + "] at line [" + Isis::toString(errline) + "], column [" + Isis::toString(errcol)
+            + "], message: " + errmsg.toStdString();
        throw IException(IException::Unknown, msg, _FILEINFO_);
      }
 

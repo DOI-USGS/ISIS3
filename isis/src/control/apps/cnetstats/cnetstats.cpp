@@ -7,6 +7,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "cnetstats.h"
+#include "Application.h"
 #include "ControlNetFilter.h"
 #include "ControlNetStatistics.h"
 #include "IException.h"
@@ -60,13 +61,13 @@ namespace Isis{
       if (ui.WasEntered("DEFFILE")) {
         sDefFile = ui.GetFileName("DEFFILE");
         sOutFile = ui.GetFileName("FLATFILE");
-        pvlDefFile = Pvl(sDefFile);
+        pvlDefFile = Pvl(sDefFile.toStdString());
 
         // Log the DefFile - Cannot log Object... only by Group
         for (int i=0; i<pvlDefFile.objects(); i++) {
           PvlObject pvlObj = pvlDefFile.object(i);
           for (int j=0; j<pvlObj.groups(); j++) {
-            log->addLogGroup(pvlObj.group(j));
+            Application::AppendAndLog(pvlObj.group(j), log);
           }
         }
 
@@ -78,10 +79,10 @@ namespace Isis{
           for (int i=0; i<pvlResults.objects(); i++) {
             PvlObject pvlObj = pvlResults.object(i);
             for (int j=0; j<pvlObj.groups(); j++) {
-              log->addLogGroup(pvlObj.group(j));
+              Application::AppendAndLog(pvlObj.group(j), log);
             }
           }
-          QString sErrMsg = "Invalid Deffile\n";
+          std::string sErrMsg = "Invalid Deffile\n";
           throw IException(IException::User, sErrMsg, _FILEINFO_);
         }
       }
@@ -108,7 +109,7 @@ namespace Isis{
       // Log the summary of the input Control Network
       PvlGroup statsGrp;
       cNetFilter.GenerateControlNetStats(statsGrp);
-      log->addLogGroup(statsGrp);
+      Application::AppendAndLog(statsGrp, log);
 
       // Run Filters using Deffile
       if (ui.WasEntered("DEFFILE")) {
@@ -153,7 +154,7 @@ namespace Isis{
     for (int i=0; i<iNumGroups; i++) {
       PvlGroup pvlGrp = filtersObj.group(i);
       // Get the pointer to ControlNetFilter member function based on Group name
-      pt2Filter=GetPtr2Filter(pvlGrp.name());
+      pt2Filter=GetPtr2Filter(QString::fromStdString(pvlGrp.name()));
       if (pt2Filter != NULL) {
         (pcNetFilter.*pt2Filter)(pvlGrp, ((i==(iNumGroups-1)) ? true : false));
       }

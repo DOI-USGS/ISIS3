@@ -63,16 +63,16 @@ namespace Isis {
     raw += "  </isis_version>\n";
 
     raw += "  <parameters>\n";
-    raw += "    <cksmithed value='" + toString(ckSmithed) + "' />\n";
-    raw += "    <ckrecon value='" + toString(ckRecon) + "' />\n";
-    raw += "    <ckpredicted value='" + toString(ckPredicted) + "' />\n";
-    raw += "    <cknadir value='" + toString(ckNadir) + "' />\n";
-    raw += "    <spksmithed value='" + toString(spkSmithed) + "' />\n";
-    raw += "    <spkrecon value='" + toString(spkRecon) + "' />\n";
-    raw += "    <spkpredicted value='" + toString(spkPredicted) + "' />\n";
+    raw += "    <cksmithed value='" + QString::number(ckSmithed) + "' />\n";
+    raw += "    <ckrecon value='" + QString::number(ckRecon) + "' />\n";
+    raw += "    <ckpredicted value='" + QString::number(ckPredicted) + "' />\n";
+    raw += "    <cknadir value='" + QString::number(ckNadir) + "' />\n";
+    raw += "    <spksmithed value='" + QString::number(spkSmithed) + "' />\n";
+    raw += "    <spkrecon value='" + QString::number(spkRecon) + "' />\n";
+    raw += "    <spkpredicted value='" + QString::number(spkPredicted) + "' />\n";
     raw += "    <shape value='" + shape + "' />\n";
-    raw += "    <startpad time='" + toString(startPad) + "' />\n";
-    raw += "    <endpad time='" + toString(endPad) + "' />\n";
+    raw += "    <startpad time='" + QString::number(startPad) + "' />\n";
+    raw += "    <endpad time='" + QString::number(endPad) + "' />\n";
     raw += "  </parameters>\n";
 
     raw += "  <label>\n";
@@ -101,11 +101,11 @@ namespace Isis {
     // newInput.Rewind();//start at begining
     // newInput.PutLine(hexCode);
     // newInput.Close();
-    // QString msg = "Exporting expected server input to: " + serverInputFile;
+    // std::string msg = "Exporting expected server input to: " + serverInputFile;
     // throw IException(IException::Programmer, msg, _FILEINFO_);
 
     int contentLength = p_xml->length();
-    QString contentLengthStr = toString((BigInt)contentLength);
+    QString contentLengthStr = QString::number((BigInt)contentLength);
 
     p_request = new QNetworkRequest();
     p_request->setUrl(QUrl(url));
@@ -198,7 +198,7 @@ namespace Isis {
       try {
         Pvl pvlTest;
         stringstream s;
-        s << *p_rawResponse;
+        s << p_rawResponse->toStdString();
         s >> pvlTest;
 
         PvlGroup &err = pvlTest.findGroup("Error", Pvl::Traverse);
@@ -207,7 +207,7 @@ namespace Isis {
 
         if (err.findKeyword("Message")[0] != "") {
           *p_error += "  The error reported was: ";
-          *p_error += err.findKeyword("Message")[0];
+          *p_error += QString::fromStdString(err.findKeyword("Message")[0]);
         }
       }
       catch(IException &) {
@@ -428,7 +428,7 @@ namespace Isis {
    */
   QDomElement SpiceClient::rootXMLElement() {
     if(!p_response || !p_rawResponse) {
-      QString error = "No server response available";
+      std::string error = "No server response available";
       throw IException(IException::Io, error, _FILEINFO_);
     }
 
@@ -442,8 +442,8 @@ namespace Isis {
       return document.firstChild().toElement();
     }
     else {
-      QString msg = "Unexpected response from spice server [";
-      msg += *p_rawResponse;
+      std::string msg = "Unexpected response from spice server [";
+      msg += p_rawResponse->toStdString();
       msg += "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -471,7 +471,7 @@ namespace Isis {
       }
     }
 
-    QString msg = "Server response missing XML Tag [" + name + "]";
+    std::string msg = "Server response missing XML Tag [" + name.toStdString() + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -491,7 +491,7 @@ namespace Isis {
     QString unencoded(QByteArray::fromHex(kernelsLabels.toLatin1()).constData());
 
     stringstream pvlStream;
-    pvlStream << unencoded;
+    pvlStream << unencoded.toStdString();
 
     Pvl labels;
     pvlStream >> labels;
@@ -515,7 +515,7 @@ namespace Isis {
     QString unencoded(QByteArray::fromHex(logLabels.toLatin1()).constData());
 
     stringstream pvlStream;
-    pvlStream << unencoded;
+    pvlStream << unencoded.toStdString();
 
     Pvl labels;
     pvlStream >> labels;
@@ -585,7 +585,7 @@ namespace Isis {
    */
   void SpiceClient::checkErrors() {
     if(p_error) {
-      throw IException(IException::Unknown, *p_error, _FILEINFO_);
+      throw IException(IException::Unknown, p_error->toStdString(), _FILEINFO_);
     }
   }
 
@@ -611,7 +611,7 @@ namespace Isis {
     QString unencoded(QByteArray::fromHex(kernelsLabels.toLatin1()).constData());
 
     stringstream pvlStream;
-    pvlStream << unencoded;
+    pvlStream << unencoded.toStdString();
 
     Pvl labels;
     pvlStream >> labels;
@@ -653,7 +653,7 @@ namespace Isis {
 
     Pvl lab;
     tableStream >> lab;
-    Blob tableBlob(tableName, "Table");
+    Blob tableBlob(tableName.toStdString(), "Table");
     tableBlob.Read(lab, tableStream);
     Table *table = new Table(tableBlob);
 

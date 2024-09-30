@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     cout << "*** Blobber unitTest ***\n";
     Preference::Preferences(true);
     QString fname = "$ISISTESTDATA/isis/src/base/unitTestData/blobTruth.cub";
-    cout << "\nFile Source: " << fname << endl;
+    cout << "\nFile Source: " << fname.toStdString() << endl;
 
 // This is assumed to be Hirise cube source
     QString blobName  = "HiRISE Calibration Ancillary";
@@ -33,9 +33,9 @@ int main(int argc, char *argv[]) {
     Cube cube;
     cube.open(fname);
     Blobber blob1(cube, blobName, fieldName, name);
-    cout << "Blob Name:           " << blob1.getName() << endl;
-    cout << "Object Name:         " << blob1.getBlobName() << endl;
-    cout << "Field Name:          " << blob1.getFieldName() << endl;
+    cout << "Blob Name:           " << blob1.getName().toStdString() << endl;
+    cout << "Object Name:         " << blob1.getBlobName().toStdString() << endl;
+    cout << "Field Name:          " << blob1.getFieldName().toStdString() << endl;
     cout << "Number Blob Lines:   " << blob1.Lines() << endl;
     cout << "Number Blob Samples: " << blob1.Samples() << endl;
     cout << "Total Pixels:        " << blob1.size() << endl;

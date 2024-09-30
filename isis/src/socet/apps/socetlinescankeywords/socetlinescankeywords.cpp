@@ -41,7 +41,7 @@ namespace Isis {
 
 void socetlinescankeywords (UserInterface &ui) {  
   // Get user parameters and error check
-  Cube input(ui.GetCubeName("FROM"), "rw");    
+  Cube input(ui.GetCubeName("FROM").toStdString(), "rw");    
   socetlinescankeywords(&input, ui);
 }
 
@@ -50,12 +50,12 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
   // Use a regular Process
   Process p;
 
-  QString to = FileName(ui.GetFileName("TO")).expanded();
+  QString to = QString::fromStdString(FileName(ui.GetFileName("TO").toStdString()).expanded());
   //TO DO: UNCOMMENT THIS LINE ONCE HRSC IS WORKING IN SS
   //  double HRSCNadirCenterTime = ui.GetDouble("HRSC_NADIRCENTERTIME");
 
   if (input->isProjected()) {
-    QString msg = "Input images is a map projected cube ... not a level 1 image";
+    std::string msg = "Input images is a map projected cube ... not a level 1 image";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -72,9 +72,9 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
 
   // Make sure the image contains the InstrumentPointing (aka CK) blob/table
   PvlGroup test = input->label()->findGroup("Kernels", Pvl::Traverse);
-  QString InstrumentPointing = (QString) test["InstrumentPointing"];
+  QString InstrumentPointing = QString::fromStdString(test["InstrumentPointing"]);
   if (InstrumentPointing != "Table") {
-    QString msg = "Input image does not contain needed SPICE blobs...run spiceinit with attach=yes.";
+    std::string msg = "Input image does not contain needed SPICE blobs...run spiceinit with attach=yes.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -82,13 +82,13 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
   ofstream toStrm;
   toStrm.open(to.toLatin1().data(), ios::trunc);
   if (toStrm.bad()) {
-    QString msg = "Unable to open output TO file";
+    std::string msg = "Unable to open output TO file";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Get required keywords from instrument and band groups
   PvlGroup inst =input->label()->findGroup("Instrument", Pvl::Traverse);
-  QString instrumentId = (QString) inst["InstrumentId"];
+  QString instrumentId = QString::fromStdString(inst["InstrumentId"]);
 
   bool     isMocNA = false;
 //TO DO: UNCOMMENT THIS LINES ONCE MOC IS WORKING IN SS
@@ -108,7 +108,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
 //    else if (strcmp(filter.toLatin1().data(), "RED") == 0)
 //      isMocWARed = true;
 //    else if (strcmp(filter.toLatin1().data(), "BLUE") == 0) {
-//      QString msg = "MOC WA Blue filter images not supported for Socet Set mapping";
+//      std::string msg = "MOC WA Blue filter images not supported for Socet Set mapping";
 //      throw IException(IException::User, msg, _FILEINFO_);
 //    }
 //  }
@@ -116,12 +116,12 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
 //TO DO: DELETE THIS LINE ONCE MOC IS WORKING IN SS
   if (instrumentId == "IdealCamera") {
     PvlGroup orig = input->label()->findGroup("OriginalInstrument",  Pvl::Traverse);
-    QString origInstrumentId = (QString) orig["InstrumentId"];
+    QString origInstrumentId = QString::fromStdString(orig["InstrumentId"]);
     if (origInstrumentId == "HIRISE") {
       isHiRise = true;
     }
     else {
-      QString msg = "Unsupported instrument: " + origInstrumentId;
+      std::string msg = "Unsupported instrument: " + origInstrumentId.toStdString();
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -140,7 +140,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
 //TO DO: UNCOMMENT THIS LINE ONCE HRSC IS WORKING IN SS
 //  else if (instrumentId == "HRSC") isHRSC = true;
   else {
-    QString msg = "Unsupported instrument: " + instrumentId;
+    std::string msg = "Unsupported instrument: " + instrumentId.toStdString();
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -246,7 +246,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
 //      intTime = lrc.GetLineScanRate();
 //    }
 //    if (numIntTimes <= 0) {
-//      QString msg = "HRSC: Invalid number of scan times";
+//      std::string msg = "HRSC: Invalid number of scan times";
 //      throw IException(IException::Programmer, msg, _FILEINFO_);
 //    }
 //    else
@@ -388,7 +388,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
   QList< QList<double> > ephemRates;
 
   PvlGroup kernels = input->label()->findGroup("Kernels", Pvl::Traverse);
-  QString InstrumentPosition = (QString) kernels["InstrumentPosition"];
+  QString InstrumentPosition = QString::fromStdString(kernels["InstrumentPosition"]);
 
   int numEphem = 0;      // number of ephemeris points
   double dtEphem = 0.0;  // delta time of ephemeris points, seconds
@@ -700,15 +700,15 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
   Distance targetRadii[3];
   if (input->label()->hasGroup("Mapping")) {
     PvlGroup &mappingGroup = input->label()->findGroup("Mapping");
-    targetRadii[0].setMeters(toDouble(mappingGroup["EquatorialRadius"][0]));
-    targetRadii[2].setMeters(toDouble(mappingGroup["PolarRadius"][0]));
+    targetRadii[0].setMeters(Isis::toDouble(mappingGroup["EquatorialRadius"][0]));
+    targetRadii[2].setMeters(Isis::toDouble(mappingGroup["PolarRadius"][0]));
   }
   else {
     try {
       cam->radii(targetRadii);
     }
     catch (IException &e) {
-      QString msg = "Failed to get target body radii from cube.";
+      std::string msg = "Failed to get target body radii from cube.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -869,7 +869,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
 //  // system call to ISIS function tabledump to dump LineScanTimes
 //  char syscmd[1056];
 //  sprintf(syscmd, "tabledump from=%s to=%s name=LineScanTimes",
-//          cubefname.expanded().toLatin1().data(), tablefname.expanded().toAscii().data());
+//          cubefname.expanded().c_str(), tablefname.expanded().toAscii().data());
 //
 //  int n = system(syscmd);
 //  if (n != 0)
@@ -879,7 +879,7 @@ void socetlinescankeywords(Cube *input, UserInterface &ui) {
 //  // HrscCamera::ReadLineRates(IString filename) is private
 //
 //  // open tabledump.txt for reading
-//  ifstream fpIn(tablefname.expanded().toLatin1().data(), ifstream::in);
+//  ifstream fpIn(tablefname.expanded().c_str(), ifstream::in);
 //  if (!fpIn)
 //    return -1;
 //

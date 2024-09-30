@@ -441,8 +441,7 @@ namespace Isis {
     } catch(IException &e) {
         // Stacks error message from Cube's create method
         throw IException(e,
-            IException::Io,
-            QObject::tr("The cube could not be saved, unable to create the cube"),
+            IException::Io,"The cube could not be saved, unable to create the cube",
             _FILEINFO_);
     }
   }
@@ -470,14 +469,14 @@ namespace Isis {
     double ons = (int)(ins * dScale + 0.5);
     double onl = (int)(inl * dScale + 0.5);
 
-    CubeAttributeInput cai(icube->fileName());
+    CubeAttributeInput cai(icube->fileName().toStdString());
     std::vector<QString> bands = cai.bands();
     int inb = bands.size();
 
     if (inb == 0) {
       inb = cubeViewport()->cube()->bandCount();
       for(int i = 1; i <= inb; i++) {
-        bands.push_back(toString(i));
+        bands.push_back(QString::number(i));
       }
     }
 
@@ -507,8 +506,7 @@ namespace Isis {
       icube->close();
       // Stacks error message from Cube's create method
       throw IException(e,
-          IException::Io,
-          QObject::tr("The cube could not be saved, unable to create the cube"),
+          IException::Io,"The cube could not be saved, unable to create the cube",
           _FILEINFO_);
     }
   }
@@ -552,7 +550,7 @@ namespace Isis {
   void FileTool::copyCubeDetails(const QString & psOutFile, Cube *icube,
       Cube *ocube, int piNumSamples, int piNumLines, int piNumBands) {
     //Create the default output attribute with the output filename
-    CubeAttributeOutput outAtt(psOutFile);
+    CubeAttributeOutput outAtt(psOutFile.toStdString());
 
     //Propagate all labels, tables, blobs, etc from the input to output cube
     try {
@@ -583,13 +581,13 @@ namespace Isis {
                 (ocube->pixelType() != UnsignedWord) &&
                 (ocube->pixelType() != Isis::UnsignedInteger) &&
                 (ocube->pixelType() != Isis::SignedInteger)) {
-          QString msg = "Looks like your refactoring to add different pixel types";
+          std::string msg = "Looks like your refactoring to add different pixel types";
           msg += " you'll need to make changes here";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else {
-          QString msg = "You've chosen to reduce your output PixelType for [" +
-                            psOutFile + "] you must specify the output pixel range too";
+          std::string msg = "You've chosen to reduce your output PixelType for [" +
+                            psOutFile.toStdString() + "] you must specify the output pixel range too";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
@@ -617,7 +615,7 @@ namespace Isis {
       Pvl &inlab = *icube->label();
       for(int i = 0; i < inlab.objects(); i++) {
         if (inlab.object(i).isNamed("Table")) {
-          Blob t((QString)inlab.object(i)["Name"], inlab.object(i).name());
+          Blob t(inlab.object(i)["Name"], inlab.object(i).name());
           icube->read(t);
           ocube->write(t);
         }
@@ -627,7 +625,7 @@ namespace Isis {
       inlab = *icube->label();
       for(int i = 0; i < inlab.objects(); i++) {
         if (inlab.object(i).isNamed("Polygon")) {
-          Blob t((QString)inlab.object(i)["Name"], inlab.object(i).name());
+          Blob t(inlab.object(i)["Name"], inlab.object(i).name());
           icube->read(t);
           ocube->write(t);
         }
@@ -705,16 +703,16 @@ namespace Isis {
     int iNumBands   = pInCube->bandCount();
 
     PvlGroup results("Results");
-    results += PvlKeyword("InputLines",      toString(pInCube->lineCount()));
-    results += PvlKeyword("InputSamples",    toString(pInCube->sampleCount()));
-    results += PvlKeyword("StartingLine",    toString(dStartLine));
-    results += PvlKeyword("StartingSample",  toString(dStartSample));
-    results += PvlKeyword("EndingLine",      toString(dEndLine));
-    results += PvlKeyword("EndingSample",    toString(dEndSample));
-    results += PvlKeyword("LineIncrement",   toString(1));
-    results += PvlKeyword("SampleIncrement", toString(1));
-    results += PvlKeyword("OutputLines",     toString(pNumLines));
-    results += PvlKeyword("OutputSamples",   toString(pNumSamples));
+    results += PvlKeyword("InputLines",      Isis::toString(pInCube->lineCount()));
+    results += PvlKeyword("InputSamples",    Isis::toString(pInCube->sampleCount()));
+    results += PvlKeyword("StartingLine",    Isis::toString(dStartLine));
+    results += PvlKeyword("StartingSample",  Isis::toString(dStartSample));
+    results += PvlKeyword("EndingLine",      Isis::toString(dEndLine));
+    results += PvlKeyword("EndingSample",    Isis::toString(dEndSample));
+    results += PvlKeyword("LineIncrement",   Isis::toString(1));
+    results += PvlKeyword("SampleIncrement", Isis::toString(1));
+    results += PvlKeyword("OutputLines",     Isis::toString(pNumLines));
+    results += PvlKeyword("OutputSamples",   Isis::toString(pNumSamples));
     SubArea subArea;
     subArea.SetSubArea(pInCube->lineCount(), pInCube->sampleCount(), dStartLine, dStartSample,
                        dEndLine, dEndSample, 1.0, 1.0);
@@ -769,7 +767,7 @@ namespace Isis {
 
     Pvl whatsThisPvl;
     cubeViewport()->getAllWhatsThisInfo(whatsThisPvl);
-    whatsThisPvl.write(output);
+    whatsThisPvl.write(output.toStdString());
   }
 
 

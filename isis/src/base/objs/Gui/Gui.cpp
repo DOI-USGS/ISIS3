@@ -94,20 +94,20 @@ namespace Isis {
     setlocale(LC_ALL, "en_US");
 
     QApplication::setQuitOnLastWindowClosed(true);
-    QApplication::setApplicationName(FileName(argv[0]).baseName());
+    QApplication::setApplicationName(QString::fromStdString(FileName(argv[0]).baseName()));
 
 
     // Qt is smart enough to use the style of the system running the program.
     // However, Isis supports overriding this with a setting in IsisPreferences.
     // Here we check to see if this has been done and force the style if needed.
     if(uiPref.hasKeyword("GuiStyle")) {
-      QString style = uiPref["GuiStyle"];
+      QString style = QString::fromStdString(uiPref["GuiStyle"]);
       QApplication::setStyle(style);
     }
 
 
     if (uiPref.hasKeyword("GuiFontName")) {
-      QString fontString = uiPref["GuiFontName"];
+      QString fontString = QString::fromStdString(uiPref["GuiFontName"]);
       QFont font = QFont(fontString);
 
       if (uiPref.hasKeyword("GuiFontSize")) {
@@ -307,7 +307,7 @@ namespace Isis {
   // Create the "Begin/Start Processing" action
   QAction *Gui::CreateProcessAction() {
     QAction *processAction = new QAction(this);
-    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
+    QString baseDir = QString::fromStdString(FileName("$ISISROOT/appdata/images/icons").expanded());
     processAction->setIcon(QPixmap(baseDir + "/guiRun.png"));
     processAction->setText("&Run");
     processAction->setToolTip("Run");
@@ -394,7 +394,7 @@ namespace Isis {
   // Create the "Exit" action
   QAction *Gui::CreateExitAction() {
     QAction *exitAction = new QAction(this);
-    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
+    QString baseDir = QString::fromStdString(FileName("$ISISROOT/appdata/images/icons").expanded());
     exitAction->setIcon(QPixmap(baseDir + "/guiExit.png"));
     exitAction->setText("&Exit");
     exitAction->setToolTip("Exit");
@@ -409,7 +409,7 @@ namespace Isis {
   // Create the "Reset" action
   QAction *Gui::CreateResetAction() {
     QAction *resetAction = new QAction(this);
-    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
+    QString baseDir = QString::fromStdString(FileName("$ISISROOT/appdata/images/icons").expanded());
     resetAction->setIcon(QPixmap(baseDir + "/guiReset.png"));
     resetAction->setText("&Reset");
     resetAction->setToolTip("Reset parameters");
@@ -426,7 +426,7 @@ namespace Isis {
   // Create the "Stop" action
   QAction *Gui::CreateStopAction() {
     QAction *stopAction = new QAction(this);
-    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
+    QString baseDir = QString::fromStdString(FileName("$ISISROOT/appdata/images/icons").expanded());
     stopAction->setIcon(QPixmap(baseDir + "/guiStop.png"));
     stopAction->setText("&Stop");
     stopAction->setToolTip("Stop");
@@ -443,7 +443,7 @@ namespace Isis {
   // Create the "SaveLog" action
   QAction *Gui::CreateSaveLogAction() {
     QAction *saveLogAction = new QAction(this);
-    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
+    QString baseDir = QString::fromStdString(FileName("$ISISROOT/appdata/images/icons").expanded());
     saveLogAction->setIcon(QPixmap(baseDir + "/guiSaveLog.png"));
     saveLogAction->setText("&Save Log...");
     saveLogAction->setToolTip("Save log");
@@ -459,7 +459,7 @@ namespace Isis {
   // Create the "ClearLog" action
   QAction *Gui::CreateClearLogAction() {
     QAction *clearlogAction = new QAction(this);
-    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
+    QString baseDir = QString::fromStdString(FileName("$ISISROOT/appdata/images/icons").expanded());
     clearlogAction->setIcon(QPixmap(baseDir + "/guiClearLog.png"));
     clearlogAction->setText("&Clear Log");
     clearlogAction->setToolTip("Clear log");
@@ -476,7 +476,7 @@ namespace Isis {
   // Create the "Previous History" action
   QAction *Gui::CreatePreviousHistoryAction() {
     QAction *previousHistoryAction = new QAction(this);
-    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
+    QString baseDir = QString::fromStdString(FileName("$ISISROOT/appdata/images/icons").expanded());
     previousHistoryAction->setIcon(QPixmap(baseDir + "/guiPrevHistory.png"));
     previousHistoryAction->setText("&Previous");
     previousHistoryAction->setToolTip("Previous parameters");
@@ -493,7 +493,7 @@ namespace Isis {
   // Create the "Next History" action
   QAction *Gui::CreateNextHistoryAction() {
     QAction *nextHistoryAction = new QAction(this);
-    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
+    QString baseDir = QString::fromStdString(FileName("$ISISROOT/appdata/images/icons").expanded());
     nextHistoryAction->setIcon(QPixmap(baseDir + "/guiNextHistory.png"));
     nextHistoryAction->setText("&Next");
     nextHistoryAction->setToolTip("Next parameters");
@@ -510,7 +510,7 @@ namespace Isis {
   // Create the Whats Action action
   QAction *Gui::CreateWhatsThisAction() {
     QAction *action = new QAction(this);
-    QString baseDir = FileName("$ISISROOT/appdata/images/icons").expanded();
+    QString baseDir = QString::fromStdString(FileName("$ISISROOT/appdata/images/icons").expanded());
     action->setIcon(QPixmap(baseDir + "/contexthelp.png"));
     action->setText("&What's This");
     action->setToolTip("What's This");
@@ -716,7 +716,7 @@ namespace Isis {
     Preference &p = Preference::Preferences();
 
     PvlGroup &grp = p.findGroup("UserInterface", Isis::Pvl::Traverse);
-    Isis::FileName progHist(grp["HistoryPath"][0] + "/" + ui.ProgramName() + ".par");
+    Isis::FileName progHist(grp["HistoryPath"][0] + "/" + ui.ProgramName().toStdString() + ".par");
 
     if(!progHist.fileExists()) {
       p_historyEntry = -1;
@@ -731,9 +731,9 @@ namespace Isis {
     }
     catch(...) {
       p_historyEntry =  -1;
-      QString msg = "A corrupt parameter history file [" + progHist.expanded() +
+      std::string msg = "A corrupt parameter history file [" + progHist.expanded() +
                         "] has been detected. Please fix or remove this file";
-      LoadMessage(msg);
+      LoadMessage(QString::fromStdString(msg));
       // When the warning is rejected (i.e. Abort), clean up from within qApp's exec event loop
       if (ShowWarning()) {
         qApp->quit();
@@ -761,14 +761,14 @@ namespace Isis {
       ResetParameters();
       Isis::PvlGroup &up = hist.group(useEntry);
       for (int k = 0; k < up.keywords(); k++) {
-        QString key = up[k].name();
+        QString key = QString::fromStdString(up[k].name());
         QString val;
         // If the value has more than one element,
         // construct a string array of those elements
         if (up[k].size() > 1) {
           val = "(";
           for (int i = 0; i < up[k].size(); i++) {
-            QString newVal = up[k][i];
+            QString newVal = QString::fromStdString(up[k][i]);
             if (newVal.contains(",")) {
               newVal = '"' + newVal + '"';
             }
@@ -782,7 +782,7 @@ namespace Isis {
         }
         // Else, return the value on its own
         else {
-          QString newVal = up[k];
+          QString newVal = QString::fromStdString(up[k]);
           val = newVal;
         }
         ui.Clear(key);
@@ -875,10 +875,10 @@ namespace Isis {
   void Gui::AboutIsis() {
     Isis::PvlGroup &uig = Isis::Preference::Preferences().findGroup("UserInterface");
 #if defined(__linux__)
-    QString command = (QString) uig["GuiHelpBrowser"] +
+    QString command = QString::fromStdString(uig["GuiHelpBrowser"]) +
                           " http://isis.astrogeology.usgs.gov >> /dev/null &";
 #elif defined(__APPLE__)
-    QString command = "open -a" + (QString) uig["GuiHelpBrowser"] +
+    QString command = "open -a" + QString::fromStdString(uig["GuiHelpBrowser"]) +
                       " http://isis.astrogeology.usgs.gov >> /dev/null &";
 #endif                  
     ProgramLauncher::RunSystemCommand(command);
@@ -888,12 +888,12 @@ namespace Isis {
   void Gui::AboutProgram() {
     Isis::PvlGroup &uig = Isis::Preference::Preferences().findGroup("UserInterface");
 #if defined(__linux__)
-    QString command = (QString) uig["GuiHelpBrowser"] +
+    QString command = QString::fromStdString(uig["GuiHelpBrowser"]) +
                       " http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
                       Isis::Application::GetUserInterface().ProgramName() + "/" +
                       Isis::Application::GetUserInterface().ProgramName() + ".html";
 #elif defined(__APPLE__)
-    QString command = "open -a" + (QString) uig["GuiHelpBrowser"] +
+    QString command = "open -a" + QString::fromStdString(uig["GuiHelpBrowser"]) +
                       " http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/" +
                       Isis::Application::GetUserInterface().ProgramName() + "/" +
                       Isis::Application::GetUserInterface().ProgramName() + ".html";

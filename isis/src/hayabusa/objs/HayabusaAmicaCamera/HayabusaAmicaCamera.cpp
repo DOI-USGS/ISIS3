@@ -38,7 +38,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
     Pvl &lab = *cube.label();
     // Get the camera characteristics
-    QString filter = (QString)(lab.findGroup("BandBin", Pvl::Traverse))["Name"];
+    QString filter = QString::fromStdString((lab.findGroup("BandBin", Pvl::Traverse))["Name"]);
     filter = filter.toUpper();
 
     SetFocalLength();  // Retrives from IK stored in units of meters
@@ -51,7 +51,7 @@ namespace Isis {
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // set variables startTime and exposureDuration
-    QString stime = inst["SpacecraftClockStartCount"];
+    QString stime = QString::fromStdString(inst["SpacecraftClockStartCount"]);
     iTime etStart = getClockTime(stime);
 
     double exposureDuration = ((double) inst["ExposureDuration"]);
@@ -62,8 +62,8 @@ namespace Isis {
 
     // lines and samples added to the pvl in the order you
     // call getDouble()
-    double bLines = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
-    double bSamples = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE");
+    double bLines = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_BORESIGHT_LINE");
+    double bSamples = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_BORESIGHT_SAMPLE");
 
     focalMap->SetDetectorOrigin(bSamples, bLines);
 

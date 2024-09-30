@@ -157,11 +157,11 @@ CkSpiceSegment::SVector CkSpiceSegment::TickRate() const {
 
 QString CkSpiceSegment::getKeyValue(PvlObject &label,
                                       const QString &keyword) {
-  QString value("");
-  if ( label.hasKeyword(keyword,Pvl::Traverse) ) {
-    value = label.findKeyword(keyword,Pvl::Traverse)[0];
+  std::string value("");
+  if ( label.hasKeyword(keyword.toStdString(), Pvl::Traverse) ) {
+    value = label.findKeyword(keyword.toStdString(), Pvl::Traverse)[0];
   }
-  return (value);
+  return QString::fromStdString(value);
 }
 
 void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
@@ -200,7 +200,7 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
     if ( _name.isEmpty() ) {
       _name = getKeyValue(*label, "ProductId");
       if (_name.isEmpty() ) {
-        _name = FileName(_fname).baseName();
+        _name = QString::fromStdString(FileName(_fname.toStdString()).baseName());
       }
     }
 
@@ -304,7 +304,7 @@ void CkSpiceSegment::import(Cube &cube, const QString &tblname) {
 
   } catch ( IException &ie  ) {
     ostringstream mess;
-    mess << "Failed to construct CK content from ISIS file " << _fname;
+    mess << "Failed to construct CK content from ISIS file " << _fname.toStdString();
     throw IException(ie, IException::User, mess.str(), _FILEINFO_);
   }
 
@@ -360,7 +360,7 @@ bool CkSpiceSegment::getTimeDependentFrameIds(Table &table, int &toId, int &from
   if ( table.Label().hasKeyword("TimeDependentFrames") ) {
     PvlKeyword labelTimeFrames = table.Label()["TimeDependentFrames"];
     for (int i=0; i<labelTimeFrames.size(); i++) {
-      tdfids.push_back(toInt(labelTimeFrames[i]));
+      tdfids.push_back(Isis::toInt(labelTimeFrames[i]));
     }
   }
   else {
@@ -413,7 +413,7 @@ bool CkSpiceSegment::getFrameChains(Table &table, const int &leftBase,
   if ( table.Label().hasKeyword("TimeDependentFrames") ) {
     PvlKeyword labelTimeFrames = table.Label()["TimeDependentFrames"];
     for (int i = 0 ; i < labelTimeFrames.size() ; i++) {
-      tdfids.push_back(toInt(labelTimeFrames[i]));
+      tdfids.push_back(Isis::toInt(labelTimeFrames[i]));
     }
   }
   else {
@@ -432,7 +432,7 @@ bool CkSpiceSegment::getFrameChains(Table &table, const int &leftBase,
     ostringstream mess;
     mess << "Left/Right CK frame ids invalid in TimeDependentFrames label keyword."
          <<  " Must have at least 1 and no more than 2 ids but have "
-         << QString::number(nfound);
+         << Isis::toString(nfound);
     throw IException(IException::User, mess.str(), _FILEINFO_);
   }
 
@@ -482,7 +482,7 @@ CkSpiceSegment::SMatrix CkSpiceSegment::getConstantRotation(Table &table) const 
     PvlKeyword conrot = table.Label()["ConstantRotation"];
     SVector rot(9, crot[0]);
     for (int i=0; i < 9 ; i++) {  //  Loop count ensures valid matrices
-      rot[i] = toDouble(conrot[i]);
+      rot[i] = Isis::toDouble(conrot[i]);
     }
   } catch ( IException &ie ) {
     ostringstream mess;
@@ -603,13 +603,13 @@ void CkSpiceSegment::getRotationMatrices(Cube &cube, Camera &camera, Table &tabl
 #if 0
   int LtoId, LfromId;
   if ( !getTimeDependentFrameIds(table, LtoId, LfromId) ) {
-    QString mess = "Cannot determine time dependent frames! - perhaps a spiceinit is in order.";
+    std::string mess = "Cannot determine time dependent frames! - perhaps a spiceinit is in order.";
     throw IException(IException::User, mess, _FILEINFO_);
   }
 #else
   QVector<int> leftFrames, rightFrames;
   if ( !getFrameChains(table, leftId, rightId, leftFrames, rightFrames) ) {
-    QString mess = "Cannot determine left/right frame chains! - perhaps a spiceinit is in order.";
+    std::string mess = "Cannot determine left/right frame chains! - perhaps a spiceinit is in order.";
     throw IException(IException::User, mess, _FILEINFO_);
   }
 #endif
@@ -714,18 +714,18 @@ void CkSpiceSegment::convert(const CkSpiceSegment::SMatrix &quats,
 QString CkSpiceSegment::getComment() const {
   ostringstream comment;
 
-  FileName fname(_fname);
+  FileName fname(_fname.toStdString());
 
   comment <<
 "\n-----------------------------------------------------------------------\n" <<
 "  File:       " << fname.name() << endl <<
-"  ProductId:  " << _name << endl <<
-"  StartTime:  " << _utcStartTime << endl <<
-"  EndTime:    " << _utcEndTime << endl <<
-"  Instrument: " << _instId << endl <<
-"  Target:     " << _target << endl <<
-"  InstFrame:  " << _instFrame << endl <<
-"  RefFrame:   " << _refFrame << endl <<
+"  ProductId:  " << _name.toStdString() << endl <<
+"  StartTime:  " << _utcStartTime.toDouble() << endl <<
+"  EndTime:    " << _utcEndTime.toDouble() << endl <<
+"  Instrument: " << _instId.toDouble() << endl <<
+"  Target:     " << _target.toDouble() << endl <<
+"  InstFrame:  " << _instFrame.toDouble() << endl <<
+"  RefFrame:   " << _refFrame.toDouble() << endl <<
 "  Records:    " << size() << endl;
 
   if (_startOffset != 0) {
@@ -740,7 +740,7 @@ QString CkSpiceSegment::getComment() const {
 
   QString hasAV = (size(_avvs) > 0) ? "YES" : "NO";
   comment <<
-"  HasAV:      " << hasAV << endl;
+"  HasAV:      " << hasAV.toStdString() << endl;
 
   comment <<
 "  CamVersion: " << _camVersion << endl;
@@ -750,7 +750,7 @@ QString CkSpiceSegment::getComment() const {
 "  Kernels:    \n";
     for ( int i = 0 ; i < klist.size() ; i++  ) {
       comment <<
-"    " << klist[i] << endl;
+"    " << klist[i].toStdString() << endl;
     }
   }
 

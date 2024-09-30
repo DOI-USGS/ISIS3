@@ -45,7 +45,7 @@ int main(void) {
 
     Cube c("$ISISTESTDATA/isis/src/voyager/unitTestData/c1639118.imq.cub", "r");
     VoyagerCamera *cam = (VoyagerCamera *) CameraFactory::Create(c);
-    cout << "FileName: " << FileName(c.fileName()).name() << endl;
+    cout << "FileName: " << FileName(c.fileName().toStdString()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -60,7 +60,7 @@ int main(void) {
     // Test Shutter Open/Close
     const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
     double exposureDuration = ((double) inst["ExposureDuration"])/1000;
-    QString stime = inst["StartTime"];
+    QString stime = QString::fromStdString(inst["StartTime"]);
     double et; // StartTime keyword is the center exposure time
     str2et_c(stime.toLatin1().data(), &et);
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
@@ -114,12 +114,12 @@ int main(void) {
     files.append("$ISISTESTDATA/isis/src/voyager/unitTestData/c4397840.cropped.cub"); // Voyager2 WAC
 
     for (int i = 0; i < files.size(); i++) {
-      Cube cu(files[i], "r");
+      Cube cu(files[i].toStdString(), "r");
       VoyagerCamera *vCam = (VoyagerCamera *) CameraFactory::Create(cu);
-      cout << "Spacecraft Name Long: " << vCam->spacecraftNameLong() << endl;
-      cout << "Spacecraft Name Short: " << vCam->spacecraftNameShort() << endl;
-      cout << "Instrument Name Long: " << vCam->instrumentNameLong() << endl;
-      cout << "Instrument Name Short: " << vCam->instrumentNameShort() << endl << endl;
+      cout << "Spacecraft Name Long: " << vCam->spacecraftNameLong().toStdString() << endl;
+      cout << "Spacecraft Name Short: " << vCam->spacecraftNameShort().toStdString() << endl;
+      cout << "Instrument Name Long: " << vCam->instrumentNameLong().toStdString() << endl;
+      cout << "Instrument Name Short: " << vCam->instrumentNameShort().toStdString() << endl << endl;
     }
 
     // Test exception: camera is not a supported Kaguya camera

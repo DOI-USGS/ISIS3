@@ -55,14 +55,14 @@ const int num_phases = 4;
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
-  Isis::FileName fromFile = ui.GetCubeName("FROM");
+  Isis::FileName fromFile = ui.GetCubeName("FROM").toStdString();
 
   Isis::Cube inputCube;
-  inputCube.open(fromFile.expanded());
+  inputCube.open(QString::fromStdString(fromFile.expanded()));
 
   //Check to make sure we got the cube properly
   if(!inputCube.isOpen()) {
-    QString msg = "Could not open FROM cube" + fromFile.expanded();
+    std::string msg = "Could not open FROM cube" + fromFile.expanded();
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -102,10 +102,10 @@ void IsisMain() {
     if(totalSamples != phases[3]) {
       QString required_samples(QString::number(phases[3]));
       QString bin_QString(QString::number(binning_mode));
-      QString msg = "image must have exactly ";
-      msg += required_samples;
+      std::string msg = "image must have exactly ";
+      msg += required_samples.toStdString();
       msg += " samples per line for binning mode ";
-      msg += bin_QString;
+      msg += bin_QString.toStdString();
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -298,7 +298,7 @@ void fix(Buffer &in, Buffer &out) {
 void DestripeForOtherBinningModes(int piSamples)
 {
   int iBoxSample = (2 * piSamples) - 1;
-  QString sSamples(toString(iBoxSample));
+  QString sSamples(QString::number(iBoxSample));
 
   Pipeline p("hidestripe");
   p.SetInputFile("FROM");

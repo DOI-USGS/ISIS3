@@ -1,3 +1,4 @@
+#include "Application.h"
 #include "IException.h"
 #include "IString.h"
 #include "ProcessByLine.h"
@@ -27,7 +28,7 @@ namespace Isis{
 
       // Setup the input and output cubes
       QString replaceMode = ui.GetAsString("VPER_REPLACE");
-      CubeAttributeInput cai(ui.GetAsString("FROM"));
+      CubeAttributeInput cai(ui.GetAsString("FROM").toStdString());
       bands = cai.bands();
 
       QString from = ui.GetCubeName("FROM");
@@ -55,7 +56,7 @@ namespace Isis{
       }
 
       if(ons > ins || onl > inl) {
-        QString msg = "Number of output samples/lines must be less than or equal";
+        std::string msg = "Number of output samples/lines must be less than or equal";
         msg = msg + " to the input samples/lines.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -85,19 +86,17 @@ namespace Isis{
       p.EndProcess();
 
       // Write the results to the log
-      if (log){
-        log->addLogGroup(results);
-      }
+      Application::Log(results);
     } // REFORMAT THESE ERRORS INTO ISIS TYPES AND RETHROW
     catch (IException &) {
       throw;
     }
     catch (std::exception const &se) {
-      QString message = "std::exception: " + (QString)se.what();
+      std::string message = "std::exception: " + (std::string)se.what();
       throw IException(IException::User, message, _FILEINFO_);
     }
     catch (...) {
-      QString message = "Other Error";
+      std::string message = "Other Error";
       throw IException(IException::User, message, _FILEINFO_);
     }
   }

@@ -48,7 +48,7 @@ namespace Isis {
 
     Cube *mcube = NULL;
     if((ui.WasEntered("MATCH"))) {
-      mcube = new Cube(ui.GetCubeName("MATCH"));
+      mcube = new Cube(ui.GetCubeName("MATCH").toStdString());
     }
     
     noproj(&icube, mcube, ui);
@@ -88,13 +88,13 @@ namespace Isis {
     // Extract Instrument groups from input labels for the output match and noproj'd cubes
     PvlGroup inst = mcube->group("Instrument");
     PvlGroup fromInst = icube->group("Instrument");
-    QString groupName = (QString) inst["SpacecraftName"] + "/";
-    groupName += (QString) inst.findKeyword("InstrumentId");
+    QString groupName = QString::fromStdString(inst["SpacecraftName"]) + "/";
+    groupName += QString::fromStdString(inst.findKeyword("InstrumentId"));
 
     // Get Ideal camera specifications
     FileName specs;
     if((ui.WasEntered("SPECS"))) {
-      specs = ui.GetFileName("SPECS");
+      specs = ui.GetFileName("SPECS").toStdString();
     }
     else {
       specs = "$ISISROOT/appdata/templates/noproj/noprojInstruments.pvl";
@@ -102,7 +102,7 @@ namespace Isis {
     Pvl idealSpecs(specs.expanded());
     PvlObject obSpecs = idealSpecs.findObject("IdealInstrumentsSpecifications");
 
-    PvlGroup idealGp = obSpecs.findGroup(groupName);
+    PvlGroup idealGp = obSpecs.findGroup(groupName.toStdString());
     double transx, transy, transl, transs;
     transx = transy = transl = transs = 0.;
     if(idealGp.hasKeyword("TransX")) transx = idealGp["TransX"];
@@ -193,19 +193,19 @@ namespace Isis {
     // Can we do a regular label? Didn't work on 12-15-2006
     cao.setLabelAttachment(Isis::DetachedLabel);
     FileName matchCubeFile = FileName::createTempFile("$Temporary/match.cub");
-    QString matchCubeFileNoExt = matchCubeFile.path() + "/" + matchCubeFile.baseName();
+    QString matchCubeFileNoExt = QString::fromStdString(matchCubeFile.path() + "/" + matchCubeFile.baseName());
 
     // Determine the output image size from
     //   1) the idealInstrument pvl if there or
     //   2) the input size expanded by user specified percentage
-    Cube *ocube = p.SetOutputCube(matchCubeFile.expanded(), cao, 1, 1, 1);
+    Cube *ocube = p.SetOutputCube(QString::fromStdString(matchCubeFile.expanded()), cao, 1, 1, 1);
     
     // Extract the times and the target from the instrument group
-    QString startTime = inst["StartTime"];
+    QString startTime = QString::fromStdString(inst["StartTime"]);
     QString stopTime;
-    if (inst.hasKeyword("StopTime")) stopTime = (QString) inst["StopTime"];
+    if (inst.hasKeyword("StopTime")) stopTime = QString::fromStdString(inst["StopTime"]);
 
-    QString target = inst["TargetName"];
+    QString target = QString::fromStdString(inst["TargetName"]);
 
     // rename the instrument groups
     inst.setName("OriginalInstrument");
@@ -230,7 +230,7 @@ namespace Isis {
     inst.addKeyword(key);
 
     key.setName("TargetName");
-    key.setValue(target);
+    key.setValue(target.toStdString());
     inst.addKeyword(key);
 
     key.setName("SampleDetectors");
@@ -242,7 +242,7 @@ namespace Isis {
     inst.addKeyword(key);
 
     key.setName("InstrumentType");
-    key.setValue(instType);
+    key.setValue(instType.toStdString());
     inst.addKeyword(key);
 
     Pvl &ocubeLabel = *ocube->label();
@@ -253,7 +253,7 @@ namespace Isis {
 
       // Clean up the naif keywords object... delete everything that isn't a radii
       for (int keyIndex = naifKeywordsObject->keywords() - 1; keyIndex >= 0; keyIndex--) {
-        QString keyName = (*naifKeywordsObject)[keyIndex].name();
+        QString keyName = QString::fromStdString((*naifKeywordsObject)[keyIndex].name());
 
         if (!keyName.contains("RADII")) {
           naifKeywordsObject->deleteKeyword(keyIndex);
@@ -287,20 +287,20 @@ namespace Isis {
     }
 
     if (naifKeywordsObject) {
-      naifKeywordsObject->addKeyword(PvlKeyword("IDEAL_FOCAL_LENGTH", toString(incam->FocalLength())),
+      naifKeywordsObject->addKeyword(PvlKeyword("IDEAL_FOCAL_LENGTH", Isis::toString(incam->FocalLength())),
                                      Pvl::Replace);
     }
     else {
-      inst.addKeyword(PvlKeyword("FocalLength", toString(incam->FocalLength()), "millimeters"));
+      inst.addKeyword(PvlKeyword("FocalLength", Isis::toString(incam->FocalLength()), "millimeters"));
     }
 
     double newPixelPitch = incam->PixelPitch() * summingMode;
     if (naifKeywordsObject) {
-      naifKeywordsObject->addKeyword(PvlKeyword("IDEAL_PIXEL_PITCH", toString(newPixelPitch)),
+      naifKeywordsObject->addKeyword(PvlKeyword("IDEAL_PIXEL_PITCH", Isis::toString(newPixelPitch)),
                                      Pvl::Replace);
     }
     else {
-      inst.addKeyword(PvlKeyword("PixelPitch", toString(newPixelPitch), "millimeters"));
+      inst.addKeyword(PvlKeyword("PixelPitch", Isis::toString(newPixelPitch), "millimeters"));
     }
 
     key.setName("EphemerisTime");
@@ -308,26 +308,26 @@ namespace Isis {
     inst.addKeyword(key);
 
     key.setName("StartTime");
-    key.setValue(startTime);
+    key.setValue(startTime.toStdString());
     inst.addKeyword(key);
 
     if(stopTime != "") {
       key.setName("StopTime");
-      key.setValue(stopTime);
+      key.setValue(stopTime.toStdString());
       inst.addKeyword(key);
     }
 
     key.setName("FocalPlaneXDependency");
-    key.setValue(toString((int)incam->FocalPlaneMap()->FocalPlaneXDependency()));
+    key.setValue(Isis::toString((int)incam->FocalPlaneMap()->FocalPlaneXDependency()));
     inst.addKeyword(key);
 
     int xDependency = incam->FocalPlaneMap()->FocalPlaneXDependency();
 
     double newInstrumentTransX = incam->FocalPlaneMap()->SignMostSigX();
-    inst.addKeyword(PvlKeyword("TransX", toString(newInstrumentTransX)));
+    inst.addKeyword(PvlKeyword("TransX", Isis::toString(newInstrumentTransX)));
 
     double newInstrumentTransY = incam->FocalPlaneMap()->SignMostSigY();
-    inst.addKeyword(PvlKeyword("TransY", toString(newInstrumentTransY)));
+    inst.addKeyword(PvlKeyword("TransY", Isis::toString(newInstrumentTransY)));
 
     storeSpice(&inst, naifKeywordsObject, "TransX0", "IDEAL_TRANSX", transx,
                newPixelPitch * newInstrumentTransX, (xDependency == CameraFocalPlaneMap::Sample));
@@ -354,7 +354,7 @@ namespace Isis {
     }
 
     key.setName("MatchedCube");
-    key.setValue(mcube->fileName());
+    key.setValue(mcube->fileName().toStdString());
     inst.addKeyword(key);
 
     ocube->putGroup(inst);
@@ -365,18 +365,18 @@ namespace Isis {
     // taking all the space it would require for the image data
     Pvl label;
     QString matchLbl = matchCubeFileNoExt + ".lbl";
-    label.read(matchLbl);
+    label.read(matchLbl.toStdString());
     PvlGroup &dims = label.findGroup("Dimensions", Pvl::Traverse);
-    dims["Lines"] = toString(numberLines);
-    dims["Samples"] = toString(detectorSamples);
-    dims["Bands"] = toString(numberBands);
-    label.write(matchLbl);
+    dims["Lines"] = Isis::toString(numberLines);
+    dims["Samples"] = Isis::toString(detectorSamples);
+    dims["Bands"] = Isis::toString(numberBands);
+    label.write(matchLbl.toStdString());
 
     // And run cam2cam to apply the transformation
     QVector<QString> args = {"to=" + ui.GetCubeName("TO"), "INTERP=" + ui.GetString("INTERP")};
-    UserInterface cam2camUI(FileName("$ISISROOT/bin/xml/cam2cam.xml").expanded(), args);
+    UserInterface cam2camUI(QString::fromStdString(FileName("$ISISROOT/bin/xml/cam2cam.xml").expanded()), args);
     Cube matchCube;
-    matchCube.open(matchCubeFile.expanded(), "rw");
+    matchCube.open(QString::fromStdString(matchCubeFile.expanded()), "rw");
     cam2cam(icube, &matchCube, cam2camUI);
     matchCube.close();
     
@@ -413,19 +413,19 @@ namespace Isis {
                   QString oldName, QString spiceName,
                   double constantCoeff, double multiplierCoeff, bool putMultiplierInX) {
     if(constantCoeff != 0 && !naifKeywordsObject && instrumentGroup) {
-      instrumentGroup->addKeyword(PvlKeyword(oldName, toString(constantCoeff)));
+      instrumentGroup->addKeyword(PvlKeyword(oldName.toStdString(), Isis::toString(constantCoeff)));
     }
     else if (naifKeywordsObject) {
-      PvlKeyword spiceKeyword(spiceName);
-      spiceKeyword += toString(constantCoeff);
+      PvlKeyword spiceKeyword(spiceName.toStdString());
+      spiceKeyword += Isis::toString(constantCoeff);
 
       if (putMultiplierInX) {
-        spiceKeyword += toString(multiplierCoeff);
-        spiceKeyword += toString(0.0);
+        spiceKeyword += Isis::toString(multiplierCoeff);
+        spiceKeyword += Isis::toString(0.0);
       }
       else {
-        spiceKeyword += toString(0.0);
-        spiceKeyword += toString(multiplierCoeff);
+        spiceKeyword += Isis::toString(0.0);
+        spiceKeyword += Isis::toString(multiplierCoeff);
       }
 
       naifKeywordsObject->addKeyword(spiceKeyword, Pvl::Replace);
@@ -437,9 +437,9 @@ namespace Isis {
 
     // Check this object for a detached file spec
     QStringList detfiles;
-    QString dfilename = "^" + object.name();
+    std::string dfilename = "^" + object.name();
     if ( object.hasKeyword(dfilename) ) {
-      QString detname = object[dfilename];
+      QString detname = QString::fromStdString(object[dfilename]);
       detfiles.append(detname);
     }
 

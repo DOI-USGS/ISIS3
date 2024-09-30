@@ -129,11 +129,11 @@ namespace Isis {
        * @param fname  Name of file to dump contents to
        */
       void Dump(const QString &fname) const {
-        FileName dumpc(fname);
-        QString dumpcFile = dumpc.expanded();
+        FileName dumpc(fname.toStdString());
+        QString dumpcFile = QString::fromStdString(dumpc.expanded());
         std::ofstream ofile(dumpcFile.toLatin1().data(), std::ios::out);
         if (!ofile) {
-          QString mess = "Unable to open/create module dump file " +
+          std::string mess = "Unable to open/create module dump file " +
                              dumpc.expanded();
           throw IException(IException::User, mess, _FILEINFO_);
         }
@@ -184,7 +184,7 @@ namespace Isis {
         o << "#  History = " << _history << std::endl;
         o << "#  Count =   " << _data.dim() << std::endl;
         for (int i = 0 ; i < _data.dim() ; i++) {
-          o << formatDbl(_data[i]) << std::endl;
+          o << formatDbl(_data[i]).toStdString() << std::endl;
         }
         return;
       }

@@ -54,8 +54,8 @@ namespace Isis {
       m_instrumentNameShort = "FC2";
     }
     else {
-      QString msg = "File does not appear to be a Dawn Framing Camera image. ";
-      msg += "(" + QString::number(ikCode) + " is not a Dawn FC instrument code)";
+      std::string msg = "File does not appear to be a Dawn Framing Camera image. ";
+      msg += "(" + Isis::toString(ikCode) + " is not a Dawn FC instrument code)";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -75,7 +75,7 @@ namespace Isis {
     // only problem with ISIS is the pixel resolution computation.  This may
     // be something we want to refactor later in case future instrument have
     // non-square detectors.
-    QString keyword = "INS" + toString(naifIkCode()) + "_PIXEL_SIZE";
+    QString keyword = "INS" + QString::number(naifIkCode()) + "_PIXEL_SIZE";
     double pixelPitch = (Spice::getDouble(keyword, 0) + Spice::getDouble(keyword, 1)) / 2.0;
     pixelPitch /= 1000.0;
     SetPixelPitch(pixelPitch);
@@ -97,15 +97,15 @@ namespace Isis {
     // from detector samp,line to focal plane x,y.  This is where the non-square detector size are read and utilized.
     // The boresight position recorded in the IK is zero-based and therefore needs to be adjusted for ISIS
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-    double boresightSample = Spice::getDouble("INS" + toString(naifIkCode()) + "_CCD_CENTER",0) + 1.0;
-    double boresightLine   = Spice::getDouble("INS" + toString(naifIkCode()) + "_CCD_CENTER",1) + 1.0;
+    double boresightSample = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_CCD_CENTER",0) + 1.0;
+    double boresightLine   = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_CCD_CENTER",1) + 1.0;
     focalMap->SetDetectorOrigin(boresightSample,boresightLine);
 
     // Setup distortion map.  Start by reading the distortion coefficient from the instrument kernel.  Then
     // construct the distortion model.  Note the distortion model code is copied from the RadialDistortionMap
     // class and reversed.  TODO:  Check with Ken Edmundson to see if we can just read from IK and pass 1/K
     // to the original RadialDistortionMap which would allow us to delete the DawnFcDistortionMap
-    double k = Spice::getDouble("INS" + toString(naifIkCode()) + "_RAD_DIST_COEFF");
+    double k = Spice::getDouble("INS" + QString::number(naifIkCode()) + "_RAD_DIST_COEFF");
     new DawnFcDistortionMap(this,k);
 
     // Setup the ground and sky map
@@ -119,7 +119,7 @@ namespace Isis {
     // needs to be obtained.
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-    QString stime = inst["SpacecraftClockStartCount"];
+    QString stime = QString::fromStdString(inst["SpacecraftClockStartCount"]);
     double et = getClockTime(stime).Et();
     et += 193.0 / 1000.0;
     double exposureDuration = (double)inst["ExposureDuration"] / 1000.0;

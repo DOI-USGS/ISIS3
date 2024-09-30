@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <SpiceUsr.h>
 
 // Isis includes
+#include "Application.h"
 #include "Buffer.h"
 #include "Cube.h"
 #include "FileName.h"
@@ -62,7 +63,7 @@ namespace Isis {
 
   void hicrop(UserInterface &ui, Pvl *log) {
     QString inputFileName = ui.GetCubeName("FROM");
-    CubeAttributeInput inAtt(inputFileName);
+    CubeAttributeInput inAtt(inputFileName.toStdString());
     g_cube = new Cube();
     g_cube->setVirtualBands(inAtt.bands());
     inputFileName = ui.GetCubeName("FROM");
@@ -84,11 +85,11 @@ namespace Isis {
 
       // read kernel files and furnish these kernels for naif routines used in
       // originalStartTime() and time2clock()
-      IString ckFileName = ui.GetFileName("CK");
+      IString ckFileName = ui.GetFileName("CK").toStdString();
 
       IString lskFileName = "";
       if (ui.WasEntered("LSK")) {
-        lskFileName = ui.GetFileName("LSK");
+        lskFileName = ui.GetFileName("LSK").toStdString();
       }
       else {
         FileName lskFile("$base/kernels/lsk/naif????.tls");
@@ -97,7 +98,7 @@ namespace Isis {
 
       IString sclkFileName = "";
       if (ui.WasEntered("SCLK")) {
-        sclkFileName = ui.GetFileName("SCLK");
+        sclkFileName = ui.GetFileName("SCLK").toStdString();
       }
       else {
         FileName sclkFile("$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc");
@@ -117,14 +118,14 @@ namespace Isis {
       // actual start time of the input cube
       Pvl &inLabels = *g_cube->label();
       PvlGroup &inputInst = inLabels.findObject("IsisCube").findGroup("Instrument");
-      QString instId = (inputInst["InstrumentId"]);
+      QString instId = QString::fromStdString(inputInst["InstrumentId"]);
       if (instId.toUpper() != "HIRISE") {
-        IString msg = "Input cube has invalid InstrumentId = [" + instId + "]. "
+        IString msg = "Input cube has invalid InstrumentId = [" + instId.toStdString() + "]. "
                       "A HiRise image is required.";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
       double tdiMode = inputInst["Tdi"]; //Original Instrument
-      QString labelStartClockCount = inputInst["SpacecraftClockStartCount"];
+      QString labelStartClockCount = QString::fromStdString(inputInst["SpacecraftClockStartCount"]);
       double binMode = inputInst["Summing"];
       double deltaLineTimerCount = inputInst["DeltaLineTimerCount"];
 
@@ -164,18 +165,18 @@ namespace Isis {
           QString currLine;
           jitterFile.GetLine(currLine, true);
           QString firstFileLine = currLine.simplified();
-          double firstSampleOffset = (double) toDouble(firstFileLine.split(" ")[0]);
-          double firstLineOffset = (double) toDouble(firstFileLine.split(" ")[1]);
+          double firstSampleOffset = (double) firstFileLine.split(" ")[0].toDouble();
+          double firstLineOffset = (double) firstFileLine.split(" ")[1].toDouble();
           if (firstSampleOffset == 0.0 && firstLineOffset == 0.0) {
             jitterFile.GetLine(currLine, true);
           }
-          iTime time = (double) toDouble(
-                                  currLine.simplified().split(" ").last());
+          iTime time = (double) 
+                                  currLine.simplified().split(" ").last().toDouble();
           firstValidTime = time.Et();
           lastValidTime = time.Et();
           while (jitterFile.GetLine(currLine)) {
-            time = (double) toDouble(
-                              currLine.simplified().split(" ").last());
+            time = (double) 
+                              currLine.simplified().split(" ").last().toDouble();
             if (time.Et() < firstValidTime) {
               firstValidTime = time.Et();
             }
@@ -263,8 +264,8 @@ namespace Isis {
                         ckCoverage.first, ckCoverage.second);
 
       // HiRise spacecraft clock format is P/SSSSSSSSSS:FFFFF
-      IString actualCropStartClockCount = time2clock(cropStartTime);//???
-      IString actualCropStopClockCount = time2clock(cropStopTime); //???
+      QString actualCropStartClockCount = time2clock(cropStartTime);//???
+      QString actualCropStopClockCount = time2clock(cropStopTime); //???
 
   //???
    // UTC
@@ -321,8 +322,8 @@ namespace Isis {
       int inputLineCount = g_cube->lineCount();
 
       Isis::CubeAttributeOutput atts = ui.GetOutputAttribute("TO");
-      FileName outFileName = ui.GetCubeName("TO");
-      Cube *ocube = p.SetOutputCube(outFileName.expanded(), atts, numSamps, g_cropLineCount, numBands);
+      FileName outFileName = ui.GetCubeName("TO").toStdString();
+      Cube *ocube = p.SetOutputCube(QString::fromStdString(outFileName.expanded()), atts, numSamps, g_cropLineCount, numBands);
 
       p.ClearInputCubes();
       // Loop through the labels looking for object = Table
@@ -332,7 +333,7 @@ namespace Isis {
         if (obj.name() != "Table") continue;
 
         // Read the table into a table object
-        Table table(obj["Name"], inputFileName);
+        Table table(obj["Name"], inputFileName.toStdString());
 
         // Write the table
         ocube->write(table);
@@ -342,10 +343,10 @@ namespace Isis {
       Pvl &outLabels = *ocube->label();
       // Change the start/end times and spacecraft start/stop counts in the labels
       PvlGroup &outputInst = outLabels.findObject("IsisCube").findGroup("Instrument");
-      outputInst["StartTime"][0] = cropStartTime.UTC(); //??? use actual or adjusted like clock counts ???
-      outputInst["StopTime"][0] = cropStopTime.UTC(); // adjustedCropStopTime ???
-      outputInst["SpacecraftClockStartCount"][0] = adjustedCropStartClockCount;
-      outputInst["SpacecraftClockStopCount"][0] = adjustedCropStopClockCount;
+      outputInst["StartTime"][0] = cropStartTime.UTC().toStdString(); //??? use actual or adjusted like clock counts ???
+      outputInst["StopTime"][0] = cropStopTime.UTC().toStdString(); // adjustedCropStopTime ???
+      outputInst["SpacecraftClockStartCount"][0] = adjustedCropStartClockCount.toStdString();
+      outputInst["SpacecraftClockStopCount"][0] = adjustedCropStopClockCount.toStdString();
 
       // Create a buffer for reading the input cube
       // Crop the input cube
@@ -354,15 +355,15 @@ namespace Isis {
 
       // Construct a label with the results
       PvlGroup results("Results");
-      results += PvlKeyword("InputLines", toString(inputLineCount));
-      results += PvlKeyword("NumberOfLinesCropped", toString(inputLineCount-g_cropLineCount));
-      results += PvlKeyword("OututStartingLine", toString(g_cropStartLine));
-      results += PvlKeyword("OututEndingLine", toString(g_cropEndLine));
-      results += PvlKeyword("OututLineCount", toString(g_cropLineCount));
-      results += PvlKeyword("OututStartTime", cropStartTime.UTC());
-      results += PvlKeyword("OututStopTime", cropStopTime.UTC()); //??? adjustedCropStopTime
-      results += PvlKeyword("OututStartClock", adjustedCropStartClockCount);
-      results += PvlKeyword("OututStopClock", adjustedCropStopClockCount);
+      results += PvlKeyword("InputLines", Isis::toString(inputLineCount));
+      results += PvlKeyword("NumberOfLinesCropped", Isis::toString(inputLineCount-g_cropLineCount));
+      results += PvlKeyword("OututStartingLine", Isis::toString(g_cropStartLine));
+      results += PvlKeyword("OututEndingLine", Isis::toString(g_cropEndLine));
+      results += PvlKeyword("OututLineCount", Isis::toString(g_cropLineCount));
+      results += PvlKeyword("OututStartTime", cropStartTime.UTC().toStdString());
+      results += PvlKeyword("OututStopTime", cropStopTime.UTC().toStdString()); //??? adjustedCropStopTime
+      results += PvlKeyword("OututStartClock", adjustedCropStartClockCount.toStdString());
+      results += PvlKeyword("OututStopClock", adjustedCropStopClockCount.toStdString());
 
       // Cleanup
       p.EndProcess();
@@ -371,9 +372,7 @@ namespace Isis {
       g_in = NULL;
 
       // Write the results to the log
-      if(log) {
-        log->addLogGroup(results);
-      }
+      Application::AppendAndLog(results, log);
 
       // Unfurnishes kernel files to prevent file table overflow
       NaifStatus::CheckErrors();
@@ -383,7 +382,7 @@ namespace Isis {
       NaifStatus::CheckErrors();
     }
     catch (IException &e) {
-      IString msg = "Unable to crop the given cube [" + inputFileName
+      IString msg = "Unable to crop the given cube [" + inputFileName.toStdString()
                     + "] using the hicrop program.";
       // clean up before throwing exception
       delete g_in;

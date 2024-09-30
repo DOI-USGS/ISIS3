@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 
     PvlGroup kern("Kernels");
     FileName f("$ISISTESTDATA/isis/src/base/unitTestData/kernels");
-    QString dir = f.expanded() + "/";
+    std::string dir = f.expanded() + "/";
 
     kern += PvlKeyword("NaifFrameCode", "-94031");
     kern += PvlKeyword("LeapSecond", dir + "naif0007.tls");
@@ -327,10 +327,10 @@ int main(int argc, char *argv[]) {
     // Test name methods
     cerr << "Test name methods ..." << endl;
     MySensor s(dummyCube);
-    cout << "Spacecraft Name Long: " << s.spacecraftNameLong() << endl;
-    cout << "Spacecraft Name Short: " << s.spacecraftNameShort() << endl;
-    cout << "Instrument Name Long: " << s.instrumentNameLong() << endl;
-    cout << "Instrument Name Short: " << s.instrumentNameShort() << endl << endl;
+    cout << "Spacecraft Name Long: " << s.spacecraftNameLong().toStdString() << endl;
+    cout << "Spacecraft Name Short: " << s.spacecraftNameShort().toStdString() << endl;
+    cout << "Instrument Name Long: " << s.instrumentNameLong().toStdString() << endl;
+    cout << "Instrument Name Short: " << s.instrumentNameShort().toStdString() << endl << endl;
   }
   catch(IException &e) {
     e.print();

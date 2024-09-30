@@ -34,12 +34,12 @@ namespace Isis {
   void tgocassismos(UserInterface &ui) {
 
     // Get the list of cubes to mosaic
-    FileList fromList(ui.GetFileName("FROMLIST"));
+    FileList fromList(ui.GetFileName("FROMLIST").toStdString());
 
     vector<Cube *> cubeList;
     try {
       if (fromList.size() < 1) {
-        QString msg = "the list file [" + ui.GetFileName("FROMLIST") +
+        std::string msg = "the list file [" + ui.GetFileName("FROMLIST").toStdString() +
                       "does not contain any data";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -49,7 +49,7 @@ namespace Isis {
       for (int i = 0; i < fromList.size(); i++) {
         Cube *cube = new Cube();
         cubeList.push_back(cube);
-        cube->open(fromList[i].toString());
+        cube->open(QString::fromStdString(fromList[i].toString()));
       }
 
 
@@ -164,7 +164,7 @@ namespace Isis {
         }
       }
       if (runXY) {
-        QString msg = "Camera did not intersect images to gather stats";
+        std::string msg = "Camera did not intersect images to gather stats";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -187,21 +187,21 @@ namespace Isis {
         PvlGroup archiveGroup = origLab->findGroup("Archive", Pvl::Traverse);
 
         if (i == 0) {
-          spacecraftName = instGroup["SpacecraftName"][0];
-          instrumentId =   instGroup["InstrumentId"][0];
-          observationId =  archiveGroup["ObservationId"][0];
-          firstStartTime =      instGroup["StartTime"][0];
-          startClock =     instGroup["SpacecraftClockStartCount"][0];
-          lastStartTime   =     instGroup["StartTime"][0];
-          exposureDuration  = instGroup["ExposureDuration"][0];
+          spacecraftName = QString::fromStdString( instGroup["SpacecraftName"][0]);
+          instrumentId =   QString::fromStdString(instGroup["InstrumentId"][0]);
+          observationId =  QString::fromStdString(archiveGroup["ObservationId"][0]);
+          firstStartTime =      QString::fromStdString(instGroup["StartTime"][0]);
+          startClock =     QString::fromStdString(instGroup["SpacecraftClockStartCount"][0]);
+          lastStartTime   =     QString::fromStdString(instGroup["StartTime"][0]);
+          exposureDuration  = QString::fromStdString(instGroup["ExposureDuration"][0]);
         }
         else {
           // current cube's StartTime/StopTime values
-          iTime currentStartTime = iTime(instGroup["StartTime"][0]);
+          iTime currentStartTime = iTime(QString::fromStdString(instGroup["StartTime"][0]));
 
           if (currentStartTime < iTime(firstStartTime)) {
             firstStartTime = currentStartTime.UTC();
-            startClock = instGroup["SpacecraftClockStartCount"][0];
+            startClock = QString::fromStdString(instGroup["SpacecraftClockStartCount"][0]);
           }
           if (currentStartTime > iTime(lastStartTime)) {
             lastStartTime = currentStartTime.UTC();
@@ -244,19 +244,19 @@ namespace Isis {
 
       // write out new information to new group mosaic
       PvlGroup mos("Mosaic");
-      mos += PvlKeyword("SpacecraftName", spacecraftName);
-      mos += PvlKeyword("InstrumentId", instrumentId);
-      mos += PvlKeyword("ObservationId ", observationId);
-      mos += PvlKeyword("StartTime ", firstStartTime);
-      mos += PvlKeyword("StopTime ", stopTime);
-      mos += PvlKeyword("SpacecraftClockStartCount ", startClock);
-      mos += PvlKeyword("IncidenceAngle ", toString(incidenceAngle), "degrees");
-      mos += PvlKeyword("EmissionAngle ", toString(emissionAngle), "degrees");
-      mos += PvlKeyword("PhaseAngle ", toString(phaseAngle), "degrees");
-      mos += PvlKeyword("LocalTime ", toString(localSolarTime));
-      mos += PvlKeyword("SolarLongitude ", toString(solarLongitude), "degrees");
-      mos += PvlKeyword("SubSolarAzimuth ", toString(sunAzimuth), "degrees");
-      mos += PvlKeyword("NorthAzimuth ", toString(northAzimuth), "degrees");
+      mos += PvlKeyword("SpacecraftName", spacecraftName.toStdString());
+      mos += PvlKeyword("InstrumentId", instrumentId.toStdString());
+      mos += PvlKeyword("ObservationId ", observationId.toStdString());
+      mos += PvlKeyword("StartTime ", firstStartTime.toStdString());
+      mos += PvlKeyword("StopTime ", stopTime.toStdString());
+      mos += PvlKeyword("SpacecraftClockStartCount ", startClock.toStdString());
+      mos += PvlKeyword("IncidenceAngle ", Isis::toString(incidenceAngle), "degrees");
+      mos += PvlKeyword("EmissionAngle ", Isis::toString(emissionAngle), "degrees");
+      mos += PvlKeyword("PhaseAngle ", Isis::toString(phaseAngle), "degrees");
+      mos += PvlKeyword("LocalTime ", Isis::toString(localSolarTime));
+      mos += PvlKeyword("SolarLongitude ", Isis::toString(solarLongitude), "degrees");
+      mos += PvlKeyword("SubSolarAzimuth ", Isis::toString(sunAzimuth), "degrees");
+      mos += PvlKeyword("NorthAzimuth ", Isis::toString(northAzimuth), "degrees");
 
       Cube mosCube;
       mosCube.open(ui.GetCubeName("TO"), "rw");
@@ -272,7 +272,7 @@ namespace Isis {
         cubeList[i]->close();
         delete cubeList[i];
       }
-      QString msg = "The mosaic [" + ui.GetCubeName("TO") + "] was NOT created";
+      std::string msg = "The mosaic [" + ui.GetCubeName("TO").toStdString() + "] was NOT created";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   } // end of isis main
@@ -286,22 +286,22 @@ namespace Isis {
      PvlGroup matchArchive = matchLabel.findGroup("Archive", Pvl::Traverse);
      PvlGroup compareArchive = compareLabel.findGroup("Archive", Pvl::Traverse);
 
-     QString matchObsId = matchArchive["ObservationId"];
-     QString compareObsId = compareArchive["ObservationId"];
+     QString matchObsId = QString::fromStdString(matchArchive["ObservationId"]);
+     QString compareObsId = QString::fromStdString(compareArchive["ObservationId"]);
 
      if (matchObsId != compareObsId) {
-       QString msg = "Images not from the same observation";
+       std::string msg = "Images not from the same observation";
        throw IException(IException::User, msg, _FILEINFO_);
      }
 
     // Test of the BandBin filter name
     PvlGroup matchBandBin = matchLabel.findGroup("BandBin", Pvl::Traverse);
     PvlGroup compareBandBin = compareLabel.findGroup("BandBin", Pvl::Traverse);
-    QString matchFilter = matchBandBin["FilterName"];
-    QString compareFilter = compareBandBin["FilterName"];
+    QString matchFilter = QString::fromStdString(matchBandBin["FilterName"]);
+    QString compareFilter = QString::fromStdString(compareBandBin["FilterName"]);
 
     if (matchFilter != compareFilter) {
-      QString msg = "Images not the same filter";
+      std::string msg = "Images not the same filter";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }

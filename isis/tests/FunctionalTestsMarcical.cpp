@@ -11,7 +11,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/marcical.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/marcical.xml").expanded());
 
 TEST(Marcical, MarcicalTestDefault) {
   QTemporaryDir prefix;
@@ -20,7 +20,7 @@ TEST(Marcical, MarcicalTestDefault) {
   UserInterface options(APP_XML, args);
   marcical(options);
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
   Pvl *label = outCube.label();
 
   PvlGroup &dims = label->findGroup("Dimensions", Pvl::Traverse);
@@ -29,9 +29,9 @@ TEST(Marcical, MarcicalTestDefault) {
   EXPECT_EQ( (int)dims["Bands"], 5 );
 
   PvlGroup &inst = label->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ( inst["VariableExposureDuration"][0].toStdString(), "17.5" );
-  EXPECT_EQ( inst["VariableExposureDuration"][1].toStdString(), "15.0" );
-  EXPECT_EQ( inst["VariableExposureDuration"][2].toStdString(), "17.5" );
+  EXPECT_EQ( inst["VariableExposureDuration"][0], "17.5" );
+  EXPECT_EQ( inst["VariableExposureDuration"][1], "15.0" );
+  EXPECT_EQ( inst["VariableExposureDuration"][2], "17.5" );
 
   std::unique_ptr<Histogram> outHist (outCube.histogram());
   EXPECT_NEAR( outHist->Average(), 0.046682, 1e-6 );
@@ -47,7 +47,7 @@ TEST(Marcical, MarcicalTestDefaultNoIof) {
   UserInterface options(APP_XML, args);
   marcical(options);
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
   Pvl *label = outCube.label();
 
   PvlGroup &dims = label->findGroup("Dimensions", Pvl::Traverse);
@@ -56,9 +56,9 @@ TEST(Marcical, MarcicalTestDefaultNoIof) {
   EXPECT_EQ( (int)dims["Bands"], 5 );
 
   PvlGroup &inst = label->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ( inst["VariableExposureDuration"][0].toStdString(), "17.5" );
-  EXPECT_EQ( inst["VariableExposureDuration"][1].toStdString(), "15.0" );
-  EXPECT_EQ( inst["VariableExposureDuration"][2].toStdString(), "17.5" );
+  EXPECT_EQ( inst["VariableExposureDuration"][0], "17.5" );
+  EXPECT_EQ( inst["VariableExposureDuration"][1], "15.0" );
+  EXPECT_EQ( inst["VariableExposureDuration"][2], "17.5" );
 
   std::unique_ptr<Histogram> outHist (outCube.histogram());
   EXPECT_NEAR( outHist->Average(), 11.78765,  1e-5);
@@ -74,7 +74,7 @@ TEST(Marcical, MarcicalTestSingleDuration) {
   UserInterface options(APP_XML, args);
   marcical(options);
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
   Pvl *label = outCube.label();
 
   PvlGroup &dims = label->findGroup("Dimensions", Pvl::Traverse);
@@ -83,7 +83,7 @@ TEST(Marcical, MarcicalTestSingleDuration) {
   EXPECT_EQ( (int)dims["Bands"], 5 );
 
   PvlGroup &inst = label->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ( inst["VariableExposureDuration"][0].toStdString(), "8.8" );
+  EXPECT_EQ( inst["VariableExposureDuration"][0], "8.8" );
 
   std::unique_ptr<Histogram> outHist (outCube.histogram());
   EXPECT_NEAR( outHist->Average(), 0.00879284, 1e-7 );
@@ -99,7 +99,7 @@ TEST(Marcical, MarcicalTestSingleDurationNoIof) {
   UserInterface options(APP_XML, args);
   marcical(options);
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
   Pvl *label = outCube.label();
 
   PvlGroup &dims = label->findGroup("Dimensions", Pvl::Traverse);
@@ -108,7 +108,7 @@ TEST(Marcical, MarcicalTestSingleDurationNoIof) {
   EXPECT_EQ( (int)dims["Bands"], 5 );
 
   PvlGroup &inst = label->findGroup("Instrument", Pvl::Traverse);
-  EXPECT_EQ( inst["VariableExposureDuration"][0].toStdString(), "8.8" );
+  EXPECT_EQ( inst["VariableExposureDuration"][0], "8.8" );
 
   std::unique_ptr<Histogram> outHist (outCube.histogram());
   EXPECT_NEAR( outHist->Average(), 2.16086, 1e-4 );

@@ -121,11 +121,11 @@ namespace Isis {
       ImageTreeWidgetItem::TreeColumn col =
           ImageTreeWidgetItem::FootprintColumn;
       while (col < ImageTreeWidgetItem::BlankColumn) {
-        IString key = ImageTreeWidgetItem::treeColumnToString(col) + "Visible";
+        IString key = ImageTreeWidgetItem::treeColumnToString(col).toStdString() + "Visible";
         key = key.Convert(" ", '_');
 
-        if (pvl.hasKeyword(key.ToQt())) {
-          bool visible = toBool(pvl[key.ToQt()][0]);
+        if (pvl.hasKeyword(key)) {
+          bool visible = toBool(QString::fromStdString(pvl[key][0]).toStdString());
 
           if (visible) {
             m_tree->showColumn(col);
@@ -156,7 +156,7 @@ namespace Isis {
       for (int cubeGrp = 0; cubeGrp < pvl.objects(); cubeGrp ++) {
         PvlObject &cubes = pvl.object(cubeGrp);
 
-        QTreeWidgetItem *newCubeGrp = m_tree->addGroup("", cubes.name());
+        QTreeWidgetItem *newCubeGrp = m_tree->addGroup("", QString::fromStdString(cubes.name()));
 
         if (cubes.hasKeyword("Expanded")) {
           bool expanded = (cubes["Expanded"][0] != "No");
@@ -185,21 +185,21 @@ namespace Isis {
     ImageTreeWidgetItem::TreeColumn col =
         ImageTreeWidgetItem::FootprintColumn;
     while (col < ImageTreeWidgetItem::BlankColumn) {
-      IString key = ImageTreeWidgetItem::treeColumnToString(col) + "Visible";
+      IString key = ImageTreeWidgetItem::treeColumnToString(col).toStdString() + "Visible";
       key = key.Convert(" ", '_');
       bool visible = !m_tree->isColumnHidden(col);
 
-      output += PvlKeyword(key.ToQt(), toString((int)visible));
+      output += PvlKeyword(key, Isis::toString((int)visible));
       col = (ImageTreeWidgetItem::TreeColumn)(col + 1);
     }
 
-    output += PvlKeyword("SortColumn", toString(m_tree->sortColumn()));
+    output += PvlKeyword("SortColumn", Isis::toString(m_tree->sortColumn()));
 
     // Now store groups and the cubes that are in those groups
     for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
       QTreeWidgetItem *group = m_tree->topLevelItem(i);
       PvlObject cubeGroup(
-          group->text(ImageTreeWidgetItem::NameColumn));
+          group->text(ImageTreeWidgetItem::NameColumn).toStdString());
       cubeGroup += PvlKeyword("Expanded", group->isExpanded() ? "Yes" : "No");
 
       for (int j = 0; j < group->childCount(); j++) {
@@ -208,7 +208,7 @@ namespace Isis {
         if (item->type() == QTreeWidgetItem::UserType) {
           ImageTreeWidgetItem *cubeItem = (ImageTreeWidgetItem *)item;
 
-          cubeGroup += PvlKeyword("Image", cubeItem->image()->id());
+          cubeGroup += PvlKeyword("Image", cubeItem->image()->id().toStdString());
         }
       }
 
@@ -535,7 +535,7 @@ namespace Isis {
         PvlKeyword &key = obj[fileKeyIndex];
 
         if (key.isNamed("Image")) {
-          if (key[0] == id) {
+          if (key[0] == id.toStdString()) {
             result = ImageTreeWidget::ImagePosition(objIndex, imageKeyOffset);
           }
           else {
@@ -633,7 +633,7 @@ namespace Isis {
 //  stream.writeEndElement();
 //
 //  stream.writeStartElement("position");
-//  //qDebug()<<"ImageFileListWidget::save   Position = "<<QVariant(pos()).toString();
+//  //qDebug()<<"ImageFileListWidget::save   Position = "<<QVariant(pos()).Isis::toString();
 //  stream.writeAttribute("x", QString::number(pos().x()));
 //  stream.writeAttribute("y", QString::number(pos().y()));
 //  stream.writeEndElement();

@@ -60,8 +60,8 @@ namespace Isis {
   void QtExporter::initialize(ExportDescription &desc) {
     // the Qt exporter only exports unsigned byte
     if (desc.pixelType() != UnsignedByte) {
-      QString msg = "Invalid pixel type. The Qt exporter for file type [";
-      msg += m_format;
+      std::string msg = "Invalid pixel type. The Qt exporter for file type [";
+      msg += m_format.toStdString();
       msg += "] requires an unsigned byte (i.e. 8BIT) output.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -136,7 +136,7 @@ namespace Isis {
       //  the following if statement does it informally.
       m_qimage->setPixel(sampleIndex, lineIndex, pixelValue);
       if (!m_qimage->valid(sampleIndex, lineIndex)) {
-        QString msg = "Qt has detected your file size as exceeding 2GB.";
+        std::string msg = "Qt has detected your file size as exceeding 2GB.";
         msg += " While your image might be under 2GB, your image labels are more";
         msg += " than likely pushing the file size over 2GB.";
         throw IException(IException::User, msg, _FILEINFO_);
@@ -201,14 +201,14 @@ namespace Isis {
                          QString compression, UserInterface *ui) {
     ImageExporter::write(outputName, quality, compression, ui);
 
-    outputName = outputName.addExtension(extension());
+    outputName = outputName.addExtension(extension().toStdString());
 
     // The return status is wrong for JPEG images, so the code will always
     // continue
-    if (!m_qimage->save(outputName.expanded(), m_format.toLatin1().data(),
+    if (!m_qimage->save(QString::fromStdString(outputName.expanded()), m_format.toLatin1().data(),
           quality)) {
 
-      QString err = "Unable to save [" + outputName.expanded() +
+      std::string err = "Unable to save [" + outputName.expanded() +
         "] to the disk";
       throw IException(IException::Programmer, err, _FILEINFO_);
     }
@@ -229,8 +229,8 @@ namespace Isis {
 
     BigInt size = samples * lines * bands;
     if (size >= maxSize) {
-      QString gigaBytes = toString(size / (1024.0 * 1024.0 * 1024.0));
-      QString msg = "Cube exceeds max size of 2GB. Qimage cannot support ";
+      std::string gigaBytes = toString(size / (1024.0 * 1024.0 * 1024.0));
+      std::string msg = "Cube exceeds max size of 2GB. Qimage cannot support ";
       msg += "that much raw data. Your cube is " + gigaBytes + " GB.";
       throw IException(IException::User, msg, _FILEINFO_);
     }

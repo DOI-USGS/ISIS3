@@ -4,6 +4,7 @@
 #include <QString>
 #include <QStringList>
 
+#include "Application.h"
 #include "IException.h"
 #include "FileList.h"
 #include "Cube.h"
@@ -37,7 +38,7 @@ namespace Isis {
                       "images that overlap another.  Images with time/body overlap "
                       "conflicts are:   \n"
                       + errors.join("; ");
-       throw IException(IException::User, mess, _FILEINFO_);
+       throw IException(IException::User, mess.toStdString(), _FILEINFO_);
     }
     return;
   }
@@ -48,10 +49,10 @@ namespace Isis {
 
     // Get the list of names of input CCD cubes to stitch together
     FileList flist;
-    if (ui.WasEntered("FROM")) flist.push_back(ui.GetCubeName("FROM"));
-    if (ui.WasEntered("FROMLIST")) flist.read(ui.GetFileName("FROMLIST"));
+    if (ui.WasEntered("FROM")) flist.push_back(ui.GetCubeName("FROM").toStdString());
+    if (ui.WasEntered("FROMLIST")) flist.read(ui.GetFileName("FROMLIST").toStdString());
     if (flist.size() < 1) {
-      QString msg = "Files must be specified in FROM and/or FROMLIST - none found!";
+      std::string msg = "Files must be specified in FROM and/or FROMLIST - none found!";
       throw IException(IException::User,msg,_FILEINFO_);
     }
 
@@ -66,10 +67,10 @@ namespace Isis {
     for (int i = 0 ; i < flist.size() ; i++) {
       // Add and process each image
       try {
-        kernel.add(SpkSegment(flist[i].toString(), spkType));
+        kernel.add(SpkSegment(QString::fromStdString(flist[i].toString()), spkType));
       }
       catch (IException &ie) {
-        QString mess = "Cannot create type 13 SPK. Please use type 9 or run jigsaw to create a "
+        std::string mess = "Cannot create type 13 SPK. Please use type 9 or run jigsaw to create a "
                        " polynomical solution for the Spice Position.";
        throw IException(ie, IException::User, mess, _FILEINFO_);
       }
@@ -91,7 +92,7 @@ namespace Isis {
         PvlGroup overlap = overrors.group(i);
         overlap.setName("Overlaps");
         overlap.addKeyword(PvlKeyword("Class", "WARNING"), PvlContainer::Replace);
-        log->addLogGroup(overlap);
+        Application::AppendAndLog(overlap, log);
       }
     }
 
@@ -109,14 +110,14 @@ namespace Isis {
 
     // Write a summary of the documentation
     if (ui.WasEntered("SUMMARY")) {
-      QString fFile = FileName(ui.GetFileName("SUMMARY")).expanded();
+      QString fFile = QString::fromStdString(FileName(ui.GetFileName("SUMMARY").toStdString()).expanded());
       ofstream os;
       os.open(fFile.toLatin1().data(),ios::out);
       if (!os) {
-        QString mess = "Cannot create SPK SUMMARY output file " + fFile;
+        std::string mess = "Cannot create SPK SUMMARY output file " + fFile.toStdString();
         throw IException(IException::User, mess, _FILEINFO_);
       }
-      os << kwriter.getComment(kernel, comfile) << endl;
+      os << kwriter.getComment(kernel, comfile).toStdString() << endl;
       os.close();
     }
     p.EndProcess();

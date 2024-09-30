@@ -44,8 +44,8 @@ namespace Isis {
       m_instrumentNameShort = "NACR";
     }
     else {
-      QString msg = "File does not appear to be a Lunar Reconnaissance Orbiter Image: ";
-      msg += QString::number(naifIkCode());
+      std::string msg = "File does not appear to be a Lunar Reconnaissance Orbiter Image: ";
+      msg += toString(naifIkCode());
       msg += " is not a supported instrument kernel code for Lunar Reconnaissance Orbiter.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -60,29 +60,29 @@ namespace Isis {
            additiveLineTimeError = 0.0,
            multiplicativeLineTimeError = 0.0;
 
-    QString ikernKey = "INS" + toString(naifIkCode()) + "_CONSTANT_TIME_OFFSET";
+    QString ikernKey = "INS" + QString::number(naifIkCode()) + "_CONSTANT_TIME_OFFSET";
     constantTimeOffset = getDouble(ikernKey);
 
-    ikernKey = "INS" + toString(naifIkCode()) + "_ADDITIONAL_PREROLL";
+    ikernKey = "INS" + QString::number(naifIkCode()) + "_ADDITIONAL_PREROLL";
     additionalPreroll = getDouble(ikernKey);
 
-    ikernKey = "INS" + toString(naifIkCode()) + "_ADDITIVE_LINE_ERROR";
+    ikernKey = "INS" + QString::number(naifIkCode()) + "_ADDITIVE_LINE_ERROR";
     additiveLineTimeError = getDouble(ikernKey);
 
-    ikernKey = "INS" + toString(naifIkCode()) + "_MULTIPLI_LINE_ERROR";
+    ikernKey = "INS" + QString::number(naifIkCode()) + "_MULTIPLI_LINE_ERROR";
     multiplicativeLineTimeError = getDouble(ikernKey);
 
     // Get the start time from labels
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-    QString stime = inst["SpacecraftClockPrerollCount"];
+    std::string stime = inst["SpacecraftClockPrerollCount"];
     SpiceDouble etStart;
 
     if(stime != "NULL") {
-      etStart = getClockTime(stime).Et();
+      etStart = getClockTime(QString::fromStdString(stime)).Et();
     }
     else {
-      etStart = iTime((QString)inst["PrerollTime"]).Et();
+      etStart = iTime(QString::fromStdString(inst["PrerollTime"])).Et();
     }
 
     // Get other info from labels
@@ -107,10 +107,10 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-    ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
+    ikernKey = "INS" + QString::number(naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoreSight = getDouble(ikernKey);
 
-    ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
+    ikernKey = "INS" + QString::number(naifIkCode()) + "_BORESIGHT_LINE";
     double lineBoreSight = getDouble(ikernKey);
 
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);

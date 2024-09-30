@@ -13,6 +13,7 @@ find files of those names at the top level of this repository. **/
 #include "ProcessImportPds.h"
 #include "ProcessByLine.h"
 
+#include "Application.h"
 #include "TableRecord.h"
 #include "Buffer.h"
 #include "Table.h"
@@ -73,35 +74,35 @@ namespace Isis {
     Pvl pdsLabel;
 
     // Get the input filename and make sure it is a HiRISE EDR
-    FileName inFile = ui.GetFileName("FROM");
+    FileName inFile = ui.GetFileName("FROM").toStdString();
     QString id;
     bool projected;
     try {
       Pvl lab(inFile.expanded());
-      id = (QString) lab.findKeyword("DATA_SET_ID");
+      id = QString::fromStdString(lab.findKeyword("DATA_SET_ID"));
       projected = lab.hasObject("IMAGE_MAP_PROJECTION");
     }
     catch(IException &e) {
-      QString msg = "Unable to read [DATA_SET_ID] from input file [" +
+      std::string msg = "Unable to read [DATA_SET_ID] from input file [" +
                    inFile.expanded() + "]";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
     //Checks if in file is rdr
     if(projected) {
-      QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
+      std::string msg = "[" + inFile.name() + "] appears to be an rdr file.";
       msg += " Use pds2isis.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     id = id.simplified().trimmed();
     if(id != "MRO-M-HIRISE-2-EDR-V1.0") {
-      QString msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
-                   "in HiRISE EDR format. DATA_SET_ID is [" + id + "]";
+      std::string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
+                   "in HiRISE EDR format. DATA_SET_ID is [" + id.toStdString() + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
-    p.SetPdsFile(inFile.expanded(), "", pdsLabel);
+    p.SetPdsFile(QString::fromStdString(inFile.expanded()), "", pdsLabel);
 
     // Make sure the data we need for the BLOBs is saved by the Process
     p.SaveFileHeader();
@@ -143,7 +144,7 @@ namespace Isis {
     // The user wants it unlutted
     else if(ui.GetBoolean("UNLUT")) {
       for(int i = 0; i < lutSeq.Size(); i++) {
-        stretch.AddPair(i, ((toDouble(lutSeq[i][0]) + toDouble(lutSeq[i][1])) / 2.0));
+        stretch.AddPair(i, ((Isis::toDouble(lutSeq[i][0]) + Isis::toDouble(lutSeq[i][1])) / 2.0));
       }
       instgrp.addKeyword(PvlKeyword("Unlutted", "TRUE"));
       instgrp.deleteKeyword("LookupTable");
@@ -186,52 +187,50 @@ namespace Isis {
     PvlGroup results("Results");
     results += PvlKeyword("From", inFile.expanded());
 
-    results += PvlKeyword("CalibrationBufferGaps", toString(gapCount[0]));
-    results += PvlKeyword("CalibrationBufferLIS", toString(lisCount[0]));
-    results += PvlKeyword("CalibrationBufferHIS", toString(hisCount[0]));
-    results += PvlKeyword("CalibrationBufferPossibleGaps", toString(suspectGapCount[0]));
-    results += PvlKeyword("CalibrationBufferInvalid", toString(invalidCount[0]));
-    results += PvlKeyword("CalibrationBufferValid", toString(validCount[0]));
+    results += PvlKeyword("CalibrationBufferGaps", Isis::toString(gapCount[0]));
+    results += PvlKeyword("CalibrationBufferLIS", Isis::toString(lisCount[0]));
+    results += PvlKeyword("CalibrationBufferHIS", Isis::toString(hisCount[0]));
+    results += PvlKeyword("CalibrationBufferPossibleGaps", Isis::toString(suspectGapCount[0]));
+    results += PvlKeyword("CalibrationBufferInvalid", Isis::toString(invalidCount[0]));
+    results += PvlKeyword("CalibrationBufferValid", Isis::toString(validCount[0]));
 
-    results += PvlKeyword("CalibrationImageGaps", toString(gapCount[1]));
-    results += PvlKeyword("CalibrationImageLIS", toString(lisCount[1]));
-    results += PvlKeyword("CalibrationImageHIS", toString(hisCount[1]));
-    results += PvlKeyword("CalibrationImagePossibleGaps", toString(suspectGapCount[1]));
-    results += PvlKeyword("CalibrationImageInvalid", toString(invalidCount[1]));
-    results += PvlKeyword("CalibrationImageValid", toString(validCount[1]));
+    results += PvlKeyword("CalibrationImageGaps", Isis::toString(gapCount[1]));
+    results += PvlKeyword("CalibrationImageLIS", Isis::toString(lisCount[1]));
+    results += PvlKeyword("CalibrationImageHIS", Isis::toString(hisCount[1]));
+    results += PvlKeyword("CalibrationImagePossibleGaps", Isis::toString(suspectGapCount[1]));
+    results += PvlKeyword("CalibrationImageInvalid", Isis::toString(invalidCount[1]));
+    results += PvlKeyword("CalibrationImageValid", Isis::toString(validCount[1]));
 
-    results += PvlKeyword("CalibrationDarkGaps", toString(gapCount[2]));
-    results += PvlKeyword("CalibrationDarkLIS", toString(lisCount[2]));
-    results += PvlKeyword("CalibrationDarkHIS", toString(hisCount[2]));
-    results += PvlKeyword("CalibrationDarkPossibleGaps", toString(suspectGapCount[2]));
-    results += PvlKeyword("CalibrationDarkInvalid", toString(invalidCount[2]));
-    results += PvlKeyword("CalibrationDarkValid", toString(validCount[2]));
+    results += PvlKeyword("CalibrationDarkGaps", Isis::toString(gapCount[2]));
+    results += PvlKeyword("CalibrationDarkLIS", Isis::toString(lisCount[2]));
+    results += PvlKeyword("CalibrationDarkHIS", Isis::toString(hisCount[2]));
+    results += PvlKeyword("CalibrationDarkPossibleGaps", Isis::toString(suspectGapCount[2]));
+    results += PvlKeyword("CalibrationDarkInvalid", Isis::toString(invalidCount[2]));
+    results += PvlKeyword("CalibrationDarkValid", Isis::toString(validCount[2]));
 
-    results += PvlKeyword("ObservationBufferGaps", toString(gapCount[3]));
-    results += PvlKeyword("ObservationBufferLIS", toString(lisCount[3]));
-    results += PvlKeyword("ObservationBufferHIS", toString(hisCount[3]));
-    results += PvlKeyword("ObservationBufferPossibleGaps", toString(suspectGapCount[3]));
-    results += PvlKeyword("ObservationBufferInvalid", toString(invalidCount[3]));
-    results += PvlKeyword("ObservationBufferValid", toString(validCount[3]));
+    results += PvlKeyword("ObservationBufferGaps", Isis::toString(gapCount[3]));
+    results += PvlKeyword("ObservationBufferLIS", Isis::toString(lisCount[3]));
+    results += PvlKeyword("ObservationBufferHIS", Isis::toString(hisCount[3]));
+    results += PvlKeyword("ObservationBufferPossibleGaps", Isis::toString(suspectGapCount[3]));
+    results += PvlKeyword("ObservationBufferInvalid", Isis::toString(invalidCount[3]));
+    results += PvlKeyword("ObservationBufferValid", Isis::toString(validCount[3]));
 
-    results += PvlKeyword("ObservationImageGaps", toString(gapCount[4]));
-    results += PvlKeyword("ObservationImageLIS", toString(lisCount[4]));
-    results += PvlKeyword("ObservationImageHIS", toString(hisCount[4]));
-    results += PvlKeyword("ObservationImagePossibleGaps", toString(suspectGapCount[4]));
-    results += PvlKeyword("ObservationImageInvalid", toString(invalidCount[4]));
-    results += PvlKeyword("ObservationImageValid", toString(validCount[4]));
+    results += PvlKeyword("ObservationImageGaps", Isis::toString(gapCount[4]));
+    results += PvlKeyword("ObservationImageLIS", Isis::toString(lisCount[4]));
+    results += PvlKeyword("ObservationImageHIS", Isis::toString(hisCount[4]));
+    results += PvlKeyword("ObservationImagePossibleGaps", Isis::toString(suspectGapCount[4]));
+    results += PvlKeyword("ObservationImageInvalid", Isis::toString(invalidCount[4]));
+    results += PvlKeyword("ObservationImageValid", Isis::toString(validCount[4]));
 
-    results += PvlKeyword("ObservationDarkGaps", toString(gapCount[5]));
-    results += PvlKeyword("ObservationDarkLIS", toString(lisCount[5]));
-    results += PvlKeyword("ObservationDarkHIS", toString(hisCount[5]));
-    results += PvlKeyword("ObservationDarkPossibleGaps", toString(suspectGapCount[5]));
-    results += PvlKeyword("ObservationDarkInvalid", toString(invalidCount[5]));
-    results += PvlKeyword("ObservationDarkValid", toString(validCount[5]));
+    results += PvlKeyword("ObservationDarkGaps", Isis::toString(gapCount[5]));
+    results += PvlKeyword("ObservationDarkLIS", Isis::toString(lisCount[5]));
+    results += PvlKeyword("ObservationDarkHIS", Isis::toString(hisCount[5]));
+    results += PvlKeyword("ObservationDarkPossibleGaps", Isis::toString(suspectGapCount[5]));
+    results += PvlKeyword("ObservationDarkInvalid", Isis::toString(invalidCount[5]));
+    results += PvlKeyword("ObservationDarkValid", Isis::toString(validCount[5]));
 
     // Write the results to the log
-    if(log){
-      log->addLogGroup(results);
-    }
+    Application::Log(results);
 
     return;
   }
@@ -458,24 +457,24 @@ namespace Isis {
     Pvl outLabel;
 
     // Get the path where the MRO HiRISE translation tables are.
-    QString transDir = "$ISISROOT/appdata/translations/";
+    std::string transDir = "$ISISROOT/appdata/translations/";
 
     // Get a filename for the HiRISE EDR label
     Pvl labelPvl(labelFile.expanded());
 
     // Translate the Instrument group
     FileName transFile(transDir + "MroHiriseInstrument.trn");
-    PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
+    PvlToPvlTranslationManager instrumentXlater(labelPvl, QString::fromStdString(transFile.expanded()));
     instrumentXlater.Auto(outLabel);
 
     // Translate the BandBin group
     transFile  = transDir + "MroHiriseBandBin.trn";
-    PvlToPvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
+    PvlToPvlTranslationManager bandBinXlater(labelPvl, QString::fromStdString(transFile.expanded()));
     bandBinXlater.Auto(outLabel);
 
     // Translate the Archive group
     transFile  = transDir + "MroHiriseArchive.trn";
-    PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
+    PvlToPvlTranslationManager archiveXlater(labelPvl, QString::fromStdString(transFile.expanded()));
     archiveXlater.Auto(outLabel);
 
     // Create the Instrument group keyword CcdId from the ProductId

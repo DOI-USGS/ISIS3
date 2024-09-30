@@ -37,8 +37,8 @@ namespace Isis {
        m_instrumentNameShort = "EIS-PBWAC";
      }
      else {
-       QString msg = "Unable to construct Clipper Push Broom camera model. "
-                     "Unrecognized NaifFrameCode [" + toString(frameCode) + "].";
+       std::string msg = "Unable to construct Clipper Push Broom camera model. "
+                     "Unrecognized NaifFrameCode [" + Isis::toString(frameCode) + "].";
        throw IException(IException::User, msg, _FILEINFO_);
      }
 
@@ -47,16 +47,16 @@ namespace Isis {
      Pvl &lab = *cube.label();
 
      PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
-     QString key = "INS" + toString(naifIkCode()) + "_" + bandBin["FilterName"][0] + "_FOCAL_LENGTH";
+     QString key = "INS" + QString::number(naifIkCode()) + "_" + QString::fromStdString(bandBin["FilterName"][0]) + "_FOCAL_LENGTH";
      SetFocalLength(Spice::getDouble(key));
 
      SetPixelPitch();
 
      PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-     QString startTime = inst["StartTime"];
+     QString startTime = QString::fromStdString(inst["StartTime"]);
      iTime etStart(startTime);
 
-     ReadLineRates(lab.fileName());
+     ReadLineRates(QString::fromStdString(lab.fileName()));
 
      // set up detector map
      new VariableLineScanCameraDetectorMap(this, p_lineRates);
@@ -124,11 +124,11 @@ namespace Isis {
     * @param filename
     */
    void ClipperPushBroomCamera::ReadLineRates(QString filename) {
-     Table timesTable("LineScanTimes", filename);
+     Table timesTable("LineScanTimes", filename.toStdString());
 
      if(timesTable.Records() <= 0) {
-       QString msg = "Table [LineScanTimes] in [";
-       msg += filename + "] must not be empty";
+       std::string msg = "Table [LineScanTimes] in [";
+       msg += filename.toStdString() + "] must not be empty";
        throw IException(IException::Unknown, msg, _FILEINFO_);
      }
 
@@ -139,8 +139,8 @@ namespace Isis {
      }
 
      if(p_lineRates.size() <= 0) {
-       QString msg = "There is a problem with the data within the Table ";
-       msg += "[LineScanTimes] in [" + filename + "]";
+       std::string msg = "There is a problem with the data within the Table ";
+       msg += "[LineScanTimes] in [" + filename.toStdString() + "]";
        throw IException(IException::Unknown, msg, _FILEINFO_);
      }
    }

@@ -42,7 +42,7 @@ namespace Isis {
     fstream input;
 
     // open as input from pvl file
-    input.open(pvl.fileName().toLatin1().data(), ios::in);
+    input.open(pvl.fileName(), ios::in);
     string output;
 
     // read first line of input and write as first output line
@@ -72,7 +72,7 @@ namespace Isis {
     vLayout->addLayout(buttonLayout);
 
     setLayout(vLayout);
-    QString titleBar = "Pvl File: " + QString(pvl.fileName()) ;
+    QString titleBar = "Pvl File: " + QString::fromStdString(pvl.fileName());
     setWindowTitle(titleBar);
 
     // Add functionality to buttons
@@ -118,8 +118,8 @@ namespace Isis {
     }
     catch(IException &e) {
       // catch errors in Pvl format when populating pvl object
-      QString message = e.toString();
-      QMessageBox::warning((QWidget *)parent(), "Error", message);
+      std::string message = e.toString();
+      QMessageBox::warning((QWidget *)parent(), "Error",QString::fromStdString(message));
       return;
     }
 
@@ -135,12 +135,12 @@ namespace Isis {
       // convert QString to std::string needed to open file stream
       QString saveFile = pvlFile;
       try {
-        pvl.write(saveFile);
+        pvl.write(saveFile.toStdString());
       }
       catch(IException &e) {
         // report exception(s) to mesage box
-        QString message = e.toString();
-        QMessageBox::warning((QWidget *)parent(), "Error", message);
+        std::string message = e.toString();
+        QMessageBox::warning((QWidget *)parent(), "Error", QString::fromStdString(message));
         return;
       }
     }

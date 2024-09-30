@@ -36,8 +36,8 @@ void IsisMain() {
     interp = new Interpolator(Interpolator::CubicConvolutionType);
   }
   else {
-    QString msg = "Unknow value for INTERP [" +
-                  ui.GetString("INTERP") + "]";
+    std::string msg = "Unknow value for INTERP [" +
+                  ui.GetString("INTERP").toStdString() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 

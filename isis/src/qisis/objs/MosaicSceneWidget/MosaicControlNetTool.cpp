@@ -160,12 +160,12 @@ namespace Isis {
 
 
   PvlObject MosaicControlNetTool::toPvl() const {
-    PvlObject obj(projectPvlObjectName());
+    PvlObject obj(projectPvlObjectName().toStdString());
 
-    obj += PvlKeyword("FileName", m_controlNetFile);
+    obj += PvlKeyword("FileName", m_controlNetFile.toStdString());
     obj += PvlKeyword("Visible",
         Isis::toString((int)(m_controlNetGraphics && m_controlNetGraphics->isVisible())));
-    obj += PvlKeyword("Movement", toString(m_movementArrowColorSource));
+    obj += PvlKeyword("Movement", Isis::toString(m_movementArrowColorSource));
 
     if (maxMovementColorMeasureCount() != -1) {
       obj += PvlKeyword("MovementColorMaxMeasureCount", Isis::toString(m_measureCount));
@@ -181,26 +181,26 @@ namespace Isis {
 
 
   void MosaicControlNetTool::fromPvl(const PvlObject &obj) {
-    m_controlNetFile = obj["FileName"][0];
+    m_controlNetFile = QString::fromStdString(obj["FileName"][0]);
     if (m_controlNetFile == "Null")
       m_controlNetFile = "";
 
     if (obj.hasKeyword("Movement")) {
-      m_movementArrowColorSource = fromMovementColorSourceString(obj["Movement"]);
+      m_movementArrowColorSource = fromMovementColorSourceString(QString::fromStdString(obj["Movement"]));
     }
 
     if (obj.hasKeyword("MovementColorMaxMeasureCount")) {
-      m_measureCount = toInt(obj["MovementColorMaxMeasureCount"][0]);
+      m_measureCount = Isis::toInt(obj["MovementColorMaxMeasureCount"][0]);
     }
 
     if (obj.hasKeyword("MovementColorMaxResidualMagnitude")) {
-      m_residualMagnitude = toDouble(obj["MovementColorMaxResidualMagnitude"][0]);
+      m_residualMagnitude = Isis::toDouble(obj["MovementColorMaxResidualMagnitude"][0]);
     }
 
     loadNetwork();
 
     if (m_controlNetGraphics && m_displayControlNetButton) {
-      m_displayControlNetButton->setChecked( toBool(obj["Visible"][0]) );
+      m_displayControlNetButton->setChecked( toBool(QString::fromStdString(obj["Visible"][0]).toStdString()) );
       displayControlNet();
     }
   }
@@ -580,8 +580,8 @@ namespace Isis {
       // for each mosaic item
       //---------------------------------------------------------------
       if (!netFile.isEmpty()) {
-        FileName controlNetFile(netFile);
-        m_controlNetFile = controlNetFile.expanded();
+        FileName controlNetFile(netFile.toStdString());
+        m_controlNetFile = QString::fromStdString(controlNetFile.expanded());
       }
     }
     else {
@@ -638,7 +638,7 @@ namespace Isis {
       }
       catch(IException &e) {
         QString message = "Invalid control network.\n";
-        message += e.toString();
+        message += QString::fromStdString(e.toString());
         QMessageBox::information(getWidget(), "Error", message);
         return;
       }

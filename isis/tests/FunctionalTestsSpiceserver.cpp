@@ -18,7 +18,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/spiceserver.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/spiceserver.xml").expanded());
 
 class TestPayload : public DefaultCube {
     protected:
@@ -107,7 +107,7 @@ TEST_F(TestPayload, FunctionalTestSpiceserverDefaultParameters) {
       if (element.tagName() == "kernels_label") {
         QString encoded = element.firstChild().toText().data();
         std::stringstream labStream;
-        labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() );
+        labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() ).toStdString();
         labStream >> kernelsLabel;
       }
       else if (element.tagName() == "tables") {
@@ -117,7 +117,7 @@ TEST_F(TestPayload, FunctionalTestSpiceserverDefaultParameters) {
           if (table.tagName() == "instrument_position") {
              QString encoded = table.firstChild().toText().data();
              std::stringstream labStream;
-             labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() );
+             labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() ).toStdString();
              labStream >> instrumentPositionTable;
           }
         }
@@ -131,18 +131,18 @@ TEST_F(TestPayload, FunctionalTestSpiceserverDefaultParameters) {
   PvlGroup naifKeywords = kernelsLabel.group(0);
 
   EXPECT_EQ((int)naifKeywords.findKeyword("NaifFrameCode"), -27002);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, naifKeywords.findKeyword("TargetPosition")[0], "Table");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, naifKeywords.findKeyword("InstrumentPointing")[0], "Table");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, naifKeywords.findKeyword("InstrumentPosition")[0], "Table");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, naifKeywords.findKeyword("TargetPosition")[0], "Table");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, naifKeywords.findKeyword("InstrumentPointing")[0], "Table");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, naifKeywords.findKeyword("InstrumentPosition")[0], "Table");
 
   PvlObject table = instrumentPositionTable.findObject("Table");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString(table.findKeyword("Name")), "InstrumentPosition");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString(table.group(0).findKeyword("Name")), "J2000X");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString(table.group(1).findKeyword("Name")), "J2000Y");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString(table.group(2).findKeyword("Name")), "J2000Z");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString(table.group(3).findKeyword("Name")), "J2000XV");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString(table.group(4).findKeyword("Name")), "J2000YV");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, QString(table.group(5).findKeyword("Name")), "J2000ZV");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, (table.findKeyword("Name")), "InstrumentPosition");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, (table.group(0).findKeyword("Name")), "J2000X");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, (table.group(1).findKeyword("Name")), "J2000Y");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, (table.group(2).findKeyword("Name")), "J2000Z");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, (table.group(3).findKeyword("Name")), "J2000XV");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, (table.group(4).findKeyword("Name")), "J2000YV");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, (table.group(5).findKeyword("Name")), "J2000ZV");
 }
 
 

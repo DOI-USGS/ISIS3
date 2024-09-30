@@ -49,7 +49,7 @@ namespace Isis {
 
 
   void moccal(UserInterface &ui) {
-    Cube icube(ui.GetCubeName("FROM"), "rw");
+    Cube icube(ui.GetCubeName("FROM").toStdString(), "rw");
     moccal(&icube, ui);
   }
 
@@ -64,7 +64,7 @@ namespace Isis {
 
     // If it is already calibrated then complain
     if(icube->hasGroup("Radiometry")) {
-      QString msg = "The MOC image [" + icube->fileName() + "] has already "
+      std::string msg = "The MOC image [" + icube->fileName().toStdString() + "] has already "
                   "been radiometrically calibrated";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -91,7 +91,7 @@ namespace Isis {
     else {
       calKernelFile = p.MissionData("mgs", "/calibration/moccal.ker.???", true);
     }
-    Pvl calKernel(calKernelFile);
+    Pvl calKernel(calKernelFile.toStdString());
 
     // Point to the right group of camera parameters
     QString camera;
@@ -107,7 +107,7 @@ namespace Isis {
     else {
       camera = "NarrowAngleA";
     }
-    PvlGroup &calCamera = calKernel.findGroup(camera);
+    PvlGroup &calCamera = calKernel.findGroup(camera.toStdString());
 
     // Get the camera specific calibration parameters from the kernel file
     // and load detector coefficients (gain/offsets at each pixel)
@@ -115,7 +115,7 @@ namespace Isis {
     gbl::dc = calCamera["DC"];
     gbl::g = calCamera["G"];
     gbl::w0 = calCamera["W0"];
-    QString coefFile = calCamera["CoefFile"];
+    QString coefFile =  QString::fromStdString(calCamera["CoefFile"]);
     gbl::LoadCoefficients(coefFile, icube->sampleCount());
 
   #if 0
@@ -176,22 +176,22 @@ namespace Isis {
 
     // Add the radiometry group
     PvlGroup calgrp("Radiometry");
-    calgrp += PvlKeyword("CalibrationKernel", calKernelFile);
-    calgrp += PvlKeyword("CoefficientFile", coefFile);
+    calgrp += PvlKeyword("CalibrationKernel", calKernelFile.toStdString());
+    calgrp += PvlKeyword("CoefficientFile", coefFile.toStdString());
 
-    calgrp += PvlKeyword("a", toString(gbl::a));
+    calgrp += PvlKeyword("a", Isis::toString(gbl::a));
     calgrp["a"].addComment("Radiometric equation in moccal");
     calgrp["a"].addComment("r = (pixel - z + off) / a - g / ex - dc");
-    calgrp += PvlKeyword("off", toString(gbl::off));
-    calgrp += PvlKeyword("ex", toString(gbl::ex));
-    calgrp += PvlKeyword("z", toString(gbl::z));
-    calgrp += PvlKeyword("dc", toString(gbl::dc));
-    calgrp += PvlKeyword("g", toString(gbl::g));
+    calgrp += PvlKeyword("off", Isis::toString(gbl::off));
+    calgrp += PvlKeyword("ex", Isis::toString(gbl::ex));
+    calgrp += PvlKeyword("z", Isis::toString(gbl::z));
+    calgrp += PvlKeyword("dc", Isis::toString(gbl::dc));
+    calgrp += PvlKeyword("g", Isis::toString(gbl::g));
 
-    calgrp += PvlKeyword("w0", toString(gbl::w0));
+    calgrp += PvlKeyword("w0", Isis::toString(gbl::w0));
     calgrp["w0"].addComment("Reflectance = r * iof, where iof = (s * s) / w0");
-    calgrp += PvlKeyword("s", toString(sunAU));
-    calgrp += PvlKeyword("iof", toString(gbl::iof));
+    calgrp += PvlKeyword("s", Isis::toString(sunAU));
+    calgrp += PvlKeyword("iof", Isis::toString(gbl::iof));
 
     ocube->putGroup(calgrp);
 
@@ -278,7 +278,7 @@ namespace Isis {
     TextFile coef(file);
     QString record, tok;
     coef.GetLine(record, true);
-    int numCoefs = toInt(record);
+    int numCoefs = record.toInt();
     for(int i = 0; i < numCoefs; i++) {
       coef.GetLine(record, true);
       record = record.simplified().trimmed();
@@ -286,15 +286,15 @@ namespace Isis {
       QStringList records = record.split(" ");
 
       if (records.count() > 1) {
-        gainCoef.push_back(toDouble(records.takeFirst()));
-        offsetCoef.push_back(toDouble(records.takeFirst()));
+        gainCoef.push_back(records.takeFirst().toDouble());
+        offsetCoef.push_back(records.takeFirst().toDouble());
       }
     }
 
     // Make sure the file had the correct number of coefficients.  It should
     // match the number of detectors in the NA or WA camera
     if((int)gainCoef.size() != gbl::moc->Detectors()) {
-      QString msg = "Coefficient file [" + file + "] size is wrong ... should have [";
+      std::string msg = "Coefficient file [" + file.toStdString() + "] size is wrong ... should have [";
       msg += toString(gbl::moc->Detectors()) + "] gain/offset entries";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -309,7 +309,7 @@ namespace Isis {
       double osum = 0.0;
       for(n = 0; ss <= es; ss++, n++) {
         if(ss >= (int)gainCoef.size()) {
-          QString msg = "Array bounds exceeded for gainCoef/offsetCoef";
+          std::string msg = "Array bounds exceeded for gainCoef/offsetCoef";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         gsum += gainCoef[ss];

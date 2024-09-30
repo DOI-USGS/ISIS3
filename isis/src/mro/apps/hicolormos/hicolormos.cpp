@@ -30,9 +30,9 @@ using namespace std;
 namespace Isis {
 
 void hicolormos(UserInterface &ui) {
-  Cube from1(ui.GetCubeName("FROM1"), "r");
+  Cube from1(ui.GetCubeName("FROM1").toStdString(), "r");
   if (ui.WasEntered("FROM2")) {
-    Cube from2(ui.GetCubeName("FROM2"), "r");
+    Cube from2(ui.GetCubeName("FROM2").toStdString(), "r");
     hicolormos(&from1, &from2, ui);
   }
   else {
@@ -45,14 +45,14 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   // Make a temporary list file for automos
   FileName tempFile = FileName::createTempFile("$TEMPORARY/hicolormos.temp.lis");
   TextFile tf;
-  tf.Open(tempFile.expanded(), "output");
+  tf.Open(QString::fromStdString(tempFile.expanded()), "output");
   tf.PutLine(from1->fileName() + "\n");
 
   Pvl from1lab = *from1->label();
   PvlGroup from1Mosaic = from1lab.findGroup("Mosaic", Pvl::Traverse);
 
   // Make the procuct ID (from1 archive group)
-  QString ProdId = from1lab.findGroup("Archive", Pvl::Traverse)["ObservationId"];
+  QString ProdId = QString::fromStdString(from1lab.findGroup("Archive", Pvl::Traverse)["ObservationId"]);
   ProdId += "_COLOR";
 
   // Prep for second image if we have one
@@ -64,9 +64,9 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
     tf.PutLine(from2->fileName() + "\n");
 
     // Test the observation ID between from1 and from2
-    if((QString)from1lab.findGroup("Archive", Pvl::Traverse)["ObservationId"] !=
-        (QString)from2lab.findGroup("Archive", Pvl::Traverse)["ObservationId"]) {
-      QString msg = "Images not from the same observation";
+    if(QString::fromStdString(from1lab.findGroup("Archive", Pvl::Traverse)["ObservationId"]) !=
+        QString::fromStdString(from2lab.findGroup("Archive", Pvl::Traverse)["ObservationId"])) {
+      std::string msg = "Images not from the same observation";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -205,23 +205,23 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   }
 
   if(runXY) {
-    QString tmp(tempFile.expanded());
+    QString tmp(QString::fromStdString(tempFile.expanded()));
     remove(tmp.toLatin1().data());
-    QString msg = "Camera did not intersect images to gather stats";
+    std::string msg = "Camera did not intersect images to gather stats";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //work on the times (from mosaic group)
-  QString startTime = from1Mosaic["StartTime"];
-  QString stopTime = from1Mosaic["StopTime"];
-  QString startClk = from1Mosaic["SpacecraftClockStartCount"];
-  QString stopClk = from1Mosaic["SpacecraftClockStopCount"];
+  QString startTime = QString::fromStdString(from1Mosaic["StartTime"]);
+  QString stopTime = QString::fromStdString(from1Mosaic["StopTime"]);
+  QString startClk = QString::fromStdString(from1Mosaic["SpacecraftClockStartCount"]);
+  QString stopClk = QString::fromStdString(from1Mosaic["SpacecraftClockStopCount"]);
 
   if(from2) {
-    if((QString)from2Mosaic["StartTime"] < startTime) startTime = (QString)from2Mosaic["StartTime"];
-    if((QString)from2Mosaic["StopTime"] > stopTime) stopTime = (QString)from2Mosaic["StopTime"];
-    if((QString)from2Mosaic["SpacecraftClockStartCount"] < startClk) startClk = (QString)from2Mosaic["SpacecraftClockStartCount"];
-    if((QString)from2Mosaic["SpacecraftClockStopCount"] < stopClk) stopClk = (QString)from2Mosaic["SpacecraftClockStopCount"];
+    if(QString::fromStdString(from2Mosaic["StartTime"]) < startTime) startTime = QString::fromStdString(from2Mosaic["StartTime"]);
+    if(QString::fromStdString(from2Mosaic["StopTime"]) > stopTime) stopTime = QString::fromStdString(from2Mosaic["StopTime"]);
+    if(QString::fromStdString(from2Mosaic["SpacecraftClockStartCount"]) < startClk) startClk = QString::fromStdString(from2Mosaic["SpacecraftClockStartCount"]);
+    if(QString::fromStdString(from2Mosaic["SpacecraftClockStopCount"]) < stopClk) stopClk = QString::fromStdString(from2Mosaic["SpacecraftClockStopCount"]);
   }
 
   // Get TDI and summing array
@@ -246,25 +246,25 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   // automos step
   QString MosaicPriority = ui.GetString("PRIORITY");
 
-  QString parameters = "FROMLIST=" + tempFile.expanded() +
+  QString parameters = "FROMLIST=" + QString::fromStdString(tempFile.expanded()) +
                       " MOSAIC=" + ui.GetCubeName("TO") +
                       " PRIORITY=" + MosaicPriority;
   ProgramLauncher::RunIsisProgram("automos", parameters);
 
   PvlGroup mos("Mosaic");
-  mos += PvlKeyword("ProductId ", ProdId);
+  mos += PvlKeyword("ProductId ", ProdId.toStdString());
   mos += sourceProductId;
-  mos += PvlKeyword("StartTime ", startTime);
-  mos += PvlKeyword("SpacecraftClockStartCount ", startClk);
-  mos += PvlKeyword("StopTime ", stopTime);
-  mos += PvlKeyword("SpacecraftClockStopCount ", stopClk);
-  mos += PvlKeyword("IncidenceAngle ", toString(Cincid), "DEG");
-  mos += PvlKeyword("EmissionAngle ", toString(Cemiss), "DEG");
-  mos += PvlKeyword("PhaseAngle ", toString(Cphase), "DEG");
-  mos += PvlKeyword("LocalTime ", toString(ClocalSolTime), "LOCALDAY/24");
-  mos += PvlKeyword("SolarLongitude ", toString(CsolarLong), "DEG");
-  mos += PvlKeyword("SubSolarAzimuth ", toString(CsunAzimuth), "DEG");
-  mos += PvlKeyword("NorthAzimuth ", toString(CnorthAzimuth), "DEG");
+  mos += PvlKeyword("StartTime ", startTime.toStdString());
+  mos += PvlKeyword("SpacecraftClockStartCount ", startClk.toStdString());
+  mos += PvlKeyword("StopTime ", stopTime.toStdString());
+  mos += PvlKeyword("SpacecraftClockStopCount ", stopClk.toStdString());
+  mos += PvlKeyword("IncidenceAngle ", Isis::toString(Cincid), "DEG");
+  mos += PvlKeyword("EmissionAngle ", Isis::toString(Cemiss), "DEG");
+  mos += PvlKeyword("PhaseAngle ", Isis::toString(Cphase), "DEG");
+  mos += PvlKeyword("LocalTime ", Isis::toString(ClocalSolTime), "LOCALDAY/24");
+  mos += PvlKeyword("SolarLongitude ", Isis::toString(CsolarLong), "DEG");
+  mos += PvlKeyword("SubSolarAzimuth ", Isis::toString(CsunAzimuth), "DEG");
+  mos += PvlKeyword("NorthAzimuth ", Isis::toString(CnorthAzimuth), "DEG");
   mos += cpmmTdiFlag;
   mos += cpmmSummingFlag;
   mos += specialProcessingFlag;
@@ -279,7 +279,7 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
   c.close();
 
   // Clean up the temporary automos list file
-  QString tmp(tempFile.expanded());
+  QString tmp(QString::fromStdString(tempFile.expanded()));
   remove(tmp.toLatin1().data());
 } // end of isis main
 

@@ -34,8 +34,8 @@ PDSINFO *pdsi;
 void IsisMain() {
   // Grab the file to import
   UserInterface &ui = Application::GetUserInterface();
-  FileName in = ui.GetFileName("FROM");
-  FileName out = ui.GetCubeName("TO");
+  FileName in = ui.GetFileName("FROM").toStdString();
+  FileName out = ui.GetCubeName("TO").toStdString();
 
   // Make sure it is a Clementine EDR
   bool projected;
@@ -43,15 +43,15 @@ void IsisMain() {
     Pvl lab(in.expanded());
     projected = lab.hasObject("IMAGE_MAP_PROJECTION");
     QString id;
-    id = (QString)lab["DATA_SET_ID"];
+    id = QString::fromStdString(lab["DATA_SET_ID"]);
     id = id.simplified().trimmed();
     if (!id.contains("CLEM")) {
-      QString msg = "Invalid DATA_SET_ID [" + id + "]";
+      std::string msg = "Invalid DATA_SET_ID [" + id.toStdString() + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
   catch(IException &e) {
-    QString msg = "Input file [" + in.expanded() +
+    std::string msg = "Input file [" + in.expanded() +
                   "] does not appear to be " +
                   "in Clementine EDR format";
     throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -59,7 +59,7 @@ void IsisMain() {
 
   //Checks if in file is rdr
   if (projected) {
-    QString msg = "[" + in.name() + "] appears to be an rdr file.";
+    std::string msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -67,7 +67,7 @@ void IsisMain() {
   //Decompress the file
   long int lines = 0;
   long int samps = 0;
-  QString filename = in.expanded();
+  QString filename = QString::fromStdString(in.expanded());
   pdsi = PDSR(filename.toLatin1().data(), &lines, &samps);
 
   ProcessByLine p;
@@ -107,11 +107,11 @@ void writeLine(Buffer &b) {
 
 void translateLabels(FileName in, Cube *ocube) {
   // Transfer the instrument group to the output cube
-  QString transDir = "$ISISROOT/appdata/translations/";
+  std::string transDir = "$ISISROOT/appdata/translations/";
   FileName transFile(transDir + "Clementine.trn");
 
   Pvl pdsLab(in.expanded());
-  PvlToPvlTranslationManager labelXlater(pdsLab, transFile.expanded());
+  PvlToPvlTranslationManager labelXlater(pdsLab, QString::fromStdString(transFile.expanded()));
 
   // Pvl outputLabels;
   Pvl *outputLabel = ocube->label();
@@ -121,41 +121,41 @@ void translateLabels(FileName in, Cube *ocube) {
   PvlGroup inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
 
   PvlKeyword &startTime = inst.findKeyword("StartTime");
-  startTime.setValue(startTime[0].mid(0, startTime[0].size() - 1));
+  startTime.setValue(startTime[0].substr(0, startTime[0].size() - 1));
 
   // Old PDS labels used keyword INSTRUMENT_COMPRESSION_TYPE & PDS Labels now use ENCODING_TYPE
   if (pdsLab.findObject("Image").hasKeyword("InstrumentCompressionType")) {
-    inst += PvlKeyword("EncodingFormat", (QString) pdsLab.findObject("Image")["InstrumentCompressionType"]);
+    inst += PvlKeyword("EncodingFormat", pdsLab.findObject("Image")["InstrumentCompressionType"]);
   }
   else {
-    inst += PvlKeyword("EncodingFormat", (QString) pdsLab.findObject("Image")["EncodingType"]);
+    inst += PvlKeyword("EncodingFormat", pdsLab.findObject("Image")["EncodingType"]);
   }
 
-  if (((QString)inst["InstrumentId"]) == "HIRES") {
-    inst += PvlKeyword("MCPGainModeID", (QString)pdsLab["MCP_Gain_Mode_ID"], "");
+  if (((std::string)inst["InstrumentId"]) == "HIRES") {
+    inst += PvlKeyword("MCPGainModeID", pdsLab["MCP_Gain_Mode_ID"], "");
   }
 
   ocube->putGroup(inst);
 
   PvlGroup bBin = outputLabel->findGroup("BandBin", Pvl::Traverse);
-  QString filter = pdsLab["FilterName"];
+  QString filter = QString::fromStdString(pdsLab["FilterName"]);
   if (filter != "F") {
     //Band Bin group
     double center = pdsLab["CenterFilterWavelength"];
     center /= 1000.0;
-    bBin.findKeyword("Center").setValue(toString(center), "micrometers");
+    bBin.findKeyword("Center").setValue(Isis::toString(center), "micrometers");
   }
   double width = pdsLab["Bandwidth"];
   width /= 1000.0;
-  bBin.findKeyword("Width").setValue(toString(width), "micrometers");
+  bBin.findKeyword("Width").setValue(Isis::toString(width), "micrometers");
   ocube->putGroup(bBin);
 
   //Kernel group
   PvlGroup kern("Kernels");
-  if (((QString)inst["InstrumentId"]) == "HIRES") {
+  if (((std::string)inst["InstrumentId"]) == "HIRES") {
     kern += PvlKeyword("NaifFrameCode", "-40001");
   }
-  if (((QString)inst["InstrumentId"]) == "UVVIS") {
+  if (((std::string)inst["InstrumentId"]) == "UVVIS") {
     // JAA & VS ... modified to support variable focal length and optical
     // distortion for UVVIS
     if (filter == "A") {
@@ -177,10 +177,10 @@ void translateLabels(FileName in, Cube *ocube) {
       kern += PvlKeyword("NaifFrameCode", "-40026");
     }
   }
-  if (((QString)inst["InstrumentId"]) == "NIR") {
+  if (((std::string)inst["InstrumentId"]) == "NIR") {
     kern += PvlKeyword("NaifFrameCode", "-40003");
   }
-  if (((QString)inst["InstrumentId"]) == "LWIR") {
+  if (((std::string)inst["InstrumentId"]) == "LWIR") {
     kern += PvlKeyword("NaifFrameCode", "-40004");
   }
   ocube->putGroup(kern);

@@ -12,7 +12,7 @@
 using namespace Isis;
 using ::testing::HasSubstr;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/apolloremrx.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/apolloremrx.xml").expanded());
 
 TEST_F(ApolloCube, FunctionalTestApolloremrxDefault) {
 
@@ -31,26 +31,26 @@ TEST_F(ApolloCube, FunctionalTestApolloremrxDefault) {
     FAIL() << "Call failed, Unable to process cube: " << e.what() << std::endl;
   }
 
-  Cube cube(outCubeFileName);
+  Cube cube(outCubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   PvlGroup reseausGroup = isisLabel->findObject("IsisCube").findGroup("Reseaus");
   PvlKeyword lineKey = reseausGroup.findKeyword("Line");
-  EXPECT_NEAR(lineKey[0].toDouble(), 200, 0.0001);
-  EXPECT_NEAR(lineKey[1].toDouble(), 400, 0.0001);
-  EXPECT_NEAR(lineKey[2].toDouble(), 600, 0.0001);
+  EXPECT_NEAR(Isis::toDouble(lineKey[0]), 200, 0.0001);
+  EXPECT_NEAR(Isis::toDouble(lineKey[1]), 400, 0.0001);
+  EXPECT_NEAR(Isis::toDouble(lineKey[2]), 600, 0.0001);
 
   PvlKeyword sampleKey = reseausGroup.findKeyword("Sample");
-  EXPECT_NEAR(sampleKey[0].toDouble(), 200, 0.0001);
-  EXPECT_NEAR(sampleKey[1].toDouble(), 400, 0.0001);
-  EXPECT_NEAR(sampleKey[2].toDouble(), 600, 0.0001);
+  EXPECT_NEAR(Isis::toDouble(sampleKey[0]), 200, 0.0001);
+  EXPECT_NEAR(Isis::toDouble(sampleKey[1]), 400, 0.0001);
+  EXPECT_NEAR(Isis::toDouble(sampleKey[2]), 600, 0.0001);
 
   PvlKeyword validKey = reseausGroup.findKeyword("Valid");
-  EXPECT_EQ(validKey[0].toInt(), 1);
-  EXPECT_EQ(validKey[1].toInt(), 1);
-  EXPECT_EQ(validKey[2].toInt(), 1);
+  EXPECT_EQ(Isis::toInt(validKey[0]), 1);
+  EXPECT_EQ(Isis::toInt(validKey[1]), 1);
+  EXPECT_EQ(Isis::toInt(validKey[2]), 1);
 
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, reseausGroup.findKeyword("Status"), "Removed");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, reseausGroup.findKeyword("Status"), "Removed");
 
   Brick brick(reseauSize,reseauSize,1,cube.pixelType());
 
@@ -86,7 +86,7 @@ TEST_F(ApolloCube, FunctionalTestApolloremrxPatch) {
     FAIL() << "Call failed, Unable to process cube: " << e.what() << std::endl;
   }
 
-  Cube cube(outCubeFileName);
+  Cube cube(outCubeFileName.toStdString());
 
   Brick brick(reseauSize,reseauSize,1,cube.pixelType());
 
@@ -117,7 +117,7 @@ TEST_F(ApolloCube, FunctionalTestApolloremrxRemovedError) {
     FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("appears to already have reseaus removed."));
+    EXPECT_THAT(e.what(), HasSubstr("appears to already have reseaus removed"));
   }
 }
 
@@ -135,7 +135,7 @@ TEST_F(ApolloCube, FunctionalTestApolloremrxSpacecraftError) {
     FAIL() << "Should throw an exception" << std::endl;
   }
   catch (IException &e) {
-    EXPECT_THAT(e.what(), HasSubstr("This application is for use with Apollo spacecrafts only."));
+    EXPECT_THAT(e.what(), HasSubstr("This application is for use with Apollo spacecrafts only"));
   }
 }
 

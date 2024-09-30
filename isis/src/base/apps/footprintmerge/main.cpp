@@ -20,9 +20,9 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileList imageList;
-  imageList.read(ui.GetFileName("FROMLIST"));
+  imageList.read(ui.GetFileName("FROMLIST").toStdString());
   if(imageList.size() < 1) {
-    QString msg = "The list file [" + ui.GetFileName("FROMLIST") +
+    std::string msg = "The list file [" + ui.GetFileName("FROMLIST").toStdString() +
                       "] does not contain any data";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -40,14 +40,14 @@ void IsisMain() {
   for(int img = 0; img < imageList.size(); img++) {
 
     Cube cube;
-    cube.open(imageList[img].toString());
+    cube.open(QString::fromStdString(imageList[img].toString()));
 
     // Make sure cube has been run through spiceinit
     try {
       cube.camera();
     }
     catch(IException &e) {
-      QString msg = "Spiceinit must be run prior to running footprintmerge";
+      std::string msg = "Spiceinit must be run prior to running footprintmerge";
       msg += " for cube [" + imageList[img].toString() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
@@ -61,7 +61,7 @@ void IsisMain() {
 
     allPolys.push_back(PolygonTools::CopyMultiPolygon(poly.Polys()));
 
-    files.push_back(imageList[img].toString());
+    files.push_back(QString::fromStdString(imageList[img].toString()));
 
     prog.CheckStatus();
 
@@ -129,7 +129,7 @@ void IsisMain() {
   // Brief
   if(mode == "BRIEF") {
     PvlGroup results("Results");
-    results += PvlKeyword("NumberOfIslands", toString((int)islandPolys.size()));
+    results += PvlKeyword("NumberOfIslands", Isis::toString((int)islandPolys.size()));
     Application::Log(results);
   }
   else if(mode == "FULL") {
@@ -137,23 +137,23 @@ void IsisMain() {
     PvlObject results("Results");
     for(unsigned int p = 0; p < islandPolys.size(); p++) {
       int numFiles = islands[p].size();
-      QString isle = "FootprintIsland_" + toString((int)p + 1);
-      PvlGroup island(isle);
-      island += PvlKeyword("NumberFiles", toString(numFiles));
+      QString isle = "FootprintIsland_" + QString::number((int)p + 1);
+      PvlGroup island(isle.toStdString());
+      island += PvlKeyword("NumberFiles", Isis::toString(numFiles));
       PvlKeyword files("Files");
       for(int f = 0; f < numFiles; f++) {
-        files.addValue(islands[p][f]);
+        files.addValue(islands[p][f].toStdString());
       }
       island.addKeyword(files);
       results.addGroup(island);
     }
     Pvl temp;
     temp.addObject(results);
-    if(FileName(out).fileExists()) {
-      temp.append(out);
+    if(FileName(out.toStdString()).fileExists()) {
+      temp.append(out.toStdString());
     }
     else {
-      temp.write(out);
+      temp.write(out.toStdString());
     }
 
   }

@@ -53,8 +53,8 @@ namespace Isis {
       }
       catch (IException &secondError) {
         p_projection = NULL;
-        QString msg = "Could not create camera or projection for [" +
-                          cube.fileName() + "]";
+        std::string msg = "Could not create camera or projection for [" +
+                          cube.fileName().toStdString() + "]";
         IException realError(IException::Unknown, msg, _FILEINFO_);
         realError.append(firstError);
         realError.append(secondError);

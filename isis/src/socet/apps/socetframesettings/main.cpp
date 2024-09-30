@@ -49,7 +49,7 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
   QString from = ui.GetCubeName("FROM");
-  QString to = FileName(ui.GetFileName("TO")).expanded();
+  QString to = QString::fromStdString(FileName(ui.GetFileName("TO").toStdString()).expanded());
   QString socetProject = ui.GetString("SS_PROJECT");
   QString socetImageLocation = ui.GetString("SS_IMG_LOC");
   QString socetInputDataPath = ui.GetString("SS_INPUT_PATH");
@@ -60,9 +60,9 @@ void IsisMain() {
   cube.open(from);
 
   if (cube.isProjected()) {
-    QString msg = QString("You can only create a SOCET Set Framing Camera or FrameOffAxis settings "
-                          "file for level 1 images. The input image [%1] is a map projected, level "
-                          "2, cube.").arg(from);
+    std::string msg = "You can only create a SOCET Set Framing Camera or FrameOffAxis settings "
+                          "file for level 1 images. The input image ["+from.toStdString()+"] is a map projected, level "
+                          "2, cube.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -74,10 +74,10 @@ void IsisMain() {
 
   // Make sure the image contains the SPICE blobs/tables
   PvlGroup test = cube.label()->findGroup("Kernels", Pvl::Traverse);
-  QString instrumentPointing = (QString) test["InstrumentPointing"];
+  QString instrumentPointing = QString::fromStdString(test["InstrumentPointing"]);
   if (instrumentPointing != "Table") {
-    QString msg = QString("Input image [%1] does not contain needed SPICE blobs.  Please run "
-                          "spiceinit on the image with attach=yes.").arg(from);
+    std::string msg = "Input image "+from.toStdString()+"] does not contain needed SPICE blobs.  Please run "
+                          "spiceinit on the image with attach=yes.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -93,14 +93,14 @@ void IsisMain() {
 
   // Get required keywords from instrument and band groups
   PvlGroup inst = cube.label()->findGroup("Instrument", Pvl::Traverse);
-  QString instrumentId = (QString) inst["InstrumentId"];
-  QString spacecraftName = (QString) inst["SpacecraftName"];
+  QString instrumentId = QString::fromStdString(inst["InstrumentId"]);
+  QString spacecraftName = QString::fromStdString(inst["SpacecraftName"]);
 
   // Compensate for noproj altering cube labels
   if (instrumentId == "IdealCamera") {
     PvlGroup orig = cube.label()->findGroup("OriginalInstrument", Pvl::Traverse);
-    instrumentId = (QString) orig["InstrumentId"];
-    spacecraftName = (QString) orig["SpacecraftName"];
+    instrumentId = QString::fromStdString(orig["InstrumentId"]);
+    spacecraftName = QString::fromStdString(orig["SpacecraftName"]);
   }
 
   // Get sensor position and orientation (opk) angles
@@ -162,7 +162,7 @@ void IsisMain() {
   else if (spacecraftName == "Galileo Orbiter") {
     //Check if this image was aquired with the cover on or off
     iTime removeCoverDate("1994/04/01 00:00:00");
-    iTime imageDate((QString) inst["StartTime"]);
+    iTime imageDate(QString::fromStdString(inst["StartTime"]));
 
     if (imageDate < removeCoverDate) {
       socetCamFile += "Galileo_SSI_Cover.cam";
@@ -174,7 +174,7 @@ void IsisMain() {
   else if (spacecraftName == "Cassini-Huygens") {
     // Get the image filter and replace "/" with "_"
     PvlGroup bandBin = cube.label()->findGroup("BandBin", Pvl::Traverse);
-    QString filter = (QString) bandBin["FilterName"];
+    QString filter = QString::fromStdString(bandBin["FilterName"]);
     filter.replace("/", "_");
 
     socetCamFile += "Cassini_ISSNA_";
@@ -202,16 +202,16 @@ void IsisMain() {
       socetCamFile += "OCAMS_PolyCam.cam";
     }
     else {
-      QString msg = QString("The ISIS to SOCET Set translation of input image "
-                            "[%1] is currently not supported for OSIRIS-REX "
-                            "instrument [%2].").arg(from).arg(instrumentId);
+      std::string msg = "The ISIS to SOCET Set translation of input image "
+                            "["+from.toStdString()+"] is currently not supported for OSIRIS-REX "
+                            "instrument ["+instrumentId.toStdString()+"].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   // Throw exception for unsupported camera
   else {
-    QString msg = QString("The ISIS to SOCET Set translation of input image [%1] is currently "
-                          "not supported for instrument [%2].").arg(from).arg(instrumentId);
+    std::string msg = "The ISIS to SOCET Set translation of input image ["+from.toStdString()+"] is currently "
+                          "not supported for instrument ["+instrumentId.toStdString()+"].";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -225,7 +225,7 @@ void IsisMain() {
   //      summation = (int) detectorMap->SampleScaleFactor();
   //    }
   //    catch (IException &e) {
-  //      QString msg = "Error reading SpatialSumming from Instrument label";
+  //      std::string msg = "Error reading SpatialSumming from Instrument label";
   //      throw IException(IException::User, msg, _FILEINFO_);
   //    }
   //  }
@@ -235,7 +235,7 @@ void IsisMain() {
       summation = (int) detectorMap->SampleScaleFactor();
     }
     catch (IException &e) {
-      QString msg = "Error reading Summing from Instrument label";
+      std::string msg = "Error reading Summing from Instrument label";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -245,7 +245,7 @@ void IsisMain() {
       summation = (int) detectorMap->SampleScaleFactor();
     }
     catch (IException &e) {
-      QString msg = "Error reading Summing from Instrument label";
+      std::string msg = "Error reading Summing from Instrument label";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -282,22 +282,22 @@ void IsisMain() {
 
   toStrm.open (to.toLatin1().data(), ios::trunc);
   if (toStrm.bad()) {
-    QString msg = "Unable to open output settings file";
+    std::string msg = "Unable to open output settings file";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   toStrm << "setting_file                        1.1\n";
-  toStrm << "multi_frame.project                 " << socetProject << endl;
-  toStrm << "multi_frame.cam_calib_filename      " << socetCamFile << endl;
+  toStrm << "multi_frame.project                 " << socetProject.toStdString() << endl;
+  toStrm << "multi_frame.cam_calib_filename      " << socetCamFile.toStdString() << endl;
   toStrm << "multi_frame.create_files            IMAGE_AND_SUPPORT\n";
   toStrm << "multi_frame.atmos_ref               0\n";
   toStrm << "multi_frame.auto_min                YES\n";
   toStrm << "multi_frame.digital_cam             NO\n";
-  toStrm << "multi_frame.input_image_filename    " << socetInputDataPath + baseName +
+  toStrm << "multi_frame.input_image_filename    " << socetInputDataPath.toStdString() + baseName.toStdString() +
                                                  ".raw" << endl;
   toStrm << "multi_frame.output_format           img_type_vitec\n";
-  toStrm << "multi_frame.output_name             " << socetSupFile << endl;
-  toStrm << "multi_frame.output_location         " << socetImageLocation << endl;
+  toStrm << "multi_frame.output_name             " << socetSupFile.toStdString() << endl;
+  toStrm << "multi_frame.output_location         " << socetImageLocation.toStdString() << endl;
   toStrm << "multi_frame.cam_loc_ang_sys         OPK\n";
   toStrm << "multi_frame.cam_loc_ang_units       UNIT_DEGREES\n";
   toStrm << "multi_frame.cam_loc_xy_units        UNIT_DEGREES\n";
@@ -387,23 +387,23 @@ void IsisMain() {
     PvlObject naifKeywordsObject = cube.label()->findObject("NaifKeywords");
     if (instrumentId == "MDIS-NAC") {
       ikCode = "236820";
-      swapObserverTarget = (QString) naifKeywordsObject["INS-236820_SWAP_OBSERVER_TARGET"];
-      lightTimeCorrection = (QString) naifKeywordsObject["INS-236820_LIGHTTIME_CORRECTION"];
-      ltSurfaceCorrect = (QString) naifKeywordsObject["INS-236820_LT_SURFACE_CORRECT"];
+      swapObserverTarget = QString::fromStdString(naifKeywordsObject["INS-236820_SWAP_OBSERVER_TARGET"]);
+      lightTimeCorrection = QString::fromStdString(naifKeywordsObject["INS-236820_LIGHTTIME_CORRECTION"]);
+      ltSurfaceCorrect = QString::fromStdString(naifKeywordsObject["INS-236820_LT_SURFACE_CORRECT"]);
     }
     else {
       ikCode = "236800";
-      swapObserverTarget = (QString) naifKeywordsObject["INS-236800_SWAP_OBSERVER_TARGET"];
-      lightTimeCorrection = (QString) naifKeywordsObject["INS-236800_LIGHTTIME_CORRECTION"];
-      ltSurfaceCorrect = (QString) naifKeywordsObject["INS-236800_LT_SURFACE_CORRECT"];
+      swapObserverTarget = QString::fromStdString(naifKeywordsObject["INS-236800_SWAP_OBSERVER_TARGET"]);
+      lightTimeCorrection = QString::fromStdString(naifKeywordsObject["INS-236800_LIGHTTIME_CORRECTION"]);
+      ltSurfaceCorrect = QString::fromStdString(naifKeywordsObject["INS-236800_LT_SURFACE_CORRECT"]);
     }
 
     toStrm << "\nSENSOR_TYPE FrameOffAxis" << endl;
     toStrm << "USE_LENS_DISTORTION 1" << endl;
     toStrm << "ORIGINAL_HALF_LINES " <<  originalHalfLines << endl;
     toStrm << "ORIGINAL_HALF_SAMPLES " << originalHalfSamples << endl;
-    toStrm << "LENSCOX " << lenscoX << endl;
-    toStrm << "LENSCOY " << lenscoY << endl;
+    toStrm << "LENSCOX " << lenscoX.toStdString() << endl;
+    toStrm << "LENSCOY " << lenscoY.toStdString() << endl;
     toStrm << "SAMPLE_SUMMING  " << sampleSumming << endl;
     toStrm << "LINE_SUMMING  " << lineSumming << endl;
     toStrm << "STARTING_DETECTOR_SAMPLE " << setprecision(17) << startingSample << endl;
@@ -430,9 +430,9 @@ void IsisMain() {
               isisFocalPlane2SocetPlateTranspose[2][0] << " " <<
               isisFocalPlane2SocetPlateTranspose[2][1] << " " <<
               isisFocalPlane2SocetPlateTranspose[2][2] << endl;
-    toStrm << "INS-" << ikCode << "_SWAP_OBSERVER_TARGET = '" << swapObserverTarget << "'\n";
-    toStrm << "INS-" << ikCode << "_LIGHTTIME_CORRECTION = '" << lightTimeCorrection << "'\n";
-    toStrm << "INS-" << ikCode << "_LT_SURFACE_CORRECT = '" << ltSurfaceCorrect <<"'\n";
+    toStrm << "INS-" << ikCode.toStdString() << "_SWAP_OBSERVER_TARGET = '" << swapObserverTarget.toStdString() << "'\n";
+    toStrm << "INS-" << ikCode.toStdString() << "_LIGHTTIME_CORRECTION = '" << lightTimeCorrection.toStdString() << "'\n";
+    toStrm << "INS-" << ikCode.toStdString() << "_LT_SURFACE_CORRECT = '" << ltSurfaceCorrect.toStdString() <<"'\n";
   }
 
 } //End IsisMain
@@ -871,8 +871,8 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
 
   // Confirm that matrix is now a rotation matrix
   else {
-    QString msg = QString("The ISIS to SOCET Set translation of input image is currently "
-                          "not supported for instrument [%1].").arg(spacecraftName);
+    std::string msg = "The ISIS to SOCET Set translation of input image is currently "
+                          "not supported for instrument ["+spacecraftName.toStdString()+"].";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 

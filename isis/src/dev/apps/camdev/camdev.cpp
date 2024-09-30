@@ -117,7 +117,7 @@ namespace Isis {
 
 
   void camdev(UserInterface &ui) {
-    Cube icube(ui.GetCubeName("FROM"), "r");
+    Cube icube(ui.GetCubeName("FROM").toStdString(), "r");
     camdev(&icube, ui);
   }
 
@@ -140,7 +140,7 @@ namespace Isis {
         proj = (TProjection *) icube->projection();
       }
       catch(IException &e) {
-        QString msg = "Mosaic files must contain mapping labels";
+        std::string msg = "Mosaic files must contain mapping labels";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
     }
@@ -149,7 +149,7 @@ namespace Isis {
         cam = icube->camera();
       }
       catch(IException &e) {
-        QString msg = "If " + FileName(ui.GetCubeName("FROM")).name() + " is a mosaic, make sure the SOURCE "
+        std::string msg = "If " + FileName(ui.GetCubeName("FROM").toStdString()).name() + " is a mosaic, make sure the SOURCE "
         "option is set to PROJECTION";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
@@ -269,7 +269,7 @@ namespace Isis {
     if((pixelResolution = ui.GetBoolean("PIXELRESOLUTION"))) nbands++;
 
     if(nbands < 1) {
-      QString message = "At least one parameter must be entered"
+      std::string message = "At least one parameter must be entered"
                        "[PHASE, EMISSION, INCIDENCE, LATITUDE, LONGITUDE...]";
       throw IException(IException::User, message, _FILEINFO_);
     }
@@ -280,16 +280,16 @@ namespace Isis {
     if ( dn && icube->hasGroup("BandBin") ) {
       PvlGroup &mybb = icube->group("BandBin");
       if ( mybb.hasKeyword("Name") ) {
-        bname = mybb["Name"][0];
+        bname = QString::fromStdString(mybb["Name"][0]);
       }
       else if ( mybb.hasKeyword("FilterName") ) {
-        bname = mybb["FilterName"][0];
+        bname = QString::fromStdString(mybb["FilterName"][0]);
       }
     }
 
     // Create a bandbin group for the output label
     PvlKeyword name("Name");
-    if (dn) name += bname;
+    if (dn) name += bname.toStdString();
     if (ra) name += "Right Ascension";
     if (declination) name += "Declination";
     if (planetocentricLatitude) name += "Planetocentric Latitude";
@@ -702,9 +702,9 @@ namespace Isis {
   template <typename T>
     PvlKeyword makeKey(const QString &name, const int &nvals,
                        const T &value) {
-      PvlKeyword key(name);
+      PvlKeyword key(name.toStdString());
       for (int i = 0 ; i < nvals ; i++) {
-        key += value;
+        key += value.toStdString();
       }
       return (key);
     }
@@ -755,8 +755,8 @@ namespace Isis {
                      const QString &default_value) {
 
     QString defVal(default_value);
-    if ( bb.hasKeyword(keyname) ) {
-      defVal = bb[keyname][0];
+    if ( bb.hasKeyword(keyname.toStdString()) ) {
+      defVal = QString::fromStdString(bb[keyname.toStdString()][0]);
     }
 
     bb.addKeyword(makeKey(keyname, nvals, defVal), PvlContainer::Replace);

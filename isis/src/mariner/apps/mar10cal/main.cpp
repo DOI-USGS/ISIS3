@@ -42,10 +42,10 @@ void IsisMain() {
   // Setup the input and make sure it is a mariner10 file
   UserInterface & ui = Application::GetUserInterface();
 
-  Isis::Pvl lab(ui.GetCubeName("FROM"));
+  Isis::Pvl lab(ui.GetCubeName("FROM").toStdString());
   Isis::PvlGroup & inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-  QString mission = inst["SpacecraftName"];
+  QString mission = QString::fromStdString(inst["SpacecraftName"]);
   if (mission != "Mariner_10") {
     string msg = "This is not a Mariner 10 image.  Mar10cal requires a Mariner 10 image.";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -55,21 +55,21 @@ void IsisMain() {
 
   // If it is already calibrated then complain
   if (icube->hasGroup("Radiometry")) {
-    QString msg = "This Mariner 10 image [" + icube->fileName() + "] has "
+    std::string msg = "This Mariner 10 image [" + icube->fileName().toStdString() + "] has "
                   "already been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Get label parameters we will need for calibration equation
-  QString instId = inst["InstrumentId"];
+  QString instId = QString::fromStdString(inst["InstrumentId"]);
   QString camera = instId.mid(instId.size()-1);
 
-  QString filter = (QString)(icube->group("BandBin"))["FilterName"];
+  QString filter = QString::fromStdString(icube->group("BandBin")["FilterName"]);
   filter = filter.toUpper().mid(0,3);
 
-  QString target = inst["TargetName"];
+  QString target = QString::fromStdString(inst["TargetName"]);
 
-  iTime startTime((QString) inst["StartTime"]);
+  iTime startTime(QString::fromStdString(inst["StartTime"]));
 
   double exposure = inst["ExposureDuration"];
   double exposureOffset = 0.0;
@@ -84,7 +84,7 @@ void IsisMain() {
       exposureOffset = 3.060;
     }
     else {
-      QString msg = "Camera [" + camera + "] is not supported.";
+      std::string msg = "Camera [" + camera.toStdString() + "] is not supported.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -114,7 +114,7 @@ void IsisMain() {
   }
 
   if (filter == "FAB" || filter == "WAF") {
-    QString msg = "Filter type [" + filter + "] is not supported at this time.";
+    std::string msg = "Filter type [" + filter.toStdString() + "] is not supported at this time.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -122,9 +122,9 @@ void IsisMain() {
     coCube.open(ui.GetCubeName("COEFCUBE"));
   }
   else {
-    FileName coFile("$mariner10/calibration/mariner_10_" + filter + "_" +
-        camera + "_coef.cub");
-    coCube.open(coFile.expanded());
+    FileName coFile("$mariner10/calibration/mariner_10_" + filter.toStdString() + "_" +
+        camera.toStdString() + "_coef.cub");
+    coCube.open(QString::fromStdString(coFile.expanded()));
   }
   coef = new Brick(icube->sampleCount(), 1, 6, coCube.pixelType());
 
@@ -139,7 +139,7 @@ void IsisMain() {
       absCoef = 750.0;
     }
     else {
-      QString msg = "Camera [" + camera + "] is not supported.";
+      std::string msg = "Camera [" + camera.toStdString() + "] is not supported.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -154,7 +154,7 @@ void IsisMain() {
   if (!camSuccess) {
     throw IException(IException::Unknown,
         "Unable to calculate the Solar Distance on [" +
-        icube->fileName() + "]", _FILEINFO_);
+        icube->fileName().toStdString() + "]", _FILEINFO_);
   }
   sunDist = cam->SolarDistance();
 
@@ -164,12 +164,12 @@ void IsisMain() {
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
 
-  calgrp += PvlKeyword("DarkCurrentCube", dcCube->fileName());
+  calgrp += PvlKeyword("DarkCurrentCube", dcCube->fileName().toStdString());
   if (useBlem) {
-    calgrp += PvlKeyword("BlemishRemovalCube", blemCube->fileName());
+    calgrp += PvlKeyword("BlemishRemovalCube", blemCube->fileName().toStdString());
   }
-  calgrp += PvlKeyword("CoefficientCube", coCube.fileName());
-  calgrp += PvlKeyword("AbsoluteCoefficient", toString(absCoef));
+  calgrp += PvlKeyword("CoefficientCube", coCube.fileName().toStdString());
+  calgrp += PvlKeyword("AbsoluteCoefficient", Isis::toString(absCoef));
 
   ocube->putGroup(calgrp);
 

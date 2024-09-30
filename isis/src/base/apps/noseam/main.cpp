@@ -16,7 +16,7 @@ void IsisMain() {
   //Get user parameters
   UserInterface &ui = Application::GetUserInterface();
   FileList cubes;
-  cubes.read(ui.GetFileName("FROMLIST"));
+  cubes.read(ui.GetFileName("FROMLIST").toStdString());
 
   int samples = ui.GetInteger("SAMPLES");
   int lines = ui.GetInteger("LINES");
@@ -26,7 +26,7 @@ void IsisMain() {
   FileName inFile = cubes[0];
 
   Pvl &pref = Preference::Preferences();
-  QString pathName = (QString)pref.findGroup("DataDirectory")["Temporary"] + "/";
+  QString pathName = QString::fromStdString(pref.findGroup("DataDirectory")["Temporary"]) + "/";
 
   /**
    * Creates a mosaic from the original images.  It is placed here
@@ -43,13 +43,13 @@ void IsisMain() {
   highPassList.open("HighPassList.lis");
   for(int i = 0; i < cubes.size(); i++) {
     inFile = cubes[i];
-    QString outParam = pathName + inFile.baseName() + "_highpass.cub";
-    parameters = "FROM=" + inFile.expanded() +
+    QString outParam = pathName + QString::fromStdString(inFile.baseName()) + "_highpass.cub";
+    parameters = "FROM=" + QString::fromStdString(inFile.expanded()) +
                  " TO=" + outParam
-                 + " SAMPLES=" + toString(samples) + " LINES=" + toString(lines);
+                 + " SAMPLES=" + QString::number(samples) + " LINES=" + QString::number(lines);
     ProgramLauncher::RunIsisProgram("highpass", parameters);
     //Reads the just created highpass cube into a list file for automos
-    highPassList << outParam << endl;
+    highPassList << outParam.toStdString() << endl;
   }
   highPassList.close();
 
@@ -61,7 +61,7 @@ void IsisMain() {
   //Does a lowpass on the original mosaic
   parameters = "FROM=" + pathName + "OriginalMosaic.cub"
                + " TO=" + pathName + "LowpassMosaic.cub"
-               + " SAMPLES=" + toString(samples) + " LINES=" + toString(lines);
+               + " SAMPLES=" + QString::number(samples) + " LINES=" + QString::number(lines);
   ProgramLauncher::RunIsisProgram("lowpass", parameters);
 
   //Finally combines the highpass and lowpass mosaics
@@ -84,7 +84,7 @@ void IsisMain() {
 
     for(int i = 0; i < cubes.size(); i++) {
       inFile = cubes[i];
-      file = pathName + inFile.baseName() + "_highpass.cub";
+      file = pathName + QString::fromStdString(inFile.baseName()) + "_highpass.cub";
       remove(file.toLatin1().data());
     }
   }

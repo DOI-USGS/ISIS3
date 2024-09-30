@@ -611,7 +611,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Invalid base radius entered.";
-      message += e.toString();
+      message += QString::fromStdString(e.toString());
       m_radiusLineEdit->setText("");
       QMessageBox::critical(m_stereoTool, "Error", message);
       m_baseRadius = Distance(0., Distance::Meters);
@@ -786,8 +786,8 @@ namespace Isis {
     m_leftCube = leftCube;
     m_rightCube = rightCube;
 
-    QString leftName = FileName( m_leftCube->fileName() ).name();
-    QString rightName = FileName( m_rightCube->fileName() ).name();
+    QString leftName = QString::fromStdString(FileName( m_leftCube->fileName().toStdString() ).name());
+    QString rightName = QString::fromStdString(FileName( m_rightCube->fileName().toStdString() ).name());
     //  Update cube name labels
     m_leftCubeLabel->setText(leftName);
     m_rightCubeLabel->setText(rightName);
@@ -823,7 +823,7 @@ namespace Isis {
     catch (IException &e) {
       QString message = "Cannot initialize universal ground map for " +
                         m_leftCube->fileName() + ".\n";
-      message += e.toString();
+      message += QString::fromStdString(e.toString());
       QMessageBox::critical(m_stereoTool, "Error", message);
       return;
     }
@@ -833,7 +833,7 @@ namespace Isis {
     catch (IException &e) {
       QString message = "Cannot initialize universal ground map for" +
                         m_rightCube->fileName() + ".\n";
-      message += e.toString();
+      message += QString::fromStdString(e.toString());
       QMessageBox::critical(m_stereoTool, "Error", message);
       return;
     }
@@ -868,7 +868,7 @@ namespace Isis {
       message += "  Longitude = " + QString::number(lon);
       message += "  Radius = " + QString::number(m_targetRadius.meters(), 'f',
                                                  6) + "\n";
-      message += e.toString();
+      message += QString::fromStdString(e.toString());
       QMessageBox::critical(m_stereoTool, "Error", message);
     }
 
@@ -900,7 +900,7 @@ namespace Isis {
       setupFiles();
     }
     catch (IException &e) {
-      QString message = e.toString();
+      QString message = QString::fromStdString(e.toString());
       QMessageBox::critical(m_stereoTool, "Error setting stereo pair", message);
       rubberBandTool()->clear();
       return;
@@ -942,7 +942,7 @@ namespace Isis {
         catch (IException &e) {
           QString message = "No points found for editing.  Create points ";
           message += "using the right mouse button.";
-          message += e.toString();
+          message += QString::fromStdString(e.toString());
           QMessageBox::critical(m_stereoTool, "Error", message);
           return;
         }
@@ -985,7 +985,7 @@ namespace Isis {
         }
         catch (IException &e) {
           QString message = "Cannot create control point.\n\n";
-          message += e.toString();
+          message += QString::fromStdString(e.toString());
           QMessageBox::critical(m_stereoTool, "Error", message);
           m_startPoint = NULL;
           rubberBandTool()->clear();
@@ -1011,7 +1011,7 @@ namespace Isis {
           message += "create end points individually using the right mouse ";
           message += "button.  Or, create profile end points by clicking and ";
           message += "dragging with the right mouse button.\n\n";
-          message += e.toString();
+          message += QString::fromStdString(e.toString());
           QMessageBox::critical(m_stereoTool, "Error", message);
           m_startPoint = NULL;
           rubberBandTool()->clear();
@@ -1032,7 +1032,7 @@ namespace Isis {
           message += "create end points individually using the right mouse ";
           message += "button.  Or, create profile end points by clicking and ";
           message += "dragging with the right mouse button.\n\n";
-          message += e.toString();
+          message += QString::fromStdString(e.toString());
           QMessageBox::critical(m_stereoTool, "Error", message);
           m_startPoint = NULL;
           m_endPoint = NULL;
@@ -1097,7 +1097,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Cannot create control point.\n\n";
-      message += e.toString();
+      message += QString::fromStdString(e.toString());
       QMessageBox::critical(m_stereoTool, "Error", message);
       delete m_profileDialog;
       m_profileDialog = NULL;
@@ -1134,7 +1134,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Cannot create control point.\n\n";
-      message += e.toString();
+      message += QString::fromStdString(e.toString());
       QMessageBox::critical(m_stereoTool, "Error", message);
       m_startPoint = NULL;
       delete m_profileDialog;
@@ -1180,7 +1180,7 @@ namespace Isis {
         if ( rightSamp < 1 || rightSamp > m_rightCube->sampleCount() ||
              rightLine < 1 || rightLine > m_rightCube->lineCount() ) {
           IString message = "Point does not exist on cube, " +
-                            m_rightCube->fileName() + ".";
+                            m_rightCube->fileName().toStdString() + ".";
           throw IException(IException::User, message, _FILEINFO_);
 //        QString message = "Point does not exist on cube, " +
 //                          QString(m_rightCube->fileName().c_str() ) + ".";
@@ -1190,7 +1190,7 @@ namespace Isis {
       }
       else {
         IString message = "Point does not exist on cube, " +
-                          m_rightCube->fileName() + ".";
+                          m_rightCube->fileName().toStdString() + ".";
         throw IException(IException::User, message, _FILEINFO_);
 //      QString message = "Point does not exist on cube, " +
 //                        QString(m_rightCube->fileName().c_str() ) + ".";
@@ -1200,7 +1200,7 @@ namespace Isis {
     }
     else {
       IString message = "Point does not exist on cube, " +
-                        m_leftCube->fileName() + ".";
+                        m_leftCube->fileName().toStdString() + ".";
       throw IException(IException::User, message, _FILEINFO_);
 //    QString message = "Point does not exist on cube, " +
 //                      QString(m_leftCube->fileName().c_str() ) + ".";
@@ -1558,17 +1558,17 @@ namespace Isis {
   void StereoTool::viewTemplateFile() {
     try {
       // Get the template file from the ControlPointEditor object
-      Pvl templatePvl( m_pointEditor->templateFileName() );
+      Pvl templatePvl( m_pointEditor->templateFileName().toStdString() );
       // Create registration dialog window using PvlEditDialog class
       // to view and/or edit the template
       PvlEditDialog registrationDialog(templatePvl);
       registrationDialog.setWindowTitle( "View or Edit Template File: "
-                                         + templatePvl.fileName() );
+                                         + QString::fromStdString(templatePvl.fileName()) );
       registrationDialog.resize(550, 360);
       registrationDialog.exec();
     }
     catch (IException &e) {
-      QString message = e.toString();
+      QString message = QString::fromStdString(e.toString());
       QMessageBox::warning(m_stereoTool, "Error", message);
     }
   }
@@ -1628,8 +1628,8 @@ namespace Isis {
     header += "Image 1, Sample, Line, Image  2, Sample, Line";
     text << header << Qt::endl;
 
-    QString leftFile = FileName( m_leftCube->fileName() ).name();
-    QString rightFile = FileName( m_rightCube->fileName() ).name();
+    QString leftFile = QString::fromStdString(FileName( m_leftCube->fileName().toStdString() ).name());
+    QString rightFile = QString::fromStdString(FileName( m_rightCube->fileName().toStdString() ).name());
     QString data;
     for (int i = 0; i < m_controlNet->GetNumPoints(); i++) {
       ControlPoint &p = *( (*m_controlNet)[i] );
@@ -1741,7 +1741,7 @@ namespace Isis {
     double elevation = 0.;
     double elevationError = 0.;
 
-    Pvl regDef = m_pointEditor->templateFileName();
+    Pvl regDef = m_pointEditor->templateFileName().toStdString();
     AutoReg *ar = AutoRegFactory::Create(regDef);
 
     int failureCount = 0;
@@ -1806,7 +1806,7 @@ namespace Isis {
         message += "   Line = " + QString::number(shortLine);
         message += "\nImage 2 Sample = " + QString::number(longSamp);
         message += "   Line = " + QString::number(longLine) + "\n\n";
-        message += e.toString();
+        message += QString::fromStdString(e.toString());
         QMessageBox::critical(m_stereoTool, "Error", message);
         rubberBandTool()->clear();
       }
@@ -1909,7 +1909,7 @@ namespace Isis {
 
   void StereoTool::readSettings() {
     FileName config("$HOME/.Isis/qview/Stereo Tool.config");
-    QSettings settings(config.expanded(),
+    QSettings settings(QString::fromStdString(config.expanded()),
                        QSettings::NativeFormat);
     m_showWarning = settings.value("showWarning", true).toBool();
 
@@ -1919,7 +1919,7 @@ namespace Isis {
 
   void StereoTool::writeSettings() {
     FileName config("$HOME/.Isis/qview/Stereo Tool.config");
-    QSettings settings(config.expanded(),
+    QSettings settings(QString::fromStdString(config.expanded()),
                        QSettings::NativeFormat);
     settings.setValue("showWarning", m_showWarning);
 

@@ -8,6 +8,8 @@ find files of those names at the top level of this repository. **/
 
 #include "cnetextract.h"
 
+#include "Application.h"
+
 using namespace std;
 
 namespace Isis {
@@ -38,7 +40,7 @@ namespace Isis {
   // Main program
   void cnetextract(ControlNet outNet, UserInterface &ui, Pvl *log) {
     if(!ui.WasEntered("FROMLIST") && ui.WasEntered("TOLIST")) {
-      QString msg = "To create a [TOLIST] the [FROMLIST] parameter must be provided.";
+      std::string msg = "To create a [TOLIST] the [FROMLIST] parameter must be provided.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -58,7 +60,7 @@ namespace Isis {
 
     if(!(noIgnore || noMeasureless || noSingleMeasure || editLocked || reference || fixed ||
          noTolerancePoints || pointsEntered || cubePoints || constrained || latLon)) {
-      QString msg = "At least one filter must be selected [";
+      std::string msg = "At least one filter must be selected [";
       msg += "NOIGNORE,NOMEASURELESS,NOSINGLEMEASURE,REFERENCE,FIXED,CONSTRAINED,EDITLOCKED,TOLERANCE,";
       msg += "POINTLIST,CUBES,LATLON]";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -71,7 +73,7 @@ namespace Isis {
     FileList inList;
     if(ui.WasEntered("FROMLIST")) {
       //inList = ui.GetFileName("FROMLIST");
-      inList.read(ui.GetFileName("FROMLIST"));
+      inList.read(ui.GetFileName("FROMLIST").toStdString());
     }
 
     int inputPoints = outNet.GetNumPoints();
@@ -82,8 +84,8 @@ namespace Isis {
     // Set up the Serial Number to FileName mapping
     QMap<QString, QString> sn2filename;
     for(int cubeIndex = 0; cubeIndex < (int)inList.size(); cubeIndex ++) {
-      QString sn = SerialNumber::Compose(inList[cubeIndex].toString());
-      sn2filename[sn] = inList[cubeIndex].toString();
+      QString sn = SerialNumber::Compose(QString::fromStdString(inList[cubeIndex].toString()));
+      sn2filename[sn] = QString::fromStdString(inList[cubeIndex].toString());
     }
 
 
@@ -115,9 +117,9 @@ namespace Isis {
     // Set up comparison data
     QVector<QString> serialNumbers;
     if(cubePoints) {
-      FileList cubeList(ui.GetFileName("CUBELIST"));
+      FileList cubeList(ui.GetFileName("CUBELIST").toStdString());
       for(int cubeIndex = 0; cubeIndex < (int)cubeList.size(); cubeIndex ++) {
-        QString sn = SerialNumber::Compose(cubeList[cubeIndex].toString());
+        QString sn = SerialNumber::Compose(QString::fromStdString(cubeList[cubeIndex].toString()));
         serialNumbers.push_back(sn);
       }
     }
@@ -295,7 +297,7 @@ namespace Isis {
 
      // Use another pass to check for Ids
     if(pointsEntered) {
-      ExtractPointList(outNet, nonListedPoints, ui.GetFileName("POINTLIST"));
+      ExtractPointList(outNet, nonListedPoints, ui.GetFileName("POINTLIST").toStdString());
     }
 
 
@@ -320,15 +322,15 @@ namespace Isis {
     PvlGroup summary("ResultSummary");
     PvlGroup results("Results");
 
-    summary.addKeyword(PvlKeyword("InputPoints", toString(inputPoints)));
-    summary.addKeyword(PvlKeyword("InputMeasures", toString(inputMeasures)));
-    summary.addKeyword(PvlKeyword("OutputPoints", toString(outputPoints)));
-    summary.addKeyword(PvlKeyword("OutputMeasures", toString(outputMeasures)));
+    summary.addKeyword(PvlKeyword("InputPoints", Isis::toString(inputPoints)));
+    summary.addKeyword(PvlKeyword("InputMeasures", Isis::toString(inputMeasures)));
+    summary.addKeyword(PvlKeyword("OutputPoints", Isis::toString(outputPoints)));
+    summary.addKeyword(PvlKeyword("OutputMeasures", Isis::toString(outputMeasures)));
 
     if (outputPoints != 0) {
       // Write the filenames associated with outNet
       if (ui.WasEntered("TOLIST") ) {
-        WriteCubeOutList(outNet, sn2filename, summary, ui.GetFileName("TOLIST"));
+        WriteCubeOutList(outNet, sn2filename, summary, ui.GetFileName("TOLIST").toStdString());
       }
 
       outProgress.SetText("Writing Control Network");
@@ -340,13 +342,13 @@ namespace Isis {
     }
     else {
       summary.addComment("The output control network file, ["
-                         + ui.GetFileName("ONET") +
+                         + ui.GetFileName("ONET").toStdString() +
                          "],  was not created. "
                          "The provided filters have resulted in no points or "
                          "measures extracted.");
       if (ui.WasEntered("TOLIST")) {
         summary.addComment("The output cube list file, ["
-                           + ui.GetFileName("TOLIST") +
+                           + ui.GetFileName("TOLIST").toStdString() +
                            "], was not created. "
                            "The provided filters have resulted in an empty"
                            "Control Network.");
@@ -355,51 +357,49 @@ namespace Isis {
 
 
     if(noIgnore) {
-      summary.addKeyword(PvlKeyword("IgnoredPoints", toString((int)ignoredPoints.size())));
-      summary.addKeyword(PvlKeyword("IgnoredMeasures", toString((int)ignoredMeasures.size())));
+      summary.addKeyword(PvlKeyword("IgnoredPoints", Isis::toString((int)ignoredPoints.size())));
+      summary.addKeyword(PvlKeyword("IgnoredMeasures", Isis::toString((int)ignoredMeasures.size())));
     }
     if(noSingleMeasure) {
-      summary.addKeyword(PvlKeyword("SingleMeasurePoints", toString((int)singleMeasurePoints.size())));
+      summary.addKeyword(PvlKeyword("SingleMeasurePoints", Isis::toString((int)singleMeasurePoints.size())));
     }
     if(noMeasureless) {
-      summary.addKeyword(PvlKeyword("MeasurelessPoints", toString((int)measurelessPoints.size())));
+      summary.addKeyword(PvlKeyword("MeasurelessPoints", Isis::toString((int)measurelessPoints.size())));
     }
     if(noTolerancePoints) {
-      summary.addKeyword(PvlKeyword("TolerancePoints", toString((int)tolerancePoints.size())));
+      summary.addKeyword(PvlKeyword("TolerancePoints", Isis::toString((int)tolerancePoints.size())));
     }
     if(reference) {
-      summary.addKeyword(PvlKeyword("NonReferenceMeasures", toString((int)nonReferenceMeasures.size())));
+      summary.addKeyword(PvlKeyword("NonReferenceMeasures", Isis::toString((int)nonReferenceMeasures.size())));
     }
     if(fixed) {
-      summary.addKeyword(PvlKeyword("NonFixedPoints", toString((int)nonFixedPoints.size())));
+      summary.addKeyword(PvlKeyword("NonFixedPoints", Isis::toString((int)nonFixedPoints.size())));
     }
     if(cubePoints) {
-      summary.addKeyword(PvlKeyword("NonCubePoints", toString((int)nonCubePoints.size())));
+      summary.addKeyword(PvlKeyword("NonCubePoints", Isis::toString((int)nonCubePoints.size())));
     }
   // This is commented out since this does not correspond to any filters or the
   //  documentation of this application. I did not delete the code in case we find
   //  that we need it later. J.Backer 2012-06-22
   //
   //  if(noMeasurePoints.size() != 0) {
-  //    summary.addKeyword(PvlKeyword("NoCubeMeasure", toString((int)noMeasurePoints.size())));
+  //    summary.addKeyword(PvlKeyword("NoCubeMeasure", Isis::toString((int)noMeasurePoints.size())));
   //  }
     if(cubeMeasures) {
-      summary.addKeyword(PvlKeyword("NonCubeMeasures", toString((int)noCubeMeasures.size())));
+      summary.addKeyword(PvlKeyword("NonCubeMeasures", Isis::toString((int)noCubeMeasures.size())));
     }
     if(pointsEntered) {
-      summary.addKeyword(PvlKeyword("NonListedPoints", toString((int)nonListedPoints.size())));
+      summary.addKeyword(PvlKeyword("NonListedPoints", Isis::toString((int)nonListedPoints.size())));
     }
     if(latLon) {
-      summary.addKeyword(PvlKeyword("LatLonOutOfRange", toString((int)nonLatLonPoints.size())));
-      summary.addKeyword(PvlKeyword("NoLatLonPoints", toString((int)cannotGenerateLatLonPoints.size())));
+      summary.addKeyword(PvlKeyword("LatLonOutOfRange", Isis::toString((int)nonLatLonPoints.size())));
+      summary.addKeyword(PvlKeyword("NoLatLonPoints", Isis::toString((int)cannotGenerateLatLonPoints.size())));
     }
 
     outProgress.CheckStatus();
 
     // Log Control Net results
-    if (log){
-      log->addLogGroup(summary);
-    }
+    Application::AppendAndLog(summary, log);
 
     outProgress.CheckStatus();
 
@@ -418,52 +418,52 @@ namespace Isis {
         QString prefix = ui.GetString("PREFIX");
 
         if(noIgnore) {
-          QString namecp = FileName(prefix + "IgnoredPoints.txt").expanded();
+          QString namecp = QString::fromStdString(FileName(prefix.toStdString() + "IgnoredPoints.txt").expanded());
           WriteResults(namecp, ignoredPoints, results);
-          QString namecm = FileName(prefix + "IgnoredMeasures.txt").expanded();
+          QString namecm = QString::fromStdString(FileName(prefix.toStdString() + "IgnoredMeasures.txt").expanded());
           WriteResults(namecm, ignoredMeasures, results);
         }
 
         resultsProgress.CheckStatus();
 
         if(noSingleMeasure) {
-          QString name = FileName(prefix + "SingleMeasurePoints.txt").expanded();
+          QString name = QString::fromStdString(FileName(prefix.toStdString() + "SingleMeasurePoints.txt").expanded());
           WriteResults(name, singleMeasurePoints, results);
         }
 
         resultsProgress.CheckStatus();
 
         if(noMeasureless) {
-          QString name = FileName(prefix + "MeasurelessPoints.txt").expanded();
+          QString name = QString::fromStdString(FileName(prefix.toStdString() + "MeasurelessPoints.txt").expanded());
           WriteResults(name, measurelessPoints, results);
         }
 
         resultsProgress.CheckStatus();
 
         if(noTolerancePoints) {
-          QString name = FileName(prefix + "TolerancePoints.txt").expanded();
+          QString name = QString::fromStdString(FileName(prefix.toStdString() + "TolerancePoints.txt").expanded());
           WriteResults(name, tolerancePoints, results);
         }
 
         resultsProgress.CheckStatus();
 
         if(reference) {
-          QString name = FileName(prefix + "NonReferenceMeasures.txt").expanded();
+          QString name = QString::fromStdString(FileName(prefix.toStdString() + "NonReferenceMeasures.txt").expanded());
           WriteResults(name, nonReferenceMeasures, results);
         }
 
         resultsProgress.CheckStatus();
 
         if(fixed) {
-          QString name = FileName(prefix + "NonFixedPoints.txt").expanded();
+          QString name = QString::fromStdString(FileName(prefix.toStdString() + "NonFixedPoints.txt").expanded());
           WriteResults(name, nonFixedPoints, results);
         }
 
         resultsProgress.CheckStatus();
 
         if(cubePoints) {
-          QString name = FileName(prefix + "NonCubePoints.txt").expanded();
-          WriteResults(name, nonCubePoints, results);
+          std::string name = FileName(prefix.toStdString() + "NonCubePoints.txt").expanded();
+          WriteResults(QString::fromStdString(name), nonCubePoints, results);
         }
 
         resultsProgress.CheckStatus();
@@ -480,32 +480,31 @@ namespace Isis {
         resultsProgress.CheckStatus();
 
         if(cubeMeasures) {
-          QString name = FileName(prefix + "NonCubeMeasures.txt").expanded();
-          WriteResults(name, noCubeMeasures, results);
+          std::string name = FileName(prefix.toStdString() + "NonCubeMeasures.txt").expanded();
+          WriteResults(QString::fromStdString(name), noCubeMeasures, results);
         }
 
         resultsProgress.CheckStatus();
 
         if(pointsEntered) {
-          QString name = FileName(prefix + "NonListedPoints.txt").expanded();
-          WriteResults(name, nonListedPoints, results);
+          std::string name = FileName(prefix.toStdString() + "NonListedPoints.txt").expanded();
+          WriteResults(QString::fromStdString(name), nonListedPoints, results);
         }
 
         resultsProgress.CheckStatus();
 
         if(latLon) {
-          QString namenon = FileName(prefix + "LatLonOutOfRange.txt").expanded();
-          WriteResults(namenon, nonLatLonPoints, results);
-          QString namegen = FileName(prefix + "NoLatLonPoints.txt").expanded();
-          WriteResults(namegen, cannotGenerateLatLonPoints, results);
+          std::string namenon = FileName(prefix.toStdString() + "LatLonOutOfRange.txt").expanded();
+          WriteResults(QString::fromStdString(namenon), nonLatLonPoints, results);
+          std::string namegen = FileName(prefix.toStdString() + "NoLatLonPoints.txt").expanded();
+          WriteResults(QString::fromStdString(namegen), cannotGenerateLatLonPoints, results);
         }
 
         results.addComment("Each keyword represents a filter parameter used. "
                            "Check the documentation for specific keyword descriptions.");
       }
-      if(log) {
-        log->addLogGroup(results);
-      }
+      Application::AppendAndLog(results, log);
+
 
       resultsProgress.CheckStatus();
     }
@@ -536,7 +535,7 @@ namespace Isis {
       // loop through line numbers of POINTLIST until we find a point ID in the
       // list that matches this control point's ID
       for(int i = 0; i < (int)listedPoints.size()  &&  !isInList; i++) {
-        QString pointId = listedPoints[i].toString();
+        QString pointId = QString::fromStdString(listedPoints[i].toString());
         // isInList is true if these strings are equal
         isInList = pointId.toLower() == controlpt->GetId().toLower();
       }
@@ -732,7 +731,7 @@ namespace Isis {
       outRange = !lat.inRange(minlat, maxlat) || !lon.inRange(minlon, maxlon);
     }
     catch (IException &e) {
-      QString msg = "Cannot complete lat/lon range test with given filters";
+      std::string msg = "Cannot complete lat/lon range test with given filters";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
@@ -761,7 +760,7 @@ namespace Isis {
       p.CheckStatus();
     }
     catch(IException &e) {
-      QString msg = "Unable to write the output cube list, [TOLIST].";
+      std::string msg = "Unable to write the output cube list, [TOLIST].";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
@@ -785,14 +784,14 @@ namespace Isis {
     }
 
     std::ofstream out_stream;
-    out_stream.open(toList.toString().toLatin1().data(), std::ios::out);
+    out_stream.open(toList.toString().c_str(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     for(std::set<QString>::iterator sn = outputsn.begin(); sn != outputsn.end(); sn ++) {
       // moved the "if" statement to the previous for loop to prevent creating
       // an empty file
       //if(!sn2file[(*sn)].length() == 0) {
-        out_stream << sn2file[(*sn)] << std::endl;
+        out_stream << sn2file[(*sn)].toStdString() << std::endl;
       //}
     }
 
@@ -816,7 +815,7 @@ namespace Isis {
     // if no points or measures are being extracted,
     // we will not create the filter report.
     if(notExtracted.size() == 0) {
-      results.addComment("The output report ["+ filename +"] was not created. "
+      results.addComment("The output report ["+ filename.toStdString() +"] was not created. "
                          "The corresponding filter found no points/measures that "
                          "would not be extracted.");
       return;
@@ -827,13 +826,13 @@ namespace Isis {
     out_stream.open(filename.toLatin1().data(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
-    out_stream << notExtracted[0];
+    out_stream << notExtracted[0].toStdString();
     for(int index = 1; index < notExtracted.size(); index ++) {
-      out_stream << std::endl << notExtracted[index];
+      out_stream << std::endl << notExtracted[index].toStdString();
     }
 
     out_stream.close();
-    results.addKeyword(PvlKeyword("ReportCreated", filename));
+    results.addKeyword(PvlKeyword("ReportCreated", filename.toStdString()));
     return;
   }
 

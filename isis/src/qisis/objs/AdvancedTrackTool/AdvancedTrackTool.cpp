@@ -256,7 +256,7 @@ namespace Isis {
           index++;
       }
     }
-    IString msg = "Header [" + keyword + "] not found; make sure spelling is correct";
+    IString msg = "Header [" + keyword.toStdString() + "] not found; make sure spelling is correct";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -320,9 +320,9 @@ namespace Isis {
     }
 
     // Write out the path, filename, and serial number
-    FileName fname = FileName(cvp->cube()->fileName()).expanded();
-    QString fnamePath = fname.path();
-    QString fnameName = fname.name();
+    FileName fname = FileName(cvp->cube()->fileName().toStdString()).expanded();
+    QString fnamePath = QString::fromStdString(fname.path());
+    QString fnameName = QString::fromStdString(fname.name());
     p_tableWin->table()->item(row, getIndex("Path"))->setText(fnamePath);
     p_tableWin->table()->item(row, getIndex("FileName"))->setText(fnameName);
     if (!cvp->cube()->hasGroup("Tracking") && !cvp->cube()->hasTable("InputImages")){
@@ -339,10 +339,10 @@ namespace Isis {
     // Otherwise write out col 4 (Pixel value)
     QString pixel;
     if(cvp->isGray()) {
-      pixel = PixelToString(cvp->grayPixel(isample, iline), 12);
+      pixel = QString::fromStdString(PixelToString(cvp->grayPixel(isample, iline), 12));
     }
     else {
-      pixel = PixelToString(cvp->redPixel(isample, iline), 12);
+      pixel = QString::fromStdString(PixelToString(cvp->redPixel(isample, iline), 12));
     }
     p_tableWin->table()->item(row, getIndex("Pixel"))->setText(pixel);
 
@@ -700,7 +700,7 @@ namespace Isis {
             TrackingTable trackingTable(table);
 
             FileName trackingFileName = trackingTable.pixelToFileName(currentPixel);
-            psSrcFileName = trackingFileName.name();
+            psSrcFileName = QString::fromStdString(trackingFileName.name());
             psSrcSerialNum = trackingTable.pixelToSN(currentPixel);
             piOrigin = trackingTable.fileNameToIndex(trackingFileName, psSrcSerialNum);
           }
@@ -744,8 +744,8 @@ namespace Isis {
             Table cFileTable = cCube->readTable(trackingTableName);
             int iRecs =   cFileTable.Records();
             if(piOrigin >= 0 && piOrigin < iRecs) {
-              psSrcFileName = QString(cFileTable[piOrigin][0]);
-              psSrcSerialNum = QString(cFileTable[piOrigin][1]);
+              psSrcFileName = QString::fromStdString(cFileTable[piOrigin][0]);
+              psSrcSerialNum = QString::fromStdString(cFileTable[piOrigin][1]);
             }
           }
         }
@@ -924,9 +924,9 @@ namespace Isis {
           "state and geometry can not be saved and restored", _FILEINFO_);
     }
 
-    FileName config(FileName("$HOME/.Isis/" + QApplication::applicationName() + "/").path() + "/" +
+    FileName config(FileName("$HOME/.Isis/" + QApplication::applicationName().toStdString() + "/").path() + "/" +
                     "advancedTrackTool.config");
 
-    return config.expanded();
+    return QString::fromStdString(config.expanded());
   }
 }

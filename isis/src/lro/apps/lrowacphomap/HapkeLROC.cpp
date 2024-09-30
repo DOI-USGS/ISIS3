@@ -57,11 +57,11 @@ namespace Isis {
     m_currentMapIndex = 0;
 
     PvlObject phoModel = pvl.findObject("PhotometricModel");
-    m_iRef = phoModel.findKeyword("Incref")[0].toDouble(); //  Incidence refernce angle
-    m_eRef = phoModel.findKeyword("EmiRef")[0].toDouble(); //  Emission  reference angle
-    m_gRef = phoModel.findKeyword("Pharef")[0].toDouble(); //  Phase     reference angle
+    m_iRef = Isis::toDouble(phoModel.findKeyword("Incref")[0]); //  Incidence refernce angle
+    m_eRef = Isis::toDouble(phoModel.findKeyword("EmiRef")[0]); //  Emission  reference angle
+    m_gRef = Isis::toDouble(phoModel.findKeyword("Pharef")[0]); //  Phase     reference angle
     
-    if (QString(phoModel.findKeyword("Units")[0]).toUpper() == "DEGREES") {
+    if (QString::fromStdString(phoModel.findKeyword("Units")[0]).toUpper() == "DEGREES") {
       m_isDegrees = true;
     }
     else {
@@ -78,7 +78,7 @@ namespace Isis {
         PvlGroup paramGroup = phoModel.group(i);
         HapkeLROC::Parameters parms;
 
-        parms.bandBinCenter = paramGroup.findKeyword("BandBinCenter")[0].toDouble();
+        parms.bandBinCenter = Isis::toDouble(paramGroup.findKeyword("BandBinCenter")[0]);
         for (int j = 0; j < center.size(); j++) {
           if (center[j] == paramGroup.findKeyword("BandBinCenter")[0]) {
             parms.band = j + 1;
@@ -87,8 +87,8 @@ namespace Isis {
 
         PvlKeyword bands = paramGroup.findKeyword("Bands");
         for (int j = 0; j < bands.size(); j++) {
-          parms.mapBands.push_back(bands[j].toInt() - 1);
-          parms.names.push_back(QString(paramBandNames[bands[j].toInt() - 1]).toUpper());
+          parms.mapBands.push_back(Isis::toInt(bands[j]) - 1);
+          parms.names.push_back(QString::fromStdString(paramBandNames[Isis::toInt(bands[j]) - 1]).toUpper());
           parms.values.push_back(0.0);
         }
 
@@ -109,11 +109,11 @@ namespace Isis {
 
     m_hfunc = "HG";
     if (phoModel.hasKeyword("Hfunc")) {
-      m_hfunc = phoModel.findKeyword("Hfunc")[0].toUpper();
+      m_hfunc = QString::fromStdString(phoModel.findKeyword("Hfunc")[0]).toUpper();
     }
 
     if (m_hfunc != "HG") {
-      QString msg = "Invalid HFunction: " + m_hfunc;
+      std::string msg = "Invalid HFunction: " + m_hfunc.toStdString();
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -615,10 +615,10 @@ namespace Isis {
    */
   void HapkeLROC::report(PvlContainer &pvl) {
     pvl += PvlKeyword("Algorithm", "HapkeLROC");
-    pvl += PvlKeyword("ParameterMapCube", m_paramMap->fileName());
-    pvl += PvlKeyword("IncRef", toString(m_iRef), "degrees");
-    pvl += PvlKeyword("EmiRef", toString(m_eRef), "degrees");
-    pvl += PvlKeyword("PhaRef", toString(m_gRef), "degrees");
+    pvl += PvlKeyword("ParameterMapCube", m_paramMap->fileName().toStdString());
+    pvl += PvlKeyword("IncRef", Isis::toString(m_iRef), "degrees");
+    pvl += PvlKeyword("EmiRef", Isis::toString(m_eRef), "degrees");
+    pvl += PvlKeyword("PhaRef", Isis::toString(m_gRef), "degrees");
     
     PvlKeyword units("Units");
     if (m_isDegrees) {

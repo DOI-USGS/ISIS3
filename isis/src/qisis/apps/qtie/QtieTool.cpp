@@ -215,7 +215,7 @@ namespace Isis {
    */
   void QtieTool::createMenus() {
 
-    p_saveNet = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/mActionFileSaveAs.png").expanded()),
+    p_saveNet = new QAction(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/mActionFileSaveAs.png").expanded())),
                             "Save Control Network &As...",
                             p_tieTool);
     p_saveNet->setToolTip("Save current control network to chosen file");
@@ -259,7 +259,7 @@ namespace Isis {
     regMenu->addAction(viewTemplate);
     //    registrationMenu->addAction(interestOp);
 
-    p_whatsThis = new QAction(QIcon(FileName("$ISISROOT/appdata/images/icons/contexthelp.png").expanded()),
+    p_whatsThis = new QAction(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/contexthelp.png").expanded())),
                               "&Whats's This",
                               p_tieTool);
     p_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
@@ -323,7 +323,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Cannot initialize universal ground map for basemap.\n";
-      QString errors = e.toString();
+      QString errors = QString::fromStdString(e.toString());
       message += errors;
       QMessageBox::critical((QWidget *)parent(), "Error", message);
       return;
@@ -333,7 +333,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Cannot initialize universal ground map for match cube.\n";
-      QString errors = e.toString();
+      QString errors = QString::fromStdString(e.toString());
       message += errors;
       QMessageBox::critical((QWidget *)parent(), "Error", message);
       return;
@@ -411,7 +411,7 @@ namespace Isis {
       message += "Latitude = " + QString::number(lat);
       message += "  Longitude = " + QString::number(lon);
       message += "  Radius = " + QString::number(radius.meters()) + "\n";
-      message += e.toString();
+      message += QString::fromStdString(e.toString());
       QMessageBox::critical((QWidget *)parent(),"Error",message);
     }
 
@@ -473,7 +473,7 @@ namespace Isis {
       catch (IException &e) {
         QString message = "No points found for editing.  Create points ";
         message += "using the right mouse button.";
-        message += e.toString();
+        message += QString::fromStdString(e.toString());
         QMessageBox::critical((QWidget *)parent(), "Error", message);
         return;
       }
@@ -889,7 +889,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Unable to bundle adjust. Solution failed.\n";
-      QString errors = e.toString();
+      QString errors = QString::fromStdString(e.toString());
       message += errors;
 //      message += "\n\nMaximum Error = " + QString::number(outNet.MaximumResiudal());
 //      message += "\nAverage Error = " + QString::number(outNet.AverageResidual());
@@ -920,16 +920,16 @@ namespace Isis {
     p_matchCube->write(*cmatrix);
     History h = p_matchCube->readHistory();
     PvlObject history("qtie");
-    history += PvlKeyword("IsisVersion", Application::Version());
+    history += PvlKeyword("IsisVersion", Application::Version().toStdString());
     QString path = QCoreApplication::applicationDirPath();
-    history += PvlKeyword("ProgramPath", path);
+    history += PvlKeyword("ProgramPath", path.toStdString());
     history += PvlKeyword("ExecutionDateTime",
-                                Application::DateTime());
-    history += PvlKeyword("HostName", Application::HostName());
-    history += PvlKeyword("UserName", Application::UserName());
+                                Application::DateTime().toStdString());
+    history += PvlKeyword("HostName", Application::HostName().toStdString());
+    history += PvlKeyword("UserName", Application::UserName().toStdString());
     PvlGroup results("Results");
     results += PvlKeyword("CameraAnglesUpdated", "True");
-    results += PvlKeyword("BaseMap", p_baseCube->fileName());
+    results += PvlKeyword("BaseMap", p_baseCube->fileName().toStdString());
     history += results;
 
     h.AddEntry(history);
@@ -974,17 +974,17 @@ namespace Isis {
   void QtieTool::viewTemplateFile() {
     try {
       // Get the template file from the ControlPointEditor object
-      Pvl templatePvl(p_pointEditor->templateFileName());
+      Pvl templatePvl(p_pointEditor->templateFileName().toStdString());
       // Create registration dialog window using PvlEditDialog class
       // to view and/or edit the template
       PvlEditDialog registrationDialog(templatePvl);
       registrationDialog.setWindowTitle("View or Edit Template File: "
-                                        + (templatePvl.fileName()));
+                                        + QString::fromStdString(templatePvl.fileName()));
       registrationDialog.resize(550, 360);
       registrationDialog.exec();
     }
     catch (IException &e) {
-      QString message = e.toString();
+      QString message = QString::fromStdString(e.toString());
       QMessageBox::warning((QWidget *)parent(), "Error", message);
     }
   }
@@ -1027,7 +1027,7 @@ namespace Isis {
       }
       catch (IException &e) {
         QString message = "Error saving control network.  \n";
-        QString errors = e.toString();
+        QString errors = QString::fromStdString(e.toString());
         message += errors;
         QMessageBox::information((QWidget *)parent(), "Error", message);
         return;

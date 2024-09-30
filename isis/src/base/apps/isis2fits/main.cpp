@@ -12,7 +12,6 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include "PvlSequence.h"
 #include "UserInterface.h"
 
 using namespace std;
@@ -46,7 +45,7 @@ void IsisMain() {
   else if (ui.GetString("BITTYPE") == "16BIT") bitpix = "16";
   else if (ui.GetString("BITTYPE") == "32BIT") bitpix = "-32";
   else {
-    QString msg = "Pixel type of [" + ui.GetString("BITTYPE") + "] is unsupported";
+    std::string msg = "Pixel type of [" + ui.GetString("BITTYPE").toStdString() + "] is unsupported";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -58,8 +57,8 @@ void IsisMain() {
 
   // determine core base and multiplier, set up the stretch
   PvlGroup pix = icube->label()->findObject("IsisCube").findObject("Core").findGroup("Pixels");
-  double scale = toDouble(pix["Multiplier"][0]);
-  double base = toDouble(pix["Base"][0]);
+  double scale = Isis::toDouble(pix["Multiplier"][0]);
+  double base = Isis::toDouble(pix["Base"][0]);
 
   if (ui.GetString("STRETCH") != "NONE" && bitpix != "-32") {
     if (ui.GetString("STRETCH") == "LINEAR") {
@@ -99,21 +98,21 @@ void IsisMain() {
     axes = 3;
   }
 
-  header += FitsKeyword("NAXIS", true, toString(axes));
+  header += FitsKeyword("NAXIS", true, QString::number(axes));
 
   // specify the limit on data axis 1 (number of samples)
-  header += FitsKeyword("NAXIS1", true, toString(icube->sampleCount()));
+  header += FitsKeyword("NAXIS1", true, QString::number(icube->sampleCount()));
 
   // specify the limit on data axis 2 (number of lines)
-  header += FitsKeyword("NAXIS2", true, toString(icube->lineCount()));
+  header += FitsKeyword("NAXIS2", true, QString::number(icube->lineCount()));
 
   if (axes == 3) {
-    header += FitsKeyword("NAXIS3", true, toString(icube->bandCount()));
+    header += FitsKeyword("NAXIS3", true, QString::number(icube->bandCount()));
   }
 
-  header += FitsKeyword("BZERO", true,  toString(base));
+  header += FitsKeyword("BZERO", true,  QString::number(base));
 
-  header += FitsKeyword("BSCALE", true, toString(scale));
+  header += FitsKeyword("BSCALE", true, QString::number(scale));
 
   // Sky and All cases
   if (ui.GetString("INFO") == "SKY" || ui.GetString("INFO") == "ALL") {
@@ -124,7 +123,7 @@ void IsisMain() {
 
     if (icube->hasGroup("mapping")) {
       map = icube->group("mapping");
-      msg = (QString)map["targetname"];
+      msg = QString::fromStdString(map["targetname"]);
     }
     // If we have sky we want it
     if (msg == "Sky") {
@@ -134,10 +133,10 @@ void IsisMain() {
 
       midDec = ((double)map["MaximumLatitude"] + (double)map["MinimumLatitude"]) / 2;
 
-      header += FitsKeyword("OBJCTRA", true, toString(midRa));
+      header += FitsKeyword("OBJCTRA", true, QString::number(midRa));
 
       // Specify the Declination
-      header += FitsKeyword("OBJCTDEC", true, toString(midDec));
+      header += FitsKeyword("OBJCTDEC", true, QString::number(midDec));
 
     }
 
@@ -168,7 +167,7 @@ void IsisMain() {
     }
     // If we were set on SKY and Sky doesn't exist
     else if (msg != "Sky") {
-      throw IException(IException::User, msg, _FILEINFO_);
+      throw IException(IException::User, msg.toStdString(), _FILEINFO_);
     }
   }
 
@@ -184,7 +183,7 @@ void IsisMain() {
   ofstream fout;
   fout.open(to.toLatin1().data(), ios::out | ios::binary);
   if (!fout.is_open()) {
-    QString msg = "Cannot open fits output file";
+    std::string msg = "Cannot open fits output file";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -244,11 +243,11 @@ QString FitsKeyword(QString key, bool isValue, QString value, QString unit) {
 QString WritePvl(QString fitsKey, QString group, QString key, Cube *icube, bool isString) {
   if (icube->hasGroup(group)) {
     PvlGroup theGroup = icube->group(group);
-    QString name = (QString)theGroup[key];
+    QString name = QString::fromStdString(theGroup[key.toStdString()]);
     if (isString) {
       name = "'" + name + "'";
     }
-    QString unit = theGroup[key].unit();
+    QString unit = QString::fromStdString(theGroup[key.toStdString()].unit());
     return FitsKeyword(fitsKey, true, name, unit);
   }
   return NULL;

@@ -25,15 +25,15 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   QString labelFile = ui.GetFileName("FROM");
-  FileName inFile = ui.GetFileName("FROM");
+  FileName inFile = ui.GetFileName("FROM").toStdString();
   QString id;
   Pvl lab(inFile.expanded());
 
   try {
-    id = (QString) lab.findKeyword("DATA_SET_ID");
+    id = QString::fromStdString(lab.findKeyword("DATA_SET_ID"));
   }
   catch(IException &e) {
-    QString msg = "Unable to read [DATA_SET_ID] from input file [" +
+    std::string msg = "Unable to read [DATA_SET_ID] from input file [" +
                  inFile.expanded() + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -44,11 +44,11 @@ void IsisMain() {
       id != "CH1-ORB-L-MRFFR-5-CDR-MOSAIC-V1.0" &&
       id != "LRO-L-MRFLRO-3-CDR-V1.0" && id != "LRO-L-MRFLRO-5-CDR-MAP-V1.0" &&
       id != "LRO-L-MRFLRO-4-CDR-V1.0" && id != "LRO-L-MRFLRO-5-CDR-MOSAIC-V1.0") {
-    QString msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
+    std::string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
                  "in CHANDRAYAAN-1 MINI-RF FORERUNNER level 1 or level 2 format " +
                  "or in LUNAR RECONNAISSANCE ORBITER MINI-RF LRO level 1 or " +
                  "level 2 format. " +
-                 "DATA_SET_ID is [" + id + "]";
+                 "DATA_SET_ID is [" + id.toStdString() + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -56,7 +56,7 @@ void IsisMain() {
   Cube *outcube = p.SetOutputCube("TO");
 
   QString bandorder;
-  bandorder = (QString) lab.findObject("IMAGE").findKeyword("BAND_STORAGE_TYPE");
+  bandorder = QString::fromStdString(lab.findObject("IMAGE").findKeyword("BAND_STORAGE_TYPE"));
   bandorder = bandorder.toUpper();
   if(bandorder == "BAND_SEQUENTIAL") {
     p.SetOrganization(Isis::ProcessImport::BSQ);
@@ -68,8 +68,8 @@ void IsisMain() {
     p.SetOrganization(Isis::ProcessImport::BIL);
   }
   else {
-    QString msg = "Input file [" + inFile.expanded() + "] has an invalid " +
-                 "band storage type. BAND_STORAGE_TYPE is [" + bandorder + "]";
+    std::string msg = "Input file [" + inFile.expanded() + "] has an invalid " +
+                 "band storage type. BAND_STORAGE_TYPE is [" + bandorder.toStdString() + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
   p.StartProcess();
@@ -81,12 +81,12 @@ void IsisMain() {
   if(id == "CHAN1-L-MRFFR-5-CDR-MAP-V1.0" || id == "LRO-L-MRFLRO-5-CDR-MAP-V1.0") {
     // Translate the BandBin group
     FileName transFile("$ISISROOT/appdata/translations/MrfLev2BandBin.trn");
-    PvlToPvlTranslationManager bandBinXlater(label, transFile.expanded());
+    PvlToPvlTranslationManager bandBinXlater(label, QString::fromStdString(transFile.expanded()));
     bandBinXlater.Auto(otherLabels);
 
     // Translate the Archive group
     transFile = "$ISISROOT/appdata/translations/MrfLev2Archive.trn";
-    PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
+    PvlToPvlTranslationManager archiveXlater(label, QString::fromStdString(transFile.expanded()));
     archiveXlater.Auto(otherLabels);
 
     // Write the BandBin, Archive, and Mapping groups to the output cube label
@@ -97,22 +97,22 @@ void IsisMain() {
   else {
     // Translate the BandBin group
     FileName transFile("$ISISROOT/appdata/translations/MrfLev1BandBin.trn");
-    PvlToPvlTranslationManager bandBinXlater(label, transFile.expanded());
+    PvlToPvlTranslationManager bandBinXlater(label, QString::fromStdString(transFile.expanded()));
     bandBinXlater.Auto(otherLabels);
 
     // Translate the Archive group
     transFile = "$ISISROOT/appdata/translations/MrfLev1Archive.trn";
-    PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
+    PvlToPvlTranslationManager archiveXlater(label, QString::fromStdString(transFile.expanded()));
     archiveXlater.Auto(otherLabels);
 
     // Translate the Instrument group
     transFile = "$ISISROOT/appdata/translations/MrfLev1Instrument.trn";
-    PvlToPvlTranslationManager instrumentXlater(label, transFile.expanded());
+    PvlToPvlTranslationManager instrumentXlater(label, QString::fromStdString(transFile.expanded()));
     instrumentXlater.Auto(otherLabels);
 
     // Translate the Image group
     transFile = "$ISISROOT/appdata/translations/MrfLev1Image.trn";
-    PvlToPvlTranslationManager imageXlater(label, transFile.expanded());
+    PvlToPvlTranslationManager imageXlater(label, QString::fromStdString(transFile.expanded()));
     imageXlater.Auto(otherLabels);
 
     // Write the BandBin, Archive, Instrument, and ImageInfo groups
@@ -129,7 +129,7 @@ void IsisMain() {
       double pheight = instGrp["ScaledPixelHeight"];
       double pwidth = instGrp["ScaledPixelWidth"];
       if(pheight != pwidth) {
-        QString msg = "Input file [" + inFile.expanded() + "] does not have valid " +
+        std::string msg = "Input file [" + inFile.expanded() + "] does not have valid " +
                      "ScaledPixelHeight and ScaledPixelWidth values. These values " +
                      "must be equivalent or the image is considered to be invalid.";
         throw IException(IException::Io, msg, _FILEINFO_);
@@ -140,7 +140,7 @@ void IsisMain() {
     // be done manually, because the frequency information was not
     // put in the PDS labels.
     if(!(instGrp.hasKeyword("Frequency"))) {
-      QString instmodeid = instGrp["InstrumentModeId"];
+      QString instmodeid = QString::fromStdString(instGrp["InstrumentModeId"]);
       double frequency;
       if(instmodeid.startsWith("BASELINE_S") ||
           instmodeid.startsWith("ZOOM_S")) {
@@ -149,15 +149,15 @@ void IsisMain() {
       else {   // BASELINE_X or ZOOM_X
         frequency = 7140000000.0;
       }
-      instGrp.addKeyword(PvlKeyword("Frequency", toString(frequency)));
+      instGrp.addKeyword(PvlKeyword("Frequency", Isis::toString(frequency)));
       outcube->putGroup(instGrp);
     }
     PvlGroup kerns("Kernels");
     if(id.startsWith("CHAN1") || id.startsWith("CH1")) {
-      kerns += PvlKeyword("NaifFrameCode", toString(-86001));
+      kerns += PvlKeyword("NaifFrameCode", Isis::toString(-86001));
     }
     else {   // LRO
-      kerns += PvlKeyword("NaifFrameCode", toString(-85700));
+      kerns += PvlKeyword("NaifFrameCode", Isis::toString(-85700));
     }
     outcube->putGroup(kerns);
   }

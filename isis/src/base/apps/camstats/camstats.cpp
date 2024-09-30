@@ -1,5 +1,7 @@
 
 #include "camstats.h"
+
+#include "Application.h"
 #include "Camera.h"
 #include "CameraStatistics.h"
 #include "Cube.h"
@@ -51,17 +53,17 @@ namespace Isis {
     // Send the Output to the log area
     Pvl statsPvl = camStats.toPvl();
     for (int i = 0; i < statsPvl.groups(); i++) {
-      log->addLogGroup(statsPvl.group(i));
+      Application::AppendAndLog(statsPvl.group(i), log);
     }
 
     if(ui.WasEntered("TO")) {
-      QString outfile = FileName(ui.GetFileName("TO")).expanded();
-      bool exists = FileName(outfile).fileExists();
+      QString outfile = QString::fromStdString(FileName(ui.GetFileName("TO").toStdString()).expanded());
+      bool exists = FileName(outfile.toStdString()).fileExists();
       bool append = ui.GetBoolean("APPEND");
 
       // If the user chose a format of PVL, then write to the output file ("TO")
       if(ui.GetString("FORMAT") == "PVL") {
-        (append) ? statsPvl.append(outfile) : statsPvl.write(outfile);
+        (append) ? statsPvl.append(outfile.toStdString()) : statsPvl.write(outfile.toStdString());
       }
       else {
         // Create a flatfile of the data with columhn headings the flatfile is
@@ -144,7 +146,7 @@ namespace Isis {
 
 
         }
-        os << FileName(from).expanded() << ",";
+        os << FileName(from.toStdString()).expanded() << ",";
         //call the function to write out the values for each group
         writeFlat(os, camStats.getLatStat());
         writeFlat(os, camStats.getLonStat());
@@ -182,7 +184,7 @@ namespace Isis {
       record += favg;
       record += fstd;
 
-      Table table(cam_name, record);
+      Table table(cam_name.toStdString(), record);
 
       // Place all the gathered camera statistics in a table and attach it to the
       // cube. Skip "User Parameters" group.
@@ -193,7 +195,7 @@ namespace Isis {
         record[entry] = group.name();
         entry++;
         for (int j = 0; j < group.keywords(); j++) {
-          record[entry] = toDouble(group[j][0]);
+          record[entry] = Isis::toDouble(group[j][0]);
           entry++;
         }
         table += record;

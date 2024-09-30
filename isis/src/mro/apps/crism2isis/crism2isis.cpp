@@ -7,6 +7,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "crism2isis.h"
+#include "Application.h"
 #include "ProcessImportPds.h"
 #include "UserInterface.h"
 #include "Pvl.h"
@@ -21,9 +22,9 @@ namespace Isis{
     Pvl pdsLabel;
     PvlGroup results;
 
-    FileName inFile = ui.GetFileName("FROM");
+    FileName inFile = ui.GetFileName("FROM").toStdString();
 
-    p.SetPdsFile(inFile.expanded(), "", pdsLabel);
+    p.SetPdsFile(QString::fromStdString(inFile.expanded()), "", pdsLabel);
     // 65535 is set to NULL
     p.SetNull(65535, 65535);
 
@@ -37,21 +38,21 @@ namespace Isis{
     QString prodType;
 
     if (labelPvl.hasKeyword("PRODUCT_TYPE")) {
-      prodType = (QString)labelPvl.findKeyword("PRODUCT_TYPE");
+      prodType = QString::fromStdString(labelPvl.findKeyword("PRODUCT_TYPE"));
     }
     else {
-      QString msg = "Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR";
+      std::string msg = "Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (prodType.toUpper() == "MAP_PROJECTED_MULTISPECTRAL_RDR") {
       QString prodId;
       if (labelPvl.hasKeyword("PRODUCT_ID")) {
-        prodId = (QString)labelPvl.findKeyword("PRODUCT_ID");
+        prodId = QString::fromStdString(labelPvl.findKeyword("PRODUCT_ID"));
         prodId = prodId.mid(prodId.indexOf("_") + 1, prodId.indexOf("_"));
       }
       else {
-        QString msg = "Could not find label PRODUCT_ID, invalid MRDR";
+        std::string msg = "Could not find label PRODUCT_ID, invalid MRDR";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
@@ -64,15 +65,15 @@ namespace Isis{
           PvlGroup bandBin = PvlGroup("BandBin");
           PvlKeyword origBand = PvlKeyword("OriginalBand");
           PvlKeyword widths = PvlKeyword("Width");
-          QString tablePath = (QString)labelPvl.findKeyword("MRO:WAVELENGTH_FILE_NAME");
+          QString tablePath = QString::fromStdString(labelPvl.findKeyword("MRO:WAVELENGTH_FILE_NAME"));
           tablePath = tablePath.toLower();
-          FileName tableFile(inFile.path() + "/" + tablePath);
+          FileName tableFile(inFile.path() + "/" + tablePath.toStdString());
           //Check if the wavelength file exists
           if (tableFile.fileExists()) {
-            TextFile *fin = new TextFile(tableFile.expanded());
+            TextFile *fin = new TextFile(QString::fromStdString(tableFile.expanded()));
             // Open table file
             if (!fin->OpenChk()) {
-              QString msg = "Cannot open wavelength table [" + tableFile.expanded() + "]";
+              std::string msg = "Cannot open wavelength table [" + tableFile.expanded() + "]";
               throw IException(IException::Io, msg, _FILEINFO_);
             }
 
@@ -84,8 +85,8 @@ namespace Isis{
               st = st.simplified().trimmed();
               QStringList cols = st.split(",");
 
-              origBand += toString(band);
-              widths += cols[2];
+              origBand += Isis::toString(band);
+              widths += cols[2].toStdString();
               band++;
             }
             delete fin;
@@ -96,7 +97,7 @@ namespace Isis{
           }
           //Otherwise throw an error
           else {
-            QString msg = "Cannot find wavelength table [" + tableFile.expanded() + "]";
+            std::string msg = "Cannot find wavelength table [" + tableFile.expanded() + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
         }
@@ -110,7 +111,7 @@ namespace Isis{
         PvlKeyword bandName = PvlKeyword("BandName");
         PvlKeyword bandNames = labelPvl.findObject("IMAGE").findKeyword("BAND_NAME");
         for (int i = 0; i < bandNames.size(); i++) {
-          origBand += toString(i + 1);
+          origBand += Isis::toString(i + 1);
           bandName += bandNames[i];
         }
         bandBin.addKeyword(origBand);
@@ -138,7 +139,7 @@ namespace Isis{
       PvlKeyword bandName = PvlKeyword("BandName");
       PvlKeyword bandNames = labelPvl.findObject("FILE").findObject("IMAGE").findKeyword("BAND_NAME");
       for (int i = 0; i < bandNames.size(); i++) {
-        origBand += toString(i + 1);
+        origBand += Isis::toString(i + 1);
         bandName += bandNames[i];
       }
       bandBin.addKeyword(origBand);
@@ -146,18 +147,18 @@ namespace Isis{
       ocube->putGroup(bandBin);
     }
     else {
-      QString msg = "Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR";
+      std::string msg = "Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Translate the Instrument group
     FileName transFile("$ISISROOT/appdata/translations/MroCrismInstrument.trn");
-    PvlToPvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
+    PvlToPvlTranslationManager instrumentXlater(labelPvl, QString::fromStdString(transFile.expanded()));
     instrumentXlater.Auto(outLabel);
 
     // Translate the Archive group
     transFile  = "$ISISROOT/appdata/translations/MroCrismArchive.trn";
-    PvlToPvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
+    PvlToPvlTranslationManager archiveXlater(labelPvl, QString::fromStdString(transFile.expanded()));
     archiveXlater.Auto(outLabel);
 
     ocube->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
@@ -173,9 +174,8 @@ namespace Isis{
                           "Isis using crism2isis should only be interpolated "
                           "using the nearest-neighbor algorithm due to gimble "
                           "jitter of the MRO CRISM instrument.");
-    if (log){
-      log->addLogGroup(results);
-    }
+
+    Application::Log(results);
     return;
   }
 }

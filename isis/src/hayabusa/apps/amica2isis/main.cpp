@@ -31,12 +31,12 @@ void IsisMain ()
   UserInterface &ui = Application::GetUserInterface();
 
   // Get input file and set translation processing
-  FileName inFile = ui.GetFileName("FROM");
+  FileName inFile = ui.GetFileName("FROM").toStdString();
   Pvl label;
-  p.SetPdsFile (inFile.expanded(), "", label);
+  p.SetPdsFile (QString::fromStdString(inFile.expanded()), "", label);
 
   // Add FITS header
-  QString fitsImage = inFile.path() + "/" + (QString) label.findKeyword("^IMAGE");
+  std::string fitsImage = inFile.path() + "/" + (std::string)label.findKeyword("^IMAGE");
   FileName fitsFile(fitsImage);
   AmicaImportFits fits(fitsFile, "FitsLabel");
   label.addGroup(fits.label());
@@ -44,11 +44,11 @@ void IsisMain ()
   QString instid;
   QString missid;
   try {
-    instid = (QString) label.findKeyword ("INSTRUMENT_ID", PvlObject::Traverse);
-    missid = (QString) label.findKeyword ("INSTRUMENT_HOST_NAME", PvlObject::Traverse);
+    instid = QString::fromStdString(label.findKeyword ("INSTRUMENT_ID", PvlObject::Traverse));
+    missid = QString::fromStdString(label.findKeyword ("INSTRUMENT_HOST_NAME", PvlObject::Traverse));
   }
   catch (IException &e) {
-    QString msg = "Unable to read [INSTRUMENT_ID] or [INSTRUMENT_HOST_NAME] "
+    std::string msg = "Unable to read [INSTRUMENT_ID] or [INSTRUMENT_HOST_NAME] "
                   "from input file [" + inFile.expanded() + "]";
     throw IException(e, IException::Io,msg, _FILEINFO_);
   }
@@ -56,7 +56,7 @@ void IsisMain ()
   instid = instid.simplified().trimmed();
   missid = missid.simplified().trimmed();
   if (missid != "HAYABUSA" && instid != "AMICA") {
-    QString msg = "Input file [" + inFile.expanded() +
+    std::string msg = "Input file [" + inFile.expanded() +
                   "] does not appear to be a " +
                   "Hayabusa/AMICA PDS label file.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -105,52 +105,52 @@ void IsisMain ()
   }
 
   // Get the path where the Hayabusa translation tables are.
-  QString transDir = "$ISISROOT/appdata/translations/";
+  std::string transDir = "$ISISROOT/appdata/translations/";
 
   // Create a PVL to store the translated labels in
   Pvl outLabel;
 
   // Translate the Instrument group
   FileName transFile = transDir + "HayabusaAmicaInstrument.trn";
-  PvlToPvlTranslationManager instrumentXlater (label, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater (label, QString::fromStdString(transFile.expanded()));
   instrumentXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile = transDir + "HayabusaAmicaArchive.trn";
-  PvlToPvlTranslationManager archiveXlater (label, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater (label, QString::fromStdString(transFile.expanded()));
   archiveXlater.Auto(outLabel);
 
   // Translate the BandBin group
   transFile = transDir + "HayabusaAmicaBandBin.trn";
-  PvlToPvlTranslationManager bandBinXlater (label, transFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater (label, QString::fromStdString(transFile.expanded()));
   bandBinXlater.Auto(outLabel);
 
   // Translate the Kernels group
   transFile = transDir + "HayabusaAmicaKernels.trn";
-  PvlToPvlTranslationManager kernelsXlater (label, transFile.expanded());
+  PvlToPvlTranslationManager kernelsXlater (label, QString::fromStdString(transFile.expanded()));
   kernelsXlater.Auto(outLabel);
 
   //  Create YearDoy keyword in Archive group
-  iTime stime(outLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
-  PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
+  iTime stime(QString::fromStdString(outLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]));
+  PvlKeyword yeardoy("YearDoy", Isis::toString(stime.Year()*1000 + stime.DayOfYear()));
   outLabel.findGroup("Archive", Pvl::Traverse).addKeyword(yeardoy);
 
 
   //  Update target if user specifies it
   if (!target.isEmpty()) {
     PvlGroup &igrp = outLabel.findGroup("Instrument",Pvl::Traverse);
-    igrp["TargetName"] = target;
+    igrp["TargetName"] = target.toStdString();
   }
 
   QString units = "";
   if (outLabel.findGroup("BandBin", Pvl::Traverse).hasKeyword("Unit")) {
-    units = outLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("Unit")[0].toLower();
+    units = QString::fromStdString(outLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("Unit")[0]).toLower();
   }
   else {
     units = "nanometers";
   }
-  outLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("Center").setUnits(units);
-  outLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("Width").setUnits(units);
+  outLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("Center").setUnits(units.toStdString());
+  outLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("Width").setUnits(units.toStdString());
 
   // Write the BandBin, Archive, and Instrument groups
   // to the output cube label

@@ -29,7 +29,7 @@ namespace Isis {
     outputCubes.clear();
     frameletLines = 192;
 
-    FileName in = ui.GetFileName("FROM");
+    FileName in = ui.GetFileName("FROM").toStdString();
 
     // Make sure it is a Themis EDR/RDR
     bool projected;
@@ -37,15 +37,15 @@ namespace Isis {
       Pvl lab(in.expanded());
       projected = lab.hasObject("IMAGE_MAP_PROJECTION");
       QString id;
-      id = (QString)lab["DATA_SET_ID"];
+      id = QString::fromStdString(lab["DATA_SET_ID"]);
       id = id.simplified().trimmed();
       if(!id.startsWith("ODY-M-THM")) {
-        QString msg = "Invalid DATA_SET_ID [" + id + "]";
+        std::string msg = "Invalid DATA_SET_ID [" + id.toStdString() + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
     catch(IException &e) {
-      QString msg = "Input file [" + in.expanded() +
+      std::string msg = "Input file [" + in.expanded() +
                     "] does not appear to be " +
                     "in Themis EDR/RDR format";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -53,14 +53,14 @@ namespace Isis {
 
     //Checks if in file is rdr
     if(projected) {
-      QString msg = "[" + in.name() + "] appears to be an rdr file.";
+      std::string msg = "[" + in.name() + "] appears to be an rdr file.";
       msg += " Use pds2isis.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Ok looks good ... set it as the PDS file
     Pvl pdsLab;
-    p.SetPdsFile(in.expanded(), "", pdsLab);
+    p.SetPdsFile(QString::fromStdString(in.expanded()), "", pdsLab);
 
     OriginalLabel origLabels(pdsLab);
 
@@ -68,19 +68,19 @@ namespace Isis {
     TranslateLabels(pdsLab, isis3Lab, p.Bands(), ui);
 
     // Set up the output cube
-    FileName outFile(ui.GetCubeName("TO"));
+    FileName outFile(ui.GetCubeName("TO").toStdString());
     PvlGroup &inst = isis3Lab.findGroup("Instrument", Pvl::Traverse);
     CubeAttributeOutput outAttr = ui.GetOutputAttribute("to");
     
-    if((QString)inst["InstrumentId"] == "THEMIS_VIS") {
+    if(QString::fromStdString(inst["InstrumentId"]) == "THEMIS_VIS") {
       Cube *even = new Cube();
       Cube *odd = new Cube();
 
       even->setDimensions(p.Samples(), p.Lines(), p.Bands());
       odd->setDimensions(p.Samples(), p.Lines(), p.Bands());
 
-      QString evenFile = outFile.path() + "/" + outFile.baseName() + ".even.cub";
-      QString oddFile = outFile.path() + "/" + outFile.baseName() + ".odd.cub";
+      QString evenFile = QString::fromStdString(outFile.path() + "/" + outFile.baseName() + ".even.cub");
+      QString oddFile = QString::fromStdString(outFile.path() + "/" + outFile.baseName() + ".odd.cub");
 
       even->create(evenFile, outAttr);
       odd->create(oddFile, outAttr);
@@ -94,7 +94,7 @@ namespace Isis {
       Cube *outCube = new Cube();
       outCube->setDimensions(p.Samples(), p.Lines(), p.Bands());
 
-      outCube->create(outFile.expanded(), outAttr);
+      outCube->create(QString::fromStdString(outFile.expanded()), outAttr);
       outputCubes.push_back(outCube);
     }
 
@@ -109,12 +109,12 @@ namespace Isis {
         if(outputCubes.size() != 1) {
           int numFramelets = p.Lines() / frameletLines;
           isis3Lab.findGroup("Instrument").addKeyword(
-            PvlKeyword("NumFramelets", toString(numFramelets)), Pvl::Replace
+            PvlKeyword("NumFramelets", Isis::toString(numFramelets)), Pvl::Replace
           );
 
           QString frameletType = ((i == 0) ? "Odd" : "Even");
           isis3Lab.findGroup("Instrument").addKeyword(
-            PvlKeyword("Framelets", frameletType), Pvl::Replace
+            PvlKeyword("Framelets", frameletType.toStdString()), Pvl::Replace
           );
         }
 
@@ -161,37 +161,35 @@ namespace Isis {
     // Create the Instrument Group
     PvlGroup inst("Instrument");
     inst += PvlKeyword("SpacecraftName", "MARS_ODYSSEY");
-    QString instId = (QString) pdsLab["InstrumentId"] + "_" +
-                    (QString) pdsLab["DetectorId"];
-    inst += PvlKeyword("InstrumentId", instId);
-    inst += PvlKeyword("TargetName", (QString) pdsLab["TargetName"]);
-    inst += PvlKeyword("MissionPhaseName", (QString) pdsLab["MissionPhaseName"]);
-    inst += PvlKeyword("StartTime", (QString)pdsLab["StartTime"]);
-    inst += PvlKeyword("StopTime", (QString)pdsLab["StopTime"]);
-    inst += PvlKeyword("SpacecraftClockCount",
-                      (QString) pdsLab["SpacecraftClockStartCount"]);
+    QString instId = QString::fromStdString(pdsLab["InstrumentId"]) + "_" + QString::fromStdString(pdsLab["DetectorId"]);
+    inst += PvlKeyword("InstrumentId", instId.toStdString());
+    inst += PvlKeyword("TargetName", pdsLab["TargetName"]);
+    inst += PvlKeyword("MissionPhaseName", pdsLab["MissionPhaseName"]);
+    inst += PvlKeyword("StartTime", pdsLab["StartTime"]);
+    inst += PvlKeyword("StopTime", pdsLab["StopTime"]);
+    inst += PvlKeyword("SpacecraftClockCount", pdsLab["SpacecraftClockStartCount"]);
 
     PvlObject &sqube = pdsLab.findObject("SPECTRAL_QUBE");
     if(instId == "THEMIS_IR") {
-      inst += PvlKeyword("GainNumber", (QString)sqube["GainNumber"]);
-      inst += PvlKeyword("OffsetNumber", (QString)sqube["OffsetNumber"]);
-      inst += PvlKeyword("MissingScanLines", (QString)sqube["MissingScanLines"]);
+      inst += PvlKeyword("GainNumber", sqube["GainNumber"]);
+      inst += PvlKeyword("OffsetNumber", sqube["OffsetNumber"]);
+      inst += PvlKeyword("MissingScanLines", sqube["MissingScanLines"]);
       inst += PvlKeyword("TimeDelayIntegration",
-                        (QString)sqube["TimeDelayIntegrationFlag"]);
+                        sqube["TimeDelayIntegrationFlag"]);
       if(sqube.hasKeyword("SpatialSumming")) {
-        inst += PvlKeyword("SpatialSumming", (QString)sqube["SpatialSumming"]);
+        inst += PvlKeyword("SpatialSumming", sqube["SpatialSumming"]);
       }
     }
     else {
-      inst += PvlKeyword("ExposureDuration", (QString)sqube["ExposureDuration"]);
-      inst += PvlKeyword("InterframeDelay", (QString)sqube["InterframeDelay"]);
-      inst += PvlKeyword("SpatialSumming", (QString)sqube["SpatialSumming"]);
+      inst += PvlKeyword("ExposureDuration", sqube["ExposureDuration"]);
+      inst += PvlKeyword("InterframeDelay", sqube["InterframeDelay"]);
+      inst += PvlKeyword("SpatialSumming", sqube["SpatialSumming"]);
     }
 
     // Add at time offset to the Instrument group
     
     double spacecraftClockOffset = ui.GetDouble("TIMEOFFSET");
-    inst += PvlKeyword("SpacecraftClockOffset", toString(spacecraftClockOffset), "seconds");
+    inst += PvlKeyword("SpacecraftClockOffset", Isis::toString(spacecraftClockOffset), "seconds");
 
     isis3.addGroup(inst);
 
@@ -201,7 +199,7 @@ namespace Isis {
     // The original band is the original ISIS cube band number upon ingestion
     PvlKeyword originalBand("OriginalBand");
     for(int i = 1; i <= numBands; i++) {
-      originalBand.addValue(toString(i));
+      originalBand.addValue(Isis::toString(i));
     }
     bandBin += originalBand;
 
@@ -236,29 +234,29 @@ namespace Isis {
 
     // Create the archive Group
     PvlGroup arch("Archive");
-    arch += PvlKeyword("DataSetId", (QString)pdsLab["DataSetId"]);
-    arch += PvlKeyword("ProducerId", (QString)pdsLab["ProducerId"]);
-    arch += PvlKeyword("ProductId", (QString)pdsLab["ProductId"]);
+    arch += PvlKeyword("DataSetId", pdsLab["DataSetId"]);
+    arch += PvlKeyword("ProducerId", pdsLab["ProducerId"]);
+    arch += PvlKeyword("ProductId", pdsLab["ProductId"]);
     arch += PvlKeyword("ProductCreationTime",
-                      (QString)pdsLab["ProductCreationTime"]);
-    arch += PvlKeyword("ProductVersionId", (QString)pdsLab["ProductVersionId"]);
+                      pdsLab["ProductCreationTime"]);
+    arch += PvlKeyword("ProductVersionId", pdsLab["ProductVersionId"]);
   //  arch += PvlKeyword("ReleaseId",(string)pdsLab["ReleaseId"]);
-    arch += PvlKeyword("OrbitNumber", (QString)pdsLab["OrbitNumber"]);
+    arch += PvlKeyword("OrbitNumber", pdsLab["OrbitNumber"]);
 
     arch += PvlKeyword("FlightSoftwareVersionId",
-                      (QString)sqube["FlightSoftwareVersionId"]);
+                      sqube["FlightSoftwareVersionId"]);
     arch += PvlKeyword("CommandSequenceNumber",
-                      (QString)sqube["CommandSequenceNumber"]);
-    arch += PvlKeyword("Description", (QString)sqube["Description"]);
+                      sqube["CommandSequenceNumber"]);
+    arch += PvlKeyword("Description", sqube["Description"]);
     isis3.addGroup(arch);
 
     // Create the Kernel Group
     PvlGroup kerns("Kernels");
     if(instId == "THEMIS_IR") {
-      kerns += PvlKeyword("NaifFrameCode", toString(-53031));
+      kerns += PvlKeyword("NaifFrameCode", Isis::toString(-53031));
     }
     else {
-      kerns += PvlKeyword("NaifFrameCode", toString(-53032));
+      kerns += PvlKeyword("NaifFrameCode", Isis::toString(-53032));
     }
     isis3.addGroup(kerns);
   }

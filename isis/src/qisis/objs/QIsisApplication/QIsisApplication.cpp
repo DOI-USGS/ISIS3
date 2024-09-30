@@ -39,7 +39,7 @@ namespace Isis {
 
             if (nextIndex < argc) {
                 FileName preferenceFile(argv[nextIndex]);
-                QString filePath = preferenceFile.expanded();
+                std::string filePath = preferenceFile.expanded();
                 Preference::Preferences().clear();
                 Preference::Preferences().Load(filePath);
             }

@@ -56,7 +56,7 @@ namespace Isis {
           return new CSMCamera(cube);
         }
         catch (IException &e) {
-          QString msg = "Unable to create CSM camera using CSMState Cube blob.";
+          std::string msg = "Unable to create CSM camera using CSMState Cube blob.";
           throw IException(e, IException::Unknown, msg, _FILEINFO_);
         }
       }
@@ -64,8 +64,8 @@ namespace Isis {
         // First get the spacecraft and instrument and combine them
         Pvl &lab = *cube.label();
         PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
-        QString spacecraft = (QString) inst["SpacecraftName"];
-        QString name = (QString) inst["InstrumentId"];
+        QString spacecraft = QString::fromStdString(inst["SpacecraftName"]);
+        QString name = QString::fromStdString(inst["InstrumentId"]);
         spacecraft = spacecraft.toUpper();
         name = name.toUpper();
         QString group = spacecraft + "/" + name;
@@ -93,9 +93,9 @@ namespace Isis {
           ptr = m_cameraPlugin.GetPlugin(group);
         }
         catch(IException &e) {
-          QString msg = "Unsupported camera model, unable to find plugin for ";
-          msg += "SpacecraftName [" + spacecraft + "] with InstrumentId [";
-          msg += name + "]";
+          std::string msg = "Unsupported camera model, unable to find plugin for ";
+          msg += "SpacecraftName [" + spacecraft.toStdString() + "] with InstrumentId [";
+          msg += name.toStdString() + "]";
           throw IException(e, IException::Unknown, msg, _FILEINFO_);
         }
 
@@ -139,7 +139,7 @@ namespace Isis {
       for (int i = 0; i<grp["CSMDirectory"].size(); i++) {
         FileName csmDir = grp["CSMDirectory"][i];
 
-        QDirIterator csmLib(csmDir.expanded(), {"*.so", "*.dylib"}, QDir::Files);
+        QDirIterator csmLib(QString::fromStdString(csmDir.expanded()), {"*.so", "*.dylib"}, QDir::Files);
         while (csmLib.hasNext()) {
           QString csmLibName = csmLib.next();
           QLibrary csmDynamicLib(csmLibName);
@@ -178,8 +178,8 @@ namespace Isis {
     try {
       // First get the spacecraft and instrument and combine them
       PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
-      QString spacecraft = (QString) inst["SpacecraftName"];
-      QString name = (QString) inst["InstrumentId"];
+      QString spacecraft = QString::fromStdString(inst["SpacecraftName"]);
+      QString name = QString::fromStdString(inst["InstrumentId"]);
       spacecraft = spacecraft.toUpper();
       name = name.toUpper();
       QString group = spacecraft + "/" + name;
@@ -190,26 +190,26 @@ namespace Isis {
         bool found = false;
         // Find the most recent (last) version of the camera model
         for (int i = m_cameraPlugin.groups() - 1; i >= 0; i--) {
-          if (m_cameraPlugin.group(i) == group) {
+          if (m_cameraPlugin.group(i) == group.toStdString()) {
             plugin = m_cameraPlugin.group(i);
             found = true;
             break;
           }
         }
         if (!found) {
-          QString msg = "Unable to find PVL group [" + group + "].";
+          std::string msg = "Unable to find PVL group [" + group.toStdString() + "].";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }
       catch(IException &e) {
-        QString msg = "Unsupported camera model, unable to find plugin for ";
-        msg += "SpacecraftName [" + spacecraft + "] with InstrumentId [";
-        msg += name + "]";
+        std::string msg = "Unsupported camera model, unable to find plugin for ";
+        msg += "SpacecraftName [" + spacecraft.toStdString() + "] with InstrumentId [";
+        msg += name.toStdString() + "]";
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
       if (!plugin.hasKeyword("Version")) {
-        QString msg = "Camera model identified by [" + group + "] does not have a version number";
+        std::string msg = "Camera model identified by [" + group.toStdString() + "] does not have a version number";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 

@@ -628,8 +628,8 @@ namespace Isis {
                            "Unable to rescale image to ["
                            + IString(newScale*100) + "]",
                            _FILEINFO_);
-      QString message = fullError.toString();
-      QMessageBox::warning((QWidget *)parent(), "Warning", message);
+      std::string message = fullError.toString();
+      QMessageBox::warning((QWidget *)parent(), "Warning", QString::fromStdString(message));
       newScale = oldScale;
       d->setScale(newScale);
     }
@@ -671,8 +671,8 @@ namespace Isis {
                            "Unable to rescale image to ["
                            + IString(newScale * 100) + "]",
                            _FILEINFO_);
-      QString message = fullError.toString();
-      QMessageBox::warning((QWidget *)parent(), "Warning", message);
+      std::string message = fullError.toString();
+      QMessageBox::warning((QWidget *)parent(), "Warning", QString::fromStdString(message));
       newScale = oldScale;
       d->setScale(newScale, x, y);
     }
@@ -714,8 +714,8 @@ namespace Isis {
                            "Unable to rescale image to ["
                            + IString(newScale*100) + "]",
                            _FILEINFO_);
-      QString message = fullError.toString();
-      QMessageBox::warning((QWidget *)parent(), "Warning", message);
+      std::string message = fullError.toString();
+      QMessageBox::warning((QWidget *)parent(), "Warning", QString::fromStdString(message));
       newScale = oldScale;
       d->setScale(newScale, samp, line);
     }

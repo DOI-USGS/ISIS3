@@ -6,6 +6,7 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
+#include "Application.h"
 #include "ProcessByLine.h"
 #include "Buffer.h"
 #include "Camera.h"
@@ -58,7 +59,7 @@ namespace Isis {
   static void calculateScaleFactor0(Cube *icube, Cube *gaincube);
   
   void gllssical(UserInterface &ui, Pvl *log) {
-    Cube icube(ui.GetCubeName("FROM"));
+    Cube icube(ui.GetCubeName("FROM").toStdString());
     gllssical(&icube, ui, log);
   }   
 
@@ -80,15 +81,15 @@ namespace Isis {
   
     Isis::CubeAttributeInput inAtt1;
     FileName darkFileName = FindDarkFile(icube);
-    Cube *darkcube = p.SetInputCube(darkFileName.expanded(), inAtt1);
-    dcScaleFactor = toDouble(darkcube->group("Instrument")["PicScale"][0]);
+    Cube *darkcube = p.SetInputCube(QString::fromStdString(darkFileName.expanded()), inAtt1);
+    dcScaleFactor = Isis::toDouble(darkcube->group("Instrument")["PicScale"][0]);
   
     Isis::CubeAttributeInput inAtt2;
     FileName gainFileName = FindGainFile(icube);
-    Cube *gaincube = p.SetInputCube(gainFileName.expanded(), inAtt2);
+    Cube *gaincube = p.SetInputCube(QString::fromStdString(gainFileName.expanded()), inAtt2);
   
     Isis::CubeAttributeInput inAtt3;
-    p.SetInputCube(FindShutterFile(icube).expanded(), inAtt3, Isis::AllMatchOrOne);
+    p.SetInputCube(QString::fromStdString(FindShutterFile(icube).expanded()), inAtt3, Isis::AllMatchOrOne);
   
     Cube *ocube = p.SetOutputCubeStretch("TO", &ui);
   
@@ -106,7 +107,7 @@ namespace Isis {
   
     calculateScaleFactor0(icube, gaincube);
   
-    exposureDuration = toDouble(icube->group("Instrument")["ExposureDuration"][0]) * 1000;
+    exposureDuration = Isis::toDouble(icube->group("Instrument")["ExposureDuration"][0]) * 1000;
   
     if(darkcube->pixelType() == Isis::UnsignedByte) {
       eightBitDarkCube = true;
@@ -116,7 +117,7 @@ namespace Isis {
     }
     p.StartProcess(Calibrate);
     PvlGroup calibrationLog("RadiometricCalibration");
-    calibrationLog.addKeyword(PvlKeyword("From", ui.GetCubeName("FROM")));
+    calibrationLog.addKeyword(PvlKeyword("From", ui.GetCubeName("FROM").toStdString()));
   
     FileName shutterFileName = FindShutterFile(icube);
     calibrationLog.addKeyword(PvlKeyword("DarkCurrentFile", darkFileName.originalPath() + "/" +
@@ -125,31 +126,29 @@ namespace Isis {
                                          gainFileName.name()));
     calibrationLog.addKeyword(PvlKeyword("ShutterFile", shutterFileName.originalPath() + "/" +
                                          shutterFileName.name()));
-    calibrationLog.addKeyword(PvlKeyword("ScaleFactor", toString(scaleFactor)));
+    calibrationLog.addKeyword(PvlKeyword("ScaleFactor", Isis::toString(scaleFactor)));
     calibrationLog.addKeyword(PvlKeyword("OutputUnits", iof ? "I/F" : "Radiance"));
     if (iof) {
-      calibrationLog.addKeyword(PvlKeyword("S1", toString(s1), "I/F per Ft-Lambert"));
-      calibrationLog.addKeyword(PvlKeyword("RSUN", toString(rsun), "(Planet-Sun range)/5.2 A.U."));
-      calibrationLog.addKeyword(PvlKeyword("Scale", toString(scaleFactor), "I/F units per DN"));
-      calibrationLog.addKeyword(PvlKeyword("GC", toString(cubeConversion), "Cube gain conversion"));
-      calibrationLog.addKeyword(PvlKeyword("GG", toString(gainConversion), "Gain file gain conversion"));
-      calibrationLog.addKeyword(PvlKeyword("IOF-SCALE0", toString(scaleFactor0), "(S1/Scale)*(GC/GG)/RSUN**2"));
+      calibrationLog.addKeyword(PvlKeyword("S1", Isis::toString(s1), "I/F per Ft-Lambert"));
+      calibrationLog.addKeyword(PvlKeyword("RSUN", Isis::toString(rsun), "(Planet-Sun range)/5.2 A.U."));
+      calibrationLog.addKeyword(PvlKeyword("Scale", Isis::toString(scaleFactor), "I/F units per DN"));
+      calibrationLog.addKeyword(PvlKeyword("GC", Isis::toString(cubeConversion), "Cube gain conversion"));
+      calibrationLog.addKeyword(PvlKeyword("GG", Isis::toString(gainConversion), "Gain file gain conversion"));
+      calibrationLog.addKeyword(PvlKeyword("IOF-SCALE0", Isis::toString(scaleFactor0), "(S1/Scale)*(GC/GG)/RSUN**2"));
     }
     else {
-      calibrationLog.addKeyword(PvlKeyword("S2", toString(s2), "Nanowatts per Ft-Lambert"));
-      calibrationLog.addKeyword(PvlKeyword("Scale", toString(scaleFactor),
+      calibrationLog.addKeyword(PvlKeyword("S2", Isis::toString(s2), "Nanowatts per Ft-Lambert"));
+      calibrationLog.addKeyword(PvlKeyword("Scale", Isis::toString(scaleFactor),
                                            "Nanowatts/cm**2/steradian/nanometer/DN"));
-      calibrationLog.addKeyword(PvlKeyword("GC", toString(cubeConversion), "Cube gain conversion"));
-      calibrationLog.addKeyword(PvlKeyword("GG", toString(gainConversion), "Gain file gain conversion"));
-      calibrationLog.addKeyword(PvlKeyword("Radiance-SCALE0", toString(scaleFactor0), "(S2/Scale)*(GC/GG)"));
+      calibrationLog.addKeyword(PvlKeyword("GC", Isis::toString(cubeConversion), "Cube gain conversion"));
+      calibrationLog.addKeyword(PvlKeyword("GG", Isis::toString(gainConversion), "Gain file gain conversion"));
+      calibrationLog.addKeyword(PvlKeyword("Radiance-SCALE0", Isis::toString(scaleFactor0), "(S2/Scale)*(GC/GG)"));
     }
   
     ocube->putGroup(calibrationLog);
-    
-    if(log){
-      log->addLogGroup(calibrationLog);
-    }
-    
+
+    Application::Log(calibrationLog);
+
     p.EndProcess();
   }
   
@@ -236,11 +235,11 @@ namespace Isis {
      * 4 = 60 2/3
      * 5 = 15 1/6
      */
-    if((int)(toDouble(icube->group("Instrument")["FrameDuration"][0])) == 2) frameRateId = 1;
-    if((int)(toDouble(icube->group("Instrument")["FrameDuration"][0])) == 8) frameRateId = 2;
-    if((int)(toDouble(icube->group("Instrument")["FrameDuration"][0])) == 30) frameRateId = 3;
-    if((int)(toDouble(icube->group("Instrument")["FrameDuration"][0])) == 60) frameRateId = 4;
-    if((int)(toDouble(icube->group("Instrument")["FrameDuration"][0])) == 15) frameRateId = 5;
+    if((int)(Isis::toDouble(icube->group("Instrument")["FrameDuration"][0])) == 2) frameRateId = 1;
+    if((int)(Isis::toDouble(icube->group("Instrument")["FrameDuration"][0])) == 8) frameRateId = 2;
+    if((int)(Isis::toDouble(icube->group("Instrument")["FrameDuration"][0])) == 30) frameRateId = 3;
+    if((int)(Isis::toDouble(icube->group("Instrument")["FrameDuration"][0])) == 60) frameRateId = 4;
+    if((int)(Isis::toDouble(icube->group("Instrument")["FrameDuration"][0])) == 15) frameRateId = 5;
   
     int exposureTypeId = (icube->group("Instrument")["ExposureType"][0] == "NORMAL") ? 0 : 1;
   
@@ -261,17 +260,17 @@ namespace Isis {
       }
   
       QString gainState = (tokens.count()? tokens.takeFirst() : "");
-      if(toInt(gainState) != gainModeId) {
+      if(gainState.toInt() != gainModeId) {
         continue;
       }
   
       QString frameRate = (tokens.count()? tokens.takeFirst() : "");
-      if(frameRateId != toInt(frameRate)) {
+      if(frameRateId != frameRate.toInt()) {
         continue;
       }
   
       QString tableExposureTypeId = (tokens.count()? tokens.takeFirst() : "");
-      if(toInt(tableExposureTypeId) != exposureTypeId) {
+      if(tableExposureTypeId.toInt() != exposureTypeId) {
         continue;
       }
   
@@ -280,11 +279,11 @@ namespace Isis {
         continue;
       }
   
-      int minImageNum = toInt(tokens.takeFirst());
-      int maxImageNum = toInt(tokens.takeFirst());
+      int minImageNum = tokens.takeFirst().toInt();
+      int maxImageNum = tokens.takeFirst().toInt();
   
-      int imageNumber = (int)(toDouble(icube->group("Instrument")["SpacecraftClockStartCount"]) * 100 + 0.5);
-      QString telemetry = icube->group("Instrument")["TelemetryFormat"][0];
+      int imageNumber = (int)(Isis::toDouble(icube->group("Instrument")["SpacecraftClockStartCount"]) * 100 + 0.5);
+      QString telemetry = QString::fromStdString(icube->group("Instrument")["TelemetryFormat"][0]);
       if(imageNumber > 99757701 && imageNumber < 159999999) {
         if((telemetry == "AI8" && (gainState == "1" || gainState == "2")) ||
             (telemetry == "IM4" && (gainState == "3" || gainState == "4"))) {
@@ -300,7 +299,7 @@ namespace Isis {
       }
   
       // By process of elimination, we found the dark current file successfully. Return it.
-      return FileName("$galileo/calibration/darkcurrent/" + tokens.takeFirst() + ".cub");
+      return FileName("$galileo/calibration/darkcurrent/" + tokens.takeFirst().toStdString() + ".cub");
     }
   
     throw IException(IException::Unknown, "Dark current file could not be determined.", _FILEINFO_);
@@ -329,7 +328,7 @@ namespace Isis {
        * Filter codes
        * 0=clear,1=green,2=red,3=violet,4=7560,5=9680,6=7270,7=8890
        */
-      QString filter = icube->group("BandBin")["FilterNumber"][0];
+      QString filter = QString::fromStdString(icube->group("BandBin")["FilterNumber"][0]);
       if(filter != tokens.takeFirst()) {
         continue;
       }
@@ -339,30 +338,30 @@ namespace Isis {
         continue;
       }
   
-      int minImageNum = toInt(tokens.takeFirst());
-      int maxImageNum = toInt(tokens.takeFirst());
+      int minImageNum = tokens.takeFirst().toInt();
+      int maxImageNum = tokens.takeFirst().toInt();
       if(imageNumber < minImageNum || imageNumber > maxImageNum) {
         continue;
       }
   
-      return FileName("$galileo/calibration/gain/" + tokens.takeFirst() + ".cub");
+      return FileName("$galileo/calibration/gain/" + tokens.takeFirst().toStdString() + ".cub");
     }
   
     throw IException(IException::Unknown, "Gain file could not be determined.", _FILEINFO_);
   }
   
   FileName ReadWeightTable(Cube *icube) {
-    QString file = "$galileo/calibration/weightTables_v???.sav";
+    std::string file = "$galileo/calibration/weightTables_v???.sav";
   
     FileName weightFile(file);
     weightFile = weightFile.highestVersion();
     Pvl weightTables(weightFile.expanded());
     QString group = QString("FrameMode") + icube->group("Instrument")["FrameModeId"][0].at(0);
-    PvlGroup &frameGrp = weightTables.findGroup(group);
+    PvlGroup &frameGrp = weightTables.findGroup(group.toStdString());
     QString keyword = QString("GainState") + ((getGainModeID(icube) < 3) ? QString("12") : QString("34"));
   
-    for(int i = 0; i < frameGrp[keyword].size(); i++) {
-      weight.push_back(toDouble(frameGrp[keyword][i]));
+    for(int i = 0; i < frameGrp[keyword.toStdString()].size(); i++) {
+      weight.push_back(Isis::toDouble(frameGrp[keyword.toStdString()][i]));
     }
   
     return weightFile;
@@ -377,16 +376,16 @@ namespace Isis {
      * 3 = 40,000
      * 4 = 10,000
      */
-    if((int)toDouble(icube->group("Instrument")["GainModeId"][0]) == 4E5) {
+    if((int)Isis::toDouble(icube->group("Instrument")["GainModeId"][0]) == 4E5) {
       gainModeId = 1;
     }
-    else if((int)toDouble(icube->group("Instrument")["GainModeId"][0]) == 1E5) {
+    else if((int)Isis::toDouble(icube->group("Instrument")["GainModeId"][0]) == 1E5) {
       gainModeId = 2;
     }
-    else if((int)toDouble(icube->group("Instrument")["GainModeId"][0]) == 4E4) {
+    else if((int)Isis::toDouble(icube->group("Instrument")["GainModeId"][0]) == 4E4) {
       gainModeId = 3;
     }
-    else if((int)toDouble(icube->group("Instrument")["GainModeId"][0]) == 1E4) {
+    else if((int)Isis::toDouble(icube->group("Instrument")["GainModeId"][0]) == 1E4) {
       gainModeId = 4;
     }
     else {
@@ -423,7 +422,7 @@ namespace Isis {
   
       // Match target name
       if(currGrp.hasKeyword("TargetName")) {
-        if(!icube->group("Archive")["CalTargetCode"][0].startsWith(currGrp["TargetName"][0])) {
+        if(!QString::fromStdString(icube->group("Archive")["CalTargetCode"][0]).startsWith(QString::fromStdString(currGrp["TargetName"][0]))) {
           continue;
         }
       }
@@ -432,7 +431,7 @@ namespace Isis {
       if(currGrp.hasKeyword("MinimumTargetName")) {
         try {
           if((int)currGrp["MinimumTargetName"] >
-              (int)toInt(icube->group("Archive")["CalTargetCode"][0].mid(0, 2))) {
+              (int)Isis::toInt(icube->group("Archive")["CalTargetCode"][0].substr(0, 2))) {
             continue;
           }
         }
@@ -445,7 +444,7 @@ namespace Isis {
       fltToRad = currGrp["FloatToRad"];
     }
   
-    int filterNumber = toInt(icube->group("BandBin")["FilterNumber"][0]);
+    int filterNumber = Isis::toInt(icube->group("BandBin")["FilterNumber"][0]);
   
     if(fltToRef.size() == 0) {
       throw IException(IException::Unknown,
@@ -455,10 +454,10 @@ namespace Isis {
                        _FILEINFO_);
     }
   
-    s1 = toDouble(fltToRef[filterNumber]);
-    s2 = toDouble(fltToRad[filterNumber]);
-    cubeConversion = toDouble( conversionFactors["GainRatios"][getGainModeID(icube)-1]);
-    gainConversion = toDouble(conversionFactors["GainRatios"][getGainModeID(gaincube)-1]);
+    s1 = Isis::toDouble(fltToRef[filterNumber]);
+    s2 = Isis::toDouble(fltToRad[filterNumber]);
+    cubeConversion = Isis::toDouble( conversionFactors["GainRatios"][getGainModeID(icube)-1]);
+    gainConversion = Isis::toDouble(conversionFactors["GainRatios"][getGainModeID(gaincube)-1]);
   
     if (iof) {
       try {
@@ -475,12 +474,12 @@ namespace Isis {
         // try original fallback for previously spiceinited data 
         try {
           Pvl *label = icube->label();
-          QString startTime = label->findGroup("Instrument",Pvl::Traverse)["SpacecraftClockStartCount"][0];
+          QString startTime = QString::fromStdString(label->findGroup("Instrument",Pvl::Traverse)["SpacecraftClockStartCount"][0]);
   
           Spice spicegll(*icube);
           spicegll.instrumentPosition()->SetAberrationCorrection("LT+S");
           Isis::FileName sclk(label->findGroup("Kernels",Pvl::Traverse)["SpacecraftClock"][0]);
-          QString sclkName(sclk.expanded());
+          QString sclkName(QString::fromStdString(sclk.expanded()));
   
           NaifStatus::CheckErrors();
           furnsh_c(sclkName.toLatin1().data());
@@ -498,7 +497,7 @@ namespace Isis {
           rsun = sunkm / 1.49597870691E8 / 5.2;
         } 
         catch (IException &e) {
-          QString message = "IOF option does not work with non-spiceinited cubes.";
+          std::string message = "IOF option does not work with non-spiceinited cubes.";
           throw IException(e, IException::User, message, _FILEINFO_);
         }
       }
@@ -525,14 +524,14 @@ namespace Isis {
   }
   
   FileName GetScaleFactorFile() {
-    QString file = "$galileo/calibration/conversionFactors_v???.sav";
+    std::string file = "$galileo/calibration/conversionFactors_v???.sav";
     FileName scaleFactor(file);
     scaleFactor = scaleFactor.highestVersion();
     return scaleFactor;
   }
   
   FileName FindShutterFile(Cube *icube) {
-    QString file = "$galileo/calibration/shutter/calibration.so02";
+    std::string file = "$galileo/calibration/shutter/calibration.so02";
     file += icube->group("Instrument")["FrameModeId"][0].at(0);
     file += ".cub";
     FileName shutterFile(file);

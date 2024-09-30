@@ -78,7 +78,7 @@ namespace Isis {
     */
   void MinnaertEmpirical::SetPhotoPhaseList(QString phasestrlist) {
     double phaseangle;
-    IString strlist(phasestrlist);
+    IString strlist(phasestrlist.toStdString());
     p_photoPhaseList.clear();
 
     while (strlist.length()) {
@@ -105,7 +105,7 @@ namespace Isis {
 
     // If the format is Keyword="1,2,3,4,5" rather than Keyword = (1,2,3,4,5) 
     if (phaseList.size() == 1) {
-      SetPhotoPhaseList(QString(phaseList));
+      SetPhotoPhaseList(QString::fromStdString(phaseList));
       return;
     }
 
@@ -113,10 +113,10 @@ namespace Isis {
     p_photoPhaseList.clear();
 
     for (int i=0; i< phaseList.size(); i++) {
-      phaseAngle = phaseList[i].toDouble();
+      phaseAngle = Isis::toDouble(phaseList[i]);
 
       if (phaseAngle < 0.0 || phaseAngle > 180.0) {
-        QString msg = "Invalid value of empirical Minnaert phase angle list value [" +
+        std::string msg = "Invalid value of empirical Minnaert phase angle list value [" +
                           toString(phaseAngle) + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -135,7 +135,7 @@ namespace Isis {
     */
   void MinnaertEmpirical::SetPhotoKList(QString kstrlist) {
     double kvalue;
-    IString strlist(kstrlist);
+    IString strlist(kstrlist.toStdString());
     p_photoKList.clear();
 
     while (strlist.length()) {
@@ -162,13 +162,13 @@ namespace Isis {
 
     // If the format is Keyword="1,2,3,4,5" rather than Keyword = (1,2,3,4,5) 
     if (kstrList.size() == 1) {
-      SetPhotoKList(QString(kstrList));
+      SetPhotoKList(QString::fromStdString(kstrList));
       return;
     }
 
     p_photoKList.clear();
     for (int i=0; i<kstrList.size(); i++) {
-      p_photoKList.push_back(kstrList[i].toDouble());
+      p_photoKList.push_back(Isis::toDouble(kstrList[i]));
     }
   }
 
@@ -181,7 +181,7 @@ namespace Isis {
     */
   void MinnaertEmpirical::SetPhotoPhaseCurveList(QString phasecurvestrlist) {
     double phasecurve;
-    IString strlist(phasecurvestrlist);
+    IString strlist(phasecurvestrlist.toStdString());
     p_photoPhaseCurveList.clear();
 
     while (strlist.length()) {
@@ -202,13 +202,13 @@ namespace Isis {
 
     // If the format is Keyword="1,2,3,4,5" rather than Keyword = (1,2,3,4,5) 
     if (photocurvestrList.size() == 1) {
-      SetPhotoPhaseCurveList(QString(photocurvestrList));
+      SetPhotoPhaseCurveList(QString::fromStdString(photocurvestrList));
       return;
     }
 
     p_photoPhaseCurveList.clear();
     for (int i=0; i<photocurvestrList.size(); i++) {
-      p_photoPhaseCurveList.push_back(photocurvestrList[i].toDouble());
+      p_photoPhaseCurveList.push_back(Isis::toDouble(photocurvestrList[i]));
     }
   }
 

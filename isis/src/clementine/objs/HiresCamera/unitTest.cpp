@@ -36,7 +36,7 @@ int main(void) {
 
     Cube c("$ISISTESTDATA/isis/src/clementine/unitTestData/lhd0147b.200.lev1.cub", "r");
     HiresCamera *cam = (HiresCamera *) CameraFactory::Create(c);
-    cout << "FileName: " << FileName(c.fileName()).name() << endl;
+    cout << "FileName: " << FileName(c.fileName().toStdString()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -51,7 +51,7 @@ int main(void) {
     // Test Shutter Open/Close
     const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
     double exposureDuration = ((double) inst["ExposureDuration"])/1000;
-    QString stime = inst["StartTime"];
+    QString stime = QString::fromStdString(inst["StartTime"]);
     double et; // StartTime keyword is the center exposure time
     str2et_c(stime.toLatin1().data(), &et);
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
@@ -96,10 +96,10 @@ int main(void) {
 
     // Test name methods
     cout << endl << endl << "Testing name methods ..." << endl;
-    cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
-    cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
-    cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
-    cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl;
+    cout << "Spacecraft Name Long: " << cam->spacecraftNameLong().toStdString() << endl;
+    cout << "Spacecraft Name Short: " << cam->spacecraftNameShort().toStdString() << endl;
+    cout << "Instrument Name Long: " << cam->instrumentNameLong().toStdString() << endl;
+    cout << "Instrument Name Short: " << cam->instrumentNameShort().toStdString() << endl;
   }
   catch(IException &e) {
     e.print();

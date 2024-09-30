@@ -34,9 +34,8 @@ namespace Isis {
 
     // Open the TIFF image
     m_image = NULL;
-    if ((m_image = XTIFFOpen(inputName.expanded().toLatin1().data(), "r")) == NULL) {
-      throw IException(IException::Programmer,
-          QString("Could not open TIFF image [") + inputName.expanded().toLatin1().data() + "]", _FILEINFO_);
+    if ((m_image = XTIFFOpen(inputName.expanded().c_str(), "r")) == NULL) {
+      throw IException(IException::Programmer, "Could not open TIFF image [" + inputName.expanded() + "]", _FILEINFO_);
     }
 
     // Get its constant dimensions.  Note, height seems to get reset to 0 if
@@ -128,12 +127,12 @@ namespace Isis {
         if (GTIFKeyGet(m_geotiff, ProjectedCSTypeGeoKey, &coordSysType, 0, 1) == 1) {
 
           // Get the mapping group data for this code: proj name, clat, clon, ...
-          FileName transFile((QString) "$ISISROOT/appdata/translations/" +
-                                 toString(coordSysType) + ".trn");
+          FileName transFile("$ISISROOT/appdata/translations/" +
+                                 Isis::toString(coordSysType) + ".trn");
           if (transFile.fileExists()) {
             Pvl tmp;
-            tmp += PvlKeyword("Code", toString(coordSysType));
-            PvlToPvlTranslationManager geoTiffCodeTranslater(tmp, transFile.expanded());
+            tmp += PvlKeyword("Code", Isis::toString(coordSysType));
+            PvlToPvlTranslationManager geoTiffCodeTranslater(tmp, QString::fromStdString(transFile.expanded()));
             geoTiffCodeTranslater.Auto(outPvl);
           }
         }
@@ -351,7 +350,7 @@ namespace Isis {
         double localRadius = proj->LocalRadius(trueScaleLat);
 
         double scale = (2.0 * Isis::PI * localRadius) / (360.0 * pixelResolution);
-        mapGroup += PvlKeyword("Scale", toString(scale), "pixels/degree");
+        mapGroup += PvlKeyword("Scale", Isis::toString(scale), "pixels/degree");
       }
       catch (IException &e) {
         outPvl.findGroup("Mapping").clear();
@@ -393,19 +392,19 @@ namespace Isis {
               if (gdalElement.tagName() == "Item") {
                 if (gdalElement.attribute("name", "") == "WEST_LONGITUDE") {
                   QString westLon = gdalElement.text();
-                  map += PvlKeyword("MinimumLongitude", toString(Angle(westLon).degrees()));
+                  map += PvlKeyword("MinimumLongitude", Isis::toString(Angle(westLon).degrees()));
                 }
                 else if (gdalElement.attribute("name", "") == "EAST_LONGITUDE") {
                   QString eastLon = gdalElement.text();
-                  map += PvlKeyword("MaximumLongitude", toString(Angle(eastLon).degrees()));
+                  map += PvlKeyword("MaximumLongitude", Isis::toString(Angle(eastLon).degrees()));
                 }
                 else if (gdalElement.attribute("name", "") == "SOUTH_LATITUDE") {
                   QString southLat = gdalElement.text();
-                  map += PvlKeyword("MinimumLatitude", toString(Angle(southLat).degrees()));
+                  map += PvlKeyword("MinimumLatitude", Isis::toString(Angle(southLat).degrees()));
                 }
                 else if (gdalElement.attribute("name", "") == "NORTH_LATITUDE") {
                   QString northLat = gdalElement.text();
-                  map += PvlKeyword("MaximumLatitude", toString(Angle(northLat).degrees()));
+                  map += PvlKeyword("MaximumLatitude", Isis::toString(Angle(northLat).degrees()));
                 }
               }
             }
@@ -451,11 +450,11 @@ namespace Isis {
           map.deleteKeyword("FalseNorthing");
         }
 
-        map += PvlKeyword("UpperLeftCornerX", toString(x), "meters");
-        map += PvlKeyword("UpperLeftCornerY", toString(y), "meters");
+        map += PvlKeyword("UpperLeftCornerX", Isis::toString(x), "meters");
+        map += PvlKeyword("UpperLeftCornerY", Isis::toString(y), "meters");
       }
       else {
-        QString msg = "The upper left X and Y can not be calculated. Unsupported tiepoint "
+        std::string msg = "The upper left X and Y can not be calculated. Unsupported tiepoint "
                       "type in Tiff file (i.e., not ( 0.0, 0.0))";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -485,10 +484,10 @@ namespace Isis {
       // The expected scales are TIFF(x, y, z) = ISIS(sample, line, 0)
       // Make sure the (x, y) are the same but not zero (0) for ISIS
       if ((scaleCount == 3) && (scales[0] > 0.0 && scales[1] > 0.0) && (scales[0] == scales[1])) {
-        map += PvlKeyword("PixelResolution", toString(scales[0]), "meters");
+        map += PvlKeyword("PixelResolution", Isis::toString(scales[0]), "meters");
       }
       else {
-        QString msg = "The pixel resolution could not be retrieved from the TIFF file. Unsupported "
+        std::string msg = "The pixel resolution could not be retrieved from the TIFF file. Unsupported "
                       "PixelScale tag values.";
         throw IException(IException::User, msg, _FILEINFO_);
       }

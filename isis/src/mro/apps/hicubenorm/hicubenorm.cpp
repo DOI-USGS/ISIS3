@@ -59,7 +59,7 @@ namespace Isis {
     void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, QString psMode);
 
     void hicubenorm(UserInterface &ui) {
-        Cube *cube = new Cube(ui.GetCubeName("FROM"), "r");
+        Cube *cube = new Cube(ui.GetCubeName("FROM").toStdString(), "r");
         hicubenorm(cube, ui);
     }
 
@@ -76,7 +76,7 @@ namespace Isis {
         // ERROR CHECK:  The user must specify at least the TO or STATS
         // parameters.
         if(!(ui.WasEntered("TO")) && !(ui.WasEntered("STATS"))) {
-            QString msg = "User must specify a TO and/or STATS file.";
+            std::string msg = "User must specify a TO and/or STATS file.";
             throw IException(IException::User, msg, _FILEINFO_);
         }
 
@@ -104,16 +104,16 @@ namespace Isis {
             p.StartProcess(getStats);
         }
         else if(ui.GetString("STATSOURCE") == "TABLE") {
-            tableIn(ui.GetFileName("FROMSTATS"));
+            tableIn(ui.GetFileName("FROMSTATS").toStdString());
         }
         else {
-            PVLIn(ui.GetFileName("FROMSTATS"));
+            PVLIn(ui.GetFileName("FROMSTATS").toStdString());
         }
         // Check to make sure the first vector has as many elements as the last
         // vector, and that there is a vector element for each row/col
         if(!bNewVersion && band.size() != (unsigned int)(rowcol * totalBands)) {
-            QString message = "You have entered an invalid input file " +
-                            ui.GetFileName("FROMSTATS");
+            std::string message = "You have entered an invalid input file " +
+                            ui.GetFileName("FROMSTATS").toStdString();
             throw IException(IException::Io, message, _FILEINFO_);
         }
 
@@ -162,7 +162,7 @@ namespace Isis {
             if(ui.GetString("MODE") == "MULTIPLY") {
             for(unsigned int i = 0; i < band.size(); i++) {
                 if(IsValidPixel(normalizer[i]) && normalizer[i] <= 0.0) {
-                QString msg = "Cube file can not be normalized with [MULTIPLY] ";
+                std::string msg = "Cube file can not be normalized with [MULTIPLY] ";
                 msg += "option, some column averages <= 0.0";
                 throw IException(IException::User, msg, _FILEINFO_);
                 }
@@ -170,11 +170,11 @@ namespace Isis {
             }
 
             Isis::CubeAttributeOutput atts = ui.GetOutputAttribute("TO");
-            FileName outFileName = ui.GetCubeName("TO");
+            FileName outFileName = ui.GetCubeName("TO").toStdString();
 
             // Setup the output file and apply the coefficients by either
             // subtracting or multipling them
-            p.SetOutputCube(outFileName.expanded(), atts, totalSamples, totalLines, totalBands);
+            p.SetOutputCube(QString::fromStdString(outFileName.expanded()), atts, totalSamples, totalLines, totalBands);
             // Should we preserve the average/median of the input image???
             if(ui.GetBoolean("PRESERVE")) {
             if(ui.GetString("MODE") == "SUBTRACT") {
@@ -254,28 +254,28 @@ namespace Isis {
     void pvlOut(const QString &StatFile) {
     PvlGroup results("Results");
     for(unsigned int i = 0; i < band.size(); i++) {
-        results += PvlKeyword("Band", toString(band[i]));
-        results += PvlKeyword("RowCol", toString(element[i]));
-        results += PvlKeyword("ValidPixels", toString(validpixels[i]));
+        results += PvlKeyword("Band", Isis::toString(band[i]));
+        results += PvlKeyword("RowCol", Isis::toString(element[i]));
+        results += PvlKeyword("ValidPixels", Isis::toString(validpixels[i]));
         if(validpixels[i] > 0) {
-        results += PvlKeyword("Mean", toString(average[i]));
-        results += PvlKeyword("Median", toString(median[i]));
-        results += PvlKeyword("Std", toString(stddev[i]));
-        results += PvlKeyword("Minimum", toString(minimum[i]));
-        results += PvlKeyword("Maximum", toString(maximum[i]));
+        results += PvlKeyword("Mean", Isis::toString(average[i]));
+        results += PvlKeyword("Median", Isis::toString(median[i]));
+        results += PvlKeyword("Std", Isis::toString(stddev[i]));
+        results += PvlKeyword("Minimum", Isis::toString(minimum[i]));
+        results += PvlKeyword("Maximum", Isis::toString(maximum[i]));
         }
         else {
-        results += PvlKeyword("Mean", toString(0.0));
-        results += PvlKeyword("Median", toString(0.0));
-        results += PvlKeyword("Std", toString(0.0));
-        results += PvlKeyword("Minimum", toString(0.0));
-        results += PvlKeyword("Maximum", toString(0.0));
+        results += PvlKeyword("Mean", Isis::toString(0.0));
+        results += PvlKeyword("Median", Isis::toString(0.0));
+        results += PvlKeyword("Std", Isis::toString(0.0));
+        results += PvlKeyword("Minimum", Isis::toString(0.0));
+        results += PvlKeyword("Maximum", Isis::toString(0.0));
         }
     }
 
     Pvl t;
     t.addGroup(results);
-    t.write(StatFile);
+    t.write(StatFile.toStdString());
     }
 
     //********************************************************
@@ -338,21 +338,21 @@ namespace Isis {
     PvlObject::PvlKeywordIterator itr = results.begin();
 
     while(itr != results.end()) {
-        band.push_back(toInt((*itr)[0]));
+        band.push_back(Isis::toInt((*itr)[0]));
         itr++;
-        element.push_back(toInt((*itr)[0]));
+        element.push_back(Isis::toInt((*itr)[0]));
         itr++;
-        validpixels.push_back(toInt((*itr)[0]));
+        validpixels.push_back(Isis::toInt((*itr)[0]));
         itr++;
-        average.push_back(toDouble((*itr)[0]));
+        average.push_back(Isis::toDouble((*itr)[0]));
         itr++;
-        median.push_back(toDouble((*itr)[0]));
+        median.push_back(Isis::toDouble((*itr)[0]));
         itr++;
-        stddev.push_back(toDouble((*itr)[0]));
+        stddev.push_back(Isis::toDouble((*itr)[0]));
         itr++;
-        minimum.push_back(toDouble((*itr)[0]));
+        minimum.push_back(Isis::toDouble((*itr)[0]));
         itr++;
-        maximum.push_back(toDouble((*itr)[0]));
+        maximum.push_back(Isis::toDouble((*itr)[0]));
         itr++;
     }
     }
@@ -362,12 +362,12 @@ namespace Isis {
     //*******************************************************
     void tableIn(const Isis::FileName &filename) {
     ifstream in;
-    QString expanded(filename.expanded());
+    QString expanded(QString::fromStdString(filename.expanded()));
     in.open(expanded.toLatin1().data(), std::ios::in);
 
 
     if(!in) {
-        QString message = "Error opening " + filename.expanded();
+        std::string message = "Error opening " + filename.expanded();
         throw IException(IException::Io, message, _FILEINFO_);
     }
 

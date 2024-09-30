@@ -77,7 +77,7 @@ namespace Isis {
     m_identity  = translateKeywordArgs("Identity", globals,"Row");
     m_table  = translateKeywordArgs("TableName", globals,"");
     if ( !m_table.isEmpty() ) ImportPdsTable::setName(m_table);
-    m_useFormatted = toBool(parms.get("UseFormattedName", "true"));
+    m_useFormatted = toBool(parms.get("UseFormattedName", "true").toStdString());
     return;
   }
   
@@ -107,12 +107,12 @@ namespace Isis {
   
     QString lblfile = translateKeywordArgs("PdsLabelFile", globals);
     if ( isDebug() ) { 
-      cout << "PdsTableReader::PdsLabelFile = " << lblfile << "\n"; 
+      cout << "PdsTableReader::PdsLabelFile = " << lblfile.toStdString() << "\n"; 
     }
       //  Check for argument replacement
     QString tblfile = translateKeywordArgs("PdsTableFile", globals,"");
     if ( isDebug() ) { 
-      cout << "PdsTableReader::PdsIndexFile = " << tblfile << "\n"; 
+      cout << "PdsTableReader::PdsIndexFile = " << tblfile.toStdString() << "\n"; 
     }
   
     //  Now open the filename
@@ -130,7 +130,7 @@ namespace Isis {
     catch ( IException &ie ) {
       m_resources.clear();
       m_globals.clear();
-      QString mess = "Failed to read PDS label/table " + lblfile + "," + tblfile;
+      std::string mess = "Failed to read PDS label/table " + lblfile.toStdString() + "," + tblfile.toStdString();
       throw IException(ie, IException::User, mess, _FILEINFO_);
     }
  
@@ -167,16 +167,16 @@ bool PdsTableReaderStrategy::processRow(const int &row,
     columns = parms.allValues("Columns");
   }
 
-  QString crow = QString::number(row);
+  QString crow = QString::fromStdString(toString(row));
   SharedResource resource(new Resource(crow));
   resource->add("Row", crow);
   BOOST_FOREACH (QString column, columns ) {
     ColumnDescr *description = findColumn(column);
-    PvlKeyword colkey = PvlKeyword(column);
+    PvlKeyword colkey = PvlKeyword(column.toStdString());
     if ( 0 != description ) {
       QStringList fields = getColumnFields(rowdata, *description, m_delimiter);
       BOOST_FOREACH (QString field, fields ) {
-        colkey.addValue(field.trimmed());
+        colkey.addValue(field.trimmed().toStdString());
       }
     }
     resource->add(colkey);

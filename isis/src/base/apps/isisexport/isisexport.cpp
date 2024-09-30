@@ -9,6 +9,7 @@
 #include <QFile>
 
 #include "cubeatt.h"
+#include "Application.h"
 #include "CubeAttribute.h"
 #include "FileName.h"
 #include "md5wrapper.h"
@@ -46,15 +47,15 @@ namespace Isis {
     QString outputFile = ui.GetFileName("TO");
 
     // Name for output image
-    FileName outputFileName(outputFile);
-    QString path(outputFileName.originalPath());
-    QString name(outputFileName.baseName());
+    FileName outputFileName(outputFile.toStdString());
+    QString path(QString::fromStdString(outputFileName.originalPath()));
+    QString name(QString::fromStdString(outputFileName.baseName()));
     QString outputCubePath = path + "/" + name + ".cub";
     CubeAttributeOutput outputAttributes("+bsq");
     cubeatt(icube, outputCubePath, outputAttributes);
 
     json dataSource;
-    Environment env;
+    inja::Environment env;
 
     Pvl &cubeLabel = *icube->label();
 
@@ -67,19 +68,19 @@ namespace Isis {
     FileName genDefaultTemplate = ("$ISISROOT/appdata/export/pvl2template.tpl");
     FileName templateFn;
     if (ui.WasEntered("TEMPLATE")) {
-      templateFn = ui.GetFileName("TEMPLATE");
+      templateFn = ui.GetFileName("TEMPLATE").toStdString();
     }
     else {
       std::string templateFnStd;
       try {
-        templateFnStd = env.render_file(genDefaultTemplate.expanded().toStdString(), dataSource);
-        templateFn = FileName(QString::fromStdString(templateFnStd));
+        templateFnStd = env.render_file(genDefaultTemplate.expanded(), dataSource);
+        templateFn = FileName(templateFnStd);
       }
       catch (const std::exception& e) {
-        QString msg = "Cannot automatically determine the output template file name from ["; 
+        std::string msg = "Cannot automatically determine the output template file name from ["; 
         msg += genDefaultTemplate.expanded();
         msg += "] using input label [";
-        msg += FileName(ui.GetFileName("FROM")).expanded();
+        msg += FileName(ui.GetFileName("FROM").toStdString()).expanded();
         msg += "]. You can explicitly provide an output template file using the [TEMPLATE] parameter. ";
         msg += e.what();
         throw IException(IException::User, msg, _FILEINFO_);
@@ -87,7 +88,7 @@ namespace Isis {
     }
 
     if (!templateFn.fileExists()) {
-      QString msg = "Template file [" + templateFn.expanded() + "] does not exist.";
+      std::string msg = "Template file [" + templateFn.expanded() + "] does not exist.";
 
       if(!ui.WasEntered("TEMPLATE")) {
         msg += " Unsupported Spacecraft/Instrument for export.";
@@ -115,19 +116,19 @@ namespace Isis {
       vector<QString> extraPvlFiles;
       ui.GetFileName("EXTRAPVL", extraPvlFiles);
       for (QString pvlFile : extraPvlFiles) {
-        Pvl extraPvl(pvlFile);
+        Pvl extraPvl(pvlFile.toStdString());
         json extraJson = pvlToJSON(extraPvl);
         // Notify users of duplicate keys that will be overwritten
         if (log) {
           for (auto& element : extraJson.items()) {
             if (dataSource["ExtraPvl"].contains(element.key())) {
               PvlGroup duplicateWarnings("Warning");
-              QString message = "Duplicate key [" + QString::fromStdString(element.key())
-                              + "] in extra Pvl file [" + pvlFile + "]. "
-                              + "Previous value [" + QString::fromStdString(dataSource["ExtraPvl"][element.key()].dump())
+              std::string message = "Duplicate key [" + element.key()
+                              + "] in extra Pvl file [" + pvlFile.toStdString() + "]. "
+                              + "Previous value [" + dataSource["ExtraPvl"][element.key()].dump()
                               + "] will be overwritten.";
               duplicateWarnings += PvlKeyword("Duplicate", message);
-              log->addLogGroup(duplicateWarnings);
+              Application::AppendAndLog(duplicateWarnings, log);
             }
           }
         }
@@ -145,12 +146,12 @@ namespace Isis {
           for (auto& element : extraJson.items()) {
             if (dataSource["ExtraXml"].contains(element.key())) {
               PvlGroup duplicateWarnings("Warning");
-              QString message = "Duplicate element [" + QString::fromStdString(element.key())
-                              + "] in extra xml file [" + xmlFile + "]. "
-                              + "Previous value [" + QString::fromStdString(dataSource["ExtraXml"][element.key()].dump())
+              std::string message = "Duplicate element [" + element.key()
+                              + "] in extra xml file [" + xmlFile.toStdString() + "]. "
+                              + "Previous value [" + dataSource["ExtraXml"][element.key()].dump()
                               + "] will be overwritten.";
               duplicateWarnings += PvlKeyword("Duplicate", message);
-              log->addLogGroup(duplicateWarnings);
+              Application::AppendAndLog(duplicateWarnings, log);
             }
           }
         }
@@ -169,12 +170,12 @@ namespace Isis {
           for (auto& element : extraJson.items()) {
             if (dataSource["ExtraJson"].contains(element.key())) {
               PvlGroup duplicateWarnings("Warning");
-              QString message = "Duplicate key [" + QString::fromStdString(element.key())
-                              + "] in extra json file [" + jsonFile + "]. "
-                              + "Previous value [" + QString::fromStdString(dataSource["ExtraJson"][element.key()].dump())
+              std::string message = "Duplicate key [" + element.key()
+                              + "] in extra json file [" + jsonFile.toStdString() + "]. "
+                              + "Previous value [" + dataSource["ExtraJson"][element.key()].dump()
                               + "] will be overwritten.";
               duplicateWarnings += PvlKeyword("Duplicate", message);
-              log->addLogGroup(duplicateWarnings);
+              Application::AppendAndLog(duplicateWarnings, log);
             }
           }
         }
@@ -186,7 +187,7 @@ namespace Isis {
     // NOTE: The environment has already been used to determine the output template file, so 
     // if there is a problem with that template this dump will never happen.
     if (ui.WasEntered("DATA")) {
-      std::ofstream jsonDataFile(FileName(ui.GetFileName("DATA")).expanded().toStdString());
+      std::ofstream jsonDataFile(FileName(ui.GetFileName("DATA").toStdString()).expanded());
       jsonDataFile << dataSource.dump(4);
       jsonDataFile.close();
     }
@@ -219,8 +220,8 @@ namespace Isis {
      * Renders to the final file size in bytes of the output image file
      */
     env.add_callback("outputFileSize", 0, [outputCubePath](Arguments& args) {
-      FileName cubeFileName = outputCubePath;
-      return QFile(cubeFileName.expanded()).size();
+      FileName cubeFileName = outputCubePath.toStdString();
+      return QFile(QString::fromStdString(cubeFileName.expanded())).size();
     });
 
     /**
@@ -242,7 +243,7 @@ namespace Isis {
 
     std::string result;
     try {
-      result = env.render_file(templateFn.expanded().toStdString(), dataSource);
+      result = env.render_file(templateFn.expanded(), dataSource);
     }
     catch (const std::exception &ex) {
       throw IException(IException::ErrorType::Unknown, ex.what(), _FILEINFO_);
@@ -277,7 +278,7 @@ namespace Isis {
       pds4Type = "IEEE754LSBSingle";
     }
     else {
-      QString msg = "Unsupported PDS pixel type or sample size";
+      std::string msg = "Unsupported PDS pixel type or sample size";
       throw Isis::IException(Isis::IException::User, msg, _FILEINFO_);
     }
     return pds4Type;

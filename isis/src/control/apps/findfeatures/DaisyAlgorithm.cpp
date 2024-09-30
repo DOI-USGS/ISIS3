@@ -53,10 +53,10 @@ namespace Isis {
     variables.merge(cvars);
     setConfig(config);
 
-    float radius = (float) toDouble(variables.get("radius"));
-    int q_radius = toInt(variables.get("q_radius"));
-    int q_theta = toInt(variables.get("q_theta"));
-    int q_hist = toInt(variables.get("q_hist"));
+    float radius = (float) variables.get("radius").toDouble();
+    int q_radius = variables.get("q_radius").toInt();
+    int q_theta = variables.get("q_theta").toInt();
+    int q_hist = variables.get("q_hist").toInt();
     int norm = m_typeMap.left.at(variables.get("norm"));
     cv::Mat H = cv::Mat::eye(3,3,CV_64FC1);
     if ( variables.exists("H")) {
@@ -66,7 +66,7 @@ namespace Isis {
       QStringList elts = Hparm.split( "," );
 
       if (elts.size() != 9 ) {
-        QString mess = "Homography matrix, H, was not input as a string of the form \"d,d,d,d,d,d,d,"
+        std::string mess = "Homography matrix, H, was not input as a string of the form \"d,d,d,d,d,d,d,"
                        "d,d\" where d is a double or integer numerical value.";
           throw IException(IException::Programmer, mess, _FILEINFO_);
       }
@@ -79,8 +79,8 @@ namespace Isis {
         }
       }
     }
-    bool interpolation = toBool(variables.get("interpolation"));
-    bool use_orientation = toBool(variables.get("use_orientation"));
+    bool interpolation = toBool(variables.get("interpolation").toStdString());
+    bool use_orientation = toBool(variables.get("use_orientation").toStdString());
 
     // Direct creation of DAISY algorithm, replacing default in constructor
     // initialization in FeatureAlgorithm::m_algorithm
@@ -185,7 +185,7 @@ namespace Isis {
  * @return int Number of variables actually set
  */
   int DaisyAlgorithm::setAlgorithmVariables(const PvlFlatMap &variables) {
-    QString message = "DAISY does not have the ability to set algorithm parameters.";
+    std::string message = "DAISY does not have the ability to set algorithm parameters.";
     throw IException(IException::Programmer, message, _FILEINFO_);
 
     return (-1);

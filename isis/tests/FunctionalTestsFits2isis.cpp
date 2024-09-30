@@ -10,7 +10,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/fits2isis.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/fits2isis.xml").expanded());
 
 TEST(Fits2Isis, Fits2IsisTestDefault) {
   QTemporaryDir prefix;
@@ -22,9 +22,9 @@ TEST(Fits2Isis, Fits2IsisTestDefault) {
    fits2isis(options);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest fits file: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest fits file: " <<  e.toString().c_str() << std::endl;
   }
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   // Dimensions Group
@@ -40,8 +40,8 @@ TEST(Fits2Isis, Fits2IsisTestDefault) {
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "WFPC2" );
-  ASSERT_EQ(inst["StartTime"][0].toStdString(), "1999-02-20" );
+  ASSERT_EQ(inst["InstrumentId"][0], "WFPC2" );
+  ASSERT_EQ(inst["StartTime"][0], "1999-02-20" );
 
   std::unique_ptr<Histogram> hist (cube.histogram());
 
@@ -65,10 +65,10 @@ TEST(Fits2Isis, Fits2IsisOrganizationBsq) {
    fits2isis(options);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest fits file: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest fits file: " <<  e.toString().c_str() << std::endl;
   }
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
   // Dimensions Group
   ASSERT_EQ(cube.sampleCount(), 25);
@@ -83,7 +83,7 @@ TEST(Fits2Isis, Fits2IsisOrganizationBsq) {
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["Target"][0].toStdString(), "JUPITER" );
+  ASSERT_EQ(inst["Target"][0], "JUPITER" );
 
   std::unique_ptr<Histogram> hist (cube.histogram());
 
@@ -95,7 +95,7 @@ TEST(Fits2Isis, Fits2IsisOrganizationBsq) {
 
 TEST(Fits2Isis, Fits2IsisOrganizationBil) {
   QTemporaryDir prefix;
-  QString APP_XML = FileName("$ISISROOT/bin/xml/fits2isis.xml").expanded();
+  QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/fits2isis.xml").expanded());
   QString cubeFileName = prefix.path() + "/fits2isisTEMP.cub";
   QVector<QString> args = {"from=data/fits2isis/organization.fits",
                            "to=" + cubeFileName,
@@ -107,10 +107,10 @@ TEST(Fits2Isis, Fits2IsisOrganizationBil) {
    fits2isis(options);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest fits file: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest fits file: " <<  e.toString().c_str() << std::endl;
   }
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   // Dimensions Group
@@ -126,7 +126,7 @@ TEST(Fits2Isis, Fits2IsisOrganizationBil) {
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["Target"][0].toStdString(), "JUPITER" );
+  ASSERT_EQ(inst["Target"][0], "JUPITER" );
 
   std::unique_ptr<Histogram> hist (cube.histogram());
 

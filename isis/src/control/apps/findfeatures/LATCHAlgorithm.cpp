@@ -40,9 +40,9 @@ namespace Isis {
     setConfig(config);
     PvlFlatMap variables = setupParameters();
     variables.merge(cvars);
-    const int bytes = toInt(variables.get("Bytes"));
-    const bool rotationInvariance = toBool(variables.get("RotationInvariance"));
-    const int halfSSDSize = toInt(variables.get("HalfSSDSize"));
+    const int bytes = variables.get("Bytes").toInt();
+    const bool rotationInvariance = toBool(variables.get("RotationInvariance").toStdString());
+    const int halfSSDSize = variables.get("HalfSSDSize").toInt();
 
     m_algorithm = LATCHType::create(bytes, rotationInvariance, halfSSDSize);
 
@@ -147,7 +147,7 @@ namespace Isis {
  *                                 to set algorithm parameters."
  */
   int LATCHAlgorithm::setAlgorithmVariables(const PvlFlatMap &variables) {
-    QString msg = "LATCHAlgorithm does not have the ability to set algorithm parameters.";
+    std::string msg = "LATCHAlgorithm does not have the ability to set algorithm parameters.";
     throw IException(IException::Programmer, msg, _FILEINFO_);
 
     return (-1);

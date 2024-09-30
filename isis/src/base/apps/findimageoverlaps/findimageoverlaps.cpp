@@ -12,7 +12,7 @@ using namespace std;
 namespace Isis {
 
   void findimageoverlaps(UserInterface &ui, bool useThread, Pvl *log) {
-    FileList images(ui.GetFileName("FROMLIST"));
+    FileList images(ui.GetFileName("FROMLIST").toStdString());
 
     findimageoverlaps(images, ui, useThread, log);
   }
@@ -24,7 +24,7 @@ namespace Isis {
     vector< pair<QString, QString> > sortedList;
 
     if (images.size() == 1) {
-      throw IException(IException::User, "The list [" + ui.GetFileName("FROMLIST") +
+      throw IException(IException::User, "The list [" + ui.GetFileName("FROMLIST").toStdString() +
                        "] only contains one image.", _FILEINFO_);
     }
 
@@ -33,11 +33,11 @@ namespace Isis {
     //   images. This is a modified insertion sort.
     for (int image = 0; image < images.size(); image++) {
       unsigned int insertPos = 0;
-      QString sn = SerialNumber::Compose(images[image].toString());
+      QString sn = SerialNumber::Compose(QString::fromStdString(images[image].toString()));
       for (insertPos = 0; insertPos < sortedList.size(); insertPos++) {
         if (sn.compare(sortedList[insertPos].first) < 0) break;
       }
-      pair<QString, QString> newPair = pair<QString, QString>(sn, images[image].toString());
+      pair<QString, QString> newPair = pair<QString, QString>(sn, QString::fromStdString(images[image].toString()));
       sortedList.insert(sortedList.begin() + insertPos, newPair);
     }
 
@@ -51,7 +51,7 @@ namespace Isis {
 
     // Use multi-threading to create the overlaps
     overlaps.FindImageOverlaps(serialNumbers,
-                               FileName(ui.GetFileName("OVERLAPLIST")).expanded());
+                               QString::fromStdString(FileName(ui.GetFileName("OVERLAPLIST").toStdString()).expanded()));
 
     // This will only occur when "CONTINUE" is true, so we can assume "ERRORS" was
     //   an entered parameter.
@@ -80,14 +80,12 @@ namespace Isis {
         }
       }
 
-      outFile.write(FileName(ui.GetFileName("ERRORS")).expanded());
+      outFile.write(FileName(ui.GetFileName("ERRORS").toStdString()).expanded());
     }
 
     PvlGroup results("Results");
-    results += PvlKeyword("ErrorCount", toString((BigInt)overlaps.Errors().size()));
+    results += PvlKeyword("ErrorCount", Isis::toString((BigInt)overlaps.Errors().size()));
 
-    if (log) {
-      log->addLogGroup(results);
-    }
+    Application::Log(results);
   }
 }

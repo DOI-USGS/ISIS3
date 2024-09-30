@@ -48,7 +48,7 @@ namespace Isis {
     // Get the start time from labels
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-    QString stime = inst["SpacecraftClockStartCount"];
+    QString stime = QString::fromStdString((std::string)inst["SpacecraftClockStartCount"]);
     double etStart = getClockTime(stime).Et();
 
     // Get other info from labels
@@ -65,18 +65,18 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-    QString ikernKey = "INS" + toString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+    QString ikernKey = "INS" + QString::number((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoreSight = getDouble(ikernKey);
 
-    ikernKey = "INS" + toString((int)naifIkCode()) + "_BORESIGHT_LINE";
+    ikernKey = "INS" + QString::number((int)naifIkCode()) + "_BORESIGHT_LINE";
     double lineBoreSight = getDouble(ikernKey);
 
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
     focalMap->SetDetectorOffset(0.0, 0.0);
 
-    QString ppKey("INS" + toString(naifIkCode()) + "_PP");
-    QString odKey("INS" + toString(naifIkCode()) + "_OD_K");
-    QString decenterKey("INS" + toString(naifIkCode()) + "_DECENTER");
+    QString ppKey("INS" + QString::number(naifIkCode()) + "_PP");
+    QString odKey("INS" + QString::number(naifIkCode()) + "_OD_K");
+    QString decenterKey("INS" + QString::number(naifIkCode()) + "_DECENTER");
 
 
     // Setup distortion map

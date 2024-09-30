@@ -1,7 +1,6 @@
 #include <iostream>
 #include <time.h>
 
-#include <QRegExp>
 #include <QString>
 #include <nlohmann/json.hpp>
 
@@ -20,7 +19,7 @@
 using namespace Isis;
 using json = nlohmann::json;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/isisimport.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/isisimport.xml").expanded());
 
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportMerMICaseOne){
@@ -120,7 +119,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportMerMICaseOne){
 
   isisimport(options);
 
-  Pvl output = Pvl(tempDir.path() + "/MerMI1.cub");
+  Pvl output = Pvl(tempDir.path().toStdString() + "/MerMI1.cub");
   Pvl truth;
   PvlInput >> truth;
 
@@ -244,7 +243,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportMerMICaseTwo){
 
   isisimport(options);
 
-  Pvl output = Pvl(tempDir.path() + "/MerMI2.cub");
+  Pvl output = Pvl(tempDir.path().toStdString() + "/MerMI2.cub");
   Pvl truth;
   PvlInput >> truth;
 

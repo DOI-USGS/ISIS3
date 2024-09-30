@@ -26,7 +26,7 @@ void IsisMain() {
   if(!ui.GetBoolean("INGESTION") &&
       !ui.GetBoolean("CALIBRATION") &&
       !ui.GetBoolean("MAPPING")) {
-    QString m = "Please pick at least one of [INGESTION, CALIBRATION, MAPPING]";
+    std::string m = "Please pick at least one of [INGESTION, CALIBRATION, MAPPING]";
     throw IException(IException::User, m, _FILEINFO_);
   }
 
@@ -65,19 +65,19 @@ void IsisMain() {
     p.Application("mocevenodd").SetInputParameter("FROM", true);
     p.Application("mocevenodd").SetOutputParameter("TO", "evenodd");
 
-    Pvl inputPvl(FileName(ui.GetFileName("FROM")).expanded());
+    Pvl inputPvl(FileName(ui.GetFileName("FROM").toStdString()).expanded());
 
     int summingMode = 0;
     bool isNarrowAngle = false;
 
     if(inputPvl.hasKeyword("CROSSTRACK_SUMMING")) {
       summingMode = inputPvl["CROSSTRACK_SUMMING"];
-      isNarrowAngle = ((QString)inputPvl["INSTRUMENT_ID"] == "MOC-NA");
+      isNarrowAngle = (QString::fromStdString(inputPvl["INSTRUMENT_ID"]) == "MOC-NA");
     }
     else {
       PvlGroup &inst = inputPvl.findGroup("Instrument", Pvl::Traverse);
       summingMode = inst["CrosstrackSumming"];
-      isNarrowAngle = ((QString)inst["InstrumentId"] == "MOC-NA");
+      isNarrowAngle = (QString::fromStdString(inst["InstrumentId"]) == "MOC-NA");
     }
 
     if(summingMode != 1) {
@@ -101,7 +101,7 @@ void IsisMain() {
       p.Application("cam2map").AddConstParameter("PIXRES", "MPP");
     }
     else if(ui.WasEntered("MAP")) {
-      Pvl mapPvl(FileName(ui.GetFileName("MAP")).expanded());
+      Pvl mapPvl(FileName(ui.GetFileName("MAP").toStdString()).expanded());
       if(mapPvl.findGroup("Mapping", Pvl::Traverse).hasKeyword("PixelResolution")) {
         p.Application("cam2map").AddConstParameter("PIXRES", "MAP");
       }

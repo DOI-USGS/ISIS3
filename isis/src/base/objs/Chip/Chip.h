@@ -15,6 +15,7 @@ find files of those names at the top level of this repository. **/
 #include "SpecialPixel.h"
 
 #include <vector>
+#include <QString>
 
 #include <geos/geom/MultiPolygon.h>
 
@@ -328,7 +329,7 @@ namespace Isis {
           return;
         }
         // Interpolator::None is not valid type
-        QString msg = "Invalid Interpolator type. Cannot use [";
+        std::string msg = "Invalid Interpolator type. Cannot use [";
         msg += toString(type) + "] to read cube into chip.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }

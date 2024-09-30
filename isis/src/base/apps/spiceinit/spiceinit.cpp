@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <QVector>
 
+#include "Application.h"
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "FileName.h"
@@ -69,12 +70,12 @@ namespace Isis {
     // Make sure at least one CK & SPK quality was selected
     if (!ui.GetBoolean("CKPREDICTED") && !ui.GetBoolean("CKRECON") &&
        !ui.GetBoolean("CKSMITHED") && !ui.GetBoolean("CKNADIR")) {
-      QString msg = "At least one CK quality must be selected";
+      std::string msg = "At least one CK quality must be selected";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     if (!ui.GetBoolean("SPKPREDICTED") && !ui.GetBoolean("SPKRECON") &&
        !ui.GetBoolean("SPKSMITHED")) {
-      QString msg = "At least one SPK quality must be selected";
+      std::string msg = "At least one SPK quality must be selected";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -88,7 +89,7 @@ namespace Isis {
     }
 
     if (proj != NULL) {
-      QString msg = "Can not initialize SPICE for a map projected cube";
+      std::string msg = "Can not initialize SPICE for a map projected cube";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -191,7 +192,7 @@ namespace Isis {
       if ((ck.size() == 0 || ck.at(0).size() == 0) && !ui.WasEntered("CK")) {
         // no ck was found in system and user did not enter ck, throw error
         throw IException(IException::Unknown,
-                         "No Camera Kernels found for the image [" + ui.GetCubeName("FROM")
+                         "No Camera Kernels found for the image [" + ui.GetCubeName("FROM").toStdString()
                          + "]",
                          _FILEINFO_);
       }
@@ -329,28 +330,28 @@ namespace Isis {
     PvlKeyword exkKeyword("Extra");
 
     for (int i = 0; i < lk.size(); i++) {
-      lkKeyword.addValue(lk[i]);
+      lkKeyword.addValue(lk[i].toStdString());
     }
     for (int i = 0; i < pck.size(); i++) {
-      pckKeyword.addValue(pck[i]);
+      pckKeyword.addValue(pck[i].toStdString());
     }
     for (int i = 0; i < targetSpk.size(); i++) {
-      targetSpkKeyword.addValue(targetSpk[i]);
+      targetSpkKeyword.addValue(targetSpk[i].toStdString());
     }
     for (int i = 0; i < ck.size(); i++) {
-      ckKeyword.addValue(ck[i]);
+      ckKeyword.addValue(ck[i].toStdString());
     }
     for (int i = 0; i < ik.size(); i++) {
-      ikKeyword.addValue(ik[i]);
+      ikKeyword.addValue(ik[i].toStdString());
     }
     for (int i = 0; i < sclk.size(); i++) {
-      sclkKeyword.addValue(sclk[i]);
+      sclkKeyword.addValue(sclk[i].toStdString());
     }
     for (int i = 0; i < spk.size(); i++) {
-      spkKeyword.addValue(spk[i]);
+      spkKeyword.addValue(spk[i].toStdString());
     }
     for (int i = 0; i < iak.size(); i++) {
-      iakKeyword.addValue(iak[i]);
+      iakKeyword.addValue(iak[i].toStdString());
     }
 
     if (ui.GetString("SHAPE") == "RINGPLANE") {
@@ -358,11 +359,11 @@ namespace Isis {
     }
     else {
       for (int i = 0; i < dem.size(); i++) {
-        demKeyword.addValue(dem[i]);
+        demKeyword.addValue(dem[i].toStdString());
       }
     }
     for (int i = 0; i < exk.size(); i++) {
-      exkKeyword.addValue(exk[i]);
+      exkKeyword.addValue(exk[i].toStdString());
     }
 
     PvlGroup originalKernels = icube->group("Kernels");
@@ -439,16 +440,16 @@ namespace Isis {
     // Add any time padding the user specified to the spice group
     if (ui.GetDouble("STARTPAD") > DBL_EPSILON) {
       currentKernels.addKeyword(PvlKeyword("StartPadding",
-                                           toString(ui.GetDouble("STARTPAD")), "seconds"));
+                                           Isis::toString(ui.GetDouble("STARTPAD")), "seconds"));
     }
 
     if (ui.GetDouble("ENDPAD") > DBL_EPSILON) {
       currentKernels.addKeyword(PvlKeyword("EndPadding",
-                                           toString(ui.GetDouble("ENDPAD")), "seconds"));
+                                           Isis::toString(ui.GetDouble("ENDPAD")), "seconds"));
     }
 
     currentKernels.addKeyword(
-        PvlKeyword("CameraVersion", toString(CameraFactory::CameraVersion(*icube))),
+        PvlKeyword("CameraVersion", Isis::toString(CameraFactory::CameraVersion(*icube))),
         Pvl::Replace);
 
     // Add the modified Kernels group to the input cube labels
@@ -472,10 +473,7 @@ namespace Isis {
 
         currentKernels += source;
         icube->putGroup(currentKernels);
-        if (log){
-          log->addLogGroup(currentKernels);
-        }
-
+        Application::Log(currentKernels);
       }
       catch(IException &e) {
         Pvl errPvl = e.toPvl();
@@ -483,9 +481,7 @@ namespace Isis {
         if (errPvl.groups() > 0) {
           currentKernels += PvlKeyword("Error", errPvl.group(errPvl.groups() - 1)["Message"][0]);
         }
-        if (log) {
-          log->addLogGroup(currentKernels);
-        }
+        Application::Log(currentKernels);
         icube->putGroup(originalKernels);
 
         // restore CSM State blob if spiceinit failed
@@ -522,7 +518,7 @@ namespace Isis {
           bodyTable.Label()["Kernels"].addValue(pckKeyword[i]);
 
         bodyTable.Label() += PvlKeyword("SolarLongitude",
-            toString(cam->solarLongitude().degrees()));
+            Isis::toString(cam->solarLongitude().degrees()));
         icube->write(bodyTable);
 
         Table sunTable = cam->sunPosition()->Cache("SunPosition");
@@ -573,10 +569,10 @@ namespace Isis {
         while (i < label->objects()) {
           PvlObject currObj = label->object(i);
           if (currObj.isNamed("Table")) {
-            if (currObj["Name"][0] == QString("InstrumentPointing") ||
-                currObj["Name"][0] == QString("InstrumentPosition") ||
-                currObj["Name"][0] == QString("BodyRotation") ||
-                currObj["Name"][0] == QString("SunPosition")) {
+            if (currObj["Name"][0] == "InstrumentPointing" ||
+                currObj["Name"][0] == "InstrumentPosition" ||
+                currObj["Name"][0] == "BodyRotation" ||
+                currObj["Name"][0] == "SunPosition") {
               label->deleteObject(i);
             }
             else {
@@ -612,15 +608,15 @@ namespace Isis {
    */
   void requestSpice(Cube *icube, UserInterface &ui, Pvl *log, Pvl &labels, QString missionName) {
     QString instrumentId =
-        labels.findGroup("Instrument", Pvl::Traverse)["InstrumentId"][0];
+        QString::fromStdString(labels.findGroup("Instrument", Pvl::Traverse)["InstrumentId"][0]);
 
     if (instrumentId == "HRSC"){
-      QString msg = "Spice Server does not support MEX HRSC images. Please rerun spiceinit with local MEX data.";
+      std::string msg = "Spice Server does not support MEX HRSC images. Please rerun spiceinit with local MEX data.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (ui.GetString("URL") == "https://services.isis.astrogeology.usgs.gov/cgi-bin/spiceinit.cgi"){
-      QString msg = "USER WARNING: The URL you entered has been deprecated and no longer recommended for use.";
+      std::string msg = "USER WARNING: The URL you entered has been deprecated and no longer recommended for use.";
       std::cerr << msg << std::endl;
     }
 
@@ -684,14 +680,12 @@ namespace Isis {
     }
 
     if (ui.GetString("SHAPE") == "USER") {
-      kernelsGroup["ShapeModel"] = ui.GetCubeName("MODEL");
+      kernelsGroup["ShapeModel"] = ui.GetCubeName("MODEL").toStdString();
     }
 
     icube->putGroup(kernelsGroup);
 
-    if (log) {
-      log->addLogGroup(kernelsGroup);
-    }
+    Application::Log(kernelsGroup);
 
     Pvl *icubeLabel = icube->label();
 

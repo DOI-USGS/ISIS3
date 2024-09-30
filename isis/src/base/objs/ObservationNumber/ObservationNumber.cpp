@@ -38,9 +38,9 @@ namespace Isis {
       if(def2filename) {
         //  Try to return the filename if it exists in the label, otherwise use
         //  "Unknown" as a last resort.
-        QString snTemp = label.fileName();
+        QString snTemp = QString::fromStdString(label.fileName());
         if(!snTemp.isEmpty()) {
-          sn = FileName(snTemp).name();
+          sn = QString::fromStdString(FileName(snTemp.toStdString()).name());
         }
         else {
           sn = "Unknown";
@@ -69,7 +69,7 @@ namespace Isis {
    * @param filename a filename to open
    */
   QString ObservationNumber::Compose(const QString &filename, bool def2filename) {
-    Pvl p(filename);
+    Pvl p(filename.toStdString());
     return Compose(p, def2filename);
   }
 
@@ -105,8 +105,8 @@ namespace Isis {
 
     if(translationIterator == missionTranslators.end()) {
       // Get the file
-      FileName snFile((QString) "$ISISROOT/appdata/translations/" + mission + 
-                                 instrument + "SerialNumber.trn");
+      FileName snFile("$ISISROOT/appdata/translations/" + mission.toStdString() + 
+                                 instrument.toStdString() + "SerialNumber.trn");
 
       // Delets the extra
       Pvl translation(snFile.expanded());
@@ -118,7 +118,7 @@ namespace Isis {
       // use the translation file to generate keywords
       missionTranslators.insert(
         std::pair<QString, std::pair<PvlToPvlTranslationManager, PvlKeyword> >
-        (key, std::pair<PvlToPvlTranslationManager, PvlKeyword>(PvlToPvlTranslationManager(snFile.expanded()), observationKeys))
+        (key, std::pair<PvlToPvlTranslationManager, PvlKeyword>(PvlToPvlTranslationManager(QString::fromStdString(snFile.expanded())), observationKeys))
       );
 
       translationIterator = missionTranslators.find(key);
@@ -129,11 +129,11 @@ namespace Isis {
     PvlGroup snGroup = outLabel.findGroup("SerialNumberKeywords");
 
     // Delets the extra
-    if(!translationIterator->second.second.name().isEmpty()) {
+    if(!QString::fromStdString(translationIterator->second.second.name()).isEmpty()) {
       snGroup += translationIterator->second.second;
     }
     else {
-      snGroup += PvlKeyword("ObservationKeys", toString(snGroup.keywords()));
+      snGroup += PvlKeyword("ObservationKeys", Isis::toString(snGroup.keywords()));
     }
 
     return snGroup;

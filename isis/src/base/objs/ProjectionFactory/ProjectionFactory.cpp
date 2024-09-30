@@ -67,7 +67,7 @@ namespace Isis {
     try {
       // Look for info in the mapping group
       Isis::PvlGroup &mapGroup = label.findGroup("Mapping", Isis::Pvl::Traverse);
-      QString proj = mapGroup["ProjectionName"];
+      QString proj = QString::fromStdString(mapGroup["ProjectionName"]);
 
       // Now get the plugin for the projection
       QFunctionPointer ptr;
@@ -75,8 +75,8 @@ namespace Isis {
         ptr = m_projPlugin.GetPlugin(proj);
       }
       catch(IException &e) {
-        QString msg = "Unsupported projection, unable to find plugin for [" +
-                     proj + "]";
+        std::string msg = "Unsupported projection, unable to find plugin for [" +
+                     proj.toStdString() + "]";
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
@@ -88,7 +88,7 @@ namespace Isis {
       return (Isis::Projection *) (*plugin)(label, allowDefaults);
     }
     catch(IException &e) {
-      QString message = "Unable to initialize Projection information ";
+      std::string message = "Unable to initialize Projection information ";
       message += "from group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
@@ -135,7 +135,7 @@ namespace Isis {
     try {
       // Look for info in the mapping group
       Isis::PvlGroup &mapGroup = label.findGroup("Mapping", Isis::Pvl::Traverse);
-      QString proj = mapGroup["ProjectionName"];
+      QString proj = QString::fromStdString(mapGroup["ProjectionName"]);
 
       // Now get the plugin for the projection
       QFunctionPointer ptr;
@@ -143,8 +143,8 @@ namespace Isis {
         ptr = m_projPlugin.GetPlugin(proj);
       }
       catch(IException &e) {
-        QString msg = "Unsupported projection, unable to find plugin for [" +
-                      proj + "]";
+        std::string msg = "Unsupported projection, unable to find plugin for [" +
+                      proj.toStdString() + "]";
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
@@ -155,7 +155,7 @@ namespace Isis {
       return (Projection *) (*plugin)(label, allowDefaults);
     }
     catch(IException &e) {
-      QString message = "Unable to initialize Projection information ";
+      std::string message = "Unable to initialize Projection information ";
       message += "from group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
@@ -212,9 +212,9 @@ namespace Isis {
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
       // Write out the scale and resolution with units and truescale latitude
-      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution), "meters/pixel"),
+      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", Isis::toString(pixelResolution), "meters/pixel"),
                           Isis::Pvl::Replace);
-      mapGroup.addKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"), Isis::Pvl::Replace);
+      mapGroup.addKeyword(Isis::PvlKeyword("Scale", Isis::toString(scale), "pixels/degree"), Isis::Pvl::Replace);
       //mapGroup.addKeyword(Isis::PvlKeyword ("TrueScaleLatitude", trueScaleLat),
       //                                    Isis::Pvl::Replace);
 
@@ -240,14 +240,14 @@ namespace Isis {
       // Couldn't find the cube size from the labels so compute it
       if (!sizeFound) {
         if (!proj->HasGroundRange()) {
-          QString msg = "Invalid ground range [MinimumLatitude,MaximumLatitude,";
+          std::string msg = "Invalid ground range [MinimumLatitude,MaximumLatitude,";
           msg += "MinimumLongitude,MaximumLongitude] missing or invalid";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         double minX, maxX, minY, maxY;
         if (!proj->XYRange(minX, maxX, minY, maxY)) {
-          QString msg = "Invalid ground range [MinimumLatitude,MaximumLatitude,";
+          std::string msg = "Invalid ground range [MinimumLatitude,MaximumLatitude,";
           msg += "MinimumLongitude,MaximumLongitude] cause invalid computation ";
           msg += "of image size";
           throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -334,7 +334,7 @@ namespace Isis {
         else {
             upperLeftX = minXFlipped;
         }
-        mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
+        mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", Isis::toString(upperLeftX)),
                             Isis::Pvl::Replace);
 
         if (flipY)  {
@@ -346,7 +346,7 @@ namespace Isis {
 
         }
 
-        mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
+        mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", Isis::toString(upperLeftY)),
                             Isis::Pvl::Replace);
 
         // Write it in pixel units as well
@@ -363,27 +363,27 @@ namespace Isis {
 
       // Make sure labels have good units
       mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution",
-                                           (QString) mapGroup["PixelResolution"],
+                                           (std::string) mapGroup["PixelResolution"],
                                            "meters/pixel"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("Scale",
-                                           (QString) mapGroup["Scale"],
+                                           (std::string) mapGroup["Scale"],
                                            "pixels/degree"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX",
-                                           (QString) mapGroup["UpperLeftCornerX"],
+                                           (std::string) mapGroup["UpperLeftCornerX"],
                                            "meters"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY",
-                                           (QString) mapGroup["UpperLeftCornerY"],
+                                           (std::string) mapGroup["UpperLeftCornerY"],
                                            "meters"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("EquatorialRadius",
-                                           (QString) mapGroup["EquatorialRadius"],
+                                           (std::string) mapGroup["EquatorialRadius"],
                                            "meters"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("PolarRadius",
-                                           (QString) mapGroup["PolarRadius"],
+                                           (std::string) mapGroup["PolarRadius"],
                                            "meters"), Isis::Pvl::Replace);
 
       // Add the mapper from pixel coordinates to projection coordinates
@@ -394,7 +394,7 @@ namespace Isis {
                                Displacement(upperLeftY, Displacement::Meters));
     }
     catch(IException &e) {
-      QString msg = "Unable to create projection";
+      std::string msg = "Unable to create projection";
       if (label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       IException finalError(IException::Unknown, msg, _FILEINFO_);
       finalError.append(errors);
@@ -457,10 +457,10 @@ namespace Isis {
       }
 
       // Write out the scale and resolution with units and truescale radius
-      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution),
+      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", Isis::toString(pixelResolution),
                                            "meters/pixel"),
                           Isis::Pvl::Replace);
-      mapGroup.addKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"),
+      mapGroup.addKeyword(Isis::PvlKeyword("Scale", Isis::toString(scale), "pixels/degree"),
                           Isis::Pvl::Replace);
 
       //mapGroup.AddKeyword(Isis::PvlKeyword ("TrueScaleRadius", trueScaleRadius),
@@ -491,14 +491,14 @@ namespace Isis {
       // Couldn't find the cube size from the labels so compute it
       if (!sizeFound) {
         if (!proj->HasGroundRange()) {
-          QString msg = "Invalid ring range [MinimumRingRadius,MaximumRingRadius,";
+          std::string msg = "Invalid ring range [MinimumRingRadius,MaximumRingRadius,";
           msg += "MinimumRingLongitude,MaximumRingLongitude] missing or invalid";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         double minX, maxX, minY, maxY;
         if (!proj->XYRange(minX, maxX, minY, maxY)) {
-          QString msg = "Invalid ring range [MinimumRingRadius,MaximumRingRadius,";
+          std::string msg = "Invalid ring range [MinimumRingRadius,MaximumRingRadius,";
           msg += "MinimumRingLongitude,MaximumRingLongitude] cause invalid computation ";
           msg += "of image size";
           throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -539,11 +539,11 @@ namespace Isis {
 
         // Set the upper left corner and add to the labels
         upperLeftX = minX;
-        mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
+        mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", Isis::toString(upperLeftX)),
                             Isis::Pvl::Replace);
 
         upperLeftY = maxY;
-        mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
+        mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", Isis::toString(upperLeftY)),
                             Isis::Pvl::Replace);
 
         // Write it in pixel units as well
@@ -560,19 +560,19 @@ namespace Isis {
 
       // Make sure labels have good units
       mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution",
-                                           (QString) mapGroup["PixelResolution"],
+                                           (std::string) mapGroup["PixelResolution"],
                                            "meters/pixel"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("Scale",
-                                           (QString) mapGroup["Scale"],
+                                           (std::string) mapGroup["Scale"],
                                            "pixels/degree"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX",
-                                           (QString) mapGroup["UpperLeftCornerX"],
+                                           (std::string) mapGroup["UpperLeftCornerX"],
                                            "meters"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY",
-                                           (QString) mapGroup["UpperLeftCornerY"],
+                                           (std::string) mapGroup["UpperLeftCornerY"],
                                            "meters"), Isis::Pvl::Replace);
 
       // Add the mapper from pixel coordinates to projection coordinates
@@ -583,7 +583,7 @@ namespace Isis {
                                Displacement(upperLeftY, Displacement::Meters));
     }
     catch(IException &e) {
-      QString msg = "Unable to create projection";
+      std::string msg = "Unable to create projection";
       if (label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       IException finalError(IException::Unknown, msg, _FILEINFO_);
       finalError.append(errors);
@@ -642,9 +642,9 @@ namespace Isis {
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
       // Write out the scale and resolution with units and truescale latitude
-      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution), "meters/pixel"),
+      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", Isis::toString(pixelResolution), "meters/pixel"),
                           Isis::Pvl::Replace);
-      mapGroup.addKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"), Isis::Pvl::Replace);
+      mapGroup.addKeyword(Isis::PvlKeyword("Scale", Isis::toString(scale), "pixels/degree"), Isis::Pvl::Replace);
       //mapGroup.AddKeyword(Isis::PvlKeyword ("TrueScaleLatitude", trueScaleLatitude),
       //                                    Isis::Pvl::Replace);
 
@@ -797,36 +797,36 @@ namespace Isis {
 
       // Set the upper left corner and add to the labels
       double upperLeftX = minX;
-      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", Isis::toString(upperLeftX)),
                           Isis::Pvl::Replace);
 
       double upperLeftY = maxY;
-      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", Isis::toString(upperLeftY)),
                           Isis::Pvl::Replace);
 
       // Make sure labels have good units
       mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution",
-                                           (QString) mapGroup["PixelResolution"],
+                                           (std::string) mapGroup["PixelResolution"],
                                            "meters/pixel"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("Scale",
-                                           (QString) mapGroup["Scale"],
+                                           (std::string) mapGroup["Scale"],
                                            "pixels/degree"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX",
-                                           (QString) mapGroup["UpperLeftCornerX"],
+                                           (std::string) mapGroup["UpperLeftCornerX"],
                                            "meters"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY",
-                                           (QString) mapGroup["UpperLeftCornerY"],
+                                           (std::string) mapGroup["UpperLeftCornerY"],
                                            "meters"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("EquatorialRadius",
-                                           (QString) mapGroup["EquatorialRadius"],
+                                           (std::string) mapGroup["EquatorialRadius"],
                                            "meters"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("PolarRadius",
-                                           (QString) mapGroup["PolarRadius"],
+                                           (std::string) mapGroup["PolarRadius"],
                                            "meters"), Isis::Pvl::Replace);
 
       // Add the mapper from pixel coordinates to projection coordinates
@@ -837,7 +837,7 @@ namespace Isis {
                                Displacement(upperLeftY, Displacement::Meters));
     }
     catch(IException &e) {
-      QString msg = "Unable to create projection";
+      std::string msg = "Unable to create projection";
       if (label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
@@ -895,9 +895,9 @@ namespace Isis {
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
       // Write out the scale and resolution with units and truescale radius
-      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution),
+      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", Isis::toString(pixelResolution),
                                            "meters/pixel"), Isis::Pvl::Replace);
-      mapGroup.addKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"),
+      mapGroup.addKeyword(Isis::PvlKeyword("Scale", Isis::toString(scale), "pixels/degree"),
                           Isis::Pvl::Replace);
 
       // Initialize the rest of the projection
@@ -1019,28 +1019,28 @@ namespace Isis {
 
       // Set the upper left corner and add to the labels
       double upperLeftX = minX;
-      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", Isis::toString(upperLeftX)),
                           Isis::Pvl::Replace);
 
       double upperLeftY = maxY;
-      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", Isis::toString(upperLeftY)),
                           Isis::Pvl::Replace);
 
       // Make sure labels have good units
       mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution",
-                                           (QString) mapGroup["PixelResolution"],
+                                           (std::string) mapGroup["PixelResolution"],
                                            "meters/pixel"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("Scale",
-                                           (QString) mapGroup["Scale"],
+                                           (std::string) mapGroup["Scale"],
                                            "pixels/degree"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX",
-                                           (QString) mapGroup["UpperLeftCornerX"],
+                                           (std::string) mapGroup["UpperLeftCornerX"],
                                            "meters"), Isis::Pvl::Replace);
 
       mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY",
-                                           (QString) mapGroup["UpperLeftCornerY"],
+                                           (std::string) mapGroup["UpperLeftCornerY"],
                                            "meters"), Isis::Pvl::Replace);
 
       // Add the mapper from pixel coordinates to projection coordinates
@@ -1051,7 +1051,7 @@ namespace Isis {
                                Displacement(upperLeftY, Displacement::Meters));
     }
     catch(IException &e) {
-      QString msg = "Unable to create projection";
+      std::string msg = "Unable to create projection";
       if (label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
@@ -1114,7 +1114,7 @@ namespace Isis {
                                Displacement(upperLeftY, Displacement::Meters));
     }
     catch (IException &e) {
-      QString msg = "Unable to initialize cube projection";
+      std::string msg = "Unable to initialize cube projection";
       if (label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
@@ -1153,7 +1153,7 @@ namespace Isis {
                                Displacement(upperLeftY, Displacement::Meters));
     }
     catch (IException &e) {
-      QString msg = "Unable to initialize cube projection";
+      std::string msg = "Unable to initialize cube projection";
       if (label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }

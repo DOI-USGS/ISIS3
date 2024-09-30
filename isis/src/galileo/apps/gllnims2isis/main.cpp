@@ -123,11 +123,11 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   importPds.Progress()->SetText((QString)"Writing " + coreParamName + " file");
 
 
-  FileName inFile = ui.GetFileName("FROM");
-  QFileInfo fi(inFile.expanded());
+  FileName inFile = ui.GetFileName("FROM").toStdString();
+  QFileInfo fi(QString::fromStdString(inFile.expanded()));
 
   //Fix the broken XML tags in the pvl file
-  QByteArray pvlData= pvlFix(inFile.expanded());
+  QByteArray pvlData= pvlFix(QString::fromStdString(inFile.expanded()));
   QTextStream pvlTextStream(&pvlData);
   istringstream pvlStream(pvlTextStream.readAll().toStdString());
   Pvl *pdsLabel = new Pvl();
@@ -136,7 +136,7 @@ void importQubs(QString coreParamName, QString suffixParamName) {
     pvlStream >> *pdsLabel;
   }
   catch(IException &e) {
-    QString msg = "Input file [" + inFile.expanded() +
+    std::string msg = "Input file [" + inFile.expanded() +
                  "] is not a valid PVL file.";
     // not appending the caught exception to this message.
     // we were picking up non-utf8 characters in the message
@@ -152,7 +152,7 @@ void importQubs(QString coreParamName, QString suffixParamName) {
 
   const PvlObject &qube = pdsLabel->findObject("Qube");
 
-  QString dataSetId(qube["DATA_SET_ID"]);
+  QString dataSetId(QString::fromStdString(qube["DATA_SET_ID"]));
 
   //Verify that we have a NIMS cube
   QRegExp galileoRx("GO-[A-Z]-NIMS*");
@@ -161,22 +161,22 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   try {
     if (!galileoRx.exactMatch(dataSetId) )
     {
-      QString msg = "Invalid DATA_SET_ID [" + dataSetId + "]";
+      std::string msg = "Invalid DATA_SET_ID [" + dataSetId.toStdString() + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
   catch(IException &e) {
-    QString msg = "Unable to read [DATA_SET_ID] from input file [" +
+    std::string msg = "Unable to read [DATA_SET_ID] from input file [" +
                  inFile.expanded() + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   //Determine the dimensions and pixel type of the core/suffix bands
-  QString g_coreItemBytesStr(qube["CORE_ITEM_BYTES"][0]);
-  QString g_suffixItemBytesStr(qube["SUFFIX_BYTES"][0]);
+  QString g_coreItemBytesStr(QString::fromStdString(qube["CORE_ITEM_BYTES"][0]));
+  QString g_suffixItemBytesStr(QString::fromStdString(qube["SUFFIX_BYTES"][0]));
 
-  QString backPlanesStr(qube["SUFFIX_ITEMS"][2]);
-  QString corePlanesStr(qube["CORE_ITEMS"][2]);
+  QString backPlanesStr(QString::fromStdString(qube["SUFFIX_ITEMS"][2]));
+  QString corePlanesStr(QString::fromStdString(qube["CORE_ITEMS"][2]));
 
   g_coreItemBytes = g_coreItemBytesStr.toInt();
   g_suffixItemBytes = g_suffixItemBytesStr.toInt();
@@ -205,10 +205,10 @@ void importQubs(QString coreParamName, QString suffixParamName) {
 
   // Convert the pds file to a cube
   try {
-      importPds.SetPdsFile(*pdsLabel,inFile.expanded(),fileType);
+      importPds.SetPdsFile(*pdsLabel,QString::fromStdString(inFile.expanded()),fileType);
   }
   catch(IException &e) {
-    QString msg = "Input file [" + inFile.expanded() +
+    std::string msg = "Input file [" + inFile.expanded() +
                  "] does not appear to be a Galileo NIMS detached PDS label";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
@@ -251,8 +251,8 @@ PvlGroup originalMappingGroup = qube.findGroup("IMAGE_MAP_PROJECTION", Pvl::Trav
   importPds.EndProcess();
 
 // New nocam2map hint PvlGroup
-  Cube coreCube(FileName(ui.GetCubeName("CORE")).expanded(),"rw");
-  Cube suffixCube(FileName(ui.GetCubeName("SUFFIX")).expanded(), "rw");
+  Cube coreCube(FileName(ui.GetCubeName("CORE").toStdString()).expanded(),"rw");
+  Cube suffixCube(FileName(ui.GetCubeName("SUFFIX").toStdString()).expanded(), "rw");
 
   PvlGroup mappingInfo("MappingInformation");
 
@@ -368,8 +368,8 @@ PvlGroup originalMappingGroup = qube.findGroup("IMAGE_MAP_PROJECTION", Pvl::Trav
       double lineOffset = -(double)(importPds.Lines()+1) / 2;
       double sampleOffset = -(double)(importPds.Samples()+1) / 2;
       double resolution = mappingGroup["PixelResolution"][0].toDouble();
-      mappingGroup["UpperLeftCornerY"] = toString(-lineOffset * resolution);
-      mappingGroup["UpperLeftCornerX"] = toString(sampleOffset * resolution);
+      mappingGroup["UpperLeftCornerY"] = Isis::toString(-lineOffset * resolution);
+      mappingGroup["UpperLeftCornerX"] = Isis::toString(sampleOffset * resolution);
       if (originalMappingGroup["COORDINATE_SYSTEM_NAME"][0] == "PLANETOCENTRIC") {
         mappingGroup["LatitudeType"] = "Planetocentric";
       }
@@ -387,11 +387,11 @@ PvlGroup originalMappingGroup = qube.findGroup("IMAGE_MAP_PROJECTION", Pvl::Trav
     }
     else {
       if (mappingGroup.hasKeyword("CenterLatitude")) {
-        mappingGroup["CenterLatitude"].setValue(toString(centerLatitude),
+        mappingGroup["CenterLatitude"].setValue(Isis::toString(centerLatitude),
                                                 "degrees");
       }
       else {
-        PvlKeyword clat("CenterLatitude", toString(centerLatitude), "degrees" );
+        PvlKeyword clat("CenterLatitude", Isis::toString(centerLatitude), "degrees" );
         mappingGroup.addKeyword(clat);
       }
     }
@@ -400,7 +400,7 @@ PvlGroup originalMappingGroup = qube.findGroup("IMAGE_MAP_PROJECTION", Pvl::Trav
                                                "degrees");
     }
     else {
-      mappingGroup["CenterLongitude"].setValue(toString(centerLongitude),
+      mappingGroup["CenterLongitude"].setValue(Isis::toString(centerLongitude),
                                                "degrees");
     }
     mappingGroup["LongitudeDomain"].setUnits("degrees");
@@ -410,7 +410,7 @@ PvlGroup originalMappingGroup = qube.findGroup("IMAGE_MAP_PROJECTION", Pvl::Trav
     mappingGroup["MaximumLongitude"].setUnits("degrees");
   }
   catch(IException &e) {
-    QString msg = "Unable to correct mapping group.";
+    std::string msg = "Unable to correct mapping group.";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
@@ -483,12 +483,12 @@ void translateNIMSLabels(Pvl &pdsLab, Cube *ocube,FileName inFile,CubeType ctype
   PvlObject qube(pdsLab.findObject("Qube"));
 
   // Directory containing translation tables
-  QString transDir = "$ISISROOT/appdata/translations/";
+  std::string transDir = "$ISISROOT/appdata/translations/";
 
-  QString instrument="GalileoNIMSInstrument.trn";
-  QString archive = "GalileoNIMSArchive.trn";
-  QString coreBandBin = "GalileoNIMSCoreBandBin.trn";
-  QString suffixBandBin = "GalileoNIMSSuffixBandBin.trn";
+  std::string instrument="GalileoNIMSInstrument.trn";
+  std::string  archive = "GalileoNIMSArchive.trn";
+  std::string  coreBandBin = "GalileoNIMSCoreBandBin.trn";
+  std::string  suffixBandBin = "GalileoNIMSSuffixBandBin.trn";
 
   FileName coreBandBinFile(transDir+coreBandBin);
   FileName suffixBandBinFile(transDir+suffixBandBin);
@@ -496,10 +496,10 @@ void translateNIMSLabels(Pvl &pdsLab, Cube *ocube,FileName inFile,CubeType ctype
   FileName instrumentFile(transDir+instrument);
   FileName archiveFile(transDir+archive);
 
-  PvlToPvlTranslationManager archiveXlator(pdsLabel, archiveFile.expanded());
-  PvlToPvlTranslationManager instrumentXlator(pdsLabel, instrumentFile.expanded());
-  PvlToPvlTranslationManager coreBandBinXlator(pdsLabel,coreBandBinFile.expanded());
-  PvlToPvlTranslationManager suffixBandBinXlator(pdsLabel,suffixBandBinFile.expanded());
+  PvlToPvlTranslationManager archiveXlator(pdsLabel, QString::fromStdString(archiveFile.expanded()));
+  PvlToPvlTranslationManager instrumentXlator(pdsLabel, QString::fromStdString(instrumentFile.expanded()));
+  PvlToPvlTranslationManager coreBandBinXlator(pdsLabel,QString::fromStdString(coreBandBinFile.expanded()));
+  PvlToPvlTranslationManager suffixBandBinXlator(pdsLabel,QString::fromStdString(suffixBandBinFile.expanded()));
 
   archiveXlator.Auto(archiveLabel);
 
@@ -549,29 +549,29 @@ void ProcessBands(Pvl &pdsLab, Cube *nimsCube, ProcessImportPds &importPds) {
   vector<double> base(g_suffixBands);
 
   for(int i = 0; i < g_suffixBands; i++) {
-    suffixNames+= (QString)qube["BAND_SUFFIX_NAME"][i];
+    suffixNames+= (std::string)qube["BAND_SUFFIX_NAME"][i];
 
     if(qube.hasKeyword("BAND_SUFFIX_UNIT"))
-        suffixUnits+= (QString)qube["BAND_SUFFIX_UNIT"][i];
+        suffixUnits+= (std::string)qube["BAND_SUFFIX_UNIT"][i];
 
     if (qube.hasKeyword("BAND_BIN_CENTER") )
-        suffixCenters += (QString)qube["BAND_BIN_CENTER"][i];
+        suffixCenters += (std::string)qube["BAND_BIN_CENTER"][i];
 
     if (qube.hasKeyword("BAND_BIN_ORIGINAL_BAND") )
-        suffixOriginalBands += (QString)qube["BAND_BIN_ORIGINAL_BAND"][i];
+        suffixOriginalBands += (std::string)qube["BAND_BIN_ORIGINAL_BAND"][i];
 
     if (qube.hasKeyword("BAND_BIN_GRATING_POSITION") )
-        suffixGratingPositions += (QString)qube["BAND_BIN_GRATING_POSITION"][i];
+        suffixGratingPositions += (std::string)qube["BAND_BIN_GRATING_POSITION"][i];
 
 
     if (qube.hasKeyword("BAND_BIN_DETECTOR") )
-        suffixDetectors += (QString)qube["BAND_BIN_DETECTOR"][i];
+        suffixDetectors += (std::string)qube["BAND_BIN_DETECTOR"][i];
 
     if (qube.hasKeyword("BAND_BIN_SOLAR_FLUX") )
-        suffixSolarFluxes += (QString)qube["BAND_BIN_SOLAR_FLUX"][i];
+        suffixSolarFluxes += (std::string)qube["BAND_BIN_SOLAR_FLUX"][i];
 
     if (qube.hasKeyword("BAND_BIN_SENSITIVITY") )
-        suffixSensitivities += (QString)qube["BAND_BIN_SENSITIVITY"][i];
+        suffixSensitivities += (std::string)qube["BAND_BIN_SENSITIVITY"][i];
   }
 
   bandBin += suffixNames;
@@ -584,14 +584,14 @@ void ProcessBands(Pvl &pdsLab, Cube *nimsCube, ProcessImportPds &importPds) {
   bandBin += suffixSolarFluxes;
 
    if(qube.hasKeyword("BAND_SUFFIX_NOTE"))
-     bandBin += (QString)qube["BAND_SUFFIX_NOTE"];
+     bandBin += (std::string)qube["BAND_SUFFIX_NOTE"];
 
    if(qube.hasKeyword("STD_DEV_SELECTED_BAND_NUMBER"))
-     bandBin += (QString)qube["STD_DEV_SELECTED_BAND_NUMBER"];
+     bandBin += (std::string)qube["STD_DEV_SELECTED_BAND_NUMBER"];
 
   for(int i = 0; i < g_suffixBands; i++) {
-    multStr = (QString)qube["BAND_SUFFIX_MULTIPLIER"];
-    baseStr = (QString)qube["BAND_SUFFIX_BASE"];
+    multStr = QString::fromStdString(qube["BAND_SUFFIX_MULTIPLIER"]);
+    baseStr = QString::fromStdString(qube["BAND_SUFFIX_BASE"]);
     multi[i]=multStr.toDouble();
     base[i] = baseStr.toDouble();
     }

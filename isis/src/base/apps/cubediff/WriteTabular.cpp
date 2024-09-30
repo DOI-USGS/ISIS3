@@ -24,6 +24,8 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <QStringList>
+#include <QRegExp>
 
 #include "WriteTabular.h"
 #include "IString.h"
@@ -69,7 +71,7 @@ namespace Isis {
       QString thisTitle = thisCol.Name();
 
       if((int)thisTitle.length() > (int)thisCol.Width()) {
-        QString message = "Column header [" + thisTitle + "] is wider " +
+        std::string message = "Column header [" + thisTitle.toStdString() + "] is wider " +
                               "than the set width for column [" + toString((int)index) + "]";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -84,16 +86,16 @@ namespace Isis {
           thisTitle = " " + thisTitle;
         }
         else {
-          QString message = "Alignment is improperly set";
+          std::string message = "Alignment is improperly set";
           throw IException(IException::User, message, _FILEINFO_);
         }
         iteration++;
       }//end while
 
       p_cols.push_back(thisCol);
-      p_outfile << thisTitle;
+      p_outfile << thisTitle.toStdString();
       if(index < (cols.size() - 1)) {
-        p_outfile << p_delimiter;
+        p_outfile << p_delimiter.toStdString();
       }
     }//end for
     p_outfile << "\n";
@@ -110,7 +112,7 @@ namespace Isis {
     stringstream tempStream;
     tempStream.width(thisCol.Width());
     tempStream.fill(' ');
-    tempStream << item;
+    tempStream << item.toStdString();
     item = tempStream.str().c_str();
 
     if(p_curCol == 0) {
@@ -125,7 +127,7 @@ namespace Isis {
       item += "\n";
       p_curCol = 0;
     }
-    p_outfile << item;
+    p_outfile << item.toStdString();
   }
 
   /**
@@ -142,10 +144,10 @@ namespace Isis {
         Write((double)item);
         return;
       }
-      QString message = "Wrong data type for this Column";
+      std::string message = "Wrong data type for this Column";
       throw IException(IException::User, message, _FILEINFO_);
     }
-    QString thisItem(toString(item));
+    QString thisItem(QString::number(item));
     if(thisItem.length() > (int)thisCol.Width()) {
       thisItem = "*";
       while(thisItem.length() < (int)thisCol.Width()) {
@@ -161,7 +163,7 @@ namespace Isis {
     }
     else tempStream.setf(std::ios::right);
 
-    tempStream << thisItem;
+    tempStream << thisItem.toStdString();
     thisItem = tempStream.str().c_str();
 
     if(p_curCol == 0) {
@@ -176,7 +178,7 @@ namespace Isis {
       thisItem += "\n";
       p_curCol = 0;
     }
-    p_outfile << thisItem;
+    p_outfile << thisItem.toStdString();
   }
 
   /**
@@ -188,7 +190,7 @@ namespace Isis {
     Column thisCol = p_cols[p_curCol];
     if(thisCol.DataType() != Column::String &&
         thisCol.DataType() != Column::Pixel) {
-      QString message = "Wrong data type for this Column";
+      std::string message = "Wrong data type for this Column";
       throw IException(IException::User, message, _FILEINFO_);
     }
 
@@ -208,7 +210,7 @@ namespace Isis {
     }
     else tempStream.setf(std::ios::right);
 
-    tempStream << item;
+    tempStream << item.toStdString();
     item = tempStream.str().c_str();
 
     if(p_curCol == 0) {
@@ -223,7 +225,7 @@ namespace Isis {
       item += "\n";
       p_curCol = 0;
     }
-    p_outfile << item;
+    p_outfile << item.toStdString();
   }
 
   /**
@@ -235,7 +237,7 @@ namespace Isis {
     Column thisCol = p_cols[p_curCol];
     if(thisCol.DataType() != Column::Real &&
         thisCol.DataType() != Column::Pixel) {
-      QString message = "Wrong data type for this Column";
+      std::string message = "Wrong data type for this Column";
       throw IException(IException::User, message, _FILEINFO_);
     }
 
@@ -263,7 +265,7 @@ namespace Isis {
       }
     }
 
-    QString thisItem(toString(item));
+    QString thisItem(QString::number(item));
 
 
     if(thisCol.Alignment() == Column::Decimal) {
@@ -289,12 +291,12 @@ namespace Isis {
       stringstream b;
       b << std::showpoint
         << std::setprecision(thisCol.Precision())
-        << toDouble(tempString.join("."));
+        << tempString.join(".").toDouble();
 
       //if the rounding causes a rollover (i.e. the decimal portion is greater
       //than 0.95) increment the integer portion
-      if(toDouble(QString(b.str().c_str())) >= 1) {
-        intPart = toString(toInt(intPart) + 1);
+      if(QString(b.str().c_str()).toDouble() >= 1) {
+        intPart = QString::number(intPart.toInt() + 1);
       }
 
       //Put it back into an QString, for easier manipulation
@@ -317,7 +319,7 @@ namespace Isis {
     }
     else tempStream.setf(std::ios::right);
 
-    tempStream << thisItem;
+    tempStream << thisItem.toStdString();
     thisItem = tempStream.str().c_str();
 
     if(p_curCol == 0) {
@@ -340,7 +342,7 @@ namespace Isis {
       thisItem += "\n";
       p_curCol = 0;
     }
-    p_outfile << thisItem;
+    p_outfile << thisItem.toStdString();
 
   }
 

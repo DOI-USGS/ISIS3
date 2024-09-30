@@ -49,14 +49,14 @@ void pvlOut(Statistics stats1, Statistics stats2, QString name, int start,
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  Isis::FileName fromFile = ui.GetCubeName("FROM");
+  Isis::FileName fromFile = ui.GetCubeName("FROM").toStdString();
 
   Isis::Cube inputCube;
-  inputCube.open(fromFile.expanded());
+  inputCube.open(QString::fromStdString(fromFile.expanded()));
 
   //Check to make sure we got the cube properly
   if(!inputCube.isOpen()) {
-    QString msg = "Could not open FROM cube" + fromFile.expanded();
+    std::string msg = "Could not open FROM cube" + fromFile.expanded();
     throw IException(IException::User, msg, _FILEINFO_);
   }
   Process p;
@@ -78,7 +78,7 @@ void IsisMain() {
 
   int numSections = ui.GetInteger("SECTIONS");
   if(numSections > 9) {
-    QString msg = "You may have no more than 9 sections per side";
+    std::string msg = "You may have no more than 9 sections per side";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -157,7 +157,7 @@ void IsisMain() {
   // Write the results to the output file if the user specified one
   PvlObject leftSide("LeftSide"), rightSide("RightSide");
   for(int i = 0 ; i < numSections ; i++) {
-    QString sectionName = "Section" + toString(i + 1);
+    QString sectionName = "Section" + QString::number(i + 1);
     pvlOut(sections[i].first, //Stats to add to the left Object
            sections[i].second, //Stats to add to the right Object
            sectionName,    //Name for the new groups
@@ -193,34 +193,34 @@ void IsisMain() {
     outputPvl.addGroup(leftGroup);
     outputPvl.addGroup(rightGroup);
   }
-  outputPvl.write(ui.GetFileName("TO"));
+  outputPvl.write(ui.GetFileName("TO").toStdString());
 }
 
 void pvlOut(Statistics stats1, Statistics stats2, QString name, int start,
             int end, PvlObject *one, PvlObject *two) {
-  PvlGroup left(name);
-  left += PvlKeyword("StartLine", toString(start + 1));
-  left += PvlKeyword("EndLine", toString(end));
-  left += PvlKeyword("TotalPixels", toString(stats1.TotalPixels()));
-  left += PvlKeyword("ValidPixels", toString(stats1.ValidPixels()));
+  PvlGroup left(name.toStdString());
+  left += PvlKeyword("StartLine", Isis::toString(start + 1));
+  left += PvlKeyword("EndLine", Isis::toString(end));
+  left += PvlKeyword("TotalPixels", Isis::toString(stats1.TotalPixels()));
+  left += PvlKeyword("ValidPixels", Isis::toString(stats1.ValidPixels()));
   if(stats1.ValidPixels() > 0) {
-    left += PvlKeyword("Mean", toString(stats1.Average()));
-    left += PvlKeyword("StandardDeviation", toString(stats1.StandardDeviation()));
-    left += PvlKeyword("Minimum", toString(stats1.Minimum()));
-    left += PvlKeyword("Maximum", toString(stats1.Maximum()));
+    left += PvlKeyword("Mean", Isis::toString(stats1.Average()));
+    left += PvlKeyword("StandardDeviation", Isis::toString(stats1.StandardDeviation()));
+    left += PvlKeyword("Minimum", Isis::toString(stats1.Minimum()));
+    left += PvlKeyword("Maximum", Isis::toString(stats1.Maximum()));
   }
   one->addGroup(left);
 
-  PvlGroup right(name);
-  right += PvlKeyword("StartLine", toString(start + 1));
-  right += PvlKeyword("EndLine", toString(end));
-  right += PvlKeyword("TotalPixels", toString(stats2.TotalPixels()));
-  right += PvlKeyword("ValidPixels", toString(stats2.ValidPixels()));
+  PvlGroup right(name.toStdString());
+  right += PvlKeyword("StartLine", Isis::toString(start + 1));
+  right += PvlKeyword("EndLine", Isis::toString(end));
+  right += PvlKeyword("TotalPixels", Isis::toString(stats2.TotalPixels()));
+  right += PvlKeyword("ValidPixels", Isis::toString(stats2.ValidPixels()));
   if(stats2.ValidPixels() > 0) {
-    right += PvlKeyword("Mean", toString(stats2.Average()));
-    right += PvlKeyword("StandardDeviation", toString(stats2.StandardDeviation()));
-    right += PvlKeyword("Minimum", toString(stats2.Minimum()));
-    right += PvlKeyword("Maximum", toString(stats2.Maximum()));
+    right += PvlKeyword("Mean", Isis::toString(stats2.Average()));
+    right += PvlKeyword("StandardDeviation", Isis::toString(stats2.StandardDeviation()));
+    right += PvlKeyword("Minimum", Isis::toString(stats2.Minimum()));
+    right += PvlKeyword("Maximum", Isis::toString(stats2.Maximum()));
   }
   two->addGroup(right);
 }

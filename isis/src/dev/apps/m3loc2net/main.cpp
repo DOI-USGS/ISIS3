@@ -51,11 +51,11 @@ void IsisMain() {
 
   if (inputCube.label()->hasKeyword("TargetName", PvlObject::Traverse)) {
     PvlGroup inst = inputCube.label()->findGroup("Instrument", PvlObject::Traverse);
-    QString targetName = inst["TargetName"];
+    QString targetName = QString::fromStdString(inst["TargetName"]);
     cnet.SetTarget(targetName);
   }
   else {
-    QString msg = "Input cube does not have target.";
+    std::string msg = "Input cube does not have target.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 

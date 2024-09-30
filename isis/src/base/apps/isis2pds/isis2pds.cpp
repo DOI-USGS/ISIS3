@@ -1,5 +1,6 @@
 #include <QString>
 
+#include "Application.h"
 #include "Cube.h"
 #include "ExportDescription.h"
 #include "FileName.h"
@@ -99,8 +100,8 @@ namespace Isis{
 
       p.StandardPdsLabel(ProcessExportPds::Image);
 
-      FileName outFile(ui.GetFileName("TO", "img"));
-      QString outFileName(outFile.expanded());
+      FileName outFile(ui.GetFileName("TO", "img").toStdString());
+      QString outFileName(QString::fromStdString(outFile.expanded()));
       ofstream oCube(outFileName.toLatin1().data());
       p.OutputLabel(oCube);
       p.StartProcess(oCube);
@@ -112,16 +113,14 @@ namespace Isis{
 
       //Records what it did to the print.prt file
       PvlGroup results("DNs Used");
-      results += PvlKeyword("Null", toString(p.OutputNull()));
-      results += PvlKeyword("LRS", toString(p.OutputLrs()));
-      results += PvlKeyword("LIS", toString(p.OutputLis()));
-      results += PvlKeyword("HIS", toString(p.OutputHis()));
-      results += PvlKeyword("HRS", toString(p.OutputHrs()));
-      results += PvlKeyword("ValidMin", toString(min));
-      results += PvlKeyword("ValidMax", toString(max));
-      if (log){
-        log->addLogGroup(results);
-      }
+      results += PvlKeyword("Null", Isis::toString(p.OutputNull()));
+      results += PvlKeyword("LRS", Isis::toString(p.OutputLrs()));
+      results += PvlKeyword("LIS", Isis::toString(p.OutputLis()));
+      results += PvlKeyword("HIS", Isis::toString(p.OutputHis()));
+      results += PvlKeyword("HRS", Isis::toString(p.OutputHrs()));
+      results += PvlKeyword("ValidMin", Isis::toString(min));
+      results += PvlKeyword("ValidMax", Isis::toString(max));
+      Application::Log(results);
     }
     else {
       // Setup the process and set the input cube
@@ -131,13 +130,13 @@ namespace Isis{
 
       PvlObject *label= icube->label();
       if (!label->hasObject("IsisCube")) {
-        QString msg = "Input file [" + ui.GetCubeName("FROM") +
+        std::string msg = "Input file [" + ui.GetCubeName("FROM").toStdString() +
                       "] does not appear to be an ISIS cube.";
         throw  IException(IException::User, msg, _FILEINFO_);
       }
 
-      FileName outFile(ui.GetFileName("TO", "img"));
-      QString outFileName(outFile.expanded());
+      FileName outFile(ui.GetFileName("TO", "img").toStdString());
+      QString outFileName(QString::fromStdString(outFile.expanded()));
 
       if (ui.GetString("STRETCH") == "LINEAR") {
         if (ui.GetString("BITTYPE") != "32BIT") {
@@ -188,16 +187,14 @@ namespace Isis{
 
       // Records what it did to the print.prt file
       PvlGroup results("DNs Used");
-      results += PvlKeyword("Null", toString(process.OutputNull()));
-      results += PvlKeyword("LRS", toString(process.OutputLrs()));
-      results += PvlKeyword("LIS", toString(process.OutputLis()));
-      results += PvlKeyword("HIS", toString(process.OutputHis()));
-      results += PvlKeyword("HRS", toString(process.OutputHrs()));
-      results += PvlKeyword("ValidMin", toString(min));
-      results += PvlKeyword("ValidMax", toString(max));
-      if (log){
-        log->addLogGroup(results);
-      }
+      results += PvlKeyword("Null", Isis::toString(process.OutputNull()));
+      results += PvlKeyword("LRS", Isis::toString(process.OutputLrs()));
+      results += PvlKeyword("LIS", Isis::toString(process.OutputLis()));
+      results += PvlKeyword("HIS", Isis::toString(process.OutputHis()));
+      results += PvlKeyword("HRS", Isis::toString(process.OutputHrs()));
+      results += PvlKeyword("ValidMin", Isis::toString(min));
+      results += PvlKeyword("ValidMax", Isis::toString(max));
+      Application::Log(results);
 
       process.StandardPds4Label();
       process.WritePds4(outFileName);

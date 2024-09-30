@@ -2,6 +2,7 @@
 #include <set>
 
 #include "overlapstats.h"
+#include "Application.h"
 #include "SerialNumberList.h"
 #include "ImageOverlapSet.h"
 #include "ImageOverlap.h"
@@ -44,7 +45,7 @@ namespace Isis {
       for (int j = 0; j < currOverlap->Size(); j++) {
         QString currSerialNum = (*currOverlap)[j];
         if (!serialNumbers.hasSerialNumber(currSerialNum)) {
-          IString msg = "Found serial number [" + currSerialNum + "] in overlap "
+          IString msg = "Found serial number [" + currSerialNum.toStdString() + "] in overlap "
               "list that was not in the provided cube list. Please ensure that "
               "the cube list is the same one used to generate your overlap list "
               "file.";
@@ -111,7 +112,7 @@ namespace Isis {
         const geos::geom::MultiPolygon *mpLatLon = overlaps[index]->Polygon();
 
         // Construct a Projection for converting between Lon/Lat and X/Y
-        Pvl cubeLab(serialNumbers.fileName(0));
+        Pvl cubeLab(serialNumbers.fileName(0).toStdString());
 
         // Get empty mapping label
         Pvl maplab;
@@ -143,32 +144,32 @@ namespace Isis {
           if (full) {
             if (firstFullOutput) {
               output << "Overlap ID";
-              output << delim << "Thickness";
-              output << delim << pretty << "Area";
-              output << delim << pretty << pretty << "Image Count";
-              output << delim << "Serial Numbers in Overlap";
-              output << delim << "Image Files in Overlap";
+              output << delim.toStdString() << "Thickness";
+              output << delim.toStdString() << pretty.toStdString() << "Area";
+              output << delim.toStdString() << pretty.toStdString() << pretty.toStdString() << "Image Count";
+              output << delim.toStdString() << "Serial Numbers in Overlap";
+              output << delim.toStdString() << "Image Files in Overlap";
               output << endl;
               firstFullOutput = false;
             }
-            output << index << pretty;
-            output << delim << thicknessValue;
+            output << index << pretty.toStdString();
+            output << delim.toStdString() << thicknessValue;
             if (tab) {
-              output << delim << FormatString(areaValue, 18, 4);
+              output << delim.toStdString() << FormatString(areaValue, 18, 4).toStdString();
             }
             else {
-              output << delim << areaValue;
+              output << delim.toStdString() << areaValue;
             }
-            output << delim << overlaps[index]->Size() << pretty;
-            output << delim << (*overlaps[index])[0];
-            output << delim << serialNumbers.fileName((*overlaps[index])[0]);
+            output << delim.toStdString() << overlaps[index]->Size() << pretty.toStdString();
+            output << delim.toStdString() << (*overlaps[index])[0].toStdString();
+            output << delim.toStdString() << serialNumbers.fileName((*overlaps[index])[0]).toStdString();
             for (int sn = 1; sn < overlaps[index]->Size(); sn ++) {
               if (!singleLine) {
-                output << endl << pretty << delim << pretty << delim << pretty << delim;
-                output << pretty << pretty;
+                output << endl << pretty.toStdString() << delim.toStdString() << pretty.toStdString() << delim.toStdString() << pretty.toStdString() << delim.toStdString();
+                output << pretty.toStdString() << pretty.toStdString();
               }
-              output << delim << pretty << (*overlaps[index])[sn];
-              output << delim << serialNumbers.fileName((*overlaps[index])[sn]);
+              output << delim.toStdString() << pretty.toStdString() << (*overlaps[index])[sn].toStdString();
+              output << delim.toStdString() << serialNumbers.fileName((*overlaps[index])[sn]).toStdString();
             }
             output << endl;
           }
@@ -190,7 +191,7 @@ namespace Isis {
               else {
                 errors << ", ";
               }
-              errors << (*overlaps[index])[serNum];
+              errors << (*overlaps[index])[serNum].toStdString();
             }
 
             errors << endl;
@@ -206,10 +207,10 @@ namespace Isis {
 
     // Checks if there were overlaps to output results from
     if (overlapnum == 0) {
-      QString msg = "The overlap file [";
-      msg += FileName(ui.GetFileName("OVERLAPLIST")).name();
+      std::string msg = "The overlap file [";
+      msg += FileName(ui.GetFileName("OVERLAPLIST").toStdString()).name();
       msg += "] does not contain any overlaps across the provided cubes [";
-      msg += FileName(ui.GetFileName("FROMLIST")).name() + "]";
+      msg += FileName(ui.GetFileName("FROMLIST").toStdString()).name() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -217,34 +218,34 @@ namespace Isis {
     //Create and Log the BRIEF description
     PvlGroup brief("Results");
 
-    brief += PvlKeyword("ThicknessMinimum", toString(thickness.Minimum()));
-    brief += PvlKeyword("ThicknessMaximum", toString(thickness.Maximum()));
-    brief += PvlKeyword("ThicknessAverage", toString(thickness.Average()));
-    brief += PvlKeyword("ThicknessStandardDeviation", toString(thickness.StandardDeviation()));
-    brief += PvlKeyword("ThicknessVariance", toString(thickness.Variance()));
+    brief += PvlKeyword("ThicknessMinimum", Isis::toString(thickness.Minimum()));
+    brief += PvlKeyword("ThicknessMaximum", Isis::toString(thickness.Maximum()));
+    brief += PvlKeyword("ThicknessAverage", Isis::toString(thickness.Average()));
+    brief += PvlKeyword("ThicknessStandardDeviation", Isis::toString(thickness.StandardDeviation()));
+    brief += PvlKeyword("ThicknessVariance", Isis::toString(thickness.Variance()));
 
-    brief += PvlKeyword("AreaMinimum", toString(area.Minimum()));
-    brief += PvlKeyword("AreaMaximum", toString(area.Maximum()));
-    brief += PvlKeyword("AreaAverage", toString(area.Average()));
-    brief += PvlKeyword("AreaStandardDeviation", toString(area.StandardDeviation()));
-    brief += PvlKeyword("AreaVariance", toString(area.Variance()));
+    brief += PvlKeyword("AreaMinimum", Isis::toString(area.Minimum()));
+    brief += PvlKeyword("AreaMaximum", Isis::toString(area.Maximum()));
+    brief += PvlKeyword("AreaAverage", Isis::toString(area.Average()));
+    brief += PvlKeyword("AreaStandardDeviation", Isis::toString(area.StandardDeviation()));
+    brief += PvlKeyword("AreaVariance", Isis::toString(area.Variance()));
 
-    brief += PvlKeyword("ImageStackMinimum", toString(sncount.Minimum()));
-    brief += PvlKeyword("ImageStackMaximum", toString(sncount.Maximum()));
-    brief += PvlKeyword("ImageStackAverage", toString(sncount.Average()));
-    brief += PvlKeyword("ImageStackStandardDeviation", toString(sncount.StandardDeviation()));
-    brief += PvlKeyword("ImageStackVariance", toString(sncount.Variance()));
+    brief += PvlKeyword("ImageStackMinimum", Isis::toString(sncount.Minimum()));
+    brief += PvlKeyword("ImageStackMaximum", Isis::toString(sncount.Maximum()));
+    brief += PvlKeyword("ImageStackAverage", Isis::toString(sncount.Average()));
+    brief += PvlKeyword("ImageStackStandardDeviation", Isis::toString(sncount.StandardDeviation()));
+    brief += PvlKeyword("ImageStackVariance", Isis::toString(sncount.Variance()));
 
-    brief += PvlKeyword("PolygonCount", toString(overlaps.Size()));
+    brief += PvlKeyword("PolygonCount", Isis::toString(overlaps.Size()));
 
     // Add non-overlapping cubes to the output
     if (!nooverlap.empty()) {
       for (set<QString>::iterator itt = nooverlap.begin(); itt != nooverlap.end(); itt ++) {
-        brief += PvlKeyword("NoOverlap", serialNumbers.fileName(*itt));
+        brief += PvlKeyword("NoOverlap", serialNumbers.fileName(*itt).toStdString());
       }
     }
 
-    log->addLogGroup(brief);
+    Application::AppendAndLog(brief, log);
 
     //Log the ERRORS file
     if (ui.WasEntered("ERRORS")) {
@@ -258,9 +259,9 @@ namespace Isis {
     //Log error num in print.prt if there were errors
     if (errorNum > 0) {
       PvlGroup grp("OverlapStats");
-      PvlKeyword key("ErrorNumber", toString(errorNum));
+      PvlKeyword key("ErrorNumber", Isis::toString(errorNum));
       grp.addKeyword(key);
-      log->addLogGroup(grp);
+      Application::AppendAndLog(grp, log);
     }
 
     // Display FULL output
@@ -271,12 +272,12 @@ namespace Isis {
       outfile << output.str();
       outfile.close();
       if (outfile.fail()) {
-        IString msg = "Unable to write the statistics to [" + ui.GetFileName("TO") + "]";
+        IString msg = "Unable to write the statistics to [" + ui.GetFileName("TO").toStdString() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
 
-    log->addLogGroup(brief);
+    Application::AppendAndLog(brief, log);
   }
 
 
@@ -294,7 +295,7 @@ namespace Isis {
    */
   QString FormatString(double input, int head, int tail) {
 
-    QString result(toString(input));
+    QString result(QString::number(input));
 
     int point = result.indexOf(".");
     QString resultHead(result.mid(0, point));

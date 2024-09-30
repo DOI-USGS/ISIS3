@@ -92,8 +92,8 @@ namespace Isis {
     OpenCube(filename);
 
     //  Determine if a shift of the CCD exists in the definitions file
-    if(shift.hasGroup(jdata.ccdName)) {
-      PvlGroup &ccddef = shift.findGroup(jdata.ccdName, Pvl::Traverse);
+    if(shift.hasGroup(jdata.ccdName.toStdString())) {
+      PvlGroup &ccddef = shift.findGroup(jdata.ccdName.toStdString(), Pvl::Traverse);
       if(ccddef.hasKeyword("SampleOffset")) {
         jdata.sampOffset = (int) ccddef["SampleOffset"];
       }
@@ -116,8 +116,8 @@ namespace Isis {
     if(jdata.summing != other.summing) {
       ostringstream msg;
       msg << "Summing mode (" << jdata.summing
-          << ") in file " << fileName() << " is not equal to summing mode ("
-          << other.summing << ") in file " << cube.fileName() << endl;
+          << ") in file " << fileName().toStdString() << " is not equal to summing mode ("
+          << other.summing << ") in file " << cube.fileName().toStdString() << endl;
       throw IException(IException::User, msg.str(), _FILEINFO_);
     }
     return;
@@ -147,8 +147,8 @@ namespace Isis {
       sclk = sclk.highestVersion();
 
 //  Load the kernels
-      QString lsk = leapseconds.expanded();
-      QString sClock = sclk.expanded();
+      QString lsk = QString::fromStdString(leapseconds.expanded());
+      QString sClock = QString::fromStdString(sclk.expanded());
       NaifStatus::CheckErrors();
       furnsh_c(lsk.toLatin1().data());
       NaifStatus::CheckErrors();
@@ -186,7 +186,7 @@ namespace Isis {
           scs2e_c(-74999, scStartTimeString.toLatin1().data(), &jdata.obsStartTime);
           NaifStatus::CheckErrors();
         } catch (IException &e) {
-            QString message = "Start time of the image can not be determined.";
+            std::string message = "Start time of the image can not be determined.";
             throw IException(e, IException::User, message, _FILEINFO_);
         }
       }
@@ -236,7 +236,7 @@ namespace Isis {
     Isis::PvlGroup idinst;
     jdata.filename = fileName();
     Isis::PvlGroup &archive = labelPvl->findGroup("Archive", Isis::Pvl::Traverse);
-    jdata.productId = (QString) archive["ProductId"];
+    jdata.productId = QString::fromStdString(archive["ProductId"]);
 
     jdata.lines = lineCount();
     if(labelPvl->findObject("IsisCube").hasGroup("OriginalInstrument")) {
@@ -276,8 +276,8 @@ namespace Isis {
     }
     jdata.ccdName = Instrument::CCD_NAMES[jdata.cpmmNumber];
     jdata.dltCount = inst["DeltaLineTimerCount"];
-    jdata.UTCStartTime = (QString) inst["StartTime"];
-    jdata.scStartTime = (QString) inst["SpacecraftClockStartCount"];
+    jdata.UTCStartTime = QString::fromStdString(inst["StartTime"]);
+    jdata.scStartTime = QString::fromStdString(inst["SpacecraftClockStartCount"]);
 
     try {
       if(originst) {
@@ -292,7 +292,7 @@ namespace Isis {
       ostringstream msg;
       msg << "Summing mode (" << jdata.summing
           << ") is illegal (must be > 0) or CPMM number (" << jdata.cpmmNumber
-          << ") is invalid in file " << fileName() << endl;
+          << ") is invalid in file " << fileName().toStdString() << endl;
       throw IException(IException::User, msg.str(), _FILEINFO_);
     }
 
@@ -303,7 +303,7 @@ namespace Isis {
     if((jdata.channelNumber > 2) || (jdata.channelNumber < 0)) {
       ostringstream msg;
       msg << "Channel number (" << jdata.channelNumber
-          << ") is invalid (must be 0, 1 or 2) in file " << fileName()
+          << ") is invalid (must be 0, 1 or 2) in file " << fileName().toStdString()
           << endl;
       throw IException(IException::User, msg.str(), _FILEINFO_);
     }
@@ -333,7 +333,7 @@ namespace Isis {
 
     ostringstream msg;
     msg << "Invalid summing mode (" << summing << ") for file " <<
-        fileName() << std::endl;
+        fileName().toStdString() << std::endl;
     throw IException(IException::User, msg.str(), _FILEINFO_);
   }
 

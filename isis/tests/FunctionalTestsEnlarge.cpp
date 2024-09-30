@@ -12,7 +12,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/enlarge.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/enlarge.xml").expanded());
 
 TEST_F(SmallCube, FunctionalTestEnlargeDefaultParameters) {
   QVector<QString> args = {"to=" + tempDir.path()+"/output.cub"};

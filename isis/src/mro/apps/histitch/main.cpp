@@ -148,9 +148,9 @@ void IsisMain() {
   fromData[0].add = HiVector(icube1->lineCount(), 0.0);
 
   if(seamSize + skipSize > icube1->sampleCount()) {
-    QString msg = "SEAMSIZE [" + toString(seamSize) + "] + SKIP [" + toString(skipSize) + "] must ";
+    std::string msg = "SEAMSIZE [" + toString(seamSize) + "] + SKIP [" + toString(skipSize) + "] must ";
     msg += " be less than the number of samples [" + toString(icube1->sampleCount()) + "] in ";
-    msg += "[" + ui.GetAsString("FROM1") + "]";
+    msg += "[" + ui.GetAsString("FROM1").toStdString() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -158,7 +158,7 @@ void IsisMain() {
   PvlGroup &from1Instrument = icube1->group("INSTRUMENT");
   fromData[0].ChnNumber = from1Instrument["ChannelNumber"];
 
-  stitchedProductIds = (QString)from1Archive["ProductId"][0];
+  stitchedProductIds = QString::fromStdString(from1Archive["ProductId"][0]);
 
 //  Set initial conditions for one input file
   if(fromData[0].ChnNumber == 1) {
@@ -181,9 +181,9 @@ void IsisMain() {
     fromData[1].add = HiVector(icube2->lineCount(), 0.0);
 
     if(seamSize + skipSize > icube2->sampleCount()) {
-      QString msg = "SEAMSIZE [" + toString(seamSize) + "] + SKIP [" + toString(skipSize) + "] must ";
+      std::string msg = "SEAMSIZE [" + toString(seamSize) + "] + SKIP [" + toString(skipSize) + "] must ";
       msg += " be less than the number of samples [" + toString(icube2->sampleCount()) + " in ";
-      msg += "[" + ui.GetAsString("FROM2") + "]";
+      msg += "[" + ui.GetAsString("FROM2").toStdString() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -191,20 +191,20 @@ void IsisMain() {
     PvlGroup &from2Archive = icube2->group("ARCHIVE");
 
     //Make sure observation id's are the same
-    QString from1ObsId = from1Archive["ObservationId"];
-    QString from2ObsId = from2Archive["ObservationId"];
+    QString from1ObsId = QString::fromStdString(from1Archive["ObservationId"]);
+    QString from2ObsId = QString::fromStdString(from2Archive["ObservationId"]);
     if(from1ObsId != from2ObsId) {
-      QString msg = "The input files Observation Id's are not compatable";
+      std::string msg = "The input files Observation Id's are not compatable";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     stitchedProductIds = "(" + stitchedProductIds + ", " +
-                         (QString)from2Archive["ProductId"][0] + ")";
+                         QString::fromStdString(from2Archive["ProductId"][0]) + ")";
 
     PvlGroup &from2Instrument = icube2->group("INSTRUMENT");
 
     //Make sure CCD Id's are the same
-    QString from1CcdId = from1Instrument["CCDId"];
-    QString from2CcdId = from2Instrument["CCDId"];
+    QString from1CcdId = QString::fromStdString(from1Instrument["CCDId"]);
+    QString from2CcdId = QString::fromStdString(from2Instrument["CCDId"]);
     if(from1CcdId != from2CcdId) {
       string msg = "The input files CCD Id's are not compatable";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -242,16 +242,16 @@ void IsisMain() {
   // Set StitchedChannels and Stitched ProductIds keywords
   if(ui.WasEntered("FROM2")) {
     InstrumentOut += PvlKeyword("StitchedChannels", "(0,1)");
-    InstrumentOut += PvlKeyword("StitchedProductIds", stitchedProductIds);
+    InstrumentOut += PvlKeyword("StitchedProductIds", stitchedProductIds.toStdString());
   }
   else {
-    InstrumentOut += PvlKeyword("StitchedChannels", toString(fromData[0].ChnNumber));
-    InstrumentOut += PvlKeyword("StitchedProductIds", stitchedProductIds);
+    InstrumentOut += PvlKeyword("StitchedChannels", Isis::toString(fromData[0].ChnNumber));
+    InstrumentOut += PvlKeyword("StitchedProductIds", stitchedProductIds.toStdString());
   }
 
   //  Do balance correction
   PvlGroup results("Results");
-  results += PvlKeyword("Balance", balance);
+  results += PvlKeyword("Balance", balance.toStdString());
   if((balance == "TRUE") || (balance == "EQUALIZE")) {
     ProcessByLine pAvg;
 
@@ -293,15 +293,15 @@ void IsisMain() {
             fromData[ch0Index].mult = coeff;
           }
         }
-        results += PvlKeyword("TruthChannel", toString(hiChannel));
-        results += PvlKeyword("BalanceRatio", toString(coeff));
+        results += PvlKeyword("TruthChannel", Isis::toString(hiChannel));
+        results += PvlKeyword("BalanceRatio", Isis::toString(coeff));
       }
       else {
         //  Store off original averages for table
         HiVector ch0_org = f0LineAvg;
         HiVector ch1_org = f1LineAvg;
 
-        results += PvlKeyword("FilterWidth", toString(filterWidth));
+        results += PvlKeyword("FilterWidth", Isis::toString(filterWidth));
         if(filterWidth > 0) {
           f0LineAvg = filter(f0LineAvg, filterWidth);
           f1LineAvg = filter(f1LineAvg, filterWidth);
@@ -311,13 +311,13 @@ void IsisMain() {
         if(fillNull) {
           int nfilled;
           f0LineAvg = filler(f0LineAvg, nfilled);
-          results += PvlKeyword("Channel0Filled", toString(nfilled));
+          results += PvlKeyword("Channel0Filled", Isis::toString(nfilled));
           f1LineAvg = filler(f1LineAvg, nfilled);
-          results += PvlKeyword("Channel1Filled", toString(nfilled));
+          results += PvlKeyword("Channel1Filled", Isis::toString(nfilled));
         }
 
-        results += PvlKeyword("TruthChannel", toString(hiChannel));
-        results += PvlKeyword("Operator", fixop);
+        results += PvlKeyword("TruthChannel", Isis::toString(hiChannel));
+        results += PvlKeyword("Operator", fixop.toStdString());
         int nunfilled(0);
         HiVector ch0_fixed(icube1->lineCount(), 1.0);
         HiVector ch1_fixed(icube1->lineCount(), 1.0);
@@ -343,7 +343,7 @@ void IsisMain() {
             ch1_fixed = 0.0;
           }
         }
-        results += PvlKeyword("UnFilled", toString(nunfilled));
+        results += PvlKeyword("UnFilled", Isis::toString(nunfilled));
 
         //  Add a table to the output file of the data values
         TableField f1("Channel1Original", Isis::TableField::Double);

@@ -53,18 +53,18 @@ namespace Isis {
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // SensorId = S (VNIR), = L (IR) = J (JOINT)
-    QString sensor = (QString) inst ["SensorId"];
+    QString sensor = QString::fromStdString(inst ["SensorId"]);
 
     // Prepare instrument code
-    QString ikCode(toString(naifIkCode()));
+    QString ikCode(QString::number(naifIkCode()));
 
     // Set Frame mounting.  Same for both (VNIR, IR) detectors
     SetFocalLength();
     SetPixelPitch();
 
     // Get the start and end time in et
-    double etStart = getEtTime((QString) inst ["SpacecraftClockStartCount"]);
-    double etStop  = getEtTime((QString) inst ["SpacecraftClockStopCount"]);
+    double etStart = getEtTime(QString::fromStdString(inst ["SpacecraftClockStartCount"]));
+    double etStop  = getEtTime(QString::fromStdString(inst ["SpacecraftClockStopCount"]));
 
 
     //  Compute the exposure time of the first line and the line rate.  This

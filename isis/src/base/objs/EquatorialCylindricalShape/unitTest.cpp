@@ -58,8 +58,8 @@ int main() {
 
     EquatorialCylindricalShape shape(&targ, pvl);
 
-    cout << "Shape name is " << shape.name() << endl;
-    cout << "Shape is DEM type? " << toString(shape.isDEM()) << endl;
+    cout << "Shape name is " << shape.name().toStdString() << endl;
+    cout << "Shape is DEM type? " << Isis::toString((bool)shape.isDEM()) << endl;
 
     cout << endl << "Testing method intersectSurface..." << endl; 
     cout << "  Do we have an intersection? " << shape.hasIntersection() << endl;
@@ -113,7 +113,7 @@ int main() {
   }
   catch (IException &e) {
     cout << endl << endl;
-    QString msg = "**************** UNIT TEST FAILED! **************** ";
+    std::string msg = "**************** UNIT TEST FAILED! **************** ";
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
 }

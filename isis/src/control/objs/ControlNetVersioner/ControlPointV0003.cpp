@@ -95,12 +95,12 @@ namespace Isis {
       m_pointData->set_type(ControlPointFileEntryV0002::Free);
     }
     else {
-      QString msg = "Invalid ControlPoint type [" + pointObject["PointType"][0] + "].";
+      std::string msg = "Invalid ControlPoint type [" + pointObject["PointType"][0] + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (pointObject.hasKeyword("AprioriXYZSource")) {
-      QString source = pointObject["AprioriXYZSource"][0];
+      QString source = QString::fromStdString(pointObject["AprioriXYZSource"][0]);
 
       if (source == "None") {
         m_pointData->set_apriorisurfpointsource(ControlPointFileEntryV0002::None);
@@ -121,13 +121,13 @@ namespace Isis {
         m_pointData->set_apriorisurfpointsource(ControlPointFileEntryV0002::BundleSolution);
       }
       else {
-        QString msg = "Invalid AprioriXYZSource [" + source + "]";
+        std::string msg = "Invalid AprioriXYZSource [" + source.toStdString() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
     if (pointObject.hasKeyword("AprioriRadiusSource")) {
-      QString source = pointObject["AprioriRadiusSource"][0];
+      QString source = QString::fromStdString(pointObject["AprioriRadiusSource"][0]);
 
       if (source == "None") {
         m_pointData->set_aprioriradiussource(ControlPointFileEntryV0002::None);
@@ -148,7 +148,7 @@ namespace Isis {
         m_pointData->set_aprioriradiussource(ControlPointFileEntryV0002::BundleSolution);
       }
       else {
-        QString msg = "Invalid AprioriRadiusSource, [" + source + "]";
+        std::string msg = "Invalid AprioriRadiusSource, [" + source.toStdString() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -157,23 +157,23 @@ namespace Isis {
     if (pointObject.hasKeyword("AprioriCovarianceMatrix")) {
       PvlKeyword &matrix = pointObject["AprioriCovarianceMatrix"];
 
-      m_pointData->add_aprioricovar(toDouble(matrix[0]));
-      m_pointData->add_aprioricovar(toDouble(matrix[1]));
-      m_pointData->add_aprioricovar(toDouble(matrix[2]));
-      m_pointData->add_aprioricovar(toDouble(matrix[3]));
-      m_pointData->add_aprioricovar(toDouble(matrix[4]));
-      m_pointData->add_aprioricovar(toDouble(matrix[5]));
+      m_pointData->add_aprioricovar(Isis::toDouble(matrix[0]));
+      m_pointData->add_aprioricovar(Isis::toDouble(matrix[1]));
+      m_pointData->add_aprioricovar(Isis::toDouble(matrix[2]));
+      m_pointData->add_aprioricovar(Isis::toDouble(matrix[3]));
+      m_pointData->add_aprioricovar(Isis::toDouble(matrix[4]));
+      m_pointData->add_aprioricovar(Isis::toDouble(matrix[5]));
     }
 
     if (pointObject.hasKeyword("AdjustedCovarianceMatrix")) {
       PvlKeyword &matrix = pointObject["AdjustedCovarianceMatrix"];
 
-      m_pointData->add_adjustedcovar(toDouble(matrix[0]));
-      m_pointData->add_adjustedcovar(toDouble(matrix[1]));
-      m_pointData->add_adjustedcovar(toDouble(matrix[2]));
-      m_pointData->add_adjustedcovar(toDouble(matrix[3]));
-      m_pointData->add_adjustedcovar(toDouble(matrix[4]));
-      m_pointData->add_adjustedcovar(toDouble(matrix[5]));
+      m_pointData->add_adjustedcovar(Isis::toDouble(matrix[0]));
+      m_pointData->add_adjustedcovar(Isis::toDouble(matrix[1]));
+      m_pointData->add_adjustedcovar(Isis::toDouble(matrix[2]));
+      m_pointData->add_adjustedcovar(Isis::toDouble(matrix[3]));
+      m_pointData->add_adjustedcovar(Isis::toDouble(matrix[4]));
+      m_pointData->add_adjustedcovar(Isis::toDouble(matrix[5]));
     }
 
     //  Process Measures
@@ -214,13 +214,13 @@ namespace Isis {
            measure, &ControlPointFileEntryV0002_Measure::set_linesigma);
 
       if (group.hasKeyword("Reference")) {
-        if (group["Reference"][0].toLower() == "true") {
+        if (QString::fromStdString(group["Reference"][0]).toLower() == "true") {
           m_pointData->set_referenceindex(groupIndex);
         }
         group.deleteKeyword("Reference");
       }
 
-      QString type = group["MeasureType"][0].toLower();
+      QString type = QString::fromStdString(group["MeasureType"][0]).toLower();
       if (type == "candidate") {
         measure.set_type(ControlPointFileEntryV0002_Measure::Candidate);
       }
@@ -235,7 +235,7 @@ namespace Isis {
       }
       else {
         throw IException(IException::Io,
-                         "Unknown measure type [" + type + "]",
+                         "Unknown measure type [" + type.toStdString() + "]",
                          _FILEINFO_);
       }
       group.deleteKeyword("MeasureType");
@@ -243,7 +243,7 @@ namespace Isis {
       for (int key = 0; key < group.keywords(); key++) {
         ControlMeasureLogData interpreter(group[key]);
         if (!interpreter.IsValid()) {
-          QString msg = "Unhandled or duplicate keywords in control measure ["
+          std::string msg = "Unhandled or duplicate keywords in control measure ["
                         + group[key].name() + "]";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
@@ -261,7 +261,7 @@ namespace Isis {
     }
 
     if (!m_pointData->IsInitialized()) {
-      QString msg = "There is missing required information in the control "
+      std::string msg = "There is missing required information in the control "
                     "points or measures";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -277,12 +277,12 @@ namespace Isis {
       : m_pointData(new ControlPointFileEntryV0002) {
     QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> oldPointData = oldPoint.pointData();
     if (!oldPointData) {
-      QString msg = "Version 2 control point is missing point data.";
+      std::string msg = "Version 2 control point is missing point data.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     QSharedPointer<ControlNetLogDataProtoV0001_Point> oldLogData = oldPoint.logData();
     if (!oldLogData) {
-      QString msg = "Version 2 control point is missing measure log data.";
+      std::string msg = "Version 2 control point is missing measure log data.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -356,7 +356,7 @@ namespace Isis {
         m_pointData->set_type(ControlPointFileEntryV0002::Free);
       }
       else {
-        QString msg = "Invalid ControlPoint type.";
+        std::string msg = "Invalid ControlPoint type.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -383,7 +383,7 @@ namespace Isis {
         m_pointData->set_apriorisurfpointsource(ControlPointFileEntryV0002::BundleSolution);
       }
       else {
-        QString msg = "Invalid ControlPoint apriori surface point source.";
+        std::string msg = "Invalid ControlPoint apriori surface point source.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -410,7 +410,7 @@ namespace Isis {
         m_pointData->set_aprioriradiussource(ControlPointFileEntryV0002::BundleSolution);
       }
       else {
-        QString msg = "Invalid AprioriRadiusSource.";
+        std::string msg = "Invalid AprioriRadiusSource.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -513,7 +513,7 @@ namespace Isis {
           newMeasure->set_type(ControlPointFileEntryV0002_Measure_MeasureType_RegisteredSubPixel);
         }
         else {
-          QString msg = "Invalid measure type";
+          std::string msg = "Invalid measure type";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
@@ -534,7 +534,7 @@ namespace Isis {
 
         // Check that all the required fields in the measure are filled
         if ( !newMeasure->IsInitialized() ) {
-          QString msg = "Measure file entry at index [" + toString(i)
+          std::string msg = "Measure file entry at index [" + toString(i)
                         + "] is missing required fields.";
           throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -543,7 +543,7 @@ namespace Isis {
 
     // Check that all of the required fields in the point are filled
     if ( !m_pointData->IsInitialized() ) {
-      QString msg = "Control point file entry is missing required fields.";
+      std::string msg = "Control point file entry is missing required fields.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -586,12 +586,12 @@ namespace Isis {
                                QSharedPointer<ControlPointFileEntryV0002> point,
                                void (ControlPointFileEntryV0002::*setter)(bool)) {
 
-    if (!container.hasKeyword(keyName)) {
+    if (!container.hasKeyword(keyName.toStdString())) {
       return;
     }
 
-    QString value = container[keyName][0];
-    container.deleteKeyword(keyName);
+    QString value = QString::fromStdString(container[keyName.toStdString()][0]);
+    container.deleteKeyword(keyName.toStdString());
     value = value.toLower();
 
     if (value == "true" || value == "yes") {
@@ -619,12 +619,12 @@ namespace Isis {
                                QSharedPointer<ControlPointFileEntryV0002> point,
                                void (ControlPointFileEntryV0002::*setter)(double)) {
 
-    if (!container.hasKeyword(keyName)) {
+    if (!container.hasKeyword(keyName.toStdString())) {
       return;
     }
 
-    double value = toDouble(container[keyName][0]);
-    container.deleteKeyword(keyName);
+    double value = Isis::toDouble(container[keyName.toStdString()][0]);
+    container.deleteKeyword(keyName.toStdString());
     (point.data()->*setter)(value);
   }
 
@@ -648,12 +648,12 @@ namespace Isis {
                                QSharedPointer<ControlPointFileEntryV0002> point,
                                void (ControlPointFileEntryV0002::*setter)(const std::string&)) {
 
-    if (!container.hasKeyword(keyName)) {
+    if (!container.hasKeyword(keyName.toStdString())) {
       return;
     }
 
-    QString value = container[keyName][0];
-    container.deleteKeyword(keyName);
+    QString value = QString::fromStdString(container[keyName.toStdString()][0]);
+    container.deleteKeyword(keyName.toStdString());
     (point.data()->*setter)(value.toLatin1().data());
   }
 
@@ -677,12 +677,12 @@ namespace Isis {
                                ControlPointFileEntryV0002_Measure &measure,
                                void (ControlPointFileEntryV0002_Measure::*setter)(bool)) {
 
-    if (!container.hasKeyword(keyName)) {
+    if (!container.hasKeyword(keyName.toStdString())) {
       return;
     }
 
-    QString value = container[keyName][0];
-    container.deleteKeyword(keyName);
+    QString value = QString::fromStdString(container[keyName.toStdString()][0]);
+    container.deleteKeyword(keyName.toStdString());
     value = value.toLower();
 
     if (value == "true" || value == "yes") {
@@ -710,12 +710,12 @@ namespace Isis {
                                ControlPointFileEntryV0002_Measure &measure,
                                void (ControlPointFileEntryV0002_Measure::*setter)(double)) {
 
-    if (!container.hasKeyword(keyName)) {
+    if (!container.hasKeyword(keyName.toStdString())) {
       return;
     }
 
-    double value = toDouble(container[keyName][0]);
-    container.deleteKeyword(keyName);
+    double value = Isis::toDouble(container[keyName.toStdString()][0]);
+    container.deleteKeyword(keyName.toStdString());
     (measure.*setter)(value);
   }
 
@@ -740,12 +740,12 @@ namespace Isis {
                                void (ControlPointFileEntryV0002_Measure::*setter)
                                       (const std::string &)) {
 
-    if (!container.hasKeyword(keyName)) {
+    if (!container.hasKeyword(keyName.toStdString())) {
       return;
     }
 
-    QString value = container[keyName][0];
-    container.deleteKeyword(keyName);
+    QString value = QString::fromStdString(container[keyName.toStdString()][0]);
+    container.deleteKeyword(keyName.toStdString());
     (measure.*setter)(value.toLatin1().data());
   }
 }

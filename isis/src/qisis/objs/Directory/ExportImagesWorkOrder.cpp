@@ -157,7 +157,7 @@ namespace Isis {
     QThreadPool::globalInstance()->reserveThread();
 
     // Get the errors that occurred during the mapped in order to report them in postSyncRedo
-    m_warning = functor.errors().toString();
+    m_warning = QString::fromStdString(functor.errors().toString());
   }
 
 
@@ -216,7 +216,7 @@ namespace Isis {
   void *ExportImagesWorkOrder::ProjectImageExportFunctor::operator()(Image * const &imageToExport) {
     try {
       FileName outputFileName =
-          m_destination + "/" + FileName(imageToExport->fileName()).baseName();
+          m_destination.toStdString() + "/" + FileName(imageToExport->fileName().toStdString()).baseName();
 
       // Copy the image, free the copy from memory because we don't need it.
       delete imageToExport->cube()->copy(outputFileName, CubeAttributeOutput());
@@ -246,8 +246,7 @@ namespace Isis {
 
     if (*m_numErrors != 0) {
       result.append(
-          IException(IException::Unknown,
-                     tr("Failed to export [%1] images").arg(*m_numErrors),
+          IException(IException::Unknown,"Failed to export [" + Isis::toString(*m_numErrors) + "] images",
                      _FILEINFO_));
     }
 

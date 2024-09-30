@@ -27,14 +27,14 @@ namespace Isis {
 
     void hyb2onc2isis(UserInterface &ui) {
         ProcessImportFits importFits;
-        importFits.setFitsFile(FileName(ui.GetFileName("FROM")));
+        importFits.setFitsFile(FileName(ui.GetFileName("FROM").toStdString()));
         importFits.setProcessFileStructure(0);
 
         CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
         Cube *outputCube = importFits.SetOutputCube(ui.GetCubeName("TO"), att);
 
         // Get the directory where the Hayabusa translation tables are.
-        QString transDir = "$ISISROOT/appdata/translations/";
+        std::string transDir = "$ISISROOT/appdata/translations/";
 
         // Create a PVL to store the translated labels in
         Pvl outputLabel;
@@ -47,7 +47,7 @@ namespace Isis {
             fitsLabel.addGroup(importFits.extraFitsLabel(0));
         }
         catch (IException &e) {
-            QString msg = "Input file [" + FileName(ui.GetFileName("FROM")).expanded() +
+            std::string msg = "Input file [" + FileName(ui.GetFileName("FROM").toStdString()).expanded() +
                         "] does not appear to be a Hayabusa2/ONC label file.";
             throw IException(e, IException::Unknown, msg, _FILEINFO_);
         }
@@ -55,45 +55,45 @@ namespace Isis {
         QString instid;
         QString missid;
         try {
-            instid = fitsLabel.findGroup("FitsLabels").findKeyword("INSTRUME")[0];
-            missid = fitsLabel.findGroup("FitsLabels").findKeyword ("SPCECRFT")[0];
+            instid = QString::fromStdString(fitsLabel.findGroup("FitsLabels").findKeyword("INSTRUME")[0]);
+            missid = QString::fromStdString(fitsLabel.findGroup("FitsLabels").findKeyword ("SPCECRFT")[0]);
         }
         catch (IException &e) {
-            QString msg = "Unable to read instrument ID, [INSTRUME], or spacecraft ID, [SPCECRFT], "
-                        "from input file [" + FileName(ui.GetFileName("FROM")).expanded() + "]";
+            std::string msg = "Unable to read instrument ID, [INSTRUME], or spacecraft ID, [SPCECRFT], "
+                        "from input file [" + FileName(ui.GetFileName("FROM").toStdString()).expanded() + "]";
             throw IException(e, IException::Io,msg, _FILEINFO_);
         }
 
         missid = missid.simplified().trimmed();
         if ((QString::compare(missid, "HAYABUSA2", Qt::CaseInsensitive) != 0) && (QString::compare(missid, "HAYABUSA-2", Qt::CaseInsensitive) != 0)) {
-            QString msg = "Input file [" + FileName(ui.GetFileName("FROM")).expanded() +
+            std::string msg = "Input file [" + FileName(ui.GetFileName("FROM").toStdString()).expanded() +
                         "] does not appear to be a Hayabusa2 label file.";
             throw IException(IException::Unknown, msg, _FILEINFO_);
         }
         instid = instid.simplified().trimmed();
         if (QString::compare(instid, "Optical Navigation Camera", Qt::CaseInsensitive) != 0) {
-            QString msg = "Input file [" + FileName(ui.GetFileName("FROM")).expanded() +
+            std::string msg = "Input file [" + FileName(ui.GetFileName("FROM").toStdString()).expanded() +
                         "] does not appear to be a Hayabusa2/ONC label file.";
             throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         // Translate the Instrument group
         FileName transFile(transDir + "Hayabusa2OncInstrument.trn");
-        PvlToPvlTranslationManager instrumentXlater (fitsLabel, transFile.expanded());
+        PvlToPvlTranslationManager instrumentXlater (fitsLabel, QString::fromStdString(transFile.expanded()));
         instrumentXlater.Auto(outputLabel);
 
         //  Update target if user specifies it
         PvlGroup &instGrp = outputLabel.findGroup("Instrument",Pvl::Traverse);
         QString target;
         if (ui.WasEntered("TARGET")) {
-            instGrp["TargetName"] = ui.GetString("TARGET");
+            instGrp["TargetName"] = ui.GetString("TARGET").toStdString();
         }
         instGrp["ExposureDuration"].setUnits("seconds");
         outputCube->putGroup(instGrp);
 
         // Translate the BandBin group
         transFile = transDir + "Hayabusa2OncBandBin.trn";
-        PvlToPvlTranslationManager bandBinXlater (fitsLabel, transFile.expanded());
+        PvlToPvlTranslationManager bandBinXlater (fitsLabel, QString::fromStdString(transFile.expanded()));
         bandBinXlater.Auto(outputLabel);
         PvlGroup &bandGrp = outputLabel.findGroup("BandBin",Pvl::Traverse);
         if (bandGrp.hasKeyword("Width")) { // if width exists, then so must center
@@ -104,22 +104,22 @@ namespace Isis {
 
         // Translate the Archive group
         transFile = transDir + "Hayabusa2OncArchive.trn";
-        PvlToPvlTranslationManager archiveXlater (fitsLabel, transFile.expanded());
+        PvlToPvlTranslationManager archiveXlater (fitsLabel, QString::fromStdString(transFile.expanded()));
         archiveXlater.Auto(outputLabel);
         PvlGroup &archGrp = outputLabel.findGroup("Archive", Pvl::Traverse);
-        QString source = archGrp.findKeyword("SourceProductId")[0];
+        std::string source = archGrp.findKeyword("SourceProductId")[0];
         archGrp["SourceProductId"].setValue(FileName(source).baseName());
 
         //  Create YearDoy keyword in Archive group
-        iTime stime(outputLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
-        PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
+        iTime stime(QString::fromStdString(outputLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]));
+        PvlKeyword yeardoy("YearDoy", Isis::toString(stime.Year()*1000 + stime.DayOfYear()));
         archGrp.addKeyword(yeardoy);
         outputCube->putGroup(archGrp);
 
 
         // Create a Kernels group
         transFile = transDir + "Hayabusa2OncKernels.trn";
-        PvlToPvlTranslationManager kernelsXlater(fitsLabel, transFile.expanded());
+        PvlToPvlTranslationManager kernelsXlater(fitsLabel, QString::fromStdString(transFile.expanded()));
         kernelsXlater.Auto(outputLabel);
         outputCube->putGroup(outputLabel.findGroup("Kernels", Pvl::Traverse));
 

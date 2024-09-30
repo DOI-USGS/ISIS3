@@ -23,17 +23,17 @@ namespace Isis{
   void lo2isis(UserInterface &ui) {
     ProcessImportPds p;
     Pvl label;
-    FileName in = ui.GetCubeName("FROM");
+    FileName in = ui.GetCubeName("FROM").toStdString();
 
     //Checks if in file is rdr
     label = in.expanded();
     if(label.hasObject("IMAGE_MAP_PROJECTION")) {
-      QString msg = "[" + in.name() + "] appears to be an rdr file.";
+      std::string msg = "[" + in.name() + "] appears to be an rdr file.";
       msg += " Use pds2isis.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    p.SetPdsFile(in.expanded(), "", label);
+    p.SetPdsFile(QString::fromStdString(in.expanded()), "", label);
     // Segfault here
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), att);
@@ -47,7 +47,7 @@ namespace Isis{
   void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
 
     // Transfer the instrument group to the output cube
-    QString transDir = "$ISISROOT/appdata/translations/";
+    std::string transDir = "$ISISROOT/appdata/translations/";
     Pvl inputLabel(labelFile.expanded());
     FileName transFile;
     FileName bandBinTransFile;
@@ -55,7 +55,7 @@ namespace Isis{
     bool hasFiducial = false;
     // Check to see if file is PDS
     if(inputLabel.hasKeyword("PDS_VERSION_ID", Pvl::None)) {
-      QString pdsVersion = inputLabel.findKeyword("PDS_VERSION_ID", Pvl::None)[0];
+      QString pdsVersion = QString::fromStdString(inputLabel.findKeyword("PDS_VERSION_ID", Pvl::None)[0]);
 
       if(pdsVersion == "PDS3") {
         if(inputLabel.hasKeyword("LO:FIDUCIAL_ID", Pvl::Traverse)) {
@@ -66,13 +66,13 @@ namespace Isis{
           bandBinTransFile = transDir + "LoPdsBoresightImport.trn";
         }
         else {
-          QString msg = "[" + labelFile.name() + "] does not contain boresight or fiducial information";
+          std::string msg = "[" + labelFile.name() + "] does not contain boresight or fiducial information";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
       else {
-        QString msg = "[" + labelFile.name() + "] contains unknown PDS version [" +
-                     pdsVersion + "]";
+        std::string msg = "[" + labelFile.name() + "] contains unknown PDS version [" +
+                     pdsVersion.toStdString() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -86,30 +86,30 @@ namespace Isis{
         bandBinTransFile = transDir + "LoIsis2BoresightImport.trn";
       }
       else {
-        QString msg = "[" + labelFile.name() + "] does not contain boresight or fiducial information";
+        std::string msg = "[" + labelFile.name() + "] does not contain boresight or fiducial information";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
     transFile = transDir + "LoGeneralImport.trn";
     // Get the translation manager ready
-    PvlToPvlTranslationManager commonlabelXlater(inputLabel, transFile.expanded());
+    PvlToPvlTranslationManager commonlabelXlater(inputLabel, QString::fromStdString(transFile.expanded()));
     // Pvl outputLabels;
     Pvl *outputLabel = ocube->label();
     commonlabelXlater.Auto(*(outputLabel));
 
-    PvlToPvlTranslationManager labelXlater(inputLabel, bandBinTransFile.expanded());
+    PvlToPvlTranslationManager labelXlater(inputLabel, QString::fromStdString(bandBinTransFile.expanded()));
     labelXlater.Auto(*(outputLabel));
 
     PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
 
     //Creates FiducialCoordinateMicron with the proper units
     if(!inputLabel.hasKeyword("LO:BORESIGHT_SAMPLE", Pvl::Traverse)) {
-      QString fcm = (QString) inst.findKeyword("FiducialCoordinateMicron");
+      QString fcm = QString::fromStdString(inst.findKeyword("FiducialCoordinateMicron"));
       QString fcmUnits = fcm;
       fcmUnits.remove(QRegExp("^[0-9.]*"));
       fcm.remove(QRegExp("[a-zA-Z]*$"));
-      inst.findKeyword("FiducialCoordinateMicron").setValue(fcm, fcmUnits);
+      inst.findKeyword("FiducialCoordinateMicron").setValue(fcm.toStdString(), fcmUnits.toStdString());
     }
 
     // High Resolution & Fiducial Medium Case
@@ -143,8 +143,8 @@ namespace Isis{
       //What needs to be done if it contains Boresight info
     }
 
-    QString instrumentID = inst.findKeyword("InstrumentId");
-    QString spacecraftName = inst.findKeyword("SpacecraftName");
+    QString instrumentID = QString::fromStdString(inst.findKeyword("InstrumentId"));
+    QString spacecraftName = QString::fromStdString(inst.findKeyword("SpacecraftName"));
 
     //Determines the NaifFrameCode
     PvlGroup kerns("Kernels");
@@ -167,14 +167,14 @@ namespace Isis{
     }
 
     //Create subframe and frame keywords
-    QString imgNumber = (QString) inst.findKeyword("ImageNumber");
-    int subFrame = toInt(imgNumber.mid(5));
+    QString imgNumber = QString::fromStdString(inst.findKeyword("ImageNumber"));
+    int subFrame = imgNumber.mid(5).toInt();
 
-    inst.addKeyword(PvlKeyword("SubFrame", toString(subFrame)));
+    inst.addKeyword(PvlKeyword("SubFrame", Isis::toString(subFrame)));
     //ImageNumber is auto translated, and no longer needed
     inst.deleteKeyword("ImageNumber");
 
-    kerns += PvlKeyword("NaifFrameCode", frameCode);
+    kerns += PvlKeyword("NaifFrameCode", frameCode.toStdString());
     outputLabel->findObject("IsisCube").addGroup(kerns);
 
     return;

@@ -48,7 +48,7 @@ void IsisMain() {
     double rad = ui.GetDouble("RINGRADIUS");
     double ringLongitude = ui.GetDouble("RINGLONGITUDE");
 
-    IString coordsys = ui.GetString("COORDSYS");
+    IString coordsys = ui.GetString("COORDSYS").toStdString();
     coordsys.UpCase();
 
     // All of these ifs will finish by setting the ground in the projection,
@@ -67,11 +67,11 @@ void IsisMain() {
 
     // Use the mapping group from a given file
     else if(coordsys == "MAP") {
-      FileName mapFile = ui.GetFileName("MAP");
+      FileName mapFile = ui.GetFileName("MAP").toStdString();
 
       // Does it exist?
       if(!mapFile.fileExists()) {
-        QString msg = "Filename [" + ui.GetFileName("MAP") + "] does not exist";
+        std::string msg = "Filename [" + ui.GetFileName("MAP").toStdString() + "] does not exist";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -130,31 +130,31 @@ void IsisMain() {
   if(proj->IsGood()) {
     PvlGroup results("Results");
     results += PvlKeyword("Filename",
-                          FileName(ui.GetCubeName("FROM")).expanded());
-    results += PvlKeyword("Sample", toString(proj->WorldX()));
-    results += PvlKeyword("Line", toString(proj->WorldY()));
+                          FileName(ui.GetCubeName("FROM").toStdString()).expanded());
+    results += PvlKeyword("Sample", Isis::toString(proj->WorldX()));
+    results += PvlKeyword("Line", Isis::toString(proj->WorldY()));
     results += PvlKeyword("PixelValue", PixelToString(b[0]));
-    results += PvlKeyword("X", toString(proj->XCoord()));
-    results += PvlKeyword("Y", toString(proj->YCoord()));
+    results += PvlKeyword("X", Isis::toString(proj->XCoord()));
+    results += PvlKeyword("Y", Isis::toString(proj->YCoord()));
 
     // Put together all the keywords for different coordinate systems.
     PvlKeyword ringRad =
-      PvlKeyword("RingRadius", toString(proj->UniversalRingRadius()));
+      PvlKeyword("RingRadius", Isis::toString(proj->UniversalRingRadius()));
 
     PvlKeyword cC360 =
-      PvlKeyword("CounterClockwise360RingLongitude", toString(proj->UniversalRingLongitude()));
+      PvlKeyword("CounterClockwise360RingLongitude", Isis::toString(proj->UniversalRingLongitude()));
 
     PvlKeyword c360 =
       PvlKeyword("Clockwise360RingLongitude",
-                 toString(proj->ToClockwise(proj->UniversalRingLongitude(), 360)));
+                 Isis::toString(proj->ToClockwise(proj->UniversalRingLongitude(), 360)));
 
     PvlKeyword cC180 =
       PvlKeyword("CounterClockwise180RingLongitude",
-                 toString(proj->To180Domain(proj->UniversalRingLongitude())));
+                 Isis::toString(proj->To180Domain(proj->UniversalRingLongitude())));
 
     PvlKeyword c180 =
       PvlKeyword("Clockwise180RingLongitude",
-                 toString(proj->To180Domain(proj->ToCounterClockwise(
+                 Isis::toString(proj->To180Domain(proj->ToCounterClockwise(
                             proj->UniversalRingLongitude(), 360))));
 
     // Input map coordinate system location
@@ -189,8 +189,8 @@ void IsisMain() {
     // Write an output label file if necessary
     if(ui.WasEntered("TO")) {
       // Get user params from ui
-      QString outFile = FileName(ui.GetFileName("TO")).expanded();
-      bool exists = FileName(outFile).fileExists();
+      QString outFile = QString::fromStdString(FileName(ui.GetFileName("TO").toStdString()).expanded());
+      bool exists = FileName(outFile.toStdString()).fileExists();
       bool append = ui.GetBoolean("APPEND");
 
       // Write the pvl group out to the file
@@ -198,10 +198,10 @@ void IsisMain() {
         Pvl temp;
         temp.addGroup(results);
         if(append) {
-          temp.append(outFile);
+          temp.append(outFile.toStdString());
         }
         else {
-          temp.write(outFile);
+          temp.write(outFile.toStdString());
         }
       }
 
@@ -233,7 +233,7 @@ void IsisMain() {
         }
 
         for(int i = 0; i < results.keywords(); i++) {
-          os << (QString)results[i];
+          os << results[i];
 
           if(i < results.keywords() - 1) {
             os << ",";
@@ -243,12 +243,12 @@ void IsisMain() {
       }
     }
     else if(ui.GetString("FORMAT") == "FLAT") {
-      QString msg = "Flat file must have a name.";
+      std::string msg = "Flat file must have a name.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   else {
-    QString msg = "Could not project requested position";
+    std::string msg = "Could not project requested position";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 }
@@ -259,7 +259,7 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log

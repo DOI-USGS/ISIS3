@@ -59,7 +59,7 @@ void helperButtonCalcRange() {
 // Function to calculate the ground range from multiple inputs (list of images)
 void calcRange(double &minRingRad, double &maxRingRad, double &minRingLon, double &maxRingLon) {
   UserInterface &ui = Application::GetUserInterface();
-  FileList list(FileName(ui.GetFileName("FROMLIST")));
+  FileList list(FileName(ui.GetFileName("FROMLIST").toStdString()));
   minRingRad = DBL_MAX;
   maxRingRad = -DBL_MAX;
   minRingLon = DBL_MAX;
@@ -72,7 +72,7 @@ void calcRange(double &minRingRad, double &maxRingRad, double &minRingLon, doubl
   for(int i = 0; i < list.size(); i++) {
     // Open the cube and get the maximum number of band in all cubes
     Cube cube;
-    cube.open(list[i].toString());
+    cube.open(QString::fromStdString(list[i].toString()));
     if(cube.bandCount() > nbands) nbands = cube.bandCount();
 
     // See if the cube has a projection and make sure it matches
@@ -82,7 +82,7 @@ void calcRange(double &minRingRad, double &maxRingRad, double &minRingLon, doubl
       firstProj = proj;
     }
     else if(*proj != *firstProj) {
-      QString msg = "Mapping groups do not match between cubes [" + list[0].toString() +
+      std::string msg = "Mapping groups do not match between cubes [" + list[0].toString() +
                     "] and [" + list[i].toString() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }

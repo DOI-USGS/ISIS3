@@ -86,7 +86,7 @@ void IsisMain() {
     inclusion.push_back("CH");
   }
   else {
-    QString sErrMsg = "Invalid Hapke Function\n";
+    std::string sErrMsg = "Invalid Hapke Function\n";
     throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
 
@@ -109,7 +109,7 @@ void IsisMain() {
   } else if (sEmpirical == "LUNARLAMBERT") {
     limbValue.setName("LList");
   } else {
-    QString sErrMsg = "Invalid Photometric Model\n";
+    std::string sErrMsg = "Invalid Photometric Model\n";
     throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
 
@@ -117,7 +117,7 @@ void IsisMain() {
   empPvl.addObject(PvlObject("PhotometricModel"));
   empPvl.findObject("PhotometricModel").addGroup(PvlGroup("Algorithm"));
   empPvl.findObject("PhotometricModel").findGroup("Algorithm").
-        addKeyword(PvlKeyword("PhtName", sEmpirical), Pvl::Replace);
+        addKeyword(PvlKeyword("PhtName", sEmpirical.toStdString()), Pvl::Replace);
   PhotoModel *empModel = PhotoModelFactory::Create(empPvl);
 
   // Order of approximation in atmospheric scatter model
@@ -247,16 +247,16 @@ void IsisMain() {
     if (!iord) {
       // Fit with no additive offset:  output multiplier normalized to
       // zero phase, which is the desired phase curve B, and unnormalized
-      phaseAngle.addValue(toString(lFitParams.phase));
-      limbValue.addValue(toString(rmsmin));
-      phaseCurve.addValue(toString(c1/c1_0));
+      phaseAngle.addValue(Isis::toString(lFitParams.phase));
+      limbValue.addValue(Isis::toString(rmsmin));
+      phaseCurve.addValue(Isis::toString(c1/c1_0));
     }
     else {
       // Fit with additive offset:  normalizing would make no sense, just
       // output additive offset and multiplier from fit
-      phaseAngle.addValue(toString(lFitParams.phase));
-      limbValue.addValue(toString(rmsmin));
-      phaseCurve.addValue(toString(c1));
+      phaseAngle.addValue(Isis::toString(lFitParams.phase));
+      limbValue.addValue(Isis::toString(rmsmin));
+      phaseCurve.addValue(Isis::toString(c1));
     }
   }
 
@@ -276,12 +276,12 @@ void IsisMain() {
     if (ui.WasEntered("NOTE")) {
       PvlGroup note("Note");
       note.addComment("NOTE DESCRIBING THE FOLLOWING PHOTOMETRIC MODEL");
-      note += PvlKeyword("NOTE", ui.GetString("NOTE"));
+      note += PvlKeyword("NOTE", ui.GetString("NOTE").toStdString());
       photoObj += note;
     }
     photoObj += photoGrp;
     mainPvl.addObject(photoObj);
-    mainPvl.write(sOutfile);
+    mainPvl.write(sOutfile.toStdString());
   }
 
   for (int r=0; r<NS; ++r){

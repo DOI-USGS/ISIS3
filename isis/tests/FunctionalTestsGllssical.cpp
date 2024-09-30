@@ -10,7 +10,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/gllssical.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/gllssical.xml").expanded());
 
 TEST_F(GalileoSsiCube, FunctionalTestGllssicalDefault) {
   // tempDir exists if the fixture subclasses TempTestingFiles, which most do
@@ -25,14 +25,14 @@ TEST_F(GalileoSsiCube, FunctionalTestGllssicalDefault) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
 
-  Cube oCube(outCubeFileName, "r");
+  Cube oCube(outCubeFileName.toStdString(), "r");
 
   PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("RadiometricCalibration");
 
-  EXPECT_EQ(radGroup.findKeyword("DarkCurrentFile")[0].toStdString(), "$galileo/calibration/darkcurrent/2f8.dc04.cub");
-  EXPECT_EQ(radGroup.findKeyword("GainFile")[0].toStdString(), "$galileo/calibration/gain/redf.cal04.cub");
-  EXPECT_EQ(radGroup.findKeyword("ShutterFile")[0].toStdString(), "$galileo/calibration/shutter/calibration.so02F.cub");
-  EXPECT_EQ(radGroup.findKeyword("OutputUnits")[0].toStdString(), "I/F");
+  EXPECT_EQ(radGroup.findKeyword("DarkCurrentFile")[0], "$galileo/calibration/darkcurrent/2f8.dc04.cub");
+  EXPECT_EQ(radGroup.findKeyword("GainFile")[0], "$galileo/calibration/gain/redf.cal04.cub");
+  EXPECT_EQ(radGroup.findKeyword("ShutterFile")[0], "$galileo/calibration/shutter/calibration.so02F.cub");
+  EXPECT_EQ(radGroup.findKeyword("OutputUnits")[0], "I/F");
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("ScaleFactor"), 1.0);
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("S1"), 0.005155);
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("RSUN"), 0.27217458506088);
@@ -78,14 +78,14 @@ TEST_F(GalileoSsiCube, FunctionalTestGllssicalClear) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
 
-  Cube oCube(outCubeFileName, "r");
+  Cube oCube(outCubeFileName.toStdString(), "r");
 
   PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("RadiometricCalibration");
 
-  EXPECT_EQ(radGroup.findKeyword("DarkCurrentFile")[0].toStdString(), "$galileo/calibration/darkcurrent/2f8.dc04.cub");
-  EXPECT_EQ(radGroup.findKeyword("GainFile")[0].toStdString(), "$galileo/calibration/gain/clrf.cal04.cub");
-  EXPECT_EQ(radGroup.findKeyword("ShutterFile")[0].toStdString(), "$galileo/calibration/shutter/calibration.so02F.cub");
-  EXPECT_EQ(radGroup.findKeyword("OutputUnits")[0].toStdString(), "I/F");
+  EXPECT_EQ(radGroup.findKeyword("DarkCurrentFile")[0], "$galileo/calibration/darkcurrent/2f8.dc04.cub");
+  EXPECT_EQ(radGroup.findKeyword("GainFile")[0], "$galileo/calibration/gain/clrf.cal04.cub");
+  EXPECT_EQ(radGroup.findKeyword("ShutterFile")[0], "$galileo/calibration/shutter/calibration.so02F.cub");
+  EXPECT_EQ(radGroup.findKeyword("OutputUnits")[0], "I/F");
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("ScaleFactor"), 1.0);
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("S1"), 0.0043579999999999999);
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("RSUN"), 0.27217458506088);
@@ -117,14 +117,14 @@ TEST_F(GalileoSsiCube, FunctionalTestGllssicalRadiance) {
     FAIL() << "Unable to open image: " << e.what() << std::endl;
   }
 
-  Cube oCube(outCubeFileName, "r");
+  Cube oCube(outCubeFileName.toStdString(), "r");
 
   PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("RadiometricCalibration");
 
-  EXPECT_EQ(radGroup.findKeyword("DarkCurrentFile")[0].toStdString(), "$galileo/calibration/darkcurrent/2f8.dc04.cub");
-  EXPECT_EQ(radGroup.findKeyword("GainFile")[0].toStdString(), "$galileo/calibration/gain/redf.cal04.cub");
-  EXPECT_EQ(radGroup.findKeyword("ShutterFile")[0].toStdString(), "$galileo/calibration/shutter/calibration.so02F.cub");
-  EXPECT_EQ(radGroup.findKeyword("OutputUnits")[0].toStdString(), "Radiance");
+  EXPECT_EQ(radGroup.findKeyword("DarkCurrentFile")[0], "$galileo/calibration/darkcurrent/2f8.dc04.cub");
+  EXPECT_EQ(radGroup.findKeyword("GainFile")[0], "$galileo/calibration/gain/redf.cal04.cub");
+  EXPECT_EQ(radGroup.findKeyword("ShutterFile")[0], "$galileo/calibration/shutter/calibration.so02F.cub");
+  EXPECT_EQ(radGroup.findKeyword("OutputUnits")[0], "Radiance");
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("ScaleFactor"), 0.0001);
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("Scale"), 0.0001);
   EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("GC"), 9.771);

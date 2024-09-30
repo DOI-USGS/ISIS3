@@ -240,16 +240,16 @@ void IsisMain() {
   gbl::FindCorrectionFactors();
   gbl::FindSensitivityCorrection();
   if(gbl::flatCorrection) { // Calibrate() parameter in[1]
-    secondpass.SetInputCube(flatFile.original(), att);
+    secondpass.SetInputCube(QString::fromStdString(flatFile.original()), att);
   }
   if(gbl::dustCorrection) { // Calibrate() parameter in[2]
-    secondpass.SetInputCube(gbl::dustFile.original(), att);
+    secondpass.SetInputCube(QString::fromStdString(gbl::dustFile.original()), att);
   }
   if(gbl::mottleCorrection) { // Calibrate() parameter in[3]
-    secondpass.SetInputCube(gbl::mottleFile.original(), att);
+    secondpass.SetInputCube(QString::fromStdString(gbl::mottleFile.original()), att);
   }
   if (gbl::dustCorrection && !gbl::cissLab->AntibloomingOn()) {  // Calibrate() parameter in[4]
-    secondpass.SetInputCube(gbl::dustFile2.original(), att);
+    secondpass.SetInputCube(QString::fromStdString(gbl::dustFile2.original()), att);
   }
   // this pass will call the Calibrate method
   secondpass.Progress()->SetText("Calibrating image...");
@@ -497,7 +497,7 @@ void gbl::BitweightCorrect(Buffer &in) {
  *   @history 2008-11-05 Jeannie Walldren - Original version
  */
 void gbl::CreateBitweightStretch(FileName bitweightTable) {
-  CisscalFile *stretchPairs = new CisscalFile(bitweightTable.original());
+  CisscalFile *stretchPairs = new CisscalFile(QString::fromStdString(bitweightTable.original()));
   // Create the stretch pairs
   double stretch1 = 0, stretch2;
   gbl::stretch.ClearPairs();
@@ -508,7 +508,7 @@ void gbl::CreateBitweightStretch(FileName bitweightTable) {
 
     QStringList tokens = line.split(QRegExp("[, ]"), Qt::SkipEmptyParts);
     foreach (QString token, tokens) {
-      stretch2 = toDouble(token);
+      stretch2 = token.toDouble();
       gbl::stretch.AddPair(stretch1, stretch2);
       stretch1 = stretch1 + 1.0;
     }
@@ -542,7 +542,7 @@ FileName gbl::FindBitweightFile() {
   else {
     bitweightName += "wac";
   }
-  QString gainState(toString(gbl::cissLab->GainState()));
+  QString gainState(QString::fromStdString(toString(gbl::cissLab->GainState())));
   bitweightName = bitweightName + "g" + gainState;
 
   if(gbl::cissLab->FrontOpticsTemp() < -5.0) {
@@ -554,7 +554,7 @@ FileName gbl::FindBitweightFile() {
   else {
     bitweightName += "p25_bwt.tab";
   }
-  return FileName(gbl::GetCalibrationDirectory("bitweight") + bitweightName);
+  return FileName(gbl::GetCalibrationDirectory("bitweight").toStdString() + bitweightName.toStdString());
 }
 //=====End Bitweight Methods=====================================================================//
 
@@ -589,7 +589,7 @@ void gbl::ComputeBias() {
     flightSoftwareVersion = 0.0;// cassimg_readlabels.pro sets this to 1.3, we treat this as 1.2???
   }
   else {
-    flightSoftwareVersion = toDouble(fsw);
+    flightSoftwareVersion = fsw.toDouble();
   }
   //  check overclocked pixels exist
   if(gbl::cissLab->CompressionType() != "Lossy") {
@@ -647,7 +647,7 @@ void gbl::ComputeBias() {
     gbl::bias.resize(1);
     gbl::bias[0] = gbl::cissLab->BiasStripMean();
   }
-  gbl::calgrp += PvlKeyword("NumberOfOverclocks", toString(gbl::numberOfOverclocks));
+  gbl::calgrp += PvlKeyword("NumberOfOverclocks", Isis::toString(gbl::numberOfOverclocks));
   return;
 }
 
@@ -783,7 +783,7 @@ void gbl::Linearize() {
   }
   vector <double> DN_VALS, C_VALS;
   // Get the directory where the CISS linearize directory is.
-  FileName linearLUT(gbl::GetCalibrationDirectory("linearize") + lut);
+  FileName linearLUT(gbl::GetCalibrationDirectory("linearize").toStdString() + lut.toStdString());
 
   if(!linearLUT.fileExists()) {
     throw IException(IException::Io,
@@ -794,14 +794,14 @@ void gbl::Linearize() {
   gbl::calgrp.findKeyword("LinearityCorrectionPerformed").addComment("Linearity Correction Parameters");
   gbl::calgrp += PvlKeyword("LinearityCorrectionTable", linearLUT.original());
 
-  TextFile *pairs = new TextFile(linearLUT.original());
+  TextFile *pairs = new TextFile(QString::fromStdString(linearLUT.original()));
   for(int i = 0; i < pairs->LineCount(); i++) {
     QString line;
     pairs->GetLine(line, true);
     line = line.simplified();
     QStringList tokens = line.split(" ");
-    DN_VALS.push_back(toDouble(tokens.takeFirst()));
-    C_VALS.push_back(toDouble(tokens.takeFirst()));
+    DN_VALS.push_back(tokens.takeFirst().toDouble());
+    C_VALS.push_back(tokens.takeFirst().toDouble());
   }
   pairs->Close();
 
@@ -884,18 +884,18 @@ void gbl::FindDustRingParameters() {
   long largestEpochFileNum = 0;
   QStringList fileList = QDir(gbl::GetCalibrationDirectory("dustring")).entryList();
   for(int i = 0; i < fileList.count(); i++){
-    long currentEpoch = FileName(fileList[i]).baseName().mid(13, 10).toInt();
+    long currentEpoch = Isis::toInt(FileName(fileList[i].toStdString()).baseName().substr(13, 10));
     if (currentEpoch > largestEpochFileNum && currentEpoch <= imgNumber) {
         largestEpochFileNum = currentEpoch;
     }
   }
 
   // get name of dust file
-  gbl::dustFile = (gbl::GetCalibrationDirectory("dustring") + "nac_dustring_" + QString::number(largestEpochFileNum)
-                   + "." + gbl::cissLab->InstrumentModeId() + ".cub");
+  gbl::dustFile = (gbl::GetCalibrationDirectory("dustring").toStdString() + "nac_dustring_" + Isis::toString(largestEpochFileNum)
+                   + "." + gbl::cissLab->InstrumentModeId().toStdString() + ".cub");
   if(!gbl::dustFile.fileExists()) { // dustring file not found, assume file uses old dustring files
-    gbl::dustFile = (gbl::GetCalibrationDirectory("dustring") + "nac_dustring_venus."
-                    + gbl::cissLab->InstrumentModeId() + ".cub");
+    gbl::dustFile = (gbl::GetCalibrationDirectory("dustring").toStdString() + "nac_dustring_venus."
+                    + gbl::cissLab->InstrumentModeId().toStdString() + ".cub");
     if(!gbl::dustFile.fileExists()) { // dustring file not found, stop calibration
       throw IException(IException::Io,
                       "Unable to calibrate image. DustRingFile ***"
@@ -905,8 +905,8 @@ void gbl::FindDustRingParameters() {
   gbl::calgrp += PvlKeyword("DustRingFile", gbl::dustFile.original());
   // if anti-blooming correction is off correct ring at sample=887, line=388
   if (!gbl::cissLab->AntibloomingOn()) {
-    gbl::dustFile2 = (gbl::GetCalibrationDirectory("dustring") + "nac_dustring_aboff"
-                      + "." + gbl::cissLab->InstrumentModeId() +".cub");
+    gbl::dustFile2 = (gbl::GetCalibrationDirectory("dustring").toStdString() + "nac_dustring_aboff"
+                      + "." + gbl::cissLab->InstrumentModeId().toStdString() +".cub");
     if(!gbl::dustFile2.fileExists()) { // dustring file not found, stop calibration
       throw IException(IException::Io,
                        "Unable to calibrate image. DustRingFile2 ***"
@@ -927,8 +927,8 @@ void gbl::FindDustRingParameters() {
   }
 
   // Mottling correction for images after 2003-286T10:28:04
-  gbl::mottleFile = (gbl::GetCalibrationDirectory("dustring") + "nac_mottle_1444733393."+
-                      gbl::cissLab->InstrumentModeId() + ".cub");
+  gbl::mottleFile = (gbl::GetCalibrationDirectory("dustring").toStdString() + "nac_mottle_1444733393."+
+                      gbl::cissLab->InstrumentModeId().toStdString() + ".cub");
   if(!gbl::mottleFile.fileExists()) { // mottle file not found, stop calibration
     throw IException(IException::Io,
                      "Unable to calibrate image. MottleFile ***"
@@ -951,14 +951,14 @@ void gbl::FindDustRingParameters() {
   if((filterIndex[0] < 17 && filterIndex[1] < 17) || (filterIndex[0] >= 17 && filterIndex[1] >= 17)) {
     gbl::strengthFactor = 0.0;
     // use effective wavelength to estimate strength factor:
-    FileName effectiveWavelength(gbl::GetCalibrationDirectory("efficiency") + "na_effwl.tab");
+    FileName effectiveWavelength(gbl::GetCalibrationDirectory("efficiency").toStdString() + "na_effwl.tab");
     if(!effectiveWavelength.fileExists()) { // effectivewavelength file not found, stop calibration
       throw IException(IException::Io,
                        "Unable to calibrate image. EffectiveWavelengthFile ***"
                        + effectiveWavelength.expanded() + "*** not found.", _FILEINFO_);
     }
     gbl::calgrp += PvlKeyword("EffectiveWavelengthFile", effectiveWavelength.original());
-    CisscalFile *effwlDB = new CisscalFile(effectiveWavelength.original());
+    CisscalFile *effwlDB = new CisscalFile(QString::fromStdString(effectiveWavelength.original()));
     QString col1, col2, col3, col4, col5;
     double effwl;
     for(int i = 0; i < effwlDB->LineCount(); i++) {
@@ -981,8 +981,8 @@ void gbl::FindDustRingParameters() {
             gbl::strengthFactor = 1.0;
           }
           else {
-            effwl = toDouble(col5);
-            gbl::calgrp += PvlKeyword("EffectiveWavelength", toString(effwl));
+            effwl = col5.toDouble();
+            gbl::calgrp += PvlKeyword("EffectiveWavelength", Isis::toString(effwl));
             gbl::strengthFactor = 1.30280 - 0.000717552 * effwl;
           }
           break;
@@ -1067,7 +1067,7 @@ void gbl::FindDustRingParameters() {
         }
     }
   }
-  gbl::calgrp += PvlKeyword("StrengthFactor", toString(gbl::strengthFactor));
+  gbl::calgrp += PvlKeyword("StrengthFactor", Isis::toString(gbl::strengthFactor));
   return;
 }
 
@@ -1099,7 +1099,7 @@ FileName gbl::FindFlatFile() {
   //   to the corresponding slope field files.
   // according to slope_info.txt, slope_db_1 is original, slope_db_2 is the best and slope_db_3 is newest but has some issues
   FileName flatFile;
-  FileName slopeDatabaseName(gbl::GetCalibrationDirectory("slope") + "slope_db_2.tab");
+  FileName slopeDatabaseName(gbl::GetCalibrationDirectory("slope").toStdString() + "slope_db_2.tab");
   if(!slopeDatabaseName.fileExists()) { // slope database not found, stop calibration
     throw IException(IException::Io,
                      "Unable to calibrate image. SlopeDataBase ***"
@@ -1123,7 +1123,7 @@ FileName gbl::FindFlatFile() {
     frontOpticsTemp += "p25";
   }
   //  Require match for instrument, temperature range name, Filter1, filter2
-  CisscalFile *slopeDB = new CisscalFile(slopeDatabaseName.original());
+  CisscalFile *slopeDB = new CisscalFile(QString::fromStdString(slopeDatabaseName.original()));
   QString col1, col2, col3, col4, col5, col6, col7, col8;
   for(int i = 0; i < slopeDB->LineCount(); i++) {
     QString line;
@@ -1168,8 +1168,8 @@ FileName gbl::FindFlatFile() {
     // Couldn't find a match in the database
     throw IException(IException::Io,
                      "Unable to calibrate image. SlopeDataBase contained no factor for combination:"
-                     + gbl::cissLab->InstrumentId()  + ":" + frontOpticsTemp + ":"
-                     + gbl::cissLab->FilterName()[0] + ":" + gbl::cissLab->FilterName()[1] + ".",
+                     + gbl::cissLab->InstrumentId().toStdString()  + ":" + frontOpticsTemp.toStdString() + ":"
+                     + gbl::cissLab->FilterName()[0].toStdString() + ":" + gbl::cissLab->FilterName()[1].toStdString() + ".",
                      _FILEINFO_);
   }
   //Column 8 contains version of slopefile from which our flatfiles are derived
@@ -1178,8 +1178,8 @@ FileName gbl::FindFlatFile() {
   // the first 5 characters("SLOPE") and skipping
   // any thing after "." ("IMG")
   col8 = "flat" + col8.mid(5, (j - 5) + 1);
-  flatFile = (gbl::GetCalibrationDirectory("slope/flat") + col8
-              + gbl::cissLab->InstrumentModeId() + ".cub");
+  flatFile = (gbl::GetCalibrationDirectory("slope/flat").toStdString() + col8.toStdString()
+              + gbl::cissLab->InstrumentModeId().toStdString() + ".cub");
   gbl::calgrp += PvlKeyword("FlatFile", flatFile.original());
   if(!flatFile.fileExists()) { // flat file not found, stop calibration
     throw IException(IException::Io,
@@ -1259,7 +1259,7 @@ void gbl::DNtoElectrons() {
                          _FILEINFO_);
     }
   }
-  gbl::calgrp += PvlKeyword("TrueGain", toString(gbl::trueGain));
+  gbl::calgrp += PvlKeyword("TrueGain", Isis::toString(gbl::trueGain));
   return;
 }
 
@@ -1300,7 +1300,7 @@ void gbl::FindShutterOffset() {
     offsetFileName += "p25.";
   }
   offsetFileName += (gbl::cissLab->InstrumentModeId() + ".cub");
-  FileName shutterOffsetFile(offsetFileName);
+  FileName shutterOffsetFile(offsetFileName.toStdString());
   if(!shutterOffsetFile.fileExists()) { // shutter offset file not found, stop calibration
     throw IException(IException::Io,
                      "Unable to calibrate image. ShutterOffsetFile ***"
@@ -1308,7 +1308,7 @@ void gbl::FindShutterOffset() {
   }
   gbl::calgrp += PvlKeyword("ShutterOffsetFile", shutterOffsetFile.original());
   Cube offsetCube;
-  offsetCube.open(shutterOffsetFile.original());
+  offsetCube.open(QString::fromStdString(shutterOffsetFile.original()));
   gbl::offset = new Brick(gbl::incube->sampleCount(), 1, 1, offsetCube.pixelType());
   gbl::offset->SetBasePosition(1, 1, 1);
   offsetCube.read(*gbl::offset);
@@ -1364,9 +1364,9 @@ void gbl::DivideByAreaPixel() {
   // it was expressed in IDL as the following:
   //       [gbl::sumFactor = (gbl::incube->sampleCount()/1024.0)*(gbl::incube->lineCount()/1024.0);]
   gbl::sumFactor = 1 / pow(gbl::cissLab->SummingMode(), 2.0);
-  gbl::calgrp += PvlKeyword("SolidAngle", toString(gbl::solidAngle));
-  gbl::calgrp += PvlKeyword("OpticsArea", toString(gbl::opticsArea));
-  gbl::calgrp += PvlKeyword("SumFactor", toString(gbl::sumFactor));
+  gbl::calgrp += PvlKeyword("SolidAngle", Isis::toString(gbl::solidAngle));
+  gbl::calgrp += PvlKeyword("OpticsArea", Isis::toString(gbl::opticsArea));
+  gbl::calgrp += PvlKeyword("SumFactor", Isis::toString(gbl::sumFactor));
   return;
 }
 
@@ -1434,16 +1434,16 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
   }
 
   gbl::calgrp += PvlKeyword("DividedByEfficiency", "Yes");
-  gbl::calgrp += PvlKeyword("EfficiencyFactorMethod", fluxunits);
+  gbl::calgrp += PvlKeyword("EfficiencyFactorMethod", fluxunits.toStdString());
   vector<double> lambda; // lambda will contain all wavelength vectors used
 
   //--- 1) CREATE LINEAR APPROXIMATION FROM SYSTEM TRANSMISSION FILE ----------
   // find system transmission file (T0*T1*T2*QE)
 
-  FileName transfile(gbl::GetCalibrationDirectory("efficiency/systrans")
-                     + gbl::cissLab->InstrumentId().toLower()
-                     + filter1.toLower()
-                     + filter2.toLower() + "_systrans.tab");
+  FileName transfile(gbl::GetCalibrationDirectory("efficiency/systrans").toStdString()
+                     + gbl::cissLab->InstrumentId().toLower().toStdString()
+                     + filter1.toLower().toStdString()
+                     + filter2.toLower().toStdString() + "_systrans.tab");
   if(!transfile.fileExists()) { // transmission file not found, stop calibration
     throw IException(IException::Io,
                      "Unable to calibrate image. TransmissionFile ***"
@@ -1451,7 +1451,7 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
   }
   // read in system transmission to find transmitted wavelength and flux
   gbl::calgrp += PvlKeyword("TransmissionFile", transfile.original());
-  CisscalFile *trans = new CisscalFile(transfile.original());
+  CisscalFile *trans = new CisscalFile(QString::fromStdString(transfile.original()));
   vector<double> wavelengthT, transmittedFlux;
   double x, y;
   for(int i = 0; i < trans->LineCount(); i++) {
@@ -1461,8 +1461,8 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
     if(line == "") {
       break;
     }
-    x = toDouble(line.split(" ")[0]);
-    y = toDouble(line.split(" ")[1]);
+    x = line.split(" ")[0].toDouble();
+    y = line.split(" ")[1].toDouble();
     wavelengthT.push_back(x);
     transmittedFlux.push_back(y);
   }
@@ -1483,10 +1483,10 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
   // find quantum efficiency file
   FileName qecorrfile;
   if(gbl::cissLab->NarrowAngle()) {
-    qecorrfile = gbl::GetCalibrationDirectory("correction") + "nac_qe_correction.tab";
+    qecorrfile = gbl::GetCalibrationDirectory("correction").toStdString() + "nac_qe_correction.tab";
   }
   else {
-    qecorrfile = gbl::GetCalibrationDirectory("correction") + "wac_qe_correction.tab";
+    qecorrfile = gbl::GetCalibrationDirectory("correction").toStdString() + "wac_qe_correction.tab";
   }
   if(!qecorrfile.fileExists()) { // quantum efficiency file not found, stop calibration
     throw IException(IException::Io,
@@ -1495,7 +1495,7 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
   }
   // read qe file to find qe wavelength and correction
   gbl::calgrp += PvlKeyword("QuantumEfficiencyFile", qecorrfile.original());
-  CisscalFile *qeCorr = new CisscalFile(qecorrfile.original());
+  CisscalFile *qeCorr = new CisscalFile(QString::fromStdString(qecorrfile.original()));
   vector<double> wavelengthQE, qecorrection;
   for(int i = 0; i < qeCorr->LineCount(); i++) {
     QString line;
@@ -1504,8 +1504,8 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
     if(line == "") {
       break;
     }
-    x = toDouble(line.split(" ").first());
-    y = toDouble(line.split(" ").last());
+    x = line.split(" ").first().toDouble();
+    y = line.split(" ").last().toDouble();
     wavelengthQE.push_back(x);
     qecorrection.push_back(y);
     lambda.push_back(x);
@@ -1572,7 +1572,7 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
     units = "I/F";
 
     // find spectral file
-    FileName specfile(gbl::GetCalibrationDirectory("efficiency") + "solarflux.tab");
+    FileName specfile(gbl::GetCalibrationDirectory("efficiency").toStdString() + "solarflux.tab");
     if(!specfile.fileExists()) { // spectral file not found, stop calibration
       throw IException(IException::Io,
                        "Unable to calibrate image using I/F. SpectralFile ***"
@@ -1605,10 +1605,10 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
                        "Unable to calibrate image using I/F. Solar Distance calculated is less than or equal to 0.",
                        _FILEINFO_);
     }
-    gbl::calgrp += PvlKeyword("SolarDistance", toString(distFromSun));
+    gbl::calgrp += PvlKeyword("SolarDistance", Isis::toString(distFromSun));
 
     // read spectral file to find wavelength and flux
-    CisscalFile *spectral = new CisscalFile(specfile.original());
+    CisscalFile *spectral = new CisscalFile(QString::fromStdString(specfile.original()));
     vector<double> wavelengthF, flux;
     for(int i = 0; i < spectral->LineCount(); i++) {
       QString line;
@@ -1617,8 +1617,8 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
       if(line == "") {
         break;
       }
-      x = toDouble(line.split(" ").first()) / angstromsToNm;
-      y = toDouble(line.split(" ").last()) * angstromsToNm;
+      x = line.split(" ").first().toDouble() / angstromsToNm;
+      y = line.split(" ").last().toDouble() * angstromsToNm;
       wavelengthF.push_back(x);
       flux.push_back(y);
       lambda.push_back(x);
@@ -1673,8 +1673,8 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
   spline2.AddData(lambda, fluxproduct2);
   gbl::efficiencyFactor = spline1.BoolesRule(spline1.DomainMinimum(), spline1.DomainMaximum());
   double efficiency = spline2.BoolesRule(spline2.DomainMinimum(), spline2.DomainMaximum());
-  gbl::calgrp += PvlKeyword("EfficiencyFactor", toString(gbl::efficiencyFactor), units);
-  gbl::calgrp += PvlKeyword("TotalEfficiency", toString(efficiency));
+  gbl::calgrp += PvlKeyword("EfficiencyFactor", Isis::toString(gbl::efficiencyFactor), units.toStdString());
+  gbl::calgrp += PvlKeyword("TotalEfficiency", Isis::toString(efficiency));
 
   // Cannot divide by 0.0
   if(gbl::efficiencyFactor == 0) {
@@ -1730,7 +1730,7 @@ void gbl::FindCorrectionFactors() {
   }
   // First Apply Standard Correction Factors
   // Get the directory where the CISS calibration directories are.
-  FileName correctionFactorFile(gbl::GetCalibrationDirectory("correction") + "correctionfactors_qecorr.tab");
+  FileName correctionFactorFile(gbl::GetCalibrationDirectory("correction").toStdString() + "correctionfactors_qecorr.tab");
   if(!correctionFactorFile.fileExists()) { // correction factor file not found, stop calibration
     throw IException(IException::Io,
                      "Unable to calibrate image. CorrectionFactorFile ***"
@@ -1740,7 +1740,7 @@ void gbl::FindCorrectionFactors() {
   gbl::calgrp.findKeyword("CorrectionFactorPerformed").addComment("Correction Factor Parameters");
 
   gbl::calgrp += PvlKeyword("CorrectionFactorFile", correctionFactorFile.original());
-  CisscalFile *corrFact = new CisscalFile(correctionFactorFile.original());
+  CisscalFile *corrFact = new CisscalFile(QString::fromStdString(correctionFactorFile.original()));
   gbl::correctionFactor = 0.0;
   QString col1, col2, col3, col4;
   for(int i = 0; i < corrFact->LineCount(); i++) {
@@ -1761,7 +1761,7 @@ void gbl::FindCorrectionFactors() {
             gbl::calgrp.findKeyword("CorrectionFactorPerformed").setValue("No: CorrectionFactorFile contained no factor for filter combination");
           }
           else {
-            gbl::correctionFactor = toDouble(col4);
+            gbl::correctionFactor = col4.toDouble();
           }
           break;
         }
@@ -1787,7 +1787,7 @@ void gbl::FindCorrectionFactors() {
     gbl::calgrp.findKeyword("CorrectionFactorPerformed").addComment("Correction Factor Parameters");
 
   }
-  gbl::calgrp += PvlKeyword("CorrectionFactor", toString(gbl::correctionFactor));
+  gbl::calgrp += PvlKeyword("CorrectionFactor", Isis::toString(gbl::correctionFactor));
   return;
 }
 
@@ -1840,7 +1840,7 @@ void gbl::FindSensitivityCorrection() {
   gbl::calgrp += PvlKeyword("SensitivityCorrectionPerformed", "Yes");
   gbl::calgrp.findKeyword("SensitivityCorrectionPerformed").addComment("Sensitivity vs Time Correction Parameters");
   gbl::sensCorrection = true;
-  gbl::calgrp += PvlKeyword("SensVsTimeCorr", toString(gbl::sensVsTimeCorr));
+  gbl::calgrp += PvlKeyword("SensVsTimeCorr", Isis::toString(gbl::sensVsTimeCorr));
 }
 
 
@@ -1859,6 +1859,6 @@ void gbl::FindSensitivityCorrection() {
 QString gbl::GetCalibrationDirectory(QString calibrationType) {
   // Get the directory where the CISS calibration directories are.
   PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-  QString missionDir = (QString) dataDir["Cassini"];
+  QString missionDir = QString::fromStdString(dataDir["Cassini"]);
   return missionDir + "/calibration/" + calibrationType + "/";
 }

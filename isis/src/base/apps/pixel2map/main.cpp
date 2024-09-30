@@ -47,17 +47,17 @@ void IsisMain() {
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   FileList list;
   if (ui.GetString("FROMTYPE") == "FROM") {
     // GetAsString will capture the entire string, including attributes
-    list.push_back(FileName(ui.GetAsString("FROM")));
+    list.push_back(FileName(ui.GetAsString("FROM").toStdString()));
   }
   else {
     try {
-      list.read(ui.GetFileName("FROMLIST"));
+      list.read(ui.GetFileName("FROMLIST").toStdString());
     }
     catch (IException &e) {
       throw IException(e);
@@ -90,20 +90,20 @@ void IsisMain() {
       vector<QString> lame = atts0.bands();
       icube.setVirtualBands(lame);
     }
-    icube.open( list[i].toString() );
+    icube.open(QString::fromStdString(list[i].toString()));
     bands = icube.bandCount();
     g_incam = icube.camera();
 
     // Make sure it is not the sky
     if (g_incam->target()->isSky()) {
-      QString msg = "The image [" + list[i].toString() +
+      std::string msg = "The image [" + list[i].toString() +
                     "] is targeting the sky, use skymap instead.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Make sure all the bands for all the files match
     if (i >= 1 && atts0.bandsString() != lastBandString) {
-      QString msg = "The Band numbers for all the files do not match.";
+      std::string msg = "The Band numbers for all the files do not match.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     else {
@@ -136,10 +136,10 @@ void IsisMain() {
     g_incam = NULL;
   } //end for list.size
 
-  camGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
-  camGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
-  camGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
-  camGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MinimumLatitude", Isis::toString(minlat)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MaximumLatitude", Isis::toString(maxlat)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MinimumLongitude", Isis::toString(minlon)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MaximumLongitude", Isis::toString(maxlon)), Pvl::Replace);
 
 
   // We want to delete the keywords we just added if the user wants the range
@@ -172,22 +172,22 @@ void IsisMain() {
   // If the user decided to enter a ground range then override
   if (ui.WasEntered("MINLON")) {
     userGrp.addKeyword(PvlKeyword("MinimumLongitude",
-                                  toString(ui.GetDouble("MINLON"))), Pvl::Replace);
+                                  Isis::toString(ui.GetDouble("MINLON"))), Pvl::Replace);
   }
 
   if (ui.WasEntered("MAXLON")) {
     userGrp.addKeyword(PvlKeyword("MaximumLongitude",
-                                  toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
+                                  Isis::toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
   }
 
   if (ui.WasEntered("MINLAT")) {
     userGrp.addKeyword(PvlKeyword("MinimumLatitude",
-                                  toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
+                                  Isis::toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
   }
 
   if (ui.WasEntered("MAXLAT")) {
     userGrp.addKeyword(PvlKeyword("MaximumLatitude",
-                                  toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
+                                  Isis::toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
   }
 
   // If they want the res. from the mapfile, delete it from the camera so
@@ -216,7 +216,7 @@ void IsisMain() {
   // If the user decided to enter a resolution then override
   if (ui.GetString("PIXRES") == "MPP") {
     userGrp.addKeyword(PvlKeyword("PixelResolution",
-                                  toString(ui.GetDouble("RESOLUTION"))),
+                                  Isis::toString(ui.GetDouble("RESOLUTION"))),
                        Pvl::Replace);
     if (userGrp.hasKeyword("Scale")) {
       userGrp.deleteKeyword("Scale");
@@ -224,7 +224,7 @@ void IsisMain() {
   }
   else if (ui.GetString("PIXRES") == "PPD") {
     userGrp.addKeyword(PvlKeyword("Scale",
-                                  toString(ui.GetDouble("RESOLUTION"))),
+                                  Isis::toString(ui.GetDouble("RESOLUTION"))),
                        Pvl::Replace);
     if (userGrp.hasKeyword("PixelResolution")) {
       userGrp.deleteKeyword("PixelResolution");
@@ -241,28 +241,28 @@ void IsisMain() {
       vector<QString> lame = atts0.bands();
       icube.setVirtualBands(lame);
     }
-    icube.open( list.back().toString() );
+    icube.open(QString::fromStdString(list.back().toString()));
     g_incam = icube.camera();
 
     if (g_incam->IntersectsLongitudeDomain(userMap)) {
       if (ui.GetString("LONSEAM") == "AUTO") {
         if ((int) userGrp["LongitudeDomain"] == 360) {
-          userGrp.addKeyword(PvlKeyword("LongitudeDomain", toString(180)),
+          userGrp.addKeyword(PvlKeyword("LongitudeDomain", Isis::toString(180)),
                              Pvl::Replace);
           if (g_incam->IntersectsLongitudeDomain(userMap)) {
             // Its looks like a global image so switch back to the
             // users preference
-            userGrp.addKeyword(PvlKeyword("LongitudeDomain", toString(360)),
+            userGrp.addKeyword(PvlKeyword("LongitudeDomain", Isis::toString(360)),
                                Pvl::Replace);
           }
         }
         else {
-          userGrp.addKeyword(PvlKeyword("LongitudeDomain", toString(360)),
+          userGrp.addKeyword(PvlKeyword("LongitudeDomain", Isis::toString(360)),
                              Pvl::Replace);
           if (g_incam->IntersectsLongitudeDomain(userMap)) {
             // Its looks like a global image so switch back to the
             // users preference
-            userGrp.addKeyword(PvlKeyword("LongitudeDomain", toString(180)),
+            userGrp.addKeyword(PvlKeyword("LongitudeDomain", Isis::toString(180)),
                                Pvl::Replace);
           }
         }
@@ -270,21 +270,21 @@ void IsisMain() {
         double minlat, maxlat, minlon, maxlon;
         g_incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
         if (!ui.WasEntered("MINLAT")) {
-          userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
+          userGrp.addKeyword(PvlKeyword("MinimumLatitude", Isis::toString(minlat)), Pvl::Replace);
         }
         if (!ui.WasEntered("MAXLAT")) {
-          userGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
+          userGrp.addKeyword(PvlKeyword("MaximumLatitude", Isis::toString(maxlat)), Pvl::Replace);
         }
         if (!ui.WasEntered("MINLON")) {
-          userGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
+          userGrp.addKeyword(PvlKeyword("MinimumLongitude", Isis::toString(minlon)), Pvl::Replace);
         }
         if (!ui.WasEntered("MAXLON")) {
-          userGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
+          userGrp.addKeyword(PvlKeyword("MaximumLongitude", Isis::toString(maxlon)), Pvl::Replace);
         }
       }
 
       else if (ui.GetString("LONSEAM") == "ERROR") {
-        QString msg = "The image [" + ui.GetCubeName("FROM") + "] crosses the " +
+        std::string msg = "The image [" + ui.GetCubeName("FROM").toStdString() + "] crosses the " +
                      "longitude seam";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -303,14 +303,14 @@ void IsisMain() {
     Cube parent(list[0].toString());
     if (!parent.hasGroup("AlphaCube")) {
       PvlGroup alpha("AlphaCube");
-      alpha += PvlKeyword("AlphaSamples", toString(parent.sampleCount()));
-      alpha += PvlKeyword("AlphaLines", toString(parent.lineCount()));
-      alpha += PvlKeyword("AlphaStartingSample", toString(0.5));
-      alpha += PvlKeyword("AlphaStartingLine", toString(0.5));
-      alpha += PvlKeyword("AlphaEndingSample", toString(parent.sampleCount() + 0.5));
-      alpha += PvlKeyword("AlphaEndingLine", toString(parent.lineCount() + 0.5));
-      alpha += PvlKeyword("BetaSamples", toString(parent.sampleCount()));
-      alpha += PvlKeyword("BetaLines", toString(parent.lineCount()));
+      alpha += PvlKeyword("AlphaSamples", Isis::toString(parent.sampleCount()));
+      alpha += PvlKeyword("AlphaLines", Isis::toString(parent.lineCount()));
+      alpha += PvlKeyword("AlphaStartingSample", Isis::toString(0.5));
+      alpha += PvlKeyword("AlphaStartingLine", Isis::toString(0.5));
+      alpha += PvlKeyword("AlphaEndingSample", Isis::toString(parent.sampleCount() + 0.5));
+      alpha += PvlKeyword("AlphaEndingLine", Isis::toString(parent.lineCount() + 0.5));
+      alpha += PvlKeyword("BetaSamples", Isis::toString(parent.sampleCount()));
+      alpha += PvlKeyword("BetaLines", Isis::toString(parent.lineCount()));
       pvl.addGroup(alpha);
     }
   }
@@ -332,11 +332,11 @@ void IsisMain() {
     Cube cube(list[f].toString(), "r");
     // Loop through the input cube and get the all pixels values for all bands
     ProcessByBrick processBrick;
-    processBrick.Progress()->SetText("Working on file:  " + list[f].toString());
+    processBrick.Progress()->SetText("Working on file:  " + QString::fromStdString(list[f].toString()));
     processBrick.SetBrickSize(1, 1, bands);
     // Recall list[f] is a FileName, which stores the attributes
     CubeAttributeInput atts0(list[f]);
-    Cube *icube = processBrick.SetInputCube(list[f].toString(), atts0, 0);
+    Cube *icube = processBrick.SetInputCube(QString::fromStdString(list[f].toString()), atts0, 0);
     g_incam = icube->camera();
 
     processBrick.StartProcess(rasterizePixel);
@@ -346,12 +346,12 @@ void IsisMain() {
   // When there is only one input cube, we want to propagate IsisCube labels to output cubes
   if (list.size() == 1) {
     // Note that polygons and original labels are not propagated
-    g_processGroundPolygons.PropagateLabels(list[0].toString());
+    g_processGroundPolygons.PropagateLabels(QString::fromStdString(list[0].toString()));
     // Tell Process which tables we want to propagate
     QList<QString> tablesToPropagate;
     tablesToPropagate << "InstrumentPointing" << "InstrumentPosition" << "BodyRotation"
         << "SunPosition";
-    g_processGroundPolygons.PropagateTables(list[0].toString(), tablesToPropagate);
+    g_processGroundPolygons.PropagateTables(QString::fromStdString(list[0].toString()), tablesToPropagate);
   }
   g_processGroundPolygons.EndProcess();
 
@@ -370,7 +370,7 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP").toStdString());
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log

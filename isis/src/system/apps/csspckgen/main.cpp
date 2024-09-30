@@ -22,7 +22,7 @@ void IsisMain() {
   // Open the input file from the GUI or find the latest version of the DB file
   FileName inputName;
   if (ui.WasEntered("FROM")) {
-    inputName = ui.GetFileName("FROM");
+    inputName = ui.GetFileName("FROM").toStdString();
   }
   else {
     // Stores highest version
@@ -36,13 +36,13 @@ void IsisMain() {
 
   // Add a timestamp for when this file was created
   PvlObject latestMain("TargetAttitudeShape");
-  latestMain += PvlKeyword("RunTime", iTime::CurrentLocalTime());
+  latestMain += PvlKeyword("RunTime", iTime::CurrentLocalTime().toStdString());
 
   // Add our dependencies, only the Leapsecond Kernel
   PvlGroup dependencies("Dependencies");
   FileName lskName("$base/kernels/lsk/naif????.tls");
   lskName = lskName.highestVersion();
-  QString lskString = lskName.originalPath() + "/" + lskName.name();
+  std::string lskString = lskName.originalPath() + "/" + lskName.name();
   dependencies += PvlKeyword("LeapsecondKernel", lskString);
   latestMain += dependencies;
 
@@ -62,7 +62,7 @@ void IsisMain() {
           FileName pckName(keyword[0]);
           if (pckName.isDateVersioned()) {
             pckName = pckName.highestVersion();
-            QString latestPck = pckName.originalPath() + "/" + pckName.name();
+            std::string latestPck = pckName.originalPath() + "/" + pckName.name();
 
             // Replace the date-versioned filename with the direct path to the
             // latest PCK
@@ -83,7 +83,7 @@ void IsisMain() {
         // Add comment specifying that this PCK is hardcoded for legacy support
         QString comment = "This PCK is hardcoded to support versions of "
           "Isis prior to v3.3.2";
-        latestGroup.addComment(comment);
+        latestGroup.addComment(comment.toStdString());
 
         // Add the direct path to the DB file to support older versions of Isis
         // that do not support date-versioned filenames
@@ -96,7 +96,7 @@ void IsisMain() {
   // user-specified location
   FileName outputName;
   if (ui.WasEntered("TO")) {
-    outputName = ui.GetFileName("TO");
+    outputName = ui.GetFileName("TO").toStdString();
   }
   else {
     outputName = "$cassini/kernels/pck/kernels.????.db";

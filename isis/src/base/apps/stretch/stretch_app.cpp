@@ -1,3 +1,4 @@
+#include "Application.h"
 #include "TextFile.h"
 #include "Statistics.h"
 #include "ProcessByLine.h"
@@ -26,10 +27,10 @@ namespace Isis {
     // first just get the pairs from where ever and worry about
     // whether they are dn values or %'s later
     if(ui.GetBoolean("READFILE")) {
-      FileName pairsFileName = ui.GetFileName("INPUTFILE");
+      FileName pairsFileName = ui.GetFileName("INPUTFILE").toStdString();
       TextFile pairsFile;
       pairsFile.SetComment("#");
-      pairsFile.Open(pairsFileName.expanded());
+      pairsFile.Open(QString::fromStdString(pairsFileName.expanded()));
 
       // concat all non-comment lines into one string (pairs)
       QString line = "";
@@ -60,15 +61,15 @@ namespace Isis {
 
     // Setup new mappings for special pixels if necessary
     if(ui.WasEntered("NULL"))
-      str.SetNull(StringToPixel(ui.GetString("NULL")));
+      str.SetNull(StringToPixel(ui.GetString("NULL").toStdString()));
     if(ui.WasEntered("LIS"))
-      str.SetLis(StringToPixel(ui.GetString("LIS")));
+      str.SetLis(StringToPixel(ui.GetString("LIS").toStdString()));
     if(ui.WasEntered("LRS"))
-      str.SetLrs(StringToPixel(ui.GetString("LRS")));
+      str.SetLrs(StringToPixel(ui.GetString("LRS").toStdString()));
     if(ui.WasEntered("HIS"))
-      str.SetHis(StringToPixel(ui.GetString("HIS")));
+      str.SetHis(StringToPixel(ui.GetString("HIS").toStdString()));
     if(ui.WasEntered("HRS"))
-      str.SetHrs(StringToPixel(ui.GetString("HRS")));
+      str.SetHrs(StringToPixel(ui.GetString("HRS").toStdString()));
 
     p.SetOutputCubeStretch("TO", &ui);
 
@@ -77,14 +78,12 @@ namespace Isis {
     p.EndProcess();
 
     PvlKeyword dnPairs = PvlKeyword("StretchPairs");
-    dnPairs.addValue(str.Text());
+    dnPairs.addValue(str.Text().toStdString());
 
     PvlGroup results = PvlGroup("Results");
     results.addKeyword(dnPairs);
 
-    if (log){
-      log->addLogGroup(results);
-    }
+    Application::Log(results);
   }
 
   // Line processing routine

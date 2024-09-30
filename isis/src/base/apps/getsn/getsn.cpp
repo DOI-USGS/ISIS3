@@ -4,6 +4,7 @@
 #include <sstream>
 #include <QString>
 
+#include "Application.h"
 #include "Blob.h"
 #include "Cube.h"
 #include "History.h"
@@ -22,7 +23,7 @@ namespace Isis {
 
   void getsn( UserInterface &ui, Pvl *log ) {
     // Open the input cube
-    Cube *cube = new Cube( ui.GetCubeName("FROM"), "r");
+    Cube *cube = new Cube( ui.GetCubeName("FROM").toStdString(), "r");
     
     getsn( cube, ui, log );
 
@@ -51,9 +52,9 @@ namespace Isis {
 
     PvlGroup sn("Results");
 
-    if (WriteFile) sn += PvlKeyword("Filename", from);
-    if (WriteSN) sn += PvlKeyword( "SerialNumber", SerialNumber::Compose( *label, ui.GetBoolean("DEFAULT") ) );
-    if (WriteObservation) sn += PvlKeyword( "ObservationNumber", ObservationNumber::Compose( *label, ui.GetBoolean("DEFAULT") ) );
+    if (WriteFile) sn += PvlKeyword("Filename", from.toStdString());
+    if (WriteSN) sn += PvlKeyword( "SerialNumber", SerialNumber::Compose( *label, ui.GetBoolean("DEFAULT") ).toStdString() );
+    if (WriteObservation) sn += PvlKeyword( "ObservationNumber", ObservationNumber::Compose( *label, ui.GetBoolean("DEFAULT") ).toStdString() );
 
     if ( ui.WasEntered("TO") ) {
       // PVL option
@@ -62,9 +63,9 @@ namespace Isis {
 	Pvl pvl;
 	pvl.addGroup(sn);
 	if ( ui.GetBoolean("APPEND") )
-	  pvl.append( ui.GetFileName("TO") );
+	  pvl.append( ui.GetFileName("TO").toStdString() );
 	else
-	  pvl.write( ui.GetFileName("TO") );
+	  pvl.write( ui.GetFileName("TO").toStdString() );
       }
       // FLAT option
       else {
@@ -77,7 +78,7 @@ namespace Isis {
 	for (int i = 0; i < sn.keywords(); i++) {
 	  if (i != 0)
 	    line += ",";
-	  line += sn[i][0];
+	  line += QString::fromStdString(sn[i][0]);
 	}
 	txt.PutLine(line);
       }
@@ -88,9 +89,8 @@ namespace Isis {
 	cout << sn[i][0] << endl;
       }
     }
-
     if (ui.IsInteractive()) {
-      log->addLogGroup(sn);
+      Application::AppendAndLog(sn, log);
     }
     else {
       log->addGroup(sn);

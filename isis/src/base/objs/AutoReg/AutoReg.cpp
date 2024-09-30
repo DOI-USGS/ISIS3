@@ -197,11 +197,11 @@ namespace Isis {
       PvlGroup &algo = pvl.findGroup("Algorithm", Pvl::Traverse);
       SetTolerance(algo["Tolerance"]);
       if(algo.hasKeyword("ChipInterpolator")) {
-        SetChipInterpolator((QString)algo["ChipInterpolator"]);
+        SetChipInterpolator(QString::fromStdString(algo["ChipInterpolator"]));
       }
 
       if(algo.hasKeyword("SubpixelAccuracy")) {
-        SetSubPixelAccuracy((QString)algo["SubpixelAccuracy"] == "True");
+        SetSubPixelAccuracy(Isis::toBool(algo["SubpixelAccuracy"]) == true);
       }
 
       if(algo.hasKeyword("ReductionFactor")) {
@@ -209,7 +209,7 @@ namespace Isis {
       }
 
       if (algo.hasKeyword("Gradient")) {
-        SetGradientFilterType((QString)algo["Gradient"]);
+        SetGradientFilterType(QString::fromStdString(algo["Gradient"]));
       }
 
       // Setup the pattern chip
@@ -257,7 +257,7 @@ namespace Isis {
 
     }
     catch(IException &e) {
-      QString msg = "Improper format for AutoReg PVL [" + pvl.fileName() + "]";
+      std::string msg = "Improper format for AutoReg PVL [" + pvl.fileName() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
     return;
@@ -280,7 +280,7 @@ namespace Isis {
     else {
       throw IException(IException::User,
                        "Invalid Gradient type.  Cannot use ["
-                       + gradientFilterType + "] to filter chip",
+                       + gradientFilterType.toStdString() + "] to filter chip",
                        _FILEINFO_);
     }
   }
@@ -452,7 +452,7 @@ namespace Isis {
     else {
       throw IException(IException::User,
                        "Invalid Interpolator type.  Cannot use ["
-                       + interpolator + "] to load chip",
+                       + interpolator.toStdString() + "] to load chip",
                        _FILEINFO_);
     }
 
@@ -1177,30 +1177,30 @@ namespace Isis {
   Pvl AutoReg::RegistrationStatistics() {
     Pvl pvl;
     PvlGroup stats("AutoRegStatistics");
-    stats += Isis::PvlKeyword("Total", toString(p_totalRegistrations));
-    stats += Isis::PvlKeyword("Successful", toString(p_pixelSuccesses + p_subpixelSuccesses));
-    stats += Isis::PvlKeyword("Failure", toString(p_totalRegistrations - (p_pixelSuccesses + p_subpixelSuccesses)));
+    stats += Isis::PvlKeyword("Total", Isis::toString(p_totalRegistrations));
+    stats += Isis::PvlKeyword("Successful", Isis::toString(p_pixelSuccesses + p_subpixelSuccesses));
+    stats += Isis::PvlKeyword("Failure", Isis::toString(p_totalRegistrations - (p_pixelSuccesses + p_subpixelSuccesses)));
     pvl.addGroup(stats);
 
     PvlGroup successes("Successes");
-    successes += PvlKeyword("SuccessPixel", toString(p_pixelSuccesses));
-    successes += PvlKeyword("SuccessSubPixel", toString(p_subpixelSuccesses));
+    successes += PvlKeyword("SuccessPixel", Isis::toString(p_pixelSuccesses));
+    successes += PvlKeyword("SuccessSubPixel", Isis::toString(p_subpixelSuccesses));
     pvl.addGroup(successes);
 
     PvlGroup grp("PatternChipFailures");
-    grp += PvlKeyword("PatternNotEnoughValidData", toString(p_patternChipNotEnoughValidDataCount));
-    grp += PvlKeyword("PatternZScoreNotMet", toString(p_patternZScoreNotMetCount));
+    grp += PvlKeyword("PatternNotEnoughValidData", Isis::toString(p_patternChipNotEnoughValidDataCount));
+    grp += PvlKeyword("PatternZScoreNotMet", Isis::toString(p_patternZScoreNotMetCount));
     pvl.addGroup(grp);
 
     PvlGroup fit("FitChipFailures");
-    fit += PvlKeyword("FitChipNoData", toString(p_fitChipNoDataCount));
-    fit += PvlKeyword("FitChipToleranceNotMet", toString(p_fitChipToleranceNotMetCount));
+    fit += PvlKeyword("FitChipNoData", Isis::toString(p_fitChipNoDataCount));
+    fit += PvlKeyword("FitChipToleranceNotMet", Isis::toString(p_fitChipToleranceNotMetCount));
     pvl.addGroup(fit);
 
     PvlGroup model("SurfaceModelFailures");
-    model += PvlKeyword("SurfaceModelNotEnoughValidData", toString(p_surfaceModelNotEnoughValidDataCount));
-    model += PvlKeyword("SurfaceModelSolutionInvalid", toString(p_surfaceModelSolutionInvalidCount));
-    model += PvlKeyword("SurfaceModelDistanceInvalid", toString(p_surfaceModelDistanceInvalidCount));
+    model += PvlKeyword("SurfaceModelNotEnoughValidData", Isis::toString(p_surfaceModelNotEnoughValidDataCount));
+    model += PvlKeyword("SurfaceModelSolutionInvalid", Isis::toString(p_surfaceModelSolutionInvalidCount));
+    model += PvlKeyword("SurfaceModelDistanceInvalid", Isis::toString(p_surfaceModelDistanceInvalidCount));
     pvl.addGroup(model);
 
     return (AlgorithmStatistics(pvl));
@@ -1289,29 +1289,29 @@ namespace Isis {
   PvlGroup AutoReg::UpdatedTemplate() {
     PvlGroup reg("AutoRegistration");
 
-    reg += PvlKeyword("Algorithm", AlgorithmName());
-    reg += PvlKeyword("Tolerance", toString(Tolerance()));
+    reg += PvlKeyword("Algorithm", AlgorithmName().toStdString());
+    reg += PvlKeyword("Tolerance", Isis::toString(Tolerance()));
     reg += PvlKeyword("SubpixelAccuracy",
         SubPixelAccuracy() ? "True" : "False");
-    reg += PvlKeyword("ReductionFactor", toString(ReductionFactor()));
-    reg += PvlKeyword("Gradient", GradientFilterString());
+    reg += PvlKeyword("ReductionFactor", Isis::toString(ReductionFactor()));
+    reg += PvlKeyword("Gradient", GradientFilterString().toStdString());
 
     Chip *pattern = PatternChip();
-    reg += PvlKeyword("PatternSamples", toString(pattern->Samples()));
-    reg += PvlKeyword("PatternLines", toString(pattern->Lines()));
-    reg += PvlKeyword("MinimumZScore", toString(MinimumZScore()));
-    reg += PvlKeyword("ValidPercent", toString(PatternValidPercent()));
+    reg += PvlKeyword("PatternSamples", Isis::toString(pattern->Samples()));
+    reg += PvlKeyword("PatternLines", Isis::toString(pattern->Lines()));
+    reg += PvlKeyword("MinimumZScore", Isis::toString(MinimumZScore()));
+    reg += PvlKeyword("ValidPercent", Isis::toString(PatternValidPercent()));
     // TODO Chip needs accessors to valid minimum and maximum
 
     Chip *search = SearchChip();
-    reg += PvlKeyword("SearchSamples", toString(search->Samples()));
-    reg += PvlKeyword("SearchLines", toString(search->Lines()));
-    reg += PvlKeyword("SubchipValidPercent", toString(SubsearchValidPercent()));
+    reg += PvlKeyword("SearchSamples", Isis::toString(search->Samples()));
+    reg += PvlKeyword("SearchLines", Isis::toString(search->Lines()));
+    reg += PvlKeyword("SubchipValidPercent", Isis::toString(SubsearchValidPercent()));
     // TODO Chip needs accessors to valid minimum and maximum
 
     if (SubPixelAccuracy()) {
-      reg += PvlKeyword("DistanceTolerance", toString(DistanceTolerance()));
-      reg += PvlKeyword("WindowSize", toString(WindowSize()));
+      reg += PvlKeyword("DistanceTolerance", Isis::toString(DistanceTolerance()));
+      reg += PvlKeyword("WindowSize", Isis::toString(WindowSize()));
     }
 
     return reg;

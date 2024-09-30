@@ -38,11 +38,11 @@ namespace Isis {
       PvlGroup &instrument = pvl.findGroup("INSTRUMENT", Pvl::Traverse);
 
       // Make sure it is a viking mission
-      QString spacecraft = (QString)instrument["SPACECRAFTNAME"];
+      QString spacecraft = QString::fromStdString(instrument["SPACECRAFTNAME"]);
       QString mission = spacecraft.split("_").first();
       spacecraft = spacecraft.split("_").last();
       if(mission != "VIKING") {
-        QString msg = "Invalid Keyword [SpacecraftName]. " +  spacecraft +
+        std::string msg = "Invalid Keyword [SpacecraftName]. " +  spacecraft.toStdString() +
                      "must start with 'VIKING'";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -50,12 +50,12 @@ namespace Isis {
       if((QChar)spacecraft[spacecraft.size() - 1] == '1') spn = 1;
       if((QChar)spacecraft[spacecraft.size() - 1] == '2') spn = 2;
       if(spn == 0) {
-        QString msg = "Invalid Keyword [SpacecraftName]. " + spacecraft +
+        std::string msg = "Invalid Keyword [SpacecraftName]. " + spacecraft.toStdString() +
                      "must terminate with '1' or '2'";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       double clock = instrument["SPACECRAFTCLOCKCOUNT"];
-      QString instId = (QString)instrument["INSTRUMENTID"];
+      QString instId = QString::fromStdString(instrument["INSTRUMENTID"]);
       int cam;
       // Camera State 4 is used to indicate an extended mission. This is
       // necessary because the dust spot changed position during the extended
@@ -73,33 +73,33 @@ namespace Isis {
         else cam = 6;
       }
       else {
-        QString msg = "Invalid Keyword [InstrumentID]. " + instId;
+        std::string msg = "Invalid Keyword [InstrumentID]. " + instId.toStdString();
         msg += "must terminate with an 'A' or 'B'";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      QString startTime = instrument["STARTTIME"];
+      QString startTime = QString::fromStdString(instrument["STARTTIME"]);
       p_dist1 = CalcSunDist(startTime, icube);
       p_labexp = (double)instrument["EXPOSUREDURATION"] * 1000.0;  // convert to msec
       QString target = " ";
       PvlKeyword cs1 = instrument["FLOODMODEID"];
-      if((QString)cs1 == "ON") cs1 = "1";
-      else if((QString)cs1 == "OFF") cs1 = "0";
+      if(QString::fromStdString(cs1) == "ON") cs1 = "1";
+      else if(QString::fromStdString(cs1) == "OFF") cs1 = "0";
       PvlKeyword cs2 = instrument["GAINMODEID"];
-      if((QString)cs2 == "LOW") cs2 = "0";
-      else if((QString)cs2 == "HIGH") cs2 = "1";
+      if(QString::fromStdString(cs2) == "LOW") cs2 = "0";
+      else if(QString::fromStdString(cs2) == "HIGH") cs2 = "1";
       PvlKeyword cs3 = instrument["OFFSETMODEID"];
-      if((QString)cs3 == "ON") cs3 = "1";
-      else if((QString)cs3 == "OFF") cs3 = "0";
+      if(QString::fromStdString(cs3) == "ON") cs3 = "1";
+      else if(QString::fromStdString(cs3) == "OFF") cs3 = "0";
       PvlKeyword wav = pvl.findGroup("BANDBIN", Pvl::Traverse)["FILTERID"];
 
       // Set up calibration, linearity, and offset variables for the input file
-      vikcalSetup(mission, spn, target, cam, wav, (int)cs1, (int)cs2, (int)cs3, (int)cs4);
-      viklinSetup(mission, spn, target, cam, wav, (int)cs1, (int)cs2, (int)cs3, (int)cs4);
+      vikcalSetup(mission, spn, target, cam, QString::fromStdString(wav), (int)cs1, (int)cs2, (int)cs3, (int)cs4);
+      viklinSetup(mission, spn, target, cam, QString::fromStdString(wav), (int)cs1, (int)cs2, (int)cs3, (int)cs4);
       vikoffSetup(mission, spn, target, cam, clock, (int)cs3);
     }
     catch(IException &e) {
-      QString msg = "Input file [" + fname + "] does not appear to be a viking image";
+      std::string msg = "Input file [" + fname.toStdString() + "] does not appear to be a viking image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -127,7 +127,7 @@ namespace Isis {
     vector<QString> line;
 
     // Read in vikcal.sav calibration file
-    TextFile cal("$viking" + toString(spn) + "/calibration/vikcal.sav",
+    TextFile cal("$viking" + QString::number(spn) + "/calibration/vikcal.sav",
                  "input", line, 0, true);
 
     // Search for a line in the vikcal.sav file that matches our data from the
@@ -139,29 +139,29 @@ namespace Isis {
 
       if(tokens.count() < 15) continue;
       if(tokens[0] != mission) continue;
-      if(toInt(tokens[1]) != spn) continue;
-      if(toInt(tokens[2]) != cam) continue;
+      if(tokens[1].toInt() != spn) continue;
+      if(tokens[2].toInt() != cam) continue;
       if(tokens[3] != wav) continue;
-      if(toInt(tokens[4]) != cs1) continue;
-      if(toInt(tokens[5]) != cs2) continue;
-      if(toInt(tokens[6]) != cs3) continue;
-      if(toInt(tokens[7]) != cs4) continue;
+      if(tokens[4].toInt() != cs1) continue;
+      if(tokens[5].toInt() != cs2) continue;
+      if(tokens[6].toInt() != cs3) continue;
+      if(tokens[7].toInt() != cs4) continue;
 
 
       // The line is a match for our data, so set all the
       // Calibration variables to their correct values
-      p_w0 = toDouble(tokens[8]);
-      p_dist = toDouble(tokens[9]);
-      p_gain = toDouble(tokens[10]);
-      p_offset = toDouble(tokens[11]);
-      p_exp = toDouble(tokens[12]);
-      p_gainFile = "$viking" + toString(spn) + "/calibration/" + tokens[13]
+      p_w0 = tokens[8].toDouble();
+      p_dist = tokens[9].toDouble();
+      p_gain = tokens[10].toDouble();
+      p_offset = tokens[11].toDouble();
+      p_exp = tokens[12].toDouble();
+      p_gainFile = "$viking" + QString::number(spn) + "/calibration/" + tokens[13]
                    + ".cub";
-      p_offsetFile = "$viking" + toString(spn) + "/calibration/" +
+      p_offsetFile = "$viking" + QString::number(spn) + "/calibration/" +
                      tokens[14] + ".cub";
       return;
     }
-    QString msg = "Could not find match in [vikcal.sav] calibration file";
+    std::string msg = "Could not find match in [vikcal.sav] calibration file";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -208,7 +208,7 @@ namespace Isis {
                                   int cam, QString wav, int cs1, int cs2, int cs3, int cs4) {
 
     vector<QString> line;
-    TextFile lin("$viking" + toString(spn) + "/calibration/viklin.sav",
+    TextFile lin("$viking" + QString::number(spn) + "/calibration/viklin.sav",
                  "input", line, 0, true);
 
     for(int i = 0; i < (int)line.size(); i++) {
@@ -218,20 +218,20 @@ namespace Isis {
 
       if(tokens.count() < 10) continue;
       if(tokens[0] != mission) continue;
-      if(toInt(tokens[1]) != spn) continue;
-      if(toInt(tokens[2]) != cam) continue;
+      if(tokens[1].toInt() != spn) continue;
+      if(tokens[2].toInt() != cam) continue;
       if(tokens[3] != wav) continue;
-      if(toInt(tokens[4]) != cs1) continue;
-      if(toInt(tokens[5]) != cs2) continue;
-      if(toInt(tokens[6]) != cs3) continue;
+      if(tokens[4].toInt() != cs1) continue;
+      if(tokens[5].toInt() != cs2) continue;
+      if(tokens[6].toInt() != cs3) continue;
 
       // Set all Linearity variables to the correct values
-      p_b = toDouble(tokens[7]);
-      p_k = toDouble(tokens[8]);
-      p_normpow = toDouble(tokens[9]);
+      p_b = tokens[7].toDouble();
+      p_k = tokens[8].toDouble();
+      p_normpow = tokens[9].toDouble();
       return;
     }
-    QString msg = "Could not find match in [viklin.sav] calibration file";
+    std::string msg = "Could not find match in [viklin.sav] calibration file";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -255,8 +255,8 @@ namespace Isis {
 
     // Get the correct offset file - depends on which camera the input image is
     // from
-    QString fname = "$viking" + toString(spn) + "/calibration/vikoffcam" +
-                   toString(cam) + ".sav";
+    QString fname = "$viking" + QString::number(spn) + "/calibration/vikoffcam" +
+                   QString::number(cam) + ".sav";
     TextFile off(fname, "input", line, 0, true);
     vector<double> pp[5], off3;
     double pp1_off[5], pp2_off[5], pp_off[5];
@@ -275,45 +275,45 @@ namespace Isis {
       if(tokens[0] == "VIKING") {
         if (tokens.count() < 12) continue;
 
-        if(toInt(tokens[1]) == spn) { }
-        if(toInt(tokens[2]) == cam) { }
-        pp[0].push_back(toDouble(tokens[3]));
-        pp[0].push_back(toDouble(tokens[4]));
-        pp[1].push_back(toDouble(tokens[5]));
-        pp[1].push_back(toDouble(tokens[6]));
-        pp[2].push_back(toDouble(tokens[7]));
-        pp[2].push_back(toDouble(tokens[8]));
-        pp[3].push_back(toDouble(tokens[9]));
-        pp[3].push_back(toDouble(tokens[10]));
-        pp[4].push_back(toDouble(tokens[11]));
-        pp[4].push_back(toDouble(tokens[12]));
+        if(tokens[1].toInt() == spn) { }
+        if(tokens[2].toInt() == cam) { }
+        pp[0].push_back(tokens[3].toDouble());
+        pp[0].push_back(tokens[4].toDouble());
+        pp[1].push_back(tokens[5].toDouble());
+        pp[1].push_back(tokens[6].toDouble());
+        pp[2].push_back(tokens[7].toDouble());
+        pp[2].push_back(tokens[8].toDouble());
+        pp[3].push_back(tokens[9].toDouble());
+        pp[3].push_back(tokens[10].toDouble());
+        pp[4].push_back(tokens[11].toDouble());
+        pp[4].push_back(tokens[12].toDouble());
         continue;
       }
-      if(toDouble(tokens[0]) < clock) {
+      if(tokens[0].toDouble() < clock) {
         if (tokens.count() < 7) continue;
 
-        frm1 = toDouble(tokens[0]);
-        off3.push_back(toDouble(tokens[1]));
-        pp1_off[2] = toDouble(tokens[2]);
-        pp1_off[0] = pp1_off[2] + toDouble(tokens[3]);
-        pp1_off[1] = pp1_off[2] + toDouble(tokens[4]);
-        pp1_off[3] = pp1_off[2] + toDouble(tokens[5]);
-        pp1_off[4] = pp1_off[2] + toDouble(tokens[6]);
+        frm1 = tokens[0].toDouble();
+        off3.push_back(tokens[1].toDouble());
+        pp1_off[2] = tokens[2].toDouble();
+        pp1_off[0] = pp1_off[2] + tokens[3].toDouble();
+        pp1_off[1] = pp1_off[2] + tokens[4].toDouble();
+        pp1_off[3] = pp1_off[2] + tokens[5].toDouble();
+        pp1_off[4] = pp1_off[2] + tokens[6].toDouble();
         continue;
       }
       else {
         if (tokens.count() < 7) continue;
 
-        frm2 = toDouble(tokens[0]);
-        off3.push_back(toDouble(tokens[1]));
-        pp2_off[2] = toDouble(tokens[2]);
-        pp2_off[0] = pp2_off[2] + toDouble(tokens[3]);
-        pp2_off[1] = pp2_off[2] + toDouble(tokens[4]);
-        pp2_off[3] = pp2_off[2] + toDouble(tokens[5]);
-        pp2_off[4] = pp2_off[2] + toDouble(tokens[6]);
+        frm2 = tokens[0].toDouble();
+        off3.push_back(tokens[1].toDouble());
+        pp2_off[2] = tokens[2].toDouble();
+        pp2_off[0] = pp2_off[2] + tokens[3].toDouble();
+        pp2_off[1] = pp2_off[2] + tokens[4].toDouble();
+        pp2_off[3] = pp2_off[2] + tokens[5].toDouble();
+        pp2_off[4] = pp2_off[2] + tokens[6].toDouble();
       }
       if(frm1 == -1.0 || frm2 == -1.0) {
-        QString msg = "Could not find match in [vikoff.sav] calibration file";
+        std::string msg = "Could not find match in [vikoff.sav] calibration file";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -358,7 +358,7 @@ namespace Isis {
 
       return;
     }
-    QString msg = "Could not find match in [vikoff.sav] calibration file";
+    std::string msg = "Could not find match in [vikoff.sav] calibration file";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -388,8 +388,8 @@ namespace Isis {
         SpiceDouble lt, et;
         FileName fname1 = (FileName)"$base/kernels/lsk/naif0007.tls";
         FileName fname2 = (FileName)"$base/kernels/spk/de405.bsp";
-        QString tempfname1 = fname1.expanded();
-        QString tempfname2 = fname2.expanded();
+        QString tempfname1 = QString::fromStdString(fname1.expanded());
+        QString tempfname2 = QString::fromStdString(fname2.expanded());
         furnsh_c(tempfname1.toLatin1().data());
         furnsh_c(tempfname2.toLatin1().data());
         utc2et_c(t.toLatin1().data(), &et);
@@ -398,7 +398,7 @@ namespace Isis {
         NaifStatus::CheckErrors();
       }
       catch(IException &e) {
-        QString msg = "Unable to determine the distance from Mars to the Sun";
+        std::string msg = "Unable to determine the distance from Mars to the Sun";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
     }

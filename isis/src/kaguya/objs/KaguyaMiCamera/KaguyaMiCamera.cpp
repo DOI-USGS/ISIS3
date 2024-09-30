@@ -50,7 +50,7 @@ namespace Isis {
       m_instrumentNameShort = "MI-NIR";
     }
     else {
-      QString msg = QString::number(ikCode);
+      std::string msg = toString(ikCode);
       msg += " is not a supported instrument kernel code for Kaguya.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -60,14 +60,14 @@ namespace Isis {
 
     SetFocalLength();
     //Kaguya IK kernel uses INS-131???_PIXEL_SIZE instead of PIXEL_PITCH
-    QString ikernKey = "INS" + toString(naifIkCode()) + "_PIXEL_SIZE";
+    QString ikernKey = "INS" + QString::number(naifIkCode()) + "_PIXEL_SIZE";
     SetPixelPitch(getDouble(ikernKey));
 
 
     // Get the start time from labels
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-    QString stime = (QString)inst["StartTime"];
+    QString stime = QString::fromStdString(inst["StartTime"]);
     SpiceDouble etStart=0;
 
     if(stime != "NULL") {
@@ -92,7 +92,7 @@ namespace Isis {
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     // Retrieve boresight location from instrument kernel (IK) (addendum?)
-    ikernKey = "INS" + toString(naifIkCode()) + "_CENTER";
+    ikernKey = "INS" + QString::number(naifIkCode()) + "_CENTER";
     double sampleBoreSight = getDouble(ikernKey,0);
     double lineBoreSight = getDouble(ikernKey,1)-1.0;
 

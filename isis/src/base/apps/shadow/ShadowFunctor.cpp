@@ -43,22 +43,18 @@ namespace Isis {
       m_inputDemMax = (double)shapeModelStats[0]["MaximumRadius"] * 1000.0;
 
       if ((double)shapeModelStats[0]["MinimumRadius"] <= 0.0) {
-        throw IException(IException::Unknown,
-                         QObject::tr("The input cube [%1] to the shadowing algorithm must be a DEM "
-                             "which stores radii; The input DEM contains zero or negative radii")
-                           .arg(inputDem->fileName()),
+        throw IException(IException::Unknown,"The input cube [" + inputDem->fileName().toStdString() + "] to the shadowing algorithm must be a DEM "
+                             "which stores radii; The input DEM contains zero or negative radii",
                          _FILEINFO_);
       }
     }
     catch (IException &e) {
-      throw IException(e, IException::Unknown,
-                       QObject::tr("The input cube [%1] is not a proper DEM. All DEM "
+      throw IException(e, IException::Unknown, "The input cube [" + inputDem->fileName().toStdString() + "] is not a proper DEM. All DEM "
                                    "files must now be padded at the poles and contain a "
                                    "ShapeModelStatistics table defining their minimum and maximum "
                                    "radii values. The demprep program should be used to prepare the "
                                    "DEM before you can run this program. There is more information "
-                                   "available in the documentation of the demprep program.")
-                         .arg(inputDem->fileName()),
+                                   "available in the documentation of the demprep program.",
                        _FILEINFO_);
     }
 
@@ -138,49 +134,49 @@ namespace Isis {
     PvlGroup shadowStats("ShadowStatistics");
 
     shadowStats += PvlKeyword("NumComputedAzimuthElevations",
-                              toString(m_azimuthStats->ValidPixels()));
+                              Isis::toString(m_azimuthStats->ValidPixels()));
 
     if (m_azimuthStats->ValidPixels() > 0) {
       PvlKeyword averageAzimuth("AverageAzimuth",
-                                toString(m_azimuthStats->Average()));
+                                Isis::toString(m_azimuthStats->Average()));
       averageAzimuth.addCommentWrapped("The azimuth is measured from three o'clock, going "
                                        "clockwise, in degrees");
       shadowStats += averageAzimuth;
 
-      shadowStats += PvlKeyword("MinimumAzimuth", toString(m_azimuthStats->Minimum()));
-      shadowStats += PvlKeyword("MaximumAzimuth", toString(m_azimuthStats->Maximum()));
+      shadowStats += PvlKeyword("MinimumAzimuth", Isis::toString(m_azimuthStats->Minimum()));
+      shadowStats += PvlKeyword("MaximumAzimuth", Isis::toString(m_azimuthStats->Maximum()));
 
-      PvlKeyword averageElevation("AverageElevation", toString(m_elevationStats->Average()));
+      PvlKeyword averageElevation("AverageElevation", Isis::toString(m_elevationStats->Average()));
       averageElevation.addCommentWrapped("The elevation is measured from the normal, with directly "
           "overhead being 0 degrees and the horizon 90 degrees. Elevations are prevented from "
           "going below the horizon.");
       shadowStats += averageElevation;
 
-      shadowStats += PvlKeyword("MinimumElevation", toString(m_elevationStats->Minimum()));
-      shadowStats += PvlKeyword("MaximumElevation", toString(m_elevationStats->Maximum()));
+      shadowStats += PvlKeyword("MinimumElevation", Isis::toString(m_elevationStats->Minimum()));
+      shadowStats += PvlKeyword("MaximumElevation", Isis::toString(m_elevationStats->Maximum()));
     }
 
-    PvlKeyword numRays("NumRays", toString(m_rayLengthStats->ValidPixels()));
+    PvlKeyword numRays("NumRays", Isis::toString(m_rayLengthStats->ValidPixels()));
     numRays.addCommentWrapped("This is the total number of rays traced from the surface towards "
                               "the sun in order to detect if any given pixel is in shadow");
     shadowStats += numRays;
 
     shadowStats += PvlKeyword("NumRayDemIntersections",
-                              toString(qRound(m_rayLengthStats->Sum())));
+                              Isis::toString(qRound(m_rayLengthStats->Sum())));
 
     if (m_rayLengthStats->ValidPixels() > 0) {
       shadowStats += PvlKeyword("AverageRayDemIntersectionsPerRay",
-                                toString(m_rayLengthStats->Average()));
+                                Isis::toString(m_rayLengthStats->Average()));
     }
 
     shadowStats += PvlKeyword("NumLightedPixels",
-        toString(qRound((1.0 - m_shadowedStats->Average()) * m_shadowedStats->ValidPixels())));
+        Isis::toString(qRound((1.0 - m_shadowedStats->Average()) * m_shadowedStats->ValidPixels())));
     shadowStats += PvlKeyword("NumShadowedPixels",
-        toString(qRound(m_shadowedStats->Average() * m_shadowedStats->ValidPixels())));
+        Isis::toString(qRound(m_shadowedStats->Average() * m_shadowedStats->ValidPixels())));
     shadowStats += PvlKeyword("NumSpecialPixels",
-        toString(m_shadowedStats->TotalPixels() - m_shadowedStats->ValidPixels()));
+        Isis::toString(m_shadowedStats->TotalPixels() - m_shadowedStats->ValidPixels()));
     shadowStats += PvlKeyword("NumPixelsShadowedByRays",
-        toString(qRound(m_shadowedByRayStats->Sum())));
+        Isis::toString(qRound(m_shadowedByRayStats->Sum())));
 
     return shadowStats;
   }
@@ -446,10 +442,8 @@ namespace Isis {
    */
   void ShadowFunctor::setRayPrecision(double approxDemRayTracePrecisionInPixels) {
     if (approxDemRayTracePrecisionInPixels <= 0.0) {
-      throw IException(IException::Unknown,
-                       QObject::tr("Ray precision [%1] must be positive; the algorithm does not "
-                                   "support ray tracing backwards through the target")
-                         .arg(approxDemRayTracePrecisionInPixels),
+      throw IException(IException::Unknown,"Ray precision [" + toString(approxDemRayTracePrecisionInPixels) + "] must be positive; the algorithm does not "
+                                   "support ray tracing backwards through the target",
                        _FILEINFO_);
     }
 
@@ -463,15 +457,13 @@ namespace Isis {
   void ShadowFunctor::setSunPosition(FileName cubeFileNameWithCamToMatch) {
     try {
       Cube matchCube;
-      matchCube.open(cubeFileNameWithCamToMatch.original(), "r");
+      matchCube.open(QString::fromStdString(cubeFileNameWithCamToMatch.original()), "r");
 
       setSunPosition(&matchCube);
     }
     catch (IException &e) {
       throw IException(e,
-          IException::User,
-          QObject::tr("Could not find the sun position from the match file [%1]")
-            .arg(cubeFileNameWithCamToMatch.original()),
+          IException::User,"Could not find the sun position from the match file [" + cubeFileNameWithCamToMatch.original() + "]",
           _FILEINFO_);
     }
   }
@@ -488,10 +480,8 @@ namespace Isis {
     }
     catch (IException &e) {
       throw IException(e,
-          IException::User,
-          QObject::tr("The match file [%1] must have camera information in order to identify the "
-                      "sun's position.")
-            .arg(cubeWithCamForSunPos->fileName()),
+          IException::User,"The match file [" + cubeWithCamForSunPos->fileName().toStdString() + "] must have camera information in order to identify the "
+                      "sun's position.",
           _FILEINFO_);
     }
 

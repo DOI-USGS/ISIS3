@@ -62,7 +62,7 @@ void IsisMain() {
 
   if(ui.WasEntered("TO")) {
     // Get user params from ui
-    QString outFile = FileName(ui.GetFileName("TO")).expanded();
+    std::string outFile = FileName(ui.GetFileName("TO").toStdString()).expanded();
     bool exists = FileName(outFile).fileExists();
     bool append = ui.GetBoolean("APPEND");
 
@@ -85,13 +85,13 @@ void IsisMain() {
       ofstream os;
       bool writeHeader = false;
       if(append) {
-        os.open(outFile.toLatin1().data(), ios::app);
+        os.open(outFile.c_str(), ios::app);
         if(!exists) {
           writeHeader = true;
         }
       }
       else {
-        os.open(outFile.toLatin1().data(), ios::out);
+        os.open(outFile.c_str(), ios::out);
         writeHeader = true;
       }
 
@@ -115,12 +115,12 @@ void IsisMain() {
 
       for(int i = 0; i < (*point).keywords(); i++) {
         if((*point)[i].size() == 3) {
-          os << (QString)(*point)[i][0] << ","
-             << (QString)(*point)[i][1] << ","
-             << (QString)(*point)[i][2];
+          os << (*point)[i][0] << ","
+             << (*point)[i][1] << ","
+             << (*point)[i][2];
         }
         else {
-          os << (QString)(*point)[i];
+          os << (*point)[i];
         }
 
         if(i < (*point).keywords() - 1) {
@@ -132,7 +132,7 @@ void IsisMain() {
   }
   else {
     if(ui.GetString("FORMAT") == "FLAT") {
-      QString msg = "Flat file must have a name.";
+      std::string msg = "Flat file must have a name.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }

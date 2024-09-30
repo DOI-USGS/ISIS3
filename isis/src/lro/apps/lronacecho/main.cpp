@@ -36,11 +36,11 @@ void IsisMain() {
   g_delta = ui.GetDouble("DELTA");
   g_halfDelta = g_delta/2.0;
 
-  Pvl lab(ui.GetCubeName("FROM"));
+  Pvl lab(ui.GetCubeName("FROM").toStdString());
   PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
   // Check if it is a NAC image
-  QString instId = inst["InstrumentId"];
+  QString instId =  QString::fromStdString(inst["InstrumentId"]);
   if (instId != "NACL" && instId != "NACR") {
     string msg = "This is not a NAC image. lrocnacecho requires a NAC image.";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -62,7 +62,7 @@ void IsisMain() {
 
   // Make sure that we aren't passed in a scaled or cropped cub
   if(lab.findObject("IsisCube").hasGroup("AlphaCube")) {
-    QString msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
+    std::string msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 

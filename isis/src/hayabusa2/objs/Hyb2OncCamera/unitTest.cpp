@@ -76,7 +76,7 @@ int main(void) {
 
 void testCamera(Cube &c, double knownLat, double knownLon) {
   Hyb2OncCamera *cam = (Hyb2OncCamera *) CameraFactory::Create(c);
-  qDebug() << "FileName: " << FileName(c.fileName()).name();
+  qDebug() << "FileName: " <<  QString::fromStdString(FileName(c.fileName().toStdString()).name());
   qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();
   qDebug() << "";
 
@@ -98,12 +98,12 @@ void testCamera(Cube &c, double knownLat, double knownLon) {
   // Test Shutter Open/Close
   const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
   double exposureDuration = ((double) inst["ExposureDuration"])/1000;
-  QString stime = inst["StartTime"];
+  QString stime = QString::fromStdString(inst["StartTime"]);
   double et; // StartTime keyword is the center exposure time
   str2et_c(stime.toLatin1().data(), &et);
   pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
-  qDebug() << "Shutter open  = " << toString(shuttertimes.first.Et(), 16);
-  qDebug() << "Shutter close = " << toString(shuttertimes.second.Et(), 16);
+  qDebug() << "Shutter open  = " << QString::number(shuttertimes.first.Et(),'g', 16);
+  qDebug() << "Shutter close = " << QString::number(shuttertimes.second.Et(),'g', 16);
   qDebug() << "";
 
   // Test all four corners to make sure the conversions are right
@@ -129,14 +129,14 @@ void testCamera(Cube &c, double knownLat, double knownLon) {
     qDebug() << "Latitude OK";
   }
   else {
-    qDebug() << "Latitude off by:  " << toString(cam->UniversalLatitude() - knownLat, 16);
+    qDebug() << "Latitude off by:  " << QString::number(cam->UniversalLatitude() - knownLat,'g', 16);
   }
 
   if(abs(cam->UniversalLongitude() - knownLon) < 1E-10) {
     qDebug() << "Longitude OK";
   }
   else {
-    qDebug() << "Longitude off by: " << toString(cam->UniversalLongitude() - knownLon, 16);
+    qDebug() << "Longitude off by: " << QString::number(cam->UniversalLongitude() - knownLon,'g', 16);
   }
 
   testLineSamp( cam, (cam->Samples()/2.0), (cam->Lines()/2.0) );

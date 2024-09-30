@@ -118,24 +118,24 @@ namespace Isis {
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     //  Vis or IR
-    p_channel = (QString) inst ["Channel"];
+    p_channel = QString::fromStdString(inst ["Channel"]);
     // Get the start time in et
-    QString stime = (QString) inst ["NativeStartTime"];
+    QString stime = QString::fromStdString(inst ["NativeStartTime"]);
     QString intTime = stime.split(".").first();
     stime = stime.split(".").last();
 
     p_etStart = p_camera->getClockTime(intTime).Et();
-    p_etStart += toDouble(stime) / 15959.0;
+    p_etStart += stime.toDouble() / 15959.0;
     //----------------------------------------------------------------------
     //  Because of inaccuracy with the 15 Mhz clock, the IR exposure and
     //  interline delay need to be adjusted.
     //----------------------------------------------------------------------
-    p_irExp = (toDouble(inst ["ExposureDuration"][0]) * 1.01725) / 1000.;
-    p_visExp = (toDouble(inst ["ExposureDuration"][1])) / 1000.;
-    p_interlineDelay = (toDouble(inst ["InterlineDelayDuration"]) * 1.01725) / 1000.;
+    p_irExp = (Isis::toDouble(inst ["ExposureDuration"][0]) * 1.01725) / 1000.;
+    p_visExp = (Isis::toDouble(inst ["ExposureDuration"][1])) / 1000.;
+    p_interlineDelay = (Isis::toDouble(inst ["InterlineDelayDuration"]) * 1.01725) / 1000.;
 
     // Get summation mode
-    QString sampMode = QString((QString)inst ["SamplingMode"]).toUpper();
+    QString sampMode = QString::fromStdString(inst ["SamplingMode"]).toUpper();
 
     //  Get sample/line offsets
     int sampOffset = inst ["XOffset"];
@@ -163,7 +163,7 @@ namespace Isis {
         p_camLineOffset = (3 * (lineOffset + p_swathLength / 2)) - p_swathLength / 2;
       }
       else {
-        string msg = "Unsupported SamplingMode [" + IString(sampMode) + "]";
+        string msg = "Unsupported SamplingMode [" + sampMode.toStdString() + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
@@ -183,7 +183,7 @@ namespace Isis {
         p_camLineOffset = lineOffset - 1;
       }
       else {
-        string msg = "Unsupported SamplingMode [" + IString(sampMode) + "]";
+        string msg = "Unsupported SamplingMode [" + sampMode.toStdString() + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }

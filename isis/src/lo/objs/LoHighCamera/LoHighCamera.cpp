@@ -57,8 +57,8 @@ namespace Isis {
       m_spacecraftNameShort = "LO5";
     }
     else {
-      QString msg = "File does not appear to be a Lunar Orbiter image: ";
-      msg += QString::number(naifIkCode());
+      std::string msg = "File does not appear to be a Lunar Orbiter image: ";
+      msg += toString(naifIkCode());
       msg += " is not a supported instrument kernel code for Lunar Orbiter.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -66,8 +66,8 @@ namespace Isis {
     // Get the Instrument label information needed to define the camera for this frame
     Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
-    QString spacecraft = (QString)inst["SpacecraftName"];
-    QString instId = (QString)inst["InstrumentId"];
+    QString spacecraft = QString::fromStdString(inst["SpacecraftName"]);
+    QString instId = QString::fromStdString(inst["InstrumentId"]);
 
     // Turn off the aberration corrections for the instrument position object
     instrumentPosition()->SetAberrationCorrection("NONE");
@@ -77,7 +77,7 @@ namespace Isis {
     SetPixelPitch();
 
     // Get the start time in et
-    double time = iTime((QString)inst["StartTime"]).Et();
+    double time = iTime(QString::fromStdString(inst["StartTime"])).Et();
 
     // Setup focal plane map
     LoCameraFiducialMap fid(inst, naifIkCode());
@@ -108,7 +108,7 @@ namespace Isis {
       m_ckFrameId = -535000;
     }
     else {
-      QString msg = "File does not appear to be an LunarOrbiter 3,4,5 image";
+      std::string msg = "File does not appear to be an LunarOrbiter 3,4,5 image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 

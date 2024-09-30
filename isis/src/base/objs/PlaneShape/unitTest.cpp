@@ -61,10 +61,10 @@ int main() {
     PlaneShape shape2(&targ);
     PlaneShape shape3;
 
-    cout << "    Shape1  name is " << shape.name() << endl;
-    cout << "    Shape2  name is " << shape2.name() << endl;
-    cout << "    Shape3  name is " << shape3.name() << endl;
-    cout << "    Shape is DEM type? " << toString(shape3.isDEM()) << endl;
+    cout << "    Shape1  name is " << shape.name().toStdString() << endl;
+    cout << "    Shape2  name is " << shape2.name().toStdString() << endl;
+    cout << "    Shape3  name is " << shape3.name().toStdString() << endl;
+    cout << "    Shape is DEM type? " << Isis::toString((bool)shape3.isDEM()) << endl;
 
     std::vector<double> sB(3);
     sB[0] = -19584.5;
@@ -166,7 +166,7 @@ int main() {
   } 
   catch (IException &e) {
     cout << endl << endl;
-    QString msg = "**************** UNIT TEST FAILED! **************** ";
+    std::string msg = "**************** UNIT TEST FAILED! **************** ";
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
 }

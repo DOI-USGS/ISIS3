@@ -72,19 +72,19 @@ void IsisMain() {
 
   // Verify Voyager1 spacecraft
   if (inst["SpacecraftName"][0] != "VOYAGER_1") {
-    QString msg = "The cube [" + ui.GetCubeName("FROM") + "] does not appear" +
+    std::string msg = "The cube [" + ui.GetCubeName("FROM").toStdString() + "] does not appear" +
                   " to be a Voyager1 image";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Verify has been radiometrically calibrated
   if (!isiscube.hasGroup("Radiometry")) {
-    QString msg = "The cube [" + ui.GetCubeName("FROM") + "] has not been" +
+    std::string msg = "The cube [" + ui.GetCubeName("FROM").toStdString() + "] has not been" +
                   "radiometrically corrected, run voycal first";
   }
 
   // Image time
-  iTime time(inst["StartTime"][0]);
+  iTime time(QString::fromStdString(inst["StartTime"][0]));
   // Day 64, hour 1
   iTime min("1979-03-05T01:00:00.000");
   // Day 64, hour 17
@@ -92,9 +92,9 @@ void IsisMain() {
 
   // From Isis2, the time range is day 64, hours 1-16, inclusive.
   if (time < min || time >= max) {
-    QString message = "The cube [" + ui.GetCubeName("FROM") + "] has image" +
-                      " time [" + time.UTC() + "] outside of allowable" +
-                      "range [" + min.UTC() + "] to [" + max.UTC() + "]";
+    std::string message = "The cube [" + ui.GetCubeName("FROM").toStdString() + "] has image" +
+                      " time [" + time.UTC().toStdString() + "] outside of allowable" +
+                      "range [" + min.UTC().toStdString() + "] to [" + max.UTC().toStdString() + "]";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
@@ -155,10 +155,10 @@ void IsisMain() {
   plasmaC = detb3/deta;
 
   // Create data to go in Radiometry group
-  PvlKeyword top = PvlKeyword("TopCorrectiveDN", toString(y1));
+  PvlKeyword top = PvlKeyword("TopCorrectiveDN", Isis::toString(y1));
   top.addComment("Voyramp plasma torus corrective DN values:");
-  PvlKeyword mid = PvlKeyword("MiddleCorrectiveDN", toString(y2));
-  PvlKeyword bot = PvlKeyword("BottomCorrectiveDN", toString(y3));
+  PvlKeyword mid = PvlKeyword("MiddleCorrectiveDN", Isis::toString(y2));
+  PvlKeyword bot = PvlKeyword("BottomCorrectiveDN", Isis::toString(y3));
 
   // Add it
   radio += top;

@@ -120,7 +120,7 @@ namespace Isis{
       // -------------------------------------------------------------------------//
       // Get required global ui...
       // -------------------------------------------------------------------------//
-      Pvl paramsPvl(ui.GetFileName("PARAMSPVL"));
+      Pvl paramsPvl(ui.GetFileName("PARAMSPVL").toStdString());
       bool defaultNames = ui.GetBoolean("DEFAULTNAMES");
 
       // parameters:
@@ -170,13 +170,13 @@ namespace Isis{
       // this directory won't be used if defaultNames=false but will be used for
       // both DTM and ortho if defaultNames=true.
       FileName outFile;
-      QString outDirString;
-      FileName outDir = FileName(ui.GetString("OUTPUTDIR"));
+      std::string outDirString;
+      FileName outDir = FileName(ui.GetString("OUTPUTDIR").toStdString());
       if (!outDir.fileExists()) {
-        outDir.dir().mkpath(".");
+        std::filesystem::create_directories(outDir.dir());
       }
       outDirString = outDir.expanded();
-      if (outDirString.mid(outDirString.size()-1, 1) != "/") {
+      if (outDirString.substr(outDirString.size()-1, 1) != "/") {
         outDirString += "/";
         outDir = FileName(outDirString);
       }
@@ -189,12 +189,12 @@ namespace Isis{
         // set the input cube to process
         CubeAttributeInput inAttribute;
         Cube *inCube = pdsExportProcess.SetInputCube(ui.GetCubeName("DTM"), inAttribute);
-        verifyDTM(inCube,  ui.GetCubeName("DTM"));
+        verifyDTM(inCube,  ui.GetCubeName("DTM").toStdString());
 
         // These are our output labels, will be modifying heavily
         Pvl &pdsLabel = pdsExportProcess.StandardPdsLabel(ProcessExportPds::Image);
         PvlObject &mappingObject = pdsLabel.findObject("IMAGE_MAP_PROJECTION");
-        QString projectionType = mappingObject["MAP_PROJECTION_TYPE"][0];
+        QString projectionType = QString::fromStdString(mappingObject["MAP_PROJECTION_TYPE"][0]);
         setProjectionInformation(inCube, pdsLabel, mappingObject, projectionType);
         customizeDtmLabels(inCube,  pdsLabel,  mappingObject);
 
@@ -214,11 +214,11 @@ namespace Isis{
           // Get the 2-character version number from the PARAMSPVL and add it
           dtmProductId += versionNumber(paramsPvl, ui);
 
-          outFile = FileName(outDirString + dtmProductId + ".IMG");
+          outFile = FileName(outDirString + dtmProductId.toStdString() + ".IMG");
         }
         else {
           dtmProductId = ui.GetString("DTM_PRODUCT_ID");
-          outFile = FileName(ui.GetFileName("DTMTO"));
+          outFile = FileName(ui.GetFileName("DTMTO").toStdString());
         } // End scope of defaultNames true
 
         // identification labels that are pretty set in stone
@@ -226,7 +226,7 @@ namespace Isis{
         processCube(pdsExportProcess, outFile);
         if (!outFile.fileExists()) {
           throw IException(IException::Unknown,
-                           QString("DTM file [%1] failed to be created.").arg(outFile.expanded()),
+                           "DTM file ["+outFile.expanded()+"] failed to be created.",
                            _FILEINFO_);
         }
       } // end if DTM was entered
@@ -246,7 +246,7 @@ namespace Isis{
       if (ui.WasEntered("ORTHOFROMLIST")) {
 
         FileList orthoFromList;
-        orthoFromList.read(FileName(ui.GetFileName("ORTHOFROMLIST")));
+        orthoFromList.read(FileName(ui.GetFileName("ORTHOFROMLIST").toStdString()));
         if(orthoFromList.size() == 0) {
           throw IException(IException::User, "Input ortho list is empty.", _FILEINFO_);
         }
@@ -256,7 +256,7 @@ namespace Isis{
         if (defaultNames) {
           // if creating default output file names and product ids then we need to get the list of
           // ortho sequence numbers
-          orthoSequenceNumberList.read(FileName(ui.GetFileName("ORTHOSEQUENCENUMBERLIST")));
+          orthoSequenceNumberList.read(FileName(ui.GetFileName("ORTHOSEQUENCENUMBERLIST").toStdString()));
           if(orthoFromList.size() != orthoSequenceNumberList.size()) {
             throw IException(IException::User, "Output sequence number list must "
                                                "correspond to the input ortho list.", _FILEINFO_);
@@ -264,8 +264,8 @@ namespace Isis{
         }
         else {
           // if not creating default names, get the lists of ortho output cube names and product ids
-          orthoToList.read(FileName(ui.GetFileName("ORTHOTOLIST")));
-          orthoProductIdList.read(FileName(ui.GetFileName("ORTHOPRODUCTIDLIST")));
+          orthoToList.read(FileName(ui.GetFileName("ORTHOTOLIST").toStdString()));
+          orthoProductIdList.read(FileName(ui.GetFileName("ORTHOPRODUCTIDLIST").toStdString()));
           if(orthoFromList.size() != orthoToList.size()
              || orthoFromList.size() != orthoProductIdList.size()) {
             throw IException(IException::User,
@@ -292,35 +292,35 @@ namespace Isis{
 
           // set the input cube to process
           CubeAttributeInput att(orthoFromList[i]);
-          Cube *inCube = orthoExportProcess.SetInputCube(orthoFromList[i].expanded(), att);
+          Cube *inCube = orthoExportProcess.SetInputCube(QString::fromStdString(orthoFromList[i].expanded()), att);
 
           // get the cube label and set identification info
           Pvl &pdsLabel  = orthoExportProcess.StandardPdsLabel(ProcessExportPds::Image);
 
           // set map projection information
           PvlObject &mappingObject = pdsLabel.findObject("IMAGE_MAP_PROJECTION");
-          QString projectionType = mappingObject["MAP_PROJECTION_TYPE"][0];
+          QString projectionType = QString::fromStdString(mappingObject["MAP_PROJECTION_TYPE"][0]);
           setProjectionInformation(inCube, pdsLabel, mappingObject, projectionType);
 
           QString productId = "";
           QString orthoId = "";
           if (defaultNames) {
-            orthoId = orthoFromList[i].baseName().left(15);
+            orthoId = QString::fromStdString(orthoFromList[i].baseName()).left(15);
             productId = orthoId;
             productId += "_";
             productId += orthoContentColorCode(orthoFromList[i]);
             productId += "_";
             productId += mapScaleCode(mappingObject.findKeyword("MAP_SCALE"));
             productId += "_";
-            productId += orthoSequenceNumberList[i].expanded();
+            productId += QString::fromStdString(orthoSequenceNumberList[i].expanded());
             productId += "_";
             productId += "ORTHO";
 
             // output file path is the same as the dtm
-            outFile = FileName(outDirString + productId + ".IMG");
+            outFile = FileName(outDirString + productId.toStdString() + ".IMG");
           }
           else {
-            productId = orthoProductIdList[i].expanded();
+            productId = QString::fromStdString(orthoProductIdList[i].expanded());
             outFile = orthoToList[i];
             orthoId = productId;
           }
@@ -332,15 +332,15 @@ namespace Isis{
             source += paramsPvl["ORTHO_SOURCE_DTM_ID"];
           }
           else {
-            source += dtmProductId;
+            source += dtmProductId.toStdString();
           }
-          source += orthoId;
+          source += orthoId.toStdString();
           setIdentificationInformation(pdsLabel, productId, source, paramsPvl, ui);
 
           processCube(orthoExportProcess, outFile);
           if (!outFile.fileExists()) {
             throw IException(IException::Unknown,
-                             QString("DTM file [%1] failed to be created.").arg(outFile.expanded()),
+                             "DTM file ["+outFile.expanded()+"] failed to be created.",
                              _FILEINFO_);
           }
 
@@ -463,7 +463,7 @@ namespace Isis{
 
 
   void processCube(ProcessExportPds &pdsExportProcess, const FileName  &outputPdsFile) {
-    ofstream pdsOut(outputPdsFile.expanded().toLatin1().data());
+    ofstream pdsOut(outputPdsFile.expanded().c_str());
     pdsExportProcess.OutputLabel(pdsOut);
     pdsExportProcess.StartProcess(pdsOut);
     pdsOut.close();
@@ -491,15 +491,15 @@ namespace Isis{
       pdsLabel.setFormatTemplate("$ISISROOT/appdata/translations/MroHirisePdsDTMPolar.pft");
     }
     else {
-      QString msg = "The projection type [" +
-                    projectionType
+      std::string msg = "The projection type [" +
+                    projectionType.toStdString()
                     + "] is not supported";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     PvlObject viewingParameters("VIEWING_PARAMETERS");
     if (northAzimuth != Isis::Null) {
-      viewingParameters.addKeyword(PvlKeyword("NORTH_AZIMUTH", toString(northAzimuth), "DEG"));
+      viewingParameters.addKeyword(PvlKeyword("NORTH_AZIMUTH", Isis::toString(northAzimuth), "DEG"));
     }
     else {
       viewingParameters.addKeyword(PvlKeyword("NORTH_AZIMUTH", "N/A"));
@@ -513,11 +513,11 @@ namespace Isis{
     TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(*inCube);
     double newRadius = proj->LocalRadius((double)mappingObject["CENTER_LATITUDE"]);
     newRadius /= 1000;
-    mappingObject.findKeyword("A_AXIS_RADIUS").setValue(toString(newRadius));
+    mappingObject.findKeyword("A_AXIS_RADIUS").setValue(Isis::toString(newRadius));
     mappingObject.findKeyword("A_AXIS_RADIUS").setUnits("KM");
-    mappingObject.findKeyword("B_AXIS_RADIUS").setValue(toString(newRadius));
+    mappingObject.findKeyword("B_AXIS_RADIUS").setValue(Isis::toString(newRadius));
     mappingObject.findKeyword("B_AXIS_RADIUS").setUnits("KM");
-    mappingObject.findKeyword("C_AXIS_RADIUS").setValue(toString(newRadius));
+    mappingObject.findKeyword("C_AXIS_RADIUS").setValue(Isis::toString(newRadius));
     mappingObject.findKeyword("C_AXIS_RADIUS").setUnits("KM");
   }
 
@@ -532,14 +532,14 @@ namespace Isis{
 
       // find the center latitude of this set of images
       // (not the same as the center lat for the projection)
-      double clat = ((toDouble(mappingObject["MAXIMUM_LATITUDE"][0]) -
-                      toDouble(mappingObject["MINIMUM_LATITUDE"][0])) / 2) +
-                    toDouble(mappingObject["MINIMUM_LATITUDE"][0]);
+      double clat = ((Isis::toDouble(mappingObject["MAXIMUM_LATITUDE"][0]) -
+                      Isis::toDouble(mappingObject["MINIMUM_LATITUDE"][0])) / 2) +
+                    Isis::toDouble(mappingObject["MINIMUM_LATITUDE"][0]);
       // find the center longitude of this set of images
       // (not the same as the center lon for the projection)
-      double clon = ((toDouble(mappingObject["EASTERNMOST_LONGITUDE"][0]) -
-                      toDouble(mappingObject["WESTERNMOST_LONGITUDE"][0])) / 2) +
-                    toDouble(mappingObject["WESTERNMOST_LONGITUDE"][0]);
+      double clon = ((Isis::toDouble(mappingObject["EASTERNMOST_LONGITUDE"][0]) -
+                      Isis::toDouble(mappingObject["WESTERNMOST_LONGITUDE"][0])) / 2) +
+                    Isis::toDouble(mappingObject["WESTERNMOST_LONGITUDE"][0]);
 
       if (clat > 0.0 && clon < 270.0) { // Northern Hemisphere, 0 to 270 lon
         northAzimuth = 270.00 - clon;
@@ -597,13 +597,13 @@ namespace Isis{
   QString dtmSourceOrbitAndTargetCodes(const PvlKeyword &sourceKeyword) {
     // we use the source product id for the DTM to get the orbit IDs and target code
     // for the source products (i.e. the stereo pair)
-    return sourceKeyword[0].mid(4,11) + "_" +
-           sourceKeyword[1].mid(4,12) + "_";
+    return QString::fromStdString(sourceKeyword[0]).mid(4,11) + "_" +
+           QString::fromStdString(sourceKeyword[1]).mid(4,12) + "_";
   }
 
 
   QString versionNumber(const Pvl &paramsPvl, const UserInterface &ui) {
-    double version = toDouble(paramsPvl["PRODUCT_VERSION_ID"]);
+    double version = Isis::toDouble(paramsPvl["PRODUCT_VERSION_ID"]);
 
     // Format the version for the output name:
     // Only important thing to note is that a #.0 number is converted to 0#
@@ -613,10 +613,10 @@ namespace Isis{
     // The number found here is used in ortho images as well.
     QString vers = "";
     if (version >= 10.0) {
-      vers = toString(version).left(2);
+      vers = QString::number(version).left(2);
     }
     else if (version >= 1.0) {
-      vers = toString(version);
+      vers = QString::number(version);
       bool wasInt = false;
       // Checking for integer values, if so, make #.0 into 0#
       // necessary because in DTMgen version 1.0 corresponded to a 01 in names.
@@ -628,7 +628,7 @@ namespace Isis{
       }
       // Wasn't int, make #.# into ##
       if (!wasInt) {
-        vers = toString(version).remove(QChar('.'));
+        vers = QString::number(version).remove(QChar('.'));
         if (vers.size() > 2) {
           vers = vers.left(2);
         }
@@ -636,7 +636,7 @@ namespace Isis{
     }
     // 0 - <1, if 0.#, is 0#, is 0.#####, is first two ##
     else if (version >= 0.001) { // Any less and we get E... not dealing with that.
-      vers = toString(version).remove(QChar('.'));
+      vers = QString::number(version).remove(QChar('.'));
       int nonZero = vers.lastIndexOf("0");
       if (vers.size() > 2) {
         vers = vers.mid(nonZero+1, 2);
@@ -644,7 +644,7 @@ namespace Isis{
     }
     // It was negative, or something else crazy?
     else {
-      QString msg = "Version number [" + toString(version) + "] is invalid";
+      std::string msg = "Version number [" + toString(version) + "] is invalid";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     return vers;
@@ -652,9 +652,9 @@ namespace Isis{
 
 
   QString producingInstitution(const Pvl &paramsPvl, const UserInterface &ui) {
-    QString producing = paramsPvl["PRODUCING_INSTITUTION"][0];
+    QString producing = QString::fromStdString(paramsPvl["PRODUCING_INSTITUTION"][0]);
     if (producing.size() > 1) {
-      QString msg = "PRODUCING_INSTITUTION value [" + producing + "] in the PARAMSPVL file must be a "
+      std::string msg = "PRODUCING_INSTITUTION value [" + producing.toStdString() + "] in the PARAMSPVL file must be a "
                     "single character. See hidtmgen documentation for these character codes.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -672,7 +672,7 @@ namespace Isis{
       colorCode = "IRB";
     }
     else {
-      QString msg = "The file [" + orthoFileName.expanded() + "] found in the ORTHOFROMLIST "
+      std::string msg = "The file [" + orthoFileName.expanded() + "] found in the ORTHOFROMLIST "
                     "is not a valid orthorectified image. Band count must be 1 (RED) or 3 (color).";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -693,7 +693,7 @@ namespace Isis{
     pdsLabel.addKeyword(paramsPvl["PRODUCER_FULL_NAME"]);
 
     // given product id
-    pdsLabel.addKeyword(PvlKeyword("PRODUCT_ID", productId));
+    pdsLabel.addKeyword(PvlKeyword("PRODUCT_ID", productId.toStdString()));
 
     // This comes from the user (PARAMSPVL)
     pdsLabel.addKeyword(paramsPvl["PRODUCT_VERSION_ID"]);
@@ -721,7 +721,7 @@ namespace Isis{
   void verifyDTM(Cube *inCube, const FileName &inputCubeFile) {
     if (inCube->bandCount() > 1 ||
         inCube->label()->hasObject("Instrument")) {
-      QString msg = "Input cube [" + inputCubeFile.expanded() + "] does not appear "
+      std::string msg = "Input cube [" + inputCubeFile.expanded() + "] does not appear "
                   + "to be a DTM";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -761,7 +761,7 @@ namespace Isis{
         "units is given by the keyvalues for SCALING_FACTOR and OFFSET. This "
         "DTM was produced using ISIS and SOCET Set (copyright BAE Systems) "
         "software as described in Kirk et al. (2008).";
-    dtmPdsLabel.findObject("IMAGE").addKeyword(PvlKeyword("NOTE", note));
+    dtmPdsLabel.findObject("IMAGE").addKeyword(PvlKeyword("NOTE", note.toStdString()));
 
     // Label records should always be 1, my example didn't included it, so we won't.
     dtmPdsLabel.deleteKeyword("LABEL_RECORDS");
@@ -777,8 +777,8 @@ namespace Isis{
 
     // Create statistics and add to image group
     Statistics *stat = inCube->statistics();
-    image.addKeyword(PvlKeyword("VALID_MINIMUM", toString(stat->Minimum())));
-    image.addKeyword(PvlKeyword("VALID_MAXIMUM", toString(stat->Maximum())));
+    image.addKeyword(PvlKeyword("VALID_MINIMUM", Isis::toString(stat->Minimum())));
+    image.addKeyword(PvlKeyword("VALID_MAXIMUM", Isis::toString(stat->Maximum())));
 
     // delete unneeded keywords in map object
     mappingObject.deleteKeyword("FIRST_STANDARD_PARALLEL");

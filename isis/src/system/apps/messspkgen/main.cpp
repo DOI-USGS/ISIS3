@@ -33,10 +33,10 @@ void IsisMain() {
   // Open the input file from the GUI or find the latest version of the DB file
   FileName dbFileName;
   if (ui.WasEntered("FROM")) {
-    dbFileName = ui.GetFileName("FROM");
+    dbFileName = ui.GetFileName("FROM").toStdString();
   }
   else {
-    QString dbString("$messenger/kernels/spk/kernels.????.db");
+    std::string dbString("$messenger/kernels/spk/kernels.????.db");
     dbFileName = FileName(dbString).highestVersion();
   }
   Pvl kernelDb(dbFileName.expanded());
@@ -48,8 +48,8 @@ void IsisMain() {
   // cutoff
   PvlGroup &reconstructed = position.findGroup("Selection");
   PvlKeyword &time = reconstructed[reconstructed.keywords() - 3];
-  QString reconstructedEnd = time[1];
-  time[1] = convertUtcToTdb(ui.GetString("TIME"));
+  QString reconstructedEnd = QString::fromStdString(time[1]);
+  time[1] = convertUtcToTdb(ui.GetString("TIME")).toStdString();
 
   // Get the predicted group from the previous file, set the start time to the
   // orbit cutoff and the end to whatever the reconstructed end was before
@@ -57,7 +57,7 @@ void IsisMain() {
 
   PvlKeyword predictedTime("Time");
   predictedTime += time[1];
-  predictedTime += reconstructedEnd;
+  predictedTime += reconstructedEnd.toStdString();
   predicted.addKeyword(predictedTime);
 
   PvlKeyword predictedFile("File");
@@ -73,7 +73,7 @@ void IsisMain() {
   // the kernels area (as run by makedb)
   FileName outDBfile;
   if (ui.WasEntered("TO")) {
-    outDBfile = ui.GetFileName("TO");
+    outDBfile = ui.GetFileName("TO").toStdString();
   }
   else {
     outDBfile = dbFileName;

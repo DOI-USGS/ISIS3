@@ -89,7 +89,7 @@ namespace Isis {
     QStringList parts = parse(config, "@");
 
     if ( parts.isEmpty() ) {
-      QString mess = "No config string provided in FeatureInventory::getFeature";
+      std::string mess = "No config string provided in FeatureInventory::getFeature";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
@@ -101,7 +101,7 @@ namespace Isis {
       return ( creator( variables, config) );
     }
     else {
-      QString mess = name + "Feature2D not found or invalid";
+      std::string mess = name.toStdString() + "Feature2D not found or invalid";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
@@ -114,7 +114,7 @@ namespace Isis {
   FeatureAlgorithmPtr FeatureInventory::getDetector(const QString &config) const {
     FeatureAlgorithmPtr algo = getFeature(config);
     if ( !algo->hasDetector() ) {
-      QString mess = "Specification does not define a detector:\n" + config;
+      std::string mess = "Specification does not define a detector:\n" + config.toStdString();
       throw IException(IException::User, mess, _FILEINFO_);
     }
     return ( algo );
@@ -124,7 +124,7 @@ namespace Isis {
   FeatureAlgorithmPtr FeatureInventory::getExtractor(const QString &config) const {
     FeatureAlgorithmPtr algo = getFeature(config);
     if ( !algo->hasExtractor() ) {
-      QString mess = "Specification does not define an extractor:\n" + config;
+      std::string mess = "Specification does not define an extractor:\n" + config.toStdString();
       throw IException(IException::User, mess, _FILEINFO_);
     }
     return ( algo );
@@ -135,7 +135,7 @@ namespace Isis {
     QStringList parts = parse(config, "@");
 
     if ( parts.isEmpty() ) {
-      QString mess = "No config string provided in FeatureInventory::getMatcher";
+      std::string mess = "No config string provided in FeatureInventory::getMatcher";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
@@ -148,7 +148,7 @@ namespace Isis {
       return ( matcher(variables, config));
     }
     else {
-      QString mess = c_name + " Matcher not found or invalid";
+      std::string mess = c_name.toStdString() + " Matcher not found or invalid";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
@@ -165,7 +165,7 @@ namespace Isis {
 
   PvlObject FeatureInventory::info(const QStringList algorithms,
                                    const QString &name) const {
-    PvlObject algos(name);
+    PvlObject algos(name.toStdString());
 
     BOOST_FOREACH ( QString algorithmName, algorithms ) {
       algos += algorithmInfo( algorithmName );
@@ -176,7 +176,7 @@ namespace Isis {
 
 
   PvlObject FeatureInventory::algorithmInfo(const QString algorithmName) const {
-    PvlObject algorithmObject(algorithmName);
+    PvlObject algorithmObject(algorithmName.toStdString());
     QString lowerName = algorithmName.toLower().trimmed();
 
     try {
@@ -187,7 +187,7 @@ namespace Isis {
         algorithmObject = getMatcher(lowerName)->info();
       }
       else {
-        QString mess = "Algorithm [" + algorithmName +
+        std::string mess = "Algorithm [" + algorithmName.toStdString() +
                       "] is not a supported OpenCV3 algorithm.";
         throw IException(IException::User, mess, _FILEINFO_);
       }
@@ -211,18 +211,18 @@ namespace Isis {
       FeatureCreator creator = m_theFeatureCreator.value(lowerName);
       QStringList aliasList = m_theFeatureCreator.keys(creator);
       BOOST_FOREACH ( QString alias, aliasList) {
-        aliasKey += alias;
+        aliasKey += alias.toStdString();
       }
     }
     else if ( m_theMatcherCreator.contains( lowerName ) ) {
       MatcherCreator creator = m_theMatcherCreator.value(lowerName);
       QStringList aliasList = m_theMatcherCreator.keys(creator);
       BOOST_FOREACH ( QString alias, aliasList) {
-        aliasKey += alias;
+        aliasKey += alias.toStdString();
       }
     }
     else {
-      QString mess = "Algorithm [" + algorithmName +
+      std::string mess = "Algorithm [" + algorithmName.toStdString() +
                      "] is not a supported OpenCV3 algorithm.";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
@@ -277,9 +277,9 @@ namespace Isis {
      BOOST_FOREACH ( QString parm, fromConfig) {
        QStringList parts = parse(parm, ":");
        if ( parts.size() > 0 ) {
-         PvlKeyword key(parts.takeFirst().trimmed());
+         PvlKeyword key(parts.takeFirst().trimmed().toStdString());
          BOOST_FOREACH  (QString value, parts) {
-           key.addValue(value);
+           key.addValue(value.toStdString());
          }
          parms.add(key);
        }

@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
   // Test case is taken from moc red wide angle image ab102401
   // sn = MGS/561812335:32/MOC-WA/RED
   FileName f("$ISISTESTDATA/isis/src/base/unitTestData/kernels");
-  QString dir = f.expanded() + "/";
+  QString dir = QString::fromStdString(f.expanded()) + "/";
   QString moc(dir + "moc.bsp");
   QString de(dir + "de405.bsp");
   QString pck(dir + "pck00006.tpc");
@@ -216,11 +216,11 @@ int main(int argc, char *argv[]) {
   // Add table label
   table.Label() += PvlKeyword("CacheType", "HermiteSpline");
   table.Label() += PvlKeyword("SpkTableStartTime");
-  table.Label()["SpkTableStartTime"].addValue(toString(-69382819.360519));
+  table.Label()["SpkTableStartTime"].addValue(Isis::toString(-69382819.360519));
   table.Label() += PvlKeyword("SpkTableEndTime");
-  table.Label()["SpkTableEndTime"].addValue(toString(-69382512.160519));
+  table.Label()["SpkTableEndTime"].addValue(Isis::toString(-69382512.160519));
   table.Label() += PvlKeyword("SpkTableOriginalSize");
-  table.Label()["SpkTableOriginalSize"].addValue(toString(769));
+  table.Label()["SpkTableOriginalSize"].addValue(Isis::toString(769));
 
   // Load table into the object
   pos4.LoadCache(table);

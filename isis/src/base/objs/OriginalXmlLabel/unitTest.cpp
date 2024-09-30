@@ -57,9 +57,9 @@ int main(int argc, char *argv[]) {
 QDomDocument parseXmlFile(const FileName &xmlFileName) {
   QDomDocument parsedXmlFile;
 
-  QFile xmlFile(xmlFileName.expanded());
+  QFile xmlFile(QString::fromStdString(xmlFileName.expanded()));
   if ( !xmlFile.open(QIODevice::ReadOnly) ) {
-    QString msg = "Could not open label file [" + xmlFileName.expanded() +
+    std::string msg = "Could not open label file [" + xmlFileName.expanded() +
                   "].";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -68,9 +68,9 @@ QDomDocument parseXmlFile(const FileName &xmlFileName) {
   int errline, errcol;
   if ( !parsedXmlFile.setContent(&xmlFile, false, &errmsg, &errline, &errcol) ) {
     xmlFile.close();
-    QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
+    std::string msg = "XML read/parse error in file [" + xmlFileName.expanded()
         + "] at line [" + toString(errline) + "], column [" + toString(errcol)
-        + "], message: " + errmsg;
+        + "], message: " + errmsg.toStdString();
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 

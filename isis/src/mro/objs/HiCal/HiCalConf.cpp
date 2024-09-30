@@ -58,7 +58,7 @@ bool HiCalConf::_naifLoaded = false;
    * @param conf Name of configuration file to use
    */
   HiCalConf::HiCalConf(Pvl &label, const QString &conf) :
-       DbAccess(Pvl(filepath(conf)).findObject("Hical", PvlObject::Traverse)) {
+       DbAccess(Pvl(filepath(conf).toStdString()).findObject("Hical", PvlObject::Traverse)) {
     _profName.clear();
     init(label);
   }
@@ -86,14 +86,14 @@ bool HiCalConf::_naifLoaded = false;
    * @return QString Expanded filename but not the filepath
    */
   QString HiCalConf::filepath(const QString &fname) const {
-    FileName efile(fname);
+    FileName efile(fname.toStdString());
     if (efile.isVersioned()) {
-      QString path(efile.originalPath());
+      QString path(QString::fromStdString(efile.originalPath()));
       if (!path.isEmpty()) path += "/";
 
       efile = efile.highestVersion();
 
-      return (path + efile.name());
+      return (path + QString::fromStdString(efile.name()));
     }
     return (fname);
   }
@@ -109,7 +109,7 @@ bool HiCalConf::_naifLoaded = false;
    * @param conf Name of configuration file to use
    */
   void HiCalConf::setConf(const QString &conf) {
-    load(Pvl(filepath(conf)).findObject("Hical", PvlObject::Traverse));
+    load((Pvl(filepath(conf).toStdString()).findObject("Hical", PvlObject::Traverse)));
   }
 
   /**
@@ -229,8 +229,8 @@ bool HiCalConf::_naifLoaded = false;
     if (expected_size != 0) {
       if (cube.sampleCount() != expected_size) {
         ostringstream mess;
-        mess << "Specifed matrix  (" << name
-             << ") from file \"" << mfile
+        mess << "Specifed matrix  (" << name.toStdString()
+             << ") from file \"" << mfile.toStdString()
              << "\" does not have expected samples (" << expected_size
              << ") but has " << cube.sampleCount();
         cube.close();
@@ -274,7 +274,7 @@ bool HiCalConf::_naifLoaded = false;
     if (expected_size != 0) {
       if (nvals != expected_size) {
         ostringstream mess;
-        mess << "Specifed scalar (" << name
+        mess << "Specifed scalar (" << name.toStdString()
              << ") does not have expected size (" << expected_size
              << ") but has " << nvals;
         throw IException(IException::User, mess.str(), _FILEINFO_);
@@ -309,12 +309,12 @@ bool HiCalConf::_naifLoaded = false;
       try {
         loadNaifTiming();
 
-        QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
+        QString scStartTime = QString::fromStdString(getKey("SpacecraftClockStartCount", "Instrument"));
         double obsStartTime;
         NaifStatus::CheckErrors();
         scs2e_c (-74999,scStartTime.toLatin1().data(),&obsStartTime);
 
-        QString targetName = getKey("TargetName", "Instrument");
+        QString targetName = QString::fromStdString(getKey("TargetName", "Instrument"));
         if (targetName.toLower() == "sky" ||
             targetName.toLower() == "cal" ||
             targetName.toLower() == "phobos" ||
@@ -330,7 +330,7 @@ bool HiCalConf::_naifLoaded = false;
         NaifStatus::CheckErrors();
       }
       catch(IException &e) {
-        QString msg = "Unable to determine the distance from the target to the sun";
+        std::string msg = "Unable to determine the distance from the target to the sun";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
     }
@@ -426,10 +426,10 @@ void HiCalConf::loadNaifTiming( ) {
     sat = sat.highestVersion();
 
 //  Load the kernels
-    QString lsk = leapseconds.expanded();
-    QString sClock = sclk.expanded();
-    QString pConstants = pck.expanded();
-    QString satConstants = sat.expanded();
+    QString lsk = QString::fromStdString(leapseconds.expanded());
+    QString sClock = QString::fromStdString(sclk.expanded());
+    QString pConstants = QString::fromStdString(pck.expanded());
+    QString satConstants = QString::fromStdString(sat.expanded());
     furnsh_c(lsk.toLatin1().data());
     furnsh_c(sClock.toLatin1().data());
     furnsh_c(pConstants.toLatin1().data());
@@ -479,11 +479,11 @@ void HiCalConf::init(Pvl &label) {
 PvlKeyword &HiCalConf::getKey(const QString &key,
                               const QString &group) {
   if (!group.isEmpty()) {
-    PvlGroup &grp = _label.findGroup(group, Pvl::Traverse);
-    return (grp[key]);
+    PvlGroup &grp = _label.findGroup(group.toStdString(), Pvl::Traverse);
+    return (grp[key.toStdString()]);
   }
   else {
-    return (_label.findKeyword(key));
+    return (_label.findKeyword(key.toStdString()));
   }
 }
 
@@ -510,7 +510,7 @@ DbProfile HiCalConf::getMatrixProfile(const QString &profile) const {
   DbProfile matconf = getProfile(myprof);
   if (!matconf.isValid()) {
     ostringstream mess;
-    mess << "Specifed matrix profile (" << matconf.Name()
+    mess << "Specifed matrix profile (" << matconf.Name().toStdString()
          << ") does not exist or is invalid!";
     throw IException(IException::User, mess.str(), _FILEINFO_);
   }
@@ -543,7 +543,7 @@ DbProfile HiCalConf::getLabelProfile(const DbProfile &profile) const {
     Pvl label = _label;
     for ( int g = 0 ; g < ngroups ; g++ ) {
       QString group = profile("LabelGroups", g);
-      PvlGroup grp = label.findGroup(group, Pvl::Traverse);
+      PvlGroup grp = label.findGroup(group.toStdString(), Pvl::Traverse);
       lblprof = DbProfile(lblprof,DbProfile(grp));
     }
   }
@@ -562,8 +562,8 @@ DbProfile HiCalConf::makeParameters(Pvl &label) const {
   int channel = inst["ChannelNumber"];
   parms.add("CCD",ToString(ccd));
   parms.add("CHANNEL", ToString(channel));
-  parms.add("TDI", inst["Tdi"]);
-  parms.add("BIN", inst["Summing"]);
+  parms.add("TDI", QString::fromStdString(inst["Tdi"]));
+  parms.add("BIN", QString::fromStdString(inst["Summing"]));
   parms.add("FILTER", CcdToFilter(ccd));
   parms.add("CCDCHANNELINDEX", ToString(getChannelIndex(ccd, channel)));
   return (parms);

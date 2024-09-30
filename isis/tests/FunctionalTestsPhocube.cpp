@@ -16,7 +16,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/phocube.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/phocube.xml").expanded());
 
 TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
@@ -25,7 +25,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
   resizeCube(5, 5, 1);
   phocube(testCube, options);
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
@@ -33,17 +33,17 @@ TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
   ASSERT_EQ(cube.bandCount(), 5);
 
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Phase Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Emission Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Incidence Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[3], "Latitude");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[4], "Longitude");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName"), "CLEAR");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[0], "Phase Angle");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[1], "Emission Angle");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[2], "Incidence Angle");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[3], "Latitude");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[4], "Longitude");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("FilterName"), "CLEAR");
   EXPECT_EQ((int) bandBin.findKeyword("FilterId"), 4);
 
   for (int i = 0; i < cube.bandCount(); i++) {
-    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Center")[i].toDouble(), 1.0);
-    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Width")[i].toDouble(), 1.0);
+    EXPECT_DOUBLE_EQ(Isis::toDouble(bandBin.findKeyword("Center")[i]), 1.0);
+    EXPECT_DOUBLE_EQ(Isis::toDouble(bandBin.findKeyword("Width")[i]), 1.0);
   }
 
   std::unique_ptr<Histogram> hist (cube.histogram(0));
@@ -71,7 +71,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
   resizeCube(5, 5, 1);
   phocube(testCube, options);
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
@@ -79,33 +79,33 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
   ASSERT_EQ(cube.bandCount(), 27);
 
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "CLEAR");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Phase Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Emission Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[3], "Incidence Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[4], "Local Emission Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[5], "Local Incidence Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[6], "Latitude");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[7], "Longitude");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[8], "Pixel Resolution");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[9], "Line Resolution");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[10], "Sample Resolution");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[11], "Detector Resolution");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[12], "Oblique Detector Resolution");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[13], "North Azimuth");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[14], "Sun Azimuth");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[15], "Spacecraft Azimuth");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[16], "OffNadir Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[17], "Sub Spacecraft Ground Azimuth");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[18], "Sub Solar Ground Azimuth");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[19], "Morphology Rank");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[20], "Albedo Rank");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[21], "Right Ascension");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[22], "Declination");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[23], "Body Fixed X");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[24], "Body Fixed Y");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[25], "Body Fixed Z");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[26], "Local Solar Time");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[0], "CLEAR");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[1], "Phase Angle");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[2], "Emission Angle");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[3], "Incidence Angle");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[4], "Local Emission Angle");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[5], "Local Incidence Angle");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[6], "Latitude");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[7], "Longitude");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[8], "Pixel Resolution");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[9], "Line Resolution");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[10], "Sample Resolution");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[11], "Detector Resolution");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[12], "Oblique Detector Resolution");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[13], "North Azimuth");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[14], "Sun Azimuth");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[15], "Spacecraft Azimuth");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[16], "OffNadir Angle");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[17], "Sub Spacecraft Ground Azimuth");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[18], "Sub Solar Ground Azimuth");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[19], "Morphology Rank");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[20], "Albedo Rank");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[21], "Right Ascension");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[22], "Declination");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[23], "Body Fixed X");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[24], "Body Fixed Y");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[25], "Body Fixed Z");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[26], "Local Solar Time");
 
   std::unique_ptr<Histogram> hist (cube.histogram(0));
   EXPECT_NEAR(hist->Average(), -56.952873505781646, .000001);
@@ -188,7 +188,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeSpecialPixels) {
 
   phocube(testCube, options);
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
@@ -196,8 +196,8 @@ TEST_F(DefaultCube, FunctionalTestPhocubeSpecialPixels) {
   ASSERT_EQ(cube.bandCount(), 2);
 
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "CLEAR");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Phase Angle");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[0], "CLEAR");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[1], "Phase Angle");
 
   int band = 1;
   LineManager outLine(cube);
@@ -239,7 +239,7 @@ TEST_F(OffBodyCube, FunctionalTestPhocubeOffBody) {
   UserInterface options(APP_XML, args);
   phocube(testCube, options);
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
@@ -247,9 +247,9 @@ TEST_F(OffBodyCube, FunctionalTestPhocubeOffBody) {
   ASSERT_EQ(cube.bandCount(), 3);
 
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Phase Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Right Ascension");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Declination");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[0], "Phase Angle");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[1], "Right Ascension");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[2], "Declination");
 
   int band = 1;
   LineManager outLine(cube);
@@ -292,7 +292,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeMosaic) {
   resizeCube(5, 5, 1);
   phocube(projTestCube, options);
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
@@ -300,7 +300,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeMosaic) {
   ASSERT_EQ(cube.bandCount(), 1);
 
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName"), "CLEAR");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("FilterName"), "CLEAR");
   EXPECT_EQ((int) bandBin.findKeyword("FilterId"), 4);
 
   EXPECT_DOUBLE_EQ((double) bandBin.findKeyword("Center"), 1.0);
@@ -324,7 +324,7 @@ TEST_F(MiniRFCube, FunctionalTestPhocubeMiniRF) {
   UserInterface options(APP_XML, args);
   phocube(testCube, options);
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
@@ -332,8 +332,8 @@ TEST_F(MiniRFCube, FunctionalTestPhocubeMiniRF) {
   ASSERT_EQ(cube.bandCount(), 1);
 
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name"), "Sub Spacecraft Ground Azimuth");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName"), "H RECEIVE INTENSITY");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name"), "Sub Spacecraft Ground Azimuth");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("FilterName"), "H RECEIVE INTENSITY");
 
   LineManager outLine(cube);
   for (int i = 1; i <= cube.lineCount(); i++) {
@@ -369,7 +369,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeNoBandBin) {
   phocube(testCube, options);
 
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
@@ -377,7 +377,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeNoBandBin) {
   ASSERT_EQ(cube.bandCount(), 1);
 
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name"), "DN");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name"), "DN");
 
   std::unique_ptr<Histogram> hist (cube.histogram(1));
   EXPECT_NEAR(hist->Average(), 13, .000001);
@@ -401,7 +401,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllDnBands) {
 
   phocube(testCube, options);
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
@@ -409,9 +409,9 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllDnBands) {
   ASSERT_EQ(cube.bandCount(), 8);
 
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName")[0], "B1");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName")[1], "B2");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("FilterName")[2], "B3");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("FilterName")[0], "B1");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("FilterName")[1], "B2");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("FilterName")[2], "B3");
 
   // Test band 1
   {
@@ -478,7 +478,7 @@ TEST(Phocube, FunctionalTestPhocubeSunIlluminationMask) {
   phocube(&testCube, options);
 
   // open output cube and retrieve label
-  Cube cube(outCubeFileName);
+  Cube cube(outCubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   // verify sample, line, and band counts
@@ -488,13 +488,13 @@ TEST(Phocube, FunctionalTestPhocubeSunIlluminationMask) {
 
   // confirm "Sun Illumination Mask" is in BandBin group
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0],
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[0],
                       "Sun Illumination Mask");
 
   // verify center and width entries in BandBin group
   for (int i = 0; i < cube.bandCount(); i++) {
-    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Center")[i].toDouble(), 650.0);
-    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Width")[i].toDouble(), 1.0);
+    EXPECT_DOUBLE_EQ(Isis::toDouble(bandBin.findKeyword("Center")[i]), 650.0);
+    EXPECT_DOUBLE_EQ(Isis::toDouble(bandBin.findKeyword("Width")[i]), 1.0);
   }
 
   // verify statistics of SunIlluminationMask band
@@ -535,7 +535,7 @@ TEST(Phocube, FunctionalTestPhocubeSurfaceObliqueDetectorResolution) {
   phocube(&testCube, options);
 
   // open output cube and retrieve label
-  Cube cube(outCubeFileName);
+  Cube cube(outCubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   // verify sample, line, and band counts
@@ -545,13 +545,13 @@ TEST(Phocube, FunctionalTestPhocubeSurfaceObliqueDetectorResolution) {
 
   // confirm "Surface Oblique Detector Resolution" is in BandBin group
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0],
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("Name")[0],
                       "Surface Oblique Detector Resolution");
 
   // verify center and width entries in BandBin group
   for (int i = 0; i < cube.bandCount(); i++) {
-    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Center")[i].toDouble(), 650.0);
-    EXPECT_DOUBLE_EQ(bandBin.findKeyword("Width")[i].toDouble(), 1.0);
+    EXPECT_DOUBLE_EQ(Isis::toDouble(bandBin.findKeyword("Center")[i]), 650.0);
+    EXPECT_DOUBLE_EQ(Isis::toDouble(bandBin.findKeyword("Width")[i]), 1.0);
   }
 
   // verify statistics of SurfaceObliqueDetectorResolution band

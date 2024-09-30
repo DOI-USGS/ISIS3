@@ -60,7 +60,7 @@ void IsisMain() {
   // parameters.
   UserInterface &ui = Application::GetUserInterface();
   if(!(ui.WasEntered("TO")) && !(ui.WasEntered("STATS"))) {
-    QString msg = "User must specify a TO and/or STATS file.";
+    std::string msg = "User must specify a TO and/or STATS file.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -94,18 +94,18 @@ void IsisMain() {
     p.StartProcess(getStats);
   }
   else if(ui.GetString("STATSOURCE") == "TABLE") {
-    tableIn(ui.GetFileName("FROMSTATS"));
+    tableIn(ui.GetFileName("FROMSTATS").toStdString());
   }
   else {
-    PVLIn(ui.GetFileName("FROMSTATS"));
+    PVLIn(ui.GetFileName("FROMSTATS").toStdString());
   }
 
   //check to make sure the first vector has as many elements as the last
   // vector, and that there is a vector element for each row/col
   if((band.size() != (unsigned int)(rowcol * totalBands)) ||
       (st.size() != (unsigned int)(rowcol * totalBands))) {
-    QString message = "You have entered an invalid input file " +
-                      ui.GetFileName("FROMSTATS");
+    std::string message = "You have entered an invalid input file " +
+                      ui.GetFileName("FROMSTATS").toStdString();
     throw IException(IException::Io, message, _FILEINFO_);
   }
 
@@ -123,7 +123,7 @@ void IsisMain() {
     if(ui.GetString("MODE") == "MULTIPLY") {
       for(unsigned int i = 0; i < st.size(); i++) {
         if(IsValidPixel(normalizer[i]) && normalizer[i] <= 0.0) {
-          QString msg = "Cube file can not be normalized with [MULTIPLY] ";
+          std::string msg = "Cube file can not be normalized with [MULTIPLY] ";
           msg += "option, some column averages <= 0.0";
           throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -219,15 +219,15 @@ void getStats(Buffer &in) {
 void pvlOut(const QString &StatFile) {
   PvlGroup results("Results");
   for(unsigned int i = 0; i < st.size(); i++) {
-    results += PvlKeyword("Band", toString(band[i]));
-    results += PvlKeyword("RowCol", toString(element[i]));
-    results += PvlKeyword("ValidPixels", toString(st[i].ValidPixels()));
+    results += PvlKeyword("Band", Isis::toString(band[i]));
+    results += PvlKeyword("RowCol", Isis::toString(element[i]));
+    results += PvlKeyword("ValidPixels", Isis::toString(st[i].ValidPixels()));
     if(st[i].ValidPixels() > 0) {
-      results += PvlKeyword("Mean", toString(st[i].Average()));
-      results += PvlKeyword("Median", toString(median[i]));
-      results += PvlKeyword("Std", toString(st[i].StandardDeviation()));
-      results += PvlKeyword("Minimum", toString(st[i].Minimum()));
-      results += PvlKeyword("Maximum", toString(st[i].Maximum()));
+      results += PvlKeyword("Mean", Isis::toString(st[i].Average()));
+      results += PvlKeyword("Median", Isis::toString(median[i]));
+      results += PvlKeyword("Std", Isis::toString(st[i].StandardDeviation()));
+      results += PvlKeyword("Minimum", Isis::toString(st[i].Minimum()));
+      results += PvlKeyword("Maximum", Isis::toString(st[i].Maximum()));
     }
     else {
       results += PvlKeyword("Mean", "0.0");
@@ -240,7 +240,7 @@ void pvlOut(const QString &StatFile) {
 
   Pvl t;
   t.addGroup(results);
-  t.write(StatFile);
+  t.write(StatFile.toStdString());
 }
 
 //********************************************************
@@ -304,21 +304,21 @@ void PVLIn(const Isis::FileName &filename) {
 
   while(itr != results.end()) {
     StaticStats newStat;
-    band.push_back(toInt((*itr)[0]));
+    band.push_back(Isis::toInt((*itr)[0]));
     itr++;
-    element.push_back(toInt((*itr)[0]));
+    element.push_back(Isis::toInt((*itr)[0]));
     itr++;
-    newStat.setValidPixels(toInt((*itr)[0]));
+    newStat.setValidPixels(Isis::toInt((*itr)[0]));
     itr++;
-    newStat.setMean(toDouble((*itr)[0]));
+    newStat.setMean(Isis::toDouble((*itr)[0]));
     itr++;
-    median.push_back(toDouble((*itr)[0]));
+    median.push_back(Isis::toDouble((*itr)[0]));
     itr++;
-    newStat.setStandardDeviation(toDouble((*itr)[0]));
+    newStat.setStandardDeviation(Isis::toDouble((*itr)[0]));
     itr++;
-    newStat.setMinimum(toDouble((*itr)[0]));
+    newStat.setMinimum(Isis::toDouble((*itr)[0]));
     itr++;
-    newStat.setMaximum(toDouble((*itr)[0]));
+    newStat.setMaximum(Isis::toDouble((*itr)[0]));
     itr++;
     st.push_back(newStat);
 
@@ -337,12 +337,12 @@ void PVLIn(const Isis::FileName &filename) {
 //*******************************************************
 void tableIn(const Isis::FileName &filename) {
   ifstream in;
-  QString expanded(filename.expanded());
-  in.open(expanded.toLatin1().data(), std::ios::in);
+  std::string expanded(filename.expanded());
+  in.open(expanded.c_str(), std::ios::in);
 
 
   if(!in) {
-    QString message = "Error opening " + filename.expanded();
+    std::string message = "Error opening " + filename.expanded();
     throw IException(IException::Io, message, _FILEINFO_);
   }
 

@@ -88,7 +88,7 @@ namespace Isis {
 
     if (ui.WasEntered("BACKPLANE")) {
       if (icube->bandCount() != 1) {
-        QString msg = "Invalid Image: The backplane option can only be used with a single image "
+        std::string msg = "Invalid Image: The backplane option can only be used with a single image "
                       "band at a time.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -106,20 +106,20 @@ namespace Isis {
         bands.push_back("5");
       }
       else if (bands.size() != 5) {
-        QString msg = "Invalid Backplane: The backplane must be exactly 5 bands";
+        std::string msg = "Invalid Backplane: The backplane must be exactly 5 bands";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
       CubeAttributeInput cai;
-      cai.setAttributes("+" + bands[0]);
+      cai.setAttributes("+" + bands[0].toStdString());
       p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
-      cai.setAttributes("+" + bands[1]);
+      cai.setAttributes("+" + bands[1].toStdString());
       p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
-      cai.setAttributes("+" + bands[2]);
+      cai.setAttributes("+" + bands[2].toStdString());
       p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
-      cai.setAttributes("+" + bands[3]);
+      cai.setAttributes("+" + bands[3].toStdString());
       p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
-      cai.setAttributes("+" + bands[4]);
+      cai.setAttributes("+" + bands[4].toStdString());
       p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
 
       useBackplane = true;
@@ -127,23 +127,23 @@ namespace Isis {
 
     // Get the name of the parameter files
     QString algoFile = ui.GetAsString("PHOALGO");
-    FileName algoFileName(algoFile);
+    FileName algoFileName(algoFile.toStdString());
     if (algoFileName.isVersioned()) {
       algoFileName = algoFileName.highestVersion();
     }
     if (!algoFileName.fileExists()) {
-      QString msg = algoFileName.expanded() + " does not exist.";
+      std::string msg = algoFileName.expanded() + " does not exist.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     Pvl par(algoFileName.expanded());
 
     QString parCubeFile = ui.GetCubeName("PHOPARCUBE");
-    FileName parCubeFileName(parCubeFile);
+    FileName parCubeFileName(parCubeFile.toStdString());
     if (parCubeFileName.isVersioned()) {
       parCubeFileName = parCubeFileName.highestVersion();
     }
     if (!parCubeFileName.fileExists()) {
-      QString msg = parCubeFileName.expanded() + " does not exist.";
+      std::string msg = parCubeFileName.expanded() + " does not exist.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     CubeAttributeInput parCubeAtt(parCubeFileName);
@@ -188,7 +188,7 @@ namespace Isis {
       phoLroc->setNormalized(normalized);
     }
     else {
-      QString msg = " Algorithm Name [" + algoName + "] not recognized. ";
+      std::string msg = " Algorithm Name [" + algoName.toStdString() + "] not recognized. ";
       msg += "Compatible Algorithms are:\n    HapkeLRO\n    HapkeLROC";
       throw IException(IException::User, msg, _FILEINFO_);
     }

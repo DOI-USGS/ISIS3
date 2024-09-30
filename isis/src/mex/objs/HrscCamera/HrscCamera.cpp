@@ -46,7 +46,7 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    ReadLineRates(lab.fileName());
+    ReadLineRates( QString::fromStdString(lab.fileName()));
 
     // Setup detector map for transform of image pixels to detector position
     new VariableLineScanCameraDetectorMap(this, p_lineRates);
@@ -58,10 +58,10 @@ namespace Isis {
 
     new CameraFocalPlaneMap(this, naifIkCode());
 
-    QString ikernKey = "INS" + toString(naifIkCode())  + "_BORESIGHT_SAMPLE";
+    QString ikernKey = "INS" + QString::number(naifIkCode())  + "_BORESIGHT_SAMPLE";
     double sampleBoresight = getDouble(ikernKey);
 
-    ikernKey = "INS" + toString(naifIkCode())  + "_BORESIGHT_LINE";
+    ikernKey = "INS" + QString::number(naifIkCode())  + "_BORESIGHT_LINE";
     double lineBoresight = getDouble(ikernKey);
 
     FocalPlaneMap()->SetDetectorOrigin(sampleBoresight, lineBoresight);
@@ -122,11 +122,11 @@ namespace Isis {
    * @param filename
    */
   void HrscCamera::ReadLineRates(QString filename) {
-    Table timesTable("LineScanTimes", filename);
+    Table timesTable("LineScanTimes", filename.toStdString());
 
     if(timesTable.Records() <= 0) {
-      QString msg = "Table [LineScanTimes] in [";
-      msg += filename + "] must not be empty";
+      std::string msg = "Table [LineScanTimes] in [";
+      msg += filename.toStdString() + "] must not be empty";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -137,8 +137,8 @@ namespace Isis {
     }
 
     if(p_lineRates.size() <= 0) {
-      QString msg = "There is a problem with the data within the Table ";
-      msg += "[LineScanTimes] in [" + filename + "]";
+      std::string msg = "There is a problem with the data within the Table ";
+      msg += "[LineScanTimes] in [" + filename.toStdString() + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }

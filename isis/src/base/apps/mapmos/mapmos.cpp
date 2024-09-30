@@ -2,6 +2,7 @@
 
 #include <QDebug>
 
+#include "Application.h"
 #include "ProcessMapMosaic.h"
 #include "PvlGroup.h"
 
@@ -11,7 +12,7 @@ using namespace Isis;
 namespace Isis {
 
   void mapmos(UserInterface &ui, Pvl *log) {
-    Cube *inCube = new Cube( ui.GetCubeName("FROM"), "r");
+    Cube *inCube = new Cube( ui.GetCubeName("FROM").toStdString(), "r");
     mapmos(inCube, ui, log);
   }
 
@@ -61,25 +62,25 @@ namespace Isis {
       inCube->close();
       
       if ( ui.WasEntered("MINLAT") ) { 
-        mapGroup.addKeyword(PvlKeyword( "MinimumLatitude",  toString( ui.GetDouble("MINLAT") ) ),
+        mapGroup.addKeyword(PvlKeyword( "MinimumLatitude",  Isis::toString( ui.GetDouble("MINLAT") ) ),
                             Pvl::Replace);
       }
       if ( ui.WasEntered("MAXLAT") ) {
-        mapGroup.addKeyword(PvlKeyword( "MaximumLatitude",  toString( ui.GetDouble("MAXLAT") ) ),
+        mapGroup.addKeyword(PvlKeyword( "MaximumLatitude",  Isis::toString( ui.GetDouble("MAXLAT") ) ),
                             Pvl::Replace);
       }
       if ( ui.WasEntered("MINLON") ) {
-        mapGroup.addKeyword(PvlKeyword( "MinimumLongitude", toString( ui.GetDouble("MINLON") ) ),
+        mapGroup.addKeyword(PvlKeyword( "MinimumLongitude", Isis::toString( ui.GetDouble("MINLON") ) ),
                             Pvl::Replace);
       }
       if ( ui.WasEntered("MAXLON") ) {
-        mapGroup.addKeyword(PvlKeyword( "MaximumLongitude", toString( ui.GetDouble("MAXLON") ) ),
+        mapGroup.addKeyword(PvlKeyword( "MaximumLongitude", Isis::toString( ui.GetDouble("MAXLON") ) ),
                             Pvl::Replace);
       }
       //check to make sure they're all there. If not, throw error, need to enter all.
       if (!mapGroup.hasKeyword("MinimumLongitude") || !mapGroup.hasKeyword("MaximumLongitude") ||
           !mapGroup.hasKeyword("MinimumLatitude") || !mapGroup.hasKeyword("MaximumLatitude") ) {
-        QString msg = "One of the extents is missing. Please input all extents.";
+        std::string msg = "One of the extents is missing. Please input all extents.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       
@@ -99,13 +100,13 @@ namespace Isis {
     if(!m.StartProcess(sInputFile)) {
       // Logs the cube if it falls outside of the given mosaic
       PvlGroup outsiders("Outside");
-      outsiders += PvlKeyword("File", sInputFile);
-      log->addLogGroup(outsiders);
+      outsiders += PvlKeyword("File", sInputFile.toStdString());
+      Application::AppendAndLog(outsiders, log);
     }
     else {
       // Logs the input file location in the mosaic
       for (int i = 0; i < m.imagePositions().groups(); i++) {
-        log->addLogGroup(m.imagePositions().group(i));
+        Application::AppendAndLog(m.imagePositions().group(i), log);
       }
     }
 

@@ -47,9 +47,9 @@ namespace Isis {
     }
 
     if(algorithm.hasKeyword("ZeroB0Standard")) {
-      SetPhoto0B0Standard(algorithm["ZeroB0Standard"][0]);
+      SetPhoto0B0Standard(QString::fromStdString(algorithm["ZeroB0Standard"][0]));
     } else if (algorithm.hasKeyword("ZeroB0St")) {
-      SetPhoto0B0Standard(algorithm["ZeroB0St"][0]);
+      SetPhoto0B0Standard(QString::fromStdString(algorithm["ZeroB0St"][0]));
     } else {
       SetPhoto0B0Standard("TRUE");
     }
@@ -421,7 +421,7 @@ namespace Isis {
     * @param b0standard  Hapke opposition surge initialization, default is true
     */
   void Hapke::SetPhoto0B0Standard(const QString &b0standard) {
-    IString temp(b0standard);
+    IString temp(b0standard.toStdString());
     temp = temp.UpCase();
 
     if(temp != "NO" && temp != "YES" && temp != "FALSE" && temp != "TRUE") {

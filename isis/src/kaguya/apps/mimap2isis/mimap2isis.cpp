@@ -8,6 +8,7 @@ find files of those names at the top level of this repository. **/
 
 #include "mimap2isis.h"
 
+#include "Application.h"
 #include "FileName.h"
 #include "ProcessImportPds.h"
 
@@ -21,18 +22,18 @@ namespace Isis {
   Pvl label;
 
   QString labelFile = ui.GetFileName("FROM");
-  label.read(labelFile);
+  label.read(labelFile.toStdString());
 
   // The Kaguya MI MAP files have an incorrect SAMPLE_PROJECTION_OFFSET
   // keyword value in their labels. The following code creates a temporary
   // detached PDS label with the correct (negated) keyword value.
   PvlObject obj = label.findObject("IMAGE_MAP_PROJECTION");
-  double soff = toDouble(obj.findKeyword("SAMPLE_PROJECTION_OFFSET")[0]);
+  double soff = Isis::toDouble(obj.findKeyword("SAMPLE_PROJECTION_OFFSET")[0]);
   soff = -soff;
-  label.findObject("IMAGE_MAP_PROJECTION").addKeyword(PvlKeyword("SAMPLE_PROJECTION_OFFSET",toString(soff)),Pvl::Replace);
+  label.findObject("IMAGE_MAP_PROJECTION").addKeyword(PvlKeyword("SAMPLE_PROJECTION_OFFSET",Isis::toString(soff)),Pvl::Replace);
   FileName tempFileName = FileName::createTempFile("TEMPORARYlabel.pvl").name();
-  QString fn(tempFileName.expanded());
-  label.write(fn);
+  QString fn(QString::fromStdString(tempFileName.expanded()));
+  label.write(fn.toStdString());
 
   QString imageFile("");
   QString datafile = labelFile;
@@ -71,14 +72,14 @@ namespace Isis {
   p.TranslatePdsProjection(otherLabels);
 
   // Translate the remaining MI MAP labels
-  QString transDir = "$ISISROOT/appdata/translations/";
+  std::string transDir = "$ISISROOT/appdata/translations/";
 
   FileName transFile(transDir + "KaguyaMiMapBandBin.trn");
-  PvlToPvlTranslationManager bandBinXlater(label, transFile.expanded());
+  PvlToPvlTranslationManager bandBinXlater(label, QString::fromStdString(transFile.expanded()));
   bandBinXlater.Auto(otherLabels);
 
   transFile = transDir + "KaguyaMiMapInstrument.trn";
-  PvlToPvlTranslationManager instXlater(label, transFile.expanded());
+  PvlToPvlTranslationManager instXlater(label, QString::fromStdString(transFile.expanded()));
   instXlater.Auto(otherLabels);
 
   PvlKeyword processId = label.findKeyword("PROCESS_VERSION_ID");
@@ -95,7 +96,7 @@ namespace Isis {
     }
   }
 
-  PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater(label, QString::fromStdString(transFile.expanded()));
   archiveXlater.Auto(otherLabels);
 
   if(otherLabels.hasGroup("Mapping") &&
@@ -121,7 +122,7 @@ namespace Isis {
     results.setName("Results");
     results[0].addComment("Projection offsets and multipliers have been changed from");
     results[0].addComment("defaults. New values are below.");
-    log->addLogGroup(results);
+    Application::Log(results);
   }
 
   p.EndProcess();

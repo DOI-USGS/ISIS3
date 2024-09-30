@@ -121,7 +121,7 @@ void IsisMain() {
   }
   catch (IException &e) {
     throw IException(IException::User,
-                     "Unable to open the file [" + ui.GetCubeName("FROM") + "] as a cube.",
+                     "Unable to open the file [" + ui.GetCubeName("FROM").toStdString() + "] as a cube.",
                      _FILEINFO_);
   }
 
@@ -132,19 +132,19 @@ void IsisMain() {
 
   //four that are the same for every panaramic mission
   keyword.setName("SpacecraftName");
-  keyword.setValue(mission);
+  keyword.setValue(mission.toStdString());
   inst_pvlG.addKeyword(keyword);
 
   keyword.setName("InstrumentName");
-  keyword.setValue(transTable.Translate("InstrumentName","whatever"));
+  keyword.setValue(transTable.Translate("InstrumentName","whatever").toStdString());
   inst_pvlG.addKeyword(keyword);
 
   keyword.setName("InstrumentId");
-  keyword.setValue(transTable.Translate("InstrumentId","whatever"));
+  keyword.setValue(transTable.Translate("InstrumentId","whatever").toStdString());
   inst_pvlG.addKeyword(keyword);
 
   keyword.setName("TargetName");
-  keyword.setValue(transTable.Translate("TargetName","whatever"));
+  keyword.setValue(transTable.Translate("TargetName","whatever").toStdString());
   inst_pvlG.addKeyword(keyword);
 
   //three that need to be calculated from input values
@@ -171,17 +171,17 @@ void IsisMain() {
 
   isisTime = time0;
   keyword.setName("StartTime");
-  keyword.setValue(iStrTEMP=isisTime.UTC());
+  keyword.setValue(isisTime.UTC().toStdString());
   inst_pvlG.addKeyword(keyword);
 
   isisTime = time1;
   keyword.setName("StopTime");
-  keyword.setValue(iStrTEMP=isisTime.UTC());
+  keyword.setValue(isisTime.UTC().toStdString());
   inst_pvlG.addKeyword(keyword);
 
   keyword.setName("LineExposureDuration");
   //converted led to msec/mm--negative sign to account for the anti-parallel time and line axes
-  keyword.setValue(iStrTEMP=toString(-led),"sec/mm");
+  keyword.setValue(Isis::toString(-led),"sec/mm");
   inst_pvlG.addKeyword(keyword);
 
   panCube.putGroup(inst_pvlG);
@@ -191,27 +191,27 @@ void IsisMain() {
   kernels_pvlG.clear();
 
   keyword.setName("NaifFrameCode");
-  keyword.setValue(toString(insCode));
+  keyword.setValue(Isis::toString(insCode));
   kernels_pvlG.addKeyword(keyword);
 
   keyword.setName("LeapSecond");
-  keyword.setValue( transTable.Translate("LeapSecond","File1") );
+  keyword.setValue( transTable.Translate("LeapSecond","File1").toStdString() );
   kernels_pvlG.addKeyword(keyword);
 
   keyword.setName("TargetAttitudeShape");
-  keyword.setValue( transTable.Translate("TargetAttitudeShape", "File1") );
-  keyword.addValue( transTable.Translate("TargetAttitudeShape", "File2") );
-  keyword.addValue( transTable.Translate("TargetAttitudeShape", "File3") );
+  keyword.setValue( transTable.Translate("TargetAttitudeShape", "File1").toStdString() );
+  keyword.addValue( transTable.Translate("TargetAttitudeShape", "File2").toStdString() );
+  keyword.addValue( transTable.Translate("TargetAttitudeShape", "File3").toStdString() );
   kernels_pvlG.addKeyword(keyword);
 
   keyword.setName("TargetPosition");
   keyword.setValue("Table");
-  keyword.addValue( transTable.Translate("TargetPosition", "File1") );
-  keyword.addValue( transTable.Translate("TargetPosition", "File2") );
+  keyword.addValue( transTable.Translate("TargetPosition", "File1").toStdString() );
+  keyword.addValue( transTable.Translate("TargetPosition", "File2").toStdString() );
   kernels_pvlG.addKeyword(keyword);
 
   keyword.setName("ShapeModel");
-  keyword.setValue( transTable.Translate("ShapeModel", "File1") );
+  keyword.setValue( transTable.Translate("ShapeModel", "File1").toStdString() );
   kernels_pvlG.addKeyword(keyword);
 
   keyword.setName("InstrumentPointing");
@@ -223,7 +223,7 @@ void IsisMain() {
   kernels_pvlG.addKeyword(keyword);
 
   keyword.setName("InstrumentAddendum");
-  keyword.setValue( transTable.Translate("InstrumentAddendum",mission));
+  keyword.setValue( transTable.Translate("InstrumentAddendum", mission).toStdString());
   kernels_pvlG.addKeyword(keyword);
 
   panCube.putGroup(kernels_pvlG);
@@ -243,7 +243,7 @@ void IsisMain() {
     QString naifTarget = QString("IAU_MOOM");
     namfrm_c(naifTarget.toLatin1().data(), &frameCode);
     if(frameCode == 0) {
-      QString msg = "Can not find NAIF code for [" + naifTarget + "]";
+      std::string msg = "Can not find NAIF code for [" + naifTarget.toStdString() + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
@@ -404,7 +404,7 @@ void IsisMain() {
   recordPos[2] = posJ20[2];
   recordPos[3] = temp;  //temp = et (right now anyway)
   tablePos += recordPos;
-  tablePos.Label() += PvlKeyword("SpkTableStartTime",toString(temp));
+  tablePos.Label() += PvlKeyword("SpkTableStartTime",Isis::toString(temp));
   //now the other node
   temp = 0.515*(time1-time0);      //3% extension
   posSel[0] = pos0[0] + temp*vel[0];    //selenocentric coordinate calculation
@@ -424,7 +424,7 @@ void IsisMain() {
   recordPos[2] = posJ20[2];
   recordPos[3] = temp;  //temp = et (right now anyway)
   tablePos += recordPos;
-  tablePos.Label() += PvlKeyword("SpkTableEndTime",toString(temp));
+  tablePos.Label() += PvlKeyword("SpkTableEndTime",Isis::toString(temp));
   tablePos.Label() += PvlKeyword("CacheType","Linear");
   tablePos.Label() += PvlKeyword("Description","Created by apollopaninit");
   panCube.write(tablePos);  //now attach it to the table
@@ -547,18 +547,18 @@ void IsisMain() {
     recordRot[4] = Q[i][4];
     tableRot += recordRot;
   }
-  tableRot.Label() += PvlKeyword("CkTableStartTime", toString(Q[0][4]));
-  tableRot.Label() += PvlKeyword("CkTableEndTime", toString(Q[NODES-1][4]));
+  tableRot.Label() += PvlKeyword("CkTableStartTime", Isis::toString(Q[0][4]));
+  tableRot.Label() += PvlKeyword("CkTableEndTime", Isis::toString(Q[NODES-1][4]));
   tableRot.Label() += PvlKeyword("Description", "Created by appollopan2isis");
 
   keyword.setName("TimeDependentFrames");
-  keyword.setValue(toString(scFrameCode));
+  keyword.setValue(Isis::toString(scFrameCode));
   keyword.addValue("1");
   tableRot.Label() += keyword;
 
   keyword.setName("ConstantFrames");
-  keyword.setValue(toString(insCode));
-  keyword.addValue(toString(scFrameCode));
+  keyword.setValue(Isis::toString(insCode));
+  keyword.addValue(Isis::toString(scFrameCode));
   tableRot.Label() += keyword;
 
   keyword.setName("ConstantRotation");
@@ -615,9 +615,9 @@ void IsisMain() {
 
   //copy the patternS chip (the entire ApolloPanFiducialMark.cub)
   FileName fiducialFileName("$apollo15/calibration/ApolloPanFiducialMark.cub");
-  fidC.open(fiducialFileName.expanded(),"r");
+  fidC.open(QString::fromStdString(fiducialFileName.expanded()),"r");
   if( !fidC.isOpen() ) {
-    QString msg = "Unable to open the fiducial patternS cube: ApolloPanFiducialMark.cub\n";
+    std::string msg = "Unable to open the fiducial patternS cube: ApolloPanFiducialMark.cub\n";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   refL = fidC.lineCount();
@@ -681,7 +681,7 @@ void IsisMain() {
     }
   }
   if(s>=averageLines+searchCellSize/2.0) {
-     QString msg = "Unable to locate a fiducial mark in the input cube [" + fileName +
+     std::string msg = "Unable to locate a fiducial mark in the input cube [" + fileName.toStdString() +
                   "].  Check FROM and MICRONS parameters.";
      throw IException(IException::Io, msg, _FILEINFO_);
      return;
@@ -777,10 +777,10 @@ void IsisMain() {
   ApolloPanoramicCamera* cam = (ApolloPanoramicCamera*)(panCube.camera());
   //log the residual report from interior orientation
   PvlGroup residualStats("InteriorOrientationStats");
-  residualStats += PvlKeyword("FiducialsFound",  toString(tableFid.Records()));
-  residualStats += PvlKeyword("ResidualMax",  toString(cam->intOriResidualMax()),"pixels");
-  residualStats += PvlKeyword("ResidualMean", toString(cam->intOriResidualMean()),"pixels");
-  residualStats += PvlKeyword("ResidualStdev", toString(cam->intOriResidualStdev()),"pixels");
+  residualStats += PvlKeyword("FiducialsFound",  Isis::toString(tableFid.Records()));
+  residualStats += PvlKeyword("ResidualMax",  Isis::toString(cam->intOriResidualMax()),"pixels");
+  residualStats += PvlKeyword("ResidualMean", Isis::toString(cam->intOriResidualMean()),"pixels");
+  residualStats += PvlKeyword("ResidualStdev", Isis::toString(cam->intOriResidualStdev()),"pixels");
 
   Application::Log( residualStats );
 
@@ -797,17 +797,17 @@ void Load_Kernel(Isis::PvlKeyword &key) {
 
   for(int i = 0; i < key.size(); i++) {
      if(key[i] == "") continue;
-     if(QString(key[i]).toUpper() == "NULL") break;
-     if(QString(key[i]).toUpper() == "NADIR") break;
+     if(QString::fromStdString(key[i]).toUpper() == "NULL") break;
+     if(QString::fromStdString(key[i]).toUpper() == "NADIR") break;
      //Table was left as the first value of these keywords because one is about to be attached,
      //  still though it needs to be skipped in this loop
-     if(QString(key[i]).toUpper() == "TABLE") continue;
+     if(QString::fromStdString(key[i]).toUpper() == "TABLE") continue;
      Isis::FileName file(key[i]);
      if(!file.fileExists()) {
-       QString msg = "Spice file does not exist [" + file.expanded() + "]";
+       std::string msg = "Spice file does not exist [" + file.expanded() + "]";
        throw IException(IException::Io, msg, _FILEINFO_);
      }
-     QString fileName(file.expanded());
+     QString fileName(QString::fromStdString(file.expanded()));
      furnsh_c(fileName.toLatin1().data());
   }
 

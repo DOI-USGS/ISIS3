@@ -39,8 +39,8 @@ namespace Isis {
     setConfig(config);
     PvlFlatMap variables = setupParameters();
     variables.merge(cvars);
-    const int lucidKernel = toInt(variables.get("LucidKernel"));
-    const int blurKernel = toInt(variables.get("BlurKernel"));
+    const int lucidKernel = variables.get("LucidKernel").toInt();
+    const int blurKernel = variables.get("BlurKernel").toInt();
 
     m_algorithm = LUCIDType::create(lucidKernel, blurKernel);
 
@@ -144,7 +144,7 @@ namespace Isis {
  *                                 to set algorithm parameters."
  */
   int LUCIDAlgorithm::setAlgorithmVariables(const PvlFlatMap &variables) {
-    QString msg = "LUCIDAlgorithm does not have the ability to set algorithm parameters.";
+    std::string msg = "LUCIDAlgorithm does not have the ability to set algorithm parameters.";
     throw IException(IException::Programmer, msg, _FILEINFO_);
 
     return (-1);

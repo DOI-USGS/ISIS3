@@ -90,11 +90,11 @@ namespace Isis {
     }
     else if (kernelsPvlGroup.hasKeyword("ElevationModel") &&
              !kernelsPvlGroup["ElevationModel"].isNull())  {
-      shapeModelFilenames = (QString) kernelsPvlGroup["ElevationModel"];
+      shapeModelFilenames = QString::fromStdString(kernelsPvlGroup["ElevationModel"]);
     }
     else if (kernelsPvlGroup.hasKeyword("ShapeModel") &&
              !kernelsPvlGroup["ShapeModel"].isNull()) {
-      shapeModelFilenames = (QString) kernelsPvlGroup["ShapeModel"];
+      shapeModelFilenames = QString::fromStdString(kernelsPvlGroup["ShapeModel"]);
     }
 
     // Create shape model
@@ -112,7 +112,7 @@ namespace Isis {
     if (shapeModelFilenames == "") {
       // No file name given.  If EllipsoidShape throws an error or returns null, the following
       // exception will be appended to the finalError.
-      QString msg = "Unable to construct an Ellipsoid shape model.";
+      std::string msg = "Unable to construct an Ellipsoid shape model.";
 
       try {
         shapeModel = new EllipsoidShape(target);
@@ -129,7 +129,7 @@ namespace Isis {
     else if (shapeModelFilenames == "RingPlane") {
       // No file name given, RingPlane indicated.  If PlaneShape throws an error or returns
       // null, the following exception will be appended to the finalError.
-      QString msg = "Unable to construct a RingPlane shape model.";
+      std::string msg = "Unable to construct a RingPlane shape model.";
 
       try {
         shapeModel = new PlaneShape(target, pvl);
@@ -146,18 +146,18 @@ namespace Isis {
 
       QString preferred = parameters.get("RayTraceEngine", "None").toLower();
       QString onerror   = parameters.get("OnError", "Continue").toLower();
-      double  tolerance = toDouble(parameters.get("Tolerance", toString(DBL_MAX)));
+      double  tolerance = parameters.get("Tolerance", QString::number(DBL_MAX)).toDouble();
 
       // A file error message will be appened to the finalError, if no shape model is constructed.
-      QString fileErrorMsg = "Invalid shape model file ["
-                             + shapeModelFilenames + "] in Kernels group.";
+      std::string fileErrorMsg = "Invalid shape model file ["
+                             + shapeModelFilenames.toStdString() + "] in Kernels group.";
       IException fileError(IException::Io, fileErrorMsg, _FILEINFO_);
 
       //-------------- Check for bullet engine first -------------------------------//
       if ( "bullet" == preferred ) {
         // Check to see of ISIS cube DEMs get a pass
-        FileName v_shapefile(shapeModelFilenames);
-        QString ext = v_shapefile.extension().toLower();
+        FileName v_shapefile(shapeModelFilenames.toStdString());
+        QString ext = QString::fromStdString(v_shapefile.extension()).toLower();
         // Cubes are not supported at this time.
 
         try {
@@ -166,12 +166,12 @@ namespace Isis {
 
             // Bullet failed to load the kernel...test failure conditions
             if ("cub" == ext) {
-              QString mess = "Bullet could not initialize ISIS Cube DEM";
+              std::string mess = "Bullet could not initialize ISIS Cube DEM";
               throw IException(IException::Unknown, mess, _FILEINFO_);
             }
 
             // Always throw an error in this case
-            QString b_msg = "Bullet could not initialize DEM!";
+            std::string b_msg = "Bullet could not initialize DEM!";
             throw IException(IException::Unknown, b_msg, _FILEINFO_);
           }
           else {
@@ -181,9 +181,9 @@ namespace Isis {
             b_model->setTolerance(tolerance);
 
             // Do this here, otherwise default behavior will ensue from here on out
-            kernelsPvlGroup.addKeyword(PvlKeyword("RayTraceEngine", preferred), PvlContainer::Replace);
-            kernelsPvlGroup.addKeyword(PvlKeyword("OnError", onerror), PvlContainer::Replace);
-            kernelsPvlGroup.addKeyword(PvlKeyword("Tolerance", toString(tolerance)),
+            kernelsPvlGroup.addKeyword(PvlKeyword("RayTraceEngine", preferred.toStdString()), PvlContainer::Replace);
+            kernelsPvlGroup.addKeyword(PvlKeyword("OnError", onerror.toStdString()), PvlContainer::Replace);
+            kernelsPvlGroup.addKeyword(PvlKeyword("Tolerance", Isis::toString(tolerance)),
                                                   PvlContainer::Replace);
 
             return ( b_model );
@@ -191,7 +191,7 @@ namespace Isis {
         } 
         catch (IException &ie) {
           fileError.append(ie);
-          QString mess = "Unable to create preferred BulletShapeModel";
+          std::string mess = "Unable to create preferred BulletShapeModel";
           fileError.append(IException(IException::Unknown, mess, _FILEINFO_));
           if ("fail" == onerror) {
             throw fileError;
@@ -205,8 +205,8 @@ namespace Isis {
       if ( "embree" == preferred ) {
 
         // Check to see of ISIS cube DEMs get a pass
-        FileName v_shapefile(shapeModelFilenames);
-        QString ext = v_shapefile.extension().toLower();
+        FileName v_shapefile(shapeModelFilenames.toStdString());
+        QString ext = QString::fromStdString(v_shapefile.extension()).toLower();
         // Cubes are not supported at this time
 
         try {
@@ -218,16 +218,16 @@ namespace Isis {
           embreeModel->setTolerance(tolerance);
 
           // Do this here, otherwise default behavior will ensue from here on out
-          kernelsPvlGroup.addKeyword(PvlKeyword("RayTraceEngine", preferred), PvlContainer::Replace);
-          kernelsPvlGroup.addKeyword(PvlKeyword("OnError", onerror), PvlContainer::Replace);
-          kernelsPvlGroup.addKeyword(PvlKeyword("Tolerance", toString(tolerance)),
+          kernelsPvlGroup.addKeyword(PvlKeyword("RayTraceEngine", preferred.toStdString()), PvlContainer::Replace);
+          kernelsPvlGroup.addKeyword(PvlKeyword("OnError", onerror.toStdString()), PvlContainer::Replace);
+          kernelsPvlGroup.addKeyword(PvlKeyword("Tolerance", Isis::toString(tolerance)),
                                                 PvlContainer::Replace);
 
           return ( embreeModel );
 
         } catch (IException &ie) {
           fileError.append(ie);
-          QString mess = "Unable to create preferred EmbreeShapeModel";
+          std::string mess = "Unable to create preferred EmbreeShapeModel";
           fileError.append(IException(IException::Unknown, mess, _FILEINFO_));
           if ("fail" == onerror) {
             throw fileError;
@@ -239,7 +239,7 @@ namespace Isis {
 
       // If NaifDskShape throws an error or returns null and DEM construction is
       // unsuccessful, the following exception will be appended to the fileError.
-      QString msg = "The given shape model file is not a valid NAIF DSK file. "
+      std::string msg = "The given shape model file is not a valid NAIF DSK file. "
                     "Unable to construct a NAIF DSK shape model.";
       IException dskError(IException::Unknown, msg, _FILEINFO_);
 
@@ -263,11 +263,11 @@ namespace Isis {
         Isis::Cube* shapeModelCube = new Isis::Cube;
         try {
           // first, try to open the shape model file as an Isis cube
-          shapeModelCube->open(FileName(shapeModelFilenames).expanded(), "r" );
+          shapeModelCube->open(QString::fromStdString(FileName(shapeModelFilenames.toStdString()).expanded()), "r" );
         }
         catch (IException &e) {
           // The file is neither a valid DSK nor an ISIS cube. Append a message and throw the error.
-          QString msg = "The given shape model file is not a valid ISIS DEM. "
+          std::string msg = "The given shape model file is not a valid ISIS DEM. "
                         "Unable to open as an ISIS cube.";
           fileError.append(IException(e, IException::Unknown, msg, _FILEINFO_));
           finalError.append(fileError);
@@ -281,7 +281,7 @@ namespace Isis {
         }
         catch (IException &e) {
           // The file is neither a valid DSK nor a valid ISIS DEM. Append message and throw the error.
-          QString msg = "The given shape model file is not a valid ISIS DEM cube. "
+          std::string msg = "The given shape model file is not a valid ISIS DEM cube. "
                         "It is not map-projected.";
           fileError.append(IException(e, IException::Unknown, msg, _FILEINFO_));
           finalError.append(fileError);
@@ -291,7 +291,7 @@ namespace Isis {
         if (projection->IsEquatorialCylindrical()) {
           // If the EquatorialCylindricalShape constructor throws an error or returns null, the
           // following exception will be appended to the fileError. (Later added to the finalError)
-          QString msg = "Unable to construct a DEM shape model from the given "
+          std::string msg = "Unable to construct a DEM shape model from the given "
                         "EquatorialCylindrical projected ISIS cube.";
 
           try {
@@ -309,7 +309,7 @@ namespace Isis {
         else {
           // If the DemShape constructor throws an error or returns null, the following
           // exception will be appended to the fileError. (Later added to the finalError)
-          QString msg = "Unable to construct a DEM shape model "
+          std::string msg = "Unable to construct a DEM shape model "
                         "from the given projected ISIS cube file.";
 
           try {

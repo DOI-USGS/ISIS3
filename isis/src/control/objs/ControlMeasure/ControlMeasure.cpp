@@ -434,7 +434,7 @@ namespace Isis {
    */
   void ControlMeasure::SetLogData(ControlMeasureLogData data) {
     if (!data.IsValid()) {
-      QString msg = "Cannot set log data with invalid information stored in "
+      std::string msg = "Cannot set log data with invalid information stored in "
                     "the ControlMeasureLogData";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -514,8 +514,8 @@ namespace Isis {
     }
 
     if (!updated) {
-      QString msg = "Unable to update the log data for ["
-                    + newLogData.DataTypeToName(newLogData.GetDataType()) + "] because this"
+      std::string msg = "Unable to update the log data for ["
+                    + newLogData.DataTypeToName(newLogData.GetDataType()).toStdString() + "] because this"
                     " control measure does not have log data for this value. Please use "
                     "SetLogData instead";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -544,7 +544,7 @@ namespace Isis {
       return *p_chooserName;
     }
     else {
-      return FileName(Application::Name()).name();
+      return QString::fromStdString(FileName(Application::Name().toStdString()).name());
     }
   }
 
@@ -678,8 +678,8 @@ namespace Isis {
     }
 
     if (!validField) {
-      QString msg = "Cannot test IsStatisticallyRelevant on Measure Data ["
-                    + QString(field) + "]";
+      std::string msg = "Cannot test IsStatisticallyRelevant on Measure Data ["
+                    + QString(field).toStdString() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -742,7 +742,7 @@ namespace Isis {
 
   QString ControlMeasure::GetPointId() const {
     if (parentPoint == NULL) {
-      QString msg = "Measure has no containing point";
+      std::string msg = "Measure has no containing point";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -823,7 +823,7 @@ namespace Isis {
       return p_ignore;
     }
     else {
-      QString msg = data + " passed to GetMeasureData but is invalid";
+      std::string msg = data.toStdString() + " passed to GetMeasureData but is invalid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -931,7 +931,7 @@ namespace Isis {
     else if (str == "registeredsubpixel")
       measureType = ControlMeasure::RegisteredSubPixel;
     else
-      throw IException(IException::Programmer, err, _FILEINFO_);
+      throw IException(IException::Programmer, err.toStdString(), _FILEINFO_);
 
     return measureType;
   }
@@ -970,7 +970,7 @@ namespace Isis {
     }
 
     if (sPrintable == "") {
-      QString msg = "Measure type [" + toString(type) + "] cannot be converted "
+      std::string msg = "Measure type [" + toString(type) + "] cannot be converted "
           "to a string";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

@@ -171,7 +171,7 @@ namespace Isis {
         inline int  Errno() const {  return (m_gerrno); }
         inline BigInt Count() const { return (m_count); }
         inline void BumpIt() { m_count++; }
-        PvlKeyword LogIt() const { return (PvlKeyword(m_keyname, toString(m_count))); }
+        PvlKeyword LogIt() const { return (PvlKeyword(m_keyname.toStdString(), Isis::toString(m_count))); }
 
         int         m_gerrno;
         QString m_keyname;
@@ -247,9 +247,7 @@ namespace Isis {
           return (defval);
         }
         QString iValue(conf.value(keyname, index));
-        IString tmp(iValue);
-        QString value = tmp.ToQt();  // This makes it work with a string?
-        return (value);
+        return iValue;
       };
 
       /**
@@ -278,7 +276,7 @@ namespace Isis {
           return (defval);
         }
         QString iValue(conf.value(keyname, index));
-        IString tmp(iValue);
+        IString tmp(iValue.toStdString());
         T value = tmp;  // This makes it work with a string?
         return (value);
       };
@@ -304,7 +302,7 @@ namespace Isis {
         if(m_prof.exists(keyname)) {
           return(ValidateKey(keyname, value, unit));
         }
-        return (PvlKeyword(keyname, "Unbounded"));
+        return (PvlKeyword(keyname.toStdString(), "Unbounded"));
       };
 
 
@@ -324,10 +322,10 @@ namespace Isis {
                                     const double &value,
                                     const QString &unit = "") const {
         if(IsSpecial(value)) {
-          return (PvlKeyword(keyname, "NULL"));
+          return (PvlKeyword(keyname.toStdString(), "NULL"));
         }
         else {
-          return (PvlKeyword(keyname, toString(value), unit));
+          return (PvlKeyword(keyname.toStdString(), Isis::toString(value), unit.toStdString()));
         }
       }
 

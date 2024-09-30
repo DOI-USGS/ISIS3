@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     qDebug() << "";
 
-    Cube itokawaCube(itokawaCubeFile);
+    Cube itokawaCube(itokawaCubeFile.toStdString());
     Camera *itokawaCamera = itokawaCube.camera();
     Target *itokawaTarget = itokawaCamera->target();
 
@@ -74,9 +74,9 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
     qDebug() << "";
     qDebug() << "Using: " << itokawaCubeFile;
-    Pvl itokawaLabel(itokawaCubeFile);
+    Pvl itokawaLabel(itokawaCubeFile.toStdString());
     PvlObject &itokawaCubeLabel = itokawaLabel.findObject("IsisCube");
-    itokawaCubeLabel.findGroup("Kernels").findKeyword("ShapeModel").setValue(itokawaDskFile);
+    itokawaCubeLabel.findGroup("Kernels").findKeyword("ShapeModel").setValue(itokawaDskFile.toStdString());
     BulletShapeModel itokawaModel( itokawaTarget, itokawaLabel );
     itokawaModel.setTolerance(0.001);
     outputModelStatus(itokawaModel);
@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
   catch (IException &e) {
     qDebug() << "";
     qDebug() << "";
-    QString msg = "**************** UNIT TEST FAILED! **************** ";
+    std::string msg = "**************** UNIT TEST FAILED! **************** ";
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
 

@@ -3,6 +3,7 @@
 
 #include <QString>
 
+#include "Application.h"
 #include "CisscalFile.h"
 #include "FileName.h"
 #include "IException.h"
@@ -38,20 +39,20 @@ namespace Isis{
     //PROCESS 1: saves off label, header, and line prefix data ==========================================//
     ProcessImportPds p;
     Pvl label;
-    FileName in = ui.GetFileName("FROM");
+    FileName in = ui.GetFileName("FROM").toStdString();
 
     try {
-      p.SetPdsFile(in.expanded(), "", label);
+      p.SetPdsFile(QString::fromStdString(in.expanded()), "", label);
     }
     catch (IException &e) {
       throw IException(e, IException::User,
-                       QObject::tr("Error reading input file.  Make sure it contains a PDS label."),
+                       "Error reading input file.  Make sure it contains a PDS label.",
                        _FILEINFO_);
     }
 
     //Checks if in file is rdr
     if(label.hasObject("IMAGE_MAP_PROJECTION")) {
-      QString msg = "[" + in.name() + "] appears to be an rdr file.";
+      std::string msg = "[" + in.name() + "] appears to be an rdr file.";
       msg += " Use pds2isis.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -61,7 +62,7 @@ namespace Isis{
     outAtt.setPixelType(SignedWord);
     outAtt.setMinimum((double)VALID_MIN2);
     outAtt.setMaximum((double)VALID_MAX2);
-    Cube *ocube = p.SetOutputCube(FileName(ui.GetCubeName("TO")).expanded(), outAtt);
+    Cube *ocube = p.SetOutputCube(QString::fromStdString(FileName(ui.GetCubeName("TO").toStdString()).expanded()), outAtt);
 
     TranslateCassIssLabels(in, ocube, log);
 
@@ -93,7 +94,7 @@ namespace Isis{
       //Adjust Table-encoded values from 8 bit back to 12 bit.
       PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
       double biasStripMean = inst.findKeyword("BiasStripMean");
-      inst.findKeyword("BiasStripMean").setValue(toString(stretch.Map(biasStripMean)));
+      inst.findKeyword("BiasStripMean").setValue(Isis::toString(stretch.Map(biasStripMean)));
       inst.findKeyword("BiasStripMean").addComment("BiasStripMean value converted back to 12 bit.");
       p.Progress()->SetText("Image was converted using 12-to-8 bit table. \nConverting prefix pixels back to 12 bit and saving line prefix data...");
     }
@@ -102,7 +103,7 @@ namespace Isis{
     if (inputLabel.hasKeyword("VALID_MAXIMUM")) {
       PvlKeyword labelValidMax = inputLabel.findKeyword("VALID_MAXIMUM");
       if (labelValidMax[1] != "UNK") {
-        validMax = toInt(labelValidMax[1]);
+        validMax = Isis::toInt(labelValidMax[1]);
       }
     }
 
@@ -119,7 +120,7 @@ namespace Isis{
     int roo = *(header + 50 + vicarLabelBytes) / 32 % 2; //**** THIS MAY NEED TO BE CHANGED,
     // SEE BOTTOM OF THIS FILE FOR IN DEPTH COMMENTS ON READOUTORDER
     PvlGroup &inst = ocube->label()->findGroup("Instrument", Pvl::Traverse);
-    inst.addKeyword(PvlKeyword("ReadoutOrder", toString(roo)));
+    inst.addKeyword(PvlKeyword("ReadoutOrder", Isis::toString(roo)));
     p.EndProcess();
 
     // PROCESS 2 : Do 8 bit to 12 bit conversion for image ==============================================//
@@ -208,9 +209,9 @@ namespace Isis{
   void CreateStretchPairs() {
     // Set up the strech for the 8 to 12 bit conversion from file
     PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-    QString missionDir = (QString) dataDir["Cassini"];
+    std::string missionDir = dataDir["Cassini"];
     FileName *lutFile = new FileName(missionDir + "/calibration/lut/lut.tab");
-    CisscalFile *stretchPairs = new CisscalFile(lutFile->expanded());
+    CisscalFile *stretchPairs = new CisscalFile(QString::fromStdString(lutFile->expanded()));
     // Create the stretch pairs
     double temp1 = 0;
     stretch.ClearPairs();
@@ -220,7 +221,7 @@ namespace Isis{
       line = line.simplified();
 
       foreach (QString value, line.split(QRegExp("[\\s,]"), Qt::SkipEmptyParts)) {
-        stretch.AddPair(temp1, toDouble(value));
+        stretch.AddPair(temp1, value.toDouble());
         temp1++;
       }
     }
@@ -271,12 +272,12 @@ namespace Isis{
    */
   void TranslateCassIssLabels(FileName &labelFile, Cube *ocube, Pvl *log) {
     // Get the directory where the CISS translation tables are.
-    QString dir = "$ISISROOT/appdata/translations";
+    std::string dir = "$ISISROOT/appdata/translations";
     FileName transFile(dir + "/CassiniIss.trn");
 
     // Get the translation manager ready
     Pvl inputLabel(labelFile.expanded());
-    PvlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
+    PvlToPvlTranslationManager labelXlater(inputLabel, QString::fromStdString(transFile.expanded()));
 
     // Pvl outputLabels;
     Pvl *outputLabel = ocube->label();
@@ -284,29 +285,29 @@ namespace Isis{
 
     //Add needed keywords that are not in translation table to cube's instrument group
     PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
-    QString scc = inputLabel.findKeyword("SPACECRAFT_CLOCK_CNT_PARTITION");
-    scc += "/" + (QString) inputLabel.findKeyword("SPACECRAFT_CLOCK_START_COUNT");
-    inst.addKeyword(PvlKeyword("SpacecraftClockCount", scc));
+    QString scc = QString::fromStdString(inputLabel.findKeyword("SPACECRAFT_CLOCK_CNT_PARTITION"));
+    scc += "/" + QString::fromStdString(inputLabel.findKeyword("SPACECRAFT_CLOCK_START_COUNT"));
+    inst.addKeyword(PvlKeyword("SpacecraftClockCount", scc.toStdString()));
 
     //Add units of measurement to keywords from translation table
     double exposureDuration = inst.findKeyword("ExposureDuration");
-    inst.findKeyword("ExposureDuration").setValue(toString(exposureDuration), "Milliseconds");
+    inst.findKeyword("ExposureDuration").setValue(Isis::toString(exposureDuration), "Milliseconds");
 
     int gainModeId = inst.findKeyword("GainModeId");
-    inst.findKeyword("GainModeId").setValue(toString(gainModeId), "ElectronsPerDN");
+    inst.findKeyword("GainModeId").setValue(Isis::toString(gainModeId), "ElectronsPerDN");
 
     PvlKeyword opticsTemp = inst.findKeyword("OpticsTemperature");
     inst.findKeyword("OpticsTemperature").setValue(opticsTemp[0]);
     inst.findKeyword("OpticsTemperature").addValue(opticsTemp[1], "DegreesCelcius");
 
     double instDataRate = inst.findKeyword("InstrumentDataRate");
-    inst.findKeyword("InstrumentDataRate").setValue(toString(instDataRate), "KilobitsPerSecond");
+    inst.findKeyword("InstrumentDataRate").setValue(Isis::toString(instDataRate), "KilobitsPerSecond");
 
     //  initialize global variables
-    dataConversionType = (QString) inst.findKeyword("DataConversionType");
+    dataConversionType = QString::fromStdString(inst.findKeyword("DataConversionType"));
     sumMode = inst.findKeyword("SummingMode");
-    compressionType = (QString) inst.findKeyword("CompressionType");
-    IString fsw((QString) inst.findKeyword("FlightSoftwareVersionId"));
+    compressionType = QString::fromStdString(inst.findKeyword("CompressionType"));
+    IString fsw((std::string)inst.findKeyword("FlightSoftwareVersionId"));
     if(fsw == "Unknown") {
       flightSoftware = 0.0;
     }
@@ -315,30 +316,30 @@ namespace Isis{
     }
 
     // Remove the trailing 'Z' in some pds labels
-    QString sUpdateTime = inst.findKeyword("StartTime")[0];
+    QString sUpdateTime = QString::fromStdString(inst.findKeyword("StartTime")[0]);
     sUpdateTime.remove(QRegExp("[Zz]"));
-    inst.findKeyword("StartTime").setValue(sUpdateTime);
+    inst.findKeyword("StartTime").setValue(sUpdateTime.toStdString());
 
-    sUpdateTime = inst.findKeyword("StopTime")[0];
+    sUpdateTime = QString::fromStdString(inst.findKeyword("StopTime")[0]);
     sUpdateTime.remove(QRegExp("[Zz]"));
-    inst.findKeyword("StopTime").setValue(sUpdateTime);
+    inst.findKeyword("StopTime").setValue(sUpdateTime.toStdString());
 
-    sUpdateTime = inst.findKeyword("ImageTime")[0];
+    sUpdateTime = QString::fromStdString(inst.findKeyword("ImageTime")[0]);
     sUpdateTime.remove(QRegExp("[Zz]"));
-    inst.findKeyword("ImageTime").setValue(sUpdateTime);
+    inst.findKeyword("ImageTime").setValue(sUpdateTime.toStdString());
 
 
     // create BandBin group
-    QString filter = inputLabel.findKeyword("FilterName")[0] + "/" +
-                     inputLabel.findKeyword("FilterName")[1];
+    QString filter = QString::fromStdString(inputLabel.findKeyword("FilterName")[0]) + "/" +
+                     QString::fromStdString(inputLabel.findKeyword("FilterName")[1]);
 
-    QString instrumentID = inst.findKeyword("InstrumentId");
+    QString instrumentID = QString::fromStdString(inst.findKeyword("InstrumentId"));
     QString cameraAngleDefs;
     if(instrumentID.at(3) == 'N') {
-      cameraAngleDefs = dir + "/CassiniIssNarrowAngle.def";
+      cameraAngleDefs = QString::fromStdString(dir) + "/CassiniIssNarrowAngle.def";
     }
     else if(instrumentID.at(3) == 'W') {
-      cameraAngleDefs = dir + "/CassiniIssWideAngle.def";
+      cameraAngleDefs = QString::fromStdString(dir) + "/CassiniIssWideAngle.def";
     }
 
     double center = 0;
@@ -353,26 +354,24 @@ namespace Isis{
 
       QStringList tokens = line.simplified().split(" ");
       if(tokens.count() > 2 && tokens.first() == filter) {
-        center = toDouble(tokens[1]);
-        width = toDouble(tokens[2]);
+        center = tokens[1].toDouble();
+        width = tokens[2].toDouble();
         foundfilter = true;
         break;
       }
     }
     PvlGroup bandBin("BandBin");
-    bandBin += PvlKeyword("FilterName", filter);
+    bandBin += PvlKeyword("FilterName", filter.toStdString());
     bandBin += PvlKeyword("OriginalBand", "1");
 
     if(foundfilter) {
-      bandBin += PvlKeyword("Center", toString(center));
-      bandBin += PvlKeyword("Width", toString(width));
+      bandBin += PvlKeyword("Center", Isis::toString(center));
+      bandBin += PvlKeyword("Width", Isis::toString(width));
     }
     else {
       PvlGroup msgGrp("Warnings");
-      msgGrp += PvlKeyword("CameraAngleLookup", "Failed! No Camera information for filter combination: " + filter);
-      if (log) {
-        log->addLogGroup(msgGrp);
-      }
+      msgGrp += PvlKeyword("CameraAngleLookup", "Failed! No Camera information for filter combination: " + filter.toStdString());
+      Application::Log(msgGrp);
       bandBin += PvlKeyword("Center", "None found for filter combination.");
       bandBin += PvlKeyword("Width", "None found for filter combination.");
     }
@@ -387,7 +386,7 @@ namespace Isis{
       kerns += PvlKeyword("NaifFrameCode", "-82361");
     }
     else {
-      QString msg = "CISS2ISIS only imports Cassini ISS narrow ";
+      std::string msg = "CISS2ISIS only imports Cassini ISS narrow ";
       msg += "angle or wide angle images";
       throw IException(IException::User, msg, _FILEINFO_);
     }

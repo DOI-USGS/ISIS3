@@ -34,13 +34,13 @@ namespace Isis {
     ifstream vicFile(vicarFile.toLatin1().data(), ios::in);
 
     if(!vicFile) {
-      QString msg = "Cannot open vicar file [" + vicarFile + "]";
+      std::string msg = "Cannot open vicar file [" + vicarFile.toStdString() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     try {
       // get the starting VICAR label and convert to PVL
-      IString vicLabels = ExtractPvlLabel(0, vicFile);
+      IString vicLabels = ExtractPvlLabel(0, vicFile).toStdString();
 
       // Fill temp Pvl label for ProcessImport startprocess
       stringstream lbl;
@@ -61,19 +61,19 @@ namespace Isis {
 
       SetDimensions(vLab["NS"], vLab["NL"], vLab["NB"]);
 
-      QString pixType = vLab["FORMAT"];
+      QString pixType = QString::fromStdString(vLab["FORMAT"]);
       Isis::PixelType pixelType = None;
       if(pixType == "BYTE") pixelType = UnsignedByte;
       if(pixType == "WORD") pixelType = UnsignedWord;
       if(pixType == "HALF") pixelType = SignedWord;
       if(pixType == "REAL") pixelType = Real;
       if(pixelType == None) {
-        QString msg = "Unsupported pixel type [FORMAT=" + pixType + "]";
+        std::string msg = "Unsupported pixel type [FORMAT=" + pixType.toStdString() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
       SetPixelType(pixelType);
 
-      QString order = vLab["INTFMT"];
+      QString order = QString::fromStdString(vLab["INTFMT"]);
       if(order == "LOW") {
         SetByteOrder(Lsb);
       }
@@ -81,7 +81,7 @@ namespace Isis {
         SetByteOrder(Msb);
       }
 
-      QString organization = vLab["ORG"];
+      QString organization = QString::fromStdString(vLab["ORG"]);
       if(organization == "BSQ") {
         SetOrganization(ProcessImport::BSQ);
       }
@@ -92,7 +92,7 @@ namespace Isis {
         SetOrganization(ProcessImport::BIP);
       }
       else {
-        QString msg = "Unsupported file organization [" + organization + "]";
+        std::string msg = "Unsupported file organization [" + organization.toStdString() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -108,7 +108,7 @@ namespace Isis {
 
           QString endPvlLabel = ExtractPvlLabel(startByte, vicFile);
           stringstream lbl;
-          lbl << endPvlLabel;
+          lbl << endPvlLabel.toStdString();
 
           Pvl endLab;
           lbl >> endLab;
@@ -121,7 +121,7 @@ namespace Isis {
       }
     }
     catch(IException &e) {
-      QString msg = "Input file [" + vicarFile + "] does not appear to be a vicar file";
+      std::string msg = "Input file [" + vicarFile.toStdString() + "] does not appear to be a vicar file";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -155,7 +155,7 @@ namespace Isis {
 
       // we're totally lost at this point
       if(pos == 1023) {
-        QString msg = "Cannot find label size in VICAR file";
+        std::string msg = "Cannot find label size in VICAR file";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }

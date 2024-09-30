@@ -493,7 +493,7 @@ namespace Isis {
         else {
           Camera *cam = m->Camera();
           if (cam == NULL) {
-            QString msg = "The Camera must be set prior to calculating apriori";
+            std::string msg = "The Camera must be set prior to calculating apriori";
             throw IException(IException::Programmer, msg, _FILEINFO_);
           }
           if (cam->SetImage(m->GetSample(), m->GetLine())) {
@@ -520,7 +520,7 @@ namespace Isis {
 
       // Did we have any measures?
       if (goodMeasures == 0) {
-        QString msg = "ControlPoint [" + id + "] has no measures which "
+        std::string msg = "ControlPoint [" + id.toStdString() + "] has no measures which "
            "project to lat/lon/radius (x/y/z)";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -606,7 +606,7 @@ namespace Isis {
 //    */
 //   void QnetSetAprioriDialog::fillGroundSourceAprioriLineEdits() {
 //     if (m_points.size() == 0) {
-//       QString msg = "There are no Points selected. Please select a Point.";
+//       std::string msg = "There are no Points selected. Please select a Point.";
 //       QMessageBox::warning((QWidget *)parent(), "Warning", msg);
 //       return;
 //     }
@@ -967,7 +967,7 @@ namespace Isis {
       }
       catch (IException &e)  {
         QString message = "Error setting sigmas. \n";
-        message += e.toString();
+        message += QString::fromStdString(e.toString());
         QMessageBox::critical((QWidget *)parent(),"Error",message);
         QApplication::restoreOverrideCursor();
         // Sigmas failed, but surface pt coordinate was set

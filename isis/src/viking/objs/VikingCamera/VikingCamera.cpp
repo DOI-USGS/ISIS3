@@ -51,8 +51,8 @@ namespace Isis {
     // raster orientation, cone, crosscone, and camera
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-    QString spacecraft = inst["SPACECRAFTNAME"];
-    QString instId = inst["INSTRUMENTID"];
+    QString spacecraft = QString::fromStdString(inst["SPACECRAFTNAME"]);
+    QString instId = QString::fromStdString(inst["INSTRUMENTID"]);
     QString cam;
     int spn;
     double raster, cone, crosscone;
@@ -84,8 +84,8 @@ namespace Isis {
         m_instrumentNameShort = "VISB";
       }
       else {
-        QString msg = "File does not appear to be a Viking image. InstrumentId ["
-            + instId + "] is invalid Viking value.";
+        std::string msg = "File does not appear to be a Viking image. InstrumentId ["
+            + instId.toStdString() + "] is invalid Viking value.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -116,14 +116,14 @@ namespace Isis {
         m_instrumentNameShort = "VISB";
       }
       else {
-        QString msg = "File does not appear to be a Viking image. InstrumentId ["
-            + instId + "] is invalid Viking value.";
+        std::string msg = "File does not appear to be a Viking image. InstrumentId ["
+            + instId.toStdString() + "] is invalid Viking value.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
-      QString msg = "File does not appear to be a Viking image. SpacecraftName ["
-          + spacecraft + "] is invalid Viking value.";
+      std::string msg = "File does not appear to be a Viking image. SpacecraftName ["
+          + spacecraft.toStdString() + "] is invalid Viking value.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -146,7 +146,7 @@ namespace Isis {
      *****************************************************************************/
 
     // Get clock count and convert it to a time
-    QString spacecraftClock = inst["SpacecraftClockCount"];
+    QString spacecraftClock = QString::fromStdString(inst["SpacecraftClockCount"]);
     double etClock = getClockTime(spacecraftClock, altinstcode).Et();
 
     // exposure duration keyword value is measured in seconds
@@ -175,8 +175,8 @@ namespace Isis {
     focalMap->SetDetectorOrigin(602.0, 528.0);
 
     // Setup distortion map
-    QString fname = FileName("$viking" + toString(spn) + "/reseaus/vik" + cam
-                             + "MasterReseaus.pvl").expanded();
+    QString fname = QString::fromStdString(FileName("$viking" + toString(spn) + "/reseaus/vik" + cam.toStdString()
+                             + "MasterReseaus.pvl").expanded());
     new ReseauDistortionMap(this, lab, fname);
 
     // Setup the ground and sky map

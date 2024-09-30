@@ -46,7 +46,7 @@ namespace Isis {
    */ 
   Strategy::Strategy(const QString &name, const QString &type) : 
                      m_globals(),
-                     m_definition(new PvlObject(name)),
+                     m_definition(new PvlObject(name.toStdString())),
                      m_name(name), m_type(type), m_total(0), 
                      m_applyDiscarded(false), m_debug(false), m_progress() { 
   }
@@ -80,8 +80,8 @@ namespace Isis {
     PvlFlatMap parms(getDefinitionMap());
     m_name = parms.get("Name");
     m_type = parms.get("Type");
-    m_applyDiscarded = toBool(parms.get("ApplyToDiscarded", "false"));
-    m_debug = toBool(parms.get("Debug", "false"));
+    m_applyDiscarded = toBool(parms.get("ApplyToDiscarded", "false").toStdString());
+    m_debug = toBool(parms.get("Debug", "false").toStdString());
     initProgress();
   }
   
@@ -200,7 +200,7 @@ namespace Isis {
  */
   QString Strategy::description() const {
     if ( m_definition->hasKeyword("Description") ) {
-      return (m_definition->findKeyword("Description")[0]);
+      return QString::fromStdString(m_definition->findKeyword("Description")[0]);
     }
     else {
       QString descr = "Strategy::" + name() + " is running a " + type() +
@@ -574,7 +574,7 @@ namespace Isis {
     QString result = value;
     int i = argKeys.size();
     BOOST_REVERSE_FOREACH ( QString arg, argKeys ) {
-      QString target("%"+QString::number(i));
+      QString target("%"+QString::fromStdString(toString(i)));
       result = scanAndReplace(result, target, findReplacement(arg,globals,0,defValue));
       i--;
     } 
@@ -646,13 +646,13 @@ namespace Isis {
       BOOST_FOREACH ( QString key, keySources ) {
         if ( resourceA->exists(key) ) {
           PvlKeyword keyword(resourceA->keyword(key));
-          keyword.setName(keyword.name().append(keySuffix.first));
+          keyword.setName(keyword.name().append(keySuffix.first.toStdString()));
           composite->add(keyword);
         }
 
         if ( resourceB->exists(key) ) {
           PvlKeyword keyword(resourceB->keyword(key));
-          keyword.setName(keyword.name().append(keySuffix.second));
+          keyword.setName(keyword.name().append(keySuffix.second.toStdString()));
           composite->add(keyword);
         }
       }
@@ -663,7 +663,7 @@ namespace Isis {
       PvlFlatMap::ConstPvlFlatMapIterator pkeys = rkeysA.begin();
       while ( rkeysA.constEnd() != pkeys) {
         PvlKeyword keyword(pkeys.value());
-        keyword.setName(keyword.name().append(keySuffix.first));
+        keyword.setName(keyword.name().append(keySuffix.first.toStdString()));
         composite->add(keyword);
         ++pkeys;
       }
@@ -672,7 +672,7 @@ namespace Isis {
       pkeys = rkeysB.begin();
       while ( rkeysB.constEnd() != pkeys) {
         PvlKeyword keyword(pkeys.value());
-        keyword.setName(keyword.name().append(keySuffix.second));
+        keyword.setName(keyword.name().append(keySuffix.second.toStdString()));
         composite->add(keyword);
         ++pkeys;
       }
@@ -717,7 +717,7 @@ namespace Isis {
         geom = resource->value(giskey);
         
         // Erase key if requested
-        if ( toBool(keys.get("RemoveGisKeywordAfterImport", "false")) ) { 
+        if ( toBool(keys.get("RemoveGisKeywordAfterImport", "false").toStdString()) ) { 
           resource->erase(giskey); 
         }
       }
@@ -750,7 +750,7 @@ namespace Isis {
                                                      getGlobals(resource, globals), ""); 
 
         if ( !gisTolerance.isEmpty() ) {
-          tolerance = toDouble(gisTolerance);
+          tolerance = gisTolerance.toDouble();
           GisGeometry *simple = geosgeom->simplify(tolerance);
           if ( 0 != simple ) geosgeom.reset(simple);
           npoints = geosgeom->points();
@@ -763,14 +763,14 @@ namespace Isis {
                                                  getGlobals(resource, globals), 
                                                  ""); 
         if ( !pointsKey.isEmpty() ) {
-          resource->add(pointsKey, toString(npoints));
-          resource->add(pointsKey+"Original", toString(npointsOrg));
-          resource->add(pointsKey+"Tolerance", toString(tolerance));
+          resource->add(pointsKey, QString::fromStdString(toString(npoints)));
+          resource->add(pointsKey+"Original", QString::fromStdString(toString(npointsOrg)));
+          resource->add(pointsKey+"Tolerance", QString::fromStdString(toString(tolerance)));
         }
 
         //  Status if requested
         if ( isDebug() ) {
-          cout << "  " << type() << ":" << name() << " has a geometry with "
+          cout << "  " << type().toStdString() << ":" << name().toStdString() << " has a geometry with "
                << npoints << " points!\n";
           if ( npoints != npointsOrg ) {
             cout << "  Geometry has been simplified/reduced from original " 
@@ -783,7 +783,7 @@ namespace Isis {
   
     // Report geometry status
     if ( isDebug() ) {
-      cout << "  " << type() << ":" << name() << " does not have a geometry!\n";
+      cout << "  " << type().toStdString() << ":" << name().toStdString() << " does not have a geometry!\n";
     }
   
     return (false);
@@ -935,7 +935,7 @@ namespace Isis {
     // The programmer is required to ensure a valid geometry provides the
     // source of the intersection operation.
     if ( !geom.isValid() ) {
-      QString mess = type() + ":" + name() + 
+      std::string mess = type().toStdString() + ":" + name().toStdString() + 
                      "Cannot apply RTree search to bad geometry."; 
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
@@ -970,7 +970,7 @@ namespace Isis {
       }
       GEOSSTRtree *rtree = GEOSSTRtree_create(v_active.size());
       if ( !rtree ) {
-        QString mess = "GEOS RTree allocation failed for " +
+        std::string mess = "GEOS RTree allocation failed for " +
                         toString(v_active.size()) + " geometries.";
           throw IException(IException::Programmer, mess, _FILEINFO_);
         }
@@ -1107,7 +1107,7 @@ namespace Isis {
     //  Check for initialization 
     if ( !doShowProgress()  ) {
       PvlFlatMap p_var( getDefinitionMap() );
-      if ( toBool(p_var.get("ShowProgress", "false")) ) {
+      if ( toBool(p_var.get("ShowProgress", "false").toStdString()) ) {
         m_progress.reset( new Progress() );
         if ( p_text.isEmpty() ) { 
            p_text = type() + "::" + name();
@@ -1133,7 +1133,7 @@ namespace Isis {
     QStringList objList;
     PvlObject::ConstPvlObjectIterator object = source.beginObject();
     while ( object != source.endObject() ) {
-      objList << object->name();
+      objList <<QString::fromStdString(object->name());
       ++object;
     }
     return (objList);

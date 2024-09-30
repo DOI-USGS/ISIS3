@@ -272,7 +272,7 @@ namespace Isis {
       return ( m_data->m_keys.keyword(keywordName) );
     }
     // Return empty keyword
-    return (PvlKeyword(keywordName));
+    return (PvlKeyword(keywordName.toStdString()));
   }
 
 
@@ -504,7 +504,7 @@ namespace Isis {
   QVariant Resource::asset(const QString &assetName) const {
     if ( !hasAsset(assetName) ) {
       throw IException(IException::Programmer,
-                        "Requested asset " + assetName + " does not exist.", 
+                        "Requested asset " + assetName.toStdString() + " does not exist.", 
                        _FILEINFO_);
     }
     return ( m_data->m_assets.value(assetName.toLower()) );
@@ -564,7 +564,7 @@ namespace Isis {
    * @return PvlObject An object with all keywords in the map
    */
   PvlObject Resource::toPvl(const QString &pvlName) const {
-    PvlObject object(pvlName);
+    PvlObject object(pvlName.toStdString());
     PvlFlatMap::ConstPvlFlatMapIterator key = m_data->m_keys.begin();
     while (  key != m_data->m_keys.end() ) {
       object.addKeyword(key.value());

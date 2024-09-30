@@ -19,7 +19,7 @@ find files of those names at the top level of this repository. **/
 #include <QSharedPointer>
 #include <QString>
 
-
+#include "Application.h"
 #include "Blob.h"
 #include "BundleAdjust.h"
 #include "BundleObservationSolveSettings.h"
@@ -82,7 +82,7 @@ namespace Isis {
           Cube *c = p.SetInputCube(snList->fileName(i), inAtt, ReadWrite);
 
           if (c->hasBlob("CSMState", "String")) {
-            QString msg = "Unable to apply bundle adjustment values to cubes with CSMState blobs.";
+            std::string msg = "Unable to apply bundle adjustment values to cubes with CSMState blobs.";
             throw IException(IException::User, msg, _FILEINFO_);
           }
 
@@ -96,16 +96,16 @@ namespace Isis {
           // Read h5 into table
           DataSet datasetRead = fileRead.getDataSet(cmatrixKey);
           auto cmatrixData = datasetRead.read<std::string>();
-          Table cmatrixTable(cmatrixName, cmatrixData, ',');
+          Table cmatrixTable(cmatrixName.toStdString(), cmatrixData, ',');
 
           datasetRead = fileRead.getDataSet(spvectorKey);
           auto spvectorData = datasetRead.read<std::string>();
-          Table spvectorTable(spvectorName, spvectorData, ',');
+          Table spvectorTable(spvectorName.toStdString(), spvectorData, ',');
 
           // Write bundle adjustment values out
-          cmatrixTable.Label().addComment(jigApplied);
+          cmatrixTable.Label().addComment(jigApplied.toStdString());
           c->write(cmatrixTable);
-          spvectorTable.Label().addComment(jigApplied);
+          spvectorTable.Label().addComment(jigApplied.toStdString());
           c->write(spvectorTable);
 
           p.WriteHistory(*c);
@@ -114,15 +114,15 @@ namespace Isis {
         if (log) {
           PvlGroup gp("JigsawResults");
           
-          gp += PvlKeyword("Status", "Bundle adjustment values from [" + ui.GetFileName("ADJUSTMENT_INPUT") 
-                            + "] were applied to the cubes in [" + cubeList+ "]");
+          gp += PvlKeyword("Status", "Bundle adjustment values from [" + ui.GetFileName("ADJUSTMENT_INPUT").toStdString() 
+                            + "] were applied to the cubes in [" + cubeList.toStdString() + "]");
           log->addLogGroup(gp);
         }
 
         return;
       }
     } catch (IException &e) {
-      QString msg = "Unable to apply bundle adjustment values from [" + ui.GetFileName("ADJUSTMENT_INPUT") + "]";
+      std::string msg = "Unable to apply bundle adjustment values from [" + ui.GetFileName("ADJUSTMENT_INPUT").toStdString() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
@@ -149,9 +149,7 @@ namespace Isis {
                                                    under review and is likely resulting \
                                                    in addition error in the bundle adjust. \
                                                    We recommend that you do not solve for radii at this moment."));
-         if(log) {
-           log->addLogGroup(radiusSolveWarning);
-         }
+        Application::Log(radiusSolveWarning);
       }
     }
     settings->setCubeList(cubeList);
@@ -190,7 +188,7 @@ namespace Isis {
       QObject::connect( bundleAdjustment, SIGNAL( statusUpdate(QString) ),
                         bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
       BundleSolutionInfo *bundleSolution = bundleAdjustment->solveCholeskyBR();
-      bundleSolution->setOutputControlName( FileName(ui.GetFileName("ONET")).expanded() );
+      bundleSolution->setOutputControlName( QString::fromStdString(FileName(ui.GetFileName("ONET").toStdString()).expanded()) );
       cout << "\nGenerating report files\n" << endl;
 
       // write output files
@@ -217,16 +215,15 @@ namespace Isis {
       // write updated control net
       bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
 
-      // write updated lidar data file
-      if (ui.WasEntered("LIDARDATA")) {
-        if (ui.GetString("OLIDARFORMAT") == "JSON") {
-          bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA"),LidarData::Format::Json);
-        }
-        else {
-          bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA"),LidarData::Format::Binary);
-        }
+    // write updated lidar data file
+    if (ui.WasEntered("LIDARDATA")) {
+      if (ui.GetString("OLIDARFORMAT") == "JSON") {
+        bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA").toStdString(),LidarData::Format::Json);
       }
-
+      else {
+        bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA").toStdString(),LidarData::Format::Binary);
+      }
+    }
       PvlGroup gp("JigsawResults");
       QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
 
@@ -250,16 +247,16 @@ namespace Isis {
             Table spvector = bundleAdjustment->spVector(i);
 
             QString serialNumber = bundleAdjustment->serialNumberList()->serialNumber(i);
-            QString cmatrixName = cmatrix.Name();
-            QString spvectorName = spvector.Name();
+            std::string cmatrixName = cmatrix.Name();
+            std::string spvectorName = spvector.Name();
 
-            std::string cmatrixKey = serialNumber.toStdString() + "/" + cmatrixName.toStdString();
-            std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
+            std::string cmatrixKey = serialNumber.toStdString() + "/" + cmatrixName;
+            std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName;
 
             // Save bundle adjustment values to HDF5 file
-            std::string cmatrixTableStr = Table::toString(cmatrix).toStdString();
+            std::string cmatrixTableStr = Table::toString(cmatrix);
             DataSet dataset = file.createDataSet<std::string>(cmatrixKey, cmatrixTableStr);
-            std::string spvectorTableStr = Table::toString(spvector).toStdString();
+            std::string spvectorTableStr = Table::toString(spvector);
             dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
           }
         }
@@ -270,7 +267,7 @@ namespace Isis {
       if (ui.GetBoolean("UPDATE") ) {
         if ( !bundleAdjustment->isConverged() ) {
           gp += PvlKeyword("Status","Bundle did not converge, camera pointing NOT updated");
-          QString msg = "Bundle did not converge within MAXITS [" + toString(ui.GetInteger("MAXITS")) + "] iterations [" + cnetFile +  "]";
+          std::string msg = "Bundle did not converge within MAXITS [" + toString(ui.GetInteger("MAXITS")) + "] iterations [" + cnetFile.toStdString() +  "]";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
         else {
@@ -289,7 +286,7 @@ namespace Isis {
             for (int iobj = 0; iobj < c->label()->objects(); iobj++) {
               PvlObject obj = c->label()->object(iobj);
               if (obj.name() != "Table") continue;
-              if (obj["Name"][0] != QString("CameraStatistics")) continue;
+              if (obj["Name"][0] != "CameraStatistics") continue;
               c->label()->deleteObject(iobj);
               break;
             }
@@ -302,14 +299,14 @@ namespace Isis {
               c->read(csmStateBlob);
               std::string modelState = bundleAdjustment->modelState(i).toStdString();
               csmStateBlob.setData(modelState.c_str(), modelState.size());
-              csmStateBlob.Label().addComment(jigComment);
+              csmStateBlob.Label().addComment(jigComment.toStdString());
               c->write(csmStateBlob);
             } else {
               // Write bundle adjustment values to cube
               Table cmatrix = bundleAdjustment->cMatrix(i);
-              cmatrix.Label().addComment(jigComment);
+              cmatrix.Label().addComment(jigComment.toStdString());
               Table spvector = bundleAdjustment->spVector(i);
-              spvector.Label().addComment(jigComment);
+              spvector.Label().addComment(jigComment.toStdString());
               c->write(cmatrix);
               c->write(spvector);
             }
@@ -322,22 +319,22 @@ namespace Isis {
       else {
         gp += PvlKeyword("Status", "Camera pointing NOT updated");
       }
-      if (log) {
-        Pvl summary;
-        std::istringstream iss (bundleAdjustment->iterationSummaryGroup().toStdString());
-        iss >> summary;
 
-        for (auto grpIt = summary.beginGroup(); grpIt!= summary.endGroup(); grpIt++) {
-          log->addLogGroup(*grpIt);
-        }
+      Pvl summary;
+      std::istringstream iss (bundleAdjustment->iterationSummaryGroup().toStdString());
+      iss >> summary;
 
-        log->addLogGroup(gp);
+      for (auto grpIt = summary.beginGroup(); grpIt!= summary.endGroup(); grpIt++) {
+        Application::Log(*grpIt);
       }
+
+      Application::Log(gp);
+
       delete bundleSolution;
     }
     catch(IException &e) {
       bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
-      QString msg = "Unable to bundle adjust network [" + cnetFile + "]";
+      std::string msg = "Unable to bundle adjust network [" + cnetFile.toStdString() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
@@ -435,9 +432,9 @@ namespace Isis {
     if (ui.GetBoolean("SOLVETARGETBODY") == true) {
       PvlObject obj;
       ui.GetFileName("TBPARAMETERS");
-      Pvl tbParPvl(FileName(ui.GetFileName("TBPARAMETERS")).expanded());
+      Pvl tbParPvl(FileName(ui.GetFileName("TBPARAMETERS").toStdString()).expanded());
       if (!tbParPvl.hasObject("Target")) {
-        QString msg = "Input Target parameters file missing main Target object";
+        std::string msg = "Input Target parameters file missing main Target object";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -496,8 +493,8 @@ namespace Isis {
 
     // Inform the user which images are not in the second list
     if (!imagesNotFound.isEmpty()) {
-      QString msg = "The following images are not in the FROMLIST:";
-      msg += imagesNotFound + ".";
+      std::string msg = "The following images are not in the FROMLIST:";
+      msg += imagesNotFound.toStdString() + ".";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -512,10 +509,10 @@ namespace Isis {
 
     if (ui.WasEntered("SCCONFIG")) {
       PvlObject obj;
-      Pvl scConfig(FileName(ui.GetFileName("SCCONFIG")).expanded());
+      Pvl scConfig(FileName(ui.GetFileName("SCCONFIG").toStdString()).expanded());
       // QMap<QString, BundleObservationSolveSettings*> instIDtoBOSS;
       if (!scConfig.hasObject("SensorParameters")) {
-        QString msg = "Input SCCONFIG file missing SensorParameters object";
+        std::string msg = "Input SCCONFIG file missing SensorParameters object";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -540,7 +537,7 @@ namespace Isis {
           }
         }
         if (!found){
-          QString msg = "No BundleObservationSolveSettings found for " + snInstId;
+          std::string msg = "No BundleObservationSolveSettings found for " + snInstId.toStdString();
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
@@ -603,7 +600,7 @@ namespace Isis {
       if ((ui.WasEntered("CSMSOLVESET")  && ui.WasEntered("CSMSOLVETYPE")) ||
           (ui.WasEntered("CSMSOLVESET")  && ui.WasEntered("CSMSOLVELIST")) ||
           (ui.WasEntered("CSMSOLVETYPE") && ui.WasEntered("CSMSOLVELIST")) ) {
-        QString msg = "Only one of CSMSOLVESET, CSMSOLVETYPE, and CSMSOLVELIST "
+        std::string msg = "Only one of CSMSOLVESET, CSMSOLVETYPE, and CSMSOLVELIST "
                       "can be specified at a time.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -740,8 +737,8 @@ namespace Isis {
           pt->SetAprioriSurfacePoint(cam->GetSurfacePoint());
         }
         else {
-          QString msg = "Cannot compute surface point for control point [" + pt->GetId() +
-              "], measure [" + cm->GetCubeSerialNumber() + "].";
+          std::string msg = "Cannot compute surface point for control point [" + pt->GetId().toStdString() +
+              "], measure [" + cm->GetCubeSerialNumber().toStdString() + "].";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }

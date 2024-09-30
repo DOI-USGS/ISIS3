@@ -1,3 +1,4 @@
+#include "Application.h"
 #include "ProcessByLine.h"
 #include "LROCEmpirical.h"
 #include "PhotometricFunction.h"
@@ -31,7 +32,7 @@ namespace Isis{
     * @param ui The user interfact to parse the parameters from. 
     */
   void lronacpho(UserInterface &ui, Pvl *log){
-    Cube iCube(ui.GetCubeName("FROM"));
+    Cube iCube(ui.GetCubeName("FROM").toStdString());
     lronacpho(&iCube, ui, log);
   }
 
@@ -79,11 +80,11 @@ namespace Isis{
       }
 
       CubeAttributeInput cai;
-      bpCaiBands == 3 ? cai.setAttributes("+" + backplaneCai.bands()[0]) : cai.setAttributes("+1" ) ;
+      bpCaiBands == 3 ? cai.setAttributes("+" + backplaneCai.bands()[0].toStdString()) : cai.setAttributes("+1" ) ;
       p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
-      bpCaiBands == 3 ? cai.setAttributes("+" + backplaneCai.bands()[1]) : cai.setAttributes("+2" ) ;
+      bpCaiBands == 3 ? cai.setAttributes("+" + backplaneCai.bands()[1].toStdString()) : cai.setAttributes("+2" ) ;
       p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
-      bpCaiBands == 3 ? cai.setAttributes("+" + backplaneCai.bands()[2]) : cai.setAttributes("+3" ) ;
+      bpCaiBands == 3 ? cai.setAttributes("+" + backplaneCai.bands()[2].toStdString()) : cai.setAttributes("+3" ) ;
       p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
 
       useBackplane = true;
@@ -92,13 +93,13 @@ namespace Isis{
     QString algoName = "";
     QString algoFile = ui.GetAsString("PHOPAR");
 
-    FileName algoFileName(algoFile);
+    FileName algoFileName(algoFile.toStdString());
 
     if(algoFileName.isVersioned())
       algoFileName = algoFileName.highestVersion();
     
     if(!algoFileName.fileExists()) {
-      QString msg = algoFile + " does not exist.";
+      std::string msg = algoFile.toStdString() + " does not exist.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -112,7 +113,7 @@ namespace Isis{
         g_phoFunction = new LROCEmpirical(params, *iCube, !useBackplane);
     }
     else {
-      QString msg = " Algorithm Name [" + algoName + "] not recognized. ";
+      std::string msg = " Algorithm Name [" + algoName.toStdString() + "] not recognized. ";
       msg += "Compatible Algorithms are:\n LROC_Empirical\n";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -140,11 +141,8 @@ namespace Isis{
     g_phoFunction->report(photo);
         
     oCube->putGroup(photo);
-    
-    if(log){
-      log->addLogGroup(photo);
-    }
-    //Application::Log(photo);
+
+    Application::Log(photo);
 
     p.EndProcess();
     p.ClearInputCubes();

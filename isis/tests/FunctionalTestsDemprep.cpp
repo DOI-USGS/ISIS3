@@ -16,7 +16,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/demprep.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/demprep.xml").expanded());
 
 TEST(Demprep, DemprepDefault){
   Pvl appLog;
@@ -29,10 +29,10 @@ TEST(Demprep, DemprepDefault){
    demprep(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to prep DEM: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to prep DEM: " <<  e.toString().c_str() << std::endl;
   }
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   ASSERT_EQ(cube.sampleCount(), 439);
@@ -41,8 +41,8 @@ TEST(Demprep, DemprepDefault){
 
   // Pixels Group
   PvlGroup &pixels = isisLabel->findGroup("Pixels", Pvl::Traverse);
-  ASSERT_EQ(pixels["Type"][0].toStdString(), "SignedWord");
-  ASSERT_EQ(pixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(pixels["Type"][0], "SignedWord");
+  ASSERT_EQ(pixels["ByteOrder"][0], "Lsb");
   ASSERT_EQ(double(pixels["Base"]), 1737400.0);
   ASSERT_EQ(double(pixels["Multiplier"]), 1.0);
 
@@ -54,13 +54,13 @@ TEST(Demprep, DemprepDefault){
 
   // Mapping Group
   PvlGroup &mapping = isisLabel->findGroup("Mapping", Pvl::Traverse);
-  ASSERT_EQ(mapping["ProjectionName"][0].toStdString(), "Equirectangular");
+  ASSERT_EQ(mapping["ProjectionName"][0], "Equirectangular");
   ASSERT_DOUBLE_EQ(double(mapping["CenterLongitude"]), 180.0);
-  ASSERT_EQ(mapping["TargetName"][0].toStdString(), "Moon");
+  ASSERT_EQ(mapping["TargetName"][0], "Moon");
   ASSERT_DOUBLE_EQ(double(mapping["EquatorialRadius"]), 1737400.0);
   ASSERT_DOUBLE_EQ(double(mapping["PolarRadius"]), 1737400.0);
-  ASSERT_EQ(mapping["LatitudeType"][0].toStdString(), "Planetocentric");
-  ASSERT_EQ(mapping["LongitudeDirection"][0].toStdString(), "PositiveEast");
+  ASSERT_EQ(mapping["LatitudeType"][0], "Planetocentric");
+  ASSERT_EQ(mapping["LongitudeDirection"][0], "PositiveEast");
   ASSERT_EQ(int(mapping["LongitudeDomain"]), 180);
   ASSERT_DOUBLE_EQ(double(mapping["MinimumLatitude"]), -90.0);
   ASSERT_DOUBLE_EQ(double(mapping["MaximumLatitude"]), 90.0);
@@ -100,10 +100,10 @@ TEST(Demprep, DemprepInside){
    demprep(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to prep DEM: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to prep DEM: " <<  e.toString().c_str() << std::endl;
   }
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
   ASSERT_EQ(cube.sampleCount(), 250);
   ASSERT_EQ(cube.lineCount(), 250);
@@ -111,7 +111,7 @@ TEST(Demprep, DemprepInside){
 
   // Mapping Group
   PvlGroup &mapping = isisLabel->findGroup("Mapping", Pvl::Traverse);
-  ASSERT_EQ(mapping["ProjectionName"][0].toStdString(), "SimpleCylindrical");
+  ASSERT_EQ(mapping["ProjectionName"][0], "SimpleCylindrical");
   ASSERT_NEAR(double(mapping["UpperLeftCornerX"]), -5801235.97802, .00001);
   ASSERT_NEAR(double(mapping["UpperLeftCornerY"]), 77703.58546, .00001);
   ASSERT_NEAR(double(mapping["PixelResolution"]), 1895.20940, .00001);
@@ -131,10 +131,10 @@ TEST(Demprep, DemprepSpecialPixels){
    demprep(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to prep DEM: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to prep DEM: " <<  e.toString().c_str() << std::endl;
   }
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
   ASSERT_EQ(cube.sampleCount(), 366);
   ASSERT_EQ(cube.lineCount(), 184);
@@ -142,7 +142,7 @@ TEST(Demprep, DemprepSpecialPixels){
 
   // Mapping Group
   PvlGroup &mapping = isisLabel->findGroup("Mapping", Pvl::Traverse);
-  ASSERT_EQ(mapping["ProjectionName"][0].toStdString(), "Equirectangular");
+  ASSERT_EQ(mapping["ProjectionName"][0], "Equirectangular");
   ASSERT_DOUBLE_EQ(double(mapping["UpperLeftCornerX"]), -915000.0);
   ASSERT_DOUBLE_EQ(double(mapping["UpperLeftCornerY"]), 460000.0);
   ASSERT_DOUBLE_EQ(double(mapping["PixelResolution"]), 5000);
@@ -174,10 +174,10 @@ TEST(Demprep, DemprepSouthPole){
    demprep(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to prep DEM: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to prep DEM: " <<  e.toString().c_str() << std::endl;
   }
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   ASSERT_EQ(cube.sampleCount(), 250);
   ASSERT_EQ(cube.lineCount(), 251);
   ASSERT_EQ(cube.bandCount(), 1);
@@ -204,10 +204,10 @@ TEST(Demprep, DemprepNorthPole){
    demprep(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to prep DEM: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to prep DEM: " <<  e.toString().c_str() << std::endl;
   }
 
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   ASSERT_EQ(cube.sampleCount(), 250);
   ASSERT_EQ(cube.lineCount(), 251);
   ASSERT_EQ(cube.bandCount(), 1);

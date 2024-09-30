@@ -289,7 +289,7 @@ namespace Isis {
 
     if (m_mapButton) {
       PvlKeyword projectionKeyword = mapping.findKeyword("ProjectionName");
-      QString projName = projectionKeyword[0];
+      QString projName = QString::fromStdString(projectionKeyword[0]);
       m_mapButton->setText(tr("View/Edit %1 Projection").arg(projName));
     }
 
@@ -356,10 +356,10 @@ namespace Isis {
         Distance radii[3];
         cam->radii(radii);
 
-        mappingGrp += PvlKeyword("TargetName", cam->target()->name());
-        mappingGrp += PvlKeyword("EquatorialRadius", toString(radii[0].meters()),
+        mappingGrp += PvlKeyword("TargetName", cam->target()->name().toStdString());
+        mappingGrp += PvlKeyword("EquatorialRadius", Isis::toString(radii[0].meters()),
                                  "meters");
-        mappingGrp += PvlKeyword("PolarRadius", toString(radii[2].meters()),
+        mappingGrp += PvlKeyword("PolarRadius", Isis::toString(radii[2].meters()),
                                  "meters");
 
       }
@@ -378,7 +378,7 @@ namespace Isis {
     connect(this, SIGNAL(destroyed()), m_mapButton, SLOT(deleteLater()));
     m_mapButton->setText(tr("View/Edit/Load Map File"));
     m_mapButton->setToolTip(tr("View/Edit/Load Map File"));
-    m_mapButton->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/ographic.png").expanded()));
+    m_mapButton->setIcon(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/ographic.png").expanded())));
     m_mapButton->setWhatsThis(tr("This is the projection used by the mosaic "
         "scene. Cubes can not be shown in the scene without a projection, so "
         "if one is not selected, a default of Equirectangular will be used. "
@@ -390,13 +390,13 @@ namespace Isis {
     if (m_projection) {
       PvlKeyword projectionKeyword =
           m_projection->Mapping().findKeyword("ProjectionName");
-      QString projName = projectionKeyword[0];
+      QString projName = QString::fromStdString(projectionKeyword[0]);
       m_mapButton->setText(projName);
     }
 
     m_quickMapAction = new QAction(tr("Quick Load Map"), this);
     m_quickMapAction->setToolTip(tr("Quick Load Map"));
-    m_quickMapAction->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/quickopen.png").expanded()));
+    m_quickMapAction->setIcon(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/quickopen.png").expanded())));
     m_quickMapAction->setWhatsThis(tr("This is the projection used by the mosaic "
         "scene. Cubes can not be shown in the scene without a projection, so "
         "if one is not selected, a default of Equirectangular will be used."));
@@ -497,7 +497,7 @@ namespace Isis {
 
   MosaicSceneItem *MosaicSceneWidget::cubeToMosaic(Image *image) {
     if (image == NULL) {
-      QString msg = tr("Can not find a NULL image in the mosaic");
+      std::string msg = "Can not find a NULL image in the mosaic";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -533,10 +533,10 @@ namespace Isis {
 
       PvlObject mosaicScenePosition("SceneVisiblePosition");
       mosaicScenePosition += PvlKeyword("ViewTransform",
-                                        QString(dataBuffer.data().toHex()));
+                                        std::string(dataBuffer.data().toHex()));
       PvlKeyword scrollPos("ScrollPosition");
-      scrollPos += toString(getView()->horizontalScrollBar()->value());
-      scrollPos += toString(getView()->verticalScrollBar()->value());
+      scrollPos += Isis::toString(getView()->horizontalScrollBar()->value());
+      scrollPos += Isis::toString(getView()->verticalScrollBar()->value());
       mosaicScenePosition += scrollPos;
 
       output += mosaicScenePosition;
@@ -545,7 +545,7 @@ namespace Isis {
       foreach(tool, *m_tools) {
         if (tool->projectPvlObjectName() != "") {
           PvlObject toolObj = tool->toPvl();
-          toolObj.setName(tool->projectPvlObjectName());
+          toolObj.setName(tool->projectPvlObjectName().toStdString());
           output += toolObj;
         }
       }
@@ -553,8 +553,8 @@ namespace Isis {
       PvlObject zOrders("ZOrdering");
       foreach(MosaicSceneItem * mosaicSceneItem, *m_mosaicSceneItems) {
         PvlKeyword zValue("ZValue");
-        zValue += mosaicSceneItem->image()->id();
-        zValue += toString(mosaicSceneItem->zValue());
+        zValue += mosaicSceneItem->image()->id().toStdString();
+        zValue += Isis::toString(mosaicSceneItem->zValue());
         zOrders += zValue;
       }
 
@@ -582,9 +582,9 @@ namespace Isis {
     MosaicTool *tool;
     foreach(tool, *m_tools) {
       if (tool->projectPvlObjectName() != "") {
-        if (project.hasObject(tool->projectPvlObjectName())) {
+        if (project.hasObject(tool->projectPvlObjectName().toStdString())) {
           const PvlObject &toolSettings(
-              project.findObject(tool->projectPvlObjectName()));
+              project.findObject(tool->projectPvlObjectName().toStdString()));
           tool->fromPvl(toolSettings);
         }
       }
@@ -601,7 +601,7 @@ namespace Isis {
              zOrderIndex ++) {
           const PvlKeyword &zOrder = zOrders[zOrderIndex];
 
-          (*m_projectImageZOrders)[zOrder[0]] = toDouble(zOrder[1]);
+          (*m_projectImageZOrders)[QString::fromStdString(zOrder[0])] = Isis::toDouble(zOrder[1]);
         }
       }
 
@@ -631,14 +631,14 @@ namespace Isis {
       foreach(MosaicSceneItem * mosaicSceneItem, *m_mosaicSceneItems) {
         stream.writeStartElement("image");
         stream.writeAttribute("id", mosaicSceneItem->image()->id());
-        stream.writeAttribute("zValue", toString(mosaicSceneItem->zValue()));
+        stream.writeAttribute("zValue", QString::number(mosaicSceneItem->zValue()));
         stream.writeEndElement();
       }
       stream.writeEndElement();
 
       stream.writeStartElement("viewTransform");
-      stream.writeAttribute("scrollBarXValue", toString(getView()->horizontalScrollBar()->value()));
-      stream.writeAttribute("scrollBarYValue", toString(getView()->verticalScrollBar()->value()));
+      stream.writeAttribute("scrollBarXValue", QString::number(getView()->horizontalScrollBar()->value()));
+      stream.writeAttribute("scrollBarYValue", QString::number(getView()->verticalScrollBar()->value()));
       QBuffer dataBuffer;
       dataBuffer.open(QIODevice::ReadWrite);
       QDataStream transformStream(&dataBuffer);
@@ -651,7 +651,7 @@ namespace Isis {
         QString projectPvlObjectName = tool->projectPvlObjectName();
         if (projectPvlObjectName != "") {
           PvlObject toolObj = tool->toPvl();
-          toolObj.setName(projectPvlObjectName);
+          toolObj.setName(projectPvlObjectName.toStdString());
 
           stream.writeStartElement("toolData");
           stream.writeAttribute("objectName", projectPvlObjectName);
@@ -687,7 +687,7 @@ namespace Isis {
 
   MosaicSceneItem *MosaicSceneWidget::cubeToMosaic(DisplayProperties *props) {
     if (props == NULL) {
-      QString msg = tr("Can not find a NULL Display Properties in the mosaic");
+      std::string msg = "Can not find a NULL Display Properties in the mosaic";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1092,7 +1092,7 @@ namespace Isis {
     QLabel *overviewMapIcon = new QLabel;
 
     overviewMapIcon->setPixmap(
-        QIcon(FileName("$ISISROOT/appdata/images/icons/ographic.png").expanded()).pixmap(32, 32));
+        QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/ographic.png").expanded())).pixmap(32, 32));
     mapHelpLayout->addWidget(overviewMapIcon);
 
     QLabel *defaultMapFile = new QLabel(tr(
@@ -1370,15 +1370,15 @@ namespace Isis {
 
     if (m_projectViewTransform) {
       PvlObject &positionInfo = *m_projectViewTransform;
-      QByteArray hexValues(positionInfo["ViewTransform"][0].toLatin1());
+      QByteArray hexValues(QString::fromStdString(positionInfo["ViewTransform"][0]).toLatin1());
       QDataStream transformStream(QByteArray::fromHex(hexValues));
 
       QTransform viewTransform;
       transformStream >> viewTransform;
       getView()->setTransform(viewTransform);
 
-      QPoint projectScrollPos(toInt(positionInfo["ScrollPosition"][0]),
-                              toInt(positionInfo["ScrollPosition"][1]));
+      QPoint projectScrollPos(Isis::toInt(positionInfo["ScrollPosition"][0]),
+                              Isis::toInt(positionInfo["ScrollPosition"][1]));
 
       getView()->horizontalScrollBar()->setValue(projectScrollPos.x());
       getView()->verticalScrollBar()->setValue(projectScrollPos.y());
@@ -1694,10 +1694,10 @@ namespace Isis {
         mosaicSceneItem->reproject();
       }
       catch (IException &e) {
-        QString msg = "The file [";
+        std::string msg = "The file [";
 
         if (mosaicSceneItem->image())
-          msg += mosaicSceneItem->image()->displayProperties()->displayName();
+          msg += mosaicSceneItem->image()->displayProperties()->displayName().toStdString();
 
         msg += "] is being removed due to not being able to project onto the scene";
 

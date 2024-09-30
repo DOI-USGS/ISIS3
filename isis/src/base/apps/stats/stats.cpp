@@ -59,19 +59,19 @@ namespace Isis {
     inputCube = nullptr;
 
     if ( ui.WasEntered("TO") ) {
-      QString outFile = FileName(ui.GetFileName("TO")).expanded();
+      QString outFile = QString::fromStdString(FileName(ui.GetFileName("TO").toStdString()).expanded());
       bool append = ui.GetBoolean("APPEND");
       //write the results in the requested format.
       if ( ui.GetString("FORMAT") == "PVL" ) {
         if (append) {
-          statsPvl.append(outFile);
+          statsPvl.append(outFile.toStdString());
         }
         else {
-          statsPvl.write(outFile);
+          statsPvl.write(outFile.toStdString());
         }
       }
       else {
-        bool exists = FileName(outFile).fileExists();
+        bool exists = FileName(outFile.toStdString()).fileExists();
         bool writeHeader = false;
         ofstream *os = new ofstream;
         if (append) {
@@ -116,19 +116,19 @@ namespace Isis {
 
       // Construct a label with the results
       PvlGroup results("Results");
-      results += PvlKeyword("From", cube->fileName());
-      results += PvlKeyword("Band", toString(cube->physicalBand(i)));
+      results += PvlKeyword("From", cube->fileName().toStdString());
+      results += PvlKeyword("Band", Isis::toString(cube->physicalBand(i)));
       if ( stats->ValidPixels() != 0 ) {
-        results += PvlKeyword("Average", toString(stats->Average()));
-        results += PvlKeyword("StandardDeviation", toString(stats->StandardDeviation()));
-        results += PvlKeyword("Variance", toString(stats->Variance()));
+        results += PvlKeyword("Average", Isis::toString(stats->Average()));
+        results += PvlKeyword("StandardDeviation", Isis::toString(stats->StandardDeviation()));
+        results += PvlKeyword("Variance", Isis::toString(stats->Variance()));
         // These statistics only worked on a histogram
-        results += PvlKeyword("Median", toString(stats->Median()));
-        results += PvlKeyword("Mode", toString(stats->Mode()));
-        results += PvlKeyword("Skew", toString(stats->Skew()));
-        results += PvlKeyword("Minimum", toString(stats->Minimum()));
-        results += PvlKeyword("Maximum", toString(stats->Maximum()));
-        results += PvlKeyword("Sum", toString(stats->Sum()));
+        results += PvlKeyword("Median", Isis::toString(stats->Median()));
+        results += PvlKeyword("Mode", Isis::toString(stats->Mode()));
+        results += PvlKeyword("Skew", Isis::toString(stats->Skew()));
+        results += PvlKeyword("Minimum", Isis::toString(stats->Minimum()));
+        results += PvlKeyword("Maximum", Isis::toString(stats->Maximum()));
+        results += PvlKeyword("Sum", Isis::toString(stats->Sum()));
       }
       else {
         results += PvlKeyword("Average", "N/A");
@@ -141,15 +141,15 @@ namespace Isis {
         results += PvlKeyword("Maximum", "N/A");
         results += PvlKeyword("Sum", "N/A");
       }
-      results += PvlKeyword("TotalPixels", toString(stats->TotalPixels()));
-      results += PvlKeyword("ValidPixels", toString(stats->ValidPixels()));
-      results += PvlKeyword("OverValidMaximumPixels", toString(stats->OverRangePixels()));
-      results += PvlKeyword("UnderValidMinimumPixels", toString(stats->UnderRangePixels()));
-      results += PvlKeyword("NullPixels", toString(stats->NullPixels()));
-      results += PvlKeyword("LisPixels", toString(stats->LisPixels()));
-      results += PvlKeyword("LrsPixels", toString(stats->LrsPixels()));
-      results += PvlKeyword("HisPixels", toString(stats->HisPixels()));
-      results += PvlKeyword("HrsPixels", toString(stats->HrsPixels()));
+      results += PvlKeyword("TotalPixels", Isis::toString(stats->TotalPixels()));
+      results += PvlKeyword("ValidPixels", Isis::toString(stats->ValidPixels()));
+      results += PvlKeyword("OverValidMaximumPixels", Isis::toString(stats->OverRangePixels()));
+      results += PvlKeyword("UnderValidMinimumPixels", Isis::toString(stats->UnderRangePixels()));
+      results += PvlKeyword("NullPixels", Isis::toString(stats->NullPixels()));
+      results += PvlKeyword("LisPixels", Isis::toString(stats->LisPixels()));
+      results += PvlKeyword("LrsPixels", Isis::toString(stats->LrsPixels()));
+      results += PvlKeyword("HisPixels", Isis::toString(stats->HisPixels()));
+      results += PvlKeyword("HrsPixels", Isis::toString(stats->HrsPixels()));
 
       statsPvl.addGroup(results);
 
@@ -181,7 +181,7 @@ namespace Isis {
 
     for (int i = 0; i < statsPvl.groups(); i++) {
       for (int j = 0; j < statsPvl.group(i).keywords(); j++) {
-        *stream << (QString) statsPvl.group(i)[j];
+        *stream << statsPvl.group(i)[j][0];
         if ( j < statsPvl.group(i).keywords() - 1 ) {
           *stream << ",";
         }

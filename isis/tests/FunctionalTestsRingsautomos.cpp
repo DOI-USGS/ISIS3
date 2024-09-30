@@ -9,7 +9,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/ringsautomos.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/ringsautomos.xml").expanded());
 
 TEST_F(RingsCube, FunctionalTestRingsautomos) {
   QString outPath = tempDir.path() + "/mosaic.cub";
@@ -20,18 +20,18 @@ TEST_F(RingsCube, FunctionalTestRingsautomos) {
 
   ringsautomos(options, &appLog);
 
-  Cube mos(outPath);
+  Cube mos(outPath.toStdString());
   Pvl label = *mos.label();
 
   PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping");
 
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("ProjectionName"), "Planar");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("TargetName"), "Saturn");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, mapping.findKeyword("ProjectionName"), "Planar");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, mapping.findKeyword("TargetName"), "Saturn");
   EXPECT_NEAR((double)mapping.findKeyword("UpperLeftCornerX"), -141593057.92723, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("UpperLeftCornerY"), 141593057.92723, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("PixelResolution"), 5899710.746968, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("Scale"), 0.5, 0.0001);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("RingLongitudeDirection"), "CounterClockwise");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, mapping.findKeyword("RingLongitudeDirection"), "CounterClockwise");
   EXPECT_EQ((int)mapping.findKeyword("RingLongitudeDomain"), 360);
   EXPECT_NEAR((double)mapping.findKeyword("MaximumRingRadius"), 198012526.14923, 0.0001);
   EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MinimumRingLongitude"), 0);
@@ -62,18 +62,18 @@ TEST_F(RingsCube, FunctionalTestRingsautomosSetRanges) {
 
   ringsautomos(options, &appLog);
 
-  Cube mos(outPath);
+  Cube mos(outPath.toStdString());
   Pvl label = *mos.label();
 
   PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping");
 
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("ProjectionName"), "Planar");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("TargetName"), "Saturn");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, mapping.findKeyword("ProjectionName"), "Planar");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, mapping.findKeyword("TargetName"), "Saturn");
   EXPECT_NEAR((double)mapping.findKeyword("UpperLeftCornerX"), -100295082.69846, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("UpperLeftCornerY"), -9.7971743931788306e-10, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("PixelResolution"), 5899710.746968, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("Scale"), 0.5, 0.0001);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("RingLongitudeDirection"), "CounterClockwise");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, mapping.findKeyword("RingLongitudeDirection"), "CounterClockwise");
   EXPECT_EQ((int)mapping.findKeyword("RingLongitudeDomain"), 360);
   EXPECT_NEAR((double)mapping.findKeyword("MaximumRingRadius"), 100000000, 0.0001);
   EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MinimumRingLongitude"), 0);
@@ -89,11 +89,11 @@ TEST_F(RingsCube, FunctionalTestRingsautomosSetRanges) {
   EXPECT_NEAR(oCubeStats->StandardDeviation(), 753.01066871414162, 0.001);
 
   FileList lout;
-  lout.read(oFileListPath);
+  lout.read(oFileListPath.toStdString());
 
   EXPECT_EQ(lout.size(), cubeFileList.size());
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lout.at(0).expanded(), cubeFileList.at(0).expanded());
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, lout.at(1).expanded(), cubeFileList.at(1).expanded());
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, lout.at(0).expanded(), cubeFileList.at(0).expanded());
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, lout.at(1).expanded(), cubeFileList.at(1).expanded());
 }
 
 
@@ -108,18 +108,18 @@ TEST_F(RingsCube, FunctionalTestRingsautomosPriority) {
 
   ringsautomos(options, &appLog);
 
-  Cube mos(outPath);
+  Cube mos(outPath.toStdString());
   Pvl label = *mos.label();
 
   PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping");
 
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("ProjectionName"), "Planar");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("TargetName"), "Saturn");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, mapping.findKeyword("ProjectionName"), "Planar");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, mapping.findKeyword("TargetName"), "Saturn");
   EXPECT_NEAR((double)mapping.findKeyword("UpperLeftCornerX"), -141593057.92723, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("UpperLeftCornerY"), 141593057.92723, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("PixelResolution"), 5899710.746968, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("Scale"), 0.5, 0.0001);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("RingLongitudeDirection"), "CounterClockwise");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, mapping.findKeyword("RingLongitudeDirection"), "CounterClockwise");
   EXPECT_EQ((int)mapping.findKeyword("RingLongitudeDomain"), 360);
   EXPECT_NEAR((double)mapping.findKeyword("MaximumRingRadius"), 198012526.14923, 0.0001);
   EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MinimumRingLongitude"), 0);
@@ -147,23 +147,23 @@ TEST_F(RingsCube, FunctionalTestRingsautomosBandSelect) {
 
   ringsautomos(options, &appLog);
 
-  Cube mos(outPath);
+  Cube mos(outPath.toStdString());
   Pvl label = *mos.label();
 
   PvlGroup bandBin = label.findObject("IsisCube").findGroup("BandBin");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)bandBin.findKeyword("FilterName"), "CL1/CL2");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, bandBin.findKeyword("FilterName"), "CL1/CL2");
   ASSERT_EQ((int)bandBin.findKeyword("OriginalBand"), 1);
   ASSERT_DOUBLE_EQ((double)bandBin.findKeyword("Center"), 633.837);
   ASSERT_DOUBLE_EQ((double)bandBin.findKeyword("Width"), 285.938);
 
   PvlGroup mapping = label.findObject("IsisCube").findGroup("Mapping");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("ProjectionName"), "Planar");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("TargetName"), "Saturn");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, mapping.findKeyword("ProjectionName"), "Planar");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, mapping.findKeyword("TargetName"), "Saturn");
   EXPECT_NEAR((double)mapping.findKeyword("UpperLeftCornerX"), -141593057.92723, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("UpperLeftCornerY"), 141593057.92723, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("PixelResolution"), 5899710.746968, 0.0001);
   EXPECT_NEAR((double)mapping.findKeyword("Scale"), 0.5, 0.0001);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, (QString)mapping.findKeyword("RingLongitudeDirection"), "CounterClockwise");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, mapping.findKeyword("RingLongitudeDirection"), "CounterClockwise");
   EXPECT_EQ((int)mapping.findKeyword("RingLongitudeDomain"), 360);
   EXPECT_NEAR((double)mapping.findKeyword("MaximumRingRadius"), 198012526.14923, 0.0001);
   EXPECT_DOUBLE_EQ((double)mapping.findKeyword("MinimumRingLongitude"), 0);

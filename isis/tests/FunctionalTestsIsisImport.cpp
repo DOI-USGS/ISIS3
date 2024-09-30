@@ -1,7 +1,6 @@
 #include <iostream>
 #include <time.h>
 
-#include <QRegExp>
 #include <QString>
 #include <nlohmann/json.hpp>
 
@@ -21,7 +20,7 @@ using namespace Isis;
 using namespace testing;
 using json = nlohmann::json;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/isisimport.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/isisimport.xml").expanded());
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelXmlInput) {
   QString labelFileName = "data/isisimport/pds4.xml";
@@ -67,9 +66,9 @@ End)";
   PvlGroup dimensionsGroup = label->findObject("IsisCube").findObject("Core").findGroup("Dimensions");
 
 
-  EXPECT_EQ(toInt(dimensionsGroup["Samples"][0]), 3);
-  EXPECT_EQ(toInt(dimensionsGroup["Lines"][0]), 2);
-  EXPECT_EQ(toInt(dimensionsGroup["Bands"][0]), 1);
+  EXPECT_EQ(Isis::toInt(dimensionsGroup["Samples"][0]), 3);
+  EXPECT_EQ(Isis::toInt(dimensionsGroup["Lines"][0]), 2);
+  EXPECT_EQ(Isis::toInt(dimensionsGroup["Bands"][0]), 1);
 
   EXPECT_EQ(cube.sampleCount(), 3);
   EXPECT_EQ(cube.lineCount(), 2);
@@ -136,7 +135,7 @@ End)";
   Pvl *label = cube.label();
   PvlGroup instrumentGroup = label->findObject("IsisCube").findGroup("Instrument");
 
-  EXPECT_EQ(instrumentGroup["StartTime"][0].toStdString(), "2021-01-01T00:00:00");
+  EXPECT_EQ(instrumentGroup["StartTime"][0], "2021-01-01T00:00:00");
 }
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelPds4YearDoy) {
@@ -184,7 +183,7 @@ End)";
   Pvl *label = cube.label();
   PvlGroup archiveGroup = label->findObject("IsisCube").findGroup("Archive");
 
-  EXPECT_EQ(archiveGroup["YearDoy"][0].toStdString(), "202132");
+  EXPECT_EQ(archiveGroup["YearDoy"][0], "202132");
 }
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportLabelObservationId) {
@@ -232,5 +231,5 @@ End)";
   Pvl *label = cube.label();
   PvlGroup archiveGroup = label->findObject("IsisCube").findGroup("Archive");
 
-  EXPECT_EQ(archiveGroup["ObservationId"][0].toStdString(), "CRUS_000000_505_1");
+  EXPECT_EQ(archiveGroup["ObservationId"][0], "CRUS_000000_505_1");
 }

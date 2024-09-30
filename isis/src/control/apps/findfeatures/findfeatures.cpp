@@ -72,7 +72,7 @@ using namespace std;
 namespace Isis {
 
   inline PvlGroup pvlmap_to_group( const PvlFlatMap &pvlmap, const QString &grpnam ) {
-    PvlGroup pgrp( grpnam );
+    PvlGroup pgrp(grpnam.toStdString());
     for ( auto pkey : pvlmap.values() ) {
       pgrp.addKeyword( pkey );
     }
@@ -82,9 +82,9 @@ namespace Isis {
 
   static void writeInfo(const QString &toname, Pvl &data, UserInterface &ui, Pvl *log) {
       if ( !toname.isEmpty() ) {
-        FileName toinfo(toname);
-        QString fname = toinfo.expanded();
-        data.write(fname);
+        FileName toinfo(toname.toStdString());
+        QString fname = QString::fromStdString(toinfo.expanded());
+        data.write(fname.toStdString());
       }
       else {
         if ( !ui.IsInteractive()  ) {
@@ -217,7 +217,7 @@ namespace Isis {
     // Check for parameters file provided by user
     if ( ui.WasEntered("PARAMETERS") ) {
       QString pfilename = ui.GetAsString("PARAMETERS");
-      Pvl pfile(pfilename);
+      Pvl pfile(pfilename.toStdString());
       PvlFlatMap parms =  PvlFlatMap(pfile);
       parameters.merge( parms );
       parameters.add("ParameterFile", pfilename);
@@ -350,15 +350,15 @@ namespace Isis {
       if ( ui.WasEntered("FROM") ) {
         QString tname = ui.GetAsString("FROM");
         if ( !load_train_with_geom(matcher, tname, logger, fastgeom.data()) ) {
-          badgeom.append(tname);
+          badgeom.append(tname.toStdString());
         }
       }
 
       // If there is a list provided, get that too
       if ( ui.WasEntered("FROMLIST") ) {
-        FileList trainers(ui.GetFileName("FROMLIST"));
+        FileList trainers(ui.GetFileName("FROMLIST").toStdString());
         BOOST_FOREACH ( FileName tfile, trainers ) {
-          if ( !load_train_with_geom(matcher, tfile.original(), logger,
+          if ( !load_train_with_geom(matcher, QString::fromStdString(tfile.original()), logger,
                                      fastgeom.data()) ) {
             badgeom.append(tfile.original());
           }
@@ -373,12 +373,12 @@ namespace Isis {
       if ( badgeom.size() > 0 ) {
         logger->dbugout() << "\nTotal failed image loads/FastGeoms excluded: " << badgeom.size() << "\n";
         for ( int f = 0 ; f < badgeom.size() ; f++ ) {
-          logger->dbugout() << badgeom[f].toString() << "\n";
+          logger->dbugout() <<QString::fromStdString( badgeom[f].toString()) << "\n";
         }
 
         if ( ui.WasEntered("TONOGEOM") ) {
           QString tonogeom(ui.GetAsString("TONOGEOM"));
-          badgeom.write(tonogeom);
+          badgeom.write(tonogeom.toStdString());
           logger->dbugout() << "\nSee also " << tonogeom << "\n\n";
         }
       }
@@ -387,8 +387,8 @@ namespace Isis {
       logger->flush();
     }
     catch (IException &ie) {
-      QString msg = "Fatal load errors encountered";
-      logger->dbugout() << "\n\n### " << msg << " - aborting..." << "\n";
+      std::string msg = "Fatal load errors encountered";
+      logger->dbugout() << "\n\n### " << QString::fromStdString(msg) << " - aborting..." << "\n";
       throw IException(ie, IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -396,7 +396,7 @@ namespace Isis {
     if ( matcher.size() <= 0 ) {
       logger->dbugout() << "\n\n###   No valid files loaded - aborting...\n";
       logger->dbugout() <<     "Time: " << Application::DateTime() << "\n";
-      QString msg = "Input cubes (" + QString::number(badgeom.size()) + ") failed to load. " +
+      std::string msg = "Input cubes (" + Isis::toString(badgeom.size()) + ") failed to load. " +
                     "Must provide valid FROM/FROMLIST and MATCH cube or image filenames";
       throw IException(IException::User, msg,  _FILEINFO_);
     }
@@ -429,7 +429,7 @@ namespace Isis {
     // If all failed, we're done
     if ( !best ) {
       logger->dbugout() << "Bummer! No matches were found!\n";
-      QString mess = "NO MATCHES WERE FOUND!!!";
+      std::string mess = "NO MATCHES WERE FOUND!!!";
       throw IException(IException::User, mess, _FILEINFO_);
     }
 
@@ -437,27 +437,24 @@ namespace Isis {
     if ( best->size() <= 0 ) {
       logger->dbugout() << "Shucks! Insufficient matches were found ("
                         << best->size() << ")\n";
-      QString mess = "Shucks! Insufficient matches were found (" +
-                      QString::number(best->size()) + ")";
+      std::string mess = "Shucks! Insufficient matches were found (" +
+                      Isis::toString(best->size()) + ")";
       throw IException(IException::User, mess, _FILEINFO_);
     }
 
     // Got some matches so lets process them
     Statistics quality = best->qualityStatistics();
     PvlGroup bestinfo("MatchSolution");
-    bestinfo += PvlKeyword("Matcher", best->matcher()->name());
-    bestinfo += PvlKeyword("MatchedPairs", toString(best->size()));
-    bestinfo += PvlKeyword("ValidPairs", toString(quality.ValidPixels()));
-    bestinfo += PvlKeyword("Efficiency",  toString(quality.Average()));
+    bestinfo += PvlKeyword("Matcher", best->matcher()->name().toStdString());
+    bestinfo += PvlKeyword("MatchedPairs", Isis::toString(best->size()));
+    bestinfo += PvlKeyword("ValidPairs", Isis::toString(quality.ValidPixels()));
+    bestinfo += PvlKeyword("Efficiency",  Isis::toString(quality.Average()));
     if ( quality.ValidPixels() > 1 ) {
       bestinfo += PvlKeyword("StdDevEfficiency",
-                              toString(quality.StandardDeviation()));
+                              Isis::toString(quality.StandardDeviation()));
     }
 
-    if(log){
-      log->addLogGroup(bestinfo);
-    }
-
+    Application::Log(bestinfo);
 
     // If a cnet file was entered, write the ControlNet file of the specified
     // type.  Note that it was created as an image-to-image network. Must make
@@ -485,7 +482,7 @@ namespace Isis {
         logger->dbugout() << "\nSession complete in " << totalE.toString("hh:mm:ss.zzz")
                           << " of elapsed time\n";
 
-        throw IException(IException::User, mess, _FILEINFO_);
+        throw IException(IException::User, mess.toStdString(), _FILEINFO_);
       }
 
       // Umm..have to check this. Probably only makes sense with two images
@@ -501,9 +498,7 @@ namespace Isis {
 
       // Write out control network
       cnet.Write( ui.GetFileName("ONET") );
-      if(log){
-        log->addLogGroup(cnetinfo);
-      }
+      Application::Log(cnetinfo);
     }
 
     // If user wants a list of matched images, write the list to the TOLIST filename

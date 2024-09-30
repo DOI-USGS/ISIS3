@@ -87,12 +87,12 @@ namespace Isis {
       m_pointData->set_type(ControlNetFileProtoV0001_PBControlPoint::Tie);
     }
     else {
-      QString msg = "Invalid ControlPoint type [" + pointObject["PointType"][0] + "].";
+      std::string msg = "Invalid ControlPoint type [" + pointObject["PointType"][0] + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (pointObject.hasKeyword("AprioriXYZSource")) {
-      QString source = pointObject["AprioriXYZSource"][0];
+      QString source = QString::fromStdString(pointObject["AprioriXYZSource"][0]);
 
       if (source == "None") {
         m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::None);
@@ -116,13 +116,13 @@ namespace Isis {
                            ControlNetFileProtoV0001_PBControlPoint::BundleSolution);
       }
       else {
-        QString msg = "Invalid AprioriXYZSource [" + source + "]";
+        std::string msg = "Invalid AprioriXYZSource [" + source.toStdString() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
     if (pointObject.hasKeyword("AprioriRadiusSource")) {
-      QString source = pointObject["AprioriRadiusSource"][0];
+      QString source = QString::fromStdString(pointObject["AprioriRadiusSource"][0]);
 
       if (source == "None") {
         m_pointData->set_aprioriradiussource(ControlNetFileProtoV0001_PBControlPoint::None);
@@ -145,7 +145,7 @@ namespace Isis {
                            ControlNetFileProtoV0001_PBControlPoint::BundleSolution);
       }
       else {
-        QString msg = "Invalid AprioriRadiusSource, [" + source + "]";
+        std::string msg = "Invalid AprioriRadiusSource, [" + source.toStdString() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -154,23 +154,23 @@ namespace Isis {
     if (pointObject.hasKeyword("AprioriCovarianceMatrix")) {
       PvlKeyword &matrix = pointObject["AprioriCovarianceMatrix"];
 
-      m_pointData->add_aprioricovar(toDouble(matrix[0]));
-      m_pointData->add_aprioricovar(toDouble(matrix[1]));
-      m_pointData->add_aprioricovar(toDouble(matrix[2]));
-      m_pointData->add_aprioricovar(toDouble(matrix[3]));
-      m_pointData->add_aprioricovar(toDouble(matrix[4]));
-      m_pointData->add_aprioricovar(toDouble(matrix[5]));
+      m_pointData->add_aprioricovar(Isis::toDouble(matrix[0]));
+      m_pointData->add_aprioricovar(Isis::toDouble(matrix[1]));
+      m_pointData->add_aprioricovar(Isis::toDouble(matrix[2]));
+      m_pointData->add_aprioricovar(Isis::toDouble(matrix[3]));
+      m_pointData->add_aprioricovar(Isis::toDouble(matrix[4]));
+      m_pointData->add_aprioricovar(Isis::toDouble(matrix[5]));
     }
 
     if (pointObject.hasKeyword("AdjustedCovarianceMatrix")) {
       PvlKeyword &matrix = pointObject["AdjustedCovarianceMatrix"];
 
-      m_pointData->add_adjustedcovar(toDouble(matrix[0]));
-      m_pointData->add_adjustedcovar(toDouble(matrix[1]));
-      m_pointData->add_adjustedcovar(toDouble(matrix[2]));
-      m_pointData->add_adjustedcovar(toDouble(matrix[3]));
-      m_pointData->add_adjustedcovar(toDouble(matrix[4]));
-      m_pointData->add_adjustedcovar(toDouble(matrix[5]));
+      m_pointData->add_adjustedcovar(Isis::toDouble(matrix[0]));
+      m_pointData->add_adjustedcovar(Isis::toDouble(matrix[1]));
+      m_pointData->add_adjustedcovar(Isis::toDouble(matrix[2]));
+      m_pointData->add_adjustedcovar(Isis::toDouble(matrix[3]));
+      m_pointData->add_adjustedcovar(Isis::toDouble(matrix[4]));
+      m_pointData->add_adjustedcovar(Isis::toDouble(matrix[5]));
     }
 
     //  Process Measures
@@ -205,33 +205,33 @@ namespace Isis {
       // The sample, line, sample residual, and line residual are nested in another structure
       // inside the measure, so they cannot be copied with the conenience methods.
       if (group.hasKeyword("Sample")) {
-        double value = toDouble(group["Sample"][0]);
+        double value = Isis::toDouble(group["Sample"][0]);
         measure.mutable_measurement()->set_sample(value);
         group.deleteKeyword("Sample");
       }
       if (group.hasKeyword("Line")) {
-        double value = toDouble(group["Line"][0]);
+        double value = Isis::toDouble(group["Line"][0]);
         measure.mutable_measurement()->set_line(value);
         group.deleteKeyword("Line");
       }
       if (group.hasKeyword("SampleResidual")) {
-        double value = toDouble(group["SampleResidual"][0]);
+        double value = Isis::toDouble(group["SampleResidual"][0]);
         measure.mutable_measurement()->set_sampleresidual(value);
         group.deleteKeyword("SampleResidual");
       }
       if (group.hasKeyword("LineResidual")) {
-        double value = toDouble(group["LineResidual"][0]);
+        double value = Isis::toDouble(group["LineResidual"][0]);
         measure.mutable_measurement()->set_lineresidual(value);
         group.deleteKeyword("LineResidual");
       }
       if (group.hasKeyword("Reference")) {
-        if (group["Reference"][0].toLower() == "true") {
+        if (QString::fromStdString(group["Reference"][0]).toLower() == "true") {
           m_pointData->set_referenceindex(groupIndex);
         }
         group.deleteKeyword("Reference");
       }
 
-      QString type = group["MeasureType"][0].toLower();
+      QString type = QString::fromStdString(group["MeasureType"][0]).toLower();
       if (type == "candidate") {
         measure.set_type(ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::Candidate);
       }
@@ -248,7 +248,7 @@ namespace Isis {
       }
       else {
         throw IException(IException::Io,
-                         "Unknown measure type [" + type + "]",
+                         "Unknown measure type [" + type.toStdString() + "]",
                          _FILEINFO_);
       }
       group.deleteKeyword("MeasureType");
@@ -268,7 +268,7 @@ namespace Isis {
 
       for (int keyIndex = 0; keyIndex < group.keywords(); keyIndex++) {
         PvlKeyword dataKeyword = group[keyIndex];
-        QString name = dataKeyword.name();
+        QString name = QString::fromStdString(dataKeyword.name());
         int dataType = 0;
         double value = 0.0;
 
@@ -297,15 +297,15 @@ namespace Isis {
           dataType = 8;
         }
         else {
-          QString msg = "Invalid control measure log data name [" + name + "]";
+          std::string msg = "Invalid control measure log data name [" + name.toStdString() + "]";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         try {
-          value = toDouble(dataKeyword[0]);
+          value = Isis::toDouble(dataKeyword[0]);
         }
         catch (IException &e) {
-          QString msg = "Invalid control measure log data value [" + dataKeyword[0] + "]";
+          std::string msg = "Invalid control measure log data value [" + dataKeyword[0] + "]";
           throw IException(e, IException::Io, msg, _FILEINFO_);
         }
 
@@ -321,7 +321,7 @@ namespace Isis {
     }
 
     if (!m_pointData->IsInitialized()) {
-      QString msg = "There is missing required information in the control "
+      std::string msg = "There is missing required information in the control "
                     "points or measures";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -385,12 +385,12 @@ namespace Isis {
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(bool)) {
 
-    if (!container.hasKeyword(keyName)) {
+    if (!container.hasKeyword(keyName.toStdString())) {
       return;
     }
 
-    QString value = container[keyName][0];
-    container.deleteKeyword(keyName);
+    QString value = QString::fromStdString(container[keyName.toStdString()][0]);
+    container.deleteKeyword(keyName.toStdString());
     value = value.toLower();
 
     if (value == "true" || value == "yes") {
@@ -418,12 +418,12 @@ namespace Isis {
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(double)) {
 
-    if (!container.hasKeyword(keyName)) {
+    if (!container.hasKeyword(keyName.toStdString())) {
       return;
     }
 
-    double value = toDouble(container[keyName][0]);
-    container.deleteKeyword(keyName);
+    double value = Isis::toDouble(container[keyName.toStdString()][0]);
+    container.deleteKeyword(keyName.toStdString());
     (point.data()->*setter)(value);
   }
 
@@ -447,12 +447,12 @@ namespace Isis {
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(const std::string&)) {
 
-    if (!container.hasKeyword(keyName)) {
+    if (!container.hasKeyword(keyName.toStdString())) {
       return;
     }
 
-    QString value = container[keyName][0];
-    container.deleteKeyword(keyName);
+    QString value = QString::fromStdString(container[keyName.toStdString()][0]);
+    container.deleteKeyword(keyName.toStdString());
     (point.data()->*setter)(value.toLatin1().data());
   }
 
@@ -476,12 +476,12 @@ namespace Isis {
                                ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(bool)) {
 
-    if (!container.hasKeyword(keyName)) {
+    if (!container.hasKeyword(keyName.toStdString())) {
       return;
     }
 
-    QString value = container[keyName][0];
-    container.deleteKeyword(keyName);
+    QString value = QString::fromStdString(container[keyName.toStdString()][0]);
+    container.deleteKeyword(keyName.toStdString());
     value = value.toLower();
 
     if (value == "true" || value == "yes") {
@@ -509,12 +509,12 @@ namespace Isis {
                                ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(double)) {
 
-    if (!container.hasKeyword(keyName)) {
+    if (!container.hasKeyword(keyName.toStdString())) {
       return;
     }
 
-    double value = toDouble(container[keyName][0]);
-    container.deleteKeyword(keyName);
+    double value = Isis::toDouble(container[keyName.toStdString()][0]);
+    container.deleteKeyword(keyName.toStdString());
     (measure.*setter)(value);
   }
 
@@ -539,12 +539,12 @@ namespace Isis {
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)
                                       (const std::string &)) {
 
-    if (!container.hasKeyword(keyName)) {
+    if (!container.hasKeyword(keyName.toStdString())) {
       return;
     }
 
-    QString value = container[keyName][0];
-    container.deleteKeyword(keyName);
+    QString value = QString::fromStdString(container[keyName.toStdString()][0]);
+    container.deleteKeyword(keyName.toStdString());
     (measure.*setter)(value.toLatin1().data());
   }
 }

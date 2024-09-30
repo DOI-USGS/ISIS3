@@ -63,9 +63,8 @@ void sanitize(std::string &input);
     Blob state("CSMState", "String");
     cube.read(state);
     PvlObject &blobLabel = state.Label();
-
-    QString pluginName = blobLabel.findKeyword("PluginName")[0];
-    QString modelName = blobLabel.findKeyword("ModelName")[0];
+    QString pluginName = QString::fromStdString(blobLabel.findKeyword("PluginName")[0]);
+    QString modelName = QString::fromStdString(blobLabel.findKeyword("ModelName")[0]);
     QString stateString = QString::fromUtf8(state.getBuffer(), state.Size());
     init(cube, pluginName, modelName, stateString);
   }
@@ -86,21 +85,21 @@ void sanitize(std::string &input);
       for (const csm::Plugin *plugin: csm::Plugin::getList()) {
         availablePlugins.append(QString::fromStdString(plugin->getPluginName()));
       }
-      QString msg = "Failed to find plugin [" + pluginName + "] for image [" + cube.fileName() +
+      std::string msg = "Failed to find plugin [" + pluginName.toStdString() + "] for image [" + cube.fileName().toStdString() +
                     "]. Check that the corresponding CSM plugin library is in the directory "
                     "specified by your IsisPreferences. Loaded plugins [" +
-                    availablePlugins.join(", ") + "].";
+                    availablePlugins.join(", ").toStdString() + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     if (!plugin->canModelBeConstructedFromState(modelName.toStdString(), stateString.toStdString())) {
-      QString msg = "CSM state string attached to image [" + cube.fileName() + "] cannot "
-                    "be converted to a [" + modelName + "] using [" + pluginName + "].";
+      std::string msg = "CSM state string attached to image [" + cube.fileName().toStdString() + "] cannot "
+                    "be converted to a [" + modelName.toStdString() + "] using [" + pluginName.toStdString() + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_model = dynamic_cast<csm::RasterGM*>(plugin->constructModelFromState(stateString.toStdString()));
     // If the dynamic cast failed, raise an exception
     if (!m_model) {
-      QString msg = "Failed to convert CSM Model to RasterGM.";
+      std::string msg = "Failed to convert CSM Model to RasterGM.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1004,8 +1003,8 @@ void sanitize(std::string &input);
     }
 
     if (!failedParams.empty()) {
-      QString msg = "Failed to find indices for the following parameters [" +
-                    failedParams.join(",") + "].";
+      std::string msg = "Failed to find indices for the following parameters [" +
+                    failedParams.join(",").toStdString() + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     return parameterIndices;
@@ -1100,7 +1099,7 @@ void sanitize(std::string &input);
    * @param time The time to set
    */
   void CSMCamera::setTime(const iTime &time) {
-    QString msg = "Setting the image time is not supported for CSM camera models";
+    std::string msg = "Setting the image time is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1116,7 +1115,7 @@ void sanitize(std::string &input);
    * @param lon Sub-solar longitude
    */
   void CSMCamera::subSolarPoint(double &lat, double &lon) {
-    QString msg = "Sub solar point is not supported for CSM camera models";
+    std::string msg = "Sub solar point is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1129,7 +1128,7 @@ void sanitize(std::string &input);
    * @returns @b QList<QPointF> The field of view offsets
    */
   QList<QPointF> CSMCamera::PixelIfovOffsets() {
-    QString msg = "Pixel Field of View is not supported for CSM camera models";
+    std::string msg = "Pixel Field of View is not supported for CSM camera models";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -1143,7 +1142,7 @@ void sanitize(std::string &input);
    * @param[out] p The position of the sun
    */
   void CSMCamera::sunPosition(double p[3]) const {
-    QString msg = "Sun position is not supported for CSM camera models";
+    std::string msg = "Sun position is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1157,7 +1156,7 @@ void sanitize(std::string &input);
    * @returns @b SpicePosition* A pointer to the SpicePosition object for the Sun
    */
   SpicePosition *CSMCamera::sunPosition() const {
-    QString msg = "Sun position is not supported for CSM camera models";
+    std::string msg = "Sun position is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1172,7 +1171,7 @@ void sanitize(std::string &input);
    * @returns @b SpicePosition* A pointer to the SpicePosition object for the sensor
    */
   SpicePosition *CSMCamera::instrumentPosition() const {
-    QString msg = "Instrument position is not supported for CSM camera models";
+    std::string msg = "Instrument position is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1186,7 +1185,7 @@ void sanitize(std::string &input);
    * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the body orientation
    */
   SpiceRotation *CSMCamera::bodyRotation() const {
-    QString msg = "Body orientation is not supported for CSM camera models";
+    std::string msg = "Body orientation is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1201,7 +1200,7 @@ void sanitize(std::string &input);
    * @returns @b SpiceRotation* A pointer to the SpiceRotation object for the sensor orientation
    */
   SpiceRotation *CSMCamera::instrumentRotation() const {
-    QString msg = "Instrument orientation is not supported for CSM camera models";
+    std::string msg = "Instrument orientation is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1215,7 +1214,7 @@ void sanitize(std::string &input);
    * @param et Ephemeris time
    */
   void CSMCamera::computeSolarLongitude(iTime et) {
-    QString msg = "Solar longitude is not supported for CSM camera models";
+    std::string msg = "Solar longitude is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1228,7 +1227,7 @@ void sanitize(std::string &input);
    * @returns @b double The distance to the sun
    */
   double CSMCamera::SolarDistance() const {
-    QString msg = "Solar distance is not supported for CSM camera models";
+    std::string msg = "Solar distance is not supported for CSM camera models";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 

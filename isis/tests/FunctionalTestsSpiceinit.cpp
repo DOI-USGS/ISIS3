@@ -27,7 +27,7 @@ using json = nlohmann::json;
 using namespace Isis;
 using ::testing::HasSubstr;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/spiceinit.xml").expanded());
 
 TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
 
@@ -93,7 +93,7 @@ TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
   tempFile.open();
   Cube testCube;
 
-  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+  testCube.fromLabel(tempFile.fileName().toStdString() + ".cub", label, "rw");
 
   QVector<QString> args = {"ckrecon=True", "cksmithed=True", "attach=false"};
   UserInterface options(APP_XML, args);
@@ -103,11 +103,11 @@ TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointing"));
   PvlKeyword instrumentPointing = kernels["InstrumentPointing"];
   ASSERT_EQ(instrumentPointing.size(), 3);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[0], "$Clementine1/kernels/ck/clem_2mn.bck");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[1], "$Clementine1/kernels/ck/clem_5sc.bck");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[2], "$clementine1/kernels/fk/clem_v12.tf");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, instrumentPointing[0], "$Clementine1/kernels/ck/clem_2mn.bck");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, instrumentPointing[1], "$Clementine1/kernels/ck/clem_5sc.bck");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, instrumentPointing[2], "$clementine1/kernels/fk/clem_v12.tf");
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointingQuality"));
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels["InstrumentPointingQuality"][0], "Reconstructed");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, kernels["InstrumentPointingQuality"][0], "Reconstructed");
 }
 
 
@@ -184,7 +184,7 @@ TEST(Spiceinit, TestSpiceinitCkConfigFile) {
   tempFile.open();
   Cube testCube;
 
-  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+  testCube.fromLabel(tempFile.fileName().toStdString() + ".cub", label, "rw");
 
   QVector<QString> args(0);
   UserInterface options(APP_XML, args);
@@ -194,14 +194,14 @@ TEST(Spiceinit, TestSpiceinitCkConfigFile) {
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointing"));
   PvlKeyword instrumentPointing = kernels["InstrumentPointing"];
   ASSERT_EQ(instrumentPointing.size(), 4);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[0], "Table");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[1], "$mro/kernels/ck/mro_crm_psp_110223_101128.bc");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[2], "$mro/kernels/ck/mro_sc_psp_110222_110228.bc");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, instrumentPointing[0], "Table");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, instrumentPointing[1], "$mro/kernels/ck/mro_crm_psp_110223_101128.bc");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, instrumentPointing[2], "$mro/kernels/ck/mro_sc_psp_110222_110228.bc");
   // Use a regex to match the version # for the frame kernel because this sometimes updates
   // when new MRO spice is released.
   QRegularExpression fkRegex("mro_v\\d\\d\\.tf");
-  EXPECT_TRUE(fkRegex.match(instrumentPointing[3]).hasMatch()) << "Frame kernel ["
-      << instrumentPointing[3].toStdString() << "] doesn't match regex ["
+  EXPECT_TRUE(fkRegex.match(QString::fromStdString(instrumentPointing[3])).hasMatch()) << "Frame kernel ["
+      << instrumentPointing[3] << "] doesn't match regex ["
       << fkRegex.pattern().toStdString() << "].";
 }
 
@@ -302,7 +302,7 @@ TEST(Spiceinit, TestSpiceinitDefault) {
   tempFile.open();
   Cube testCube;
 
-  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+  testCube.fromLabel(tempFile.fileName().toStdString() + ".cub", label, "rw");
 
   QVector<QString> args(0);
   UserInterface options(APP_XML, args);
@@ -408,7 +408,7 @@ TEST(Spiceinit, TestSpiceinitNadir) {
   tempFile.open();
   Cube testCube;
 
-  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+  testCube.fromLabel(tempFile.fileName().toStdString() + ".cub", label, "rw");
 
   QVector<QString> args = {"ckrecon=False", "cknadir=True", "tspk=$base/kernels/spk/de405.bsp", "attach=false"};
   UserInterface options(APP_XML, args);
@@ -419,7 +419,7 @@ TEST(Spiceinit, TestSpiceinitNadir) {
 
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointing"));
   ASSERT_EQ(kernels["InstrumentPointing"].size(), 1);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels["InstrumentPointing"][0], "Nadir");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, kernels["InstrumentPointing"][0], "Nadir");
 }
 
 
@@ -507,7 +507,7 @@ TEST(Spiceinit, TestSpiceinitPadding) {
   tempFile.open();
   Cube testCube;
 
-  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+  testCube.fromLabel(tempFile.fileName().toStdString() + ".cub", label, "rw");
 
   QVector<QString> args = {"startpad=1.1", "endpad=0.5", "fk=$cassini/kernels/fk/cas_v40_usgs.tf", "attach=false"};
   UserInterface options(APP_XML, args);
@@ -518,13 +518,13 @@ TEST(Spiceinit, TestSpiceinitPadding) {
 
   ASSERT_TRUE(kernels.hasKeyword("StartPadding"));
   ASSERT_EQ(kernels["StartPadding"].size(), 1);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels["StartPadding"][0], "1.1");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels["StartPadding"].unit(0), "seconds");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, kernels["StartPadding"][0], "1.1");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, kernels["StartPadding"].unit(0), "seconds");
 
   ASSERT_TRUE(kernels.hasKeyword("EndPadding"));
   ASSERT_EQ(kernels["EndPadding"].size(), 1);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels["EndPadding"][0], "0.5");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels["EndPadding"].unit(0), "seconds");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, kernels["EndPadding"][0], "0.5");
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, kernels["EndPadding"].unit(0), "seconds");
 }
 
 TEST_F(DefaultCube, TestSpiceinitCsmCleanup) {
@@ -654,14 +654,14 @@ TEST_F(DemCube, FunctionalTestSpiceinitWebAndShapeModel) {
   tempFile.open();
   Cube testCube;
 
-  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+  testCube.fromLabel(tempFile.fileName().toStdString() + ".cub", label, "rw");
 
   QVector<QString> args = {"web=true", "shape=user", "model=" + demCube->fileName()};
   UserInterface options(APP_XML, args);
   spiceinit(&testCube, options);
 
   PvlGroup kernels = testCube.label()->findGroup("Kernels", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels.findKeyword("ShapeModel"), demCube->fileName());
+  EXPECT_PRED_FORMAT2(AssertStringsEqual, kernels.findKeyword("ShapeModel"), demCube->fileName().toStdString());
 }
 
 
@@ -688,7 +688,7 @@ TEST_F(SmallCube, FunctionalTestSpiceinitCsminitRestorationOnFail) {
     "from="+cubeFile,
     "isd="+isdPath};
 
-  QString CSMINIT_APP_XML = FileName("$ISISROOT/bin/xml/csminit.xml").expanded();
+  QString CSMINIT_APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/csminit.xml").expanded());
   UserInterface csmOptions(CSMINIT_APP_XML, csmArgs);
   testCube->close();
 
@@ -703,7 +703,7 @@ TEST_F(SmallCube, FunctionalTestSpiceinitCsminitRestorationOnFail) {
   UserInterface spiceinitOptions(APP_XML, spiceinitArgs);
   ASSERT_ANY_THROW(spiceinit(spiceinitOptions));
 
-  Cube outputCube(cubeFile);
+  Cube outputCube(cubeFile.toStdString());
 
   ASSERT_NO_THROW(outputCube.camera());
   EXPECT_TRUE(outputCube.hasBlob("CSMState", "String"));
@@ -778,7 +778,7 @@ TEST(Spiceinit, TestSpiceinitHrscWebError) {
   tempFile.open();
   Cube testCube;
 
-  testCube.fromLabel(tempFile.fileName() + ".cub", label, "rw");
+  testCube.fromLabel(tempFile.fileName().toStdString() + ".cub", label, "rw");
 
   QVector<QString> args = {"web=true"};
   UserInterface options(APP_XML, args);

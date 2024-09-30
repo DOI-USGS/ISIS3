@@ -48,8 +48,8 @@ class MyShape : public DemShape {
 
    void testDemCube()  {
      // Cube *demCube();
-     IString fileName = demCube()->fileName();
-     cout << "    Using dem cube file = " << FileName(demCube()->fileName()).name() << endl;
+     IString fileName = demCube()->fileName().toStdString();
+     cout << "    Using dem cube file = " << FileName(demCube()->fileName().toStdString()).name() << endl;
    }
 };
 
@@ -72,9 +72,9 @@ int main() {
     DemShape shape(&targ, pvl);
     DemShape defaultShape;
 
-    cout << "    Shape name is " << shape.name() << endl;
-    cout << "    Shape name is " << defaultShape.name() << endl;
-    cout << "    Shape is DEM type? " << toString(shape.isDEM()) << endl;
+    cout << "    Shape name is " << shape.name().toStdString() << endl;
+    cout << "    Shape name is " << defaultShape.name().toStdString() << endl;
+    cout << "    Shape is DEM type? " << Isis::toString((bool)shape.isDEM()) << endl;
 
     cout << endl << "  Testing method intersectSurface..." << endl;
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
@@ -191,9 +191,9 @@ int main() {
       Pvl elPvl;
       PvlGroup kernels = pvl.findGroup("Kernels", Pvl::Traverse);
       QString demCubeFile;
-      demCubeFile = (QString) kernels["ShapeModel"];
+      demCubeFile = QString::fromStdString(kernels["ShapeModel"]);
       kernels.deleteKeyword("ShapeModel");
-      PvlKeyword shapeKey("ElevationModel", demCubeFile);
+      PvlKeyword shapeKey("ElevationModel", demCubeFile.toStdString());
       kernels.addKeyword(shapeKey);
       elPvl.addGroup(kernels);
       DemShape elShape (&targ, elPvl);
@@ -233,7 +233,7 @@ int main() {
   }
   catch (IException &e) {
     cout << endl << endl;
-    QString msg = "**************** UNIT TEST FAILED! **************** ";
+    std::string msg = "**************** UNIT TEST FAILED! **************** ";
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
 }

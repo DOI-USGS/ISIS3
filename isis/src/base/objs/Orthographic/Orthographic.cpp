@@ -48,7 +48,7 @@ namespace Isis {
        */
       if ((allowDefaults) && (!mapGroup.hasKeyword("CenterLongitude"))) {
         double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLongitude", toString(lon));
+        mapGroup += PvlKeyword("CenterLongitude", Isis::toString(lon));
       }
 
       /*
@@ -57,7 +57,7 @@ namespace Isis {
        */
       if ((allowDefaults) && (!mapGroup.hasKeyword("CenterLatitude"))) {
         double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLatitude", toString(lat));
+        mapGroup += PvlKeyword("CenterLatitude", Isis::toString(lat));
       }
 
       // Get the center longitude  & latitude
@@ -69,7 +69,7 @@ namespace Isis {
 
       //Restrict center longitude to avoid converting between domains.
       if ((m_centerLongitude < -360.0) || (m_centerLongitude > 360.0)) {
-        QString msg = "The center longitude cannot exceed [-360, 360]. "
+        std::string msg = "The center longitude cannot exceed [-360, 360]. "
                       "[" + toString(m_centerLongitude) + "] is not valid";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -124,7 +124,7 @@ namespace Isis {
 
       //Restrict the longitude range to 360 degrees to simplify comparisons.
       if ((m_maximumLongitude - m_minimumLongitude) > 360.0) {
-        QString msg = "The longitude range cannot exceed 360 degrees.";
+        std::string msg = "The longitude range cannot exceed 360 degrees.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -146,7 +146,7 @@ namespace Isis {
       }
     }
     catch(IException &e) {
-      QString message = "Invalid label group [Mapping]";
+      std::string message = "Invalid label group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }

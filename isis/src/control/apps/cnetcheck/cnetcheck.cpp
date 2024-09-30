@@ -25,6 +25,7 @@ find files of those names at the top level of this repository. **/
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Polygon.h>
 
+#include "Application.h"
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "ControlMeasure.h"
@@ -80,7 +81,7 @@ namespace Isis {
    */
   QString cnetcheck(UserInterface &ui, Pvl *log) {
    ControlNet innet(ui.GetFileName("CNET"));
-   FileList inlist(ui.GetFileName("FROMLIST"));
+   FileList inlist(ui.GetFileName("FROMLIST").toStdString());
 
    return cnetcheck(innet, inlist, ui, log);
   }
@@ -126,8 +127,8 @@ namespace Isis {
     }
 
     for (int index = 0; index < inlist.size(); index++) {
-      num2cube.add(inlist[index].toString());
-      QString st = num2cube.serialNumber(inlist[index].toString());
+      num2cube.add(QString::fromStdString(inlist[index].toString()));
+      QString st = num2cube.serialNumber(QString::fromStdString(inlist[index].toString()));
       inListNums.insert(st);
       listedSerialNumbers.push_back(st);   // Used with nonListedSerialNumbers
       progress.CheckStatus();
@@ -231,7 +232,7 @@ namespace Isis {
     //  Islands that have no cubes listed in the input list will
     //  not be shown.
     for (int i = 0; i < (int)islands.size(); i++) {
-      QString name(FileName(prefix + "Island." + toString(i + 1)).expanded());
+      QString name(QString::fromStdString(FileName(prefix.toStdString() + "Island." + Isis::toString(i + 1)).expanded()));
       ofstream out_stream;
       out_stream.open(name.toLatin1().data(), std::ios::out);
       out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
@@ -257,11 +258,11 @@ namespace Isis {
 
     PvlGroup results("Results");
 
-    QString networkName = ui.WasEntered("CNET") ? FileName(ui.GetFileName("CNET")).name() : innet.GetNetworkId();
+    QString networkName = ui.WasEntered("CNET") ? QString::fromStdString(FileName(ui.GetFileName("CNET").toStdString()).name()) : innet.GetNetworkId();
 
     stringstream ss(stringstream::in | stringstream::out);
 
-    results.addKeyword(PvlKeyword("Islands", toString((BigInt)islands.size())));
+    results.addKeyword(PvlKeyword("Islands", Isis::toString((BigInt)islands.size())));
     ss << endl << "----------------------------------------" \
        "----------------------------------------" << endl;
     if (islands.size() == 1) {
@@ -269,7 +270,7 @@ namespace Isis {
     }
     else if (islands.size() == 0) {
       ss << "There are no control points in the provided Control Network [";
-      ss << networkName << "]" << endl;
+      ss << networkName.toStdString() << "]" << endl;
     }
     else {
       ss << "The cubes are NOT fully connected by the Control Network." << endl;
@@ -278,10 +279,10 @@ namespace Isis {
 
     if (ui.GetBoolean("SINGLEMEASURE")  &&  singleMeasureSerialNumbers.size() > 0) {
       results.addKeyword(
-        PvlKeyword("SingleMeasure", toString((BigInt)singleMeasureSerialNumbers.size())));
+        PvlKeyword("SingleMeasure", Isis::toString((BigInt)singleMeasureSerialNumbers.size())));
 
-      QString name(FileName(prefix + "SinglePointCubes.txt").expanded());
-      writeOutput(num2cube, name,
+      std::string name(FileName(prefix.toStdString() + "SinglePointCubes.txt").expanded());
+      writeOutput(num2cube, QString::fromStdString(name),
                   singleMeasureSerialNumbers, singleMeasureControlPoints);
 
       int serials = singleMeasureSerialNumbers.size();
@@ -296,10 +297,10 @@ namespace Isis {
 
     if (ui.GetBoolean("NOLATLON")  &&  noLatLonSerialNumbers.size() > 0) {
       results.addKeyword(
-        PvlKeyword("NoLatLonCubes", toString((BigInt)noLatLonSerialNumbers.size())));
+        PvlKeyword("NoLatLonCubes", Isis::toString((BigInt)noLatLonSerialNumbers.size())));
 
-      QString name(FileName(prefix + "NoLatLon.txt").expanded());
-      writeOutput(num2cube, name,
+      std::string name(FileName(prefix.toStdString() + "NoLatLon.txt").expanded());
+      writeOutput(num2cube, QString::fromStdString(name),
                   noLatLonSerialNumbers, noLatLonControlPoints);
 
       ss << "----------------------------------------" \
@@ -318,9 +319,9 @@ namespace Isis {
       QList< QString > netSerials = innet.GetCubeSerials();
 
       if (netSerials.size() > 0) {
-        QString name(FileName(prefix + coverageOp + ".txt").expanded());
+        std::string name(FileName(prefix.toStdString() + coverageOp.toStdString() + ".txt").expanded());
         ofstream out_stream;
-        out_stream.open(name.toLatin1().data(), std::ios::out);
+        out_stream.open(name.c_str(), std::ios::out);
         out_stream.seekp(0, std::ios::beg); // Start writing from file beginning
 
         double tolerance = ui.GetDouble("TOLERANCE");
@@ -351,16 +352,16 @@ namespace Isis {
           "coverages, are listed in [" << FileName(name).name() << "]" << endl;
 
         results.addKeyword(
-            PvlKeyword(coverageOp, toString((BigInt) failedCoverageCheck)));
+            PvlKeyword(coverageOp.toStdString(), Isis::toString((BigInt) failedCoverageCheck)));
       }
     }
 
     // At this point, inListNums is the list of cubes NOT included in the
     //  ControlNet, and inListNums are their those cube's serial numbers.
     if (ui.GetBoolean("NOCONTROL") && !inListNums.empty()) {
-      results.addKeyword(PvlKeyword("NoControl", toString((BigInt)inListNums.size())));
+      results.addKeyword(PvlKeyword("NoControl", Isis::toString((BigInt)inListNums.size())));
 
-      QString name(FileName(prefix + "NoControl.txt").expanded());
+      QString name(QString::fromStdString(FileName(prefix.toStdString() + "NoControl.txt").expanded()));
       ofstream out_stream;
       out_stream.open(name.toLatin1().data(), std::ios::out);
       out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
@@ -375,10 +376,10 @@ namespace Isis {
       ss << "----------------------------------------" \
          "----------------------------------------" << endl;
       ss << "There are " << inListNums.size();
-      ss << " cubes in the input list [" << FileName(ui.GetFileName("FROMLIST")).name();
+      ss << " cubes in the input list [" << FileName(ui.GetFileName("FROMLIST").toStdString()).name();
       ss << "] which do not exist or are ignored in the Control Network [";
-      ss << networkName << "]" << endl;
-      ss << "These cubes are listed in [" + FileName(name).name() + "]" << endl;
+      ss << networkName.toStdString() << "]" << endl;
+      ss << "These cubes are listed in [" + FileName(name.toStdString()).name() + "]" << endl;
     }
 
     // In addition, nonListedSerialNumbers should be the SerialNumbers of
@@ -386,9 +387,9 @@ namespace Isis {
     //  cube in the input list.
     if (ui.GetBoolean("NOCUBE")  &&  nonListedSerialNumbers.size() > 0) {
       results.addKeyword(
-        PvlKeyword("NoCube", toString((BigInt)nonListedSerialNumbers.size())));
+        PvlKeyword("NoCube", Isis::toString((BigInt)nonListedSerialNumbers.size())));
 
-      QString name(FileName(prefix + "NoCube.txt").expanded());
+      QString name(QString::fromStdString(FileName(prefix.toStdString() + "NoCube.txt").expanded()));
       ofstream out_stream;
       out_stream.open(name.toLatin1().data(), std::ios::out);
       out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
@@ -396,7 +397,7 @@ namespace Isis {
       for (int sn = 0; sn < (int)nonListedSerialNumbers.size(); sn++) {
         int validMeasureCount = innet.GetValidMeasuresInCube(nonListedSerialNumbers[sn]).size();
         QString rowText = nonListedSerialNumbers[sn] + " (Valid Measures: " +
-            toString(validMeasureCount) + ")";
+            QString::number(validMeasureCount) + ")";
         outputRow(out_stream, rowText);
       }
 
@@ -406,11 +407,11 @@ namespace Isis {
          "----------------------------------------" << endl;
       ss << "There are " << nonListedSerialNumbers.size();
       ss << " serial numbers in the Control Net [";
-      ss << networkName;
+      ss << networkName.toStdString();
       ss << "] \nwhich do not exist in the  input list [";
-      ss << FileName(ui.GetFileName("FROMLIST")).name() << "]" << endl;
+      ss << FileName(ui.GetFileName("FROMLIST").toStdString()).name() << "]" << endl;
       ss << "These serial numbers are listed in [";
-      ss << FileName(name).name() + "]" << endl;
+      ss << FileName(name.toStdString()).name() + "]" << endl;
     }
 
     // At this point cubeMeasureCount should be equal to the number of
@@ -427,11 +428,11 @@ namespace Isis {
 
       if (singleMeasureCubes.size() > 0) {
         results.addKeyword(
-          PvlKeyword("SingleCube", toString((BigInt)singleMeasureCubes.size())));
+          PvlKeyword("SingleCube", Isis::toString((BigInt)singleMeasureCubes.size())));
 
-        QString name(FileName(prefix + "SingleCube.txt").expanded());
+        std::string name(FileName(prefix.toStdString() + "SingleCube.txt").expanded());
         ofstream out_stream;
-        out_stream.open(name.toLatin1().data(), std::ios::out);
+        out_stream.open(name.c_str(), std::ios::out);
         out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
         for (set<QString>::iterator sn = singleMeasureCubes.begin();
@@ -446,7 +447,7 @@ namespace Isis {
            "----------------------------------------" << endl;
         ss << "There are " << singleMeasureCubes.size();
         ss << " serial numbers in the Control Net [";
-        ss << networkName;
+        ss << networkName.toStdString();
         ss << "] which only exist in one Control Measure." << endl;
         ss << "These serial numbers are listed in [";
         ss << FileName(name).name() + "]" << endl;
@@ -457,9 +458,7 @@ namespace Isis {
        "----------------------------------------" << endl << endl;
     QString logstr = ss.str().c_str();
 
-    if (log){
-      log->addLogGroup(results);
-    }
+    Application::AppendAndLog(results, log);
 
     if (!ui.IsInteractive()) {
       std::cout << ss.str();
@@ -662,7 +661,7 @@ namespace Isis {
 
   QString buildRow(SerialNumberList &serials, QString sn) {
     QString cubeName = serials.hasSerialNumber(sn) ?
-        FileName(serials.fileName(sn)).expanded() : "UnknownFilename";
+        QString::fromStdString(FileName(serials.fileName(sn).toStdString()).expanded()) : "UnknownFilename";
     return cubeName + g_delimiter + sn;
   }
 
@@ -680,11 +679,11 @@ namespace Isis {
 
 
   QString buildRow(SerialNumberList &serials, QString sn, double value) {
-    return buildRow(serials, sn) + g_delimiter + toString(value);
+    return buildRow(serials, sn) + g_delimiter + QString::number(value);
   }
 
 
   void outputRow(ofstream &outStream, QString rowText) {
-    outStream << rowText << "\n";
+    outStream << rowText.toStdString() << "\n";
   }
 }

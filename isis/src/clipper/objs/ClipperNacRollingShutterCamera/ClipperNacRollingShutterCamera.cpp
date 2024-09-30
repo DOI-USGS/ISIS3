@@ -48,7 +48,7 @@ namespace Isis {
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // Set up start time and exposure duration
-    QString startTime = inst["StartTime"];
+    QString startTime = QString::fromStdString(inst["StartTime"]);
     iTime etStart(startTime);
 
     // Use to calculate center time when exposure duration is available
@@ -67,12 +67,12 @@ namespace Isis {
         && cube.hasTable("Normalized Main Readout Line Times")) {
       PvlKeyword sampleCoefficients = inst.findKeyword("JitterSampleCoefficients");
       for (int i = 0; i < sampleCoefficients.size(); i++) {
-        sampleCoeffs.push_back(sampleCoefficients[i].toDouble());
+        sampleCoeffs.push_back(Isis::toDouble(sampleCoefficients[i]));
       }
 
       PvlKeyword lineCoefficients = inst.findKeyword("JitterLineCoefficients");
       for (int i = 0; i < lineCoefficients.size(); i++) {
-        lineCoeffs.push_back(lineCoefficients[i].toDouble());
+        lineCoeffs.push_back(Isis::toDouble(lineCoefficients[i]));
       }
 
       Table normalizedReadoutTimes("Normalized Main Readout Line Times", lab.fileName(), lab);

@@ -14,8 +14,6 @@ find files of those names at the top level of this repository. **/
 extern int errno;
 
 #include <fstream>
-//#include <stdlib.h>
-//#include <QString>
 
 #include <iostream>
 #include <sstream>
@@ -28,12 +26,9 @@ extern int errno;
 #include <QTime>
 
 #include "Application.h"
-#include "Constants.h"    //is this still used in this class?
-#include "CubeManager.h"
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
-#include "Gui.h"  //is this still used?
 #include "Message.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
@@ -98,7 +93,7 @@ namespace Isis {
 
     // Create user interface and log
     try {
-      FileName f(QString(argv[0]) + ".xml");
+      FileName f(std::string(argv[0]) + ".xml");
 
       // Create preferences
       Preference::Preferences(f.name() == "unitTest.xml");
@@ -106,11 +101,11 @@ namespace Isis {
       if (!f.fileExists()) {
         f = "$ISISROOT/bin/xml/" + f.name();
         if (!f.fileExists()) {
-          QString message = Message::FileOpen(f.expanded());
+          std::string message = Message::FileOpen(f.expanded());
           throw IException(IException::Io, message, _FILEINFO_);
         }
       }
-      QString xmlfile = f.expanded();
+      QString xmlfile = QString::fromStdString(f.expanded());
 
       p_ui = new UserInterface(xmlfile, argc, argv);
 
@@ -133,7 +128,7 @@ namespace Isis {
           setlocale(LC_ALL, "en_US");
         }
 
-        QCoreApplication::setApplicationName(FileName(p_appName).baseName());
+        QCoreApplication::setApplicationName(QString::fromStdString(FileName(p_appName.toStdString()).baseName()));
       }
     }
     catch (IException &e) {
@@ -148,7 +143,7 @@ namespace Isis {
       p_connectionToParent = new QLocalSocket;
 
       QString serverName = "isis_" + UserName() +
-          "_" + toString(iApp->GetUserInterface().ParentId());
+          "_" + QString::fromStdString(toString(iApp->GetUserInterface().ParentId()));
 
       p_connectionToParent->connectToServer(serverName);
       if (!p_connectionToParent->waitForConnected()) {
@@ -228,12 +223,12 @@ namespace Isis {
 
 #if 0
     catch (exception &e) {
-      QString message = e.what();
+      std::string message = e.what();
       Isis::iExceptionSystem i(message, _FILEINFO_);
       status = i.Report();
     }
     catch (...) {
-      QString message = "Unknown error expection";
+      std::string message = "Unknown error expection";
       Isis::iExceptionSystem i(message, _FILEINFO_);
       status = i.Report();
     }
@@ -254,15 +249,15 @@ namespace Isis {
       m_connectTime.start();
       //cerr << "History GUI start clock=" << p_startClock << " time=" << p_startTime << endl;
     }
-    PvlObject history(p_ui->ProgramName());
-    history += PvlKeyword("IsisVersion", Version());
-    history += PvlKeyword("ProgramVersion", p_ui->Version());
+    PvlObject history(p_ui->ProgramName().toStdString());
+    history += PvlKeyword("IsisVersion", Version().toStdString());
+    history += PvlKeyword("ProgramVersion", p_ui->Version().toStdString());
     QString path = QCoreApplication::applicationDirPath();
-    history += PvlKeyword("ProgramPath", path);
-    history += PvlKeyword("ExecutionDateTime", p_datetime);
-    history += PvlKeyword("HostName", HostName());
-    history += PvlKeyword("UserName", UserName());
-    history += PvlKeyword("Description", p_ui->Brief());
+    history += PvlKeyword("ProgramPath", path.toStdString());
+    history += PvlKeyword("ExecutionDateTime", p_datetime.toStdString());
+    history += PvlKeyword("HostName", HostName().toStdString());
+    history += PvlKeyword("UserName", UserName().toStdString());
+    history += PvlKeyword("Description", p_ui->Brief().toStdString());
 
     // Add the user parameters
     Pvl pvl;
@@ -301,8 +296,8 @@ namespace Isis {
 
     // Add this information to the log
     PvlGroup acct("Accounting");
-    acct += PvlKeyword("ConnectTime", conTime);
-    acct += PvlKeyword("CpuTime", cpuTime);
+    acct += PvlKeyword("ConnectTime", conTime.toStdString());
+    acct += PvlKeyword("CpuTime", cpuTime.toStdString());
 
     // Not sure if these are really valuable.  If deemed so then
     // uncomment and complete private methods (DirectIO, Pagefaults, and
@@ -385,6 +380,21 @@ namespace Isis {
       cout << results << endl;
     }
     blankLine = true;
+  }
+
+  /**
+   * Writes the pvl group results to both a passed in Pvl log and
+   * the applications log (either GUI or command line)
+   *
+   * @param results Pvl containing the results to add to the session log
+   * @param log App log for running in code
+   *
+   */
+  void Application::AppendAndLog(PvlGroup &results, Pvl *log) {
+    Application::Log(results);
+    if (log) {
+      log->addGroup(results);
+    }
   }
 
   /**
@@ -501,7 +511,7 @@ namespace Isis {
       const QString &message) {
     // See if we need to connect to the parent
     if (p_connectionToParent == NULL) {
-      QString msg = "This process (program) was executed by an existing Isis "
+      std::string msg = "This process (program) was executed by an existing Isis "
           "process. However, we failed to establish a communication channel "
           "with the parent (launcher) process. The parent process has a PID of "
           "[" + toString(iApp->GetUserInterface().ParentId()) + "]";
@@ -516,11 +526,11 @@ namespace Isis {
     data += '\n';
 
     if (p_connectionToParent->write(data.toLatin1().data(), data.toLatin1().size()) == -1) {
-      QString msg = "This process (program) was executed by an exiting Isis "
+      std::string msg = "This process (program) was executed by an exiting Isis "
           "process. A communication channel was established with the parent "
           "(launcher) process, but when we tried to send data to the parent "
           "process an error occurred. The parent process has a PID of [" +
-          QString(iApp->GetUserInterface().ParentId()) + "]";
+          Isis::toString(iApp->GetUserInterface().ParentId()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -577,16 +587,16 @@ namespace Isis {
         if (p_BatchlistPass == 0) {
           ofstream debugingLog(filename.toLatin1().data());
           if (!debugingLog.good()) {
-            QString msg = "Error opening debugging log file [" + filename + "]";
+            std::string msg = "Error opening debugging log file [" + filename.toStdString() + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
           debugingLog << log << endl;
           debugingLog << "\n############### User Preferences ################\n" << endl;
           debugingLog << Preference::Preferences();
           debugingLog << "\n############## System Disk Space ################\n" << endl;
-          debugingLog << GetSystemDiskSpace() << endl;
+          debugingLog << GetSystemDiskSpace().toStdString() << endl;
           debugingLog << "\n############ Executable Information #############\n" << endl;
-          debugingLog << GetLibraryDependencies(app) << endl;
+          debugingLog << GetLibraryDependencies(app).toStdString() << endl;
           debugingLog.close();
         }
         else {
@@ -601,9 +611,9 @@ namespace Isis {
           cout << "\n############### User Preferences ################\n" << endl;
           cout << Preference::Preferences();
           cout << "\n############## System Disk Space ################\n" << endl;
-          cout << GetSystemDiskSpace() << endl;
+          cout << GetSystemDiskSpace().toStdString() << endl;
           cout << "\n############ Executable Information #############\n" << endl;
-          cout << GetLibraryDependencies(app) << endl;
+          cout << GetLibraryDependencies(app).toStdString() << endl;
         }
         else {
           cout << SessionLog::TheLog() << endl;
@@ -625,6 +635,12 @@ namespace Isis {
    */
   int Application::FunctionError(IException &e) {
     Pvl errors = e.toPvl();
+    for (int i = 0; i < errors.groups(); i++) {
+      PvlGroup &group = errors.group(i);
+      if (group.isNamed("Error")) {
+        group += PvlKeyword("Program", Application::Name().toStdString());
+      }
+    }
     SessionLog::TheLog().AddError(errors);
     SessionLog::TheLog().Write();
 
@@ -632,13 +648,13 @@ namespace Isis {
       SendParentErrors(errors);
     }
     else if (p_ui->IsInteractive()) {
-      p_ui->TheGui()->LoadMessage(e.toString());
+      p_ui->TheGui()->LoadMessage(Application::formatError(e));
     }
     else if (SessionLog::TheLog().TerminalOutput()) {
       cerr << SessionLog::TheLog() << endl;
     }
     else {
-      cerr << e.toString() << endl;
+      cerr << Application::formatError(e).toStdString() << endl;
     }
 
     // If debugging flag on write debugging log
@@ -662,16 +678,16 @@ namespace Isis {
         if (p_BatchlistPass == 0) {
           ofstream debugingLog(filename.toLatin1().data());
           if (!debugingLog.good()) {
-            QString msg = "Error opening debugging log file [" + filename + "]";
+            std::string msg = "Error opening debugging log file [" + filename.toStdString() + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
           debugingLog << log << endl;
           debugingLog << "\n############### User Preferences ################\n" << endl;
           debugingLog << Preference::Preferences();
           debugingLog << "\n############ System Disk Space #############\n" << endl;
-          debugingLog << GetSystemDiskSpace() << endl;
+          debugingLog << GetSystemDiskSpace().toStdString() << endl;
           debugingLog << "\n############ Executable Information #############\n" << endl;
-          debugingLog << GetLibraryDependencies(app) << endl;
+          debugingLog << GetLibraryDependencies(app).toStdString() << endl;
           debugingLog.close();
         }
         else {
@@ -686,9 +702,9 @@ namespace Isis {
           cout << "\n############### User Preferences ################\n" << endl;
           cout << Preference::Preferences();
           cout << "\n############ System Disk Space #############\n" << endl;
-          cout << GetSystemDiskSpace() << endl;
+          cout << GetSystemDiskSpace().toStdString() << endl;
           cout << "\n############ Executable Information #############\n" << endl;
-          cout << GetLibraryDependencies(app) << endl;
+          cout << GetLibraryDependencies(app).toStdString() << endl;
         }
         else {
           cout << SessionLog::TheLog() << endl;
@@ -706,17 +722,40 @@ namespace Isis {
    * @param e The Isis::iException
    */
   void Application::GuiReportError(IException &e) {
-    QString errorMessage = e.toString();
+    std::string errorMessage = Application::formatError(e).toStdString();
     if (errorMessage == "") {
       p_ui->TheGui()->ProgressText("Stopped");
     }
     else {
-      p_ui->TheGui()->LoadMessage(errorMessage);
+      p_ui->TheGui()->LoadMessage(QString::fromStdString(errorMessage));
       p_ui->TheGui()->ProgressText("Error");
     }
 
     if (p_ui->TheGui()->ShowWarning())
       exit(0);
+  }
+
+  QString Application::formatError(IException &e) {
+    stringstream stringStream;
+    std::string stringErrors = e.toString(Preference::Preferences().reportFileLine());
+
+    if (Preference::Preferences().outputErrorAsPvl()) {
+      stringStream << stringErrors;
+      Pvl errors;
+      stringStream >> errors;
+      for (int i = 0; i < errors.groups(); i++) {
+        PvlGroup &group = errors.group(i);
+        if (group.isNamed("Error")) {
+          group += PvlKeyword("Program", Application::Name().toStdString());
+        }
+      }
+      stringStream.str(std::string());
+      stringStream.clear();
+      stringStream << errors;
+      stringErrors = stringStream.str().c_str();
+    }
+
+    return QString::fromStdString(stringErrors);
   }
 
   QString Application::p_appName("Unknown"); //!<
@@ -745,7 +784,7 @@ namespace Isis {
       p_ui->TheGui()->ProgressText(text);
     }
     else if (print) {
-      QString msg = p_ui->ProgramName() + ": " + text;
+      std::string msg = p_ui->ProgramName().toStdString() + ": " + text.toStdString();
       cout << msg << endl;
     }
 
@@ -761,7 +800,7 @@ namespace Isis {
    */
   void Application::UpdateProgress(int percent, bool print) {
     if (HasParent() && print) {
-      QString data = toString(percent);
+      QString data = QString::fromStdString(toString(percent));
       iApp->SendParentData(QString("PROGRESS"), data);
     }
     else if (p_ui->IsInteractive()) {
@@ -844,7 +883,7 @@ namespace Isis {
   PvlGroup Application::GetUnameInfo() {
     // Create a temporary file to store console output to
     FileName temp = FileName::createTempFile("$temporary/UnameConsoleInfo.txt");
-    QString tempFile = temp.expanded();
+    QString tempFile = QString::fromStdString(temp.expanded());
 
     // Uname commands output to temp file with each of the following
     // values on its own line in this order:
@@ -924,7 +963,7 @@ namespace Isis {
   PvlGroup Application::GetEnviromentInfo() {
     // Create a temporary file to store console output to
     FileName temp = FileName::createTempFile("$temporary/EnviromentInfo.txt");
-    QString tempFile = temp.expanded();
+    QString tempFile = QString::fromStdString(temp.expanded());
     PvlGroup envGroup("EnviromentVariables");
     ifstream readTemp;
 
@@ -965,7 +1004,7 @@ namespace Isis {
    */
   QString Application::GetSystemDiskSpace() {
     FileName temp = FileName::createTempFile("$temporary/SystemDiskSpace.txt");
-    QString tempFile = temp.expanded();
+    QString tempFile = QString::fromStdString(temp.expanded());
     ifstream readTemp;
     QString diskspace = "df >| " + tempFile;
     ProgramLauncher::RunSystemCommand(diskspace);
@@ -992,7 +1031,7 @@ namespace Isis {
    */
   QString Application::GetLibraryDependencies(QString file) {
     FileName temp = FileName::createTempFile("$temporary/LibraryDependencies.txt");
-    QString tempFile = temp.expanded();
+    QString tempFile = QString::fromStdString(temp.expanded());
     ifstream readTemp;
     QString dependencies = "";
 #if defined(__linux__)

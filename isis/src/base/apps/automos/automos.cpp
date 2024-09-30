@@ -1,10 +1,12 @@
 #include "automos.h"
-#include "ProcessMapMosaic.h"
+
+#include "Application.h"
 #include "FileList.h"
 #include "IException.h"
+#include "ProcessMapMosaic.h"
+#include "ProjectionFactory.h"
 #include "SpecialPixel.h"
 #include "TProjection.h"
-#include "ProjectionFactory.h"
 
 using namespace std;
 
@@ -13,7 +15,7 @@ namespace Isis {
     FileList list;
 
     // Get the list of cubes to mosaic
-    list.read(FileName(ui.GetFileName("FROMLIST")));
+    list.read(FileName(ui.GetFileName("FROMLIST").toStdString()));
 
     fstream os;
     bool olistFlag = false;
@@ -74,12 +76,10 @@ namespace Isis {
 
     bool mosaicCreated = false;
     for (int i = 0; i < list.size(); i++) {
-      if (!m.StartProcess(list[i].toString())) {
+      if (!m.StartProcess(QString::fromStdString(list[i].toString()))) {
         PvlGroup outsiders("Outside");
-        outsiders += PvlKeyword("File", list[i].toString());
-        if (log) {
-          log->addLogGroup(outsiders);
-        }
+        outsiders += PvlKeyword("File", (list[i].toString()));
+        Application::AppendAndLog(outsiders, log);
       }
       else {
         mosaicCreated = true;
@@ -94,9 +94,7 @@ namespace Isis {
     }
     // Logs the input file location in the mosaic
     for (int i = 0; i < m.imagePositions().groups(); i++) {
-      if (log) {
-        log->addLogGroup(m.imagePositions().group(i));
-      }
+      Application::AppendAndLog(m.imagePositions().group(i), log);
     }
 
     if(olistFlag) {

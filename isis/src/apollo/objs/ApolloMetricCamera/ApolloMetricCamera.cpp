@@ -75,7 +75,7 @@ namespace Isis {
       m_spacecraftNameShort = "Apollo17";
     }
     else {
-      QString msg = "File does not appear to be an Apollo image";
+      std::string msg = "File does not appear to be an Apollo image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -90,9 +90,9 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     focalMap->SetDetectorOrigin(ParentSamples() / 2.0, ParentLines() / 2.0);
 
-    QString ppKey("INS" + toString(naifIkCode()) + "_PP");
-    QString odkKey("INS" + toString(naifIkCode()) + "_OD_K");
-    QString decenterKey("INS" + toString(naifIkCode()) + "_DECENTER");
+    QString ppKey("INS" + QString::number(naifIkCode()) + "_PP");
+    QString odkKey("INS" + QString::number(naifIkCode()) + "_OD_K");
+    QString decenterKey("INS" + QString::number(naifIkCode()) + "_DECENTER");
 
     new ApolloMetricDistortionMap(this, getDouble(ppKey, 0),
                                   getDouble(ppKey, 1), getDouble(odkKey, 0), getDouble(odkKey, 1),
@@ -106,7 +106,7 @@ namespace Isis {
     // Create a cache and grab spice info since it does not change for
     // a framing camera (fixed spacecraft position and pointing)
     // Convert the start time to et
-    setTime((QString)inst["StartTime"]);
+    setTime(QString::fromStdString(inst["StartTime"]));
     LoadCache();
     NaifStatus::CheckErrors();
   }

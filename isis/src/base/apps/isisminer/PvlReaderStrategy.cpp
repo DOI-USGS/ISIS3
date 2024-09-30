@@ -80,7 +80,7 @@ namespace Isis {
     // allows for using KeyListFileArgs
     QString keyfile = translateKeywordArgs("KeyListFile", globals);
     if ( !keyfile.isEmpty() ) { 
-      m_pvlparms.addKeyToList(FileName(keyfile));
+      m_pvlparms.addKeyToList(FileName(keyfile.toStdString()));
     }
   
   }
@@ -110,12 +110,12 @@ namespace Isis {
   int PvlReaderStrategy::apply(ResourceList &resources, const ResourceList &globals) { 
   
     m_pvlfile = translateKeywordArgs("FromList", globals);
-    FileName fromlistFile(m_pvlfile);
+    FileName fromlistFile(m_pvlfile.toStdString());
     FileList fromlist(fromlistFile);
   
     int npvls(0);
     BOOST_FOREACH ( FileName from, fromlist ) {
-      resources.push_back( pvlResource(from.expanded(), globals, npvls) );
+      resources.push_back( pvlResource(QString::fromStdString(from.expanded()), globals, npvls) );
       npvls++;
     }
   
@@ -159,9 +159,9 @@ namespace Isis {
     // Make assets out of them
     PvlFlatMap keys(getDefinitionMap());
     QString rowBase(keys.get("PvlBaseName","Pvl"));
-    QString rowId = rowBase + QString::number(nth);
+    QString rowId = rowBase + QString::fromStdString(toString(nth));
   
-    Pvl pvl(pvlfile);
+    Pvl pvl(pvlfile.toStdString());
     PvlFlatMap pvlImports(pvl, m_pvlparms);
     SharedResource pvlsrc(new Resource(rowId, pvlImports));
   
@@ -174,8 +174,8 @@ namespace Isis {
     pvlsrc->setName(identity);
     
     if ( isDebug() ) { 
-      cout << "  PvlReader::Resource::" << rowId 
-           << "::Identity = " << identity << "\n"; 
+      cout << "  PvlReader::Resource::" << rowId.toStdString() 
+           << "::Identity = " << identity.toStdString() << "\n"; 
     }
   
     // Import geometry w/exception handling
@@ -185,8 +185,8 @@ namespace Isis {
       importGeometry(pvlsrc, globals);
     }
     catch (IException &ie) {
-      QString mess = "Geometry conversion failed horribly for Resource(" + 
-                     identity + ")";
+      std::string mess = "Geometry conversion failed horribly for Resource(" + 
+                     identity.toStdString() + ")";
       throw IException(ie, IException::User, mess, _FILEINFO_);
     }
   

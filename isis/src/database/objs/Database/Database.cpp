@@ -403,7 +403,7 @@ namespace Isis {
   QSqlDatabase Database::init(const DbProfile &profile, Database::Access dbConn) {
     if(!profile.isValid()) {
       ostringstream mess;
-      mess << "Database/profile [" << profile.Name() << "] is not valid!" << ends;
+      mess << "Database/profile [" << profile.Name().toStdString() << "] is not valid!" << ends;
       throw IException(IException::Programmer, mess.str(), _FILEINFO_);
     }
 
@@ -430,12 +430,12 @@ namespace Isis {
       return (db);
     }
     catch(IException &ie) {
-      QString mess = "Unable to create database from " + profile.Name();
+      std::string mess = "Unable to create database from " + profile.Name().toStdString();
       throw IException(ie, IException::User, mess, _FILEINFO_);
     }
     catch(...) {
-      QString mess = "Unknown exception while creating database from profile "
-                    + profile.Name();
+      std::string mess = "Unknown exception while creating database from profile "
+                    + profile.Name().toStdString();
       throw IException(IException::User, mess, _FILEINFO_);
     }
   }
@@ -474,8 +474,8 @@ namespace Isis {
       db.setPort(profile("Port").toInt(&ok));
       if(!ok) {
         ostringstream mess;
-        mess << "Invalid port number [" << profile("Port") << "] in profile "
-             << profile("Name") << ends;
+        mess << "Invalid port number [" << profile("Port").toStdString() << "] in profile "
+             << profile("Name").toStdString() << ends;
         throw IException(IException::User, mess.str().c_str(), _FILEINFO_);
       }
     }
@@ -548,8 +548,8 @@ namespace Isis {
    * @param l        Line number the error occured
    */
   void Database::tossDbError(const QString &message, const char *f, int l) const {
-    QString errmess = message + " - DatabaseError = " +
-                      lastError().text();
+    std::string errmess = message.toStdString() + " - DatabaseError = " +
+                      lastError().text().toStdString();
     throw IException(IException::Programmer, errmess, f, l);
   }
 

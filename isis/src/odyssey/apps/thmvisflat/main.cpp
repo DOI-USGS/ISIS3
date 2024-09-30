@@ -27,34 +27,34 @@ void IsisMain() {
     icube.setVirtualBands(inAtt.bands());
   }
 
-  icube.open(FileName(ui.GetCubeName("FROM")).expanded());
+  icube.open(QString::fromStdString(FileName(ui.GetCubeName("FROM").toStdString()).expanded()));
 
   // Make sure it is a Themis EDR/RDR
-  FileName inFileName = ui.GetCubeName("FROM");
+  FileName inFileName = ui.GetCubeName("FROM").toStdString();
   try {
     if(icube.group("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
-      QString msg = "This program is intended for use on THEMIS VIS images only. [";
+      std::string msg = "This program is intended for use on THEMIS VIS images only. [";
       msg += inFileName.expanded() + "] does not appear to be a THEMIS VIS image.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   catch(IException &e) {
-    QString msg = "This program is intended for use on THEMIS VIS images only. [";
+    std::string msg = "This program is intended for use on THEMIS VIS images only. [";
     msg += inFileName.expanded() + "] does not appear to be a THEMIS VIS image.";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   vector<Cube *> flatcubes;
   vector<LineManager *> fcubeMgrs;
-  int summing = toInt(icube.group("Instrument")["SpatialSumming"][0]);
+  int summing = Isis::toInt(icube.group("Instrument")["SpatialSumming"][0]);
 
   for(int filt = 0; filt < 5; filt++) {
     QString filePattern = "$odyssey/calibration/flat_filter_";
-    filePattern += toString(filt + 1) + "_summing_";
-    filePattern += toString(summing) + "_v????.cub";
-    FileName flatFile = FileName(filePattern).highestVersion();
+    filePattern += QString::number(filt + 1) + "_summing_";
+    filePattern += QString::number(summing) + "_v????.cub";
+    FileName flatFile = FileName(filePattern.toStdString()).highestVersion();
     Cube *fcube = new Cube();
-    fcube->open(flatFile.expanded());
+    fcube->open(QString::fromStdString(flatFile.expanded()));
     flatcubes.push_back(fcube);
 
     LineManager *fcubeMgr = new LineManager(*fcube);
@@ -71,7 +71,7 @@ void IsisMain() {
   ocube.setLabelsAttached(outAtt.labelAttachment() == AttachedLabel);
   ocube.setPixelType(outAtt.pixelType());
 
-  ocube.create(FileName(ui.GetCubeName("TO")).expanded());
+  ocube.create(QString::fromStdString(FileName(ui.GetCubeName("TO").toStdString()).expanded()));
 
   LineManager icubeMgr(icube);
   vector<int> filter;
@@ -79,7 +79,7 @@ void IsisMain() {
   PvlKeyword &filtNums =
       icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterNumber"];
   for(int i = 0; i < filtNums.size(); i++) {
-    filter.push_back(toInt(filtNums[i]));
+    filter.push_back(Isis::toInt(filtNums[i]));
   }
 
   LineManager ocubeMgr(ocube);

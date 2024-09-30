@@ -41,18 +41,18 @@ void IsisMain() {
 
   // Make sure we have a ctx cube and it has SpatialSumming of 1
   UserInterface &ui = Application::GetUserInterface();
-  Isis::Pvl lab(ui.GetCubeName("FROM"));
+  Isis::Pvl lab(ui.GetCubeName("FROM").toStdString());
   Isis::PvlGroup &inst =
     lab.findGroup("Instrument", Pvl::Traverse);
 
-  QString instId = inst["InstrumentId"];
+  QString instId = QString::fromStdString(inst["InstrumentId"]);
   if(instId != "CTX") {
-    QString msg = "This is not a CTX image.  Ctxcevenodd requires a CTX image.";
+    std::string msg = "This is not a CTX image.  Ctxcevenodd requires a CTX image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   int sum = inst["SpatialSumming"];
   if(sum != 1) {
-    QString msg = "CTX images do not have even/odd noise problems";
+    std::string msg = "CTX images do not have even/odd noise problems";
     msg += " if the SpatialSumming is greater than one.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -74,7 +74,7 @@ void IsisMain() {
   //
   // throw err if, pixel counts could result in division by zero
   if((oddCount == 0) || (evenCount == 0)) {
-    QString msg = "Couldn't compute column averages";
+    std::string msg = "Couldn't compute column averages";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 

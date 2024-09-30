@@ -24,7 +24,7 @@ using namespace Isis;
 namespace Isis{
 
   void skypt(UserInterface &ui, Pvl *log) {
-    Cube *cube = new Cube(ui.GetCubeName("FROM"));
+    Cube *cube = new Cube(ui.GetCubeName("FROM").toStdString());
     skypt(cube, ui, log);
   }
 
@@ -50,7 +50,7 @@ namespace Isis{
       double ra = ui.GetDouble("RA");
       double dec = ui.GetDouble("DEC");
       if (!cam->SetRightAscensionDeclination(ra, dec)) {
-        QString msg = "Invalid Ra/Dec coordinate";
+        std::string msg = "Invalid Ra/Dec coordinate";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       samp = cam->Sample();
@@ -74,24 +74,24 @@ namespace Isis{
     // Create group with sky position
     PvlGroup sp("SkyPoint");
      {
-        sp += PvlKeyword("Filename", FileName(channel).expanded());
-        sp += PvlKeyword("Sample", toString(cam->Sample()));
-        sp += PvlKeyword("Line", toString(cam->Line()));
-        sp += PvlKeyword("RightAscension", toString(cam->RightAscension()));
-        sp += PvlKeyword("Declination", toString(cam->Declination()));
-        sp += PvlKeyword("EphemerisTime", toString(cam->time().Et()));
+        sp += PvlKeyword("Filename", FileName(channel.toStdString()).expanded());
+        sp += PvlKeyword("Sample", Isis::toString(cam->Sample()));
+        sp += PvlKeyword("Line", Isis::toString(cam->Line()));
+        sp += PvlKeyword("RightAscension", Isis::toString(cam->RightAscension()));
+        sp += PvlKeyword("Declination", Isis::toString(cam->Declination()));
+        sp += PvlKeyword("EphemerisTime", Isis::toString(cam->time().Et()));
         sp += PvlKeyword("PixelValue", PixelToString(b[0]));
-        sp += PvlKeyword("CelestialNorthClockAngle", toString(rot), "degrees");
+        sp += PvlKeyword("CelestialNorthClockAngle", Isis::toString(rot), "degrees");
      }
 
     //Write the group to the screen
-    log->addLogGroup(sp);
+    log->addGroup(sp);
 
     // Write an output label file if necessary
     if (ui.WasEntered("TO")) {
       // Get user params from ui
-      QString outFile = FileName(ui.GetFileName("TO")).expanded();
-      bool exists = FileName(outFile).fileExists();
+      QString outFile = QString::fromStdString(FileName(ui.GetFileName("TO").toStdString()).expanded());
+      bool exists = FileName(outFile.toStdString()).fileExists();
       bool append = ui.GetBoolean("APPEND");
 
       // Write the pvl group out to the file
@@ -100,10 +100,10 @@ namespace Isis{
         temp.setTerminator("");
         temp.addGroup(sp);
         if (append) {
-          temp.append(ui.GetAsString("TO"));
+          temp.append(ui.GetAsString("TO").toStdString());
         }
         else {
-          temp.write(ui.GetAsString("TO"));
+          temp.write(ui.GetAsString("TO").toStdString());
         }
       }
   
@@ -134,7 +134,7 @@ namespace Isis{
         }
 
         for(int i = 0; i < sp.keywords(); i++) {
-          os << (QString)sp[i];
+          os << sp[i][0];
           if (i < sp.keywords() - 1) {
             os << ",";
           }
@@ -143,7 +143,7 @@ namespace Isis{
       }
     }
     else if (ui.GetString("FORMAT") == "FLAT") {
-      QString msg = "Flat file must have a name.";
+      std::string msg = "Flat file must have a name.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }

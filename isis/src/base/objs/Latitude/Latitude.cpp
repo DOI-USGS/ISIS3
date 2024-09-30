@@ -94,21 +94,21 @@ namespace Isis {
     m_polarRadius = NULL;
 
     if (mapping.hasKeyword("EquatorialRadius") && mapping.hasKeyword("PolarRadius")) {
-      m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
+      m_equatorialRadius = new Distance(Isis::toDouble(mapping["EquatorialRadius"][0]),
                                         Distance::Meters);
-      m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
+      m_polarRadius = new Distance(Isis::toDouble(mapping["PolarRadius"][0]),
                                    Distance::Meters);
     }
     else {
       try {
-        PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
-        m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
+        PvlGroup radiiGrp = Target::radiiGroup(QString::fromStdString(mapping["TargetName"][0]));
+        m_equatorialRadius = new Distance(Isis::toDouble(radiiGrp["EquatorialRadius"][0]),
                                           Distance::Meters);
-        m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
+        m_polarRadius = new Distance(Isis::toDouble(radiiGrp["PolarRadius"][0]),
                                      Distance::Meters);
       }
       catch (IException &e) {
-        QString msg = "Unable to create Latitude object from given mapping group.";
+        std::string msg = "Unable to create Latitude object from given mapping group.";
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -122,7 +122,7 @@ namespace Isis {
       setPlanetocentric(latitude.radians(), Radians);
     }
     else {
-      QString msg = "Latitude type [" + mapping["LatitudeType"][0] +
+      std::string msg = "Latitude type [" + mapping["LatitudeType"][0] +
         "] is not recognized";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -154,21 +154,21 @@ namespace Isis {
     m_polarRadius = NULL;
 
     if (mapping.hasKeyword("EquatorialRadius") && mapping.hasKeyword("PolarRadius")) {
-      m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
+      m_equatorialRadius = new Distance(Isis::toDouble(mapping["EquatorialRadius"][0]),
                                         Distance::Meters);
-      m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
+      m_polarRadius = new Distance(Isis::toDouble(mapping["PolarRadius"][0]),
                                    Distance::Meters);
     }
     else {
       try {
-        PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
-        m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
+        PvlGroup radiiGrp = Target::radiiGroup(QString::fromStdString(mapping["TargetName"][0]));
+        m_equatorialRadius = new Distance(Isis::toDouble(radiiGrp["EquatorialRadius"][0]),
                                           Distance::Meters);
-        m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
+        m_polarRadius = new Distance(Isis::toDouble(radiiGrp["PolarRadius"][0]),
                                      Distance::Meters);
       }
       catch (IException &e) {
-        QString msg = "Unable to create Latitude object from given mapping group.";
+        std::string msg = "Unable to create Latitude object from given mapping group.";
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -182,7 +182,7 @@ namespace Isis {
       setPlanetocentric(latitude, latitudeUnits);
     }
     else {
-      QString msg = "Latitude type [" + mapping["LatitudeType"][0] +
+      std::string msg = "Latitude type [" + mapping["LatitudeType"][0] +
         "] is not recognized";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -226,7 +226,7 @@ namespace Isis {
       setPlanetographic(latitude, latitudeUnits);
     }
     else {
-      QString msg = "Enumeration value [" + toString(latType) + "] is not a valid CoordinateType";
+      std::string msg = "Enumeration value [" + Isis::toString(latType) + "] is not a valid CoordinateType";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -315,7 +315,7 @@ namespace Isis {
   double Latitude::planetographic(Angle::Units units) const {
     
     if (m_equatorialRadius == NULL || m_polarRadius == NULL) {
-      QString msg = "Latitude [" + toString(true) + "] cannot "
+      std::string msg = "Latitude [" + Isis::toString(true) + "] cannot "
           "be converted to Planetographic without the planetary radii, please "
           "use the other Latitude constructor.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -323,13 +323,13 @@ namespace Isis {
 
     if (*this > Angle(90.0, Angle::Degrees) ||
         *this < Angle(-90.0, Angle::Degrees)) {
-      QString msg = "Latitudes outside of the -90/90 range cannot be converted "
+      std::string msg = "Latitudes outside of the -90/90 range cannot be converted "
           "between Planetographic and Planetocentric";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (!isValid()) {
-      QString msg = "Invalid planetographic latitudes are not currently "
+      std::string msg = "Invalid planetographic latitudes are not currently "
           "supported";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -360,7 +360,7 @@ namespace Isis {
   void Latitude::setPlanetographic(double latitude, Angle::Units units) {
     
     if (m_equatorialRadius == NULL || m_polarRadius == NULL) {
-      QString msg = "Latitude [" + Isis::toString(latitude) + " degrees] cannot be "
+      std::string msg = "Latitude [" + Isis::toString(latitude) + " degrees] cannot be "
           "converted to Planetocentic without the planetary radii, please use "
           "the other Latitude constructor.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -370,7 +370,7 @@ namespace Isis {
 
     if (inputAngle > Angle(90.0, Angle::Degrees) ||
         inputAngle < Angle(-90.0, Angle::Degrees)) {
-      QString msg = "Latitudes outside of the -90/90 range cannot be converted "
+      std::string msg = "Latitudes outside of the -90/90 range cannot be converted "
           "between Planetographic and Planetocentric";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -379,7 +379,7 @@ namespace Isis {
     // when passing in a special pixel.
     // Left this here just in case the functionality in Angle changes.
     if (IsSpecial(latitude)) {  
-      QString msg = "Invalid planetographic latitudes are not currently "
+      std::string msg = "Invalid planetographic latitudes are not currently "
           "supported";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -440,9 +440,9 @@ namespace Isis {
     
     // Validity check on the range
     if (min > max) {
-      QString msg = "Minimum latitude [" + min.toString(true) + 
+      std::string msg = "Minimum latitude [" + min.toString(true).toStdString() + 
                     "] is greater than maximum latitude [" + 
-                    max.toString(true) + "]";
+                    max.toString(true).toStdString() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -507,21 +507,21 @@ namespace Isis {
     Distance equatorialRadius;
     Distance polarRadius;
     if (mapping.hasKeyword("EquatorialRadius") && mapping.hasKeyword("PolarRadius")) {
-      equatorialRadius = Distance(toDouble(mapping["EquatorialRadius"][0]),
+      equatorialRadius = Distance(Isis::toDouble(mapping["EquatorialRadius"][0]),
                                   Distance::Meters);
-      polarRadius = Distance(toDouble(mapping["PolarRadius"][0]),
+      polarRadius = Distance(Isis::toDouble(mapping["PolarRadius"][0]),
                              Distance::Meters);
     }
     else {
       try {
-        PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
-        equatorialRadius = Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
+        PvlGroup radiiGrp = Target::radiiGroup(QString::fromStdString(mapping["TargetName"][0]));
+        equatorialRadius = Distance(Isis::toDouble(radiiGrp["EquatorialRadius"][0]),
                                     Distance::Meters);
-        polarRadius = Distance(toDouble(radiiGrp["PolarRadius"][0]),
+        polarRadius = Distance(Isis::toDouble(radiiGrp["PolarRadius"][0]),
                                Distance::Meters);
       }
       catch (IException &e) {
-        QString msg = "Unable to add angle to Latitude object from given mapping group.";
+        std::string msg = "Unable to add angle to Latitude object from given mapping group.";
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -531,7 +531,7 @@ namespace Isis {
     else if (mapping["LatitudeType"][0] == "Planetographic")
       latType = Planetographic;
     else {
-      QString msg = "Latitude type [" + mapping["LatitudeType"][0] + "] is not recognized";
+      std::string msg = "Latitude type [" + mapping["LatitudeType"][0] + "] is not recognized";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -588,7 +588,7 @@ namespace Isis {
       Angle tmpAngle(angle, units);
       if (tmpAngle > Angle(90, Angle::Degrees) ||
           tmpAngle < Angle(-90, Angle::Degrees)) {
-        QString msg = "Latitudes past 90 degrees are not valid. The latitude [" 
+        std::string msg = "Latitudes past 90 degrees are not valid. The latitude [" 
                       + Isis::toString(tmpAngle.degrees(), 8) + "] is not allowed";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }

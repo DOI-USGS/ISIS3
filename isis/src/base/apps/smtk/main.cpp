@@ -83,7 +83,7 @@ void WriteCnet(const QString &netfile, SmtkQStack &points,
   cn.SetCreatedDate(iTime::CurrentLocalTime());
   SmtkQStackIter pnt = points.begin();
   for (int i = 0 ; pnt != points.end() ; i++, ++pnt) {
-    QString pntid = "Point_" + toString(i);
+    QString pntid = "Point_" + QString::number(i);
     cn.AddPoint(new ControlPoint(CreatePoint(pnt.value(), pntid, lcn, rcn)));
   }
 
@@ -112,7 +112,7 @@ void IsisMain() {
 
   // Ensure only single bands
   if (lhImage.bandCount() != 1 || rhImage.bandCount() != 1) {
-    QString msg = "Input Cubes must have only one band!";
+    std::string msg = "Input Cubes must have only one band!";
     throw IException(IException::User,msg,_FILEINFO_);
   }
 
@@ -126,7 +126,7 @@ void IsisMain() {
     rhCamera = rhImage.camera();
   }
   catch (IException &ie) {
-    QString msg = "Both input images must have a camera";
+    std::string msg = "Both input images must have a camera";
     throw IException(ie, IException::User, msg, _FILEINFO_);
   }
 
@@ -141,11 +141,11 @@ void IsisMain() {
 
 //  This still precludes band to band registrations.
   if (serialLeft == serialRight) {
-    QString sLeft = FileName(lhImage.fileName()).name();
-    QString sRight = FileName(rhImage.fileName()).name();
+    QString sLeft = QString::fromStdString(FileName(lhImage.fileName().toStdString()).name());
+    QString sRight = QString::fromStdString(FileName(rhImage.fileName().toStdString()).name());
     if (sLeft == sRight) {
-      QString msg = "Cube Serial Numbers must be unique - FROM=" + serialLeft +
-                   ", MATCH=" + serialRight;
+      std::string msg = "Cube Serial Numbers must be unique - FROM=" + serialLeft.toStdString() +
+                   ", MATCH=" + serialRight.toStdString();
       throw IException(IException::User,msg,_FILEINFO_);
     }
     serialLeft = sLeft;
@@ -292,7 +292,7 @@ void IsisMain() {
   // some.
   ///////////////////////////////////////////////////////////////////////
   if (gstack.size() <= 0) {
-    QString msg = "No seed points found - may need to check Gruen parameters.";
+    std::string msg = "No seed points found - may need to check Gruen parameters.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -449,10 +449,10 @@ void IsisMain() {
 
     //  Report Stereo separation angles
     PvlGroup stresultsPvl("StereoSeparationAngle");
-    stresultsPvl += PvlKeyword("Minimum", toString(stAng.Minimum()), "deg");
-    stresultsPvl += PvlKeyword("Average", toString(stAng.Average()), "deg");
-    stresultsPvl += PvlKeyword("Maximum", toString(stAng.Maximum()), "deg");
-    stresultsPvl += PvlKeyword("StandardDeviation", toString(stAng.StandardDeviation()), "deg");
+    stresultsPvl += PvlKeyword("Minimum", Isis::toString(stAng.Minimum()), "deg");
+    stresultsPvl += PvlKeyword("Average", Isis::toString(stAng.Average()), "deg");
+    stresultsPvl += PvlKeyword("Maximum", Isis::toString(stAng.Maximum()), "deg");
+    stresultsPvl += PvlKeyword("StandardDeviation", Isis::toString(stAng.StandardDeviation()), "deg");
     Application::Log(stresultsPvl);
 
     // Update the label with BandBin keywords
@@ -481,17 +481,17 @@ void IsisMain() {
 
   // Create output data
   PvlGroup totalPointsPvl("Totals");
-  totalPointsPvl += PvlKeyword("AttemptedPoints", toString(numAttemptedInitialPoints));
-  totalPointsPvl += PvlKeyword("InitialSuccesses", toString(numOrigPoints));
-  totalPointsPvl += PvlKeyword("GrowSuccesses", toString(passpix2));
-  totalPointsPvl += PvlKeyword("ResultingPoints", toString(bmf.size()));
+  totalPointsPvl += PvlKeyword("AttemptedPoints", Isis::toString(numAttemptedInitialPoints));
+  totalPointsPvl += PvlKeyword("InitialSuccesses", Isis::toString(numOrigPoints));
+  totalPointsPvl += PvlKeyword("GrowSuccesses", Isis::toString(passpix2));
+  totalPointsPvl += PvlKeyword("ResultingPoints", Isis::toString(bmf.size()));
 
   Application::Log(totalPointsPvl);
 
   Pvl arPvl = matcher.RegistrationStatistics();
   PvlGroup smtkresultsPvl("SmtkResults");
-  smtkresultsPvl += PvlKeyword("SpiceOffImage", toString(matcher.OffImageErrorCount()));
-  smtkresultsPvl += PvlKeyword("SpiceDistanceError", toString(matcher.SpiceErrorCount()));
+  smtkresultsPvl += PvlKeyword("SpiceOffImage", Isis::toString(matcher.OffImageErrorCount()));
+  smtkresultsPvl += PvlKeyword("SpiceDistanceError", Isis::toString(matcher.SpiceErrorCount()));
   arPvl.addGroup(smtkresultsPvl);
 
   for (int i = 0; i < arPvl.groups(); i++) {
@@ -513,7 +513,7 @@ void helperButtonLog () {
   UserInterface &ui = Application::GetUserInterface();
   QString file(ui.GetFileName("REGDEF"));
   Pvl p;
-  p.read(file);
+  p.read(file.toStdString());
   Application::GuiLog(p);
 }
 //...........end of helper function ........

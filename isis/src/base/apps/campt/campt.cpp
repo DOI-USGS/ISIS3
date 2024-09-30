@@ -3,6 +3,7 @@
 #include <string>
 #include <iomanip>
 
+#include "Application.h"
 #include "Brick.h"
 #include "Camera.h"
 #include "CameraPointInfo.h"
@@ -28,7 +29,7 @@ namespace Isis{
   void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints, Pvl *log);
 
   void campt(UserInterface &ui, Pvl *log) {
-    Cube *cube = new Cube(ui.GetCubeName("FROM"), "r");
+    Cube *cube = new Cube(ui.GetCubeName("FROM").toStdString(), "r");
     campt(cube, ui, log);
   }
 
@@ -73,17 +74,17 @@ namespace Isis{
     if (usePointList) {
 
       CSVReader reader;
-      reader.read(FileName(ui.GetFileName("COORDLIST")).expanded());
+      reader.read(QString::fromStdString(FileName(ui.GetFileName("COORDLIST").toStdString()).expanded()));
 
       if (!reader.isTableValid(reader.getTable()) || reader.columns() != 2) {
-        QString msg = "Coordinate file formatted incorrectly.\n"
+        std::string msg = "Coordinate file formatted incorrectly.\n"
                       "Each row must have two columns: a sample,line or a latitude,longitude pair.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
       for (int row = 0; row < reader.rows(); row++) {
-        point1 = toDouble(reader.getRow(row)[0]);
-        point2 = toDouble(reader.getRow(row)[1]);
+        point1 = reader.getRow(row)[0].toDouble();
+        point2 = reader.getRow(row)[1].toDouble();
         points.append(QPair<double, double>(point1, point2));
       }
 
@@ -175,14 +176,14 @@ namespace Isis{
     QString outFile;
     // Get user params from ui
     if (ui.WasEntered("TO")) {
-      outFile = FileName(ui.GetFileName("TO")).expanded();
+      outFile = QString::fromStdString(FileName(ui.GetFileName("TO").toStdString()).expanded());
     }
     bool append = ui.GetBoolean("APPEND");
     QString fileFormat = ui.GetString("FORMAT");
     PvlGroup *point = NULL;
 
     for (int p = 0; p < camPoints.size(); p++) {
-        bool fileExists = FileName(outFile).fileExists();
+        bool fileExists = FileName(outFile.toStdString()).fileExists();
 
       prog.CheckStatus();
       point = camPoints[p];
@@ -202,10 +203,10 @@ namespace Isis{
 
          // we don't want to overwrite successive points in outfile
           if (append || p > 0) {
-            temp.append(outFile);
+            temp.append(outFile.toStdString());
           }
           else {
-            temp.write(outFile);
+            temp.write(outFile.toStdString());
           }
        }
         // Create a flatfile from PVL data
@@ -246,12 +247,12 @@ namespace Isis{
 
           for (int i = 0; i < (*point).keywords(); i++) {
             if ((*point)[i].size() == 3) {
-              os << (QString)(*point)[i][0] << ","
-              << (QString)(*point)[i][1] << ","
-              << (QString)(*point)[i][2];
+              os << (*point)[i][0] << ","
+              << (*point)[i][1] << ","
+              << (*point)[i][2];
             }
             else {
-              os << (QString)(*point)[i];
+              os << (*point)[i];
             }
 
             if (i < (*point).keywords() - 1) {
@@ -272,7 +273,7 @@ namespace Isis{
       }
 
       // we still want to output the results
-      log->addLogGroup((*point));
+      Application::AppendAndLog((*point), log);
       delete point;
       point = NULL;
     }

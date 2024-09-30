@@ -55,7 +55,7 @@ namespace Isis {
 
     // Open the input cube
     QString from = ui.GetAsString("FROM");
-    CubeAttributeInput inAtt(from);
+    CubeAttributeInput inAtt(from.toStdString());
     cube = new Cube();
     cube->setVirtualBands(inAtt.bands());
     from = ui.GetCubeName("FROM");
@@ -80,27 +80,27 @@ namespace Isis {
     // Make sure starting positions fall within the cube
     if (ss > cube->sampleCount()) {
       cube->close();
-      QString msg = "[SAMPLE] exceeds number of samples in the [FROM] cube";
+      std::string msg = "[SAMPLE] exceeds number of samples in the [FROM] cube";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (sl > cube->lineCount()) {
       cube->close();
-      QString msg = "[LINE] exceeds number of lines in the [FROM] cube";
+      std::string msg = "[LINE] exceeds number of lines in the [FROM] cube";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Make sure the number of elements do not fall outside the cube
     if (es > cube->sampleCount()) {
       cube->close();
-      QString msg = "[SAMPLE+NSAMPLES-1] exceeds number of ";
+      std::string msg = "[SAMPLE+NSAMPLES-1] exceeds number of ";
       msg += "samples in the [FROM] cube";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (el > cube->lineCount()) {
       cube->close();
-      QString msg = "[LINE+NLINES-1] exceeds number of ";
+      std::string msg = "[LINE+NLINES-1] exceeds number of ";
       msg += "lines in the [FROM] cube";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -140,7 +140,7 @@ namespace Isis {
       }
 
       // Read the table into a table object
-      Table table(obj["Name"], from);
+      Table table(obj["Name"], from.toStdString());
 
       // We are not going to bother with line/sample associations; they apply
       //   only to the alpha cube at this time. I'm leaving this code here for the
@@ -185,8 +185,8 @@ namespace Isis {
         tryKey = "NaifFrameCode";
       }
 
-      if(kerns.hasKeyword(tryKey)) {
-        PvlKeyword ikCode = kerns[tryKey];
+      if(kerns.hasKeyword(tryKey.toStdString())) {
+        PvlKeyword ikCode = kerns[tryKey.toStdString()];
         kerns = PvlGroup("Kernels");
         kerns += ikCode;
       }
@@ -203,16 +203,16 @@ namespace Isis {
 
     // Construct a label with the results
     PvlGroup results("Results");
-    results += PvlKeyword("InputLines", toString(orignl));
-    results += PvlKeyword("InputSamples", toString(origns));
-    results += PvlKeyword("StartingLine", toString(sl));
-    results += PvlKeyword("StartingSample", toString(ss));
-    results += PvlKeyword("EndingLine", toString(el));
-    results += PvlKeyword("EndingSample", toString(es));
-    results += PvlKeyword("LineIncrement", toString(linc));
-    results += PvlKeyword("SampleIncrement", toString(sinc));
-    results += PvlKeyword("OutputLines", toString(nl));
-    results += PvlKeyword("OutputSamples", toString(ns));
+    results += PvlKeyword("InputLines", Isis::toString(orignl));
+    results += PvlKeyword("InputSamples", Isis::toString(origns));
+    results += PvlKeyword("StartingLine", Isis::toString(sl));
+    results += PvlKeyword("StartingSample", Isis::toString(ss));
+    results += PvlKeyword("EndingLine", Isis::toString(el));
+    results += PvlKeyword("EndingSample", Isis::toString(es));
+    results += PvlKeyword("LineIncrement", Isis::toString(linc));
+    results += PvlKeyword("SampleIncrement", Isis::toString(sinc));
+    results += PvlKeyword("OutputLines", Isis::toString(nl));
+    results += PvlKeyword("OutputSamples", Isis::toString(ns));
 
     // Update the Mapping, Instrument, and AlphaCube groups in the output
     // cube label

@@ -20,7 +20,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/footprintinit.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/footprintinit.xml").expanded());
 
 TEST_F(DefaultCube, FunctionalTestFootprintinitDefault) {
   QVector<QString> footprintArgs = {};
@@ -142,8 +142,8 @@ TEST_F(DefaultCube, FunctionalTestFootprintinitPrecision) {
   ASSERT_TRUE(testCube->label()->hasObject("Polygon"));
 
   ASSERT_TRUE(log.hasGroup("Results"));
-  ASSERT_EQ(100, log.findGroup("Results").findKeyword("LINC")[0].toInt());
-  ASSERT_EQ(100, log.findGroup("Results").findKeyword("SINC")[0].toInt());
+  ASSERT_EQ(100, Isis::toInt(log.findGroup("Results").findKeyword("LINC")[0]));
+  ASSERT_EQ(100, Isis::toInt(log.findGroup("Results").findKeyword("SINC")[0]));
 
   ImagePolygon poly = testCube->readFootprint();
 

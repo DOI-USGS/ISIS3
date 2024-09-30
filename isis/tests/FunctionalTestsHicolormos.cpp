@@ -11,7 +11,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/hicolormos.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/hicolormos.xml").expanded());
 
 TEST_F(MroHiriseCube, FunctionalTestHicolormosDefault) {
   QString outCubeFileName = tempDir.path() + "/outTEMP.cub";
@@ -25,7 +25,7 @@ TEST_F(MroHiriseCube, FunctionalTestHicolormosDefault) {
     FAIL() << "Unable to process HRISE image: " << e.what() << std::endl;
   }
 
-  Cube oCube(outCubeFileName);
+  Cube oCube(outCubeFileName.toStdString());
   Pvl *label = oCube.label();
   PvlGroup group = label->findObject("IsisCube").findGroup("Mosaic");
 
@@ -43,17 +43,17 @@ TEST_F(MroHiriseCube, FunctionalTestHicolormosDefault) {
 
   PvlKeyword kw = group.findKeyword("cpmmTdiFlag");
   for (int i = 0; i < cppmmTdiFlag.size(); i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, cppmmTdiFlag[i], kw[i]);
+    EXPECT_PRED_FORMAT2(AssertStringsEqual, cppmmTdiFlag[i].toStdString(), kw[i]);
   }
 
   kw = group.findKeyword("cpmmSummingFlag");
   for (int i = 0; i < cppmmTdiFlag.size(); i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, cpmmSummingFlag[i], kw[i]);
+    EXPECT_PRED_FORMAT2(AssertStringsEqual, cpmmSummingFlag[i].toStdString(), kw[i]);
   }
 
   kw = group.findKeyword("SpecialProcessingFlag");
   for (int i = 0; i < cppmmTdiFlag.size(); i++) {
-    EXPECT_PRED_FORMAT2(AssertQStringsEqual, specialProcessingFlag[i], kw[i]);
+    EXPECT_PRED_FORMAT2(AssertStringsEqual, specialProcessingFlag[i].toStdString(), kw[i]);
   }
 
   Histogram *oCubeStats = oCube.histogram();

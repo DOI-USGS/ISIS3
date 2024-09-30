@@ -8,6 +8,7 @@ find files of those names at the top level of this repository. **/
 
 #include <nlohmann/json.hpp>
 #include <QString>
+#include <QList>
 
 #include "IException.h"
 #include "IString.h"
@@ -58,8 +59,8 @@ namespace Isis {
         // Check for blank lines
         if (line.substr(0, 1) != " " && line.substr(0, 1) != "/") {
           // Name of keyword
-          PvlKeyword label(line.Token(" =").ToQt()); // Stop on spaces OR equal sign
-          if (QString::compare(label.name(), "OBJECT", Qt::CaseInsensitive) == 0) {
+          PvlKeyword label(line.Token(" =")); // Stop on spaces OR equal sign
+          if (QString::compare(QString::fromStdString(label.name()), "OBJECT", Qt::CaseInsensitive) == 0) {
             label.setName("TARGET");
             label.addComment("NOTE: This keyword name was changed from 'OBJECT' in the original "
                              "fit header file.");
@@ -68,28 +69,28 @@ namespace Isis {
           line.TrimHead(" =");
           line.TrimTail(" ");
           if (label.name() == "COMMENT" || label.name() == "HISTORY") {
-            label += line.ToQt();
+            label += line;
           }
           else {
             // Check for a quoted value
             if (line.substr(0,1) == "'") {
               line.TrimHead("'");
-              label += line.Token("'").TrimHead(" ").TrimTail(" ").ToQt();
+              label += line.Token("'").TrimHead(" ").TrimTail(" ");
               line.TrimHead(" '");
             }
             else {
               // Access any remaining data without the trailing comment if there is one
               IString value = line.Token("/");
               value.TrimTail(" ");
-              label += value.ToQt();
+              label += value;
               line.TrimHead(" ");
             }
             // If the line still has anything in it, treat it is as a comment.
             if (line.size() > 2) {
               line.TrimHead(" /");
-              label.addComment(line.ToQt());
+              label.addComment(line);
               if (line != line.Token("[")) {
-                label.setUnits(line.Token("[").Token("]").ToQt());
+                label.setUnits(line.Token("[").Token("]"));
               }
             }
           }
@@ -122,16 +123,16 @@ namespace Isis {
           bytesPerPixel /= 8;
 
           unsigned int axis1 = 1;
-          axis1 = toInt((*fitsLabel)["NAXIS1"]);
+          axis1 = Isis::toInt((*fitsLabel)["NAXIS1"]);
 
           unsigned int axis2 = 1;
           if (fitsLabel->hasKeyword("NAXIS2")) {
-            axis2 = toInt((*fitsLabel)["NAXIS2"]);
+            axis2 = Isis::toInt((*fitsLabel)["NAXIS2"]);
           }
 
           unsigned int axis3 = 1;
           if (fitsLabel->hasKeyword("NAXIS3")) {
-            axis3 = toInt((*fitsLabel)["NAXIS3"]);
+            axis3 = Isis::toInt((*fitsLabel)["NAXIS3"]);
           }
 
           jump = (int)(ceil(bytesPerPixel * axis1 * axis2 * axis3 / 2880.0) * 2880.0);
@@ -162,8 +163,8 @@ namespace Isis {
       }
 
       else {
-        QString msg = QObject::tr("The FITS file does not contain a section header that appears "
-                                  "to describe an image.");
+        std::string msg = "The FITS file does not contain a section header that appears "
+                                  "to describe an image.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -181,11 +182,10 @@ namespace Isis {
   json fitsToJson(FileName fitsFile) {
     std::ifstream fileStream;
     try {
-      fileStream.open(fitsFile.expanded().toLocal8Bit().constData(), std::ios::in  | std::ios::binary);
+      fileStream.open(fitsFile.expanded().c_str(), std::ios::in  | std::ios::binary);
     }
     catch (IException &e) {
-      QString msg = QString("Unable to open FITS formatted file [%1].")
-                               .arg(fitsFile.toString());
+      std::string msg = "Unable to open FITS formatted file " + fitsFile.toString() + ".";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 

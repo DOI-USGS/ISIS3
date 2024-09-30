@@ -63,32 +63,32 @@ namespace Isis {
       m_spacecraftNameShort = "Apollo17";
     }
     else {
-      QString msg = "File does not appear to be an Apollo image";
+      std::string msg = "File does not appear to be an Apollo image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     //following keywords in InstrumentAddendum file
-    QString ikernKey = "INS" + toString((int)naifIkCode()) + "_CONSTANT_TIME_OFFSET";
+    QString ikernKey = "INS" + QString::number((int)naifIkCode()) + "_CONSTANT_TIME_OFFSET";
     constantTimeOffset = getDouble(ikernKey);
 
-    ikernKey = "INS" + toString((int)naifIkCode()) + "_ADDITIONAL_PREROLL";
+    ikernKey = "INS" + QString::number((int)naifIkCode()) + "_ADDITIONAL_PREROLL";
     additionalPreroll = getDouble(ikernKey);
 
-    ikernKey = "INS" + toString((int)naifIkCode()) + "_ADDITIVE_LINE_ERROR";
+    ikernKey = "INS" + QString::number((int)naifIkCode()) + "_ADDITIVE_LINE_ERROR";
     additiveLineTimeError = getDouble(ikernKey);
 
-    ikernKey = "INS" + toString((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
+    ikernKey = "INS" + QString::number((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
     multiplicativeLineTimeError = getDouble(ikernKey);
 
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-    QString stime = (QString)inst["StartTime"];
+    QString stime = QString::fromStdString(inst["StartTime"]);
     SpiceDouble etStart;
     str2et_c(stime.toLatin1().data(), &etStart);
-    stime = (QString) inst["StopTime"];
+    stime = QString::fromStdString(inst["StopTime"]);
     SpiceDouble etStop;
     str2et_c(stime.toLatin1().data(), &etStop);
-    iTime isisTime( (QString) inst["StartTime"]);
+    iTime isisTime( QString::fromStdString(inst["StartTime"]));
 
     // Get other info from labels
     // line exposure duration, sec/mm
@@ -135,7 +135,7 @@ namespace Isis {
     new LineScanCameraSkyMap(this);
 
     PvlGroup &instP = lab.findGroup("Kernels", Pvl::Traverse);
-    m_CkFrameId = toInt(instP["NaifFrameCode"][0]);
+    m_CkFrameId = Isis::toInt(instP["NaifFrameCode"][0]);
     m_CkFrameId = -int(-m_CkFrameId/1000)*1000;
 
     LoadCache();

@@ -36,7 +36,7 @@ namespace Isis {
    * @param keyListFile The name of the file containing PvlKeyword names.
    */  
   PvlConstraints::PvlConstraints(const QString &keyListFile) {
-    addKeyToList(FileName(keyListFile));
+    addKeyToList(FileName(keyListFile.toStdString()));
     return;
   }
   
@@ -328,7 +328,7 @@ namespace Isis {
 //       cout << "HI!" << endl;
 //       addKeyToList(pvl[k].name());
 //     }
-    TextFile keyList(keyListFile.expanded());
+    TextFile keyList(QString::fromStdString(keyListFile.expanded()));
     QString keywordName = "";
     while (keyList.GetLine(keywordName)) {
       addKeyToList(keywordName);
@@ -487,7 +487,7 @@ namespace Isis {
    */  
   void PvlFlatMap::add(const QString &key, 
                        const QString &value) {
-    add(PvlKeyword(key, value));
+    add(PvlKeyword(key.toStdString(), value.toStdString()));
   }
   
   
@@ -498,7 +498,7 @@ namespace Isis {
    * @param key The PvlKeyword to add to the map.
    */  
   void PvlFlatMap::add(const PvlKeyword &key) {
-    insert(key.name().toLower(),  key);
+    insert(QString::fromStdString(key.name()).toLower(),  key);
   }
   
   
@@ -513,7 +513,7 @@ namespace Isis {
    */  
   void PvlFlatMap::append(const QString &key, 
                           const QString &value) {
-    append(PvlKeyword(key, value));
+    append(PvlKeyword(key.toStdString(), value.toStdString()));
     return;
   }
   
@@ -527,19 +527,19 @@ namespace Isis {
    * @param key A PvlKeyword to append to the map.
    */  
   void PvlFlatMap::append(const PvlKeyword &key) {
-    if ( exists(key.name()) ) {
-      PvlFlatMapIterator kw = find(key.name().toLower());
+    if ( exists(QString::fromStdString(key.name())) ) {
+      PvlFlatMapIterator kw = find(QString::fromStdString(key.name()).toLower());
       // add all values to the map
       for (int i = 0; i < key.size(); i++) {
         kw.value().addValue(key[i]); 
       }
     }
     else {
-      insert(key.name().toLower(),  PvlKeyword(key.name(), key[0]));
+      insert(QString::fromStdString(key.name()).toLower(),  PvlKeyword(key.name(), key[0]));
       // if there are more than one values in this keyword, insert the first
       // into the map and recursively call append to add the rest.
       for (int i = 1; i < key.size(); i++) {
-        append(key.name(), key[i]);
+        append(QString::fromStdString(key.name()), QString::fromStdString(key[i]));
       }
     }
     return;
@@ -577,15 +577,15 @@ namespace Isis {
                           const int &index) const {
     QMap<QString, PvlKeyword>::const_iterator k = find(key.toLower());
     if (end() == k) {
-      QString mess = "Keyword " + key + " does not exist!";
+      std::string mess = "Keyword " + key.toStdString() + " does not exist!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
     if (index >= k.value().size()) {
-      QString mess = "Index " + toString(index) + " does not exist for keyword " + key + "!";
+      std::string mess = "Index " + toString(index) + " does not exist for keyword " + key.toStdString() + "!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
   
-    return (k.value()[index]);
+    return QString::fromStdString(k.value()[index]);
   }
   
   
@@ -609,7 +609,7 @@ namespace Isis {
       return (defValue);
     }
     else {
-      return (k.value()[index]);
+      return QString::fromStdString(k.value()[index]);
     }
   }
   
@@ -660,7 +660,7 @@ namespace Isis {
   PvlKeyword PvlFlatMap::keyword(const QString &key) const {
     QMap<QString, PvlKeyword>::const_iterator k = find(key.toLower());
     if (end() == k) {
-      QString mess = "Keyword " + key + " does not exist!";
+      std::string mess = "Keyword " + key.toStdString() + " does not exist!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
     return (k.value());
@@ -702,7 +702,7 @@ namespace Isis {
   QStringList PvlFlatMap::keywordValues(const PvlKeyword &keyword) {
     QStringList values;
     for (int i = 0 ; i < keyword.size() ; i++) {
-      values << keyword[i];
+      values << QString::fromStdString(keyword[i]);
     }
     return (values);
   }
@@ -734,8 +734,8 @@ namespace Isis {
     // Check constraints if specified
     int nconsts = constraints.excludeSize() + constraints.includeSize();
     if ( nconsts > 0 ) {
-      bool isExcluded = constraints.isExcluded(object.name());
-      bool isIncluded = constraints.isIncluded(object.name());
+      bool isExcluded = constraints.isExcluded(QString::fromStdString(object.name()));
+      bool isIncluded = constraints.isIncluded(QString::fromStdString(object.name()));
       bool hasBoth = (constraints.excludeSize() > 0) && 
                      (constraints.includeSize() > 0);
 
@@ -821,8 +821,8 @@ namespace Isis {
     // Check constraints if specified
     int nconsts = constraints.excludeSize() + constraints.includeSize();
     if ( nconsts > 0 ) {
-      bool isExcluded = constraints.isExcluded(group.name());
-      bool isIncluded = constraints.isIncluded(group.name());
+      bool isExcluded = constraints.isExcluded(QString::fromStdString(group.name()));
+      bool isIncluded = constraints.isIncluded(QString::fromStdString(group.name()));
       bool hasBoth = (constraints.excludeSize() > 0) && 
                      (constraints.includeSize() > 0);
       // Check constraints
@@ -878,7 +878,7 @@ namespace Isis {
     // if there are any keyword constraints, only load those PvlKeywords
     if ( constraints.keyListSize() > 0 ) {
       for (key = pvl.begin() ; key != pvl.end() ; ++key) {
-        if ( constraints.isKeyInList(key->name()) ) {
+        if ( constraints.isKeyInList(QString::fromStdString(key->name())) ) {
           add(*key);
           n++;
         }

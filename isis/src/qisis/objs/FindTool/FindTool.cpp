@@ -679,7 +679,7 @@ namespace Isis {
       p_line = DBL_MAX;
       p_lat = DBL_MAX;
       p_lon = DBL_MAX;
-      QMessageBox::warning((QWidget *)parent(), "Warning", e.toString());
+      QMessageBox::warning((QWidget *)parent(), "Warning", QString::fromStdString(e.toString()));
     }
 
     return viewportResolution;

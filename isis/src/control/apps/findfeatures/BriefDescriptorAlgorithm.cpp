@@ -41,8 +41,8 @@ namespace Isis {
     setConfig(config);
     PvlFlatMap variables = setupParameters();
     variables.merge(cvars);
-    int bytes = toInt(variables.get("Bytes"));
-    bool useOrientation = toBool(variables.get("UseOrientation"));
+    int bytes = variables.get("Bytes").toInt();
+    bool useOrientation = toBool(variables.get("UseOrientation").toStdString());
 
     m_algorithm = BriefType::create(bytes, useOrientation);
 
@@ -149,7 +149,7 @@ namespace Isis {
    *                                 to set algorithm parameters."
    */
   int BriefDescriptorAlgorithm::setAlgorithmVariables(const PvlFlatMap &variables) {
-    QString msg = "BriefDescriptorAlgorithm does not have the ability to set algorithm parameters.";
+    std::string msg = "BriefDescriptorAlgorithm does not have the ability to set algorithm parameters.";
     throw IException(IException::Programmer, msg, _FILEINFO_);
 
     return (-1);

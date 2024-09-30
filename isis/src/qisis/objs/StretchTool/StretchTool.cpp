@@ -439,12 +439,12 @@ namespace Isis {
     // Create a list of existing Stretch names
     if (cvp->isGray()) {
       PvlObject::PvlObjectIterator objIter;
-      for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
+      for (objIter = lab->beginObject(); objIter != lab->endObject(); objIter++) {
         if (objIter->name() == "Stretch") {
           PvlKeyword tempKeyword = objIter->findKeyword("Name");
           int bandNumber = int(objIter->findKeyword("BandNumber"));
           if (cvp->grayBand() == bandNumber) {
-            QString tempName = tempKeyword[0];
+            QString tempName = QString::fromStdString(tempKeyword[0]);
             namelist.append(tempName);
           }
         }
@@ -457,13 +457,13 @@ namespace Isis {
 
       QMap<QString, QList<int>> tempNameMap;
       PvlObject::PvlObjectIterator objIter;
-      for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
+      for (objIter = lab->beginObject(); objIter != lab->endObject(); objIter++) {
         if (objIter->name() == "Stretch") {
           PvlKeyword tempKeyword = objIter->findKeyword("Name");
           int bandNumber = int(objIter->findKeyword("BandNumber"));
           if (bandNumber == redBandNumber || bandNumber == greenBandNumber
               || bandNumber == blueBandNumber) {
-            QString tempName = tempKeyword[0];
+            QString tempName = QString::fromStdString(tempKeyword[0]);
             if (tempNameMap.contains(tempName)) {
               tempNameMap[tempName].append(bandNumber);
             }
@@ -511,13 +511,13 @@ namespace Isis {
       }
       else {
         std::vector<PvlKeyword> keywordValueRed;
-        keywordValueRed.push_back(PvlKeyword("BandNumber",  QString::number(cvp->redBand())));
+        keywordValueRed.push_back(PvlKeyword("BandNumber",  Isis::toString(cvp->redBand())));
 
         std::vector<PvlKeyword> keywordValueGreen;
-        keywordValueGreen.push_back(PvlKeyword("BandNumber", QString::number(cvp->greenBand())));
+        keywordValueGreen.push_back(PvlKeyword("BandNumber", Isis::toString(cvp->greenBand())));
 
         std::vector<PvlKeyword> keywordValueBlue;
-        keywordValueBlue.push_back(PvlKeyword("BandNumber", QString::number(cvp->blueBand())));
+        keywordValueBlue.push_back(PvlKeyword("BandNumber", Isis::toString(cvp->blueBand())));
 
         CubeStretch redStretch = icube->readCubeStretch(stretchName, keywordValueRed);
         CubeStretch greenStretch = icube->readCubeStretch(stretchName, keywordValueGreen);
@@ -557,12 +557,12 @@ namespace Isis {
     // Create a list of existing Stretch names
     QStringList namelist;
     PvlObject::PvlObjectIterator objIter;
-    for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
+    for (objIter = lab->beginObject(); objIter != lab->endObject(); objIter++){
       if (objIter->name() == "Stretch") {
         PvlKeyword tempKeyword = objIter->findKeyword("Name");
         int bandNumber = int(objIter->findKeyword("BandNumber"));
         if (cvp->grayBand() == bandNumber) {
-          QString tempName = tempKeyword[0];
+          QString tempName = QString::fromStdString(tempKeyword[0]);
           namelist.append(tempName);
         }
       }
@@ -623,10 +623,10 @@ namespace Isis {
     // Create a list of existing Stretch names
     QStringList namelist;
     PvlObject::PvlObjectIterator objIter;
-    for (objIter=lab->beginObject(); objIter<lab->endObject(); objIter++) {
+    for (objIter = lab->beginObject(); objIter != lab->endObject(); objIter++) {
       if (objIter->name() == "Stretch") {
         PvlKeyword tempKeyword = objIter->findKeyword("Name");
-        QString tempName = tempKeyword[0];
+        QString tempName = QString::fromStdString(tempKeyword[0]);
         namelist.append(tempName);
       }
     }

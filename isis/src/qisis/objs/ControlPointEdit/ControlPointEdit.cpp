@@ -122,7 +122,7 @@ namespace Isis {
     //  grid row
     int row = 0;
 
-    QString tempFileName = FileName("$ISISROOT/appdata/images/icons").expanded();
+    QString tempFileName = QString::fromStdString(FileName("$ISISROOT/appdata/images/icons").expanded());
     QString toolIconDir = tempFileName;
 
     QSize isize(27, 27);
@@ -158,32 +158,32 @@ namespace Isis {
     if (p_allowLeftMouse) {
       // Add arrows for panning
       leftPanUp = new QToolButton(parent);
-      leftPanUp->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/up.png").
-                               expanded()));
+      leftPanUp->setIcon(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/up.png").
+                               expanded())));
       leftPanUp->setIconSize(isize);
       leftPanUp->setToolTip("Move up 1 screen pixel");
       leftPanUp->setStatusTip("Move up 1 screen pixel");
       leftPanUp->setWhatsThis("Move the left measure up 1 screen pixel.");
 
       leftPanDown = new QToolButton(parent);
-      leftPanDown->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/down.png").
-                                 expanded()));
+      leftPanDown->setIcon(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/down.png").
+                                 expanded())));
       leftPanDown->setIconSize(isize);
       leftPanDown->setToolTip("Move down 1 screen pixel");
       leftPanDown->setStatusTip("Move down 1 screen pixel");
       leftPanDown->setWhatsThis("Move the left measure down 1 screen pixel.");
 
       leftPanLeft = new QToolButton(parent);
-      leftPanLeft->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/back.png").
-                                 expanded()));
+      leftPanLeft->setIcon(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/back.png").
+                                 expanded())));
       leftPanLeft->setIconSize(isize);
       leftPanLeft->setToolTip("Move left 1 screen pixel");
       leftPanLeft->setWhatsThis("Move the left measure to the left by 1 screen"
                                 "pixel.");
 
       leftPanRight = new QToolButton(parent);
-      leftPanRight->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/forward.png").
-                                  expanded()));
+      leftPanRight->setIcon(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/forward.png").
+                                  expanded())));
       leftPanRight->setIconSize(isize);
       leftPanRight->setToolTip("Move right 1 screen pixel");
       leftPanRight->setWhatsThis("Move the left measure to the right by 1"
@@ -205,8 +205,8 @@ namespace Isis {
     p_rightZoomIn->setWhatsThis("Zoom In 2x on right measure.");
 
     p_rightZoomOut = new QToolButton();
-    p_rightZoomOut->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/viewmag-.png").
-                                  expanded()));
+    p_rightZoomOut->setIcon(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/viewmag-.png").
+                                  expanded())));
     p_rightZoomOut->setIconSize(isize);
     p_rightZoomOut->setToolTip("Zoom Out 2x");
     p_rightZoomOut->setWhatsThis("Zoom Out 2x on right measure.");
@@ -224,30 +224,30 @@ namespace Isis {
 
     //  Add arrows for panning
     QToolButton *rightPanUp = new QToolButton(parent);
-    rightPanUp->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/up.png").
-                              expanded()));
+    rightPanUp->setIcon(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/up.png").
+                              expanded())));
     rightPanUp->setIconSize(isize);
     rightPanUp->setToolTip("Move up 1 screen pixel");
     rightPanUp->setWhatsThis("Move the right measure up 1 screen pixel.");
 
     QToolButton *rightPanDown = new QToolButton(parent);
-    rightPanDown->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/down.png").
-                                expanded()));
+    rightPanDown->setIcon(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/down.png").
+                                expanded())));
     rightPanDown->setIconSize(isize);
     rightPanDown->setToolTip("Move down 1 screen pixel");
     rightPanUp->setWhatsThis("Move the right measure down 1 screen pixel.");
 
     QToolButton *rightPanLeft = new QToolButton(parent);
-    rightPanLeft->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/back.png").
-                                expanded()));
+    rightPanLeft->setIcon(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/back.png").
+                                expanded())));
     rightPanLeft->setIconSize(isize);
     rightPanLeft->setToolTip("Move left 1 screen pixel");
     rightPanLeft->setWhatsThis("Move the right measure to the left by 1 screen"
                               "pixel.");
 
     QToolButton *rightPanRight = new QToolButton(parent);
-    rightPanRight->setIcon(QIcon(FileName("$ISISROOT/appdata/images/icons/forward.png").
-                                 expanded()));
+    rightPanRight->setIcon(QIcon(QString::fromStdString(FileName("$ISISROOT/appdata/images/icons/forward.png").
+                                 expanded())));
     rightPanRight->setIconSize(isize);
     rightPanRight->setToolTip("Move right 1 screen pixel");
     rightPanRight->setWhatsThis("Move the right measure to the right by 1"
@@ -756,7 +756,7 @@ namespace Isis {
       }
       catch (IException &e) {
         IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
-        QString message = fullError.toString();
+        QString message = QString::fromStdString(fullError.toString());
         QMessageBox::information((QWidget *)parent(), "Error", message);
         p_rightChip->Load(*p_rightCube);
         p_geomIt = false;
@@ -943,7 +943,7 @@ namespace Isis {
     // if the auto registration factory has not been initialized, do it here
     if (p_autoRegFact == NULL) {
       try {
-        Pvl pvl(p_templateFileName);
+        Pvl pvl(p_templateFileName.toStdString());
         p_autoRegFact = AutoRegFactory::Create(pvl);
       }
       catch (IException &e) {
@@ -952,7 +952,7 @@ namespace Isis {
                             "Cannot create AutoRegFactory. As a result, "
                             "sub-pixel registration will not work.",
                             _FILEINFO_);
-        QString message = fullError.toString();
+        QString message = QString::fromStdString(fullError.toString());
         QMessageBox::information((QWidget *)parent(), "Error", message);
         return;
       }
@@ -991,9 +991,9 @@ namespace Isis {
       }
     }
     catch (IException &e) {
-      QString msg = "Cannot register this point, unable to Load chips.\n";
+      std::string msg = "Cannot register this point, unable to Load chips.\n";
       msg += e.toString();
-      QMessageBox::information((QWidget *)parent(), "Error", msg);
+      QMessageBox::information((QWidget *)parent(), "Error", QString::fromStdString(msg));
       return;
     }
 
@@ -1050,9 +1050,9 @@ namespace Isis {
       }
     }
     catch (IException &e) {
-      QString msg = "Cannot register this point.\n";
+      std::string msg = "Cannot register this point.\n";
       msg += e.toString();
-      QMessageBox::information((QWidget *)parent(), "Error", msg);
+      QMessageBox::information((QWidget *)parent(), "Error", QString::fromStdString(msg));
       return;
     }
 
@@ -1146,7 +1146,7 @@ namespace Isis {
         // need to handle exception that SetLogData throws if our data is invalid -
         // unhandled exceptions thrown in Qt signal and slot connections produce undefined behavior
         catch (IException &e) {
-          QString message = e.toString();
+          QString message = QString::fromStdString(e.toString());
           QMessageBox::critical((QWidget *)parent(), "Error", message);
           return;
         }
@@ -1233,7 +1233,7 @@ namespace Isis {
       }
       catch (IException &e) {
         IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
-        QString message = fullError.toString();
+        QString message = QString::fromStdString(fullError.toString());
         QMessageBox::information((QWidget *)parent(), "Error", message);
         p_geomIt = false;
         p_nogeom->setChecked(true);
@@ -1260,7 +1260,7 @@ namespace Isis {
 //    }
 //    catch (IException &e) {
 //      IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
-//      QString message = fullError.toString();
+//      QString message = QString::fromStdString(fullError.toString());
 //      QMessageBox::information((QWidget *)parent(), "Error", message);
 //      p_geomIt = false;
 //      p_nogeom->setChecked(true);
@@ -1344,7 +1344,7 @@ namespace Isis {
     }
     catch (IException &e) {
       IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
-      QString message = fullError.toString();
+      QString message = QString::fromStdString(fullError.toString());
       QMessageBox::information((QWidget *)parent(), "Error", message);
       p_geomIt = false;
       p_nogeom->setChecked(true);
@@ -1513,7 +1513,7 @@ namespace Isis {
       p_templateFileName = fn;
 
       // Create PVL object with this file
-      Pvl pvl(fn);
+      Pvl pvl(fn.toStdString());
 
       // try to register file
       reg = AutoRegFactory::Create(pvl);
@@ -1535,10 +1535,10 @@ namespace Isis {
       p_templateFileName = temp;
       IException fullError(e, IException::Io,
           "Cannot create AutoRegFactory for " +
-          fn +
+          fn.toStdString() +
           ".  As a result, current template file will remain set to " +
-          p_templateFileName, _FILEINFO_);
-      QString message = fullError.toString();
+          p_templateFileName.toStdString(), _FILEINFO_);
+      QString message = QString::fromStdString(fullError.toString());
       QMessageBox::information((QWidget *)parent(), "Error", message);
       return false;
     }
@@ -1598,10 +1598,10 @@ namespace Isis {
 
     //  Save chips - pattern, search and fit
     QString baseFile = p_pointId.replace(" ", "_") + "_" +
-                           toString((int)(p_leftMeasure ->GetSample())) + "_" +
-                           toString((int)(p_leftMeasure ->GetLine()))   + "_" +
-                           toString((int)(p_rightMeasure->GetSample())) + "_" +
-                           toString((int)(p_rightMeasure->GetLine()))   + "_";
+                           QString::number((int)(p_leftMeasure ->GetSample())) + "_" +
+                           QString::number((int)(p_leftMeasure ->GetLine()))   + "_" +
+                           QString::number((int)(p_rightMeasure->GetSample())) + "_" +
+                           QString::number((int)(p_rightMeasure->GetLine()))   + "_";
     QString fname = baseFile + "Search.cub";
     QString command = "$ISISROOT/bin/qview \'" + fname + "\'";
     p_autoRegFact->RegistrationSearchChip()->Write(fname);

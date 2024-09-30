@@ -32,7 +32,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/autoseed.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/autoseed.xml").expanded());
 
 TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
   Pvl *log = NULL;
@@ -51,12 +51,12 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
 
   Pvl autoseedDef;
   autoseedDef.addObject(autoseedObject);
-  autoseedDef.write(defFile);
+  autoseedDef.write(defFile.toStdString());
 
   QVector<QString> autoseedArgs = {"fromlist="+cubeListFile,
                                     "onet="+outnet,
                                     "deffile="+defFile,
-                                    "overlaplist="+threeImageOverlapFile->original(),
+                                    "overlaplist="+QString::fromStdString(threeImageOverlapFile->original()),
                                     "networkid=1",
                                     "pointid=??",
                                     "description=autoseed test network"};
@@ -85,15 +85,15 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
 
   Pvl autoseedDef;
   autoseedDef.addObject(autoseedObject);
-  autoseedDef.write(defFile);
+  autoseedDef.write(defFile.toStdString());
 
   cubeList->removeLast();
-  cubeList->write(cubeListFile);
+  cubeList->write(cubeListFile.toStdString());
 
   QVector<QString> autoseedArgs = {"fromlist="+cubeListFile,
                                     "onet="+outnet1,
                                     "deffile="+defFile,
-                                    "overlaplist="+twoImageOverlapFile->original(),
+                                    "overlaplist="+QString::fromStdString(twoImageOverlapFile->original()),
                                     "networkid=1",
                                     "pointid=??",
                                     "description=autoseed test network"};
@@ -103,13 +103,13 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
   ControlNet onet(outnet1);
   ASSERT_EQ(onet.GetNumPoints(), 18);
 
-  cubeList->append(cube3->fileName());
-  cubeList->write(cubeListFile);
+  cubeList->append(cube3->fileName().toStdString());
+  cubeList->write(cubeListFile.toStdString());
   SerialNumberList serialNumList(cubeListFile);
 
   autoseedArgs.removeAt(0);
   autoseedArgs.replace(1, "onet="+outnet2);
-  autoseedArgs.replace(3, "overlaplist="+threeImageOverlapFile->original());
+  autoseedArgs.replace(3, "overlaplist="+QString::fromStdString(threeImageOverlapFile->original()));
   autoseedUi = UserInterface(APP_XML, autoseedArgs);
   autoseed(autoseedUi, serialNumList, &onet, log);
   onet = ControlNet(outnet2);
@@ -124,7 +124,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
   QVector<QString> autoseedArgs = {"fromlist="+cubeListFile,
                                     "onet="+outnet,
                                     "deffile="+defFile,
-                                    "overlaplist="+threeImageOverlapFile->original(),
+                                    "overlaplist="+QString::fromStdString(threeImageOverlapFile->original()),
                                     "networkid=1",
                                     "pointid=???",
                                     "description=autoseed test network"};
@@ -144,7 +144,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
 
   Pvl autoseedDef;
   autoseedDef.addObject(autoseedObject);
-  autoseedDef.write(defFile);
+  autoseedDef.write(defFile.toStdString());
 
   autoseed(autoseedUi, log);
   ControlNet onet(outnet);
@@ -156,7 +156,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").deleteKeyword("MaxDN");
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").addKeyword(PvlKeyword("MinEmission", "18.0"));
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").addKeyword(PvlKeyword("MaxEmission", "75.0"));
-  autoseedDef.write(defFile);
+  autoseedDef.write(defFile.toStdString());
 
   autoseed(autoseedUi, log);
   onet = ControlNet(outnet);
@@ -167,7 +167,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").deleteKeyword("MinEmission");
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").deleteKeyword("MaxEmission");
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").addKeyword(PvlKeyword("PixelsFromEdge", "20.0"));
-  autoseedDef.write(defFile);
+  autoseedDef.write(defFile.toStdString());
 
   autoseed(autoseedUi, log);
   onet = ControlNet(outnet);
@@ -178,7 +178,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").deleteKeyword("PixelsFromEdge");
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").addKeyword(PvlKeyword("MinIncidence", "35.0"));
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").addKeyword(PvlKeyword("MaxIncidence", "65.0"));
-  autoseedDef.write(defFile);
+  autoseedDef.write(defFile.toStdString());
 
   autoseed(autoseedUi, log);
   onet = ControlNet(outnet);
@@ -190,7 +190,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").deleteKeyword("MaxIncidence");
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").addKeyword(PvlKeyword("MinResolution", "255.0"));
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").addKeyword(PvlKeyword("MaxResolution", "259.0"));
-  autoseedDef.write(defFile);
+  autoseedDef.write(defFile.toStdString());
 
   autoseed(autoseedUi, log);
   onet = ControlNet(outnet);

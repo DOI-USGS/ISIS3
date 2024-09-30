@@ -141,19 +141,20 @@ namespace Isis {
       QStringList* stateToSave = new QStringList();
 
       if (!fileNames.isEmpty()) {
-        foreach (FileName fileName, fileNames) {
+        for (const QString &str : fileNames) {
+          FileName fileName(str.toStdString());
           if (fileName.extension() == "lis") {
-            TextFile listFile(fileName.expanded());
-            QString path = fileName.path();
+            TextFile listFile(QString::fromStdString(fileName.expanded()));
+            QString path = QString::fromStdString(fileName.path());
             QString lineOfListFile;
 
             while (listFile.GetLine(lineOfListFile)) {
-              FileName relFileName(path + "/" + lineOfListFile);
+              FileName relFileName(path.toStdString() + "/" + lineOfListFile.toStdString());
               if (relFileName.fileExists() ) {
                 stateToSave->append(path + "/" + lineOfListFile);
               }
               else {
-                FileName absFileName(lineOfListFile);
+                FileName absFileName(lineOfListFile.toStdString());
                 if ( absFileName.fileExists() && lineOfListFile.startsWith("/") ) {
                   stateToSave->append(lineOfListFile);
                 }
@@ -165,7 +166,7 @@ namespace Isis {
             }
           }
           else {
-            stateToSave->append(fileName.original());
+            stateToSave->append(QString::fromStdString(fileName.original()));
           }
         }
 
@@ -392,24 +393,23 @@ namespace Isis {
     // to import images.
     if (*m_numErrors < 20) {
       try {
-        QString destination = QFileInfo(m_destinationFolder, original.name())
-                                .absoluteFilePath();
+        QString destination = QFileInfo(m_destinationFolder, QString::fromStdString(original.name())).absoluteFilePath();
         Cube *input = new Cube(original, "r");
 
         if (m_copyDnData) {
-          Cube *copiedCube = input->copy(destination, CubeAttributeOutput());
+          Cube *copiedCube = input->copy(destination.toStdString(), CubeAttributeOutput());
           delete input;
           input = copiedCube;
         }
 
-        FileName externalLabelFile(destination);
+        FileName externalLabelFile(destination.toStdString());
         externalLabelFile = externalLabelFile.setExtension("ecub");
 
         Cube *projectImage = input->copy(externalLabelFile, CubeAttributeOutput("+External"));
 
         if (m_copyDnData) {
           // Make sure the external label has a fully relative path to the DN data
-          projectImage->relocateDnData(FileName(destination).name());
+          projectImage->relocateDnData(FileName(destination.toStdString()).name());
         }
 
         //  Set new ecub to readOnly.  When closing cube, the labels were being re-written because
@@ -453,8 +453,7 @@ namespace Isis {
 
     if (*m_numErrors >= 20) {
       result.append(
-          IException(IException::Unknown,
-                     tr("Aborted import images due to a high number of errors"),
+          IException(IException::Unknown,"Aborted import images due to a high number of errors",
                      _FILEINFO_));
     }
     return result;
@@ -509,9 +508,15 @@ namespace Isis {
           }
         }
 
+        std::vector<std::string> stdStringList;
+        stdStringList.reserve(confirmedImagesFileNames.size());
+        for (const QString &qstr : confirmedImagesFileNames) {
+          stdStringList.push_back(qstr.toStdString());
+        }
+
         OriginalFileToProjectCubeFunctor functor(thread(), folder, copyDnData);
         // Start concurrently copying the images to import.
-        QFuture<Cube *> future = QtConcurrent::mapped(confirmedImagesFileNames, functor);
+        QFuture<Cube *> future = QtConcurrent::mapped(stdStringList, functor);
 
         // The new internal data will store the copied files as well as their associated unique id's.
         QStringList newInternalData;
@@ -534,10 +539,10 @@ namespace Isis {
             // Confirm that the target body and the gui camera do not exist before creating and 
             // and adding them for each image. Since a target may be covered by many cameras and a 
             // camera may cover many targets, have to get tricky with the checking.
-            QString instrumentId = cube->label()->findGroup("Instrument", 
-                              PvlObject::FindOptions::Traverse).findKeyword("InstrumentId")[0];
-            QString targetName = cube->label()->findGroup("Instrument", 
-                              PvlObject::FindOptions::Traverse).findKeyword("TargetName")[0];
+            QString instrumentId = QString::fromStdString(cube->label()->findGroup("Instrument", 
+                              PvlObject::FindOptions::Traverse).findKeyword("InstrumentId")[0]);
+            QString targetName = QString::fromStdString(cube->label()->findGroup("Instrument", 
+                              PvlObject::FindOptions::Traverse).findKeyword("TargetName")[0]);
             if (!project()->hasTarget(targetName)) {
               Camera *camera = cube->camera();
               Target *target = camera->target();
@@ -586,7 +591,7 @@ namespace Isis {
         // See Qt's QThreadPool::reserveThread().
         QThreadPool::globalInstance()->reserveThread();
 
-        m_warning = functor.errors().toString();
+        m_warning = QString::fromStdString(functor.errors().toString());
 
         // Recall that m_newImages has thread affinity with a thread in the global thread pool.
         // Move it to the GUI-thread because these threads in the pool do not run in an event loop,

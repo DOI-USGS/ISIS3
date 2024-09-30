@@ -1,5 +1,6 @@
 #include "cam2map.h"
 
+#include "Application.h"
 #include "Camera.h"
 #include "CubeAttribute.h"
 #include "IException.h"
@@ -30,7 +31,7 @@ namespace Isis {
 
     // Get the map projection file provided by the user
     Pvl userMap;
-    userMap.read(ui.GetFileName("MAP"));
+    userMap.read(ui.GetFileName("MAP").toStdString());
     PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
     cam2map(&icube, userMap, userGrp, ui, log);
@@ -52,7 +53,7 @@ namespace Isis {
 
     // Make sure it is not the sky
     if (incam->target()->isSky()) {
-      QString msg = "The image [" + ui.GetCubeName("FROM") +
+      std::string msg = "The image [" + ui.GetCubeName("FROM").toStdString() +
                     "] is targeting the sky, use skymap instead.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -65,10 +66,10 @@ namespace Isis {
     // Make the target info match the user mapfile
     double minlat, maxlat, minlon, maxlon;
     incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
-    camGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
-    camGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
-    camGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
-    camGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
+    camGrp.addKeyword(PvlKeyword("MinimumLatitude", Isis::toString(minlat)), Pvl::Replace);
+    camGrp.addKeyword(PvlKeyword("MaximumLatitude", Isis::toString(maxlat)), Pvl::Replace);
+    camGrp.addKeyword(PvlKeyword("MinimumLongitude", Isis::toString(minlon)), Pvl::Replace);
+    camGrp.addKeyword(PvlKeyword("MaximumLongitude", Isis::toString(maxlon)), Pvl::Replace);
 
 
     // We want to delete the keywords we just added if the user wants the range
@@ -83,10 +84,10 @@ namespace Isis {
 
     // Make sure the target name of the input cube and map file match.
     if (userGrp.hasKeyword("TargetName") && !icube->group("Instrument").findKeyword("TargetName").isNull()) {
-      if (!PvlKeyword::stringEqual(incam->target()->name(), userGrp.findKeyword("TargetName")[0])) {
-        QString msg = "The TargetName: [" + incam->target()->name() + "] of the input cube: [" + icube->fileName() +
+      if (!PvlKeyword::stringEqual(incam->target()->name().toStdString(), userGrp.findKeyword("TargetName")[0])) {
+        std::string msg = "The TargetName: [" + incam->target()->name().toStdString() + "] of the input cube: [" + icube->fileName().toStdString() +
                       "] does not match the TargetName: [" + userGrp.findKeyword("TargetName")[0] + "] of the map file: [" +
-                      ui.GetFileName("MAP") + "].";
+                      ui.GetFileName("MAP").toStdString() + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -118,22 +119,22 @@ namespace Isis {
       // If the user decided to enter a ground range then override
       if ( ui.WasEntered("MINLON") ) {
         userGrp.addKeyword(PvlKeyword("MinimumLongitude",
-                                      toString(ui.GetDouble("MINLON"))), Pvl::Replace);
+                                      Isis::toString(ui.GetDouble("MINLON"))), Pvl::Replace);
       }
 
       if ( ui.WasEntered("MAXLON") ) {
         userGrp.addKeyword(PvlKeyword("MaximumLongitude",
-                                      toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
+                                      Isis::toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
       }
 
       if ( ui.WasEntered("MINLAT") ) {
         userGrp.addKeyword(PvlKeyword("MinimumLatitude",
-                                      toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
+                                      Isis::toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
       }
 
       if ( ui.WasEntered("MAXLAT") ) {
         userGrp.addKeyword(PvlKeyword("MaximumLatitude",
-                                      toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
+                                      Isis::toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
       }
 
       // If they want the res. from the mapfile, delete it from the camera so
@@ -163,7 +164,7 @@ namespace Isis {
       if (ui.WasEntered("PIXRES")) {
         if (ui.GetString("PIXRES") == "MPP") {
           userGrp.addKeyword(PvlKeyword("PixelResolution",
-                                        toString(ui.GetDouble("RESOLUTION"))),
+                                        Isis::toString(ui.GetDouble("RESOLUTION"))),
                             Pvl::Replace);
           if (userGrp.hasKeyword("Scale")) {
             userGrp.deleteKeyword("Scale");
@@ -171,7 +172,7 @@ namespace Isis {
         }
         else if (ui.GetString("PIXRES") == "PPD") {
           userGrp.addKeyword(PvlKeyword("Scale",
-                                        toString(ui.GetDouble("RESOLUTION"))),
+                                        Isis::toString(ui.GetDouble("RESOLUTION"))),
                             Pvl::Replace);
           if (userGrp.hasKeyword("PixelResolution")) {
             userGrp.deleteKeyword("PixelResolution");
@@ -204,21 +205,21 @@ namespace Isis {
             double minlat, maxlat, minlon, maxlon;
             incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
             if (!ui.WasEntered("MINLAT")) {
-              userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
+              userGrp.addKeyword(PvlKeyword("MinimumLatitude", Isis::toString(minlat)), Pvl::Replace);
             }
             if (!ui.WasEntered("MAXLAT")) {
-              userGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
+              userGrp.addKeyword(PvlKeyword("MaximumLatitude", Isis::toString(maxlat)), Pvl::Replace);
             }
             if (!ui.WasEntered("MINLON")) {
-              userGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
+              userGrp.addKeyword(PvlKeyword("MinimumLongitude", Isis::toString(minlon)), Pvl::Replace);
             }
             if (!ui.WasEntered("MAXLON")) {
-              userGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
+              userGrp.addKeyword(PvlKeyword("MaximumLongitude", Isis::toString(maxlon)), Pvl::Replace);
             }
           }
 
           else if (ui.GetString("LONSEAM") == "ERROR") {
-            QString msg = "The image [" + ui.GetCubeName("FROM") + "] crosses the " +
+            std::string msg = "The image [" + ui.GetCubeName("FROM").toStdString() + "] crosses the " +
                           "longitude seam";
             throw IException(IException::User, msg, _FILEINFO_);
           }
@@ -293,14 +294,14 @@ namespace Isis {
     // Create an alpha cube group for the output cube
     if (!ocube->hasGroup("AlphaCube")) {
       PvlGroup alpha("AlphaCube");
-      alpha += PvlKeyword("AlphaSamples", toString(icube->sampleCount()));
-      alpha += PvlKeyword("AlphaLines", toString(icube->lineCount()));
-      alpha += PvlKeyword("AlphaStartingSample", toString(0.5));
-      alpha += PvlKeyword("AlphaStartingLine", toString(0.5));
-      alpha += PvlKeyword("AlphaEndingSample", toString(icube->sampleCount() + 0.5));
-      alpha += PvlKeyword("AlphaEndingLine", toString(icube->lineCount() + 0.5));
-      alpha += PvlKeyword("BetaSamples", toString(icube->sampleCount()));
-      alpha += PvlKeyword("BetaLines", toString(icube->lineCount()));
+      alpha += PvlKeyword("AlphaSamples", Isis::toString(icube->sampleCount()));
+      alpha += PvlKeyword("AlphaLines", Isis::toString(icube->lineCount()));
+      alpha += PvlKeyword("AlphaStartingSample", Isis::toString(0.5));
+      alpha += PvlKeyword("AlphaStartingLine", Isis::toString(0.5));
+      alpha += PvlKeyword("AlphaEndingSample", Isis::toString(icube->sampleCount() + 0.5));
+      alpha += PvlKeyword("AlphaEndingLine", Isis::toString(icube->lineCount() + 0.5));
+      alpha += PvlKeyword("BetaSamples", Isis::toString(icube->sampleCount()));
+      alpha += PvlKeyword("BetaLines", Isis::toString(icube->lineCount()));
       ocube->putGroup(alpha);
     }
 
@@ -403,7 +404,7 @@ namespace Isis {
         startLine -= offset;
       }
 
-      if (((QString)instGrp["Framelets"]).toUpper() == "EVEN") {
+      if ((QString::fromStdString(instGrp["Framelets"])).toUpper() == "EVEN") {
         startLine += frameSize;
       }
 
@@ -432,9 +433,7 @@ namespace Isis {
     p.EndProcess();
 
     // add mapping to print.prt
-    if(log) {
-      log->addLogGroup(cleanMapping);
-    }
+    Application::Log(cleanMapping);
 
     // Cleanup
     delete outmap;

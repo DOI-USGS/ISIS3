@@ -45,7 +45,7 @@ void IsisMain ()
   ProcessImportPds p;
   UserInterface &ui = Application::GetUserInterface();
 
-  FileName inFile = ui.GetFileName("FROM");
+  FileName inFile = ui.GetFileName("FROM").toStdString();
 
   Pvl pdsLabel;
   try {
@@ -53,7 +53,7 @@ void IsisMain ()
   }
   catch (IException &e) {
     // Try to fix the PVL before reading it in
-    QByteArray pvlData = pvlFix(inFile.expanded());
+    QByteArray pvlData = pvlFix(QString::fromStdString(inFile.expanded()));
     QTextStream pvlTextStream(&pvlData);
     istringstream pvlStream(pvlTextStream.readAll().toStdString());
 
@@ -61,13 +61,13 @@ void IsisMain ()
       pvlStream >> pdsLabel;
     }
     catch(IException &e) {
-      QString msg = "Input file [" + inFile.expanded() +
+      std::string msg = "Input file [" + inFile.expanded() +
                  "] is not a valid PVL file.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }
 
-  p.SetPdsFile(pdsLabel, inFile.expanded());
+  p.SetPdsFile(pdsLabel, QString::fromStdString(inFile.expanded()));
   p.SetOrganization(Isis::ProcessImport::BIP);
 
   // Processing level 2 = uncalibrated
@@ -89,12 +89,12 @@ void IsisMain ()
 
   try {
     // ROSETTA:CHANNEL_ID will be IR or VIS
-    instid = (QString) pdsLabel.findKeyword("INSTRUMENT_ID");
-    missid = (QString) pdsLabel.findKeyword("MISSION_ID");
-    channelid = (QString) pdsLabel.findKeyword("ROSETTA:CHANNEL_ID");
+    instid = QString::fromStdString(pdsLabel.findKeyword("INSTRUMENT_ID"));
+    missid = QString::fromStdString(pdsLabel.findKeyword("MISSION_ID"));
+    channelid = QString::fromStdString(pdsLabel.findKeyword("ROSETTA:CHANNEL_ID"));
   }
   catch (IException &e) {
-    QString msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
+    std::string msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
                  inFile.expanded() + "]";
     throw IException(e, IException::Io,msg, _FILEINFO_);
   }
@@ -104,7 +104,7 @@ void IsisMain ()
   channelid = channelid.simplified().trimmed();
 
   if (missid != "ROSETTA" && instid != "VIRTIS") {
-    QString msg = "Input file [" + inFile.expanded() + "] does not appear to be a " +
+    std::string msg = "Input file [" + inFile.expanded() + "] does not appear to be a " +
                  "DAWN Visual and InfraRed Mapping Spectrometer (VIR) EDR or RDR file.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -125,7 +125,7 @@ void IsisMain ()
   p.StartProcess();
 
   // Get the directory where the Rosetta translation tables are.
-  QString transDir = "$ISISROOT/appdata/translations/";
+  std::string transDir = "$ISISROOT/appdata/translations/";
 
   if (procLevel == 2) {
 
@@ -133,11 +133,11 @@ void IsisMain ()
     QList<VirtisHK> hk;
 
     FileName hkTranslationFile = transDir + "RosettaVirtisMHousekeeping.def";
-    QFile hkFile(hkTranslationFile.toString());
+    QFile hkFile(QString::fromStdString(hkTranslationFile.toString()));
 
     if(!hkFile.open(QIODevice::ReadOnly)) {
-      QString msg = "Unable to open Virtis Housekeeping information file [" +
-                   hkFile.fileName() + "]";
+      std::string msg = "Unable to open Virtis Housekeeping information file [" +
+                   hkFile.fileName().toStdString() + "]";
       throw IException(IException::Io,msg, _FILEINFO_);
     }
 
@@ -371,7 +371,7 @@ void IsisMain ()
 
       // Calculate the SCET and add it to the table
       QString translatedScet = convertSCET(scetWords[0], scetWords[1], scetWords[2]);
-      rec[0] = translatedScet;
+      rec[0] = translatedScet.toStdString();
       table += rec;
 
       // Save off first and last scet values.
@@ -390,12 +390,12 @@ void IsisMain ()
 
   // Translate the Archive group
   FileName transFile = transDir + "RosettaVirtisArchive.trn";
-  PvlToPvlTranslationManager archiveXlater (pdsLabel, transFile.expanded());
+  PvlToPvlTranslationManager archiveXlater (pdsLabel, QString::fromStdString(transFile.expanded()));
   archiveXlater.Auto(outLabel);
 
   // Translate the Instrument group
   transFile = transDir + "RosettaVirtisInstruments.trn";
-  PvlToPvlTranslationManager instrumentXlater (pdsLabel, transFile.expanded());
+  PvlToPvlTranslationManager instrumentXlater (pdsLabel, QString::fromStdString(transFile.expanded()));
   instrumentXlater.Auto(outLabel);
 
   if (procLevel == 3) {
@@ -405,14 +405,14 @@ void IsisMain ()
     // Pass the Start/Stop SCET values to naif to get the utc time.
     QString sclk = "$ISISDATA/rosetta/kernels/sclk/ROS_??????_STEP.TSC";
     QString lsk  = "$ISISDATA/base/kernels/lsk/naif????.tls";
-    FileName sclkName(sclk);
-    FileName lskName(lsk);
+    FileName sclkName(sclk.toStdString());
+    FileName lskName(lsk.toStdString());
 
     sclkName = sclkName.highestVersion();
     lskName = lskName.highestVersion();
 
-    furnsh_c(lskName.expanded().toLatin1().data());
-    furnsh_c(sclkName.expanded().toLatin1().data());
+    furnsh_c(lskName.expanded().c_str());
+    furnsh_c(sclkName.expanded().c_str());
 
     SpiceDouble etStart;
     SpiceDouble etEnd;
@@ -420,7 +420,7 @@ void IsisMain ()
     scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
 
     PvlKeyword &frameParam = inst["FrameParameter"];
-    double exposureTime = toDouble(frameParam[0]);
+    double exposureTime = Isis::toDouble(frameParam[0]);
 
     QString startTime = iTime(etStart-exposureTime).UTC();
     QString stopTime = iTime(etEnd-exposureTime).UTC();
@@ -430,8 +430,8 @@ void IsisMain ()
     sce2s_c( (SpiceInt) -226, etStart-exposureTime, (SpiceInt) 50, startSclkString);
     sce2s_c( (SpiceInt) -226, etEnd-exposureTime, (SpiceInt) 50, endSclkString);
 
-    inst.findKeyword("StartTime").setValue(startTime);
-    inst.findKeyword("StopTime").setValue(stopTime);
+    inst.findKeyword("StartTime").setValue(startTime.toStdString());
+    inst.findKeyword("StopTime").setValue(stopTime.toStdString());
 
     inst.findKeyword("SpacecraftClockStartCount").setValue(startSclkString);
     inst.findKeyword("SpacecraftClockStopCount").setValue(endSclkString);
@@ -451,16 +451,16 @@ void IsisMain ()
   // VIRTIS_H is also supported.
   PvlGroup kerns("Kernels");
   if (channelid == "VIRTIS_M_IR") {
-    kerns += PvlKeyword("NaifFrameCode", toString(-226213));
+    kerns += PvlKeyword("NaifFrameCode", Isis::toString(-226213));
   }
   else if (channelid == "VIRTIS_M_VIS") {
-    kerns += PvlKeyword("NaifFrameCode", toString(-226211));
+    kerns += PvlKeyword("NaifFrameCode", Isis::toString(-226211));
   }
   else if (channelid == "VIRTIS_H") {
-    kerns += PvlKeyword("NaifFrameCode", toString(-226220));
+    kerns += PvlKeyword("NaifFrameCode", Isis::toString(-226220));
   }
   else {
-    QString msg = "Input file [" + inFile.expanded() + "] has an invalid " +
+    std::string msg = "Input file [" + inFile.expanded() + "] has an invalid " +
                  "InstrumentId.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -471,7 +471,7 @@ void IsisMain ()
     const PvlKeyword &frameKey = outcube->group("Instrument").findKeyword("FrameParameter");
     // The third frame key is always the number of scans in between dark current scans.
     // So, we need to add one to that in order to get the number of lines to next dark current.
-    int darkRate = toInt(frameKey[3]) + 1;
+    int darkRate = Isis::toInt(frameKey[3]) + 1;
     LineManager darkLineManager(*outcube);
 
     for (int band = 1; band <= outcube->bandCount(); band++) {

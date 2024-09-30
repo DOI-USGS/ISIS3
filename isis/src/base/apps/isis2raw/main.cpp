@@ -89,10 +89,10 @@ void IsisMain() {
   }
 
   // Set the Output Storage Format
-  if(Isis::IString(ui.GetString("STORAGEORDER")).DownCase()  == "bil") {
+  if(Isis::IString(ui.GetString("STORAGEORDER").toStdString()).DownCase()  == "bil") {
     p.setFormat(ProcessExport::BIL);
   }
-  else if(Isis::IString(ui.GetString("STORAGEORDER")).DownCase()  == "bip") {
+  else if(Isis::IString(ui.GetString("STORAGEORDER").toStdString()).DownCase()  == "bip") {
     p.setFormat(ProcessExport::BIP);
   }
 
@@ -105,13 +105,13 @@ void IsisMain() {
   // Records what output values were used, then sends it to the print.prt file
   // as well as the terminal.
   PvlGroup results("DNs Used");
-  results += PvlKeyword("Null", toString(p.OutputNull()));
-  results += PvlKeyword("LRS", toString(p.OutputLrs()));
-  results += PvlKeyword("LIS", toString(p.OutputLis()));
-  results += PvlKeyword("HIS", toString(p.OutputHis()));
-  results += PvlKeyword("HRS", toString(p.OutputHrs()));
-  results += PvlKeyword("ValidMin", toString(min));
-  results += PvlKeyword("ValidMax", toString(max));
+  results += PvlKeyword("Null", Isis::toString(p.OutputNull()));
+  results += PvlKeyword("LRS", Isis::toString(p.OutputLrs()));
+  results += PvlKeyword("LIS", Isis::toString(p.OutputLis()));
+  results += PvlKeyword("HIS", Isis::toString(p.OutputHis()));
+  results += PvlKeyword("HRS", Isis::toString(p.OutputHrs()));
+  results += PvlKeyword("ValidMin", Isis::toString(min));
+  results += PvlKeyword("ValidMax", Isis::toString(max));
   Application::Log(results);
 
   return;
@@ -123,8 +123,8 @@ void checkRange(UserInterface &ui, double &min, double &max) {
 
   if(ui.WasEntered("OMIN")) {
     if(ui.GetDouble("OMIN") < min) {
-      QString message = "OMIN [" + toString(min) + "] is too small for the provided BITTYPE [";
-      message += ui.GetString("BITTYPE") + "]";
+      std::string message = "OMIN [" + toString(min) + "] is too small for the provided BITTYPE [";
+      message += ui.GetString("BITTYPE").toStdString() + "]";
       throw IException(IException::User, message, _FILEINFO_);
     }
     else {
@@ -142,8 +142,8 @@ void checkRange(UserInterface &ui, double &min, double &max) {
 
   if(ui.WasEntered("OMAX")) {
     if(ui.GetDouble("OMAX") > max) {
-      QString message = "OMAX [" + toString(max) + "] is too large for the provided BITTYPE [";
-      message += ui.GetString("BITTYPE") + "]";
+      std::string message = "OMAX [" + toString(max) + "] is too large for the provided BITTYPE [";
+      message += ui.GetString("BITTYPE").toStdString() + "]";
       throw IException(IException::User, message, _FILEINFO_);
     }
     else {

@@ -44,13 +44,14 @@ namespace Isis {
 
     // Make sure the user has a .Isis and .Isis/history directory
     try {
-      FileName setup = "$HOME/.Isis/history";
-      // cannot completely test this if in unit test
-      if ( !setup.fileExists() ) {
-        setup.dir().mkpath(".");
+      std::filesystem::path homePath = std::getenv("HOME");
+      std::filesystem::path historyPath = homePath / ".Isis" / "history";
+      if (!std::filesystem::exists(historyPath)) {
+        std::filesystem::create_directories(historyPath);
       }
     }
-    catch (IException &) {
+    catch (const std::filesystem::filesystem_error& e) {
+      std::cerr << "Error: " << e.what() << '\n';
     }
 
     // Parse the user input
@@ -81,13 +82,14 @@ namespace Isis {
 
     // Make sure the user has a .Isis and .Isis/history directory
     try {
-      FileName setup = "$HOME/.Isis/history";
-      // cannot completely test this if in unit test
-      if ( !setup.fileExists() ) {
-        setup.dir().mkpath(".");
+      std::filesystem::path homePath = std::getenv("HOME");
+      std::filesystem::path historyPath = homePath / ".Isis" / "history";
+      if (!std::filesystem::exists(historyPath)) {
+        std::filesystem::create_directories(historyPath);
       }
     }
-    catch (IException &) {
+    catch (const std::filesystem::filesystem_error& e) {
+      std::cerr << "Error: " << e.what() << '\n';
     }
 
     // Parse the user input
@@ -150,7 +152,7 @@ namespace Isis {
     }
 
     //Load the new parameters into the gui
-    cout << p_progName << " ";
+    cout << p_progName.toStdString() << " ";
 
     for (unsigned int currArgument = 1; currArgument < p_cmdline.size(); currArgument ++) {
       QString paramName;
@@ -164,8 +166,8 @@ namespace Isis {
           continue;
 
         for (unsigned int value = 0; value < paramValue.size(); value++) {
-          IString thisValue = paramValue[value];
-          QString token = thisValue.Token("$").ToQt();
+          IString thisValue = paramValue[value].toStdString();
+          QString token = QString::fromStdString(thisValue.Token("$"));
 
           QString newValue;
 
@@ -175,12 +177,12 @@ namespace Isis {
               int j = toInt( thisValue.substr(0, 1).c_str() ) - 1;
               newValue += p_batchList[i][j];
               thisValue.replace(0, 1, "");
-              token = thisValue.Token("$").ToQt();
+              token = QString::fromStdString(thisValue.Token("$"));
             }
             catch (IException &e) {
               // Let the variable be parsed by the application
               newValue += "$";
-              token = thisValue.Token("$").ToQt();
+              token = QString::fromStdString(thisValue.Token("$"));
             }
           }
 
@@ -197,10 +199,10 @@ namespace Isis {
 
       PutAsString(paramName, paramValue);
 
-      cout << paramName;
+      cout << paramName.toStdString();
 
       if(paramValue.size() == 1) {
-        cout << "=" << paramValue[0] << " ";
+        cout << "=" << paramValue[0].toStdString() << " ";
       }
       else if (paramValue.size() > 1) {
         cout << "=(";
@@ -209,7 +211,7 @@ namespace Isis {
           if(value != 0)
             cout << ",";
 
-          cout << paramValue[value] << endl;
+          cout << paramValue[value].toStdString() << endl;
         }
 
         cout << ") ";
@@ -235,18 +237,18 @@ namespace Isis {
   void UserInterface::SetErrorList(int i) {
     if (p_errList != "") {
       std::ofstream os;
-      QString fileName( FileName(p_errList).expanded() );
+      QString fileName(QString::fromStdString(FileName(p_errList.toStdString()).expanded()));
       os.open(fileName.toLatin1().data(), std::ios::app);
 
       // did not unit test since it is assumed ofstream will be instantiated correctly
       if ( !os.good() ) {
-        QString msg = "Unable to create error list [" + p_errList
+        std::string msg = "Unable to create error list [" + p_errList.toStdString()
                       + "] Disk may be full or directory permissions not writeable";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
       for (int j = 0; j < (int) p_batchList[i].size(); j++) {
-        os << p_batchList[i][j] << " ";
+        os << p_batchList[i][j].toStdString() << " ";
       }
 
       os << endl;
@@ -268,11 +270,11 @@ namespace Isis {
       return;
 
     // Get the current history file
-    Isis::FileName histFile(grp["HistoryPath"][0] + "/" + ProgramName() + ".par");
+    Isis::FileName histFile(grp["HistoryPath"][0] + "/" + ProgramName().toStdString() + ".par");
 
     // If a save file is specified, override the default file path
     if (p_saveFile != "")
-      histFile = p_saveFile;
+      histFile = p_saveFile.toStdString();
 
     // Get the current command line
     Isis::Pvl cmdLine;
@@ -285,7 +287,7 @@ namespace Isis {
     // overwriten with the new entry.
     try {
       if ( histFile.fileExists() ) {
-        hist.read( histFile.expanded() );
+        hist.read(histFile.expanded());
       }
     }
     catch (IException &) {
@@ -295,13 +297,13 @@ namespace Isis {
     hist.addGroup( cmdLine.findGroup("UserParameters") );
 
     // See if we have exceeded history length
-    while( hist.groups() > toInt(grp["HistoryLength"][0]) ) {
+    while( hist.groups() > Isis::toInt(grp["HistoryLength"][0]) ) {
       hist.deleteGroup("UserParameters");
     }
 
     // Write it
     try {
-      hist.write( histFile.expanded() );
+      hist.write(histFile.expanded());
     }
     catch (IException &) {
     }
@@ -327,28 +329,28 @@ namespace Isis {
       temp.Open(file);
     }
     catch (IException &e) {
-      QString msg = "The batchlist file [" + file + "] could not be opened";
+      std::string msg = "The batchlist file [" + file.toStdString() + "] could not be opened";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     p_batchList.resize( temp.LineCount() );
 
     for (int i = 0; i < temp.LineCount(); i++) {
-      QString t;
-      temp.GetLine(t);
+      IString t;
+      temp.GetLine(toBool(t));
 
       // Convert tabs to spaces but leave tabs inside quotes alone
-      t = IString(t).Replace("\t", " ", true).ToQt();
+      t = t.Replace("\t", " ", true);
 
-      t = IString(t).Compress().ToQt().trimmed();
+      t = QString::fromStdString(t.Compress()).trimmed().toStdString();
       // Allow " ," " , " or ", " as a valid single seperator
-      t = IString(t).Replace(" ,", ",", true).ToQt();
-      t = IString(t).Replace(", ", ",", true).ToQt();
+      t = t.Replace(" ,", ",", true);
+      t = t.Replace(", ", ",", true);
       // Convert all spaces to "," the use "," as delimiter
-      t = IString(t).Replace(" ", ",", true).ToQt();
+      t = t.Replace(" ", ",", true);
       int j = 0;
 
-      QStringList tokens = t.split(",");
+      QStringList tokens = QString::fromStdString(t).split(",");
 
       foreach (QString token, tokens) {
         // removes quotes from tokens. NOTE: also removes escaped quotes.
@@ -362,13 +364,13 @@ namespace Isis {
       if (i == 0)
         continue;
       if ( p_batchList[i - 1].size() != p_batchList[i].size() ) {
-        QString msg = "The number of columns must be constant in batchlist";
+        std::string msg = "The number of columns must be constant in batchlist";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     // The batchlist cannot be empty
     if (p_batchList.size() < 1) {
-      QString msg = "The list file [" + file + "] does not contain any data";
+      std::string msg = "The list file [" + file.toStdString() + "] does not contain any data";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -425,7 +427,7 @@ namespace Isis {
     // The program will be interactive if it has no arguments or
     // if it has the name unitTest
     p_progName = argv[0];
-    Isis::FileName file(p_progName);
+    Isis::FileName file(p_progName.toStdString());
     // cannot completely test in a unit test since unitTest will always evaluate to true
     if ( (argc == 1) && (file.name() != "unitTest") ) {
       p_interactive = true;
@@ -477,8 +479,8 @@ namespace Isis {
         // where if(paramname == -last ) to continue } was originally
 
         if (paramValue.size() > 1) {
-          QString msg = "Invalid value for reserve parameter ["
-                       + paramName + "]";
+          std::string msg = "Invalid value for reserve parameter ["
+                       + paramName.toStdString() + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
@@ -524,20 +526,20 @@ namespace Isis {
     if(usedDashLast) {
       Pvl temp;
       CommandLine(temp);
-      cout << BuildNewCommandLineFromPvl(temp) << endl;
+      cout << BuildNewCommandLineFromPvl(temp).toStdString() << endl;
     }
 
     // Can't use the batchlist with the gui, save, last or restore option
     if ( BatchListSize() != 0 && (p_interactive || usedDashLast || p_saveFile != ""
                                   || usedDashRestore) ) {
-      QString msg = "-BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, ";
+      std::string msg = "-BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, ";
       msg += "or -LAST";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Must use batchlist if using errorlist or onerror=continue
     if ( (BatchListSize() == 0) && (!p_abortOnError || p_errList != "") ) {
-      QString msg = "-ERRLIST and -ONERROR=continue cannot be used without ";
+      std::string msg = "-ERRLIST and -ONERROR=continue cannot be used without ";
       msg += " the -BATCHLIST option";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -550,9 +552,9 @@ namespace Isis {
 
     for(int i = 0; i < numKeywords; i++){
       PvlKeyword key = group[i];
-      returnVal += key.name();
+      returnVal += QString::fromStdString(key.name());
       returnVal += "=";
-      returnVal += QString(key);
+      returnVal += QString::fromStdString(key);
       returnVal += " ";
     }
     return returnVal;
@@ -569,22 +571,22 @@ namespace Isis {
    * @throws Isis::IException::User - Parameter history file does not exist
    */
   void UserInterface::loadHistory(const QString file) {
-    Isis::FileName hist(file);
+    Isis::FileName hist(file.toStdString());
     if ( hist.fileExists() ) {
       try {
-        Isis::Pvl lab( hist.expanded() );
+        Isis::Pvl lab(hist.expanded());
 
         int g = lab.groups() - 1;
         if (g >= 0 && lab.group(g).isNamed("UserParameters") ) {
           Isis::PvlGroup &up = lab.group(g);
           QString commandline(p_progName + " ");
           for (int k = 0; k < up.keywords(); k++) {
-            QString keyword = up[k].name();
+            QString keyword = QString::fromStdString(up[k].name());
 
             vector<QString> values;
 
             for (int i = 0; i < up[k].size(); i++) {
-              values.push_back(up[k][i]);
+              values.push_back(QString::fromStdString(up[k][i]));
             }
 
             const IsisParameterData *paramData = ReturnParam(keyword);
@@ -616,14 +618,14 @@ namespace Isis {
         }
 
         for (int o = lab.objects() - 1; o >= 0; o--) {
-          if ( lab.object(o).isNamed( ProgramName() ) ) {
+          if ( lab.object(o).isNamed( ProgramName().toStdString() ) ) {
             Isis::PvlObject &obj = lab.object(o);
             for (int g = obj.groups() - 1; g >= 0; g--) {
               Isis::PvlGroup &up = obj.group(g);
               if ( up.isNamed("UserParameters") ) {
                 for (int k = 0; k < up.keywords(); k++) {
-                  QString keyword = up[k].name();
-                  QString value = up[k][0];
+                  QString keyword = QString::fromStdString(up[k].name());
+                  QString value = QString::fromStdString(up[k][0]);
                   PutAsString(keyword, value);
                 }
               }
@@ -632,18 +634,18 @@ namespace Isis {
           }
         }
 
-        /*QString msg = "[" + hist.expanded() +
+        /*std::string msg = "[" + hist.expanded() +
          "] does not contain any parameters to restore";
          throw Isis::iException::Message( Isis::iException::User, msg, _FILEINFO_ );*/
       }
       catch (...) {
-        QString msg = "The history file [" + file + "] is for a different application or corrupt, "\
+        std::string msg = "The history file [" + file.toStdString() + "] is for a different application or corrupt, "\
                       "please fix or delete this file";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
-      QString msg = "The history file [" + file + "] does not exist";
+      std::string msg = "The history file [" + file.toStdString() + "] does not exist";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -670,7 +672,7 @@ namespace Isis {
                                      const QString value) {
     // check to see if the program is a unitTest
     bool unitTest = false;
-      if (FileName(p_progName).name() == "unitTest") {
+      if (FileName(p_progName.toStdString()).name() == "unitTest") {
         unitTest = true;
       }
     Preference &p = Preference::Preferences();
@@ -688,11 +690,11 @@ namespace Isis {
       QString histFile;
       // need to handle for unit test since -LAST is preprocessed
       if (unitTest) {
-        histFile = "./" + FileName(p_progName).name() + ".par";
+        histFile = QString::fromStdString("./" + FileName(p_progName.toStdString()).name() + ".par");
       }
       else {
         PvlGroup &grp = p.findGroup("UserInterface", Isis::Pvl::Traverse);
-        histFile = grp["HistoryPath"][0] + "/" + FileName(p_progName).name() + ".par";
+        histFile = QString::fromStdString(grp["HistoryPath"][0] + "/" + FileName(p_progName.toStdString()).name() + ".par");
       }
 
       loadHistory(histFile);
@@ -702,9 +704,9 @@ namespace Isis {
     }
     else if(name == "-WEBHELP") {
       Isis::PvlGroup &pref = Isis::Preference::Preferences().findGroup("UserInterface");
-      QString command = pref["GuiHelpBrowser"];
+      QString command = QString::fromStdString(pref["GuiHelpBrowser"]);
       command += " $ISISROOT/docs/Application/presentation/Tabbed/";
-      command += FileName(p_progName).name() + "/" + FileName(p_progName).name() + ".html";
+      command += QString::fromStdString(FileName(p_progName.toStdString()).name() + "/" + FileName(p_progName.toStdString()).name() + ".html");
       // cannot test else in unit test - don't want to open webhelp
       if (unitTest) {
         throw IException(IException::Programmer,
@@ -732,16 +734,16 @@ namespace Isis {
         for (int k = 0; k < NumGroups(); k++) {
           for (int j = 0; j < NumParams(k); j++) {
             if (ParamListSize(k, j) == 0) {
-              params += PvlKeyword( ParamName(k, j), ParamDefault(k, j) );
+              params += PvlKeyword( ParamName(k, j).toStdString(), ParamDefault(k, j).toStdString() );
             }
             else {
-              PvlKeyword key( ParamName(k, j) );
+              PvlKeyword key( ParamName(k, j).toStdString() );
               QString def = ParamDefault(k, j);
               for (int l = 0; l < ParamListSize(k, j); l++) {
                 if (ParamListValue(k, j, l) == def)
-                  key.addValue("*" + def);
+                  key.addValue("*" + def.toStdString());
                 else
-                  key.addValue( ParamListValue(k, j, l) );
+                  key.addValue( ParamListValue(k, j, l).toStdString() );
               }
               params += key;
             }
@@ -756,105 +758,105 @@ namespace Isis {
         for (int k = 0; k < NumGroups(); k++) {
           for (int j = 0; j < NumParams(k); j++) {
             if (ParamName(k, j) == key) {
-              param += PvlKeyword("ParameterName", key);
-              param += PvlKeyword( "Brief", ParamBrief(k, j) );
-              param += PvlKeyword( "Type", ParamType(k, j) );
+              param += PvlKeyword("ParameterName", key.toStdString());
+              param += PvlKeyword( "Brief", ParamBrief(k, j).toStdString() );
+              param += PvlKeyword( "Type", ParamType(k, j).toStdString() );
               if (PixelType(k, j) != "") {
-                param += PvlKeyword( "PixelType", PixelType(k, j) );
+                param += PvlKeyword( "PixelType", PixelType(k, j).toStdString() );
               }
               if (ParamInternalDefault(k, j) != "") {
-                param += PvlKeyword( "InternalDefault", ParamInternalDefault(k, j) );
+                param += PvlKeyword( "InternalDefault", ParamInternalDefault(k, j).toStdString() );
               }
               else {
-                param += PvlKeyword( "Default", ParamDefault(k, j) );
+                param += PvlKeyword( "Default", ParamDefault(k, j).toStdString() );
               }
               if (ParamMinimum(k, j) != "") {
                 if (ParamMinimumInclusive(k, j).toUpper() == "YES") {
                   param += PvlKeyword( "GreaterThanOrEqual",
-                                       ParamMinimum(k, j) );
+                                       ParamMinimum(k, j).toStdString() );
                 }
                 else {
                   param += PvlKeyword( "GreaterThan",
-                                       ParamMinimum(k, j) );
+                                       ParamMinimum(k, j).toStdString() );
                 }
               }
               if (ParamMaximum(k, j) != "") {
                 if (ParamMaximumInclusive(k, j).toUpper() == "YES") {
                   param += PvlKeyword( "LessThanOrEqual",
-                                       ParamMaximum(k, j) );
+                                       ParamMaximum(k, j).toStdString() );
                 }
                 else {
                   param += PvlKeyword( "LessThan",
-                                       ParamMaximum(k, j) );
+                                       ParamMaximum(k, j).toStdString() );
                 }
               }
               if (ParamLessThanSize(k, j) > 0) {
                 PvlKeyword key("LessThan");
                 for(int l = 0; l < ParamLessThanSize(k, j); l++) {
-                  key.addValue( ParamLessThan(k, j, l) );
+                  key.addValue( ParamLessThan(k, j, l).toStdString() );
                 }
                 param += key;
               }
               if (ParamLessThanOrEqualSize(k, j) > 0) {
                 PvlKeyword key("LessThanOrEqual");
                 for (int l = 0; l < ParamLessThanOrEqualSize(k, j); l++) {
-                  key.addValue( ParamLessThanOrEqual(k, j, l) );
+                  key.addValue( ParamLessThanOrEqual(k, j, l).toStdString() );
                 }
                 param += key;
               }
               if (ParamNotEqualSize(k, j) > 0) {
                 PvlKeyword key("NotEqual");
                 for (int l = 0; l < ParamNotEqualSize(k, j); l++) {
-                  key.addValue( ParamNotEqual(k, j, l) );
+                  key.addValue( ParamNotEqual(k, j, l).toStdString() );
                 }
                 param += key;
               }
               if (ParamGreaterThanSize(k, j) > 0) {
                 PvlKeyword key("GreaterThan");
                 for (int l = 0; l < ParamGreaterThanSize(k, j); l++) {
-                  key.addValue( ParamGreaterThan(k, j, l) );
+                  key.addValue( ParamGreaterThan(k, j, l).toStdString() );
                 }
                 param += key;
               }
               if (ParamGreaterThanOrEqualSize(k, j) > 0) {
                 PvlKeyword key("GreaterThanOrEqual");
                 for(int l = 0; l < ParamGreaterThanOrEqualSize(k, j); l++) {
-                  key.addValue( ParamGreaterThanOrEqual(k, j, l) );
+                  key.addValue( ParamGreaterThanOrEqual(k, j, l).toStdString() );
                 }
                 param += key;
               }
               if (ParamIncludeSize(k, j) > 0) {
                 PvlKeyword key("Inclusions");
                 for (int l = 0; l < ParamIncludeSize(k, j); l++) {
-                  key.addValue( ParamInclude(k, j, l) );
+                  key.addValue( ParamInclude(k, j, l).toStdString() );
                 }
                 param += key;
               }
               if (ParamExcludeSize(k, j) > 0) {
                 PvlKeyword key("Exclusions");
                 for (int l = 0; l < ParamExcludeSize(k, j); l++) {
-                  key.addValue( ParamExclude(k, j, l) );
+                  key.addValue( ParamExclude(k, j, l).toStdString() );
                 }
                 param += key;
               }
               if (ParamOdd(k, j) != "") {
-                param += PvlKeyword( "Odd", ParamOdd(k, j) );
+                param += PvlKeyword( "Odd", ParamOdd(k, j).toStdString() );
               }
               if (ParamListSize(k, j) != 0) {
                 for (int l = 0; l < ParamListSize(k, j); l++) {
-                  PvlGroup grp( ParamListValue(k, j, l) );
-                  grp += PvlKeyword( "Brief", ParamListBrief(k, j, l) );
+                  PvlGroup grp( ParamListValue(k, j, l).toStdString() );
+                  grp += PvlKeyword( "Brief", ParamListBrief(k, j, l).toStdString() );
                   if (ParamListIncludeSize(k, j, l) != 0) {
                     PvlKeyword include("Inclusions");
                     for (int m = 0; m < ParamListIncludeSize(k, j, l); m++) {
-                      include.addValue( ParamListInclude(k, j, l, m) );
+                      include.addValue( ParamListInclude(k, j, l, m).toStdString() );
                     }
                     grp += include;
                   }
                   if (ParamListExcludeSize(k, j, l) != 0) {
                     PvlKeyword exclude("Exclusions");
                     for (int m = 0; m < ParamListExcludeSize(k, j, l); m++) {
-                      exclude.addValue( ParamListExclude(k, j, l, m) );
+                      exclude.addValue( ParamListExclude(k, j, l, m).toStdString() );
                     }
                     grp += exclude;
                   }
@@ -878,17 +880,17 @@ namespace Isis {
       }
     }
     else if (name == "-PID") {
-      p_parentId = toInt(value);
+      p_parentId = value.toInt();
     }
     else if (name == "-ERRLIST") {
       p_errList = value;
 
       if (value == "") {
-        QString msg = "-ERRLIST expects a file name";
+        std::string msg = "-ERRLIST expects a file name";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      if ( FileName(p_errList).fileExists() ) {
+      if ( FileName(p_errList.toStdString()).fileExists() ) {
         QFile::remove(p_errList);
       }
     }
@@ -902,7 +904,7 @@ namespace Isis {
       }
 
       else {
-        QString msg = "[" + value
+        std::string msg = "[" + value.toStdString()
                       + "] is an invalid value for -ONERROR, options are ABORT or CONTINUE";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -916,7 +918,7 @@ namespace Isis {
       }
     }
     else if (name == "-PREFERENCE") {
-      p.Load(value);
+      p.Load(value.toStdString());
       p_preference = value;
     }
     else if (name == "-LOG") {
@@ -925,7 +927,7 @@ namespace Isis {
       }
       else {
         p.findGroup("SessionLog")["FileOutput"].setValue("On");
-        p.findGroup("SessionLog")["FileName"].setValue(value);
+        p.findGroup("SessionLog")["FileName"].setValue(value.toStdString());
       }
     }
     // this only evaluates to true in unit test since this is last else if
@@ -935,7 +937,7 @@ namespace Isis {
 
     // Can't have a parent id and the gui
     if (p_parentId > 0 && p_interactive) {
-      QString msg = "-GUI and -PID are incompatible arguments";
+      std::string msg = "-GUI and -PID are incompatible arguments";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
@@ -995,7 +997,7 @@ namespace Isis {
     // We found "=" at the beginning - did we find "appname param =value" ?
     else {
       // parameters can not start with "="
-      QString msg = "Unknown parameter [" + QString(p_cmdline[curPos])
+      std::string msg = "Unknown parameter [" + std::string(p_cmdline[curPos])
                    + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -1098,7 +1100,7 @@ namespace Isis {
     for (int strPos = 0; strPos < arrayString.size(); strPos++) {
       if (strPos == 0) {
         if (arrayString[strPos] != '(') {
-          QString msg = "Invalid array format [" + arrayString + "]";
+          std::string msg = "Invalid array format [" + arrayString.toStdString() + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
@@ -1113,14 +1115,14 @@ namespace Isis {
       }
       // ends in a backslash??
       else if (arrayString[strPos] == '\\') {
-        QString msg = "Invalid array format [" + arrayString + "]";
+        std::string msg = "Invalid array format [" + arrayString.toStdString() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
       // not in quoted part of QString
       if (!inDoubleQuotes && !inSingleQuotes) {
         if (arrayClosed) {
-          QString msg = "Invalid array format [" + arrayString + "]";
+          std::string msg = "Invalid array format [" + arrayString.toStdString() + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
@@ -1150,12 +1152,11 @@ namespace Isis {
         else if (nextElementStarted && arrayString[strPos] == ' ') {
           // Make sure there's something before the next ',' or ')'
           bool onlyWhite = true;
-          int closingPos = strPos + 1;
 
           for( int pos = strPos;
                onlyWhite && arrayString[pos] != ',' && arrayString[pos] != ')' &&
                pos < arrayString.size(); pos++) {
-            closingPos++;
+
             onlyWhite &= (arrayString[pos] == ' ');
           }
 
@@ -1187,7 +1188,7 @@ namespace Isis {
     }
 
     if (!arrayClosed || currElement != "") {
-      QString msg = "Invalid array format [" + arrayString + "]";
+      std::string msg = "Invalid array format [" + arrayString.toStdString() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -1223,8 +1224,8 @@ namespace Isis {
       // If our option starts with the parameter name so far, this is it
       if ( reservedParams[option].startsWith(unresolvedParam) ) {
         if (matchOption >= 0) {
-          QString msg = "Ambiguous Reserve Parameter ["
-          + unresolvedParam + "]. Please clarify.";
+          std::string msg = "Ambiguous Reserve Parameter ["
+          + unresolvedParam.toStdString() + "]. Please clarify.";
           throw IException(IException::User, msg, _FILEINFO_);
         }
         // set match to current iteration in loop
@@ -1235,8 +1236,8 @@ namespace Isis {
     if (handleNoMatches) {
       // handle no matches
       if (matchOption < 0) {
-        QString msg = "Invalid Reserve Parameter Option ["
-        + unresolvedParam + "]. Choices are ";
+        std::string msg = "Invalid Reserve Parameter Option ["
+        + unresolvedParam.toStdString() + "]. Choices are ";
 
         QString msgOptions;
         for (int option = 0; option < (int)reservedParams.size(); option++) {
@@ -1258,7 +1259,7 @@ namespace Isis {
 
         // remove the terminating ',' from msgOptions
         msgOptions.chop(1);
-        msg += " [" + msgOptions + "]";
+        msg += " [" + msgOptions.toStdString() + "]";
 
         throw IException(IException::User, msg, _FILEINFO_);
       }

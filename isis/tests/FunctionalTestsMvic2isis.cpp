@@ -15,7 +15,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/mvic2isis.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/mvic2isis.xml").expanded());
 
 TEST_F(TempTestingFiles, Mvic2IsisTestTdiMode) {
   Pvl appLog;
@@ -34,9 +34,9 @@ TEST_F(TempTestingFiles, Mvic2IsisTestTdiMode) {
    mvic2isis(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest MVIC image: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest MVIC image: " <<  e.toString().c_str() << std::endl;
   }
-  std::unique_ptr<Cube> cube (new Cube(cubeFileName));
+  std::unique_ptr<Cube> cube (new Cube(cubeFileName.toStdString()));
   Pvl *isisLabel = cube->label();
 
   // Dimensions Group
@@ -52,29 +52,29 @@ TEST_F(TempTestingFiles, Mvic2IsisTestTdiMode) {
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["SpacecraftName"][0].toStdString(), "NEW HORIZONS");
-  ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "MVIC_TDI");
-  ASSERT_EQ(inst["TargetName"][0].toStdString(), "Jupiter");
-  ASSERT_EQ(inst["MidObservationTime"][0].toStdString(), "2007-02-28T06:00:23.454");
-  ASSERT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "1/0034948318:06600");
+  ASSERT_EQ(inst["SpacecraftName"][0], "NEW HORIZONS");
+  ASSERT_EQ(inst["InstrumentId"][0], "MVIC_TDI");
+  ASSERT_EQ(inst["TargetName"][0], "Jupiter");
+  ASSERT_EQ(inst["MidObservationTime"][0], "2007-02-28T06:00:23.454");
+  ASSERT_EQ(inst["SpacecraftClockStartCount"][0], "1/0034948318:06600");
   ASSERT_DOUBLE_EQ(double(inst["ExposureDuration"]), 0.59168);
-  ASSERT_EQ(inst["Detector"][0].toStdString(), "CH4");
-  ASSERT_EQ(inst["HwSide"][0].toStdString(), "1");
-  ASSERT_EQ(inst["ScanType"][0].toStdString(), "TDI");
-  ASSERT_EQ(inst["InstrumentMode"][0].toStdString(), "2");
+  ASSERT_EQ(inst["Detector"][0], "CH4");
+  ASSERT_EQ(inst["HwSide"][0], "1");
+  ASSERT_EQ(inst["ScanType"][0], "TDI");
+  ASSERT_EQ(inst["InstrumentMode"][0], "2");
   ASSERT_EQ(double(inst["RalphExposureDuration"]), 0.59168);
   ASSERT_EQ(double(inst["TdiRate"]), 54.0833);
-  ASSERT_EQ(inst["StartTime"][0].toStdString(), "2007-02-28T06:00:00.520");
+  ASSERT_EQ(inst["StartTime"][0], "2007-02-28T06:00:00.520");
 
   // Archive Group
   PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
-  ASSERT_EQ(archive["HighSpeedCompressionMode"][0].toStdString(), "LOSSLESS");
-  ASSERT_EQ(archive["ObservationCompletionStatus"][0].toStdString(), "COMPLETE");
-  ASSERT_EQ(archive["SequenceDescription"][0].toStdString(), "MVIC terminator flat");
+  ASSERT_EQ(archive["HighSpeedCompressionMode"][0], "LOSSLESS");
+  ASSERT_EQ(archive["ObservationCompletionStatus"][0], "COMPLETE");
+  ASSERT_EQ(archive["SequenceDescription"][0], "MVIC terminator flat");
 
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "CH4");
+  ASSERT_EQ(bandbin["Name"][0], "CH4");
   ASSERT_EQ(double(bandbin["Center"]), 895);
   ASSERT_EQ(double(bandbin["Width"]), 40);
   ASSERT_EQ(double(bandbin["OriginalBand"]), 1);
@@ -82,7 +82,7 @@ TEST_F(TempTestingFiles, Mvic2IsisTestTdiMode) {
   // Kernels Group
   PvlGroup &kernel = isisLabel->findGroup("Kernels", Pvl::Traverse);
   ASSERT_EQ(int(kernel["NaifFrameCode"]), -98908);
-  ASSERT_EQ(kernel["NaifFrameCode"].unit().toStdString(), "SPICE ID");
+  ASSERT_EQ(kernel["NaifFrameCode"].unit(), "SPICE ID");
 
   // RadiometricCalibration Group
   PvlGroup &radiometricCalibration = isisLabel->findGroup("RadiometricCalibration", Pvl::Traverse);
@@ -118,21 +118,21 @@ TEST_F(TempTestingFiles, Mvic2IsisTestTdiMode) {
   try {
     cube->open(undistortedCubeName);
   } catch(IException &e) {
-    FAIL() << "Unable to open undistorted output MVIC cube: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to open undistorted output MVIC cube: " <<  e.toString().c_str() << std::endl;
   }
 
   cube->close();
   try {
     cube->open(errorCubeName);
   } catch(IException &e) {
-    FAIL() << "Unable to open error output MVIC cube: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to open error output MVIC cube: " <<  e.toString().c_str() << std::endl;
   }
 
   cube->close();
   try {
     cube->open(qualityCubeName);
   } catch(IException &e) {
-    FAIL() << "Unable to open quality output MVIC cube: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to open quality output MVIC cube: " <<  e.toString().c_str() << std::endl;
   }
 }
 
@@ -146,19 +146,19 @@ TEST_F(TempTestingFiles, Mvic2IsisTestPanMode) {
    mvic2isis(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest MVIC image: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest MVIC image: " <<  e.toString().c_str() << std::endl;
   }
-  std::unique_ptr<Cube> cube (new Cube(cubeFileName));
+  std::unique_ptr<Cube> cube (new Cube(cubeFileName.toStdString()));
   Pvl *isisLabel = cube->label();
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["Detector"][0].toStdString(), "PAN1");
-  ASSERT_EQ(inst["InstrumentMode"][0].toStdString(), "3");
+  ASSERT_EQ(inst["Detector"][0], "PAN1");
+  ASSERT_EQ(inst["InstrumentMode"][0], "3");
 
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "CLEAR");
+  ASSERT_EQ(bandbin["Name"][0], "CLEAR");
   ASSERT_EQ(double(bandbin["Center"]), 680);
   ASSERT_EQ(double(bandbin["Width"]), 560);
   ASSERT_EQ(double(bandbin["OriginalBand"]), 1);
@@ -166,7 +166,7 @@ TEST_F(TempTestingFiles, Mvic2IsisTestPanMode) {
   // Kernels Group
   PvlGroup &kernel = isisLabel->findGroup("Kernels", Pvl::Traverse);
   ASSERT_EQ(int(kernel["NaifFrameCode"]), -98905);
-  ASSERT_EQ(kernel["NaifFrameCode"].unit().toStdString(), "SPICE ID");
+  ASSERT_EQ(kernel["NaifFrameCode"].unit(), "SPICE ID");
 
   // RadiometricCalibration Group
   PvlGroup &radiometricCalibration = isisLabel->findGroup("RadiometricCalibration", Pvl::Traverse);
@@ -205,19 +205,19 @@ TEST_F(TempTestingFiles, Mvic2IsisTestFrameMode) {
    mvic2isis(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest MVIC image: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest MVIC image: " <<  e.toString().c_str() << std::endl;
   }
-  std::unique_ptr<Cube> cube (new Cube(cubeFileName));
+  std::unique_ptr<Cube> cube (new Cube(cubeFileName.toStdString()));
   Pvl *isisLabel = cube->label();
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["Detector"][0].toStdString(), "FRAME");
-  ASSERT_EQ(inst["InstrumentMode"][0].toStdString(), "1");
+  ASSERT_EQ(inst["Detector"][0], "FRAME");
+  ASSERT_EQ(inst["InstrumentMode"][0], "1");
 
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "CLEAR");
+  ASSERT_EQ(bandbin["Name"][0], "CLEAR");
   ASSERT_EQ(double(bandbin["Center"]), 680);
   ASSERT_EQ(double(bandbin["Width"]), 560);
   ASSERT_EQ(double(bandbin["OriginalBand"]), 1);
@@ -225,7 +225,7 @@ TEST_F(TempTestingFiles, Mvic2IsisTestFrameMode) {
   // Kernels Group
   PvlGroup &kernel = isisLabel->findGroup("Kernels", Pvl::Traverse);
   ASSERT_EQ(int(kernel["NaifFrameCode"]), -98903);
-  ASSERT_EQ(kernel["NaifFrameCode"].unit().toStdString(), "SPICE ID");
+  ASSERT_EQ(kernel["NaifFrameCode"].unit(), "SPICE ID");
 
   // RadiometricCalibration Group
   PvlGroup &radiometricCalibration = isisLabel->findGroup("RadiometricCalibration", Pvl::Traverse);
@@ -244,7 +244,7 @@ TEST_F(TempTestingFiles, Mvic2IsisTestFrameMode) {
   ASSERT_EQ(double(radiometricCalibration["PholusPivotWavelength"]), 7.01E-5);
   ASSERT_EQ(double(radiometricCalibration["PlutoPivotWavelength"]), 6.64E-5);
   ASSERT_EQ(double(radiometricCalibration["CharonPivotWavelength"]), 6.51E-5);
-  ASSERT_EQ(radiometricCalibration["FlatFile"][0].toStdString(), "mfr_flat_20070130.fits");
+  ASSERT_EQ(radiometricCalibration["FlatFile"][0], "mfr_flat_20070130.fits");
 
   std::unique_ptr<Histogram> hist (cube->histogram());
 
@@ -265,19 +265,19 @@ TEST_F(TempTestingFiles, Mvic2IsisTestUncalibrated) {
    mvic2isis(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest MVIC image: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest MVIC image: " <<  e.toString().c_str() << std::endl;
   }
-  std::unique_ptr<Cube> cube (new Cube(cubeFileName));
+  std::unique_ptr<Cube> cube (new Cube(cubeFileName.toStdString()));
   Pvl *isisLabel = cube->label();
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["Detector"][0].toStdString(), "BLUE");
-  ASSERT_EQ(inst["InstrumentMode"][0].toStdString(), "2");
+  ASSERT_EQ(inst["Detector"][0], "BLUE");
+  ASSERT_EQ(inst["InstrumentMode"][0], "2");
 
   // BandBin Group
   PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  ASSERT_EQ(bandbin["Name"][0].toStdString(), "BLUE");
+  ASSERT_EQ(bandbin["Name"][0], "BLUE");
   ASSERT_EQ(double(bandbin["Center"]), 475);
   ASSERT_EQ(double(bandbin["Width"]), 150);
   ASSERT_EQ(double(bandbin["OriginalBand"]), 1);
@@ -285,7 +285,7 @@ TEST_F(TempTestingFiles, Mvic2IsisTestUncalibrated) {
   // Kernels Group
   PvlGroup &kernel = isisLabel->findGroup("Kernels", Pvl::Traverse);
   ASSERT_EQ(int(kernel["NaifFrameCode"]), -98907);
-  ASSERT_EQ(kernel["NaifFrameCode"].unit().toStdString(), "SPICE ID");
+  ASSERT_EQ(kernel["NaifFrameCode"].unit(), "SPICE ID");
 
   std::unique_ptr<Histogram> hist (cube->histogram());
 

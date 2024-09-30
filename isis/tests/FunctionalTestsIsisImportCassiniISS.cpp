@@ -1,7 +1,6 @@
 #include <iostream>
 #include <time.h>
 
-#include <QRegExp>
 #include <QString>
 #include <nlohmann/json.hpp>
 
@@ -20,7 +19,7 @@
 using namespace Isis;
 using json = nlohmann::json;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/isisimport.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/isisimport.xml").expanded());
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportCassiniIssNac) {
   Pvl appLog;
@@ -131,13 +130,13 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportCassiniIssNac) {
     isisimport(options);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest file: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest file: " <<  e.toString().c_str() << std::endl;
   }
 
   Pvl truthLabel;
   PvlInput >> truthLabel;
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
   Pvl *outLabel = outCube.label();
 
   PvlGroup truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);
@@ -283,13 +282,13 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportCassiniIssWac) {
     isisimport(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest file: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest file: " <<  e.toString().c_str() << std::endl;
   }
 
   Pvl truthLabel;
   PvlInput >> truthLabel;
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
   Pvl *outLabel = outCube.label();
 
   PvlGroup truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);
@@ -430,9 +429,9 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportCassiniIssCustomMax) {
 
   QString inputLabel = "data/ciss2isis/W1472855646_5.cropped.lbl";
   QString updatedPvlLabel = tempDir.path() + "/W1472855646_5.cropped.lbl";
-  Pvl inputPvl(inputLabel);
+  Pvl inputPvl(inputLabel.toStdString());
   inputPvl["VALID_MAXIMUM"][1] = "70";
-  inputPvl.write(updatedPvlLabel);
+  inputPvl.write(updatedPvlLabel.toStdString());
   QFile::copy("data/ciss2isis/W1472855646_5.cropped.img", tempDir.path() + "/W1472855646_5.cropped.img");
 
   QVector<QString> args = { "from=" + updatedPvlLabel,
@@ -442,13 +441,13 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportCassiniIssCustomMax) {
     isisimport(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest file: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest file: " <<  e.toString().c_str() << std::endl;
   }
 
   Pvl truthLabel;
   PvlInput >> truthLabel;
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubeFileName.toStdString());
   Pvl *outLabel = outCube.label();
 
   PvlGroup truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);

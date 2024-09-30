@@ -106,20 +106,20 @@ namespace Isis {
   
     QString fmtfile = translateKeywordArgs("PdsFormatFile", getGlobals(m_parameters, globals));
     if ( isDebug() ) { 
-      cout << "PdsTableCreator::PdsFormatFile = " << fmtfile << "\n"; 
+      cout << "PdsTableCreator::PdsFormatFile = " << fmtfile.toStdString() << "\n"; 
     }
-    Pvl fmtpvl(fmtfile);
+    Pvl fmtpvl(fmtfile.toStdString());
     readColumns(fmtpvl);
   
       //  Check for argument replacement
     QString fname = translateKeywordArgs("PdsTableFile", getGlobals(m_parameters, globals));
     if ( isDebug() ) { 
-      cout << "PdsTableCreator::PdsTableFile = " << fname << "\n"; 
+      cout << "PdsTableCreator::PdsTableFile = " << fname.toStdString() << "\n"; 
     }
   
     //  Now open the filename
     ofstream os;
-    QString ofFile = FileName(fname).expanded();
+    QString ofFile = QString::fromStdString(FileName(fname.toStdString()).expanded());
     QByteArray qofFile = ofFile.toLatin1();
     if ( "append" == m_mode ) {
       os.open(qofFile.data(), ios::out | ios::app);
@@ -129,8 +129,8 @@ namespace Isis {
     }
   
     if ( !os.is_open() ) {
-      QString mess = "PdsTableCreator::Cannot open/create output file (" + 
-                     fname + ")";
+      std::string mess = "PdsTableCreator::Cannot open/create output file (" + 
+                     fname.toStdString() + ")";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
   
@@ -152,7 +152,7 @@ namespace Isis {
           row += separator + col->formattedValue(resource, m_null);
           separator = m_delimiter;
         }
-        os << row << "\n";
+        os << row.toStdString() << "\n";
         nrows++;
       }
     }
@@ -195,7 +195,7 @@ namespace Isis {
    */  
   int PdsTableCreatorStrategy::readColumns(PvlObject &pvl) {
     QString colobj = m_parameters->value("ColumnObject", "");
-    PvlObject &obj = ( colobj.isEmpty() ? pvl : pvl.findObject(colobj, PvlObject::Traverse) );
+    PvlObject &obj = ( colobj.isEmpty() ? pvl : pvl.findObject(colobj.toStdString(), PvlObject::Traverse) );
   
     PvlObject::PvlObjectIterator pvlcol = obj.beginObject();
     while ( pvlcol != obj.endObject() ) {

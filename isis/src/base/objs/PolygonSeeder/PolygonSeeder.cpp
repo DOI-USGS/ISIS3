@@ -84,7 +84,7 @@ namespace Isis {
    **/
   void PolygonSeeder::Parse(Pvl &pvl) {
 
-    QString errorSpot;
+    std::string errorSpot;
 
     try {
       // Get info from Algorithm group
@@ -97,7 +97,7 @@ namespace Isis {
 
       // Set the algorithm name
       errorSpot = "Name";
-      p_algorithmName = (QString) algo["Name"];
+      p_algorithmName = QString::fromStdString(algo["Name"]);
 
       if(invalgo.hasKeyword("Name"))
         invalgo.deleteKeyword("Name");
@@ -123,7 +123,7 @@ namespace Isis {
         invalgo.deleteKeyword("MinimumArea");
     }
     catch(IException &e) {
-      QString msg = "Improper format for PolygonSeeder PVL [";
+      std::string msg = "Improper format for PolygonSeeder PVL [";
       msg +=  pvl.fileName() + "]. Location [" + errorSpot + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -146,18 +146,18 @@ namespace Isis {
   QString PolygonSeeder::StandardTests(const geos::geom::MultiPolygon *xymp,
       const geos::geom::Envelope *xyBoundBox) {
     if(xymp->getArea() < MinimumArea()) {
-      QString msg = "Polygon did not meet the minimum area of [";
-      msg += toString(MinimumArea()) + "]";
-      return msg;
+      std::string msg = "Polygon did not meet the minimum area of [";
+      msg += Isis::toString(MinimumArea()) + "]";
+      return QString::fromStdString(msg);
     }
 
     double thickness =
       xymp->getArea() /
       pow(std::max(xyBoundBox->getWidth(), xyBoundBox->getHeight()), 2.0);
     if(thickness < MinimumThickness()) {
-      QString msg = "Polygon did not meet the minimum thickness ratio of [";
-      msg += toString(MinimumThickness()) + "]";
-      return msg;
+      std::string msg = "Polygon did not meet the minimum thickness ratio of [";
+      msg += Isis::toString(MinimumThickness()) + "]";
+      return QString::fromStdString(msg);
     }
 
     return "";
@@ -208,11 +208,11 @@ namespace Isis {
    * 
    */
   PvlGroup PolygonSeeder::PluginParameters(QString grpName) {
-    PvlGroup pluginInfo(grpName);
+    PvlGroup pluginInfo(grpName.toStdString());
 
-    PvlKeyword name("Name", p_algorithmName);
-    PvlKeyword minThickness("MinimumThickness", toString(p_minimumThickness));
-    PvlKeyword minArea("MinimumArea", toString(p_minimumArea));
+    PvlKeyword name("Name", p_algorithmName.toStdString());
+    PvlKeyword minThickness("MinimumThickness", Isis::toString(p_minimumThickness));
+    PvlKeyword minArea("MinimumArea", Isis::toString(p_minimumArea));
 
     pluginInfo.addKeyword(name);
     pluginInfo.addKeyword(minThickness);

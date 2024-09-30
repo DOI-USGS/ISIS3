@@ -16,6 +16,9 @@ find files of those names at the top level of this repository. **/
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 
+#include <QString>
+#include <QStringList>
+
 using namespace std;
 namespace Isis {
 
@@ -71,13 +74,13 @@ namespace Isis {
     // Attempt to translate every group in the translation table
     for(int i = 0; i < TranslationTable().groups(); i++) {
       PvlGroup &g = TranslationTable().group(i);
-      if(IsAuto(g.name())) {
+      if(IsAuto(QString::fromStdString(g.name()))) {
         try {
-          PvlContainer *con = CreateContainer(g.name(), outputLabel);
-          (*con) += DoTranslation(g.name());
+          PvlContainer *con = CreateContainer(QString::fromStdString(g.name()), outputLabel);
+          (*con) += DoTranslation(QString::fromStdString(g.name()));
         }
         catch(IException &e) {
-          if(!IsOptional(g.name())) {
+          if(!IsOptional(QString::fromStdString(g.name()))) {
             throw e;//??? is this needed???
           }
         }
@@ -108,7 +111,7 @@ namespace Isis {
     // Look at every pair in the output position
     for(int c = 0; c < np.size(); c += 2) {
       // If this pair is an object
-      if(np[c].toUpper() == "OBJECT") {
+      if(QString::fromStdString(np[c]).toUpper() == "OBJECT") {
         // If the object doesn't exist create it
         if(!obj->hasObject(np[c+1])) {
           obj->addObject(np[c+1]);
@@ -116,7 +119,7 @@ namespace Isis {
         obj = &(obj->findObject(np[c+1]));
       }
       // If this pair is a group
-      else if(np[c].toUpper() == "GROUP") {
+      else if(QString::fromStdString(np[c]).toUpper() == "GROUP") {
         // If the group doesn't exist create it
         if(!obj->hasGroup(np[c+1])) {
           obj->addGroup(np[c+1]);
@@ -142,7 +145,7 @@ namespace Isis {
    * @TODO output units
    */
   PvlKeyword LabelTranslationManager::DoTranslation(const QString outputName) {
-    PvlKeyword outputKeyword( outputName, Translate(outputName) );
+    PvlKeyword outputKeyword( outputName.toStdString(), Translate(outputName).toStdString() );
     return outputKeyword;
   }
 
@@ -181,7 +184,7 @@ QStringList LabelTranslationManager::parseSpecification(QString specification) c
       if (typeSplit[0].toLower() != "att" &&
           typeSplit[0].toLower() != "tag" &&
           typeSplit[0].toLower() != "new") {
-        QString msg = "Dependency type specification [" + typeSplit[0] +
+        std::string msg = "Dependency type specification [" + typeSplit[0].toStdString() +
                       "] is invalid. Valid types are [att], [tag] and [new]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -195,7 +198,7 @@ QStringList LabelTranslationManager::parseSpecification(QString specification) c
         parsedSpecification.append(nameValueSplit);
       }
       else { //nameValueSplit is an unexpected value
-        QString msg = "Malformed dependency specification [" + specification + "].";
+        std::string msg = "Malformed dependency specification [" + specification.toStdString() + "].";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
@@ -206,13 +209,13 @@ QStringList LabelTranslationManager::parseSpecification(QString specification) c
       parsedSpecification = barSplit;
     }
     else { //nameValueSplit is an unexpected value
-      QString msg = " [" + specification + "] has unexpected number of '@' or '|' delimiters";
+      std::string msg = " [" + specification.toStdString() + "] has unexpected number of '@' or '|' delimiters";
       throw IException(IException::Programmer,msg, _FILEINFO_);
     }
   }
 
   catch (IException &e) {
-    QString msg = "Malformed dependency specification [" + specification + "].";
+    std::string msg = "Malformed dependency specification [" + specification.toStdString() + "].";
     throw IException(e, IException::Programmer, msg, _FILEINFO_);
   }
 

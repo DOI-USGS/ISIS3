@@ -43,7 +43,7 @@ void IsisMain() {
   }
   catch (IException &e) {
     IString msg = "Cannot initalize UniversalGroundMap for DEM cube [" +
-                   demFile + "]";
+                   demFile.toStdString() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -58,7 +58,7 @@ void IsisMain() {
 
 
   GetLatLon newRadiiSource;
-  IString getLatLon = IString(ui.GetAsString("GETLATLON")).UpCase();
+  IString getLatLon = IString(ui.GetAsString("GETLATLON").toStdString()).UpCase();
   if (getLatLon == "ADJUSTED") {
     newRadiiSource = Adjusted;
   }
@@ -66,8 +66,8 @@ void IsisMain() {
     newRadiiSource = Apriori;
   }
   else {
-    QString msg = "The value for parameter GETLATLON [";
-    msg += ui.GetAsString("GETLATLON") + "] must be provided.";
+    std::string msg = "The value for parameter GETLATLON [";
+    msg += ui.GetAsString("GETLATLON").toStdString() + "] must be provided.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -145,13 +145,13 @@ void IsisMain() {
 
   if (numSuccesses == 0) {
     if (numConstrainedFixed == 0) {
-      QString msg = "There were no Fixed or Constrained points in this network."
+      std::string msg = "There were no Fixed or Constrained points in this network."
           "  No radii were replaced.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     else {
-      QString msg = "No valid radii can be calculated. Verify that the DEM [" +
-                       ui.GetAsString("MODEL") + "] is valid.";
+      std::string msg = "No valid radii can be calculated. Verify that the DEM [" +
+                       ui.GetAsString("MODEL").toStdString() + "] is valid.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -161,18 +161,18 @@ void IsisMain() {
   // Write results to Logs
   // Summary group is created with the counts of successes and failures
   PvlGroup summaryGroup = PvlGroup("Summary");
-  summaryGroup.addKeyword(PvlKeyword("Successes", toString(numSuccesses)));
-  summaryGroup.addKeyword(PvlKeyword("Failures", toString(numFailures)));
+  summaryGroup.addKeyword(PvlKeyword("Successes", Isis::toString(numSuccesses)));
+  summaryGroup.addKeyword(PvlKeyword("Failures", Isis::toString(numFailures)));
   summaryGroup.addKeyword(PvlKeyword("NumberFixedConstrainedPoints",
-                                      toString(numConstrainedFixed)));
-  summaryGroup.addKeyword(PvlKeyword("NumberEditLockedPoints", toString(numLocked)));
+                                      Isis::toString(numConstrainedFixed)));
+  summaryGroup.addKeyword(PvlKeyword("NumberEditLockedPoints", Isis::toString(numLocked)));
 
   bool errorlog;
   FileName errorlogFile;
   // if a filename was entered, use it to create the log
   if (ui.WasEntered("ERRORS")) {
     errorlog = true;
-    errorlogFile = ui.GetFileName("ERRORS");
+    errorlogFile = ui.GetFileName("ERRORS").toStdString();
   }
   // if no filename was entered, but there were some failures,
   // create an error log named "failures" in the current directory
@@ -198,7 +198,7 @@ void IsisMain() {
       PvlGroup failGroup = PvlGroup("Failures");
       failGroup.addComment("A point fails if we are unable to set universal "
                "ground or if the radius calculated is a special pixel value.");
-      failGroup.addKeyword(PvlKeyword("PointIDs", failedIDs));
+      failGroup.addKeyword(PvlKeyword("PointIDs", failedIDs.toStdString()));
       results.addGroup(failGroup);
     }
     results.write(errorlogFile.expanded());

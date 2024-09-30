@@ -49,12 +49,12 @@ namespace Isis {
 
     if (objectTitle == "") {
       throw IException(IException::Programmer,
-          tr("You must provide a valid objectTitle to MainWindow::settingsFileName"),
+          "You must provide a valid objectTitle to MainWindow::settingsFileName",
           _FILEINFO_);
     }
 
     QDir programSettings =
-        QDir(FileName("$HOME/.Isis/" + QCoreApplication::applicationName() + "/").path());
+        QDir(QString::fromStdString(FileName("$HOME/.Isis/" + QCoreApplication::applicationName().toStdString() + "/").path()));
     QString windowSettings = programSettings.filePath(objectTitle + ".config");
 
     return windowSettings;
@@ -101,14 +101,13 @@ namespace Isis {
     }
 
     if (objectName() == "") {
-      throw IException(IException::Programmer,
-          tr("You must set the objectName of the widget titled [%1] before "
+      throw IException(IException::Programmer,"You must set the objectName of the widget titled [" + windowTitle().toStdString() + "] before "
           "using the instance. Window state and geometry can not be saved and "
-          "restored").arg(windowTitle()), _FILEINFO_);
+          "restored", _FILEINFO_);
     }
 
     QDir programSettings =
-        QDir(FileName("$HOME/.Isis/" + QCoreApplication::applicationName() + "/").path());
+        QDir(QString::fromStdString(FileName("$HOME/.Isis/" + QCoreApplication::applicationName().toStdString() + "/").path()));
     QString windowSettings = programSettings.filePath(objectName() + ".config");
     //qDebug()<<"MainWindow::settingsFileName windowSettings = "<<windowSettings;
     return windowSettings;

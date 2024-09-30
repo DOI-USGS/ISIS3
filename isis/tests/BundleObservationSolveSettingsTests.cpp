@@ -375,22 +375,22 @@ TEST(BundleObservationSolveSettings, SaveSettings){
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     pointingOptionsAtts.namedItem("numberCoefSolved").nodeValue(),
-    toString(boss.numberCameraAngleCoefficientsSolved()));
+    QString::number(boss.numberCameraAngleCoefficientsSolved()));
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
-    pointingOptionsAtts.namedItem("degree").nodeValue(), toString(boss.ckDegree()));
+    pointingOptionsAtts.namedItem("degree").nodeValue(), QString::number(boss.ckDegree()));
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     pointingOptionsAtts.namedItem("solveDegree").nodeValue(),
-    toString(boss.ckSolveDegree()));
+    QString::number(boss.ckSolveDegree()));
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     pointingOptionsAtts.namedItem("solveTwist").nodeValue(),
-    toString(boss.solveTwist()));
+    QString::fromStdString(Isis::toString(boss.solveTwist())));
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     pointingOptionsAtts.namedItem("solveOverExisting").nodeValue(),
-    toString(boss.solvePolyOverPointing()));
+    QString::fromStdString(Isis::toString(boss.solvePolyOverPointing())));
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     pointingOptionsAtts.namedItem("interpolationType").nodeValue(), "3");
@@ -415,23 +415,23 @@ TEST(BundleObservationSolveSettings, SaveSettings){
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     positionOptionsAtts.namedItem("numberCoefSolved").nodeValue(),
-    toString(boss.numberCameraPositionCoefficientsSolved()));
+    QString::number(boss.numberCameraPositionCoefficientsSolved()));
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     positionOptionsAtts.namedItem("degree").nodeValue(),
-    toString(boss.spkDegree()));
+    QString::number(boss.spkDegree()));
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     positionOptionsAtts.namedItem("degree").nodeValue(),
-    toString(boss.spkDegree()));
+    QString::number(boss.spkDegree()));
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     positionOptionsAtts.namedItem("solveDegree").nodeValue(),
-    toString(boss.spkSolveDegree()));
+    QString::number(boss.spkSolveDegree()));
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     positionOptionsAtts.namedItem("solveOverHermiteSpline").nodeValue(),
-    toString(boss.solvePositionOverHermite()));
+    QString::fromStdString(Isis::toString(boss.solvePositionOverHermite())));
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual,
     positionOptionsAtts.namedItem("interpolationType").nodeValue(), "3");

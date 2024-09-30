@@ -136,7 +136,7 @@ namespace Isis {
    *              column.
    */  
   void PdsColumn::setBytes(const int &bytes) {
-    add("BYTES", toString(bytes));
+    add("BYTES", QString::fromStdString(toString(bytes)));
     return;
   }
   
@@ -150,7 +150,7 @@ namespace Isis {
    *         column.
    */  
   int PdsColumn::bytes() const {
-    return ( toInt(value("BYTES", "0")));
+    return value("BYTES", "0").toInt();
   }
   
   
@@ -220,7 +220,7 @@ namespace Isis {
    *              PDS column resource.
    */  
   void PdsColumn::setStartByte(const int &bytes) {
-    add("START_BYTE", toString(bytes));
+    add("START_BYTE", QString::fromStdString(toString(bytes)));
     return;
   }
   
@@ -234,7 +234,7 @@ namespace Isis {
    *         for this PDS column.
    */  
   int  PdsColumn::startByte() const {
-    return ( toInt( value("START_BYTE", "0") ) );
+    return value("START_BYTE", "0").toInt();
   }
   
   
@@ -338,28 +338,28 @@ namespace Isis {
    * @return PvlObject An object with all keywords in the map
    */  
   PvlObject PdsColumn::toPvl(const QString &object) const {
-    PvlObject column(object.toUpper());
+    PvlObject column(object.toUpper().toStdString());
     
-    column.addKeyword(PvlKeyword("COLUMN_NUMBER", value("COLUMN_NUMBER")));
-    column.addKeyword(PvlKeyword("NAME", value("NAME")));
-    column.addKeyword(PvlKeyword("DATA_TYPE", value("DATA_TYPE")));
+    column.addKeyword(PvlKeyword("COLUMN_NUMBER", value("COLUMN_NUMBER").toStdString()));
+    column.addKeyword(PvlKeyword("NAME", value("NAME").toStdString()));
+    column.addKeyword(PvlKeyword("DATA_TYPE", value("DATA_TYPE").toStdString()));
   
     // Check for optional parameters
     if ( exists("UNIT") ) {
       QString unit = value("UNIT");
       if ( unit.size() > 0 ) {
-        column.addKeyword(PvlKeyword("UNIT", value("UNIT"))); 
+        column.addKeyword(PvlKeyword("UNIT", value("UNIT").toStdString())); 
       }
     }
   
-    column.addKeyword(PvlKeyword("START_BYTE", value("START_BYTE")));
-    column.addKeyword(PvlKeyword("BYTES", value("BYTES")));
+    column.addKeyword(PvlKeyword("START_BYTE", value("START_BYTE").toStdString()));
+    column.addKeyword(PvlKeyword("BYTES", value("BYTES").toStdString()));
   
     if ( exists("FORMAT") ) {
-      column.addKeyword(PvlKeyword("FORMAT", format())); 
+      column.addKeyword(PvlKeyword("FORMAT", format().toStdString())); 
     }
   
-    column.addKeyword(PvlKeyword("DESCRIPTION", value("DESCRIPTION")));
+    column.addKeyword(PvlKeyword("DESCRIPTION", value("DESCRIPTION").toStdString()));
   
   
     return (column);
@@ -392,7 +392,7 @@ namespace Isis {
     if ( pos < 0 ) { 
       return (0); 
     }
-    return (toInt(rx.cap(2)));
+    return rx.cap(2).toInt();
   }
   
   /**
@@ -410,7 +410,7 @@ namespace Isis {
   PdsColumn *PdsColumn::promote(SharedResource &resource) {
     PdsColumn *column = dynamic_cast<PdsColumn *> (resource.data());
     if ( 0 == column ) {
-      QString mess = "Could not cast Resource [" + resource->name() +
+      std::string mess = "Could not cast Resource [" + resource->name().toStdString() +
                      "] to a PdsColumn pointer.";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }

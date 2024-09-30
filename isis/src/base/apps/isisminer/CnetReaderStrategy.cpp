@@ -116,7 +116,7 @@ namespace Isis {
 
     int nrows = pointNum;
 
-    FileName netfile(translateKeywordArgs("CnetFile", globals));
+    FileName netfile(translateKeywordArgs("CnetFile", globals).toStdString());
     ControlNetVersioner cnetReader(netfile);
     Pvl pvl(cnetReader.toPvl());
 
@@ -127,15 +127,15 @@ namespace Isis {
     for ( int p = 0 ; p < network.objects() ; p++ ) {
       PvlObject &point = network.object(p);
 
-      if ( "controlpoint" == point.name().toLower() ) {
+      if ( "controlpoint" == QString::fromStdString(point.name()).toLower() ) {
 
         PvlFlatMap netpoint(netkeys, loadkeys(point));
         for (int m = 0; m < point.groups() ; m++ ) {
           PvlGroup &measure = point.group(m);
 
-          if ( "controlmeasure" == measure.name().toLower() ) {
+          if ( "controlmeasure" == QString::fromStdString(measure.name()).toLower() ) {
             PvlFlatMap netmeasure(netpoint, loadkeys(measure));
-            QString rowId = QString::number(nrows++);
+            QString rowId = QString::fromStdString(toString(nrows++));
             SharedResource rowmeasure(new Resource(rowId, netmeasure));
 
             // Make the unique identifier (set default identity or set to specified)

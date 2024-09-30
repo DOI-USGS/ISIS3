@@ -120,16 +120,16 @@ namespace Isis {
     DBFileStatus::DBFileStatus() : m_file() { }
     DBFileStatus::DBFileStatus( const DBFileStatus::DBFileData &dbfile ) : m_file ( dbfile ) { }
     DBFileStatus::DBFileStatus( const FileName &dbfile, const QFileInfo &dbfileinfo ) :
-                                m_file(dbfile.original(), dbfile , dbfileinfo, "DBFileStatus" ) { }
+                                m_file(QString::fromStdString(dbfile.original()), dbfile, dbfileinfo, "DBFileStatus" ) { }
 
     DBFileStatus::DBFileStatus( const FileName &dbfile, const bool versionIt ) :
-                                m_file( dbfile.original(), dbfile, QFileInfo( dbfile.expanded() ), "DBFileStatus") {
+                                m_file( QString::fromStdString(dbfile.original()), dbfile, QFileInfo( QString::fromStdString(dbfile.expanded()) ), "DBFileStatus") {
       if ( versionIt ) versionize();
     }
 
     DBFileStatus::DBFileStatus( const QString &dbfile, const bool versionIt ) : m_file() {
-      FileName v_file( dbfile );
-      m_file = DBFileData( dbfile, v_file, QFileInfo( v_file.expanded() ), "DBFileStatus");
+      FileName v_file( dbfile.toStdString() );
+      m_file = DBFileData( dbfile, v_file, QFileInfo( QString::fromStdString(v_file.expanded()) ), "DBFileStatus");
       if ( versionIt ) versionize();
     }
 
@@ -141,7 +141,7 @@ namespace Isis {
       bool isversioned( false) ;
       try {
         m_file.m_key = file().highestVersion();
-        m_file.m_data.setFile( file().expanded() );
+        m_file.m_data.setFile( QString::fromStdString(file().expanded()) );
         isversioned = true;
       }
       catch (...) {
@@ -173,17 +173,17 @@ namespace Isis {
       bool isGoodToGo( doVersioning );
       try {
         if ( key.size() == 2 ) {
-          dbfile = fname = "$" + key[0] + "/" + key[1];  // In case the translation fails...
-          dbfile = prefdata[key[0]][0] + "/" + key[1];
+          dbfile = fname = "$" + QString::fromStdString(key[0]) + "/" + QString::fromStdString(key[1]);  // In case the translation fails...
+          dbfile = QString::fromStdString(prefdata[key[0]][0]) + "/" + QString::fromStdString(key[1]);
         }
         else if ( key.size() == 1 ) {
-          dbfile = fname = key[0];
+          dbfile = fname = QString::fromStdString(key[0]);
         }
         else {
           // Ill-formed string, prepare a return string
           QString bad;
           for ( int v = 0 ; v < key.size() ; v++) {
-            bad += "[" + key[v] + "]";
+            bad += "[" + QString::fromStdString(key[v]) + "]";
           }
 
           // If its an empty PvlKeyword...
@@ -209,7 +209,7 @@ namespace Isis {
       isisdata_json is_null;
 
 
-      if ( !dbfilestatus.file().toString().isEmpty() ) {
+      if ( !dbfilestatus.file().toString().empty() ) {
         js_dbfile["filespec"] = dbfilestatus.name().toStdString();
         js_dbfile["filepath"] = dbfilestatus.expanded().toStdString();
         js_dbfile["exists"]   = json_bool( dbfilestatus.exists() ).toStdString();
@@ -273,14 +273,14 @@ namespace Isis {
       // File exists, lets open it and compute the hash
       QFile v_file( expanded() );
       if ( !v_file.open( QIODevice::ReadOnly ) ) {
-        QString mess = "Could not open file " + expanded() +  " to compute hash";
+        std::string mess = "Could not open file " + expanded().toStdString() +  " to compute hash";
         throw IException( IException::User, mess, _FILEINFO_ );
       }
 
       // Compute the hash!
       QCryptographicHash q_hash( hashAlgorithm );
       if ( !q_hash.addData( &v_file ) ) {
-        QString mess = "Could not compute hash for  " + expanded();
+        std::string mess = "Could not compute hash for  " + expanded().toStdString();
         throw IException( IException::User, mess, _FILEINFO_ );
       }
 
@@ -393,13 +393,13 @@ namespace Isis {
         else if ( key.isNamed("Time") ) {
           if ( dbselection.hasTime() == false ) {
             // Set first time coverage
-            s_starttime = iTime( key[0] );
-            s_stoptime   = iTime( key[1] );
+            s_starttime = iTime(QString::fromStdString(key[0]));
+            s_stoptime   = iTime(QString::fromStdString(key[1]));
           }
           else {
             // Test limits of current span
-            iTime start_time_t( key[0] );
-            iTime  stop_time_t( key[1] );
+            iTime start_time_t(QString::fromStdString(key[0]));
+            iTime  stop_time_t(QString::fromStdString(key[1]));
 
             if ( start_time_t < s_starttime ) s_starttime = start_time_t;
             if (  stop_time_t > s_stoptime  ) s_stoptime  = stop_time_t;
@@ -410,11 +410,11 @@ namespace Isis {
         }
         else if ( key.isNamed( "Match") ) {
           // Add a match keyword
-          dbselection.addMatch( DBMatch( key[0], key[1], key[2] ) );
+          dbselection.addMatch( DBMatch(QString::fromStdString(key[0]),QString::fromStdString(key[1]),QString::fromStdString(key[2])));
         }
         else if ( key.isNamed( "Type" ) ) {
           // Update the type which will be "Reconstructed", "Smithed", etc...
-          dbselection.setType( key[0] );
+          dbselection.setType(QString::fromStdString(key[0]));
         }
       }
 
@@ -444,7 +444,7 @@ namespace Isis {
           }
 
           // Check if file is in inventory
-          if ( !inventory.contains( dbfile.expanded() ) ) {
+          if (inventory.find(dbfile.expanded().toStdString()) == inventory.end()) {
             dbstatus.push_back( DBFileDisposition( "External", dbfile.expanded(), source(), type() ) );
             nbad++;
           }
@@ -515,7 +515,7 @@ namespace Isis {
       }
 
       // Got a kerneldb file
-      Pvl db( dbfile.expanded() );
+      Pvl db( dbfile.expanded().toStdString() );
 
       // Check if there are any specs in the file
       if ( db.objects() < 1 ) {
@@ -523,11 +523,11 @@ namespace Isis {
       }
 
       PvlObject &inst = db.object(0);  // Get first object of .db or .conf
-      DBKernelDb dbkernel( dbfile, inst.name() );
+      DBKernelDb dbkernel( dbfile, QString::fromStdString(inst.name()) );
 
       // Check for a Runtime keyword
       if ( inst.hasKeyword("Runtime") ) {
-        dbkernel.setRuntime( iTime( inst["Runtime"][0] ) );
+        dbkernel.setRuntime(iTime(QString::fromStdString(inst["Runtime"][0])));
       }
 
       // Set up the data dir translation for the files
@@ -570,7 +570,7 @@ namespace Isis {
         }
 
         // Check the location of the DB file (it does exist at this point)
-        if ( !inventory.contains( kerneldb().expanded() ) ) {
+        if (inventory.find(kerneldb().expanded().toStdString()) == inventory.end()) {
           // std::cout << "External_S, " << kerneldb().name() << ", " << source().name() << std::endl;
           dbstatus.push_back( DBFileDisposition( "External", kerneldb().expanded(), kerneldb(), category() ) );
           nbad++;
@@ -728,19 +728,19 @@ namespace Isis {
 
       // Check for validity of datadir and isisdata
       if ( !hasIsisData() ) {
-        QString mess = "ISISDATA (" + isisdata().original() + ") does not not exist/invalid!";
+        std::string mess = "ISISDATA (" + isisdata().original().toStdString() + ") does not not exist/invalid!";
         throw IException( IException::User, mess, _FILEINFO_ );
       }
 
       // Check for validity of datadir and isisdata
       if ( !hasDataRoot() ) {
-        QString mess = "DATAROOT (" + dataroot().original() + ") does not not exist/invalid!";
+        std::string mess = "DATAROOT (" + dataroot().original().toStdString() + ") does not not exist/invalid!";
         throw IException( IException::User, mess, _FILEINFO_ );
       }
 
       // Check for validity of datadir and isisdata
       if ( !dataroot().isDirectory() ) {
-        QString mess = "DATAROOT (" + dataroot().original() + ") is not a directory!";
+        std::string mess = "DATAROOT (" + dataroot().original().toStdString() + ") is not a directory!";
         throw IException( IException::User, mess, _FILEINFO_ );
       }
 
@@ -756,9 +756,9 @@ namespace Isis {
       while ( ddir.hasNext() ) {
         QString ddfile = ddir.next();
         QFileInfo f_ddfile = ddir.fileInfo();
-        DBFileStatus d_file( DBFileStatus::DBFileData( givenPath( ddfile ), FileName( ddfile ), f_ddfile, "inventory" ) );
+        DBFileStatus d_file( DBFileStatus::DBFileData( givenPath( ddfile ), FileName( ddfile.toStdString() ), f_ddfile, "inventory" ) );
 
-        m_allfiles.insert( d_file.name(), d_file );
+        m_allfiles.insert(std::make_pair(d_file.name().toStdString(), d_file ));
 
         // Determine any kernels that are referenced in a directory
         if ( d_file.isDirectory() ) {

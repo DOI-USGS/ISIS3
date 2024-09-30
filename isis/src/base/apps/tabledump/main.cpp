@@ -25,9 +25,9 @@ map <QString, void *> GuiHelpers() {
 void IsisMain() {
   // Gather parameters from the UserInterface
   UserInterface &ui = Application::GetUserInterface();
-  FileName file = ui.GetCubeName("FROM");
+  FileName file = ui.GetCubeName("FROM").toStdString();
   QString tableName = ui.GetString("NAME");
-  Table table(tableName, file.expanded());
+  Table table(tableName.toStdString(), file.expanded());
 
   // Set the character to separate the entries
   QString delimit;
@@ -46,7 +46,7 @@ void IsisMain() {
 
   for (int i = 0; i < table[0].Fields(); i++) {
     for (int j = 0; j < table[0][i].size(); j++) {
-      QString title = table[0][i].name();
+      std::string title = table[0][i].name();
       if (table[0][i].isText()) {
         j += table[0][i].bytes();
       }
@@ -58,7 +58,7 @@ void IsisMain() {
         ss << title;
       }
       else {
-        ss << title + delimit;
+        ss << title + delimit.toStdString();
       }
     }
   }
@@ -79,17 +79,17 @@ void IsisMain() {
           ss << IString((double)table[i][j]);
         }
         else if (table[i][j].isText()) {
-          ss << (QString)table[i][j];
+          ss << (std::string)table[i][j];
         }
         if (j < table[i].Fields() - 1) {
-          ss << delimit;
+          ss << delimit.toStdString();
         }
       }
       // Otherwise, build a vector to contain the entries,
       // and output them with the delimiter character between
       else {
         if (table[i][j].isText()) {
-          ss << (QString)table[i][j] << delimit;
+          ss << (std::string)table[i][j] << delimit.toStdString();
         }
         else if (table[i][j].isInteger()) {
           vector<int> currField = table[i][j];
@@ -98,7 +98,7 @@ void IsisMain() {
             // (if we are), we aren't on the last element of the field
             if (j < table[i].Fields() - 1 ||
                 k < (int)currField.size() - 1) {
-              ss << currField[k] << delimit;
+              ss << currField[k] << delimit.toStdString();
             }
             else {
               ss << currField[k];
@@ -112,7 +112,7 @@ void IsisMain() {
             // (if we are), we aren't on the last element of the field
             if (j < table[i].Fields() - 1 ||
                 k < (int)currField.size() - 1) {
-              ss << currField[k] << delimit;
+              ss << currField[k] << delimit.toStdString();
             }
             else {
               ss << currField[k];
@@ -126,8 +126,8 @@ void IsisMain() {
 
 
   if (ui.WasEntered("TO")) {
-    QString outfile(FileName(ui.GetFileName("TO")).expanded());
-    ofstream outFile(outfile.toLatin1().data());
+    std::string outfile(FileName(ui.GetFileName("TO").toStdString()).expanded());
+    ofstream outFile(outfile.c_str());
     outFile << ss.str();
     outFile.close();
   }
@@ -146,14 +146,14 @@ void helperButtonGetTableList() {
   bool match = false;
 
   UserInterface &ui = Application::GetUserInterface();
-  QString currentFile = ui.GetCubeName("FROM");
+  std::string currentFile = ui.GetCubeName("FROM").toStdString();
   const Pvl label(FileName(currentFile).expanded());
 
   // Check to see if the "FILE" parameter has changed since last press
-  if (currentFile != g_previousFile) {
+  if (currentFile != g_previousFile.toStdString()) {
     ui.Clear("NAME");
     g_pos = 0;
-    g_previousFile = currentFile;
+    g_previousFile = QString::fromStdString(currentFile);
   }
 
   // Look for tables
@@ -162,7 +162,7 @@ void helperButtonGetTableList() {
     // If we've gone through all objects and found nothing, throw an exception
     if (cnt >= label.objects()) {
       g_pos = 0;
-      QString msg = "Parameter [FROM] has no tables.";
+      std::string msg = "Parameter [FROM] has no tables.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     // When the end of the objects is hit, display "NAME" parameter as blank
@@ -173,7 +173,7 @@ void helperButtonGetTableList() {
     }
     // When we find a table, fetch its name to stick in the "NAME" parameter
     else if (label.object(g_pos).name() == "Table") {
-      list = label.object(g_pos)["Name"][0];
+      list = QString::fromStdString(label.object(g_pos)["Name"][0]);
       match = true;
       g_pos++;
     }

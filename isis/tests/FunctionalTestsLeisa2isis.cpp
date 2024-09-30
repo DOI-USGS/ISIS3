@@ -10,7 +10,7 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
+static QString APP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded());
 
 TEST(Leisa2Isis, Leisa2IsisTestDefault) {
    Pvl appLog;
@@ -23,9 +23,9 @@ TEST(Leisa2Isis, Leisa2IsisTestDefault) {
    leisa2isis(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest LEISA image: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest LEISA image: " <<  e.toString().c_str() << std::endl;
   }
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
   Pvl *isisLabel = cube.label();
 
   // Dimensions Group
@@ -36,30 +36,30 @@ TEST(Leisa2Isis, Leisa2IsisTestDefault) {
 
   // Pixels Group
   PvlGroup &pixels = isisLabel->findGroup("Pixels", Pvl::Traverse);
-  ASSERT_EQ(pixels["Type"][0].toStdString(), "Real");
-  ASSERT_EQ(pixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(pixels["Type"][0], "Real");
+  ASSERT_EQ(pixels["ByteOrder"][0], "Lsb");
   ASSERT_EQ(double(pixels["Base"]), 0.0);
   ASSERT_EQ(double(pixels["Multiplier"]), 1.0);
 
   // Instrument Group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-  ASSERT_EQ(inst["SpacecraftName"][0].toStdString(), "NEW HORIZONS");
-  ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "LEISA" );
-  ASSERT_EQ(inst["TargetName"][0].toStdString(), "EUROPA" );
-  ASSERT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "1/0034931099:00000" );
+  ASSERT_EQ(inst["SpacecraftName"][0], "NEW HORIZONS");
+  ASSERT_EQ(inst["InstrumentId"][0], "LEISA" );
+  ASSERT_EQ(inst["TargetName"][0], "EUROPA" );
+  ASSERT_EQ(inst["SpacecraftClockStartCount"][0], "1/0034931099:00000" );
   ASSERT_DOUBLE_EQ(double(inst["ExposureDuration"]), 0.676);
-  ASSERT_EQ(inst["StartTime"][0].toStdString(), "2007-02-28T01:13:01.3882781" );
-  ASSERT_EQ(inst["StopTime"][0].toStdString(), "2007-02-28T01:17:12.388278" );
-  ASSERT_DOUBLE_EQ(double(inst["FrameRate"]), 1.47929);
-  ASSERT_EQ(inst["FrameRate"].unit().toStdString(), "Hz");
+  ASSERT_EQ(inst["StartTime"][0], "2007-02-28T01:13:01.3882781" );
+  ASSERT_EQ(inst["StopTime"][0], "2007-02-28T01:17:12.388278" );
+  ASSERT_NEAR(double(inst["FrameRate"]), 1.47929, 0.0001);
+  ASSERT_EQ(inst["FrameRate"].unit(), "Hz");
 
   // Archive Group
   PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
   ASSERT_DOUBLE_EQ(double(archive["MidObservationTime"]), 225897372.0736388);
-  ASSERT_EQ(archive["MidObservationTime"].unit().toStdString(), "s past J2000");
+  ASSERT_EQ(archive["MidObservationTime"].unit(), "s past J2000");
   ASSERT_DOUBLE_EQ(double(archive["ObservationDuration"]), 251.0);
-  ASSERT_EQ(archive["Detector"][0].toStdString(), "LEISA" );
-  ASSERT_EQ(archive["ScanType"][0].toStdString(), "LEISA" );
+  ASSERT_EQ(archive["Detector"][0], "LEISA" );
+  ASSERT_EQ(archive["ScanType"][0], "LEISA" );
 
   // BandBin Group
   // Check size, first, 2 middle, and last values? Enough?
@@ -68,25 +68,25 @@ TEST(Leisa2Isis, Leisa2IsisTestDefault) {
   ASSERT_EQ(bandbin["Width"].size(), 256);
   ASSERT_EQ(bandbin["OriginalBand"].size(), 256);
 
-  ASSERT_DOUBLE_EQ(bandbin["Center"][0].toDouble(), 2.4892);
-  ASSERT_DOUBLE_EQ(bandbin["Center"][64].toDouble(), 1.9784);
-  ASSERT_DOUBLE_EQ(bandbin["Center"][128].toDouble(), 1.572);
-  ASSERT_DOUBLE_EQ(bandbin["Center"][255].toDouble(), 2.0898);
+  ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Center"][0]), 2.4892);
+  ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Center"][64]), 1.9784);
+  ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Center"][128]), 1.572);
+  ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Center"][255]), 2.0898);
 
-  ASSERT_DOUBLE_EQ(bandbin["Width"][0].toDouble(), 0.011228);
-  ASSERT_DOUBLE_EQ(bandbin["Width"][64].toDouble(), 0.008924);
-  ASSERT_DOUBLE_EQ(bandbin["Width"][128].toDouble(), 0.007091);
-  ASSERT_DOUBLE_EQ(bandbin["Width"][255].toDouble(), 0.004915);
+  ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Width"][0]), 0.011228);
+  ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Width"][64]), 0.008924);
+  ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Width"][128]), 0.007091);
+  ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Width"][255]), 0.004915);
 
-  ASSERT_DOUBLE_EQ(bandbin["OriginalBand"][0].toDouble(), 1);
-  ASSERT_DOUBLE_EQ(bandbin["OriginalBand"][64].toDouble(), 65);
-  ASSERT_DOUBLE_EQ(bandbin["OriginalBand"][128].toDouble(), 129);
-  ASSERT_DOUBLE_EQ(bandbin["OriginalBand"][255].toDouble(), 256);
+  ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["OriginalBand"][0]), 1);
+  ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["OriginalBand"][64]), 65);
+  ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["OriginalBand"][128]), 129);
+  ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["OriginalBand"][255]), 256);
 
   // Kernels Group
   PvlGroup &kernel = isisLabel->findGroup("Kernels", Pvl::Traverse);
   ASSERT_EQ(int(kernel["NaifFrameCode"]), -98901);
-  ASSERT_EQ(kernel["NaifFrameCode"].unit().toStdString(), "SPICE ID");
+  ASSERT_EQ(kernel["NaifFrameCode"].unit(), "SPICE ID");
 
   Histogram *hist = cube.histogram();
 
@@ -102,7 +102,7 @@ TEST(Leisa2Isis, Leisa2IsisTestDefault) {
 TEST(Leisa2Isis, Leisa2IsisTestJan2015Format) {
    Pvl appLog;
    QTemporaryDir prefix;
-   QString dAPP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
+   QString dAPP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded());
    QString cubeFileName = prefix.path() + "/leisa2isisTEMP.cub";
    QString errFileName = prefix.path() + "/leisa2isisTEMPerr.cub";
    QString qualityFileName = prefix.path() + "/leisa2isisTEMPqual.cub";
@@ -116,11 +116,11 @@ TEST(Leisa2Isis, Leisa2IsisTestJan2015Format) {
    leisa2isis(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest LEISA image: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest LEISA image: " <<  e.toString().c_str() << std::endl;
   }
 
-  Cube errCube(errFileName);
-  Cube qualityCube(qualityFileName);
+  Cube errCube(errFileName.toStdString());
+  Cube qualityCube(qualityFileName.toStdString());
   Pvl *isisErrLabel = errCube.label();
   Pvl *isisQualityLabel = qualityCube.label();
 
@@ -138,16 +138,16 @@ TEST(Leisa2Isis, Leisa2IsisTestJan2015Format) {
 
   // Quality File Pixels Group
   PvlGroup &qualPixels = isisQualityLabel->findGroup("Pixels", Pvl::Traverse);
-  ASSERT_EQ(qualPixels["Type"][0].toStdString(), "SignedWord");
-  ASSERT_EQ(qualPixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(qualPixels["Type"][0], "SignedWord");
+  ASSERT_EQ(qualPixels["ByteOrder"][0], "Lsb");
   ASSERT_EQ(double(qualPixels["Base"]), 0.0);
   ASSERT_EQ(double(qualPixels["Multiplier"]), 1.0);
 
 
   // Quality File Pixels Group
   PvlGroup &errPixels = isisErrLabel->findGroup("Pixels", Pvl::Traverse);
-  ASSERT_EQ(errPixels["Type"][0].toStdString(), "Real");
-  ASSERT_EQ(errPixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(errPixels["Type"][0], "Real");
+  ASSERT_EQ(errPixels["ByteOrder"][0], "Lsb");
   ASSERT_EQ(double(errPixels["Base"]), 0.0);
   ASSERT_EQ(double(errPixels["Multiplier"]), 1.0);
 
@@ -175,7 +175,7 @@ TEST(Leisa2Isis, Leisa2IsisTestJan2015Format) {
 TEST(Leisa2Isis, Leisa2IsisTestCalib) {
    Pvl appLog;
    QTemporaryDir prefix;
-   QString dAPP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
+   QString dAPP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded());
    QString cubeFileName = prefix.path() + "/leisa2isisTEMP.cub";
    QString errFileName = prefix.path() + "/leisa2isisTEMPerr.cub";
    QString qualityFileName = prefix.path() + "/leisa2isisTEMPqual.cub";
@@ -189,11 +189,11 @@ TEST(Leisa2Isis, Leisa2IsisTestCalib) {
    leisa2isis(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest LEISA image: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest LEISA image: " <<  e.toString().c_str() << std::endl;
   }
 
-  Cube errCube(errFileName);
-  Cube qualityCube(qualityFileName);
+  Cube errCube(errFileName.toStdString());
+  Cube qualityCube(qualityFileName.toStdString());
   Pvl *isisErrLabel = errCube.label();
   Pvl *isisQualityLabel = qualityCube.label();
 
@@ -211,16 +211,16 @@ TEST(Leisa2Isis, Leisa2IsisTestCalib) {
 
   // Quality File Pixels Group
   PvlGroup &qualPixels = isisQualityLabel->findGroup("Pixels", Pvl::Traverse);
-  ASSERT_EQ(qualPixels["Type"][0].toStdString(), "SignedWord");
-  ASSERT_EQ(qualPixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(qualPixels["Type"][0], "SignedWord");
+  ASSERT_EQ(qualPixels["ByteOrder"][0], "Lsb");
   ASSERT_EQ(double(qualPixels["Base"]), 0.0);
   ASSERT_EQ(double(qualPixels["Multiplier"]), 1.0);
 
 
   // Quality File Pixels Group
   PvlGroup &errPixels = isisErrLabel->findGroup("Pixels", Pvl::Traverse);
-  ASSERT_EQ(errPixels["Type"][0].toStdString(), "Real");
-  ASSERT_EQ(errPixels["ByteOrder"][0].toStdString(), "Lsb");
+  ASSERT_EQ(errPixels["Type"][0], "Real");
+  ASSERT_EQ(errPixels["ByteOrder"][0], "Lsb");
   ASSERT_EQ(double(errPixels["Base"]), 0.0);
   ASSERT_EQ(double(errPixels["Multiplier"]), 1.0);
 
@@ -247,7 +247,7 @@ TEST(Leisa2Isis, Leisa2IsisTestCalib) {
 TEST(Leisa2Isis, Leisa2IsisTestRaw) {
    Pvl appLog;
    QTemporaryDir prefix;
-   QString dAPP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
+   QString dAPP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded());
    QString cubeFileName = prefix.path() + "/leisa2isisTEMP.cub";
 
    QVector<QString> args = {"from=data/leisa2isis/raw.fit",
@@ -259,10 +259,10 @@ TEST(Leisa2Isis, Leisa2IsisTestRaw) {
      leisa2isis(options, &appLog);
    }
    catch (IException &e) {
-     FAIL() << "Unable to ingest LEISA image: " << e.toString().toStdString().c_str() << std::endl;
+     FAIL() << "Unable to ingest LEISA image: " <<  e.toString().c_str() << std::endl;
    }
 
-   Cube cube(cubeFileName);
+   Cube cube(cubeFileName.toStdString());
    Pvl *isisLabel = cube.label();
 
       // Dimensions Group
@@ -273,30 +273,30 @@ TEST(Leisa2Isis, Leisa2IsisTestRaw) {
 
    // Pixels Group
    PvlGroup &pixels = isisLabel->findGroup("Pixels", Pvl::Traverse);
-   ASSERT_EQ(pixels["Type"][0].toStdString(), "SignedWord");
-   ASSERT_EQ(pixels["ByteOrder"][0].toStdString(), "Lsb");
+   ASSERT_EQ(pixels["Type"][0], "SignedWord");
+   ASSERT_EQ(pixels["ByteOrder"][0], "Lsb");
    ASSERT_EQ(double(pixels["Base"]), 0.0);
    ASSERT_EQ(double(pixels["Multiplier"]), 1.0);
 
    // Instrument Group
    PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
-   ASSERT_EQ(inst["SpacecraftName"][0].toStdString(), "NEW HORIZONS");
-   ASSERT_EQ(inst["InstrumentId"][0].toStdString(), "LEISA" );
-   ASSERT_EQ(inst["TargetName"][0].toStdString(), "CALLISTO" );
-   ASSERT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "1/0030594839:00000" );
+   ASSERT_EQ(inst["SpacecraftName"][0], "NEW HORIZONS");
+   ASSERT_EQ(inst["InstrumentId"][0], "LEISA" );
+   ASSERT_EQ(inst["TargetName"][0], "CALLISTO" );
+   ASSERT_EQ(inst["SpacecraftClockStartCount"][0], "1/0030594839:00000" );
    ASSERT_DOUBLE_EQ(double(inst["ExposureDuration"]), 0.131);
-   ASSERT_EQ(inst["StartTime"][0].toStdString(), "2007-01-08T20:42:01.3824425" );
-   ASSERT_EQ(inst["StopTime"][0].toStdString(), "2007-01-08T20:42:42.3824425" );
-   ASSERT_DOUBLE_EQ(double(inst["FrameRate"]), 7.63359);
-   ASSERT_EQ(inst["FrameRate"].unit().toStdString(), "Hz");
+   ASSERT_EQ(inst["StartTime"][0], "2007-01-08T20:42:01.3824425" );
+   ASSERT_EQ(inst["StopTime"][0], "2007-01-08T20:42:42.3824425" );
+   ASSERT_NEAR(double(inst["FrameRate"]), 7.63359, 0.0001);
+   ASSERT_EQ(inst["FrameRate"].unit(), "Hz");
 
    // Archive Group
    PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
    ASSERT_DOUBLE_EQ(double(archive["MidObservationTime"]), 221561007.0665882);
-   ASSERT_EQ(archive["MidObservationTime"].unit().toStdString(), "s past J2000");
+   ASSERT_EQ(archive["MidObservationTime"].unit(), "s past J2000");
    ASSERT_DOUBLE_EQ(double(archive["ObservationDuration"]), 41.0);
-   ASSERT_EQ(archive["Detector"][0].toStdString(), "LEISA" );
-   ASSERT_EQ(archive["ScanType"][0].toStdString(), "LEISA" );
+   ASSERT_EQ(archive["Detector"][0], "LEISA" );
+   ASSERT_EQ(archive["ScanType"][0], "LEISA" );
 
    // BandBin Group
    PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
@@ -304,27 +304,27 @@ TEST(Leisa2Isis, Leisa2IsisTestRaw) {
    ASSERT_EQ(bandbin["Width"].size(), 256);
    ASSERT_EQ(bandbin["OriginalBand"].size(), 256);
 
-   ASSERT_DOUBLE_EQ(bandbin["Center"][0].toDouble(), 2.4892);
-   ASSERT_DOUBLE_EQ(bandbin["Center"][64].toDouble(), 1.9784);
-   ASSERT_DOUBLE_EQ(bandbin["Center"][128].toDouble(), 1.572);
-   ASSERT_DOUBLE_EQ(bandbin["Center"][255].toDouble(), 2.0898);
+   ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Center"][0]), 2.4892);
+   ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Center"][64]), 1.9784);
+   ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Center"][128]), 1.572);
+   ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Center"][255]), 2.0898);
 
-   ASSERT_DOUBLE_EQ(bandbin["Width"][0].toDouble(), 0.011228);
-   ASSERT_DOUBLE_EQ(bandbin["Width"][64].toDouble(), 0.008924);
-   ASSERT_DOUBLE_EQ(bandbin["Width"][128].toDouble(), 0.007091);
-   ASSERT_DOUBLE_EQ(bandbin["Width"][255].toDouble(), 0.004915);
+   ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Width"][0]), 0.011228);
+   ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Width"][64]), 0.008924);
+   ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Width"][128]), 0.007091);
+   ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["Width"][255]), 0.004915);
 
-   ASSERT_DOUBLE_EQ(bandbin["OriginalBand"][0].toDouble(), 1);
-   ASSERT_DOUBLE_EQ(bandbin["OriginalBand"][64].toDouble(), 65);
-   ASSERT_DOUBLE_EQ(bandbin["OriginalBand"][128].toDouble(), 129);
-   ASSERT_DOUBLE_EQ(bandbin["OriginalBand"][255].toDouble(), 256);
+   ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["OriginalBand"][0]), 1);
+   ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["OriginalBand"][64]), 65);
+   ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["OriginalBand"][128]), 129);
+   ASSERT_DOUBLE_EQ(Isis::toDouble(bandbin["OriginalBand"][255]), 256);
  }
 
 
 TEST(Leisa2Isis, Leisa2IsisTestRawErrormapFail) {
    Pvl appLog;
    QTemporaryDir prefix;
-   QString dAPP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
+   QString dAPP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded());
    QString cubeFileName = prefix.path() + "/leisa2isisTEMP.cub";
    QString errFileName = prefix.path() + "/leisa2isisTEMPerr.cub";
 
@@ -341,7 +341,7 @@ TEST(Leisa2Isis, Leisa2IsisTestRawErrormapFail) {
 TEST(Leisa2Isis, Leisa2IsisTestRawQualityFail) {
    Pvl appLog;
    QTemporaryDir prefix;
-   QString dAPP_XML = FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded();
+   QString dAPP_XML = QString::fromStdString(FileName("$ISISROOT/bin/xml/leisa2isis.xml").expanded());
    QString cubeFileName = prefix.path() + "/leisa2isisTEMP.cub";
    QString qualityFileName = prefix.path() + "/leisa2isisTEMPqual.cub";
 
@@ -368,9 +368,9 @@ TEST(Leisa2Isis, Leisa2IsisTestQualityReplacement) {
    leisa2isis(options, &appLog);
   }
   catch (IException &e) {
-    FAIL() << "Unable to ingest LEISA image: " << e.toString().toStdString().c_str() << std::endl;
+    FAIL() << "Unable to ingest LEISA image: " <<  e.toString().c_str() << std::endl;
   }
-  Cube cube(cubeFileName);
+  Cube cube(cubeFileName.toStdString());
 
   Histogram *hist = cube.histogram();
 

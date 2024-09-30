@@ -51,27 +51,27 @@ void IsisMain() {
   ProcessImportPds p;
   Pvl pdsLabel;
   UserInterface &ui = Application::GetUserInterface();
-  FileName inFile = ui.GetFileName("FROM");
+  FileName inFile = ui.GetFileName("FROM").toStdString();
 
-  p.SetPdsFile(inFile.expanded(), "", pdsLabel);
+  p.SetPdsFile(QString::fromStdString(inFile.expanded()), "", pdsLabel);
 
-  QString filename = FileName(ui.GetFileName("FROM")).baseName();
-  FileName toFile = ui.GetCubeName("TO");
+  QString filename = QString::fromStdString(FileName(ui.GetFileName("FROM").toStdString()).baseName());
+  FileName toFile = ui.GetCubeName("TO").toStdString();
 
   apollo = new Apollo(filename);
 
-  utcTime = (QString)pdsLabel["START_TIME"];
+  utcTime = QString::fromStdString(pdsLabel["START_TIME"]);
 
   // Setup the output cube attributes for a 16-bit unsigned tiff
   Isis::CubeAttributeOutput cao;
   cao.setPixelType(Isis::Real);
-  p.SetOutputCube(toFile.expanded(), cao);
+  p.SetOutputCube(QString::fromStdString(toFile.expanded()), cao);
 
   // Import image
   p.StartProcess();
   p.EndProcess();
 
-  cube.open(toFile.expanded(), "rw");
+  cube.open(QString::fromStdString(toFile.expanded()), "rw");
 
   // Once the image is imported, we need to find and decrypt the code
   if (apollo->IsMetric() && FindCode())
@@ -79,7 +79,7 @@ void IsisMain() {
 
   CalculateTransform();
   // Once we have decrypted the code, we need to populate the image labels
-  TranslateApolloLabels(filename, &cube);
+  TranslateApolloLabels(filename.toStdString(), &cube);
   cube.close();
 }
 
@@ -231,17 +231,17 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
   PvlGroup kern("Kernels");
   PvlGroup codeGroup("Code");
 
-  inst += PvlKeyword("SpacecraftName", apollo->SpacecraftName());
-  inst += PvlKeyword("InstrumentId", apollo->InstrumentId());
-  inst += PvlKeyword("TargetName", apollo->TargetName());
+  inst += PvlKeyword("SpacecraftName", apollo->SpacecraftName().toStdString());
+  inst += PvlKeyword("InstrumentId", apollo->InstrumentId().toStdString());
+  inst += PvlKeyword("TargetName", apollo->TargetName().toStdString());
 
   if ( !IsValidCode() ){
     PvlGroup error("ERROR");
     error.addComment("The decrypted code is invalid.");
     for (int i=0; i<4; i++) {
-      PvlKeyword keyword("Column"+toString(i+1));
+      PvlKeyword keyword("Column"+Isis::toString(i+1));
       for (int j=0; j<32; j++) {
-        keyword += toString((int)code[i][j]);
+        keyword += Isis::toString((int)code[i][j]);
       }
       error.addKeyword(keyword);
       codeGroup += keyword;
@@ -249,18 +249,18 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
     Application::Log(error);
   }
   else {
-    codeGroup += PvlKeyword("StartTime", FrameTime());
-    codeGroup += PvlKeyword("SpacecraftAltitude", toString(Altitude()),"meters");
+    codeGroup += PvlKeyword("StartTime", FrameTime().toStdString());
+    codeGroup += PvlKeyword("SpacecraftAltitude", Isis::toString(Altitude()),"meters");
 
     if (apollo->IsMetric()){
-      codeGroup += PvlKeyword("ExposureDuration", toString(ShutterInterval()), "milliseconds");
-      codeGroup += PvlKeyword("ForwardMotionCompensation", FMC());
+      codeGroup += PvlKeyword("ExposureDuration", Isis::toString(ShutterInterval()), "milliseconds");
+      codeGroup += PvlKeyword("ForwardMotionCompensation", FMC().toStdString());
     }
 
     for (int i=0; i<4; i++) {
-      PvlKeyword keyword("Column"+toString(i+1));
+      PvlKeyword keyword("Column"+ Isis::toString(i+1));
       for (int j=0; j<32; j++) {
-        keyword += toString((int)code[i][j]);
+        keyword += Isis::toString((int)code[i][j]);
       }
       codeGroup += keyword;
     }
@@ -272,32 +272,32 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
   bandBin += PvlKeyword("FilterName", "CLEAR");
   bandBin += PvlKeyword("FilterId", "1");
 
-  kern += PvlKeyword("NaifFrameCode", apollo->NaifFrameCode());
+  kern += PvlKeyword("NaifFrameCode", apollo->NaifFrameCode().toStdString());
 
   // Set up the nominal reseaus group
   Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
   Process p;
   PvlTranslationTable tTable("$ISISROOT/appdata/translations/MissionName2DataDir.trn");
-  QString missionDir = dataDir[tTable.Translate("MissionName", apollo->SpacecraftName())][0];
-  Pvl resTemplate(missionDir + "/reseaus/" + apollo->InstrumentId() + "_NOMINAL.pvl");
+  QString missionDir = QString::fromStdString(dataDir[tTable.Translate("MissionName", apollo->SpacecraftName()).toStdString()][0]);
+  Pvl resTemplate(missionDir.toStdString() + "/reseaus/" + apollo->InstrumentId().toStdString() + "_NOMINAL.pvl");
   PvlGroup *reseaus = &resTemplate.findGroup("Reseaus");
 
   // Update reseau locations based on refined code location
   for (int i=0; i<(reseaus->findKeyword("Type")).size(); i++) {
-    double x = toDouble(reseaus->findKeyword("Sample")[i]) + sampleTranslation + 2278,
-           y = toDouble(reseaus->findKeyword("Line")[i]) + lineTranslation - 20231;
+    double x = Isis::toDouble(reseaus->findKeyword("Sample")[i]) + sampleTranslation + 2278,
+           y = Isis::toDouble(reseaus->findKeyword("Line")[i]) + lineTranslation - 20231;
 
     if (apollo->IsApollo17()) {
         x += 50;
         y += 20;
     }
 
-    reseaus->findKeyword("Sample")[i] = toString(
+    reseaus->findKeyword("Sample")[i] = Isis::toString(
         cos(rotation)*(x-sampleTranslation) - sin(rotation)*(y-lineTranslation) + sampleTranslation);
-    reseaus->findKeyword("Line")[i] = toString(
+    reseaus->findKeyword("Line")[i] = Isis::toString(
         sin(rotation)*(x-sampleTranslation) + cos(rotation)*(y-lineTranslation) + lineTranslation);
   }
-  inst += PvlKeyword("StartTime", utcTime);
+  inst += PvlKeyword("StartTime", utcTime.toStdString());
 
   opack->putGroup(inst);
   opack->putGroup(bandBin);
@@ -371,17 +371,17 @@ QString FrameTime() {
       month += 1;
     }
 
-    QString sTime = toString(year) + "-";
+    QString sTime = QString::number(year) + "-";
     if (month < 10) sTime += "0";
-    sTime += toString(month)+ "-";
+    sTime += QString::number(month)+ "-";
     if (days <10) sTime += "0";
-    sTime += toString(days) + "T";
+    sTime += QString::number(days) + "T";
     if (hours <10) sTime += "0";
-    sTime += toString(hours) + ":";
+    sTime += QString::number(hours) + ":";
     if (minutes <10) sTime += "0";
-    sTime += toString(minutes) + ":";
+    sTime += QString::number(minutes) + ":";
     if (seconds <10) sTime += "0";
-    sTime += toString(seconds);
+    sTime += QString::number(seconds);
 
     return sTime;
 }

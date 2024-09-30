@@ -40,7 +40,7 @@ void IsisMain() {
       p.SetInputCube("MASK", OneBand);
     }
     catch (IException &e) {
-      QString msg = "The MASK input must be a single band.";
+      std::string msg = "The MASK input must be a single band.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }
@@ -74,10 +74,10 @@ void IsisMain() {
   PvlGroup results("Results");
 
   if(g_masked == true) {
-      results += PvlKeyword("PixelsMasked", toString(g_pixelsMasked));
+      results += PvlKeyword("PixelsMasked", Isis::toString(g_pixelsMasked));
   }
   else {
-      PvlKeyword pm("PixelsMasked", toString(g_pixelsMasked));
+      PvlKeyword pm("PixelsMasked", Isis::toString(g_pixelsMasked));
       pm.addComment( "No pixels were masked for this image");
       results += pm;
   }

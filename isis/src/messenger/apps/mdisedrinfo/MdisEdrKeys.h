@@ -66,7 +66,7 @@ namespace Isis {
        * @param edrfile  File containing the PDS EDR label
        */
       MdisEdrKeys(const QString &edrfile) {
-        _edrLabel = Pvl(edrfile);
+        _edrLabel = Pvl(edrfile.toStdString());
         LoadKeys(_edrLabel, _keys);
       }
 
@@ -111,7 +111,7 @@ namespace Isis {
           _keys.add(key.name(), key);
         }
         else {
-          _keys.add(name, key);
+          _keys.add(name.toStdString(), key);
         }
         return;
       }
@@ -145,7 +145,7 @@ namespace Isis {
        * @return PvlKeyword& Reference to named keyword
        */
       PvlKeyword &get(const QString &name) {
-        return (_keys.get(name));
+        return (_keys.get(name.toStdString()));
       }
 
       /**
@@ -160,7 +160,7 @@ namespace Isis {
        *         keyword
        */
       const PvlKeyword &get(const QString &name) const {
-        return (_keys.get(name));
+        return (_keys.get(name.toStdString()));
       }
 
       /**
@@ -202,21 +202,21 @@ namespace Isis {
           QString keyname(keylist[i]);
           keyname = keyname.trimmed();
           try {
-            PvlKeyword &key = _keys.get(keyname);
+            PvlKeyword &key = _keys.get(keyname.toStdString());
             if(group) group->addKeyword(key);
             if((key.size() == 0) || (key.isNull())) {
-              out << loopSep << "NULL";
+              out << loopSep.toStdString() << "NULL";
             }
             else if(key.size() == 1) {
-              out << loopSep << key[0] << formatUnit(key.unit(0));
+              out << loopSep.toStdString() << key[0] << formatUnit(QString::fromStdString(key.unit(0))).toStdString();
             }
             else {
-              out << loopSep << "(";
+              out << loopSep.toStdString() << "(";
               QString vsep("");
               for(int iv = 0 ; iv < key.size() ; iv++) {
-                out << vsep << key[iv];
-                if(key[iv] != NAstr) {
-                  out << formatUnit(key.unit(iv));
+                out << vsep.toStdString() << key[iv];
+                if(QString::fromStdString(key[iv]) != NAstr) {
+                  out << formatUnit(QString::fromStdString(key.unit(iv))).toStdString();
                 }
                 vsep = ",";
               }
@@ -226,7 +226,7 @@ namespace Isis {
           }
           catch(IException &ie) {
             nbad++;
-            QString mess = "Keyword \"" + keyname + "\" does not exist!";
+            std::string mess = "Keyword \"" + keyname.toStdString() + "\" does not exist!";
             errors.append(
                 IException(IException::User, mess, _FILEINFO_));
           }
@@ -234,7 +234,7 @@ namespace Isis {
 
         // Check to see if all keywords are found
         if(nbad > 0) {
-          QString mess = "One or more keywords in list do not exist!";
+          std::string mess = "One or more keywords in list do not exist!";
           throw IException(errors, IException::User, mess, _FILEINFO_);
         }
 
@@ -262,10 +262,10 @@ namespace Isis {
         if(!prefix.isEmpty()) prekey += "/";
         PvlContainer::PvlKeywordIterator keyIter = p.begin();
         for(; keyIter != p.end() ;  ++keyIter) {
-          QString keyname = prefix + keyIter->name();
+          QString keyname = prefix + QString::fromStdString(keyIter->name());
           PvlKeyword key = *keyIter;
-          key.setName(keyname);
-          keys.add(keyname, key);
+          key.setName(keyname.toStdString());
+          keys.add(keyname.toStdString(), key);
         }
         return;
       }
@@ -305,11 +305,11 @@ namespace Isis {
         //  all SUBFRAME[12345]_PARAMETERS since they are unsupported.
         PvlObject::PvlObjectIterator objIter = obj.beginObject();
         for(; objIter != obj.endObject() ; ++objIter) {
-          QString objname(objIter->name());
+          QString objname(QString::fromStdString(objIter->name()));
           objname = objname.toUpper();
           int gotSubframe = objname.indexOf("SUBFRAME");
           if(gotSubframe != -1) {
-            LoadKeys(*objIter, keys, objIter->name());
+            LoadKeys(*objIter, keys, QString::fromStdString(objIter->name()));
           }
           else {
             LoadKeys(*objIter, keys);
