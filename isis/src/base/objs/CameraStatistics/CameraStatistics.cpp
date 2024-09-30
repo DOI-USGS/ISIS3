@@ -284,7 +284,7 @@ namespace Isis {
       return (PvlKeyword(keyname.toStdString(), "NULL"));
     }
     else {
-      return (PvlKeyword(keyname.toStdString(), toString(value), unit.toStdString()));
+      return (PvlKeyword(keyname.toStdString(), Isis::toString(value), unit.toStdString()));
     }
   }
 
@@ -368,8 +368,8 @@ namespace Isis {
     // object
     PvlGroup pUser("User Parameters");
     if (m_filename != "") pUser += PvlKeyword("Filename", m_filename.toStdString());
-    pUser += PvlKeyword("Linc", toString(m_linc));
-    pUser += PvlKeyword("Sinc", toString(m_sinc));
+    pUser += PvlKeyword("Linc", Isis::toString(m_linc));
+    pUser += PvlKeyword("Sinc", Isis::toString(m_sinc));
 
     PvlGroup pLat("Latitude");
     pLat += constructKeyword("LatitudeMinimum", m_latStat->Minimum());

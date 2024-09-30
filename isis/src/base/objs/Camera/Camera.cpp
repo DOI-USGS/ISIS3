@@ -1206,10 +1206,10 @@ namespace Isis {
     PvlGroup map = pvl.findGroup("Mapping", Pvl::Traverse);
 
     if(map.hasKeyword("EquatorialRadius"))
-      a = Distance(IString::ToDouble(map["EquatorialRadius"][0]), Distance::Meters);
+      a = Distance(Isis::toDouble(map["EquatorialRadius"][0]), Distance::Meters);
 
     if(map.hasKeyword("PolarRadius"))
-      b = Distance(IString::ToDouble(map["PolarRadius"][0]), Distance::Meters);
+      b = Distance(Isis::toDouble(map["PolarRadius"][0]), Distance::Meters);
 
     // Convert to planetographic if necessary
     minlat = p_minlat;
@@ -1369,19 +1369,19 @@ namespace Isis {
     map += PvlKeyword("TargetName", target()->name().toStdString());
 
     std::vector<Distance> radii = target()->radii();
-    map += PvlKeyword("EquatorialRadius", toString(radii[0].meters()), "meters");
-    map += PvlKeyword("PolarRadius", toString(radii[2].meters()), "meters");
+    map += PvlKeyword("EquatorialRadius", Isis::toString(radii[0].meters()), "meters");
+    map += PvlKeyword("PolarRadius", Isis::toString(radii[2].meters()), "meters");
 
     map += PvlKeyword("LatitudeType", "Planetocentric");
     map += PvlKeyword("LongitudeDirection", "PositiveEast");
     map += PvlKeyword("LongitudeDomain", "360");
 
     GroundRangeResolution();
-    map += PvlKeyword("MinimumLatitude", toString(p_minlat));
-    map += PvlKeyword("MaximumLatitude", toString(p_maxlat));
-    map += PvlKeyword("MinimumLongitude", toString(p_minlon));
-    map += PvlKeyword("MaximumLongitude", toString(p_maxlon));
-    map += PvlKeyword("PixelResolution", toString(p_minres));
+    map += PvlKeyword("MinimumLatitude", Isis::toString(p_minlat));
+    map += PvlKeyword("MaximumLatitude", Isis::toString(p_maxlat));
+    map += PvlKeyword("MinimumLongitude", Isis::toString(p_minlon));
+    map += PvlKeyword("MaximumLongitude", Isis::toString(p_maxlon));
+    map += PvlKeyword("PixelResolution", Isis::toString(p_minres));
 
     map += PvlKeyword("ProjectionName", "Sinusoidal");
     pvl.addGroup(map);
@@ -1408,11 +1408,11 @@ namespace Isis {
     map += PvlKeyword("RingLongitudeDomain", "360");
 
     ringRangeResolution();
-    map += PvlKeyword("MinimumRingRadius", toString(p_minRingRadius));
-    map += PvlKeyword("MaximumRingRadius", toString(p_maxRingRadius));
-    map += PvlKeyword("MinimumRingLongitude", toString(p_minRingLongitude));
-    map += PvlKeyword("MaximumRingLongitude", toString(p_maxRingLongitude));
-    map += PvlKeyword("PixelResolution", toString(p_minres));
+    map += PvlKeyword("MinimumRingRadius", Isis::toString(p_minRingRadius));
+    map += PvlKeyword("MaximumRingRadius", Isis::toString(p_maxRingRadius));
+    map += PvlKeyword("MinimumRingLongitude", Isis::toString(p_minRingLongitude));
+    map += PvlKeyword("MaximumRingLongitude", Isis::toString(p_maxRingLongitude));
+    map += PvlKeyword("PixelResolution", Isis::toString(p_minres));
 
     map += PvlKeyword("ProjectionName", "Planar");
     pvl.addGroup(map);

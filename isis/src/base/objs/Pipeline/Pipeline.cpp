@@ -727,7 +727,7 @@ namespace Isis {
    */
   PipelineApplication &Pipeline::Application(const int &index) {
     if (index > Size()) {
-      std::string msg = "Index [" + std::to_string(index) + "] out of bounds";
+      std::string msg = "Index [" + Isis::toString(index) + "] out of bounds";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -811,7 +811,7 @@ namespace Isis {
 
     if (p_finalOutput.size() > 1) {
       if ((unsigned int)branch >= p_finalOutput.size()) {
-        std::string msg = "Output not set for branch [" + std::to_string(branch) + "]";
+        std::string msg = "Output not set for branch [" + Isis::toString(branch) + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
