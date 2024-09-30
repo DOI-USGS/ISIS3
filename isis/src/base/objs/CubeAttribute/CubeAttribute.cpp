@@ -95,9 +95,9 @@ namespace Isis {
         direction = (start <= end) ? 1 : -1;
         // Save the entire range of bands
         for (int band = start; band != end; band += direction) {
-          result.push_back(QString::number(band));
+          result.push_back(QString::fromStdString(Isis::toString(band)));
         }
-        result.push_back(QString::number(end));
+        result.push_back(QString::fromStdString(Isis::toString(end)));
       }
       // This token is a single band specification
       else {
@@ -323,15 +323,15 @@ namespace Isis {
 
   void CubeAttributeOutput::setMinimum(double min) {
     if (!IsSpecial(min)) {
-      QString newRange = QString::number(min) + ":";
+      QString newRange = QString::fromStdString(Isis::toString(min)) + ":";
 
       if (!IsSpecial(maximum()))
-        newRange += QString::number(maximum());
+        newRange += QString::fromStdString(Isis::toString(maximum()));
 
       setAttribute(newRange, &CubeAttributeOutput::isRange);
     }
     else if (!IsSpecial(maximum())) {
-      setAttribute(":" + QString::number(maximum()), &CubeAttributeOutput::isRange);
+      setAttribute(":" + QString::fromStdString(Isis::toString(maximum())), &CubeAttributeOutput::isRange);
     }
     else {
       setAttribute("", &CubeAttributeOutput::isRange);
@@ -341,15 +341,15 @@ namespace Isis {
 
   void CubeAttributeOutput::setMaximum(double max) {
     if (!IsSpecial(max)) {
-      QString newRange = ":" + QString::number(max);
+      QString newRange = ":" + QString::fromStdString(Isis::toString(max));
 
       if (!IsSpecial(minimum()))
-        newRange = QString::number(minimum()) + newRange;
+        newRange = QString::fromStdString(Isis::toString(minimum())) + newRange;
 
       setAttribute(newRange, &CubeAttributeOutput::isRange);
     }
     else if (!IsSpecial(minimum())) {
-      setAttribute(QString::number(minimum()) + ":", &CubeAttributeOutput::isRange);
+      setAttribute(QString::fromStdString(Isis::toString(minimum())) + ":", &CubeAttributeOutput::isRange);
     }
     else {
       setAttribute("", &CubeAttributeOutput::isRange);

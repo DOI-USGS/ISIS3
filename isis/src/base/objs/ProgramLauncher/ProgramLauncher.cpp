@@ -45,7 +45,7 @@ namespace Isis {
     }
 
     QString command = QString::fromStdString(program.expanded()) + " " + parameters +
-        " -pid=" + QString::number(getpid());
+        " -pid=" + QString::fromStdString(toString(getpid()));
 
     if(!isIsisProgram) {
       std::string msg = "Program [" + programName.toStdString() + "] does not appear to be a "
@@ -54,7 +54,7 @@ namespace Isis {
     }
 
     QString serverName = "isis_" + Application::UserName() +
-        "_" + QString::number(getpid());
+        "_" + QString::fromStdString(toString(getpid()));
 
     QLocalServer server;
     server.listen(serverName);

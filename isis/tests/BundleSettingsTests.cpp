@@ -262,7 +262,7 @@ TEST_P(BoolTest, saveValidateNetwork) {
   QDomElement validateNetwork = globalSettings.firstChildElement("validateNetwork");
   ASSERT_FALSE(validateNetwork.isNull());
   EXPECT_EQ("validateNetwork", validateNetwork.tagName());
-  EXPECT_EQ(QString::number(testSettings.validateNetwork()), validateNetwork.text());
+  EXPECT_EQ(QString::fromStdString(toString(testSettings.validateNetwork())), validateNetwork.text());
 }
 
 TEST_P(BoolTest, outlierRejection) {
@@ -285,12 +285,12 @@ TEST_P(BoolTest, saveOutlierRejection) {
   ASSERT_FALSE(outlierRejectionOptions.isNull());
   QDomNamedNodeMap outlierRejectionOptionsAtts = outlierRejectionOptions.attributes();
   EXPECT_EQ(
-        QString::number(testSettings.outlierRejection()),
+        QString::fromStdString(toString(testSettings.outlierRejection())),
         outlierRejectionOptionsAtts.namedItem("rejection").nodeValue()
   );
   EXPECT_EQ(
         (testSettings.outlierRejection() ?
-            QString::number(testSettings.outlierRejectionMultiplier()) : "N/A"),
+            QString::fromStdString(toString(testSettings.outlierRejectionMultiplier())) : "N/A"),
         outlierRejectionOptionsAtts.namedItem("multiplier").nodeValue()
   );
 }
@@ -341,23 +341,23 @@ TEST_P(BoolTest, saveSolveOptions) {
   ASSERT_FALSE(solveOptions.isNull());
   QDomNamedNodeMap solveOptionAtts = solveOptions.attributes();
   EXPECT_EQ(
-        QString::number(testSettings.solveObservationMode()),
+        QString::fromStdString(toString(testSettings.solveObservationMode())),
         solveOptionAtts.namedItem("solveObservationMode").nodeValue()
   );
   EXPECT_EQ(
-        QString::number(testSettings.solveRadius()),
+        QString::fromStdString(toString(testSettings.solveRadius())),
         solveOptionAtts.namedItem("solveRadius").nodeValue()
   );
   EXPECT_EQ(
-        QString::number(testSettings.updateCubeLabel()),
+        QString::fromStdString(toString(testSettings.updateCubeLabel())),
         solveOptionAtts.namedItem("updateCubeLabel").nodeValue()
   );
   EXPECT_EQ(
-        QString::number(testSettings.errorPropagation()),
+        QString::fromStdString(toString(testSettings.errorPropagation())),
         solveOptionAtts.namedItem("errorPropagation").nodeValue()
   );
   EXPECT_EQ(
-        QString::number(testSettings.createInverseMatrix()),
+        QString::fromStdString(toString(testSettings.createInverseMatrix())),
         solveOptionAtts.namedItem("createInverseMatrix").nodeValue()
   );
 }
@@ -402,11 +402,11 @@ TEST_P(BoolTest, saveCoordinateTypes) {
   ASSERT_FALSE(solveOptions.isNull());
   QDomNamedNodeMap solveOptionAtts = solveOptions.attributes();
   EXPECT_EQ(
-        QString::number(testSettings.controlPointCoordTypeReports()),
+        QString::fromStdString(toString(testSettings.controlPointCoordTypeReports())),
         solveOptionAtts.namedItem("controlPointCoordTypeReports").nodeValue()
   );
   EXPECT_EQ(
-        QString::number(testSettings.controlPointCoordTypeBundle()),
+        QString::fromStdString(toString(testSettings.controlPointCoordTypeBundle())),
         solveOptionAtts.namedItem("controlPointCoordTypeBundle").nodeValue()
   );
 }
@@ -496,15 +496,15 @@ TEST(BundleSettings, saveGlobalSigmas) {
   ASSERT_FALSE(aprioriSigmas.isNull());
   QDomNamedNodeMap aprioriSigmasAtts = aprioriSigmas.attributes();
   EXPECT_EQ(
-        QString::number(testSettings.globalPointCoord1AprioriSigma()),
+        QString::fromStdString(toString(testSettings.globalPointCoord1AprioriSigma())),
         aprioriSigmasAtts.namedItem("pointCoord1").nodeValue()
   );
   EXPECT_EQ(
-        QString::number(testSettings.globalPointCoord2AprioriSigma()),
+        QString::fromStdString(toString(testSettings.globalPointCoord2AprioriSigma())),
         aprioriSigmasAtts.namedItem("pointCoord2").nodeValue()
   );
   EXPECT_EQ(
-        QString::number(testSettings.globalPointCoord3AprioriSigma()),
+        QString::fromStdString(toString(testSettings.globalPointCoord3AprioriSigma())),
         aprioriSigmasAtts.namedItem("pointCoord3").nodeValue()
   );
 }
@@ -622,11 +622,11 @@ TEST_P(ConvergenceCriteriaTest, saveConvergenceCriteria) {
         convergenceCriteriaOptionsAtts.namedItem("convergenceCriteria").nodeValue()
   );
   EXPECT_EQ(
-        QString::number(testSettings.convergenceCriteriaThreshold()),
+        QString::fromStdString(toString(testSettings.convergenceCriteriaThreshold())),
         convergenceCriteriaOptionsAtts.namedItem("threshold").nodeValue()
   );
   EXPECT_EQ(
-        QString::number(testSettings.convergenceCriteriaMaximumIterations()),
+        QString::fromStdString(toString(testSettings.convergenceCriteriaMaximumIterations())),
         convergenceCriteriaOptionsAtts.namedItem("maximumIterations").nodeValue()
   );
 }
@@ -781,7 +781,7 @@ TEST(BundleSettings, saveMaximumLikelyhoodModels) {
           modelAtts.namedItem("type").nodeValue()
     );
     EXPECT_EQ(
-          QString::number(functions[modelIndex].second),
+          QString::fromStdString(toString(functions[modelIndex].second)),
           modelAtts.namedItem("quantile").nodeValue()
     );
   }

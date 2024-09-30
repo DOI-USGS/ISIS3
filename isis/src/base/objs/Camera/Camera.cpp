@@ -1369,19 +1369,19 @@ namespace Isis {
     map += PvlKeyword("TargetName", target()->name().toStdString());
 
     std::vector<Distance> radii = target()->radii();
-    map += PvlKeyword("EquatorialRadius", std::to_string(radii[0].meters()), "meters");
-    map += PvlKeyword("PolarRadius", std::to_string(radii[2].meters()), "meters");
+    map += PvlKeyword("EquatorialRadius", toString(radii[0].meters()), "meters");
+    map += PvlKeyword("PolarRadius", toString(radii[2].meters()), "meters");
 
     map += PvlKeyword("LatitudeType", "Planetocentric");
     map += PvlKeyword("LongitudeDirection", "PositiveEast");
     map += PvlKeyword("LongitudeDomain", "360");
 
     GroundRangeResolution();
-    map += PvlKeyword("MinimumLatitude", std::to_string(p_minlat));
-    map += PvlKeyword("MaximumLatitude", std::to_string(p_maxlat));
-    map += PvlKeyword("MinimumLongitude", std::to_string(p_minlon));
-    map += PvlKeyword("MaximumLongitude", std::to_string(p_maxlon));
-    map += PvlKeyword("PixelResolution", std::to_string(p_minres));
+    map += PvlKeyword("MinimumLatitude", toString(p_minlat));
+    map += PvlKeyword("MaximumLatitude", toString(p_maxlat));
+    map += PvlKeyword("MinimumLongitude", toString(p_minlon));
+    map += PvlKeyword("MaximumLongitude", toString(p_maxlon));
+    map += PvlKeyword("PixelResolution", toString(p_minres));
 
     map += PvlKeyword("ProjectionName", "Sinusoidal");
     pvl.addGroup(map);
@@ -1408,11 +1408,11 @@ namespace Isis {
     map += PvlKeyword("RingLongitudeDomain", "360");
 
     ringRangeResolution();
-    map += PvlKeyword("MinimumRingRadius", std::to_string(p_minRingRadius));
-    map += PvlKeyword("MaximumRingRadius", std::to_string(p_maxRingRadius));
-    map += PvlKeyword("MinimumRingLongitude", std::to_string(p_minRingLongitude));
-    map += PvlKeyword("MaximumRingLongitude", std::to_string(p_maxRingLongitude));
-    map += PvlKeyword("PixelResolution", std::to_string(p_minres));
+    map += PvlKeyword("MinimumRingRadius", toString(p_minRingRadius));
+    map += PvlKeyword("MaximumRingRadius", toString(p_maxRingRadius));
+    map += PvlKeyword("MinimumRingLongitude", toString(p_minRingLongitude));
+    map += PvlKeyword("MaximumRingLongitude", toString(p_maxRingLongitude));
+    map += PvlKeyword("PixelResolution", toString(p_minres));
 
     map += PvlKeyword("ProjectionName", "Planar");
     pvl.addGroup(map);
@@ -1421,14 +1421,14 @@ namespace Isis {
   //! Reads the focal length from the instrument kernel
   void Camera::SetFocalLength() {
     int code = naifIkCode();
-    QString key = "INS" + QString::number(code) + "_FOCAL_LENGTH";
+    QString key = "INS" + QString::fromStdString(toString(code)) + "_FOCAL_LENGTH";
     SetFocalLength(Spice::getDouble(key));
   }
 
   //! Reads the Pixel Pitch from the instrument kernel
   void Camera::SetPixelPitch() {
     int code = naifIkCode();
-    QString key = "INS" + QString::number(code) + "_PIXEL_PITCH";
+    QString key = "INS" + QString::fromStdString(toString(code)) + "_PIXEL_PITCH";
     SetPixelPitch(Spice::getDouble(key));
   }
 

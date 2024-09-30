@@ -217,10 +217,10 @@ namespace Isis {
       vector<Statistics *> statsList;
       for (int img = 0; img < (int) m_imageList.size(); img++) {
         ProcessByLine p;
-        QString bandStr(QString::number(band));
+        QString bandStr(QString::fromStdString(toString(band)));
         QString statMsg = "Calculating Statistics for Band " + bandStr +
-            " of " + QString::number(m_maxBand) + " in Cube " + QString::number(img + 1) +
-            " of " + QString::number(m_maxCube);
+            " of " + QString::fromStdString(toString(m_maxBand)) + " in Cube " + QString::fromStdString(toString(img + 1)) +
+            " of " + QString::fromStdString(toString(m_maxCube));
         p.Progress()->SetText(statMsg);
         CubeAttributeInput att("+" + bandStr.toStdString());
         QString inp = QString::fromStdString(m_imageList[img].toString());
@@ -272,11 +272,11 @@ namespace Isis {
 
         Cube cube2;
         cube2.open(QString::fromStdString(m_imageList[j].toString()));
-        QString cubeStr1 = QString::number((int)(i + 1));
-        QString cubeStr2 = QString::number((int)(j + 1));
+        QString cubeStr1 = QString::fromStdString(toString((int)(i + 1)));
+        QString cubeStr2 = QString::fromStdString(toString((int)(j + 1)));
         QString statMsg = "Gathering Overlap Statisitcs for Cube " +
                          cubeStr1 + " vs " + cubeStr2 + " of " +
-                         QString::number(m_maxCube);
+                         QString::fromStdString(toString(m_maxCube));
 
         // Get overlap statistics for new cubes
         OverlapStatistics *oStats = new OverlapStatistics(cube1, cube2, statMsg, m_samplingPercent);
@@ -332,16 +332,16 @@ namespace Isis {
 
     PvlObject equ("EqualizationInformation");
     PvlGroup gen("General");
-    gen += PvlKeyword("TotalOverlaps", std::to_string(m_validCnt + m_invalidCnt));
-    gen += PvlKeyword("ValidOverlaps", std::to_string(m_validCnt));
-    gen += PvlKeyword("InvalidOverlaps", std::to_string(m_invalidCnt));
-    gen += PvlKeyword("MinCount", std::to_string(m_mincnt));
-    gen += PvlKeyword("SamplingPercent", std::to_string(m_samplingPercent));
+    gen += PvlKeyword("TotalOverlaps", toString(m_validCnt + m_invalidCnt));
+    gen += PvlKeyword("ValidOverlaps", toString(m_validCnt));
+    gen += PvlKeyword("InvalidOverlaps", toString(m_invalidCnt));
+    gen += PvlKeyword("MinCount", toString(m_mincnt));
+    gen += PvlKeyword("SamplingPercent", toString(m_samplingPercent));
     gen += PvlKeyword("Weighted", (m_wtopt) ? "true" : "false");
     int solType = m_sType;
     int lsqMethod = m_lsqMethod;
-    gen += PvlKeyword("SolutionType", std::to_string(solType));
-    gen += PvlKeyword("SolveMethod" , std::to_string(lsqMethod));
+    gen += PvlKeyword("SolutionType", toString(solType));
+    gen += PvlKeyword("SolveMethod" , toString(lsqMethod));
     PvlKeyword nonOverlaps("NonOverlaps");
     for (int img = 0; img < m_badFiles.size(); img++) {
       nonOverlaps += m_badFiles[img].toStdString();
@@ -379,25 +379,25 @@ namespace Isis {
       if (m_normsSolved) {
         // Band by band statistics
         for (int band = 1; band <= m_maxBand; band++) {
-          QString bandNum = QString::number(band);
+          QString bandNum = QString::fromStdString(toString(band));
           QString bandStr = "Band" + bandNum;
           PvlKeyword bandStats(bandStr.toStdString());
           // GAIN
           if (m_sType == OverlapNormalization::Both ||
               m_sType == OverlapNormalization::Gains ||
               m_sType == OverlapNormalization::GainsWithoutNormalization) {
-            bandStats += std::to_string(m_adjustments[img]->getGain(band - 1));
+            bandStats += toString(m_adjustments[img]->getGain(band - 1));
           }
           // OFFSET
           if (m_sType == OverlapNormalization::Both ||
               m_sType == OverlapNormalization::Offsets) {
-            bandStats += std::to_string(m_adjustments[img]->getOffset(band - 1));
+            bandStats += toString(m_adjustments[img]->getOffset(band - 1));
           }
           // AVERAGE
           if (m_sType == OverlapNormalization::Both ||
               m_sType == OverlapNormalization::Gains ||
               m_sType == OverlapNormalization::Offsets) {
-            bandStats += std::to_string(m_adjustments[img]->getAverage(band - 1));
+            bandStats += toString(m_adjustments[img]->getAverage(band - 1));
           }
           norm += bandStats;
         }
@@ -513,11 +513,11 @@ namespace Isis {
     FileList outList;
     fillOutList(outList, toListName);
 
-    QString maxCubeStr = QString::number((int) m_imageList.size());
+    QString maxCubeStr = QString::fromStdString(toString((int) m_imageList.size()));
     for (int img = 0; img < m_imageList.size(); img++) {
       // Set up for progress bar
       ProcessByLine p;
-      p.Progress()->SetText("Equalizing Cube " + QString::number((int) img + 1) +
+      p.Progress()->SetText("Equalizing Cube " + QString::fromStdString(toString((int) img + 1)) +
           " of " + maxCubeStr);
 
       // Open input cube
@@ -557,10 +557,10 @@ namespace Isis {
 
         // Band by band statistics
         for (int band = 1; band <= m_maxBand; band++) {
-          QString mult = QString::number(m_adjustments[img]->getGain(band - 1));
-          QString base = QString::number(m_adjustments[img]->getOffset(band - 1));
-          QString avg = QString::number(m_adjustments[img]->getAverage(band - 1));
-          QString bandNum = QString::number(band);
+          QString mult = QString::fromStdString(toString(m_adjustments[img]->getGain(band - 1)));
+          QString base = QString::fromStdString(toString(m_adjustments[img]->getOffset(band - 1)));
+          QString avg = QString::fromStdString(toString(m_adjustments[img]->getAverage(band - 1)));
+          QString bandNum = QString::fromStdString(toString(band));
           QString bandStr = "Band" + bandNum;
           PvlKeyword bandStats(bandStr.toStdString());
           bandStats += mult.toStdString();
