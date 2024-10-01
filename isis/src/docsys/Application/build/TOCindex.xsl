@@ -42,8 +42,6 @@ Deborah Lee Soltesz
             USGS: ISIS Application Table of Contents
         </title>
         <link rel="stylesheet" href="../assets/styles/IsisStyleCommon.css"></link>
-        <link rel="stylesheet" href="presentation/PrinterFriendly/styles/IsisApplicationDocStyle.css"></link>
-        <link rel="stylesheet" href="../assets/styles/menu.css"/>
         <link rel="stylesheet" media="print" href="../assets/styles/print.css"/>
 
         <meta name="keywords" content="Isis, applications, table of contents, image processing"/>

@@ -8,8 +8,6 @@ include $(ISISROOT)/make/isismake.os
 
 DEST_PRES_DIR = $(ISISROOT)/doc/Application/presentation
 
-PFSTYLEDIR = ../presentation/PrinterFriendly/styles
-PFDIR = $(DEST_PRES_DIR)/PrinterFriendly
 TABSTYLEDIR = ../presentation/Tabbed/styles
 TABDIR = $(DEST_PRES_DIR)/Tabbed
 
@@ -25,21 +23,7 @@ APPSDIR = $(ISISROOT)/doc/Application
 #------
 # DOCS: generate documentation
 
-docs: printer tabbed toc
-
-
-#------
-# PRINTER FRIENDLY
-# run style sheet for Printer Friendly presentation
-printer:
-
-	echo "        Printer Friendly Version"
-
-	for dirname in $(APPLICATIONS); do \
-	  cd $$dirname ; $(MAKE) -f ../Makefile-application printer ; cd .. ; \
-	done
-	mkdir -p $(PFDIR)/styles ; \
-	rsync -lHptr --delete --rsh=ssh $(PFSTYLEDIR)/*.css $(PFDIR)/styles/ ; \
+docs: tabbed toc
 
 #------
 # TABBED

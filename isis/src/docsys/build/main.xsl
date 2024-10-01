@@ -14,7 +14,11 @@ Deborah Lee Soltesz
 
 -->
 
+<xsl:param name="menuPath"/>
+
 <xsl:include href="menu.xsl"/>
+<xsl:include href="header.xsl"/>
+<xsl:include href="footer.xsl"/>
 
 <xsl:output 
   media-type="text/html" 
@@ -44,56 +48,48 @@ Deborah Lee Soltesz
         <meta name="city" content="Flagstaff"/>
         <meta name="zip" content="86001"/>
 
+        <!-- ISIS Docs -->
         <link rel="stylesheet" href="assets/styles/IsisStyleCommon.css"/>
-        <link rel="stylesheet" href="assets/styles/main.css"/>
-        <link rel="stylesheet" href="assets/styles/menu.css"/>
         <link rel="stylesheet" media="print" href="assets/styles/print.css"/>
-
-      <!-- ** start PAGE HEADER needs these scripts  ** -->
-      <!-- Commented out because we don't want to show the navigation menu
-           due to the rest of the Astrogeology site changing in structure.
-        <script type="text/javascript" src="assets/scripts/navigationBar.js">
-          <xsl:comment><![CDATA[
-          ]]></xsl:comment>
-        </script>
-      -->
         <script type="text/javascript" src="assets/scripts/homepage.js"></script>
-        <!-- Dynamic analytics insertion to prevent running on local URLs -->
-        <xsl:text>&#xa;</xsl:text>
-        <script type="text/javascript">
-          //<xsl:comment><![CDATA[
-	  (function() {
-            var usgsAnalytics = document.createElement('script');
-            usgsAnalytics.type = 'text/javascript';
-            usgsAnalytics.async = true;
-            usgsAnalytics.src = 'http://www.usgs.gov/scripts/analytics/usgs-analytics.js';
-            if('http:' == document.location.protocol) {
-              var s = document.getElementsByTagName('script')[0];
-              s.parentNode.insertBefore(usgsAnalytics, s);
-            }
-          })(); 
-          ]]></xsl:comment>
-        <xsl:text>&#xa;</xsl:text>
-        </script>
-      <!-- ** end  PAGE HEADER needs these scripts  ** -->
+
+        <!-- USGS -->
+        <link rel="stylesheet" href="assets/styles/usgs/common.css" />
+        <link rel="stylesheet" href="assets/styles/usgs/custom.css" />
+
+        <!-- Govt -->
+        <link rel="stylesheet" href="assets/styles/uswds.css"/>
+        <script src="assets/scripts/uswds-init.min.js"></script>
+
+        <style>
+          .topnav-container {
+            border-top-color: black;
+          }
+        </style>
 
       </head>
 
-      <!-- Commented out because we are not displaying the navigation menu
-           anymore.
-      <body onclick="coolAllNavButtons();" onload="setDefaultBarTo(techBar); coolAllNavButtons();">
-      -->
       <body>
 
-        <div class="isisMenu">
-          <xsl:call-template  name="writeMenu"/>
-         </div>
+        <script src="assets/scripts/uswds.min.js"></script>
+        
+        <xsl:call-template name="writeHeader"/>
 
-       <div class="isisContent">
-        <!--xsl:copy-of select="."/-->
-        <xsl:apply-templates select="* | text()" mode="copyContents"/>
-       </div>
+        <div id="isis-banner">
+          <div class="isis-logo"></div>
+          <p><em>Integrated Software for Imagers and Spectrometers</em></p>
+        </div>
 
+        <div id="page">
+          <div class="isisMenu">
+            <xsl:call-template  name="writeMenu"/>
+          </div>
+          <main class="isisContent">
+            <!--xsl:copy-of select="."/-->
+            <xsl:apply-templates select="* | text()" mode="copyContents"/>
+          </main>
+        </div>
+        <xsl:call-template name="writeFooter"/>
       <!-- end of body -->
       </body>
       </html>
