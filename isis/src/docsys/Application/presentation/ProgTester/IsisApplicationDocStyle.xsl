@@ -150,6 +150,7 @@ Deborah Lee Soltesz
     /* ----------------------------------------------------------------
      * HEADINGS */
 
+    /*
      H1       {
                font-family:     Arial Black, Arial, Geneva, sans-serif ;
                font-size:       150% ;
@@ -168,7 +169,6 @@ Deborah Lee Soltesz
                text-decoration: none ;
                margin-top:2px;
                margin-bottom:3px;
-               background-color: #88AACC ;
                padding: 3px ;
               }
 
@@ -220,6 +220,7 @@ Deborah Lee Soltesz
      body     {
                background-color: #FFFFFF;
               }
+    */
 
 
     /* ----------------------------------------------------------------
@@ -386,35 +387,6 @@ Deborah Lee Soltesz
 
 
     /* ----------------------------------------------------------------
-     * PAGE VIEW: page view styles */
-
-     .pageView {
-                 border:      3px;
-                 border-style:solid;
-                 border-color:#6666AA;
-               }
-
-     .functionView {
-                      background-color: #DDDDEE;
-                      border-top:       3px;
-                      border-left:      3px;
-                      border-right:     10px;
-                      border-bottom:    10px;
-                      border-style:     solid;
-                      border-color:     #666666;
-
-                      position:         absolute;
-                      padding:          10px;
-                      top:              10px;
-                      left:             20px;
-
-                      visibility:       hidden;
-                   }
-
-
-
-
-    /* ----------------------------------------------------------------
      * CAPTION: caption text styles */
 
     .caption /* defines style for a text caption using page's default color */
@@ -441,16 +413,6 @@ Deborah Lee Soltesz
                margin-top:5px ;
               }
 
-    .TOCtoplink /* defines style for link to top of page */
-              {
-               font-family: Arial, Helvetica, Geneva, sans-serif ;
-               font-size: 70% ;
-               font-variant: small-caps ;
-               font-weight: bold ;
-               margin-bottom:10px ;
-               margin-top:10px ;
-              }
-
 
     /* ----------------------------------------------------------------
      * IMAGE FORMATTING: special formatting for linked images */
@@ -475,11 +437,6 @@ Deborah Lee Soltesz
                  background-color: #9BD ;
                }
 
-    /** Warning Class for displaying Warning messages. */
-    span.warning {
-          color: #ff0000;
-          font-weight: bold;
-    }
         </style>
         <!-- Dynamic analytics insertion to prevent running on local URLs -->
         <xsl:text>&#xa;</xsl:text>
@@ -1102,11 +1059,11 @@ Deborah Lee Soltesz
 
                   <div style="margin-left:20px;">
                       <xsl:for-each select="terminalInterface">
-                            <tt style="font-weight:bold;">
+                            <code style="font-weight:bold;">
                               <xsl:value-of select="/application/@name"/>
                               <xsl:text> </xsl:text>
                               <xsl:value-of select="commandLine"/>
-                            </tt>
+                            </code>
                             <br/>
                             <div style="font-style:italic; font-size:X-SMALL;margin-left:20px; width:400px;">
                               <xsl:apply-templates select="description/* | description/text()" mode="copyContents"/>
@@ -1123,8 +1080,8 @@ Deborah Lee Soltesz
                   GUI Screenshot
                   </h4>
 
-                  <div style="margin-left:20px;">
-                    <table cellpadding="5" width="600">
+                  <div>
+                    <table cellpadding="5">
                       <xsl:for-each select="guiInterfaces/guiInterface/image">
                       <xsl:apply-templates mode="tabledImages" select="."/>
                       </xsl:for-each>

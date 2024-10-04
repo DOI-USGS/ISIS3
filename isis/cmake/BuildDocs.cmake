@@ -167,19 +167,14 @@ function(build_application_docs)
   #  locations instead of copying them to a temporary build directory?
 
   set(appFolder            "${docBuildFolder}/Application")
-  set(printerStyleFolder   "${appFolder}/presentation/PrinterFriendly/styles")
   set(tabbedStyleFolder    "${appFolder}/presentation/Tabbed/styles")
 
   set(installAppFolder     "${docInstallFolder}/${docVersion}/Application")
-  set(installPrinterFolder "${installAppFolder}/presentation/PrinterFriendly")
   set(installTabbedFolder  "${installAppFolder}/presentation/Tabbed")
 
   # Make output directories and copy the styles
-  file(MAKE_DIRECTORY "${installPrinterFolder}")
   file(MAKE_DIRECTORY "${installTabbedFolder}")
-  file(MAKE_DIRECTORY "${installPrinterFolder}/styles")
   file(MAKE_DIRECTORY "${installTabbedFolder}/styles")
-  copy_wildcard("${printerStyleFolder}/*.css" ${installPrinterFolder}/styles/)
   copy_wildcard("${tabbedStyleFolder}/*.css"  ${installTabbedFolder}/styles/ )
 
   # Loop through module folders
@@ -193,17 +188,13 @@ function(build_application_docs)
       get_filename_component(appName ${f} NAME)
 
       # Get printer-friendly and tabbed output folders
-      set(pfAppFolder ${installPrinterFolder}/${appName})
       set(tbAppFolder ${installTabbedFolder}/${appName})
-      file(MAKE_DIRECTORY "${pfAppFolder}")
       file(MAKE_DIRECTORY "${tbAppFolder}")
 
       if(EXISTS ${f}/assets)
-        copy_folder(${f}/assets ${pfAppFolder})
         copy_folder(${f}/assets ${tbAppFolder})
       endif()
 
-      execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../../../../\" ${XALAN_OUTFILE_OPTION} ${pfAppFolder}/${appName}.html ${XALAN_INFILE_OPTION} ${f}/${appName}.xml ${XALAN_XSL_OPTION} ${printerStyleFolder}/IsisApplicationDocStyle.xsl)
       execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} menuPath \"../../../../\" ${XALAN_OUTFILE_OPTION} ${tbAppFolder}/${appName}.html ${XALAN_INFILE_OPTION} ${f}/${appName}.xml ${XALAN_XSL_OPTION} ${tabbedStyleFolder}/IsisApplicationDocStyle.xsl)
 
     endforeach() # End loop through app folders
