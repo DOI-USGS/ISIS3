@@ -46,6 +46,7 @@ release.
 - Added *.history to the ignore list in downloadIsisData
 
 ### Changed
+- Noseam has been refactored to be callable; old Makefile test has been removed and replaced by a gtest. Issue: [#5599](https://github.com/USGS-Astrogeology/ISIS3/issues/5599)
 - Explode has been refactored to be callable; old Makefile test has been removed and replaced by a gtest. Issue: [#5557](https://github.com/USGS-Astrogeology/ISIS3/issues/5557)
 - Isisminer has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5516](https://github.com/USGS-Astrogeology/ISIS3/issues/5516)
 - Algebra has been refactored to be callable; old Makefile tests have been removed and replaced by gtests. Issue: [#5594](https://github.com/USGS-Astrogeology/ISIS3/issues/5594)
