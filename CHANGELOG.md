@@ -35,8 +35,16 @@ release.
 
 ## [Unreleased]
 
-### Fixed
+### Added
+- Added TOVECT output parameter which generate a geospatial CSV file with a VRT metadata sidecar file [#5571](https://github.com/DOI-USGS/ISIS3/issues/5571)  
+- Added Vectorize to ProcessGroundPolygon library
+- Added gtest files for the app and unit test 
 
+### Changed
+- Refactored the pixel2map app
+- Updated pixel2map documentation
+
+### Fixed
 - Fixed a bug in kaguyasp2isis that doesn't work for data with a detached label.
 
 ## [8.3.0] - 2024-08-16
