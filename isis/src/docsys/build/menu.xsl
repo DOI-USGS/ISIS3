@@ -59,6 +59,12 @@ Deborah Lee Soltesz
               <a href="https://isis.astrogeology.usgs.gov">Public&#160;Release</a>
             </li>
             <li class="usa-sidenav__item">
+              <a href="https://isis.astrogeology.usgs.gov/8.3.0/">8.3.0</a>
+            </li>
+            <li class="usa-sidenav__item">
+              <a href="https://isis.astrogeology.usgs.gov/8.2.0/">8.2.0</a>
+            </li>
+            <li class="usa-sidenav__item">
               <a href="https://isis.astrogeology.usgs.gov/8.1.0/">8.1.0</a>
             </li>
             <li class="usa-sidenav__item">
