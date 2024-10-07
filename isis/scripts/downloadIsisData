@@ -38,6 +38,7 @@ filter_list = [
         '- *.txt',
         '- *.bck', 
         '- *.log', 
+        '- *.temp',
         '- *.history',
         '- misc/',
         '- document/',
