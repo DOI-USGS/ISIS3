@@ -46,16 +46,16 @@ Deborah Lee Soltesz
         </title>
 
         <!-- ISIS Docs -->
-        <link rel="stylesheet" href="../assets/styles/IsisStyleCommon.css"/>
-        <link rel="stylesheet" media="print" href="../assets/styles/print.css"/>
+        <link rel="stylesheet" href="{$menuPath}assets/styles/IsisStyleCommon.css"/>
+        <link rel="stylesheet" media="print" href="{$menuPath}assets/styles/print.css"/>
 
         <!-- USGS -->
-        <link rel="stylesheet" href="../assets/styles/usgs/common.css" />
-        <link rel="stylesheet" href="../assets/styles/usgs/custom.css" />
+        <link rel="stylesheet" href="{$menuPath}assets/styles/usgs/common.css" />
+        <link rel="stylesheet" href="{$menuPath}assets/styles/usgs/custom.css" />
 
         <!-- Govt -->
-        <link rel="stylesheet" href="../assets/styles/uswds.css"/>
-        <script src="../assets/scripts/uswds-init.min.js"></script>
+        <link rel="stylesheet" href="{$menuPath}assets/styles/uswds.css"/>
+        <script src="{$menuPath}assets/scripts/uswds-init.min.js"></script>
 
         <meta name="keywords" content="Isis, applications, table of contents, image processing"/>
 
@@ -69,11 +69,11 @@ Deborah Lee Soltesz
         <meta name="county" content="Coconino"/>
         <meta name="city" content="Flagstaff"/>
         <meta name="zip" content="86001"/>
-       </head>
+      </head>
 
       <body>
 
-        <script src="../assets/scripts/uswds.min.js"></script>
+        <script src="{$menuPath}assets/scripts/uswds.min.js"></script>
         
         <xsl:call-template name="writeHeader"/>
 
