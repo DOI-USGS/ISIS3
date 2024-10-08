@@ -178,7 +178,7 @@
       display: block;
       padding: 0.5rem 1rem;
       text-decoration: none;
-      width: 14rem;
+      width: calc(14rem - 4px);
     }
 
     .card-list-sm > li > a:hover {
