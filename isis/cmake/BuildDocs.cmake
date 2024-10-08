@@ -73,6 +73,8 @@ function(build_upper_level)
   # Create the main documentaion page. This is located in the version directory 
   execute_process(COMMAND ${XALAN} ${XALAN_VALIDATE_OPTION} ${XALAN_PARAM_OPTION} menuPath \"\" ${XALAN_OUTFILE_OPTION} ${docInstallFolder}/${docVersion}/index.html ${XALAN_INFILE_OPTION} ${docBuildFolder}/build/homepage.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/main.xsl)
 
+  # Copy Favicon
+  file(COPY ${docBuildFolder}/favicon.ico DESTINATION ${docInstallFolder}/${docVersion}/favicon.ico)
 
 endfunction(build_upper_level)
 
