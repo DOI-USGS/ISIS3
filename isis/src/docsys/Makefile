@@ -128,11 +128,9 @@ clean:
 	rm -rf cgi-bin
 
 	cd Schemas        && rm -f *.html     ; cd .. ;
-	cd build          && rm -f doctoc.xml ; cd .. ;
 
 	cd Application ; $(MAKE) clean ; cd .. ;
 	cd Object ; $(MAKE) clean ; cd .. ;
-	cd documents ; $(MAKE) clean ; cd .. ;
 
 cleandocs:
 	rm -r $(DOCDIR)/*

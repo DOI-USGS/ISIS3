@@ -125,7 +125,7 @@ function(build_application_docs)
   # Set up the file
   set(appTocPath "${CMAKE_INSTALL_PREFIX}/bin/xml/applicationTOC.xml")
   file(REMOVE ${appTocPath})
-  cat(${docBuildFolder}/Application/build/toc_header.xml ${appTocPath})
+  file(APPEND ${appTocPath} "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><tableofcontents>")
   get_subdirectory_list(${appDataFolder} moduleFolders)
 
   # Loop through module folders
@@ -144,8 +144,8 @@ function(build_application_docs)
     endforeach()
   endforeach()
 
-  # Append the footer to complete the TOC file!
-  cat(${docBuildFolder}/Application/build/toc_footer.xml ${appTocPath})
+  # Append closing tag to complete the TOC file
+  file(APPEND ${appTocPath} "</tableofcontents>")
 
 endfunction(build_application_docs)
 
