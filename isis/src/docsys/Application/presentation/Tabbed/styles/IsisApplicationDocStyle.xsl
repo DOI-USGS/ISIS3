@@ -84,10 +84,6 @@
         <meta name="city" content="Flagstaff"/>
         <meta name="zip" content="86001"/>
 
-        <script type="text/javascript" src="../../../../assets/scripts/utility.js">
-          <xsl:comment><![CDATA[
-          ]]></xsl:comment>
-        </script>
         <script type="text/javascript">
 
           numExamples = <xsl:value-of select="count(/application/examples/example)"/> ;
