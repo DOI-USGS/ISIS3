@@ -271,13 +271,6 @@
       font-family: Arial, Helvetica, Geneva, sans-serif ;
       font-size: 80% ;
     }
-
-    /* ----------------------------------------------------------------
-     * IMAGE FORMATTING: special formatting for linked images */
-
-    .blackBorderedImage {
-      border: 2px solid black ;
-    }
  
     /* ----------------------------------------------------------------
      * Page format/hiding. should be at bottom of css */
