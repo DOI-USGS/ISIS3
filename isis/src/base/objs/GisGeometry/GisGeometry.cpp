@@ -211,8 +211,8 @@ namespace Isis {
    * @return bool True if valid, false if invalid or non-existant 
    *  
    * @history 2018-07-29 Kris Becker - If the geometry is invalid, it throws an 
-   *                        exception. Catch all exceptions an return proper
-   *                        status
+   *                        exception. Catch all exceptions and return proper
+   *                        status.
    */  
   bool GisGeometry::isValid() const {
     if (!isDefined()) {
