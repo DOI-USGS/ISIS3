@@ -97,7 +97,7 @@
             rgba(0, 0, 0, 0.2), 
             rgba(0, 0, 0, 0.3)
           ),
-        url(../banners/moon-cr.jpg);
+        url(../img/moon-cr.jpg);
       color: white;
       padding: 4rem;
       background-size: cover;
@@ -171,12 +171,14 @@
       list-style-type: none;
       width: 14rem;
       margin-bottom: 0.6rem;
+      display: inline-flex;
     }
 
     .card-list-sm > li > a {
       display: block;
       padding: 0.5rem 1rem;
       text-decoration: none;
+      width: calc(14rem - 4px);
     }
 
     .card-list-sm > li > a:hover {
@@ -270,13 +272,6 @@
     {
       font-family: Arial, Helvetica, Geneva, sans-serif ;
       font-size: 80% ;
-    }
-
-    /* ----------------------------------------------------------------
-     * IMAGE FORMATTING: special formatting for linked images */
-
-    .blackBorderedImage {
-      border: 2px solid black ;
     }
  
     /* ----------------------------------------------------------------

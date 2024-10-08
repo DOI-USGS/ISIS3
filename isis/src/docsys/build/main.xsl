@@ -51,7 +51,6 @@ Deborah Lee Soltesz
         <!-- ISIS Docs -->
         <link rel="stylesheet" href="assets/styles/IsisStyleCommon.css"/>
         <link rel="stylesheet" media="print" href="assets/styles/print.css"/>
-        <script type="text/javascript" src="assets/scripts/homepage.js"></script>
 
         <!-- USGS -->
         <link rel="stylesheet" href="assets/styles/usgs/common.css" />

@@ -40,20 +40,20 @@
         </title>
 
         <!-- Govt -->
-        <link rel="stylesheet" href="../../../../assets/styles/uswds.css"/>
-        <script src="../../../../assets/scripts/uswds-init.min.js"></script>
+        <link rel="stylesheet" href="{$menuPath}assets/styles/uswds.css"/>
+        <script src="{$menuPath}assets/scripts/uswds-init.min.js"></script>
         
         <!-- USGS -->
-        <link rel="stylesheet" href="../../../../assets/styles/usgs/common.css" />
-        <link rel="stylesheet" href="../../../../assets/styles/usgs/custom.css" />
+        <link rel="stylesheet" href="{$menuPath}assets/styles/usgs/common.css" />
+        <link rel="stylesheet" href="{$menuPath}assets/styles/usgs/custom.css" />
 
         <!-- ISIS Docs -->
-        <link rel="stylesheet" href="../../../../assets/styles/IsisStyleCommon.css"></link>
+        <link rel="stylesheet" href="{$menuPath}assets/styles/IsisStyleCommon.css"></link>
         <link rel="stylesheet" href="../styles/IsisApplicationDocStyle.css"></link>
-        <link rel="stylesheet" media="print" href="../../../../assets/styles/print.css"/>
+        <link rel="stylesheet" media="print" href="{$menuPath}assets/styles/print.css"/>
         
         <noscript> <!-- Use Print stylesheet, unhide all sections if no script -->
-          <link rel="stylesheet" href="../../../../assets/styles/print.css"/>
+          <link rel="stylesheet" href="{$menuPath}assets/styles/print.css"/>
         </noscript> <!-- Note: currently hides header/menu -->
 
         <xsl:variable name="keywordList">
@@ -84,10 +84,6 @@
         <meta name="city" content="Flagstaff"/>
         <meta name="zip" content="86001"/>
 
-        <script type="text/javascript" src="../../../../assets/scripts/utility.js">
-          <xsl:comment><![CDATA[
-          ]]></xsl:comment>
-        </script>
         <script type="text/javascript">
 
           numExamples = <xsl:value-of select="count(/application/examples/example)"/> ;
@@ -150,7 +146,7 @@
 
       <body onload="contentToggleVisibility('overview');">
 
-        <script src="../../../../assets/scripts/uswds.min.js"></script>
+        <script src="{$menuPath}assets/scripts/uswds.min.js"></script>
 
         <xsl:call-template name="writeHeader"/>
 

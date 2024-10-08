@@ -46,12 +46,12 @@ toc: ../build/toc.xml
 ../build/toc.xml: $(APPSDIR) ../build/IsisApplicationTOCbuild.xsl
 
 	echo "        Table of Contents XML"
-	cat ../build/toc_header.xml > ../build/toc.xml
+	echo "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><tableofcontents>" >> ../build/toc.xml
 	for dirname in $(APPLICATIONS); do \
 	  echo "          Adding [$$dirname]" ; \
 	  $(XALAN) $(XALAN_INFILE_OPTION) $$dirname/$$dirname.xml $(XALAN_XSL_OPTION) ../build/IsisApplicationTOCbuild.xsl >> ../build/toc.xml ; \
 	done
-	cat ../build/toc_footer.xml >> ../build/toc.xml
+	echo "</tableofcontents>" >> ../build/toc.xml
 	mkdir -p $(ISISROOT)/bin/xml/
 	cp ../build/toc.xml $(ISISROOT)/bin/xml/applicationTOC.xml
 

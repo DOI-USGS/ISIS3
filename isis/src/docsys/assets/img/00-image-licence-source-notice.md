@@ -50,3 +50,10 @@ https://thenounproject.com/creator/cfpb_minicons/
   - by Jacob Cain USGS ASC. CC0 Public Domain.
   - Derivative work of the following, also public domain:
     - noun-magnifying-glass-89626.svg (CFPB via the Noun Project)
+
+## Banner Sources
+
+- moon-cr.jpg
+  - Modified by Jacob Cain USGS ASC. CC0 Public Domain.
+  - Modification of a Project Apollo Archive Image (also public domain).
+    
