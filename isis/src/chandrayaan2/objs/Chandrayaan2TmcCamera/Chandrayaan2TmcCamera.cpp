@@ -10,6 +10,7 @@ find files of those names at the top level of this repository. **/
 
 #include <QString>
 
+#include "Affine.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
@@ -35,17 +36,23 @@ namespace Isis {
     NaifStatus::CheckErrors();
     // Set up the camera info from ik/iak kernels
     SetFocalLength();
-    SetPixelPitch();
+    //Chandrayaan2 iak uses INS-152???_PIXEL_SIZE instead of PIXEL_PITCH
+    QString ikernKey = "INS" + toString(naifIkCode()) + "_PIXEL_SIZE";
+    // Pixel size is specified in meters, we need it in mm
+    SetPixelPitch(getDouble(ikernKey)*1000);
 
     // Get the start time from labels
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-    QString stime = inst["SpacecraftClockStartCount"];
-    double etStart = getClockTime(stime).Et();
+    QString stime = (QString)inst["StartTime"];
+    SpiceDouble etStart=0;
+    etStart = iTime(stime).Et();
 
-    // Get other info from labels
-    double csum = inst["SpatialSumming"];
-    double lineRate = (double) inst["LineExposureDuration"] / 1000.0;
+    double csum = 1;
+    if (inst.hasKeyword("SpatialSumming")){
+      csum = inst["SpatialSumming"];
+    }
+    double lineRate = (double) inst["LineExposureDuration"] / 1000;
 
     // Setup detector map
     LineScanCameraDetectorMap *detectorMap =
@@ -56,13 +63,14 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-    QString boresightkey = "INS" + toString((int)naifIkCode()) + "_BORESIGHT";
-    double sampleBoreSight = getDouble(boresightkey, 0);
-    double lineBoreSight = getDouble(boresightkey, 1);
+    QString centerKey = "INS" + toString((int)naifIkCode()) + "_CENTER";
+    double sampleCenter = getDouble(centerKey, 0);
+    double lineCenter = getDouble(centerKey, 1);
 
-    focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
+    focalMap->SetDetectorOrigin(sampleCenter, lineCenter);
     focalMap->SetDetectorOffset(0.0, 0.0);
 
+    // @TODO set no distortion? No values in IK
     // Setup distortion map
     CameraDistortionMap *distMap = new CameraDistortionMap(this);
     distMap->SetDistortion(naifIkCode());
@@ -80,7 +88,7 @@ namespace Isis {
 /**
  * This is the function that is called in order to instantiate an Chandrayaan2TmcCamera object.
  *
- * @param lab Cube labels
+ * @param cube The input cube from which to instantiate the camera model.
  *
  * @return Isis::Camera* Chandrayaan2TmcCamera
  *

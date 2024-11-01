@@ -1,0 +1,36 @@
+Unit Test for Chandrayaan1M3Camera...
+FileName: out.cub
+CK Frame: -152210
+
+Kernel IDs: 
+CK Frame ID = -152001
+CK Reference ID = 1
+SPK Target ID = -152
+SPK Reference ID = 1
+
+Spacecraft Name Long: Chandrayaan 2
+Spacecraft Name Short: Chan2
+Instrument Name Long: Terrain Mapping Camera-2
+Instrument Name Short: TMC-2
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+RightAscension = 120.8153761895855354
+Declination = -23.1624991236805506
