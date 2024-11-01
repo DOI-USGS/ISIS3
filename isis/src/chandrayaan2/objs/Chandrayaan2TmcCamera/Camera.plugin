@@ -1,4 +1,4 @@
-Group = CHANDRAYAAN-2/TMC
+Group = CHANDRAYAAN-2/TMC-2
   Version = 1
   Library = Chandrayaan2TmcCamera
   Routine = Chandrayaan2TmcCameraPlugin
