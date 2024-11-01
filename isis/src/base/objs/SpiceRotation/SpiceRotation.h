@@ -427,7 +427,7 @@ namespace Isis {
       int p_axis1;                      //!< Axis of rotation for angle 1 of rotation
       int p_axis2;                      //!< Axis of rotation for angle 2 of rotation
       int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
-      ale::Orientations *m_orientation; //! Cached orientation information
+      ale::Orientations *m_orientation = nullptr; //! Cached orientation information
 
     private:
       // method
