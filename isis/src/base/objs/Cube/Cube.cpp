@@ -968,10 +968,10 @@ namespace Isis {
     setLabelsAttached(LabelAttachment::AttachedLabel);
     m_dataFileName = new FileName(*m_labelFileName);
 
-    initCoreFromGdal(m_labelFileName->toString());
+    initCoreFromGdal(m_labelFileName->expanded());
     GDALDataset *dataset = GDALDataset::FromHandle(GDALOpen(m_dataFileName->expanded().toStdString().c_str(), GA_ReadOnly));
     if (!dataset) {
-      QString msg = "Opening GDALDataset from [" + m_dataFileName->name() + "]";
+      QString msg = "Failed opening GDALDataset from [" + m_dataFileName->name() + "]";
       cleanUp(false);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -2725,17 +2725,24 @@ namespace Isis {
 
 
   void Cube::initCoreFromGdal(const QString &labelFile) {
-    GDALDataset *geodataSet = GDALDataset::FromHandle(GDALOpen(labelFile.toStdString().c_str(), GA_Update));
+    GDALDataset *geodataSet = GDALDataset::FromHandle(GDALOpen(labelFile.toStdString().c_str(), GA_ReadOnly));
     if (!geodataSet) {
       QString msg = "Gdal failed to open [" + labelFile + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+
+    std::string format = std::string(m_geodataSet->GetDriverName());
+    if (format == "GTiff") {
+      setFormat(GTiff);
+    }
+    else {
+      QString msg = "Unsupported GDAL format [" + QString::fromStdString(format) + "]";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+
     setDimensions(geodataSet->GetRasterXSize(), geodataSet->GetRasterYSize(), geodataSet->GetRasterCount());
-    
-    // Get the format from the driver
-    // GDALDriver *driver = GDALDriver::FromHandle(GDALIdentifyDriver(labelFile.toStdString().c_str()));
+
     GDALRasterBand *band = geodataSet->GetRasterBand(1);
-    setFormat(GTiff);
     setPixelType(GdalPixelToIsis(band->GetRasterDataType()));
     setBaseMultiplier(band->GetOffset(), band->GetScale());
     GDALClose(geodataSet);
