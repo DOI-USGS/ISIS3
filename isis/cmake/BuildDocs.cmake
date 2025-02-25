@@ -312,7 +312,6 @@ function(build_object_docs)
   file(MAKE_DIRECTORY ${docInstallFolder}/${docVersion}/Object/apps)
   file(MAKE_DIRECTORY ${docInstallFolder}/${docVersion}/Object/Developer)
   file(MAKE_DIRECTORY ${docInstallFolder}/${docVersion}/Object/Programmer)
-  file(MAKE_DIRECTORY ${docInstallFolder}/${docVersion}/documents/DocStyle/assets)
   copy_wildcard("${docBuildFolder}/Object/*.html" ${docInstallFolder}/${docVersion}/Object/)
   #copy_file(${objBuildDir}/isisDoxyDefs.doxydef ${docInstallFolder}/documents/DocStyle/assets/isisDoxyDefs.doxydef)
 
