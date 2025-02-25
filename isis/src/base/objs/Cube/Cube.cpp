@@ -2731,15 +2731,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    std::string format = std::string(m_geodataSet->GetDriverName());
-    if (format == "GTiff") {
-      setFormat(GTiff);
-    }
-    else {
-      QString msg = "Unsupported GDAL format [" + QString::fromStdString(format) + "]";
-      throw IException(IException::Io, msg, _FILEINFO_);
-    }
-
+    setFormat(GTiff);
     setDimensions(geodataSet->GetRasterXSize(), geodataSet->GetRasterYSize(), geodataSet->GetRasterCount());
 
     GDALRasterBand *band = geodataSet->GetRasterBand(1);
