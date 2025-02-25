@@ -21,7 +21,7 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "NaifStatus.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 
 using namespace UA::HiRISE;
 using std::endl;
@@ -158,7 +158,8 @@ namespace Isis {
       } catch (IException &e) {
         try {
           QString scStartTimeString = jdata.scStartTime;
-          jdata.obsStartTime = Isis::RestfulSpice::strSclkToEt(-74999, scStartTimeString.toLatin1().data(), "hirise");
+          auto [output, kernels] = SpiceQL::strSclkToEt(-74999, scStartTimeString.toLatin1().data(), "hirise");
+          jdata.obsStartTime = output; 
         } catch (IException &e) {
             QString message = "Start time of the image can not be determined.";
             throw IException(e, IException::User, message, _FILEINFO_);

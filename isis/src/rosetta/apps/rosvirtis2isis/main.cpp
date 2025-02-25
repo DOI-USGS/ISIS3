@@ -25,7 +25,7 @@ find files of those names at the top level of this repository. **/
 #include "LineManager.h"
 #include "PolynomialUnivariate.h"
 #include "ProcessImportPds.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 #include "Table.h"
 #include "UserInterface.h"
 #include "VirtisHK.h"
@@ -404,8 +404,8 @@ void IsisMain ()
     PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
 
 
-    double etStart = Isis::RestfulSpice::strSclkToEt(-226, startScet.toLatin1().data(), "virtis");
-    double etEnd = Isis::RestfulSpice::strSclkToEt(-226, stopScet.toLatin1().data(), "virtis");
+    auto [etStart, k1] = SpiceQL::strSclkToEt(-226, startScet.toLatin1().data(), "virtis");
+    auto [etEnd, k2]  = SpiceQL::strSclkToEt(-226, stopScet.toLatin1().data(), "virtis");
 
     scs2e_c( (SpiceInt) -226, startScet.toLatin1().data(), &etStart);
     scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
@@ -417,8 +417,8 @@ void IsisMain ()
     QString stopTime = iTime(etEnd-exposureTime).UTC();
 
 
-    std::string startSclkString = Isis::RestfulSpice::doubleEtToSclk( -226, etStart-exposureTime, "virtis");
-    std::string endSclkString = Isis::RestfulSpice::doubleEtToSclk( -226, etEnd-exposureTime, "virtis");
+    auto [startSclkString, k3] = SpiceQL::doubleEtToSclk( -226, etStart-exposureTime, "virtis");
+    auto [endSclkString, k4] = SpiceQL::doubleEtToSclk( -226, etEnd-exposureTime, "virtis");
 
     inst.findKeyword("StartTime").setValue(startTime);
     inst.findKeyword("StopTime").setValue(stopTime);

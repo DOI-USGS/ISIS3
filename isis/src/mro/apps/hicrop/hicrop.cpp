@@ -23,7 +23,7 @@ find files of those names at the top level of this repository. **/
 #include "LineManager.h"
 #include "NaifStatus.h"
 #include "ProcessByLine.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 #include "spiceql.h"
 #include "Table.h"
 #include "TextFile.h"
@@ -119,7 +119,8 @@ namespace Isis {
 
       // get the actual original start time by making adjustments to the
       // spacecraft clock start count in the labels
-      iTime timeFromLabelClockCount = Isis::RestfulSpice::strSclkToEt(-74999, labelStartClockCount.toLatin1().data(), "hirise");
+      auto [timeFromLabelClockCount, kernels] = SpiceQL::strSclkToEt(-74999, labelStartClockCount.toLatin1().data(), "hirise");
+      
       iTime originalStart = actualTime(timeFromLabelClockCount, tdiMode,
                                        unbinnedRate, binMode);
       double originalStartEt = originalStart.Et();
@@ -248,18 +249,18 @@ namespace Isis {
                         ckCoverage.first, ckCoverage.second);
 
       // HiRise spacecraft clock format is P/SSSSSSSSSS:FFFFF
-      IString actualCropStartClockCount = Isis::RestfulSpice::doubleEtToSclk(-74999, cropStartTime.Et(), "hirise");
-      IString actualCropStopClockCount = Isis::RestfulSpice::doubleEtToSclk(-74999, cropStopTime.Et(), "hirise");
+      SpiceQL::doubleEtToSclk(-74999, cropStartTime.Et(), "hirise");
+      SpiceQL::doubleEtToSclk(-74999, cropStopTime.Et(), "hirise");
 
 
       // readjust the time to get the appropriate label value for the
       // spacecraft clock start count for the labels of the cropped cube
       iTime adjustedCropStartTime = labelClockCountTime(cropStartTime, tdiMode,
                                                         unbinnedRate, binMode);
-      QString adjustedCropStartClockCount = QString::fromStdString(Isis::RestfulSpice::doubleEtToSclk(-74999, adjustedCropStartTime.Et(), "hirise"));
+      QString adjustedCropStartClockCount = QString::fromStdString(SpiceQL::doubleEtToSclk(-74999, adjustedCropStartTime.Et(), "hirise").first);
       iTime adjustedCropStopTime = labelClockCountTime(cropStopTime, tdiMode,
                                                        unbinnedRate, binMode);
-      QString adjustedCropStopClockCount = QString::fromStdString(Isis::RestfulSpice::doubleEtToSclk(-74999, adjustedCropStopTime.Et(), "hirise"));
+      QString adjustedCropStopClockCount = QString::fromStdString(SpiceQL::doubleEtToSclk(-74999, adjustedCropStopTime.Et(), "hirise").first);
 
 
 

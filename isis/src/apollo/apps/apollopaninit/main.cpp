@@ -38,7 +38,7 @@ find files of those names at the top level of this repository. **/
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "PvlTranslationTable.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 #include "Spice.h"
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
@@ -242,14 +242,14 @@ void IsisMain() {
   //////////////////////////////////////////attach a target rotation table
   std::string frameName;
    SpiceInt frameCode = 0;
-   try{
-     json output = Isis::RestfulSpice::getTargetFrameInfo(301, mission.toLower().toStdString());
+   try {
+     auto [output, kernels] = SpiceQL::getTargetFrameInfo(301, mission.toLower().toStdString());
      cout << output << endl;
      frameCode = output["frameCode"].get<SpiceInt>();
      frameName = output["frameName"].get<std::string>();
-   }catch(std::invalid_argument){
+   } catch(std::invalid_argument) {
      std::string naifTarget = "IAU_MOON";
-     frameCode = Isis::RestfulSpice::translateNameToCode(naifTarget, mission.toLower().toStdString());
+     auto [frameCode, kernels] = SpiceQL::translateNameToCode(naifTarget, mission.toLower().toStdString());
      if(frameCode == 0) {
        QString msg = "Can not find NAIF code for [" + QString::fromStdString(naifTarget) + "]";
        throw IException(IException::Io, msg, _FILEINFO_);

@@ -13,7 +13,7 @@ find files of those names at the top level of this repository. **/
 #include "TextFile.h"
 #include "LineManager.h"
 #include "Brick.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 #include "Table.h"
 #include "UserInterface.h"
 #include "Camera.h"
@@ -171,7 +171,7 @@ namespace Isis {
           double sunpos[6];
 
           std::vector<double> etStartVec = {etStart};
-          std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStartVec, "mars", "sun", "iau_mars", "LT+S", "mro", "reconstructed", "reconstructed");
+          auto [sunLt, kernels] = SpiceQL::getTargetStates(etStartVec, "mars", "sun", "iau_mars", "LT+S", "mro", {"reconstructed"}, {"reconstructed"});
           std::copy(sunLt[0].begin(), sunLt[0].begin()+6, sunpos);
 
           dist1 = vnorm_c(sunpos);

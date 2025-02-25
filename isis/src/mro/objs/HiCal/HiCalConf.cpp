@@ -24,7 +24,7 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 #include "IException.h"
 #include "Pvl.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 #include "SpecialPixel.h"
 #include "NaifStatus.h"
 
@@ -310,7 +310,7 @@ bool HiCalConf::_naifLoaded = false;
       try {
         QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
         NaifStatus::CheckErrors();
-        double obsStartTime = Isis::RestfulSpice::strSclkToEt(-74999, scStartTime.toLatin1().data(), "hirise");
+        double obsStartTime = SpiceQL::strSclkToEt(-74999, scStartTime.toLatin1().data(), "hirise").first;
 
         QString targetName = getKey("TargetName", "Instrument");
         if (targetName.toLower() == "sky" ||
@@ -322,7 +322,7 @@ bool HiCalConf::_naifLoaded = false;
         double sunv[3];
 
         std::vector<double> etStart = {obsStartTime};
-        std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, targetName.toLatin1().data(), "sun", "J2000", "LT+S", "hirise", "reconstructed", "reconstructed");
+        vector<vector<double>> sunLt = SpiceQL::getTargetStates(etStart, targetName.toLatin1().data(), "sun", "J2000", "LT+S", "hirise", {"reconstructed"}, {"reconstructed"}).first;
         std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunv);
 
         sunkm = vnorm_c(sunv);

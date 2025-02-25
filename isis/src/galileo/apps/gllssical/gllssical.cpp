@@ -11,7 +11,7 @@ find files of those names at the top level of this repository. **/
 #include "Buffer.h"
 #include "Camera.h"
 #include "iTime.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 #include "SpecialPixel.h"
 #include "Spice.h"
 #include "TextFile.h"
@@ -484,7 +484,7 @@ namespace Isis {
   
           NaifStatus::CheckErrors();
   
-          double obsStartTime = Isis::RestfulSpice::strSclkToEt(-77, startTime.toStdString(), "galileo");
+          auto [obsStartTime, kernels] = SpiceQL::strSclkToEt(-77, startTime.toStdString(), "galileo");
           spicegll.setTime(obsStartTime);
           double sunv[3];
           spicegll.sunPosition(sunv);

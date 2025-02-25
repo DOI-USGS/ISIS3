@@ -25,7 +25,7 @@ find files of those names at the top level of this repository. **/
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 #include "UserInterface.h"
 
 using namespace std;
@@ -248,8 +248,8 @@ namespace Isis {
     }
 
     QString scTime = inst["SpacecraftClockStartCount"];
-    double et = Isis::RestfulSpice::strSclkToEt(sclkCode, scTime.toLatin1().data(), "mvic");
-    std::string utc = Isis::RestfulSpice::etToUtc(et, "ISOC", 3);
+    auto [et, k1] = SpiceQL::strSclkToEt(sclkCode, scTime.toLatin1().data(), "mvic");
+    auto [utc, k2] = SpiceQL::etToUtc(et, "ISOC", 3);
     inst.addKeyword(PvlKeyword("StartTime", QString::fromStdString(utc)));
 
     // Create a Band Bin group

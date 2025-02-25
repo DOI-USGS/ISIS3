@@ -35,7 +35,7 @@ find files of those names at the top level of this repository. **/
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlToPvlTranslationManager.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 #include "UserInterface.h"
 
 using namespace std;
@@ -361,14 +361,14 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   // The purpose of the next two steps, getting the spacecraft clock count,
   // are simply to get the partition, the very first number 1/...
 
-  double approxEphemeris = Isis::RestfulSpice::utcToEt(inst["StartTime"][0].toLatin1().data());
+  auto [approxEphemeris, kernels] = SpiceQL::utcToEt(inst["StartTime"][0].toLatin1().data());
 
   // sce2s_c requires the spacecraft number, not the instrument number as
   // we've found elsewhere, either -31 or -32 in this case.
   int spacecraftClockNumber = -30;
   spacecraftClockNumber -= toInt(spacecraftNumber);
   std::string confId = "voyager" + spacecraftNumber.toStdString();
-  std::string approxSpacecraftClock = Isis::RestfulSpice::doubleEtToSclk(spacecraftClockNumber, approxEphemeris, confId);
+  string approxSpacecraftClock = SpiceQL::doubleEtToSclk(spacecraftClockNumber, approxEphemeris, confId).first;
 
   /*
    * For our next trick, we will substitute the image number we got earlier
@@ -394,10 +394,10 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   newClockCount.append(":");
   newClockCount.append(imgNumber.mid(5, 2));
 
-  approxEphemeris = Isis::RestfulSpice::strSclkToEt(spacecraftClockNumber, newClockCount.toStdString(), confId);
+  approxEphemeris = SpiceQL::strSclkToEt(spacecraftClockNumber, newClockCount.toStdString(), confId).first;
 
   //* 4 *//
-  std::string utcOut = Isis::RestfulSpice::etToUtc(approxEphemeris, "ISOC", 3);
+  std::string utcOut = SpiceQL::etToUtc(approxEphemeris, "ISOC", 3).first;
   NaifStatus::CheckErrors();
   inst["StartTime"].setValue(QString::fromStdString(utcOut));
 

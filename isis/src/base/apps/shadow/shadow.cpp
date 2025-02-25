@@ -8,7 +8,7 @@
 #include "KernelDb.h"
 #include "NaifStatus.h"
 #include "ProcessByBrick.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 #include "ShadowFunctor.h"
 #include "SpicePosition.h"
 #include "spiceql.h"
@@ -77,10 +77,12 @@ namespace Isis {
         userKernels = true;
       }
       
-      if (userKernels){
-        sunLt = SpiceQL::getTargetStates(etStart, "sun", observer, bff, "NONE", "base", "reconstructed", "reconstructed", true);
-      }else{
-        sunLt = Isis::RestfulSpice::getTargetStates(etStart, "sun", observer, bff, "NONE", RestfulSpice::spiceql_mission_map[observer], "reconstructed", "reconstructed");
+      if (userKernels) {
+        auto [output, kernels] = SpiceQL::getTargetStates(etStart, "sun", observer, bff, "NONE", "base", {"reconstructed"}, {"reconstructed"}, false, true);
+        sunLt = output;
+      } else {
+        auto [output, kernels] = SpiceQL::getTargetStates(etStart, "sun", observer, bff, "NONE", SpiceQL::spiceql_mission_map[observer], {"reconstructed"}, {"reconstructed"});
+        sunLt = output; 
       }
 
       NaifStatus::CheckErrors();
@@ -90,9 +92,11 @@ namespace Isis {
       etStart = {time.Et() - lightTime};
 
       if (userKernels){
-        sunLt = SpiceQL::getTargetStates(etStart, "sun", observer, bff, "NONE", "base", "reconstructed", "reconstructed", true);
+        auto [output, kernels]  = SpiceQL::getTargetStates(etStart, "sun", observer, bff, "NONE", "base", {"reconstructed"}, {"reconstructed"}, false, true);
+        sunLt = output;
       }else{
-        sunLt = Isis::RestfulSpice::getTargetStates(etStart, "sun", observer, bff, "NONE", RestfulSpice::spiceql_mission_map[observer], "reconstructed", "reconstructed");
+        auto [output, kernels]  =SpiceQL::getTargetStates(etStart, "sun", observer, bff, "NONE", SpiceQL::spiceql_mission_map[observer], {"reconstructed"}, {"reconstructed"});
+        sunLt = output;   
       }
       
       std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunPosition);

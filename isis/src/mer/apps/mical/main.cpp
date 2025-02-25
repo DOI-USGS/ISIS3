@@ -16,7 +16,7 @@ find files of those names at the top level of this repository. **/
 #include "MiCalibration.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 #include "UserInterface.h"
 
 #include <cmath>
@@ -99,7 +99,7 @@ void IsisMain() {
   double sunpos[6];
   std::vector<double> etStart = {startTime.Et()};
   vector<string> kernel_list = {"/lro/tspk/de421.bsp", "/mars/tspk/mar[0-9]{3}", "/base/pck/pck[0-9]{5}"}; 
-  std::vector<std::vector<double>> sunLt = Isis::RestfulSpice::getTargetStates(etStart, "mars", "sun", "iau_mars", "LT+S", "mer1", "reconstructed", "reconstructed", kernel_list);
+  auto [sunLt, kernels] = SpiceQL::getTargetStates(etStart, "mars", "sun", "iau_mars", "LT+S", "mer1", {"reconstructed"}, {"reconstructed"}, false, true, kernel_list);
   std::copy(sunLt[0].begin(), sunLt[0].begin()+6, sunpos);
 
   double dist = vnorm_c(sunpos);

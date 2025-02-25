@@ -30,7 +30,7 @@ find files of those names at the top level of this repository. **/
 #include "ProcessImportPds.h"
 #include "Progress.h"
 #include "Pvl.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 #include "Table.h"
 #include "UserInterface.h"
 
@@ -384,12 +384,12 @@ namespace Isis {
       }
 
       inst.findKeyword("StartTime").setValue(firstEt.UTC());
-      std::string startClockString = Isis::RestfulSpice::doubleEtToSclk(sclkCode, firstEt.Et(), "chandrayaan1");
+      auto [startClockString, kernels] = SpiceQL::doubleEtToSclk(sclkCode, firstEt.Et(), "chandrayaan1");
       QString startClock = QString::fromStdString(startClockString);
       inst.findKeyword("SpacecraftClockStartCount").setValue(startClock);
 
       inst.findKeyword("StopTime").setValue(lastEt.UTC());
-      std::string stopClockString= Isis::RestfulSpice::doubleEtToSclk(sclkCode, lastEt.Et(), "chandrayaan1");
+      auto [stopClockString, kernels2]= SpiceQL::doubleEtToSclk(sclkCode, lastEt.Et(), "chandrayaan1");
       QString stopClock = QString::fromStdString(stopClockString);
       inst.findKeyword("SpacecraftClockStopCount").setValue(stopClock);
     }

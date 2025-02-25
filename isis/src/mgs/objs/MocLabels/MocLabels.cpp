@@ -20,7 +20,7 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 #include "iTime.h"
 #include "mocxtrack.h"
-#include "RestfulSpice.h"
+#include "spiceql.h"
 #include "TextFile.h"
 #include "AlphaCube.h"
 
@@ -226,7 +226,8 @@ namespace Isis {
     // Initialize the maps from sample coordinate to detector coordinates
     InitDetectorMaps();
 
-    p_etStart = Isis::RestfulSpice::strSclkToEt(-94, p_clockCount.toLatin1().data(), "mgs");
+    auto [output, kernels] = SpiceQL::strSclkToEt(-94, p_clockCount.toLatin1().data(), "mgs");
+    p_etStart = output; 
     p_etEnd = EphemerisTime((double)p_nl);
 
   }
@@ -458,7 +459,7 @@ namespace Isis {
       sclk = currentSclk;
       sclk.Remove("\"");
       sclk.Trim(" ");
-      double et = Isis::RestfulSpice::strSclkToEt(-94, currentSclk, "mgs");
+      auto [et, kernels] = SpiceQL::strSclkToEt(-94, currentSclk, "mgs");
 
       //Compare time against given parameters, if it fits, process
       if(et < p_etEnd && et > p_etStart) {
@@ -484,7 +485,8 @@ namespace Isis {
           }
           sclk = currentSclk;
           sclk.Trim(" ");
-          et = Isis::RestfulSpice::strSclkToEt(-94, currentSclk, "mgs");
+          
+          tie(et, kernels) = SpiceQL::strSclkToEt(-94, currentSclk, "mgs");
           scs2e_c(-94, currentSclk.c_str(), &et);
 
           bottom = linenum;
@@ -507,7 +509,7 @@ namespace Isis {
           }
           sclk = currentSclk;
           sclk.Trim(" ");
-          et = Isis::RestfulSpice::strSclkToEt(-94, currentSclk, "mgs");
+          tie(et, kernels) = SpiceQL::strSclkToEt(-94, currentSclk, "mgs");
           top = linenum;
         }
         //Now, go from the upper limit to the lower limit, and grab all lines
@@ -535,7 +537,7 @@ namespace Isis {
           sclk.Remove("\"");
           sclk.Trim(" ");
 
-          et = Isis::RestfulSpice::strSclkToEt(-94, currentSclk, "mgs");
+          tie(et, kernels) = SpiceQL::strSclkToEt(-94, currentSclk, "mgs");
 
           // Get the gain mode id
           gainId = line.Token(",").ToQt().remove("\"").trimmed();
