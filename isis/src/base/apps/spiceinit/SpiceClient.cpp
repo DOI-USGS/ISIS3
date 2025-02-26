@@ -371,6 +371,10 @@ namespace Isis {
       p_response = new QString();
     }
 
+    if (!p_error) {
+      p_error = new QString();
+    }
+
     *p_error = "Server expects authentication which is not currently ";
     *p_error += "supported";
     quit();
@@ -384,6 +388,10 @@ namespace Isis {
     if(!p_response) {
       p_rawResponse = new QString();
       p_response = new QString();
+    }
+
+    if (!p_error) {
+      p_error = new QString();
     }
 
     *p_error = "Server expects authentication which is not currently ";
@@ -401,6 +409,10 @@ namespace Isis {
     if(!p_response) {
       p_rawResponse = new QString();
       p_response = new QString();
+    }
+
+    if (!p_error) {
+      p_error = new QString();
     }
 
     *p_error = "Server expects authentication which is not currently ";
