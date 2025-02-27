@@ -164,9 +164,8 @@ int main(int argc, char *argv[]) {
     // directly. these methods are called by calculateDefaultNormal()
     shapeModelFromPvlElevation.calculateDefaultNormal(); 
     qDebug() << "Has default normal?                  " << shapeModelFromPvlElevation.hasNormal();
-    normal = shapeModelFromPvlElevation.normal();
     qDebug() << "Default normal:                      "
-             << QVector<double>(normal.begin(), normal.end());
+             << QVector<double>::fromStdVector(shapeModelFromPvlElevation.normal());
 
     QVector <double *> cornerNeighborPoints;
     double point[3];

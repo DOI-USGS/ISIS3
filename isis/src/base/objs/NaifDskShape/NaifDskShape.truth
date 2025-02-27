@@ -58,11 +58,11 @@ Thrown by setLocalNormalFromIntercept() - Failed to find intercept.
 Thrown by calculateLocalNormal() - Failed to find intercept for normal vector. 
 **PROGRAMMER ERROR** Intercept point does not exist - cannot provide normal vector.
 
-Thrown by ellipsoidNormal() - No intersection. 
+Thrown by calculateDefaultNormal() - No intersection. 
 **PROGRAMMER ERROR** An intersection must be defined before computing the surface normal.
 
-Thrown by ellipsoidNormal() - Invalid intersection. 
+Thrown by calculateDefaultNormal() - Invalid intersection. 
 **PROGRAMMER ERROR** The surface point intersection must be valid to compute the surface normal.
 
-Thrown by ellipsoidNormal() - Invalid target. 
+Thrown by calculateDefaultNormal() - Invalid target. 
 **PROGRAMMER ERROR** A valid target must be defined before computing the surface normal.
