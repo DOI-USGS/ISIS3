@@ -179,6 +179,18 @@ namespace Isis {
   }
 
 
+  bool CubeAttributeOutput::propagateFileFormat() const {
+    bool result = false;
+
+    QStringList fileFormatAtts = attributeList(&CubeAttributeOutput::isFileFormat);
+
+    if (fileFormatAtts.isEmpty() || fileFormatAtts.last() == "PROPAGATE")
+      result = true;
+
+    return result;
+  }
+
+
 //   void CubeAttributeOutput::Set(const FileName &fileName) {
 //     Reset();
 //

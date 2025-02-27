@@ -481,6 +481,9 @@ namespace Isis {
       //! Return true if the min/max are to be propagated from an input cube
       bool propagateMinimumMaximum() const;
 
+      //! Return true if the file format is to be propagated from an input cube
+      bool propagateFileFormat() const;
+
       //! Return the file format an Cube::Format
       Cube::Format fileFormat() const;
 

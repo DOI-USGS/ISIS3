@@ -329,7 +329,19 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
     try {
       cube->setDimensions(ns, nl, nb);
       cube->setByteOrder(att.byteOrder());
-      cube->setFormat(att.fileFormat());
+      if (att.propagateFileFormat()) {
+        if(InputCubes.size() > 0) {
+          cube->setFormat(InputCubes[0]->format());
+        }
+        else {
+          QString msg = "You told me to propagate file format from input to output";
+          msg += " cube but there are no input cubes loaded";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+        }
+      }
+      else {
+        cube->setFormat(att.fileFormat());
+      }
       cube->setLabelsAttached(att.labelAttachment());
       if(att.propagatePixelType()) {
         if(InputCubes.size() > 0) {
