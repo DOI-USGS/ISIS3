@@ -12,27 +12,27 @@ include $(ISISROOT)/make/isismake.tsts
 #   the standard points for testing work correctly.
 commands:
 	$(APPNAME) from=$(INPUT)/V1515948001_1.ir.cub \
-	  to=$(OUTPUT)/V1515948001_1.ir.cal1.cub UNITS=IOF \
+	  to=$(OUTPUT)/V1515948001_1.ir.cal1.cub+Tile UNITS=IOF \
 	  IRORIGDARK=false DARK=true > /dev/null;
 	catlab from=$(OUTPUT)/V1515948001_1.ir.cal1.cub \
 	  TO=$(OUTPUT)/V1515948001_1.ir.cal1.pvl > /dev/null;
 	$(APPNAME) from=$(INPUT)/V1515948001_1.ir.cub \
-	  to=$(OUTPUT)/V1515948001_1.ir.cal2.cub UNITS=SPECENERGY \
+	  to=$(OUTPUT)/V1515948001_1.ir.cal2.cub+Tile UNITS=SPECENERGY \
 	  IRORIGDARK=false DARK=true > /dev/null;
 	catlab from=$(OUTPUT)/V1515948001_1.ir.cal2.cub \
 	  TO=$(OUTPUT)/V1515948001_1.ir.cal2.pvl > /dev/null;
 	$(APPNAME) from=$(INPUT)/V1515948001_1.ir.cub \
-	  to=$(OUTPUT)/V1515948001_1.ir.cal3.cub UNITS=IOF \
+	  to=$(OUTPUT)/V1515948001_1.ir.cal3.cub+Tile  UNITS=IOF \
 	  IRORIGDARK=true DARK=true > /dev/null;
 	catlab from=$(OUTPUT)/V1515948001_1.ir.cal3.cub \
 	  TO=$(OUTPUT)/V1515948001_1.ir.cal3.pvl > /dev/null;
 	$(APPNAME) from=$(INPUT)/V1515948001_1.ir.cub \
-	  to=$(OUTPUT)/V1515948001_1.ir.cal4.cub UNITS=IOF \
+	  to=$(OUTPUT)/V1515948001_1.ir.cal4.cub+Tile  UNITS=IOF \
 	  IRORIGDARK=true DARK=false > /dev/null;
 	catlab from=$(OUTPUT)/V1515948001_1.ir.cal4.cub \
 	  TO=$(OUTPUT)/V1515948001_1.ir.cal4.pvl > /dev/null;
 	$(APPNAME) from=$(INPUT)/V1515948001_1.ir.cub \
-	  to=$(OUTPUT)/V1515948001_1.ir.cal5.cub UNITS=IOF \
+	  to=$(OUTPUT)/V1515948001_1.ir.cal5.cub+Tile  UNITS=IOF \
 	  IRORIGDARK=false DARK=false > /dev/null;
 	catlab from=$(OUTPUT)/V1515948001_1.ir.cal5.cub \
 	  TO=$(OUTPUT)/V1515948001_1.ir.cal5.pvl > /dev/null;
