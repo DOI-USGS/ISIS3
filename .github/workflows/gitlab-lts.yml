@@ -60,9 +60,11 @@ jobs:
           git clone https://isis-codebuild-ci:$GITLAB_TOKEN@code.usgs.gov/astrogeology/isis-codebuild-ci.git
           echo $LTS_VERSION
           cd isis-codebuild-ci
-          if [[ "git ls-remote --exit-code origin $LTS_VERSION" == 2 ]]; then
+          if [[ $(git ls-remote --heads origin $LTS_VERSION | wc -l) -eq 0 ]]; then
+            echo "Branch $LTS_VERSION does not exist, will create"
             git checkout -b $LTS_VERSION
           else
+            echo "Branch $LTS_VERSION already exists"
             git checkout $LTS_VERSION
             git reset --hard origin/main
           fi
