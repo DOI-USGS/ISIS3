@@ -1134,7 +1134,7 @@ namespace Isis {
    *
    */
   void Cube::reopen(QString access) {
-    if (!m_labelFile) {
+    if (!isOpen()) {
       QString msg = "Cube has not been opened yet. The filename to re-open is "
           "unknown";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -3036,7 +3036,6 @@ namespace Isis {
       // update metadata
       nlohmann::ordered_json jsonblob = this->label()->toJson()["Root"];
       nlohmann::ordered_json jsonOut;
-      // std::cout << jsonblob << std::endl;
       for (auto& [key, val] : jsonblob.items()) {
         if (!val.contains("Bytes") || key == "Label") {
           jsonOut[key] = val;
@@ -3048,7 +3047,6 @@ namespace Isis {
 
       if (this->label()->findObject("IsisCube").hasGroup("Mapping")) {
         PvlGroup &mappingGroup = this->label()->findObject("IsisCube").findGroup("Mapping");
-        std::cout << mappingGroup.name() << std::endl;
 
         if (mappingGroup.hasKeyword("ProjStr")) {
           OGRSpatialReference *oSRS = new OGRSpatialReference();

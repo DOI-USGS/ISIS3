@@ -155,12 +155,7 @@ namespace Isis {
       return jsonobj;
     };
 
-    if (this->name() == "Root" && this->objects() == 1) { 
-      return pvlobject_to_json(this->object(0));
-    }
-    else { 
-      return pvlobject_to_json(*this);
-    }
+    return pvlobject_to_json(*this);
   }
 
   /**
