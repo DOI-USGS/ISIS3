@@ -175,7 +175,7 @@ TEST_P(GdalDnTypeGenerator, TestGTiffCreateWrite) {
   in.close();
 }
 
-TEST_F(TempTestingFiles, TableTestsWriteReadGdal) {
+TEST_F(TempTestingFiles, TestGTiffTableWriteRead) {
   TableField f1("Column1", TableField::Integer);
   TableField f2("Column2", TableField::Double);
   TableField f3("Column3", TableField::Text, 10);
