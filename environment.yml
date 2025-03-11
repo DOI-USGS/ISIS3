@@ -1,7 +1,7 @@
 channels:
   - conda-forge
-  - defaults
-
+  - usgs-astrogeology
+  
 dependencies:
   - ale =0.10.0,<1
   - aom
