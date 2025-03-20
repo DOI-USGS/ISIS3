@@ -72,9 +72,6 @@ namespace Isis {
       // Return dem scale in pixels/degree
       double demScale();
 
-      // Calculate the default normal of the current intersection point
-      virtual void calculateDefaultNormal();
-
       // implement pure virtual method from ShapeModel class
       bool isDEM() const;
 
@@ -85,8 +82,7 @@ namespace Isis {
       // example, or use its GetLocalNormal method.
 
       // Calculate the surface normal of the current intersection point
-      void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
-      void calculateSurfaceNormal();
+     void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
 
     protected:
       Cube *demCube();         //!< Returns the cube defining the shape model.
