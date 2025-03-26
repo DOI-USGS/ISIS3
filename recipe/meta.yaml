@@ -84,6 +84,7 @@ requirements:
    - libxml2
    - make
    - mesalib
+   - mkl
    - mysql
    - mysql-connector-c
    - nanoflann <1.4
