@@ -34,7 +34,7 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "8.3.0")
+set(VERSION            "9.0.0")
 string(REPLACE "." ";" VERSION_LIST ${VERSION})
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
@@ -267,6 +267,7 @@ find_package(CSM       3.0.3.3 REQUIRED)
 find_package(CSPICE    65      REQUIRED)
 find_package(Eigen             REQUIRED)
 find_package(Embree    3.13.0  REQUIRED)
+find_package(GDAL              REQUIRED CONFIG)
 find_package(GeoTIFF   2       REQUIRED)
 SET(GSL_ROOT_DIR $ENV{CONDA_PREFIX})
 find_package(GSL       2.2.1   REQUIRED)
@@ -353,7 +354,7 @@ foreach (_variableName ${_variableNames})
 endforeach()
 
 # add target based linkages to ALLLIBS variable
-list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree)
+list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree GDAL::GDAL)
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)

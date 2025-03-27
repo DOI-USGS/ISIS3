@@ -35,8 +35,6 @@ documentation:
 	mkdir -p $(ISISROOT)/doc/Object
 	mkdir -p $(ISISROOT)/doc/Object/Developer
 	mkdir -p $(ISISROOT)/doc/Object/Programmer
-	mkdir -p $(ISISROOT)/doc/documents/DocStyle/assets
-	rsync -qlHptr --delete --rsh=ssh build/isisDoxyDefs.doxydef $(ISISROOT)/doc/documents/DocStyle/assets/
 
 
 assetsDir:
@@ -108,7 +106,6 @@ clean:
 	rm -f  build/Programmer_temp.conf
 	rm -f  build/Developer_temp.conf 
 	rm -rf docbuild
-	rm -f ../documents/DocStyle/assets/isisDoxyDefs.doxydef
 	rm -f doxyWarnDeveloper.txt doxyWarnProgrammer.txt
 
 cleandoc:
