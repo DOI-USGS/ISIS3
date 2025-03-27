@@ -152,6 +152,7 @@ requirements:
   - {{ pin_compatible('libpng') }}
   - libtiff
   - mesalib
+  - mkl
   - mysql
   - nanoflann
   - nlohmann_json
