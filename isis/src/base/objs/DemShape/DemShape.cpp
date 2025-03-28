@@ -129,6 +129,7 @@ namespace Isis {
   /**
      Given a position along a ray, compute the difference between the 
      radius at that position and the surface radius at that lon-lat location.
+     Update the intersection point in the class based on the input parameters.
      All lengths are in km.
    * @param observerPos Observer position
    * @param lookDirection Look direction
@@ -137,11 +138,11 @@ namespace Isis {
    * @param success True if the calculation was successful
    * @return @d double Signed error, if the calculation was successful
    **/
-  double DemShape::demError(vector<double> const& observerPos,
-                            vector<double> const& lookDirection, 
-                            double t, 
-                            double * intersectionPoint,
-                            bool & success) {
+  double DemShape::calcDemErrUpdateIntersection(vector<double> const& observerPos,
+                                                vector<double> const& lookDirection, 
+                                                double t, 
+                                                double * intersectionPoint,
+                                                bool & success) {
   
     // Initialize the return value
     success = false;
@@ -243,12 +244,14 @@ namespace Isis {
     double intersectionPoint[3];
     
     // Initial guess. If no luck, wiggle it around.
-    double f0 = demError(observerPos, lookDirection, t0, intersectionPoint, success); 
+    double f0 = calcDemErrUpdateIntersection(observerPos, lookDirection, t0, 
+                                             intersectionPoint, success); 
     if (!success) {
       std::vector<double> delta = {1.0, 0.1, 10.0, 100.0, 1000.0, 5000.0, 10000.0};
       for (size_t i = 0; i < delta.size(); i++) {
         double try_t = t0 + delta[i] / 1000.0; // convert to km
-        f0 = demError(observerPos, lookDirection, try_t, intersectionPoint, success);
+        f0 = calcDemErrUpdateIntersection(observerPos, lookDirection, try_t, 
+                                          intersectionPoint, success);
         if (success) {
           t0 = try_t;
           break;
@@ -268,7 +271,8 @@ namespace Isis {
     success = false;
     for (size_t i = 0; i < delta.size(); i++) {
       t1 = t0 + delta[i] / 1000.0; // convert to km
-      f1 = demError(observerPos, lookDirection, t1, intersectionPoint, success);
+      f1 = calcDemErrUpdateIntersection(observerPos, lookDirection, t1, 
+                                        intersectionPoint, success);
       if (f1 == f0)
         continue; // equal values are not a good thing for the secant method
       if (success) 
@@ -284,14 +288,16 @@ namespace Isis {
     bool converged = false;
     // Use 1/1000 of a pixel as tolerance. Otherwise the results may be not 
     // accurate enough for ground-level sensors with oblique views.
-    double tol = resolution()/1000;  
+    double tolFactor = 1000.0;
+    double tol = resolution() / tolFactor;
     for (int i = 1; i <= 15; i++) {
       
+      // Convert to meters and compare with tolerance
       if (std::abs(f1) * 1000.0 < tol) {
         
         // Recompute tolerance at updated surface point and recheck
         surfaceIntersection()->FromNaifArray(intersectionPoint);
-        tol = resolution() / 100.0;
+        tol = resolution() / tolFactor;
         
         if (std::abs(f1) * 1000.0 < tol) {
           converged = true;
@@ -309,7 +315,8 @@ namespace Isis {
       
       // Secant method iteration
       double t2 = t1 - f1 * (t1 - t0) / (f1 - f0);
-      double f2 = demError(observerPos, lookDirection, t2, intersectionPoint, success);
+      double f2 = calcDemErrUpdateIntersection(observerPos, lookDirection, t2, 
+                                               intersectionPoint, success);
       
       if (!success) {
         converged = false;

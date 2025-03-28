@@ -93,9 +93,10 @@ namespace Isis {
 
     private:
     
-      // Given a position along a ray, compute the difference between the 
-      // radius at that position and the surface radius at that lon-lat location.
-      // All lengths are in km.
+      // Given a position along a ray, compute the difference between the radius
+      // at that position and the surface radius at that lon-lat location.
+      // Update the intersection point in the class based on the input
+      // parameters. All lengths are in km.
       double demError(std::vector<double> const& observerPos,
                       std::vector<double> const& lookDirection, 
                       double t, 
