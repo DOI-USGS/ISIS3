@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
   cerr << "\tchar(A):            " << toString('A') << endl;
   cerr << "\tint(2147483647):    " << toString(2147483647) << endl;
   cerr << "\tuint(2147483648):   " << toString((unsigned int)2147483648) << endl;
-  cerr << "\tBigInt(2147483648): " << toString(2147483648) << endl;
+  cerr << "\tBigInt(2147483648): " << toString((BigInt)2147483648) << endl;
   cerr << "\tdouble(0.0):        " << toString(0.0) << endl;
   cerr << "\tdouble(DBL_MIN):    " << toString(DBL_MIN) << endl;
   cerr << "\tdouble(DBL_MAX*2):  " << toString(DBL_MAX * 2) << endl;

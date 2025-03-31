@@ -82,6 +82,11 @@ if(DEFINED ENV{CONDA_PREFIX} AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
  set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
 endif()
 
+# This is essential for tests to build
+if(NOT DEFINED ENV{ISISROOT})
+  message(FATAL_ERROR "Environment variable ISISROOT is not set.")
+endif()
+
 # Prioritize passed in variables over env vars, probably a better way to do this
 if(DEFINED ENV{ISISDATA} AND NOT isisData)
  set(isisData $ENV{ISISDATA})

@@ -3,7 +3,8 @@
 # of the old Makefile infrastructure.
 #============================================================================
 
-cmake_minimum_required(VERSION 3.3)
+# Minimum version 3.5 required to avoid cmake warnings
+cmake_minimum_required(VERSION 3.5)
 list(APPEND CMAKE_MODULE_PATH "${CODE_ROOT}/cmake")
 list(APPEND CMAKE_PREFIX_PATH "${CODE_ROOT}/cmake")
 include(Utilities)

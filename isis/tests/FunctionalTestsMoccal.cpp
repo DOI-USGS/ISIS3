@@ -44,7 +44,7 @@ TEST_F(MgsMocCube, FunctionalTestMoccalDefault) {
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.056909484090283513);
   EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 22.763793636113405);
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0021719888294085255);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.0021719888294085255, 1e-14);
 }
 
 

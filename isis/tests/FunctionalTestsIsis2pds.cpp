@@ -419,7 +419,7 @@ TEST(isis2pdsTest, FunctionalTestIsis2pdsPds4) {
   EXPECT_EQ(outputLabel.Translate("Filter_Number"), "1");
   EXPECT_EQ(outputLabel.Translate("Bandwidth"), "0.0140");
   EXPECT_EQ(outputLabel.Translate("Wavelength"), "1.021");
-  EXPECT_EQ(outputLabel.Translate("West_Bound_Coord"), "0.0048031106755032");
+  EXPECT_NEAR(outputLabel.Translate("West_Bound_Coord").toFloat(), 0.0048031106755032, 1e-9); // For Arm 
   EXPECT_EQ(outputLabel.Translate("East_Bound_Coord"), "359.97220491712");
   EXPECT_EQ(outputLabel.Translate("North_Bound_Coord"), "-1.1656354932701");
   EXPECT_EQ(outputLabel.Translate("South_Bound_Coord"), "-12.077278860826");
