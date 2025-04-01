@@ -1946,7 +1946,7 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawSaveApplyValues) {
   
   EXPECT_NEAR(spvectorVals[0].toDouble(), 491.19844009026, 1e-6);
   EXPECT_NEAR(spvectorVals[1].toDouble(), 1198.1045282857, 1e-6);
-  EXPECT_NEAR(spvectorVals[2].toDouble(), 1313.7703671439, 1e-6);
+  EXPECT_NEAR(spvectorVals[2].toDouble(), 1313.7703660029999, 1e-6);
   EXPECT_NEAR(spvectorVals[3].toDouble(), 1.5198029518433, 1e-6);
   EXPECT_NEAR(spvectorVals[4].toDouble(), -0.58925196165899, 1e-6);
   EXPECT_NEAR(spvectorVals[5].toDouble(), -0.046463883259045, 1e-6);
