@@ -51,7 +51,7 @@ dependencies:
   - ninja >=1.7.2,<1.8
   - nn
   - opencv >=4.5,<4.10
-  - openssl >=3.1.2
+  - openssl >=3.1.2,<3.5
   - pcl >=1.13,<1.14
   - pdal=2.6
   - plio
