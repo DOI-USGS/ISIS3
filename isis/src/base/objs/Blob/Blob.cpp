@@ -477,7 +477,7 @@ namespace Isis {
       }
 
       // update metadata
-      string jsonblobstr = pvl.toJson().dump();
+      string jsonblobstr = pvl.toJson()["Root"].dump();
       string key = this->Type().toStdString() + "_" + this->Name().toStdString();
       dataset->SetMetadataItem(key.c_str(), jsonblobstr.c_str(), "USGS");
     }

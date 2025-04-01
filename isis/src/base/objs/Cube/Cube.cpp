@@ -1020,80 +1020,92 @@ namespace Isis {
 
       isiscube.addObject(core);
 
-      if (dataset->GetSpatialRef()) {
-        char ** projStr = new char*[1];
-        const OGRSpatialReference &oSRS = *dataset->GetSpatialRef();
-        oSRS.exportToProj4(projStr);
-        QString qProjStr = QString::fromStdString(std::string(projStr[0]) + " +type=crs");
-        delete[] projStr[0];
-        delete[] projStr;
-
-        char ** projJsonStr = new char*[1];
-        oSRS.exportToPROJJSON(projJsonStr, nullptr);
-        nlohmann::json projJson = nlohmann::json::parse(projJsonStr[0]);
-        CPLFree(projJsonStr);
-
-        PvlGroup mappingGroup("Mapping");
-        mappingGroup.addKeyword(PvlKeyword("ProjectionName", "IProj"));
-        mappingGroup.addKeyword(PvlKeyword("EquatorialRadius", toString(oSRS.GetSemiMajor()), "meters"));
-        mappingGroup.addKeyword(PvlKeyword("PolarRadius", toString(oSRS.GetSemiMinor()), "meters"));
-
-        if (projJson.contains("base_crs")) {
-          projJson = projJson["base_crs"];
-        }
-
-        std::string direction = projJson["coordinate_system"]["axis"][1]["direction"];
-        if (direction == "east") {
-          mappingGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
-        }
-        else if (direction == "west") {
-          mappingGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"));
-        }
-        else {
-          QString msg = "Unknown direction [" + QString::fromStdString(direction) + "]";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
-        }
-        mappingGroup.addKeyword(PvlKeyword("LongitudeDomain", "180"));
-        mappingGroup.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"));
-        mappingGroup.addKeyword(PvlKeyword("ProjStr", qProjStr));
-        
-        // Read the GeoTransform and get the elements we care about
-        double *padfTransform = new double[6];
-        dataset->GetGeoTransform(padfTransform);
-        if (abs(padfTransform[1]) != abs(padfTransform[5])) {
-          delete[] padfTransform;
-          QString msg = "Vertical and horizontal resolution do not match";
-          throw IException(IException::Io, msg, _FILEINFO_);
-        }
-
-        double dfScale;
-        double dfRes;
-        double upperLeftX;
-        double upperLeftY;
-        dfRes = padfTransform[1] * oSRS.GetLinearUnits();
-        upperLeftX = padfTransform[0];
-        upperLeftY = padfTransform[3];
-        if (oSRS.IsProjected()) {
-          const double dfDegToMeter = oSRS.GetSemiMajor() * M_PI / 180.0;
-          dfScale = dfDegToMeter / dfRes;
-          mappingGroup.addKeyword(PvlKeyword("PixelResolution", toString(dfRes), "meters/pixel"));
-        }
-        else if (oSRS.IsGeographic()) {
-          dfScale = 1.0 / dfRes;
-          mappingGroup.addKeyword(PvlKeyword("PixelResolution", toString(dfRes), "degrees/pixel"));
-        }
-        else {
-          QString msg = "Gdal spatial reference is not Geographic or Projected";
-          throw IException(IException::Io, msg, _FILEINFO_);
-        }
-        mappingGroup.addKeyword(PvlKeyword("Scale", toString(dfScale), "pixels/degree"));
-        mappingGroup.addKeyword(PvlKeyword("UpperLeftCornerX", toString(upperLeftX)));
-        mappingGroup.addKeyword(PvlKeyword("UpperLeftCornerY", toString(upperLeftY)));
-        delete[] padfTransform;
-
-        isiscube.addGroup(mappingGroup);
-      }
       m_label->addObject(isiscube);
+    }
+
+    if (dataset->GetSpatialRef()) {
+      char ** projStr = new char*[1];
+      const OGRSpatialReference &oSRS = *dataset->GetSpatialRef();
+      oSRS.exportToProj4(projStr);
+      QString qProjStr = QString::fromStdString(std::string(projStr[0]) + " +type=crs");
+      delete[] projStr[0];
+      delete[] projStr;
+
+      char ** projJsonStr = new char*[1];
+      oSRS.exportToPROJJSON(projJsonStr, nullptr);
+      nlohmann::json projJson = nlohmann::json::parse(projJsonStr[0]);
+      CPLFree(projJsonStr);
+
+      PvlGroup mappingGroup("Mapping");
+      mappingGroup.addKeyword(PvlKeyword("ProjectionName", "IProj"));
+      mappingGroup.addKeyword(PvlKeyword("EquatorialRadius", toString(oSRS.GetSemiMajor()), "meters"));
+      mappingGroup.addKeyword(PvlKeyword("PolarRadius", toString(oSRS.GetSemiMinor()), "meters"));
+
+      if (projJson.contains("base_crs")) {
+        projJson = projJson["base_crs"];
+      }
+
+      std::string direction = projJson["coordinate_system"]["axis"][1]["direction"];
+      if (direction == "east") {
+        mappingGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
+      }
+      else if (direction == "west") {
+        mappingGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"));
+      }
+      else {
+        QString msg = "Unknown direction [" + QString::fromStdString(direction) + "]";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+      
+      if (oSRS.GetSemiMajor() == oSRS.GetSemiMinor()) {
+        mappingGroup.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"));
+      }
+      else {
+        mappingGroup.addKeyword(PvlKeyword("LatitudeType", "Planetographic"));
+      }
+
+      mappingGroup.addKeyword(PvlKeyword("LongitudeDomain", "180"));
+      mappingGroup.addKeyword(PvlKeyword("ProjStr", qProjStr));
+      
+      // Read the GeoTransform and get the elements we care about
+      double *padfTransform = new double[6];
+      dataset->GetGeoTransform(padfTransform);
+      if (abs(padfTransform[1]) != abs(padfTransform[5])) {
+        delete[] padfTransform;
+        QString msg = "Vertical and horizontal resolution do not match";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+
+      double dfScale;
+      double dfRes;
+      double upperLeftX;
+      double upperLeftY;
+      dfRes = padfTransform[1] * oSRS.GetLinearUnits();
+      upperLeftX = padfTransform[0];
+      upperLeftY = padfTransform[3];
+      if (oSRS.IsProjected()) {
+        const double dfDegToMeter = oSRS.GetSemiMajor() * M_PI / 180.0;
+        dfScale = dfDegToMeter / dfRes;
+        mappingGroup.addKeyword(PvlKeyword("PixelResolution", toString(dfRes), "meters/pixel"));
+      }
+      else if (oSRS.IsGeographic()) {
+        dfScale = 1.0 / dfRes;
+        mappingGroup.addKeyword(PvlKeyword("PixelResolution", toString(dfRes), "degrees/pixel"));
+      }
+      else {
+        QString msg = "Gdal spatial reference is not Geographic or Projected";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+      mappingGroup.addKeyword(PvlKeyword("Scale", toString(dfScale), "pixels/degree"));
+      mappingGroup.addKeyword(PvlKeyword("UpperLeftCornerX", toString(upperLeftX)));
+      mappingGroup.addKeyword(PvlKeyword("UpperLeftCornerY", toString(upperLeftY)));
+      delete[] padfTransform;
+
+      PvlObject &isiscube = m_label->findObject("IsisCube");
+      if (isiscube.hasGroup("Mapping")) {
+        isiscube.deleteGroup("Mapping");
+      }
+      isiscube.addGroup(mappingGroup);
     }
     GDALClose(dataset);
     
@@ -1122,7 +1134,7 @@ namespace Isis {
    *
    */
   void Cube::reopen(QString access) {
-    if (!m_labelFile) {
+    if (!isOpen()) {
       QString msg = "Cube has not been opened yet. The filename to re-open is "
           "unknown";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -3024,7 +3036,6 @@ namespace Isis {
       // update metadata
       nlohmann::ordered_json jsonblob = this->label()->toJson()["Root"];
       nlohmann::ordered_json jsonOut;
-      // std::cout << jsonblob << std::endl;
       for (auto& [key, val] : jsonblob.items()) {
         if (!val.contains("Bytes") || key == "Label") {
           jsonOut[key] = val;
@@ -3033,6 +3044,31 @@ namespace Isis {
       std::string jsonblobstr = jsonOut.dump();
       std::string name = "CubeLabel";
       gdalDataset()->SetMetadataItem(name.c_str(), jsonblobstr.c_str(), "USGS");
+
+      if (this->label()->findObject("IsisCube").hasGroup("Mapping")) {
+        PvlGroup &mappingGroup = this->label()->findObject("IsisCube").findGroup("Mapping");
+
+        if (mappingGroup.hasKeyword("ProjStr")) {
+          OGRSpatialReference *oSRS = new OGRSpatialReference();
+          oSRS->SetFromUserInput(mappingGroup.findKeyword("ProjStr")[0].toStdString().c_str());
+
+          gdalDataset()->SetSpatialRef(oSRS);
+
+          double dfRes = (double)mappingGroup.findKeyword("PixelResolution") / oSRS->GetLinearUnits();
+          double upperLeftX = (double) mappingGroup.findKeyword("UpperLeftCornerX");
+          double upperLeftY = (double) mappingGroup.findKeyword("UpperLeftCornerY");
+          double *padfTransform = new double[6];
+          padfTransform[1] = dfRes;
+          padfTransform[5] = -dfRes;
+          padfTransform[0] = upperLeftX;
+          padfTransform[3] = upperLeftY;
+          gdalDataset()->SetGeoTransform(padfTransform);
+          delete oSRS;
+          delete[] padfTransform;
+        }
+      }
+
+
       return;
     }
 

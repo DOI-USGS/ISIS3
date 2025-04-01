@@ -18,6 +18,7 @@ using json = nlohmann::json;
 #include "TableRecord.h"
 
 #include "CubeFixtures.h"
+#include "TiffFixtures.h"
 #include "TestUtilities.h"
 
 #include "gmock/gmock.h"
@@ -174,9 +175,7 @@ TEST_P(GdalDnTypeGenerator, TestGTiffCreateWrite) {
   in.close();
 }
 
-// Add Test for GTiff with no ISIS metadata
-
-TEST_F(TempTestingFiles, TableTestsWriteReadGdal) {
+TEST_F(TempTestingFiles, TestGTiffTableWriteRead) {
   TableField f1("Column1", TableField::Integer);
   TableField f2("Column2", TableField::Double);
   TableField f3("Column3", TableField::Text, 10);
@@ -222,4 +221,73 @@ TEST_F(TempTestingFiles, TableTestsWriteReadGdal) {
   for (int i = 0; i < t.Records(); i++) {
     EXPECT_EQ(TableRecord::toString(t[i]).toStdString(), TableRecord::toString(t2[i]).toStdString());
   }
+}
+
+TEST_F(ReadWriteTiff, TestGTiffSRS) {
+  PvlGroup mapping("Mapping");
+  mapping.addKeyword(PvlKeyword("ProjectionName", "IProj"));
+  mapping.addKeyword(PvlKeyword("EquatorialRadius", "3396190.0", "meters"));
+  mapping.addKeyword(PvlKeyword("PolarRadius", "3396190.0", "meters"));
+  mapping.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
+  mapping.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"));
+  mapping.addKeyword(PvlKeyword("LongitudeDomain", "180"));
+  mapping.addKeyword(PvlKeyword("ProjStr", "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R=3396190 +units=m +no_defs +type=crs"));
+  mapping.addKeyword(PvlKeyword("PixelResolution", "20.0", "meters/pixel"));
+  mapping.addKeyword(PvlKeyword("Scale", "2963.7348761653", "pixels/degree"));
+  mapping.addKeyword(PvlKeyword("UpperLeftCornerX", "8120050.0"));
+  mapping.addKeyword(PvlKeyword("UpperLeftCornerY", "-230230.0"));
+
+  createTiff(SignedWord);
+
+  Cube tiff;
+  tiff.open(path, "rw");
+  tiff.putGroup(mapping);
+  tiff.reopen();
+
+  Pvl &label = *tiff.label();
+  PvlGroup returnMapping = label.findObject("IsisCube").findGroup("Mapping");
+  EXPECT_TRUE(returnMapping == mapping);
+
+  dataset = GDALDataset::FromHandle(GDALOpen(path.toStdString().c_str(), GA_ReadOnly));
+
+  char ** projStr = new char*[1];
+  ASSERT_TRUE(dataset->GetSpatialRef() != nullptr);
+  const OGRSpatialReference &oSRS = *dataset->GetSpatialRef();
+  oSRS.exportToProj4(projStr);
+  std::string projAsCPPStr = projStr[0];
+  EXPECT_EQ(projAsCPPStr, "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R=3396190 +units=m +no_defs");
+
+  char ** projJsonStr = new char*[1];
+  oSRS.exportToPROJJSON(projJsonStr, nullptr);
+  nlohmann::ordered_json projJson = nlohmann::ordered_json::parse(projJsonStr[0]);
+  CPLFree(projJsonStr);
+
+  ASSERT_TRUE(projJson.contains("base_crs"));
+  ASSERT_TRUE(projJson["base_crs"].contains("coordinate_system"));
+  ASSERT_TRUE(projJson["base_crs"].contains("datum"));
+  ASSERT_TRUE(projJson["base_crs"]["coordinate_system"].contains("axis"));
+  ASSERT_TRUE(projJson["base_crs"]["datum"].contains("ellipsoid"));
+  ASSERT_TRUE(projJson["base_crs"]["datum"]["ellipsoid"].contains("radius"));
+
+  EXPECT_EQ(projJson["base_crs"]["coordinate_system"]["axis"][1]["direction"], "east");
+  EXPECT_EQ(projJson["base_crs"]["datum"]["ellipsoid"]["radius"],  3396190);
+
+  ASSERT_TRUE(projJson.contains("conversion"));
+  ASSERT_TRUE(projJson["conversion"].contains("name"));
+  ASSERT_TRUE(projJson["conversion"].contains("parameters"));
+  ASSERT_EQ(projJson["conversion"]["parameters"].size(), 5);
+
+  EXPECT_EQ(projJson["conversion"]["name"], "Equidistant Cylindrical");
+  EXPECT_EQ(projJson["conversion"]["parameters"][0]["name"], "Latitude of 1st standard parallel");
+  EXPECT_EQ(projJson["conversion"]["parameters"][0]["value"], 0);
+  EXPECT_EQ(projJson["conversion"]["parameters"][1]["name"], "Latitude of natural origin");
+  EXPECT_EQ(projJson["conversion"]["parameters"][1]["value"], 0);
+  EXPECT_EQ(projJson["conversion"]["parameters"][2]["name"], "Longitude of natural origin");
+  EXPECT_EQ(projJson["conversion"]["parameters"][2]["value"], 0);
+  EXPECT_EQ(projJson["conversion"]["parameters"][3]["name"], "False easting");
+  EXPECT_EQ(projJson["conversion"]["parameters"][3]["value"], 0);
+  EXPECT_EQ(projJson["conversion"]["parameters"][4]["name"], "False northing");
+  EXPECT_EQ(projJson["conversion"]["parameters"][4]["value"], 0);
+
+  dataset->Close();
 }

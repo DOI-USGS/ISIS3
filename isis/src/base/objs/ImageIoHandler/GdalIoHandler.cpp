@@ -282,7 +282,7 @@ namespace Isis {
       }
 
       if(raw >= VALID_MIN4) {
-        bufferVal = (double) raw;
+        bufferVal = (double) raw * m_scale + m_offset;
       }
       else {
         if(raw == NULL4)

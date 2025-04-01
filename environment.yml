@@ -1,5 +1,6 @@
 channels:
   - conda-forge
+  - usgs-astrogeology
   
 dependencies:
   - ale =0.10.0,<1
@@ -42,6 +43,7 @@ dependencies:
   - libxml2
   - make
   - mesalib
+  - mkl
   - mysql
   - mysql-connector-c
   - nanoflann <1.4
