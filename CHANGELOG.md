@@ -41,6 +41,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Added OFFBODY and OFFBODYTRIM parameters to cam2cam. Added tests and updated documentation. [#3602] (https://github.com/DOI-USGS/ISIS3/issues/3602)
 - Added support for reading, writing, and viewing GeoTIFFs in ISIS. [#5618](https://github.com/DOI-USGS/ISIS3/pull/5618)
 - Added GDAL SRS propagation for systems outside of ISIS to display projected GTiffs. [#5736](https://github.com/DOI-USGS/ISIS3/pull/5736)
+- Added CSM State output capability for jigsaw. [#5609](https://github.com/DOI-USGS/ISIS3/issues/5609)
 
 ### Changed
 - Enhanced csminit by removing the need to specify model and plugin [#5585](https://github.com/DOI-USGS/ISIS3/issues/5585)
