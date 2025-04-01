@@ -41,7 +41,7 @@ For Development and Contributing, see:
 ## Requests for Comment
 The ISIS project uses a Request for Comment (RFC) model where major changes to the code, data area, or distribution are proposed, discussed, and potentially adopted.  All contributors and users are welcome to review and comment on open RFCs.
 
-See this repo's [discussion page](https://github.com/USGS-Astrogeology/ISIS3/wiki) for recent RFCs.
+See this repo's [discussion page](https://github.com/DOI-USGS/ISIS3/discussions?discussions_q=is%3Aopen+label%3ARFC) for open RFCs.
 
 
 ## Citing ISIS
