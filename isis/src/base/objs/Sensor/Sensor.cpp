@@ -31,8 +31,6 @@ find files of those names at the top level of this repository. **/
 #include "Target.h"
 #include "UniqueIOCachingAlgorithm.h"
 
-#define MAX(x,y) (((x) > (y)) ? (x) : (y))
-
 using namespace std;
 
 namespace Isis {
