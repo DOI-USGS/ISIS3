@@ -4,6 +4,9 @@
 #include <QtMath>
 #include <QFile>
 #include <QScopedPointer>
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5File.hpp>
+#include <nlohmann/json.hpp>
 
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -17,9 +20,6 @@
 #include "SerialNumber.h"
 #include "BundleAdjust.h"
 #include "BundleSettings.h"
-#include <highfive/H5DataSet.hpp>
-#include <highfive/H5File.hpp>
-
 
 #include "jigsaw.h"
 
@@ -31,7 +31,7 @@
 
 using namespace Isis;
 using namespace testing;
-
+using json = nlohmann::json;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/jigsaw.xml").expanded();
 
@@ -1932,4 +1932,32 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawSaveApplyValues) {
             "J2000X,J2000Y,J2000Z,J2000XV,J2000YV,J2000ZV,ET\n491.19844009026,1198.1045282857,1313.7703671439,1.5198029518433,-0.58925196165899,-0.046463883259045,-896818899.38874\n");
 
   file.flush();
+}
+
+TEST_F(ObservationPair, FunctionalTestJigsawOutputCsmState) {
+
+  QTemporaryDir prefix;
+  QString outCnetFileName = prefix.path() + "/outTemp.net";
+
+  QVector<QString> args = {"fromlist="+cubeListFile, "cnet="+cnetPath, "onet="+outCnetFileName,
+  "camsolve=None", "spsolve=position", "output_adjusted_csmstate=yes"};
+
+  UserInterface ui(APP_XML, args);
+
+  try {
+    jigsaw(ui);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to bundle: " << e.what() << std::endl;
+  }
+
+  // Check state.json file was created
+  QString csmStateOutput = tempDir.path()+"/observationPairR.state.json";
+  ASSERT_TRUE(std::filesystem::exists(csmStateOutput.toStdString()));
+  
+  std::ifstream ifs(csmStateOutput.toStdString());
+  ifs.ignore(10000, '\n');
+  json jf = json::parse(ifs);
+  EXPECT_EQ(jf["m_modelName"], "USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL");
+  EXPECT_EQ(jf["m_centerEphemerisTime"], 300761292.8556427);
 }
