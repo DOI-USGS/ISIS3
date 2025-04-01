@@ -107,7 +107,7 @@ Contributors must make sure that breaking changes are well-identified.  Breaking
 
 #### Upgrade considerations
 
-Most users can safely upgrade to Minor and Patch Versions, but should be more cautious about a Major upgrade, which may introduce changes that could alter their workflow.  You can reference the [Changelog](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/CHANGELOG.md) for more specific information on the changes.
+Most users can safely upgrade to Minor and Patch Versions, but should be more cautious about a Major upgrade, which may introduce changes that could alter their workflow.  You can reference the [Changelog](https://github.com/DOI-USGS/ISIS3/blob/dev/CHANGELOG.md) for more specific information on the changes.
 
 ### ISIS Release Cadence (LTS)
-ISIS has a Long Term Support (LTS) model ([RFC8](https://github.com/USGS-Astrogeology/ISIS3/discussions/4691), [RFC14](https://github.com/DOI-USGS/ISIS3/discussions/5731)). This assumes that users will update at ***each LTS release*** (supported for 18 months), or use more frequent interim/dev releases with shorter-term support.
+ISIS has a Long Term Support (LTS) model ([RFC8](https://github.com/DOI-USGS/ISIS3/discussions/4691), [RFC14](https://github.com/DOI-USGS/ISIS3/discussions/5731)). This assumes that users will update at ***each LTS release*** (supported for 18 months), or use more frequent interim/dev releases with shorter-term support.
