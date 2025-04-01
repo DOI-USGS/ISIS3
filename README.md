@@ -46,7 +46,7 @@ See this repo's [discussion page](https://github.com/DOI-USGS/ISIS3/discussions?
 
 ## Citing ISIS
 
-The badge at the top of this README lists the DOI of the most recent ISIS version.  As of 02/28/2025, the latest release of ISIS is version 8.3.0, and its DOI is [`10.5066/P13TADS5`](https://doi.org/10.5066/P13TADS5).
+The badge at the top of this README lists the DOI of the most recent ISIS version.  ISIS 8.3.0 was released on 10/01/2024 and its DOI is [`10.5066/P13TADS5`](https://doi.org/10.5066/P13TADS5).  (This section last updated on 04/01/2025, 8.3.0 is the latest ISIS version.)
 
 The [Releases Page on GitHub](https://github.com/DOI-USGS/ISIS3/releases) lists the DOI for each version of ISIS.  Older versions may be listed on [Zenodo](https://doi.org/10.5281/zenodo.2563341).  It is good practice to cite the version of the software being used by the citing work, so others can reproduce your exact results.
 
