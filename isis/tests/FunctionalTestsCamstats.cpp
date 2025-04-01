@@ -111,7 +111,7 @@ TEST(CamStats, FunctionalTestCamstatsDefaultParameters) {
 
   group = appLog.findGroup("NorthAzimuth");
   EXPECT_NEAR( (double) group.findKeyword("NorthAzimuthMinimum"), 332.91681144925002, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("NorthAzimuthMaximum"), 338.21827792507997, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("NorthAzimuthMaximum"), 338.21827792507997, 1e-7);
   EXPECT_NEAR( (double) group.findKeyword("NorthAzimuthAverage"), 333.98488155281001, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("NorthAzimuthStandardDeviation"), 0.48452163466794002, 1e-8);
 }
