@@ -54,6 +54,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed segfault in SpiceClient when an authentication error was encountered. [#5735](https://github.com/DOI-USGS/ISIS3/pull/5735)
 - Fixed offset and scale not being applied to gdal 32 bit floating point pixels [#5753](https://github.com/DOI-USGS/ISIS3/pull/5753)
 - Fixed `getLocalNormal` not reseting the sample and line [#5752](https://github.com/DOI-USGS/ISIS3/pull/5752)
+- Fixed QView bug that would not allow manual editing of min/max values via the text fields and defaulted to the current min/max type dropdown selection [#5719](https://github.com/DOI-USGS/ISIS3/issues/5719)
 
 ## [9.0.0] - 09-25-2024
 
