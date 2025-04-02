@@ -1,6 +1,6 @@
 channels:
   - conda-forge
-  - nasa-ames-stereo-pipeline
+  - usgs-astrogeology
   
 dependencies:
   - ale =0.10.0,<1
@@ -9,12 +9,12 @@ dependencies:
   - boost >=1.76.0,<1.82
   - boost-cpp >=1.76.0,<1.82
   - blas
-  - nasa-ames-stereo-pipeline::bullet
+  - usgs-astrogeology::bullet
   - bz2file
   - bzip2
   - cmake >=3.27,<3.28
   - cspice =67
-#  - csm >=3.0.3,<3.0.4
+  - csm >=3.0.3,<3.0.4
   - curl >=8.4.0,<8.5
   - cxx-compiler=1.7
   - doxygen
@@ -30,9 +30,9 @@ dependencies:
   - hdf5
   - highfive
   - icu
-  - nasa-ames-stereo-pipeline::inja
+  - inja
   - jama
-#  - usgs-astrogeology::kakadu==1  # [not 'osx-arm64']
+  - usgs-astrogeology::kakadu==1
   - kalasiris
   - krb5
   - libgdal >=3.7,<3.9
@@ -43,12 +43,12 @@ dependencies:
   - libxml2
   - make
   - mesalib
-#  - mkl   # [not 'osx-arm64']
+  - mkl
   - mysql
-#  - mysql-connector-c
+  - mysql-connector-c
   - nanoflann <1.4
   - nlohmann_json=3.11.2
-  - ninja 1.10.1
+  - ninja >=1.7.2,<1.8
   - nn
   - opencv >=4.5,<4.10
   - openssl >=3.1.2,<3.5
@@ -69,9 +69,9 @@ dependencies:
   - swig
   - texlive-core
   - tnt
-  - nasa-ames-stereo-pipeline::usgscsm
+  - usgscsm
   - x264
-  - nasa-ames-stereo-pipeline::xalan-c
+  - xalan-c
   - xerces-c >=3.2.4,<3.3.0a0
   - xorg-kbproto
   - xorg-libice
