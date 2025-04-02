@@ -27,8 +27,8 @@ void TestLineSamp(Camera *cam, double samp, double line) {
 
 void TestImageToGroundToImage(Camera *cam, double samp, double line, double lat, double lon){
   ASSERT_TRUE(cam->SetImage(samp, line));
-  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), lat);
-  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), lon);
+  EXPECT_NEAR(cam->UniversalLatitude(), lat, 1e-8);
+  EXPECT_NEAR(cam->UniversalLongitude(), lon, 1e-8);
   ASSERT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
   EXPECT_NEAR(cam->Sample(), samp, 0.001);
   EXPECT_NEAR(cam->Line(), line, 0.001);

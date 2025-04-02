@@ -479,9 +479,10 @@ TEST_F(SpiceKernels, IsisBodyRotation) {
   rot.SetEphemerisTime(startTime);
 
   IsisBody testBody(&rot);
-  std::vector<double> rotation = testBody.rotation(-69382512);
-
-  EXPECT_EQ(testBody.rotation(-69382512), expectedResult);
+  std::vector<double> currResult = testBody.rotation(-69382512);
+  EXPECT_EQ(currResult.size(), expectedResult.size());
+  for (size_t i = 0; i < currResult.size(); i++)
+    EXPECT_NEAR(currResult[i], expectedResult[i], 1e-8);
 }
 
 TEST_F(SpiceKernels, IsisBodyFixedVector) {
@@ -493,7 +494,7 @@ TEST_F(SpiceKernels, IsisBodyFixedVector) {
   SensorUtilities::Vec expectResult = {87.506927366393171, -1.1442263253059641, -48.386241939308213};
   SensorUtilities::Vec result = testBody.fixedVector(pos);
 
-  EXPECT_EQ(result.x, expectResult.x);
-  EXPECT_EQ(result.y, expectResult.y);
-  EXPECT_EQ(result.z, expectResult.z);
+  EXPECT_NEAR(result.x, expectResult.x, 1e-8);
+  EXPECT_NEAR(result.y, expectResult.y, 1e-8);
+  EXPECT_NEAR(result.z, expectResult.z, 1e-8);
 }

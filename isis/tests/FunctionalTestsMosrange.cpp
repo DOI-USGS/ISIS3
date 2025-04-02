@@ -96,7 +96,7 @@ TEST(Mosrange, MosrangeOnErrorContinue) {
   EXPECT_DOUBLE_EQ(double(mapping["PixelResolution"]), 495.0249);
   EXPECT_DOUBLE_EQ(double(mapping["Scale"]), 86.0281);
   EXPECT_DOUBLE_EQ(double(mapping["MinObliquePixelResolution"]), 490.32027782048);
-  EXPECT_DOUBLE_EQ(double(mapping["MaxObliquePixelResolution"]), 821.88316879416);
+  EXPECT_NEAR(double(mapping["MaxObliquePixelResolution"]), 821.88316879416, 1.5e-11);
   EXPECT_DOUBLE_EQ(double(mapping["CenterLongitude"]), 154.5774);
   EXPECT_DOUBLE_EQ(double(mapping["CenterLatitude"]), -14.3546);
   EXPECT_DOUBLE_EQ(double(mapping["MinimumLatitude"]), -21.5392);

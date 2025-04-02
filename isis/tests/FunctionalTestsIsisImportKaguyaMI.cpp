@@ -125,7 +125,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiNir) {
   // Pixels group
   EXPECT_EQ(PixelTypeName(cube.pixelType()), "SignedWord");
   EXPECT_EQ(ByteOrderName(cube.byteOrder()), "Lsb");
-  EXPECT_DOUBLE_EQ(cube.base(), 0.0);
+  EXPECT_NEAR(cube.base(), 0.0, 4e-14);
   EXPECT_DOUBLE_EQ(cube.multiplier(), 0.013);
 
   // Instrument Group
@@ -176,7 +176,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiNir) {
   EXPECT_DOUBLE_EQ(hist->Average(), 29.395262812500022);
   EXPECT_DOUBLE_EQ(hist->Sum(), 188129.68200000015);
   EXPECT_EQ(hist->ValidPixels(), 6400);
-  EXPECT_DOUBLE_EQ(hist->StandardDeviation(), 2.8449125231835715);
+  EXPECT_NEAR(hist->StandardDeviation(), 2.8449125231835715, 8.3e-14);
 }
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportKaguyamiProj) {

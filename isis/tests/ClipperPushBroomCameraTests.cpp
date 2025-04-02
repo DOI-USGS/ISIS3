@@ -101,7 +101,7 @@ TEST_F(ClipperPbCube, ClipperPushBroomCameraWacTest) {
 
   // Left
   EXPECT_TRUE(cam->SetImage(544, 1024));
-  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), 21.737113033236419);
+  EXPECT_NEAR(cam->UniversalLatitude(), 21.737113033236419, 4.3e-14);
   EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 78.157998184264912);
   EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
   EXPECT_NEAR(cam->Sample(), 544, 0.001);

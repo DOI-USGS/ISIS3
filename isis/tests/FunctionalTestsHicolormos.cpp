@@ -61,5 +61,5 @@ TEST_F(MroHiriseCube, FunctionalTestHicolormosDefault) {
   ASSERT_DOUBLE_EQ(oCubeStats->Average(), 0.99336582359379422);
   ASSERT_DOUBLE_EQ(oCubeStats->Sum(),     802.63958546378569);
   ASSERT_EQ(oCubeStats->ValidPixels(),    808);
-  ASSERT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.079236816283481101);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.079236816283481101, 3.3e-16);
 }

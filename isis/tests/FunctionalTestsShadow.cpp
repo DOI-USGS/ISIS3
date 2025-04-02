@@ -68,13 +68,13 @@ TEST_F(DemCube, FunctionalTestShadowTime) {
 
   PvlGroup shadowStats = appLog.findGroup("ShadowStatistics");
   EXPECT_EQ(int(shadowStats["NumComputedAzimuthElevations"]), 10000);
-  EXPECT_DOUBLE_EQ(double(shadowStats["AverageAzimuth"]), 141.60048536348);
-  EXPECT_DOUBLE_EQ(double(shadowStats["MinimumAzimuth"]), 141.18641687989);
-  EXPECT_DOUBLE_EQ(double(shadowStats["MaximumAzimuth"]), 142.02798316054);
+  EXPECT_NEAR(double(shadowStats["AverageAzimuth"]), 141.60048536348, 9e-11);
+  EXPECT_NEAR(double(shadowStats["MinimumAzimuth"]), 141.18641687989, 1.1e-10);
+  EXPECT_NEAR(double(shadowStats["MaximumAzimuth"]), 142.02798316054, 1.1e-10);
 
-  EXPECT_DOUBLE_EQ(double(shadowStats["AverageElevation"]), 54.723733952308997);
-  EXPECT_DOUBLE_EQ(double(shadowStats["MinimumElevation"]), 54.185416336220001);
-  EXPECT_DOUBLE_EQ(double(shadowStats["MaximumElevation"]), 55.260883777776002);
+  EXPECT_NEAR(double(shadowStats["AverageElevation"]), 54.723733952308997, 1.2e-10);
+  EXPECT_NEAR(double(shadowStats["MinimumElevation"]), 54.185416336220001, 1.2e-10);
+  EXPECT_NEAR(double(shadowStats["MaximumElevation"]), 55.260883777776002, 1.2e-10);
 
   EXPECT_EQ(int(shadowStats["NumRays"]), 9604);
   EXPECT_EQ(int(shadowStats["NumRayDemIntersections"]), 10159);

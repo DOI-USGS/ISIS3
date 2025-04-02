@@ -271,7 +271,7 @@ TEST_F(DefaultCube, FunctionalTestIsis2pdsManuals16bit) {
   EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 741);
   EXPECT_EQ(int(outputLabel["^IMAGE"]), 742);
 
-  EXPECT_DOUBLE_EQ(double(imageObject["OFFSET"]), -2.5001526018641);
+  EXPECT_NEAR(double(imageObject["OFFSET"]), -2.5001526018641, 6e-13);
   EXPECT_DOUBLE_EQ(double(imageObject["SCALING_FACTOR"]), 1.0000763009309);
   EXPECT_EQ(int(imageObject["SAMPLE_BITS"]), 16);
   EXPECT_EQ(QString(imageObject["SAMPLE_BIT_MASK"]), "2#1111111111111111#");

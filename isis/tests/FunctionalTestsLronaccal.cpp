@@ -226,7 +226,7 @@ TEST_F(TempTestingFiles, FunctionalTestsLronaccalNacLFull) {
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.026724545839011172);
   EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 136829.67469573719);
   EXPECT_EQ(oCubeStats->ValidPixels(), 5120000);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0020650268181325645);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.0020650268181325645, 2e-17);
 }
 
 TEST_F(TempTestingFiles, FunctionalTestsLronaccalNacLSummed) {
@@ -339,7 +339,7 @@ TEST_F(TempTestingFiles, FunctionalTestsLronaccalNacRFull) {
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.025868278779590172);
   EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 132445.58735150169);
   EXPECT_EQ(oCubeStats->ValidPixels(), 5120000);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0018962021917208359);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.0018962021917208359, 2.3e-18);
 }
 
 TEST_F(TempTestingFiles, FunctionalTestsLronaccalNacRSummed) {

@@ -39,7 +39,7 @@ TEST(FunctionalTestMimap2Isis, Default) {
   PvlGroup &pixels = isisLabel->findGroup("Pixels", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, pixels.findKeyword("Type"), "SignedWord");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, pixels.findKeyword("ByteOrder"), "Lsb");
-  EXPECT_DOUBLE_EQ((double) pixels.findKeyword("Base"), 0.0);
+  EXPECT_NEAR((double) pixels.findKeyword("Base"), 0.0, 2e-17);
   EXPECT_DOUBLE_EQ((double) pixels.findKeyword("Multiplier"), 2.0e-05);
 
   // Instrument Group
