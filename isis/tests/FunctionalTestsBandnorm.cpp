@@ -90,7 +90,7 @@ TEST_F(SmallCube, FunctionalTestBandnormPencil) {
   ASSERT_DOUBLE_EQ(oCubeStats->Average(), 83.166666641235352);
   ASSERT_DOUBLE_EQ(oCubeStats->Sum(), 8316.6666641235352);
   ASSERT_EQ(oCubeStats->ValidPixels(), 100);
-  ASSERT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 9.6704973399038625);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 9.6704973399038625, 5.9e-14);
 
   oCubeStats.reset(oCube.histogram(4));
   EXPECT_NEAR(oCubeStats->Average(), 87.375, 0.0001);

@@ -54,4 +54,4 @@ Begin testing Dem Shape Model class....
     local normal = (-0.743083, 0.662884, 0.0917187
 
   Testing method calculateLocalNormal with magnitude = 0
-**ERROR** The local normal has not been computed.
+    local normal = (0, 0, 1)

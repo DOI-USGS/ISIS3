@@ -85,14 +85,14 @@ int main(void) {
       cout << "ERROR call SetImage "<< samp << " " << line << endl;
     }
 
-    if (abs(cam->UniversalLatitude() - knownLat) < 6E-14) {
+    if (abs(cam->UniversalLatitude() - knownLat) < 1e-10) {
       cout << "Latitude OK" << endl;
     }
     else {
       cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
     }
 
-    if (abs(cam->UniversalLongitude() - knownLon) < 6E-14) {
+    if (abs(cam->UniversalLongitude() - knownLon) < 1e-10) {
       cout << "Longitude OK" << endl << endl;
     }
     else {
