@@ -8,13 +8,10 @@ find files of those names at the top level of this repository. **/
 
 #include <iostream>
 #include <stdlib.h>
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 #include <QString>
 #include <QStringList>
 #include <QCoreApplication>
-#include <QProcess>
 
 #include "IException.h"
 #include "IString.h"
