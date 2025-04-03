@@ -118,11 +118,13 @@
         This is the default mode.                  
         <pre> 
 Object = mirror
-  IsisVersion       = "3.0.2 beta | 2004-11-17"
+  IsisVersion       = "8.3.0  | 2024-10-01"
+  AleVersion        = "0.10.0 | py310hf166250_3"
   ProgramVersion    = 2003-07-29
-  ExecutionDateTime = 2005-01-10T13:33:12
-  HostName          = orkin
-  UserName          = eribelin
+  ProgramPath       = $ISISROOT/bin
+  ExecutionDateTime = 2025-04-03T08:59:57
+  HostName          = x86_64-apple-darwin13.4.0
+  UserName          = user
   Description       = "Flip a cube from left-to-right"
 
   Group = UserParameters
@@ -132,16 +134,19 @@ Object = mirror
 End_Object
 
 Object = circle
-  IsisVersion       = "3.0.2 beta | 2004-11-17"
-  ProgramVersion    = 2003-07-29
-  ExecutionDateTime = 2005-01-10T13:50:46
-  HostName          = orkin
-  UserName          = eribelin
+  IsisVersion       = "8.3.0  | 2024-10-01"
+  AleVersion        = "0.10.0 | py310hf166250_3"
+  ProgramVersion    = 2012-05-25
+  ProgramPath       = $ISISROOT/bin
+  ExecutionDateTime = 2025-04-03T08:59:17
+  HostName          = x86_64-apple-darwin13.4.0
+  UserName          = user
   Description       = "Trims data outside of a circle"
 
   Group = UserParameters
-    FROM = temp.cub
-    TO   = temp2.cub
+    FROM       = temp.cub
+    TO         = temp2.cub
+    DEFINITION = CENTERRAD
   End_Group
 End_Object
 End

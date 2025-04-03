@@ -251,6 +251,7 @@ namespace Isis {
     }
     PvlObject history(p_ui->ProgramName());
     history += PvlKeyword("IsisVersion", Version());
+    history += PvlKeyword("AleVersion", AleVersion());
     history += PvlKeyword("ProgramVersion", p_ui->Version());
     QString path = QCoreApplication::applicationDirPath();
     history += PvlKeyword("ProgramPath", path);
@@ -872,6 +873,15 @@ namespace Isis {
    */
   QString Application::Version() {
     return isisVersion();
+  }
+
+  /**
+   * The Ale Version for this application.
+   * @return @b QString
+   *
+   */
+  QString Application::AleVersion() {
+    return aleVersion();
   }
 
 

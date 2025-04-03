@@ -8,10 +8,13 @@ find files of those names at the top level of this repository. **/
 
 #include <iostream>
 #include <stdlib.h>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 #include <QString>
 #include <QStringList>
 #include <QCoreApplication>
+#include <QProcess>
 
 #include "IException.h"
 #include "IString.h"
@@ -141,5 +144,32 @@ namespace Isis {
     return line1 + " " + line4 + " | " + line2;
   }
 
+  /**
+   * @returns the Ale version extracted from the conda environment
+   */
+  QString Environment::aleVersion() {
+    QProcess process;
+    process.start("conda", QStringList() << "list" << "ale" << "--json");
+    process.waitForFinished();
 
+    QByteArray output = process.readAllStandardOutput();
+    try {
+      json j = json::parse(output.toStdString());
+
+      if (!j.empty()) {
+        if (j[0].contains("version") && j[0]["name"] == "ale") {
+          return QString::fromStdString(j[0]["version"]) + " | " + QString::fromStdString(j[0]["build_string"]);
+        }
+        else {
+          return "ALE version information unavailable";
+        }
+      }
+      else {
+        return "ALE version information unavailable";
+      }
+    }  
+    catch (const json::exception& e) {
+      return "ALE version information unavailable";
+    }
+  }
 }
