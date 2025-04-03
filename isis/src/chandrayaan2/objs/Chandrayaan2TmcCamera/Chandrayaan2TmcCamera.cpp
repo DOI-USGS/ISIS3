@@ -79,6 +79,27 @@ namespace Isis {
     new LineScanCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
+
+    // Set proper end frame
+    int tmcFrame(0);
+    if (naifIkCode() == -152210) {
+      // Frame DAWN_VIR_VIS : DAWN_VIR_VIS_ZERO
+      tmcFrame = -152220;
+    }
+    else if (naifIkCode() == -152211) { // (channelId == "IR)
+      // Frame DAWN_VIR_IR : DAWN_VIR_IR_ZERO
+      tmcFrame = -152221;
+    }
+    else if (naifIkCode() == -152212) {
+      tmcFrame = -152222;
+    }
+    else {
+      QString msg = "Unknown frame code [" + toString(naifIkCode()) + "] for Chandrayaan2 TMC Camera.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    instrumentRotation()->SetFrame(tmcFrame);
+
     LoadCache();
     NaifStatus::CheckErrors();
   }
