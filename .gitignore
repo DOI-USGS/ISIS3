@@ -50,7 +50,6 @@ print.prt
 build/
 *build*/
 install/
-*build*/
 
 # Unignore the documentation build
 !isis/src/docsys/build
