@@ -56,21 +56,18 @@ if(EXISTS ${exclusionPath})
 
 endif()
 
-# Read the tolerance from a file that has the same name as ${TRUTH_FILE} 
-# but with the .tol extension. Otherwise assume a tolerance of 1e-8.
+# Read the tolerance from a file that has the name ${TRUTH_FILE}.TOL.
+# Otherwise assume a tolerance of 1e-8.
 set(TOLERANCE "1e-8")
 set(HAVE_TOL FALSE)
-if(TRUTH_FILE MATCHES ".truth")
-  string(REPLACE ".truth" ".tol" TOL_FILE "${TRUTH_FILE}")
-  message(STATUS "Tolerance file: ${TOL_FILE}")
-  if (EXISTS "${TOL_FILE}")
-    file(READ "${TOL_FILE}" TOLERANCE)
-    string(REGEX REPLACE "\n.*" "" TOLERANCE "${TOLERANCE}")
-    message(STATUS "Read tolerance: ${TOLERANCE}")
-    set(HAVE_TOL TRUE)
-  endif()  
-endif()
-if(NOT HAVE_TOL)
+set(TOL_FILE "${TRUTH_FILE}.TOL")
+message(STATUS "Tolerance file: ${TOL_FILE}")
+if (EXISTS "${TOL_FILE}")
+  file(READ "${TOL_FILE}" TOLERANCE)
+  string(REGEX REPLACE "\n.*" "" TOLERANCE "${TOLERANCE}")
+  message(STATUS "Read tolerance: ${TOLERANCE}")
+  set(HAVE_TOL TRUE)
+else()
   message(STATUS "Tolerance file does not exist. Using tolerance: ${TOLERANCE}.")
 endif()
 
