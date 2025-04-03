@@ -169,7 +169,7 @@ namespace Isis {
     private slots:
       void stretchChanged();
       void advancedStretchChanged();
-      void changeStretch();
+      void changeStretch(bool useMinMaxTypeSelection = false);
       void showAdvancedDialog();
       void setStretchAcrossBands();
       void setStretchAllViewports();
