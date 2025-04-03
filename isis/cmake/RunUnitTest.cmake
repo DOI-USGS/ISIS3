@@ -59,14 +59,18 @@ endif()
 # Read the tolerance from a file that has the same name as ${TRUTH_FILE} 
 # but with the .tol extension. Otherwise assume a tolerance of 1e-8.
 set(TOLERANCE "1e-8")
+set(HAVE_TOL FALSE)
 if(TRUTH_FILE MATCHES ".truth")
   string(REPLACE ".truth" ".tol" TOL_FILE "${TRUTH_FILE}")
   message(STATUS "Tolerance file: ${TOL_FILE}")
   if (EXISTS "${TOL_FILE}")
     file(READ "${TOL_FILE}" TOLERANCE)
+    string(REGEX REPLACE "\n.*" "" TOLERANCE "${TOLERANCE}")
     message(STATUS "Read tolerance: ${TOLERANCE}")
+    set(HAVE_TOL TRUE)
   endif()  
-else()
+endif()
+if(NOT HAVE_TOL)
   message(STATUS "Tolerance file does not exist. Using tolerance: ${TOLERANCE}.")
 endif()
 
@@ -81,7 +85,7 @@ execute_process(COMMAND ${COMMAND_WITH_ARGS}
     RESULT_VARIABLE DIFFERENT)
 if(DIFFERENT)
   message("------------------------------------------------- ")
-  message(FATAL_ERROR "Test failed - files differ with tolerance.")
+  message(FATAL_ERROR "Test failed. Files differ with tolerance.")
   # On error the result file is left around to aid in debugging.
 else()
   file(REMOVE ${outputFile}) # On success, clean out the result file.

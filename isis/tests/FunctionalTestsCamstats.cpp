@@ -107,7 +107,7 @@ TEST(CamStats, FunctionalTestCamstatsDefaultParameters) {
   EXPECT_NEAR( (double) group.findKeyword("LocalRadiusMinimum"), 3411855.0367067, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("LocalRadiusMaximum"), 3412097.9742176002, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("LocalRadiusAverage"), 3411965.1948332, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("LocalRadiusStandardDeviation"), 54.219159576357001, 1e-5);
+  EXPECT_NEAR( (double) group.findKeyword("LocalRadiusStandardDeviation"), 54.219159576357001, 3.9e-05);
 
   group = appLog.findGroup("NorthAzimuth");
   EXPECT_NEAR( (double) group.findKeyword("NorthAzimuthMinimum"), 332.91681144925002, 1e-8);

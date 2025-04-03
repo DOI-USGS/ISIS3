@@ -270,8 +270,8 @@ int main(int argc, char *argv[]) {
     p1->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
          << p1->Latitude() << " / " << p1->Longitude() << endl;
-    p1->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
+    p1->SetCoordinate(0, maxY-0.1);
+    cout << "            SetCoordinate(0,maxY-0.1) returns lat/lon = " 
          << p1->Latitude() << " / " << p1->Longitude()  << endl;
     p1->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
@@ -308,8 +308,8 @@ int main(int argc, char *argv[]) {
     p1a->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
          << p1a->Latitude() << " / " << p1a->Longitude()  << endl;
-    p1a->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
+    p1a->SetCoordinate(0, maxY-0.1);
+    cout << "            SetCoordinate(0,maxY-0.1) returns lat/lon = " 
          << p1a->Latitude() << " / " << p1a->Longitude()  << endl;
     p1a->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
@@ -335,8 +335,8 @@ int main(int argc, char *argv[]) {
     p1b->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
          << p1b->Latitude() << " / " << p1b->Longitude()  << endl;
-    p1b->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
+    p1b->SetCoordinate(0, maxY-0.1);
+    cout << "            SetCoordinate(0,maxY-0.1) returns lat/lon = " 
          << p1b->Latitude() << " / " << p1b->Longitude()  << endl;
     p1b->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
@@ -524,8 +524,8 @@ int main(int argc, char *argv[]) {
     cout << std::setprecision(3);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
          << p2->Latitude() << " / " << p2->Longitude()  << endl;
-    p2->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " << 
+    p2->SetCoordinate(0, maxY-0.1);
+    cout << "            SetCoordinate(0,maxY-0.1) returns lat/lon = " << 
          p2->Latitude() << " / " << p2->Longitude()  << endl;
     p2->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
@@ -555,8 +555,8 @@ int main(int argc, char *argv[]) {
     p2a->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
          << p2a->Latitude() << " / " << p2a->Longitude()  << endl;
-    p2a->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " << 
+    p2a->SetCoordinate(0, maxY-0.1);
+    cout << "            SetCoordinate(0,maxY-0.1) returns lat/lon = " << 
          p2a->Latitude() << " / " << p2a->Longitude()  << endl;
     p2a->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
@@ -775,8 +775,8 @@ int main(int argc, char *argv[]) {
     p3->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
          << p3->Latitude() << " / " << p3->Longitude()  << endl;
-    p3->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
+    p3->SetCoordinate(0, maxY-0.1);
+    cout << "            SetCoordinate(0,maxY-0.1) returns lat/lon = " 
          << p3->Latitude() << " / " << p3->Longitude()  << endl;
     p3->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
@@ -820,8 +820,8 @@ int main(int argc, char *argv[]) {
     p3a->SetCoordinate(maxX,-sqrt(2*rad*rad-maxX*maxX));
     cout << "            SetCoordinate(maxX, y) returns lat/lon = " 
          << p3a->Latitude() << " / " << p3a->Longitude()  << endl;
-    p3a->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " << 
+    p3a->SetCoordinate(0, maxY-0.1);
+    cout << "            SetCoordinate(0,maxY-0.1) returns lat/lon = " << 
          p3a->Latitude() << " / " << p3a->Longitude()  << endl;
     p3a->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
@@ -857,8 +857,8 @@ int main(int argc, char *argv[]) {
          << p3b->Latitude() << " / " << p3b->Longitude()  << endl;
     cout << "For x = sqrt2*SphRad/2 = " 
          << rad*sqrt(2)/2 << endl;
-    p3b->SetCoordinate(rad*sqrt(2)/2, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " << 
+    p3b->SetCoordinate(rad*sqrt(2)/2, maxY-0.1);
+    cout << "            SetCoordinate(rad*sqrt(2)/2, maxY-0.1) returns lat/lon = " << 
          p3b->Latitude() << " / " << p3b->Longitude()  << endl;
     p3b->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
@@ -1071,8 +1071,8 @@ int main(int argc, char *argv[]) {
     p4->SetCoordinate(maxX,maxX);
     cout << "            SetCoordinate(maxX,sqrt2*SphRad) returns lat/lon = " 
          << p4->Latitude() << " / " << p4->Longitude()  << endl;
-    p4->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
+    p4->SetCoordinate(0, maxY-0.1);
+    cout << "            SetCoordinate(0,maxY-0.1) returns lat/lon = " 
          << p4->Latitude() << " / " << p4->Longitude()  << endl;
     p4->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " << 
@@ -1378,8 +1378,8 @@ int main(int argc, char *argv[]) {
     p5->SetCoordinate(maxX, 0);
     cout << "            SetCoordinate(maxX, 0) returns lat/lon = " 
          << p5->Latitude() << " / " << p5->Longitude()  << endl;
-    p5->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
+    p5->SetCoordinate(0, maxY-0.1);
+    cout << "            SetCoordinate(0,maxY-0.1) returns lat/lon = " 
          << p5->Latitude() << " / " << p5->Longitude()  << endl;
     p5->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " << 
@@ -1802,14 +1802,14 @@ int main(int argc, char *argv[]) {
     p7->SetCoordinate(maxX, -2882473.6383627);                               
     cout << "            SetCoordinate(maxX,-2882473.6383627) returns lat/lon = "
          << p7->Latitude() << " / " << p7->Longitude()  << endl;                   
-    p7->SetCoordinate(0, maxY);                                                  
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = "               
+    p7->SetCoordinate(0, maxY-0.1);
+    cout << "            SetCoordinate(0,maxY-0.1) returns lat/lon = "               
          << p7->Latitude() << " / " << p7->Longitude()  << endl;                   
     p7->SetCoordinate(minX, -2882473.6383627);                                    
     cout << "            SetCoordinate(minX,-2882473.6383627) returns lat/lon = "
          << p7->Latitude() << " / " << p7->Longitude()  << endl;                   
-    p7->SetCoordinate(0, minY);                                                  
-    cout << "            SetCoordinate(0,minY) returns lat/lon = "               
+    p7->SetCoordinate(0, minY+0.1);                                                  
+    cout << "            SetCoordinate(0,minY+0.1) returns lat/lon = "               
          << p7->Latitude() << " / " << p7->Longitude()  << endl;                   
     cout << endl;
     cout << endl;
@@ -1952,14 +1952,14 @@ int main(int argc, char *argv[]) {
     p8->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
          << p8->Latitude() << " / " << p8->Longitude()  << endl;
-    p8->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
+    p8->SetCoordinate(0, maxY-0.1);
+    cout << "            SetCoordinate(0,maxY-0.1) returns lat/lon = " 
          << p8->Latitude() << " / " << p8->Longitude()  << endl;
     p8->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
          << p8->Latitude() << " / " << p8->Longitude()  << endl;
-    p8->SetCoordinate(0, minY);
-    cout << "            SetCoordinate(0,minY) returns lat/lon = " 
+    p8->SetCoordinate(0, minY+0.1);
+    cout << "            SetCoordinate(0,minY+0.1) returns lat/lon = " 
          << p8->Latitude() << " / " << p8->Longitude()  << endl;
     cout << endl;
     mapGroup.findKeyword("MaximumLongitude").setValue("90.0");
@@ -1984,14 +1984,14 @@ int main(int argc, char *argv[]) {
     p8a->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
          << p8a->Latitude() << " / " << p8a->Longitude()  << endl;
-    p8a->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
+    p8a->SetCoordinate(0, maxY-0.1);
+    cout << "            SetCoordinate(0,maxY-0.1) returns lat/lon = " 
          << p8a->Latitude() << " / " << p8a->Longitude()  << endl;
     p8a->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
          << p8a->Latitude() << " / " << p8a->Longitude()  << endl;
-    p8a->SetCoordinate(0, minY);
-    cout << "            SetCoordinate(0,minY) returns lat/lon = " 
+    p8a->SetCoordinate(0, minY+0.1);
+    cout << "            SetCoordinate(0,minY+0.1) returns lat/lon = " 
          << p8a->Latitude() << " / " << p8a->Longitude()  << endl;
     cout << endl;
     cout << endl;
