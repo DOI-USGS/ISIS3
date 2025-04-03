@@ -148,28 +148,13 @@ namespace Isis {
    * @returns the Ale version extracted from the conda environment
    */
   QString Environment::aleVersion() {
-    QProcess process;
-    process.start("conda", QStringList() << "list" << "ale" << "--json");
-    process.waitForFinished();
-
-    QByteArray output = process.readAllStandardOutput();
-    try {
-      json j = json::parse(output.toStdString());
-
-      if (!j.empty()) {
-        if (j[0].contains("version") && j[0]["name"] == "ale") {
-          return QString::fromStdString(j[0]["version"]) + " | " + QString::fromStdString(j[0]["build_string"]);
-        }
-        else {
-          return "ALE version information unavailable";
-        }
+    TextFile aleVersionFile("$ISISROOT/ale_version.txt");
+    QString line1;
+    if (aleVersionFile.GetLine(line1)) {
+      if (!line1.isEmpty()) {
+          return line1.trimmed();
       }
-      else {
-        return "ALE version information unavailable";
-      }
-    }  
-    catch (const json::exception& e) {
-      return "ALE version information unavailable";
     }
+    return "ALE version information unavailable";
   }
 }
