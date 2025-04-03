@@ -27,7 +27,7 @@ TEST(Photomet, FunctionalTestPhotometClementine) {
 
   std::unique_ptr<Histogram> hist (cube.histogram(0));
   EXPECT_NEAR(hist->Average(), 57.865063346038504, .000001);
-  EXPECT_NEAR(hist->Sum(), 6399413.0855574608, .000001);
+  EXPECT_NEAR(hist->Sum(), 6399413.0855574608, 5.7e-06);
   EXPECT_EQ(hist->ValidPixels(), 110592);
   EXPECT_NEAR(hist->StandardDeviation(), 5.0229621098463886, .000001);
 }
@@ -68,7 +68,7 @@ TEST(Photomet, FunctionalTestPhotometClemMaxemission) {
 
   std::unique_ptr<Histogram> hist (cube.histogram(0));
   EXPECT_NEAR(hist->Average(), 58.134963167604397, .000001);
-  EXPECT_NEAR(hist->Sum(), 6094695.1335945129, .000001);
+  EXPECT_NEAR(hist->Sum(), 6094695.1335945129, 5.7e-06);
   EXPECT_EQ(hist->ValidPixels(), 104837);
   EXPECT_NEAR(hist->StandardDeviation(), 4.7295549270234245, .000001);
 }

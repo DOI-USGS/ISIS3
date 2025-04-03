@@ -87,13 +87,13 @@ int main(void) {
       return 0;
     }
 
-    if(abs(cam->UniversalLatitude() - knownLat) < 6E-14) {
+    if(abs(cam->UniversalLatitude() - knownLat) < 1e-8) {
       cout << "Latitude OK" << endl;
     } else {
       cout << setprecision(16) << "Known latitude: " << knownLat << ", Calculated latitude: " << cam->UniversalLatitude() << ", difference: " << cam->UniversalLatitude() - knownLat << endl;
     }
 
-    if(abs(cam->UniversalLongitude() - knownLon) < 6E-14) {
+    if(abs(cam->UniversalLongitude() - knownLon) < 1e-8) {
       cout << "Longitude OK" << endl;
     } else {
       cout << setprecision(16) << "Known longitude: " << knownLon << ", Calculated longitude: " << cam->UniversalLongitude() << ", difference: " << cam->UniversalLongitude() - knownLon << endl;

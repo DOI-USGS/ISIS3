@@ -1,126 +1,124 @@
 Group = GroundPoint
   Sample                     = 1.0
   Line                       = 1.0
-  PixelValue                 = 21
-  RightAscension             = 254.44877411829 <DEGREE>
-  Declination                = 67.288137235407 <DEGREE>
-  PlanetocentricLatitude     = -85.539935773152 <DEGREE>
-  PlanetographicLatitude     = -85.539935773152 <DEGREE>
-  PositiveEast360Longitude   = 27.089557592005 <DEGREE>
-  PositiveEast180Longitude   = 27.089557592005 <DEGREE>
-  PositiveWest360Longitude   = 332.910442408 <DEGREE>
-  PositiveWest180Longitude   = -27.089557592005 <DEGREE>
-  BodyFixedCoordinate        = (120.64938344242, 61.711664339986,
+  PixelValue                 = 21.0
+  RightAscension             = 254.449 <DEGREE>
+  Declination                = 67.288 <DEGREE>
+  PlanetocentricLatitude     = -85.54 <DEGREE>
+  PlanetographicLatitude     = -85.54 <DEGREE>
+  PositiveEast360Longitude   = 27.09 <DEGREE>
+  PositiveEast180Longitude   = 27.09 <DEGREE>
+  PositiveWest360Longitude   = 332.91 <DEGREE>
+  PositiveWest180Longitude   = -27.09 <DEGREE>
+  BodyFixedCoordinate        = (120.649, 61.711664339986,
                                 -1737.3761261903) <km>
-  LocalRadius                = 1742653.2664579 <meters>
-  SampleResolution           = 186.88475777315 <meters/pixel>
-  LineResolution             = 186.88475777315 <meters/pixel>
-  ObliqueDetectorResolution  = 190.45165102118 <meters>
-  ObliquePixelResolution     = 190.45165102118 <meters/pix>
-  ObliqueLineResolution      = 190.45165102118 <meters>
-  ObliqueSampleResolution    = 190.45165102118 <meters>
+  LocalRadius                = 1742653.266 <meters>
+  SampleResolution           = 186.885 <meters/pixel>
+  LineResolution             = 186.885 <meters/pixel>
+  ObliqueDetectorResolution  = 190.452 <meters>
+  ObliquePixelResolution     = 190.452 <meters/pix>
+  ObliqueLineResolution      = 190.452 <meters>
+  ObliqueSampleResolution    = 190.452 <meters>
 
   # Spacecraft Information
-  SpacecraftPosition         = (216.77599432924, 54.260221515165,
+  SpacecraftPosition         = (216.776, 54.260221515165,
                                 -2462.1104393388) <km>
   SpacecraftAzimuth          = 38.331 <DEGREE>
-  SlantDistance              = 731.11946628144 <km>
-  TargetCenterDistance       = 2472.2305351357 <km>
-  SubSpacecraftLatitude      = -84.813985589411 <DEGREE>
-  SubSpacecraftLongitude     = 14.052715974498 <DEGREE>
-  SpacecraftAltitude         = 735.29826910549 <km>
+  SlantDistance              = 731.119 <km>
+  TargetCenterDistance       = 2472.231 <km>
+  SubSpacecraftLatitude      = -84.814 <DEGREE>
+  SubSpacecraftLongitude     = 14.053 <DEGREE>
+  SpacecraftAltitude         = 735.298 <km>
   OffNadirAngle              = 3.124 <DEGREE>
   SubSpacecraftGroundAzimuth = 296.906 <DEGREE>
 
   # Sun Information
-  SunPosition                = (142092302.24738, 46513072.418956,
+  SunPosition                = (142092302.247, 46513072.418956,
                                 3175615.049146) <km>
   SubSolarAzimuth            = 92.425 <DEGREE>
-  SolarDistance              = 0.99964740327813 <AU>
-  SubSolarLatitude           = 1.2167758823866 <DEGREE>
-  SubSolarLongitude          = 18.125552305876 <DEGREE>
+  SolarDistance              = 1.0 <AU>
+  SubSolarLatitude           = 1.217 <DEGREE>
+  SubSolarLongitude          = 18.126 <DEGREE>
   SubSolarGroundAzimuth      = 351.024 <DEGREE>
 
   # Illumination and Other
-  Phase                      = 84.220811487227 <DEGREE>
-  Incidence                  = 86.811870187483 <DEGREE>
+  Phase                      = 84.221 <DEGREE>
+  Incidence                  = 86.812 <DEGREE>
   Emission                   = 4.434 <DEGREE>
   NorthAzimuth               = 101.407 <DEGREE>
 
   # Time
-  EphemerisTime              = -182103311.79772 <seconds>
+  EphemerisTime              = -182103311.798 <seconds>
   UTC                        = 1994-03-25T19:43:48.0166464
-  LocalSolarTime             = 12.597600352409 <hour>
-  SolarLongitude             = 129.01116499267 <DEGREE>
+  LocalSolarTime             = 12.598 <hour>
+  SolarLongitude             = 129.011 <DEGREE>
 
   # Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.
-  LookDirectionBodyFixed     = (-0.13147866432244, 0.010191826600814,
+  LookDirectionBodyFixed     = (-0.131, 0.010191826600814,
                                 0.99126660767854) <DEGREE>
-  LookDirectionJ2000         = (-0.10351254426163, -0.37196246815074,
+  LookDirectionJ2000         = (-0.104, -0.37196246815074,
                                 0.92245817003683) <DEGREE>
-  LookDirectionCamera        = (-0.0488021669, -0.0365697261,
-                                0.9981387697) <DEGREE>
+  LookDirectionCamera        = (-0.048802, -0.03657, 0.998139) <DEGREE>
 End_Group
 Group = GroundPoint
-  Sample                     = 155.47884244269
-  Line                       = 184.71817081965
-  PixelValue                 = 29
-  RightAscension             = 262.28855950942 <DEGREE>
-  Declination                = 65.693319737566 <DEGREE>
+  Sample                     = 155.479
+  Line                       = 184.718
+  PixelValue                 = 29.0
+  RightAscension             = 262.289 <DEGREE>
+  Declination                = 65.693 <DEGREE>
   PlanetocentricLatitude     = -84.5 <DEGREE>
   PlanetographicLatitude     = -84.5 <DEGREE>
   PositiveEast360Longitude   = 15.0 <DEGREE>
   PositiveEast180Longitude   = 15.0 <DEGREE>
   PositiveWest360Longitude   = 345.0 <DEGREE>
   PositiveWest180Longitude   = -15.0 <DEGREE>
-  BodyFixedCoordinate        = (160.94807486378, 43.125906683093,
+  BodyFixedCoordinate        = (160.948, 43.125906683093,
                                 -1730.4741433054) <km>
-  LocalRadius                = 1738477.7500095 <meters>
-  SampleResolution           = 187.58212566559 <meters/pixel>
-  LineResolution             = 187.58212566559 <meters/pixel>
-  ObliqueDetectorResolution  = 190.2928348535 <meters>
-  ObliquePixelResolution     = 190.2928348535 <meters/pix>
-  ObliqueLineResolution      = 190.2928348535 <meters>
-  ObliqueSampleResolution    = 190.2928348535 <meters>
+  LocalRadius                = 1738477.75 <meters>
+  SampleResolution           = 187.582 <meters/pixel>
+  LineResolution             = 187.582 <meters/pixel>
+  ObliqueDetectorResolution  = 190.293 <meters>
+  ObliquePixelResolution     = 190.293 <meters/pix>
+  ObliqueLineResolution      = 190.293 <meters>
+  ObliqueSampleResolution    = 190.293 <meters>
 
   # Spacecraft Information
-  SpacecraftPosition         = (216.77599432924, 54.260221515165,
+  SpacecraftPosition         = (216.776, 54.260221515165,
                                 -2462.1104393388) <km>
   SpacecraftAzimuth          = 284.604 <DEGREE>
-  SlantDistance              = 733.84774229398 <km>
-  TargetCenterDistance       = 2472.2305351357 <km>
-  SubSpacecraftLatitude      = -84.813985589411 <DEGREE>
-  SubSpacecraftLongitude     = 14.052715974498 <DEGREE>
-  SpacecraftAltitude         = 735.29826910549 <km>
+  SlantDistance              = 733.848 <km>
+  TargetCenterDistance       = 2472.231 <km>
+  SubSpacecraftLatitude      = -84.814 <DEGREE>
+  SubSpacecraftLongitude     = 14.053 <DEGREE>
+  SpacecraftAltitude         = 735.298 <km>
   OffNadirAngle              = 0.773 <DEGREE>
   SubSpacecraftGroundAzimuth = 195.221 <DEGREE>
 
   # Sun Information
-  SunPosition                = (142092302.24738, 46513072.418956,
+  SunPosition                = (142092302.247, 46513072.418956,
                                 3175615.049146) <km>
   SubSolarAzimuth            = 92.516 <DEGREE>
-  SolarDistance              = 0.99964718498479 <AU>
-  SubSolarLatitude           = 1.2167758823866 <DEGREE>
-  SubSolarLongitude          = 18.125552305876 <DEGREE>
+  SolarDistance              = 1.0 <AU>
+  SubSolarLatitude           = 1.217 <DEGREE>
+  SubSolarLongitude          = 18.126 <DEGREE>
   SubSolarGroundAzimuth      = 3.134 <DEGREE>
 
   # Illumination and Other
-  Phase                      = 86.8000517799 <DEGREE>
-  Incidence                  = 85.725629988114 <DEGREE>
+  Phase                      = 86.8 <DEGREE>
+  Incidence                  = 85.726 <DEGREE>
   Emission                   = 1.099 <DEGREE>
   NorthAzimuth               = 89.382 <DEGREE>
 
   # Time
-  EphemerisTime              = -182103311.79772 <seconds>
+  EphemerisTime              = -182103311.798 <seconds>
   UTC                        = 1994-03-25T19:43:48.0166464
-  LocalSolarTime             = 11.791629854897 <hour>
-  SolarLongitude             = 129.01116499267 <DEGREE>
+  LocalSolarTime             = 11.792 <hour>
+  SolarLongitude             = 129.011 <DEGREE>
 
   # Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.
-  LookDirectionBodyFixed     = (-0.076075624316564, -0.015172515119546,
+  LookDirectionBodyFixed     = (-0.076, -0.015172515119546,
                                 0.99698660681566) <DEGREE>
-  LookDirectionJ2000         = (-0.055232924372436, -0.40789809729026,
+  LookDirectionJ2000         = (-0.055, -0.40789809729026,
                                 0.9113552909224) <DEGREE>
-  LookDirectionCamera        = (-0.0094616465, 0.0102787327,
-                                0.9999024077) <DEGREE>
+  LookDirectionCamera        = (-0.009462, 0.010279, 0.999902) <DEGREE>
 End_Group

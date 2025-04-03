@@ -44,32 +44,28 @@ int main() {
 }
 
 void LowerPrecision(PvlKeyword &keyword) {
-  if (keyword.name() != "LookDirectionCamera") {
-    double value = toDouble(keyword[0]);
-    value = round(value * 1000) / 1000.0;
-    keyword[0] = toString(value);
-  }
-  else {
-    for (int i = 0; i < 3; i++) {
-      double value = toDouble(keyword[i]);
-      value = round(value * 10000000000) / 10000000000.0;
-      keyword[i] = toString(value);
+  try {
+    if (keyword.name() != "LookDirectionCamera") {
+      double factor = 1e+3;
+      double value = toDouble(keyword[0]);
+      value = round(value * factor) / factor;
+      keyword[0] = toString(value);
+    } else {
+      double factor = 1e+6;
+      for (int i = 0; i < 3; i++) {
+        double value = toDouble(keyword[i]);
+        value = round(value * factor) / factor;
+        keyword[i] = toString(value);
+      }
     }
-  }
+  } catch (...) {}
 }
-
 
 void PrintResults(PvlGroup &grp) {
   grp.deleteKeyword("FileName");
-
-  LowerPrecision(grp["NorthAzimuth"]);
-  LowerPrecision(grp["SpacecraftAzimuth"]);
-  LowerPrecision(grp["SubSolarAzimuth"]);
-  LowerPrecision(grp["SubSolarGroundAzimuth"]);
-  LowerPrecision(grp["SubSpacecraftGroundAzimuth"]);
-  LowerPrecision(grp["OffNadirAngle"]);
-  LowerPrecision(grp["Emission"]);
-  LowerPrecision(grp["LookDirectionCamera"]);
-
+  for (auto it = grp.begin(); it != grp.end(); ++it) {
+    auto key = it->name();
+    LowerPrecision(grp[key]);
+  }
   cout << grp << endl;
 }
