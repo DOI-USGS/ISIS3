@@ -101,8 +101,8 @@ Object = IsisCube
     SunAzimuth              = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_sun_azimuth._text }} <degrees>
     SunElevation            = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_sun_elevation._text }} <degrees>
     SolarIncidence          = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_solar_incidence._text }} <degrees>
-    Projection              = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_projection }}
-    Area                    = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_area }}
+    Projection              = "{{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_projection }}"
+    Area                    = "{{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_area }}"
   End_Group
   {% endif %}
 
