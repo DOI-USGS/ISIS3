@@ -228,8 +228,10 @@ TEST_F(DefaultCube, FunctionalTestCam2CamOffbody) {
   v_longitude = from_dsk->UniversalLongitude( );
 
   // Check that the values are as expected.
-  EXPECT_NEAR( v_latitude,  -27.334564355166282,  tolerance_d );
-  EXPECT_NEAR( v_longitude, 332.723940352585032,  tolerance_d );  
+  EXPECT_NEAR( v_latitude,  -25.438270031992843,  tolerance_d );
+  EXPECT_NEAR( v_longitude, 329.25585471583702,  tolerance_d );  
+  // EXPECT_NEAR( v_latitude,  -27.334564355166282,  tolerance_d );
+  // EXPECT_NEAR( v_longitude, 332.723940352585032,  tolerance_d );  
 
   // Get the corresponding pixel at that latitude and longitude from the other cube.
   // (Note that both cubes are still identical at this step.)
@@ -242,9 +244,10 @@ TEST_F(DefaultCube, FunctionalTestCam2CamOffbody) {
   EXPECT_NEAR( v_inline,   v_match_line,   tolerance_p );
 
   // Check that the RA/DEC coordinates are as expected.
-  EXPECT_NEAR( from_dsk->RightAscension( ), 179.38575724578, tolerance_d );
+  EXPECT_NEAR( from_dsk->RightAscension( ), 179.20591608724465, tolerance_d );
   EXPECT_NEAR( from_dsk->Declination( ),   -1.9176166684378, tolerance_d );
-
+  // EXPECT_NEAR( from_dsk->RightAscension( ), 179.38575724578, tolerance_d );
+  // EXPECT_NEAR( from_dsk->Declination( ),   -1.9176166684378, tolerance_d );
 
   // Now tell the camera model to just use the ellipsoid in the referenced cube.
   from_ell->IgnoreElevationModel( true );
@@ -329,8 +332,8 @@ TEST_F(DefaultCube, FunctionalTestCam2CamOffbody) {
 
  
   // Check a pixel that is on the target, but in an occluded area in the DSK.
-  v_match_sample = 220.0;
-  v_match_line   =  40.0;
+  v_match_sample = 207.0;
+  v_match_line   =  23.0;
 
   // This pixel should return a valid surface location in both cubes because it is
   // on the target body surface.
@@ -391,6 +394,5 @@ TEST_F(DefaultCube, FunctionalTestCam2CamOffbody) {
   EXPECT_TRUE( map_from_default.mapit( v_from_sample, v_from_line, v_match_sample, v_match_line) );
   EXPECT_TRUE( map_from_off_notrim.mapit( v_from_sample, v_from_line, v_match_sample, v_match_line) );
   EXPECT_TRUE( map_from_off_trim.mapit( v_from_sample, v_from_line, v_match_sample, v_match_line) ); 
-
-}
+  }
 

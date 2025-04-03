@@ -35,19 +35,18 @@ For Development and Contributing, see:
 - [Requests for Comment](#Requests-for-Comment)
 - [Citing ISIS](#Citing-ISIS)
 - [System Requirements](#system-requirements)
-- [Semantic Versioning](#Semantic-Versioning-and-It's-Role-in-Describing-the-Software)
+- [Semantic Versioning](#Semantic-Versioning)
 
 
 ## Requests for Comment
-The ISIS project uses a Request for Comment (RFC) model where major changes to the code, data area, or distribution are proposed, discussed, and potentially adopted.  RFCs are being housed in this repository's [wiki](https://github.com/USGS-Astrogeology/ISIS3/wiki).
+The ISIS project uses a Request for Comment (RFC) model where major changes to the code, data area, or distribution are proposed, discussed, and potentially adopted.  All contributors and users are welcome to review and comment on open RFCs.
 
-No RFCs are currently open.
+See this repo's [discussion page](https://github.com/DOI-USGS/ISIS3/discussions?discussions_q=is%3Aopen+label%3ARFC) for open RFCs.
 
-All contributors and users are welcome to review and comment on open RFCs.
 
 ## Citing ISIS
 
-The badge at the top of this README lists the DOI of the most recent ISIS version.  As of 11/22/2024, the latest release of ISIS is version 8.3.0, and its DOI is [`10.5066/P13TADS5`](https://doi.org/10.5066/P13TADS5).
+The badge at the top of this README lists the DOI of the most recent ISIS version.  ISIS 8.3.0 was released on 10/01/2024 and its DOI is [`10.5066/P13TADS5`](https://doi.org/10.5066/P13TADS5).  (This section last updated on 04/01/2025, 8.3.0 is the latest ISIS version.)
 
 The [Releases Page on GitHub](https://github.com/DOI-USGS/ISIS3/releases) lists the DOI for each version of ISIS.  Older versions may be listed on [Zenodo](https://doi.org/10.5281/zenodo.2563341).  It is good practice to cite the version of the software being used by the citing work, so others can reproduce your exact results.
 
@@ -81,14 +80,6 @@ may be possible.
 - 10 GB up to multiple TB for mission data and processing large images
 
 
-
-[//]: # ( Legacy ISIS Versions, links broken )
-
-[//]: # ( ISIS 2  - http://isis.astrogeology.usgs.gov/Isis2/isis-bin/installation.cgi )
-
-[//]: # ( ISIS3 3.5.2 - https://isis.astrogeology.usgs.gov/documents/LegacyInstallGuide/index.html )
-
-
 ## Semantic Versioning
 
 Versions of ISIS now use a Major.Minor.Patch scheme (e.g., 8.3.0), detailed in [RFC 2](https://github.com/DOI-USGS/ISIS3/wiki/RFC2:-Release-Process#terms). 
@@ -116,10 +107,7 @@ Contributors must make sure that breaking changes are well-identified.  Breaking
 
 #### Upgrade considerations
 
-Most users can safely upgrade to Minor and Patch Versions, but should be more cautious about a Major upgrade, which may introduce changes that could alter their workflow.  You can reference the [Changelog](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/CHANGELOG.md) for more specific information on the changes.
+Most users can safely upgrade to Minor and Patch Versions, but should be more cautious about a Major upgrade, which may introduce changes that could alter their workflow.  You can reference the [Changelog](https://github.com/DOI-USGS/ISIS3/blob/dev/CHANGELOG.md) for more specific information on the changes.
 
 ### ISIS Release Cadence (LTS)
-ISIS has a [Long Term Support (LTS)](https://github.com/USGS-Astrogeology/ISIS3/discussions/4691) model. This assumes that users will update at either:
-
-  - Each LTS release (every 18 months), or 
-  - Each quarterly release (every 3 months).
+ISIS has a Long Term Support (LTS) model ([RFC8](https://github.com/DOI-USGS/ISIS3/discussions/4691), [RFC14](https://github.com/DOI-USGS/ISIS3/discussions/5731)). This assumes that users will update at ***each LTS release*** (supported for 18 months), or use more frequent interim/dev releases with shorter-term support.

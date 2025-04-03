@@ -5,7 +5,7 @@ include $(ISISROOT)/make/isismake.tsts
 #Use sed to lower output precision to 5 decimal places in output txt files
 
 commands:
-#Test Celemintine, UVVIS
+#Test OSIRIS-REx, PolyCam
 	$(APPNAME) from=$(INPUT)/20190329T183101S0400_pol_iofL2pan.cub \
 	  to=$(OUTPUT)/20190329T183101S0400_pol_iofL2pan.set \
 	  ss_project=D:\\data\\TEST \
