@@ -42,6 +42,7 @@ Group = MissionName
   Translation   = (Chandrayaan1, "CHANDRAYAAN-1 ORBITER")
   Translation   = (Chandrayaan1, CHANDRAYAAN1_ORBITER)
   Translation   = (Chandrayaan1, CHANDRAYAAN-1)
+  Translation   = (Chandrayaan2, Chandrayaan-2)
   Translation   = (Clementine1, CLEMENTINE_1)
   Translation   = (Clementine1, "CLEMENTINE 1")
   Translation   = (Clipper, "CLIPPER")
