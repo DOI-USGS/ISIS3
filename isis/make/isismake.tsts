@@ -273,16 +273,6 @@ comparefiles: FORCE
 	for FILE in $$FILES; do                                                    \
 	  echo Compare: $(TRUTH)/$$FILE $(OUTPUT)/$$FILE;                          \
 	                                                                           \
-	  TOL_FILE="$(INPUT)/$$FILE.TOL";                                          \
-	  TOL=1e-8;                                                                \
-	  if [ ! -f "$$TOL_FILE" ]; then                                           \
-	    echo Missing: $$TOL_FILE;                                              \
-	    echo Using default tolerance: $$TOL.;                                  \
-	  else                                                                     \
-	    TOL=`$(CAT) $$TOL_FILE`;                                               \
-	    echo Using tolerance $$TOL from: $$TOL_FILE.;                          \
-	  fi;                                                                      \
-	                                                                           \
 	  if [ ! -f $(OUTPUT)/$$FILE ]; then                                       \
 	    MSG="$(FILENOTFOUND) [$$FILE]";                                        \
 	    echo -n $(CURTIMESTAMP) >> errors.txt;                                 \
@@ -292,8 +282,8 @@ comparefiles: FORCE
 	    FILETYPE=$${FILE##*.};                                                 \
 	    FAILURE_REPORT=$(OUTPUT)/$$FILE.fail.txt;                              \
 	                                                                           \
-	    # Parse .cub tolerance.                                                \
 	    if [ "$$FILETYPE" == "cub" ]; then                                     \
+	      # Parse .cub tolerance.                                              \
 	      TOLERANCESTR="";                                                     \
 	      FILETOLERANCES="$(foreach TOLERANCEVAR,                              \
 	                          $(filter %.TOLERANCE,$(.VARIABLES)),             \
@@ -324,7 +314,21 @@ comparefiles: FORCE
 	          fi;                                                              \
 	        done;                                                              \
 	      fi;                                                                  \
+	    else                                                                   \
+	      # Parse tolerance for non-cub                                        \
+	      TOL_FILE="$(INPUT)/$$FILE.TOL";                                      \
+	      TOL=1e-8;                                                            \
+	      if [ ! -f "$$TOL_FILE" ]; then                                       \
+	        echo Missing: $$TOL_FILE;                                          \
+	        echo Using default tolerance: $$TOL.;                              \
+	      else                                                                 \
+	        TOL=`$(CAT) $$TOL_FILE`;                                           \
+	        echo Using tolerance $$TOL from: $$TOL_FILE.;                      \
+	      fi;                                                                  \
+	    fi;                                                                    \
 	                                                                           \
+	    # Do comparison for each file type                                     \
+	    if [ "$$FILETYPE" == "cub" ]; then                                     \
 	      echo will do cubediff;                                               \
 	      $(ISISROOT)/bin/cubediff                                             \
 	          $(TSTARGS)                                                       \
