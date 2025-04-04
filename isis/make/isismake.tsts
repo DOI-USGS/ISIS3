@@ -319,17 +319,15 @@ comparefiles: FORCE
 	      TOL_FILE="$(INPUT)/$$FILE.TOL";                                      \
 	      TOL=1e-8;                                                            \
 	      if [ ! -f "$$TOL_FILE" ]; then                                       \
-	        echo Missing: $$TOL_FILE;                                          \
-	        echo Using default tolerance: $$TOL.;                              \
+	        echo Using default tolerance: $$TOL, as missing $$TOL_FILE;        \
 	      else                                                                 \
 	        TOL=`$(CAT) $$TOL_FILE`;                                           \
-	        echo Using tolerance $$TOL from: $$TOL_FILE.;                      \
+	        echo Using tolerance $$TOL from: $$TOL_FILE;                       \
 	      fi;                                                                  \
 	    fi;                                                                    \
 	                                                                           \
 	    # Do comparison for each file type                                     \
 	    if [ "$$FILETYPE" == "cub" ]; then                                     \
-	      echo will do cubediff;                                               \
 	      $(ISISROOT)/bin/cubediff                                             \
 	          $(TSTARGS)                                                       \
 	          from=$(TRUTH)/$$FILE                                             \
@@ -372,6 +370,7 @@ comparefiles: FORCE
 	        echo Failed compparing txt;                                        \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
+	        echo Successs comparing txt;                                       \
 	      fi;                                                                  \
 	    elif [ "$$FILETYPE" == "csv" ]; then                                   \
 	      DIFFFILE="$(INPUT)/$$FILE.DIFF";                                     \
@@ -391,6 +390,7 @@ comparefiles: FORCE
 	        echo Failed comparing CSV;                                         \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
+	        echo Successs comparing csv;                                       \
 	      fi;                                                                  \
 	    elif [ "$$FILETYPE" == "pvl" ]; then                                   \
 	      DIFFFILE="$(INPUT)/$$FILE.DIFF";                                     \
@@ -415,9 +415,10 @@ comparefiles: FORCE
 	        if [ "$$COMPRESULT" == "ERROR" ]; then                             \
 	          cat pvldiffError.txt >> errors.txt;                              \
 	        fi;                                                                \
-	        echo Failed comparing PVL. Report: $$FAILURE_REPORT;               \
+	        echo Failed comparing PVL. Report: $(shell pwd)/$$FAILURE_REPORT;  \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
+	        echo Successs comparing pvl;                                       \
 	      fi;                                                                  \
 	      $(RM) compare.txt;                                                   \
 	      if [ -f pvldiffError.txt ]; then                                     \
@@ -451,9 +452,10 @@ comparefiles: FORCE
 	        if [ "$$COMPRESULT" == "ERROR" ]; then                             \
 	          cat cnetdiffError.txt >> errors.txt;                             \
 	        fi;                                                                \
-	        echo Failed comparing net;                                         \
+	        echo Failed comparing cnet;                                        \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
+	        echo Successs comparing cnet;                                      \
 	      fi;                                                                  \
 	      $(RM) compare.txt;                                                   \
 	      if [ -f cnetdiffError.txt ]; then                                    \
@@ -470,6 +472,7 @@ comparefiles: FORCE
 	        echo Failed comparing binary;                                      \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
+	        echo Successs comparing binaries;                                  \
 	      fi;                                                                  \
 	    else                                                                   \
 	      MSG="$(UNKNOWNFILE) [$$FILE]";                                       \
