@@ -141,5 +141,17 @@ namespace Isis {
     return line1 + " " + line4 + " | " + line2;
   }
 
-
+  /**
+   * @returns the Ale version extracted from the conda environment
+   */
+  QString Environment::aleVersion() {
+    TextFile aleVersionFile("$ISISROOT/ale_version.txt");
+    QString line1;
+    if (aleVersionFile.GetLine(line1)) {
+      if (!line1.isEmpty()) {
+          return line1.trimmed();
+      }
+    }
+    return "ALE version information unavailable";
+  }
 }

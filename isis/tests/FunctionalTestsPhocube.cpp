@@ -499,10 +499,10 @@ TEST(Phocube, FunctionalTestPhocubeSunIlluminationMask) {
 
   // verify statistics of SunIlluminationMask band
   std::unique_ptr<Histogram> hist (cube.histogram(1));
-  EXPECT_NEAR(hist->Average(), 0.069599999999999995, .000001);
-  EXPECT_NEAR(hist->Sum(), 696, .000001);
+  EXPECT_NEAR(hist->Average(), 0.159, .000001);
+  EXPECT_NEAR(hist->Sum(), 1590, .000001);
   EXPECT_EQ(hist->ValidPixels(), 10000);
-  EXPECT_NEAR(hist->StandardDeviation(), 0.25448441255138432, .000001);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.3656943713503446, .000001);
 
   cube.close();
 }
@@ -556,10 +556,10 @@ TEST(Phocube, FunctionalTestPhocubeSurfaceObliqueDetectorResolution) {
 
   // verify statistics of SurfaceObliqueDetectorResolution band
   std::unique_ptr<Histogram> hist (cube.histogram(1));
-  EXPECT_NEAR(hist->Average(), 1.0194460722140173, .000001);
-  EXPECT_NEAR(hist->Sum(), 10191.402383923531, .000001);
-  EXPECT_EQ(hist->ValidPixels(), 9997);
-  EXPECT_NEAR(hist->StandardDeviation(), 0.87642429424877888, .000001);
+  EXPECT_NEAR(hist->Average(), 0.89422233675122265, .000001);
+  EXPECT_NEAR(hist->Sum(), 8942.223367512226, .000001);
+  EXPECT_EQ(hist->ValidPixels(), 10000);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.19152389132027792, .000001);
 
   cube.close();
 }

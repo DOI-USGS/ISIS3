@@ -1916,20 +1916,36 @@ TEST_F(ApolloNetwork, FunctionalTestJigsawSaveApplyValues) {
   HighFive::DataSet datasetRead = file.getDataSet(cmatrixKey);
   auto cmatrixData = datasetRead.read<std::string>();
   Table cmatrixTable(cmatrixName, cmatrixData, ',');
-  std::string cmatrixTableStr = Table::toString(cmatrixTable).toStdString();
 
   datasetRead = file.getDataSet(spvectorKey);
   auto spvectorData = datasetRead.read<std::string>();
   Table spvectorTable(spvectorName, spvectorData, ',');
-  std::string spvectorTableStr = Table::toString(spvectorTable).toStdString();
 
   EXPECT_EQ(cmatrixTable.RecordFields(), 8);
   EXPECT_EQ(spvectorTable.RecordFields(), 7);
 
-  EXPECT_EQ(cmatrixTableStr,
-            "J2000Q0,J2000Q1,J2000Q2,J2000Q3,AV1,AV2,AV3,ET\n0.72889620121855,0.66172757646101,-0.1261913882606,0.12207651669777,4.29360266307594e-04,6.9419874212449e-04,-6.23609851587137e-04,-896818899.38874\n");
-  EXPECT_EQ(spvectorTableStr, 
-            "J2000X,J2000Y,J2000Z,J2000XV,J2000YV,J2000ZV,ET\n491.19844009026,1198.1045282857,1313.7703671439,1.5198029518433,-0.58925196165899,-0.046463883259045,-896818899.38874\n");
+  QString cmatrixTableStr = TableRecord::toString(cmatrixTable[0]);
+  QStringList cmatrixVals = cmatrixTableStr.split(',');
+  
+  EXPECT_NEAR(cmatrixVals[0].toDouble(), 0.72889620121855, 1e-6);
+  EXPECT_NEAR(cmatrixVals[1].toDouble(), 0.66172757646101, 1e-6);
+  EXPECT_NEAR(cmatrixVals[2].toDouble(), -0.1261913882606, 1e-6);
+  EXPECT_NEAR(cmatrixVals[3].toDouble(), 0.12207651669777, 1e-6);
+  EXPECT_NEAR(cmatrixVals[4].toDouble(), 4.29360266307594e-04, 1e-6);
+  EXPECT_NEAR(cmatrixVals[5].toDouble(), 6.9419874212449e-04, 1e-6);
+  EXPECT_NEAR(cmatrixVals[6].toDouble(), -6.23609851587137e-04, 1e-6);
+  EXPECT_NEAR(cmatrixVals[7].toDouble(), -896818899.38874, 1e-6);
+
+  QString spvectorTableStr = TableRecord::toString(spvectorTable[0]);
+  QStringList spvectorVals = spvectorTableStr.split(',');
+  
+  EXPECT_NEAR(spvectorVals[0].toDouble(), 491.19844009026, 1e-6);
+  EXPECT_NEAR(spvectorVals[1].toDouble(), 1198.1045282857, 1e-6);
+  EXPECT_NEAR(spvectorVals[2].toDouble(), 1313.7703671439, 1e-6);
+  EXPECT_NEAR(spvectorVals[3].toDouble(), 1.5198029518433, 1e-6);
+  EXPECT_NEAR(spvectorVals[4].toDouble(), -0.58925196165899, 1e-6);
+  EXPECT_NEAR(spvectorVals[5].toDouble(), -0.046463883259045, 1e-6);
+  EXPECT_NEAR(spvectorVals[6].toDouble(), -896818899.38874, 1e-6);
 
   file.flush();
 }

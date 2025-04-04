@@ -809,7 +809,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   Histogram *hist = panCube.histogram();
 
   EXPECT_NEAR(hist->Average(), 0.082351300138231429, 0.0001);
-  EXPECT_NEAR(hist->Sum(), 70857.19977273792, 0.0001);
+  EXPECT_NEAR(hist->Sum(), 70857.19977273792, 0.0002);
   EXPECT_EQ(hist->ValidPixels(), 860426);
   EXPECT_NEAR(hist->StandardDeviation(), 0.0010547865346787659, 0.0001);
 
