@@ -28,7 +28,7 @@ function(run_app_makefile_test makefile inputFolder outputFolder truthFolder bin
   message("Working directory: ${sourceFolder}")
   execute_process(COMMAND make test --no-print-directory WORKING_DIRECTORY ${sourceFolder} OUTPUT_VARIABLE result)
   
-  message("result: ${result}")
+  message(STATUS "Test output log:\n${result}")
   if (result MATCHES "OK")
       set(failed "OFF")
   else()
@@ -37,8 +37,8 @@ function(run_app_makefile_test makefile inputFolder outputFolder truthFolder bin
 
   # If any file failed, the test is a failure.
   if(${failed})
-    message("TRUTH: ${TRUTH}")
-    message(FATAL_ERROR "Test failed. Result:\n ${result}")
+    #message("TRUTH: ${TRUTH}")
+    message(FATAL_ERROR "Test failed.")
   endif()
 
 endfunction()

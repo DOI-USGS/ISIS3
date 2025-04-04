@@ -150,8 +150,8 @@ test: FORCE clean
 	    $$MSG >> errors.txt;                                                   \
 	  else                                                                     \
 	    $(MAKE) output;                                                        \
-	    TRUTHFILECOUNT=`$(LS) -p $(TRUTH)/ | $(GREP) -v "/" | $(GREP) -v .TOL | wc -l`;   \
-	    OUTPUTFILECOUNT=`$(LS) -p $(OUTPUT)/ | $(GREP) -v "/" | $(GREP) -v .TOL | wc -l`; \
+	    TRUTHFILECOUNT=`$(LS) -p $(TRUTH)/ | $(GREP) -v "/" | wc -l`;          \
+	    OUTPUTFILECOUNT=`$(LS) -p $(OUTPUT)/ | $(GREP) -v "/" | wc -l`;        \
 	    if [ $$TRUTHFILECOUNT -ne $$OUTPUTFILECOUNT ]; then                    \
 	      MSG='$(FILECOUNTMISMATCH)';                                          \
 	      echo -n $(CURTIMESTAMP) >> errors.txt;                               \
@@ -187,8 +187,8 @@ test: FORCE clean
 	else                                                                       \
 	  eval $(TESTFAILED);                                                      \
 	  $(PRINTF) "Duration [%.2i:%.2i:%.2i]\n" $$HOUR60 $$MIN60 $$SEC60;        \
-	  echo Error file: errors.txt;                                             \
-	  $(CAT) errors.txt;                                                       \
+	  echo Error summary file: $(shell pwd)/errors.txt;                        \
+	  #$(CAT) errors.txt;                                                      \
 	fi;
 
 #-------------------------------------------------------------------------     ---
@@ -280,7 +280,7 @@ comparefiles: FORCE
 	    $$MSG >> errors.txt;                                                   \
 	  else                                                                     \
 	    FILETYPE=$${FILE##*.};                                                 \
-	    FAILURE_REPORT=$(OUTPUT)/$$FILE.fail.txt;                              \
+	    FAILURE_REPORT=$(OUTPUT)/$$FILE.err.txt;                               \
 	                                                                           \
 	    if [ "$$FILETYPE" == "cub" ]; then                                     \
 	      # Parse .cub tolerance.                                              \
@@ -288,7 +288,7 @@ comparefiles: FORCE
 	      FILETOLERANCES="$(foreach TOLERANCEVAR,                              \
 	                          $(filter %.TOLERANCE,$(.VARIABLES)),             \
 	                          $(TOLERANCEVAR);$($(TOLERANCEVAR)))";            \
-	      echo CUB tolerance: $$FILETOLERANCES;                                \
+	      echo Tolerance from Makefile: $$FILETOLERANCES;                      \
 	      if [ -n "$$FILETOLERANCES" ]; then                                   \
 	        for TOLERANCE in $$FILETOLERANCES; do                              \
 	          TOLERANCEFILENAME=`echo "$$TOLERANCE" | sed "s/;.*//"`;          \
@@ -322,7 +322,7 @@ comparefiles: FORCE
 	        echo Using default tolerance: $$TOL, as missing $$TOL_FILE;        \
 	      else                                                                 \
 	        TOL=`$(CAT) $$TOL_FILE`;                                           \
-	        echo Using tolerance $$TOL from: $$TOL_FILE;                       \
+	        echo Tolerance: $$TOL from: $$TOL_FILE;                            \
 	      fi;                                                                  \
 	    fi;                                                                    \
 	                                                                           \
@@ -334,7 +334,8 @@ comparefiles: FORCE
 	          from2=$(OUTPUT)/$$FILE                                           \
 	          to=compare.txt                                                   \
 	          $$TOLERANCESTR                                                   \
-	          $$IGNORESTR 1>>/dev/null 2>cubediffError.txt;                    \
+	          $$IGNORESTR 1>>/dev/null 2> $$FAILURE_REPORT;                    \
+	          cat compare.txt	>> $$FAILURE_REPORT;                             \
 	      if [ $$? != 0 ]; then                                                \
 	        COMPRESULT="ERROR";                                                \
 	      else                                                                 \
@@ -348,16 +349,16 @@ comparefiles: FORCE
 	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
 	        $$MSG >> errors.txt;                                               \
 	        if [ "$$COMPRESULT" == "ERROR" ]; then                             \
-	          cat cubediffError.txt >> errors.txt;                             \
+	          cat $$FAILURE_REPORT >> errors.txt;                              \
 	        fi;                                                                \
-	        echo Failed comparing cubes;                                       \
+	        echo Failed comparing cubes. Report: $(shell pwd)/$$FAILURE_REPORT;\
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	        echo Successs comparing cubes;                                     \
-	      fi;                                                                  \
-	      $(RM) compare.txt;                                                   \
-	      if [ -f cubediffError.txt ]; then                                    \
-	        $(RM) cubediffError.txt;                                           \
+	        $(RM) compare.txt;                                                 \
+	        if [ -f $$FAILURE_REPORT ]; then                                   \
+	          $(RM) $$FAILURE_REPORT;                                          \
+	        fi;                                                                \
 	      fi;                                                                  \
 	    elif [ "$$FILETYPE" == "txt" ]; then                                   \
 	      COMMAND="";                                                          \
