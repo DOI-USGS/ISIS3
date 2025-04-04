@@ -36,6 +36,27 @@ def read_lines(filename):
   
   return lines
 
+def parseIgnoreFile(ignoreFile):
+  """Read the ignore file. Split each line by equal sign and spaces.
+     Store the first entry in each line in a set.
+  """
+  ignoreSet = set()
+  try:
+    with open(ignoreFile, 'r') as f:
+      for line in f:
+        if line.strip() == "":
+          continue
+        # Replace equal with space
+        line = line.replace("=", " ")
+        # Split by spaces
+        parts = line.split()
+        if len(parts) > 1:
+          ignoreSet.add(parts[0].strip())
+  except IOError:
+    sys.exit("ERROR: Unable to read '" + ignoreFile + "'")
+  
+  return ignoreSet
+  
 # Check that we got four values on the command line
 if len(sys.argv) < 4:
   print("Not enough input arguments. Usage:\n" +
@@ -65,6 +86,15 @@ except ValueError:
   print("ERROR: Tolerance must be a number.")
   sys.exit(1)
 
+# The 5th argument may be the file having the fields to ignore
+ignoreSet = set()
+if len(sys.argv) > 5:
+  ignoreFile = sys.argv[5]
+  ignoreSet = parseIgnoreFile(ignoreFile)
+  
+# Start with success status
+status = 0
+
 lines1 = read_lines(sys.argv[1])
 lines2 = read_lines(sys.argv[2])
 
@@ -84,6 +114,10 @@ for i in range(len(lines1)):
   words1 = lines1[i].strip().split()
   words2 = lines2[i].strip().split()
   
+  # Skip empty lines
+  if len(words1) == 0 and len(words2) == 0:
+    continue
+    
   # Must have the same number of words
   if len(words1) != len(words2):
     print("ERROR: Lines have different number of words.")
@@ -91,6 +125,12 @@ for i in range(len(lines1)):
     print("Second file line: " + str(i+1) + ": " + lines2[i].strip())
     sys.exit(1)
   
+  # Skip if first word is to be ignored
+  if len(words1) > 0 and words1[0] in ignoreSet:
+    continue
+  if len(words2) > 0 and words2[0] in ignoreSet:
+    continue
+    
   # Iterate through the words
   for j in range(len(words1)):
 
@@ -120,8 +160,9 @@ for i in range(len(lines1)):
             str(err) + " at line " + str(i+1) + ", word " + str(j+1))
       print("First  file line: " + str(i+1) + ": " + lines1[i].strip())
       print("Second file line: " + str(i+1) + ": " + lines2[i].strip())
-      sys.exit(1)
+      # Record failure but keep going, so we can print all failures
+      status = 1
 
 print("Input tolerance: " + str(tolerance))
 print("Max observed " + errType + ": " + str(maxErr))
-sys.exit(0)
+sys.exit(status)

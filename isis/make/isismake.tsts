@@ -289,16 +289,15 @@ comparefiles: FORCE
 	                          $(filter %.TOLERANCE,$(.VARIABLES)),             \
 	                          $(TOLERANCEVAR);$($(TOLERANCEVAR)))";            \
 	      echo Tolerance from Makefile: $$FILETOLERANCES;                      \
-	      if [ -n "$$FILETOLERANCES" ]; then                                   \
-	        for TOLERANCE in $$FILETOLERANCES; do                              \
-	          TOLERANCEFILENAME=`echo "$$TOLERANCE" | sed "s/;.*//"`;          \
-	          if [ "$$TOLERANCEFILENAME" == "$$FILE.TOLERANCE" ]; then         \
-	            TOLERANCEVALUE=`echo "$$TOLERANCE" | sed "s/^.*;//"`;          \
-	            TOLERANCESTR="tolerance=$$TOLERANCEVALUE";                     \
-	            break;                                                         \
-	          fi;                                                              \
-	        done;                                                              \
+	      # Split into tokens and search based on .cub name.                   \
+	      TOLERANCESTR=`echo "$$FILETOLERANCES"                                \
+	                     | perl -p -e "s#\s#\n#g"                              \
+	                     | grep $$FILE | grep TOLERANCE                        \
+	                     | perl -p -e "s#^.*?TOLERANCE;##g"`;                  \
+	      if [ ! -n "$$TOLERANCESTR" ]; then                                   \
+	        TOLERANCESTR=1e-8;                                                 \
 	      fi;                                                                  \
+	      echo Tolerance for $$FILE: $$TOLERANCESTR;                           \
 	                                                                           \
 	      IGNORESTR="";                                                        \
 	      FILESTOIGNORESPECIALS="$(foreach IGNOREVAR,$(filter                  \
@@ -333,7 +332,7 @@ comparefiles: FORCE
 	          from=$(TRUTH)/$$FILE                                             \
 	          from2=$(OUTPUT)/$$FILE                                           \
 	          to=compare.txt                                                   \
-	          $$TOLERANCESTR                                                   \
+	          TOLERANCE=$$TOLERANCESTR                                         \
 	          $$IGNORESTR 1>>/dev/null 2> $$FAILURE_REPORT;                    \
 	          cat compare.txt	>> $$FAILURE_REPORT;                             \
 	      if [ $$? != 0 ]; then                                                \
