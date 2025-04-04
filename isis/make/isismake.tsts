@@ -179,17 +179,16 @@ test: FORCE clean
 	if [ -f casesucceeded.txt ]; then                                          \
 	  eval $(TESTPASSED);                                                      \
 	  $(PRINTF) "Duration [%.2i:%.2i:%.2i]\n" $$HOUR60 $$MIN60 $$SEC60;        \
+	                                                                           \
 	  $(RM) casesucceeded.txt;                                                 \
+	  if [ "$(findstring $(TESTNOCLEAN), $(MODE))" != "$(TESTNOCLEAN)" ]; then \
+	    $(MAKE) ccsafeclean;                                                   \
+	  fi;                                                                      \
 	else                                                                       \
 	  eval $(TESTFAILED);                                                      \
 	  $(PRINTF) "Duration [%.2i:%.2i:%.2i]\n" $$HOUR60 $$MIN60 $$SEC60;        \
+	  $(echo) Error file: errors.txt;                                          \
 	  $(CAT) errors.txt;                                                       \
-	  $(RM) errors.txt;                                                        \
-	fi;                                                                        \
-	                                                                           \
-	if [ "$(findstring $(TESTNOCLEAN), $(MODE))" != "$(TESTNOCLEAN)" ];        \
-	then                                                                       \
-	  $(MAKE) ccsafeclean;                                                     \
 	fi;
 
 #-------------------------------------------------------------------------     ---
@@ -257,67 +256,33 @@ compare: FORCE
 # in the output directory, casesucceeded.txt is created to
 # indicate that the comparison was successful. All errors are
 # written to errors.txt.
-#
-# Some parts of this target are not very straightforward. For comparing cubes,
-# users may specify make variables within their tests to indicate tolerance or
-# to ignore special pixels when running cubediff
-# (i.e. test_cube.cub.TOLERANCE=0.0000001). The problem here is that within
-# this target, we have the current filename that is being compared stored in a
-# bash variable. We know that the *make* tolerance variable, if it exists, will
-# have the same name as the current file, but with .TOLERANCE appended to it.
-# We cannot, however, access it by simply appending .TOLERANCE to the contents
-# of our current filename variable (bash) and then ask make to evaluate that
-# new variable name because make converts all make-specific code into bash
-# BEFORE it evaluates the bash code.
-#
-# Here is an example of the problem:
-#
-#   FILENAME=foo.cub;                  // this is a bash variable
-#   TOLERANCE=$($$FILENAME.TOLERANCE); // this does not work because make will
-#                                      // try to look for a make variable named
-#                                      // '$FILENAME.TOLERANCE' (literally).
-#
-# The workaround is to use make's special variable that is a space-separated
-# list of currently defined make variable *names* (NOT values). This variable
-# is .VARIABLES. The names of each of the currently defined make .TOLERANCE
-# variables are extracted from this list, and their values are looked up as
-# well. A new bash variable is used to hold these name/values pairs for each of
-# the tolerances (the name and value is separated by a semicolon). The list of
-# tolerances is searched for the matching tolerance for the current file (if it
-# even exists), and this is used in the cubediff. The reason that all of this
-# works is because the we are able to get the name AND value of each tolerance
-# out of the make variables and into bash variables. This same process is
-# repeated for cubes that have .IGNORESPECIAL variables defined.
-#
-# This is only a workaround. The real solution would be to completely get rid
-# of make variable tolerances from all tests and force the use of .DIFF files
-# (like pvldiff uses). However, around 138 tests are currently using make
-# variables to do this, so it would be a considerable undertaking.
-#
-#
-# 2012-06-26 - Jeannie Backer - Sent stderr of pvldiff and cnetdiff to error
-#                  files instead of /dev/null.  If errors exist, test fails and
-#                  error messages are reported to stdout.  This was already
-#                  being handled for cubediff.
-#----------------------------------------------------------------------------
+
+# For comparing cubes, users may specify in the Makefile for a test a 
+# tolerance or instructions to ignore special pixels when running cubediff. 
+# Example: test_cube.cub.TOLERANCE=0.0000001). These are parsed and applied 
+# below.
+
+# For other data, the tolerance is in a file with the same name as the truth
+# file, but ending in .TOL. Example: labels.pvl.TOL.
+ 
 comparefiles: FORCE
 	TRUTHFILECOUNT=`$(LS) -p $(TRUTH)/ | $(GREP) -v "/" | wc -l`;              \
 	SUCCESSFULCOMPARISONS=0;                                                   \
 	                                                                           \
 	FILES="$(notdir $(wildcard $(TRUTH)/*))";                                  \
 	for FILE in $$FILES; do                                                    \
-	  echo File is $$FILE;                                                     \
+	  echo Compare: $(TRUTH)/$$FILE $(OUTPUT)/$$FILE;                          \
+	                                                                           \
 	  TOL_FILE="$(INPUT)/$$FILE.TOL";                                          \
-	  echo TOL_FILE is $$TOL_FILE;                                             \
 	  TOL=1e-8;                                                                \
-	  if [ ! -f $$TOL_FILE ]; then                                             \
-	    echo Missing $$TOL_FILE;                                               \
-	    echo Usig default tolerance;                                           \
+	  if [ ! -f "$$TOL_FILE" ]; then                                           \
+	    echo Missing: $$TOL_FILE;                                              \
+	    echo Using default tolerance: $$TOL.;                                  \
 	  else                                                                     \
-	    Reading tolerance from $$TOL_FILE;                                     \
 	    TOL=`$(CAT) $$TOL_FILE`;                                               \
+	    echo Using tolerance $$TOL from: $$TOL_FILE.;                          \
 	  fi;                                                                      \
-	  echo Comparing with tolerance: $$TOL;                                    \
+	                                                                           \
 	  if [ ! -f $(OUTPUT)/$$FILE ]; then                                       \
 	    MSG="$(FILENOTFOUND) [$$FILE]";                                        \
 	    echo -n $(CURTIMESTAMP) >> errors.txt;                                 \
@@ -325,12 +290,15 @@ comparefiles: FORCE
 	    $$MSG >> errors.txt;                                                   \
 	  else                                                                     \
 	    FILETYPE=$${FILE##*.};                                                 \
+	    FAILURE_REPORT=$(OUTPUT)/$$FILE.fail.txt;                              \
 	                                                                           \
+	    # Parse .cub tolerance.                                                \
 	    if [ "$$FILETYPE" == "cub" ]; then                                     \
 	      TOLERANCESTR="";                                                     \
 	      FILETOLERANCES="$(foreach TOLERANCEVAR,                              \
 	                          $(filter %.TOLERANCE,$(.VARIABLES)),             \
 	                          $(TOLERANCEVAR);$($(TOLERANCEVAR)))";            \
+	      echo CUB tolerance: $$FILETOLERANCES;                                \
 	      if [ -n "$$FILETOLERANCES" ]; then                                   \
 	        for TOLERANCE in $$FILETOLERANCES; do                              \
 	          TOLERANCEFILENAME=`echo "$$TOLERANCE" | sed "s/;.*//"`;          \
@@ -357,6 +325,7 @@ comparefiles: FORCE
 	        done;                                                              \
 	      fi;                                                                  \
 	                                                                           \
+	      echo will do cubediff;                                               \
 	      $(ISISROOT)/bin/cubediff                                             \
 	          $(TSTARGS)                                                       \
 	          from=$(TRUTH)/$$FILE                                             \
@@ -379,8 +348,10 @@ comparefiles: FORCE
 	        if [ "$$COMPRESULT" == "ERROR" ]; then                             \
 	          cat cubediffError.txt >> errors.txt;                             \
 	        fi;                                                                \
+	        echo Failed comparing cubes;                                       \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
+	        echo Successs comparing cubes;                                     \
 	      fi;                                                                  \
 	      $(RM) compare.txt;                                                   \
 	      if [ -f cubediffError.txt ]; then                                    \
@@ -394,6 +365,7 @@ comparefiles: FORCE
 	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
 	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
 	        $$MSG >> errors.txt;                                               \
+	        echo Failed compparing txt;                                        \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	      fi;                                                                  \
@@ -412,6 +384,7 @@ comparefiles: FORCE
 	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
 	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
 	        $$MSG >> errors.txt;                                               \
+	        echo Failed comparing CSV;                                         \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	      fi;                                                                  \
@@ -420,18 +393,14 @@ comparefiles: FORCE
 	      if [ ! -f $$DIFFFILE ]; then                                         \
 	        DIFFFILE='';                                                       \
 	      fi;                                                                  \
-				echo will do pvldiff;                                                \
-	      $(ISISROOT)/bin/pvldiff                                              \
-	          $(TSTARGS)                                                       \
-	          from=$(TRUTH)/$$FILE                                             \
-	          from2=$(OUTPUT)/$$FILE                                           \
-	          to=compare.txt                                                   \
-	          diff=$$DIFFFILE 1>>/dev/null 2>pvldiffError.txt;                 \
+	      python $(ISISROOT)/scripts/textdiff.py $(TRUTH)/$$FILE               \
+	          $(OUTPUT)/$$FILE -abs_err $$TOL $$DIFFFILE                       \
+	          > $$FAILURE_REPORT 2>&1;                                         \
+	                                                                           \
 	      if [ $$? != 0 ]; then                                                \
 	        COMPRESULT="ERROR";                                                \
 	      else                                                                 \
-	        COMPRESULT=`$(ISISROOT)/bin/getkey from=compare.txt                \
-	          grp=Results keyword=Compare | tr '[:upper:]' '[:lower:]'`;       \
+	        COMPRESULT="identical";                                            \
 	      fi;                                                                  \
 	                                                                           \
 	      if [ "$$COMPRESULT" != "identical" ]; then                           \
@@ -442,6 +411,7 @@ comparefiles: FORCE
 	        if [ "$$COMPRESULT" == "ERROR" ]; then                             \
 	          cat pvldiffError.txt >> errors.txt;                              \
 	        fi;                                                                \
+	        echo Failed comparing PVL. Report: $$FAILURE_REPORT;               \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	      fi;                                                                  \
@@ -477,6 +447,7 @@ comparefiles: FORCE
 	        if [ "$$COMPRESULT" == "ERROR" ]; then                             \
 	          cat cnetdiffError.txt >> errors.txt;                             \
 	        fi;                                                                \
+	        echo Failed comparing net;                                         \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	      fi;                                                                  \
@@ -492,11 +463,13 @@ comparefiles: FORCE
 	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
 	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
 	        $$MSG >> errors.txt;                                               \
+	        echo Failed comparing binary;                                      \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	      fi;                                                                  \
 	    else                                                                   \
 	      MSG="$(UNKNOWNFILE) [$$FILE]";                                       \
+	      echo Unknown file type: $FFILE;                                      \
 	      echo -n $(CURTIMESTAMP) >> errors.txt;                               \
 	      $(PRINTF) "$(BLANKS)   " >> errors.txt;                              \
 	      $$MSG >> errors.txt;                                                 \
