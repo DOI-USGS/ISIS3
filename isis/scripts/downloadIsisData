@@ -210,6 +210,7 @@ def main(mission, dest, cfg_path, parsedArgs, kwargs):
 
     if(mission.upper() == "ALL"):
         supported_missions.remove("legacybase")
+        supported_missions.remove("isistestdata")
         for mission in supported_missions:
             args = create_rclone_arguments(dest, mission, parsedArgs, kwargs)
             rclone(command=parsedArgs.command, extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
