@@ -150,8 +150,8 @@ test: FORCE clean
 	    $$MSG >> errors.txt;                                                   \
 	  else                                                                     \
 	    $(MAKE) output;                                                        \
-	    TRUTHFILECOUNT=`$(LS) -p $(TRUTH)/ | $(GREP) -v "/" | wc -l`;          \
-	    OUTPUTFILECOUNT=`$(LS) -p $(OUTPUT)/ | $(GREP) -v "/" | wc -l`;        \
+	    TRUTHFILECOUNT=`$(LS) -p $(TRUTH)/ | $(GREP) -v "/" | $(GREP) -v .TOL | wc -l`;   \
+	    OUTPUTFILECOUNT=`$(LS) -p $(OUTPUT)/ | $(GREP) -v "/" | $(GREP) -v .TOL | wc -l`; \
 	    if [ $$TRUTHFILECOUNT -ne $$OUTPUTFILECOUNT ]; then                    \
 	      MSG='$(FILECOUNTMISMATCH)';                                          \
 	      echo -n $(CURTIMESTAMP) >> errors.txt;                               \
@@ -306,6 +306,18 @@ comparefiles: FORCE
 	                                                                           \
 	FILES="$(notdir $(wildcard $(TRUTH)/*))";                                  \
 	for FILE in $$FILES; do                                                    \
+	  echo File is $$FILE;                                                     \
+	  TOL_FILE="$(INPUT)/$$FILE.TOL";                                          \
+	  echo TOL_FILE is $$TOL_FILE;                                             \
+	  TOL=1e-8;                                                                \
+	  if [ ! -f $$TOL_FILE ]; then                                             \
+	    echo Missing $$TOL_FILE;                                               \
+	    echo Usig default tolerance;                                           \
+	  else                                                                     \
+	    Reading tolerance from $$TOL_FILE;                                     \
+	    TOL=`$(CAT) $$TOL_FILE`;                                               \
+	  fi;                                                                      \
+	  echo Comparing with tolerance: $$TOL;                                    \
 	  if [ ! -f $(OUTPUT)/$$FILE ]; then                                       \
 	    MSG="$(FILENOTFOUND) [$$FILE]";                                        \
 	    echo -n $(CURTIMESTAMP) >> errors.txt;                                 \
@@ -408,7 +420,7 @@ comparefiles: FORCE
 	      if [ ! -f $$DIFFFILE ]; then                                         \
 	        DIFFFILE='';                                                       \
 	      fi;                                                                  \
-	                                                                           \
+				echo will do pvldiff;                                                \
 	      $(ISISROOT)/bin/pvldiff                                              \
 	          $(TSTARGS)                                                       \
 	          from=$(TRUTH)/$$FILE                                             \
