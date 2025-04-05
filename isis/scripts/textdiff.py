@@ -14,7 +14,7 @@ of lines that disagree will be printed, along with max error per line
 (relative or absolute).
 """
 
-import math, sys
+import math, sys, os
 
 def is_number(candidate):
   """Tests a candidate string for having a numerical format."""
@@ -23,6 +23,70 @@ def is_number(candidate):
     return True
   except ValueError:
     return False
+
+def fixPvlLines(lines):
+  """ 
+   Fix for PVL files. If the line has 79 characters, and the last
+   character is a dash, then it is a continuation line. Remove the dash
+   and add the next line to the current line. Below will also wipe
+   leading spaces on continuation lines.
+  """
+
+  numLines = len(lines)
+  problemLines = [0] * numLines
+  for lineCount in range(numLines):
+    line = lines[lineCount]
+    if len(line) == 79 and line[-1] == "\n" and line[-2] == "-":
+      # Remove the last two characters
+      lines[lineCount] = line[:-2]
+      # Flag as problem line
+      problemLines[lineCount] = 1
+
+  # Each block of problem lines must be concatenated, also with the
+  # next line, if it is not a problem line.
+  outLines = []
+  removedLines = [0] * numLines
+  for lineCount in range(numLines - 1):
+  
+    if removedLines[lineCount] == 1:
+      # This was appended and removed
+      continue
+      
+    if problemLines[lineCount] == 0:
+      # Not a problem line
+      outLines.append(lines[lineCount])
+      continue
+      
+    # Iterate till the end until no more problem lines
+    lastProblemLine = lineCount
+    for probCount in range(lineCount, numLines):
+      if problemLines[probCount] == 0:
+        break
+      lastProblemLine = probCount
+    
+    # We need to append the line after the last problem line, so increment.
+    lastProblemLine += 1
+    
+    # Must not exceed the number of lines
+    if lastProblemLine >= numLines:
+      lastProblemLine = numLines - 1
+    
+    outLine = ""  
+    # Append the lines and flag them as appended.
+    for probCount in range(lineCount, lastProblemLine + 1):
+     
+      # For all lines after the first problem one, wipe all leading spaces, as
+      # that is part of continuation. 
+      if probCount > lineCount:
+        lines[probCount] = lines[probCount].lstrip()
+        
+      outLine += lines[probCount]
+      removedLines[probCount] = 1
+    
+    # Append the line to the output
+    outLines.append(outLine)  
+
+  return outLines
 
 def read_lines(filename):
   """Attempt to read all lines from a file."""
@@ -33,6 +97,9 @@ def read_lines(filename):
   
   lines = file.readlines()
   file.close()
+  
+  # Fix for PVL files
+  lines = fixPvlLines(lines)
   
   return lines
 
@@ -94,6 +161,9 @@ if len(sys.argv) > 5:
   
 # Start with success status
 status = 0
+
+print("First file: " + os.path.abspath(sys.argv[1]))
+print("Second file: " + os.path.abspath(sys.argv[2]))
 
 lines1 = read_lines(sys.argv[1])
 lines2 = read_lines(sys.argv[2])
