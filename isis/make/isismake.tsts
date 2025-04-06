@@ -167,7 +167,6 @@ test: FORCE clean
 	  $(PRINTF) "$(BLANKS)  " >> errors.txt;                                   \
 	  $$MSG >> errors.txt;                                                     \
 	fi;                                                                        \
-	                                                                           \
 	TIME2=`date +"%s"`;                                                        \
 	TIMEDIFF=`expr $$TIME2 - $$TIME1`;                                         \
 	SEC60=`expr $$TIMEDIFF % 60`;                                              \
@@ -187,11 +186,10 @@ test: FORCE clean
 	else                                                                       \
 	  eval $(TESTFAILED);                                                      \
 	  $(PRINTF) "Duration [%.2i:%.2i:%.2i]\n" $$HOUR60 $$MIN60 $$SEC60;        \
-	  echo Error summary file: $(shell pwd)/errors.txt;                        \
-	  #$(CAT) errors.txt;                                                      \
+	  echo Error report file: $(shell pwd)/errors.txt;                         \
 	fi;
 
-#-------------------------------------------------------------------------     ---
+#-------------------------------------------------------------------------
 # Target = compare
 # Dependencies = All files in the truth and output directories
 #
@@ -200,7 +198,7 @@ test: FORCE clean
 # If successful (indicated by presence of casesucceeded.txt),
 # prints success message. If not, prints all errors that were
 # encountered (found in errors.txt).
-#-------------------------------------------------------------------------     ---
+#-------------------------------------------------------------------------
 compare: FORCE
 	if [ -d "$(OUTPUT)" ]; then                                                \
 	  if [ -d "$(TRUTH)" ]; then                                               \
@@ -271,7 +269,6 @@ comparefiles: FORCE
 	                                                                           \
 	FILES="$(notdir $(wildcard $(TRUTH)/*))";                                  \
 	for FILE in $$FILES; do                                                    \
-	  echo Compare: $(TRUTH)/$$FILE $(OUTPUT)/$$FILE;                          \
 	                                                                           \
 	  if [ ! -f $(OUTPUT)/$$FILE ]; then                                       \
 	    MSG="$(FILENOTFOUND) [$$FILE]";                                        \
@@ -317,11 +314,8 @@ comparefiles: FORCE
 	      # Parse tolerance for non-cub                                        \
 	      TOL_FILE="$(INPUT)/$$FILE.TOL";                                      \
 	      TOL=1e-8;                                                            \
-	      if [ ! -f "$$TOL_FILE" ]; then                                       \
-	        echo Using default tolerance: $$TOL, as missing $$TOL_FILE;        \
-	      else                                                                 \
+	      if [ -f "$$TOL_FILE" ]; then                                         \
 	        TOL=`$(CAT) $$TOL_FILE`;                                           \
-	        echo Tolerance: $$TOL from: $$TOL_FILE;                            \
 	      fi;                                                                  \
 	    fi;                                                                    \
 	                                                                           \
@@ -353,7 +347,6 @@ comparefiles: FORCE
 	        echo Failed comparing cubes. Report: $(shell pwd)/$$FAILURE_REPORT;\
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
-	        echo Successs comparing cubes;                                     \
 	        $(RM) compare.txt;                                                 \
 	        if [ -f $$FAILURE_REPORT ]; then                                   \
 	          $(RM) $$FAILURE_REPORT;                                          \
@@ -372,7 +365,6 @@ comparefiles: FORCE
 	        echo Failed compparing txt;                                        \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
-	        echo Successs comparing txt;                                       \
 	      fi;                                                                  \
 	                                                                           \
 	    # csv                                                                  \
@@ -392,7 +384,6 @@ comparefiles: FORCE
 	        echo Failed comparing CSV;                                         \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
-	        echo Successs comparing csv;                                       \
 	      fi;                                                                  \
 	                                                                           \
 	    # pvl                                                                  \
@@ -418,10 +409,12 @@ comparefiles: FORCE
 	        if [ "$$COMPRESULT" == "ERROR" ]; then                             \
 	          cat $$FAILURE_REPORT >> errors.txt;                              \
 	        fi;                                                                \
+	        echo "";                                                           \
 	        echo Failed comparing PVL. Report: $(shell pwd)/$$FAILURE_REPORT;  \
+	        echo Tolerance: $$TOL;                                             \
+	        echo Tolerance file to update: $$TOL_FILE;                         \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
-	        echo Successs comparing pvl;                                       \
 	        $(RM) compare.txt;                                                 \
 	        if [ -f $$FAILURE_REPORT ]; then                                   \
 	          $(RM) $$FAILURE_REPORT;                                          \
@@ -457,7 +450,6 @@ comparefiles: FORCE
 	        echo Failed comparing cnet;                                        \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
-	        echo Successs comparing cnet;                                      \
 	      fi;                                                                  \
 	      $(RM) compare.txt;                                                   \
 	      if [ -f cnetdiffError.txt ]; then                                    \
@@ -476,7 +468,6 @@ comparefiles: FORCE
 	        echo Failed comparing binary;                                      \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
-	        echo Successs comparing binaries;                                  \
 	      fi;                                                                  \
 	                                                                           \
 	    # unknown                                                              \
