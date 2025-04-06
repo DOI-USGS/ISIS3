@@ -26,7 +26,7 @@ def is_number(candidate):
 
 def fixPvlLines(lines):
   """ 
-   Fix for PVL files. If the line has 79 characters, and the last
+   Fix for PVL files. If the line has about 79 characters, and the last
    character is a dash, then it is a continuation line. Remove the dash
    and add the next line to the current line. Below will also wipe
    leading spaces on continuation lines.
@@ -36,7 +36,9 @@ def fixPvlLines(lines):
   problemLines = [0] * numLines
   for lineCount in range(numLines):
     line = lines[lineCount]
-    if len(line) == 79 and line[-1] == "\n" and line[-2] == "-":
+    if (len(line) >= 78 and len(line) <= 80) and line[-1] == "\n" and line[-2] == "-" \
+      and lineCount < numLines - 1 and \
+      lines[lineCount + 1][0:5].strip() == '': # next line starts with lots of spaces
       # Remove the last two characters
       lines[lineCount] = line[:-2]
       # Flag as problem line
@@ -99,8 +101,9 @@ def read_lines(filename):
   file.close()
   
   # Fix for PVL files
-  lines = fixPvlLines(lines)
-  
+  if filename.lower().endswith(".pvl"):
+    lines = fixPvlLines(lines)
+
   return lines
 
 def parseIgnoreFile(ignoreFile):
