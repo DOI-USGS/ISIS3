@@ -186,7 +186,7 @@ test: FORCE clean
 	else                                                                       \
 	  eval $(TESTFAILED);                                                      \
 	  $(PRINTF) "Duration [%.2i:%.2i:%.2i]\n" $$HOUR60 $$MIN60 $$SEC60;        \
-	  echo Error report file: $(shell pwd)/errors.txt;                         \
+	  echo Summary error file: $(shell pwd)/errors.txt;                        \
 	fi;
 
 #-------------------------------------------------------------------------
@@ -345,6 +345,8 @@ comparefiles: FORCE
 	          cat $$FAILURE_REPORT >> errors.txt;                              \
 	        fi;                                                                \
 	        echo Failed comparing cubes. Report: $(shell pwd)/$$FAILURE_REPORT;\
+	        echo Add/update the truth cube tolerance in the test Makefile.;    \
+	        echo Truth cube that needs tolerance: $$FILE;                      \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	        $(RM) compare.txt;                                                 \
@@ -355,14 +357,18 @@ comparefiles: FORCE
 	                                                                           \
 	    # txt                                                                  \
 	    elif [ "$$FILETYPE" == "txt" ]; then                                   \
-	      COMMAND="";                                                          \
-	      $(DIFF) $(TRUTH)/$$FILE $(OUTPUT)/$$FILE > /dev/null;                \
+	      python $(ISISROOT)/scripts/textdiff.py $(TRUTH)/$$FILE               \
+	          $(OUTPUT)/$$FILE -abs_err $$TOL $$DIFFFILE                       \
+	          > $$FAILURE_REPORT 2>&1;                                         \
+	                                                                           \
 	      if [ $$? -ne 0 ]; then                                               \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                                  \
 	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
 	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
 	        $$MSG >> errors.txt;                                               \
-	        echo Failed compparing txt;                                        \
+	        echo Failed comparing txt. Report: $(shell pwd)/$$FAILURE_REPORT;  \
+	        echo Tolerance: $$TOL;                                             \
+	        echo Tolerance file to update: $$TOL_FILE;                         \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	      fi;                                                                  \

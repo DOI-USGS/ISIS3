@@ -70,7 +70,7 @@ def fixProblemLines(lines, problemLines):
         
       outLine += lines[probCount]
       removedLines[probCount] = 1
-    
+      
     # Append the line to the output
     outLines.append(outLine)  
     
@@ -85,12 +85,11 @@ def fixPvlLines(lines):
    continuing on multiple lines.
   """
 
-  numLines = len(lines)
-  problemLines = [0] * numLines
-  for lineCount in range(numLines):
+  problemLines = [0] * len(lines)
+  for lineCount in range(len(lines)):
     line = lines[lineCount]
-    if (len(line) >= 76 and len(line) <= 82) and line[-1] == "\n" and line[-2] == "-" \
-      and lineCount < numLines - 1 and \
+    if (len(line) >= 78 and len(line) <= 80) and line[-1] == "\n" and line[-2] == "-" \
+      and lineCount < len(lines) - 1 and \
       lines[lineCount + 1][0:5].strip() == '': # next line starts with lots of spaces
       # Remove the last two characters
       lines[lineCount] = line[:-2]
@@ -102,14 +101,18 @@ def fixPvlLines(lines):
   
   # Fix for some quoted text continuing on multiple lines
   numQuotes = 0
+  numOpenParens = 0
+  numCloseParens = 0
   problemLines = [0] * len(lines)
   for lineCount in range(len(lines)):
-     # Count the number of quotes
+     # Count the number of quotes and parentheses. Unbalanced lines need merging.
      numQuotes += lines[lineCount].count("'")
      numQuotes += lines[lineCount].count('"')
+     numOpenParens += lines[lineCount].count('(')
+     numCloseParens += lines[lineCount].count(')')
      
      # If it is even, we are good, so continue
-     if numQuotes % 2 == 0:
+     if numQuotes % 2 == 0 and numOpenParens == numCloseParens:
        continue
       
      # Flag as problem line
@@ -204,6 +207,22 @@ lines2 = read_lines(sys.argv[2])
 # The number of lines in the two files must be the same
 if len(lines1) != len(lines2):
   print("ERROR: Files have different number of lines.")
+  # This is helpful with debugging
+  file1 = os.path.abspath(sys.argv[1]) + ".preprocessed"
+  file2 = os.path.abspath(sys.argv[2]) + ".preprocessed"
+  print("The files to compare after internal preprocessing:")
+  print("File 1: " + file1)
+  print("File 2: " + file2)
+  print("Delete these after debugging, to avoid failures with different number of files.")
+  try:
+    with open(file1, "w") as f1:
+      f1.writelines(lines1)
+    with open(file2, "w") as f2:
+      f2.writelines(lines2)
+  except IOError:
+    print("ERROR: Unable to write '" + file1 + "' or '" + file2 + "'")
+    sys.exit(1)
+
   sys.exit(1)
 
 # Iterate through the lines of the two files
