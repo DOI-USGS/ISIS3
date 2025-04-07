@@ -24,31 +24,17 @@ def is_number(candidate):
   except ValueError:
     return False
 
-def fixPvlLines(lines):
-  """ 
-   Fix for PVL files. If the line has about 79 characters, and the last
-   character is a dash, then it is a continuation line. Remove the dash
-   and add the next line to the current line. Below will also wipe
-   leading spaces on continuation lines.
+def fixProblemLines(lines, problemLines):
+
+  """" 
+    Each block of problem lines must be concatenated, also with the next line
+    after the last problem line in a block.
   """
-
+  
   numLines = len(lines)
-  problemLines = [0] * numLines
-  for lineCount in range(numLines):
-    line = lines[lineCount]
-    if (len(line) >= 78 and len(line) <= 80) and line[-1] == "\n" and line[-2] == "-" \
-      and lineCount < numLines - 1 and \
-      lines[lineCount + 1][0:5].strip() == '': # next line starts with lots of spaces
-      # Remove the last two characters
-      lines[lineCount] = line[:-2]
-      # Flag as problem line
-      problemLines[lineCount] = 1
-
-  # Each block of problem lines must be concatenated, also with the
-  # next line, if it is not a problem line.
   outLines = []
   removedLines = [0] * numLines
-  for lineCount in range(numLines - 1):
+  for lineCount in range(numLines):
   
     if removedLines[lineCount] == 1:
       # This was appended and removed
@@ -87,9 +73,53 @@ def fixPvlLines(lines):
     
     # Append the line to the output
     outLines.append(outLine)  
-
+    
   return outLines
 
+def fixPvlLines(lines):
+  """ 
+   Fix for PVL files. If the line has about 79 characters, and the last
+   character is a dash, then it is a continuation line. Remove the dash
+   and add the next line to the current line. Below will also wipe
+   leading spaces on continuation lines. Also fix for quoted text
+   continuing on multiple lines.
+  """
+
+  numLines = len(lines)
+  problemLines = [0] * numLines
+  for lineCount in range(numLines):
+    line = lines[lineCount]
+    if (len(line) >= 76 and len(line) <= 82) and line[-1] == "\n" and line[-2] == "-" \
+      and lineCount < numLines - 1 and \
+      lines[lineCount + 1][0:5].strip() == '': # next line starts with lots of spaces
+      # Remove the last two characters
+      lines[lineCount] = line[:-2]
+      # Flag as problem line
+      problemLines[lineCount] = 1
+
+  # Fix the problem lines
+  lines = fixProblemLines(lines, problemLines)
+  
+  # Fix for some quoted text continuing on multiple lines
+  numQuotes = 0
+  problemLines = [0] * len(lines)
+  for lineCount in range(len(lines)):
+     # Count the number of quotes
+     numQuotes += lines[lineCount].count("'")
+     numQuotes += lines[lineCount].count('"')
+     
+     # If it is even, we are good, so continue
+     if numQuotes % 2 == 0:
+       continue
+      
+     # Flag as problem line
+     problemLines[lineCount] = 1
+
+  # Fix the problem lines
+  lines = fixProblemLines(lines, problemLines)  
+
+  return lines
+  
 def read_lines(filename):
   """Attempt to read all lines from a file."""
   try:
