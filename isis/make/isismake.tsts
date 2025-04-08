@@ -156,8 +156,10 @@ test: FORCE clean
 	      MSG='$(FILECOUNTMISMATCH)';                                          \
 	      echo -n $(CURTIMESTAMP) >> errors.txt;                               \
 	      $(PRINTF) "$(BLANKS)  " >> errors.txt;                               \
-	      $$MSG >> errors.txt;                                                 \
 	      echo $$MSG;                                                          \
+	      echo Truth file count: $$TRUTHFILECOUNT;                             \
+	      echo Output file count: $$OUTPUTFILECOUNT;                           \
+	      $$MSG >> errors.txt;                                                 \
 	    else                                                                   \
 	      $(MAKE) comparefiles;                                                \
 	    fi;                                                                    \

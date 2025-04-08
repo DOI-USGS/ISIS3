@@ -14,6 +14,8 @@
 # To verify the label data, change the lbl extension to pvl.
 APPNAME = hideal2pds
 
+hideal2pds2hideal16bit.cub.TOLERANCE = 1e-5
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:

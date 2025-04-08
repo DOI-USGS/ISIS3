@@ -136,6 +136,10 @@ def skipIgnoreLines(lines, ignoreSet):
     
     if len(words) > 0 and words[0] in ignoreSet:
       continue
+    
+    # Also skip empty lines. PVL ignores them.
+    if len(words) == 0:
+      continue
 
     outLines.append(lines[lineCount])
       
@@ -144,7 +148,8 @@ def skipIgnoreLines(lines, ignoreSet):
 def read_lines(filename, ignoreSet):
   """Attempt to read all lines from a file."""
   try:
-    file = open(filename, "r")
+    # Will ignore binary data
+    file = open(filename, "r", encoding='utf-8', errors='ignore')
   except IOError:
     sys.exit("ERROR: Unable to read '" + filename + "")
 
@@ -155,7 +160,9 @@ def read_lines(filename, ignoreSet):
   if filename.lower().endswith(".pvl"):
     lines = fixPvlLines(lines)
 
-  # Skip lines that have the first word in the ignore set
+  # Skip lines that have the first word in the ignore set.
+  # Skip lines starting with comments.
+  ignoreSet.add("#")
   lines = skipIgnoreLines(lines, ignoreSet)
   
   return lines
