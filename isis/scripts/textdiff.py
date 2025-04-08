@@ -122,8 +122,26 @@ def fixPvlLines(lines):
   lines = fixProblemLines(lines, problemLines)  
 
   return lines
+
+def skipIgnoreLines(lines, ignoreSet):
+  """ 
+   Skip lines that have the first word in the ignore set.  
+  """
   
-def read_lines(filename):
+  outLines = []
+  for lineCount in range(len(lines)):
+  
+    # Split the line by spaces
+    words = lines[lineCount].strip().split()
+    
+    if len(words) > 0 and words[0] in ignoreSet:
+      continue
+
+    outLines.append(lines[lineCount])
+      
+  return outLines
+  
+def read_lines(filename, ignoreSet):
   """Attempt to read all lines from a file."""
   try:
     file = open(filename, "r")
@@ -137,6 +155,9 @@ def read_lines(filename):
   if filename.lower().endswith(".pvl"):
     lines = fixPvlLines(lines)
 
+  # Skip lines that have the first word in the ignore set
+  lines = skipIgnoreLines(lines, ignoreSet)
+  
   return lines
 
 def parseIgnoreFile(ignoreFile):
@@ -153,7 +174,7 @@ def parseIgnoreFile(ignoreFile):
         line = line.replace("=", " ")
         # Split by spaces
         parts = line.split()
-        if len(parts) > 1:
+        if len(parts) > 0:
           ignoreSet.add(parts[0].strip())
   except IOError:
     sys.exit("ERROR: Unable to read '" + ignoreFile + "'")
@@ -201,28 +222,28 @@ status = 0
 print("First file: " + os.path.abspath(sys.argv[1]))
 print("Second file: " + os.path.abspath(sys.argv[2]))
 
-lines1 = read_lines(sys.argv[1])
-lines2 = read_lines(sys.argv[2])
+lines1 = read_lines(sys.argv[1], ignoreSet)
+lines2 = read_lines(sys.argv[2], ignoreSet)
 
 # The number of lines in the two files must be the same
 if len(lines1) != len(lines2):
   print("ERROR: Files have different number of lines.")
-  # This is helpful with debugging
-  file1 = os.path.abspath(sys.argv[1]) + ".preprocessed"
-  file2 = os.path.abspath(sys.argv[2]) + ".preprocessed"
-  print("The files to compare after internal preprocessing:")
-  print("File 1: " + file1)
-  print("File 2: " + file2)
-  print("Delete these after debugging, to avoid failures with different number of files.")
-  try:
-    with open(file1, "w") as f1:
-      f1.writelines(lines1)
-    with open(file2, "w") as f2:
-      f2.writelines(lines2)
-  except IOError:
-    print("ERROR: Unable to write '" + file1 + "' or '" + file2 + "'")
-    sys.exit(1)
-
+  # # This is helpful with debugging but will result in complains
+  # # about extraneous files later.
+  # file1 = os.path.abspath(sys.argv[1]) + ".preprocessed"
+  # file2 = os.path.abspath(sys.argv[2]) + ".preprocessed"
+  # print("The files to compare after internal preprocessing:")
+  # print("File 1: " + file1)
+  # print("File 2: " + file2)
+  # print("Delete these after debugging, to avoid failures with different number of files.")
+  # try:
+  #   with open(file1, "w") as f1:
+  #     f1.writelines(lines1)
+  #   with open(file2, "w") as f2:
+  #     f2.writelines(lines2)
+  # except IOError:
+  #   print("ERROR: Unable to write '" + file1 + "' or '" + file2 + "'")
+  #   sys.exit(1)
   sys.exit(1)
 
 # Iterate through the lines of the two files

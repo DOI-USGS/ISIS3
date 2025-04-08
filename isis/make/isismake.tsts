@@ -420,7 +420,7 @@ comparefiles: FORCE
 	        echo Failed comparing PVL. Report: $(shell pwd)/$$FAILURE_REPORT;  \
 	        echo Tolerance: $$TOL;                                             \
 	        echo Tolerance file to update: $$TOL_FILE;                         \
-	        echo DIFFFILE=$$DIFF;                                              \
+	        echo DIFFFILE=$$DIFFFILE;                                          \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	        $(RM) compare.txt;                                                 \
