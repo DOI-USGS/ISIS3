@@ -129,7 +129,7 @@ def read_lines(filename):
     file = open(filename, "r")
   except IOError:
     sys.exit("ERROR: Unable to read '" + filename + "")
-  
+
   lines = file.readlines()
   file.close()
   
@@ -239,14 +239,20 @@ for i in range(len(lines1)):
   # Skip empty lines
   if len(words1) == 0 and len(words2) == 0:
     continue
-    
+
+  # Skip if first word is to be ignored
+  if len(words1) > 0 and words1[0] in ignoreSet:
+    continue
+  if len(words2) > 0 and words2[0] in ignoreSet:
+    continue
+
   # Must have the same number of words
   if len(words1) != len(words2):
     print("ERROR: Lines have different number of words.")
     print("First  file line: " + str(i+1) + ": " + lines1[i].strip())
     print("Second file line: " + str(i+1) + ": " + lines2[i].strip())
     sys.exit(1)
-  
+
   # Skip if first word is to be ignored
   if len(words1) > 0 and words1[0] in ignoreSet:
     continue

@@ -157,6 +157,7 @@ test: FORCE clean
 	      echo -n $(CURTIMESTAMP) >> errors.txt;                               \
 	      $(PRINTF) "$(BLANKS)  " >> errors.txt;                               \
 	      $$MSG >> errors.txt;                                                 \
+	      echo $$MSG;                                                          \
 	    else                                                                   \
 	      $(MAKE) comparefiles;                                                \
 	    fi;                                                                    \
@@ -286,12 +287,12 @@ comparefiles: FORCE
 	                          $(filter %.TOLERANCE,$(.VARIABLES)),             \
 	                          $(TOLERANCEVAR);$($(TOLERANCEVAR)))";            \
 	      echo Tolerance from Makefile: $$FILETOLERANCES;                      \
-	      # Split into tokens and search based on .cub name.                   \
+	      # Split into tokens and search based on .cub name                    \
 	      TOLERANCESTR=`echo "$$FILETOLERANCES"                                \
 	                     | perl -p -e "s#\s#\n#g"                              \
 	                     | grep $$FILE | grep TOLERANCE                        \
 	                     | perl -p -e "s#^.*?TOLERANCE;##g"`;                  \
-	      if [ ! -n "$$TOLERANCESTR" ]; then                                   \
+	      if [ "$$TOLERANCESTR" == "" ]; then                                  \
 	        TOLERANCESTR=1e-8;                                                 \
 	      fi;                                                                  \
 	      echo Tolerance for $$FILE: $$TOLERANCESTR;                           \
@@ -419,6 +420,7 @@ comparefiles: FORCE
 	        echo Failed comparing PVL. Report: $(shell pwd)/$$FAILURE_REPORT;  \
 	        echo Tolerance: $$TOL;                                             \
 	        echo Tolerance file to update: $$TOL_FILE;                         \
+	        echo DIFFFILE=$$DIFF;                                              \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	        $(RM) compare.txt;                                                 \
