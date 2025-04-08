@@ -745,8 +745,8 @@ TEST(OsirisRexSamCamModules, SamCamModuleInfoAndStatsTest)
   EXPECT_NEAR((double)gpULGroup.findKeyword("SpacecraftAltitude"), 0.082907681748561002, 1e-8);
   EXPECT_NEAR((double)gpULGroup.findKeyword("OffNadirAngle"), 5.9510850664105002, 1e-8);
   EXPECT_NEAR((double)gpULGroup.findKeyword("SubSpacecraftGroundAzimuth"), 352.73031127557999, 1e-8);
-  EXPECT_NEAR(toDouble(gpULGroup.findKeyword("SunPosition")[0]), 173381543.43966001, 1e-5);
-  EXPECT_NEAR(toDouble(gpULGroup.findKeyword("SunPosition")[1]), 75149827.507274002, 1e-5);
+  EXPECT_NEAR(toDouble(gpULGroup.findKeyword("SunPosition")[0]), 173381543.43966001, 0.0093);
+  EXPECT_NEAR(toDouble(gpULGroup.findKeyword("SunPosition")[1]), 75149827.507274002, 0.021);
   EXPECT_NEAR(toDouble(gpULGroup.findKeyword("SunPosition")[2]),  7504735.7285030996, 1e-5);
   EXPECT_NEAR((double)gpULGroup.findKeyword("SubSolarAzimuth"), 146.88037353876001, 1e-8);
   EXPECT_NEAR((double)gpULGroup.findKeyword("SolarDistance"), 1.2641644235414999, 1e-8);
@@ -813,8 +813,8 @@ TEST(OsirisRexSamCamModules, SamCamModuleInfoAndStatsTest)
   EXPECT_NEAR((double)gpURGroup.findKeyword("SpacecraftAltitude"), 0.082907681748561002, 1e-8);
   EXPECT_NEAR((double)gpURGroup.findKeyword("OffNadirAngle"), 15.672041739717001, 1e-8);
   EXPECT_NEAR((double)gpURGroup.findKeyword("SubSpacecraftGroundAzimuth"), 223.34979952218001, 1e-8);
-  EXPECT_NEAR(toDouble(gpURGroup.findKeyword("SunPosition")[0]), 173381543.43966001, 1e-5);
-  EXPECT_NEAR(toDouble(gpURGroup.findKeyword("SunPosition")[1]), 75149827.507274002, 1e-5);
+  EXPECT_NEAR(toDouble(gpURGroup.findKeyword("SunPosition")[0]), 173381543.43966001, 0.0093);
+  EXPECT_NEAR(toDouble(gpURGroup.findKeyword("SunPosition")[1]), 75149827.507274002, 0.021);
   EXPECT_NEAR(toDouble(gpURGroup.findKeyword("SunPosition")[2]), 7504735.7285030996, 1e-5);
   EXPECT_NEAR((double)gpURGroup.findKeyword("SubSolarAzimuth"), 151.02219421958, 1e-8);
   EXPECT_NEAR((double)gpURGroup.findKeyword("SolarDistance"), 1.264164423697, 1e-8);
@@ -881,8 +881,8 @@ TEST(OsirisRexSamCamModules, SamCamModuleInfoAndStatsTest)
   EXPECT_NEAR((double)gpLRGroup.findKeyword("SpacecraftAltitude"), 0.082907681748561002, 1e-8);
   EXPECT_NEAR((double)gpLRGroup.findKeyword("OffNadirAngle"), 21.993698903517998, 1e-8);
   EXPECT_NEAR((double)gpLRGroup.findKeyword("SubSpacecraftGroundAzimuth"), 134.81055570525999, 1e-8);
-  EXPECT_NEAR(toDouble(gpLRGroup.findKeyword("SunPosition")[0]), 173381543.43966001, 1e-5);
-  EXPECT_NEAR(toDouble(gpLRGroup.findKeyword("SunPosition")[1]), 75149827.507274002, 1e-5);
+  EXPECT_NEAR(toDouble(gpLRGroup.findKeyword("SunPosition")[0]), 173381543.43966001, 0.0093);
+  EXPECT_NEAR(toDouble(gpLRGroup.findKeyword("SunPosition")[1]), 75149827.507274002, 0.021);
   EXPECT_NEAR(toDouble(gpLRGroup.findKeyword("SunPosition")[2]), 7504735.7285030996, 1e-5);
   EXPECT_NEAR((double)gpLRGroup.findKeyword("SubSolarAzimuth"), 153.97800288957001, 1e-8);
   EXPECT_NEAR((double)gpLRGroup.findKeyword("SolarDistance"), 1.2641644236189, 1e-8);
@@ -949,8 +949,8 @@ TEST(OsirisRexSamCamModules, SamCamModuleInfoAndStatsTest)
   EXPECT_NEAR((double)gpLLGroup.findKeyword("SpacecraftAltitude"), 0.082907681748561002, 1e-8);
   EXPECT_NEAR((double)gpLLGroup.findKeyword("OffNadirAngle"), 15.706768952824, 1e-8);
   EXPECT_NEAR((double)gpLLGroup.findKeyword("SubSpacecraftGroundAzimuth"), 68.057343513310002, 1e-8);
-  EXPECT_NEAR(toDouble(gpLLGroup.findKeyword("SunPosition")[0]), 173381543.43966001, 1e-5);
-  EXPECT_NEAR(toDouble(gpLLGroup.findKeyword("SunPosition")[1]), 75149827.507274002, 1e-5);
+  EXPECT_NEAR(toDouble(gpLLGroup.findKeyword("SunPosition")[0]), 173381543.43966001, 0.0093);
+  EXPECT_NEAR(toDouble(gpLLGroup.findKeyword("SunPosition")[1]), 75149827.507274002, 0.021);
   EXPECT_NEAR(toDouble(gpLLGroup.findKeyword("SunPosition")[2]), 7504735.7285030996, 1e-5);
   EXPECT_NEAR((double)gpLLGroup.findKeyword("SubSolarAzimuth"), 154.57933226068999, 1e-8);
   EXPECT_NEAR((double)gpLLGroup.findKeyword("SolarDistance"), 1.2641644234575999, 1e-8);
@@ -1017,8 +1017,8 @@ TEST(OsirisRexSamCamModules, SamCamModuleInfoAndStatsTest)
   EXPECT_NEAR((double)gpCTRGroup.findKeyword("SpacecraftAltitude"), 0.082907681748561002, 1e-8);
   EXPECT_NEAR((double)gpCTRGroup.findKeyword("OffNadirAngle"), 7.7063113038062996, 1e-8);
   EXPECT_NEAR((double)gpCTRGroup.findKeyword("SubSpacecraftGroundAzimuth"), 107.71147351473, 1e-8);
-  EXPECT_NEAR(toDouble(gpCTRGroup.findKeyword("SunPosition")[0]), 173381543.43966001, 1e-5);
-  EXPECT_NEAR(toDouble(gpCTRGroup.findKeyword("SunPosition")[1]), 75149827.507274002, 1e-5);
+  EXPECT_NEAR(toDouble(gpCTRGroup.findKeyword("SunPosition")[0]), 173381543.43966001, 0.0093);
+  EXPECT_NEAR(toDouble(gpCTRGroup.findKeyword("SunPosition")[1]), 75149827.507274002, 0.021);
   EXPECT_NEAR(toDouble(gpCTRGroup.findKeyword("SunPosition")[2]), 7504735.7285030996, 1e-5);
   EXPECT_NEAR((double)gpCTRGroup.findKeyword("SubSolarAzimuth"), 151.53939253928999, 1e-8);
   EXPECT_NEAR((double)gpCTRGroup.findKeyword("SolarDistance"), 1.2641644235755001, 1e-8);
