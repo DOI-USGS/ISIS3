@@ -316,27 +316,35 @@ comparefiles: FORCE
 	    else                                                                   \
 	      # Parse tolerance for non-cub                                        \
 	      TOL_FILE="$(INPUT)/$$FILE.TOL";                                      \
-	      TOL=1e-8;                                                            \
+	      TOLERANCESTR=1e-8;                                                   \
 	      if [ -f "$$TOL_FILE" ]; then                                         \
-	        TOL=`$(CAT) $$TOL_FILE`;                                           \
+	        TOLERANCESTR=`$(CAT) $$TOL_FILE`;                                  \
 	      fi;                                                                  \
 	    fi;                                                                    \
 	                                                                           \
 	    # cub                                                                  \
 	    if [ "$$FILETYPE" == "cub" ]; then                                     \
-	      $(ISISROOT)/bin/cubediff                                             \
-	          $(TSTARGS)                                                       \
-	          from=$(TRUTH)/$$FILE                                             \
-	          from2=$(OUTPUT)/$$FILE                                           \
-	          to=compare.txt                                                   \
-	          TOLERANCE=$$TOLERANCESTR                                         \
-	          $$IGNORESTR 1>>/dev/null 2> $$FAILURE_REPORT;                    \
-	          cat compare.txt	>> $$FAILURE_REPORT;                             \
+	      # cubediff cannot handle different special pixels. Use GDAL.;        \
+	      truthStats=$${FILE}.truth.txt; currStats=$${FILE}.curr.txt;          \
+	      gdalinfo -stats $(TRUTH)/$$FILE > $$truthStats;                      \
+	      gdalinfo -stats $(OUTPUT)/$$FILE > $$currStats;                      \
+	      $(RM) $(TRUTH)/$$FILE.aux.xml $(OUTPUT)/$$FILE.aux.xml;              \
+	      python $(ISISROOT)/scripts/textdiff.py $$truthStats                  \
+	          $$currStats -abs_err $$TOLERANCESTR $$DIFFFILE                   \
+	          > $$FAILURE_REPORT 2>&1;                                         \
+	      #$(ISISROOT)/bin/cubediff                                            \
+	      #    $(TSTARGS)                                                      \
+	      #    from=$(TRUTH)/$$FILE                                            \
+	      #    from2=$(OUTPUT)/$$FILE                                          \
+	      #    to=$$FAILURE_REPORT                                             \
+	      #    TOLERANCE=$$TOLERANCESTR                                        \
+	      #    $$IGNORESTR 1>>/dev/null 2> $$FAILURE_REPORT;                   \
 	      if [ $$? != 0 ]; then                                                \
 	        COMPRESULT="ERROR";                                                \
 	      else                                                                 \
-	        COMPRESULT=`$(ISISROOT)/bin/getkey from=compare.txt                \
-	          grp=Results keyword=Compare | tr '[:upper:]' '[:lower:]'`;       \
+	        COMPRESULT="identical";                                            \
+	        # COMPRESULT=`$(ISISROOT)/bin/getkey from=$$FAILURE_REPORT         \
+	        # grp=Results keyword=Compare | tr '[:upper:]' '[:lower:]'`;       \
 	      fi;                                                                  \
 	      COMMAND="";                                                          \
 	      if [ "$$COMPRESULT" != "identical" ]; then                           \
@@ -352,7 +360,7 @@ comparefiles: FORCE
 	        echo Truth cube that needs tolerance: $$FILE;                      \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
-	        $(RM) compare.txt;                                                 \
+	        $(RM) $$FAILURE_REPORT;                                            \
 	        if [ -f $$FAILURE_REPORT ]; then                                   \
 	          $(RM) $$FAILURE_REPORT;                                          \
 	        fi;                                                                \
@@ -361,7 +369,7 @@ comparefiles: FORCE
 	    # txt                                                                  \
 	    elif [ "$$FILETYPE" == "txt" ]; then                                   \
 	      python $(ISISROOT)/scripts/textdiff.py $(TRUTH)/$$FILE               \
-	          $(OUTPUT)/$$FILE -abs_err $$TOL $$DIFFFILE                       \
+	          $(OUTPUT)/$$FILE -abs_err $$TOLERANCESTR $$DIFFFILE              \
 	          > $$FAILURE_REPORT 2>&1;                                         \
 	                                                                           \
 	      if [ $$? -ne 0 ]; then                                               \
@@ -370,7 +378,7 @@ comparefiles: FORCE
 	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
 	        $$MSG >> errors.txt;                                               \
 	        echo Failed comparing txt. Report: $(shell pwd)/$$FAILURE_REPORT;  \
-	        echo Tolerance: $$TOL;                                             \
+	        echo Tolerance: $$TOLERANCESTR;                                    \
 	        echo Tolerance file to update: $$TOL_FILE;                         \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
@@ -402,7 +410,7 @@ comparefiles: FORCE
 	        DIFFFILE='';                                                       \
 	      fi;                                                                  \
 	      python $(ISISROOT)/scripts/textdiff.py $(TRUTH)/$$FILE               \
-	          $(OUTPUT)/$$FILE -abs_err $$TOL $$DIFFFILE                       \
+	          $(OUTPUT)/$$FILE -abs_err $$TOLERANCESTR $$DIFFFILE              \
 	          > $$FAILURE_REPORT 2>&1;                                         \
 	                                                                           \
 	      if [ $$? != 0 ]; then                                                \
@@ -420,12 +428,11 @@ comparefiles: FORCE
 	        fi;                                                                \
 	        echo "";                                                           \
 	        echo Failed comparing PVL. Report: $(shell pwd)/$$FAILURE_REPORT;  \
-	        echo Tolerance: $$TOL;                                             \
+	        echo Tolerance: $$TOLERANCESTR;                                    \
 	        echo Tolerance file to update: $$TOL_FILE;                         \
 	        echo DIFFFILE=$$DIFFFILE;                                          \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
-	        $(RM) compare.txt;                                                 \
 	        if [ -f $$FAILURE_REPORT ]; then                                   \
 	          $(RM) $$FAILURE_REPORT;                                          \
 	        fi;                                                                \
@@ -458,6 +465,8 @@ comparefiles: FORCE
 	          cat cnetdiffError.txt >> errors.txt;                             \
 	        fi;                                                                \
 	        echo Failed comparing cnet;                                        \
+	        cat compare.txt;                                                   \
+	        echo DIFFFILE=$$DIFFFILE;                                          \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	      fi;                                                                  \

@@ -14,7 +14,7 @@ of lines that disagree will be printed, along with max error per line
 (relative or absolute).
 """
 
-import math, sys, os
+import math, sys, os, re
 
 def is_number(candidate):
   """Tests a candidate string for having a numerical format."""
@@ -256,9 +256,9 @@ if len(lines1) != len(lines2):
 # Iterate through the lines of the two files
 maxErr = 0.0
 for i in range(len(lines1)):
-  # Replace any comma by space
-  lines1[i] = lines1[i].replace(",", " ")
-  lines2[i] = lines2[i].replace(",", " ")
+  # Replace any comma and equal sign by space
+  lines1[i] = re.sub(r"[,=]+", " ", lines1[i])
+  lines2[i] = re.sub(r"[,=]+", " ", lines2[i])
   
   # Split the lines into a list of strings
   words1 = lines1[i].strip().split()
