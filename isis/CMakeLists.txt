@@ -87,6 +87,12 @@ if(NOT DEFINED ENV{ISISROOT})
   message(FATAL_ERROR "Environment variable ISISROOT is not set.")
 endif()
 
+# No JPEG2000 support on Mac Arm
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+  message(STATUS "Support for JPEG2000 is not available on Mac Arm.")
+  set(JP2KFLAG OFF)
+endif()
+
 # Prioritize passed in variables over env vars, probably a better way to do this
 if(DEFINED ENV{ISISDATA} AND NOT isisData)
  set(isisData $ENV{ISISDATA})
@@ -179,6 +185,10 @@ string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
 
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 
+if (NOT JP2KFLAG)
+  # Pass the NO_JP2K flag to C++
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DNO_JP2K")
+endif()
 
 # Flag to fix numeric literals problem with boost on linux
 # Add gold linker (and therefore, phtread) to speed up linux (spec. Ubuntu18.04) builds

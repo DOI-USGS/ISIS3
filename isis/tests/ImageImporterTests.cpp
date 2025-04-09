@@ -47,7 +47,6 @@ TEST_F(TempTestingFiles, DISABLED_UnitTestImageImporterTestJpeg) {
   ASSERT_NEAR(hist->StandardDeviation(), 97.569786532996, .0001);
 }
 
-
 TEST_F(TempTestingFiles, UnitTestImageImporterStd2IsisTiffRgb) {
   FileName inputName("data/stdFormatImages/rgb.tif");
 
@@ -82,6 +81,8 @@ TEST_F(TempTestingFiles, UnitTestImageImporterStd2IsisTiffRgb) {
   ASSERT_NEAR(hist->StandardDeviation(), 64.032045970490174, .0001);
 }
 
+#ifndef NO_JP2K
+// Run only if JP2K is enabled
 
 TEST_F(TempTestingFiles, UnitTestImageImporterStd2IsisJp2) {
   FileName inputName("data/stdFormatImages/rgb.jp2");
@@ -118,3 +119,4 @@ TEST_F(TempTestingFiles, UnitTestImageImporterStd2IsisJp2) {
   ASSERT_NEAR(hist->StandardDeviation(), 97.354405991298336, .0001);
 }
 
+#endif // NO_JP2K
