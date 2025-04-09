@@ -322,6 +322,12 @@ comparefiles: FORCE
 	      fi;                                                                  \
 	    fi;                                                                    \
 	                                                                           \
+	    DIFFFILE_CANDIDATE="$(INPUT)/$$FILE.DIFF";                             \
+	    DIFFFILE=$$DIFFFILE_CANDIDATE;                                         \
+	    if [ ! -f $$DIFFFILE ]; then                                           \
+	      DIFFFILE='';                                                         \
+	    fi;                                                                    \
+	                                                                           \
 	    # cub                                                                  \
 	    if [ "$$FILETYPE" == "cub" ]; then                                     \
 	      # cubediff cannot handle different special pixels. Use GDAL.;        \
@@ -358,6 +364,7 @@ comparefiles: FORCE
 	        echo Failed comparing cubes. Report: $(shell pwd)/$$FAILURE_REPORT;\
 	        echo Add/update the truth cube tolerance in the test Makefile.;    \
 	        echo Truth cube that needs tolerance: $$FILE;                      \
+	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	        $(RM) $$FAILURE_REPORT;                                            \
@@ -386,10 +393,6 @@ comparefiles: FORCE
 	                                                                           \
 	    # csv                                                                  \
 	    elif [ "$$FILETYPE" == "csv" ]; then                                   \
-	      DIFFFILE="$(INPUT)/$$FILE.DIFF";                                     \
-	      if [ ! -f $$DIFFFILE ]; then                                         \
-	        DIFFFILE='';                                                       \
-	      fi;                                                                  \
 	      $(ISISROOT)/scripts/csvdiff.py $(TRUTH)/$$FILE $(OUTPUT)/$$FILE      \
 	          $$DIFFFILE > /dev/null;                                          \
 	      RETVAL=$$?;                                                          \
@@ -405,10 +408,6 @@ comparefiles: FORCE
 	                                                                           \
 	    # pvl                                                                  \
 	    elif [ "$$FILETYPE" == "pvl" ]; then                                   \
-	      DIFFFILE="$(INPUT)/$$FILE.DIFF";                                     \
-	      if [ ! -f $$DIFFFILE ]; then                                         \
-	        DIFFFILE='';                                                       \
-	      fi;                                                                  \
 	      python $(ISISROOT)/scripts/textdiff.py $(TRUTH)/$$FILE               \
 	          $(OUTPUT)/$$FILE -abs_err $$TOLERANCESTR $$DIFFFILE              \
 	          > $$FAILURE_REPORT 2>&1;                                         \
@@ -430,7 +429,7 @@ comparefiles: FORCE
 	        echo Failed comparing PVL. Report: $(shell pwd)/$$FAILURE_REPORT;  \
 	        echo Tolerance: $$TOLERANCESTR;                                    \
 	        echo Tolerance file to update: $$TOL_FILE;                         \
-	        echo DIFFFILE=$$DIFFFILE;                                          \
+	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	        if [ -f $$FAILURE_REPORT ]; then                                   \
@@ -440,10 +439,6 @@ comparefiles: FORCE
 	                                                                           \
 	    # cnet                                                                 \
 	    elif [ "$$FILETYPE" == "net" ]; then                                   \
-	      DIFFFILE="$(INPUT)/$$FILE.DIFF";                                     \
-	      if [ ! -f $$DIFFFILE ]; then                                         \
-	        DIFFFILE='';                                                       \
-	      fi;                                                                  \
 	      $(ISISROOT)/bin/cnetdiff                                             \
 	          $(TSTARGS)                                                       \
 	          from=$(TRUTH)/$$FILE                                             \
@@ -466,7 +461,7 @@ comparefiles: FORCE
 	        fi;                                                                \
 	        echo Failed comparing cnet;                                        \
 	        cat compare.txt;                                                   \
-	        echo DIFFFILE=$$DIFFFILE;                                          \
+	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	      fi;                                                                  \
