@@ -320,5 +320,9 @@ for i in range(len(lines1)):
       status = 1
 
 print("Input tolerance: " + str(tolerance))
+
+# Put the observed error as the last line. It will be printed by the failing test
+# and used to update the tolerance.
 print("Max observed " + errType + ": " + str(maxErr))
+
 sys.exit(status)

@@ -316,6 +316,11 @@ comparefiles: FORCE
 	    else                                                                   \
 	      # Parse tolerance for non-cub                                        \
 	      TOL_FILE="$(INPUT)/$$FILE.TOL";                                      \
+	      REPO_TOL_FILE="$(shell pwd)/$$FILE.TOL";                             \
+	      if [ -f "$$REPO_TOL_FILE" ]; then                                    \
+	        # A few tests have the tol file in the isis repo, then use that.   \
+	        TOL_FILE="$$REPO_TOL_FILE";                                        \
+	      fi;                                                                  \
 	      TOLERANCESTR=1e-8;                                                   \
 	      if [ -f "$$TOL_FILE" ]; then                                         \
 	        TOLERANCESTR=`$(CAT) $$TOL_FILE`;                                  \
@@ -374,6 +379,7 @@ comparefiles: FORCE
 	        $(RM) $$FAILURE_REPORT 2>/dev/null;                                \
 	        $(RM) $$truthStats     2>/dev/null;                                \
 	        $(RM) $$currStats      2>/dev/null;                                \
+	        $(RM) errors.txt       2>/dev/null;                                \
 	      fi;                                                                  \
 	                                                                           \
 	    # txt, csv, pvl                                                        \
@@ -567,8 +573,9 @@ clean: FORCE
 #   coverage files.
 #----------------------------------------------------------------------------
 ccsafeclean: FORCE
-	$(RM) -r $(OUTPUT);              \
-	$(RM) print.prt;
+	$(RM) -r $(OUTPUT); \
+	$(RM) print.prt;    \
+	$(RM) errors.txt
 
 #----------------------------------------------------------------------------
 # Target = modifyFiles
