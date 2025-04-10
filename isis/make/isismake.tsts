@@ -435,14 +435,41 @@ comparefiles: FORCE
 	    # binary                                                               \
 	    elif [[ "$(BINFILES)" =~ "$$FILETYPE" ]]; then                         \
 	      $(DIFF) $(TRUTH)/$$FILE $(OUTPUT)/$$FILE > /dev/null;                \
-	      if [ $$? -ne 0 ]; then                                               \
+	      res=$$?;                                                             \
+	      if [ $$res != 0 ]; then                                              \
+	        # Fallback to GDAL-based comparison                                \
+	        truthCub=$${FILE}.truth.cub; currCub=$${FILE}.curr.cub;            \
+	        truthStats=$${FILE}.truth.txt; currStats=$${FILE}.curr.txt;        \
+	        raw2isis lines=100 samples=100 from = $(TRUTH)/$$FILE              \
+	          to = $$truthCub;                                                 \
+	        raw2isis lines=100 samples=100 from = $(OUTPUT)/$$FILE             \
+	          to = $$currCub;                                                  \
+	        gdalinfo -stats $$truthCub > $$truthStats;                         \
+	        gdalinfo -stats $$currCub > $$currStats;                           \
+	        $(RM) $${truthCub}.aux.xml $${currCub}.aux.xml;                    \
+	        python $(ISISROOT)/scripts/textdiff.py $$truthStats                \
+	            $$currStats -abs_err $$TOLERANCESTR $$DIFFFILE                 \
+	            > $$FAILURE_REPORT 2>&1;                                       \
+	        res=$$?;                                                           \
+	      fi;                                                                  \
+	      if [ $$res != 0 ]; then                                              \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                                  \
 	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
 	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
 	        $$MSG >> errors.txt;                                               \
-	        echo Failed comparing binary;                                      \
+	        cat $$FAILURE_REPORT >> errors.txt;                                \
+	        echo Failed comparing binary.;                                     \
+	        echo Report: $(shell pwd)/$$FAILURE_REPORT;                        \
+	        echo Tolerance: $$TOLERANCESTR;                                    \
+	        echo Tolerance file to update: $$TOL_FILE;                         \
+	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
+	        $(RM) $$FAILURE_REPORT 2>/dev/null;                                \
+	        $(RM) $$truthCub       2>/dev/null;                                \
+	        $(RM) $$currCub        2>/dev/null;                                \
+	        $(RM) $$truthStats     2>/dev/null;                                \
+	        $(RM) $$currStats      2>/dev/null;                                \
 	      fi;                                                                  \
 	                                                                           \
 	    # unknown                                                              \
