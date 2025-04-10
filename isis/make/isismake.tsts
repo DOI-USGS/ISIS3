@@ -330,27 +330,34 @@ comparefiles: FORCE
 	                                                                           \
 	    # cub                                                                  \
 	    if [ "$$FILETYPE" == "cub" ]; then                                     \
-	      # cubediff cannot handle different special pixels. Use GDAL.;        \
-	      truthStats=$${FILE}.truth.txt; currStats=$${FILE}.curr.txt;          \
-	      gdalinfo -stats $(TRUTH)/$$FILE > $$truthStats;                      \
-	      gdalinfo -stats $(OUTPUT)/$$FILE > $$currStats;                      \
-	      $(RM) $(TRUTH)/$$FILE.aux.xml $(OUTPUT)/$$FILE.aux.xml;              \
-	      python $(ISISROOT)/scripts/textdiff.py $$truthStats                  \
-	          $$currStats -abs_err $$TOLERANCESTR $$DIFFFILE                   \
-	          > $$FAILURE_REPORT 2>&1;                                         \
-	      #$(ISISROOT)/bin/cubediff                                            \
-	      #    $(TSTARGS)                                                      \
-	      #    from=$(TRUTH)/$$FILE                                            \
-	      #    from2=$(OUTPUT)/$$FILE                                          \
-	      #    to=$$FAILURE_REPORT                                             \
-	      #    TOLERANCE=$$TOLERANCESTR                                        \
-	      #    $$IGNORESTR 1>>/dev/null 2> $$FAILURE_REPORT;                   \
-	      if [ $$? != 0 ]; then                                                \
+	      $(ISISROOT)/bin/cubediff                                             \
+	         $(TSTARGS)                                                        \
+	         from=$(TRUTH)/$$FILE                                              \
+	         from2=$(OUTPUT)/$$FILE                                            \
+	         to=$$FAILURE_REPORT                                               \
+	         TOLERANCE=$$TOLERANCESTR                                          \
+	         $$IGNORESTR 1>>/dev/null 2> $$FAILURE_REPORT;                     \
+	      res=$$?;                                                             \
+	      if [ $$res != 0 ]; then                                              \
+	        # cubediff cannot handle different number of special pixels.       \
+	        echo cubediff failed. Try GDAL.;                                   \
+	        truthStats=$${FILE}.truth.txt; currStats=$${FILE}.curr.txt;        \
+	        gdalinfo -stats $(TRUTH)/$$FILE > $$truthStats;                    \
+	        #ans1=$$?;                                                         \
+	        gdalinfo -stats $(OUTPUT)/$$FILE > $$currStats;                    \
+	        #ans2=$$?;                                                         \
+	        $(RM) $(TRUTH)/$$FILE.aux.xml $(OUTPUT)/$$FILE.aux.xml;            \
+	        #if [ $$ans1 -eq 0 ] && [ $$ans2 -eq 0 ]; then                     \
+	        python $(ISISROOT)/scripts/textdiff.py $$truthStats                \
+	            $$currStats -abs_err $$TOLERANCESTR $$DIFFFILE                 \
+	            > $$FAILURE_REPORT 2>&1;                                       \
+	        res=$$?;                                                           \
+	      fi;                                                                  \
+	                                                                           \
+	      if [ $$res != 0 ]; then                                              \
 	        COMPRESULT="ERROR";                                                \
 	      else                                                                 \
 	        COMPRESULT="identical";                                            \
-	        # COMPRESULT=`$(ISISROOT)/bin/getkey from=$$FAILURE_REPORT         \
-	        # grp=Results keyword=Compare | tr '[:upper:]' '[:lower:]'`;       \
 	      fi;                                                                  \
 	      COMMAND="";                                                          \
 	      if [ "$$COMPRESULT" != "identical" ]; then                           \
