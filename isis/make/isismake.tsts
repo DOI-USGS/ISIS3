@@ -343,11 +343,8 @@ comparefiles: FORCE
 	        echo cubediff failed. Try GDAL.;                                   \
 	        truthStats=$${FILE}.truth.txt; currStats=$${FILE}.curr.txt;        \
 	        gdalinfo -stats $(TRUTH)/$$FILE > $$truthStats;                    \
-	        #ans1=$$?;                                                         \
 	        gdalinfo -stats $(OUTPUT)/$$FILE > $$currStats;                    \
-	        #ans2=$$?;                                                         \
 	        $(RM) $(TRUTH)/$$FILE.aux.xml $(OUTPUT)/$$FILE.aux.xml;            \
-	        #if [ $$ans1 -eq 0 ] && [ $$ans2 -eq 0 ]; then                     \
 	        python $(ISISROOT)/scripts/textdiff.py $$truthStats                \
 	            $$currStats -abs_err $$TOLERANCESTR $$DIFFFILE                 \
 	            > $$FAILURE_REPORT 2>&1;                                       \
@@ -359,7 +356,6 @@ comparefiles: FORCE
 	      else                                                                 \
 	        COMPRESULT="identical";                                            \
 	      fi;                                                                  \
-	      COMMAND="";                                                          \
 	      if [ "$$COMPRESULT" != "identical" ]; then                           \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                                  \
 	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
@@ -380,8 +376,9 @@ comparefiles: FORCE
 	        fi;                                                                \
 	      fi;                                                                  \
 	                                                                           \
-	    # txt                                                                  \
-	    elif [ "$$FILETYPE" == "txt" ]; then                                   \
+	    # txt, csv, pvl                                                        \
+	    elif [ "$$FILETYPE" == "txt" ] || [ "$$FILETYPE" == "csv" ] ||         \
+	         [ "$$FILETYPE" == "pvl" ]; then                                   \
 	      python $(ISISROOT)/scripts/textdiff.py $(TRUTH)/$$FILE               \
 	          $(OUTPUT)/$$FILE -abs_err $$TOLERANCESTR $$DIFFFILE              \
 	          > $$FAILURE_REPORT 2>&1;                                         \
@@ -391,49 +388,8 @@ comparefiles: FORCE
 	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
 	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
 	        $$MSG >> errors.txt;                                               \
+	        cat $$FAILURE_REPORT >> errors.txt;                                \
 	        echo Failed comparing txt. Report: $(shell pwd)/$$FAILURE_REPORT;  \
-	        echo Tolerance: $$TOLERANCESTR;                                    \
-	        echo Tolerance file to update: $$TOL_FILE;                         \
-	      else                                                                 \
-	        let SUCCESSFULCOMPARISONS++;                                       \
-	      fi;                                                                  \
-	                                                                           \
-	    # csv                                                                  \
-	    elif [ "$$FILETYPE" == "csv" ]; then                                   \
-	      $(ISISROOT)/scripts/csvdiff.py $(TRUTH)/$$FILE $(OUTPUT)/$$FILE      \
-	          $$DIFFFILE > /dev/null;                                          \
-	      RETVAL=$$?;                                                          \
-	      if [ $$RETVAL != 0 ]; then                                           \
-	        MSG="$(TESTFILEFAILED) [$$FILE]";                                  \
-	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
-	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
-	        $$MSG >> errors.txt;                                               \
-	        echo Failed comparing CSV;                                         \
-	      else                                                                 \
-	        let SUCCESSFULCOMPARISONS++;                                       \
-	      fi;                                                                  \
-	                                                                           \
-	    # pvl                                                                  \
-	    elif [ "$$FILETYPE" == "pvl" ]; then                                   \
-	      python $(ISISROOT)/scripts/textdiff.py $(TRUTH)/$$FILE               \
-	          $(OUTPUT)/$$FILE -abs_err $$TOLERANCESTR $$DIFFFILE              \
-	          > $$FAILURE_REPORT 2>&1;                                         \
-	                                                                           \
-	      if [ $$? != 0 ]; then                                                \
-	        COMPRESULT="ERROR";                                                \
-	      else                                                                 \
-	        COMPRESULT="identical";                                            \
-	      fi;                                                                  \
-	      if [ "$$COMPRESULT" != "identical" ]; then                           \
-	        MSG="$(TESTFILEFAILED) [$$FILE]";                                  \
-	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
-	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
-	        $$MSG >> errors.txt;                                               \
-	        if [ "$$COMPRESULT" == "ERROR" ]; then                             \
-	          cat $$FAILURE_REPORT >> errors.txt;                              \
-	        fi;                                                                \
-	        echo "";                                                           \
-	        echo Failed comparing PVL. Report: $(shell pwd)/$$FAILURE_REPORT;  \
 	        echo Tolerance: $$TOLERANCESTR;                                    \
 	        echo Tolerance file to update: $$TOL_FILE;                         \
 	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
@@ -479,7 +435,6 @@ comparefiles: FORCE
 	                                                                           \
 	    # binary                                                               \
 	    elif [[ "$(BINFILES)" =~ "$$FILETYPE" ]]; then                         \
-	      COMMAND="";                                                          \
 	      $(DIFF) $(TRUTH)/$$FILE $(OUTPUT)/$$FILE > /dev/null;                \
 	      if [ $$? -ne 0 ]; then                                               \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                                  \
