@@ -260,11 +260,11 @@ compare: FORCE
 
 # For comparing cubes, users may specify in the Makefile for a test a 
 # tolerance or instructions to ignore special pixels when running cubediff. 
-# Example: test_cube.cub.TOLERANCE=0.0000001). These are parsed and applied 
+# Example: test_cube.cub.TOLERANCE=0.0000001. These are parsed and applied 
 # below.
 
-# For other data, the tolerance is in a file with the same name as the truth
-# file, but ending in .TOL. Example: labels.pvl.TOL.
+# For other data, the tolerance is in a file with the same name as the truth #
+file, but with .TOL appended. Example: labels.pvl.TOL.
  
 comparefiles: FORCE
 	TRUTHFILECOUNT=`$(LS) -p $(TRUTH)/ | $(GREP) -v "/" | wc -l`;              \

@@ -7,7 +7,7 @@ Numerical values must agree to within given absolute or relative tolerance.
 
 Usage:
 
-  textdiff.py TXT1 TXT2 -abs_err/-rel_err TOLERANCE
+  textdiff.py TXT1 TXT2 -abs_err/-rel_err TOLERANCE [IGNORE_FIELDS_FILE]
 
 The output will be empty, unless there are differences. In that case, each pair
 of lines that disagree will be printed, along with max error per line 

@@ -37,8 +37,8 @@ function(run_app_makefile_test makefile inputFolder outputFolder truthFolder bin
 
   # If any file failed, the test is a failure.
   if(${failed})
-    #message("TRUTH: ${TRUTH}")
-    message(FATAL_ERROR "Test failed.")
+    #message("TRUTH: ${TRUTH}") # This message just prints "TRUTH"; not helpful.
+    message(FATAL_ERROR "Test failed.") # The test output log is printed above.
   endif()
 
 endfunction()
