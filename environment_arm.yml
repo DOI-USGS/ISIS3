@@ -14,7 +14,7 @@ dependencies:
   - bzip2
   - cmake >=3.27,<3.28
   - cspice =67
-  - csm >=3.0.3,<3.0.4
+  - usgs-astrogeology::csm >=3.0.3,<3.0.4
   - curl >=8.4.0,<8.5
   - cxx-compiler=1.7
   - doxygen
@@ -30,9 +30,8 @@ dependencies:
   - hdf5
   - highfive
   - icu
-  - inja
+  - usgs-astrogeology::inja
   - jama
-  - usgs-astrogeology::kakadu==1
   - kalasiris
   - krb5
   - libgdal >=3.7,<3.9
@@ -43,9 +42,7 @@ dependencies:
   - libxml2
   - make
   - mesalib
-  - mkl
   - mysql
-  - mysql-connector-c
   - nanoflann <1.4
   - nlohmann_json=3.11.2
   - ninja >=1.10,<1.11
@@ -69,9 +66,9 @@ dependencies:
   - swig
   - texlive-core
   - tnt
-  - usgscsm
+  - usgs-astrogeology::usgscsm
   - x264
-  - xalan-c
+  - usgs-astrogeology::xalan-c
   - xerces-c >=3.2.4,<3.3.0a0
   - xorg-kbproto
   - xorg-libice
