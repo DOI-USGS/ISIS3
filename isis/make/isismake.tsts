@@ -368,6 +368,7 @@ comparefiles: FORCE
 	        echo Add/update the truth cube tolerance in the test Makefile.;    \
 	        echo Truth cube that needs tolerance: $$FILE;                      \
 	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
+	        tail -n 1 $$FAILURE_REPORT;                                        \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	        $(RM) $$FAILURE_REPORT 2>/dev/null;                                \
@@ -392,6 +393,7 @@ comparefiles: FORCE
 	        echo Tolerance: $$TOLERANCESTR;                                    \
 	        echo Tolerance file to update: $$TOL_FILE;                         \
 	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
+	        tail -n 1 $$FAILURE_REPORT;                                        \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	        if [ -f $$FAILURE_REPORT ]; then                                   \
@@ -463,6 +465,7 @@ comparefiles: FORCE
 	        echo Tolerance: $$TOLERANCESTR;                                    \
 	        echo Tolerance file to update: $$TOL_FILE;                         \
 	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
+	        tail -n 1 $$FAILURE_REPORT;                                        \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	        $(RM) $$FAILURE_REPORT 2>/dev/null;                                \

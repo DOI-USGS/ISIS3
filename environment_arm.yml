@@ -14,7 +14,6 @@ dependencies:
   - bzip2
   - cmake >=3.27,<3.28
   - cspice =67
-  - usgs-astrogeology::csm >=3.0.3,<3.0.4
   - curl >=8.4.0,<8.5
   - cxx-compiler=1.7
   - doxygen
@@ -66,7 +65,7 @@ dependencies:
   - swig
   - texlive-core
   - tnt
-  - usgs-astrogeology::usgscsm
+  - usgscsm
   - x264
   - usgs-astrogeology::xalan-c
   - xerces-c >=3.2.4,<3.3.0a0
