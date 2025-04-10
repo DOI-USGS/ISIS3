@@ -26,14 +26,14 @@ int main(void) {
   Preference::Preferences(true);
 
 
-  cout << "Unit Test for Chandrayaan2TmcCamera..." << endl;
+  cout << "Unit Test for Chandrayaan1M3Camera..." << endl;
   try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables. NOTE: These are only used
     // for the center of the image test, not the corners.
-    double knownLat = -14.4676517916533811;
-    double knownLon = 131.0534566173186306;
+    double knownLat = 61.50040250242506;
+    double knownLon = 74.89590535143694;
 
     Cube c("$ISISTESTDATA/isis/src/chandrayaan1/unitTestData/M3T20090630T083407_V03_RDN.cub", "r");
     Camera *cam = CameraFactory::Create(c);
