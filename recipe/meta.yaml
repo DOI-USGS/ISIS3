@@ -90,7 +90,7 @@ requirements:
    - mysql-connector-c
    - nanoflann <1.4
    - nlohmann_json=3.11.2
-   - ninja >=1.7.2,<1.8
+   - ninja >=1.10,<1.11
    - nn
    - opencv >=4.5,<4.10
    - openssl >=3.1.2,<3.5
