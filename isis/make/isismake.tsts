@@ -370,10 +370,9 @@ comparefiles: FORCE
 	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
-	        $(RM) $$FAILURE_REPORT;                                            \
-	        if [ -f $$FAILURE_REPORT ]; then                                   \
-	          $(RM) $$FAILURE_REPORT;                                          \
-	        fi;                                                                \
+	        $(RM) $$FAILURE_REPORT 2>/dev/null;                                \
+	        $(RM) $$truthStats     2>/dev/null;                                \
+	        $(RM) $$currStats      2>/dev/null;                                \
 	      fi;                                                                  \
 	                                                                           \
 	    # txt, csv, pvl                                                        \
