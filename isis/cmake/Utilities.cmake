@@ -174,7 +174,11 @@ function(get_os_version text)
     string(REPLACE "." "_" version "${version}")
 
     set(name   "MacOSX")
-    set(prefix "Darwin_x86_64_")
+    if (CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+      set(prefix "Darwin_arm64_")
+    else()
+      set(prefix "Darwin_x86_64_")
+    endif()
 
   else()
     message( FATAL_ERROR "Did not recognize a supported operating system!" )
@@ -182,6 +186,7 @@ function(get_os_version text)
 
   # Final string assembly
   set(${text} ${prefix}${name}${version} PARENT_SCOPE)
+
 endfunction()
 
 
