@@ -195,7 +195,7 @@ TEST(Sumspice, FunctionalTestSumspiceSpiceUpdate) {
   EXPECT_EQ(csvLine[5].toDouble(), 0.087);
   EXPECT_EQ(csvLine[6].toStdString(), "2005-09-21T10:44:07.3519998");
   EXPECT_EQ(csvLine[7].toStdString(), "2005-09-21T10:44:07.3954998");
-  EXPECT_EQ(csvLine[8].toStdString().substr(0, 22), "2005-09-21T10:44:07.43"); // Arm fix
+  EXPECT_EQ(csvLine[8].toStdString(), "2005-09-21T10:44:07.4390337");
   EXPECT_EQ(csvLine[9].toStdString(), "2005-09-21T10:44:07.352");
   EXPECT_EQ(csvLine[10].toStdString(), "2005-09-21T10:44:07.3955");
   EXPECT_EQ(csvLine[11].toStdString(), "2005-09-21T10:44:07.439");
