@@ -2177,19 +2177,17 @@ namespace Isis {
    *            input parameters, adapted to be used with data set.
    */
   double NumericalApproximation::RombergsMethod(double a, double b) {
+    
     // This method was derived from an algorithm in the text
     // Numerical Recipes in C: The Art of Scientific Computing
     // Section 4.3 by Flannery, Press, Teukolsky, and Vetterling
     int maxits = 20;
-    double dss = 0; // error estimate for
-    double h[maxits+1]; // relative stepsizes for trap
-    double trap[maxits+1]; // successive trapeziodal approximations
-    double epsilon; // desired fractional accuracy
-    double epsilon2;// desired fractional accuracy
-    double ss; // result
-
-    epsilon = 1.0e-4;
-    epsilon2 = 1.0e-6;
+    double dss = 0; // error estimate
+    std::vector<double> h(maxits+1, 0); // relative stepsizes for trap
+    std::vector<double> trap(maxits+1, 0); // successive trapezoidal approximations
+    double epsilon = 1.0e-4; // desired fractional accuracy
+    double epsilon2 = 1.0e-6;// desired fractional accuracy
+    double ss = -1.0; // result
 
     h[0] = 1.0;
     try {
@@ -2212,12 +2210,11 @@ namespace Isis {
         h[i+1] = 0.25 * h[i];
         // This is a key step:  the factor is 0.25d0 even though
         // the stepsize is decreased by 0.5d0.  This makes the
-        // extraplolation a polynomial in h-squared as allowed
+        // extrapolation a polynomial in h-squared as allowed
         // by the equation from Numerical Recipes 4.2.1 pg.132,
         // not just a polynomial in h.
       }
-    }
-    catch(IException &e) { // catch error from RefineExtendedTrap, Constructor, Evaluate, PolynomialNevilleErrorEstimate
+    } catch (IException &e) { // catch error from RefineExtendedTrap, Constructor, Evaluate, PolynomialNevilleErrorEstimate
       throw IException(e,
                        e.errorType(),
                        "RombergsMethod() - Unable to calculate the integral on the interval (a,b) = ("

@@ -610,16 +610,12 @@ int main(int argc, char *argv[]) {
         }
         
         try {
-          // Crashes the Mac Arm without throwing an exception 
-          //if (s - integral(a, b) == 0) 
-          //  cout << "\t";
-          //cout << interp5.RombergsMethod(a, b) - integral(a, b) << endl;
-          cout << endl;
+          if (s - integral(a, b) == 0) 
+            cout << "\t";
+          cout << interp5.RombergsMethod(a, b) - integral(a, b) << endl;
         } catch (IException &e) {
           e.print();
-        } catch(...) {
         }
-        
       }
     }
     
