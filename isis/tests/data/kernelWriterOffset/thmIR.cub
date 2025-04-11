@@ -64,7 +64,7 @@ Object = IsisCube
     InstrumentPointing        = (Table, $odyssey/kernels/ck/m01_sc_map1_v2.bc,
                                  $odyssey/kernels/fk/m01_v29.tf)
     Instrument                = Null
-    SpacecraftClock           = $odyssey/kernels/sclk/ORB1_SCLKSCET.00312.tsc
+    SpacecraftClock           = $odyssey/kernels/sclk/ORB1_SCLKSCET.00274.tsc
     InstrumentPosition        = (Table, $odyssey/kernels/spk/m01_map1_v2.bsp)
     InstrumentAddendum        = $odyssey/kernels/iak/themisAddendum003.ti
     ShapeModel                = $base/dems/molaMarsPlanetaryRadius0005.cub
@@ -333,7 +333,7 @@ End_Object
 Object = History
   Name      = IsisCube
   StartByte = 73316
-  Bytes     = 4172
+  Bytes     = 1448
 End_Object
 
 Object = OriginalLabel
@@ -482,8 +482,7 @@ Object = SPECTRAL_QUBE
                               5.166187034e-09, 1.658951643e-09)
   End_Group
 End_Object
-EndyˆaÍì®â?Xð8:LÕ?óÆ[ï8±ç¿î0ÚmPr¿S>Í"üìH?8%µ°Ï²8?¡ój+)s3¿Ü–äÎ÷Aë:¿w[®â?Îƒ’+Õ?ÔÞl¦¸¸ç¿¤ë™âwQ¿ìˆrdþH?E>ž×7?
-UDÃºT2¿E”äæ÷AsùØÏZ®â?‚eÈÈö)Õ?ä·XX¹ç¿ t%D2f¿¬˜RI?¥¸K´™“7?B|½Q32¿$”è÷A±â¸Ë®â?³6H˜Õ?ž¸±÷¼ç¿JÐí @‘¿+,c)ÄH?Û†t)åL8?û,8eïÒ2¿Â’äô÷AØd^Zß­â?‘c2Õ?KãìLÀç¿?$Ó¢{ç‘¿ÏîDdöH?îÊ>‚‹É8?ßC´1Äú2¿®‘äþ÷Akëçci@/"}<¤ÀdÍ0-+¼¥À÷µC¥ù‘ü¿?ÕH>Lh @1žÌ¾ÿ¿ÿ¿:FÑÖ÷A³ oÄæmh@MhîÃ ¤À‘UZ2È¥À½Iº—ä“ü¿xHÖt @·ˆþ°¤ÿ¿©êõâ÷AëØm¡•ig@÷	<Gýí£Àüë¶¨)Ú¥À3ª¼{«–ü¿þÇWn–‡ @¿o´á{ÿ¿Pá,õ÷A`ÕçÐÁá?Iøg*Ô¿pñí¦?«‡1¸é¿SŒr ’” ?ä¹o+2þ¾•“r¢?:FÑÖ÷AñOx§á?1ÈŸf5*Ô¿9lÐ«ø¦?á:Ôõäé¿ûr ’” ?›öºo+2þ¾Ì”“r¢?Pá,õ÷AØÁ¦I!žÁ'ê™ñ£ÁŸeë·{‘ÁÊR4	3 3@ Zboq,ÀïlÃ:%À:FÑÖ÷A|<ïeG!žÁâÄÂšñ£Áç…{‘ÁQ
+EndyˆaÍì®â?Xð8:LÕ?óÆ[ï8±ç¿ï0ÚmPr¿V>Í"üìH?8%µ°Ï²8?¢ój+)s3¿Ü–äÎ÷Aë:¿w[®â?Îƒ’+Õ?ÔÞl¦¸¸ç¿ë™âwQ¿ìˆrdþH?E>ž×7?UDÃºT2¿E”äæ÷AsùØÏZ®â?eÈÈö)Õ?å·XX¹ç¿ t%D2f¿ª˜RI?¥¸K´™“7?B|½Q32¿$”è÷A±â¸Ë®â?²6H˜Õ?ž¸±÷¼ç¿	JÐí @‘¿+,c)ÄH?Ü†t)åL8?ù,8eïÒ2¿Â’äô÷AØd^Zß­â?‘c2Õ?KãìLÀç¿L$Ó¢{ç‘¿ÎîDdöH?íÊ>‚‹É8?ßC´1Äú2¿®‘äþ÷Akëçci@/"}<¤ÀdÍ0-+¼¥ÀñµC¥ù‘ü¿>ÕH>Lh @3žÌ¾ÿ¿ÿ¿:FÑÖ÷A³ oÄæmh@MhîÃ ¤À‘UZ2È¥À»Iº—ä“ü¿|HÖt @µˆþ°¤ÿ¿©êõâ÷AÙm¡•ig@õ	;Gýí£Àýë¶¨)Ú¥Àª¼{«–ü¿øÇWn–‡ @»o´á{ÿ¿Pá,õ÷AßÐçÐÁá?‡Iøg*Ô¿	ñí¦?®‡1¸é¿TŒr ’” ?ä¹o+2þ¾•“r¢?:FÑÖ÷Aä>x§á?=ÆŸf5*Ô¿*§lÐ«ø¦?yFÔõäé¿ür ’” ?›öºo+2þ¾Ì”“r¢?Pá,õ÷AØÁ¦I!žÁ'ê™ñ£ÁŸeë·{‘ÁÊR4	3 3@ Zboq,ÀïlÃ:%À:FÑÖ÷A|<ïeG!žÁâÄÂšñ£Áç…{‘ÁQ
 Ì3 3@èikq,À#£„v%ÀPá,õ÷AObject = thm2isis
   IsisVersion       = "7.0.0  | 2021-12-20"
   ProgramVersion    = 2014-05-16
@@ -527,93 +526,6 @@ Object = spiceinit
     ENDPAD       = 0.0
     URL          = https://services.isis.astrogeology.usgs.gov/cgi-bin/spicei-
                    nit.cgi
-    PORT         = 443
-  End_Group
-End_Object
-
-Object = spiceinit
-  IsisVersion       = "9.0.0  | 2025-04-02"
-  ProgramVersion    = 2021-08-10
-  ProgramPath       = /Users/oalexan1/projects/ISIS3/build/bin
-  ExecutionDateTime = 2025-04-02T14:27:44
-  HostName          = arm64-apple-darwin20.0.0
-  UserName          = oalexan1
-  Description       = "Update SPICE data (kernels, pointing, and position) for
-                       a camera cube"
-
-  Group = UserParameters
-    FROM         = ../isis/tests/data/kernelWriterOffset/thmIR.cub
-    WEB          = false
-    ATTACH       = TRUE
-    CKSMITHED    = FALSE
-    CKRECON      = TRUE
-    CKPREDICTED  = FALSE
-    CKNADIR      = FALSE
-    SPKSMITHED   = FALSE
-    SPKRECON     = TRUE
-    SPKPREDICTED = FALSE
-    SHAPE        = SYSTEM
-    STARTPAD     = 0.0
-    ENDPAD       = 0.0
-    URL          = https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/
-    PORT         = 443
-  End_Group
-End_Object
-
-Object = spiceinit
-  IsisVersion       = "9.0.0  | 2025-04-02"
-  ProgramVersion    = 2021-08-10
-  ProgramPath       = /Users/oalexan1/projects/ISIS3/build/bin
-  ExecutionDateTime = 2025-04-02T14:29:41
-  HostName          = arm64-apple-darwin20.0.0
-  UserName          = oalexan1
-  Description       = "Update SPICE data (kernels, pointing, and position) for
-                       a camera cube"
-
-  Group = UserParameters
-    FROM         = ../isis/tests/data/kernelWriterOffset/thmIR.cub
-    WEB          = false
-    ATTACH       = TRUE
-    CKSMITHED    = FALSE
-    CKRECON      = TRUE
-    CKPREDICTED  = FALSE
-    CKNADIR      = FALSE
-    SPKSMITHED   = FALSE
-    SPKRECON     = TRUE
-    SPKPREDICTED = FALSE
-    SHAPE        = SYSTEM
-    STARTPAD     = 0.0
-    ENDPAD       = 0.0
-    URL          = https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/
-    PORT         = 443
-  End_Group
-End_Object
-
-Object = spiceinit
-  IsisVersion       = "9.0.0  | 2025-04-02"
-  ProgramVersion    = 2021-08-10
-  ProgramPath       = /Users/oalexan1/projects/ISIS3/build/bin
-  ExecutionDateTime = 2025-04-02T14:30:48
-  HostName          = arm64-apple-darwin20.0.0
-  UserName          = oalexan1
-  Description       = "Update SPICE data (kernels, pointing, and position) for
-                       a camera cube"
-
-  Group = UserParameters
-    FROM         = ../isis/tests/data/kernelWriterOffset/thmIR.cub
-    WEB          = false
-    ATTACH       = TRUE
-    CKSMITHED    = FALSE
-    CKRECON      = TRUE
-    CKPREDICTED  = FALSE
-    CKNADIR      = FALSE
-    SPKSMITHED   = FALSE
-    SPKRECON     = TRUE
-    SPKPREDICTED = FALSE
-    SHAPE        = SYSTEM
-    STARTPAD     = 0.0
-    ENDPAD       = 0.0
-    URL          = https://astrogeology.usgs.gov/apis/ale/v0.9.1/spiceserver/
     PORT         = 443
   End_Group
 End_Object
