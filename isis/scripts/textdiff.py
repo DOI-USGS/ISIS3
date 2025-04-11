@@ -12,6 +12,9 @@ Usage:
 The output will be empty, unless there are differences. In that case, each pair
 of lines that disagree will be printed, along with max error per line 
 (relative or absolute).
+
+The last line that is printed will have the max of all discrepancies,
+which is useful for updating the tolerance in the texts.
 """
 
 import math, sys, os, re
@@ -321,8 +324,8 @@ for i in range(len(lines1)):
 
 print("Input tolerance: " + str(tolerance))
 
-# Put the observed error as the last line. It will be printed by the failing test
-# and used to update the tolerance.
+# Put the max observed error as the last line. It will be printed by the failing
+# test and used to update the tolerance.
 print("Max observed " + errType + ": " + str(maxErr))
 
 sys.exit(status)
