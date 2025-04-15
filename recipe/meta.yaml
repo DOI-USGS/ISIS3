@@ -80,7 +80,7 @@ requirements:
    - libgdal >=3.7,<3.9
    - libopencv >=4.5,<4.10
    - libpng >=1.6.34,<1.7
-   - libprotobuf
+   - libprotobuf >=4,<5
    - libtiff >=4.5,<4.8
    - libxml2
    - make
@@ -96,8 +96,8 @@ requirements:
    - openssl >=3.1.2,<3.5
    - pcl >=1.13,<1.14
    - pdal=2.6
-   - plio
-   - protobuf
+   - plio=1.5.3
+   - protobuf >=4,<5
    - python >=3.9
    - python_abi >=3.9
    - pytest
