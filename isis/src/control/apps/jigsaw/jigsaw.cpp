@@ -356,7 +356,12 @@ namespace Isis {
         
         // Generate ISD from cube
         json props;
-        json isd = ale::load(filename.toStdString(), props.dump(), "ale", false, true, false);
+	json isd;
+	try {
+          isd = ale::load(filename.toStdString(), props.dump(), "ale", false, true, false);
+	} catch (...) {
+	  throw IException(IException::Unknown, "Unable to find the appropriate ISIS driver in ALE.", _FILEINFO_); 
+	}
 
         // Load plugin list
         CameraFactory::initPlugin();
