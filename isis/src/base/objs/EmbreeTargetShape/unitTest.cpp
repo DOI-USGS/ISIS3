@@ -369,9 +369,9 @@ void outputOcclusionRay(RTCOcclusionRay &ray) {
 void outputRayHitInformation(RayHitInformation &hit) {
   qDebug() << "Ray Hit Information";
   qDebug() << "  Primitive ID: " << hit.primID;
-  qDebug() << "  Intersection: (" << roundToPrecision(hit.intersection[0], 0.0001) << ","
-                                  << roundToPrecision(hit.intersection[1], 0.0001) << "," 
-                                  << roundToPrecision(hit.intersection[2], 0.0001) << ")";
+  qDebug() << "  Intersection: (" << roundToPrecision(hit.intersection[0], 0.0000000001) << ","
+                                  << roundToPrecision(hit.intersection[1], 0.0000000001) << "," 
+                                  << roundToPrecision(hit.intersection[2], 0.0000000001) << ")";
   qDebug() << "  Surface Normal: (" << hit.intersection[0] << ","
                                     << hit.intersection[1] << "," 
                                     << hit.intersection[2] << ")";
