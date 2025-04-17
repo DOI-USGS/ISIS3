@@ -44,6 +44,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Added GDAL SRS propagation for systems outside of ISIS to display projected GTiffs. [#5736](https://github.com/DOI-USGS/ISIS3/pull/5736)
 - Added ale version to history blob. [#5207](https://github.com/DOI-USGS/ISIS3/issues/5207)
 - Added CSM State output capability for jigsaw. [#5609](https://github.com/DOI-USGS/ISIS3/issues/5609)
+- Added ShowDeprecated option to show or hide warnings in IsisPreferences. [#5611](https://github.com/DOI-USGS/ISIS3/issues/5611)
 
 ### Changed
 - Update OSIRIS-REx OCams instrument (Map, Poly, & SamCam) support to current state in UofA code base [#5426](https://github.com/DOI-USGS/ISIS3/issues/5426)
