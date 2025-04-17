@@ -312,11 +312,11 @@ void outputModelStatus(EmbreeShapeModel &embreeModel) {
               << roundToPrecision(embreeIntersection->GetY().kilometers(), 0.0001) << ", "
               << roundToPrecision(embreeIntersection->GetZ().kilometers(), 0.0001) << ")";
   }
-  qDebug() << "Model has normal? " << embreeModel.hasNormal();
+  qDebug() << "Model has local normal? " << embreeModel.hasLocalNormal();
   std::vector<double> embreeNormal;
-  if ( embreeModel.hasNormal() ) {
-    embreeNormal = embreeModel.normal();
-    qDebug() << "  Surface Normal: ("
+  if ( embreeModel.hasLocalNormal() ) {
+    embreeNormal = embreeModel.localNormal();
+    qDebug() << "  Surface Local Normal: ("
               << roundToPrecision(embreeNormal[0], 0.0001) << ", "
               << roundToPrecision(embreeNormal[1], 0.0001) << ", "
               << roundToPrecision(embreeNormal[2], 0.0001) << ")";
