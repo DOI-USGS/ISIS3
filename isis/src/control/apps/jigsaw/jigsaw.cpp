@@ -7,6 +7,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include <iostream>
+#include <highfive/H5Attribute.hpp>
 #include <highfive/H5File.hpp>
 #include <highfive/H5DataType.hpp>
 #include <highfive/H5DataSet.hpp>
@@ -39,6 +40,8 @@ find files of those names at the top level of this repository. **/
 #include "SerialNumberList.h"
 #include "Table.h"
 #include "CameraFactory.h"
+#include "PvlToJSON.h"
+#include "PvlKeyword.h"
 
 #include <ale/Load.h>
 #include <nlohmann/json.hpp>
@@ -102,13 +105,44 @@ namespace Isis {
           std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
 
           // Read h5 into table
+
+          // Create cmatrix table from dataset
           DataSet datasetRead = fileRead.getDataSet(cmatrixKey);
           auto cmatrixData = datasetRead.read<std::string>();
-          Table cmatrixTable(cmatrixName, cmatrixData, ',');
 
+          vector<PvlKeyword> cmatrixAttrs;
+          cmatrixAttrs.push_back(PvlKeyword("CkTableEndTime", 
+            QString::fromStdString(datasetRead.getAttribute("CkTableEndTime").read<string>())));
+          cmatrixAttrs.push_back(PvlKeyword("CkTableOriginalSize", 
+            QString::fromStdString(datasetRead.getAttribute("CkTableOriginalSize").read<string>())));
+          cmatrixAttrs.push_back(PvlKeyword("CkTableStartTime", 
+            QString::fromStdString(datasetRead.getAttribute("CkTableStartTime").read<string>())));
+          cmatrixAttrs.push_back(PvlKeyword("FrameTypeCode", 
+            QString::fromStdString(datasetRead.getAttribute("FrameTypeCode").read<string>())));          
+          cmatrixAttrs.push_back(PvlKeyword("ConstantFrames", 
+            datasetRead.getAttribute("ConstantFrames").read<vector<string>>()));
+          cmatrixAttrs.push_back(PvlKeyword("ConstantRotation", 
+            datasetRead.getAttribute("ConstantRotation").read<vector<string>>()));
+          cmatrixAttrs.push_back(PvlKeyword("TimeDependentFrames", 
+            datasetRead.getAttribute("TimeDependentFrames").read<vector<string>>()));
+          
+          Table cmatrixTable(cmatrixName, cmatrixData, ',', cmatrixAttrs);
+
+          // Create spvector table from dataset
           datasetRead = fileRead.getDataSet(spvectorKey);
           auto spvectorData = datasetRead.read<std::string>();
-          Table spvectorTable(spvectorName, spvectorData, ',');
+
+          vector<PvlKeyword> spvectorAttrs;
+          spvectorAttrs.push_back(PvlKeyword("SpkTableEndTime", 
+            QString::fromStdString(datasetRead.getAttribute("SpkTableEndTime").read<string>())));
+          spvectorAttrs.push_back(PvlKeyword("SpkTableOriginalSize", 
+            QString::fromStdString(datasetRead.getAttribute("SpkTableOriginalSize").read<string>())));
+          spvectorAttrs.push_back(PvlKeyword("SpkTableStartTime", 
+            QString::fromStdString(datasetRead.getAttribute("SpkTableStartTime").read<string>())));
+          spvectorAttrs.push_back(PvlKeyword("CacheType", 
+            QString::fromStdString(datasetRead.getAttribute("CacheType").read<string>())));          
+
+          Table spvectorTable(spvectorName, spvectorData, ',', spvectorAttrs);
 
           // Write bundle adjustment values out
           cmatrixTable.Label().addComment(jigApplied);
@@ -250,6 +284,20 @@ namespace Isis {
           CubeAttributeInput inAtt;
           Cube *c = p.SetInputCube(bundleAdjustment->fileName(i), inAtt, 0); // 0 for read only
 
+          //check for existing polygon, if exists delete it
+          if (c->label()->hasObject("Polygon")) {
+            c->label()->deleteObject("Polygon");
+          }
+
+          // check for CameraStatistics Table, if exists, delete
+          for (int iobj = 0; iobj < c->label()->objects(); iobj++) {
+            PvlObject obj = c->label()->object(iobj);
+            if (obj.name() != "Table") continue;
+            if (obj["Name"][0] != QString("CameraStatistics")) continue;
+            c->label()->deleteObject(iobj);
+            break;
+          }
+          
           // Only for ISIS adjustment values
           if (!c->hasBlob("CSMState", "String")) {
             Table cmatrix = bundleAdjustment->cMatrix(i);
@@ -265,8 +313,39 @@ namespace Isis {
             // Save bundle adjustment values to HDF5 file
             std::string cmatrixTableStr = Table::toString(cmatrix).toStdString();
             DataSet dataset = file.createDataSet<std::string>(cmatrixKey, cmatrixTableStr);
+
+            // Add cmatrix attributes
+            json cmatrixLabel = pvlObjectToJSON(cmatrix.Label());
+
+            string ckTableEndTime = cmatrixLabel["CkTableEndTime"]["Value"];
+            string ckTableOriginalSize = cmatrixLabel["CkTableOriginalSize"]["Value"];
+            string ckTableStartTime = cmatrixLabel["CkTableStartTime"]["Value"];
+            string frameTypeCode = cmatrixLabel["FrameTypeCode"]["Value"];
+            vector<string> constantFrames = cmatrixLabel["ConstantFrames"]["Value"];
+            vector<string> constantRotation = cmatrixLabel["ConstantRotation"]["Value"];
+            vector<string> timeDependentFrames = cmatrixLabel["TimeDependentFrames"]["Value"];
+            dataset.createAttribute("CkTableEndTime", ckTableEndTime).write(ckTableEndTime);
+            dataset.createAttribute("CkTableOriginalSize", ckTableOriginalSize).write(ckTableOriginalSize);
+            dataset.createAttribute("CkTableStartTime", ckTableStartTime).write(ckTableStartTime);
+            dataset.createAttribute("FrameTypeCode", frameTypeCode).write(frameTypeCode);
+            dataset.createAttribute("ConstantFrames", constantFrames).write(constantFrames);
+            dataset.createAttribute("ConstantRotation", constantRotation).write(constantRotation);
+            dataset.createAttribute("TimeDependentFrames", timeDependentFrames).write(timeDependentFrames);
+  
             std::string spvectorTableStr = Table::toString(spvector).toStdString();
             dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
+
+            // Add spvector attributes
+            json spvectorLabel = pvlObjectToJSON(spvector.Label());
+
+            string spkTableEndTime = spvectorLabel["SpkTableEndTime"]["Value"];
+            string spkTableOriginalSize = spvectorLabel["SpkTableOriginalSize"]["Value"];
+            string spkTableStartTime = spvectorLabel["SpkTableStartTime"]["Value"];
+            string cacheType = spvectorLabel["CacheType"]["Value"];
+            dataset.createAttribute("SpkTableEndTime", spkTableEndTime).write(spkTableEndTime);
+            dataset.createAttribute("SpkTableOriginalSize", spkTableOriginalSize).write(spkTableOriginalSize);
+            dataset.createAttribute("SpkTableStartTime", spkTableStartTime).write(spkTableStartTime);
+            dataset.createAttribute("CacheType", cacheType).write(cacheType);
           }
         }
         file.flush();

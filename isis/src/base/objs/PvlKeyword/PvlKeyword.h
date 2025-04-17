@@ -90,6 +90,8 @@ namespace Isis {
       PvlKeyword(QString name);
       PvlKeyword(QString name, QString value,
                  QString unit = "");
+      PvlKeyword(QString name, std::vector<std::string> vecValue,
+                 QString unit = "");
       PvlKeyword(const PvlKeyword &other);
       ~PvlKeyword();
 
