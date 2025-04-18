@@ -71,8 +71,13 @@ namespace Isis {
         return p_unitTest;
       }
 
-      bool outputErrorAsPvl();
+      bool checkIfPrefEquals(const QString &group, const QString &key, const QString &val);
+      bool checkIfPrefEquals(const QString &group, const QString &key, const QString &val, const bool defaultReturn);
+
       bool reportFileLine();
+      bool outputErrorAsPvl();
+      bool getShowDeprecatedPref();
+      bool getStackTracePref();
 
       static Preference &Preferences(bool unitTest = false);
 
