@@ -72,8 +72,8 @@ class MyShape : public ShapeModel {
     return hasEllipsoidIntersection();
   }
 
-  virtual void calculateDefaultNormal()  {
-    calculateSurfaceNormal();
+  virtual void calculateSurfaceNormal()  {
+    calculateDefaultNormal();
   }
 
   virtual void calculateLocalNormal(QVector<double *> cornerNeighborPoints) {
@@ -85,7 +85,7 @@ class MyShape : public ShapeModel {
     setHasNormal(true);
   }
 
-  virtual void calculateSurfaceNormal() {
+  virtual void calculateDefaultNormal() {
     setNormal( -0.623384,
                -0.698838,
                 0.350738);
@@ -93,7 +93,7 @@ class MyShape : public ShapeModel {
   }
 
   virtual void calculateEllipsoidNormal() {
-    calculateEllipsoidalSurfaceNormal();
+    calculateDefaultNormal();
   }
 
   Distance localRadius(const Latitude &lat, const Longitude &lon) {
@@ -384,7 +384,7 @@ int main() {
          << shape.isVisibleFrom(occPosition, lookB) << endl;
     
     cout << "    Calculate the ellipsoid normal" << endl;
-    shape.calculateEllipsoidNormal();
+    shape.calculateDefaultNormal();
     cout << "      Do we have a normal? " << shape.normalStatus() << endl;
     myNormal = shape.normal();
     cout << "      local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
@@ -402,7 +402,7 @@ int main() {
     }
     try {
       cout << "    Attempt to calculate the ellipsoid normal without an intersection" << endl;
-      shape.calculateEllipsoidNormal();
+      shape.calculateDefaultNormal();
       cout << "    Calculation successful" << endl;
     }
     catch (IException &e) {

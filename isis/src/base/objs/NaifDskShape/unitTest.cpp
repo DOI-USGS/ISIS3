@@ -158,16 +158,14 @@ int main(int argc, char *argv[]) {
     qDebug() << "Try to calculate norms using valid shape model...";
     shapeModelFromPvlElevation.setLocalNormalFromIntercept();
     qDebug() << "Has intercept normal?                " << shapeModelFromPvlElevation.hasLocalNormal();
-    std::vector<double> normal = shapeModelFromPvlElevation.localNormal();
     qDebug() << "Normal set from Intercept:           "
-             << QVector<double>(normal.begin(), normal.end());
+             << QVector<double>::fromStdVector(shapeModelFromPvlElevation.localNormal());
     // no need to call calculateSurfaceNormal() or ellipsoidNormal()
     // directly. these methods are called by calculateDefaultNormal()
     shapeModelFromPvlElevation.calculateDefaultNormal(); 
     qDebug() << "Has default normal?                  " << shapeModelFromPvlElevation.hasNormal();
-    normal = shapeModelFromPvlElevation.normal();
     qDebug() << "Default normal:                      "
-             << QVector<double>(normal.begin(), normal.end());
+             << QVector<double>::fromStdVector(shapeModelFromPvlElevation.normal());
 
     QVector <double *> cornerNeighborPoints;
     double point[3];
@@ -175,9 +173,8 @@ int main(int argc, char *argv[]) {
     cornerNeighborPoints.push_back(point);
     shapeModelFromPvlElevation.calculateLocalNormal(cornerNeighborPoints); 
     qDebug() << "Has local normal?                    " << shapeModelFromPvlElevation.hasLocalNormal();
-    normal = shapeModelFromPvlElevation.localNormal();
     qDebug() << "Local normal from neighbor points:   "
-             << QVector<double>(normal.begin(), normal.end());
+             << QVector<double>::fromStdVector(shapeModelFromPvlElevation.localNormal());
     qDebug() << "";
 
     qDebug() << "================================= Error Throws ==================================";
@@ -206,31 +203,31 @@ int main(int argc, char *argv[]) {
       e.print();
     }
     qDebug() << "";
-    qDebug() << "Thrown by ellipsoidNormal() - No intersection. ";
+    qDebug() << "Thrown by calculateDefaultNormal() - No intersection. ";
     try {
-      shapeModel.ellipsoidNormal();
+      shapeModel.calculateDefaultNormal();
     } 
     catch (IException &e) {
       e.print();
     }
     qDebug() << "";
-    qDebug() << "Thrown by ellipsoidNormal() - Invalid intersection. ";
+    qDebug() << "Thrown by calculateDefaultNormal() - Invalid intersection. ";
     try {
       // if the surface point is accidentally reset to an invalid point, but hasIntercept still 
       // set to true.
       shapeModelFromPvlElevation.setSurfacePoint(SurfacePoint());
-      shapeModelFromPvlElevation.ellipsoidNormal();
+      shapeModelFromPvlElevation.calculateDefaultNormal();
     } 
     catch (IException &e) {
       e.print();
     }
     qDebug() << "";
-    qDebug() << "Thrown by ellipsoidNormal() - Invalid target. ";
+    qDebug() << "Thrown by calculateDefaultNormal() - Invalid target. ";
     try {
       // get valid intersection
       shapeModelFromPlate.intersectSurface(obsPos, lookDir);
       // model with invalid target
-      shapeModelFromPlate.ellipsoidNormal();
+      shapeModelFromPlate.calculateDefaultNormal();
     } 
     catch (IException &e) {
       e.print();

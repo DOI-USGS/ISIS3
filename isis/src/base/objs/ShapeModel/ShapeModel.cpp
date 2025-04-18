@@ -136,33 +136,60 @@ namespace Isis {
     return (true);
   }
 
-  /**
-   *  Calculates the ellipsoidal surface normal.
+  /** Calculate surface normal
+   *
    */
-  void ShapeModel::calculateEllipsoidalSurfaceNormal()  {
-    // The below code is not truly normal unless the ellipsoid is a sphere.  TODO Should this be
-    // fixed? Send an email asking Jeff and Stuart.  See Naif routine surfnm.c to get the true
-    // for an ellipsoid.  For testing purposes to match old results do as Isis currently does until
-    // Jeff and Stuart respond.
+  void ShapeModel::calculateSurfaceNormal()  {
+    calculateDefaultNormal();
+  }
 
-    if (!m_hasIntersection || !surfaceIntersection()->Valid()) {
-     QString msg = "A valid intersection must be defined before computing the surface normal";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-   }
+  /**
+   * @brief Compute the true surface normal vector of an ellipsoid
+   *
+   * This routine is used instead of the one provided by the ShapeModel
+   * implementation.  This is primarly because
+   * ShapeModel::calculateEllipsoidalSurfaceNormal() is only suitable for a
+   * spheroid. This implementation is intended for irregular bodies so we expect
+   * triaxial ellipsoids.
+   *
+   * @author 2017-03-27 Kris Becker
+   *
+   * @return @b QVector<double> Normal vector at the intercept point relative
+   *                            to the ellipsoid (not the plate model)
+   */
+  void ShapeModel::calculateDefaultNormal()  {
 
-   // Get the coordinates of the current surface point
+    // Sanity check on state
+    if ( !hasIntersection() ) {
+       QString msg = "An intersection must be defined before computing the surface normal.";
+       throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    if ( !surfaceIntersection()->Valid() ) {
+       QString msg = "The surface point intersection must be valid to compute the surface normal.";
+       throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    if (!hasValidTarget()) {
+       QString msg = "A valid target must be defined before computing the surface normal.";
+       throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    // Get the coordinates of the current surface point
     SpiceDouble pB[3];
-    pB[0] = surfaceIntersection()->GetX().kilometers();
-    pB[1] = surfaceIntersection()->GetY().kilometers();
-    pB[2] = surfaceIntersection()->GetZ().kilometers();
+    surfaceIntersection()->ToNaifArray(pB);
 
-    // Unitize the vector
-    SpiceDouble upB[3];
-    SpiceDouble dist;
-    unorm_c(pB, upB, &dist);
-    memcpy(&m_normal[0], upB, sizeof(double) * 3);
+    // Get the body radii and compute the true normal of the ellipsoid
+    std::vector<double> norm(3);
+    // need a case for target == NULL
+    QVector<Distance> radii = QVector<Distance>::fromStdVector(targetRadii());
+    NaifStatus::CheckErrors();
+    surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(),
+             pB, &norm[0]);
+    NaifStatus::CheckErrors();
 
-    m_hasNormal = true;
+    setNormal(norm);
+    setHasNormal(true);
   }
 
 

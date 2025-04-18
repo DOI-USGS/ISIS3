@@ -100,7 +100,7 @@ namespace Isis {
       bool hasLocalNormal() const;
 
       // Calculate the default normal of the current intersection point
-      virtual void calculateDefaultNormal() = 0;
+      virtual void calculateDefaultNormal();
 
       // Calculate the local normal of the current intersection point
       // (relative to neighbor points)
@@ -108,7 +108,7 @@ namespace Isis {
 
       // Calculate the surface normal of the current intersection point
       // (relative to ellipsoid)
-      virtual void calculateSurfaceNormal() = 0;
+      virtual void calculateSurfaceNormal();
 
       // Clear current point
       virtual void clearSurfacePoint();
@@ -168,7 +168,6 @@ namespace Isis {
       // Set shape name
       void setName(QString name);
 
-      void calculateEllipsoidalSurfaceNormal();
       bool hasEllipsoidIntersection();
 
       // Intersect ellipse

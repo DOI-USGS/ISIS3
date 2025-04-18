@@ -62,7 +62,7 @@ Begin testing Shape Model base class....
     Get the resolution:             Test resolution() error message when there is no intersection:
 **PROGRAMMER ERROR** No valid intersection point for computing resolution.
     Attempt to calculate the ellipsoid normal without an intersection
-**PROGRAMMER ERROR** A valid intersection must be defined before computing the surface normal.
+**ERROR** No intersection point is known.  A normal cannot be set.
 
   Testing setSurfacePoint method ...
      Do we have an intersection? 1

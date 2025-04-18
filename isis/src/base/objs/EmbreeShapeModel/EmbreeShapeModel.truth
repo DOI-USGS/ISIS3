@@ -2,7 +2,7 @@ Testing default shape model
 Model name:  "Embree"
 Embree shape model status:
 Model has intersection?  false
-Model has normal?  false
+Model has local normal?  false
 
 Testing with  "$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds" ...
 
@@ -13,7 +13,7 @@ Create an EmbreeShapeModel from a string
 
 Embree shape model status:
 Model has intersection?  false
-Model has normal?  false
+Model has local normal?  false
 
 Testing accessors
   Tolerance:  1.79769e+308
@@ -25,14 +25,14 @@ Create an EmbreeShapeModel from a pvl with ShapeModel keyword
 
 Embree shape model status:
 Model has intersection?  false
-Model has normal?  false
+Model has local normal?  false
 
 
 Create an EmbreeShapeModel from a pvl with ElevationModel keyword
 
 Embree shape model status:
 Model has intersection?  false
-Model has normal?  false
+Model has local normal?  false
 
 
 Testing observer look direction intersection
@@ -44,9 +44,9 @@ Intersection inputs:
 Intersecting Embree shape model
 Embree shape model status:
 Model has intersection?  true
-  Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
-Model has normal?  true
-  Surface Normal: ( 0.8471 ,  -0.1944 ,  0.4943 )
+  Surface Point: ( 0.2916 ,  0 ,  0 )
+Model has local normal?  true
+  Surface Local Normal: ( 0.8471 ,  -0.1944 ,  0.4943 )
 
 
 Testing observer look direction non-intersection
@@ -58,7 +58,7 @@ Intersection inputs:
 Intersecting Embree shape model
 Embree shape model status:
 Model has intersection?  false
-Model has normal?  false
+Model has local normal?  false
 
 
 Testing latitude, longitude intersection
@@ -71,9 +71,9 @@ Intersection inputs:
 Intersecting Embree shape model
 Embree shape model status:
 Model has intersection?  true
-  Surface Point: ( 0.0087 ,  0.0886 ,  0.0878 )
-Model has normal?  true
-  Surface Normal: ( -0.0455 ,  0.6722 ,  0.7389 )
+  Surface Point: ( 0.0077 ,  0.088 ,  0.0883 )
+Model has local normal?  true
+  Surface Local Normal: ( -0.0455 ,  0.6722 ,  0.7389 )
 
 
 Testing latitude, longitude occlusion
@@ -87,14 +87,14 @@ Intersection inputs:
 Intersecting Embree shape model
 Embree shape model status:
 Model has intersection?  false
-Model has normal?  false
+Model has local normal?  false
 
 Intersecting Embree shape model without occlusion
 Embree shape model status:
 Model has intersection?  true
-  Surface Point: ( 0.0255 ,  -0.1383 ,  -0.0001 )
-Model has normal?  true
-  Surface Normal: ( 0.3975 ,  -0.8953 ,  -0.2007 )
+  Surface Point: ( 0.029 ,  -0.1368 ,  0 )
+Model has local normal?  true
+  Surface Local Normal: ( 0.3975 ,  -0.8953 ,  -0.2007 )
 
 
 Testing surface point intersection
@@ -106,9 +106,9 @@ Intersection inputs:
   Intersecting Embree shape model
 Embree shape model status:
 Model has intersection?  true
-  Surface Point: ( -0.2165 ,  -0.0778 ,  0 )
-Model has normal?  true
-  Surface Normal: ( -0.734 ,  -0.6549 ,  0.1795 )
+  Surface Point: ( -0.2159 ,  -0.0785 ,  0 )
+Model has local normal?  true
+  Surface Local Normal: ( -0.734 ,  -0.6549 ,  0.1795 )
 
 
 Testing surface point occlusion
@@ -120,14 +120,14 @@ Intersection inputs:
 Intersecting Embree shape model
 Embree shape model status:
 Model has intersection?  false
-Model has normal?  false
+Model has local normal?  false
 
 Intersecting Embree shape model without occlusion
 Embree shape model status:
 Model has intersection?  true
-  Surface Point: ( 0.0105 ,  0.0639 ,  -0.065 )
-Model has normal?  true
-  Surface Normal: ( 0.2508 ,  0.5734 ,  -0.7798 )
+  Surface Point: ( 0.0112 ,  0.0638 ,  -0.0648 )
+Model has local normal?  true
+  Surface Local Normal: ( 0.2508 ,  0.5734 ,  -0.7798 )
 
 
 Testing local radius
@@ -136,13 +136,13 @@ Testing local radius
 Local radius point
   Latitude:   35
   Longitude:  270
-Radius:  0.123904
+Radius:  0.123706
 Checking that shape model status did not change
 Embree shape model status:
 Model has intersection?  true
-  Surface Point: ( 0.0105 ,  0.0639 ,  -0.065 )
-Model has normal?  true
-  Surface Normal: ( 0.2508 ,  0.5734 ,  -0.7798 )
+  Surface Point: ( 0.0112 ,  0.0638 ,  -0.0648 )
+Model has local normal?  true
+  Surface Local Normal: ( 0.2508 ,  0.5734 ,  -0.7798 )
 
 Testing visibility check
 
@@ -150,9 +150,9 @@ Testing visibility check
 Intersecting Embree shape model
 Embree shape model status:
 Model has intersection?  true
-  Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
-Model has normal?  true
-  Surface Normal: ( 0.8471 ,  -0.1944 ,  0.4943 )
+  Surface Point: ( 0.2916 ,  0 ,  0 )
+Model has local normal?  true
+  Surface Local Normal: ( 0.8471 ,  -0.1944 ,  0.4943 )
 
 Intersection is visible from same position and look direction?  true
 Intersection is visible with non-intersecting look?  false
@@ -165,28 +165,28 @@ Testing default ellipsoid normal
 Starting model status
 Embree shape model status:
 Model has intersection?  true
-  Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
-Model has normal?  true
-  Surface Normal: ( 0.8471 ,  -0.1944 ,  0.4943 )
+  Surface Point: ( 0.2916 ,  0 ,  0 )
+Model has local normal?  true
+  Surface Local Normal: ( 0.8471 ,  -0.1944 ,  0.4943 )
 
 Model status after recalculating
 Embree shape model status:
 Model has intersection?  true
-  Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
-Model has normal?  true
-  Surface Normal: ( 0.9997 ,  -0.0209 ,  0.0081 )
+  Surface Point: ( 0.2916 ,  0 ,  0 )
+Model has local normal?  true
+  Surface Local Normal: ( 0.8471 ,  -0.1944 ,  0.4943 )
 
 Testing photometric angles
 
 
 Embree shape model status:
 Model has intersection?  true
-  Surface Point: ( 0.2908 ,  -0.0019 ,  0.0005 )
-Model has normal?  true
-  Surface Normal: ( 0.9997 ,  -0.0209 ,  0.0081 )
+  Surface Point: ( 0.2916 ,  0 ,  0 )
+Model has local normal?  true
+  Surface Local Normal: ( 0.8471 ,  -0.1944 ,  0.4943 )
 
-Emission angle:  1.28823
-Incidence angle:  6.92945
+Emission angle:  0
+Incidence angle:  5.71225
 Testing errors
 
 

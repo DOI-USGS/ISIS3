@@ -109,7 +109,7 @@ int main() {
                     "with no neighbor points" << endl;
     QVector<double *>  neighborPoints;
     shape.calculateLocalNormal(neighborPoints);
-    cout << "    has normal? " << toString(shape.hasNormal()) << endl;
+    cout << "    has normal? " << toString(shape.hasLocalNormal()) << endl;
 
     cout << endl << "  Testing class method calculateLocalNormal "
                     "with correction for inward pointing vector" << endl;
