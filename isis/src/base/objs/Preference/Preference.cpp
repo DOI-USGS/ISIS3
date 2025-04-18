@@ -124,18 +124,6 @@ namespace Isis {
     return *p_preference;
   }
 
-  bool Preference::checkIfPrefEquals(const QString &group, const QString &key, const QString &val) {
-    bool prefIsValue = true;
-    if (this->hasGroup(group)) {
-      PvlGroup &targetGroup = this->findGroup(group);
-      if (targetGroup.hasKeyword(key)) {
-        QString targetVal = targetGroup[key][0];
-        prefIsValue = (targetVal.toUpper() == val.toUpper());
-      }
-    }
-    return prefIsValue;
-  }
-
   bool Preference::checkIfPrefEquals(const QString &group, const QString &key, const QString &val, const bool defaultReturn) {
     bool prefIsValue = defaultReturn;
     if (this->hasGroup(group)) {

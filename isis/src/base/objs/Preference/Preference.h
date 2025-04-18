@@ -71,8 +71,7 @@ namespace Isis {
         return p_unitTest;
       }
 
-      bool checkIfPrefEquals(const QString &group, const QString &key, const QString &val);
-      bool checkIfPrefEquals(const QString &group, const QString &key, const QString &val, const bool defaultReturn);
+      bool checkIfPrefEquals(const QString &group, const QString &key, const QString &val, const bool defaultReturn = true);
 
       bool reportFileLine();
       bool outputErrorAsPvl();
