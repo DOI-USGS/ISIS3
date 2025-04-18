@@ -79,8 +79,8 @@ requirements:
    - libgdal >=3.7,<3.8
    - libopencv >=4.7,<4.8
    - libpng >=1.6.34,<1.7
-   - libprotobuf
-   - libtiff >=4.5,<4.6
+   - libprotobuf >=4,<5
+   - libtiff >=4.5,<4.8
    - libxml2
    - make
    - mesalib
@@ -94,10 +94,11 @@ requirements:
    - opencv >=4.7,<4.8
    - openssl >=3.1.2,<3.2
    - pcl >=1.13,<1.14
-   - plio
-   - protobuf
-   - python >=3.10
-   - python_abi >=3.10
+   - pdal=2.6
+   - plio=1.5.3
+   - protobuf >=4,<5
+   - python >=3.9
+   - python_abi >=3.9
    - pytest
    - rclone
    - qhull
