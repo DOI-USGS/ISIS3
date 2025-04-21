@@ -38,7 +38,10 @@ release.
 ### Changed
 - Enhanced csminit by removing the need to specify model and plugin [#5585](https://github.com/DOI-USGS/ISIS3/issues/5585)
 
-## [9.0.0] - 09-25-2024
+### Fixed
+- Fixed offset and scale not being applied to gdal 32 bit floating point pixels [#5753](https://github.com/DOI-USGS/ISIS3/pull/5753)
+  
+## [9.0.0] - 04-21-2025
 
 ### Added
 - Added TOVECT output parameter which generate a geospatial CSV file with a VRT metadata sidecar file [#5571](https://github.com/DOI-USGS/ISIS3/issues/5571)  
