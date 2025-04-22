@@ -78,12 +78,12 @@ def search_for_linked_issues(pull_body: str) -> list:
             filtered_list = list(filter(None, flattened_list))
             # Remove '#' from items
             issue_numbers = list(map(lambda item: item.replace('#', ''), filtered_list))
-        
         # Check if change type is bugfix
         # Find section with heading 'Types of changes'
         if section and 'Types of changes' in section:
             matched_items = rgx.findall(r'\[(x|X)\] Bug fix', section)
-            if matched_items:
+            if matched_items is not None:
+                global BUGFIX_CHANGE_TYPE
                 BUGFIX_CHANGE_TYPE = True
     return issue_numbers
 
@@ -155,7 +155,7 @@ def is_pr_bugfix(response: Response) -> bool:
     Check PR label for 'bug' or if change type is indicated as bugfix
     in the body of the PR
     """
-    if BUGFIX_CHANGE_TYPE is True:
+    if BUGFIX_CHANGE_TYPE:
         return True
     labels = response.json().get("labels")
     for label in labels:
