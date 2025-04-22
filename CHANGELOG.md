@@ -87,7 +87,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed order of observer and target in spiceql call in `ctxcal`. [#5823](https://github.com/DOI-USGS/ISIS3/pull/5823)
 - Fixed bundle serialization on MacOS for IPCE [#5808](https://github.com/DOI-USGS/ISIS3/pull/5808)
 
-## [9.0.0] - 09-25-2024
+## [9.0.0] - 04-21-2025
 
 ### Added
 - Added TOVECT output parameter which generate a geospatial CSV file with a VRT metadata sidecar file [#5571](https://github.com/DOI-USGS/ISIS3/issues/5571)  
@@ -97,9 +97,8 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Added majority replacement for reduce app [#5101](https://github.com/DOI-USGS/ISIS3/issues/5101).
 - Added HRSC support in socetlinescankeywords [#5465](https://github.com/DOI-USGS/ISIS3/issues/5465)
 - Added option to save and apply bundle adjustment values in `jigsaw` [#4474](https://github.com/DOI-USGS/ISIS3/issues/4474)
-- Added the ability to pass column types in csv2table to set the column types in the resulting ISIS table [#5631](https://github.com/DOI-USGS/ISIS3/pull/5631)
 
-### Changed
+### Changed
 - Refactored the pixel2map app
 - Updated pixel2map documentation
 - Changed PVL parsing to no longer allow valueless keywords [#5573](https://github.com/DOI-USGS/ISIS3/pull/5573)
@@ -120,6 +119,17 @@ file. Slightly modified the FunctionalTestJigsawBundleXYZ ctest accordingly. Iss
 - Fixed PHOTOMET not accepting backplanes [#5281](https://github.com/DOI-USGS/ISIS3/issues/5281)
 - Fixed dstripe parallel test failing by converting tests to gtests [#5613](https://github.com/DOI-USGS/ISIS3/issues/5613)
 - Fixed autoseed SeedDomain = SampleLine only working for first overlap [#5673](https://github.com/DOI-USGS/ISIS3/issues/5673)
+- Fixed jigsaw to default OUTADJUSTMENTH5 option to false and allow this feature to run on read-only images [#5700](https://github.com/DOI-USGS/ISIS3/issues/5700)
+- Fixed kaguyatc2isis invalid BandBin values [#5629](https://github.com/DOI-USGS/ISIS3/issues/5629)
+- Fixed SpiceClient to handle redirect requests.
+- Fixed jigsaw to default OUTADJUSTMENTH5 option to false and allow this feature to run on read-only images [#5700](https://github.com/DOI-USGS/ISIS3/issues/5700)
+- Fixed Cube::fromIsd to add "LineScanTimes" table from HRSC isds [#5668](https://github.com/DOI-USGS/ISIS3/issues/5668)
+- Fixed segfault in SpiceClient when an authentication error was encountered. [#5735](https://github.com/DOI-USGS/ISIS3/pull/5735)
+- Fixed `getLocalNormal` not reseting the sample and line [#5752](https://github.com/DOI-USGS/ISIS3/pull/5752)
+- Fixed QView bug that would not allow manual editing of min/max values via the text fields and defaulted to the current min/max type dropdown selection [#5719](https://github.com/DOI-USGS/ISIS3/issues/5719)
+- Fixed Juno Data Area SPKs causing Spiceinit to fail [#5724](https://github.com/DOI-USGS/ISIS3/issues/5724)
+- Fixed embree shapemodel intersection calculation [#5592](https://github.com/DOI-USGS/ISIS3/issues/5592)
+- Fixed findFeaturesSegment.py errors from issues [#5725](https://github.com/DOI-USGS/ISIS3/issues/5725) and [#5702](https://github.com/DOI-USGS/ISIS3/issues/5702)
 
 ## [8.3.0] - 2024-09-30
 
