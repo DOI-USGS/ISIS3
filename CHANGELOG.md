@@ -32,14 +32,6 @@ When preparing for a bug fix release create a new 2nd heading above the Fixed
 heading to indicate that only the bug fixes and security fixes are in the bug fix
 release.
 -->
-
-## [Unreleased]
-
-### Changed
-- Enhanced csminit by removing the need to specify model and plugin [#5585](https://github.com/DOI-USGS/ISIS3/issues/5585)
-
-### Fixed
-- Fixed offset and scale not being applied to gdal 32 bit floating point pixels [#5753](https://github.com/DOI-USGS/ISIS3/pull/5753)
   
 ## [9.0.0] - 04-21-2025
 
@@ -50,6 +42,7 @@ release.
 - Added Chandrayaan2 template for isisimport
 - Added majority replacement for reduce app [#5101](https://github.com/DOI-USGS/ISIS3/issues/5101).
 - Added HRSC support in socetlinescankeywords [#5465](https://github.com/DOI-USGS/ISIS3/issues/5465)
+- Added option to save and apply bundle adjustment values in `jigsaw` [#4474](https://github.com/DOI-USGS/ISIS3/issues/4474)
 
 ### Changed
 - Refactored the pixel2map app
