@@ -82,7 +82,7 @@ def search_for_linked_issues(pull_body: str) -> list:
         # Find section with heading 'Types of changes'
         if section and 'Types of changes' in section:
             matched_items = rgx.findall(r'\[(x|X)\] Bug fix', section)
-            if matched_items is not None:
+            if matched_items:
                 global BUGFIX_CHANGE_TYPE
                 BUGFIX_CHANGE_TYPE = True
     return issue_numbers
