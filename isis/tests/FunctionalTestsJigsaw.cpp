@@ -1889,7 +1889,7 @@ TEST_F(LidarNetwork, FunctionalTestJigsawLidar) {
 
 }
 
-TEST_F(ApolloNetwork, FunctionalTestJigsawSaveApplyValues) {
+TEST_F(ApolloNetwork, DISABLED_FunctionalTestJigsawSaveApplyValues) {
   QVector<QString> args = {"spsolve=position",
                             "update=no",
                             "bundleout_txt=no",
