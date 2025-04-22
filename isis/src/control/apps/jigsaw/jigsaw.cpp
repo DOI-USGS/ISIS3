@@ -97,6 +97,20 @@ namespace Isis {
             throw IException(IException::User, msg, _FILEINFO_);
           }
 
+          //check for existing polygon, if exists delete it
+          if (c->label()->hasObject("Polygon")) {
+            c->label()->deleteObject("Polygon");
+          }
+
+          // check for CameraStatistics Table, if exists, delete
+          for (int iobj = 0; iobj < c->label()->objects(); iobj++) {
+            PvlObject obj = c->label()->object(iobj);
+            if (obj.name() != "Table") continue;
+            if (obj["Name"][0] != QString("CameraStatistics")) continue;
+            c->label()->deleteObject(iobj);
+            break;
+          }
+
           QString serialNumber = snList->serialNumber(i);
           QString cmatrixName = "InstrumentPointing";
           QString spvectorName = "InstrumentPosition";
@@ -284,20 +298,6 @@ namespace Isis {
           CubeAttributeInput inAtt;
           Cube *c = p.SetInputCube(bundleAdjustment->fileName(i), inAtt, 0); // 0 for read only
 
-          //check for existing polygon, if exists delete it
-          if (c->label()->hasObject("Polygon")) {
-            c->label()->deleteObject("Polygon");
-          }
-
-          // check for CameraStatistics Table, if exists, delete
-          for (int iobj = 0; iobj < c->label()->objects(); iobj++) {
-            PvlObject obj = c->label()->object(iobj);
-            if (obj.name() != "Table") continue;
-            if (obj["Name"][0] != QString("CameraStatistics")) continue;
-            c->label()->deleteObject(iobj);
-            break;
-          }
-          
           // Only for ISIS adjustment values
           if (!c->hasBlob("CSMState", "String")) {
             Table cmatrix = bundleAdjustment->cMatrix(i);
