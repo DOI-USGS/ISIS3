@@ -82,7 +82,6 @@ def search_for_linked_issues(pull_body: str) -> list:
         # Check if change type is bugfix
         # Find section with heading 'Types of changes'
         if section and 'Types of changes' in section:
-            print(section)
             matched_items = rgx.findall(r'\[(x|X)\] Bug fix', section)
             if matched_items:
                 BUGFIX_CHANGE_TYPE = True
