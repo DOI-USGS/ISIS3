@@ -85,25 +85,6 @@ namespace Isis {
 
     *p_xml = QString(QByteArray(raw.toLatin1()).toHex().constData());
 
-    /*
-     * For Debugging, you may want to run spiceserver locally (without spiceinit).
-     *
-     * Uncomment the following code and run the spiceinit with web=true. An error will be thrown
-     * with the file name of the stored input hex file. You can rsync that file to your work area
-     * and run spiceserver locally.
-     */
-
-    // const char *inmode = "overwrite";
-    // const char *ext  = "dat";
-    // TextFile newInput;
-    // QString serverInputFile("/tmp/input");
-    // newInput.Open(serverInputFile, inmode, ext);
-    // newInput.Rewind();//start at begining
-    // newInput.PutLine(hexCode);
-    // newInput.Close();
-    // QString msg = "Exporting expected server input to: " + serverInputFile;
-    // throw IException(IException::Programmer, msg, _FILEINFO_);
-
     int contentLength = p_xml->length();
     QString contentLengthStr = toString((BigInt)contentLength);
 
@@ -112,9 +93,6 @@ namespace Isis {
     p_request->setRawHeader("User-Agent", "SpiceInit 1.0");
     p_request->setHeader(QNetworkRequest::ContentTypeHeader,
                          "application/x-www-form-urlencoded");
-    //p_request->setRawHeader("Content-Length", contentLengthStr.c_str());
-    //p_request->setAttribute(QNetworkRequest::DoNotBufferUploadDataAttribute,
-    //    true);
 
     moveToThread(this);
     start();
@@ -179,6 +157,18 @@ namespace Isis {
    * @param reply
    */
   void SpiceClient::replyFinished(QNetworkReply *reply) {
+    // Check for redirection
+    QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    if (!redirectionTarget.isNull()) {
+        QUrl redirectedUrl = redirectionTarget.toUrl();
+
+        // Update the request with the new URL and re-send
+        p_request->setUrl(redirectedUrl);
+        sendRequest();
+        return;
+    }
+
+    // No redirection, proceed with the original processing
     p_rawResponse = new QString(QString(reply->readAll()));
 
     // Decode the response
@@ -381,6 +371,10 @@ namespace Isis {
       p_response = new QString();
     }
 
+    if (!p_error) {
+      p_error = new QString();
+    }
+
     *p_error = "Server expects authentication which is not currently ";
     *p_error += "supported";
     quit();
@@ -394,6 +388,10 @@ namespace Isis {
     if(!p_response) {
       p_rawResponse = new QString();
       p_response = new QString();
+    }
+
+    if (!p_error) {
+      p_error = new QString();
     }
 
     *p_error = "Server expects authentication which is not currently ";
@@ -411,6 +409,10 @@ namespace Isis {
     if(!p_response) {
       p_rawResponse = new QString();
       p_response = new QString();
+    }
+
+    if (!p_error) {
+      p_error = new QString();
     }
 
     *p_error = "Server expects authentication which is not currently ";

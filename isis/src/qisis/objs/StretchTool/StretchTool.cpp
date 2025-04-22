@@ -205,7 +205,9 @@ namespace Isis {
     p_minMaxTypeSelection->addItem("Absolute",     2);
     p_minMaxTypeSelection->addItem("Chebyshev",    3);
 
-    connect(p_minMaxTypeSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(changeStretch()));
+    connect(p_minMaxTypeSelection, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this] {
+      changeStretch(true);
+    });
 
     QDoubleValidator *dval = new QDoubleValidator(hbox);
     m_stretchMinEdit = new QLineEdit(hbox);
@@ -1056,12 +1058,14 @@ namespace Isis {
    *
    *  Does not effect All as the min/max lineedits are hidden for this option
    */
-  void StretchTool::changeStretch() {
+  void StretchTool::changeStretch(bool useMinMaxTypeSelection) {
     MdiCubeViewport *cvp = cubeViewport();
     if(cvp == NULL) return;
 
     // Set the min/max based on selected type
-    stretchMinMaxType(cvp);
+    if (useMinMaxTypeSelection) {
+      stretchMinMaxType(cvp);
+    }
     
     // Make sure the user didn't enter bad min/max and if so fix it
     double min = m_stretchMinEdit->text().toDouble();

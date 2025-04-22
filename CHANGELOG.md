@@ -32,13 +32,8 @@ When preparing for a bug fix release create a new 2nd heading above the Fixed
 heading to indicate that only the bug fixes and security fixes are in the bug fix
 release.
 -->
-
-## [Unreleased]
-
-### Changed
-- Enhanced csminit by removing the need to specify model and plugin [#5585](https://github.com/DOI-USGS/ISIS3/issues/5585)
-
-## [9.0.0] - 09-25-2024
+  
+## [9.0.0] - 04-21-2025
 
 ### Added
 - Added TOVECT output parameter which generate a geospatial CSV file with a VRT metadata sidecar file [#5571](https://github.com/DOI-USGS/ISIS3/issues/5571)  
@@ -47,6 +42,7 @@ release.
 - Added Chandrayaan2 template for isisimport
 - Added majority replacement for reduce app [#5101](https://github.com/DOI-USGS/ISIS3/issues/5101).
 - Added HRSC support in socetlinescankeywords [#5465](https://github.com/DOI-USGS/ISIS3/issues/5465)
+- (*Temporarily disabled*) Added option to save and apply bundle adjustment values in `jigsaw` [#4474](https://github.com/DOI-USGS/ISIS3/issues/4474)
 
 ### Changed
 - Refactored the pixel2map app
@@ -56,10 +52,9 @@ release.
 - Changed 'User Parameters' group in camstats to UserParameters for PVL compliance [#5625](https://github.com/DOI-USGS/ISIS3/issues/5625).
 
 ### Fixed
-- Fixed noseam bug where a debugging output statement was inadvertently left in noseam.cpp.
-Issue: [5660](https://github.com/DOI-USGS/ISIS3/issues/5660)
-- Fixed jigsaw bugs in which RADIUS is handled incorrectly in the jigsaw gui and in the bundleout.txt
-file. Slightly modified the FunctionalTestJigsawBundleXYZ ctest accordingly. Issue: [5642](https://github.com/DOI-USGS/ISIS3/issues/5642)
+- Fixed bug in the method BundleSolutionInfo::outputPointsCSV() where, when performing a rectangular (XYZ) bundle adjustment, the Lat/Lon/Radius point corrections written to points.csv are incorrect and do not match those written to bundleout.txt. Also modified the ctest FunctionalTestJigsawBundleXYZ to spot check six lines (points) in points.csv. Issue: [5646](https://github.com/DOI-USGS/ISIS3/issues/5646)
+- Fixed noseam bug where a debugging output statement was inadvertently left in noseam.cpp. Issue: [5660](https://github.com/DOI-USGS/ISIS3/issues/5660)
+- Fixed jigsaw bugs in which RADIUS is handled incorrectly in the jigsaw gui and in the bundleout.txt file. Slightly modified the FunctionalTestJigsawBundleXYZ ctest accordingly. Issue: [5642](https://github.com/DOI-USGS/ISIS3/issues/5642)
 - Fixed a bug in isisminer in which bad (e.g. self-intersecting) polygon geometries were not treated properly. Added pertinent unit tests to GisGeometry and Strategy classes. Issue: [5612](https://github.com/DOI-USGS/ISIS3/issues/5612)
 - Fixed a bug in kaguyasp2isis that doesn't work for data with a detached label.
 - Fixed FunctionalTestCamstatsDefaultParameters test by increasing the runtime speed [#5459](https://github.com/DOI-USGS/ISIS3/issues/5459)
@@ -68,6 +63,15 @@ file. Slightly modified the FunctionalTestJigsawBundleXYZ ctest accordingly. Iss
 - Fixed dstripe parallel test failing by converting tests to gtests [#5613](https://github.com/DOI-USGS/ISIS3/issues/5613)
 - Fixed autoseed SeedDomain = SampleLine only working for first overlap [#5673](https://github.com/DOI-USGS/ISIS3/issues/5673)
 - Fixed jigsaw to default OUTADJUSTMENTH5 option to false and allow this feature to run on read-only images [#5700](https://github.com/DOI-USGS/ISIS3/issues/5700)
+- Fixed kaguyatc2isis invalid BandBin values [#5629](https://github.com/DOI-USGS/ISIS3/issues/5629)
+- Fixed SpiceClient to handle redirect requests.
+- Fixed Cube::fromIsd to add "LineScanTimes" table from HRSC isds [#5668](https://github.com/DOI-USGS/ISIS3/issues/5668)
+- Fixed segfault in SpiceClient when an authentication error was encountered. [#5735](https://github.com/DOI-USGS/ISIS3/pull/5735)
+- Fixed `getLocalNormal` not reseting the sample and line [#5752](https://github.com/DOI-USGS/ISIS3/pull/5752)
+- Fixed QView bug that would not allow manual editing of min/max values via the text fields and defaulted to the current min/max type dropdown selection [#5719](https://github.com/DOI-USGS/ISIS3/issues/5719)
+- Fixed Juno Data Area SPKs causing Spiceinit to fail [#5724](https://github.com/DOI-USGS/ISIS3/issues/5724)
+- Fixed embree shapemodel intersection calculation [#5592](https://github.com/DOI-USGS/ISIS3/issues/5592)
+- Fixed findFeaturesSegment.py errors from issues [#5725](https://github.com/DOI-USGS/ISIS3/issues/5725) and [#5702](https://github.com/DOI-USGS/ISIS3/issues/5702)
 
 ## [8.3.0] - 2024-09-30
 

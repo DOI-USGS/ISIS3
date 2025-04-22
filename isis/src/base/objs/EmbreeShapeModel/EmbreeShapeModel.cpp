@@ -370,9 +370,9 @@ namespace Isis {
     setSurfacePoint(intersectPoint);
 
     // Save the surface normal
-    setNormal( hitInfo.surfaceNormal[0],
-               hitInfo.surfaceNormal[1],
-               hitInfo.surfaceNormal[2] );
+    setLocalNormal( hitInfo.surfaceNormal[0],
+                    hitInfo.surfaceNormal[1],
+                    hitInfo.surfaceNormal[2] );
   }
 
 
