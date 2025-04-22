@@ -59,12 +59,9 @@ release.
 - Changed 'User Parameters' group in camstats to UserParameters for PVL compliance [#5625](https://github.com/DOI-USGS/ISIS3/issues/5625).
 
 ### Fixed
-- Fixed bug in the method BundleSolutionInfo::outputPointsCSV() where, when performing a rectangular (XYZ) bundle adjustment, the Lat/Lon/Radius point corrections written to points.csv are incorrect and do not match those written to bundleout.txt. Also modified the ctest FunctionalTestJigsawBundleXYZ to spot check six lines (points) in points.csv.
-Issue: [5646](https://github.com/DOI-USGS/ISIS3/issues/5646)
-- Fixed noseam bug where a debugging output statement was inadvertently left in noseam.cpp.
-Issue: [5660](https://github.com/DOI-USGS/ISIS3/issues/5660)
-- Fixed jigsaw bugs in which RADIUS is handled incorrectly in the jigsaw gui and in the bundleout.txt
-file. Slightly modified the FunctionalTestJigsawBundleXYZ ctest accordingly. Issue: [5642](https://github.com/DOI-USGS/ISIS3/issues/5642)
+- Fixed bug in the method BundleSolutionInfo::outputPointsCSV() where, when performing a rectangular (XYZ) bundle adjustment, the Lat/Lon/Radius point corrections written to points.csv are incorrect and do not match those written to bundleout.txt. Also modified the ctest FunctionalTestJigsawBundleXYZ to spot check six lines (points) in points.csv. Issue: [5646](https://github.com/DOI-USGS/ISIS3/issues/5646)
+- Fixed noseam bug where a debugging output statement was inadvertently left in noseam.cpp. Issue: [5660](https://github.com/DOI-USGS/ISIS3/issues/5660)
+- Fixed jigsaw bugs in which RADIUS is handled incorrectly in the jigsaw gui and in the bundleout.txt file. Slightly modified the FunctionalTestJigsawBundleXYZ ctest accordingly. Issue: [5642](https://github.com/DOI-USGS/ISIS3/issues/5642)
 - Fixed a bug in isisminer in which bad (e.g. self-intersecting) polygon geometries were not treated properly. Added pertinent unit tests to GisGeometry and Strategy classes. Issue: [5612](https://github.com/DOI-USGS/ISIS3/issues/5612)
 - Fixed a bug in kaguyasp2isis that doesn't work for data with a detached label.
 - Fixed FunctionalTestCamstatsDefaultParameters test by increasing the runtime speed [#5459](https://github.com/DOI-USGS/ISIS3/issues/5459)
