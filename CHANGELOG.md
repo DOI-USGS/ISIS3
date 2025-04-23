@@ -61,6 +61,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed QView bug that would not allow manual editing of min/max values via the text fields and defaulted to the current min/max type dropdown selection [#5719](https://github.com/DOI-USGS/ISIS3/issues/5719)
 - Fixed Juno Data Area SPKs causing Spiceinit to fail [#5724](https://github.com/DOI-USGS/ISIS3/issues/5724)
 - Fixed embree shapemodel intersection calculation [#5592](https://github.com/DOI-USGS/ISIS3/issues/5592)
+- Fixed jigsaw save/apply bug by adding back missing metadata to Instrument Position/Pointing tables [#5701](https://github.com/DOI-USGS/ISIS3/issues/5701)
 
 ## [9.0.0] - 09-25-2024
 
