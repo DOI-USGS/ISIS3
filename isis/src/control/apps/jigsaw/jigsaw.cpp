@@ -63,6 +63,10 @@ namespace Isis {
                               const QString &heldList,
                               const QString &imageList);
 
+  vector<string> CMATRIX_KEYS_FOR_STR = {"CkTableEndTime", "CkTableOriginalSize", "CkTableStartTime", "FrameTypeCode"};
+  vector<string> CMATRIX_KEYS_FOR_VEC = {"ConstantFrames", "ConstantRotation", "TimeDependentFrames"};
+  vector<string> SPVECTOR_KEYS_FOR_STR = {"SpkTableEndTime", "SpkTableOriginalSize", "SpkTableStartTime", "CacheType"};
+
   void jigsaw(UserInterface &ui, Pvl *log) {
 
     QString cubeList = ui.GetFileName("FROMLIST");
@@ -125,20 +129,22 @@ namespace Isis {
           auto cmatrixData = datasetRead.read<std::string>();
 
           vector<PvlKeyword> cmatrixAttrs;
-          cmatrixAttrs.push_back(PvlKeyword("CkTableEndTime", 
-            QString::fromStdString(datasetRead.getAttribute("CkTableEndTime").read<string>())));
-          cmatrixAttrs.push_back(PvlKeyword("CkTableOriginalSize", 
-            QString::fromStdString(datasetRead.getAttribute("CkTableOriginalSize").read<string>())));
-          cmatrixAttrs.push_back(PvlKeyword("CkTableStartTime", 
-            QString::fromStdString(datasetRead.getAttribute("CkTableStartTime").read<string>())));
-          cmatrixAttrs.push_back(PvlKeyword("FrameTypeCode", 
-            QString::fromStdString(datasetRead.getAttribute("FrameTypeCode").read<string>())));          
-          cmatrixAttrs.push_back(PvlKeyword("ConstantFrames", 
-            datasetRead.getAttribute("ConstantFrames").read<vector<string>>()));
-          cmatrixAttrs.push_back(PvlKeyword("ConstantRotation", 
-            datasetRead.getAttribute("ConstantRotation").read<vector<string>>()));
-          cmatrixAttrs.push_back(PvlKeyword("TimeDependentFrames", 
-            datasetRead.getAttribute("TimeDependentFrames").read<vector<string>>()));
+
+          // Add attributes
+          vector<string> cmatrixAttributeKeys = datasetRead.listAttributeNames();
+          for (string cmatrixAttrKey : cmatrixAttributeKeys) {
+            auto n = count(CMATRIX_KEYS_FOR_STR.begin(), CMATRIX_KEYS_FOR_STR.end(), cmatrixAttrKey);
+            auto m = count(CMATRIX_KEYS_FOR_VEC.begin(), CMATRIX_KEYS_FOR_VEC.end(), cmatrixAttrKey);
+            if (n > 0) {
+              cmatrixAttrs.push_back(PvlKeyword(QString::fromStdString(cmatrixAttrKey), 
+                QString::fromStdString(datasetRead.getAttribute(cmatrixAttrKey).read<string>())));
+            } else if (m > 0) {
+              cmatrixAttrs.push_back(PvlKeyword(QString::fromStdString(cmatrixAttrKey), 
+                datasetRead.getAttribute(cmatrixAttrKey).read<vector<string>>()));
+            } else {
+              // Do not add attribute.
+            }
+          }
           
           Table cmatrixTable(cmatrixName, cmatrixData, ',', cmatrixAttrs);
 
@@ -146,15 +152,18 @@ namespace Isis {
           datasetRead = fileRead.getDataSet(spvectorKey);
           auto spvectorData = datasetRead.read<std::string>();
 
+          // Add attributes
           vector<PvlKeyword> spvectorAttrs;
-          spvectorAttrs.push_back(PvlKeyword("SpkTableEndTime", 
-            QString::fromStdString(datasetRead.getAttribute("SpkTableEndTime").read<string>())));
-          spvectorAttrs.push_back(PvlKeyword("SpkTableOriginalSize", 
-            QString::fromStdString(datasetRead.getAttribute("SpkTableOriginalSize").read<string>())));
-          spvectorAttrs.push_back(PvlKeyword("SpkTableStartTime", 
-            QString::fromStdString(datasetRead.getAttribute("SpkTableStartTime").read<string>())));
-          spvectorAttrs.push_back(PvlKeyword("CacheType", 
-            QString::fromStdString(datasetRead.getAttribute("CacheType").read<string>())));          
+          vector<string> spvectorAttributeKeys = datasetRead.listAttributeNames();
+          for (string spvectorAttrKey : spvectorAttributeKeys) {
+            auto n = count(SPVECTOR_KEYS_FOR_STR.begin(), SPVECTOR_KEYS_FOR_STR.end(), spvectorAttrKey);
+            if (n > 0) {
+              spvectorAttrs.push_back(PvlKeyword(QString::fromStdString(spvectorAttrKey), 
+                QString::fromStdString(datasetRead.getAttribute(spvectorAttrKey).read<string>())));
+            } else {
+              // Do not add attribute.
+            }
+          }          
 
           Table spvectorTable(spvectorName, spvectorData, ',', spvectorAttrs);
 
@@ -316,36 +325,35 @@ namespace Isis {
 
             // Add cmatrix attributes
             json cmatrixLabel = pvlObjectToJSON(cmatrix.Label());
-
-            string ckTableEndTime = cmatrixLabel["CkTableEndTime"]["Value"];
-            string ckTableOriginalSize = cmatrixLabel["CkTableOriginalSize"]["Value"];
-            string ckTableStartTime = cmatrixLabel["CkTableStartTime"]["Value"];
-            string frameTypeCode = cmatrixLabel["FrameTypeCode"]["Value"];
-            vector<string> constantFrames = cmatrixLabel["ConstantFrames"]["Value"];
-            vector<string> constantRotation = cmatrixLabel["ConstantRotation"]["Value"];
-            vector<string> timeDependentFrames = cmatrixLabel["TimeDependentFrames"]["Value"];
-            dataset.createAttribute("CkTableEndTime", ckTableEndTime).write(ckTableEndTime);
-            dataset.createAttribute("CkTableOriginalSize", ckTableOriginalSize).write(ckTableOriginalSize);
-            dataset.createAttribute("CkTableStartTime", ckTableStartTime).write(ckTableStartTime);
-            dataset.createAttribute("FrameTypeCode", frameTypeCode).write(frameTypeCode);
-            dataset.createAttribute("ConstantFrames", constantFrames).write(constantFrames);
-            dataset.createAttribute("ConstantRotation", constantRotation).write(constantRotation);
-            dataset.createAttribute("TimeDependentFrames", timeDependentFrames).write(timeDependentFrames);
+            for (auto cmatrixItem : cmatrixLabel.items()) {
+              string cmatrixKey = cmatrixItem.key();
+              auto cmatrixValue = cmatrixItem.value();
+              auto n = count(CMATRIX_KEYS_FOR_STR.begin(), CMATRIX_KEYS_FOR_STR.end(), cmatrixKey);
+              auto m = count(CMATRIX_KEYS_FOR_VEC.begin(), CMATRIX_KEYS_FOR_VEC.end(), cmatrixKey);
+              if (n > 0) {
+                dataset.createAttribute<string>(cmatrixKey, cmatrixValue["Value"]);
+              } else if (m > 0) {
+                dataset.createAttribute<vector<string>>(cmatrixKey, cmatrixValue["Value"]);
+              } else {
+                // Do not add as attribute
+              }
+            }
   
             std::string spvectorTableStr = Table::toString(spvector).toStdString();
             dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
 
             // Add spvector attributes
             json spvectorLabel = pvlObjectToJSON(spvector.Label());
-
-            string spkTableEndTime = spvectorLabel["SpkTableEndTime"]["Value"];
-            string spkTableOriginalSize = spvectorLabel["SpkTableOriginalSize"]["Value"];
-            string spkTableStartTime = spvectorLabel["SpkTableStartTime"]["Value"];
-            string cacheType = spvectorLabel["CacheType"]["Value"];
-            dataset.createAttribute("SpkTableEndTime", spkTableEndTime).write(spkTableEndTime);
-            dataset.createAttribute("SpkTableOriginalSize", spkTableOriginalSize).write(spkTableOriginalSize);
-            dataset.createAttribute("SpkTableStartTime", spkTableStartTime).write(spkTableStartTime);
-            dataset.createAttribute("CacheType", cacheType).write(cacheType);
+            for (auto spvectorItem : spvectorLabel.items()) {
+              string spvectorKey = spvectorItem.key();
+              auto spvectorValue = spvectorItem.value();
+              auto n = count(SPVECTOR_KEYS_FOR_STR.begin(), SPVECTOR_KEYS_FOR_STR.end(), spvectorKey);
+              if (n > 0) {
+                dataset.createAttribute<string>(spvectorKey, spvectorValue["Value"]);
+              } else {
+                // Do not add as attribute
+              }
+            }
           }
         }
         file.flush();
