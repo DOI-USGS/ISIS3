@@ -44,6 +44,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Added GDAL SRS propagation for systems outside of ISIS to display projected GTiffs. [#5736](https://github.com/DOI-USGS/ISIS3/pull/5736)
 - Added ale version to history blob. [#5207](https://github.com/DOI-USGS/ISIS3/issues/5207)
 - Added CSM State output capability for jigsaw. [#5609](https://github.com/DOI-USGS/ISIS3/issues/5609)
+- Added ShowDeprecated option to show or hide warnings in IsisPreferences. [#5611](https://github.com/DOI-USGS/ISIS3/issues/5611)
 
 ### Changed
 - Update OSIRIS-REx OCams instrument (Map, Poly, & SamCam) support to current state in UofA code base [#5426](https://github.com/DOI-USGS/ISIS3/issues/5426)
@@ -61,6 +62,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed QView bug that would not allow manual editing of min/max values via the text fields and defaulted to the current min/max type dropdown selection [#5719](https://github.com/DOI-USGS/ISIS3/issues/5719)
 - Fixed Juno Data Area SPKs causing Spiceinit to fail [#5724](https://github.com/DOI-USGS/ISIS3/issues/5724)
 - Fixed embree shapemodel intersection calculation [#5592](https://github.com/DOI-USGS/ISIS3/issues/5592)
+- Fixed findFeaturesSegment.py errors from issues [#5725](https://github.com/DOI-USGS/ISIS3/issues/5725) and [#5702](https://github.com/DOI-USGS/ISIS3/issues/5702)
 - Fixed jigsaw save/apply bug by adding back missing metadata to Instrument Position/Pointing tables [#5701](https://github.com/DOI-USGS/ISIS3/issues/5701)
 
 ## [9.0.0] - 09-25-2024

@@ -124,33 +124,35 @@ namespace Isis {
     return *p_preference;
   }
 
-  bool Preference::outputErrorAsPvl() {
-    bool usePvlFormat = false;
-    try {
-      PvlGroup &errorFacility = this->findGroup("ErrorFacility");
-      if (errorFacility.hasKeyword("Format")) {
-        QString format = errorFacility["Format"][0];
-        usePvlFormat = (format.toUpper() == "PVL");
+  bool Preference::checkIfPrefEquals(const QString &group, const QString &key, const QString &val, const bool defaultReturn) {
+    bool prefIsValue = defaultReturn;
+    if (this->hasGroup(group)) {
+      PvlGroup &targetGroup = this->findGroup(group);
+      if (targetGroup.hasKeyword(key)) {
+        QString targetVal = targetGroup[key][0];
+        prefIsValue = (targetVal.toUpper() == val.toUpper());
       }
     }
-    catch (IException &e) {
-      // If we failed we likely don't have an ErrorFacility group
-    }
-    return usePvlFormat;
+    return prefIsValue;
   }
 
+  // The following four methods check the boolean preferences 
+  // in the ErrorFacility Group.
+
   bool Preference::reportFileLine() {
-    bool reportFileLine = true;
+    return checkIfPrefEquals("ErrorFacility", "FileLine", "On");
+  }
 
-    if (this->hasGroup("ErrorFacility")) {
-      PvlGroup &errorFacility = this->findGroup("ErrorFacility");
-      if (errorFacility.hasKeyword("FileLine")) {
-        QString fileLine = errorFacility["FileLine"][0];
-        reportFileLine = (fileLine.toUpper() == "ON");
-      }
-    }
+  bool Preference::outputErrorAsPvl() {
+    return checkIfPrefEquals("ErrorFacility", "Format", "PVL", false);
+  }
 
-    return reportFileLine;
+  bool Preference::getShowDeprecatedPref() {
+    return checkIfPrefEquals("ErrorFacility", "ShowDeprecated", "On");
+  }
+
+  bool Preference::getStackTracePref() {
+    return checkIfPrefEquals("ErrorFacility", "StackTrace", "Off");
   }
 
   void Preference::Shutdown() {

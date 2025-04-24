@@ -50,6 +50,9 @@ namespace Isis {
 
     QString command = program.expanded() + " " + parameters +
         " -pid=" + toString(getpid());
+    QStringList split = QProcess::splitCommand(command);
+    QString app = split.takeFirst();
+    QStringList paramList = split;
 
     if(!isIsisProgram) {
       QString msg = "Program [" + programName + "] does not appear to be a "
@@ -69,7 +72,7 @@ namespace Isis {
     QProcess childProcess;
     childProcess.setProcessEnvironment(env);
     childProcess.setProcessChannelMode(QProcess::ForwardedChannels);
-    childProcess.start("bash", QStringList() << "-c" << command);
+    childProcess.start(app, paramList);
     childProcess.waitForStarted();
 
     bool connected = false;

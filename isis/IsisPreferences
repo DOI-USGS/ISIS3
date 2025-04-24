@@ -40,12 +40,14 @@ EndGroup
 #
 # FileLine = On | Off
 # Format = Standard | Pvl
+# ShowDeprecated = On | Off
 # StackTrace = On | Off
 ########################################################
 
 Group = ErrorFacility
   FileLine = Off
   Format = Standard
+  ShowDeprecated = On
   StackTrace = Off
 EndGroup
 
