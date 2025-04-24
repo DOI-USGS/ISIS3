@@ -147,7 +147,7 @@ namespace Isis {
    * @param tableStr The table string
    * @param fieldDelimiter The delimiter to separate fields with
   */
-  Table::Table(const QString &tableName, const std::string &tableString, const char &fieldDelimiter, const vector<PvlKeyword> tableAttrs) {
+  Table::Table(const QString &tableName, const std::string &tableString, const char &fieldDelimiter, const vector<PvlKeyword> &tableAttrs) {
     p_name = tableName;
 
     std::stringstream tableStream;
