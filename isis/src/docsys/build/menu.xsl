@@ -47,8 +47,11 @@
           <li class="usa-sidenav__item">
             <a href="https://isis.astrogeology.usgs.gov">Latest Release</a>
           </li>
-          <li class="usa-sidenav__item usa-current">
+          <li class="usa-sidenav__item">
             <a href="https://isis.astrogeology.usgs.gov/dev/">Dev</a>
+          </li>
+          <li class="usa-sidenav__item usa-current">
+            <a href="https://isis.astrogeology.usgs.gov/9.0.0/">9.0.0</a>
           </li>
           <li class="usa-sidenav__item">
             <a href="https://isis.astrogeology.usgs.gov/8.3.0/">8.3.0</a>
