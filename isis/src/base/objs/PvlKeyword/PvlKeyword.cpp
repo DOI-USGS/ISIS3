@@ -52,6 +52,24 @@ namespace Isis {
     addValue(value, unit);
   }
 
+  /**
+   * Constructs a PvlKeyword object with a name, vector of string values 
+   * and units.
+   * Defaults to unit="".
+   *
+   * @param name The keyword name.
+   * @param vecValue The vector of string values.
+   * @param unit The units the values are given in.
+   */
+  PvlKeyword::PvlKeyword(QString name, vector<string> vecValue,
+                         QString unit) {
+    init();
+    setName(name);
+    for (int i = 0; i < vecValue.size(); i++) {
+      addValue(QString::fromStdString(vecValue[i]), unit);
+    }
+  }
+
 
   //! Copy constructor
   PvlKeyword::PvlKeyword(const PvlKeyword &other) {
