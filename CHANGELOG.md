@@ -64,6 +64,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed embree shapemodel intersection calculation [#5592](https://github.com/DOI-USGS/ISIS3/issues/5592)
 - Fixed findFeaturesSegment.py errors from issues [#5725](https://github.com/DOI-USGS/ISIS3/issues/5725) and [#5702](https://github.com/DOI-USGS/ISIS3/issues/5702)
 - Fixed jigsaw save/apply bug by adding back missing metadata to Instrument Position/Pointing tables [#5701](https://github.com/DOI-USGS/ISIS3/issues/5701)
+- Fixed `StripPolygonSeeder` and `GridPolygonSeeder` memory leaks [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
 
 ## [9.0.0] - 09-25-2024
 
