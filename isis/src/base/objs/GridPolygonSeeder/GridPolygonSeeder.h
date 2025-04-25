@@ -68,7 +68,7 @@ namespace Isis {
       std::vector<geos::geom::Point *> SeedSubGrid(const geos::geom::MultiPolygon *mp);
 
 
-      geos::geom::Point *CheckSubGrid(const geos::geom::MultiPolygon &, const double &,
+      geos::geom::Point *CheckSubGrid(const geos::geom::Polygon &, const double &,
                                       const double &, const int &);
 
       double p_Xspacing;

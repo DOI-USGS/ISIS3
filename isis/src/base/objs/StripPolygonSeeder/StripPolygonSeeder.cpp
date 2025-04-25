@@ -54,47 +54,51 @@ namespace Isis {
     std::vector<geos::geom::Point *> points;
 
     // Create some things we will need shortly
-    const geos::geom::Envelope *polyBoundBox = multiPoly->getEnvelopeInternal();
+    const geos::geom::Envelope *mPolyBoundBox = multiPoly->getEnvelopeInternal();
 
     // Call the parents standardTests member
-    QString msg = StandardTests(multiPoly, polyBoundBox);
+    QString msg = StandardTests(multiPoly, mPolyBoundBox);
     if(!msg.isEmpty()) {
       return points;
     }
 
-    // Do strip seeder specific tests to make sure this poly should be seeded
-    // (none for now)
+    for(unsigned int i = 0; i < multiPoly->getNumGeometries(); ++i) {
+      const geos::geom::Polygon *poly = multiPoly->getGeometryN(i);
+      // Do strip seeder specific tests to make sure this poly should be seeded
+      // (none for now)
 
-    // Starting at the centroid of the xy polygon populate the polygon with
-    // staggered points with the requested spacing
-    geos::geom::Point *centroid = multiPoly->getCentroid().release();
-    double centerX = centroid->getX();
-    double centerY = centroid->getY();
-    delete centroid;
+      // Starting at the centroid of the xy polygon populate the polygon with
+      // staggered points with the requested spacing
+      geos::geom::Point *centroid = poly->getCentroid().release();
+      double centerX = centroid->getX();
+      double centerY = centroid->getY();
+      delete centroid;
+      const geos::geom::Envelope *polyBoundBox = poly->getEnvelopeInternal();
 
-    int xStepsToCentroid = (int)((centerX - polyBoundBox->getMinX()) / p_Xspacing + 0.5);
-    int yStepsToCentroid = (int)((centerY - polyBoundBox->getMinY()) / p_Yspacing + 0.5);
-    double dRealMinX = centerX - (xStepsToCentroid * p_Xspacing);
-    double dRealMinY = centerY - (yStepsToCentroid * p_Yspacing);
-    double dDeltaXToReal = p_Xspacing * 1.0 / 6.0;
-    double dDeltaYToReal = p_Yspacing * 1.0 / 6.0;
+      int xStepsToCentroid = (int)((centerX - polyBoundBox->getMinX()) / p_Xspacing + 0.5);
+      int yStepsToCentroid = (int)((centerY - polyBoundBox->getMinY()) / p_Yspacing + 0.5);
+      double dRealMinX = centerX - (xStepsToCentroid * p_Xspacing);
+      double dRealMinY = centerY - (yStepsToCentroid * p_Yspacing);
+      double dDeltaXToReal = p_Xspacing * 1.0 / 6.0;
+      double dDeltaYToReal = p_Yspacing * 1.0 / 6.0;
 
-    for(double y = dRealMinY; y <= polyBoundBox->getMaxY(); y += p_Yspacing) {
-      //printf("Grid Line,%.10f,%.10f,Through,%.10f,%.10f\n",dRealMinX, y, xyBoundBox->getMaxX(), y);
-      for(double x = dRealMinX; x <= polyBoundBox->getMaxX(); x += p_Xspacing) {
-        geos::geom::Coordinate c(x + dDeltaXToReal, y + dDeltaYToReal);
-        geos::geom::Point *p = Isis::globalFactory->createPoint(c).release();
-        if(p->within(multiPoly)) {
-          points.push_back(Isis::globalFactory->createPoint(c).release());
+      for(double y = dRealMinY; y <= polyBoundBox->getMaxY(); y += p_Yspacing) {
+        //printf("Grid Line,%.10f,%.10f,Through,%.10f,%.10f\n",dRealMinX, y, xyBoundBox->getMaxX(), y);
+        for(double x = dRealMinX; x <= polyBoundBox->getMaxX(); x += p_Xspacing) {
+          geos::geom::Coordinate c(x + dDeltaXToReal, y + dDeltaYToReal);
+          geos::geom::Point *p = Isis::globalFactory->createPoint(c).release();
+          if(p->within(poly)) {
+            points.push_back(Isis::globalFactory->createPoint(c).release());
+          }
+          delete p;
+
+          geos::geom::Coordinate c2(x - dDeltaXToReal, y - dDeltaYToReal);
+          p = Isis::globalFactory->createPoint(c2).release();
+          if(p->within(poly)) {
+            points.push_back(Isis::globalFactory->createPoint(c2).release());
+          }
+          delete p;
         }
-        delete p;
-
-        geos::geom::Coordinate c2(x - dDeltaXToReal, y - dDeltaYToReal);
-        p = Isis::globalFactory->createPoint(c2).release();
-        if(p->within(multiPoly)) {
-          points.push_back(Isis::globalFactory->createPoint(c2).release());
-        }
-        delete p;
       }
     }
 

@@ -71,10 +71,10 @@ namespace Isis {
     std::vector<geos::geom::Point *> points;
 
     // Create some things we will need shortly
-    const geos::geom::Envelope *polyBoundBox = multiPoly->getEnvelopeInternal();
+    const geos::geom::Envelope *mPolyBoundBox = multiPoly->getEnvelopeInternal();
 
     // Call the parents standardTests member
-    QString msg = StandardTests(multiPoly, polyBoundBox);
+    QString msg = StandardTests(multiPoly, mPolyBoundBox);
     if(!msg.isEmpty()) {
       return points;
     }
@@ -82,27 +82,31 @@ namespace Isis {
     // Do grid specific tests to make sure this poly should be seeded
     // (none for now)
 
-    // Starting at the centroid of the xy polygon populate the polygon with a
-    // grid of points with the requested spacing
-    geos::geom::Point *centroid = multiPoly->getCentroid().release();
-    double centerX = centroid->getX();
-    double centerY = centroid->getY();
-    delete centroid;
+    for(unsigned int i = 0; i < multiPoly->getNumGeometries(); ++i) {
+      const geos::geom::Polygon *poly = multiPoly->getGeometryN(i);
+      // Starting at the centroid of the xy polygon populate the polygon with a
+      // grid of points with the requested spacing
+      geos::geom::Point *centroid = poly->getCentroid().release();
+      double centerX = centroid->getX();
+      double centerY = centroid->getY();
+      delete centroid;
+      const geos::geom::Envelope *polyBoundBox = poly->getEnvelopeInternal();
 
-    int xStepsLeft = (int)((centerX - polyBoundBox->getMinX()) / p_Xspacing + 0.5);
-    int yStepsLeft = (int)((centerY - polyBoundBox->getMinY()) / p_Yspacing + 0.5);
-    double dRealMinX = centerX - (xStepsLeft * p_Xspacing);
-    double dRealMinY = centerY - (yStepsLeft * p_Yspacing);
+      int xStepsLeft = (int)((centerX - polyBoundBox->getMinX()) / p_Xspacing + 0.5);
+      int yStepsLeft = (int)((centerY - polyBoundBox->getMinY()) / p_Yspacing + 0.5);
+      double dRealMinX = centerX - (xStepsLeft * p_Xspacing);
+      double dRealMinY = centerY - (yStepsLeft * p_Yspacing);
 
-    for(double y = dRealMinY; y <= polyBoundBox->getMaxY(); y += p_Yspacing) {
-      for(double x = dRealMinX; x <= polyBoundBox->getMaxX(); x += p_Xspacing) {
-        geos::geom::Coordinate c(x, y);
-        geos::geom::Point *p = Isis::globalFactory->createPoint(c).release();
+      for(double y = dRealMinY; y <= polyBoundBox->getMaxY(); y += p_Yspacing) {
+        for(double x = dRealMinX; x <= polyBoundBox->getMaxX(); x += p_Xspacing) {
+          geos::geom::Coordinate c(x, y);
+          geos::geom::Point *p = Isis::globalFactory->createPoint(c).release();
 
-        if(p->within(multiPoly)) {
-          points.push_back(Isis::globalFactory->createPoint(c).release());
+          if(p->within(multiPoly)) {
+            points.push_back(Isis::globalFactory->createPoint(c).release());
+          }
+          delete p;
         }
-        delete p;
       }
     }
 
@@ -125,143 +129,147 @@ namespace Isis {
     std::vector<geos::geom::Point *> points;
 
     // Create some things we will need shortly
-    //geos::geom::MultiPolygon *xymp = PolygonTools::LatLonToXY(*lonLatPoly, proj);
-    const geos::geom::Envelope *polyBoundBox = multiPoly->getEnvelopeInternal();
+    //geos::geom::MultiPolygon *xyp = PolygonTools::LatLonToXY(*lonLatPoly, proj);
+    const geos::geom::Envelope *mPolyBoundBox = multiPoly->getEnvelopeInternal();
 
     // Call the parents standardTests member
-    QString msg = StandardTests(multiPoly, polyBoundBox);
+    QString msg = StandardTests(multiPoly, mPolyBoundBox);
     if(!msg.isEmpty()) {
       return points;
     }
 
-    geos::geom::Point *centroid = multiPoly->getCentroid().release();
-    double centerX = centroid->getX();
-    double centerY = centroid->getY();
-    delete centroid;
+    for(unsigned int i = 0; i < multiPoly->getNumGeometries(); ++i) {
+      const geos::geom::Polygon *poly = multiPoly->getGeometryN(i);
+      geos::geom::Point *centroid = poly->getCentroid().release();
+      double centerX = centroid->getX();
+      double centerY = centroid->getY();
+      delete centroid;
 
-    // Do grid specific tests to make sure this poly should be seeded
-    // (none for now)
+      const geos::geom::Envelope *polyBoundBox = poly->getEnvelopeInternal();
+      // Do grid specific tests to make sure this poly should be seeded
+      // (none for now)
 
-    /**
-     * Every square in the grid needs to be monitored, we'll need to know if:
-     *   (a) center needs checked - pointShouldCheck
-     *   (b) entire square needs checked using precision, next to found pt - pointShouldSubGridCheck
-     *   (c) A point was found in the square - pointFound
-     *   (d) The center of the square is not found, but the square hasnt been checked in depth - pointNotFound
-     *   (e) The square has been checked in depth and no valid points found - pointCantFind
-     */
-    enum PointStatus {
-      pointShouldCheck,
-      pointShouldSubGridCheck,
-      pointFound,
-      pointNotFound,
-      pointCantFind
-    };
+      /**
+      * Every square in the grid needs to be monitored, we'll need to know if:
+      *   (a) center needs checked - pointShouldCheck
+      *   (b) entire square needs checked using precision, next to found pt - pointShouldSubGridCheck
+      *   (c) A point was found in the square - pointFound
+      *   (d) The center of the square is not found, but the square hasnt been checked in depth - pointNotFound
+      *   (e) The square has been checked in depth and no valid points found - pointCantFind
+      */
+      enum PointStatus {
+        pointShouldCheck,
+        pointShouldSubGridCheck,
+        pointFound,
+        pointNotFound,
+        pointCantFind
+      };
 
-    // For maintaining an idea of what's going on in this polygon, we needs to know the dimensions
-    //   of the grid.
-    int xSteps = (int)((polyBoundBox->getMaxX() - polyBoundBox->getMinX()) / p_Xspacing + 1.5);
-    int ySteps = (int)((polyBoundBox->getMaxY() - polyBoundBox->getMinY()) / p_Yspacing + 1.5);
-    PointStatus pointCheck[xSteps][ySteps];
+      // For maintaining an idea of what's going on in this polygon, we needs to know the dimensions
+      //   of the grid.
+      int xSteps = (int)((polyBoundBox->getMaxX() - polyBoundBox->getMinX()) / p_Xspacing + 1.5);
+      int ySteps = (int)((polyBoundBox->getMaxY() - polyBoundBox->getMinY()) / p_Yspacing + 1.5);
+      PointStatus pointCheck[xSteps][ySteps];
 
-    // Initialize our grid of point status'
-    for(int y = 0; y < ySteps; y++) {
-      for(int x = 0; x < xSteps; x++) {
-        pointCheck[x][y] = pointShouldCheck;
-      }
-    }
-
-    /**
-     * This is a pretty good equation for how much precision is to be used in the in-depth checks
-     *   around the edges of polygons.
-     *
-     * Thickness * Depth^2 <= 0.5 (0.5 is a constant, the larger the more precision to be used)
-     * Depth^2 <= 0.5/Thickness
-     * Depth <= (0.5/Thickness)^0.5
-     */
-    int precision = (int)pow(0.5 / MinimumThickness(), 0.5) * 2;
-    bool bGridCleared = true;
-    int xStepsToCentroid = (int)((centerX - polyBoundBox->getMinX()) / p_Xspacing + 0.5);
-    int yStepsToCentroid = (int)((centerY - polyBoundBox->getMinY()) / p_Yspacing + 0.5);
-    double dRealMinX = centerX - (xStepsToCentroid * p_Xspacing);
-    double dRealMinY = centerY - (yStepsToCentroid * p_Yspacing);
-
-    do {
-      // gridCleared is true if we did nothing, if we performed any actions on the grid
-      //   it becomes false and another pass should be used.
-      bGridCleared = true;
-
+      // Initialize our grid of point status'
       for(int y = 0; y < ySteps; y++) {
-        double centerY = dRealMinY + p_Yspacing * y;
         for(int x = 0; x < xSteps; x++) {
-          double centerX = dRealMinX + p_Xspacing * x;
-          geos::geom::Point *p = NULL;
-
-          // pointShouldCheck tells us we need to check center. Calling
-          //   CheckSubGrid with precision=0 will do this for us.
-          if(pointCheck[x][y] == pointShouldCheck) {
-            p = CheckSubGrid(*multiPoly, centerX, centerY, 0);
-          }
-          // pointShouldSubGridCheck tells us we're next to a grid
-          //   square where a point was found, so check in depth
-          else if(pointCheck[x][y] == pointShouldSubGridCheck) {
-            p = CheckSubGrid(*multiPoly, centerX, centerY, precision);
-          }
-
-          // If we found a point, verify we can setCoordinate and save the point
-          if(p != NULL) {
-            // Convert the x/y point to a lon/lat point
-            /*if (proj->SetCoordinate(p->getX(),p->getY())) {
-              points.push_back(Isis::globalFactory->createPoint(
-                  geos::geom::Coordinate(proj->UniversalLongitude(),
-                  proj->UniversalLatitude())));
-            }
-            else {
-              IString msg = "Unable to convert [(" + IString(x) + ",";
-              msg += IString(y) + ")] to a (lon,lat)";
-              throw iException::Message(iException::Programmer, msg, _FILEINFO_);
-            }*/
-            points.push_back(Isis::globalFactory->createPoint(
-                               geos::geom::Coordinate(p->getX(), p->getY())).release());
-
-            // We found something new and need a new pass
-            bGridCleared = false;
-            pointCheck[x][y] = pointFound;
-          }
-          else {
-            if(pointCheck[x][y] == pointShouldCheck) {
-              pointCheck[x][y] = pointNotFound;
-            }
-            else if(pointCheck[x][y] == pointShouldSubGridCheck) {
-              pointCheck[x][y] = pointCantFind;
-            }
-          }
+          pointCheck[x][y] = pointShouldCheck;
         }
       }
 
-      // now that the grid has been updated with it's founds, we can look for subgrid checks
-      for(int y = 0; y < ySteps; y++) {
-        for(int x = 0; x < xSteps; x++) {
-          if(pointCheck[x][y] == pointFound) {
-            for(int yOff = -1; yOff <= 1; yOff++) {
-              for(int xOff = -1; xOff <= 1; xOff++) {
-                if(x + xOff >= 0 && x + xOff < xSteps &&
-                    y + yOff >= 0 && y + yOff < ySteps &&
-                    pointCheck[x+xOff][y+yOff] == pointNotFound) {
+      /**
+      * This is a pretty good equation for how much precision is to be used in the in-depth checks
+      *   around the edges of polygons.
+      *
+      * Thickness * Depth^2 <= 0.5 (0.5 is a constant, the larger the more precision to be used)
+      * Depth^2 <= 0.5/Thickness
+      * Depth <= (0.5/Thickness)^0.5
+      */
+      int precision = (int)pow(0.5 / MinimumThickness(), 0.5) * 2;
+      bool bGridCleared = true;
+      int xStepsToCentroid = (int)((centerX - polyBoundBox->getMinX()) / p_Xspacing + 0.5);
+      int yStepsToCentroid = (int)((centerY - polyBoundBox->getMinY()) / p_Yspacing + 0.5);
+      double dRealMinX = centerX - (xStepsToCentroid * p_Xspacing);
+      double dRealMinY = centerY - (yStepsToCentroid * p_Yspacing);
 
-                  pointCheck[x+xOff][y+yOff] = pointShouldSubGridCheck;
+      do {
+        // gridCleared is true if we did nothing, if we performed any actions on the grid
+        //   it becomes false and another pass should be used.
+        bGridCleared = true;
 
-                  // We need to do a searchso we need another pass
-                  bGridCleared = false;
+        for(int y = 0; y < ySteps; y++) {
+          double centerY = dRealMinY + p_Yspacing * y;
+          for(int x = 0; x < xSteps; x++) {
+            double centerX = dRealMinX + p_Xspacing * x;
+            geos::geom::Point *p = NULL;
+
+            // pointShouldCheck tells us we need to check center. Calling
+            //   CheckSubGrid with precision=0 will do this for us.
+            if(pointCheck[x][y] == pointShouldCheck) {
+              p = CheckSubGrid(*poly, centerX, centerY, 0);
+            }
+            // pointShouldSubGridCheck tells us we're next to a grid
+            //   square where a point was found, so check in depth
+            else if(pointCheck[x][y] == pointShouldSubGridCheck) {
+              p = CheckSubGrid(*poly, centerX, centerY, precision);
+            }
+
+            // If we found a point, verify we can setCoordinate and save the point
+            if(p != NULL) {
+              // Convert the x/y point to a lon/lat point
+              /*if (proj->SetCoordinate(p->getX(),p->getY())) {
+                points.push_back(Isis::globalFactory->createPoint(
+                    geos::geom::Coordinate(proj->UniversalLongitude(),
+                    proj->UniversalLatitude())));
+              }
+              else {
+                IString msg = "Unable to convert [(" + IString(x) + ",";
+                msg += IString(y) + ")] to a (lon,lat)";
+                throw iException::Message(iException::Programmer, msg, _FILEINFO_);
+              }*/
+              points.push_back(Isis::globalFactory->createPoint(
+                                geos::geom::Coordinate(p->getX(), p->getY())).release());
+
+              // We found something new and need a new pass
+              bGridCleared = false;
+              pointCheck[x][y] = pointFound;
+            }
+            else {
+              if(pointCheck[x][y] == pointShouldCheck) {
+                pointCheck[x][y] = pointNotFound;
+              }
+              else if(pointCheck[x][y] == pointShouldSubGridCheck) {
+                pointCheck[x][y] = pointCantFind;
+              }
+            }
+          }
+        }
+
+        // now that the grid has been updated with it's founds, we can look for subgrid checks
+        for(int y = 0; y < ySteps; y++) {
+          for(int x = 0; x < xSteps; x++) {
+            if(pointCheck[x][y] == pointFound) {
+              for(int yOff = -1; yOff <= 1; yOff++) {
+                for(int xOff = -1; xOff <= 1; xOff++) {
+                  if(x + xOff >= 0 && x + xOff < xSteps &&
+                      y + yOff >= 0 && y + yOff < ySteps &&
+                      pointCheck[x+xOff][y+yOff] == pointNotFound) {
+
+                    pointCheck[x+xOff][y+yOff] = pointShouldSubGridCheck;
+
+                    // We need to do a searchso we need another pass
+                    bGridCleared = false;
+                  }
                 }
               }
             }
           }
         }
-      }
 
+      }
+      while(!bGridCleared);
     }
-    while(!bGridCleared);
 
     return points;
   }
@@ -280,14 +288,14 @@ namespace Isis {
    *                       |___________________________|
    *  Where the numbers represent the precision at which the point will be found.
    *
-   * @param xymp The multipolygon we're testing for points
+   * @param xyp The polygon we're testing for points
    * @param centerX The X position of the center of the polygon
    * @param centerY The Y position of the center of the polygon
    * @param precision See description
    *
    * @return geos::Point* Found point, NULL if nothing found
    */
-  geos::geom::Point *GridPolygonSeeder::CheckSubGrid(const geos::geom::MultiPolygon &xymp, const double &centerX,
+  geos::geom::Point *GridPolygonSeeder::CheckSubGrid(const geos::geom::Polygon &xyp, const double &centerX,
       const double &centerY, const int &precision) {
     // We'll make a 2D array detailing which points to check, and which not to, in this rectangle.
     // Figure out how many points across and vertically we need to check
@@ -358,7 +366,7 @@ namespace Isis {
         double yPos = centerY + (y - gridSize / 2) * deltaYSize;
         geos::geom::Coordinate c(xPos, yPos);
         geos::geom::Point *p = Isis::globalFactory->createPoint(c).release();
-        if(p->within(&xymp)) {
+        if(p->within(&xyp)) {
           result = p->clone().release();
         }
         delete p;
