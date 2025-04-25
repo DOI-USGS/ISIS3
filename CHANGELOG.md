@@ -52,6 +52,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Update OSIRIS-REx OCams instrument (Map, Poly, & SamCam) support to current state in UofA code base [#5426](https://github.com/DOI-USGS/ISIS3/issues/5426)
 - Enhanced csminit by removing the need to specify model and plugin [#5585](https://github.com/DOI-USGS/ISIS3/issues/5585)
 - Changed file format to propagate from the input image format to the output image format [#5737](https://github.com/DOI-USGS/ISIS3/pull/5737)
+- Changed `StripPolygonSeeder` and `GridPolygonSeeder` to seed individual polygons within each images multipolygon footprint [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
 
 ### Fixed
 - Fixed kaguyatc2isis invalid BandBin values [#5629](https://github.com/DOI-USGS/ISIS3/issues/5629)
