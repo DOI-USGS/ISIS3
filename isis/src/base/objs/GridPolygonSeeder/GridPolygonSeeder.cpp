@@ -102,8 +102,7 @@ namespace Isis {
         if(p->within(multiPoly)) {
           points.push_back(Isis::globalFactory->createPoint(c).release());
         }
-          delete p;
-        }
+        delete p;
       }
     }
 
@@ -362,7 +361,7 @@ namespace Isis {
         if(p->within(&xymp)) {
           result = p->clone().release();
         }
-          delete p;
+        delete p;
       }
     }
 

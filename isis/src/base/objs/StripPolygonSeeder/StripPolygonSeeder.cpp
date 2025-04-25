@@ -87,15 +87,14 @@ namespace Isis {
         if(p->within(multiPoly)) {
           points.push_back(Isis::globalFactory->createPoint(c).release());
         }
-          delete p;
+        delete p;
 
         geos::geom::Coordinate c2(x - dDeltaXToReal, y - dDeltaYToReal);
         p = Isis::globalFactory->createPoint(c2).release();
         if(p->within(multiPoly)) {
           points.push_back(Isis::globalFactory->createPoint(c2).release());
-          }
-          delete p;
         }
+        delete p;
       }
     }
 
