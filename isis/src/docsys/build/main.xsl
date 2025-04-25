@@ -59,6 +59,7 @@ Deborah Lee Soltesz
         <!-- Govt -->
         <link rel="stylesheet" href="assets/styles/uswds.css"/>
         <script src="assets/scripts/uswds-init.min.js"></script>
+        <script async="async" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=DOI" id="_fed_an_ua_tag"></script>
 
         <style>
           .topnav-container {
