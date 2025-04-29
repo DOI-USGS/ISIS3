@@ -47,6 +47,7 @@ Deborah Lee Soltesz
         <meta name="county" content="Coconino"/>
         <meta name="city" content="Flagstaff"/>
         <meta name="zip" content="86001"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
 
         <!-- ISIS Docs -->
         <link rel="stylesheet" href="assets/styles/IsisStyleCommon.css"/>

@@ -43,49 +43,97 @@
       </li>
       <li class="usa-sidenav__item">
         <a href="https://isis.astrogeology.usgs.gov">Versions</a>
-        <ul class="usa-sidenav__sublist">
-          <li class="usa-sidenav__item">
-            <a href="https://isis.astrogeology.usgs.gov">Latest Release</a>
-          </li>
-          <li class="usa-sidenav__item usa-current">
-            <a href="https://isis.astrogeology.usgs.gov/dev/">Dev</a>
-          </li>
-          <li class="usa-sidenav__item">
-            <a href="https://isis.astrogeology.usgs.gov/9.0.0/">9.0.0</a>
-          </li>
-          <li class="usa-sidenav__item">
-            <a href="https://isis.astrogeology.usgs.gov/8.3.0/">8.3.0</a>
-          </li>
-          <li class="usa-sidenav__item">
-            <a href="https://isis.astrogeology.usgs.gov/8.2.0/">8.2.0</a>
-          </li>
-          <li class="usa-sidenav__item">
-            <a href="https://isis.astrogeology.usgs.gov/8.1.0/">8.1.0</a>
-          </li>
-          <li class="usa-sidenav__item">
-            <a href="https://isis.astrogeology.usgs.gov/8.0.0/">8.0.0</a>
-          </li>
-          <li class="usa-sidenav__item">
-            <a href="https://isis.astrogeology.usgs.gov/7.2.0/">7.2.0</a>
-          </li>
-          <li class="usa-sidenav__item">
-            <a href="https://isis.astrogeology.usgs.gov/7.1.0/">7.1.0</a>
-          </li>
-          <li class="usa-sidenav__item">
-            <a href="https://isis.astrogeology.usgs.gov/7.0.0/">7.0.0</a>
-          </li>
-          <li class="usa-sidenav__item">
-            <a href="https://isis.astrogeology.usgs.gov/6.0.0/">6.0.0</a>
-          </li>
-          <li class="usa-sidenav__item">
-            <a href="https://isis.astrogeology.usgs.gov/3.9.0/">3.9.0</a>
-          </li>
-          <li class="usa-sidenav__item">
-            <a href="https://isis.astrogeology.usgs.gov/3.5.0/">3.5.0</a>
-          </li>
+        <ul class="usa-sidenav__sublist" id="versions-menu-large">
         </ul>
       </li>
     </ul>
+    <script><![CDATA[
+      fetch('/versions.json')
+      .then(response => response.json())
+      .then(versions => {
+        const largeMenu = document.getElementById('versions-menu-large');
+        const smallMenu = document.getElementById('versions-menu-small');
+        
+        largeMenu.innerHTML = '';
+        smallMenu.innerHTML = '';
+        
+        const latestLi = document.createElement('li');
+        latestLi.className = 'usa-sidenav__item';
+        latestLi.innerHTML = `<a href="https://isis.astrogeology.usgs.gov">Latest Release</a>`;
+        
+        largeMenu.appendChild(latestLi);
+        smallMenu.appendChild(latestLi.cloneNode(true));
+
+        const pathParts = window.location.pathname.split('/');
+        let currentVersion = pathParts[1];
+        if (currentVersion.endsWith('/')) {
+          currentVersion = currentVersion.slice(0, -1);
+        }
+
+        versions.forEach(version => {
+          const li = document.createElement('li');
+          li.className = 'usa-sidenav__item';
+          if (currentVersion === version) {
+            li.classList.add('usa-current');
+          }
+          li.innerHTML = `<a href="https://isis.astrogeology.usgs.gov/${version}/">${version}</a>`;
+          
+          largeMenu.appendChild(li);
+          smallMenu.appendChild(li.cloneNode(true));  // Clone for the smaller menu
+        });
+      })
+      .catch(error => {
+        console.error('Failed to load versions list', error);
+      });
+    ]]></script>           
+  </xsl:template>
+
+  <xsl:template mode="writeMiniMenuContents" name="writeMiniMenuContents">
+    <ul class="usa-sidenav">
+      <li class="usa-sidenav__item">
+        <a href="{$menuPath}index.html" target="_top" id="homeLink">Home/About</a>
+      </li>
+      <li class="usa-sidenav__item">
+        <div class="usa-accordion">
+          <h2 class="usa-accordion__heading">
+            <button class="usa-accordion__button text-normal bg-white" aria-expanded="false" aria-controls="app-mini-menu">
+              Application&#160;Manuals
+            </button>
+          </h2>
+          <div id="app-mini-menu" class="usa-accordion__content usa-prose" hidden="hidden">
+            <ul class="usa-sidenav__sublist">
+              <li class="usa-sidenav__item">
+                <a href="{$menuPath}Application/index.html">By Category</a>
+              </li>
+              <li class="usa-sidenav__item">
+                <a href="{$menuPath}Application/alpha.html">By Alphabetical</a>
+              </li>
+              <li class="usa-sidenav__item">
+                <a href="{$menuPath}Application/oldvnew.html">Old vs. New</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </li>
+      <li class="usa-sidenav__item">
+        <a href="https://github.com/DOI-USGS/ISIS3">GitHub</a>
+      </li>
+      <li class="usa-sidenav__item">
+        <a href="{$menuPath}Object/Developer/index.html">API</a>
+      </li>
+      <li class="usa-sidenav__item">
+        <div class="usa-accordion">
+          <h2 class="usa-accordion__heading">
+            <button class="usa-accordion__button text-normal bg-white" aria-expanded="false" aria-controls="versions-menu-small">
+              Versions
+            </button>
+          </h2>
+          <div id="versions-menu-small" class="usa-accordion__content usa-prose" hidden="hidden">
+            <ul class="usa-sidenav__sublist"></ul>
+          </div>
+        </div>
+      </li>
+    </ul>        
   </xsl:template>
 
   <xsl:template mode="writeFrontPageMenu" name="writeFrontPageMenu">
@@ -122,5 +170,15 @@
     </nav>
 
   </xsl:template>
+
+  <xsl:template mode="writeMiniMenu" name="writeMiniMenu">
+
+  <nav aria-label="usa-sidenav" class="sidenav">
+
+    <xsl:call-template  name="writeMiniMenuContents"/>
+    
+  </nav>
+
+</xsl:template>
 
 </xsl:stylesheet>
