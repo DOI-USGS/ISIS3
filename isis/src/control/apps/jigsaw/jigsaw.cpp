@@ -70,12 +70,6 @@ namespace Isis {
 
     QString cubeList = ui.GetFileName("FROMLIST");
 
-    if (ui.GetBoolean("OUTADJUSTMENTH5") || ui.WasEntered("ADJUSTMENT_INPUT")) {
-      // Disable save/apply feature for 9.0.0
-      QString msg = "[ISIS 9.0.0 - Feature Disabled] Options [OUTADJUSTMENTH5] and [ADJUSTMENT_INPUT] have been temporarily disabled and will be re-enabled in a future release.";
-      throw IException(IException::Unknown, msg, _FILEINFO_);
-    }
-
     // Check for ADJUSTMENT_INPUT file and apply
     try {
       if (ui.WasEntered("ADJUSTMENT_INPUT")) {
