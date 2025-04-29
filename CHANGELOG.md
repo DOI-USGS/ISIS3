@@ -42,7 +42,7 @@ release.
 - Added Chandrayaan2 template for isisimport
 - Added majority replacement for reduce app [#5101](https://github.com/DOI-USGS/ISIS3/issues/5101).
 - Added HRSC support in socetlinescankeywords [#5465](https://github.com/DOI-USGS/ISIS3/issues/5465)
-- (*Temporarily disabled*) Added option to save and apply bundle adjustment values in `jigsaw` [#4474](https://github.com/DOI-USGS/ISIS3/issues/4474)
+- Added option to save and apply bundle adjustment values in `jigsaw` [#4474](https://github.com/DOI-USGS/ISIS3/issues/4474)
 
 ### Changed
 - Refactored the pixel2map app
