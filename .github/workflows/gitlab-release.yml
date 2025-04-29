@@ -1,8 +1,8 @@
-name: Github to Gitlab CI - Run CodeBuild
+name: Github Actions - Build Anaconda Release
 
 env:
-  GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-  ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }} 
+  ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }} 
+  ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
 
 on:
   release:
@@ -16,17 +16,81 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Run script
+
+      - name: Set up Mambaforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-variant: Mambaforge
+          auto-update-conda: true
+          use-mamba: true
+
+      - name: Build Release
         env:
           ISIS_VERSION: ${{ github.event.release.tag_name || github.ref_name }}
         run: |
-          git config --global user.name "Github_CI"
-          git config --global user.email "project_14468_bot_3f7d8e1a392afd88ead5f3f3154e809d@noreply.gitlab.com"
-          git clone https://isis-codebuild-ci:$GITLAB_TOKEN@code.usgs.gov/astrogeology/isis-codebuild-ci.git
-          echo $ISIS_VERSION
-          cd isis-codebuild-ci
-          git checkout -b RELEASE_$ISIS_VERSION
-          echo -e "\nenv: \n  shell: bash \n  variables: \n    ISIS_VERSION: $ISIS_VERSION \n    ANACONDA_API_TOKEN: $ANACONDA_TOKEN" >> buildspec-release.yml
-          git commit -a -m "$ISIS_VERSION"
-          git push origin RELEASE_$ISIS_VERSION --force
+          mamba install conda-build anaconda-client
+          git fetch origin
+          if [[ "$ISIS_VERSION" =~ .*_RC[0-9]$ ]]; then 
+            git checkout $ISIS_VERSION
+          else 
+            git checkout refs/tags/$ISIS_VERSION
+          fi
+          cd recipe
+          echo $ENCRYPTION_KEY | openssl enc -aes-256-cbc -d -in kakadu/kakadu_7_9.zip.enc -out kakadu/kakadu_7_9.zip -pbkdf2 -iter 10000 -pass stdin
+          unzip kakadu/kakadu_7_9.zip -d kakadu
+          sed -i "s|/isisData/kakadu|kakadu/kakadu_7_9|g" build.sh
 
+          if [[ "$ISIS_VERSION" =~ .*_RC[0-9]$ ]]; then 
+            conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label RC
+          elif [[ "$ISIS_VERSION" =~ .*_LTS$ ]]; then 
+            conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label LTS
+          else 
+            conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label LTS --label main
+          fi
+
+          BUILT_PACKAGE=$(ls $HOME/miniconda3/conda-bld/linux-64 | grep "isis-${ISIS_VERSION}-.*\.conda")
+          echo "::set-output name=built_package::${BUILT_PACKAGE}"
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Set up Mambaforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-variant: Mambaforge
+          auto-update-conda: true
+          use-mamba: true
+
+      - name: Create conda environment and install dependencies
+        run: |
+          conda create -n install_test -y
+          conda activate install_test
+          export ISISROOT=$CONDA_PREFIX
+          
+          # Install ISIS depending on the version
+          if [[ "$ISIS_VERSION" =~ .*_RC[0-9]$ ]]; then
+            conda install -c conda-forge -c usgs-astrogeology usgs-astrogeology/label/RC::isis=${ISIS_VERSION} -y
+          elif [[ "$ISIS_VERSION" =~ .*_LTS$ ]]; then
+            conda install . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label LTS -y
+          else
+            conda install -c conda-forge -c usgs-astrogeology usgs-astrogeology::isis=${ISIS_VERSION} -y
+          fi
+
+      - name: Run spiceinit
+        if: success()
+        run: |
+          spiceinit -H
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: test
+    if: failure()
+
+    steps:
+      - name: Delete Anaconda download if test fails
+        run: |
+          echo "Cleaning up Anaconda download..."
+          BUILT_PACKAGE=${{ needs.build.outputs.built_package }}
+          echo "Removing package: $BUILT_PACKAGE"
+          anaconda --token ${{ secrets.ANACONDA_TOKEN }} remove usgs-astrogeology/isis/${BUILT_PACKAGE}
