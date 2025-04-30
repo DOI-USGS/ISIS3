@@ -2,7 +2,7 @@ name: Github Actions - Build Anaconda Release
 
 env:
   ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }} 
-  ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+  ENCRYPTION_KEY: ${{ secrets.KDU_ENC_KEY }}
 
 on:
   release:
