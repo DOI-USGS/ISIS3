@@ -16,7 +16,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # os: [ubuntu-latest, macos-13, macos-14]  # Ubuntu, macOS x86_64, macOS arm64
           os: [ubuntu-latest, macos-13]
     runs-on: ${{ matrix.os }}
 
@@ -75,20 +74,29 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-13]
+        include:
+          - os: ubuntu-latest
+            python: "3.10"
+          - os: macos-13
+            python: "3.12"
     env:
       ISIS_VERSION: ${{ github.event.release.tag_name || github.ref_name }}
       
     steps:
-      - name: Set up Mambaforge
+      - name: Set up Miniforge
         uses: conda-incubator/setup-miniconda@v3
         with:
-          conda-remove-defaults: "true"
+          miniforge-variant: Miniforge3
           auto-update-conda: true
-          use-mamba: false
+          activate-environment: isis-test
+          use-mamba: true
+          mamba-version: "1.5.3"
+          python-version: ${{ matrix.python-version }}
 
       - name: Conda install and test spiceinit
         run: |
-          export ISISROOT=$CONDA_PREFIX
+          source "${CONDA}/etc/profile.d/conda.sh"
+          conda activate isis-test
           if [[ "$ISIS_VERSION" =~ .*_RC[0-9]$ ]]; then
             conda install -c conda-forge -c usgs-astrogeology usgs-astrogeology/label/RC::isis=${ISIS_VERSION} -y
           elif [[ "$ISIS_VERSION" =~ .*_LTS$ ]]; then
@@ -96,6 +104,8 @@ jobs:
           else
             conda install -c conda-forge -c usgs-astrogeology isis=${ISIS_VERSION} -y
           fi
+
+          export ISISROOT=$CONDA_PREFIX
           conda list isis
           spiceinit -h
      
