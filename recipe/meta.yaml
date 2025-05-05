@@ -148,7 +148,7 @@ requirements:
   - usgs-astrogeology::inja      # [osx and arm64]
   - jama
   - {{ pin_compatible('jasper', max_pin='x.x') }}
-  - {{ pin_compatible('kakadu', max_pin='x') }}
+  - {{ pin_compatible('kakadu', max_pin='x') }}   # [linux or osx64]
   - kalasiris
   - libcxx
   - libopenblas
@@ -156,7 +156,7 @@ requirements:
   - {{ pin_compatible('libpng') }}
   - libtiff
   - mesalib
-  - mkl
+  - mkl                          # [linux or osx64]
   - mysql
   - nanoflann
   - nlohmann_json
