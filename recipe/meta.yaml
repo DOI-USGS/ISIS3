@@ -74,7 +74,7 @@ requirements:
    - icu
    - inja
    - jama
-   - usgs-astrogeology::kakadu==1
+   - usgs-astrogeology::kakadu==1 # [linux or osx64]
    - kalasiris
    - krb5
    - libgdal >=3.7,<3.9
@@ -113,7 +113,8 @@ requirements:
    - tnt
    - usgscsm
    - x264
-   - xalan-c
+   - xalan-c                    # [linux or osx64]
+   - usgs-astrogeology::xalan-c # [osx and arm64]
    - xerces-c >=3.2.4,<3.3.0a0
    - xorg-kbproto
    - xorg-libice
@@ -143,7 +144,8 @@ requirements:
   - {{ pin_compatible('gsl', min_pin='x.x', max_pin='x.x.x') }}
   - hdf5
   - icu
-  - inja
+  - inja                         # [linux or osx64]
+  - usgs-astrogeology::inja      # [osx and arm64]
   - jama
   - {{ pin_compatible('jasper', max_pin='x.x') }}
   - {{ pin_compatible('kakadu', max_pin='x') }}

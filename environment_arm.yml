@@ -3,7 +3,7 @@ channels:
   - usgs-astrogeology
   
 dependencies:
-  - ale =0.10.0,<1
+  - ale =0.11.0,<1
   - aom
   - armadillo
   - boost >=1.76.0,<1.82
@@ -42,7 +42,9 @@ dependencies:
   - libxml2
   - make
   - mesalib
+  - mkl
   - mysql
+  - mysql-connector-c
   - nanoflann <1.4
   - nlohmann_json=3.11.2
   - ninja >=1.10,<1.11
