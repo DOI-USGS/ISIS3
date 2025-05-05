@@ -85,9 +85,9 @@ requirements:
    - libxml2
    - make
    - mesalib
-   - mkl
+   - mkl                         # [linux or osx64]
    - mysql
-   - mysql-connector-c
+   - mysql-connector-c           # [linux or osx64]
    - nanoflann <1.4
    - nlohmann_json=3.11.2
    - ninja >=1.10,<1.11
