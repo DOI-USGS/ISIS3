@@ -48,7 +48,7 @@
       </li>
     </ul>
     <script><![CDATA[
-      fetch('/versions.json')
+      fetch('/isis-site/versions.json')
       .then(response => response.json())
       .then(versions => {
         const largeMenu = document.getElementById('versions-menu-large');
@@ -65,7 +65,7 @@
         smallMenu.appendChild(latestLi.cloneNode(true));
 
         const pathParts = window.location.pathname.split('/');
-        let currentVersion = pathParts[1];
+        let currentVersion = pathParts[2];
         if (currentVersion.endsWith('/')) {
           currentVersion = currentVersion.slice(0, -1);
         }
@@ -73,7 +73,7 @@
         versions.forEach(version => {
           const li = document.createElement('li');
           li.className = 'usa-sidenav__item';
-          if (currentVersion === version) {
+          if (currentVersion === version.toLowerCase()) {
             li.classList.add('usa-current');
           }
           li.innerHTML = `<a href="https://isis.astrogeology.usgs.gov/${version}/">${version}</a>`;
