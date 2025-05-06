@@ -100,14 +100,6 @@ jobs:
           export ISISROOT=$CONDA_PREFIX
           conda list isis
           spiceinit -h
-     
-      - name: Cleanup Anaconda package if spiceinit fails
-        if: failure()
-        run: |
-          echo "Cleaning up Anaconda download..."
-          BUILT_PACKAGE=${{ needs.build.outputs.built_package }}
-          echo "Removing package: $BUILT_PACKAGE"
-          anaconda --token ${{ secrets.ANACONDA_TOKEN }} remove usgs-astrogeology/isis/${BUILT_PACKAGE} -y
 
   docs:
     name: Build and Upload ISIS Dev Docs

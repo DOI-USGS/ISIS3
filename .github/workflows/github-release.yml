@@ -77,13 +77,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-13, macos-14]
-        include:
-          - os: ubuntu-latest
-            python: "3.10"
-          - os: macos-13
-            python: "3.12"
-          - os: macos-14
-            python: "3.12"
     env:
       ISIS_VERSION: ${{ needs.build.outputs.isis_version }}
       
@@ -96,7 +89,6 @@ jobs:
           activate-environment: isis-test
           use-mamba: true
           mamba-version: "1.5.3"
-          python-version: ${{ matrix.python }}
 
       - name: Conda install and test spiceinit
         run: |
@@ -113,14 +105,6 @@ jobs:
           export ISISROOT=$CONDA_PREFIX
           conda list isis
           spiceinit -h
-     
-      - name: Cleanup Anaconda package if spiceinit fails
-        if: failure()
-        run: |
-          echo "Cleaning up Anaconda download..."
-          BUILT_PACKAGE=${{ needs.build.outputs.built_package }}
-          echo "Removing package: $BUILT_PACKAGE"
-          anaconda --token ${{ secrets.ANACONDA_TOKEN }} remove usgs-astrogeology/isis/${BUILT_PACKAGE} -y
 
   docs:
     name: Build and Upload ISIS Public Release Docs
