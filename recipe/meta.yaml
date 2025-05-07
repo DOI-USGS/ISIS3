@@ -56,7 +56,8 @@ requirements:
    - bzip2
    - cmake >=3.27,<3.28
    - cspice =67
-   - csm >=3.0.3,<3.0.4
+   - usgs-astrogeology::csm >=3.0.3,<3.0.4   # [osx and arm64]
+   - csm >=3.0.3,<3.0.4                      # [not (osx and arm64)]
    - curl >=8.4.0,<8.5
    - cxx-compiler=1.7
    - doxygen
@@ -74,7 +75,7 @@ requirements:
    - icu
    - inja
    - jama
-   - usgs-astrogeology::kakadu==1 # [linux or osx64]
+   - usgs-astrogeology::kakadu==1 # [not (osx and arm64)]
    - kalasiris
    - krb5
    - libgdal >=3.7,<3.9
@@ -85,9 +86,9 @@ requirements:
    - libxml2
    - make
    - mesalib
-   - mkl                         # [linux or osx64]
+   - mkl                         # [not (osx and arm64)]
    - mysql
-   - mysql-connector-c           # [linux or osx64]
+   - mysql-connector-c           # [not (osx and arm64)]
    - nanoflann <1.4
    - nlohmann_json=3.11.2
    - ninja >=1.10,<1.11
@@ -113,7 +114,7 @@ requirements:
    - tnt
    - usgscsm
    - x264
-   - xalan-c                    # [linux or osx64]
+   - xalan-c                    # [not (osx and arm64)]
    - usgs-astrogeology::xalan-c # [osx and arm64]
    - xerces-c >=3.2.4,<3.3.0a0
    - xorg-kbproto
@@ -132,7 +133,8 @@ requirements:
   - blas
   - {{ pin_compatible('bullet', max_pin='x.x') }}
   - bz2file
-  - csm
+  - usgs-astrogeology::csm                        # [osx and arm64]
+  - csm                                           # [not (osx and arm64)]
   - cspice
   - curl
   - eigen
@@ -144,11 +146,11 @@ requirements:
   - {{ pin_compatible('gsl', min_pin='x.x', max_pin='x.x.x') }}
   - hdf5
   - icu
-  - inja                         # [linux or osx64]
-  - usgs-astrogeology::inja      # [osx and arm64]
+  - inja                                          # [not (osx and arm64)]
+  - usgs-astrogeology::inja                       # [osx and arm64]
   - jama
   - {{ pin_compatible('jasper', max_pin='x.x') }}
-  - {{ pin_compatible('kakadu', max_pin='x') }}   # [linux or osx64]
+  - {{ pin_compatible('kakadu', max_pin='x') }}   # [not (osx and arm64)]
   - kalasiris
   - libcxx
   - libopenblas
@@ -156,7 +158,7 @@ requirements:
   - {{ pin_compatible('libpng') }}
   - libtiff
   - mesalib
-  - mkl                          # [linux or osx64]
+  - mkl                                           # [not (osx and arm64)]
   - mysql
   - nanoflann
   - nlohmann_json

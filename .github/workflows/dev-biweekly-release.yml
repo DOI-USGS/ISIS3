@@ -64,7 +64,7 @@ jobs:
             sed -i "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
           fi
 
-          conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label dev
+          conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label dev
 
           BUILT_DIR=$(conda info --base)/conda-bld
           BUILT_PACKAGE=$(find "$BUILT_DIR" -name "isis-${ISIS_VERSION}-*.conda" | head -n1)

@@ -58,11 +58,11 @@ jobs:
           fi
 
           if [[ "$ISIS_VERSION" =~ .*_RC[0-9]$ ]]; then 
-            conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label RC
+            conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label RC
           elif [[ "$ISIS_VERSION" =~ .*_LTS$ ]]; then 
-            conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label LTS
+            conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label LTS
           else 
-            conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label LTS --label main
+            conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label LTS --label main
           fi
 
           BUILT_DIR=$(conda info --base)/conda-bld
