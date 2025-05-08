@@ -5,6 +5,7 @@ env:
   ENCRYPTION_KEY: ${{ secrets.KDU_ENC_KEY }}
 
 on:
+  workflow_dispatch:
   release:
     types: [prereleased, released]
   push:
@@ -58,11 +59,11 @@ jobs:
           fi
 
           if [[ "$ISIS_VERSION" =~ .*_RC[0-9]$ ]]; then 
-            conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label RC
+            conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label RC
           elif [[ "$ISIS_VERSION" =~ .*_LTS$ ]]; then 
-            conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label LTS
+            conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label LTS
           else 
-            conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label LTS --label main
+            conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label LTS --label main
           fi
 
           BUILT_DIR=$(conda info --base)/conda-bld
@@ -77,11 +78,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-13]
-        include:
-          - os: ubuntu-latest
-            python: "3.10"
-          - os: macos-13
-            python: "3.12"
     env:
       ISIS_VERSION: ${{ needs.build.outputs.isis_version }}
       
@@ -94,7 +90,6 @@ jobs:
           activate-environment: isis-test
           use-mamba: true
           mamba-version: "1.5.3"
-          python-version: ${{ matrix.python }}
 
       - name: Conda install and test spiceinit
         run: |
