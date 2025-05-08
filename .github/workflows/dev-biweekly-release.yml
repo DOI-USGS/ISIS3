@@ -17,9 +17,6 @@ jobs:
           os: [ubuntu-latest, macos-13, macos-14]
     runs-on: ${{ matrix.os }}
 
-    outputs:
-      built_package: ${{ steps.build_release.outputs.built_package }}
-
     steps:
       - name: Skip odd weeks
         run: |
@@ -65,10 +62,6 @@ jobs:
           fi
 
           conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label dev
-
-          BUILT_DIR=$(conda info --base)/conda-bld
-          BUILT_PACKAGE=$(find "$BUILT_DIR" -name "isis-${ISIS_VERSION}-*.conda" | head -n1)
-          echo "built_package=$BUILT_PACKAGE" >> "$GITHUB_OUTPUT"
   
   test:
     runs-on: ${{ matrix.os }}

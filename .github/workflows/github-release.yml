@@ -21,7 +21,6 @@ jobs:
 
     outputs:
       isis_version: ${{ steps.set_version.outputs.isis_version }}
-      built_package: ${{ steps.build_release.outputs.built_package }}
 
     steps:
       - uses: actions/checkout@v4
@@ -64,10 +63,6 @@ jobs:
           else 
             conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label LTS --label main
           fi
-
-          BUILT_DIR=$(conda info --base)/conda-bld
-          BUILT_PACKAGE=$(find "$BUILT_DIR" -name "isis-${ISIS_VERSION}-*.conda" | head -n1)
-          echo "built_package=$BUILT_PACKAGE" >> "$GITHUB_OUTPUT"
 
   
   test:
