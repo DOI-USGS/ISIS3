@@ -48,7 +48,7 @@
       </li>
     </ul>
     <script><![CDATA[
-      fetch('/isis-site/versions.json')
+      fetch('/versions.json')
       .then(response => response.json())
       .then(versions => {
         const largeMenu = document.getElementById('versions-menu-large');
@@ -65,7 +65,7 @@
         smallMenu.appendChild(latestLi.cloneNode(true));
 
         const pathParts = window.location.pathname.split('/');
-        let currentVersion = pathParts[2];
+        let currentVersion = pathParts[1];
         if (currentVersion.endsWith('/')) {
           currentVersion = currentVersion.slice(0, -1);
         }
