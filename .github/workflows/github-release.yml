@@ -21,7 +21,6 @@ jobs:
 
     outputs:
       isis_version: ${{ steps.set_version.outputs.isis_version }}
-      built_package: ${{ steps.build_release.outputs.built_package }}
 
     steps:
       - uses: actions/checkout@v4
@@ -58,18 +57,13 @@ jobs:
           fi
 
           if [[ "$ISIS_VERSION" =~ .*_RC[0-9]$ ]]; then 
-            conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label RC
+            conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label RC
           elif [[ "$ISIS_VERSION" =~ .*_LTS$ ]]; then 
-            conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label LTS
+            conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label LTS
           else 
-            conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label LTS --label main
+            conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label LTS --label main
           fi
 
-          BUILT_DIR=$(conda info --base)/conda-bld
-          BUILT_PACKAGE=$(find "$BUILT_DIR" -name "isis-${ISIS_VERSION}-*.conda" | head -n1)
-          echo "built_package=$BUILT_PACKAGE" >> "$GITHUB_OUTPUT"
-
-  
   test:
     runs-on: ${{ matrix.os }}
     needs: build
@@ -77,11 +71,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-13]
-        include:
-          - os: ubuntu-latest
-            python: "3.10"
-          - os: macos-13
-            python: "3.12"
     env:
       ISIS_VERSION: ${{ needs.build.outputs.isis_version }}
       
@@ -94,7 +83,6 @@ jobs:
           activate-environment: isis-test
           use-mamba: true
           mamba-version: "1.5.3"
-          python-version: ${{ matrix.python }}
 
       - name: Conda install and test spiceinit
         run: |
@@ -111,14 +99,6 @@ jobs:
           export ISISROOT=$CONDA_PREFIX
           conda list isis
           spiceinit -h
-     
-      - name: Cleanup Anaconda package if spiceinit fails
-        if: failure()
-        run: |
-          echo "Cleaning up Anaconda download..."
-          BUILT_PACKAGE=${{ needs.build.outputs.built_package }}
-          echo "Removing package: $BUILT_PACKAGE"
-          anaconda --token ${{ secrets.ANACONDA_TOKEN }} remove usgs-astrogeology/isis/${BUILT_PACKAGE} -y
 
   docs:
     name: Build and Upload ISIS Public Release Docs
