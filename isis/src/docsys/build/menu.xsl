@@ -30,9 +30,6 @@
           <li class="usa-sidenav__item">
             <a href="{$menuPath}Application/alpha.html">By Alphabetical</a>
           </li>
-          <li class="usa-sidenav__item">
-            <a href="{$menuPath}Application/oldvnew.html">Old vs. New</a>
-          </li>
         </ul>
       </li>
       <li class="usa-sidenav__item">
@@ -107,9 +104,6 @@
               </li>
               <li class="usa-sidenav__item">
                 <a href="{$menuPath}Application/alpha.html">By Alphabetical</a>
-              </li>
-              <li class="usa-sidenav__item">
-                <a href="{$menuPath}Application/oldvnew.html">Old vs. New</a>
               </li>
             </ul>
           </div>
