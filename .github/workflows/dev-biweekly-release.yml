@@ -7,6 +7,8 @@ env:
 on:
   schedule:
     - cron: '0 5 * * 6'  # 10:00 PM MST Friday (UTC: Saturday 5:00 AM)
+  workflow_dispatch:     # Option to manually run pipeline in Actions
+  
 jobs:
   build:
     strategy:
@@ -59,17 +61,7 @@ jobs:
             sed -i "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
           fi
 
-          conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label dev
-
-          BUILT_DIR=$(conda info --base)/conda-bld
-          BUILT_PACKAGE=$(find "$BUILT_DIR" -name "isis-${ISIS_VERSION}-*.conda" | head -n1)
-          echo "$BUILT_PACKAGE" > built_package.txt
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: built-package-${{ matrix.os }}
-          path: built_package.txt
+          conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label dev
   
   test:
     runs-on: ${{ matrix.os }}
@@ -78,11 +70,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-13]
-        include:
-          - os: ubuntu-latest
-            python: "3.10"
-          - os: macos-13
-            python: "3.12"
       
     steps:
       - name: Set up Miniforge
@@ -93,7 +80,6 @@ jobs:
           activate-environment: isis-test
           use-mamba: true
           mamba-version: "1.5.3"
-          python-version: ${{ matrix.python-version }}
 
       - name: Conda install and test spiceinit
         run: |
@@ -107,14 +93,6 @@ jobs:
           export ISISROOT=$CONDA_PREFIX
           conda list isis
           spiceinit -h
-     
-      - name: Cleanup Anaconda package if spiceinit fails
-        if: failure()
-        run: |
-          echo "Cleaning up Anaconda download..."
-          BUILT_PACKAGE=${{ needs.build.outputs.built_package }}
-          echo "Removing package: $BUILT_PACKAGE"
-          anaconda --token ${{ secrets.ANACONDA_TOKEN }} remove usgs-astrogeology/isis/${BUILT_PACKAGE} -y
 
   docs:
     name: Build and Upload ISIS Dev Docs
@@ -123,6 +101,8 @@ jobs:
     if: ${{ success() }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Set up Conda for doc build
         uses: conda-incubator/setup-miniconda@v3
@@ -143,7 +123,7 @@ jobs:
           ninja docs
 
       - name: Set AWS credentials for upload
-        uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -151,6 +131,6 @@ jobs:
       
       - name: Upload to S3
         run: |
-          cd docs && cd "$(find . -maxdepth 1 -type d ! -name .)"
+          cd /home/runner/work/ISIS3/ISIS3/build/docs && cd "$(find . -maxdepth 1 -type d ! -name .)"
           echo "Uploading documentation to S3..."
           aws s3 sync ./ s3://asc-public-docs/isis-site/dev/ --delete
