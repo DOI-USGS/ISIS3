@@ -4,7 +4,7 @@
 #============================================================================
 
 # Minimum version 3.5 required to avoid cmake warnings
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15)
 list(APPEND CMAKE_MODULE_PATH "${CODE_ROOT}/cmake")
 list(APPEND CMAKE_PREFIX_PATH "${CODE_ROOT}/cmake")
 include(Utilities)
