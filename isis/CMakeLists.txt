@@ -73,8 +73,9 @@ option(buildCore       "Build the core ISIS modules"                    ON  )
 option(buildMissions   "Build the mission specific modules"             ON  )
 option(buildStaticCore "Build libisis static as well as dynamic"        OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
+option(buildDocs       "Build the docs."                                ON  )
 option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
-option(pybindings      "Turn on to build Python bindings"               ON )
+option(pybindings      "Turn on to build Python bindings"               ON  )
 
 # if cmake install prefix is not set, and conda env is activated, use the
 # conda env as the install directory.
@@ -91,6 +92,12 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
   message(STATUS "Support for JPEG2000 is not available on Mac Arm.")
   set(JP2KFLAG OFF)
+endif()
+
+# No docs support on Mac Arm. The xalan-c Arm package is not available on conda-forge.
+if (CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+  message(STATUS "Building documentation is not available on Mac Arm.")
+  set(buildDocs OFF)
 endif()
 
 # Prioritize passed in variables over env vars, probably a better way to do this
@@ -132,6 +139,7 @@ add_definitions( -DISISBUILDDIR="${CMAKE_BINARY_DIR}" )
 message("CONFIGURATION")
 message("\tBUILD STATIC CORE: ${buildStaticCore}")
 message("\tBUILD TESTS: ${buildTests}")
+message("\tBUILD DOCS: ${buildDocs}")
 message("\tBUILD CORE: ${buildCore}")
 message("\tBUILD MISSIONS: ${buildMissions}")
 message("\tJP2K SUPPORT: ${JP2KFLAG}")
@@ -214,7 +222,10 @@ else()
 endif()
 
 # Paths to required executables
-find_program(XALAN Xalan REQUIRED)
+if (buildDocs)
+  find_program(XALAN Xalan REQUIRED)
+endif()
+
 find_program(LATEX latex)
 find_program(DOXYGEN NAME doxygen PATH_SUFFIXES doxygen REQUIRED)
 find_program(UIC uic REQUIRED)
@@ -479,13 +490,15 @@ endif()
 # Set up documentation build target.
 # - This script is called by running "ninja docs".
 # - This long call passes all desired variables to the script.
-add_custom_target(docs COMMAND ${CMAKE_COMMAND}
-                  -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
-                  -DDOXYGEN=${DOXYGEN}  -DXALAN=${XALAN}
-                  -DLATEX=${LATEX}
-                  -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                  -DPACKAGE_VERSION=${PACKAGE_VERSION}
-                  -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
+if (buildDocs)
+  add_custom_target(docs COMMAND ${CMAKE_COMMAND}
+                    -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
+                    -DDOXYGEN=${DOXYGEN}  -DXALAN=${XALAN}
+                    -DLATEX=${LATEX}
+                    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+                    -DPACKAGE_VERSION=${PACKAGE_VERSION}
+                    -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
+endif()
 
 # Add custom build target to copy modified header files to the build/incs directory.
 # ALL is specified so that the target is added to the default build target, i.e. the copy command
