@@ -73,7 +73,7 @@ option(buildCore       "Build the core ISIS modules"                    ON  )
 option(buildMissions   "Build the mission specific modules"             ON  )
 option(buildStaticCore "Build libisis static as well as dynamic"        OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
-option(buildDocs       "Build the docs."                                ON  )
+option(buildDocs       "Build the docs."                                OFF )
 option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
 option(pybindings      "Turn on to build Python bindings"               ON  )
 
