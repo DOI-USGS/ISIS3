@@ -92,6 +92,14 @@ namespace Isis {
         QString msg = "Unable to find instrument group in [" + file.name() + "]";
         throw IException(e, IException::User, msg, _FILEINFO_); 
       }
+
+      if (instGroup.findKeyword("SpacecraftName") != "Europa Clipper" &&
+          !instGroup.findKeyword("InstrumentId").contains("EIS")) {
+        QString msg = "Cube " + file.name() + " is not a Clipper EIS image. Either update the "
+                      "image or remove it so the other images can be stitched."
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
       if (detectorOffset == -1) {
         detectorOffset = instGroup.findKeyword("DetectorOffset");
       }
@@ -99,7 +107,7 @@ namespace Isis {
         if (detectorOffset != toInt(instGroup.findKeyword("DetectorOffset"))) {
           QString msg = "DetectorOffset [" + instGroup.findKeyword("DetectorOffset")[0] + "] from image [" + file.name() + "] does "
                         "not match recorded detector offset " + toString(detectorOffset);
-          throw IException(IException::User, msg, _FILEINFO_); 
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
 
