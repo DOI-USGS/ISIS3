@@ -93,10 +93,10 @@ namespace Isis {
         throw IException(e, IException::User, msg, _FILEINFO_); 
       }
 
-      if (instGroup.findKeyword("SpacecraftName") != "Europa Clipper" &&
-          !instGroup.findKeyword("InstrumentId").contains("EIS")) {
+      if (instGroup.findKeyword("SpacecraftName")[0] != "Europa Clipper" &&
+          !instGroup.findKeyword("InstrumentId")[0].contains("EIS")) {
         QString msg = "Cube " + file.name() + " is not a Clipper EIS image. Either update the "
-                      "image or remove it so the other images can be stitched."
+                      "image or remove it so the other images can be stitched.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
