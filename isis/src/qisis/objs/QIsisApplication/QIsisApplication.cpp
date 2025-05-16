@@ -8,6 +8,8 @@
 #include <QMessageBox>
 #include <QUrl>
 
+#include <gdal_priv.h>
+
 #include "FileName.h"
 #include "Preference.h"
 #include "IException.h"
@@ -29,6 +31,16 @@ namespace Isis {
     QApplication(argc, argv) {
     // try to use US locale for numbers so we don't end up printing "," instead
     //   of "." where it might count.
+
+    // Setup gdal drivers and error handler
+    try {
+      GDALAllRegister();
+      CPLSetErrorHandler(CPLQuietErrorHandler);
+    }
+    catch(std::exception &e) {
+      QString msg = "Failed to load GDAL Drivers, with error [" + QString(e.what()) + "]";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
 
     for (int i = 1; i < argc; i++) {
         QString arg(argv[i]);

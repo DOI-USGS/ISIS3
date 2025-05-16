@@ -19,7 +19,6 @@ using namespace std;
 namespace Isis {
   GdalIoHandler::GdalIoHandler(QString &dataFilePath, const QList<int> *virtualBandList, GDALDataType pixelType, GDALAccess eAccess) : 
                  ImageIoHandler(virtualBandList) {
-    GDALAllRegister();
     m_geodataSetPath = dataFilePath.toUtf8().constData();
     m_geodataSet = GDALDataset::FromHandle(GDALOpen(m_geodataSetPath.c_str(), eAccess));
     m_datasetOwner = true;

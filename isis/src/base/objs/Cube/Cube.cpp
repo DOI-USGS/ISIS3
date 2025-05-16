@@ -48,8 +48,6 @@ using namespace std;
 namespace Isis {
   //! Constructs a Cube object.
   Cube::Cube() {
-    GDALAllRegister();
-    CPLSetErrorHandler(CPLQuietErrorHandler);
     construct();
   }
 
@@ -62,8 +60,6 @@ namespace Isis {
    *     "r" or read-write "rw".
    */
   Cube::Cube(const FileName &fileName, QString access) {
-    GDALAllRegister();
-    CPLSetErrorHandler(CPLQuietErrorHandler);
     construct();
     open(fileName.toString(), access);
   }
@@ -78,8 +74,6 @@ namespace Isis {
    *     "r" or read-write "rw".
    */
   void Cube::fromLabel(const FileName &fileName, Pvl &label, QString access) {
-    GDALAllRegister();
-    CPLSetErrorHandler(CPLQuietErrorHandler);
     initCoreFromLabel(label);
     create(fileName.expanded());
 
@@ -103,8 +97,6 @@ namespace Isis {
    *     "r" or read-write "rw".
    */
   void Cube::fromIsd(const FileName &fileName, Pvl &label, nlohmann::json &isd, QString access) {
-    GDALAllRegister();
-    CPLSetErrorHandler(CPLQuietErrorHandler);
     fromLabel(fileName, label, access);
 
     PvlGroup &instGrp = label.findGroup("Instrument", Pvl::Traverse);
@@ -670,8 +662,6 @@ namespace Isis {
   }
 
   void Cube::createGdal(QString &dataFileName, QString &driverName, char **papszOptions) {
-    GDALAllRegister();
-    CPLSetErrorHandler(CPLQuietErrorHandler);
     GDALDriver* driver = GetGDALDriverManager()->GetDriverByName(driverName.toStdString().c_str());
     if (driver) {
       double noDataValue;

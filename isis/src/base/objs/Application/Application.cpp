@@ -25,6 +25,8 @@ extern int errno;
 #include <QString>
 #include <QTime>
 
+#include "gdal_priv.h"
+
 #include "Application.h"
 #include "FileName.h"
 #include "IException.h"
@@ -90,6 +92,16 @@ namespace Isis {
     p_startDirectIO = DirectIO();
     p_startPageFaults = PageFaults();
     p_startProcessSwaps = ProcessSwaps();
+
+    // Setup gdal drivers and error handler
+    try {
+      GDALAllRegister();
+      CPLSetErrorHandler(CPLQuietErrorHandler);
+    }
+    catch(exception &e) {
+      QString msg = "Failed to load GDAL Drivers, with error [" + QString(e.what()) + "]";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
 
     // Create user interface and log
     try {
