@@ -18,6 +18,7 @@ find files of those names at the top level of this repository. **/
 #include "IException.h"
 #include "Instrument.hh"
 #include "iTime.h"
+#include "Preference.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "NaifStatus.h"
@@ -157,8 +158,9 @@ namespace Isis {
         jdata.obsStartTime = cam->time().Et();
       } catch (IException &e) {
         try {
+          bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
           QString scStartTimeString = jdata.scStartTime;
-          auto [output, kernels] = SpiceQL::strSclkToEt(-74999, scStartTimeString.toLatin1().data(), "hirise");
+          auto [output, kernels] = SpiceQL::strSclkToEt(-74999, scStartTimeString.toLatin1().data(), "hirise", useWeb);
           jdata.obsStartTime = output; 
         } catch (IException &e) {
             QString message = "Start time of the image can not be determined.";

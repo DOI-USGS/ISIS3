@@ -18,6 +18,7 @@ find files of those names at the top level of this repository. **/
 #include "UserInterface.h"
 #include "Camera.h"
 #include "NaifStatus.h"
+#include "Preference.h"
 
 #include "ctxcal.h"
 
@@ -170,8 +171,10 @@ namespace Isis {
           NaifStatus::CheckErrors();
           double sunpos[6];
 
+          bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+
           std::vector<double> etStartVec = {etStart};
-          auto [sunLt, kernels] = SpiceQL::getTargetStates(etStartVec, "mars", "sun", "iau_mars", "LT+S", "mro", {"reconstructed"}, {"reconstructed"});
+          auto [sunLt, kernels] = SpiceQL::getTargetStates(etStartVec, "mars", "sun", "iau_mars", "LT+S", "mro", {"reconstructed"}, {"reconstructed"}, useWeb);
           std::copy(sunLt[0].begin(), sunLt[0].begin()+6, sunpos);
 
           dist1 = vnorm_c(sunpos);

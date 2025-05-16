@@ -19,6 +19,7 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
+#include "Preference.h"
 #include "spiceql.h"
 #include "Spice.h"
 
@@ -76,21 +77,23 @@ namespace Isis {
         NaifStatus::CheckErrors();
         sunDist = 1.0;
         
+        bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+
         //  Determine if the target is a valid NAIF target
         try{
-          SpiceQL::translateNameToCode(target.toLatin1().data(), "mdis");
+          SpiceQL::translateNameToCode(target.toLatin1().data(), "mdis", useWeb);
         }catch(std::invalid_argument){
           return false;
         }
 
         
         //  Convert starttime to et
-        auto [obsStartTime, k1] = SpiceQL::strSclkToEt(-236, scStartTime.toLatin1().data(), "mdis");
+        auto [obsStartTime, k1] = SpiceQL::strSclkToEt(-236, scStartTime.toLatin1().data(), "mdis", useWeb);
         
         //  Get the vector from target to sun and determine its length
         double sunv[3];
         std::vector<double> etStart = {obsStartTime};
-        auto [sunLt, k2] = SpiceQL::getTargetStates(etStart, target.toLatin1().data(), "sun", "J2000", "LT+S", "mdis", {"reconstructed"}, {"reconstructed"});
+        auto [sunLt, k2] = SpiceQL::getTargetStates(etStart, target.toLatin1().data(), "sun", "J2000", "LT+S", "mdis", {"reconstructed"}, {"reconstructed"}, useWeb);
         std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunv);
 
         double sunkm = vnorm_c(sunv);
@@ -372,8 +375,10 @@ namespace Isis {
         // Ensure NAIF kernels are loaded for NAIF time computations
         NaifStatus::CheckErrors();
 
+        bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+
         //  Convert s/c clock start time to et
-        tie(obsStartTime, kernels) = SpiceQL::strSclkToEt(-236, scStartTime.toLatin1().data(), "mdis");
+        tie(obsStartTime, kernels) = SpiceQL::strSclkToEt(-236, scStartTime.toLatin1().data(), "mdis", useWeb);
       } 
       catch (IException &e) {
         QString message = "Could not convert spacecraft clock start count to ET.";

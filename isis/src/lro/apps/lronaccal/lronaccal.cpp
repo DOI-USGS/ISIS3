@@ -319,9 +319,11 @@ namespace Isis {
         catch(IException &e) {
           // Failed to instantiate a camera, try furnishing kernels directly
           try {
+            bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+            
             std::vector<double> etStart = {startTime.Et()};
             double sunpos[6];
-            auto [sunLt, kernels] = SpiceQL::getTargetStates(etStart, "sun", "MOON", "MOON_ME", "LT+S", "lroc", {"reconstructed"}, {"reconstructed"});
+            auto [sunLt, kernels] = SpiceQL::getTargetStates(etStart, "sun", "MOON", "MOON_ME", "LT+S", "lroc", {"reconstructed"}, {"reconstructed"}, useWeb);
             std::copy(sunLt[0].begin(), sunLt[0].begin()+6, sunpos);
             g_solarDistance = vnorm_c(sunpos) / KM_PER_AU;
           }

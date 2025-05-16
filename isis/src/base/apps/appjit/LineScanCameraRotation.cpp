@@ -14,6 +14,7 @@
 #include "LeastSquares.h"
 #include "BasisFunction.h"
 #include "PolynomialUnivariate.h"
+#include "Preference.h"
 #include "IString.h"
 #include "iTime.h"
 #include "IException.h"
@@ -122,7 +123,8 @@ namespace Isis {
 
     std::vector<ale::Rotation> rotationCache;
 
-    auto [sunLt, kernels] = SpiceQL::getTargetStates(p_cacheTime, "MRO", "mars", "IAU_MARS", "NONE", "mro", {"reconstructed"}, {"reconstructed"});
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+    auto [sunLt, kernels] = SpiceQL::getTargetStates(p_cacheTime, "MRO", "mars", "IAU_MARS", "NONE", "mro", {"reconstructed"}, {"reconstructed"}, useWeb);
 
     double state[6];
     for(std::vector<double>::iterator i = p_cacheTime.begin(); i < p_cacheTime.end(); i++) {

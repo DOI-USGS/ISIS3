@@ -383,13 +383,15 @@ namespace Isis {
         lastEt = firstEt + (g_expectedLineRate / 2.0);
       }
 
+      bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+
       inst.findKeyword("StartTime").setValue(firstEt.UTC());
-      auto [startClockString, kernels] = SpiceQL::doubleEtToSclk(sclkCode, firstEt.Et(), "chandrayaan1");
+      auto [startClockString, kernels] = SpiceQL::doubleEtToSclk(sclkCode, firstEt.Et(), "chandrayaan1", useWeb);
       QString startClock = QString::fromStdString(startClockString);
       inst.findKeyword("SpacecraftClockStartCount").setValue(startClock);
 
       inst.findKeyword("StopTime").setValue(lastEt.UTC());
-      auto [stopClockString, kernels2]= SpiceQL::doubleEtToSclk(sclkCode, lastEt.Et(), "chandrayaan1");
+      auto [stopClockString, kernels2]= SpiceQL::doubleEtToSclk(sclkCode, lastEt.Et(), "chandrayaan1", useWeb);
       QString stopClock = QString::fromStdString(stopClockString);
       inst.findKeyword("SpacecraftClockStopCount").setValue(stopClock);
     }

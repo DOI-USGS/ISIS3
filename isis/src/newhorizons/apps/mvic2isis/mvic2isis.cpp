@@ -247,9 +247,10 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     QString scTime = inst["SpacecraftClockStartCount"];
-    auto [et, k1] = SpiceQL::strSclkToEt(sclkCode, scTime.toLatin1().data(), "mvic");
-    auto [utc, k2] = SpiceQL::etToUtc(et, "ISOC", 3);
+    auto [et, k1] = SpiceQL::strSclkToEt(sclkCode, scTime.toLatin1().data(), "mvic", useWeb);
+    auto [utc, k2] = SpiceQL::etToUtc(et, "ISOC", 3, useWeb);
     inst.addKeyword(PvlKeyword("StartTime", QString::fromStdString(utc)));
 
     // Create a Band Bin group

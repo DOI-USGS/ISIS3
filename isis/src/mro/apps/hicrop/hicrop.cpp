@@ -117,9 +117,11 @@ namespace Isis {
       double unbinnedRate = (74.0 + (deltaLineTimerCount / 16.0)) / 1000000.0;
       double lineRate = unbinnedRate * binMode;
 
+      bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+
       // get the actual original start time by making adjustments to the
       // spacecraft clock start count in the labels
-      auto [timeFromLabelClockCount, kernels] = SpiceQL::strSclkToEt(-74999, labelStartClockCount.toLatin1().data(), "hirise");
+      auto [timeFromLabelClockCount, kernels] = SpiceQL::strSclkToEt(-74999, labelStartClockCount.toLatin1().data(), "hirise", useWeb);
       
       iTime originalStart = actualTime(timeFromLabelClockCount, tdiMode,
                                        unbinnedRate, binMode);
@@ -249,18 +251,18 @@ namespace Isis {
                         ckCoverage.first, ckCoverage.second);
 
       // HiRise spacecraft clock format is P/SSSSSSSSSS:FFFFF
-      SpiceQL::doubleEtToSclk(-74999, cropStartTime.Et(), "hirise");
-      SpiceQL::doubleEtToSclk(-74999, cropStopTime.Et(), "hirise");
+      SpiceQL::doubleEtToSclk(-74999, cropStartTime.Et(), "hirise", useWeb);
+      SpiceQL::doubleEtToSclk(-74999, cropStopTime.Et(), "hirise", useWeb);
 
 
       // readjust the time to get the appropriate label value for the
       // spacecraft clock start count for the labels of the cropped cube
       iTime adjustedCropStartTime = labelClockCountTime(cropStartTime, tdiMode,
                                                         unbinnedRate, binMode);
-      QString adjustedCropStartClockCount = QString::fromStdString(SpiceQL::doubleEtToSclk(-74999, adjustedCropStartTime.Et(), "hirise").first);
+      QString adjustedCropStartClockCount = QString::fromStdString(SpiceQL::doubleEtToSclk(-74999, adjustedCropStartTime.Et(), "hirise", useWeb).first);
       iTime adjustedCropStopTime = labelClockCountTime(cropStopTime, tdiMode,
                                                        unbinnedRate, binMode);
-      QString adjustedCropStopClockCount = QString::fromStdString(SpiceQL::doubleEtToSclk(-74999, adjustedCropStopTime.Et(), "hirise").first);
+      QString adjustedCropStopClockCount = QString::fromStdString(SpiceQL::doubleEtToSclk(-74999, adjustedCropStopTime.Et(), "hirise", useWeb).first);
 
 
 

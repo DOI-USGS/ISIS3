@@ -22,6 +22,7 @@ find files of those names at the top level of this repository. **/
 #include "LineManager.h"
 #include "NaifStatus.h"
 #include "IString.h"
+#include "Preference.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "spiceql.h"
@@ -60,23 +61,24 @@ static bool sunDistanceAU(Cube *iCube,
   }
   catch(IException &e) {
     sunDist = 1.0;
-
+    
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
     //  Determine if the target is a valid NAIF target
     try {
-      SpiceQL::translateNameToCode(target.toLatin1().data(), "amica");
+      SpiceQL::translateNameToCode(target.toLatin1().data(), "amica", useWeb);
     } catch(invalid_argument) {
       return false;
     }
 
     //  Convert starttime to et
     try{
-     auto [obsStartTime, kernels] = SpiceQL::strSclkToEt(-130, scStartTime.toLatin1().data(), "amica");
+     auto [obsStartTime, kernels] = SpiceQL::strSclkToEt(-130, scStartTime.toLatin1().data(), "amica", useWeb);
 
       //  Get the vector from target to sun and determine its length
       double sunv[3];
 
       std::vector<double> etStart = {obsStartTime};
-      auto [sunLt, kernels2] = SpiceQL::getTargetStates(etStart, target.toLatin1().data(), "sun", "J2000", "LT+S", "amica", {"reconstructed"}, {"reconstructed"});
+      auto [sunLt, kernels2] = SpiceQL::getTargetStates(etStart, target.toLatin1().data(), "sun", "J2000", "LT+S", "amica", {"reconstructed"}, {"reconstructed"}, useWeb);
       std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunv);
 
       NaifStatus::CheckErrors();

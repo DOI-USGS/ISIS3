@@ -23,6 +23,7 @@ find files of those names at the top level of this repository. **/
 #include "spiceql.h"
 #include "TextFile.h"
 #include "AlphaCube.h"
+#include "Preference.h"
 
 using namespace std;
 namespace Isis {
@@ -226,7 +227,9 @@ namespace Isis {
     // Initialize the maps from sample coordinate to detector coordinates
     InitDetectorMaps();
 
-    auto [output, kernels] = SpiceQL::strSclkToEt(-94, p_clockCount.toLatin1().data(), "mgs");
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+
+    auto [output, kernels] = SpiceQL::strSclkToEt(-94, p_clockCount.toLatin1().data(), "mgs", useWeb);
     p_etStart = output; 
     p_etEnd = EphemerisTime((double)p_nl);
 
@@ -459,7 +462,9 @@ namespace Isis {
       sclk = currentSclk;
       sclk.Remove("\"");
       sclk.Trim(" ");
-      auto [et, kernels] = SpiceQL::strSclkToEt(-94, currentSclk, "mgs");
+
+      bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+      auto [et, kernels] = SpiceQL::strSclkToEt(-94, currentSclk, "mgs", useWeb);
 
       //Compare time against given parameters, if it fits, process
       if(et < p_etEnd && et > p_etStart) {
@@ -486,7 +491,7 @@ namespace Isis {
           sclk = currentSclk;
           sclk.Trim(" ");
           
-          tie(et, kernels) = SpiceQL::strSclkToEt(-94, currentSclk, "mgs");
+          tie(et, kernels) = SpiceQL::strSclkToEt(-94, currentSclk, "mgs", useWeb);
           scs2e_c(-94, currentSclk.c_str(), &et);
 
           bottom = linenum;
@@ -509,7 +514,7 @@ namespace Isis {
           }
           sclk = currentSclk;
           sclk.Trim(" ");
-          tie(et, kernels) = SpiceQL::strSclkToEt(-94, currentSclk, "mgs");
+          tie(et, kernels) = SpiceQL::strSclkToEt(-94, currentSclk, "mgs", useWeb);
           top = linenum;
         }
         //Now, go from the upper limit to the lower limit, and grab all lines
@@ -537,7 +542,7 @@ namespace Isis {
           sclk.Remove("\"");
           sclk.Trim(" ");
 
-          tie(et, kernels) = SpiceQL::strSclkToEt(-94, currentSclk, "mgs");
+          tie(et, kernels) = SpiceQL::strSclkToEt(-94, currentSclk, "mgs", useWeb);
 
           // Get the gain mode id
           gainId = line.Token(",").ToQt().remove("\"").trimmed();

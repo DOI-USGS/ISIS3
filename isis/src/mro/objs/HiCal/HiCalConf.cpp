@@ -23,6 +23,7 @@ find files of those names at the top level of this repository. **/
 #include "HiCalUtil.h"
 #include "IString.h"
 #include "IException.h"
+#include "Preference.h"
 #include "Pvl.h"
 #include "spiceql.h"
 #include "SpecialPixel.h"
@@ -310,7 +311,8 @@ bool HiCalConf::_naifLoaded = false;
       try {
         QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
         NaifStatus::CheckErrors();
-        double obsStartTime = SpiceQL::strSclkToEt(-74999, scStartTime.toLatin1().data(), "hirise").first;
+        bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+        double obsStartTime = SpiceQL::strSclkToEt(-74999, scStartTime.toLatin1().data(), "hirise", useWeb).first;
 
         QString targetName = getKey("TargetName", "Instrument");
         if (targetName.toLower() == "sky" ||
@@ -322,7 +324,7 @@ bool HiCalConf::_naifLoaded = false;
         double sunv[3];
 
         std::vector<double> etStart = {obsStartTime};
-        vector<vector<double>> sunLt = SpiceQL::getTargetStates(etStart, targetName.toLatin1().data(), "sun", "J2000", "LT+S", "hirise", {"reconstructed"}, {"reconstructed"}).first;
+        vector<vector<double>> sunLt = SpiceQL::getTargetStates(etStart, targetName.toLatin1().data(), "sun", "J2000", "LT+S", "hirise", {"reconstructed"}, {"reconstructed"}, useWeb).first;
         std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunv);
 
         sunkm = vnorm_c(sunv);

@@ -95,11 +95,12 @@ void IsisMain() {
   iTime startTime = gbl::mi->StartTime();
   //Get the distance between Mars and the Sun at the given time in
   // Astronomical Units (AU)
+  bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
 
   double sunpos[6];
   std::vector<double> etStart = {startTime.Et()};
   vector<string> kernel_list = {"/lro/tspk/de421.bsp", "/mars/tspk/mar[0-9]{3}", "/base/pck/pck[0-9]{5}"}; 
-  auto [sunLt, kernels] = SpiceQL::getTargetStates(etStart, "mars", "sun", "iau_mars", "LT+S", "mer1", {"reconstructed"}, {"reconstructed"}, false, true, kernel_list);
+  auto [sunLt, kernels] = SpiceQL::getTargetStates(etStart, "mars", "sun", "iau_mars", "LT+S", "mer1", {"reconstructed"}, {"reconstructed"}, useWeb, true, kernel_list);
   std::copy(sunLt[0].begin(), sunLt[0].begin()+6, sunpos);
 
   double dist = vnorm_c(sunpos);

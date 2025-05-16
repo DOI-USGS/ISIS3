@@ -671,7 +671,8 @@ QString loadCalibrationVariables(const QString &config, Cube *iCube)  {
   }
   catch(IException &e) {
     try{
-      auto [output, kernels]  = SpiceQL::strSclkToEt(g_hayabusaNaifCode, g_startTime.toLatin1().data(), "amica");
+      bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+      auto [output, kernels]  = SpiceQL::strSclkToEt(g_hayabusaNaifCode, g_startTime.toLatin1().data(), "amica", useWeb);
       obsStartTime = output;
     }
     catch (IException &e) {

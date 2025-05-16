@@ -403,9 +403,10 @@ void IsisMain ()
     // Fix the StartTime and SpacecraftStartClockCount in the ISIS label
     PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
 
+    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
 
-    auto [etStart, k1] = SpiceQL::strSclkToEt(-226, startScet.toLatin1().data(), "virtis");
-    auto [etEnd, k2]  = SpiceQL::strSclkToEt(-226, stopScet.toLatin1().data(), "virtis");
+    auto [etStart, k1] = SpiceQL::strSclkToEt(-226, startScet.toLatin1().data(), "virtis", useWeb);
+    auto [etEnd, k2]  = SpiceQL::strSclkToEt(-226, stopScet.toLatin1().data(), "virtis", useWeb);
 
     scs2e_c( (SpiceInt) -226, startScet.toLatin1().data(), &etStart);
     scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
@@ -417,8 +418,8 @@ void IsisMain ()
     QString stopTime = iTime(etEnd-exposureTime).UTC();
 
 
-    auto [startSclkString, k3] = SpiceQL::doubleEtToSclk( -226, etStart-exposureTime, "virtis");
-    auto [endSclkString, k4] = SpiceQL::doubleEtToSclk( -226, etEnd-exposureTime, "virtis");
+    auto [startSclkString, k3] = SpiceQL::doubleEtToSclk( -226, etStart-exposureTime, "virtis", useWeb);
+    auto [endSclkString, k4] = SpiceQL::doubleEtToSclk( -226, etEnd-exposureTime, "virtis", useWeb);
 
     inst.findKeyword("StartTime").setValue(startTime);
     inst.findKeyword("StopTime").setValue(stopTime);

@@ -361,14 +361,16 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   // The purpose of the next two steps, getting the spacecraft clock count,
   // are simply to get the partition, the very first number 1/...
 
-  auto [approxEphemeris, kernels] = SpiceQL::utcToEt(inst["StartTime"][0].toLatin1().data());
+  bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+
+  auto [approxEphemeris, kernels] = SpiceQL::utcToEt(inst["StartTime"][0].toLatin1().data(), useWeb);
 
   // sce2s_c requires the spacecraft number, not the instrument number as
   // we've found elsewhere, either -31 or -32 in this case.
   int spacecraftClockNumber = -30;
   spacecraftClockNumber -= toInt(spacecraftNumber);
   std::string confId = "voyager" + spacecraftNumber.toStdString();
-  string approxSpacecraftClock = SpiceQL::doubleEtToSclk(spacecraftClockNumber, approxEphemeris, confId).first;
+  string approxSpacecraftClock = SpiceQL::doubleEtToSclk(spacecraftClockNumber, approxEphemeris, confId, useWeb).first;
 
   /*
    * For our next trick, we will substitute the image number we got earlier
@@ -394,10 +396,10 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   newClockCount.append(":");
   newClockCount.append(imgNumber.mid(5, 2));
 
-  approxEphemeris = SpiceQL::strSclkToEt(spacecraftClockNumber, newClockCount.toStdString(), confId).first;
+  approxEphemeris = SpiceQL::strSclkToEt(spacecraftClockNumber, newClockCount.toStdString(), confId, useWeb).first;
 
   //* 4 *//
-  std::string utcOut = SpiceQL::etToUtc(approxEphemeris, "ISOC", 3).first;
+  std::string utcOut = SpiceQL::etToUtc(approxEphemeris, "ISOC", 3, useWeb).first;
   NaifStatus::CheckErrors();
   inst["StartTime"].setValue(QString::fromStdString(utcOut));
 

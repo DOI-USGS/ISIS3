@@ -22,6 +22,7 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 #include "iTime.h"
 #include "LeastSquares.h"
+#include "Preference.h"
 #include "Pvl.h"
 #include "spiceql.h"
 #include "TextFile.h"
@@ -385,11 +386,12 @@ namespace Isis {
       // Failed to instantiate a camera, try furnishing kernels directly
       try {
         NaifStatus::CheckErrors();
+        bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
         double sunv[3];
-        double et  = SpiceQL::utcToEt(t.toLatin1().data()).first;
+        double et  = SpiceQL::utcToEt(t.toLatin1().data(), useWeb).first;
 
         std::vector<double> etStart = {et};
-        vector<std::vector<double>> sunLt  = SpiceQL::getTargetStates(etStart, "sun", "mars", "J2000", "LT+S", "viking2", {"reconstructed"}, {"reconstructed"}).first;
+        vector<std::vector<double>> sunLt  = SpiceQL::getTargetStates(etStart, "sun", "mars", "J2000", "LT+S", "viking2", {"reconstructed"}, {"reconstructed"}, useWeb).first;
         std::copy(sunLt[0].begin(), sunLt[0].begin()+3, sunv);
 
         return sqrt(sunv[0] * sunv[0] + sunv[1] * sunv[1] + sunv[2] * sunv[2]);

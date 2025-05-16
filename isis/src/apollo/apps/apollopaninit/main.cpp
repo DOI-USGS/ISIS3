@@ -32,6 +32,7 @@ find files of those names at the top level of this repository. **/
 #include "IString.h"
 #include "iTime.h"
 #include "JP2Decoder.h"
+#include "Preference.h"
 #include "ProcessImport.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -240,16 +241,17 @@ void IsisMain() {
 
 
   //////////////////////////////////////////attach a target rotation table
+  bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
   std::string frameName;
    SpiceInt frameCode = 0;
    try {
-     auto [output, kernels] = SpiceQL::getTargetFrameInfo(301, mission.toLower().toStdString());
+     auto [output, kernels] = SpiceQL::getTargetFrameInfo(301, mission.toLower().toStdString(), useWeb);
      cout << output << endl;
      frameCode = output["frameCode"].get<SpiceInt>();
      frameName = output["frameName"].get<std::string>();
    } catch(std::invalid_argument) {
      std::string naifTarget = "IAU_MOON";
-     auto [frameCode, kernels] = SpiceQL::translateNameToCode(naifTarget, mission.toLower().toStdString());
+     auto [frameCode, kernels] = SpiceQL::translateNameToCode(naifTarget, mission.toLower().toStdString(), useWeb);
      if(frameCode == 0) {
        QString msg = "Can not find NAIF code for [" + QString::fromStdString(naifTarget) + "]";
        throw IException(IException::Io, msg, _FILEINFO_);
