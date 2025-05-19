@@ -67,7 +67,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed findFeaturesSegment.py errors from issues [#5725](https://github.com/DOI-USGS/ISIS3/issues/5725) and [#5702](https://github.com/DOI-USGS/ISIS3/issues/5702)
 - Fixed jigsaw save/apply bug by adding back missing metadata to Instrument Position/Pointing tables [#5701](https://github.com/DOI-USGS/ISIS3/issues/5701)
 - Fixed `StripPolygonSeeder` and `GridPolygonSeeder` memory leaks [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
-- Fixed `pointreg` helper function to display deffile to application log [#5806](https://github.com/DOI-USGS/ISIS3/issues/5806)
+- Fixed `pointreg` helper function to display deffile to application log [#5806](https://github.com/DOI-USGS/ISIS3/pull/5806)
 
 ## [9.0.0] - 09-25-2024
 
