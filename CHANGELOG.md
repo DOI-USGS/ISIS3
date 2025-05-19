@@ -81,6 +81,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed CSM State String blob not being propagated between input and output cubes [#5847](https://github.com/DOI-USGS/ISIS3/pull/5847)
 - Fixed campt reporting when `ALLOWERROR` is set to true [#5845](https://github.com/DOI-USGS/ISIS3/pull/5845)
 - Fixed order of observer and target in spiceql call in `ctxcal`. [#5823](https://github.com/DOI-USGS/ISIS3/pull/5823)
+- Fixed bundle serialization on MacOS for IPCE [#5808](https://github.com/DOI-USGS/ISIS3/pull/5808)
 
 ## [9.0.0] - 09-25-2024
 
