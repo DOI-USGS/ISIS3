@@ -432,12 +432,27 @@ namespace Isis {
     while (xmlReader->readNextStartElement()) {
       if (xmlReader->qualifiedName() == "cumulativeProbabilityCalculator") {
         m_cumPro = NULL;
-        m_cumPro =  new StatCumProbDistDynCalc(xmlReader);
+        xmlReader->readNextStartElement();
+        if (xmlReader->qualifiedName() == "statCumProbDistDynCalc") {
+          m_cumPro =  new StatCumProbDistDynCalc(xmlReader);
+          xmlReader->skipCurrentElement();
+          xmlReader->skipCurrentElement();
+        }
+        else {
+          m_cumPro =  new StatCumProbDistDynCalc();
+        }
       }
       else if (xmlReader->qualifiedName() == "residualsCumulativeProbabilityCalculator") {
         m_cumProRes = NULL;
-        m_cumProRes = new StatCumProbDistDynCalc();
-        m_cumProRes->readStatistics(xmlReader);
+        xmlReader->readNextStartElement();
+        if (xmlReader->qualifiedName() == "statCumProbDistDynCalc") {
+          m_cumProRes = new StatCumProbDistDynCalc(xmlReader);
+          xmlReader->skipCurrentElement();
+          xmlReader->skipCurrentElement();
+        }
+        else {
+          m_cumProRes = new StatCumProbDistDynCalc();
+        }
       }
       else if (xmlReader->qualifiedName() == "model") {
         QString model = xmlReader->attributes().value("modelSelection").toString();
@@ -2313,11 +2328,11 @@ namespace Isis {
                           toString(maximumLikelihoodMedianR2Residuals()));
 
     stream.writeStartElement("cumulativeProbabilityCalculator");
-    // cumulativeProbabilityDistribution().save(stream, project);
+    cumulativeProbabilityDistribution().save(stream, project);
     stream.writeEndElement(); // end cumulativeProbabilityCalculator
 
     stream.writeStartElement("residualsCumulativeProbabilityCalculator");
-    // residualsCumulativeProbabilityDistribution().save(stream, project);
+    residualsCumulativeProbabilityDistribution().save(stream, project);
     stream.writeEndElement(); // end residualsCumulativeProbabilityCalculator
 
     for (int i = 0; i < numberMaximumLikelihoodModels(); i++) {
