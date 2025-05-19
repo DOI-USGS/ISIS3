@@ -18,6 +18,8 @@ using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
+  GDALAllRegister();
+  CPLSetErrorHandler(CPLQuietErrorHandler);
 
   cerr.precision(14);
 

@@ -18,6 +18,8 @@ using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
+  GDALAllRegister();
+  CPLSetErrorHandler(CPLQuietErrorHandler);
 
   cout << "CubeManager Unit Test" << endl;
   QVector<Cube *> cubes;

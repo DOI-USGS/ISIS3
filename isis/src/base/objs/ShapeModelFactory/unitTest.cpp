@@ -47,6 +47,9 @@ using namespace Isis;
  }
 
 int main() {
+  GDALAllRegister();
+  CPLSetErrorHandler(CPLQuietErrorHandler);
+
   try {
     Isis::Preference::Preferences(true);
 

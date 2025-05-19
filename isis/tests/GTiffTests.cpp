@@ -58,6 +58,9 @@ void check_tiff(Cube &cube,
 
 
 TEST_F(TempTestingFiles, TestGTiffCreateWriteCopy) {
+  GDALAllRegister();
+  CPLSetErrorHandler(CPLQuietErrorHandler);
+
   Cube out;
   QString file = "";
   check_tiff(out, file, 0, 0, 0, 0, 1, 7, 0, 1, 0, 0, 0, 65536);
@@ -121,6 +124,9 @@ INSTANTIATE_TEST_SUITE_P (GdalDnPixelTypes,
                                             Isis::Double));
 
 TEST_P(GdalDnTypeGenerator, TestGTiffCreateWrite) {
+  GDALAllRegister();
+  CPLSetErrorHandler(CPLQuietErrorHandler);
+  
   Cube out;
   QString file = "";
   check_tiff(out, file, 0, 0, 0, 0, 1, 7, 0, 1, 0, 0, 0, 65536);
@@ -176,6 +182,9 @@ TEST_P(GdalDnTypeGenerator, TestGTiffCreateWrite) {
 }
 
 TEST_F(TempTestingFiles, TestGTiffTableWriteRead) {
+  GDALAllRegister();
+  CPLSetErrorHandler(CPLQuietErrorHandler);
+
   TableField f1("Column1", TableField::Integer);
   TableField f2("Column2", TableField::Double);
   TableField f3("Column3", TableField::Text, 10);
