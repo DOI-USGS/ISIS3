@@ -105,7 +105,7 @@ TEST(Spiceinit, TestSpiceinitPredictAndReconCk) {
   ASSERT_EQ(instrumentPointing.size(), 3);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[0], "$Clementine1/kernels/ck/clem_2mn.bck");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[1], "$Clementine1/kernels/ck/clem_5sc.bck");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[2], "$clementine1/kernels/fk/clem_v12.tf");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instrumentPointing[2], "$clementine1/kernels/fk/clem_v21.tf");
   ASSERT_TRUE(kernels.hasKeyword("InstrumentPointingQuality"));
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, kernels["InstrumentPointingQuality"][0], "Reconstructed");
 }
