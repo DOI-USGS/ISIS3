@@ -20,7 +20,6 @@ find files of those names at the top level of this repository. **/
 
 using namespace std;
 
-#define MAX(x,y) (((x) > (y)) ? (x) : (y))
 namespace Isis {
   /**
    * Create an AtmosModel object.  Because this is a pure virtual
@@ -176,7 +175,7 @@ namespace Isis {
       fac = fac * (-tau) / fi;
       term = fac / (fi * fi);
     }
-    elog = log(MAX(1.0e-30, tau)) + eulgam;
+    elog = log(std::max(1.0e-30, tau)) + eulgam;
     e1_2 = sum + PI * PI / 12.0 + 0.5 *
            pow(elog, 2.0);
     result = 2.0 * (AtmosModel::En(1, tau)

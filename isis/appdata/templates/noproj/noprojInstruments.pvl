@@ -145,6 +145,34 @@ Object = IdealInstrumentsSpecifications
     DetectorSamples = 832
     DetectorLines = 700
   End_Group
+  
+  Group = "OSIRIS-REX/MapCam"
+    DetectorSamples = 1050
+    DetectorLines = 1050
+  End_Group
+
+  Group = "OSIRIS-REX/PolyCam"
+    DetectorSamples = 1050
+    DetectorLines = 1050
+  End_Group
+
+  Group = "OSIRIS-REX/SamCam"
+    DetectorSamples = 1050
+    DetectorLines = 1050
+  End_Group
+
+Group = "OSIRIS-REX/NAVCam"
+    #  Must be larger than NAV team due to off-center boresight
+    DetectorSamples = 3050
+    DetectorLines = 2404
+  End_Group
+  
+  Group = "OSIRIS-REX/NFTCam"
+    DetectorSamples = 2992
+    DetectorLines = 2344
+  End_Group
+  
+  
 
 End_Object
 End

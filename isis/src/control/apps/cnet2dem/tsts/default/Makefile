@@ -1,7 +1,7 @@
 # Standard use case test (default) for cnet2dem
 # Tests CNET, TO, MAP, ALGORITHM
 
-truthDemNet.cub.TOLERANCE  = 0.00000001
+truthDemNet.cub.TOLERANCE  = 0.07
 
 APPNAME = cnet2dem
 

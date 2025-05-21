@@ -35,8 +35,9 @@ namespace Isis {
    * @param btbody The Bullet collision object to contain.
    * @param name The name of the object.
    */
-  BulletTargetShape::BulletTargetShape(btCollisionObject *btbody, const QString &name) :
-                                       m_name(name), m_btbody(btbody) {
+  BulletTargetShape::BulletTargetShape(btCollisionObject *btbody, const QString &name) {
+    m_name = name;
+    m_btbody = std::shared_ptr<btCollisionObject> ( btbody,  BulletTargetShape::btDelete );
     setMaximumDistance();
   }
 
@@ -148,13 +149,13 @@ namespace Isis {
    * @return @b btCollisionObject A target to the Bullet collision object.
    */
   btCollisionObject *BulletTargetShape::body() const {
-    return ( m_btbody.data() );
+    return ( m_btbody.get() );
   }
 
 
   /** Set the Bullet shape object to this object instance   */
   void BulletTargetShape::setTargetBody(btCollisionObject *body) {
-    m_btbody.reset(body);
+    m_btbody = std::shared_ptr<btCollisionObject>  ( body, BulletTargetShape::btDelete );
     m_btbody->setUserPointer(this);
     setMaximumDistance();
     return;
@@ -163,5 +164,14 @@ namespace Isis {
   btScalar BulletTargetShape::maximumDistance() const {
     return m_maximumDistance;
   }
+
+  void BulletTargetShape::btDelete( btCollisionObject *btbody ) {
+    if ( nullptr != btbody ) {
+      delete btbody->getCollisionShape();
+      delete btbody;
+    }
+    return;
+  }
+
 
 }  // namespace Isis

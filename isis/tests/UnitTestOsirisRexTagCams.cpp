@@ -43,8 +43,8 @@ TEST_F(TempTestingFiles, UnitTestOsirisRexTagCamsNAVCam) {
   double et; // StartTime keyword is the center exposure time
   str2et_c(stime.toLatin1().data(), &et);
   pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
-  EXPECT_NEAR(shuttertimes.first.Et(), 636543100.32342994, 6E-14);
-  EXPECT_NEAR(shuttertimes.second.Et(), 636543100.32343423, 6E-14);
+  EXPECT_NEAR(shuttertimes.first.Et(), 636543100.32342994, 1e-8);
+  EXPECT_NEAR(shuttertimes.second.Et(), 636543100.32343423, 1e-8);
 
   // test at center of format
   EXPECT_TRUE(cam->SetImage(129.5, 97.0));

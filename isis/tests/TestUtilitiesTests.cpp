@@ -56,11 +56,10 @@ TEST(TestUtilities, CompareCsvLine) {
     csvLine = csv.getRow(1);
     compareCsvLine(csvLine, "Near Doubles, 3.1415926535898");
     compareCsvLine(csvLine, "Near Doubles, 3.141593");
-
-    EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Near Doubles, 3.14159"), "");
-    EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Near Doubles, 3.141591"), "");
+    
+    EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Near Doubles, 3.1415"), "");
+    EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Near Doubles, 3.141"), "");
     EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Near Doubles, Pi"), "");
-
 
     // Scientific Notation (csv has sci notation)
     csvLine = csv.getRow(2);
@@ -70,7 +69,6 @@ TEST(TestUtilities, CompareCsvLine) {
     EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Sci Notation, 478"), "");
     EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Sci Notation, 4783"), "");
     EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Sci Notation, Text"), "");
-
 
     // Scientific Notation (csv has standard notation)
     csvLine = csv.getRow(3);
@@ -85,7 +83,6 @@ TEST(TestUtilities, CompareCsvLine) {
     compareCsvLine(csvLine, "Pie Notation, 4780", 1);    
     EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Pie Notation, 4780"), "");
     EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Pie Notation, 4783", 1), "");
-
     
     // Text vs Numbers
     csvLine = csv.getRow(4);
@@ -103,12 +100,10 @@ TEST(TestUtilities, CompareCsvLine) {
         EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, csvLine2), "");
     }, "Actual: 6");
 
-
     // Sample line with lots of numbers
     csvLine = csv.getRow(7);
     compareCsvLine(csvLine, "AS15_000031957,FREE,3,0,0.33,24.25013429,6.15097050,1735.93990543,270.68671676,265.71819251,500.96944842,860.25781493,-1823.63228489,-677.74533463,1573.65050943,169.59077243,712.98695596");
     EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "AS15_000031957,FREE,3,0,0.33,24.25013429,6.15097050,1742.85730233,270.68671676,265.71819251,500.96944842,860.25781493,-1823.63228489,-677.74533463,1573.65050943,169.59077243,712.98695596"), "");
-
 
     // long numbers
     csvLine = csv.getRow(8);
@@ -117,7 +112,6 @@ TEST(TestUtilities, CompareCsvLine) {
     compareCsvLine(csvLine, "Long Numbers, 3.1415926535898");
     EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Long Numbers, 3.1417"), "");
 
-
     // plus and minus
     csvLine = csv.getRow(9);
     compareCsvLine(csvLine, "Plus and Minus, 0, -1, +302, 5.46e-3, -4.7e4, 3+4, 56-62, 89-e3");
@@ -125,7 +119,6 @@ TEST(TestUtilities, CompareCsvLine) {
     EXPECT_NONFATAL_FAILURE({
         EXPECT_NONFATAL_FAILURE(compareCsvLine(csvLine, "Plus and Minus, 0, -1, +302, 5.46e3, 4.7e4, 3+A, 56-62, 89-e3"), "");
     }, "Actual: 3");
-
 
     // very small
     csvLine = csv.getRow(10);

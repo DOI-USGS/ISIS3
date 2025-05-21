@@ -36,14 +36,39 @@ release.
 ## [Unreleased]
 
 ### Added
+- Added OFFBODY and OFFBODYTRIM parameters to noproj and cam2cam. Added tests and updated documentation. [#3602](https://github.com/DOI-USGS/ISIS3/issues/3602)
+- Added use Bullet Anaconda feedstock library, which includes double precision support, and fix ISIS use of general Bullet configurations. [#5772](https://github.com/DOI-USGS/ISIS3/pull/5772)
+- Added Mac Arm build support and adjusted the tests appropriately.
+- Added adjusted XYZ point coordinate sigmas to the points.csv jigsaw output file. Modified
+ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github.com/DOI-USGS/ISIS3/issues/5710)
+- Added support for reading, writing, and viewing GeoTIFFs in ISIS. [#5618](https://github.com/DOI-USGS/ISIS3/pull/5618)
+- Added GDAL SRS propagation for systems outside of ISIS to display projected GTiffs. [#5736](https://github.com/DOI-USGS/ISIS3/pull/5736)
+- Added ale version to history blob. [#5207](https://github.com/DOI-USGS/ISIS3/issues/5207)
+- Added CSM State output capability for jigsaw. [#5609](https://github.com/DOI-USGS/ISIS3/issues/5609)
+- Added ShowDeprecated option to show or hide warnings in IsisPreferences. [#5611](https://github.com/DOI-USGS/ISIS3/issues/5611)
 
 ### Changed
+- Removed Arm dependency on xalan-c, as it does not build for now on conda-forge. This requires turning off doc building on Arm. Also changed some variables to avoid name clashes on Arm with clang 16. [#5802])(https://github.com/DOI-USGS/ISIS3/pull/5802)
+- Update OSIRIS-REx OCams instrument (Map, Poly, & SamCam) support to current state in UofA code base [#5426](https://github.com/DOI-USGS/ISIS3/issues/5426)
+- Enhanced csminit by removing the need to specify model and plugin [#5585](https://github.com/DOI-USGS/ISIS3/issues/5585)
+- Changed file format to propagate from the input image format to the output image format [#5737](https://github.com/DOI-USGS/ISIS3/pull/5737)
+- Changed `StripPolygonSeeder` and `GridPolygonSeeder` to seed individual polygons within each images multipolygon footprint [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
 
 ### Fixed
 - Fixed kaguyatc2isis invalid BandBin values [#5629](https://github.com/DOI-USGS/ISIS3/issues/5629)
 - Fixed SpiceClient to handle redirect requests.
 - Fixed jigsaw to default OUTADJUSTMENTH5 option to false and allow this feature to run on read-only images [#5700](https://github.com/DOI-USGS/ISIS3/issues/5700)
 - Fixed Cube::fromIsd to add "LineScanTimes" table from HRSC isds [#5668](https://github.com/DOI-USGS/ISIS3/issues/5668)
+- Fixed segfault in SpiceClient when an authentication error was encountered. [#5735](https://github.com/DOI-USGS/ISIS3/pull/5735)
+- Fixed offset and scale not being applied to gdal 32 bit floating point pixels [#5753](https://github.com/DOI-USGS/ISIS3/pull/5753)
+- Fixed `getLocalNormal` not reseting the sample and line [#5752](https://github.com/DOI-USGS/ISIS3/pull/5752)
+- Fixed QView bug that would not allow manual editing of min/max values via the text fields and defaulted to the current min/max type dropdown selection [#5719](https://github.com/DOI-USGS/ISIS3/issues/5719)
+- Fixed Juno Data Area SPKs causing Spiceinit to fail [#5724](https://github.com/DOI-USGS/ISIS3/issues/5724)
+- Fixed embree shapemodel intersection calculation [#5592](https://github.com/DOI-USGS/ISIS3/issues/5592)
+- Fixed findFeaturesSegment.py errors from issues [#5725](https://github.com/DOI-USGS/ISIS3/issues/5725) and [#5702](https://github.com/DOI-USGS/ISIS3/issues/5702)
+- Fixed jigsaw save/apply bug by adding back missing metadata to Instrument Position/Pointing tables [#5701](https://github.com/DOI-USGS/ISIS3/issues/5701)
+- Fixed `StripPolygonSeeder` and `GridPolygonSeeder` memory leaks [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
+- Fixed `pointreg` helper function to display deffile to application log [#5806](https://github.com/DOI-USGS/ISIS3/pull/5806)
 
 ## [9.0.0] - 09-25-2024
 

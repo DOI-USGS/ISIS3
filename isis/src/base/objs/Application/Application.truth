@@ -7,6 +7,7 @@ End_Group
 
 Object = unittest
   IsisVersion       = "7.2.0  | 2023-07-18"
+  AleVersion        = "0.10.0 | py311hd18a35c_3"
   ProgramVersion    = 2011-08-19
   ProgramPath       = /Users/acpaquette/repos/ISIS3/pvl_build/unitTest
   ExecutionDateTime = 2023-07-18T16:56:19
@@ -48,6 +49,7 @@ End
 
 Object = unittest
   IsisVersion       = "7.2.0  | 2023-07-18"
+  AleVersion        = "0.10.0 | py311hd18a35c_3"
   ProgramVersion    = 2011-08-19
   ProgramPath       = /Users/acpaquette/repos/ISIS3/pvl_build/unitTest
   ExecutionDateTime = 2023-07-18T16:56:19
@@ -76,6 +78,7 @@ End_Object
 
 Object = unittest
   IsisVersion       = "7.2.0  | 2023-07-18"
+  AleVersion        = "0.10.0 | py311hd18a35c_3"
   ProgramVersion    = 2011-08-19
   ProgramPath       = /Users/acpaquette/repos/ISIS3/pvl_build/unitTest
   ExecutionDateTime = 2023-07-18T16:56:19
@@ -113,6 +116,7 @@ End_Object
 
 Object = unittest
   IsisVersion       = "7.2.0  | 2023-07-18"
+  AleVersion        = "0.10.0 | py311hd18a35c_3"
   ProgramVersion    = 2011-08-19
   ProgramPath       = /Users/acpaquette/repos/ISIS3/pvl_build/unitTest
   ExecutionDateTime = 2023-07-18T16:56:19

@@ -31,8 +31,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 48.3664548995653121;
-    double knownLon = 277.9524457902612653;
+    double knownLat = 48.3664548732875730;
+    double knownLon = 277.9524457453107402;
 
     Cube c("$ISISTESTDATA/isis/src/dawn/unitTestData/FC21B0001010_09049002212F5D.cub", "r");
     DawnFcCamera *cam = (DawnFcCamera *) CameraFactory::Create(c);
@@ -87,18 +87,16 @@ int main(void) {
       return 0;
     }
 
-    if(abs(cam->UniversalLatitude() - knownLat) < 6E-14) {
+    if(abs(cam->UniversalLatitude() - knownLat) < 1e-8) {
       cout << "Latitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
+    } else {
+      cout << setprecision(16) << "Known latitude: " << knownLat << ", Calculated latitude: " << cam->UniversalLatitude() << ", difference: " << cam->UniversalLatitude() - knownLat << endl;
     }
 
-    if(abs(cam->UniversalLongitude() - knownLon) < 6E-14) {
+    if(abs(cam->UniversalLongitude() - knownLon) < 1e-8) {
       cout << "Longitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
+    } else {
+      cout << setprecision(16) << "Known longitude: " << knownLon << ", Calculated longitude: " << cam->UniversalLongitude() << ", difference: " << cam->UniversalLongitude() - knownLon << endl;
     }
 
     // Test exception

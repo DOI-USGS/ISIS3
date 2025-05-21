@@ -10,7 +10,7 @@ dependencies:
   - boost=1.68.0
   - armadillo
   - blas
-  - bullet
+  - bullet >= 3.25
   - bz2file
   - bzip2
   - cmake >=3.15

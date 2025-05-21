@@ -73,13 +73,31 @@ option(buildCore       "Build the core ISIS modules"                    ON  )
 option(buildMissions   "Build the mission specific modules"             ON  )
 option(buildStaticCore "Build libisis static as well as dynamic"        OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
+option(buildDocs       "Build the docs."                                ON  )
 option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
-option(pybindings      "Turn on to build Python bindings"               ON )
+option(pybindings      "Turn on to build Python bindings"               ON  )
 
 # if cmake install prefix is not set, and conda env is activated, use the
 # conda env as the install directory.
 if(DEFINED ENV{CONDA_PREFIX} AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
  set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
+endif()
+
+# This is essential for tests to build
+if(NOT DEFINED ENV{ISISROOT})
+  message(FATAL_ERROR "Environment variable ISISROOT is not set.")
+endif()
+
+# No JPEG2000 support on Mac Arm
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+  message(STATUS "Support for JPEG2000 is not available on Mac Arm.")
+  set(JP2KFLAG OFF)
+endif()
+
+# No docs support on Mac Arm. The xalan-c Arm package is not available on conda-forge.
+if (CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+  message(STATUS "Building documentation is not available on Mac Arm.")
+  set(buildDocs OFF)
 endif()
 
 # Prioritize passed in variables over env vars, probably a better way to do this
@@ -121,6 +139,7 @@ add_definitions( -DISISBUILDDIR="${CMAKE_BINARY_DIR}" )
 message("CONFIGURATION")
 message("\tBUILD STATIC CORE: ${buildStaticCore}")
 message("\tBUILD TESTS: ${buildTests}")
+message("\tBUILD DOCS: ${buildDocs}")
 message("\tBUILD CORE: ${buildCore}")
 message("\tBUILD MISSIONS: ${buildMissions}")
 message("\tJP2K SUPPORT: ${JP2KFLAG}")
@@ -174,6 +193,10 @@ string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
 
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 
+if (NOT JP2KFLAG)
+  # Pass the NO_JP2K flag to C++
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DNO_JP2K")
+endif()
 
 # Flag to fix numeric literals problem with boost on linux
 # Add gold linker (and therefore, phtread) to speed up linux (spec. Ubuntu18.04) builds
@@ -199,7 +222,10 @@ else()
 endif()
 
 # Paths to required executables
-find_program(XALAN Xalan REQUIRED)
+if (buildDocs)
+  find_program(XALAN Xalan REQUIRED)
+endif()
+
 find_program(LATEX latex)
 find_program(DOXYGEN NAME doxygen PATH_SUFFIXES doxygen REQUIRED)
 find_program(UIC uic REQUIRED)
@@ -261,12 +287,13 @@ find_package(Boost 1.59.0 REQUIRED atomic
 
 find_package(Ale               REQUIRED)
 find_package(Json              REQUIRED)
-find_package(Bullet    2.86    REQUIRED)
+find_package(BulletFloat64     REQUIRED)
 find_package(Cholmod   4.4.5   REQUIRED)
 find_package(CSM       3.0.3.3 REQUIRED)
 find_package(CSPICE    65      REQUIRED)
 find_package(Eigen             REQUIRED)
 find_package(Embree    3.13.0  REQUIRED)
+find_package(GDAL              REQUIRED CONFIG)
 find_package(GeoTIFF   2       REQUIRED)
 SET(GSL_ROOT_DIR $ENV{CONDA_PREFIX})
 find_package(GSL       2.2.1   REQUIRED)
@@ -354,7 +381,7 @@ foreach (_variableName ${_variableNames})
 endforeach()
 
 # add target based linkages to ALLLIBS variable
-list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree)
+list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree GDAL::GDAL)
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)
@@ -464,13 +491,15 @@ endif()
 # Set up documentation build target.
 # - This script is called by running "ninja docs".
 # - This long call passes all desired variables to the script.
-add_custom_target(docs COMMAND ${CMAKE_COMMAND}
-                  -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
-                  -DDOXYGEN=${DOXYGEN}  -DXALAN=${XALAN}
-                  -DLATEX=${LATEX}
-                  -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                  -DPACKAGE_VERSION=${PACKAGE_VERSION}
-                  -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
+if (buildDocs)
+  add_custom_target(docs COMMAND ${CMAKE_COMMAND}
+                    -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
+                    -DDOXYGEN=${DOXYGEN}  -DXALAN=${XALAN}
+                    -DLATEX=${LATEX}
+                    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+                    -DPACKAGE_VERSION=${PACKAGE_VERSION}
+                    -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
+endif()
 
 # Add custom build target to copy modified header files to the build/incs directory.
 # ALL is specified so that the target is added to the default build target, i.e. the copy command
@@ -597,6 +626,7 @@ install(FILES     ${CMAKE_SOURCE_DIR}/../LICENSE.md   DESTINATION  ${CMAKE_INSTA
 install(FILES     ${CMAKE_SOURCE_DIR}/../AUTHORS.rst  DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_SOURCE_DIR}/../CHANGELOG.md DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_BINARY_DIR}/isis_version.txt DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES     ${CMAKE_BINARY_DIR}/ale_version.txt DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(PROGRAMS ${CMAKE_BINARY_DIR}/lib/Camera.plugin DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
 install(PROGRAMS ${CMAKE_SOURCE_DIR}/scripts/downloadIsisData DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)

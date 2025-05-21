@@ -31,13 +31,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-#if 0
-    double knownLat =  0.0;
-    double knownLon = 0.0;
-#else
     double knownLat = -31.7044148065366365;
-    double knownLon = 143.0420765243170251;
-#endif
+    double knownLon = 143.0420765254804678;
 
     Cube c("$ISISTESTDATA/isis/src/mro/unitTestData/frt0001cfd8_07_if124s_trr3_b24.cub", "r");
     Camera *cam = CameraFactory::Create(c);
@@ -76,18 +71,16 @@ int main(void) {
       return 0;
     }
 
-    if(abs(cam->UniversalLatitude() - knownLat) < 1E-10) {
+    if (abs(cam->UniversalLatitude() - knownLat) < 1E-10) {
       cout << "Latitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
+    } else {
+      cout << setprecision(16) << "Known latitude: " << knownLat << ", Calculated latitude: " << cam->UniversalLatitude() << ", difference: " << cam->UniversalLatitude() - knownLat << endl;
     }
 
-    if(abs(cam->UniversalLongitude() - knownLon) < 1E-10) {
+    if (abs(cam->UniversalLongitude() - knownLon) < 1E-10) {
       cout << "Longitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
+    } else {
+      cout << setprecision(16) << "Known longitude: " << knownLon << ", Calculated longitude: " << cam->UniversalLongitude() << ", difference: " << cam->UniversalLongitude() - knownLon << endl;
     }
 
     // Test name methods
@@ -112,15 +105,12 @@ void TestLineSamp(Camera *cam, double samp, double line) {
     success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
-  if(success) {
+  if (success) {
     double deltaSamp = samp - cam->Sample();
     double deltaLine = line - cam->Line();
-//    if(fabs(deltaSamp) < 0.08) deltaSamp = 0;
-//    if(fabs(deltaLine) < 0.08) deltaLine = 0;
     cout << "DeltaSample = " << deltaSamp << endl;
     cout << "DeltaLine = " << deltaLine << endl << endl;
-  }
-  else {
+  } else {
     cout << "Lat/Lon SetUniversalGround failed!\n";
     cout << "DeltaSample = ERROR" << endl;
     cout << "DeltaLine = ERROR" << endl << endl;

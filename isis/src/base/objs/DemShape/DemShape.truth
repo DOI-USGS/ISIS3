@@ -53,5 +53,5 @@ Begin testing Dem Shape Model class....
   Testing method calculateLocalNormal with vector pointing outward
     local normal = (-0.743083, 0.662884, 0.0917187
 
-  Testing method calculateLocalNormal with magnitude = 0
-**ERROR** The local normal has not been computed.
+  Testing method calculateLocalNormal with tiny magnitude.
+    local normal = (0.705558, -0.705558, -0.0661461)

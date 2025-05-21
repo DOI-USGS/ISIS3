@@ -10,8 +10,8 @@
 #
 APPNAME = ringscam2map
 
-
-issWAC.cub.TOLERANCE = .000001
+# The cubes have values on the order of 176663338638.330, which needs a large tolerance.
+issWAC.cub.TOLERANCE = 80000
 
 include $(ISISROOT)/make/isismake.tsts
 

@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat[3] = { -22.00026732942671, -15.08829558278137, -40.6918887505667115 };
+    double knownLat[3] = { -22.00026732942671, -15.08829558278137, -40.6918887500588227 };
     double knownLon[3] = { 307.9160921848336, 309.8677351454377, 102.4181750964207964 };
     char files[3][1024] = { "$ISISTESTDATA/isis/src/mro/unitTestData/ctx_pmoi_i_00003.bottom.cub",
                             "$ISISTESTDATA/isis/src/mro/unitTestData/ctx_pmoi_i_00003.top.cub",
@@ -96,14 +96,14 @@ int main(int argc, char *argv[]) {
         cout << "Latitude OK" << endl;
       }
       else {
-        cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat[i] << endl;
+        cout << setprecision(16) << "Latitude index: " << i << ", expect: " << knownLat[i] << ", " << "got: " << cam->UniversalLatitude() << ", off by: " << cam->UniversalLatitude() - knownLat[i] << endl;
       }
 
       if(abs(cam->UniversalLongitude() - knownLon[i]) < 1E-10) {
         cout << "Longitude OK" << endl;
       }
       else {
-        cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon[i] << endl;
+        cout << setprecision(16) << "Longitude index: " << i << ", expect: " << knownLon[i] << ", " << "got: " << cam->UniversalLongitude() << ", off by: " << cam->UniversalLongitude() - knownLon[i] << endl;
       }
       cout << endl << "--------------------------------------------" << endl;
     }

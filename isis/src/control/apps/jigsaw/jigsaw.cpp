@@ -7,11 +7,13 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include <iostream>
+#include <highfive/H5Attribute.hpp>
 #include <highfive/H5File.hpp>
 #include <highfive/H5DataType.hpp>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5Group.hpp>
 #include <vector>
+#include <cstdio>
 
 #include <QDir>
 #include <QList>
@@ -37,6 +39,14 @@ find files of those names at the top level of this repository. **/
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
 #include "Table.h"
+#include "CameraFactory.h"
+#include "PvlToJSON.h"
+#include "PvlKeyword.h"
+
+#include <ale/Load.h>
+#include <nlohmann/json.hpp>
+#include <boost/filesystem.hpp>
+using json = nlohmann::json;
 
 #include "jigsaw.h"
 
@@ -52,6 +62,10 @@ namespace Isis {
   ControlNetQsp fixHeldImages(const QString &cnetFile,
                               const QString &heldList,
                               const QString &imageList);
+
+  vector<string> CMATRIX_KEYS_FOR_STR = {"CkTableEndTime", "CkTableOriginalSize", "CkTableStartTime", "FrameTypeCode"};
+  vector<string> CMATRIX_KEYS_FOR_VEC = {"ConstantFrames", "ConstantRotation", "TimeDependentFrames"};
+  vector<string> SPVECTOR_KEYS_FOR_STR = {"SpkTableEndTime", "SpkTableOriginalSize", "SpkTableStartTime", "CacheType"};
 
   void jigsaw(UserInterface &ui, Pvl *log) {
 
@@ -70,6 +84,7 @@ namespace Isis {
         ui.PutBoolean("RESIDUALS_CSV", false);
         ui.PutBoolean("LIDAR_CSV", false);
         ui.PutBoolean("OUTADJUSTMENTH5", false);
+        ui.PutBoolean("OUTPUT_ADJUSTED_CSMSTATE", false);
         
         File fileRead(ui.GetFileName("ADJUSTMENT_INPUT").toStdString(), File::ReadOnly);
         SerialNumberList *snList = new SerialNumberList(cubeList);
@@ -86,6 +101,20 @@ namespace Isis {
             throw IException(IException::User, msg, _FILEINFO_);
           }
 
+          //check for existing polygon, if exists delete it
+          if (c->label()->hasObject("Polygon")) {
+            c->label()->deleteObject("Polygon");
+          }
+
+          // check for CameraStatistics Table, if exists, delete
+          for (int iobj = 0; iobj < c->label()->objects(); iobj++) {
+            PvlObject obj = c->label()->object(iobj);
+            if (obj.name() != "Table") continue;
+            if (obj["Name"][0] != QString("CameraStatistics")) continue;
+            c->label()->deleteObject(iobj);
+            break;
+          }
+
           QString serialNumber = snList->serialNumber(i);
           QString cmatrixName = "InstrumentPointing";
           QString spvectorName = "InstrumentPosition";
@@ -94,13 +123,49 @@ namespace Isis {
           std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
 
           // Read h5 into table
+
+          // Create cmatrix table from dataset
           DataSet datasetRead = fileRead.getDataSet(cmatrixKey);
           auto cmatrixData = datasetRead.read<std::string>();
-          Table cmatrixTable(cmatrixName, cmatrixData, ',');
 
+          vector<PvlKeyword> cmatrixAttrs;
+
+          // Add attributes
+          vector<string> cmatrixAttributeKeys = datasetRead.listAttributeNames();
+          for (string cmatrixAttrKey : cmatrixAttributeKeys) {
+            auto n = count(CMATRIX_KEYS_FOR_STR.begin(), CMATRIX_KEYS_FOR_STR.end(), cmatrixAttrKey);
+            auto m = count(CMATRIX_KEYS_FOR_VEC.begin(), CMATRIX_KEYS_FOR_VEC.end(), cmatrixAttrKey);
+            if (n > 0) {
+              cmatrixAttrs.push_back(PvlKeyword(QString::fromStdString(cmatrixAttrKey), 
+                QString::fromStdString(datasetRead.getAttribute(cmatrixAttrKey).read<string>())));
+            } else if (m > 0) {
+              cmatrixAttrs.push_back(PvlKeyword(QString::fromStdString(cmatrixAttrKey), 
+                datasetRead.getAttribute(cmatrixAttrKey).read<vector<string>>()));
+            } else {
+              // Do not add attribute.
+            }
+          }
+          
+          Table cmatrixTable(cmatrixName, cmatrixData, ',', cmatrixAttrs);
+
+          // Create spvector table from dataset
           datasetRead = fileRead.getDataSet(spvectorKey);
           auto spvectorData = datasetRead.read<std::string>();
-          Table spvectorTable(spvectorName, spvectorData, ',');
+
+          // Add attributes
+          vector<PvlKeyword> spvectorAttrs;
+          vector<string> spvectorAttributeKeys = datasetRead.listAttributeNames();
+          for (string spvectorAttrKey : spvectorAttributeKeys) {
+            auto n = count(SPVECTOR_KEYS_FOR_STR.begin(), SPVECTOR_KEYS_FOR_STR.end(), spvectorAttrKey);
+            if (n > 0) {
+              spvectorAttrs.push_back(PvlKeyword(QString::fromStdString(spvectorAttrKey), 
+                QString::fromStdString(datasetRead.getAttribute(spvectorAttrKey).read<string>())));
+            } else {
+              // Do not add attribute.
+            }
+          }          
+
+          Table spvectorTable(spvectorName, spvectorData, ',', spvectorAttrs);
 
           // Write bundle adjustment values out
           cmatrixTable.Label().addComment(jigApplied);
@@ -257,8 +322,38 @@ namespace Isis {
             // Save bundle adjustment values to HDF5 file
             std::string cmatrixTableStr = Table::toString(cmatrix).toStdString();
             DataSet dataset = file.createDataSet<std::string>(cmatrixKey, cmatrixTableStr);
+
+            // Add cmatrix attributes
+            json cmatrixLabel = pvlObjectToJSON(cmatrix.Label());
+            for (auto cmatrixItem : cmatrixLabel.items()) {
+              string cmatrixKey = cmatrixItem.key();
+              auto cmatrixValue = cmatrixItem.value();
+              auto n = count(CMATRIX_KEYS_FOR_STR.begin(), CMATRIX_KEYS_FOR_STR.end(), cmatrixKey);
+              auto m = count(CMATRIX_KEYS_FOR_VEC.begin(), CMATRIX_KEYS_FOR_VEC.end(), cmatrixKey);
+              if (n > 0) {
+                dataset.createAttribute<string>(cmatrixKey, cmatrixValue["Value"]);
+              } else if (m > 0) {
+                dataset.createAttribute<vector<string>>(cmatrixKey, cmatrixValue["Value"]);
+              } else {
+                // Do not add as attribute
+              }
+            }
+  
             std::string spvectorTableStr = Table::toString(spvector).toStdString();
             dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
+
+            // Add spvector attributes
+            json spvectorLabel = pvlObjectToJSON(spvector.Label());
+            for (auto spvectorItem : spvectorLabel.items()) {
+              string spvectorKey = spvectorItem.key();
+              auto spvectorValue = spvectorItem.value();
+              auto n = count(SPVECTOR_KEYS_FOR_STR.begin(), SPVECTOR_KEYS_FOR_STR.end(), spvectorKey);
+              if (n > 0) {
+                dataset.createAttribute<string>(spvectorKey, spvectorValue["Value"]);
+              } else {
+                // Do not add as attribute
+              }
+            }
           }
         }
         file.flush();
@@ -337,6 +432,58 @@ namespace Isis {
       bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
       QString msg = "Unable to bundle adjust network [" + cnetFile + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+
+    if (ui.GetBoolean("OUTPUT_ADJUSTED_CSMSTATE")) {
+      
+      // Go thru each file in cubelist
+      SerialNumberList *snList = new SerialNumberList(cubeList);
+      for (int i = 0; i < snList->size(); i++) {        
+        QString filename = snList->fileName(i);
+        
+        // Generate ISD from cube
+        json props;
+	json isd;
+	try {
+          isd = ale::load(filename.toStdString(), props.dump(), "ale", false, true, false);
+	} catch (...) {
+	  throw IException(IException::Unknown, "Unable to find the appropriate ISIS driver in ALE.", _FILEINFO_); 
+	}
+
+        // Load plugin list
+        CameraFactory::initPlugin();
+
+        // Write ISD to temp file
+        boost::filesystem::path tempIsdFilePath = boost::filesystem::temp_directory_path() / boost::filesystem::unique_path();
+        tempIsdFilePath = tempIsdFilePath.replace_extension(".json");
+        std::ofstream tempIsdFile(tempIsdFilePath.c_str());
+        if (tempIsdFile.is_open()) {
+          tempIsdFile << isd.dump() << std::endl;
+          tempIsdFile.close();
+        } else {
+          std::cerr << "Error creating temporary file [" << tempIsdFilePath << "]." << std::endl;
+          boost::filesystem::remove(tempIsdFilePath);
+        }
+        
+        // Generate CSMState string
+        QString tempIsdFilePathStr = QString::fromStdString(tempIsdFilePath.string());
+        csm::Model *csmModel = CameraFactory::constructModelFromIsd(tempIsdFilePathStr);
+        std::string csmStateString = csmModel->getModelState();
+
+        // Remove temp file
+        boost::filesystem::remove(tempIsdFilePath);
+
+        // Write CSMState string to file
+        boost::filesystem::path filenamePath(filename.toStdString());
+        boost::filesystem::path csmStateFilename = filenamePath.replace_extension(".state.json");
+        ofstream csmStateFile(csmStateFilename.c_str());
+        if (csmStateFile.is_open()) {
+          csmStateFile << csmStateString << std::endl;
+          csmStateFile.close();
+        } else {
+          std::cerr << "Error creating CSMState file [" << csmStateFilename << "]." << std::endl;
+        }
+      }
     }
 
   //TODO - WHY DOES THIS MAKE VALGRIND ANGRY???

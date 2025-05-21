@@ -38,8 +38,12 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat[3] = { -3.8709488902507347, 69.16103791616183, 41.5550783983903855 };
-    double knownLon[3] = { 342.3331666742689094, 317.6341072210002, 245.3158115000968849 };
+    double knownLat[3] = {-3.8709488906397787,
+                          69.16103791616183,
+                          41.5550788252753591};
+    double knownLon[3] = {342.3331666740851915, 
+                          317.6341072210002, 
+                          245.3158119571340592};
 
     QList<QString> files;
     files.append("$ISISTESTDATA/isis/src/lo/unitTestData/3133_h1.cropped.cub"); // LO3 High
@@ -104,18 +108,14 @@ int main(void) {
 
       if(abs(cam->UniversalLatitude() - knownLat[i]) < 1E-10) {
         cout << "Latitude OK" << endl;
-      }
-      else {
-        cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat[i]
-        << endl;
+      } else {
+        cout << setprecision(16) << "Index: " << i << ", Known latitude: " << knownLat[i] << ", Calculated latitude: " << cam->UniversalLatitude() << ", difference: " << cam->UniversalLatitude() - knownLat[i] << endl;
       }
 
       if(abs(cam->UniversalLongitude() - knownLon[i]) < 1E-10) {
         cout << "Longitude OK" << endl;
-      }
-      else {
-        cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon[i]
-        << endl;
+      } else {
+        cout << setprecision(16) << "Index: " << i << ", Known longitude: " << knownLon[i] << ", Calculated longitude: " << cam->UniversalLongitude() << ", difference: " << cam->UniversalLongitude() - knownLon[i] << endl;
       }
       cout << endl << "--------------------------------------------" << endl;
     }

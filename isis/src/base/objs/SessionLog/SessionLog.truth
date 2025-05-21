@@ -1,5 +1,6 @@
 Object = ratio
   IsisVersion       = "3.1.13 | 2007-07-13"
+  AleVersion        = "0.10.0 | py311hd18a35c_3"
   ProgramVersion    = 2003-07-29
   ExecutionDateTime = 2007-08-01T11:42:35
   HostName          = blackflag
@@ -26,6 +27,7 @@ End_Object
 End
 Object = ratio
   IsisVersion       = "3.1.13 | 2007-07-13"
+  AleVersion        = "0.10.0 | py311hd18a35c_3"
   ProgramVersion    = 2003-07-29
   ExecutionDateTime = 2007-08-01T11:42:35
   HostName          = blackflag

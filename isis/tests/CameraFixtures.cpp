@@ -763,6 +763,11 @@ namespace Isis {
     PvlGroup &kernels = testCube->label()->findObject("IsisCube").findGroup("Kernels");
     kernels.findKeyword("NaifFrameCode").setValue(ikid);
     kernels["ShapeModel"] = "Null";
+    
+    // NOTE: this is a workaround of a bug in the camera model
+    // versioning program in that the DefaultCube class
+    // doesn't properly handle camera versions
+    kernels.findKeyword("CameraVersion").setValue("2");
 
     PvlGroup &inst = testCube->label()->findObject("IsisCube").findGroup("Instrument");
     std::istringstream iss(R"(
@@ -788,10 +793,8 @@ namespace Isis {
     PvlGroup &bandBin = label.findObject("IsisCube").findGroup("BandBin");
     std::istringstream bss(R"(
       Group = BandBin
-        FilterName = Monochrome
-        Name       = NAVCam
-        Number     = 1
-        Center     = 550
+        FilterName = PAN
+        Center     = 650
       End_Group
     )");
 
@@ -819,6 +822,7 @@ namespace Isis {
     delete testCube;
     testCube = new Cube(fileName, "rw");
   }
+
 
   void OsirisRexTagcamsNAVCamCube::setInstrument(QString ikid, QString instrumentId) {
     delete testCube;
@@ -988,4 +992,30 @@ namespace Isis {
     testCube.reset();
   }
 
+  void OrexManyIsdCameraCubes::SetUp() {
+    TempTestingFiles::SetUp();
+
+    m_sourcefile = "data/cam2cam/20190509T180552S020_map_iofL2b.cub";
+
+    std::ifstream isdFile("data/cam2cam/20190509T180552S020_map_iofL2b.isd");
+    std::ifstream cubeLabel("data/cam2cam/20190509T180552S020_map_iofL2b.pvl");
+
+    isdFile   >> m_isd;
+    cubeLabel >> m_label;
+  }
+
+   const QString &OrexManyIsdCameraCubes::source() const {
+    return ( m_sourcefile );
+   }
+
+   Cube *OrexManyIsdCameraCubes::make_cube( const QString &cubefile ) {
+    std::unique_ptr<Cube> testCube( new Cube );
+
+    testCube->fromIsd(tempDir.path() + "/" + cubefile, m_label, m_isd, "rw");
+    return ( testCube.release() );
+  }
+
+  void OrexManyIsdCameraCubes::TearDown() {
+    // passthru...
+  }
 }

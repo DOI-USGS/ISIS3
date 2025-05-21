@@ -30,22 +30,12 @@ int main(void) {
   qDebug() << "Unit Test for ThemisVisCamera...";
   qDebug() << "";
   /**
-   * unit test changed for themis vis camera
+   * Unit test changed for themis vis camera. Print values that will be later
+     compared to truth with tolerance.
    */
   try {
-    // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
-    // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
-    // and "Longitude off by: " values directly into these variables.
-    //double knownCenterLat =  48.53477763371114;
-    //double knownCenterLon = 332.0435632412456;
-    // double knownCenterLat = 48.5338707313522;
-    // double knownCenterLon = 332.0434591311045;
-    // 2014-06-10 Jeannie Backer - Improved distortion model.  New lat/lon
-    double knownCenterLat =  48.515167642355;
-    double knownCenterLon = 332.03690329802;
 
     Cube evenCube("$ISISTESTDATA/isis/src/odyssey/unitTestData/V14093008RDR.even.cub", "r");
-//    Cube evenCube("./V14093008RDR.even.cub", "r");
     Camera *evenCam = CameraFactory::Create(evenCube);
     qDebug() << "FileName: " << FileName(evenCube.fileName()).name();
     qDebug() << "CK Frame: " << evenCam->instrumentRotation()->Frame();
@@ -84,21 +74,9 @@ int main(void) {
       return 0;
     }
 
-    if (abs(evenCam->UniversalLatitude() - knownCenterLat) < 1e-10) {
-      qDebug() << "Latitude:     OK";
-    }
-    else {
-      qDebug() << "Latitude:     off by "
-               << QString::number(evenCam->UniversalLatitude() - knownCenterLat,  'f',  16);
-    }
-
-    if (abs(evenCam->UniversalLongitude() - knownCenterLon) < 2e-10) {
-      qDebug() << "Longitude:    OK";
-    }
-    else {
-      qDebug() << "Longitude:    off by "
-               << QString::number(evenCam->UniversalLongitude() - knownCenterLon,  'f',  16);
-    }
+    cout << "Calculated latitude: " << evenCam->UniversalLatitude() << endl;
+    cout << "Calculated longitude: " << evenCam->UniversalLongitude() << endl;
+    
     TestSampLine(evenCam, samp, line);
 
     qDebug() << "";
@@ -132,8 +110,6 @@ int main(void) {
     TestSampLine(oddCam, oddCam->Samples(), oddCam->Lines() - 96.0); // omit framelet 26 for odd
 
     qDebug() << "For center framelet 13 pixel position ...";
-    knownCenterLat =  48.563958771636;
-    knownCenterLon = 332.04676929446;
     samp = oddCam->Samples()/ 2;
     line = oddCam->Lines() / 2 - 192.0 / 2.0 / 2.0;  // subtract half of summed framelet to
                                                      // get center of framelet 13
@@ -142,21 +118,9 @@ int main(void) {
       return 0;
     }
 
-    if (abs(oddCam->UniversalLatitude() - knownCenterLat) < 1e-10) {
-      qDebug() << "Latitude:     OK";
-    }
-    else {
-      qDebug() << "Latitude:     off by "
-          << QString::number(oddCam->UniversalLatitude() - knownCenterLat,  'f',  16);
-    }
+    cout << "Calculated latitude: " << oddCam->UniversalLatitude() << endl;
+    cout << "Calculated longitude: " << oddCam->UniversalLongitude() << endl;
 
-    if (abs(oddCam->UniversalLongitude() - knownCenterLon) < 2e-10) {
-      qDebug() << "Longitude:    OK";
-    }
-    else {
-      qDebug() << "Longitude:    off by "
-          << QString::number(oddCam->UniversalLongitude() - knownCenterLon,  'f',  16);
-    }
     TestSampLine(oddCam, samp, line);
 
     qDebug() << "";

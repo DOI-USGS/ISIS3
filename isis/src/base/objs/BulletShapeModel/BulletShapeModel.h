@@ -60,19 +60,13 @@ namespace Isis {
       virtual void setSurfacePoint(const SurfacePoint &surfacePoint);
       virtual void clearSurfacePoint();
 
-      // Calculate the default normal of the current intersection point
-      void calculateDefaultNormal();
-
       bool isDEM() const;
 
       // Calculate the surface normal of the current intersection point
       void setLocalNormalFromIntercept();
       void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
-      void calculateSurfaceNormal();
 
       Distance localRadius(const Latitude &lat, const Longitude &lon);
-
-      QVector<double> ellipsoidNormal();
 
       const BulletWorldManager &model() const;
 

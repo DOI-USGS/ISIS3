@@ -105,7 +105,7 @@ TEST(Chan1m32Isis, Chan1m32IsisTestFowardAscending) {
   ASSERT_DOUBLE_EQ(hist->Average(), 15.58169779027077);
   ASSERT_DOUBLE_EQ(hist->Sum(), 47368.361282423139);
   ASSERT_EQ(hist->ValidPixels(), 3040);
-  ASSERT_DOUBLE_EQ(hist->StandardDeviation(), 2.2696592481066249);
+  EXPECT_NEAR(hist->StandardDeviation(), 2.2696592481066249, 3.3e-15);
 }
 
 

@@ -42,6 +42,7 @@
         <!-- Govt -->
         <link rel="stylesheet" href="{$menuPath}assets/styles/uswds.css"/>
         <script src="{$menuPath}assets/scripts/uswds-init.min.js"></script>
+        <script async="async" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=DOI" id="_fed_an_ua_tag"></script>
         
         <!-- USGS -->
         <link rel="stylesheet" href="{$menuPath}assets/styles/usgs/common.css" />

@@ -552,57 +552,98 @@ int main(int argc, char *argv[]) {
     }
     cout << "Quadrature method errors:  " << endl;
     cout << "(a,b)\t\tY(b)-Y(a)\tTrap-Neigh\tSimp3pt-Neigh\tSimp4pt-Clamp\tBoole-Clamp\tExtTrap-Nev\tRomberg-Nev" << endl;
-    double s;
+    double s = 0.0;
     for(double a = 0.0; a < 0.8; a += .3) {
       for(double b = 0.8; b > a; b -= .3) {
         s = 0;
-        s = interp5.RefineExtendedTrap(a, b, s, 10);
+        try {
+          s = interp5.RefineExtendedTrap(a, b, s, 10);
+        } catch(IException &e) {
+          e.print();
+        }
+        
         cout << "(" << a << "," << b << ")\t";
-        if(a == 0) cout << "\t";
-        cout << integral(a, b) << " \t";
-        cout << interp3.TrapezoidalRule(a, b) - integral(a, b) << "\t";
-        if(interp3.TrapezoidalRule(a, b) - integral(a, b) == 0) cout << "\t";
-        cout << interp3.Simpsons3PointRule(a, b) - integral(a, b) << "\t";
-        if(interp3.Simpsons3PointRule(a, b) - integral(a, b) == 0) cout << "\t";
-        cout << interp4.Simpsons4PointRule(a, b) - integral(a, b) << "\t";
-        if(interp4.Simpsons4PointRule(a, b) - integral(a, b) == 0) cout << "\t";
-        cout <<      interp4.BoolesRule(a, b) - integral(a, b) << "\t";
-        if(interp4.BoolesRule(a, b) - integral(a, b) == 0) cout << "\t";
-        cout <<                       s - integral(a, b) << "\t";
-        if(s - integral(a, b) == 0) cout << "\t";
-        cout << interp5.RombergsMethod(a, b) - integral(a, b) << endl;
+        if (a == 0) 
+          cout << "\t";
+        try {
+          cout << integral(a, b) << " \t";
+        } catch(IException &e) {
+          e.print();
+        }
+        
+        try {
+          cout << interp3.TrapezoidalRule(a, b) - integral(a, b) << "\t";
+        } catch(IException &e) {
+          e.print();
+        }
+
+        try {
+          if (interp3.TrapezoidalRule(a, b) - integral(a, b) == 0) 
+            cout << "\t";
+          cout << interp3.Simpsons3PointRule(a, b) - integral(a, b) << "\t";
+        } catch (IException &e) {
+          e.print();
+        }
+        
+        try {
+          if (interp3.Simpsons3PointRule(a, b) - integral(a, b) == 0) 
+            cout << "\t";
+          cout << interp4.Simpsons4PointRule(a, b) - integral(a, b) << "\t";
+        } catch (IException &e) {
+          e.print();
+        }
+        
+        try {
+          if (interp4.Simpsons4PointRule(a, b) - integral(a, b) == 0) 
+            cout << "\t";
+          cout <<      interp4.BoolesRule(a, b) - integral(a, b) << "\t";
+        } catch (IException &e) {
+          e.print();
+        }
+        
+        try {
+          if (interp4.BoolesRule(a, b) - integral(a, b) == 0) 
+            cout << "\t";
+          cout <<                       s - integral(a, b) << "\t";
+        } catch (IException &e) {
+          e.print();
+        }
+        
+        try {
+          if (s - integral(a, b) == 0) 
+            cout << "\t";
+          cout << interp5.RombergsMethod(a, b) - integral(a, b) << endl;
+        } catch (IException &e) {
+          e.print();
+        }
       }
     }
+    
     cout << endl;
     cout << "EXCEPTIONS:" << endl;
     try {
       cout << interp1.GslIntegral(1.1, 1.0) << endl; // invalid interval
-    }
-    catch(IException &e) {
+    } catch(IException &e) {
       e.print();
     }
     try {
       cout << interp1.GslIntegral(1.0, 1.1) << endl; // outside domain
-    }
-    catch(IException &e) {
+    } catch(IException &e) {
       e.print();
     }
     try {
       cout << interp3.GslIntegral(0.0, 0.8) << endl; // not GSL supported
-    }
-    catch(IException &e) {
+    } catch(IException &e) {
       e.print();
     }
     try {
       cout << interp1.TrapezoidalRule(.81, .70) << endl; // invalid interval
-    }
-    catch(IException &e) {
+    } catch(IException &e) {
       e.print();
     }
     try {
       cout << interp1.TrapezoidalRule(-.1, .70) << endl; // outside domain
-    }
-    catch(IException &e) {
+    } catch(IException &e) {
       e.print();
     }
     cout << "\t************************************************" << endl;

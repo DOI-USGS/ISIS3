@@ -1,23 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <application name="noproj" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
-
   <brief>
     Removes camera distortions in a raw level 1 cube creating an ideal version of the cube.
   </brief>
 
   <description>
     <p>
+    <i>Noproj</i> reprojects a <def link="level1">level1</def>
+    <def link="Cube">cube</def> to correct for camera distortion.   
+    The result is a level1 cube of the undistorted image in "Ideal" camera space.
+    </p>
+    
+    <p>     
+    Both cubes (FROM and MATCH) must see the same target. 
+    Each requires <def link="SPICE">SPICE</def> data and should be processed with
+    <a href="../spiceinit/spiceinit.html" target="_blank">spiceinit</a> prior
+    to running <i>noproj</i>.
+    </p>
+    
+    <p>
+    The Ideal camera geometry is derived from the MATCH	cube. 
+    If the coordinate (lat/long) at each pixel in the MATCH cube maps to a lat/long 
+    coordinate in the FROM cube, then the pixel value at the mapped coordinate in 
+    the FROM cube is projected into the TO cube, with some interpolation due to 
+    the distortion correction. 
+    The default behavior is that any offbody pixels in the MATCH and the FROM cube
+    are set to null in the TO cube. 
+    See OFFBODY and OFFBODYTRIM for alternative options
+    for mapping offbody data.
+    Also see <a href="../cam2cam/cam2cam.html" target="_blank">cam2cam</a> as 
+    <i>noproj</i> parameters are passed to <i>cam2cam</i>.
+    </p>
+    
+    <p>
     This program will modify the cube labels for the Ideal camera.
     The original Instrument group is renamed OriginalInstrument and a new
     instrument group is created for the Ideal Camera.  The cube data
-    is modified when this program runs cam2cam, creating the noproj'd
+    is modified when this program runs <i>cam2cam</i>, creating the <i>noproj</i>'ed
     output cube with camera distortions removed.
     </p>
+    
     <p>
-    Note that noproj will not propagate AlphaCube groups from the match cube into the output
-    cube since noproj is resampling the image.
+    Note that <i>noproj</i> will not propagate AlphaCube groups from the MATCH cube into 
+    the TO cube since <i>noproj</i> is resampling the image.
     </p>
+
   </description>
 
   <history>
@@ -64,29 +92,42 @@
     <change name="Ian Humphrey" date="2017-08-19">
       No longer propagates AlphaCube group to output cube. Fixes #4907.
     </change>
+    <change name="Kris Becker" date="2019-01-28">
+      Add OFFBODY option to also project off-body pixels. Added the 
+      OFFBODYTRIM option to not propagate target intersections in 
+      the FROM image into the projection when they don't intersect
+      into the MATCH view. Added use of unique temporary name 
+      creation for the match file template to avoid file name
+      collisions (e.g., when run in parallel in same directory)
+    </change>
     <change name="Kaitlyn Lee" date="2021-03-31">
       Refactored app to be callable and converted its tests to GTests.
     </change>
     <change name="Kris Becker" date="2021-05-06">
-          Added checks for ray tracing options in UofA OSIRIS-REx ISIS code base.
-          The keywords needed for Bullet to operate properly are RayTraceEngine,
-          BulletParts, and Tolerance. These parameters must be included in the
-          output label in order for cam2cam to run and subsequent use is consistent.
+      Added checks for ray tracing options in UofA OSIRIS-REx ISIS code base.
+      The keywords needed for Bullet to operate properly are RayTraceEngine,
+      BulletParts, and Tolerance. These parameters must be included in the
+      output label in order for cam2cam to run and subsequent use is consistent.
     </change>
     <change name="Kris Becker" date="2021-09-22">
-          Rework how temporary external files are identified in UofA OSIRIS-REx
-          ISIS code base after use by cam2cam and ensure they are all deleted. Fixes
-          #4813.
+      Rework how temporary external files are identified in UofA OSIRIS-REx
+      ISIS code base after use by cam2cam and ensure they are all deleted. Fixes
+      #4813.
     </change>
     <change name="Ken Edmundson" date="2023-12-14">
-          Incorporated Kris Becker's 2021-05-06 bug fix above into USGS code base.
+      Incorporated Kris Becker's 2021-05-06 bug fix above into USGS code base.
     </change>
     <change name="Ken Edmundson" date="2024-01-09">
-          Incorporated Kris Becker's 2021-09-22 bug fix above into USGS code base.
+      Incorporated Kris Becker's 2021-09-22 bug fix above into USGS code base.
     </change>
     <change name="Ken Edmundson" date="2024-08-07">
-          Additional bug fix to address persistent temporary lbl file after
-          running noproj. Fixes #5577.
+      Additional bug fix to address persistent temporary lbl file after
+      running noproj. Fixes #5577.
+    </change>
+    <change name="Sarah Sutton" date="2025-04-30">
+	    Incorporated Kris Becker's keyword additions OFFBODY and OFFBODYTRIM
+	    of 1/16/2019 and 1/28/2019 from UofA codebase to Astrogeology.	
+	    Added examples and updated documentation. Addresses #3602.
     </change>
   </history>
 
@@ -148,8 +189,9 @@
              SystemDefault
          </internalDefault>
           <description>
-           This file contains the specifications for the "ideal" camera based on the original instrument.   If no value is entered, the default
-           specs file will be read from "$ISISROOT/appdata/templates/noproj/noprojInstruments.pvl"
+           This file contains the specifications for the "ideal" camera based on the original instrument.   
+           If no value is entered, the default specs file will be read from 
+           "$ISISROOT/appdata/templates/noproj/noprojInstruments.pvl"
          </description>
          <filter>
            *.pvl
@@ -270,6 +312,7 @@
                 </option>
              </list>
         </parameter>
+
        <parameter name="SAMPEXP">
            <type>double</type>
            <default>
@@ -292,8 +335,152 @@
                 This parameter expands the size of the output file in lines beyond the default size to prevent cropping of the 
                 undistorted image.  The undistorted image may be larger than the raw distorted image.
             </description>
-        </parameter>
-    </group>
+      </parameter>
 
+      <parameter name="OFFBODY">
+          <type>boolean</type>
+          <default><item>FALSE</item></default>
+          <brief>
+               Preserve offbody data
+          </brief>
+          <description>
+               This parameter is provided to allow the user to selectively keep data
+               in the FROM image that is off the target body. 
+               When OFFBODY is FALSE (the default), pixels off the target body 
+               in the FROM cube will be NULL in the resulting TO cube.
+               When OFFBODY is TRUE, for pixels that are off the target body, 
+               the RA/DEC coordinates in MATCH are mapped to 
+               FROM. If the RA/DEC is within the FROM cube, the output pixel DN value
+               is interpolated from the FROM cube to the TO cube. See also OFFBODYTRIM.
+          </description>
+      </parameter>
+
+      <parameter name="OFFBODYTRIM">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>
+              Set select pixels in OFFBODY mode to NULL
+        </brief>
+        <description>
+              When using OFFBODY mode, there are situations where the coordinates in
+              the MATCH do not intersect the target body (i.e., the pixel does not have
+              a latitude and longitude).
+              In that case, the MATCH RA/DEC coordinate is mapped into the FROM 
+              image field of view. 
+              If the RA/DEC maps to a FROM sample/line and OFFBODYTRIM=TRUE, 
+              the sample/line is checked for intersection with the target body. 
+              Pixels that intersect the body will result in a NULL output pixel value.
+              Otherwise, the FROM pixel value is interpolated and propagated
+              to the output pixel.
+        </description>
+      </parameter>
+    </group>
   </groups>
+  
+   <examples>
+     <example>
+      <brief> Demonstrate the effects of the OFFBODY and OFFBODYTRIM parameters </brief>
+      
+      <description>
+        In this example, <i>noproj</i> is used to remove camera distortions from two images acquired
+        by the OSIRIS-REx NavCam during a particle ejection event at Bennu 
+        (<a href="https://www.science.org/doi/10.1126/science.aay3544"
+            target="_blank">Lauretta et al., 2019</a>).
+        Example images are 20190106T205618S792_ncm_L0 (long exposure) and
+        20190106T205611S433_ncm_L0 (short exposure). The images are imported from FITS files and
+        converted to ISIS cubes with <a href="../tagcams2isis/tagcams2isis.html" target="_blank">tagcams2isis</a>.
+        Both cubes are initialized with <a href="../spiceinit/spiceinit.html" target="_blank">spiceinit</a>
+        using the bennu_g_00880mm_alt_obj_0000n00000_v020.bds global shapemodel found in the 
+        <a href="https://arcnav.psi.edu/urn:nasa:pds:orex.spice" target="_blank">OSIRIS-REX SPICE KERNEL bundle</a>.    
+
+        <h3>Input images</h3> 
+
+        <img src='assets/images/example1/noproj_example1_inputImages.png' width="2600"/>
+
+        <h3>Command Line for running <i>noproj</i> on long exposure image</h3>
+
+        <img src='assets/images/example1/noproj_example1_cmdLine1.png' width="2600"/>
+
+        <p>
+          Here, OFFBODY=TRUE and OFFBODYTRIM=FALSE to preserve the pixels in the space around Bennu,
+          including the ejected particles. Note that the same cube is used for both FROM and MATCH
+          parameters. 
+        </p>
+
+        <h3>Command Line for running <i>noproj</i> on short exposure image</h3>
+
+        <img src='assets/images/example1/noproj_example1_cmdLine2.png' width="2600"/>
+
+        <p>
+          Here, OFFBODY and OFFBODYTRIM are FALSE. OFFBODY is set to FALSE to set all pixels off the
+          target body to null. The <i>noproj</i>'ed long exposure output is used as the MATCH cube. 
+          The specifications file (specs.pvl) is required because the MATCH cube has been
+          run through <i>noproj</i> and is now identified as an "Ideal" camera in the label.
+          The specifications file contains the undistorted (Ideal camera) detector dimensions. 
+          In this case:
+
+          <pre>
+            Object = IdealInstrumentsSpecifications
+  
+              Group = "IdealSpacecraft/IdealCamera"
+                DetectorSamples = 3050
+                DetectorLines = 2404
+              End_Group
+  
+            End_Object
+            End
+          </pre>  
+        </p>
+
+        <h3>Output images</h3> 
+
+        <img src='assets/images/example1/noproj_example1_outputImages.png' width="2600"/>
+        
+        <p>      
+          Null pixels are shown in yellow to illustrate the undistorted image outline.
+        </p>
+
+        <h3>Mosaic the <i>noproj</i>'ed long and short exposures</h3> 
+        
+        <p>
+          To see the ejected particles <em>and</em> the surface of Bennu in the same scene,
+          we mosaicked the short exposure cube on top of the long exposure cube using 
+          <a href="../handmos/handmos.html" target="_blank">handmos</a>. 
+          In the image shown, both <i>noproj</i>'ed cubes have been contrast-stretched, 
+          but only at a rudimentary level. This example does not
+          reproduce the full processing required to generate the figure in the article
+          referenced above, but it does illustrate a case where it is necessary to 
+          preserve off-body pixels.
+        </p>
+          
+        <h3>Particle ejection observations mosaic</h3> 
+
+        <img src='assets/images/example1/particle_mosaic.jpeg' width="600"/>
+
+        <p>
+          OSIRIS-REx NavCam image 20190106T205611S433_ncm_L0 combined with 20190106T205618S792_ncm_L0.
+        </p>
+
+     <h3>To Reproduce This Example</h3>        
+        <p>
+        Download the <a href="assets/files/process_navcam_particle_images.sh" target="_blank">shell script</a>, 
+        the <a href="assets/files/BulletEngineSelect.pref" target="_blank">ray tracer</a> 
+        preference file, and the Ideal camera 
+        <a href="assets/files/specs.pvl" target="_blank">specifications</a>  
+        file linked here. 
+        The ray trace preference file sets the ray trace library to 
+        <b>Bullet</b> rather than <b>NAIF DSK</b> (default for shape models with a ".bds" 
+        file extension) as Bullet will detect occlusions. 
+        The specifications file defines the size of the distortion-corrected NavCam image,
+        which after running <i>noproj</i> is identified as the "Ideal" camera model.
+        Before running the script, place the preference and specification files 
+        in $ISISROOT. 
+        The script will download and move the OSIRIS-REx DSK (shapemodel) kernel into $ISISDATA. 
+        See the
+        <a href="https://github.com/DOI-USGS/ISIS3/blob/dev/README.md#Mission-Specific-Data-Downloads" target="_blank">ISIS documentation</a>
+        for instructions on downloading $ISISDATA for a specific mission.
+        </p>
+      </description>
+      </example>          
+   </examples>
 </application>

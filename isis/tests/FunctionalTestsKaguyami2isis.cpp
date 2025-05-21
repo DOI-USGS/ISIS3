@@ -40,7 +40,7 @@ TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisVis) {
   // Pixels group
   EXPECT_EQ(PixelTypeName(cube.pixelType()), "SignedWord");
   EXPECT_EQ(ByteOrderName(cube.byteOrder()), "Lsb");
-  EXPECT_DOUBLE_EQ(cube.base(), 0.0);
+  EXPECT_NEAR(cube.base(), 0.0, 5e-14); // For Mac Arm
   EXPECT_DOUBLE_EQ(cube.multiplier(), 0.013);
 
   // Instrument Group
@@ -91,7 +91,7 @@ TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisVis) {
   EXPECT_DOUBLE_EQ(hist->Average(), 25.685768243243238);
   EXPECT_DOUBLE_EQ(hist->Sum(), 494194.18099999992);
   EXPECT_EQ(hist->ValidPixels(), 19240);
-  EXPECT_DOUBLE_EQ(hist->StandardDeviation(), 26.830242572528928);
+  EXPECT_NEAR(hist->StandardDeviation(), 26.830242572528928, 1e-13);
 }
 
 TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisNir) {
@@ -118,7 +118,7 @@ TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisNir) {
   // Pixels group
   EXPECT_EQ(PixelTypeName(cube.pixelType()), "SignedWord");
   EXPECT_EQ(ByteOrderName(cube.byteOrder()), "Lsb");
-  EXPECT_DOUBLE_EQ(cube.base(), 0.0);
+  EXPECT_NEAR(cube.base(), 0.0, 4e-14);
   EXPECT_DOUBLE_EQ(cube.multiplier(), 0.013);
 
   // Instrument Group
@@ -169,7 +169,7 @@ TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisNir) {
   EXPECT_DOUBLE_EQ(hist->Average(), 29.395262812500022);
   EXPECT_DOUBLE_EQ(hist->Sum(), 188129.68200000015);
   EXPECT_EQ(hist->ValidPixels(), 6400);
-  EXPECT_DOUBLE_EQ(hist->StandardDeviation(), 2.8449125231835715);
+  EXPECT_NEAR(hist->StandardDeviation(), 2.8449125231835715, 8.3e-14);
 }
 
 TEST(kaguyatc2isisTest, FunctionalTestKaguyami2isisProj) {

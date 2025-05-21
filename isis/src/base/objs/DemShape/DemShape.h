@@ -72,9 +72,6 @@ namespace Isis {
       // Return dem scale in pixels/degree
       double demScale();
 
-      // Calculate the default normal of the current intersection point
-      virtual void calculateDefaultNormal();
-
       // implement pure virtual method from ShapeModel class
       bool isDEM() const;
 
@@ -86,17 +83,33 @@ namespace Isis {
 
       // Calculate the surface normal of the current intersection point
      void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
-     void calculateSurfaceNormal();
 
     protected:
-     Cube *demCube();         //!< Returns the cube defining the shape model.
+      Cube *demCube();         //!< Returns the cube defining the shape model.
 
     private:
+    
+      // Given a position along a ray, compute the difference between the radius
+      // at that position and the surface radius at that lon-lat location.
+      // Update the intersection point in the class based on the input
+      // parameters. All lengths are in km.
+      double calcDemErrUpdateIntersection(std::vector<double> const& observerPos,
+                                          std::vector<double> const& lookDirection, 
+                                          double t, 
+                                          double * intersectionPoint,
+                                          bool & success);
+    
+      // Find a value in the DEM. Used when intersecting a ray with the DEM.
+      // Returned value is in km. 
+      double findDemValue();
+      
       Cube *m_demCube;        //!< The cube containing the model
       Projection *m_demProj;  //!< The projection of the model
       double m_pixPerDegree;  //!< Scale of DEM file in pixels per degree
       Portal *m_portal;       //!< Buffer used to read from the model
       Interpolator *m_interp; //!< Use bilinear interpolation from dem
+      double m_demValue;      //!< A value picked from the dem
+      bool m_demValueFound;   //!< True if it was attempted to find a value in the DEM
   };
 }
 

@@ -117,7 +117,7 @@ int main() {
     cout << "GroundAzimuth in North: " << c->GroundAzimuth(20.0, 226.671, 20.0, 230.0) << endl;
     cout << "GroundAzimuth in North: " << c->GroundAzimuth(18.221, 355.0, 20.0, 6.671) << endl;
     cout << "GroundAzimuth in North: " << c->GroundAzimuth(18.221, 6.671, 20.0, 355.0) << endl;
-    cout << "GroundAzimuth in North: " << c->GroundAzimuth(18.221, 6.671, 20.0, 6.671) << endl;
+    cout << "GroundAzimuth in North: " << round(c->GroundAzimuth(18.221, 6.671, 20.0, 6.671)*100)/100.0 << endl; // Mac arm fix
     cout << "GroundAzimuth in South: " << c->GroundAzimuth(-18.221, 226.671, -20.0, 230.0) << endl;
     cout << "GroundAzimuth in South: " << c->GroundAzimuth(-20.0, 226.671, -20.0, 230.0) << endl;
     cout << "GroundAzimuth in South: " << c->GroundAzimuth(-18.221, 355.0, -20.0, 6.671) << endl;

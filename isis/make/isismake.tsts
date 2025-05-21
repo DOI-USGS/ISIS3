@@ -156,6 +156,9 @@ test: FORCE clean
 	      MSG='$(FILECOUNTMISMATCH)';                                          \
 	      echo -n $(CURTIMESTAMP) >> errors.txt;                               \
 	      $(PRINTF) "$(BLANKS)  " >> errors.txt;                               \
+	      echo $$MSG;                                                          \
+	      echo Truth file count: $$TRUTHFILECOUNT;                             \
+	      echo Output file count: $$OUTPUTFILECOUNT;                           \
 	      $$MSG >> errors.txt;                                                 \
 	    else                                                                   \
 	      $(MAKE) comparefiles;                                                \
@@ -167,7 +170,6 @@ test: FORCE clean
 	  $(PRINTF) "$(BLANKS)  " >> errors.txt;                                   \
 	  $$MSG >> errors.txt;                                                     \
 	fi;                                                                        \
-	                                                                           \
 	TIME2=`date +"%s"`;                                                        \
 	TIMEDIFF=`expr $$TIME2 - $$TIME1`;                                         \
 	SEC60=`expr $$TIMEDIFF % 60`;                                              \
@@ -179,20 +181,18 @@ test: FORCE clean
 	if [ -f casesucceeded.txt ]; then                                          \
 	  eval $(TESTPASSED);                                                      \
 	  $(PRINTF) "Duration [%.2i:%.2i:%.2i]\n" $$HOUR60 $$MIN60 $$SEC60;        \
+	                                                                           \
 	  $(RM) casesucceeded.txt;                                                 \
+	  if [ "$(findstring $(TESTNOCLEAN), $(MODE))" != "$(TESTNOCLEAN)" ]; then \
+	    $(MAKE) ccsafeclean;                                                   \
+	  fi;                                                                      \
 	else                                                                       \
 	  eval $(TESTFAILED);                                                      \
 	  $(PRINTF) "Duration [%.2i:%.2i:%.2i]\n" $$HOUR60 $$MIN60 $$SEC60;        \
-	  $(CAT) errors.txt;                                                       \
-	  $(RM) errors.txt;                                                        \
-	fi;                                                                        \
-	                                                                           \
-	if [ "$(findstring $(TESTNOCLEAN), $(MODE))" != "$(TESTNOCLEAN)" ];        \
-	then                                                                       \
-	  $(MAKE) ccsafeclean;                                                     \
+	  echo Summary error file: $(shell pwd)/errors.txt;                        \
 	fi;
 
-#-------------------------------------------------------------------------     ---
+#-------------------------------------------------------------------------
 # Target = compare
 # Dependencies = All files in the truth and output directories
 #
@@ -201,7 +201,7 @@ test: FORCE clean
 # If successful (indicated by presence of casesucceeded.txt),
 # prints success message. If not, prints all errors that were
 # encountered (found in errors.txt).
-#-------------------------------------------------------------------------     ---
+#-------------------------------------------------------------------------
 compare: FORCE
 	if [ -d "$(OUTPUT)" ]; then                                                \
 	  if [ -d "$(TRUTH)" ]; then                                               \
@@ -257,55 +257,22 @@ compare: FORCE
 # in the output directory, casesucceeded.txt is created to
 # indicate that the comparison was successful. All errors are
 # written to errors.txt.
-#
-# Some parts of this target are not very straightforward. For comparing cubes,
-# users may specify make variables within their tests to indicate tolerance or
-# to ignore special pixels when running cubediff
-# (i.e. test_cube.cub.TOLERANCE=0.0000001). The problem here is that within
-# this target, we have the current filename that is being compared stored in a
-# bash variable. We know that the *make* tolerance variable, if it exists, will
-# have the same name as the current file, but with .TOLERANCE appended to it.
-# We cannot, however, access it by simply appending .TOLERANCE to the contents
-# of our current filename variable (bash) and then ask make to evaluate that
-# new variable name because make converts all make-specific code into bash
-# BEFORE it evaluates the bash code.
-#
-# Here is an example of the problem:
-#
-#   FILENAME=foo.cub;                  // this is a bash variable
-#   TOLERANCE=$($$FILENAME.TOLERANCE); // this does not work because make will
-#                                      // try to look for a make variable named
-#                                      // '$FILENAME.TOLERANCE' (literally).
-#
-# The workaround is to use make's special variable that is a space-separated
-# list of currently defined make variable *names* (NOT values). This variable
-# is .VARIABLES. The names of each of the currently defined make .TOLERANCE
-# variables are extracted from this list, and their values are looked up as
-# well. A new bash variable is used to hold these name/values pairs for each of
-# the tolerances (the name and value is separated by a semicolon). The list of
-# tolerances is searched for the matching tolerance for the current file (if it
-# even exists), and this is used in the cubediff. The reason that all of this
-# works is because the we are able to get the name AND value of each tolerance
-# out of the make variables and into bash variables. This same process is
-# repeated for cubes that have .IGNORESPECIAL variables defined.
-#
-# This is only a workaround. The real solution would be to completely get rid
-# of make variable tolerances from all tests and force the use of .DIFF files
-# (like pvldiff uses). However, around 138 tests are currently using make
-# variables to do this, so it would be a considerable undertaking.
-#
-#
-# 2012-06-26 - Jeannie Backer - Sent stderr of pvldiff and cnetdiff to error
-#                  files instead of /dev/null.  If errors exist, test fails and
-#                  error messages are reported to stdout.  This was already
-#                  being handled for cubediff.
-#----------------------------------------------------------------------------
+
+# For comparing cubes, users may specify in the Makefile for a test a 
+# tolerance or instructions to ignore special pixels when running cubediff. 
+# Example: test_cube.cub.TOLERANCE=0.0000001. These are parsed and applied 
+# below.
+
+# For other data, the tolerance is in a file with the same name as the truth
+# file, but with .TOL appended. Example: labels.pvl.TOL.
+ 
 comparefiles: FORCE
 	TRUTHFILECOUNT=`$(LS) -p $(TRUTH)/ | $(GREP) -v "/" | wc -l`;              \
 	SUCCESSFULCOMPARISONS=0;                                                   \
 	                                                                           \
 	FILES="$(notdir $(wildcard $(TRUTH)/*))";                                  \
 	for FILE in $$FILES; do                                                    \
+	                                                                           \
 	  if [ ! -f $(OUTPUT)/$$FILE ]; then                                       \
 	    MSG="$(FILENOTFOUND) [$$FILE]";                                        \
 	    echo -n $(CURTIMESTAMP) >> errors.txt;                                 \
@@ -313,21 +280,23 @@ comparefiles: FORCE
 	    $$MSG >> errors.txt;                                                   \
 	  else                                                                     \
 	    FILETYPE=$${FILE##*.};                                                 \
+	    FAILURE_REPORT=$(OUTPUT)/$$FILE.err.txt;                               \
 	                                                                           \
 	    if [ "$$FILETYPE" == "cub" ]; then                                     \
+	      # Parse .cub tolerance based on cub name                             \
 	      TOLERANCESTR="";                                                     \
 	      FILETOLERANCES="$(foreach TOLERANCEVAR,                              \
 	                          $(filter %.TOLERANCE,$(.VARIABLES)),             \
 	                          $(TOLERANCEVAR);$($(TOLERANCEVAR)))";            \
-	      if [ -n "$$FILETOLERANCES" ]; then                                   \
-	        for TOLERANCE in $$FILETOLERANCES; do                              \
-	          TOLERANCEFILENAME=`echo "$$TOLERANCE" | sed "s/;.*//"`;          \
-	          if [ "$$TOLERANCEFILENAME" == "$$FILE.TOLERANCE" ]; then         \
-	            TOLERANCEVALUE=`echo "$$TOLERANCE" | sed "s/^.*;//"`;          \
-	            TOLERANCESTR="tolerance=$$TOLERANCEVALUE";                     \
-	            break;                                                         \
-	          fi;                                                              \
-	        done;                                                              \
+	      TOLERANCESTR=`echo "$$FILETOLERANCES"                                \
+	                     | perl -p -e "s#\s#\n#g"                              \
+	                     | grep $$FILE | grep TOLERANCE                        \
+	                     | perl -p -e "s#^.*?TOLERANCE;##g"`;                  \
+	      if [ "$$TOLERANCESTR" != "" ]; then                                  \
+	        echo Tolerance from Makefile for $$FILE: $$TOLERANCESTR;           \
+	      else                                                                 \
+	        TOLERANCESTR=1e-8;                                                 \
+	        echo Default tolerance for $$FILE: $$TOLERANCESTR;                 \
 	      fi;                                                                  \
 	                                                                           \
 	      IGNORESTR="";                                                        \
@@ -344,119 +313,114 @@ comparefiles: FORCE
 	          fi;                                                              \
 	        done;                                                              \
 	      fi;                                                                  \
+	    else                                                                   \
+	      # Parse tolerance for non-cub                                        \
+	      TOL_FILE="$(INPUT)/$$FILE.TOL";                                      \
+	      REPO_TOL_FILE="$(shell pwd)/$$FILE.TOL";                             \
+	      if [ -f "$$REPO_TOL_FILE" ]; then                                    \
+	        # A few tests have the tol file in the isis repo, then use that.   \
+	        TOL_FILE="$$REPO_TOL_FILE";                                        \
+	      fi;                                                                  \
+	      TOLERANCESTR=1e-8;                                                   \
+	      if [ -f "$$TOL_FILE" ]; then                                         \
+	        TOLERANCESTR=`$(CAT) $$TOL_FILE`;                                  \
+	      fi;                                                                  \
+	    fi;                                                                    \
 	                                                                           \
+	    DIFFFILE_CANDIDATE="$(INPUT)/$$FILE.DIFF";                             \
+	    DIFFFILE=$$DIFFFILE_CANDIDATE;                                         \
+	    if [ ! -f $$DIFFFILE ]; then                                           \
+	      DIFFFILE='';                                                         \
+	    fi;                                                                    \
+	                                                                           \
+	    # cub                                                                  \
+	    if [ "$$FILETYPE" == "cub" ]; then                                     \
 	      $(ISISROOT)/bin/cubediff                                             \
-	          $(TSTARGS)                                                       \
-	          from=$(TRUTH)/$$FILE                                             \
-	          from2=$(OUTPUT)/$$FILE                                           \
-	          to=compare.txt                                                   \
-	          $$TOLERANCESTR                                                   \
-	          $$IGNORESTR 1>>/dev/null 2>cubediffError.txt;                    \
-	      if [ $$? != 0 ]; then                                                \
+	         $(TSTARGS)                                                        \
+	         from=$(TRUTH)/$$FILE                                              \
+	         from2=$(OUTPUT)/$$FILE                                            \
+	         to=$$FAILURE_REPORT                                               \
+	         TOLERANCE=$$TOLERANCESTR                                          \
+	         $$IGNORESTR 1>>/dev/null 2> $$FAILURE_REPORT;                     \
+	      res=$$?;                                                             \
+	      if [ $$res != 0 ]; then                                              \
+	        # cubediff cannot handle different number of special pixels.       \
+	        echo cubediff failed. Try GDAL.;                                   \
+	        truthStats=$${FILE}.truth.txt; currStats=$${FILE}.curr.txt;        \
+	        gdalinfo -stats $(TRUTH)/$$FILE > $$truthStats;                    \
+	        gdalinfo -stats $(OUTPUT)/$$FILE > $$currStats;                    \
+	        $(RM) $(TRUTH)/$$FILE.aux.xml $(OUTPUT)/$$FILE.aux.xml;            \
+	        python $(ISISROOT)/scripts/textdiff.py $$truthStats                \
+	            $$currStats -abs_err $$TOLERANCESTR $$DIFFFILE                 \
+	            > $$FAILURE_REPORT 2>&1;                                       \
+	        res=$$?;                                                           \
+	      fi;                                                                  \
+	                                                                           \
+	      if [ $$res != 0 ]; then                                              \
 	        COMPRESULT="ERROR";                                                \
 	      else                                                                 \
-	        COMPRESULT=`$(ISISROOT)/bin/getkey from=compare.txt                \
-	          grp=Results keyword=Compare | tr '[:upper:]' '[:lower:]'`;       \
+	        COMPRESULT="identical";                                            \
 	      fi;                                                                  \
-	      COMMAND="";                                                          \
 	      if [ "$$COMPRESULT" != "identical" ]; then                           \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                                  \
 	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
 	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
 	        $$MSG >> errors.txt;                                               \
 	        if [ "$$COMPRESULT" == "ERROR" ]; then                             \
-	          cat cubediffError.txt >> errors.txt;                             \
+	          cat $$FAILURE_REPORT >> errors.txt;                              \
 	        fi;                                                                \
+	        echo Failed comparing cubes. Report: $(shell pwd)/$$FAILURE_REPORT;\
+	        echo Add/update the truth cube tolerance in the test Makefile.;    \
+	        echo Truth cube that needs tolerance: $$FILE;                      \
+	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
+	        tail -n 1 $$FAILURE_REPORT;                                        \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
+	        $(RM) $$FAILURE_REPORT 2>/dev/null;                                \
+	        $(RM) $$truthStats     2>/dev/null;                                \
+	        $(RM) $$currStats      2>/dev/null;                                \
+	        $(RM) errors.txt       2>/dev/null;                                \
 	      fi;                                                                  \
-	      $(RM) compare.txt;                                                   \
-	      if [ -f cubediffError.txt ]; then                                    \
-	        $(RM) cubediffError.txt;                                           \
-	      fi;                                                                  \
-	    elif [ "$$FILETYPE" == "txt" ]; then                                   \
-	      COMMAND="";                                                          \
-	      $(DIFF) $(TRUTH)/$$FILE $(OUTPUT)/$$FILE > /dev/null;                \
+	                                                                           \
+	    # txt, csv, pvl                                                        \
+	    elif [ "$$FILETYPE" == "txt" ] || [ "$$FILETYPE" == "csv" ] ||         \
+	         [ "$$FILETYPE" == "pvl" ]; then                                   \
+	      python $(ISISROOT)/scripts/textdiff.py $(TRUTH)/$$FILE               \
+	          $(OUTPUT)/$$FILE -abs_err $$TOLERANCESTR $$DIFFFILE              \
+	          > $$FAILURE_REPORT 2>&1;                                         \
+	                                                                           \
 	      if [ $$? -ne 0 ]; then                                               \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                                  \
 	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
 	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
 	        $$MSG >> errors.txt;                                               \
+	        cat $$FAILURE_REPORT >> errors.txt;                                \
+	        echo Failed comparing txt. Report: $(shell pwd)/$$FAILURE_REPORT;  \
+	        echo Tolerance: $$TOLERANCESTR;                                    \
+	        echo Tolerance file to update: $$TOL_FILE;                         \
+	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
+	        tail -n 1 $$FAILURE_REPORT;                                        \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
-	      fi;                                                                  \
-	    elif [ "$$FILETYPE" == "csv" ]; then                                   \
-	      DIFFFILE="$(INPUT)/$$FILE.DIFF";                                     \
-	      if [ ! -f $$DIFFFILE ]; then                                         \
-	        DIFFFILE='';                                                       \
-	      fi;                                                                  \
-	                                                                           \
-	      $(ISISROOT)/scripts/csvdiff.py $(TRUTH)/$$FILE $(OUTPUT)/$$FILE      \
-	          $$DIFFFILE > /dev/null;                                          \
-	                                                                           \
-	      RETVAL=$$?;                                                          \
-	      if [ $$RETVAL != 0 ]; then                                           \
-	        MSG="$(TESTFILEFAILED) [$$FILE]";                                  \
-	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
-	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
-	        $$MSG >> errors.txt;                                               \
-	      else                                                                 \
-	        let SUCCESSFULCOMPARISONS++;                                       \
-	      fi;                                                                  \
-	    elif [ "$$FILETYPE" == "pvl" ]; then                                   \
-	      DIFFFILE="$(INPUT)/$$FILE.DIFF";                                     \
-	      if [ ! -f $$DIFFFILE ]; then                                         \
-	        DIFFFILE='';                                                       \
-	      fi;                                                                  \
-	                                                                           \
-	      $(ISISROOT)/bin/pvldiff                                              \
-	          $(TSTARGS)                                                       \
-	          from=$(TRUTH)/$$FILE                                             \
-	          from2=$(OUTPUT)/$$FILE                                           \
-	          to=compare.txt                                                   \
-	          diff=$$DIFFFILE 1>>/dev/null 2>pvldiffError.txt;                 \
-	      if [ $$? != 0 ]; then                                                \
-	        COMPRESULT="ERROR";                                                \
-	      else                                                                 \
-	        COMPRESULT=`$(ISISROOT)/bin/getkey from=compare.txt                \
-	          grp=Results keyword=Compare | tr '[:upper:]' '[:lower:]'`;       \
-	      fi;                                                                  \
-	                                                                           \
-	      if [ "$$COMPRESULT" != "identical" ]; then                           \
-	        MSG="$(TESTFILEFAILED) [$$FILE]";                                  \
-	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
-	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
-	        $$MSG >> errors.txt;                                               \
-	        if [ "$$COMPRESULT" == "ERROR" ]; then                             \
-	          cat pvldiffError.txt >> errors.txt;                              \
+	        if [ -f $$FAILURE_REPORT ]; then                                   \
+	          $(RM) $$FAILURE_REPORT;                                          \
 	        fi;                                                                \
-	      else                                                                 \
-	        let SUCCESSFULCOMPARISONS++;                                       \
-	      fi;                                                                  \
-	      $(RM) compare.txt;                                                   \
-	      if [ -f pvldiffError.txt ]; then                                     \
-	        $(RM) pvldiffError.txt;                                            \
-	      fi;                                                                  \
-	    elif [ "$$FILETYPE" == "net" ]; then                                   \
-	      DIFFFILE="$(INPUT)/$$FILE.DIFF";                                     \
-	      if [ ! -f $$DIFFFILE ]; then                                         \
-	        DIFFFILE='';                                                       \
 	      fi;                                                                  \
 	                                                                           \
+	    # cnet                                                                 \
+	    elif [ "$$FILETYPE" == "net" ]; then                                   \
 	      $(ISISROOT)/bin/cnetdiff                                             \
 	          $(TSTARGS)                                                       \
 	          from=$(TRUTH)/$$FILE                                             \
 	          from2=$(OUTPUT)/$$FILE                                           \
 	          to=compare.txt                                                   \
 	          diff=$$DIFFFILE 1>>/dev/null 2>cnetdiffError.txt;                \
-	                                                                           \
 	      if [ $$? != 0 ]; then                                                \
 	        COMPRESULT="ERROR";                                                \
 	      else                                                                 \
 	        COMPRESULT=`$(ISISROOT)/bin/getkey from=compare.txt                \
 	          grp=Results keyword=Compare | tr '[:upper:]' '[:lower:]'`;       \
 	      fi;                                                                  \
-	                                                                           \
 	      if [ "$$COMPRESULT" != "identical" ]; then                           \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                                  \
 	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
@@ -465,6 +429,9 @@ comparefiles: FORCE
 	        if [ "$$COMPRESULT" == "ERROR" ]; then                             \
 	          cat cnetdiffError.txt >> errors.txt;                             \
 	        fi;                                                                \
+	        echo Failed comparing cnet;                                        \
+	        cat compare.txt;                                                   \
+	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
 	      fi;                                                                  \
@@ -472,19 +439,52 @@ comparefiles: FORCE
 	      if [ -f cnetdiffError.txt ]; then                                    \
 	        $(RM) cnetdiffError.txt;                                           \
 	      fi;                                                                  \
+	                                                                           \
+	    # binary                                                               \
 	    elif [[ "$(BINFILES)" =~ "$$FILETYPE" ]]; then                         \
-	      COMMAND="";                                                          \
 	      $(DIFF) $(TRUTH)/$$FILE $(OUTPUT)/$$FILE > /dev/null;                \
-	      if [ $$? -ne 0 ]; then                                               \
+	      res=$$?;                                                             \
+	      if [ $$res != 0 ]; then                                              \
+	        # Fallback to GDAL-based comparison                                \
+	        truthCub=$${FILE}.truth.cub; currCub=$${FILE}.curr.cub;            \
+	        truthStats=$${FILE}.truth.txt; currStats=$${FILE}.curr.txt;        \
+	        raw2isis lines=100 samples=100 from = $(TRUTH)/$$FILE              \
+	          to = $$truthCub;                                                 \
+	        raw2isis lines=100 samples=100 from = $(OUTPUT)/$$FILE             \
+	          to = $$currCub;                                                  \
+	        gdalinfo -stats $$truthCub > $$truthStats;                         \
+	        gdalinfo -stats $$currCub > $$currStats;                           \
+	        $(RM) $${truthCub}.aux.xml $${currCub}.aux.xml;                    \
+	        python $(ISISROOT)/scripts/textdiff.py $$truthStats                \
+	            $$currStats -abs_err $$TOLERANCESTR $$DIFFFILE                 \
+	            > $$FAILURE_REPORT 2>&1;                                       \
+	        res=$$?;                                                           \
+	      fi;                                                                  \
+	      if [ $$res != 0 ]; then                                              \
 	        MSG="$(TESTFILEFAILED) [$$FILE]";                                  \
 	        echo -n $(CURTIMESTAMP) >> errors.txt;                             \
 	        $(PRINTF) "$(BLANKS)   " >> errors.txt;                            \
 	        $$MSG >> errors.txt;                                               \
+	        cat $$FAILURE_REPORT >> errors.txt;                                \
+	        echo Failed comparing binary.;                                     \
+	        echo Report: $(shell pwd)/$$FAILURE_REPORT;                        \
+	        echo Tolerance: $$TOLERANCESTR;                                    \
+	        echo Tolerance file to update: $$TOL_FILE;                         \
+	        echo File with fields to ignore: $$DIFFFILE_CANDIDATE;             \
+	        tail -n 1 $$FAILURE_REPORT;                                        \
 	      else                                                                 \
 	        let SUCCESSFULCOMPARISONS++;                                       \
+	        $(RM) $$FAILURE_REPORT 2>/dev/null;                                \
+	        $(RM) $$truthCub       2>/dev/null;                                \
+	        $(RM) $$currCub        2>/dev/null;                                \
+	        $(RM) $$truthStats     2>/dev/null;                                \
+	        $(RM) $$currStats      2>/dev/null;                                \
 	      fi;                                                                  \
+	                                                                           \
+	    # unknown                                                              \
 	    else                                                                   \
 	      MSG="$(UNKNOWNFILE) [$$FILE]";                                       \
+	      echo Unknown file type: $FFILE;                                      \
 	      echo -n $(CURTIMESTAMP) >> errors.txt;                               \
 	      $(PRINTF) "$(BLANKS)   " >> errors.txt;                              \
 	      $$MSG >> errors.txt;                                                 \
@@ -573,8 +573,9 @@ clean: FORCE
 #   coverage files.
 #----------------------------------------------------------------------------
 ccsafeclean: FORCE
-	$(RM) -r $(OUTPUT);              \
-	$(RM) print.prt;
+	$(RM) -r $(OUTPUT); \
+	$(RM) print.prt;    \
+	$(RM) errors.txt
 
 #----------------------------------------------------------------------------
 # Target = modifyFiles

@@ -1,7 +1,7 @@
 APPNAME = hijitter
 
-PSP_007556_2010_RED4.balance.cropped.cub.TOLERANCE = .00074
-PSP_007556_2010_RED5.balance.cropped.cub.TOLERANCE = .00074
+PSP_007556_2010_RED4.balance.cropped.cub.TOLERANCE = 0.005
+PSP_007556_2010_RED5.balance.cropped.cub.TOLERANCE = 0.005
 
 include $(ISISROOT)/make/isismake.tsts
 

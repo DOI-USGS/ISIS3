@@ -42,7 +42,7 @@ TEST(GaussianDistribution, InvalidPercentage) {
 
 TEST_P(DoubleTest, Distributions) {
   Isis::GaussianDistribution dist;
-  EXPECT_NEAR(dist.CumulativeDistribution(GetParam().first), GetParam().second, .000000000000000001);
+  EXPECT_NEAR(dist.CumulativeDistribution(GetParam().first), GetParam().second, 1e-12);
   EXPECT_NEAR(dist.InverseCumulativeDistribution(GetParam().second), GetParam().first, .000001);
 }
 

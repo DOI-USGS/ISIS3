@@ -179,6 +179,18 @@ namespace Isis {
   }
 
 
+  bool CubeAttributeOutput::propagateFileFormat() const {
+    bool result = false;
+
+    QStringList fileFormatAtts = attributeList(&CubeAttributeOutput::isFileFormat);
+
+    if (fileFormatAtts.isEmpty() || fileFormatAtts.last() == "PROPAGATE")
+      result = true;
+
+    return result;
+  }
+
+
 //   void CubeAttributeOutput::Set(const FileName &fileName) {
 //     Reset();
 //
@@ -274,6 +286,9 @@ namespace Isis {
 
       if (formatString == "BSQ" || formatString == "BANDSEQUENTIAL")
         result = Cube::Bsq;
+      else if(formatString == "GTIFF") {
+        result = Cube::GTiff;
+      }
     }
 
     return result;
@@ -286,8 +301,19 @@ namespace Isis {
 
 
   void CubeAttributeOutput::setFileFormat(Cube::Format fmt) {
-    setAttribute((fmt == Cube::Tile)? "Tile" : "BandSequential",
-                 &CubeAttributeOutput::isFileFormat);
+    if (fmt == Cube::Tile) {
+      setAttribute("Tile", &CubeAttributeOutput::isFileFormat);
+    }
+    else if (fmt == Cube::Bsq) {
+      setAttribute("BandSequential", &CubeAttributeOutput::isFileFormat);
+    }
+    else if (fmt == Cube::GTiff) {
+      setAttribute("GTiff", &CubeAttributeOutput::isFileFormat);
+    }
+    else {
+      QString msg = "Unsupported format [" + toString(fmt) + "]";
+      IException(IException::Programmer, msg, _FILEINFO_);
+    }
   }
 
 
@@ -392,22 +418,22 @@ namespace Isis {
   }
 
 
-  void CubeAttributeOutput::setLabelAttachment(LabelAttachment attachment) {
+  void CubeAttributeOutput::setLabelAttachment(Cube::LabelAttachment attachment) {
     setAttribute(LabelAttachmentName(attachment), &CubeAttributeOutput::isLabelAttachment);
   }
 
 
-  LabelAttachment CubeAttributeOutput::labelAttachment() const {
-    LabelAttachment result = AttachedLabel;
+  Cube::LabelAttachment CubeAttributeOutput::labelAttachment() const {
+    Cube::LabelAttachment result = Cube::AttachedLabel;
 
     QStringList labelAttachmentAtts = attributeList(&CubeAttributeOutput::isLabelAttachment);
     if (!labelAttachmentAtts.isEmpty()) {
       QString labelAttachmentAtt = labelAttachmentAtts.last();
 
       if (labelAttachmentAtt == "DETACHED")
-        result = DetachedLabel;
+        result = Cube::DetachedLabel;
       else if (labelAttachmentAtt == "EXTERNAL")
-        result = ExternalLabel;
+        result = Cube::ExternalLabel;
     }
 
     return result;
@@ -420,7 +446,7 @@ namespace Isis {
 
 
   bool CubeAttributeOutput::isFileFormat(QString attribute) const {
-    return QRegExp("(BANDSEQUENTIAL|BSQ|TILE)").exactMatch(attribute);
+    return QRegExp("(BANDSEQUENTIAL|BSQ|TILE|GTIFF)").exactMatch(attribute);
   }
 
 
@@ -443,10 +469,21 @@ namespace Isis {
 
 
   QString CubeAttributeOutput::toString(Cube::Format format) {
-    QString result = "Tile";
+    QString result;
 
-    if (format == Cube::Bsq)
+    if (format == Cube::Tile) {
+      result = "Tile";
+    }
+    else if (format == Cube::Bsq) {
       result = "BandSequential";
+    }
+    else if (format == Cube::GTiff) {
+      result = "GTiff";
+    }
+    else {
+      QString msg = "Format [" + QString::number(format) + "] cannot be translated to string";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
 
     return result;
   }

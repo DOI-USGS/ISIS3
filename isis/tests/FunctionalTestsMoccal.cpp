@@ -44,7 +44,7 @@ TEST_F(MgsMocCube, FunctionalTestMoccalDefault) {
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.056909484090283513);
   EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 22.763793636113405);
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0021719888294085255);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.0021719888294085255, 1e-14);
 }
 
 
@@ -81,7 +81,7 @@ TEST_F(MgsMocCube, FunctionalTestMoccalIofFalse) {
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.11209752136841417);
   EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 44.839008547365665);
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.004278277553211739);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.004278277553211739, 1.2e-16);
 }
 
 
@@ -117,7 +117,7 @@ TEST_F(MgsMocCube, FunctionalTestMoccalNullwagoTrue) {
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.056909484090283513);
   EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 22.763793636113405);
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0021719888294085255);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.0021719888294085255, 1.1e-16);
 }
 
 

@@ -34,7 +34,10 @@ TEST(BulletDskShapeTests, SingleSegment) {
                          0.024060550800000004,
                         -0.0021415063999999989);
   btVector3 normal = itokawaShape.getNormal(0);
-  EXPECT_TRUE(normal == truthNormal);
+  
+  EXPECT_NEAR(normal.x(), truthNormal.x(), 1e-10);
+  EXPECT_NEAR(normal.y(), truthNormal.y(), 1e-10);
+  EXPECT_NEAR(normal.z(), truthNormal.z(), 1e-10);
 }
 
 TEST(BulletDskShapeTests, BadFile) {
@@ -61,5 +64,8 @@ TEST(BulletDskShapeTests, MutiSegment) {
 
   btVector3 truthNormal(1, 0, 0);
   btVector3 normal = multiseg.getNormal(0);
-  EXPECT_TRUE(normal == truthNormal);
+
+  EXPECT_NEAR(normal.x(), truthNormal.x(), 1e-10);
+  EXPECT_NEAR(normal.y(), truthNormal.y(), 1e-10);
+  EXPECT_NEAR(normal.z(), truthNormal.z(), 1e-10);
 }

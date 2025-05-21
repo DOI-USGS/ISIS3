@@ -1,0 +1,9 @@
+Object = IdealInstrumentsSpecifications
+
+  Group = "IdealSpacecraft/IdealCamera"
+    DetectorSamples = 3050
+    DetectorLines = 2404
+  End_Group
+
+End_Object
+End

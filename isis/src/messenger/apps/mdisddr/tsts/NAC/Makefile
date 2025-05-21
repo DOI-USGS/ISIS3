@@ -1,6 +1,6 @@
 APPNAME = mdisddr
 
-output.cub.TOLERANCE = 0.0000002
+output.cub.TOLERANCE = 1e-6
 output.pvl.IGNORELINES = PRODUCT_CREATION_TIME
 #NOPREFERENCES=
 

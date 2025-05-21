@@ -1596,7 +1596,7 @@ namespace Isis {
         normal[0] = normal[1] = normal[2] = 0.0;
 
         // restore input state
-        if (!computed) {
+        if (computed) {
           SetImage(originalSample, originalLine);
         }
         else {

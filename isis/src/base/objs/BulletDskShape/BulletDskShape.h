@@ -7,10 +7,16 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
+#include <memory>
+
 #include <QScopedPointer>
 #include <QString>
 #include <QVector>
 
+
+// #define DSK_DEBUG 1
+
+#include "DskSegmentBuffer.hpp"
 #include "BulletTargetShape.h"
 #include "BulletClosestRayCallback.h"
 
@@ -22,6 +28,10 @@ namespace Isis {
  * @author 2017-03-17 Kris Becker
  * @internal
  *   @history 2017-03-17  Kris Becker  Original Version
+ *   @history 2025-04-17 Kris Becker - Modified for bullet >= 3.25 and
+ *                          configure to use conda-forge bullet feedstock
+ *                          library Float64 double precision build. See Issues
+ *                           #5100.
  */
   class BulletDskShape : public BulletTargetShape {
     public:
@@ -36,7 +46,8 @@ namespace Isis {
       virtual btMatrix3x3 getTriangle(const int index, const int segment=0) const;
 
     private:
-      QSharedPointer<btTriangleIndexVertexArray> m_mesh; /**! Triangular mesh representation of
+      std::vector<DskSegmentBuffer>               m_buffers;
+      std::shared_ptr<btTriangleIndexVertexArray> m_mesh; /**! Triangular mesh representation of
                                                               the target shape. The vertex ordering
                                                               is the same as in the DSK file,
                                                               except the DSK uses 1-based indexing

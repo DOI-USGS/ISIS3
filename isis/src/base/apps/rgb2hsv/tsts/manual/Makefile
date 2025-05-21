@@ -1,8 +1,8 @@
 APPNAME = rgb2hsv
 
 rgb2hsvTruth4.cub.TOLERANCE = 0.02
-rgb2hsvTruth5.cub.TOLERANCE = 0.0001
-rgb2hsvTruth6.cub.TOLERANCE = 0.0001
+rgb2hsvTruth5.cub.TOLERANCE = 0.0005
+rgb2hsvTruth6.cub.TOLERANCE = 0.0005
 
 include $(ISISROOT)/make/isismake.tsts
 

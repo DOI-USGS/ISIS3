@@ -14,6 +14,8 @@ find files of those names at the top level of this repository. **/
 #include "Endian.h"
 #include "IException.h"
 #include "TableField.h"
+#include "PvlKeyword.h"
+
 
 using namespace std;
 namespace Isis {
@@ -145,7 +147,7 @@ namespace Isis {
    * @param tableStr The table string
    * @param fieldDelimiter The delimiter to separate fields with
   */
-  Table::Table(const QString &tableName, const std::string &tableString, const char &fieldDelimiter) {
+  Table::Table(const QString &tableName, const std::string &tableString, const char &fieldDelimiter, const vector<PvlKeyword> &tableAttrs) {
     p_name = tableName;
 
     std::stringstream tableStream;
@@ -192,6 +194,13 @@ namespace Isis {
     // Add fields
     for (int f = 0; f < p_record.Fields(); f++) {
       p_label.addGroup(p_record[f].pvlGroup());
+    }
+
+    // Add attributes
+    if (!tableAttrs.empty()) {
+      for (PvlKeyword attr : tableAttrs) {
+        p_label += attr;
+      }
     }
   }
 

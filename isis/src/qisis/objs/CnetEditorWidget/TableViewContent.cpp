@@ -1520,9 +1520,10 @@ namespace Isis {
     */
   QList< AbstractTreeItem * > TableViewContent::updateRowGroupSelection(int lastRow) {
     foreach (AbstractTreeItem * row, *m_lastShiftSelection) {
-      if (row->getPointerType() == AbstractTreeItem::Point)
+      if (row->getPointerType() == AbstractTreeItem::Point) {
         foreach (AbstractTreeItem * child, row->getChildren())
-        child->setSelected(false);
+          child->setSelected(false);
+      }
 
       if (row->getPointerType() == AbstractTreeItem::Measure)
         row->parent()->setSelected(false);

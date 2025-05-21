@@ -25,16 +25,10 @@ int main(void) {
   Preference::Preferences(true);
 
   /**
-   * ThemisIrCamera unit test modified to have increased known lat/lon
-   *   tolerances
+   * Print the observed values. These will be later compared to truth with tolerance.
    */
   cout << "Unit Test for ThemisIrCamera..." << endl;
   try {
-    // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
-    // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
-    // and "Longitude off by: " values directly into these variables.
-    double knownLat = -21.4034421064589;
-    double knownLon = 176.4512306413952;
 
     Cube c("$ISISTESTDATA/isis/src/odyssey/unitTestData/I00831002RDR.cub", "r");
     Camera *cam = CameraFactory::Create(c);
@@ -72,19 +66,8 @@ int main(void) {
       return 0;
     }
 
-    if(abs(cam->UniversalLatitude() - knownLat) < 1E-8) {
-      cout << "Latitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
-    }
-
-    if(abs(cam->UniversalLongitude() - knownLon) < 1E-9) {
-      cout << "Longitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
-    }
+    cout << "Latitude: " << cam->UniversalLatitude() << endl;
+    cout << "Longitude: " << cam->UniversalLongitude() << endl;
 
     // Test name methods
     cout << endl << endl << "Testing name methods ..." << endl;

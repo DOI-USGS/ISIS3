@@ -47,6 +47,7 @@ Deborah Lee Soltesz
         <meta name="county" content="Coconino"/>
         <meta name="city" content="Flagstaff"/>
         <meta name="zip" content="86001"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
 
         <!-- ISIS Docs -->
         <link rel="stylesheet" href="assets/styles/IsisStyleCommon.css"/>
@@ -59,6 +60,7 @@ Deborah Lee Soltesz
         <!-- Govt -->
         <link rel="stylesheet" href="assets/styles/uswds.css"/>
         <script src="assets/scripts/uswds-init.min.js"></script>
+        <script async="async" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=DOI" id="_fed_an_ua_tag"></script>
 
         <style>
           .topnav-container {

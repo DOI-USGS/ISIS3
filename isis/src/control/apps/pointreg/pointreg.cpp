@@ -195,13 +195,6 @@ namespace Isis {
   void verifyCube(Cube & cube);
   bool outputValue(ofstream &os, double value);
   int calcGoodMeasureCount(const ControlPoint *point);
-  void printTemp();
-
-  map<QString, void *> GuiHelpers() {
-    map<QString, void *> helper;
-    helper["PrintTemp"] = (void *) printTemp;
-    return helper;
-  }
 
 
   void pointreg(UserInterface &ui, Pvl *appLog) {
@@ -826,18 +819,5 @@ namespace Isis {
     }
 
     return goodMeasureCount;
-  }
-
-
-  // Helper function to print out template to session log
-  void printTemp() {
-    UserInterface &ui = Application::GetUserInterface();
-
-    // Get template pvl
-    Pvl userTemp;
-    userTemp.read(ui.GetFileName("DEFFILE"));
-
-    //Write template file out to the log
-    Isis::Application::GuiLog(userTemp);
   }
 }

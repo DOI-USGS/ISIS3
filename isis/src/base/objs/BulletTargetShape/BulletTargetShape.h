@@ -26,6 +26,10 @@ namespace Isis {
  * Bullet library. For each type of file that can be used to create a bullet
  * target body, this class should be extended to manage that type of file.
  * 
+ * Note this object takes ownership of the btCollisionObject parameter as
+ * well as the underlying btCollisionShape pointer (which is also deleted
+ * when the object body pointer is deleted.)
+ * 
  * @author 2017-03-17 Kris Becker 
  * @internal 
  *   @history 2017-03-17  Kris Becker  Original Version
@@ -52,14 +56,16 @@ namespace Isis {
     protected:
       void setTargetBody(btCollisionObject *body);
       void setMaximumDistance();
+      static void btDelete( btCollisionObject *btbody ); // shared_ptr destructor cleanup
 
     private:
-      QString                           m_name; /**! The name of the body */
-      QSharedPointer<btCollisionObject> m_btbody; /**! The Bullet collision object
+      QString                            m_name;   /**! The name of the body */
+      std::shared_ptr<btCollisionObject> m_btbody; /**! The Bullet collision object
                                                        for the body */
-      btScalar                          m_maximumDistance; /**! The distance from the minimum
+      btScalar                           m_maximumDistance; /**! The distance from the minimum
                                                                 x, y, z values to the maximum
                                                                 x, y, z values. */
+
 
   };
 

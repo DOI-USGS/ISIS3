@@ -60,7 +60,7 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalFlatfile) {
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.10046864503994585);
   EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 40.187458015978336);
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0018248585597074806);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.0018248585597074806, 1e-14);
 }
 
 TEST_F(MroCtxCube, FunctionalTestCtxcalMonthlyFlatfile) {
@@ -83,7 +83,7 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalMonthlyFlatfile) {
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.080543650835752489);
   EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 32.217460334300995);
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0012787322597001109);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.0012787322597001109, 4.2e-16);
 }
 
 

@@ -64,7 +64,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDefault) {
 
   autoseed(autoseedUi, log);
   ControlNet onet(outnet);
-  ASSERT_EQ(onet.GetNumPoints(), 26);
+  EXPECT_EQ(onet.GetNumPoints(), 26);
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
@@ -101,7 +101,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
 
   autoseed(autoseedUi, log);
   ControlNet onet(outnet1);
-  ASSERT_EQ(onet.GetNumPoints(), 18);
+  EXPECT_EQ(onet.GetNumPoints(), 18);
 
   cubeList->append(cube3->fileName());
   cubeList->write(cubeListFile);
@@ -113,7 +113,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedCnetInput) {
   autoseedUi = UserInterface(APP_XML, autoseedArgs);
   autoseed(autoseedUi, serialNumList, &onet, log);
   onet = ControlNet(outnet2);
-  ASSERT_EQ(onet.GetNumPoints(), 7);
+  EXPECT_EQ(onet.GetNumPoints(), 6);
 }
 
 TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
@@ -148,8 +148,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
 
   autoseed(autoseedUi, log);
   ControlNet onet(outnet);
-  ASSERT_EQ(onet.GetNumValidPoints(), 0);
-  ASSERT_EQ(onet.GetNumValidMeasures(), 0);
+  EXPECT_EQ(onet.GetNumValidPoints(), 0);
+  EXPECT_EQ(onet.GetNumValidMeasures(), 0);
 
   // Grid Emission
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").deleteKeyword("MinDN");
@@ -160,8 +160,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
 
   autoseed(autoseedUi, log);
   onet = ControlNet(outnet);
-  ASSERT_EQ(onet.GetNumValidPoints(), 50);
-  ASSERT_EQ(onet.GetNumValidMeasures(), 126);
+  EXPECT_EQ(onet.GetNumValidPoints(), 54);
+  EXPECT_EQ(onet.GetNumValidMeasures(), 134);
 
   // Grid Pixels
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").deleteKeyword("MinEmission");
@@ -171,8 +171,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
 
   autoseed(autoseedUi, log);
   onet = ControlNet(outnet);
-  ASSERT_EQ(onet.GetNumValidPoints(), 57);
-  ASSERT_EQ(onet.GetNumValidMeasures(), 144);
+  EXPECT_EQ(onet.GetNumValidPoints(), 59);
+  EXPECT_EQ(onet.GetNumValidMeasures(), 146);
 
   // Grid Incidence
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").deleteKeyword("PixelsFromEdge");
@@ -182,8 +182,8 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
 
   autoseed(autoseedUi, log);
   onet = ControlNet(outnet);
-  ASSERT_EQ(onet.GetNumValidPoints(), 72);
-  ASSERT_EQ(onet.GetNumValidMeasures(), 181);
+  EXPECT_EQ(onet.GetNumValidPoints(), 76);
+  EXPECT_EQ(onet.GetNumValidMeasures(), 191);
 
   // Grid Resolution
   autoseedDef.findObject("AutoSeed").findGroup("PolygonSeederAlgorithm").deleteKeyword("MinIncidence");
@@ -194,6 +194,6 @@ TEST_F(ThreeImageNetwork, FunctionalTestAutoseedDeffiles) {
 
   autoseed(autoseedUi, log);
   onet = ControlNet(outnet);
-  ASSERT_EQ(onet.GetNumValidPoints(), 60);
-  ASSERT_EQ(onet.GetNumValidMeasures(), 147);
+  EXPECT_EQ(onet.GetNumValidPoints(), 59);
+  EXPECT_EQ(onet.GetNumValidMeasures(), 147);
 }

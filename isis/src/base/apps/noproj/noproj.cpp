@@ -1,10 +1,10 @@
 /** This is free and unencumbered software released into the public domain.
+
 The authors of ISIS do not claim copyright on the contents of this file.
 For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
-
 #include "noproj.h"
 
 #include <iostream>
@@ -191,7 +191,7 @@ namespace Isis {
     CubeAttributeOutput cao;
 
     // Can we do a regular label? Didn't work on 12-15-2006
-    cao.setLabelAttachment(Isis::DetachedLabel);
+    cao.setLabelAttachment(Cube::DetachedLabel);
     FileName matchCubeFile = FileName::createTempFile("$Temporary/match.cub");
     QString matchCubeFileNoExt = matchCubeFile.path() + "/" + matchCubeFile.baseName();
 
@@ -372,8 +372,11 @@ namespace Isis {
     dims["Bands"] = toString(numberBands);
     label.write(matchLbl);
 
-    // And run cam2cam to apply the transformation
-    QVector<QString> args = {"to=" + ui.GetCubeName("TO"), "INTERP=" + ui.GetString("INTERP")};
+  // And run cam2cam to apply the transformation
+    QVector<QString> args = {"to=" + ui.GetCubeName("TO"),
+                             "INTERP=" + ui.GetString("INTERP"),
+                             "OFFBODY=" + ui.GetAsString("OFFBODY"),
+                             "OFFBODYTRIM=" + ui.GetAsString("OFFBODYTRIM")};
     UserInterface cam2camUI(FileName("$ISISROOT/bin/xml/cam2cam.xml").expanded(), args);
     Cube matchCube;
     matchCube.open(matchCubeFile.expanded(), "rw");

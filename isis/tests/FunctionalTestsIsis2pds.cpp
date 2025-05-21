@@ -271,7 +271,7 @@ TEST_F(DefaultCube, FunctionalTestIsis2pdsManuals16bit) {
   EXPECT_EQ(int(outputLabel["LABEL_RECORDS"]), 741);
   EXPECT_EQ(int(outputLabel["^IMAGE"]), 742);
 
-  EXPECT_DOUBLE_EQ(double(imageObject["OFFSET"]), -2.5001526018641);
+  EXPECT_NEAR(double(imageObject["OFFSET"]), -2.5001526018641, 6e-13);
   EXPECT_DOUBLE_EQ(double(imageObject["SCALING_FACTOR"]), 1.0000763009309);
   EXPECT_EQ(int(imageObject["SAMPLE_BITS"]), 16);
   EXPECT_EQ(QString(imageObject["SAMPLE_BIT_MASK"]), "2#1111111111111111#");
@@ -419,7 +419,7 @@ TEST(isis2pdsTest, FunctionalTestIsis2pdsPds4) {
   EXPECT_EQ(outputLabel.Translate("Filter_Number"), "1");
   EXPECT_EQ(outputLabel.Translate("Bandwidth"), "0.0140");
   EXPECT_EQ(outputLabel.Translate("Wavelength"), "1.021");
-  EXPECT_EQ(outputLabel.Translate("West_Bound_Coord"), "0.0048031106755032");
+  EXPECT_NEAR(outputLabel.Translate("West_Bound_Coord").toFloat(), 0.0048031106755032, 1e-9); // For Arm 
   EXPECT_EQ(outputLabel.Translate("East_Bound_Coord"), "359.97220491712");
   EXPECT_EQ(outputLabel.Translate("North_Bound_Coord"), "-1.1656354932701");
   EXPECT_EQ(outputLabel.Translate("South_Bound_Coord"), "-12.077278860826");

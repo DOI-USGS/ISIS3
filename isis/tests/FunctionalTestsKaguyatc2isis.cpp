@@ -38,7 +38,7 @@ TEST(kaguyatc2isisTest, kaguyatc2isisTestDefault) {
   // Pixels group
   ASSERT_EQ(PixelTypeName(cube.pixelType()), "SignedWord");
   ASSERT_EQ(ByteOrderName(cube.byteOrder()), "Lsb");
-  ASSERT_DOUBLE_EQ(cube.base(), 0.0);
+  EXPECT_NEAR(cube.base(), 0.0, 4e-14);
   ASSERT_DOUBLE_EQ(cube.multiplier(), 0.013);
 
   // Instrument Group
@@ -111,7 +111,7 @@ TEST(kaguyatc2isisTest, kaguyatc2isisTestSpSupport) {
   // Pixels group
   ASSERT_EQ(PixelTypeName(cube.pixelType()), "SignedWord");
   ASSERT_EQ(ByteOrderName(cube.byteOrder()), "Lsb");
-  ASSERT_DOUBLE_EQ(cube.base(), 0.0);
+  EXPECT_NEAR(cube.base(), 0.0, 4e-14);
   ASSERT_DOUBLE_EQ(cube.multiplier(), 0.013);
 
   // Instrument Group

@@ -1050,7 +1050,7 @@ XYRange method returns
             SetGround(-21.5, -10) returns (x,y) = (9590653.0861956, -2882473.6383627)
 
             SetCoordinate(maxX,-2882473.6383627) returns lat/lon = -21.5002243 / -9.9996049
-            SetCoordinate(0,maxY) returns lat/lon = 90.0000000 / -100.0000000
+            SetCoordinate(0,maxY) returns lat = 90.0000000
             SetCoordinate(minX,-2882473.6383627) returns lat/lon = -21.5002243 / 169.9996049
             SetCoordinate(0,minY) returns lat/lon = -50.0000000 / -100.0000000
 
@@ -1145,9 +1145,9 @@ XYRange method returns
     Minimum Y:  -8999766.9300905
     Maximum Y:  8999766.9300905
             SetCoordinate(maxX,0) returns lat/lon = 0.0000000 / 0.0000000
-            SetCoordinate(0,maxY) returns lat/lon = 90.0000000 / 180.0000000
+            SetCoordinate(0,maxY) returns lat = 90.0000000
             SetCoordinate(minX,0) returns lat/lon = 0.0000000 / -90.0000000
-            SetCoordinate(0,minY) returns lat/lon = -90.0000000 / 180.0000000
+            SetCoordinate(0,minY) returns lat = -90.0000000
 
 				/-----------------------------------------/
 
@@ -1165,9 +1165,9 @@ XYRange method returns
     Minimum Y:  -8999766.9300905
     Maximum Y:  8999766.9300905
             SetCoordinate(maxX,0) returns lat/lon = 0.0000000 / 90.0000000
-            SetCoordinate(0,maxY) returns lat/lon = 90.0000000 / 180.0000000
+            SetCoordinate(0,maxY) returns lat = 90.0000000
             SetCoordinate(minX,0) returns lat/lon = 0.0000000 / -90.0000000
-            SetCoordinate(0,minY) returns lat/lon = -90.0000000 / 180.0000000
+            SetCoordinate(0,minYy8) returns lat = -90.0000000
 
 
 

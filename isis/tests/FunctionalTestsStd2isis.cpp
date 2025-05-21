@@ -184,6 +184,8 @@ TEST_F(TempTestingFiles, FunctionalTestStd2isisSpecial) {
   ASSERT_NEAR(hist->StandardDeviation(), -1.7976931348623149e+308, .0001);
 }
 
+#ifndef NO_JP2K
+// Run only if JP2K is enabled
 
 TEST_F(TempTestingFiles, FunctionalTestStd2isisJp2) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
@@ -224,3 +226,5 @@ TEST_F(TempTestingFiles, FunctionalTestStd2isisJp2) {
   ASSERT_EQ(hist->ValidPixels(), 15876);
   ASSERT_NEAR(hist->StandardDeviation(), 97.354405991298336, .0001);
 }
+
+#endif // NO_JP2K

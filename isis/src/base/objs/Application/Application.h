@@ -138,6 +138,7 @@ namespace Isis {
       static QString HostName();
       static QString DateTime(time_t *curtime = 0);
       static QString Version();
+      static QString AleVersion();
 
       static bool HasParent();
 

@@ -40,7 +40,7 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output
     // "Latitude off by: " and "Longitude off by: " values directly into these variables.
-    double knownLat = 58.3524398749999;
+    double knownLat = 58.3524398745713029;
     double knownLon = 311.457363494321;
 
     qDebug() << "Testing TC2 w L2B0 image...";
@@ -83,28 +83,25 @@ int main(void) {
       return 0;
     }
 
-    if(abs(cam->UniversalLatitude() - knownLat) < 1E-13) {
+    if (abs(cam->UniversalLatitude() - knownLat) < 1E-13) {
       qDebug() << "Latitude OK";
-    }
-    else {
+    } else {
       qDebug() << qSetRealNumberPrecision(18)
-               << "Latitude off by: " << cam->UniversalLatitude() - knownLat;
+               << "Known latitude: " << knownLat << ", Calculated latitude: " << cam->UniversalLatitude() << ", difference: " << cam->UniversalLatitude() - knownLat;
     }
 
-    if(abs(cam->UniversalLongitude() - knownLon) < 1E-11) {
+    if (abs(cam->UniversalLongitude() - knownLon) < 1E-11) {
       qDebug() << "Longitude OK";
-    }
-    else {
+    } else {
       qDebug() << qSetRealNumberPrecision(18)
-               << "Longitude off by: " << cam->UniversalLongitude() - knownLon;
+               << "Known longitude: " << knownLon << ", Calculated longitude: " << cam->UniversalLongitude() << ", difference: " << cam->UniversalLongitude() - knownLon;
     }
-
 
     qDebug() << "";
     qDebug() << "";
     qDebug() << "Testing TC1 s L2B0 image...";
-    knownLat = -82.0195024182112;
-    knownLon = 46.4153943800818;
+    knownLat = -82.0195023988551384;
+    knownLon = 46.4153944114218859;
 
     Cube c2("$ISISTESTDATA/isis/src/kaguya/unitTestData/TC1S2B0_01_06691S820E0465.cub", "r");
     KaguyaTcCamera *cam2 = (KaguyaTcCamera *) CameraFactory::Create(c2);
@@ -145,20 +142,18 @@ int main(void) {
       return 0;
     }
 
-    if(abs(cam2->UniversalLatitude() - knownLat) < 1E-13) {
+    if (abs(cam2->UniversalLatitude() - knownLat) < 1E-13) {
       qDebug() << "Latitude OK";
-    }
-    else {
+    } else {
       qDebug() << qSetRealNumberPrecision(18)
-               << "Latitude off by: " << cam2->UniversalLatitude() - knownLat;
+               << "Known latitude: " << knownLat << ", Calculated latitude: " << cam2->UniversalLatitude() << ", difference: " << cam2->UniversalLatitude() - knownLat;
     }
 
-    if(abs(cam2->UniversalLongitude() - knownLon) < 1E-11) {
+    if (abs(cam2->UniversalLongitude() - knownLon) < 1E-11) {
       qDebug() << "Longitude OK";
-    }
-    else {
+    } else {
       qDebug() << qSetRealNumberPrecision(18)
-               << "Longitude off by: " << cam2->UniversalLongitude() - knownLon;
+               << "Known longitude: " << knownLon << ", Calculated longitude: " << cam2->UniversalLongitude() << ", difference: " << cam2->UniversalLongitude() - knownLon;
     }
   }
   catch(IException &e) {

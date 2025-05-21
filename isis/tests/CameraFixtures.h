@@ -178,6 +178,20 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class OrexManyIsdCameraCubes : public TempTestingFiles {
+    protected:
+
+      QString        m_sourcefile;
+      nlohmann::json m_isd;
+      Pvl            m_label;
+
+      const QString &source() const;
+      Cube *make_cube( const QString &cubefile );
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
 }
 
 #endif

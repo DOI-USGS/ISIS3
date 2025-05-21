@@ -709,11 +709,14 @@ namespace Isis {
       QString msg = "Hit index [" + toString(hitIndex) + "] is out of bounds.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    RTCGeometry geom = rtcGetGeometry(m_scene, ray.hitGeomIDs[hitIndex]);
+    Vertex *vertices = (Vertex *)rtcGetGeometryBufferData(geom, RTC_BUFFER_TYPE_VERTEX, 0);
+    Triangle *triangles = (Triangle *)rtcGetGeometryBufferData(geom, RTC_BUFFER_TYPE_INDEX, 0);
 
     // Get the vertices of the triangle hit
-    pcl::PointXYZ v0 = m_cloud.points[m_mesh->polygons[ray.hitPrimIDs[hitIndex]].vertices[0]];
-    pcl::PointXYZ v1 = m_cloud.points[m_mesh->polygons[ray.hitPrimIDs[hitIndex]].vertices[1]];
-    pcl::PointXYZ v2 = m_cloud.points[m_mesh->polygons[ray.hitPrimIDs[hitIndex]].vertices[2]];
+    Vertex v0 = vertices[triangles[ray.hitPrimIDs[hitIndex]].v0];
+    Vertex v1 = vertices[triangles[ray.hitPrimIDs[hitIndex]].v1];
+    Vertex v2 = vertices[triangles[ray.hitPrimIDs[hitIndex]].v2];
 
     // The intersection location comes out in barycentric coordinates, (u, v, w).
     // Only u and v are returned because u + v + w = 1. If the coordinates of the
@@ -724,9 +727,9 @@ namespace Isis {
     float w = 1.0 - u - v;
 
     LinearAlgebra::Vector intersection(3);
-    intersection[0] = w*v0.x + v*v1.x + u*v2.x;
-    intersection[1] = w*v0.y + v*v1.y + u*v2.y;
-    intersection[2] = w*v0.z + v*v1.z + u*v2.z;
+    intersection[0] = w*v0.x + u*v1.x + v*v2.x;
+    intersection[1] = w*v0.y + u*v1.y + v*v2.y;
+    intersection[2] = w*v0.z + u*v1.z + v*v2.z;
 
     // Calculate the normal vector as (v1 - v0) x (v2 - v0) and normalize it
     // TODO This calculation assumes that the shape conforms to the NAIF dsk standard

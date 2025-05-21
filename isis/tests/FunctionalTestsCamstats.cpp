@@ -34,22 +34,22 @@ TEST(CamStats, FunctionalTestCamstatsDefaultParameters) {
   EXPECT_NEAR( (double) group.findKeyword("LongitudeMinimum"), 255.64553280449999, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("LongitudeMaximum"), 255.68944338700999, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("LongitudeAverage"), 255.66752361025999, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("LongitudeStandardDeviation"), 0.0096378907096538995, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("LongitudeStandardDeviation"), 0.0096379069233152002, 1e-8);
 
   group = appLog.findGroup("SampleResolution");
-  EXPECT_NEAR( (double) group.findKeyword("SampleResolutionMinimum"), 18.840689155126, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("SampleResolutionMinimum"), 18.840689192469, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("SampleResolutionMaximum"), 18.851286623334001, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("SampleResolutionAverage"), 18.846056043836999, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("SampleResolutionStandardDeviation"), 0.003012465806427, 1e-8);
 
   group = appLog.findGroup("LineResolution");
-  EXPECT_NEAR( (double) group.findKeyword("LineResolutionMinimum"), 18.840689155126, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("LineResolutionMinimum"), 18.840689192469, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("LineResolutionMaximum"), 18.851286623334001, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("LineResolutionAverage"), 18.846056043836999, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("LineResolutionStandardDeviation"), 0.003012465806427, 1e-8);
 
   group = appLog.findGroup("Resolution");
-  EXPECT_NEAR( (double) group.findKeyword("ResolutionMinimum"), 18.840689155126, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("ResolutionMinimum"), 18.840689192469, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("ResolutionMaximum"), 18.851286623334001, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("ResolutionAverage"), 18.846056043836999, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("ResolutionStandardDeviation"), 0.003012465806427, 1e-8);
@@ -58,19 +58,19 @@ TEST(CamStats, FunctionalTestCamstatsDefaultParameters) {
   EXPECT_NEAR( (double) group.findKeyword("ObliqueSampleResolutionMinimum"), 19.155188929324002, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("ObliqueSampleResolutionMaximum"), 19.367224440177999, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("ObliqueSampleResolutionAverage"), 19.275477210727999, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("ObliqueSampleResolutionStandardDeviation"), 0.033844349179675999, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("ObliqueSampleResolutionStandardDeviation"), 0.033844336430560999, 1e-8);
 
   group = appLog.findGroup("ObliqueLineResolution");
   EXPECT_NEAR( (double) group.findKeyword("ObliqueLineResolutionMinimum"), 19.155188929324002, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("ObliqueLineResolutionMaximum"), 19.367224440177999, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("ObliqueLineResolutionAverage"), 19.275477210727999, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("ObliqueLineResolutionStandardDeviation"), 0.033844349179675999, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("ObliqueLineResolutionStandardDeviation"), 0.033844336430560999, 1e-8);
 
   group = appLog.findGroup("ObliqueResolution");
   EXPECT_NEAR( (double) group.findKeyword("ObliqueResolutionMinimum"), 19.155188929324002, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("ObliqueResolutionMaximum"), 19.367224440177999, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("ObliqueResolutionAverage"), 19.275477210727999, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("ObliqueResolutionStandardDeviation"), 0.033844349179675999, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("ObliqueResolutionStandardDeviation"), 0.033844336430560999, 1e-8);
 
   group = appLog.findGroup("AspectRatio");
   EXPECT_DOUBLE_EQ( (double) group.findKeyword("AspectRatioMinimum"), 1.0);
@@ -104,14 +104,14 @@ TEST(CamStats, FunctionalTestCamstatsDefaultParameters) {
   EXPECT_NEAR( (double) group.findKeyword("LocalSolarTimeStandardDeviation"), 0.00064252695695377895, 1e-8);
 
   group = appLog.findGroup("LocalRadius");
-  EXPECT_NEAR( (double) group.findKeyword("LocalRadiusMinimum"), 3411855.0366011998, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("LocalRadiusMaximum"), 3412097.9756964999, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("LocalRadiusAverage"), 3411965.1948032002, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("LocalRadiusStandardDeviation"), 54.219727730480997, 1e-5);
+  EXPECT_NEAR( (double) group.findKeyword("LocalRadiusMinimum"), 3411855.0367067, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("LocalRadiusMaximum"), 3412097.9742176002, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("LocalRadiusAverage"), 3411965.1948332, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("LocalRadiusStandardDeviation"), 54.219159576357001, 3.9e-05);
 
   group = appLog.findGroup("NorthAzimuth");
   EXPECT_NEAR( (double) group.findKeyword("NorthAzimuthMinimum"), 332.91681144925002, 1e-8);
-  EXPECT_NEAR( (double) group.findKeyword("NorthAzimuthMaximum"), 338.21827790755998, 1e-8);
+  EXPECT_NEAR( (double) group.findKeyword("NorthAzimuthMaximum"), 338.21827792507997, 1e-7);
   EXPECT_NEAR( (double) group.findKeyword("NorthAzimuthAverage"), 333.98488155281001, 1e-8);
   EXPECT_NEAR( (double) group.findKeyword("NorthAzimuthStandardDeviation"), 0.48452163466794002, 1e-8);
 }

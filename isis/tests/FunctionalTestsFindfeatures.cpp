@@ -447,7 +447,7 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomGridDefault) {
   // Tests are based upon these condtions
   ASSERT_EQ(network.GetNetworkId(), "grid_default_fastgeom");
   ASSERT_EQ(network.Description().toStdString(), "orb@hessianThreshold:100/orb/BFMatcher@NormType:NORM_HAMMING@CrossCheck:false");
-  ASSERT_EQ(network.GetNumPoints(), 38);
+  ASSERT_EQ(network.GetNumPoints(), 36);
 
   // Load the log file and parse it looking for FastGeom signatures
   std::vector<QString> logdata;

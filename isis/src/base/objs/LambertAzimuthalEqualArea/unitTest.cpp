@@ -858,7 +858,7 @@ int main(int argc, char *argv[]) {
     cout << "For x = sqrt2*SphRad/2 = " 
          << rad*sqrt(2)/2 << endl;
     p3b->SetCoordinate(rad*sqrt(2)/2, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " << 
+    cout << "            SetCoordinate(0, maxY) returns lat/lon = " << 
          p3b->Latitude() << " / " << p3b->Longitude()  << endl;
     p3b->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
@@ -1802,9 +1802,17 @@ int main(int argc, char *argv[]) {
     p7->SetCoordinate(maxX, -2882473.6383627);                               
     cout << "            SetCoordinate(maxX,-2882473.6383627) returns lat/lon = "
          << p7->Latitude() << " / " << p7->Longitude()  << endl;                   
-    p7->SetCoordinate(0, maxY);                                                  
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = "               
-         << p7->Latitude() << " / " << p7->Longitude()  << endl;                   
+    
+    // Linux build returns here (lat, lon) = (90, 80), while Arm Mac returns (90, -100).
+    // This is a borderline situation where the values differ by 180,
+    // and are likely both fine, as this is the North pole, and the longitude 
+    // is not well defined. Turning off the longitude.
+    p7->SetCoordinate(0, maxY);
+    cout << "            SetCoordinate(0,maxY) returns lat = "               
+         << p7->Latitude() 
+         // << " / " << p7->Longitude()  
+         << endl;                   
+    
     p7->SetCoordinate(minX, -2882473.6383627);                                    
     cout << "            SetCoordinate(minX,-2882473.6383627) returns lat/lon = "
          << p7->Latitude() << " / " << p7->Longitude()  << endl;                   
@@ -1953,14 +1961,24 @@ int main(int argc, char *argv[]) {
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
          << p8->Latitude() << " / " << p8->Longitude()  << endl;
     p8->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
-         << p8->Latitude() << " / " << p8->Longitude()  << endl;
+    // Same issue as above. Linux returns (lat, lon) = (90, 0),
+    // while the Arm returns (90, 180). At the North pole both are fine.
+    // Turning off the longitude.
+    cout << "            SetCoordinate(0,maxY) returns lat = " 
+         << p8->Latitude()  
+         // << " / " << p8->Longitude()  
+         << endl;
     p8->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
          << p8->Latitude() << " / " << p8->Longitude()  << endl;
     p8->SetCoordinate(0, minY);
-    cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p8->Latitude() << " / " << p8->Longitude()  << endl;
+    // As above, the longitude is undefined at a pole.
+    // Linux returns here (lat, lon) = (-90, 0), while Arm returns (-90, 180).
+    // Not displaying the longitude.
+    cout << "            SetCoordinate(0,minY) returns lat = " 
+         << p8->Latitude() 
+         // << " / " << p8->Longitude() 
+         << endl;
     cout << endl;
     mapGroup.findKeyword("MaximumLongitude").setValue("90.0");
     TProjection *p8a = (TProjection *) ProjectionFactory::Create(lab);
@@ -1985,14 +2003,22 @@ int main(int argc, char *argv[]) {
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
          << p8a->Latitude() << " / " << p8a->Longitude()  << endl;
     p8a->SetCoordinate(0, maxY);
-    cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
-         << p8a->Latitude() << " / " << p8a->Longitude()  << endl;
+    // Linux returns here (lat, lon) = (90, 0) while Arm returns (90, 180).
+    // The longitude is undefined at a pole, so turning it off.
+    cout << "            SetCoordinate(0,maxY) returns lat = " 
+         << p8a->Latitude() 
+         // << " / " << p8a->Longitude()  
+         << endl;
     p8a->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
          << p8a->Latitude() << " / " << p8a->Longitude()  << endl;
+    // Same as above. Linux returns (lat, lon) = (-90, 0), while Arm returns (-90, 180).
+    // Hiding the longitude.
     p8a->SetCoordinate(0, minY);
-    cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p8a->Latitude() << " / " << p8a->Longitude()  << endl;
+    cout << "            SetCoordinate(0,minYy8) returns lat = " 
+         << p8a->Latitude() 
+         //<< " / " << p8a->Longitude()  
+         << endl;
     cout << endl;
     cout << endl;
     cout << endl;

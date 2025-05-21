@@ -18,7 +18,7 @@
 #       A Public Release for ISIS3.6.1:                        {% set version = "3.6.1" %}
 #       A Release Candidate for ISIS3.6.1:                     {% set version = "3.6.1_RC" %}
 #       A custom build of ISIS3.6.1 for the CaSSIS mission:    {% set version = "3.6.1_cassis" %}
-{% set version = "8.3" %}
+{% set version = "dev" %}
 
 # This is the build number for the current version you are building. If this is the first build of
 # this version, the build number will be 0. It is incremented by 1 with every consecutive build of
@@ -27,7 +27,7 @@
 
 package:
   name: isis
-  version: {{ version }}.0_RC1
+  version: {{ version }}
 
 source:
   git_url: 'https://github.com/DOI-USGS/ISIS3.git'
@@ -45,61 +45,66 @@ build:
 # Shotgun strat on requirements until we can narrow them down
 requirements:
   build:
-   - ale =0.10.0,<1
+   - ale =0.11.0,<1
    - aom
    - armadillo
-   - boost >=1.78.0,<1.79
-   - boost-cpp >=1.78.0,<1.79
+   - boost >=1.76.0,<1.82
+   - boost-cpp >=1.76.0,<1.82
    - blas
-   - usgs-astrogeology::bullet
+   - bullet >=3.25
    - bz2file
    - bzip2
    - cmake >=3.27,<3.28
    - cspice =67
-   - csm >=3.0.3,<3.0.4
+   - usgs-astrogeology::csm >=3.0.3,<3.0.4   # [osx and arm64]
+   - csm >=3.0.3,<3.0.4                      # [not (osx and arm64)]
    - curl >=8.4.0,<8.5
-   - cxx-compiler=1.1.2
+   - cxx-compiler=1.7
    - doxygen
    - eigen >=3, <4
    - embree >=3, <4
    - ffmpeg
    - geos >=3.12, <3.13
    - geotiff
+   - gdal >=3.7,<3.9
    - gmp
    - graphviz
    - conda-forge::gsl >=2.6, <2.7
    - hdf5
+   - highfive
    - icu
    - inja
    - jama
-   - usgs-astrogeology::kakadu==1
+   - usgs-astrogeology::kakadu==1 # [not (osx and arm64)]
    - kalasiris
    - krb5
-   - libgdal >=3.7.0,<3.8
-   - libopencv >=4.7,<4.8
+   - libgdal >=3.7,<3.9
+   - libopencv >=4.5,<4.10
    - libpng >=1.6.34,<1.7
-   - libprotobuf
-   - libtiff >=4.5,<4.6
+   - libprotobuf >=4,<5
+   - libtiff >=4.5,<4.8
    - libxml2
    - make
    - mesalib
+   - mkl                         # [not (osx and arm64)]
    - mysql
-   - mysql-connector-c
+   - mysql-connector-c           # [not (osx and arm64)]
    - nanoflann <1.4
-   - nlohmann_json
-   - ninja >=1.7.2,<1.8
+   - nlohmann_json=3.11.2
+   - ninja >=1.10,<1.11
    - nn
-   - opencv >=4.7,<4.8
-   - openssl >=3.1.2,<3.2
+   - opencv >=4.5,<4.10
+   - openssl >=3.1.2,<3.5
    - pcl >=1.13,<1.14
-   - plio
-   - protobuf
-   - python >=3.10
-   - python_abi >=3.10
+   - pdal=2.6
+   - plio=1.5.3
+   - protobuf >=4,<5
+   - python >=3.9
+   - python_abi >=3.9
    - pytest
    - rclone
    - qhull
-   - qt-main=5.15.8
+   - qt-main >=5.15,<5.16
    - qwt <6.3.0
    - sqlite >=3.46.0,<3.47
    - suitesparse <7.7.0
@@ -107,15 +112,17 @@ requirements:
    - swig
    - texlive-core
    - tnt
+   - usgscsm
    - x264
-   - xalan-c
+   - xalan-c                    # [not (osx and arm64)]
+   - usgs-astrogeology::xalan-c # [osx and arm64]
    - xerces-c >=3.2.4,<3.3.0a0
    - xorg-kbproto
    - xorg-libice
    - xorg-libsm
    - xorg-libx11
    - xorg-libxi
-   - zlib >=1.3,<1.4
+   - zlib >=1.3,<1.4.0a0
 
   run:
   - {{ pin_compatible('ale', max_pin='x.x.x') }}
@@ -126,7 +133,8 @@ requirements:
   - blas
   - {{ pin_compatible('bullet', max_pin='x.x') }}
   - bz2file
-  - csm
+  - usgs-astrogeology::csm                        # [osx and arm64]
+  - csm                                           # [not (osx and arm64)]
   - cspice
   - curl
   - eigen
@@ -138,10 +146,11 @@ requirements:
   - {{ pin_compatible('gsl', min_pin='x.x', max_pin='x.x.x') }}
   - hdf5
   - icu
-  - inja
+  - inja                                          # [not (osx and arm64)]
+  - usgs-astrogeology::inja                       # [osx and arm64]
   - jama
   - {{ pin_compatible('jasper', max_pin='x.x') }}
-  - {{ pin_compatible('kakadu', max_pin='x') }}
+  - {{ pin_compatible('kakadu', max_pin='x') }}   # [not (osx and arm64)]
   - kalasiris
   - libcxx
   - libopenblas
@@ -149,6 +158,7 @@ requirements:
   - {{ pin_compatible('libpng') }}
   - libtiff
   - mesalib
+  - mkl                                           # [not (osx and arm64)]
   - mysql
   - nanoflann
   - nlohmann_json

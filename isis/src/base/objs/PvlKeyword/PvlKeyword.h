@@ -90,6 +90,8 @@ namespace Isis {
       PvlKeyword(QString name);
       PvlKeyword(QString name, QString value,
                  QString unit = "");
+      PvlKeyword(QString name, std::vector<std::string> vecValue,
+                 QString unit = "");
       PvlKeyword(const PvlKeyword &other);
       ~PvlKeyword();
 
@@ -117,7 +119,9 @@ namespace Isis {
       };
 
       void setValue(QString value, QString unit = "");
-      void setJsonValue(nlohmann::json jsonobj, QString unit = "");
+      void setJsonValue(nlohmann::json jsonobj);
+      void setJsonArrayValue(nlohmann::json jsonobj);
+
 
       void setUnits(QString units);
       void setUnits(QString value, QString units);
@@ -125,7 +129,8 @@ namespace Isis {
       PvlKeyword &operator=(QString value);
 
       void addValue(QString value, QString unit = "");
-      void addJsonValue(nlohmann::json jsonobj, QString unit = "");
+      void addJsonValue(nlohmann::json jsonobj);
+      void addJsonArrayValue(nlohmann::json jsonobj);
 
       PvlKeyword &operator+=(QString value);
 
@@ -154,6 +159,8 @@ namespace Isis {
       };
 
       operator QString() const;
+
+      nlohmann::json toJson();
 
       const QString &operator[](int index) const;
       QString &operator[](int index);

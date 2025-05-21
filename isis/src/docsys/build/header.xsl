@@ -130,7 +130,7 @@ Deborah Lee Soltesz
           <button type="button" class="usa-nav__close">
             <img src="{$menuPath}assets/img/usa-icons/close.svg" role="img" alt="Close" />
           </button>
-          <xsl:call-template  name="writeMenu"/>
+          <xsl:call-template  name="writeMiniMenu"/>
         </div>
       </nav>
     </header>

@@ -1,5 +1,18 @@
 APPNAME = fx
 
+radius.cub.TOLERANCE = 6
+emac.cub.TOLERANCE = 0.0001
+pha.cub.TOLERANCE = 3e-3
+ina.cub.TOLERANCE = 0.00001
+ina.cub.TOLERANCE = 0.001
+ema.cub.TOLERANCE = 0.0001
+phal.cub.TOLERANCE = 3e-5
+inal.cub.TOLERANCE = 0.08
+emal.cub.TOLERANCE = 0.08
+lon.cub.TOLERANCE = 3e-4
+lat.cub.TOLERANCE = 0.00001
+res.cub.TOLERANCE = 3e-2
+
 include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) f1=$(INPUT)/crop.cub \

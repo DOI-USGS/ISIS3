@@ -24,6 +24,8 @@ HEADERS = {
     "X-GitHub-Api-Version": "2022-11-28"
 }
 
+BUGFIX_CHANGE_TYPE = False
+
 def get_prs_associated_with_commit() -> Response:
     """
     Get list of PRs associated with commit.
@@ -67,7 +69,7 @@ def search_for_linked_issues(pull_body: str) -> list:
     issue_numbers = []
     for section in pull_body_list:
         # Find section with heading 'Related Issue'
-        if section != None and 'Related Issue' in section:
+        if section and 'Related Issue' in section:
             # Find items that match the regex pattern
             matched_items = rgx.findall(regex_pattern, section)
             # Convert list of tuples to list of all items
@@ -76,6 +78,13 @@ def search_for_linked_issues(pull_body: str) -> list:
             filtered_list = list(filter(None, flattened_list))
             # Remove '#' from items
             issue_numbers = list(map(lambda item: item.replace('#', ''), filtered_list))
+        # Check if change type is bugfix
+        # Find section with heading 'Types of changes'
+        if section and 'Types of changes' in section:
+            matched_items = rgx.findall(r'\[(x|X)\] Bug fix', section)
+            if matched_items:
+                global BUGFIX_CHANGE_TYPE
+                BUGFIX_CHANGE_TYPE = True
     return issue_numbers
 
 
@@ -143,8 +152,11 @@ def get_pr(pull_number: str) -> Response:
 
 def is_pr_bugfix(response: Response) -> bool:
     """
-    Check PR label for 'bug'
+    Check PR label for 'bug' or if change type is indicated as bugfix
+    in the body of the PR
     """
+    if BUGFIX_CHANGE_TYPE:
+        return True
     labels = response.json().get("labels")
     for label in labels:
         if label.get("name") == "bug":

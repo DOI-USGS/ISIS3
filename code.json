@@ -136,7 +136,7 @@
     "name": "ISIS3",
     "organization": "U.S. Geological Survey",
     "description": "GitHub code repository for the Integrated Software for Imagers and Spectrometers (ISIS)",
-    "version": "9.0.0_rc1",
+    "version": "9.0.0",
     "status": "Production",
 
     "permissions": {
@@ -144,14 +144,14 @@
       "licenses": [
         {
           "name": "Public Domain, CC0-1.0",
-          "URL": "https://code.usgs.gov/astrogeology/isis/-/raw/9.0.0_rc1/LICENSE.md"
+          "URL": "https://code.usgs.gov/astrogeology/isis/-/raw/9.0.0/LICENSE.md"
         }
       ]
     },
 
     "homepageURL": "https://isis.astrogeology.usgs.gov",
-    "downloadURL": "https://code.usgs.gov/astrogeology/isis/-/archive/9.0.0_rc1/isis-9.0.0_rc1.zip",
-    "disclaimerURL": "https://code.usgs.gov/astrogeology/isis/-/raw/9.0.0_rc1/DISCLAIMER.md",
+    "downloadURL": "https://code.usgs.gov/astrogeology/isis/-/archive/9.0.0/isis-9.0.0.zip",
+    "disclaimerURL": "https://code.usgs.gov/astrogeology/isis/-/raw/9.0.0/DISCLAIMER.md",
     "repositoryURL": "https://code.usgs.gov/astrogeology/isis.git",
     "vcs": "git",
 

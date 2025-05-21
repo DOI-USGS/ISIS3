@@ -28,8 +28,8 @@ DeltaSample:  OK
 DeltaLine:    OK
 
 For center framelet 14 pixel position ...
-Latitude:     OK
-Longitude:    OK
+Calculated latitude: 48.5141
+Calculated longitude: 332.037
 DeltaSample:  OK
 DeltaLine:    OK
 
@@ -62,8 +62,8 @@ DeltaSample:  OK
 DeltaLine:    OK
 
 For center framelet 13 pixel position ...
-Latitude:     OK
-Longitude:    OK
+Calculated latitude: 48.564
+Calculated longitude: 332.047
 DeltaSample:  OK
 DeltaLine:    OK
 

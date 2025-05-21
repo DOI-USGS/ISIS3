@@ -40,6 +40,7 @@ namespace Isis {
       static QString userName();
       static QString hostName();
       static QString isisVersion();
+      static QString aleVersion();
 
       static QString getEnvironmentValue(QString, QString);
     protected:

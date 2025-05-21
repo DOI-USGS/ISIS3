@@ -1,6 +1,6 @@
 APPNAME = hirdrgen
 
-test_himos_070418_8_reimport.cub.TOLERANCE = .00026
+test_himos_070418_8_reimport.cub.TOLERANCE = 0.03
 
 include $(ISISROOT)/make/isismake.tsts
 

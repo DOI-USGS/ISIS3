@@ -63,14 +63,8 @@ namespace Isis {
       double getTolerance() const;
       void   setTolerance(const double &tolerance);
 
-      // Calculate the default normal of the current intersection point
-      virtual void calculateDefaultNormal();
       // Calculate the surface normal of the current intersection point
       virtual void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
-      virtual void calculateSurfaceNormal();
-      QVector<double> ellipsoidNormal();
-
-      virtual double incidenceAngle(const std::vector<double> &uB);
 
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon);
 

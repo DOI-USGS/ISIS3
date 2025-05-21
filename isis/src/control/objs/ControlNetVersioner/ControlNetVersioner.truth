@@ -3,8 +3,6 @@ Reading: $ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersione
 
 Read network...
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Reading/Writing control network is consistent
 
 Reading: $ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net...
 
@@ -60,9 +58,6 @@ Object = ControlNetwork
 End_Object
 End
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Conversion to Pvl stays consistent
-Reading/Writing control network is consistent
 
 Reading: $ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork1_PvlV0001.net...
 
@@ -120,9 +115,6 @@ Object = ControlNetwork
 End_Object
 End
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Conversion to Pvl stays consistent
-Reading/Writing control network is consistent
 
 Reading: $ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net...
 
@@ -300,9 +292,6 @@ Object = ControlNetwork
 End_Object
 End
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Conversion to Pvl stays consistent
-Reading/Writing control network is consistent
 
 Reading: $ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_BadNetwork_ProtoV0001.net...
 
@@ -314,8 +303,6 @@ Reading: $ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersione
 
 Read network...
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Reading/Writing control network is consistent
 
 Reading: $ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork8_PvlV0005.pvl...
 
@@ -356,7 +343,7 @@ Object = ControlNetwork
     # AdjustedRadius = 3394325.2138031 <meters>
     AdjustedZ                = 829595.31268436 <meters>
 
-    # AdjustedLatitudeSigma = 100.08343601321 <meters>  AdjustedLongitudeSigma = 100.07117311087 <meters>  AdjustedRadiusSigma = 0.099947528407384 <meters>
+    # AdjustedLatitudeSigma = 100.08343601321 <meters>  AdjustedLongitudeSigma = 100.07117311087 <meters>  AdjustedRadiusSigma = 0.099947528406152 <meters>
     AdjustedCovarianceMatrix = (8096.6118516192, 3791.9236705506,
                                 -1072.6708105639, 2516.0772474838,
                                 2117.9301543094, 9418.2547424025)
@@ -452,7 +439,7 @@ Object = ControlNetwork
     # AdjustedRadius = 3397378.3342506 <meters>
     AdjustedZ                = 93324.42152629 <meters>
 
-    # AdjustedLatitudeSigma = 56.58050463946 <meters>  AdjustedLongitudeSigma = 56.523513347564 <meters>  AdjustedRadiusSigma = 0.099943774867249 <meters>
+    # AdjustedLatitudeSigma = 56.58050463946 <meters>  AdjustedLongitudeSigma = 56.523513347564 <meters>  AdjustedRadiusSigma = 0.099943774867201 <meters>
     AdjustedCovarianceMatrix = (2621.8486551013, 1225.183985133,
                                 -35.999329178353, 575.49833284641,
                                 80.485341554024, 3198.9240672187)
@@ -554,60 +541,41 @@ Object = ControlNetwork
 End_Object
 End
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Conversion to Pvl stays consistent
-Reading/Writing control network is consistent
-Check conversions between the binary format and the pvl format.
-The conversion methods for pvl->bin and bin->pvl are correct.
 
 Reading: $ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork5_PvlV0003.pvl...
 
 Read network...
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Reading/Writing control network is consistent
 
 Reading: $ISISTESTDATA/isis/src/control/unitTestData/PvlNet_TestNetwork1_V2.net...
 
 Read network...
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Reading/Writing control network is consistent
 
 Reading: $ISISTESTDATA/isis/src/control/unitTestData/PvlNet_TestNetwork2_V3.net...
 
 Read network...
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Reading/Writing control network is consistent
 
 Reading: $ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net...
 
 Read network...
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Reading/Writing control network is consistent
 
 Reading: $ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net...
 
 Read network...
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Reading/Writing control network is consistent
 
 Reading: $ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net...
 
 Read network...
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Reading/Writing control network is consistent
 
 Reading: $ISISTESTDATA/isis/src/control/unitTestData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl...
 
 Read network...
 Write the network and re-read it...
-After reading and writing to a binary form does Pvl match?
-Reading/Writing control network is consistent
 
 Test writing from ControlNet objects
 

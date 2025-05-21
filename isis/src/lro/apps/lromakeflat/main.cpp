@@ -154,7 +154,7 @@ void IsisMain() {
     frameLineCount = abs(ui.GetInteger("NUMLINES"));
     if (iLineCount != frameLineCount) {
       string err = "User selected lines value (" + IString(frameLineCount) +
-         ") exceeds number of lines in cube (" + IString(iLineCount) + ". \n";
+         ") exceeds number of lines in cube (" + IString((BigInt)iLineCount) + ". \n";
       throw IException(IException::User, err, _FILEINFO_);
     }
   }
