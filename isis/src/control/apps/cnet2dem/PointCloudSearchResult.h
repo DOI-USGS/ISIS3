@@ -58,7 +58,7 @@ namespace Isis {
       }
 
       PointCloudSearchResult(const T &source, int neighbors,
-                      QVector<size_t> &indices, QVector<double> &distances,
+                      QVector<unsigned int> &indices, QVector<double> &distances,
                       QSharedPointer<PointCloud<T,D> > &pc) {
         Q_ASSERT ( indices.size() == distances.size() );
         Q_ASSERT ( neighbors == indices.size() );
@@ -80,7 +80,7 @@ namespace Isis {
       }
 
       PointCloudSearchResult(const T &source, const double radius_sq,
-                      std::vector< std::pair<size_t, double> > &matches,
+                      std::vector< std::pair<unsigned int, double> > &matches,
                       const QSharedPointer<PointCloud<T,D> > &pc,
                       const int nfound = 0) {
         m_search_type = Radius;
