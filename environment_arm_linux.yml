@@ -1,6 +1,4 @@
 channels:
-  - nasa-ames-stereo-pipeline
-  - usgs-astrogeology
   - conda-forge
   
 dependencies:
@@ -69,7 +67,7 @@ dependencies:
   - tnt
   - usgscsm
   - x264
-  #- usgs-astrogeology::xalan-c
+  #- xalan-c
   - xerces-c >=3.2.4,<3.3.0a0
   - xorg-kbproto
   - xorg-libice
