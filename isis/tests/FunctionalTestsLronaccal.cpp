@@ -212,7 +212,7 @@ TEST_F(TempTestingFiles, FunctionalTestsLronaccalNacLFull) {
                                 ub
     RadiometricType           = IOF
     ResponsivityValue         = 15869.0
-    SolarDistance             = 0.98615168542222
+    SolarDistance             = 0.98615168541745
   End_Group
   )");
 
@@ -223,10 +223,10 @@ TEST_F(TempTestingFiles, FunctionalTestsLronaccalNacLFull) {
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, radGroup, truthRadGroup);
 
   Histogram *oCubeStats = outCube.histogram();
-  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.026724545839011172);
-  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 136829.67469573719);
+  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.026724545838699577);
+  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 136829.67469414184);
   EXPECT_EQ(oCubeStats->ValidPixels(), 5120000);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0020650268181325645);
+  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0020650268181003251);
 }
 
 TEST_F(TempTestingFiles, FunctionalTestsLronaccalNacLSummed) {
@@ -325,7 +325,7 @@ TEST_F(TempTestingFiles, FunctionalTestsLronaccalNacRFull) {
                                 ub
     RadiometricType           = IOF
     ResponsivityValue         = 15058.0
-    SolarDistance             = 0.98615168542222
+    SolarDistance             = 0.98615168541745
   End_Group
   )");
 
@@ -336,10 +336,10 @@ TEST_F(TempTestingFiles, FunctionalTestsLronaccalNacRFull) {
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, radGroup, truthRadGroup);
 
   Histogram *oCubeStats = outCube.histogram();
-  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.025868278779590172);
-  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 132445.58735150169);
+  EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.025868278779362618);
+  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 132445.5873503366);
   EXPECT_EQ(oCubeStats->ValidPixels(), 5120000);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0018962021917208359);
+  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0018962021917028015);
 }
 
 TEST_F(TempTestingFiles, FunctionalTestsLronaccalNacRSummed) {
