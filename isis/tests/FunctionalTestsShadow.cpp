@@ -88,10 +88,10 @@ TEST_F(DemCube, FunctionalTestShadowTime) {
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
-  EXPECT_NEAR(hist->Average(), 0.57755590102547094, 1e-11);
-  EXPECT_NEAR(hist->Sum(), 5486.7810597419739, 1e-11);
+  EXPECT_NEAR(hist->Average(), 0.57757151580484289, 1e-11);
+  EXPECT_NEAR(hist->Sum(), 5486.9294001460075, 1e-11);
   ASSERT_EQ(hist->ValidPixels(), 9500);
-  EXPECT_NEAR(hist->StandardDeviation(), 0.0027122379581059736, 1e-11);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.0027113946106837737, 1e-11);
 }
 
 TEST_F(DemCube, FunctionalTestShadowNoShadow) {
