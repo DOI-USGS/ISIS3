@@ -36,6 +36,7 @@ release.
 ## [Unreleased]
 
 ### Added
+- Added Linux Arm support.
 - Added OFFBODY and OFFBODYTRIM parameters to noproj and cam2cam. Added tests and updated documentation. [#3602](https://github.com/DOI-USGS/ISIS3/issues/3602)
 - Added use Bullet Anaconda feedstock library, which includes double precision support, and fix ISIS use of general Bullet configurations. [#5772](https://github.com/DOI-USGS/ISIS3/pull/5772)
 - Added Mac Arm build support and adjusted the tests appropriately.
