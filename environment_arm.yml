@@ -43,7 +43,7 @@ dependencies:
   - make
   - mesalib
   - mysql
-  - nanoflann <1.4
+  - nanoflann=1.4.2
   - nlohmann_json=3.11.2
   - ninja >=1.10,<1.11
   - nn
