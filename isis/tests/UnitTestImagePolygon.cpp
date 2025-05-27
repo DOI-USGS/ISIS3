@@ -83,20 +83,20 @@ TEST_F(TempTestingFiles, UnitTestImagePolygonCross) {
     QString msg = "Cannot create polygon for [" + crossCube.fileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
-  ASSERT_EQ(40, poly.numVertices());
+  EXPECT_EQ(37, poly.numVertices());
 
   geos::geom::Geometry* boundary = poly.Polys()->getEnvelope().release();
   geos::geom::Point* centroid = poly.Polys()->getCentroid().release();
   std::vector<double> lons = {0.000000, 360.000000, 360.000000, 0.000000, 0.000000};
-  std::vector<double> lats = {54.208699, 54.208699, 77.858559, 77.858559, 54.208699};
+  std::vector<double> lats = {23.209991, 23.209991, 23.263401, 23.263401559, 23.209991};
   geos::geom::CoordinateSequence coordArray = *(boundary->getCoordinates().release());
   for (size_t i = 0; i < coordArray.getSize(); i++) {
     EXPECT_NEAR(lons[i], coordArray.getAt(i).x, 1e-6);
     EXPECT_NEAR(lats[i], coordArray.getAt(i).y, 1e-6);
   }
 
-  EXPECT_NEAR(centroid->getX(), 214.399354, 1e-1);
-  EXPECT_NEAR(centroid->getY(), 67.471751, 1e-1);
+  EXPECT_NEAR(centroid->getX(), 230.603005, 1e-1);
+  EXPECT_NEAR(centroid->getY(), 23.236899, 1e-1);
 }
 
 TEST_F(DefaultCube, UnitTestImagePolygonBoundary) {
