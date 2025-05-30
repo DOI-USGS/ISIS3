@@ -69,7 +69,7 @@ Object = IsisCube
   Group = Instrument
     SpacecraftName            = {{ capitalize(Product_Observational.Observation_Area.Investigation_Area.name) }}
     {% set inst_name = Product_Observational.Observation_Area.Observing_System.Observing_System_Component.1.name %}
-    {% if inst_name == "terrain mapping camera" %}
+    {% if inst_name == "orbiter high resolution camera" %}
     InstrumentId              = OHRC
     {% endif %}
     TargetName                = {{ Product_Observational.Observation_Area.Target_Identification.name }}

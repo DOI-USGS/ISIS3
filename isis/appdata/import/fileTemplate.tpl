@@ -98,6 +98,9 @@
   {%- if InstrumentId == "terrain mapping camera"-%}
     {%- set InstrumentId="TMC2" -%}
   {%- endif -%}
+  {%- if InstrumentId == "orbiter high resolution camera"-%}
+    {%- set InstrumentId="OHRC" -%}
+  {%- endif -%}
 {%- endif -%}
 
 {#- Combine the pieces to output the file name to be used to import an image into a cube -#}

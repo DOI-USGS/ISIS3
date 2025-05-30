@@ -90,9 +90,21 @@ Object = IsisCube
     ExposureType            = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_exposure }}
     DetectorPixelWidth      = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_detector_pixel_width._text }} <micrometers>
     FocalLength             = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_focal_length._text }} <mm>
-    ReferenceData           = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_reference_data_used }}
-    OrbitLimbDirection      = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_orbit_limb_direction }}
-    SpacecraftYawDirection  = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_spacecraft_yaw_direction }}
+    {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_reference_data_used") %}
+      ReferenceData = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_reference_data_used }}
+    {% else %}
+      ReferenceData = NA
+    {% endif %}
+    {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_orbit_limb_direction") %}
+      OrbitLimbDirection = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_orbit_limb_direction }}
+    {% else %}
+      OrbitLimbDirection = NA
+    {% endif %}
+    {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_spacecraft_yaw_direction") %}
+      SpacecraftYawDirection = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_spacecraft_yaw_direction }}
+    {% else %}
+      SpacecraftYawDirection = NA
+    {% endif %}
     SpacecraftAltitude      = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_spacecraft_altitude._text }} <km>
     PixelResolution         = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_pixel_resolution._text }} <meters/pixel>
     Roll                    = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_roll._text }} <degrees>
