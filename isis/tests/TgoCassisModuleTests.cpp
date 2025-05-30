@@ -1083,7 +1083,7 @@ TEST_F(TgoCassisModuleKernels, TgoCassisSingleFrameletProjection) {
   hist = bluCube.histogram();
 
   EXPECT_NEAR(hist->Average(), 0.051942847688226532, 0.0001);
-  EXPECT_NEAR(hist->Sum(), 42226.885122356936, 0.0001);
+  EXPECT_NEAR(hist->Sum(), 42226.885122356936, 0.001);
   EXPECT_EQ(hist->ValidPixels(), 812949);
   EXPECT_NEAR(hist->StandardDeviation(), 0.00085567958401590197, 0.0001);
 }

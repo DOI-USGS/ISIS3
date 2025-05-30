@@ -1282,6 +1282,9 @@ namespace Isis {
         if (!numberCoefSolved.isEmpty()) {
           m_numberCamAngleCoefSolved = numberCoefSolved.toInt();
         }
+        else {
+          m_numberCamAngleCoefSolved = 0;
+        }
         QStringRef degree = xmlReader->attributes().value("degree");
         if (!degree.isEmpty()) {
           m_ckDegree = degree.toInt();
@@ -1340,6 +1343,9 @@ namespace Isis {
         QStringRef numberCoefSolved = xmlReader->attributes().value("numberCoefSolved");
         if (!numberCoefSolved.isEmpty()) {
           m_numberCamPosCoefSolved = numberCoefSolved.toInt();
+        }
+        else {
+          m_numberCamPosCoefSolved = 0;
         }
         QStringRef degree = xmlReader->attributes().value("degree");
         if (!degree.isEmpty()) {

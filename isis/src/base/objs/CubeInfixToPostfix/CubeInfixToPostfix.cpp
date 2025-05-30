@@ -69,7 +69,8 @@ namespace Isis {
     }
 
     bool isFunction = (representation.size() > 1);
-    if(representation[0] == 'f') {
+    if(isFunction) {
+      isFunction &= (representation[0] == 'f');
       for(int i = 1; isFunction && i < representation.size(); i++) {
         isFunction &= (representation[i] >= '0' && representation[i] <= '9');
       }
