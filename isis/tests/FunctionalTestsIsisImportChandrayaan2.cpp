@@ -176,8 +176,6 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2MinimalLabel){
 }
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
-  
-  std::cout << "---now in FunctionalTestIsisImportChandrayaan2FullLabel---" << std::endl;
   std::istringstream PvlInput(R"(
   Object = IsisCube
     Object = Core
