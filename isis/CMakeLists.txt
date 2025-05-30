@@ -167,7 +167,9 @@ endif()
 
 if(buildTests)
   include(CTest)
+  include(CodeCoverage)
   enable_testing()
+  APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
 
@@ -643,4 +645,14 @@ add_subdirectory(cmake)
 
 if(buildTests)
   add_subdirectory(tests)
+  setup_target_for_coverage_gcovr_html(
+    NAME testrunner_coverage                    # New target name
+    EXECUTABLE ctest -R Spiceinit -j ${PROCESSOR_COUNT} --output-on-failure --timeout 100 # Executable in PROJECT_BINARY_DIR
+    DEPENDENCIES runISISTests                     # Dependencies to build first
+    BASE_DIRECTORY "../"                        # Base directory for report
+                                                #  (defaults to PROJECT_SOURCE_DIR)
+    NO_DEMANGLE                                 # Don't demangle C++ symbols
+                                                #  even if c++filt is found
+    EXCLUDE ".*/unitTest.cpp" ".*/tests/.*" ".*/moc_.*" "build/.*" "gtest/.*" ".*/qisis/.*"
+  )
 endif()
