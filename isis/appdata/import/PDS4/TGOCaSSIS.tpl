@@ -456,4 +456,7 @@ Object = IsisCube
   End_Group
   {% endif %}
 End_Object
+
+Object = Translation
+End_Object
 End
