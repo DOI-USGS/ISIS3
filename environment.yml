@@ -21,6 +21,7 @@ dependencies:
   - eigen >=3, <4
   - embree >=3, <4
   - ffmpeg
+  - gcovr
   - geos >=3.12,<3.13
   - geotiff
   - gdal >=3.7,<3.9
