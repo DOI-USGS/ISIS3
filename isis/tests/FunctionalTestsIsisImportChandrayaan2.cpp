@@ -176,6 +176,8 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2MinimalLabel){
 }
 
 TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
+  
+  std::cout << "---now in FunctionalTestIsisImportChandrayaan2FullLabel---" << std::endl;
   std::istringstream PvlInput(R"(
   Object = IsisCube
     Object = Core
@@ -337,6 +339,179 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 
     truthGroup = truthLabel.findGroup("Archive", Pvl::Traverse);
+  outGroup = outLabel->findGroup("Archive", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+}
+
+TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2OHRC) {
+  
+  std::istringstream PvlInput(R"(
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 2000
+    TileLines   = 1042
+
+    Group = Dimensions
+      Samples = 12000
+      Lines   = 101074
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName       = Chandrayaan-2
+    InstrumentId         = OHRC
+    TargetName           = Moon
+    StartTime            = 2024-03-16T20:08:01.4680
+    StopTime             = 2024-03-16T20:08:17.4304
+    LineExposureDuration = 162.100 <ms>
+  End_Group
+
+  Group = Archive
+    JobId                  = OHRXXD18CHO2033202NNNN24077121755300_V3_1
+    OrbitNumber            = 20323
+    DetectorPixelWidth     = 5.2 <micrometers>
+    FocalLength            = 2080 <mm>
+    ReferenceData          = System
+    OrbitLimbDirection     = Ascending
+    SpacecraftYawDirection = True
+    SpacecraftAltitude     = 76.94 <km>
+    PixelResolution        = 0.20 <meters/pixel>
+    Roll                   = 1.148114 <degrees>
+    Pitch                  = 32.999214 <degrees>
+    Yaw                    = 0.004525 <degrees>
+    SunAzimuth             = 59.899440 <degrees>
+    SunElevation           = 2.031766 <degrees>
+    SolarIncidence         = 87.968234 <degrees>
+    Projection             = "Polar stereographic"
+    Area                   = "South Pole"
+  End_Group
+
+  Group = BandBin
+    Center = 675
+    Width  = 175
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -152270
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 1212953537
+  Bytes     = 827
+End_Object
+
+Object = OriginalXmlLabel
+  Name      = IsisCube
+  StartByte = 1212954364
+  Bytes     = 7593
+  ByteOrder = Lsb
+End_Object
+End
+  )");
+  
+  QString dataFilePath= "data/isisimport/chan2/ch2_ohr_ncp_20240316T2008014680_d_img_d18.xml";
+  QString dataFileName = "ch2_ohr_ncp_20240316T2008014680_d_img_d18.xml";
+  QString imageFileName = "ch2_ohr_ncp_20240316T2008014680_d_img_d18.img";
+  QString cubeFileName = tempDir.path() + "/output.cub";
+
+  int samples = 12000;
+  int lines = 101074;
+  int bytes = 2;
+
+  // create a temp img file and write data to it
+  QFile tempImgFile(tempDir.path() + "/" + imageFileName);
+
+  if(!tempImgFile.open(QFile::WriteOnly | QFile::Text)){
+      FAIL() << " Could not open file for writing";
+  }
+  QDataStream out(&tempImgFile);
+
+  // generate lines
+  QByteArray writeToFile = QByteArray();
+  short int fill = 0;
+  for(int i=-1; i<(samples * bytes); i++){
+    writeToFile.append(fill);
+  }
+
+  // write the lines to the temp file
+  for(int i=0; i<lines; i++){
+    QDataStream out(&tempImgFile);
+    out << writeToFile;
+  }
+  tempImgFile.flush();
+  tempImgFile.close();
+
+  // create a temp data file and copy the contents of the xml in to it
+  QFile tempDataFile(tempDir.path() + "/" + dataFileName);
+
+  if(!tempDataFile.open(QFile::ReadWrite | QFile::Text)){
+      FAIL() << " Could not open file for writing";
+  }
+
+  // open xml to get data
+  QFile realXmlFile(dataFilePath);
+  if (!realXmlFile.open(QIODevice::ReadOnly | QIODevice::Text))
+  {
+      FAIL() << "Failed to open file";
+  }
+
+  QTextStream xmlData(&tempDataFile);
+  xmlData << realXmlFile.readAll();
+
+  tempDataFile.close();
+  realXmlFile.close();
+
+  QFileInfo fileInfo(tempDataFile);
+
+  // testing with template
+  QVector<QString> args = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName};
+  UserInterface options(APP_XML, args);
+  isisimport(options);
+
+  Pvl truthLabel;
+  PvlInput >> truthLabel;
+
+  Cube outCube(cubeFileName);
+  Pvl *outLabel = outCube.label();
+
+  PvlGroup truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);
+  PvlGroup &outGroup = outLabel->findGroup("Dimensions", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Pixels", Pvl::Traverse);
+  outGroup = outLabel->findGroup("Pixels", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Instrument", Pvl::Traverse);
+  outGroup = outLabel->findGroup("Instrument", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("BandBin", Pvl::Traverse);
+  outGroup = outLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Kernels", Pvl::Traverse);
+  outGroup = outLabel->findGroup("Kernels", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+
+  truthGroup = truthLabel.findGroup("Archive", Pvl::Traverse);
   outGroup = outLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 
