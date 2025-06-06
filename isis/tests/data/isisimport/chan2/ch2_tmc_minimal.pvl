@@ -1,0 +1,58 @@
+    Object = IsisCube
+      Object = Core
+        StartByte   = 65537
+        Format      = Tile
+        TileSamples = 128
+        TileLines   = 400
+
+        Group = Dimensions
+          Samples = 400
+          Lines   = 17891
+          Bands   = 1
+        End_Group
+
+        Group = Pixels
+          Type       = UnsignedByte
+          ByteOrder  = Lsb
+          Base       = 0.0
+          Multiplier = 1.0
+        End_Group
+      End_Object
+
+      Group = Instrument
+        SpacecraftName = Chandrayaan-2
+        InstrumentId   = TMC-2
+        TargetName     = Moon
+        StartTime      = 2019-11-28T00:35:38.9755
+        StopTime       = 2019-11-28T00:45:17.9161
+        LineExposureDuration = 3.236 <ms>
+      End_Group
+
+      Group = BandBin
+        Center = 675
+        Width  = 175
+      End_Group
+
+      Group = Kernels
+        NaifFrameCode = -152212
+      End_Group
+    End_Object
+
+    Object = Label
+      Bytes = 65536
+    End_Object
+
+    Object = History
+      Name      = IsisCube
+      StartByte = 7233537
+      Bytes     = 703
+    End_Object
+
+    Object = OriginalXmlLabel
+      Name      = IsisCube
+      StartByte = 7234240
+      Bytes     = 4223
+      ByteOrder = Lsb
+    End_Object
+    End
+
