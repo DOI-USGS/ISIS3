@@ -26,7 +26,8 @@ int main(void) {
   Preference::Preferences(true);
 
 
-  cout << "Unit Test for Chandrayaan1M3Camera..." << endl;
+  cout << "Unit test for Chandrayaan2TMC camera." << endl;
+  
   try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
@@ -34,8 +35,10 @@ int main(void) {
     // for the center of the image test, not the corners.
     double knownLat = 61.50040250242506;
     double knownLon = 74.89590535143694;
-
-    Cube c("/Users/arsanders/chandrayaan/data/calibrated/20191127/out.cub", "r");
+    
+    std::string pref = "ch2_tmc_ncf_20231030T1757326391_d_img_d18"; 
+    std::string path =  "../../../../tests/data/chandrayaan2/" + pref + ".cub";
+    Cube c(path.c_str(), "r");
     Camera *cam = CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
@@ -57,45 +60,34 @@ int main(void) {
 
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;
-    TestLineSamp(cam, 0.5, 0.5);
+    TestLineSamp(cam, 1.0, 1.0);
 
     cout << "For upper right corner ..." << endl;
-    TestLineSamp(cam, 608.4999, 0.5);
+    TestLineSamp(cam, 98.5, 1.0);
 
     cout << "For lower left corner ..." << endl;
-    TestLineSamp(cam, 0.5, 564.4999);
+    TestLineSamp(cam, 1.0, 98.5);
 
     cout << "For lower right corner ..." << endl;
-    TestLineSamp(cam, 608.4999, 564.4999);
+    TestLineSamp(cam, 98.5, 98.5);
 
-    double samp = 304.0;
-    double line = 282.0;
     cout << "For center pixel position ..." << endl;
+    double samp = 49.5;
+    double line = 49.5;
+    TestLineSamp(cam, samp, line);
 
     if (!cam->SetImage(samp, line)) {
       cout << "ERROR" << endl;
       return 0;
     }
 
-    if (abs(cam->UniversalLatitude() - knownLat) < 1E-10) {
-      cout << "Latitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
-    }
+    std::cout << "Universal latitude: " << cam->UniversalLatitude() << endl;
+    std::cout << "Universal longitude: " << cam->UniversalLongitude() << endl;
+                        
+    cout << "RightAscension: " << cam->RightAscension() << endl;
+    cout << "Declination: " << cam->Declination() << endl;
 
-    if (abs(cam->UniversalLongitude() - knownLon) < 1E-10) {
-      cout << "Longitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
-    }
-
-    cout << "RightAscension = " << cam->RightAscension() << endl;
-    cout << "Declination = " << cam->Declination() << endl;
-
-  }
-  catch (IException &e) {
+  } catch (IException &e) {
     e.print();
   }
 }
