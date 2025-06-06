@@ -28,7 +28,7 @@ using json = nlohmann::json;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/isisimport.xml").expanded();
 
-TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2MinimalLabel){
+TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2TmcMinimalLabel){
 
   QString pref = "ch2_tmc_nca_20191128T0035389755_b_brw_d18";
   QString dataFilePath= "data/isisimport/chan2/" + pref + ".xml";
@@ -114,21 +114,19 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2MinimalLabel){
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
 }
 
-TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
+void testChanImport(QString const& pref, 
+                    QString const& truthFile, 
+                    QString const& cubFile, 
+                    QString const& tempPath,
+                    int samples, int lines) {
 
-  QString pref = "ch2_tmc_ncn_20240808T0532596974_d_img_d18";
-  QString fullPvlFileName = "data/isisimport/chan2/ch2_tmc_full.pvl";
   QString dataFilePath= "data/isisimport/chan2/" + pref + ".xml";
   QString dataFileName = pref + ".xml";
   QString imageFileName = pref + ".img";
-  QString cubeFileName = tempDir.path() + "/output.cub";
-
-  int samples = 4000;
-  int lines = 2000; // Decreased for speed, also in the above xml file
   int bytes = 2;
 
   // Create a temp img file and write data to it
-  QFile tempImgFile(tempDir.path() + "/" + imageFileName);
+  QFile tempImgFile(tempPath + "/" + imageFileName);
 
   // Write binary data 
   if (!tempImgFile.open(QIODevice::WriteOnly))
@@ -143,7 +141,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
   tempImgFile.close();
 
   // create a temp data file and copy the contents of the xml in to it
-  QFile tempDataFile(tempDir.path() + "/" + dataFileName);
+  QFile tempDataFile(tempPath + "/" + dataFileName);
 
   if (!tempDataFile.open(QFile::ReadWrite | QFile::Text))
       FAIL() << " Could not open file for writing";
@@ -162,14 +160,14 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
   QFileInfo fileInfo(tempDataFile);
 
   // testing with template
-  QVector<QString> args = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubeFileName};
+  QVector<QString> args = {"from=" + fileInfo.absoluteFilePath(), "to=" + cubFile};
   UserInterface options(APP_XML, args);
   isisimport(options);
 
   Pvl truthLabel;
-  truthLabel.read(fullPvlFileName);
+  truthLabel.read(truthFile);
 
-  Cube outCube(cubeFileName);
+  Cube outCube(cubFile);
   Pvl *outLabel = outCube.label();
 
   PvlGroup truthGroup = truthLabel.findGroup("Dimensions", Pvl::Traverse);
@@ -195,5 +193,28 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
   truthGroup = truthLabel.findGroup("Archive", Pvl::Traverse);
   outGroup = outLabel->findGroup("Archive", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertPvlGroupEqual, outGroup, truthGroup);
+}
 
+TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2TmcFullLabel){
+
+  QString pref = "ch2_tmc_ncn_20240808T0532596974_d_img_d18";
+  QString truthFile = "data/isisimport/chan2/ch2_tmc_full.pvl";
+  QString tempPath = tempDir.path();
+  QString cubFile = tempPath + "/output_tmc.cub";
+  int samples = 4000;
+  int lines = 2000; // Decreased for speed, also in the input files
+
+  testChanImport(pref, truthFile, cubFile, tempPath, samples, lines);
+}
+
+TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2OhrcFullLabel){
+
+  QString pref = "ch2_ohr_ncp_20240229T0921593215_d_img_d18";
+  QString truthFile = "data/isisimport/chan2/ch2_ohrc_full.pvl";
+  QString tempPath = tempDir.path();
+  QString cubFile = tempPath + "/output_ohrc.cub";
+  int samples = 3000;
+  int lines = 2000; // Decreased for speed, also in the input files
+  
+  testChanImport(pref, truthFile, cubFile, tempPath, samples, lines);
 }

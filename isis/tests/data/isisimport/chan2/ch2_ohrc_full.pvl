@@ -1,0 +1,77 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 1500
+    TileLines   = 2000
+
+    Group = Dimensions
+      Samples = 3000
+      Lines   = 4000
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName       = Chandrayaan-2
+    InstrumentId         = OHRC
+    TargetName           = Moon
+    StartTime            = 2024-02-29T09:21:59.3215
+    StopTime             = 2024-02-29T09:22:15.7052
+    LineExposureDuration = 162.100 <ms>
+  End_Group
+
+  Group = Archive
+    JobId                  = OHRXXD18CHO2012702NNNN24060200055380_V6_1_00
+    OrbitNumber            = 20120
+    DetectorPixelWidth     = 5.2 <micrometers>
+    FocalLength            = 2080 <mm>
+    ReferenceData          = System
+    OrbitLimbDirection     = Descending
+    SpacecraftYawDirection = False
+    SpacecraftAltitude     = 91.21 <km>
+    PixelResolution        = 0.23 <meters/pixel>
+    Roll                   = -24.589199 <degrees>
+    Pitch                  = -11.900772 <degrees>
+    Yaw                    = -0.045955 <degrees>
+    SunAzimuth             = 253.986347 <degrees>
+    SunElevation           = -0.027513 <degrees>
+    SolarIncidence         = 90.027513 <degrees>
+    Projection             = "Polar stereographic"
+    Area                   = "South Pole"
+  End_Group
+
+  Group = BandBin
+    Center = 675
+    Width  = 175
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -152270
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 12065537
+  Bytes     = 670
+End_Object
+
+Object = OriginalXmlLabel
+  Name      = IsisCube
+  StartByte = 12066207
+  Bytes     = 7604
+  ByteOrder = Lsb
+End_Object
+End
