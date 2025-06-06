@@ -647,7 +647,7 @@ if(buildTests)
   add_subdirectory(tests)
   setup_target_for_coverage_gcovr_html(
     NAME testrunner_coverage                    # New target name
-    EXECUTABLE ctest -j ${PROCESSOR_COUNT} --output-on-failure --timeout 100 # Executable in PROJECT_BINARY_DIR
+    EXECUTABLE ctest -j ${PROCESSOR_COUNT} --output-on-failure --timeout 10000 --output-junit test-report.xml # Executable in PROJECT_BINARY_DIR
     DEPENDENCIES runISISTests                     # Dependencies to build first
     BASE_DIRECTORY "${CMAKE_SOURCE_DIR}"        # Base directory for report
     NO_DEMANGLE                                 # Don't demangle C++ symbols
