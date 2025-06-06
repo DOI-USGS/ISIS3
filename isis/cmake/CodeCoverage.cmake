@@ -572,7 +572,7 @@ function(setup_target_for_coverage_gcovr_html)
     endif()
 
     add_custom_target(${Coverage_NAME}
-        # COMMAND ${GCOVR_HTML_EXEC_TESTS_CMD}
+        COMMAND ${GCOVR_HTML_EXEC_TESTS_CMD}
         COMMAND ${GCOVR_HTML_FOLDER_CMD}
         COMMAND ${GCOVR_HTML_CMD}
 
