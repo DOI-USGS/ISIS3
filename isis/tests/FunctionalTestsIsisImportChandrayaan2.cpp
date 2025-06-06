@@ -179,10 +179,10 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
   std::istringstream PvlInput(R"(
   Object = IsisCube
     Object = Core
-      StartByte      = 65537
-      Format         = Tile
+      StartByte   = 65537
+      Format      = Tile
       TileSamples = 519
-      TileLines      = 1000
+      TileLines   = 1000
 
       Group = Dimensions
         Samples = 4000
@@ -191,9 +191,9 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
       End_Group
 
       Group = Pixels
-        Type         = UnsignedWord
-        ByteOrder    = Lsb
-        Base         = 0.0
+        Type       = UnsignedWord
+        ByteOrder  = Lsb
+        Base       = 0.0
         Multiplier = 1.0
       End_Group
     End_Object
@@ -208,25 +208,25 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
     End_Group
 
     Group = Archive
-      JobId                = TMCXXD18CHO2210300NNNN24221055326097_V2_1
-      OrbitNumber          = 22103
-      GainType             = g1
-      ExposureType         = e1
-      DetectorPixelWidth   = 7 <micrometers>
-      FocalLength          = 140 <mm>
-      ReferenceData        = SELENE
-      OrbitLimbDirection   = Descending
+      JobId                  = TMCXXD18CHO2210300NNNN24221055326097_V2_1
+      OrbitNumber            = 22103
+      GainType               = g1
+      ExposureType           = e1
+      DetectorPixelWidth     = 7 <micrometers>
+      FocalLength            = 140 <mm>
+      ReferenceData          = SELENE
+      OrbitLimbDirection     = Descending
       SpacecraftYawDirection = False
-      SpacecraftAltitude   = 89.53 <km>
-      PixelResolution      = 4.48 <meters/pixel>
-      Roll                 = 0.009365 <degrees>
-      Pitch                = 0.066417 <degrees>
-      Yaw                  = -0.017284 <degrees>
-      SunAzimuth           = 116.737463 <degrees>
-      SunElevation         = 39.932493 <degrees>
-      SolarIncidence       = 50.067507 <degrees>
-      Projection           = Selenographic
-      Area                 = Equatorial
+      SpacecraftAltitude     = 89.53 <km>
+      PixelResolution        = 4.48 <meters/pixel>
+      Roll                   = 0.009365 <degrees>
+      Pitch                  = 0.066417 <degrees>
+      Yaw                    = -0.017284 <degrees>
+      SunAzimuth             = 116.737463 <degrees>
+      SunElevation           = 39.932493 <degrees>
+      SolarIncidence         = 50.067507 <degrees>
+      Projection             = Selenographic
+      Area                   = Equatorial
     End_Group
 
     Group = BandBin
@@ -244,9 +244,9 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
   End_Object
 
   Object = OriginalXmlLabel
-    Name        = IsisCube
+    Name      = IsisCube
     StartByte = 1440809537
-    Bytes       = 7625
+    Bytes     = 7625
     ByteOrder = Lsb
   End_Object
   End
@@ -258,28 +258,23 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
 
   int samples = 4000;
   int lines = 180093;
-  int bytes = 2; // This is actually bytes_per_pixel
+  int bytes = 2;
 
-  // create a temp img file and write data to it
+  // Create a temp img file and write data to it
   QFile tempImgFile(tempDir.path() + "/" + imageFileName);
 
-  // Changed to QIODevice::WriteOnly for binary data, not QFile::Text
-  if(!tempImgFile.open(QIODevice::WriteOnly)){
+  // Prepare to write binary data 
+  if (!tempImgFile.open(QIODevice::WriteOnly))
       FAIL() << " Could not open file for writing";
-  }
-  // Removed QDataStream here as we want raw bytes
 
-  // generate lines - QByteArray should represent a single raw line of pixels
-  // Corrected the size of writeToFile and initialized with zeros
+  // Allocate space
   QByteArray writeToFile = QByteArray(samples * bytes, 0);
 
   // write the lines to the temp file using direct write, not QDataStream serialization
-  for(int i=0; i<lines; i++){
-    // Removed QDataStream out(&tempImgFile); here
+  for(int i=0; i<lines; i++) {
     qint64 bytesWritten = tempImgFile.write(writeToFile); // Direct write
-    if (bytesWritten == -1 || bytesWritten != writeToFile.size()) {
+    if (bytesWritten == -1 || bytesWritten != writeToFile.size())
         FAIL() << "Failed to write all data for line " << i << " to image file.";
-    }
   }
   tempImgFile.flush();
   tempImgFile.close();
@@ -287,16 +282,13 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
   // create a temp data file and copy the contents of the xml in to it
   QFile tempDataFile(tempDir.path() + "/" + dataFileName);
 
-  if(!tempDataFile.open(QFile::ReadWrite | QFile::Text)){
+  if (!tempDataFile.open(QFile::ReadWrite | QFile::Text))
       FAIL() << " Could not open file for writing";
-  }
 
   // open xml to get data
   QFile realXmlFile(dataFilePath);
-  if (!realXmlFile.open(QIODevice::ReadOnly | QIODevice::Text))
-  {
+  if (!realXmlFile.open(QIODevice::ReadOnly | QIODevice::Text)) 
       FAIL() << "Failed to open file";
-  }
 
   QTextStream xmlData(&tempDataFile);
   xmlData << realXmlFile.readAll();
