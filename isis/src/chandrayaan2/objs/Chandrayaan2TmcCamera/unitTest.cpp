@@ -29,12 +29,6 @@ int main(void) {
   cout << "Unit test for Chandrayaan2TMC camera." << endl;
   
   try {
-    // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
-    // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
-    // and "Longitude off by: " values directly into these variables. NOTE: These are only used
-    // for the center of the image test, not the corners.
-    double knownLat = 61.50040250242506;
-    double knownLon = 74.89590535143694;
     
     std::string pref = "ch2_tmc_ncf_20231030T1757326391_d_img_d18"; 
     std::string path =  "../../../../tests/data/chandrayaan2/" + pref + ".cub";
