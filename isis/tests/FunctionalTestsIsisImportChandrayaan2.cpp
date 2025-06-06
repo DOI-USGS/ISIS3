@@ -186,7 +186,7 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
 
       Group = Dimensions
         Samples = 4000
-        Lines   = 180093
+        Lines   = 2000
         Bands   = 1
       End_Group
 
@@ -257,22 +257,18 @@ TEST_F(TempTestingFiles, FunctionalTestIsisImportChandrayaan2FullLabel){
   QString cubeFileName = tempDir.path() + "/output.cub";
 
   int samples = 4000;
-  int lines = 180093;
+  int lines = 2000; // Decreased for speed, also in the above xml file
   int bytes = 2;
 
   // Create a temp img file and write data to it
   QFile tempImgFile(tempDir.path() + "/" + imageFileName);
 
-  // Prepare to write binary data 
+  // Write binary data 
   if (!tempImgFile.open(QIODevice::WriteOnly))
       FAIL() << " Could not open file for writing";
-
-  // Allocate space
   QByteArray writeToFile = QByteArray(samples * bytes, 0);
-
-  // write the lines to the temp file using direct write, not QDataStream serialization
-  for(int i=0; i<lines; i++) {
-    qint64 bytesWritten = tempImgFile.write(writeToFile); // Direct write
+  for (int i=0; i<lines; i++) {
+    qint64 bytesWritten = tempImgFile.write(writeToFile);
     if (bytesWritten == -1 || bytesWritten != writeToFile.size())
         FAIL() << "Failed to write all data for line " << i << " to image file.";
   }
