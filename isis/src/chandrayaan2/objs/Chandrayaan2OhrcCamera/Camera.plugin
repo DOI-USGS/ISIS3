@@ -1,0 +1,6 @@
+Group = CHANDRAYAAN-2/OHRC
+  Version = 1
+  Library = Chandrayaan2OhrcCamera
+  Routine = Chandrayaan2OhrcCameraPlugin
+EndGroup
+
