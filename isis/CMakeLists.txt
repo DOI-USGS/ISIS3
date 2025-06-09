@@ -645,13 +645,27 @@ add_subdirectory(cmake)
 
 if(buildTests)
   add_subdirectory(tests)
-  setup_target_for_coverage_gcovr_html(
-    NAME testrunner_coverage                    # New target name
-    EXECUTABLE ctest -j ${PROCESSOR_COUNT} --output-on-failure --timeout 10000 --output-junit test-report.xml # Executable in PROJECT_BINARY_DIR
+  SET(COVERAGE_COMMAND ctest -j ${PROCESSOR_COUNT} --output-on-failure --timeout 10000 | true)
+  SET(COVERAGE_EXCLUDE ".*/unitTest.cpp" ".*/tests/.*" ".*/moc_.*" "build/.*" "gtest/.*" ".*/qisis/.*" ".*/.*/.*.h")
+  setup_target_for_coverage_gcovr_xml(
+    NAME test_coverage_xml                    # New target name
+    EXECUTABLE ${COVERAGE_COMMAND} # Executable in PROJECT_BINARY_DIR
     DEPENDENCIES runISISTests                     # Dependencies to build first
     BASE_DIRECTORY "${CMAKE_SOURCE_DIR}"        # Base directory for report
     NO_DEMANGLE                                 # Don't demangle C++ symbols
                                                 #  even if c++filt is found
-    EXCLUDE ".*/unitTest.cpp" ".*/tests/.*" ".*/moc_.*" "build/.*" "gtest/.*" ".*/qisis/.*" ".*/.*/.*.h"
+    EXCLUDE ${COVERAGE_EXCLUDE}
+    OPTIONS --print-summary
+  )
+
+  setup_target_for_coverage_gcovr_html(
+    NAME test_coverage_html                    # New target name
+    EXECUTABLE ${COVERAGE_COMMAND} # Executable in PROJECT_BINARY_DIR
+    DEPENDENCIES runISISTests                     # Dependencies to build first
+    BASE_DIRECTORY "${CMAKE_SOURCE_DIR}"        # Base directory for report
+    NO_DEMANGLE                                 # Don't demangle C++ symbols
+                                                #  even if c++filt is found
+    EXCLUDE ${COVERAGE_EXCLUDE}
+    OPTIONS --print-summary
   )
 endif()
