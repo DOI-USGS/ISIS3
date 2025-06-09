@@ -46,7 +46,7 @@ dependencies:
   - mkl
   - mysql
   - mysql-connector-c
-  - nanoflann>=1.4.2
+  - nanoflann>=1.4.2,<1.5
   - nlohmann_json=3.11.2
   - ninja >=1.10,<1.11
   - nn
