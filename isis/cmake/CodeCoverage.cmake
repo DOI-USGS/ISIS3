@@ -480,6 +480,7 @@ function(setup_target_for_coverage_gcovr_xml)
         DEPENDS ${Coverage_DEPENDENCIES}
         VERBATIM # Protect arguments to commands
         COMMENT "Running gcovr to produce Cobertura code coverage report."
+        OUTPUT ${PROJECT_BINARY_DIR}/coverage_output.txt
     )
 
     # Show info where to find the report
@@ -575,12 +576,13 @@ function(setup_target_for_coverage_gcovr_html)
         COMMAND ${GCOVR_HTML_EXEC_TESTS_CMD}
         COMMAND ${GCOVR_HTML_FOLDER_CMD}
         COMMAND ${GCOVR_HTML_CMD}
-
+        
         BYPRODUCTS ${PROJECT_BINARY_DIR}/${Coverage_NAME}/index.html  # report directory
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
         DEPENDS ${Coverage_DEPENDENCIES}
         VERBATIM # Protect arguments to commands
         COMMENT "Running gcovr to produce HTML code coverage report."
+        OUTPUT ${PROJECT_BINARY_DIR}/coverage_output.txt
     )
 
     # Show info where to find the report
