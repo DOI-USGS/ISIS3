@@ -657,7 +657,6 @@ if(buildTests)
     EXCLUDE ${COVERAGE_EXCLUDE}
     OPTIONS --print-summary
   )
-
   setup_target_for_coverage_gcovr_html(
     NAME test_coverage_html                    # New target name
     EXECUTABLE ${COVERAGE_COMMAND} # Executable in PROJECT_BINARY_DIR
