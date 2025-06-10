@@ -70,8 +70,8 @@ TEST_F(DefaultCube, UnitTestImagePolygonSubPoly) {
 }
 
 TEST_F(TempTestingFiles, UnitTestImagePolygonCross) {
-  FileName isdFile("$ISISROOT/../isis/tests/data/footprintinit/cross.isd");
-  FileName labelFile("$ISISROOT/../isis/tests/data/footprintinit/cross.pvl");
+  FileName isdFile(QString(_SOURCE_PREFIX) + "/data/footprintinit/cross.isd");
+  FileName labelFile(QString(_SOURCE_PREFIX) + "/data/footprintinit/cross.pvl");
 
   Cube crossCube;
   crossCube.fromIsd(tempDir.path() + "/footprintCube.cub", labelFile, isdFile, "rw");
