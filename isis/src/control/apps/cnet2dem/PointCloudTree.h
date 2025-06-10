@@ -102,7 +102,7 @@ namespace Isis {
       /** Perform radius query for points in kilometer units */
       PointCloudSearchResult<T,D> radius_query(const T &point,
                                                const double &radius_sq) {
-        std::vector<std::pair<size_t, double> > matches;
+        std::vector<std::pair<unsigned int, double> > matches;
 
         int n = m_kd_index.radiusSearch(point.array(), radius_sq, matches,
                                         nanoflann::SearchParams());
@@ -112,7 +112,7 @@ namespace Isis {
       /** Perform nearest set of points from its neighbors   */
       PointCloudSearchResult<T,D> neighbor_query(const T &point,
                                                   const int &neighbors) {
-        QVector<size_t> indices(neighbors);
+        QVector<unsigned int> indices(neighbors);
         QVector<double> distances(neighbors);
         m_kd_index.knnSearch(point.array(), neighbors, indices.data(),
                              distances.data());

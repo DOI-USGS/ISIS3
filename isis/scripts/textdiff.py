@@ -144,6 +144,10 @@ def skipIgnoreLines(lines, ignoreSet):
     if len(words) == 0:
       continue
 
+    # Temporary fix for a python warning that breaks tests
+    if 'pkg_resources' in lines[lineCount]:
+      continue
+
     outLines.append(lines[lineCount])
       
   return outLines

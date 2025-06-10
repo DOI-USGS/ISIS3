@@ -114,7 +114,7 @@ template <class T> class PointCloudTree {
      * @return @b QList<T> A list of all the points within the radius.
      */
     QList<T> radius_query(const T &point, const double &radius_sq) {
-      std::vector<std::pair<size_t, double> > matches;
+      std::vector<std::pair<unsigned int, double> > matches;
 
       (void) m_kd_index.radiusSearch(point.array(), radius_sq, matches,
                                      nanoflann::SearchParams());

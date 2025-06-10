@@ -2,17 +2,17 @@ Object = IsisCube
   Object = Core
     StartByte   = 65537
     Format      = Tile
-    TileSamples = 128
-    TileLines   = 128
+    TileSamples = 352
+    TileLines   = 256
 
     Group = Dimensions
-      Samples = 1204
-      Lines   = 1056
+      Samples = 1408
+      Lines   = 256
       Bands   = 1
     End_Group
 
     Group = Pixels
-      Type       = UnsignedByte
+      Type       = Real
       ByteOrder  = Lsb
       Base       = 0.0
       Multiplier = 1.0
@@ -20,91 +20,536 @@ Object = IsisCube
   End_Object
 
   Group = Instrument
-    SpacecraftName       = VIKING_ORBITER_1
-    InstrumentId         = VISUAL_IMAGING_SUBSYSTEM_CAMERA_A
-    TargetName           = MARS
-    StartTime            = 1979-09-14T00:36:50
-    ExposureDuration     = 0.067880 <seconds>
-    SpacecraftClockCount = 48677568
-    FloodModeId          = ON
-    GainModeId           = LOW
-    OffsetModeId         = OFF
+    SpacecraftName            = "TRACE GAS ORBITER"
+    InstrumentId              = CaSSIS
+    TargetName                = Mars
+    StartTime                 = 2024-09-21T05:06:49.230
+    SpacecraftClockStartCount = 2f1008779aa0d3a9
+    ExposureDuration          = 1.565e-003 <seconds>
+    Filter                    = BLU
+    Expanded                  = 1
+    SummingMode               = 0
   End_Group
 
   Group = Archive
-    DataSetId         = VO1/VO2-M-VIS-2-EDR-V2.0
-    ProductId         = 174S47
-    MissonPhaseName   = SURVEY_MISSION
-    ImageNumber       = 48677568
-    OrbitNumber       = 1174
-    EdrSource         = http://pdsimage2.wr.usgs.gov/cdroms/viking_orbiter/vo-
-                        _1002/f174sxx/f174s47.imq
-    BrowseImageSource = $thumbnail_server/VIKING/viking_orbiter/vo_1002/f174s-
-                        xx/f174s47.browse.jpg
-    ThumbImageSource  = $thumbnail_server/VIKING/viking_orbiter/vo_1002/f174s-
-                        xx/f174s47.thumb.jpg
+    DataSetId                    = TBD
+    ProductVersionId             = UNK
+    ProducerId                   = UBE
+    ProducerName                 = "Nicolas Thomas"
+    ProductId                    = M8420240921050649230BLU0301500
+    ProductCreationTime          = 2024-10-07T03:24:31
+    FileName                     = MY37_030464_158_0_015_BLU03-C1
+    ScalingFactor                = 1.00
+    Offset                       = 0.00
+    PredictMaximumExposureTime   = 1.5929 <ms>
+    CassisOffNadirAngle          = 9.964 <deg>
+    PredictedRepetitionFrequency = 367.0 <ms>
+    GroundTrackVelocity          = 2.9437 <km/s>
+    ForwardRotationAngle         = 96.022 <deg>
+    SpiceMisalignment            = 174.483 <deg>
+    FocalLength                  = 0.8749 <m>
+    FNumber                      = 6.48
+    ExposureTimeCommand          = 163
+    FrameletNumber               = 15
+    NumberOfFramelets            = 40
+    ImageFrequency               = 361000 <ms>
+    NumberOfWindows              = 4
+    UniqueIdentifier             = 1136132728
+    UID                          = 1136132728
+    ExposureTimestamp            = 2f1008779aa0d3a9
+    ExposureTimePEHK             = 1.565e-003 <ms>
+    IFOV                         = 1.143e-005
+    IFOVUnit                     = rad/px
+    FiltersAvailable             = "BLU RED NIR PAN"
+    FocalLengthUnit              = M
+    TelescopeType                = "Three-mirror anastigmat with powered fold
+                                    mirror"
+    DetectorDescription          = "2D Array"
+    PixelHeight                  = 10.0
+    PixelHeightUnit              = MICRON
+    PixelWidth                   = 10.0
+    PixelWidthUnit               = MICRON
+    DetectorType                 = "SI CMOS HYBRID (OSPREY 2K)"
+    ReadNoise                    = 61.0
+    ReadNoiseUnit                = ELECTRON
+    MissionPhase                 = M84
+    SubInstrumentIdentifier      = 61.0
+    WindowCount                  = 3
+    Window1Binning               = 0
+    Window1StartSample           = 384
+    Window1EndSample             = 1791
+    Window1StartLine             = 354
+    Window1EndLine               = 633
+    Window2Binning               = 0
+    Window2StartSample           = 320
+    Window2EndSample             = 1727
+    Window2StartLine             = 712
+    Window2EndLine               = 967
+    Window3Binning               = 0
+    Window3StartSample           = 320
+    Window3EndSample             = 1727
+    Window3StartLine             = 1048
+    Window3EndLine               = 1303
+    Window4Binning               = 0
+    Window4StartSample           = 256
+    Window4EndSample             = 1663
+    Window4StartLine             = 1409
+    Window4EndLine               = 1664
+    Window5Binning               = 0
+    Window5StartSample           = 0
+    Window5EndSample             = 63
+    Window5StartLine             = 0
+    Window5EndLine               = -1
+    Window6Binning               = 0
+    Window6StartSample           = 0
+    Window6EndSample             = 63
+    Window6StartLine             = 0
+    Window6EndLine               = -1
+    YearDoy                      = 2024265
+    ObservationId                = MY37_030464_158_0
   End_Group
 
   Group = BandBin
-    FilterName = VIOLET
-    FilterId   = 3
+    FilterName = BLU
+    Center     = 497.4 <nm>
+    Width      = 134.3 <nm>
+    NaifIkCode = -143424
   End_Group
 
   Group = Kernels
-    NaifFrameCode             = -27001
+    NaifFrameCode             = -143400
     LeapSecond                = $base/kernels/lsk/naif0012.tls
-    TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
-    TargetPosition            = (Table, $base/kernels/spk/de430.bsp,
-                                 $base/kernels/spk/mar097.bsp)
-    InstrumentPointing        = (Table, $viking1/kernels/ck/vo1_sedr_ck2.bc,
-                                 $viking1/kernels/fk/vo1_v10.tf)
-    Instrument                = Null
-    SpacecraftClock           = ($viking1/kernels/sclk/vo1_fict.tsc,
-                                 $viking1/kernels/sclk/vo1_fsc.tsc)
-    InstrumentPosition        = (Table, $viking1/kernels/spk/vik1_ext.bsp)
-    InstrumentAddendum        = $viking1/kernels/iak/vikingAddendum003.ti
+    TargetAttitudeShape       = ($tgo/kernels/pck/pck00010.tpc,
+                                 $tgo/kernels/pck/de-403-masses.tpc)
+    TargetPosition            = (Table, $tgo/kernels/tspk/de432s.bsp,
+                                 $tgo/kernels/tspk/mar097.bsp)
+    InstrumentPointing        = (Table,
+                                 $tgo/kernels/ck/em16_tgo_sc_ssm_20240101_2025-
+                                 0101_s20241207_v01.bc,
+                                 $tgo/kernels/ck/em16_tgo_cassis_tel_20160407_-
+                                 20261231_s20250407_v01.bc,
+                                 $tgo/kernels/fk/em16_tgo_v27.tf,
+                                 $tgo/kernels/fk/em16_tgo_ops_v02.tf,
+                                 $tgo/kernels/fk/rssd0002.tf)
+    Instrument                = $tgo/kernels/ik/em16_tgo_cassis_v09.ti
+    SpacecraftClock           = $tgo/kernels/sclk/em16_tgo_step_20250407.tsc
+    InstrumentPosition        = (Table,
+                                 $tgo/kernels/spk/em16_tgo_fsp_369_01_20240916-
+                                 _20250301_v01.bsp)
+    InstrumentAddendum        = $tgo/kernels/iak/tgoCassisAddendum007.ti
     ShapeModel                = $base/dems/molaMarsPlanetaryRadius0005.cub
-    CameraVersion             = 1
-    InstrumentPositionQuality = Reconstructed
+    InstrumentPositionQuality = Predicted
     InstrumentPointingQuality = Reconstructed
-    Source                    = isis
+    CameraVersion             = 1
+    Source                    = ale
   End_Group
 
-  Group = Reseaus
-    Line     = (4, 8, 11, 13, 15, 17, 18, 20, 21, 22, 23, 132, 134, 137, 139,
-                141, 143, 145, 147, 148, 150, 151, 152, 260, 264, 266, 268,
-                270, 272, 274, 276, 277, 279, 281, 389, 391, 394, 396, 398,
-                400, 401, 403, 405, 407, 408, 409, 518, 521, 523, 526, 528,
-                529, 531, 532, 534, 536, 538, 647, 648, 651, 653, 655, 657,
-                658, 660, 662, 663, 665, 666, 776, 779, 781, 783, 785, 786,
-                788, 789, 790, 792, 794, 906, 907, 909, 911, 913, 914, 915,
-                917, 918, 920, 922, 923, 1035, 1037, 1039, 1040, 1042, 1043,
-                1044, 1046, 1047, 1048, 1051)
-    Sample   = (18, 137, 255, 372, 489, 605, 721, 837, 954, 1070, 1187, 20,
-                79, 197, 314, 431, 547, 663, 779, 895, 1011, 1127, 1186, 20,
-                139, 256, 373, 490, 605, 721, 837, 953, 1069, 1185, 21, 81,
-                199, 316, 432, 548, 663, 779, 895, 1010, 1126, 1184, 22, 141,
-                257, 374, 489, 605, 721, 836, 952, 1068, 1184, 22, 82, 199,
-                316, 431, 547, 663, 778, 893, 1009, 1125, 1183, 22, 141, 257,
-                373, 489, 604, 719, 835, 950, 1066, 1182, 22, 81, 198, 314,
-                430, 545, 660, 776, 891, 1007, 1123, 1181, 20, 138, 255, 371,
-                486, 602, 717, 832, 948, 1064, 1180)
-    Type     = (1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-                5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5,
-                5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5,
-                5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5,
-                5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6)
-    Valid    = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    Template = $viking1/reseaus/vo1.visa.template.cub
-    Status   = Nominal
+  Group = AlphaCube
+    AlphaSamples        = 2048
+    AlphaLines          = 2048
+    AlphaStartingSample = 256.5
+    AlphaStartingLine   = 1409.5
+    AlphaEndingSample   = 1664.5
+    AlphaEndingLine     = 1665.5
+    BetaSamples         = 1408
+    BetaLines           = 256
   End_Group
 End_Object
 
 Object = Label
   Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 1531206
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-143410, -143400, -143000, 1)
+  ConstantFrames      = (-143420, -143410)
+  ConstantRotation    = (0.0021039880161897, -5.08910327555068e-04,
+                         0.99999765711961, 0.98482103650022, 0.17356149021485,
+                         -0.0019837290716918, -0.17356007404082,
+                         0.98482290292452, 8.66356891752518e-04)
+  CkTableStartTime    = 780167278.41317
+  CkTableEndTime      = 780167278.41317
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($tgo/kernels/ck/em16_tgo_sc_ssm_20240101_20250101_s2-
+                         0241207_v01.bc,
+                         $tgo/kernels/ck/em16_tgo_cassis_tel_20160407_20261231-
+                         _s20250407_v01.bc, $tgo/kernels/fk/em16_tgo_v27.tf,
+                         $tgo/kernels/fk/em16_tgo_ops_v02.tf,
+                         $tgo/kernels/fk/rssd0002.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 1531270
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 780167278.41317
+  SpkTableEndTime      = 780167278.41317
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $tgo/kernels/spk/em16_tgo_fsp_369_01_20240916_202503-
+                         01_v01.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 1531326
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10014, 1)
+  CkTableStartTime    = 780167278.41317
+  CkTableEndTime      = 780167278.41317
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($tgo/kernels/tspk/de432s.bsp,
+                         $tgo/kernels/tspk/mar097.bsp,
+                         $tgo/kernels/pck/pck00010.tpc,
+                         $tgo/kernels/pck/de-403-masses.tpc)
+  SolarLongitude      = 332.76359103359
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 1531390
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 780167278.41317
+  SpkTableEndTime      = 780167278.41317
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($tgo/kernels/tspk/de432s.bsp,
+                          $tgo/kernels/tspk/mar097.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 1531446
+  Bytes     = 1533
+End_Object
+
+Object = OriginalXmlLabel
+  Name      = IsisCube
+  StartByte = 1507926
+  Bytes     = 23280
+  ByteOrder = Lsb
+End_Object
+
+Object = NaifKeywords
+  BODY499_GM                      = 42828.314
+  BODY499_PM                      = (176.63, 350.89198226, 0)
+  BODY499_POLE_DEC                = (52.8865, -0.0609, 0)
+  BODY499_POLE_RA                 = (317.68143, -0.1061, 0)
+  BODY499_RADII                   = (3396.19, 3396.19, 3376.2)
+  BODY_CODE                       = 499
+  BODY_FRAME_CODE                 = 10014
+  FRAME_-143400_CENTER            = -143400
+  FRAME_-143400_CLASS             = 4
+  FRAME_-143400_CLASS_ID          = -143400
+  FRAME_-143400_NAME              = TGO_CASSIS_CRU
+  FRAME_1500499_CENTER            = 499
+  FRAME_1500499_CLASS             = 5
+  FRAME_1500499_CLASS_ID          = 1500499
+  FRAME_1500499_DEF_STYLE         = PARAMETERIZED
+  FRAME_1500499_FAMILY            = TWO-VECTOR
+  FRAME_1500499_NAME              = MME
+  FRAME_1500499_PRI_AXIS          = Z
+  FRAME_1500499_PRI_FRAME         = IAU_MARS
+  FRAME_1500499_PRI_SPEC          = RECTANGULAR
+  FRAME_1500499_PRI_VECTOR        = (0, 0, 1)
+  FRAME_1500499_PRI_VECTOR_DEF    = CONSTANT
+  FRAME_1500499_RELATIVE          = J2000
+  FRAME_1500499_SEC_AXIS          = Y
+  FRAME_1500499_SEC_FRAME         = J2000
+  FRAME_1500499_SEC_SPEC          = RECTANGULAR
+  FRAME_1500499_SEC_VECTOR        = (0, 0, 1)
+  FRAME_1500499_SEC_VECTOR_DEF    = CONSTANT
+  FRAME_1501499_ANGLE_1_COEFFS    = (-47.68143, 3.362106117068471e-11)
+  FRAME_1501499_ANGLE_2_COEFFS    = (-37.1135, -1.929804547874363e-11)
+  FRAME_1501499_ANGLE_3_COEFFS    = 0
+  FRAME_1501499_AXES              = (3, 1, 3)
+  FRAME_1501499_CENTER            = 499
+  FRAME_1501499_CLASS             = 5
+  FRAME_1501499_CLASS_ID          = 1501499
+  FRAME_1501499_DEF_STYLE         = PARAMETERIZED
+  FRAME_1501499_EPOCH             = 0
+  FRAME_1501499_FAMILY            = EULER
+  FRAME_1501499_NAME              = MME_IAU2000
+  FRAME_1501499_RELATIVE          = J2000
+  FRAME_1501499_UNITS             = DEGREES
+  FRAME_1502499_CENTER            = 499
+  FRAME_1502499_CLASS             = 5
+  FRAME_1502499_CLASS_ID          = 1502499
+  FRAME_1502499_DEF_STYLE         = PARAMETERIZED
+  FRAME_1502499_FAMILY            = TWO-VECTOR
+  FRAME_1502499_NAME              = MSO
+  FRAME_1502499_PRI_ABCORR        = NONE
+  FRAME_1502499_PRI_AXIS          = X
+  FRAME_1502499_PRI_OBSERVER      = MARS
+  FRAME_1502499_PRI_TARGET        = SUN
+  FRAME_1502499_PRI_VECTOR_DEF    = OBSERVER_TARGET_POSITION
+  FRAME_1502499_RELATIVE          = J2000
+  FRAME_1502499_SEC_ABCORR        = NONE
+  FRAME_1502499_SEC_AXIS          = Y
+  FRAME_1502499_SEC_FRAME         = J2000
+  FRAME_1502499_SEC_OBSERVER      = MARS
+  FRAME_1502499_SEC_TARGET        = SUN
+  FRAME_1502499_SEC_VECTOR_DEF    = OBSERVER_TARGET_VELOCITY
+  FRAME_1503499_CENTER            = 499
+  FRAME_1503499_CLASS             = 4
+  FRAME_1503499_CLASS_ID          = 1503499
+  FRAME_1503499_NAME              = MME2000
+  INS-143400_BORESIGHT            = (0, 0, 1)
+  INS-143400_BORESIGHT_LINE       = 1024.5
+  INS-143400_BORESIGHT_SAMPLE     = 1024.5
+  INS-143400_FILTER_LINES         = 2048
+  INS-143400_FILTER_SAMPLES       = 2048
+  INS-143400_FOCAL_LENGTH         = 874.9
+  INS-143400_FOV_ANGLE_UNITS      = DEGREES
+  INS-143400_FOV_CLASS_SPEC       = ANGLES
+  INS-143400_FOV_CROSS_ANGLE      = 0.67057
+  INS-143400_FOV_FRAME            = TGO_CASSIS_FSA
+  INS-143400_FOV_REF_ANGLE        = 0.67057
+  INS-143400_FOV_REF_VECTOR       = (1, 0, 0)
+  INS-143400_FOV_SHAPE            = RECTANGLE
+  INS-143400_ITRANSL              = (0, 0, 100)
+  INS-143400_ITRANSS              = (0, 100, 0)
+  INS-143400_LIGHTTIME_CORRECTION = LT+S
+  INS-143400_LT_SURFACE_CORRECT   = TRUE
+  INS-143400_NAME                 = TGO_CASSIS
+  INS-143400_OD_A1_CORR           = (0.00376130530948266, -0.0134154156065812,
+                                     -1.86749521007237e-05, 1.00021352681836,
+                                     -0.000432362371703953,
+                                     -0.000948065735350123)
+  INS-143400_OD_A1_DIST           = (0.00213658795560622,
+                                     -0.00711785765064197,
+                                     1.10355974742147e-05, 0.573607182625377,
+                                     0.000250884350194894,
+                                     0.000550623913037132)
+  INS-143400_OD_A2_CORR           = (9.984255936367599e-05,
+                                     0.00373543707958162, -0.0133299918873929,
+                                     -0.000215311328389359, 0.995296015537294,
+                                     -0.0183542717710778)
+  INS-143400_OD_A2_DIST           = (-5.697257410154059e-05,
+                                     0.00215155905679149, -0.00716392991767185,
+                                     0.000124152787728634, 0.5764595443924261,
+                                     0.010576940564854)
+  INS-143400_OD_A3_CORR           = (-3.13320167004204e-05,
+                                     -7.356551257498069e-06,
+                                     -1.57664245066771e-05,
+                                     0.00373549465439151, -0.0141671946930935,
+                                     1)
+  INS-143400_OD_A3_DIST           = (1.78250771483506e-05,
+                                     4.24592743471094e-06,
+                                     9.512206990366529e-06,
+                                     0.00215158425420738, -0.0066835595774833,
+                                     0.573741540971609)
+  INS-143400_PIXEL_PITCH          = 0.01
+  INS-143400_SWAP_OBSERVER_TARGET = TRUE
+  INS-143400_TRANSX               = (0, 0.01, 0)
+  INS-143400_TRANSY               = (0, 0, 0.01)
+  TKFRAME_-143400_ANGLES          = (0.021, 0.12, -179.881)
+  TKFRAME_-143400_AXES            = (1, 2, 3)
+  TKFRAME_-143400_RELATIVE        = TGO_SPACECRAFT
+  TKFRAME_-143400_SPEC            = ANGLES
+  TKFRAME_-143400_UNITS           = DEGREES
+  TKFRAME_1503499_MATRIX          = (0.6732521982472339, 0.7394129276360181,
+                                     0, -0.589638760543004, 0.536879430789133,
+                                     0.6033958972853946, 0.4461587269353556,
+                                     -0.4062376142607541, 0.7974417791532832)
+  TKFRAME_1503499_RELATIVE        = J2000
+  TKFRAME_1503499_SPEC            = MATRIX
 End_Object
 End
