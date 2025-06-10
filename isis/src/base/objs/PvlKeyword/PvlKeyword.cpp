@@ -66,7 +66,7 @@ namespace Isis {
                          QString unit) {
     init();
     setName(name);
-    for (int i = 0; i < vecValue.size(); i++) {
+    for (size_t i = 0; i < vecValue.size(); i++) {
       addValue(QString::fromStdString(vecValue[i]), unit);
     }
   }

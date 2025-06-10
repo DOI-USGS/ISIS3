@@ -60,7 +60,7 @@ namespace Isis {
             }
         }
         else {
-            if (fieldTypes.size() == numColumns) {
+            if (fieldTypes.size() == static_cast<size_t>(numColumns)) {
             for (QString type: fieldTypes) {
                 QString upper_type = type.toUpper();
                 if (upper_type == "INTEGER") {
