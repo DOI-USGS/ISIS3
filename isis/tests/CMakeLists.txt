@@ -46,5 +46,6 @@ add_executable(runISISTests
                ${test_source})
 
 target_link_libraries(runISISTests isis ${MISSION_LIBS} ${ALLLIBS} gmock_main)
+target_compile_definitions(runISISTests PRIVATE -D_SOURCE_PREFIX="${CMAKE_CURRENT_SOURCE_DIR}")
 
 gtest_discover_tests(runISISTests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests PROPERTIES DISCOVERY_TIMEOUT 6000)

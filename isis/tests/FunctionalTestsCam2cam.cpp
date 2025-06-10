@@ -195,7 +195,7 @@ TEST_F(DefaultCube, FunctionalTestCam2CamOffbody) {
   // At first, we will use the same cube for both the FROM and the MATCH.
   // Later, we will ignore the high resolution topography in one of the input cubes' camera
   // models to compare the vector tracing using the low resolution ellipsoid model.
-  QString fCubeName = "$ISISROOT/../isis/tests/data/osirisRexImages/20190509T180552S020_DSK_reduced.cub";
+  QString fCubeName = QString(_SOURCE_PREFIX) + "/data/osirisRexImages/20190509T180552S020_DSK_reduced.cub";
   QString mCubeName = fCubeName;
   
   Cube cube_ell;
