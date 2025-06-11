@@ -64,6 +64,9 @@ def search_for_linked_issues(pull_body: str) -> list:
     '#ABC' - fails
     '## ABC'- fails
     """
+
+    print('search_for_linked_issues')
+
     # Split the PR body by heading 
     pull_body_list = pull_body.split('##')
     regex_pattern = rf'{ISSUES_URL}(\d)|(#[^\D]\d*)'
@@ -71,6 +74,9 @@ def search_for_linked_issues(pull_body: str) -> list:
     for section in pull_body_list:
         # Find section with heading 'Related Issue'
         if section and 'Related Issue' in section:
+
+            print('Related Issue Section') #debug
+
             # Find items that match the regex pattern
             matched_items = rgx.findall(regex_pattern, section)
             # Convert list of tuples to list of all items
@@ -82,12 +88,21 @@ def search_for_linked_issues(pull_body: str) -> list:
         # Check if change type is bugfix
         # Find section with heading 'Types of changes'
         if section and 'Types of changes' in section:
+
+            print('Types of Changes Section') #debug
+
             matched_items = rgx.findall(r'\[(x|X)\] Bug fix', section)
             if matched_items:
+
+                print('Bug fix is checked in PR') #debug
+
                 global BUGFIX_CHANGE_TYPE
                 BUGFIX_CHANGE_TYPE = True
             matched_items = rgx.findall(r'\[(x|X)\] New feature', section)
             if matched_items:
+
+                print('New feature is checked in PR') #debug
+
                 global ENHANCEMENT_CHANGE_TYPE
                 ENHANCEMENT_CHANGE_TYPE = True
     return issue_numbers
