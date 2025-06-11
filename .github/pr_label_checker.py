@@ -35,7 +35,8 @@ def get_prs_associated_with_commit() -> Response:
         print(f'{API_COMMITS_URL}/{GITHUB_SHA}/pulls') #debug
         response = get(f'{API_COMMITS_URL}/{GITHUB_SHA}/pulls', headers=HEADERS)
         response.raise_for_status()
-        print("Repsonse " + response) #debug
+        print("Response") #debug
+        print(response) #debug
         return response
     except HTTPError as he:
         print("HTTPError") #debug
