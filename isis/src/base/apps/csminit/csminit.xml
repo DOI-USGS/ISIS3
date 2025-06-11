@@ -2,18 +2,18 @@
 
 <application name="csminit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Attach a CSM model state to a cube.
+    Attach a CSM model isd or state to a cube.
   </brief>
 
   <description>
     <p>
-      This program takes Instrument Support Data (ISD) and attempts to create a
-      valid Community Sensor Model (CSM) state string using models from the
-      loaded CSM Libraries. If a single state string can be created, it is
-      attached to the cube in the CSMState BLOB for later use. If there are
-      multiple models that create valid state strings, then this program will
-      error and return a list of possible models. The user will then have to
-      re-run this program using the PLUGINNAME and/or MODELNAME parameters to
+      This program takes either Instrument Support Data (ISD) or a state file 
+      and attempts to create a valid Community Sensor Model (CSM) state string 
+      using models from the loaded CSM Libraries. If a single state string can 
+      be created, it is attached to the cube in the CSMState BLOB for later use. 
+      If there are multiple models that create valid state strings, then this 
+      program will error and return a list of possible models. The user will then 
+      have to re-run this program using the PLUGINNAME and/or MODELNAME parameters to
       select a specific model.
     </p>
     <p>
@@ -22,22 +22,22 @@
       parameters.
     </p>
     <pre>
-Group = CsmInfo
-CSMPlatformID       = Mars_Reconnaissance_Orbiter
-CSMInstrumentId     = "CONTEXT CAMERA"
-ReferenceTime       = 2014-05-21T15:48:56Z
-ModelParameterNames = ("IT Pos. Bias   ", "CT Pos. Bias   ",
-                        "Rad Pos. Bias  ", "IT Vel. Bias   ",
-                        "CT Vel. Bias   ", "Rad Vel. Bias  ",
-                        "Omega Bias     ", "Phi Bias       ",
-                        "Kappa Bias     ", "Omega Rate     ",
-                        "Phi Rate       ", "Kappa Rate     ",
-                        "Omega Accl     ", "Phi Accl       ",
-                        "Kappa Accl     ", "Focal Bias     ")
-ModelParameterUnits = (m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m)
-ModelParameterTypes = (REAL, REAL, REAL, REAL, REAL, REAL, REAL, REAL,
-                        REAL, REAL, REAL, REAL, REAL, REAL, REAL, REAL)
-End_Group
+      Group = CsmInfo
+      CSMPlatformID       = Mars_Reconnaissance_Orbiter
+      CSMInstrumentId     = "CONTEXT CAMERA"
+      ReferenceTime       = 2014-05-21T15:48:56Z
+      ModelParameterNames = ("IT Pos. Bias   ", "CT Pos. Bias   ",
+                              "Rad Pos. Bias  ", "IT Vel. Bias   ",
+                              "CT Vel. Bias   ", "Rad Vel. Bias  ",
+                              "Omega Bias     ", "Phi Bias       ",
+                              "Kappa Bias     ", "Omega Rate     ",
+                              "Phi Rate       ", "Kappa Rate     ",
+                              "Omega Accl     ", "Phi Accl       ",
+                              "Kappa Accl     ", "Focal Bias     ")
+      ModelParameterUnits = (m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m)
+      ModelParameterTypes = (REAL, REAL, REAL, REAL, REAL, REAL, REAL, REAL,
+                              REAL, REAL, REAL, REAL, REAL, REAL, REAL, REAL)
+      End_Group
     </pre>
     <p>
       The ModelParameter keywords contain information that can be used
@@ -72,6 +72,10 @@ End_Group
     <change name="Kristin Berry and Stuart Sides" date="2021-02-12">
       Added the ability to take a state string instead of an ISD.
     </change>
+    <change name="Adam Paquette" date="2025-05-23">
+      Updated documentation providing examples for running csminit
+      with an ISD or a state file
+    </change>
   </history>
 
   <groups>
@@ -100,6 +104,8 @@ End_Group
         <description>
           The Instrument Support Data (ISD) file that will be used to create the
           model state string. The ISD can be just a filename ISD or a NITF2.1 ISD.
+          It should be noted that you do not need to pass a state file if you use 
+          an ISD.
         </description>
       </parameter>
 
@@ -111,8 +117,9 @@ End_Group
           A Community Sensor Model (CSM) state string
         </brief>
         <description>
-          A file containing a Community Sensor Model (CSM) state string that will be used to create the
-          model for the input cube.
+          A file containing a Community Sensor Model (CSM) state string that will 
+          be used to create the model for the input cube. It should be noted that 
+          you do not need to pass an ISD if you use a state file.
         </description>
       </parameter>
     </group>
@@ -171,17 +178,36 @@ End_Group
       </parameter>
     </group>
   </groups>
-  <example>
-  <brief>Simple csminit Example</brief>
-  <description>
-    This example uses a calibrated MRO CTX image and an isd generated using ALE or Abstraction Layer for Ephemerides.
-  </description>
-  <terminalInterface>
-    <commandLine> csminit from= F02_036648_2021_XN_22N022W.cal.csm.cub isd= F02_036648_2021_XN_22N022W.cal.csm.json
-    </commandLine>
-    <description>
-      Simple csminit example
-    </description>
-  </terminalInterface>
-</example>
+  <examples>
+    <example>
+      <brief>Running csminit with an ISD</brief>
+      <description>
+        This example uses a calibrated MRO CTX image and an ISD generated using ALE or Abstraction Layer for Ephemerides.
+      </description>
+      <terminalInterface>
+        <description>
+          Running csminit with an ISD file
+        </description>
+        <commandLine> 
+          from= F02_036648_2021_XN_22N022W.cal.csm.cub isd= F02_036648_2021_XN_22N022W.cal.csm.json
+        </commandLine>
+      </terminalInterface>
+    </example>
+    <example>
+      <brief>Running csminit with a state file</brief>
+      <description>
+        This example uses a calibrated MRO CTX image and a state file. The CSMState string was extracted from a 
+        cube using <b>blobbump</b> and saved into a file. This cube was from example 1, having attached the state
+        from an ISD.
+      </description>
+      <terminalInterface>
+        <description>
+          Running csminit with a state file
+        </description>
+        <commandLine> 
+          from= F02_036648_2021_XN_22N022W.cal.csm.cub state= F02_036648_2021_XN_22N022W.cal.csm.state.json
+        </commandLine>
+      </terminalInterface>
+    </example>
+  </examples>
 </application>

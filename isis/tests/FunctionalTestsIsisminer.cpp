@@ -1558,8 +1558,8 @@ TEST(Isisminer, IsisminerTestGisIntersect) {
   QTemporaryDir tempDir;
 
   // create cube from isd and label files
-  FileName isdFile("$ISISROOT/../isis/tests/data/isisminer/gisintersect/EN0240208184M.lev1.isd");
-  FileName labelFile("$ISISROOT/../isis/tests/data/isisminer/gisintersect/EN0240208184M.lev1.pvl");
+  FileName isdFile(QString(_SOURCE_PREFIX) + "/data/isisminer/gisintersect/EN0240208184M.lev1.isd");
+  FileName labelFile(QString(_SOURCE_PREFIX) + "/data/isisminer/gisintersect/EN0240208184M.lev1.pvl");
 
   Cube cube;
   cube.fromIsd(tempDir.path() + "/EN0240208184M.lev1.cub", labelFile, isdFile, "rw");

@@ -36,6 +36,7 @@ release.
 ## [Unreleased]
 
 ### Added
+- Added Linux Arm support.
 - Added OFFBODY and OFFBODYTRIM parameters to noproj and cam2cam. Added tests and updated documentation. [#3602](https://github.com/DOI-USGS/ISIS3/issues/3602)
 - Added use Bullet Anaconda feedstock library, which includes double precision support, and fix ISIS use of general Bullet configurations. [#5772](https://github.com/DOI-USGS/ISIS3/pull/5772)
 - Added Mac Arm build support and adjusted the tests appropriately.
@@ -71,6 +72,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed `StripPolygonSeeder` and `GridPolygonSeeder` memory leaks [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
 - Fixed `pointreg` helper function to display deffile to application log [#5806](https://github.com/DOI-USGS/ISIS3/pull/5806)
 - Fixed ISIS Q Applications crashing when opening more than one cube at once. [#5805](https://github.com/DOI-USGS/ISIS3/pull/5805)
+- Fixed csminit docs with more details on the `ISD` and `STATE` pameters [#5790](https://github.com/DOI-USGS/ISIS3/issues/5790)
 
 ## [9.0.0] - 09-25-2024
 

@@ -28,8 +28,8 @@ TEST_F(DefaultCube, FunctionalTestCamrangeMeta) {
   EXPECT_EQ( (double) target.findKeyword("RadiusC"), 3376200.0 );
 
   PvlGroup pixelResolution = appLog.findGroup("PixelResolution");
-  EXPECT_EQ( (double) pixelResolution.findKeyword("Lowest"), 18.986042659079001);
-  EXPECT_EQ( (double) pixelResolution.findKeyword("Highest"), 18.840630706272002);
+  EXPECT_NEAR( (double) pixelResolution.findKeyword("Lowest"), 18.986042659079001, 1e-11);
+  EXPECT_NEAR( (double) pixelResolution.findKeyword("Highest"), 18.840630706272002, 1e-12);
 }
 
 TEST_F(DefaultCube, FunctionalTestCamrangeUniversalGround) {

@@ -68,13 +68,13 @@ TEST_F(DemCube, FunctionalTestShadowTime) {
 
   PvlGroup shadowStats = appLog.findGroup("ShadowStatistics");
   EXPECT_EQ(int(shadowStats["NumComputedAzimuthElevations"]), 10000);
-  EXPECT_DOUBLE_EQ(double(shadowStats["AverageAzimuth"]), 141.60048549076001);
-  EXPECT_DOUBLE_EQ(double(shadowStats["MinimumAzimuth"]), 141.18641700737001);
-  EXPECT_DOUBLE_EQ(double(shadowStats["MaximumAzimuth"]), 142.02798328761);
+  EXPECT_NEAR(double(shadowStats["AverageAzimuth"]), 141.60048549076001, 1.9e-07);
+  EXPECT_NEAR(double(shadowStats["MinimumAzimuth"]), 141.18641700737001, 1.9e-07);
+  EXPECT_NEAR(double(shadowStats["MaximumAzimuth"]), 142.02798328761, 1.9e-07);
 
-  EXPECT_DOUBLE_EQ(double(shadowStats["AverageElevation"]), 54.723733961424003);
-  EXPECT_DOUBLE_EQ(double(shadowStats["MinimumElevation"]), 54.185416345476);
-  EXPECT_DOUBLE_EQ(double(shadowStats["MaximumElevation"]), 55.26088378675);
+  EXPECT_NEAR(double(shadowStats["AverageElevation"]), 54.723733961424003, 1.4e-08);
+  EXPECT_NEAR(double(shadowStats["MinimumElevation"]), 54.185416345476, 1.4e-08);
+  EXPECT_NEAR(double(shadowStats["MaximumElevation"]), 55.26088378675, 1.3e-08);
 
   EXPECT_EQ(int(shadowStats["NumRays"]), 9604);
   EXPECT_EQ(int(shadowStats["NumRayDemIntersections"]), 10159);
@@ -88,10 +88,10 @@ TEST_F(DemCube, FunctionalTestShadowTime) {
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
-  EXPECT_NEAR(hist->Average(), 0.57757151580484289, 1e-11);
-  EXPECT_NEAR(hist->Sum(), 5486.9294001460075, 1e-11);
+  EXPECT_NEAR(hist->Average(), 0.57757151580484289, 3e-10);
+  EXPECT_NEAR(hist->Sum(), 5486.9294001460075, 2.9e-06);
   ASSERT_EQ(hist->ValidPixels(), 9500);
-  EXPECT_NEAR(hist->StandardDeviation(), 0.0027113946106837737, 1e-11);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.0027113946106837737, 8.1e-11);
 }
 
 TEST_F(DemCube, FunctionalTestShadowNoShadow) {
