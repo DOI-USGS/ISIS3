@@ -25,7 +25,7 @@ Object = IsisCube
     TargetName           = Moon
     StartTime            = 2024-02-29T09:21:59.3215
     StopTime             = 2024-02-29T09:22:15.7052
-    LineExposureDuration = 162.100 <ms>
+    LineExposureDuration = 0.1621 <ms>
   End_Group
 
   Group = Archive
