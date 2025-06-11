@@ -81,7 +81,7 @@ jobs:
       - name: Run script
         env:
           PROD_VERSION: '9.0.0_Prod'  # formatted as x.x.x_Prod
-          BASE_LTS: '9.0'
+          BASE_PROD: '9.0'
           GITHUB_SHA: ${{ secrets.GITHUB_SHA }}
         run: |
           git config --global user.name "Github_CI"
@@ -97,6 +97,6 @@ jobs:
             git checkout $PROD_VERSION
             git reset --hard origin/main
           fi
-          echo -e "\nenv: \n  shell: bash \n  variables: \n    PROD_VERSION: $PROD_VERSION \n    BASE_LTS: $BASE_LTS \n    ANACONDA_API_TOKEN: $ANACONDA_TOKEN \n    GITHUB_SHA: $GITHUB_SHA" >> buildspec-lts.yml
+          echo -e "\nenv: \n  shell: bash \n  variables: \n    PROD_VERSION: $PROD_VERSION \n    BASE_PROD: $BASE_PROD \n    ANACONDA_API_TOKEN: $ANACONDA_TOKEN \n    GITHUB_SHA: $GITHUB_SHA" >> buildspec-prod.yml
           git commit -a -m "$PROD_VERSION"
           git push origin $PROD_VERSION --force
