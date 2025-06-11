@@ -38,7 +38,7 @@ jobs:
         GITHUB_SERVER_URL: ${{ secrets.GITHUB_SERVER_URL }}
         GITHUB_SHA: ${{ secrets.GITHUB_SHA }}
       run: |
-        echo "result=$(python ./.github/pr_label_checker.py)" >> $GITHUB_OUTPUT
+        echo "result=$(python ./.github/pr_label_checker.py)" >> "$GITHUB_OUTPUT"
     # Print the result to the log
     - name: See result
       run: echo "${{ steps.execute_py_script.outputs.result }}"
