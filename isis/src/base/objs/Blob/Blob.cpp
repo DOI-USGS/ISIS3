@@ -687,7 +687,7 @@ namespace Isis {
     p_buffer[p_nbytes] = '\0';
 
     // Loop through the hex string and bytes, hex is two characters at a time 
-    for (size_t i=0,j=0; i < p_nbytes; i++,j+=2) {
+    for (size_t i=0,j=0; i < static_cast<size_t>(p_nbytes); i++,j+=2) {
         string byteString = hexdata.substr(j, 2);
   
         char byteValue = static_cast<char>( 

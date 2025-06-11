@@ -214,6 +214,7 @@ Group = DataDirectory
   Cassini      = $ISISDATA/cassini
   Chan1        = $ISISDATA/chan1
   Chandrayaan1 = $ISISDATA/chandrayaan1
+  Chandrayaan2 = $ISISDATA/chandrayaan2
   Clementine1  = $ISISDATA/clementine1
   Clipper      = $ISISDATA/../datalocal/clipper
   Control      = $ISISDATA/control

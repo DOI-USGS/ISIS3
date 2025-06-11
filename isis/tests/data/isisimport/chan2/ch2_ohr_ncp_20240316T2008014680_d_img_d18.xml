@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?xml-model href="https://isda.issdc.gov.in/pds4/isda/v1/ch2_ldd_ISDA_1000.sch" schematypens="http://purl.oclc.org/dsdl/schematron" ?><Product_Observational xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:disp="http://pds.nasa.gov/pds4/disp/v1" xmlns:isda="https://isda.issdc.gov.in/pds4/isda/v1" xmlns:pds="http://pds.nasa.gov/pds4/pds/v1" xmlns:sp="http://pds.nasa.gov/pds4/sp/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.xsd                  http://pds.nasa.gov/pds4/disp/v1 http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1301.xsd                 http://pds.nasa.gov/pds4/sp/v1 http://pds.nasa.gov/pds4/sp/v1/PDS4_SP_1100.xsd           https://isda.issdc.gov.in/pds4/isda/v1 https://isda.issdc.gov.in/pds4/isda/v1/ch2_ldd_ISDA_1000.xsd">    
+        
+    
+    <Identification_Area>
+        <logical_identifier>urn:isro:isda:ch2_cho.ohr:data_calibrated:ch2_ohr_ncp_20240316t2008014680_d_img_d18</logical_identifier>
+        <version_id>1.0</version_id>
+        <title>Chandrayaan-2 Orbiter OHRC Experiment</title>
+        <information_model_version>1.11.0.0</information_model_version>
+        <product_class>Product_Observational</product_class>
+        <Modification_History>
+            <Modification_Detail>
+                <modification_date>2017-12-22</modification_date>
+                <version_id>1.0</version_id>
+                <description>PDS4 product label created by SAC Optical DP Team</description>
+            </Modification_Detail>
+        </Modification_History>
+    </Identification_Area>
+    <Observation_Area>
+        <Time_Coordinates>
+            <start_date_time>2024-03-16T20:08:01.4680Z</start_date_time>
+            <stop_date_time>2024-03-16T20:08:17.4304Z</stop_date_time>
+        </Time_Coordinates>
+        <Primary_Result_Summary>
+            <purpose>Science</purpose>
+	    <processing_level>Calibrated</processing_level>
+            <description>Calibrated Processing Level describes the radiometric correction (look up table) applied to the raw data</description>
+	</Primary_Result_Summary>
+        <Investigation_Area>
+            <name>Chandrayaan-2</name>
+            <type>Mission</type>
+            <Internal_Reference>
+                <lidvid_reference>urn:isro:isda:context:investigation:mission.chandrayaan2::1.0</lidvid_reference>
+                <reference_type>data_to_investigation</reference_type>
+            </Internal_Reference>
+        </Investigation_Area>
+        <Observing_System>
+            <Observing_System_Component>
+                <name>Chandrayaan 2 Orbiter</name>
+                <type>Spacecraft</type>
+                <description>
+                    Chandrayaan-2 Orbiter is an Orbiter craft under the Chandrayaan-2 Spacecraft 
+                    consists of various scientific instruments.
+                </description>
+            </Observing_System_Component>
+            <Observing_System_Component>
+                <name>orbiter high resolution camera</name>
+                <type>Instrument</type>
+                <description>
+                    OHRC (Orbiter High Resolution Camera) is one of the scientific instrument hosted 
+                    on the Chandrayaan-2 Orbiter. The instrument is a a passive electro-optical 
+                    imaging camera operating in visible-panchromatic band (500-800nm). 
+                    OHRC images will be used to characterize the landing site 
+                    (as its primary goal) with a ground sampling of 0.25m 
+                </description>
+            </Observing_System_Component>
+        </Observing_System>
+        <Target_Identification>
+            <name>Moon</name>
+            <type>Satellite</type>
+            <description>Moon is a natural satellite of Earth</description>
+        </Target_Identification>
+        <Mission_Area>
+            <isda:Product_Parameters>
+                <isda:job_id>OHRXXD18CHO2033202NNNN24077121755300_V3_1</isda:job_id>
+                <isda:level0_dir_name>OHRXXD18CHO2033202NNNN24077121755300_V3_1</isda:level0_dir_name>
+                <isda:imaging_orbit_number>20323</isda:imaging_orbit_number>
+                <isda:dumping_orbit_number>20332</isda:dumping_orbit_number>                                
+                <isda:line_exposure_duration unit="ms">162.100</isda:line_exposure_duration>
+                <isda:bits_selection>msb</isda:bits_selection>
+                <isda:tdi_stages>TDI64</isda:tdi_stages>
+                <isda:detector_pixel_width unit="micrometer">5.2</isda:detector_pixel_width>      
+                <isda:focal_length unit="mm">2080</isda:focal_length>
+                <isda:reference_data_used>System</isda:reference_data_used>
+                <isda:orbit_limb_direction>Ascending</isda:orbit_limb_direction>
+                <isda:spacecraft_yaw_direction>True</isda:spacecraft_yaw_direction>
+                <isda:spacecraft_altitude unit="km">76.94</isda:spacecraft_altitude>
+                <isda:pixel_resolution unit="m/pixel">0.20</isda:pixel_resolution>
+                <isda:roll unit="deg">1.148114</isda:roll>
+                <isda:pitch unit="deg">32.999214</isda:pitch>
+                <isda:yaw unit="deg">0.004525</isda:yaw>
+                <isda:sun_azimuth unit="deg">59.899440</isda:sun_azimuth>
+                <isda:sun_elevation unit="deg">2.031766</isda:sun_elevation>
+                <isda:solar_incidence unit="deg">87.968234</isda:solar_incidence>
+                <isda:projection>Polar stereographic</isda:projection>
+                <isda:area>South Pole</isda:area>
+            </isda:Product_Parameters>
+            <isda:Geometry_Parameters>
+                <isda:System_Level_Coordinates>
+                    <isda:upper_left_latitude unit="deg">-85.907571</isda:upper_left_latitude>
+                    <isda:upper_left_longitude unit="deg">34.330103</isda:upper_left_longitude>
+                    <isda:upper_right_latitude unit="deg">-85.934206</isda:upper_right_latitude>
+                    <isda:upper_right_longitude unit="deg">33.066466</isda:upper_right_longitude>
+                    <isda:lower_left_latitude unit="deg">-85.095173</isda:lower_left_latitude>
+                    <isda:lower_left_longitude unit="deg">31.275579</isda:lower_left_longitude>
+                    <isda:lower_right_latitude unit="deg">-85.117078</isda:lower_right_latitude>
+                    <isda:lower_right_longitude unit="deg">30.211200</isda:lower_right_longitude>
+                </isda:System_Level_Coordinates>    
+                <isda:Refined_Corner_Coordinates>
+                    <isda:upper_left_latitude unit="deg">-85.907571</isda:upper_left_latitude>
+                    <isda:upper_left_longitude unit="deg">34.330103</isda:upper_left_longitude>
+                    <isda:upper_right_latitude unit="deg">-85.934206</isda:upper_right_latitude>
+                    <isda:upper_right_longitude unit="deg">33.066466</isda:upper_right_longitude>
+                    <isda:lower_left_latitude unit="deg">-85.095173</isda:lower_left_latitude>
+                    <isda:lower_left_longitude unit="deg">31.275579</isda:lower_left_longitude>
+                    <isda:lower_right_latitude unit="deg">-85.117078</isda:lower_right_latitude>
+                    <isda:lower_right_longitude unit="deg">30.211200</isda:lower_right_longitude>
+                </isda:Refined_Corner_Coordinates>
+            </isda:Geometry_Parameters>
+        </Mission_Area>
+    </Observation_Area>
+    <File_Area_Observational>
+        <File>
+            <file_name>ch2_ohr_ncp_20240316T2008014680_d_img_d18.img</file_name>
+            <creation_date_time>2024-04-04T13:38:15</creation_date_time>
+            <file_size unit="byte">1212888000</file_size>
+            <md5_checksum>59e4ccaf833554f01daad2bab3828b53</md5_checksum>
+            <comment>
+                This File contains the count calibrated image
+                md5_checksum is provided for ensuring data integrity when users are downloading the data.
+            </comment>
+        </File>
+        <Array_2D_Image>
+            <offset unit="byte">0</offset>
+            <axes>2</axes>
+            <axis_index_order>Last Index Fastest</axis_index_order>
+            <Element_Array>
+                <data_type>UnsignedByte</data_type>
+            </Element_Array>
+            <Axis_Array>
+                <axis_name>Line</axis_name>
+                <elements>101074</elements>
+                <sequence_number>1</sequence_number>
+            </Axis_Array>
+            <Axis_Array>
+                <axis_name>Sample</axis_name>
+                <elements>12000</elements>
+                <sequence_number>2</sequence_number>
+            </Axis_Array>
+        </Array_2D_Image>
+    </File_Area_Observational>
+</Product_Observational>

@@ -1,0 +1,74 @@
+  Object = IsisCube
+    Object = Core
+      StartByte   = 65537
+      Format      = Tile
+      TileSamples = 519
+      TileLines   = 1000
+
+      Group = Dimensions
+        Samples = 4000
+        Lines   = 2000
+        Bands   = 1
+      End_Group
+
+      Group = Pixels
+        Type       = UnsignedWord
+        ByteOrder  = Lsb
+        Base       = 0.0
+        Multiplier = 1.0
+      End_Group
+    End_Object
+
+    Group = Instrument
+      SpacecraftName       = Chandrayaan-2
+      InstrumentId         = TMC-2
+      TargetName           = Moon
+      StartTime            = 2024-08-08T05:32:59.6974
+      StopTime             = 2024-08-08T05:42:42.4783
+      LineExposureDuration = 3.236 <ms>
+    End_Group
+
+    Group = Archive
+      JobId                  = TMCXXD18CHO2210300NNNN24221055326097_V2_1
+      OrbitNumber            = 22103
+      GainType               = g1
+      ExposureType           = e1
+      DetectorPixelWidth     = 7 <micrometers>
+      FocalLength            = 140 <mm>
+      ReferenceData          = SELENE
+      OrbitLimbDirection     = Descending
+      SpacecraftYawDirection = False
+      SpacecraftAltitude     = 89.53 <km>
+      PixelResolution        = 4.48 <meters/pixel>
+      Roll                   = 0.009365 <degrees>
+      Pitch                  = 0.066417 <degrees>
+      Yaw                    = -0.017284 <degrees>
+      SunAzimuth             = 116.737463 <degrees>
+      SunElevation           = 39.932493 <degrees>
+      SolarIncidence         = 50.067507 <degrees>
+      Projection             = Selenographic
+      Area                   = Equatorial
+    End_Group
+
+    Group = BandBin
+      Center = 675
+      Width  = 175
+    End_Group
+
+    Group = Kernels
+      NaifFrameCode = -152210
+    End_Group
+  End_Object
+
+  Object = Label
+    Bytes = 65536
+  End_Object
+
+  Object = OriginalXmlLabel
+    Name      = IsisCube
+    StartByte = 1440809537
+    Bytes     = 7625
+    ByteOrder = Lsb
+  End_Object
+  End
+

@@ -1,0 +1,39 @@
+Unit test for Chandrayaan2OHRC camera.
+FileName: ch2_ohr_nrp_20200827T0226453039_d_img_d18_crop.cub
+CK Frame: -152280
+
+Kernel IDs: 
+CK Frame ID = -152270
+CK Reference ID = 1
+SPK Target ID = -152
+SPK Reference ID = 1
+
+Spacecraft Name Long: Chandrayaan 2
+Spacecraft Name Short: Chan2
+Instrument Name Long: Orbiter High-Resolution Camera
+Instrument Name Short: OHRC
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+Universal latitude: -68.385852004
+Universal longitude: 20.930764315
+RightAscension: 253.028039993
+Declination: 31.834468197

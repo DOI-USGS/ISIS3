@@ -1,0 +1,39 @@
+Unit test for Chandrayaan2TMC camera.
+FileName: ch2_tmc_ncf_20231030T1757326391_d_img_d18.cub
+CK Frame: -152221
+
+Kernel IDs: 
+CK Frame ID = -152001
+CK Reference ID = 1
+SPK Target ID = -152
+SPK Reference ID = 1
+
+Spacecraft Name Long: Chandrayaan 2
+Spacecraft Name Short: Chan2
+Instrument Name Long: Terrain Mapping Camera-2
+Instrument Name Short: TMC-2
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = -0.000855841
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = -0.000855841
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000496502
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000496502
+
+For center pixel position ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+Universal latitude: -88.685764645
+Universal longitude: 161.291870743
+RightAscension: 276.119202527
+Declination: 40.856287254

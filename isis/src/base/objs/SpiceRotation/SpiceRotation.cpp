@@ -2486,10 +2486,9 @@ namespace Isis {
           "Full cache size does NOT match cache size in LoadTimeCache -- should never happen";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
-
-      SpiceDouble timeSclkdp[p_fullCacheSize];
-      SpiceDouble quats[p_fullCacheSize][4];
-      double avvs[p_fullCacheSize][3]; // Angular velocity vector
+      std::vector<SpiceDouble> timeSclkdp(p_fullCacheSize);
+      std::vector<SpiceDouble> quats(p_fullCacheSize * 4);
+      std::vector<double> avvs(p_fullCacheSize * 3);
 
       // We will treat et as the sclock time and avoid converting back and forth
      std::vector<ale::Rotation> fullRotationCache = m_orientation->getRotations();
@@ -2501,14 +2500,14 @@ namespace Isis {
                               rotationMatrix[3], rotationMatrix[4], rotationMatrix[5],
                               rotationMatrix[6], rotationMatrix[7], rotationMatrix[8]
                             };
-        m2q_c(CJ, quats[r]);
+        m2q_c(CJ, &quats[r * 4]);
         if (p_hasAngularVelocity) {
           ale::Vec3d angularVelocity = angularVelocities[r];
-          vequ_c((SpiceDouble *) &angularVelocity.x, avvs[r]);
+          vequ_c((SpiceDouble *) &angularVelocity.x, &avvs[r*3]);
         }
      }
 
-      double cubeStarts = timeSclkdp[0]; //,timsSclkdp[ckBlob.Records()-1] };
+      double cubeStarts = timeSclkdp[0]; //,timsSclkdp[ckBlob.Records()-1] ;
       double radTol = 0.000000017453; //.000001 degrees  Make this instrument dependent TODO
       SpiceInt avflag = 1;            // Don't use angular velocity for now
       SpiceInt nints = 1;             // Always make an observation a single interpolation interval
@@ -2516,8 +2515,8 @@ namespace Isis {
       SpiceInt intarr[p_fullCacheSize]; // Integer work array
       SpiceInt sizOut = p_fullCacheSize; // Size of downsized cache
 
-      ck3sdn(radTol, avflag, (int *) &sizOut, timeSclkdp, (doublereal *) quats,
-             (SpiceDouble *) avvs, nints, &cubeStarts, dparr, (int *) intarr);
+      ck3sdn(radTol, avflag, (int *) &sizOut, &timeSclkdp[0], (doublereal *) &quats[0],
+             (SpiceDouble *) &avvs[0], nints, &cubeStarts, dparr, (int *) intarr);
 
       // Clear full cache and load with downsized version
       p_cacheTime.clear();
@@ -2538,9 +2537,9 @@ namespace Isis {
         et = timeSclkdp[r];
         p_cacheTime.push_back(et);
         std::vector<double> CJ(9);
-        q2m_c(quats[r], (SpiceDouble( *)[3]) &CJ[0]);
+        q2m_c(&quats[r*4], (SpiceDouble(*)[3]) &CJ[0]);
         rotationCache.push_back(CJ);
-        vequ_c(avvs[r], (SpiceDouble *) &av[0]);
+        vequ_c(&avvs[r*3], (SpiceDouble *) &av[0]);
         avCache.push_back(av);
       }
 

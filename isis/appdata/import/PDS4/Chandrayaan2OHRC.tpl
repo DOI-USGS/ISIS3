@@ -69,8 +69,8 @@ Object = IsisCube
   Group = Instrument
     SpacecraftName            = {{ capitalize(Product_Observational.Observation_Area.Investigation_Area.name) }}
     {% set inst_name = Product_Observational.Observation_Area.Observing_System.Observing_System_Component.1.name %}
-    {% if inst_name == "terrain mapping camera" %}
-    InstrumentId              = TMC-2
+    {% if inst_name == "orbiter high resolution camera" %}
+    InstrumentId              = OHRC
     {% endif %}
     TargetName                = {{ Product_Observational.Observation_Area.Target_Identification.name }}
     StartTime                 = {{ RemoveStartTimeZ(Product_Observational.Observation_Area.Time_Coordinates.start_date_time) }}
@@ -86,35 +86,65 @@ Object = IsisCube
   Group = Archive
     JobId                   = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_job_id }}
     OrbitNumber             = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_imaging_orbit_number }}
-    GainType                = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_gain }}
-    ExposureType            = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_exposure }}
     DetectorPixelWidth      = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_detector_pixel_width._text }} <micrometers>
     FocalLength             = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_focal_length._text }} <mm>
     {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_reference_data_used") %}
-      ReferenceData = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_reference_data_used }}
+    ReferenceData           = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_reference_data_used }}
     {% else %}
-      ReferenceData = NA
+    ReferenceData = NA
     {% endif %}
     {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_orbit_limb_direction") %}
-      OrbitLimbDirection = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_orbit_limb_direction }}
+    OrbitLimbDirection      = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_orbit_limb_direction }}
     {% else %}
-      OrbitLimbDirection = NA
+    OrbitLimbDirection      = Descending
     {% endif %}
     {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_spacecraft_yaw_direction") %}
-      SpacecraftYawDirection = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_spacecraft_yaw_direction }}
+    SpacecraftYawDirection  = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_spacecraft_yaw_direction }}
     {% else %}
-      SpacecraftYawDirection = NA
+    SpacecraftYawDirection  = True
     {% endif %}
     SpacecraftAltitude      = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_spacecraft_altitude._text }} <km>
     PixelResolution         = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_pixel_resolution._text }} <meters/pixel>
+    {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_roll._text") %}
     Roll                    = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_roll._text }} <degrees>
+    {% else %}
+    Roll                    = -1 <degrees>
+    {% endif %}
+    {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_pitch._text") %}
     Pitch                   = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_pitch._text }} <degrees>
+    {% else %}
+    Pitch                   = -1 <degrees>
+    {% endif %}
+    {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_yaw._text") %}
     Yaw                     = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_yaw._text }} <degrees>
+    {% else %}
+    Yaw                     = -1 <degrees>
+    {% endif %}
+    {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_sun_azimuth._text") %}
     SunAzimuth              = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_sun_azimuth._text }} <degrees>
+    {% else %}
+    SunAzimuth              = -1 <degrees>
+    {% endif %}
+    {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_sun_elevation._text") %}
     SunElevation            = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_sun_elevation._text }} <degrees>
+    {% else %}
+    SunElevation            = -1 <degrees>
+    {% endif %}
+    {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_solar_incidence._text") %}
     SolarIncidence          = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_solar_incidence._text }} <degrees>
+    {% else %}
+    SolarIncidence          = -1 <degrees>
+    {% endif %}
+    {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_projection") %}
     Projection              = "{{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_projection }}"
+    {% else %}
+    Projection              = "NA"
+    {% endif %}
+    {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_area") %}
     Area                    = "{{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_area }}"
+    {% else %}
+    Area                    = "NA"
+    {% endif %}
   End_Group
   {% endif %}
 
@@ -124,11 +154,7 @@ Object = IsisCube
   End_Group
 
   Group = Kernels
-    NaifFrameCode = {% if sensor == "a" %}-152212
-                    {% else if sensor == "f" %}-152211
-                    {% else if sensor == "n" %}-152210
-                    {% endif %}
-
+    NaifFrameCode = -152270
   End_Group
 End_Object
 
