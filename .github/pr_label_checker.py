@@ -65,9 +65,6 @@ def search_for_linked_issues(pull_body: str) -> list:
     '#ABC' - fails
     '## ABC'- fails
     """
-
-    print('search_for_linked_issues')
-
     # Split the PR body by heading 
     pull_body_list = pull_body.split('##')
     regex_pattern = rf'{ISSUES_URL}(\d)|(#[^\D]\d*)'
