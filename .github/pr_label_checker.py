@@ -34,10 +34,13 @@ def get_prs_associated_with_commit() -> Response:
     try:
         response = get(f'{API_COMMITS_URL}/{GITHUB_SHA}/pulls', headers=HEADERS)
         response.raise_for_status()
+        print("Repsonse " + response)
         return response
     except HTTPError as he:
+        print("HTTPError")
         raise HTTPError("HTTPError in retrieving list of PRs", he) 
     except RequestException as re:
+        print("RequestException")
         raise RequestException("Unable to retrieve list of PRs associated with commit.", re)
 
 def get_pr_attributes(response: Response) -> tuple:
