@@ -199,11 +199,11 @@ if __name__ == "__main__":
 
         # Check if PR is a bugfix and/or enhancement
         response = get_pr(pull_number)
-        results_str = ""
+        results_str = 'change_types_'
         if is_pr_bugfix(response):
-            results_str += "bugfix;"
+            results_str += 'bugfix_'
         if is_pr_bugfix(response) or is_pr_enhancement(response):
-            results_str += "production_update;"
+            results_str += 'production_update_'
         print(results_str)
     except (HTTPError, RequestException):
         raise
