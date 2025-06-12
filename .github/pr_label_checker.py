@@ -12,7 +12,7 @@ GITHUB_API_URL=os.environ["GITHUB_API_URL"]
 GITHUB_SERVER_URL=os.environ["GITHUB_SERVER_URL"]
 GITHUB_SHA=os.environ["GITHUB_SHA"]
 
-REPO_URL_PATH='jrcain-usgs/ISIS3' #debug, for production use 'DOI-USGS/ISIS3'
+REPO_URL_PATH='DOI-USGS/ISIS3' #for a fork, use 'your-username/ISIS3'
 API_BASE_URL=f'{GITHUB_API_URL}/repos/{REPO_URL_PATH}'
 API_PULLS_URL=f'{API_BASE_URL}/pulls'
 API_COMMITS_URL=f'{API_BASE_URL}/commits'
@@ -32,7 +32,6 @@ def get_prs_associated_with_commit() -> Response:
     Get list of PRs associated with commit.
     """
     try:
-        # print(f'{API_COMMITS_URL}/{GITHUB_SHA}/pulls') #debug
         response = get(f'{API_COMMITS_URL}/{GITHUB_SHA}/pulls', headers=HEADERS)
         response.raise_for_status()
         return response
