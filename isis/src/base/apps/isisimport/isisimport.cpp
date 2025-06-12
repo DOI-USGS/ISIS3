@@ -457,15 +457,17 @@ namespace Isis {
     }
 
     // Bugfix for OHRC, the exposure duration is off by a factor of 1000.
-    PvlGroup &inst = newLabel.findGroup("Instrument", Pvl::Traverse); // alias
-    QString spacecraft = inst["SpacecraftName"];
-    QString instrumentId = inst["InstrumentId"];
-    if (spacecraft == "Chandrayaan-2" && instrumentId == "OHRC") {
-      double val = toDouble(inst["LineExposureDuration"]);
-      val /= 1000.0;
-      inst["LineExposureDuration"].setValue(toString(val), "ms");
-    }
-
+    try {
+      PvlGroup &inst = newLabel.findGroup("Instrument", Pvl::Traverse); // alias
+      QString spacecraft = inst["SpacecraftName"];
+      QString instrumentId = inst["InstrumentId"];
+      if (spacecraft == "Chandrayaan-2" && instrumentId == "OHRC") {
+        double val = toDouble(inst["LineExposureDuration"]);
+        val /= 1000.0;
+        inst["LineExposureDuration"].setValue(toString(val), "ms");
+      }
+    } catch(IException &e) {}
+    
     // Checks that are unique to mgsmoc
     if (translation.hasKeyword("compressed") && translation.hasKeyword("projected")) {
       if (toBool(translation["compressed"])) {
