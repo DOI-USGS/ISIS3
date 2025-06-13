@@ -510,8 +510,7 @@ namespace Isis {
 
         BundleControlPointQsp bundleControlPoint(new BundleControlPoint
                             (m_bundleSettings, point));
-        m_bundleControlPoints.append(bundleControlPoint);
-
+        
         // set parent observation for each BundleMeasure
         int numMeasures = bundleControlPoint->size();
         for (int j = 0; j < numMeasures; j++) {
@@ -524,11 +523,18 @@ namespace Isis {
 
           measure->setParentObservation(observation);
           measure->setParentImage(image);
-        measure->setSigma(1.4);
+          measure->setSigma(1.4);
         }
 
-      point->ComputeApriori();
-    }
+        // Compute apriori. That can result in ignoring failed points.
+        point->ComputeApriori();
+        if (point->IsIgnored()) {
+          continue;
+        }
+        
+        // Add a successful point to the bundle control points
+        m_bundleControlPoints.append(bundleControlPoint);
+      }
 
     // set up vector of BundleLidarControlPoints
     int numLidarPoints = 0;

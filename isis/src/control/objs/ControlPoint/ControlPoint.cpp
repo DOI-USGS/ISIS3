@@ -968,6 +968,7 @@ namespace Isis {
       msg += "no measures which project to the body. Will ignore it.";
       SetIgnored(true);
       std::cerr << msg << std::endl;
+      adjustedSurfacePoint = aprioriSurfacePoint;
       return Success;
     }
 
