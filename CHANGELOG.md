@@ -58,6 +58,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Changed `StripPolygonSeeder` and `GridPolygonSeeder` to seed individual polygons within each images multipolygon footprint [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
 
 ### Fixed
+- Fixed a failure for jigsaw crashing when encountering an invalid control point. Now it is ignored. Added a warning when the problem is underconstrained. 
 - Fixed kaguyatc2isis invalid BandBin values [#5629](https://github.com/DOI-USGS/ISIS3/issues/5629)
 - Fixed SpiceClient to handle redirect requests.
 - Fixed jigsaw to default OUTADJUSTMENTH5 option to false and allow this feature to run on read-only images [#5700](https://github.com/DOI-USGS/ISIS3/issues/5700)
