@@ -202,6 +202,19 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
+    std::cout << "--twist is: " << (ui.GetBoolean("TWIST") ? "true" : "false") << std::endl;
+    std::cout << "radius is : " << (ui.GetBoolean("RADIUS") ? "true" : "false") << std::endl;
+    std::cout << "radius sigma " << ui.WasEntered("POINT_RADIUS_SIGMA") << std::endl;
+    if (ui.GetBoolean("TWIST") && ui.GetBoolean("RADIUS") && 
+        !ui.WasEntered("POINT_RADIUS_SIGMA")) {
+      string msg = "If solving for both twist and radius, must set a value "
+        "for point_radius_sigma, as otherwise the problem is under-constrained and a "
+        "failure may result.";
+      PvlGroup radiusSolveWarning("RadiusSolveWarning");
+      radiusSolveWarning.addKeyword(PvlKeyword("Warning", msg.c_str()));
+      Application::Log(radiusSolveWarning);
+    }
+
     QString cnetFile = ui.GetFileName("CNET");
 
     // retrieve settings from jigsaw gui

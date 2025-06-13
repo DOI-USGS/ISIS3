@@ -962,12 +962,13 @@ namespace Isis {
 
     // if point is Free, we continue to compute a priori coordinates
 
-    // if no good measures, we're done
-    // TODO: is the message true/meaningful?
+    // If no good measures, this point is ignored
     if (goodMeasures == 0) {
-      QString msg = "in method ControlPoint::ComputeApriori(). ControlPoint [" + GetId() + "] has ";
-      msg += "no measures which project to the body";
-      throw IException(IException::User, msg, _FILEINFO_);
+      QString msg = "In method ControlPoint::ComputeApriori(): ControlPoint [" + GetId() + "] has ";
+      msg += "no measures which project to the body. Will ignore it.";
+      SetIgnored(true);
+      std::cerr << msg << std::endl;
+      return Success;
     }
 
     // Compute the averages if all coordinates are free
