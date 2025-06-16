@@ -209,7 +209,7 @@ namespace Isis {
         "failure may result.";
       PvlGroup radiusSolveWarning("RadiusSolveWarning");
       radiusSolveWarning.addKeyword(PvlKeyword("Warning", msg.c_str()));
-      Application::AppendLog(radiusSolveWarning, log);
+      Application::AppendAndLog(radiusSolveWarning, log);
     }
 
     QString cnetFile = ui.GetFileName("CNET");
