@@ -224,7 +224,7 @@ namespace Isis {
                                                    under review and is likely resulting \
                                                    in addition error in the bundle adjust. \
                                                    We recommend that you do not solve for radii at this moment."));
-        Application::Log(radiusSolveWarning);
+        Application::AppendAndLog(radiusSolveWarning, log);
       }
     }
     settings->setCubeList(cubeList);
