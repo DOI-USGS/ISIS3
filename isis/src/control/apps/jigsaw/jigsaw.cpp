@@ -202,14 +202,14 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if (ui.GetBoolean("TWIST") && ui.GetBoolean("RADIUS") && 
+    if (ui.GetBoolean("TWIST") && ui.GetBoolean("RADIUS") &&
         !ui.WasEntered("POINT_RADIUS_SIGMA")) {
       string msg = "If solving for both twist and radius, must set a value "
         "for point_radius_sigma, as otherwise the problem is under-constrained and a "
         "failure may result.";
       PvlGroup radiusSolveWarning("RadiusSolveWarning");
       radiusSolveWarning.addKeyword(PvlKeyword("Warning", msg.c_str()));
-      Application::Log(radiusSolveWarning);
+      Application::AppendLog(radiusSolveWarning, log);
     }
 
     QString cnetFile = ui.GetFileName("CNET");
