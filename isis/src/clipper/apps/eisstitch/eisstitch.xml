@@ -44,7 +44,7 @@
         </filter>
       </parameter>
 
-    <parameter name="TO">
+      <parameter name="TO">
         <type>cube</type>
         <fileMode>output</fileMode>
         <brief>
@@ -59,6 +59,50 @@
       </parameter>
     </group>
 
-   </groups>
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Demonstrats how to use eisstitch </brief>
+      <description>
+        This example demonstrates the basic workings of eisstitch and
+        how to properly format the input information for stitching.
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          fromlist=eis_cubes.lis to=eis_stitched_cube.cub
+        </commandLine>
+        <description>
+          This is the command line used to create the stitched output cube
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/images/capture_1.jpg" width="4000" height="200">
+          <brief> First chronological capture from an EIS image set</brief>
+          <description>
+            This is the first image in a series of images taken by the EIS Clipper
+            WAC/NAC camera.
+          </description>
+          <thumbnail caption="First capture to be stitched" src="assets/thumbs/capture_1_thumb.jpg" width="1200" height="60"/>
+        </image>
+        <image src="assets/images/capture_2.jpg" width="4000" height="200">
+          <brief> Second chronological capture from an EIS image set</brief>
+          <description>
+            This is the second image in a series of images taken by the EIS Clipper
+            WAC/NAC camera.
+          </description>
+          <thumbnail caption="Second capture to be stitched" src="assets/thumbs/capture_2_thumb.jpg" width="1200" height="60"/>
+        </image>
+        <image src="assets/images/capture_3.jpg" width="4000" height="200">
+          <brief> Third chronological capture from an EIS image set</brief>
+          <description>
+            This is the third image in a series of images taken by the EIS Clipper
+            WAC/NAC camera.
+          </description>
+          <thumbnail caption="Third capture to be stitched" src="assets/thumbs/capture_3_thumb.jpg" width="1200" height="60"/>
+        </image>
+      </inputImages>
+    <example>
+   <examples>
 
 </application>
