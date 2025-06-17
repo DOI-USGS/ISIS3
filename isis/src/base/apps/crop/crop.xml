@@ -436,6 +436,35 @@ End_Group
       </parameter>
     </group>
 
+    <group name="Geometry">
+      <parameter name="OVERHANG">
+        <type>string</type>
+        <brief>Behavior when part of crop area is outside of cube boundaries.</brief>
+        <description>
+        </description>
+        <default>
+          <item>FAIL</item>
+        </default>
+        <list>
+          <option value="FAIL">
+            <brief>Fail if area overhangs</brief>
+            <description>If the crop area extends beyond the area of the cube, throw an error.</description>
+          </option>
+          <option value="PAD">
+            <brief>Pad crop with null</brief>
+            <description>Pad any crop area outside the cube boundaries with Null Pixels.</description>
+          </option>
+          <option value="SHRINK">
+            <brief>Shrink to edge of cube</brief>
+            <description>
+              Shrink the crop area down to the edges of the cube so it will not overhang.
+              May output a cube with a smaller size than specified.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
     <group name="MISC">
       <parameter name="PROPSPICE">
         <type>boolean</type>
