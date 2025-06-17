@@ -8,21 +8,13 @@ find files of those names at the top level of this repository. **/
 
 #include <QObject>
 
-#include <cfloat>
-#include <cmath>
-#include <iomanip>
-#include <sstream>
 #include <vector>
 
-#include <SpiceUsr.h>
-
-#include "Constants.h"
 #include "Displacement.h"
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
 #include "Longitude.h"
-#include "NaifStatus.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
