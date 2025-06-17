@@ -33,7 +33,8 @@ namespace Isis {
     m_outputProj = proj_create(m_C, projString.c_str());
 
     if (!m_outputProj) {
-      QString msg = "Unable to create projection from [" + QString(projString.c_str()) + "]";
+      QString msg = "Unable to create projection from [" + QString(projString.c_str()) + "].\n"
+                    "You might need to add '+type=crs' to your proj4 string.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -41,13 +42,6 @@ namespace Isis {
     // proj ellipsoid
     if (!mapGroup.hasKeyword("EquatorialRadius") || 
         !mapGroup.hasKeyword("PolarRadius")) {
-      PJ *outputEllipsoid = proj_get_ellipsoid(m_C, m_outputProj);
-
-      if (!outputEllipsoid) {
-        QString msg = "Unable to get ellipsoid from [" + *m_userOutputProjStr + "]. " + 
-        "Please add a radii definition to your proj string.";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
 
       int res = proj_ellipsoid_get_parameters(m_C, m_outputProj, 
                                               &m_equatorialRadius,
@@ -59,8 +53,6 @@ namespace Isis {
         QString msg = "Unable to get ellipsoid information from [" + *m_userOutputProjStr + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-
-      proj_destroy(outputEllipsoid);
     }
     else {
       m_equatorialRadius = toDouble(mapGroup.findKeyword("EquatorialRadius"));
@@ -70,7 +62,7 @@ namespace Isis {
     m_llaProj = proj_crs_get_geodetic_crs(m_C, m_outputProj);
 
     if (0 == m_llaProj) {
-      QString msg = "Unable to create projection from []";
+      QString msg = "Unable to create lla projection from [" + QString(projString.c_str()) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -192,12 +184,6 @@ namespace Isis {
     XYRangeCheck(m_maximumLatitude, m_minimumLongitude);
     XYRangeCheck(m_minimumLatitude, m_maximumLongitude);
     XYRangeCheck(m_maximumLatitude, m_maximumLongitude);
-
-    // If the latitude crosses the equator check there
-    if ((m_minimumLatitude < 0.0) && (m_maximumLatitude > 0.0)) {
-      XYRangeCheck(0.0, m_minimumLongitude);
-      XYRangeCheck(0.0, m_maximumLongitude);
-    }
 
     // Make sure everything is ordered
     if (m_minimumX >= m_maximumX) return false;
