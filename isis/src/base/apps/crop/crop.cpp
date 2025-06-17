@@ -33,6 +33,8 @@ namespace Isis {
     int ss, sl, sb;
     int ns, nl, nb;
     int sinc, linc;
+    
+    bool allowOverhang, padOverhang;
 
     LineManager *in = NULL;
 
@@ -45,13 +47,15 @@ namespace Isis {
 
       // Loop and move appropriate samples
       for(int i = 0; i < out.size(); i++) {
-        out[i] = (*in)[(ss - 1) + i * sinc];
+        out[i] = (*in)[(ss - 1) + i * sinc];  // TODO: If enabled, pad values here (or make separate method for overhanging crops)
       }
 
       if(out.Line() == nl) sb++;
     };
 
     ProcessByLine p;
+
+    // TODO: add OVERHANG Parameter: [FAIL, PAD, SHRINK]
 
     // Open the input cube
     QString from = ui.GetAsString("FROM");
@@ -60,6 +64,20 @@ namespace Isis {
     cube->setVirtualBands(inAtt.bands());
     from = ui.GetCubeName("FROM");
     cube->open(from);
+
+    QString OverhangBehavior = ui.GetString("OVERHANG");
+    switch(OverhangBehavior) {
+      case "PAD":
+        allowOverhang = true;
+        padOverhang = true;
+        break;
+      case "SHRINK":
+        allowOverhang = true;
+        padOverhang = false;
+        break;
+      default:
+        allowOverhang = false;
+    }
 
     // Determine the sub-area to extract
     ss = ui.GetInteger("SAMPLE");
@@ -78,6 +96,7 @@ namespace Isis {
     linc = ui.GetInteger("LINC");
 
     // Make sure starting positions fall within the cube
+    // TODO: avoid exceptions if diferent OVERHANG option selected
     if (ss > cube->sampleCount()) {
       cube->close();
       QString msg = "[SAMPLE] exceeds number of samples in the [FROM] cube";
@@ -91,6 +110,7 @@ namespace Isis {
     }
 
     // Make sure the number of elements do not fall outside the cube
+    // TODO: avoid exceptions if diferent OVERHANG option selected
     if (es > cube->sampleCount()) {
       cube->close();
       QString msg = "[SAMPLE+NSAMPLES-1] exceeds number of ";
