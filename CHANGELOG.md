@@ -80,6 +80,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed SpiceQL 1.2.0 API changes [#5846](https://github.com/DOI-USGS/ISIS3/pull/5846)
 - Fixed CSM State String blob not being propagated between input and output cubes [#5847](https://github.com/DOI-USGS/ISIS3/pull/5847)
 - Fixed campt reporting when `ALLOWERROR` is set to true [#5845](https://github.com/DOI-USGS/ISIS3/pull/5845)
+- Fixed order of observer and target in spiceql call in `ctxcal`. [#5823](https://github.com/DOI-USGS/ISIS3/pull/5823)
 
 ## [9.0.0] - 09-25-2024
 
