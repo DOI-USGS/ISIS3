@@ -7,7 +7,7 @@
   </brief>
   <description>
     <p>
-      This program takes a series of Clipper EIS cubes and combines them into a single cube with a unified ephemeris time table
+      This program takes a series of Clipper EIS cubes and combines them into a single unified cube with a unified ephemeris time table
       as well as a unified camera.
     </p>
 
@@ -73,7 +73,8 @@
           fromlist=eis_cubes.lis to=eis_stitched_cube.cub
         </commandLine>
         <description>
-          This is the command line used to create the stitched output cube
+          This is the command line used to create the stitched output cube. The FROMLIST
+          needs to be a newline delimited list of EIS Clipper cubes to stitch together.
         </description>
       </terminalInterface>
       <inputImages>
@@ -83,7 +84,7 @@
             This is the first image in a series of images taken by the EIS Clipper
             WAC/NAC camera.
           </description>
-          <thumbnail caption="First capture to be stitched" src="assets/thumbs/capture_1_thumb.jpg" width="1200" height="60"/>
+          <thumbnail caption="First capture to be stitched" src="assets/thumbs/capture_1_thumb.jpg" width="2400" height="120"/>
         </image>
         <image src="assets/images/capture_2.jpg" width="4000" height="200">
           <brief> Second chronological capture from an EIS image set</brief>
@@ -91,7 +92,7 @@
             This is the second image in a series of images taken by the EIS Clipper
             WAC/NAC camera.
           </description>
-          <thumbnail caption="Second capture to be stitched" src="assets/thumbs/capture_2_thumb.jpg" width="1200" height="60"/>
+          <thumbnail caption="Second capture to be stitched" src="assets/thumbs/capture_2_thumb.jpg" width="2400" height="120"/>
         </image>
         <image src="assets/images/capture_3.jpg" width="4000" height="200">
           <brief> Third chronological capture from an EIS image set</brief>
@@ -99,10 +100,32 @@
             This is the third image in a series of images taken by the EIS Clipper
             WAC/NAC camera.
           </description>
-          <thumbnail caption="Third capture to be stitched" src="assets/thumbs/capture_3_thumb.jpg" width="1200" height="60"/>
+          <thumbnail caption="Third capture to be stitched" src="assets/thumbs/capture_3_thumb.jpg" width="2400" height="120"/>
         </image>
       </inputImages>
-    <example>
-   <examples>
+
+      <dataFiles>
+        <dataFile path="assets/IN/eis_cubes.lis">
+          <brief> FROMLIST </brief>
+          <description>
+            Input list file of cubes, where each line is the full path or relative
+            path for each cube to stitch
+          </description>
+          <parameterName> FROMLIST </parameterName>
+        </dataFile>
+      </dataFiles>
+
+      <outputImages>
+        <image src="assets/images/eis_stitched_cube.jpg" width="4000" height="700">
+          <brief> Output image for eisstitch</brief>
+          <description>
+            The sitched output from the three images above
+          </description>
+          <thumbnail caption="Output of eisstitch" src="assets/thumbs/eis_stitched_cube_thumb.jpg" width="2400" height="400"/>
+          <parameterName> TO </parameterName>
+        </image>
+      </outputImages>
+    </example>
+   </examples>
 
 </application>
