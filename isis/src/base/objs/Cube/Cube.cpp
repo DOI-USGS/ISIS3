@@ -942,7 +942,9 @@ namespace Isis {
           realDataFileLabel(), true);
     }
     else if (m_format == GTiff) {
-      m_dataFile->close();
+      if (m_dataFile) {
+        m_dataFile->close();
+      }
       m_geodataSet = GDALDataset::FromHandle(GDALOpen(m_dataFileName->expanded().toStdString().c_str(), eAccess));
       if (!m_geodataSet) {
         QString msg = "Opening GDALDataset from [" + m_dataFileName->name() + "] failed with access [" + QString::number(eAccess) +"]";
