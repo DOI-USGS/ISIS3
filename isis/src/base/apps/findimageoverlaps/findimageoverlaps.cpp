@@ -33,8 +33,7 @@ namespace Isis {
     //   images. This is a modified insertion sort.
     for (int image = 0; image < images.size(); image++) {
       unsigned int insertPos = 0;
-      Cube cube(images[image].toString());
-      QString sn = SerialNumber::Compose(*(cube.label()));
+      QString sn = SerialNumber::Compose(images[image].toString());
       for (insertPos = 0; insertPos < sortedList.size(); insertPos++) {
         if (sn.compare(sortedList[insertPos].first) < 0) break;
       }
