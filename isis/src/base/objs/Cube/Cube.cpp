@@ -495,7 +495,7 @@ namespace Isis {
     ptype += PvlKeyword("Multiplier", toString(m_multiplier));
 
     if (labelsAttached() != LabelAttachment::ExternalLabel) {
-      if (format() !=  Format::GTiff) {
+      if (format() != Format::GTiff) {
         imageFile = imageFile.addExtension("cub");
       }
       else if (format() == Format::GTiff) {
@@ -636,8 +636,24 @@ namespace Isis {
     }
     else if(format() ==  Format::GTiff) {
       char **papszOptions = NULL;
-      papszOptions = CSLSetNameValue(papszOptions, "COMPRESS", "DEFLATE");
+      // Make sure the cube is not going to exceed the maximum size preference
+      BigInt size = (BigInt)m_samples * m_lines *
+                    (BigInt)m_bands * (BigInt)SizeOf(m_pixelType);
+
+      size = size / 1024; // kb
+      size = size / 1024; // mb
+      size = size / 1024; // gb
+
       papszOptions = CSLSetNameValue(papszOptions, "PREDICTOR", "2");
+      papszOptions = CSLSetNameValue(papszOptions, "NUM_THREADS", "4");
+      if (size < 4) {
+        papszOptions = CSLSetNameValue(papszOptions, "COMPRESS", "DEFLATE");
+      }
+      else {
+        papszOptions = CSLSetNameValue(papszOptions, "COMPRESS", "LZW");
+        papszOptions = CSLSetNameValue(papszOptions, "BIGTIFF", "YES");
+      }
+
       QString datafile = m_dataFileName->expanded();
       QString format = "GTiff";
       createGdal(datafile, format, papszOptions);
@@ -1013,7 +1029,7 @@ namespace Isis {
       m_label->addObject(isiscube);
     }
 
-    if (dataset->GetSpatialRef()) {
+    if (dataset->GetSpatialRef() && !(m_label->findObject("IsisCube").hasGroup("Mapping"))) {
       char ** projStr = new char*[1];
       const OGRSpatialReference &oSRS = *dataset->GetSpatialRef();
       oSRS.exportToProj4(projStr);
