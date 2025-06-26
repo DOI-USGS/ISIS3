@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="eisstitch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Combine Clipper EIS files into a single ISIS cube
+  </brief>
+  <description>
+    <p>
+      This program takes a series of Clipper EIS cubes and combines them into a single unified cube with a unified ephemeris time table
+      as well as a unified camera.
+    </p>
+
+    <p>
+      The program requires that the list of cubes provided be Clipper EIS cubes and that the cubes are in chronological order.
+    </p>
+  </description>
+
+  <history>
+    <change name="Adam Paquette" date="2024-08-12">
+      Original version.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Clipper</missionItem>
+  </category>
+
+  <groups>
+
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of cubes to stitch together
+        </brief>
+        <description>
+          The name of a file containing a list of Clipper EIS images in chronological
+          order to be stitched together.
+        </description>
+        <filter>
+          *
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output ISIS cube file for the stitched image
+        </brief>
+        <description>
+          The output cube file that will contain the EIS <em>stitched image</em> in ISIS format.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+  </groups>
+
+  <examples>
+    <example>
+      <brief> Demonstrats how to use eisstitch </brief>
+      <description>
+        This example demonstrates the basic workings of eisstitch and
+        how to properly format the input information for stitching.
+      </description>
+      <terminalInterface>
+        <commandLine> 
+          fromlist=eis_cubes.lis to=eis_stitched_cube.cub
+        </commandLine>
+        <description>
+          This is the command line used to create the stitched output cube. The FROMLIST
+          needs to be a newline delimited list of EIS Clipper cubes to stitch together.
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/images/capture_1.jpg" width="4000" height="200">
+          <brief> First chronological capture from an EIS image set</brief>
+          <description>
+            This is the first image in a series of images taken by the EIS Clipper
+            WAC/NAC camera.
+          </description>
+          <thumbnail caption="First capture to be stitched" src="assets/thumbs/capture_1_thumb.jpg" width="2400" height="120"/>
+        </image>
+        <image src="assets/images/capture_2.jpg" width="4000" height="200">
+          <brief> Second chronological capture from an EIS image set</brief>
+          <description>
+            This is the second image in a series of images taken by the EIS Clipper
+            WAC/NAC camera.
+          </description>
+          <thumbnail caption="Second capture to be stitched" src="assets/thumbs/capture_2_thumb.jpg" width="2400" height="120"/>
+        </image>
+        <image src="assets/images/capture_3.jpg" width="4000" height="200">
+          <brief> Third chronological capture from an EIS image set</brief>
+          <description>
+            This is the third image in a series of images taken by the EIS Clipper
+            WAC/NAC camera.
+          </description>
+          <thumbnail caption="Third capture to be stitched" src="assets/thumbs/capture_3_thumb.jpg" width="2400" height="120"/>
+        </image>
+      </inputImages>
+
+      <dataFiles>
+        <dataFile path="assets/IN/eis_cubes.lis">
+          <brief> FROMLIST </brief>
+          <description>
+            Input list file of cubes, where each line is the full path or relative
+            path for each cube to stitch
+          </description>
+          <parameterName> FROMLIST </parameterName>
+        </dataFile>
+      </dataFiles>
+
+      <outputImages>
+        <image src="assets/images/eis_stitched_cube.jpg" width="4000" height="700">
+          <brief> Output image for eisstitch</brief>
+          <description>
+            The sitched output from the three images above
+          </description>
+          <thumbnail caption="Output of eisstitch" src="assets/thumbs/eis_stitched_cube_thumb.jpg" width="2400" height="400"/>
+          <parameterName> TO </parameterName>
+        </image>
+      </outputImages>
+    </example>
+   </examples>
+
+</application>
