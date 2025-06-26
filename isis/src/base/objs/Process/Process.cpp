@@ -418,7 +418,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
       if((p_propagateTables) && (InputCubes.size() > 0)) {
         Isis::Pvl &inlab = *InputCubes[0]->label();
         for(int i = 0; i < inlab.objects(); i++) {
-          if(inlab.object(i).isNamed("Table")) {
+          if(inlab.object(i).isNamed("Table") || inlab.object(i).isNamed("String")) {
             Isis::Blob t((QString)inlab.object(i)["Name"], inlab.object(i).name());
             InputCubes[0]->read(t);
             cube->write(t);
@@ -438,7 +438,7 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
         }
       }
 
-      // Transfer tables from the first input cube
+      // Transfer original label from the first input cube
       if((p_propagateOriginalLabel) && (InputCubes.size() > 0)) {
         Isis::Pvl &inlab = *InputCubes[0]->label();
         for(int i = 0; i < inlab.objects(); i++) {
