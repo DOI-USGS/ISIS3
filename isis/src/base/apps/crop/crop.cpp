@@ -30,32 +30,65 @@ namespace Isis {
    */
   PvlGroup crop(Cube *cube, UserInterface &ui) {
     // Globals and prototypes
-    int ss, sl, sb;
-    int ns, nl, nb;
-    int sinc, linc;
+    int startSamp, startLine;
+    int numSamps, numLines;
+    int endSamp, endLine;
+    int sinc, linc;  // sample/line increments 
+    int curBand, numBands;
+    int minPixel;
+    int negOffsetLine, negOffsetSamp;
+    int posOffsetLine, posOffsetSamp;
+
+    enum class fillType { Nul, Pix, NulPix, PixNul, NulPixNul };
+    fillType fillMode = fillType::Pix;
     
-    bool allowOverhang, padOverhang;
+    bool allowOverhang, padOverhang, hasOverhang;
 
     LineManager *in = NULL;
 
-    // Line processing routine
+    // Line processing routine (normal)
     auto cropProccess = [&](Buffer &out)->void {
+
       // Read the input line
-      int iline = sl + (out.Line() - 1) * linc;
-      in->SetLine(iline, sb);
+      int iline = startLine + (out.Line() - 1) * linc;
+      in->SetLine(iline, curBand);
       cube->read(*in);
 
       // Loop and move appropriate samples
       for(int i = 0; i < out.size(); i++) {
-        out[i] = (*in)[(ss - 1) + i * sinc];  // TODO: If enabled, pad values here (or make separate method for overhanging crops)
+        out[i] = (*in)[(startSamp - 1) + i * sinc];
       }
 
-      if(out.Line() == nl) sb++;
+      if(out.Line() == numLines) curBand++;
+    };
+
+    // Line processing routine with padding
+    auto cropProccessPad = [&](Buffer &out)->void {
+      // This is run for every line of the output cube, out.Line() gives which line.
+
+      // if padding above input cube first line or below last line
+      if ( out.Line() < negOffsetLine || posOffsetLine <= out.Line()) {
+        for(int i = 0; i < out.size(); i++) {
+          out[i] = NULL8;
+        }
+      }
+
+      // lines between input cube first and last line.
+      else {
+        for(int i = 0; i < out.size(); i++) {
+          if (i < negOffsetSamp || posOffsetSamp <= i) {
+            out[i] = NULL8;
+          }
+          else {
+            out[i] = (*in)[negOffsetSamp + (startSamp - 1) + i * sinc];
+          }
+        }
+      }
+
+      if(out.Line() == numLines) curBand++;
     };
 
     ProcessByLine p;
-
-    // TODO: add OVERHANG Parameter: [FAIL, PAD, SHRINK]
 
     // Open the input cube
     QString from = ui.GetAsString("FROM");
@@ -65,6 +98,7 @@ namespace Isis {
     from = ui.GetCubeName("FROM");
     cube->open(from);
 
+    // Behavior for overhanging crops
     QString OverhangBehavior = ui.GetString("OVERHANG");
     switch(OverhangBehavior) {
       case "PAD":
@@ -79,69 +113,122 @@ namespace Isis {
         allowOverhang = false;
     }
 
+    #pragma region calculateDimensions
+
     // Determine the sub-area to extract
-    ss = ui.GetInteger("SAMPLE");
-    sl = ui.GetInteger("LINE");
-    sb = 1;
+    startSamp = ui.GetInteger("SAMPLE");
+    startLine = ui.GetInteger("LINE");
+    curBand = 1;                        
+    minPixel = 1;
 
     int origns = cube->sampleCount();
     int orignl = cube->lineCount();
-    int es = cube->sampleCount();
-    if (ui.WasEntered("NSAMPLES")) es = ss + ui.GetInteger("NSAMPLES") - 1;
-    int el = cube->lineCount();
-    if (ui.WasEntered("NLINES")) el = sl + ui.GetInteger("NLINES") - 1;
-    int eb = cube->bandCount();
+    endSamp = cube->sampleCount();                                                       // endSamp = ending sample: edge of cube, 
+    if (ui.WasEntered("NSAMPLES")) endSamp = startSamp + ui.GetInteger("NSAMPLES") - 1; //            or startSample plus numSamples if numSamples was entered
+    endLine = cube->lineCount();
+    if (ui.WasEntered("NLINES")) endLine = startLine + ui.GetInteger("NLINES") - 1;   // endLine = ending line: ''
+    numBands = cube->bandCount();
 
     sinc = ui.GetInteger("SINC");
     linc = ui.GetInteger("LINC");
 
-    // Make sure starting positions fall within the cube
-    // TODO: avoid exceptions if diferent OVERHANG option selected
-    if (ss > cube->sampleCount()) {
-      cube->close();
-      QString msg = "[SAMPLE] exceeds number of samples in the [FROM] cube";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
+    hasOverhang = (minPixel > startSamp || minPixel > startLine || endSamp >= cube->sampleCount() || endLine >= cube->lineCount())
 
-    if (sl > cube->lineCount()) {
-      cube->close();
-      QString msg = "[LINE] exceeds number of lines in the [FROM] cube";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
+    if (allowOverhang && hasOverhang) {
 
-    // Make sure the number of elements do not fall outside the cube
-    // TODO: avoid exceptions if diferent OVERHANG option selected
-    if (es > cube->sampleCount()) {
-      cube->close();
-      QString msg = "[SAMPLE+NSAMPLES-1] exceeds number of ";
-      msg += "samples in the [FROM] cube";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
+      if (padOverhang) {
 
-    if (el > cube->lineCount()) {
-      cube->close();
-      QString msg = "[LINE+NLINES-1] exceeds number of ";
-      msg += "lines in the [FROM] cube";
-      throw IException(IException::User, msg, _FILEINFO_);
+        negOffsetLine = startLine < minPixel ? minPixel - startLine : 0;
+        negOffsetSamp = startSamp < minPixel ? minPixel - startLine : 0;
+        posOffsetLine = cube->lineCount() < endLine : negOffsetLine + cube->lineCount() : endLine;
+        posOffsetSamp = cube->sampleCount() < endSamp : negOffsetSamp + cube->sampleCount() : endSamp;
+      }
+
+      // If need to shrink an overhanging crop, adjust down the dimensions.
+      else {
+        if (startLine < minPixel) { // Overhangs Top
+          numLines -= (minPixel - startLine);
+          startLine = minPixel;
+        }
+        if (startSamp < minPixel) { // Overhangs Left
+          numSamps -= (minPixel - startSamp);
+          startSamp = minPixel;
+        }
+        if (cube->lineCount() < endLine) { // Overhangs Bottom
+          numLines -= (endLine - cube->lineCount());
+          endLine = cube->lineCount();
+        }
+        if (cube->sampleCount() < endSamp) { // Overhangs Right
+          numSamps -= (endSamp - cube->sampleCount());
+          endSamp = cube->sampleCount();
+        }
+        hasOverhang = false;
+      }
+    }
+    
+    // Some overhang, but not allowed. Throw exceptions.
+    else {
+
+      if (startLine < minPixel) {
+        cube->close();
+        QString msg = "[LINE] less than position of first line in the [FROM] cube";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      if (startSamp < minPixel) {
+        cube->close();
+        QString msg = "[SAMPLE] less than position of first sample in the [FROM] cube";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      if (startSamp > cube->sampleCount()) {
+        cube->close();
+        QString msg = "[SAMPLE] exceeds number of samples in the [FROM] cube";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      
+      if (startLine > cube->lineCount()) {
+        cube->close();
+        QString msg = "[LINE] exceeds number of lines in the [FROM] cube";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      
+      // Make sure the number of elements do not fall outside the cube
+      if (endSamp > cube->sampleCount()) {
+        cube->close();
+        QString msg = "[SAMPLE+NSAMPLES-1] exceeds number of ";
+        msg += "samples in the [FROM] cube";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      
+      if (endLine > cube->lineCount()) {
+        cube->close();
+        QString msg = "[LINE+NLINES-1] exceeds number of ";
+        msg += "lines in the [FROM] cube";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
     }
 
     // Determine the size of the output cube and then set the output image size
-    ns = ceil((double)(es - ss + 1) / sinc);
-    nl = ceil((double)(el - sl + 1) / linc);
-    nb = eb;
-    //if (ns == 0) ns = 1;
-    //if (nl == 0) nl = 1;
-    es = ss + (ns - 1) * sinc;
-    el = sl + (nl - 1) * linc;
+    numSamps = ceil((double)(endSamp - startSamp + 1) / sinc);
+    numLines = ceil((double)(endLine - startLine + 1) / linc);
+    //if (numSamps == 0) numSamps = 1;
+    //if (numLines == 0) numLines = 1;
+    endSamp = startSamp + (numSamps - 1) * sinc;
+    endLine = startLine + (numLines - 1) * linc;
+
+    #pragma endregion
 
     // Allocate the output file and make sure things get propogated nicely
     CubeAttributeInput &inputAtt =ui.GetInputAttribute("FROM");
     p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, numSamps, numLines, numBands);
     p.PropagateTables(false);
     p.ClearInputCubes();
 
+
+    #pragma region propogateTables
     // propagate tables manually
     Pvl &inLabels = *cube->label();
 
@@ -162,30 +249,30 @@ namespace Isis {
       // Read the table into a table object
       Table table = cube->readTable(obj["Name"]);
 
+      /*
       // We are not going to bother with line/sample associations; they apply
       //   only to the alpha cube at this time. I'm leaving this code here for the
       //   equations in case we try our hand at modifying these tables at a later date.
 
-      /* Deal with associations, sample first
+      // Deal with associations, sample first
       if(table.IsSampleAssociated()) {
         int numDeleted = 0;
         for(int samp = 0; samp < cube->sampleCount(); samp++) {
           // This tests checks to see if we would include this sample.
-          //   samp - (ss-1)) / sinc must be a whole number less than ns.
-          if((samp - (ss-1)) % sinc != 0 || (samp - (ss-1)) / sinc >= ns || (samp - (ss-1)) < 0) {
+          //   samp - (startSamp-1)) / sinc must be a whole number less than numSamps.
+          if((samp - (startSamp-1)) % sinc != 0 || (samp - (startSamp-1)) / sinc >= numSamps || (samp - (startSamp-1)) < 0) {
             table.Delete(samp-numDeleted);
             numDeleted ++;
           }
         }
       }
-
       // Deal with line association
       if(table.IsLineAssociated()) {
         int numDeleted = 0;
         for(int line = 0; line < cube->lineCount(); line++) {
           // This tests checks to see if we would include this line.
-          //   line - (sl-1)) / linc must be a whole number less than nl.
-          if((line - (sl-1)) % linc != 0 || (line - (sl-1)) / linc >= nl || (line - (sl-1)) < 0) {
+          //   line - (startLine-1)) / linc must be a whole number less than numLines.
+          if((line - (startLine-1)) % linc != 0 || (line - (startLine-1)) / linc >= numLines || (line - (startLine-1)) < 0) {
             table.Delete(line-numDeleted);
             numDeleted ++;
           }
@@ -212,36 +299,50 @@ namespace Isis {
       }
     }
 
+    #pragma endregion
+
+    #pragma region cropLogic
+
     // Create a buffer for reading the input cube
     in = new LineManager(*cube);
 
-    // Crop the input cube
-    p.StartProcess(cropProccess);
+    if (hasOverhang) {
+      p.StartProcess(cropProcessPad);
+    } else {
+      // Crop the input cube
+      p.StartProcess(cropProccess);
+    }
 
     delete in;
     in = NULL;
+
+    #pragma endregion
+
+    #pragma region postCropInfo
 
     // Construct a label with the results
     PvlGroup results("Results");
     results += PvlKeyword("InputLines", toString(orignl));
     results += PvlKeyword("InputSamples", toString(origns));
-    results += PvlKeyword("StartingLine", toString(sl));
-    results += PvlKeyword("StartingSample", toString(ss));
-    results += PvlKeyword("EndingLine", toString(el));
-    results += PvlKeyword("EndingSample", toString(es));
+    results += PvlKeyword("StartingLine", toString(startLine));
+    results += PvlKeyword("StartingSample", toString(startSamp));
+    results += PvlKeyword("EndingLine", toString(endLine));
+    results += PvlKeyword("EndingSample", toString(endSamp));
     results += PvlKeyword("LineIncrement", toString(linc));
     results += PvlKeyword("SampleIncrement", toString(sinc));
-    results += PvlKeyword("OutputLines", toString(nl));
-    results += PvlKeyword("OutputSamples", toString(ns));
+    results += PvlKeyword("OutputLines", toString(numLines));
+    results += PvlKeyword("OutputSamples", toString(numSamps));
 
     // Update the Mapping, Instrument, and AlphaCube groups in the output
     // cube label
     SubArea *s;
     s = new SubArea;
-    s->SetSubArea(orignl, origns, sl, ss, el, es, linc, sinc);
+    s->SetSubArea(orignl, origns, startLine, startSamp, endLine, endSamp, linc, sinc);
     s->UpdateLabel(cube, ocube, results);
     delete s;
     s = NULL;
+
+    #pragma endregion
 
     // Cleanup
     p.EndProcess();
