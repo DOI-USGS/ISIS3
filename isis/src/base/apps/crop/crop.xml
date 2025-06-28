@@ -359,8 +359,6 @@ End_Group
           This is the starting sample of the area to extract.  It must be inside
           the cube area.
         </description>
-
-        <minimum inclusive="yes">1</minimum>
       </parameter>
 
       <parameter name="NSAMPLES">
@@ -401,8 +399,6 @@ End_Group
         <description>
           This is the starting line of the area to extract.  It must be inside the cube.
         </description>
-
-        <minimum inclusive="yes">1</minimum>
       </parameter>
 
       <parameter name="NLINES">

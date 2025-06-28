@@ -38,9 +38,6 @@ namespace Isis {
     int minPixel;
     int negOffsetLine, negOffsetSamp;
     int posOffsetLine, posOffsetSamp;
-
-    enum class fillType { Nul, Pix, NulPix, PixNul, NulPixNul };
-    fillType fillMode = fillType::Pix;
     
     bool allowOverhang, padOverhang, hasOverhang;
 
@@ -49,6 +46,8 @@ namespace Isis {
     // Line processing routine (normal)
     auto cropProccess = [&](Buffer &out)->void {
 
+      printf("regular crop process\n");
+
       // Read the input line
       int iline = startLine + (out.Line() - 1) * linc;
       in->SetLine(iline, curBand);
@@ -56,18 +55,23 @@ namespace Isis {
 
       // Loop and move appropriate samples
       for(int i = 0; i < out.size(); i++) {
+        printf("|%5.0f|", (*in)[(startSamp - 1) + i * sinc]);
         out[i] = (*in)[(startSamp - 1) + i * sinc];
       }
+      printf("\n");
 
       if(out.Line() == numLines) curBand++;
     };
 
     // Line processing routine with padding
-    auto cropProccessPad = [&](Buffer &out)->void {
+    auto cropProcessPad = [&](Buffer &out)->void {
       // This is run for every line of the output cube, out.Line() gives which line.
+      
+      printf("out.Line()= %d;   negOffsetLine=%d;   posOffsetLine=%d;   \n", out.Line(), negOffsetLine, posOffsetLine);
 
       // if padding above input cube first line or below last line
-      if ( out.Line() < negOffsetLine || posOffsetLine <= out.Line()) {
+      if ( out.Line() <= negOffsetLine || posOffsetLine < out.Line()) {
+        printf("Upper/Lower Overhang Nulls\n");
         for(int i = 0; i < out.size(); i++) {
           out[i] = NULL8;
         }
@@ -75,14 +79,24 @@ namespace Isis {
 
       // lines between input cube first and last line.
       else {
+
+        // Read the input line
+        int iline = startLine + (out.Line() - 1) * linc;
+        printf("iline= %d\n", iline);
+        in->SetLine(iline, curBand);
+        cube->read(*in);
+
         for(int i = 0; i < out.size(); i++) {
           if (i < negOffsetSamp || posOffsetSamp <= i) {
+            printf("|   N   |");
             out[i] = NULL8;
           }
           else {
-            out[i] = (*in)[negOffsetSamp + (startSamp - 1) + i * sinc];
+            printf("|%5.0f|", (*in)[(startSamp - 1) + i * sinc]);
+            out[i] = (*in)[(startSamp - 1) + i * sinc];
           }
         }
+        printf("\n");
       }
 
       if(out.Line() == numLines) curBand++;
@@ -100,17 +114,17 @@ namespace Isis {
 
     // Behavior for overhanging crops
     QString OverhangBehavior = ui.GetString("OVERHANG");
-    switch(OverhangBehavior) {
-      case "PAD":
-        allowOverhang = true;
-        padOverhang = true;
-        break;
-      case "SHRINK":
-        allowOverhang = true;
-        padOverhang = false;
-        break;
-      default:
-        allowOverhang = false;
+
+    if(OverhangBehavior == "PAD") {
+      allowOverhang = true;
+      padOverhang = true;
+    }
+    else if (OverhangBehavior == "SHRINK") {
+      allowOverhang = true;
+      padOverhang = false;
+    }
+    else {
+      allowOverhang = false;
     }
 
     #pragma region calculateDimensions
@@ -132,16 +146,29 @@ namespace Isis {
     sinc = ui.GetInteger("SINC");
     linc = ui.GetInteger("LINC");
 
-    hasOverhang = (minPixel > startSamp || minPixel > startLine || endSamp >= cube->sampleCount() || endLine >= cube->lineCount())
+    // Determine the size of the output cube and then set the output image size
+    numSamps = ceil((double)(endSamp - startSamp + 1) / sinc);
+    numLines = ceil((double)(endLine - startLine + 1) / linc);
+    //if (numSamps == 0) numSamps = 1;
+    //if (numLines == 0) numLines = 1;
+    endSamp = startSamp + (numSamps - 1) * sinc;
+    endLine = startLine + (numLines - 1) * linc;
+
+    // Overhang Calculations
+    hasOverhang = (minPixel > startSamp || minPixel > startLine || endSamp > cube->sampleCount() || endLine > cube->lineCount());
 
     if (allowOverhang && hasOverhang) {
 
       if (padOverhang) {
 
-        negOffsetLine = startLine < minPixel ? minPixel - startLine : 0;
-        negOffsetSamp = startSamp < minPixel ? minPixel - startLine : 0;
-        posOffsetLine = cube->lineCount() < endLine : negOffsetLine + cube->lineCount() : endLine;
-        posOffsetSamp = cube->sampleCount() < endSamp : negOffsetSamp + cube->sampleCount() : endSamp;
+        printf("\n----\n\nstartLine=%d;   startSamp=%d;   minPixel=%d;   \n", startLine, startSamp, minPixel);
+        printf("endLine=%d;   endSamp=%d;   \n", startLine, startSamp);
+        printf("cube->lineCount()=%d;   cube->sampleCount()=%d;   \n", cube->lineCount(), cube->sampleCount());
+
+        negOffsetLine = minPixel - startLine;
+        negOffsetSamp = minPixel - startSamp;
+        posOffsetLine = negOffsetLine > 0 ? negOffsetLine + cube->lineCount() : cube->lineCount();
+        posOffsetSamp = negOffsetSamp > 0 ? negOffsetSamp + cube->sampleCount() : cube->sampleCount();
       }
 
       // If need to shrink an overhanging crop, adjust down the dimensions.
@@ -208,14 +235,6 @@ namespace Isis {
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-
-    // Determine the size of the output cube and then set the output image size
-    numSamps = ceil((double)(endSamp - startSamp + 1) / sinc);
-    numLines = ceil((double)(endLine - startLine + 1) / linc);
-    //if (numSamps == 0) numSamps = 1;
-    //if (numLines == 0) numLines = 1;
-    endSamp = startSamp + (numSamps - 1) * sinc;
-    endLine = startLine + (numLines - 1) * linc;
 
     #pragma endregion
 
@@ -307,6 +326,12 @@ namespace Isis {
     in = new LineManager(*cube);
 
     if (hasOverhang) {
+
+      printf("negOffsetLine= %d;   ", negOffsetLine);
+      printf("posOffsetLine= %d;   ", posOffsetLine);
+      printf("negOffsetSamp= %d;   ", negOffsetSamp);
+      printf("posOffsetSamp= %d; \n", posOffsetSamp);
+
       p.StartProcess(cropProcessPad);
     } else {
       // Crop the input cube
