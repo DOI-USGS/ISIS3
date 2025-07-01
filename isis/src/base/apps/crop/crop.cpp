@@ -45,8 +45,7 @@ namespace Isis {
 
     // Line processing routine (normal)
     auto cropProccess = [&](Buffer &out)->void {
-
-      printf("regular crop process\n");
+      // This is run for every line of the output cube
 
       // Read the input line
       int iline = startLine + (out.Line() - 1) * linc;
@@ -55,10 +54,8 @@ namespace Isis {
 
       // Loop and move appropriate samples
       for(int i = 0; i < out.size(); i++) {
-        printf("|%5.0f|", (*in)[(startSamp - 1) + i * sinc]);
         out[i] = (*in)[(startSamp - 1) + i * sinc];
       }
-      printf("\n");
 
       if(out.Line() == numLines) curBand++;
     };
@@ -66,12 +63,9 @@ namespace Isis {
     // Line processing routine with padding
     auto cropProcessPad = [&](Buffer &out)->void {
       // This is run for every line of the output cube, out.Line() gives which line.
-      
-      printf("out.Line()= %d;   negOffsetLine=%d;   posOffsetLine=%d;   \n", out.Line(), negOffsetLine, posOffsetLine);
 
       // if padding above input cube first line or below last line
       if ( out.Line() <= negOffsetLine || posOffsetLine < out.Line()) {
-        printf("Upper/Lower Overhang Nulls\n");
         for(int i = 0; i < out.size(); i++) {
           out[i] = NULL8;
         }
@@ -82,21 +76,17 @@ namespace Isis {
 
         // Read the input line
         int iline = startLine + (out.Line() - 1) * linc;
-        printf("iline= %d\n", iline);
         in->SetLine(iline, curBand);
         cube->read(*in);
 
         for(int i = 0; i < out.size(); i++) {
           if (i < negOffsetSamp || posOffsetSamp <= i) {
-            printf("|   N   |");
             out[i] = NULL8;
           }
           else {
-            printf("|%5.0f|", (*in)[(startSamp - 1) + i * sinc]);
             out[i] = (*in)[(startSamp - 1) + i * sinc];
           }
         }
-        printf("\n");
       }
 
       if(out.Line() == numLines) curBand++;
@@ -126,8 +116,6 @@ namespace Isis {
     else {
       allowOverhang = false;
     }
-
-    #pragma region calculateDimensions
 
     // Determine the sub-area to extract
     startSamp = ui.GetInteger("SAMPLE");
@@ -160,15 +148,10 @@ namespace Isis {
     if (allowOverhang && hasOverhang) {
 
       if (padOverhang) {
-
-        printf("\n----\n\nstartLine=%d;   startSamp=%d;   minPixel=%d;   \n", startLine, startSamp, minPixel);
-        printf("endLine=%d;   endSamp=%d;   \n", startLine, startSamp);
-        printf("cube->lineCount()=%d;   cube->sampleCount()=%d;   \n", cube->lineCount(), cube->sampleCount());
-
         negOffsetLine = minPixel - startLine;
         negOffsetSamp = minPixel - startSamp;
-        posOffsetLine = negOffsetLine > 0 ? negOffsetLine + cube->lineCount() : cube->lineCount();
-        posOffsetSamp = negOffsetSamp > 0 ? negOffsetSamp + cube->sampleCount() : cube->sampleCount();
+        posOffsetLine = negOffsetLine + cube->lineCount();
+        posOffsetSamp = negOffsetSamp + cube->sampleCount();
       }
 
       // If need to shrink an overhanging crop, adjust down the dimensions.
@@ -236,8 +219,6 @@ namespace Isis {
       }
     }
 
-    #pragma endregion
-
     // Allocate the output file and make sure things get propogated nicely
     CubeAttributeInput &inputAtt =ui.GetInputAttribute("FROM");
     p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
@@ -246,8 +227,6 @@ namespace Isis {
     p.PropagateTables(false);
     p.ClearInputCubes();
 
-
-    #pragma region propogateTables
     // propagate tables manually
     Pvl &inLabels = *cube->label();
 
@@ -318,32 +297,19 @@ namespace Isis {
       }
     }
 
-    #pragma endregion
-
-    #pragma region cropLogic
-
     // Create a buffer for reading the input cube
     in = new LineManager(*cube);
 
     if (hasOverhang) {
-
-      printf("negOffsetLine= %d;   ", negOffsetLine);
-      printf("posOffsetLine= %d;   ", posOffsetLine);
-      printf("negOffsetSamp= %d;   ", negOffsetSamp);
-      printf("posOffsetSamp= %d; \n", posOffsetSamp);
-
+      // crop for overhang, with extra checks/logic
       p.StartProcess(cropProcessPad);
     } else {
-      // Crop the input cube
+      // regular crop
       p.StartProcess(cropProccess);
     }
 
     delete in;
     in = NULL;
-
-    #pragma endregion
-
-    #pragma region postCropInfo
 
     // Construct a label with the results
     PvlGroup results("Results");
@@ -366,8 +332,6 @@ namespace Isis {
     s->UpdateLabel(cube, ocube, results);
     delete s;
     s = NULL;
-
-    #pragma endregion
 
     // Cleanup
     p.EndProcess();
