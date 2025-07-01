@@ -64,8 +64,11 @@ namespace Isis {
     auto cropProcessPad = [&](Buffer &out)->void {
       // This is run for every line of the output cube, out.Line() gives which line.
 
+      printf("out.Line()=%d;   ", out.Line());
+
       // if padding above input cube first line or below last line
-      if ( out.Line() <= negOffsetLine || posOffsetLine < out.Line()) {
+      if ( (out.Line() - 1) * linc < negOffsetLine || posOffsetLine <= (out.Line() - 1) * linc) {
+        printf("Null Line\n");
         for(int i = 0; i < out.size(); i++) {
           out[i] = NULL8;
         }
@@ -79,8 +82,11 @@ namespace Isis {
         in->SetLine(iline, curBand);
         cube->read(*in);
 
+        printf("iline=%d;   ", iline);
+        printf("Mid \n");
+
         for(int i = 0; i < out.size(); i++) {
-          if (i < negOffsetSamp || posOffsetSamp <= i) {
+          if (i * sinc < negOffsetSamp || posOffsetSamp <= i * sinc) {
             out[i] = NULL8;
           }
           else {
@@ -302,9 +308,15 @@ namespace Isis {
 
     if (hasOverhang) {
       // crop for overhang, with extra checks/logic
+
+      printf("Padded Crop\n");
+      printf("startLine=%d;   numLines=%d;   endLine=%d;   negOffsetLine=%d;   posOffsetLine=%d;   linc=%d;   \n", startLine, numLines, endLine, negOffsetLine, posOffsetLine, linc);
+      printf("startSamp=%d;   numSamps=%d;   endSamp=%d;   negOffsetSamp=%d;   posOffsetSamp=%d;   sinc=%d;   \n", startSamp, numSamps, endSamp, negOffsetSamp, posOffsetSamp, sinc);
+
       p.StartProcess(cropProcessPad);
     } else {
       // regular crop
+      printf("Regular Crop\n");
       p.StartProcess(cropProccess);
     }
 
