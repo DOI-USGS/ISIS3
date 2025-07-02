@@ -230,3 +230,28 @@ TEST_F(DefaultCube, FunctionalTestCropError4) {
         EXPECT_THAT(e.what(), HasSubstr("exceeds number of lines in"));
     }
 }
+
+TEST_F(LargeCube, FunctionalTestCropPad1) {
+  QTemporaryDir tempDir;
+  QString outCubeFileName = tempDir.path() + "/outTemp.cub";
+  QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName,
+    "sample=-50", "nsamples=200", "line=-75", "nlines=300", "overhang=pad"};
+
+
+  UserInterface options(APP_XML, args);
+  try {
+    crop(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open image: " << e.what() << std::endl;
+  }
+
+  Cube oCube(outCubeFileName, "r");
+
+  Histogram *oCubeStats = oCube.histogram();
+
+  EXPECT_NEAR(oCubeStats->Average(), 111.5, 0.01);
+  EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 3721424);
+  EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 33376);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 64.663554502508418, 0.0000000001);
+}
