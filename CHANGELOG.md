@@ -77,6 +77,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed ISIS Q Applications crashing when opening more than one cube at once. [#5805](https://github.com/DOI-USGS/ISIS3/pull/5805)
 - Fixed csminit docs with more details on the `ISD` and `STATE` pameters [#5790](https://github.com/DOI-USGS/ISIS3/issues/5790)
 - Fixed SpiceQL 1.2.0 API changes [#5846](https://github.com/DOI-USGS/ISIS3/pull/5846)
+- Fixed CSM State String blob not being propagated between input and output cubes [#5847](https://github.com/DOI-USGS/ISIS3/pull/5847)
 
 ## [9.0.0] - 09-25-2024
 
