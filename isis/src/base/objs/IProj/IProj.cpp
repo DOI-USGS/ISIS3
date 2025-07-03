@@ -43,11 +43,21 @@ namespace Isis {
     if (!mapGroup.hasKeyword("EquatorialRadius") || 
         !mapGroup.hasKeyword("PolarRadius")) {
 
-      int res = proj_ellipsoid_get_parameters(m_C, m_outputProj, 
+      PJ *ellipsoid = proj_get_ellipsoid(m_C, m_outputProj);
+
+      if (ellipsoid == nullptr) {
+        QString msg = "Unable to create ellipsoid from [" + *m_userOutputProjStr + "]. \n"
+                      "You might need to add '+type=crs' to your proj4 string.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      int res = proj_ellipsoid_get_parameters(m_C, ellipsoid, 
                                               &m_equatorialRadius,
                                               &m_polarRadius,
                                               nullptr,
                                               nullptr);
+
+      proj_destroy(ellipsoid);
 
       if (res == 0) {
         QString msg = "Unable to get ellipsoid information from [" + *m_userOutputProjStr + "]";
