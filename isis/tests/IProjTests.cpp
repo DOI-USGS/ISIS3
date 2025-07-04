@@ -30,7 +30,7 @@ class IProjMappingGroup : public ::testing::Test {
         std::istringstream iss(R"(
             Group = Mapping
             TargetName              = Mars
-            ProjStr                 = "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R=1 +units=m +no_defs +type=crs"
+            ProjStr                 = "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=-90 +over +x_0=0 +y_0=0 +R=1 +units=m +no_defs +type=crs"
             LatitudeType            = Planetocentric
             LongitudeDirection      = PositiveEast
             LongitudeDomain         = 180
@@ -85,16 +85,16 @@ TEST_F(IProjMappingGroup, TestIProjSetGround) {
     bool success = projection->SetGround(-50.0, -75.0);
     ASSERT_TRUE(success);
 
-    EXPECT_EQ(projection->WorldX(), -1.3089969389957472);
-    EXPECT_EQ(projection->WorldY(), -0.87266462599716466);
+    EXPECT_EQ(projection->WorldX(), 0.26179938779914935);
+    EXPECT_EQ(projection->WorldY(), -0.87266462599716477);
 }
 
 TEST_F(IProjMappingGroup, TestIProjSetCoordinate) {
-    bool success = projection->SetCoordinate(-1.3089969389957472,-0.87266462599716466);
+    bool success = projection->SetCoordinate(0.26179938779914935,-0.87266462599716477);
     ASSERT_TRUE(success);
 
-    EXPECT_NEAR(projection->Latitude(), -50, 1e-13);
-    EXPECT_NEAR(projection->Longitude(), -75, 1e-13);
+    EXPECT_EQ(projection->Latitude(), -50);
+    EXPECT_EQ(projection->Longitude(), -75);
 }
 
 TEST_F(IProjMappingGroup, TestIProjXYRange) {
@@ -102,8 +102,8 @@ TEST_F(IProjMappingGroup, TestIProjXYRange) {
     bool rangeCheck = projection->XYRange(minX, maxX, minY, maxY);
     ASSERT_TRUE(rangeCheck);
 
-    EXPECT_NEAR(minX, -3.1415926535897931, 1e-13);
-    EXPECT_NEAR(maxX, 3.1415926535897931, 1e-13);
-    EXPECT_NEAR(minY, -1.5707963267948966, 1e-13);
-    EXPECT_NEAR(maxY, 1.5707963267948966, 1e-13);
+    EXPECT_EQ(minX, -1.5707963267948966);
+    EXPECT_EQ(maxX, 4.71238898038469);
+    EXPECT_EQ(minY, -1.5707963267948966);
+    EXPECT_EQ(maxY, 1.5707963267948966);
 }
