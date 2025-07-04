@@ -137,8 +137,7 @@ namespace Isis {
 
     PJ_COORD c_in;
     c_in.lpz.lam = m_longitude;
-    // Convert to ographic as proj defaults to operating in ographic latitudes
-    c_in.lpz.phi = ToPlanetographic(m_latitude);
+    c_in.lpz.phi = m_latitude;
 
     PJ_COORD c_out = proj_trans(m_llaProj2outputProj, PJ_FWD, c_in);
     SetComputedXY(c_out.xy.x, c_out.xy.y);
@@ -156,8 +155,7 @@ namespace Isis {
     PJ_COORD c_out = proj_trans(m_llaProj2outputProj, PJ_INV, c_in);
 
     m_longitude = c_out.lpz.lam;
-    // Convert back to ocentric as ISIS defaults to operating in ocentric latitudes
-    m_latitude = ToPlanetocentric(c_out.lpz.phi);
+    m_latitude = c_out.lpz.phi;
     m_good = true;
     return m_good;
   }
