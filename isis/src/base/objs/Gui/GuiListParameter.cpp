@@ -40,31 +40,25 @@ namespace Isis {
       btext += ui.ParamListValue(group, param, item);
       btext += ")";
 
-      // If there's helper buttons, they need to be added with the 1st value in
-      // the list
+      // If there's helper buttons, create a vertical box layout
+      // and add it next to the radio buttons
       if((item == 0) && (p_ui->HelpersSize(group, param) != 0)) {
-        // Create Horizontal layout box
-        QHBoxLayout *hlo = new QHBoxLayout;
-        lo->addLayout(hlo);
+        // Create Vertical layout box
+        QVBoxLayout *vlo = new QVBoxLayout;
+        grid->addLayout(vlo, 0, 3);
 
-        // Create radio button & add to horizontal layout
-        QRadioButton *rb = new QRadioButton(btext);
-        hlo->addWidget(rb);
-        p_buttonGroup->addButton(rb);
-
-        // Get helpers and add to horizontal layout
+        // Get helpers and add to vertical layout
         QWidget *helper = AddHelpers(p_buttonGroup);
-        hlo->addWidget(helper);
+        vlo->addWidget(helper, 0, Qt::AlignTop);
 
-        RememberWidget(rb);
         RememberWidget(helper);
       }
-      else {
-        QRadioButton *rb = new QRadioButton(btext);
-        lo->addWidget(rb);
-        p_buttonGroup->addButton(rb);
-        RememberWidget(rb);
-      }
+      // Create radio button & add to vertical layout
+      QRadioButton *rb = new QRadioButton(btext);
+      rb->setObjectName(ui.ParamListValue(group, param, item));
+      lo->addWidget(rb);
+      p_buttonGroup->addButton(rb);
+      RememberWidget(rb);
     }
     connect(p_buttonGroup, SIGNAL(buttonClicked(QAbstractButton *)),
             this, SIGNAL(ValueChanged()));
