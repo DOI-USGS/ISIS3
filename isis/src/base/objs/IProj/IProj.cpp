@@ -25,6 +25,7 @@ namespace Isis {
       throw IException(IException::User, message, _FILEINFO_);
     }
     m_C = proj_context_create();
+    proj_log_level(m_C, PJ_LOG_ERROR);
 
     m_userOutputProjStr = new QString(mapGroup["ProjStr"]);
 
@@ -33,40 +34,29 @@ namespace Isis {
     m_outputProj = proj_create(m_C, projString.c_str());
 
     if (!m_outputProj) {
-      QString msg = "Unable to create projection from [" + QString(projString.c_str()) + "].\n"
-                    "You might need to add '+type=crs' to your proj4 string.";
+      QString msg = "Unable to create projection from [" + QString(projString.c_str()) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // If we don't have radii try to get it from the underlying
-    // proj ellipsoid
-    if (!mapGroup.hasKeyword("EquatorialRadius") || 
-        !mapGroup.hasKeyword("PolarRadius")) {
+    // Read the radii information from the PROJ projection
+    PJ *ellipsoid = proj_get_ellipsoid(m_C, m_outputProj);
 
-      PJ *ellipsoid = proj_get_ellipsoid(m_C, m_outputProj);
-
-      if (ellipsoid == nullptr) {
-        QString msg = "Unable to create ellipsoid from [" + *m_userOutputProjStr + "]. \n"
-                      "You might need to add '+type=crs' to your proj4 string.";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-
-      int res = proj_ellipsoid_get_parameters(m_C, ellipsoid, 
-                                              &m_equatorialRadius,
-                                              &m_polarRadius,
-                                              nullptr,
-                                              nullptr);
-
-      proj_destroy(ellipsoid);
-
-      if (res == 0) {
-        QString msg = "Unable to get ellipsoid information from [" + *m_userOutputProjStr + "]";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
+    if (ellipsoid == nullptr) {
+      QString msg = "Unable to create ellipsoid from [" + *m_userOutputProjStr + "]";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
-    else {
-      m_equatorialRadius = toDouble(mapGroup.findKeyword("EquatorialRadius"));
-      m_polarRadius = toDouble(mapGroup.findKeyword("PolarRadius"));
+
+    int res = proj_ellipsoid_get_parameters(m_C, ellipsoid, 
+                                            &m_equatorialRadius,
+                                            &m_polarRadius,
+                                            nullptr,
+                                            nullptr);
+
+    proj_destroy(ellipsoid);
+
+    if (res == 0) {
+      QString msg = "Unable to get ellipsoid information from [" + *m_userOutputProjStr + "]";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     m_llaProj = proj_crs_get_geodetic_crs(m_C, m_outputProj);
@@ -113,9 +103,6 @@ namespace Isis {
 
     mapping.addKeyword(PvlKeyword("EquatorialRadius", toString(m_equatorialRadius, 15), "meters"), PvlContainer::InsertMode::Replace);
     mapping.addKeyword(PvlKeyword("PolarRadius", toString(m_polarRadius, 15), "meters"), PvlContainer::InsertMode::Replace);
-    mapping.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"), PvlContainer::InsertMode::Replace);
-    mapping.addKeyword(PvlKeyword("LongitudeDomain", "180"), PvlContainer::InsertMode::Replace);
-
     mapping += PvlKeyword("ProjStr", *m_userOutputProjStr);
 
     return mapping;

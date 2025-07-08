@@ -11,6 +11,8 @@
 #include "Target.h"
 #include "TProjection.h"
 
+#include <proj.h>
+
 using namespace std;
 
 namespace Isis {
@@ -35,6 +37,52 @@ namespace Isis {
       PvlGroup mappingGroup("Mapping");
       mappingGroup.addKeyword(PvlKeyword("ProjectionName", "IProj"));
       mappingGroup.addKeyword(PvlKeyword("ProjStr", ui.GetAsString("PROJString")));
+      QString projStr = mappingGroup["ProjStr"][0];
+      PJ_CONTEXT *projContext = proj_context_create();
+      proj_log_level(projContext, PJ_LOG_ERROR);
+
+      /* Create a projection. */
+      PJ *outputProj = proj_create(projContext, projStr.toStdString().c_str());
+
+      if (!outputProj) {
+        proj_context_destroy(projContext);
+        QString msg = "Unable to create projection from [" + projStr + "].";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      // Read the radii information from the PROJ projection
+      PJ *ellipsoid = proj_get_ellipsoid(projContext, outputProj);
+
+      if (ellipsoid == nullptr) {
+        proj_destroy(outputProj);
+        proj_context_destroy(projContext);
+        QString msg = "Unable to create ellipsoid from [" + projStr + "]";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      double equatorialRadius;
+      double polarRadius;
+
+      int res = proj_ellipsoid_get_parameters(projContext, ellipsoid, 
+                                              &equatorialRadius,
+                                              &polarRadius,
+                                              nullptr,
+                                              nullptr);
+
+      proj_destroy(ellipsoid);
+      proj_destroy(outputProj);
+      proj_context_destroy(projContext);
+
+      if (res == 0) {
+        QString msg = "Unable to get ellipsoid information from [" + projStr + "]";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      mappingGroup.addKeyword(PvlKeyword("EquitorialRadius", toString(equatorialRadius, 15)));
+      mappingGroup.addKeyword(PvlKeyword("PolarRadius", toString(polarRadius, 15)));
+      mappingGroup.addKeyword(PvlKeyword("LatitudeType", "Planetographic"));
+      mappingGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
+      mappingGroup.addKeyword(PvlKeyword("LongitudeDomain", "180", "degrees"));
       userMap.addGroup(mappingGroup);
     }
     else {
