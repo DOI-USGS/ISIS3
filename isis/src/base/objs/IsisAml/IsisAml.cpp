@@ -2150,7 +2150,7 @@ Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const QString &paramName)
  * @throws iException::User (Unknown Parameter)
  */
 const IsisParameterData *IsisAml::ReturnParam(const QString &paramName) const {
-  Isis::IString pn = paramName;
+  Isis::IString pn = paramName.split('.', Qt::SkipEmptyParts)[0];
   pn.UpCase();
   int found = 0;
   bool exact = false;
@@ -2644,10 +2644,22 @@ void IsisAml::VerifyAll() {
 
             const IsisParameterData *param2 = ReturnParam(param->exclude[item]);
             if(param2->values.size() > 0) {
-              QString message = "Parameter [" + param2->name +
-                               "] must NOT be used if parameter [" +
-                               param->name + "] equates to true.";
-              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
+              QString exclude = param->exclude[item];
+              if (exclude.contains('.')) {
+                exclude = exclude.split('.', Qt::SkipEmptyParts)[1].toUpper();
+                if (exclude == param2->values[0].toUpper()) {
+                  QString message = "Parameter [" + param2->name +
+                                  "] must NOT be used with option [" + exclude + "]"
+                                  " if parameter [" + param->name + "] equates to true.";
+                  throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
+                }
+              }
+              else {
+                QString message = "Parameter [" + param2->name +
+                  "] must NOT be used if parameter [" +
+                  param->name + "] equates to true.";
+                throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
+              }
             }
           }
         }
@@ -2914,7 +2926,7 @@ void IsisAml::VerifyAll() {
 
       // If this parameter has a value, and a list/option/include, make sure
       // the included parameter has a value
-      if(((param->values.size() > 0) || (param->defaultValues.size())) > 0) {
+      if ((param->values.size() > 0) || (param->defaultValues.size() > 0)) {
         for(unsigned int o2 = 0; o2 < param->listOptions.size(); o2++) {
           QString value, option;
           if(param->type == "string"  || param->type == "combo") {
