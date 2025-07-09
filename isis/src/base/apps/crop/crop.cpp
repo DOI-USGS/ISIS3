@@ -2,7 +2,7 @@
 
 #include "crop.h"
 
-using namespace std; 
+using namespace std;
 
 namespace Isis {
 
