@@ -415,6 +415,7 @@
         </inclusions>
         <exclusions>
           <item>G5P3</item>
+          <item>G5P4.2</item>
         </exclusions>
       </parameter>
 
@@ -453,6 +454,20 @@
           <item>G5P2</item>
         </exclusions>
       </parameter>
+
+      <parameter name="G5P4">
+        <type>integer</type>
+        <brief>Brief for parameter G5P4</brief>
+        <description>
+          Description for G5P4.
+        </description>
+        <list>
+          <option value="1">
+          </option>
+          <option value="2">
+          </option>
+        </list>
+      </parameter>
     </group>
 
     <group name="Group 6, boolean tests">
@@ -476,6 +491,7 @@
         </inclusions>
         <exclusions>
           <item>G6P2</item>
+          <item>G6P4.G6P4L0</item>
         </exclusions>
       </parameter>
 
@@ -497,12 +513,69 @@
           <item>100</item>
         </default>
       </parameter>
+
       <parameter name="G6P3">
         <type>string</type>
         <brief>Brief for parameter G6P3</brief>
         <description>
           Description for G6P3.
         </description>
+      </parameter>
+
+      <parameter name="G6P4">
+        <type>string</type>
+        <brief>Brief for parameter G6P4</brief>
+        <description>
+          Description for G6P4.
+        </description>
+        <list>
+          <option value="G6P4L0">
+            <brief>Brief for list item G6P4L0</brief>
+            <description>
+              Description for list item G6P4L0
+            </description>
+          </option>
+          <option value="G6P4L1">
+            <brief>Brief for list item G6P4L1</brief>
+            <description>
+              Description for list item G6P4L1
+            </description>
+          </option>
+          <option value="G6P4L2">
+            <brief>Brief for list item G6P4L2</brief>
+            <description>
+              Description for list item G6P4L2
+            </description>
+            <exclusions>
+              <item>G6P5.G6P5L0</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="G6P5">
+        <type>string</type>
+        <brief>Brief for parameter G6P5</brief>
+        <description>
+          Description for G6P5.
+        </description>
+        <internalDefault>
+          None
+        </internalDefault>
+        <list>
+          <option value="G6P5L0">
+            <brief>Brief for list item G6P5L0</brief>
+            <description>
+              Description for list item G6P5L0
+            </description>
+          </option>
+          <option value="G6P5L1">
+            <brief>Brief for list item G6P5L1</brief>
+            <description>
+              Description for list item G6P5L1
+            </description>
+          </option>
+        </list>
       </parameter>
     </group>
 

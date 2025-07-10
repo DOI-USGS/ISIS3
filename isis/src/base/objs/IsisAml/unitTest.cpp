@@ -652,6 +652,9 @@ int main(void) {
 
   aml->Clear("G5P3");
 
+  aml->Clear("G5P4");
+  aml->PutAsString("G5P4", "1");
+
   aml->Clear("G6P0");
   aml->PutAsString("G6P0", "yes");
 
@@ -662,6 +665,12 @@ int main(void) {
 
   aml->Clear("G6P3");
   aml->PutAsString("G6P3", "STRING2");
+
+  aml->Clear("G6P4");
+  aml->PutAsString("G6P4", "G6P4L1");
+
+  aml->Clear("G6P5");
+  aml->PutAsString("G6P5", "G6P5L1");
 
   aml->Clear("FROM");
   aml->PutAsString("FROM", "STRING3");
@@ -714,6 +723,59 @@ int main(void) {
   aml->PutAsString("G1P0", "G1P0L0");
 
   cout << "---------- Check for value in an option/list/excluded parameter ----------" << endl;
+  aml->Clear("G6P4");
+  aml->PutAsString("G6P4", "G6P4L0");
+  try { // PARAMETER CAN NOT BE ENTERED IF OTHER PARAMETER HAS PARTICULAR VALUE
+    aml->VerifyAll();
+  }
+  catch(IException &error) {
+    ReportError(error.toString());
+  }
+  aml->Clear("G6P4");
+
+  aml->Clear("G5P4");
+  aml->PutAsString("G5P4", "2");
+  try { // PARAMETER CAN NOT BE ENTERED IF OTHER PARAMETER HAS PARTICULAR VALUE
+    aml->VerifyAll();
+  }
+  catch(IException &error) {
+    ReportError(error.toString());
+  }
+  aml->Clear("G5P4");
+  aml->PutAsString("G5P4", "1");
+
+  aml->Clear("G6P4");
+  aml->PutAsString("G6P4", "G6P4L2");
+  aml->Clear("G6P5");
+  aml->PutAsString("G6P5", "G6P5L0");
+  try { // PARAMETER CAN NOT BE ENTERED IF OTHER PARAMETER HAS PARTICULAR VALUE
+    aml->VerifyAll();
+  }
+  catch(IException &error) {
+    ReportError(error.toString());
+  }
+
+  aml->Clear("G6P5");
+  aml->PutAsString("G6P5", "G6P5L1");
+  try { // PARAMETER CAN NOT BE ENTERED IF OTHER PARAMETER HAS PARTICULAR VALUE
+    aml->VerifyAll();
+  }
+  catch(IException &error) {
+    ReportError(error.toString());
+  }
+  aml->Clear("G6P4");
+  aml->Clear("G6P5");
+
+  aml->Clear("G6P4");
+  aml->PutAsString("G6P4", "G6P4L2");
+  try { // PARAMETER CAN NOT BE ENTERED IF OTHER PARAMETER HAS PARTICULAR VALUE
+    aml->VerifyAll();
+  }
+  catch(IException &error) {
+    ReportError(error.toString());
+  }
+
+  cout << "---------- Check for list value exclude in a parameter ----------" << endl;
   aml->PutAsString("G2P0", "0");
   try { // PARAMETER CAN NOT BE ENTERED IF OTHER PARAMETER HAS PARTICULAR VALUE
     aml->VerifyAll();

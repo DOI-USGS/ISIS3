@@ -627,6 +627,7 @@ Create the aml object
         [1] = G5P2
       Exclude parameters:
         [0] = G5P3
+        [1] = G5P4.2
       List data:
     parameter 1, name = G5P1
       type = integer
@@ -706,6 +707,36 @@ Create the aml object
         [1] = G5P1
         [2] = G5P2
       List data:
+    parameter 4, name = G5P4
+      type = integer
+      brief = Brief for parameter G5P4
+      description = Description for G5P4.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+        value [0] = 1
+        brief [0] = 
+        description [0] = 
+        value [1] = 2
+        brief [1] = 
+        description [1] = 
   group 6 name = Group 6, boolean tests
     parameter 0, name = G6P0
       type = boolean
@@ -737,6 +768,7 @@ Create the aml object
         [0] = G6P1
       Exclude parameters:
         [0] = G6P2
+        [1] = G6P4.G6P4L0
       List data:
     parameter 1, name = G6P1
       type = integer
@@ -811,6 +843,70 @@ Create the aml object
       Include parameters:
       Exclude parameters:
       List data:
+    parameter 4, name = G6P4
+      type = string
+      brief = Brief for parameter G6P4
+      description = Description for G6P4.
+      internal def = 
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+        value [0] = G6P4L0
+        brief [0] = Brief for list item G6P4L0
+        description [0] = Description for list item G6P4L0
+        value [1] = G6P4L1
+        brief [1] = Brief for list item G6P4L1
+        description [1] = Description for list item G6P4L1
+        value [2] = G6P4L2
+        brief [2] = Brief for list item G6P4L2
+        description [2] = Description for list item G6P4L2
+          exclude = G6P5.G6P5L0
+    parameter 5, name = G6P5
+      type = string
+      brief = Brief for parameter G6P5
+      description = Description for G6P5.
+      internal def = None
+      helpers = 0
+      count = 
+      minimum = 
+      minimum inclusive = 
+      maximum = 
+      maximum inclusive = 
+      filter = 
+      file mode = 
+      odd = 
+      Values:
+      Default Values:
+      Greater Than:
+      Greater or Equal Than:
+      Less Than:
+      Less Than or Equal:
+      Not equal to:
+      Include parameters:
+      Exclude parameters:
+      List data:
+        value [0] = G6P5L0
+        brief [0] = Brief for list item G6P5L0
+        description [0] = Description for list item G6P5L0
+        value [1] = G6P5L1
+        brief [1] = Brief for list item G6P5L1
+        description [1] = Description for list item G6P5L1
   group 7 name = Group 7, name search test
     parameter 0, name = FROM
       type = string
@@ -1265,6 +1361,26 @@ Parameter information:
       File Mode: 
       Helper Information:
       List Information:
+    Parameter number: 4
+      Name: G5P4
+      Type: integer
+      Brief: Brief for parameter G5P4
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+        Value: 1
+        Brief: 
+        Description: 
+        List exclusions: 
+        List inclusions: 
+        Value: 2
+        Brief: 
+        Description: 
+        List exclusions: 
+        List inclusions: 
   Group number: 6
   Group name : Group 6, boolean tests
     Parameter number: 0
@@ -1312,6 +1428,52 @@ Parameter information:
       File Mode: 
       Helper Information:
       List Information:
+    Parameter number: 4
+      Name: G6P4
+      Type: string
+      Brief: Brief for parameter G6P4
+      Default: 
+      Internal default: 
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+        Value: G6P4L0
+        Brief: Brief for list item G6P4L0
+        Description: Description for list item G6P4L0
+        List exclusions: 
+        List inclusions: 
+        Value: G6P4L1
+        Brief: Brief for list item G6P4L1
+        Description: Description for list item G6P4L1
+        List exclusions: 
+        List inclusions: 
+        Value: G6P4L2
+        Brief: Brief for list item G6P4L2
+        Description: Description for list item G6P4L2
+        List exclusions: 
+          Exclude parameter: G6P5.G6P5L0
+        List inclusions: 
+    Parameter number: 5
+      Name: G6P5
+      Type: string
+      Brief: Brief for parameter G6P5
+      Default: 
+      Internal default: None
+      Filter: 
+      File Mode: 
+      Helper Information:
+      List Information:
+        Value: G6P5L0
+        Brief: Brief for list item G6P5L0
+        Description: Description for list item G6P5L0
+        List exclusions: 
+        List inclusions: 
+        Value: G6P5L1
+        Brief: Brief for list item G6P5L1
+        Description: Description for list item G6P5L1
+        List exclusions: 
+        List inclusions: 
   Group number: 7
   Group name : Group 7, name search test
     Parameter number: 0
@@ -1528,10 +1690,13 @@ Group = UserParameters
   G5P0  = 9
   G5P1  = 10
   G5P2  = 11
+  G5P4  = 1
   G6P0  = yes
   G6P1  = 13
   G6P2  = 100
   G6P3  = STRING2
+  G6P4  = G6P4L1
+  G6P5  = G6P5L1
   FROM  = STRING3
   FROM1 = STRING4
   FR    = STRING4
@@ -1545,6 +1710,13 @@ End
 **USER ERROR** Parameter [G1P3] must be entered if parameter [G1P0] is equal to [G1P0L1X].
 
 ---------- Check for value in an option/list/excluded parameter ----------
+**USER ERROR** Parameter [G6P4] must NOT be used with option [G6P4L0] if parameter [G6P0] equates to true.
+
+**USER ERROR** Parameter [G5P4] must NOT be used with option [2] if parameter [G5P0] is used.
+
+**USER ERROR** Parameter [G6P5] can not be be used with option [G6P5L0] if parameter [G6P4] is equal to [G6P5L0].
+
+---------- Check for list value exclude in a parameter ----------
 **USER ERROR** Parameter [G2P0] can not be entered if parameter [G1P0] is equal to [G1P0L0].
 
 ---------- Check error for unknown parameter ----------
