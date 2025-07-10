@@ -23,6 +23,7 @@ dependencies:
   - geos=3.7.1
   - geotiff
   - gmp
+  - gcovr
   - graphviz
   - gsl
   - hdf5

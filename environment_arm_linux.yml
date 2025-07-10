@@ -24,6 +24,7 @@ dependencies:
   - geotiff
   - gdal >=3.7,<3.9
   - gmp
+  - gcovr
   - graphviz
   - conda-forge::gsl >=2.6, <2.7
   - hdf5
