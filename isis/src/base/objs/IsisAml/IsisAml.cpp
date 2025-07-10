@@ -2866,7 +2866,8 @@ void IsisAml::VerifyAll() {
       }
 
       // If this parameter has a value, and a list/option/exclude, make sure
-      // the excluded parameter has NO value
+      // the excluded parameter has NO value or is not set to an excluded 
+      // value
       if(((param->values.size() > 0) || (param->defaultValues.size())) > 0) {
         for(unsigned int o2 = 0; o2 < param->listOptions.size(); o2++) {
           QString value, option;
@@ -2884,14 +2885,29 @@ void IsisAml::VerifyAll() {
           }
           if(value == option) {
             for(unsigned int e2 = 0; e2 < param->listOptions[o2].exclude.size(); e2++) {
-              const IsisParameterData *param2 =
-                ReturnParam(param->listOptions[o2].exclude[e2]);
-              if(param2->values.size() > 0) {
-                QString message = "Parameter [" + param2->name +
-                                 "] can not be entered if parameter [" +
-                                 param->name + "] is equal to [" +
-                                 value + "]";
-                throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
+              const IsisParameterData *param2 = nullptr;
+              QString exclude = param->listOptions[o2].exclude[e2];
+              if (exclude.contains('.')) {
+                QStringList splitList = exclude.split('.', Qt::SkipEmptyParts);
+                param2 = ReturnParam(splitList[0]);
+                exclude = splitList[1].toUpper();
+                if (exclude == param2->values[0].toUpper()) {
+                  QString message = "Parameter [" + param2->name +
+                                    "] can not be be used with option [" + exclude + "] "
+                                    "if parameter [" +param->name + "] is equal to [" +
+                                    exclude + "]";
+                  throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
+                }
+              }
+              else {
+                param2 = ReturnParam(exclude);
+                if(param2->values.size() > 0) {
+                  QString message = "Parameter [" + param2->name +
+                                    "] can not be entered if parameter [" +
+                                    param->name + "] is equal to [" +
+                                    value + "]";
+                  throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
+                }
               }
             }
           }
