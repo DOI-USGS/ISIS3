@@ -50,6 +50,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Added ShowDeprecated option to show or hide warnings in IsisPreferences. [#5611](https://github.com/DOI-USGS/ISIS3/issues/5611)
 - Added SpiceQL integration to replace cspice calls. [#5545](https://github.com/DOI-USGS/ISIS3/pull/5545)
 - Added initial `eisstitch` app [#5591](https://github.com/DOI-USGS/ISIS3/pull/5591)
+- Added the ability to disable individual options for parameters in ISIS GUIs [#5849](https://github.com/DOI-USGS/ISIS3/pull/5849)
 
 ### Changed
 - Removed Arm dependency on xalan-c, as it does not build for now on conda-forge. This requires turning off doc building on Arm. Also changed some variables to avoid name clashes on Arm with clang 16. [#5802](https://github.com/DOI-USGS/ISIS3/pull/5802)
