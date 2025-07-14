@@ -340,7 +340,7 @@
               This helper button will cat out the mapping group of the given mapfile to the session log
                of the application
              </description>
-	     <icon>$ISISROOT/appdata/images/icons/labels.png</icon>
+	          <icon>$ISISROOT/appdata/images/icons/labels.png</icon>
           </helper>
         </helpers>
         <filter>
@@ -387,6 +387,9 @@
         <default><item>false</item></default>
         <exclusions>
           <item>MAP</item>
+          <item>PIXRES.MAP</item>
+          <item>DEFAULTRANGE.MAP</item>
+          <item>MATCHMAP</item>
         </exclusions>
         <inclusions>
           <item>PROJString</item>
@@ -419,7 +422,7 @@
             <function>LoadCameraRes</function>
             <brief>Load Camera Resolution </brief>
             <description>This helper button will load the default resolution from the camera</description>
-	    <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
+	          <icon>$ISISROOT/appdata/images/icons/exec.png</icon>
           </helper>
           <helper name="H2">
             <function>LoadMapRes</function>
@@ -428,45 +431,45 @@
           </helper>
         </helpers>
         <list>
-           <option value="CAMERA">
-              <brief>Compute resolution from input cube</brief>
-              <description>
-                This option will automatically determine the resolution from the input cube specified using the FROM parameter.
-              </description>
-              <exclusions>
-                <item>RESOLUTION</item>
-              </exclusions>
-            </option>
+          <option value="CAMERA">
+            <brief>Compute resolution from input cube</brief>
+            <description>
+              This option will automatically determine the resolution from the input cube specified using the FROM parameter.
+            </description>
+            <exclusions>
+              <item>RESOLUTION</item>
+            </exclusions>
+          </option>
 
-           <option value="MAP">
-              <brief>Read resolution from input map file</brief>
-              <description>
-                This option will use either the PixelResolution (meters/pixel) or Scale (pixels/degree) in the map file.
-              </description>
-              <exclusions>
-                <item>RESOLUTION</item>
-              </exclusions>
-            </option>
+          <option value="MAP">
+            <brief>Read resolution from input map file</brief>
+            <description>
+              This option will use either the PixelResolution (meters/pixel) or Scale (pixels/degree) in the map file.
+            </description>
+            <exclusions>
+              <item>RESOLUTION</item>
+            </exclusions>
+          </option>
 
-           <option value="MPP">
-              <brief> Get resolution from user in meters per pixel</brief>
-              <description>
-                This option allows the user to specify the resolution in meters per pixel using the RESOLUTION parameter
-              </description>
-              <inclusions>
-                <item>RESOLUTION</item>
-              </inclusions>
-            </option>
+          <option value="MPP">
+            <brief> Get resolution from user in meters per pixel</brief>
+            <description>
+              This option allows the user to specify the resolution in meters per pixel using the RESOLUTION parameter
+            </description>
+            <inclusions>
+              <item>RESOLUTION</item>
+            </inclusions>
+          </option>
 
-           <option value="PPD">
-              <brief> Get resolution from user in pixels per degree</brief>
-              <description>
-                This option allows the user to specify the resolution in pixels per degree using the RESOLUTION parameter
-              </description>
-              <inclusions>
-                <item>RESOLUTION</item>
-              </inclusions>
-            </option>
+          <option value="PPD">
+            <brief> Get resolution from user in pixels per degree</brief>
+            <description>
+              This option allows the user to specify the resolution in pixels per degree using the RESOLUTION parameter
+            </description>
+            <inclusions>
+              <item>RESOLUTION</item>
+            </inclusions>
+          </option>
         </list>
       </parameter>
 
