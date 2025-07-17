@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          ref: 9.0
+          ref: '9.0'
       - name: Cherry Pick
         run: echo "TODO Cherry Pick" # git cherry-pick -m 1 ${{ secrets.GITHUB_SHA }}
       - name: Setup conda
