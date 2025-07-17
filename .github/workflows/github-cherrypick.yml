@@ -6,7 +6,7 @@ env:
 on:
   push:
     branches:
-      - dev
+      - ci-test-target
 jobs:
 
   # Check if the PR is a bugfix/feature
@@ -65,4 +65,4 @@ jobs:
           which cmake
           ls
 
-      
+
