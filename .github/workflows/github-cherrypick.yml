@@ -68,10 +68,9 @@ jobs:
           activate-environment: isis
           environment-file: environment.yml
           auto-activate-base: true
-      - name: Set Variables
+      - name: Check Environment (Debug)
         env: 
           ISISROOT: ${{ GITHUB_WORKSPACE }}/build
-      - name: Check Environment (Debug)
         run: |
           echo "Conda Env"
           conda info --envs
