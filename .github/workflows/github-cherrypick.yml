@@ -97,7 +97,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -GNinja -DJP2KFLAG=ON ../isis
+          cmake -GNinja -DJP2KFLAG=OFF ../isis
           ninja -j8
       - name: Push to LTS branch
         run: |
