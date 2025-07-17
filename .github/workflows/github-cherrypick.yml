@@ -63,8 +63,12 @@ jobs:
         with:
           submodules: recursive
           ref: '9.0.0_Prod' # This branch must exist in the repo
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Cherry Pick
-        run: echo "TODO Cherry Pick" # git cherry-pick -m 1 ${{ secrets.GITHUB_SHA }}
+        run: git cherry-pick -m 1 ${{ secrets.GITHUB_SHA }}
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
@@ -75,22 +79,25 @@ jobs:
         env: 
           ISISROOT: ${{ github.workspace }}/build
         run: |
-          echo "Conda Env"
+          echo "--- Conda Env"
           conda info --envs
-          echo "cmake Location (Should be in isis conda env)"
+          echo "--- cmake Location (Should be in isis conda env)"
           which cmake
-          echo "Working Directory"
+          cmake --version
+          echo "--- Working Directory"
           pwd
-          echo "Files"
+          echo "--- Files"
           ls
-          echo "ISISROOT"
+          echo "--- ISISROOT"
           echo $ISISROOT
       - name: Build ISIS
         run: |
           mkdir build
           cd build
-          # TODO cmake -GNinja -DJP2KFLAG=ON ../isis
-          # TODO ninja -j8
+          cmake -GNinja -DJP2KFLAG=ON ../isis
+          ninja -j8
       - name: Push to LTS branch
-        run: echo "TODO Push to LTS branch if successful"
+        run: |
+          git commit -m "Auto cherry-pick"
+          git push
 
