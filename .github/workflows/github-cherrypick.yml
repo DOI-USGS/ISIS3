@@ -49,6 +49,9 @@ jobs:
     # Only run this step if the code was a bugfix
     if: contains(needs.check_labels.outputs.result, 'bugfix_')
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -59,10 +62,21 @@ jobs:
           environment-file: environment.yml
           auto-activate-base: true
 
-      - name: CD Tests
+      - name: check active conda repo
+        run: conda info --envs
+      - name: check cmake binary location
+        run: which cmake
+      - name: ls the working directory
+        run: ls
+      - name: Build ISIS
         run: |
-          echo $CONDA_DEFAULT_ENV
-          which cmake
-          ls
-
+          echo "TODO"
+          echo "checkout a branch based on 9.0"
+          echo "cherrypick to the branch"
+          echo "mkdir build"
+          echo "cd build"
+          echo "cmake -j8 ..."
+          echo "ninja install -j8 ..."
+          echo "if Build succeeds:"
+          echo "push to 9.0.0_Prod"
 
