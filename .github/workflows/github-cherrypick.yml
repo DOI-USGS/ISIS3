@@ -19,18 +19,21 @@ jobs:
     outputs: 
       result: ${{steps.execute_py_script.outputs.result}}
     steps:
-    - name: checkout repo content
-      uses: actions/checkout@v2 # checkout the repository content
-    - name: setup python
+    - name: Checkout files (only the PR Label Checker)
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: 
+          .github/pr_label_checker.py
+        sparse-checkout-cone-mode: false
+    - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
         cache: 'pip'
-    - name: install python packages
       run: |
         python -m pip install --upgrade pip
         pip install -r ./.github/requirements.txt
-    - name: Set output
+    - name: Output Result
       id: execute_py_script
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -39,9 +42,7 @@ jobs:
         GITHUB_SHA: ${{ secrets.GITHUB_SHA }}
       run: |
         echo "result=$(python ./.github/pr_label_checker.py)" >> "$GITHUB_OUTPUT"
-    # Print the result to the log
-    - name: See result
-      run: echo "${{ steps.execute_py_script.outputs.result }}"
+        echo "${{ steps.execute_py_script.outputs.result }}"
 
 
   build-lts:
@@ -51,32 +52,42 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        shell: bash -l {0}
+        shell: bash -l {0} # bash login mode so conda can auto activate isis env
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ref: 9.0
+      - name: Cherry Pick
+        run: echo "TODO Cherry Pick" # git cherry-pick -m 1 ${{ secrets.GITHUB_SHA }}
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: isis
           environment-file: environment.yml
           auto-activate-base: true
-
-      - name: check active conda repo
-        run: conda info --envs
-      - name: check cmake binary location
-        run: which cmake
-      - name: ls the working directory
-        run: ls
+      - name: Set Variables
+        env: 
+          ISISROOT: ${{ GITHUB_WORKSPACE }}/build
+      - name: Check Environment (Debug)
+        run: |
+          echo "Conda Env"
+          conda info --envs
+          echo "cmake Location (Should be in isis conda env)"
+          which cmake
+          echo "Working Directory"
+          pwd
+          echo "Files"
+          ls
+          echo "ISISROOT"
+          echo $ISISROOT
       - name: Build ISIS
         run: |
-          echo "TODO"
-          echo "checkout a branch based on 9.0"
-          echo "cherrypick to the branch"
-          echo "mkdir build"
-          echo "cd build"
-          echo "cmake -j8 ..."
-          echo "ninja install -j8 ..."
-          echo "if Build succeeds:"
-          echo "push to 9.0.0_Prod"
+          mkdir build
+          cd build
+          # TODO cmake -GNinja -DJP2KFLAG=ON ../isis
+          # TODO ninja -j8
+      - name: Push to LTS branch
+        run: echo "TODO Push to LTS branch if successful"
 
