@@ -75,9 +75,11 @@ jobs:
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
+          miniconda-version: "latest"
           activate-environment: isis
           environment-file: environment.yml
-          auto-activate-base: true
+          auto-activate-base: false
+          auto-update-conda: true
       - name: Check Environment (Debug)
         env: 
           ISISROOT: ${{ github.workspace }}/build
