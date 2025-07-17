@@ -25,8 +25,9 @@ jobs:
         sparse-checkout: |
           .github/pr_label_checker.py
           .github/requirements.txt
+        sparse-checkout-cone-mode: false
     - name: List files in current Directory
-      run: ls
+      run: ls .github
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
