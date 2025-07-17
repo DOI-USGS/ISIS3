@@ -24,6 +24,7 @@ jobs:
       with:
         sparse-checkout: 
           .github/pr_label_checker.py
+          .github/requirements.txt
         sparse-checkout-cone-mode: false
     - name: Setup Python
       uses: actions/setup-python@v4
