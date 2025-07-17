@@ -22,7 +22,7 @@ jobs:
     - name: Checkout files (only the PR Label Checker)
       uses: actions/checkout@v4
       with:
-        sparse-checkout: 
+        sparse-checkout: |
           .github/pr_label_checker.py
           .github/requirements.txt
         sparse-checkout-cone-mode: false
