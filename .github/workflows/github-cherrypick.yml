@@ -68,7 +68,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Cherry Pick
-        run: git cherry-pick -m 1 ${{ secrets.GITHUB_SHA }}
+        env: 
+          GITHUB_SHA: ${{ secrets.GITHUB_SHA }}
+        run: git cherry-pick -m 1 $GITHUB_SHA
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
