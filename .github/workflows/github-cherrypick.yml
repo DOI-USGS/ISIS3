@@ -57,7 +57,7 @@ jobs:
         with:
           activate-environment: isis
           environment-file: environment.yml
-          auto-activate-base: false
+          auto-activate-base: true
 
       - name: CD Tests
         run: |
