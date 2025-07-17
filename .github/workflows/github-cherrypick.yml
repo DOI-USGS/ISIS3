@@ -70,7 +70,7 @@ jobs:
           auto-activate-base: true
       - name: Check Environment (Debug)
         env: 
-          ISISROOT: ${{ GITHUB_WORKSPACE }}/build
+          ISISROOT: ${{ github.workspace }}/build
         run: |
           echo "Conda Env"
           conda info --envs
