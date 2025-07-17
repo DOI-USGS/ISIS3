@@ -1136,9 +1136,9 @@
           <parameterName>TO</parameterName>
         </image>
       </outputImages>
-      </example>
+    </example>
 
-      <example>
+    <example>
       <brief> The following four examples illustrate the effects of the TRIM option </brief>
         <description>
           In the GUI below, <i>cam2map</i> is set up to project the input (level1) image to a (level2)
@@ -1179,8 +1179,9 @@
           <parameterName>TO</parameterName>
         </image>
       </outputImages>
-      </example>
-      <example>
+    </example>
+
+    <example>
       <brief> The following example illustrates what happens to the same data set with TRIM=YES  </brief>
         <description>
             This <i>cam2map</i> GUI  is set up to trim the image to a specific latitude and longitude
@@ -1219,9 +1220,9 @@
           <parameterName>TO</parameterName>
         </image>
       </outputImages>
-      </example>
+    </example>
 
-      <example>
+    <example>
       <brief> Potential anomalies using Sinusoidal projections </brief>
         <description>
             Below is a Cassini ISS wide-angle image of Enceladus, in sinusoidal projection. It illustrates the
@@ -1274,9 +1275,9 @@
           <parameterName>TO</parameterName>
         </image>
       </outputImages>
-      </example>
+    </example>
 
-      <example>
+    <example>
       <brief> Solution for anomalies using Sinusoidal projections </brief>
         <description>
             Below is the same Cassini ISS wide-angle image of Enceladus used in Example #7. The GUI
@@ -1326,7 +1327,49 @@
           <parameterName>TO</parameterName>
         </image>
       </outputImages>
-      </example>
+    </example>
+
+    <example>
+      <brief> Using PROJ fpr projections </brief>
+        <description>
+            Below is an example of an image projected using a <a href="https://proj.org/en/stable/usage/quickstart.html">
+            proj-string</a> in cam2map.
+        </description>
+      <terminalInterface>
+        <commandLine>
+          from=B10_013341_1010_XN_79S172W.cal.crop.cub to=B10_013341_1010_XN_79S172W.cal.crop.ext_proj.cub useproj=yes projstring="+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=3396190
+          +b=3396190  +units=m +no_defs +type=crs"
+        </commandLine>
+        <description>
+          The command used to project the level1 image to a simple cylindrical projection using PROJ.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/CAM2MAP_USEPROJ_GUI.jpeg" width="640" height="1140">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Entire <i>cam2map</i> GUI with parameters filled in for FROM file, TO
+              file, projstring, default PIXRES, Output Map Ground Range set to the CAMERA
+              of the input cube, and USEPROJ=YES. The rest of the parameters are all set to the defaults.
+            </description>
+            <thumbnail src="assets/thumbs/CAM2MAP_USEPROJ_GUI_thumb.jpeg" width="200" height="500" caption="USEPROJ=YES GUI "/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <outputImages>
+        <image src="assets/images/CAM2MAP_USEPROJ_OUT.jpeg" width="496" height="496">
+          <brief> Output image for cam2map USEPROJ=YES</brief>
+          <description> This is the output of the cam2map Sinusoidal projection
+            with TRIM turned on.
+          </description>
+          <thumbnail caption="USEPROJ=YES output" src="assets/thumbs/CAM2MAP_USEPROJ_OUT_thumb.jpeg " width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
 
    </examples>
 </application>
