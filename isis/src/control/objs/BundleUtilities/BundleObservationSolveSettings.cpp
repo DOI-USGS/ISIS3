@@ -1282,9 +1282,6 @@ namespace Isis {
         if (!numberCoefSolved.isEmpty()) {
           m_numberCamAngleCoefSolved = numberCoefSolved.toInt();
         }
-        else {
-          m_numberCamAngleCoefSolved = 0;
-        }
         QStringRef degree = xmlReader->attributes().value("degree");
         if (!degree.isEmpty()) {
           m_ckDegree = degree.toInt();
@@ -1312,22 +1309,25 @@ namespace Isis {
         }
         while (xmlReader->readNextStartElement()) {
           if (xmlReader->qualifiedName() == "aprioriPointingSigmas") {
-            m_anglesAprioriSigma.clear();
+            QList<double> anglesAprioriSigma;
             while (xmlReader->readNextStartElement()) {
               if (xmlReader->qualifiedName() == "sigma") {
                 QString sigma = xmlReader->readElementText();
                 if (!sigma.isEmpty()){
                   if (sigma == "N/A") {
-                    m_anglesAprioriSigma.append(Isis::Null);
+                    anglesAprioriSigma.append(Isis::Null);
                   }
                   else {
-                    m_anglesAprioriSigma.append(sigma.toDouble()); 
+                    anglesAprioriSigma.append(sigma.toDouble()); 
                   } 
                 }      
               }
               else {
                 xmlReader->skipCurrentElement();
               }
+            }
+            if (anglesAprioriSigma.size() > 0) {
+              m_anglesAprioriSigma = anglesAprioriSigma;
             }
           }
           else {
@@ -1343,9 +1343,6 @@ namespace Isis {
         QStringRef numberCoefSolved = xmlReader->attributes().value("numberCoefSolved");
         if (!numberCoefSolved.isEmpty()) {
           m_numberCamPosCoefSolved = numberCoefSolved.toInt();
-        }
-        else {
-          m_numberCamPosCoefSolved = 0;
         }
         QStringRef degree = xmlReader->attributes().value("degree");
         if (!degree.isEmpty()) {
@@ -1370,23 +1367,26 @@ namespace Isis {
         }
         while (xmlReader->readNextStartElement()) {
           if (xmlReader->qualifiedName() == "aprioriPositionSigmas") {
-            m_positionAprioriSigma.clear();
+            QList<double> positionAprioriSigma;
             while (xmlReader->readNextStartElement()) {
               if (xmlReader->qualifiedName() == "sigma") {
                 QString sigma = xmlReader->readElementText();
                 if (!sigma.isEmpty()){
                   if (sigma == "N/A") {
-                    m_positionAprioriSigma.append(Isis::Null);
+                    positionAprioriSigma.append(Isis::Null);
                     
                   }
                   else {
-                    m_positionAprioriSigma.append(sigma.toDouble());
+                    positionAprioriSigma.append(sigma.toDouble());
                   }  
                 }
               }
               else {
                 xmlReader->skipCurrentElement();
               }
+            }
+            if (positionAprioriSigma.size() > 0) {
+              m_positionAprioriSigma = positionAprioriSigma;
             }
           }
           else {
