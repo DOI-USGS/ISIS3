@@ -676,7 +676,7 @@ namespace Isis {
 
             std::vector<double> etStartVec = {etStart};
             std::vector<std::string> kernels_to_use = {"/moon/tspk/moon_pa_de421_1900-2050.bpc", "/lro/tspk/de421.bsp", "/base/pck/pck[0-9]{5}.tpc", "/moon/pck/moon_080317.tf", "/moon/pck/moon_assoc_me.tf"};
-            auto [sunLt, kernels] = SpiceQL::getTargetStates(etStartVec, "sun", "moon", "MOON_ME", "LT+S", "lroc", {"reconstructed"}, {"reconstructed"}, useWeb, true, kernels_to_use);
+            auto [sunLt, kernels] = SpiceQL::getTargetStates(etStartVec, "sun", "moon", "MOON_ME", "LT+S", "lroc", {"reconstructed"}, {"reconstructed"}, useWeb, true, false, true, kernels_to_use);
             std::copy(sunLt[0].begin(), sunLt[0].begin()+6, sunpos);
 
             g_solarDistance = vnorm_c(sunpos) / KM_PER_AU;

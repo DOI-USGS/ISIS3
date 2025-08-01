@@ -353,7 +353,8 @@ namespace Isis {
         QString name = (*gp)[i].name();
         // These three keywords have 3 values, so they must have 3 NULLs
         if (name == "BodyFixedCoordinate" || name == "SpacecraftPosition" ||
-            name == "SunPosition") {
+            name == "SunPosition" || name == "LookDirectionJ2000" || 
+            name == "LookDirectionBodyFixed" || name == "LookDirectionCamera") {
           (*gp)[i].addValue("NULL");
           (*gp)[i].addValue("NULL");
           (*gp)[i].addValue("NULL");
@@ -362,16 +363,18 @@ namespace Isis {
           (*gp)[i].setValue("NULL");
         }
       }
-      if (!allowErrors) {
+      if (allowErrors) {
         double spB[3], sB[3];
 
         m_camera->instrumentPosition(spB);
+        gp->findKeyword("SpacecraftPosition").clear();
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[0]), "km");
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[1]), "km");
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[2]), "km");
 
         try {
           m_camera->sunPosition(sB);
+          gp->findKeyword("SunPosition").clear();
           gp->findKeyword("SunPosition").addValue(toString(sB[0]), "km");
           gp->findKeyword("SunPosition").addValue(toString(sB[1]), "km");
           gp->findKeyword("SunPosition").addValue(toString(sB[2]), "km");
@@ -383,12 +386,14 @@ namespace Isis {
         }
 
         std::vector<double>lookB = m_camera->lookDirectionBodyFixed();
+        gp->findKeyword("LookDirectionBodyFixed").clear();
         gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[0]), "DEGREE");
         gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[1]), "DEGREE");
         gp->findKeyword("LookDirectionBodyFixed").addValue(toString(lookB[2]), "DEGREE");
 
         try {
           std::vector<double>lookJ = m_camera->lookDirectionJ2000();
+          gp->findKeyword("LookDirectionJ2000").clear();
           gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[0]), "DEGREE");
           gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[1]), "DEGREE");
           gp->findKeyword("LookDirectionJ2000").addValue(toString(lookJ[2]), "DEGREE");
@@ -402,6 +407,7 @@ namespace Isis {
         try {
           double lookC[3];
           m_camera->LookDirection(lookC);
+          gp->findKeyword("LookDirectionCamera").clear();
           gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[0]), "DEGREE");
           gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[1]), "DEGREE");
           gp->findKeyword("LookDirectionCamera").addValue(toString(lookC[2]), "DEGREE");

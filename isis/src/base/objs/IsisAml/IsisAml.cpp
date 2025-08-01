@@ -2150,7 +2150,7 @@ Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const QString &paramName)
  * @throws iException::User (Unknown Parameter)
  */
 const IsisParameterData *IsisAml::ReturnParam(const QString &paramName) const {
-  Isis::IString pn = paramName;
+  Isis::IString pn = paramName.split('.', Qt::SkipEmptyParts)[0];
   pn.UpCase();
   int found = 0;
   bool exact = false;
@@ -2581,99 +2581,85 @@ void IsisAml::VerifyAll() {
 
       // Check the values for inclusive clauses
       for(unsigned int item = 0; item < param->include.size(); item++) {
-        // If this parameter is a boolean and it is true/yes
-        // all included parameters must have some type of value
-        if(param->type == "boolean") {
-          if(((param->values.size() > 0) && StringToBool(param->values[0])) ||
-              ((param->values.size() == 0) && (param->defaultValues.size() > 0)
-               && StringToBool(param->defaultValues[0]))) {
-
-            const IsisParameterData *param2 = ReturnParam(param->include[item]);
-            if((param2->values.size()) == 0 &&
-                (param2->defaultValues.size() == 0) &&
-                (param2->internalDefault.size() == 0)) {
-              QString message = "Parameter [" + param2->name +
-                               "] must be used if parameter [" +
-                               param->name + "] equates to true.";
-              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
-            }
+        bool paramOneSet = false;
+        try {
+          QString parameterValue = GetAsString(param->name);
+          paramOneSet = true;
+          if (param->type == "boolean") {
+            paramOneSet = Isis::toBool(parameterValue);
           }
         }
-        // This parameter is NOT a boolean but the other one might be
-        else {
-          // If the other parameter is a boolean and it is true/yes
-          // then this parameter must have some type of value
-          const IsisParameterData *param2 = ReturnParam(param->include[item]);
-          if(param2->type == "boolean") {
-            if(((param2->values.size() > 0) && StringToBool(param2->values[0])) ||
-                ((param2->values.size() == 0) && (param2->defaultValues.size() > 0) &&
-                 StringToBool(param2->defaultValues[0]))) {
-              if((param->values.size()) == 0 &&
-                  (param->defaultValues.size() == 0) &&
-                  (param->internalDefault.size() == 0)) {
-                QString message = "Parameter [" + param2->name +
-                                 "] must be used if parameter [" +
-                                 param->name + "] is used.";
-                throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
-              }
-            }
+        catch (Isis::IException &e) {
+          if (param->internalDefault.size() > 0) {
+            paramOneSet = true;
           }
-          // Neithter parameter is a boolean so
-          // If this one has a value the other parameter must have some type of value
-          else {
-            if(param->values.size() > 0 &&
-                param2->values.size() == 0 &&
-                param2->defaultValues.size() == 0 &&
-                param2->internalDefault.size() == 0) {
-              QString message = "Parameter [" + param2->name +
-                               "] must be used if parameter [" +
-                               param->name + "] is used.";
-              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
-            }
+        }
+
+        const IsisParameterData *param2 = ReturnParam(param->include[item]);
+        bool paramTwoSet = false;
+        try {
+          QString parameterValue = GetAsString(param2->name);
+          paramTwoSet = true;
+        }
+        catch (Isis::IException &e) {
+          if (param2->internalDefault.size() > 0) {
+            paramTwoSet = true;
           }
+        }
+
+        if (paramOneSet && !paramTwoSet) {
+          QString messageEnd = "is used.";
+          if (param->type == "boolean") {
+            messageEnd = "equates to true.";
+          }
+          QString message = "Parameter [" + param2->name +
+                            "] must be used if parameter [" +
+                            param->name + "] " + messageEnd;
+          throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
         }
       }
+
       // Check the values for exclusive clauses
       for(unsigned int item = 0; item < param->exclude.size(); item++) {
-        // If this parameter is a boolean that is true/yes
-        // the other parameter should not have a value
-        if(param->type == "boolean") {
-          if(((param->values.size() > 0) && StringToBool(param->values[0])) ||
-              ((param->values.size() == 0) && (param->defaultValues.size() > 0) &&
-               StringToBool(param->defaultValues[0]))) {
-
-            const IsisParameterData *param2 = ReturnParam(param->exclude[item]);
-            if(param2->values.size() > 0) {
-              QString message = "Parameter [" + param2->name +
-                               "] must NOT be used if parameter [" +
-                               param->name + "] equates to true.";
-              throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
-            }
+        bool paramOneSet = false;
+        try {
+          paramOneSet = WasEntered(param->name);
+          if (param->type == "boolean") {
+            paramOneSet = GetBoolean(param->name);
           }
         }
-        // This parameter is NOT a boolean but the other one might be
-        else {
-          const IsisParameterData *param2 = ReturnParam(param->exclude[item]);
-          if(param2->type == "boolean") {
-            if(((param2->values.size() > 0) && StringToBool(param2->values[0])) ||
-                ((param2->values.size() == 0) && (param2->defaultValues.size() > 0) &&
-                 StringToBool(param2->defaultValues[0]))) {
-              if(param->values.size() > 0) {
-                QString message = "Parameter [" + param2->name +
-                                 "] must be used if parameter [" +
-                                 param->name + "] is used.";
-                throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
-              }
-            }
+        catch (Isis::IException &e) {}
+
+        const IsisParameterData *param2 = ReturnParam(param->exclude[item]);
+        bool paramTwoSet = false;
+        try {
+          paramTwoSet = WasEntered(param2->name);
+          if (param2->type == "boolean") {
+            paramTwoSet = GetBoolean(param2->name);
           }
-          // Neither parameter is a boolean
-          else {
-            if(param->values.size() > 0 && param2->values.size() > 0) {
+        }
+        catch (Isis::IException &e) {}
+
+        if (paramOneSet && paramTwoSet) {
+          QString messageEnd = "is used.";
+          if (param->type == "boolean") {
+            messageEnd = "equates to true.";
+          }
+          QString exclude = param->exclude[item];
+          if (exclude.contains('.')) {
+            exclude = exclude.split('.', Qt::SkipEmptyParts)[1].toUpper();
+            if (exclude == param2->values[0].toUpper()) {
               QString message = "Parameter [" + param2->name +
-                               "] must NOT be used if parameter [" +
-                               param->name + "] is used.";
+                                "] must NOT be used with option [" + exclude + "]"
+                                " if parameter [" + param->name + "] " + messageEnd;
               throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
             }
+          }
+          else {
+            QString message = "Parameter [" + param2->name +
+                              "] must NOT be used if parameter [" +
+                              param->name + "] " + messageEnd;;
+            throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
           }
         }
       }
@@ -2880,7 +2866,8 @@ void IsisAml::VerifyAll() {
       }
 
       // If this parameter has a value, and a list/option/exclude, make sure
-      // the excluded parameter has NO value
+      // the excluded parameter has NO value or is not set to an excluded 
+      // value
       if(((param->values.size() > 0) || (param->defaultValues.size())) > 0) {
         for(unsigned int o2 = 0; o2 < param->listOptions.size(); o2++) {
           QString value, option;
@@ -2898,14 +2885,29 @@ void IsisAml::VerifyAll() {
           }
           if(value == option) {
             for(unsigned int e2 = 0; e2 < param->listOptions[o2].exclude.size(); e2++) {
-              const IsisParameterData *param2 =
-                ReturnParam(param->listOptions[o2].exclude[e2]);
-              if(param2->values.size() > 0) {
-                QString message = "Parameter [" + param2->name +
-                                 "] can not be entered if parameter [" +
-                                 param->name + "] is equal to [" +
-                                 value + "]";
-                throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
+              const IsisParameterData *param2 = nullptr;
+              QString exclude = param->listOptions[o2].exclude[e2];
+              if (exclude.contains('.')) {
+                QStringList splitList = exclude.split('.', Qt::SkipEmptyParts);
+                param2 = ReturnParam(splitList[0]);
+                exclude = splitList[1].toUpper();
+                if (exclude == param2->values[0].toUpper()) {
+                  QString message = "Parameter [" + param2->name +
+                                    "] can not be be used with option [" + exclude + "] "
+                                    "if parameter [" +param->name + "] is equal to [" +
+                                    exclude + "]";
+                  throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
+                }
+              }
+              else {
+                param2 = ReturnParam(exclude);
+                if(param2->values.size() > 0) {
+                  QString message = "Parameter [" + param2->name +
+                                    "] can not be entered if parameter [" +
+                                    param->name + "] is equal to [" +
+                                    value + "]";
+                  throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
+                }
               }
             }
           }
@@ -2914,7 +2916,7 @@ void IsisAml::VerifyAll() {
 
       // If this parameter has a value, and a list/option/include, make sure
       // the included parameter has a value
-      if(((param->values.size() > 0) || (param->defaultValues.size())) > 0) {
+      if ((param->values.size() > 0) || (param->defaultValues.size() > 0)) {
         for(unsigned int o2 = 0; o2 < param->listOptions.size(); o2++) {
           QString value, option;
           if(param->type == "string"  || param->type == "combo") {
@@ -3002,7 +3004,7 @@ void IsisAml::VerifyAll() {
         }
 
         // See if this parameter excludes any other (this implies the other
-        // one also excludes this one too
+        // one also excludes this one too)
         for(unsigned int item = 0; item < param->exclude.size(); item++) {
           const IsisParameterData *param2 = ReturnParam(param->exclude[item]);
           if((param2->values.size() != 0) ||

@@ -50,6 +50,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Added ShowDeprecated option to show or hide warnings in IsisPreferences. [#5611](https://github.com/DOI-USGS/ISIS3/issues/5611)
 - Added SpiceQL integration to replace cspice calls. [#5545](https://github.com/DOI-USGS/ISIS3/pull/5545)
 - Added initial `eisstitch` app [#5591](https://github.com/DOI-USGS/ISIS3/pull/5591)
+- Added the ability to disable individual options for parameters in ISIS GUIs [#5849](https://github.com/DOI-USGS/ISIS3/pull/5849)
 - Added PAD or SHRINK options to crop for crops that extend beyond the source image [#5843](https://github.com/DOI-USGS/ISIS3/pull/5843)
 
 ### Changed
@@ -58,6 +59,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Enhanced csminit by removing the need to specify model and plugin [#5585](https://github.com/DOI-USGS/ISIS3/issues/5585)
 - Changed file format to propagate from the input image format to the output image format [#5737](https://github.com/DOI-USGS/ISIS3/pull/5737)
 - Changed `StripPolygonSeeder` and `GridPolygonSeeder` to seed individual polygons within each images multipolygon footprint [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
+- Pinned SpiceQL to 1.2.0 [#5852](https://github.com/DOI-USGS/ISIS3/pull/5852)
 
 ### Fixed
 - Fixed kaguyatc2isis invalid BandBin values [#5629](https://github.com/DOI-USGS/ISIS3/issues/5629)
@@ -76,6 +78,10 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed `pointreg` helper function to display deffile to application log [#5806](https://github.com/DOI-USGS/ISIS3/pull/5806)
 - Fixed ISIS Q Applications crashing when opening more than one cube at once. [#5805](https://github.com/DOI-USGS/ISIS3/pull/5805)
 - Fixed csminit docs with more details on the `ISD` and `STATE` pameters [#5790](https://github.com/DOI-USGS/ISIS3/issues/5790)
+- Fixed SpiceQL 1.2.0 API changes [#5846](https://github.com/DOI-USGS/ISIS3/pull/5846)
+- Fixed CSM State String blob not being propagated between input and output cubes [#5847](https://github.com/DOI-USGS/ISIS3/pull/5847)
+- Fixed campt reporting when `ALLOWERROR` is set to true [#5845](https://github.com/DOI-USGS/ISIS3/pull/5845)
+- Fixed order of observer and target in spiceql call in `ctxcal`. [#5823](https://github.com/DOI-USGS/ISIS3/pull/5823)
 
 ## [9.0.0] - 09-25-2024
 

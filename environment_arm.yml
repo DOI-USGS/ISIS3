@@ -25,6 +25,7 @@ dependencies:
   - geotiff
   - gdal >=3.7,<3.9
   - gmp
+  - gcovr
   - graphviz
   - conda-forge::gsl >=2.6, <2.7
   - hdf5
@@ -60,6 +61,7 @@ dependencies:
   - qhull
   - qt-main>=5.15, <5.16
   - qwt <6.3.0
+  - spiceql =1.2.0
   - sqlite >=3.46.0,<3.47
   - suitesparse <7.7.0
   - superlu

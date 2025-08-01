@@ -213,6 +213,20 @@ namespace Isis {
     p_widgetList.push_back(w);
   }
 
+  //! Enable or disable individual radio/combo options
+  void GuiParameter::SetEnabledOption(bool enabled, QString option, bool isParentCombo) {
+    for(int i = 0; i < p_widgetList.size(); i++) {
+      QString objectName = p_widgetList[i]->objectName();
+      if (objectName == option) {
+        p_widgetList[i]->setEnabled(enabled);
+        p_widgetList[i]->setVisible(true);
+        if(isParentCombo && !enabled) {
+          p_widgetList[i]->setVisible(false);
+        }
+      }
+    }
+  }
+
   //! Enable or disable the parameter
   void GuiParameter::SetEnabled(bool enabled, bool isParentCombo) {
     if(p_type != ComboWidget) {

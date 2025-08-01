@@ -6,7 +6,7 @@ env:
 
 on:
   schedule:
-    - cron: '0 5 * * 6'  # 10:00 PM MST Friday (UTC: Saturday 5:00 AM)
+    - cron: '0 5 * * 0'  # 10:00 PM MST Monday (UTC: Sunday 5:00 AM)
   workflow_dispatch:     # Option to manually run pipeline in Actions
   
 jobs:
@@ -18,13 +18,13 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Skip odd weeks
-        run: |
-          WEEK_NUM=$(date +%V)
-          if (( WEEK_NUM % 2 != 0 )); then
-            echo "Skipping this week ($WEEK_NUM is odd)."
-            exit 0
-          fi
+      # - name: Skip odd weeks
+      #   run: |
+      #     WEEK_NUM=$(date +%V)
+      #     if (( WEEK_NUM % 2 != 0 )); then
+      #       echo "Skipping this week ($WEEK_NUM is odd)."
+      #       exit 0
+      #     fi
 
       - uses: actions/checkout@v4
 
@@ -47,7 +47,6 @@ jobs:
 
           echo $ENCRYPTION_KEY | openssl enc -aes-256-cbc -d -in kakadu/kakadu_7_9.zip.enc -out kakadu/kakadu_7_9.zip -pbkdf2 -iter 10000 -pass stdin
           unzip -j kakadu/kakadu_7_9.zip -d /tmp/kakadu_7_9 -x "__MACOSX/*"
-          
 
           if [[ "$OSTYPE" == "darwin"* ]]; then
             sed -i '' "s|/isisData/kakadu|/tmp/kakadu_7_9|g" build.sh

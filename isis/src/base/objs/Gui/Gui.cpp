@@ -819,8 +819,17 @@ namespace Isis {
       for(int i = 0; i < (int)excludeList.size(); i++) {
         for(unsigned int e = 0; e < p_parameters.size(); e++) {
           GuiParameter &exclude = *(p_parameters[e]);
-          if(exclude.Name() != excludeList[i]) continue;
-          exclude.SetEnabled(false, (param.Type()==GuiParameter::ComboWidget));
+          if (excludeList[i].contains('.')) {
+            QStringList liststr = excludeList[i].split('.', Qt::SkipEmptyParts);
+            QString exclusionName = liststr[0];
+            QString exclusionOption = liststr[1];
+            if(exclude.Name() != exclusionName) continue;
+            exclude.SetEnabledOption(false, exclusionOption, (param.Type()==GuiParameter::ComboWidget));
+          }
+          else {
+            if(exclude.Name() != excludeList[i]) continue;
+            exclude.SetEnabled(false, (param.Type()==GuiParameter::ComboWidget));
+          }
         }
       }
     }

@@ -55,6 +55,8 @@ namespace Isis {
 
       void SetEnabled(bool enabled, bool isParentCombo=false);
 
+      void SetEnabledOption(bool enabled, QString option, bool isParentCombo);
+
       //! Is the parameter enabled
       bool IsEnabled() const {
         return p_label->isEnabled();

@@ -214,6 +214,7 @@ else
     printf "\nISIS version set to [$ISIS_VERSION]\n"
 fi
 
+
 if [ $ISIS_VERSION = "latest" ]; then
     ISIS_VERSION=""
 fi
@@ -309,7 +310,8 @@ if ! command -v mamba &> /dev/null; then
         bash Miniforge3.sh -b -p $MINIFORGE_DIR || failed_command "Miniforge installation"
     fi
 
-    $MINIFORGE_DIR/bin/$CLIENT init || exit 1
+    $MINIFORGE_DIR/bin/conda init bash || exit 1
+    $MINIFORGE_DIR/bin/conda init zsh || exit 1 
     export PATH="$MINIFORGE_DIR/bin:$PATH"
 else
     echo "Miniforge is already installed."
@@ -344,14 +346,9 @@ fi
 
 if [ "$ENV_NAME" = "auto" ]; then
     # Get latest version from specified channels
-    if [ -n "$ISIS_VERSION" ]; then
-        LATEST_VERSION=$ISIS_VERSION
-    else
-        LATEST_VERSION=$($CLIENT search $PACKAGE_NAME | grep -E "^isis\s+" | tail -n 1 | awk '{print $2}')
-    fi
+    LATEST_VERSION=$(conda search $PACKAGE_NAME | grep -E "^isis\s+" | tail -n 1 | awk '{print $2}')
     ENV_NAME="isis-$LATEST_VERSION"
 fi
-
 
 # Handle the --install-prefix flag
 if [ -n "$INSTALL_PREFIX" ] && [ "$INSTALL_PREFIX" != "auto" ]; then
@@ -363,7 +360,7 @@ if [ -n "$INSTALL_PREFIX" ] && [ "$INSTALL_PREFIX" != "auto" ]; then
     fi
 else
     # Default behavior if --install-prefix is not set or set to "auto"
-    INSTALL_PREFIX=$CONDA_PREFIX/envs/
+    INSTALL_PREFIX=$MINIFORGE_DIR/envs/
 fi
 
 INSTALL_PREFIX="$INSTALL_PREFIX/$ENV_NAME"
@@ -437,7 +434,7 @@ if [ ! -d "$ISISDATA_PREFIX" ]; then
     fi
 fi
 
-$CLIENT env config vars set -p $INSTALL_PREFIX ISISDATA=$ISISDATA_PREFIX ISISROOT=$INSTAL_PREFIX || failed_command "Mamba config var set"
+conda env config vars set -p $INSTALL_PREFIX ISISDATA=$ISISDATA_PREFIX ISISROOT=$INSTALL_PREFIX || failed_command "Mamba config var set"
 
 if [ ! "$DOWNLOAD_DATA" = "NO" ]; then
     DOWNLOAD_ISIS_DATA_SCRIPT="$ENV_PATH/bin/downloadIsisData"
@@ -556,9 +553,15 @@ if [ ! "$DOWNLOAD_DATA" = "NO" ]; then
     fi
 fi
 
-printf "\n\n"
-printf "Activate the new environment with:\n\n"
-if ! command -v mamba &> /dev/null ; then
-    printf "\t$ source ~/.bashrc  # or restart your shell\n"
+# Run isisvarinit.py with ISISDATA and ISISROOT
+if [ -x "$INSTALL_PREFIX/isis/scripts/isisVarInit.py" ]; then
+    ISISROOT="$INSTALL_PREFIX"
+    ISISDATA="$ISISDATA_PREFIX"
+    "$INSTALL_PREFIX/isis/scripts/isisVarInit.py" "$ISISDATA" "$ISISROOT" || failed_command "Running isisvarinit.py"
+else
+    echo "Warning: isisvarinit.py not found or not executable in $INSTALL_PREFIX/isis/scripts/"
 fi
+
+printf "\n\n"
+printf "Activate the new environment by restarting your and shell and run:\n\n"
 printf "\t$ conda activate $ENV_NAME\n\n"
