@@ -63,6 +63,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Changed `StripPolygonSeeder` and `GridPolygonSeeder` to seed individual polygons within each images multipolygon footprint [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
 - Pinned SpiceQL to 1.2.0 [#5852](https://github.com/DOI-USGS/ISIS3/pull/5852)
 - Changed `ControlMeasure` object comparison to no longer factor in creation date for equality [#5862](https://github.com/DOI-USGS/ISIS3/pull/5862)
+- Changed `BundleObservationSolveSettings` to set 0 coefficients for camera angle and camera position if None were defined [#5822](https://github.com/DOI-USGS/ISIS3/pull/5822)
 
 ### Fixed
 - Fixed kaguyatc2isis invalid BandBin values [#5629](https://github.com/DOI-USGS/ISIS3/issues/5629)
@@ -87,6 +88,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed order of observer and target in spiceql call in `ctxcal`. [#5823](https://github.com/DOI-USGS/ISIS3/pull/5823)
 - Fixed bundle serialization on MacOS for IPCE [#5808](https://github.com/DOI-USGS/ISIS3/pull/5808)
 - Fixed `noseam` to use correct temporary files when running [#5878](https://github.com/DOI-USGS/ISIS3/pull/5878)
+- Fixed `CubeInfixToPostfix` to safely determine if a known symbol is a function symbol [#5822](https://github.com/DOI-USGS/ISIS3/pull/5822)
 
 ## [9.0.0] - 09-25-2024
 
