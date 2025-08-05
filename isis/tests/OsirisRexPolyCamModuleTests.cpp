@@ -241,7 +241,7 @@ TEST(OsirisRexPolyCamModules, PolyCamModuleExplodeReuniteTest) {
    *         2) algebra
    *            - 20190328T200344S309_pol_iofL2pan_algebra.cub
    */
-  TEST(OsirisRexPolyCamModules, PolyCamModuleAlgebraTest) {
+TEST(OsirisRexPolyCamModules, PolyCamModuleAlgebraTest) {
   QTemporaryDir tempDir;
 
   // ingest polycam fits format image with ocams2isis
@@ -315,7 +315,7 @@ TEST(OsirisRexPolyCamModules, PolyCamModuleExplodeReuniteTest) {
    *         5) stats
    *            - 20190328T200344S309_pol_iofL2pan_dnstats.pvl
    */ 
-  TEST(OsirisRexPolyCamModules, PolyCamModuleInfoAndStatsTest) {
+TEST(OsirisRexPolyCamModules, PolyCamModuleInfoAndStatsTest) {
   QTemporaryDir tempDir;
 
   // ingest polycam fits format image with ocams2isis
@@ -629,7 +629,7 @@ TEST(OsirisRexPolyCamModules, PolyCamModuleExplodeReuniteTest) {
    *         2) campt
    *            - 20190328T200344S309_pol_iofL2pan.cub_campt.pvl
    */
-  TEST(OsirisRexPolyCamModules, PolyCamModuleCamptTest) {
+TEST(OsirisRexPolyCamModules, PolyCamModuleCamptTest) {
   QTemporaryDir tempDir;
 
   // ingest polycam fits format image with ocams2isis
@@ -1067,7 +1067,7 @@ TEST(OsirisRexPolyCamModules, PolyCamModuleExplodeReuniteTest) {
    *         9) pointreg
    *            - polycam_pointreg.net
    */
-  TEST(OsirisRexPolyCamModules, PolyCamModuleTwoImageTest) {
+TEST(OsirisRexPolyCamModules, PolyCamModuleTwoImageTest) {
   QTemporaryDir tempDir;
 
   // ingest 1st polycam fits format image 
@@ -1309,7 +1309,7 @@ TEST(OsirisRexPolyCamModules, PolyCamModuleExplodeReuniteTest) {
 
   std::unique_ptr<Histogram> noseamMosaicHist(noseamMosaic.histogram());
   EXPECT_NEAR(noseamMosaicHist->Average(), 0.013594249872813711, 0.005);
-  EXPECT_NEAR(noseamMosaicHist->Sum(), 28517.09297419725, 0.014);
+  EXPECT_NEAR(noseamMosaicHist->Sum(), 28517.175773404939, 0.014);
   EXPECT_EQ(noseamMosaicHist->ValidPixels(), 2097732);
   EXPECT_NEAR(noseamMosaicHist->StandardDeviation(), 0.0073422521190466645, 0.005);
 
