@@ -27,7 +27,8 @@ jobs:
       #     fi
 
       - uses: actions/checkout@v4
-        ref: devfix
+        with:
+          ref: devfix
 
       - name: Set up Mambaforge
         uses: conda-incubator/setup-miniconda@v3
