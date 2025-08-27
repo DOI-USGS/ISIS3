@@ -52,6 +52,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Added initial `eisstitch` app [#5591](https://github.com/DOI-USGS/ISIS3/pull/5591)
 - Added the ability to disable individual options for parameters in ISIS GUIs [#5849](https://github.com/DOI-USGS/ISIS3/pull/5849)
 - Added PAD or SHRINK options to crop for crops that extend beyond the source image [#5843](https://github.com/DOI-USGS/ISIS3/pull/5843)
+- Added std:: namespace for isinf, fixes build errors for some versions of c++
 
 ### Changed
 - Removed Arm dependency on xalan-c, as it does not build for now on conda-forge. This requires turning off doc building on Arm. Also changed some variables to avoid name clashes on Arm with clang 16. [#5802](https://github.com/DOI-USGS/ISIS3/pull/5802)
