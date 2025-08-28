@@ -90,6 +90,8 @@ jobs:
           echo "--- cmake Location (Should be in isis conda env)"
           which cmake
           cmake --version
+          echo "--- python location"
+          which python
           echo "--- Working Directory"
           pwd
           echo "--- Files"
@@ -98,6 +100,7 @@ jobs:
           echo $ISISROOT
       - name: Build ISIS
         run: |
+          echo $ISISROOT
           mkdir build
           cd build
           cmake -GNinja -DJP2KFLAG=OFF ../isis
