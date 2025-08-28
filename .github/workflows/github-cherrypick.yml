@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - ci-test-target
+      
 jobs:
 
   # Check if the PR is a bugfix/feature
@@ -89,6 +90,8 @@ jobs:
           echo "--- cmake Location (Should be in isis conda env)"
           which cmake
           cmake --version
+          echo "--- pyconfig.h location"
+          find /usr -name pyconfig.h
           echo "--- Working Directory"
           pwd
           echo "--- Files"
