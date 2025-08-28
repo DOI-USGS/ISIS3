@@ -96,9 +96,6 @@ jobs:
           ls
           echo "--- ISISROOT"
           echo $ISISROOT
-      - name: fix python path
-        run: | 
-          sudo apt install python3-dev
       - name: Build ISIS
         run: |
           mkdir build
