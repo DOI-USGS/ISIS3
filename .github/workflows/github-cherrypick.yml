@@ -81,6 +81,9 @@ jobs:
           environment-file: environment.yml
           auto-activate-base: false
           auto-update-conda: true
+      - name: Setup libGL
+        run: |
+          sudo apt install -y libgl1
       - name: Check Environment (Debug)
         env: 
           ISISROOT: ${{ github.workspace }}/build
@@ -102,9 +105,7 @@ jobs:
         env: 
           ISISROOT: ${{ github.workspace }}/build
         run: |
-          echo "--- ISISROOT"
-          echo $ISISROOT
-          echo "--- Build ISIS"
+          
           mkdir build
           cd build
           cmake -GNinja -DJP2KFLAG=OFF ../isis
