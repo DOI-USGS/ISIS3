@@ -99,9 +99,12 @@ jobs:
           echo "--- ISISROOT"
           echo $ISISROOT
       - name: Build ISIS
+        env: 
+          ISISROOT: ${{ github.workspace }}/build
         run: |
-          echo "ISISROOT:"
+          echo "--- ISISROOT"
           echo $ISISROOT
+          echo "--- Build ISIS"
           mkdir build
           cd build
           cmake -GNinja -DJP2KFLAG=OFF ../isis
