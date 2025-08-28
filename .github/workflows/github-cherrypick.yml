@@ -90,14 +90,15 @@ jobs:
           echo "--- cmake Location (Should be in isis conda env)"
           which cmake
           cmake --version
-          echo "--- pyconfig.h location"
-          find /usr -name pyconfig.h
           echo "--- Working Directory"
           pwd
           echo "--- Files"
           ls
           echo "--- ISISROOT"
           echo $ISISROOT
+      - name: fix python path
+        run: | 
+          export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/usr/include"
       - name: Build ISIS
         run: |
           mkdir build
