@@ -107,10 +107,9 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -GNinja -DJP2KFLAG=OFF ../isis
-          ninja -j8
+          # cmake -GNinja -DJP2KFLAG=OFF ../isis
+          # ninja -j8
       - name: Push to LTS branch
         run: |
-          git commit -m "Auto cherry-pick"
           git push
 
