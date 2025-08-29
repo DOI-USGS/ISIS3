@@ -51,6 +51,8 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Added SpiceQL integration to replace cspice calls. [#5545](https://github.com/DOI-USGS/ISIS3/pull/5545)
 - Added initial `eisstitch` app [#5591](https://github.com/DOI-USGS/ISIS3/pull/5591)
 - Added the ability to disable individual options for parameters in ISIS GUIs [#5849](https://github.com/DOI-USGS/ISIS3/pull/5849)
+- Added PAD or SHRINK options to crop for crops that extend beyond the source image [#5843](https://github.com/DOI-USGS/ISIS3/pull/5843)
+- Added std:: namespace for isinf, fixes build errors for some versions of c++
 
 ### Changed
 - Removed Arm dependency on xalan-c, as it does not build for now on conda-forge. This requires turning off doc building on Arm. Also changed some variables to avoid name clashes on Arm with clang 16. [#5802](https://github.com/DOI-USGS/ISIS3/pull/5802)
@@ -59,6 +61,8 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Changed file format to propagate from the input image format to the output image format [#5737](https://github.com/DOI-USGS/ISIS3/pull/5737)
 - Changed `StripPolygonSeeder` and `GridPolygonSeeder` to seed individual polygons within each images multipolygon footprint [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
 - Pinned SpiceQL to 1.2.0 [#5852](https://github.com/DOI-USGS/ISIS3/pull/5852)
+- Changed `noseam` to apply `highpass` and `lowpass` to the same mosaic [#5862](https://github.com/DOI-USGS/ISIS3/pull/5862)
+- Changed `ControlMeasure` object comparison to no longer factor in creation date for equality [#5862](https://github.com/DOI-USGS/ISIS3/pull/5862)
 
 ### Fixed
 - Fixed kaguyatc2isis invalid BandBin values [#5629](https://github.com/DOI-USGS/ISIS3/issues/5629)
@@ -81,6 +85,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed CSM State String blob not being propagated between input and output cubes [#5847](https://github.com/DOI-USGS/ISIS3/pull/5847)
 - Fixed campt reporting when `ALLOWERROR` is set to true [#5845](https://github.com/DOI-USGS/ISIS3/pull/5845)
 - Fixed order of observer and target in spiceql call in `ctxcal`. [#5823](https://github.com/DOI-USGS/ISIS3/pull/5823)
+- Fixed bundle serialization on MacOS for IPCE [#5808](https://github.com/DOI-USGS/ISIS3/pull/5808)
 
 ## [9.0.0] - 09-25-2024
 

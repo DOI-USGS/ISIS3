@@ -240,7 +240,7 @@ TEST(OsirisRexMapCamModules, MapCamModuleExplodeReuniteTest) {
    *         2) algebra
    *            - 20190223T023051S790_map_iofL2pan_algebra.cub
    */
-  TEST(OsirisRexMapCamModules, MapCamModuleAlgebraTest) {
+TEST(OsirisRexMapCamModules, MapCamModuleAlgebraTest) {
   QTemporaryDir tempDir;
 
   // ingest mapcam fits format image with ocams2isis
@@ -311,7 +311,7 @@ TEST(OsirisRexMapCamModules, MapCamModuleExplodeReuniteTest) {
    *         5) stats
    *            - 20190223T023051S790_map_iofL2pan_dnstats.pvl
    */
-  TEST(OsirisRexMapCamModules, MapCamModuleInfoAndStatsTest) {
+TEST(OsirisRexMapCamModules, MapCamModuleInfoAndStatsTest) {
   QTemporaryDir tempDir;
 
   // ingest mapcam fits format image with ocams2isis and then spiceinit
@@ -618,7 +618,7 @@ TEST(OsirisRexMapCamModules, MapCamModuleExplodeReuniteTest) {
    *         2) campt
    *            - 20190223T023051S790_map_iofL2pan.cub_campt.pvl
    */
-  TEST(OsirisRexMapCamModules, MapCamModuleCamptTest) {
+TEST(OsirisRexMapCamModules, MapCamModuleCamptTest) {
   QTemporaryDir tempDir;
 
   // ingest mapcam fits format image with ocams2isis and then spiceinit
@@ -1052,7 +1052,7 @@ TEST(OsirisRexMapCamModules, MapCamModuleExplodeReuniteTest) {
    *         9) pointreg
    *            - mapcam_pointreg.net
    */
-  TEST(OsirisRexMapCamModules, MapCamModuleTwoImageTest) {
+TEST(OsirisRexMapCamModules, MapCamModuleTwoImageTest) {
   QTemporaryDir tempDir;
 
   // ingest 1st mapcam fits format image, then spiceinit and footprintinit 
@@ -1282,7 +1282,7 @@ TEST(OsirisRexMapCamModules, MapCamModuleExplodeReuniteTest) {
 
   std::unique_ptr<Histogram> noseamMosaicHist(noseamMosaic.histogram());
   EXPECT_NEAR(noseamMosaicHist->Average(), 0.0040496894214538124, 0.005);
-  EXPECT_NEAR(noseamMosaicHist->Sum(), 7338.8188217326478, 0.005);
+  EXPECT_NEAR(noseamMosaicHist->Sum(), 7338.5876967209242, 0.005);
   EXPECT_EQ(noseamMosaicHist->ValidPixels(), 1812193);
   EXPECT_NEAR(noseamMosaicHist->StandardDeviation(), 0.0037573821357031172, 0.005);
 
