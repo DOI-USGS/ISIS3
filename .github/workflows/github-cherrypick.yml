@@ -63,7 +63,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          ref: '9.0.0_Prod' # This branch must exist in the repo.  Target LTS changes branch.
+          ref: '8.0' # This branch must exist in the repo.  Target LTS changes branch.
           fetch-depth: '0'
       - name: Configure git
         run: |
