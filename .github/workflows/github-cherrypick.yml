@@ -109,3 +109,69 @@ jobs:
       - name: Push to LTS branch
         run: |
           git push
+  
+  build-prod:
+    needs: check_labels
+    # Only run this step if code was a bugfix
+    if: contains(needs.check_labels.outputs.result, 'production_update_')
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash -l {0} # bash login mode so conda can auto activate isis env
+    steps:
+      - name: TODO
+        run: |
+          echo "TODO: This Job is for future use, cherry-picking to a production branch."
+          echo "Once the name of the production branch is decided, "
+          echo "uncomment the rest of this job, and "
+          echo "update the "ref:" in the next step, "Checkout Repo."
+      # - name: Checkout Repo
+      #   uses: actions/checkout@v4
+      #   with:
+      #     submodules: recursive
+      #     ref: '8.0' # This branch must exist in the repo.  Target PROD changes branch.
+      #     fetch-depth: '0'
+      # - name: Configure git
+      #   run: |
+      #     git config user.name "github-actions[bot]"
+      #     git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      # - name: Cherry Pick
+      #   env: 
+      #     GITHUB_SHA: ${{ secrets.GITHUB_SHA }}
+      #   run: git cherry-pick -m 1 $GITHUB_SHA
+      # - name: Setup conda
+      #   uses: conda-incubator/setup-miniconda@v3
+      #   with:
+      #     miniconda-version: "latest"
+      #     activate-environment: isis
+      #     environment-file: environment.yml
+      #     auto-activate-base: false
+      #     auto-update-conda: true
+      # - name: Check Environment (Debug)
+      #   env: 
+      #     ISISROOT: ${{ github.workspace }}/build
+      #   run: |
+      #     echo "--- Conda Env"
+      #     conda info --envs
+      #     echo "--- cmake Location (Should be in isis conda env)"
+      #     which cmake
+      #     cmake --version
+      #     echo "--- python location"
+      #     which python
+      #     echo "--- Working Directory"
+      #     pwd
+      #     echo "--- Files"
+      #     ls
+      #     echo "--- ISISROOT"
+      #     echo $ISISROOT
+      # - name: Build ISIS
+      #   env: 
+      #     ISISROOT: ${{ github.workspace }}/build
+      #   run: |
+      #     mkdir build
+      #     cd build
+      #     cmake -GNinja -DJP2KFLAG=OFF ../isis
+      #     ninja -j8
+      # - name: Push to LTS branch
+      #   run: |
+      #     git push
