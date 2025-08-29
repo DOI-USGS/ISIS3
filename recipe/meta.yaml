@@ -58,7 +58,7 @@ requirements:
    - cspice =67
    - usgs-astrogeology::csm >=3.0.3,<3.0.4   # [osx and arm64]
    - csm >=3.0.3,<3.0.4                      # [not (osx and arm64)]
-   - curl >=8.4.0,<8.5
+   - curl >=8.14.1,<9
    - cxx-compiler=1.7
    - doxygen
    - eigen >=3, <4
@@ -94,7 +94,7 @@ requirements:
    - ninja >=1.10,<1.11
    - nn
    - opencv >=4.5,<4.10
-   - openssl >=3.1.2,<3.5
+   - openssl >=3.5,<4
    - pcl >=1.13,<1.14
    - pdal=2.6
    - plio=1.5.3

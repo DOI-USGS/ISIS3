@@ -1088,7 +1088,6 @@ namespace Isis {
     return pMeasure.p_measureType == p_measureType &&
         *pMeasure.p_serialNumber == *p_serialNumber &&
         *pMeasure.p_chooserName == *p_chooserName &&
-        *pMeasure.p_dateTime == *p_dateTime &&
         pMeasure.p_editLock == p_editLock &&
         pMeasure.p_ignore == p_ignore &&
         pMeasure.p_jigsawRejected == p_jigsawRejected &&

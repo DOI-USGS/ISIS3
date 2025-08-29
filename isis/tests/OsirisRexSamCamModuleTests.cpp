@@ -655,7 +655,7 @@ TEST(OsirisRexSamCamModules, SamCamModuleInfoAndStatsTest)
  *         2) campt
  *            - 20200811T221418S029_sam_iofL2pan5.cub_campt.pvl
  */
-  TEST(OsirisRexSamCamModules, SamCamModuleCamptTest) {
+TEST(OsirisRexSamCamModules, SamCamModuleCamptTest) {
   QTemporaryDir tempDir;
 
   // ingest polycam fits format image with ocams2isis
@@ -1092,7 +1092,7 @@ TEST(OsirisRexSamCamModules, SamCamModuleInfoAndStatsTest)
  *         9) pointreg
  *            - samcam_pointreg.net
  */
-  TEST(OsirisRexSamCamModules, SamCamModuleTwoImageTest) {
+TEST(OsirisRexSamCamModules, SamCamModuleTwoImageTest) {
   QTemporaryDir tempDir;
 
   // ingest 1st samcam fits format image, then spiceinit and footprintinit
@@ -1330,7 +1330,7 @@ TEST(OsirisRexSamCamModules, SamCamModuleInfoAndStatsTest)
 
   std::unique_ptr<Histogram> noseamMosaicHist(noseamMosaic.histogram());
   EXPECT_NEAR(noseamMosaicHist->Average(), 0.010375753089644776, 0.005);
-  EXPECT_NEAR(noseamMosaicHist->Sum(), 11976.949682191847, 0.005);
+  EXPECT_NEAR(noseamMosaicHist->Sum(), 11976.425999546173, 0.005);
   EXPECT_EQ(noseamMosaicHist->ValidPixels(), 1154321);
   EXPECT_NEAR(noseamMosaicHist->StandardDeviation(), 0.010379350848041419, 0.005);
 

@@ -37,16 +37,16 @@
       to compute accurate geometric and photometric information using the cropped 
       <def>Level1</def> cube.
     </p>
-<p>
-<table border="">
-  <tr>
-    <th>Level1 labels using PROPSPICE=TRUE:</th>
-    <th>Level1 labels using PROPSPICE=FALSE:</th>
-  </tr>
-<tr>
-<td>
-<small>
-<pre>
+    <p>
+      <table border="">
+        <tr>
+          <th>Level1 labels using PROPSPICE=TRUE:</th>
+          <th>Level1 labels using PROPSPICE=FALSE:</th>
+        </tr>
+        <tr>
+          <td>
+            <small>
+              <pre>
 Group = Kernels                                                               
     <b>NaifFrameCode             = -53031				
     LeapSecond                 = $base/kernels/lsk/naif0009.tls		      
@@ -74,12 +74,12 @@ Group = Kernels
     BetaSamples         = 100						      
     BetaLines           = 100						      
   End_Group								      
-</pre>
-</small>
-</td>
-<td>
-<small>
-<pre>
+              </pre>
+            </small>
+          </td>
+          <td>
+            <small>
+              <pre>
 Group = Kernels
     <b>NaifFrameCode = -53031</b>
 End_Group
@@ -95,23 +95,13 @@ End_Group
    BetaSamples         = 100
    BetaLines	       = 100
  End_Group
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-</pre>
-</small>
-</td>
-</tr>
-</table>
-</p>
+
+              </pre>
+            </small>
+          </td>
+        </tr>
+      </table>
+    </p>
     <p>
       For a <def>Level2</def> image or a mosaic, the Mapping group keywords in 
       the labels are updated or removed depending on the settings used to crop 
@@ -132,16 +122,16 @@ End_Group
       for all projections as shown in the example below.  
     </p>
 
-<p>
-<table border="">
-  <tr>
-    <th>Level2 labels of uncropped image:</th>
-    <th>Level2 labels of cropped image:</th>
-  </tr>
-<tr>
-<td>
-<small>
-<pre>
+    <p>
+      <table border="">
+        <tr>
+          <th>Level2 labels of uncropped image:</th>
+          <th>Level2 labels of cropped image:</th>
+        </tr>
+        <tr>
+          <td>
+            <small>
+              <pre>
 Group = Mapping                                           
   ProjectionName       = Equirectangular		  
   CenterLongitude      = 0				  
@@ -162,12 +152,12 @@ Group = Mapping
   CenterLatitude       = -60
   CenterLatitudeRadius = 1737400.0
 End_Group
-</pre>
-</small>
-</td>
-<td>
-<small>
-<pre>
+              </pre>
+            </small>
+          </td>
+          <td>
+            <small>
+              <pre>
 Group = Mapping
    ProjectionName	= Equirectangular
    CenterLongitude	= 0
@@ -185,33 +175,30 @@ Group = Mapping
    CenterLatitudeRadius = 1737400.0
 End_Group
 
-
-
-
-</pre>
-</small>
-</td>
-</tr>
-</table>
-</p>
+              </pre>
+            </small>
+          </td>
+        </tr>
+      </table>
+    </p>
     <p>
-    <b>WARNING:</b><br />
-      If the cropped image is displayed with the application <i>qview</i>, the latitude 
-      and longitude reported by the application will be correct for the cropped files. 
-      The <i>mappt</i> application can be used to compute the <def link="Latitude">latitude</def> 
-      and <def link="Longitude">longitude</def> at a specific point in a cropped cube.  
-      <br /><br/> 
-      The minimum and maximum latitude and longitude range are not recomputed and the 
-      keywords are deleted from the labels when the input image is in a non-rectangular
-      projection.  Unfortunately there is not a generic way to update the ranges for 
-      all projections so only the values for rectangular projections are recalculated
-      and updated in the labels.
-      <br /><br/> 
-      The cropped images may be included in a list to create a mosaic with 
-      <i>automos</i>. All the cropped images included in the input list must contain 
-      the same mapping values. If <i>automos</i> fails because of the cropped images, 
-      the user may need to specify the MINLAT, MAXLAT, MINLON, and MAXLON values of 
-      the output mosaic for some ISIS versions.      
+      <b>WARNING:</b><br />
+        If the cropped image is displayed with the application <i>qview</i>, the latitude 
+        and longitude reported by the application will be correct for the cropped files. 
+        The <i>mappt</i> application can be used to compute the <def link="Latitude">latitude</def> 
+        and <def link="Longitude">longitude</def> at a specific point in a cropped cube.  
+        <br /><br/> 
+        The minimum and maximum latitude and longitude range are not recomputed and the 
+        keywords are deleted from the labels when the input image is in a non-rectangular
+        projection.  Unfortunately there is not a generic way to update the ranges for 
+        all projections so only the values for rectangular projections are recalculated
+        and updated in the labels.
+        <br /><br/> 
+        The cropped images may be included in a list to create a mosaic with 
+        <i>automos</i>. All the cropped images included in the input list must contain 
+        the same mapping values. If <i>automos</i> fails because of the cropped images, 
+        the user may need to specify the MINLAT, MAXLAT, MINLON, and MAXLON values of 
+        the output mosaic for some ISIS versions.      
     </p>
   </description>
 
@@ -359,8 +346,6 @@ End_Group
           This is the starting sample of the area to extract.  It must be inside
           the cube area.
         </description>
-
-        <minimum inclusive="yes">1</minimum>
       </parameter>
 
       <parameter name="NSAMPLES">
@@ -370,7 +355,7 @@ End_Group
         <description>
           This defines how many samples to extract from the input cube,
           if SINC is 1. Otherwise, the number of samples actually extracted
-	  from the input cube is NSAMPLES/SINC.
+	        from the input cube is NSAMPLES/SINC.
         </description>
 
         <minimum inclusive="yes">1</minimum>
@@ -382,11 +367,11 @@ End_Group
         <default><item>1</item></default>
         <description>
           This specifies the sample increment to use when extracting from the 
-	  input cube. This effectively skips samples when the value is greater
-	  than 1.  For example, if SINC=2 and SAMPLE=1 the output cube would 
-	  contain samples 1, 3, 5, 7, and so on.  Note that this reduces the size 
-	  of the output cube as specified by NSAMPLES.  That is, if NSAMPLES=200 
-	  and SINC=2, the output cube will have 100 samples.
+          input cube. This effectively skips samples when the value is greater
+          than 1.  For example, if SINC=2 and SAMPLE=1 the output cube would 
+          contain samples 1, 3, 5, 7, and so on.  Note that this reduces the size 
+          of the output cube as specified by NSAMPLES.  That is, if NSAMPLES=200 
+          and SINC=2, the output cube will have 100 samples.
         </description>
 
         <minimum inclusive="yes">1</minimum>
@@ -401,8 +386,6 @@ End_Group
         <description>
           This is the starting line of the area to extract.  It must be inside the cube.
         </description>
-
-        <minimum inclusive="yes">1</minimum>
       </parameter>
 
       <parameter name="NLINES">
@@ -412,7 +395,7 @@ End_Group
         <description>
           This defines how many lines will be extracted from the input cube,
           if LINC is 1. Otherwise, the number of lines actually extracted from 
-	  the input cube is NLINES/LINC.
+	        the input cube is NLINES/LINC.
         </description>
 
         <minimum inclusive="yes">1</minimum>
@@ -424,8 +407,8 @@ End_Group
         <default><item>1</item></default>
         <description>
           This specifies the line increment to use when extracting from the 
-	  input cube. This effectively skips lines when the value is greater
-	  than 1.  For example if LINC=2 and LINE=5
+          input cube. This effectively skips lines when the value is greater
+	        than 1.  For example if LINC=2 and LINE=5
           the output cube would contain lines 5, 7, 9, 11, and so on.  Note that
           this reduces the size of the output cube as specified by NLINES.
           That is, if NLINES=200 and LINC=2, the output cube will have 100
@@ -433,6 +416,35 @@ End_Group
         </description>
 
         <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+
+    <group name="Geometry">
+      <parameter name="OVERHANG">
+        <type>string</type>
+        <brief>Behavior when part of crop area is outside of cube boundaries.</brief>
+        <description>
+        </description>
+        <default>
+          <item>FAIL</item>
+        </default>
+        <list>
+          <option value="FAIL">
+            <brief>Fail if area overhangs</brief>
+            <description>If the crop area extends beyond the area of the cube, throw an error.</description>
+          </option>
+          <option value="PAD">
+            <brief>Pad crop with null</brief>
+            <description>Pad any crop area outside the cube boundaries with Null Pixels.</description>
+          </option>
+          <option value="SHRINK">
+            <brief>Shrink to edge of cube</brief>
+            <description>
+              Shrink the crop area down to the edges of the cube so it will not overhang.
+              May output a cube with a smaller size than specified.
+            </description>
+          </option>
+        </list>
       </parameter>
     </group>
 
@@ -445,15 +457,16 @@ End_Group
         </brief>
         <description>
           This specifies whether or not to propagate the <def>SPICE</def> Kernels group 
-	  to the output file for a <def>Level 1</def> image.  If this parameter is set to 
-	  "False," then there will be no camera model available to compute 
-	  geometric and photometric information using the cropped cube. 
+          to the output file for a <def>Level 1</def> image.  If this parameter is set to 
+          "False," then there will be no camera model available to compute 
+          geometric and photometric information using the cropped cube. 
         </description>
       </parameter>
     </group>
   </groups>
 
   <examples>
+
     <example>
       <brief>Extract a 200x300 sub-area</brief>
       <description>
@@ -464,15 +477,16 @@ End_Group
         </commandLine>
         <description>
         In this example, crop will extract a 200x300 sub-area that starts at sample 100 
-	and line 200 from the input cube.
+	      and line 200 from the input cube.
         </description>
       </terminalInterface>
 
       <inputImages>
         <image src="assets/image/peaks.1.jpg" width="500" height="500">
           <brief> Input image</brief>
-          <description>This is the full size input image.  The area (200x300) 
-	  to be "cropped" is outlined in red.
+          <description>
+            This is the full size input image.  The area (200x300) 
+	          to be cropped is outlined in red.
           </description>
           <thumbnail caption="Input image" src="assets/thumb/peaks.1.jpg" width="200" height="200"/>
           <parameterName>FROM</parameterName>
@@ -495,6 +509,102 @@ End_Group
             <brief>Example GUI</brief>
             <description>This is a screenshot of crop.  The GUI shows the parameters filled to extract a 200x300 pixel sub-area from the input image. </description>
             <thumbnail width="186" height="200" caption="Crop GUI" src="assets/thumb/cropgui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+
+    <example>
+      <brief>Crop with Padding</brief>
+      <description>
+        Crop a 330×330 area and pad the portion that extends beyond the bounds of the cube with NULL pixels.
+      </description>
+      <terminalInterface>
+        <commandLine> from=f064a22-crop.cub to=f064a22-crop-pad.cub sample=-150 nsamples=330 line=200 nlines=330 overhang=pad
+        </commandLine>
+        <description>
+          Start at sample -150 and line 200.  Crop a 330×330 area.  For any overhanging area, pad with NULL pixels.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/f064a22-crop-outline.png" width="500" height="410">
+          <brief> Input image</brief>
+          <description>
+            This is the full size input image.  The area (330×330) 
+	          to be cropped is outlined in red.
+          </description>
+          <thumbnail caption="Input image" src="assets/image/f064a22-crop-outline.png" width="200" height="164"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/padded-cube.png" width="400" height="400">
+          <brief>Cropped/padded output image</brief>
+          <description>
+            This is the cropped output image. 
+            The NULL pixels are shown in red.
+          </description>
+          <thumbnail caption="Output image with NULL pixels in red on the left of the image." src="assets/image/padded-cube.png" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="700" height="800" src="assets/image/crop-pad-gui.png">
+            <brief>Example GUI</brief>
+            <description>This is a screenshot of crop.  The GUI shows PAD option selected for Overhang. </description>
+            <thumbnail width="175" height="200" caption="Crop GUI" src="assets/image/crop-pad-gui.png" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+    
+    <example>
+      <brief>Crop and Shrink</brief>
+      <description>
+        Crop a 330×330 area and shrink the portion that extends beyond the bounds of the cube to the edge of the cube.
+      </description>
+      <terminalInterface>
+        <commandLine> from=f064a22-crop.cub to=f064a22-crop-shrink.cub sample=-150 nsamples=330 line=200 nlines=330 overhang=shrink
+        </commandLine>
+        <description>
+          Start at sample -150 and line 200.  Crop a 330×330 area.  For any overhanging area, shrink it down to the edge of the cube data.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/f064a22-crop-outline.png" width="500" height="410">
+          <brief> Input image</brief>
+          <description>
+            This is the full size input image.  The area (330×330) 
+	          to be cropped is outlined in red.
+          </description>
+          <thumbnail caption="Input image" src="assets/image/f064a22-crop-outline.png" width="200" height="164"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/shrunk-cube.png" width="358" height="660">
+          <brief> Cropped/padded output image</brief>
+          <description>
+            This is the cropped output image.
+            It has been shrunk to the edge of the cube data; there are less samples in the output than the target number of samples.
+          </description>
+          <thumbnail caption="Output image with NULL pixels in red on the left of the image." src="assets/image/shrunk-cube.png" width="108" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="700" height="800" src="assets/image/crop-shrink-gui.png">
+            <brief>Example GUI</brief>
+            <description>This is a screenshot of crop.  The GUI shows SHRINK option selected for Overhang. </description>
+            <thumbnail width="175" height="200" caption="Crop GUI" src="assets/image/crop-shrink-gui.png" />
           </image>
         </guiInterface>
       </guiInterfaces>

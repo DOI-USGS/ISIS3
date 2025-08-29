@@ -561,7 +561,9 @@ namespace Isis {
       stream.writeStartElement("quantileInfo");
        // we need to write out high precision for minDistance calculations in value() and cumProb()
       stream.writeAttribute("quantile", toString(m_quantiles[i], 17));
-      stream.writeAttribute("dataValue", toString(m_observationValues[i], 17));
+      if (i < m_observationValues.size()) {
+        stream.writeAttribute("dataValue", toString(m_observationValues[i], 17));
+      }
       stream.writeAttribute("idealNumObsBelowQuantile", 
                             toString(m_idealNumObsBelowQuantile[i]));
       stream.writeAttribute("actualNumObsBelowQuantile", toString(m_numObsBelowQuantile[i]));
