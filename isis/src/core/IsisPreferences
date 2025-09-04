@@ -1,7 +1,7 @@
 #######################################################
 # This file allows the user to customize their Isis
 # configuration.  See the Isis Preference Dictionary
-# on our website isis.astrogeology.usgs.gov for a
+# on our website astrogeology.usgs.gov/docs for a
 # full description of each group.
 ########################################################
 
@@ -40,12 +40,14 @@ EndGroup
 #
 # FileLine = On | Off
 # Format = Standard | Pvl
+# ShowDeprecated = On | Off
 # StackTrace = On | Off
 ########################################################
 
 Group = ErrorFacility
   FileLine = Off
   Format = Standard
+  ShowDeprecated = On
   StackTrace = Off
 EndGroup
 
@@ -178,9 +180,21 @@ EndGroup
 ########################################################
 
 Group = Plugins
-  CSMDirectory = ("$ISISROOT/lib/isis/csm3.0.3/", -
+  CSMDirectory = ("$ISISROOT/lib/csmplugins/", -
+                  "$ISISROOT/lib/isis/csm3.0.3/", -
                   "$ISISROOT/csmlibs/3.0.3/", -
                   "$HOME/.Isis/csm3.0.3/")
+EndGroup
+
+########################################################
+#
+# Set whether spice calls use the SpiceQL web API or
+# local kernels.
+#
+########################################################
+
+Group = WebSpice
+  UseWebSpice = "false"
 EndGroup
 
 ########################################################
@@ -200,6 +214,7 @@ Group = DataDirectory
   Cassini      = $ISISDATA/cassini
   Chan1        = $ISISDATA/chan1
   Chandrayaan1 = $ISISDATA/chandrayaan1
+  Chandrayaan2 = $ISISDATA/chandrayaan2
   Clementine1  = $ISISDATA/clementine1
   Clipper      = $ISISDATA/../datalocal/clipper
   Control      = $ISISDATA/control
