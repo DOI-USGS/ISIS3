@@ -1282,7 +1282,7 @@ TEST(OsirisRexMapCamModules, MapCamModuleTwoImageTest) {
 
   std::unique_ptr<Histogram> noseamMosaicHist(noseamMosaic.histogram());
   EXPECT_NEAR(noseamMosaicHist->Average(), 0.0040496894214538124, 0.005);
-  EXPECT_NEAR(noseamMosaicHist->Sum(), 7338.5876967209242, 0.005);
+  EXPECT_NEAR(noseamMosaicHist->Sum(), 7338.8188217326478, 0.005);
   EXPECT_EQ(noseamMosaicHist->ValidPixels(), 1812193);
   EXPECT_NEAR(noseamMosaicHist->StandardDeviation(), 0.0037573821357031172, 0.005);
 

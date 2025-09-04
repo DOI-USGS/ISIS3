@@ -1309,7 +1309,7 @@ TEST(OsirisRexPolyCamModules, PolyCamModuleTwoImageTest) {
 
   std::unique_ptr<Histogram> noseamMosaicHist(noseamMosaic.histogram());
   EXPECT_NEAR(noseamMosaicHist->Average(), 0.013594249872813711, 0.005);
-  EXPECT_NEAR(noseamMosaicHist->Sum(), 28517.175773404939, 0.014);
+  EXPECT_NEAR(noseamMosaicHist->Sum(), 28517.09297419725, 0.014);
   EXPECT_EQ(noseamMosaicHist->ValidPixels(), 2097732);
   EXPECT_NEAR(noseamMosaicHist->StandardDeviation(), 0.0073422521190466645, 0.005);
 

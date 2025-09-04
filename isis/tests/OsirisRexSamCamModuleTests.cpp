@@ -1330,7 +1330,7 @@ TEST(OsirisRexSamCamModules, SamCamModuleTwoImageTest) {
 
   std::unique_ptr<Histogram> noseamMosaicHist(noseamMosaic.histogram());
   EXPECT_NEAR(noseamMosaicHist->Average(), 0.010375753089644776, 0.005);
-  EXPECT_NEAR(noseamMosaicHist->Sum(), 11976.425999546173, 0.005);
+  EXPECT_NEAR(noseamMosaicHist->Sum(), 11976.949682191847, 0.005);
   EXPECT_EQ(noseamMosaicHist->ValidPixels(), 1154321);
   EXPECT_NEAR(noseamMosaicHist->StandardDeviation(), 0.010379350848041419, 0.005);
 

@@ -640,7 +640,12 @@ namespace Isis {
   }
 
   int IException::length() {
-    return m_previousExceptions->length();
+    if (m_previousExceptions) {
+      return m_previousExceptions->length();
+    }
+    else {
+      return 0;
+    }
   }
 
 
