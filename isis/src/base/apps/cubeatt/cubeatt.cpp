@@ -19,7 +19,7 @@ namespace Isis {
   }
 
 
-  // Doesn't allow specification of input attributes
+  // Does not allow specification of input attributes
   void cubeatt(Cube *icube, UserInterface &ui) {
     bool propTables = ui.GetBoolean("PROPTABLES");
     QString outputFileName = ui.GetCubeName("TO");
@@ -27,7 +27,7 @@ namespace Isis {
     cubeatt(icube, outputFileName, outputAttributes, propTables);
   }
 
-  // Doesn't allow specification of input attributes
+  // Does not allow specification of input attributes
   void cubeatt(Cube *icube, QString outputCubePath, CubeAttributeOutput outAttributes, bool propTables) {
     // We will be processing by line
     ProcessByLine p;
