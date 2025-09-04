@@ -86,7 +86,6 @@ namespace Isis {
     FileName inFile = cubes[0];
 
     FileName mosaicFile = FileName::createTempFile("$TEMPORARY/OriginalMosaic.cub");
-    std::cout << "MOSAIC FILE FROM NOSEAM: " << mosaicFile.expanded() << std::endl;
     tempFiles.push_back(mosaicFile);
 
     /**
