@@ -63,6 +63,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Changed `StripPolygonSeeder` and `GridPolygonSeeder` to seed individual polygons within each images multipolygon footprint [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
 - Pinned SpiceQL to 1.2.0 [#5852](https://github.com/DOI-USGS/ISIS3/pull/5852)
 - Changed `ControlMeasure` object comparison to no longer factor in creation date for equality [#5862](https://github.com/DOI-USGS/ISIS3/pull/5862)
+- Pinned Ale to >=1.0,<2 (from 0.11.0)
 
 ### Fixed
 - Fixed kaguyatc2isis invalid BandBin values [#5629](https://github.com/DOI-USGS/ISIS3/issues/5629)
