@@ -1,6 +1,5 @@
 # List of classes with old ISIS unitTests
-set(unitTestClasses "Blob"
-                    "Endian"
+set(unitTestClasses "Endian"
                     "FileName"
                     "IException"
                     "IString"
