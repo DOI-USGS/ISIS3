@@ -47,8 +47,11 @@ namespace Isis {
 
     // Check if we need to create the mask band
     if ((m_geodataSet->GetAccess() == GA_Update) && (m_driverName != "ISIS3")) {
-      m_geodataSet->CreateMaskBand(8);
-      m_geodataSet->GetRasterBand(1)->GetMaskBand()->Fill(255);
+      for (int i = 1; i <= m_bands; i++) {
+        GDALRasterBand *band = m_geodataSet->GetRasterBand(i);
+        band->CreateMaskBand(GMF_ALPHA);
+        band->GetMaskBand()->Fill(255);
+      }
     }
 
     GDALRasterBand *band = m_geodataSet->GetRasterBand(1);
