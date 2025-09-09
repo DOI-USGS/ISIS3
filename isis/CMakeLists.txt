@@ -236,27 +236,27 @@ find_program(RCC rcc REQUIRED)
 find_program(PROTOC protoc REQUIRED)
 
 find_package(Qt5 COMPONENTS
-                Core
-                Concurrent
-                Gui
-                Multimedia
-                MultimediaWidgets
-                Network
-                OpenGL # Needed to install mesa-common-dev for this!
-                PrintSupport
-                Qml
-                Quick
-                Script
-                ScriptTools
-                Sql
-                Svg
-                Test
-                WebChannel
-                Widgets
-                Xml
-                XmlPatterns
-                # Search this path explicitly for MacOS OpenGL Framework
-                PATHS /System/Library/Frameworks/ REQUIRED)
+                 Core
+                 Concurrent
+                 Gui
+                 Multimedia
+                 MultimediaWidgets
+                 Network
+                 OpenGL # Needed to install mesa-common-dev for this!
+                 PrintSupport
+                 Qml
+                 Quick
+                 Script
+                 ScriptTools
+                 Sql
+                 Svg
+                 Test
+                 WebChannel
+                 Widgets
+                 Xml
+                 XmlPatterns
+                 # Search this path explicitly for MacOS OpenGL Framework
+                 PATHS /System/Library/Frameworks/ REQUIRED)
 
 find_package(Boost 1.59.0 REQUIRED atomic
                                         log
@@ -302,10 +302,10 @@ find_package(GSL       2.2.1   REQUIRED)
 find_package(HDF5      1.8.15  REQUIRED)
 find_package(Jama      125     REQUIRED)
 find_package(NN                REQUIRED)
-find_package(OpenCV    3.1.0   REQUIRED)
+find_package(OpenCV    3.1.0   REQUIRED CONFIG)
 find_package(PCL               REQUIRED)
 find_package(Protobuf          REQUIRED CONFIG)
-find_package(PROJ              REQUIRED)
+find_package(PROJ              REQUIRED CONFIG)
 find_package(Qwt       6       REQUIRED)
 find_package(SuperLU   4.3     REQUIRED)
 find_package(SpiceQL           REQUIRED)
