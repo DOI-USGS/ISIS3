@@ -1,25 +1,27 @@
 #include <QTemporaryFile>
+#include <QTemporaryDir>
 #include <QString>
 #include <iostream>
 
+#include "Pvl.h"
 #include "Blob.h"
-
-#include "TempFixtures.h"
-#include "TiffFixtures.h"
-#include "TestUtilities.h"
+#include "SpecialPixel.h"
 
 #include "gmock/gmock.h"
 
 using namespace Isis;
 
-class DefaultBlob : public TempTestingFiles {
+
+class DefaultBlob : public ::testing::Test {
 
   protected:
+    QTemporaryDir tempDir;
     Blob *testBlob;
-    QString testBlobPath = tempDir.path() + "/junk_blob.pvl";
+    QString testBlobPath;
 
     void SetUp() override {
-      TempTestingFiles::SetUp();
+      ASSERT_TRUE(tempDir.isValid());
+      testBlobPath = tempDir.path() + "/junk_blob.pvl";
 
       testBlob = new Blob("UnitTest", "Blob");
       char buf[] = {"ABCD"};
@@ -33,7 +35,7 @@ class DefaultBlob : public TempTestingFiles {
   
 };
 
-TEST_F(TempTestingFiles, TestBlobDefault) {
+TEST_F(DefaultBlob, TestBlobDefault) {
   Blob b("UnitTest", "Blob");
   char buf[] = {"ABCD"};
   b.setData(buf, 4);
@@ -61,12 +63,12 @@ TEST_F(DefaultBlob, TestBlobWriteExisting) {
   strm.open(testBlobPath.toStdString(), std::ios::binary | std::ios::out);
   char buf[] = {"ABCD"};
   testBlob->setData(buf, 3);
+  ASSERT_EQ("UnitTest", testBlob->Name());
+  ASSERT_EQ(3, testBlob->Size());
+  ASSERT_EQ("Blob", testBlob->Type());
   testBlob->Write(pvl, strm);
   strm.seekp(0, std::ios::beg);
   strm << pvl;
-  EXPECT_EQ("UnitTest", testBlob->Name());
-  EXPECT_EQ(3, testBlob->Size());
-  EXPECT_EQ("Blob", testBlob->Type());
   strm.close();
 
   Blob b("UnitTest", "Blob", testBlobPath);
@@ -77,17 +79,28 @@ TEST_F(DefaultBlob, TestBlobWriteExisting) {
 }
 
 TEST_F(DefaultBlob, TestBlobWriteExistingEOF) {
-  Isis::Pvl pvl("junk");
+  Isis::Pvl pvl(testBlobPath);
   std::fstream strm;
   strm.open(testBlobPath.toStdString(), std::ios::binary | std::ios::out);
   char buf[] = {"ABCD"};
-  testBlob->setData(buf, 4);
+  testBlob->setData(buf, 3);
+  ASSERT_EQ("UnitTest", testBlob->Name());
+  ASSERT_EQ(3, testBlob->Size());
+  ASSERT_EQ("Blob", testBlob->Type());
   testBlob->Write(pvl, strm);
   strm.seekp(0, std::ios::beg);
   strm << pvl;
-  EXPECT_EQ("UnitTest", testBlob->Name());
-  EXPECT_EQ(4, testBlob->Size());
-  EXPECT_EQ("Blob", testBlob->Type());
+  strm.close();
+
+  pvl = Pvl(testBlobPath);
+  strm.open(testBlobPath.toStdString(), std::ios::binary | std::ios::out);
+  testBlob->setData(buf, 4);
+  ASSERT_EQ("UnitTest", testBlob->Name());
+  ASSERT_EQ(4, testBlob->Size());
+  ASSERT_EQ("Blob", testBlob->Type());
+  testBlob->Write(pvl, strm);
+  strm.seekp(0, std::ios::beg);
+  strm << pvl;
   strm.close();
 
   Blob b("UnitTest", "Blob", testBlobPath);
@@ -97,9 +110,26 @@ TEST_F(DefaultBlob, TestBlobWriteExistingEOF) {
   EXPECT_EQ("Blob", b.Type());
 }
 
-TEST_F(ReadWriteTiff, TestBlobWriteReadGdal) {
-  createTiff(UnsignedByte, false);
-  GDALDataset *dataset = GDALDataset::FromHandle(GDALOpen(path.toStdString().c_str(), GA_Update));
+TEST_F(DefaultBlob, TestBlobWriteReadGdal) {
+  GDALDataset *dataset = NULL;
+  QString path = tempDir.path() + "/tiny.tiff";
+  GDALAllRegister();
+  GDALDriver* driver = GetGDALDriverManager()->GetDriverByName("GTiff");
+  if (driver) {
+    char **papszOptions = NULL;
+    dataset = driver->Create(path.toStdString().c_str(), 1, 1, 1, GDT_Byte, papszOptions);
+    if (dataset) {
+      double noDataValue = (double) NULL1;
+      GDALRasterBand *band = dataset->GetRasterBand(1);
+      band->SetScale(1);
+      band->SetOffset(0);
+      band->SetNoDataValue(noDataValue);
+      dataset->CreateMaskBand(GMF_ALPHA);
+      dataset->GetRasterBand(1)->GetMaskBand()->Fill(255);
+      dataset->Close();
+    }
+  }
+  dataset = GDALDataset::FromHandle(GDALOpen(path.toStdString().c_str(), GA_Update));
 
   Blob writeBlob("UnitTest", "Blob");
   char buf[] = {"ABCD"};

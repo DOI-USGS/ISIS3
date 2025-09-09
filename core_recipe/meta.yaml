@@ -20,10 +20,12 @@ requirements:
     - {{ compiler("cxx") }}
     - {{ stdlib("c") }}
     - cmake >=3.27,<3.28
+    - gdal
     - ninja
     - python =3.11
     - setuptools
   host:
+    - gdal
     - mesalib
     - nlohmann_json
     - python =3.11
@@ -33,7 +35,7 @@ requirements:
   run:
     - python =3.11
     - {{ pin_compatible('qt-main', max_pin='x.x') }}
-    - {{ pin_compatible('nlohmann_json', min_pin='x.x', max_pin='x.x') }}
+    - {{ pin_compatible('nlohmann_json', min_pin='x.x.x', max_pin='x.x.x') }}
 
 test:
   commands:

@@ -55,16 +55,16 @@ add_library(core SHARED "${Pvl_source_files}")
 
 target_include_directories(core PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
-find_package(Qt5 REQUIRED COMPONENTS
-                Core
-                Concurrent
-                Widgets
-                Xml
-                XmlPatterns
-                # Search this path explicitly for MacOS OpenGL Framework
-                PATHS /System/Library/Frameworks/ REQUIRED)
-
+find_package(Qt5           REQUIRED COMPONENTS
+                                    Core
+                                    Concurrent
+                                    Widgets
+                                    Xml
+                                    XmlPatterns
+                                    # Search this path explicitly for MacOS OpenGL Framework
+                                    PATHS /System/Library/Frameworks/ REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(GDAL          REQUIRED CONFIG)
 
 include_directories(SYSTEM
                     ${Qt5Widgets_INCLUDE_DIRS}
@@ -79,7 +79,9 @@ target_link_libraries(core PUBLIC Qt5::Core
                                   Qt5::Widgets
                                   Qt5::Network
                                   Qt5::Xml
-                                  nlohmann_json::nlohmann_json)
+                           PRIVATE
+                                  nlohmann_json::nlohmann_json
+                                  GDAL::GDAL)
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
         DESTINATION ${CMAKE_INSTALL_PREFIX}/include/isis
@@ -88,12 +90,14 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
 install(TARGETS core DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
 # Copy the preferences file
-EXECUTE_PROCESS(COMMAND cp -f ${PROJECT_SOURCE_DIR}/IsisPreferences ${CMAKE_BINARY_DIR}/)
-install(FILES     ${CMAKE_SOURCE_DIR}/IsisPreferences DESTINATION  ${CMAKE_INSTALL_PREFIX})
+EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_CURRENT_SOURCE_DIR}/../../../isis/IsisPreferences ${CMAKE_BINARY_DIR}/)
+install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/../../../isis/IsisPreferences DESTINATION  ${CMAKE_INSTALL_PREFIX})
+
+EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_CURRENT_SOURCE_DIR}/../../../LICENSE.md    ${CMAKE_BINARY_DIR})
 
 if (BUILD_TESTS)
   # Copy the test preferences file
-  EXECUTE_PROCESS(COMMAND cp -f ${PROJECT_SOURCE_DIR}/TestPreferences ${CMAKE_BINARY_DIR}/)
+  EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_CURRENT_SOURCE_DIR}/../../../isis/TestPreferences ${CMAKE_BINARY_DIR}/)
   enable_testing()
   add_subdirectory(tests)
 endif()
