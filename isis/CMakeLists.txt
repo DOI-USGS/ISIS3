@@ -218,10 +218,11 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(APPLE)
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0" CACHE STRING "" FORCE)
 else()
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Og")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og"  CACHE STRING "" FORCE)
 endif()
+message("${CMAKE_CXX_FLAGS_DEBUG}")
 
 # Paths to required executables
 if (buildDocs)
