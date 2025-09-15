@@ -2408,14 +2408,15 @@ namespace Isis {
    * @return bool True if the BLOB was found
    */
   bool Cube::hasBlob(const QString &name, const QString &type) {
-    if (gdalDataset()) {
+    try {
       string key = type.toStdString() + "_" + name.toStdString();
       const char *jsonblobStr = gdalDataset()->GetMetadataItem(key.c_str(), "USGS");
 
       if (jsonblobStr) {
         return true;
       }
-
+    }
+    catch (IException &e) {
       return false;
     }
     
