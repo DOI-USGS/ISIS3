@@ -2408,15 +2408,13 @@ namespace Isis {
    * @return bool True if the BLOB was found
    */
   bool Cube::hasBlob(const QString &name, const QString &type) {
-    try {
+    if (gdalDataset()) {
       string key = type.toStdString() + "_" + name.toStdString();
       const char *jsonblobStr = gdalDataset()->GetMetadataItem(key.c_str(), "USGS");
 
       if (jsonblobStr) {
         return true;
       }
-    }
-    catch (IException &e) {
       return false;
     }
     
@@ -2599,10 +2597,6 @@ namespace Isis {
 
 
   GDALDataset *Cube::gdalDataset() const {
-    if (!m_geodataSet) {
-      QString msg = "No GDALDataset has been constructed";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
     return m_geodataSet;
   }
 
