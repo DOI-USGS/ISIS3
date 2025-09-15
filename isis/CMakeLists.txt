@@ -205,14 +205,15 @@ endif()
 # Add gold linker (and therefore, phtread) to speed up linux (spec. Ubuntu18.04) builds
 if(NOT APPLE)
   set(thirdPartyCppFlags ${thirdPartyCppFlags} -fuse-ld=gold
-	                                             -pthread
-					                                     -fext-numeric-literals
-                                               -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
+	                                       -pthread
+					       -fext-numeric-literals
+                                               -Wl,-rpath,$ENV{CONDA_PREFIX}/lib
+				               --param=max-vartrack-size=4500000)
 endif()
 
 # Append CPP flags set in the third party lib file to the string set in this file.
 string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" CACHE STRING "" FORCE)
 
 if(NOT CMAKE_BUILD_TYPE)
    set(CMAKE_BUILD_TYPE "RELEASE")
