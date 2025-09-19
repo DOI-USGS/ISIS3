@@ -193,7 +193,7 @@ set(CMAKE_CXX_STANDARD 17)
 # Append CPP flags set in the third party lib file to the string set in this file.
 string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
 
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR} " )
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 
 if (NOT JP2KFLAG)
   # Pass the NO_JP2K flag to C++
@@ -203,7 +203,7 @@ endif()
 # Flag to fix numeric literals problem with boost on linux
 # Add gold linker (and therefore, phtread) to speed up linux (spec. Ubuntu18.04) builds
 if(NOT APPLE)
-  set(thirdPartyCppFlags ${thirdPartyCppFlags} 
+  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fuse-ld=gold
 	                                             -pthread
 					                                     -fext-numeric-literals
                                                -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
