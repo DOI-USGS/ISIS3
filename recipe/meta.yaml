@@ -64,6 +64,7 @@ requirements:
    - eigen >=3, <4
    - embree >=3, <4
    - ffmpeg
+   - gcovr
    - geos >=3.12, <3.13
    - geotiff
    - gdal >=3.7,<3.9
@@ -89,7 +90,7 @@ requirements:
    - mkl                         # [not (osx and arm64)]
    - mysql
    - mysql-connector-c           # [not (osx and arm64)]
-   - nanoflann <1.4
+   - nanoflann >=1.4.2,<1.5
    - nlohmann_json=3.11.2
    - ninja >=1.10,<1.11
    - nn
@@ -161,7 +162,7 @@ requirements:
   - mesalib
   - {{ pin_compatible('mkl', min_pin='x', max_pin='x.x') }}  # [not (osx and arm64)]
   - mysql
-  - nanoflann
+  - nanoflann >=1.4.2,<1.5
   - nlohmann_json
   - nn
   - {{ pin_compatible('opencv', max_pin='x.x') }}
@@ -174,6 +175,7 @@ requirements:
   - {{ pin_compatible('qt-main', max_pin='x.x') }}
   - {{ pin_compatible('qwt', max_pin='x.x') }}
   - rclone
+  - spiceql =1.2.0
   - {{ pin_compatible('suitesparse', min_pin='x.x', max_pin='x.x') }}
   - superlu
   - tnt
