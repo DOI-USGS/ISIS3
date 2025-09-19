@@ -107,7 +107,7 @@ requirements:
    - qhull
    - qt-main >=5.15,<5.16
    - qwt <6.3.0
-   - spiceql =1.2.4
+   - spiceql =1.2.0
    - sqlite >=3.46.0,<3.47
    - suitesparse <7.7.0
    - superlu
@@ -175,7 +175,7 @@ requirements:
   - {{ pin_compatible('qt-main', max_pin='x.x') }}
   - {{ pin_compatible('qwt', max_pin='x.x') }}
   - rclone
-  - spiceql =1.2.4
+  - spiceql =1.2.0
   - {{ pin_compatible('suitesparse', min_pin='x.x', max_pin='x.x') }}
   - superlu
   - tnt
