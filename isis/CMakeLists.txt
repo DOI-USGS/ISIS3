@@ -283,7 +283,7 @@ find_package(Json              REQUIRED)
 find_package(BulletFloat64     REQUIRED)
 find_package(Cholmod   4.4.5   REQUIRED)
 find_package(CSM       3.0.3.3 REQUIRED)
-find_package(CSPICE    65      REQUIRED)
+find_package(cspice    67      REQUIRED)
 find_package(Eigen             REQUIRED)
 find_package(Embree    3.13.0  REQUIRED)
 find_package(GDAL              REQUIRED CONFIG)
@@ -395,6 +395,10 @@ list(REMOVE_DUPLICATES ALLINCDIRS)
 #===============================================================================
 #===============================================================================
 
+
+get_target_property(CSPICE_INCLUDE_DIRS CSPICE::cspice INTERFACE_INCLUDE_DIRECTORIES)
+link_libraries(CSPICE::cspice)
+
 # Start setting up the build
 # Add extension to find fortran until .so symlink can be added to /usr/lib64
 list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES .so.3 .so.6 .so.5)
@@ -403,7 +407,10 @@ list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES .so.3 .so.6 .so.5)
 include_directories(SYSTEM ${ALLINCDIRS})
 link_directories(${ALLLIBDIRS})
 
-include_directories(${CMAKE_BINARY_DIR}/inc)
+include_directories(
+  ${CMAKE_BINARY_DIR}/inc
+  ${CSPICE_INCLUDE_DIRS}
+  )
 set(CORE_LIB_NAME isis)
 message(STATUS "CORE LIB:  ${CORE_LIB_NAME}")
 
