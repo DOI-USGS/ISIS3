@@ -1,0 +1,86 @@
+name: Environment File Check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  check-environment-files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get changed files
+        id: files
+        run: |
+          files=$(gh api \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
+            --jq '.[].filename')
+          echo "Changed files:"
+          printf '  -> %s\n' $files
+          echo "changed_files<<EOF" >> $GITHUB_ENV
+          echo "$files" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Determine missing environment/meta files
+        id: check
+        run: |
+          # Required files
+          required_files=("environment.yml" "environment_arm.yml" "environment_arm_linux.yml" "recipe/meta.yaml")
+
+          # Convert changed files to array
+          readarray -t changed_array <<< "$changed_files"
+
+          # Check if any required file was changed
+          any_changed=false
+          for f in "${required_files[@]}"; do
+            if printf '%s\n' "${changed_array[@]}" | grep -qx "$f"; then
+              any_changed=true
+              break
+            fi
+          done
+
+          if [ "$any_changed" = false ]; then
+            echo "No environment/meta files changed."
+            exit 0
+          fi
+
+          # Determine missing files
+          missing=()
+          for f in "${required_files[@]}"; do
+            if ! printf '%s\n' "${changed_array[@]}" | grep -qx "$f"; then
+              missing+=("$f")
+            fi
+          done
+
+          # Set output if missing files exist
+          if [ ${#missing[@]} -gt 0 ]; then
+            formatted_missing=$(printf "%s\n" "${missing[@]}" | sed 's/^/> - /')
+
+            echo "missing_files<<EOF" >> $GITHUB_OUTPUT
+            echo "$formatted_missing" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+        env:
+          changed_files: ${{ env.changed_files }}
+
+      - name: Comment on PR if files are missing
+        if: steps.check.outputs.missing_files
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            > [!CAUTION] 
+            > ## Environment/meta file update notice
+            > You modified one of the environment/meta files but the following files were not updated:
+            >
+            ${{ steps.check.outputs.missing_files }}
+            >
+            > Please update them as well.
+
+      - name: Fail workflow if missing files
+        if: steps.check.outputs.missing_files
+        run: |
+          echo "Missing required environment/meta files detected."
+          exit 1
