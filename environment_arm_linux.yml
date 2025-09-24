@@ -13,7 +13,7 @@ dependencies:
   - cspice =67
   #- csm >=3.0.3,<3.0.4
   - curl >=8.14.1,<9
-  - cxx-compiler=1.7
+  - cxx-compiler=1.10
   - doxygen
   - eigen >=3, <4
   - embree >=3, <4
@@ -57,8 +57,8 @@ dependencies:
   - pytest
   - rclone
   - qhull
-  - qt-main>=5.15, <5.16
-  - qwt <6.3.0
+  # - qt-main>=5.15, <5.16
+  # - qwt <6.3.0
   - spiceql >=1.2.4*_5,<2
   - sqlite >=3.46.0,<4
   - suitesparse <7.7.0
