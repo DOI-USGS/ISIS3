@@ -1,15 +1,16 @@
 name: Environment File Check
 
+permissions:
+  pull-requests: write
+
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, edited, synchronize]
 
 jobs:
   check-environment-files:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
       - name: Get changed files
         id: files
         run: |
