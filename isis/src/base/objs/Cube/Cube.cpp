@@ -2483,7 +2483,7 @@ namespace Isis {
     }
 
     // Change the number of bands in the labels of the cube
-    if (m_virtualBandList && core.hasGroup("Dimensions")) core.findGroup("Dimensions")["Bands"] = toString(m_virtualBandList->size());
+    if (m_virtualBandList && core.hasGroup("Dimensions")) core.findGroup("Dimensions")["Bands"] = toString((int)m_virtualBandList->size());
   }
 
 

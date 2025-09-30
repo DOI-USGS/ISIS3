@@ -167,9 +167,9 @@ endif()
 
 if(buildTests)
   include(CTest)
-  # include(CodeCoverage)
+  include(CodeCoverage)
   enable_testing()
-  # APPEND_COVERAGE_COMPILER_FLAGS()
+  APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
 

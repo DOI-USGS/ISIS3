@@ -548,7 +548,7 @@ namespace Isis {
       if(rubberBandTool()->mouseButton() & Qt::MiddleButton) {
         factor = 1.0;
       }
-      if(rubberBandTool()->mouseButton() == Qt::MiddleButton + Qt::ControlModifier) {
+      if(rubberBandTool()->mouseButton() == (Qt::MiddleButton & Qt::ControlModifier)) {
         factor = 0.0;
       }
 //      MdiCubeViewport *d = cubeViewport();

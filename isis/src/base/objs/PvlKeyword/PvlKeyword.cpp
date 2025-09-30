@@ -1899,7 +1899,8 @@ namespace Isis {
         // if any errors (i.e. eof) happen in the get operation then don't
         //   store this data
         if (is.good()) {
-          lineOfData += next;
+          // Cast this back to char to handle signed issues with ARM
+          lineOfData += (char)next;
         }
 
         if (insideComment &&

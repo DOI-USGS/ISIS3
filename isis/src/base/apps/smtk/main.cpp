@@ -484,7 +484,7 @@ void IsisMain() {
   totalPointsPvl += PvlKeyword("AttemptedPoints", toString(numAttemptedInitialPoints));
   totalPointsPvl += PvlKeyword("InitialSuccesses", toString(numOrigPoints));
   totalPointsPvl += PvlKeyword("GrowSuccesses", toString(passpix2));
-  totalPointsPvl += PvlKeyword("ResultingPoints", toString(bmf.size()));
+  totalPointsPvl += PvlKeyword("ResultingPoints", toString((int)bmf.size()));
 
   Application::Log(totalPointsPvl);
 

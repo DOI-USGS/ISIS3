@@ -1041,7 +1041,7 @@ namespace Isis {
       GEOSSTRtree *rtree = GEOSSTRtree_create(v_active.size());
       if ( !rtree ) {
         QString mess = "GEOS RTree allocation failed for " +
-                        toString(v_active.size()) + " geometries.";
+                        toString((int)v_active.size()) + " geometries.";
           throw IException(IException::Programmer, mess, _FILEINFO_);
         }
 

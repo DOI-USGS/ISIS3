@@ -2130,7 +2130,7 @@ namespace Isis {
 
     stream.writeStartElement("imageResidualsLists");
     stream.writeStartElement("residualsList");
-    stream.writeAttribute("listSize", toString(rmsImageResiduals().size()));
+    stream.writeAttribute("listSize", toString((int)rmsImageResiduals().size()));
     for (int i = 0; i < m_rmsImageResiduals.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsImageResiduals[i].save(stream, project);
@@ -2138,7 +2138,7 @@ namespace Isis {
     }
     stream.writeEndElement(); // end residuals list
     stream.writeStartElement("sampleList");
-    stream.writeAttribute("listSize", toString(rmsImageSampleResiduals().size()));
+    stream.writeAttribute("listSize", toString((int)rmsImageSampleResiduals().size()));
     for (int i = 0; i < m_rmsImageSampleResiduals.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsImageSampleResiduals[i].save(stream, project);
@@ -2147,7 +2147,7 @@ namespace Isis {
     stream.writeEndElement(); // end sample residuals list
 
     stream.writeStartElement("lineList");
-    stream.writeAttribute("listSize", toString(rmsImageLineResiduals().size()));
+    stream.writeAttribute("listSize", toString((int)rmsImageLineResiduals().size()));
     for (int i = 0; i < m_rmsImageLineResiduals.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsImageLineResiduals[i].save(stream, project);
@@ -2156,7 +2156,7 @@ namespace Isis {
     stream.writeEndElement(); // end line residuals list
 
     stream.writeStartElement("lidarResidualsList");
-    stream.writeAttribute("listSize", toString(rmsLidarImageResiduals().size()));
+    stream.writeAttribute("listSize", toString((int)rmsLidarImageResiduals().size()));
     for (int i = 0; i < m_rmsLidarImageResiduals.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsLidarImageResiduals[i].save(stream, project);
@@ -2165,7 +2165,7 @@ namespace Isis {
     stream.writeEndElement(); // end line residuals list
 
     stream.writeStartElement("lidarSampleList");
-    stream.writeAttribute("listSize", toString(rmsLidarImageSampleResiduals().size()));
+    stream.writeAttribute("listSize", toString((int)rmsLidarImageSampleResiduals().size()));
     for (int i = 0; i < m_rmsLidarImageSampleResiduals.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsLidarImageSampleResiduals[i].save(stream, project);
@@ -2174,7 +2174,7 @@ namespace Isis {
     stream.writeEndElement(); // end line residuals list
 
     stream.writeStartElement("lidarLineList");
-    stream.writeAttribute("listSize", toString(rmsLidarImageLineResiduals().size()));
+    stream.writeAttribute("listSize", toString((int)rmsLidarImageLineResiduals().size()));
     for (int i = 0; i < m_rmsLidarImageLineResiduals.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsLidarImageLineResiduals[i].save(stream, project);
@@ -2185,7 +2185,7 @@ namespace Isis {
 
     stream.writeStartElement("imageSigmasLists");
     stream.writeStartElement("xSigmas");
-    stream.writeAttribute("listSize", toString(rmsImageXSigmas().size()));
+    stream.writeAttribute("listSize", toString((int)rmsImageXSigmas().size()));
     for (int i = 0; i < m_rmsImageXSigmas.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsImageXSigmas[i].save(stream, project);
@@ -2195,7 +2195,7 @@ namespace Isis {
     stream.writeEndElement(); // end x sigma list
 
     stream.writeStartElement("ySigmas");
-    stream.writeAttribute("listSize", toString(rmsImageYSigmas().size()));
+    stream.writeAttribute("listSize", toString((int)rmsImageYSigmas().size()));
     for (int i = 0; i < m_rmsImageYSigmas.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsImageYSigmas[i].save(stream, project);
@@ -2204,7 +2204,7 @@ namespace Isis {
     stream.writeEndElement(); // end y sigma list
 
     stream.writeStartElement("zSigmas");
-    stream.writeAttribute("listSize", toString(rmsImageZSigmas().size()));
+    stream.writeAttribute("listSize", toString((int)rmsImageZSigmas().size()));
     for (int i = 0; i < m_rmsImageZSigmas.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsImageZSigmas[i].save(stream, project);
@@ -2213,7 +2213,7 @@ namespace Isis {
     stream.writeEndElement(); // end z sigma list
 
     stream.writeStartElement("raSigmas");
-    stream.writeAttribute("listSize", toString(rmsImageRASigmas().size()));
+    stream.writeAttribute("listSize", toString((int)rmsImageRASigmas().size()));
     for (int i = 0; i < m_rmsImageRASigmas.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsImageRASigmas[i].save(stream, project);
@@ -2222,7 +2222,7 @@ namespace Isis {
     stream.writeEndElement(); // end ra sigma list
 
     stream.writeStartElement("decSigmas");
-    stream.writeAttribute("listSize", toString(rmsImageDECSigmas().size()));
+    stream.writeAttribute("listSize", toString((int)rmsImageDECSigmas().size()));
     for (int i = 0; i < m_rmsImageDECSigmas.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsImageDECSigmas[i].save(stream, project);
@@ -2231,7 +2231,7 @@ namespace Isis {
     stream.writeEndElement(); // end dec sigma list
 
     stream.writeStartElement("twistSigmas");
-    stream.writeAttribute("listSize", toString(rmsImageTWISTSigmas().size()));
+    stream.writeAttribute("listSize", toString((int)rmsImageTWISTSigmas().size()));
     for (int i = 0; i < m_rmsImageTWISTSigmas.size(); i++) {
       stream.writeStartElement("statisticsItem");
       m_rmsImageTWISTSigmas[i].save(stream, project);

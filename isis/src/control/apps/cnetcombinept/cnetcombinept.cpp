@@ -490,7 +490,7 @@ namespace Isis{
     int pMerged = validPoints - vPoints;
     PvlGroup summary("Summary");
     summary += PvlKeyword("TotalCubes",        toString(cube_measures_size));
-    summary += PvlKeyword("TotalInputPoints",  toString(all_points.size()));
+    summary += PvlKeyword("TotalInputPoints",  toString((int)all_points.size()));
     summary += PvlKeyword("TotalOutputPoints", toString(oPoints));
     summary += PvlKeyword("PointsMerged",      toString(pMerged));
     summary += PvlKeyword("PointsEvaluated",   toString(nfound));

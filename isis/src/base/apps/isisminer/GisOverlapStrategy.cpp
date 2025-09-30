@@ -209,7 +209,7 @@ namespace Isis {
     if ( !rtree ) {
       cout << "Address: " << rtree << "\n";
       QString mess = "GEOS RTree allocation failed for " +
-                      toString(goodones.size()) + " geometries.";
+                      toString((int)goodones.size()) + " geometries.";
         throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
