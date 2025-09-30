@@ -167,9 +167,9 @@ endif()
 
 if(buildTests)
   include(CTest)
-  include(CodeCoverage)
+  # include(CodeCoverage)
   enable_testing()
-  APPEND_COVERAGE_COMPILER_FLAGS()
+  # APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
 
@@ -206,7 +206,9 @@ endif()
 
 # Append CPP flags set in the third party lib file to the string set in this file.
 string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
+message("FLAGS: ${FLAGS_STR}")
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" CACHE STRING "" FORCE)
+message("CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
 if(NOT CMAKE_BUILD_TYPE)
    set(CMAKE_BUILD_TYPE "RELEASE")
@@ -238,7 +240,7 @@ find_package(Qt6 COMPONENTS
                  Multimedia
                  MultimediaWidgets
                  Network
-                 OpenGL # Needed to install mesa-common-dev for this!
+            		 OpenGL # Needed to install mesa-common-dev for this!
                  PrintSupport
                  Qml
                  Quick
