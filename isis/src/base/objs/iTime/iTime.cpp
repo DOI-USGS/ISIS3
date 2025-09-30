@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 #include <sstream>
 
 #include <QString>
+#include <QRegularExpression>
 
 #include "Preference.h"
 
@@ -343,7 +344,7 @@ namespace Isis {
     osec.setf(ios::fixed);
     osec << setprecision(precision) << Second();
     QString sSeconds(osec.str().c_str());
-    sSeconds = sSeconds.remove(QRegExp("(\\.0*|0*)$"));
+    sSeconds = sSeconds.remove(QRegularExpression("(\\.0*|0*)$"));
 
     if(sSeconds.isEmpty()) sSeconds = "0";
     return sSeconds;

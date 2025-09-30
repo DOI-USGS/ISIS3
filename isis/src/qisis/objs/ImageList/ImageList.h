@@ -13,7 +13,6 @@
 #include "SerialNumberList.h"
 #include "WorkOrder.h"
 
-class QStringList;
 class QXmlStreamWriter;
 
 namespace Isis {

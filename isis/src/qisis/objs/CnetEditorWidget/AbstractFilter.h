@@ -14,7 +14,6 @@ find files of those names at the top level of this repository. **/
 class QBoxLayout;
 class QButtonGroup;
 class QCheckBox;
-template< typename U, typename V > struct QPair;
 class QString;
 template< typename T > class QFlags;
 

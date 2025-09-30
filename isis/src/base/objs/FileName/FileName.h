@@ -13,8 +13,6 @@ class QDate;
 class QDir;
 class QString;
 
-template<typename A, typename B> struct QPair;
-
 namespace Isis {
   /**
    * @brief File name manipulation and expansion.
@@ -179,8 +177,8 @@ namespace Isis {
        */
       QString toString() const;
       FileName &operator=(const FileName &rhs);
-      bool operator==(const FileName &rhs);
-      bool operator!=(const FileName &rhs);
+      friend bool operator==(const FileName& lhs, const FileName& rhs);
+      friend bool operator!=(const FileName& lhs, const FileName& rhs);
 
 
     private:

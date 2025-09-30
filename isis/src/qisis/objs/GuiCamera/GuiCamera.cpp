@@ -3,6 +3,7 @@
 #include <QDataStream>
 #include <QDebug>
 #include <QList>
+#include <QRegularExpression>
 #include <QUuid>
 #include <QXmlStreamWriter>
 
@@ -129,7 +130,7 @@ namespace Isis {
    * @return @b QString returns m_id
    */
   QString GuiCamera::id() const {
-    return m_id->toString().remove(QRegExp("[{}]"));
+    return m_id->toString().remove(QRegularExpression("[{}]"));
   }
   
   

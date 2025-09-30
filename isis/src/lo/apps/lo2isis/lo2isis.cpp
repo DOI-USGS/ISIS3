@@ -7,13 +7,16 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "lo2isis.h"
+
+#include <QRegularExpression>
+#include <QString>
+
 #include "ProcessImportPds.h"
 #include "UserInterface.h"
 #include "FileName.h"
 #include "Pvl.h"
 #include "IException.h"
 #include "TextFile.h"
-#include <QString>
 
 using namespace std;
 
@@ -107,8 +110,8 @@ namespace Isis{
     if(!inputLabel.hasKeyword("LO:BORESIGHT_SAMPLE", Pvl::Traverse)) {
       QString fcm = (QString) inst.findKeyword("FiducialCoordinateMicron");
       QString fcmUnits = fcm;
-      fcmUnits.remove(QRegExp("^[0-9.]*"));
-      fcm.remove(QRegExp("[a-zA-Z]*$"));
+      fcmUnits.remove(QRegularExpression("^[0-9.]*"));
+      fcm.remove(QRegularExpression("[a-zA-Z]*$"));
       inst.findKeyword("FiducialCoordinateMicron").setValue(fcm, fcmUnits);
     }
 

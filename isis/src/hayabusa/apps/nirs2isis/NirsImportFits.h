@@ -44,28 +44,28 @@ namespace Isis {
     public:
       NirsImportFits();
       NirsImportFits(const FileName &fitsfile,
-                 const QString &fitsLabelName="FitsLabel");
+                     const QString &fitsLabelName="FitsLabel");
       ~NirsImportFits();
 
       int samples() const;
       int lines() const;
       int bands() const;
 
-      PvlObject label() const;
+      PvlGroup label() const;
 
       void load(const QString &fitsfile,
                 const QString &fitsLabelName = "FitsLabel");
 
     private:
       void init();
-      PvlObject parseLabel(std::ifstream &in, const QString &fitLabelName);
+      PvlGroup parseLabel(std::ifstream &in, const QString &fitLabelName);
 
       // Private instance variables
       FileName  m_file;       //!< FITS file name
       int       m_lines;      //!< Number lines in image
       int       m_samples;    //!< Number samples in image
       int       m_bands;      //!< Number bands in image
-      PvlObject  m_label;      //!< FITS label converted to ISIS format
+      PvlGroup m_label;      //!< FITS label converted to ISIS format
 
   };
 

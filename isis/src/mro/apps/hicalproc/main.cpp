@@ -9,6 +9,8 @@ find files of those names at the top level of this repository. **/
 #include "Isis.h"
 #include "IException.h"
 
+#include <QRegularExpression>
+
 #include "CSVReader.h"
 #include "IString.h"
 #include "UserInterface.h"
@@ -524,7 +526,7 @@ void ReadCoefficientFile(QString psCoeffile, QString psCcd, int piChannel)
   if (iRowIndex != -1) {
     int iArrSize = csvArr.dim();
     for (int i=1; i<iArrSize; i++) {
-      csvArr[i] = csvArr[i].trimmed().remove(QRegExp("(^,*|,*$)"));
+      csvArr[i] = csvArr[i].trimmed().remove(QRegularExpression("(^,*|,*$)"));
       dCoeff[i] = toDouble(csvArr[i]);
       if (dCoeff[i] < 0) {
         dCoeff[i] *= -1;
@@ -558,7 +560,7 @@ void AnalyzeCubenormStats(QString psStatsFile, int piSumming, double & pdMinDN, 
 
     int iArrSize = csvArr.dim();
     for (int j=0; j<iArrSize; j++) {
-      csvArr[i] = csvArr[i].trimmed().remove(QRegExp("(^,*|,*$)"));
+      csvArr[i] = csvArr[i].trimmed().remove(QRegularExpression("(^,*|,*$)"));
       // Store Valid Points and get the Max Valid Points for a
       // given RowCol
       //cerr << "  " << j << "." << csvArr[j];

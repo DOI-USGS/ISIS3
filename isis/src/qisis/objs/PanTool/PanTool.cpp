@@ -154,7 +154,7 @@ namespace Isis {
     QLabel *percent = new QLabel("%");
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(leftButton);
     layout->addWidget(rightButton);
     layout->addWidget(upButton);

@@ -212,24 +212,24 @@ namespace Isis {
         int iComment = 0;
         if (numMeasures == 0) {
           QString sComment = "Comment";
-          sComment += QString(++iComment);
+          sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
         }
 
         if (newPnt->IsIgnored()) {
           QString sComment = "Comment";
-          sComment += QString(++iComment);
+          sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
 
         if (newPnt->GetType() == ControlPoint::Fixed) {
           QString sComment = "Comment";
-          sComment += QString(++iComment);
+          sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Fixed Point");
         }
         else if (newPnt->GetType() == ControlPoint::Constrained) {
           QString sComment = "Comment";
-          sComment += QString(++iComment);
+          sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Constrained Point");
         }
 
@@ -261,9 +261,9 @@ namespace Isis {
               origPnt.GetMeasure(iRefIndex)->GetCubeSerialNumber());
           pvlRefChangeGrp += Isis::PvlKeyword("PrevResolution",   toString(mdResVector[iRefIndex]));
 
-          istrTemp = QString((int)origPnt.GetMeasure(iRefIndex)->GetSample());
+          istrTemp = toString((int)origPnt.GetMeasure(iRefIndex)->GetSample());
           istrTemp += ",";
-          istrTemp += QString((int)origPnt.GetMeasure(iRefIndex)->GetLine());
+          istrTemp += toString((int)origPnt.GetMeasure(iRefIndex)->GetLine());
           pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     istrTemp);
         }
         else {
@@ -288,9 +288,9 @@ namespace Isis {
         }
         pvlRefChangeGrp += Isis::PvlKeyword(sKeyName,  toString(mdResVector[iBestIndex]));
 
-        istrTemp = QString((int)newPnt->GetMeasure(iBestIndex)->GetSample());
+        istrTemp = toString((int)newPnt->GetMeasure(iBestIndex)->GetSample());
         istrTemp += ",";
-        istrTemp += QString((int)newPnt->GetMeasure(iBestIndex)->GetLine());
+        istrTemp += toString((int)newPnt->GetMeasure(iBestIndex)->GetLine());
         pvlRefChangeGrp += Isis::PvlKeyword("NewLocation",      istrTemp);
 
         pvlPointObj += pvlRefChangeGrp;

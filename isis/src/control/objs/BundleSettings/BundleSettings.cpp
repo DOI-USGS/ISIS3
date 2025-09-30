@@ -1121,15 +1121,15 @@ namespace Isis {
             }       
           }
           else if (xmlReader->qualifiedName() == "solveOptions") {
-            QStringRef solveObservationMode = xmlReader->attributes().value("solveObservationMode");
+            QStringView solveObservationMode = xmlReader->attributes().value("solveObservationMode");
             if (!solveObservationMode.isEmpty()) {
               m_solveObservationMode = toBool(solveObservationMode.toString());
             }
-            QStringRef solveRadius = xmlReader->attributes().value("solveRadius");
+            QStringView solveRadius = xmlReader->attributes().value("solveRadius");
             if (!solveRadius.isEmpty()) {
               m_solveRadius = toBool(solveRadius.toString());
             }
-            QStringRef controlPointCoordTypeReports = xmlReader->attributes().value("controlPointCoordTypeReports");
+            QStringView controlPointCoordTypeReports = xmlReader->attributes().value("controlPointCoordTypeReports");
             if (!controlPointCoordTypeReports.isEmpty()) {
               if (controlPointCoordTypeReports == "0") {
                 m_cpCoordTypeReports = SurfacePoint::Latitudinal;
@@ -1138,7 +1138,7 @@ namespace Isis {
                 m_cpCoordTypeReports = SurfacePoint::Rectangular;
               }           
             }
-            QStringRef controlPointCoordTypeBundle = xmlReader->attributes().value("controlPointCoordTypeBundle");
+            QStringView controlPointCoordTypeBundle = xmlReader->attributes().value("controlPointCoordTypeBundle");
             if (!controlPointCoordTypeBundle.isEmpty()) {
               if (controlPointCoordTypeBundle == "0") {
                 m_cpCoordTypeBundle = SurfacePoint::Latitudinal;
@@ -1147,22 +1147,22 @@ namespace Isis {
                 m_cpCoordTypeBundle = SurfacePoint::Rectangular;
               }   
             }
-            QStringRef updateCubeLabel = xmlReader->attributes().value("updateCubeLabel");
+            QStringView updateCubeLabel = xmlReader->attributes().value("updateCubeLabel");
             if (!updateCubeLabel.isEmpty()) {
               m_updateCubeLabel = toBool(updateCubeLabel.toString());
             }
-            QStringRef errorPropagation = xmlReader->attributes().value("errorPropagation");
+            QStringView errorPropagation = xmlReader->attributes().value("errorPropagation");
             if (!errorPropagation.isEmpty()) {
               m_errorPropagation = toBool(errorPropagation.toString());
             }
-            QStringRef createInverseMatrix = xmlReader->attributes().value("createInverseMatrix");
+            QStringView createInverseMatrix = xmlReader->attributes().value("createInverseMatrix");
             if (!createInverseMatrix.isEmpty()) {
               m_createInverseMatrix = toBool(createInverseMatrix.toString());
             }
             xmlReader->skipCurrentElement();
           }
           else if (xmlReader->qualifiedName() == "aprioriSigmas") {
-            QStringRef globalPointCoord1AprioriSigma = xmlReader->attributes().value("pointCoord1");
+            QStringView globalPointCoord1AprioriSigma = xmlReader->attributes().value("pointCoord1");
             if (!globalPointCoord1AprioriSigma.isEmpty()) {
               if (globalPointCoord1AprioriSigma == "N/A") {
                 m_globalPointCoord1AprioriSigma = Isis::Null;
@@ -1171,7 +1171,7 @@ namespace Isis {
                 m_globalPointCoord1AprioriSigma = globalPointCoord1AprioriSigma.toDouble();
               }
             }
-            QStringRef globalPointCoord2AprioriSigma = xmlReader->attributes().value("pointCoord2");
+            QStringView globalPointCoord2AprioriSigma = xmlReader->attributes().value("pointCoord2");
             if (!globalPointCoord2AprioriSigma.isEmpty()) {
               if (globalPointCoord2AprioriSigma == "N/A") {
                 m_globalPointCoord2AprioriSigma = Isis::Null;
@@ -1180,7 +1180,7 @@ namespace Isis {
                 m_globalPointCoord2AprioriSigma = globalPointCoord2AprioriSigma.toDouble();
               }
             }
-            QStringRef globalPointCoord3AprioriSigma = xmlReader->attributes().value("radius");
+            QStringView globalPointCoord3AprioriSigma = xmlReader->attributes().value("radius");
             if (!globalPointCoord3AprioriSigma.isEmpty()) {
               if (globalPointCoord3AprioriSigma == "N/A") {
                 m_globalPointCoord3AprioriSigma = Isis::Null;
@@ -1192,11 +1192,11 @@ namespace Isis {
             xmlReader->skipCurrentElement();
           }
           else if (xmlReader->qualifiedName() == "outlierRejectionOptions") {
-            QStringRef outlierRejection = xmlReader->attributes().value("rejection");
+            QStringView outlierRejection = xmlReader->attributes().value("rejection");
             if (!outlierRejection.isEmpty()) {
               m_outlierRejection = toBool(outlierRejection.toString());
             }
-            QStringRef outlierRejectionMultiplier = xmlReader->attributes().value("multiplier");
+            QStringView outlierRejectionMultiplier = xmlReader->attributes().value("multiplier");
             if (!outlierRejectionMultiplier.isEmpty()) {
               if (outlierRejectionMultiplier != "N/A") {
                 m_outlierRejectionMultiplier = outlierRejectionMultiplier.toDouble();
@@ -1208,15 +1208,15 @@ namespace Isis {
             xmlReader->skipCurrentElement();
           }
           else if (xmlReader->qualifiedName() == "convergenceCriteriaOptions") {
-            QStringRef convergenceCriteria = xmlReader->attributes().value("convergenceCriteria");
+            QStringView convergenceCriteria = xmlReader->attributes().value("convergenceCriteria");
             if (!convergenceCriteria.isEmpty()) {
               m_convergenceCriteria = stringToConvergenceCriteria(convergenceCriteria.toString());
             }
-            QStringRef threshold = xmlReader->attributes().value("threshold");
+            QStringView threshold = xmlReader->attributes().value("threshold");
             if (!threshold.isEmpty()) {
               m_convergenceCriteriaThreshold = threshold.toDouble();
             }
-            QStringRef maximumIterations = xmlReader->attributes().value("maximumIterations");
+            QStringView maximumIterations = xmlReader->attributes().value("maximumIterations");
             if (!maximumIterations.isEmpty()) {
               m_convergenceCriteriaMaximumIterations = maximumIterations.toInt();
             }
@@ -1225,8 +1225,8 @@ namespace Isis {
           else if (xmlReader->qualifiedName() == "maximumLikelihoodEstimation") {
             while (xmlReader->readNextStartElement()) {
               if (xmlReader->qualifiedName() == "model") {
-                QStringRef type = xmlReader->attributes().value("type");
-                QStringRef quantile = xmlReader->attributes().value("quantile");
+                QStringView type = xmlReader->attributes().value("type");
+                QStringView quantile = xmlReader->attributes().value("quantile");
                 if (!type.isEmpty() && !quantile.isEmpty()) {
                   m_maximumLikelihood.append(qMakePair(MaximumLikelihoodWFunctions::stringToModel(type.toString()), quantile.toDouble()));
                 }
@@ -1238,7 +1238,7 @@ namespace Isis {
             }
           }
           else if (xmlReader->qualifiedName() == "outputFileOptions") {
-            QStringRef fileNamePrefix = xmlReader->attributes().value("fileNamePrefix");
+            QStringView fileNamePrefix = xmlReader->attributes().value("fileNamePrefix");
             if (!fileNamePrefix.isEmpty()) {
               m_outputFilePrefix = fileNamePrefix.toString();
             }

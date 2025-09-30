@@ -16,6 +16,7 @@ find files of those names at the top level of this repository. **/
 #include <QPair>
 #include <QString>
 #include <QTemporaryFile>
+#include <QRegularExpression>
 
 #include "Preference.h"
 #include "IException.h"
@@ -301,7 +302,7 @@ namespace Isis {
    * @return Boolean
    */
   bool FileName::isDateVersioned() const {
-    return FileName(expanded()).name().contains(QRegExp("\\{.*\\}"));
+    return FileName(expanded()).name().contains(QRegularExpression("\\{.*\\}"));
   }
 
   /**
@@ -533,46 +534,6 @@ namespace Isis {
   }
 
   /**
-   * Compares equality of two FileName objects. Returns true if the two objects are equal
-   * and false otherwise.
-   *
-   * @param rhs FileName to compare the current FileName object to.
-   *
-   * @return Boolean
-   */
-  bool FileName::operator==(const FileName &rhs) {
-    QString expandedOfThis = expanded();
-    QString canonicalOfThis = QFileInfo(expandedOfThis).canonicalFilePath();
-
-    QString expandedOfRhs = rhs.expanded();
-    QString canonicalOfRhs = QFileInfo(expandedOfRhs).canonicalFilePath();
-
-    // Cononical file paths return empty strings if the file does not exist. Either both canonicals
-    //   are valid and the same (equal is initialized to true), or neither canonical is valid but
-    //   the expandeds are the same (equal is set to true when it isn't initialized to true).
-    bool equal = (!canonicalOfThis.isEmpty() && canonicalOfThis == canonicalOfRhs);
-
-    if (!equal) {
-      equal = (canonicalOfThis.isEmpty() && canonicalOfRhs.isEmpty() &&
-               expandedOfThis == expandedOfRhs);
-    }
-
-    return equal;
-  }
-
-  /**
-   * Compares equality of two FileName objects. Returns false if the two objects are equal
-   * and true otherwise.
-   *
-   * @param rhs FileName to compare the current FileName object to.
-   *
-   * @return Boolean
-   */
-  bool FileName::operator!=(const FileName &rhs) {
-    return !(*this == rhs);
-  }
-
-  /**
    * This looks through the directory of the file and checks for the highest version date of
    * the file that is versioned date.
    *
@@ -583,7 +544,7 @@ namespace Isis {
 
     QPair<int, int> truncateRange(-1, -1);
     if (fileQDatePattern.contains("?")) {
-      QString trueLengthName = name().replace(QRegExp("[{}]"), "");
+      QString trueLengthName = name().replace(QRegularExpression("[{}]"), "");
       truncateRange.first = trueLengthName.indexOf("?");
       truncateRange.second = trueLengthName.lastIndexOf("?");
       fileQDatePattern = fileQDatePattern.replace("?", "");
@@ -682,7 +643,7 @@ namespace Isis {
   void FileName::validateVersioningState() const {
     QString file = QFileInfo(expanded()).fileName();
 
-    if (file.contains(QRegExp("\\?\\?*[^?][^?]*\\?"))) {
+    if (file.contains(QRegularExpression("\\?\\?*[^?][^?]*\\?"))) {
       throw IException(IException::Unknown,
           QObject::tr("Only one numerical version sequence is allowed in a filename; "
                       "there are multiple in [%1]").arg(file),
@@ -696,9 +657,9 @@ namespace Isis {
       // This prevents the replacement of {} with '' in the pattern, since
       // Qt5's QDate.toString(pattern) handles these two adjacent single quotes in the pattern
       // differently than Qt4 did.
-      fileDatePattern.replace(QRegExp("\\{\\}"), "");
+      fileDatePattern.replace(QRegularExpression("\\{\\}"), "");
 
-      fileDatePattern = "'" + fileDatePattern.replace(QRegExp("[{}]"), "'") + "'";
+      fileDatePattern = "'" + fileDatePattern.replace(QRegularExpression("[{}]"), "'") + "'";
 
       QString dated = QDate::currentDate().toString(fileDatePattern);
       if (file.contains("'")) {
@@ -712,7 +673,7 @@ namespace Isis {
             QObject::tr("The date version sequence is not usable in the file named [%1]").arg(file),
             _FILEINFO_);
       }
-      else if (dated == fileDatePattern.replace(QRegExp("'"), "")) {
+      else if (dated == fileDatePattern.replace(QRegularExpression("'"), "")) {
         throw IException(IException::Unknown,
             QObject::tr("The date version sequences are not recognized in the file named [%1]")
               .arg(file),
@@ -732,7 +693,7 @@ namespace Isis {
     QString file = FileName(expanded()).name();
 
     // Current Text: {VAR}XXX{VAR}XXX{VAR} or XXX{VAR}XXX{VAR} or XXX{VAR}XXX or {VAR}XXX
-    file = file.replace(QRegExp("[{}]"), "'");
+    file = file.replace(QRegularExpression("[{}]"), "'");
 
     // Current Text: 'VAR'XXX'VAR'XXX'VAR' or XXX'VAR'XXX'VAR' or XXX'VAR'XXX or 'VAR'XXX
     if (file.startsWith("'"))
@@ -849,7 +810,7 @@ namespace Isis {
     // Loop while there are any "$" at the current position or after
     // Some "$" might be skipped if no translation can be found
     while((varStartPos = expandedStr.indexOf("$", varSearchStartPos)) != -1) {
-      int varEndPos = expandedStr.indexOf(QRegExp("[^a-zA-Z{}0-9_]"), varStartPos + 1);
+      int varEndPos = expandedStr.indexOf(QRegularExpression("[^a-zA-Z{}0-9_]"), varStartPos + 1);
       if (varEndPos == -1)
         varEndPos = expandedStr.length();
 
@@ -923,5 +884,45 @@ namespace Isis {
     }
 
     return result;
+  }
+
+  /**
+   * Compares equality of two FileName objects. Returns true if the two objects are equal
+   * and false otherwise.
+   *
+   * @param rhs FileName to compare the current FileName object to.
+   *
+   * @return Boolean
+   */
+  bool operator==(const FileName& lhs, const FileName& rhs) {
+    QString expandedOfLhs = lhs.expanded();
+    QString canonicalOfLhs = QFileInfo(expandedOfLhs).canonicalFilePath();
+
+    QString expandedOfRhs = rhs.expanded();
+    QString canonicalOfRhs = QFileInfo(expandedOfRhs).canonicalFilePath();
+
+    // Cononical file paths return empty strings if the file does not exist. Either both canonicals
+    //   are valid and the same (equal is initialized to true), or neither canonical is valid but
+    //   the expandeds are the same (equal is set to true when it isn't initialized to true).
+    bool equal = (!canonicalOfLhs.isEmpty() && canonicalOfLhs == canonicalOfRhs);
+
+    if (!equal) {
+      equal = (canonicalOfLhs.isEmpty() && canonicalOfRhs.isEmpty() &&
+               expandedOfLhs == expandedOfRhs);
+    }
+
+    return equal;
+  }
+
+  /**
+   * Compares equality of two FileName objects. Returns false if the two objects are equal
+   * and true otherwise.
+   *
+   * @param rhs FileName to compare the current FileName object to.
+   *
+   * @return Boolean
+   */
+  bool operator!=(const FileName& lhs, const FileName& rhs) {
+    return !(lhs == rhs);
   }
 }

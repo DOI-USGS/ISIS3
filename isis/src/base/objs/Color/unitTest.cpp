@@ -6,6 +6,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 #include <QColor>
 #include <QDebug>
+#include <QRegExp>
 
 #include "Color.h"
 #include "IException.h"

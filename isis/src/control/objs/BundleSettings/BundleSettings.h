@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 #include <QPair>
 #include <QSharedPointer>
 #include <QString>
+#include <QStringRef>
 #include <QXmlStreamReader>
 
 

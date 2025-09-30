@@ -153,7 +153,7 @@ namespace Isis {
     m_drawInSunDirection->setChecked(true);
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_drawInSunDirection);
     layout->addWidget(m_shadowHeightLineEdit);
     layout->addWidget(m_unitsComboBox);

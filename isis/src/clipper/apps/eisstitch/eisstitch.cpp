@@ -181,9 +181,9 @@ namespace Isis {
     // sort(eisTimes.begin(), eisTimes.end(), compareByStartTime);
 
     // Check for overlap
-    for (int i = 0; i < eisTimes.size() - 1; i++) {
+    for (long unsigned int i = 0; i < eisTimes.size() - 1; i++) {
       if (eisTimes[i].stop > eisTimes[i + 1].start) {
-        QString msg = "Image " + QString(i + 1) + " and " + QString(i + 2) + " in the image list have " + 
+        QString msg = "Image " + QString::number(i + 1) + " and " + QString::number(i + 2) + " in the image list have " + 
         "overlapping times.";
         throw IException(IException::User, msg, _FILEINFO_);
       }

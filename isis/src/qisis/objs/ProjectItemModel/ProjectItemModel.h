@@ -18,7 +18,6 @@ class QItemSelectionModel;
 class QMimeData;
 class QModelIndex;
 class QString;
-class QStringList;
 class QVariant;
 
 namespace Isis {

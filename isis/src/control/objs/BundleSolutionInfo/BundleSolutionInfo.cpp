@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
 #include <QDebug>
 #include <QFile>
 #include <QList>
+#include <QRegularExpression>
 #include <QString>
 #include <QStringList>
 #include <QUuid>
@@ -332,7 +333,7 @@ namespace Isis {
    * @return @b QString A unique ID for this BundleSolutionInfo object
    */
   QString BundleSolutionInfo::id() const {
-    return m_id->toString().remove(QRegExp("[{}]"));
+    return m_id->toString().remove(QRegularExpression("[{}]"));
   }
 
 

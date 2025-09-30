@@ -945,7 +945,7 @@ namespace Isis {
       m_dataFile->close();
       m_geodataSet = GDALDataset::FromHandle(GDALOpen(m_dataFileName->expanded().toStdString().c_str(), eAccess));
       if (!m_geodataSet) {
-        QString msg = "Opening GDALDataset from [" + m_dataFileName->name() + "] failed with access [" + eAccess +"]";
+        QString msg = "Opening GDALDataset from [" + m_dataFileName->name() + "] failed with access [" + QString::number(eAccess) +"]";
         cleanUp(false);
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -1121,7 +1121,7 @@ namespace Isis {
     }
     m_geodataSet = GDALDataset::FromHandle(GDALOpen(m_dataFileName->expanded().toStdString().c_str(), eAccess));
     if (!m_geodataSet) {
-      QString msg = "Opening GDALDataset from [" + m_dataFileName->name() + "] failed with access [" + eAccess +"]";
+      QString msg = "Opening GDALDataset from [" + m_dataFileName->name() + "] failed with access [" + QString::number(eAccess) +"]";
       cleanUp(false);
       throw IException(IException::Io, msg, _FILEINFO_);
     }

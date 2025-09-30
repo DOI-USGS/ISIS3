@@ -7,6 +7,7 @@ find files of those names at the top level of this repository. **/
 #include <sstream>
 
 #include <QDebug>
+#include <QRegularExpression>
 
 #include "FileName.h"
 #include "IException.h"
@@ -391,7 +392,7 @@ int main(void) {
     }
     catch(IException &e) {
       QString message = e.toString();
-      cout << message.replace(QRegExp("in file.*/translations"), "in file [/translations");
+      cout << message.replace(QRegularExpression("in file.*/translations"), "in file [/translations");
       cout << endl;
       cout << endl;
     }

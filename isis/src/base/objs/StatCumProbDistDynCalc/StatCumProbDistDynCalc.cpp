@@ -10,6 +10,7 @@ find files of those names at the top level of this repository. **/
 #include <QDataStream>
 #include <QDebug>
 #include <QList>
+#include <QStringView>
 #include <QUuid>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
@@ -81,19 +82,19 @@ namespace Isis {
         for (unsigned int i = 0; i < m_numberQuantiles; i++) {
           while (xmlReader->readNextStartElement()) {
             if (xmlReader->qualifiedName() == "quantileInfo") {
-              QStringRef quantile = xmlReader->attributes().value("quantile");
+              QStringView quantile = xmlReader->attributes().value("quantile");
               if (!quantile.isEmpty()) {
                 m_quantiles.append(quantile.toDouble());
               }
-              QStringRef dataValue = xmlReader->attributes().value("dataValue");
+              QStringView dataValue = xmlReader->attributes().value("dataValue");
               if (!dataValue.isEmpty()) {
                 m_observationValues.append(dataValue.toDouble());
               }
-              QStringRef idealNumObsBelowQuantile = xmlReader->attributes().value("idealNumObsBelowQuantile");
+              QStringView idealNumObsBelowQuantile = xmlReader->attributes().value("idealNumObsBelowQuantile");
               if (!idealNumObsBelowQuantile.isEmpty()) {
                 m_idealNumObsBelowQuantile.append(idealNumObsBelowQuantile.toDouble());
               }
-              QStringRef actualNumObsBelowQuantile = xmlReader->attributes().value("actualNumObsBelowQuantile");
+              QStringView actualNumObsBelowQuantile = xmlReader->attributes().value("actualNumObsBelowQuantile");
               
               if (!actualNumObsBelowQuantile.isEmpty()) {
                 m_numObsBelowQuantile.append(actualNumObsBelowQuantile.toInt());

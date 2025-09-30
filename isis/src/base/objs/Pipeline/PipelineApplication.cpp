@@ -349,7 +349,7 @@ namespace Isis {
       }
 
       if(!BranchEnabled(branch)) {
-        QString tmpBranch(branch);
+        QString tmpBranch = QString::number(branch);
         p_outputs.push_back(p_name + "." +tmpBranch + ".blank");
         continue;
       }

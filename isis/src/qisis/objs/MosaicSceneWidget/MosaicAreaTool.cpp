@@ -269,7 +269,7 @@ namespace Isis {
     actionLayout->addWidget(okButton);
     actionLayout->addWidget(clearButton);
     actionLayout->addStretch(1);
-    actionLayout->setMargin(0);
+    actionLayout->setContentsMargins(0, 0, 0, 0);
 
     QWidget *toolBarWidget = new QWidget;
     toolBarWidget->setLayout(actionLayout);

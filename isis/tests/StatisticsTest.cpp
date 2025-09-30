@@ -217,7 +217,6 @@ TEST(Statistics,XMLReadWrite) {
     QXmlStreamWriter writer(&xmlOutput);
 
     writer.setAutoFormatting(true);
-    writer.setCodec("UTF-8");
     writer.writeStartDocument();
     Project *project = NULL;
     s.save(writer, project);

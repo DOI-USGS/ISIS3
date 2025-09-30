@@ -267,9 +267,9 @@ namespace Isis {
 
     if (index < 0 || index >= m_cols->size()) {
       QString msg = "index [";
-      msg += index;
+      msg += QString::number(index);
       msg += "] is out of range.  Size of list is: ";
-      msg += m_cols->size();
+      msg += QString::number(m_cols->size());
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

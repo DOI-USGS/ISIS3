@@ -7,6 +7,7 @@ find files of those names at the top level of this repository. **/
 #include "ProcessImportPds.h"
 
 #include <QString>
+#include <QRegularExpression>
 
 #include <iostream>
 #include <QString>
@@ -1484,7 +1485,7 @@ namespace Isis {
     if (inst.hasKeyword("StartTime")) {
       Isis::PvlKeyword &stkey = inst["StartTime"];
       QString stime = stkey[0];
-      stime = stime.remove(QRegExp("[Zz]$"));
+      stime = stime.remove(QRegularExpression("[Zz]$"));
       stkey = stime;
     }
   }

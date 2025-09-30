@@ -1703,8 +1703,8 @@ namespace Isis {
         case QEvent::MouseMove: {
           QMouseEvent *m = (QMouseEvent *) e;
           emit mouseMove(m->pos());
-          emit mouseMove(m->pos(), (Qt::MouseButton)(m->button() +
-                                    m->modifiers()));
+          emit mouseMove(m->pos(), 
+                         (Qt::MouseButton)(m->button() & m->modifiers()));
           return true;
         }
 
@@ -1717,14 +1717,14 @@ namespace Isis {
         case QEvent::MouseButtonPress: {
           QMouseEvent *m = (QMouseEvent *) e;
           emit mouseButtonPress(m->pos(),
-                                (Qt::MouseButton)(m->button() + m->modifiers()));
+                                (Qt::MouseButton)(m->button() & m->modifiers()));
           return true;
         }
 
         case QEvent::MouseButtonRelease: {
           QMouseEvent *m = (QMouseEvent *) e;
           emit mouseButtonRelease(m->pos(),
-                                  (Qt::MouseButton)(m->button() + m->modifiers()));
+                                  (Qt::MouseButton)(m->button() & m->modifiers()));
           return true;
         }
 
@@ -1787,7 +1787,7 @@ namespace Isis {
              Qt::ControlModifier) {
 
       //QString fileName = p_cube->fileName();
-      QFileInfo fileName = p_cube->fileName();
+      QFileInfo fileName = QFileInfo(p_cube->fileName());
 
       // Grabs the clipboard and copies the file name into it.
       QClipboard *clipboard = QApplication::clipboard();

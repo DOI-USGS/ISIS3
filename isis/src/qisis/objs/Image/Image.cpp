@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QMutexLocker>
+#include <QRegularExpression>
 #include <QScopedPointer>
 #include <QString>
 #include <QUuid>
@@ -418,7 +419,7 @@ namespace Isis {
    * @return @b QString A unique ID for this image.
    */
   QString Image::id() const {
-    return m_id->toString().remove(QRegExp("[{}]"));
+    return m_id->toString().remove(QRegularExpression("[{}]"));
   }
 
 

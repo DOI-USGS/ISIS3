@@ -20,6 +20,8 @@ find files of those names at the top level of this repository. **/
 #include "NaifStatus.h"
 #include "Preference.h"
 
+#include <QStringRef>
+
 #include "ctxcal.h"
 
 using namespace std;

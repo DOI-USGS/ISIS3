@@ -10,6 +10,8 @@ find files of those names at the top level of this repository. **/
 #include <iomanip>
 #include <algorithm>
 
+#include <QRegularExpression>
+
 #include "Kernels.h"
 
 //  Used extensively in Kernels interface
@@ -28,7 +30,7 @@ using namespace Isis;
 
 QString stripPath(QString input) {
   QString result = input.replace(
-      QRegExp("(.*/)([^/]*/[^/]*/[^/]*/[^/]*$)"),
+      QRegularExpression("(.*/)([^/]*/[^/]*/[^/]*/[^/]*$)"),
       "$\\2");
 
   return result;

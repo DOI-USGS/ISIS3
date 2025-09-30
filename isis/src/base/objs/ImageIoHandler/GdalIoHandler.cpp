@@ -756,7 +756,7 @@ namespace Isis {
     }
 
     else if(m_pixelType == GDT_Int8) {
-     char raw;
+     signed char raw;
 
       if(bufferVal >= VALID_MIN8) {
         double filePixelValueDbl = (bufferVal - m_offset) /
@@ -780,7 +780,7 @@ namespace Isis {
             isSpecial = true;
           }
           else {
-            raw = (char)(filePixelValue);
+            raw = (signed char)(filePixelValue);
           }
         }
       }
@@ -810,7 +810,7 @@ namespace Isis {
           isSpecial = true;
         }
       }
-      ((char *)rawBuff)[idx] = raw;
+      ((signed char *)rawBuff)[idx] = raw;
     }
 
     else if(m_pixelType == GDT_Byte) {

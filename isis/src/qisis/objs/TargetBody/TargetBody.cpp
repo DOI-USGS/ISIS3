@@ -1,8 +1,8 @@
 #include "TargetBody.h"
 
-#include <QDataStream>
 #include <QDebug>
 #include <QList>
+#include <QRegularExpression>
 #include <QUuid>
 #include <QXmlStreamWriter>
 
@@ -413,7 +413,7 @@ TargetBody::TargetBody(Target *target, QObject *parent) : QObject(parent) {
    * @return @b A unique ID for this TargetBody object.
    */
   QString TargetBody::id() const {
-    return m_id->toString().remove(QRegExp("[{}]"));
+    return m_id->toString().remove(QRegularExpression("[{}]"));
   }
 
 

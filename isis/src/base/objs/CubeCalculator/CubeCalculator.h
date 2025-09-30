@@ -13,7 +13,6 @@ find files of those names at the top level of this repository. **/
 #include "Cube.h"
 
 class QString;
-template<class T> class QVector;
 
 namespace Isis {
   class DataValue;

@@ -6,6 +6,9 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 #include <iostream>
 #include <iomanip>
+
+#include <QRegularExpression>
+
 #include "IException.h"
 #include "ProjectionFactory.h"
 #include "Pvl.h"
@@ -307,6 +310,6 @@ void doit2(Pvl &lab) {
 }
 
 void ReportError(QString err) {
-  cout << err.replace(QRegExp("\\[[^\\]]*\\.plugin\\]"), "[isis/lib/Projection.plugin]") << endl << endl;
+  cout << err.replace(QRegularExpression("\\[[^\\]]*\\.plugin\\]"), "[isis/lib/Projection.plugin]") << endl << endl;
 }
 

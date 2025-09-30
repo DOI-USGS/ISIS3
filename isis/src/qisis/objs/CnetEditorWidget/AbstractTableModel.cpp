@@ -184,7 +184,7 @@ namespace Isis {
 
         // Sorting is always done on a COPY of the items list.
         QFuture< QList< AbstractTreeItem * > > future =
-          QtConcurrent::run(this, &AbstractTableModel::doSort,
+          QtConcurrent::run(&AbstractTableModel::doSort, this, 
               *m_sortedItems);
         m_sortingWatcher->setFuture(future);
 
@@ -269,8 +269,7 @@ namespace Isis {
       // This is accomplished by using either append or prepend.  We abstract
       // away which of these we should use (why should we care) by using the
       // variable "someKindaPend" to store the appropriate method.
-      void (QList< AbstractTreeItem * >::*someKindaPend)(
-        AbstractTreeItem * const &);
+      void (QList< AbstractTreeItem * >::*someKindaPend)(AbstractTreeItem *);
       someKindaPend = &QList< AbstractTreeItem * >::append;
 
       if (start == item2) {

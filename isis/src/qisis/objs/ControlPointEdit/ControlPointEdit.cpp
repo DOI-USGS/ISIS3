@@ -530,7 +530,7 @@ namespace Isis {
     p_goodFit->setWhatsThis("Resulting Goodness of Fit from sub-pixel "
                               "registration.");
     QVBoxLayout *autoRegLayout = new QVBoxLayout;
-    autoRegLayout->setMargin(0);
+    autoRegLayout->setContentsMargins(0, 0, 0, 0);
     autoRegLayout->addWidget(p_oldPosition);
     autoRegLayout->addWidget(p_goodFit);
     p_autoRegExtension->setLayout(autoRegLayout);

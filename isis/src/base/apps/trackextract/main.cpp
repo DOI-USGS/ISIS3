@@ -235,7 +235,7 @@ void createTrackCube(QString inputName, QString ouputName, int trackBand) {
       break;
 
     default:
-      QString msg = "Invalid Pixel Type [" + QString(inputCube.pixelType()) + "]";
+      QString msg = "Invalid Pixel Type [" + QString::number(inputCube.pixelType()) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
   }
   CopyPixelsFunctor copyTrackPixels(offset, defaultVal);

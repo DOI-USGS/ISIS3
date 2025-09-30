@@ -14,7 +14,6 @@ find files of those names at the top level of this repository. **/
 #include <QToolBar>
 
 class QWidget;
-template< class A > class QVector;
 
 namespace Isis
 {

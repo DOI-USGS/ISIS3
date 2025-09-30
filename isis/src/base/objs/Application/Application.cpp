@@ -543,7 +543,7 @@ namespace Isis {
           "process. A communication channel was established with the parent "
           "(launcher) process, but when we tried to send data to the parent "
           "process an error occurred. The parent process has a PID of [" +
-          QString(iApp->GetUserInterface().ParentId()) + "]";
+          QString::number(iApp->GetUserInterface().ParentId()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 

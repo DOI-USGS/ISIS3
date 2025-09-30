@@ -1,6 +1,7 @@
 #include "ciss2isis.h"
 #include <vector>
 
+#include <QRegularExpression>
 #include <QString>
 
 #include "Application.h"
@@ -220,7 +221,7 @@ namespace Isis{
       stretchPairs->GetLine(line);  //assigns value to line
       line = line.simplified();
 
-      foreach (QString value, line.split(QRegExp("[\\s,]"), Qt::SkipEmptyParts)) {
+      foreach (QString value, line.split(QRegularExpression("[\\s,]"), Qt::SkipEmptyParts)) {
         stretch.AddPair(temp1, toDouble(value));
         temp1++;
       }
@@ -317,15 +318,15 @@ namespace Isis{
 
     // Remove the trailing 'Z' in some pds labels
     QString sUpdateTime = inst.findKeyword("StartTime")[0];
-    sUpdateTime.remove(QRegExp("[Zz]"));
+    sUpdateTime.remove(QRegularExpression("[Zz]"));
     inst.findKeyword("StartTime").setValue(sUpdateTime);
 
     sUpdateTime = inst.findKeyword("StopTime")[0];
-    sUpdateTime.remove(QRegExp("[Zz]"));
+    sUpdateTime.remove(QRegularExpression("[Zz]"));
     inst.findKeyword("StopTime").setValue(sUpdateTime);
 
     sUpdateTime = inst.findKeyword("ImageTime")[0];
-    sUpdateTime.remove(QRegExp("[Zz]"));
+    sUpdateTime.remove(QRegularExpression("[Zz]"));
     inst.findKeyword("ImageTime").setValue(sUpdateTime);
 
 

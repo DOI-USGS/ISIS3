@@ -692,7 +692,7 @@ namespace Isis {
   }
 
   void InfixToPostfix::checkArgument(QString funcName, int argNum, QString argument) {
-    argument = argument.remove(QRegExp("[ ()]"));
+    argument = argument.remove(QRegularExpression("[ ()]"));
 
     if(argument == "") {
       throw IException(IException::User,

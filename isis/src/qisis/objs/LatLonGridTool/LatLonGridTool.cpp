@@ -66,7 +66,7 @@ namespace Isis {
     m_gridCheckBox->setText("Show Grid");
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_gridCheckBox);
     layout->addStretch(1);
     container->setLayout(layout);

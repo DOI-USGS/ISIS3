@@ -14,8 +14,6 @@ find files of those names at the top level of this repository. **/
 #include <QMdiArea>
 #include <QPointer>
 
-template< class T > class QVector;
-
 namespace Isis {
   class Cube;
   class Image;

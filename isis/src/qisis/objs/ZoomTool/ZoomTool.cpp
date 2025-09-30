@@ -240,7 +240,7 @@ namespace Isis {
     connect(p_zoomLineEdit, SIGNAL(returnPressed()), this, SLOT(zoomManual()));
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(zoomInButton);
     layout->addWidget(zoomOutButton);
     layout->addWidget(zoomActButton);

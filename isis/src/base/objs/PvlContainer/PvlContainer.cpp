@@ -137,9 +137,9 @@ namespace Isis {
     bool keywordDeleted = false;
 
     for(int index = 0; index < m_keywords.size(); index ++) {
-      PvlKeyword &current = m_keywords[index];
+      PvlKeyword &current = *(m_keywords.begin() + index);
 
-      for(PvlKeywordIterator key = begin() + index + 1; key < end(); key ++) {
+      for(PvlKeywordIterator key = begin() + index + 1; key != end(); key ++) {
         if(current == *key) {
           key = m_keywords.erase(key);
           keywordDeleted = true;

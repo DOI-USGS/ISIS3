@@ -123,7 +123,7 @@ namespace Isis {
         AbstractPlotTool::createToolBarWidget(parent);
 
     QHBoxLayout *layout = new QHBoxLayout(wrapper);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_rubberBandCombo);
     layout->addWidget(new QLabel("Interpolation:"));
     layout->addWidget(m_interpolationCombo);

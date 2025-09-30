@@ -8,7 +8,6 @@
 #include <QJsonValue>
 #include <QList>
 #include <QMapIterator>
-#include <QRegExp>
 #include <QSharedPointer>
 #include <QString>
 #include <QStringList>

@@ -94,12 +94,12 @@ namespace Isis {
       }
       else if (xmlReader->qualifiedName() == "elapsedTime") {
 
-        QStringRef time = xmlReader->attributes().value("time");
+        QStringView time = xmlReader->attributes().value("time");
         if (!time.isEmpty()) {
           m_elapsedTime = time.toDouble();
         }
 
-        QStringRef errorProp = xmlReader->attributes().value("errorProp");
+        QStringView errorProp = xmlReader->attributes().value("errorProp");
         if (!errorProp.isEmpty()) {
           m_elapsedTimeErrorProp = errorProp.toDouble();
         }
@@ -131,20 +131,20 @@ namespace Isis {
     m_correlationMatrix = NULL;
     m_correlationMatrix = new CorrelationMatrix();
 
-    QString correlationFileName = *(xmlReader->attributes().value("correlationFileName").string());
+    QString correlationFileName = xmlReader->attributes().value("correlationFileName").toString();
     if (!correlationFileName.isEmpty()) {
       FileName correlationFile(correlationFileName);
       m_correlationMatrix->setCorrelationFileName(correlationFile);
     }
 
-    QString covarianceFileName = *(xmlReader->attributes().value("covarianceFileName").string());
+    QString covarianceFileName = xmlReader->attributes().value("covarianceFileName").toString();
     if (!covarianceFileName.isEmpty()) {
       FileName covarianceFile(covarianceFileName);
       m_correlationMatrix->setCovarianceFileName(covarianceFile);
     }
     while (xmlReader->readNextStartElement()) {
       if (xmlReader->qualifiedName() == "image") {
-        QString correlationMatrixImageId = *(xmlReader->attributes().value("id").string());
+        QString correlationMatrixImageId = xmlReader->attributes().value("id").toString();
         if (!correlationMatrixImageId.isEmpty()) {
           m_xmlHandlerCorrelationImageId = correlationMatrixImageId;
         }
@@ -225,17 +225,17 @@ namespace Isis {
     Q_ASSERT(xmlReader->name() == "rms");
     while (xmlReader->readNextStartElement()) {
       if (xmlReader->qualifiedName() == "residuals") {
-        QStringRef rx = xmlReader->attributes().value("x");
+        QStringView rx = xmlReader->attributes().value("x");
         if (!rx.isEmpty()) {
           m_rmsXResiduals = rx.toDouble();
         }
 
-        QStringRef ry = xmlReader->attributes().value("y");
+        QStringView ry = xmlReader->attributes().value("y");
         if (!ry.isEmpty()) {
           m_rmsYResiduals = ry.toDouble();
         }
 
-        QStringRef rxy = xmlReader->attributes().value("xy");
+        QStringView rxy = xmlReader->attributes().value("xy");
         if (!rxy.isEmpty()) {
           m_rmsXYResiduals = rxy.toDouble();
         }
@@ -243,32 +243,32 @@ namespace Isis {
       }
       else if (xmlReader->qualifiedName() == "sigmas")
       {
-        QStringRef lat = xmlReader->attributes().value("lat");
+        QStringView lat = xmlReader->attributes().value("lat");
         if (!lat.isEmpty()){
           m_rmsSigmaCoord1Stats = lat.toDouble();
         }
 
-        QStringRef lon = xmlReader->attributes().value("lon");
+        QStringView lon = xmlReader->attributes().value("lon");
         if (!lon.isEmpty()){
           m_rmsSigmaCoord2Stats = lon.toDouble();
         }
 
-        QStringRef rad = xmlReader->attributes().value("rad");
+        QStringView rad = xmlReader->attributes().value("rad");
         if (!rad.isEmpty()){
           m_rmsSigmaCoord3Stats = rad.toDouble();
         }
 
-        QStringRef x = xmlReader->attributes().value("x");
+        QStringView x = xmlReader->attributes().value("x");
         if (!x.isEmpty()){
           m_rmsSigmaCoord1Stats = x.toDouble();
         }
 
-        QStringRef y = xmlReader->attributes().value("y");
+        QStringView y = xmlReader->attributes().value("y");
         if (!y.isEmpty()){
           m_rmsSigmaCoord2Stats = y.toDouble();
         }
 
-        QStringRef z = xmlReader->attributes().value("z");
+        QStringView z = xmlReader->attributes().value("z");
         if (!z.isEmpty()){
           m_rmsSigmaCoord3Stats = z.toDouble();
         }
@@ -404,7 +404,7 @@ namespace Isis {
   void BundleResults::readSigma(Distance &dist, QString &pointId, QXmlStreamReader *xmlReader) {
     Q_ASSERT(xmlReader->attributes().hasAttribute("value"));
     Q_ASSERT(xmlReader->attributes().hasAttribute("pointId"));
-    QStringRef sigmaValue = xmlReader->attributes().value("value");
+    QStringView sigmaValue = xmlReader->attributes().value("value");
     if (!sigmaValue.isEmpty()) {
       dist.setMeters(sigmaValue.toDouble());
     }
@@ -418,12 +418,12 @@ namespace Isis {
 
   void BundleResults::readMaxLikelihoodEstimation(QXmlStreamReader *xmlReader) {
     Q_ASSERT(xmlReader->name() == "maximumLikelihoodEstimation");
-    QStringRef maximumLikelihoodIndex = xmlReader->attributes().value("maximumLikelihoodIndex");
+    QStringView maximumLikelihoodIndex = xmlReader->attributes().value("maximumLikelihoodIndex");
     if (!maximumLikelihoodIndex.isEmpty()) {
       m_maximumLikelihoodIndex = maximumLikelihoodIndex.toInt();
     }
 
-    QStringRef maximumLikelihoodMedianR2Residuals =
+    QStringView maximumLikelihoodMedianR2Residuals =
         xmlReader->attributes().value("maximumLikelihoodMedianR2Residuals");
     if (!maximumLikelihoodMedianR2Residuals.isEmpty()) {
       m_maximumLikelihoodMedianR2Residuals =
@@ -456,8 +456,8 @@ namespace Isis {
       }
       else if (xmlReader->qualifiedName() == "model") {
         QString model = xmlReader->attributes().value("modelSelection").toString();
-        QStringRef tweakingConstant = xmlReader->attributes().value("tweakingConstant");
-        QStringRef quantile = xmlReader->attributes().value("quantile");
+        QStringView tweakingConstant = xmlReader->attributes().value("tweakingConstant");
+        QStringView quantile = xmlReader->attributes().value("quantile");
         bool validModel = true;
         if (model.isEmpty())
           validModel = false;
@@ -769,18 +769,6 @@ namespace Isis {
     m_rmsImageDECSigmas.resize(numberImages);
     m_rmsImageTWISTSigmas.resize(numberImages);
   }
-
-
-#if 0
-  void BundleResults::setRmsImageResidualLists(QVector<Statistics> rmsImageLineResiduals,
-                                               QVector<Statistics> rmsImageSampleResiduals,
-                                               QVector<Statistics> rmsImageResiduals) {
-    // QList??? jigsaw apptest gives - ASSERT failure in QList<T>::operator[]: "index out of range",
-    m_rmsImageLineResiduals = rmsImageLineResiduals.toList();
-    m_rmsImageSampleResiduals = rmsImageSampleResiduals.toList();
-    m_rmsImageResiduals = rmsImageResiduals.toList();
-  }
-#endif
 
 
   /**

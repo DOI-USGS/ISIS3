@@ -36,7 +36,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QProgressBar>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QStringList>
 #include <QtDebug>
@@ -139,7 +139,7 @@ namespace Isis {
 
     foreach (QString existingProject, existingProjects) {
       FileName existingProjectFileName(tempDir.absolutePath() + "/" + existingProject);
-      QString pidString = QString(existingProject).replace(QRegExp(".*_"), "");
+      QString pidString = QString(existingProject).replace(QRegularExpression(".*_"), "");
       int otherPid = pidString.toInt();
 
       if (otherPid != 0) {
@@ -367,7 +367,8 @@ namespace Isis {
     delete m_warnings;
     m_warnings = NULL;
 
-    m_workOrderHistory->removeAll(NULL);
+    m_workOrderHistory->removeAll(QPointer<WorkOrder>());
+    delete m_workOrderHistory;
     m_workOrderHistory = NULL;
 
     delete m_bundleSettings;
@@ -1492,9 +1493,9 @@ namespace Isis {
   void Project::readProjectXml(QXmlStreamReader *xmlReader) {
     if (xmlReader->readNextStartElement()) {
       if (xmlReader->name() == "project") {
-        QStringRef name = xmlReader->attributes().value("name");
+        QStringView name = xmlReader->attributes().value("name");
         if (!name.isEmpty()) {
-          m_project->setName(*(name.string()));
+          m_project->setName(name.toString());
         }
       }
       else if (xmlReader->name() == "controlNets") {
@@ -1514,7 +1515,7 @@ namespace Isis {
       }
       //  workOrders are stored in history.xml, using same reader as project.xml
       else if (xmlReader->name() == "workOrder") {
-        QString type = *(xmlReader->attributes().value("type").string());
+        QString type = xmlReader->attributes().value("type").toString();
 
         m_workOrder = WorkOrderFactory::create(m_project, type);
 
@@ -1522,7 +1523,7 @@ namespace Isis {
       }
       //  warnings stored in warning.xml, using same reader as project.xml
       else if (xmlReader->name() == "warning") {
-        QString warningText = *(xmlReader->attributes().value("text").string());
+        QString warningText = xmlReader->attributes().value("text").toString();
 
         if (!warningText.isEmpty())
         {
@@ -1542,12 +1543,12 @@ namespace Isis {
         m_bundleSolutionInfos.append(new BundleSolutionInfo(m_project, xmlReader));
       }
       else if (xmlReader->name() == "activeImageList") {
-        QString displayName = *(xmlReader->attributes().value("displayName").string());
+        QString displayName = xmlReader->attributes().value("displayName").toString();
         m_project->setActiveImageList(displayName);
       }
       else if (xmlReader->name() == "activeControl") {
         // Find Control
-        QString displayName = *(xmlReader->attributes().value("displayName").string());
+        QString displayName = xmlReader->attributes().value("displayName").toString();
         m_project->setActiveControl(displayName);
       }
       else
@@ -2691,7 +2692,7 @@ namespace Isis {
           workOrder->redo();
         }
         // Clean up deleted work orders (the m_undoStack.push() can delete work orders)
-        m_workOrderHistory->removeAll(NULL);
+        m_workOrderHistory->removeAll(QPointer<WorkOrder>());
       }
       else {
         delete workOrder;

@@ -8,6 +8,8 @@ find files of those names at the top level of this repository. **/
 
 #include <string>
 
+#include <QRegularExpression>
+
 #include "ProcessMapMosaic.h"
 #include "Application.h"
 #include "CubeAttribute.h"
@@ -51,10 +53,10 @@ void IsisMain() {
 
   for(int i = 0; i < cubes.size(); i++) {
     if(m1.StartProcess(cubes[i].toString())) {
-      cout << cubes[i].toString().replace(QRegExp(".*base/unitTestData"), "base/unitTestData") << " is inside the mosaic" << endl;
+      cout << cubes[i].toString().replace(QRegularExpression(".*base/unitTestData"), "base/unitTestData") << " is inside the mosaic" << endl;
     }
     else {
-      cout << cubes[i].toString().replace(QRegExp(".*base/unitTestData"), "base/unitTestData") << " is outside the mosaic" << endl;
+      cout << cubes[i].toString().replace(QRegularExpression(".*base/unitTestData"), "base/unitTestData") << " is outside the mosaic" << endl;
     }
   }
 
@@ -76,10 +78,10 @@ void IsisMain() {
 
   for(int i = 0; i < cubes.size(); i++) {
     if(m2.StartProcess(cubes[i].toString())) {
-      cout << cubes[i].toString().replace(QRegExp(".*base/unitTestData"), "base/unitTestData") << " is inside the mosaic" << endl;
+      cout << cubes[i].toString().replace(QRegularExpression(".*base/unitTestData"), "base/unitTestData") << " is inside the mosaic" << endl;
     }
     else {
-      cout << cubes[i].toString().replace(QRegExp(".*base/unitTestData"), "base/unitTestData") << " is outside the mosaic" << endl;
+      cout << cubes[i].toString().replace(QRegularExpression(".*base/unitTestData"), "base/unitTestData") << " is outside the mosaic" << endl;
     }
   }
 
@@ -162,10 +164,10 @@ void IsisMain() {
 
   for(int i = 0; i < cubes_crop.size(); i++) {
     if(m4.StartProcess(cubes_crop[i].toString())) {
-      cout << cubes_crop[i].toString().replace(QRegExp(".*base/unitTestData"), "base/unitTestData") << " is inside the mosaic" << endl;
+      cout << cubes_crop[i].toString().replace(QRegularExpression(".*base/unitTestData"), "base/unitTestData") << " is inside the mosaic" << endl;
     }
     else {
-      cout << cubes_crop[i].toString().replace(QRegExp(".*base/unitTestData"), "base/unitTestData") << " is outside the mosaic" << endl;
+      cout << cubes_crop[i].toString().replace(QRegularExpression(".*base/unitTestData"), "base/unitTestData") << " is outside the mosaic" << endl;
     }
   }
 

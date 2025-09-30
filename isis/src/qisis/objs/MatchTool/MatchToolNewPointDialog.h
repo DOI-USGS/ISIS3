@@ -8,7 +8,6 @@ class QLineEdit;
 class QListWidget;
 class QPushButton;
 class QString;
-class QStringList;
 
 namespace Isis {
   class ControlNet;

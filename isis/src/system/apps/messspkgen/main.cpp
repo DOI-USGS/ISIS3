@@ -10,8 +10,8 @@ find files of those names at the top level of this repository. **/
 
 #include <iostream>
 #include <sstream>
-#include <QString>
 
+#include <QRegularExpression>
 #include <QString>
 
 #include "FileName.h"
@@ -89,20 +89,20 @@ QString convertUtcToTdb(QString utcTime) {
   // with TDB syntax
   QString orbitCutoffRaw = utcTime;
   (void)orbitCutoffRaw.trimmed();  // cast to void to silence unused reult warning
-  orbitCutoffRaw.remove(QRegExp(" UTC$"));
+  orbitCutoffRaw.remove(QRegularExpression(" UTC$"));
 
   // We need to swap around the day and the year in order to go from UTC to TDB.
   // The year will be the first and only occurrence of 4 numbers in a row, so
   // pull that out.
-  QRegExp yearRx("(\\d{4})");
-  int pos = yearRx.indexIn(orbitCutoffRaw);
-  QString year = (pos > -1) ? yearRx.cap(1) : "";
+  QRegularExpression yearRx("(\\d{4})");
+  QRegularExpressionMatch yearRxMatch = yearRx.match(orbitCutoffRaw);
+  QString year = yearRxMatch.hasMatch() ? yearRxMatch.captured(0) : "";
 
   // The day will come at the beginning of the QString, and will be 1 or 2
   // characters.  If it's only 1, add an extra 0 to make it 2.
-  QRegExp dayRx("(^\\d{1,2})");
-  pos = dayRx.indexIn(orbitCutoffRaw);
-  QString day = (pos > -1) ? dayRx.cap(1) : "";
+  QRegularExpression dayRx("(^\\d{1,2})");
+  QRegularExpressionMatch dayRxMatch = dayRx.match(orbitCutoffRaw);
+  QString day = dayRxMatch.hasMatch() ? dayRxMatch.captured(0) : "";
   if (day.length() == 1) day = "0" + day;
 
   // Swap the day and year

@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
   tmpFilesToRemove << nonOverlapList;
 
   FileList nonOverlaps(fromList);
-  nonOverlaps.removeOne("$ISISTESTDATA/isis/src/odyssey/unitTestData/I01523019RDR.lev2.cub");
+  nonOverlaps.removeOne(FileName("$ISISTESTDATA/isis/src/odyssey/unitTestData/I01523019RDR.lev2.cub"));
   nonOverlaps.write(nonOverlapList);
 
   // Default constructor is protected, won't be tested

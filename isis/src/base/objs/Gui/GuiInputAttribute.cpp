@@ -10,6 +10,7 @@ find files of those names at the top level of this repository. **/
 
 #include <QDebug>
 #include <QRadioButton>
+#include <QRegularExpression>
 #include <QPushButton>
 #include <QButtonGroup>
 #include <QGridLayout>
@@ -104,7 +105,7 @@ namespace Isis {
     QString attStr("");
     if(p_lineEdit->isEnabled()) {
       attStr = p_lineEdit->text().simplified();
-      attStr = attStr.remove(QRegExp("^[+]*"));
+      attStr = attStr.remove(QRegularExpression("^[+]*"));
       if (attStr.length() > 0) {
         if (attStr.left(1) != "+") attStr.prepend('+');
       }

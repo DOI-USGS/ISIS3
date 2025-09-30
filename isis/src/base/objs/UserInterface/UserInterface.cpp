@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 #include <vector>
 
 #include <QDir>
+#include <QRegularExpression>
 
 #include "Application.h"
 #include "FileName.h"
@@ -352,7 +353,7 @@ namespace Isis {
 
       foreach (QString token, tokens) {
         // removes quotes from tokens. NOTE: also removes escaped quotes.
-        token = token.remove( QRegExp("[\"']") );
+        token = token.remove( QRegularExpression("[\"']") );
         p_batchList[i].push_back(token);
         j++ ;
       }

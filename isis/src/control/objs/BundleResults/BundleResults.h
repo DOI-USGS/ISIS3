@@ -114,9 +114,6 @@ namespace Isis {
       void setRmsImageResidualLists(QList<Statistics> rmsImageLineResiduals,
                                     QList<Statistics> rmsImageSampleResiduals,
                                     QList<Statistics> rmsImageResiduals);
-      void setRmsImageResidualLists(QVector<Statistics> rmsImageLineResiduals,
-                                    QVector<Statistics> rmsImageSampleResiduals,
-                                    QVector<Statistics> rmsImageResiduals);
       void setRmsLidarImageResidualLists(QList<Statistics> rmsLidarImageLineResiduals,
                                     QList<Statistics> rmsLidarImageSampleResiduals,
                                     QList<Statistics> rmsLidarImageResiduals);

@@ -11,7 +11,6 @@ find files of those names at the top level of this repository. **/
 
 #include "AbstractMultipleChoiceFilter.h"
 
-template< typename U, typename V > struct QPair;
 class QString;
 
 namespace Isis {

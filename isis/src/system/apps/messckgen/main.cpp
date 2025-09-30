@@ -15,6 +15,7 @@ find files of those names at the top level of this repository. **/
 #include <QFile>
 #include <QHash>
 #include <QList>
+#include <QRegularExpression>
 #include <QSet>
 #include <QString>
 
@@ -139,12 +140,12 @@ void IsisMain() {
 
           // Remove the trailing " TDB" as it confuses the time conversion
           QString newEnd = pivotEndRaw;
-          pivotEndRaw.remove(QRegExp(" TDB$"));
+          pivotEndRaw.remove(QRegularExpression(" TDB$"));
           QString pivotEnd = pivotEndRaw;
 
           PvlKeyword &time = ckGroup.findKeyword("Time");
           QString currentStartRaw = time[0];
-          currentStartRaw.remove(QRegExp(" TDB$"));
+          currentStartRaw.remove(QRegularExpression(" TDB$"));
           QString currentStart = currentStartRaw;
 
           // Add 7 days (in units of seconds) to the current start time to

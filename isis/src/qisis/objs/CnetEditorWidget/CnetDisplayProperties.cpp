@@ -240,7 +240,7 @@ namespace Isis {
     m_curComposing = true;
 
     QFuture< QMap< QString, QString > > future = QtConcurrent::run(
-        this, &CnetDisplayProperties::composeSerialNumbers, imageFileNames);
+        &CnetDisplayProperties::composeSerialNumbers, this, imageFileNames);
 
     m_composeWatcher->setFuture(future);
   }

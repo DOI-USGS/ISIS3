@@ -10,7 +10,6 @@ find files of those names at the top level of this repository. **/
 #include <QThread>
 
 template<typename T> class QList;
-template<typename A, typename B> struct QPair;
 
 namespace Isis {
   class Brick;

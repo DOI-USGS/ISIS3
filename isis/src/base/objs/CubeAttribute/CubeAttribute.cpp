@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 #include <iostream>
 
 #include <QDebug>
+#include <QRegularExpression>
 
 #include "FileName.h"
 #include "IException.h"
@@ -82,7 +83,7 @@ namespace Isis {
   vector<QString> CubeAttributeInput::bands() const {
     vector<QString> result;
 
-    QString str = toString().remove(QRegExp("^\\+"));
+    QString str = toString().remove(QRegularExpression("^\\+"));
 
     QStringList strSplit = str.split(",", Qt::SkipEmptyParts);
     foreach (QString commaTok, strSplit) {
@@ -120,7 +121,7 @@ namespace Isis {
 
 
   bool CubeAttributeInput::isBandRange(QString attribute) const {
-    return QRegExp("[0-9,\\-]+").exactMatch(attribute);
+    return QRegularExpression("[0-9,\\-]+").match(attribute).hasMatch();
   }
 
 
@@ -441,30 +442,30 @@ namespace Isis {
 
 
   bool CubeAttributeOutput::isByteOrder(QString attribute) const {
-    return QRegExp("(M|L)SB").exactMatch(attribute);
+    return QRegularExpression("(M|L)SB").match(attribute).hasMatch();
   }
 
 
   bool CubeAttributeOutput::isFileFormat(QString attribute) const {
-    return QRegExp("(BANDSEQUENTIAL|BSQ|TILE|GTIFF)").exactMatch(attribute);
+    return QRegularExpression("(BANDSEQUENTIAL|BSQ|TILE|GTIFF)").match(attribute).hasMatch();
   }
 
 
   bool CubeAttributeOutput::isLabelAttachment(QString attribute) const {
-    return QRegExp("(ATTACHED|DETACHED|EXTERNAL)").exactMatch(attribute);
+    return QRegularExpression("(ATTACHED|DETACHED|EXTERNAL)").match(attribute).hasMatch();
   }
 
 
   bool CubeAttributeOutput::isPixelType(QString attribute) const {
     QString expressions = "(8-?BIT|16-?BIT|32-?BIT|UNSIGNEDBYTE|SIGNEDWORD|UNSIGNEDWORD|REAL";
     expressions += "|32-?UINT|32-?INT|UNSIGNEDINTEGER|SIGNEDINTEGER)";
-    return QRegExp(expressions).exactMatch(attribute);
+    return QRegularExpression(expressions).match(attribute).hasMatch();
 
   }
 
 
   bool CubeAttributeOutput::isRange(QString attribute) const {
-    return QRegExp("[\\-+E0-9.]*:[\\-+E0-9.]*").exactMatch(attribute);
+    return QRegularExpression("[\\-+E0-9.]*:[\\-+E0-9.]*").match(attribute).hasMatch();
   }
 
 

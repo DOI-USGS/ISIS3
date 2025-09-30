@@ -218,7 +218,7 @@ namespace Isis {
     QString pdsTableName;
     pdsTableName.push_back(tableName[0]);
     for (int i = 1 ; i < tableName.size() ; i++) {
-      if (tableName[i] >= 65 && tableName[i] <= 90) {
+      if (tableName[i].toLatin1() >= 65 && tableName[i].toLatin1() <= 90) {
         pdsTableName.push_back('_');
         pdsTableName.push_back(tableName[i]);
       }

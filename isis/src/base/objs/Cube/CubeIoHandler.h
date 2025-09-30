@@ -21,7 +21,6 @@ class QMutex;
 class QElapsedTimer;
 template <typename A> class QList;
 template <typename A, typename B> class QMap;
-template <typename A, typename B> struct QPair;
 
 namespace Isis {
   class Buffer;

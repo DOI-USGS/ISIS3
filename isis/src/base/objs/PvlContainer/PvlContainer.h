@@ -8,7 +8,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 #include "PvlKeyword.h"
 
-template<typename T> class QList;
+#include <QLinkedList>
 
 namespace Isis {
   /**
@@ -154,10 +154,10 @@ namespace Isis {
 
       bool hasKeyword(const QString &name) const;
       //! The keyword iterator.
-      typedef QList<PvlKeyword>::iterator PvlKeywordIterator;
+      typedef QLinkedList<PvlKeyword>::iterator PvlKeywordIterator;
 
       //! The const keyword iterator
-      typedef QList<PvlKeyword>::const_iterator ConstPvlKeywordIterator;
+      typedef QLinkedList<PvlKeyword>::const_iterator ConstPvlKeywordIterator;
 
 
       PvlKeywordIterator findKeyword(const QString &name,
@@ -287,7 +287,7 @@ namespace Isis {
                                                     initialized using a filename
                                                     the string is empty.*/
       PvlKeyword m_name;                   //!< This is the name keyword
-      QList<PvlKeyword> m_keywords; /**<This is the vector of
+      QLinkedList<PvlKeyword> m_keywords; /**<This is the vector of
                                                     PvlKeywords the container is
                                                     holding. */
 

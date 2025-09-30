@@ -261,7 +261,7 @@ namespace Isis {
                            will not be active</p>");
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(p_statusEdit);
     layout->addWidget(p_showDialogButton);
     layout->addWidget(p_linkViewportsButton);

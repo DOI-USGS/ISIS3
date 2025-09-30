@@ -186,13 +186,13 @@ namespace Isis {
   const unsigned int VALID_MAXUI4      = ((unsigned int)   4294967282);
 
   // 1-byte signed special pixel values
-  const char VALID_MINS1      = ((char) -126);
-  const char NULLS1           = ((char) -128);
-  const char LOW_REPR_SATS1   = ((char) -128);
-  const char LOW_INSTR_SATS1  = ((char) -128);
-  const char HIGH_INSTR_SATS1 = ((char) -127);
-  const char HIGH_REPR_SATS1  = ((char) -127);
-  const char VALID_MAXS1      = ((char) 127);
+  const signed char VALID_MINS1      = ((signed char) -126);
+  const signed char NULLS1           = ((signed char) -128);
+  const signed char LOW_REPR_SATS1   = ((signed char) -128);
+  const signed char LOW_INSTR_SATS1  = ((signed char) -128);
+  const signed char HIGH_INSTR_SATS1 = ((signed char) -127);
+  const signed char HIGH_REPR_SATS1  = ((signed char) -127);
+  const signed char VALID_MAXS1      = ((signed char) 127);
 
   // 1-byte unsigned special pixel values
   const unsigned char VALID_MIN1      = ((unsigned char) 1);

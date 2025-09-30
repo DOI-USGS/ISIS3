@@ -9,8 +9,8 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 // Global forward declarations
+#include <QVector>
 template< class A, class B > class QMap;
-template< class A > class QVector;
 class QString;
 
 namespace Isis {

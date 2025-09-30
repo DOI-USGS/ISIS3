@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
 #include <QString>
 #include <QStringList>
 #include <QCoreApplication>
+#include <QRegExp>
 
 #include "IException.h"
 #include "IString.h"

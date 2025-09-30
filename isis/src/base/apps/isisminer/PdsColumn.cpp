@@ -174,7 +174,7 @@ namespace Isis {
       BOOST_FOREACH(SharedResource resource, resources) {
         if ( !resource->isDiscarded() ) {
           if (resource->exists(name())) {
-            maxSize = std::max(maxSize, resource->value(name(), "NULL").size() );
+            maxSize = std::max(maxSize, (int)resource->value(name(), "NULL").size() );
           }
         }
       }

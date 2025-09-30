@@ -511,7 +511,7 @@ namespace Isis {
                                    "&Close", this);
     m_closePointEditor->setToolTip("Close this window");
     m_closePointEditor->setStatusTip("Close this window");
-    m_closePointEditor->setShortcut(Qt::ALT + Qt::Key_F4);
+    m_closePointEditor->setShortcut(Qt::ALT | Qt::Key_F4);
     QString whatsThis = "<b>Function:</b> Closes the Match Tool window for this point "
         "<p><b>Shortcut:</b> Alt+F4 </p>";
     m_closePointEditor->setWhatsThis(whatsThis);

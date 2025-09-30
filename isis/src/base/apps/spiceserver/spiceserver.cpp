@@ -5,6 +5,7 @@
 #include <QDomElement>
 #include <QDomNode>
 #include <QFile>
+#include <QRegularExpression>
 #include <QString>
 #include <QStringList>
 
@@ -133,7 +134,7 @@ namespace Isis {
 
 
       if (ui.GetBoolean("CHECKVERSION") ) {
-        QStringList remoteVersion = otherVersion.split(QRegExp("\\s+"))[0].split(QRegExp("\\."));
+        QStringList remoteVersion = otherVersion.split(QRegularExpression("\\s+"))[0].split(QRegularExpression("\\."));
         if ( remoteVersion[0].toInt() <= 3 && remoteVersion[1].toInt() < 5) {
 
          QString msg ="The SPICE server only supports Isis versions greater than or equal to 3.5.*.*.";

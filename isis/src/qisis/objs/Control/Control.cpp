@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
 #include <QDir>
 #include <QFileInfo>
 #include <QMutex>
+#include <QRegularExpression>
 #include <QString>
 #include <QUuid>
 #include <QXmlStreamWriter>
@@ -260,7 +261,7 @@ namespace Isis {
    * @return @b QString The Control ID.
    */
   QString Control::id() const {
-    return m_id->toString().remove(QRegExp("[{}]"));
+    return m_id->toString().remove(QRegularExpression("[{}]"));
   }
 
 

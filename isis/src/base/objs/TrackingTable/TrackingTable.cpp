@@ -44,7 +44,7 @@ namespace Isis {
       int found = nameField.lastIndexOf(extension);
       if (found != -1) {
         // clear the packing characters - get only the file name
-        nameField.remove(found + 3);
+        nameField.remove(QString::number(found + 3));
       }
       FileName fileName(nameField);
       QString serialNumber = QString(record["SerialNumber"]);

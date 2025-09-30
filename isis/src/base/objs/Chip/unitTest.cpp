@@ -8,6 +8,8 @@ find files of those names at the top level of this repository. **/
 #include <iomanip>
 #include <iostream>
 
+#include <QRegularExpression>
+
 #include "Affine.h"
 #include "Chip.h"
 #include "Cube.h"
@@ -386,6 +388,6 @@ int main() {
  *   @history 2010-06-15 Jeannie Walldren - Original version.
  */
 void ReportError(QString err) {
-  cout << err.replace(QRegExp("\\[[^\\]]*\\.cub\\]"), "[]") << endl << endl;
+  cout << err.replace(QRegularExpression("\\[[^\\]]*\\.cub\\]"), "[]") << endl << endl;
 }
 

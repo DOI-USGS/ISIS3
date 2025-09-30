@@ -10,6 +10,7 @@ find files of those names at the top level of this repository. **/
 #include <fstream>
 
 #include <QDebug>
+#include <QRegularExpression>
 
 #include "IException.h"
 #include "IString.h"
@@ -291,23 +292,23 @@ namespace Isis {
     }
     while(c != '"');
 
-    int pos = s.indexOf(QRegExp("[\\n\\r]"));
+    int pos = s.indexOf(QRegularExpression("[\\n\\r]"));
     while(pos != -1) {
       QString first = s.mid(0, pos);
       bool addspace = false;
       if(first[pos-1] == ' ') addspace = true;
-      first = first.remove(QRegExp("[\\s]*$"));
+      first = first.remove(QRegularExpression("[\\s]*$"));
       QString second = s.mid(pos + 1);
       if(second[0] == ' ') addspace = true;
       if(second[0] == '\r') addspace = true;
       if(second[0] == '\n') addspace = true;
-      second = second.remove(QRegExp("^[\\s]*"));
+      second = second.remove(QRegularExpression("^[\\s]*"));
       if(second[0] == ',') addspace = false;
       s = first;
       if(addspace) s += " ";
       s += second;
 
-      pos = s.indexOf(QRegExp("[\\n\\r]"));
+      pos = s.indexOf(QRegularExpression("[\\n\\r]"));
     }
     return s;
   }
@@ -329,22 +330,22 @@ namespace Isis {
     }
     while(c != '\'');
 
-    int pos = s.indexOf(QRegExp("[\\n\\r]"));
+    int pos = s.indexOf(QRegularExpression("[\\n\\r]"));
     while(pos != -1) {
       QString first = s.mid(0, pos);
       bool addspace = false;
       if(first[pos-1] == ' ') addspace = true;
-      first = first.remove(QRegExp("[\\s]*$"));
+      first = first.remove(QRegularExpression("[\\s]*$"));
       QString second = s.mid(pos + 1);
       if(second[0] == ' ') addspace = true;
       if(second[0] == '\r') addspace = true;
       if(second[0] == '\n') addspace = true;
-      second = second.remove(QRegExp("^[\\s]*"));
+      second = second.remove(QRegularExpression("^[\\s]*"));
       if(second[0] == ',') addspace = false;
       s = first;
       if(addspace) s += " ";
       s += second;
-      pos = s.indexOf(QRegExp("[\\n\\r]"));
+      pos = s.indexOf(QRegularExpression("[\\n\\r]"));
     }
 
     return s;

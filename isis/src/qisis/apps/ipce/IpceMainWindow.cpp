@@ -12,7 +12,6 @@ find files of those names at the top level of this repository. **/
 #include <QBrush>
 #include <QColor>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QDockWidget>
 #include <QMap>
 #include <QMapIterator>

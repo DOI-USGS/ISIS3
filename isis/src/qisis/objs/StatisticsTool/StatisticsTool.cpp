@@ -113,25 +113,25 @@ namespace Isis {
     p_minLabel = new QLabel("Minimum: n/a");
     p_minLabel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     p_minLabel->setLineWidth(1);
-    p_minLabel->setMargin(10);
+    p_minLabel->setContentsMargins(10, 10, 10, 10);
     p_minLabel->setAlignment(Qt::AlignLeft);
 
     p_maxLabel = new QLabel("Maximum: n/a");
     p_maxLabel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     p_maxLabel->setLineWidth(1);
-    p_maxLabel->setMargin(10);
+    p_maxLabel->setContentsMargins(10, 10, 10, 10);
     p_maxLabel->setAlignment(Qt::AlignLeft);
 
     p_avgLabel = new QLabel("Average: n/a");
     p_avgLabel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     p_avgLabel->setLineWidth(1);
-    p_avgLabel->setMargin(10);
+    p_avgLabel->setContentsMargins(10, 10, 10, 10);
     p_avgLabel->setAlignment(Qt::AlignLeft);
 
     p_stdevLabel = new QLabel("Standard Dev: n/a");
     p_stdevLabel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     p_stdevLabel->setLineWidth(1);
-    p_stdevLabel->setMargin(10);
+    p_stdevLabel->setContentsMargins(10, 10, 10, 10);
     p_stdevLabel->setAlignment(Qt::AlignLeft);
 
     p_dnLabel = new QLabel("DN: n/a");
@@ -235,7 +235,7 @@ namespace Isis {
     connect(showButton, SIGNAL(clicked()), p_dialog, SLOT(show()));
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(sampleLabel);
     layout->addWidget(p_sampsEdit);
     layout->addWidget(lineLabel);

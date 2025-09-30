@@ -71,7 +71,7 @@ namespace Isis {
       };
 
       // Constructors and Destructors
-      Table();
+      // Table();
       Table(Blob &blob);
       Table(const QString &tableName, TableRecord &rec);
       Table(const QString &tableName);// Only use this constructor for reading in an existing table

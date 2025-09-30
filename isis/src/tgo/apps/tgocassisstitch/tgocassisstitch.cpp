@@ -27,7 +27,7 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
-  static QMap<QString, FileName> sortFramelets(FileName frameletListFile);
+  static QMultiMap<QString, FileName> sortFramelets(FileName frameletListFile);
   static void stitchFrame(QList<FileName> frameletList, FileName frameFileName);
 
   /**
@@ -114,11 +114,11 @@ namespace Isis {
    *
    * @param frameletList The file containing the list of framelet cubes
    *
-   * @return @b QMap<QString,FileName> A multi-valued mapping from observation
+   * @return @b QMultiMap<QString,FileName> A multi-valued mapping from observation
    *                                   number for a frame to the framelet cube
    *                                   files in that frame.
    */
-  QMap<QString, FileName> sortFramelets(FileName frameletListFile) {
+  QMultiMap<QString, FileName> sortFramelets(FileName frameletListFile) {
     QMultiMap<QString, FileName> frameMap;
 
     ObservationNumberList frameletList(frameletListFile.expanded(), false);
@@ -128,7 +128,7 @@ namespace Isis {
                             frameletList.fileName(i) );
     }
 
-    return std::move(frameMap);
+    return frameMap;
   }
 
 

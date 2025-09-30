@@ -13,7 +13,6 @@ find files of those names at the top level of this repository. **/
 
 class QButtonGroup;
 class QLineEdit;
-template< typename U, typename V > struct QPair;
 class QSpinBox;
 class QString;
 

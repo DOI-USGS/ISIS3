@@ -83,7 +83,7 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
      */
     void setType(const int spktype) {
       if ( (spktype != 9) && (spktype != 13) ) {
-        QString mess = "SPK kernel type " + QString(spktype) +
+        QString mess = "SPK kernel type " + QString::number(spktype) +
                            " not valid/supported -  must 9 or 13";
         throw IException(IException::User, mess, _FILEINFO_);
       }

@@ -8,9 +8,6 @@
 
 #include "Stretch.h"
 
-template <typename A, typename B> struct QPair;
-template <typename T> class QVector;
-
 class QwtInterval;
 
 namespace Isis {
