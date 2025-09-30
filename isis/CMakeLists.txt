@@ -385,7 +385,7 @@ foreach (_variableName ${_variableNames})
 endforeach()
 
 # add target based linkages to ALLLIBS variable
-list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree GDAL::GDAL Bullet::Bullet_double)
+list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree GDAL::GDAL Bullet::Bullet_double CSPICE::cspice)
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)
@@ -397,7 +397,7 @@ list(REMOVE_DUPLICATES ALLINCDIRS)
 
 
 get_target_property(CSPICE_INCLUDE_DIRS CSPICE::cspice INTERFACE_INCLUDE_DIRECTORIES)
-link_libraries(CSPICE::cspice)
+list(APPEND ALLLIBDIRS ${CSPICE_INCLUDE_DIRS})
 
 # Start setting up the build
 # Add extension to find fortran until .so symlink can be added to /usr/lib64
@@ -407,10 +407,8 @@ list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES .so.3 .so.6 .so.5)
 include_directories(SYSTEM ${ALLINCDIRS})
 link_directories(${ALLLIBDIRS})
 
-include_directories(
-  ${CMAKE_BINARY_DIR}/inc
-  ${CSPICE_INCLUDE_DIRS}
-  )
+include_directories(${CMAKE_BINARY_DIR}/inc)
+
 set(CORE_LIB_NAME isis)
 message(STATUS "CORE LIB:  ${CORE_LIB_NAME}")
 
