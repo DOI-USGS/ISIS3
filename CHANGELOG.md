@@ -35,6 +35,7 @@ release.
 
 ## [Unreleased]
 
+
 ### Added
 - Added Linux Arm support.
 - Added support for Chandrayaan-2 TMC and OHRC cameras. [#5828](https://github.com/DOI-USGS/ISIS3/pull/5828)
@@ -65,6 +66,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Changed `ControlMeasure` object comparison to no longer factor in creation date for equality [#5862](https://github.com/DOI-USGS/ISIS3/pull/5862)
 
 ### Fixed
+- Fixed Chandrayaan-2 TMC2 serial numbers by setting InstrumentId to CH2_TMC_FORE/NADIR/AFT based on the filename sensor [#5871](https://github.com/DOI-USGS/ISIS3/issues/5871)
 - Fixed kaguyatc2isis invalid BandBin values [#5629](https://github.com/DOI-USGS/ISIS3/issues/5629)
 - Fixed SpiceClient to handle redirect requests.
 - Fixed jigsaw to default OUTADJUSTMENTH5 option to false and allow this feature to run on read-only images [#5700](https://github.com/DOI-USGS/ISIS3/issues/5700)
@@ -87,10 +89,10 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed order of observer and target in spiceql call in `ctxcal`. [#5823](https://github.com/DOI-USGS/ISIS3/pull/5823)
 - Fixed bundle serialization on MacOS for IPCE [#5808](https://github.com/DOI-USGS/ISIS3/pull/5808)
 - Fixed `noseam` to use correct temporary files when running [#5878](https://github.com/DOI-USGS/ISIS3/pull/5878)
-- Fixed `spiceserver` to use CK quality for PCK selection [#5901](https://github.com/DOI-USGS/ISIS3/pull/5901)
-- Fixed Chandrayaan2 TMC2 template in `isisimport` to allow Pixel Resolution to be optional [#5882](https://github.com/DOI-USGS/ISIS3/issues/5882)
+
 
 ## [9.0.0] - 09-25-2024
+
 
 ### Added
 - Added TOVECT output parameter which generate a geospatial CSV file with a VRT metadata sidecar file [#5571](https://github.com/DOI-USGS/ISIS3/issues/5571)  
