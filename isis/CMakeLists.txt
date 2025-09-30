@@ -167,9 +167,9 @@ endif()
 
 if(buildTests)
   include(CTest)
-  include(CodeCoverage)
+  # include(CodeCoverage)
   enable_testing()
-  APPEND_COVERAGE_COMPILER_FLAGS()
+  # APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
 
@@ -255,7 +255,7 @@ find_package(Qt6 COMPONENTS
                  Xml
 		             # XmlPatterns
                  # Search this path explicitly for MacOS OpenGL Framework
-		 PATHS /System/Library/Frameworks/ REQUIRED CONFIG)
+		             PATHS /System/Library/Frameworks/ REQUIRED CONFIG)
 add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
 
 find_package(Boost 1.59.0 REQUIRED      atomic
