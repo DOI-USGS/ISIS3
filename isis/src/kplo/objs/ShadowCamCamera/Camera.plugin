@@ -1,0 +1,5 @@
+Group = KOREA_PATHFINDER_LUNAR_ORBITER/SHADOWCAM
+  Version = 1
+  Library = ShadowCamCamera
+  Routine = ShadowCamCameraPlugin
+EndGroup
