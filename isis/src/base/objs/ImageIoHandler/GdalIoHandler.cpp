@@ -426,8 +426,8 @@ namespace Isis {
     }
 
     else if(m_pixelType == GDT_Int8) {
-      char raw = ((char *)rawBuff)[idx];
-      if (raw == (char) m_gdalNoDataValue) {
+      signed char raw = ((signed char *)rawBuff)[idx];
+      if (raw == (signed char) m_gdalNoDataValue) {
         raw = NULLS1;
       }
 
@@ -441,7 +441,7 @@ namespace Isis {
         bufferVal = (double) raw * m_scale + m_offset;
       }
 
-      ((char *)rawBuff)[idx] = raw;
+      ((signed char *)rawBuff)[idx] = raw;
     }
     
     else if(m_pixelType == GDT_Byte) {

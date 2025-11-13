@@ -48,7 +48,7 @@ namespace Isis {
   inline int SizeOf(Isis::PixelType pixelType) {
     if(pixelType == Isis::None) return 0;
     if(pixelType == Isis::UnsignedByte) return sizeof(unsigned char);
-    if(pixelType == Isis::SignedByte) return sizeof(char);
+    if(pixelType == Isis::SignedByte) return sizeof(signed char);
     if(pixelType == Isis::UnsignedWord) return sizeof(unsigned short);
     if(pixelType == Isis::SignedWord) return sizeof(short);
     if(pixelType == Isis::UnsignedInteger) return sizeof(unsigned int);
