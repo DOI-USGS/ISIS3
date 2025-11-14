@@ -88,6 +88,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed bundle serialization on MacOS for IPCE [#5808](https://github.com/DOI-USGS/ISIS3/pull/5808)
 - Fixed `noseam` to use correct temporary files when running [#5878](https://github.com/DOI-USGS/ISIS3/pull/5878)
 - Fixed `spiceserver` to use CK quality for PCK selection [#5901](https://github.com/DOI-USGS/ISIS3/pull/5901)
+- Fixed Chandrayaan2 TMC2 template in `isisimport` to allow Pixel Resolution to be optional [#5882](https://github.com/DOI-USGS/ISIS3/issues/5882)
 
 ## [9.0.0] - 09-25-2024
 
