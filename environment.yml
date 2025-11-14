@@ -14,15 +14,15 @@ dependencies:
   - cspice =67
   - csm >=3.0.3,<3.0.4
   - curl >=8.14.1,<9
-  - cxx-compiler=1.7
+  - cxx-compiler=1.9
   - doxygen
   - eigen >=3, <4
   - embree >=3, <4
   - ffmpeg
   - gcovr
-  - geos >=3.13,<3.14
+  - geos >=3.14,<3.15
   - geotiff
-  - gdal >=3.11,<4
+  - gdal >=3.12,<4
   - gmp
   - graphviz
   - conda-forge::gsl >=2.6, <2.7
@@ -35,10 +35,10 @@ dependencies:
   - kalasiris
   - krb5
   - libboost >=1.88.0,<1.89
-  - libgdal >=3.11,<4
+  - libgdal >=3.12,<4
   - libopencv >=4.12,<5
   - libpng >=1.6.34,<1.7
-  - libprotobuf >=5,<6
+  - libprotobuf >=6,<7
   - libtiff >=4.5,<4.8
   - libxml2
   - make
@@ -53,9 +53,9 @@ dependencies:
   - opencv >=4.12,<5
   - openssl >=3.5,<4
   - pcl >=1.15,<1.16
-  - pdal >=2.8.4,<3
+  # - pdal >=2.8.4,<3
   - plio=1.5.3
-  - protobuf >=5,<6
+  - protobuf >=6,<7
   - python >=3.9
   - python_abi >=3.9
   - pytest
@@ -74,7 +74,7 @@ dependencies:
   - usgscsm
   - x264
   - xalan-c
-  - xerces-c >=3.2.4,<3.3.0a0
+  - xerces-c >=3.3.0,<3.4
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm
