@@ -131,6 +131,7 @@ namespace Isis {
 
       static Isis::PvlObject &readObject(Isis::PvlObject &pvlobj, nlohmann::ordered_json jdata);
       nlohmann::ordered_json toJson();
+      void readGdal(const QString &file);
 
       ~Pvl() {
         if(m_internalTemplate) delete m_formatTemplate;

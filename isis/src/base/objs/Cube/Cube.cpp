@@ -977,145 +977,8 @@ namespace Isis {
     m_dataFileName = new FileName(*m_labelFileName);
 
     initCoreFromGdal(m_labelFileName->expanded());
-    GDALDataset *dataset = GDALDataset::FromHandle(GDALOpen(m_dataFileName->expanded().toStdString().c_str(), GA_ReadOnly));
-    if (!dataset) {
-      QString msg = "Failed opening GDALDataset from [" + m_dataFileName->name() + "]";
-      cleanUp(false);
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
 
-    CPLStringList metadata = CPLStringList(dataset->GetMetadata("USGS"), false);
-
-    m_label = new Pvl();
-    if (metadata[0] != nullptr) {
-      for (int i = 0; i < metadata.size(); i++) {
-        const char *metadataItem = CPLParseNameValue(metadata[i], nullptr);
-        nlohmann::ordered_json metadataAsJson = nlohmann::ordered_json::parse(metadataItem);
-        Pvl pvl;
-        Pvl::readObject(pvl, metadataAsJson);
-        for (int i = 0; i < pvl.objects(); i++) {
-          m_label->addObject(pvl.object(i));
-        }
-        for (int i = 0; i < pvl.groups(); i++) {
-          m_label->addGroup(pvl.group(i));
-        }
-      }
-    }
-    else {
-      // Setup the PVL
-      PvlObject isiscube("IsisCube");
-      PvlObject core("Core");
-
-      // Create the size of the core
-      PvlGroup dims("Dimensions");
-      dims += PvlKeyword("Samples", toString(m_samples));
-      dims += PvlKeyword("Lines", toString(m_lines));
-      dims += PvlKeyword("Bands", toString(m_bands));
-
-      // Create the pixel type
-      PvlGroup ptype("Pixels");
-      ptype += PvlKeyword("Type", PixelTypeName(m_pixelType));
-
-      // And the byte ordering
-      ptype += PvlKeyword("ByteOrder", ByteOrderName(m_byteOrder));
-      ptype += PvlKeyword("Base", toString(m_base));
-      ptype += PvlKeyword("Multiplier", toString(m_multiplier));
-      
-      core += PvlKeyword("StartByte", toString(m_labelBytes + 1));
-
-      core.addGroup(dims);
-      core.addGroup(ptype);
-
-      isiscube.addObject(core);
-
-      m_label->addObject(isiscube);
-    }
-
-    if (dataset->GetSpatialRef() && !(m_label->findObject("IsisCube").hasGroup("Mapping"))) {
-      char ** projStr = new char*[1];
-      const OGRSpatialReference &oSRS = *dataset->GetSpatialRef();
-      oSRS.exportToProj4(projStr);
-      QString qProjStr = QString::fromStdString(std::string(projStr[0]) + " +type=crs");
-      delete[] projStr[0];
-      delete[] projStr;
-
-      char ** projJsonStr = new char*[1];
-      oSRS.exportToPROJJSON(projJsonStr, nullptr);
-      nlohmann::json projJson = nlohmann::json::parse(projJsonStr[0]);
-      CPLFree(projJsonStr);
-
-      PvlGroup mappingGroup("Mapping");
-      mappingGroup.addKeyword(PvlKeyword("ProjectionName", "IProj"));
-      mappingGroup.addKeyword(PvlKeyword("EquatorialRadius", toString(oSRS.GetSemiMajor()), "meters"));
-      mappingGroup.addKeyword(PvlKeyword("PolarRadius", toString(oSRS.GetSemiMinor()), "meters"));
-
-      if (projJson.contains("base_crs")) {
-        projJson = projJson["base_crs"];
-      }
-
-      std::string direction = projJson["coordinate_system"]["axis"][1]["direction"];
-      if (direction == "east") {
-        mappingGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
-      }
-      else if (direction == "west") {
-        mappingGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"));
-      }
-      else {
-        QString msg = "Unknown direction [" + QString::fromStdString(direction) + "]";
-        throw IException(IException::Programmer, msg, _FILEINFO_);
-      }
-      
-      if (oSRS.GetSemiMajor() == oSRS.GetSemiMinor()) {
-        mappingGroup.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"));
-      }
-      else {
-        mappingGroup.addKeyword(PvlKeyword("LatitudeType", "Planetographic"));
-      }
-
-      mappingGroup.addKeyword(PvlKeyword("LongitudeDomain", "180"));
-      mappingGroup.addKeyword(PvlKeyword("ProjStr", qProjStr));
-      
-      // Read the GeoTransform and get the elements we care about
-      double *padfTransform = new double[6];
-      dataset->GetGeoTransform(padfTransform);
-      if (abs(padfTransform[1]) != abs(padfTransform[5])) {
-        delete[] padfTransform;
-        QString msg = "Vertical and horizontal resolution do not match";
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
-
-      double dfScale;
-      double dfRes;
-      double upperLeftX;
-      double upperLeftY;
-      dfRes = padfTransform[1] * oSRS.GetLinearUnits();
-      upperLeftX = padfTransform[0];
-      upperLeftY = padfTransform[3];
-      if (oSRS.IsProjected()) {
-        const double dfDegToMeter = oSRS.GetSemiMajor() * M_PI / 180.0;
-        dfScale = dfDegToMeter / dfRes;
-        mappingGroup.addKeyword(PvlKeyword("PixelResolution", toString(dfRes), "meters/pixel"));
-      }
-      else if (oSRS.IsGeographic()) {
-        dfScale = 1.0 / dfRes;
-        mappingGroup.addKeyword(PvlKeyword("PixelResolution", toString(dfRes), "degrees/pixel"));
-      }
-      else {
-        QString msg = "Gdal spatial reference is not Geographic or Projected";
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
-      mappingGroup.addKeyword(PvlKeyword("Scale", toString(dfScale), "pixels/degree"));
-      mappingGroup.addKeyword(PvlKeyword("UpperLeftCornerX", toString(upperLeftX)));
-      mappingGroup.addKeyword(PvlKeyword("UpperLeftCornerY", toString(upperLeftY)));
-      delete[] padfTransform;
-
-      PvlObject &isiscube = m_label->findObject("IsisCube");
-      if (isiscube.hasGroup("Mapping")) {
-        isiscube.deleteGroup("Mapping");
-      }
-      isiscube.addGroup(mappingGroup);
-    }
-    GDALClose(dataset);
+    m_label = new Pvl(m_dataFileName->expanded());
     
     GDALAccess eAccess = GA_ReadOnly;
     if (access == "rw") {
@@ -1208,7 +1071,12 @@ namespace Isis {
     }
 
     QMutexLocker locker(m_mutex);
-    m_ioHandler->read(bufferToFill);
+    try {
+      m_ioHandler->read(bufferToFill);
+    }
+    catch(IException &e) {
+      throw e;
+    }
   }
 
 
