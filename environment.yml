@@ -63,7 +63,7 @@ dependencies:
   - qhull
   - qt6-main >=6,<7
   - qt6-multimedia
-  # - qwt <6.3.0
+  - qwt <6.3.0
   - spiceql >=1.2.4*_5,<2
   - sqlite >=3.46.0,<4
   - suitesparse <7.7.0
