@@ -508,8 +508,7 @@ namespace Isis {
       double xmin, double xmax, double ymin, double ymax,
       double slat, double elat, double slon, double elon, int nbands,
       CubeAttributeOutput &oAtt, const QString &mosaicFile, bool latlonflag) {
-    Cube cube(inputFile);
-    Pvl fileLab = *cube.label();
+    Pvl fileLab(inputFile);
     PvlGroup &mapping = fileLab.findGroup("Mapping", Pvl::Traverse);
 
     // All mosaicking programs use only the upper left x and y to determine where to
