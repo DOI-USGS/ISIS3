@@ -317,6 +317,7 @@ namespace Isis {
   /**
    * Allows copying of the buffer contents of a larger buffer to another same size or smaller
    *   Buffer, using their base positions to relate data. This does not copy the raw buffer.
+   *   This method does not guarantee consistent data translation when buffers have scale disparities.
    *
    * @param in The Buffer to be copied.
    * @return The operation was successful (the buffers overlapped)
@@ -349,11 +350,25 @@ namespace Isis {
       for (int b = firstBand; b < lastBand; b++) {
         for (int i = topLine; i < bottomLine; i++) {
           for (int j = topSamp; j < bottomSamp; j++) {
+            int inIndex = -1;
+            int index = -1;
             try {
-              (*this)[Index(j, i, b)] = in[in.Index(j, i, b)];
+              inIndex = in.Index(j, i, b);
             }
             catch(...) {
-              (*this)[Index(j, i, b)] = NULL8;
+            }
+            try {
+              index = Index(j, i, b);
+            }
+            catch(...) {
+            }
+            double value = NULL8;
+            if (inIndex != -1 && inIndex < in.size()) {
+              value = in[in.Index(j, i, b)];
+            }
+
+            if (index != -1 && index < size()) {
+              (*this)[index] = value;
             }
           }
         }
