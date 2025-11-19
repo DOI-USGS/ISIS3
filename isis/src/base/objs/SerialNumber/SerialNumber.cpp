@@ -84,14 +84,7 @@ namespace Isis {
    * @return Calculated SerialNumber or FileName
   */
   QString SerialNumber::Compose(const QString &filename, bool def2filename) {
-    Pvl p;
-    try {
-      p = Pvl(filename);
-    }
-    catch(...) {
-      Cube cube(filename);
-      p = *(cube.label());
-    }
+    Pvl p(filename);
     return Compose(p, def2filename);
   }
 
