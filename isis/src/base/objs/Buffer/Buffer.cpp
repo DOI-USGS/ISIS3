@@ -363,11 +363,11 @@ namespace Isis {
             catch(...) {
             }
             double value = NULL8;
-            if (inIndex != -1 && inIndex < in.size()) {
-              value = in[in.Index(j, i, b)];
+            if (inIndex > -1 && inIndex < in.size()) {
+              value = in[inIndex];
             }
 
-            if (index != -1 && index < size()) {
+            if (index > -1 && index < size()) {
               (*this)[index] = value;
             }
           }
