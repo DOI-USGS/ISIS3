@@ -153,14 +153,7 @@ namespace Isis {
 
     // Grab the labels from the first filename in the SerialNumberList to get
     // some info
-    Pvl cubeLab;
-    try {
-      cubeLab = Pvl(serialNumbers.fileName(0));
-    }
-    catch (...) {
-      Cube cube(serialNumbers.fileName(0));
-      cubeLab = *(cube.label());
-    }
+    Pvl cubeLab(serialNumbers.fileName(0));
 
     // Construct a Projection for converting between Lon/Lat and X/Y
     // This is used inside the seeding algorithms.

@@ -8,7 +8,6 @@ find files of those names at the top level of this repository. **/
 
 #include <QString>
 
-#include "Cube.h"
 #include "IException.h"
 #include "FileList.h"
 #include "FileName.h"
@@ -120,14 +119,7 @@ namespace Isis {
    *                           does not exist.
    */
   void SerialNumberList::add(const QString &filename, bool def2filename) {
-    Pvl p;
-    try {
-      p = Pvl(Isis::FileName(filename).expanded());
-    }
-    catch (...) {
-      Cube cube(Isis::FileName(filename).expanded());
-      p = *(cube.label());
-    }
+    Pvl p(Isis::FileName(filename).expanded());
     PvlObject cubeObj = p.findObject("IsisCube");
 
     try {
@@ -257,14 +249,7 @@ namespace Isis {
    *
    */
   void SerialNumberList::add(const QString &serialNumber, const QString &filename) {
-    Pvl p;
-    try {
-      p = Pvl(Isis::FileName(filename).expanded());
-    }
-    catch (...) {
-      Cube cube(Isis::FileName(filename).expanded());
-      p = *(cube.label());
-    }
+    Pvl p(Isis::FileName(filename).expanded());
     PvlObject cubeObj = p.findObject("IsisCube");
 
     try {
