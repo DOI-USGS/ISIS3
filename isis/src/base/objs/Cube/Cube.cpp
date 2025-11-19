@@ -1071,12 +1071,7 @@ namespace Isis {
     }
 
     QMutexLocker locker(m_mutex);
-    try {
-      m_ioHandler->read(bufferToFill);
-    }
-    catch(IException &e) {
-      throw e;
-    }
+    m_ioHandler->read(bufferToFill);
   }
 
 
