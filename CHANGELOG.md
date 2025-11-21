@@ -87,6 +87,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed order of observer and target in spiceql call in `ctxcal`. [#5823](https://github.com/DOI-USGS/ISIS3/pull/5823)
 - Fixed bundle serialization on MacOS for IPCE [#5808](https://github.com/DOI-USGS/ISIS3/pull/5808)
 - Fixed `noseam` to use correct temporary files when running [#5878](https://github.com/DOI-USGS/ISIS3/pull/5878)
+- Fixed `spiceserver` to use CK quality for PCK selection [#5901](https://github.com/DOI-USGS/ISIS3/pull/5901)
 
 ## [9.0.0] - 09-25-2024
 
