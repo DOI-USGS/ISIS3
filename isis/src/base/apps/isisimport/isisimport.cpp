@@ -354,6 +354,11 @@ namespace Isis {
     else if (inputFileName.removeExtension().addExtension("QUB").fileExists()) {
       importer.SetInputFile(inputFileName.removeExtension().addExtension("QUB").expanded());
     }
+    else if (inputFileName.removeExtension().addExtension("tif").fileExists()) {
+    QString msg = "GeoTIFFs may contain ancillary data that isisimport cannot process. "
+                  "Please convert the .TIF to a cube using another tool, such as gdal_translate.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
     else {
       importer.SetInputFile(inputFileName.expanded());
     }

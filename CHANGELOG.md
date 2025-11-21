@@ -73,6 +73,7 @@ release.
 - Fixed embree shapemodel intersection calculation [#5592](https://github.com/DOI-USGS/ISIS3/issues/5592)
 - Fixed findFeaturesSegment.py errors from issues [#5725](https://github.com/DOI-USGS/ISIS3/issues/5725) and [#5702](https://github.com/DOI-USGS/ISIS3/issues/5702)
 - Fixed jigsaw save/apply bug by adding back missing metadata to Instrument Position/Pointing tables [#5701](https://github.com/DOI-USGS/ISIS3/issues/5701)
+- Fixed Chandrayaan2 TMC2 template in `isisimport` to allow Pixel Resolution to be optional [#5882](https://github.com/DOI-USGS/ISIS3/issues/5882)
 
 ## [8.3.0] - 2024-09-30
 
