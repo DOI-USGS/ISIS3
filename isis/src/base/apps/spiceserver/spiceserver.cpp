@@ -180,7 +180,7 @@ namespace Isis {
       Kernel lk, pck, targetSpk, fk, ik, sclk, spk, iak, dem, exk;
       QList< priority_queue<Kernel> > ck;
       lk        = baseKernels.leapSecond(label);
-      pck       = baseKernels.targetAttitudeShape(label);
+      pck       = ckKernels.targetAttitudeShape(label);
       targetSpk = baseKernels.targetPosition(label);
       ik        = baseKernels.instrument(label);
       sclk      = baseKernels.spacecraftClock(label);
