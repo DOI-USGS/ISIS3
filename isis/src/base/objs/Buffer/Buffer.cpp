@@ -317,7 +317,6 @@ namespace Isis {
   /**
    * Allows copying of the buffer contents of a larger buffer to another same size or smaller
    *   Buffer, using their base positions to relate data. This does not copy the raw buffer.
-   *   This method does not guarantee consistent data translation when buffers have scale disparities.
    *
    * @param in The Buffer to be copied.
    * @return The operation was successful (the buffers overlapped)
@@ -347,29 +346,15 @@ namespace Isis {
       int firstBand = max(in.p_band, p_band);
       int lastBand = min(in.p_band + in.p_nbands, p_band + p_nbands);
 
-      for (int b = firstBand; b < lastBand; b++) {
-        for (int i = topLine; i < bottomLine; i++) {
-          for (int j = topSamp; j < bottomSamp; j++) {
-            int inIndex = -1;
-            int index = -1;
-            try {
-              inIndex = in.Index(j, i, b);
-            }
-            catch(...) {
-            }
-            try {
-              index = Index(j, i, b);
-            }
-            catch(...) {
-            }
-            double value = NULL8;
-            if (inIndex > -1 && inIndex < in.size()) {
-              value = in[inIndex];
-            }
+      int lineIncrement = (double)LineDimension() / (double)LineDimensionScaled();
+      int sampleIncrement = (double)SampleDimension() / (double)SampleDimensionScaled();
 
-            if (index > -1 && index < size()) {
-              (*this)[index] = value;
-            }
+      for (int b = firstBand; b < lastBand; b++) {
+        for (int i = topLine; i < bottomLine; i+=lineIncrement) {
+          for (int j = topSamp; j < bottomSamp; j+=sampleIncrement) {
+            int index = Index(j, i, b);
+            int inIndex = in.Index(j, i, b);
+            (*this)[index] = in[inIndex];
           }
         }
       }
