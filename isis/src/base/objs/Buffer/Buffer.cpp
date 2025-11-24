@@ -68,9 +68,16 @@ namespace Isis {
     if (p_nsampsScaled <= 0) {
       p_nsampsScaled = 1;
     }
+    if (int((p_nsamps - 1) * p_scale) == p_nsampsScaled) {
+      p_nsampsScaled += 1;
+    }
+
     p_nlinesScaled = int(p_nlines * p_scale);
     if (p_nlinesScaled <= 0) {
       p_nlinesScaled = 1;
+    }
+    if (int((p_nlines - 1) * p_scale) == p_nlinesScaled) {
+      p_nlinesScaled += 1;
     }
 
     p_npixels = (p_nsampsScaled * p_nlinesScaled) * p_nbands;
@@ -412,8 +419,8 @@ namespace Isis {
    * @throws Isis::iException::System - Memory allocation failed
    */
   void Buffer::Allocate() {
-    p_buf = NULL;
-    p_rawbuf = NULL;
+    p_buf = nullptr;
+    p_rawbuf = nullptr;
     try {
       p_buf = new double [p_npixels];
       size_t n = Isis::SizeOf(p_pixelType);
@@ -424,16 +431,16 @@ namespace Isis {
       try {
         if(p_buf) {
           delete [] p_buf;
-          p_buf = NULL;
+          p_buf = nullptr;
         }
         if(p_rawbuf) {
           delete [](char *)p_rawbuf;
-          p_rawbuf = NULL;
+          p_rawbuf = nullptr;
         }
       }
       catch(...) {
-        p_buf = NULL;
-        p_rawbuf = NULL;
+        p_buf = nullptr;
+        p_rawbuf = nullptr;
       }
       QString message = Message::MemoryAllocationFailed();
       throw IException(IException::Unknown, message, _FILEINFO_);

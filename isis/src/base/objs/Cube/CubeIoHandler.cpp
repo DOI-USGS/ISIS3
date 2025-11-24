@@ -1359,10 +1359,6 @@ namespace Isis {
           for(int x = startX; x < endX; x = x + sampleIncrement) {
             const int &sampleIntoChunk = x - chunkStartSample;
             int bufferIndex = output.Index(x, y, virtualBand);
-            // Avoid rolling back onto your buffer
-            if (bufferIndex >= output.size()) {
-              bufferIndex = output.size() - 1;
-            }
 
             const int &chunkIndex = sampleIntoChunk +
                 (chunkLineSize * lineIntoChunk) +
