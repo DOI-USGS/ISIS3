@@ -352,16 +352,36 @@ namespace Isis {
 
       int firstBand = max(in.p_band, p_band);
       int lastBand = min(in.p_band + in.p_nbands, p_band + p_nbands);
-
+    
       int lineIncrement = (double)LineDimension() / (double)LineDimensionScaled();
       int sampleIncrement = (double)SampleDimension() / (double)SampleDimensionScaled();
 
       for (int b = firstBand; b < lastBand; b++) {
-        for (int i = topLine; i < bottomLine; i+=lineIncrement) {
-          for (int j = topSamp; j < bottomSamp; j+=sampleIncrement) {
-            int index = Index(j, i, b);
+        int lineIndex = -1;
+        for (int i = topLine; i < bottomLine;) {
+          int nextLineIndex = Index(topSamp, i, b);
+
+          int sampleIndex = -1;
+          for (int j = topSamp; j < bottomSamp;) {
+            int nextSampleIndex = Index(j, i, b);
             int inIndex = in.Index(j, i, b);
-            (*this)[index] = in[inIndex];
+            if (sampleIndex == nextSampleIndex) {
+              j++;
+              continue;
+            }
+            else {
+              j += sampleIncrement;
+              sampleIndex = nextSampleIndex;
+            }
+            (*this)[sampleIndex] = in[inIndex];
+          }
+          if (lineIndex == nextLineIndex) {
+            i++;
+            continue;
+          }
+          else {
+            i += lineIncrement;
+            lineIndex = nextLineIndex;
           }
         }
       }
