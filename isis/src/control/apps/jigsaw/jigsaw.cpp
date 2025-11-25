@@ -331,14 +331,16 @@ namespace Isis {
               auto n = count(CMATRIX_KEYS_FOR_STR.begin(), CMATRIX_KEYS_FOR_STR.end(), cmatrixKey);
               auto m = count(CMATRIX_KEYS_FOR_VEC.begin(), CMATRIX_KEYS_FOR_VEC.end(), cmatrixKey);
               if (n > 0) {
-                dataset.createAttribute<string>(cmatrixKey, cmatrixValue["Value"]);
+                std::string cmatrixValueStr = cmatrixValue["Value"].get<std::string>();
+                std::vector<std::string> cmatrixValueStrVec{cmatrixValueStr};
+                dataset.createAttribute(cmatrixKey, cmatrixValueStrVec);
               } else if (m > 0) {
                 dataset.createAttribute<vector<string>>(cmatrixKey, cmatrixValue["Value"]);
               } else {
                 // Do not add as attribute
               }
             }
-  
+            
             std::string spvectorTableStr = Table::toString(spvector).toStdString();
             dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
 
@@ -349,7 +351,9 @@ namespace Isis {
               auto spvectorValue = spvectorItem.value();
               auto n = count(SPVECTOR_KEYS_FOR_STR.begin(), SPVECTOR_KEYS_FOR_STR.end(), spvectorKey);
               if (n > 0) {
-                dataset.createAttribute<string>(spvectorKey, spvectorValue["Value"]);
+                std::string spvectorValueStr = spvectorValue["Value"].get<std::string>();
+                std::vector<std::string> spvectorValueStrVec{spvectorValueStr};
+                dataset.createAttribute(spvectorKey, spvectorValueStrVec);
               } else {
                 // Do not add as attribute
               }
