@@ -989,6 +989,7 @@ namespace Isis {
     envGroup.addKeyword(PvlKeyword("PWD",      getenv("PWD")));
     envGroup.addKeyword(PvlKeyword("ISISROOT", getenv("ISISROOT")));
     envGroup.addKeyword(PvlKeyword("ISISDATA", getenv("ISISDATA")));
+    envGroup.addKeyword(PvlKeyword("SPICEQL_CACHE_DIR", getenv("SPICEQL_CACHE_DIR")));
 
     return envGroup;
   }
