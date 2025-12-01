@@ -333,14 +333,14 @@ namespace Isis {
 
     // If one rectangle is on left side of other
     // if (l1.x > r2.x || l2.x > r1.x)
-    if (p_line > in.p_line + in.p_nlines ||
-        in.p_line > p_line + p_nlines)
+    if (p_line >= in.p_line + in.p_nlines ||
+        in.p_line >= p_line + p_nlines)
       isSubareaOfIn = false;
 
     // If one rectangle is above other
     // if (r1.y > l2.y || r2.y > l1.y)
-    if (p_sample + p_nsamps < in.p_sample ||
-        in.p_sample + in.p_nsamps < p_sample)
+    if (p_sample >= in.p_sample + in.p_nsamps || 
+        in.p_sample >= p_sample + p_nsamps)
       isSubareaOfIn = false;
 
     if (isSubareaOfIn) {
@@ -386,24 +386,6 @@ namespace Isis {
         }
       }
     }
-
-    isSubareaOfIn = (p_npixels <= in.size());
-    isSubareaOfIn &= (p_sample >= in.p_sample);
-    isSubareaOfIn &= (p_line >= in.p_line);
-    isSubareaOfIn &= (p_band >= in.p_band);
-
-    int endSample = p_sample + p_nsamps - 1;
-    int otherEndSample = in.p_sample + in.p_nsamps - 1;
-
-    int endLine = p_line + p_nlines - 1;
-    int otherEndLine = in.p_line + in.p_nlines - 1;
-
-    int endBand = p_band + p_nbands - 1;
-    int otherEndBand = in.p_band + in.p_nbands - 1;
-
-    isSubareaOfIn &= (endSample <= otherEndSample);
-    isSubareaOfIn &= (endLine <= otherEndLine);
-    isSubareaOfIn &= (endBand <= otherEndBand);
 
     return isSubareaOfIn;
   }
