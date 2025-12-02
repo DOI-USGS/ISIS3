@@ -64,6 +64,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Changed `StripPolygonSeeder` and `GridPolygonSeeder` to seed individual polygons within each images multipolygon footprint [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
 - Pinned SpiceQL to 1.2.0 [#5852](https://github.com/DOI-USGS/ISIS3/pull/5852)
 - Changed `ControlMeasure` object comparison to no longer factor in creation date for equality [#5862](https://github.com/DOI-USGS/ISIS3/pull/5862)
+- Changed 'jigsaw' attribute type to account for Linux compiler changes [#5904](https://github.com/DOI-USGS/ISIS3/pull/5904)
 
 ### Fixed
 - Fixed Chandrayaan-2 TMC2 serial numbers by setting InstrumentId to CH2_TMC_FORE/NADIR/AFT based on the filename sensor [#5871](https://github.com/DOI-USGS/ISIS3/issues/5871)
