@@ -12,4 +12,7 @@ ifeq ($(HOST_ARCH),Linux)
       include $(ISISROOT)/make/config.linux-x86_64
     endif
   endif
+  ifeq ($(HOST_MACH),aarch64)
+    include $(ISISROOT)/make/config.linux-aarch64
+  endif
 endif
