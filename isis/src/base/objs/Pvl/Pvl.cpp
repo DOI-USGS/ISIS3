@@ -43,16 +43,26 @@ namespace Isis {
    */
   Pvl::Pvl(const QString &file) : Isis::PvlObject("Root") {
     init();
+    QString msg = "Unable to read label from [" + file + "]"; 
+    IException readException(IException::Io, msg, _FILEINFO_);
     try {
       read(file);
     }
     catch(IException &e) {
+      readException.append(e);
     }
 
-    try {
-      readGdal(file);
+    if (readException.length() > 0) {
+      try {
+        readGdal(file);
+      }
+      catch(IException &e) {
+        readException.append(e);
+      }
     }
-    catch(IException &e) {
+
+    if (readException.length() > 0) {
+        throw readException;
     }
   }
 
