@@ -302,7 +302,7 @@ find_package(GSL       2.2.1   REQUIRED)
 find_package(HDF5      1.8.15  REQUIRED)
 find_package(Jama      125     REQUIRED)
 find_package(NN                REQUIRED)
-find_package(OpenCV    4.12.0  REQUIRED)
+find_package(OpenCV    4.9.0   REQUIRED CONFIG)
 find_package(PCL               REQUIRED)
 find_package(Protobuf          REQUIRED CONFIG)
 find_package(PROJ              REQUIRED CONFIG)
@@ -395,6 +395,8 @@ endforeach()
 
 # add target based linkages to ALLLIBS variable
 list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree GDAL::GDAL Bullet::Bullet_double CSPICE::cspice)
+
+list(APPEND ALLINCDIRS ${OpenCV_INCLUDE_DIRS})
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)
