@@ -6,6 +6,8 @@ APP4NAME = cam2map
 labels.txt.IGNORELINES = ByteOrder StartByte Bytes
 
 lowpassTruth.cub.TOLERANCE = 8
+EnlargeCropTruth.cub.TOLERANCE = 1e-9
+EnlargeCropCam2mapTruth.cub.TOLERANCE = 1e-5
 
 include $(ISISROOT)/make/isismake.tsts
 
