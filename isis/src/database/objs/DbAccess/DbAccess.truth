@@ -16,4 +16,6 @@ Key: test_key
 Value: test value
 () operator: test value
 **PROGRAMMER ERROR** Requested index (99) out of range.
+**I/O ERROR** Unable to read label from [/tmp/not_a_file].
+**PROGRAMMER ERROR** Failed opening GDALDataset from [not_a_file].
 **I/O ERROR** Unable to open [/tmp/not_a_file].

@@ -14,7 +14,8 @@ using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
-
+  CPLSetErrorHandler(CPLQuietErrorHandler);
+  
   DbAccess d;
   DbProfile p("test profile");
 

@@ -17,6 +17,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
+  CPLSetErrorHandler(CPLQuietErrorHandler);
 
   cout << "Unit test for Isis::UserInterface ..." << endl;
 
