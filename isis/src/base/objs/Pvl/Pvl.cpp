@@ -58,11 +58,8 @@ namespace Isis {
       }
       catch(IException &e) {
         readException.append(e);
-      }
-    }
-
-    if (readException.length() > 0) {
         throw readException;
+      }
     }
   }
 
