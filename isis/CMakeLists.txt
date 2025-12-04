@@ -396,6 +396,7 @@ endforeach()
 # add target based linkages to ALLLIBS variable
 list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree GDAL::GDAL Bullet::Bullet_double CSPICE::cspice)
 
+list(APPEND ALLLIBS ${OpenCV_LIBS})
 list(APPEND ALLINCDIRS ${OpenCV_INCLUDE_DIRS})
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
