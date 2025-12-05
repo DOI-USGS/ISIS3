@@ -402,7 +402,9 @@ Testing XML: Object deserialized as (should match object above):
             
             <instrumentId></instrumentId>
             <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
-                <aprioriPointingSigmas/>
+                <aprioriPointingSigmas>
+                    <sigma>N/A</sigma>
+                </aprioriPointingSigmas>
             </instrumentPointingOptions>
             <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="7" degree="5" solveDegree="6" solveOverHermiteSpline="Yes" interpolationType="4">
                 <aprioriPositionSigmas>

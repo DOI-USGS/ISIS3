@@ -64,7 +64,10 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Changed `StripPolygonSeeder` and `GridPolygonSeeder` to seed individual polygons within each images multipolygon footprint [#5193](https://github.com/DOI-USGS/ISIS3/issues/5193)
 - Pinned SpiceQL to 1.2.0 [#5852](https://github.com/DOI-USGS/ISIS3/pull/5852)
 - Changed `ControlMeasure` object comparison to no longer factor in creation date for equality [#5862](https://github.com/DOI-USGS/ISIS3/pull/5862)
-- in Application.cpp, converted initialization environmental variable shell commands and file read to c commands. [#5906](https://github.com/DOI-USGS/ISIS3/pull/5906)
+- In Application.cpp, converted initialization environmental variable shell commands and file read to c commands. [#5906](https://github.com/DOI-USGS/ISIS3/pull/5906)
+- Improved the Conda Bullet CMAKE configuration in FindBulletFloat64.cmake. Adds the Bullet::Bullet_double target to ALLLIBS. [#5899](https://github.com/DOI-USGS/ISIS3/issues/5899)
+- Changed 'jigsaw' attribute type to account for Linux compiler changes [#5904](https://github.com/DOI-USGS/ISIS3/pull/5904)
+
 
 ### Fixed
 - Fixed Chandrayaan-2 TMC2 serial numbers by setting InstrumentId to CH2_TMC_FORE/NADIR/AFT based on the filename sensor [#5871](https://github.com/DOI-USGS/ISIS3/issues/5871)
@@ -90,6 +93,8 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed order of observer and target in spiceql call in `ctxcal`. [#5823](https://github.com/DOI-USGS/ISIS3/pull/5823)
 - Fixed bundle serialization on MacOS for IPCE [#5808](https://github.com/DOI-USGS/ISIS3/pull/5808)
 - Fixed `noseam` to use correct temporary files when running [#5878](https://github.com/DOI-USGS/ISIS3/pull/5878)
+- Fixed `CubeInfixToPostfix` to safely determine if a known symbol is a function symbol [#5822](https://github.com/DOI-USGS/ISIS3/pull/5822)
+- Fixed `BundleObservationSolveSettings` to properly read empty solve setting xmls [#5822](https://github.com/DOI-USGS/ISIS3/pull/5822)
 
 
 ## [9.0.0] - 09-25-2024

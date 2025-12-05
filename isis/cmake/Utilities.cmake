@@ -158,7 +158,11 @@ function(get_os_version text)
     #message("name = ${name}")
     #message("version = ${version}")
 
-    set(prefix "Linux_x86_64_")
+    if (CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+      set(prefix "Linux_aarch64_")
+    else()
+      set(prefix "Linux_x86_64_")
+    endif()
 
   # Build the final output string
   elseif(APPLE)

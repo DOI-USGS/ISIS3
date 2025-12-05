@@ -178,6 +178,7 @@ endif()
 # sometimes third parties do not set their rpaths correctly
 set(thirdPartyCppFlags -Wall
                        -fPIC
+                       -fsigned-char
                        -std=c++17
                        -DISIS_LITTLE_ENDIAN=1
                        -Wno-unused-parameter
@@ -256,7 +257,7 @@ find_package(Qt5 COMPONENTS
                 Xml
                 XmlPatterns
                 # Search this path explicitly for MacOS OpenGL Framework
-                PATHS /System/Library/Frameworks/ REQUIRED)
+                PATHS /System/Library/Frameworks/ REQUIRED CONFIG)
 
 find_package(Boost 1.59.0 REQUIRED atomic
                                         log
@@ -357,6 +358,10 @@ foreach (_variableName ${_variableNames})
   endif()
 endforeach()
 
+if (NOT OPENGL_XMESA_FOUND)
+	list(REMOVE_ITEM ALLINCDIRS OPENGL_xmesa_INCLUDE_DIR-NOTFOUND)
+endif()
+
 # get all Library variables
 foreach (_variableName ${_variableNames})
   get_filename_component(LIBDIR "${${_variableName}}" DIRECTORY)
@@ -384,7 +389,7 @@ foreach (_variableName ${_variableNames})
 endforeach()
 
 # add target based linkages to ALLLIBS variable
-list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree GDAL::GDAL)
+list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree GDAL::GDAL Bullet::Bullet_double)
 
 # Sometimes we add the same lib more than once (especially with LIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBDIRS)
