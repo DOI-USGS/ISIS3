@@ -21,7 +21,7 @@
 
       Group = Instrument
         SpacecraftName = Chandrayaan-2
-        InstrumentId   = TMC-2
+        InstrumentId   = CH2_TMC_AFT
         TargetName     = Moon
         StartTime      = 2019-11-28T00:35:38.9755
         StopTime       = 2019-11-28T00:45:17.9161
