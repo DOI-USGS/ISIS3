@@ -3,7 +3,7 @@ channels:
   - usgs-astrogeology
   
 dependencies:
-  - ale =0.11.0
+  - ale =0.11.1
   - aom
   - armadillo
   - boost >=1.76.0,<1.82
