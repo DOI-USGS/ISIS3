@@ -3,7 +3,7 @@ channels:
   - usgs-astrogeology
   
 dependencies:
-  - ale =0.11.0,<1
+  - ale =0.11.1
   - aom
   - armadillo
   - boost >=1.76.0,<1.82
@@ -13,7 +13,7 @@ dependencies:
   - bz2file
   - bzip2
   - cmake >=3.27,<3.28
-  - cspice =67
+  - cspice =67=*_8
   - csm >=3.0.3,<3.0.4
   - curl >=8.4.0,<8.5
   - cxx-compiler=1.7
@@ -61,8 +61,9 @@ dependencies:
   - pytest
   - rclone
   - qhull
-  - qt-main>=5.15, <5.16
+  - qt-main >=5.15,<5.16
   - qwt <6.3.0
+  - spiceypy >=6.0.0,<7.0.0
   - sqlite >=3.46.0,<3.47
   - suitesparse <7.7.0
   - superlu

@@ -33,7 +33,7 @@ heading to indicate that only the bug fixes and security fixes are in the bug fi
 release.
 -->
   
-## [9.0.0] - 04-21-2025
+## [9.0.0] - 12-10-2025
 
 ### Added
 - Added TOVECT output parameter which generate a geospatial CSV file with a VRT metadata sidecar file [#5571](https://github.com/DOI-USGS/ISIS3/issues/5571)  
@@ -47,6 +47,7 @@ release.
 ### Changed
 - Refactored the pixel2map app
 - Updated pixel2map documentation
+- Updated ALE to version 0.11.1
 - Changed PVL parsing to no longer allow valueless keywords [#5573](https://github.com/DOI-USGS/ISIS3/pull/5573)
 - Changed all `.trn` files with an `Auto`, `Debug` or `Optional` keyword with no value to have a value of `1` [#5573](https://github.com/DOI-USGS/ISIS3/pull/5573)
 - Changed 'User Parameters' group in camstats to UserParameters for PVL compliance [#5625](https://github.com/DOI-USGS/ISIS3/issues/5625).
@@ -73,6 +74,7 @@ release.
 - Fixed embree shapemodel intersection calculation [#5592](https://github.com/DOI-USGS/ISIS3/issues/5592)
 - Fixed findFeaturesSegment.py errors from issues [#5725](https://github.com/DOI-USGS/ISIS3/issues/5725) and [#5702](https://github.com/DOI-USGS/ISIS3/issues/5702)
 - Fixed jigsaw save/apply bug by adding back missing metadata to Instrument Position/Pointing tables [#5701](https://github.com/DOI-USGS/ISIS3/issues/5701)
+- Added std:: namespace for isinf, fixes build errors for some versions of c++ [#5874](https://github.com/DOI-USGS/ISIS3/pull/5874)
 
 ## [8.3.0] - 2024-09-30
 

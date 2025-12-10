@@ -678,7 +678,7 @@ namespace Isis {
     rtcOccluded1(m_scene,  &context, (RTCRay*)&ray);
 
     // rtcOccluded sets the ray.tfar to -inf if the ray hits anything
-    if (isinf(ray.ray.tfar) && ray.ray.tfar < 0) {
+    if (std::isinf(ray.ray.tfar) && ray.ray.tfar < 0) {
       return true;
     }
     return false;

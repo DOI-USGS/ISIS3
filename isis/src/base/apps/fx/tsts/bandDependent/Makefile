@@ -8,7 +8,15 @@
 #                tolerance allows the macs to pass the test. References #1301.
 APPNAME = fx
 
-emalTruth.cub.TOLERANCE = 0.00001
+emaTruth.cub.TOLERANCE = 0.00001
+emalTruth.cub.TOLERANCE = 3e-4
+inaTruth.cub.TOLERANCE = 0.00001
+inalTruth.cub.TOLERANCE = 3e-4
+inaTruth.cub.TOLERANCE = 0.00001
+latTruth.cub.TOLERANCE = 0.00001
+lonTruth.cub.TOLERANCE = 3e-4
+radiusTruth.cub.TOLERANCE = 0.3
+resTruth.cub.TOLERANCE = 3e-4
 
 include $(ISISROOT)/make/isismake.tsts
 

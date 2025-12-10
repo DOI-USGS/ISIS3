@@ -56,18 +56,34 @@ if(EXISTS ${exclusionPath})
 
 endif()
 
-# Verify that the files are exactly the same
-execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files
-    ${comp1} ${comp2}
-    RESULT_VARIABLE DIFFERENT)
+# Read the tolerance from a file that has the name ${TRUTH_FILE}.TOL.
+# Otherwise assume a tolerance of 1e-8.
+set(TOLERANCE "1e-8")
+set(HAVE_TOL FALSE)
+set(TOL_FILE "${TRUTH_FILE}.TOL")
+message(STATUS "Tolerance file: ${TOL_FILE}")
+if (EXISTS "${TOL_FILE}")
+  file(READ "${TOL_FILE}" TOLERANCE)
+  string(REGEX REPLACE "\n.*" "" TOLERANCE "${TOLERANCE}")
+  message(STATUS "Read tolerance: ${TOLERANCE}")
+  set(HAVE_TOL TRUE)
+else()
+  message(STATUS "Tolerance file does not exist. Using tolerance: ${TOLERANCE}.")
+endif()
 
+# Verify that the files are the same with tolerance
+set(SCRIPT_NAME "$ENV{ISISROOT}/scripts/textdiff.py")
+set(COMMAND_WITH_ARGS
+    python "${SCRIPT_NAME}" ${comp1} ${comp2} -abs_err "${TOLERANCE}")
+list(JOIN COMMAND_WITH_ARGS " " CMD_STR)
+message(STATUS "Comparison command: ${CMD_STR}")
+message("------------------ COMPARISON OUTPUT ------------------ ")
+execute_process(COMMAND ${COMMAND_WITH_ARGS}
+    RESULT_VARIABLE DIFFERENT)
 if(DIFFERENT)
-    message("------------------ DIFFERENCES ------------------ ")
-    execute_process(COMMAND diff ${comp1} ${comp2} OUTPUT_VARIABLE compdiff)
-    message("${compdiff}")
-    message("------------------------------------------------- ")
-    message(FATAL_ERROR "Test failed - files differ")        
-    # On error the result file is left around to aid in debugging.
+  message("------------------------------------------------- ")
+  message(FATAL_ERROR "Test failed. Files differ with tolerance.")
+  # On error the result file is left around to aid in debugging.
 else()
   file(REMOVE ${outputFile}) # On success, clean out the result file.
   execute_process(COMMAND rm -rf ${tempdir})

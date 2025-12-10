@@ -52,14 +52,15 @@
 
       <parameter name="TEMPLATE">
         <type>filename</type>
-        <internalDefault>None</internalDefault>
+        <internalDefault>auto-selected</internalDefault>
         <fileMode>input</fileMode>
-        <brief>
-          Input template
-        </brief>
+        <brief>Optional custom template</brief>
         <description>
-          The file name of the input template. This file contains "inja" compatible
-          template syntax inside of a ISIS Cube label.
+          The Inja-compatible template used to generate the ISIS Cube label.  
+          By default, <i>isisimport</i> automatically selects the appropriate template based on the input file type.  
+          Specify this parameter only if you wish to override the default with a custom template file.
+          
+          To modify an existing template, refer to the files located in <code>$ISISROOT/appdata/import/PDS3</code> or <code>$ISISROOT/appdata/import/PDS4</code>.
         </description>
       </parameter>
 
@@ -104,4 +105,29 @@
          </parameter>
      </group>
   </groups>
+  <examples>
+    <example>
+      <brief>
+        Default usage of isisimport
+      </brief>
+      <description>
+        This example is for a PDS4 image that uses .xml labels. For isisimport to work, it is expected to have the associated .img file within the same directory.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=input.xml to=output.cub
+        </commandLine>
+      </terminalInterface>
+    </example>
+        <example>
+      <brief>
+        Usage of isisimport using custom templates
+      </brief>
+      <terminalInterface>
+        <commandLine>
+          from=input.xml to=custom.cub template=my_custom_template.tpl
+        </commandLine>
+      </terminalInterface>
+    </example>
+  </examples>
 </application>

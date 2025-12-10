@@ -31,7 +31,7 @@ Current open RFCs:
   We encourage all contributors and users to review open RFCs and comment, as these proposed changes will impact use of the software.
 
 ## FAQ
-We maintain a list of frequently encountered questions and issues. Before opening a new issue, please take a look at the [FAQ](https://github.com/USGS-Astrogeology/ISIS3/wiki/FAQ).
+Before opening a new issue, please take a look at the [Frequently Asked Questions](https://github.com/USGS-Astrogeology/ISIS3/wiki/FAQ).
 
 ## ISIS Tutorials
 Please refer to the GitHub wiki page [ISIS Online Workshops](https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops) for current ISIS tutorials.

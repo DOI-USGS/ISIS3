@@ -5,9 +5,9 @@ SpacecraftName          =  Cassini-Huygens
 
 {% set targetName =  TARGET_NAME.Value %}
 {% if targetName == "DARK SKY"%}
-{% set targetName = Sky %}
+{% set targetName = "Sky" %}
 {% else if targetName == "S8_2004" %}
-{% set targetName = Sky %}
+{% set targetName = "Sky" %}
 {% else if targetName == "S12_2004" %}
 {% set targetName = "Sky" %}
 {% else if targetName == "S13_2004" %}
@@ -130,7 +130,7 @@ ReadoutCycleIndex       = {{ ReadoutCycleIndex }}
 
 {% set shutterModeId = SHUTTER_MODE_ID.Value %}
 {% if shutterModeId == "UNK" %}
-{% set shutterModeId = 'Unknown' %}
+{% set shutterModeId = "Unknown" %}
 {% else if shutterModeId == "BOTSIM" %}
 {% set shutterModeId= "BothSim" %}
 {% else if shutterModeId == "NACONLY" %}
