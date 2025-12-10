@@ -61,7 +61,7 @@ dependencies:
   - pytest
   - rclone
   - qhull
-  - qt-main>=5.15, <5.16
+  - qt-main >=5.15,<5.16
   - qwt <6.3.0
   - spiceypy >=6.0.0,<7.0.0
   - sqlite >=3.46.0,<3.47
