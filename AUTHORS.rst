@@ -56,6 +56,9 @@ Integrated Software for Imagers and Spectrometers Contributors
 - Eliason, Patrica
 - Fergason, Robin (United States Geological Survey, Astro Geology
   Science Center)
+- Frigeri, Alessandro (Italian National Institute for Astrophysics
+  (INAF), Istituto di Astrofisica e Planetologia Spaziali (IAPS),
+  Rome, Italy)
 - Gaddis, Lisa
 - Gault, Eric
 - Geissler, Paul (United States Geological Survey, Astro Geology
@@ -119,6 +122,8 @@ Integrated Software for Imagers and Spectrometers Contributors
 - Milazzo, Moses
 - Miller, David
 - Miller-Ribelin, Elizabeth
+- Murakami, Shin-ya (Japan Aerospace Exploration Agency, Institute of
+  Space and Astronautical Science)
 - Nelson, Gavin (United States Geological Survey, Astro Geology
   Science Center)
 - Neubauer, Cole

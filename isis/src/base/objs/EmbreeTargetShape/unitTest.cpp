@@ -299,9 +299,9 @@ void outputIntersection(EmbreeTargetShape &embreeShape,
     qDebug() << "Intersection" << (i + 1) << "information:";
     qDebug() << "  Primitive ID:  " << intersectionInfo.primID;
     qDebug() << "  Intersection:   ("
-            << roundToPrecision(intersectionInfo.intersection[0], 0.0001) << ","
-            << roundToPrecision(intersectionInfo.intersection[1], 0.0001) << ","
-            << roundToPrecision(intersectionInfo.intersection[2], 0.0001) << ")";
+            << roundToPrecision(intersectionInfo.intersection[0], 7) << ","
+            << roundToPrecision(intersectionInfo.intersection[1], 7) << ","
+            << roundToPrecision(intersectionInfo.intersection[2], 7) << ")";
     qDebug() << "  Surface normal: ("
             << intersectionInfo.surfaceNormal[0] << ","
             << intersectionInfo.surfaceNormal[1] << ","
@@ -369,14 +369,14 @@ void outputOcclusionRay(RTCOcclusionRay &ray) {
 void outputRayHitInformation(RayHitInformation &hit) {
   qDebug() << "Ray Hit Information";
   qDebug() << "  Primitive ID: " << hit.primID;
-  qDebug() << "  Intersection: (" << roundToPrecision(hit.intersection[0], 0.0001) << ","
-                                  << roundToPrecision(hit.intersection[1], 0.0001) << "," 
-                                  << roundToPrecision(hit.intersection[2], 0.0001) << ")";
+  qDebug() << "  Intersection: (" << roundToPrecision(hit.intersection[0], 7) << ","
+                                  << roundToPrecision(hit.intersection[1], 7) << "," 
+                                  << roundToPrecision(hit.intersection[2], 7) << ")";
   qDebug() << "  Surface Normal: (" << hit.intersection[0] << ","
                                     << hit.intersection[1] << "," 
                                     << hit.intersection[2] << ")";
 }
 
 double roundToPrecision(double value, double precision) {
-  return value - fmod(value, precision);
+  return std::round(value * pow(10, precision)) / pow(10, precision);
 }

@@ -7,6 +7,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include <iostream>
+#include <highfive/H5Attribute.hpp>
 #include <highfive/H5File.hpp>
 #include <highfive/H5DataType.hpp>
 #include <highfive/H5DataSet.hpp>
@@ -37,6 +38,14 @@ find files of those names at the top level of this repository. **/
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
 #include "Table.h"
+#include "CameraFactory.h"
+#include "PvlToJSON.h"
+#include "PvlKeyword.h"
+
+#include <ale/Load.h>
+#include <nlohmann/json.hpp>
+#include <boost/filesystem.hpp>
+using json = nlohmann::json;
 
 #include "jigsaw.h"
 
@@ -52,6 +61,10 @@ namespace Isis {
   ControlNetQsp fixHeldImages(const QString &cnetFile,
                               const QString &heldList,
                               const QString &imageList);
+
+  vector<string> CMATRIX_KEYS_FOR_STR = {"CkTableEndTime", "CkTableOriginalSize", "CkTableStartTime", "FrameTypeCode"};
+  vector<string> CMATRIX_KEYS_FOR_VEC = {"ConstantFrames", "ConstantRotation", "TimeDependentFrames"};
+  vector<string> SPVECTOR_KEYS_FOR_STR = {"SpkTableEndTime", "SpkTableOriginalSize", "SpkTableStartTime", "CacheType"};
 
   void jigsaw(UserInterface &ui, Pvl *log) {
 
@@ -86,6 +99,20 @@ namespace Isis {
             throw IException(IException::User, msg, _FILEINFO_);
           }
 
+          //check for existing polygon, if exists delete it
+          if (c->label()->hasObject("Polygon")) {
+            c->label()->deleteObject("Polygon");
+          }
+
+          // check for CameraStatistics Table, if exists, delete
+          for (int iobj = 0; iobj < c->label()->objects(); iobj++) {
+            PvlObject obj = c->label()->object(iobj);
+            if (obj.name() != "Table") continue;
+            if (obj["Name"][0] != QString("CameraStatistics")) continue;
+            c->label()->deleteObject(iobj);
+            break;
+          }
+
           QString serialNumber = snList->serialNumber(i);
           QString cmatrixName = "InstrumentPointing";
           QString spvectorName = "InstrumentPosition";
@@ -94,13 +121,49 @@ namespace Isis {
           std::string spvectorKey = serialNumber.toStdString() + "/" + spvectorName.toStdString();
 
           // Read h5 into table
+
+          // Create cmatrix table from dataset
           DataSet datasetRead = fileRead.getDataSet(cmatrixKey);
           auto cmatrixData = datasetRead.read<std::string>();
-          Table cmatrixTable(cmatrixName, cmatrixData, ',');
 
+          vector<PvlKeyword> cmatrixAttrs;
+
+          // Add attributes
+          vector<string> cmatrixAttributeKeys = datasetRead.listAttributeNames();
+          for (string cmatrixAttrKey : cmatrixAttributeKeys) {
+            auto n = count(CMATRIX_KEYS_FOR_STR.begin(), CMATRIX_KEYS_FOR_STR.end(), cmatrixAttrKey);
+            auto m = count(CMATRIX_KEYS_FOR_VEC.begin(), CMATRIX_KEYS_FOR_VEC.end(), cmatrixAttrKey);
+            if (n > 0) {
+              cmatrixAttrs.push_back(PvlKeyword(QString::fromStdString(cmatrixAttrKey), 
+                QString::fromStdString(datasetRead.getAttribute(cmatrixAttrKey).read<string>())));
+            } else if (m > 0) {
+              cmatrixAttrs.push_back(PvlKeyword(QString::fromStdString(cmatrixAttrKey), 
+                datasetRead.getAttribute(cmatrixAttrKey).read<vector<string>>()));
+            } else {
+              // Do not add attribute.
+            }
+          }
+          
+          Table cmatrixTable(cmatrixName, cmatrixData, ',', cmatrixAttrs);
+
+          // Create spvector table from dataset
           datasetRead = fileRead.getDataSet(spvectorKey);
           auto spvectorData = datasetRead.read<std::string>();
-          Table spvectorTable(spvectorName, spvectorData, ',');
+
+          // Add attributes
+          vector<PvlKeyword> spvectorAttrs;
+          vector<string> spvectorAttributeKeys = datasetRead.listAttributeNames();
+          for (string spvectorAttrKey : spvectorAttributeKeys) {
+            auto n = count(SPVECTOR_KEYS_FOR_STR.begin(), SPVECTOR_KEYS_FOR_STR.end(), spvectorAttrKey);
+            if (n > 0) {
+              spvectorAttrs.push_back(PvlKeyword(QString::fromStdString(spvectorAttrKey), 
+                QString::fromStdString(datasetRead.getAttribute(spvectorAttrKey).read<string>())));
+            } else {
+              // Do not add attribute.
+            }
+          }          
+
+          Table spvectorTable(spvectorName, spvectorData, ',', spvectorAttrs);
 
           // Write bundle adjustment values out
           cmatrixTable.Label().addComment(jigApplied);
@@ -240,7 +303,7 @@ namespace Isis {
         for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
           Process p;
           CubeAttributeInput inAtt;
-          Cube *c = p.SetInputCube(bundleAdjustment->fileName(i), inAtt, ReadWrite);
+          Cube *c = p.SetInputCube(bundleAdjustment->fileName(i), inAtt, 0); // 0 for read only
 
           // Only for ISIS adjustment values
           if (!c->hasBlob("CSMState", "String")) {
@@ -257,8 +320,38 @@ namespace Isis {
             // Save bundle adjustment values to HDF5 file
             std::string cmatrixTableStr = Table::toString(cmatrix).toStdString();
             DataSet dataset = file.createDataSet<std::string>(cmatrixKey, cmatrixTableStr);
+
+            // Add cmatrix attributes
+            json cmatrixLabel = pvlObjectToJSON(cmatrix.Label());
+            for (auto cmatrixItem : cmatrixLabel.items()) {
+              string cmatrixKey = cmatrixItem.key();
+              auto cmatrixValue = cmatrixItem.value();
+              auto n = count(CMATRIX_KEYS_FOR_STR.begin(), CMATRIX_KEYS_FOR_STR.end(), cmatrixKey);
+              auto m = count(CMATRIX_KEYS_FOR_VEC.begin(), CMATRIX_KEYS_FOR_VEC.end(), cmatrixKey);
+              if (n > 0) {
+                dataset.createAttribute<string>(cmatrixKey, cmatrixValue["Value"]);
+              } else if (m > 0) {
+                dataset.createAttribute<vector<string>>(cmatrixKey, cmatrixValue["Value"]);
+              } else {
+                // Do not add as attribute
+              }
+            }
+  
             std::string spvectorTableStr = Table::toString(spvector).toStdString();
             dataset = file.createDataSet<std::string>(spvectorKey, spvectorTableStr);
+
+            // Add spvector attributes
+            json spvectorLabel = pvlObjectToJSON(spvector.Label());
+            for (auto spvectorItem : spvectorLabel.items()) {
+              string spvectorKey = spvectorItem.key();
+              auto spvectorValue = spvectorItem.value();
+              auto n = count(SPVECTOR_KEYS_FOR_STR.begin(), SPVECTOR_KEYS_FOR_STR.end(), spvectorKey);
+              if (n > 0) {
+                dataset.createAttribute<string>(spvectorKey, spvectorValue["Value"]);
+              } else {
+                // Do not add as attribute
+              }
+            }
           }
         }
         file.flush();

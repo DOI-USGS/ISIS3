@@ -94,7 +94,9 @@ Object = IsisCube
     OrbitLimbDirection      = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_orbit_limb_direction }}
     SpacecraftYawDirection  = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_spacecraft_yaw_direction }}
     SpacecraftAltitude      = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_spacecraft_altitude._text }} <km>
+    {% if exists("Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_pixel_resolution._text") %}
     PixelResolution         = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_pixel_resolution._text }} <meters/pixel>
+    {% endif %}
     Roll                    = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_roll._text }} <degrees>
     Pitch                   = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_pitch._text }} <degrees>
     Yaw                     = {{ Product_Observational.Observation_Area.Mission_Area.isda_Product_Parameters.isda_yaw._text }} <degrees>

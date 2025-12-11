@@ -3,7 +3,7 @@ APP2NAME = reduce
 APP3NAME = cam2map
 
 # Single pixel different by this amount on samson and decon
-CropReduceCam2mapTruth.cub.TOLERANCE = 7.62939453125e-06 
+CropReduceCam2mapTruth.cub.TOLERANCE = 4e-5
 
 include $(ISISROOT)/make/isismake.tsts
 

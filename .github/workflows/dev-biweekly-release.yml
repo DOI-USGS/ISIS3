@@ -1,0 +1,156 @@
+name: Github Actions - Build Dev Biweekly Anaconda Release
+
+env:
+  ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }} 
+  ENCRYPTION_KEY: ${{ secrets.KDU_ENC_KEY }}
+
+on:
+  schedule:
+    - cron: '0 5 * * 6'  # 10:00 PM MST Friday (UTC: Saturday 5:00 AM)
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+          os: [ubuntu-latest, macos-13]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Skip odd weeks
+        run: |
+          WEEK_NUM=$(date +%V)
+          if (( WEEK_NUM % 2 != 0 )); then
+            echo "Skipping this week ($WEEK_NUM is odd)."
+            exit 0
+          fi
+
+      - uses: actions/checkout@v4
+
+      - name: Set up Mambaforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-variant: Miniforge3
+          auto-update-conda: true
+          use-mamba: true
+
+      - name: Build Release
+        run: |
+          export ISIS_VERSION=$(date +%Y.%m.%d)
+          echo $ISIS_VERSION
+
+          mamba install conda-build anaconda-client
+          git fetch origin
+          git checkout dev
+          cd recipe
+
+          echo $ENCRYPTION_KEY | openssl enc -aes-256-cbc -d -in kakadu/kakadu_7_9.zip.enc -out kakadu/kakadu_7_9.zip -pbkdf2 -iter 10000 -pass stdin
+          unzip -j kakadu/kakadu_7_9.zip -d /tmp/kakadu_7_9 -x "__MACOSX/*"
+          
+
+          if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' "s|/isisData/kakadu|/tmp/kakadu_7_9|g" build.sh
+            sed -i '' "s/{% set version = \"[^\"]*\" %}/{% set version = \"$ISIS_VERSION\" %}/" meta.yaml
+            sed -i '' "s/version: {{ version }}.0_RC[^ ]*/version: {{ version }}/" meta.yaml
+            sed -i '' "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
+          else
+            sed -i "s|/isisData/kakadu|/tmp/kakadu_7_9|g" build.sh
+            sed -i "s/{% set version = \"[^\"]*\" %}/{% set version = \"$ISIS_VERSION\" %}/" meta.yaml
+            sed -i "s/version: {{ version }}.0_RC[^ ]*/version: {{ version }}/" meta.yaml
+            sed -i "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
+          fi
+
+          conda build . -c conda-forge -c usgs-astrogeology --override-channels --user usgs-astrogeology --label dev
+
+          BUILT_DIR=$(conda info --base)/conda-bld
+          BUILT_PACKAGE=$(find "$BUILT_DIR" -name "isis-${ISIS_VERSION}-*.conda" | head -n1)
+          echo "$BUILT_PACKAGE" > built_package.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-package-${{ matrix.os }}
+          path: built_package.txt
+  
+  test:
+    runs-on: ${{ matrix.os }}
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-13]
+        include:
+          - os: ubuntu-latest
+            python: "3.10"
+          - os: macos-13
+            python: "3.12"
+      
+    steps:
+      - name: Set up Miniforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-variant: Miniforge3
+          auto-update-conda: true
+          activate-environment: isis-test
+          use-mamba: true
+          mamba-version: "1.5.3"
+          python-version: ${{ matrix.python-version }}
+
+      - name: Conda install and test spiceinit
+        run: |
+          export ISIS_VERSION=$(date +%Y.%m.%d)
+
+          source "${CONDA}/etc/profile.d/conda.sh"
+          conda activate isis-test
+
+          conda install -c conda-forge -c usgs-astrogeology usgs-astrogeology/label/dev::isis=${ISIS_VERSION} -y
+
+          export ISISROOT=$CONDA_PREFIX
+          conda list isis
+          spiceinit -h
+     
+      - name: Cleanup Anaconda package if spiceinit fails
+        if: failure()
+        run: |
+          echo "Cleaning up Anaconda download..."
+          BUILT_PACKAGE=${{ needs.build.outputs.built_package }}
+          echo "Removing package: $BUILT_PACKAGE"
+          anaconda --token ${{ secrets.ANACONDA_TOKEN }} remove usgs-astrogeology/isis/${BUILT_PACKAGE} -y
+
+  docs:
+    name: Build and Upload ISIS Dev Docs
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ success() }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Conda for doc build
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-variant: Miniforge3
+          auto-update-conda: true
+          environment-file: environment.yml
+          activate-environment: isis
+          use-mamba: true
+
+      - name: Build documentation
+        run: |
+          source "${CONDA}/etc/profile.d/conda.sh"
+          conda activate isis
+          mkdir build && cd build
+          export ISISROOT=$(pwd)
+          cmake -GNinja ../isis
+          ninja docs
+
+      - name: Set AWS credentials for upload
+        uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      
+      - name: Upload to S3
+        run: |
+          cd docs && cd "$(find . -maxdepth 1 -type d ! -name .)"
+          echo "Uploading documentation to S3..."
+          aws s3 sync ./ s3://asc-public-docs/isis-site/dev/ --delete
