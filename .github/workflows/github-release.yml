@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-          os: [ubuntu-latest, macos-14, macos-15-intel]
+          os: [ubuntu-latest, macos-14-large]
     runs-on: ${{ matrix.os }}
 
     outputs:
@@ -77,7 +77,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-14, macos-15-intel]
+        os: [ubuntu-latest, macos-14-large]
     env:
       ISIS_VERSION: ${{ needs.build.outputs.isis_version }}
       
