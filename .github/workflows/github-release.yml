@@ -5,6 +5,7 @@ env:
   ENCRYPTION_KEY: ${{ secrets.KDU_ENC_KEY }}
 
 on:
+  workflow_dispatch:
   release:
     types: [prereleased, released]
   push:
