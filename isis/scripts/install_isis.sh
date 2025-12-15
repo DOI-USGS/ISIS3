@@ -554,12 +554,12 @@ if [ ! "$DOWNLOAD_DATA" = "NO" ]; then
 fi
 
 # Run isisvarinit.py with ISISDATA and ISISROOT
-if [ -x "$INSTALL_PREFIX/isis/scripts/isisVarInit.py" ]; then
+if [ -x "$INSTALL_PREFIX/scripts/isisVarInit.py" ]; then
     ISISROOT="$INSTALL_PREFIX"
     ISISDATA="$ISISDATA_PREFIX"
-    "$INSTALL_PREFIX/isis/scripts/isisVarInit.py" "$ISISDATA" "$ISISROOT" || failed_command "Running isisvarinit.py"
+    "$INSTALL_PREFIX/scripts/isisVarInit.py" "$ISISDATA" "$ISISROOT" || failed_command "Running isisVarInit.py"
 else
-    echo "Warning: isisvarinit.py not found or not executable in $INSTALL_PREFIX/isis/scripts/"
+    echo "Warning: isisVarInit.py not found or not executable in $INSTALL_PREFIX/scripts/"
 fi
 
 printf "\n\n"
