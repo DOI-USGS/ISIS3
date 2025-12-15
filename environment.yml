@@ -40,6 +40,7 @@ dependencies:
   - libpng >=1.6.34,<1.7
   - libprotobuf >=6,<7
   - libtiff >=4.5,<4.8
+  - libvulkan-headers
   - libxml2
   - make
   - mesalib
@@ -72,7 +73,6 @@ dependencies:
   - texlive-core
   - tnt
   - usgscsm
-  - libvulkan-headers
   - x264
   - xalan-c
   - xerces-c >=3.3.0,<3.4
