@@ -46,7 +46,7 @@ namespace Isis {
     //p_comboBoxes[1]->setEditText("Choose a filter or create your own.");
     disconnect(lineEdit, 0, 0, 0);
     connect(lineEdit, SIGNAL(textChanged(const QString &)), p_comboBoxes[1],
-            SIGNAL(activated(const QString &)));
+            SIGNAL(textActivated(const QString &)));
     connect(lineEdit, SIGNAL(editingFinished()), this,
             SLOT(saveFilter()));
 
