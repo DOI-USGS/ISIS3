@@ -347,7 +347,7 @@ fi
 if [ "$ENV_NAME" = "auto" ]; then
     # Get latest version from specified channels
     LATEST_VERSION=$(conda search $PACKAGE_NAME | grep -E "^isis\s+" | tail -n 1 | awk '{print $2}')
-    ENV_NAME="isis-$LATEST_VERSION"
+    ENV_NAME="isis$LATEST_VERSION"
 fi
 
 # Handle the --install-prefix flag
