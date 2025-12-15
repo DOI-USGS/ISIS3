@@ -255,7 +255,7 @@ find_package(Qt6 COMPONENTS
                  Xml
 		             # XmlPatterns
                  # Search this path explicitly for MacOS OpenGL Framework
-             		 PATHS /System/Library/Frameworks/ REQUIRED)
+		 PATHS /System/Library/Frameworks/ REQUIRED CONFIG)
 add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
 
 find_package(Boost 1.59.0 REQUIRED      atomic
@@ -357,6 +357,12 @@ endforeach()
 
 if (NOT OPENGL_XMESA_FOUND)
 	list(REMOVE_ITEM ALLINCDIRS OPENGL_xmesa_INCLUDE_DIR-NOTFOUND)
+endif()
+if (NOT OPENGL_GLES2_FOUND)
+	 list(REMOVE_ITEM ALLINCDIRS OPENGL_GLES2_INCLUDE_DIR-NOTFOUND)
+endif()
+if (NOT OPENGL_GLES3_FOUND)
+         list(REMOVE_ITEM ALLINCDIRS OPENGL_GLES3_INCLUDE_DIR-NOTFOUND)
 endif()
 
 # get all Library variables
