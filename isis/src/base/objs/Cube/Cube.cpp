@@ -985,7 +985,7 @@ namespace Isis {
     CPLStringList metadata = CPLStringList(dataset->GetMetadata("USGS"), false);
 
     m_label = new Pvl();
-    if (metadata) {
+    if (metadata[0] != nullptr) {
       for (int i = 0; i < metadata.size(); i++) {
         const char *metadataItem = CPLParseNameValue(metadata[i], nullptr);
         nlohmann::ordered_json metadataAsJson = nlohmann::ordered_json::parse(metadataItem);
