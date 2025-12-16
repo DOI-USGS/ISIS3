@@ -60,7 +60,7 @@ namespace Isis {
             }
         }
     }
-    setlocale(LC_NUMERIC, "en_US");
+    setlocale(LC_NUMERIC, "en_US.UTF-8");
 
     QDesktopServices::setUrlHandler("http", this, "openUrl");
   }
