@@ -76,10 +76,10 @@ namespace Isis {
 
     // try to use US locale for numbers so we don't end up printing "," instead
     //   of "." where it might count.
-    setlocale(LC_ALL, "en_US");
+    setlocale(LC_ALL, "en_US.UTF-8");
 
     char env[1024];
-    strncpy(env, "LANG=en_US", 1023);
+    strncpy(env, "LANG=en_US.UTF-8", 1023);
     putenv(env);
 
     // add qt path to 3rdParty so no default is taken from enviroment
@@ -131,13 +131,13 @@ namespace Isis {
           new QApplication(argc, argv);
           // When QApplication is initialized, it will reset the locale to the shells locale. As a result
           // the locale needs to be reset after QApplications initialization.
-          setlocale(LC_ALL, "en_US");
+          setlocale(LC_ALL, "en_US.UTF-8");
         }
         else {
           new QCoreApplication(argc, argv);
           // When QCoreApplication is initialized, it will reset the locale to the shells locale. As a result
           // the locale needs to be reset after QCoreApplications initialization.
-          setlocale(LC_ALL, "en_US");
+          setlocale(LC_ALL, "en_US.UTF-8");
         }
 
         QCoreApplication::setApplicationName(FileName(p_appName).baseName());
