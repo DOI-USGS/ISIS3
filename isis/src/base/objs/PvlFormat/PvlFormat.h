@@ -40,7 +40,7 @@ namespace Isis {
   inline KeywordType toKeywordType(const QString type) {
 
     QString t(type);
-    t = t.remove(QRegularExpression("[\\w_-\"'")).toUpper();
+    t = t.remove(QRegularExpression("[\"'\\s_-]")).toUpper();
 
     if(t == "STRING") return StringKeyword;
     else if(t == "BOOL") return BoolKeyword;
