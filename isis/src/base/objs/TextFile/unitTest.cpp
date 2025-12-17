@@ -545,6 +545,6 @@ int main(int argc, char *argv[]) {
  *   @history 2011-08-05 Jeannie Backer - Copied from Cube class.
  */
 void ReportError(QString err) {
-  cout << err.replace(QRegularExpression("\\[[^\\]*\\]"), "[]") << endl;
+  cout << err << endl;
 }
 
