@@ -40,7 +40,7 @@ namespace Isis {
 
     m_imageType = StandardImage;
 
-    qSetGlobalQHashSeed(0); // hash seed to force consistent output
+    QHashSeed::setDeterministicGlobalSeed(); // hash seed to force consistent output
 
     m_domDoc = new QDomDocument("");
 
