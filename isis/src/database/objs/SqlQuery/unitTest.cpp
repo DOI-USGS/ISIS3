@@ -12,12 +12,14 @@ find files of those names at the top level of this repository. **/
 #include "Database.h"
 #include "IException.h"
 #include "Preference.h"
+#include <QCoreApplication>
 
 using namespace std;
 using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
+  QCoreApplication app(argc, argv);
 
   Database testdb("testdb", "SQLite");
   testdb.setDatabaseName(":memory:");
