@@ -43,6 +43,7 @@ dependencies:
   - libvulkan-headers
   - libxml2
   - make
+  - mariadb
   - mesalib
   - mkl
   - mysql
@@ -65,6 +66,7 @@ dependencies:
   - qt6-main >=6,<7
   - qt6-multimedia
   - qwt =6.3.0
+  - spiceypy >=6,<7
   - spiceql >=1.2.4*_5,<2
   - sqlite >=3.46.0,<4
   - suitesparse <7.7.0
