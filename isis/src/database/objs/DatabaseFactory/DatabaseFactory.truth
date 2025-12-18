@@ -5,7 +5,7 @@ Default profile name:
 Setting a default name... 0
 Default profile name: default name
 Driver available [doesntexist]: 0
-Driver available [mysql]: 1
+Driver available [mysql]: 0
 Driver available [postgresql]: 1
 Driver available [sqlite]: 1
 Is Available: 0
