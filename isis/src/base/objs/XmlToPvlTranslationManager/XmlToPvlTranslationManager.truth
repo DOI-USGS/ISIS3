@@ -794,5 +794,5 @@ Testing error throws
 
 **ERROR** Could not open label file [DoesNotExist.xml].
 
-**ERROR** XML read/parse error in file [/translations/pdsImage.trn] at line [1], column [1], message: error occurred while parsing element.
+**ERROR** XML read/parse error in file [/translations/pdsImage.trn] at line [1], column [1], message: Start tag expected.
 
