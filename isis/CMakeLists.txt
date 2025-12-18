@@ -206,9 +206,7 @@ endif()
 
 # Append CPP flags set in the third party lib file to the string set in this file.
 string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
-message("FLAGS: ${FLAGS_STR}")
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" CACHE STRING "" FORCE)
-message("CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
 if(NOT CMAKE_BUILD_TYPE)
    set(CMAKE_BUILD_TYPE "RELEASE")
@@ -219,7 +217,6 @@ if(APPLE)
 else()
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0"  CACHE STRING "" FORCE)
 endif()
-message("${CMAKE_CXX_FLAGS_DEBUG}")
 
 # Paths to required executables
 if (buildDocs)
@@ -241,22 +238,18 @@ find_package(Qt6 COMPONENTS
                  Multimedia
                  MultimediaWidgets
                  Network
-            		 OpenGL # Needed to install mesa-common-dev for this!
+                 OpenGL # Needed to install mesa-common-dev for this!
                  PrintSupport
                  Qml
                  Quick
-		             # Script
-		             # ScriptTools
                  Sql
                  Svg
                  Test
                  WebChannel
                  Widgets
                  Xml
-		             # XmlPatterns
                  # Search this path explicitly for MacOS OpenGL Framework
-		             PATHS /System/Library/Frameworks/ REQUIRED CONFIG)
-add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
+                 PATHS /System/Library/Frameworks/ REQUIRED CONFIG)
 
 find_package(Boost 1.59.0 REQUIRED      atomic
                                         log
@@ -356,13 +349,13 @@ foreach (_variableName ${_variableNames})
 endforeach()
 
 if (NOT OPENGL_XMESA_FOUND)
-	list(REMOVE_ITEM ALLINCDIRS OPENGL_xmesa_INCLUDE_DIR-NOTFOUND)
+  list(REMOVE_ITEM ALLINCDIRS OPENGL_xmesa_INCLUDE_DIR-NOTFOUND)
 endif()
 if (NOT OPENGL_GLES2_FOUND)
-	 list(REMOVE_ITEM ALLINCDIRS OPENGL_GLES2_INCLUDE_DIR-NOTFOUND)
+  list(REMOVE_ITEM ALLINCDIRS OPENGL_GLES2_INCLUDE_DIR-NOTFOUND)
 endif()
 if (NOT OPENGL_GLES3_FOUND)
-         list(REMOVE_ITEM ALLINCDIRS OPENGL_GLES3_INCLUDE_DIR-NOTFOUND)
+  list(REMOVE_ITEM ALLINCDIRS OPENGL_GLES3_INCLUDE_DIR-NOTFOUND)
 endif()
 
 # get all Library variables
