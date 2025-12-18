@@ -306,8 +306,8 @@ namespace Isis {
        */
       void addObject(const PvlObject &object) {
         PvlObject obj(object);
-        obj.setFileName(fileName());
         m_objects.push_back(object);
+        m_objects.last().setFileName(fileName());
       }
 
       void deleteObject(const QString &name);
