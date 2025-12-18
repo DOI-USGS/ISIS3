@@ -73,6 +73,8 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 - Added std:: namespace for isinf, fixes build errors for some versions of c++
 - Added configuration for towncrier changelog utility. ([#5953](https://github.com/DOI-USGS/ISIS3/issues/5953))
 - Added qt6-multimedia to ARM env file. ([#5968])(https://github.com/DOI-USGS/ISIS3/pull/5968)
+- Adds PROJ into ISIS, and exposes the capability with a new class called IProj. [#5317](https://github.com/DOI-USGS/ISIS3/pull/5317)
+- Added support for accessing Cloud Optimized GeoTIFF (COG) shape models via STAC API
 
 ### Changed
 
