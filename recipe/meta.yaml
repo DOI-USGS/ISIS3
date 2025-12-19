@@ -81,7 +81,7 @@ requirements:
    - libgdal >=3.12,<4
    - libopencv >=4.12,<5
    - libpng >=1.6.34,<1.7
-   - libprotobuf >=4,<5
+   - libprotobuf >=6,<7
    - libtiff >=4.5,<4.8
    - libvulkan-headers
    - libxml2
