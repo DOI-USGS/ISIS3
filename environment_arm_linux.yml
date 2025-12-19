@@ -48,7 +48,7 @@ dependencies:
   - nn
   - opencv >=4.12,<5
   - openssl >=3.5,<4
-  - pcl >=1.15,<1.16
+  - pcl >=1.15,<1.17
   - pdal >=2.8.4,<3
   - plio=1.5.3
   - protobuf >=6,<7
@@ -60,7 +60,7 @@ dependencies:
   - qt6-main >=6,<7
   - qwt =6.3.0
   - spiceypy >=6,<7
-  - spiceql >=1.2.4*_5,<2
+  - spiceql >=1.2.4,<2
   - sqlite >=3.46.0,<4
   - suitesparse <7.7.0
   - superlu
@@ -70,7 +70,7 @@ dependencies:
   - usgscsm
   - x264
   #- xalan-c
-  - xerces-c >=3.3.0,<3.4
+  - xerces-c >=3.1.0,<3.4
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm

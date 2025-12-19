@@ -77,7 +77,7 @@ dependencies:
   - usgscsm
   - x264
   - xalan-c
-  - xerces-c >=3.3.0,<3.4
+  - xerces-c >=3.1.0,<3.4
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm

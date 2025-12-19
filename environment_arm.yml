@@ -38,8 +38,8 @@ dependencies:
   - libopencv >=4.12,<5
   - libpng >=1.6.34,<1.7
   - libprotobuf >=6,<7
-  - libvulkan-headers
   - libtiff >=4.5,<4.8
+  - libvulkan-headers
   - libxml2
   - make
   - mesalib
@@ -53,13 +53,13 @@ dependencies:
   - pcl >=1.15,<1.16
   - pdal >=2.8.4,<3
   - plio=1.5.3
-  - protobuf >=5,<6
+  - protobuf >=6,<7
   - python >=3.9
   - python_abi >=3.9
   - pytest
   - rclone
   - qhull
-  - qt-main>=6, <7
+  - qt6-main >=6,<7
   - qwt =6.3.0
   - spiceypy >=6,<7
   - spiceql >=1.2.4*_5,<2
@@ -72,7 +72,7 @@ dependencies:
   - usgscsm
   - x264
   - usgs-astrogeology::xalan-c
-  - xerces-c >=3.2.4,<3.3.0a0
+  - xerces-c >=3.1.0,<3.4
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm
