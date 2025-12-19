@@ -295,7 +295,7 @@ TEST_F(KernelDbFixture, SystemKernels) {
   ASSERT_EQ(dbFiles.size(), 10);
 
   QStringList tspks = db.targetPosition(cubeLabel).kernels();
-  ASSERT_EQ(tspks.size(), 1);
+  ASSERT_EQ(tspks.size(), 2);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, tspks[0], "$base/kernels/spk/de430.bsp");
 
   QList< std::priority_queue<Kernel> > cklist = db.spacecraftPointing(cubeLabel);
