@@ -976,46 +976,21 @@ namespace Isis {
   }
 
   /**
-   * Runs some printenv commands that return Isis related Enviroment Variables.
+   * Returns ISIS-related Enviroment Variables.
    *
    * @return PvlGroup containing Enviroment information
-   * @todo Replace printenv commands with c library getenv
-   * @todo
    */
   PvlGroup Application::GetEnviromentInfo() {
-    // Create a temporary file to store console output to
-    FileName temp = FileName::createTempFile("$temporary/EnviromentInfo.txt");
-    QString tempFile = temp.expanded();
+    
     PvlGroup envGroup("EnviromentVariables");
-    ifstream readTemp;
 
-    QString env1 = "printenv SHELL >| " + tempFile;
-    QString env2 = "printenv HOME >> " + tempFile;
-    QString env3 = "printenv PWD >> " + tempFile;
-    QString env5 = "printenv ISISROOT >> " + tempFile;
-    QString env6 = "printenv ISISDATA >> " + tempFile;
-    ProgramLauncher::RunSystemCommand(env1);
-    ProgramLauncher::RunSystemCommand(env2);
-    ProgramLauncher::RunSystemCommand(env3);
-    ProgramLauncher::RunSystemCommand(env5);
-    ProgramLauncher::RunSystemCommand(env6);
-    // Read data from temp file
-    char value[511];
-    readTemp.open(tempFile.toLatin1().data(), ifstream::in);
-    readTemp.getline(value, 255);
-    envGroup.addKeyword(PvlKeyword("Shell", value));
-    readTemp.getline(value, 255);
-    envGroup.addKeyword(PvlKeyword("Home", value));
-    readTemp.getline(value, 255);
-    envGroup.addKeyword(PvlKeyword("Pwd", value));
-    readTemp.getline(value, 255);
-    envGroup.addKeyword(PvlKeyword("ISISROOT", value));
-    readTemp.getline(value, 255);
-    envGroup.addKeyword(PvlKeyword("ISISDATA", value));
+    envGroup.addKeyword(PvlKeyword("Shell",    getenv("SHELL")));
+    envGroup.addKeyword(PvlKeyword("Home",     getenv("HOME")));
+    envGroup.addKeyword(PvlKeyword("PWD",      getenv("PWD")));
+    envGroup.addKeyword(PvlKeyword("ISISROOT", getenv("ISISROOT")));
+    envGroup.addKeyword(PvlKeyword("ISISDATA", getenv("ISISDATA")));
+    envGroup.addKeyword(PvlKeyword("SPICEQL_CACHE_DIR", getenv("SPICEQL_CACHE_DIR")));
 
-    // remove temp file and return
-    QString cleanup = "rm -f " + tempFile;
-    ProgramLauncher::RunSystemCommand(cleanup);
     return envGroup;
   }
 
