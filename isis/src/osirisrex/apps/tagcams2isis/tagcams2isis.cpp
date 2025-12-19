@@ -142,14 +142,12 @@ namespace Isis {
     FileName insTransFile(transDir + "OsirisRexTagcamsInstrument_fit.trn");
     PvlToPvlTranslationManager insXlater(fitsLabel, insTransFile.expanded());
     insXlater.Auto(outLabel);
-    std::cout << outLabel << std::endl;
     PvlGroup &instGrp(outLabel.findGroup("Instrument", Pvl::Traverse));
 
     // Create an Archive group
     FileName archTransFile(transDir + "OsirisRexTagcamsArchive_fit.trn");
     PvlToPvlTranslationManager archXlater(fitsLabel, archTransFile.expanded());
     archXlater.Auto(outLabel);
-    std::cout << outLabel << std::endl;
     PvlGroup &archiveGrp(outLabel.findGroup("Archive", Pvl::Traverse));
 
     // Add product id which is just the filename base
