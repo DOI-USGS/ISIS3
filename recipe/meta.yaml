@@ -109,7 +109,7 @@ requirements:
    - qt6-multimedia
    - qwt =6.3.0
    - spiceypy >=6,<7
-   - spiceql >=1.2.4*_5,<2
+   - spiceql >=1.2.4,<2
    - sqlite >=3.46.0,<4
    - suitesparse <7.7.0
    - superlu
@@ -120,7 +120,7 @@ requirements:
    - x264
    - xalan-c                    # [not (osx and arm64)]
    - usgs-astrogeology::xalan-c # [osx and arm64]
-   - xerces-c >=3.3.0,<3.4
+   - xerces-c >=3.1.0,<3.4
    - xorg-kbproto
    - xorg-libice
    - xorg-libsm
