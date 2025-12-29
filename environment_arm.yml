@@ -29,7 +29,7 @@ dependencies:
   - hdf5
   - highfive
   - icu
-  - usgs-astrogeology::inja
+  - inja
   - jama
   - kalasiris
   - krb5
