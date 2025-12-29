@@ -3,7 +3,7 @@ channels:
   - usgs-astrogeology
 
 dependencies:
-  - ale >=1.0.2*_1,<2
+  - ale >=1.0.2,<2
   - aom
   - armadillo
   - blas
@@ -67,17 +67,17 @@ dependencies:
   - qt6-multimedia
   - qwt =6.3.0
   - spiceypy >=6,<7
-  - spiceql >=1.2.4*_5,<2
+  - spiceql >=1.2.4,<2
   - sqlite >=3.46.0,<4
   - suitesparse <7.7.0
   - superlu
   - swig
-  - texlive-core
+  - tectonic
   - tnt
   - usgscsm
   - x264
-  - xalan-c
-  - xerces-c >=3.1.0,<3.4
+  - conda-forge::xalan-c
+  - xerces-c >=3.2.0,<3.4
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm

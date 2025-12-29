@@ -54,8 +54,7 @@ requirements:
    - bzip2
    - cmake >=3.27,<3.28
    - cspice =67
-   - usgs-astrogeology::csm >=3.0.3,<3.0.4   # [osx and arm64]
-   - csm >=3.0.3,<3.0.4                      # [not (osx and arm64)]
+   - csm >=3.0.3,<3.0.4
    - curl >=8.14.1,<9
    - cxx-compiler=1.9
    - doxygen
@@ -114,13 +113,9 @@ requirements:
    - suitesparse <7.7.0
    - superlu
    - swig
-   - texlive-core
    - tnt
    - usgscsm
    - x264
-   - xalan-c                    # [not (osx and arm64)]
-   - usgs-astrogeology::xalan-c # [osx and arm64]
-   - xerces-c >=3.1.0,<3.4
    - xorg-kbproto
    - xorg-libice
    - xorg-libsm
@@ -183,7 +178,6 @@ requirements:
   - tnt
   - x264
   - x265
-  - {{ pin_compatible('xerces-c', max_pin='x.x.x') }}
   - xorg-kbproto
   - xorg-libice
   - xorg-libsm
