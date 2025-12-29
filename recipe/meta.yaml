@@ -45,7 +45,7 @@ build:
 # Shotgun strat on requirements until we can narrow them down
 requirements:
   build:
-   - ale >=1.0.2*_1,<2
+   - ale >=1.0.2,<2
    - aom
    - armadillo
    - blas
@@ -132,8 +132,7 @@ requirements:
   - blas
   - {{ pin_compatible('bullet', max_pin='x.x') }}
   - bz2file
-  - usgs-astrogeology::csm                        # [osx and arm64]
-  - csm                                           # [not (osx and arm64)]
+  - csm
   - cspice
   - curl
   - eigen
@@ -145,8 +144,7 @@ requirements:
   - {{ pin_compatible('gsl', min_pin='x.x', max_pin='x.x.x') }}
   - hdf5
   - icu
-  - inja                                          # [not (osx and arm64)]
-  - usgs-astrogeology::inja                       # [osx and arm64]
+  - inja
   - jama
   - {{ pin_compatible('jasper', max_pin='x.x') }}
   - {{ pin_compatible('kakadu', max_pin='x') }}   # [not (osx and arm64)]
@@ -172,7 +170,7 @@ requirements:
   - {{ pin_compatible('qt-main', max_pin='x.x') }}
   - {{ pin_compatible('qwt', max_pin='x.x') }}
   - rclone
-  - spiceql =1.2.0
+  - {{ pin_compatible('spiceql', max_pin='x.x') }}
   - {{ pin_compatible('suitesparse', min_pin='x.x', max_pin='x.x') }}
   - superlu
   - tnt
