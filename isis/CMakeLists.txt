@@ -94,8 +94,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm6
   set(JP2KFLAG OFF)
 endif()
 
-# No docs support on Mac Arm. The xalan-c Arm package is not available on conda-forge.
-if (CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+# No docs support on Arm. The xalan-c Arm package is not available on conda-forge.
+if (CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64" AND buildDocs)
   message(STATUS "Building documentation is not available on Mac Arm.")
   set(buildDocs OFF)
 endif()
@@ -223,7 +223,7 @@ if (buildDocs)
   find_program(XALAN Xalan REQUIRED)
 endif()
 
-find_program(LATEX latex)
+find_program(LATEX tectonic)
 find_program(DOXYGEN NAME doxygen PATH_SUFFIXES doxygen REQUIRED)
 find_program(UIC uic PATH_SUFFIXES lib/qt6/ REQUIRED)
 find_program(MOC moc PATH_SUFFIXES lib/qt6/ REQUIRED)
