@@ -184,6 +184,9 @@ namespace Isis {
         getUserEnteredKernel(ui, "MODEL", dem);
       }
       else if (ui.GetString("SHAPE") == "SYSTEM") {
+        dem = baseKernels.dem(lab);
+      }
+      else if (ui.GetString("SHAPE") == "WEB") {
         QString tiffUrl = baseKernels.getDemTiffUrl(lab);
         if (!tiffUrl.isEmpty()) {
           dem.push_back(tiffUrl);

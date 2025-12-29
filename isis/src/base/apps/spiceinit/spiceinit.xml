@@ -805,6 +805,16 @@
                the <b>ShapeModel</b> keyword.
             </description>
           </option>
+          <option value="WEB">
+            <brief>Search default shape model from ISIS STAC API</brief>
+            <description>
+              This option searches the ISIS STAC API for a shape model that matches the target of 
+              the input cube. If no matching shape model is found, spiceinit will fall back to using 
+              SYSTEM to search for a shape model in the data area. The label will contain a vsicurl 
+              URL pointing to the GeoTIFF shape model file in an S3 bucket and can be found in the cube labels
+              Kernels Group under the <b>ShapeModel</b> keyword.
+            </description>
+          </option>
         </list>
       </parameter>
 
