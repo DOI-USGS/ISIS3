@@ -12,6 +12,7 @@
 #include "Distance.h"
 #include "Interpolator.h"
 #include "iTime.h"
+#include "KernelDb.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Process.h"
@@ -67,6 +68,13 @@ class MockCamera : public Camera {
     MOCK_METHOD(std::vector<double>, lookDirectionJ2000, (), (const, override));
     MOCK_METHOD(void, instrumentBodyFixedPosition, (double p[3]), (const, override));
     MOCK_METHOD(iTime, time, (), (const, override));
+};
+
+
+class MockKernelDb : public KernelDb {
+  public:
+    MockKernelDb(Kernel::Type type) : KernelDb(type) {}
+    MOCK_METHOD(std::string, curlPostRequest, (const std::string url, const std::string jsonData), (override));
 };
 
 class MockTProjection : public TProjection {

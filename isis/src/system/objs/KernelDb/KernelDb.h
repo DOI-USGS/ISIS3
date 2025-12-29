@@ -124,6 +124,8 @@ namespace Isis {
       Kernel dem(Pvl &lab);
       QString getDemTiffUrl(const Pvl &lab);
 
+      virtual std::string curlPostRequest(const std::string url, const std::string jsonData);
+
       Kernel findLast(const QString &entry, Pvl &lab);
       QList< std::priority_queue<Kernel> > findAll(const QString &entry,
                                                    Pvl &lab);
