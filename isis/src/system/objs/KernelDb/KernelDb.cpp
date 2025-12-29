@@ -701,6 +701,18 @@ namespace Isis {
     std::string jsonData = "{ \"query\": { \"target\": {\"eq\": \"" + target + "\"} } }";
 
 
+    std::string responseBody = curlPostRequest(url, jsonData);
+
+    auto json = nlohmann::json::parse(responseBody);
+
+    if (json.contains("tiff_url")) {
+      tiffUrl = "/vsicurl/" + QString::fromStdString(json["tiff_url"]);
+    }
+
+    return tiffUrl;
+  }
+
+  std::string KernelDb::curlPostRequest(const std::string url, const std::string jsonData) {
     CURL *curl = curl_easy_init();
     if (!curl) {
       throw IException(IException::Programmer, "Failed to initialize CURL", _FILEINFO_);
@@ -724,14 +736,8 @@ namespace Isis {
     if (res != CURLE_OK) {
       throw IException(IException::Io, "CURL error: " + QString(curl_easy_strerror(res)), _FILEINFO_);
     }
-    
-    auto json = nlohmann::json::parse(responseBody);
 
-    if (json.contains("tiff_url")) {
-      tiffUrl = "/vsicurl/" + QString::fromStdString(json["tiff_url"]);
-    }
-
-    return tiffUrl;
+    return responseBody;
   }
 
   /**

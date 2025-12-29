@@ -6,6 +6,7 @@
 
 #include "FileName.h"
 #include "KernelDb.h"
+#include "Mocks.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -365,7 +366,11 @@ TEST_F(KernelDbFixture, TestKernelsSmithOffset) {
 }
 
 TEST_F(KernelDbFixture, TestDemTiffUrl) {
-    KernelDb db(Kernel::Predicted);
+    MockKernelDb db(Kernel::Predicted);
+
+    EXPECT_CALL(db, curlPostRequest(testing::_, testing::_))
+        .WillOnce(testing::Return("{\"id\": \"molaMarsPlanetaryRadius0005\", \"tiff_url\": \"https://asc-isisdata.s3.us-west-2.amazonaws.com/isis-stac/isis-dtm-collection/molaMarsPlanetaryRadius0005.tiff\"}"));
+
     QString url = db.getDemTiffUrl(cubeLabel);
     EXPECT_PRED_FORMAT2(AssertQStringsEqual, url, "/vsicurl/https://asc-isisdata.s3.us-west-2.amazonaws.com/isis-stac/isis-dtm-collection/molaMarsPlanetaryRadius0005.tiff");
 }
