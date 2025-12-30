@@ -808,27 +808,26 @@ namespace Isis {
 
     QString msg = "Failed to open [" + cubeFileName + "]";
     IException exceptions(IException::Io, msg, _FILEINFO_);
-    if (!isOpen()) {
-      try {
-        openCube(cubeFileName, access);
-      }
-      catch (IException &e) {
-        cleanUp(false);
-        exceptions.append(e);
-      }
+
+    GDALDriverH hDriver = GDALIdentifyDriver(FileName(cubeFileName).expanded().toStdString().c_str(), nullptr);
+    bool openWithGdal = false;
+    if (hDriver != nullptr) {
+        GDALDriver* poDriver = (GDALDriver*)hDriver;
+        QString driverDescription = poDriver->GetDescription();
+        openWithGdal = driverDescription == QString("GTiff");
     }
 
-    if (!isOpen()) {
-      try {
+    try{
+      if (openWithGdal) {
         openGdal(cubeFileName, access);
       }
-      catch(IException &e) {
-        cleanUp(false);
-        exceptions.append(e);
+      else {
+        openCube(cubeFileName, access);
       }
     }
-
-    if (!isOpen()) {
+    catch(IException &e) {
+      cleanUp(false);
+      exceptions.append(e);
       throw exceptions;
     }
 
