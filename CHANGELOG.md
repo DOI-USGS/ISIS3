@@ -70,6 +70,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Changed 'jigsaw' attribute type to account for Linux compiler changes [#5904](https://github.com/DOI-USGS/ISIS3/pull/5904)
 - Updated GDAL to 3.12 and QT to 6.X [#5909](https://github.com/DOI-USGS/ISIS3/pull/5909)
 - Updated cmake configs to accommodate new cspice release [#5886](https://github.com/DOI-USGS/ISIS3/pull/5886)
+- Changed `PVL` class to read data from GDAL metadata directly [#5824](https://github.com/DOI-USGS/ISIS3/pull/5824)
 
 ### Fixed
 - Fixed Chandrayaan-2 TMC2 serial numbers by setting InstrumentId to CH2_TMC_FORE/NADIR/AFT based on the filename sensor [#5871](https://github.com/DOI-USGS/ISIS3/issues/5871)
