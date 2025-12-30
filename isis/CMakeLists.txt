@@ -502,7 +502,7 @@ if (buildDocs)
                     -DLATEX=${LATEX}
                     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                     -DPACKAGE_VERSION=${PACKAGE_VERSION}
-                    -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
+                    -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocs.cmake)
 endif()
 
 # Add custom build target to copy modified header files to the build/incs directory.
