@@ -95,8 +95,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm6
 endif()
 
 # No docs support on Arm. The xalan-c Arm package is not available on conda-forge.
-if (CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64" AND buildDocs)
-  message(STATUS "Building documentation is not available on Mac Arm.")
+if ((CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64") AND buildDocs)
+  message(WARNING "Building documentation is not available on Arm, forcing buildDocs to OFF")
   set(buildDocs OFF)
 endif()
 
@@ -213,9 +213,9 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(APPLE)
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0" CACHE STRING "" FORCE)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0" CACHE STRING "" FORCE)
 else()
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0"  CACHE STRING "" FORCE)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Og"  CACHE STRING "" FORCE)
 endif()
 
 # Paths to required executables
