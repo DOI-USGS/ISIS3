@@ -96,7 +96,6 @@ requirements:
    - opencv >=4.12,<5
    - openssl >=3.5,<4
    - pcl >=1.15,<1.16
-   - pdal >=2.8.4,<3
    - plio=1.5.3
    - protobuf >=6,<7
    - python >=3.9
@@ -162,6 +161,7 @@ requirements:
   - nn
   - {{ pin_compatible('opencv', max_pin='x.x') }}
   - {{ pin_compatible('openssl', min_pin='x', max_pin='x.x') }}
+  - pdal >=2.8.4,<3
   - {{ pin_compatible('pcl', min_pin='x', max_pin='x.x') }}
   - plio
   - {{ pin_compatible('proj', min_pin='x.x', max_pin='x.x') }}
