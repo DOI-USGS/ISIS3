@@ -90,7 +90,7 @@ TEST_F(TempTestingFiles, TestGTiffCreateWriteCopy) {
 
   // Test the open and read methods
   Cube in(file2);
-  check_tiff(in, file2, 150, 200, 2, 0, 1, 7, 0, 2, 1, 1, 0, 6516);
+  check_tiff(in, file2, 150, 200, 2, 0, 1, 7, 0, 2, 1, 1, 0, 65536);
 
   LineManager inLine(in);
   j = 0;
