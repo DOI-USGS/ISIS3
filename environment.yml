@@ -43,7 +43,6 @@ dependencies:
   - libvulkan-headers
   - libxml2
   - make
-  - mariadb
   - mesalib
   - mkl
   - mysql
