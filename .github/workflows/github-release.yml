@@ -149,7 +149,40 @@ jobs:
             cd "${ISIS_VERSION}"
             echo "Uploading documentation to S3..."
             aws s3 sync ./ s3://asc-public-docs/isis-site/${ISIS_VERSION}/ --delete
+
+            aws s3 cp s3://asc-public-docs/isis-site/versions.json ./versions.json
           else
             echo "Error: docs/${ISIS_VERSION} directory not found!"
             exit 1
           fi
+
+      - name: Update versions.json
+        shell: python
+        env:
+          ISIS_VERSION: ${{ env.ISIS_VERSION }}
+        run: |
+          import json
+          from packaging.version import parse
+          import os
+
+          new_version = os.environ["ISIS_VERSION"]
+
+          with open("versions.json") as f:
+              versions = json.load(f)
+
+          non_dev = [v for v in versions if v != "Dev" and v.strip() != ""]
+          if new_version not in non_dev:
+              non_dev.append(new_version)
+          non_dev_sorted = sorted(non_dev, key=parse, reverse=True)
+          updated_versions = ["Dev"] + non_dev_sorted
+
+          if updated_versions != versions:
+              with open("versions.json", "w") as f:
+                  json.dump(updated_versions, f)
+              print("versions.json updated:", updated_versions)
+          else:
+              print("No changes needed to versions.json")
+
+      - name: Upload updated versions.json to S3
+        run: |
+          aws s3 cp ./versions.json s3://asc-public-docs/isis-site/versions.json
