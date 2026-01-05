@@ -16,12 +16,15 @@ find files of those names at the top level of this repository. **/
 #include "SqlQuery.h"
 #include "SqlRecord.h"
 #include "Preference.h"
+#include <QCoreApplication>
 
 using namespace std;
 using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
+  QCoreApplication app(argc, argv);
+
   // SQLite
   FileName dbfile("$TEMPORARY/test.db");
   Database testdb("testdb", "SQLite");

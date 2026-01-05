@@ -7,6 +7,7 @@ find files of those names at the top level of this repository. **/
 #include <iostream>
 
 #include <QFile>
+#include <QRegularExpression>
 
 #include "FileName.h"
 #include "IException.h"
@@ -172,7 +173,7 @@ int main(int argc, char *argv[]) {
     ObservationNumberList emptyONL(&empty);
   }
   catch (IException &e) {
-    QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
+    QString error = e.toString().replace(QRegularExpression("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
     cerr << error.toStdString() << endl;
   }
 
@@ -182,7 +183,7 @@ int main(int argc, char *argv[]) {
     onl.remove(&empty);
   }
   catch (IException &e) {
-    QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
+    QString error = e.toString().replace(QRegularExpression("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
     cerr << error.toStdString() << endl;
   }
 
@@ -192,7 +193,7 @@ int main(int argc, char *argv[]) {
     onl.observationNumberMapIndex(-1);
   }
   catch (IException &e) {
-    QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
+    QString error = e.toString().replace(QRegularExpression("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
     cerr << error.toStdString() << endl;
   }
  
@@ -202,7 +203,7 @@ int main(int argc, char *argv[]) {
     onl.observationNumber("$ISISTESTDATA/isis/src/odyssey/unitTestData/I00824006RDR.lev2.cub");
   }
   catch (IException &e) {
-    QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
+    QString error = e.toString().replace(QRegularExpression("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
     cerr << error.toStdString() << endl;
   }
 
@@ -212,7 +213,7 @@ int main(int argc, char *argv[]) {
     onl.observationNumber(5);
   }
   catch (IException &e) {
-    QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
+    QString error = e.toString().replace(QRegularExpression("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
     cerr << error.toStdString() << endl;
   } 
 
@@ -222,7 +223,7 @@ int main(int argc, char *argv[]) {
     onl.possibleFileNames("DNE");
   }
   catch (IException &e) {
-    QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
+    QString error = e.toString().replace(QRegularExpression("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
     cerr << error.toStdString() << endl;
   }
 

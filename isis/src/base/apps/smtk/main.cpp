@@ -98,7 +98,7 @@ void IsisMain() {
   // Set the QHash seed, otherwise output is ALWAYS slightly different.
   // Note that in Qt4, the seed was constant, but in Qt5, the seed is created differently for each
   // process. Fixes #4058.
-  qSetGlobalQHashSeed(1031);
+  QHashSeed::setDeterministicGlobalSeed();
   UserInterface &ui = Application::GetUserInterface();
 
   // Open the first cube.  It is the left hand image.
@@ -215,8 +215,7 @@ void IsisMain() {
     }
   }
   else {
-  // We want to create a grid of control points that is N rows by M columns.
-
+    // We want to create a grid of control points that is N rows by M columns.
     int rows = (lhImage.lineCount() + linc - 1)/linc;
     int cols = (lhImage.sampleCount() + sinc - 1)/sinc;
 
@@ -306,6 +305,7 @@ void IsisMain() {
   }
 
   // Use seed points (in stack) to grow
+  prog.SetText("Growing From Seed Points");
   SmtkQStack bmf;
   bmf.reserve(gstack.size());  // Probably need much more but for starters...
 
@@ -316,21 +316,21 @@ void IsisMain() {
   int halfBox((subcbox-1)/2);
   while (!gstack.isEmpty()) {
 
-    SmtkQStackIter cstack = matcher.FindSmallestEV(gstack);
+    SmtkQPair cstack = matcher.FindSmallestEV(gstack).key();
 
     // Print number on stack
     if ((gstack.size() % 1000) == 0) {
       cout << "Number on Stack: " << gstack.size()
-           << ". " << cstack.value().GoodnessOfFit() << "\n";
+           << ". " << gstack.value(cstack).GoodnessOfFit() << "\n";
     }
 
     // Test to see if already determined
-    SmtkQStackIter bmfPt = bmf.find(cstack.key());
+    SmtkQStackIter bmfPt = bmf.find(cstack);
     if (bmfPt == bmf.end()) {
       // Its not in the final stack, process it
 
       //  Retrieve the point
-      SmtkPoint spnt = cstack.value();
+      SmtkPoint spnt = gstack.value(cstack);
       //  Register if its not already registered
       if (!spnt.isRegistered()) {
         spnt = matcher.Register(spnt, spnt.getAffine());
@@ -340,9 +340,9 @@ void IsisMain() {
       // otherwise should be good
       if ( spnt.isValid() ) {
         passpix2++;
-        bmf.insert(cstack.key(), spnt);  // inserts (0,0) offset excluded below
-        int line   = cstack.key().first;
-        int sample = cstack.key().second;
+        bmf.insert(cstack, spnt);  // inserts (0,0) offset excluded below
+        int line   = cstack.first;
+        int sample = cstack.second;
 
         //  Determine match points
         double eigen(spnt.GoodnessOfFit());
@@ -400,7 +400,7 @@ void IsisMain() {
     }
 
     // Remove the current point from the grow stack (hole)
-    gstack.erase(cstack);
+    gstack.remove(cstack);
   }
 
 /////////////////////////////////////////////////////////////////////////
@@ -484,7 +484,7 @@ void IsisMain() {
   totalPointsPvl += PvlKeyword("AttemptedPoints", toString(numAttemptedInitialPoints));
   totalPointsPvl += PvlKeyword("InitialSuccesses", toString(numOrigPoints));
   totalPointsPvl += PvlKeyword("GrowSuccesses", toString(passpix2));
-  totalPointsPvl += PvlKeyword("ResultingPoints", toString(bmf.size()));
+  totalPointsPvl += PvlKeyword("ResultingPoints", toString((int)bmf.size()));
 
   Application::Log(totalPointsPvl);
 

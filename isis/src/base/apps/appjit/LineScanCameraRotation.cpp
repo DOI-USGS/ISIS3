@@ -124,7 +124,7 @@ namespace Isis {
     std::vector<ale::Rotation> rotationCache;
 
     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
-    auto [sunLt, kernels] = SpiceQL::getTargetStates(p_cacheTime, "MRO", "mars", "IAU_MARS", "NONE", "mro", {"reconstructed"}, {"reconstructed"}, useWeb);
+    auto [sunLt, kernels] = SpiceQL::getTargetStates(p_cacheTime, "MRO", "MARS", "IAU_MARS", "NONE", "mro", {"reconstructed"}, {"reconstructed"}, useWeb, false, false);
 
     double state[6];
     for(std::vector<double>::iterator i = p_cacheTime.begin(); i < p_cacheTime.end(); i++) {
@@ -140,7 +140,6 @@ namespace Isis {
       crot->SetEphemerisTime(et);
 
       // The following code will be put into method LoadIBcache()
-      
       std::copy(sunLt[idx].begin(), sunLt[idx].begin()+6, state);
 
 

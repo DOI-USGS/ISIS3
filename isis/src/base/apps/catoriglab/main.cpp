@@ -16,7 +16,7 @@ void IsisMain() {
   // QDomDocument makes use of QHashes to store attributes.
   // This sets the QHash seed so that the attributes always come out in the
   // same order.
-  qSetGlobalQHashSeed(1031);
+  QHashSeed::setDeterministicGlobalSeed();
 
   // Get user entered file name & mode
   UserInterface &ui = Application::GetUserInterface();

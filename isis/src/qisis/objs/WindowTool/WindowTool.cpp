@@ -88,7 +88,7 @@ namespace Isis {
     p_linkAllWindows->setToolTip("Link all viewports");
     p_linkAllWindows->setWhatsThis("<b>Function: </b> Links all open viewports \
                                    together. <p><b>Shortcut: </b> Ctrl+Shift+L");
-    p_linkAllWindows->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_L);
+    p_linkAllWindows->setShortcut(QKeySequence("Ctrl+Shift+L"));
     p_linkAllWindows->setEnabled(false);
     connect(p_linkAllWindows, SIGNAL(triggered()), this, SLOT(linkWindows()));
 
@@ -97,7 +97,7 @@ namespace Isis {
     p_unlinkAllWindows->setToolTip("Unlink all viewports");
     p_unlinkAllWindows->setWhatsThis("<b>Function: </b> Unlinks all open viewports. \
                                      <p><b>Shortcut: </b> Ctrl+Shift+U");
-    p_unlinkAllWindows->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_U);
+    p_unlinkAllWindows->setShortcut(QKeySequence("Ctrl+Shift+U"));
     p_unlinkAllWindows->setEnabled(false);
     connect(p_unlinkAllWindows, SIGNAL(triggered()), this, SLOT(unlinkWindows()));
 

@@ -21,12 +21,10 @@ find files of those names at the top level of this repository. **/
 #include <SpiceZmc.h>
 
 #include "Angle.h"
-//#include "BundleTargetBody.h"
 #include "Distance.h"
 #include "Target.h"
 
 
-class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
 
@@ -182,12 +180,6 @@ namespace Isis {
   };
 
   typedef QSharedPointer<TargetBody> TargetBodyQsp;//!< Defines A smart pointer to a TargetBody obj
-
-  //
-
-  // operators to read/write TargetBody to/from binary data
-  QDataStream &operator<<(QDataStream &stream, const TargetBody &TargetBody);
-  QDataStream &operator>>(QDataStream &stream, TargetBody &TargetBody);
 };
 
 Q_DECLARE_METATYPE(Isis::TargetBodyQsp);

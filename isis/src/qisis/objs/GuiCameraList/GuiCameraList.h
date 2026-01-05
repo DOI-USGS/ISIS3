@@ -11,7 +11,6 @@
 //#include "GuiCameraListActionWorkOrder.h"  TODO - will we need this?
 #include "WorkOrder.h"
 
-class QStringList;
 class QXmlStreamWriter;
 
 namespace Isis {

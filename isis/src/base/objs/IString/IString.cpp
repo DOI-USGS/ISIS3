@@ -17,6 +17,7 @@ find files of those names at the top level of this repository. **/
 
 #include <QMap>
 #include <QObject>
+#include <QStringRef>
 
 #include "IException.h"
 #include "SpecialPixel.h"

@@ -8,6 +8,7 @@ find files of those names at the top level of this repository. **/
 
 #include "ControlNetVersioner.h"
 
+#include <QRegularExpression>
 #include <QString>
 #include <QTime>
 
@@ -161,7 +162,7 @@ int main(int argc, char *argv[]) {
   }
   catch (IException &e) {
     QString message = e.toString();
-    cout << message.replace(QRegExp("file.*control/unitTestData"), "file [control/unitTestData");
+    cout << message.replace(QRegularExpression("file.*control/unitTestData"), "file [control/unitTestData");
     cout << endl;
   }
   try {
@@ -170,7 +171,7 @@ int main(int argc, char *argv[]) {
   }
   catch (IException &e) {
     QString message = e.toString();
-    cout << message.replace(QRegExp("file.*control/unitTestData"), "file [control/unitTestData");
+    cout << message.replace(QRegularExpression("file.*control/unitTestData"), "file [control/unitTestData");
     cout << endl;
   }
   try {
@@ -179,7 +180,7 @@ int main(int argc, char *argv[]) {
   }
   catch (IException &e) {
     QString message = e.toString();
-    cout << message.replace(QRegExp("file.*control/unitTestData"), "file [control/unitTestData");
+    cout << message.replace(QRegularExpression("file.*control/unitTestData"), "file [control/unitTestData");
     cout << endl;
   }
   try {
@@ -188,7 +189,7 @@ int main(int argc, char *argv[]) {
   }
   catch (IException &e) {
     QString message = e.toString();
-    cout << message.replace(QRegExp("file.*control/unitTestData"), "file [control/unitTestData");
+    cout << message.replace(QRegularExpression("file.*control/unitTestData"), "file [control/unitTestData");
     cout << endl;
   }
   try {
@@ -197,7 +198,7 @@ int main(int argc, char *argv[]) {
   }
   catch (IException &e) {
     QString message = e.toString();
-    cout << message.replace(QRegExp("file.*control/unitTestData"), "file [control/unitTestData");
+    cout << message.replace(QRegularExpression("file.*control/unitTestData"), "file [control/unitTestData");
     cout << endl;
   }
 

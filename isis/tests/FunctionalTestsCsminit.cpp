@@ -48,7 +48,7 @@ class CSMPluginFixture : public TempTestingFiles {
       isd["scale_sigma"] = 8.25832912882503;
       isdPath = tempDir.path() + "/default.json";
       std::ofstream file(isdPath.toStdString());
-      file << isd;
+      file << isd.dump(2);
       file.flush();
 
       json altIsd;
@@ -59,7 +59,7 @@ class CSMPluginFixture : public TempTestingFiles {
 
       altIsdPath = tempDir.path() + "/alternate.json";
       std::ofstream altFile(altIsdPath.toStdString());
-      altFile << altIsd;
+      altFile << altIsd.dump(2);
       altFile.flush();
       std::ifstream cubeLabel("data/threeImageNetwork/cube1.pvl");
       cubeLabel >> label;
@@ -277,7 +277,7 @@ TEST_F(CSMPluginFixture, CSMInitFails) {
 
   isdPath = tempDir.path() + "/failing.json";
   std::ofstream file(isdPath.toStdString());
-  file << isd;
+  file << isd.dump(2);
   file.flush();
 
   QVector<QString> args = {
@@ -310,7 +310,7 @@ TEST_F(DefaultCube, CSMInitSpiceCleanup) {
   isd["scale_sigma"] = 8.25832912882503;
   QString isdPath = tempDir.path() + "/default.json";
   std::ofstream file(isdPath.toStdString());
-  file << isd;
+  file << isd.dump(2);
   file.flush();
 
   QVector<QString> args = {
@@ -343,7 +343,7 @@ TEST_F(DefaultCube, CSMInitSpiceRestoredAfterFailure) {
 
   QString isdPath = tempDir.path() + "/default.json";
   std::ofstream file(isdPath.toStdString());
-  file << isd;
+  file << isd.dump(2);
   file.flush();
 
   QVector<QString> args = {
@@ -386,7 +386,7 @@ TEST_F(DefaultCube, CSMInitSpiceNoCleanup) {
 
   QString isdPath = tempDir.path() + "/default.json";
   std::ofstream file(isdPath.toStdString());
-  file << isd;
+  file << isd.dump(2);
   file.flush();
 
   QVector<QString> args = {
@@ -414,7 +414,7 @@ TEST_F(CSMPluginFixture, CSMInitStateStringFails) {
 
   QString statePath = tempDir.path() + "/failing.json";
   std::ofstream file(statePath.toStdString());
-  file << state;
+  file << state.dump(2);
   file.flush();
 
   QVector<QString> args = {

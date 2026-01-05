@@ -45,8 +45,6 @@ class QLineEdit;
 class QComboBox;
 class QCheckBox;
 
-template <typename A, typename B> struct QPair;
-
 namespace Isis {
   class MdiCubeViewport;
   class CubePlotCurve;

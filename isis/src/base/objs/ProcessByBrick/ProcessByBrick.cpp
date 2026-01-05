@@ -758,7 +758,7 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
    *
    * @param future The future to monitor
    */
-  void ProcessByBrick::BlockingReportProgress(QFuture<void> &future) {
+  void ProcessByBrick::BlockingReportProgress(QFuture<void*> &future) {
     int isisReportedProgress = 0;
     int lastProgressValue = future.progressValue();
     // Using a mutex with a timeout isn't as bad of a hack as inheriting QThread

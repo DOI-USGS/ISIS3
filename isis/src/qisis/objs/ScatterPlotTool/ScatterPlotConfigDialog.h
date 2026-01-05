@@ -6,7 +6,6 @@
 
 class QwtInterval;
 
-template <typename A, typename B> struct QPair;
 class QCheckBox;
 class QComboBox;
 class QSpinBox;

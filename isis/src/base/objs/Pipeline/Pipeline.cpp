@@ -721,7 +721,7 @@ namespace Isis {
    */
   PipelineApplication &Pipeline::Application(const int &index) {
     if (index > Size()) {
-      QString msg = "Index [" + QString(index) + "] out of bounds";
+      QString msg = "Index [" + QString::number(index) + "] out of bounds";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -805,7 +805,7 @@ namespace Isis {
 
     if (p_finalOutput.size() > 1) {
       if ((unsigned int)branch >= p_finalOutput.size()) {
-        QString msg = "Output not set for branch [" + QString(branch) + "]";
+        QString msg = "Output not set for branch [" + QString::number(branch) + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 

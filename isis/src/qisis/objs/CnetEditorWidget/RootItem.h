@@ -35,7 +35,6 @@ namespace Isis {
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
    */
   class RootItem : public AbstractNullDataItem, public AbstractParentItem {
-      Q_OBJECT
 
     public:
       RootItem();

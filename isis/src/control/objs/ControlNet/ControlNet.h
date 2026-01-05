@@ -31,7 +31,6 @@ find files of those names at the top level of this repository. **/
 
 template< typename A, typename B > class QHash;
 template< typename T > class QList;
-template< typename A, typename B > struct QPair;
 template< typename T > class QSet;
 
 class QMutex;

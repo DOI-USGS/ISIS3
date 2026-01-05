@@ -6,6 +6,7 @@
 
 #include <QDebug>
 #include <QColor>
+#include <QRegExp>
 
 
 namespace Isis{

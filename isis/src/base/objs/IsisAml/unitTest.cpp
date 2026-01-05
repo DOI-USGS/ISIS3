@@ -7,8 +7,10 @@ find files of those names at the top level of this repository. **/
 #include <iostream>
 #include <QString>
 #include <sstream>
-#include "IsisAml.h"
 
+#include <QRegularExpression>
+
+#include "IsisAml.h"
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
@@ -835,6 +837,6 @@ int main(void) {
  *   @history 2010-07-26 Jeannie Walldren - Original version.
  */
 void ReportError(QString err) {
-  cout << err.replace(QRegExp("\\[/[^\\]]*\\]"), "[]") << endl << endl;
+  cout << err.replace(QRegularExpression("\\[/[^\\]]*\\]"), "[]") << endl << endl;
 }
 

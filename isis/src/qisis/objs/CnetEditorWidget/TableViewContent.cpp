@@ -24,7 +24,6 @@ find files of those names at the top level of this repository. **/
 #include <QScrollBar>
 #include <QSize>
 #include <QStyle>
-#include <QStyleOptionViewItemV4>
 #include <QThread>
 #include <QVBoxLayout>
 

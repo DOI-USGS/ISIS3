@@ -128,7 +128,7 @@ void ascii2isis(Buffer &out) {
     if (!fin) {
       // Clean stream to get the position and invalid data that broke the stream
       fin.clear();
-      QString msg = "Could not extract non-numerical data [" + QString(fin.peek()) + "] ";
+      QString msg = "Could not extract non-numerical data [" + QString::number(fin.peek()) + "] ";
       msg += "at byte position [" + QString::number(fin.tellg()) + "]. ";
       msg += "Please make sure to skip any header data in [" + from + "].";
       throw IException(IException::User, msg, _FILEINFO_);

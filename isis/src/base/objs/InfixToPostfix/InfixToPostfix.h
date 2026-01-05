@@ -13,6 +13,7 @@ find files of those names at the top level of this repository. **/
 
 #include <QList>
 #include <QString>
+#include <QRegularExpression>
 
 namespace Isis {
   class InfixOperator;

@@ -3618,7 +3618,7 @@ namespace Isis {
     connect(showNavToolButton,SIGNAL(clicked(bool)),this,SLOT(showNavWindow(bool)));
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(showNavToolButton);
     layout->addStretch(1);
     hbox->setLayout(layout);

@@ -14,8 +14,8 @@ find files of those names at the top level of this repository. **/
 #include <QMimeData>
 #include <QModelIndex>
 #include <QObject>
-#include <QRegExp>
-#include <QRegExpValidator>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QStandardItemModel>
 #include <QString>
 #include <QValidator>
@@ -927,13 +927,13 @@ namespace Isis {
   bool ProjectItemModel::rejectName(QStringList &reserved, QString target) {
 
 
-    QRegExpValidator valid;
+    QRegularExpressionValidator valid;
     QValidator::State state;
     int pos =0;
     foreach (QString name, reserved) {
 
-      QRegExp rx(name);
-      valid.setRegExp(rx);
+      QRegularExpression rx(name);
+      valid.setRegularExpression(rx);
       state = valid.validate(target,pos);
 
       if (state == 2) {

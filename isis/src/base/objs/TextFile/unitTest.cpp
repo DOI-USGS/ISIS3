@@ -4,14 +4,17 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
+#include <iostream>
+#include <stdio.h>
+#include <vector>
+
+#include <QRegularExpression>
+
 #include "TextFile.h"
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
 #include "Preference.h"
-#include <iostream>
-#include <stdio.h>
-#include <vector>
 
 using namespace std;
 using namespace Isis;
@@ -542,6 +545,6 @@ int main(int argc, char *argv[]) {
  *   @history 2011-08-05 Jeannie Backer - Copied from Cube class.
  */
 void ReportError(QString err) {
-  cout << err.replace(QRegExp("\\[[^\\]*\\]"), "[]") << endl;
+  cout << err << endl;
 }
 

@@ -186,6 +186,15 @@ namespace Isis {
       else if (ui.GetString("SHAPE") == "SYSTEM") {
         dem = baseKernels.dem(lab);
       }
+      else if (ui.GetString("SHAPE") == "WEB") {
+        QString tiffUrl = baseKernels.getDemTiffUrl(lab);
+        if (!tiffUrl.isEmpty()) {
+          dem.push_back(tiffUrl);
+        } 
+        else {
+          dem = baseKernels.dem(lab);
+        }
+      }
 
       bool kernelSuccess = false;
 

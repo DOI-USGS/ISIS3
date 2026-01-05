@@ -2,6 +2,7 @@
 #define SpiceClient_h
 
 #include <QThread>
+#include <QSslError>
 
 class QAuthenticator;
 class QDomElement;
@@ -9,7 +10,6 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class QNetworkRequest;
 class QNetworkProxy;
-class QSslError;
 class QString;
 
 template <typename A> class QList;

@@ -25,6 +25,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <QRegularExpression>
+
 #include "WriteTabular.h"
 #include "IString.h"
 #include "Message.h"
@@ -297,7 +299,7 @@ namespace Isis {
 
       //Put it back into an QString, for easier manipulation
       QString tempString2 = b.str().c_str();
-      tempString2.remove(QRegExp("[^.]*\\."));
+      tempString2.remove(QRegularExpression("[^.]*\\."));
       //Add any zeros necessary to pad the number
       while(tempString2.size() < (int)thisCol.Precision()) {
         tempString2 += "0";

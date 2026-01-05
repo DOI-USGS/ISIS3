@@ -479,7 +479,7 @@ namespace Isis {
     if ( nexpected > 0 ) {
       if ( values.size() != nexpected ) {
         QString message = "Expected " + toString(nexpected) + " but got "
-                       + toString(values.size());
+                       + toString((int)values.size());
         throw IException(IException::User, message, _FILEINFO_);
       }
     }

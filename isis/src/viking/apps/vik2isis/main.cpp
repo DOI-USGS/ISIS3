@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 #include "Isis.h"
 
 #include <cstdio>
+#include <QRegularExpression>
 #include <QString>
 #include "stdlib.h"
 
@@ -127,7 +128,7 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
   inst += PvlKeyword("TargetName", (QString)pdsLabel["TARGET_NAME"]);
 
   QString stime = (QString) pdsLabel["IMAGE_TIME"];
-  stime.remove(QRegExp("Z$"));
+  stime.remove(QRegularExpression("Z$"));
   inst += PvlKeyword("StartTime", stime);
 
   inst += PvlKeyword("ExposureDuration",

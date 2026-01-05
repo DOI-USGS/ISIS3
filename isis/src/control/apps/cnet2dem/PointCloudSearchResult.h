@@ -73,7 +73,7 @@ namespace Isis {
           const T &p = m_pc->point(indices[i]);
           if ( m_source != p) {
             if ( p.isValid() ) {
-              m_matches.push_back(qMakePair<T, double>(p, std::sqrt(distances[i])));
+              m_matches.push_back(qMakePair<T, double>(T(p), std::sqrt(distances[i])));
             }
           }
         }
@@ -93,7 +93,7 @@ namespace Isis {
           const T &p = m_pc->point(matches[i].first);
           if ( m_source != p) {
             if ( p.isValid() ) {
-              m_matches.push_back(qMakePair<T, double>(p, std::sqrt(matches[i].second)));
+              m_matches.push_back(qMakePair<T, double>(T(p), std::sqrt(matches[i].second)));
             }
           }
         }

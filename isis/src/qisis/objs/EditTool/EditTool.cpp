@@ -172,7 +172,7 @@ namespace Isis {
     p_saveAsButton->setIconSize(QSize(22, 22));
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(p_shapeComboBox);
     layout->addWidget(p_valTypeComboBox);
     layout->addWidget(p_dnLineEdit);

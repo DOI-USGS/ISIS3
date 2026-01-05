@@ -11,9 +11,6 @@ find files of those names at the top level of this repository. **/
 
 #include <QObject>
 
-template<typename A, typename B> struct QPair;
-
-
 namespace Isis {
   class TableColumn;
 

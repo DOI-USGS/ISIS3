@@ -28,7 +28,6 @@ find files of those names at the top level of this repository. **/
 #include <QIcon>
 #include <QLineEdit>
 #include <QHeaderView>
-#include <QDesktopWidget>
 #include <QGridLayout>
 #include <QWidgetAction>
 #include <QMenu>

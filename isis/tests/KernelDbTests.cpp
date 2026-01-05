@@ -6,6 +6,7 @@
 
 #include "FileName.h"
 #include "KernelDb.h"
+#include "Mocks.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
@@ -47,6 +48,7 @@ class KernelDbFixture : public ::testing::Test {
         Group = Instrument
           SpacecraftName = IdealSpacecraft
           InstrumentId   = IdealCamera
+          TargetName     = Mars
           StartTime      = "2005 JUN 15 12:00:00.000 TDB"
           StopTime       = "2005 DEC 15 12:00:00.000 TDB"
         End_Group
@@ -294,7 +296,7 @@ TEST_F(KernelDbFixture, SystemKernels) {
   ASSERT_EQ(dbFiles.size(), 10);
 
   QStringList tspks = db.targetPosition(cubeLabel).kernels();
-  ASSERT_EQ(tspks.size(), 1);
+  ASSERT_EQ(tspks.size(), 2);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, tspks[0], "$base/kernels/spk/de430.bsp");
 
   QList< std::priority_queue<Kernel> > cklist = db.spacecraftPointing(cubeLabel);
@@ -361,4 +363,14 @@ TEST_F(KernelDbFixture, TestKernelsSmithOffset) {
   Kernel cKernels(ck[0].top());
   QStringList cklist = cKernels.kernels();
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, cklist[0], "data/kerneldbgen/thmIR.bc");
+}
+
+TEST_F(KernelDbFixture, TestDemTiffUrl) {
+    MockKernelDb db(Kernel::Predicted);
+
+    EXPECT_CALL(db, curlPostRequest(testing::_, testing::_))
+        .WillOnce(testing::Return("{\"id\": \"molaMarsPlanetaryRadius0005\", \"tiff_url\": \"https://asc-isisdata.s3.us-west-2.amazonaws.com/isis-stac/isis-dtm-collection/molaMarsPlanetaryRadius0005.tiff\"}"));
+
+    QString url = db.getDemTiffUrl(cubeLabel);
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, url, "/vsicurl/https://asc-isisdata.s3.us-west-2.amazonaws.com/isis-stac/isis-dtm-collection/molaMarsPlanetaryRadius0005.tiff");
 }

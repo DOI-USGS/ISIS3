@@ -5,8 +5,7 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) from=$(INPUT)/2392975548_lvl3_0.lbl \
 	to=$(OUTPUT)/2392975548_lvl3_0.refl.cub \
-	tostddev=$(OUTPUT)/2392975548_lvl3_0.stdev.cub \
-	> /dev/null;
+	tostddev=$(OUTPUT)/2392975548_lvl3_0.stdev.cub;
 	catlab from=$(OUTPUT)/2392975548_lvl3_0.refl.cub \
 	to=$(OUTPUT)/2392975548_lvl3_0.refl.pvl \
 	> /dev/null;

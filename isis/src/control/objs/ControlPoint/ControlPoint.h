@@ -19,8 +19,6 @@ find files of those names at the top level of this repository. **/
 
 template< typename A, typename B > class QHash;
 
-class QStringList;
-
 namespace Isis {
   class ControlNet;
   class ControlPointFileEntryV0002;

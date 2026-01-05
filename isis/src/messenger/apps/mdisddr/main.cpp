@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
 #include <fstream>
 #include <sstream>
 
+#include <QRegularExpression>
 #include <QString>
 
 #include "BufferManager.h"
@@ -234,7 +235,7 @@ void IsisMain() {
     else {
       QString pid = productIdKeyword[0];
       pid[0] = 'D';
-      pid.remove(QRegExp("_.*"));
+      pid.remove(QRegularExpression("_.*"));
       pid.append("_DE_0");
       productIdKeyword.setValue(pid);
       prodid = pid;

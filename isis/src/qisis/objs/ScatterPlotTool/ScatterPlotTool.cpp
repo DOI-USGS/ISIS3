@@ -41,7 +41,7 @@ namespace Isis {
    * @param painter The painter to use for painting
    */
   void ScatterPlotTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
-    m_plotWindows->removeAll(NULL);
+    m_plotWindows->removeAll(QPointer<ScatterPlotWindow>());
 
     foreach (ScatterPlotWindow *window, *m_plotWindows) {
       window->paint(vp, painter);
@@ -97,7 +97,7 @@ namespace Isis {
 
 
     QHBoxLayout *layout = new QHBoxLayout(wrapper);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     layout->addWidget(create);
 
@@ -158,7 +158,7 @@ namespace Isis {
    * @param p The mouse location
    */
   void ScatterPlotTool::mouseMove(QPoint p, Qt::MouseButton) {
-    m_plotWindows->removeAll(NULL);
+    m_plotWindows->removeAll(QPointer<ScatterPlotWindow>());
 
     foreach (ScatterPlotWindow *window, *m_plotWindows) {
       window->setMousePosition(cubeViewport(), p);
@@ -171,7 +171,7 @@ namespace Isis {
    *   alarming viewport->plot.
    */
   void ScatterPlotTool::mouseLeave() {
-    m_plotWindows->removeAll(NULL);
+    m_plotWindows->removeAll(QPointer<ScatterPlotWindow>());
 
     foreach (ScatterPlotWindow *window, *m_plotWindows) {
       window->setMousePosition(NULL, QPoint());

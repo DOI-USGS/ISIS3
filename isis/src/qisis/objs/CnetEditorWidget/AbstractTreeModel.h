@@ -17,7 +17,6 @@ class QFont;
 template <typename A> class QFutureWatcher;
 class QModelIndex;
 class QMutex;
-template< typename A, typename B > struct QPair;
 class QSize;
 class QString;
 

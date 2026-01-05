@@ -22,8 +22,6 @@ class QPainter;
 class QStackedWidget;
 class QToolBar;
 
-template< class T > class QVector;
-
 
 namespace Isis {
   class CubeViewport;

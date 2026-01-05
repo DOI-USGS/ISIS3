@@ -142,7 +142,7 @@ namespace Isis {
       QStringList modelSpec = possibleModels.front();
 
       if (modelSpec.size() != 2) {
-        QString message = "Model specification [" + modelSpec.join(" ") + "] has [" + modelSpec.size() + "] elements "
+        QString message = "Model specification [" + modelSpec.join(" ") + "] has [" + QString::number(modelSpec.size()) + "] elements "
           "when it should have 2 elements.";
         throw IException(IException::Programmer, message, _FILEINFO_);
       }

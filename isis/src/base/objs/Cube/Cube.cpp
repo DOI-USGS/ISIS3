@@ -945,7 +945,7 @@ namespace Isis {
       m_dataFile->close();
       m_geodataSet = GDALDataset::FromHandle(GDALOpen(m_dataFileName->expanded().toStdString().c_str(), eAccess));
       if (!m_geodataSet) {
-        QString msg = "Opening GDALDataset from [" + m_dataFileName->name() + "] failed with access [" + eAccess +"]";
+        QString msg = "Opening GDALDataset from [" + m_dataFileName->name() + "] failed with access [" + QString::number(eAccess) +"]";
         cleanUp(false);
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -985,7 +985,7 @@ namespace Isis {
     CPLStringList metadata = CPLStringList(dataset->GetMetadata("USGS"), false);
 
     m_label = new Pvl();
-    if (metadata) {
+    if (metadata[0] != nullptr) {
       for (int i = 0; i < metadata.size(); i++) {
         const char *metadataItem = CPLParseNameValue(metadata[i], nullptr);
         nlohmann::ordered_json metadataAsJson = nlohmann::ordered_json::parse(metadataItem);
@@ -1121,7 +1121,7 @@ namespace Isis {
     }
     m_geodataSet = GDALDataset::FromHandle(GDALOpen(m_dataFileName->expanded().toStdString().c_str(), eAccess));
     if (!m_geodataSet) {
-      QString msg = "Opening GDALDataset from [" + m_dataFileName->name() + "] failed with access [" + eAccess +"]";
+      QString msg = "Opening GDALDataset from [" + m_dataFileName->name() + "] failed with access [" + QString::number(eAccess) +"]";
       cleanUp(false);
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -2483,7 +2483,7 @@ namespace Isis {
     }
 
     // Change the number of bands in the labels of the cube
-    if (m_virtualBandList && core.hasGroup("Dimensions")) core.findGroup("Dimensions")["Bands"] = toString(m_virtualBandList->size());
+    if (m_virtualBandList && core.hasGroup("Dimensions")) core.findGroup("Dimensions")["Bands"] = toString((int)m_virtualBandList->size());
   }
 
 

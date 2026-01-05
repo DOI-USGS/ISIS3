@@ -1301,7 +1301,7 @@ namespace Isis {
                  &numValuesRead, kernelValue, &found);
 
         if (found && numValuesRead > 0)
-          result = kernelValue;
+          result = QString(kernelValue);
       }
       else if (type == SpiceIntType) {
         SpiceInt kernelValue;

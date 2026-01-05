@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QPushButton>
+#include <QRegExp>
 #include <QSettings>
 #include <QScrollArea>
 #include <QStatusBar>

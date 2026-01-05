@@ -87,7 +87,7 @@ namespace Isis {
 
     if (testXY) {
       Pvl map(ui.GetFileName("MAP"));
-      PvlGroup &mapGroup = map.findGroup("MAPPING");
+      PvlGroup &mapGroup = map.findGroup("Mapping");
 
       // This call adds TargetName, EquatorialRadius and PolarRadius to mapGroup
       mapGroup = Target::radiiGroup(*(cube->label()), mapGroup);

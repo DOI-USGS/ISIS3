@@ -219,7 +219,7 @@ namespace Isis {
             this, SLOT(selectCurvesToPlot()));
 
     QHBoxLayout *layout = new QHBoxLayout(wrapper);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_rubberBandCombo);
     layout->addWidget(spectralDisplayCombo());
     layout->addWidget(plotCurvesButton);

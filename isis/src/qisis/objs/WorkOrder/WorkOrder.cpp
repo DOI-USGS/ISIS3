@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
 #include <QFutureWatcher>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QRegularExpression>
 #include <QtConcurrentRun>
 #include <QTimer>
 #include <QXmlStreamWriter>
@@ -787,7 +788,7 @@ namespace Isis {
     if (result.isEmpty()) {
       // get the name of the work order
       result = QString(metaObject()->className()).remove("Isis::").remove("WorkOrder")
-                   .replace(QRegExp("([a-z0-9])([A-Z])"), "\\1 \\2");
+                   .replace(QRegularExpression("([a-z0-9])([A-Z])"), "\\1 \\2");
       qWarning() << QString("WorkOrder::bestText(): Work order [%1] has no QUndoCommand text")
                     .arg(result);
     }
@@ -1113,7 +1114,7 @@ namespace Isis {
           m_progressBar->setText("Running...");
           m_progressBar->update();
           // queue the workorder for asynchronous execution
-          QFuture<void> future = QtConcurrent::run(this, &WorkOrder::execute);
+          QFuture<void> future = QtConcurrent::run(&WorkOrder::execute, this);
           // executionFinished() is called via the finished signal.  The
           // connection is setup in the constructor.
           m_futureWatcher->setFuture(future);
@@ -1184,7 +1185,7 @@ namespace Isis {
           m_progressBar->setText("Undoing...");
           m_progressBar->update();
           // queue the workorder for asynchronous execution
-          QFuture<void> future = QtConcurrent::run(this, &WorkOrder::undoExecution);
+          QFuture<void> future = QtConcurrent::run(&WorkOrder::undoExecution, this);
           // executionFinished() is called via the finished signal.  The
           // connection is setup in the constructor.
           m_futureWatcher->setFuture(future);

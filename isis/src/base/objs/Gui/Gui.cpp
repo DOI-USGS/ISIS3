@@ -13,7 +13,6 @@ find files of those names at the top level of this repository. **/
 
 #include <QApplication>
 #include <QCoreApplication>
-#include <QDesktopWidget>
 #include <QFont>
 #include <QFrame>
 #include <QIcon>
@@ -21,8 +20,9 @@ find files of those names at the top level of this repository. **/
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QSplitter>
+#include <QScreen>
 #include <QScrollArea>
+#include <QSplitter>
 #include <QStatusBar>
 #include <QToolBar>
 #include <QWhatsThis>
@@ -91,7 +91,7 @@ namespace Isis {
     new QApplication(argc, argv);
     // When QApplication is initialized, it will reset the locale to the shells locale. As a result
     // the locale needs to be reset after QApplications initialization.
-    setlocale(LC_ALL, "en_US");
+    setlocale(LC_ALL, "en_US.UTF-8");
 
     QApplication::setQuitOnLastWindowClosed(true);
     QApplication::setApplicationName(FileName(argv[0]).baseName());
@@ -194,7 +194,7 @@ namespace Isis {
     p_scrollArea->setWidgetResizable(true);
 
     // Set the scroll area size
-    int height = QApplication::desktop()->height();
+    int height = QApplication::primaryScreen()->availableSize().height();
 
     // Add the log area to the bottom of the spliter
     p_log = new GuiLog();
@@ -291,14 +291,14 @@ namespace Isis {
     QAction *aboutProgram = new QAction(this);
     aboutProgram->setMenuRole(QAction::AboutRole);
     aboutProgram->setText("About this program");
-    aboutProgram->setShortcut(Qt::CTRL + Qt::Key_H);
+    aboutProgram->setShortcut(Qt::CTRL | Qt::Key_H);
     helpMenu->addAction(aboutProgram);
     connect(aboutProgram, SIGNAL(triggered(bool)), this, SLOT(AboutProgram()));
 
     QAction *aboutIsis = new QAction(this);
     aboutIsis->setMenuRole(QAction::NoRole);
     aboutIsis->setText("About Isis");
-    aboutIsis->setShortcut(Qt::CTRL + Qt::Key_I);
+    aboutIsis->setShortcut(Qt::CTRL | Qt::Key_I);
     helpMenu->addAction(aboutIsis);
     connect(aboutIsis, SIGNAL(triggered(bool)), this, SLOT(AboutIsis()));
   }
@@ -314,7 +314,7 @@ namespace Isis {
     QString processActionWhatsThisText = "<p><b>Function: </b> \
                       Runs the application with the current parameters</p> \
                       <p><b>Shortcut: </b> Ctrl+R</p>";
-    processAction->setShortcut(Qt::CTRL + Qt::Key_R);
+    processAction->setShortcut(Qt::CTRL | Qt::Key_R);
     processAction->setWhatsThis(processActionWhatsThisText);
 
     connect(processAction, SIGNAL(triggered(bool)), this, SLOT(StartProcess()));
@@ -401,7 +401,7 @@ namespace Isis {
     QString exitWhatsThisText = "<p><b>Function: </b> \
                Closes the program window </p> <p><b>Shortcut: </b> Ctrl+Q</p>";
     exitAction->setWhatsThis(exitWhatsThisText);
-    exitAction->setShortcut(Qt::CTRL + Qt::Key_Q);
+    exitAction->setShortcut(Qt::CTRL | Qt::Key_Q);
     connect(exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     return exitAction;
   }
@@ -433,7 +433,7 @@ namespace Isis {
     QString stopWhatsThisText = "<p><b>Function: </b> \
                 Stops the application from running</p> \
                 <p><b>Shortcut: </b> Ctrl+E</p>";
-    stopAction->setShortcut(Qt::CTRL + Qt::Key_E);
+    stopAction->setShortcut(Qt::CTRL | Qt::Key_E);
     stopAction->setWhatsThis(stopWhatsThisText);
     connect(stopAction, SIGNAL(triggered()), this, SLOT(StopProcessing()));
 
@@ -450,7 +450,7 @@ namespace Isis {
     QString saveWhatsThisText = "<p><b>Function: </b> Saves the information \
            currently in the log area to a file <p><b>Shortcut: </b> Ctrl+S</p>";
     saveLogAction->setWhatsThis(saveWhatsThisText);
-    saveLogAction->setShortcut(Qt::CTRL + Qt::Key_S);
+    saveLogAction->setShortcut(Qt::CTRL | Qt::Key_S);
     connect(saveLogAction, SIGNAL(triggered(bool)), p_log, SLOT(Save()));
 
     return saveLogAction;
@@ -467,7 +467,7 @@ namespace Isis {
         from the log area at the bottom of the application screen</p> \
         <p><b>Shortcut: </b> Ctrl+L</p>";
     clearlogAction->setWhatsThis(clearWhatsThisText);
-    clearlogAction->setShortcut(Qt::CTRL + Qt::Key_L);
+    clearlogAction->setShortcut(Qt::CTRL | Qt::Key_L);
     connect(clearlogAction, SIGNAL(triggered(bool)), p_log, SLOT(Clear()));
 
     return clearlogAction;
@@ -518,7 +518,7 @@ namespace Isis {
          descriptions of button functions and parameter information</p> \
          <p><b>Shortcut: </b> Shift+F1</p>";
     action->setWhatsThis(whatsThisText);
-    action->setShortcut(Qt::SHIFT + Qt::Key_F1);
+    action->setShortcut(Qt::SHIFT | Qt::Key_F1);
     connect(action, SIGNAL(triggered(bool)), this, SLOT(WhatsThis()));
 
     return action;

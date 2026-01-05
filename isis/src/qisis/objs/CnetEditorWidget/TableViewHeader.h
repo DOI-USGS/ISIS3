@@ -15,7 +15,6 @@ class QMouseEvent;
 class QPainter;
 class QPaintEvent;
 class QSize;
-class QStringList;
 template<typename T> class QList;
 
 

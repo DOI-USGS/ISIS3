@@ -7,6 +7,7 @@ find files of those names at the top level of this repository. **/
 #include <iostream>
 
 #include <QDebug>
+#include <QRegularExpression>
 
 #include "Stretch.h"
 #include "Histogram.h"
@@ -187,8 +188,8 @@ namespace Isis {
     std::pair<double, double> pear;
 
     QString p = pairs.simplified().trimmed();
-    p.replace(QRegExp("[\\s]*:"), ":");
-    p.replace(QRegExp(":[\\s]*"), ":");
+    p.replace(QRegularExpression("[\\s]*:"), ":");
+    p.replace(QRegularExpression(":[\\s]*"), ":");
     QStringList pairList = p.split(" ", Qt::SkipEmptyParts);
 
     try {

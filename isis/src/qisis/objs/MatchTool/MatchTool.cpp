@@ -644,7 +644,7 @@ namespace Isis {
     helpButton->setIconSize(QSize(22, 22));
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(openNetButton);
     layout->addWidget(saveAsNetButton);
     layout->addWidget(saveNetButton);

@@ -12,7 +12,6 @@ find files of those names at the top level of this repository. **/
 #include "AbstractTableModel.h"
 
 
-class QStringList;
 template< class T > class QList;
 
 

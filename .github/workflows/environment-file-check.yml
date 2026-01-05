@@ -29,7 +29,7 @@ jobs:
         id: check
         run: |
           # Required files
-          required_files=("environment.yml" "environment_arm.yml" "environment_arm_linux.yml" "recipe/meta.yaml")
+          required_files=("environment.yml" "environment_arm.yml" "recipe/meta.yaml")
 
           # Convert changed files to array
           readarray -t changed_array <<< "$changed_files"

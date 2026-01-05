@@ -679,7 +679,7 @@ namespace Isis {
 
     if (!validField) {
       QString msg = "Cannot test IsStatisticallyRelevant on Measure Data ["
-                    + QString(field) + "]";
+                    + QString::number(field) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

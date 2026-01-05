@@ -162,7 +162,7 @@ namespace Isis {
     connect(rubberBandTool(), SIGNAL(modeChanged()), this, SLOT(updateUnitsCombo()));
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_rubberBand);
     layout->addWidget(m_distLineEdit);
     layout->addWidget(m_unitsComboBox);

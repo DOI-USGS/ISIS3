@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
 #include <sstream>
 
 #include <QDebug>
+#include <QRegularExpression>
 #include <QScopedPointer>
 #include <QString>
 
@@ -757,7 +758,7 @@ namespace Isis {
    * @return QString Returns the formatted keyword
    */
   QString  ImportPdsTable::getFormattedName(const QString &colname) const {
-    QString cname = QString(colname).replace(QRegExp("[(),]"), " ").simplified();
+    QString cname = QString(colname).replace(QRegularExpression("[(),]"), " ").simplified();
 
     bool uppercase = true;
     QString oString;

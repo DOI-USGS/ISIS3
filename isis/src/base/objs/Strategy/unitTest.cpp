@@ -482,7 +482,7 @@ void IsisMain() {
 
   SharedResource elven4 = SharedResource(new Resource("Sindarin Plant Names",elvenPlantsObj));
 
-  QVariant elfPlants(elven4);
+  QVariant elfPlants = QVariant::fromValue(elven4);
 
 
   qDebug() << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << Qt::endl;

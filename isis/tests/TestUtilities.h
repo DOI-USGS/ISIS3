@@ -8,6 +8,7 @@
 
 #include <QString>
 #include <QVector>
+#include <QRegExp>
 
 #include "csm.h"
 

@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
   cerr << endl;
   cerr << "Testing cerr with QString and with QStringRef" << endl;
   cerr << QString("\tQString\n");
-  cerr << QString("\tQStringRef - FAIL!\n").leftRef(11) << endl;
+  cerr << QString("\tQStringRef - FAIL!\n").left(11) << endl;
 
   cerr << endl;
   cerr << "----------------------------------" << endl;

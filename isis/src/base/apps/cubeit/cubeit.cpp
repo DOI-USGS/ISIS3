@@ -187,7 +187,7 @@ namespace Isis {
 
       Progress *prog = m.Progress();
       prog->SetText("Adding bands from Cube " + toString((int)i + 1) +
-                    " of " + toString(newcubeList.size()));
+                    " of " + toString((int)newcubeList.size()));
       m.SetOutputCube("TO", ui);
 
       //update attributes to the input cube

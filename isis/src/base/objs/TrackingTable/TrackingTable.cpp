@@ -44,7 +44,7 @@ namespace Isis {
       int found = nameField.lastIndexOf(extension);
       if (found != -1) {
         // clear the packing characters - get only the file name
-        nameField.remove(found + 3);
+        nameField.remove(QString::number(found + 3));
       }
       FileName fileName(nameField);
       QString serialNumber = QString(record["SerialNumber"]);
@@ -129,7 +129,7 @@ namespace Isis {
     if (index >= (unsigned int)m_fileList.size()) {
       QString msg = "Cannot convert pixel [" + toString(pixel)
                   + "] to a filename, pixel is above valid maximum ["
-                  + toString(VALID_MINUI4 + m_fileList.size()) + "].";
+                  + toString((int)(VALID_MINUI4 + m_fileList.size())) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -179,7 +179,7 @@ namespace Isis {
     if (index >= (unsigned int)m_fileList.size()) {
       QString msg = "Cannot convert pixel [" + toString(pixel)
                   + "] to a serial number, pixel is above valid maximum ["
-                  + toString(VALID_MINUI4 + m_fileList.size()) + "].";
+                  + toString((int)(VALID_MINUI4 + m_fileList.size())) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

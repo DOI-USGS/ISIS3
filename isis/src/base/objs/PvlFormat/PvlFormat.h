@@ -9,6 +9,8 @@ find files of those names at the top level of this repository. **/
 #include <map>
 #include <string>
 
+#include <QRegularExpression>
+
 #include "Pvl.h"
 
 #include "PvlKeyword.h"
@@ -38,7 +40,7 @@ namespace Isis {
   inline KeywordType toKeywordType(const QString type) {
 
     QString t(type);
-    t = t.remove(QRegExp("[\\w_-\"'")).toUpper();
+    t = t.remove(QRegularExpression("[\"'\\s_-]")).toUpper();
 
     if(t == "STRING") return StringKeyword;
     else if(t == "BOOL") return BoolKeyword;

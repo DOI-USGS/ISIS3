@@ -291,7 +291,7 @@ namespace Isis {
 
         int threadCount = QThreadPool::globalInstance()->maxThreadCount();
         if (threaded && threadCount > 1) {
-          QFuture<void> result = QtConcurrent::mapped(begin, end,
+          QFuture<void*> result = QtConcurrent::mapped(begin, end,
               wrapperFunctor);
           BlockingReportProgress(result);
         }
@@ -729,7 +729,7 @@ namespace Isis {
        };
 
 
-      void BlockingReportProgress(QFuture<void> &future);
+      void BlockingReportProgress(QFuture<void*> &future);
       std::vector<int> CalculateMaxDimensions(std::vector<Cube *> cubes) const;
       bool PrepProcessCubeInPlace(Cube **cube, Brick **bricks);
       int PrepProcessCube(Brick **ibrick, Brick **obrick);

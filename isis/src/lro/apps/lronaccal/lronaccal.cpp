@@ -23,6 +23,7 @@ find files of those names at the top level of this repository. **/
 #include <fstream>
 #include <QTextStream>
 #include <QDir>
+#include <QRegularExpression>
 #include <QRegExp>
 #include <QString>
 #include <vector>
@@ -479,7 +480,7 @@ namespace Isis {
     TextFile file(filename.expanded());
     QString lineString;
     while(file.GetLine(lineString)) {
-      data.push_back(toDouble(lineString.split(QRegExp("[ ,;]")).first()));
+      data.push_back(toDouble(lineString.split(QRegularExpression("[ ,;]")).first()));
     }
     fileString = filename.original();
   }
@@ -503,9 +504,9 @@ namespace Isis {
     QString lineString;
     while(file.GetLine(lineString)) {
       vector<double> line;
-      lineString = lineString.simplified().remove(QRegExp("^[ ,]*")).trimmed();
+      lineString = lineString.simplified().remove(QRegularExpression("^[ ,]*")).trimmed();
 
-      QStringList lineTokens = lineString.split(QRegExp("[ ,]"), Qt::SkipEmptyParts);
+      QStringList lineTokens = lineString.split(QRegularExpression("[ ,]"), Qt::SkipEmptyParts);
       foreach (QString value, lineTokens) {
         line.push_back(toDouble(value));
       }

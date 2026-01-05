@@ -140,7 +140,7 @@ namespace Isis {
    */
   void PvlKeyword::setName(QString name) {
     QString final = name.trimmed();
-    if (final.contains(QRegExp("\\s"))) {
+    if (final.contains(QRegularExpression("\\s"))) {
       QString msg = "[" + name + "] is invalid. Keyword name cannot ";
       msg += "contain whitespace.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -1887,7 +1887,7 @@ namespace Isis {
       // read until \n (works for both \r\n and \n) or */
       while(is.good() &&
             (!lineOfData.size() || lineOfData[lineOfData.size() - 1] != '\n')) {
-        char next = is.get();
+        signed char next = is.get();
 
         // if non-ascii found then we're done... immediately
         if (next <= 0) {
@@ -1899,7 +1899,8 @@ namespace Isis {
         // if any errors (i.e. eof) happen in the get operation then don't
         //   store this data
         if (is.good()) {
-          lineOfData += next;
+          // Cast this back to char to handle signed issues with ARM
+          lineOfData += (char)next;
         }
 
         if (insideComment &&

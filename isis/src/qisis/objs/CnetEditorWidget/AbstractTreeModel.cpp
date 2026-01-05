@@ -199,7 +199,7 @@ namespace Isis {
       // away which of these we should use (why should we care) by using the
       // variable "someKindaPend" to store the appropriate method.
       void (QList<AbstractTreeItem *>::*someKindaPend)(
-        AbstractTreeItem * const &);
+        AbstractTreeItem *);
 
       someKindaPend = &QList<AbstractTreeItem *>::append;
       if (start == item2) {
@@ -566,7 +566,7 @@ namespace Isis {
   void AbstractTreeModel::rebuildItemsDone() {
     clear();
 
-    QAtomicPointer< RootItem > newRootPtr = m_rebuildWatcher->future();
+    QAtomicPointer< RootItem > newRootPtr = m_rebuildWatcher->future().result();
     RootItem *newRoot = newRootPtr.loadAcquire();
 
     if (newRoot && newRoot->childCount()) {

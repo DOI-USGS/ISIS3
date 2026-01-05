@@ -37,6 +37,7 @@ find files of those names at the top level of this repository. **/
 #include <QDataStream>
 #include <QFile>
 #include <QIODevice>
+#include <QRegularExpression>
 #include <QString>
 #include <QXmlInputSource>
 #include <QXmlStreamWriter>
@@ -1977,6 +1978,6 @@ void printXml(const BundleObservationSolveSettings &printable) {
   QXmlStreamWriter writer(&output);
   writer.setAutoFormatting(true);
   printable.save(writer, NULL);
-  output.remove(QRegExp("<id>[^<]*</id>"));
+  output.remove(QRegularExpression("<id>[^<]*</id>"));
   qDebug().noquote() << output << Qt::endl << Qt::endl;
 }

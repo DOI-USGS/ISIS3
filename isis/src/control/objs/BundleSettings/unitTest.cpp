@@ -11,7 +11,7 @@ find files of those names at the top level of this repository. **/
 #include <QDebug>
 #include <QFile>
 #include <QList>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QString>
 #include <QtDebug>
 #include <QXmlStreamWriter>
@@ -392,6 +392,6 @@ void printXml(const T &printable) {
   writer.setAutoFormatting(true);
   printable.save(writer, NULL);
   // needed to remove UUids from sub-object serialization.
-  output.remove(QRegExp("<id>[^<]*</id>"));
+  output.remove(QRegularExpression("<id>[^<]*</id>"));
   qDebug().noquote() << output << Qt::endl << Qt::endl;
 }

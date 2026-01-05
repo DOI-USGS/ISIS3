@@ -9,8 +9,6 @@ find files of those names at the top level of this repository. **/
 
 #include "ShapeModel.h"
 
-template<class T> class QVector;
-
 namespace Isis {
   class Cube;
   class Interpolator;

@@ -5,6 +5,11 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
+#include "lronac2isis.h"
+
+#include <vector>
+
+#include <QRegularExpression>
 
 #include "ProcessImportPds.h"
 #include "UserInterface.h"
@@ -16,10 +21,6 @@ find files of those names at the top level of this repository. **/
 #include "History.h"
 #include "LineManager.h"
 #include "Application.h"
-
-#include <vector>
-
-#include "lronac2isis.h"
 
 #define MAX_INPUT_VALUE 4095
 
@@ -75,7 +76,7 @@ namespace Isis {
         g_bterm.push_back(toDouble(btermKeyword[i]));
       }
 
-      double versionId = toDouble(lab.findKeyword("PRODUCT_VERSION_ID")[0].remove(QRegExp("^v")));
+      double versionId = toDouble(lab.findKeyword("PRODUCT_VERSION_ID")[0].remove(QRegularExpression("^v")));
       if(lab.findKeyword("FRAME_ID")[0] == "RIGHT" && versionId < 1.30)
         g_flip = true;
       else

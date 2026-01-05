@@ -124,7 +124,7 @@ namespace Isis {
 
       // Test if a regular expression is used
       if ( !m_regexp.isEmpty() ) {
-        if ( rvalue.contains( m_regexp ) ) {  return (1);  }
+        if ( m_regexp.indexIn( rvalue ) ) {  return (1);  }
       }
   
       // Check exclude list

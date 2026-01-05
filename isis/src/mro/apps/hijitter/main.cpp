@@ -8,6 +8,8 @@ find files of those names at the top level of this repository. **/
 
 #include "Isis.h"
 
+#include <QRegularExpression>
+
 #include "Camera.h"
 #include "CameraDetectorMap.h"
 #include "CameraFactory.h"
@@ -666,7 +668,7 @@ void ephemerisTimeFromJitterFile(const QString jitterFile, double & eTime1, doub
     csvArr = jitter.getRow(j);
     int iArrSize = csvArr.dim();
     for (int i=0; i<iArrSize; i++) {
-      csvArr[i] = csvArr[i].trimmed().remove(QRegExp("(^,*|,*$)"));
+      csvArr[i] = csvArr[i].trimmed().remove(QRegularExpression("(^,*|,*$)"));
       temp = toDouble(QString(csvArr[i]));
       if (!i && temp == 0) {
         break;

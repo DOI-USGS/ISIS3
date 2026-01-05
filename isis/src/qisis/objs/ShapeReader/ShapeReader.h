@@ -16,7 +16,6 @@
 template <typename A> class QFutureWatcher;
 class QMutex;
 class QProgressBar;
-class QStringList;
 class QVariant;
 
 namespace Isis {

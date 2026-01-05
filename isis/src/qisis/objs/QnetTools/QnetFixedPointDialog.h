@@ -9,7 +9,6 @@ class QListWidget;
 class QRadioButton;
 class QPushButton;
 class QString;
-class QStringList;
 
 namespace Isis {
   class ControlPoint;

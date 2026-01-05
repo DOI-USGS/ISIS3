@@ -9,7 +9,6 @@ find files of those names at the top level of this repository. **/
 
 #include <cstdio>
 #include <QString>
-#include <QRegExp>
 #include "FileList.h"
 #include "Brick.h"
 #include "OriginalLabel.h"

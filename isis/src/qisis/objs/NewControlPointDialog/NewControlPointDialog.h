@@ -11,7 +11,6 @@ class QListWidget;
 class QPushButton;
 class QRadioButton;
 class QString;
-class QStringList;
 
 namespace Isis {
   class ControlNet;

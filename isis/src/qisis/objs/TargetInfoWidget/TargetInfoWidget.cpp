@@ -269,7 +269,7 @@ namespace Isis {
     QFont font;
     font.setPointSize(9);
     font.setBold(true);
-    font.setWeight(75);
+    font.setWeight(QFont::Thin);
     m_ui->label->setFont(font);
     m_ui->label_6->setFont(font);
 

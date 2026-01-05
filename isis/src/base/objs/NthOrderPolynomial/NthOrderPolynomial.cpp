@@ -39,7 +39,7 @@ namespace Isis {
 
     if((int) vars.size() != Variables()) {
       QString mess = "Number of variables given (" + QString::number(vars.size())
-          + ") does not match expected (" + Variables() + ")!";
+          + ") does not match expected (" + QString::number(Variables()) + ")!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
     

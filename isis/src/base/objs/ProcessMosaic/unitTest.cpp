@@ -6,6 +6,8 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 #include "Isis.h"
 
+#include <QRegularExpression>
+
 #include "Application.h"
 #include "IString.h"
 #include "Portal.h"
@@ -544,7 +546,7 @@ void IsisMain() {
   }
   catch (IException &e) {
     QString message = e.toString();
-    qDebug().noquote() << message.replace(QRegExp("cube.*base/unitTestData"), "cube [base/unitTestData");
+    qDebug().noquote() << message.replace(QRegularExpression("cube.*base/unitTestData"), "cube [base/unitTestData");
     p.EndProcess();
     qDebug() << "";
   }

@@ -366,7 +366,7 @@ namespace Isis {
     if (m_controlNetFileLabel)
       actionLayout->addWidget(m_controlNetFileLabel);
 
-    actionLayout->setMargin(0);
+    actionLayout->setContentsMargins(0, 0, 0, 0);
 
     QWidget *toolBarWidget = new QWidget;
     toolBarWidget->setLayout(actionLayout);

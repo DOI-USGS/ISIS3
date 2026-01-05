@@ -12,9 +12,13 @@ find files of those names at the top level of this repository. **/
 #include <cstdlib>
 #include <iterator>//unique
 #include <iostream> // unique
-#include <QString>
 #include <sstream>
 #include <vector>
+
+#include <QDir>
+#include <QRegularExpression>
+#include <QString>
+
 #include "Brick.h"
 #include "Buffer.h"
 #include "Camera.h"
@@ -36,7 +40,6 @@ find files of those names at the top level of this repository. **/
 #include "UserInterface.h"
 #include "IException.h"
 #include "IString.h"
-#include <QDir>
 
 using namespace Isis;
 using namespace std;
@@ -506,7 +509,7 @@ void gbl::CreateBitweightStretch(FileName bitweightTable) {
     stretchPairs->GetLine(line);
     line = line.simplified().trimmed();
 
-    QStringList tokens = line.split(QRegExp("[, ]"), Qt::SkipEmptyParts);
+    QStringList tokens = line.split(QRegularExpression("[, ]"), Qt::SkipEmptyParts);
     foreach (QString token, tokens) {
       stretch2 = toDouble(token);
       gbl::stretch.AddPair(stretch1, stretch2);
@@ -1130,7 +1133,7 @@ FileName gbl::FindFlatFile() {
     slopeDB->GetLine(line);  //assigns value to line
     line = line.simplified();
     QStringList cols = line.split(" ");
-    cols.replaceInStrings(QRegExp("(^'|'$)"), "");
+    cols.replaceInStrings(QRegularExpression("(^'|'$)"), "");
 
     col1 = cols.takeFirst();
     if(col1 == gbl::cissLab->InstrumentId()) {

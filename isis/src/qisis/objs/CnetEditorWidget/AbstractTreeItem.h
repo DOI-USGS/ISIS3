@@ -37,8 +37,7 @@ namespace Isis {
    *                           image serial number. References #5434.
    */
   class AbstractTreeItem : public QObject {
-
-      Q_OBJECT
+    Q_OBJECT
 
     public:
       enum InternalPointerType {

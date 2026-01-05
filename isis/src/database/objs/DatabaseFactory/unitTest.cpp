@@ -10,12 +10,14 @@ find files of those names at the top level of this repository. **/
 #include "Database.h"
 #include "DatabaseFactory.h"
 #include "Preference.h"
+#include <QCoreApplication>
 
 using namespace std;
 using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
+  QCoreApplication app(argc, argv);
 
   DatabaseFactory *df = DatabaseFactory::getInstance();
   DbProfile p0("default profile");

@@ -25,7 +25,6 @@ find files of those names at the top level of this repository. **/
 
 #include <QProcess>
 #include <QDebug>
-#include <QRegExp>
 #include <string>
 #include <vector>
 #include <cmath>

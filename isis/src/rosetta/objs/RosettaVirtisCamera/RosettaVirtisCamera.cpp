@@ -69,10 +69,6 @@ namespace Isis {
     // Get the start time from labels
     QString channelId = inst["ChannelId"];
 
-    QString instMode = inst["InstrumentModeId"];
-    m_slitMode = instMode[14].toLatin1();   // "F" for full slit, Q for quarter slit
-
-
     // Check for presence of articulation kernel
     bool hasArtCK = hasArticulationKernel(lab);
 

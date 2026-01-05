@@ -246,7 +246,6 @@ void IsisMain() {
    SpiceInt frameCode = 0;
    try {
      auto [output, kernels] = SpiceQL::getTargetFrameInfo(301, mission.toLower().toStdString(), useWeb);
-     cout << output << endl;
      frameCode = output["frameCode"].get<SpiceInt>();
      frameName = output["frameName"].get<std::string>();
    } catch(std::invalid_argument) {

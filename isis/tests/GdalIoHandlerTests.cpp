@@ -501,12 +501,12 @@ TEST_F(ReadWriteTiff, GdalIoTestsWriteInt8) {
     FAIL() << "Failed to read tiff";
   }
 
-  EXPECT_EQ(((char *)dbuf)[0], HIGH_INSTR_SATS1);
-  EXPECT_EQ(((char *)dbuf)[1], HIGH_REPR_SATS1);
-  EXPECT_EQ(((char *)dbuf)[2], LOW_INSTR_SATS1);
-  EXPECT_EQ(((char *)dbuf)[3], LOW_REPR_SATS1);
-  EXPECT_EQ(((char *)dbuf)[4], NULLS1);
-  EXPECT_EQ(((char *)dbuf)[5], 50);
+  EXPECT_EQ(((signed char *)dbuf)[0], HIGH_INSTR_SATS1);
+  EXPECT_EQ(((signed char *)dbuf)[1], HIGH_REPR_SATS1);
+  EXPECT_EQ(((signed char *)dbuf)[2], LOW_INSTR_SATS1);
+  EXPECT_EQ(((signed char *)dbuf)[3], LOW_REPR_SATS1);
+  EXPECT_EQ(((signed char *)dbuf)[4], NULLS1);
+  EXPECT_EQ(((signed char *)dbuf)[5], 50);
 }
 
 TEST_F(ReadWriteTiff, GdalIoTestsWriteUInt8) {

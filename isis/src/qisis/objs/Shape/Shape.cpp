@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QMutexLocker>
+#include <QRegularExpression>
 #include <QScopedPointer>
 #include <QString>
 #include <QUuid>
@@ -103,8 +104,8 @@ namespace Isis {
     m_lineResolution = Null;
     m_sampleResolution = Null;
 
-    m_targetName = Null;
-    m_projectionName = Null;
+    m_targetName = "";
+    m_projectionName = "";
     m_pixelResolution = Null;
     m_scale = Null;
   }
@@ -441,7 +442,7 @@ namespace Isis {
    * @return A unique ID for this shape
    */
   QString Shape::id() const {
-    return m_id->toString().remove(QRegExp("[{}]"));
+    return m_id->toString().remove(QRegularExpression("[{}]"));
   }
 
 

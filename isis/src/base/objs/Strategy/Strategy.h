@@ -19,8 +19,6 @@ find files of those names at the top level of this repository. **/
 #include "Resource.h"
 #include "PvlObject.h"
 
-class QStringList;
-
 namespace Isis {
 
   class GisGeometry;

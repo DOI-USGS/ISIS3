@@ -7,7 +7,6 @@
 #include <QScopedPointer>
 
 class QAction;
-template< class T > class QVector;
 class QWidget;
 
 namespace Isis {

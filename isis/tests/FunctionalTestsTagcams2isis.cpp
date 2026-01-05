@@ -1,4 +1,5 @@
 #include <QString>
+#include <QLinkedList>
 
 #include "tagcams2isis.h"
 
@@ -123,6 +124,14 @@ TEST_F(TempTestingFiles, FunctionalTestTagcams2IsisNavCam) {
   EXPECT_EQ(int(origLabel["Bytes"]), 5638);
 }
 
+TEST(BananaTest, FunctionalTestBanana) {
+  int a=1, b=2, c=3;
+  std::vector<int> my_int_array = {a, b, c};
+  int &int_ref = my_int_array[0];
+  // my_int_array.push_back(4);
+  int_ref = 10;
+  std::cout << my_int_array[0] << ", " << int_ref << std::endl;
+}
 
 /**
    * FunctionalTestTagcams2IsisNavCamRemCalPixOff

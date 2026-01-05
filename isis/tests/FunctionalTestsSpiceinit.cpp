@@ -679,7 +679,7 @@ TEST_F(SmallCube, FunctionalTestSpiceinitCsminitRestorationOnFail) {
   isd["scale_sigma"] = 8.25832912882503;
   QString isdPath = tempDir.path() + "/default.json";
   std::ofstream file(isdPath.toStdString());
-  file << isd;
+  file << isd.dump(2);
   file.flush();
 
   QString cubeFile = testCube->fileName();

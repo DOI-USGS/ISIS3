@@ -20,6 +20,7 @@ find files of those names at the top level of this repository. **/
 #include "iTime.h"//???
 #include "Kernel.h"
 #include "Pvl.h"
+#include <curl/curl.h>
 
 class  KernelDbFixture_TestKernelsSmithOffset_Test;
 
@@ -121,6 +122,9 @@ namespace Isis {
       Kernel frame(Pvl &lab);
       Kernel instrumentAddendum(Pvl &lab);
       Kernel dem(Pvl &lab);
+      QString getDemTiffUrl(const Pvl &lab);
+
+      virtual std::string curlPostRequest(const std::string url, const std::string jsonData);
 
       Kernel findLast(const QString &entry, Pvl &lab);
       QList< std::priority_queue<Kernel> > findAll(const QString &entry,
@@ -156,6 +160,16 @@ namespace Isis {
       Pvl m_kernelData; /**< Pvl containing the information in the kernel
                              database(s) that is read in from the constructor
                              and whenever the loadSystemDb() method is called.*/
+
+      static size_t writeCallback(void* ptr, size_t size, size_t nmemb, void* userdata){
+          const size_t total = size * nmemb;
+          if (!ptr || !userdata || total == 0) return 0;
+
+          auto* response = static_cast<std::string*>(userdata);
+          response->append(static_cast<char*>(ptr), total);
+
+          return total;
+      }
   };
 };
 

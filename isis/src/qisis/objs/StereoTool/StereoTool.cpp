@@ -321,7 +321,7 @@ namespace Isis {
     connect( helpButton, SIGNAL( clicked() ), this, SLOT( showHelp() ));
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(AbstractPlotTool::createToolBarWidget(parent) );
     layout->addWidget(boxLabel);
     layout->addWidget(m_radiusBox);

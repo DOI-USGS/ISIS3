@@ -64,9 +64,9 @@ namespace Isis {
           band->SetScale(1);
           band->SetOffset(0);
           band->SetNoDataValue(noDataValue);
+          band->CreateMaskBand(GMF_ALPHA);
+          band->GetMaskBand()->Fill(255);
         }
-        dataset->CreateMaskBand(GMF_ALPHA);
-        dataset->GetRasterBand(1)->GetMaskBand()->Fill(255);
         dataset->Close();
       }
     }
@@ -137,14 +137,14 @@ namespace Isis {
         ((unsigned short *)dbuf)[5] = 1000;
       }
       else if (pixelType == SignedByte) {
-        dbuf = (void *)CPLMalloc(sizeof(char) * 6);
+        dbuf = (void *)CPLMalloc(sizeof(signed char) * 6);
 
-        ((char *)dbuf)[0] = HIGH_INSTR_SATS1;
-        ((char *)dbuf)[1] = HIGH_REPR_SATS1;
-        ((char *)dbuf)[2] = LOW_INSTR_SATS1;
-        ((char *)dbuf)[3] = LOW_REPR_SATS1;
-        ((char *)dbuf)[4] = NULLS1;
-        ((char *)dbuf)[5] = 50;
+        ((signed char *)dbuf)[0] = HIGH_INSTR_SATS1;
+        ((signed char *)dbuf)[1] = HIGH_REPR_SATS1;
+        ((signed char *)dbuf)[2] = LOW_INSTR_SATS1;
+        ((signed char *)dbuf)[3] = LOW_REPR_SATS1;
+        ((signed char *)dbuf)[4] = NULLS1;
+        ((signed char *)dbuf)[5] = 50;
       }
       else if (pixelType == UnsignedByte) {
         dbuf = (void *)CPLMalloc(sizeof(unsigned char) * 6);

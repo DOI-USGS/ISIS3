@@ -81,7 +81,7 @@ namespace Isis
     {
       QMouseEvent *m = (QMouseEvent *) e;
       QPoint currentPosition(m->pos());
-      Qt::MouseButton b = (Qt::MouseButton)(m->button() + m->modifiers());
+      Qt::MouseButton b = (Qt::MouseButton)(m->button() & m->modifiers());
 
       switch (e->type())
       {

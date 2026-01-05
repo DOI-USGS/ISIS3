@@ -172,13 +172,13 @@ namespace Isis {
     colorWidget->setLayout(displayLayout);
 
     QHBoxLayout *layout = new QHBoxLayout(stuff1);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(p_graySpin);
     layout->addStretch(1);
     stuff1->setLayout(layout);
 
     layout = new QHBoxLayout(stuff2);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(p_redSpin);
     layout->addWidget(p_grnSpin);
     layout->addWidget(p_bluSpin);
@@ -195,7 +195,7 @@ namespace Isis {
     vertLine->setFrameShadow(QFrame::Sunken);
 
     layout = new QHBoxLayout(hbox);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(p_rgbButton);
     layout->addWidget(p_blackwhiteButton);
     layout->addWidget(copyButton);

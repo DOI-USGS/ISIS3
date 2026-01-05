@@ -1,7 +1,7 @@
 #include <iostream>
 #include <time.h>
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QString>
 #include <nlohmann/json.hpp>
 
@@ -362,7 +362,7 @@ TEST_F(SmallCube, FunctionalTestIsisexportCurrentTime) {
   EXPECT_EQ(yearstr, line.substr(0, 4));
   // Check that the rest is the correct format
   // YYYY-MM-DDTHH:MM:SS
-  QRegExp timeRegex("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}");
+  QRegularExpression timeRegex("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}");
   EXPECT_TRUE(QString::fromStdString(line).contains(timeRegex)) << "String [" << line << "] "
                                                                 << "does not match the time format "
                                                                 << "[YYYY-MM-DDTHH:MM:SS].";

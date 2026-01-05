@@ -12,6 +12,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QProgressBar>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QUuid>
 #include <QtConcurrentMap>
@@ -371,7 +372,7 @@ namespace Isis {
 
       image += displayProps;
 
-      imageFileToNewId[fileName] = newId.toString().replace(QRegExp("[{}]"), "");
+      imageFileToNewId[fileName] = newId.toString().replace(QRegularExpression("[{}]"), "");
     }
 
     PvlObject &fileListOpts = project.findObject("MosaicFileList");

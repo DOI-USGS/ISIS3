@@ -10,11 +10,11 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include <QObject>
+#include <QVector>
+#include <QStringList>
 
-template< class A> class QVector;
 template< class A> class QList;
 class QString;
-class QStringList;
 class QVariant;
 
 namespace Isis {
@@ -31,7 +31,7 @@ namespace Isis {
    * This class is used to record a coordinate (measurement) on a cube
    * for a control point.
    *
-   * @ingroup ControlNetwork
+  * @ingroup ControlNetwork
    *
    * @author 2005-07-29 Jeff Anderson
    *

@@ -17,7 +17,7 @@ find files of those names at the top level of this repository. **/
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QSizePolicy>
 #include <QSplitter>
@@ -687,7 +687,7 @@ namespace Isis {
     }
     else {
       //  If no objectName, create unique identifier
-      QString newObjectName = QUuid::createUuid().toString().remove(QRegExp("[{}]"));
+      QString newObjectName = QUuid::createUuid().toString().remove(QRegularExpression("[{}]"));
       result->setObjectName(newObjectName);
     }
 
@@ -718,7 +718,7 @@ namespace Isis {
     }
     else {
       //  If no objectName, create unique identifier
-      QString newObjectName = QUuid::createUuid().toString().remove(QRegExp("[{}]"));
+      QString newObjectName = QUuid::createUuid().toString().remove(QRegularExpression("[{}]"));
       result->setObjectName(newObjectName);
     }
 
@@ -765,7 +765,7 @@ namespace Isis {
     }
     else {
       //  If no objectName, create unique identifier
-      QString newObjectName = QUuid::createUuid().toString().remove(QRegExp("[{}]"));
+      QString newObjectName = QUuid::createUuid().toString().remove(QRegularExpression("[{}]"));
       result->setObjectName(newObjectName);
     }
 
@@ -1036,7 +1036,7 @@ namespace Isis {
     }
     else {
       //  If no objectName, create unique identifier
-      QString newObjectName = QUuid::createUuid().toString().remove(QRegExp("[{}]"));
+      QString newObjectName = QUuid::createUuid().toString().remove(QRegularExpression("[{}]"));
       result->setObjectName(newObjectName);
     }
 

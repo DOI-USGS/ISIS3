@@ -1919,9 +1919,9 @@ namespace Isis {
         LinearAlgebra::Matrix *normalsBlock = it.value();
         if ( !normalsBlock ) {
           QString status = "\nmatrix block retrieval failure at column ";
-          status.append(columnIndex);
+          status.append(QString::number(columnIndex));
           status.append(", row ");
-          status.append(rowIndex);
+          status.append(QString::number(rowIndex));
           outputBundleStatus(status);
           status = "Total # of block columns: " + QString::number(numBlockcolumns);
           outputBundleStatus(status);

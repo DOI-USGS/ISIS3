@@ -5,7 +5,7 @@
 
 # Specify the required version of CMake.  If your machine does not
 #  have this, it should be easy to build from https://cmake.org/download/
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
 # Point cmake to our other CMake files.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
@@ -94,9 +94,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm6
   set(JP2KFLAG OFF)
 endif()
 
-# No docs support on Mac Arm. The xalan-c Arm package is not available on conda-forge.
-if (CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
-  message(STATUS "Building documentation is not available on Mac Arm.")
+# No docs support on Arm. The xalan-c Arm package is not available on conda-forge.
+if ((CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64") AND buildDocs)
+  message(WARNING "Building documentation is not available on Arm, forcing buildDocs to OFF")
   set(buildDocs OFF)
 endif()
 
@@ -178,8 +178,7 @@ endif()
 # sometimes third parties do not set their rpaths correctly
 set(thirdPartyCppFlags -Wall
                        -fPIC
-                       -fsigned-char
-                       -std=c++17
+                       -std=gnu++17
                        -DISIS_LITTLE_ENDIAN=1
                        -Wno-unused-parameter
                        -Wno-overloaded-virtual
@@ -191,11 +190,6 @@ set(thirdPartyCppFlags -Wall
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Append CPP flags set in the third party lib file to the string set in this file.
-string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
-
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
-
 if (NOT JP2KFLAG)
   # Pass the NO_JP2K flag to C++
   set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DNO_JP2K")
@@ -204,24 +198,24 @@ endif()
 # Flag to fix numeric literals problem with boost on linux
 # Add gold linker (and therefore, phtread) to speed up linux (spec. Ubuntu18.04) builds
 if(NOT APPLE)
-  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fuse-ld=gold
-	                                             -pthread
-					                                     -fext-numeric-literals
-                                               -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
+  set(thirdPartyCppFlags ${thirdPartyCppFlags} -pthread
+                                               -fext-numeric-literals
+                                               -Wl,-rpath,$ENV{CONDA_PREFIX}/lib
+                                               --param=max-vartrack-size=4500000)
 endif()
 
 # Append CPP flags set in the third party lib file to the string set in this file.
 string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" CACHE STRING "" FORCE)
 
 if(NOT CMAKE_BUILD_TYPE)
    set(CMAKE_BUILD_TYPE "RELEASE")
 endif()
 
 if(APPLE)
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0" CACHE STRING "" FORCE)
 else()
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Og")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Og"  CACHE STRING "" FORCE)
 endif()
 
 # Paths to required executables
@@ -229,37 +223,35 @@ if (buildDocs)
   find_program(XALAN Xalan REQUIRED)
 endif()
 
-find_program(LATEX latex)
+find_program(LATEX tectonic)
 find_program(DOXYGEN NAME doxygen PATH_SUFFIXES doxygen REQUIRED)
-find_program(UIC uic REQUIRED)
-find_program(MOC moc REQUIRED)
-find_program(RCC rcc REQUIRED)
+find_program(UIC uic PATH_SUFFIXES lib/qt6/ REQUIRED)
+find_program(MOC moc PATH_SUFFIXES lib/qt6/ REQUIRED)
+find_program(RCC rcc PATH_SUFFIXES lib/qt6/ REQUIRED)
 find_program(PROTOC protoc REQUIRED)
 
-find_package(Qt5 COMPONENTS
-                Core
-                Concurrent
-                Gui
-                Multimedia
-                MultimediaWidgets
-                Network
-                OpenGL # Needed to install mesa-common-dev for this!
-                PrintSupport
-                Qml
-                Quick
-                Script
-                ScriptTools
-                Sql
-                Svg
-                Test
-                WebChannel
-                Widgets
-                Xml
-                XmlPatterns
-                # Search this path explicitly for MacOS OpenGL Framework
-                PATHS /System/Library/Frameworks/ REQUIRED CONFIG)
+find_package(Qt6 COMPONENTS
+                 Core
+                 Concurrent
+                 Core5Compat
+                 Gui
+                 Multimedia
+                 MultimediaWidgets
+                 Network
+            		 OpenGL # Needed to install mesa-common-dev for this!
+                 PrintSupport
+                 Qml
+                 Quick
+                 Sql
+                 Svg
+                 Test
+                 WebChannel
+                 Widgets
+                 Xml
+                 # Search this path explicitly for MacOS OpenGL Framework
+                 PATHS /System/Library/Frameworks/ REQUIRED CONFIG)
 
-find_package(Boost 1.59.0 REQUIRED atomic
+find_package(Boost 1.59.0 REQUIRED      atomic
                                         log
                                         regex
                                         log_setup
@@ -274,7 +266,6 @@ find_package(Boost 1.59.0 REQUIRED atomic
                                         math_tr1
                                         math_tr1f
                                         math_tr1l
-                                        test_exec_monitor
                                         date_time
                                         thread
                                         exception
@@ -282,11 +273,10 @@ find_package(Boost 1.59.0 REQUIRED atomic
                                         filesystem
                                         prg_exec_monitor
                                         program_options
-                                        unit_test_framework
                                         iostreams
                                         wave
                                         random
-                                        wserialization)
+                                        wserialization CONFIG)
 
 find_package(Ale               REQUIRED)
 find_package(Json              REQUIRED)
@@ -303,10 +293,10 @@ find_package(GSL       2.2.1   REQUIRED)
 find_package(HDF5      1.8.15  REQUIRED)
 find_package(Jama      125     REQUIRED)
 find_package(NN                REQUIRED)
-find_package(OpenCV    3.1.0   REQUIRED)
+find_package(OpenCV    4.12.0  REQUIRED)
 find_package(PCL               REQUIRED)
 find_package(Protobuf          REQUIRED CONFIG)
-find_package(PROJ              REQUIRED)
+find_package(PROJ              REQUIRED CONFIG)
 find_package(Qwt       6       REQUIRED)
 find_package(SuperLU   4.3     REQUIRED)
 find_package(SpiceQL           REQUIRED)
@@ -359,7 +349,13 @@ foreach (_variableName ${_variableNames})
 endforeach()
 
 if (NOT OPENGL_XMESA_FOUND)
-	list(REMOVE_ITEM ALLINCDIRS OPENGL_xmesa_INCLUDE_DIR-NOTFOUND)
+  list(REMOVE_ITEM ALLINCDIRS OPENGL_xmesa_INCLUDE_DIR-NOTFOUND)
+endif()
+if (NOT OPENGL_GLES2_FOUND)
+  list(REMOVE_ITEM ALLINCDIRS OPENGL_GLES2_INCLUDE_DIR-NOTFOUND)
+endif()
+if (NOT OPENGL_GLES3_FOUND)
+  list(REMOVE_ITEM ALLINCDIRS OPENGL_GLES3_INCLUDE_DIR-NOTFOUND)
 endif()
 
 # get all Library variables
@@ -506,7 +502,7 @@ if (buildDocs)
                     -DLATEX=${LATEX}
                     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                     -DPACKAGE_VERSION=${PACKAGE_VERSION}
-                    -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
+                    -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocs.cmake)
 endif()
 
 # Add custom build target to copy modified header files to the build/incs directory.

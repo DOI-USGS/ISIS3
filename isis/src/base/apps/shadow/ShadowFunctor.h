@@ -2,10 +2,11 @@
 #define ShadowFunctor_H
 
 // Default argument requires knowledge of the type
+#include <QPair>
+
 #include "Distance.h"
 
 template <typename A, typename B> class QHash;
-template <typename A, typename B> struct QPair;
 
 namespace Isis {
   class Buffer;

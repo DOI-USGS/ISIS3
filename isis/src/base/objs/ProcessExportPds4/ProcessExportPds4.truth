@@ -10,7 +10,85 @@ Testing default CaSSIS export
 <?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>0</offset>
+<Product_Observational>
+ <Identification_Area>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Modification_History>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+  </Modification_History>
+ </Identification_Area>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2016-11-26T22:32:39.582Z</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582Z</stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>TRACE GAS ORBITER</name>
+   <type>Mission</type>
+   <Internal_Reference>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+   </Internal_Reference>
+  </Investigation_Area>
+  <Observing_System>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <img:Imaging>
+    <img:Imaging_Instrument_Parameters>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+    </img:Imaging_Instrument_Parameters>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+    </Local_Internal_Reference>
+    <img:Image_Product_Information>
+     <img:Filter>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+     </img:Filter>
+    </img:Image_Product_Information>
+   </img:Imaging>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+ </Observation_Area>
+ <File_Area_Observational>
+  <Array_2D_Image>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
    <Element_Array>
@@ -42,7 +120,90 @@ Testing default CaSSIS export
 <?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>0</offset>
+<Product_Observational>
+ <Identification_Area>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Modification_History>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>tbd</modification_date>
+    <version_id>1.0</version_id>
+    <description>Test history entry.</description>
+   </Modification_Detail>
+  </Modification_History>
+ </Identification_Area>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2016-11-26T22:32:39.582Z</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582Z</stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>TRACE GAS ORBITER</name>
+   <type>Mission</type>
+   <Internal_Reference>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+   </Internal_Reference>
+  </Investigation_Area>
+  <Observing_System>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <img:Imaging>
+    <img:Imaging_Instrument_Parameters>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+    </img:Imaging_Instrument_Parameters>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+    </Local_Internal_Reference>
+    <img:Image_Product_Information>
+     <img:Filter>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+     </img:Filter>
+    </img:Image_Product_Information>
+   </img:Imaging>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+ </Observation_Area>
+ <File_Area_Observational>
+  <Array_2D_Image>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
    <Element_Array>
@@ -78,7 +239,85 @@ Testing export pixel types
 <?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>0</offset>
+<Product_Observational>
+ <Identification_Area>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Modification_History>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+  </Modification_History>
+ </Identification_Area>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2016-11-26T22:32:39.582Z</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582Z</stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>TRACE GAS ORBITER</name>
+   <type>Mission</type>
+   <Internal_Reference>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+   </Internal_Reference>
+  </Investigation_Area>
+  <Observing_System>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <img:Imaging>
+    <img:Imaging_Instrument_Parameters>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+    </img:Imaging_Instrument_Parameters>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+    </Local_Internal_Reference>
+    <img:Image_Product_Information>
+     <img:Filter>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+     </img:Filter>
+    </img:Image_Product_Information>
+   </img:Imaging>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+ </Observation_Area>
+ <File_Area_Observational>
+  <Array_2D_Image>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
    <Element_Array>
@@ -112,7 +351,155 @@ Testing export pixel types
 <?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>0</offset>
+<Product_Observational>
+ <Identification_Area>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Modification_History>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+  </Modification_History>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+ </Identification_Area>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2016-11-26T22:32:39.582ZZ</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582ZZ</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>TRACE GAS ORBITER</name>
+   <type>Mission</type>
+   <Internal_Reference>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+   </Internal_Reference>
+   <name>TRACE GAS ORBITER</name>
+  </Investigation_Area>
+  <Observing_System>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <img:Imaging>
+    <img:Imaging_Instrument_Parameters>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+    </img:Imaging_Instrument_Parameters>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+    </Local_Internal_Reference>
+    <img:Image_Product_Information>
+     <img:Filter>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+     </img:Filter>
+    </img:Image_Product_Information>
+   </img:Imaging>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+ </Observation_Area>
+ <File_Area_Observational>
+  <Array_2D_Image>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Element_Array>
+    <data_type>SignedMSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>SignedLSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-32768</missing_constant>
+    <high_instrument_saturation>-32765</high_instrument_saturation>
+    <high_representation_saturation>-32764</high_representation_saturation>
+    <low_instrument_saturation>-32766</low_instrument_saturation>
+    <low_representation_saturation>-32767</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
    <Axis_Array>
@@ -143,7 +530,220 @@ Testing export pixel types
 <?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>0</offset>
+<Product_Observational>
+ <Identification_Area>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Modification_History>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+  </Modification_History>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+ </Identification_Area>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2016-11-26T22:32:39.582ZZZ</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582ZZZ</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>TRACE GAS ORBITER</name>
+   <type>Mission</type>
+   <Internal_Reference>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+   </Internal_Reference>
+   <name>TRACE GAS ORBITER</name>
+   <name>TRACE GAS ORBITER</name>
+  </Investigation_Area>
+  <Observing_System>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <img:Imaging>
+    <img:Imaging_Instrument_Parameters>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+    </img:Imaging_Instrument_Parameters>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+    </Local_Internal_Reference>
+    <img:Image_Product_Information>
+     <img:Filter>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+     </img:Filter>
+    </img:Image_Product_Information>
+   </img:Imaging>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+ </Observation_Area>
+ <File_Area_Observational>
+  <Array_2D_Image>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Element_Array>
+    <data_type>SignedMSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>SignedLSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>IEEE754MSBSingle</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-32768</missing_constant>
+    <high_instrument_saturation>-32765</high_instrument_saturation>
+    <high_representation_saturation>-32764</high_representation_saturation>
+    <low_instrument_saturation>-32766</low_instrument_saturation>
+    <low_representation_saturation>-32767</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-32768</missing_constant>
+    <high_instrument_saturation>-32765</high_instrument_saturation>
+    <high_representation_saturation>-32764</high_representation_saturation>
+    <low_instrument_saturation>-32766</low_instrument_saturation>
+    <low_representation_saturation>-32767</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
    <Axis_Array>
@@ -176,7 +776,285 @@ Testing export pixel types
 <?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>0</offset>
+<Product_Observational>
+ <Identification_Area>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Modification_History>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+  </Modification_History>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+ </Identification_Area>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2016-11-26T22:32:39.582ZZZZ</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582ZZZZ</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>TRACE GAS ORBITER</name>
+   <type>Mission</type>
+   <Internal_Reference>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+   </Internal_Reference>
+   <name>TRACE GAS ORBITER</name>
+   <name>TRACE GAS ORBITER</name>
+   <name>TRACE GAS ORBITER</name>
+  </Investigation_Area>
+  <Observing_System>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <img:Imaging>
+    <img:Imaging_Instrument_Parameters>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+    </img:Imaging_Instrument_Parameters>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+    </Local_Internal_Reference>
+    <img:Image_Product_Information>
+     <img:Filter>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+     </img:Filter>
+    </img:Image_Product_Information>
+   </img:Imaging>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+ </Observation_Area>
+ <File_Area_Observational>
+  <Array_2D_Image>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Element_Array>
+    <data_type>SignedMSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>SignedLSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>IEEE754MSBSingle</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>UnsignedMSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-32768</missing_constant>
+    <high_instrument_saturation>-32765</high_instrument_saturation>
+    <high_representation_saturation>-32764</high_representation_saturation>
+    <low_instrument_saturation>-32766</low_instrument_saturation>
+    <low_representation_saturation>-32767</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-32768</missing_constant>
+    <high_instrument_saturation>-32765</high_instrument_saturation>
+    <high_representation_saturation>-32764</high_representation_saturation>
+    <low_instrument_saturation>-32766</low_instrument_saturation>
+    <low_representation_saturation>-32767</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-3.40282265508890445e+38</missing_constant>
+    <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
+    <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
+    <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
+    <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
    <Axis_Array>
@@ -211,7 +1089,350 @@ Testing export pixel types
 <?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>0</offset>
+<Product_Observational>
+ <Identification_Area>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Modification_History>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+  </Modification_History>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+ </Identification_Area>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2016-11-26T22:32:39.582ZZZZZ</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582ZZZZZ</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>TRACE GAS ORBITER</name>
+   <type>Mission</type>
+   <Internal_Reference>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+   </Internal_Reference>
+   <name>TRACE GAS ORBITER</name>
+   <name>TRACE GAS ORBITER</name>
+   <name>TRACE GAS ORBITER</name>
+   <name>TRACE GAS ORBITER</name>
+  </Investigation_Area>
+  <Observing_System>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <img:Imaging>
+    <img:Imaging_Instrument_Parameters>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+    </img:Imaging_Instrument_Parameters>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+    </Local_Internal_Reference>
+    <img:Image_Product_Information>
+     <img:Filter>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+     </img:Filter>
+    </img:Image_Product_Information>
+   </img:Imaging>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+ </Observation_Area>
+ <File_Area_Observational>
+  <Array_2D_Image>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Element_Array>
+    <data_type>SignedMSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>SignedLSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>IEEE754MSBSingle</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>UnsignedMSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>UnsignedLSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-32768</missing_constant>
+    <high_instrument_saturation>-32765</high_instrument_saturation>
+    <high_representation_saturation>-32764</high_representation_saturation>
+    <low_instrument_saturation>-32766</low_instrument_saturation>
+    <low_representation_saturation>-32767</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-32768</missing_constant>
+    <high_instrument_saturation>-32765</high_instrument_saturation>
+    <high_representation_saturation>-32764</high_representation_saturation>
+    <low_instrument_saturation>-32766</low_instrument_saturation>
+    <low_representation_saturation>-32767</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-3.40282265508890445e+38</missing_constant>
+    <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
+    <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
+    <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
+    <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>0</missing_constant>
+    <high_instrument_saturation>65534</high_instrument_saturation>
+    <high_representation_saturation>65535</high_representation_saturation>
+    <low_instrument_saturation>2</low_instrument_saturation>
+    <low_representation_saturation>1</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
    <Axis_Array>
@@ -248,7 +1469,415 @@ Testing export pixel types
 <?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>0</offset>
+<Product_Observational>
+ <Identification_Area>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Modification_History>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+  </Modification_History>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+ </Identification_Area>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2016-11-26T22:32:39.582ZZZZZZ</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582ZZZZZZ</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+   <start_date_time>2016-11-26T22:32:39.582</start_date_time>
+   <stop_date_time>2016-11-26T22:32:39.582</stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>TRACE GAS ORBITER</name>
+   <type>Mission</type>
+   <Internal_Reference>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+   </Internal_Reference>
+   <name>TRACE GAS ORBITER</name>
+   <name>TRACE GAS ORBITER</name>
+   <name>TRACE GAS ORBITER</name>
+   <name>TRACE GAS ORBITER</name>
+   <name>TRACE GAS ORBITER</name>
+  </Investigation_Area>
+  <Observing_System>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <img:Imaging>
+    <img:Imaging_Instrument_Parameters>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+    </img:Imaging_Instrument_Parameters>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+    </Local_Internal_Reference>
+    <img:Image_Product_Information>
+     <img:Filter>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+     </img:Filter>
+    </img:Image_Product_Information>
+   </img:Imaging>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+ </Observation_Area>
+ <File_Area_Observational>
+  <Array_2D_Image>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Element_Array>
+    <data_type>SignedMSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>SignedLSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>IEEE754MSBSingle</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>UnsignedMSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>UnsignedLSB2</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Element_Array>
+    <data_type>UnsignedByte</data_type>
+    <scaling_factor>1.0</scaling_factor>
+    <value_offset>0.0</value_offset>
+   </Element_Array>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-32768</missing_constant>
+    <high_instrument_saturation>-32765</high_instrument_saturation>
+    <high_representation_saturation>-32764</high_representation_saturation>
+    <low_instrument_saturation>-32766</low_instrument_saturation>
+    <low_representation_saturation>-32767</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-32768</missing_constant>
+    <high_instrument_saturation>-32765</high_instrument_saturation>
+    <high_representation_saturation>-32764</high_representation_saturation>
+    <low_instrument_saturation>-32766</low_instrument_saturation>
+    <low_representation_saturation>-32767</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-3.40282265508890445e+38</missing_constant>
+    <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
+    <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
+    <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
+    <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>0</missing_constant>
+    <high_instrument_saturation>65534</high_instrument_saturation>
+    <high_representation_saturation>65535</high_representation_saturation>
+    <low_instrument_saturation>2</low_instrument_saturation>
+    <low_representation_saturation>1</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>0</missing_constant>
+    <high_instrument_saturation>65534</high_instrument_saturation>
+    <high_representation_saturation>65535</high_representation_saturation>
+    <low_instrument_saturation>2</low_instrument_saturation>
+    <low_representation_saturation>1</low_representation_saturation>
+   </Special_Constants>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
    <Axis_Array>
@@ -277,7 +1906,85 @@ Testing missing start and end times
 <?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>0</offset>
+<Product_Observational>
+ <Identification_Area>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Modification_History>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+  </Modification_History>
+ </Identification_Area>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time></start_date_time>
+   <stop_date_time></stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>TRACE GAS ORBITER</name>
+   <type>Mission</type>
+   <Internal_Reference>
+    <lid_reference>urn:nasa:pds:TBD</lid_reference>
+    <reference_type>data_to_investigation</reference_type>
+   </Internal_Reference>
+  </Investigation_Area>
+  <Observing_System>
+   <name>TRACE GAS ORBITER CaSSIS</name>
+   <Observing_System_Component>
+    <name>TRACE GAS ORBITER</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>CaSSIS</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <img:Imaging>
+    <img:Imaging_Instrument_Parameters>
+     <img:exposure_duration unit="s">1.920e-003</img:exposure_duration>
+    </img:Imaging_Instrument_Parameters>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>imaging_parameters_to_image_object</local_reference_type>
+    </Local_Internal_Reference>
+    <img:Image_Product_Information>
+     <img:Filter>
+      <img:filter_name>BLU</img:filter_name>
+      <img:filter_id>BLU</img:filter_id>
+      <img:bandwidth unit="nm">165</img:bandwidth>
+      <img:center_filter_wavelength unit="nm">485</img:center_filter_wavelength>
+     </img:Filter>
+    </img:Image_Product_Information>
+   </img:Imaging>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+ </Observation_Area>
+ <File_Area_Observational>
+  <Array_2D_Image>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
    <Element_Array>
@@ -312,7 +2019,87 @@ Testing exporting a map projected product
 <?xml-model href="http://pds.nasa.gov/pds4/cart/v1/PDS4_CART_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>0</offset>
+<Product_Observational>
+ <Identification_Area>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS cube.</title>
+  <information_model_version>1.11.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Modification_History>
+   <Modification_Detail>
+    <modification_date>2025-12-17</modification_date>
+    <version_id>1.0</version_id>
+    <description>Created PDS4 output product from ISIS cube with the unitTest application from ISIS version 9.0.0 .</description>
+   </Modification_Detail>
+  </Modification_History>
+ </Identification_Area>
+ <Observation_Area>
+  <Target_Identification>
+   <name>Mars</name>
+   <type>Planet</type>
+  </Target_Identification>
+  <Discipline_Area>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>Image_Array_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+   <cart:Cartography>
+    <cart:Spatial_Domain>
+     <cart:Bounding_Coordinates>
+      <cart:west_bounding_coordinate unit="deg">75.699918597186</cart:west_bounding_coordinate>
+      <cart:east_bounding_coordinate unit="deg">76.099751932323</cart:east_bounding_coordinate>
+      <cart:north_bounding_coordinate unit="deg">-82.199997698583</cart:north_bounding_coordinate>
+      <cart:south_bounding_coordinate unit="deg">-82.599831033721</cart:south_bounding_coordinate>
+     </cart:Bounding_Coordinates>
+    </cart:Spatial_Domain>
+    <cart:Spatial_Reference_Information>
+     <cart:Horizontal_Coordinate_System_Definition>
+      <cart:Planar>
+       <cart:Map_Projection>
+        <cart:map_projection_name>Simple Cylindrical</cart:map_projection_name>
+        <cart:Simple_Cylindrical>
+         <cart:longitude_of_central_meridian unit="deg">75.944711073677</cart:longitude_of_central_meridian>
+        </cart:Simple_Cylindrical>
+       </cart:Map_Projection>
+       <cart:Planar_Coordinate_Information>
+        <cart:planar_coordinate_encoding_method>Coordinate Pair</cart:planar_coordinate_encoding_method>
+        <cart:Coordinate_Representation>
+         <cart:pixel_resolution_x unit="m/pixel">10.0</cart:pixel_resolution_x>
+         <cart:pixel_resolution_y unit="m/pixel">10.0</cart:pixel_resolution_y>
+         <cart:pixel_scale_x unit="pixel/deg">5927.4697523306</cart:pixel_scale_x>
+         <cart:pixel_scale_y unit="pixel/deg">5927.4697523306</cart:pixel_scale_y>
+        </cart:Coordinate_Representation>
+       </cart:Planar_Coordinate_Information>
+       <cart:Geo_Transformation>
+        <cart:upperleft_corner_x unit="m">-14510.0</cart:upperleft_corner_x>
+        <cart:upperleft_corner_y unit="m">-4872380.0</cart:upperleft_corner_y>
+       </cart:Geo_Transformation>
+      </cart:Planar>
+      <cart:Geodetic_Model>
+       <cart:latitude_type>planetocentric</cart:latitude_type>
+       <cart:semi_major_radius unit="m">3396190.0</cart:semi_major_radius>
+       <cart:semi_minor_radius unit="m">3396190.0</cart:semi_minor_radius>
+       <cart:polar_radius unit="m">3376200.0</cart:polar_radius>
+       <cart:longitude_direction>Positive East</cart:longitude_direction>
+      </cart:Geodetic_Model>
+     </cart:Horizontal_Coordinate_System_Definition>
+    </cart:Spatial_Reference_Information>
+   </cart:Cartography>
+  </Discipline_Area>
+ </Observation_Area>
+ <File_Area_Observational>
+  <Array_2D_Image>
+   <local_identifier>Image_Array_Object</local_identifier>
+   <offset unit="byte">0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
    <Element_Array>

@@ -82,7 +82,7 @@ namespace Isis {
   }
 
   /** Returns the FITS label in a object name specified in the constructor */
-  PvlObject NirsImportFits::label() const {
+  PvlGroup NirsImportFits::label() const {
     return (m_label);
   }
 
@@ -159,27 +159,27 @@ namespace Isis {
   void NirsImportFits::init() {
     m_file = "";
     m_lines = m_samples = m_bands = 0;
-    m_label = PvlObject("FitsLabel");
+    m_label = PvlGroup("FitsLabel");
     return;
   }
 
-/**
- * @brief Import a FITS label in to PvlGroup
- *
- * @author 2013-11-07 kbecker
- *
- * @param input        Input stream to read label from
- * @param fitLabelName Name of group to parse and store FITS label into
- *
- * @return PvlObject Returns the FITS keywords in this object
- */
-  PvlObject NirsImportFits::parseLabel(std::ifstream &input,
+  /**
+    * @brief Import a FITS label in to PvlGroup
+    *
+    * @author 2013-11-07 kbecker
+    *
+    * @param input        Input stream to read label from
+    * @param fitLabelName Name of group to parse and store FITS label into
+    *
+    * @return PvlObject Returns the FITS keywords in this object
+    */
+  PvlGroup NirsImportFits::parseLabel(std::ifstream &input,
                                   const QString &fitLabelName) {
 
     char reading[81];
     IString line = "";
     unsigned int place = 0;
-    PvlObject labels(fitLabelName);
+    PvlGroup labels(fitLabelName);
 
     // Load first line
     input.seekg(0);

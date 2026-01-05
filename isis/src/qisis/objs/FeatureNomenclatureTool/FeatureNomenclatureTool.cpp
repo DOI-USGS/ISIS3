@@ -339,7 +339,7 @@ namespace Isis {
     m_queryingProgress->setRange(0, 0);
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_findNomenclatureCheckBox);
     layout->addWidget(foundFeaturesLabel);
     layout->addWidget(m_foundFeaturesCombo);

@@ -10,6 +10,8 @@ find files of those names at the top level of this repository. **/
 
 #include <map>
 
+#include <QRegularExpression>
+
 #include "Application.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
@@ -404,7 +406,7 @@ void IsisMain() {
       // column 4 = point id, begins at 73rd char and is 7 characters
       QString pid = currLine.mid(72);
       // remove any white space from beginning of string
-      pid = pid.remove(QRegExp("^ *"));
+      pid = pid.remove(QRegularExpression("^ *"));
       if (pid.length() > 7) {
         QString msg = "Invalid value(s) in RAND PPP file [";
         msg += ui.GetAsString("PPP") + "] at line [" + toString(line);

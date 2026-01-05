@@ -80,8 +80,8 @@ namespace Isis {
       const PvlGroup &group(const int index) const;
 
       //! The counter for groups.
-      typedef QList<Isis::PvlGroup>::iterator PvlGroupIterator;
-      typedef QList<Isis::PvlGroup>::const_iterator ConstPvlGroupIterator;
+      typedef QLinkedList<Isis::PvlGroup>::iterator PvlGroupIterator;
+      typedef QLinkedList<Isis::PvlGroup>::const_iterator ConstPvlGroupIterator;
 
 
       /**
@@ -224,8 +224,8 @@ namespace Isis {
       const PvlObject &object(const int index) const;
 
       //! The counter for objects.
-      typedef QList<PvlObject>::iterator PvlObjectIterator;
-      typedef QList<PvlObject>::const_iterator ConstPvlObjectIterator;
+      typedef QLinkedList<PvlObject>::iterator PvlObjectIterator;
+      typedef QLinkedList<PvlObject>::const_iterator ConstPvlObjectIterator;
 
 
       /**
@@ -305,8 +305,9 @@ namespace Isis {
        * @param object The PvlObject to add.
        */
       void addObject(const PvlObject &object) {
+        PvlObject obj(object);
         m_objects.push_back(object);
-        m_objects[m_objects.size()-1].setFileName(fileName());
+        m_objects.last().setFileName(fileName());
       }
 
       void deleteObject(const QString &name);
@@ -350,9 +351,9 @@ namespace Isis {
       void validateObject(PvlObject & pPvlObj);
 
     private:
-      QList<PvlObject> m_objects;    /**<A vector of PvlObjects contained
+      QLinkedList<PvlObject> m_objects;    /**<A vector of PvlObjects contained
                                                 in the current PvlObject. */
-      QList<PvlGroup> m_groups;/**<A vector of PvlGroups contained
+      QLinkedList<PvlGroup> m_groups;/**<A vector of PvlGroups contained
                                                 in the current PvlObject. */
   };
 }

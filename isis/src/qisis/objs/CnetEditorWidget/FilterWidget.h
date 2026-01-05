@@ -18,7 +18,6 @@ find files of those names at the top level of this repository. **/
 
 class QLabel;
 template< class T > class QList;
-template< typename U, typename V > struct QPair;
 class QPushButton;
 class QString;
 class QTextEdit;

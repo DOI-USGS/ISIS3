@@ -15,7 +15,6 @@ class QListWidgetItem;
 class QPushButton;
 class QStackedWidget;
 class QString;
-class QStringList;
 class QVBoxLayout;
 
 

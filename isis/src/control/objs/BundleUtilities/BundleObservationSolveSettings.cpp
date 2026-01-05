@@ -1274,31 +1274,31 @@ namespace Isis {
         }
       }
       else if (xmlReader->qualifiedName() == "instrumentPointingOptions") {
-        QStringRef solveOption = xmlReader->attributes().value("solveOption");
+        QStringView solveOption = xmlReader->attributes().value("solveOption");
         if (!solveOption.isEmpty()) {
           m_instrumentPointingSolveOption = stringToInstrumentPointingSolveOption(solveOption.toString());
         }
-        QStringRef numberCoefSolved = xmlReader->attributes().value("numberCoefSolved");
+        QStringView numberCoefSolved = xmlReader->attributes().value("numberCoefSolved");
         if (!numberCoefSolved.isEmpty()) {
           m_numberCamAngleCoefSolved = numberCoefSolved.toInt();
         }
-        QStringRef degree = xmlReader->attributes().value("degree");
+        QStringView degree = xmlReader->attributes().value("degree");
         if (!degree.isEmpty()) {
           m_ckDegree = degree.toInt();
         }
-        QStringRef solveDegree = xmlReader->attributes().value("solveDegree");
+        QStringView solveDegree = xmlReader->attributes().value("solveDegree");
         if (!solveDegree.isEmpty()) {
          m_ckSolveDegree = solveDegree.toInt();
         }
-        QStringRef solveTwist = xmlReader->attributes().value("solveTwist");
+        QStringView solveTwist = xmlReader->attributes().value("solveTwist");
         if (!solveTwist.isEmpty()) {
           m_solveTwist = toBool(solveTwist.toString());
         }
-        QStringRef solveOverExisting = xmlReader->attributes().value("solveOverExisting");
+        QStringView solveOverExisting = xmlReader->attributes().value("solveOverExisting");
         if (!solveOverExisting.isEmpty()) {
           m_solvePointingPolynomialOverExisting = toBool(solveOverExisting.toString());
         }
-        QStringRef interpolationType = xmlReader->attributes().value("interpolationType");
+        QStringView interpolationType = xmlReader->attributes().value("interpolationType");
         if (!interpolationType.isEmpty()) {
           if (interpolationType == "3") {
             m_pointingInterpolationType = SpiceRotation::PolyFunction;
@@ -1336,27 +1336,27 @@ namespace Isis {
         }
       }
       else if (xmlReader->qualifiedName() == "instrumentPositionOptions") {
-        QStringRef solveOption = xmlReader->attributes().value("solveOption");
+        QStringView solveOption = xmlReader->attributes().value("solveOption");
         if (!solveOption.isEmpty()) {
           m_instrumentPositionSolveOption = stringToInstrumentPositionSolveOption(solveOption.toString());
         }
-        QStringRef numberCoefSolved = xmlReader->attributes().value("numberCoefSolved");
+        QStringView numberCoefSolved = xmlReader->attributes().value("numberCoefSolved");
         if (!numberCoefSolved.isEmpty()) {
           m_numberCamPosCoefSolved = numberCoefSolved.toInt();
         }
-        QStringRef degree = xmlReader->attributes().value("degree");
+        QStringView degree = xmlReader->attributes().value("degree");
         if (!degree.isEmpty()) {
           m_spkDegree = degree.toInt();
         }
-        QStringRef solveDegree = xmlReader->attributes().value("solveDegree");
+        QStringView solveDegree = xmlReader->attributes().value("solveDegree");
         if (!solveDegree.isEmpty()) {
          m_spkSolveDegree = solveDegree.toInt();
         }
-        QStringRef solveOverHermiteSpline = xmlReader->attributes().value("solveOverHermiteSpline");
+        QStringView solveOverHermiteSpline = xmlReader->attributes().value("solveOverHermiteSpline");
         if (!solveOverHermiteSpline.isEmpty()) {
           m_solvePositionOverHermiteSpline = toBool(solveOverHermiteSpline.toString());
         }
-        QStringRef interpolationType = xmlReader->attributes().value("interpolationType");
+        QStringView interpolationType = xmlReader->attributes().value("interpolationType");
         if (!interpolationType.isEmpty()) {
           if (interpolationType == "3") {
             m_positionInterpolationType = SpicePosition::PolyFunction;

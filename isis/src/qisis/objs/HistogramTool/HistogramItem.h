@@ -6,11 +6,10 @@
 #include <qcolor.h>
 
 #include "qwt_plot_item.h"
+#include "qwt_series_data.h"
 #include "CubeViewport.h"
 
 class QRectF;
-
-class QwtIntervalSeriesData; 
 
 namespace Isis {
   /**

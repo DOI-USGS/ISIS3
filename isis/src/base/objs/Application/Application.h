@@ -151,7 +151,7 @@ namespace Isis {
       QLocalSocket *p_connectionToParent; //!<
       time_t p_startTime;                 //!<
       clock_t p_startClock;               //!<
-      QElapsedTimer m_connectTime;                //!< Used to calculate program's run time
+      QElapsedTimer m_connectTime;        //!< Used to calculate program's run time
       QString p_datetime;                 //!<
       int p_startDirectIO;                //!<
       int p_startPageFaults;              //!<

@@ -166,7 +166,7 @@ namespace Isis {
     QLabel *resolutionLabel = new QLabel("Meters per pixel");
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(zoomInButton);
     layout->addWidget(zoomOutButton);
 

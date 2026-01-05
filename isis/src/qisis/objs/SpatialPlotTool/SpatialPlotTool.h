@@ -9,8 +9,6 @@ class QAction;
 class QComboBox;
 class QMainWindow;
 
-template <typename T> class QVector;
-
 namespace Isis {
   class CubePlotCurve;
   class PlotWindow;
