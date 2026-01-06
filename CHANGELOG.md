@@ -98,6 +98,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed `CubeInfixToPostfix` to safely determine if a known symbol is a function symbol [#5822](https://github.com/DOI-USGS/ISIS3/pull/5822)
 - Fixed `BundleObservationSolveSettings` to properly read empty solve setting xmls [#5822](https://github.com/DOI-USGS/ISIS3/pull/5822)
 - Fixed `footprintinit` to find mapping group (no caps). [#5920](https://github.com/DOI-USGS/ISIS3/pull/5820)
+- Fixed unnecessary un/distortion checks for pixels near the origin. [#5932](https://github.com/DOI-USGS/ISIS3/pull/5932)
 
 ### Removed
 - QT 6 removed MySQL support so MySQL is no longer supported in `isisminer` [#5909](https://github.com/DOI-USGS/ISIS3/pull/5909)
