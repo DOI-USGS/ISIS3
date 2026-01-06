@@ -499,7 +499,10 @@ namespace Isis {
         imageFile = imageFile.addExtension("cub");
       }
       else if (format() == Format::GTiff) {
-        imageFile = imageFile.addExtension("tiff");
+        if (imageFile.extension() != "tif" &&
+            imageFile.extension() != "tiff") {
+          imageFile = imageFile.addExtension("tif");
+        }
       }
       else {
         QString msg = "Unknown format type [" + toString(format()) + "]";
