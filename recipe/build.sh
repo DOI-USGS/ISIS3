@@ -1,3 +1,4 @@
+CXXFLAGS="${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY"  # To enable conda builds targeting macos 13 from macos 15
 mkdir build
 cd build
 export ISISROOT=$PWD
