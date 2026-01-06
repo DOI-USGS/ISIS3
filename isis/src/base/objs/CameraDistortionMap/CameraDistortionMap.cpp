@@ -92,14 +92,8 @@ namespace Isis {
       return true;
     }
 
-    // Get the distance from the focal plane center and if we are close
-    // then skip the distortion
+    // Get the distance from the focal plane center
     double r2 = (dx * dx) + (dy * dy);
-    if (r2 <= 1.0E-6) {
-      p_undistortedFocalPlaneX = dx;
-      p_undistortedFocalPlaneY = dy;
-      return true;
-    }
 
     // Ok we need to apply distortion correction
     double drOverR = p_odk[0] + (r2 * (p_odk[1] + (r2 * p_odk[2])));
@@ -140,14 +134,8 @@ namespace Isis {
       return true;
     }
 
-    // Compute the distance from the focal plane center and if we are
-    // close to the center then no distortion is required
+    // Compute the distance from the focal plane center
     double rp2 = (ux * ux) + (uy * uy);
-    if (rp2 <= 1.0E-6) {
-      p_focalPlaneX = ux;
-      p_focalPlaneY = uy;
-      return true;
-    }
 
     // Ok make the correction, start by computing
     // fractional distortion at rp (r-prime)

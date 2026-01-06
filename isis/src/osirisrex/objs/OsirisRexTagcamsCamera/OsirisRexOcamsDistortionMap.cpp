@@ -243,17 +243,10 @@ namespace Isis {
     double x0 = (m_distortionOriginLine - m_detectorOriginSample) * m_pixelPitch;
     double y0 = (m_distortionOriginSample - m_detectorOriginLine) * m_pixelPitch;
 
-    // Compute the distance from the focal plane center. If we are
-    // close to the center then no distortion is required
+    // Compute the distance from the focal plane center.
     double x = ux;
     double y = uy;
     double r = qSqrt(((x-x0) * (x-x0)) + ((y - y0) * (y-y0)));
-
-    if (r <= 1.0E-6) {
-      p_focalPlaneX = ux;
-      p_focalPlaneY = uy;
-      return true;
-    }
 
     double r2 = r*r;
     double r3 = r2*r;

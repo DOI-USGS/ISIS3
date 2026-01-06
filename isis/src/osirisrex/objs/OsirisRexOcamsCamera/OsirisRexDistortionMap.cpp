@@ -308,20 +308,10 @@ namespace Isis {
       std::cout << "xP = " << x0 / m_pixelPitch << ", yP = " << y0 / m_pixelPitch << "\n";
     }
 
-    // Compute the distance from the focal plane center. If we are
-    // close to the center then no distortion is required
+    // Compute the distance from the focal plane center.
     double x = ux;
     double y = uy;
     double r = qSqrt(((x-x0) * (x-x0)) + ((y - y0) * (y-y0)));
-
-    if (r <= 1.0E-6) {
-      p_focalPlaneX = ux;
-      p_focalPlaneY = uy;
-      if ( m_debug ) {
-        std::cout << "Degenerate case at center of distortion!\n";
-      }
-      return true;
-    }
 
     double r2 = r*r;
     double r3 = r2*r;

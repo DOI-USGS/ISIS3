@@ -64,16 +64,10 @@ namespace Isis {
     double x = dx;// - p_xp;
     double y = dy;// - p_yp;
     //
-    // Get the distance from the focal plane center and if we are close
-    // then skip the distortion (this prevents division by zero)
+    // Get the distance from the focal plane center
     double r = (x * x) + (y * y);
     double r2 = r*r;
     double r4 = r2*r2;
-    if (r <= 1.0E-6) {
-      p_undistortedFocalPlaneX = dx;
-      p_undistortedFocalPlaneY = dy;
-      return true;
-    }
 
     // apply distortion correction
     // r = x^2 + y^2
@@ -110,8 +104,7 @@ namespace Isis {
     p_undistortedFocalPlaneX = ux;
     p_undistortedFocalPlaneY = uy;
 
-    // Compute the distance from the focal plane center and if we are
-    // close to the center then no distortion is required
+    // Compute the distance from the focal plane center
 
     bool converged = false;
     int iteration = 0;
@@ -119,11 +112,6 @@ namespace Isis {
     double x = ux;
     double y = uy;
     double r = (x * x) + (y * y);
-    if (r <= 1.0E-6) {
-      p_focalPlaneX = ux;
-      p_focalPlaneY = uy;
-      return true;
-    }
     double rPrevious = r;
 
     while (!converged && qAbs(r - rPrevious) > tolMilliMeters) {

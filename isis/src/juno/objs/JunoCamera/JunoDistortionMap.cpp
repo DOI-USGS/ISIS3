@@ -112,14 +112,8 @@ namespace Isis {
     p_undistortedFocalPlaneX = ux;
     p_undistortedFocalPlaneY = uy;
 
-    // Compute the distance from the focal plane center and if we are
-    // close to the center then assume no distortion
+    // Compute the distance from the focal plane center
     double r2 = (ux * ux) + (uy * uy);
-    if (r2 <= 1.0E-6) {
-      p_focalPlaneX = ux;
-      p_focalPlaneY = uy;
-      return true;
-    }
 
     // The equation given in the IK computes the undistorted focal plane
     // ux = dx * (1 + k1*r^2), r^2 = dx^2 + dy^2
@@ -154,14 +148,8 @@ namespace Isis {
     p_focalPlaneX = dx;
     p_focalPlaneY = dy;
 
-    // Get the distance from the focal plane center and if we are close
-    // then skip the distortion
+    // Get the distance from the focal plane center
     double r2 = (dx * dx) + (dy * dy);
-    if (r2 <= 1.0E-6) {
-      p_undistortedFocalPlaneX = dx;
-      p_undistortedFocalPlaneY = dy;
-      return true;
-    }
 
     bool converged = false;
     int i = 0;

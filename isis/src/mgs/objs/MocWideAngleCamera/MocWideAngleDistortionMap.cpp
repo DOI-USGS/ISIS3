@@ -70,13 +70,8 @@ namespace Isis {
     p_focalPlaneY = dy;
     double sdy = dy / p_scale;
 
-    // See if we are close to the boresight which implies no distortion
+    // Get the distance from the focal plane center 
     double s2 = dx * dx + sdy * sdy;
-    if(s2 <= 1.0E-6) {
-      p_undistortedFocalPlaneX = dx;
-      p_undistortedFocalPlaneY = sdy;
-      return true;
-    }
 
     // Remove distortion
     double s = sqrt(s2);
@@ -98,13 +93,8 @@ namespace Isis {
     p_undistortedFocalPlaneX = ux;
     p_undistortedFocalPlaneY = uy;
 
-    // See if we are close to boresight
+    // Get the distance from the focal plane center 
     double sp2 = ux * ux + uy * uy;
-    if(sp2 <= 1.0E-6) {
-      p_focalPlaneX = ux;
-      p_focalPlaneY = uy * p_scale;
-      return true;
-    }
 
     // Add distortion
     double sp = sqrt(sp2);

@@ -125,14 +125,8 @@ namespace Isis {
     double distx  =  pcx - p_x0;
     double disty  =  pcy - p_y0;
 
-    // Get the distance from the focal plane center and if we are close
-    // skip the distortion
+    // Get the distance from the focal plane center
     double r2 = distx * distx + disty * disty;
-    if(r2 <= 1.0E-6) {
-      p_undistortedFocalPlaneX = pcx;
-      p_undistortedFocalPlaneY = pcy;
-      return true;
-    }
 
     // Otherwise remove distortion
     double drOverR  =  p_odk[0] + p_odk[1] * r2;
@@ -171,25 +165,17 @@ namespace Isis {
     double distux  =  p_undistortedFocalPlaneX - p_x0;
     double distuy  =  p_undistortedFocalPlaneY - p_y0;
 
-    // Compute the distance from the focal plane center and if we are
-    // close to the center then no distortion is required
+    // Compute the distance from the focal plane center
     double rp2 = distux * distux + distuy * distuy;
 
     double pcx, pcy;
 
-    if(rp2 > 1.0E-6) {
+    // Add distortion.  First compute fractional distortion at rp (r-prime)
+    double drOverR   =   p_odk[0]  +  rp2 * p_odk[1];
 
-      // Add distortion.  First compute fractional distortion at rp (r-prime)
-      double drOverR   =   p_odk[0]  +  rp2 * p_odk[1];
-
-      // Compute the perspective corrected x/y
-      pcx  =  p_undistortedFocalPlaneX + (distux * drOverR);
-      pcy  =  p_undistortedFocalPlaneY + (distuy * drOverR);
-    }
-    else {
-      pcx = p_undistortedFocalPlaneX;
-      pcy = p_undistortedFocalPlaneY;
-    }
+    // Compute the perspective corrected x/y
+    pcx  =  p_undistortedFocalPlaneX + (distux * drOverR);
+    pcy  =  p_undistortedFocalPlaneY + (distuy * drOverR);
 
     // Add the perspective error
     double perspectiveCorrection = 1. - (p_xPerspective * pcx) - (p_yPerspective * pcy);

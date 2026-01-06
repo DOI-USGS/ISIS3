@@ -50,15 +50,8 @@ namespace Isis {
     double dxPix = p_focalPlaneX / p_camera->PixelPitch();
     double dyPix = p_focalPlaneY / p_camera->PixelPitch();
 
-    // Get the distance from the focal plane center and if we are close
-    // then skip the distortion
+    // Get the distance from the focal plane center
     double radialDist2 = (dxPix * dxPix) + (dyPix * dyPix);
-
-    if(radialDist2 <= 1.0E-3) {
-      p_undistortedFocalPlaneX = dx;
-      p_undistortedFocalPlaneY = dy;
-      return true;
-    }
 
     // Ok we need to apply distortion correction
     double radialDist4 = radialDist2 * radialDist2;
@@ -102,15 +95,8 @@ namespace Isis {
     double dxPix = GuessDx(uxPix);
     double dyPix = uyPix;
 
-    // Get the distance from the focal plane center and if we are close
-    // then skip the distortion
+    // Get the distance from the focal plane center
     double Ru = sqrt((uxPix * uxPix) + (uyPix * uyPix));
-
-    if(Ru <= 1.0E-6) {
-      p_focalPlaneX = ux;
-      p_focalPlaneY = uy;
-      return true;
-    }
 
     double delta = 1.0;
     int iter = 0;
