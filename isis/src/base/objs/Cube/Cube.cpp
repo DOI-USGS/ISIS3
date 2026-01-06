@@ -536,14 +536,15 @@ namespace Isis {
       core.addGroup(ptype);
     }
     else if (labelsAttached() == LabelAttachment::ExternalLabel) {
+      imageFile = imageFile.addExtension("ecub");
       if (!m_dataFileName) {
         if (format() == Bsq || format() == Tile) {
-          imageFile = imageFile.addExtension("cub");
+          imageFile = imageFile.setExtension("cub");
 
           Pvl dnLabel;
           PvlObject isiscube("IsisCube");
           PvlObject dnCore(core);
-          PvlKeyword fileFormat("Format", toString(format()));
+          PvlKeyword fileFormat("Format", CubeAttributeOutput::toString(format()));
 
           dnCore.addKeyword(fileFormat);
           dnCore.addGroup(dims);
@@ -555,13 +556,11 @@ namespace Isis {
           Cube dnCube;
           dnCube.fromLabel(imageFile, dnLabel, "rw");
           dnCube.close();
-
-          m_dataFileName = new FileName(imageFile);
         }
         else if (format() ==  Format::GTiff) {
-          imageFile = imageFile.setExtension("tiff");
-          m_dataFileName = new FileName(imageFile);
+          imageFile = imageFile.setExtension("tif");
         }
+        m_dataFileName = new FileName(imageFile);
         
         imageFile = imageFile.setExtension("ecub");
         FileName labelFileName(imageFile);
@@ -815,9 +814,9 @@ namespace Isis {
     GDALDriverH hDriver = GDALIdentifyDriver(FileName(cubeFileName).expanded().toStdString().c_str(), nullptr);
     bool openWithGdal = false;
     if (hDriver != nullptr) {
-        GDALDriver* poDriver = (GDALDriver*)hDriver;
-        QString driverDescription = poDriver->GetDescription();
-        openWithGdal = driverDescription == QString("GTiff");
+      GDALDriver* poDriver = (GDALDriver*)hDriver;
+      QString driverDescription = poDriver->GetDescription();
+      openWithGdal = driverDescription == QString("GTiff");
     }
 
     try{
@@ -1241,7 +1240,9 @@ namespace Isis {
       // maxbyte = position after the cube DN data and labels
       streampos maxbyte = (streampos) m_labelBytes;
 
-      maxbyte += (streampos) m_ioHandler->getDataSize();
+      if (labelsAttached() != ExternalLabel) {
+        maxbyte += (streampos) m_ioHandler->getDataSize();
+      }
 
       // If EOF is too early, allocate space up to where we want the blob
       if (endByte < maxbyte) {

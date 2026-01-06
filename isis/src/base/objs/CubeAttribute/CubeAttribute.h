@@ -527,6 +527,7 @@ namespace Isis {
 
       using CubeAttribute<CubeAttributeOutput>::toString;
 
+      static QString toString(Cube::Format);
 
     private:
       bool isByteOrder(QString attribute) const;
@@ -534,8 +535,6 @@ namespace Isis {
       bool isLabelAttachment(QString attribute) const;
       bool isPixelType(QString attribute) const;
       bool isRange(QString attribute) const;
-
-      static QString toString(Cube::Format);
 
       /**
        * @brief Output cube range tracker
