@@ -816,7 +816,7 @@ namespace Isis {
     if (hDriver != nullptr) {
       GDALDriver* poDriver = (GDALDriver*)hDriver;
       QString driverDescription = poDriver->GetDescription();
-      openWithGdal = driverDescription != QString("ISIS3");
+      openWithGdal = (!driverDescription.contains("ISIS"));
     }
 
     try{
