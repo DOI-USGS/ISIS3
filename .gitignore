@@ -108,3 +108,12 @@ Temporary Items
 
 # Ignore coverage output 
 errors.txt
+
+# Ignore test output
+isis/src/**/output/*.txt
+isis/src/**/output/*.pvl
+isis/src/**/output/*.csv
+isis/tests/data/isisimport/pds4.xml
+
+# Ignore the local copy of kakadu
+recipe/kakadu/kakadu_7_9.zip
