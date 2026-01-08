@@ -55,7 +55,6 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Added PAD or SHRINK options to crop for crops that extend beyond the source image [#5843](https://github.com/DOI-USGS/ISIS3/pull/5843)
 - Added std:: namespace for isinf, fixes build errors for some versions of c++
 - Adds PROJ into ISIS, and exposes the capability with a new class called IProj. [#5317](https://github.com/DOI-USGS/ISIS3/pull/5317)
-- Added support for accessing Cloud Optimized GeoTIFF (COG) shape models via STAC API. [#5919](https://github.com/DOI-USGS/ISIS3/pull/5919)
 
 ### Changed
 - Removed Arm dependency on xalan-c, as it does not build for now on conda-forge. This requires turning off doc building on Arm. Also changed some variables to avoid name clashes on Arm with clang 16. [#5802](https://github.com/DOI-USGS/ISIS3/pull/5802)

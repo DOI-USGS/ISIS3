@@ -691,55 +691,6 @@ namespace Isis {
     return matchKeywords && matchTime;
   }
 
-  QString KernelDb::getDemTiffUrl(const Pvl &lab) {
-    QString tiffUrl;
-
-    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
-    std::string target = (inst.findKeyword("TargetName")[0]).toStdString();
-
-    std::string url = "https://3hr5l9mbj6.execute-api.us-west-2.amazonaws.com/prod/search";
-    std::string jsonData = "{ \"query\": { \"target\": {\"eq\": \"" + target + "\"} } }";
-
-
-    std::string responseBody = curlPostRequest(url, jsonData);
-
-    auto json = nlohmann::json::parse(responseBody);
-
-    if (json.contains("tiff_url")) {
-      tiffUrl = "/vsicurl/" + QString::fromStdString(json["tiff_url"]);
-    }
-
-    return tiffUrl;
-  }
-
-  std::string KernelDb::curlPostRequest(const std::string url, const std::string jsonData) {
-    CURL *curl = curl_easy_init();
-    if (!curl) {
-      throw IException(IException::Programmer, "Failed to initialize CURL", _FILEINFO_);
-    }
-
-    std::string responseBody;
-    struct curl_slist* headers = nullptr;
-    headers = curl_slist_append(headers, "Content-Type: application/json");
-
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &KernelDb::writeCallback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseBody);
-
-    CURLcode res = curl_easy_perform(curl);
-
-    curl_easy_cleanup(curl);
-    curl_slist_free_all(headers);
-
-    if (res != CURLE_OK) {
-      throw IException(IException::Io, "CURL error: " + QString(curl_easy_strerror(res)), _FILEINFO_);
-    }
-
-    return responseBody;
-  }
-
   /**
    * Loads the appropriate kernel database files with the defined BASE and
    * MISSION info for each type of kernel.
