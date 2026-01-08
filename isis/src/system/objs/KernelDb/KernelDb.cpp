@@ -697,11 +697,11 @@ namespace Isis {
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
     std::string target = (inst.findKeyword("TargetName")[0]).toStdString();
 
-    std::string url = "https://3hr5l9mbj6.execute-api.us-west-2.amazonaws.com/prod/search";
+    QString url = Preference::Preferences().findGroup("ShapeModelWeb")["URL"];
     std::string jsonData = "{ \"query\": { \"target\": {\"eq\": \"" + target + "\"} } }";
 
 
-    std::string responseBody = curlPostRequest(url, jsonData);
+    std::string responseBody = curlPostRequest(url.toStdString(), jsonData);
 
     auto json = nlohmann::json::parse(responseBody);
 
