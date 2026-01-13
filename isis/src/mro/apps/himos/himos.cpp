@@ -247,8 +247,12 @@ namespace Isis {
       QString list = ui.GetFileName("FROMLIST");
       QString toMosaic = ui.GetCubeName("TO");
       QString MosaicPriority = ui.GetString("PRIORITY");
+      bool matchBandBin = ui.GetBoolean("MATCHBANDBIN");
 
-      QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + MosaicPriority;
+      QString parameters = "FROMLIST=" + list + 
+                           " MOSAIC=" + toMosaic + 
+                           " PRIORITY=" + MosaicPriority +
+                           " MATCHBANDBIN=" + (matchBandBin ? "TRUE" : "FALSE");
       ProgramLauncher::RunIsisProgram("automos", parameters);
 
       // write out new information to new group mosaic

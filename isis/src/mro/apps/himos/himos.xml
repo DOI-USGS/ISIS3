@@ -114,6 +114,22 @@
           </option>
         </list>
       </parameter>
+
+      <parameter name="MATCHBANDBIN">
+        <type>boolean</type>
+        <brief>Input and mosaic BandBin Groups must match</brief>
+        <description>
+          This option set to TRUE causes the application to fail if the BandBin group keywords
+          are not identical for all input cubes and the output mosaic cube.  The default
+          for this parameter is TRUE in order to preserve integrity of a multi-band
+          (multi-wavelength) mosaic product.  The order of band wavelengths of the input
+          cubes must match each other and the mosaic. If MATCHBANDIN is set to FALSE,
+          then the BandBin Group keywords of the input images do not have to match the mosaic
+          BandBin Group labels.  <b>Note:</b> The output mosaic BandBin Group and number
+          of output bands is established with the first input file into the mosaic.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
     </group>
   </groups>
 </application>

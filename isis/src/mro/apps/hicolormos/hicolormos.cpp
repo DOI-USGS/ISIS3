@@ -245,10 +245,12 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
 
   // automos step
   QString MosaicPriority = ui.GetString("PRIORITY");
+  bool matchBandBin = ui.GetBoolean("MATCHBANDBIN");
 
   QString parameters = "FROMLIST=" + tempFile.expanded() +
                       " MOSAIC=" + ui.GetCubeName("TO") +
-                      " PRIORITY=" + MosaicPriority;
+                      " PRIORITY=" + MosaicPriority +
+                      " MATCHBANDBIN=" + (matchBandBin ? "TRUE" : "FALSE");
   ProgramLauncher::RunIsisProgram("automos", parameters);
 
   PvlGroup mos("Mosaic");
