@@ -66,7 +66,7 @@ dependencies:
   - qt6-multimedia
   - qwt =6.3.0
   - spiceypy >=6,<7
-  - spiceql >=1.2.4,<2
+  - spiceql =1.2.4
   - sqlite >=3.46.0,<4
   - suitesparse <7.7.0
   - superlu
