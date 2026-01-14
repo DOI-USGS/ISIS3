@@ -632,7 +632,7 @@ namespace Isis {
   Distance FindTool::distancePerPixel(MdiCubeViewport *viewport,
                                       double lat, double lon) {
     // UniversalGroundMaps default to camera priority, so create a new one so that we can use projection if it exists.
-    std::unique_ptr<UniversalGroundMap> groundMap(new UniversalGroundMap(*(viewport->cube()), UniversalGroundMap::ProjectionFirst));
+    UniversalGroundMap *groundMap = viewport->universalGroundMap();
     Distance viewportResolution;
     if (groundMap->Camera() != NULL){
       if (groundMap->Camera()->target()->isSky()) {

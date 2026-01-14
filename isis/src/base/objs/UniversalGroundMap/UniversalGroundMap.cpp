@@ -24,6 +24,13 @@ find files of those names at the top level of this repository. **/
 #include "Target.h"
 
 namespace Isis {
+  UniversalGroundMap::UniversalGroundMap(Cube *cube, CameraPriority priority) {
+    p_camera = NULL;
+    p_projection = NULL;
+    p_ownCameraOrProjection = false;
+
+    setProjectionEngine(cube, priority, p_ownCameraOrProjection);
+  }
   /**
    * Constructs a UniversalGroundMap object from a cube
    *
@@ -33,33 +40,81 @@ namespace Isis {
   UniversalGroundMap::UniversalGroundMap(Cube &cube, CameraPriority priority) {
     p_camera = NULL;
     p_projection = NULL;
+    p_ownCameraOrProjection = true;
 
-    Pvl &pvl = *cube.label();
-    try {
-      if(priority == CameraFirst)
-        p_camera = CameraFactory::Create(cube);
-      else
-        p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
-    }
-    catch (IException &firstError) {
-      p_camera = NULL;
-      p_projection = NULL;
+    setProjectionEngine(&cube, priority, p_ownCameraOrProjection);
+  }
 
+  void UniversalGroundMap::setProjectionEngine(Cube *cube, CameraPriority priority, bool owned) {
+    QString msg = "Could not create camera or projection for [" +
+                  cube->fileName() + "]";
+    IException realError(IException::Unknown, msg, _FILEINFO_);
+    if (priority ==  UniversalGroundMap::CameraFirst) {
       try {
-        if(priority == CameraFirst)
-          p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
-        else
-          p_camera = CameraFactory::Create(cube);
+        setCamera(cube, owned);
       }
-      catch (IException &secondError) {
-        p_projection = NULL;
-        QString msg = "Could not create camera or projection for [" +
-                          cube.fileName() + "]";
-        IException realError(IException::Unknown, msg, _FILEINFO_);
-        realError.append(firstError);
-        realError.append(secondError);
-        throw realError;
+      catch(IException &error) {
+        realError.append(error);
       }
+
+      if (p_camera == NULL) {
+        try {
+          setProjection(cube, owned);
+        }
+        catch(IException &error) {
+          realError.append(error);
+          throw realError;
+        }
+      }
+    }
+    else {
+      try {
+        setProjection(cube, owned);
+      }
+      catch(IException &error) {
+        realError.append(error);
+      }
+
+      if (p_projection == NULL) {
+        try {
+          setCamera(cube, owned);
+        }
+        catch(IException &error) {
+          realError.append(error);
+          throw realError;
+        }
+      }
+    }
+  }
+
+  void UniversalGroundMap::setProjection(Cube *cube, bool owned) {
+    try {
+      if (owned) {
+        Pvl &pvl = *(cube->label());
+        p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
+      }
+      else {
+        p_projection = cube->projection();
+      }
+    }
+    catch(IException &error) {
+      p_projection = NULL;
+      throw error;
+    }
+  }
+
+  void UniversalGroundMap::setCamera(Cube *cube, bool owned) {
+    try {
+      if (owned) {
+        p_camera = CameraFactory::Create(*cube);
+      }
+      else {
+        p_camera = cube->camera();
+      }
+    }
+    catch(IException &error) {
+      p_camera = NULL;
+      throw error;
     }
   }
 
@@ -78,14 +133,16 @@ namespace Isis {
 
   //! Destroys the UniversalGroundMap object
   UniversalGroundMap::~UniversalGroundMap() {
-    if (p_camera != NULL) {
-      delete p_camera;
-      p_camera = NULL;
-    }
+    if (p_ownCameraOrProjection) {
+      if (p_camera != NULL) {
+        delete p_camera;
+        p_camera = NULL;
+      }
 
-    if (p_projection != NULL) {
-      delete p_projection;
-      p_projection = NULL;
+      if (p_projection != NULL) {
+        delete p_projection;
+        p_projection = NULL;
+      }
     }
   }
 
