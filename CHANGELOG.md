@@ -99,6 +99,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed `BundleObservationSolveSettings` to properly read empty solve setting xmls [#5822](https://github.com/DOI-USGS/ISIS3/pull/5822)
 - Fixed `footprintinit` to find mapping group (no caps). [#5920](https://github.com/DOI-USGS/ISIS3/pull/5820)
 - Fixed unnecessary un/distortion checks for pixels near the origin. [#5861](https://github.com/DOI-USGS/ISIS3/issues/5861)
+- Fixed the isisStartup scripts for users outside of USGS systems. [#5478](https://github.com/DOI-USGS/ISIS3/issues/5478)
 
 ### Removed
 - QT 6 removed MySQL support so MySQL is no longer supported in `isisminer` [#5909](https://github.com/DOI-USGS/ISIS3/pull/5909)
