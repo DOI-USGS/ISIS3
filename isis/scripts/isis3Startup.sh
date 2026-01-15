@@ -16,7 +16,7 @@ if [ ! "$ISISROOT" ]; then
   export ISISROOT
 fi
 
-if [ -d $ISISROOT/../data ]; then
+if [ -d $ISISROOT/../isis_data ]; then
   ISISDATA=$ISISROOT/../isis_data
 else
   ISISDATA=/usgs/cpkgs/isis3/isis_data

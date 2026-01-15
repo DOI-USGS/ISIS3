@@ -16,7 +16,7 @@ def setisis():
     os.environ['ISISROOT'] = ISISROOT
 
   #Check for the ISISDATA directory. If it does not exist use a default
-  if os.path.exists("%s/../data" % (ISISROOT)):
+  if os.path.exists("%s/../isis_data" % (ISISROOT)):
     os.environ['ISISDATA'] = "%s/../isis_data" % (ISISROOT)
   else:
     os.environ['ISISDATA'] = "/usgs/cpkgs/isis3/isis_data"

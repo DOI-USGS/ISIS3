@@ -40,7 +40,7 @@ if ($?ISISROOT == 0) then
 endif
 
 # Initialize the ISISDATA environment variable
-if (-d $ISISROOT/../data) then
+if (-d $ISISROOT/../isis_data) then
   setenv ISISDATA $ISISROOT/../isis_data
 else
   setenv ISISDATA /usgs/cpkgs/isis3/isis_data
