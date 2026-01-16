@@ -84,7 +84,7 @@ namespace Isis {
          */
         ProjectionFirst
       };
-      UniversalGroundMap(Cube *cube, CameraPriority priority = CameraFirst);
+
       UniversalGroundMap(Cube &cube, CameraPriority priority = CameraFirst);
       ~UniversalGroundMap();
 
@@ -139,12 +139,8 @@ namespace Isis {
 
 
     private:
-      void setProjectionEngine(Cube *cube,  CameraPriority priority, bool owned);
-      void setProjection(Cube *cube, bool owned);
-      void setCamera(Cube *cube, bool owned);
       Isis::Camera *p_camera;  //!<The camera (if the image has a camera)
       Isis::Projection *p_projection;  //!<The projection (if the image is projected)
-      bool p_ownCameraOrProjection;
   };
 };
 
