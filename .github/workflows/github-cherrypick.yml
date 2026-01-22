@@ -86,7 +86,7 @@ jobs:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           pr-number: '${{ steps.getpr.outputs.pr }}'
           message: |
-            Maintainers: Please cherry-pick this bugfix to LTS.  
+            Maintainers (@jrcain-usgs @Kelvinrr): Please cherry-pick this bugfix to LTS.  
             PR:  #${{ steps.getpr.outputs.pr }}
             SHA: ${{ github.sha }}.  
 
