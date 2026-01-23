@@ -1,0 +1,12 @@
+coverage:
+  status:
+    project:
+      default:
+        # 'auto' compares against the base branch (e.g., main)
+        target: auto 
+        # The 'threshold' allows for a specific drop amount
+        threshold: 0.5% 
+    patch:
+      default:
+        # This ensures all NEW code in the PR is also covered
+        target: 80%

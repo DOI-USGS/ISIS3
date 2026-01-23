@@ -73,7 +73,7 @@ option(buildCore       "Build the core ISIS modules"                    ON  )
 option(buildMissions   "Build the mission specific modules"             ON  )
 option(buildStaticCore "Build libisis static as well as dynamic"        OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
-option(buildCoverage   "Set up code coverage"                           OFF  )
+option(buildCoverage   "Set up code coverage"                           ON  )
 option(buildDocs       "Build the docs."                                ON  )
 option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
 option(pybindings      "Turn on to build Python bindings"               ON  )
@@ -169,9 +169,7 @@ endif()
 
 if(buildTests)
   include(CTest)
-  include(CodeCoverage)
   enable_testing()
-  APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
 if(buildCoverage AND buildTests)
@@ -667,17 +665,8 @@ if(buildTests)
 
   if(buildCoverage)
     SET(COVERAGE_COMMAND ctest -j ${PROCESSOR_COUNT} --output-on-failure --timeout 10000 | true)
-    SET(COVERAGE_EXCLUDE ".*/unitTest.cpp" ".*/tests/.*" ".*/moc_.*" "build/.*" "gtest/.*" ".*/qisis/.*" ".*/.*/.*.h")
-    setup_target_for_coverage_gcovr_xml(
-      NAME test_coverage_xml                    # New target name
-      EXECUTABLE ${COVERAGE_COMMAND} # Executable in PROJECT_BINARY_DIR
-      DEPENDENCIES runISISTests                   # Dependencies to build first
-      BASE_DIRECTORY "${CMAKE_SOURCE_DIR}"        # Base directory for report
-      NO_DEMANGLE                                 # Don't demangle C++ symbols
-                                                  #  even if c++filt is found
-      EXCLUDE ${COVERAGE_EXCLUDE}
-      OPTIONS --print-summary
-    )
+    SET(COVERAGE_EXCLUDE ".*/unitTest.cpp" "tests/.*" ".*/moc_.*" "build/.*" "gtest/.*" ".*/qisis/.*" ".*.h" ".*.hpp" ".*.cc")
+    SET(CODE_COVERAGE_VERBOSE TRUE)
 
     setup_target_for_coverage_gcovr_html(
       NAME test_coverage_html                    # New target name
@@ -688,6 +677,16 @@ if(buildTests)
                                                   #  even if c++filt is found
       EXCLUDE ${COVERAGE_EXCLUDE}
       OPTIONS --print-summary
+    )
+
+    setup_target_for_coverage_gcovr_ascii(
+      NAME test_coverage_ascii                    # New target name
+      EXECUTABLE ${COVERAGE_COMMAND} # Executable in PROJECT_BINARY_DIR
+      DEPENDENCIES runISISTests                   # Dependencies to build first
+      BASE_DIRECTORY "${CMAKE_SOURCE_DIR}"        # Base directory for report
+      NO_DEMANGLE                                 # Don't demangle C++ symbols
+                                                  #  even if c++filt is found
+      EXCLUDE ${COVERAGE_EXCLUDE}
     )
   endif()
 endif()

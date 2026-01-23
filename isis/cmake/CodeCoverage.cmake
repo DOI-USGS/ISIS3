@@ -610,6 +610,47 @@ endfunction() # setup_target_for_coverage_gcovr_html
 #     SKIP_HTML                                   # Don't create html report
 #     POST_CMD perl -i -pe s!${PROJECT_SOURCE_DIR}/!!g ctest_coverage.json  # E.g. for stripping source dir from file paths
 # )
+
+# Function to invoke gcov with --txt/--text flag to generate a coverage table
+# Example usage:
+#   gcov_text_table(
+#     SOURCE_FILES file1.cpp file2.cpp
+#     OUTPUT_FILE  "${CMAKE_BINARY_DIR}/coverage_table.txt"
+#   )
+function(setup_target_for_coverage_gcovr_ascii)
+    set(options)
+    set(oneValueArgs NAME OUTPUT_FILE)
+    set(multiValueArgs EXCLUDE)
+    cmake_parse_arguments(GCTT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if(NOT GCOVR_PATH)
+        message(FATAL_ERROR "gcovr not found! Aborting...")
+    endif()
+
+    if(NOT GCTT_OUTPUT_FILE)
+        set(GCTT_OUTPUT_FILE "${CMAKE_BINARY_DIR}/coverage_table.txt")
+    endif()
+
+    # Build up the exclude patterns (if any).
+    set(GCOVR_EXCLUDE_ARGS "")
+    foreach(EXCLUDE_PATTERN ${GCTT_EXCLUDE} ${COVERAGE_EXCLUDE} ${COVERAGE_EXCLUDES})
+        list(APPEND GCOVR_EXCLUDE_ARGS "--exclude=${EXCLUDE_PATTERN}")
+    endforeach()
+    list(REMOVE_DUPLICATES GCOVR_EXCLUDE_ARGS)
+
+    # Run gcovr with -r (root) and --txt to produce ascii table, using the relevant excludes
+    add_custom_target(
+        ${GCTT_NAME}
+        COMMAND "${GCOVR_PATH}" -r "${CMAKE_SOURCE_DIR}" --txt-summary --gcov-suspicious-hits-threshold 0 --object-directory ${CMAKE_BINARY_DIR} ${GCOVR_EXCLUDE_ARGS}
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        COMMENT "Generating gcovr ASCII coverage report."
+        VERBATIM
+    )
+
+endfunction()
+
+
+
 function(setup_target_for_coverage_fastcov)
 
     set(options NO_DEMANGLE SKIP_HTML)
@@ -750,3 +791,11 @@ function(append_coverage_compiler_flags_to_target name)
         target_link_libraries(${name} PRIVATE gcov)
     endif()
 endfunction()
+
+# Add a custom target to clean all *.gcda files in the build directory.
+add_custom_target(covlean
+    COMMAND ${CMAKE_COMMAND} -E echo "Cleaning all *.gcda coverage data files in ${CMAKE_BINARY_DIR}/"
+    COMMAND find ${CMAKE_BINARY_DIR} -type f -name "*.gcda" -delete
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Removing all .gcda files (coverage data)"
+)
