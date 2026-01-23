@@ -55,6 +55,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Added PAD or SHRINK options to crop for crops that extend beyond the source image [#5843](https://github.com/DOI-USGS/ISIS3/pull/5843)
 - Added std:: namespace for isinf, fixes build errors for some versions of c++
 - Adds PROJ into ISIS, and exposes the capability with a new class called IProj. [#5317](https://github.com/DOI-USGS/ISIS3/pull/5317)
+- Added `MATCHBANDBIN` option to himos and hicolormos. [#5859](https://github.com/DOI-USGS/ISIS3/issues/5859) and [#5860](https://github.com/DOI-USGS/ISIS3/issues/5860)
 - Added serial number translation for ideal camera [#5662](https://github.com/DOI-USGS/ISIS3/issues/5662)
 
 ### Changed
@@ -101,6 +102,7 @@ ctest FunctionalTestJigsawApollo to validate this output. [#5710](https://github
 - Fixed `footprintinit` to find mapping group (no caps). [#5920](https://github.com/DOI-USGS/ISIS3/pull/5820)
 - Fixed unnecessary un/distortion checks for pixels near the origin. [#5861](https://github.com/DOI-USGS/ISIS3/issues/5861)
 - Fixed the isisStartup scripts for users outside of USGS systems. [#5478](https://github.com/DOI-USGS/ISIS3/issues/5478)
+- Fixed all Q apps not consistently prioritized projction over camera in various tools [#5896](https://github.com/DOI-USGS/ISIS3/issue/5896)
 
 ### Removed
 - QT 6 removed MySQL support so MySQL is no longer supported in `isisminer` [#5909](https://github.com/DOI-USGS/ISIS3/pull/5909)

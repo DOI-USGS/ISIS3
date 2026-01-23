@@ -147,7 +147,7 @@ namespace Isis {
 
     // Setup a universal ground map
     try {
-      p_groundMap = new UniversalGroundMap(*p_cube);
+      p_groundMap = new UniversalGroundMap(*p_cube, UniversalGroundMap::ProjectionFirst);
     }
     catch(IException &) {
     }

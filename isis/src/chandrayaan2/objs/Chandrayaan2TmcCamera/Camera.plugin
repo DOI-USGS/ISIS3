@@ -3,4 +3,23 @@ Group = CHANDRAYAAN-2/TMC-2
   Library = Chandrayaan2TmcCamera
   Routine = Chandrayaan2TmcCameraPlugin
 EndGroup
+
+Group = CHANDRAYAAN-2/CH2_TMC_FORE
+  Version = 1
+  Library = Chandrayaan2TmcCamera
+  Routine = Chandrayaan2TmcCameraPlugin
+EndGroup
+
+Group = CHANDRAYAAN-2/CH2_TMC_NADIR
+  Version = 1
+  Library = Chandrayaan2TmcCamera
+  Routine = Chandrayaan2TmcCameraPlugin
+EndGroup
+
+Group = CHANDRAYAAN-2/CH2_TMC_AFT
+  Version = 1
+  Library = Chandrayaan2TmcCamera
+  Routine = Chandrayaan2TmcCameraPlugin
+EndGroup
+ 
  
