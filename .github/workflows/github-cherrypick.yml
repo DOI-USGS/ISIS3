@@ -2,8 +2,6 @@ name: GH Cherrypick bugfixes/features for LTS/Prod
 
 env:
   GITHUB_SHA: ${{ github.sha }}
-  CURRENT_LTS: 9-lts
-  # CURRENT_PROD: 9-prod
 
 on:
   push:
@@ -16,9 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
-    name: Check PR labels action step
+    name: Detect Max LTS/Prod Version, Bugfix/Feature Checkboxes
     # Make the output of this job available to other jobs
     outputs: 
+      maxlts: ${{ steps.parse_lts.outputs.maxlts }}
+      maxprod: ${{ steps.parse_prod.outputs.maxprod }}
       result: ${{steps.execute_py_script.outputs.result}}
     steps:
     - name: Checkout files (only the PR Label Checker)
@@ -28,6 +28,26 @@ jobs:
           .github/pr_label_checker.py
           .github/requirements.txt
         sparse-checkout-cone-mode: false
+    - name: Fetch/Parse LTS Version
+      id: parse_lts
+      run: |
+        MAX_LTS="$( \
+        git ls-remote --heads origin | \
+        sed '/-lts/!d; s/^.*refs\/heads\///; s/-lts//; /^[0-9][0-9]*$/!d' | \
+        sort -n | \
+        tail -n 1 \
+        )"
+        echo "maxlts=${MAX_LTS}-lts" >> $GITHUB_OUTPUT
+    - name: Fetch/Parse Prod Version
+      id: parse_prod
+      run: |
+        MAX_PROD="$( \
+        git ls-remote --heads origin | \
+        sed '/-prod/!d; s/^.*refs\/heads\///; s/-prod//; /^[0-9][0-9]*$/!d' | \
+        sort -n | \
+        tail -n 1 \
+        )"
+        echo "maxprod=${MAX_PROD}-prod" >> $GITHUB_OUTPUT
     - name: List files in current Directory
       run: ls .github
     - name: Setup Python
@@ -47,7 +67,10 @@ jobs:
         GITHUB_SERVER_URL: ${{ secrets.GITHUB_SERVER_URL }}
       run: echo "result=$(python ./.github/pr_label_checker.py)" >> "$GITHUB_OUTPUT"
     - name: Show Output
-      run: echo "${{ steps.execute_py_script.outputs.result }}"
+      run: |
+        echo "checkboxes... ${{ steps.execute_py_script.outputs.result }}"
+        echo "max lts... ${{ steps.execute_py_script.outputs.maxlts }}"
+        echo "max prod... ${{ steps.execute_py_script.outputs.maxprod }}"
 
 
   cherrypick-lts:
@@ -61,6 +84,8 @@ jobs:
     permissions:
       pull-requests: write
       contents: write
+    env:
+      MAX_LTS: ${{ needs.check_labels.outputs.maxlts }}
     steps:
       - name: Get PR number
         id: getpr
@@ -69,7 +94,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          ref: '${{ env.CURRENT_LTS }}' # This branch must exist in the repo.  Target LTS changes branch.
+          ref: '${{ env.MAX_LTS }}' # This branch must exist in the repo.  Target LTS changes branch.
           fetch-depth: '0'
       - name: Configure git
         run: |
@@ -94,13 +119,13 @@ jobs:
             (Assuming you have the DOI-USGS/ISIS3 repo as a remote named `upstream`):
             ```
             git fetch upstream
-            git checkout -b cherry-${{ steps.getpr.outputs.pr }} upstream/${{ env.CURRENT_LTS }}
+            git checkout -b cherry-${{ steps.getpr.outputs.pr }} upstream/${{ env.MAX_LTS }}
             git cherry-pick -m 1 ${{ github.sha }}
 
             # Resolve Merge Conflicts Manually
 
             # Then push to LTS
-            git push --set-upstream upstream ${{ env.CURRENT_LTS }}
+            git push --set-upstream upstream ${{ env.MAX_LTS }}
             ```
       - name: Setup conda
         if: steps.cherryPickStep.outcome == 'success'
@@ -155,6 +180,8 @@ jobs:
   #   permissions:
   #     pull-requests: write
   #     contents: write
+  #   env: 
+  #     MAX_PROD: ${{ needs.check_labels.outputs.maxprod }}
   #   steps:
   #     - name: Get PR number
   #       id: getpr
@@ -163,7 +190,7 @@ jobs:
   #       uses: actions/checkout@v4
   #       with:
   #         submodules: recursive
-  #         ref: '${{ env.CURRENT_PROD }}' # This branch must exist in the repo.  Target Prod changes branch.
+  #         ref: '${{ env.MAX_PROD }}' # This branch must exist in the repo.  Target Prod changes branch.
   #         fetch-depth: '0'
   #     - name: Configure git
   #       run: |
@@ -188,13 +215,13 @@ jobs:
   #           (Assuming you have the DOI-USGS/ISIS3 repo as a remote named `upstream`):
   #           ```
   #           git fetch upstream
-  #           git checkout -b cherry-${{ steps.getpr.outputs.pr }} upstream/${{ env.CURRENT_PROD }}
+  #           git checkout -b cherry-${{ steps.getpr.outputs.pr }} upstream/${{ env.MAX_PROD }}
   #           git cherry-pick -m 1 ${{ github.sha }}
 
   #           # Resolve Merge Conflicts Manually
 
   #           # Then push to LTS
-  #           git push --set-upstream upstream ${{ env.CURRENT_PROD }}
+  #           git push --set-upstream upstream ${{ env.MAX_PROD }}
   #           ```
   #     - name: Setup conda
   #       if: steps.cherryPickStep.outcome == 'success'
