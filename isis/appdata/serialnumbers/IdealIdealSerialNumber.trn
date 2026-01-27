@@ -27,4 +27,20 @@ Group = Keyword3
   OutputPosition = (Group, SerialNumberKeywords)
   Translation    = (*, *)
 End_Group
+
+/* This keyword is an optional keyword that is to be used to */
+/* create unique serial numbers for images derived from the  */
+/* original. When processing multiple CCDs from the same    */
+/* observation, CcdId ensures each CCD has a unique serial  */
+/* number. It has no effect if the keyword does not exist.  */
+Group = Keyword4
+  Auto           = 1
+  Optional       = 1
+  InputKey       = CcdId
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = Keyword4
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (*, *)
+End_Group
 End
