@@ -1,0 +1,15 @@
+[tool.towncrier]
+name = "ISIS"
+version = "9.0.0"
+directory = "changes"
+filename = "changes.md"
+issue_format = "[#{issue}](https://github.com/DOI-USGS/ISIS3/issues/{issue})"
+
+[tool.towncrier.fragment.add]
+name = "Added"
+
+[tool.towncrier.fragment.change]
+name = "Changed"
+
+[tool.towncrier.fragment.fix]
+name = "Fixed"
