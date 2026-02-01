@@ -14,13 +14,13 @@ Changes to things like tests and CI should not be noted in this document.
 
 When making a PR, add a one-line file ('fragment')
 to the `changes` directory describing your change,
-in this format: [issue number].[change type].md (1234.change.md).
+in this format: {ISSUE_NUMBER}.{CHANGE_TYPE}.md (1234.change.md).
 
 If your change fixes two issues, make multiple fragments with the same line of text.
 if your change is not related to an issue, begin the filename with a +, and try to make the name unique 
-(+1username.add.md, +2marscameraorientation.fix.md)
+(+13ab64username.add.md, +2marscameraorientation.fix.md).
 
-Changes are categorized as one of the following:
+Changes are categorized as one of the following CHANGE_TYPES, listed in `towncrier.toml`:
 
  - Breaking   (####.break.md)  - for any API-breaking changes (will stay in dev until next major release.).
  - Added      (####.add.md)    - for new features.
