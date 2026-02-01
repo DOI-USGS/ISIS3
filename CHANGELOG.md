@@ -37,7 +37,7 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 
 <!-- towncrier release notes start -->
 
-## [9.0.0] - 09-25-2024
+## [9.0.0] - 2024-09-25
 
 
 ### Added
