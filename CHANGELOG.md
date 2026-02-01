@@ -39,7 +39,6 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 
 ## [9.0.0] - 2024-09-25
 
-
 ### Added
 - Added TOVECT output parameter which generate a geospatial CSV file with a VRT metadata sidecar file [#5571](https://github.com/DOI-USGS/ISIS3/issues/5571)  
 - Added Vectorize to ProcessGroundPolygon library
