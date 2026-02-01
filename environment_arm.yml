@@ -48,7 +48,7 @@ dependencies:
   - nlohmann_json=3.11.2
   - ninja >=1.10,<1.11
   - nn
-  - opencv >=4.12,<5
+  - opencv >=4.12,<4.13
   - openssl >=3.5,<4
   - pcl >=1.15,<1.16
   - pdal >=2.8.4,<3

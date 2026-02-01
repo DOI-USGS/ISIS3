@@ -126,7 +126,7 @@ TEST(BufferTest, TestBufferOutOfBound) {
   }
 }
 
-TEST(BufferTest, TestBufferScale) {
+TEST(BufferTest, TestBufferScaleSmallToBig) {
   Buffer b(4, 3, 2, Isis::SignedInteger, 0.5);
 
   EXPECT_EQ(b.SampleDimension(), 4);
@@ -134,9 +134,9 @@ TEST(BufferTest, TestBufferScale) {
   EXPECT_EQ(b.BandDimension(), 2);
 
   EXPECT_EQ(b.SampleDimensionScaled(), 2);
-  EXPECT_EQ(b.LineDimensionScaled(), 1);
+  EXPECT_EQ(b.LineDimensionScaled(), 2);
 
-  EXPECT_EQ(b.size(), 4);
+  EXPECT_EQ(b.size(), 8);
 
   for(int i = 0; i < b.size(); i++) {
     b[i] = i;
@@ -146,12 +146,40 @@ TEST(BufferTest, TestBufferScale) {
   d.CopyOverlapFrom(b);
   std::vector<int> truthBuffer = {0, 0, 1, 1,
                                   0, 0, 1, 1,
-                                  0, 0, 1, 1,
+                                  2, 2, 3, 3,
                                   // Second band
-                                  2, 2, 3, 3,
-                                  2, 2, 3, 3,
-                                  2, 2, 3, 3};
-  for (int i = 0; i < truthBuffer.size(); i++) {
+                                  4, 4, 5, 5,
+                                  4, 4, 5, 5,
+                                  6, 6, 7, 7};
+  for (int i = 0; i < d.size(); i++) {
+    EXPECT_EQ(truthBuffer[i], d[i]);
+  }
+}
+
+TEST(BufferTest, TestBufferScaleBigToSmall) {
+  Buffer b(4, 3, 2, Isis::SignedInteger, 1);
+
+  EXPECT_EQ(b.SampleDimension(), 4);
+  EXPECT_EQ(b.LineDimension(), 3);
+  EXPECT_EQ(b.BandDimension(), 2);
+
+  EXPECT_EQ(b.SampleDimensionScaled(), 4);
+  EXPECT_EQ(b.LineDimensionScaled(), 3);
+
+  EXPECT_EQ(b.size(), 24);
+
+  for(int i = 0; i < b.size(); i++) {
+    b[i] = i;
+  }
+
+  Buffer d(4, 3, 2, Isis::SignedInteger, 0.5);
+  d.CopyOverlapFrom(b);
+  std::vector<int> truthBuffer = {4, 6,
+                                  8, 10,
+                                  // Second band
+                                  16, 18,
+                                  20, 22,};
+  for (int i = 0; i < d.size(); i++) {
     EXPECT_EQ(truthBuffer[i], d[i]);
   }
 }

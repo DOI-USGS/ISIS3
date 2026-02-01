@@ -311,6 +311,12 @@ namespace Isis {
     key.setValue(startTime);
     inst.addKeyword(key);
 
+    // Preserve CcdId from original instrument if present
+    // These are needed for unique serial numbers when processing multiple CCDs
+    if (fromInst.hasKeyword("CcdId")) {
+      inst.addKeyword(fromInst["CcdId"]);
+    }
+
     if(stopTime != "") {
       key.setName("StopTime");
       key.setValue(stopTime);

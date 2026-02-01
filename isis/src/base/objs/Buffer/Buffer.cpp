@@ -68,9 +68,16 @@ namespace Isis {
     if (p_nsampsScaled <= 0) {
       p_nsampsScaled = 1;
     }
+    if (int((p_nsamps - 1) * p_scale) == p_nsampsScaled) {
+      p_nsampsScaled += 1;
+    }
+
     p_nlinesScaled = int(p_nlines * p_scale);
     if (p_nlinesScaled <= 0) {
       p_nlinesScaled = 1;
+    }
+    if (int((p_nlines - 1) * p_scale) == p_nlinesScaled) {
+      p_nlinesScaled += 1;
     }
 
     p_npixels = (p_nsampsScaled * p_nlinesScaled) * p_nbands;
@@ -326,14 +333,14 @@ namespace Isis {
 
     // If one rectangle is on left side of other
     // if (l1.x > r2.x || l2.x > r1.x)
-    if (p_line > in.p_line + in.p_nlines ||
-        in.p_line > p_line + p_nlines)
+    if (p_line >= in.p_line + in.p_nlines ||
+        in.p_line >= p_line + p_nlines)
       isSubareaOfIn = false;
 
     // If one rectangle is above other
     // if (r1.y > l2.y || r2.y > l1.y)
-    if (p_sample + p_nsamps < in.p_sample ||
-        in.p_sample + in.p_nsamps < p_sample)
+    if (p_sample >= in.p_sample + in.p_nsamps || 
+        in.p_sample >= p_sample + p_nsamps)
       isSubareaOfIn = false;
 
     if (isSubareaOfIn) {
@@ -345,38 +352,40 @@ namespace Isis {
 
       int firstBand = max(in.p_band, p_band);
       int lastBand = min(in.p_band + in.p_nbands, p_band + p_nbands);
+    
+      int lineIncrement = (double)LineDimension() / (double)LineDimensionScaled();
+      int sampleIncrement = (double)SampleDimension() / (double)SampleDimensionScaled();
 
       for (int b = firstBand; b < lastBand; b++) {
-        for (int i = topLine; i < bottomLine; i++) {
-          for (int j = topSamp; j < bottomSamp; j++) {
-            try {
-              (*this)[Index(j, i, b)] = in[in.Index(j, i, b)];
+        int lineIndex = -1;
+        for (int i = topLine; i < bottomLine;) {
+          int nextLineIndex = Index(topSamp, i, b);
+
+          int sampleIndex = -1;
+          for (int j = topSamp; j < bottomSamp;) {
+            int nextSampleIndex = Index(j, i, b);
+            int inIndex = in.Index(j, i, b);
+            if (sampleIndex == nextSampleIndex) {
+              j++;
+              continue;
             }
-            catch(...) {
-              (*this)[Index(j, i, b)] = NULL8;
+            else {
+              j += sampleIncrement;
+              sampleIndex = nextSampleIndex;
             }
+            (*this)[sampleIndex] = in[inIndex];
+          }
+          if (lineIndex == nextLineIndex) {
+            i++;
+            continue;
+          }
+          else {
+            i += lineIncrement;
+            lineIndex = nextLineIndex;
           }
         }
       }
     }
-
-    isSubareaOfIn = (p_npixels <= in.size());
-    isSubareaOfIn &= (p_sample >= in.p_sample);
-    isSubareaOfIn &= (p_line >= in.p_line);
-    isSubareaOfIn &= (p_band >= in.p_band);
-
-    int endSample = p_sample + p_nsamps - 1;
-    int otherEndSample = in.p_sample + in.p_nsamps - 1;
-
-    int endLine = p_line + p_nlines - 1;
-    int otherEndLine = in.p_line + in.p_nlines - 1;
-
-    int endBand = p_band + p_nbands - 1;
-    int otherEndBand = in.p_band + in.p_nbands - 1;
-
-    isSubareaOfIn &= (endSample <= otherEndSample);
-    isSubareaOfIn &= (endLine <= otherEndLine);
-    isSubareaOfIn &= (endBand <= otherEndBand);
 
     return isSubareaOfIn;
   }
@@ -412,8 +421,8 @@ namespace Isis {
    * @throws Isis::iException::System - Memory allocation failed
    */
   void Buffer::Allocate() {
-    p_buf = NULL;
-    p_rawbuf = NULL;
+    p_buf = nullptr;
+    p_rawbuf = nullptr;
     try {
       p_buf = new double [p_npixels];
       size_t n = Isis::SizeOf(p_pixelType);
@@ -424,16 +433,16 @@ namespace Isis {
       try {
         if(p_buf) {
           delete [] p_buf;
-          p_buf = NULL;
+          p_buf = nullptr;
         }
         if(p_rawbuf) {
           delete [](char *)p_rawbuf;
-          p_rawbuf = NULL;
+          p_rawbuf = nullptr;
         }
       }
       catch(...) {
-        p_buf = NULL;
-        p_rawbuf = NULL;
+        p_buf = nullptr;
+        p_rawbuf = nullptr;
       }
       QString message = Message::MemoryAllocationFailed();
       throw IException(IException::Unknown, message, _FILEINFO_);

@@ -1343,7 +1343,7 @@ namespace Isis {
     // Scale the sampleand line increment, only necessary in read for Q apps
     int lineIncrement = (double)output.LineDimension() / (double)output.LineDimensionScaled();
     int sampleIncrement = (double)output.SampleDimension() / (double)output.SampleDimensionScaled();
-
+    
     for(int z = startZ; z <= endZ; z++) {
       const int &bandIntoChunk = z - chunkStartBand;
       int virtualBand = z;
@@ -1353,22 +1353,34 @@ namespace Isis {
       if(virtualBand != 0 && virtualBand >= bufferBand &&
          virtualBand <= bufferBand + bufferBands - 1) {
 
-        for(int y = startY; y < endY; y = y + lineIncrement) {
+        int bufferLineIndex = -1;
+        for(int y = startY; y < endY;) {
           const int &lineIntoChunk = y - chunkStartLine;
+          int nextLineBufferIndex = output.Index(startX, y, virtualBand);
 
-          for(int x = startX; x < endX; x = x + sampleIncrement) {
+          int bufferSampleIndex = -1;
+          for(int x = startX; x < endX;) {
+            int nextSampleBufferIndex = output.Index(x, y, virtualBand);
             const int &sampleIntoChunk = x - chunkStartSample;
-            int bufferIndex = output.Index(x, y, virtualBand);
-            // Avoid rolling back onto your buffer
-            if (bufferIndex >= output.size()) {
-              bufferIndex = output.size() - 1;
+            // Handle sample iteration
+            // If we continue to compute the same bufferIndex just iterate by 1
+            // If we compute the next index, increment by the 
+            // floored sample increment and read the DN value
+            // at newly computed index
+            if (bufferSampleIndex == nextSampleBufferIndex) {
+              x++;
+              continue;
+            }
+            else {
+              x += sampleIncrement;
+              bufferSampleIndex = nextSampleBufferIndex;
             }
 
             const int &chunkIndex = sampleIntoChunk +
                 (chunkLineSize * lineIntoChunk) +
                 (chunkBandSize * bandIntoChunk);
 
-            double &bufferVal = buffersDoubleBuf[bufferIndex];
+            double &bufferVal = buffersDoubleBuf[bufferSampleIndex];
 
             if(m_pixelType == Real) {
               float raw = ((float *)chunkBuf)[chunkIndex];
@@ -1393,7 +1405,7 @@ namespace Isis {
                   bufferVal = LOW_REPR_SAT8;
               }
 
-              ((float *)buffersRawBuf)[bufferIndex] = raw;
+              ((float *)buffersRawBuf)[bufferSampleIndex] = raw;
             }
 
             else if(m_pixelType == SignedWord) {
@@ -1419,7 +1431,7 @@ namespace Isis {
                   bufferVal = LOW_REPR_SAT8;
               }
 
-              ((short *)buffersRawBuf)[bufferIndex] = raw;
+              ((short *)buffersRawBuf)[bufferSampleIndex] = raw;
             }
 
 
@@ -1450,7 +1462,7 @@ namespace Isis {
                   bufferVal = LOW_REPR_SAT8;
               }
 
-              ((unsigned short *)buffersRawBuf)[bufferIndex] = raw;
+              ((unsigned short *)buffersRawBuf)[bufferSampleIndex] = raw;
             }
 
             else if(m_pixelType == UnsignedInteger) {
@@ -1481,7 +1493,7 @@ namespace Isis {
                   bufferVal = LOW_REPR_SAT8;
               }
 
-              ((unsigned int *)buffersRawBuf)[bufferIndex] = raw;
+              ((unsigned int *)buffersRawBuf)[bufferSampleIndex] = raw;
 
 
 
@@ -1500,10 +1512,21 @@ namespace Isis {
                 bufferVal = (double) raw * m_multiplier + m_base;
               }
 
-              ((unsigned char *)buffersRawBuf)[bufferIndex] = raw;
+              ((unsigned char *)buffersRawBuf)[bufferSampleIndex] = raw;
             }
+          }
 
-            bufferIndex++;
+          // Handle line iteration
+          // If we continue to compute the same bufferIndex just iterate by 1
+          // If we compute a next index, increment by the floored 
+          // line increment
+          if (bufferLineIndex == nextLineBufferIndex) {
+            y++;
+            continue;
+          }
+          else {
+            y += lineIncrement;
+            bufferLineIndex = nextLineBufferIndex;
           }
         }
       }
