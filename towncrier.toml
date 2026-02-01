@@ -3,13 +3,21 @@ name = "ISIS"
 version = "9.0.0"
 directory = "changes"
 filename = "changes.md"
+start_string = "<!-- towncrier release notes start -->\n"
 issue_format = "[#{issue}](https://github.com/DOI-USGS/ISIS3/issues/{issue})"
 
-[tool.towncrier.fragment.add]
+[[tool.towncrier.type]]
+name = "Breaking"
+directory = "break"
+
+[[tool.towncrier.type]]
 name = "Added"
+directory = "add"
 
-[tool.towncrier.fragment.change]
+[[tool.towncrier.type]]
 name = "Changed"
+directory = "change"
 
-[tool.towncrier.fragment.fix]
+[[tool.towncrier.type]]
 name = "Fixed"
+directory = "fix"
