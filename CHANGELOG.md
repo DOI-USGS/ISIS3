@@ -12,13 +12,22 @@ instead of adding directly to this file, add a fragment in the `changes` directo
 This document is intended for users of the applications and API. 
 Changes to things like tests and CI should not be noted in this document.
 
+
 When making a PR, add a one-line file ('fragment')
 to the `changes` directory describing your change,
 in this format: {ISSUE_NUMBER}.{CHANGE_TYPE}.md (1234.change.md).
+See the list of CHANGE_TYPES that ISIS uses below for reference.
+Example for a bugfix (always abbreviated 'fix' in the filename):
+
+    echo 'Fixed `footprintinit` to find mapping group (no caps).' > 5920.fix.md
+
 
 If your change fixes two issues, make multiple fragments with the same line of text.
-if your change is not related to an issue, begin the filename with a +, and try to make the name unique 
-(+13ab64username.add.md, +2marscameraorientation.fix.md).
+If your change is **not related to an issue**, begin the filename with a +, and timestamp it (+20260202113046.fix.md).
+You can use this line to write a timestamped fragment:
+
+    echo 'Your change description here' > changes/+`date +"%Y%m%d%H%M%S"`.fix.md
+
 
 Changes are categorized as one of the following CHANGE_TYPES, listed in `towncrier.toml`:
 
@@ -30,6 +39,7 @@ Changes are categorized as one of the following CHANGE_TYPES, listed in `towncri
  - Deprecated (####.deprec.md) - for soon-to-be removed features.
  - Removed    (####.rm.md)     - for removed features.
  - Misc       (####.misc.md)   - for changes that won't be included in the changelog (Tests, CICD, etc...)
+
 
 When maintainers prepare for a release, they should update the version in the `towncrier.toml` config file,
 then run the `towncrier` utility to compile the change fragments into a chagelog section here.
