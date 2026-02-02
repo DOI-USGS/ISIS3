@@ -193,8 +193,8 @@ EndGroup
 #
 ########################################################
 
-Group = WebSpice
-  UseWebSpice = "false"
+Group = SpiceQL
+  UseSpiceQL = "false"
 EndGroup
 
 ########################################################

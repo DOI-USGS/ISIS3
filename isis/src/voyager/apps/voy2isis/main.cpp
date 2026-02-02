@@ -361,7 +361,7 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   // The purpose of the next two steps, getting the spacecraft clock count,
   // are simply to get the partition, the very first number 1/...
 
-  bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+  bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 
   auto [approxEphemeris, kernels] = SpiceQL::utcToEt(inst["StartTime"][0].toLatin1().data(), useWeb);
 

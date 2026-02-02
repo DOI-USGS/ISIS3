@@ -383,7 +383,7 @@ namespace Isis {
         lastEt = firstEt + (g_expectedLineRate / 2.0);
       }
 
-      bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+      bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 
       inst.findKeyword("StartTime").setValue(firstEt.UTC());
       auto [startClockString, kernels] = SpiceQL::doubleEtToSclk(sclkCode, firstEt.Et(), "chandrayaan1", useWeb);

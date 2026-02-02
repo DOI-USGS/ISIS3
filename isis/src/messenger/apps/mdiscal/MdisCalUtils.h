@@ -77,7 +77,7 @@ namespace Isis {
         NaifStatus::CheckErrors();
         sunDist = 1.0;
         
-        bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+        bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 
         //  Determine if the target is a valid NAIF target
         try{
@@ -375,7 +375,7 @@ namespace Isis {
         // Ensure NAIF kernels are loaded for NAIF time computations
         NaifStatus::CheckErrors();
 
-        bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+        bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 
         //  Convert s/c clock start time to et
         tie(obsStartTime, kernels) = SpiceQL::strSclkToEt(-236, scStartTime.toLatin1().data(), "mdis", useWeb);

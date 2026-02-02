@@ -320,7 +320,7 @@ namespace Isis {
         catch(IException &e) {
           // Failed to instantiate a camera, try furnishing kernels directly
           try {
-            bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+            bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
             
             std::vector<double> etStart = {startTime.Et()};
             double sunpos[6];

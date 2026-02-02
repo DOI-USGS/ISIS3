@@ -158,7 +158,7 @@ namespace Isis {
         jdata.obsStartTime = cam->time().Et();
       } catch (IException &e) {
         try {
-          bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+          bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
           QString scStartTimeString = jdata.scStartTime;
           auto [output, kernels] = SpiceQL::strSclkToEt(-74999, scStartTimeString.toLatin1().data(), "hirise", useWeb);
           jdata.obsStartTime = output; 

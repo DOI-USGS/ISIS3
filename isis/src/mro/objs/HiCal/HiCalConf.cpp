@@ -311,7 +311,7 @@ bool HiCalConf::_naifLoaded = false;
       try {
         QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
         NaifStatus::CheckErrors();
-        bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+        bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
         double obsStartTime = SpiceQL::strSclkToEt(-74999, scStartTime.toLatin1().data(), "hirise", useWeb).first;
 
         QString targetName = getKey("TargetName", "Instrument");

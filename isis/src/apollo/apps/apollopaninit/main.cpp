@@ -241,7 +241,7 @@ void IsisMain() {
 
 
   //////////////////////////////////////////attach a target rotation table
-  bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+  bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
   std::string frameName;
    SpiceInt frameCode = 0;
    try {

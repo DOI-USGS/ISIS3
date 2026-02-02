@@ -142,7 +142,7 @@ namespace Isis {
       
       NaifStatus::CheckErrors();
 
-      bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+      bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 
       double sunpos[6];
       std::vector<double> etStartVec = {etStart};

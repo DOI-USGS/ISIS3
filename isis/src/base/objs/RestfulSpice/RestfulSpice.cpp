@@ -106,7 +106,7 @@
 
 
 //   std::vector<std::vector<double>> getTargetStates(std::vector<double> ets, std::string target, std::string observer, std::string frame, std::string abcorr, std::string mission, std::string ckQuality, std::string spkQuality, std::vector<std::string> kernel_list){
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       // @TODO validity checks
 //       json args = json::object({
@@ -129,7 +129,7 @@
 
 
 //   std::vector<std::vector<double>> getTargetOrientations(std::vector<double> ets, int toFrame, int refFrame, std::string mission, std::string ckQuality) {
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"ets", ets},
@@ -146,7 +146,7 @@
 //   }
 
 //   double strSclkToEt(int frameCode, std::string sclk, std::string mission) {
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"frameCode", frameCode},
@@ -161,7 +161,7 @@
 //   }
 
 //   double doubleSclkToEt(int frameCode, double sclk, std::string mission){
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"frameCode", frameCode},
@@ -176,7 +176,7 @@
 //   }
 
 //   double utcToEt(std::string utc){
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"utc", utc}
@@ -191,7 +191,7 @@
 
 
 //   std::string etToUtc(double et, std::string format, double precision){
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     // TODO Add etToUtc to web api
 //     if (useWeb){
 //       json args = json::object({
@@ -207,7 +207,7 @@
 //   }
 
 //   std::string doubleEtToSclk(int frameCode, double et, std::string mission) {
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"frameCode", frameCode},
@@ -223,7 +223,7 @@
 //   }
 
 //   int translateNameToCode(std::string frame, std::string mission){
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"frame", frame},
@@ -237,7 +237,7 @@
 //   }
 
 //   std::string translateCodeToName(int code, std::string mission){
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"code", code},
@@ -251,7 +251,7 @@
 //   }
 
 //   std::vector<int> getFrameInfo(int frame, std::string mission) {
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"frame", frame},
@@ -266,7 +266,7 @@
 //   }
 
 //   json getTargetFrameInfo(int targetId, std::string mission) {
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"targetId", targetId},
@@ -280,7 +280,7 @@
 //   }
 
 //   json findMissionKeywords(std::string key, std::string mission){
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"key", key},
@@ -294,7 +294,7 @@
 //   }
 
 //   json findTargetKeywords(std::string key, std::string mission){
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"key", key},
@@ -308,7 +308,7 @@
 //   }
 
 //   std::vector<std::vector<int>> frameTrace(double et, int initialFrame, std::string mission, std::string ckQuality) {
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"et", et},
@@ -324,7 +324,7 @@
 //   }
 
 //   std::vector<double> extractExactCkTimes(double observStart, double observEnd, int targetFrame, std::string mission, std::string ckQuality) {
-//     bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+//     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 //     if (useWeb){
 //       json args = json::object({
 //         {"observStart", observStart},

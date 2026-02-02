@@ -62,7 +62,7 @@ static bool sunDistanceAU(Cube *iCube,
   catch(IException &e) {
     sunDist = 1.0;
     
-    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+    bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
     //  Determine if the target is a valid NAIF target
     try {
       SpiceQL::translateNameToCode(target.toLatin1().data(), "amica", useWeb);

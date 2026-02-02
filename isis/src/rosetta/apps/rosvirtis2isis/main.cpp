@@ -403,7 +403,7 @@ void IsisMain ()
     // Fix the StartTime and SpacecraftStartClockCount in the ISIS label
     PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
 
-    bool useWeb = QString(Preference::Preferences().findGroup("WebSpice")["UseWebSpice"]).toUpper() == "TRUE";
+    bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
 
     auto [etStart, k1] = SpiceQL::strSclkToEt(-226, startScet.toLatin1().data(), "virtis", useWeb);
     auto [etEnd, k2]  = SpiceQL::strSclkToEt(-226, stopScet.toLatin1().data(), "virtis", useWeb);
