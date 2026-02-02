@@ -1,0 +1,39 @@
+[tool.towncrier]
+name = "ISIS"
+version = "9.0.0"
+directory = "changes"
+filename = "CHANGELOG.md"
+start_string = "<!-- towncrier release notes start -->\n"
+title_format = "## [{version}] - {project_date}"
+issue_format = "[#{issue}](https://github.com/DOI-USGS/ISIS3/issues/{issue})"
+
+[[tool.towncrier.type]]
+name = "Breaking"
+directory = "break"
+
+[[tool.towncrier.type]]
+name = "Added"
+directory = "add"
+
+[[tool.towncrier.type]]
+name = "Changed"
+directory = "change"
+
+[[tool.towncrier.type]]
+name = "Fixed"
+directory = "fix"
+
+[[tool.towncrier.type]]
+name = "Security"
+directory = "sec"
+
+[[tool.towncrier.type]]
+name = "Deprecated"
+directory = "deprec"
+
+[[tool.towncrier.type]]
+name = "Removed"
+directory = "rm"
+
+
+
