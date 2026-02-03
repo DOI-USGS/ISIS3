@@ -4,9 +4,11 @@
 #include "CameraFixtures.h"
 #include "Histogram.h"
 #include "LineManager.h"
+#include "Pvl.h"
 #include "PvlGroup.h"
 #include "TestUtilities.h"
 #include "skypt.h"
+#include "getsn.h"
 
 #include "gmock/gmock.h"
 
@@ -852,3 +854,32 @@ TEST_F(DefaultCube, FunctionalTestNoprojOffBodyTrueOffBodyTrimTrue) {
 
 }
 
+TEST_F(DefaultCube, FunctionalTestNoprojSn) {
+  QString cubeFileName = tempDir.path() + "/output.cub";
+  QVector<QString> args = {"to=" + cubeFileName};
+  UserInterface options(APP_XML, args);
+  
+  noproj(testCube, NULL, options);
+
+  Cube oCube(cubeFileName);
+  Pvl *isisLabel = oCube.label();
+  PvlGroup instGroup = isisLabel->findGroup("Instrument", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instGroup.findKeyword("SpacecraftName"), "IdealSpacecraft");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, instGroup.findKeyword("InstrumentId"), "IdealCamera");
+  EXPECT_DOUBLE_EQ((double)instGroup.findKeyword("EphemerisTime"), -709401200.26114);
+
+  // Get SN
+  QString APP_XML_SN = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
+  QVector<QString> sn_args = {"from=" + cubeFileName,
+                              "file=true",
+                              "observation=true"};
+  UserInterface sn_options(APP_XML_SN, sn_args);
+  Pvl appLog;
+  getsn(sn_options, &appLog);
+
+  PvlGroup results = appLog.findGroup("Results");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("Filename"), cubeFileName);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("SerialNumber"), "IdealSpacecraft/IdealCamera/-709401200.26114");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("ObservationNumber"), "IdealSpacecraft/IdealCamera/-709401200.26114");
+  
+}
