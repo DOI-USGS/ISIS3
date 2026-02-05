@@ -187,11 +187,11 @@ namespace Isis {
       double v_factors[numPts] = {0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0};
       
       cam->IgnoreProjection(true);
-      cam->SetImage(cam->Samples()/2.0, cam->Lines()/2.0);
+      cam->SetImage(cam->ParentSamples()/2.0, cam->ParentLines()/2.0);
       SurfacePoint refPt = cam->GetSurfacePoint();
 
-      double numImageRows = cam->Lines();
-      double numImageCols = cam->Samples();
+      double numImageRows = cam->ParentLines();
+      double numImageCols = cam->ParentSamples();
 
       std::vector<std::vector<double>> ip(numPts, std::vector<double>(2, 0.0));
       std::vector<std::vector<double>> gp(numPts, std::vector<double>(3, 0.0));
@@ -263,7 +263,7 @@ namespace Isis {
       double z = surfacePoint.GetZ().meters();
       double line_den = 1 + u[4]  * x + u[5]  * y + u[6]  * z;
       double approxLine = 0;
-      double numRows = p_camera->Lines();
+      double numRows = p_camera->ParentLines();
 
       // Sanity checks. Ensure we don't divide by 0 and that the numbers are valid.
       if (line_den == 0.0 || std::isnan(line_den) || std::isinf(line_den)) {
@@ -594,40 +594,15 @@ namespace Isis {
     SensorSurfacePointDistanceFunctor distanceFunc(p_camera, surfacePoint);
 
     // Use the line given as a start point for the secant method root search.
-    // convert the approxLine to an approximate time and offset
-    double alphaApproxLine = p_camera->alphaCube()->AlphaLine(approxLine);
-    p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2.0, alphaApproxLine);
+    p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2.0, approxLine);
     approxTime = p_camera->time().Et();
-
     approxOffset = offsetFunc(approxTime);
-
-    // Check to see if there is no need to improve this root, it's good enough
-    if (fabs(approxOffset) < 1e-5) {
-      p_camera->Sensor::setTime(approxTime);
-      // check to make sure the point isn't behind the planet
-      if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
-        return Failure;
-      }
-      p_camera->Sensor::LookDirection(lookC);
-      ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-      uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-
-      p_focalPlaneX = ux;
-      p_focalPlaneY = uy;
-
-      return Success;
-    }
 
     double f0, f1, x0, x1;
 
-    // starting times for the secant method, kept within the domain of the cache
+    // starting times for the secant method
     x0 = approxTime;
-    // if (xh + lineRate < cacheEnd) {
     x1 = x0 + lineRate;
-    // }
-    // else {
-    //   xl = xh - lineRate;
-    // }
 
     // starting offsets
     f0 = approxOffset;  //the first is already calculated
@@ -635,20 +610,8 @@ namespace Isis {
 
     // Iterate to refine the given approximate time that the instrument imaged the ground point
     for (int j=0; j < 10; j++) {
-      if (f1 - f0 == 0.0) {
-        return Failure;
-      }
-      double x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
 
-      double f2 = offsetFunc(x2);
-
-      x0 = x1;
-      f0 = f1;
-      x1 = x2;
-      f1 = f2;
-
-      // See if we converged on the point so set up the undistorted focal plane values and return
-      if (fabs(f1) < 1e-3) {
+      if (fabs(f1) < 1e-6 || ((f1 - f0) == 0.0)) {
         p_camera->Sensor::setTime(x1);
         // check to make sure the point isn't behind the planet
         if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
@@ -663,6 +626,15 @@ namespace Isis {
 
         return Success;
       }
+
+      double x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
+
+      double f2 = offsetFunc(x2);
+
+      x0 = x1;
+      f0 = f1;
+      x1 = x2;
+      f1 = f2;
     } // End use a guess
     return Failure;
   }

@@ -2850,16 +2850,6 @@ namespace Isis {
     return p_focalPlaneMap;
   }
 
-  
-  /**
-   * Returns a pointer to the AlphaCube object
-   *
-   * @return @b AlphaCube*
-   */
-  AlphaCube *Camera::alphaCube() {
-    return p_alphaCube;
-  }
-
 
   /**
    * Returns a pointer to the CameraDetectorMap object
@@ -2949,6 +2939,11 @@ namespace Isis {
     p_ignoreProjection = ignore;
   }
 
+  /**
+   * Whether or not the camera is ignoring the Projection
+   *
+   * @param ignore
+   */
   bool Camera::isProjectionIgnored() {
     return p_ignoreProjection;
   }
