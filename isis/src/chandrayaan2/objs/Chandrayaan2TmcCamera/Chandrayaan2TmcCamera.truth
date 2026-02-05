@@ -15,19 +15,19 @@ Instrument Name Short: TMC-2
 
 For upper left corner ...
 DeltaSample = 0.000000000
-DeltaLine = -0.000855841
+DeltaLine = 0.000000000
 
 For upper right corner ...
 DeltaSample = 0.000000000
-DeltaLine = -0.000855841
+DeltaLine = 0.000000000
 
 For lower left corner ...
 DeltaSample = 0.000000000
-DeltaLine = 0.000496502
+DeltaLine = 0.000000000
 
 For lower right corner ...
 DeltaSample = 0.000000000
-DeltaLine = 0.000496502
+DeltaLine = 0.000000000
 
 For center pixel position ...
 DeltaSample = 0.000000000
