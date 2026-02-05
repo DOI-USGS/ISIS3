@@ -127,7 +127,7 @@ namespace Isis {
     }
 
     if (rateIndex < 0) {
-      return false;
+      rateIndex = 0;
     }
 
     int rateStartLine = p_lineRates[rateIndex].GetStartLine();
