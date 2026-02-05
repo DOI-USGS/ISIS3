@@ -317,7 +317,6 @@ namespace Isis {
 
       CameraDistortionMap *DistortionMap();
       CameraFocalPlaneMap *FocalPlaneMap();
-      AlphaCube *alphaCube();
       CameraDetectorMap *DetectorMap();
       CameraGroundMap *GroundMap();
       CameraSkyMap *SkyMap();
