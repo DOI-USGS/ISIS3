@@ -38,8 +38,8 @@ jobs:
           sed -i "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
           conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label dev
 
-  build-macos13-x64:
-    runs-on: macos-13
+  build-macos-15-intel:
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
       - name: Set up Mambaforge
@@ -116,9 +116,9 @@ jobs:
           conda list isis
           spiceinit -h
   
-  test-macos13-x64:
-    runs-on: macos-13
-    needs: build-macos13-x64
+  test-macos-15-intel:
+    runs-on: macos-15-intel
+    needs: build-macos-15-intel
     steps:
       - name: Set up Miniforge
         uses: conda-incubator/setup-miniconda@v3
@@ -165,11 +165,13 @@ jobs:
   docs:
     name: Build and Upload ISIS Dev Docs
     runs-on: ubuntu-latest
-    needs: [test-ubuntu, test-macos13-x64, test-macos15-arm64]
+    needs: [test-ubuntu, test-macos-15-intel, test-macos15-arm64]
     if: |
-      needs.test-ubuntu.result == 'success' ||
-      needs.test-macos13-x64.result == 'success' ||
-      needs.test-macos15-arm64.result == 'success'
+      always() && (
+        needs.test-ubuntu.result == 'success' ||
+        needs.test-macos-15-intel.result == 'success' ||
+        needs.test-macos15-arm64.result == 'success'
+      )
     steps:
       - uses: actions/checkout@v4
         with:

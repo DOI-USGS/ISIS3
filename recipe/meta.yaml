@@ -168,7 +168,7 @@ requirements:
   - {{ pin_compatible('proj', min_pin='x.x', max_pin='x.x') }}
   - {{ pin_compatible('protobuf', max_pin='x.x') }}
   - qhull
-  - {{ pin_compatible('qt-main', max_pin='x.x') }}
+  - {{ pin_compatible('qt6-main', max_pin='x.x') }}
   - {{ pin_compatible('qwt', max_pin='x.x') }}
   - rclone
   - {{ pin_compatible('spiceql', max_pin='x.x') }}
