@@ -1,6 +1,6 @@
 # See https://github.com/actions/runner-images?tab=readme-ov-file#available-images for Github's Available Images
 
-name: Github Actions - Build Dev Biweekly Anaconda Release
+name: Github Actions - Build Dev Weekly Anaconda Release
 
 env:
   ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }} 
