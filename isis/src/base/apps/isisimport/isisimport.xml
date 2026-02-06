@@ -7,13 +7,16 @@
 
   <description>
     <p>
-      NOTE: This program and the associated template files are incomplete. The documentation
-      describes what the eventual intended capabilities are. Many capabilities are not implemented
-      at this time.
-    </p>
-    <p>
       Reads an input label file and image file. The contents of the ISIS cube label file are
       generated using the template file specified by the TEMPLATE parameter.
+    </p>
+    <p>
+      If a template file for the input label is included in ISIS, 
+      it will be used automatically and does not need to be specified.
+      NOTE: Some template files are incomplete/still being developed.
+    </p>
+    <p>
+      In particular, isisimport can import Chandrayaan 2, TGO Cassis, and Clipper EIS Images.
     </p>
     <p>
       This application uses the <a href="https://pantor.github.io/inja">Inja templating engine</a>
@@ -26,11 +29,17 @@
 
   <category>
     <categoryItem>Import and Export</categoryItem>
+    <missionItem>Chandrayaan 2</missionItem>
+    <missionItem>ExoMars Trace Gas Orbiter</missionItem>
+    <missionItem>Clipper</missionItem>
   </category>
 
   <history>
     <change name="Kristin Berry and Amy Stamile" date="2021-05-17">
       Original version
+    </change>
+    <change name="Jacob Cain" date="2026-02-05">
+      Listed missions where isisimport is the main method of import.
     </change>
   </history>
 

@@ -102,6 +102,16 @@ Deborah Lee Soltesz
             </ul>
 
             <h3>Mission Specific Programs</h3>
+            <p>For more info on select missions (LRO, MRO, MGS, Viking, Chandrayaan 2), see 
+              <a href="https://astrogeology.usgs.gov/docs/concepts/missions/" target="_blank" rel="noopener">
+                Astro Software Docs
+              </a>.
+              We are in the process of porting more mission (Cassini, Kaguya) pages from the (deprecated)
+              <a href="https://github.com/DOI-USGS/ISIS3/wiki" target="_blank" rel="noopener">
+                ISIS3 git wiki
+              </a>
+              to Astro Software Docs.
+            </p>
             <ul class="card-list-sm">
                 <xsl:for-each select="//application/category/missionItem[not(normalize-space(.)=preceding::application/category/missionItem)]">
                   <xsl:sort order="ascending" select="normalize-space(.)"/>
