@@ -1,13 +1,27 @@
-#include <QTemporaryDir>
+// NOTE: This work is free and unencumbered software released into the public domain.
+// The authors of ISIS do not claim copyright on the contents of this file.
+// For more details about the LICENSE terms and the AUTHORS, you will
+// find files of those names at the top level of this repository.
+//
+// SPDX-License-Identifier: CC0-1.0
+
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QStringList>
 #include <QSet>
+#include <QString>
+#include <QStringList>
+#include <QTemporaryDir>
+#include <QVector>
+#include <QIODevice>
 
 #include "FileName.h"
+#include "IException.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
+#include "UserInterface.h"
+
+#include "equalizer.h"
 
 #include "gtest/gtest.h"
 
@@ -15,8 +29,15 @@ using namespace Isis;
 
 namespace {
 
+// App XML
+static QString EQUALIZER_XML = FileName("$ISISROOT/bin/xml/equalizer.xml").expanded();
+
 QString joinPath(const QString &a, const QString &b) {
   return QDir(a).filePath(b);
+}
+
+QString prefArg() {
+  return "-preference=$ISISROOT/TestPreferences";
 }
 
 void copyFileOrFail(const QString &src, const QString &dst) {
@@ -27,6 +48,7 @@ void copyFileOrFail(const QString &src, const QString &dst) {
   ASSERT_TRUE(QFile::copy(src, dst))
       << "Failed to copy " << src.toStdString()
       << " -> " << dst.toStdString();
+
   ASSERT_TRUE(QFileInfo::exists(dst))
       << "Missing after copy: " << dst.toStdString();
 }
@@ -41,7 +63,9 @@ QStringList readListFile(const QString &path) {
   QStringList lines;
   while (!f.atEnd()) {
     QString line = QString::fromUtf8(f.readLine()).trimmed();
-    if (line.isEmpty() || line.startsWith("#")) continue;
+    if (line.isEmpty() || line.startsWith("#")) {
+      continue;
+    }
     lines.append(line);
   }
   return lines;
@@ -57,19 +81,8 @@ void writeListFile(const QString &path, const QStringList &lines) {
   }
 }
 
-QString prefArg() {
-  return "-preference=$ISISROOT/TestPreferences";
-}
 
-QString bin(const QString &app) {
-  return QString("$ISISROOT/bin/") + app;
-}
-
-void runSys(const QString &cmd) {
-  ProgramLauncher::RunSystemCommand(cmd);
-}
-
-} // namespace
+}  // namespace
 
 
 TEST(Equalizer, NonOverlapRetryBoth) {
@@ -92,6 +105,7 @@ TEST(Equalizer, NonOverlapRetryBoth) {
   QDir().mkpath(outputAbs);
   QDir().mkpath(truthAbs);
 
+  // Keep legacy-ish working directory contract for any relative file behavior
   ASSERT_TRUE(QDir::setCurrent(work));
 
   // Copy toList.lis
@@ -113,7 +127,7 @@ TEST(Equalizer, NonOverlapRetryBoth) {
   copyFileOrFail(joinPath(truthSrc, "recalculatedStats.pvl"),
                  joinPath(truthAbs, "recalculatedStats.pvl"));
 
-  // Authoritative lists from the legacy Makefile (order matters)
+  // Authoritative lists from legacy Makefile (order matters)
   const QStringList nonOverlapNames = {
     "I10047011EDR.proj.reduced.cub",
     "I25685003EDR.crop.proj.reduced.cub",
@@ -131,9 +145,15 @@ TEST(Equalizer, NonOverlapRetryBoth) {
 
   // Copy all required cubes (union)
   QSet<QString> needed;
-  for (const auto &n : nonOverlapNames) needed.insert(n);
-  for (const auto &n : fixedNames)      needed.insert(n);
-  for (const auto &n : toListNames)     needed.insert(n);
+  for (const auto &n : nonOverlapNames) {
+    needed.insert(n);
+  }
+  for (const auto &n : fixedNames) {
+    needed.insert(n);
+  }
+  for (const auto &n : toListNames) {
+    needed.insert(n);
+  }
 
   for (const QString &name : needed) {
     copyFileOrFail(joinPath(inputSrc, name),
@@ -142,76 +162,115 @@ TEST(Equalizer, NonOverlapRetryBoth) {
                    joinPath(truthAbs, name));
   }
 
-  // Write list files like Makefile (relative input/ paths)
+  // Write list files like Makefile (relative input/ paths), stored in output/
   QStringList nonOverlapRel, fixedRel;
-  for (const auto &n : nonOverlapNames) nonOverlapRel.append("input/" + n);
-  for (const auto &n : fixedNames)      fixedRel.append("input/" + n);
+  for (const auto &n : nonOverlapNames) {
+    nonOverlapRel.append("input/" + n);
+  }
+  for (const auto &n : fixedNames) {
+    fixedRel.append("input/" + n);
+  }
 
-  writeListFile("output/nonOverlap.lis", nonOverlapRel);
-  writeListFile("output/fixed.lis", fixedRel);
+  writeListFile(joinPath(work, "output/nonOverlap.lis"), nonOverlapRel);
+  writeListFile(joinPath(work, "output/fixed.lis"), fixedRel);
 
-  const QString nonOverlapStats = "output/nonOverlapStats.pvl";
-  const QString recalculatedStats = "output/recalculatedStats.pvl";
+  const QString nonOverlapStatsAbs   = joinPath(work, "output/nonOverlapStats.pvl");
+  const QString recalculatedStatsAbs = joinPath(work, "output/recalculatedStats.pvl");
 
-  // Phase A: expected failure (kept as behavioral check only)
-  runSys(
-    "sh -c '" + bin("equalizer") + " "
-      "fromlist=output/nonOverlap.lis "
-      "outstats=" + nonOverlapStats + " "
-      "process=CALCULATE "
-      + prefArg() + " "
-      "2>> output/nonOverlapError.txt > /dev/null || true'"
-  );
-  ASSERT_TRUE(QFileInfo::exists(joinPath(work, nonOverlapStats)));
+  const QString nonOverlapLisAbs = joinPath(work, "output/nonOverlap.lis");
+  const QString fixedLisAbs      = joinPath(work, "output/fixed.lis");
+  const QString toListLisAbs     = joinPath(work, "input/toList.lis");
 
-  // Phase B: RETRYBOTH using truth instats (portable/stable)
-  // NOTE: In this environment, the CALCULATE failure path produces an outstats PVL
-  // that is not usable as instats for RETRYBOTH (even if pvldiff-equivalent).
-  // We therefore use the truth instats PVL to preserve the intent of the legacy test.
-  // This is the smallest deviation that preserves test intent while avoiding the
-  // non-portable assumption that a failed CALCULATE produces usable instats.
-  runSys(
-    "sh -c '" + bin("equalizer") + " "
-      "fromlist=output/fixed.lis "
-      "tolist=input/toList.lis "
-      "instats=truth/nonOverlapStats.pvl "
-      "outstats=" + recalculatedStats + " "
-      "process=RETRYBOTH "
-      + prefArg() + " "
-      "> /dev/null'"
-  );
+  // Phase A: expected failure (smoke check only)
+  {
+    QVector<QString> argsA = {
+      "fromlist=" + nonOverlapLisAbs,
+      "outstats=" + nonOverlapStatsAbs,
+      "process=CALCULATE",
+      "solvemethod=QRD",
+      prefArg()
+    };
 
-  ASSERT_TRUE(QFileInfo::exists(joinPath(work, recalculatedStats)));
+    try {
+      UserInterface uiA(EQUALIZER_XML, argsA);
+      equalizer(uiA);
+      FAIL() << "Expected equalizer CALCULATE to fail for non-overlapping list";
+    }
+    catch (IException &) {
+      // expected
+    }
 
-  // Move output cubes like legacy
-  runSys("sh -c 'ls -1 *.cub >/dev/null 2>&1 && mv -f *.cub output/ || true'");
+    ASSERT_TRUE(QFileInfo::exists(nonOverlapStatsAbs))
+        << "Expected nonOverlapStats to be written even on CALCULATE failure";
+  }
 
-  // Validate stats PVLs
-  runSys(
-    "sh -c '" + bin("pvldiff") + " "
-      "from=" + recalculatedStats + " "
+  // Phase B: RETRYBOTH using truth instats
+  //
+  // NOTE: In this environment, the OUTSTATS PVL produced by a failing CALCULATE run
+  // is not reusable as INSTATS for RETRYBOTH. We use the truth instats PVL to keep
+  // RETRYBOTH output validation deterministic and consistent with the legacy intent.
+  {
+    const QString truthInstatsAbs = joinPath(work, "truth/nonOverlapStats.pvl");
+
+    QVector<QString> argsB = {
+      "fromlist=" + fixedLisAbs,
+      "tolist=" + toListLisAbs,
+      "instats=" + truthInstatsAbs,
+      "outstats=" + recalculatedStatsAbs,
+      "process=RETRYBOTH",
+      "solvemethod=QRD",
+      prefArg()
+    };
+
+    UserInterface uiB(EQUALIZER_XML, argsB);
+    ASSERT_NO_THROW(equalizer(uiB));
+  }
+
+  ASSERT_TRUE(QFileInfo::exists(recalculatedStatsAbs));
+
+  // Move output cubes like legacy (equalizer writes to CWD)
+  QDir cwd(work);
+  QStringList cubes = cwd.entryList(QStringList() << "*.cub", QDir::Files);
+
+  for (const QString &cube : cubes) {
+    QString src = joinPath(work, cube);
+    QString dst = joinPath(outputAbs, cube);
+
+    QFile::remove(dst); // in case exists
+    ASSERT_TRUE(QFile::rename(src, dst))
+        << "Failed to move " << src.toStdString()
+        << " to " << dst.toStdString();
+  }
+
+  // Validate stats PVLs with pvldiff 
+  ASSERT_NO_THROW(
+    ProgramLauncher::RunIsisProgram(
+      "pvldiff",
+      "from=output/recalculatedStats.pvl "
       "from2=truth/recalculatedStats.pvl "
       "diff=input/recalculatedStats.pvl.DIFF "
-      + prefArg() + " "
-      "> /dev/null'"
+      + prefArg()
+      )
   );
 
   // Validate output cubes
   const QString tol = "0.00001";
+
   for (const QString &name : toListNames) {
-    const QString outCube = "output/" + name;
-    const QString truthCube = "truth/" + name;
+    const QString outCubeAbs = joinPath(work, "output/" + name);
+    const QString truthCubeAbs = joinPath(work, "truth/" + name);
 
-    ASSERT_TRUE(QFileInfo::exists(joinPath(work, outCube)))
-        << "Missing output cube: " << outCube.toStdString();
+    ASSERT_TRUE(QFileInfo::exists(outCubeAbs))
+        << "Missing output cube: " << outCubeAbs.toStdString();
 
-    runSys(
-      "sh -c '" + bin("cubediff") + " "
-        "from=" + outCube + " "
-        "from2=" + truthCube + " "
+    ASSERT_NO_THROW(
+      ProgramLauncher::RunIsisProgram(
+        "cubediff",
+        "from=" + outCubeAbs + " "
+        "from2=" + truthCubeAbs + " "
         "tolerance=" + tol + " "
-        + prefArg() + " "
-        "> /dev/null'"
+        + prefArg()
+      )
     );
   }
 }
