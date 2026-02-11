@@ -11,6 +11,7 @@ find files of those names at the top level of this repository. **/
 
 template<typename T> class QList;
 
+template<typename A, typename B> struct QPair;
 template<typename A, typename B> class QMap;
 
 class QReadWriteLock;
@@ -80,7 +81,7 @@ namespace Isis {
 
     public slots:
       void ReadCube(int cubeId, int startSample, int startLine,
-                    int endSample, int endLine, int band, void *caller, double scale);
+                    int endSample, int endLine, int band, void *caller);
       void ReadWriteCube(int cubeId, int startSample, int startLine,
                          int endSample, int endLine, int band, void *caller);
 
@@ -154,7 +155,7 @@ namespace Isis {
                        int instanceNum, bool &exact);
 
       void GetCubeData(int cubeId, int ss, int sl, int es, int el, int band,
-                       void *caller, bool sharedLock, double scale=1);
+                       void *caller, bool sharedLock);
 
       void AcquireLock(QReadWriteLock *lockObject, bool readLock);
 

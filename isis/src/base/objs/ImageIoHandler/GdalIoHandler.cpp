@@ -119,16 +119,12 @@ namespace Isis {
 
       if (sampleSize > 0 && lineSize > 0) {
         if (outOfBounds) {
-          Brick boundedBrick(sampleSize, lineSize, bufferToFill.BandDimension(), GdalPixelToIsis(m_pixelType), false, bufferToFill.scale());
+          Brick boundedBrick(sampleSize, lineSize, bufferToFill.BandDimension(), GdalPixelToIsis(m_pixelType), false);
           boundedBrick.SetBasePosition(sampleStart + 1, lineStart + 1, bufferToFill.Band());
-          int bufferSize = boundedBrick.SampleDimensionScaled() * boundedBrick.LineDimensionScaled();
-          int currentBandIdx = bufferSize * (vband - boundedBrick.Band());
-          char *buffersRawBuf = &(((char *)boundedBrick.RawBuffer())[(int)(currentBandIdx * SizeOf(boundedBrick.PixelType()))]);
-          double *buffersDoubleBuf = &(boundedBrick.DoubleBuffer()[currentBandIdx]);
           CPLErr err = poBand->RasterIO(GF_Read, sampleStart, lineStart,
                                         sampleSize, lineSize,
-                                        buffersRawBuf,
-                                        boundedBrick.SampleDimensionScaled(), boundedBrick.LineDimensionScaled(),
+                                        boundedBrick.RawBuffer(),
+                                        sampleSize, lineSize,
                                         m_pixelType,
                                         0, 0);
 
@@ -138,21 +134,18 @@ namespace Isis {
           }
 
           // Handle pixel type conversion
-          for (int bufferIdx = 0; bufferIdx < bufferSize; bufferIdx++) {
+          char *buffersRawBuf = (char *)boundedBrick.RawBuffer();
+          double *buffersDoubleBuf = boundedBrick.DoubleBuffer();
+          for (int bufferIdx = 0; bufferIdx < boundedBrick.size(); bufferIdx++) {
             readPixelType(buffersDoubleBuf, buffersRawBuf, bufferIdx);
           }
           bufferToFill.CopyOverlapFrom(boundedBrick);
         }
         else {
-          int bufferSize = bufferToFill.SampleDimensionScaled() * bufferToFill.LineDimensionScaled();;
-          int currentBandIdx = bufferSize * (vband - bufferToFill.Band());
-          // silence warnings
-          char *buffersRawBuf = &(((char *)bufferToFill.RawBuffer())[(int)(currentBandIdx * SizeOf(bufferToFill.PixelType()))]);
-          double *buffersDoubleBuf = &(bufferToFill.DoubleBuffer()[currentBandIdx]);
           CPLErr err = poBand->RasterIO(GF_Read, sampleStart, lineStart,
                                         sampleSize, lineSize,
-                                        buffersRawBuf,
-                                        bufferToFill.SampleDimensionScaled(), bufferToFill.LineDimensionScaled(),
+                                        bufferToFill.RawBuffer(),
+                                        sampleSize, lineSize,
                                         m_pixelType,
                                         0, 0);
           if (err >= CE_Failure) {
@@ -161,7 +154,9 @@ namespace Isis {
           }
 
           // Handle pixel type conversion
-          for (int bufferIdx = 0; bufferIdx < bufferSize; bufferIdx++) {
+          char *buffersRawBuf = (char *)bufferToFill.RawBuffer();
+          double *buffersDoubleBuf = bufferToFill.DoubleBuffer();
+          for (int bufferIdx = 0; bufferIdx < bufferToFill.size(); bufferIdx++) {
             readPixelType(buffersDoubleBuf, buffersRawBuf, bufferIdx);
           }
         }

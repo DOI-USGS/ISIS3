@@ -111,9 +111,6 @@ namespace Isis {
 
       void stop();
 
-      double scale() {
-        return p_xScale;
-      }
 
     private:
       //! Position of the cube reads

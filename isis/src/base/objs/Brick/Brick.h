@@ -58,9 +58,9 @@ namespace Isis {
        *             bands first, then lines, then samples.
        */
       Brick(const int nsamps, const int nlines, const int nbands,
-            const Isis::PixelType type, bool reverse=false, double scale=1.0) :
+            const Isis::PixelType type, bool reverse=false) :
         Isis::BufferManager(nsamps, nlines, nbands,
-                            nsamps, nlines, nbands, type, reverse, scale) {
+                            nsamps, nlines, nbands, type, reverse) {
       };
 
       /**
@@ -78,10 +78,10 @@ namespace Isis {
        */
       Brick(const Isis::Cube &cube, const int &bufNumSamples,
             const int &bufNumLines, const int &bufNumBands,
-            bool reverse=false, double scale=1.0) :
+            bool reverse=false) :
         Isis::BufferManager(cube.sampleCount(), cube.lineCount(),
                             cube.bandCount(), bufNumSamples, bufNumLines,
-                            bufNumBands, cube.pixelType(), reverse, scale) {
+                            bufNumBands, cube.pixelType(), reverse) {
       };
 
       /**
@@ -103,9 +103,9 @@ namespace Isis {
        */
       Brick(int maxSamples, int maxLines, int maxBands, int bufNumSamples,
             int bufNumLines, int bufNumBands, Isis::PixelType type,
-            bool reverse=false, double scale=1.0) :
+            bool reverse=false) :
         Isis::BufferManager(maxSamples, maxLines, maxBands, bufNumSamples,
-                            bufNumLines, bufNumBands, type, reverse, scale) {
+                            bufNumLines, bufNumBands, type, reverse) {
       };
 
     public:

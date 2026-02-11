@@ -295,9 +295,9 @@ namespace Isis {
 
     QPair< QList<RawCubeChunk *>, QList<int> > chunkInfo;
       chunkInfo = findCubeChunks(
-          bufferToFill.Sample(), bufferToFill.SampleDimension(),
-          bufferToFill.Line(), bufferToFill.LineDimension(),
-          bufferToFill.Band(), bufferToFill.BandDimension());
+          bufferToFill.Sample(), bufferSampleCount,
+          bufferToFill.Line(), bufferLineCount,
+          bufferToFill.Band(), bufferBandCount);
       cubeChunks = chunkInfo.first;
       chunkBands = chunkInfo.second;
     }
@@ -880,10 +880,10 @@ namespace Isis {
     startX = max(cube1.getStartSample(), cube2.Sample());
     startY = max(cube1.getStartLine(), cube2.Line());
     startZ = max(cube1.getStartBand(), startPhysicalBand);
-    endX = min(cube1.getStartSample() + cube1.sampleCount(),
-               cube2.Sample() + cube2.SampleDimension());
-    endY = min(cube1.getStartLine() + cube1.lineCount(),
-               cube2.Line() + cube2.LineDimension());
+    endX = min(cube1.getStartSample() + cube1.sampleCount() - 1,
+               cube2.Sample() + cube2.SampleDimension() - 1);
+    endY = min(cube1.getStartLine() + cube1.lineCount() - 1,
+               cube2.Line() + cube2.LineDimension() - 1);
     endZ = min(cube1.getStartBand() + cube1.bandCount() - 1,
                endPhysicalBand);
   }
@@ -1339,11 +1339,6 @@ namespace Isis {
     const char *chunkBuf = chunk.getRawData().data();
     char *buffersRawBuf = (char *)output.RawBuffer();
 
-
-    // Scale the sampleand line increment, only necessary in read for Q apps
-    int lineIncrement = (double)output.LineDimension() / (double)output.LineDimensionScaled();
-    int sampleIncrement = (double)output.SampleDimension() / (double)output.SampleDimensionScaled();
-    
     for(int z = startZ; z <= endZ; z++) {
       const int &bandIntoChunk = z - chunkStartBand;
       int virtualBand = z;
@@ -1353,34 +1348,18 @@ namespace Isis {
       if(virtualBand != 0 && virtualBand >= bufferBand &&
          virtualBand <= bufferBand + bufferBands - 1) {
 
-        int bufferLineIndex = -1;
-        for(int y = startY; y < endY;) {
+        for(int y = startY; y <= endY; y++) {
           const int &lineIntoChunk = y - chunkStartLine;
-          int nextLineBufferIndex = output.Index(startX, y, virtualBand);
+          int bufferIndex = output.Index(startX, y, virtualBand);
 
-          int bufferSampleIndex = -1;
-          for(int x = startX; x < endX;) {
-            int nextSampleBufferIndex = output.Index(x, y, virtualBand);
+          for(int x = startX; x <= endX; x++) {
             const int &sampleIntoChunk = x - chunkStartSample;
-            // Handle sample iteration
-            // If we continue to compute the same bufferIndex just iterate by 1
-            // If we compute the next index, increment by the 
-            // floored sample increment and read the DN value
-            // at newly computed index
-            if (bufferSampleIndex == nextSampleBufferIndex) {
-              x++;
-              continue;
-            }
-            else {
-              x += sampleIncrement;
-              bufferSampleIndex = nextSampleBufferIndex;
-            }
 
             const int &chunkIndex = sampleIntoChunk +
                 (chunkLineSize * lineIntoChunk) +
-                (chunkBandSize * bandIntoChunk);
+                (chunkBandSize * bandIntoChunk);            
 
-            double &bufferVal = buffersDoubleBuf[bufferSampleIndex];
+            double &bufferVal = buffersDoubleBuf[bufferIndex];
 
             if(m_pixelType == Real) {
               float raw = ((float *)chunkBuf)[chunkIndex];
@@ -1405,7 +1384,7 @@ namespace Isis {
                   bufferVal = LOW_REPR_SAT8;
               }
 
-              ((float *)buffersRawBuf)[bufferSampleIndex] = raw;
+              ((float *)buffersRawBuf)[bufferIndex] = raw;
             }
 
             else if(m_pixelType == SignedWord) {
@@ -1431,7 +1410,7 @@ namespace Isis {
                   bufferVal = LOW_REPR_SAT8;
               }
 
-              ((short *)buffersRawBuf)[bufferSampleIndex] = raw;
+              ((short *)buffersRawBuf)[bufferIndex] = raw;
             }
 
 
@@ -1462,7 +1441,7 @@ namespace Isis {
                   bufferVal = LOW_REPR_SAT8;
               }
 
-              ((unsigned short *)buffersRawBuf)[bufferSampleIndex] = raw;
+              ((unsigned short *)buffersRawBuf)[bufferIndex] = raw;
             }
 
             else if(m_pixelType == UnsignedInteger) {
@@ -1493,7 +1472,7 @@ namespace Isis {
                   bufferVal = LOW_REPR_SAT8;
               }
 
-              ((unsigned int *)buffersRawBuf)[bufferSampleIndex] = raw;
+              ((unsigned int *)buffersRawBuf)[bufferIndex] = raw;
 
 
 
@@ -1512,21 +1491,10 @@ namespace Isis {
                 bufferVal = (double) raw * m_multiplier + m_base;
               }
 
-              ((unsigned char *)buffersRawBuf)[bufferSampleIndex] = raw;
+              ((unsigned char *)buffersRawBuf)[bufferIndex] = raw;
             }
-          }
 
-          // Handle line iteration
-          // If we continue to compute the same bufferIndex just iterate by 1
-          // If we compute a next index, increment by the floored 
-          // line increment
-          if (bufferLineIndex == nextLineBufferIndex) {
-            y++;
-            continue;
-          }
-          else {
-            y += lineIncrement;
-            bufferLineIndex = nextLineBufferIndex;
+            bufferIndex++;
           }
         }
       }
@@ -1582,11 +1550,11 @@ namespace Isis {
       if(virtualBand != 0 && virtualBand >= bufferBand &&
          virtualBand <= bufferBand + bufferBands - 1) {
 
-        for(int y = startY; y < endY; y++) {
+        for(int y = startY; y <= endY; y++) {
           const int &lineIntoChunk = y - outputStartLine;
           int bufferIndex = buffer.Index(startX, y, virtualBand);
 
-          for(int x = startX; x < endX; x++) {
+          for(int x = startX; x <= endX; x++) {
             const int &sampleIntoChunk = x - outputStartSample;
 
             const int &chunkIndex = sampleIntoChunk +

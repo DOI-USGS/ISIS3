@@ -44,9 +44,8 @@ namespace Isis {
   BufferManager::BufferManager(int maxsamps, int maxlines,
                                int maxbands, int bufsamps,
                                int buflines, int bufbands,
-                               Isis::PixelType type, bool reverse, 
-                               double scale) :
-                                   Isis::Buffer(bufsamps, buflines, bufbands, type, scale),
+                               Isis::PixelType type, bool reverse) :
+                                   Isis::Buffer(bufsamps, buflines, bufbands, type),
                                    p_maxSamps(maxsamps), p_maxLines(maxlines),
                                    p_maxBands(maxbands) {
     SetIncrements(bufsamps, buflines, bufbands);
