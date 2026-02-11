@@ -634,9 +634,11 @@ namespace Isis {
     // UniversalGroundMaps default to camera priority, so create a new one so that we can use projection if it exists.
     UniversalGroundMap *groundMap = viewport->universalGroundMap();
     Distance viewportResolution;
-    if (groundMap->Camera() != NULL){
-      if (groundMap->Camera()->target()->isSky()) {
-        return Distance(groundMap->Camera()->RaDecResolution(), Distance::Units::Meters);
+    if (groundMap) {
+      if (groundMap->Camera() != NULL) {
+        if (groundMap->Camera()->target()->isSky()) {
+          return Distance(groundMap->Camera()->RaDecResolution(), Distance::Units::Meters);
+        }
       }
     }
 
