@@ -7,16 +7,30 @@
 
   <description>
     <p>
-      Reads an input label file and image file. The contents of the ISIS cube label file are
-      generated using the template file specified by the TEMPLATE parameter.
+      Imports an input label file and image file to an ISIS cube,
+      using a template file (optionally specified by the TEMPLATE parameter).
+      The primary ISIS ingestion app for PDS4 products.
     </p>
     <p>
-      If a template file for the input label is included in ISIS, 
-      it will be used automatically and does not need to be specified.
-      NOTE: Some template files are incomplete/still being developed.
+      <code>isisimport</code> will auto-select a template based on product type 
+      (PDS3, PDS4, qube), Spacecraft ID, and Instrument ID. 
+      The auto-selection logic can be found in the 
+      <a href="https://github.com/DOI-USGS/ISIS3/blob/dev/isis/appdata/import/fileTemplate.tpl"><code>$ISISROOT/appdata/import/fileTemplate.tpl</code></a> file.
     </p>
     <p>
-      In particular, isisimport can import Chandrayaan 2, TGO Cassis, and Clipper EIS Images.
+      If auto-selection fails, use the TEMPLATE parameter to specify a template.
+    </p>
+    <p>
+      <code>isisimport</code> should be used for any PDS4 product. 
+      Supported PDS4 missions (as of early 2026) include Chandrayaan 2, TGO Cassis, and Clipper EIS. 
+      If a PDS4-format product can't be ingested with isisimport, 
+      make an issue on the <a href="https://github.com/DOI-USGS/ISIS3/issues">ISIS repo</a>.
+    </p>
+    <p>
+      NOTE: Most PDS3 template files are incomplete. 
+      There is no planned work to migrate PDS3 ingestion into isisimport. 
+      Most PDS3 products have dedicated 2isis applications. 
+      See the relevant mission section of the ISIS docs for details.
     </p>
     <p>
       This application uses the <a href="https://pantor.github.io/inja">Inja templating engine</a>
