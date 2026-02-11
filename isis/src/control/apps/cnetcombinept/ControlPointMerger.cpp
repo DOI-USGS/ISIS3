@@ -169,7 +169,7 @@ namespace Isis {
 
       BOOST_FOREACH ( ControlMeasure *m, measures ) {
         if ( !source->HasSerialNumber(m->GetCubeSerialNumber()) ) {
-          QScopedPointer<ControlMeasure> p_m(new ControlMeasure(*m));
+          std::unique_ptr<ControlMeasure> p_m(new ControlMeasure(*m));
 
           // Handle the transfer of a reference measure from the candidate
           if ( candidate->GetRefMeasure() == m ) {
@@ -181,7 +181,7 @@ namespace Isis {
           if (setCandidateType) {
             p_m->SetType(ControlMeasure::Candidate);
           }
-          source->Add( p_m.take() );
+          source->Add( p_m.release() );
           nMerged++;
         }
       }

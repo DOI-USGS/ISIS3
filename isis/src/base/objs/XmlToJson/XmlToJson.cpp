@@ -41,11 +41,10 @@ namespace Isis {
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
-    QString errMsg;
-    int errLine, errCol;
-    if (!doc.setContent(&file, &errMsg, &errLine, &errCol)) {
+    QDomDocument::ParseResult result = doc.setContent(&file);
+    if (!bool(result)) {
       file.close();
-      QString message = QString("Failed to use file for XML Input: [%1]. %2 at line %3, column %4").arg(xmlFile).arg(errMsg).arg(errLine).arg(errCol);
+      QString message = QString("Failed to use file for XML Input: [%1]. %2 at line %3, column %4").arg(xmlFile).arg(result.errorMessage).arg(result.errorLine).arg(result.errorColumn);
       throw IException(IException::Io, message, _FILEINFO_);
     }
 

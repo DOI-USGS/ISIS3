@@ -201,7 +201,7 @@ namespace Isis {
   QString AbstractTreeItem::catchNull(QVariant data) {
     QString result;
 
-    if (data.type() == QVariant::Double) {
+    if (data.typeId() == QMetaType::Double) {
       double dblData = data.toDouble();
       result = "NULL";
 

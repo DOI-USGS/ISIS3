@@ -800,13 +800,9 @@ namespace Isis {
   void FeatureNomenclature::requestFinished(QNetworkReply *reply) {
     if (reply->error() == QNetworkReply::NoError) {
 
-      QString errorMsg;
-      int errorLine;
-      int errorCol;
-
       QDomDocument xmlResultDocument;
-      if (xmlResultDocument.setContent(reply->readAll(),
-                                       &errorMsg, &errorLine, &errorCol)) {
+      QDomDocument::ParseResult result = xmlResultDocument.setContent(reply->readAll());
+      if (bool(result)) {
         for (QDomNode node = xmlResultDocument.firstChild();
              !node.isNull();
              node = node.nextSibling()) {
@@ -827,9 +823,9 @@ namespace Isis {
                            "An error occurred when parsing the data sent back "
                            "from the nomenclature database. "
                            "The XML result was invalid. The parse is [" +
-                           errorMsg + "] on line [" +
-                           QString::number(errorLine) +"], column [" +
-                           QString::number(errorCol) + "]");
+                           result.errorMessage + "] on line [" +
+                           QString::number(result.errorLine) +"], column [" +
+                           QString::number(result.errorColumn) + "]");
       }
     }
     else {

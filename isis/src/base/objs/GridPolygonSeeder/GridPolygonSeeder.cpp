@@ -169,14 +169,7 @@ namespace Isis {
       //   of the grid.
       int xSteps = (int)((polyBoundBox->getMaxX() - polyBoundBox->getMinX()) / p_Xspacing + 1.5);
       int ySteps = (int)((polyBoundBox->getMaxY() - polyBoundBox->getMinY()) / p_Yspacing + 1.5);
-      PointStatus pointCheck[xSteps][ySteps];
-
-      // Initialize our grid of point status'
-      for(int y = 0; y < ySteps; y++) {
-        for(int x = 0; x < xSteps; x++) {
-          pointCheck[x][y] = pointShouldCheck;
-        }
-      }
+      std::vector<std::vector<PointStatus>> pointCheck(xSteps, std::vector<PointStatus>(ySteps, pointShouldCheck));
 
       /**
       * This is a pretty good equation for how much precision is to be used in the in-depth checks
@@ -312,14 +305,7 @@ namespace Isis {
       gridNewCheckPt,
       gridCheckPt
     };
-
-    GridPoint grid[gridSize][gridSize];
-
-    for(int y = 0; y < gridSize; y++) {
-      for(int x = 0; x < gridSize; x++) {
-        grid[x][y] = gridEmpty;
-      }
-    }
+    std::vector<std::vector<GridPoint>> grid(gridSize, std::vector<GridPoint>(gridSize, gridEmpty));
 
     // Precision 0: Always center, this is always true
     grid[gridSize/2][gridSize/2] = gridCheckPt;

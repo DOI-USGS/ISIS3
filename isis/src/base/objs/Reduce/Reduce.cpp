@@ -193,7 +193,7 @@ namespace Isis {
       mdIncTab[miOutputSamples-1] = miInputSamples;
     }
 
-    unordered_map<QString, int> specialPixelCounts[miOutputSamples];
+    std::vector<unordered_map<QString, int>> specialPixelCounts(miOutputSamples);
 
     while(mdLine < rline) {
       if((int)mdLine <= miInputLines) {

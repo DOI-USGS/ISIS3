@@ -2511,12 +2511,12 @@ namespace Isis {
       double radTol = 0.000000017453; //.000001 degrees  Make this instrument dependent TODO
       SpiceInt avflag = 1;            // Don't use angular velocity for now
       SpiceInt nints = 1;             // Always make an observation a single interpolation interval
-      double dparr[p_fullCacheSize];    // Double precision work array
-      SpiceInt intarr[p_fullCacheSize]; // Integer work array
+      std::vector<double> dparr(p_fullCacheSize);    // Double precision work array
+      std::vector<SpiceInt> intarr(p_fullCacheSize); // Integer work array
       SpiceInt sizOut = p_fullCacheSize; // Size of downsized cache
 
       ck3sdn(radTol, avflag, (int *) &sizOut, &timeSclkdp[0], (doublereal *) &quats[0],
-             (SpiceDouble *) &avvs[0], nints, &cubeStarts, dparr, (int *) intarr);
+             (SpiceDouble *) &avvs[0], nints, &cubeStarts, &dparr[0], (int *) &intarr[0]);
 
       // Clear full cache and load with downsized version
       p_cacheTime.clear();
@@ -2559,9 +2559,9 @@ namespace Isis {
       SpiceInt handle;
 
       // Define some Naif constants
-      int FILESIZ = 128;
-      int TYPESIZ = 32;
-      int SOURCESIZ = 128;
+      constexpr int FILESIZ = 128;
+      constexpr int TYPESIZ = 32;
+      constexpr int SOURCESIZ = 128;
 //      double DIRSIZ = 100;
 
       SpiceChar file[FILESIZ];
@@ -3174,9 +3174,9 @@ namespace Isis {
     ktotal_c("PCK", &count);
 
     // Define some Naif constants
-    int FILESIZ = 128;
-    int TYPESIZ = 32;
-    int SOURCESIZ = 128;
+    constexpr int FILESIZ = 128;
+    constexpr int TYPESIZ = 32;
+    constexpr int SOURCESIZ = 128;
     SpiceChar file[FILESIZ];
     SpiceChar filetype[TYPESIZ];
     SpiceChar source[SOURCESIZ];

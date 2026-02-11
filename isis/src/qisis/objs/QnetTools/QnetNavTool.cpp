@@ -858,12 +858,14 @@ namespace Isis {
       return;
     }
     QList<QListWidgetItem *> selected = m_listBox->selectedItems();
-    switch (QMessageBox::question((QWidget *)parent(),
-        "Control Network Navigator - Ignore Points",
-        "You have chosen to set "
-        + QString::number(selected.size())
-        + " point(s) to ignore. Do you want to continue?",
-        "&Yes", "&No", 0, 0)) {
+    QString message = "You have chosen to set " +
+                      QString::number(selected.size()) +
+                      " point(s) to ignore. Do you want to continue?";
+    int ret = QMessageBox::question((QWidget *)parent(),
+                                    "Control Network Navigator - Ignore Points",
+                                    message,
+                                    QMessageBox::Yes | QMessageBox::No);
+    switch (ret) {
       case 0: // Yes was clicked or Enter was pressed, delete points
         QApplication::setOverrideCursor(Qt::WaitCursor);
         int lockedPoints = 0;
@@ -928,12 +930,13 @@ namespace Isis {
           "Error", "No point selected to delete");
       return;
     }
-    switch (QMessageBox::question((QWidget *)parent(),
-        "Control Network Navigator - Delete Points",
-        "You have chosen to delete "
-        + QString::number(selected.size())
-        + " point(s). Do you want to continue?",
-        "&Yes", "&No", 0, 0)) {
+    int ret = QMessageBox::question((QWidget *)parent(),
+                                    "Control Network Navigator - Delete Points",
+                                    "You have chosen to delete "
+                                    + QString::number(selected.size())
+                                    + " point(s). Do you want to continue?",
+                                    QMessageBox::Yes | QMessageBox::No);
+    switch (ret) {
       case 0: // Yes was clicked or Enter was pressed, delete points
 
 

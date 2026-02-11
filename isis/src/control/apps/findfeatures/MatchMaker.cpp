@@ -299,7 +299,7 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
 
   // Add a measure to the existing control point std::cout << "Adding new
   // ControlMeasure...\n";
-  QScopedPointer<ControlMeasure> trainpt(makeMeasure(mpair.train(),
+  std::unique_ptr<ControlMeasure> trainpt(makeMeasure(mpair.train(),
                                                      point.trainIdx,
                                                      solution.matcher()->name() ) );
 
@@ -348,7 +348,7 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
     }
 
     nMade++;
-    (*cpt)->Add( trainpt.take() );
+    (*cpt)->Add( trainpt.release() );
   }
   return (nMade);
 }
@@ -356,7 +356,7 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
 ControlMeasure *MatchMaker::makeMeasure(const MatchImage &image,
                                         const int &keyindex,
                                         const QString &name) const {
-  QScopedPointer<ControlMeasure> v_measure(new ControlMeasure());
+  std::unique_ptr<ControlMeasure> v_measure(new ControlMeasure());
   v_measure->SetChooserName(name);
   v_measure->SetCubeSerialNumber(image.id());
 
@@ -367,7 +367,7 @@ ControlMeasure *MatchMaker::makeMeasure(const MatchImage &image,
   cv::Point2f query = image.imageToSource(image.keypoint(keyindex).pt);
   // std::cout << "SourceCoordinate: " << query << "\n";
   v_measure->SetCoordinate(query.x, query.y, ControlMeasure::Candidate);
-  return ( v_measure.take() );
+  return ( v_measure.release() );
 }
 
 SurfacePoint MatchMaker::getSurfacePoint( const ControlMeasure &measure,

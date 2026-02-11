@@ -718,8 +718,8 @@ namespace Isis {
     double startX = width() / 2 - (p_boxWidth * (int)floor(p_boxSamps / 2) + (p_boxWidth / 2));
     double startY = height() / 2 - (p_boxHeight * (int)floor(p_boxLines / 2) + (p_boxHeight / 2));
 
-    int x = (int)ceil((event->x() - startX) / p_boxWidth);
-    int y = (int)ceil((event->y() - startY) / p_boxHeight);
+    int x = (int)ceil((event->position().x() - startX) / p_boxWidth);
+    int y = (int)ceil((event->position().y() - startY) / p_boxHeight);
 
     if(!p_set || x < 1 || y < 1 || x > p_boxSamps || y > p_boxLines) {
       emit setSample("Sample: n/a");

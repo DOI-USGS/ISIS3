@@ -352,7 +352,7 @@ namespace Isis {
     }
   
     // Open the NAIF Digital Shape Kernel (DSK)
-    QScopedPointer<NaifDskDescriptor> dsk(new NaifDskDescriptor());
+    std::unique_ptr<NaifDskDescriptor> dsk(new NaifDskDescriptor());
     dsk->m_dskfile = dskfile;
     NaifStatus::CheckErrors();
     dasopr_c( dskFile.expanded().toLatin1().data(), &dsk->m_handle );
@@ -376,7 +376,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   
     // return pointer
-    return ( dsk.take() );
+    return ( dsk.release() );
   }
   
 

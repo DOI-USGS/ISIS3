@@ -395,17 +395,15 @@ namespace Isis {
     QList<QString> cubesToOpen;
 
     QFile file(cubeFileName.filePath());
-    file.open(QIODevice::ReadOnly);
+    if (file.open(QIODevice::ReadOnly)) {
+      // Loop through every cube name in the cube list and add it to a list of cubes to open.
+      while ( !file.atEnd() ) {
+        QString line = file.readLine().replace("\n", "");
+        cubesToOpen.append(line);
+      }
 
-    QTextStream in(&file);
-
-    // Loop through every cube name in the cube list and add it to a list of cubes to open.
-    while ( !file.atEnd() ) {
-      QString line = file.readLine().replace("\n", "");
-      cubesToOpen.append(line);
+      file.close();
     }
-
-    file.close();
 
     for (int i = 0; i < cubesToOpen.size(); i++) {
 

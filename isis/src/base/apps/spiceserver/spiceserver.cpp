@@ -91,9 +91,8 @@ namespace Isis {
 
         // Parse the XML with Qt's XML parser... kindof convoluted, I'm sorry
         QDomDocument document;
-        QString error;
-        int errorLine, errorCol;
-        if ( document.setContent(QString(xml), &error, &errorLine, &errorCol) ) {
+        QDomDocument::ParseResult result = document.setContent(QString(xml));
+        if ( bool(result) ) {
           QDomElement rootElement = document.firstChild().toElement();
 
           for ( QDomNode node = rootElement.firstChild();
@@ -121,9 +120,9 @@ namespace Isis {
         }
         else {
           QString err = "Unable to read XML. The reason given was [";
-          err += error;
-          err += "] on line [" + toString(errorLine) + "] column [";
-          err += toString(errorCol) + "]";
+          err += result.errorMessage;
+          err += "] on line [" +  QString::number(result.errorLine) + "] column [";
+          err += QString::number(result.errorColumn) + "]";
           throw IException(IException::Io, err, _FILEINFO_);
         }
       }

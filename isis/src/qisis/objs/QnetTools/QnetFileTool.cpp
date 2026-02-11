@@ -123,9 +123,8 @@ namespace Isis {
       int resp = QMessageBox::warning((QWidget *)parent(), "Qnet",
           "The control network files has been modified.\n"
           "Do you want to save your changes?",
-          QMessageBox::Yes | QMessageBox::Default,
-          QMessageBox::No,
-          QMessageBox::Cancel | QMessageBox::Escape);
+          QMessageBox::Yes | QMessageBox::No,
+          QMessageBox::Yes);
       if (resp == QMessageBox::Yes) {
         saveAs();
       }
@@ -237,9 +236,8 @@ namespace Isis {
       int resp = QMessageBox::warning((QWidget *)parent(), "QnetTool",
           "The control network files has been modified.\n"
           "Do you want to save your changes?",
-          QMessageBox::Yes | QMessageBox::Default,
-          QMessageBox::No,
-          QMessageBox::Cancel | QMessageBox::Escape);
+          QMessageBox::Yes | QMessageBox::No,
+          QMessageBox::Yes);
       if (resp == QMessageBox::Yes) {
         saveAs();
       }

@@ -195,7 +195,8 @@ namespace Isis {
     p.EndProcess();
 
     // Now go fix errors around the wago changes
-    gbl::FixWagoLines(ui.GetCubeName("TO"));
+    FileName outCube(ui.GetCubeName("TO"));
+    gbl::FixWagoLines(outCube.expanded());
 
     // Cleanup
     gbl::pixelGain.clear();

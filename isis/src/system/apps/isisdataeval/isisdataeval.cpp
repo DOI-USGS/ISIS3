@@ -337,8 +337,8 @@ namespace Isis {
                     qint64 nread = v_file.read(file_data.get(), MaxBytesToRead );
 
                     // Add to hashes
-                    file_hash.addData(   file_data.get(), nread );
-                    volume_hash.addData( file_data.get(), nread );
+                    file_hash.addData(   QByteArrayView(file_data.get()));
+                    volume_hash.addData( QByteArrayView(file_data.get()));
                   }
 
                   // Write the file hash to the output file row

@@ -57,7 +57,7 @@ namespace Isis {
 
     // Set up find point action
     p_findPoint = new QAction(parent);
-    p_findPoint->setShortcut(Qt::CTRL + Qt::Key_F);
+    p_findPoint->setShortcut(Qt::CTRL | Qt::Key_F);
     p_findPoint->setText("&Find Point");
     p_findPoint->setIcon( QPixmap(toolIconDir() + "/find.png") );
     QString text =
@@ -639,6 +639,7 @@ namespace Isis {
         return Distance(groundMap->Camera()->RaDecResolution(), Distance::Units::Meters);
       }
     }
+
 
     try {
       if ( groundMap && !IsSpecial(lat) && !IsSpecial(lon) &&

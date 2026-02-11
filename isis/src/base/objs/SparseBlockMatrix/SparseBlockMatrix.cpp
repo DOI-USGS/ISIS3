@@ -355,10 +355,10 @@ namespace Isis {
       // read block number (key); rows (size1); and columns (size2)
       stream >> nBlockNumber >> nRows >> nCols;
 
-      double data[nRows*nCols];
+      std::vector<double> data(nRows*nCols, 0.0);
 
       // read raw matrix data
-      stream.readRawData((char*)data, nRows*nCols*sizeof(double));
+      stream.readRawData((char*)&data[0], nRows*nCols*sizeof(double));
 
       // insert matrix at correct key
       sbcm.insertMatrixBlock(nBlockNumber, nRows, nCols);
@@ -737,10 +737,10 @@ namespace Isis {
       // read block number (key); rows (size1); and columns (size2)
       stream >> nBlockNumber >> nRows >> nCols;
 
-      double data[nRows*nCols];
+      std::vector<double> data(nRows*nCols, 0.0);
 
       // read raw matrix data
-      stream.readRawData((char*)data, nRows*nCols*sizeof(double));
+      stream.readRawData((char*)&data[0], nRows*nCols*sizeof(double));
 
       // insert matrix at correct key
       sbrm.insertMatrixBlock(nBlockNumber, nRows, nCols);

@@ -1634,7 +1634,7 @@ namespace Isis {
       contextMenu.addAction(pasteAct);
 
       QAction *chosenAct = contextMenu.exec(
-          qobject_cast<QWidget *>(object)->mapToGlobal(event->pos()));
+          qobject_cast<QWidget *>(object)->mapToGlobal(event->position().toPoint()));
 
       if (chosenAct == pasteAct) {
         pasteCurve();
@@ -1871,7 +1871,7 @@ namespace Isis {
         QAction *cancelAct = new QAction("&Cancel", this);
         dropActionsMenu.addAction(cancelAct);
 
-        QAction *chosenAct = dropActionsMenu.exec(mapToGlobal(event->pos()));
+        QAction *chosenAct = dropActionsMenu.exec(mapToGlobal(event->position().toPoint()));
 
         if (chosenAct == copyAct) {
           actionToTake = Qt::CopyAction;
