@@ -215,7 +215,7 @@ namespace Isis {
       // Read the GeoTransform and get the elements we care about
       double *padfTransform = new double[6];
       dataset->GetGeoTransform(padfTransform);
-      if (abs(padfTransform[1]) != abs(padfTransform[5])) {
+      if ((abs(padfTransform[1]) - abs(padfTransform[5])) > 1e-2) {
         delete[] padfTransform;
         QString msg = "Vertical and horizontal resolution do not match";
         throw IException(IException::Io, msg, _FILEINFO_);
