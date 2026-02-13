@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
+#include <cmath>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -17,9 +18,6 @@
 #include "PvlGroup.h"
 #include "PvlObject.h"
 #include "PvlKeyword.h"
-
-#include "gdal.h"
-#include "cpl_conv.h"
 
 #include "equalizer.h"
 
@@ -75,13 +73,6 @@ QStringList readListFile(const QString &path) {
   return lines;
 }
 
-
-void initGdalOrFail() {
-  // Ensure drivers are registered inside the test process (ctest env can differ from your shell).
-  GDALAllRegister();
-  ASSERT_GT(GDALGetDriverCount(), 0) << "GDAL has 0 registered drivers in-process";
-}
-
 PvlGroup findNormalizationGroupByBaseName(const PvlObject &root, const QString &baseName) {
   for (int i = 0; i < root.groups(); i++) {
     const PvlGroup &g = root.group(i);
@@ -121,14 +112,65 @@ void expectBandTripletWellFormed(const PvlGroup &norm, const QString &bandKey) {
   EXPECT_GT(gain, 0.0) << bandKey.toStdString() << " gain must be > 0";
 }
 
+static QString isisTestdataRoot() {
+  return QString::fromUtf8(qgetenv("ISISTESTDATA"));
+}
+
+static QString equalizerCaseRootFromIsisTestdata() {
+  const QString root = isisTestdataRoot();
+  if (root.isEmpty()) return "";
+  return QDir(root).filePath("isis/src/base/apps/equalizer/tsts/nonOverlapRetryBoth");
+}
+
+static bool resolveInputCube(const QString &inTreeBase,
+                             const QString &cubeName,
+                             QString *resolvedPath,
+                             QString *diagnostic) {
+  QStringList tried;
+
+  // 1) In-tree (developer convenience)
+  const QString inTree = QDir(inTreeBase).filePath(cubeName);
+  tried << inTree;
+  if (QFileInfo::exists(inTree)) {
+    *resolvedPath = inTree;
+    return true;
+  }
+
+  // 2) ISISTESTDATA layouts
+  const QString caseRoot = equalizerCaseRootFromIsisTestdata();
+  if (!caseRoot.isEmpty()) {
+    const QString cand1 = QDir(caseRoot).filePath("input/" + cubeName);
+    const QString cand2 = QDir(caseRoot).filePath(cubeName);  // optional alternate
+    tried << cand1 << cand2;
+
+    if (QFileInfo::exists(cand1)) { *resolvedPath = cand1; return true; }
+    if (QFileInfo::exists(cand2)) { *resolvedPath = cand2; return true; }
+  }
+  else {
+    tried << "ISISTESTDATA not set";
+  }
+
+  if (diagnostic) {
+    *diagnostic =
+      "Missing cube: " + cubeName + "\n"
+      "ISISTESTDATA=" + isisTestdataRoot() + "\n"
+      "Tried:\n  - " + tried.join("\n  - ");
+  }
+
+  *resolvedPath = "";
+  return false;
+}
+
 }  // namespace
 
 TEST(Equalizer, NonOverlapRetryBoth) {
   Preference::Preferences(true);
-  initGdalOrFail();
 
   const QString dataBase =
       QString(_SOURCE_PREFIX) + "/data/equalizer/nonOverlapRetryBoth";
+
+  ASSERT_TRUE(QFileInfo::exists(joinPath(dataBase, "nonOverlapStats.pvl")));
+  ASSERT_TRUE(QFileInfo::exists(joinPath(dataBase, "toList.lis")));
 
   const QStringList allCubes = {
     "I10047011EDR.proj.reduced.cub",
@@ -157,7 +199,9 @@ TEST(Equalizer, NonOverlapRetryBoth) {
 
   // --- Stage inputs ---
   for (const auto &n : allCubes) {
-    copyFileOrFail(joinPath(dataBase, n), joinPath(inputAbs, n));
+    QString src, diag;
+    ASSERT_TRUE(resolveInputCube(dataBase, n, &src, &diag)) << diag.toStdString();
+    copyFileOrFail(src, joinPath(inputAbs, n));
   }
 
   copyFileOrFail(joinPath(dataBase, "toList.lis"),
@@ -177,6 +221,9 @@ TEST(Equalizer, NonOverlapRetryBoth) {
     for (const auto &n : allCubes) rel.append("../input/" + n);
     writeListFile(joinPath(outputAbs, "fixed.lis"), rel);
   }
+
+  // Save current working directory
+  const QString oldCwd = QDir::currentPath();
 
   // Run from output/ so list files resolve.
   ASSERT_TRUE(QDir::setCurrent(outputAbs));
@@ -258,5 +305,6 @@ TEST(Equalizer, NonOverlapRetryBoth) {
     EXPECT_TRUE(QFileInfo::exists(joinPath(outputAbs, outName)))
         << "Missing output cube: " << outName.toStdString();
   }
+  ASSERT_TRUE(QDir::setCurrent(oldCwd));
 }
 
