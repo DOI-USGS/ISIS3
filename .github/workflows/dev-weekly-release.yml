@@ -24,19 +24,19 @@ jobs:
           use-mamba: true
       - name: Build Release
         run: |
-          # export ISIS_VERSION=$(date +%Y.%m.%d)
-          # echo $ISIS_VERSION
-          # mamba install python=3.12 conda-build anaconda-client
-          # git fetch origin
-          # git checkout dev
-          # cd recipe
-          # echo $ENCRYPTION_KEY | openssl enc -aes-256-cbc -d -in kakadu/kakadu_7_9.zip.enc -out kakadu/kakadu_7_9.zip -pbkdf2 -iter 10000 -pass stdin
-          # unzip -j kakadu/kakadu_7_9.zip -d /tmp/kakadu_7_9 -x "__MACOSX/*"
-          # sed -i "s|/isisData/kakadu|/tmp/kakadu_7_9|g" build.sh
-          # sed -i "s/{% set version = \"[^\"]*\" %}/{% set version = \"$ISIS_VERSION\" %}/" meta.yaml
-          # sed -i "s/version: {{ version }}.0_RC[^ ]*/version: {{ version }}/" meta.yaml
-          # sed -i "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
-          # conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label dev
+          export ISIS_VERSION=$(date +%Y.%m.%d)
+          echo $ISIS_VERSION
+          mamba install python=3.12 conda-build anaconda-client
+          git fetch origin
+          git checkout dev
+          cd recipe
+          echo $ENCRYPTION_KEY | openssl enc -aes-256-cbc -d -in kakadu/kakadu_7_9.zip.enc -out kakadu/kakadu_7_9.zip -pbkdf2 -iter 10000 -pass stdin
+          unzip -j kakadu/kakadu_7_9.zip -d /tmp/kakadu_7_9 -x "__MACOSX/*"
+          sed -i "s|/isisData/kakadu|/tmp/kakadu_7_9|g" build.sh
+          sed -i "s/{% set version = \"[^\"]*\" %}/{% set version = \"$ISIS_VERSION\" %}/" meta.yaml
+          sed -i "s/version: {{ version }}.0_RC[^ ]*/version: {{ version }}/" meta.yaml
+          sed -i "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
+          conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label dev
 
   build-macos-15-intel:
     runs-on: macos-15-intel
@@ -50,19 +50,19 @@ jobs:
           use-mamba: true
       - name: Build Release
         run: |
-          # export ISIS_VERSION=$(date +%Y.%m.%d)
-          # echo $ISIS_VERSION
-          # mamba install conda-build anaconda-client
-          # git fetch origin
-          # git checkout dev
-          # cd recipe
-          # echo $ENCRYPTION_KEY | openssl enc -aes-256-cbc -d -in kakadu/kakadu_7_9.zip.enc -out kakadu/kakadu_7_9.zip -pbkdf2 -iter 10000 -pass stdin
-          # unzip -j kakadu/kakadu_7_9.zip -d /tmp/kakadu_7_9 -x "__MACOSX/*"
-          # sed -i '' "s|/isisData/kakadu|/tmp/kakadu_7_9|g" build.sh
-          # sed -i '' "s/{% set version = \"[^\"]*\" %}/{% set version = \"$ISIS_VERSION\" %}/" meta.yaml
-          # sed -i '' "s/version: {{ version }}.0_RC[^ ]*/version: {{ version }}/" meta.yaml
-          # sed -i '' "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
-          # conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label dev
+          export ISIS_VERSION=$(date +%Y.%m.%d)
+          echo $ISIS_VERSION
+          mamba install conda-build anaconda-client
+          git fetch origin
+          git checkout dev
+          cd recipe
+          echo $ENCRYPTION_KEY | openssl enc -aes-256-cbc -d -in kakadu/kakadu_7_9.zip.enc -out kakadu/kakadu_7_9.zip -pbkdf2 -iter 10000 -pass stdin
+          unzip -j kakadu/kakadu_7_9.zip -d /tmp/kakadu_7_9 -x "__MACOSX/*"
+          sed -i '' "s|/isisData/kakadu|/tmp/kakadu_7_9|g" build.sh
+          sed -i '' "s/{% set version = \"[^\"]*\" %}/{% set version = \"$ISIS_VERSION\" %}/" meta.yaml
+          sed -i '' "s/version: {{ version }}.0_RC[^ ]*/version: {{ version }}/" meta.yaml
+          sed -i '' "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
+          conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label dev
 
   build-macos15-arm64:
     runs-on: macos-15
@@ -76,19 +76,19 @@ jobs:
           use-mamba: true
       - name: Build Release
         run: |
-          # export ISIS_VERSION=$(date +%Y.%m.%d)
-          # echo $ISIS_VERSION
-          # mamba install conda-build anaconda-client
-          # git fetch origin
-          # git checkout dev
-          # cd recipe
-          # echo $ENCRYPTION_KEY | openssl enc -aes-256-cbc -d -in kakadu/kakadu_7_9.zip.enc -out kakadu/kakadu_7_9.zip -pbkdf2 -iter 10000 -pass stdin
-          # unzip -j kakadu/kakadu_7_9.zip -d /tmp/kakadu_7_9 -x "__MACOSX/*"
-          # sed -i '' "s|/isisData/kakadu|/tmp/kakadu_7_9|g" build.sh
-          # sed -i '' "s/{% set version = \"[^\"]*\" %}/{% set version = \"$ISIS_VERSION\" %}/" meta.yaml
-          # sed -i '' "s/version: {{ version }}.0_RC[^ ]*/version: {{ version }}/" meta.yaml
-          # sed -i '' "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
-          # conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label dev
+          export ISIS_VERSION=$(date +%Y.%m.%d)
+          echo $ISIS_VERSION
+          mamba install conda-build anaconda-client
+          git fetch origin
+          git checkout dev
+          cd recipe
+          echo $ENCRYPTION_KEY | openssl enc -aes-256-cbc -d -in kakadu/kakadu_7_9.zip.enc -out kakadu/kakadu_7_9.zip -pbkdf2 -iter 10000 -pass stdin
+          unzip -j kakadu/kakadu_7_9.zip -d /tmp/kakadu_7_9 -x "__MACOSX/*"
+          sed -i '' "s|/isisData/kakadu|/tmp/kakadu_7_9|g" build.sh
+          sed -i '' "s/{% set version = \"[^\"]*\" %}/{% set version = \"$ISIS_VERSION\" %}/" meta.yaml
+          sed -i '' "s/version: {{ version }}.0_RC[^ ]*/version: {{ version }}/" meta.yaml
+          sed -i '' "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
+          conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label dev
 
   test-ubuntu:
     runs-on: ubuntu-latest

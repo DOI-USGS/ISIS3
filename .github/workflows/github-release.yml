@@ -84,7 +84,6 @@ jobs:
           auto-update-conda: true
           activate-environment: isis-test
           use-mamba: true
-          mamba-version: "1.5.3"
 
       - name: Conda install and test spiceinit
         run: |
