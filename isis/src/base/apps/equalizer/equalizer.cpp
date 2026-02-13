@@ -26,7 +26,6 @@
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
 
-using namespace Isis;
 using namespace std;
 
 namespace Isis {
