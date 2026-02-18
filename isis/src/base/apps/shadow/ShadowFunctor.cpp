@@ -394,9 +394,33 @@ namespace Isis {
 
 
           Portal portal(3, 3, m_inputDem->pixelType(), -0.5, -0.5);
-          portal.SetPosition(sample + 1, line + 1, input.Band());
+          portal.SetPosition(sample, line, input.Band());
 
-          if (!portal.CopyOverlapFrom(input)) {
+          bool completeOverlap = (portal.size() <= input.size());
+          completeOverlap &= (portal.Sample() >= input.Sample());
+          completeOverlap &= (portal.Line() >= input.Line());
+          completeOverlap &= (portal.Band() >= input.Band());
+
+          int endSample = portal.Sample() + portal.SampleDimension() - 1;
+          int otherEndSample = input.Sample() + input.SampleDimension() - 1;
+
+          int endLine = portal.Line() + portal.LineDimension() - 1;
+          int otherEndLine = input.Line() + input.LineDimension() - 1;
+
+          int endBand = portal.Band() + portal.BandDimension() - 1;
+          int otherEndBand = input.Band() + input.BandDimension() - 1;
+
+          completeOverlap &= (endSample <= otherEndSample);
+          completeOverlap &= (endLine <= otherEndLine);
+          completeOverlap &= (endBand <= otherEndBand);
+
+          // We need a complete chip from our input DEM
+          // If we can get it from the input brick do that first
+          // Otherwise requst it from the DEM
+          if (completeOverlap) {
+            portal.CopyOverlapFrom(input);
+          }
+          else {
             m_inputDem->read(portal);
           }
 
