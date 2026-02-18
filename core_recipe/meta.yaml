@@ -1,4 +1,4 @@
-{% set version = "9.0.0" %}
+{% set version = "10.0.0" %}
 {% set build_number = "0" %}
 
 package:
@@ -18,23 +18,21 @@ build:
 requirements:
   build:
     - {{ compiler("cxx") }}
-    - {{ stdlib("c") }}
     - cmake >=3.27,<3.28
-    - gdal
     - ninja
     - python =3.11
     - setuptools
   host:
-    - gdal
+    - gdal >=3.12.2,<4
     - mesalib
-    - nlohmann_json
+    - nlohmann_json=3.11.2
     - python =3.11
-    - qt-main >=5.15.8, <5.16
+    - qt6-main >=6,<7
     - setuptools
     - swig
   run:
     - python =3.11
-    - {{ pin_compatible('qt-main', max_pin='x.x') }}
+    - {{ pin_compatible('qt6-main', max_pin='x.x') }}
     - {{ pin_compatible('nlohmann_json', min_pin='x.x.x', max_pin='x.x.x') }}
 
 test:
