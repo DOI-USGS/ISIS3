@@ -47,6 +47,8 @@ set(Pvl_source_files ${PROJECT_SOURCE_DIR}/src/ArraySubscriptNotInRange.cpp
                      ${PROJECT_SOURCE_DIR}/src/PvlKeyword.cpp
                      ${PROJECT_SOURCE_DIR}/src/PvlObject.cpp
                      ${PROJECT_SOURCE_DIR}/src/PvlSequence.cpp
+                     ${PROJECT_SOURCE_DIR}/src/PvlToken.cpp
+                     ${PROJECT_SOURCE_DIR}/src/PvlTokenizer.cpp
                      ${PROJECT_SOURCE_DIR}/src/Table.cpp
                      ${PROJECT_SOURCE_DIR}/src/TableField.cpp
                      ${PROJECT_SOURCE_DIR}/src/TableRecord.cpp)
@@ -55,49 +57,41 @@ add_library(core SHARED "${Pvl_source_files}")
 
 target_include_directories(core PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
-find_package(Qt5           REQUIRED COMPONENTS
+find_package(Qt6 REQUIRED COMPONENTS
                                     Core
+                                    Core5Compat
                                     Concurrent
                                     Widgets
                                     Xml
-                                    XmlPatterns
-                                    # Search this path explicitly for MacOS OpenGL Framework
-                                    PATHS /System/Library/Frameworks/ REQUIRED)
+                                    Network)
 find_package(nlohmann_json REQUIRED)
 find_package(GDAL          REQUIRED CONFIG)
 
-include_directories(SYSTEM
-                    ${Qt5Widgets_INCLUDE_DIRS}
-                    ${Qt5Concurrent_INCLUDE_DIRS}
-                    ${Qt5Network_INCLUDE_DIRS}
-                    ${Qt5Xml_INCLUDE_DIRS}
-                    ${CSPICE_INCLUDE_DIR}
-                    ${JSON_INCLUDE_DIR})
 
-target_link_libraries(core PUBLIC Qt5::Core
-                                  Qt5::Concurrent
-                                  Qt5::Widgets
-                                  Qt5::Network
-                                  Qt5::Xml
+target_link_libraries(core PUBLIC
+                                  Qt6::Core
+                                  Qt6::Core5Compat
+                                  Qt6::Concurrent
+                                  Qt6::Widgets
+                                  Qt6::Network
+                                  Qt6::Xml
                            PRIVATE
                                   nlohmann_json::nlohmann_json
                                   GDAL::GDAL)
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/isis
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/isis
         FILES_MATCHING PATTERN "*.h")
 
-install(TARGETS core DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(TARGETS core DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../../isis/IsisPreferences
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/isis)
 
-# Copy the preferences file
-EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_CURRENT_SOURCE_DIR}/../../../isis/IsisPreferences ${CMAKE_BINARY_DIR}/)
-install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/../../../isis/IsisPreferences DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../../LICENSE.md
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/isis)
 
-EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_CURRENT_SOURCE_DIR}/../../../LICENSE.md    ${CMAKE_BINARY_DIR})
-
-if (BUILD_TESTS)
-  # Copy the test preferences file
-  EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_CURRENT_SOURCE_DIR}/../../../isis/TestPreferences ${CMAKE_BINARY_DIR}/)
+if(BUILD_TESTS)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../../isis/TestPreferences DESTINATION ${CMAKE_INSTALL_DATADIR}/isis)
   enable_testing()
   add_subdirectory(tests)
 endif()
