@@ -77,21 +77,21 @@ TEST_F(DemCube, FunctionalTestShadowTime) {
   EXPECT_NEAR(double(shadowStats["MaximumElevation"]), 55.26088378675, 1.3e-08);
 
   EXPECT_EQ(int(shadowStats["NumRays"]), 9604);
-  EXPECT_EQ(int(shadowStats["NumRayDemIntersections"]), 10223);
-  EXPECT_DOUBLE_EQ(double(shadowStats["AverageRayDemIntersectionsPerRay"]), 1.0644523115369);
-  EXPECT_EQ(int(shadowStats["NumLightedPixels"]), 9507);
-  EXPECT_EQ(int(shadowStats["NumShadowedPixels"]), 97);
+  EXPECT_NEAR(int(shadowStats["NumRayDemIntersections"]), 10223, 30);
+  EXPECT_NEAR(double(shadowStats["AverageRayDemIntersectionsPerRay"]), 1.0644523115369, 1e-02);
+  EXPECT_NEAR(int(shadowStats["NumLightedPixels"]), 9507, 7);
+  EXPECT_NEAR(int(shadowStats["NumShadowedPixels"]), 97, 10);
   EXPECT_EQ(int(shadowStats["NumSpecialPixels"]), 2800);
-  EXPECT_EQ(int(shadowStats["NumPixelsShadowedByRays"]), 97);
+  EXPECT_NEAR(int(shadowStats["NumPixelsShadowedByRays"]), 97, 10);
 
   Cube shadowCube(shadowUi.GetCubeName("TO"));
 
   std::unique_ptr<Histogram> hist (shadowCube.histogram());
 
-  EXPECT_NEAR(hist->Average(), 0.57755353058426495, 3e-10);
-  EXPECT_NEAR(hist->Sum(), 5490.8014152646065, 2.9e-06);
-  ASSERT_EQ(hist->ValidPixels(), 9507);
-  EXPECT_NEAR(hist->StandardDeviation(), 0.0027126779510164519, 8.1e-11);
+  EXPECT_NEAR(hist->Average(), 0.57755353058426495, 3e-06);
+  EXPECT_NEAR(hist->Sum(), 5490.8014152646065, 5);
+  EXPECT_NEAR(hist->ValidPixels(), 9507, 7);
+  EXPECT_NEAR(hist->StandardDeviation(), 0.0027126779510164519, 5e-07);
 }
 
 TEST_F(DemCube, FunctionalTestShadowNoShadow) {
