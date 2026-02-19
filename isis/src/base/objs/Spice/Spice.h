@@ -285,6 +285,7 @@ namespace Isis {
       // constructors
       Spice(Cube &cube);
       Spice(Pvl &lab, nlohmann::json isd);
+      Spice(Cube &cube, bool useIsis);
 
       // destructor
       virtual ~Spice();
