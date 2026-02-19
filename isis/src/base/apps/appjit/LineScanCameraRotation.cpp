@@ -41,8 +41,9 @@ namespace Isis {
     p_yaw = 0.;
 
     // Load the Spice kernels to get state matrices
+    bool useIsis = true;
     p_spi = 0;
-    p_spi = new Isis::Spice(cube);
+    p_spi = new Isis::Spice(cube, useIsis);
 
     // Make sure the kernels are written to the labels and not just the tables (blobs)
     Pvl &lab = *cube.label();
