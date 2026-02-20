@@ -3,7 +3,7 @@ channels:
   - usgs-astrogeology
 
 dependencies:
-  - ale >=1.0.2,<2
+  - ale >=1.1.1,<2
   - aom
   - armadillo
   - blas
