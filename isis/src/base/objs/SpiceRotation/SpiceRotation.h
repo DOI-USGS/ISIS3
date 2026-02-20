@@ -428,16 +428,15 @@ namespace Isis {
       int p_axis2;                      //!< Axis of rotation for angle 2 of rotation
       int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
       ale::Orientations *m_orientation = nullptr; //! Cached orientation information
-
-    private:
-      // method
-      void setFrameType();
       std::vector<int> p_constantFrames;  /**< Chain of Naif frame codes in constant
                                                rotation TC. The first entry will always
                                                be the target frame code*/
       std::vector<int> p_timeFrames;      /**< Chain of Naif frame codes in time-based
                                                rotation CJ. The last entry will always
                                                be 1 (J2000 code)*/
+    private:
+      // method
+      void setFrameType();
       double p_timeBias;                  //!< iTime bias when reading kernels
 
       double p_et;                           //!< Current ephemeris time
