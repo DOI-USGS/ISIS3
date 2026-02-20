@@ -30,7 +30,7 @@ int main(void) {
   
   try {
     
-    std::string pref = "ch2_tmc_ncf_20231030T1757326391_d_img_d18"; 
+    std::string pref = "ch2_tmc_ncn_20231030T1757326423_d_img_d18-crop"; 
     std::string path =  "../../../../tests/data/chandrayaan2/" + pref + ".cub";
     Cube c(path.c_str(), "r");
     Camera *cam = CameraFactory::Create(c);

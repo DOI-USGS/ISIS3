@@ -1,6 +1,6 @@
 Unit test for Chandrayaan2TMC camera.
 FileName: ch2_tmc_ncf_20231030T1757326391_d_img_d18.cub
-CK Frame: -152221
+CK Frame: -152220
 
 Kernel IDs: 
 CK Frame ID = -152001
@@ -15,25 +15,25 @@ Instrument Name Short: TMC-2
 
 For upper left corner ...
 DeltaSample = 0.000000000
-DeltaLine = -0.000855841
+DeltaLine = 0.000000000
 
 For upper right corner ...
 DeltaSample = 0.000000000
-DeltaLine = -0.000855841
+DeltaLine = 0.000000000
 
 For lower left corner ...
 DeltaSample = 0.000000000
-DeltaLine = 0.000496502
+DeltaLine = 0.000000000
 
 For lower right corner ...
 DeltaSample = 0.000000000
-DeltaLine = 0.000496502
+DeltaLine = 0.000000000
 
 For center pixel position ...
 DeltaSample = 0.000000000
 DeltaLine = 0.000000000
 
-Universal latitude: -88.685764645
-Universal longitude: 161.291870743
-RightAscension: 276.119202527
-Declination: 40.856287254
+Universal latitude: -87.603907998
+Universal longitude: 189.674455379
+RightAscension: 280.344745141
+Declination: 65.563417917
