@@ -89,6 +89,7 @@ namespace Isis {
           props["kernels"] = kernel_pvl.str();
 
           json isd = ale::load(lab.fileName().toStdString(), props.dump(), "ale", false, false, true);
+          m_usingNaif = false;
           m_usingAle = true;
 
           isdInit(lab, isd);
