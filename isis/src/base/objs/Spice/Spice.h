@@ -340,6 +340,8 @@ namespace Isis {
       PvlObject getStoredNaifKeywords() const;
       virtual double resolution();
 
+      void load(PvlKeyword &key, bool notab);
+
     protected:
       /**
        * NAIF value primitive type
@@ -391,8 +393,6 @@ namespace Isis {
       void isdInit(Pvl &pvl, nlohmann::json isd);
       void csmInit(Cube &cube, Pvl label);
       void defaultInit();
-
-      void load(PvlKeyword &key, bool notab);
 
       QVector<QString> * m_kernels; //!< Vector containing kernels filenames
 
