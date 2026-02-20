@@ -301,9 +301,13 @@ namespace Isis {
     }
 
     m_instrumentRotation->LoadCache(isd["instrument_pointing"]);
-    if (m_instrumentRotation->cacheSize() == m_instrumentRotation->GetFullCacheTime().size()) {
+    if (m_instrumentRotation->cacheSize() == m_instrumentRotation->GetFullCacheTime().size() && 
+        m_instrumentRotation->cacheSize() > 5) {
       m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
       m_instrumentRotation->LoadTimeCache();
+    }
+    else {
+      m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Done);
     }
 
 
