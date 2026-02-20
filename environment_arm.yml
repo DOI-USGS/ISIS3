@@ -60,6 +60,7 @@ dependencies:
   - rclone
   - qhull
   - qt6-main >=6,<7
+  - qt6-multimedia
   - qwt =6.3.0
   - spiceypy >=6,<7
   - spiceql >=1.2.4,<2
