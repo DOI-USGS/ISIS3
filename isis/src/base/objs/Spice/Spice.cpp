@@ -103,27 +103,6 @@ namespace Isis {
     }
   }
 
-  /**
-   * Constructs a Spice Object to load kernels
-   * by bypassing use of ale.
-   *
-   * @param cube Isis Cube
-   * @param useIsis Override using ale to load kernels
-   */
-  Spice::Spice(Cube &cube, bool useIsis)
-    : Spice(cube)   {
-    if (useIsis) {
-      Pvl &lab = *cube.label();
-      PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
-      bool hasTables = (kernels["TargetPosition"][0] == "Table");
-
-      m_usingNaif = !lab.hasObject("NaifKeywords") || !hasTables;
-      m_usingAle = false;
-
-      init(cube, lab, !hasTables);
-    }
-  }
-
 
   /**
    * Constructs a Spice Object
