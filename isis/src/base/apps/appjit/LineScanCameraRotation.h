@@ -124,7 +124,7 @@ namespace Isis {
         p_yaw = yaw;
       };
 
-      Isis::PvlKeyword InstrumentPointingValue() { return p_ckKeyword; };
+      Isis::PvlKeyword InstrumentPointingValue() { return p_kernels["InstrumentPointing"]; };
 
     private:
       Isis::Spice *p_spi;
@@ -136,7 +136,7 @@ namespace Isis {
       bool p_cachesLoaded;                                //!< Flag indicated p_cache and p_cacheIB are loaded
       double p_pitchRate;                                 //!< Optional update to pitch rate
       double p_yaw;                                       //!< Optional update to yaw
-      Isis::PvlKeyword p_ckKeyword;                       //!< List of the ck and related fk
+      Isis::PvlGroup p_kernels;                           //!< List of the ck and related fk
   };
 };
 

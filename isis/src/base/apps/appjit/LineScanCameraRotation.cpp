@@ -52,18 +52,34 @@ namespace Isis {
     }
 
     // Get the kernel group and save the instrument pointing keyword
-    Isis::PvlGroup kernels = lab.findGroup("Kernels", Isis::Pvl::Traverse);
-    p_ckKeyword = kernels["InstrumentPointing"];
+    p_kernels = lab.findGroup("Kernels", Isis::Pvl::Traverse);
 
     p_cacheTime = timeCache;
 
-    InitConstantRotation(p_cacheTime[0]);
+    // Generate a list of kernels from label
+    std::vector<QString> kernelKeys = {"LeapSecond", 
+                                       "TargetAttitudeShape", 
+                                       "TargetPosition", 
+                                       "InstrumentPointing",
+                                       "SpacecraftClock", 
+                                       "InstrumentPosition"};
+    for (QString key : kernelKeys) {
+      if (p_kernels.hasKeyword(key)) {
+        PvlKeyword &kernelKeyword = p_kernels[key];
+        p_spi->load(kernelKeyword, true);
+      }
+    }
 
     p_cachesLoaded = false;
     p_spi->instrumentRotation()->SetFrame(frameCode);
+    p_spi->setTime(p_cacheTime[0]);
     p_crot = p_spi->instrumentRotation();
     p_prot = p_spi->bodyRotation();
     p_spos = p_spi->instrumentPosition();
+
+    SetConstantMatrix(p_crot->ConstantMatrix());
+    p_constantFrames = p_crot->ConstantFrameChain();
+    p_timeFrames = p_crot->TimeFrameChain();
     // Load the line scan specific rotation matrix caches before loading the regular Spice caches because
     // the CreateCache method will unload all the kernels after the caches are created
     LoadCache();
@@ -124,7 +140,7 @@ namespace Isis {
     std::vector<ale::Rotation> rotationCache;
 
     bool useWeb = QString(Preference::Preferences().findGroup("SpiceQL")["UseSpiceQL"]).toUpper() == "TRUE";
-    auto [sunLt, kernels] = SpiceQL::getTargetStates(p_cacheTime, "MRO", "MARS", "IAU_MARS", "NONE", "mro", {"reconstructed"}, {"reconstructed"}, useWeb, false, false);
+    auto [sunLt, kernels] = SpiceQL::getTargetStates(p_cacheTime, "MRO", "MARS", "IAU_MARS", "NONE", "", {"reconstructed"}, {"reconstructed"}, useWeb, false, false);
 
     double state[6];
     for(std::vector<double>::iterator i = p_cacheTime.begin(); i < p_cacheTime.end(); i++) {
