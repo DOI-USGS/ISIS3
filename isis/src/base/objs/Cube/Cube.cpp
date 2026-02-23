@@ -1704,7 +1704,7 @@ namespace Isis {
     PvlKeyword demKeyword("ShapeModel");
     PvlKeyword exkKeyword("Extra");
 
-    Spice spice(*this->label(), isd);
+    Spice spice(*this, *this->label(), isd);
     Table ckTable = spice.instrumentRotation()->Cache("InstrumentPointing");
     ckTable.Label() += PvlKeyword("Kernels");
 

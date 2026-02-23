@@ -1,3 +1,4 @@
+#include "Cube.h"
 #include "Spice.h"
 #include "IException.h"
 #include "Pvl.h"
@@ -167,7 +168,8 @@ class ConstVelIsd : public ::testing::Test {
 };
 
 TEST_F(ConstVelIsd, TestSpiceFromIsd) {
-  Spice testSpice(isisLabel, constVelIsdStr);
+  Cube cube;
+  Spice testSpice(cube, isisLabel, constVelIsdStr);
   testSpice.setTime(100);
 
   EXPECT_DOUBLE_EQ(testSpice.time().Et(), 100);
@@ -187,6 +189,7 @@ TEST_F(ConstVelIsd, TestSpiceFromIsd) {
 }
 
 TEST_F(ConstVelIsd, SunToBodyDist) {
-  Spice testSpice(isisLabel, constVelIsdStr);
+  Cube cube;
+  Spice testSpice(cube, isisLabel, constVelIsdStr);
   EXPECT_DOUBLE_EQ(testSpice.sunToBodyDist(), 20);
 }

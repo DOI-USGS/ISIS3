@@ -92,7 +92,7 @@ namespace Isis {
           m_usingNaif = false;
           m_usingAle = true;
 
-          isdInit(lab, isd);
+          isdInit(cube, lab, isd);
         }
         catch(...) {
           init(cube, lab, !hasTables);
@@ -108,19 +108,20 @@ namespace Isis {
   /**
    * Constructs a Spice Object
    *
-   * @param lab Isis Cube Pvl Lavel
+   * @param cube Isis Cube
+   * @param lab Isis Cube Pvl Label assocaited with the cube parameter
    * @param isd ALE Json ISD
    */
-  Spice::Spice(Pvl &lab, json isd) {
+  Spice::Spice(Cube &cube, Pvl &lab, json isd) {
     // Set the expected member states for other parts of the Spice
     // class
-    m_usingNaif = true;
+    m_usingNaif = false;
     m_usingAle = true;
 
-    isdInit(lab, isd);
+    isdInit(cube, lab, isd);
   }
 
-  void Spice::isdInit(Pvl &lab, json isd) {
+  void Spice::isdInit(Cube &cube, Pvl &lab, nlohmann::json isd) {
     NaifStatus::CheckErrors();
     // Initialize members
     defaultInit();
@@ -275,19 +276,33 @@ namespace Isis {
 
     m_sunPosition = new SpicePosition(10, m_target->naifBodyCode());
 
+    // Check to see if we have table blobs to load
+    if (kernels["TargetPosition"][0].toUpper() == "TABLE") {
+      Table t = cube.readTable("SunPosition");
+      m_sunPosition->LoadCache(t);
 
-    // Check to see if we have nadir pointing that needs to be computed &
-    // See if we have table blobs to load
-    m_sunPosition->LoadCache(isd["sun_position"]);
-    if (m_sunPosition->cacheSize() > 3) {
-      m_sunPosition->Memcache2HermiteCache(0.01);
+      Table t2 = cube.readTable("BodyRotation");
+      m_bodyRotation->LoadCache(t2);
+      if (t2.Label().hasKeyword("SolarLongitude")) {
+        *m_solarLongitude = Longitude(t2.Label()["SolarLongitude"],
+            Angle::Degrees);
+      }
+      else {
+        solarLongitude();
+      }
     }
-    m_bodyRotation->LoadCache(isd["body_rotation"]);
-    m_bodyRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
-    if (m_bodyRotation->cacheSize() > 5) {
-      m_bodyRotation->LoadTimeCache();
+    else {
+      m_sunPosition->LoadCache(isd["sun_position"]);
+      if (m_sunPosition->cacheSize() > 3) {
+        m_sunPosition->Memcache2HermiteCache(0.01);
+      }
+      m_bodyRotation->LoadCache(isd["body_rotation"]);
+      m_bodyRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
+      if (m_bodyRotation->cacheSize() > 5) {
+        m_bodyRotation->LoadTimeCache();
+      }
+      solarLongitude();
     }
-    solarLongitude();
 
     //  We can't assume InstrumentPointing & InstrumentPosition exist, old
     //  files may be around with the old keywords, SpacecraftPointing &
@@ -300,14 +315,20 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    m_instrumentRotation->LoadCache(isd["instrument_pointing"]);
-    if (m_instrumentRotation->cacheSize() == m_instrumentRotation->GetFullCacheTime().size() && 
-        m_instrumentRotation->cacheSize() > 5) {
-      m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
-      m_instrumentRotation->LoadTimeCache();
+    if (kernels["InstrumentPointing"][0].toUpper() == "TABLE") {
+      Table t = cube.readTable("InstrumentPointing");
+      m_instrumentRotation->LoadCache(t);
     }
     else {
-      m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Done);
+      m_instrumentRotation->LoadCache(isd["instrument_pointing"]);
+      if (m_instrumentRotation->cacheSize() == m_instrumentRotation->GetFullCacheTime().size() && 
+          m_instrumentRotation->cacheSize() > 5) {
+        m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
+      }
+      else {
+        m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Done);
+      }
+      m_instrumentRotation->LoadTimeCache();
     }
 
 
@@ -317,7 +338,15 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    m_instrumentPosition->LoadCache(isd["instrument_position"]);
+    if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
+      Table t = cube.readTable("InstrumentPosition");
+      m_instrumentPosition->LoadCache(t);
+    }
+    else {
+      m_instrumentPosition->LoadCache(isd["instrument_position"]);
+    }
+
+    // Add checks for loading existing tables
     NaifStatus::CheckErrors();
   }
 
