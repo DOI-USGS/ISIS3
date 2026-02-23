@@ -277,7 +277,8 @@ namespace Isis {
     m_sunPosition = new SpicePosition(10, m_target->naifBodyCode());
 
     // Check to see if we have table blobs to load
-    if (kernels["TargetPosition"][0].toUpper() == "TABLE") {
+    if (kernels["TargetPosition"][0].toUpper() == "TABLE" &&
+        (cube.hasTable("SunPosition") && cube.hasTable("BodyRotation"))) {
       Table t = cube.readTable("SunPosition");
       m_sunPosition->LoadCache(t);
 
@@ -286,9 +287,6 @@ namespace Isis {
       if (t2.Label().hasKeyword("SolarLongitude")) {
         *m_solarLongitude = Longitude(t2.Label()["SolarLongitude"],
             Angle::Degrees);
-      }
-      else {
-        solarLongitude();
       }
     }
     else {
@@ -301,7 +299,6 @@ namespace Isis {
       if (m_bodyRotation->cacheSize() > 5) {
         m_bodyRotation->LoadTimeCache();
       }
-      solarLongitude();
     }
 
     //  We can't assume InstrumentPointing & InstrumentPosition exist, old
@@ -315,7 +312,8 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    if (kernels["InstrumentPointing"][0].toUpper() == "TABLE") {
+    if (kernels["InstrumentPointing"][0].toUpper() == "TABLE" &&
+        cube.hasTable("InstrumentPointing")) {
       Table t = cube.readTable("InstrumentPointing");
       m_instrumentRotation->LoadCache(t);
     }
@@ -324,11 +322,11 @@ namespace Isis {
       if (m_instrumentRotation->cacheSize() == m_instrumentRotation->GetFullCacheTime().size() && 
           m_instrumentRotation->cacheSize() > 5) {
         m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Yes);
+        m_instrumentRotation->LoadTimeCache();
       }
       else {
         m_instrumentRotation->MinimizeCache(SpiceRotation::DownsizeStatus::Done);
       }
-      m_instrumentRotation->LoadTimeCache();
     }
 
 
@@ -338,7 +336,8 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
+    if (kernels["InstrumentPosition"][0].toUpper() == "TABLE" &&
+        cube.hasTable("InstrumentPosition")) {
       Table t = cube.readTable("InstrumentPosition");
       m_instrumentPosition->LoadCache(t);
     }
