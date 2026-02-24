@@ -7,6 +7,7 @@
 #include "Preference.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
+#include <QFile>
 
 using namespace Isis;
 
@@ -174,12 +175,11 @@ TEST_F(AlphaCubeTest, UpdateGroupWritesExpectedAlphaCubeGroup) {
   AlphaCube d = MakeD();
   c.Rehash(d);
 
-  // Use the same test cube path as the legacy unit test, but only manipulate
-  // the in-memory label.
-  const QString cubePath =
-      FileName("$ISISTESTDATA/isis/src/base/unitTestData/isisTruth.cub").expanded();
+  // Create a small throwaway cube instead of using ISISTESTDATA.
+  Cube cube;
+  cube.setDimensions(4, 8, 1);
+  cube.create("AlphaCubeTest_UpdateGroup.cub");
 
-  Cube cube(cubePath, "r");
   Pvl &lab = *cube.label();
 
   lab.clear();
@@ -197,7 +197,6 @@ TEST_F(AlphaCubeTest, UpdateGroupWritesExpectedAlphaCubeGroup) {
   ASSERT_TRUE(isiscube.hasGroup("AlphaCube"));
   PvlGroup &alpha = isiscube.findGroup("AlphaCube");
 
-  // These should match the composite mapping parameters derived above.
   EXPECT_EQ(alpha["AlphaSamples"][0], "4");
   EXPECT_EQ(alpha["AlphaLines"][0],   "8");
 
@@ -208,4 +207,9 @@ TEST_F(AlphaCubeTest, UpdateGroupWritesExpectedAlphaCubeGroup) {
 
   EXPECT_EQ(alpha["BetaSamples"][0], "2");
   EXPECT_EQ(alpha["BetaLines"][0],   "4");
+  
+  cube.close();
+  QFile::remove("AlphaCubeTest_UpdateGroup.cub");
+
 }
+
