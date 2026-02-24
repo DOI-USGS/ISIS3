@@ -1693,18 +1693,18 @@ namespace Isis {
 
 
   void Cube::attachSpiceFromIsd(nlohmann::json isd) {
-    PvlKeyword lkKeyword("LeapSecond");
-    PvlKeyword pckKeyword("TargetAttitudeShape");
-    PvlKeyword targetSpkKeyword("TargetPosition");
-    PvlKeyword ckKeyword("InstrumentPointing");
-    PvlKeyword ikKeyword("Instrument");
-    PvlKeyword sclkKeyword("SpacecraftClock");
-    PvlKeyword spkKeyword("InstrumentPosition");
-    PvlKeyword iakKeyword("InstrumentAddendum");
-    PvlKeyword demKeyword("ShapeModel");
-    PvlKeyword exkKeyword("Extra");
+    PvlGroup currentKernels = this->group("Kernels");
+    PvlKeyword lkKeyword = currentKernels["LeapSecond"];
+    PvlKeyword pckKeyword = currentKernels["TargetAttitudeShape"];
+    PvlKeyword targetSpkKeyword = currentKernels["TargetPosition"];
+    PvlKeyword ckKeyword = currentKernels["InstrumentPointing"];
+    PvlKeyword ikKeyword = currentKernels["Instrument"];
+    PvlKeyword sclkKeyword = currentKernels["SpacecraftClock"];
+    PvlKeyword spkKeyword = currentKernels["InstrumentPosition"];
+    PvlKeyword iakKeyword = currentKernels["InstrumentAddendum"];
+    PvlKeyword demKeyword = currentKernels["ShapeModel"];
 
-    Spice spice(*this->label(), isd);
+    Spice spice(*this, *this->label(), isd);
     Table ckTable = spice.instrumentRotation()->Cache("InstrumentPointing");
     ckTable.Label() += PvlKeyword("Kernels");
 
@@ -1738,8 +1738,27 @@ namespace Isis {
       sunTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
 
     this->write(sunTable);
+    
+    //  Save original kernels in keyword before changing to Table
+    if (ckKeyword[0] != "Table") {
+      currentKernels["InstrumentPointing"] = "Table";
+      for (int i = 0; i < ckKeyword.size(); i++)
+        currentKernels["InstrumentPointing"].addValue(ckKeyword[i]);
+    }
 
-    PvlGroup currentKernels = this->group("Kernels");
+    if (spkKeyword[0] != "Table") {
+      currentKernels["InstrumentPosition"] = "Table";
+      for (int i = 0; i < spkKeyword.size(); i++)
+        currentKernels["InstrumentPosition"].addValue(spkKeyword[i]);
+    }
+
+    if (targetSpkKeyword[0] != "Table") {
+      currentKernels["TargetPosition"] = "Table";
+      for (int i = 0; i < targetSpkKeyword.size(); i++)
+        currentKernels["TargetPosition"].addValue(targetSpkKeyword[i]);
+    }
+
+    putGroup(currentKernels);
 
     Pvl *label = this->label();
     int i = 0;
