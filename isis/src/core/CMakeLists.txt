@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project (core VERSION 1.0.0)
 option(buildStaticCore "Build libisis static as well as dynamic"        OFF )
-option (BUILD_TESTS "Build core module tests" ON)
+option (BUILD_CORE_TESTS "Build core module tests" ON)
 option(ISIS_BUILD_SWIG "Turn on to build swig wrappers"                 OFF )
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -90,7 +90,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../../isis/IsisPreferences
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../../LICENSE.md
         DESTINATION ${CMAKE_INSTALL_DATADIR}/isis)
 
-if(BUILD_TESTS)
+if(BUILD_CORE_TESTS)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../../isis/TestPreferences DESTINATION ${CMAKE_INSTALL_DATADIR}/isis)
   enable_testing()
   add_subdirectory(tests)

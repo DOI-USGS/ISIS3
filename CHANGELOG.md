@@ -67,10 +67,12 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 - Added PAD or SHRINK options to crop for crops that extend beyond the source image ([#5843](https://github.com/DOI-USGS/ISIS3/issues/5843))
 - Added the ability to disable individual options for parameters in ISIS GUIs ([#5849](https://github.com/DOI-USGS/ISIS3/issues/5849))
 - Added `MATCHBANDBIN` option to himos and hicolormos. ([#5859](https://github.com/DOI-USGS/ISIS3/issues/5859), [#5860](https://github.com/DOI-USGS/ISIS3/issues/5860))
-- Modularized ISIS PVL library. ([#20260218101602](https://github.com/DOI-USGS/ISIS3/issues/20260218101602))
+- Modularized ISIS PVL library. ([#5717](https://github.com/DOI-USGS/ISIS3/pull/5717))
 - Added Linux Arm support.
 - Added Mac Arm build support and adjusted the tests appropriately.
 - Added std:: namespace for isinf, fixes build errors for some versions of c++
+- Added configuration for towncrier changelog utility. ([#5953](https://github.com/DOI-USGS/ISIS3/issues/5953))
+- Added qt6-multimedia to ARM env file. ([#5968])(https://github.com/DOI-USGS/ISIS3/pull/5968)
 
 ### Changed
 
@@ -88,6 +90,7 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 - In Application.cpp, converted initialization environmental variable shell commands and file read to c commands. ([#5906](https://github.com/DOI-USGS/ISIS3/issues/5906))
 - Updated GDAL to 3.12 and QT to 6.X ([#5909](https://github.com/DOI-USGS/ISIS3/issues/5909))
 - Update 'UseWebSpice' keyword in preferences to 'UseSpiceQL'.
+- Updated isisimport docs, and included it mission categories that need it.  Linked to other docs on missions. ([#5875](https://github.com/DOI-USGS/ISIS3/issues/5875))
 
 ### Fixed
 
@@ -119,6 +122,7 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 - Fixed all Q apps not consistently prioritized projction over camera in various tools ([#5896](https://github.com/DOI-USGS/ISIS3/issues/5896))
 - Fixed `footprintinit` to find mapping group (no caps). ([#5920](https://github.com/DOI-USGS/ISIS3/issues/5920))
 - Fixed SpiceClient to handle redirect requests.
+- Fixes the table generation from plot windows in ISIS qapps not capturing all pixels ([#5962](https://github.com/DOI-USGS/ISIS3/issues/5962))
 
 ### Removed
 
