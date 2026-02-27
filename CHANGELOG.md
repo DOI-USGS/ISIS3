@@ -67,12 +67,12 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 - Added PAD or SHRINK options to crop for crops that extend beyond the source image ([#5843](https://github.com/DOI-USGS/ISIS3/issues/5843))
 - Added the ability to disable individual options for parameters in ISIS GUIs ([#5849](https://github.com/DOI-USGS/ISIS3/issues/5849))
 - Added `MATCHBANDBIN` option to himos and hicolormos. ([#5859](https://github.com/DOI-USGS/ISIS3/issues/5859), [#5860](https://github.com/DOI-USGS/ISIS3/issues/5860))
-- Modularized ISIS PVL library.
+- Modularized ISIS PVL library. ([#5717](https://github.com/DOI-USGS/ISIS3/pull/5717))
 - Added Linux Arm support.
 - Added Mac Arm build support and adjusted the tests appropriately.
 - Added std:: namespace for isinf, fixes build errors for some versions of c++
 - Added configuration for towncrier changelog utility. ([#5953](https://github.com/DOI-USGS/ISIS3/issues/5953))
-- Added qt6-multimedia to ARM env file.
+- Added qt6-multimedia to ARM env file. ([#5968])(https://github.com/DOI-USGS/ISIS3/pull/5968)
 
 ### Changed
 
