@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDialog>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -260,9 +261,24 @@ namespace Isis {
                            <b>Hint: </b> If the cube is 'None' the find tool \
                            will not be active</p>");
 
+    p_groundEngine = new QComboBox();
+    p_groundEngine->setEditable(true);
+    p_groundEngine->setToolTip("Ground Engine Selection");
+    p_groundEngine->setWhatsThis("<b>Function: </b> Select whether to use the projection \
+                                 to determine ground coordinate or the camera. Images with \
+                                 both can use either, images with only one of either a projection \
+                                 or a camera will use what is available even if the other is \
+                                 requested.");
+    p_groundEngine->insertItem(0, "Camera");  
+    p_groundEngine->insertItem(1, "Projection");
+    p_groundEngine->setCurrentIndex(0);
+    connect( p_groundEngine, SIGNAL( currentIndexChanged(int) ), 
+             this, SLOT( setProjectionEngine(int) ) );
+
     QHBoxLayout *layout = new QHBoxLayout(hbox);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(p_statusEdit);
+    layout->addWidget(p_groundEngine);
     layout->addWidget(p_showDialogButton);
     layout->addWidget(p_linkViewportsButton);
     layout->addWidget(p_togglePointVisibleButton);
@@ -548,6 +564,19 @@ namespace Isis {
   }
 
 
+    //! toggles visibility of the red circle
+  void FindTool::setProjectionEngine(int index) {
+    for (int i = 0; i < cubeViewportList()->size(); i++) {
+      MdiCubeViewport *viewport = ( *( cubeViewportList() ) )[i];
+      UniversalGroundMap *groundMap = viewport->universalGroundMap();
+
+      if (groundMap) {
+        groundMap->setPriority(index);
+      }
+    }
+  }
+
+
   //! Links all cubes that have camera models or are map projections
   void FindTool::handleLinkClicked() {
     MdiCubeViewport *d;
@@ -654,22 +683,20 @@ namespace Isis {
         if ( groundMap->SetImage(samp - 0.5, line - 0.5) ) {
           double lat1 = groundMap->UniversalLatitude();
           double lon1 = groundMap->UniversalLongitude();
+          double radius1 = groundMap->Radius();
 
           if ( groundMap->SetImage(samp + 0.5, line + 0.5) ) {
             double lat2 = groundMap->UniversalLatitude();
             double lon2 = groundMap->UniversalLongitude();
-
-            double radius = groundMap->HasProjection()?
-                groundMap->Projection()->LocalRadius() :
-                groundMap->Camera()->LocalRadius().meters();
+            double radius2 = groundMap->Radius();
 
             SurfacePoint point1( Latitude(lat1, Angle::Degrees),
                                  Longitude(lon1, Angle::Degrees),
-                                 Distance(radius, Distance::Meters) );
+                                 Distance(radius1, Distance::Meters) );
 
             SurfacePoint point2( Latitude(lat2, Angle::Degrees),
                                  Longitude(lon2, Angle::Degrees),
-                                 Distance(radius, Distance::Meters) );
+                                 Distance(radius2, Distance::Meters) );
 
             viewportResolution = point1.GetDistanceToPoint(point2);
           }
