@@ -46,7 +46,7 @@ build:
 requirements:
   build:
    - {{ stdlib("c") }}
-   - ale >=1.1.1,<2
+   - ale >=1.1.2,<2
    - aom
    - armadillo
    - blas
