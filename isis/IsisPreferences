@@ -82,7 +82,7 @@ EndGroup
 ########################################################
 
 Group = ShapeModelWeb
-  URL = "https://isis-stac.prod-asc.chs.usgs.gov/search"
+  URL = "https://3hr5l9mbj6.execute-api.us-west-2.amazonaws.com/prod/search"
 EndGroup
 
 ########################################################

@@ -695,18 +695,28 @@ namespace Isis {
     QString tiffUrl;
 
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
-    std::string target = (inst.findKeyword("TargetName")[0]).toStdString();
+    QString target = inst.findKeyword("TargetName")[0];
+    target = target.toLower();
+    target[0] = target[0].toUpper();
 
     QString url = Preference::Preferences().findGroup("ShapeModelWeb")["URL"];
-    std::string jsonData = "{ \"query\": { \"target\": {\"eq\": \"" + target + "\"} } }";
+    std::string jsonData =
+      std::string(R"({
+        "query": {
+          "ssys:targets": {"in": [")") + target.toStdString() + R"("]}
+        },
+        "sort": [{"field": "version", "direction": "desc"}],
+        "limit": 1
+      })";
 
 
     std::string responseBody = curlPostRequest(url.toStdString(), jsonData);
 
-    auto json = nlohmann::json::parse(responseBody);
+    nlohmann::json json = nlohmann::json::parse(responseBody);
 
-    if (json.contains("tiff_url")) {
-      tiffUrl = "/vsicurl/" + QString::fromStdString(json["tiff_url"]);
+    if (json.contains("features")) {
+      nlohmann::json data = json["features"][0]["assets"]["data"];
+      tiffUrl = "/vsicurl/" + QString::fromStdString(data["href"]);
     }
 
     return tiffUrl;
