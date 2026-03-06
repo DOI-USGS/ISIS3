@@ -59,7 +59,7 @@ namespace Isis {
     }
 
     // Table table("ShapeModelStatistics", demCubeFile(), *demCube()->label()));
-    Table table("ShapeModelStatistics", demCube()->fileName(), *demCube()->label());
+    Table table = demCube()->readTable("ShapeModelStatistics");
 
     // Find minimum and maximum radius
     m_minRadius = new Distance(table[0]["MinimumRadius"], Distance::Kilometers);
