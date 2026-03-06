@@ -46,7 +46,7 @@ build:
 requirements:
   build:
    - {{ stdlib("c") }}
-   - ale >=1.1.1,<2
+   - ale >=1.1.2,<2
    - aom
    - armadillo
    - blas
@@ -124,6 +124,7 @@ requirements:
    - zlib
 
   run:
+  - {{ pin_compatible('ale', max_pin='x.x.x') }}
   - {{ pin_compatible('armadillo', max_pin='x.x.x') }}
   - {{ pin_compatible('aom', max_pin='x.x') }}
   - {{ pin_compatible('libboost', max_pin='x.x') }}
