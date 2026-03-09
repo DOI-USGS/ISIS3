@@ -715,7 +715,7 @@ namespace Isis {
     nlohmann::json json = nlohmann::json::parse(responseBody);
 
     if (json.contains("features")) {
-      nlohmann::json data = json["features"][0]["assets"]["data"];
+      nlohmann::json data = json["features"][0]["assets"]["image"];
       tiffUrl = "/vsicurl/" + QString::fromStdString(data["href"]);
     }
 
