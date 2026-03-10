@@ -810,6 +810,38 @@
         </description>
         <default><item>false</item></default>
       </parameter>
+
+      <parameter name="ASP_MAP">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>
+          Produce output with the Ames Stereo Pipeline algorithm
+        </brief>
+        <description>
+          Produce a map-projected cube with the same algorithm as the Ames
+          Stereo Pipeline mapproject program and same grid on the ground. The
+          precise extent may be somewhat different. Requires the DEM
+          parameter.
+        </description>
+        <inclusions>
+          <item>DEM</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="DEM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          DEM to use for map projection (only if ASP_MAP is true)
+        </brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          DEM to use for map projection. Only used when ASP_MAP is true.
+        </description>
+        <filter>
+          *.cub *.tif
+        </filter>
+      </parameter>
     </group>
   </groups>
 
