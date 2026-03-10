@@ -6,6 +6,7 @@
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "IException.h"
+#include "LineManager.h"
 #include "PixelType.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -21,6 +22,70 @@ using ::testing::Return;
 using ::testing::AtLeast;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/cam2map.xml").expanded();
+
+// Create a height-above-datum DEM .cub covering a given lat/lon extent.
+// The mock Viking Orbiter camera's body-fixed position is at lon ~254, lat ~10.
+// Pixels are filled with smooth terrain (30-60 m above datum).
+QString createHeightDem(const QString &dir,
+                        double minLat, double maxLat,
+                        double minLon, double maxLon,
+                        double centerLon) {
+  Pvl demLabel;
+  std::ifstream cubeLabel("data/defaultImage/demCube.pvl");
+  cubeLabel >> demLabel;
+
+  PvlGroup &demMap = demLabel.findObject("IsisCube").findGroup("Mapping");
+  demMap["MinimumLatitude"]  = toString(minLat);
+  demMap["MaximumLatitude"]  = toString(maxLat);
+  demMap["MinimumLongitude"] = toString(minLon);
+  demMap["MaximumLongitude"] = toString(maxLon);
+  demMap["CenterLongitude"]  = toString(centerLon);
+
+  double eqRad = 3396190.0;
+  double deg2m = eqRad * M_PI / 180.0;
+  double demUlx = (minLon - centerLon) * deg2m;
+  double demUly = maxLat * deg2m;
+  demMap["UpperLeftCornerX"] = toString(demUlx);
+  demMap["UpperLeftCornerY"] = toString(demUly);
+  // 100x100 cube, so pixel size = extent / 100. Must be square.
+  double pixRes = (maxLat - minLat) * deg2m / 100.0;
+  demMap["PixelResolution"] = toString(pixRes);
+  demMap["Scale"] = toString(1.0 / (pixRes / deg2m));
+
+  demLabel.findObject("IsisCube").findObject("Core")
+    .findGroup("Pixels")["Type"] = "Real";
+  demLabel.findObject("IsisCube").findObject("Core")
+    .findGroup("Pixels")["Base"] = "0.0";
+  demLabel.findObject("IsisCube").findObject("Core")
+    .findGroup("Pixels")["Multiplier"] = "1.0";
+
+  QString path = dir + "/heightDem.cub";
+  Cube heightDem;
+  heightDem.fromLabel(path, demLabel, "rw");
+
+  int xCenter = heightDem.lineCount() / 2;
+  int yCenter = heightDem.sampleCount() / 2;
+  double radius = std::min(xCenter, yCenter);
+  double depth = 30.0;
+  LineManager line(heightDem);
+  double xPos = 0.0;
+  for (line.begin(); !line.end(); line++) {
+    for (int yPos = 0; yPos < line.size(); yPos++) {
+      double pointRadius = sqrt(pow(xPos - xCenter, 2) +
+                                pow(yPos - yCenter, 2));
+      if (pointRadius < radius)
+        line[yPos] = (sin((M_PI * pointRadius) / (2 * radius)) * depth)
+                     + depth;
+      else
+        line[yPos] = depth * 2;
+    }
+    xPos++;
+    heightDem.write(line);
+  }
+  heightDem.reopen("rw");
+  heightDem.close();
+  return path;
+}
 
 TEST_F(DefaultCube, FunctionalTestCam2mapDefault) {
   std::istringstream labelStrm(R"(
@@ -440,6 +505,62 @@ TEST_F(DefaultCube, FunctionalTestCam2mapForwardMock) {
   EXPECT_CALL(rs, processPatchTransform).Times(AtLeast(1));
   EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
   cam2map(testCube, userMap, userGrp, rs, ui, &log);
+}
+
+// Test the ASP_MAP per-pixel projection code path.
+// Uses the DemCube fixture which creates a synthetic DEM with
+// ShapeModelStatistics table (demprep'd). Verifies that:
+// 1. Output has a Mapping group with Equirectangular projection
+// 2. Output has an AspMapproject metadata group with expected keywords
+// 3. Grid is snapped (UpperLeftCornerX/Y are multiples of half-pixel)
+// 4. Output has non-zero dimensions
+TEST_F(DemCube, FunctionalTestCam2mapAspMap) {
+  // Create a height-above-datum DEM covering the mock camera's footprint.
+  // Camera body-fixed position is at lon ~254, lat ~10.
+  QString heightDemPath = createHeightDem(tempDir.path(),
+                                          -35.0, 55.0, 200.0, 290.0, 245.0);
+  QString outPath = tempDir.path() + "/aspmap_out.cub";
+
+  QVector<QString> args = {"from=" + testCube->fileName(),
+                           "to=" + outPath,
+                           "asp_map=true",
+                           "dem=" + heightDemPath,
+                           "pixres=mpp",
+                           "resolution=500"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  cam2map(ui, &log);
+
+  Cube ocube(outPath);
+  Pvl *outLabel = ocube.label();
+
+  // Check Mapping group exists and has expected projection
+  PvlGroup mapGrp = outLabel->findGroup("Mapping", Pvl::Traverse);
+  ASSERT_EQ(mapGrp.findKeyword("ProjectionName")[0], "Equirectangular");
+
+  // Check grid snapping: UL corner should be at center - pixres/2,
+  // i.e., a multiple of pixres offset by half a pixel
+  double ulx = toDouble(mapGrp.findKeyword("UpperLeftCornerX")[0]);
+  double uly = toDouble(mapGrp.findKeyword("UpperLeftCornerY")[0]);
+  double pixres = 500.0;
+  double cx = ulx + pixres / 2.0;
+  double cy = uly - pixres / 2.0;
+  // First pixel center should be at an integer multiple of pixres
+  ASSERT_NEAR(fmod(fabs(cx), pixres), 0.0, 1.0);
+  ASSERT_NEAR(fmod(fabs(cy), pixres), 0.0, 1.0);
+
+  // Check output has nonzero dimensions
+  ASSERT_GT(ocube.sampleCount(), 0);
+  ASSERT_GT(ocube.lineCount(), 0);
+
+  // Check AspMapproject metadata group
+  PvlGroup aspGrp = outLabel->findGroup("AspMapproject", Pvl::Traverse);
+  ASSERT_EQ(aspGrp.findKeyword("CAMERA_MODEL_TYPE")[0], "isis");
+  ASSERT_EQ(aspGrp.findKeyword("BUNDLE_ADJUST_PREFIX")[0], "NONE");
+  ASSERT_TRUE(aspGrp.hasKeyword("DEM_FILE"));
+  ASSERT_TRUE(aspGrp.hasKeyword("INPUT_IMAGE_FILE"));
+  ASSERT_TRUE(aspGrp.hasKeyword("CAMERA_FILE"));
 }
 
 TEST_F(DefaultCube, FunctionalTestCam2mapReverseMock) {
