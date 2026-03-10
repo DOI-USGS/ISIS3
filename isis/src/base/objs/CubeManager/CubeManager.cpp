@@ -8,6 +8,7 @@ find files of those names at the top level of this repository. **/
 
 #include <iostream>
 #include <sys/resource.h>
+#include <climits>  // INT_MAX
 #include <cstdlib>  // atexit
 #include <memory>   // smart pointers
 #include <QCoreApplication>
@@ -51,9 +52,15 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    // Allow for library files, etc used by this process
-    // So set or file limit to 60% of maximum allowed number of opened files
-    p_maxOpenFiles = fileLimit.rlim_cur * .60;
+    // Allow for library files, etc used by this process.
+    // Use 60% of the system limit so the remaining 40% is available for
+    // library files, SPICE kernels, and other non-cube I/O.
+    //
+    // Cap rlim_cur to INT_MAX - 1 to prevent overflow.
+    rlim_t rawLimit = fileLimit.rlim_cur;
+    if (rawLimit > (rlim_t)(INT_MAX - 1))
+      rawLimit = INT_MAX - 1;
+    p_maxOpenFiles = rawLimit * .60;
     p_currentLimit = p_maxOpenFiles;
 
     // Add the CleanUp() call to QCoreApplication's clean up routine,
