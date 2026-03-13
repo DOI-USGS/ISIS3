@@ -1,6 +1,8 @@
 #include "AspMapProjection.h"
 
+#include "Blob.h"
 #include "Camera.h"
+#include "CameraFactory.h"
 #include "Cube.h"
 #include "Distance.h"
 #include "Latitude.h"
@@ -1840,10 +1842,33 @@ void renderMapprojectedImage(Camera *cam,
   outCube.close();
 }
 
+// Load a CSM camera model from an ISD file and inject its state into the
+// cube in memory, so that cube->camera() returns a CSMCamera without
+// modifying the file on disk.
+void loadCsmIntoCube(const QString &isdFile, Cube *cube) {
+  CameraFactory::initPlugin();
+  QStringList spec = CameraFactory::getModelSpecFromIsd(isdFile);
+  csm::Model *model = CameraFactory::constructModelFromIsd(
+      isdFile, spec[0], spec[1], spec[2]);
+  std::string stateStr = model->getModelState();
+  delete model;
+
+  // Set up a CSMState blob. Maybe worth integrating this with csminit logic.
+  Blob csmBlob("CSMState", "String");
+  csmBlob.setData(stateStr.c_str(), stateStr.size());
+  PvlObject &blobLabel = csmBlob.Label();
+  blobLabel += PvlKeyword("ModelName", spec[1]);
+  blobLabel += PvlKeyword("PluginName", spec[0]);
+  cube->addInMemoryBlob(csmBlob);
+}
+
 void mapproject(Cube *inCube, const UserInterface &ui) {
 
   std::cout << "Running ASP-compatible map projection\n";
   validateUi(ui);
+
+  if (ui.WasEntered("ISD"))
+    loadCsmIntoCube(ui.GetFileName("ISD"), inCube);
 
   Camera *cam = inCube->camera();
   std::string demFile = ui.GetFileName("DEM").toStdString();

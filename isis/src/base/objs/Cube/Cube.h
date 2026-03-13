@@ -349,6 +349,7 @@ namespace Isis {
       bool hasGroup(const QString &group) const;
       bool hasTable(const QString &name);
       bool hasBlob(const QString &name, const QString &type);
+      void addInMemoryBlob(Blob &blob);
       void putGroup(const PvlGroup &group);
       void latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude,
                        double &maxLongitude);

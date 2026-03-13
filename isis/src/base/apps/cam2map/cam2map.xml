@@ -842,6 +842,25 @@
           *.cub *.tif
         </filter>
       </parameter>
+
+      <parameter name="ISD">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Load the camera model in CSM format from this file,
+          rather than the one from the .cub file.
+          Only used when ASP_MAP is true.
+        </brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          JSON ISD (Instrument Support Data) file. Load the camera
+          model in CSM format from this file, rather than the one
+          from the .cub file. Only used when ASP_MAP is true.
+        </description>
+        <filter>
+          *.json
+        </filter>
+      </parameter>
     </group>
   </groups>
 
