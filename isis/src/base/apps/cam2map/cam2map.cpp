@@ -32,6 +32,13 @@ namespace Isis {
     }
     icube.open(ui.GetCubeName("FROM"));
 
+    if (ui.GetBoolean("ASP_MAP")) {
+      // ASP_MAP: run ASP-compatible per-pixel exact projection and return.
+      // Bypasses ISIS's projection factory, rubber sheeting, and PVL machinery.
+      asp::mapproject(&icube, ui);
+      return;
+    }
+
     // Get the map projection file provided by the user
     Pvl userMap;
     if (ui.GetBoolean("USEPROJ")) {
@@ -69,7 +76,7 @@ namespace Isis {
       double equatorialRadius;
       double polarRadius;
 
-      int res = proj_ellipsoid_get_parameters(projContext, ellipsoid, 
+      int res = proj_ellipsoid_get_parameters(projContext, ellipsoid,
                                               &equatorialRadius,
                                               &polarRadius,
                                               nullptr,
@@ -95,13 +102,6 @@ namespace Isis {
       userMap.read(ui.GetFileName("MAP"));
     }
     PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
-
-    // ASP_MAP: run ASP-compatible per-pixel exact projection and return.
-    // Bypasses ISIS's projection factory, rubber sheeting, and PVL machinery.
-    if (ui.GetBoolean("ASP_MAP")) {
-      asp::mapproject(&icube, ui);
-      return;
-    }
 
     cam2map(&icube, userMap, userGrp, ui, log);
   }

@@ -21,7 +21,6 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
-#include <cstdint>
 #include <limits>
 #include <map>
 #include <memory>
@@ -508,6 +507,11 @@ public:
     m_cols = m_cube.sampleCount();
     m_rows = m_cube.lineCount();
     m_bands = m_cube.bandCount();
+    if (m_cols <= 0 || m_rows <= 0)
+      throw IException(IException::User,
+        "Raster file [" + filename + "] has zero-size dimensions (" +
+        std::to_string(m_cols) + "x" + std::to_string(m_rows) + ")",
+        _FILEINFO_);
     m_portal1 = std::make_shared<Portal>(1, 1, m_cube.pixelType());
     // 2x2 portal for bilinear; hotspot (0,0) per ISIS convention (0-based)
     m_portal2 = std::make_shared<Portal>(2, 2, m_cube.pixelType(), 0, 0);
@@ -1479,17 +1483,33 @@ bool handleMapFile(const UserInterface &ui,
   if (!ui.WasEntered("MAP"))
     return false;
 
-  // pixres=MAP: read GSD from map file's PixelResolution or Scale
+  // pixres=MAP: read GSD from map file. Try GDAL first (works for .tif,
+  // .cub), fall back to PVL (for .map text files with PixelResolution/Scale).
   if (ui.GetString("PIXRES") == "MAP") {
-    Pvl mapPvl;
-    mapPvl.read(ui.GetFileName("MAP"));
-    PvlGroup &mg = mapPvl.findGroup("Mapping", Pvl::Traverse);
-    if (mg.hasKeyword("PixelResolution"))
-      gsd = toDouble(mg["PixelResolution"][0]);
-    else if (mg.hasKeyword("Scale"))
-      gsd = ppdToMpp(toDouble(mg["Scale"][0]),
-                     targetGeoRef.semi_major_axis(),
-                     targetGeoRef.semi_minor_axis(), 0.0);
+    std::string mapFile = ui.GetFileName("MAP").toStdString();
+    bool gdalGsd = false;
+    GDALAllRegister();
+    GDALDataset *ds = (GDALDataset *)GDALOpen(mapFile.c_str(), GA_ReadOnly);
+    if (ds) {
+      double gt[6] = {};
+      if (ds->GetGeoTransform(gt) == CE_None) {
+        gsd = gt[1];
+        gdalGsd = true;
+      }
+      GDALClose(ds);
+    }
+    if (!gdalGsd) {
+      // GDAL failed, try PVL
+      Pvl mapPvl;
+      mapPvl.read(ui.GetFileName("MAP"));
+      PvlGroup &mg = mapPvl.findGroup("Mapping", Pvl::Traverse);
+      if (mg.hasKeyword("PixelResolution"))
+        gsd = toDouble(mg["PixelResolution"][0]);
+      else if (mg.hasKeyword("Scale"))
+        gsd = ppdToMpp(toDouble(mg["Scale"][0]),
+                       targetGeoRef.semi_major_axis(),
+                       targetGeoRef.semi_minor_axis(), 0.0);
+    }
   }
 
   // defaultrange=MAP: read bounds from map file.
@@ -1521,25 +1541,7 @@ bool handleMapFile(const UserInterface &ui,
   return false;
 }
 
-// Snap a value down to the nearest multiple of spacing. Uses half-grid
-// rounding via int64_t to avoid floating-point noise where bare floor()
-// overshoots by one grid step when the quotient is very close to an
-// integer. Matches ASP's gridFloor() in CartographyUtils.cc.
-static double gridFloor(double val, double spacing) {
-  double half = 0.5 * spacing;
-  int64_t n = llround(val / half);
-  int64_t g = (n >= 0) ? (n / 2) : ((n - 1) / 2);
-  return g * spacing;
-}
 
-// Snap a value up to the nearest multiple of spacing.
-// Matches ASP's gridCeil() in CartographyUtils.cc.
-static double gridCeil(double val, double spacing) {
-  double half = 0.5 * spacing;
-  int64_t n = llround(val / half);
-  int64_t g = (n >= 0) ? ((n + 1) / 2) : (n / 2);
-  return g * spacing;
-}
 
 // Snap bounding box to integer multiples of GSD and compute the output
 // image origin (first pixel center) and dimensions.
@@ -1551,15 +1553,16 @@ void snapGridCalcImageSize(double gsd,
                            double bboxMaxX, double bboxMaxY,
                            double &snap_ulx, double &snap_uly,
                            int &outSamples, int &outLines) {
-  double minX = gridFloor(bboxMinX, gsd);
-  double maxX = gridCeil(bboxMaxX, gsd);
-  double minY = gridFloor(bboxMinY, gsd);
-  double maxY = gridCeil(bboxMaxY, gsd);
+  double minX = gsd * floor(bboxMinX / gsd);
+  double maxX = gsd * ceil(bboxMaxX / gsd);
+  double minY = gsd * floor(bboxMinY / gsd);
+  double maxY = gsd * ceil(bboxMaxY / gsd);
   double delta = 0.5 * gsd;
-  snap_ulx = minX + delta;
+  snap_ulx = minX - delta;
   snap_uly = maxY + delta;
-  outSamples = (int)round((maxX - minX) / gsd);
-  outLines   = (int)round((maxY - minY) / gsd);
+  // Both min and max are pixel centers at grid multiples, so +1 to include both endpoints.
+  outSamples = (int)round((maxX - minX) / gsd) + 1;
+  outLines   = (int)round((maxY - minY) / gsd) + 1;
 }
 
 // Build the Mapping PVL group for the output cube from camera target info
@@ -1685,12 +1688,10 @@ GeoRef geoRefFromMapFile(const std::string &mapFile,
   GDALDataset *ds = (GDALDataset *)GDALOpen(mapFile.c_str(), GA_ReadOnly);
   if (ds) {
     GDALClose(ds);
-    std::cout << "Reading map file via GDAL: " << mapFile << "\n";
     return GeoRef(mapFile);
   }
 
   // Fall back to PVL parsing (for .map text files)
-  std::cout << "Reading map file via PVL: " << mapFile << "\n";
   Pvl mapPvl;
   mapPvl.read(QString::fromStdString(mapFile));
   PvlGroup &mapGrp = mapPvl.findGroup("Mapping", Pvl::Traverse);
