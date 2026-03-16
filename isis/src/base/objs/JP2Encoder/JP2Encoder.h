@@ -51,7 +51,8 @@ namespace Isis {
       void Write(short int **inbuf);
 
     private:
-      QString p_jp2File;                   //!<Output file name
+      QString p_jp2File;                   //!<Output JP2 file name
+      QString p_tmpFile;                   //!<Temporary GeoTIFF for staging
       unsigned int p_numSamples = 0;       //!<Sample dimension of output file
       unsigned int p_numLines = 0;         //!<Line dimension of output file
       unsigned int p_numBands = 0;         //!<Band dimension of output file
@@ -59,7 +60,7 @@ namespace Isis {
       bool p_signedData = false;           //!<Set to true if output data is signed
       GDALDataType p_gdalType = GDT_Byte;  //!<GDAL pixel type
 
-      GDALDataset *p_dataset = nullptr;    //!<GDAL dataset handle
+      GDALDataset *p_dataset = nullptr;    //!<Temp GeoTIFF dataset handle
       int p_currentLine = 0;               //!<Next line to write
   };
 };

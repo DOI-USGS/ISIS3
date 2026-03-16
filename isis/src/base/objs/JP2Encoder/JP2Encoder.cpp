@@ -7,6 +7,8 @@ find files of those names at the top level of this repository. **/
 
 #include <string>
 
+#include <QFile>
+
 #include "gdal_priv.h"
 #include "cpl_string.h"
 
@@ -64,30 +66,28 @@ namespace Isis {
   }
 
   /**
-   * Open the JPEG2000 file and initialize it
+   * Open the JPEG2000 file and initialize it.
+   * Creates a temporary GeoTIFF for staging pixel data. The actual JP2
+   * encoding happens in the destructor via GDAL CreateCopy, which reads
+   * the temp file block by block (no full-image memory needed).
    */
   void JP2Encoder::OpenFile() {
     if (p_dataset != nullptr)
       return;
 
-    GDALDriver *driver = GetGDALDriverManager()->GetDriverByName("JP2OpenJPEG");
-    if (driver == nullptr) {
-      QString msg = "GDAL JP2OpenJPEG driver not available";
+    // Create a temporary GeoTIFF for staging pixel data
+    p_tmpFile = p_jp2File + ".tmp.tif";
+    GDALDriver *tifDriver = GetGDALDriverManager()->GetDriverByName("GTiff");
+    if (tifDriver == nullptr) {
+      QString msg = "GDAL GTiff driver not available";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    // Use lossless compression (reversible wavelet transform)
-    char **options = nullptr;
-    options = CSLSetNameValue(options, "REVERSIBLE", "YES");
-    options = CSLSetNameValue(options, "QUALITY", "100");
-
-    p_dataset = driver->Create(p_jp2File.toLatin1().data(),
-                               p_numSamples, p_numLines, p_numBands,
-                               p_gdalType, options);
-    CSLDestroy(options);
-
+    p_dataset = tifDriver->Create(p_tmpFile.toLatin1().data(),
+                                  p_numSamples, p_numLines, p_numBands,
+                                  p_gdalType, nullptr);
     if (p_dataset == nullptr) {
-      QString msg = "Unable to create JP2 file [" + p_jp2File + "]";
+      QString msg = "Unable to create temporary file [" + p_tmpFile + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -147,12 +147,37 @@ namespace Isis {
   }
 
   /**
-   * JP2Encoder destructor
+   * JP2Encoder destructor. Converts the temporary GeoTIFF to JP2 via
+   * GDAL CreateCopy, then removes the temp file.
    */
   JP2Encoder::~JP2Encoder() {
     if (p_dataset != nullptr) {
-      GDALClose(p_dataset); // closes dataset and frees all memory
+      GDALClose(p_dataset); // flush and close the temp GeoTIFF
       p_dataset = nullptr;
+
+      // Convert temp GeoTIFF to JP2 via CreateCopy
+      GDALDriver *jp2Driver =
+        GetGDALDriverManager()->GetDriverByName("JP2OpenJPEG");
+      if (jp2Driver != nullptr) {
+        GDALDataset *srcDs = (GDALDataset *)GDALOpen(
+          p_tmpFile.toLatin1().data(), GA_ReadOnly);
+        if (srcDs != nullptr) {
+          // Lossless compression (reversible wavelet transform)
+          char **options = nullptr;
+          options = CSLSetNameValue(options, "REVERSIBLE", "YES");
+          options = CSLSetNameValue(options, "QUALITY", "100");
+          GDALDataset *jp2Ds = jp2Driver->CreateCopy(
+            p_jp2File.toLatin1().data(), srcDs, false, options,
+            nullptr, nullptr);
+          CSLDestroy(options);
+          if (jp2Ds != nullptr)
+            GDALClose(jp2Ds);
+          GDALClose(srcDs);
+        }
+      }
+
+      // Remove the temporary GeoTIFF
+      QFile::remove(p_tmpFile);
     }
   }
 }
