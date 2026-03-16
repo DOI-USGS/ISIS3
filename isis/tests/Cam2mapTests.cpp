@@ -87,6 +87,44 @@ QString createHeightDem(const QString &dir,
   return path;
 }
 
+// Check that each band in a projected cube has valid pixels with
+// non-trivial DN range. At least 10% of pixels must be non-null
+// and the DN range must exceed 0.001.
+void checkPixelValues(Cube &cube, int expectedBands) {
+  ASSERT_GT(cube.sampleCount(), 0);
+  ASSERT_GT(cube.lineCount(), 0);
+  ASSERT_EQ(cube.bandCount(), expectedBands);
+
+  int samples = cube.sampleCount();
+  int lines = cube.lineCount();
+  int totalPixels = samples * lines;
+
+  for (int band = 1; band <= expectedBands; band++) {
+    LineManager reader(cube);
+    int validCount = 0;
+    double minVal = std::numeric_limits<double>::max();
+    double maxVal = -std::numeric_limits<double>::max();
+    for (int line = 1; line <= lines; line++) {
+      reader.SetLine(line, band);
+      cube.read(reader);
+      for (int s = 0; s < reader.size(); s++) {
+        double dn = reader[s];
+        if (!IsSpecial(dn)) {
+          validCount++;
+          if (dn < minVal) minVal = dn;
+          if (dn > maxVal) maxVal = dn;
+        }
+      }
+    }
+    ASSERT_GT(validCount, totalPixels / 10)
+      << "Band " << band << ": too few valid pixels: "
+      << validCount << " / " << totalPixels;
+    ASSERT_GT(maxVal - minVal, 0.001)
+      << "Band " << band << ": pixel values are constant: "
+      << "min=" << minVal << " max=" << maxVal;
+  }
+}
+
 TEST_F(DefaultCube, FunctionalTestCam2mapDefault) {
   std::istringstream labelStrm(R"(
     Group = Mapping
@@ -561,6 +599,228 @@ TEST_F(DemCube, FunctionalTestCam2mapAspMap) {
   ASSERT_TRUE(aspGrp.hasKeyword("DEM_FILE"));
   ASSERT_TRUE(aspGrp.hasKeyword("INPUT_IMAGE_FILE"));
   ASSERT_TRUE(aspGrp.hasKeyword("CAMERA_FILE"));
+
+  // Check pixel values across all bands
+  checkPixelValues(ocube, ocube.bandCount());
+}
+
+// Test ASP_MAP matchmap=true with a PVL .map file.
+// Also exercises auto-GSD (no pixres/resolution args in step 1).
+// Two-step self-consistency test:
+// 1. Run cam2map asp_map=true with auto GSD to produce a reference output.
+// 2. Extract the Mapping group from that output, write it as a PVL .map
+//    file with Samples/Lines added, then run cam2map asp_map=true
+//    matchmap=true map=that.map.
+// The matchmap output must have the same grid (ULX/Y, GSD, dimensions)
+// as the reference. This exercises both the auto-GSD computation
+// (computeAutoGrid) and the readGridFromPvl() fallback path (GDAL can't
+// open a .map text file, so it falls through to PVL parsing).
+TEST_F(DemCube, FunctionalTestCam2mapAspMapMatchmapPvl) {
+  QString heightDemPath = createHeightDem(tempDir.path(),
+                                          -35.0, 55.0, 200.0, 290.0, 245.0);
+
+  // Step 1: Run cam2map asp_map=true with auto grid
+  QString refPath = tempDir.path() + "/aspmap_ref.cub";
+  {
+    QVector<QString> args = {"from=" + testCube->fileName(),
+                             "to=" + refPath,
+                             "asp_map=true",
+                             "dem=" + heightDemPath};
+    UserInterface ui(APP_XML, args);
+    Pvl log;
+    cam2map(ui, &log);
+  }
+
+  // Read the reference output's Mapping group
+  Cube refCube(refPath);
+  Pvl *refLabel = refCube.label();
+  PvlGroup refMapGrp = refLabel->findGroup("Mapping", Pvl::Traverse);
+  int refSamples = refCube.sampleCount();
+  int refLines = refCube.lineCount();
+  refCube.close();
+
+  // Step 2: Write a PVL .map file from the reference Mapping group.
+  // Add Samples and Lines keywords (needed by readGridFromPvl).
+  PvlGroup mapGrp = refMapGrp;
+  mapGrp.addKeyword(PvlKeyword("Samples", toString(refSamples)));
+  mapGrp.addKeyword(PvlKeyword("Lines", toString(refLines)));
+  Pvl mapPvl;
+  mapPvl.addGroup(mapGrp);
+  QString mapPath = tempDir.path() + "/reference.map";
+  mapPvl.write(mapPath);
+
+  // Step 3: Run cam2map asp_map=true with matchmap=true map=reference.map
+  QString outPath = tempDir.path() + "/aspmap_matchmap.cub";
+  {
+    QVector<QString> args = {"from=" + testCube->fileName(),
+                             "to=" + outPath,
+                             "asp_map=true",
+                             "dem=" + heightDemPath,
+                             "map=" + mapPath,
+                             "matchmap=true"};
+    UserInterface ui(APP_XML, args);
+    Pvl log;
+    cam2map(ui, &log);
+  }
+
+  // Step 4: Verify the matchmap output matches the reference grid
+  Cube ocube(outPath);
+  Pvl *outLabel = ocube.label();
+  PvlGroup outMapGrp = outLabel->findGroup("Mapping", Pvl::Traverse);
+
+  // Dimensions must match exactly
+  ASSERT_EQ(ocube.sampleCount(), refSamples)
+    << "Samples mismatch: matchmap=" << ocube.sampleCount()
+    << " ref=" << refSamples;
+  ASSERT_EQ(ocube.lineCount(), refLines)
+    << "Lines mismatch: matchmap=" << ocube.lineCount()
+    << " ref=" << refLines;
+
+  // Grid origin must match exactly
+  double outUlx = toDouble(outMapGrp.findKeyword("UpperLeftCornerX")[0]);
+  double outUly = toDouble(outMapGrp.findKeyword("UpperLeftCornerY")[0]);
+  double refUlx = toDouble(refMapGrp.findKeyword("UpperLeftCornerX")[0]);
+  double refUly = toDouble(refMapGrp.findKeyword("UpperLeftCornerY")[0]);
+  ASSERT_DOUBLE_EQ(outUlx, refUlx) << "UpperLeftCornerX mismatch";
+  ASSERT_DOUBLE_EQ(outUly, refUly) << "UpperLeftCornerY mismatch";
+
+  // GSD must match
+  double outRes = toDouble(outMapGrp.findKeyword("PixelResolution")[0]);
+  double refRes = toDouble(refMapGrp.findKeyword("PixelResolution")[0]);
+  ASSERT_DOUBLE_EQ(outRes, refRes) << "PixelResolution mismatch";
+
+  // Projection must match
+  ASSERT_EQ(outMapGrp.findKeyword("ProjectionName")[0],
+            refMapGrp.findKeyword("ProjectionName")[0]);
+
+  // Check pixel values are valid
+  checkPixelValues(ocube, ocube.bandCount());
+}
+
+// Test ASP_MAP with a CSM camera model via the isd= parameter.
+// Uses the same DemCube fixture (reuses testCube for pixel data) but
+// provides a CSM ISD JSON file instead of the ISIS camera.
+// The CSM framer looks at lon=0, lat=0 on Mars from 4000 km.
+// Requires USGSCSM plugin, which is loaded from ISISROOT or CONDA_PREFIX.
+TEST_F(DemCube, FunctionalTestCam2mapAspMapCsm) {
+  // Ensure CSM plugins are available. Check ISISROOT first, then
+  // CONDA_PREFIX. If neither has lib/csmplugins/, skip the test.
+  auto hasPlugins = [](const char *dir) {
+    return dir && QDir(QString(dir) + "/lib/csmplugins").exists();
+  };
+  const char *isisroot = getenv("ISISROOT");
+  const char *conda = getenv("CONDA_PREFIX");
+  if (!hasPlugins(isisroot)) {
+    if (hasPlugins(conda))
+      setenv("ISISROOT", conda, 1);
+    else
+      GTEST_SKIP() << "No CSM plugins found (set ISISROOT or CONDA_PREFIX)";
+  }
+
+  // DEM centered at lon=0, lat=0 to match CSM framer footprint
+  QString heightDemPath = createHeightDem(tempDir.path(),
+                                          -5.0, 5.0, -5.0, 5.0, 0.0);
+  QString outPath = tempDir.path() + "/aspmap_csm_out.cub";
+  QString isdPath = "data/defaultImage/orbitalMarsFramer.json";
+
+  QVector<QString> args = {"from=" + testCube->fileName(),
+                           "to=" + outPath,
+                           "asp_map=true",
+                           "dem=" + heightDemPath,
+                           "isd=" + isdPath,
+                           "pixres=mpp",
+                           "resolution=1000"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  cam2map(ui, &log);
+
+  Cube ocube(outPath);
+  Pvl *outLabel = ocube.label();
+
+  // Check Mapping group
+  PvlGroup mapGrp = outLabel->findGroup("Mapping", Pvl::Traverse);
+  ASSERT_EQ(mapGrp.findKeyword("ProjectionName")[0], "Equirectangular");
+
+  // Check output has nonzero dimensions
+  ASSERT_GT(ocube.sampleCount(), 0);
+  ASSERT_GT(ocube.lineCount(), 0);
+
+  // Check AspMapproject metadata
+  PvlGroup aspGrp = outLabel->findGroup("AspMapproject", Pvl::Traverse);
+  ASSERT_TRUE(aspGrp.hasKeyword("CAMERA_MODEL_TYPE"));
+
+  // Check pixel values
+  checkPixelValues(ocube, ocube.bandCount());
+}
+
+// Multi-band fixture: reuses DemCube but makes the input cube 3-band.
+// The mock camera is band-independent, so this tests multi-band I/O
+// plumbing, not band-dependent camera behavior.
+// We recreate only testCube (not projTestCube) to avoid ISD parse issues.
+class MultiBandDemCube : public DemCube {
+protected:
+  void SetUp() override {
+    DemCube::SetUp();
+
+    int samples = testCube->sampleCount();
+    int lines = testCube->lineCount();
+    int bands = 3;
+
+    // Extract the label and change band count
+    Pvl newLabel;
+    newLabel.addObject(testCube->label()->findObject("IsisCube"));
+    PvlGroup &dim = newLabel.findObject("IsisCube")
+                      .findObject("Core").findGroup("Dimensions");
+    dim.findKeyword("Bands").setValue(QString::number(bands));
+
+    nlohmann::json savedIsd = isd;
+
+    // Recreate testCube with 3 bands
+    delete testCube;
+    testCube = new Cube();
+    testCube->fromIsd(tempDir.path() + "/default.cub", newLabel, savedIsd, "rw");
+
+    // Write per-band pixel data
+    LineManager line(*testCube);
+    int pixelValue = 1;
+    for (int band = 1; band <= bands; band++)
+      for (int i = 1; i <= lines; i++) {
+        line.SetLine(i, band);
+        for (int j = 0; j < line.size(); j++) {
+          line[j] = (double)(pixelValue % 255);
+          pixelValue++;
+        }
+        testCube->write(line);
+      }
+    testCube->reopen("rw");
+  }
+};
+
+TEST_F(MultiBandDemCube, FunctionalTestCam2mapAspMapMultiBand) {
+  QString heightDemPath = createHeightDem(tempDir.path(),
+                                          -35.0, 55.0, 200.0, 290.0, 245.0);
+  QString outPath = tempDir.path() + "/aspmap_multiband_out.cub";
+
+  QVector<QString> args = {"from=" + testCube->fileName(),
+                           "to=" + outPath,
+                           "asp_map=true",
+                           "dem=" + heightDemPath,
+                           "pixres=mpp",
+                           "resolution=500"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  cam2map(ui, &log);
+
+  Cube ocube(outPath);
+
+  // Output must have same number of bands as input
+  ASSERT_EQ(ocube.bandCount(), 3)
+    << "Expected 3 bands, got " << ocube.bandCount();
+
+  // Check pixel values across all bands
+  checkPixelValues(ocube, 3);
 }
 
 TEST_F(DefaultCube, FunctionalTestCam2mapReverseMock) {

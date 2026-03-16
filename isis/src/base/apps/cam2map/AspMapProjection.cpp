@@ -1614,14 +1614,16 @@ PvlGroup buildMappingGroup(Camera *cam,
 // Build the AspMapproject PVL group with ASP-compatible metadata for the
 // output cube, so ASP stereo can consume the mapprojected .cub file.
 PvlGroup buildAspGroup(const std::string &inputFile,
-                       const std::string &demFile) {
+                       const std::string &demFile,
+                       const std::string &isdFile) {
   PvlGroup aspGrp("AspMapproject");
   aspGrp += PvlKeyword("BUNDLE_ADJUST_PREFIX", "NONE");
-  aspGrp += PvlKeyword("CAMERA_MODEL_TYPE", "isis");
+  bool useCsm = !isdFile.empty();
+  aspGrp += PvlKeyword("CAMERA_MODEL_TYPE", useCsm ? "csm" : "isis");
   aspGrp += PvlKeyword("INPUT_IMAGE_FILE",
                        QString::fromStdString(inputFile));
   aspGrp += PvlKeyword("CAMERA_FILE",
-                       QString::fromStdString(inputFile));
+                       QString::fromStdString(useCsm ? isdFile : inputFile));
   aspGrp += PvlKeyword("DEM_FILE",
                        QString::fromStdString(demFile));
   return aspGrp;
@@ -2040,7 +2042,10 @@ void mapproject(Cube *inCube, const UserInterface &ui) {
   outCube.putGroup(mapGrp);
 
   // Write ASP-compatible metadata
-  PvlGroup aspGrp = buildAspGroup(inputFile, demFile);
+  std::string isdFile;
+  if (ui.WasEntered("ISD"))
+    isdFile = ui.GetFileName("ISD").toStdString();
+  PvlGroup aspGrp = buildAspGroup(inputFile, demFile, isdFile);
   outCube.putGroup(aspGrp);
 
   // Render the mapprojected image

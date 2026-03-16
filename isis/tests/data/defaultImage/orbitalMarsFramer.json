@@ -1,0 +1,144 @@
+{
+  "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+  "name_platform": "TEST_PLATFORM",
+  "name_sensor": "TEST_SENSOR",
+  "center_ephemeris_time": 1000.0,
+  "detector_sample_summing": 1.0,
+  "detector_line_summing": 1.0,
+  "focal2pixel_lines": [
+    0.0,
+    10.0,
+    0.0
+  ],
+  "focal2pixel_samples": [
+    0.0,
+    0.0,
+    10.0
+  ],
+  "focal_length_model": {
+    "focal_length": 50
+  },
+  "image_lines": 16,
+  "image_samples": 16,
+  "detector_center": {
+    "line": 8.0,
+    "sample": 8.0
+  },
+  "interpolation_method": "lagrange",
+  "optical_distortion": {
+    "radial": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "radii": {
+    "semimajor": 3396.19,
+    "semiminor": 3376.2,
+    "unit": "km"
+  },
+  "reference_height": {
+    "maxheight": 1000,
+    "minheight": -1000,
+    "unit": "m"
+  },
+  "instrument_position": {
+    "unit": "km",
+    "positions": [
+      [
+        4000.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "velocities": [
+      [
+        0.0,
+        0.0,
+        -1.0
+      ]
+    ],
+    "ephemeris_times": [
+      50
+    ],
+    "reference_frame": 1
+  },
+  "instrument_pointing": {
+    "quaternions": [
+      [
+        -0.707106781186547,
+        0.0,
+        -0.707106781186547,
+        0
+      ]
+    ],
+    "angular_velocities": [
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "ephemeris_times": [
+      50
+    ],
+    "reference_frame": 1
+  },
+  "body_rotation": {
+    "quaternions": [
+      [
+        1,
+        0,
+        0,
+        0
+      ]
+    ],
+    "ephemeris_times": [
+      50
+    ],
+    "angular_velocities": [
+      [
+        0.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "reference_frame": 1,
+    "constant_frames": [
+      1,
+      2,
+      3
+    ],
+    "time_dependent_frames": [
+      4,
+      5,
+      6
+    ]
+  },
+  "starting_detector_line": 0,
+  "starting_detector_sample": 0,
+  "starting_ephemeris_time": 0,
+  "sun_position": {
+    "positions": [
+      [
+        100000.0,
+        100000.0,
+        0.0
+      ]
+    ],
+    "velocities": [
+      [
+        0.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "ephemeris_times": [
+      50
+    ],
+    "unit": "m",
+    "reference_frame": 1
+  }
+}
