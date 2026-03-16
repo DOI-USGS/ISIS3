@@ -315,6 +315,9 @@ double GeoRef::centerLatitude() const {
   if (srs.importFromWkt(m_wkt.c_str()) != OGRERR_NONE)
     return 0.0;
   const char *p = srs.GetAttrValue("PROJECTION");
+  // GetProjParm returns the default (0.0) if the parameter is absent,
+  // which is indistinguishable from a genuine lat=0. Acceptable since
+  // 0.0 is the correct value in both cases.
   if (p && std::string(p) == SRS_PT_EQUIRECTANGULAR)
     return srs.GetProjParm(SRS_PP_STANDARD_PARALLEL_1, 0.0);
   return srs.GetProjParm(SRS_PP_LATITUDE_OF_ORIGIN, 0.0);
@@ -1358,6 +1361,10 @@ void lonlatBboxToProj(double minLat, double maxLat,
 //   mpp = 2*PI*localRadius / (360*ppd)
 // For a sphere (a == c), localRadius = a regardless of latitude.
 // For an ellipsoid, localRadius = a*c / sqrt((c*cos)^2 + (a*sin)^2).
+// In practice, semiMajor == semiMinor here because pvlToWkt() and the
+// GDAL ISIS3 driver bake the local radius at CenterLatitude into the
+// ellipsoid as a sphere. The ellipsoid case below is kept for correctness
+// if this function is ever called with true ellipsoid axes.
 double ppdToMpp(double ppd, double semiMajor, double semiMinor,
                 double trueScaleLatDeg) {
   double localRadius = semiMajor;
@@ -1368,6 +1375,38 @@ double ppdToMpp(double ppd, double semiMajor, double semiMinor,
            pow(semiMajor * sin(latRad), 2));
   }
   return 2.0 * M_PI * localRadius / (360.0 * ppd);
+}
+
+// Override GSD if user specified pixres=MPP or pixres=PPD with a resolution.
+// For projected CRS, GSD is in meters/pixel:
+//   MPP -> use as-is, PPD -> convert to meters/pixel.
+// For geographic CRS, GSD is in degrees/pixel:
+//   PPD -> 1/ppd, MPP -> convert meters to degrees.
+void handleMppPpd(const UserInterface &ui,
+                  const GeoRef &targetGeoRef,
+                  double &gsd) {
+  if (!ui.WasEntered("RESOLUTION"))
+    return;
+
+  double a = targetGeoRef.semi_major_axis();
+  double b = targetGeoRef.semi_minor_axis();
+  QString pixres = ui.GetString("PIXRES");
+  double res = ui.GetDouble("RESOLUTION");
+
+  if (targetGeoRef.isGeographic()) {
+    // Geographic CRS is currently rejected (not supported for .cub output),
+    // so this branch is not reached. The conversion is approximate.
+    double metersPerDeg = M_PI * a / 180.0;
+    if (pixres == "PPD")
+      gsd = 1.0 / res;
+    else if (pixres == "MPP")
+      gsd = res / metersPerDeg;
+  } else {
+    if (pixres == "MPP")
+      gsd = res;
+    else if (pixres == "PPD")
+      gsd = ppdToMpp(res, a, b, 0.0);
+  }
 }
 
 // Read pixel-edge bounds from a GDAL-readable image. Computes pixel-edge
@@ -1417,35 +1456,6 @@ bool readPixelEdgeBoundsFromPvl(const std::string &mapFile,
   lonlatBboxToProj(mapMinLat, mapMaxLat, mapMinLon, mapMaxLon,
                    targetGeoRef, minX, minY, maxX, maxY);
   return true;
-}
-
-// Override GSD if user specified pixres=MPP or pixres=PPD with a resolution.
-// For projected CRS, GSD is in meters/pixel:
-//   MPP -> use as-is, PPD -> convert to meters/pixel.
-// For geographic CRS, GSD is in degrees/pixel:
-//   PPD -> 1/ppd, MPP -> convert meters to degrees.
-void handleMppPpd(const UserInterface &ui,
-                  const GeoRef &targetGeoRef,
-                  double &gsd) {
-  if (!ui.WasEntered("RESOLUTION"))
-    return;
-
-  double R = targetGeoRef.semi_major_axis();
-  double metersPerDeg = M_PI * R / 180.0;
-  QString pixres = ui.GetString("PIXRES");
-  double res = ui.GetDouble("RESOLUTION");
-
-  if (targetGeoRef.isGeographic()) {
-    if (pixres == "PPD")
-      gsd = 1.0 / res;
-    else if (pixres == "MPP")
-      gsd = res / metersPerDeg;
-  } else {
-    if (pixres == "MPP")
-      gsd = res;
-    else if (pixres == "PPD")
-      gsd = metersPerDeg / res;
-  }
 }
 
 // Override bounding box with user-specified lat/lon bounds. Converts any
@@ -1602,7 +1612,7 @@ PvlGroup buildMappingGroup(Camera *cam,
 }
 
 // Build the AspMapproject PVL group with ASP-compatible metadata for the
-// output cube, so ASP stereo can consume the map-projected .cub file.
+// output cube, so ASP stereo can consume the mapprojected .cub file.
 PvlGroup buildAspGroup(const std::string &inputFile,
                        const std::string &demFile) {
   PvlGroup aspGrp("AspMapproject");
@@ -1753,9 +1763,70 @@ void validateUi(const UserInterface &ui) {
   }
 }
 
-// Render the map-projected image by iterating over output pixels, projecting
+// Project a single output pixel to input image coordinates via the camera model.
+// outSamp/outLine: desired mapprojected image pixel (1-based) to mapproject at.
+// outCol/outRow: resulting input raw camera image pixel (0-based), or NaN on failure.
+void projectPixel(Camera *cam,
+                  const GeoRef &targetGeoRef,
+                  const GeoRef &demGeoRef,
+                  RasterReader &demReader,
+                  int outSamp, int outLine,
+                  int imgCols, int imgRows,
+                  double &outCol, double &outRow) {
+  const double nan = std::numeric_limits<double>::quiet_NaN();
+  outCol = nan;
+  outRow = nan;
+
+  // Output pixel -> lon/lat via targetGeoRef (pixel -> proj -> lonlat)
+  double lon = 0.0, lat = 0.0;
+  try {
+    targetGeoRef.pixel_to_lonlat(outSamp - 1, outLine - 1, lon, lat);
+  } catch (...) {
+    return;
+  }
+
+  // Lon/lat -> DEM pixel via GDAL
+  double demCol = 0.0, demRow = 0.0;
+  demGeoRef.lonlat_to_pixel(lon, lat, demCol, demRow);
+
+  // Bicubic DEM interpolation (VW kernel, Portal-based)
+  double height = demReader.bicubicVal(demCol, demRow);
+  if (std::isnan(height))
+    return;
+
+  // Geodetic to ECEF
+  double ex = 0.0, ey = 0.0, ez = 0.0;
+  demGeoRef.geodetic_to_cartesian(lon, lat, height, ex, ey, ez);
+
+  // Project through ISIS camera model
+  double radius = sqrt(ex * ex + ey * ey + ez * ez);
+  SurfacePoint surfPt(Latitude(lat, Angle::Degrees),
+                      Longitude(lon, Angle::Degrees),
+                      Distance(radius, Distance::Meters));
+
+  try {
+    if (!cam->SetGround(surfPt))
+      return;
+  } catch (...) {
+    return;
+  }
+
+  // ISIS returns 1-based pixels; convert to 0-based for image lookup
+  double col0 = cam->Sample() - 1.0;
+  double row0 = cam->Line() - 1.0;
+
+  // Check input image bounds (0-based)
+  if (col0 < 0.0 || row0 < 0.0 || col0 >= imgCols || row0 >= imgRows)
+    return;
+
+  outCol = col0;
+  outRow = row0;
+}
+
+// Render the mapprojected image by iterating over output pixels, projecting
 // each through the camera model to find the corresponding input pixel, and
-// writing the result to the output cube.
+// writing the result to the output cube. For band-independent cameras,
+// projection is computed once per pixel and reused for all bands.
 void renderMapprojectedImage(Camera *cam,
                              const GeoRef &targetGeoRef,
                              const GeoRef &demGeoRef,
@@ -1763,74 +1834,58 @@ void renderMapprojectedImage(Camera *cam,
                              const std::string &inputFile,
                              int outSamples, int outLines,
                              Cube &outCube, int numBands) {
+
   // Portal-based image reader (tiled, no full memory load)
   RasterReader imgReader(inputFile);
   int imgCols = imgReader.cols();
   int imgRows = imgReader.rows();
 
+  // For some multi-band cameras, the camera model changes per band (e.g.,
+  // THEMIS IR, CRISM). Need to set the camera and reproject per band in that
+  // case.
+  bool bandDependentCam = !cam->IsBandIndependent();
+
+  // Cache input image coords for one line (avoids re-projection per band)
+  const double nan = std::numeric_limits<double>::quiet_NaN();
+  std::vector<double> cachedCol(outSamples, nan);
+  std::vector<double> cachedRow(outSamples, nan);
+
+  // Progress indicator: print every 5%
   int nextPercent = 0;
-  int percentStep = 10;
+  int percentStep = 5;
 
   LineManager outManager(outCube);
   for (int out_line = 1; out_line <= outLines; out_line++) {
+
+    // Iterate over bands for this line
     for (int band = 1; band <= numBands; band++) {
+
+      // Project the row. For band-dependent cameras, re-project per band
+      // because SetBand changes the camera model. For band-independent cameras,
+      // or if only one band, project only once (band 1) and reuse the cached
+      // coords. Results go into cachedCol/cachedRow.
+      cam->SetBand(band);
+      if (bandDependentCam || band == 1)
+        for (int out_samp = 1; out_samp <= outSamples; out_samp++)
+          projectPixel(cam, targetGeoRef, demGeoRef, demReader,
+                       out_samp, out_line, imgCols, imgRows,
+                       cachedCol[out_samp - 1], cachedRow[out_samp - 1]);
+
+      // Do interpolation in the image and write the line for this band
       outManager.SetLine(out_line, band);
-
       for (int out_samp = 1; out_samp <= outSamples; out_samp++) {
-        outManager[out_samp - 1] = Null;
-
-        // Output pixel -> lon/lat via targetGeoRef (pixel -> proj -> lonlat)
-        double lon = 0.0, lat = 0.0;
-        try {
-          targetGeoRef.pixel_to_lonlat(out_samp - 1, out_line - 1,
-                                       lon, lat);
-        } catch (...) {
-          continue;
+        outManager[out_samp - 1] = Null; // default to Null if projection failed
+        if (!std::isnan(cachedCol[out_samp - 1])) {
+          double val = imgReader.bicubicVal(cachedCol[out_samp - 1],
+                                            cachedRow[out_samp - 1], band);
+          if (!std::isnan(val))
+            outManager[out_samp - 1] = val;
         }
-
-        // Lon/lat -> DEM pixel via GDAL
-        double demCol = 0.0, demRow = 0.0;
-        demGeoRef.lonlat_to_pixel(lon, lat, demCol, demRow);
-
-        // Bicubic DEM interpolation (VW kernel, Portal-based)
-        double height = demReader.bicubicVal(demCol, demRow);
-        if (std::isnan(height))
-          continue;
-
-        // Geodetic to ECEF
-        double ex = 0.0, ey = 0.0, ez = 0.0;
-        demGeoRef.geodetic_to_cartesian(lon, lat, height, ex, ey, ez);
-
-        // Project through ISIS camera model
-        double radius = sqrt(ex * ex + ey * ey + ez * ez);
-        SurfacePoint surfPt(Latitude(lat, Angle::Degrees),
-                            Longitude(lon, Angle::Degrees),
-                            Distance(radius, Distance::Meters));
-
-        try {
-          if (!cam->SetGround(surfPt))
-            continue;
-        } catch (...) {
-          continue;
-        }
-
-        // ISIS returns 1-based pixels; convert to 0-based for image lookup
-        double imgCol0 = cam->Sample() - 1.0;
-        double imgRow0 = cam->Line() - 1.0;
-
-        // Check input image bounds (0-based)
-        if (imgCol0 < 0.0 || imgRow0 < 0.0 ||
-            imgCol0 >= imgCols || imgRow0 >= imgRows)
-          continue;
-
-        // Bicubic interpolation on input image (VW kernel, Portal-based)
-        double val = imgReader.bicubicVal(imgCol0, imgRow0, band);
-        if (!std::isnan(val))
-          outManager[out_samp - 1] = (double)val;
       }
-
       outCube.write(outManager);
     }
+    
+    // Update progress
     int percent = (int)(100.0 * out_line / outLines);
     if (percent >= nextPercent && percent < 100) {
       std::cout << "\r" << percent << "%" << std::flush;
@@ -1988,7 +2043,7 @@ void mapproject(Cube *inCube, const UserInterface &ui) {
   PvlGroup aspGrp = buildAspGroup(inputFile, demFile);
   outCube.putGroup(aspGrp);
 
-  // Render the map-projected image
+  // Render the mapprojected image
   renderMapprojectedImage(cam, targetGeoRef, demGeoRef,
                           demReader, inputFile, outSamples, outLines,
                           outCube, inCube->bandCount());
