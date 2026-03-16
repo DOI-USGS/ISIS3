@@ -9,21 +9,15 @@ find files of those names at the top level of this repository. **/
 
 #include <string>
 
-#if ENABLEJP2K
-#include "jp2.h"
-#include "kdu_stripe_decompressor.h"
-#endif
-
-#define MIN_STRIPE_HEIGHT 256
-#define MAX_STRIPE_HEIGHT 8192
+#include "gdal_priv.h"
 
 namespace Isis {
-  class JP2Error;
 
   /**
    * @brief  JPEG2000 decoder class
    *
-   * This class is used to decode a JPEG2000 image.
+   * This class is used to decode a JPEG2000 image with GDAL
+   * (OpenJPEG backend).
    *
    * Here is an example of how to use JP2Decoder
    * @code
@@ -79,43 +73,40 @@ namespace Isis {
    *                          before destroying the kdu_codestream. Caused segfault on OSX 10.11
    *                          for the JP2Importer test, and isis2std and std2isis jpeg2000 tests.
    *                          References #4809.
+   *  @history 2026-03-16 Oleg Alexandrov - Replaced Kakadu backend with GDAL
+   *                          (OpenJPEG). Removed JP2Error dependency.
    */
   class JP2Decoder {
     public:
       JP2Decoder(const QString &jp2file);
       ~JP2Decoder();
 
-      // Register with the Kakadu error facility
-      JP2Error *kakadu_error() const {
-        return Kakadu_Error;
-      };
-
       // Open and initialize the JP2 file for reading
       void OpenFile();
 
       // Get the sample dimension of the JP2 file
       inline int GetSampleDimension() const {
-        return ((int) p_numSamples);
+        return (int)p_numSamples;
       }
 
       // Get the line dimension of the JP2 file
       inline int GetLineDimension() const {
-        return ((int) p_numLines);
+        return (int)p_numLines;
       }
 
       // Get the band dimension of the JP2 file
       inline int GetBandDimension() const {
-        return ((int) p_numBands);
+        return (int)p_numBands;
       }
 
       // Get number of bytes per pixel in the JP2 file
       inline int GetPixelBytes() const {
-        return (p_pixelBytes);
+        return p_pixelBytes;
       }
 
       // Determine if data in JP2 file is signed
       inline bool GetSignedData() const {
-        return (p_signedData);
+        return p_signedData;
       }
 
       // Read byte data from the JP2 file
@@ -127,43 +118,15 @@ namespace Isis {
       static bool IsJP2(QString filename);
 
     private:
-      QString p_jp2File;          //!<Input file name
-      unsigned int p_numSamples;      //!<Number of samples in JP2 file
-      unsigned int p_numLines;        //!<Number of lines in JP2 file
-      unsigned int p_numBands;        //!<Number of bands in JP2 file
-      unsigned int p_pixelBytes;      //!<Number of bytes per pixel in JP2 file.
-      bool p_signedData;              //!<Set to true if data in JP2 file is signed.
+      QString p_jp2File;                 //!<Input file name
+      unsigned int p_numSamples = 0;     //!<Number of samples in JP2 file
+      unsigned int p_numLines = 0;       //!<Number of lines in JP2 file
+      unsigned int p_numBands = 0;       //!<Number of bands in JP2 file
+      unsigned int p_pixelBytes = 0;     //!<Number of bytes per pixel in JP2 file
+      bool p_signedData = false;         //!<Set to true if data in JP2 file is signed
 
-#if ENABLEJP2K
-      unsigned int p_resolutionLevel; //!<Resolution level that file will be decompressed
-      //!<at. Always full resolution.
-      unsigned int p_highestResLevel; //!<Total number of available resolution levels in
-      //!<JP2 file.
-      int *p_maxStripeHeights;        //!<Determines the maximum number of lines that can
-      //!<be read at a time from the JP2 file.
-      int *p_precisions;              //!<Determines the bit precision of each band in
-      //!<the JP2 file.
-      bool *p_isSigned;               //!<Determines if the data is signed/unsigned for
-      //!<each band in the JP2 file.
-      int *p_stripeHeights;           //!<Determines how many lines are read at a time
-      //!<from the JP2 file.
-
-      unsigned int p_pixelBits;       //!<Number of bits per pixel in JP2 file.
-      bool p_readStripes;             //!<Number of lines read per call to Read methods
-
-
-      kdu_core::kdu_dims p_imageDims;           //!<Image dimensions of JP2 file
-      kdu_supp::jp2_family_src *JP2_Stream;     //!<JP2 file input stream
-      kdu_supp::jp2_source *JP2_Source;         //!<JP2 content source
-      kdu_core::kdu_codestream *JPEG2000_Codestream;    //!<Allow access to JP2 file codestream.
-      kdu_supp::kdu_stripe_decompressor p_decompressor; //!<High level interface to decompression of
-      //!<JP2 file.
-#endif
-      JP2Error *Kakadu_Error;         //!<JP2 Error handling facility
-
-      void SetResolutionAndRegion();  //!<Sets resolution of data that will be decompressed.
-      //!<Also determines the image dimensions at the requested
-      //!<resolution.
+      GDALDataset *p_dataset = nullptr;  //!<GDAL dataset handle
+      int p_currentLine = 0;             //!<Next line to read
   };
 };
 #endif

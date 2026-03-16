@@ -74,7 +74,6 @@ requirements:
    - icu
    - inja
    - jama
-   - usgs-astrogeology::kakadu==1 # [not (osx and arm64)]
    - kalasiris
    - krb5
    - libboost >=1.88.0,<1.89
@@ -146,7 +145,6 @@ requirements:
   - inja
   - jama
   - {{ pin_compatible('jasper', max_pin='x.x') }}
-  - {{ pin_compatible('kakadu', max_pin='x') }}   # [not (osx and arm64)]
   - kalasiris
   - libcxx
   - libopenblas

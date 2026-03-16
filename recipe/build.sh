@@ -2,5 +2,5 @@ CXXFLAGS="${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY"  # To enable conda builds 
 mkdir build
 cd build
 export ISISROOT=$PWD
-cmake -GNinja -DJP2KFLAG=ON -DbuildDocs=OFF -Dpybindings=ON -DKAKADU_INCLUDE_DIR=/isisData/kakadu -DbuildTests=OFF -DBUILD_CORE_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX ../isis
+cmake -GNinja -DbuildDocs=OFF -Dpybindings=ON -DbuildTests=OFF -DBUILD_CORE_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX ../isis
 ninja install

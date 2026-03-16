@@ -75,7 +75,6 @@ option(buildStaticCore "Build libisis static as well as dynamic"        OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
 option(buildCoverage   "Set up code coverage"                           ON  )
 option(buildDocs       "Build the docs."                                ON  )
-option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
 option(pybindings      "Turn on to build Python bindings"               ON )
 option(ISIS_BUILD_SWIG "Turn on to build swig wrappers"                 OFF )
 option(BUILD_CORE_TESTS "Turn on to build core tests"                   ON )
@@ -91,11 +90,6 @@ if(NOT DEFINED ENV{ISISROOT})
   message(FATAL_ERROR "Environment variable ISISROOT is not set.")
 endif()
 
-# No JPEG2000 support on Mac Arm
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
-  message(STATUS "Support for JPEG2000 is not available on Mac Arm.")
-  set(JP2KFLAG OFF)
-endif()
 
 # No docs support on Arm. The xalan-c Arm package is not available on conda-forge.
 if ((CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64") AND buildDocs)
@@ -165,11 +159,6 @@ if(EXISTS $ENV{CONDA_PREFIX})
                                    $ENV{CONDA_PREFIX}/lib/cmake/Qt5)
 endif()
 
-# options only allow on/off but this flag is piped into ISIS as ENABLEJP2K
-# needs to be either 1 or 0 for C style true false
-if(JP2KFLAG)
- set(JP2KFLAG 1)
-endif()
 
 if(buildTests)
   include(CTest)
@@ -196,15 +185,10 @@ set(thirdPartyCppFlags -Wall
                        -Wno-strict-aliasing
                        -DUSE_UNSTABLE_GEOS_CPP_API=1
                        -Wno-strict-overflow
-                       -DENABLEJP2K=${JP2KFLAG}
                      )
 
 set(CMAKE_CXX_STANDARD 17)
 
-if (NOT JP2KFLAG)
-  # Pass the NO_JP2K flag to C++
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DNO_JP2K")
-endif()
 
 # Flag to fix numeric literals problem with boost on linux
 # Add gold linker (and therefore, phtread) to speed up linux (spec. Ubuntu18.04) builds
@@ -317,7 +301,6 @@ find_package(XercesC   3.1.2   REQUIRED)
 find_package(X11       6       REQUIRED)
 find_package(nanoflann         REQUIRED)
 find_package(PNG               REQUIRED)
-find_package(Kakadu)
 find_package(Geos    3.5.0     REQUIRED)
 find_package(Armadillo         REQUIRED)
 find_package(Threads)

@@ -31,7 +31,6 @@ dependencies:
   - icu
   - inja
   - jama
-  - usgs-astrogeology::kakadu==1
   - kalasiris
   - krb5
   - libboost >=1.88.0,<1.89

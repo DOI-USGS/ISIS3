@@ -255,8 +255,6 @@ TEST_F(IsisTruthCube, FunctionalTestsIsis2StdBmp) {
   checkReingestedCube(tempDir.path(), outputBmpFilename, chunkSize, 1, 127, 255, 1, 255, 0);
 }
 
-#ifndef NO_JP2K
-
 ////////////////
 // JPEG Tests //
 ////////////////
@@ -475,8 +473,6 @@ TEST_F(IsisTruthCube, FunctionalTestsIsis2StdJpeg2KS16) {
 
   checkReingestedCube(tempDir.path(), outputJp2Filename, chunkSize, -32767, 0, 32767, -32767, 32767, -32768, 1);
 }
-
-#endif // NO_JP2K
 
 ///////////////
 // PNG Tests //

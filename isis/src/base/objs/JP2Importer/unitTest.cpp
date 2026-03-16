@@ -21,30 +21,19 @@ int main(int argc, char *argv[]) {
   cout << setprecision(9);
 
   try {
-
-    // When JP2K is not available, print only the messages, so that the test passes.
-
     cout << "Testing JP2Importer..." << endl << endl;
-#ifndef NO_JP2K
     FileName inputName("test.jp2");
-#endif
 
     cout << "Creating Instance" << endl;
-#ifndef NO_JP2K
     JP2Importer *importer = new JP2Importer(inputName);
-#endif
 
     cout << "Importing" << endl;
-#ifndef NO_JP2K
     FileName outputName("test.cub");
     importer->import(outputName);
-#endif
 
     cout << "Clean-up" << endl;
-#ifndef NO_JP2K
     delete importer;
     QFile::remove(outputName.expanded());
-#endif
 
     cout << endl << "Done" << endl;
   }
@@ -52,4 +41,3 @@ int main(int argc, char *argv[]) {
     e.print();
   }
 }
-
