@@ -825,6 +825,7 @@
         </description>
         <inclusions>
           <item>DEM</item>
+          <item>ISD</item>
         </inclusions>
       </parameter>
 
@@ -841,6 +842,9 @@
         <filter>
           *.cub *.tif
         </filter>
+        <inclusions>
+          <item>ASP_MAP</item>
+        </inclusions>
       </parameter>
 
       <parameter name="ISD">
@@ -860,6 +864,9 @@
         <filter>
           *.json
         </filter>
+        <inclusions>
+          <item>ASP_MAP</item>
+        </inclusions>
       </parameter>
     </group>
   </groups>

@@ -9,6 +9,8 @@
 #include "LineManager.h"
 #include "Longitude.h"
 #include "Portal.h"
+#include "Preference.h"
+#include "Progress.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
@@ -325,6 +327,8 @@ double GeoRef::centerLatitude() const {
 
 void GeoRef::pixel_to_lonlat(double col, double row,
                              double &lon, double &lat) const {
+  // GDAL GeoTransform uses pixel-edge convention (0,0 = UL corner of UL pixel).
+  // Add 0.5 to get pixel center, matching ASP/VW convention.
   double ac = col + 0.5;
   double ar = row + 0.5;
   double x = m_gt[0] + ac * m_gt[1] + ar * m_gt[2];
@@ -343,6 +347,7 @@ void GeoRef::lonlat_to_pixel(double lon, double lat,
     throw std::runtime_error("GeoRef::lonlat_to_pixel failed");
   double ac = m_inv_gt[0] + x * m_inv_gt[1] + y * m_inv_gt[2];
   double ar = m_inv_gt[3] + x * m_inv_gt[4] + y * m_inv_gt[5];
+  // Convert from GDAL pixel-edge back to pixel-center convention
   col = ac - 0.5;
   row = ar - 0.5;
 }
@@ -401,8 +406,11 @@ std::string pvlToWkt(const PvlGroup &mapGrp,
 
   if (projName == "pointperspective" || projName == "obliquecylindrical")
     throw IException(IException::User,
-      "ASP_MAP: projection not yet supported in map file: " +
-      QString::fromStdString(projName), _FILEINFO_);
+      "ASP_MAP: projection not yet supported in PVL map file: " +
+      QString::fromStdString(projName) +
+      ". Provide the projection via a georeferenced image "
+      "(e.g., a .cub or .tif) as the map= argument instead.",
+      _FILEINFO_);
   else if (projName == "equirectangular" || projName == "simplecylindrical")
     oSRS.SetEquirectangular2(0.0, lon0, lat0, 0, 0);
   else if (projName == "orthographic")
@@ -432,8 +440,11 @@ std::string pvlToWkt(const PvlGroup &mapGrp,
     oSRS.SetRobinson(lon0, 0, 0);
   else
     throw IException(IException::User,
-      "ASP_MAP: unsupported projection in map file: " +
-      QString::fromStdString(projName), _FILEINFO_);
+      "ASP_MAP: unsupported projection in PVL map file: " +
+      QString::fromStdString(projName) +
+      ". Provide the projection via a georeferenced image "
+      "(e.g., a .cub or .tif) as the map= argument instead.",
+      _FILEINFO_);
 
   // Set ProjCS name, e.g. "Equirectangular Moon"
   std::string targetName = "Body";
@@ -642,6 +653,8 @@ void datumIntersection(double semiMajor, double semiMinor,
                        const double camCtr[3], const double camVec[3],
                        // Outputs
                        bool &hit, double xyz[3]) {
+
+  // Initialize outputs
   hit = false;
   xyz[0] = 0.0; xyz[1] = 0.0; xyz[2] = 0.0;
 
@@ -670,7 +683,7 @@ void datumIntersection(double semiMajor, double semiMinor,
   hit = true;
 }
 
-// ECEF XYZ to geodetic lon/lat/height (degrees, meters).
+// ECEF XYZ to geodetic lon/lat/height (degrees, meters). Models the ellipsoid. 
 void xyzToLonLat(const double xyz[3], double semiMajor, double semiMinor,
                  double &lon, double &lat, double &height) {
   double x = xyz[0], y = xyz[1], z = xyz[2];
@@ -909,10 +922,10 @@ void bresenhamSample(int x0, int y0, int x1, int y1, int step,
   bool steep = abs(y1 - y0) > abs(x1 - x0);
   if (steep) { std::swap(x0, y0); std::swap(x1, y1); }
   if (x0 > x1) { std::swap(x0, x1); std::swap(y0, y1); }
-  int deltax = x1 - x0;
-  int deltay = abs(y1 - y0);
-  int error = deltax / 2;
-  int ystep = (y0 < y1) ? 1 : -1;
+  int deltaX = x1 - x0;
+  int deltaY = abs(y1 - y0);
+  int error = deltaX / 2;
+  int yStep = (y0 < y1) ? 1 : -1;
 
   // Walk the line, sampling every 'step' pixels
   int x = x0, y = y0;
@@ -926,8 +939,8 @@ void bresenhamSample(int x0, int y0, int x1, int y1, int step,
     }
     // Move along the line
     x++;
-    error -= deltay;
-    if (error < 0) { y += ystep; error += deltax; }
+    error -= deltaY;
+    if (error < 0) { y += yStep; error += deltaX; }
     count++;
   }
 }
@@ -1553,8 +1566,6 @@ bool handleMapFile(const UserInterface &ui,
   return false;
 }
 
-
-
 // Snap bounding box to integer multiples of GSD and compute the output
 // image origin (first pixel center) and dimensions.
 // Input bbox values are projected coordinates to cover. After snapping
@@ -1563,15 +1574,15 @@ bool handleMapFile(const UserInterface &ui,
 void snapGridCalcImageSize(double gsd,
                            double bboxMinX, double bboxMinY,
                            double bboxMaxX, double bboxMaxY,
-                           double &snap_ulx, double &snap_uly,
+                           double &snapUlx, double &snapUly,
                            int &outSamples, int &outLines) {
   double minX = gsd * floor(bboxMinX / gsd);
   double maxX = gsd * ceil(bboxMaxX / gsd);
   double minY = gsd * floor(bboxMinY / gsd);
   double maxY = gsd * ceil(bboxMaxY / gsd);
   double delta = 0.5 * gsd;
-  snap_ulx = minX - delta;
-  snap_uly = maxY + delta;
+  snapUlx = minX - delta;
+  snapUly = maxY + delta;
   // Both min and max are pixel centers at grid multiples, so +1 to include both endpoints.
   outSamples = (int)round((maxX - minX) / gsd) + 1;
   outLines   = (int)round((maxY - minY) / gsd) + 1;
@@ -1582,7 +1593,7 @@ void snapGridCalcImageSize(double gsd,
 PvlGroup buildMappingGroup(Camera *cam,
                            const GeoRef &targetGeoRef,
                            double gsd,
-                           double snap_ulx, double snap_uly) {
+                           double snapUlx, double snapUly) {
   PvlGroup mapGrp("Mapping");
   mapGrp += PvlKeyword("TargetName", cam->target()->name());
   std::vector<Distance> radii = cam->target()->radii();
@@ -1606,8 +1617,8 @@ PvlGroup buildMappingGroup(Camera *cam,
                                                 : "meters/pixel";
   QString posUnit = targetGeoRef.isGeographic() ? "degrees" : "meters";
   mapGrp += PvlKeyword("PixelResolution", toString(gsd), resUnit);
-  mapGrp += PvlKeyword("UpperLeftCornerX", toString(snap_ulx), posUnit);
-  mapGrp += PvlKeyword("UpperLeftCornerY", toString(snap_uly), posUnit);
+  mapGrp += PvlKeyword("UpperLeftCornerX", toString(snapUlx), posUnit);
+  mapGrp += PvlKeyword("UpperLeftCornerY", toString(snapUly), posUnit);
   return mapGrp;
 }
 
@@ -1711,7 +1722,8 @@ GeoRef geoRefFromMapFile(const std::string &mapFile,
   PvlGroup &mapGrp = mapPvl.findGroup("Mapping", Pvl::Traverse);
 
   std::string wkt = pvlToWkt(mapGrp, defaultSemiMajor, defaultSemiMinor);
-  return GeoRef(wkt, true);
+  bool fromString = true;
+  return GeoRef(wkt, fromString);
 }
 
 // Validate user options for ASP_MAP mode. Check mutual exclusions and
@@ -1724,20 +1736,14 @@ void validateUi(const UserInterface &ui) {
   }
 
   // ASP_MAP auto-computes bounds from camera footprint in projected coords.
-  // DEFAULTRANGE=CAMERA is accepted (unlocks MINLAT/MAXLAT/MINLON/MAXLON).
+  // DEFAULTRANGE=CAMERA unlocks MINLAT/MAXLAT/MINLON/MAXLON overrides.
   // DEFAULTRANGE=MAP takes bounds from the map= file.
-  // DEFAULTRANGE=MINIMIZE is the default and excludes lat/lon overrides.
-  if (ui.WasEntered("DEFAULTRANGE")) {
-    QString dr = ui.GetString("DEFAULTRANGE");
-    if (dr != "CAMERA" && dr != "MAP") {
-      QString msg = "Only DEFAULTRANGE=CAMERA or MAP is supported in ASP_MAP "
-        "mode. Bounds are auto-computed from the camera footprint and DEM.";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-    if (dr == "MAP" && !ui.WasEntered("MAP")) {
-      QString msg = "DEFAULTRANGE=MAP requires a MAP file.";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
+  // Other values (MINIMIZE, GROUND) are silently ignored - ASP_MAP
+  // auto-computes bounds regardless.
+  if (ui.WasEntered("DEFAULTRANGE") &&
+      ui.GetString("DEFAULTRANGE") == "MAP" && !ui.WasEntered("MAP")) {
+    QString msg = "DEFAULTRANGE=MAP requires a MAP file.";
+    throw IException(IException::User, msg, _FILEINFO_);
   }
   if (ui.WasEntered("LONSEAM")) {
     QString msg = "LONSEAM is not supported in ASP_MAP mode. "
@@ -1852,9 +1858,23 @@ void renderMapprojectedImage(Camera *cam,
   std::vector<double> cachedCol(outSamples, nan);
   std::vector<double> cachedRow(outSamples, nan);
 
-  // Progress indicator: print every 5%
+  // Progress indicator. Use ISIS Progress if the user has ProgressBar = On
+  // in their preferences (feeds the ISIS GUI too). Otherwise, use our own
+  // simple console printout so progress is always visible.
+  PvlGroup &uiGroup =
+    Preference::Preferences().findGroup("UserInterface");
+  QString pbar = (QString) uiGroup["ProgressBar"];
+  bool useIsisProgress = (pbar.toUpper() == "ON");
+
+  Progress isisProgress;
   int nextPercent = 0;
   int percentStep = 5;
+
+  if (useIsisProgress) {
+    isisProgress.SetText("Projecting");
+    isisProgress.SetMaximumSteps(outLines);
+    isisProgress.CheckStatus();
+  }
 
   LineManager outManager(outCube);
   for (int out_line = 1; out_line <= outLines; out_line++) {
@@ -1888,13 +1908,18 @@ void renderMapprojectedImage(Camera *cam,
     }
     
     // Update progress
-    int percent = (int)(100.0 * out_line / outLines);
-    if (percent >= nextPercent && percent < 100) {
-      std::cout << "\r" << percent << "%" << std::flush;
-      nextPercent = percent + percentStep;
+    if (useIsisProgress) {
+      isisProgress.CheckStatus();
+    } else {
+      int percent = (int)(100.0 * out_line / outLines);
+      if (percent >= nextPercent && percent < 100) {
+        std::cout << "\r" << percent << "%" << std::flush;
+        nextPercent = percent + percentStep;
+      }
     }
   }
-  std::cout << "\r100%" << std::endl;
+  if (!useIsisProgress)
+    std::cout << "\r100%" << std::endl;
 
   outCube.close();
 }
@@ -1923,6 +1948,7 @@ void mapproject(Cube *inCube, const UserInterface &ui) {
 
   std::cout << "Running ASP-compatible map projection\n";
   validateUi(ui);
+  std::cout << "Writing: " << ui.GetCubeName("TO").toStdString() << "\n";
 
   if (ui.WasEntered("ISD"))
     loadCsmIntoCube(ui.GetFileName("ISD"), inCube);
@@ -1961,7 +1987,7 @@ void mapproject(Cube *inCube, const UserInterface &ui) {
   // Compute output grid: origin (upper-left), GSD, and dimensions.
   // matchmap=true reads the exact grid from the map file (no snapping).
   // Otherwise, auto-compute from camera footprint + DEM, with overrides.
-  double snap_ulx = 0.0, snap_uly = 0.0, gsd = 0.0;
+  double snapUlx = 0.0, snapUly = 0.0, gsd = 0.0;
   int outSamples = 0, outLines = 0;
   bool matchMap = ui.WasEntered("MATCHMAP") && ui.GetBoolean("MATCHMAP");
 
@@ -1969,10 +1995,10 @@ void mapproject(Cube *inCube, const UserInterface &ui) {
     // matchmap=true: read the exact grid from the map file (no snapping).
     // Try GDAL first (.cub, .tif), fall back to PVL (.map text files).
     std::string mapFile = ui.GetFileName("MAP").toStdString();
-    bool success = readGridFromImage(mapFile, snap_ulx, snap_uly, gsd,
+    bool success = readGridFromImage(mapFile, snapUlx, snapUly, gsd,
                                      outSamples, outLines);
     if (!success)
-      readGridFromPvl(mapFile, targetGeoRef, snap_ulx, snap_uly, gsd,
+      readGridFromPvl(mapFile, targetGeoRef, snapUlx, snapUly, gsd,
                       outSamples, outLines);
     std::cout << "matchmap=true: using exact grid from map file\n";
   } else {
@@ -2013,18 +2039,18 @@ void mapproject(Cube *inCube, const UserInterface &ui) {
     if (boundsFromMap) {
       // defaultrange=MAP: use the map file's pixel-edge extent directly.
       // No grid snapping - the map file defines the exact geographic area.
-      snap_ulx = bboxMinX;
-      snap_uly = bboxMaxY;
+      snapUlx = bboxMinX;
+      snapUly = bboxMaxY;
       outSamples = (int)round((bboxMaxX - bboxMinX) / gsd);
       outLines   = (int)round((bboxMaxY - bboxMinY) / gsd);
     } else {
       // Auto-computed bounds: snap grid centers to GSD multiples
       snapGridCalcImageSize(gsd, bboxMinX, bboxMinY, bboxMaxX, bboxMaxY,
-                            snap_ulx, snap_uly, outSamples, outLines);
+                            snapUlx, snapUly, outSamples, outLines);
     }
   }
   // Update targetGeoRef to match the output grid
-  double gt[6] = {snap_ulx, gsd, 0.0, snap_uly, 0.0, -gsd};
+  double gt[6] = {snapUlx, gsd, 0.0, snapUly, 0.0, -gsd};
   targetGeoRef.setGeoTransform(gt);
 
   // Create output cube
@@ -2038,7 +2064,7 @@ void mapproject(Cube *inCube, const UserInterface &ui) {
 
   // Build the Mapping PVL group for the output cube
   PvlGroup mapGrp = buildMappingGroup(cam, targetGeoRef, gsd,
-                                      snap_ulx, snap_uly);
+                                      snapUlx, snapUly);
   outCube.putGroup(mapGrp);
 
   // Write ASP-compatible metadata

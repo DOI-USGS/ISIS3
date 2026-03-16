@@ -545,26 +545,84 @@ TEST_F(DefaultCube, FunctionalTestCam2mapForwardMock) {
   cam2map(testCube, userMap, userGrp, rs, ui, &log);
 }
 
-// Test the ASP_MAP per-pixel projection code path.
-// Uses the DemCube fixture which creates a synthetic DEM with
-// ShapeModelStatistics table (demprep'd). Verifies that:
-// 1. Output has a Mapping group with Equirectangular projection
-// 2. Output has an AspMapproject metadata group with expected keywords
-// 3. Grid is snapped (UpperLeftCornerX/Y are multiples of half-pixel)
-// 4. Output has non-zero dimensions
+// Test the ASP_MAP per-pixel projection code path with (1) sinusoidal
+// projection output, (2) equirectangular projection DEM input, and (3) user
+// lat/lon bounds. Checks resulting projection, metadata, bounds, grid snapping,
+// and pixel values.
 TEST_F(DemCube, FunctionalTestCam2mapAspMap) {
-  // Create a height-above-datum DEM covering the mock camera's footprint.
   // Camera body-fixed position is at lon ~254, lat ~10.
   QString heightDemPath = createHeightDem(tempDir.path(),
                                           -35.0, 55.0, 200.0, 290.0, 245.0);
+
+  // Write a sinusoidal .map file
+  QString mapPath = tempDir.path() + "/sinusoidal.map";
+  Pvl mapPvl;
+  PvlGroup mapGrp("Mapping");
+  mapGrp += PvlKeyword("ProjectionName", "Sinusoidal");
+  mapGrp += PvlKeyword("CenterLongitude", "245.0");
+  mapGrp += PvlKeyword("TargetName", "MARS");
+  mapGrp += PvlKeyword("EquatorialRadius", "3396190.0", "meters");
+  mapGrp += PvlKeyword("PolarRadius", "3376200.0", "meters");
+  mapGrp += PvlKeyword("LatitudeType", "Planetocentric");
+  mapGrp += PvlKeyword("LongitudeDirection", "PositiveEast");
+  mapGrp += PvlKeyword("LongitudeDomain", "360");
+  mapPvl.addGroup(mapGrp);
+  mapPvl.write(mapPath);
+
   QString outPath = tempDir.path() + "/aspmap_out.cub";
+
+  // First run: no bounds, to discover the auto-computed extent
+  QString refPath = tempDir.path() + "/aspmap_ref.cub";
+  {
+    QVector<QString> refArgs = {"from=" + testCube->fileName(),
+                                "to=" + refPath,
+                                "asp_map=true",
+                                "dem=" + heightDemPath,
+                                "map=" + mapPath,
+                                "pixres=mpp",
+                                "resolution=500"};
+    UserInterface refUi(APP_XML, refArgs);
+    Pvl refLog;
+    cam2map(refUi, &refLog);
+  }
+  // Read auto-computed bounds and shrink by 20% on each side
+  double eqRad = 3396190.0;
+  double deg2m = eqRad * M_PI / 180.0;
+  double pixres = 500.0;
+  Cube refCube(refPath);
+  PvlGroup refMap = refCube.label()->findGroup("Mapping", Pvl::Traverse);
+  double refUlx = toDouble(refMap.findKeyword("UpperLeftCornerX")[0]);
+  double refUly = toDouble(refMap.findKeyword("UpperLeftCornerY")[0]);
+  double refLrx = refUlx + refCube.sampleCount() * pixres;
+  double refLry = refUly - refCube.lineCount() * pixres;
+  refCube.close();
+  // Convert projected coords to lat/lon (sinusoidal: y = lat * deg2m,
+  // x = (lon - centerLon) * deg2m * cos(lat))
+  double autoMinLat = refLry / deg2m;
+  double autoMaxLat = refUly / deg2m;
+  double midLat = (autoMinLat + autoMaxLat) / 2.0;
+  double cosLat = cos(midLat * M_PI / 180.0);
+  double autoMinLon = 245.0 + refUlx / (deg2m * cosLat);
+  double autoMaxLon = 245.0 + refLrx / (deg2m * cosLat);
+  // Shrink by 20% on each side to get a proper subset
+  double latRange = autoMaxLat - autoMinLat;
+  double userMinLat = autoMinLat + 0.2 * latRange;
+  double userMaxLat = autoMaxLat - 0.2 * latRange;
+  double lonRange = autoMaxLon - autoMinLon;
+  double userMinLon = autoMinLon + 0.2 * lonRange;
+  double userMaxLon = autoMaxLon - 0.2 * lonRange;
 
   QVector<QString> args = {"from=" + testCube->fileName(),
                            "to=" + outPath,
                            "asp_map=true",
                            "dem=" + heightDemPath,
+                           "map=" + mapPath,
                            "pixres=mpp",
-                           "resolution=500"};
+                           "resolution=500",
+                           "minlat=" + toString(userMinLat),
+                           "maxlat=" + toString(userMaxLat),
+                           "minlon=" + toString(userMinLon),
+                           "maxlon=" + toString(userMaxLon)};
   UserInterface ui(APP_XML, args);
 
   Pvl log;
@@ -573,24 +631,44 @@ TEST_F(DemCube, FunctionalTestCam2mapAspMap) {
   Cube ocube(outPath);
   Pvl *outLabel = ocube.label();
 
-  // Check Mapping group exists and has expected projection
-  PvlGroup mapGrp = outLabel->findGroup("Mapping", Pvl::Traverse);
-  ASSERT_EQ(mapGrp.findKeyword("ProjectionName")[0], "Equirectangular");
+  // Check Mapping group exists and has sinusoidal projection
+  PvlGroup outMapGrp = outLabel->findGroup("Mapping", Pvl::Traverse);
+  ASSERT_EQ(outMapGrp.findKeyword("ProjectionName")[0], "Sinusoidal");
 
-  // Check grid snapping: UL corner should be at center - pixres/2,
-  // i.e., a multiple of pixres offset by half a pixel
-  double ulx = toDouble(mapGrp.findKeyword("UpperLeftCornerX")[0]);
-  double uly = toDouble(mapGrp.findKeyword("UpperLeftCornerY")[0]);
-  double pixres = 500.0;
+  // Verify output extent is consistent with the user lat/lon bounds.
+  // ASP_MAP doesn't write MinimumLatitude etc. to PVL, so verify via
+  // projected coordinates and image dimensions.
+  double ulx = toDouble(outMapGrp.findKeyword("UpperLeftCornerX")[0]);
+  double uly = toDouble(outMapGrp.findKeyword("UpperLeftCornerY")[0]);
+  int samples = ocube.sampleCount();
+  int lines = ocube.lineCount();
+  double lrx = ulx + samples * pixres;
+  double lry = uly - lines * pixres;
+  // Convert back to lat/lon (sinusoidal: y = lat * deg2m,
+  // x = (lon - centerLon) * deg2m * cos(lat))
+  double outMaxLat = uly / deg2m;
+  double outMinLat = lry / deg2m;
+  double outCosLat = cos((outMinLat + outMaxLat) / 2.0 * M_PI / 180.0);
+  double outMinLon = 245.0 + ulx / (deg2m * outCosLat);
+  double outMaxLon = 245.0 + lrx / (deg2m * outCosLat);
+  // Allow 1.5-pixel tolerance: grid snapping (floor/ceil) can expand by
+  // up to 1 pixel, and the produced extent goes 0.5 GSD beyond grid centers
+  double tolDeg = 1.5 * pixres / deg2m;
+  ASSERT_NEAR(outMinLat, userMinLat, tolDeg) << "MinLat";
+  ASSERT_NEAR(outMaxLat, userMaxLat, tolDeg) << "MaxLat";
+  double tolDegLon = 1.5 * pixres / (deg2m * outCosLat);
+  ASSERT_NEAR(outMinLon, userMinLon, tolDegLon) << "MinLon";
+  ASSERT_NEAR(outMaxLon, userMaxLon, tolDegLon) << "MaxLon";
+
+  // Check grid snapping: first pixel center at integer multiple of pixres
   double cx = ulx + pixres / 2.0;
   double cy = uly - pixres / 2.0;
-  // First pixel center should be at an integer multiple of pixres
   ASSERT_NEAR(fmod(fabs(cx), pixres), 0.0, 1.0);
   ASSERT_NEAR(fmod(fabs(cy), pixres), 0.0, 1.0);
 
   // Check output has nonzero dimensions
-  ASSERT_GT(ocube.sampleCount(), 0);
-  ASSERT_GT(ocube.lineCount(), 0);
+  ASSERT_GT(samples, 0);
+  ASSERT_GT(lines, 0);
 
   // Check AspMapproject metadata group
   PvlGroup aspGrp = outLabel->findGroup("AspMapproject", Pvl::Traverse);
