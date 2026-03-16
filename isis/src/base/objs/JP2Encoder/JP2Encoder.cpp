@@ -7,10 +7,11 @@ find files of those names at the top level of this repository. **/
 
 #include <string>
 
-#include <QFile>
+#include <QFileInfo>
 
 #include "gdal_priv.h"
 #include "cpl_string.h"
+#include "cpl_vsi.h"
 
 #include "IException.h"
 #include "IString.h"
@@ -67,16 +68,16 @@ namespace Isis {
 
   /**
    * Open the JPEG2000 file and initialize it.
-   * Creates a temporary GeoTIFF for staging pixel data. The actual JP2
-   * encoding happens in the destructor via GDAL CreateCopy, which reads
-   * the temp file block by block (no full-image memory needed).
+   * Stages pixel data in GDAL's in-memory filesystem (/vsimem/).
+   * The actual JP2 encoding happens in the destructor via GDAL
+   * CreateCopy.
    */
   void JP2Encoder::OpenFile() {
     if (p_dataset != nullptr)
       return;
 
-    // Create a temporary GeoTIFF for staging pixel data
-    p_tmpFile = p_jp2File + ".tmp.tif";
+    // Stage pixel data in GDAL's in-memory filesystem
+    p_tmpFile = "/vsimem/" + QFileInfo(p_jp2File).fileName() + ".tmp.tif";
     GDALDriver *tifDriver = GetGDALDriverManager()->GetDriverByName("GTiff");
     if (tifDriver == nullptr) {
       QString msg = "GDAL GTiff driver not available";
@@ -147,8 +148,8 @@ namespace Isis {
   }
 
   /**
-   * JP2Encoder destructor. Converts the temporary GeoTIFF to JP2 via
-   * GDAL CreateCopy, then removes the temp file.
+   * JP2Encoder destructor. Converts the in-memory staging data to JP2
+   * via GDAL CreateCopy, then frees the in-memory file.
    */
   JP2Encoder::~JP2Encoder() {
     if (p_dataset != nullptr) {
@@ -176,8 +177,8 @@ namespace Isis {
         }
       }
 
-      // Remove the temporary GeoTIFF
-      QFile::remove(p_tmpFile);
+      // Free the in-memory temporary file
+      VSIUnlink(p_tmpFile.toLatin1().data());
     }
   }
 }

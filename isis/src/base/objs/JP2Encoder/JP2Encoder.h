@@ -52,7 +52,7 @@ namespace Isis {
 
     private:
       QString p_jp2File;                   //!<Output JP2 file name
-      QString p_tmpFile;                   //!<Temporary GeoTIFF for staging
+      QString p_tmpFile;                   //!<In-memory staging file (/vsimem/)
       unsigned int p_numSamples = 0;       //!<Sample dimension of output file
       unsigned int p_numLines = 0;         //!<Line dimension of output file
       unsigned int p_numBands = 0;         //!<Band dimension of output file
