@@ -9,25 +9,16 @@ on:
       - dev
       
 jobs:
-  # Check if the PR is a bugfix/feature
-  check_labels:
+
+  get_ver:
+    name: Get Latest LTS/Prod Versions
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-    name: Detect Max LTS/Prod Version, Bugfix/Feature Checkboxes
-    # Make the output of this job available to other jobs
-    outputs: 
+    outputs:
       maxlts: ${{ steps.parse_lts.outputs.maxlts }}
       maxprod: ${{ steps.parse_prod.outputs.maxprod }}
-      result: ${{steps.execute_py_script.outputs.result}}
     steps:
-    - name: Checkout files (only the PR Label Checker)
-      uses: actions/checkout@v4
-      with:
-        sparse-checkout: |
-          .github/pr_label_checker.py
-          .github/requirements.txt
-        sparse-checkout-cone-mode: false
+    - name: Checkout Files
+      uses: actions/checkout@v6
     - name: Fetch/Parse LTS Version
       id: parse_lts
       run: |
@@ -48,35 +39,55 @@ jobs:
         tail -n 1 \
         )"
         echo "maxprod=${MAX_PROD}-prod" >> $GITHUB_OUTPUT
-    - name: List files in current Directory
-      run: ls .github
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-        cache: 'pip'
-    - name: Install Python Packages
+    - name: Echo Versions
       run: |
-        python -m pip install --upgrade pip
-        pip install -r ./.github/requirements.txt
-    - name: Write Output
-      id: execute_py_script
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_API_URL: ${{ secrets.GITHUB_API_URL }}
-        GITHUB_SERVER_URL: ${{ secrets.GITHUB_SERVER_URL }}
-      run: echo "result=$(python ./.github/pr_label_checker.py)" >> "$GITHUB_OUTPUT"
-    - name: Show Output
-      run: |
-        echo "checkboxes... ${{ steps.execute_py_script.outputs.result }}"
-        echo "max lts... ${{ steps.execute_py_script.outputs.maxlts }}"
-        echo "max prod... ${{ steps.execute_py_script.outputs.maxprod }}"
+        echo "Detected LTS Version:  ${{ steps.parse_lts.outputs.maxlts }}"
+        echo "Detected Prod Version: ${{ steps.parse_prod.outputs.maxprod }}"
 
+  # Check if the PR is a bugfix/feature
+  check_labels:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    name: Check PR labels action step
+    # Make the output of this job available to other jobs
+    outputs: 
+      pr: ${{ steps.getpr.outputs.pr }}
+      fixes: ${{ steps.fixfrags.outputs.fixes }}
+    steps:
+    - name: Checkout files
+      uses: actions/checkout@v6
+    - name: Get PR number
+      id: getpr
+      continue-on-error: true
+      uses: bcgov/action-get-pr@v0.1.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check if PR
+      if: steps.getpr.outcome == 'failure'
+      run: |
+        echo "No PR Number found (this is probably just a push).  Further steps skipped."
+    - name: Detect Fix Change Fragments
+      if: steps.getpr.outcome == 'success'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      id: fixfrags
+      run: |
+        if gh api repos/${{ github.repository }}/pulls/${{ steps.getpr.outputs.pr }}/files --jq '.[].filename' | \
+        grep '^changes\/[0-9]*\.fix\.md$'; then
+            echo "Fixes Found"
+            echo "fixes=true" >> $GITHUB_OUTPUT
+        else
+            echo "No Fixes Found"
+            echo "fixes=false" >> $GITHUB_OUTPUT
+        fi
 
   cherrypick-lts:
-    needs: check_labels
+    needs: 
+      - get_ver
+      - check_labels
     # Only run this step if code was a bugfix
-    if: contains(needs.check_labels.outputs.result, 'bugfix_')
+    if: needs.check_labels.outputs.fixes == 'true'
     runs-on: ubuntu-22.04
     defaults:
       run:
@@ -85,13 +96,10 @@ jobs:
       pull-requests: write
       contents: write
     env:
-      MAX_LTS: ${{ needs.check_labels.outputs.maxlts }}
+      MAX_LTS: ${{ needs.get_ver.outputs.maxlts }}
     steps:
-      - name: Get PR number
-        id: getpr
-        uses: bcgov/action-get-pr@v0.1.0
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
           ref: '${{ env.MAX_LTS }}' # This branch must exist in the repo.  Target LTS changes branch.
@@ -104,29 +112,35 @@ jobs:
         id: cherryPickStep
         continue-on-error: true
         run: git cherry-pick -m 1 $GITHUB_SHA
-      - name: Failed Cherry Pick - Comment
+
+
+      - name: Failed Cherry Pick - Re-Checkout
         if: steps.cherryPickStep.outcome == 'failure'
-        uses: thollander/actions-comment-pull-request@v3
+        uses: actions/checkout@v6
         with:
-          github-token: '${{ secrets.GITHUB_TOKEN }}'
-          pr-number: '${{ steps.getpr.outputs.pr }}'
-          message: |
-            Maintainers (@jrcain-usgs @Kelvinrr): Please cherry-pick this bugfix to LTS.  
-            PR:  #${{ steps.getpr.outputs.pr }}
-            SHA: ${{ github.sha }}.  
+          sparse-checkout: |
+            .github
 
-            You may use the following commands to cherry-pick 
-            (Assuming you have the DOI-USGS/ISIS3 repo as a remote named `upstream`):
-            ```
-            git fetch upstream
-            git checkout -b cherry-${{ steps.getpr.outputs.pr }} upstream/${{ env.MAX_LTS }}
-            git cherry-pick -m 1 ${{ github.sha }}
+      - name: Failed Cherry Pick - Email
+        if: steps.cherryPickStep.outcome == 'failure'
+        env:
+          GITHUB_PR: ${{ needs.check_labels.outputs.pr }}
+          GOV_DELIVERY_AUTH: ${{ secrets.GOV_DELIVERY_AUTH }}
+        run: |
+          echo 'Auto Cherry Pick Failed, sending notification.'
 
-            # Resolve Merge Conflicts Manually
+          # Create Template
+          sed -e "s/###PR###/${GITHUB_PR}/" \
+          -e "s/###SHA###/${GITHUB_SHA}/" \
+          -e "s/###CURRENT_LTS###/${MAX_LTS}/" \
+          .github/cherry-pick-bulletin-template.xml > bulletin-${GITHUB_PR}.xml
 
-            # Then push to LTS
-            git push --set-upstream upstream ${{ env.MAX_LTS }}
-            ```
+          # Post and Send Bulletin
+          curl -X POST https://api.govdelivery.com/api/account/USDOIGS/bulletins/send_now \
+          -H 'Content-Type: application/xml' \
+          -H "Authorization: ${GOV_DELIVERY_AUTH}" \
+          -d @bulletin-${GITHUB_PR}.xml
+
       - name: Setup conda
         if: steps.cherryPickStep.outcome == 'success'
         uses: conda-incubator/setup-miniconda@v3
@@ -168,99 +182,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: git push
-  
-  # cherrypick-prod:
-  #   needs: check_labels
-  #   # Run this step if code was a bugfix or non-breaking change
-  #   if: contains(needs.check_labels.outputs.result, 'production_update_')
-  #   runs-on: ubuntu-22.04
-  #   defaults:
-  #     run:
-  #       shell: bash -l {0} # bash login mode so conda can auto activate isis env
-  #   permissions:
-  #     pull-requests: write
-  #     contents: write
-  #   env: 
-  #     MAX_PROD: ${{ needs.check_labels.outputs.maxprod }}
-  #   steps:
-  #     - name: Get PR number
-  #       id: getpr
-  #       uses: bcgov/action-get-pr@v0.1.0
-  #     - name: Checkout Repo
-  #       uses: actions/checkout@v4
-  #       with:
-  #         submodules: recursive
-  #         ref: '${{ env.MAX_PROD }}' # This branch must exist in the repo.  Target Prod changes branch.
-  #         fetch-depth: '0'
-  #     - name: Configure git
-  #       run: |
-  #         git config user.name "github-actions[bot]"
-  #         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-  #     - name: Cherry Pick
-  #       id: cherryPickStep
-  #       continue-on-error: true
-  #       run: git cherry-pick -m 1 $GITHUB_SHA
-  #     - name: Failed Cherry Pick - Comment
-  #       if: steps.cherryPickStep.outcome == 'failure'
-  #       uses: thollander/actions-comment-pull-request@v3
-  #       with:
-  #         github-token: '${{ secrets.GITHUB_TOKEN }}'
-  #         pr-number: '${{ steps.getpr.outputs.pr }}'
-  #         message: |
-  #           Maintainers: Please cherry-pick this bugfix to Production.  
-  #           PR:  #${{ steps.getpr.outputs.pr }}
-  #           SHA: ${{ github.sha }}.  
-
-  #           You may use the following commands to cherry-pick 
-  #           (Assuming you have the DOI-USGS/ISIS3 repo as a remote named `upstream`):
-  #           ```
-  #           git fetch upstream
-  #           git checkout -b cherry-${{ steps.getpr.outputs.pr }} upstream/${{ env.MAX_PROD }}
-  #           git cherry-pick -m 1 ${{ github.sha }}
-
-  #           # Resolve Merge Conflicts Manually
-
-  #           # Then push to LTS
-  #           git push --set-upstream upstream ${{ env.MAX_PROD }}
-  #           ```
-  #     - name: Setup conda
-  #       if: steps.cherryPickStep.outcome == 'success'
-  #       uses: conda-incubator/setup-miniconda@v3
-  #       with:
-  #         miniconda-version: "latest"
-  #         activate-environment: isis
-  #         environment-file: environment.yml
-  #         auto-activate-base: false
-  #         auto-update-conda: true
-  #     - name: Check Environment (Debug)
-  #       if: steps.cherryPickStep.outcome == 'success'
-  #       env: 
-  #         ISISROOT: ${{ github.workspace }}/build
-  #       run: |
-  #         echo "--- Conda Env"
-  #         conda info --envs
-  #         echo "--- cmake Location (Should be in isis conda env)"
-  #         which cmake
-  #         cmake --version
-  #         echo "--- python location"
-  #         which python
-  #         echo "--- Working Directory"
-  #         pwd
-  #         echo "--- Files"
-  #         ls
-  #         echo "--- ISISROOT"
-  #         echo $ISISROOT
-  #     - name: Build ISIS
-  #       if: steps.cherryPickStep.outcome == 'success'
-  #       env: 
-  #         ISISROOT: ${{ github.workspace }}/build
-  #       run: |
-  #         mkdir build
-  #         cd build
-  #         cmake -GNinja -DJP2KFLAG=OFF ../isis
-  #         ninja -j8
-  #     - name: Successful Cherry Pick - Auto Push to LTS
-  #       if: steps.cherryPickStep.outcome == 'success'
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       run: git push
+        
