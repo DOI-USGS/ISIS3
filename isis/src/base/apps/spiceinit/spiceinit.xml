@@ -806,13 +806,30 @@
             </description>
           </option>
           <option value="WEB">
-            <brief>Search default shape model from ISIS STAC API</brief>
+            <brief>Retrieve shape models from ISIS STAC APIs</brief>
             <description>
-              This option searches the ISIS STAC API for a shape model that matches the target of 
-              the input cube. If no matching shape model is found, spiceinit will fall back to using 
-              SYSTEM to search for a shape model in the data area. The label will contain a vsicurl 
-              URL pointing to the GeoTIFF shape model file in an S3 bucket and can be found in the cube labels
-              Kernels Group under the <b>ShapeModel</b> keyword.
+              This option retrieves shape models using a multi-stage process:
+
+              1. A default global DEM is first loaded from the ISIS STAC API.
+                This provides the necessary surface reference to compute the
+                geographic footprint of the input cube.
+
+              2. Using this footprint, a STAC search is performed to locate a
+                higher-resolution, image-specific shape model. If a
+                ShapeModelWeb URL is configured in IsisPreferences, that API
+                will be used for the search.
+
+              3. If a more specific shape model is found, it replaces the
+                global DEM. Otherwise, the global DEM remains in use.
+
+              If no web-based shape models are available, spiceinit will fall
+              back to using SYSTEM to search for a shape model in the local
+              data area.
+
+              The resulting ShapeModel will be written to the cube label
+              in the Kernels Group under the <b>ShapeModel</b> keyword.
+              For web-based models, this will typically be a /vsicurl/ URL
+              pointing to a GeoTIFF in cloud storage.
             </description>
           </option>
         </list>

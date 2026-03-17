@@ -498,6 +498,143 @@ TEST_F(KernelDbFixture, TestDemTiffUrl) {
     EXPECT_CALL(db, curlPostRequest(testing::_, testing::_))
         .WillOnce(testing::Return(expectedJson));
 
-    QString url = db.getDemTiffUrl(cubeLabel);
+    QString url = db.getDemTiffUrl(cubeLabel, -180, -90, 180, 90);
+    EXPECT_PRED_FORMAT2(AssertQStringsEqual, url, "/vsicurl/https://asc-isisdata.s3.us-west-2.amazonaws.com/isis-stac/isis-dtm-collection/molaMarsPlanetaryRadius0005.tiff");
+}
+
+TEST_F(KernelDbFixture, TestGlobalDemTiffUrl) {
+    MockKernelDb db(Kernel::Predicted);
+
+    std::string expectedJson = R"({
+        "type": "FeatureCollection",
+        "stac_version": "1.0.0",
+        "stac_extensions": [],
+        "context": {
+            "limit": 1,
+            "matched": 3,
+            "returned": 1
+        },
+        "numberMatched": 3,
+        "numberReturned": 1,
+        "features": [
+            {
+                "type": "Feature",
+                "stac_version": "1.1.0",
+                "stac_extensions": [
+                    "https://stac-extensions.github.io/version/v1.0.0/schema.json"
+                ],
+                "id": "molaMarsPlanetaryRadius0005",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [
+                                180,
+                                -89.99843755425232
+                            ],
+                            [
+                                180,
+                                90
+                            ],
+                            [
+                                -180,
+                                90
+                            ],
+                            [
+                                -180,
+                                -89.99843755425232
+                            ],
+                            [
+                                180,
+                                -89.99843755425232
+                            ]
+                        ]
+                    ]
+                },
+                "bbox": [
+                    -180,
+                    -89.99843755425232,
+                    180,
+                    90
+                ],
+                "properties": {
+                    "ssys:targets": [
+                        "Mars"
+                    ],
+                    "version": "0003",
+                    "datetime": "2026-03-09T21:17:57.818569Z",
+                    "created": "2025-12-15T20:40:04.463Z",
+                    "updated": "2026-03-09T21:22:38.637Z"
+                },
+                "links": [
+                    {
+                        "rel": "self",
+                        "type": "application/geo+json",
+                        "href": "https://3hr5l9mbj6.execute-api.us-west-2.amazonaws.com/prod/collections/isis-global-dtms/items/molaMarsPlanetaryRadius0005"
+                    },
+                    {
+                        "rel": "parent",
+                        "type": "application/json",
+                        "href": "https://3hr5l9mbj6.execute-api.us-west-2.amazonaws.com/prod/collections/isis-global-dtms"
+                    },
+                    {
+                        "rel": "collection",
+                        "type": "application/json",
+                        "href": "https://3hr5l9mbj6.execute-api.us-west-2.amazonaws.com/prod/collections/isis-global-dtms"
+                    },
+                    {
+                        "rel": "root",
+                        "type": "application/json",
+                        "href": "https://3hr5l9mbj6.execute-api.us-west-2.amazonaws.com/prod"
+                    },
+                    {
+                        "rel": "thumbnail",
+                        "href": "https://3hr5l9mbj6.execute-api.us-west-2.amazonaws.com/prod/collections/isis-global-dtms/items/molaMarsPlanetaryRadius0005/thumbnail"
+                    }
+                ],
+                "assets": {
+                    "image": {
+                        "href": "https://asc-isisdata.s3.us-west-2.amazonaws.com/isis-stac/isis-dtm-collection/molaMarsPlanetaryRadius0005.tiff",
+                        "type": "image/tiff; application=geotiff"
+                    }
+                },
+                "collection": "isis-global-dtms"
+            }
+        ],
+        "links": [
+            {
+                "rel": "next",
+                "title": "Next page of Items",
+                "method": "POST",
+                "type": "application/geo+json",
+                "href": "https://3hr5l9mbj6.execute-api.us-west-2.amazonaws.com/prod/search",
+                "merge": false,
+                "body": {
+                    "query": {
+                        "ssys:targets": {
+                            "in": [
+                                "Mars"
+                            ]
+                        }
+                    },
+                    "collections": [
+                        "isis-global-dtms"
+                    ],
+                    "limit": 1,
+                    "next": "2026-03-09T21:17:57.818569Z,molaMarsPlanetaryRadius0005,isis-global-dtms"
+                }
+            },
+            {
+                "rel": "root",
+                "type": "application/json",
+                "href": "https://3hr5l9mbj6.execute-api.us-west-2.amazonaws.com/prod"
+            }
+        ]
+    })";
+
+    EXPECT_CALL(db, curlPostRequest(testing::_, testing::_))
+        .WillOnce(testing::Return(expectedJson));
+
+    QString url = db.getGlobalDemTiffUrl(cubeLabel);
     EXPECT_PRED_FORMAT2(AssertQStringsEqual, url, "/vsicurl/https://asc-isisdata.s3.us-west-2.amazonaws.com/isis-stac/isis-dtm-collection/molaMarsPlanetaryRadius0005.tiff");
 }

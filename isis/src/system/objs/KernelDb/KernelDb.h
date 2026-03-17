@@ -122,7 +122,8 @@ namespace Isis {
       Kernel frame(Pvl &lab);
       Kernel instrumentAddendum(Pvl &lab);
       Kernel dem(Pvl &lab);
-      QString getDemTiffUrl(const Pvl &lab);
+      QString getGlobalDemTiffUrl(const Pvl &lab);
+      QString getDemTiffUrl(const Pvl &lab, double north, double south, double east, double west);
 
       virtual std::string curlPostRequest(const std::string url, const std::string jsonData);
 

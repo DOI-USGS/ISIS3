@@ -187,12 +187,9 @@ namespace Isis {
         dem = baseKernels.dem(lab);
       }
       else if (ui.GetString("SHAPE") == "WEB") {
-        QString tiffUrl = baseKernels.getDemTiffUrl(lab);
+        QString tiffUrl = baseKernels.getGlobalDemTiffUrl(lab);
         if (!tiffUrl.isEmpty()) {
           dem.push_back(tiffUrl);
-        } 
-        else {
-          dem = baseKernels.dem(lab);
         }
       }
 
@@ -264,6 +261,49 @@ namespace Isis {
 
         kernelSuccess = tryKernels(icube, p, ui, log, lk, pck, targetSpk,
                                    realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
+
+        if (kernelSuccess && ui.GetString("SHAPE") == "WEB" and Preference::Preferences().hasGroup("ShapeModelWeb")) {
+          Camera *cam = icube->camera();
+
+          vector<pair<int,int>> points = {
+            {1, 1},                    
+            {icube->sampleCount(), 1},             
+            {1, icube->lineCount()},                     
+            {icube->sampleCount(), icube->lineCount()}, 
+            {icube->sampleCount()/2, icube->lineCount()/2} 
+          };
+
+          double north = -90.0;
+          double south = 90.0;
+          double west =  180.0;
+          double east = -180.0;
+
+          for (auto &pt : points) {
+            if (cam->SetImage(pt.first, pt.second)) {
+              double lat = cam->UniversalLatitude();
+              double lon = cam->UniversalLongitude();
+
+              if (lon > 180.0) lon -= 360.0;
+
+              north = std::max(north, lat);
+              south = std::min(south, lat);
+              east  = std::max(east, lon);
+              west  = std::min(west, lon);
+            }
+          }
+          QString tiffUrl = baseKernels.getDemTiffUrl(lab, north, south, east, west);
+
+          if (!tiffUrl.isEmpty()) {
+            dem.setKernels(QStringList());
+            dem.push_back(tiffUrl);
+          }
+          else {
+            dem = baseKernels.dem(lab);
+          }
+
+          kernelSuccess = tryKernels(icube, p, ui, log, lk, pck, targetSpk,
+                              realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
+        }
       }
       if (!kernelSuccess) {
         throw IException(IException::Unknown,

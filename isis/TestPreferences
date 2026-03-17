@@ -72,18 +72,6 @@ EndGroup
 #EndGroup
 
 ########################################################
-#
-# Set Shape Model Web API URL 
-# Default uses ISIS STAC API
-# Note: This is only used when running spiceinit with shape="web"
-#
-########################################################
-
-Group = ShapeModelWeb
-  URL = "https://3hr5l9mbj6.execute-api.us-west-2.amazonaws.com/prod/search"
-EndGroup
-
-########################################################
 # Customize how session logging is handled
 #
 # TerminalOutput = On | Off

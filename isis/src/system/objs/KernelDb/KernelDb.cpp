@@ -18,7 +18,6 @@ find files of those names at the top level of this repository. **/
 #include "iTime.h"
 #include "Kernel.h"
 #include "Preference.h"
-#include "Preference.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
@@ -691,7 +690,35 @@ namespace Isis {
     return matchKeywords && matchTime;
   }
 
-  QString KernelDb::getDemTiffUrl(const Pvl &lab) {
+  QString KernelDb::getGlobalDemTiffUrl(const Pvl &lab) {
+    QString tiffUrl;
+
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
+    QString target = inst.findKeyword("TargetName")[0];
+    target = target.toLower();
+    target[0] = target[0].toUpper();
+
+    QString isisStacURL = "https://astrogeology.usgs.gov/apis/isis-stac/search";
+    nlohmann::json body;
+    body["query"]["ssys:targets"]["in"] = {target.toStdString()};
+    body["sort"] = {{{"field","version"},{"direction","desc"}}};
+    body["limit"] = 1;
+
+    std::string jsonData = body.dump();
+    std::string responseBody = curlPostRequest(isisStacURL.toStdString(), jsonData);
+
+    if (!responseBody.empty() && responseBody[0] == '{') {
+      nlohmann::json json = nlohmann::json::parse(responseBody);
+
+      if (json.contains("features") && !json["features"].empty()) {
+        nlohmann::json data = json["features"][0]["assets"]["image"];
+        tiffUrl = "/vsicurl/" + QString::fromStdString(data["href"]);
+      }
+    }
+    return tiffUrl;
+  }
+
+  QString KernelDb::getDemTiffUrl(const Pvl &lab, double north, double south, double east, double west) {
     QString tiffUrl;
 
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -700,25 +727,45 @@ namespace Isis {
     target[0] = target[0].toUpper();
 
     QString url = Preference::Preferences().findGroup("ShapeModelWeb")["URL"];
-    std::string jsonData =
-      std::string(R"({
-        "query": {
-          "ssys:targets": {"in": [")") + target.toStdString() + R"("]}
-        },
-        "sort": [{"field": "version", "direction": "desc"}],
-        "limit": 1
-      })";
-
+    nlohmann::json body;
+    body["bbox"] = {west, south, east, north};
+    body["query"]["ssys:targets"]["in"] = {target.toStdString()};
+    body["sort"] = {{{"field","version"},{"direction","desc"}}};
+    body["limit"] = 100;
+    
+    std::string jsonData = body.dump();
 
     std::string responseBody = curlPostRequest(url.toStdString(), jsonData);
 
-    nlohmann::json json = nlohmann::json::parse(responseBody);
+    if (!responseBody.empty() && responseBody[0] == '{') {
+      nlohmann::json json = nlohmann::json::parse(responseBody);
 
-    if (json.contains("features")) {
-      nlohmann::json data = json["features"][0]["assets"]["image"];
-      tiffUrl = "/vsicurl/" + QString::fromStdString(data["href"]);
+      if (json.contains("features") && !json["features"].empty()) {
+        double bestGSD = std::numeric_limits<double>::max();
+        nlohmann::json bestFeature;
+
+        for (auto &feat : json["features"]) {
+          double gsd = std::numeric_limits<double>::max();
+
+          if (feat["properties"].contains("gsd")) {
+            gsd = feat["properties"]["gsd"].get<double>();
+          }
+
+          if (gsd < bestGSD) {
+            bestGSD = gsd;
+            bestFeature = feat;
+          }
+        }
+
+        // If no GSD was found in any feature, pick the first feature
+        if (bestFeature.is_null()) {
+          bestFeature = json["features"][0];
+        }
+
+        nlohmann::json data = bestFeature["assets"]["image"];
+        tiffUrl = "/vsicurl/" + QString::fromStdString(data["href"]);
+      }
     }
-
     return tiffUrl;
   }
 
