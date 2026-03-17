@@ -1,0 +1,35 @@
+<bulletin>
+  <subject>[Test] Cherry-Pick ISIS PR ###PR### to LTS</subject>
+  <body><![CDATA[<p>Maintainers: This is a test message.
+<br>Future messages will ask a maintainer to cherry-pick bugfixes to ISIS LTS.</p>
+<table>
+<tbody><tr>
+<td>PR:</td>
+<td><code>###PR###</code></td>
+</tr>
+<tr>
+<td>SHA:</td>
+<td><code>###SHA###</code></td>
+</tr>
+</tbody></table>
+<p>You may use the following commands to cherry-pick<br>(Assuming you have the DOI-USGS/ISIS3 repo as a remote named <code>upstream</code>):</p>
+<code>git fetch upstream</code><br>
+<code>git checkout -b cherry-###PR### upstream/###CURRENT_LTS###</code><br>
+<code>git cherry-pick -m 1 ###SHA###</code><br>
+<code></code><br>
+<code># Resolve Merge Conflicts Manually</code><br>
+<code></code><br>
+<code># Then push to LTS</code><br>
+<code>git push --set-upstream upstream ###CURRENT_LTS###</code><br>
+]]></body>
+  <sms_body nil='true'></sms_body>
+  <publish_rss type='boolean'>false</publish_rss>
+  <open_tracking type='boolean'>true</open_tracking>
+  <click_tracking type='boolean'>false</click_tracking>
+  <share_content_enabled type='boolean'>false</share_content_enabled>
+  <topics type='array'>
+    <topic>
+      <code>USDOIGS_164</code>
+    </topic>
+  </topics>
+</bulletin>
