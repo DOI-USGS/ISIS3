@@ -5,7 +5,7 @@
 <table>
 <tbody><tr>
 <td>PR:</td>
-<td><code>###PR###</code></td>
+<td><a href="https://github.com/DOI-USGS/ISIS3/pull/###PR###"><code>###PR###</code></a></td>
 </tr>
 <tr>
 <td>SHA:</td>
