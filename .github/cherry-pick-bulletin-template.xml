@@ -1,7 +1,6 @@
 <bulletin>
-  <subject>[Test] Cherry-Pick ISIS PR ###PR### to LTS</subject>
-  <body><![CDATA[<p>Maintainers: This is a test message.
-<br>Future messages will ask a maintainer to cherry-pick bugfixes to ISIS LTS.</p>
+  <subject>Cherry-Pick ISIS PR ###PR### to LTS</subject>
+  <body><![CDATA[<p>Maintainers: Please cherry-pick this bugfix to ISIS LTS.</p>
 <table>
 <tbody><tr>
 <td>PR:</td>
