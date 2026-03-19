@@ -7,7 +7,7 @@ Group = Keyword1
   InputPosition  = (IsisCube, Instrument)
   OutputName     = Keyword1
   OutputPosition = (Group, SerialNumberKeywords)
-  Translation    = (CH2, "Chandrayaan-2")
+  Translation    = (CH2, "CHANDRAYAAN-2")
   Translation    = (*, *)
 End_Group
 
