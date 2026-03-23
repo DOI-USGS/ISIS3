@@ -1692,6 +1692,18 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the camera for this cube. The cube takes ownership of the
+   * pointer and will delete it when done.
+   *
+   * @param camera The camera to set
+   */
+  void Cube::setCamera(Camera *camera) {
+    delete m_camera;
+    m_camera = camera;
+  }
+
+
   void Cube::attachSpiceFromIsd(nlohmann::json isd) {
     PvlGroup currentKernels = this->group("Kernels");
     PvlKeyword lkKeyword = currentKernels["LeapSecond"];

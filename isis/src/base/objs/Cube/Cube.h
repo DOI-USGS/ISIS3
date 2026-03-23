@@ -319,6 +319,7 @@ namespace Isis {
       double base() const;
       ByteOrder byteOrder() const;
       Camera *camera();
+      void setCamera(Camera *camera);
       FileName externalCubeFileName() const;
       virtual QString fileName() const;
       Format format() const;

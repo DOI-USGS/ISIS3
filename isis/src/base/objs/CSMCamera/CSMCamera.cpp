@@ -72,6 +72,21 @@ void sanitize(std::string &input);
 
 
   /**
+   * Construct a CSMCamera from plugin/model names and a state string.
+   * This avoids the blob round-trip when the caller already has the state.
+   *
+   * @param cube The Cube with image data
+   * @param pluginName The CSM plugin name
+   * @param modelName The CSM model name
+   * @param stateString The CSM state string
+   */
+  CSMCamera::CSMCamera(Cube &cube, QString pluginName, QString modelName,
+                        QString stateString) : Camera(cube) {
+    init(cube, pluginName, modelName, stateString);
+  }
+
+
+  /**
    * Init method which performs most of the setup for the CSM Camera Model inside ISIS.
    *
    * @param cube The cube with the image data
