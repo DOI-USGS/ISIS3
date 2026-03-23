@@ -2334,19 +2334,6 @@ namespace Isis {
 
 
   /**
-   * Add a blob to the cube in memory without modifying the file on disk.
-   * This inserts the blob into the in-memory blob map and adds its PVL
-   * label to the cube label so that hasBlob() and read(Blob) find it.
-   *
-   * @param blob The blob to add
-   */
-  void Cube::addInMemoryBlob(Blob &blob) {
-    deleteBlob(blob.Name(), blob.Type()); // remove existing blob if present
-    m_blobMap[blob.Key()] = blob;
-    label()->addObject(blob.Label());
-  }
-
-  /**
    * Check to see if the cube contains a pvl table by the provided name
    *
    * @param name The name of the pvl table to search for
