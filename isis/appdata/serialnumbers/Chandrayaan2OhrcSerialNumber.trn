@@ -1,0 +1,33 @@
+ObservationKeys = 2
+
+Group = Keyword1
+  Auto           = 1
+  InputKey       = SpacecraftName
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = Keyword1
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (CH2, "CHANDRAYAAN-2")
+  Translation    = (*, *)
+End_Group
+
+Group = Keyword2
+  Auto           = 1
+  InputKey       = InstrumentId
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = Keyword2
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (*, *)
+End_Group
+
+Group = Keyword3
+  Auto           = 1
+  InputKey       = StartTime
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = Keyword3
+  OutputPosition = (Group, SerialNumberKeywords)
+  Translation    = (*, *)
+End_Group
+End
