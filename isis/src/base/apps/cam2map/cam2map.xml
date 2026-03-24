@@ -818,7 +818,7 @@
           Produce output with the Ames Stereo Pipeline algorithm
         </brief>
         <description>
-          Produce a map-projected cube with the same algorithm as the Ames
+          Produce a mapprojected cube with the same algorithm as the Ames
           Stereo Pipeline mapproject program and same grid on the ground. The
           precise extent may be somewhat different. Requires the DEM
           parameter.
