@@ -46,6 +46,10 @@ Group = InstrumentName
   # Chandrayaan
   Translation   = (M3, M3)
   Translation   = (Minirf, MRFFR)
+  Translation   = (Ohrc, OHRC)
+  Translation   = (Tmc2, CH2_TMC_NADIR)
+  Translation   = (Tmc2, CH2_TMC_FORE)
+  Translation   = (Tmc2, CH2_TMC_AFT)
 
   # Clementine
   Translation   = (Hires, HIRES)
