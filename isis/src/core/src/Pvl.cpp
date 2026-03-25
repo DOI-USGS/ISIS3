@@ -190,16 +190,21 @@ namespace Isis {
         projJson = projJson["base_crs"];
       }
 
-      std::string direction = projJson["coordinate_system"]["axis"][1]["direction"];
-      if (direction == "east") {
-        mappingGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
-      }
-      else if (direction == "west") {
-        mappingGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"));
-      }
-      else {
-        QString msg = "Unknown direction [" + QString::fromStdString(direction) + "]";
-        throw IException(IException::Programmer, msg, _FILEINFO_);
+      nlohmann::json axes = projJson["coordinate_system"]["axis"];
+      for (nlohmann::json axis : axes) {
+        if (axis["name"] == "Longitude") {
+          std::string direction = axis["direction"];
+          if (direction == "east") {
+            mappingGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
+          }
+          else if (direction == "west") {
+            mappingGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"));
+          }
+          else {
+            QString msg = "Unknown direction [" + QString::fromStdString(direction) + "]";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
+        }
       }
       
       if (oSRS.GetSemiMajor() == oSRS.GetSemiMinor()) {
@@ -215,7 +220,7 @@ namespace Isis {
       // Read the GeoTransform and get the elements we care about
       double *padfTransform = new double[6];
       dataset->GetGeoTransform(padfTransform);
-      if (abs(padfTransform[1]) != abs(padfTransform[5])) {
+      if ((abs(padfTransform[1]) - abs(padfTransform[5])) > 1e-2) {
         delete[] padfTransform;
         QString msg = "Vertical and horizontal resolution do not match";
         throw IException(IException::Io, msg, _FILEINFO_);
