@@ -263,13 +263,12 @@ namespace Isis {
 
     p_groundEngine = new QComboBox();
     p_groundEngine->setEditable(true);
-    p_groundEngine->setToolTip("Ground Engine Selection");
-    p_groundEngine->setWhatsThis("<b>Function: </b> Select whether to use the projection \
-                                 to determine ground coordinate or the camera. Images with \
-                                 both can use either, images with only one of either a projection \
-                                 or a camera will use what is available even if the other is \
-                                 requested.");
-    p_groundEngine->insertItem(0, "Camera");  
+    p_groundEngine->setToolTip("Ground Engine Priority");
+    p_groundEngine->setWhatsThis("<b>Function: </b> Set priortiy use of the projection \
+                             or the camera to determine ground coordinates. If both are available, \
+                             the selected option takes priority. If only one is available, it will \
+                             be used by default.");
+    p_groundEngine->insertItem(0, "Camera");
     p_groundEngine->insertItem(1, "Projection");
     p_groundEngine->setCurrentIndex(0);
     connect( p_groundEngine, SIGNAL( currentIndexChanged(int) ), 
