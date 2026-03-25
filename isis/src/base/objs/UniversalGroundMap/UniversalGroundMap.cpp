@@ -555,11 +555,9 @@ namespace Isis {
 
   void UniversalGroundMap::setPriority(int priority)  {
     if (priority == UniversalGroundMap::CameraFirst && HasCamera()) {
-      std::cout << "Setting camera priority" << std::endl;
       p_priority = (CameraPriority) priority;
     }
     else if (priority == UniversalGroundMap::ProjectionFirst && HasProjection()) {
-      std::cout << "Setting projection priority" << std::endl;
       p_priority = (CameraPriority) priority;
     }
   }
