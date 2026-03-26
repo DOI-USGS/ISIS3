@@ -264,7 +264,7 @@ namespace Isis {
     p_groundEngine = new QComboBox();
     p_groundEngine->setEditable(true);
     p_groundEngine->setToolTip("Ground Engine Priority");
-    p_groundEngine->setWhatsThis("<b>Function: </b> Set priortiy use of the projection \
+    p_groundEngine->setWhatsThis("<b>Function: </b> Set priority use of the projection \
                              or the camera to determine ground coordinates. If both are available, \
                              the selected option takes priority. If only one is available, it will \
                              be used by default.");
@@ -682,12 +682,12 @@ namespace Isis {
         if ( groundMap->SetImage(samp - 0.5, line - 0.5) ) {
           double lat1 = groundMap->UniversalLatitude();
           double lon1 = groundMap->UniversalLongitude();
-          double radius1 = groundMap->Radius();
+          double radius1 = groundMap->LocalRadius();
 
           if ( groundMap->SetImage(samp + 0.5, line + 0.5) ) {
             double lat2 = groundMap->UniversalLatitude();
             double lon2 = groundMap->UniversalLongitude();
-            double radius2 = groundMap->Radius();
+            double radius2 = groundMap->LocalRadius();
 
             SurfacePoint point1( Latitude(lat1, Angle::Degrees),
                                  Longitude(lon1, Angle::Degrees),
