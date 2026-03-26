@@ -336,12 +336,14 @@ namespace Isis {
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    const QString &cnetFile,
                    const QString &cubeList,
-                   bool printSummary = true);
+                   bool printSummary = true,
+                   const QString &isdList = "");
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    const QString &cnetFile,
                    const QString &cubeList,
                    const QString &lidarDataFile,
-                   bool printSummary = true);
+                   bool printSummary = true,
+                   const QString &isdList = "");
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    QString &cnet,
                    SerialNumberList &snlist,
@@ -357,7 +359,8 @@ namespace Isis {
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    ControlNetQsp cnet,
                    const QString &cubeList,
-                   bool printSummary = true);
+                   bool printSummary = true,
+                   const QString &isdList = "");
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    Control &control,
                    QList<ImageList *> imgList,
@@ -379,6 +382,7 @@ namespace Isis {
       LidarDataQsp     lidarData();
       SerialNumberList *serialNumberList();
       QString          fileName(int index);
+      QString          isdFile(int index);
       QString          iterationSummaryGroup() const;
       bool             isConverged();
       Table            cMatrix(int index);
@@ -399,6 +403,7 @@ namespace Isis {
     private:
       //TODO Should there be a resetBundle(BundleSettings bundleSettings) method
       //     that allows for rerunning with new settings? JWB
+      void readIsdList(const QString &isdList, const QString &cubeList);
       void init(Progress *progress = 0);
       bool initializeNormalEquationsMatrix();
       bool validateNetwork();
@@ -465,40 +470,32 @@ namespace Isis {
 
       // member variables
 
-      BundleSettingsQsp m_bundleSettings;                    //!< Contains the solve settings.
-      BundleResults  m_bundleResults;                        //!< Stores the results of the
-                                                             //!< bundle adjust.
-      ControlNetQsp m_controlNet;                            //!< Output control net.
-      QString m_cnetFileName;                                //!< The control net filename.
+      BundleSettingsQsp m_bundleSettings;                   //!< Contains the solve settings.
+      BundleResults  m_bundleResults;                       //!< Stores the results of the
+                                                            //!< bundle adjust.
+      ControlNetQsp m_controlNet;                           //!< Output control net.
+      QString m_cnetFileName;                               //!< The control net filename.
 
-      QVector <BundleControlPointQsp> m_bundleControlPoints; //!< Vector of control points.
-      BundleLidarPointVector m_bundleLidarControlPoints;     //!< Vector of lidar points.
+      QVector<BundleControlPointQsp> m_bundleControlPoints; //!< Vector of control points.
+      BundleLidarPointVector m_bundleLidarControlPoints;    //!< Vector of lidar points.
 
-      QString m_lidarFileName;                               //!< Input lidar point filename.
-      LidarDataQsp m_lidarDataSet;                           //!< Output lidar data.
-      int m_numLidarConstraints;                             //!< TODO: temp
+      QString m_lidarFileName;                              //!< Input lidar point filename.
+      LidarDataQsp m_lidarDataSet;                          //!< Output lidar data.
+      int m_numLidarConstraints;                            //!< TODO: temp
 
-      BundleObservationVector m_bundleObservations;          /**!< Vector of observations.
-                                                                   Each observation contains one or
-                                                                   more images.*/
-      SerialNumberList *m_serialNumberList;                  //!< List of image serial numbers.
-      BundleTargetBodyQsp m_bundleTargetBody;                /**!< Contains information about the
-                                                                   target body.*/
-      bool m_abort;                                          //!< If the bundle should abort.
-      QString m_iterationSummary;                            /**!< Summary of the most recently
-                                                                   completed iteration.*/
-      bool m_printSummary;                                   /**!< If the iteration summaries
-                                                                   should be output to the log
-                                                                   file.*/
-      bool m_cleanUp;                                        /**!< If the serial number lists
-                                                                   need to be deleted by
-                                                                   the destructor.*/
-      int m_rank;                                            //!< The rank of the system.
-      int m_iteration;                                       //!< The current iteration.
-      double m_iterationTime;                                //!< Time for last iteration
-      int m_numberOfImagePartials;                           //!< number of image-related partials.
-      QList<ImageList *> m_imageLists;                        /**!< The lists of images used in the
-                                                                   bundle.*/
+      BundleObservationVector m_bundleObservations;         //!< Vector of observations.
+      SerialNumberList *m_serialNumberList;                 //!< List of image serial numbers.
+      QStringList m_isdFiles;                               //!< Parsed ISD paths, parallel to cubes.
+      BundleTargetBodyQsp m_bundleTargetBody;               //!< Contains target body info.
+      bool m_abort;                                         //!< If the bundle should abort.
+      QString m_iterationSummary;                           //!< Most recent iteration summary.
+      bool m_printSummary;                                  //!< Print iteration summaries.
+      bool m_cleanUp;                                       //!< If destructor deletes serial number lists.
+      int m_rank;                                           //!< The rank of the system.
+      int m_iteration;                                      //!< The current iteration.
+      double m_iterationTime;                               //!< Time for last iteration
+      int m_numberOfImagePartials;                          //!< number of image-related partials.
+      QList<ImageList *> m_imageLists;                      //!< Image lists used in the bundle.
 
       // ==========================================================================================
       // === BEYOND THIS PLACE (THERE BE DRAGONS) all refers to the folded bundle solution.     ===

@@ -15,6 +15,7 @@ find files of those names at the top level of this repository. **/
 namespace Isis {
 
   class Progress;
+  class Pvl;
 
   /**
    * @brief Serial Number list generator
@@ -68,6 +69,7 @@ namespace Isis {
       virtual ~SerialNumberList();
 
       void add(const QString &filename, bool def2filename = false);
+      void add(Pvl &p, const QString &filename, bool def2filename = false);
       void add(const QString &serialNumber, const QString &filename);
       void add(const char *serialNumber, const char *filename);
       bool hasSerialNumber(QString sn);

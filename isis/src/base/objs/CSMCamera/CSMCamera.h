@@ -29,8 +29,9 @@ namespace Isis {
       CSMCamera(Cube &cube);
       CSMCamera(Cube &cube, QString pluginName, QString modelName, QString stateString);
 
-      //! Destroys the CSMCamera object.
-      ~CSMCamera() {};
+      //! Destroys the CSMCamera object and frees the owned CSM model.
+      ~CSMCamera();
+
 
       /**
        * The CSM camera needs a bogus type for now.
@@ -145,7 +146,7 @@ namespace Isis {
     private:
       void init(Cube &cube, QString pluginName, QString modelName, QString stateString);
 
-      csm::RasterGM *m_model; //! CSM sensor model
+      csm::RasterGM *m_model = nullptr; //! CSM sensor model, owned by CSMCamera
       iTime m_refTime; //! The reference time that all model image times are relative to
 
       void isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel) const;

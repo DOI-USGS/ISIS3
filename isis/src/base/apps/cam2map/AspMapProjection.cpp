@@ -1924,20 +1924,10 @@ void renderMapprojectedImage(Camera *cam,
   outCube.close();
 }
 
-// Load a CSM camera model from an ISD file and set it on the cube,
-// so that cube->camera() returns a CSMCamera. Uses the CSMCamera
-// constructor that takes plugin/model/state strings directly,
-// avoiding the blob serialize/deserialize round-trip.
+// Load a CSM camera model from an ISD file and set it in the cube,
+// so that cube->camera() returns a CSMCamera.
 void loadCsmCamera(const QString &isdFile, Cube *cube) {
-  CameraFactory::initPlugin();
-  QStringList spec = CameraFactory::getModelSpecFromIsd(isdFile);
-  csm::Model *model = CameraFactory::constructModelFromIsd(
-      isdFile, spec[0], spec[1], spec[2]);
-  std::string stateStr = model->getModelState();
-  delete model;
-
-  Camera *cam = new CSMCamera(*cube, spec[0], spec[1],
-                               QString::fromStdString(stateStr));
+  Camera *cam = CameraFactory::CreateFromIsd(isdFile, *cube);
   cube->setCamera(cam);
 }
 

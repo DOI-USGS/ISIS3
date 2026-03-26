@@ -202,6 +202,16 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
+    // ISDLIST and OUTPUT_ADJUSTED_CSMSTATE are incompatible. With ISDLIST,
+    // cameras come from external ISDs and cubes are not modified. The adjusted
+    // state is written next to the input ISD files.
+    if (ui.WasEntered("ISDLIST") && ui.GetBoolean("OUTPUT_ADJUSTED_CSMSTATE")) {
+      QString msg = "Cannot use ISDLIST together with OUTPUT_ADJUSTED_CSMSTATE. "
+        "With ISDLIST, cubes are not modified and adjusted camera state is "
+        "written next to the input ISD files.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     QString cnetFile = ui.GetFileName("CNET");
 
     // retrieve settings from jigsaw gui
@@ -219,6 +229,11 @@ namespace Isis {
     }
     settings->setCubeList(cubeList);
 
+    // Read optional ISD list
+    QString isdList = "";
+    if (ui.WasEntered("ISDLIST"))
+      isdList = ui.GetFileName("ISDLIST");
+
     BundleAdjust *bundleAdjustment = NULL;
     try {
       // Get the held list if entered and prep for bundle adjustment
@@ -226,21 +241,19 @@ namespace Isis {
         QString heldList = ui.GetFileName("HELDLIST");
         // Update the control network so that any control points intersecting a held image are fixed
         ControlNetQsp cnet = fixHeldImages(cnetFile, heldList, cubeList);
-        bundleAdjustment = new BundleAdjust(settings, cnet, cubeList);
-      }
-    else if (ui.WasEntered("LIDARDATA")) {
-      QString lidarFile = ui.GetFileName("LIDARDATA");
+        bundleAdjustment = new BundleAdjust(settings, cnet, cubeList, true, isdList);
+      } else if (ui.WasEntered("LIDARDATA")) {
+        QString lidarFile = ui.GetFileName("LIDARDATA");
 
-      // validate lidar point file exists
-      if (!QFile::exists(lidarFile)) {
-        string msg = "Input lidar point file does not exist";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
+        // validate lidar point file exists
+        if (!QFile::exists(lidarFile)) {
+          string msg = "Input lidar point file does not exist";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
 
-      bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList, lidarFile);
-    }
-      else {
-        bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList);
+        bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList, lidarFile, true, isdList);
+      } else {
+        bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList, true, isdList);
       }
     }
     catch (IException &e) {
@@ -420,6 +433,19 @@ namespace Isis {
         gp += PvlKeyword("Status", "Camera pointing NOT updated");
       }
 
+      // Write adjusted CSM state to external files if requested
+      // via ISDLIST or OUTPUT_ADJUSTED_CSMSTATE. This is independent
+      // of whether UPDATE is true or not. ISDLIST images always get
+      // external state files when the bundle converges, since cubes
+      // are not modified.
+      bool writeIsd = ui.WasEntered("ISDLIST");
+      bool writeCsmState = ui.GetBoolean("OUTPUT_ADJUSTED_CSMSTATE");
+      if (writeIsd || writeCsmState)
+        for (int i = 0; i < bundleAdjustment->numberOfImages(); i++)
+          CameraFactory::writeAdjustedCsmState(bundleAdjustment->fileName(i),
+                                  bundleAdjustment->modelState(i),
+                                  settings->outputFilePrefix());
+
       Pvl summary;
       std::istringstream iss (bundleAdjustment->iterationSummaryGroup().toStdString());
       iss >> summary;
@@ -433,61 +459,10 @@ namespace Isis {
       delete bundleSolution;
     }
     catch(IException &e) {
-      bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
+      if (ui.WasEntered("ONET"))
+        bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
       QString msg = "Unable to bundle adjust network [" + cnetFile + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
-    }
-
-    if (ui.GetBoolean("OUTPUT_ADJUSTED_CSMSTATE")) {
-      
-      // Go thru each file in cubelist
-      SerialNumberList *snList = new SerialNumberList(cubeList);
-      for (int i = 0; i < snList->size(); i++) {        
-        QString filename = snList->fileName(i);
-        
-        // Generate ISD from cube
-        json props;
-	json isd;
-	try {
-          isd = ale::load(filename.toStdString(), props.dump(), "ale", false, true, false);
-	} catch (...) {
-	  throw IException(IException::Unknown, "Unable to find the appropriate ISIS driver in ALE.", _FILEINFO_); 
-	}
-
-        // Load plugin list
-        CameraFactory::initPlugin();
-
-        // Write ISD to temp file
-        boost::filesystem::path tempIsdFilePath = boost::filesystem::temp_directory_path() / boost::filesystem::unique_path();
-        tempIsdFilePath = tempIsdFilePath.replace_extension(".json");
-        std::ofstream tempIsdFile(tempIsdFilePath.c_str());
-        if (tempIsdFile.is_open()) {
-          tempIsdFile << isd.dump() << std::endl;
-          tempIsdFile.close();
-        } else {
-          std::cerr << "Error creating temporary file [" << tempIsdFilePath << "]." << std::endl;
-          boost::filesystem::remove(tempIsdFilePath);
-        }
-        
-        // Generate CSMState string
-        QString tempIsdFilePathStr = QString::fromStdString(tempIsdFilePath.string());
-        csm::Model *csmModel = CameraFactory::constructModelFromIsd(tempIsdFilePathStr);
-        std::string csmStateString = csmModel->getModelState();
-
-        // Remove temp file
-        boost::filesystem::remove(tempIsdFilePath);
-
-        // Write CSMState string to file
-        boost::filesystem::path filenamePath(filename.toStdString());
-        boost::filesystem::path csmStateFilename = filenamePath.replace_extension(".state.json");
-        ofstream csmStateFile(csmStateFilename.c_str());
-        if (csmStateFile.is_open()) {
-          csmStateFile << csmStateString << std::endl;
-          csmStateFile.close();
-        } else {
-          std::cerr << "Error creating CSMState file [" << csmStateFilename << "]." << std::endl;
-        }
-      }
     }
 
   //TODO - WHY DOES THIS MAKE VALGRIND ANGRY???
