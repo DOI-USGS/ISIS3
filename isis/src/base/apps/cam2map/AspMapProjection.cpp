@@ -163,7 +163,8 @@ GeoRef::GeoRef(const std::string &projStr, bool /*fromString*/):
   // Identity GeoTransform: pixel coords = projected coords
   m_gt[0] = 0.0; m_gt[1] = 1.0; m_gt[2] = 0.0;
   m_gt[3] = 0.0; m_gt[4] = 0.0; m_gt[5] = -1.0;
-  (void)GDALInvGeoTransform(m_gt, m_inv_gt);
+  if (!GDALInvGeoTransform(m_gt, m_inv_gt))
+    throw IException(IException::Unknown, "Non-invertible geo transform", _FILEINFO_);
 
   OGRSpatialReference projCRS;
   projCRS.SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
@@ -257,7 +258,8 @@ void GeoRef::lonlat_to_point(double lon, double lat,
 void GeoRef::setGeoTransform(const double gt[6]) {
   for (int i = 0; i < 6; i++)
     m_gt[i] = gt[i];
-  (void)GDALInvGeoTransform(m_gt, m_inv_gt);
+  if (!GDALInvGeoTransform(m_gt, m_inv_gt))
+    throw IException(IException::Unknown, "Non-invertible geo transform", _FILEINFO_);
 }
 
 bool GeoRef::isGeographic() const {

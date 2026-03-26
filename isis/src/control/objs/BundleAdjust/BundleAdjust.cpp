@@ -430,7 +430,7 @@ namespace Isis {
     // Parse the cube list file
     FileList cubeFiles(cubeList);
     if (m_isdFiles.size() != (int)cubeFiles.size()) {
-      QString msg = "ISD list has " + toString(m_isdFiles.size()) +
+      QString msg = "ISD list has " + toString((int)m_isdFiles.size()) +
         " entries but cube list has " + toString((int)cubeFiles.size()) + ".";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -3000,7 +3000,7 @@ namespace Isis {
    * @return @b QString The isd file path.
    */
   QString BundleAdjust::isdFile(int i) {
-    if (i < 0 || i >= m_isdFiles.size())
+    if (i < 0 || i >= (int)m_isdFiles.size())
       return "";
     return m_isdFiles[i];
   }
