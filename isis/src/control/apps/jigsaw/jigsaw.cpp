@@ -311,11 +311,10 @@ namespace Isis {
 
       std::string outputFilePrefix = settings->outputFilePrefix().toStdString();
 
-      // ALWAYS* WRITE OUT ADJUSTMENT VALUES
-      // Do NOT write out for cubes w/ CSMState (TODO)
+      // Write out adjustment values (skip CSM cubes, handled separately)
       if (ui.GetBoolean("OUTADJUSTMENTH5")) {
         std::string adjustmentFilename = outputFilePrefix + "adjustment_out.h5";
-        
+
         File file(adjustmentFilename, File::Truncate);
 
         for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {

@@ -237,22 +237,14 @@ namespace Isis {
 
     updateLabelForCsm(cube, model);
 
-    // Get model state and name for CSMCamera construction
-    std::string stateStr = model->getModelState();
-    std::string modelNameStr = model->getModelName();
-
-    // Find which plugin owns this model
-    QString pluginName;
-    for (const csm::Plugin *plugin : csm::Plugin::getList())
-      if (plugin->canModelBeConstructedFromState(modelNameStr, stateStr)) {
-        pluginName = QString::fromStdString(plugin->getPluginName());
-        break;
-      }
-
-    delete model;
-    return new CSMCamera(cube, pluginName,
-                         QString::fromStdString(modelNameStr),
-                         QString::fromStdString(stateStr));
+    // Cast to RasterGM and transfer ownership to CSMCamera
+    csm::RasterGM *rasterModel = dynamic_cast<csm::RasterGM*>(model);
+    if (!rasterModel) {
+      delete model;
+      QString msg = "CSM model from [" + isdFile + "] is not a RasterGM.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return new CSMCamera(cube, rasterModel);
   }
 
 
