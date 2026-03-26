@@ -202,13 +202,16 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // ISDLIST and OUTPUT_ADJUSTED_CSMSTATE are incompatible. With ISDLIST,
-    // cameras come from external ISDs and cubes are not modified. The adjusted
-    // state is written next to the input ISD files.
+    // ISDLIST and OUTPUT_ADJUSTED_CSMSTATE are incompatible.
+    // OUTPUT_ADJUSTED_CSMSTATE writes adjusted state for cubes that
+    // have CSM blobs. ISDLIST loads cameras from external files and
+    // keeps cubes read-only. Both write .adjusted_state.json files
+    // using the same FILE_PREFIX naming convention.
     if (ui.WasEntered("ISDLIST") && ui.GetBoolean("OUTPUT_ADJUSTED_CSMSTATE")) {
-      QString msg = "Cannot use ISDLIST together with OUTPUT_ADJUSTED_CSMSTATE. "
-        "With ISDLIST, cubes are not modified and adjusted camera state is "
-        "written next to the input ISD files.";
+      QString msg = "Cannot use ISDLIST together with "
+        "OUTPUT_ADJUSTED_CSMSTATE. OUTPUT_ADJUSTED_CSMSTATE is for "
+        "cubes with CSM blobs. ISDLIST keeps cubes unmodified and "
+        "writes adjusted state to external files automatically.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
