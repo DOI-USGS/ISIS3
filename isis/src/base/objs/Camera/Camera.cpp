@@ -382,7 +382,7 @@ namespace Isis {
   bool Camera::SetUniversalGround(const double latitude, const double longitude) {
     // Convert lat/lon or rad/az (i.e. ring rad / ring lon) to undistorted focal plane x/y
     if (p_groundMap->SetGround(Latitude(latitude, Angle::Degrees),
-                              Longitude(longitude, Angle::Degrees))) {
+                               Longitude(longitude, Angle::Degrees))) {
       return RawFocalPlanetoImage();
     }
 
@@ -1526,8 +1526,8 @@ namespace Isis {
 
       // As documented in the doxygen above, the goal of this method is to
       // calculate a normal vector to the surface using the 4 corner surrounding points.
-      double samp = Sample();
-      double line = Line();
+      double samp = p_detectorMap->ParentSample();
+      double line = p_detectorMap->ParentLine();
 
       // order of points in vector is top, bottom, left, right
       QList< QPair< double, double > > surroundingPoints;
@@ -1537,8 +1537,8 @@ namespace Isis {
       surroundingPoints.append(qMakePair(std::nexttoward(samp + 0.5, samp), line));
 
       // save input state to be restored on return
-      double originalSample = samp;
-      double originalLine = line;
+      double originalSample = Sample();
+      double originalLine = Line();
 
       // now we have all four points in the image, so find the same points on the surface
       for (int i = 0; i < cornerNeighborPoints.size(); i++) {
@@ -1549,6 +1549,8 @@ namespace Isis {
       Longitude lon;
       Distance radius;
 
+      bool originalIgnoreProj = p_ignoreProjection;
+      IgnoreProjection(true);
       // if this is a dsk, we only need to use the existing intercept point (plate) normal then return
       for (int i = 0; i < cornerNeighborPoints.size(); i++) {
         // If a surrounding point fails, set it to the original point
@@ -1597,6 +1599,7 @@ namespace Isis {
 
         // restore input state
         if (computed) {
+          IgnoreProjection(originalIgnoreProj);
           SetImage(originalSample, originalLine);
         }
         else {
@@ -1611,6 +1614,7 @@ namespace Isis {
       }
 
       // Restore input state to original point before calculating normal
+      IgnoreProjection(originalIgnoreProj);
       SetImage(originalSample, originalLine);
       shapeModel->calculateLocalNormal(cornerNeighborPoints);
 
