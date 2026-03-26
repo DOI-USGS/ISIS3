@@ -99,7 +99,7 @@ namespace Isis {
       bool SetImage(double sample, double line);
       double UniversalLatitude() const;
       double UniversalLongitude() const;
-      double Radius() const;
+      double LocalRadius() const;
       double Resolution() const;
 
       bool GroundRange(Cube *cube,

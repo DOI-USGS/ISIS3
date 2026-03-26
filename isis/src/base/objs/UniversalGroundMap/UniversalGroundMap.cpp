@@ -287,11 +287,11 @@ namespace Isis {
   }
 
   /**
-   * Returns the resolution of the camera model or projection
+   * Returns the radius of the camera model or projection
    *
-   * @return Resolution
+   * @return Radius
    */
-  double UniversalGroundMap::Radius() const {
+  double UniversalGroundMap::LocalRadius() const {
     if (p_priority == CameraFirst) {
       return p_camera->LocalRadius().meters();
     }
