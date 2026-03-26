@@ -83,7 +83,7 @@ namespace Isis {
 
     p_mapping = new PvlGroup;
 
-    if (p_groundMap->Camera()) {
+    if (p_groundMap->currentPriority() == 0) {
       Pvl tmp;
       p_groundMap->Camera()->BasicMapping(tmp);
       *p_mapping = tmp.findGroup("Mapping");
@@ -146,7 +146,7 @@ namespace Isis {
 
     // p_defaultResolution is in degrees/pixel
 
-    if (p_groundMap->HasCamera()) {
+    if (p_groundMap->currentPriority() == 0) {
       p_defaultResolution =
         (p_groundMap->Camera()->HighestImageResolution() /
          largerRadius.meters()) * 10;
