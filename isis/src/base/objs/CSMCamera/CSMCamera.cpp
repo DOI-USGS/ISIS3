@@ -105,12 +105,6 @@ void sanitize(std::string &input);
   }
 
 
-  CSMCamera::~CSMCamera() {
-    delete m_model;
-    m_model = nullptr;
-  }
-
-
   /**
    * Init method which performs most of the setup for the CSM Camera Model inside ISIS.
    *
@@ -137,7 +131,6 @@ void sanitize(std::string &input);
                     "be converted to a [" + modelName + "] using [" + pluginName + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    // CSMCamera owns m_model and frees it in the destructor
     m_model = dynamic_cast<csm::RasterGM*>(plugin->constructModelFromState(stateString.toStdString()));
     // If the dynamic cast failed, raise an exception
     if (!m_model) {
