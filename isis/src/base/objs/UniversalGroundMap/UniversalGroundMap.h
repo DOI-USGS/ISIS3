@@ -99,6 +99,7 @@ namespace Isis {
       bool SetImage(double sample, double line);
       double UniversalLatitude() const;
       double UniversalLongitude() const;
+      double LocalRadius() const;
       double Resolution() const;
 
       bool GroundRange(Cube *cube,
@@ -127,6 +128,12 @@ namespace Isis {
         return p_camera != 0;
       };
 
+      int currentPriority() {
+        return p_priority;
+      };
+
+      void setPriority(int priority);
+
       //! Return the projection associated with the ground map (NULL implies none)
       Isis::Projection *Projection() const {
         return p_projection;
@@ -141,6 +148,7 @@ namespace Isis {
     private:
       Isis::Camera *p_camera;  //!<The camera (if the image has a camera)
       Isis::Projection *p_projection;  //!<The projection (if the image is projected)
+      CameraPriority p_priority;
   };
 };
 

@@ -15,6 +15,7 @@ find files of those names at the top level of this repository. **/
 
 class QAction;
 class QCheckBox;
+class QComboBox;
 class QLineEdit;
 class QTabWidget;
 class QToolButton;
@@ -148,6 +149,7 @@ namespace Isis {
       void handleLinkClicked();
       void handleRecordClicked();
       void togglePointVisible();
+      void setProjectionEngine(int index);
 
     private: // methods
       void centerLinkedViewports();
@@ -163,6 +165,7 @@ namespace Isis {
       QToolButton *p_togglePointVisibleButton;
       QCheckBox *p_syncScale;
       QLineEdit *p_statusEdit;
+      QComboBox *p_groundEngine;
       QTabWidget *p_tabWidget;
       GroundTab *p_groundTab;
       ImageTab *p_imageTab;

@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDialog>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -260,9 +261,23 @@ namespace Isis {
                            <b>Hint: </b> If the cube is 'None' the find tool \
                            will not be active</p>");
 
+    p_groundEngine = new QComboBox();
+    p_groundEngine->setEditable(true);
+    p_groundEngine->setToolTip("Ground Engine Priority");
+    p_groundEngine->setWhatsThis("<b>Function: </b> Set priority use of the projection \
+                             or the camera to determine ground coordinates. If both are available, \
+                             the selected option takes priority. If only one is available, it will \
+                             be used by default.");
+    p_groundEngine->insertItem(0, "Camera");
+    p_groundEngine->insertItem(1, "Projection");
+    p_groundEngine->setCurrentIndex(0);
+    connect( p_groundEngine, SIGNAL( currentIndexChanged(int) ), 
+             this, SLOT( setProjectionEngine(int) ) );
+
     QHBoxLayout *layout = new QHBoxLayout(hbox);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(p_statusEdit);
+    layout->addWidget(p_groundEngine);
     layout->addWidget(p_showDialogButton);
     layout->addWidget(p_linkViewportsButton);
     layout->addWidget(p_togglePointVisibleButton);
@@ -548,6 +563,19 @@ namespace Isis {
   }
 
 
+    //! toggles visibility of the red circle
+  void FindTool::setProjectionEngine(int index) {
+    for (int i = 0; i < cubeViewportList()->size(); i++) {
+      MdiCubeViewport *viewport = ( *( cubeViewportList() ) )[i];
+      UniversalGroundMap *groundMap = viewport->universalGroundMap();
+
+      if (groundMap) {
+        groundMap->setPriority(index);
+      }
+    }
+  }
+
+
   //! Links all cubes that have camera models or are map projections
   void FindTool::handleLinkClicked() {
     MdiCubeViewport *d;
@@ -634,9 +662,11 @@ namespace Isis {
     // UniversalGroundMaps default to camera priority, so create a new one so that we can use projection if it exists.
     UniversalGroundMap *groundMap = viewport->universalGroundMap();
     Distance viewportResolution;
-    if (groundMap->Camera() != NULL){
-      if (groundMap->Camera()->target()->isSky()) {
-        return Distance(groundMap->Camera()->RaDecResolution(), Distance::Units::Meters);
+    if (groundMap) {
+      if (groundMap->Camera() != NULL) {
+        if (groundMap->Camera()->target()->isSky()) {
+          return Distance(groundMap->Camera()->RaDecResolution(), Distance::Units::Meters);
+        }
       }
     }
 
@@ -652,22 +682,20 @@ namespace Isis {
         if ( groundMap->SetImage(samp - 0.5, line - 0.5) ) {
           double lat1 = groundMap->UniversalLatitude();
           double lon1 = groundMap->UniversalLongitude();
+          double radius1 = groundMap->LocalRadius();
 
           if ( groundMap->SetImage(samp + 0.5, line + 0.5) ) {
             double lat2 = groundMap->UniversalLatitude();
             double lon2 = groundMap->UniversalLongitude();
-
-            double radius = groundMap->HasProjection()?
-                groundMap->Projection()->LocalRadius() :
-                groundMap->Camera()->LocalRadius().meters();
+            double radius2 = groundMap->LocalRadius();
 
             SurfacePoint point1( Latitude(lat1, Angle::Degrees),
                                  Longitude(lon1, Angle::Degrees),
-                                 Distance(radius, Distance::Meters) );
+                                 Distance(radius1, Distance::Meters) );
 
             SurfacePoint point2( Latitude(lat2, Angle::Degrees),
                                  Longitude(lon2, Angle::Degrees),
-                                 Distance(radius, Distance::Meters) );
+                                 Distance(radius2, Distance::Meters) );
 
             viewportResolution = point1.GetDistanceToPoint(point2);
           }

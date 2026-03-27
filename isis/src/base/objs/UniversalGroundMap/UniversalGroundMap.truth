@@ -30,7 +30,7 @@ Sample = 1203.99978
 Line = 1056.0001
 
   Testing Projection...
-Is Projection? = 1
+Has Projection? = 1
 
 For (2.0, 5.0) ...
 Universal Latitude = 89.9727
@@ -57,7 +57,7 @@ Sample = 23040
 Line = 11520
 
   Testing Camera Model and Projection...
-Is Projection? = 0
+Is Projection? = 1
 
 For (1.0, 5.0) ...
 Universal Latitude = -86.9422124

@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
       if (ugm.SetGround(
           SurfacePoint(Latitude(ugm.UniversalLatitude(), Angle::Degrees),
                        Longitude(ugm.UniversalLongitude(), Angle::Degrees),
-                       ugm.Camera()->LocalRadius()))) {
+                       Distance(ugm.LocalRadius(), Distance::Units::Meters)))) {
         cout << "Sample = " << ugm.Sample() << endl;
         cout << "Line = " << ugm.Line() << endl << endl;
       }
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
     cout << "  Testing Projection..." << endl;
     Cube c2("$base/dems/molaMarsPlanetaryRadius0001.cub", "r");
     UniversalGroundMap ugm2(c2);
-    cout << "Is Projection? = " << ugm2.HasProjection() << endl << endl;
+    cout << "Has Projection? = " << ugm2.HasProjection() << endl << endl;
 
     // Test all four corners to make sure the conversions are right
     cerr << "For (2.0, 5.0) ..." << endl;

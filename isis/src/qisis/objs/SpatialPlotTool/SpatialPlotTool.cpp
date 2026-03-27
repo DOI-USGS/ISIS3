@@ -290,13 +290,7 @@ namespace Isis {
     SurfacePoint result;
 
     if (groundMap) {
-      Distance radius;
-
-      if (groundMap->Camera())
-        radius = groundMap->Camera()->LocalRadius();
-      else if (groundMap->Projection())
-        radius = Distance(groundMap->Projection()->LocalRadius(), Distance::Meters);
-
+      Distance radius(groundMap->LocalRadius(), Distance::Units::Meters);
       result = SurfacePoint(Latitude(groundMap->UniversalLatitude(), Angle::Degrees),
           Longitude(groundMap->UniversalLongitude(), Angle::Degrees), radius);
     }

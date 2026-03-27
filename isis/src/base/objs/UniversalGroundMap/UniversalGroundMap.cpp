@@ -33,33 +33,33 @@ namespace Isis {
   UniversalGroundMap::UniversalGroundMap(Cube &cube, CameraPriority priority) {
     p_camera = NULL;
     p_projection = NULL;
+    p_priority = priority;
 
     Pvl &pvl = *cube.label();
     try {
-      if(priority == CameraFirst)
-        p_camera = CameraFactory::Create(cube);
-      else
-        p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
+      p_camera = CameraFactory::Create(cube);
     }
-    catch (IException &firstError) {
+    catch (IException &e) {
+      if (p_priority == CameraFirst) {
+        p_priority = ProjectionFirst;
+      }
       p_camera = NULL;
-      p_projection = NULL;
+    }
 
-      try {
-        if(priority == CameraFirst)
-          p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
-        else
-          p_camera = CameraFactory::Create(cube);
+    try {
+      p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
+    }
+    catch (IException &e) {
+      if (p_priority == ProjectionFirst) {
+        p_priority = CameraFirst;
       }
-      catch (IException &secondError) {
-        p_projection = NULL;
-        QString msg = "Could not create camera or projection for [" +
-                          cube.fileName() + "]";
-        IException realError(IException::Unknown, msg, _FILEINFO_);
-        realError.append(firstError);
-        realError.append(secondError);
-        throw realError;
-      }
+      p_projection = NULL;
+    }
+
+    if (p_camera == NULL && p_projection == NULL) {
+      QString msg = "Could not create camera or projection for [" +
+                        cube.fileName() + "]";
+      IException realError(IException::Unknown, msg, _FILEINFO_);
     }
   }
 
@@ -100,7 +100,7 @@ namespace Isis {
    *         false if it was not
    */
   bool UniversalGroundMap::SetUniversalGround(double lat, double lon) {
-    if (p_camera != NULL) {
+    if (p_priority == CameraFirst) {
       if (p_camera->SetUniversalGround(lat, lon)) {  // This should work for rings (radius,azimuth)
         return p_camera->InCube();
       }
@@ -125,7 +125,7 @@ namespace Isis {
    *         false if it was not
    */
   bool UniversalGroundMap::SetGround(Latitude lat, Longitude lon) {
-    if(p_camera != NULL) {
+    if(p_priority == CameraFirst) {
       if(p_camera->SetGround(lat, lon)) {  // This should work for rings (radius,azimuth)
         return p_camera->InCube();
       }
@@ -152,7 +152,7 @@ namespace Isis {
    *         false if it was not
    */
   bool UniversalGroundMap::SetUnboundGround(Latitude lat, Longitude lon) {
-    if(p_camera != NULL) {
+    if(p_priority == CameraFirst) {
       if(p_camera->SetGround(lat, lon)) {  // This should work for rings (radius,azimuth)
         return p_camera->InCube();
       }
@@ -178,7 +178,7 @@ namespace Isis {
    *         otherwise
    */
   bool UniversalGroundMap::SetGround(const SurfacePoint &sp) {
-    if (p_camera != NULL) {
+    if (p_priority == CameraFirst) {
       if (p_camera->SetGround(sp)) {
         return p_camera->InCube();
       }
@@ -198,7 +198,7 @@ namespace Isis {
    * @return Sample value
    */
   double UniversalGroundMap::Sample() const {
-    if (p_camera != NULL) {
+    if (p_priority == CameraFirst) {
       return p_camera->Sample();
     }
     else {
@@ -212,7 +212,7 @@ namespace Isis {
    * @return Line value
    */
   double UniversalGroundMap::Line() const {
-    if (p_camera != NULL) {
+    if (p_priority == CameraFirst) {
       return p_camera->Line();
     }
     else {
@@ -231,7 +231,7 @@ namespace Isis {
    *         false if it was not
    */
   bool UniversalGroundMap::SetImage(double sample, double line) {
-    if (p_camera != NULL) {
+    if (p_priority == CameraFirst) {
       return p_camera->SetImage(sample, line);
     }
     else {
@@ -245,7 +245,7 @@ namespace Isis {
    * @return Universal Latitude
    */
   double UniversalGroundMap::UniversalLatitude() const {
-    if (p_camera != NULL) {
+    if (p_priority == CameraFirst) {
       return p_camera->UniversalLatitude();
     }
     else {
@@ -268,7 +268,7 @@ namespace Isis {
    * @return Universal Longitude
    */
   double UniversalGroundMap::UniversalLongitude() const {
-    if (p_camera != NULL) {
+    if (p_priority == CameraFirst) {
       return p_camera->UniversalLongitude();
     }
     else {
@@ -287,12 +287,26 @@ namespace Isis {
   }
 
   /**
+   * Returns the radius of the camera model or projection
+   *
+   * @return Radius
+   */
+  double UniversalGroundMap::LocalRadius() const {
+    if (p_priority == CameraFirst) {
+      return p_camera->LocalRadius().meters();
+    }
+    else {
+      return p_projection->LocalRadius();
+    }
+  }
+
+  /**
    * Returns the resolution of the camera model or projection
    *
    * @return Resolution
    */
   double UniversalGroundMap::Resolution() const {
-    if (p_camera != NULL) {
+    if (p_priority == CameraFirst) {
       return p_camera->PixelResolution();
     }
     else {
@@ -374,7 +388,7 @@ namespace Isis {
 
     if (!minLat.isValid() || !maxLat.isValid() ||
         !minLon.isValid() || !maxLon.isValid()) {
-      if (HasCamera()) {
+      if (p_priority == CameraFirst) {
         // Footprint failed, ask the camera
         PvlGroup mappingGrp("Mapping");
         mappingGrp += PvlKeyword("LatitudeType", "Planetocentric");
@@ -395,7 +409,7 @@ namespace Isis {
         minLon = Longitude(minLonDouble, Angle::Degrees);
         maxLon = Longitude(maxLonDouble, Angle::Degrees);
       }
-      else if (HasProjection()) {
+      else if (p_priority == ProjectionFirst) {
         // Footprint failed, look in the mapping group
         PvlGroup mappingGrp = p_projection->Mapping();
         if (mappingGrp.hasKeyword("MinimumLatitude") &&
@@ -537,5 +551,14 @@ namespace Isis {
     return (minLat.isValid() && maxLat.isValid() &&
             minLon.isValid() && maxLon.isValid() &&
             minLat < maxLat && minLon < maxLon);
+  }
+
+  void UniversalGroundMap::setPriority(int priority)  {
+    if (priority == UniversalGroundMap::CameraFirst && HasCamera()) {
+      p_priority = (CameraPriority) priority;
+    }
+    else if (priority == UniversalGroundMap::ProjectionFirst && HasProjection()) {
+      p_priority = (CameraPriority) priority;
+    }
   }
 }
