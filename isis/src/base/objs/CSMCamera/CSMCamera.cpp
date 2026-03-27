@@ -87,12 +87,12 @@ void sanitize(std::string &input);
 
 
   /**
-   * Construct a CSMCamera from an already-constructed CSM model. Takes
-   * ownership of the model pointer (caller must not delete it).
+   * Construct a CSMCamera from an already-constructed CSM model. The model
+   * pointer is left unmanaged (pre-existing issue).
    * This avoids the model->state->model round-trip in CreateFromIsd.
    *
    * @param cube The cube with the image data
-   * @param model The CSM RasterGM model (ownership transferred to CSMCamera)
+   * @param model The CSM RasterGM model
    */
   CSMCamera::CSMCamera(Cube &cube, csm::RasterGM *model) : Camera(cube) {
     if (!model) {

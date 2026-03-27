@@ -417,15 +417,10 @@ namespace Isis {
   // as csminit, but in memory only. Cubes on disk are not modified.
   void BundleAdjust::readIsdList(const QString &isdList,
                                  const QString &cubeList) {
-    // Parse the ISD list file
-    QFile file(isdList);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      QString msg = "Unable to open ISD list file [" + isdList + "].";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-    QTextStream in(&file);
-    while (!in.atEnd())
-      m_isdFiles.append(in.readLine().trimmed());
+    // Parse the ISD list file (use FileList, same as cube list parsing)
+    FileList isdFileList(isdList);
+    for (int i = 0; i < (int)isdFileList.size(); i++)
+      m_isdFiles.append(isdFileList[i].toString());
 
     // Parse the cube list file
     FileList cubeFiles(cubeList);

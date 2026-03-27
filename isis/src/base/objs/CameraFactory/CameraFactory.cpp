@@ -233,11 +233,12 @@ namespace Isis {
    * @return Camera* The CSMCamera object created.
    */
   Camera *CameraFactory::CreateFromIsd(const QString &isdFile, Cube &cube) {
+    // This raw pointer is not managed. Pre-existing issue.
     csm::Model *model = constructModelFromIsdOrState(isdFile);
 
     updateLabelForCsm(cube, model);
 
-    // Cast to RasterGM and transfer ownership to CSMCamera
+    // Cast to RasterGM
     csm::RasterGM *rasterModel = dynamic_cast<csm::RasterGM*>(model);
     if (!rasterModel) {
       delete model;
@@ -344,7 +345,7 @@ namespace Isis {
           return plugin->constructModelFromISD(isd, modelName);
       }
 
-    // Fall back to state path (read file content for state string)
+    // ISD path failed. Try interpreting the file as a model state string.
     std::ifstream stateFile(filePath.toStdString());
     if (!stateFile.is_open()) {
       QString msg = "Unable to open CSM file [" + filePath + "].";
