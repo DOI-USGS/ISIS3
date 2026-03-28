@@ -525,13 +525,17 @@ namespace Isis {
     if (m_projection) {
       output += m_projection->Mapping();
 
+      PvlObject mosaicScenePosition("SceneVisiblePosition");
+
       QBuffer dataBuffer;
       dataBuffer.open(QIODevice::ReadWrite);
       QDataStream transformStream(&dataBuffer);
+      PvlKeyword qtVersionKeyword("QtVersion", QString::number(transformStream.version()));
+      qtVersionKeyword.addCommentWrapped("See QDataStream Version for more info on QT version");
+      mosaicScenePosition += qtVersionKeyword;
+
       transformStream << getView()->transform();
       dataBuffer.seek(0);
-
-      PvlObject mosaicScenePosition("SceneVisiblePosition");
       mosaicScenePosition += PvlKeyword("ViewTransform",
                                         QString(dataBuffer.data().toHex()));
       PvlKeyword scrollPos("ScrollPosition");
@@ -1372,6 +1376,13 @@ namespace Isis {
       PvlObject &positionInfo = *m_projectViewTransform;
       QByteArray hexValues(positionInfo["ViewTransform"][0].toLatin1());
       QDataStream transformStream(QByteArray::fromHex(hexValues));
+      if (positionInfo.hasKeyword("QtVersion")) {
+        transformStream.setVersion(int(positionInfo["QtVersion"]));
+      }
+      else {
+        // Assume qt5
+        transformStream.setVersion(QDataStream::Qt_5_15);
+      }
 
       QTransform viewTransform;
       transformStream >> viewTransform;
