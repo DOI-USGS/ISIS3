@@ -525,13 +525,13 @@ namespace Isis {
     if (m_projection) {
       output += m_projection->Mapping();
 
-      PvlObject mosaicScenePosition("SceneVisiblePosition");
-
       QBuffer dataBuffer;
       dataBuffer.open(QIODevice::ReadWrite);
       QDataStream transformStream(&dataBuffer);
       transformStream << getView()->transform();
       dataBuffer.seek(0);
+
+      PvlObject mosaicScenePosition("SceneVisiblePosition");
       mosaicScenePosition += PvlKeyword("ViewTransform",
                                         QString(dataBuffer.data().toHex()));
       PvlKeyword scrollPos("ScrollPosition");
