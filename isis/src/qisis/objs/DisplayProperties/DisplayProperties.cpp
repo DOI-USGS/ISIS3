@@ -47,6 +47,7 @@ namespace Isis {
 
     QByteArray hexValues(pvl["Values"][0].toLatin1());
     QDataStream valuesStream(QByteArray::fromHex(hexValues));
+    valuesStream.setVersion(int(pvl["QtVersion"]));
     valuesStream >> *m_propertyValues;
   }
 

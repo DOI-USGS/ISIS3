@@ -130,6 +130,10 @@ namespace Isis {
     return m_progress;
   }
 
+  void ImageReader::setQtVersion(int qtVersion) {
+    m_qtVersion = qtVersion;
+  }
+
 
   void ImageReader::askDefaultAlpha() {
     bool ok = false;
@@ -191,7 +195,7 @@ namespace Isis {
       QFuture< Image * > images = QtConcurrent::mapped(
           culledBacklog,
           VariantToImageFunctor(m_cameraMutex, m_requireFootprints, QThread::currentThread(),
-            m_openFilled, m_defaultAlpha));
+            m_openFilled, m_defaultAlpha, m_qtVersion));
 
       m_watcher->setFuture(images);
       m_mappedRunning = true;
@@ -259,12 +263,13 @@ namespace Isis {
    */
   ImageReader::VariantToImageFunctor::VariantToImageFunctor(
       QMutex *cameraMutex, bool requireFootprints, QThread *targetThread, bool openFilled,
-      int defaultAlpha) {
+      int defaultAlpha, int qtVersion) {
     m_mutex = cameraMutex;
     m_targetThread = targetThread;
     m_openFilled = openFilled;
     m_defaultAlpha = defaultAlpha;
     m_requireFootprints = requireFootprints;
+    m_qtVersion = qtVersion;
   }
 
 
@@ -297,6 +302,8 @@ namespace Isis {
         PvlObject imageObj = imageData.value<PvlObject>();
         fileName = ((IString)imageObj["FileName"][0]).ToQt();
         result = new Image(FileName(fileName).expanded());
+        PvlObject &displayProps = imageObj.findObject("DisplayProperties");
+        displayProps += PvlKeyword("QtVersion", QString::number(m_qtVersion));
         result->fromPvl(imageObj);
       }
 

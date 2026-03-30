@@ -49,6 +49,8 @@ namespace Isis {
       QList<QAction *> actions(ImageDisplayProperties::Property relevantDispProperties);
       QProgressBar *progress();
 
+      void setQtVersion(int qtVersion);
+
     signals:
       void imagesReady(ImageList images);
 
@@ -100,6 +102,8 @@ namespace Isis {
       QPointer<QAction> m_safeFileOpenAct;
       QFutureWatcher<Image *> * m_watcher;
 
+      int m_qtVersion;
+
       bool m_safeFileOpen;
       bool m_openFilled;
       int m_defaultAlpha;
@@ -121,7 +125,7 @@ namespace Isis {
 
         public:
           VariantToImageFunctor(QMutex *cameraMutex, bool requireFootprints, QThread *targetThread,
-              bool openFilled, int defaultAlpha);
+              bool openFilled, int defaultAlpha, int qtVersion);
           Image *operator()(const QVariant &);
 
         private:
@@ -129,6 +133,7 @@ namespace Isis {
           QThread *m_targetThread;
 
           int m_defaultAlpha;
+          int m_qtVersion;
           bool m_openFilled;
           bool m_requireFootprints;
       };
