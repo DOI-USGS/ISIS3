@@ -611,6 +611,7 @@ namespace Isis {
 
         delete m_projectViewTransform;
         m_projectViewTransform = new PvlObject(positionInfo);
+        m_projectViewTransform->addKeyword(project.findKeyword("QtVersion"));
       }
     }
   }
@@ -1372,6 +1373,7 @@ namespace Isis {
       PvlObject &positionInfo = *m_projectViewTransform;
       QByteArray hexValues(positionInfo["ViewTransform"][0].toLatin1());
       QDataStream transformStream(QByteArray::fromHex(hexValues));
+      transformStream.setVersion(int(positionInfo["QtVersion"]));
 
       QTransform viewTransform;
       transformStream >> viewTransform;
