@@ -47,6 +47,19 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 
 <!-- towncrier release notes start -->
 
+## [10.0.0_RC2] - 2026-03-30
+
+### Added
+
+- Added projection priority selection to QApps. ([#6000](https://github.com/DOI-USGS/ISIS3/pull/6000))
+
+### Fixed
+
+- Fixed serial number generation for Chandrayaan-2. ([#5993](https://github.com/DOI-USGS/ISIS3/issues/5993))
+- Fixed ability to correctly load Qmos projects made with isis versions older than 10.0.0 ([#5995](https://github.com/DOI-USGS/ISIS3/issues/5995))
+- Allows for slightly unsquare pixels from projected GDAL products and fixes axes parsing for longitude direction. ([#5999](https://github.com/DOI-USGS/ISIS3/issues/5999))
+
+
 ## [10.0.0_RC1] - 2026-02-26
 
 ### Added

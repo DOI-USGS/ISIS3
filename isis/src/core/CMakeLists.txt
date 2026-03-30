@@ -67,6 +67,9 @@ find_package(Qt6 REQUIRED COMPONENTS
 find_package(nlohmann_json REQUIRED)
 find_package(GDAL          REQUIRED CONFIG)
 
+if(pybindings)
+ add_subdirectory(python_bindings)
+endif()
 
 target_link_libraries(core PUBLIC
                                   Qt6::Core
