@@ -47,13 +47,7 @@ namespace Isis {
 
     QByteArray hexValues(pvl["Values"][0].toLatin1());
     QDataStream valuesStream(QByteArray::fromHex(hexValues));
-    if (pvl.hasKeyword("QtVersion")) {
-      valuesStream.setVersion(int(pvl["QtVersion"]));
-    }
-    else {
-      // Assume qt5
-      valuesStream.setVersion(QDataStream::Qt_5_15);
-    }
+    valuesStream.setVersion(int(pvl["QtVersion"]));
     valuesStream >> *m_propertyValues;
   }
 
@@ -71,10 +65,6 @@ namespace Isis {
     dataBuffer.open(QIODevice::ReadWrite);
 
     QDataStream propsStream(&dataBuffer);
-    PvlKeyword qtVersionKeyword("QtVersion", QString::number(propsStream.version()));
-    qtVersionKeyword.addCommentWrapped("See QDataStream Version for more info on QT version");
-    output += qtVersionKeyword;
-
     propsStream << *m_propertyValues;
     dataBuffer.seek(0);
 
