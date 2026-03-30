@@ -18,7 +18,7 @@ add_executable(runISISCoreTests
 
 target_link_libraries(runISISCoreTests core gtest gmock Threads::Threads GDAL::GDAL)
 
-gtest_discover_tests(runISISCoreTests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/tests)
+gtest_discover_tests(runISISCoreTests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/tests PROPERTIES DISCOVERY_TIMEOUT 6000)
 
 # Add old ISIS unitTests
 add_subdirectory(unitTests)
