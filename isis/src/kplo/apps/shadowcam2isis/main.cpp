@@ -7,7 +7,9 @@
 /* SPDX-License-Identifier: CC0-1.0 */
 #include "Isis.h"
 
+#include "Application.h"
 #include "UserInterface.h"
+
 #include "shadowcam2isis.h"
 
 using namespace Isis;

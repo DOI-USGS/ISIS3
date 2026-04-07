@@ -5,164 +5,171 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
+#include <array>
+#include <cstdint>
+#include <memory>
+
 #include <QString>
-#include "Cube.h"
+#include <QStringBuilder>
+
+#include "Buffer.h"
 #include "CubeAttribute.h"
+#include "FileName.h"
 #include "IException.h"
+#include "IString.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "PvlKeyword.h"
 #include "UserInterface.h"
-#include "SpecialPixel.h"
+
 #include "ShadowCamUtilities.h"
-#include "ShadowCamConstants.h"
 #include "shadowcam2isis.h"
 
-using namespace std;
+using std::uint8_t, std::uint16_t;
 
 namespace Isis {
 
   void shadowcam2isis(UserInterface &ui, Pvl *log) {
     try{
-      bool keepSpecial = ui.GetBoolean("KEEPSPECIALPIXELS");
-      FileName from = ui.GetCubeName("FROM");
+      const bool keepSpecial = ui.GetBoolean("KEEPSPECIALPIXELS");
+      const FileName from = static_cast<FileName>(ui.GetCubeName("FROM"));
 
       // Use a smart pointer for automatic memory management
-      auto inLbl = std::make_unique<Pvl>(from.expanded());
+      const auto inLabel = std::make_unique<Pvl>(from.expanded());
 
       // Error check for instrument label
-      PvlGroup instrument = inLbl->findObject("IsisCube").findGroup("Instrument");
+      const PvlGroup &instrument = inLabel->findObject("IsisCube").findGroup("Instrument");
 
       if (!instrument.hasKeyword("InstrumentId") && !instrument.hasKeyword("InstrumentID")) {
-        QString msg = "Keyword InstrumentID or InstrumentId was not found in labels.";
+        const QString msg = "Keyword InstrumentID or InstrumentId was not found in labels.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
       if (QString::compare(instrument["InstrumentId"], "ShadowCam", Qt::CaseInsensitive) != 0) {
-        QString msg = "Error: InstrumentId not equal to ShadowCam.";
+        const QString msg = "Error: InstrumentId not equal to ShadowCam.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      // get xterm, bterm, lines from raw edr label
-      int bterm[6];
-      int xterm[6];
-
-      for(int i=0; i<6; i++) {
-        bterm[i] = 9999;
-        xterm[i] = 9999;
-      }
-
-      xterm[5] = 4096; 
+      // Get xTerm, bTerm, lines from raw edr label
+      std::array<int, 6> bTerm;
+      bTerm.fill(9999);
+      std::array<int, 6> xTerm;
+      xTerm.fill(9999);
+      xTerm[5] = 4096; 
 
       // Load term arrays
       for (int i = 0; i < 6; i++) {
         if (i != 0) {
-          QString bt = "Bterm" + toString(i);
-          bterm[i] = (GetFromLabels(instrument, bt)).toInt();
+          QString bTermKey = "Bterm" % toString(i);
+          bTerm[i] = (ShadowCam::GetFromLabels(instrument, bTermKey)).toInt();
         }
 
         if (i != 5) {
-          QString xt = "Xterm" + toString(i);
-          xterm[i] = (GetFromLabels(instrument, xt)).toInt();
+          QString xTermKey = "Xterm" % toString(i);
+          xTerm[i] = (ShadowCam::GetFromLabels(instrument, xTermKey)).toInt();
         }
       }
 
       /**
-       * @brief Lambda to compand
+       * @brief Compands DN values to 8-bit values.
        *
        * This function is used to create a companding table for the decompanding routine.
        *
        * @param dn Incoming DN pixel value.
-       * @param bterm ShadowCam bterms.
-       * @param xterm ShadowCam xterms.
+       * @param bTerm ShadowCam bterms.
+       * @param xTerm ShadowCam xterms.
+       *
        * @return Companded 8-bit value.
        **/
-      const auto compand = [&](uint16_t dn, int bterm[5], int xterm[5]) -> uint8_t {
-        for (int i = 0; i < 6; i++) {
-          if (dn < xterm[i]) {
-            return ((dn >> i) + bterm[i]) & 0xff;
+      const auto compand = [](uint16_t dn, std::array<int, 6> bTerm, std::array<int, 6> xTerm) -> uint8_t {
+        for (int xTermIndex = 0; xTermIndex < xTerm.size(); xTermIndex++) {
+          if (dn < xTerm[xTermIndex]) {
+            return ((dn >> xTermIndex) + bTerm[xTermIndex]) & 0xff;
           }
         }
-        QString msg = "Failed to compand value: " + toString(dn) + "\n";
+        const QString msg = "Failed to compand value: " % toString(dn) % "\n";
         throw IException(IException::User, msg, _FILEINFO_);
       };
 
       /**
-       * @brief Lambda to decompand
+       * @brief Decompands 8-bit DN values.
        *
        * Decompands 8-bit DN values and handles special pixels.
        *
        * @param in Input buffer.
        * @param out Output buffer.
        **/
-      const auto decompand = [&](Isis::Buffer &in, Isis::Buffer &out) -> void { 
-        uint8_t companding_table[4096];
+      const auto decompand = [&compand, &bTerm, &xTerm, keepSpecial](Buffer &in, Buffer &out) -> void { 
+        std::array<uint8_t, 4096> companding_table;
 
         // Create companding table
-        for (uint16_t dn12 = 0; dn12 < 4096; dn12++) {
-          companding_table[dn12] = compand(dn12, bterm, xterm);
+        for (uint16_t tableIndex = 0; tableIndex < companding_table.size(); tableIndex++) {
+          companding_table[tableIndex] = compand(tableIndex, bTerm, xTerm);
         }
 
-        uint16_t decompanding_table[256];
+        std::array<uint16_t, 256> decompanding_table;
 
         // Create decompanding table
-        for (uint16_t dn = 0; dn < 256; dn++) {
+        for (uint16_t decompandIndex = 0; decompandIndex < decompanding_table.size(); decompandIndex++) {
           uint16_t min = 9999, max = 0;
-          for (uint16_t dn12 = 0; dn12 < 4096; dn12++) {
-            if (companding_table[dn12] == dn) {
-              if (min == 9999) 
-                min = dn12;
-
-              max = dn12;
+          for (uint16_t compandIndex = 0; compandIndex < 4096; compandIndex++) {
+            if (companding_table[compandIndex] == decompandIndex) {
+              if (min == 9999) {
+                min = compandIndex;
+              }
+              max = compandIndex;
             }
 
-            if (min != 9999 && companding_table[dn12] != dn)
+            if (min != 9999 && companding_table[compandIndex] != decompandIndex) {
               break;
+            }
           }
 
-          decompanding_table[dn] = (min + max) / 2;
+          decompanding_table[decompandIndex] = (min + max) / 2;
         }
 
-        int size = SHC_CHANNELS * SHC_AFE_WIDTH;
+        const int bufferSize = SHC_CHANNELS * SHC_AFE_WIDTH;
 
         // handle 8 bit special pixels first
 
         // Process buffer
-        for (int i = 0; i < size; i++) {
-          uint16_t tmpVal = static_cast<float> (in[i]);
+        for (int bufferIndex = 0; bufferIndex < bufferSize; bufferIndex++) {
+          uint16_t tmpVal = static_cast<float> (in[bufferIndex]);
           float tmpFloatVal;
-
-          if(keepSpecial)
-            tmpFloatVal = Set8bitMaxMintoSpecialPixelsHIS4LIS4(tmpVal);
-          else
+          if (keepSpecial) {
+            tmpFloatVal = ShadowCam::Set8bitMaxMintoSpecialPixelsHIS4LIS4(tmpVal);
+          }
+          else {
             tmpFloatVal = static_cast<float>(tmpVal);
+          }
 
-          if(!IsSpecialPixelSHC(tmpFloatVal)){
+          if (!ShadowCam::IsSpecialPixelSHC(tmpFloatVal)){
             // only decompanding non-special pixels
-            out[i] = static_cast<uint16_t>(decompanding_table[(uint16_t) tmpFloatVal]);
-            if (out[i] < 0){
-              string msg  =  "Value is less than zero for line: " + std::to_string(in.Line()) + ", pixel: " + std::to_string(i);
+            out[bufferIndex] = static_cast<uint16_t>(decompanding_table[(uint16_t) tmpFloatVal]);
+            if (out[bufferIndex] < 0) {
+              QString msg = "Value is less than zero for line: "
+                          % QString::number(in.Line())
+                          % ", pixel: "
+                          % QString::number(bufferIndex);
               throw IException(IException::User, msg, _FILEINFO_);
             }
           }
           
-          
           /*
-          if (IsSpecialPixelSHC(in[i])) {
+          if (ShadowCam::IsSpecialPixelSHC(in[bufferIndex])) {
             if (keepSpecial)
-              out[i] = Set8bitMaxMintoSpecialPixelsHIS4LIS4(in[i]);
+              out[bufferIndex] = ShadowCam::Set8bitMaxMintoSpecialPixelsHIS4LIS4(in[bufferIndex]);
             else {
               // Special pixel handling
               cout << "WARNING: Special pixels set to 0 or 255." << endl;
-              out[i] = static_cast<float>(Set_LIS_HIS_SpecialPixelsTo_0_255(in[i]));
+              out[bufferIndex] = static_cast<float>(ShadowCam::Set_LIS_HIS_SpecialPixelsTo_0_255(in[bufferIndex]));
             }
           } 
           else {
             // Decompanding non-special pixels
-            out[i] = static_cast<float>(decompanding_table[(uint16_t) in[i]]);
-            #if (out[i] < 0){
-             # cout << "Value is less than zero for line: " << std::to_string(in.Line()) << ", pixel: " << std::to_string(in[i]) << "at(i): " << std::to_string(in.at(i)) << endl;
+            out[bufferIndex] = static_cast<float>(decompanding_table[(uint16_t) in[bufferIndex]]);
+            #if (out[bufferIndex] < 0){
+             # cout << "Value is less than zero for line: " << std::to_string(in.Line()) << ", pixel: " << std::to_string(bufferIndex) << "at(i): " << std::to_string(in.at(bufferIndex)) << endl;
           }*/
         }
       };
@@ -179,14 +186,14 @@ namespace Isis {
       p.ClearCubes();
     }
     catch (const IException& e) {
-      throw IException(e, IException::Programmer, "ISIS Exception: " + Isis::toString(e.what()) + ". Unable to import shadowcam image to ISIS", _FILEINFO_);
+      throw IException(e, IException::Programmer, "ISIS Exception: " + Isis::toString(e.what()) + ". Unable to import ShadowCam image to ISIS", _FILEINFO_);
     }
     catch (const std::exception &e) {
-      cerr << "Standard exception: " << e.what() << ". Unable to import shadowcam image to ISIS" << endl;
+      cerr << "Standard exception: " << e.what() << ". Unable to import ShadowCam image to ISIS" << endl;
       exit(1);
     }
     catch (...) {
-      throw IException(IException::Programmer, "Unknown exception occured. Unable to import shadowcam image to ISIS", _FILEINFO_);
+      throw IException(IException::Programmer, "Unknown exception occurred. Unable to import ShadowCam image to ISIS", _FILEINFO_);
     }
   }
 }

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef shadowcam2isis_h
+#define shadowcam2isis_h
 /** This is free and unencumbered software released into the public domain.
   
     The authors of ISIS do not claim copyright on the contents of this file.
@@ -7,9 +8,10 @@
   
 /* SPDX-License-Identifier: CC0-1.0 */
 #include "Pvl.h"
-#include "PvlKeyword.h"
 #include "UserInterface.h"
 
 namespace Isis {
-  extern void shadowcam2isis( UserInterface &ui, Pvl *log=nullptr);
+  extern void shadowcam2isis(UserInterface &ui, Pvl *log = nullptr);
 }
+
+#endif
