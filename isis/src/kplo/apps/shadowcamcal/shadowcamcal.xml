@@ -73,6 +73,10 @@
     <change name="Victor Silva" date="2024-05-22">
       Original version
     </change>
+    <change name="Cordell Michaud" date="2025-03-31">
+      Refactored for better testability, simplified code where possible, and improved readability.
+      Changed INTRCPTCOEFF parameter to INTERCEPTCOEFF for clarity and consistency.
+    </change>
   </history>
 
   <groups>
@@ -212,7 +216,7 @@
         </description>
         <inclusions>
           <item>SLOPECOEFF</item>
-          <item>INTRCPTCOEFF</item>
+          <item>INTERCEPTCOEFF</item>
         </inclusions>
       </parameter>
       <parameter name="SLOPECOEFF">
@@ -227,7 +231,7 @@
         </description>
         <filter>*.csv</filter>
       </parameter>
-      <parameter name="INTRCPTCOEFF">
+      <parameter name="INTERCEPTCOEFF">
         <type>filename</type>
         <fileMode>input</fileMode>
         <defaultPath>$kplo/calibration</defaultPath>

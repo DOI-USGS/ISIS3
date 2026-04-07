@@ -131,7 +131,7 @@ namespace Isis {
     // dark subtraction
     if (subtractDark) {
       const QString slopeCoeffsCsv = ui.GetAsString("SLOPECOEFF");
-      const QString interceptCoeffsCsv = ui.GetAsString("INTRCPTCOEFF");
+      const QString interceptCoeffsCsv = ui.GetAsString("INTERCEPTCOEFF");
       cubeFileOut = tempDir.path() + "/temp.subtractDark.shc_cal.cub";
       
       ShadowCam::SubtractDark(slopeCoeffsCsv, interceptCoeffsCsv, instrumentGroup, cubeFileIn, cubeFileOut, lines);
