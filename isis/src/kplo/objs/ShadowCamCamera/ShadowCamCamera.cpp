@@ -31,11 +31,11 @@ namespace Isis {
   ShadowCamCamera::ShadowCamCamera(Cube &cube) : LineScanCamera(cube) {
     m_spacecraftNameLong = "KOREA PATHFINDER LUNAR ORBITER";
     m_spacecraftNameShort = "KPLO";
-    // SHADOWCAM instrument kernel code = -155151
-    if (naifIkCode() != -155151) {
-      QString msg = "File does not appear to be a Korea Pathfinder Lunar Orbiter ShadowCam Image: "
-                  % QString::number(naifIkCode())
-                  % " is not a supported instrument kernel code for Korea Pathfinder Lunar Orbiter.";
+    constexpr int shadowCamIkCode = -155151;
+    if (naifIkCode() != shadowCamIkCode) {
+      QString msg = QString(
+        "File does not appear to be a Korea Pathfinder Lunar Orbiter ShadowCam Image: %1 is not a supported instrument kernel code for Korea Pathfinder Lunar Orbiter."
+      ).arg(QString::number(naifIkCode()));
       throw IException(IException::User, msg, _FILEINFO_);
     }
     m_instrumentNameLong = "KOREA PATHFINDER LUNAR ORBITER SHADOWCAM";
