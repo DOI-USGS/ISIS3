@@ -1,4 +1,5 @@
 #include <exception>
+#include <iostream>
 #include <memory>
 
 #include <QDir>
@@ -228,10 +229,10 @@ namespace Isis {
           if (removeBias) {
             puts("Removing bias pixel columns from output cube");
           }
-          wp.SetOutputCube(ui.GetCubeName("TO"), outputAtt, samples, lines, ShadowCam::SHC_BANDS);
+          wp.SetOutputCube(ui.GetCubeName("TO"), outputAtt, samples, lines, SHC_BANDS);
         }
         else {
-          wp.SetOutputCube(cubeFileOut, outputAtt, samples, lines, ShadowCam::SHC_BANDS);
+          wp.SetOutputCube(cubeFileOut, outputAtt, samples, lines, SHC_BANDS);
         }
 
         wp.PropagateTables(false);
@@ -245,7 +246,7 @@ namespace Isis {
         throw IException(e, IException::Programmer, "ISIS Exception: " + Isis::toString(e.what()) + ". Unable to write cube.", _FILEINFO_);
       }
       catch (const std::exception &e) {
-        cerr << "Standard exception: " << e.what() << ". Unable to write cube." << endl;
+        std::cerr << "Standard exception: " << e.what() << ". Unable to write cube." << std::endl;
         exit(1);
       }
       catch (...) {
