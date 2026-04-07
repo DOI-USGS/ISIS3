@@ -49,32 +49,19 @@ namespace Isis {
     SetFocalLength();
     SetPixelPitch();
 
-    const QString constantTimeOffsetIkKey = "INS" % toString(naifIkCode()) % "_CONSTANT_TIME_OFFSET";
-    const double constantTimeOffset = getDouble(constantTimeOffsetIkKey);
-
     const QString additiveLineErrorIkKey = "INS" % toString(naifIkCode()) % "_ADDITIVE_LINE_ERROR";
     const double additiveLineError = getDouble(additiveLineErrorIkKey);
 
     const QString multiplicativeLineErrorIkKey = "INS" % toString(naifIkCode()) % "_MULTIPLI_LINE_ERROR";
     const double multiplicativeLineError = getDouble(multiplicativeLineErrorIkKey);
     
-    // Get the start time from labels
     const Pvl &label = *cube.label();
     const PvlGroup &instrument = label.findGroup("Instrument", Pvl::Traverse);
 
-    const QString executionSpacecraftTimeClockString = (ShadowCam::GetFromLabels(instrument, "ExecutionSpacecraftTime"));
-    const SpiceDouble executionSpacecraftTimeSecs = getClockTime(executionSpacecraftTimeClockString, -155, false).Et();
-
-    //SpiceDouble etStart = getClockTime(executionSpacecraftTimeClockString, -155, false).Et();
-    //static double prerollLines = (GetFromLabels(instrument, "PrerollLines")).toDouble();
-
     // ShadowCam linerate is in milliseconds, so convert it to seconds first
     const double lineRateSecs = ((ShadowCam::GetFromLabels(instrument, "LineRate")).toDouble() / 1000.0)
-                        * (1.0 + multiplicativeLineError)
-                        + additiveLineError;
-
-    // Start time offset is in seconds, so no conversion needed
-    const double startTimeOffsetSecs = (ShadowCam::GetFromLabels(instrument, "StartTimeOffset")).toDouble();
+                              * (1.0 + multiplicativeLineError)
+                              + additiveLineError;
 
     // TDI direction offset from IAK
     /*keywordExist
@@ -96,12 +83,11 @@ namespace Isis {
       tdiOffset = getDouble(tdiBOffsetIkKey);
     }
     else {
-      const QString msg = "Error: TDIDirection value in labels is invalid. Expected value of A or B, but got: " % QString(instrument["TDIDirection"]);
+      const QString msg = QString("Error: TDIDirection value in labels is invalid. Expected value of A or B, but got: %1").arg(QString(instrument["TDIDirection"]));
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    const double tdiOffsetSecs = tdiOffset * lineRateSecs;
 
-    const double ss = (ShadowCam::GetFromLabels(instrument, "SampleFirstPixel")).toDouble() + 1.0;
+    const double startingSample = (ShadowCam::GetFromLabels(instrument, "SampleFirstPixel")).toDouble() + 1.0;
 
     /*/===========================================================================
       startTimeOffsetSecs will come from labels instead but code is left commented  
@@ -120,12 +106,19 @@ namespace Isis {
       startTimeOffSetSecs += tdi_offset_secs;
 
     ====================================*/
-    const double etStartTime = executionSpacecraftTimeSecs + startTimeOffsetSecs + constantTimeOffset + tdiOffsetSecs;
-    setTime(etStartTime);
+    // Start time offset is in seconds, so no conversion needed
+    const double startTimeOffsetSecs = (ShadowCam::GetFromLabels(instrument, "StartTimeOffset")).toDouble();
+
+    const QString executionSpacecraftTimeClockString = (ShadowCam::GetFromLabels(instrument, "ExecutionSpacecraftTime"));
+    const iTime executionSpacecraftTime = getClockTime(executionSpacecraftTimeClockString, -155, false);
+    const iTime startTime = executionSpacecraftTime + startTimeOffsetSecs;
+    const double startTimeSecsEt = startTime.Et();
+
+    setTime(startTime);
 
     // Setup detector map
-    LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, etStartTime, lineRateSecs);
-    detectorMap->SetStartingDetectorSample(ss);
+    LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, startTimeSecsEt, lineRateSecs);
+    detectorMap->SetStartingDetectorSample(startingSample);
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
