@@ -24,7 +24,6 @@
 #include "PvlGroup.h"
 #include "UserInterface.h"
 
-#include "RadianceCoefficients.h"
 #include "ShadowCamConstants.h"
 #include "ShadowCamUtilities.h"
 
