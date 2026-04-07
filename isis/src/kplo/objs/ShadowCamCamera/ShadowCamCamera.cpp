@@ -63,30 +63,6 @@ namespace Isis {
                               * (1.0 + multiplicativeLineError)
                               + additiveLineError;
 
-    // TDI direction offset from IAK
-    /*keywordExist
-      INS-155151_TDI_A_Offset 
-      INS-155151_TDI_B_Offset 
-    */
-    double tdiOffset = 0.0;
-    if(!instrument.hasKeyword("TDIDirection")){
-      const QString msg = "Error: keyword: TDIDirection was not found in labels.";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-    // Get TDI factor from TDI direction
-    if(QString::compare(instrument["TDIDirection"], "A", Qt::CaseInsensitive) != 0){
-      const QString tdiAOffsetIkKey = "INS" % toString(naifIkCode()) % "_TDI_A_OFFSET";
-      tdiOffset = getDouble(tdiAOffsetIkKey);
-    }
-    else if (QString::compare(instrument["TDIDirection"], "B", Qt::CaseInsensitive) != 0) {
-      const QString tdiBOffsetIkKey = "INS" % toString(naifIkCode()) % "_TDI_B_OFFSET";
-      tdiOffset = getDouble(tdiBOffsetIkKey);
-    }
-    else {
-      const QString msg = QString("Error: TDIDirection value in labels is invalid. Expected value of A or B, but got: %1").arg(QString(instrument["TDIDirection"]));
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-
     const double startingSample = (ShadowCam::GetFromLabels(instrument, "SampleFirstPixel")).toDouble() + 1.0;
 
     /*/===========================================================================
