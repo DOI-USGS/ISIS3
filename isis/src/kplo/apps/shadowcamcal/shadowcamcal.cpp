@@ -373,16 +373,7 @@ namespace Isis {
           throw IException(IException::User, "Error: TDIDirection not found.", _FILEINFO_);
         }
 
-        int tdiFactor = 0;
-        if (QString::compare(instrumentGroup["TDIDirection"], "A", Qt::CaseInsensitive) == 0) {
-          tdiFactor = 0;
-        }
-        else if (QString::compare(instrumentGroup["TDIDirection"], "B", Qt::CaseInsensitive) == 0) {
-          tdiFactor = 1;
-        }
-        else {
-          throw IException(IException::User, "Error: TDIDirection is not A or B.", _FILEINFO_);
-        }
+        const int tdiFactor = GetTdiFactor(instrumentGroup);
 
         constexpr int slopeInterceptCount = SHC_SCENE * SHC_AFE_WIDTH;
 
@@ -524,16 +515,7 @@ namespace Isis {
           throw IException(IException::User, "Error: TDIDirection not found.", _FILEINFO_);
         }
 
-        int tdiFactor = 0;
-        if (QString::compare(instrumentGroup["TDIDirection"], "A", Qt::CaseInsensitive) == 0) {
-          tdiFactor = 0;
-        }
-        else if (QString::compare(instrumentGroup["TDIDirection"], "B", Qt::CaseInsensitive) == 0) {
-          tdiFactor = 1;
-        }
-        else {
-          throw IException(IException::User, "Error: TDIDirection is not A or B.", _FILEINFO_);
-        }
+        const int tdiFactor = GetTdiFactor(instrumentGroup);
         
         std::vector<double> flatCoeff(SHC_CHANNELS * SHC_SCENE); 
 
@@ -668,16 +650,7 @@ namespace Isis {
           throw IException(IException::User, "Error: TDIDirection not found.", _FILEINFO_);
         }
 
-        int tdiFactor = 0;
-        if (QString::compare(instrumentGroup["TDIDirection"], "A", Qt::CaseInsensitive) == 0) {
-          tdiFactor = 0;
-        }
-        else if (QString::compare(instrumentGroup["TDIDirection"], "B", Qt::CaseInsensitive) == 0) {
-          tdiFactor = 1;
-        }
-        else {
-          throw IException(IException::User, "Error: TDIDirection is not A or B.", _FILEINFO_);
-        }
+        const int tdiFactor = GetTdiFactor(instrumentGroup);
 
         /**
          * @brief Reads gain coefficients from CSV files
@@ -802,16 +775,7 @@ namespace Isis {
           throw IException(IException::User, "Error: TDIDirection not found.", _FILEINFO_);
         }
 
-        int tdiFactor = 0;
-        if (QString::compare(instrumentGroup["TDIDirection"], "A", Qt::CaseInsensitive) == 0) {
-          tdiFactor = 0;
-        }
-        else if (QString::compare(instrumentGroup["TDIDirection"], "B", Qt::CaseInsensitive) == 0) {
-          tdiFactor = 1;
-        }
-        else {
-          throw IException(IException::User, "Error: TDIDirection is not A or B.", _FILEINFO_);
-        }
+        const int tdiFactor = GetTdiFactor(instrumentGroup);
 
         const double lineRateMs = (GetFromLabels(instrumentGroup, "LineRate")).toDouble();
 
