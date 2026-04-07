@@ -83,6 +83,18 @@ namespace Isis {
      */
     void SubtractDark(const QString &slopeFilename, const QString &interceptFilename, const PvlGroup &instrumentGroup,
       const QString &cubeFileIn, const QString &cubeFileOut, int lines);
+
+    /**
+     * @brief Applies the flatfield correction to the input cube.
+     * 
+     * @param flatfieldCoeffFilename  The CSV filename containing the flatfield coefficients for flatfield correction.
+     * @param instrumentGroup The instrument group from the cube label.
+     * @param cubeFileIn The input cube file path.
+     * @param cubeFileOut The output cube file path.
+     * @param lines The number of lines in the cube.
+     */
+    void CorrectFlatfield(const QString &flatfieldCoeffFilename, const PvlGroup &instrumentGroup,
+      const QString &cubeFileIn, const QString &cubeFileOut, int lines);
   }
 }
 

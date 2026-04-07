@@ -25,7 +25,6 @@
 #include "UserInterface.h"
 
 #include "GainCorrection.h"
-#include "FlatFieldCorrection.h"
 #include "RadianceCoefficients.h"
 #include "ShadowCamConstants.h"
 #include "ShadowCamUtilities.h"
@@ -145,9 +144,9 @@ namespace Isis {
     
     // flatfile
     if (correctFlatfield) {
-      const QString flatfield_coeffs_csv = ui.GetAsString("FLATCOEFF");
+      const QString flatfieldCoeffsCsv = ui.GetAsString("FLATCOEFF");
       cubeFileOut = tempDir.path() + "/temp.correctFlatfield.shc_cal.cub";
-      FlatFieldCorrection(flatfield_coeffs_csv, instrumentGroup, cubeFileIn, cubeFileOut, lines);
+      ShadowCam::CorrectFlatfield(flatfieldCoeffsCsv, instrumentGroup, cubeFileIn, cubeFileOut, lines);
       cubeFileIn = cubeFileOut;
 
       if (writeOutSteps) {
@@ -359,7 +358,7 @@ namespace Isis {
         exit(1);
       }
       catch (...) {
-        throw IException(IException::Programmer, "Unknown exception occured. Unable to apply bias pixel subtraction to image.", _FILEINFO_);
+        throw IException(IException::Programmer, "Unknown exception occurred. Unable to apply bias pixel subtraction to image.", _FILEINFO_);
       }
     }
 
@@ -403,7 +402,7 @@ namespace Isis {
          * @param coeffB
          * @param coeffRmse
          */
-        auto ReadCoeffCSV = [tdiFactor](const QString &filename, std::vector<double> &coeffA,
+        auto ReadCoeffCsv = [tdiFactor](const QString &filename, std::vector<double> &coeffA,
             std::vector<double> &coeffB, std::vector<double> &coeffRmse) -> void {
           const std::string csvFilename = GetVersionedFilename(filename);
           std::cout << " Config file found: " << csvFilename << std::endl;
@@ -497,8 +496,8 @@ namespace Isis {
           }
         };
 
-        ReadCoeffCSV(slopeFilename, slopeA, slopeB, slopeRmse);
-        ReadCoeffCSV(interceptFilename, interceptA, interceptB, interceptRmse);
+        ReadCoeffCsv(slopeFilename, slopeA, slopeB, slopeRmse);
+        ReadCoeffCsv(interceptFilename, interceptA, interceptB, interceptRmse);
 
         ProcessByLine p;
         CubeAttributeInput inputAtt = CubeAttributeInput();
@@ -517,7 +516,137 @@ namespace Isis {
         exit(1);
       }
       catch (...) {
-        throw IException(IException::Programmer, "Unknown exception occured. Unable to apply dark correction to image.", _FILEINFO_);
+        throw IException(IException::Programmer, "Unknown exception occurred. Unable to apply dark correction to image.", _FILEINFO_);
+      }
+    }
+
+    void CorrectFlatfield(const QString &flatfieldCoeffFilename, const PvlGroup &instrumentGroup, const QString &cubeFileIn,
+        const QString &cubeFileOut, int lines) {
+      try {
+        if (!instrumentGroup.hasKeyword("TDIDirection")) {
+          throw IException(IException::User, "Error: TDIDirection not found.", _FILEINFO_);
+        }
+
+        int tdiFactor = 0;
+        if (QString::compare(instrumentGroup["TDIDirection"], "A", Qt::CaseInsensitive) == 0) {
+          tdiFactor = 0;
+        }
+        else if (QString::compare(instrumentGroup["TDIDirection"], "B", Qt::CaseInsensitive) == 0) {
+          tdiFactor = 1;
+        }
+        else {
+          throw IException(IException::User, "Error: TDIDirection is not A or B.", _FILEINFO_);
+        }
+        
+        std::vector<double> flatCoeff(SHC_CHANNELS * SHC_SCENE); 
+
+        /**
+         * @brief Reads coefficients from a CSV file and inserts values into the respective coefficient vectors.
+         *
+         * @param filename Input CSV filename
+         * @param flatCoeff Flatfield coefficient vector
+         */
+        auto ReadCoeffCsv = [tdiFactor](QString filename, std::vector<double> &flatCoeff)->void {
+          std::string csvFilename = GetVersionedFilename(filename);
+        
+          std::ifstream csvBuffer(csvFilename.c_str());
+
+          if (!csvBuffer.is_open()) {
+            throw IException(IException::User, "Failed to open CSV file: " + filename, _FILEINFO_);
+          }
+
+          // Read scene pixels per line from the CSV file
+          for (int column = 0; column < SHC_SCENE; column++) {
+            // find a non-comment/header line
+            std::string line;
+            while (std::getline(csvBuffer, line)) {
+              if (line.rfind("#", 0) != 0) {
+                break;
+              }
+            }
+
+            std::vector<double> coeffTmp(SHC_CHANNELS * 2);
+            std::stringstream ss(line);
+            std::string token;
+
+            std::getline(ss, token, ',');  // discard first token
+            if (token.empty()) {
+              throw IException(IException::User, "Expected ',' in " + filename + ". loading CSV failed.\n", _FILEINFO_);
+            }
+
+            for (int i = 0; i < SHC_CHANNELS * 2; i++) {
+              std::getline(ss, token, ',');
+              if (token.empty()) {
+                throw IException(IException::User, "Expected ',' in " + filename + ". loading CSV failed.\n", _FILEINFO_);
+              }
+
+              coeffTmp.at(i) = std::stod(token);  
+            }
+
+            // Assign values to flatCoeff of length 3072
+            for (int channel = 0; channel < SHC_CHANNELS; channel++) {
+              flatCoeff.at(channel * SHC_SCENE + column) = coeffTmp.at(channel + SHC_CHANNELS * tdiFactor);
+            }
+          }
+        };
+
+        /**
+         * @brief Applies the flatfield correction to each pixel in the buffer.
+         *
+         * Applies the flatfield correction to each pixel by dividing each pixel by the flatfield coefficient, which is
+         * calculated using the csv file provided by the user or by default.
+         *
+         * @param in The input buffer.
+         * @param out The output buffer.
+         */
+        auto CorrectBufferFlatfield = [&flatCoeff](Isis::Buffer &in, Isis::Buffer &out) -> void {
+          // fill output buffer since flatfield correction is only applied to scene pixels
+          for (int i = 0; i < in.size(); i++) {
+            out[i] = in[i];
+          }
+
+          // flatfield is only applied to scene pixels
+          for (int channel = 0; channel < SHC_CHANNELS; channel++) {
+            for (int column = 0; column < SHC_SCENE; column++) {
+
+              uint16_t sample = column + SHC_SCENE_OFFSET;
+              int index = GetDataIndex(channel, SHC_AFE_WIDTH, sample);
+              int coeff_index = channel * SHC_SCENE + column;
+
+              if (!IsSpecialPixelSHC(in[index])) {
+                if (flatCoeff.at(coeff_index) == 0) {
+                  QString msg = QString("ERROR (divideByZero): Flatfield coefficient is zero for flatCoeff [%1].").arg(coeff_index);
+                  throw IException(IException::Programmer, msg, _FILEINFO_);
+                }
+
+                out[index] = in[index] / flatCoeff.at(coeff_index);
+              }
+            }
+          }
+        };
+
+        // Read coefficients from CSV file
+        ReadCoeffCsv(flatfieldCoeffFilename, flatCoeff);
+
+        // Set up process to apply flatfield correction
+        ProcessByLine p;
+        CubeAttributeInput inputAtt = CubeAttributeInput();
+        CubeAttributeOutput outputAtt = CubeAttributeOutput();
+        p.SetInputCube(cubeFileIn, inputAtt, 0);
+        p.SetOutputCube(cubeFileOut, outputAtt, SHC_AFE_WIDTH * SHC_CHANNELS, lines, SHC_BANDS);
+        p.StartProcess(CorrectBufferFlatfield);
+        p.EndProcess();
+        p.Finalize();
+      }
+      catch (const IException &e) {
+        throw IException(e, IException::Programmer, "ISIS Exception: " + Isis::toString(e.what()) + ". Unable to apply flatfield correction to image.", _FILEINFO_);
+      }
+      catch (const std::exception &e) {
+        std::cerr << "Standard exception: " << e.what() << ". Unable to apply flatfield correction to image." << endl;
+        exit(1);
+      }
+      catch (...) {
+        throw IException(IException::Programmer, "Unknown exception occurred. Unable to apply flatfield correction to image.", _FILEINFO_);
       }
     }
   }
