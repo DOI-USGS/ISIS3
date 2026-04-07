@@ -79,19 +79,19 @@ namespace Isis {
         throw IException(IException::User, "Error: TDIDirection not found.", _FILEINFO_);
       }
 
-      int tdi_factor = 0;
+      int tdiFactor = 0;
       if (QString::compare(instrumentGroup["TDIDirection"], "A", Qt::CaseInsensitive) == 0) {
-        tdi_factor = 0;
+        tdiFactor = 0;
       }
       else if (QString::compare(instrumentGroup["TDIDirection"], "B", Qt::CaseInsensitive) == 0) {
-        tdi_factor = 1;
+        tdiFactor = 1;
       }
       else {
         QString msg = "Error: TDIDirection value: " % QString(instrumentGroup["TDIDirection"]) % " is not valid. Expected 'A' or 'B'.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      return tdi_factor;
+      return tdiFactor;
     }
 
     std::string ToLower(const std::string &str){
