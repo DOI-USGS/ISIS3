@@ -92,6 +92,9 @@ namespace Isis {
      * @param cubeFileIn The input cube file path.
      * @param cubeFileOut The output cube file path.
      * @param lines The number of lines in the cube.
+     *
+     * @internal
+     *    @history 2026-03-31 Cordell Michaud - Moved this function to shadowcamcal and refactored it.
      */
     void CorrectFlatfield(const QString &flatfieldCoeffFilename, const PvlGroup &instrumentGroup,
       const QString &cubeFileIn, const QString &cubeFileOut, int lines);
