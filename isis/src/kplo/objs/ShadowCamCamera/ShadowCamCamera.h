@@ -1,6 +1,5 @@
 #ifndef ShadowCamCamera_h
 #define ShadowCamCamera_h
-
 /** This is free and unencumbered software released into the public domain.
 
 The authors of ISIS do not claim copyright on the contents of this file.
@@ -9,8 +8,8 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
+#include "Cube.h"
 #include "LineScanCamera.h"
-#include "NaifStatus.h"  // Add missing header if needed for NaifStatus
 
 namespace Isis {
   /**
@@ -30,6 +29,18 @@ namespace Isis {
 
   class ShadowCamCamera : public LineScanCamera {
     public:
+      /**
+       * Constructor for the ShadowCam Camera Model
+       *
+       * @param cube The cube for which to construct a KPLO ShadowCam Camera object.
+       *
+       * @internal
+       *   @history 2022-10-12 Victor Silva - original object
+       *   @history 2024-07-12 Victor Silva - updated to use SpacecraftClockPrerollCount
+       *                                      and use getClockTime to use SCLKS
+       *   @history 2025-09-08 Victor Silva - updated to use SpacecraftStartTime + StartTimeOffset
+       *                                      from labels instead of deriving in kernel.
+       */
       ShadowCamCamera(Cube &cube);
       ~ShadowCamCamera() {};
 
@@ -49,26 +60,24 @@ namespace Isis {
        * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Frame ID
        */
-      virtual int CkFrameId() const { return (-155151); }
+      virtual int CkFrameId() const { return -155151; }
 
       /**
        * CK Reference ID - J2000
        *
-       * @return @b int The appropriate instrument code for the "Camera-matrix"
-       *         Kernel Reference ID
+       * @return @b int The appropriate instrument code for the "Camera-matrix" Kernel Reference ID
        */
-      virtual int CkReferenceId() const { return (1); }
+      virtual int CkReferenceId() const { return 1; }
 
       /**
        *  SPK Reference ID - J2000
        *
-       * @return @b int The appropriate instrument code for the Spacecraft
-       *         Kernel Reference ID
+       * @return @b int The appropriate instrument code for the Spacecraft Kernel Reference ID
        */
-      virtual int SpkReferenceId() const { return (1); }
+      virtual int SpkReferenceId() const { return 1; }
 
     private:
-      // Declare any additional member variables if necessary
   };
-};
+}
+
 #endif
