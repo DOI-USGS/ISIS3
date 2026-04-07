@@ -272,45 +272,47 @@ namespace Isis {
 
         realCkKernel.setKernels(ckKernelList);
 
-        Camera *cam = nullptr;
-        cam = tryCamera(icube, ui, lk, pck, targetSpk, realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
-
-        if (!cam) {
-          continue;
-        }
-
-        double north = -90.0;
-        double south = 90.0;
-        double west =  180.0;
-        double east = -180.0;
-
-        vector<pair<int,int>> points = {
-          {1, 1},                    
-          {icube->sampleCount(), 1},             
-          {1, icube->lineCount()},                     
-          {icube->sampleCount(), icube->lineCount()}, 
-          {icube->sampleCount()/2, icube->lineCount()/2} 
-        };
-
-        for (auto &pt : points) {
-          if (cam->SetImage(pt.first, pt.second)) {
-            double lat = cam->UniversalLatitude();
-            double lon = cam->UniversalLongitude();
-
-            if (lon > 180.0) lon -= 360.0;
-
-            north = std::max(north, lat);
-            south = std::min(south, lat);
-            east  = std::max(east, lon);
-            west  = std::min(west, lon);
-          }
-        }
-
         if (ui.GetString("SHAPE") == "WEB" && Preference::Preferences().hasGroup("ShapeModelWeb")) {
+          Camera *cam = nullptr;
+          cam = tryCamera(icube, ui, lk, pck, targetSpk, realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
+
+          if (!cam) {
+            continue;
+          }
+
+          double north = -90.0;
+          double south = 90.0;
+          double west =  180.0;
+          double east = -180.0;
+
+          vector<pair<int,int>> points = {
+            {1, 1},                    
+            {icube->sampleCount(), 1},             
+            {1, icube->lineCount()},                     
+            {icube->sampleCount(), icube->lineCount()}, 
+            {icube->sampleCount()/2, icube->lineCount()/2} 
+          };
+
+          for (auto &pt : points) {
+            if (cam->SetImage(pt.first, pt.second)) {
+              double lat = cam->UniversalLatitude();
+              double lon = cam->UniversalLongitude();
+
+              if (lon > 180.0) lon -= 360.0;
+
+              north = std::max(north, lat);
+              south = std::min(south, lat);
+              east  = std::max(east, lon);
+              west  = std::min(west, lon);
+            }
+          }
+
+          delete cam;
+          cam = nullptr;
+
           QString tiffUrl = baseKernels.getDemTiffUrl(lab, north, south, east, west);
 
           if (!tiffUrl.isEmpty()) {
-            dem.setKernels(QStringList());
             dem.push_back(tiffUrl);
           }
           else {
@@ -319,13 +321,12 @@ namespace Isis {
               "Falling back to default shape model.",
               _FILEINFO_).print();
 
-              if (!globalUrl.isEmpty()) {
-                dem.setKernels(QStringList());
-                dem.push_back(globalUrl);
-              }
-              else {
-                dem = baseKernels.dem(lab);
-              }
+            if (!globalUrl.isEmpty()) {
+              dem.push_back(globalUrl);
+            }
+            else {
+              dem = baseKernels.dem(lab);
+            }
           }
         }
 

@@ -72,6 +72,31 @@ EndGroup
 #EndGroup
 
 ########################################################
+#
+# Set Shape Model Web STAC API URL 
+# Leave the ShapeModelWeb Group commented-out to continue
+# using the ISIS default.
+#
+# Note:
+# This is only used when running spiceinit with shape="web".
+#
+# spiceinit will:
+#   1. Load a default global DEM from the ISIS STAC API
+#      (used to compute the image's geographic footprint)
+#   2. Query the configured STAC API (below) using that
+#      footprint to search for a higher-resolution,
+#      image-specific shape model
+#
+# If no matching shape model is found, the global DEM
+# will continue to be used.
+#
+########################################################
+
+Group = ShapeModelWeb
+  URL = "https://stac.astrogeology.usgs.gov/api/search/"
+EndGroup
+
+########################################################
 # Customize how session logging is handled
 #
 # TerminalOutput = On | Off
