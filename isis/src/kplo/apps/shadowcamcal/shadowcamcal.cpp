@@ -614,7 +614,7 @@ namespace Isis {
 
               if (!IsSpecialPixelSHC(in[index])) {
                 if (flatCoeff.at(coeff_index) == 0) {
-                  QString msg = QString("ERROR (divideByZero): Flatfield coefficient is zero for flatCoeff [%1].").arg(coeff_index);
+                  QString msg = QString("ERROR (divideByZero): Flatfield coefficient is zero for flatCoeff [%1].").arg(QString::number(coeff_index));
                   throw IException(IException::Programmer, msg, _FILEINFO_);
                 }
 
