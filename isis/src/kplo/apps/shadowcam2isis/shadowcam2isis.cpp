@@ -84,7 +84,7 @@ namespace Isis {
        * @return Companded 8-bit value.
        **/
       const auto compand = [](uint16_t dn, std::array<int, 6> bTerm, std::array<int, 6> xTerm) -> uint8_t {
-        for (int xTermIndex = 0; xTermIndex < xTerm.size(); xTermIndex++) {
+        for (int xTermIndex = 0; static_cast<size_t>(xTermIndex) < xTerm.size(); xTermIndex++) {
           if (dn < xTerm[xTermIndex]) {
             return ((dn >> xTermIndex) + bTerm[xTermIndex]) & 0xff;
           }
