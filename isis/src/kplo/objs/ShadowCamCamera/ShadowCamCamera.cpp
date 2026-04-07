@@ -5,7 +5,6 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
-
 #include <QString>
 #include <QStringBuilder>
 
@@ -49,6 +48,8 @@ namespace Isis {
     SetFocalLength();
     SetPixelPitch();
 
+    const QString constantTimeOffsetIkKey = "INS" % toString(naifIkCode()) % "_CONSTANT_TIME_OFFSET";
+    const double constantTimeOffset = getDouble(constantTimeOffsetIkKey);
     const QString additiveLineErrorIkKey = "INS" % toString(naifIkCode()) % "_ADDITIVE_LINE_ERROR";
     const double additiveLineError = getDouble(additiveLineErrorIkKey);
 
@@ -65,29 +66,31 @@ namespace Isis {
 
     const double startingSample = (ShadowCam::GetFromLabels(instrument, "SampleFirstPixel")).toDouble() + 1.0;
 
-    /*/===========================================================================
-      startTimeOffsetSecs will come from labels instead but code is left commented  
-      for information purposes
+    double tdiOffsetSecs = 0.0;
+    if (!instrument.hasKeyword("TDIDirection")) {
+      const QString msg = "Error: keyword TDIDirection was not found in label.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    if (QString::compare(instrument["TDIDirection"], "A", Qt::CaseInsensitive) == 0) {
+      const QString tdiAOffsetKey = "INS" % toString(naifIkCode()) % "_TDI_A_OFFSET";
+      tdiOffsetSecs = getDouble(tdiAOffsetKey) * lineRateSecs;
+    }
+    else if (QString::compare(instrument["TDIDirection"], "B", Qt::CaseInsensitive) == 0) {
+      const QString tdiBOffsetKey = "INS" % toString(naifIkCode()) % "_TDI_B_OFFSET";
+      tdiOffsetSecs = getDouble(tdiBOffsetKey) * lineRateSecs;
+    }
+    else {
+      const QString msg = QString("Error: TDIDirection value in label is invalid. Expected A or B but got: %1").arg(
+        QString(instrument["TDIDirection"]));
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
 
-      
-      double preroll_delay = prerollLines * lineRateSecs;
-      double command_delay = 0.0043656;
-      double mystery_offset = 0.79539;
-
-      preroll_delay + command_delay + mystery_offset;
-      if (startTimeOffsetSecs != startTimeOffsetSecsFromLabels){
-        QString msg = "Error: startTimeOffset in camera model doesn't match offset in labels";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-      startTimeOffSetSecs += tdi_offset_secs;
-
-    ====================================*/
     // Start time offset is in seconds, so no conversion needed
     const double startTimeOffsetSecs = (ShadowCam::GetFromLabels(instrument, "StartTimeOffset")).toDouble();
 
     const QString executionSpacecraftTimeClockString = (ShadowCam::GetFromLabels(instrument, "ExecutionSpacecraftTime"));
     const iTime executionSpacecraftTime = getClockTime(executionSpacecraftTimeClockString, -155, false);
-    const iTime startTime = executionSpacecraftTime + startTimeOffsetSecs;
+    const iTime startTime = executionSpacecraftTime + startTimeOffsetSecs + constantTimeOffset + tdiOffsetSecs;
     const double startTimeSecsEt = startTime.Et();
 
     setTime(startTime);
