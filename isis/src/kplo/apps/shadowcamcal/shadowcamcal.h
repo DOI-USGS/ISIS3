@@ -67,6 +67,22 @@ namespace Isis {
      *                                          shadowcamcal, and refactored it.
      */
     void SubtractBiasPixels(bool useMedian, const QString &tempCubeFileIn, const QString &tempCubeFileOut, int lines);
+
+    /**
+     * @brief Subtracts dark current from the input cube.
+     *
+     * @param slopeFilename The CSV filename containing the slope coefficients for dark current subtraction.
+     * @param interceptFilename The CSV filenames containing the intercept coefficients for dark current subtraction.
+     * @param instrumentGroup The instrument group from the cube label.
+     * @param cubeFileIn The input cube file path.
+     * @param cubeFileOut The output cube file path.
+     * @param lines The number of lines in the cube.
+     *
+     * @internal
+     *    @history 2026-03-30 Cordell Michaud - Moved this function to shadowcamcal and refactored it.
+     */
+    void SubtractDark(const QString &slopeFilename, const QString &interceptFilename, const PvlGroup &instrumentGroup,
+      const QString &cubeFileIn, const QString &cubeFileOut, int lines);
   }
 }
 

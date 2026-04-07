@@ -1,8 +1,12 @@
 #include <array>
 #include <algorithm>
+#include <cstdint>
 #include <exception>
+#include <fstream>
 #include <iostream>
 #include <memory>
+#include <sstream>
+#include <string>
 #include <vector>
 
 #include <QDir>
@@ -20,8 +24,6 @@
 #include "PvlGroup.h"
 #include "UserInterface.h"
 
-#include "BiasPixelSubtraction.h"
-#include "DarkSubtraction.h"
 #include "GainCorrection.h"
 #include "FlatFieldCorrection.h"
 #include "RadianceCoefficients.h"
@@ -61,11 +63,11 @@ namespace Isis {
     }
     
     /**
-    * @brief Loads output cube to allow processInPlace
-    *
-    * @param in Reference to the input line buffer.
-    * @param out Reference to the output line buffer.
-    **/
+     * @brief Loads output cube to allow processInPlace
+     *
+     * @param in The input line buffer.
+     * @param out The output line buffer.
+     */
     auto LoadOutputCube = [](Isis::Buffer &in, Isis::Buffer &out) -> void {
       for(int i = 0; i < in.size(); i++){
         out[i] = in[i];
@@ -107,14 +109,14 @@ namespace Isis {
       ShadowCam::SubtractBiasPixels(useMedian, cubeFileIn, cubeFileOut, lines);
       cubeFileIn = cubeFileOut;
 
-      if (writeOutSteps){
+      if (writeOutSteps) {
         QString cubeStepOut = stepOutputDir + "/" + qBaseName + "-shc_cal-bias_subtract.cub";
         ShadowCam::WriteCube(cubeFileIn, cubeStepOut, ui, removeBias, lines);
       }
     }
 
     // gain correction
-    if(correctGain){
+    if (correctGain) {
       QString gain_factors_csv = ui.GetAsString("GAINFACTORS");
       cubeFileOut = tempDir.path() + "/temp.gaincorrection.shc_cal.cub";
       GainCorrection(cubeFileIn, cubeFileOut, gain_factors_csv, instrumentGroup, lines);
@@ -128,11 +130,11 @@ namespace Isis {
     
     // dark subtraction
     if (subtractDark) {
-      const QString slope_coeffs_csv = ui.GetAsString("SLOPECOEFF");
-      const QString intrcpt_coeffs_csv = ui.GetAsString("INTRCPTCOEFF");
+      const QString slopeCoeffsCsv = ui.GetAsString("SLOPECOEFF");
+      const QString interceptCoeffsCsv = ui.GetAsString("INTRCPTCOEFF");
       cubeFileOut = tempDir.path() + "/temp.subtractDark.shc_cal.cub";
       
-      DarkSubtraction(slope_coeffs_csv, intrcpt_coeffs_csv, instrumentGroup, cubeFileIn, cubeFileOut, lines);
+      ShadowCam::SubtractDark(slopeCoeffsCsv, interceptCoeffsCsv, instrumentGroup, cubeFileIn, cubeFileOut, lines);
       cubeFileIn = cubeFileOut;
 
       if (writeOutSteps) {
@@ -187,12 +189,10 @@ namespace Isis {
         }
 
         /**
-          * @brief Lambda to remove bias pixels
-          *
-          * This lambda function removes bias pixels.
-          *
-          * @param out Reference to the output line buffer.
-          **/
+         * @brief Removes bias pixels
+         *
+         * @param out The output line buffer.
+         */
         auto WriteOutCube = [iCube=iCube.get(), lineManager=lineManager.get(), removeBias, samples, channelWidth](
             Isis::Buffer &out) -> void {
           lineManager->SetLine(out.Line(), 1);
@@ -270,14 +270,14 @@ namespace Isis {
 
       try{
         /**
-          * @brief Subtracts bias pixel averages
-          *
-          * Subtracts bias pixel averages, either mean or median, from the
-          * each sample, hence entire image.
-          *
-          * @param in The input buffer.
-          * @param out The output buffer.
-        **/
+         * @brief Subtracts bias pixel averages
+         *
+         * Subtracts bias pixel averages, either mean or median, from
+         * each sample, hence entire image.
+         *
+         * @param in The input buffer.
+         * @param out The output buffer.
+         */
         auto SubtractBufferBiasPixels = [useMedian, &biasMedian, &biasMean](Isis::Buffer &in, Isis::Buffer &out) -> void { 
           for (int channel = 0; channel < SHC_CHANNELS; channel++) {
             for (int pixel = 0; pixel < SHC_AFE_WIDTH; pixel++) {
@@ -360,6 +360,164 @@ namespace Isis {
       }
       catch (...) {
         throw IException(IException::Programmer, "Unknown exception occured. Unable to apply bias pixel subtraction to image.", _FILEINFO_);
+      }
+    }
+
+    void SubtractDark(const QString &slopeFilename, const QString &interceptFilename,
+        const PvlGroup &instrumentGroup, const QString &cubeFileIn, const QString &cubeFileOut, int lines) {
+      std::cout << "Dark subtraction." << std::endl;
+
+      try {
+        const double fpaATemp = (GetFromLabels(instrumentGroup, "TemperatureFPAA")).toDouble();
+        const double lineRateMs = (GetFromLabels(instrumentGroup, "LineRate")).toDouble();
+
+        if (!instrumentGroup.hasKeyword("TDIDirection")) {
+          throw IException(IException::User, "Error: TDIDirection not found.", _FILEINFO_);
+        }
+
+        int tdiFactor = 0;
+        if (QString::compare(instrumentGroup["TDIDirection"], "A", Qt::CaseInsensitive) == 0) {
+          tdiFactor = 0;
+        }
+        else if (QString::compare(instrumentGroup["TDIDirection"], "B", Qt::CaseInsensitive) == 0) {
+          tdiFactor = 1;
+        }
+        else {
+          throw IException(IException::User, "Error: TDIDirection is not A or B.", _FILEINFO_);
+        }
+
+        constexpr int slopeInterceptCount = SHC_SCENE * SHC_AFE_WIDTH;
+
+        std::vector<double> slopeA(slopeInterceptCount);
+        std::vector<double> slopeB(slopeInterceptCount);
+        std::vector<double> slopeRmse(slopeInterceptCount);
+        std::vector<double> interceptA(slopeInterceptCount);
+        std::vector<double> interceptB(slopeInterceptCount);
+        std::vector<double> interceptRmse(slopeInterceptCount);
+
+        /**
+         * @brief Reads slope and intercept coefficients from a CSV into coefficient vectors
+         *
+         * @param filename Input CSV filename
+         * @param coeffA
+         * @param coeffB
+         * @param coeffRmse
+         */
+        auto ReadCoeffCSV = [tdiFactor](const QString &filename, std::vector<double> &coeffA,
+            std::vector<double> &coeffB, std::vector<double> &coeffRmse) -> void {
+          const std::string csvFilename = GetVersionedFilename(filename);
+          std::cout << " Config file found: " << csvFilename << std::endl;
+
+          std::ifstream csvFileBuffer(csvFilename.c_str());
+
+          if (!csvFileBuffer.is_open()) {
+            throw IException(IException::User, "Failed to open CSV file: " + filename, _FILEINFO_);
+          }
+
+          for (int channel = 0; channel < SHC_CHANNELS; channel++) {
+            for (int column = 0; column < SHC_SCENE; column++) {
+              std::string line;
+
+              while (std::getline(csvFileBuffer, line)) {
+                if ((line.rfind("#", 0) != 0) && (ToLower(line).rfind("tdi", 0) != 0)) {
+                  break;
+                }
+              }
+
+              std::vector<double> coeffTemp(SHC_CHANNELS);
+
+              std::stringstream ss(line);
+              std::string token = "";
+              std::getline(ss, token, ',');
+              if (token == "") {
+                throw IException(IException::User, "Expected ',' in file. Loading CSV failed.", _FILEINFO_);
+              }
+
+              for (int i = 0; i < SHC_CHANNELS; i++) {
+                try {
+                  coeffTemp.at(i) = std::stod(token);
+                }
+                catch (const std::exception &e) {
+                  std::cout << "token: " << token << std::endl;
+                  throw IException(IException::User, ("Error reading CSV file: " + std::string(e.what())).c_str(), _FILEINFO_);
+                }
+                if (i != 5) {
+                  token.clear();
+                  std::getline(ss, token, ',');
+                  if (token == "") {
+                    throw IException(IException::User, "Expected ',' in file. Loading CSV failed", _FILEINFO_);
+                  }
+                }
+              }
+
+              std::uint16_t index = channel * SHC_SCENE + column;
+
+              if (coeffA.size() < index){
+                coeffA.resize(index);
+                coeffB.resize(index);
+                coeffRmse.resize(index);
+                std::cout << "resized coeff vectors to " << index << std::endl;
+              }
+
+              coeffA.at(index) = coeffTemp.at(0 + 3 * tdiFactor);
+              coeffB.at(index) = coeffTemp.at(1 + 3 * tdiFactor);
+              coeffRmse.at(index) = coeffTemp.at(2 + 3 * tdiFactor);
+            }
+          }
+        };
+
+        /**
+         * @brief Subtracts dark current from each pixel
+         *
+         * Subtracts the dark current named darkLevel, which is calculated using the two csv files provided by the user
+         * or by default. This value is then subracted by each scene pixel value and assigned to that pixel. 
+         *
+         * @param in The input buffer.
+         * @param out The output buffer.
+         */
+        auto SubtractBufferDark = [&slopeA, &slopeB, fpaATemp, lineRateMs, &interceptA, &interceptB](
+            Isis::Buffer &in, Isis::Buffer &out) -> void {
+          // fill buffer
+          for (int i = 0; i < in.size(); i++) {
+            out[i] = in[i];
+          }
+
+          for (int channel = 0; channel < SHC_CHANNELS; channel++) {
+            for (int column = 0; column < SHC_SCENE; column++) {
+              std::uint16_t sample = column + SHC_SCENE_OFFSET;
+              std::uint16_t ci = channel * SHC_SCENE + column;
+              int index = GetDataIndex(channel, SHC_AFE_WIDTH, sample);
+
+              if (!IsSpecialPixelSHC(in[index])) {
+                // Calculate dark level based on temperature, line rate, and coefficients
+                double darkLevel = slopeA.at(ci) * exp(slopeB.at(ci) * fpaATemp) * lineRateMs + interceptA.at(ci) * exp(interceptB.at(ci) * fpaATemp);
+                out[index] = in[index] - darkLevel;
+              }
+            }
+          }
+        };
+
+        ReadCoeffCSV(slopeFilename, slopeA, slopeB, slopeRmse);
+        ReadCoeffCSV(interceptFilename, interceptA, interceptB, interceptRmse);
+
+        ProcessByLine p;
+        CubeAttributeInput inputAtt = CubeAttributeInput();
+        CubeAttributeOutput outputAtt = CubeAttributeOutput();
+        p.SetInputCube(cubeFileIn, inputAtt, 0);
+        p.SetOutputCube(cubeFileOut, outputAtt, SHC_AFE_WIDTH * SHC_CHANNELS, lines, SHC_BANDS);
+        p.StartProcess(SubtractBufferDark);
+        p.EndProcess();
+        p.Finalize();
+      }
+      catch (const IException &e) {
+        throw IException(e, IException::Programmer, "ISIS Exception: " + Isis::toString(e.what()) + ". Unable to apply dark correction to image.", _FILEINFO_);
+      }
+      catch (const std::exception &e) {
+        cerr << "Standard exception: " << e.what() << ". Unable to apply dark correction to image." << endl;
+        exit(1);
+      }
+      catch (...) {
+        throw IException(IException::Programmer, "Unknown exception occured. Unable to apply dark correction to image.", _FILEINFO_);
       }
     }
   }
