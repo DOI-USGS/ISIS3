@@ -242,11 +242,12 @@ namespace Isis {
         wp.Finalize();
       }
       catch (const IException &e) {
-        throw IException(e, IException::Programmer, "ISIS Exception: " + Isis::toString(e.what()) + ". Unable to write cube.", _FILEINFO_);
+        QString msg = QString("ISIS Exception: %1. Unable to write cube.").arg(QString(e.what()));
+        throw IException(e, IException::Programmer, msg, _FILEINFO_);
       }
       catch (const std::exception &e) {
-        std::cerr << "Standard exception: " << e.what() << ". Unable to write cube." << std::endl;
-        exit(1);
+        QString msg = QString("Standard exception: %1. Unable to write cube.").arg(QString(e.what()));
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       catch (...) {
         throw IException(IException::Programmer, "Unknown exception occurred. Unable to write cube.", _FILEINFO_);
@@ -350,11 +351,12 @@ namespace Isis {
         p.Finalize();
       }
       catch (const IException &e) {
-        throw IException(e, IException::Programmer, "ISIS Exception: " + Isis::toString(e.what()) + ". Unable to apply bias pixel subtraction to image.", _FILEINFO_);
+        QString msg = QString("ISIS Exception: %1. Unable to apply bias pixel subtraction to image.").arg(QString(e.what()));
+        throw IException(e, IException::Programmer, msg, _FILEINFO_);
       }
       catch (const std::exception &e) {
-        std::cerr << "Standard exception: " << e.what() << ". Unable to apply bias pixel subtraction to image." << std::endl;
-        exit(1);
+        QString msg = QString("Standard exception: %1. Unable to apply bias pixel subtraction to image.").arg(QString(e.what()));
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       catch (...) {
         throw IException(IException::Programmer, "Unknown exception occurred. Unable to apply bias pixel subtraction to image.", _FILEINFO_);
@@ -503,11 +505,12 @@ namespace Isis {
         p.Finalize();
       }
       catch (const IException &e) {
-        throw IException(e, IException::Programmer, "ISIS Exception: " + Isis::toString(e.what()) + ". Unable to apply dark correction to image.", _FILEINFO_);
+        QString msg = QString("ISIS Exception: %1. Unable to apply dark correction to image.").arg(QString(e.what()));
+        throw IException(e, IException::Programmer, msg, _FILEINFO_);
       }
       catch (const std::exception &e) {
-        cerr << "Standard exception: " << e.what() << ". Unable to apply dark correction to image." << endl;
-        exit(1);
+        QString msg = QString("Standard exception: %1. Unable to apply dark correction to image.").arg(QString(e.what()));
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       catch (...) {
         throw IException(IException::Programmer, "Unknown exception occurred. Unable to apply dark correction to image.", _FILEINFO_);
@@ -633,11 +636,12 @@ namespace Isis {
         p.Finalize();
       }
       catch (const IException &e) {
-        throw IException(e, IException::Programmer, "ISIS Exception: " + Isis::toString(e.what()) + ". Unable to apply flatfield correction to image.", _FILEINFO_);
+        QString msg = QString("ISIS Exception: %1. Unable to apply flatfield correction to image.").arg(QString(e.what()));
+        throw IException(e, IException::Programmer, msg, _FILEINFO_);
       }
       catch (const std::exception &e) {
-        std::cerr << "Standard exception: " << e.what() << ". Unable to apply flatfield correction to image." << endl;
-        exit(1);
+        QString msg = QString("Standard exception: %1. Unable to apply flatfield correction to image.").arg(QString(e.what()));
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       catch (...) {
         throw IException(IException::Programmer, "Unknown exception occurred. Unable to apply flatfield correction to image.", _FILEINFO_);
@@ -781,7 +785,15 @@ namespace Isis {
         throw IException(e, IException::Programmer, msg, _FILEINFO_);
       }
       catch (const std::exception &e) {
-        QString msg = QString("Standard exception: %1. Unable to apply gain correction to image.").arg(QString(e.what()));
+        QString msg = QString("Standard exception: %1. Unable to apply gain correction to image.").arg(
+          QString(e.what()));
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+      catch (...) {
+        throw IException(IException::Programmer,
+          "Unknown exception occurred. Unable to apply gain correction to image.", _FILEINFO_);
+      }
+    }
 
     void CorrectRadiance(const QString &radianceCoeffFilename, const PvlGroup &instrumentGroup,
         const QString &cubeFileIn, const QString &cubeFileOut, int lines) {
