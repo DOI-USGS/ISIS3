@@ -1,188 +1,170 @@
-/** This is free and unencumbered software released into the public domain.
+#include <memory>
 
-The authors of ISIS do not claim copyright on the contents of this file.
-For more details about the LICENSE terms and the AUTHORS, you will
-find files of those names at the top level of this repository. **/
+#include <QDir>
+#include <QFileInfo>
+#include <QString>
+#include <QTemporaryDir>
 
-/* SPDX-License-Identifier: CC0-1.0 */
+#include "Buffer.h"
+#include "Cube.h"
+#include "CubeAttribute.h"
+#include "IException.h"
+#include "ProcessByLine.h"
+#include "Progress.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "UserInterface.h"
+
+#include "BiasPixelSubtraction.h"
+#include "DarkSubtraction.h"
+#include "GainCorrection.h"
+#include "FlatFieldCorrection.h"
+#include "RadianceCoefficients.h"
+#include "ShadowCamConstants.h"
+#include "WriteCube.h"
+
 #include "shadowcamcal.h"
 
-using namespace std;
-
 namespace Isis {
-  void shadowcamcal(UserInterface &ui, Pvl *log ) {
-  /*
-  This application can not be run on any image that has been
-  geometrically transformed (i.e. scaled, rotated, sheared, or
-  reflected) or cropped and must be raw 8 bit EDR.
-  */
-    QString from = ui.GetAsString("FROM");
-    CubeAttributeInput inAtt(from);
-    from = ui.GetCubeName("FROM");
-    QString to = ui.GetCubeName("TO");
-    QFileInfo bName(to);
-    QString qBaseName = bName.completeBaseName();
-    cout << qBaseName << endl;
+  void shadowcamcal(UserInterface &ui) {
+    QString inCubeName = ui.GetCubeName("FROM");
+    std::unique_ptr<Cube> inCube = std::make_unique<Cube>(inCubeName);
+    shadowcamcal(inCube.get(), ui);
+  }
+
+  void shadowcamcal(Cube *inCube, UserInterface &ui) {
+    /*
+    This application can not be run on any image that has been
+    geometrically transformed (i.e. scaled, rotated, sheared, or
+    reflected) or cropped and must be raw 8 bit EDR.
+    */
+    const QString qBaseName = QFileInfo(ui.GetCubeName("TO")).completeBaseName();
   
     // grab the Instrument pvl group from cube's labels
-    Pvl *inLbl = new Pvl(from);
-    PvlGroup instrument = inLbl->findObject("IsisCube").findGroup("Instrument");
-    PvlGroup dims = inLbl->findObject("IsisCube").findObject("Core").findGroup("Dimensions");
+    const Pvl *inLabel = inCube->label();
+    const PvlGroup &instrumentGroup = inLabel->findObject("IsisCube").findGroup("Instrument");
+    const PvlGroup &dimsGroup = inLabel->findObject("IsisCube").findObject("Core").findGroup("Dimensions");
 
-    if(!instrument.hasKeyword("InstrumentId") && (!instrument.hasKeyword("InstrumentID"))){
+    if (!instrumentGroup.hasKeyword("InstrumentId") && (!instrumentGroup.hasKeyword("InstrumentID"))) {
       QString msg = "Keyword InstrumentID or InstrumentId was not found in labels.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if (QString::compare(instrument["InstrumentId"], "ShadowCam", Qt::CaseInsensitive) != 0){
+    if (QString::compare(instrumentGroup["InstrumentId"], "ShadowCam", Qt::CaseInsensitive) != 0) {
       QString msg = "Error: InstrumentId not equal to ShadowCam.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     
     /**
-    * 
-    * @brief Lambda to loads output cube to allow processInPlace
-    *
-    * This lambda function loads output cube to allow processInPlace
+    * @brief Loads output cube to allow processInPlace
     *
     * @param in Reference to the input line buffer.
-    * @param out Reference to the output line buffer.    * 
+    * @param out Reference to the output line buffer.
     **/
-    auto LoadOutputCube = [&](Isis::Buffer &in, Isis::Buffer &out)->void { 
+    auto LoadOutputCube = [](Isis::Buffer &in, Isis::Buffer &out) -> void {
       for(int i = 0; i < in.size(); i++){
         out[i] = in[i];
       }
     };
 
-    delete inLbl;
-   
-    static int lines = 0, bands = 0;
-    lines = dims["Lines"];
-    bands = dims["Bands"];
+    const int lines = static_cast<int>(dimsGroup["Lines"]);
+    const int bands = static_cast<int>(dimsGroup["Bands"]);
     
-    bool remvBias = ui.GetBoolean("BiasPixelRemoval");
-    bool subtrktBias = ui.GetBoolean("BiasAvgSubtraction");
-    bool gainCrrkt = ui.GetBoolean("GainCorrection");
-    bool darkSubtrkt = ui.GetBoolean("DarkSubtraction");
-    bool flatCrrkt = ui.GetBoolean("FlatfieldCorrection");
-    bool radCrrkt = ui.GetBoolean("RadianceCorrection");
-    bool writeOutSteps = ui.GetBoolean("WriteOutSteps");
+    const bool removeBias = ui.GetBoolean("BiasPixelRemoval");
+    const bool subtractBias = ui.GetBoolean("BiasAvgSubtraction");
+    const bool correctGain = ui.GetBoolean("GainCorrection");
+    const bool subtractDark = ui.GetBoolean("DarkSubtraction");
+    const bool correctFlatfield = ui.GetBoolean("FlatfieldCorrection");
+    const bool correctRadiance = ui.GetBoolean("RadianceCorrection");
+    const bool writeOutSteps = ui.GetBoolean("WriteOutSteps");
 
     Progress progress;
     progress.SetMaximumSteps(lines);
-    CubeAttributeInput inputAtt = CubeAttributeInput();
-    inputAtt = ui.GetInputAttribute("FROM");
     CubeAttributeOutput outputAtt = CubeAttributeOutput();
 
-    LineManager *lineMgr = NULL;
-    Cube *iCube = new Cube();
-    QTemporaryDir tempDir;
-    QString tempDirektory = NULL;
-    QString notTempDirektory = NULL;
-    QDir dir;
+    const QTemporaryDir tempDir;
+    const QString stepOutputDir = writeOutSteps ? QDir::currentPath() : tempDir.path();
 
-    if(writeOutSteps){
-      notTempDirektory = dir.currentPath();
-      tempDirektory = tempDir.path();
-    }
-    else{
-      tempDirektory = tempDir.path();
-      notTempDirektory = tempDirektory;
-    }
-
-    QString cubeFileIn;
-    QString cubeFileOut;
+    QString cubeFileOut = tempDir.path() + "/temp.load.shc_cal.cub";
 
     ProcessByLine loadProcess;
-    loadProcess.SetInputCube(ui.GetCubeName("FROM"), inputAtt, 0);
-    cubeFileOut = tempDirektory + "/temp.load.shc_cal.cub";
+    loadProcess.SetInputCube(inCube, 0);
     loadProcess.SetOutputCube(cubeFileOut, outputAtt, SHC_AFE_WIDTH * SHC_CHANNELS, lines, bands);
     loadProcess.StartProcess(LoadOutputCube);
     loadProcess.EndProcess();
     loadProcess.Finalize();
-    cubeFileIn = cubeFileOut;
+
+    QString cubeFileIn = cubeFileOut;
     
     // bias average subtraction
-    if(subtrktBias){
-      bool use_median = false;
+    if (subtractBias) {
+      const bool useMedian = ui.GetAsString("BIASAVGTYPE") == "MEDIAN";
       
-      if(ui.GetAsString("BIASAVGTYPE") == "MEDIAN"){
-        use_median = true;  
-      }
-      
-      cubeFileOut = tempDirektory + "/temp.rmvBiasPxl.shc_cal.cub";
-      BiasPixelSubtraction(use_median, cubeFileIn, cubeFileOut, lines);
-      iCube->clearIoCache();
+      cubeFileOut = tempDir.path() + "/temp.remove_bias_pixels.shc_cal.cub";
+      BiasPixelSubtraction(useMedian, cubeFileIn, cubeFileOut, lines);
       cubeFileIn = cubeFileOut;
 
-      if(writeOutSteps){
-        QString cubeStepOut = notTempDirektory + "/" + qBaseName + "-shc_cal-bias_subtract.cub";
-        WriteCube(cubeFileIn, &cubeStepOut, ui, remvBias, lines);
+      if (writeOutSteps){
+        QString cubeStepOut = stepOutputDir + "/" + qBaseName + "-shc_cal-bias_subtract.cub";
+        WriteCube(cubeFileIn, &cubeStepOut, ui, removeBias, lines);
       }
     }
 
     // gain correction
-    if(gainCrrkt){
+    if(correctGain){
       QString gain_factors_csv = ui.GetAsString("GAINFACTORS");
-      cubeFileOut = tempDirektory + "/temp.gainCrrkt.shc_cal.cub";
-      GainCorrection(cubeFileIn, cubeFileOut, gain_factors_csv, instrument, lines);
-      iCube->clearIoCache();
+      cubeFileOut = tempDir.path() + "/temp.gaincorrection.shc_cal.cub";
+      GainCorrection(cubeFileIn, cubeFileOut, gain_factors_csv, instrumentGroup, lines);
       cubeFileIn = cubeFileOut;
 
-      if(writeOutSteps){
-        QString cubeStepOut = notTempDirektory + "/" + qBaseName + "-shc_cal-gain_correct.cub";
-        WriteCube(cubeFileIn, &cubeStepOut, ui, remvBias, lines);
+      if (writeOutSteps) {
+        QString cubeStepOut = stepOutputDir + "/" + qBaseName + "-shc_cal-gain_correct.cub";
+        WriteCube(cubeFileIn, &cubeStepOut, ui, removeBias, lines);
       }
     }
     
     // dark subtraction
-    if(darkSubtrkt){
-      QString slope_coeffs_csv = ui.GetAsString("SLOPECOEFF");
-      QString intrcpt_coeffs_csv = ui.GetAsString("INTRCPTCOEFF");
-      cubeFileOut = tempDirektory + "/temp.darkSbtrkt.shc_cal.cub";
+    if (subtractDark) {
+      const QString slope_coeffs_csv = ui.GetAsString("SLOPECOEFF");
+      const QString intrcpt_coeffs_csv = ui.GetAsString("INTRCPTCOEFF");
+      cubeFileOut = tempDir.path() + "/temp.subtractDark.shc_cal.cub";
       
-      DarkSubtraction(slope_coeffs_csv, intrcpt_coeffs_csv, instrument, cubeFileIn, cubeFileOut, lines);
+      DarkSubtraction(slope_coeffs_csv, intrcpt_coeffs_csv, instrumentGroup, cubeFileIn, cubeFileOut, lines);
       cubeFileIn = cubeFileOut;
 
-      if(writeOutSteps){
-        QString cubeStepOut = notTempDirektory + "/" + qBaseName + "-shc_cal-dark_subtract.cub";
-        WriteCube(cubeFileIn, &cubeStepOut, ui, remvBias, lines);
+      if (writeOutSteps) {
+        QString cubeStepOut = stepOutputDir + "/" + qBaseName + "-shc_cal-dark_subtract.cub";
+        WriteCube(cubeFileIn, &cubeStepOut, ui, removeBias, lines);
       }
     }
     
     // flatfile
-    if(flatCrrkt){
-      QString flatfield_coeffs_csv = ui.GetAsString("FLATCOEFF");
-      cubeFileOut = tempDirektory + "/temp.flatCrrkt.shc_cal.cub";
-      FlatFieldCorrection(flatfield_coeffs_csv, instrument, cubeFileIn, cubeFileOut, lines);
+    if (correctFlatfield) {
+      const QString flatfield_coeffs_csv = ui.GetAsString("FLATCOEFF");
+      cubeFileOut = tempDir.path() + "/temp.correctFlatfield.shc_cal.cub";
+      FlatFieldCorrection(flatfield_coeffs_csv, instrumentGroup, cubeFileIn, cubeFileOut, lines);
       cubeFileIn = cubeFileOut;
 
-      if(writeOutSteps){
-        QString cubeStepOut = notTempDirektory + "/" + qBaseName + "-shc_cal-flat_field.cub";
-        WriteCube(cubeFileIn, &cubeStepOut, ui, remvBias, lines);
+      if (writeOutSteps) {
+        QString cubeStepOut = stepOutputDir + "/" + qBaseName + "-shc_cal-flat_field.cub";
+        WriteCube(cubeFileIn, &cubeStepOut, ui, removeBias, lines);
       }
     }
     
     // radiance
-    if(radCrrkt){
-      QString radiance_coeffs_csv = ui.GetAsString("RADCOEFF");
-      cubeFileOut = tempDirektory + "/temp.radiance.shc_cal.cub";
-      RadianceCoefficients(radiance_coeffs_csv, instrument, cubeFileIn, cubeFileOut, lines);
+    if (correctRadiance) {
+      const QString radiance_coeffs_csv = ui.GetAsString("RADCOEFF");
+      cubeFileOut = tempDir.path() + "/temp.radiance.shc_cal.cub";
+      RadianceCoefficients(radiance_coeffs_csv, instrumentGroup, cubeFileIn, cubeFileOut, lines);
       cubeFileIn = cubeFileOut;
 
-      if(writeOutSteps){
-        QString cubeStepOut = notTempDirektory + "/" + qBaseName + "-shc_cal-radiance_correct.cub";
-        WriteCube(cubeFileIn, &cubeStepOut, ui, remvBias, lines);
+      if (writeOutSteps) {
+        QString cubeStepOut = stepOutputDir + "/" + qBaseName + "-shc_cal-radiance_correct.cub";
+        WriteCube(cubeFileIn, &cubeStepOut, ui, removeBias, lines);
       }
     }
     // final output cube name will get pulled automatically in WriteCube
     QString* noTempCube = nullptr;  
-    WriteCube(cubeFileIn, noTempCube, ui, remvBias, lines);
-
-    if(lineMgr) {
-      puts("deleting lineMgr");
-      delete lineMgr;
-    }
-    puts("\nFinished calibrating this image.\n");
+    WriteCube(cubeFileIn, noTempCube, ui, removeBias, lines);
   }
-}  
+}
