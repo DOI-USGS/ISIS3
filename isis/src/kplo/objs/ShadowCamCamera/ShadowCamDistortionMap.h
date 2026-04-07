@@ -1,6 +1,5 @@
 #ifndef ShadowCamDistortionMap_h
 #define ShadowCamDistortionMap_h
-
 /** This is free and unencumbered software released into the public domain.
 
 The authors of ISIS do not claim copyright on the contents of this file.
@@ -9,18 +8,12 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include <vector>
-#include <cmath>
-#include <string.h>
-#include "IString.h"
-#include "IException.h"
-#include "Application.h"
+#include "Camera.h"
 #include "CameraDistortionMap.h"
 
 namespace Isis {
-
   /**
-   *  Distort/undistort focal plane coordinates
+   * Distort/undistort focal plane coordinates.
    *
    * Creates a map for adding/removing optical distortions
    * from the focal plane of a camera.
@@ -35,6 +28,7 @@ namespace Isis {
    *
    * @author 2022-10-12 Victor Silva
    * @internal
+   *   @history 2026-03-19 Cordell Michaud - Slightly refactored and moved docstrings to header.
    */
   class ShadowCamDistortionMap : public CameraDistortionMap {
     public:
@@ -44,29 +38,37 @@ namespace Isis {
       virtual ~ShadowCamDistortionMap() {};
 
       /**
-       * Sets the distortion coefficients for the camera.
+       * @brief Sets the distortion coefficients for the camera.
+       *
        * @param naifIkCode The NAIF IK Code to retrieve the distortion coefficients.
+       *
        * @throws IException if error occurs during retrieval.
        */
-      void SetDistortion(const int naifIkCode);
+      void SetDistortion(int naifIkCode);
 
       /**
-       * Computes the undistorted focal plane coordinates given the distorted ones.
+       * @brief Computes the undistorted focal plane coordinates given the distorted ones.
+       *
        * @param dx Distorted focal plane x-coordinate.
        * @param dy Distorted focal plane y-coordinate.
+       *
        * @returns true if conversion was successful, false otherwise.
+       *
        * @throws IException if error occurs during computation.
        */
-      virtual bool SetFocalPlane(const double dx, const double dy);
+      virtual bool SetFocalPlane(double dx, double dy);
 
       /**
-       * Computes the distorted focal plane coordinates given the undistorted ones.
+       * @brief Computes the distorted focal plane coordinates given the undistorted ones.
+       *
        * @param ux Undistorted focal plane x-coordinate.
        * @param uy Undistorted focal plane y-coordinate.
+       *
        * @returns true if conversion was successful, false otherwise.
+       *
        * @throws IException if error occurs during computation.
        */
-      virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
+      virtual bool SetUndistortedFocalPlane(double ux, double uy);
 
   };
 };
