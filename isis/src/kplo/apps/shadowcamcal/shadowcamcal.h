@@ -1,6 +1,8 @@
 #ifndef shadowcamcal_h
 #define shadowcamcal_h
 
+#include <QString>
+
 #include "Cube.h"
 #include "UserInterface.h"
 
@@ -34,6 +36,10 @@ namespace Isis {
    *    @history 2026-03-30 Cordell Michaud - Added this new overload for better testability and refactored.
    */
   extern void shadowcamcal(Cube *inCube, UserInterface &ui);
+
+  namespace ShadowCam {
+    void WriteCube(const QString &cubeFileIn, const QString &cubeFileOut, UserInterface &ui, bool removeBias, int lines);
+  }
 }
 
 #endif

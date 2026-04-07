@@ -1,3 +1,4 @@
+#include <exception>
 #include <memory>
 
 #include <QDir>
@@ -9,6 +10,7 @@
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "IException.h"
+#include "LineManager.h"
 #include "ProcessByLine.h"
 #include "Progress.h"
 #include "Pvl.h"
@@ -21,7 +23,6 @@
 #include "FlatFieldCorrection.h"
 #include "RadianceCoefficients.h"
 #include "ShadowCamConstants.h"
-#include "WriteCube.h"
 
 #include "shadowcamcal.h"
 
@@ -89,7 +90,7 @@ namespace Isis {
 
     ProcessByLine loadProcess;
     loadProcess.SetInputCube(inCube, 0);
-    loadProcess.SetOutputCube(cubeFileOut, outputAtt, SHC_AFE_WIDTH * SHC_CHANNELS, lines, bands);
+    loadProcess.SetOutputCube(cubeFileOut, outputAtt, ShadowCam::SHC_AFE_WIDTH * ShadowCam::SHC_CHANNELS, lines, bands);
     loadProcess.StartProcess(LoadOutputCube);
     loadProcess.EndProcess();
     loadProcess.Finalize();
@@ -106,7 +107,7 @@ namespace Isis {
 
       if (writeOutSteps){
         QString cubeStepOut = stepOutputDir + "/" + qBaseName + "-shc_cal-bias_subtract.cub";
-        WriteCube(cubeFileIn, &cubeStepOut, ui, removeBias, lines);
+        ShadowCam::WriteCube(cubeFileIn, cubeStepOut, ui, removeBias, lines);
       }
     }
 
@@ -119,7 +120,7 @@ namespace Isis {
 
       if (writeOutSteps) {
         QString cubeStepOut = stepOutputDir + "/" + qBaseName + "-shc_cal-gain_correct.cub";
-        WriteCube(cubeFileIn, &cubeStepOut, ui, removeBias, lines);
+        ShadowCam::WriteCube(cubeFileIn, cubeStepOut, ui, removeBias, lines);
       }
     }
     
@@ -134,7 +135,7 @@ namespace Isis {
 
       if (writeOutSteps) {
         QString cubeStepOut = stepOutputDir + "/" + qBaseName + "-shc_cal-dark_subtract.cub";
-        WriteCube(cubeFileIn, &cubeStepOut, ui, removeBias, lines);
+        ShadowCam::WriteCube(cubeFileIn, cubeStepOut, ui, removeBias, lines);
       }
     }
     
@@ -147,7 +148,7 @@ namespace Isis {
 
       if (writeOutSteps) {
         QString cubeStepOut = stepOutputDir + "/" + qBaseName + "-shc_cal-flat_field.cub";
-        WriteCube(cubeFileIn, &cubeStepOut, ui, removeBias, lines);
+        ShadowCam::WriteCube(cubeFileIn, cubeStepOut, ui, removeBias, lines);
       }
     }
     
@@ -160,11 +161,96 @@ namespace Isis {
 
       if (writeOutSteps) {
         QString cubeStepOut = stepOutputDir + "/" + qBaseName + "-shc_cal-radiance_correct.cub";
-        WriteCube(cubeFileIn, &cubeStepOut, ui, removeBias, lines);
+        ShadowCam::WriteCube(cubeFileIn, cubeStepOut, ui, removeBias, lines);
       }
     }
-    // final output cube name will get pulled automatically in WriteCube
-    QString* noTempCube = nullptr;  
-    WriteCube(cubeFileIn, noTempCube, ui, removeBias, lines);
+    // final output cube name will get pulled automatically in ShadowCam::WriteCube
+    QString noTempCube = "";
+    ShadowCam::WriteCube(cubeFileIn, noTempCube, ui, removeBias, lines);
+  }
+
+  namespace ShadowCam {
+    void WriteCube(const QString &cubeFileIn, const QString &cubeFileOut, UserInterface &ui, bool removeBias, int lines) {
+      try {
+        // Open input cube
+        auto iCube = std::make_unique<Cube>(cubeFileIn);
+        auto lineManager = std::make_unique<LineManager>(*iCube);
+
+        int samples = SHC_AFE_WIDTH * SHC_CHANNELS;
+        int channelWidth = SHC_AFE_WIDTH;
+
+        if (removeBias) {
+          samples = SHC_SCENE * SHC_CHANNELS;
+          channelWidth = SHC_SCENE;
+        }
+
+        /**
+          * @brief Lambda to remove bias pixels
+          *
+          * This lambda function removes bias pixels.
+          *
+          * @param out Reference to the output line buffer.
+          **/
+        auto WriteOutCube = [iCube=iCube.get(), lineManager=lineManager.get(), removeBias, samples, channelWidth](
+            Isis::Buffer &out) -> void {
+          lineManager->SetLine(out.Line(), 1);
+          iCube->read(*lineManager);
+          int outdex = 0;
+          int index = 0;
+          int column = 0;
+
+          if (removeBias) {
+            for (int channel = 0; channel < SHC_CHANNELS; channel++) {
+              for (int pixel = 0; pixel < channelWidth; pixel++) {
+                outdex = GetDataIndex(channel, SHC_SCENE, pixel);
+                column = pixel + SHC_SCENE_OFFSET;
+                index = GetDataIndex(channel, SHC_AFE_WIDTH, column);
+                out[outdex] = (*lineManager)[index];
+              }
+            }
+          }
+          else {
+            for (int index = 0; index < samples; index++) {
+              out[index] = (*lineManager)[index];
+            }
+          }
+        };
+
+        // Setup the ProcessByLine object
+        ProcessByLine wp;
+        wp.PropagateHistory(false);
+        CubeAttributeInput inputAtt = CubeAttributeInput();
+        CubeAttributeOutput outputAtt = CubeAttributeOutput();
+        wp.SetInputCube(cubeFileIn, inputAtt, 0);
+
+        // Check if output file is provided
+        if (cubeFileOut.isEmpty()) {
+          if (removeBias) {
+            puts("Removing bias pixel columns from output cube");
+          }
+          wp.SetOutputCube(ui.GetCubeName("TO"), outputAtt, samples, lines, ShadowCam::SHC_BANDS);
+        }
+        else {
+          wp.SetOutputCube(cubeFileOut, outputAtt, samples, lines, ShadowCam::SHC_BANDS);
+        }
+
+        wp.PropagateTables(false);
+        wp.ClearInputCubes();
+        wp.StartProcess(WriteOutCube);
+
+        wp.EndProcess();
+        wp.Finalize();
+      }
+      catch (const IException &e) {
+        throw IException(e, IException::Programmer, "ISIS Exception: " + Isis::toString(e.what()) + ". Unable to write cube.", _FILEINFO_);
+      }
+      catch (const std::exception &e) {
+        cerr << "Standard exception: " << e.what() << ". Unable to write cube." << endl;
+        exit(1);
+      }
+      catch (...) {
+        throw IException(IException::Programmer, "Unknown exception occurred. Unable to write cube.", _FILEINFO_);
+      }
+    }
   }
 }
