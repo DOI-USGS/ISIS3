@@ -156,9 +156,9 @@ namespace Isis {
     
     // radiance
     if (correctRadiance) {
-      const QString radiance_coeffs_csv = ui.GetAsString("RADCOEFF");
+      const QString radianceCoeffsCsv = ui.GetAsString("RADCOEFF");
       cubeFileOut = tempDir.path() + "/temp.radiance.shc_cal.cub";
-      RadianceCoefficients(radiance_coeffs_csv, instrumentGroup, cubeFileIn, cubeFileOut, lines);
+      RadianceCoefficients(radianceCoeffsCsv, instrumentGroup, cubeFileIn, cubeFileOut, lines);
       cubeFileIn = cubeFileOut;
 
       if (writeOutSteps) {
@@ -363,8 +363,6 @@ namespace Isis {
 
     void SubtractDark(const QString &slopeFilename, const QString &interceptFilename,
         const PvlGroup &instrumentGroup, const QString &cubeFileIn, const QString &cubeFileOut, int lines) {
-      std::cout << "Dark subtraction." << std::endl;
-
       try {
         const double fpaATemp = (GetFromLabels(instrumentGroup, "TemperatureFPAA")).toDouble();
         const double lineRateMs = (GetFromLabels(instrumentGroup, "LineRate")).toDouble();
@@ -404,7 +402,6 @@ namespace Isis {
         auto ReadCoeffCsv = [tdiFactor](const QString &filename, std::vector<double> &coeffA,
             std::vector<double> &coeffB, std::vector<double> &coeffRmse) -> void {
           const std::string csvFilename = GetVersionedFilename(filename);
-          std::cout << " Config file found: " << csvFilename << std::endl;
 
           std::ifstream csvFileBuffer(csvFilename.c_str());
 
@@ -436,7 +433,6 @@ namespace Isis {
                   coeffTemp.at(i) = std::stod(token);
                 }
                 catch (const std::exception &e) {
-                  std::cout << "token: " << token << std::endl;
                   throw IException(IException::User, ("Error reading CSV file: " + std::string(e.what())).c_str(), _FILEINFO_);
                 }
                 if (i != 5) {
@@ -454,7 +450,6 @@ namespace Isis {
                 coeffA.resize(index);
                 coeffB.resize(index);
                 coeffRmse.resize(index);
-                std::cout << "resized coeff vectors to " << index << std::endl;
               }
 
               coeffA.at(index) = coeffTemp.at(0 + 3 * tdiFactor);
@@ -608,17 +603,17 @@ namespace Isis {
           for (int channel = 0; channel < SHC_CHANNELS; channel++) {
             for (int column = 0; column < SHC_SCENE; column++) {
 
-              uint16_t sample = column + SHC_SCENE_OFFSET;
+              std::uint16_t sample = column + SHC_SCENE_OFFSET;
               int index = GetDataIndex(channel, SHC_AFE_WIDTH, sample);
-              int coeff_index = channel * SHC_SCENE + column;
+              int coeffIndex = channel * SHC_SCENE + column;
 
               if (!IsSpecialPixelSHC(in[index])) {
-                if (flatCoeff.at(coeff_index) == 0) {
-                  QString msg = QString("ERROR (divideByZero): Flatfield coefficient is zero for flatCoeff [%1].").arg(QString::number(coeff_index));
+                if (flatCoeff.at(coeffIndex) == 0) {
+                  QString msg = QString("ERROR (divideByZero): Flatfield coefficient is zero for flatCoeff [%1].").arg(QString::number(coeffIndex));
                   throw IException(IException::Programmer, msg, _FILEINFO_);
                 }
 
-                out[index] = in[index] / flatCoeff.at(coeff_index);
+                out[index] = in[index] / flatCoeff.at(coeffIndex);
               }
             }
           }
