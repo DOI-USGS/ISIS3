@@ -22,7 +22,9 @@ find files of those names at the top level of this repository. **/
 #include "PvlGroup.h"
 #include "UserInterface.h"
 
+#include "ShadowCamConstants.h"
 #include "ShadowCamUtilities.h"
+
 #include "shadowcam2isis.h"
 
 using std::uint8_t, std::uint16_t;
@@ -128,7 +130,7 @@ namespace Isis {
           decompanding_table[decompandIndex] = (min + max) / 2;
         }
 
-        const int bufferSize = SHC_CHANNELS * SHC_AFE_WIDTH;
+        constexpr int bufferSize = ShadowCam::SHC_CHANNELS * ShadowCam::SHC_AFE_WIDTH;
 
         // handle 8 bit special pixels first
 
