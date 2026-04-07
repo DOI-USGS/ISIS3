@@ -7,11 +7,10 @@
     find files of those names at the top level of this repository. **/
   
 /* SPDX-License-Identifier: CC0-1.0 */
-#include "Pvl.h"
 #include "UserInterface.h"
 
 namespace Isis {
-  extern void shadowcam2isis(UserInterface &ui, Pvl *log = nullptr);
+  extern void shadowcam2isis(UserInterface &ui);
 }
 
 #endif

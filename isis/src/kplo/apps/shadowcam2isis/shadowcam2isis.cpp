@@ -31,7 +31,7 @@ using std::uint8_t, std::uint16_t;
 
 namespace Isis {
 
-  void shadowcam2isis(UserInterface &ui, Pvl *log) {
+  void shadowcam2isis(UserInterface &ui) {
     try{
       const bool keepSpecial = ui.GetBoolean("KEEPSPECIALPIXELS");
       const FileName from = FileName(ui.GetCubeName("FROM"));
