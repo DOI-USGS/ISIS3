@@ -1,6 +1,9 @@
+#include <array>
+#include <algorithm>
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <vector>
 
 #include <QDir>
 #include <QFileInfo>
@@ -13,7 +16,6 @@
 #include "IException.h"
 #include "LineManager.h"
 #include "ProcessByLine.h"
-#include "Progress.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "UserInterface.h"
@@ -24,6 +26,7 @@
 #include "FlatFieldCorrection.h"
 #include "RadianceCoefficients.h"
 #include "ShadowCamConstants.h"
+#include "ShadowCamUtilities.h"
 
 #include "shadowcamcal.h"
 
@@ -80,8 +83,6 @@ namespace Isis {
     const bool correctRadiance = ui.GetBoolean("RadianceCorrection");
     const bool writeOutSteps = ui.GetBoolean("WriteOutSteps");
 
-    Progress progress;
-    progress.SetMaximumSteps(lines);
     CubeAttributeOutput outputAtt = CubeAttributeOutput();
 
     const QTemporaryDir tempDir;
@@ -103,7 +104,7 @@ namespace Isis {
       const bool useMedian = ui.GetAsString("BIASAVGTYPE") == "MEDIAN";
       
       cubeFileOut = tempDir.path() + "/temp.remove_bias_pixels.shc_cal.cub";
-      BiasPixelSubtraction(useMedian, cubeFileIn, cubeFileOut, lines);
+      ShadowCam::SubtractBiasPixels(useMedian, cubeFileIn, cubeFileOut, lines);
       cubeFileIn = cubeFileOut;
 
       if (writeOutSteps){
@@ -227,7 +228,7 @@ namespace Isis {
         // Check if output file is provided
         if (cubeFileOut.isEmpty()) {
           if (removeBias) {
-            puts("Removing bias pixel columns from output cube");
+            std::cout << "Removing bias pixel columns from output cube" << std::endl;
           }
           wp.SetOutputCube(ui.GetCubeName("TO"), outputAtt, samples, lines, SHC_BANDS);
         }
@@ -251,6 +252,114 @@ namespace Isis {
       }
       catch (...) {
         throw IException(IException::Programmer, "Unknown exception occurred. Unable to write cube.", _FILEINFO_);
+      }
+    }
+
+    void SubtractBiasPixels(bool useMedian, const QString &tempCubeFileIn, const QString &tempCubeFileOut, int lines) {
+      std::cout << "Subtracting per-channel bias pixel average." << std::endl;
+      if (useMedian) {
+        std::cout << "Performing bias median average pixel subtraction" << std::endl;
+      }
+      else {
+        std::cout << "Performing bias mean average pixel subtraction" << std::endl;
+      }
+
+      std::array<std::vector<double>, SHC_CHANNELS> biasPile;
+      std::vector<double> biasMedian(SHC_CHANNELS, -1.0);
+      std::vector<double> biasMean(SHC_CHANNELS);
+
+      try{
+        /**
+          * @brief Subtracts bias pixel averages
+          *
+          * Subtracts bias pixel averages, either mean or median, from the
+          * each sample, hence entire image.
+          *
+          * @param in The input buffer.
+          * @param out The output buffer.
+        **/
+        auto SubtractBufferBiasPixels = [useMedian, &biasMedian, &biasMean](Isis::Buffer &in, Isis::Buffer &out) -> void { 
+          for (int channel = 0; channel < SHC_CHANNELS; channel++) {
+            for (int pixel = 0; pixel < SHC_AFE_WIDTH; pixel++) {
+              int index = GetDataIndex(channel, SHC_AFE_WIDTH, pixel);
+              if (!IsSpecialPixelSHC(in[index])) {
+                if (useMedian) {
+                  if (biasMedian.at(channel) < 0) {
+                    std::cout << "WARNING: bias median for channel is negative " << std::endl;
+                  }
+                  out[index] = in[index] - biasMedian.at(channel);
+                }
+                else {
+                  if (biasMean.at(channel) < 0) {
+                    std::cout << "WARNING: bias mean for channel is negative." << std::endl;
+                  }
+                  out[index] = in[index] - biasMean.at(channel);
+                }
+              } 
+              else {
+                out[index] = in[index];
+              }
+            }
+          }
+        };
+
+        // Open input cube
+        auto iCube = std::make_unique<Cube>(tempCubeFileIn);
+        auto lineManager = std::make_unique<LineManager>(*iCube);
+
+        // Collect non-special bias pixels in a pile
+        for (int line = 1; line <= lines; line++) {
+          lineManager->SetLine(line, SHC_BANDS);
+          iCube->read(*lineManager);
+          for (int channel = 0; channel < SHC_CHANNELS; channel++) {
+            for (int pixel = 2; pixel < 10; ++pixel) {
+              int index = (channel * SHC_AFE_WIDTH) + pixel;
+              if (!IsSpecialPixelSHC((*lineManager)[index]))
+                biasPile.at(channel).push_back((*lineManager)[index]);
+            }
+          }
+        }
+
+        // Calculate bias median and mean
+        for (int channel = 0; channel < SHC_CHANNELS; ++channel) {
+          std::sort(biasPile.at(channel).begin(), biasPile.at(channel).end());
+
+          // Calculate median
+          int biasCountPerChannel = biasPile.at(channel).size();
+          if (biasCountPerChannel % 2 == 0) {
+            biasMedian.at(channel) = static_cast<double>(biasPile.at(channel).at((biasCountPerChannel / 2 - 1)) + biasPile.at(channel).at((biasCountPerChannel / 2))) / 2.0;
+          }
+          else {
+            biasMedian.at(channel) = biasPile.at(channel).at(biasCountPerChannel / 2);
+          }
+
+          // Calculate mean
+          double sum = std::accumulate(biasPile.at(channel).begin(), biasPile.at(channel).end(), 0.0);
+          if (biasCountPerChannel == 0) {
+            throw IException(IException::Programmer, "ERROR (divideByZero): bias count per channel is zero (sum/biasCountPerChannel)" , _FILEINFO_);
+          }
+          biasMean.at(channel) = sum / biasCountPerChannel;
+        }
+
+        // Process the cube
+        ProcessByLine p;
+        CubeAttributeInput inputAtt = CubeAttributeInput();
+        CubeAttributeOutput outputAtt = CubeAttributeOutput();
+        p.SetInputCube(tempCubeFileIn, inputAtt, 0);
+        p.SetOutputCube(tempCubeFileOut, outputAtt, SHC_AFE_WIDTH * SHC_CHANNELS, lines, SHC_BANDS);
+        p.StartProcess(SubtractBufferBiasPixels);
+        p.EndProcess();
+        p.Finalize();
+      }
+      catch (const IException &e) {
+        throw IException(e, IException::Programmer, "ISIS Exception: " + Isis::toString(e.what()) + ". Unable to apply bias pixel subtraction to image.", _FILEINFO_);
+      }
+      catch (const std::exception &e) {
+        std::cerr << "Standard exception: " << e.what() << ". Unable to apply bias pixel subtraction to image." << std::endl;
+        exit(1);
+      }
+      catch (...) {
+        throw IException(IException::Programmer, "Unknown exception occured. Unable to apply bias pixel subtraction to image.", _FILEINFO_);
       }
     }
   }

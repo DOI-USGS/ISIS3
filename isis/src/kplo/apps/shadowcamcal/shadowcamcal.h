@@ -39,6 +39,7 @@ namespace Isis {
 
   namespace ShadowCam {
     void WriteCube(const QString &cubeFileIn, const QString &cubeFileOut, UserInterface &ui, bool removeBias, int lines);
+    void SubtractBiasPixels(bool useMedian, const QString &tempCubeFileIn, const QString &tempCubeFileOut, int lines);
   }
 }
 
