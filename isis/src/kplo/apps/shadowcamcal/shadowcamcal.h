@@ -79,7 +79,8 @@ namespace Isis {
      * @param lines The number of lines in the cube.
      *
      * @internal
-     *    @history 2026-03-30 Cordell Michaud - Moved this function to shadowcamcal and refactored it.
+     *    @history 2026-03-30 Cordell Michaud - Renamed this function from DarkSubtraction, moved it to shadowcamcal and
+     *                                          refactored it.
      */
     void SubtractDark(const QString &slopeFilename, const QString &interceptFilename, const PvlGroup &instrumentGroup,
       const QString &cubeFileIn, const QString &cubeFileOut, int lines);
@@ -94,7 +95,8 @@ namespace Isis {
      * @param lines The number of lines in the cube.
      *
      * @internal
-     *    @history 2026-03-31 Cordell Michaud - Moved this function to shadowcamcal and refactored it.
+     *    @history 2026-03-31 Cordell Michaud - Renamed this function from FlatFieldCorrection, moved it to
+     *                                          shadowcamcal, and refactored it.
      */
     void CorrectFlatfield(const QString &flatfieldCoeffFilename, const PvlGroup &instrumentGroup,
       const QString &cubeFileIn, const QString &cubeFileOut, int lines);
