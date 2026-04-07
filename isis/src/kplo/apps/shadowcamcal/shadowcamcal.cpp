@@ -158,7 +158,7 @@ namespace Isis {
     if (correctRadiance) {
       const QString radianceCoeffsCsv = ui.GetAsString("RADCOEFF");
       cubeFileOut = tempDir.path() + "/temp.radiance.shc_cal.cub";
-      RadianceCoefficients(radianceCoeffsCsv, instrumentGroup, cubeFileIn, cubeFileOut, lines);
+      ShadowCam::CorrectRadiance(radianceCoeffsCsv, instrumentGroup, cubeFileIn, cubeFileOut, lines);
       cubeFileIn = cubeFileOut;
 
       if (writeOutSteps) {
@@ -782,10 +782,130 @@ namespace Isis {
       }
       catch (const std::exception &e) {
         QString msg = QString("Standard exception: %1. Unable to apply gain correction to image.").arg(QString(e.what()));
+
+    void CorrectRadiance(const QString &radianceCoeffFilename, const PvlGroup &instrumentGroup,
+        const QString &cubeFileIn, const QString &cubeFileOut, int lines) {
+      try {
+        if (!instrumentGroup.hasKeyword("TDIDirection")) {
+          throw IException(IException::User, "Error: TDIDirection not found.", _FILEINFO_);
+        }
+
+        int tdiFactor = 0;
+        if (QString::compare(instrumentGroup["TDIDirection"], "A", Qt::CaseInsensitive) == 0) {
+          tdiFactor = 0;
+        }
+        else if (QString::compare(instrumentGroup["TDIDirection"], "B", Qt::CaseInsensitive) == 0) {
+          tdiFactor = 1;
+        }
+        else {
+          throw IException(IException::User, "Error: TDIDirection is not A or B.", _FILEINFO_);
+        }
+
+        const double lineRateMs = (GetFromLabels(instrumentGroup, "LineRate")).toDouble();
+
+        std::array<double, SHC_CHANNELS> radianceCoeff;
+
+        /**
+          * @brief Lambda to read coefficients from the provided CSV file and inserts values into
+          * the respective coefficient vectors
+          *
+          * @param radianceCoeffFilename Reference to incoming filename and directory address
+          * @param coeff    Reference to coefficient vector
+          */
+        auto ReadCoeffCsv = [tdiFactor](const QString &filename, std::array<double, SHC_CHANNELS> &coeff) -> void {
+          std::string line;
+
+          std::string csvFilename = GetVersionedFilename(filename);
+
+          std::ifstream csvBuffer(csvFilename.c_str());
+
+          // Check if the file is empty
+          if (!csvBuffer.is_open()) {
+            throw IException(IException::User, "Failed to open CSV file: " + filename, _FILEINFO_);
+          }
+
+          while (std::getline(csvBuffer, line)) {
+            if ((line.rfind("#", 0) == 0)) {
+              continue;
+            }
+
+            std::vector<double> coeff_tmp(SHC_CHANNELS * 2);
+            std::stringstream ss(line);
+            std::string token;
+
+            std::getline(ss, token, ',');  // discard first token
+            if (token.empty()) {
+              throw IException(IException::User, "Expected ',' in " + filename + ". loading CSV failed.\n", _FILEINFO_);
+            }
+            for (int i = 0; i < SHC_CHANNELS * 2; i++) {
+              std::getline(ss, token, ',');
+              if (token.empty()) {
+                throw IException(IException::User,
+                  "Expected ',' in " + filename + ". loading CSV failed.\n", _FILEINFO_);
+              }
+              coeff_tmp.at(i) = std::stod(token);
+            }
+
+            for (int channel = 0; channel < SHC_CHANNELS; channel++) {
+              coeff.at(channel) = coeff_tmp.at(channel + SHC_CHANNELS * tdiFactor);
+            }
+          }
+        };
+
+        /**
+         * @brief Applies radiance correction to each pixel in the buffer.
+         *
+         * Applies the radiance correction by dividing each pixel by the product of the line rate
+         * and the channel's radiance coefficient from the CSV file provided by the user or by
+         * default.
+         *
+         * @param in The input buffer.
+         * @param out The output buffer.
+         */
+        auto ApplyRadianceCoefficients = [lineRateMs, &radianceCoeff](Isis::Buffer &in, Isis::Buffer &out) -> void {
+          for (int channel = 0; channel < SHC_CHANNELS; channel++) {
+            for (int pixel = 0; pixel < SHC_AFE_WIDTH; pixel++) {
+              int index = GetDataIndex(channel, SHC_AFE_WIDTH, pixel);
+              if (!IsSpecialPixelSHC(in[index])) {
+                double lineRateScaledRadiance = lineRateMs * radianceCoeff.at(channel);
+                if (lineRateScaledRadiance == 0) {
+                  throw IException(IException::Programmer, "ERROR (divideByZero): linerate * radiance coefficient is zero ", _FILEINFO_);
+                }
+                else {
+                  out[index] = in[index] / lineRateScaledRadiance;
+                }
+              }
+              else {
+                out[index] = in[index];
+              }
+            }
+          }
+        };
+
+        // Read coefficients from CSV file
+        ReadCoeffCsv(radianceCoeffFilename, radianceCoeff);
+
+        // Set up the process to apply radiance correction
+        ProcessByLine p;
+        CubeAttributeInput inputAtt = CubeAttributeInput();
+        CubeAttributeOutput outputAtt = CubeAttributeOutput();
+        p.SetInputCube(cubeFileIn, inputAtt, 0);
+        p.SetOutputCube(cubeFileOut, outputAtt, SHC_AFE_WIDTH * SHC_CHANNELS, lines, SHC_BANDS);
+        p.StartProcess(ApplyRadianceCoefficients);
+        p.EndProcess();
+        p.Finalize();
+      }
+      catch (const IException &e) {
+        QString msg = QString("ISIS Exception: %1. Unable to apply radiance coefficients to image.").arg(QString(e.what()));
+        throw IException(e, IException::Programmer, msg, _FILEINFO_);
+      }
+      catch (const std::exception &e) {
+        QString msg = QString("Standard exception: %1. Unable to apply radiance coefficients to image.").arg(QString(e.what()));
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       catch (...) {
-        throw IException(IException::Programmer, "Unknown exception occurred. Unable to apply gain correction to image.", _FILEINFO_);
+        throw IException(IException::Programmer,
+          "Unknown exception occurred. Unable to apply radiance coefficients to image.", _FILEINFO_);
       }
     }
   }

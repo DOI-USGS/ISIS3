@@ -117,6 +117,22 @@ namespace Isis {
     void CorrectGain(const QString &cubeFileIn, const QString &cubeFileOut, const QString &gainCoeffFilename,
       const PvlGroup &instrumentGroup, int lines);
   }
+
+  /**
+   * @brief Applies radiance correction to the input cube.
+   *
+   * @param radianceCoeffFilename The CSV filename containing the radiance coefficients for radiance correction.
+   * @param instrumentGroup The instrument group from the cube label.
+   * @param cubeFileIn The input cube file path.
+   * @param cubeFileOut The output cube file path.
+   * @param lines The number of lines in the cube.
+   *
+   * @internal
+   *    @history 2026-03-31 Cordell Michaud - Renamed this function from RadianceCoefficients, moved it to shadowcamcal,
+   *                                          and refactored it.
+   */
+  void CorrectRadiance(const QString &radianceCoeffFilename, const PvlGroup &instrumentGroup, const QString &cubeFileIn,
+    const QString &cubeFileOut, int lines);
 }
 
 #endif
