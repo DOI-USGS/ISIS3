@@ -808,19 +808,7 @@
           <option value="WEB">
             <brief>Retrieve shape models from ISIS STAC APIs</brief>
             <description>
-              This option retrieves shape models using a multi-stage process:
-
-              1. A default global DEM is first loaded from the ISIS STAC API.
-                This provides the necessary surface reference to compute the
-                geographic footprint of the input cube.
-
-              2. Using this footprint, a STAC search is performed to locate a
-                higher-resolution, image-specific shape model. If a
-                ShapeModelWeb URL is configured in IsisPreferences, that API
-                will be used for the search.
-
-              3. If a more specific shape model is found, it replaces the
-                global DEM. Otherwise, the global DEM remains in use.
+              Retrieves a global DEM GeoTIFF from the ISIS STAC API and uses it as the shape model.
 
               If no web-based shape models are available, spiceinit will fall
               back to using SYSTEM to search for a shape model in the local

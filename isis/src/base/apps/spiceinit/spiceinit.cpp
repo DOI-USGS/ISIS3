@@ -35,14 +35,6 @@ namespace Isis {
                   Kernel sclk, Kernel spk,
                   Kernel iak, Kernel dem,
                   Kernel exk);
-  Camera *tryCamera(Cube *icube,
-                    UserInterface &ui,
-                    Kernel lk, Kernel pck,
-                    Kernel targetSpk, Kernel ck,
-                    Kernel fk, Kernel ik,
-                    Kernel sclk, Kernel spk,
-                    Kernel iak, Kernel dem,
-                    Kernel exk);
 
   void requestSpice(Cube *icube, UserInterface &ui, Pvl *log, Pvl &labels, QString missionName);
 
@@ -272,63 +264,6 @@ namespace Isis {
 
         realCkKernel.setKernels(ckKernelList);
 
-        if (ui.GetString("SHAPE") == "WEB" && Preference::Preferences().hasGroup("ShapeModelWeb")) {
-          Camera *cam = nullptr;
-          cam = tryCamera(icube, ui, lk, pck, targetSpk, realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
-
-          if (!cam) {
-            continue;
-          }
-
-          double north = -90.0;
-          double south = 90.0;
-          double west =  180.0;
-          double east = -180.0;
-
-          vector<pair<int,int>> points = {
-            {1, 1},                    
-            {icube->sampleCount(), 1},             
-            {1, icube->lineCount()},                     
-            {icube->sampleCount(), icube->lineCount()}, 
-            {icube->sampleCount()/2, icube->lineCount()/2} 
-          };
-
-          for (auto &pt : points) {
-            if (cam->SetImage(pt.first, pt.second)) {
-              double lat = cam->UniversalLatitude();
-              double lon = cam->UniversalLongitude();
-
-              if (lon > 180.0) lon -= 360.0;
-
-              north = std::max(north, lat);
-              south = std::min(south, lat);
-              east  = std::max(east, lon);
-              west  = std::min(west, lon);
-            }
-          }
-
-          delete cam;
-          cam = nullptr;
-
-          QString tiffUrl = baseKernels.getDemTiffUrl(lab, north, south, east, west);
-
-          if (!tiffUrl.isEmpty()) {
-            dem.push_back(tiffUrl);
-          }
-          else {
-            IException(IException::User,
-              "shape=web requested, but no GeoTIFF DEM was found. "
-              "Falling back to default shape model.",
-              _FILEINFO_).print();
-
-            if (!globalUrl.isEmpty()) {
-              dem.push_back(globalUrl);
-            }
-            else {
-              dem = baseKernels.dem(lab);
-            }
-          }
-        }
 
         kernelSuccess = tryKernels(icube, p, ui, log, lk, pck, targetSpk,
                                 realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
@@ -671,107 +606,6 @@ namespace Isis {
     return true;
   }
 
-  /**
-  * Attempt to create a camera model from a set of kernels without permanently
-  * modifying the cube.
-  *
-  * This method temporarily applies a set of kernels to the input cube and
-  * attempts to instantiate a Camera object. Unlike tryKernels(), this function
-  * does not write results to the cube, log kernel selections, or persist any
-  * SPICE data. The original kernel state and CSM blob (if present) are restored
-  * before returning.
-  *
-  * This is primarily used for probing kernel combinations (e.g., to compute
-  * latitude/longitude bounds) prior to committing the final kernel set.
-  *
-  * @param(in/out) icube The Cube to create the camera from. The cube's kernel
-  *                      group and CSM state will be temporarily modified but
-  *                      restored before returning.
-  * @param ui The spiceinit user interface options
-  * @param lk The leap second kernels
-  * @param pck The planetary constant kernels
-  * @param targetSpk The target state kernels
-  * @param ck The camera kernels
-  * @param fk The frame kernels
-  * @param ik The instrument kernels
-  * @param sclk The spacecraft clock kernels
-  * @param spk The spacecraft state kernels
-  * @param iak The instrument addendum kernels
-  * @param dem The digital elevation model
-  * @param exk The extra kernels
-  *
-  * @return A pointer to a Camera object if successful; NULL if the camera could
-  *         not be created with the provided kernels.
-  */
-  Camera *tryCamera(Cube *icube,
-                    UserInterface &ui,
-                    Kernel lk, Kernel pck,
-                    Kernel targetSpk, Kernel ck,
-                    Kernel fk, Kernel ik,
-                    Kernel sclk, Kernel spk,
-                    Kernel iak, Kernel dem,
-                    Kernel exk) {
-
-  PvlGroup originalKernels = icube->group("Kernels");
-  PvlGroup tempKernels = originalKernels;
-
-  auto addKernelList = [](PvlKeyword &kw, Kernel &k) {
-    for (int i = 0; i < k.size(); i++) {
-      kw.addValue(k[i]);
-    }
-  };
-
-  PvlKeyword lkKeyword("LeapSecond"); addKernelList(lkKeyword, lk);
-  PvlKeyword pckKeyword("TargetAttitudeShape"); addKernelList(pckKeyword, pck);
-  PvlKeyword targetSpkKeyword("TargetPosition"); addKernelList(targetSpkKeyword, targetSpk);
-  PvlKeyword ckKeyword("InstrumentPointing"); addKernelList(ckKeyword, ck);
-  PvlKeyword ikKeyword("Instrument"); addKernelList(ikKeyword, ik);
-  PvlKeyword sclkKeyword("SpacecraftClock"); addKernelList(sclkKeyword, sclk);
-  PvlKeyword spkKeyword("InstrumentPosition"); addKernelList(spkKeyword, spk);
-  PvlKeyword iakKeyword("InstrumentAddendum"); addKernelList(iakKeyword, iak);
-  PvlKeyword demKeyword("ShapeModel");
-
-  if (ui.GetString("SHAPE") == "RINGPLANE") {
-    demKeyword.addValue("RingPlane");
-  } else {
-    addKernelList(demKeyword, dem);
-  }
-
-  tempKernels.addKeyword(lkKeyword, Pvl::Replace);
-  tempKernels.addKeyword(pckKeyword, Pvl::Replace);
-  tempKernels.addKeyword(targetSpkKeyword, Pvl::Replace);
-  tempKernels.addKeyword(ckKeyword, Pvl::Replace);
-  tempKernels.addKeyword(ikKeyword, Pvl::Replace);
-  tempKernels.addKeyword(sclkKeyword, Pvl::Replace);
-  tempKernels.addKeyword(spkKeyword, Pvl::Replace);
-  tempKernels.addKeyword(iakKeyword, Pvl::Replace);
-  tempKernels.addKeyword(demKeyword, Pvl::Replace);
-
-  Blob csmState("CSMState", "String");
-  bool hadCsm = icube->hasBlob("CSMState", "String");
-  if (hadCsm) {
-    icube->read(csmState);
-    icube->deleteBlob("CSMState", "String");
-  }
-
-  icube->putGroup(tempKernels);
-
-  Camera *cam = nullptr;
-
-  try {
-    cam = icube->camera();
-  }
-  catch (...) {
-    icube->putGroup(originalKernels);
-    if (hadCsm) icube->write(csmState);
-    return nullptr;
-  }
-
-  icube->putGroup(originalKernels);
-  if (hadCsm) icube->write(csmState);
-
-  return cam;
-}
 
 
   /**
