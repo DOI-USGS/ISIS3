@@ -24,7 +24,6 @@
 #include "PvlGroup.h"
 #include "UserInterface.h"
 
-#include "GainCorrection.h"
 #include "RadianceCoefficients.h"
 #include "ShadowCamConstants.h"
 #include "ShadowCamUtilities.h"
@@ -116,9 +115,9 @@ namespace Isis {
 
     // gain correction
     if (correctGain) {
-      QString gain_factors_csv = ui.GetAsString("GAINFACTORS");
+      const QString gainFactorsCsv = ui.GetAsString("GAINFACTORS");
       cubeFileOut = tempDir.path() + "/temp.gaincorrection.shc_cal.cub";
-      GainCorrection(cubeFileIn, cubeFileOut, gain_factors_csv, instrumentGroup, lines);
+      ShadowCam::CorrectGain(cubeFileIn, cubeFileOut, gainFactorsCsv, instrumentGroup, lines);
       cubeFileIn = cubeFileOut;
 
       if (writeOutSteps) {
@@ -647,6 +646,151 @@ namespace Isis {
       }
       catch (...) {
         throw IException(IException::Programmer, "Unknown exception occurred. Unable to apply flatfield correction to image.", _FILEINFO_);
+      }
+    }
+
+    void CorrectGain(const QString &cubeFileIn, const QString &cubeFileOut, const QString &gainCoeffFilename,
+        const PvlGroup &instrumentGroup, int lines) {
+      // get gain channels from labels
+      std::array<double, TERMS> gainChannels;
+
+      try {
+        for (int i = 0; i < TERMS; i++) {
+          QString gainChannelKey = "GainCh" + toString(i);
+          if (instrumentGroup.hasKeyword(gainChannelKey)) {
+            gainChannels.at(i) = instrumentGroup[gainChannelKey];
+          }
+          else {
+            throw IException(IException::User, "Gain Channels not found in Instrument label group.", _FILEINFO_);
+          }
+        }
+
+        if (!instrumentGroup.hasKeyword("TDIDirection")) {
+          throw IException(IException::User, "Error: TDIDirection not found.", _FILEINFO_);
+        }
+
+        int tdiFactor = 0;
+        if (QString::compare(instrumentGroup["TDIDirection"], "A", Qt::CaseInsensitive) == 0) {
+          tdiFactor = 0;
+        }
+        else if (QString::compare(instrumentGroup["TDIDirection"], "B", Qt::CaseInsensitive) == 0) {
+          tdiFactor = 1;
+        }
+        else {
+          throw IException(IException::User, "Error: TDIDirection is not A or B.", _FILEINFO_);
+        }
+
+        /**
+         * @brief Reads gain coefficients from CSV files
+         *
+         * Reads the gain coefficient CSV file line by line and adds to gainFactors which will be used when applying
+         * the gain correction.
+         *
+         * @param filename The path to the CSV file.
+         * @param gainCoeffs The vector to store the gain coefficients for each channel.
+         *
+         */
+        auto ReadCoeffCsv = [tdiFactor, &gainChannels](
+            const QString &filename, std::vector<double> &gainCoeffs) -> void {
+          std::string line;
+          std::string csvFilename = GetVersionedFilename(filename);
+
+          std::ifstream csvBuffer(csvFilename.c_str());
+
+          if(!csvBuffer.is_open()) {
+            throw IException(IException::User, "Unable to open csv file!", _FILEINFO_);
+          }
+
+          while (std::getline(csvBuffer, line)) {
+            if ((line.rfind("#", 0) == 0) || (line.rfind("gain_code", 0) == 0)) {
+              continue;
+            }
+
+            std::vector<double> gainTmp(SHC_CHANNELS * 2);
+
+            std::stringstream ss(line);
+            std::string token;
+
+            std::getline(ss, token, ',');
+            if (token.empty()) {
+              throw IException(IException::User, "Gain Code not found in CSV. Loading CSV failed.", _FILEINFO_);
+            }
+
+            double gainCode = stod(token);
+
+            for (int i = 0; i < SHC_CHANNELS * 2; i++){
+              std::getline(ss, token, ',');
+              if (token.empty()){
+                throw IException(IException::User, "Expected a ',' in " + line + ". Loading CSV failed.", _FILEINFO_);
+              }
+              gainTmp.at(i) = std::stod(token);
+            }
+
+            for (int channel = 0; channel < SHC_CHANNELS; channel++) {
+              if (gainChannels.at(channel) == gainCode) {
+                gainCoeffs.at(channel) = gainTmp.at(channel + SHC_CHANNELS * tdiFactor);
+              }
+            }
+          }
+        };
+
+        // Read coefficients from CSV file
+        std::vector<double> gainFactors(SHC_CHANNELS);
+        ReadCoeffCsv(gainCoeffFilename, gainFactors);
+
+        /**
+         * @brief Applies the gain correction to each pixel
+         *
+         * Divides each pixel by the the channel's gain factor which is calculated using the values found in the CSV
+         * file provided by the user or by default.
+         *
+         * @param in The input buffer.
+         * @param out The output buffer.
+         */
+        auto CorrectBufferGain = [&gainFactors](Isis::Buffer &in, Isis::Buffer &out) -> void {
+          for (int channel = 0; channel < SHC_CHANNELS; channel++) {
+            for (int pixel = 0; pixel < SHC_AFE_WIDTH; pixel++) {
+              int index = GetDataIndex(channel, SHC_AFE_WIDTH, pixel);
+              double gainFactor = gainFactors.at(channel);
+
+              if (!IsSpecialPixelSHC(in[index])) {
+                if (gainFactor == 0) {
+                  throw IException(
+                    IException::User,
+                    QString("WARNING: Gain for channel %1: %2. Can't apply correction (divideByZero).").arg(
+                      QString::number(channel), QString::number(gainFactor)),
+                    _FILEINFO_);
+                }
+                out[index] = in[index] / gainFactor;
+              }
+              else {
+                out[index] = in[index];
+              }
+            }
+          }
+        };
+
+        ProcessByLine p;
+        CubeAttributeInput inputAtt = CubeAttributeInput();
+        CubeAttributeOutput outputAtt = CubeAttributeOutput();
+        p.SetInputCube(cubeFileIn, inputAtt, 0);
+        p.SetOutputCube(cubeFileOut, outputAtt, SHC_AFE_WIDTH * SHC_CHANNELS, lines, SHC_BANDS);
+
+        // Apply correction line by line
+        p.StartProcess(CorrectBufferGain);
+        p.EndProcess();
+        p.Finalize();
+      }
+      catch (const IException &e) {
+        QString msg = QString("ISIS Exception: %1. Unable to apply gain correction to image.").arg(QString(e.what()));
+        throw IException(e, IException::Programmer, msg, _FILEINFO_);
+      }
+      catch (const std::exception &e) {
+        QString msg = QString("Standard exception: %1. Unable to apply gain correction to image.").arg(QString(e.what()));
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+      catch (...) {
+        throw IException(IException::Programmer, "Unknown exception occurred. Unable to apply gain correction to image.", _FILEINFO_);
       }
     }
   }
