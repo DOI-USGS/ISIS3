@@ -34,7 +34,7 @@ namespace Isis {
   void shadowcam2isis(UserInterface &ui, Pvl *log) {
     try{
       const bool keepSpecial = ui.GetBoolean("KEEPSPECIALPIXELS");
-      const FileName from = static_cast<FileName>(ui.GetCubeName("FROM"));
+      const FileName from = FileName(ui.GetCubeName("FROM"));
 
       // Use a smart pointer for automatic memory management
       const auto inLabel = std::make_unique<Pvl>(from.expanded());
@@ -89,7 +89,7 @@ namespace Isis {
             return ((dn >> xTermIndex) + bTerm[xTermIndex]) & 0xff;
           }
         }
-        const QString msg = "Failed to compand value: " % toString(dn) % "\n";
+        const QString msg = QString("Failed to compand value: %1").arg(toString(dn));
         throw IException(IException::User, msg, _FILEINFO_);
       };
 
@@ -149,10 +149,8 @@ namespace Isis {
             // only decompanding non-special pixels
             out[bufferIndex] = static_cast<uint16_t>(decompanding_table[(uint16_t) tmpFloatVal]);
             if (out[bufferIndex] < 0) {
-              QString msg = "Value is less than zero for line: "
-                          % QString::number(in.Line())
-                          % ", pixel: "
-                          % QString::number(bufferIndex);
+              QString msg = QString("Value is less than zero for line: %1, pixel: %2.").arg(
+                QString::number(in.Line()), QString::number(bufferIndex));
               throw IException(IException::User, msg, _FILEINFO_);
             }
           }
@@ -187,12 +185,13 @@ namespace Isis {
       p.Finalize();
       p.ClearCubes();
     }
-    catch (const IException& e) {
-      throw IException(e, IException::Programmer, "ISIS Exception: " + Isis::toString(e.what()) + ". Unable to import ShadowCam image to ISIS", _FILEINFO_);
+    catch (const IException &e) {
+      QString msg = QString("ISIS Exception: %1. Unable to import ShadowCam image to ISIS").arg(QString(e.what()));
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     catch (const std::exception &e) {
-      cerr << "Standard exception: " << e.what() << ". Unable to import ShadowCam image to ISIS" << endl;
-      exit(1);
+      QString msg = QString("Standard exception: %1. Unable to import ShadowCam image to ISIS").arg(QString(e.what()));
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     catch (...) {
       throw IException(IException::Programmer, "Unknown exception occurred. Unable to import ShadowCam image to ISIS", _FILEINFO_);
