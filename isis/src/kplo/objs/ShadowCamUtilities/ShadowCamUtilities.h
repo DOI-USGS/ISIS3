@@ -98,7 +98,7 @@ namespace ShadowCam {
    * @return int The TDI factor
    * 
    * @internal
-   *   @history 2026-03-18 Cordell Michaud - Updated to throw an error if TDIDirection value is not "A" or "B", rather than defaulting to 0.
+   *    @history 2026-03-18 Cordell Michaud - Updated to throw an error if TDIDirection value is not "A" or "B", rather than defaulting to 0.
    */
   int GetTdiFactor(const PvlGroup &instrument);
 
@@ -110,7 +110,7 @@ namespace ShadowCam {
    * @return string The string converted to lowercase
    * 
    * @internal
-   *   @history 2026-03-18 Cordell Michaud - Modified to use QString for conversion and return std::string.
+   *    @history 2026-03-18 Cordell Michaud - Modified to use QString for conversion and return std::string.
    */
   std::string ToLower(const std::string &str);
 
