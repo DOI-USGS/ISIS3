@@ -65,8 +65,8 @@ namespace Isis {
      * @param in The input line buffer.
      * @param out The output line buffer.
      */
-    auto LoadOutputCube = [](Isis::Buffer &in, Isis::Buffer &out) -> void {
-      for(int i = 0; i < in.size(); i++){
+    std::function<void(Buffer &in, Buffer &out)> LoadOutputCube = [](Isis::Buffer &in, Isis::Buffer &out) -> void {
+      for (int i = 0; i < in.size(); i++) {
         out[i] = in[i];
       }
     };
