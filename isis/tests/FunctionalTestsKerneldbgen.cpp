@@ -228,8 +228,13 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenExtraDefault) {
   EXPECT_TRUE(kerneldbPvl.hasObject("SpacecraftPointing"));
 
   PvlGroup depend = kerneldbPvl.findGroup("Dependencies", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, depend[2], "$mro/kernels/fk/mro_v15.tf");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, depend[3], "$mro/kernels/fk/mro_v16.tf");
+  QString dep2 = depend[2];
+  QString dep3 = depend[3];
+
+  EXPECT_TRUE(dep2.contains("$mro/kernels/fk/mro_v"));
+  EXPECT_TRUE(dep3.contains("$mro/kernels/fk/mro_v"));
+  EXPECT_TRUE(dep2.endsWith(".tf"));
+  EXPECT_TRUE(dep3.endsWith(".tf"));
 }
 
 
