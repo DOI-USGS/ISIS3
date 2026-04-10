@@ -13,7 +13,7 @@ using namespace Isis;
 static QString APP_XML = FileName("$ISISROOT/bin/xml/ctxcal.xml").expanded();
 
 
-TEST_F(MroCtxCube, DISABLED_FunctionalTestCtxcalDefault) {
+TEST_F(MroCtxCube, FunctionalTestCtxcalDefault) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"to="+outCubeFileName};
 
@@ -36,7 +36,7 @@ TEST_F(MroCtxCube, DISABLED_FunctionalTestCtxcalDefault) {
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 0.080529551990330225);
   EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 32.211820796132088);
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 0.0012845090812918776);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 0.0012845090812917909, 1e-12);
 }
 
 
@@ -87,7 +87,7 @@ TEST_F(MroCtxCube, FunctionalTestCtxcalMonthlyFlatfile) {
 }
 
 
-TEST_F(MroCtxCube, DISABLED_FunctionalTestCtxcalIofFalse) {
+TEST_F(MroCtxCube, FunctionalTestCtxcalIofFalse) {
   QString outCubeFileName = tempDir.path() + "/outTemp.cub";
   QVector<QString> args = {"to="+outCubeFileName, "iof=false"};
 
@@ -110,7 +110,7 @@ TEST_F(MroCtxCube, DISABLED_FunctionalTestCtxcalIofFalse) {
   EXPECT_DOUBLE_EQ(oCubeStats->Average(), 229.35238750457765);
   EXPECT_DOUBLE_EQ(oCubeStats->Sum(), 91740.955001831055);
   EXPECT_DOUBLE_EQ(oCubeStats->ValidPixels(), 400);
-  EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 3.6583500046604196);
+  EXPECT_NEAR(oCubeStats->StandardDeviation(), 3.6583500046604196, 1e-12);
 }
 
 

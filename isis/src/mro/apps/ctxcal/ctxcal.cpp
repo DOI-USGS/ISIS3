@@ -68,6 +68,11 @@ namespace Isis {
       else {
           FileName flat;
           if (ui.GetBoolean("MONTHLYFLAT")) {
+            if (Preference::Preferences().getShowDeprecatedPref()) {
+                QString msg = "MONTHLYFLAT parameter will be deprecated in a future ISIS release. "
+                              "Use default flat file selection instead.";
+                std::cerr << msg << std::endl;
+            }
               FileName outputFileName(icube->fileName());
               QString outputFileBase = outputFileName.baseName();
 

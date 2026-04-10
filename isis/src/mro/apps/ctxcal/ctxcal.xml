@@ -218,15 +218,17 @@
         </description>
       </parameter>
       <parameter name="MONTHLYFLAT">
-      <brief> Change the default flat file to a monthly mission flat file</brief>
-      <description>
-          If turned on, ctxcal will use the default mission monthly flat file
-          for calibration.
-      </description>
-      <type>boolean</type>
-      <default>
-        <item>No</item>
-      </default>
+        <brief>Deprecated: use default flat file selection</brief>
+        <description>
+          <p>
+            <b>DEPRECATED:</b> This parameter references legacy monthly flat field
+            calibration files that are no longer supported.
+          </p>
+        </description>
+        <type>boolean</type>
+        <default>
+          <item>No</item>
+        </default>
       </parameter>
     </group>
 
