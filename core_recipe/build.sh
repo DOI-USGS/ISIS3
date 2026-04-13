@@ -1,8 +1,19 @@
 mkdir build_core
 cd build_core
-export ISISROOT=$PWD
+export ISISROOT=$PREFIX
 
-cmake -GNinja -DBUILD_CORE_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DISIS_BUILD_SWIG=ON -DCMAKE_INSTALL_PREFIX=$PREFIX ../isis/src/core
+cp $SRC_DIR/isis/src/core/IsisPreferences $ISISROOT
+cp $SRC_DIR/isis/src/core/TestPreferences $ISISROOT
+
+cmake -GNinja \
+  ${CMAKE_ARGS} \
+  -DBUILD_CORE_TESTS=OFF \
+  -DISIS_BUILD_SWIG=ON \
+  -DBUILD_COVERAGE=OFF \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=$PREFIX \
+  -DCMAKE_INSTALL_DATADIR=$PREFIX \
+  $SRC_DIR/isis/src/core
 ninja install
-cd swig/python/
-${PYTHON} setup.py install
+cd swig/python
+${PYTHON} -m pip install . --no-deps --no-build-isolation --prefix=$PREFIX
