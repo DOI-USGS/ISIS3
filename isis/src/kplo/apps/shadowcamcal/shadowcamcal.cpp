@@ -31,7 +31,12 @@
 
 namespace Isis {
   void shadowcamcal(UserInterface &ui) {
-    QString inCubeName = ui.GetCubeName("FROM");
+    FileName inCubeName = FileName(ui.GetCubeName("FROM"));
+    if (ShadowCam::isCalibrated(inCubeName)) {
+      const QString msg = "File [" + inCubeName.name() + "] is calibrated, no need to run shadowcamcal";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     std::unique_ptr<Cube> inCube = std::make_unique<Cube>(inCubeName);
     shadowcamcal(inCube.get(), ui);
   }
