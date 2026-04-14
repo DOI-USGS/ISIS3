@@ -36,6 +36,11 @@ namespace Isis {
       const bool keepSpecial = ui.GetBoolean("KEEPSPECIALPIXELS");
       const FileName from = FileName(ui.GetCubeName("FROM"));
 
+      if (ShadowCam::isCalibrated(from)) {
+        const QString msg = "File [" + from.name() + "] is calibrated, no need to run shadowcam2isis";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
       // Use a smart pointer for automatic memory management
       const auto inLabel = std::make_unique<Pvl>(from.expanded());
 
@@ -186,8 +191,8 @@ namespace Isis {
       p.ClearCubes();
     }
     catch (const IException &e) {
-      QString msg = QString("ISIS Exception: %1. Unable to import ShadowCam image to ISIS").arg(QString(e.what()));
-      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+      QString msg = QString("ISIS Exception. Unable to import ShadowCam image to ISIS");
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     catch (const std::exception &e) {
       QString msg = QString("Standard exception: %1. Unable to import ShadowCam image to ISIS").arg(QString(e.what()));

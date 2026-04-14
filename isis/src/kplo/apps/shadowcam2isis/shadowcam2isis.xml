@@ -7,7 +7,8 @@
   </brief>
 
   <description>
-      This program takes a raw EDR image from the KPLO ShadowCam (Camera) and produces an Isis cube containing the image data. ShadowCam images in the CDR or RDR format should be ingested using pds2isis.
+      This program takes a raw EDR image from the KPLO ShadowCam (Camera) and produces an Isis cube containing the image data. 
+      ShadowCam images in the CDR or RDR format can be used directly, with no processing required.
   </description>
 
   <history>
