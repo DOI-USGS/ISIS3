@@ -32,7 +32,7 @@
 namespace Isis {
   void shadowcamcal(UserInterface &ui) {
     FileName inCubeName = FileName(ui.GetCubeName("FROM"));
-    if (ShadowCam::isCalibrated(inCubeName)) {
+    if (ShadowCam::IsCalibrated(inCubeName)) {
       const QString msg = "File [" + inCubeName.name() + "] is calibrated, no need to run shadowcamcal";
       throw IException(IException::User, msg, _FILEINFO_);
     }

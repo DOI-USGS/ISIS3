@@ -131,7 +131,7 @@ namespace ShadowCam {
    * 
    * @return bool True if the file is a calibrated file, False otherwise
    */
-   bool isCalibrated(FileName file);
+   bool IsCalibrated(const FileName &file);
 }
 }
 

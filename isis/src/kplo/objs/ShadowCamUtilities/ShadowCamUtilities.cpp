@@ -109,7 +109,7 @@ namespace Isis {
       return false;
     }
 
-    bool isCalibrated(FileName file) {
+    bool IsCalibrated(const FileName &file) {
       bool isCalibrated = "c" == file.baseName().toLower().back();
       const Pvl label(file.expanded());
       const PvlGroup &dimGroup = label.findGroup("Dimensions", Pvl::Traverse);

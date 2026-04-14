@@ -36,7 +36,7 @@ namespace Isis {
       const bool keepSpecial = ui.GetBoolean("KEEPSPECIALPIXELS");
       const FileName from = FileName(ui.GetCubeName("FROM"));
 
-      if (ShadowCam::isCalibrated(from)) {
+      if (ShadowCam::IsCalibrated(from)) {
         const QString msg = "File [" + from.name() + "] is calibrated, no need to run shadowcam2isis";
         throw IException(IException::User, msg, _FILEINFO_);
       }
