@@ -232,6 +232,7 @@ Group = DataDirectory
   Hayabusa2    = $ISISDATA/hayabusa2
   Juno         = $ISISDATA/juno
   Kaguya       = $ISISDATA/kaguya
+  Kplo         = $ISISDATA/kplo
   Lo           = $ISISDATA/lo
   Lro          = $ISISDATA/lro
   Mariner10    = $ISISDATA/mariner10
