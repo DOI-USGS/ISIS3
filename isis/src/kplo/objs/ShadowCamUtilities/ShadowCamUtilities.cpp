@@ -8,10 +8,12 @@
 
 #include "FileName.h"
 #include "IException.h"
+#include "Pvl.h"
 #include "PvlContainer.h"
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
 
+#include "ShadowCamConstants.h"
 #include "ShadowCamUtilities.h"
 
 namespace Isis {
@@ -105,6 +107,14 @@ namespace Isis {
         }
       }
       return false;
+    }
+
+    bool isCalibrated(FileName file) {
+      bool isCalibrated = "c" == file.baseName().toLower().back();
+      const Pvl label(file.expanded());
+      const PvlGroup &dimGroup = label.findGroup("Dimensions", Pvl::Traverse);
+      bool isCorrectSize = int(dimGroup["Samples"]) == ShadowCam::SHC_CHANNELS * ShadowCam::SHC_AFE_WIDTH;
+      return isCalibrated || !isCorrectSize;
     }
   }
 }
