@@ -124,6 +124,14 @@ namespace ShadowCam {
    */
   bool ContainsKeyword(const std::string &line, const std::vector<std::string> &keywords);
 
+  /**
+   * @brief Check of image is a calibrated image
+   *
+   * @param file A FileName object to read
+   * 
+   * @return bool True if the file is a calibrated file, False otherwise
+   */
+   bool IsCalibrated(const FileName &file);
 }
 }
 
