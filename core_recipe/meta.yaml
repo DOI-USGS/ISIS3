@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/DOI-USGS/ISIS3/releases/download/{{ version }}/isis-{{ version }}.tar.gz
-  sha256: f08b093df48b69d465f003fff0804609db1d5b140f2157a0e9e1e9631d827109
+  sha256: 8031748b31c4321ef4598a58a20f895481edcf12d8b4c9290cd25584ad29583d
 build:
   skip: true  # [win]
   number: {{ build_number }}
@@ -23,6 +23,7 @@ requirements:
     - setuptools
   host:
     - python
+    - pip
     - gdal
     - libgl-devel  # [linux]
     - libgdal-core
@@ -48,4 +49,3 @@ about:
 extra:
   recipe-maintainers:
     - amystamile-usgs
-    
