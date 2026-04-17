@@ -169,6 +169,7 @@ def create_rclone_arguments(destination, mission_name, parsedArgs, rclone_kwargs
                   "--track-renames",
                   f"--log-level={log.getLevelName(log.getLogger().getEffectiveLevel())}"]
     extra_args.extend(filter_args)
+    extra_args.extend(rclone_kwargs)
     log.debug(f"Args created: {extra_args}")
     return extra_args
     
