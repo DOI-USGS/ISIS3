@@ -272,7 +272,7 @@ namespace Isis {
           return;
         }
 
-        hist = std::make_unique<ImageHistogram>(ImageHistogram(*cube, band, NULL, ssamp, sline, esamp, eline));
+        hist = std::make_unique<ImageHistogram>(ImageHistogram(*cube, band, NULL, std::min(ssamp, esamp),  std::min(sline, eline), std::max(ssamp, esamp), std::max(sline, eline)));
         Brick *brick = new Brick(*cube, 1, 1, 1);
 
         //For each point read that value from the cube and add it to the histogram
@@ -305,8 +305,8 @@ namespace Isis {
         esamp = round(esamp);
         eline = round(eline);
 
-        hist = std::make_unique<ImageHistogram>(ImageHistogram(*cube, band, NULL, ssamp, sline, esamp, eline));
-        int nsamps = (int)(std::fabs(esamp - ssamp) + 1);
+        hist = std::make_unique<ImageHistogram>(ImageHistogram(*cube, band, NULL, std::min(ssamp, esamp), std::min(sline, eline), std::max(ssamp, esamp), std::max(sline, eline)));
+        int nsamps = std::max(ssamp, esamp) - std::min(ssamp, esamp) + 1;
 
         Brick *brick = new Brick(*cube, nsamps, 1, 1);
 
