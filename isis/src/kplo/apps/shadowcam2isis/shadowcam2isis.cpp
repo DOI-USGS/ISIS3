@@ -181,8 +181,9 @@ namespace Isis {
 
       // Process raw EDR cube
       CubeAttributeOutput outAttr = CubeAttributeOutput("+Real");
+      Isis::CubeAttributeInput &att = ui.GetInputAttribute("FROM");
       ProcessByLine p;
-      p.SetInputCube("FROM");
+      p.SetInputCube(ui.GetCubeName("FROM"), att);
       p.SetOutputCube(ui.GetCubeName("TO"), outAttr);
       p.Progress()->SetText("Importing 8-bit EDR cube and decompanding...");
       p.StartProcess(decompand);

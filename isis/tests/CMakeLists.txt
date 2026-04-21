@@ -22,6 +22,7 @@ set(MISSION_LIBS
   hayabusa2
   juno
   kaguya
+  kplo
   lo
   lro
   mariner
