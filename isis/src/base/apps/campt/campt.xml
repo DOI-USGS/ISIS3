@@ -550,4 +550,53 @@ xsi:noNamespaceSchemaLocation=
       </parameter>
     </group>
   </groups>
+  <examples>
+
+    <example>
+      <brief>Sample/Line</brief>
+      <description>
+        Get photometric information at pixel (1, 1).  TO (optional) specifies a label filename to save output to.  FORMAT and APPEND are also used to specify output.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=ab102401.cub sample=1 line=1 to=campt_out.pvl
+        </commandLine>
+      </terminalInterface>
+    </example>
+
+    <example>
+      <brief>Latitude/Longitude</brief>
+      <description>
+        Get photometric information at lat 0, lon 270.  To use latitude and longitude, TYPE=GROUND must be specified.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=ctx.cub lat=0.0 lon=270.0 type=ground
+        </commandLine>
+      </terminalInterface>
+    </example>
+
+    <example>
+      <brief>Coordinate List</brief>
+      <description>
+        Get photometric information for a series of points.  The points should be in sample, line format (or lat, lon if COORDTYPE=GROUND is specified).
+        <pre>
+2, 3
+2, 13
+12, 13
+12, 3
+        </pre>
+        <description>
+          campt_coords.lis
+        </description>
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=ab102401.cub coordlist=campt_coords.lis to=campt_out.pvl
+        </commandLine>
+      </terminalInterface>
+    </example>
+
+
+  </examples>
 </application>
