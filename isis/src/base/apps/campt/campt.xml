@@ -240,6 +240,26 @@ xsi:noNamespaceSchemaLocation=
       <item>mappt</item>
       <item>getkey</item>
     </applications>
+    <documents>
+      <document>
+        <title>Multi-Instrument Registration</title>
+        <source>
+          <path>https://astrogeology.usgs.gov/docs/concepts/control-networks/multi-instrument-registration/</path>
+        </source>
+      </document>
+      <document>
+        <title>Camera Geometry</title>
+        <source>
+          <path>https://astrogeology.usgs.gov/docs/concepts/camera-geometry-and-projections/camera-geometry/#campt</path>
+        </source>
+      </document>
+      <document>
+        <title>HiRISE Anaglyphs</title>
+        <source>
+          <path>https://astrogeology.usgs.gov/docs/concepts/missions/mro/hirise-anaglyphs/</path>
+        </source>
+      </document>
+    </documents>
   </seeAlso>
 
   <groups>
