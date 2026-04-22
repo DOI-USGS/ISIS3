@@ -599,7 +599,7 @@ xsi:noNamespaceSchemaLocation=
     <example>
       <brief>Coordinate List</brief>
       <description>
-        Get photometric information for a series of points.  The points should be in sample, line format (or lat, lon if COORDTYPE=GROUND is specified).
+        Get photometric information for a series of points.  The points should be in sample, line format for COORDTYPE=IMAGE (or lat, lon for COORDTYPE=GROUND).  COORDTYPE is required when COORDLIST is used.
       </description>
       <inputText>
         <commandLine>2, 3
@@ -612,7 +612,7 @@ xsi:noNamespaceSchemaLocation=
       </inputText>
       <terminalInterface>
         <commandLine>
-          from=ab102401.cub coordlist=campt_coords.lis to=campt_out.pvl
+          from=ab102401.cub coordlist=campt_coords.lis coordtype=image to=campt_out.pvl
         </commandLine>
       </terminalInterface>
     </example>
