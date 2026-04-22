@@ -141,6 +141,15 @@
       display: block;
     }
 
+    .cmd-multiline {
+      padding: 1rem;
+      border-radius: 0.3rem;
+      background-color: #444;
+      color: white;
+      display: block;
+      white-space: pre-wrap;
+    }
+
     .cmd-line-caption {
       font-style: italic;
       margin-bottom: 0.5rem;

@@ -600,16 +600,16 @@ xsi:noNamespaceSchemaLocation=
       <brief>Coordinate List</brief>
       <description>
         Get photometric information for a series of points.  The points should be in sample, line format (or lat, lon if COORDTYPE=GROUND is specified).
-        <pre>
-2, 3
+      </description>
+      <inputText>
+        <commandLine>2, 3
 2, 13
 12, 13
-12, 3
-        </pre>
+12, 3   </commandLine>
         <description>
           campt_coords.lis
         </description>
-      </description>
+      </inputText>
       <terminalInterface>
         <commandLine>
           from=ab102401.cub coordlist=campt_coords.lis to=campt_out.pvl
