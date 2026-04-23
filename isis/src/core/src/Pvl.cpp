@@ -132,9 +132,18 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    CPLStringList metadata = CPLStringList(dataset->GetMetadata("json:ISIS3"), false);
+    CPLStringList metadataDomains = CPLStringList(dataset->GetMetadataDomainList(), false);
+    CPLStringList metadata;
+    const char* domainIsis = "json:ISIS3";
+    const char* domainPds = "json:PDS";
+    if (CSLFindString(metadataDomains.List(), domainIsis) != -1) {
+      metadata = CPLStringList(dataset->GetMetadata(domainIsis), false);
+    } 
+    else if (CSLFindString(metadataDomains.List(), domainPds) != -1) {
+      metadata = CPLStringList(dataset->GetMetadata(domainPds), false);
+    }
 
-    if (metadata[0] != nullptr) {
+    if (metadata.Count() > 0 && metadata[0] != nullptr) {
       const char *metadataJsonString = metadata[0];
       nlohmann::ordered_json metadataAsJson = nlohmann::ordered_json::parse(metadataJsonString);
       readObject(*this, metadataAsJson);
