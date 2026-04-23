@@ -18,6 +18,9 @@ find files of those names at the top level of this repository. **/
 #include "SpecialPixel.h"
 #include "UserInterface.h"
 
+#include "cpl_vsi.h"
+
+
 namespace Isis {
   /**
    * @brief  Byte swapper
@@ -177,6 +180,7 @@ namespace Isis {
       virtual void StartProcess(void funct(Isis::Buffer &out));
       void SetInputFile(const QString &file);
       QString InputFile();
+      void CheckVsiIo(size_t bytesRead, size_t expectedBytes, vsi_l_offset pos);
 
       // SetOutputCube() is not virtual in the Process class, so the following
       // definitions for this method are the only ones that are allowed for
