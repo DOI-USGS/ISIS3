@@ -347,22 +347,16 @@ namespace Isis {
 
 
     ProcessImport importer;
-    if (inputFileName.removeExtension().addExtension("dat").fileExists()){
-      importer.SetInputFile(inputFileName.removeExtension().addExtension("dat").expanded());
-    }
-    else if (inputFileName.removeExtension().addExtension("img").fileExists()) {
-      importer.SetInputFile(inputFileName.removeExtension().addExtension("img").expanded());
-    }
-    else if (inputFileName.removeExtension().addExtension("QUB").fileExists()) {
-      importer.SetInputFile(inputFileName.removeExtension().addExtension("QUB").expanded());
-    }
-    else if (inputFileName.removeExtension().addExtension("tif").fileExists()) {
-    QString msg = "GeoTIFFs may contain ancillary data that isisimport cannot process. "
-                  "Please convert the .TIF to a cube using another tool, such as gdal_translate.";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-    else {
-      importer.SetInputFile(inputFileName.expanded());
+    importer.SetInputFile(inputFileName.expanded());
+
+    // Check for files that match the from= file, except with these file extensions.
+    // If found, replace the data filename to import.  Check upper and lower cases for linux compatibility.
+    const QString fileExtensions[] = {"dat", "DAT", "img", "IMG", "QUB", "qub"};
+    for (const QString& ext : fileExtensions) {
+      if (inputFileName.removeExtension().addExtension(ext).fileExists()){
+        importer.SetInputFile(inputFileName.removeExtension().addExtension(ext).expanded());
+        break;
+      }
     }
 
     // Use inja to get number of lines, samples, and bands from the input label
