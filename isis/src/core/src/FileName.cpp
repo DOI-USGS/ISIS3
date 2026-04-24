@@ -275,6 +275,17 @@ namespace Isis {
   }
 
   /**
+   * Checks if the filename exists, but with the given extension instead of its own.
+   *
+   * @param ext The new file extension to check in place of any current file extension
+   *
+   * @return bool, true if file exists with given extension
+   */
+  bool FileName::existsWithExt(const QString& ext) const {
+    return removeExtension().addExtension(ext).fileExists();
+  }
+
+  /**
    * Checks to see if a file name is versioned by date or numerically. Returns true if file is
    * versioned by date or numerically; returns false otherwise.
    *

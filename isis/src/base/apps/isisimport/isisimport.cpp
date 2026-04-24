@@ -15,7 +15,6 @@
 #include "OriginalLabel.h"
 #include "OriginalXmlLabel.h"
 #include "PvlToJSON.h"
-#include "ProcessImport.h"
 #include "TextFile.h"
 #include "XmlToJson.h"
 
@@ -26,6 +25,14 @@ using namespace inja;
 using json = nlohmann::json;
 
 namespace Isis {
+
+  bool setFileIfExists(ProcessImport& fileImporter, FileName& fileName, const QString &ext) {
+    if(fileName.existsWithExt(ext)) {
+      fileImporter.SetInputFile(fileName.removeExtension().addExtension(ext).expanded());
+      return true;
+    }
+    return false;
+  }
 
   void isisimport(UserInterface &ui, Pvl *log) {
     FileName fileTemplate = ("$ISISROOT/appdata/import/fileTemplate.tpl");
@@ -351,11 +358,21 @@ namespace Isis {
 
     // Check for files that match the from= file, except with these file extensions.
     // If found, replace the data filename to import.  Check upper and lower cases for linux compatibility.
-    const QString fileExtensions[] = {"dat", "DAT", "img", "IMG", "QUB", "qub"};
+    QString fileExtensions[] = {"dat", "img", "qub"};
+    bool foundDataFile = false;
+
     for (const QString& ext : fileExtensions) {
-      if (inputFileName.removeExtension().addExtension(ext).fileExists()){
-        importer.SetInputFile(inputFileName.removeExtension().addExtension(ext).expanded());
-        break;
+      foundDataFile = setFileIfExists(importer, inputFileName, ext);
+      if (foundDataFile) break;
+      foundDataFile = setFileIfExists(importer, inputFileName, ext.toUpper());
+      if (foundDataFile) break;
+    }
+
+    if (!foundDataFile) {
+      if (inputFileName.existsWithExt("tif") || inputFileName.existsWithExt("TIF")) {
+        QString msg = "GeoTIFFs may contain ancillary data that isisimport cannot process. "
+                      "Please convert the .TIF to a cube using another tool, such as gdal_translate.";
+        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
