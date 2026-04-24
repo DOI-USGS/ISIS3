@@ -15,6 +15,7 @@
 #include "OriginalLabel.h"
 #include "OriginalXmlLabel.h"
 #include "PvlToJSON.h"
+#include "ProcessImport.h"
 #include "TextFile.h"
 #include "XmlToJson.h"
 
