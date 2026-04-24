@@ -356,11 +356,11 @@ namespace Isis {
 
     for (const QString& ext : fileExtensions) {
       if(inputFileName.setExtension(ext).fileExists()){
-        importer.SetInputFile(inputFileName.setExtension(ext).expanded());
+        importer.SetInputFile(inputFileName.expanded());
         break;
       }
       else if(inputFileName.setExtension(ext.toUpper()).fileExists()){
-        importer.SetInputFile(inputFileName.setExtension(ext.toUpper()).expanded());
+        importer.SetInputFile(inputFileName.expanded());
         break;
       }
     }
