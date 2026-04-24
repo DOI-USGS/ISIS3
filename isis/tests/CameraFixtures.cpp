@@ -1018,4 +1018,16 @@ namespace Isis {
   void OrexManyIsdCameraCubes::TearDown() {
     // passthru...
   }
+
+  void ShadowCamCube::SetUp() {
+    TempTestingFiles::SetUp();
+
+    QString testPath = tempDir.path() + "/M013_test.cub";
+    QFile::copy("data/shadowcam/M013049982SE.2isis.cal.crop.cub", testPath);
+    testCube.reset(new Cube(testPath));
+  }
+
+  void ShadowCamCube::TearDown() {
+    testCube.reset();
+  }
 }

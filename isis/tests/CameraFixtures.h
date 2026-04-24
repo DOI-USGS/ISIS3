@@ -192,6 +192,14 @@ namespace Isis {
       void TearDown() override;
   };
 
+  class ShadowCamCube : public DefaultCube {
+    protected:
+      std::unique_ptr<Cube> testCube;
+
+      void SetUp() override;
+      void TearDown() override;
+  };
+
 }
 
 #endif
