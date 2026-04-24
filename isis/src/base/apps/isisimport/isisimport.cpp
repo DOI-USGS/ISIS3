@@ -352,7 +352,6 @@ namespace Isis {
     // Check for files that match the from= file, except with these file extensions.
     // If found, replace the data filename to import.  Check upper and lower cases for linux compatibility.
     QString fileExtensions[] = {"dat", "img", "qub"};
-    bool foundDataFile = false;
 
     for (const QString& ext : fileExtensions) {
       if(inputFileName.setExtension(ext).fileExists()){
@@ -365,12 +364,10 @@ namespace Isis {
       }
     }
 
-    if (!foundDataFile) {
-      if (inputFileName.setExtension("tif").fileExists() || inputFileName.setExtension("TIF").fileExists()) {
-        QString msg = "GeoTIFFs may contain ancillary data that isisimport cannot process. "
-                      "Please convert the .TIF to a cube using another tool, such as gdal_translate.";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
+    if (inputFileName.setExtension("tif").fileExists() || inputFileName.setExtension("TIF").fileExists()) {
+      QString msg = "GeoTIFFs may contain ancillary data that isisimport cannot process. "
+                    "Please convert the .TIF to a cube using another tool, such as gdal_translate.";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Use inja to get number of lines, samples, and bands from the input label
