@@ -149,7 +149,6 @@ namespace Isis {
       FileName addExtension(const QString &extension) const;
       FileName removeExtension() const;
       FileName setExtension(const QString &extension) const;
-      bool existsWithExt(const QString &extension) const;
 
       bool isVersioned() const;
       bool isNumericallyVersioned() const;

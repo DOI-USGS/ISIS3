@@ -26,14 +26,6 @@ using json = nlohmann::json;
 
 namespace Isis {
 
-  bool setFileIfExists(ProcessImport& fileImporter, FileName& fileName, const QString &ext) {
-    if(fileName.existsWithExt(ext)) {
-      fileImporter.SetInputFile(fileName.removeExtension().addExtension(ext).expanded());
-      return true;
-    }
-    return false;
-  }
-
   void isisimport(UserInterface &ui, Pvl *log) {
     FileName fileTemplate = ("$ISISROOT/appdata/import/fileTemplate.tpl");
     json jsonData;
@@ -362,14 +354,18 @@ namespace Isis {
     bool foundDataFile = false;
 
     for (const QString& ext : fileExtensions) {
-      foundDataFile = setFileIfExists(importer, inputFileName, ext);
-      if (foundDataFile) break;
-      foundDataFile = setFileIfExists(importer, inputFileName, ext.toUpper());
-      if (foundDataFile) break;
+      if(inputFileName.setExtension(ext).fileExists()){
+        importer.SetInputFile(inputFileName.setExtension(ext).expanded());
+        break;
+      }
+      else if(inputFileName.setExtension(ext.toUpper()).fileExists()){
+        importer.SetInputFile(inputFileName.setExtension(ext.toUpper()).expanded());
+        break;
+      }
     }
 
     if (!foundDataFile) {
-      if (inputFileName.existsWithExt("tif") || inputFileName.existsWithExt("TIF")) {
+      if (inputFileName.setExtension("tif").fileExists() || inputFileName.setExtension("TIF").fileExists()) {
         QString msg = "GeoTIFFs may contain ancillary data that isisimport cannot process. "
                       "Please convert the .TIF to a cube using another tool, such as gdal_translate.";
         throw IException(IException::User, msg, _FILEINFO_);
