@@ -1399,7 +1399,11 @@ namespace Isis {
 
     // Internalize the PDS label in the PVL that was passed in
     try {
-      pdsLabel = Pvl(pdsLabelFile);
+      if (pdsLabelFile.contains((QString)"/vsi")) {
+        pdsLabel = Pvl(pdsLabelFile);
+      } else {
+        pdsLabel.read(pdsLabelFile);
+      }
     }
     catch (IException &e) {
       throw IException(e, IException::User,
