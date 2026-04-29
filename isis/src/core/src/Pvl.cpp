@@ -24,6 +24,9 @@ find files of those names at the top level of this repository. **/
 #include "Message.h"
 #include "PixelType.h"
 
+#include "cpl_vsi.h"
+
+
 namespace fs = std::filesystem;
 using json = nlohmann::json;
 using ordered_json = nlohmann::ordered_json;
@@ -128,6 +131,22 @@ namespace Isis {
     FileName dataFilename(file);
     GDALDataset *dataset = GDALDataset::FromHandle(GDALOpen(dataFilename.expanded().toStdString().c_str(), GA_ReadOnly));
     if (!dataset) {
+      if (file.contains("/vsi")) {
+        // Attempt to manually read the label via VSI buffer
+        // Needed for Cassini VIMS workflow
+        VSILFILE *fp = VSIFOpenL(file.toUtf8().constData(), "rb");
+        if (fp) {
+          char *buffer = (char *)CPLMalloc(1024 * 1024); // 1 MB
+          size_t nRead = VSIFReadL(buffer, 1, 1024 * 1024 - 1, fp);
+          buffer[nRead] = '\0'; // end sign
+          VSIFCloseL(fp);
+          this->fromString(std::string(buffer));
+          CPLFree(buffer);
+          return;
+        }
+      }
+      
+      // If it's not a VSI file or VSI open failed, then throw the error
       QString msg = "Failed opening GDALDataset from [" + dataFilename.name() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

@@ -42,6 +42,7 @@ void ReadVimsBIL(QString inFile, const PvlKeyword &suffixItems, QString outFile)
 void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType);
 void ProcessCube(Buffer &in, Buffer &out);
 void ProcessBands(Pvl &pdsLab, Cube *vimscube, VimsType vtype);
+void CheckVsiIo(QString inFile,  size_t bytesRead, size_t expectedBytes, vsi_l_offset pos);
 
 //***********************************************************************
 //   IsisMain()
@@ -254,27 +255,25 @@ void ReadVimsBIL(QString inFileName, const PvlKeyword &suffixItems, QString outF
   tok = tok.toUpper();
   Isis::EndianSwapper swapper(tok);
 
-  ifstream fin;
   // Open input file
   Isis::FileName inFile(inFileName);
-  fin.open(inFileName.toLatin1().data(), ios::in | ios::binary);
-  if(!fin.is_open()) {
+
+  // Number of bytes read
+  size_t nRead = 0;
+
+  VSILFILE *fp = VSIFOpenL(inFileName.toLatin1().data(), "rb");
+  if (fp == nullptr) {
     QString msg = "Cannot open input file [" + inFileName + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
-
+  
   // Handle the file header
-  streampos pos = fin.tellg();
+  vsi_l_offset pos = VSIFTellL(fp);
   int fileHeaderBytes = (int)(IString)pdsXlater.Translate("DataFileRecordBytes") *
                         ((int)(IString)pdsXlater.Translate("DataStart", 0) - 1);
 
-  fin.seekg(fileHeaderBytes, ios_base::beg);
-
-  // Check the last io
-  if(!fin.good()) {
-    QString msg = "Cannot read file [" + inFileName + "]. Position [" +
-                 toString((int)pos) + "]. Byte count [" +
-                 toString(fileHeaderBytes) + "]" ;
+  if (VSIFSeekL(fp, fileHeaderBytes, SEEK_SET) != 0) {
+    QString msg = "VSI Error: Cannot seek to header in [" + inFileName + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -297,15 +296,9 @@ void ReadVimsBIL(QString inFileName, const PvlKeyword &suffixItems, QString outF
       }
 
       // Get a line of data from the input file
-      pos = fin.tellg();
-      fin.read(in, readBytes);
-
-      if(!fin.good()) {
-        QString msg = "Cannot read file [" + inFileName + "]. Position [" +
-                     toString((int)pos) + "]. Byte count [" +
-                     toString(readBytes) + "]" ;
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
+      pos = VSIFTellL(fp);
+      nRead = VSIFReadL(in, 1, readBytes, fp);
+      CheckVsiIo(inFileName, nRead, readBytes, pos);
 
       // Swap the bytes if necessary and convert any out of bounds pixels
       // to special pixels
@@ -340,9 +333,10 @@ void ReadVimsBIL(QString inFileName, const PvlKeyword &suffixItems, QString outF
       outCube.write(out);
 
       if(toInt(suffixItems[0]) != 0) {
-        pos = fin.tellg();
+        pos = VSIFTellL(fp);
         char *sideplaneData = new char[4*toInt(suffixItems[0])];
-        fin.read(sideplaneData, 4 * toInt(suffixItems[0]));
+        nRead = VSIFReadL(sideplaneData, 1, 4 * toInt(suffixItems[0]), fp);
+        CheckVsiIo(inFileName, nRead, 4 * toInt(suffixItems[0]), pos);
         int suffixData = (int)swapper.Int((int *)sideplaneData);
         record[0] = line + 1;
         record[1] = band + 1;
@@ -371,35 +365,22 @@ void ReadVimsBIL(QString inFileName, const PvlKeyword &suffixItems, QString outF
         }
 
         delete [] sideplaneData;
-
-        // Check the last io
-        if(!fin.good()) {
-          QString msg = "Cannot read file [" + inFileName + "]. Position [" +
-                       toString((int)pos) + "]. Byte count [" +
-                       toString(4) + "]" ;
-          throw IException(IException::Io, msg, _FILEINFO_);
-        }
       }
     } // End band loop
 
     int backplaneSize = toInt(suffixItems[1]) * (4 * (ns + toInt(suffixItems[0])));
-    fin.seekg(backplaneSize, ios_base::cur);
 
-    // Check the last io
-    if(!fin.good()) {
-      QString msg = "Cannot read file [" + inFileName + "]. Position [" +
-                   toString((int)pos) + "]. Byte count [" +
-                   toString(4 * (4 * ns + 4)) + "]" ;
+    if (VSIFSeekL(fp, backplaneSize, SEEK_SET) != 0) {
+      QString msg = "VSI Error: Cannot seek to header in [" + inFileName + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
-
   } // End line loop
 
   outCube.write(sideplaneVisTable);
   outCube.write(sideplaneIrTable);
 
   // Close the file and clean up
-  fin.close();
+  VSIFCloseL(fp);
   outCube.close();
   delete [] in;
 }
@@ -537,4 +518,14 @@ void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
   vimscube->putGroup(archive);
 
   ProcessBands(pdsLab, vimscube, vType);
+}
+
+void CheckVsiIo(QString inFile, size_t bytesRead, size_t expectedBytes, vsi_l_offset pos) {
+  if (bytesRead != expectedBytes) {
+    QString msg = "Cannot read file [" + inFile + "]." + 
+                  "Position [" + toString((int)pos) + "]." + 
+                  "Byte count [" + toString((long long)bytesRead) + "]." +
+                  "Expected byte count [" + toString((long long)expectedBytes) + "]." ;
+    throw IException(IException::Io, msg, _FILEINFO_);
+  }
 }
