@@ -1376,6 +1376,7 @@ namespace Isis {
     Isis::FileName inFile(p_inFile);
     QString inFileName(inFile.expanded());
 
+    // Number of bytes read
     size_t nRead = 0;
 
     VSILFILE *fp = VSIFOpenL(inFileName.toLatin1().data(), "rb");
@@ -1432,7 +1433,7 @@ namespace Isis {
       }
       else {
         VSIFSeekL(fp, p_dataHeaderBytes, SEEK_CUR);
-       }
+      }
 
       // Space for storing prefix and suffix data pointers
       vector<char *> tempPre, tempPost;
@@ -1590,34 +1591,29 @@ namespace Isis {
     tok = tok.toUpper();
     Isis::EndianSwapper swapper(tok);
 
-    ifstream fin;
     // Open input file
     Isis::FileName inFile(p_inFile);
     QString inFileName(inFile.expanded());
-    fin.open(inFileName.toLatin1().data(), ios::in | ios::binary);
-    if (!fin.is_open()) {
+
+    // Number of bytes read
+    size_t nRead = 0;
+    VSILFILE *fp = VSIFOpenL(inFileName.toLatin1().data(), "rb");
+    if (fp == nullptr) {
       QString msg = "Cannot open input file [" + p_inFile + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     // Handle the file header
-    streampos pos = fin.tellg();
+    vsi_l_offset pos = VSIFTellL(fp);
 
     if (p_saveFileHeader) {
       p_fileHeader = new char[p_fileHeaderBytes];
-      fin.read(p_fileHeader, p_fileHeaderBytes);
-      fin.seekg(p_suffixData+p_fileHeaderBytes, ios_base::beg);
+      nRead = VSIFReadL(p_fileHeader, 1, p_fileHeaderBytes, fp);
+      CheckVsiIo(nRead, p_fileHeaderBytes, pos);
+      VSIFSeekL(fp, p_suffixData+p_fileHeaderBytes, SEEK_SET);
     }
     else {
-      fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
-    }
-
-    // Check the last io
-    if (!fin.good()) {
-      QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                   toString((int)pos) + "]. Byte count [" +
-                   toString(p_fileHeaderBytes) + "]" ;
-      throw IException(IException::Io, msg, _FILEINFO_);
+      VSIFSeekL(fp, p_fileHeaderBytes+p_suffixData, SEEK_SET);
     }
 
     // Construct a line buffer manager
@@ -1651,45 +1647,24 @@ namespace Isis {
           mult = p_mult[0];
         }
 
-        // Check the last io
-        if (!fin.good()) {
-          QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       toString((int)pos) + "]. Byte count [" +
-                       toString(p_dataHeaderBytes) + "]" ;
-          throw IException(IException::Io, msg, _FILEINFO_);
-        }
-
         // Space for storing prefix and suffix data pointers
         vector<char *> tempPre, tempPost;
 
         // Handle any line prefix bytes
-        pos = fin.tellg();
+        pos = VSIFTellL(fp);
         if (p_saveDataPre) {
           tempPre.push_back(new char[p_dataPreBytes]);
-          fin.read(tempPre.back(), p_dataPreBytes);
+          nRead = VSIFReadL(tempPre.back(), 1, p_dataPreBytes, fp);
+          CheckVsiIo(nRead, p_dataPreBytes, pos);
         }
         else {
-          fin.seekg(p_dataPreBytes, ios_base::cur);
+          VSIFSeekL(fp, p_dataPreBytes, SEEK_CUR);
         }
-
-        // Check the last io
-        if (!fin.good()) {
-          QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       toString((int)pos) + "]. Byte count [" +
-                       toString(p_dataPreBytes) + "]" ;
-          throw IException(IException::Io, msg, _FILEINFO_);
-        }
-
 
         // Get a line of data from the input file
-        pos = fin.tellg();
-        fin.read(in, readBytes);
-        if (!fin.good()) {
-          QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       toString((int)pos) + "]. Byte count [" +
-                       toString(readBytes) + "]" ;
-          throw IException(IException::Io, msg, _FILEINFO_);
-        }
+        pos = VSIFTellL(fp);
+        nRead = VSIFReadL(in, 1, readBytes, fp);
+        CheckVsiIo(nRead, readBytes, pos);
 
         // Swap the bytes if necessary and convert any out of bounds pixels
         // to special pixels
@@ -1746,21 +1721,14 @@ namespace Isis {
         p_progress->CheckStatus();
 
         // Handle any line suffix bytes
-        pos = fin.tellg();
+        pos = VSIFTellL(fp);
         if (p_saveDataPost) {
           tempPost.push_back(new char[p_dataPostBytes]);
-          fin.read(tempPost.back(), p_dataPostBytes);
+          nRead = VSIFReadL(tempPost.back(), 1, p_dataPostBytes, fp);
+          CheckVsiIo(nRead, p_dataPostBytes, pos);
         }
         else {
-          fin.seekg(p_dataPostBytes, ios_base::cur);
-        }
-
-        // Check the last io
-        if (!fin.good()) {
-          QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       toString((int)pos) + "]. Byte count [" +
-                       toString(p_dataPreBytes) + "]" ;
-          throw IException(IException::Io, msg, _FILEINFO_);
+          VSIFSeekL(fp, p_dataPostBytes, SEEK_CUR);
         }
 
         // Save off the prefix bytes vector
@@ -1775,40 +1743,24 @@ namespace Isis {
           tempPost.clear();
         }
 
-        // Check the last io
-        if (!fin.good()) {
-          QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       toString((int)pos) + "]. Byte count [" +
-                       toString(p_fileHeaderBytes) + "]" ;
-          throw IException(IException::Io, msg, _FILEINFO_);
-        }
-
       } // End band loop
 
     } // End line loop
 
     // Handle the file trailer
-    pos = fin.tellg();
+    pos = VSIFTellL(fp);
     if (p_saveFileTrailer) {
-      fin.seekg(0, ios_base::end);
-      streampos e = fin.tellg();
-      p_fileTrailerBytes = (int)(e - pos + (streampos)1);
+      VSIFSeekL(fp, 0, SEEK_END);
+      vsi_l_offset e = VSIFTellL(fp);
+      p_fileTrailerBytes = (int)(e - pos); //(int)(e - pos + (streampos)1);
       p_fileTrailer = new char[p_fileTrailerBytes];
-      fin.seekg(pos);
-      fin.read(p_fileTrailer, p_fileTrailerBytes);
-
-      // Check the io
-      if (!fin.good()) {
-        QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     toString((int)pos) + "]. Byte count [" +
-                     toString(p_fileTrailerBytes) + "]" ;
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
-
+      VSIFSeekL(fp, pos, SEEK_SET);
+      nRead = VSIFReadL(p_fileTrailer, 1, p_fileTrailerBytes, fp);
+      CheckVsiIo(nRead, p_fileTrailerBytes, pos);
     }
 
     // Close the file and clean up
-    fin.close();
+    VSIFCloseL(fp);
     delete [] in;
   }
 
@@ -1830,33 +1782,29 @@ namespace Isis {
     tok = tok.toUpper();
     Isis::EndianSwapper swapper(tok);
 
-    ifstream fin;
     // Open input file
     Isis::FileName inFile(p_inFile);
     QString inFileName(inFile.expanded());
-    fin.open(inFileName.toLatin1().data(), ios::in | ios::binary);
-    if (!fin.is_open()) {
+    
+    // Number of bytes read
+    size_t nRead = 0;
+
+    VSILFILE *fp = VSIFOpenL(inFileName.toLatin1().data(), "rb");
+    if (fp == nullptr) {
       QString msg = "Cannot open input file [" + p_inFile + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     // Handle the file header
-    streampos pos = fin.tellg();
+    vsi_l_offset pos = VSIFTellL(fp);
     if (p_saveFileHeader) {
       p_fileHeader = new char[p_fileHeaderBytes];
-      fin.read(p_fileHeader, p_fileHeaderBytes);
-      fin.seekg(p_suffixData+p_fileHeaderBytes, ios_base::beg);
+      nRead = VSIFReadL(p_fileHeader, 1, p_fileHeaderBytes, fp);
+      CheckVsiIo(nRead, p_fileHeaderBytes, pos);
+      VSIFSeekL(fp, p_suffixData+p_fileHeaderBytes, SEEK_SET);
     }
     else {
-      fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
-    }
-
-    // Check the last io
-    if (!fin.good()) {
-      QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                   toString((int)pos) + "]. Byte count [" +
-                   toString(p_fileHeaderBytes) + "]" ;
-      throw IException(IException::Io, msg, _FILEINFO_);
+      VSIFSeekL(fp, p_fileHeaderBytes+p_suffixData, SEEK_SET);
     }
 
     OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
@@ -1882,34 +1830,14 @@ namespace Isis {
 
     // Loop for each line
     for(int line = 0; line < p_nl; line++) {
-      // Check the last io
-      if (!fin.good()) {
-        QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     toString((int)pos) + "]. Byte count [" +
-                     toString(p_dataHeaderBytes) + "]" ;
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
 
       // Space for storing prefix and suffix data pointers
       vector<char *> tempPre, tempPost;
 
-      // Check the last io
-      if (!fin.good()) {
-        QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     toString((int)pos) + "]. Byte count [" +
-                     toString(p_dataPreBytes) + "]" ;
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
-
       // Get a line of data from the input file
-      pos = fin.tellg();
-      fin.read(in, readBytes);
-      if (!fin.good()) {
-        QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     toString((int)pos) + "]. Byte count [" +
-                     toString(readBytes) + "]" ;
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
+      pos = VSIFTellL(fp);
+      nRead = VSIFReadL(in, 1, readBytes, fp);
+      CheckVsiIo(nRead, readBytes, pos);
 
       // Loop for each band
       for(int band = 0; band < p_nb; band++) {
@@ -2003,30 +1931,15 @@ namespace Isis {
         tempPost.clear();
       }
 
-      // Check the last io
-      if (!fin.good()) {
-        QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     toString((int)pos) + "]. Byte count [" +
-                     toString(p_dataPreBytes) + "]" ;
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
-
       // Handle the data trailer
-      pos = fin.tellg();
+      pos = VSIFTellL(fp);
       if (p_saveDataTrailer) {
         p_dataTrailer.push_back(new char[p_dataTrailerBytes]);
-        fin.read(p_dataTrailer.back(), p_dataTrailerBytes);
+        nRead = VSIFReadL(p_dataTrailer.back(), 1, p_dataTrailerBytes, fp);
+        CheckVsiIo(nRead, p_dataTrailerBytes, pos);
       }
       else {
-        fin.seekg(p_dataTrailerBytes, ios_base::cur);
-      }
-
-      // Check the last io
-      if (!fin.good()) {
-        QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     toString((int)pos) + "]. Byte count [" +
-                     toString(p_fileHeaderBytes) + "]" ;
-        throw IException(IException::Io, msg, _FILEINFO_);
+        VSIFSeekL(fp, p_dataTrailerBytes, SEEK_CUR);
       }
 
       p_progress->CheckStatus();
@@ -2034,27 +1947,19 @@ namespace Isis {
     } // End line loop
 
     // Handle the file trailer
-    pos = fin.tellg();
+    pos = VSIFTellL(fp);
     if (p_saveFileTrailer) {
-      fin.seekg(0, ios_base::end);
-      streampos e = fin.tellg();
-      p_fileTrailerBytes = (int)(e - pos + (streampos)1);
+      VSIFSeekL(fp, 0, SEEK_END);
+      vsi_l_offset e = VSIFTellL(fp);
+      p_fileTrailerBytes = (int)(e - pos);
       p_fileTrailer = new char[p_fileTrailerBytes];
-      fin.seekg(pos);
-      fin.read(p_fileTrailer, p_fileTrailerBytes);
-
-      // Check the io
-      if (!fin.good()) {
-        QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     toString((int)pos) + "]. Byte count [" +
-                     toString(p_fileTrailerBytes) + "]" ;
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
-
+      VSIFSeekL(fp, pos, SEEK_SET);
+      nRead = VSIFReadL(p_fileTrailer, 1, p_fileTrailerBytes, fp);
+      CheckVsiIo(nRead, p_fileTrailerBytes, pos);
     }
 
     // Close the file and clean up
-    fin.close();
+    VSIFCloseL(fp);
     delete [] in;
 
   }
