@@ -524,8 +524,8 @@ void CheckVsiIo(QString inFile, size_t bytesRead, size_t expectedBytes, vsi_l_of
   if (bytesRead != expectedBytes) {
     QString msg = "Cannot read file [" + inFile + "]." + 
                   "Position [" + toString((int)pos) + "]." + 
-                  "Byte count [" + toString((long long)bytesRead) + "]." +
-                  "Expected byte count [" + toString((long long)expectedBytes) + "]." ;
+                  "Byte count [" + toString((Isis::BigInt)bytesRead) + "]." +
+                  "Expected byte count [" + toString((Isis::BigInt)expectedBytes) + "]." ;
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 }

@@ -2188,8 +2188,8 @@ namespace Isis {
     if (bytesRead != expectedBytes) {
       QString msg = "Cannot read file [" + p_inFile + "]." + 
                     "Position [" + toString((int)pos) + "]." + 
-                    "Byte count [" + toString((long long)bytesRead) + "]." +
-                    "Expected byte count [" + toString((long long)expectedBytes) + "]." ;
+                    "Byte count [" + toString((Isis::BigInt)bytesRead) + "]." +
+                    "Expected byte count [" + toString((Isis::BigInt)expectedBytes) + "]." ;
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
